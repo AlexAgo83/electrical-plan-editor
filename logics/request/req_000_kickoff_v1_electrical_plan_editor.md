@@ -1,7 +1,7 @@
 ## req_000_kickoff_v1_electrical_plan_editor - Kickoff V1 Electrical Plan Editor
 > From version: 0.1.0
-> Understanding: 97%
-> Confidence: 95%
+> Understanding: 99%
+> Confidence: 97%
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -77,3 +77,14 @@ Architecture reference for implementation kickoff:
 - Bundle diameter/sheath handling.
 - Slack/connectors margin rules.
 - Advanced industrial export (detailed BOM, manufacturer standard outputs).
+
+# Backlog
+- `item_000_v1_foundation_domain_model_and_store.md`
+- `item_001_v1_connector_management_and_cavity_occupancy.md`
+- `item_002_v1_splice_management_and_port_occupancy.md`
+- `item_003_v1_routing_network_nodes_segments_and_sub_networks.md`
+- `item_004_v1_shortest_path_engine_and_deterministic_tie_break.md`
+- `item_005_v1_wire_lifecycle_auto_routing_and_forced_route_lock.md`
+- `item_006_v1_network_and_synthesis_views.md`
+- `item_007_v1_local_persistence_and_save_schema_versioning.md`
+- `item_008_v1_validation_matrix_and_acceptance_test_coverage.md`
