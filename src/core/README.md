@@ -22,3 +22,10 @@ Each entity uses a branded string ID type (`ConnectorId`, `SpliceId`, `NodeId`, 
 
 `graph.ts` provides `buildRoutingGraphIndex(...)` to construct a bidirectional adjacency index from nodes and segments.
 This index is used by selectors and is the baseline for shortest-path routing in upcoming items.
+
+## Shortest Path
+
+`pathfinding.ts` provides `findShortestRoute(...)` with V1 deterministic rules:
+- shortest total length first,
+- then fewer segments on equal length,
+- then stable segment ID ordering as fallback tie-break.

@@ -1,8 +1,8 @@
 ## item_004_v1_shortest_path_engine_and_deterministic_tie_break - V1 Shortest Path Engine and Deterministic Tie Break
 > From version: 0.1.0
-> Understanding: 96%
-> Confidence: 94%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,3 +36,7 @@ V1 requires automatic routing to the shortest path with deterministic behavior. 
 - Related AC: AC2.
 - References:
   - `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`
+  - `src/core/pathfinding.ts`
+  - `src/store/selectors.ts`
+  - `src/app/App.tsx`
+  - `src/tests/core.pathfinding.spec.ts`

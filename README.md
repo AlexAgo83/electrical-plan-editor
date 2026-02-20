@@ -37,6 +37,12 @@ Routing network item `item_003` is implemented:
 - Sub-network grouping tag on segments with summary visualization.
 - Graph index builder (`src/core/graph.ts`) consumable by routing logic.
 
+Shortest-path item `item_004` is implemented:
+- Dijkstra-based routing engine in `src/core/pathfinding.ts`.
+- Deterministic tie-break: shortest length, then fewer segments, then stable segment ID ordering.
+- Route computation API exposed via `findShortestRoute(...)` and `selectShortestRouteBetweenNodes(...)`.
+- Route preview panel integrated in the app for graph-level validation.
+
 ## V1 Scope
 
 - Connector management with cavity occupancy constraints.

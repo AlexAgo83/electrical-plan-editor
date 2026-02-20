@@ -22,6 +22,7 @@ import {
   selectSegmentById,
   selectSegments,
   selectSelection,
+  selectShortestRouteBetweenNodes,
   selectSpliceById,
   selectSplicePortStatuses,
   selectSpliceTechnicalIdTaken,
@@ -106,6 +107,8 @@ export function App(): ReactElement {
   const [segmentLengthMm, setSegmentLengthMm] = useState("120");
   const [segmentSubNetworkTag, setSegmentSubNetworkTag] = useState("");
   const [segmentFormError, setSegmentFormError] = useState<string | null>(null);
+  const [routePreviewStartNodeId, setRoutePreviewStartNodeId] = useState("");
+  const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
 
   const selected = selectSelection(state);
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
@@ -150,6 +153,17 @@ export function App(): ReactElement {
     (sum, nodeId) => sum + (routingGraph.edgesByNodeId[nodeId]?.length ?? 0),
     0
   );
+  const routePreview = useMemo(() => {
+    if (routePreviewStartNodeId.length === 0 || routePreviewEndNodeId.length === 0) {
+      return null;
+    }
+
+    return selectShortestRouteBetweenNodes(
+      state,
+      routePreviewStartNodeId as NodeId,
+      routePreviewEndNodeId as NodeId
+    );
+  }, [state, routePreviewStartNodeId, routePreviewEndNodeId]);
 
   const lastError = selectLastError(state);
 
@@ -1104,6 +1118,47 @@ export function App(): ReactElement {
               Segment: {selectedSegment === null ? "none" : `${selectedSegment.id} (${selectedSegment.lengthMm} mm)`}
             </p>
           </div>
+
+          <h3 className="summary-title">Route preview</h3>
+          <form className="row-form">
+            <label>
+              Start node
+              <select value={routePreviewStartNodeId} onChange={(event) => setRoutePreviewStartNodeId(event.target.value)}>
+                <option value="">Select node</option>
+                {nodes.map((node) => (
+                  <option key={node.id} value={node.id}>
+                    {describeNode(node)}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              End node
+              <select value={routePreviewEndNodeId} onChange={(event) => setRoutePreviewEndNodeId(event.target.value)}>
+                <option value="">Select node</option>
+                {nodes.map((node) => (
+                  <option key={node.id} value={node.id}>
+                    {describeNode(node)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </form>
+
+          {routePreviewStartNodeId.length > 0 && routePreviewEndNodeId.length > 0 ? (
+            routePreview === null ? (
+              <p className="empty-copy">No route currently exists between the selected nodes.</p>
+            ) : (
+              <div className="selection-snapshot">
+                <p>Length: {routePreview.totalLengthMm} mm</p>
+                <p>Segments: {routePreview.segmentIds.length === 0 ? "(none)" : routePreview.segmentIds.join(" -> ")}</p>
+                <p>Nodes: {routePreview.nodeIds.join(" -> ")}</p>
+              </div>
+            )
+          ) : (
+            <p className="empty-copy">Select start and end nodes to preview shortest path routing.</p>
+          )}
         </section>
       </section>
     </main>

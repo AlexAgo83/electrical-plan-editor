@@ -11,6 +11,7 @@ import type {
   WireId
 } from "../core/entities";
 import { buildRoutingGraphIndex, type RoutingGraphIndex } from "../core/graph";
+import { findShortestRoute, type ShortestRouteResult } from "../core/pathfinding";
 import type { AppState, SelectionState } from "./types";
 
 function selectCollection<T, Id extends string>(
@@ -201,4 +202,12 @@ export function selectSubNetworkSummaries(state: AppState): SubNetworkSummary[] 
 
 export function selectRoutingGraphIndex(state: AppState): RoutingGraphIndex {
   return buildRoutingGraphIndex(selectNodes(state), selectSegments(state));
+}
+
+export function selectShortestRouteBetweenNodes(
+  state: AppState,
+  fromNodeId: NodeId,
+  toNodeId: NodeId
+): ShortestRouteResult | null {
+  return findShortestRoute(selectRoutingGraphIndex(state), fromNodeId, toNodeId);
 }
