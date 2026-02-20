@@ -6,7 +6,7 @@ The V1 goal is to model connectors, splices, routing segments, and wires as a de
 
 ## Project Status
 
-This repository is currently in **Wave 3 completion**:
+This repository is currently in **V1 kickoff ready** status:
 - Product request is defined in `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`.
 - Target architecture is defined in `logics/architecture/target_reference_v1_frontend_local_first.md`.
 - Backlog is split into 9 V1 items in `logics/backlog/`.
@@ -134,6 +134,8 @@ npm run typecheck
 npm run test:ci
 npm run test:e2e
 ```
+
+GitHub Actions CI is available in `.github/workflows/ci.yml` and runs the same baseline checks on pushes/PRs.
 
 Note: npm-based checks are target validation gates for the upcoming application implementation phase.
 

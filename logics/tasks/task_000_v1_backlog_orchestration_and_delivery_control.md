@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 96%
+> Progress: 100%
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -26,8 +26,8 @@ Backlog scope covered:
 - [x] 2. Deliver Wave 1 (`item_000` -> `item_004`) with domain and routing validations
 - [x] 3. Deliver Wave 2 (`item_005` -> `item_007`) with UI and persistence validations
 - [x] 4. Deliver Wave 3 (`item_008`) and verify AC1..AC6 traceability
-- [ ] 5. Publish V1 kickoff readiness report (status, risks, blocked items)
-- [ ] FINAL: Update related Logics docs
+- [x] 5. Publish V1 kickoff readiness report (status, risks, blocked items)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -46,8 +46,23 @@ Backlog scope covered:
 
 # Report
 - Wave status: Wave 1 completed (`item_000` to `item_004`). Wave 2 completed (`item_005` to `item_007`). Wave 3 completed (`item_008`).
-- Current blockers: none identified at orchestration creation.
+- Current blockers: none.
 - Main risks to track:
   - Routing determinism edge cases on equal-cost paths.
   - Occupancy consistency between model and views.
   - State migration safety once persistence is active.
+
+# V1 Kickoff Readiness
+- Status: ready for V1 kickoff.
+- Scope completion: all backlog items (`item_000` .. `item_008`) are marked `Progress: 100%`.
+- Quality gates:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` passes.
+  - `npm run lint` passes.
+  - `npm run typecheck` passes.
+  - `npm run test:ci` passes.
+  - `npm run test:e2e` passes.
+- CI baseline: automated pipeline available in `.github/workflows/ci.yml` running docs lint, lint, typecheck, unit/integration, and E2E smoke.
+- Blocking items: none.
+- Residual risks:
+  - Future schema migrations beyond v1 snapshot format need dedicated migration tests per schema bump.
+  - Additional E2E scenarios may be needed when introducing richer editing interactions or larger network datasets.

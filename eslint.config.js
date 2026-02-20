@@ -6,7 +6,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 
 export default tseslint.config(
   {
-    ignores: ["dist", "coverage", "node_modules", "playwright-report"]
+    ignores: ["dist", "coverage", "node_modules", "playwright-report", "test-results"]
   },
   {
     files: ["**/*.{ts,tsx}"],
