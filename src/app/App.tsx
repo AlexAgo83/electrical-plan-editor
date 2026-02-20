@@ -1,4 +1,13 @@
-import { type FormEvent, type MouseEvent as ReactMouseEvent, type ReactElement, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import {
+  type FormEvent,
+  type MouseEvent as ReactMouseEvent,
+  type ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore
+} from "react";
 import type {
   Connector,
   ConnectorId,
@@ -74,8 +83,65 @@ interface NodePosition {
   y: number;
 }
 
+type SortField = "name" | "technicalId";
+type SortDirection = "asc" | "desc";
+
+interface SortState {
+  field: SortField;
+  direction: SortDirection;
+}
+
+interface ConnectorSynthesisRow {
+  wireId: WireId;
+  wireName: string;
+  wireTechnicalId: string;
+  localEndpointLabel: string;
+  remoteEndpointLabel: string;
+  lengthMm: number;
+}
+
+interface SpliceSynthesisRow {
+  wireId: WireId;
+  wireName: string;
+  wireTechnicalId: string;
+  localEndpointLabel: string;
+  remoteEndpointLabel: string;
+  lengthMm: number;
+}
+
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
+}
+
+function sortByNameAndTechnicalId<T>(
+  items: T[],
+  sortState: SortState,
+  getName: (item: T) => string,
+  getTechnicalId: (item: T) => string
+): T[] {
+  return [...items].sort((left, right) => {
+    const leftPrimary = sortState.field === "name" ? getName(left) : getTechnicalId(left);
+    const rightPrimary = sortState.field === "name" ? getName(right) : getTechnicalId(right);
+    const primaryComparison = leftPrimary.localeCompare(rightPrimary, undefined, { sensitivity: "base" });
+    if (primaryComparison !== 0) {
+      return sortState.direction === "asc" ? primaryComparison : -primaryComparison;
+    }
+
+    const leftSecondary = sortState.field === "name" ? getTechnicalId(left) : getName(left);
+    const rightSecondary = sortState.field === "name" ? getTechnicalId(right) : getName(right);
+    return leftSecondary.localeCompare(rightSecondary, undefined, { sensitivity: "base" });
+  });
+}
+
+function nextSortState(current: SortState, field: SortField): SortState {
+  if (current.field !== field) {
+    return { field, direction: "asc" };
+  }
+
+  return {
+    field,
+    direction: current.direction === "asc" ? "desc" : "asc"
+  };
 }
 
 function createNodePositionMap(nodes: NetworkNode[]): Record<NodeId, NodePosition> {
@@ -183,6 +249,17 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
   const [activeScreen, setActiveScreen] = useState<ScreenId>("modeling");
   const [activeSubScreen, setActiveSubScreen] = useState<SubScreenId>("connector");
+  const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
+  const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
+  const [wireSort, setWireSort] = useState<SortState>({ field: "name", direction: "asc" });
+  const [connectorSynthesisSort, setConnectorSynthesisSort] = useState<SortState>({
+    field: "name",
+    direction: "asc"
+  });
+  const [spliceSynthesisSort, setSpliceSynthesisSort] = useState<SortState>({
+    field: "name",
+    direction: "asc"
+  });
   const [manualNodePositions, setManualNodePositions] = useState<Record<NodeId, NodePosition>>({} as Record<NodeId, NodePosition>);
   const [draggingNodeId, setDraggingNodeId] = useState<NodeId | null>(null);
 
@@ -263,6 +340,23 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const isNodeSubScreen = activeSubScreen === "node";
   const isSegmentSubScreen = activeSubScreen === "segment";
   const isWireSubScreen = activeSubScreen === "wire";
+  const describeWireEndpoint = useCallback((endpoint: WireEndpoint): string => {
+    if (endpoint.kind === "connectorCavity") {
+      const connector = connectorMap.get(endpoint.connectorId);
+      if (connector === undefined) {
+        return `Connector ${endpoint.connectorId} / C${endpoint.cavityIndex}`;
+      }
+
+      return `${connector.name} (${connector.technicalId}) / C${endpoint.cavityIndex}`;
+    }
+
+    const splice = spliceMap.get(endpoint.spliceId);
+    if (splice === undefined) {
+      return `Splice ${endpoint.spliceId} / P${endpoint.portIndex}`;
+    }
+
+    return `${splice.name} (${splice.technicalId}) / P${endpoint.portIndex}`;
+  }, [connectorMap, spliceMap]);
 
   useEffect(() => {
     const validNodeIds = new Set(nodes.map((node) => node.id));
@@ -283,85 +377,116 @@ export function App({ store = appStore }: AppProps): ReactElement {
     });
   }, [nodes]);
 
-  const connectorSynthesisRows = selectedConnector === null
-    ? []
-    : wires
-        .flatMap((wire) => {
-          const entries: Array<{
-            wireId: WireId;
-            wireName: string;
-            wireTechnicalId: string;
-            localEndpointLabel: string;
-            remoteEndpointLabel: string;
-            lengthMm: number;
-          }> = [];
+  const connectorSynthesisRows = useMemo<ConnectorSynthesisRow[]>(() => {
+    if (selectedConnector === null) {
+      return [];
+    }
 
-          if (wire.endpointA.kind === "connectorCavity" && wire.endpointA.connectorId === selectedConnector.id) {
-            entries.push({
-              wireId: wire.id,
-              wireName: wire.name,
-              wireTechnicalId: wire.technicalId,
-              localEndpointLabel: `C${wire.endpointA.cavityIndex}`,
-              remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
-              lengthMm: wire.lengthMm
-            });
-          }
+    return wires.flatMap((wire) => {
+      const entries: ConnectorSynthesisRow[] = [];
 
-          if (wire.endpointB.kind === "connectorCavity" && wire.endpointB.connectorId === selectedConnector.id) {
-            entries.push({
-              wireId: wire.id,
-              wireName: wire.name,
-              wireTechnicalId: wire.technicalId,
-              localEndpointLabel: `C${wire.endpointB.cavityIndex}`,
-              remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
-              lengthMm: wire.lengthMm
-            });
-          }
+      if (wire.endpointA.kind === "connectorCavity" && wire.endpointA.connectorId === selectedConnector.id) {
+        entries.push({
+          wireId: wire.id,
+          wireName: wire.name,
+          wireTechnicalId: wire.technicalId,
+          localEndpointLabel: `C${wire.endpointA.cavityIndex}`,
+          remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
+          lengthMm: wire.lengthMm
+        });
+      }
 
-          return entries;
-        })
-        .sort((left, right) => left.wireTechnicalId.localeCompare(right.wireTechnicalId));
+      if (wire.endpointB.kind === "connectorCavity" && wire.endpointB.connectorId === selectedConnector.id) {
+        entries.push({
+          wireId: wire.id,
+          wireName: wire.name,
+          wireTechnicalId: wire.technicalId,
+          localEndpointLabel: `C${wire.endpointB.cavityIndex}`,
+          remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
+          lengthMm: wire.lengthMm
+        });
+      }
 
-  const spliceSynthesisRows = selectedSplice === null
-    ? []
-    : wires
-        .flatMap((wire) => {
-          const entries: Array<{
-            wireId: WireId;
-            wireName: string;
-            wireTechnicalId: string;
-            localEndpointLabel: string;
-            remoteEndpointLabel: string;
-            lengthMm: number;
-          }> = [];
+      return entries;
+    });
+  }, [describeWireEndpoint, selectedConnector, wires]);
 
-          if (wire.endpointA.kind === "splicePort" && wire.endpointA.spliceId === selectedSplice.id) {
-            entries.push({
-              wireId: wire.id,
-              wireName: wire.name,
-              wireTechnicalId: wire.technicalId,
-              localEndpointLabel: `P${wire.endpointA.portIndex}`,
-              remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
-              lengthMm: wire.lengthMm
-            });
-          }
+  const spliceSynthesisRows = useMemo<SpliceSynthesisRow[]>(() => {
+    if (selectedSplice === null) {
+      return [];
+    }
 
-          if (wire.endpointB.kind === "splicePort" && wire.endpointB.spliceId === selectedSplice.id) {
-            entries.push({
-              wireId: wire.id,
-              wireName: wire.name,
-              wireTechnicalId: wire.technicalId,
-              localEndpointLabel: `P${wire.endpointB.portIndex}`,
-              remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
-              lengthMm: wire.lengthMm
-            });
-          }
+    return wires.flatMap((wire) => {
+      const entries: SpliceSynthesisRow[] = [];
 
-          return entries;
-        })
-        .sort((left, right) => left.wireTechnicalId.localeCompare(right.wireTechnicalId));
+      if (wire.endpointA.kind === "splicePort" && wire.endpointA.spliceId === selectedSplice.id) {
+        entries.push({
+          wireId: wire.id,
+          wireName: wire.name,
+          wireTechnicalId: wire.technicalId,
+          localEndpointLabel: `P${wire.endpointA.portIndex}`,
+          remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
+          lengthMm: wire.lengthMm
+        });
+      }
+
+      if (wire.endpointB.kind === "splicePort" && wire.endpointB.spliceId === selectedSplice.id) {
+        entries.push({
+          wireId: wire.id,
+          wireName: wire.name,
+          wireTechnicalId: wire.technicalId,
+          localEndpointLabel: `P${wire.endpointB.portIndex}`,
+          remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
+          lengthMm: wire.lengthMm
+        });
+      }
+
+      return entries;
+    });
+  }, [describeWireEndpoint, selectedSplice, wires]);
+
+  const sortedConnectors = useMemo(
+    () => sortByNameAndTechnicalId(connectors, connectorSort, (connector) => connector.name, (connector) => connector.technicalId),
+    [connectors, connectorSort]
+  );
+  const sortedSplices = useMemo(
+    () => sortByNameAndTechnicalId(splices, spliceSort, (splice) => splice.name, (splice) => splice.technicalId),
+    [splices, spliceSort]
+  );
+  const sortedWires = useMemo(
+    () => sortByNameAndTechnicalId(wires, wireSort, (wire) => wire.name, (wire) => wire.technicalId),
+    [wires, wireSort]
+  );
+  const sortedConnectorSynthesisRows = useMemo(
+    () =>
+      sortByNameAndTechnicalId(
+        connectorSynthesisRows,
+        connectorSynthesisSort,
+        (row) => row.wireName,
+        (row) => row.wireTechnicalId
+      ),
+    [connectorSynthesisRows, connectorSynthesisSort]
+  );
+  const sortedSpliceSynthesisRows = useMemo(
+    () =>
+      sortByNameAndTechnicalId(
+        spliceSynthesisRows,
+        spliceSynthesisSort,
+        (row) => row.wireName,
+        (row) => row.wireTechnicalId
+      ),
+    [spliceSynthesisRows, spliceSynthesisSort]
+  );
 
   const lastError = selectLastError(state);
+
+  function getSortIndicator(sortState: SortState, field: SortField): string {
+    if (sortState.field !== field) {
+      return "";
+    }
+
+    return sortState.direction === "asc" ? "▲" : "▼";
+  }
 
   function describeNode(node: NetworkNode): string {
     if (node.kind === "intermediate") {
@@ -377,24 +502,6 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     const splice = spliceMap.get(node.spliceId);
     return splice === undefined ? `Splice node (${node.spliceId})` : `Splice: ${splice.name} (${splice.technicalId})`;
-  }
-
-  function describeWireEndpoint(endpoint: WireEndpoint): string {
-    if (endpoint.kind === "connectorCavity") {
-      const connector = connectorMap.get(endpoint.connectorId);
-      if (connector === undefined) {
-        return `Connector ${endpoint.connectorId} / C${endpoint.cavityIndex}`;
-      }
-
-      return `${connector.name} (${connector.technicalId}) / C${endpoint.cavityIndex}`;
-    }
-
-    const splice = spliceMap.get(endpoint.spliceId);
-    if (splice === undefined) {
-      return `Splice ${endpoint.spliceId} / P${endpoint.portIndex}`;
-    }
-
-    return `${splice.name} (${splice.technicalId}) / P${endpoint.portIndex}`;
   }
 
   function resetConnectorForm(): void {
@@ -1450,15 +1557,31 @@ export function App({ store = appStore }: AppProps): ReactElement {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Technical ID</th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => setConnectorSort((current) => nextSortState(current, "name"))}
+                    >
+                      Name <span className="sort-indicator">{getSortIndicator(connectorSort, "name")}</span>
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => setConnectorSort((current) => nextSortState(current, "technicalId"))}
+                    >
+                      Technical ID <span className="sort-indicator">{getSortIndicator(connectorSort, "technicalId")}</span>
+                    </button>
+                  </th>
                   <th>Cavities</th>
                   <th>Occupied</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {connectors.map((connector) => {
+                {sortedConnectors.map((connector) => {
                   const occupiedCount = selectConnectorCavityStatuses(state, connector.id).filter((slot) => slot.isOccupied)
                     .length;
                   const isSelected = selectedConnectorId === connector.id;
@@ -1501,15 +1624,31 @@ export function App({ store = appStore }: AppProps): ReactElement {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Technical ID</th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => setSpliceSort((current) => nextSortState(current, "name"))}
+                    >
+                      Name <span className="sort-indicator">{getSortIndicator(spliceSort, "name")}</span>
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => setSpliceSort((current) => nextSortState(current, "technicalId"))}
+                    >
+                      Technical ID <span className="sort-indicator">{getSortIndicator(spliceSort, "technicalId")}</span>
+                    </button>
+                  </th>
                   <th>Ports</th>
                   <th>Branches</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {splices.map((splice) => {
+                {sortedSplices.map((splice) => {
                   const occupiedCount = selectSplicePortStatuses(state, splice.id).filter((slot) => slot.isOccupied).length;
                   const isSelected = selectedSpliceId === splice.id;
 
@@ -1663,8 +1802,24 @@ export function App({ store = appStore }: AppProps): ReactElement {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Technical ID</th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => setWireSort((current) => nextSortState(current, "name"))}
+                    >
+                      Name <span className="sort-indicator">{getSortIndicator(wireSort, "name")}</span>
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => setWireSort((current) => nextSortState(current, "technicalId"))}
+                    >
+                      Technical ID <span className="sort-indicator">{getSortIndicator(wireSort, "technicalId")}</span>
+                    </button>
+                  </th>
                   <th>Endpoints</th>
                   <th>Length (mm)</th>
                   <th>Route mode</th>
@@ -1672,7 +1827,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {wires.map((wire) => {
+                {sortedWires.map((wire) => {
                   const isSelected = selectedWireId === wire.id;
 
                   return (
@@ -1773,21 +1928,38 @@ export function App({ store = appStore }: AppProps): ReactElement {
           <h2>Connector synthesis</h2>
           {selectedConnector === null ? (
             <p className="empty-copy">Select a connector to view connected wire synthesis.</p>
-          ) : connectorSynthesisRows.length === 0 ? (
+          ) : sortedConnectorSynthesisRows.length === 0 ? (
             <p className="empty-copy">No wire currently connected to this connector.</p>
           ) : (
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Wire</th>
-                  <th>Technical ID</th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => setConnectorSynthesisSort((current) => nextSortState(current, "name"))}
+                    >
+                      Wire <span className="sort-indicator">{getSortIndicator(connectorSynthesisSort, "name")}</span>
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => setConnectorSynthesisSort((current) => nextSortState(current, "technicalId"))}
+                    >
+                      Technical ID{" "}
+                      <span className="sort-indicator">{getSortIndicator(connectorSynthesisSort, "technicalId")}</span>
+                    </button>
+                  </th>
                   <th>Local cavity</th>
                   <th>Destination</th>
                   <th>Length (mm)</th>
                 </tr>
               </thead>
               <tbody>
-                {connectorSynthesisRows.map((row) => (
+                {sortedConnectorSynthesisRows.map((row) => (
                   <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
                     <td>{row.wireName}</td>
                     <td>{row.wireTechnicalId}</td>
@@ -1860,21 +2032,37 @@ export function App({ store = appStore }: AppProps): ReactElement {
           <h2>Splice synthesis</h2>
           {selectedSplice === null ? (
             <p className="empty-copy">Select a splice to view connected wire synthesis.</p>
-          ) : spliceSynthesisRows.length === 0 ? (
+          ) : sortedSpliceSynthesisRows.length === 0 ? (
             <p className="empty-copy">No wire currently connected to this splice.</p>
           ) : (
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Wire</th>
-                  <th>Technical ID</th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => setSpliceSynthesisSort((current) => nextSortState(current, "name"))}
+                    >
+                      Wire <span className="sort-indicator">{getSortIndicator(spliceSynthesisSort, "name")}</span>
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => setSpliceSynthesisSort((current) => nextSortState(current, "technicalId"))}
+                    >
+                      Technical ID <span className="sort-indicator">{getSortIndicator(spliceSynthesisSort, "technicalId")}</span>
+                    </button>
+                  </th>
                   <th>Local port</th>
                   <th>Destination</th>
                   <th>Length (mm)</th>
                 </tr>
               </thead>
               <tbody>
-                {spliceSynthesisRows.map((row) => (
+                {sortedSpliceSynthesisRows.map((row) => (
                   <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
                     <td>{row.wireName}</td>
                     <td>{row.wireTechnicalId}</td>

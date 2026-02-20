@@ -219,6 +219,29 @@ button {
   font-weight: 600;
 }
 
+.sort-header-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+
+.sort-header-button:hover {
+  color: #123a57;
+}
+
+.sort-indicator {
+  min-width: 0.8rem;
+  text-align: center;
+  color: #4a6a82;
+}
+
 .data-table tr.is-selected {
   background: #eef6fc;
 }

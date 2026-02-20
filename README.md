@@ -57,6 +57,7 @@ Network and synthesis views item `item_006` is implemented:
 - 2D SVG network diagram for `Node`/`Segment`/`Wire` analysis with selectable nodes and segments.
 - Manual ID entry for node and segment creation (no auto-generated IDs for these entities).
 - Draggable nodes in 2D network view (mouse drag-and-drop).
+- Sortable list headers on `Name` and `Technical ID` columns (click to toggle asc/desc).
 - Wire route highlight in network segment view when a wire is selected.
 - Connector synthesis table with destination and computed wire lengths.
 - Splice synthesis table with destination and computed wire lengths.

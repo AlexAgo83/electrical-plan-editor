@@ -57,6 +57,13 @@ function createUiIntegrationState(): AppState {
   ]);
 }
 
+function createConnectorSortingState(): AppState {
+  return reduceAll([
+    appActions.upsertConnector({ id: asConnectorId("C2"), name: "Zulu connector", technicalId: "C-200", cavityCount: 2 }),
+    appActions.upsertConnector({ id: asConnectorId("C1"), name: "Alpha connector", technicalId: "C-100", cavityCount: 2 })
+  ]);
+}
+
 function getPanelByHeading(name: string): HTMLElement {
   const heading = screen
     .getAllByRole("heading", { name })
@@ -137,5 +144,19 @@ describe("App integration UI", () => {
     expect(within(networkSummaryPanel).getByLabelText("2D network diagram")).toBeInTheDocument();
     expect(networkSummaryPanel.querySelectorAll(".network-node").length).toBe(3);
     expect(networkSummaryPanel.querySelectorAll(".network-segment").length).toBe(2);
+  });
+
+  it("sorts connector list by clicking the Name header", () => {
+    const store = createAppStore(createConnectorSortingState());
+    render(<App store={store} />);
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    const nameSortButton = within(connectorsPanel).getByRole("button", { name: /Name/i });
+    const getFirstConnectorName = () =>
+      connectorsPanel.querySelector("tbody tr td")?.textContent?.trim() ?? "";
+
+    expect(getFirstConnectorName()).toBe("Alpha connector");
+    fireEvent.click(nameSortButton);
+    expect(getFirstConnectorName()).toBe("Zulu connector");
   });
 });
