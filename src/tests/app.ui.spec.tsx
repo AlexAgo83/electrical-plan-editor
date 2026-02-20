@@ -74,6 +74,14 @@ function getPanelByHeading(name: string): HTMLElement {
   return panel as HTMLElement;
 }
 
+function switchScreen(target: "modeling" | "analysis"): void {
+  fireEvent.change(screen.getByLabelText(/^Screen$/), { target: { value: target } });
+}
+
+function switchSubScreen(target: "connector" | "splice" | "node" | "segment" | "wire"): void {
+  fireEvent.change(screen.getByLabelText(/^Sub-screen$/), { target: { value: target } });
+}
+
 describe("App integration UI", () => {
   it("reflects connector cavity occupancy in real time", () => {
     const store = createAppStore(createUiIntegrationState());
@@ -81,6 +89,7 @@ describe("App integration UI", () => {
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));
+    switchScreen("analysis");
 
     const connectorCavitiesPanel = getPanelByHeading("Connector cavities");
     expect(within(connectorCavitiesPanel).getByText("wire:W1:A")).toBeInTheDocument();
@@ -90,8 +99,10 @@ describe("App integration UI", () => {
     const store = createAppStore(createUiIntegrationState());
     render(<App store={store} />);
 
+    switchSubScreen("splice");
     const splicesPanel = getPanelByHeading("Splices");
     fireEvent.click(within(splicesPanel).getByRole("button", { name: "Select" }));
+    switchScreen("analysis");
 
     const splicePortsPanel = getPanelByHeading("Splice ports");
     expect(within(splicePortsPanel).getByText("wire:W1:B")).toBeInTheDocument();
@@ -101,13 +112,16 @@ describe("App integration UI", () => {
     const store = createAppStore(createUiIntegrationState());
     render(<App store={store} />);
 
+    switchSubScreen("segment");
     const segmentsPanel = getPanelByHeading("Segments");
     expect(within(segmentsPanel).getByText("SEG-A").closest("tr")).not.toHaveClass("is-wire-highlighted");
     expect(within(segmentsPanel).getByText("SEG-B").closest("tr")).not.toHaveClass("is-wire-highlighted");
 
+    switchSubScreen("wire");
     const wiresPanel = getPanelByHeading("Wires");
     fireEvent.click(within(wiresPanel).getByRole("button", { name: "Select" }));
 
+    switchSubScreen("segment");
     expect(within(segmentsPanel).getByText("SEG-A").closest("tr")).toHaveClass("is-wire-highlighted");
     expect(within(segmentsPanel).getByText("SEG-B").closest("tr")).toHaveClass("is-wire-highlighted");
   });

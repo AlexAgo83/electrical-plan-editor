@@ -2,22 +2,28 @@ import { expect, test } from "@playwright/test";
 
 test("create -> route -> force -> recompute flow works end-to-end", async ({ page }) => {
   test.setTimeout(60_000);
+  const switchSubScreen = async (value: "connector" | "splice" | "node" | "segment" | "wire") => {
+    await page.getByLabel(/^Sub-screen$/).selectOption(value);
+  };
 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Electrical Plan Editor" })).toBeVisible();
 
+  await switchSubScreen("connector");
   const connectorForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Connector" }) });
   await connectorForm.getByLabel("Functional name").fill("Connector 1");
   await connectorForm.getByLabel("Technical ID").fill("C-1");
   await connectorForm.getByLabel("Cavity count").fill("2");
   await connectorForm.getByRole("button", { name: "Create" }).click();
 
+  await switchSubScreen("splice");
   const spliceForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Splice" }) });
   await spliceForm.getByLabel("Functional name").fill("Splice 1");
   await spliceForm.getByLabel("Technical ID").fill("S-1");
   await spliceForm.getByLabel("Port count").fill("2");
   await spliceForm.getByRole("button", { name: "Create" }).click();
 
+  await switchSubScreen("node");
   const nodeForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Node" }) });
   await nodeForm.getByLabel("Node kind").selectOption("connector");
   await nodeForm.locator("select").nth(1).selectOption({ label: "Connector 1 (C-1)" });
@@ -31,6 +37,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await nodeForm.locator("select").nth(1).selectOption({ label: "Splice 1 (S-1)" });
   await nodeForm.getByRole("button", { name: "Create" }).click();
 
+  await switchSubScreen("segment");
   const segmentForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Segment" }) });
   await segmentForm.getByLabel("Node A").selectOption({ label: "Connector: Connector 1 (C-1)" });
   await segmentForm.getByLabel("Node B").selectOption({ label: "Intermediate: MID" });
@@ -42,6 +49,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await segmentForm.getByLabel("Length (mm)").fill("60");
   await segmentForm.getByRole("button", { name: "Create" }).click();
 
+  await switchSubScreen("wire");
   const wireForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Wire" }) });
   await wireForm.getByLabel("Functional name").fill("Wire 1");
   await wireForm.getByLabel("Technical ID").fill("W-1");
@@ -54,13 +62,14 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await expect(wireRow).toContainText("100");
   await expect(wireRow).toContainText("Auto");
   await wireRow.getByRole("button", { name: "Select" }).click();
-
-  const routeControlPanel = page.locator("section.panel").filter({ has: page.getByRole("heading", { name: "Wire route control" }) });
-  await routeControlPanel.getByRole("button", { name: "Lock forced route" }).click();
-  await expect(wireRow).toContainText("Locked");
-
   const initialWireLengthRaw = await wireRow.locator("td").nth(3).textContent();
   const initialWireLength = Number(initialWireLengthRaw ?? "0");
+
+  await page.getByLabel(/^Screen$/).selectOption("analysis");
+  await switchSubScreen("wire");
+  const routeControlPanel = page.locator("section.panel").filter({ has: page.getByRole("heading", { name: "Wire route control" }) });
+  await routeControlPanel.getByRole("button", { name: "Lock forced route" }).click();
+  await expect(routeControlPanel).toContainText("Locked");
   const currentRouteLine = await routeControlPanel.getByText(/^Current route:/).textContent();
   const [routeSegmentToEdit] = (currentRouteLine ?? "")
     .replace("Current route:", "")
@@ -72,6 +81,8 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     throw new Error("Expected at least one route segment to edit in E2E flow.");
   }
 
+  await page.getByLabel(/^Screen$/).selectOption("modeling");
+  await switchSubScreen("segment");
   const segmentsPanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Segments" }) });
   const targetSegmentRow = segmentsPanel.locator("tbody tr").filter({ hasText: routeSegmentToEdit }).first();
   const targetSegmentLengthRaw = await targetSegmentRow.locator("td").nth(3).textContent();
@@ -87,5 +98,11 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await editSegmentForm.getByLabel("Length (mm)").fill(String(updatedSegmentLength));
   await editSegmentForm.getByRole("button", { name: "Save" }).click();
 
-  await expect(wireRow.locator("td").nth(3)).toHaveText(String(initialWireLength + 40));
+  await switchSubScreen("wire");
+  const refreshedWireRow = page
+    .locator("article.panel")
+    .filter({ has: page.getByRole("heading", { name: "Wires" }) })
+    .locator("tbody tr")
+    .first();
+  await expect(refreshedWireRow.locator("td").nth(3)).toHaveText(String(initialWireLength + 40));
 });

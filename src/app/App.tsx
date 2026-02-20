@@ -70,6 +70,9 @@ export interface AppProps {
   store?: AppStore;
 }
 
+type ScreenId = "modeling" | "analysis";
+type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
+
 export function App({ store = appStore }: AppProps): ReactElement {
   const state = useAppSnapshot(store);
 
@@ -135,6 +138,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [wireFormError, setWireFormError] = useState<string | null>(null);
   const [routePreviewStartNodeId, setRoutePreviewStartNodeId] = useState("");
   const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
+  const [activeScreen, setActiveScreen] = useState<ScreenId>("modeling");
+  const [activeSubScreen, setActiveSubScreen] = useState<SubScreenId>("connector");
 
   const selected = selectSelection(state);
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
@@ -197,6 +202,11 @@ export function App({ store = appStore }: AppProps): ReactElement {
     );
   }, [state, routePreviewStartNodeId, routePreviewEndNodeId]);
   const selectedWireRouteSegmentIds = useMemo(() => new Set(selectedWire?.routeSegmentIds ?? []), [selectedWire]);
+  const isConnectorSubScreen = activeSubScreen === "connector";
+  const isSpliceSubScreen = activeSubScreen === "splice";
+  const isNodeSubScreen = activeSubScreen === "node";
+  const isSegmentSubScreen = activeSubScreen === "segment";
+  const isWireSubScreen = activeSubScreen === "wire";
 
   const connectorSynthesisRows = selectedConnector === null
     ? []
@@ -842,8 +852,43 @@ export function App({ store = appStore }: AppProps): ReactElement {
         </article>
       </section>
 
+      <section className="screen-switcher">
+        <label className="stack-label">
+          Screen
+          <select
+            aria-label="Screen"
+            value={activeScreen}
+            onChange={(event) => setActiveScreen(event.target.value as ScreenId)}
+          >
+            <option value="modeling">Modeling</option>
+            <option value="analysis">Analysis</option>
+          </select>
+        </label>
+        <label className="stack-label">
+          Sub-screen
+          <select
+            aria-label="Sub-screen"
+            value={activeSubScreen}
+            onChange={(event) => setActiveSubScreen(event.target.value as SubScreenId)}
+          >
+            <option value="connector">Connector</option>
+            <option value="splice">Splice</option>
+            <option value="node">Node</option>
+            <option value="segment">Segment</option>
+            <option value="wire">Wire</option>
+          </select>
+        </label>
+        <p className="meta-line screen-description">
+          {activeScreen === "modeling"
+            ? "Modeling: create/edit and list for the selected entity."
+            : "Analysis: synthesis and controls scoped to the selected entity."}
+        </p>
+      </section>
+
+      {activeScreen === "modeling" ? (
+        <>
       <section className="panel-grid">
-        <article className="panel">
+        <article className="panel" hidden={!isConnectorSubScreen}>
           <h2>{connectorFormMode === "create" ? "Create Connector" : "Edit Connector"}</h2>
           <form className="stack-form" onSubmit={handleConnectorSubmit}>
             <label>
@@ -893,7 +938,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           </form>
         </article>
 
-        <article className="panel">
+        <article className="panel" hidden={!isSpliceSubScreen}>
           <h2>{spliceFormMode === "create" ? "Create Splice" : "Edit Splice"}</h2>
           <form className="stack-form" onSubmit={handleSpliceSubmit}>
             <label>
@@ -943,7 +988,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           </form>
         </article>
 
-        <article className="panel">
+        <article className="panel" hidden={!isNodeSubScreen}>
           <h2>{nodeFormMode === "create" ? "Create Node" : "Edit Node"}</h2>
           <form className="stack-form" onSubmit={handleNodeSubmit}>
             <label>
@@ -1007,7 +1052,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           </form>
         </article>
 
-        <article className="panel">
+        <article className="panel" hidden={!isSegmentSubScreen}>
           <h2>{segmentFormMode === "create" ? "Create Segment" : "Edit Segment"}</h2>
           <form className="stack-form" onSubmit={handleSegmentSubmit}>
             <label>
@@ -1067,7 +1112,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           </form>
         </article>
 
-        <article className="panel">
+        <article className="panel" hidden={!isWireSubScreen}>
           <h2>{wireFormMode === "create" ? "Create Wire" : "Edit Wire"}</h2>
           <form className="stack-form" onSubmit={handleWireSubmit}>
             <label>
@@ -1224,7 +1269,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
       </section>
 
       <section className="panel-grid">
-        <article className="panel">
+        <article className="panel" hidden={!isConnectorSubScreen}>
           <h2>Connectors</h2>
           {connectors.length === 0 ? (
             <p className="empty-copy">No connector yet.</p>
@@ -1275,7 +1320,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </article>
 
-        <article className="panel">
+        <article className="panel" hidden={!isSpliceSubScreen}>
           <h2>Splices</h2>
           {splices.length === 0 ? (
             <p className="empty-copy">No splice yet.</p>
@@ -1327,7 +1372,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </article>
 
-        <article className="panel">
+        <article className="panel" hidden={!isNodeSubScreen}>
           <h2>Nodes</h2>
           {nodes.length === 0 ? (
             <p className="empty-copy">No node yet.</p>
@@ -1376,7 +1421,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </article>
 
-        <article className="panel">
+        <article className="panel" hidden={!isSegmentSubScreen}>
           <h2>Segments</h2>
           {segments.length === 0 ? (
             <p className="empty-copy">No segment yet.</p>
@@ -1437,7 +1482,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </article>
 
-        <article className="panel">
+        <article className="panel" hidden={!isWireSubScreen}>
           <h2>Wires</h2>
           {wires.length === 0 ? (
             <p className="empty-copy">No wire yet.</p>
@@ -1493,9 +1538,12 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </article>
       </section>
+        </>
+      ) : null}
 
+      {activeScreen === "analysis" ? (
       <section className="panel-grid">
-        <section className="panel">
+        <section className="panel" hidden={!isConnectorSubScreen}>
           <h2>Connector cavities</h2>
           {selectedConnector === null ? (
             <p className="empty-copy">Select a connector to view and manage cavity occupancy.</p>
@@ -1548,7 +1596,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </section>
 
-        <section className="panel">
+        <section className="panel" hidden={!isConnectorSubScreen}>
           <h2>Connector synthesis</h2>
           {selectedConnector === null ? (
             <p className="empty-copy">Select a connector to view connected wire synthesis.</p>
@@ -1580,7 +1628,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </section>
 
-        <section className="panel">
+        <section className="panel" hidden={!isSpliceSubScreen}>
           <h2>Splice ports</h2>
           {selectedSplice === null ? (
             <p className="empty-copy">Select a splice to view and manage port occupancy.</p>
@@ -1635,7 +1683,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </section>
 
-        <section className="panel">
+        <section className="panel" hidden={!isSpliceSubScreen}>
           <h2>Splice synthesis</h2>
           {selectedSplice === null ? (
             <p className="empty-copy">Select a splice to view connected wire synthesis.</p>
@@ -1667,7 +1715,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </section>
 
-        <section className="panel">
+        <section className="panel" hidden={!isWireSubScreen}>
           <h2>Wire route control</h2>
           {selectedWire === null ? (
             <p className="empty-copy">Select a wire to lock a forced route or reset to auto shortest path.</p>
@@ -1701,7 +1749,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </section>
 
-        <section className="panel">
+        <section className="panel" hidden={!(isNodeSubScreen || isSegmentSubScreen || isWireSubScreen)}>
           <h2>Network summary</h2>
           <div className="summary-grid">
             <article>
@@ -1789,6 +1837,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </section>
       </section>
+      ) : null}
     </main>
   );
 }

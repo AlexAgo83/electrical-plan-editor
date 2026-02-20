@@ -141,11 +141,23 @@ button {
 .stack-form select,
 .row-form input,
 .row-form select,
-.stack-label input {
+.stack-label input,
+.stack-label select {
   border-radius: 0.5rem;
   border: 1px solid #bacada;
   padding: 0.45rem 0.6rem;
   background: #fff;
+}
+
+.screen-switcher {
+  display: grid;
+  gap: 0.45rem;
+  align-items: end;
+  grid-template-columns: repeat(2, minmax(180px, 260px)) 1fr;
+}
+
+.screen-description {
+  margin: 0;
 }
 
 .row-actions {
