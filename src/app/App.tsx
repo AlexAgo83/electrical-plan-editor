@@ -1,4 +1,4 @@
-import { type FormEvent, type ReactElement, useMemo, useState, useSyncExternalStore } from "react";
+import { type FormEvent, type MouseEvent as ReactMouseEvent, type ReactElement, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type {
   Connector,
   ConnectorId,
@@ -66,6 +66,47 @@ function toPositiveNumber(raw: string): number {
   return parsed;
 }
 
+const NETWORK_VIEW_WIDTH = 760;
+const NETWORK_VIEW_HEIGHT = 420;
+
+interface NodePosition {
+  x: number;
+  y: number;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function createNodePositionMap(nodes: NetworkNode[]): Record<NodeId, NodePosition> {
+  const positions = {} as Record<NodeId, NodePosition>;
+  if (nodes.length === 0) {
+    return positions;
+  }
+
+  const centerX = NETWORK_VIEW_WIDTH / 2;
+  const centerY = NETWORK_VIEW_HEIGHT / 2;
+  if (nodes.length === 1) {
+    const singleNode = nodes[0];
+    if (singleNode !== undefined) {
+      positions[singleNode.id] = { x: centerX, y: centerY };
+    }
+    return positions;
+  }
+
+  const radius = Math.min(NETWORK_VIEW_WIDTH, NETWORK_VIEW_HEIGHT) * 0.36;
+  const orderedNodes = [...nodes].sort((left, right) => left.id.localeCompare(right.id));
+  orderedNodes.forEach((node, index) => {
+    const angle = -Math.PI / 2 + (2 * Math.PI * index) / orderedNodes.length;
+    positions[node.id] = {
+      x: centerX + radius * Math.cos(angle),
+      y: centerY + radius * Math.sin(angle)
+    };
+  });
+
+  return positions;
+}
+
 export interface AppProps {
   store?: AppStore;
 }
@@ -107,6 +148,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
   const [nodeFormMode, setNodeFormMode] = useState<"create" | "edit">("create");
   const [editingNodeId, setEditingNodeId] = useState<NodeId | null>(null);
+  const [nodeIdInput, setNodeIdInput] = useState("");
   const [nodeKind, setNodeKind] = useState<NetworkNode["kind"]>("intermediate");
   const [nodeConnectorId, setNodeConnectorId] = useState("");
   const [nodeSpliceId, setNodeSpliceId] = useState("");
@@ -115,6 +157,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
   const [segmentFormMode, setSegmentFormMode] = useState<"create" | "edit">("create");
   const [editingSegmentId, setEditingSegmentId] = useState<SegmentId | null>(null);
+  const [segmentIdInput, setSegmentIdInput] = useState("");
   const [segmentNodeA, setSegmentNodeA] = useState("");
   const [segmentNodeB, setSegmentNodeB] = useState("");
   const [segmentLengthMm, setSegmentLengthMm] = useState("120");
@@ -140,6 +183,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
   const [activeScreen, setActiveScreen] = useState<ScreenId>("modeling");
   const [activeSubScreen, setActiveSubScreen] = useState<SubScreenId>("connector");
+  const [manualNodePositions, setManualNodePositions] = useState<Record<NodeId, NodePosition>>({} as Record<NodeId, NodePosition>);
+  const [draggingNodeId, setDraggingNodeId] = useState<NodeId | null>(null);
 
   const selected = selectSelection(state);
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
@@ -202,11 +247,41 @@ export function App({ store = appStore }: AppProps): ReactElement {
     );
   }, [state, routePreviewStartNodeId, routePreviewEndNodeId]);
   const selectedWireRouteSegmentIds = useMemo(() => new Set(selectedWire?.routeSegmentIds ?? []), [selectedWire]);
+  const autoNodePositions = useMemo(() => createNodePositionMap(nodes), [nodes]);
+  const networkNodePositions = useMemo(() => {
+    const merged = { ...autoNodePositions };
+    for (const node of nodes) {
+      const manualPosition = manualNodePositions[node.id];
+      if (manualPosition !== undefined) {
+        merged[node.id] = manualPosition;
+      }
+    }
+    return merged;
+  }, [autoNodePositions, manualNodePositions, nodes]);
   const isConnectorSubScreen = activeSubScreen === "connector";
   const isSpliceSubScreen = activeSubScreen === "splice";
   const isNodeSubScreen = activeSubScreen === "node";
   const isSegmentSubScreen = activeSubScreen === "segment";
   const isWireSubScreen = activeSubScreen === "wire";
+
+  useEffect(() => {
+    const validNodeIds = new Set(nodes.map((node) => node.id));
+    setManualNodePositions((previous) => {
+      let changed = false;
+      const next = {} as Record<NodeId, NodePosition>;
+      for (const nodeId of Object.keys(previous) as NodeId[]) {
+        const position = previous[nodeId];
+        if (position !== undefined && validNodeIds.has(nodeId)) {
+          next[nodeId] = position;
+          continue;
+        }
+
+        changed = true;
+      }
+
+      return changed ? next : previous;
+    });
+  }, [nodes]);
 
   const connectorSynthesisRows = selectedConnector === null
     ? []
@@ -483,6 +558,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   function resetNodeForm(): void {
     setNodeFormMode("create");
     setEditingNodeId(null);
+    setNodeIdInput("");
     setNodeKind("intermediate");
     setNodeConnectorId("");
     setNodeSpliceId("");
@@ -493,6 +569,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   function startNodeEdit(node: NetworkNode): void {
     setNodeFormMode("edit");
     setEditingNodeId(node.id);
+    setNodeIdInput(node.id);
     setNodeKind(node.kind);
     setNodeLabel(node.kind === "intermediate" ? node.label : "");
     setNodeConnectorId(node.kind === "connector" ? node.connectorId : "");
@@ -503,8 +580,22 @@ export function App({ store = appStore }: AppProps): ReactElement {
   function handleNodeSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
 
-    const nodeId =
-      nodeFormMode === "edit" && editingNodeId !== null ? editingNodeId : (createEntityId("node") as NodeId);
+    const normalizedNodeId = nodeIdInput.trim();
+    const nodeId = (nodeFormMode === "edit" && editingNodeId !== null
+      ? editingNodeId
+      : normalizedNodeId) as NodeId;
+
+    if (nodeFormMode === "create") {
+      if (normalizedNodeId.length === 0) {
+        setNodeFormError("Node ID is required.");
+        return;
+      }
+
+      if (state.nodes.byId[nodeId] !== undefined) {
+        setNodeFormError(`Node ID '${normalizedNodeId}' already exists.`);
+        return;
+      }
+    }
 
     if (nodeKind === "intermediate") {
       const trimmedLabel = nodeLabel.trim();
@@ -567,6 +658,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   function resetSegmentForm(): void {
     setSegmentFormMode("create");
     setEditingSegmentId(null);
+    setSegmentIdInput("");
     setSegmentNodeA("");
     setSegmentNodeB("");
     setSegmentLengthMm("120");
@@ -577,6 +669,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   function startSegmentEdit(segment: Segment): void {
     setSegmentFormMode("edit");
     setEditingSegmentId(segment.id);
+    setSegmentIdInput(segment.id);
     setSegmentNodeA(segment.nodeA);
     setSegmentNodeB(segment.nodeB);
     setSegmentLengthMm(String(segment.lengthMm));
@@ -586,6 +679,23 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
   function handleSegmentSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
+
+    const normalizedSegmentId = segmentIdInput.trim();
+    const segmentId = (segmentFormMode === "edit" && editingSegmentId !== null
+      ? editingSegmentId
+      : normalizedSegmentId) as SegmentId;
+
+    if (segmentFormMode === "create") {
+      if (normalizedSegmentId.length === 0) {
+        setSegmentFormError("Segment ID is required.");
+        return;
+      }
+
+      if (state.segments.byId[segmentId] !== undefined) {
+        setSegmentFormError(`Segment ID '${normalizedSegmentId}' already exists.`);
+        return;
+      }
+    }
 
     if (segmentNodeA.length === 0 || segmentNodeB.length === 0) {
       setSegmentFormError("Both segment endpoints are required.");
@@ -599,11 +709,6 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
 
     setSegmentFormError(null);
-
-    const segmentId =
-      segmentFormMode === "edit" && editingSegmentId !== null
-        ? editingSegmentId
-        : (createEntityId("segment") as SegmentId);
 
     store.dispatch(
       appActions.upsertSegment({
@@ -813,11 +918,53 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
   }
 
+  function getSvgCoordinates(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
+    const bounds = svgElement.getBoundingClientRect();
+    if (bounds.width <= 0 || bounds.height <= 0) {
+      return null;
+    }
+
+    const localX = ((clientX - bounds.left) / bounds.width) * NETWORK_VIEW_WIDTH;
+    const localY = ((clientY - bounds.top) / bounds.height) * NETWORK_VIEW_HEIGHT;
+
+    return {
+      x: clamp(localX, 20, NETWORK_VIEW_WIDTH - 20),
+      y: clamp(localY, 20, NETWORK_VIEW_HEIGHT - 20)
+    };
+  }
+
+  function handleNetworkNodeMouseDown(event: ReactMouseEvent<SVGGElement>, nodeId: NodeId): void {
+    event.preventDefault();
+    setDraggingNodeId(nodeId);
+    store.dispatch(appActions.select({ kind: "node", id: nodeId }));
+  }
+
+  function handleNetworkMouseMove(event: ReactMouseEvent<SVGSVGElement>): void {
+    if (draggingNodeId === null) {
+      return;
+    }
+
+    const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
+    if (coordinates === null) {
+      return;
+    }
+
+    setManualNodePositions((previous) => ({
+      ...previous,
+      [draggingNodeId]: coordinates
+    }));
+  }
+
+  function stopNetworkNodeDrag(): void {
+    if (draggingNodeId !== null) {
+      setDraggingNodeId(null);
+    }
+  }
+
   return (
     <main className="app-shell">
       <section className="header-block">
         <h1>Electrical Plan Editor</h1>
-        <p>Wave 1 in progress: connectors, splices, nodes, segments, and sub-network grouping are active.</p>
       </section>
 
       {lastError !== null ? (
@@ -992,6 +1139,18 @@ export function App({ store = appStore }: AppProps): ReactElement {
           <h2>{nodeFormMode === "create" ? "Create Node" : "Edit Node"}</h2>
           <form className="stack-form" onSubmit={handleNodeSubmit}>
             <label>
+              Node ID
+              <input
+                value={nodeIdInput}
+                onChange={(event) => setNodeIdInput(event.target.value)}
+                placeholder="N-001"
+                disabled={nodeFormMode === "edit"}
+                required
+              />
+            </label>
+            {nodeFormMode === "edit" ? <small className="inline-help">Node ID is immutable in edit mode.</small> : null}
+
+            <label>
               Node kind
               <select value={nodeKind} onChange={(event) => setNodeKind(event.target.value as NetworkNode["kind"])}>
                 <option value="intermediate">Intermediate</option>
@@ -1055,6 +1214,20 @@ export function App({ store = appStore }: AppProps): ReactElement {
         <article className="panel" hidden={!isSegmentSubScreen}>
           <h2>{segmentFormMode === "create" ? "Create Segment" : "Edit Segment"}</h2>
           <form className="stack-form" onSubmit={handleSegmentSubmit}>
+            <label>
+              Segment ID
+              <input
+                value={segmentIdInput}
+                onChange={(event) => setSegmentIdInput(event.target.value)}
+                placeholder="SEG-001"
+                disabled={segmentFormMode === "edit"}
+                required
+              />
+            </label>
+            {segmentFormMode === "edit" ? (
+              <small className="inline-help">Segment ID is immutable in edit mode.</small>
+            ) : null}
+
             <label>
               Node A
               <select value={segmentNodeA} onChange={(event) => setSegmentNodeA(event.target.value)} required>
@@ -1765,6 +1938,95 @@ export function App({ store = appStore }: AppProps): ReactElement {
               <p>{totalEdgeEntries}</p>
             </article>
           </div>
+
+          <h3 className="summary-title">2D network view</h3>
+          {nodes.length === 0 ? (
+            <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
+          ) : (
+            <div className="network-canvas-shell">
+              <svg
+                className="network-svg"
+                role="img"
+                aria-label="2D network diagram"
+                viewBox={`0 0 ${NETWORK_VIEW_WIDTH} ${NETWORK_VIEW_HEIGHT}`}
+                onMouseMove={handleNetworkMouseMove}
+                onMouseUp={stopNetworkNodeDrag}
+                onMouseLeave={stopNetworkNodeDrag}
+              >
+                {segments.map((segment) => {
+                  const nodeAPosition = networkNodePositions[segment.nodeA];
+                  const nodeBPosition = networkNodePositions[segment.nodeB];
+                  if (nodeAPosition === undefined || nodeBPosition === undefined) {
+                    return null;
+                  }
+
+                  const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
+                  const isSelectedSegment = selectedSegmentId === segment.id;
+                  const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
+                    isSelectedSegment ? " is-selected" : ""
+                  }`;
+                  const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
+                  const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
+
+                  return (
+                    <g key={segment.id}>
+                      <line
+                        className={segmentClassName}
+                        x1={nodeAPosition.x}
+                        y1={nodeAPosition.y}
+                        x2={nodeBPosition.x}
+                        y2={nodeBPosition.y}
+                      />
+                      <line
+                        className="network-segment-hitbox"
+                        x1={nodeAPosition.x}
+                        y1={nodeAPosition.y}
+                        x2={nodeBPosition.x}
+                        y2={nodeBPosition.y}
+                        onClick={() => store.dispatch(appActions.select({ kind: "segment", id: segment.id }))}
+                      />
+                      <text className="network-segment-label" x={labelX} y={labelY - 6} textAnchor="middle">
+                        {segment.id}
+                      </text>
+                    </g>
+                  );
+                })}
+
+                {nodes.map((node) => {
+                  const position = networkNodePositions[node.id];
+                  if (position === undefined) {
+                    return null;
+                  }
+
+                  const nodeKindClass =
+                    node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
+                  const isSelectedNode = selectedNodeId === node.id;
+                  const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}`;
+                  const nodeLabel =
+                    node.kind === "intermediate"
+                      ? node.label
+                      : node.kind === "connector"
+                        ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
+                        : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
+
+                  return (
+                    <g
+                      key={node.id}
+                      className={nodeClassName}
+                      onMouseDown={(event) => handleNetworkNodeMouseDown(event, node.id)}
+                      onClick={() => store.dispatch(appActions.select({ kind: "node", id: node.id }))}
+                    >
+                      <title>{describeNode(node)}</title>
+                      <circle cx={position.x} cy={position.y} r={17} />
+                      <text className="network-node-label" x={position.x} y={position.y + 4} textAnchor="middle">
+                        {nodeLabel}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
+          )}
 
           <h3 className="summary-title">Sub-networks</h3>
           {subNetworkSummaries.length === 0 ? (

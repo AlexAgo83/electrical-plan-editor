@@ -125,4 +125,17 @@ describe("App integration UI", () => {
     expect(within(segmentsPanel).getByText("SEG-A").closest("tr")).toHaveClass("is-wire-highlighted");
     expect(within(segmentsPanel).getByText("SEG-B").closest("tr")).toHaveClass("is-wire-highlighted");
   });
+
+  it("renders the 2D network diagram in analysis", () => {
+    const store = createAppStore(createUiIntegrationState());
+    render(<App store={store} />);
+
+    switchScreen("analysis");
+    switchSubScreen("segment");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    expect(within(networkSummaryPanel).getByLabelText("2D network diagram")).toBeInTheDocument();
+    expect(networkSummaryPanel.querySelectorAll(".network-node").length).toBe(3);
+    expect(networkSummaryPanel.querySelectorAll(".network-segment").length).toBe(2);
+  });
 });

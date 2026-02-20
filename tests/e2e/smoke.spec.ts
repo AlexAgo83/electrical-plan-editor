@@ -25,25 +25,30 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
 
   await switchSubScreen("node");
   const nodeForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Node" }) });
+  await nodeForm.getByLabel("Node ID").fill("NODE-C1");
   await nodeForm.getByLabel("Node kind").selectOption("connector");
   await nodeForm.locator("select").nth(1).selectOption({ label: "Connector 1 (C-1)" });
   await nodeForm.getByRole("button", { name: "Create" }).click();
 
+  await nodeForm.getByLabel("Node ID").fill("NODE-MID");
   await nodeForm.getByLabel("Node kind").selectOption("intermediate");
   await nodeForm.getByLabel("Label").fill("MID");
   await nodeForm.getByRole("button", { name: "Create" }).click();
 
+  await nodeForm.getByLabel("Node ID").fill("NODE-S1");
   await nodeForm.getByLabel("Node kind").selectOption("splice");
   await nodeForm.locator("select").nth(1).selectOption({ label: "Splice 1 (S-1)" });
   await nodeForm.getByRole("button", { name: "Create" }).click();
 
   await switchSubScreen("segment");
   const segmentForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Segment" }) });
+  await segmentForm.getByLabel("Segment ID").fill("SEG-A");
   await segmentForm.getByLabel("Node A").selectOption({ label: "Connector: Connector 1 (C-1)" });
   await segmentForm.getByLabel("Node B").selectOption({ label: "Intermediate: MID" });
   await segmentForm.getByLabel("Length (mm)").fill("40");
   await segmentForm.getByRole("button", { name: "Create" }).click();
 
+  await segmentForm.getByLabel("Segment ID").fill("SEG-B");
   await segmentForm.getByLabel("Node A").selectOption({ label: "Intermediate: MID" });
   await segmentForm.getByLabel("Node B").selectOption({ label: "Splice: Splice 1 (S-1)" });
   await segmentForm.getByLabel("Length (mm)").fill("60");

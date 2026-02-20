@@ -190,6 +190,11 @@ button {
   font-size: 0.82rem;
 }
 
+.inline-help {
+  color: #4b6477;
+  font-size: 0.8rem;
+}
+
 .empty-copy {
   margin: 0;
   color: #4d677a;
@@ -354,4 +359,83 @@ button {
   margin: 0;
   color: #2c495f;
   font-size: 0.88rem;
+}
+
+.network-canvas-shell {
+  margin-top: 0.55rem;
+  border: 1px solid #c9d9e6;
+  border-radius: 0.65rem;
+  background: linear-gradient(180deg, #f7fbff, #f0f6fb);
+  padding: 0.35rem;
+}
+
+.network-svg {
+  display: block;
+  width: 100%;
+  min-height: 360px;
+}
+
+.network-segment {
+  stroke: #7f99af;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.network-segment.is-wire-highlighted {
+  stroke: #4f8d2d;
+  stroke-width: 5;
+}
+
+.network-segment.is-selected {
+  stroke: #0f6cb8;
+  stroke-width: 5;
+}
+
+.network-segment-hitbox {
+  stroke: transparent;
+  stroke-width: 16;
+  stroke-linecap: round;
+  cursor: pointer;
+}
+
+.network-segment-label {
+  font-size: 10px;
+  fill: #38566a;
+  pointer-events: none;
+}
+
+.network-node {
+  cursor: pointer;
+}
+
+.network-node:active {
+  cursor: grabbing;
+}
+
+.network-node circle {
+  stroke: #55748d;
+  stroke-width: 2;
+}
+
+.network-node.connector circle {
+  fill: #dff0ff;
+}
+
+.network-node.splice circle {
+  fill: #fdeecf;
+}
+
+.network-node.intermediate circle {
+  fill: #ecf2f7;
+}
+
+.network-node.is-selected circle {
+  stroke: #0f6cb8;
+  stroke-width: 3;
+}
+
+.network-node-label {
+  font-size: 9px;
+  fill: #183549;
+  pointer-events: none;
 }
