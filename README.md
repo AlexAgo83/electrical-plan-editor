@@ -31,6 +31,12 @@ Splice item `item_002` is implemented:
 - Splice port occupancy reservation/release and single-occupancy enforcement.
 - Distinct splice visualization with junction marker and branch count.
 
+Routing network item `item_003` is implemented:
+- Node management for connector/splice/intermediate node types.
+- Segment management with strict endpoint and length validation.
+- Sub-network grouping tag on segments with summary visualization.
+- Graph index builder (`src/core/graph.ts`) consumable by routing logic.
+
 ## V1 Scope
 
 - Connector management with cavity occupancy constraints.

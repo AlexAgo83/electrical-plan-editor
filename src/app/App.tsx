@@ -1,5 +1,14 @@
 import { type FormEvent, type ReactElement, useMemo, useState, useSyncExternalStore } from "react";
-import type { Connector, ConnectorId, Splice, SpliceId } from "../core/entities";
+import type {
+  Connector,
+  ConnectorId,
+  NetworkNode,
+  NodeId,
+  Segment,
+  SegmentId,
+  Splice,
+  SpliceId
+} from "../core/entities";
 import {
   appActions,
   selectConnectorById,
@@ -7,13 +16,17 @@ import {
   selectConnectorTechnicalIdTaken,
   selectConnectors,
   selectLastError,
+  selectNodeById,
   selectNodes,
+  selectRoutingGraphIndex,
+  selectSegmentById,
   selectSegments,
   selectSelection,
   selectSpliceById,
   selectSplicePortStatuses,
   selectSpliceTechnicalIdTaken,
   selectSplices,
+  selectSubNetworkSummaries,
   selectWires
 } from "../store";
 import { appStore } from "./store";
@@ -37,6 +50,15 @@ function toPositiveInteger(raw: string): number {
   return Math.max(0, Math.trunc(parsed));
 }
 
+function toPositiveNumber(raw: string): number {
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return 0;
+  }
+
+  return parsed;
+}
+
 export function App(): ReactElement {
   const state = useAppSnapshot();
 
@@ -45,6 +67,11 @@ export function App(): ReactElement {
   const nodes = selectNodes(state);
   const segments = selectSegments(state);
   const wires = selectWires(state);
+  const routingGraph = selectRoutingGraphIndex(state);
+  const subNetworkSummaries = selectSubNetworkSummaries(state);
+
+  const connectorMap = useMemo(() => new Map(connectors.map((connector) => [connector.id, connector])), [connectors]);
+  const spliceMap = useMemo(() => new Map(splices.map((splice) => [splice.id, splice])), [splices]);
 
   const [connectorFormMode, setConnectorFormMode] = useState<"create" | "edit">("create");
   const [editingConnectorId, setEditingConnectorId] = useState<ConnectorId | null>(null);
@@ -64,12 +91,33 @@ export function App(): ReactElement {
   const [spliceOccupantRefInput, setSpliceOccupantRefInput] = useState("manual-assignment");
   const [spliceFormError, setSpliceFormError] = useState<string | null>(null);
 
+  const [nodeFormMode, setNodeFormMode] = useState<"create" | "edit">("create");
+  const [editingNodeId, setEditingNodeId] = useState<NodeId | null>(null);
+  const [nodeKind, setNodeKind] = useState<NetworkNode["kind"]>("intermediate");
+  const [nodeConnectorId, setNodeConnectorId] = useState("");
+  const [nodeSpliceId, setNodeSpliceId] = useState("");
+  const [nodeLabel, setNodeLabel] = useState("");
+  const [nodeFormError, setNodeFormError] = useState<string | null>(null);
+
+  const [segmentFormMode, setSegmentFormMode] = useState<"create" | "edit">("create");
+  const [editingSegmentId, setEditingSegmentId] = useState<SegmentId | null>(null);
+  const [segmentNodeA, setSegmentNodeA] = useState("");
+  const [segmentNodeB, setSegmentNodeB] = useState("");
+  const [segmentLengthMm, setSegmentLengthMm] = useState("120");
+  const [segmentSubNetworkTag, setSegmentSubNetworkTag] = useState("");
+  const [segmentFormError, setSegmentFormError] = useState<string | null>(null);
+
   const selected = selectSelection(state);
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
   const selectedSpliceId = selected?.kind === "splice" ? (selected.id as SpliceId) : null;
+  const selectedNodeId = selected?.kind === "node" ? (selected.id as NodeId) : null;
+  const selectedSegmentId = selected?.kind === "segment" ? (selected.id as SegmentId) : null;
+
   const selectedConnector =
     selectedConnectorId === null ? null : (selectConnectorById(state, selectedConnectorId) ?? null);
   const selectedSplice = selectedSpliceId === null ? null : (selectSpliceById(state, selectedSpliceId) ?? null);
+  const selectedNode = selectedNodeId === null ? null : (selectNodeById(state, selectedNodeId) ?? null);
+  const selectedSegment = selectedSegmentId === null ? null : (selectSegmentById(state, selectedSegmentId) ?? null);
 
   const connectorCavityStatuses = useMemo(() => {
     if (selectedConnectorId === null) {
@@ -98,7 +146,28 @@ export function App(): ReactElement {
     spliceTechnicalId.trim().length > 0 &&
     selectSpliceTechnicalIdTaken(state, spliceTechnicalId.trim(), spliceIdExcludedFromUniqueness);
 
+  const totalEdgeEntries = routingGraph.nodeIds.reduce(
+    (sum, nodeId) => sum + (routingGraph.edgesByNodeId[nodeId]?.length ?? 0),
+    0
+  );
+
   const lastError = selectLastError(state);
+
+  function describeNode(node: NetworkNode): string {
+    if (node.kind === "intermediate") {
+      return `Intermediate: ${node.label}`;
+    }
+
+    if (node.kind === "connector") {
+      const connector = connectorMap.get(node.connectorId);
+      return connector === undefined
+        ? `Connector node (${node.connectorId})`
+        : `Connector: ${connector.name} (${connector.technicalId})`;
+    }
+
+    const splice = spliceMap.get(node.spliceId);
+    return splice === undefined ? `Splice node (${node.spliceId})` : `Splice: ${splice.name} (${splice.technicalId})`;
+  }
 
   function resetConnectorForm(): void {
     setConnectorFormMode("create");
@@ -258,11 +327,161 @@ export function App(): ReactElement {
     appStore.dispatch(appActions.releaseSplicePort(selectedSpliceId, portIndex));
   }
 
+  function resetNodeForm(): void {
+    setNodeFormMode("create");
+    setEditingNodeId(null);
+    setNodeKind("intermediate");
+    setNodeConnectorId("");
+    setNodeSpliceId("");
+    setNodeLabel("");
+    setNodeFormError(null);
+  }
+
+  function startNodeEdit(node: NetworkNode): void {
+    setNodeFormMode("edit");
+    setEditingNodeId(node.id);
+    setNodeKind(node.kind);
+    setNodeLabel(node.kind === "intermediate" ? node.label : "");
+    setNodeConnectorId(node.kind === "connector" ? node.connectorId : "");
+    setNodeSpliceId(node.kind === "splice" ? node.spliceId : "");
+    appStore.dispatch(appActions.select({ kind: "node", id: node.id }));
+  }
+
+  function handleNodeSubmit(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+
+    const nodeId =
+      nodeFormMode === "edit" && editingNodeId !== null ? editingNodeId : (createEntityId("node") as NodeId);
+
+    if (nodeKind === "intermediate") {
+      const trimmedLabel = nodeLabel.trim();
+      if (trimmedLabel.length === 0) {
+        setNodeFormError("Intermediate node label is required.");
+        return;
+      }
+
+      setNodeFormError(null);
+      appStore.dispatch(appActions.upsertNode({ id: nodeId, kind: "intermediate", label: trimmedLabel }));
+    }
+
+    if (nodeKind === "connector") {
+      if (nodeConnectorId.length === 0) {
+        setNodeFormError("Select a connector to create a connector node.");
+        return;
+      }
+
+      setNodeFormError(null);
+      appStore.dispatch(
+        appActions.upsertNode({
+          id: nodeId,
+          kind: "connector",
+          connectorId: nodeConnectorId as ConnectorId
+        })
+      );
+    }
+
+    if (nodeKind === "splice") {
+      if (nodeSpliceId.length === 0) {
+        setNodeFormError("Select a splice to create a splice node.");
+        return;
+      }
+
+      setNodeFormError(null);
+      appStore.dispatch(
+        appActions.upsertNode({
+          id: nodeId,
+          kind: "splice",
+          spliceId: nodeSpliceId as SpliceId
+        })
+      );
+    }
+
+    const nextState = appStore.getState();
+    if (nextState.nodes.byId[nodeId] !== undefined) {
+      appStore.dispatch(appActions.select({ kind: "node", id: nodeId }));
+      resetNodeForm();
+    }
+  }
+
+  function handleNodeDelete(nodeId: NodeId): void {
+    appStore.dispatch(appActions.removeNode(nodeId));
+
+    if (editingNodeId === nodeId) {
+      resetNodeForm();
+    }
+  }
+
+  function resetSegmentForm(): void {
+    setSegmentFormMode("create");
+    setEditingSegmentId(null);
+    setSegmentNodeA("");
+    setSegmentNodeB("");
+    setSegmentLengthMm("120");
+    setSegmentSubNetworkTag("");
+    setSegmentFormError(null);
+  }
+
+  function startSegmentEdit(segment: Segment): void {
+    setSegmentFormMode("edit");
+    setEditingSegmentId(segment.id);
+    setSegmentNodeA(segment.nodeA);
+    setSegmentNodeB(segment.nodeB);
+    setSegmentLengthMm(String(segment.lengthMm));
+    setSegmentSubNetworkTag(segment.subNetworkTag ?? "");
+    appStore.dispatch(appActions.select({ kind: "segment", id: segment.id }));
+  }
+
+  function handleSegmentSubmit(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+
+    if (segmentNodeA.length === 0 || segmentNodeB.length === 0) {
+      setSegmentFormError("Both segment endpoints are required.");
+      return;
+    }
+
+    const lengthMm = toPositiveNumber(segmentLengthMm);
+    if (lengthMm <= 0) {
+      setSegmentFormError("Segment length must be > 0.");
+      return;
+    }
+
+    setSegmentFormError(null);
+
+    const segmentId =
+      segmentFormMode === "edit" && editingSegmentId !== null
+        ? editingSegmentId
+        : (createEntityId("segment") as SegmentId);
+
+    appStore.dispatch(
+      appActions.upsertSegment({
+        id: segmentId,
+        nodeA: segmentNodeA as NodeId,
+        nodeB: segmentNodeB as NodeId,
+        lengthMm,
+        subNetworkTag: segmentSubNetworkTag
+      })
+    );
+
+    const nextState = appStore.getState();
+    if (nextState.segments.byId[segmentId] !== undefined) {
+      appStore.dispatch(appActions.select({ kind: "segment", id: segmentId }));
+      resetSegmentForm();
+    }
+  }
+
+  function handleSegmentDelete(segmentId: SegmentId): void {
+    appStore.dispatch(appActions.removeSegment(segmentId));
+
+    if (editingSegmentId === segmentId) {
+      resetSegmentForm();
+    }
+  }
+
   return (
     <main className="app-shell">
       <section className="header-block">
         <h1>Electrical Plan Editor</h1>
-        <p>Wave 1 in progress: connector + splice management and occupancy controls are active.</p>
+        <p>Wave 1 in progress: connectors, splices, nodes, segments, and sub-network grouping are active.</p>
       </section>
 
       {lastError !== null ? (
@@ -399,6 +618,132 @@ export function App(): ReactElement {
         </article>
 
         <article className="panel">
+          <h2>{nodeFormMode === "create" ? "Create Node" : "Edit Node"}</h2>
+          <form className="stack-form" onSubmit={handleNodeSubmit}>
+            <label>
+              Node kind
+              <select value={nodeKind} onChange={(event) => setNodeKind(event.target.value as NetworkNode["kind"])}>
+                <option value="intermediate">Intermediate</option>
+                <option value="connector">Connector node</option>
+                <option value="splice">Splice node</option>
+              </select>
+            </label>
+
+            {nodeKind === "intermediate" ? (
+              <label>
+                Label
+                <input
+                  value={nodeLabel}
+                  onChange={(event) => setNodeLabel(event.target.value)}
+                  placeholder="N-branch-01"
+                  required
+                />
+              </label>
+            ) : null}
+
+            {nodeKind === "connector" ? (
+              <label>
+                Connector
+                <select value={nodeConnectorId} onChange={(event) => setNodeConnectorId(event.target.value)} required>
+                  <option value="">Select connector</option>
+                  {connectors.map((connector) => (
+                    <option key={connector.id} value={connector.id}>
+                      {connector.name} ({connector.technicalId})
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+
+            {nodeKind === "splice" ? (
+              <label>
+                Splice
+                <select value={nodeSpliceId} onChange={(event) => setNodeSpliceId(event.target.value)} required>
+                  <option value="">Select splice</option>
+                  {splices.map((splice) => (
+                    <option key={splice.id} value={splice.id}>
+                      {splice.name} ({splice.technicalId})
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+
+            <div className="row-actions">
+              <button type="submit">{nodeFormMode === "create" ? "Create" : "Save"}</button>
+              {nodeFormMode === "edit" ? (
+                <button type="button" onClick={resetNodeForm}>
+                  Cancel edit
+                </button>
+              ) : null}
+            </div>
+            {nodeFormError !== null ? <small className="inline-error">{nodeFormError}</small> : null}
+          </form>
+        </article>
+
+        <article className="panel">
+          <h2>{segmentFormMode === "create" ? "Create Segment" : "Edit Segment"}</h2>
+          <form className="stack-form" onSubmit={handleSegmentSubmit}>
+            <label>
+              Node A
+              <select value={segmentNodeA} onChange={(event) => setSegmentNodeA(event.target.value)} required>
+                <option value="">Select node</option>
+                {nodes.map((node) => (
+                  <option key={node.id} value={node.id}>
+                    {describeNode(node)}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Node B
+              <select value={segmentNodeB} onChange={(event) => setSegmentNodeB(event.target.value)} required>
+                <option value="">Select node</option>
+                {nodes.map((node) => (
+                  <option key={node.id} value={node.id}>
+                    {describeNode(node)}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Length (mm)
+              <input
+                type="number"
+                min={0.1}
+                step={0.1}
+                value={segmentLengthMm}
+                onChange={(event) => setSegmentLengthMm(event.target.value)}
+                required
+              />
+            </label>
+
+            <label>
+              Sub-network tag
+              <input
+                value={segmentSubNetworkTag}
+                onChange={(event) => setSegmentSubNetworkTag(event.target.value)}
+                placeholder="front-harness"
+              />
+            </label>
+
+            <div className="row-actions">
+              <button type="submit">{segmentFormMode === "create" ? "Create" : "Save"}</button>
+              {segmentFormMode === "edit" ? (
+                <button type="button" onClick={resetSegmentForm}>
+                  Cancel edit
+                </button>
+              ) : null}
+            </div>
+            {segmentFormError !== null ? <small className="inline-error">{segmentFormError}</small> : null}
+          </form>
+        </article>
+      </section>
+
+      <section className="panel-grid">
+        <article className="panel">
           <h2>Connectors</h2>
           {connectors.length === 0 ? (
             <p className="empty-copy">No connector yet.</p>
@@ -489,6 +834,110 @@ export function App(): ReactElement {
                             Edit
                           </button>
                           <button type="button" onClick={() => handleSpliceDelete(splice.id)}>
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </article>
+
+        <article className="panel">
+          <h2>Nodes</h2>
+          {nodes.length === 0 ? (
+            <p className="empty-copy">No node yet.</p>
+          ) : (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Kind</th>
+                  <th>Reference</th>
+                  <th>Linked segments</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {nodes.map((node) => {
+                  const linkedSegments = segments.filter(
+                    (segment) => segment.nodeA === node.id || segment.nodeB === node.id
+                  ).length;
+                  const isSelected = selectedNodeId === node.id;
+
+                  return (
+                    <tr key={node.id} className={isSelected ? "is-selected" : undefined}>
+                      <td>{node.id}</td>
+                      <td>{node.kind}</td>
+                      <td>{describeNode(node)}</td>
+                      <td>{linkedSegments}</td>
+                      <td>
+                        <div className="row-actions compact">
+                          <button type="button" onClick={() => appStore.dispatch(appActions.select({ kind: "node", id: node.id }))}>
+                            Select
+                          </button>
+                          <button type="button" onClick={() => startNodeEdit(node)}>
+                            Edit
+                          </button>
+                          <button type="button" onClick={() => handleNodeDelete(node.id)}>
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </article>
+
+        <article className="panel">
+          <h2>Segments</h2>
+          {segments.length === 0 ? (
+            <p className="empty-copy">No segment yet.</p>
+          ) : (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Node A</th>
+                  <th>Node B</th>
+                  <th>Length (mm)</th>
+                  <th>Sub-network</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {segments.map((segment) => {
+                  const nodeA = state.nodes.byId[segment.nodeA];
+                  const nodeB = state.nodes.byId[segment.nodeB];
+                  const isSelected = selectedSegmentId === segment.id;
+
+                  return (
+                    <tr key={segment.id} className={isSelected ? "is-selected" : undefined}>
+                      <td>{segment.id}</td>
+                      <td>{nodeA === undefined ? segment.nodeA : describeNode(nodeA)}</td>
+                      <td>{nodeB === undefined ? segment.nodeB : describeNode(nodeB)}</td>
+                      <td>{segment.lengthMm}</td>
+                      <td>
+                        <span className="subnetwork-chip">{segment.subNetworkTag?.trim() || "(default)"}</span>
+                      </td>
+                      <td>
+                        <div className="row-actions compact">
+                          <button
+                            type="button"
+                            onClick={() => appStore.dispatch(appActions.select({ kind: "segment", id: segment.id }))}
+                          >
+                            Select
+                          </button>
+                          <button type="button" onClick={() => startSegmentEdit(segment)}>
+                            Edit
+                          </button>
+                          <button type="button" onClick={() => handleSegmentDelete(segment.id)}>
                             Delete
                           </button>
                         </div>
@@ -609,6 +1058,52 @@ export function App(): ReactElement {
               </div>
             </>
           )}
+        </section>
+
+        <section className="panel">
+          <h2>Network summary</h2>
+          <div className="summary-grid">
+            <article>
+              <h3>Graph nodes</h3>
+              <p>{routingGraph.nodeIds.length}</p>
+            </article>
+            <article>
+              <h3>Graph segments</h3>
+              <p>{routingGraph.segmentIds.length}</p>
+            </article>
+            <article>
+              <h3>Adjacency entries</h3>
+              <p>{totalEdgeEntries}</p>
+            </article>
+          </div>
+
+          <h3 className="summary-title">Sub-networks</h3>
+          {subNetworkSummaries.length === 0 ? (
+            <p className="empty-copy">No sub-network tags yet. Segments currently belong to the default group.</p>
+          ) : (
+            <ul className="subnetwork-list">
+              {subNetworkSummaries.map((group) => (
+                <li key={group.tag}>
+                  <span className="subnetwork-chip">{group.tag}</span>
+                  <span>
+                    {group.segmentCount} segment(s), {group.totalLengthMm} mm total
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <h3 className="summary-title">Selection snapshot</h3>
+          <div className="selection-snapshot">
+            <p>
+              Connector: {selectedConnector === null ? "none" : `${selectedConnector.name} (${selectedConnector.technicalId})`}
+            </p>
+            <p>Splice: {selectedSplice === null ? "none" : `${selectedSplice.name} (${selectedSplice.technicalId})`}</p>
+            <p>Node: {selectedNode === null ? "none" : describeNode(selectedNode)}</p>
+            <p>
+              Segment: {selectedSegment === null ? "none" : `${selectedSegment.id} (${selectedSegment.lengthMm} mm)`}
+            </p>
+          </div>
         </section>
       </section>
     </main>

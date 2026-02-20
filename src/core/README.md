@@ -17,3 +17,8 @@ Each entity uses a branded string ID type (`ConnectorId`, `SpliceId`, `NodeId`, 
 ## Schema
 
 `schema.ts` defines `APP_SCHEMA_VERSION` for persistence compatibility.
+
+## Graph Index
+
+`graph.ts` provides `buildRoutingGraphIndex(...)` to construct a bidirectional adjacency index from nodes and segments.
+This index is used by selectors and is the baseline for shortest-path routing in upcoming items.

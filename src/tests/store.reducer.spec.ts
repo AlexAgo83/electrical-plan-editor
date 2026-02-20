@@ -189,6 +189,118 @@ describe("appReducer", () => {
     const second = appReducer(first, appActions.removeSplice(asSpliceId("S1")));
     expect(second.splicePortOccupancy[asSpliceId("S1")]).toBeUndefined();
   });
+
+  it("requires existing connector or splice when creating specialized nodes", () => {
+    const missingConnectorNode = appReducer(
+      createInitialState(),
+      appActions.upsertNode({
+        id: asNodeId("N-CONNECTOR"),
+        kind: "connector",
+        connectorId: asConnectorId("C-MISSING")
+      })
+    );
+    expect(missingConnectorNode.nodes.byId[asNodeId("N-CONNECTOR")]).toBeUndefined();
+    expect(missingConnectorNode.ui.lastError).toBe("Cannot create connector node for unknown connector.");
+
+    const missingSpliceNode = appReducer(
+      createInitialState(),
+      appActions.upsertNode({
+        id: asNodeId("N-SPLICE"),
+        kind: "splice",
+        spliceId: asSpliceId("S-MISSING")
+      })
+    );
+    expect(missingSpliceNode.nodes.byId[asNodeId("N-SPLICE")]).toBeUndefined();
+    expect(missingSpliceNode.ui.lastError).toBe("Cannot create splice node for unknown splice.");
+  });
+
+  it("allows only one specialized node per connector or splice", () => {
+    const first = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 }),
+      appActions.upsertSplice({ id: asSpliceId("S1"), name: "Splice 1", technicalId: "S-1", portCount: 2 }),
+      appActions.upsertNode({ id: asNodeId("N-C1"), kind: "connector", connectorId: asConnectorId("C1") }),
+      appActions.upsertNode({ id: asNodeId("N-S1"), kind: "splice", spliceId: asSpliceId("S1") })
+    ]);
+
+    const second = appReducer(
+      first,
+      appActions.upsertNode({ id: asNodeId("N-C2"), kind: "connector", connectorId: asConnectorId("C1") })
+    );
+    expect(second.nodes.byId[asNodeId("N-C2")]).toBeUndefined();
+    expect(second.ui.lastError).toBe("Only one connector node is allowed per connector.");
+
+    const third = appReducer(
+      first,
+      appActions.upsertNode({ id: asNodeId("N-S2"), kind: "splice", spliceId: asSpliceId("S1") })
+    );
+    expect(third.nodes.byId[asNodeId("N-S2")]).toBeUndefined();
+    expect(third.ui.lastError).toBe("Only one splice node is allowed per splice.");
+  });
+
+  it("rejects invalid segment endpoints and length", () => {
+    const withNodes = reduceAll([
+      appActions.upsertNode({ id: asNodeId("N1"), kind: "intermediate", label: "Node 1" }),
+      appActions.upsertNode({ id: asNodeId("N2"), kind: "intermediate", label: "Node 2" })
+    ]);
+
+    const sameNode = appReducer(
+      withNodes,
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-INVALID-A"),
+        nodeA: asNodeId("N1"),
+        nodeB: asNodeId("N1"),
+        lengthMm: 100
+      })
+    );
+    expect(sameNode.segments.byId[asSegmentId("SEG-INVALID-A")]).toBeUndefined();
+    expect(sameNode.ui.lastError).toBe("Segment endpoints must reference two different nodes.");
+
+    const missingNode = appReducer(
+      withNodes,
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-INVALID-B"),
+        nodeA: asNodeId("N1"),
+        nodeB: asNodeId("N-MISSING"),
+        lengthMm: 100
+      })
+    );
+    expect(missingNode.segments.byId[asSegmentId("SEG-INVALID-B")]).toBeUndefined();
+    expect(missingNode.ui.lastError).toBe("Segment endpoints must reference existing nodes.");
+
+    const invalidLength = appReducer(
+      withNodes,
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-INVALID-C"),
+        nodeA: asNodeId("N1"),
+        nodeB: asNodeId("N2"),
+        lengthMm: 0
+      })
+    );
+    expect(invalidLength.segments.byId[asSegmentId("SEG-INVALID-C")]).toBeUndefined();
+    expect(invalidLength.ui.lastError).toBe("Segment lengthMm must be a positive number.");
+  });
+
+  it("blocks node and connector removal when graph references exist", () => {
+    const state = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 }),
+      appActions.upsertNode({ id: asNodeId("N-C1"), kind: "connector", connectorId: asConnectorId("C1") }),
+      appActions.upsertNode({ id: asNodeId("N2"), kind: "intermediate", label: "Node 2" }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG1"),
+        nodeA: asNodeId("N-C1"),
+        nodeB: asNodeId("N2"),
+        lengthMm: 80
+      })
+    ]);
+
+    const removeNode = appReducer(state, appActions.removeNode(asNodeId("N-C1")));
+    expect(removeNode.nodes.byId[asNodeId("N-C1")]).toBeDefined();
+    expect(removeNode.ui.lastError).toBe("Cannot remove node while segments are connected to it.");
+
+    const removeConnector = appReducer(state, appActions.removeConnector(asConnectorId("C1")));
+    expect(removeConnector.connectors.byId[asConnectorId("C1")]).toBeDefined();
+    expect(removeConnector.ui.lastError).toBe("Cannot remove connector while a connector node references it.");
+  });
 });
 
 describe("createAppStore", () => {

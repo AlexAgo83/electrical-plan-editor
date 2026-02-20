@@ -10,6 +10,7 @@ import type {
   Wire,
   WireId
 } from "../core/entities";
+import { buildRoutingGraphIndex, type RoutingGraphIndex } from "../core/graph";
 import type { AppState, SelectionState } from "./types";
 
 function selectCollection<T, Id extends string>(
@@ -159,4 +160,45 @@ export function selectSplicePortStatuses(
       isOccupied: occupantRef !== null
     };
   });
+}
+
+export interface SubNetworkSummary {
+  tag: string;
+  segmentCount: number;
+  totalLengthMm: number;
+}
+
+export function selectSubNetworkSummaries(state: AppState): SubNetworkSummary[] {
+  const byTag = new Map<string, SubNetworkSummary>();
+
+  for (const segmentId of state.segments.allIds) {
+    const segment = state.segments.byId[segmentId];
+    if (segment === undefined) {
+      continue;
+    }
+
+    const normalizedTag = segment.subNetworkTag?.trim();
+    const tag = normalizedTag === undefined || normalizedTag.length === 0 ? "(default)" : normalizedTag;
+    const previous = byTag.get(tag);
+    if (previous === undefined) {
+      byTag.set(tag, {
+        tag,
+        segmentCount: 1,
+        totalLengthMm: segment.lengthMm
+      });
+      continue;
+    }
+
+    byTag.set(tag, {
+      tag,
+      segmentCount: previous.segmentCount + 1,
+      totalLengthMm: previous.totalLengthMm + segment.lengthMm
+    });
+  }
+
+  return [...byTag.values()].sort((left, right) => left.tag.localeCompare(right.tag));
+}
+
+export function selectRoutingGraphIndex(state: AppState): RoutingGraphIndex {
+  return buildRoutingGraphIndex(selectNodes(state), selectSegments(state));
 }

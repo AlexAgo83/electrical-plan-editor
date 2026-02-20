@@ -1,8 +1,8 @@
 ## item_003_v1_routing_network_nodes_segments_and_sub_networks - V1 Routing Network Nodes Segments and Sub Networks
 > From version: 0.1.0
-> Understanding: 96%
-> Confidence: 94%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,3 +36,9 @@ Shortest-path and wire length calculation cannot work without an explicit routin
 - Blocks: item_004, item_005.
 - References:
   - `logics/architecture/target_reference_v1_frontend_local_first.md`
+  - `src/core/graph.ts`
+  - `src/store/reducer.ts`
+  - `src/store/selectors.ts`
+  - `src/app/App.tsx`
+  - `src/tests/store.reducer.spec.ts`
+  - `src/tests/core.graph.spec.ts`

@@ -13,7 +13,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -110,10 +111,12 @@ button {
 }
 
 .stack-form input,
+.stack-form select,
 .row-form input {
   border-radius: 0.5rem;
   border: 1px solid #bacada;
   padding: 0.45rem 0.6rem;
+  background: #fff;
 }
 
 .row-actions {
@@ -238,4 +241,72 @@ button {
   color: #153048;
   border-radius: 0.45rem;
   padding: 0.2rem 0.55rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.5rem;
+}
+
+.summary-grid article {
+  border: 1px solid #d3e0ea;
+  border-radius: 0.6rem;
+  padding: 0.55rem;
+  background: #f8fbfe;
+}
+
+.summary-grid h3 {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #3d596d;
+}
+
+.summary-grid p {
+  margin: 0.25rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.summary-title {
+  margin: 0.95rem 0 0.55rem;
+  font-size: 0.9rem;
+  color: #314a5f;
+}
+
+.subnetwork-chip {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #e6f0f8;
+  border: 1px solid #b8cfdf;
+  color: #1f4059;
+  font-size: 0.8rem;
+}
+
+.subnetwork-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.subnetwork-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #2f4d63;
+  font-size: 0.88rem;
+}
+
+.selection-snapshot {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.selection-snapshot p {
+  margin: 0;
+  color: #2c495f;
+  font-size: 0.88rem;
 }
