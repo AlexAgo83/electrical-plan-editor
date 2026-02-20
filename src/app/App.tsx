@@ -7,7 +7,10 @@ import type {
   Segment,
   SegmentId,
   Splice,
-  SpliceId
+  SpliceId,
+  Wire,
+  WireEndpoint,
+  WireId
 } from "../core/entities";
 import {
   appActions,
@@ -28,6 +31,8 @@ import {
   selectSpliceTechnicalIdTaken,
   selectSplices,
   selectSubNetworkSummaries,
+  selectWireById,
+  selectWireTechnicalIdTaken,
   selectWires
 } from "../store";
 import { appStore } from "./store";
@@ -107,6 +112,22 @@ export function App(): ReactElement {
   const [segmentLengthMm, setSegmentLengthMm] = useState("120");
   const [segmentSubNetworkTag, setSegmentSubNetworkTag] = useState("");
   const [segmentFormError, setSegmentFormError] = useState<string | null>(null);
+  const [wireFormMode, setWireFormMode] = useState<"create" | "edit">("create");
+  const [editingWireId, setEditingWireId] = useState<WireId | null>(null);
+  const [wireName, setWireName] = useState("");
+  const [wireTechnicalId, setWireTechnicalId] = useState("");
+  const [wireEndpointAKind, setWireEndpointAKind] = useState<WireEndpoint["kind"]>("connectorCavity");
+  const [wireEndpointAConnectorId, setWireEndpointAConnectorId] = useState("");
+  const [wireEndpointACavityIndex, setWireEndpointACavityIndex] = useState("1");
+  const [wireEndpointASpliceId, setWireEndpointASpliceId] = useState("");
+  const [wireEndpointAPortIndex, setWireEndpointAPortIndex] = useState("1");
+  const [wireEndpointBKind, setWireEndpointBKind] = useState<WireEndpoint["kind"]>("splicePort");
+  const [wireEndpointBConnectorId, setWireEndpointBConnectorId] = useState("");
+  const [wireEndpointBCavityIndex, setWireEndpointBCavityIndex] = useState("1");
+  const [wireEndpointBSpliceId, setWireEndpointBSpliceId] = useState("");
+  const [wireEndpointBPortIndex, setWireEndpointBPortIndex] = useState("1");
+  const [wireForcedRouteInput, setWireForcedRouteInput] = useState("");
+  const [wireFormError, setWireFormError] = useState<string | null>(null);
   const [routePreviewStartNodeId, setRoutePreviewStartNodeId] = useState("");
   const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
 
@@ -115,12 +136,14 @@ export function App(): ReactElement {
   const selectedSpliceId = selected?.kind === "splice" ? (selected.id as SpliceId) : null;
   const selectedNodeId = selected?.kind === "node" ? (selected.id as NodeId) : null;
   const selectedSegmentId = selected?.kind === "segment" ? (selected.id as SegmentId) : null;
+  const selectedWireId = selected?.kind === "wire" ? (selected.id as WireId) : null;
 
   const selectedConnector =
     selectedConnectorId === null ? null : (selectConnectorById(state, selectedConnectorId) ?? null);
   const selectedSplice = selectedSpliceId === null ? null : (selectSpliceById(state, selectedSpliceId) ?? null);
   const selectedNode = selectedNodeId === null ? null : (selectNodeById(state, selectedNodeId) ?? null);
   const selectedSegment = selectedSegmentId === null ? null : (selectSegmentById(state, selectedSegmentId) ?? null);
+  const selectedWire = selectedWireId === null ? null : (selectWireById(state, selectedWireId) ?? null);
 
   const connectorCavityStatuses = useMemo(() => {
     if (selectedConnectorId === null) {
@@ -148,6 +171,10 @@ export function App(): ReactElement {
   const spliceTechnicalIdAlreadyUsed =
     spliceTechnicalId.trim().length > 0 &&
     selectSpliceTechnicalIdTaken(state, spliceTechnicalId.trim(), spliceIdExcludedFromUniqueness);
+  const wireIdExcludedFromUniqueness = wireFormMode === "edit" ? editingWireId ?? undefined : undefined;
+  const wireTechnicalIdAlreadyUsed =
+    wireTechnicalId.trim().length > 0 &&
+    selectWireTechnicalIdTaken(state, wireTechnicalId.trim(), wireIdExcludedFromUniqueness);
 
   const totalEdgeEntries = routingGraph.nodeIds.reduce(
     (sum, nodeId) => sum + (routingGraph.edgesByNodeId[nodeId]?.length ?? 0),
@@ -164,6 +191,85 @@ export function App(): ReactElement {
       routePreviewEndNodeId as NodeId
     );
   }, [state, routePreviewStartNodeId, routePreviewEndNodeId]);
+  const selectedWireRouteSegmentIds = useMemo(() => new Set(selectedWire?.routeSegmentIds ?? []), [selectedWire]);
+
+  const connectorSynthesisRows = selectedConnector === null
+    ? []
+    : wires
+        .flatMap((wire) => {
+          const entries: Array<{
+            wireId: WireId;
+            wireName: string;
+            wireTechnicalId: string;
+            localEndpointLabel: string;
+            remoteEndpointLabel: string;
+            lengthMm: number;
+          }> = [];
+
+          if (wire.endpointA.kind === "connectorCavity" && wire.endpointA.connectorId === selectedConnector.id) {
+            entries.push({
+              wireId: wire.id,
+              wireName: wire.name,
+              wireTechnicalId: wire.technicalId,
+              localEndpointLabel: `C${wire.endpointA.cavityIndex}`,
+              remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
+              lengthMm: wire.lengthMm
+            });
+          }
+
+          if (wire.endpointB.kind === "connectorCavity" && wire.endpointB.connectorId === selectedConnector.id) {
+            entries.push({
+              wireId: wire.id,
+              wireName: wire.name,
+              wireTechnicalId: wire.technicalId,
+              localEndpointLabel: `C${wire.endpointB.cavityIndex}`,
+              remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
+              lengthMm: wire.lengthMm
+            });
+          }
+
+          return entries;
+        })
+        .sort((left, right) => left.wireTechnicalId.localeCompare(right.wireTechnicalId));
+
+  const spliceSynthesisRows = selectedSplice === null
+    ? []
+    : wires
+        .flatMap((wire) => {
+          const entries: Array<{
+            wireId: WireId;
+            wireName: string;
+            wireTechnicalId: string;
+            localEndpointLabel: string;
+            remoteEndpointLabel: string;
+            lengthMm: number;
+          }> = [];
+
+          if (wire.endpointA.kind === "splicePort" && wire.endpointA.spliceId === selectedSplice.id) {
+            entries.push({
+              wireId: wire.id,
+              wireName: wire.name,
+              wireTechnicalId: wire.technicalId,
+              localEndpointLabel: `P${wire.endpointA.portIndex}`,
+              remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
+              lengthMm: wire.lengthMm
+            });
+          }
+
+          if (wire.endpointB.kind === "splicePort" && wire.endpointB.spliceId === selectedSplice.id) {
+            entries.push({
+              wireId: wire.id,
+              wireName: wire.name,
+              wireTechnicalId: wire.technicalId,
+              localEndpointLabel: `P${wire.endpointB.portIndex}`,
+              remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
+              lengthMm: wire.lengthMm
+            });
+          }
+
+          return entries;
+        })
+        .sort((left, right) => left.wireTechnicalId.localeCompare(right.wireTechnicalId));
 
   const lastError = selectLastError(state);
 
@@ -181,6 +287,24 @@ export function App(): ReactElement {
 
     const splice = spliceMap.get(node.spliceId);
     return splice === undefined ? `Splice node (${node.spliceId})` : `Splice: ${splice.name} (${splice.technicalId})`;
+  }
+
+  function describeWireEndpoint(endpoint: WireEndpoint): string {
+    if (endpoint.kind === "connectorCavity") {
+      const connector = connectorMap.get(endpoint.connectorId);
+      if (connector === undefined) {
+        return `Connector ${endpoint.connectorId} / C${endpoint.cavityIndex}`;
+      }
+
+      return `${connector.name} (${connector.technicalId}) / C${endpoint.cavityIndex}`;
+    }
+
+    const splice = spliceMap.get(endpoint.spliceId);
+    if (splice === undefined) {
+      return `Splice ${endpoint.spliceId} / P${endpoint.portIndex}`;
+    }
+
+    return `${splice.name} (${splice.technicalId}) / P${endpoint.portIndex}`;
   }
 
   function resetConnectorForm(): void {
@@ -491,6 +615,189 @@ export function App(): ReactElement {
     }
   }
 
+  function resetWireForm(): void {
+    setWireFormMode("create");
+    setEditingWireId(null);
+    setWireName("");
+    setWireTechnicalId("");
+    setWireEndpointAKind("connectorCavity");
+    setWireEndpointAConnectorId("");
+    setWireEndpointACavityIndex("1");
+    setWireEndpointASpliceId("");
+    setWireEndpointAPortIndex("1");
+    setWireEndpointBKind("splicePort");
+    setWireEndpointBConnectorId("");
+    setWireEndpointBCavityIndex("1");
+    setWireEndpointBSpliceId("");
+    setWireEndpointBPortIndex("1");
+    setWireForcedRouteInput("");
+    setWireFormError(null);
+  }
+
+  function startWireEdit(wire: Wire): void {
+    setWireFormMode("edit");
+    setEditingWireId(wire.id);
+    setWireName(wire.name);
+    setWireTechnicalId(wire.technicalId);
+    setWireEndpointAKind(wire.endpointA.kind);
+    if (wire.endpointA.kind === "connectorCavity") {
+      setWireEndpointAConnectorId(wire.endpointA.connectorId);
+      setWireEndpointACavityIndex(String(wire.endpointA.cavityIndex));
+      setWireEndpointASpliceId("");
+      setWireEndpointAPortIndex("1");
+    } else {
+      setWireEndpointASpliceId(wire.endpointA.spliceId);
+      setWireEndpointAPortIndex(String(wire.endpointA.portIndex));
+      setWireEndpointAConnectorId("");
+      setWireEndpointACavityIndex("1");
+    }
+
+    setWireEndpointBKind(wire.endpointB.kind);
+    if (wire.endpointB.kind === "connectorCavity") {
+      setWireEndpointBConnectorId(wire.endpointB.connectorId);
+      setWireEndpointBCavityIndex(String(wire.endpointB.cavityIndex));
+      setWireEndpointBSpliceId("");
+      setWireEndpointBPortIndex("1");
+    } else {
+      setWireEndpointBSpliceId(wire.endpointB.spliceId);
+      setWireEndpointBPortIndex(String(wire.endpointB.portIndex));
+      setWireEndpointBConnectorId("");
+      setWireEndpointBCavityIndex("1");
+    }
+
+    setWireForcedRouteInput(wire.routeSegmentIds.join(", "));
+    appStore.dispatch(appActions.select({ kind: "wire", id: wire.id }));
+  }
+
+  function buildWireEndpoint(side: "A" | "B"): WireEndpoint | null {
+    if (side === "A") {
+      if (wireEndpointAKind === "connectorCavity") {
+        if (wireEndpointAConnectorId.length === 0) {
+          setWireFormError("Endpoint A connector is required.");
+          return null;
+        }
+
+        return {
+          kind: "connectorCavity",
+          connectorId: wireEndpointAConnectorId as ConnectorId,
+          cavityIndex: toPositiveInteger(wireEndpointACavityIndex)
+        };
+      }
+
+      if (wireEndpointASpliceId.length === 0) {
+        setWireFormError("Endpoint A splice is required.");
+        return null;
+      }
+
+      return {
+        kind: "splicePort",
+        spliceId: wireEndpointASpliceId as SpliceId,
+        portIndex: toPositiveInteger(wireEndpointAPortIndex)
+      };
+    }
+
+    if (wireEndpointBKind === "connectorCavity") {
+      if (wireEndpointBConnectorId.length === 0) {
+        setWireFormError("Endpoint B connector is required.");
+        return null;
+      }
+
+      return {
+        kind: "connectorCavity",
+        connectorId: wireEndpointBConnectorId as ConnectorId,
+        cavityIndex: toPositiveInteger(wireEndpointBCavityIndex)
+      };
+    }
+
+    if (wireEndpointBSpliceId.length === 0) {
+      setWireFormError("Endpoint B splice is required.");
+      return null;
+    }
+
+    return {
+      kind: "splicePort",
+      spliceId: wireEndpointBSpliceId as SpliceId,
+      portIndex: toPositiveInteger(wireEndpointBPortIndex)
+    };
+  }
+
+  function handleWireSubmit(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+
+    const normalizedName = wireName.trim();
+    const normalizedTechnicalId = wireTechnicalId.trim();
+    if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
+      setWireFormError("Wire name and technical ID are required.");
+      return;
+    }
+
+    const endpointA = buildWireEndpoint("A");
+    const endpointB = buildWireEndpoint("B");
+    if (endpointA === null || endpointB === null) {
+      return;
+    }
+
+    setWireFormError(null);
+
+    const wireId = wireFormMode === "edit" && editingWireId !== null ? editingWireId : (createEntityId("wire") as WireId);
+    appStore.dispatch(
+      appActions.saveWire({
+        id: wireId,
+        name: normalizedName,
+        technicalId: normalizedTechnicalId,
+        endpointA,
+        endpointB
+      })
+    );
+
+    const nextState = appStore.getState();
+    if (nextState.wires.byId[wireId] !== undefined) {
+      appStore.dispatch(appActions.select({ kind: "wire", id: wireId }));
+      resetWireForm();
+      setWireForcedRouteInput(nextState.wires.byId[wireId].routeSegmentIds.join(", "));
+    }
+  }
+
+  function handleWireDelete(wireId: WireId): void {
+    appStore.dispatch(appActions.removeWire(wireId));
+    if (editingWireId === wireId) {
+      resetWireForm();
+    }
+  }
+
+  function handleLockWireRoute(): void {
+    if (selectedWire === null) {
+      return;
+    }
+
+    const forcedSegmentIds = wireForcedRouteInput
+      .split(",")
+      .map((token) => token.trim())
+      .filter((token) => token.length > 0) as SegmentId[];
+
+    if (forcedSegmentIds.length === 0) {
+      setWireFormError("Provide at least one segment ID to lock a forced route.");
+      return;
+    }
+
+    setWireFormError(null);
+    appStore.dispatch(appActions.lockWireRoute(selectedWire.id, forcedSegmentIds));
+  }
+
+  function handleResetWireRoute(): void {
+    if (selectedWire === null) {
+      return;
+    }
+
+    setWireFormError(null);
+    appStore.dispatch(appActions.resetWireRoute(selectedWire.id));
+    const nextState = appStore.getState();
+    const updatedWire = nextState.wires.byId[selectedWire.id];
+    if (updatedWire !== undefined) {
+      setWireForcedRouteInput(updatedWire.routeSegmentIds.join(", "));
+    }
+  }
+
   return (
     <main className="app-shell">
       <section className="header-block">
@@ -754,6 +1061,161 @@ export function App(): ReactElement {
             {segmentFormError !== null ? <small className="inline-error">{segmentFormError}</small> : null}
           </form>
         </article>
+
+        <article className="panel">
+          <h2>{wireFormMode === "create" ? "Create Wire" : "Edit Wire"}</h2>
+          <form className="stack-form" onSubmit={handleWireSubmit}>
+            <label>
+              Functional name
+              <input value={wireName} onChange={(event) => setWireName(event.target.value)} placeholder="Feed wire" required />
+            </label>
+
+            <label>
+              Technical ID
+              <input
+                value={wireTechnicalId}
+                onChange={(event) => setWireTechnicalId(event.target.value)}
+                placeholder="W-001"
+                required
+              />
+            </label>
+            {wireTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
+
+            <div className="form-split">
+              <fieldset className="inline-fieldset">
+                <legend>Endpoint A</legend>
+                <label>
+                  Type
+                  <select value={wireEndpointAKind} onChange={(event) => setWireEndpointAKind(event.target.value as WireEndpoint["kind"])}>
+                    <option value="connectorCavity">Connector cavity</option>
+                    <option value="splicePort">Splice port</option>
+                  </select>
+                </label>
+                {wireEndpointAKind === "connectorCavity" ? (
+                  <>
+                    <label>
+                      Connector
+                      <select value={wireEndpointAConnectorId} onChange={(event) => setWireEndpointAConnectorId(event.target.value)}>
+                        <option value="">Select connector</option>
+                        {connectors.map((connector) => (
+                          <option key={connector.id} value={connector.id}>
+                            {connector.name} ({connector.technicalId})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      Cavity index
+                      <input
+                        type="number"
+                        min={1}
+                        step={1}
+                        value={wireEndpointACavityIndex}
+                        onChange={(event) => setWireEndpointACavityIndex(event.target.value)}
+                      />
+                    </label>
+                  </>
+                ) : (
+                  <>
+                    <label>
+                      Splice
+                      <select value={wireEndpointASpliceId} onChange={(event) => setWireEndpointASpliceId(event.target.value)}>
+                        <option value="">Select splice</option>
+                        {splices.map((splice) => (
+                          <option key={splice.id} value={splice.id}>
+                            {splice.name} ({splice.technicalId})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      Port index
+                      <input
+                        type="number"
+                        min={1}
+                        step={1}
+                        value={wireEndpointAPortIndex}
+                        onChange={(event) => setWireEndpointAPortIndex(event.target.value)}
+                      />
+                    </label>
+                  </>
+                )}
+              </fieldset>
+
+              <fieldset className="inline-fieldset">
+                <legend>Endpoint B</legend>
+                <label>
+                  Type
+                  <select value={wireEndpointBKind} onChange={(event) => setWireEndpointBKind(event.target.value as WireEndpoint["kind"])}>
+                    <option value="connectorCavity">Connector cavity</option>
+                    <option value="splicePort">Splice port</option>
+                  </select>
+                </label>
+                {wireEndpointBKind === "connectorCavity" ? (
+                  <>
+                    <label>
+                      Connector
+                      <select value={wireEndpointBConnectorId} onChange={(event) => setWireEndpointBConnectorId(event.target.value)}>
+                        <option value="">Select connector</option>
+                        {connectors.map((connector) => (
+                          <option key={connector.id} value={connector.id}>
+                            {connector.name} ({connector.technicalId})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      Cavity index
+                      <input
+                        type="number"
+                        min={1}
+                        step={1}
+                        value={wireEndpointBCavityIndex}
+                        onChange={(event) => setWireEndpointBCavityIndex(event.target.value)}
+                      />
+                    </label>
+                  </>
+                ) : (
+                  <>
+                    <label>
+                      Splice
+                      <select value={wireEndpointBSpliceId} onChange={(event) => setWireEndpointBSpliceId(event.target.value)}>
+                        <option value="">Select splice</option>
+                        {splices.map((splice) => (
+                          <option key={splice.id} value={splice.id}>
+                            {splice.name} ({splice.technicalId})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      Port index
+                      <input
+                        type="number"
+                        min={1}
+                        step={1}
+                        value={wireEndpointBPortIndex}
+                        onChange={(event) => setWireEndpointBPortIndex(event.target.value)}
+                      />
+                    </label>
+                  </>
+                )}
+              </fieldset>
+            </div>
+
+            <div className="row-actions">
+              <button type="submit" disabled={wireTechnicalIdAlreadyUsed}>
+                {wireFormMode === "create" ? "Create" : "Save"}
+              </button>
+              {wireFormMode === "edit" ? (
+                <button type="button" onClick={resetWireForm}>
+                  Cancel edit
+                </button>
+              ) : null}
+            </div>
+            {wireFormError !== null ? <small className="inline-error">{wireFormError}</small> : null}
+          </form>
+        </article>
       </section>
 
       <section className="panel-grid">
@@ -930,9 +1392,15 @@ export function App(): ReactElement {
                   const nodeA = state.nodes.byId[segment.nodeA];
                   const nodeB = state.nodes.byId[segment.nodeB];
                   const isSelected = selectedSegmentId === segment.id;
+                  const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
+                  const rowClassName = isSelected
+                    ? "is-selected"
+                    : isWireHighlighted
+                      ? "is-wire-highlighted"
+                      : undefined;
 
                   return (
-                    <tr key={segment.id} className={isSelected ? "is-selected" : undefined}>
+                    <tr key={segment.id} className={rowClassName}>
                       <td>{segment.id}</td>
                       <td>{nodeA === undefined ? segment.nodeA : describeNode(nodeA)}</td>
                       <td>{nodeB === undefined ? segment.nodeB : describeNode(nodeB)}</td>
@@ -952,6 +1420,62 @@ export function App(): ReactElement {
                             Edit
                           </button>
                           <button type="button" onClick={() => handleSegmentDelete(segment.id)}>
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </article>
+
+        <article className="panel">
+          <h2>Wires</h2>
+          {wires.length === 0 ? (
+            <p className="empty-copy">No wire yet.</p>
+          ) : (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Technical ID</th>
+                  <th>Endpoints</th>
+                  <th>Length (mm)</th>
+                  <th>Route mode</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {wires.map((wire) => {
+                  const isSelected = selectedWireId === wire.id;
+
+                  return (
+                    <tr key={wire.id} className={isSelected ? "is-selected" : undefined}>
+                      <td>{wire.name}</td>
+                      <td>{wire.technicalId}</td>
+                      <td>
+                        {describeWireEndpoint(wire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(wire.endpointB)}
+                      </td>
+                      <td>{wire.lengthMm}</td>
+                      <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td>
+                      <td>
+                        <div className="row-actions compact">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setWireForcedRouteInput(wire.routeSegmentIds.join(", "));
+                              appStore.dispatch(appActions.select({ kind: "wire", id: wire.id }));
+                            }}
+                          >
+                            Select
+                          </button>
+                          <button type="button" onClick={() => startWireEdit(wire)}>
+                            Edit
+                          </button>
+                          <button type="button" onClick={() => handleWireDelete(wire.id)}>
                             Delete
                           </button>
                         </div>
@@ -1020,6 +1544,38 @@ export function App(): ReactElement {
         </section>
 
         <section className="panel">
+          <h2>Connector synthesis</h2>
+          {selectedConnector === null ? (
+            <p className="empty-copy">Select a connector to view connected wire synthesis.</p>
+          ) : connectorSynthesisRows.length === 0 ? (
+            <p className="empty-copy">No wire currently connected to this connector.</p>
+          ) : (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Wire</th>
+                  <th>Technical ID</th>
+                  <th>Local cavity</th>
+                  <th>Destination</th>
+                  <th>Length (mm)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {connectorSynthesisRows.map((row) => (
+                  <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
+                    <td>{row.wireName}</td>
+                    <td>{row.wireTechnicalId}</td>
+                    <td>{row.localEndpointLabel}</td>
+                    <td>{row.remoteEndpointLabel}</td>
+                    <td>{row.lengthMm}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+
+        <section className="panel">
           <h2>Splice ports</h2>
           {selectedSplice === null ? (
             <p className="empty-copy">Select a splice to view and manage port occupancy.</p>
@@ -1075,6 +1631,72 @@ export function App(): ReactElement {
         </section>
 
         <section className="panel">
+          <h2>Splice synthesis</h2>
+          {selectedSplice === null ? (
+            <p className="empty-copy">Select a splice to view connected wire synthesis.</p>
+          ) : spliceSynthesisRows.length === 0 ? (
+            <p className="empty-copy">No wire currently connected to this splice.</p>
+          ) : (
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Wire</th>
+                  <th>Technical ID</th>
+                  <th>Local port</th>
+                  <th>Destination</th>
+                  <th>Length (mm)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {spliceSynthesisRows.map((row) => (
+                  <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
+                    <td>{row.wireName}</td>
+                    <td>{row.wireTechnicalId}</td>
+                    <td>{row.localEndpointLabel}</td>
+                    <td>{row.remoteEndpointLabel}</td>
+                    <td>{row.lengthMm}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+
+        <section className="panel">
+          <h2>Wire route control</h2>
+          {selectedWire === null ? (
+            <p className="empty-copy">Select a wire to lock a forced route or reset to auto shortest path.</p>
+          ) : (
+            <>
+              <p className="meta-line">
+                <strong>{selectedWire.name}</strong> ({selectedWire.technicalId}) - {selectedWire.isRouteLocked ? "Locked" : "Auto"}
+              </p>
+              <p className="meta-line">
+                {describeWireEndpoint(selectedWire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(selectedWire.endpointB)}
+              </p>
+              <p className="meta-line">Current route: {selectedWire.routeSegmentIds.join(" -> ") || "(none)"}</p>
+              <label className="stack-label">
+                Forced route segment IDs (comma-separated)
+                <input
+                  value={wireForcedRouteInput}
+                  onChange={(event) => setWireForcedRouteInput(event.target.value)}
+                  placeholder="segment-1, segment-2, segment-3"
+                />
+              </label>
+              <div className="row-actions">
+                <button type="button" onClick={handleLockWireRoute}>
+                  Lock forced route
+                </button>
+                <button type="button" onClick={handleResetWireRoute}>
+                  Reset to auto route
+                </button>
+              </div>
+              {wireFormError !== null ? <small className="inline-error">{wireFormError}</small> : null}
+            </>
+          )}
+        </section>
+
+        <section className="panel">
           <h2>Network summary</h2>
           <div className="summary-grid">
             <article>
@@ -1117,6 +1739,7 @@ export function App(): ReactElement {
             <p>
               Segment: {selectedSegment === null ? "none" : `${selectedSegment.id} (${selectedSegment.lengthMm} mm)`}
             </p>
+            <p>Wire: {selectedWire === null ? "none" : `${selectedWire.name} (${selectedWire.technicalId})`}</p>
           </div>
 
           <h3 className="summary-title">Route preview</h3>

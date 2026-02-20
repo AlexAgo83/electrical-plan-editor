@@ -103,6 +103,27 @@ button {
   gap: 0.75rem;
 }
 
+.form-split {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.inline-fieldset {
+  margin: 0;
+  border: 1px solid #cfdde8;
+  border-radius: 0.55rem;
+  padding: 0.6rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.inline-fieldset legend {
+  padding: 0 0.3rem;
+  font-size: 0.82rem;
+  color: #345167;
+}
+
 .stack-form label,
 .row-form label {
   display: grid;
@@ -110,9 +131,17 @@ button {
   font-size: 0.9rem;
 }
 
+.stack-label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
 .stack-form input,
 .stack-form select,
-.row-form input {
+.row-form input,
+.row-form select,
+.stack-label input {
   border-radius: 0.5rem;
   border: 1px solid #bacada;
   padding: 0.45rem 0.6rem;
@@ -175,6 +204,10 @@ button {
 
 .data-table tr.is-selected {
   background: #eef6fc;
+}
+
+.data-table tr.is-wire-highlighted {
+  background: #f0f7e8;
 }
 
 .meta-line {

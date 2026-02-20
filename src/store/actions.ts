@@ -7,6 +7,7 @@ import type {
   SegmentId,
   Splice,
   SpliceId,
+  WireEndpoint,
   Wire,
   WireId
 } from "../core/entities";
@@ -31,6 +32,18 @@ export type AppAction =
   | { type: "node/remove"; payload: { id: NodeId } }
   | { type: "segment/upsert"; payload: Segment }
   | { type: "segment/remove"; payload: { id: SegmentId } }
+  | {
+      type: "wire/save";
+      payload: {
+        id: WireId;
+        name: string;
+        technicalId: string;
+        endpointA: WireEndpoint;
+        endpointB: WireEndpoint;
+      };
+    }
+  | { type: "wire/lockRoute"; payload: { id: WireId; segmentIds: SegmentId[] } }
+  | { type: "wire/resetRoute"; payload: { id: WireId } }
   | { type: "wire/upsert"; payload: Wire }
   | { type: "wire/remove"; payload: { id: WireId } }
   | { type: "ui/select"; payload: SelectionState }
@@ -66,6 +79,18 @@ export const appActions = {
   upsertSegment: (payload: Segment): AppAction => ({ type: "segment/upsert", payload }),
   removeSegment: (id: SegmentId): AppAction => ({ type: "segment/remove", payload: { id } }),
 
+  saveWire: (payload: {
+    id: WireId;
+    name: string;
+    technicalId: string;
+    endpointA: WireEndpoint;
+    endpointB: WireEndpoint;
+  }): AppAction => ({ type: "wire/save", payload }),
+  lockWireRoute: (id: WireId, segmentIds: SegmentId[]): AppAction => ({
+    type: "wire/lockRoute",
+    payload: { id, segmentIds }
+  }),
+  resetWireRoute: (id: WireId): AppAction => ({ type: "wire/resetRoute", payload: { id } }),
   upsertWire: (payload: Wire): AppAction => ({ type: "wire/upsert", payload }),
   removeWire: (id: WireId): AppAction => ({ type: "wire/remove", payload: { id } }),
 

@@ -1,8 +1,8 @@
 ## item_006_v1_network_and_synthesis_views - V1 Network and Synthesis Views
 > From version: 0.1.0
-> Understanding: 95%
-> Confidence: 92%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -33,3 +33,7 @@ The model is not usable without operator-facing views for navigation and verific
 # Notes
 - Dependencies: item_001, item_002, item_005.
 - Related AC: AC4, AC5, AC6.
+- References:
+  - `src/app/App.tsx`
+  - `src/app/styles.css`
+  - `src/store/selectors.ts`

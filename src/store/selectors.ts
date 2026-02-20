@@ -107,6 +107,25 @@ export function selectSpliceTechnicalIdTaken(
   });
 }
 
+export function selectWireTechnicalIdTaken(
+  state: AppState,
+  technicalId: string,
+  excludedWireId?: WireId
+): boolean {
+  return state.wires.allIds.some((id) => {
+    if (excludedWireId !== undefined && id === excludedWireId) {
+      return false;
+    }
+
+    const wire = state.wires.byId[id];
+    if (wire === undefined) {
+      return false;
+    }
+
+    return wire.technicalId === technicalId;
+  });
+}
+
 export interface ConnectorCavityStatus {
   cavityIndex: number;
   occupantRef: string | null;

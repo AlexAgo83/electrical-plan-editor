@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 55%
+> Progress: 75%
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -37,7 +37,7 @@ Backlog scope covered:
 - `npm run test:e2e`
 
 # Report
-- Wave status: Wave 1 completed (`item_000` to `item_004`). Wave 2 pending.
+- Wave status: Wave 1 completed (`item_000` to `item_004`). Wave 2 in progress (`item_005` and `item_006` completed).
 - Current blockers: none identified at orchestration creation.
 - Main risks to track:
   - Routing determinism edge cases on equal-cost paths.

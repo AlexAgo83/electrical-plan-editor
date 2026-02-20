@@ -1,8 +1,8 @@
 ## item_005_v1_wire_lifecycle_auto_routing_and_forced_route_lock - V1 Wire Lifecycle Auto Routing and Forced Route Lock
 > From version: 0.1.0
-> Understanding: 96%
-> Confidence: 93%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,3 +36,10 @@ Wires are the core business entity. V1 needs full lifecycle support: endpoint as
 - Dependencies: item_001, item_002, item_003, item_004.
 - Blocks: item_006, item_008.
 - Related AC: AC1, AC2, AC3.
+- References:
+  - `src/store/reducer.ts`
+  - `src/store/actions.ts`
+  - `src/store/selectors.ts`
+  - `src/core/pathfinding.ts`
+  - `src/app/App.tsx`
+  - `src/tests/store.reducer.spec.ts`

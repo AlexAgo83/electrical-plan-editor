@@ -6,7 +6,7 @@ The V1 goal is to model connectors, splices, routing segments, and wires as a de
 
 ## Project Status
 
-This repository is currently in **Wave 1 execution**:
+This repository is currently in **Wave 2 execution**:
 - Product request is defined in `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`.
 - Target architecture is defined in `logics/architecture/target_reference_v1_frontend_local_first.md`.
 - Backlog is split into 9 V1 items in `logics/backlog/`.
@@ -42,6 +42,20 @@ Shortest-path item `item_004` is implemented:
 - Deterministic tie-break: shortest length, then fewer segments, then stable segment ID ordering.
 - Route computation API exposed via `findShortestRoute(...)` and `selectShortestRouteBetweenNodes(...)`.
 - Route preview panel integrated in the app for graph-level validation.
+
+Wire lifecycle item `item_005` is implemented:
+- Wire create/edit/delete workflow with connector/splice endpoints.
+- Automatic shortest-path routing and computed wire length on save.
+- Forced route locking with ordered segment validation.
+- Route reset to shortest path.
+- Automatic impacted wire recomputation when segment definitions change.
+- Endpoint occupancy enforcement for connector cavities and splice ports.
+
+Network and synthesis views item `item_006` is implemented:
+- Wire route highlight in network segment view when a wire is selected.
+- Connector synthesis table with destination and computed wire lengths.
+- Splice synthesis table with destination and computed wire lengths.
+- Selection snapshot and route tooling wired to synthesis/navigation workflows.
 
 ## V1 Scope
 
