@@ -1,0 +1,89 @@
+# Electrical Plan Editor (V1)
+
+Logic-first kickoff repository for a local-first electrical plan editor.
+
+The V1 goal is to model connectors, splices, routing segments, and wires as a deterministic graph, then compute wire routes and lengths automatically.
+
+## Project Status
+
+This repository is currently in **planning/orchestration phase**:
+- Product request is defined in `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`.
+- Target architecture is defined in `logics/architecture/target_reference_v1_frontend_local_first.md`.
+- Backlog is split into 9 V1 items in `logics/backlog/`.
+- Delivery orchestration lives in `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`.
+
+At the time of writing, backlog/task progress indicators are initialized and implementation code is not yet scaffolded in `src/`.
+
+## V1 Scope
+
+- Connector management with cavity occupancy constraints.
+- Splice management with port occupancy constraints.
+- Routing network with weighted segments (`lengthMm`).
+- Automatic shortest-path wire routing (Dijkstra).
+- Deterministic tie-break (fewer segments, then stable ordering).
+- Forced route lock/reset for wires.
+- Automatic wire length recomputation when segment lengths change.
+- Global network + connector/splice synthesis views.
+- Local persistence with schema versioning.
+
+## Repository Structure
+
+```text
+logics/
+  architecture/   # technical reference architecture and decisions
+  request/        # product needs and context
+  backlog/        # scoped items with acceptance criteria
+  tasks/          # execution orchestration and validation plans
+  skills/         # Logics kit (scripts + guides, imported as submodule)
+```
+
+## Prerequisites
+
+- `python3`
+- `git`
+- `node` 20+ (target runtime for implementation phase)
+
+## Working with Logics
+
+Bootstrap or maintain the Logics workflow:
+
+```bash
+python3 logics/skills/logics-bootstrapper/scripts/logics_bootstrap.py
+python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
+```
+
+Create and promote documents:
+
+```bash
+python3 logics/skills/logics-flow-manager/scripts/logics_flow.py new request --title "My need"
+python3 logics/skills/logics-flow-manager/scripts/logics_flow.py new backlog --title "My need"
+python3 logics/skills/logics-flow-manager/scripts/logics_flow.py new task --title "Implement my need"
+python3 logics/skills/logics-flow-manager/scripts/logics_flow.py promote request-to-backlog logics/request/req_001_my_need.md
+python3 logics/skills/logics-flow-manager/scripts/logics_flow.py promote backlog-to-task logics/backlog/item_001_my_need.md
+```
+
+## Delivery Waves (V1)
+
+- Wave 1: `item_000` to `item_004` (foundation + routing engine).
+- Wave 2: `item_005` to `item_007` (wire lifecycle + views + persistence).
+- Wave 3: `item_008` (validation matrix and AC1..AC6 automated coverage).
+
+## Validation Baseline
+
+Current orchestration task references:
+
+```bash
+python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
+npm run lint
+npm run typecheck
+npm run test:ci
+npm run test:e2e
+```
+
+Note: npm-based checks are target validation gates for the upcoming application implementation phase.
+
+## Key References
+
+- `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`
+- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`
