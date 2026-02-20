@@ -1,8 +1,8 @@
 ## item_008_v1_validation_matrix_and_acceptance_test_coverage - V1 Validation Matrix and Acceptance Test Coverage
 > From version: 0.1.0
-> Understanding: 96%
-> Confidence: 93%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -33,3 +33,9 @@ The kickoff needs objective confidence gates proving that V1 behavior matches ac
 # Notes
 - Dependencies: item_004, item_005, item_006, item_007.
 - Related AC: AC1, AC2, AC3, AC4, AC5, AC6.
+- References:
+  - `src/tests/store.reducer.spec.ts`
+  - `src/tests/app.ui.spec.tsx`
+  - `tests/e2e/smoke.spec.ts`
+  - `playwright.config.ts`
+  - `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`

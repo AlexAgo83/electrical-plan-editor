@@ -1,8 +1,8 @@
 ## item_007_v1_local_persistence_and_save_schema_versioning - V1 Local Persistence and Save Schema Versioning
 > From version: 0.1.0
-> Understanding: 95%
-> Confidence: 92%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -32,5 +32,10 @@ V1 is local-first. Without persistence and schema versioning, user work is volat
 
 # Notes
 - Dependencies: item_000.
+- Blocks: item_008.
 - Related references:
   - `logics/architecture/target_reference_v1_frontend_local_first.md`
+  - `src/adapters/persistence/localStorage.ts`
+  - `src/adapters/persistence/migrations.ts`
+  - `src/app/store.ts`
+  - `src/tests/persistence.localStorage.spec.ts`

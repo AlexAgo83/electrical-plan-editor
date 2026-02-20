@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 75%
+> Progress: 96%
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -24,8 +24,8 @@ Backlog scope covered:
 # Plan
 - [x] 1. Freeze dependency order and delivery waves
 - [x] 2. Deliver Wave 1 (`item_000` -> `item_004`) with domain and routing validations
-- [ ] 3. Deliver Wave 2 (`item_005` -> `item_007`) with UI and persistence validations
-- [ ] 4. Deliver Wave 3 (`item_008`) and verify AC1..AC6 traceability
+- [x] 3. Deliver Wave 2 (`item_005` -> `item_007`) with UI and persistence validations
+- [x] 4. Deliver Wave 3 (`item_008`) and verify AC1..AC6 traceability
 - [ ] 5. Publish V1 kickoff readiness report (status, risks, blocked items)
 - [ ] FINAL: Update related Logics docs
 
@@ -36,8 +36,16 @@ Backlog scope covered:
 - `npm run test:ci`
 - `npm run test:e2e`
 
+# AC Traceability Matrix
+- AC1 (segment length recomputation): `src/tests/store.reducer.spec.ts` (`recomputes unlocked wire route when segment lengths change`, `keeps locked route and recomputes locked length on segment updates`), `tests/e2e/smoke.spec.ts` (`create -> route -> force -> recompute flow works end-to-end`).
+- AC2 (auto shortest path on wire create): `src/tests/store.reducer.spec.ts` (`creates a wire with automatic shortest route and endpoint occupancy`), `tests/e2e/smoke.spec.ts`.
+- AC3 (force + lock alternative route): `src/tests/store.reducer.spec.ts` (`locks and resets wire route deterministically`), `tests/e2e/smoke.spec.ts`.
+- AC4 (connector occupancy visibility): `src/tests/app.ui.spec.tsx` (`reflects connector cavity occupancy in real time`).
+- AC5 (splice occupancy visibility): `src/tests/app.ui.spec.tsx` (`reflects splice port occupancy in real time`).
+- AC6 (selected wire full path highlight): `src/tests/app.ui.spec.tsx` (`highlights every segment in the selected wire route`).
+
 # Report
-- Wave status: Wave 1 completed (`item_000` to `item_004`). Wave 2 in progress (`item_005` and `item_006` completed).
+- Wave status: Wave 1 completed (`item_000` to `item_004`). Wave 2 completed (`item_005` to `item_007`). Wave 3 completed (`item_008`).
 - Current blockers: none identified at orchestration creation.
 - Main risks to track:
   - Routing determinism edge cases on equal-cost paths.

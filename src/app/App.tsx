@@ -13,6 +13,7 @@ import type {
   WireId
 } from "../core/entities";
 import {
+  type AppStore,
   appActions,
   selectConnectorById,
   selectConnectorCavityStatuses,
@@ -38,8 +39,8 @@ import {
 import { appStore } from "./store";
 import "./styles.css";
 
-function useAppSnapshot() {
-  return useSyncExternalStore(appStore.subscribe, appStore.getState, appStore.getState);
+function useAppSnapshot(store: AppStore) {
+  return useSyncExternalStore(store.subscribe, store.getState, store.getState);
 }
 
 function createEntityId(prefix: string): string {
@@ -65,8 +66,12 @@ function toPositiveNumber(raw: string): number {
   return parsed;
 }
 
-export function App(): ReactElement {
-  const state = useAppSnapshot();
+export interface AppProps {
+  store?: AppStore;
+}
+
+export function App({ store = appStore }: AppProps): ReactElement {
+  const state = useAppSnapshot(store);
 
   const connectors = selectConnectors(state);
   const splices = selectSplices(state);
@@ -322,7 +327,7 @@ export function App(): ReactElement {
     setConnectorName(connector.name);
     setConnectorTechnicalId(connector.technicalId);
     setCavityCount(String(connector.cavityCount));
-    appStore.dispatch(appActions.select({ kind: "connector", id: connector.id }));
+    store.dispatch(appActions.select({ kind: "connector", id: connector.id }));
   }
 
   function handleConnectorSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -343,7 +348,7 @@ export function App(): ReactElement {
         ? editingConnectorId
         : (createEntityId("conn") as ConnectorId);
 
-    appStore.dispatch(
+    store.dispatch(
       appActions.upsertConnector({
         id: connectorId,
         name: trimmedName,
@@ -352,15 +357,15 @@ export function App(): ReactElement {
       })
     );
 
-    const nextState = appStore.getState();
+    const nextState = store.getState();
     if (nextState.connectors.byId[connectorId] !== undefined) {
-      appStore.dispatch(appActions.select({ kind: "connector", id: connectorId }));
+      store.dispatch(appActions.select({ kind: "connector", id: connectorId }));
       resetConnectorForm();
     }
   }
 
   function handleConnectorDelete(connectorId: ConnectorId): void {
-    appStore.dispatch(appActions.removeConnector(connectorId));
+    store.dispatch(appActions.removeConnector(connectorId));
 
     if (editingConnectorId === connectorId) {
       resetConnectorForm();
@@ -375,7 +380,7 @@ export function App(): ReactElement {
     }
 
     const cavityIndex = toPositiveInteger(cavityIndexInput);
-    appStore.dispatch(appActions.occupyConnectorCavity(selectedConnectorId, cavityIndex, connectorOccupantRefInput));
+    store.dispatch(appActions.occupyConnectorCavity(selectedConnectorId, cavityIndex, connectorOccupantRefInput));
   }
 
   function handleReleaseCavity(cavityIndex: number): void {
@@ -383,7 +388,7 @@ export function App(): ReactElement {
       return;
     }
 
-    appStore.dispatch(appActions.releaseConnectorCavity(selectedConnectorId, cavityIndex));
+    store.dispatch(appActions.releaseConnectorCavity(selectedConnectorId, cavityIndex));
   }
 
   function resetSpliceForm(): void {
@@ -401,7 +406,7 @@ export function App(): ReactElement {
     setSpliceName(splice.name);
     setSpliceTechnicalId(splice.technicalId);
     setPortCount(String(splice.portCount));
-    appStore.dispatch(appActions.select({ kind: "splice", id: splice.id }));
+    store.dispatch(appActions.select({ kind: "splice", id: splice.id }));
   }
 
   function handleSpliceSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -422,7 +427,7 @@ export function App(): ReactElement {
         ? editingSpliceId
         : (createEntityId("splice") as SpliceId);
 
-    appStore.dispatch(
+    store.dispatch(
       appActions.upsertSplice({
         id: spliceId,
         name: trimmedName,
@@ -431,15 +436,15 @@ export function App(): ReactElement {
       })
     );
 
-    const nextState = appStore.getState();
+    const nextState = store.getState();
     if (nextState.splices.byId[spliceId] !== undefined) {
-      appStore.dispatch(appActions.select({ kind: "splice", id: spliceId }));
+      store.dispatch(appActions.select({ kind: "splice", id: spliceId }));
       resetSpliceForm();
     }
   }
 
   function handleSpliceDelete(spliceId: SpliceId): void {
-    appStore.dispatch(appActions.removeSplice(spliceId));
+    store.dispatch(appActions.removeSplice(spliceId));
 
     if (editingSpliceId === spliceId) {
       resetSpliceForm();
@@ -454,7 +459,7 @@ export function App(): ReactElement {
     }
 
     const portIndex = toPositiveInteger(portIndexInput);
-    appStore.dispatch(appActions.occupySplicePort(selectedSpliceId, portIndex, spliceOccupantRefInput));
+    store.dispatch(appActions.occupySplicePort(selectedSpliceId, portIndex, spliceOccupantRefInput));
   }
 
   function handleReleasePort(portIndex: number): void {
@@ -462,7 +467,7 @@ export function App(): ReactElement {
       return;
     }
 
-    appStore.dispatch(appActions.releaseSplicePort(selectedSpliceId, portIndex));
+    store.dispatch(appActions.releaseSplicePort(selectedSpliceId, portIndex));
   }
 
   function resetNodeForm(): void {
@@ -482,7 +487,7 @@ export function App(): ReactElement {
     setNodeLabel(node.kind === "intermediate" ? node.label : "");
     setNodeConnectorId(node.kind === "connector" ? node.connectorId : "");
     setNodeSpliceId(node.kind === "splice" ? node.spliceId : "");
-    appStore.dispatch(appActions.select({ kind: "node", id: node.id }));
+    store.dispatch(appActions.select({ kind: "node", id: node.id }));
   }
 
   function handleNodeSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -499,7 +504,7 @@ export function App(): ReactElement {
       }
 
       setNodeFormError(null);
-      appStore.dispatch(appActions.upsertNode({ id: nodeId, kind: "intermediate", label: trimmedLabel }));
+      store.dispatch(appActions.upsertNode({ id: nodeId, kind: "intermediate", label: trimmedLabel }));
     }
 
     if (nodeKind === "connector") {
@@ -509,7 +514,7 @@ export function App(): ReactElement {
       }
 
       setNodeFormError(null);
-      appStore.dispatch(
+      store.dispatch(
         appActions.upsertNode({
           id: nodeId,
           kind: "connector",
@@ -525,7 +530,7 @@ export function App(): ReactElement {
       }
 
       setNodeFormError(null);
-      appStore.dispatch(
+      store.dispatch(
         appActions.upsertNode({
           id: nodeId,
           kind: "splice",
@@ -534,15 +539,15 @@ export function App(): ReactElement {
       );
     }
 
-    const nextState = appStore.getState();
+    const nextState = store.getState();
     if (nextState.nodes.byId[nodeId] !== undefined) {
-      appStore.dispatch(appActions.select({ kind: "node", id: nodeId }));
+      store.dispatch(appActions.select({ kind: "node", id: nodeId }));
       resetNodeForm();
     }
   }
 
   function handleNodeDelete(nodeId: NodeId): void {
-    appStore.dispatch(appActions.removeNode(nodeId));
+    store.dispatch(appActions.removeNode(nodeId));
 
     if (editingNodeId === nodeId) {
       resetNodeForm();
@@ -566,7 +571,7 @@ export function App(): ReactElement {
     setSegmentNodeB(segment.nodeB);
     setSegmentLengthMm(String(segment.lengthMm));
     setSegmentSubNetworkTag(segment.subNetworkTag ?? "");
-    appStore.dispatch(appActions.select({ kind: "segment", id: segment.id }));
+    store.dispatch(appActions.select({ kind: "segment", id: segment.id }));
   }
 
   function handleSegmentSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -590,7 +595,7 @@ export function App(): ReactElement {
         ? editingSegmentId
         : (createEntityId("segment") as SegmentId);
 
-    appStore.dispatch(
+    store.dispatch(
       appActions.upsertSegment({
         id: segmentId,
         nodeA: segmentNodeA as NodeId,
@@ -600,15 +605,15 @@ export function App(): ReactElement {
       })
     );
 
-    const nextState = appStore.getState();
+    const nextState = store.getState();
     if (nextState.segments.byId[segmentId] !== undefined) {
-      appStore.dispatch(appActions.select({ kind: "segment", id: segmentId }));
+      store.dispatch(appActions.select({ kind: "segment", id: segmentId }));
       resetSegmentForm();
     }
   }
 
   function handleSegmentDelete(segmentId: SegmentId): void {
-    appStore.dispatch(appActions.removeSegment(segmentId));
+    store.dispatch(appActions.removeSegment(segmentId));
 
     if (editingSegmentId === segmentId) {
       resetSegmentForm();
@@ -666,7 +671,7 @@ export function App(): ReactElement {
     }
 
     setWireForcedRouteInput(wire.routeSegmentIds.join(", "));
-    appStore.dispatch(appActions.select({ kind: "wire", id: wire.id }));
+    store.dispatch(appActions.select({ kind: "wire", id: wire.id }));
   }
 
   function buildWireEndpoint(side: "A" | "B"): WireEndpoint | null {
@@ -740,7 +745,7 @@ export function App(): ReactElement {
     setWireFormError(null);
 
     const wireId = wireFormMode === "edit" && editingWireId !== null ? editingWireId : (createEntityId("wire") as WireId);
-    appStore.dispatch(
+    store.dispatch(
       appActions.saveWire({
         id: wireId,
         name: normalizedName,
@@ -750,16 +755,16 @@ export function App(): ReactElement {
       })
     );
 
-    const nextState = appStore.getState();
+    const nextState = store.getState();
     if (nextState.wires.byId[wireId] !== undefined) {
-      appStore.dispatch(appActions.select({ kind: "wire", id: wireId }));
+      store.dispatch(appActions.select({ kind: "wire", id: wireId }));
       resetWireForm();
       setWireForcedRouteInput(nextState.wires.byId[wireId].routeSegmentIds.join(", "));
     }
   }
 
   function handleWireDelete(wireId: WireId): void {
-    appStore.dispatch(appActions.removeWire(wireId));
+    store.dispatch(appActions.removeWire(wireId));
     if (editingWireId === wireId) {
       resetWireForm();
     }
@@ -781,7 +786,7 @@ export function App(): ReactElement {
     }
 
     setWireFormError(null);
-    appStore.dispatch(appActions.lockWireRoute(selectedWire.id, forcedSegmentIds));
+    store.dispatch(appActions.lockWireRoute(selectedWire.id, forcedSegmentIds));
   }
 
   function handleResetWireRoute(): void {
@@ -790,8 +795,8 @@ export function App(): ReactElement {
     }
 
     setWireFormError(null);
-    appStore.dispatch(appActions.resetWireRoute(selectedWire.id));
-    const nextState = appStore.getState();
+    store.dispatch(appActions.resetWireRoute(selectedWire.id));
+    const nextState = store.getState();
     const updatedWire = nextState.wires.byId[selectedWire.id];
     if (updatedWire !== undefined) {
       setWireForcedRouteInput(updatedWire.routeSegmentIds.join(", "));
@@ -808,7 +813,7 @@ export function App(): ReactElement {
       {lastError !== null ? (
         <section className="error-banner" role="alert">
           <p>{lastError}</p>
-          <button type="button" onClick={() => appStore.dispatch(appActions.clearError())}>
+          <button type="button" onClick={() => store.dispatch(appActions.clearError())}>
             Clear
           </button>
         </section>
@@ -1250,7 +1255,7 @@ export function App(): ReactElement {
                         <div className="row-actions compact">
                           <button
                             type="button"
-                            onClick={() => appStore.dispatch(appActions.select({ kind: "connector", id: connector.id }))}
+                            onClick={() => store.dispatch(appActions.select({ kind: "connector", id: connector.id }))}
                           >
                             Select
                           </button>
@@ -1302,7 +1307,7 @@ export function App(): ReactElement {
                         <div className="row-actions compact">
                           <button
                             type="button"
-                            onClick={() => appStore.dispatch(appActions.select({ kind: "splice", id: splice.id }))}
+                            onClick={() => store.dispatch(appActions.select({ kind: "splice", id: splice.id }))}
                           >
                             Select
                           </button>
@@ -1352,7 +1357,7 @@ export function App(): ReactElement {
                       <td>{linkedSegments}</td>
                       <td>
                         <div className="row-actions compact">
-                          <button type="button" onClick={() => appStore.dispatch(appActions.select({ kind: "node", id: node.id }))}>
+                          <button type="button" onClick={() => store.dispatch(appActions.select({ kind: "node", id: node.id }))}>
                             Select
                           </button>
                           <button type="button" onClick={() => startNodeEdit(node)}>
@@ -1412,7 +1417,7 @@ export function App(): ReactElement {
                         <div className="row-actions compact">
                           <button
                             type="button"
-                            onClick={() => appStore.dispatch(appActions.select({ kind: "segment", id: segment.id }))}
+                            onClick={() => store.dispatch(appActions.select({ kind: "segment", id: segment.id }))}
                           >
                             Select
                           </button>
@@ -1467,7 +1472,7 @@ export function App(): ReactElement {
                             type="button"
                             onClick={() => {
                               setWireForcedRouteInput(wire.routeSegmentIds.join(", "));
-                              appStore.dispatch(appActions.select({ kind: "wire", id: wire.id }));
+                              store.dispatch(appActions.select({ kind: "wire", id: wire.id }));
                             }}
                           >
                             Select

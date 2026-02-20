@@ -6,7 +6,7 @@ The V1 goal is to model connectors, splices, routing segments, and wires as a de
 
 ## Project Status
 
-This repository is currently in **Wave 2 execution**:
+This repository is currently in **Wave 3 completion**:
 - Product request is defined in `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`.
 - Target architecture is defined in `logics/architecture/target_reference_v1_frontend_local_first.md`.
 - Backlog is split into 9 V1 items in `logics/backlog/`.
@@ -16,7 +16,7 @@ Foundation item `item_000` is implemented:
 - TypeScript strict project scaffold (Vite + React + Vitest + ESLint).
 - Domain contracts in `src/core`.
 - Deterministic normalized store in `src/store`.
-- Local persistence adapter skeleton in `src/adapters/persistence`.
+- Local persistence adapter base in `src/adapters/persistence`.
 - Baseline reducer/store invariants tests in `src/tests/store.reducer.spec.ts`.
 
 Connector item `item_001` is implemented:
@@ -56,6 +56,18 @@ Network and synthesis views item `item_006` is implemented:
 - Connector synthesis table with destination and computed wire lengths.
 - Splice synthesis table with destination and computed wire lengths.
 - Selection snapshot and route tooling wired to synthesis/navigation workflows.
+
+Local persistence and schema versioning item `item_007` is implemented:
+- App bootstrap restores saved project state from local storage.
+- Persisted payload includes `schemaVersion`, `createdAtIso`, and `updatedAtIso`.
+- Migration entry point supports current schema and legacy payload normalization.
+- Corrupted/invalid payloads fall back safely to a clean initial state.
+
+Validation and acceptance coverage item `item_008` is implemented:
+- AC1..AC6 traceability matrix is documented in `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`.
+- Integration/UI tests cover connector occupancy, splice occupancy, and selected wire route highlight.
+- E2E smoke scenario covers create -> route -> force lock -> recompute flow.
+- CI baseline executes lint, typecheck, unit/integration, and E2E smoke checks.
 
 ## V1 Scope
 
@@ -108,8 +120,8 @@ python3 logics/skills/logics-flow-manager/scripts/logics_flow.py promote backlog
 ## Delivery Waves (V1)
 
 - Wave 1: `item_000` to `item_004` (foundation + routing engine).
-- Wave 2: `item_005` to `item_007` (wire lifecycle + views + persistence).
-- Wave 3: `item_008` (validation matrix and AC1..AC6 automated coverage).
+- Wave 2: `item_005` to `item_007` (wire lifecycle + views + persistence) - completed.
+- Wave 3: `item_008` (validation matrix and AC1..AC6 automated coverage) - completed.
 
 ## Validation Baseline
 
