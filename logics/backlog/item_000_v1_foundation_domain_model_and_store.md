@@ -1,8 +1,8 @@
 ## item_000_v1_foundation_domain_model_and_store - V1 Foundation Domain Model and Store
 > From version: 0.1.0
-> Understanding: 98%
-> Confidence: 96%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,3 +36,11 @@ V1 needs a stable technical foundation to avoid fragmented implementations of co
 - References:
   - `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`
   - `logics/architecture/target_reference_v1_frontend_local_first.md`
+  - `src/core/entities.ts`
+  - `src/store/types.ts`
+  - `src/store/actions.ts`
+  - `src/store/reducer.ts`
+  - `src/store/selectors.ts`
+  - `src/store/createStore.ts`
+  - `src/adapters/persistence/localStorage.ts`
+  - `src/tests/store.reducer.spec.ts`

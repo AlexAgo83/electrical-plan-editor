@@ -1,8 +1,8 @@
 ## task_000_v1_backlog_orchestration_and_delivery_control - V1 Backlog Orchestration and Delivery Control
 > From version: 0.1.0
-> Understanding: 98%
-> Confidence: 95%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 96%
+> Progress: 15%
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -22,7 +22,7 @@ Backlog scope covered:
 - `item_008_v1_validation_matrix_and_acceptance_test_coverage.md`
 
 # Plan
-- [ ] 1. Freeze dependency order and delivery waves
+- [x] 1. Freeze dependency order and delivery waves
 - [ ] 2. Deliver Wave 1 (`item_000` -> `item_004`) with domain and routing validations
 - [ ] 3. Deliver Wave 2 (`item_005` -> `item_007`) with UI and persistence validations
 - [ ] 4. Deliver Wave 3 (`item_008`) and verify AC1..AC6 traceability
@@ -37,7 +37,7 @@ Backlog scope covered:
 - `npm run test:e2e`
 
 # Report
-- Wave status: not started.
+- Wave status: Wave 1 in progress (`item_000` completed).
 - Current blockers: none identified at orchestration creation.
 - Main risks to track:
   - Routing determinism edge cases on equal-cost paths.

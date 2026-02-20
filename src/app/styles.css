@@ -1,0 +1,52 @@
+:root {
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  color: #0e2233;
+  background-color: #f4f7f9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 2rem;
+  display: grid;
+  gap: 2rem;
+  align-content: start;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+}
+
+p {
+  margin: 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.stats-grid article {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #c8d6e3;
+  background: #ffffff;
+}
+
+.stats-grid h2 {
+  font-size: 0.95rem;
+  margin: 0 0 0.5rem;
+}
+
+.stats-grid p {
+  font-size: 1.4rem;
+  font-weight: 600;
+}

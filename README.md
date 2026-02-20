@@ -6,13 +6,18 @@ The V1 goal is to model connectors, splices, routing segments, and wires as a de
 
 ## Project Status
 
-This repository is currently in **planning/orchestration phase**:
+This repository is currently in **Wave 1 execution**:
 - Product request is defined in `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`.
 - Target architecture is defined in `logics/architecture/target_reference_v1_frontend_local_first.md`.
 - Backlog is split into 9 V1 items in `logics/backlog/`.
 - Delivery orchestration lives in `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`.
 
-At the time of writing, backlog/task progress indicators are initialized and implementation code is not yet scaffolded in `src/`.
+Foundation item `item_000` is implemented:
+- TypeScript strict project scaffold (Vite + React + Vitest + ESLint).
+- Domain contracts in `src/core`.
+- Deterministic normalized store in `src/store`.
+- Local persistence adapter skeleton in `src/adapters/persistence`.
+- Baseline reducer/store invariants tests in `src/tests/store.reducer.spec.ts`.
 
 ## V1 Scope
 

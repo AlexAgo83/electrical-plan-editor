@@ -1,0 +1,69 @@
+export type Brand<T, B extends string> = T & { readonly __brand: B };
+
+export type ConnectorId = Brand<string, "ConnectorId">;
+export type SpliceId = Brand<string, "SpliceId">;
+export type NodeId = Brand<string, "NodeId">;
+export type SegmentId = Brand<string, "SegmentId">;
+export type WireId = Brand<string, "WireId">;
+
+export interface Connector {
+  id: ConnectorId;
+  name: string;
+  technicalId: string;
+  cavityCount: number;
+}
+
+export interface Splice {
+  id: SpliceId;
+  name: string;
+  technicalId: string;
+  portCount: number;
+}
+
+export type NetworkNode =
+  | {
+      id: NodeId;
+      kind: "connector";
+      connectorId: ConnectorId;
+    }
+  | {
+      id: NodeId;
+      kind: "splice";
+      spliceId: SpliceId;
+    }
+  | {
+      id: NodeId;
+      kind: "intermediate";
+      label: string;
+    };
+
+export interface Segment {
+  id: SegmentId;
+  nodeA: NodeId;
+  nodeB: NodeId;
+  lengthMm: number;
+  subNetworkTag?: string;
+}
+
+export type WireEndpoint =
+  | {
+      kind: "connectorCavity";
+      connectorId: ConnectorId;
+      cavityIndex: number;
+    }
+  | {
+      kind: "splicePort";
+      spliceId: SpliceId;
+      portIndex: number;
+    };
+
+export interface Wire {
+  id: WireId;
+  name: string;
+  technicalId: string;
+  endpointA: WireEndpoint;
+  endpointB: WireEndpoint;
+  routeSegmentIds: SegmentId[];
+  lengthMm: number;
+  isRouteLocked: boolean;
+}
