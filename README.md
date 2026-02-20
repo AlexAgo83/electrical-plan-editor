@@ -19,6 +19,12 @@ Foundation item `item_000` is implemented:
 - Local persistence adapter skeleton in `src/adapters/persistence`.
 - Baseline reducer/store invariants tests in `src/tests/store.reducer.spec.ts`.
 
+Connector item `item_001` is implemented:
+- Connector create/edit/delete flow in `src/app/App.tsx`.
+- Unique connector technical ID validation in `src/store/reducer.ts`.
+- Connector cavity occupancy reservation/release and single-occupancy enforcement.
+- Real-time connector cavity visualization and occupancy counters.
+
 ## V1 Scope
 
 - Connector management with cavity occupancy constraints.

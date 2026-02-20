@@ -9,7 +9,17 @@ function isAppState(candidate: unknown): candidate is AppState {
   }
 
   const value = candidate as Partial<AppState>;
-  return value.schemaVersion === APP_SCHEMA_VERSION;
+  return (
+    value.schemaVersion === APP_SCHEMA_VERSION &&
+    value.connectors !== undefined &&
+    value.splices !== undefined &&
+    value.nodes !== undefined &&
+    value.segments !== undefined &&
+    value.wires !== undefined &&
+    value.connectorCavityOccupancy !== undefined &&
+    value.ui !== undefined &&
+    value.meta !== undefined
+  );
 }
 
 export function loadState(storage: Pick<Storage, "getItem"> = window.localStorage): AppState {

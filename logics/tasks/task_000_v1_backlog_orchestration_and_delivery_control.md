@@ -1,8 +1,8 @@
 ## task_000_v1_backlog_orchestration_and_delivery_control - V1 Backlog Orchestration and Delivery Control
 > From version: 0.1.0
 > Understanding: 99%
-> Confidence: 96%
-> Progress: 15%
+> Confidence: 97%
+> Progress: 25%
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -37,7 +37,7 @@ Backlog scope covered:
 - `npm run test:e2e`
 
 # Report
-- Wave status: Wave 1 in progress (`item_000` completed).
+- Wave status: Wave 1 in progress (`item_000` and `item_001` completed).
 - Current blockers: none identified at orchestration creation.
 - Main risks to track:
   - Routing determinism edge cases on equal-cost paths.

@@ -109,6 +109,46 @@ describe("appReducer", () => {
     expect(updatedConnector).toBeDefined();
     expect(updatedConnector?.name).toBe("Connector 1 Updated");
   });
+
+  it("rejects duplicate connector technical IDs", () => {
+    const first = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 })
+    ]);
+
+    const second = appReducer(
+      first,
+      appActions.upsertConnector({ id: asConnectorId("C2"), name: "Connector 2", technicalId: "C-1", cavityCount: 3 })
+    );
+
+    expect(second.connectors.byId[asConnectorId("C2")]).toBeUndefined();
+    expect(second.ui.lastError).toBe("Connector technical ID 'C-1' is already used.");
+  });
+
+  it("enforces single occupancy per connector cavity", () => {
+    const first = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 4 }),
+      appActions.occupyConnectorCavity(asConnectorId("C1"), 2, "wire-draft-1:A")
+    ]);
+    const second = appReducer(first, appActions.occupyConnectorCavity(asConnectorId("C1"), 2, "wire-draft-2:A"));
+    const firstConnectorOccupancy = first.connectorCavityOccupancy[asConnectorId("C1")];
+    const secondConnectorOccupancy = second.connectorCavityOccupancy[asConnectorId("C1")];
+
+    expect(firstConnectorOccupancy).toBeDefined();
+    expect(secondConnectorOccupancy).toBeDefined();
+    expect(firstConnectorOccupancy?.[2]).toBe("wire-draft-1:A");
+    expect(secondConnectorOccupancy?.[2]).toBe("wire-draft-1:A");
+    expect(second.ui.lastError).toBe("Cavity 2 is already occupied by 'wire-draft-1:A'.");
+  });
+
+  it("clears connector occupancy on connector removal", () => {
+    const first = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 4 }),
+      appActions.occupyConnectorCavity(asConnectorId("C1"), 1, "wire-draft-1:A")
+    ]);
+
+    const second = appReducer(first, appActions.removeConnector(asConnectorId("C1")));
+    expect(second.connectorCavityOccupancy[asConnectorId("C1")]).toBeUndefined();
+  });
 });
 
 describe("createAppStore", () => {

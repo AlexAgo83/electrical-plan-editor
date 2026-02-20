@@ -1,8 +1,8 @@
 ## item_001_v1_connector_management_and_cavity_occupancy - V1 Connector Management and Cavity Occupancy
 > From version: 0.1.0
-> Understanding: 97%
-> Confidence: 95%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -35,3 +35,7 @@ Connector data must be editable and reliable at cavity level. V1 requires cavity
 - Related AC: AC4.
 - References:
   - `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`
+  - `src/app/App.tsx`
+  - `src/store/reducer.ts`
+  - `src/store/selectors.ts`
+  - `src/tests/store.reducer.spec.ts`

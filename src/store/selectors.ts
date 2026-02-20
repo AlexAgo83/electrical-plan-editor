@@ -62,3 +62,54 @@ export function selectWireById(state: AppState, id: WireId): Wire | undefined {
 export function selectSelection(state: AppState): SelectionState | null {
   return state.ui.selected;
 }
+
+export function selectLastError(state: AppState): string | null {
+  return state.ui.lastError;
+}
+
+export function selectConnectorTechnicalIdTaken(
+  state: AppState,
+  technicalId: string,
+  excludedConnectorId?: ConnectorId
+): boolean {
+  return state.connectors.allIds.some((id) => {
+    if (excludedConnectorId !== undefined && id === excludedConnectorId) {
+      return false;
+    }
+
+    const connector = state.connectors.byId[id];
+    if (connector === undefined) {
+      return false;
+    }
+
+    return connector.technicalId === technicalId;
+  });
+}
+
+export interface ConnectorCavityStatus {
+  cavityIndex: number;
+  occupantRef: string | null;
+  isOccupied: boolean;
+}
+
+export function selectConnectorCavityStatuses(
+  state: AppState,
+  connectorId: ConnectorId
+): ConnectorCavityStatus[] {
+  const connector = state.connectors.byId[connectorId];
+  if (connector === undefined) {
+    return [];
+  }
+
+  const occupancy = state.connectorCavityOccupancy[connectorId] ?? {};
+
+  return Array.from({ length: connector.cavityCount }, (_, index) => {
+    const cavityIndex = index + 1;
+    const occupantRef = occupancy[cavityIndex] ?? null;
+    return {
+      cavityIndex,
+      occupantRef,
+      isOccupied: occupantRef !== null
+    };
+  });
+}

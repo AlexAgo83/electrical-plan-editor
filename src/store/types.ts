@@ -29,8 +29,10 @@ export interface AppState {
   nodes: EntityState<NetworkNode, NodeId>;
   segments: EntityState<Segment, SegmentId>;
   wires: EntityState<Wire, WireId>;
+  connectorCavityOccupancy: Record<ConnectorId, Record<number, string>>;
   ui: {
     selected: SelectionState | null;
+    lastError: string | null;
   };
   meta: {
     revision: number;
@@ -52,8 +54,10 @@ export function createInitialState(): AppState {
     nodes: createEmptyEntityState<NetworkNode, NodeId>(),
     segments: createEmptyEntityState<Segment, SegmentId>(),
     wires: createEmptyEntityState<Wire, WireId>(),
+    connectorCavityOccupancy: {} as Record<ConnectorId, Record<number, string>>,
     ui: {
-      selected: null
+      selected: null,
+      lastError: null
     },
     meta: {
       revision: 0
