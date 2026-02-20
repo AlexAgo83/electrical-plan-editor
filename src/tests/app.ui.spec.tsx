@@ -159,4 +159,32 @@ describe("App integration UI", () => {
     fireEvent.click(nameSortButton);
     expect(getFirstConnectorName()).toBe("Zulu connector");
   });
+
+  it("sorts node list by clicking the ID header", () => {
+    const store = createAppStore(createUiIntegrationState());
+    render(<App store={store} />);
+
+    switchSubScreen("node");
+    const nodesPanel = getPanelByHeading("Nodes");
+    const idSortButton = within(nodesPanel).getByRole("button", { name: /ID/i });
+    const getFirstNodeId = () => nodesPanel.querySelector("tbody tr td")?.textContent?.trim() ?? "";
+
+    expect(getFirstNodeId()).toBe("N-C1");
+    fireEvent.click(idSortButton);
+    expect(getFirstNodeId()).toBe("N-S1");
+  });
+
+  it("sorts segment list by clicking the ID header", () => {
+    const store = createAppStore(createUiIntegrationState());
+    render(<App store={store} />);
+
+    switchSubScreen("segment");
+    const segmentsPanel = getPanelByHeading("Segments");
+    const idSortButton = within(segmentsPanel).getByRole("button", { name: /ID/i });
+    const getFirstSegmentId = () => segmentsPanel.querySelector("tbody tr td")?.textContent?.trim() ?? "";
+
+    expect(getFirstSegmentId()).toBe("SEG-A");
+    fireEvent.click(idSortButton);
+    expect(getFirstSegmentId()).toBe("SEG-B");
+  });
 });

@@ -133,6 +133,13 @@ function sortByNameAndTechnicalId<T>(
   });
 }
 
+function sortById<T>(items: T[], direction: SortDirection, getId: (item: T) => string): T[] {
+  return [...items].sort((left, right) => {
+    const comparison = getId(left).localeCompare(getId(right), undefined, { sensitivity: "base" });
+    return direction === "asc" ? comparison : -comparison;
+  });
+}
+
 function nextSortState(current: SortState, field: SortField): SortState {
   if (current.field !== field) {
     return { field, direction: "asc" };
@@ -251,6 +258,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [activeSubScreen, setActiveSubScreen] = useState<SubScreenId>("connector");
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
+  const [nodeIdSortDirection, setNodeIdSortDirection] = useState<SortDirection>("asc");
+  const [segmentIdSortDirection, setSegmentIdSortDirection] = useState<SortDirection>("asc");
   const [wireSort, setWireSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [connectorSynthesisSort, setConnectorSynthesisSort] = useState<SortState>({
     field: "name",
@@ -452,6 +461,11 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const sortedSplices = useMemo(
     () => sortByNameAndTechnicalId(splices, spliceSort, (splice) => splice.name, (splice) => splice.technicalId),
     [splices, spliceSort]
+  );
+  const sortedNodes = useMemo(() => sortById(nodes, nodeIdSortDirection, (node) => node.id), [nodes, nodeIdSortDirection]);
+  const sortedSegments = useMemo(
+    () => sortById(segments, segmentIdSortDirection, (segment) => segment.id),
+    [segments, segmentIdSortDirection]
   );
   const sortedWires = useMemo(
     () => sortByNameAndTechnicalId(wires, wireSort, (wire) => wire.name, (wire) => wire.technicalId),
@@ -1692,7 +1706,19 @@ export function App({ store = appStore }: AppProps): ReactElement {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setNodeIdSortDirection((currentDirection) =>
+                          currentDirection === "asc" ? "desc" : "asc"
+                        )
+                      }
+                    >
+                      ID <span className="sort-indicator">{nodeIdSortDirection === "asc" ? "▲" : "▼"}</span>
+                    </button>
+                  </th>
                   <th>Kind</th>
                   <th>Reference</th>
                   <th>Linked segments</th>
@@ -1700,7 +1726,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {nodes.map((node) => {
+                {sortedNodes.map((node) => {
                   const linkedSegments = segments.filter(
                     (segment) => segment.nodeA === node.id || segment.nodeB === node.id
                   ).length;
@@ -1741,7 +1767,19 @@ export function App({ store = appStore }: AppProps): ReactElement {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setSegmentIdSortDirection((currentDirection) =>
+                          currentDirection === "asc" ? "desc" : "asc"
+                        )
+                      }
+                    >
+                      ID <span className="sort-indicator">{segmentIdSortDirection === "asc" ? "▲" : "▼"}</span>
+                    </button>
+                  </th>
                   <th>Node A</th>
                   <th>Node B</th>
                   <th>Length (mm)</th>
@@ -1750,7 +1788,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {segments.map((segment) => {
+                {sortedSegments.map((segment) => {
                   const nodeA = state.nodes.byId[segment.nodeA];
                   const nodeB = state.nodes.byId[segment.nodeB];
                   const isSelected = selectedSegmentId === segment.id;
