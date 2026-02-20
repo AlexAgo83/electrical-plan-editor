@@ -25,6 +25,12 @@ Connector item `item_001` is implemented:
 - Connector cavity occupancy reservation/release and single-occupancy enforcement.
 - Real-time connector cavity visualization and occupancy counters.
 
+Splice item `item_002` is implemented:
+- Splice create/edit/delete flow in `src/app/App.tsx`.
+- Unique splice technical ID validation in `src/store/reducer.ts`.
+- Splice port occupancy reservation/release and single-occupancy enforcement.
+- Distinct splice visualization with junction marker and branch count.
+
 ## V1 Scope
 
 - Connector management with cavity occupancy constraints.

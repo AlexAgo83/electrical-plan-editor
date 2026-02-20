@@ -30,6 +30,7 @@ export interface AppState {
   segments: EntityState<Segment, SegmentId>;
   wires: EntityState<Wire, WireId>;
   connectorCavityOccupancy: Record<ConnectorId, Record<number, string>>;
+  splicePortOccupancy: Record<SpliceId, Record<number, string>>;
   ui: {
     selected: SelectionState | null;
     lastError: string | null;
@@ -55,6 +56,7 @@ export function createInitialState(): AppState {
     segments: createEmptyEntityState<Segment, SegmentId>(),
     wires: createEmptyEntityState<Wire, WireId>(),
     connectorCavityOccupancy: {} as Record<ConnectorId, Record<number, string>>,
+    splicePortOccupancy: {} as Record<SpliceId, Record<number, string>>,
     ui: {
       selected: null,
       lastError: null

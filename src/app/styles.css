@@ -179,6 +179,18 @@ button {
   color: #365166;
 }
 
+.splice-badge {
+  display: inline-block;
+  margin-right: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: #133a57;
+  color: #fff;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
 .row-form {
   display: grid;
   gap: 0.75rem;

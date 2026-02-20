@@ -149,6 +149,46 @@ describe("appReducer", () => {
     const second = appReducer(first, appActions.removeConnector(asConnectorId("C1")));
     expect(second.connectorCavityOccupancy[asConnectorId("C1")]).toBeUndefined();
   });
+
+  it("rejects duplicate splice technical IDs", () => {
+    const first = reduceAll([
+      appActions.upsertSplice({ id: asSpliceId("S1"), name: "Splice 1", technicalId: "S-1", portCount: 2 })
+    ]);
+
+    const second = appReducer(
+      first,
+      appActions.upsertSplice({ id: asSpliceId("S2"), name: "Splice 2", technicalId: "S-1", portCount: 3 })
+    );
+
+    expect(second.splices.byId[asSpliceId("S2")]).toBeUndefined();
+    expect(second.ui.lastError).toBe("Splice technical ID 'S-1' is already used.");
+  });
+
+  it("enforces single occupancy per splice port", () => {
+    const first = reduceAll([
+      appActions.upsertSplice({ id: asSpliceId("S1"), name: "Splice 1", technicalId: "S-1", portCount: 4 }),
+      appActions.occupySplicePort(asSpliceId("S1"), 2, "wire-draft-1:B")
+    ]);
+    const second = appReducer(first, appActions.occupySplicePort(asSpliceId("S1"), 2, "wire-draft-2:B"));
+    const firstSpliceOccupancy = first.splicePortOccupancy[asSpliceId("S1")];
+    const secondSpliceOccupancy = second.splicePortOccupancy[asSpliceId("S1")];
+
+    expect(firstSpliceOccupancy).toBeDefined();
+    expect(secondSpliceOccupancy).toBeDefined();
+    expect(firstSpliceOccupancy?.[2]).toBe("wire-draft-1:B");
+    expect(secondSpliceOccupancy?.[2]).toBe("wire-draft-1:B");
+    expect(second.ui.lastError).toBe("Port 2 is already occupied by 'wire-draft-1:B'.");
+  });
+
+  it("clears splice occupancy on splice removal", () => {
+    const first = reduceAll([
+      appActions.upsertSplice({ id: asSpliceId("S1"), name: "Splice 1", technicalId: "S-1", portCount: 4 }),
+      appActions.occupySplicePort(asSpliceId("S1"), 1, "wire-draft-1:B")
+    ]);
+
+    const second = appReducer(first, appActions.removeSplice(asSpliceId("S1")));
+    expect(second.splicePortOccupancy[asSpliceId("S1")]).toBeUndefined();
+  });
 });
 
 describe("createAppStore", () => {

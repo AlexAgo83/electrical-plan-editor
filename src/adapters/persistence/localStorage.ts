@@ -17,6 +17,7 @@ function isAppState(candidate: unknown): candidate is AppState {
     value.segments !== undefined &&
     value.wires !== undefined &&
     value.connectorCavityOccupancy !== undefined &&
+    value.splicePortOccupancy !== undefined &&
     value.ui !== undefined &&
     value.meta !== undefined
   );

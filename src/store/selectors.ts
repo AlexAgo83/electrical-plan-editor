@@ -86,6 +86,25 @@ export function selectConnectorTechnicalIdTaken(
   });
 }
 
+export function selectSpliceTechnicalIdTaken(
+  state: AppState,
+  technicalId: string,
+  excludedSpliceId?: SpliceId
+): boolean {
+  return state.splices.allIds.some((id) => {
+    if (excludedSpliceId !== undefined && id === excludedSpliceId) {
+      return false;
+    }
+
+    const splice = state.splices.byId[id];
+    if (splice === undefined) {
+      return false;
+    }
+
+    return splice.technicalId === technicalId;
+  });
+}
+
 export interface ConnectorCavityStatus {
   cavityIndex: number;
   occupantRef: string | null;
@@ -108,6 +127,34 @@ export function selectConnectorCavityStatuses(
     const occupantRef = occupancy[cavityIndex] ?? null;
     return {
       cavityIndex,
+      occupantRef,
+      isOccupied: occupantRef !== null
+    };
+  });
+}
+
+export interface SplicePortStatus {
+  portIndex: number;
+  occupantRef: string | null;
+  isOccupied: boolean;
+}
+
+export function selectSplicePortStatuses(
+  state: AppState,
+  spliceId: SpliceId
+): SplicePortStatus[] {
+  const splice = state.splices.byId[spliceId];
+  if (splice === undefined) {
+    return [];
+  }
+
+  const occupancy = state.splicePortOccupancy[spliceId] ?? {};
+
+  return Array.from({ length: splice.portCount }, (_, index) => {
+    const portIndex = index + 1;
+    const occupantRef = occupancy[portIndex] ?? null;
+    return {
+      portIndex,
       occupantRef,
       isOccupied: occupantRef !== null
     };

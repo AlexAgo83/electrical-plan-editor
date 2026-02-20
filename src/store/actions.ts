@@ -22,6 +22,11 @@ export type AppAction =
   | { type: "connector/releaseCavity"; payload: { connectorId: ConnectorId; cavityIndex: number } }
   | { type: "splice/upsert"; payload: Splice }
   | { type: "splice/remove"; payload: { id: SpliceId } }
+  | {
+      type: "splice/occupyPort";
+      payload: { spliceId: SpliceId; portIndex: number; occupantRef: string };
+    }
+  | { type: "splice/releasePort"; payload: { spliceId: SpliceId; portIndex: number } }
   | { type: "node/upsert"; payload: NetworkNode }
   | { type: "node/remove"; payload: { id: NodeId } }
   | { type: "segment/upsert"; payload: Segment }
@@ -46,6 +51,14 @@ export const appActions = {
 
   upsertSplice: (payload: Splice): AppAction => ({ type: "splice/upsert", payload }),
   removeSplice: (id: SpliceId): AppAction => ({ type: "splice/remove", payload: { id } }),
+  occupySplicePort: (spliceId: SpliceId, portIndex: number, occupantRef: string): AppAction => ({
+    type: "splice/occupyPort",
+    payload: { spliceId, portIndex, occupantRef }
+  }),
+  releaseSplicePort: (spliceId: SpliceId, portIndex: number): AppAction => ({
+    type: "splice/releasePort",
+    payload: { spliceId, portIndex }
+  }),
 
   upsertNode: (payload: NetworkNode): AppAction => ({ type: "node/upsert", payload }),
   removeNode: (id: NodeId): AppAction => ({ type: "node/remove", payload: { id } }),
