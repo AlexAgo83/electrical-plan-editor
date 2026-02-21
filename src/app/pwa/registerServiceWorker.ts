@@ -8,6 +8,16 @@ export interface RegisteredServiceWorker {
   applyUpdate: () => Promise<void>;
 }
 
+let updateServiceWorkerAction: ((reloadPage?: boolean) => Promise<void>) | null = null;
+
+export async function applyRegisteredServiceWorkerUpdate(): Promise<void> {
+  if (updateServiceWorkerAction === null) {
+    return;
+  }
+
+  await updateServiceWorkerAction(true);
+}
+
 export async function registerServiceWorker(
   callbacks: RegisterServiceWorkerCallbacks
 ): Promise<RegisteredServiceWorker | null> {
@@ -17,7 +27,7 @@ export async function registerServiceWorker(
 
   try {
     const { registerSW } = await import("virtual:pwa-register");
-    const updateServiceWorker = registerSW({
+    updateServiceWorkerAction = registerSW({
       immediate: false,
       onNeedRefresh: callbacks.onNeedRefresh,
       onOfflineReady: callbacks.onOfflineReady,
@@ -26,7 +36,7 @@ export async function registerServiceWorker(
 
     return {
       applyUpdate: async () => {
-        await updateServiceWorker(true);
+        await applyRegisteredServiceWorkerUpdate();
       }
     };
   } catch (error) {

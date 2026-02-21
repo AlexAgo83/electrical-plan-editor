@@ -96,6 +96,22 @@ button {
   margin-right: 0.45rem;
 }
 
+.header-install-toggle,
+.header-update-toggle {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  margin-right: 0.45rem;
+}
+
+.header-update-toggle {
+  border-color: #2f8f4e;
+  background: #e5f6eb;
+  color: #19542d;
+}
+
 .header-settings-toggle.is-active {
   background: #17374e;
   color: #fff;
@@ -279,11 +295,19 @@ button {
 .app-shell.theme-dark .error-banner button,
 .app-shell.theme-dark .inspector-context-toggle,
 .app-shell.theme-dark .header-nav-toggle,
+.app-shell.theme-dark .header-install-toggle,
+.app-shell.theme-dark .header-update-toggle,
 .app-shell.theme-dark .header-settings-toggle,
 .app-shell.theme-dark .header-ops-toggle {
   border-color: #4e6a84;
   background: #27415a;
   color: #e3ecf6;
+}
+
+.app-shell.theme-dark .header-update-toggle {
+  border-color: #5ba777;
+  background: #214538;
+  color: #d7f6e3;
 }
 
 .app-shell.theme-dark .workspace-tab.is-active,

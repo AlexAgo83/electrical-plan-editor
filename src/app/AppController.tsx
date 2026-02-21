@@ -83,6 +83,7 @@ import { useValidationModel } from "./hooks/useValidationModel";
 import { useWireHandlers } from "./hooks/useWireHandlers";
 import { useWorkspaceHandlers } from "./hooks/useWorkspaceHandlers";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
+import { applyRegisteredServiceWorkerUpdate } from "./pwa/registerServiceWorker";
 import {
   clamp,
   createNodePositionMap,
@@ -105,6 +106,14 @@ import type {
 import "./styles.css";
 
 export type { AppProps } from "./types/app-controller";
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{
+    outcome: "accepted" | "dismissed";
+    platform: string;
+  }>;
+}
 
 function useAppSnapshot(store: AppStore) {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);
@@ -284,6 +293,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [showShortcutHints, setShowShortcutHints] = useState(true);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
+  const [isInstallPromptAvailable, setIsInstallPromptAvailable] = useState(false);
+  const [isPwaUpdateReady, setIsPwaUpdateReady] = useState(false);
   const [isNavigationDrawerOpen, setIsNavigationDrawerOpen] = useState(false);
   const [isOperationsPanelOpen, setIsOperationsPanelOpen] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(() =>
@@ -306,6 +317,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const navigationToggleButtonRef = useRef<HTMLButtonElement | null>(null);
   const operationsPanelRef = useRef<HTMLDivElement | null>(null);
   const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
+  const deferredInstallPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
   const selected = selectSelection(state);
   const {
@@ -800,6 +812,71 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setIsNavigationDrawerOpen(false);
     setIsOperationsPanelOpen(false);
   }, [setActiveScreen]);
+
+  const handleInstallApp = useCallback(() => {
+    const promptEvent = deferredInstallPromptRef.current;
+    if (promptEvent === null) {
+      return;
+    }
+
+    void (async () => {
+      await promptEvent.prompt();
+      const choice = await promptEvent.userChoice;
+      if (choice.outcome === "accepted") {
+        deferredInstallPromptRef.current = null;
+        setIsInstallPromptAvailable(false);
+      }
+    })();
+  }, []);
+
+  const handleApplyPwaUpdate = useCallback(() => {
+    void (async () => {
+      await applyRegisteredServiceWorkerUpdate();
+      setIsPwaUpdateReady(false);
+    })();
+  }, []);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (event: Event): void => {
+      const promptEvent = event as BeforeInstallPromptEvent;
+      if (typeof promptEvent.prompt !== "function") {
+        return;
+      }
+
+      promptEvent.preventDefault();
+      deferredInstallPromptRef.current = promptEvent;
+      setIsInstallPromptAvailable(true);
+    };
+
+    const handleAppInstalled = (): void => {
+      deferredInstallPromptRef.current = null;
+      setIsInstallPromptAvailable(false);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
+    window.addEventListener("appinstalled", handleAppInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
+      window.removeEventListener("appinstalled", handleAppInstalled);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handlePwaUpdateAvailable = (): void => {
+      setIsPwaUpdateReady(true);
+    };
+
+    const handlePwaRegistrationError = (): void => {
+      setIsPwaUpdateReady(false);
+    };
+
+    window.addEventListener("app:pwa-update-available", handlePwaUpdateAvailable);
+    window.addEventListener("app:pwa-registration-error", handlePwaRegistrationError);
+    return () => {
+      window.removeEventListener("app:pwa-update-available", handlePwaUpdateAvailable);
+      window.removeEventListener("app:pwa-registration-error", handlePwaRegistrationError);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isNavigationDrawerOpen) {
@@ -1395,6 +1472,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         navigationToggleButtonRef={navigationToggleButtonRef}
         isSettingsActive={isSettingsScreen}
         onOpenSettings={handleOpenSettingsScreen}
+        isInstallPromptAvailable={isInstallPromptAvailable}
+        onInstallApp={handleInstallApp}
+        isPwaUpdateReady={isPwaUpdateReady}
+        onApplyPwaUpdate={handleApplyPwaUpdate}
         isOperationsPanelOpen={isOperationsPanelOpen}
         onToggleOperationsPanel={handleToggleOperationsPanel}
         operationsButtonRef={operationsButtonRef}

@@ -6,6 +6,10 @@ interface AppHeaderAndStatsProps {
   navigationToggleButtonRef: RefObject<HTMLButtonElement | null>;
   isSettingsActive: boolean;
   onOpenSettings: () => void;
+  isInstallPromptAvailable: boolean;
+  onInstallApp: () => void;
+  isPwaUpdateReady: boolean;
+  onApplyPwaUpdate: () => void;
   isOperationsPanelOpen: boolean;
   onToggleOperationsPanel: () => void;
   operationsButtonRef: RefObject<HTMLButtonElement | null>;
@@ -22,6 +26,10 @@ export function AppHeaderAndStats({
   navigationToggleButtonRef,
   isSettingsActive,
   onOpenSettings,
+  isInstallPromptAvailable,
+  onInstallApp,
+  isPwaUpdateReady,
+  onApplyPwaUpdate,
   isOperationsPanelOpen,
   onToggleOperationsPanel,
   operationsButtonRef,
@@ -48,6 +56,16 @@ export function AppHeaderAndStats({
           Active network: <strong>{activeNetworkLabel}</strong>
         </p>
         <div className="header-actions">
+          {isInstallPromptAvailable ? (
+            <button type="button" className="header-install-toggle" onClick={onInstallApp}>
+              Install app
+            </button>
+          ) : null}
+          {isPwaUpdateReady ? (
+            <button type="button" className="header-update-toggle" onClick={onApplyPwaUpdate}>
+              Update ready
+            </button>
+          ) : null}
           <button
             type="button"
             className={isSettingsActive ? "header-settings-toggle is-active" : "header-settings-toggle"}

@@ -1,8 +1,8 @@
 ## item_067_pwa_install_entrypoint_and_user_feedback - PWA Install Entrypoint and User Feedback
 > From version: 0.3.0
-> Understanding: 98%
-> Confidence: 96%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Installability UX
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -38,5 +38,6 @@ Even with PWA technical support enabled, users may not discover install/update c
   - `logics/request/req_011_pwa_enablement_installability_and_offline_reliability.md`
   - `src/app/components/workspace/AppHeaderAndStats.tsx`
   - `src/app/AppController.tsx`
+  - `src/app/pwa/registerServiceWorker.ts`
+  - `src/tests/pwa.header-actions.spec.tsx`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
-

@@ -2,7 +2,7 @@
 > From version: 0.3.0
 > Understanding: 100%
 > Confidence: 99%
-> Progress: 60%
+> Progress: 80%
 > Complexity: High
 > Theme: PWA Delivery Orchestration
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -21,7 +21,7 @@ Backlog scope covered:
 - [x] 1. Deliver Wave 0 PWA baseline: manifest, icons, and Vite build integration (`item_064`)
 - [x] 2. Deliver Wave 1 service worker registration and update strategy selection (`item_065`)
 - [x] 3. Deliver Wave 2 offline shell caching and deterministic cache invalidation (`item_066`)
-- [ ] 4. Deliver Wave 3 install entrypoint and update/install user feedback (`item_067`)
+- [x] 4. Deliver Wave 3 install entrypoint and update/install user feedback (`item_067`)
 - [ ] 5. Deliver Wave 4 regression matrix closure across install/offline/update and browser compatibility (`item_068`)
 - [ ] FINAL: Update related Logics docs
 
@@ -39,7 +39,7 @@ Backlog scope covered:
   - Wave 0 completed: added PWA plugin build integration, manifest metadata, and installability icon assets with successful production build artifact generation (`manifest.webmanifest`, `sw.js`).
   - Wave 1 completed: added production-only runtime SW registration with prompt-driven update strategy hooks (`onNeedRefresh`/`onOfflineReady`) and deterministic no-op behavior in non-prod paths.
   - Wave 2 completed: configured deterministic offline shell/runtime caching policy (`generateSW`, outdated cache cleanup, navigation fallback, document `NetworkFirst` runtime cache) with versioned build artifact output.
-  - Wave 3 pending: install/update UX entrypoint not started.
+  - Wave 3 completed: added header-level install entrypoint (`beforeinstallprompt` gated) and update feedback/action (`Update ready`) wired to SW update application path.
   - Wave 4 pending: regression and compatibility closure not started.
 - Current blockers:
   - None at orchestration kickoff.
@@ -65,3 +65,7 @@ Backlog scope covered:
   - `npm run typecheck` OK
   - `npm run lint` OK
   - `npm run build` OK
+- Validation snapshot (Wave 3):
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npm test -- src/tests/pwa.header-actions.spec.tsx src/tests/pwa.registration.spec.ts src/tests/app.ui.navigation-canvas.spec.tsx` OK
