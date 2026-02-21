@@ -366,7 +366,7 @@ export function useWorkspaceHandlers({
     setSnapNodesToGrid(true);
     setNetworkScale(1);
     setNetworkOffset({ x: 0, y: 0 });
-    setShowShortcutHints(true);
+    setShowShortcutHints(false);
     setKeyboardShortcutsEnabled(true);
   }
 

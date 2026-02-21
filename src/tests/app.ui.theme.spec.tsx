@@ -24,6 +24,41 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).toHaveClass("theme-dark");
   });
 
+  it("supports slate neon and paper blueprint theme variants", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    const appShell = document.querySelector("main.app-shell");
+    expect(appShell).not.toBeNull();
+
+    switchScreen("settings");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
+    expect(settingsPanel).not.toBeNull();
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "slateNeon" }
+    });
+    expect(appShell).toHaveClass("theme-dark");
+    expect(appShell).toHaveClass("theme-slate-neon");
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "paperBlueprint" }
+    });
+    expect(appShell).toHaveClass("theme-normal");
+    expect(appShell).toHaveClass("theme-paper-blueprint");
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "warmBrown" }
+    });
+    expect(appShell).toHaveClass("theme-normal");
+    expect(appShell).toHaveClass("theme-warm-brown");
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "deepGreen" }
+    });
+    expect(appShell).toHaveClass("theme-dark");
+    expect(appShell).toHaveClass("theme-deep-green");
+  });
+
   it("persists dark mode preference across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreen("settings");

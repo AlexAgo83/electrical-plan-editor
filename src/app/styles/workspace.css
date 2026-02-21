@@ -599,11 +599,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 1.2;
-}
-
-.network-scope-list tbody tr {
-  height: 2.8rem;
 }
 
 .network-scope-list .is-focusable-row {

@@ -14,7 +14,7 @@ import type {
 } from "../core/entities";
 import { buildRoutingGraphIndex, type RoutingGraphIndex } from "../core/graph";
 import { findShortestRoute, type ShortestRouteResult } from "../core/pathfinding";
-import type { AppState, SelectionState } from "./types";
+import type { AppState, SelectionState, ThemeMode } from "./types";
 
 function selectCollection<T, Id extends string>(
   byId: Record<Id, T>,
@@ -95,7 +95,7 @@ export function selectLastError(state: AppState): string | null {
   return state.ui.lastError;
 }
 
-export function selectThemeMode(state: AppState): "normal" | "dark" {
+export function selectThemeMode(state: AppState): ThemeMode {
   return state.ui.themeMode;
 }
 

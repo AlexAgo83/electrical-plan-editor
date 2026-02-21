@@ -322,7 +322,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [canvasDefaultShowGrid, setCanvasDefaultShowGrid] = useState(true);
   const [canvasDefaultSnapToGrid, setCanvasDefaultSnapToGrid] = useState(true);
   const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("100");
-  const [showShortcutHints, setShowShortcutHints] = useState(true);
+  const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
   const [isInstallPromptAvailable, setIsInstallPromptAvailable] = useState(false);
@@ -465,10 +465,19 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const isSegmentSubScreen = activeSubScreen === "segment";
   const isWireSubScreen = activeSubScreen === "wire";
   const selectedSubScreen = selected?.kind === undefined ? null : (selected.kind as SubScreenId);
+  const themeClassNamesByMode: Record<ThemeMode, string[]> = {
+    normal: ["theme-normal"],
+    dark: ["theme-dark"],
+    slateNeon: ["theme-dark", "theme-slate-neon"],
+    paperBlueprint: ["theme-normal", "theme-paper-blueprint"],
+    warmBrown: ["theme-normal", "theme-warm-brown"],
+    deepGreen: ["theme-dark", "theme-deep-green"]
+  };
+  const resolvedThemeClassNames = themeClassNamesByMode[themeMode] ?? themeClassNamesByMode.normal;
   const appShellClassName = [
     "app-shell",
     tableDensity === "compact" ? "table-density-compact" : "",
-    themeMode === "dark" ? "theme-dark" : "theme-normal"
+    ...resolvedThemeClassNames
   ]
     .filter((token) => token.length > 0)
     .join(" ");

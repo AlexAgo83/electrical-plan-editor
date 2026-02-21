@@ -24,7 +24,13 @@ export interface SelectionState {
   id: string;
 }
 
-export type ThemeMode = "normal" | "dark";
+export type ThemeMode =
+  | "normal"
+  | "dark"
+  | "slateNeon"
+  | "paperBlueprint"
+  | "warmBrown"
+  | "deepGreen";
 
 export interface LayoutNodePosition {
   x: number;

@@ -1,12 +1,29 @@
 import { useEffect } from "react";
+import type { ThemeMode } from "../../store";
 
 const UI_PREFERENCES_SCHEMA_VERSION = 1;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
+function normalizeThemeMode(value: unknown): ThemeMode {
+  switch (value) {
+    case "dark":
+      return "dark";
+    case "slateNeon":
+      return "slateNeon";
+    case "paperBlueprint":
+      return "paperBlueprint";
+    case "warmBrown":
+      return "warmBrown";
+    case "deepGreen":
+      return "deepGreen";
+    default:
+      return "normal";
+  }
+}
+
 type TableDensity = "comfortable" | "compact";
 type SortField = "name" | "technicalId";
 type SortDirection = "asc" | "desc";
-type ThemeMode = "normal" | "dark";
 
 interface SortState {
   field: SortField;
@@ -148,7 +165,7 @@ export function useUiPreferences({
         ? clamp(parsedResetZoomPercent / 100, networkMinScale, networkMaxScale)
         : 1;
 
-      setThemeMode(preferences.themeMode === "dark" ? "dark" : "normal");
+      setThemeMode(normalizeThemeMode(preferences.themeMode));
       setTableDensity(preferences.tableDensity === "compact" ? "compact" : "comfortable");
       setDefaultSortField(sortField);
       setDefaultSortDirection(sortDirection);
@@ -168,7 +185,7 @@ export function useUiPreferences({
       setCanvasResetZoomPercentInput(rawResetZoomPercent);
       setNetworkScale(resetScale);
       setNetworkOffset({ x: 0, y: 0 });
-      setShowShortcutHints(typeof preferences.showShortcutHints === "boolean" ? preferences.showShortcutHints : true);
+      setShowShortcutHints(typeof preferences.showShortcutHints === "boolean" ? preferences.showShortcutHints : false);
       setKeyboardShortcutsEnabled(
         typeof preferences.keyboardShortcutsEnabled === "boolean" ? preferences.keyboardShortcutsEnabled : true
       );

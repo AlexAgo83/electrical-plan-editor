@@ -776,3 +776,411 @@ button {
 .app-shell.theme-dark .import-status.is-failed {
   color: #ffb4bc;
 }
+
+.app-shell.theme-slate-neon {
+  color: #dcfbff;
+}
+
+.app-shell.theme-slate-neon::before {
+  background: radial-gradient(circle at top right, #143c4a 0%, #102a3a 42%, #0a1d2b 100%);
+}
+
+.app-shell.theme-slate-neon :focus-visible {
+  outline-color: #19dfc6;
+}
+
+.app-shell.theme-slate-neon .header-block {
+  border-color: #2f6a77;
+  background: rgba(15, 44, 56, 0.94);
+}
+
+.app-shell.theme-slate-neon .header-block.is-drawer-open {
+  background: rgba(15, 44, 56, 0.56);
+}
+
+.app-shell.theme-slate-neon .panel,
+.app-shell.theme-slate-neon .workspace-sidebar .workspace-switcher,
+.app-shell.theme-slate-neon .workspace-sidebar .workspace-meta,
+.app-shell.theme-slate-neon .stats-grid article,
+.app-shell.theme-slate-neon .summary-grid article,
+.app-shell.theme-slate-neon .validation-group,
+.app-shell.theme-slate-neon .cavity,
+.app-shell.theme-slate-neon .network-canvas-shell {
+  border-color: #2f6676;
+  background: #123344;
+}
+
+.app-shell.theme-slate-neon .workspace-tab,
+.app-shell.theme-slate-neon .filter-chip,
+.app-shell.theme-slate-neon .row-actions button,
+.app-shell.theme-slate-neon .row-form button,
+.app-shell.theme-slate-neon .error-banner button,
+.app-shell.theme-slate-neon .inspector-context-toggle,
+.app-shell.theme-slate-neon .header-nav-toggle,
+.app-shell.theme-slate-neon .network-scope-create-button,
+.app-shell.theme-slate-neon .header-install-toggle,
+.app-shell.theme-slate-neon .header-update-toggle,
+.app-shell.theme-slate-neon .header-settings-toggle,
+.app-shell.theme-slate-neon .header-ops-toggle {
+  border-color: #3d7a88;
+  background: #1d495a;
+  color: #dbfbff;
+}
+
+.app-shell.theme-slate-neon .workspace-tab.is-active,
+.app-shell.theme-slate-neon .filter-chip.is-active,
+.app-shell.theme-slate-neon .header-settings-toggle.is-active {
+  background: #38e6c8;
+  color: #07262c;
+  border-color: #38e6c8;
+}
+
+.app-shell.theme-slate-neon .workspace-tab-badge,
+.app-shell.theme-slate-neon .header-ops-badge {
+  background: #27586a;
+  color: #d8f1f8;
+}
+
+.app-shell.theme-slate-neon input,
+.app-shell.theme-slate-neon select,
+.app-shell.theme-slate-neon textarea {
+  border-color: #3e7584;
+  background: #0f2a38;
+  color: #ecfdff;
+}
+
+.app-shell.theme-slate-neon .data-table th,
+.app-shell.theme-slate-neon .data-table td {
+  border-bottom-color: #2d5f6d;
+}
+
+.app-shell.theme-slate-neon .data-table th {
+  color: #c6ebf4;
+}
+
+.app-shell.theme-slate-neon .data-table tr.is-selected > td {
+  background: rgba(56, 230, 200, 0.18);
+}
+
+.app-shell.theme-slate-neon .data-table tr.is-wire-highlighted > td {
+  background: rgba(68, 187, 86, 0.22);
+}
+
+.app-shell.theme-slate-neon .network-grid line {
+  stroke: #2d5a68;
+}
+
+.app-shell.theme-slate-neon .network-segment {
+  stroke: #88aec1;
+}
+
+.app-shell.theme-slate-neon .network-segment.is-wire-highlighted {
+  stroke: #59cc7a;
+}
+
+.app-shell.theme-slate-neon .network-segment.is-selected {
+  stroke: #38e6c8;
+}
+
+.app-shell.theme-slate-neon .network-node.connector circle {
+  fill: #1f5e70;
+}
+
+.app-shell.theme-slate-neon .network-node.splice circle {
+  fill: #6a6e4d;
+}
+
+.app-shell.theme-slate-neon .network-node.intermediate circle {
+  fill: #2f5664;
+}
+
+.app-shell.theme-paper-blueprint {
+  color: #12354f;
+}
+
+.app-shell.theme-paper-blueprint::before {
+  background:
+    radial-gradient(circle at top right, #f5faff 0%, #eaf3fc 42%, #deebf7 100%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(92, 131, 168, 0.08) 0,
+      rgba(92, 131, 168, 0.08) 1px,
+      transparent 1px,
+      transparent 74px
+    );
+}
+
+.app-shell.theme-paper-blueprint :focus-visible {
+  outline-color: #2a79b8;
+}
+
+.app-shell.theme-paper-blueprint .header-block {
+  border-color: #a7bfd4;
+  background: rgba(245, 250, 255, 0.96);
+}
+
+.app-shell.theme-paper-blueprint .header-block.is-drawer-open {
+  background: rgba(245, 250, 255, 0.6);
+}
+
+.app-shell.theme-paper-blueprint .panel,
+.app-shell.theme-paper-blueprint .workspace-sidebar .workspace-switcher,
+.app-shell.theme-paper-blueprint .workspace-sidebar .workspace-meta,
+.app-shell.theme-paper-blueprint .stats-grid article,
+.app-shell.theme-paper-blueprint .summary-grid article,
+.app-shell.theme-paper-blueprint .validation-group,
+.app-shell.theme-paper-blueprint .cavity,
+.app-shell.theme-paper-blueprint .network-canvas-shell {
+  border-color: #b2c7d9;
+  background: rgba(250, 253, 255, 0.95);
+}
+
+.app-shell.theme-paper-blueprint .workspace-tab,
+.app-shell.theme-paper-blueprint .filter-chip,
+.app-shell.theme-paper-blueprint .row-actions button,
+.app-shell.theme-paper-blueprint .row-form button,
+.app-shell.theme-paper-blueprint .error-banner button,
+.app-shell.theme-paper-blueprint .inspector-context-toggle,
+.app-shell.theme-paper-blueprint .header-nav-toggle,
+.app-shell.theme-paper-blueprint .network-scope-create-button,
+.app-shell.theme-paper-blueprint .header-install-toggle,
+.app-shell.theme-paper-blueprint .header-update-toggle,
+.app-shell.theme-paper-blueprint .header-settings-toggle,
+.app-shell.theme-paper-blueprint .header-ops-toggle {
+  border-color: #7f9ebb;
+  background: #e6f0f8;
+  color: #12374f;
+}
+
+.app-shell.theme-paper-blueprint .workspace-tab.is-active,
+.app-shell.theme-paper-blueprint .filter-chip.is-active,
+.app-shell.theme-paper-blueprint .header-settings-toggle.is-active {
+  background: #2f6f9f;
+  color: #f1f8ff;
+  border-color: #2f6f9f;
+}
+
+.app-shell.theme-paper-blueprint .workspace-tab-badge,
+.app-shell.theme-paper-blueprint .header-ops-badge {
+  background: #d2e3f1;
+  color: #244b67;
+}
+
+.app-shell.theme-paper-blueprint input,
+.app-shell.theme-paper-blueprint select,
+.app-shell.theme-paper-blueprint textarea {
+  border-color: #9db7cb;
+  background: #fbfeff;
+  color: #14344c;
+}
+
+.app-shell.theme-paper-blueprint .data-table th,
+.app-shell.theme-paper-blueprint .data-table td {
+  border-bottom-color: #bfd0de;
+}
+
+.app-shell.theme-paper-blueprint .data-table tr.is-selected > td {
+  background: rgba(76, 140, 196, 0.24);
+}
+
+.app-shell.theme-paper-blueprint .data-table tr.is-wire-highlighted > td {
+  background: rgba(91, 161, 101, 0.2);
+}
+
+.app-shell.theme-paper-blueprint .network-canvas-shell {
+  background: linear-gradient(180deg, #f9fcff, #edf4fb);
+}
+
+.app-shell.theme-paper-blueprint .network-grid line {
+  stroke: #b8cbda;
+}
+
+.app-shell.theme-paper-blueprint .network-segment.is-selected {
+  stroke: #2f6f9f;
+}
+
+.app-shell.theme-warm-brown {
+  color: #4e3525;
+}
+
+.app-shell.theme-warm-brown::before {
+  background: radial-gradient(circle at top right, #fbf1e7 0%, #f2e3d2 45%, #e8d6c3 100%);
+}
+
+.app-shell.theme-warm-brown .header-block {
+  border-color: #d6bca5;
+  background: rgba(252, 245, 236, 0.94);
+}
+
+.app-shell.theme-warm-brown .header-block.is-drawer-open {
+  background: rgba(252, 245, 236, 0.58);
+}
+
+.app-shell.theme-warm-brown .panel,
+.app-shell.theme-warm-brown .workspace-sidebar .workspace-switcher,
+.app-shell.theme-warm-brown .workspace-sidebar .workspace-meta,
+.app-shell.theme-warm-brown .stats-grid article,
+.app-shell.theme-warm-brown .summary-grid article,
+.app-shell.theme-warm-brown .validation-group,
+.app-shell.theme-warm-brown .cavity,
+.app-shell.theme-warm-brown .network-canvas-shell {
+  border-color: #d8bfa9;
+  background: rgba(255, 248, 241, 0.95);
+}
+
+.app-shell.theme-warm-brown .workspace-tab,
+.app-shell.theme-warm-brown .filter-chip,
+.app-shell.theme-warm-brown .row-actions button,
+.app-shell.theme-warm-brown .row-form button,
+.app-shell.theme-warm-brown .error-banner button,
+.app-shell.theme-warm-brown .inspector-context-toggle,
+.app-shell.theme-warm-brown .header-nav-toggle,
+.app-shell.theme-warm-brown .network-scope-create-button,
+.app-shell.theme-warm-brown .header-install-toggle,
+.app-shell.theme-warm-brown .header-update-toggle,
+.app-shell.theme-warm-brown .header-settings-toggle,
+.app-shell.theme-warm-brown .header-ops-toggle {
+  border-color: #caa686;
+  background: #f2dfce;
+  color: #563928;
+}
+
+.app-shell.theme-warm-brown .workspace-tab.is-active,
+.app-shell.theme-warm-brown .filter-chip.is-active,
+.app-shell.theme-warm-brown .header-settings-toggle.is-active {
+  background: #9a6b44;
+  color: #fff5ea;
+  border-color: #9a6b44;
+}
+
+.app-shell.theme-warm-brown .workspace-tab-badge,
+.app-shell.theme-warm-brown .header-ops-badge {
+  background: #e7cfbb;
+  color: #6a4731;
+}
+
+.app-shell.theme-warm-brown input,
+.app-shell.theme-warm-brown select,
+.app-shell.theme-warm-brown textarea {
+  border-color: #d0b499;
+  background: #fffaf4;
+  color: #4f3525;
+}
+
+.app-shell.theme-warm-brown .data-table th,
+.app-shell.theme-warm-brown .data-table td {
+  border-bottom-color: #dec8b4;
+}
+
+.app-shell.theme-warm-brown .data-table tr.is-selected > td {
+  background: rgba(180, 128, 84, 0.22);
+}
+
+.app-shell.theme-warm-brown .data-table tr.is-wire-highlighted > td {
+  background: rgba(128, 168, 104, 0.2);
+}
+
+.app-shell.theme-warm-brown .network-grid line {
+  stroke: #dac8b8;
+}
+
+.app-shell.theme-warm-brown .network-segment.is-selected {
+  stroke: #9a6b44;
+}
+
+.app-shell.theme-deep-green {
+  color: #d7ead7;
+}
+
+.app-shell.theme-deep-green::before {
+  background: radial-gradient(circle at top right, #18372d 0%, #122a22 44%, #0b1c16 100%);
+}
+
+.app-shell.theme-deep-green :focus-visible {
+  outline-color: #5bc88f;
+}
+
+.app-shell.theme-deep-green .header-block {
+  border-color: #3d6654;
+  background: rgba(21, 45, 36, 0.94);
+}
+
+.app-shell.theme-deep-green .header-block.is-drawer-open {
+  background: rgba(21, 45, 36, 0.56);
+}
+
+.app-shell.theme-deep-green .panel,
+.app-shell.theme-deep-green .workspace-sidebar .workspace-switcher,
+.app-shell.theme-deep-green .workspace-sidebar .workspace-meta,
+.app-shell.theme-deep-green .stats-grid article,
+.app-shell.theme-deep-green .summary-grid article,
+.app-shell.theme-deep-green .validation-group,
+.app-shell.theme-deep-green .cavity,
+.app-shell.theme-deep-green .network-canvas-shell {
+  border-color: #3b6653;
+  background: #16362d;
+}
+
+.app-shell.theme-deep-green .workspace-tab,
+.app-shell.theme-deep-green .filter-chip,
+.app-shell.theme-deep-green .row-actions button,
+.app-shell.theme-deep-green .row-form button,
+.app-shell.theme-deep-green .error-banner button,
+.app-shell.theme-deep-green .inspector-context-toggle,
+.app-shell.theme-deep-green .header-nav-toggle,
+.app-shell.theme-deep-green .network-scope-create-button,
+.app-shell.theme-deep-green .header-install-toggle,
+.app-shell.theme-deep-green .header-update-toggle,
+.app-shell.theme-deep-green .header-settings-toggle,
+.app-shell.theme-deep-green .header-ops-toggle {
+  border-color: #4a7e67;
+  background: #1f4a3a;
+  color: #ddf3e2;
+}
+
+.app-shell.theme-deep-green .workspace-tab.is-active,
+.app-shell.theme-deep-green .filter-chip.is-active,
+.app-shell.theme-deep-green .header-settings-toggle.is-active {
+  background: #5bc88f;
+  color: #0a2618;
+  border-color: #5bc88f;
+}
+
+.app-shell.theme-deep-green .workspace-tab-badge,
+.app-shell.theme-deep-green .header-ops-badge {
+  background: #2a5a49;
+  color: #d5ebdb;
+}
+
+.app-shell.theme-deep-green input,
+.app-shell.theme-deep-green select,
+.app-shell.theme-deep-green textarea {
+  border-color: #4d7a66;
+  background: #102a21;
+  color: #eaf7ed;
+}
+
+.app-shell.theme-deep-green .data-table th,
+.app-shell.theme-deep-green .data-table td {
+  border-bottom-color: #345646;
+}
+
+.app-shell.theme-deep-green .data-table th {
+  color: #c4e0cd;
+}
+
+.app-shell.theme-deep-green .data-table tr.is-selected > td {
+  background: rgba(91, 200, 143, 0.2);
+}
+
+.app-shell.theme-deep-green .data-table tr.is-wire-highlighted > td {
+  background: rgba(111, 190, 88, 0.24);
+}
+
+.app-shell.theme-deep-green .network-grid line {
+  stroke: #2f5544;
+}
+
+.app-shell.theme-deep-green .network-segment.is-selected {
+  stroke: #5bc88f;
+}

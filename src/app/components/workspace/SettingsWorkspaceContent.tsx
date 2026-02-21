@@ -100,8 +100,12 @@ export function SettingsWorkspaceContent({
           <label className="settings-field">
             Theme mode
             <select value={themeMode} onChange={(event) => setThemeMode(event.target.value as ThemeMode)}>
-              <option value="normal">Normal</option>
+              <option value="normal">Light</option>
               <option value="dark">Dark</option>
+              <option value="slateNeon">Slate Neon</option>
+              <option value="paperBlueprint">Paper Blueprint</option>
+              <option value="warmBrown">Warm Brown</option>
+              <option value="deepGreen">Deep Green</option>
             </select>
           </label>
           <label className="settings-field">
