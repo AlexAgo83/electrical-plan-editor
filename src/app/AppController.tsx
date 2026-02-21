@@ -790,6 +790,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     });
   }, []);
 
+  const handleOpenSettingsScreen = useCallback(() => {
+    setActiveScreen("settings");
+    setIsNavigationDrawerOpen(false);
+    setIsOperationsPanelOpen(false);
+  }, [setActiveScreen]);
+
   useEffect(() => {
     if (!isNavigationDrawerOpen) {
       return;
@@ -1327,6 +1333,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         isNavigationDrawerOpen={isNavigationDrawerOpen}
         onToggleNavigationDrawer={handleToggleNavigationDrawer}
         navigationToggleButtonRef={navigationToggleButtonRef}
+        isSettingsActive={isSettingsScreen}
+        onOpenSettings={handleOpenSettingsScreen}
         isOperationsPanelOpen={isOperationsPanelOpen}
         onToggleOperationsPanel={handleToggleOperationsPanel}
         operationsButtonRef={operationsButtonRef}
@@ -1334,11 +1342,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         validationErrorCount={validationErrorCount}
         lastError={lastError}
         onClearError={() => dispatchAction(appActions.clearError())}
-        connectorCount={connectors.length}
-        spliceCount={splices.length}
-        nodeCount={nodes.length}
-        segmentCount={segments.length}
-        wireCount={wires.length}
       />
 
       <section className="workspace-shell">
@@ -1400,6 +1403,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           <NetworkScopeScreen isActive={isNetworkScopeScreen}>
             <NetworkScopeWorkspaceContent
               networks={networks}
+              connectorCount={connectors.length}
+              spliceCount={splices.length}
+              nodeCount={nodes.length}
+              segmentCount={segments.length}
+              wireCount={wires.length}
               activeNetworkId={activeNetworkId}
               activeNetworkLabel={activeNetworkLabel}
               hasActiveNetwork={hasActiveNetwork}

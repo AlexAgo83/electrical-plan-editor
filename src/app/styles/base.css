@@ -72,6 +72,8 @@ button {
 
 .header-actions {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
 }
 
 .header-ops-toggle {
@@ -83,6 +85,21 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+}
+
+.header-settings-toggle {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  margin-right: 0.45rem;
+}
+
+.header-settings-toggle.is-active {
+  background: #17374e;
+  color: #fff;
+  border-color: #17374e;
 }
 
 .header-ops-badge {
@@ -260,6 +277,7 @@ button {
 .app-shell.theme-dark .row-form button,
 .app-shell.theme-dark .error-banner button,
 .app-shell.theme-dark .header-nav-toggle,
+.app-shell.theme-dark .header-settings-toggle,
 .app-shell.theme-dark .header-ops-toggle {
   border-color: #4e6a84;
   background: #27415a;
@@ -268,6 +286,12 @@ button {
 
 .app-shell.theme-dark .workspace-tab.is-active,
 .app-shell.theme-dark .filter-chip.is-active {
+  background: #7fc5ff;
+  color: #092038;
+  border-color: #7fc5ff;
+}
+
+.app-shell.theme-dark .header-settings-toggle.is-active {
   background: #7fc5ff;
   color: #092038;
   border-color: #7fc5ff;

@@ -5,6 +5,11 @@ import type { SortDirection, SortField, TableDensity } from "../../types/app-con
 
 interface NetworkScopeWorkspaceContentProps {
   networks: Array<{ id: NetworkId; name: string; technicalId: string }>;
+  connectorCount: number;
+  spliceCount: number;
+  nodeCount: number;
+  segmentCount: number;
+  wireCount: number;
   activeNetworkId: NetworkId | null;
   activeNetworkLabel: string;
   hasActiveNetwork: boolean;
@@ -52,6 +57,11 @@ interface NetworkScopeWorkspaceContentProps {
 
 export function NetworkScopeWorkspaceContent({
   networks,
+  connectorCount,
+  spliceCount,
+  nodeCount,
+  segmentCount,
+  wireCount,
   activeNetworkId,
   activeNetworkLabel,
   hasActiveNetwork,
@@ -98,6 +108,29 @@ export function NetworkScopeWorkspaceContent({
 }: NetworkScopeWorkspaceContentProps): ReactElement {
   return (
     <section className="panel-grid">
+      <section className="stats-grid" aria-label="Entity counters">
+        <article>
+          <h2>Connectors</h2>
+          <p>{connectorCount}</p>
+        </article>
+        <article>
+          <h2>Splices</h2>
+          <p>{spliceCount}</p>
+        </article>
+        <article>
+          <h2>Nodes</h2>
+          <p>{nodeCount}</p>
+        </article>
+        <article>
+          <h2>Segments</h2>
+          <p>{segmentCount}</p>
+        </article>
+        <article>
+          <h2>Wires</h2>
+          <p>{wireCount}</p>
+        </article>
+      </section>
+
       <section className="panel">
         <h2>Network Scope</h2>
         <p className="meta-line">

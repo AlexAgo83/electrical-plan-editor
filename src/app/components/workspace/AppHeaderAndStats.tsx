@@ -4,6 +4,8 @@ interface AppHeaderAndStatsProps {
   isNavigationDrawerOpen: boolean;
   onToggleNavigationDrawer: () => void;
   navigationToggleButtonRef: RefObject<HTMLButtonElement | null>;
+  isSettingsActive: boolean;
+  onOpenSettings: () => void;
   isOperationsPanelOpen: boolean;
   onToggleOperationsPanel: () => void;
   operationsButtonRef: RefObject<HTMLButtonElement | null>;
@@ -11,11 +13,6 @@ interface AppHeaderAndStatsProps {
   validationErrorCount: number;
   lastError: string | null;
   onClearError: () => void;
-  connectorCount: number;
-  spliceCount: number;
-  nodeCount: number;
-  segmentCount: number;
-  wireCount: number;
 }
 
 export function AppHeaderAndStats({
@@ -23,18 +20,15 @@ export function AppHeaderAndStats({
   isNavigationDrawerOpen,
   onToggleNavigationDrawer,
   navigationToggleButtonRef,
+  isSettingsActive,
+  onOpenSettings,
   isOperationsPanelOpen,
   onToggleOperationsPanel,
   operationsButtonRef,
   validationIssuesCount,
   validationErrorCount,
   lastError,
-  onClearError,
-  connectorCount,
-  spliceCount,
-  nodeCount,
-  segmentCount,
-  wireCount
+  onClearError
 }: AppHeaderAndStatsProps): ReactElement {
   return (
     <>
@@ -54,6 +48,14 @@ export function AppHeaderAndStats({
           Active network: <strong>{activeNetworkLabel}</strong>
         </p>
         <div className="header-actions">
+          <button
+            type="button"
+            className={isSettingsActive ? "header-settings-toggle is-active" : "header-settings-toggle"}
+            aria-pressed={isSettingsActive}
+            onClick={onOpenSettings}
+          >
+            Settings
+          </button>
           <button
             ref={operationsButtonRef}
             type="button"
@@ -81,29 +83,6 @@ export function AppHeaderAndStats({
           </button>
         </section>
       ) : null}
-
-      <section className="stats-grid" aria-label="Entity counters">
-        <article>
-          <h2>Connectors</h2>
-          <p>{connectorCount}</p>
-        </article>
-        <article>
-          <h2>Splices</h2>
-          <p>{spliceCount}</p>
-        </article>
-        <article>
-          <h2>Nodes</h2>
-          <p>{nodeCount}</p>
-        </article>
-        <article>
-          <h2>Segments</h2>
-          <p>{segmentCount}</p>
-        </article>
-        <article>
-          <h2>Wires</h2>
-          <p>{wireCount}</p>
-        </article>
-      </section>
     </>
   );
 }

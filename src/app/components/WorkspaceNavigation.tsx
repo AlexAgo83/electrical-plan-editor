@@ -35,8 +35,7 @@ export function WorkspaceNavigation({
           ["networkScope", "Network Scope"],
           ["modeling", "Modeling"],
           ["analysis", "Analysis"],
-          ["validation", "Validation"],
-          ["settings", "Settings"]
+          ["validation", "Validation"]
         ] as const).map(([screenId, label]) => (
           <button
             key={screenId}

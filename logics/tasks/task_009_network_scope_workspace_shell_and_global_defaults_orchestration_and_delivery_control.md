@@ -2,7 +2,7 @@
 > From version: 0.3.0
 > Understanding: 100%
 > Confidence: 98%
-> Progress: 63%
+> Progress: 75%
 > Complexity: High
 > Theme: Workspace Shell and Navigation Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -27,7 +27,7 @@ Backlog scope covered:
 - [x] 3. Deliver Wave 2 network lifecycle consolidation in `Network Scope` with safeguards (`item_057`)
 - [x] 4. Deliver Wave 3 global settings relocation and defaults (`dark` + snap enabled) with persistence compatibility (`item_058`)
 - [x] 5. Deliver Wave 4 operational controls extraction: floating operations/health panel + header issue badge (`item_060`)
-- [ ] 6. Deliver Wave 5 information placement cleanup: summary capsules moved to `Network Scope` and `Settings` header entrypoint cleanup (`item_061`, `item_062`)
+- [x] 6. Deliver Wave 5 information placement cleanup: summary capsules moved to `Network Scope` and `Settings` header entrypoint cleanup (`item_061`, `item_062`)
 - [ ] 7. Deliver Wave 6 contextual inspector floating panel (`open` / `collapsed` / `hidden`) anchored bottom-right (`item_063`)
 - [ ] 8. Deliver Wave 7 regression, accessibility, scroll-layering, and AC traceability closure (`item_059`)
 - [ ] FINAL: Update related Logics docs
@@ -48,7 +48,7 @@ Backlog scope covered:
   - Wave 2 completed: moved active-network lifecycle controls (select/create/rename/duplicate/delete) into `Network Scope` workspace with existing safeguards preserved.
   - Wave 3 completed: relocated global preferences to `Network Scope`, kept `Settings` for sample/import-export tools, and switched fresh/reset defaults to dark mode + snap enabled.
   - Wave 4 completed: moved undo/redo + model health actions into a floating panel opened from header right, with issue-count badge and outside/focus/escape close behavior.
-  - Wave 5 pending: summary capsule relocation and settings entrypoint cleanup not started.
+  - Wave 5 completed: moved entity counter capsules from header to `Network Scope` and moved `Settings` entrypoint from left navigation to a dedicated header-right action.
   - Wave 6 pending: contextual inspector floating panel behavior not started.
   - Wave 7 pending: regression/accessibility/traceability closure not started.
 - Current blockers:
@@ -84,3 +84,7 @@ Backlog scope covered:
   - `npm run typecheck` OK
   - `npm run lint` OK
   - `npm test -- src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.validation.spec.tsx` OK
+- Validation snapshot (Wave 5):
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npm test -- src/tests/app.ui.settings.spec.tsx src/tests/app.ui.theme.spec.tsx src/tests/app.ui.import-export.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.validation.spec.tsx` OK

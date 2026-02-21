@@ -146,12 +146,16 @@ export function getPanelByHeading(name: string): HTMLElement {
 }
 
 export function switchScreen(target: "networkScope" | "modeling" | "analysis" | "validation" | "settings"): void {
+  if (target === "settings") {
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    return;
+  }
+
   const labelByScreen = {
     networkScope: "Network Scope",
     modeling: "Modeling",
     analysis: "Analysis",
-    validation: "Validation",
-    settings: "Settings"
+    validation: "Validation"
   } as const;
   const primaryNavRow = document.querySelector(".workspace-nav-row");
   if (primaryNavRow === null) {

@@ -1,8 +1,8 @@
 ## item_061_network_scope_summary_capsules_relocation - Network Scope Summary Capsules Relocation
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Information Density and Context Placement
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -37,7 +37,7 @@ Top summary capsules consume premium header space and compete with shell control
 - References:
   - `logics/request/req_010_network_scope_workspace_shell_and_global_defaults.md`
   - `src/app/components/workspace/AppHeaderAndStats.tsx`
+  - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`
   - `src/app/components/NetworkSummaryPanel.tsx`
   - `src/app/AppController.tsx`
   - `src/tests/app.ui.networks.spec.tsx`
-
