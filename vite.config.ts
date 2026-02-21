@@ -4,6 +4,9 @@ import { resolveRuntimeEnvironment } from "./src/config/environment";
 
 export default defineConfig(({ mode }) => {
   const env = resolveRuntimeEnvironment(loadEnv(mode, process.cwd(), ""));
+  for (const warning of env.warnings) {
+    console.warn(`[env] ${warning}`);
+  }
 
   return {
     plugins: [react()],

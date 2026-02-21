@@ -1,8 +1,12 @@
 import { APP_SCHEMA_VERSION } from "../../core/schema";
+import { resolveStorageKey } from "../../config/environment";
 import { createSampleNetworkState, isWorkspaceEmpty, type AppState } from "../../store";
 import { migratePersistedPayload, type PersistedStateSnapshotV1 } from "./migrations";
 
-export const STORAGE_KEY = "electrical-plan-editor.state";
+const configuredStorageKey =
+  typeof import.meta.env.VITE_STORAGE_KEY === "string" ? import.meta.env.VITE_STORAGE_KEY : undefined;
+
+export const STORAGE_KEY = resolveStorageKey(configuredStorageKey);
 
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 type IsoNowProvider = () => string;

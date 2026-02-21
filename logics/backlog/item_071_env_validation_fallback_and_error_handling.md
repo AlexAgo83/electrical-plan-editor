@@ -1,8 +1,8 @@
 ## item_071_env_validation_fallback_and_error_handling - Env Validation Fallback and Error Handling
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Defensive Configuration Safety
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,7 +36,9 @@ Env support without strong validation introduces ambiguous startup behavior when
 - Related AC: AC4, AC6, AC7, AC8.
 - References:
   - `logics/request/req_012_environment_configuration_and_runtime_defaults.md`
+  - `src/config/environment.ts`
   - `vite.config.ts`
   - `src/adapters/persistence/localStorage.ts`
+  - `src/tests/config.environment.spec.ts`
+  - `src/tests/persistence.storage-key.spec.ts`
   - `README.md`
-

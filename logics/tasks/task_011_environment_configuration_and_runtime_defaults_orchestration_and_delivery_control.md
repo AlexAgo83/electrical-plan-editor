@@ -2,7 +2,7 @@
 > From version: 0.3.0
 > Understanding: 100%
 > Confidence: 99%
-> Progress: 40%
+> Progress: 60%
 > Complexity: Medium
 > Theme: Env Configuration Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -20,7 +20,7 @@ Backlog scope covered:
 # Plan
 - [x] 1. Deliver Wave 0 env contract bootstrap with `.env.example` and tracked defaults (`item_069`)
 - [x] 2. Deliver Wave 1 runtime resolution for host/port/preview/e2e defaults with `APP_PORT=5284` baseline (`item_070`)
-- [ ] 3. Deliver Wave 2 validation and deterministic fallback/error policy (`item_071`)
+- [x] 3. Deliver Wave 2 validation and deterministic fallback/error policy (`item_071`)
 - [ ] 4. Deliver Wave 3 documentation and onboarding updates (`item_072`)
 - [ ] 5. Deliver Wave 4 regression matrix and CI stability closure (`item_073`)
 - [ ] FINAL: Update related Logics docs
@@ -36,7 +36,7 @@ Backlog scope covered:
 - Wave status:
   - Wave 0 completed: added `.env.example` contract with documented defaults and updated `.gitignore` to keep `.env` local-only.
   - Wave 1 completed: introduced shared env runtime resolver and wired `vite` + `playwright` to `APP_HOST`/`APP_PORT`/`PREVIEW_PORT`/`E2E_BASE_URL` defaults and overrides.
-  - Wave 2 pending: validation/fallback policy not started.
+  - Wave 2 completed: enforced deterministic fallback/warnings for invalid env values and added `VITE_STORAGE_KEY` resolution with explicit persistence-key fallback.
   - Wave 3 pending: docs onboarding update not started.
   - Wave 4 pending: regression and CI closure not started.
 - Current blockers:
@@ -54,3 +54,7 @@ Backlog scope covered:
 - Validation snapshot (Wave 1):
   - `npm run typecheck` OK
   - `npm run lint` OK
+- Validation snapshot (Wave 2):
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npm test -- src/tests/config.environment.spec.ts src/tests/persistence.storage-key.spec.ts src/tests/persistence.localStorage.spec.ts` OK
