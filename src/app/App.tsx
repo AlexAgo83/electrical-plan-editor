@@ -2732,74 +2732,78 @@ export function App({ store = appStore }: AppProps): ReactElement {
         </article>
       </section>
 
-      <section className="workspace-switcher">
-        <div className="workspace-nav-row">
-          {([
-            ["modeling", "Modeling"],
-            ["analysis", "Analysis"],
-            ["validation", "Validation"],
-            ["settings", "Settings"]
-          ] as const).map(([screenId, label]) => (
-            <button
-              key={screenId}
-              type="button"
-              className={activeScreen === screenId ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={() => setActiveScreen(screenId)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        {isModelingScreen || isAnalysisScreen ? (
-          <div className="workspace-nav-row secondary">
-            {([
-              ["connector", "Connector"],
-              ["splice", "Splice"],
-              ["node", "Node"],
-              ["segment", "Segment"],
-              ["wire", "Wire"]
-            ] as const).map(([subScreenId, label]) => (
-              <button
-                key={subScreenId}
-                type="button"
-                className={activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
-                onClick={() => setActiveSubScreen(subScreenId)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        ) : null}
-        <p className="meta-line screen-description">
-          {isModelingScreen
-            ? "Modeling workspace: entity editor + operational lists."
-            : isAnalysisScreen
-              ? "Analysis workspace: synthesis, route control, and network insight."
-              : isValidationScreen
-                ? "Validation center: grouped model integrity issues with one-click navigation."
-                : "Settings workspace: workspace preferences and project-level options."}
-        </p>
-      </section>
+      <section className="workspace-shell">
+        <aside className="workspace-sidebar">
+          <section className="workspace-switcher">
+            <div className="workspace-nav-row">
+              {([
+                ["modeling", "Modeling"],
+                ["analysis", "Analysis"],
+                ["validation", "Validation"],
+                ["settings", "Settings"]
+              ] as const).map(([screenId, label]) => (
+                <button
+                  key={screenId}
+                  type="button"
+                  className={activeScreen === screenId ? "workspace-tab is-active" : "workspace-tab"}
+                  onClick={() => setActiveScreen(screenId)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {isModelingScreen || isAnalysisScreen ? (
+              <div className="workspace-nav-row secondary">
+                {([
+                  ["connector", "Connector"],
+                  ["splice", "Splice"],
+                  ["node", "Node"],
+                  ["segment", "Segment"],
+                  ["wire", "Wire"]
+                ] as const).map(([subScreenId, label]) => (
+                  <button
+                    key={subScreenId}
+                    type="button"
+                    className={activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
+                    onClick={() => setActiveSubScreen(subScreenId)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            <p className="meta-line screen-description">
+              {isModelingScreen
+                ? "Modeling workspace: entity editor + operational lists."
+                : isAnalysisScreen
+                  ? "Analysis workspace: synthesis, route control, and network insight."
+                  : isValidationScreen
+                    ? "Validation center: grouped model integrity issues with one-click navigation."
+                    : "Settings workspace: workspace preferences and project-level options."}
+            </p>
+          </section>
 
-      <section className="workspace-meta">
-        <div className="workspace-meta-main">
-          <div className="row-actions compact">
-            <button type="button" onClick={handleUndo} disabled={!isUndoAvailable}>
-              Undo
-            </button>
-            <button type="button" onClick={handleRedo} disabled={!isRedoAvailable}>
-              Redo
-            </button>
-          </div>
-          {showShortcutHints ? (
-            <p className="shortcut-hints">Shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo.</p>
-          ) : null}
-        </div>
-        <p className={`save-status is-${saveStatus}`}>
-          State: {saveStatus === "saved" ? "Saved" : saveStatus === "unsaved" ? "Unsaved" : "Error"}
-        </p>
-      </section>
+          <section className="workspace-meta">
+            <div className="workspace-meta-main">
+              <div className="row-actions compact">
+                <button type="button" onClick={handleUndo} disabled={!isUndoAvailable}>
+                  Undo
+                </button>
+                <button type="button" onClick={handleRedo} disabled={!isRedoAvailable}>
+                  Redo
+                </button>
+              </div>
+              {showShortcutHints ? (
+                <p className="shortcut-hints">Shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo.</p>
+              ) : null}
+            </div>
+            <p className={`save-status is-${saveStatus}`}>
+              State: {saveStatus === "saved" ? "Saved" : saveStatus === "unsaved" ? "Unsaved" : "Error"}
+            </p>
+          </section>
+        </aside>
 
+        <section className="workspace-content">
       {isModelingScreen ? (
         <>
       <section className="workspace-stage">
@@ -4170,6 +4174,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
           </section>
         </section>
       ) : null}
+        </section>
+      </section>
     </main>
   );
 }

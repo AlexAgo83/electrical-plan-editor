@@ -79,7 +79,7 @@ Validation and acceptance coverage item `item_008` is implemented:
 - CI baseline executes lint, typecheck, unit/integration, and E2E smoke checks.
 
 UX/UI workspace wave (`task_001`) is in progress:
-- Persistent workspace navigation is active.
+- Persistent left-rail workspace navigation is active.
 - Validation center screen with grouped issues and `Go to` actions is active.
 - List ergonomics now include search on all core lists and filters on node/wire/connector/splice/segment lists.
 - Network canvas is visible in both modeling and analysis workspaces.

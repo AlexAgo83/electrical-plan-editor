@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 75%
+> Progress: 95%
 > Complexity: High
 > Theme: UX/UI Information Architecture
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -34,9 +34,10 @@ The current UX relies on dropdown selectors and fragmented panels, which slows d
 - Dependencies: item_006, item_008.
 - Related AC: AC1, AC2.
 - Status update:
-  - Persistent workspace tabs are active (`Modeling`, `Analysis`, `Validation`, `Settings`).
+  - Persistent left navigation rail is active with top-level workspace tabs (`Modeling`, `Analysis`, `Validation`, `Settings`).
+  - Entity sub-navigation is available from the same rail for modeling/analysis contexts.
   - Canvas panel is now visible in both modeling and analysis contexts.
-  - Responsive 3-column workspace stage is active for wide desktop viewports.
+  - Responsive workspace behavior keeps sidebar + content split on desktop and stacked flow on narrower viewports.
 - References:
   - `logics/request/req_001_v1_ux_ui_operator_workspace.md`
   - `src/app/App.tsx`
