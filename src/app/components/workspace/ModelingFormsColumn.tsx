@@ -355,8 +355,8 @@ export function ModelingFormsColumn({
             <input value={wireTechnicalId} onChange={(event) => setWireTechnicalId(event.target.value)} placeholder="W-001" required />
           </label>
           {wireTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
-          <div className="form-split">
-            <fieldset className="inline-fieldset">
+          <div className="form-split wire-endpoints-grid">
+            <fieldset className="inline-fieldset wire-endpoint-fieldset">
               <legend>Endpoint A</legend>
               <label>
                 Type
@@ -396,7 +396,7 @@ export function ModelingFormsColumn({
               )}
             </fieldset>
 
-            <fieldset className="inline-fieldset">
+            <fieldset className="inline-fieldset wire-endpoint-fieldset">
               <legend>Endpoint B</legend>
               <label>
                 Type

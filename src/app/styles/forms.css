@@ -9,6 +9,10 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+.form-split > * {
+  min-width: 0;
+}
+
 .inline-fieldset {
   margin: 0;
   border: 1px solid #cfdde8;
@@ -16,6 +20,7 @@
   padding: 0.6rem;
   display: grid;
   gap: 0.55rem;
+  min-width: 0;
 }
 
 .inline-fieldset legend {
@@ -47,6 +52,32 @@
   border: 1px solid #bacada;
   padding: 0.45rem 0.6rem;
   background: #fff;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.wire-endpoints-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.wire-endpoint-fieldset {
+  padding: 0.7rem;
+  border-color: #b8cedf;
+  background: linear-gradient(180deg, rgba(246, 251, 255, 0.72), rgba(236, 245, 252, 0.34));
+}
+
+.wire-endpoint-fieldset legend {
+  padding: 0 0.35rem;
+  font-size: 0.84rem;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+
+.wire-endpoint-fieldset label {
+  min-width: 0;
 }
 
 .inline-error {
@@ -111,4 +142,10 @@
   color: #153048;
   border-radius: 0.45rem;
   padding: 0.2rem 0.55rem;
+}
+
+@media (max-width: 980px) {
+  .wire-endpoints-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

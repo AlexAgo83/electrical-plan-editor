@@ -310,7 +310,7 @@ export function AnalysisWorkspaceContent({
         )}
       </section>
 
-      <section className="panel" hidden={!isWireSubScreen}>
+      <section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen}>
         <header className="list-panel-header">
           <h2>Wires</h2>
           <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
@@ -393,7 +393,7 @@ export function AnalysisWorkspaceContent({
         )}
       </section>
 
-      <section className="panel" hidden={!isWireSubScreen}>
+      <section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen}>
         <header className="analysis-wire-route-header">
           <h2>Wire route control</h2>
           {selectedWire !== null ? (

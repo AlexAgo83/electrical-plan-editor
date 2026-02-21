@@ -226,6 +226,7 @@
 
 .analysis-panel-grid {
   grid-template-columns: minmax(0, 1fr);
+  align-items: start;
 }
 
 .analysis-wire-route-header {
@@ -263,6 +264,10 @@
 .analysis-wire-route-content {
   display: grid;
   gap: 0.6rem;
+}
+
+.analysis-wire-route-panel {
+  align-self: start;
 }
 
 .analysis-wire-identity {

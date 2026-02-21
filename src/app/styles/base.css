@@ -590,6 +590,11 @@ button {
   color: #b8cbdd;
 }
 
+.app-shell.theme-dark .wire-endpoint-fieldset {
+  border-color: #4d6781;
+  background: linear-gradient(180deg, rgba(19, 35, 50, 0.76), rgba(18, 34, 49, 0.45));
+}
+
 .app-shell.theme-dark .data-table th,
 .app-shell.theme-dark .data-table td {
   border-bottom-color: #334d64;
