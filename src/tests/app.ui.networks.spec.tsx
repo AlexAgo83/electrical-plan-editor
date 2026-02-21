@@ -58,8 +58,7 @@ describe("App integration UI - networks", () => {
     const networkRow = within(networkScopePanel).getByText("Network B").closest("tr");
     expect(networkRow).not.toBeNull();
     fireEvent.click(networkRow as HTMLElement);
-    const editPanel = getPanelByHeading("Edit network");
-    fireEvent.click(within(editPanel).getByRole("button", { name: "Set active" }));
+    fireEvent.click(within(networkScopePanel).getByRole("button", { name: "Set active" }));
 
     switchScreen("modeling");
     connectorsPanel = getPanelByHeading("Connectors");
@@ -75,7 +74,7 @@ describe("App integration UI - networks", () => {
     switchScreen("networkScope");
 
     expect(within(document.body).getByRole("heading", { name: "Network Scope" })).toBeInTheDocument();
-    expect(within(document.body).getByRole("button", { name: "Create new network" })).toBeInTheDocument();
+    expect(within(document.body).getByRole("button", { name: "New" })).toBeInTheDocument();
   });
 
   it("edits the selected network through the shared create/edit form", async () => {

@@ -28,6 +28,8 @@ export function WorkspaceNavigation({
   onScreenChange,
   onSubScreenChange
 }: WorkspaceNavigationProps): ReactElement {
+  const showEntityNavigation = isModelingScreen || isAnalysisScreen;
+
   return (
     <section className="workspace-switcher">
       <div className="workspace-nav-row">
@@ -57,31 +59,33 @@ export function WorkspaceNavigation({
           </button>
         ))}
       </div>
-      {isModelingScreen || isAnalysisScreen ? <p className="meta-line workspace-nav-divider">Entity navigation</p> : null}
-      {isModelingScreen || isAnalysisScreen ? (
-        <div className="workspace-nav-row secondary">
-          {([
-            ["connector", "Connector"],
-            ["splice", "Splice"],
-            ["node", "Node"],
-            ["segment", "Segment"],
-            ["wire", "Wire"]
-          ] as const).map(([subScreenId, label]) => (
-            <button
-              key={subScreenId}
-              type="button"
-              className={activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={() => onSubScreenChange(subScreenId)}
-            >
-              <span className="workspace-tab-content">
-                <span>{label}</span>
-                <span className="workspace-tab-badge" aria-hidden="true">
-                  {entityCountBySubScreen[subScreenId]}
+      {showEntityNavigation ? (
+        <section className="workspace-nav-subsection" aria-label="Entity navigation">
+          <p className="meta-line workspace-nav-divider">Entity navigation</p>
+          <div className="workspace-nav-row secondary">
+            {([
+              ["connector", "Connector"],
+              ["splice", "Splice"],
+              ["node", "Node"],
+              ["segment", "Segment"],
+              ["wire", "Wire"]
+            ] as const).map(([subScreenId, label]) => (
+              <button
+                key={subScreenId}
+                type="button"
+                className={activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
+                onClick={() => onSubScreenChange(subScreenId)}
+              >
+                <span className="workspace-tab-content">
+                  <span>{label}</span>
+                  <span className="workspace-tab-badge" aria-hidden="true">
+                    {entityCountBySubScreen[subScreenId]}
+                  </span>
                 </span>
-              </span>
-            </button>
-          ))}
-        </div>
+              </button>
+            ))}
+          </div>
+        </section>
       ) : null}
       <p className="meta-line screen-description">
         {activeScreen === "networkScope"

@@ -7,11 +7,18 @@ interface NetworkScopeWorkspaceContentProps {
   networks: Array<{ id: NetworkId; name: string; technicalId: string }>;
   networkSort: SortState;
   setNetworkSort: (value: SortState | ((current: SortState) => SortState)) => void;
-  connectorCount: number;
-  spliceCount: number;
-  nodeCount: number;
-  segmentCount: number;
-  wireCount: number;
+  networkEntityCountsById: Partial<
+    Record<
+      NetworkId,
+      {
+        connectorCount: number;
+        spliceCount: number;
+        nodeCount: number;
+        segmentCount: number;
+        wireCount: number;
+      }
+    >
+  >;
   activeNetworkId: NetworkId | null;
   handleSelectNetwork: (networkId: NetworkId) => void;
   handleDuplicateNetwork: (networkId: NetworkId | null) => void;
@@ -35,11 +42,7 @@ export function NetworkScopeWorkspaceContent({
   networks,
   networkSort,
   setNetworkSort,
-  connectorCount,
-  spliceCount,
-  nodeCount,
-  segmentCount,
-  wireCount,
+  networkEntityCountsById,
   activeNetworkId,
   handleSelectNetwork,
   handleDuplicateNetwork,
@@ -74,6 +77,8 @@ export function NetworkScopeWorkspaceContent({
     [networkSort, networks]
   );
   const focusedNetwork = focusedNetworkId === null ? null : networks.find((network) => network.id === focusedNetworkId) ?? null;
+  const focusedNetworkCounts =
+    focusedNetworkId === null ? null : networkEntityCountsById[focusedNetworkId] ?? null;
   const networkSortIndicator = (field: "name" | "technicalId"): "asc" | "desc" | null => {
     if (networkSort.field !== field) {
       return null;
@@ -95,29 +100,17 @@ export function NetworkScopeWorkspaceContent({
     setFocusedNetworkId(activeNetworkId ?? networks[0]?.id ?? null);
   }, [activeNetworkId, focusedNetworkId, networks]);
   const indicators = [
-    { label: "Connectors", value: connectorCount },
-    { label: "Splices", value: spliceCount },
-    { label: "Nodes", value: nodeCount },
-    { label: "Segments", value: segmentCount },
-    { label: "Wires", value: wireCount }
+    { label: "Connectors", value: focusedNetworkCounts?.connectorCount ?? 0 },
+    { label: "Splices", value: focusedNetworkCounts?.spliceCount ?? 0 },
+    { label: "Nodes", value: focusedNetworkCounts?.nodeCount ?? 0 },
+    { label: "Segments", value: focusedNetworkCounts?.segmentCount ?? 0 },
+    { label: "Wires", value: focusedNetworkCounts?.wireCount ?? 0 }
   ];
 
   return (
     <section className="panel-grid network-scope-grid">
-      <section className="network-scope-indicators" aria-label="Entity counters">
-        {indicators.map((indicator) => (
-          <article key={indicator.label} className="network-scope-indicator">
-            <h2>{indicator.label}</h2>
-            <p>{indicator.value}</p>
-          </article>
-        ))}
-      </section>
-
       <section className="panel network-scope-panel">
         <h2>Network Scope</h2>
-        <p className="meta-line">
-          Available networks: <strong>{networks.length}</strong>
-        </p>
         {networks.length === 0 ? (
           <p className="empty-copy">No network available. Create one to enable modeling and analysis.</p>
         ) : (
@@ -209,9 +202,45 @@ export function NetworkScopeWorkspaceContent({
             </div>
           </>
         )}
-        <button type="button" className="network-scope-create-button" onClick={handleOpenCreateNetworkForm}>
-          Create new network
-        </button>
+        <div className="row-actions compact network-scope-list-actions">
+          <button type="button" className="network-scope-create-button" onClick={handleOpenCreateNetworkForm}>
+            New
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (focusedNetwork !== null) {
+                handleSelectNetwork(focusedNetwork.id);
+              }
+            }}
+            disabled={focusedNetwork === null || isCreateMode || focusedNetwork.id === activeNetworkId}
+          >
+            Set active
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (focusedNetwork !== null) {
+                handleDuplicateNetwork(focusedNetwork.id);
+              }
+            }}
+            disabled={focusedNetwork === null || isCreateMode}
+          >
+            Duplicate
+          </button>
+          <button
+            type="button"
+            className="network-delete-button"
+            onClick={() => {
+              if (focusedNetwork !== null) {
+                handleDeleteNetwork(focusedNetwork.id);
+              }
+            }}
+            disabled={focusedNetwork === null || isCreateMode}
+          >
+            Delete
+          </button>
+        </div>
       </section>
 
       <section className="panel network-form-panel">
@@ -229,33 +258,14 @@ export function NetworkScopeWorkspaceContent({
             {isCreateMode ? "Create mode" : isEditMode ? "Edit mode" : "Idle"}
           </span>
         </header>
-        {focusedNetwork !== null ? (
-          <section className="network-focus-actions">
-            <p className="network-focus-title">
-              Focused network: <strong>{focusedNetwork.name}</strong>
-            </p>
-            <div className="row-actions compact">
-            <button
-              type="button"
-              onClick={() => handleSelectNetwork(focusedNetwork.id)}
-              disabled={isCreateMode || focusedNetwork.id === activeNetworkId}
-            >
-              Set active
-            </button>
-            <button type="button" onClick={() => handleDuplicateNetwork(focusedNetwork.id)} disabled={isCreateMode}>
-              Duplicate
-            </button>
-            <button
-              type="button"
-              className="network-delete-button"
-              onClick={() => handleDeleteNetwork(focusedNetwork.id)}
-              disabled={isCreateMode}
-            >
-              Delete
-            </button>
-            </div>
-          </section>
-        ) : null}
+        <section className="network-scope-indicators network-scope-indicators-form" aria-label="Focused network entity counters">
+          {indicators.map((indicator) => (
+            <article key={indicator.label} className="network-scope-indicator">
+              <span className="network-scope-indicator-label">{indicator.label}</span>
+              <strong className="network-scope-indicator-value">{indicator.value}</strong>
+            </article>
+          ))}
+        </section>
         {!isFormOpen ? (
           <>
             <p className="empty-copy">Choose Create or Edit from the network scope panel to open this form.</p>
@@ -292,9 +302,6 @@ export function NetworkScopeWorkspaceContent({
             </div>
           </form>
         )}
-        {isEditMode ? (
-          <p className="meta-line">Edit mode targets the network currently selected in the list.</p>
-        ) : null}
       </section>
 
     </section>

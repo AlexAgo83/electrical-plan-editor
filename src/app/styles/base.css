@@ -306,6 +306,14 @@ button {
   color: #e3ecf6;
 }
 
+.app-shell.theme-dark .network-scope-indicator-label {
+  color: #b7c9dc;
+}
+
+.app-shell.theme-dark .network-scope-indicator-value {
+  color: #e3ecf6;
+}
+
 .app-shell.theme-dark .network-scope-list-shell {
   border-color: #365069;
 }
@@ -333,15 +341,6 @@ button {
 .app-shell.theme-dark .network-form-mode-chip.is-edit {
   background: #2c5844;
   color: #d7f6e3;
-}
-
-.app-shell.theme-dark .network-focus-actions {
-  border-color: #4f6b84;
-  background: #1f3448;
-}
-
-.app-shell.theme-dark .network-focus-title {
-  color: #bcd0e2;
 }
 
 .app-shell.theme-dark .network-delete-button {

@@ -136,6 +136,33 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const wires = selectWires(state);
   const routingGraph = selectRoutingGraphIndex(state);
   const subNetworkSummaries = selectSubNetworkSummaries(state);
+  const networkEntityCountsById = useMemo(() => {
+    const counts: Partial<
+      Record<
+        NetworkId,
+        {
+          connectorCount: number;
+          spliceCount: number;
+          nodeCount: number;
+          segmentCount: number;
+          wireCount: number;
+        }
+      >
+    > = {};
+
+    for (const network of networks) {
+      const scoped = state.networkStates[network.id];
+      counts[network.id] = {
+        connectorCount: scoped?.connectors.allIds.length ?? 0,
+        spliceCount: scoped?.splices.allIds.length ?? 0,
+        nodeCount: scoped?.nodes.allIds.length ?? 0,
+        segmentCount: scoped?.segments.allIds.length ?? 0,
+        wireCount: scoped?.wires.allIds.length ?? 0
+      };
+    }
+
+    return counts;
+  }, [networks, state.networkStates]);
 
   const connectorMap = useMemo(() => new Map(connectors.map((connector) => [connector.id, connector])), [connectors]);
   const spliceMap = useMemo(() => new Map(splices.map((splice) => [splice.id, splice])), [splices]);
@@ -326,6 +353,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const operationsPanelRef = useRef<HTMLDivElement | null>(null);
   const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
   const deferredInstallPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
+  const hasAutoOpenedNetworkFormRef = useRef(false);
 
   const selected = selectSelection(state);
   const {
@@ -898,6 +926,19 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     [handleCreateNetwork, handleUpdateActiveNetwork, networkFormMode, networkFormTargetId]
   );
+
+  useEffect(() => {
+    if (!isNetworkScopeScreen || hasAutoOpenedNetworkFormRef.current || networkFormMode === "create") {
+      return;
+    }
+
+    if (activeNetworkId === null) {
+      return;
+    }
+
+    handleOpenEditNetworkForm(activeNetworkId);
+    hasAutoOpenedNetworkFormRef.current = true;
+  }, [activeNetworkId, handleOpenEditNetworkForm, isNetworkScopeScreen, networkFormMode]);
 
   const closeNavigationDrawer = useCallback(() => {
     setIsNavigationDrawerOpen(false);
@@ -1662,11 +1703,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
               networks={networks}
               networkSort={networkSort}
               setNetworkSort={setNetworkSort}
-              connectorCount={connectors.length}
-              spliceCount={splices.length}
-              nodeCount={nodes.length}
-              segmentCount={segments.length}
-              wireCount={wires.length}
+              networkEntityCountsById={networkEntityCountsById}
               activeNetworkId={activeNetworkId}
               handleSelectNetwork={handleSelectNetwork}
               handleDuplicateNetwork={handleDuplicateNetwork}
