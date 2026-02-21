@@ -1,8 +1,8 @@
 ## item_060_operations_health_floating_panel_and_header_badge - Operations/Health Floating Panel and Header Badge
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Operational Visibility and Control Access
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,9 +36,9 @@
 - Related AC: AC8, AC9.
 - References:
   - `logics/request/req_010_network_scope_workspace_shell_and_global_defaults.md`
+  - `src/app/components/workspace/OperationsHealthPanel.tsx`
   - `src/app/components/workspace/WorkspaceSidebarPanel.tsx`
   - `src/app/components/workspace/AppHeaderAndStats.tsx`
   - `src/app/AppController.tsx`
   - `src/tests/app.ui.validation.spec.tsx`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
-

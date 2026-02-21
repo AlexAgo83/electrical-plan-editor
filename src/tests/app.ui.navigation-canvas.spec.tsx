@@ -12,6 +12,10 @@ import {
 import { appActions, appReducer, createInitialState } from "../store";
 
 describe("App integration UI - navigation and canvas", () => {
+  function openOperationsHealthPanel(): void {
+    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+  }
+
   beforeEach(() => {
     localStorage.clear();
   });
@@ -57,6 +61,7 @@ describe("App integration UI - navigation and canvas", () => {
     const connectorsPanel = getPanelByHeading("Connectors");
     expect(within(connectorsPanel).getByText("Undo test connector")).toBeInTheDocument();
 
+    openOperationsHealthPanel();
     fireEvent.click(screen.getByRole("button", { name: "Undo" }));
     expect(within(connectorsPanel).queryByText("Undo test connector")).not.toBeInTheDocument();
 
@@ -171,6 +176,7 @@ describe("App integration UI - navigation and canvas", () => {
     const updatedNetworkPanel = getPanelByHeading("Network summary");
     expect(within(updatedNetworkPanel).getByRole("button", { name: /^Select$/ })).toHaveClass("is-active");
 
+    openOperationsHealthPanel();
     const modelHealth = screen.getByRole("region", { name: "Model health" });
     expect(within(modelHealth).getByText("2/2", { selector: "strong" })).toBeInTheDocument();
     expect(within(modelHealth).getByText(/\[WARNING\] Occupancy conflict/i)).toBeInTheDocument();

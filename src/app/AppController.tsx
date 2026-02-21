@@ -62,6 +62,7 @@ import { ModelingFormsColumn } from "./components/workspace/ModelingFormsColumn"
 import { ModelingPrimaryTables } from "./components/workspace/ModelingPrimaryTables";
 import { ModelingSecondaryTables } from "./components/workspace/ModelingSecondaryTables";
 import { NetworkScopeWorkspaceContent } from "./components/workspace/NetworkScopeWorkspaceContent";
+import { OperationsHealthPanel } from "./components/workspace/OperationsHealthPanel";
 import { SettingsWorkspaceContent } from "./components/workspace/SettingsWorkspaceContent";
 import { ValidationWorkspaceContent } from "./components/workspace/ValidationWorkspaceContent";
 import { WorkspaceSidebarPanel } from "./components/workspace/WorkspaceSidebarPanel";
@@ -284,6 +285,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
   const [isNavigationDrawerOpen, setIsNavigationDrawerOpen] = useState(false);
+  const [isOperationsPanelOpen, setIsOperationsPanelOpen] = useState(false);
   const panStartRef = useRef<{
     clientX: number;
     clientY: number;
@@ -297,6 +299,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const nextValidationIssueRef = useRef<() => void>(() => {});
   const navigationDrawerRef = useRef<HTMLDivElement | null>(null);
   const navigationToggleButtonRef = useRef<HTMLButtonElement | null>(null);
+  const operationsPanelRef = useRef<HTMLDivElement | null>(null);
+  const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const selected = selectSelection(state);
   const {
@@ -763,7 +767,27 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   }, []);
 
   const handleToggleNavigationDrawer = useCallback(() => {
-    setIsNavigationDrawerOpen((current) => !current);
+    setIsNavigationDrawerOpen((current) => {
+      const next = !current;
+      if (next) {
+        setIsOperationsPanelOpen(false);
+      }
+      return next;
+    });
+  }, []);
+
+  const closeOperationsPanel = useCallback(() => {
+    setIsOperationsPanelOpen(false);
+  }, []);
+
+  const handleToggleOperationsPanel = useCallback(() => {
+    setIsOperationsPanelOpen((current) => {
+      const next = !current;
+      if (next) {
+        setIsNavigationDrawerOpen(false);
+      }
+      return next;
+    });
   }, []);
 
   useEffect(() => {
@@ -828,6 +852,65 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   useEffect(() => {
     setIsNavigationDrawerOpen(false);
   }, [activeScreen, activeSubScreen]);
+
+  useEffect(() => {
+    if (!isOperationsPanelOpen) {
+      return;
+    }
+
+    const handlePointerInteraction = (event: MouseEvent | TouchEvent): void => {
+      if (!(event.target instanceof Node)) {
+        return;
+      }
+
+      if (operationsPanelRef.current?.contains(event.target)) {
+        return;
+      }
+
+      if (operationsButtonRef.current?.contains(event.target)) {
+        return;
+      }
+
+      setIsOperationsPanelOpen(false);
+    };
+
+    const handleFocusIn = (event: FocusEvent): void => {
+      if (!(event.target instanceof Node)) {
+        return;
+      }
+
+      if (operationsPanelRef.current?.contains(event.target)) {
+        return;
+      }
+
+      if (operationsButtonRef.current?.contains(event.target)) {
+        return;
+      }
+
+      setIsOperationsPanelOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setIsOperationsPanelOpen(false);
+      operationsButtonRef.current?.focus();
+    };
+
+    document.addEventListener("mousedown", handlePointerInteraction);
+    document.addEventListener("touchstart", handlePointerInteraction, { passive: true });
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerInteraction);
+      document.removeEventListener("touchstart", handlePointerInteraction);
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOperationsPanelOpen]);
 
   useEffect(() => {
     undoActionRef.current = handleUndo;
@@ -1244,6 +1327,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         isNavigationDrawerOpen={isNavigationDrawerOpen}
         onToggleNavigationDrawer={handleToggleNavigationDrawer}
         navigationToggleButtonRef={navigationToggleButtonRef}
+        isOperationsPanelOpen={isOperationsPanelOpen}
+        onToggleOperationsPanel={handleToggleOperationsPanel}
+        operationsButtonRef={operationsButtonRef}
+        validationIssuesCount={validationIssues.length}
+        validationErrorCount={validationErrorCount}
         lastError={lastError}
         onClearError={() => dispatchAction(appActions.clearError())}
         connectorCount={connectors.length}
@@ -1276,12 +1364,28 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             entityCountBySubScreen={entityCountBySubScreen}
             onScreenChange={setActiveScreen}
             onSubScreenChange={setActiveSubScreen}
+          />
+        </div>
+        <button
+          type="button"
+          className={isOperationsPanelOpen ? "workspace-ops-backdrop is-open" : "workspace-ops-backdrop"}
+          aria-label="Close operations panel"
+          onClick={closeOperationsPanel}
+        />
+        <div
+          id="workspace-operations-panel"
+          ref={operationsPanelRef}
+          className={isOperationsPanelOpen ? "workspace-ops-panel is-open" : "workspace-ops-panel"}
+        >
+          <OperationsHealthPanel
             handleUndo={handleUndo}
             handleRedo={handleRedo}
             isUndoAvailable={isUndoAvailable}
             isRedoAvailable={isRedoAvailable}
             showShortcutHints={showShortcutHints}
             saveStatus={saveStatus}
+            validationIssuesCount={validationIssues.length}
+            validationErrorCount={validationErrorCount}
             validationWarningCount={validationWarningCount}
             issueNavigatorDisplay={issueNavigatorDisplay}
             issueNavigationScopeLabel={issueNavigationScopeLabel}

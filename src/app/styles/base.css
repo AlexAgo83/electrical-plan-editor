@@ -70,6 +70,39 @@ button {
   padding: 0.35rem 0.6rem;
 }
 
+.header-actions {
+  margin-left: auto;
+}
+
+.header-ops-toggle {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.header-ops-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.3rem;
+  border-radius: 999px;
+  padding: 0.08rem 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #dceaf5;
+  color: #1b3b53;
+}
+
+.header-ops-badge.is-error {
+  background: #fde0e0;
+  color: #902020;
+}
+
 .error-banner {
   display: flex;
   align-items: center;
@@ -226,7 +259,8 @@ button {
 .app-shell.theme-dark .row-actions button,
 .app-shell.theme-dark .row-form button,
 .app-shell.theme-dark .error-banner button,
-.app-shell.theme-dark .header-nav-toggle {
+.app-shell.theme-dark .header-nav-toggle,
+.app-shell.theme-dark .header-ops-toggle {
   border-color: #4e6a84;
   background: #27415a;
   color: #e3ecf6;
@@ -244,7 +278,17 @@ button {
   color: #dbe9f5;
 }
 
+.app-shell.theme-dark .header-ops-badge {
+  background: #365778;
+  color: #dbe9f5;
+}
+
 .app-shell.theme-dark .workspace-tab-badge.is-error {
+  background: #643c47;
+  color: #ffd3d8;
+}
+
+.app-shell.theme-dark .header-ops-badge.is-error {
   background: #643c47;
   color: #ffd3d8;
 }

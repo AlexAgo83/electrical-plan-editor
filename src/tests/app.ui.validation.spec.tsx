@@ -8,6 +8,10 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - validation", () => {
+  function openOperationsHealthPanel(): void {
+    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+  }
+
   beforeEach(() => {
     localStorage.clear();
   });
@@ -124,6 +128,7 @@ describe("App integration UI - validation", () => {
 
     switchScreen("validation");
     const validationPanel = getPanelByHeading("Validation center");
+    openOperationsHealthPanel();
     const modelHealth = screen.getByRole("region", { name: "Model health" });
 
     fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
@@ -145,6 +150,7 @@ describe("App integration UI - validation", () => {
     const validationBadgeText = validationButton.querySelector(".workspace-tab-badge")?.textContent?.trim() ?? "0";
     expect(Number(validationBadgeText)).toBeGreaterThan(0);
 
+    openOperationsHealthPanel();
     const modelHealth = screen.getByRole("region", { name: "Model health" });
     expect(within(modelHealth).getByText(/Total issues:/i)).toBeInTheDocument();
     expect(within(modelHealth).getByRole("button", { name: "Review errors" })).toBeEnabled();
@@ -161,6 +167,7 @@ describe("App integration UI - validation", () => {
   it("navigates validation issues from model health quick navigator", () => {
     renderAppWithState(createValidationIssueState());
 
+    openOperationsHealthPanel();
     const modelHealth = screen.getByRole("region", { name: "Model health" });
     expect(within(modelHealth).getByText(/Issue navigator:/i, { selector: "p" })).toBeInTheDocument();
     expect(within(modelHealth).getByText("1/2", { selector: "strong" })).toBeInTheDocument();

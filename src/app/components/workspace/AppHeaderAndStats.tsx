@@ -4,6 +4,11 @@ interface AppHeaderAndStatsProps {
   isNavigationDrawerOpen: boolean;
   onToggleNavigationDrawer: () => void;
   navigationToggleButtonRef: RefObject<HTMLButtonElement | null>;
+  isOperationsPanelOpen: boolean;
+  onToggleOperationsPanel: () => void;
+  operationsButtonRef: RefObject<HTMLButtonElement | null>;
+  validationIssuesCount: number;
+  validationErrorCount: number;
   lastError: string | null;
   onClearError: () => void;
   connectorCount: number;
@@ -18,6 +23,11 @@ export function AppHeaderAndStats({
   isNavigationDrawerOpen,
   onToggleNavigationDrawer,
   navigationToggleButtonRef,
+  isOperationsPanelOpen,
+  onToggleOperationsPanel,
+  operationsButtonRef,
+  validationIssuesCount,
+  validationErrorCount,
   lastError,
   onClearError,
   connectorCount,
@@ -43,6 +53,24 @@ export function AppHeaderAndStats({
         <p className="meta-line">
           Active network: <strong>{activeNetworkLabel}</strong>
         </p>
+        <div className="header-actions">
+          <button
+            ref={operationsButtonRef}
+            type="button"
+            className="header-ops-toggle"
+            onClick={onToggleOperationsPanel}
+            aria-expanded={isOperationsPanelOpen}
+            aria-controls="workspace-operations-panel"
+          >
+            <span>Ops &amp; Health</span>
+            <span
+              className={validationErrorCount > 0 ? "header-ops-badge is-error" : "header-ops-badge"}
+              aria-hidden="true"
+            >
+              {validationIssuesCount}
+            </span>
+          </button>
+        </div>
       </section>
 
       {lastError !== null ? (

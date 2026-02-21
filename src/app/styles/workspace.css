@@ -119,6 +119,47 @@
   padding-right: 0.15rem;
 }
 
+.workspace-ops-backdrop {
+  position: fixed;
+  inset: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: rgba(10, 27, 43, 0.24);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 52;
+  transition: opacity 0.2s ease;
+}
+
+.workspace-ops-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.workspace-ops-panel {
+  position: fixed;
+  top: 5.8rem;
+  right: 1rem;
+  width: min(470px, calc(100vw - 2rem));
+  transform: translateY(-6px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 53;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.workspace-ops-panel.is-open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.workspace-ops-content {
+  display: grid;
+  gap: 0.5rem;
+}
+
 .workspace-content {
   min-width: 0;
   display: grid;
