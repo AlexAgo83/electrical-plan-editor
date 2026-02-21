@@ -2012,6 +2012,16 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       </SettingsScreen>
             </>
           ) : null}
+          <div
+            aria-hidden="true"
+            className={
+              isInspectorHidden
+                ? "workspace-inspector-scroll-spacer"
+                : isInspectorOpen
+                  ? "workspace-inspector-scroll-spacer is-open"
+                  : "workspace-inspector-scroll-spacer is-collapsed"
+            }
+          />
         </section>
       </section>
       {!isInspectorHidden ? (

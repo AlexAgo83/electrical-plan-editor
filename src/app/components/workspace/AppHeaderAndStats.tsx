@@ -40,7 +40,10 @@ export function AppHeaderAndStats({
 }: AppHeaderAndStatsProps): ReactElement {
   return (
     <>
-      <section ref={headerBlockRef} className="header-block">
+      <section
+        ref={headerBlockRef}
+        className={isNavigationDrawerOpen ? "header-block is-drawer-open" : "header-block"}
+      >
         <button
           ref={navigationToggleButtonRef}
           type="button"
