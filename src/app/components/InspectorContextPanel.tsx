@@ -44,6 +44,41 @@ export function InspectorContextPanel({
   onClearSelection
 }: InspectorContextPanelProps): ReactElement {
   const isCollapsed = mode === "collapsed";
+  const detailRows: Array<{ label: string; value: ReactElement | string }> = [];
+
+  if (selectedConnector !== null) {
+    detailRows.push({ label: "Name", value: selectedConnector.name });
+    detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedConnector.technicalId}</span> });
+    detailRows.push({ label: "Cavities", value: `${selectedConnector.cavityCount} / Occupied ${connectorOccupiedCount}` });
+  }
+
+  if (selectedSplice !== null) {
+    detailRows.push({ label: "Name", value: selectedSplice.name });
+    detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedSplice.technicalId}</span> });
+    detailRows.push({ label: "Ports", value: `${selectedSplice.portCount} / Occupied ${spliceOccupiedCount}` });
+  }
+
+  if (selectedNode !== null) {
+    detailRows.push({ label: "Node kind", value: selectedNode.kind });
+    detailRows.push({ label: "Reference", value: describeNode(selectedNode) });
+  }
+
+  if (selectedSegment !== null) {
+    detailRows.push({ label: "Node A", value: <span className="technical-id">{selectedSegment.nodeA}</span> });
+    detailRows.push({ label: "Node B", value: <span className="technical-id">{selectedSegment.nodeB}</span> });
+    detailRows.push({ label: "Length", value: `${selectedSegment.lengthMm} mm` });
+  }
+
+  if (selectedWire !== null) {
+    detailRows.push({ label: "Name", value: selectedWire.name });
+    detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedWire.technicalId}</span> });
+    detailRows.push({
+      label: "Route",
+      value: `${selectedWire.isRouteLocked ? "Locked" : "Auto"} / ${
+        selectedWire.routeSegmentIds.length === 0 ? "(none)" : selectedWire.routeSegmentIds.join(" -> ")
+      }`
+    });
+  }
 
   return (
     <article className={isCollapsed ? "panel inspector-context-panel is-collapsed" : "panel inspector-context-panel"}>
@@ -75,63 +110,20 @@ export function InspectorContextPanel({
         <p className="empty-copy">No entity selected. Select a row or a canvas item to inspect details here.</p>
       ) : (
         <>
-          <p className="meta-line">
-            Focused entity: <strong>{selected.kind}</strong> <span className="technical-id">{selected.id}</span>
-          </p>
-          <div className="selection-snapshot inspector-snapshot">
-            {selectedConnector !== null ? (
-              <>
-                <p>Name: {selectedConnector.name}</p>
-                <p>
-                  Technical ID: <span className="technical-id">{selectedConnector.technicalId}</span>
-                </p>
-                <p>
-                  Cavities: {selectedConnector.cavityCount} / Occupied: {connectorOccupiedCount}
-                </p>
-              </>
-            ) : null}
-            {selectedSplice !== null ? (
-              <>
-                <p>Name: {selectedSplice.name}</p>
-                <p>
-                  Technical ID: <span className="technical-id">{selectedSplice.technicalId}</span>
-                </p>
-                <p>
-                  Ports: {selectedSplice.portCount} / Occupied: {spliceOccupiedCount}
-                </p>
-              </>
-            ) : null}
-            {selectedNode !== null ? (
-              <>
-                <p>Node kind: {selectedNode.kind}</p>
-                <p>{describeNode(selectedNode)}</p>
-              </>
-            ) : null}
-            {selectedSegment !== null ? (
-              <>
-                <p>
-                  Node A: <span className="technical-id">{selectedSegment.nodeA}</span>
-                </p>
-                <p>
-                  Node B: <span className="technical-id">{selectedSegment.nodeB}</span>
-                </p>
-                <p>Length: {selectedSegment.lengthMm} mm</p>
-              </>
-            ) : null}
-            {selectedWire !== null ? (
-              <>
-                <p>Name: {selectedWire.name}</p>
-                <p>
-                  Technical ID: <span className="technical-id">{selectedWire.technicalId}</span>
-                </p>
-                <p>
-                  Route mode: {selectedWire.isRouteLocked ? "Locked" : "Auto"} / Segments: {" "}
-                  {selectedWire.routeSegmentIds.length === 0 ? "(none)" : selectedWire.routeSegmentIds.join(" -> ")}
-                </p>
-              </>
-            ) : null}
+          <div className="inspector-entity-line">
+            <span className="inspector-entity-label">Focused entity:</span>
+            <span className="inspector-kind-chip">{selected.kind}</span>
+            <span className="technical-id inspector-entity-id">{selected.id}</span>
           </div>
-          <div className="row-actions compact">
+          <dl className="inspector-detail-grid">
+            {detailRows.map((row) => (
+              <div key={row.label}>
+                <dt>{row.label}</dt>
+                <dd>{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <div className="row-actions compact inspector-actions">
             <button type="button" onClick={onEditSelected} disabled={selectedSubScreen === null}>
               Edit
             </button>

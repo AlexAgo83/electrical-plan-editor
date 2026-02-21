@@ -223,13 +223,14 @@
 .workspace-inspector-panel .inspector-context-panel {
   pointer-events: auto;
   box-shadow: 0 10px 26px rgba(9, 26, 40, 0.2);
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.68);
   -webkit-backdrop-filter: blur(9px);
   backdrop-filter: blur(9px);
+  padding: 0.82rem 0.9rem;
 }
 
 .workspace-inspector-panel.is-collapsed .inspector-context-panel {
-  padding: 0.8rem 0.9rem;
+  padding: 0.72rem 0.82rem;
 }
 
 .inspector-context-header {
@@ -237,11 +238,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.45rem;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.48rem;
 }
 
 .inspector-context-header h2 {
   margin: 0;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4f6a7f;
 }
 
 .inspector-context-toggle {
@@ -254,13 +259,96 @@
 }
 
 .inspector-context-panel.is-collapsed .meta-line {
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.3rem;
 }
 
 .inspector-collapsed-copy {
   margin: 0;
   color: #4a6277;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
+}
+
+.inspector-entity-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.34rem;
+  margin: 0 0 0.45rem;
+}
+
+.inspector-entity-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #5a7386;
+}
+
+.inspector-kind-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #a8bfd1;
+  background: #e8f1f8;
+  color: #1a405c;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.05rem 0.4rem;
+}
+
+.inspector-entity-id {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.inspector-detail-grid {
+  margin: 0 0 0.52rem;
+  display: grid;
+  gap: 0.26rem;
+}
+
+.inspector-detail-grid > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.34rem;
+}
+
+.inspector-detail-grid dt {
+  margin: 0;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #617a8d;
+}
+
+.inspector-detail-grid dd {
+  margin: 0;
+  min-width: 0;
+  font-size: 0.9rem;
+  line-height: 1.28;
+  color: #17374e;
+  word-break: break-word;
+}
+
+.row-actions.inspector-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.36rem;
+}
+
+.row-actions.inspector-actions button {
+  width: 100%;
+  min-width: 0;
+  padding: 0.27rem 0.54rem;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 520px) {
+  .row-actions.inspector-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .workspace-content {

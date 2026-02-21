@@ -371,7 +371,33 @@ button {
 
 .app-shell.theme-dark .workspace-ops-content.panel,
 .app-shell.theme-dark .workspace-inspector-panel .inspector-context-panel {
-  background: rgba(26, 44, 63, 0.86);
+  background: rgba(26, 44, 63, 0.68);
+}
+
+.app-shell.theme-dark .inspector-context-header h2 {
+  color: #a9bfd3;
+}
+
+.app-shell.theme-dark .inspector-entity-label {
+  color: #9eb7cb;
+}
+
+.app-shell.theme-dark .inspector-kind-chip {
+  border-color: #4c6882;
+  background: #27415a;
+  color: #d5e5f4;
+}
+
+.app-shell.theme-dark .inspector-entity-id {
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .inspector-detail-grid dt {
+  color: #9eb7cb;
+}
+
+.app-shell.theme-dark .inspector-detail-grid dd {
+  color: #dce8f4;
 }
 
 .app-shell.theme-dark .network-scope-indicator {
