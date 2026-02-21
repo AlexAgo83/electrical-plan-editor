@@ -1,8 +1,32 @@
 import { expect, test } from "@playwright/test";
 
 test("bootstraps a comprehensive sample network on first launch", async ({ page }) => {
+  const ensureNavigationDrawerOpen = async () => {
+    const navigationToggle = page.locator(".header-nav-toggle");
+    if ((await navigationToggle.getAttribute("aria-expanded")) !== "true") {
+      await navigationToggle.click();
+    }
+    await expect(page.locator(".workspace-drawer.is-open")).toBeVisible();
+  };
+  const ensureNavigationDrawerClosed = async () => {
+    const closeMenuButton = page.getByRole("button", { name: "Close menu", exact: true });
+    if ((await closeMenuButton.count()) > 0) {
+      await closeMenuButton.click();
+    }
+    await expect(page.locator(".workspace-drawer.is-open")).toHaveCount(0);
+  };
+  const switchScreen = async (value: "modeling" | "analysis") => {
+    await ensureNavigationDrawerOpen();
+    await page
+      .locator(".workspace-drawer.is-open .workspace-nav-row")
+      .getByRole("button", { name: value === "modeling" ? "Modeling" : "Analysis", exact: true })
+      .click();
+    await ensureNavigationDrawerClosed();
+  };
+
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Electrical Plan Editor" })).toBeVisible();
+  await switchScreen("modeling");
 
   const connectorsPanel = page
     .locator("article.panel")
@@ -38,6 +62,12 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
       wire: "Wire"
     } as const;
     await ensureNavigationDrawerOpen();
+    if ((await page.locator(".workspace-drawer.is-open .workspace-nav-row.secondary").count()) === 0) {
+      await page
+        .locator(".workspace-drawer.is-open .workspace-nav-row")
+        .getByRole("button", { name: "Modeling", exact: true })
+        .click();
+    }
     await page
       .locator(".workspace-drawer.is-open .workspace-nav-row.secondary")
       .getByRole("button", { name: labelBySubScreen[value], exact: true })
@@ -113,7 +143,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   const wireRow = wiresPanel.locator("tbody tr").filter({ hasText: "Wire 1" }).first();
   await expect(wireRow).toContainText("100");
   await expect(wireRow).toContainText("Auto");
-  await wireRow.getByRole("button", { name: "Select" }).click();
+  await wireRow.click();
   const initialWireLengthRaw = await wireRow.locator("td").nth(3).textContent();
   const initialWireLength = Number(initialWireLengthRaw ?? "0");
 
@@ -140,10 +170,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   const targetSegmentLengthRaw = await targetSegmentRow.locator("td").nth(3).textContent();
   const targetSegmentLength = Number(targetSegmentLengthRaw ?? "0");
   const updatedSegmentLength = targetSegmentLength + 40;
-  const editTargetSegmentButton = targetSegmentRow.getByRole("button", { name: "Edit" });
-  await editTargetSegmentButton.evaluate((button) => {
-    (button as HTMLButtonElement).click();
-  });
+  await targetSegmentRow.click();
   await expect(page.getByRole("heading", { name: "Edit Segment" })).toBeVisible();
 
   const editSegmentForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Edit Segment" }) });

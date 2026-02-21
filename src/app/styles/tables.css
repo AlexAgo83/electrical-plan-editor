@@ -132,6 +132,37 @@
   background: #f0f7e8;
 }
 
+.data-table tr.is-focusable-row {
+  cursor: pointer;
+}
+
+.data-table tr.is-focusable-row:focus-visible {
+  outline: 2px solid #0f6cb8;
+  outline-offset: -2px;
+}
+
+.modeling-list-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 0.55rem;
+}
+
+.modeling-list-actions button {
+  width: 100%;
+}
+
+.modeling-list-action-delete {
+  border-color: #d3a7ad !important;
+  background: #fbeaed !important;
+  color: #8f1e1e !important;
+}
+
+@media (max-width: 860px) {
+  .modeling-list-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .splice-badge {
   display: inline-block;
   margin-right: 0.35rem;

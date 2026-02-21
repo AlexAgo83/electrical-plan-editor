@@ -1,8 +1,8 @@
 ## task_012_list_form_workspace_harmonization_orchestration_and_delivery_control - List/Form Workspace Harmonization Orchestration and Delivery Control
 > From version: 0.4.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: High
 > Theme: Cross-Screen List/Form UX Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -20,14 +20,14 @@ Backlog scope covered:
 - `item_080_ui_regression_and_e2e_validation_for_harmonized_list_form_screens.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 baseline contract: finalize shared list/form interaction model and reusable state semantics (`item_074`)
-- [ ] 2. Deliver Wave 1 primary entity migration: connectors/splices action-row and form alignment (`item_075`)
-- [ ] 3. Deliver Wave 2 structural entity migration: nodes/segments action-row and form alignment (`item_076`)
-- [ ] 4. Deliver Wave 3 wire workflow migration: wire action-row and route-aware form alignment (`item_077`)
-- [ ] 5. Deliver Wave 4 regression hardening: remove residual action columns and lock focused-row behavior coverage (`item_078`)
-- [ ] 6. Deliver Wave 5 UX quality pass: responsive + keyboard accessibility consistency across migrated screens (`item_079`)
-- [ ] 7. Deliver Wave 6 closure: full UI regression + E2E validation and AC traceability (`item_080`)
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Deliver Wave 0 baseline contract: finalize shared list/form interaction model and reusable state semantics (`item_074`)
+- [x] 2. Deliver Wave 1 primary entity migration: connectors/splices action-row and form alignment (`item_075`)
+- [x] 3. Deliver Wave 2 structural entity migration: nodes/segments action-row and form alignment (`item_076`)
+- [x] 4. Deliver Wave 3 wire workflow migration: wire action-row and route-aware form alignment (`item_077`)
+- [x] 5. Deliver Wave 4 regression hardening: remove residual action columns and lock focused-row behavior coverage (`item_078`)
+- [x] 6. Deliver Wave 5 UX quality pass: responsive + keyboard accessibility consistency across migrated screens (`item_079`)
+- [x] 7. Deliver Wave 6 closure: full UI regression + E2E validation and AC traceability (`item_080`)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -40,9 +40,17 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Not started.
+  - Wave 0 completed: aligned list/form interaction contract on `Network Scope` pattern (focused row, under-list action row, explicit create/edit transitions).
+  - Wave 1 completed: migrated connectors/splices tables to focused-row interactions, removed inline action columns, added under-list action rows.
+  - Wave 2 completed: migrated nodes/segments with the same action-row model and keyboard-accessible row activation.
+  - Wave 3 completed: migrated wires list/actions to focused-row model while preserving route-aware behavior.
+  - Wave 4 completed: removed residual inline actions and reinforced regression coverage around focused-row targeting and selection behavior.
+  - Wave 5 completed: applied responsive action-row behavior and focus-visible/keyboard consistency updates.
+  - Wave 6 completed: validated full UI regression + E2E flow alignment and AC closure for `req_013`.
 - Current blockers:
-  - None at orchestration kickoff.
+  - `npm run quality:ui-modularization` remains failing on pre-existing baseline files over line budget:
+    - `src/app/styles/workspace.css` (606 lines)
+    - `src/app/styles/base.css` (561 lines)
 - Main risks to track:
   - Behavior drift when replacing row-level action columns with focused-row under-list actions.
   - Inconsistent mode transitions (`create`/`edit`) across entity screens if migration waves are mixed.
@@ -53,3 +61,11 @@ Backlog scope covered:
   - Add focused-row and disabled-state test coverage immediately after each migration wave.
   - Run accessibility/responsive checks before final regression wave.
   - Keep full quality gates mandatory before closing request delivery.
+- Validation snapshot:
+  - `npm run typecheck` OK
+  - `npm test -- src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.inspector-shell.spec.tsx src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.networks.spec.tsx` OK
+  - `npm run lint` OK
+  - `npm run quality:store-modularization` OK
+  - `npm run quality:ui-modularization` KO (pre-existing line-budget baseline debt)
+  - `npm run test:ci` OK
+  - `npm run test:e2e` OK

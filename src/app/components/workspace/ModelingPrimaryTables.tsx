@@ -12,6 +12,8 @@ import type { OccupancyFilter, SortDirection, SortState } from "../../types/app-
 
 interface ModelingPrimaryTablesProps {
   isConnectorSubScreen: boolean;
+  connectorFormMode: "create" | "edit";
+  onOpenCreateConnector: () => void;
   connectorSearchQuery: string;
   setConnectorSearchQuery: (value: string) => void;
   connectorOccupancyFilter: OccupancyFilter;
@@ -27,6 +29,8 @@ interface ModelingPrimaryTablesProps {
   onEditConnector: (connector: Connector) => void;
   onDeleteConnector: (connectorId: ConnectorId) => void;
   isSpliceSubScreen: boolean;
+  spliceFormMode: "create" | "edit";
+  onOpenCreateSplice: () => void;
   spliceSearchQuery: string;
   setSpliceSearchQuery: (value: string) => void;
   spliceOccupancyFilter: OccupancyFilter;
@@ -41,6 +45,8 @@ interface ModelingPrimaryTablesProps {
   onEditSplice: (splice: Splice) => void;
   onDeleteSplice: (spliceId: SpliceId) => void;
   isNodeSubScreen: boolean;
+  nodeFormMode: "create" | "edit";
+  onOpenCreateNode: () => void;
   nodeSearchQuery: string;
   setNodeSearchQuery: (value: string) => void;
   nodeKindFilter: "all" | NetworkNode["kind"];
@@ -59,6 +65,8 @@ interface ModelingPrimaryTablesProps {
 
 export function ModelingPrimaryTables({
   isConnectorSubScreen,
+  connectorFormMode,
+  onOpenCreateConnector,
   connectorSearchQuery,
   setConnectorSearchQuery,
   connectorOccupancyFilter,
@@ -74,6 +82,8 @@ export function ModelingPrimaryTables({
   onEditConnector,
   onDeleteConnector,
   isSpliceSubScreen,
+  spliceFormMode,
+  onOpenCreateSplice,
   spliceSearchQuery,
   setSpliceSearchQuery,
   spliceOccupancyFilter,
@@ -88,6 +98,8 @@ export function ModelingPrimaryTables({
   onEditSplice,
   onDeleteSplice,
   isNodeSubScreen,
+  nodeFormMode,
+  onOpenCreateNode,
   nodeSearchQuery,
   setNodeSearchQuery,
   nodeKindFilter,
@@ -103,6 +115,19 @@ export function ModelingPrimaryTables({
   onEditNode,
   onDeleteNode
 }: ModelingPrimaryTablesProps): ReactElement {
+  const focusedConnector =
+    (selectedConnectorId === null ? null : visibleConnectors.find((connector) => connector.id === selectedConnectorId) ?? null) ??
+    visibleConnectors[0] ??
+    null;
+  const focusedSplice =
+    (selectedSpliceId === null ? null : visibleSplices.find((splice) => splice.id === selectedSpliceId) ?? null) ??
+    visibleSplices[0] ??
+    null;
+  const focusedNode =
+    (selectedNodeId === null ? null : visibleNodes.find((node) => node.id === selectedNodeId) ?? null) ??
+    visibleNodes[0] ??
+    null;
+
   return (
     <>
       <article className="panel" hidden={!isConnectorSubScreen}>
@@ -134,26 +159,42 @@ export function ModelingPrimaryTables({
                 <th><button type="button" className="sort-header-button" onClick={() => setConnectorSort((current) => nextSortState(current, "technicalId"))}>Technical ID <span className="sort-indicator">{getSortIndicator(connectorSort, "technicalId")}</span></button></th>
                 <th>Cavities</th>
                 <th>Occupied</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {visibleConnectors.map((connector) => {
                 const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
-                const isSelected = selectedConnectorId === connector.id;
+                const isFocused = focusedConnector?.id === connector.id;
                 return (
-                  <tr key={connector.id} className={isSelected ? "is-selected" : undefined}>
+                  <tr
+                    key={connector.id}
+                    className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
+                    aria-selected={isFocused}
+                    tabIndex={0}
+                    onClick={() => onEditConnector(connector)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onEditConnector(connector);
+                      }
+                    }}
+                  >
                     <td>{connector.name}</td>
                     <td className="technical-id">{connector.technicalId}</td>
                     <td>{connector.cavityCount}</td>
                     <td>{occupiedCount}</td>
-                    <td><div className="row-actions compact"><button type="button" onClick={() => onSelectConnector(connector.id)}>Select</button><button type="button" onClick={() => onEditConnector(connector)}>Edit</button><button type="button" onClick={() => onDeleteConnector(connector.id)}>Delete</button></div></td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         )}
+        <div className="row-actions compact modeling-list-actions">
+          <button type="button" onClick={onOpenCreateConnector}>New</button>
+          <button type="button" onClick={() => focusedConnector !== null && onSelectConnector(focusedConnector.id)} disabled={focusedConnector === null}>Select</button>
+          <button type="button" onClick={() => focusedConnector !== null && onEditConnector(focusedConnector)} disabled={focusedConnector === null}>Edit</button>
+          <button type="button" className="modeling-list-action-delete" onClick={() => focusedConnector !== null && onDeleteConnector(focusedConnector.id)} disabled={focusedConnector === null || connectorFormMode === "create"}>Delete</button>
+        </div>
       </article>
 
       <article className="panel" hidden={!isSpliceSubScreen}>
@@ -185,26 +226,42 @@ export function ModelingPrimaryTables({
                 <th><button type="button" className="sort-header-button" onClick={() => setSpliceSort((current) => nextSortState(current, "technicalId"))}>Technical ID <span className="sort-indicator">{getSortIndicator(spliceSort, "technicalId")}</span></button></th>
                 <th>Ports</th>
                 <th>Branches</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {visibleSplices.map((splice) => {
                 const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
-                const isSelected = selectedSpliceId === splice.id;
+                const isFocused = focusedSplice?.id === splice.id;
                 return (
-                  <tr key={splice.id} className={isSelected ? "is-selected" : undefined}>
+                  <tr
+                    key={splice.id}
+                    className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
+                    aria-selected={isFocused}
+                    tabIndex={0}
+                    onClick={() => onEditSplice(splice)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onEditSplice(splice);
+                      }
+                    }}
+                  >
                     <td><span className="splice-badge">Junction</span> {splice.name}</td>
                     <td className="technical-id">{splice.technicalId}</td>
                     <td>{splice.portCount}</td>
                     <td>{occupiedCount}</td>
-                    <td><div className="row-actions compact"><button type="button" onClick={() => onSelectSplice(splice.id)}>Select</button><button type="button" onClick={() => onEditSplice(splice)}>Edit</button><button type="button" onClick={() => onDeleteSplice(splice.id)}>Delete</button></div></td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         )}
+        <div className="row-actions compact modeling-list-actions">
+          <button type="button" onClick={onOpenCreateSplice}>New</button>
+          <button type="button" onClick={() => focusedSplice !== null && onSelectSplice(focusedSplice.id)} disabled={focusedSplice === null}>Select</button>
+          <button type="button" onClick={() => focusedSplice !== null && onEditSplice(focusedSplice)} disabled={focusedSplice === null}>Edit</button>
+          <button type="button" className="modeling-list-action-delete" onClick={() => focusedSplice !== null && onDeleteSplice(focusedSplice.id)} disabled={focusedSplice === null || spliceFormMode === "create"}>Delete</button>
+        </div>
       </article>
 
       <article className="panel" hidden={!isNodeSubScreen}>
@@ -237,26 +294,42 @@ export function ModelingPrimaryTables({
                 <th>Kind</th>
                 <th>Reference</th>
                 <th>Linked segments</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {visibleNodes.map((node) => {
                 const linkedSegments = segmentsCountByNodeId.get(node.id) ?? 0;
-                const isSelected = selectedNodeId === node.id;
+                const isFocused = focusedNode?.id === node.id;
                 return (
-                  <tr key={node.id} className={isSelected ? "is-selected" : undefined}>
+                  <tr
+                    key={node.id}
+                    className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
+                    aria-selected={isFocused}
+                    tabIndex={0}
+                    onClick={() => onEditNode(node)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onEditNode(node);
+                      }
+                    }}
+                  >
                     <td className="technical-id">{node.id}</td>
                     <td>{node.kind}</td>
                     <td>{describeNode(node)}</td>
                     <td>{linkedSegments}</td>
-                    <td><div className="row-actions compact"><button type="button" onClick={() => onSelectNode(node.id)}>Select</button><button type="button" onClick={() => onEditNode(node)}>Edit</button><button type="button" onClick={() => onDeleteNode(node.id)}>Delete</button></div></td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         )}
+        <div className="row-actions compact modeling-list-actions">
+          <button type="button" onClick={onOpenCreateNode}>New</button>
+          <button type="button" onClick={() => focusedNode !== null && onSelectNode(focusedNode.id)} disabled={focusedNode === null}>Select</button>
+          <button type="button" onClick={() => focusedNode !== null && onEditNode(focusedNode)} disabled={focusedNode === null}>Edit</button>
+          <button type="button" className="modeling-list-action-delete" onClick={() => focusedNode !== null && onDeleteNode(focusedNode.id)} disabled={focusedNode === null || nodeFormMode === "create"}>Delete</button>
+        </div>
       </article>
     </>
   );

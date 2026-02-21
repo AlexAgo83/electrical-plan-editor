@@ -349,6 +349,12 @@ button {
   color: #ffd9de !important;
 }
 
+.app-shell.theme-dark .modeling-list-action-delete {
+  border-color: #8f5660 !important;
+  background: #5b2f37 !important;
+  color: #ffd9de !important;
+}
+
 .app-shell.theme-dark .workspace-tab,
 .app-shell.theme-dark .filter-chip,
 .app-shell.theme-dark .row-actions button,

@@ -11,6 +11,8 @@ import type { SegmentSubNetworkFilter, SortDirection, SortState } from "../../ty
 
 interface ModelingSecondaryTablesProps {
   isSegmentSubScreen: boolean;
+  segmentFormMode: "create" | "edit";
+  onOpenCreateSegment: () => void;
   segmentSearchQuery: string;
   setSegmentSearchQuery: (value: string) => void;
   segmentSubNetworkFilter: SegmentSubNetworkFilter;
@@ -26,6 +28,8 @@ interface ModelingSecondaryTablesProps {
   onEditSegment: (segment: Segment) => void;
   onDeleteSegment: (segmentId: SegmentId) => void;
   isWireSubScreen: boolean;
+  wireFormMode: "create" | "edit";
+  onOpenCreateWire: () => void;
   wireSearchQuery: string;
   setWireSearchQuery: (value: string) => void;
   wireRouteFilter: "all" | "auto" | "locked";
@@ -44,6 +48,8 @@ interface ModelingSecondaryTablesProps {
 
 export function ModelingSecondaryTables({
   isSegmentSubScreen,
+  segmentFormMode,
+  onOpenCreateSegment,
   segmentSearchQuery,
   setSegmentSearchQuery,
   segmentSubNetworkFilter,
@@ -59,6 +65,8 @@ export function ModelingSecondaryTables({
   onEditSegment,
   onDeleteSegment,
   isWireSubScreen,
+  wireFormMode,
+  onOpenCreateWire,
   wireSearchQuery,
   setWireSearchQuery,
   wireRouteFilter,
@@ -74,6 +82,15 @@ export function ModelingSecondaryTables({
   onEditWire,
   onDeleteWire
 }: ModelingSecondaryTablesProps): ReactElement {
+  const focusedSegment =
+    (selectedSegmentId === null ? null : visibleSegments.find((segment) => segment.id === selectedSegmentId) ?? null) ??
+    visibleSegments[0] ??
+    null;
+  const focusedWire =
+    (selectedWireId === null ? null : visibleWires.find((wire) => wire.id === selectedWireId) ?? null) ??
+    visibleWires[0] ??
+    null;
+
   return (
     <>
       <article className="panel" hidden={!isSegmentSubScreen}>
@@ -103,30 +120,46 @@ export function ModelingSecondaryTables({
                 <th>Node B</th>
                 <th>Length (mm)</th>
                 <th>Sub-network</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {visibleSegments.map((segment) => {
                 const nodeA = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
                 const nodeB = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
-                const isSelected = selectedSegmentId === segment.id;
+                const isFocused = focusedSegment?.id === segment.id;
                 const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
-                const rowClassName = isSelected ? "is-selected" : isWireHighlighted ? "is-wire-highlighted" : undefined;
+                const rowClassName = `${isFocused ? "is-selected " : ""}${isWireHighlighted ? "is-wire-highlighted " : ""}is-focusable-row`;
                 return (
-                  <tr key={segment.id} className={rowClassName}>
+                  <tr
+                    key={segment.id}
+                    className={rowClassName}
+                    aria-selected={isFocused}
+                    tabIndex={0}
+                    onClick={() => onEditSegment(segment)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onEditSegment(segment);
+                      }
+                    }}
+                  >
                     <td className="technical-id">{segment.id}</td>
                     <td>{nodeA}</td>
                     <td>{nodeB}</td>
                     <td>{segment.lengthMm}</td>
                     <td><span className="subnetwork-chip">{segment.subNetworkTag?.trim() || "(default)"}</span></td>
-                    <td><div className="row-actions compact"><button type="button" onClick={() => onSelectSegment(segment.id)}>Select</button><button type="button" onClick={() => onEditSegment(segment)}>Edit</button><button type="button" onClick={() => onDeleteSegment(segment.id)}>Delete</button></div></td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         )}
+        <div className="row-actions compact modeling-list-actions">
+          <button type="button" onClick={onOpenCreateSegment}>New</button>
+          <button type="button" onClick={() => focusedSegment !== null && onSelectSegment(focusedSegment.id)} disabled={focusedSegment === null}>Select</button>
+          <button type="button" onClick={() => focusedSegment !== null && onEditSegment(focusedSegment)} disabled={focusedSegment === null}>Edit</button>
+          <button type="button" className="modeling-list-action-delete" onClick={() => focusedSegment !== null && onDeleteSegment(focusedSegment.id)} disabled={focusedSegment === null || segmentFormMode === "create"}>Delete</button>
+        </div>
       </article>
 
       <article className="panel" hidden={!isWireSubScreen}>
@@ -156,26 +189,42 @@ export function ModelingSecondaryTables({
                 <th>Endpoints</th>
                 <th>Length (mm)</th>
                 <th>Route mode</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {visibleWires.map((wire) => {
-                const isSelected = selectedWireId === wire.id;
+                const isFocused = focusedWire?.id === wire.id;
                 return (
-                  <tr key={wire.id} className={isSelected ? "is-selected" : undefined}>
+                  <tr
+                    key={wire.id}
+                    className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
+                    aria-selected={isFocused}
+                    tabIndex={0}
+                    onClick={() => onEditWire(wire)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onEditWire(wire);
+                      }
+                    }}
+                  >
                     <td>{wire.name}</td>
                     <td className="technical-id">{wire.technicalId}</td>
                     <td>{describeWireEndpoint(wire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(wire.endpointB)}</td>
                     <td>{wire.lengthMm}</td>
                     <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td>
-                    <td><div className="row-actions compact"><button type="button" onClick={() => onSelectWire(wire)}>Select</button><button type="button" onClick={() => onEditWire(wire)}>Edit</button><button type="button" onClick={() => onDeleteWire(wire.id)}>Delete</button></div></td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         )}
+        <div className="row-actions compact modeling-list-actions">
+          <button type="button" onClick={onOpenCreateWire}>New</button>
+          <button type="button" onClick={() => focusedWire !== null && onSelectWire(focusedWire)} disabled={focusedWire === null}>Select</button>
+          <button type="button" onClick={() => focusedWire !== null && onEditWire(focusedWire)} disabled={focusedWire === null}>Edit</button>
+          <button type="button" className="modeling-list-action-delete" onClick={() => focusedWire !== null && onDeleteWire(focusedWire.id)} disabled={focusedWire === null || wireFormMode === "create"}>Delete</button>
+        </div>
       </article>
     </>
   );

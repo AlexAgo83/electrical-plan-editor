@@ -6,6 +6,7 @@ import {
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
+  switchScreen,
   switchSubScreen
 } from "./helpers/app-ui-test-utils";
 
@@ -16,6 +17,7 @@ describe("App integration UI - list ergonomics", () => {
 
   it("sorts connector list by clicking the Name header", () => {
     renderAppWithState(createConnectorSortingState());
+    switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     const nameSortButton = within(connectorsPanel).getByRole("button", { name: /Name/i });
@@ -54,6 +56,7 @@ describe("App integration UI - list ergonomics", () => {
 
   it("filters connectors by occupancy chips", () => {
     renderAppWithState(createConnectorOccupancyFilterState());
+    switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     expect(within(connectorsPanel).getByText("Connector used")).toBeInTheDocument();
