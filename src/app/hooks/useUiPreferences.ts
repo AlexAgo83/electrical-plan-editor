@@ -42,6 +42,8 @@ interface UiPreferencesPayload {
   defaultIdSortDirection: SortDirection;
   canvasDefaultShowGrid: boolean;
   canvasDefaultSnapToGrid: boolean;
+  canvasDefaultShowInfoPanels: boolean;
+  canvasDefaultShowSegmentLengths: boolean;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
@@ -85,6 +87,8 @@ interface UseUiPreferencesOptions {
   defaultIdSortDirection: SortDirection;
   canvasDefaultShowGrid: boolean;
   canvasDefaultSnapToGrid: boolean;
+  canvasDefaultShowInfoPanels: boolean;
+  canvasDefaultShowSegmentLengths: boolean;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
@@ -105,8 +109,12 @@ interface UseUiPreferencesOptions {
   setSegmentIdSortDirection: (direction: SortDirection) => void;
   setCanvasDefaultShowGrid: (value: boolean) => void;
   setCanvasDefaultSnapToGrid: (value: boolean) => void;
+  setCanvasDefaultShowInfoPanels: (value: boolean) => void;
+  setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   setShowNetworkGrid: (value: boolean) => void;
   setSnapNodesToGrid: (value: boolean) => void;
+  setShowNetworkInfoPanels: (value: boolean) => void;
+  setShowSegmentLengths: (value: boolean) => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
   setNetworkScale: (value: number) => void;
   setNetworkOffset: (value: { x: number; y: number }) => void;
@@ -126,6 +134,8 @@ export function useUiPreferences({
   defaultIdSortDirection,
   canvasDefaultShowGrid,
   canvasDefaultSnapToGrid,
+  canvasDefaultShowInfoPanels,
+  canvasDefaultShowSegmentLengths,
   canvasResetZoomPercentInput,
   showShortcutHints,
   keyboardShortcutsEnabled,
@@ -146,8 +156,12 @@ export function useUiPreferences({
   setSegmentIdSortDirection,
   setCanvasDefaultShowGrid,
   setCanvasDefaultSnapToGrid,
+  setCanvasDefaultShowInfoPanels,
+  setCanvasDefaultShowSegmentLengths,
   setShowNetworkGrid,
   setSnapNodesToGrid,
+  setShowNetworkInfoPanels,
+  setShowSegmentLengths,
   setCanvasResetZoomPercentInput,
   setNetworkScale,
   setNetworkOffset,
@@ -165,6 +179,12 @@ export function useUiPreferences({
         typeof preferences.canvasDefaultShowGrid === "boolean" ? preferences.canvasDefaultShowGrid : true;
       const snapDefault =
         typeof preferences.canvasDefaultSnapToGrid === "boolean" ? preferences.canvasDefaultSnapToGrid : true;
+      const showInfoPanelsDefault =
+        typeof preferences.canvasDefaultShowInfoPanels === "boolean" ? preferences.canvasDefaultShowInfoPanels : true;
+      const showSegmentLengthsDefault =
+        typeof preferences.canvasDefaultShowSegmentLengths === "boolean"
+          ? preferences.canvasDefaultShowSegmentLengths
+          : false;
       const rawResetZoomPercent =
         typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "100";
       const parsedResetZoomPercent = Number(rawResetZoomPercent);
@@ -192,8 +212,12 @@ export function useUiPreferences({
       setSegmentIdSortDirection(idSortDirection);
       setCanvasDefaultShowGrid(showGridDefault);
       setCanvasDefaultSnapToGrid(snapDefault);
+      setCanvasDefaultShowInfoPanels(showInfoPanelsDefault);
+      setCanvasDefaultShowSegmentLengths(showSegmentLengthsDefault);
       setShowNetworkGrid(showGridDefault);
       setSnapNodesToGrid(snapDefault);
+      setShowNetworkInfoPanels(showInfoPanelsDefault);
+      setShowSegmentLengths(showSegmentLengthsDefault);
       setCanvasResetZoomPercentInput(rawResetZoomPercent);
       setNetworkScale(resetScale);
       setNetworkOffset({ x: 0, y: 0 });
@@ -209,6 +233,8 @@ export function useUiPreferences({
     networkMinScale,
     setCanvasDefaultShowGrid,
     setCanvasDefaultSnapToGrid,
+    setCanvasDefaultShowInfoPanels,
+    setCanvasDefaultShowSegmentLengths,
     setCanvasResetZoomPercentInput,
     setConnectorSort,
     setDefaultIdSortDirection,
@@ -222,7 +248,9 @@ export function useUiPreferences({
     setPreferencesHydrated,
     setSegmentIdSortDirection,
     setShowNetworkGrid,
+    setShowNetworkInfoPanels,
     setShowShortcutHints,
+    setShowSegmentLengths,
     setSnapNodesToGrid,
     setSpliceSort,
     setSpliceSynthesisSort,
@@ -248,6 +276,8 @@ export function useUiPreferences({
       defaultIdSortDirection,
       canvasDefaultShowGrid,
       canvasDefaultSnapToGrid,
+      canvasDefaultShowInfoPanels,
+      canvasDefaultShowSegmentLengths,
       canvasResetZoomPercentInput,
       showShortcutHints,
       keyboardShortcutsEnabled
@@ -261,6 +291,8 @@ export function useUiPreferences({
   }, [
     canvasDefaultShowGrid,
     canvasDefaultSnapToGrid,
+    canvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentLengths,
     canvasResetZoomPercentInput,
     defaultIdSortDirection,
     defaultSortDirection,

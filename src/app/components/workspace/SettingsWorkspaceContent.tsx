@@ -37,6 +37,10 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultShowGrid: (value: boolean) => void;
   canvasDefaultSnapToGrid: boolean;
   setCanvasDefaultSnapToGrid: (value: boolean) => void;
+  canvasDefaultShowInfoPanels: boolean;
+  setCanvasDefaultShowInfoPanels: (value: boolean) => void;
+  canvasDefaultShowSegmentLengths: boolean;
+  setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   canvasResetZoomPercentInput: string;
   setCanvasResetZoomPercentInput: (value: string) => void;
   configuredResetZoomPercent: number;
@@ -81,6 +85,10 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultShowGrid,
   canvasDefaultSnapToGrid,
   setCanvasDefaultSnapToGrid,
+  canvasDefaultShowInfoPanels,
+  setCanvasDefaultShowInfoPanels,
+  canvasDefaultShowSegmentLengths,
+  setCanvasDefaultShowSegmentLengths,
   canvasResetZoomPercentInput,
   setCanvasResetZoomPercentInput,
   configuredResetZoomPercent,
@@ -172,6 +180,22 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasDefaultSnapToGrid(event.target.checked)}
             />
             Snap node movement by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultShowInfoPanels}
+              onChange={(event) => setCanvasDefaultShowInfoPanels(event.target.checked)}
+            />
+            Show info overlays by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultShowSegmentLengths}
+              onChange={(event) => setCanvasDefaultShowSegmentLengths(event.target.checked)}
+            />
+            Show segment lengths by default
           </label>
           <label className="settings-field">
             Reset zoom target (%)

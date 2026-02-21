@@ -1,23 +1,20 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--table-font-size, 0.84rem);
 }
 
 .data-table th,
 .data-table td {
+  font-size: var(--table-cell-font-size, var(--table-font-size, 0.84rem));
   border-bottom: 1px solid #d5e1ea;
   text-align: left;
   padding: 0.45rem 0.3rem;
   vertical-align: top;
 }
 
-.table-density-compact .data-table {
-  font-size: var(--table-font-size-compact, 0.78rem);
-}
-
 .table-density-compact .data-table th,
 .table-density-compact .data-table td {
+  font-size: var(--table-cell-font-size-compact, var(--table-font-size-compact, 0.76rem));
   padding: 0.28rem 0.22rem;
 }
 
@@ -121,7 +118,7 @@
   align-items: center;
   border-radius: 999px;
   padding: 0.15rem 0.45rem;
-  font-size: 0.72rem;
+  font-size: 0.8em;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -191,19 +188,19 @@
   border-radius: 999px;
   background: #133a57;
   color: #fff;
-  font-size: 0.72rem;
+  font-size: 0.8em;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
 .app-shell.table-font-small {
-  --table-font-size: 0.78rem;
-  --table-font-size-compact: 0.72rem;
+  --table-font-size: 0.74rem;
+  --table-font-size-compact: 0.7rem;
 }
 
 .app-shell.table-font-normal {
-  --table-font-size: 0.84rem;
-  --table-font-size-compact: 0.78rem;
+  --table-font-size: 0.82rem;
+  --table-font-size-compact: 0.76rem;
 }
 
 .app-shell.table-font-large {

@@ -323,6 +323,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [networkSort, setNetworkSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [canvasDefaultShowGrid, setCanvasDefaultShowGrid] = useState(true);
   const [canvasDefaultSnapToGrid, setCanvasDefaultSnapToGrid] = useState(true);
+  const [canvasDefaultShowInfoPanels, setCanvasDefaultShowInfoPanels] = useState(true);
+  const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(false);
   const [showNetworkInfoPanels, setShowNetworkInfoPanels] = useState(true);
   const [showSegmentLengths, setShowSegmentLengths] = useState(false);
   const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("100");
@@ -685,6 +687,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     defaultIdSortDirection,
     canvasDefaultShowGrid,
     canvasDefaultSnapToGrid,
+    canvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentLengths,
     canvasResetZoomPercentInput,
     showShortcutHints,
     keyboardShortcutsEnabled,
@@ -704,8 +708,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setSegmentIdSortDirection,
     setCanvasDefaultShowGrid,
     setCanvasDefaultSnapToGrid,
+    setCanvasDefaultShowInfoPanels,
+    setCanvasDefaultShowSegmentLengths,
     setShowNetworkGrid,
     setSnapNodesToGrid,
+    setShowNetworkInfoPanels,
+    setShowSegmentLengths,
     setCanvasResetZoomPercentInput,
     setNetworkScale,
     setNetworkOffset,
@@ -869,8 +877,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNetworkOffset,
     canvasDefaultShowGrid,
     canvasDefaultSnapToGrid,
+    canvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentLengths,
     setShowNetworkGrid,
     setSnapNodesToGrid,
+    setShowNetworkInfoPanels,
+    setShowSegmentLengths,
     defaultSortField,
     defaultSortDirection,
     defaultIdSortDirection,
@@ -890,6 +902,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setDefaultIdSortDirection,
     setCanvasDefaultShowGrid,
     setCanvasDefaultSnapToGrid,
+    setCanvasDefaultShowInfoPanels,
+    setCanvasDefaultShowSegmentLengths,
     setCanvasResetZoomPercentInput,
     setShowShortcutHints,
     setKeyboardShortcutsEnabled
@@ -2073,6 +2087,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setCanvasDefaultShowGrid={setCanvasDefaultShowGrid}
           canvasDefaultSnapToGrid={canvasDefaultSnapToGrid}
           setCanvasDefaultSnapToGrid={setCanvasDefaultSnapToGrid}
+          canvasDefaultShowInfoPanels={canvasDefaultShowInfoPanels}
+          setCanvasDefaultShowInfoPanels={setCanvasDefaultShowInfoPanels}
+          canvasDefaultShowSegmentLengths={canvasDefaultShowSegmentLengths}
+          setCanvasDefaultShowSegmentLengths={setCanvasDefaultShowSegmentLengths}
           canvasResetZoomPercentInput={canvasResetZoomPercentInput}
           setCanvasResetZoomPercentInput={setCanvasResetZoomPercentInput}
           configuredResetZoomPercent={configuredResetZoomPercent}
