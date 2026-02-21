@@ -67,11 +67,32 @@ git submodule update --init --recursive
 
 ### Run locally
 
+Create local env values from the tracked template:
+
+```bash
+cp .env.example .env
+```
+
+Supported variables and defaults:
+
+- `APP_HOST=127.0.0.1`
+- `APP_PORT=5284`
+- `PREVIEW_PORT=5285`
+- `E2E_BASE_URL=http://127.0.0.1:5284`
+- `VITE_STORAGE_KEY=electrical-plan-editor.state`
+
+Env fallback behavior:
+
+- Invalid/empty `APP_PORT` or `PREVIEW_PORT` falls back to documented defaults.
+- Invalid/empty `E2E_BASE_URL` falls back to `http://{APP_HOST}:{APP_PORT}`.
+- Invalid/empty `VITE_STORAGE_KEY` falls back to `electrical-plan-editor.state`.
+- Keep secrets out of `VITE_*` variables (they are client-visible at build/runtime).
+
 ```bash
 npm run dev
 ```
 
-Then open the local Vite URL shown in the terminal.
+Then open `http://127.0.0.1:5284` (unless overridden).
 
 ## Available Scripts
 
@@ -91,6 +112,7 @@ Then open the local Vite URL shown in the terminal.
 ```text
 src/
   app/                    # React app shell and UI
+  config/                 # Runtime env resolution and defaults
   core/                   # Domain entities, graph and pathfinding
   store/                  # State management, reducer, selectors, actions
   adapters/persistence/   # Local storage persistence + migrations

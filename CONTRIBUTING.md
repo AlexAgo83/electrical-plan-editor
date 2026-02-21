@@ -13,7 +13,20 @@ Thanks for contributing to Electrical Plan Editor.
 ```bash
 npm ci
 git submodule update --init --recursive
+cp .env.example .env
 ```
+
+Default local runtime is `http://127.0.0.1:5284` unless overridden in `.env`.
+
+Supported env variables:
+
+- `APP_HOST`
+- `APP_PORT`
+- `PREVIEW_PORT`
+- `E2E_BASE_URL`
+- `VITE_STORAGE_KEY`
+
+Do not put secrets in `VITE_*` variables (client-visible).
 
 ## Development Workflow
 
@@ -49,4 +62,3 @@ Include:
 - Why it changed
 - How you validated it
 - Any known limitations or follow-up items
-
