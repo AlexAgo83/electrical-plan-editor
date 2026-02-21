@@ -127,6 +127,19 @@ function snapToGrid(value: number, step: number): number {
   return Math.round(value / step) * step;
 }
 
+function isEditableElement(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  const tagName = target.tagName;
+  if (tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT") {
+    return true;
+  }
+
+  return target.isContentEditable;
+}
+
 function sortByNameAndTechnicalId<T>(
   items: T[],
   sortState: SortState,
@@ -269,6 +282,7 @@ export interface AppProps {
 type ScreenId = "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
 type InteractionMode = "select" | "addNode" | "addSegment" | "connect" | "route";
+type TableDensity = "comfortable" | "compact";
 
 interface ValidationIssue {
   id: string;
@@ -399,6 +413,15 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [snapNodesToGrid, setSnapNodesToGrid] = useState(false);
   const [networkScale, setNetworkScale] = useState(1);
   const [networkOffset, setNetworkOffset] = useState<NodePosition>({ x: 0, y: 0 });
+  const [tableDensity, setTableDensity] = useState<TableDensity>("comfortable");
+  const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
+  const [defaultSortDirection, setDefaultSortDirection] = useState<SortDirection>("asc");
+  const [defaultIdSortDirection, setDefaultIdSortDirection] = useState<SortDirection>("asc");
+  const [canvasDefaultShowGrid, setCanvasDefaultShowGrid] = useState(true);
+  const [canvasDefaultSnapToGrid, setCanvasDefaultSnapToGrid] = useState(false);
+  const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("100");
+  const [showShortcutHints, setShowShortcutHints] = useState(true);
+  const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [undoStack, setUndoStack] = useState<ReturnType<AppStore["getState"]>[]>([]);
   const [redoStack, setRedoStack] = useState<ReturnType<AppStore["getState"]>[]>([]);
   const [saveStatus, setSaveStatus] = useState<"saved" | "unsaved" | "error">("saved");
@@ -410,6 +433,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
     offsetY: number;
   } | null>(null);
   const lastInspectorSelectionRef = useRef<string | null>(null);
+  const undoActionRef = useRef<() => void>(() => {});
+  const redoActionRef = useRef<() => void>(() => {});
 
   const selected = selectSelection(state);
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
@@ -495,6 +520,16 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const isSegmentSubScreen = activeSubScreen === "segment";
   const isWireSubScreen = activeSubScreen === "wire";
   const selectedSubScreen = selected?.kind === undefined ? null : (selected.kind as SubScreenId);
+  const appShellClassName = tableDensity === "compact" ? "app-shell table-density-compact" : "app-shell";
+  const configuredResetScale = useMemo(() => {
+    const parsedPercent = Number(canvasResetZoomPercentInput);
+    if (!Number.isFinite(parsedPercent) || parsedPercent <= 0) {
+      return 1;
+    }
+
+    return clamp(parsedPercent / 100, NETWORK_MIN_SCALE, NETWORK_MAX_SCALE);
+  }, [canvasResetZoomPercentInput]);
+  const configuredResetZoomPercent = Math.round(configuredResetScale * 100);
   const describeWireEndpoint = useCallback((endpoint: WireEndpoint): string => {
     if (endpoint.kind === "connectorCavity") {
       const connector = connectorMap.get(endpoint.connectorId);
@@ -1290,6 +1325,71 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setSaveStatus("unsaved");
     queueSavedStatus();
   }
+
+  function resetNetworkViewToConfiguredScale(): void {
+    setNetworkScale(configuredResetScale);
+    setNetworkOffset({ x: 0, y: 0 });
+  }
+
+  function applyListSortDefaults(): void {
+    setConnectorSort({ field: defaultSortField, direction: defaultSortDirection });
+    setSpliceSort({ field: defaultSortField, direction: defaultSortDirection });
+    setWireSort({ field: defaultSortField, direction: defaultSortDirection });
+    setConnectorSynthesisSort({ field: defaultSortField, direction: defaultSortDirection });
+    setSpliceSynthesisSort({ field: defaultSortField, direction: defaultSortDirection });
+    setNodeIdSortDirection(defaultIdSortDirection);
+    setSegmentIdSortDirection(defaultIdSortDirection);
+  }
+
+  function applyCanvasDefaultsNow(): void {
+    setShowNetworkGrid(canvasDefaultShowGrid);
+    setSnapNodesToGrid(canvasDefaultSnapToGrid);
+    resetNetworkViewToConfiguredScale();
+  }
+
+  useEffect(() => {
+    undoActionRef.current = handleUndo;
+    redoActionRef.current = handleRedo;
+  });
+
+  useEffect(() => {
+    if (!keyboardShortcutsEnabled) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (isEditableElement(event.target)) {
+        return;
+      }
+
+      const hasModifier = event.metaKey || event.ctrlKey;
+      if (!hasModifier) {
+        return;
+      }
+
+      const normalizedKey = event.key.toLocaleLowerCase();
+      if (normalizedKey === "z") {
+        event.preventDefault();
+        if (event.shiftKey) {
+          redoActionRef.current();
+          return;
+        }
+
+        undoActionRef.current();
+        return;
+      }
+
+      if (normalizedKey === "y") {
+        event.preventDefault();
+        redoActionRef.current();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [keyboardShortcutsEnabled]);
 
   function getSortIndicator(sortState: SortState, field: SortField): string {
     if (sortState.field !== field) {
@@ -2120,8 +2220,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
   function handleZoomAction(target: "in" | "out" | "reset"): void {
     if (target === "reset") {
-      setNetworkScale(1);
-      setNetworkOffset({ x: 0, y: 0 });
+      resetNetworkViewToConfiguredScale();
       return;
     }
 
@@ -2543,7 +2642,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   );
 
   return (
-    <main className="app-shell">
+    <main className={appShellClassName}>
       <section className="header-block">
         <h1>Electrical Plan Editor</h1>
       </section>
@@ -2630,13 +2729,18 @@ export function App({ store = appStore }: AppProps): ReactElement {
       </section>
 
       <section className="workspace-meta">
-        <div className="row-actions compact">
-          <button type="button" onClick={handleUndo} disabled={!isUndoAvailable}>
-            Undo
-          </button>
-          <button type="button" onClick={handleRedo} disabled={!isRedoAvailable}>
-            Redo
-          </button>
+        <div className="workspace-meta-main">
+          <div className="row-actions compact">
+            <button type="button" onClick={handleUndo} disabled={!isUndoAvailable}>
+              Undo
+            </button>
+            <button type="button" onClick={handleRedo} disabled={!isRedoAvailable}>
+              Redo
+            </button>
+          </div>
+          {showShortcutHints ? (
+            <p className="shortcut-hints">Shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo.</p>
+          ) : null}
         </div>
         <p className={`save-status is-${saveStatus}`}>
           State: {saveStatus === "saved" ? "Saved" : saveStatus === "unsaved" ? "Unsaved" : "Error"}
@@ -3840,12 +3944,122 @@ export function App({ store = appStore }: AppProps): ReactElement {
       {isSettingsScreen ? (
         <section className="panel-grid">
           <section className="panel">
-            <h2>Settings</h2>
-            <p className="meta-line">Workspace preferences are being expanded in this UX/UI wave.</p>
+            <h2>Table and list preferences</h2>
+            <div className="settings-grid">
+              <label>
+                Table density
+                <select value={tableDensity} onChange={(event) => setTableDensity(event.target.value as TableDensity)}>
+                  <option value="comfortable">Comfortable</option>
+                  <option value="compact">Compact</option>
+                </select>
+              </label>
+              <label>
+                Default sort column
+                <select value={defaultSortField} onChange={(event) => setDefaultSortField(event.target.value as SortField)}>
+                  <option value="name">Name</option>
+                  <option value="technicalId">Technical ID</option>
+                </select>
+              </label>
+              <label>
+                Default sort direction
+                <select
+                  value={defaultSortDirection}
+                  onChange={(event) => setDefaultSortDirection(event.target.value as SortDirection)}
+                >
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </label>
+              <label>
+                Default ID sort direction
+                <select
+                  value={defaultIdSortDirection}
+                  onChange={(event) => setDefaultIdSortDirection(event.target.value as SortDirection)}
+                >
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </label>
+            </div>
+            <div className="row-actions">
+              <button type="button" onClick={applyListSortDefaults}>
+                Apply sort defaults now
+              </button>
+            </div>
+          </section>
+
+          <section className="panel">
+            <h2>Canvas preferences</h2>
+            <div className="settings-grid">
+              <label className="settings-checkbox">
+                <input
+                  type="checkbox"
+                  checked={canvasDefaultShowGrid}
+                  onChange={(event) => setCanvasDefaultShowGrid(event.target.checked)}
+                />
+                Show grid by default
+              </label>
+              <label className="settings-checkbox">
+                <input
+                  type="checkbox"
+                  checked={canvasDefaultSnapToGrid}
+                  onChange={(event) => setCanvasDefaultSnapToGrid(event.target.checked)}
+                />
+                Snap node movement by default
+              </label>
+              <label>
+                Reset zoom target (%)
+                <input
+                  type="number"
+                  min={Math.round(NETWORK_MIN_SCALE * 100)}
+                  max={Math.round(NETWORK_MAX_SCALE * 100)}
+                  step={5}
+                  value={canvasResetZoomPercentInput}
+                  onChange={(event) => setCanvasResetZoomPercentInput(event.target.value)}
+                />
+              </label>
+            </div>
+            <div className="row-actions">
+              <button type="button" onClick={applyCanvasDefaultsNow}>
+                Apply canvas defaults now
+              </button>
+              <button type="button" onClick={() => handleZoomAction("reset")}>
+                Reset current view
+              </button>
+            </div>
+            <p className="meta-line">Configured reset zoom: {configuredResetZoomPercent}%.</p>
+          </section>
+
+          <section className="panel">
+            <h2>Action bar and shortcuts</h2>
+            <div className="settings-grid">
+              <label className="settings-checkbox">
+                <input
+                  type="checkbox"
+                  checked={showShortcutHints}
+                  onChange={(event) => setShowShortcutHints(event.target.checked)}
+                />
+                Show shortcut hints in the action bar
+              </label>
+              <label className="settings-checkbox">
+                <input
+                  type="checkbox"
+                  checked={keyboardShortcutsEnabled}
+                  onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
+                />
+                Enable keyboard shortcuts (undo/redo)
+              </label>
+            </div>
             <ul className="subnetwork-list">
-              <li>Upcoming: configurable table density and default sort behavior.</li>
-              <li>Upcoming: canvas preferences (grid visibility, snap default, zoom reset).</li>
-              <li>Upcoming: action bar preferences and shortcut hints.</li>
+              <li>
+                <span className="technical-id">Ctrl/Cmd + Z</span> Undo last modeling action
+              </li>
+              <li>
+                <span className="technical-id">Ctrl/Cmd + Shift + Z</span> Redo
+              </li>
+              <li>
+                <span className="technical-id">Ctrl/Cmd + Y</span> Redo alternative shortcut
+              </li>
             </ul>
           </section>
         </section>

@@ -306,4 +306,39 @@ describe("App integration UI", () => {
     expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
     expect(within(validationPanel).queryByRole("heading", { name: "Route lock validity" })).not.toBeInTheDocument();
   });
+
+  it("applies settings defaults for list sort behavior", () => {
+    const store = createAppStore(createConnectorSortingState());
+    render(<App store={store} />);
+
+    switchScreen("settings");
+    const settingsPanel = getPanelByHeading("Table and list preferences");
+    fireEvent.change(within(settingsPanel).getByLabelText("Default sort column"), {
+      target: { value: "technicalId" }
+    });
+    fireEvent.change(within(settingsPanel).getByLabelText("Default sort direction"), {
+      target: { value: "desc" }
+    });
+    fireEvent.click(within(settingsPanel).getByRole("button", { name: "Apply sort defaults now" }));
+
+    switchScreen("modeling");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    const firstConnectorName = connectorsPanel.querySelector("tbody tr td")?.textContent?.trim() ?? "";
+    expect(firstConnectorName).toBe("Zulu connector");
+  });
+
+  it("switches to compact table density from settings", () => {
+    const store = createAppStore(createUiIntegrationState());
+    render(<App store={store} />);
+
+    switchScreen("settings");
+    const settingsPanel = getPanelByHeading("Table and list preferences");
+    fireEvent.change(within(settingsPanel).getByLabelText("Table density"), {
+      target: { value: "compact" }
+    });
+
+    const appShell = document.querySelector("main.app-shell");
+    expect(appShell).not.toBeNull();
+    expect(appShell).toHaveClass("table-density-compact");
+  });
 });

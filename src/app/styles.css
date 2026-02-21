@@ -224,6 +224,17 @@ button {
   gap: 0.75rem;
 }
 
+.workspace-meta-main {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.shortcut-hints {
+  margin: 0;
+  color: #3b596d;
+  font-size: 0.8rem;
+}
+
 .save-status {
   margin: 0;
   font-size: 0.85rem;
@@ -294,6 +305,15 @@ button {
   text-align: left;
   padding: 0.45rem 0.3rem;
   vertical-align: top;
+}
+
+.table-density-compact .data-table {
+  font-size: 0.83rem;
+}
+
+.table-density-compact .data-table th,
+.table-density-compact .data-table td {
+  padding: 0.28rem 0.22rem;
 }
 
 .data-table th {
@@ -576,6 +596,19 @@ button {
 
 .validation-active-filter {
   margin-top: 0.65rem;
+}
+
+.settings-grid {
+  display: grid;
+  gap: 0.65rem;
+  margin-bottom: 0.65rem;
+}
+
+.settings-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
 }
 
 .network-canvas-shell {
