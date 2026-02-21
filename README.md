@@ -1,160 +1,105 @@
-# Electrical Plan Editor (V1)
+# Electrical Plan Editor
 
-Logic-first kickoff repository for a local-first electrical plan editor.
+A local-first electrical network editor focused on deterministic modeling, routing, and validation.
 
-The V1 goal is to model connectors, splices, routing segments, and wires as a deterministic graph, then compute wire routes and lengths automatically.
+The project models connectors, splices, nodes, segments, and wires as a graph, computes shortest routes, and keeps wire lengths synchronized with segment changes.
 
-## Project Status
+## Table of Contents
 
-This repository is currently in **V1 kickoff ready** status:
-- Product request is defined in `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`.
-- Target architecture is defined in `logics/architecture/target_reference_v1_frontend_local_first.md`.
-- Kickoff backlog is split into 9 V1 items (`item_000`..`item_008`) in `logics/backlog/`.
-- UX/UI extension backlog is defined in `item_009`..`item_013` from `req_001`.
-- Delivery orchestration lives in:
-  - `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`
-  - `logics/tasks/task_001_v1_ux_ui_workspace_orchestration_and_delivery_control.md`
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Available Scripts](#available-scripts)
+- [Project Structure](#project-structure)
+- [Quality and CI](#quality-and-ci)
+- [Roadmap and Logics](#roadmap-and-logics)
+- [Contributing](#contributing)
+- [License](#license)
 
-Foundation item `item_000` is implemented:
-- TypeScript strict project scaffold (Vite + React + Vitest + ESLint).
-- Domain contracts in `src/core`.
-- Deterministic normalized store in `src/store`.
-- Local persistence adapter base in `src/adapters/persistence`.
-- Baseline reducer/store invariants tests in `src/tests/store.reducer.spec.ts`.
+## Features
 
-Connector item `item_001` is implemented:
-- Connector create/edit/delete flow in `src/app/App.tsx`.
-- Unique connector technical ID validation in `src/store/reducer.ts`.
-- Connector cavity occupancy reservation/release and single-occupancy enforcement.
-- Real-time connector cavity visualization and occupancy counters.
+- Deterministic domain model for:
+  - Connectors with cavity occupancy
+  - Splices with port occupancy
+  - Graph nodes and weighted segments
+  - Wires with endpoint constraints
+- Automatic shortest-path routing (Dijkstra-based)
+- Forced route lock/reset for wires
+- Automatic wire length recomputation after segment edits
+- 2D network view:
+  - Node drag-and-drop
+  - Pan with `Shift + drag`
+  - Zoom with toolbar controls (`Zoom -`, `Zoom +`, `Reset view`, `Fit network`)
+- Validation center with grouped issues and issue navigation
+- Local persistence with schema versioning and migrations
+- Keyboard shortcuts for major workspace actions
 
-Splice item `item_002` is implemented:
-- Splice create/edit/delete flow in `src/app/App.tsx`.
-- Unique splice technical ID validation in `src/store/reducer.ts`.
-- Splice port occupancy reservation/release and single-occupancy enforcement.
-- Distinct splice visualization with junction marker and branch count.
+## Tech Stack
 
-Routing network item `item_003` is implemented:
-- Node management for connector/splice/intermediate node types.
-- Segment management with strict endpoint and length validation.
-- Sub-network grouping tag on segments with summary visualization.
-- Graph index builder (`src/core/graph.ts`) consumable by routing logic.
+- React 19
+- TypeScript (strict)
+- Vite
+- Vitest + Testing Library
+- Playwright (E2E smoke)
+- ESLint
+- Logics documentation workflow (`logics/`)
 
-Shortest-path item `item_004` is implemented:
-- Dijkstra-based routing engine in `src/core/pathfinding.ts`.
-- Deterministic tie-break: shortest length, then fewer segments, then stable segment ID ordering.
-- Route computation API exposed via `findShortestRoute(...)` and `selectShortestRouteBetweenNodes(...)`.
-- Route preview panel integrated in the app for graph-level validation.
+## Getting Started
 
-Wire lifecycle item `item_005` is implemented:
-- Wire create/edit/delete workflow with connector/splice endpoints.
-- Automatic shortest-path routing and computed wire length on save.
-- Forced route locking with ordered segment validation.
-- Route reset to shortest path.
-- Automatic impacted wire recomputation when segment definitions change.
-- Endpoint occupancy enforcement for connector cavities and splice ports.
+### Prerequisites
 
-Network and synthesis views item `item_006` is implemented:
-- Workspace tabs to switch between `Modeling`, `Analysis`, `Validation`, and `Settings`.
-- Sub-screen tab navigation (`Connector`, `Splice`, `Node`, `Segment`, `Wire`) for modeling/analysis focus.
-- 2D SVG network diagram for `Node`/`Segment`/`Wire` analysis with selectable nodes and segments.
-- Manual ID entry for node and segment creation (no auto-generated IDs for these entities).
-- Draggable nodes in 2D network view (mouse drag-and-drop).
-- Sortable list headers on `Name` and `Technical ID` columns (click to toggle asc/desc).
-- Wire route highlight in network segment view when a wire is selected.
-- Connector synthesis table with destination and computed wire lengths.
-- Splice synthesis table with destination and computed wire lengths.
-- Selection snapshot and route tooling wired to synthesis/navigation workflows.
+- Node.js 20+
+- npm
+- Python 3 (for Logics lint/tooling)
 
-Local persistence and schema versioning item `item_007` is implemented:
-- App bootstrap restores saved project state from local storage.
-- Persisted payload includes `schemaVersion`, `createdAtIso`, and `updatedAtIso`.
-- Migration entry point supports current schema and legacy payload normalization.
-- Corrupted/invalid payloads fall back safely to a clean initial state.
+### Install
 
-Validation and acceptance coverage item `item_008` is implemented:
-- AC1..AC6 traceability matrix is documented in `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`.
-- Integration/UI tests cover connector occupancy, splice occupancy, and selected wire route highlight.
-- E2E smoke scenario covers create -> route -> force lock -> recompute flow.
-- CI baseline executes lint, typecheck, unit/integration, and E2E smoke checks.
+```bash
+npm ci
+```
 
-UX/UI workspace wave (`task_001`) is completed:
-- Persistent left-rail workspace navigation is active.
-- Workspace navigation now surfaces live counters (entity counts on sub-screens, issue count on `Validation`).
-- Validation center screen with grouped issues and `Go to` actions is active.
-- Validation center now supports severity filtering (`All severities`, `Errors`, `Warnings`) in addition to category filters.
-- Validation center now supports text search on issue content/category/entity references.
-- Validation toolbar now includes quick triage actions (`Previous issue`, `Next issue`, `Clear filters`).
-- In Validation screen, `Previous issue` / `Next issue` follow the currently visible filtered issue set.
-- The issue cursor auto-realigns to visible results when filters change in Validation.
-- Validation category chips now expose contextual counts and disable empty categories under current severity/search scope.
-- Validation severity chips now expose contextual counts and disable empty severities under current category/search scope.
-- `Go to` from validation rows now synchronizes the sidebar issue cursor and current-issue summary.
-- Sidebar now includes a `Model health` snapshot with quick actions to open validation, focus on errors/warnings, and step through issues (`Previous`/`Next`).
-- Keyboard shortcuts now include issue-step navigation (`Alt+J` previous issue, `Alt+K` next issue).
-- List ergonomics now include search on all core lists and filters on node/wire/connector/splice/segment lists.
-- Network canvas is visible in both modeling and analysis workspaces.
-- Canvas controls include `Fit network` (button + `Alt+F`) to frame current topology quickly.
-- Settings workspace now exposes table density, sort defaults, canvas defaults, and shortcut preferences (persisted locally).
+If you cloned without submodules and need Logics tooling:
 
-## V1 Scope
+```bash
+git submodule update --init --recursive
+```
 
-- Connector management with cavity occupancy constraints.
-- Splice management with port occupancy constraints.
-- Routing network with weighted segments (`lengthMm`).
-- Automatic shortest-path wire routing (Dijkstra).
-- Deterministic tie-break (fewer segments, then stable ordering).
-- Forced route lock/reset for wires.
-- Automatic wire length recomputation when segment lengths change.
-- Global network + connector/splice synthesis views.
-- Local persistence with schema versioning.
+### Run locally
 
-## Repository Structure
+```bash
+npm run dev
+```
+
+Then open the local Vite URL shown in the terminal.
+
+## Available Scripts
+
+- `npm run dev`: start local dev server
+- `npm run build`: typecheck + production build
+- `npm run preview`: preview production build
+- `npm run lint`: run ESLint
+- `npm run typecheck`: run TypeScript checks
+- `npm run test`: run Vitest in watch mode
+- `npm run test:ci`: run Vitest with coverage
+- `npm run test:e2e`: run Playwright E2E smoke tests
+
+## Project Structure
 
 ```text
-logics/
-  architecture/   # technical reference architecture and decisions
-  request/        # product needs and context
-  backlog/        # scoped items with acceptance criteria
-  tasks/          # execution orchestration and validation plans
-  skills/         # Logics kit (scripts + guides, imported as submodule)
+src/
+  app/                    # React app shell and UI
+  core/                   # Domain entities, graph and pathfinding
+  store/                  # State management, reducer, selectors, actions
+  adapters/persistence/   # Local storage persistence + migrations
+  tests/                  # Unit + integration tests
+
+tests/e2e/                # Playwright end-to-end smoke
+logics/                   # Product requests, backlog, tasks, architecture
 ```
 
-## Prerequisites
+## Quality and CI
 
-- `python3`
-- `git`
-- `node` 20+ (target runtime for implementation phase)
-
-## Working with Logics
-
-Bootstrap or maintain the Logics workflow:
-
-```bash
-python3 logics/skills/logics-bootstrapper/scripts/logics_bootstrap.py
-python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
-```
-
-Create and promote documents:
-
-```bash
-python3 logics/skills/logics-flow-manager/scripts/logics_flow.py new request --title "My need"
-python3 logics/skills/logics-flow-manager/scripts/logics_flow.py new backlog --title "My need"
-python3 logics/skills/logics-flow-manager/scripts/logics_flow.py new task --title "Implement my need"
-python3 logics/skills/logics-flow-manager/scripts/logics_flow.py promote request-to-backlog logics/request/req_001_my_need.md
-python3 logics/skills/logics-flow-manager/scripts/logics_flow.py promote backlog-to-task logics/backlog/item_001_my_need.md
-```
-
-## Delivery Waves (V1)
-
-- Wave 1: `item_000` to `item_004` (foundation + routing engine).
-- Wave 2: `item_005` to `item_007` (wire lifecycle + views + persistence) - completed.
-- Wave 3: `item_008` (validation matrix and AC1..AC6 automated coverage) - completed.
-- Wave 4: `item_009` to `item_013` (UX/UI workspace overhaul) - completed.
-
-## Validation Baseline
-
-Current orchestration task references:
+Primary validation commands:
 
 ```bash
 python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
@@ -164,12 +109,27 @@ npm run test:ci
 npm run test:e2e
 ```
 
-GitHub Actions CI is available in `.github/workflows/ci.yml` and runs the same baseline checks on pushes/PRs.
+CI runs the same pipeline in `.github/workflows/ci.yml` on `push` and `pull_request`.
 
-## Key References
+## Roadmap and Logics
+
+Product and delivery planning are tracked in `logics/`:
+
+- Requests: `logics/request/`
+- Backlog items: `logics/backlog/`
+- Orchestration tasks: `logics/tasks/`
+- Architecture references: `logics/architecture/`
+
+Key starting points:
 
 - `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`
 - `logics/request/req_001_v1_ux_ui_operator_workspace.md`
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
 - `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`
-- `logics/tasks/task_001_v1_ux_ui_workspace_orchestration_and_delivery_control.md`
+
+## Contributing
+
+Contribution guidelines are available in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+## License
+
+This project is licensed under the MIT License. See [`LICENSE`](LICENSE).
