@@ -1,6 +1,6 @@
-import type { FormEvent, ReactElement } from "react";
+import { useState, type FormEvent, type ReactElement } from "react";
 import { nextSortState } from "../../lib/app-utils";
-import type { Connector, Splice, Wire, WireId } from "../../../core/entities";
+import type { Connector, Splice, SpliceId, Wire, WireId } from "../../../core/entities";
 import type { ConnectorSynthesisRow, SortState, SpliceSynthesisRow } from "../../types/app-controller";
 
 interface OccupancyStatus {
@@ -34,6 +34,15 @@ interface AnalysisWorkspaceContentProps {
   setConnectorSynthesisSort: (value: SortState | ((current: SortState) => SortState)) => void;
   getSortIndicator: (sortState: SortState, field: "name" | "technicalId") => string;
   selectedSplice: Splice | null;
+  selectedSpliceId: SpliceId | null;
+  spliceOccupancyFilter: "all" | "occupied" | "free";
+  setSpliceOccupancyFilter: (value: "all" | "occupied" | "free") => void;
+  splices: Splice[];
+  visibleSplices: Splice[];
+  spliceSort: SortState;
+  setSpliceSort: (value: SortState | ((current: SortState) => SortState)) => void;
+  spliceOccupiedCountById: Map<SpliceId, number>;
+  onSelectSplice: (spliceId: SpliceId) => void;
   splicePortStatuses: SplicePortStatus[];
   portIndexInput: string;
   setPortIndexInput: (value: string) => void;
@@ -79,6 +88,15 @@ export function AnalysisWorkspaceContent({
   setConnectorSynthesisSort,
   getSortIndicator,
   selectedSplice,
+  selectedSpliceId,
+  spliceOccupancyFilter,
+  setSpliceOccupancyFilter,
+  splices,
+  visibleSplices,
+  spliceSort,
+  setSpliceSort,
+  spliceOccupiedCountById,
+  onSelectSplice,
   splicePortStatuses,
   portIndexInput,
   setPortIndexInput,
@@ -105,6 +123,8 @@ export function AnalysisWorkspaceContent({
   handleResetWireRoute,
   wireFormError
 }: AnalysisWorkspaceContentProps): ReactElement {
+  const [spliceAnalysisView, setSpliceAnalysisView] = useState<"ports" | "synthesis">("ports");
+
   return (
     <section className="panel-grid analysis-panel-grid">
       <section className="panel" hidden={!isConnectorSubScreen}>
@@ -209,10 +229,108 @@ export function AnalysisWorkspaceContent({
       </section>
 
       <section className="panel" hidden={!isSpliceSubScreen}>
-        <h2>Splice ports</h2>
-        {selectedSplice === null ? (
-          <p className="empty-copy">Select a splice to view and manage port occupancy.</p>
+        <header className="list-panel-header">
+          <h2>Splices</h2>
+          <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
+            {([
+              ["all", "All"],
+              ["occupied", "Occupied"],
+              ["free", "Free"]
+            ] as const).map(([filterId, label]) => (
+              <button
+                key={filterId}
+                type="button"
+                className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+                onClick={() => setSpliceOccupancyFilter(filterId)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </header>
+        {splices.length === 0 ? (
+          <p className="empty-copy">No splice yet.</p>
+        ) : visibleSplices.length === 0 ? (
+          <p className="empty-copy">No splice matches the current filters.</p>
         ) : (
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>
+                  <button
+                    type="button"
+                    className="sort-header-button"
+                    onClick={() => setSpliceSort((current) => nextSortState(current, "name"))}
+                  >
+                    Name <span className="sort-indicator">{getSortIndicator(spliceSort, "name")}</span>
+                  </button>
+                </th>
+                <th>
+                  <button
+                    type="button"
+                    className="sort-header-button"
+                    onClick={() => setSpliceSort((current) => nextSortState(current, "technicalId"))}
+                  >
+                    Technical ID <span className="sort-indicator">{getSortIndicator(spliceSort, "technicalId")}</span>
+                  </button>
+                </th>
+                <th>Ports</th>
+                <th>Branches</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleSplices.map((splice) => {
+                const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
+                const isSelected = selectedSpliceId === splice.id;
+                return (
+                  <tr
+                    key={splice.id}
+                    className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
+                    aria-selected={isSelected}
+                    tabIndex={0}
+                    onClick={() => onSelectSplice(splice.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onSelectSplice(splice.id);
+                      }
+                    }}
+                  >
+                    <td>{splice.name}</td>
+                    <td className="technical-id">{splice.technicalId}</td>
+                    <td>{splice.portCount}</td>
+                    <td>{occupiedCount}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section className="panel" hidden={!isSpliceSubScreen}>
+        <header className="list-panel-header">
+          <h2>Splice</h2>
+          <div className="chip-group list-panel-filters" role="group" aria-label="Splice analysis view">
+            <button
+              type="button"
+              className={spliceAnalysisView === "ports" ? "filter-chip is-active" : "filter-chip"}
+              onClick={() => setSpliceAnalysisView("ports")}
+            >
+              Ports
+            </button>
+            <button
+              type="button"
+              className={spliceAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
+              onClick={() => setSpliceAnalysisView("synthesis")}
+            >
+              Synthesis
+            </button>
+          </div>
+        </header>
+        {selectedSplice === null ? (
+          <p className="empty-copy">Select a splice to view ports and synthesis.</p>
+        ) : spliceAnalysisView === "ports" ? (
           <>
             <p className="meta-line">
               <span className="splice-badge">Junction</span> <strong>{selectedSplice.name}</strong> ({selectedSplice.technicalId})
@@ -259,13 +377,6 @@ export function AnalysisWorkspaceContent({
               ))}
             </div>
           </>
-        )}
-      </section>
-
-      <section className="panel" hidden={!isSpliceSubScreen}>
-        <h2>Splice synthesis</h2>
-        {selectedSplice === null ? (
-          <p className="empty-copy">Select a splice to view connected wire synthesis.</p>
         ) : sortedSpliceSynthesisRows.length === 0 ? (
           <p className="empty-copy">No wire currently connected to this splice.</p>
         ) : (

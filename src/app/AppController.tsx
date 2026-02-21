@@ -1928,6 +1928,22 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setConnectorSynthesisSort={setConnectorSynthesisSort}
           getSortIndicator={getSortIndicator}
           selectedSplice={selectedSplice}
+          selectedSpliceId={selectedSpliceId}
+          spliceOccupancyFilter={spliceOccupancyFilter}
+          setSpliceOccupancyFilter={setSpliceOccupancyFilter}
+          splices={splices}
+          visibleSplices={visibleSplices}
+          spliceSort={spliceSort}
+          setSpliceSort={setSpliceSort}
+          spliceOccupiedCountById={spliceOccupiedCountById}
+          onSelectSplice={(spliceId) =>
+            dispatchAction(
+              appActions.select({
+                kind: "splice",
+                id: spliceId
+              })
+            )
+          }
           splicePortStatuses={splicePortStatuses}
           portIndexInput={portIndexInput}
           setPortIndexInput={setPortIndexInput}
