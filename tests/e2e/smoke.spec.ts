@@ -3,7 +3,17 @@ import { expect, test } from "@playwright/test";
 test("create -> route -> force -> recompute flow works end-to-end", async ({ page }) => {
   test.setTimeout(60_000);
   const switchSubScreen = async (value: "connector" | "splice" | "node" | "segment" | "wire") => {
-    await page.getByLabel(/^Sub-screen$/).selectOption(value);
+    const labelBySubScreen = {
+      connector: "Connector",
+      splice: "Splice",
+      node: "Node",
+      segment: "Segment",
+      wire: "Wire"
+    } as const;
+    await page.getByRole("button", { name: labelBySubScreen[value] }).click();
+  };
+  const switchScreen = async (value: "modeling" | "analysis") => {
+    await page.getByRole("button", { name: value === "modeling" ? "Modeling" : "Analysis" }).click();
   };
 
   await page.goto("/");
@@ -70,7 +80,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   const initialWireLengthRaw = await wireRow.locator("td").nth(3).textContent();
   const initialWireLength = Number(initialWireLengthRaw ?? "0");
 
-  await page.getByLabel(/^Screen$/).selectOption("analysis");
+  await switchScreen("analysis");
   await switchSubScreen("wire");
   const routeControlPanel = page.locator("section.panel").filter({ has: page.getByRole("heading", { name: "Wire route control" }) });
   await routeControlPanel.getByRole("button", { name: "Lock forced route" }).click();
@@ -86,7 +96,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     throw new Error("Expected at least one route segment to edit in E2E flow.");
   }
 
-  await page.getByLabel(/^Screen$/).selectOption("modeling");
+  await switchScreen("modeling");
   await switchSubScreen("segment");
   const segmentsPanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Segments" }) });
   const targetSegmentRow = segmentsPanel.locator("tbody tr").filter({ hasText: routeSegmentToEdit }).first();

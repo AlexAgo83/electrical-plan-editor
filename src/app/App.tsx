@@ -184,8 +184,19 @@ export interface AppProps {
   store?: AppStore;
 }
 
-type ScreenId = "modeling" | "analysis";
+type ScreenId = "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
+type InteractionMode = "select" | "addNode" | "addSegment" | "connect" | "route";
+
+interface ValidationIssue {
+  id: string;
+  severity: "error" | "warning";
+  category: string;
+  message: string;
+  subScreen: SubScreenId;
+  selectionKind: "connector" | "splice" | "node" | "segment" | "wire";
+  selectionId: string;
+}
 
 export function App({ store = appStore }: AppProps): ReactElement {
   const state = useAppSnapshot(store);
@@ -256,6 +267,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
   const [activeScreen, setActiveScreen] = useState<ScreenId>("modeling");
   const [activeSubScreen, setActiveSubScreen] = useState<SubScreenId>("connector");
+  const [interactionMode, setInteractionMode] = useState<InteractionMode>("select");
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [nodeIdSortDirection, setNodeIdSortDirection] = useState<SortDirection>("asc");
@@ -344,6 +356,10 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
     return merged;
   }, [autoNodePositions, manualNodePositions, nodes]);
+  const isModelingScreen = activeScreen === "modeling";
+  const isAnalysisScreen = activeScreen === "analysis";
+  const isValidationScreen = activeScreen === "validation";
+  const isSettingsScreen = activeScreen === "settings";
   const isConnectorSubScreen = activeSubScreen === "connector";
   const isSpliceSubScreen = activeSubScreen === "splice";
   const isNodeSubScreen = activeSubScreen === "node";
@@ -491,6 +507,123 @@ export function App({ store = appStore }: AppProps): ReactElement {
       ),
     [spliceSynthesisRows, spliceSynthesisSort]
   );
+  const validationIssues = useMemo<ValidationIssue[]>(() => {
+    const issues: ValidationIssue[] = [];
+
+    for (const node of nodes) {
+      if (node.kind === "connector" && connectorMap.get(node.connectorId) === undefined) {
+        issues.push({
+          id: `node-missing-connector-${node.id}`,
+          severity: "error",
+          category: "Missing reference",
+          message: `Node '${node.id}' references missing connector '${node.connectorId}'.`,
+          subScreen: "node",
+          selectionKind: "node",
+          selectionId: node.id
+        });
+      }
+
+      if (node.kind === "splice" && spliceMap.get(node.spliceId) === undefined) {
+        issues.push({
+          id: `node-missing-splice-${node.id}`,
+          severity: "error",
+          category: "Missing reference",
+          message: `Node '${node.id}' references missing splice '${node.spliceId}'.`,
+          subScreen: "node",
+          selectionKind: "node",
+          selectionId: node.id
+        });
+      }
+    }
+
+    for (const segment of segments) {
+      if (state.nodes.byId[segment.nodeA] === undefined || state.nodes.byId[segment.nodeB] === undefined) {
+        issues.push({
+          id: `segment-missing-node-${segment.id}`,
+          severity: "error",
+          category: "Missing reference",
+          message: `Segment '${segment.id}' has an endpoint that is no longer available.`,
+          subScreen: "segment",
+          selectionKind: "segment",
+          selectionId: segment.id
+        });
+      }
+    }
+
+    for (const wire of wires) {
+      if (wire.endpointA.kind === "connectorCavity" && connectorMap.get(wire.endpointA.connectorId) === undefined) {
+        issues.push({
+          id: `wire-missing-connector-a-${wire.id}`,
+          severity: "error",
+          category: "Missing reference",
+          message: `Wire '${wire.technicalId}' endpoint A references missing connector '${wire.endpointA.connectorId}'.`,
+          subScreen: "wire",
+          selectionKind: "wire",
+          selectionId: wire.id
+        });
+      }
+      if (wire.endpointA.kind === "splicePort" && spliceMap.get(wire.endpointA.spliceId) === undefined) {
+        issues.push({
+          id: `wire-missing-splice-a-${wire.id}`,
+          severity: "error",
+          category: "Missing reference",
+          message: `Wire '${wire.technicalId}' endpoint A references missing splice '${wire.endpointA.spliceId}'.`,
+          subScreen: "wire",
+          selectionKind: "wire",
+          selectionId: wire.id
+        });
+      }
+      if (wire.endpointB.kind === "connectorCavity" && connectorMap.get(wire.endpointB.connectorId) === undefined) {
+        issues.push({
+          id: `wire-missing-connector-b-${wire.id}`,
+          severity: "error",
+          category: "Missing reference",
+          message: `Wire '${wire.technicalId}' endpoint B references missing connector '${wire.endpointB.connectorId}'.`,
+          subScreen: "wire",
+          selectionKind: "wire",
+          selectionId: wire.id
+        });
+      }
+      if (wire.endpointB.kind === "splicePort" && spliceMap.get(wire.endpointB.spliceId) === undefined) {
+        issues.push({
+          id: `wire-missing-splice-b-${wire.id}`,
+          severity: "error",
+          category: "Missing reference",
+          message: `Wire '${wire.technicalId}' endpoint B references missing splice '${wire.endpointB.spliceId}'.`,
+          subScreen: "wire",
+          selectionKind: "wire",
+          selectionId: wire.id
+        });
+      }
+
+      if (wire.routeSegmentIds.length === 0) {
+        issues.push({
+          id: `wire-empty-route-${wire.id}`,
+          severity: "warning",
+          category: "Route",
+          message: `Wire '${wire.technicalId}' currently has an empty route.`,
+          subScreen: "wire",
+          selectionKind: "wire",
+          selectionId: wire.id
+        });
+      }
+
+      const missingRouteSegmentIds = wire.routeSegmentIds.filter((segmentId) => state.segments.byId[segmentId] === undefined);
+      if (missingRouteSegmentIds.length > 0) {
+        issues.push({
+          id: `wire-missing-route-segment-${wire.id}`,
+          severity: "error",
+          category: "Route",
+          message: `Wire '${wire.technicalId}' route references missing segments: ${missingRouteSegmentIds.join(", ")}.`,
+          subScreen: "wire",
+          selectionKind: "wire",
+          selectionId: wire.id
+        });
+      }
+    }
+
+    return issues;
+  }, [connectorMap, nodes, segments, spliceMap, state.nodes.byId, state.segments.byId, wires]);
 
   const lastError = selectLastError(state);
 
@@ -1039,6 +1172,31 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
   }
 
+  function handleValidationIssueGoTo(issue: ValidationIssue): void {
+    setActiveScreen("modeling");
+    setActiveSubScreen(issue.subScreen);
+    store.dispatch(
+      appActions.select({
+        kind: issue.selectionKind,
+        id: issue.selectionId
+      })
+    );
+  }
+
+  function handleNetworkSegmentClick(segmentId: SegmentId): void {
+    if (interactionMode !== "select") {
+      return;
+    }
+    store.dispatch(appActions.select({ kind: "segment", id: segmentId }));
+  }
+
+  function handleNetworkNodeClick(nodeId: NodeId): void {
+    if (interactionMode !== "select") {
+      return;
+    }
+    store.dispatch(appActions.select({ kind: "node", id: nodeId }));
+  }
+
   function getSvgCoordinates(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
     const bounds = svgElement.getBoundingClientRect();
     if (bounds.width <= 0 || bounds.height <= 0) {
@@ -1055,9 +1213,12 @@ export function App({ store = appStore }: AppProps): ReactElement {
   }
 
   function handleNetworkNodeMouseDown(event: ReactMouseEvent<SVGGElement>, nodeId: NodeId): void {
+    if (interactionMode !== "select") {
+      return;
+    }
     event.preventDefault();
     setDraggingNodeId(nodeId);
-    store.dispatch(appActions.select({ kind: "node", id: nodeId }));
+    handleNetworkNodeClick(nodeId);
   }
 
   function handleNetworkMouseMove(event: ReactMouseEvent<SVGSVGElement>): void {
@@ -1120,40 +1281,56 @@ export function App({ store = appStore }: AppProps): ReactElement {
         </article>
       </section>
 
-      <section className="screen-switcher">
-        <label className="stack-label">
-          Screen
-          <select
-            aria-label="Screen"
-            value={activeScreen}
-            onChange={(event) => setActiveScreen(event.target.value as ScreenId)}
-          >
-            <option value="modeling">Modeling</option>
-            <option value="analysis">Analysis</option>
-          </select>
-        </label>
-        <label className="stack-label">
-          Sub-screen
-          <select
-            aria-label="Sub-screen"
-            value={activeSubScreen}
-            onChange={(event) => setActiveSubScreen(event.target.value as SubScreenId)}
-          >
-            <option value="connector">Connector</option>
-            <option value="splice">Splice</option>
-            <option value="node">Node</option>
-            <option value="segment">Segment</option>
-            <option value="wire">Wire</option>
-          </select>
-        </label>
+      <section className="workspace-switcher">
+        <div className="workspace-nav-row">
+          {([
+            ["modeling", "Modeling"],
+            ["analysis", "Analysis"],
+            ["validation", "Validation"],
+            ["settings", "Settings"]
+          ] as const).map(([screenId, label]) => (
+            <button
+              key={screenId}
+              type="button"
+              className={activeScreen === screenId ? "workspace-tab is-active" : "workspace-tab"}
+              onClick={() => setActiveScreen(screenId)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        {isModelingScreen || isAnalysisScreen ? (
+          <div className="workspace-nav-row secondary">
+            {([
+              ["connector", "Connector"],
+              ["splice", "Splice"],
+              ["node", "Node"],
+              ["segment", "Segment"],
+              ["wire", "Wire"]
+            ] as const).map(([subScreenId, label]) => (
+              <button
+                key={subScreenId}
+                type="button"
+                className={activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
+                onClick={() => setActiveSubScreen(subScreenId)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        ) : null}
         <p className="meta-line screen-description">
-          {activeScreen === "modeling"
-            ? "Modeling: create/edit and list for the selected entity."
-            : "Analysis: synthesis and controls scoped to the selected entity."}
+          {isModelingScreen
+            ? "Modeling workspace: entity editor + operational lists."
+            : isAnalysisScreen
+              ? "Analysis workspace: synthesis, route control, and network insight."
+              : isValidationScreen
+                ? "Validation center: grouped model integrity issues with one-click navigation."
+                : "Settings workspace: workspace preferences and project-level options."}
         </p>
       </section>
 
-      {activeScreen === "modeling" ? (
+      {isModelingScreen ? (
         <>
       <section className="panel-grid">
         <article className="panel" hidden={!isConnectorSubScreen}>
@@ -1907,7 +2084,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
         </>
       ) : null}
 
-      {activeScreen === "analysis" ? (
+      {isAnalysisScreen ? (
       <section className="panel-grid">
         <section className="panel" hidden={!isConnectorSubScreen}>
           <h2>Connector cavities</h2>
@@ -2148,8 +2325,32 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </section>
 
-        <section className="panel" hidden={!(isNodeSubScreen || isSegmentSubScreen || isWireSubScreen)}>
+        <section className="panel">
           <h2>Network summary</h2>
+          <div className="canvas-toolbar" aria-label="Canvas interaction mode">
+            <span>Interaction mode</span>
+            {([
+              ["select", "Select"],
+              ["addNode", "Add Node"],
+              ["addSegment", "Add Segment"],
+              ["connect", "Connect"],
+              ["route", "Route"]
+            ] as const).map(([modeId, label]) => (
+              <button
+                key={modeId}
+                type="button"
+                className={interactionMode === modeId ? "workspace-tab is-active" : "workspace-tab"}
+                onClick={() => setInteractionMode(modeId)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="meta-line">
+            {interactionMode === "select"
+              ? "Select mode: node drag-and-drop and network selection are active."
+              : "Other modes are prepared in this wave and will get dedicated canvas gestures next."}
+          </p>
           <div className="summary-grid">
             <article>
               <h3>Graph nodes</h3>
@@ -2209,7 +2410,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                         y1={nodeAPosition.y}
                         x2={nodeBPosition.x}
                         y2={nodeBPosition.y}
-                        onClick={() => store.dispatch(appActions.select({ kind: "segment", id: segment.id }))}
+                        onClick={() => handleNetworkSegmentClick(segment.id)}
                       />
                       <text className="network-segment-label" x={labelX} y={labelY - 6} textAnchor="middle">
                         {segment.id}
@@ -2240,7 +2441,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                       key={node.id}
                       className={nodeClassName}
                       onMouseDown={(event) => handleNetworkNodeMouseDown(event, node.id)}
-                      onClick={() => store.dispatch(appActions.select({ kind: "node", id: node.id }))}
+                      onClick={() => handleNetworkNodeClick(node.id)}
                     >
                       <title>{describeNode(node)}</title>
                       <circle cx={position.x} cy={position.y} r={17} />
@@ -2325,6 +2526,77 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </section>
       </section>
+      ) : null}
+
+      {isValidationScreen ? (
+        <section className="panel-grid">
+          <section className="panel">
+            <h2>Validation center</h2>
+            {validationIssues.length === 0 ? (
+              <p className="empty-copy">No integrity issue found in the current model.</p>
+            ) : (
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Severity</th>
+                    <th>Category</th>
+                    <th>Issue</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {validationIssues.map((issue) => (
+                    <tr key={issue.id}>
+                      <td>
+                        <span className={issue.severity === "error" ? "status-chip is-error" : "status-chip is-warning"}>
+                          {issue.severity.toUpperCase()}
+                        </span>
+                      </td>
+                      <td>{issue.category}</td>
+                      <td>{issue.message}</td>
+                      <td>
+                        <button type="button" onClick={() => handleValidationIssueGoTo(issue)}>
+                          Go to
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </section>
+          <section className="panel">
+            <h2>Validation summary</h2>
+            <div className="summary-grid">
+              <article>
+                <h3>Total issues</h3>
+                <p>{validationIssues.length}</p>
+              </article>
+              <article>
+                <h3>Errors</h3>
+                <p>{validationIssues.filter((issue) => issue.severity === "error").length}</p>
+              </article>
+              <article>
+                <h3>Warnings</h3>
+                <p>{validationIssues.filter((issue) => issue.severity === "warning").length}</p>
+              </article>
+            </div>
+          </section>
+        </section>
+      ) : null}
+
+      {isSettingsScreen ? (
+        <section className="panel-grid">
+          <section className="panel">
+            <h2>Settings</h2>
+            <p className="meta-line">Workspace preferences are being expanded in this UX/UI wave.</p>
+            <ul className="subnetwork-list">
+              <li>Upcoming: configurable table density and default sort behavior.</li>
+              <li>Upcoming: canvas preferences (grid visibility, snap default, zoom reset).</li>
+              <li>Upcoming: action bar preferences and shortcut hints.</li>
+            </ul>
+          </section>
+        </section>
       ) : null}
     </main>
   );

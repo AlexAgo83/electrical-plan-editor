@@ -82,11 +82,18 @@ function getPanelByHeading(name: string): HTMLElement {
 }
 
 function switchScreen(target: "modeling" | "analysis"): void {
-  fireEvent.change(screen.getByLabelText(/^Screen$/), { target: { value: target } });
+  fireEvent.click(screen.getByRole("button", { name: target === "modeling" ? "Modeling" : "Analysis" }));
 }
 
 function switchSubScreen(target: "connector" | "splice" | "node" | "segment" | "wire"): void {
-  fireEvent.change(screen.getByLabelText(/^Sub-screen$/), { target: { value: target } });
+  const labelBySubScreen = {
+    connector: "Connector",
+    splice: "Splice",
+    node: "Node",
+    segment: "Segment",
+    wire: "Wire"
+  } as const;
+  fireEvent.click(screen.getByRole("button", { name: labelBySubScreen[target] }));
 }
 
 describe("App integration UI", () => {
