@@ -14,6 +14,21 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
 
 test("create -> route -> force -> recompute flow works end-to-end", async ({ page }) => {
   test.setTimeout(60_000);
+  const ensureNavigationDrawerOpen = async () => {
+    const navigationToggle = page.locator(".header-nav-toggle");
+    if ((await navigationToggle.getAttribute("aria-expanded")) !== "true") {
+      await navigationToggle.click();
+    }
+    await expect(page.locator(".workspace-drawer.is-open")).toBeVisible();
+  };
+  const ensureNavigationDrawerClosed = async () => {
+    const closeMenuButton = page.getByRole("button", { name: "Close menu", exact: true });
+    if ((await closeMenuButton.count()) > 0) {
+      await closeMenuButton.click();
+    }
+    await expect(page.locator(".workspace-drawer.is-open")).toHaveCount(0);
+  };
+
   const switchSubScreen = async (value: "connector" | "splice" | "node" | "segment" | "wire") => {
     const labelBySubScreen = {
       connector: "Connector",
@@ -22,17 +37,20 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
       segment: "Segment",
       wire: "Wire"
     } as const;
+    await ensureNavigationDrawerOpen();
     await page
-      .locator(".workspace-nav-row.secondary")
+      .locator(".workspace-drawer.is-open .workspace-nav-row.secondary")
       .getByRole("button", { name: labelBySubScreen[value], exact: true })
       .click();
+    await ensureNavigationDrawerClosed();
   };
   const switchScreen = async (value: "modeling" | "analysis") => {
+    await ensureNavigationDrawerOpen();
     await page
-      .locator(".workspace-nav-row")
-      .first()
+      .locator(".workspace-drawer.is-open .workspace-nav-row")
       .getByRole("button", { name: value === "modeling" ? "Modeling" : "Analysis", exact: true })
       .click();
+    await ensureNavigationDrawerClosed();
   };
 
   await page.goto("/");

@@ -1,8 +1,8 @@
 ## item_059_workspace_shell_regression_accessibility_and_scroll_behavior - Workspace Shell Regression Accessibility and Scroll Behavior
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0% (regression matrix refined for inspector visibility states)
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100% (regression/accessibility matrix and quality gates closed)
 > Complexity: High
 > Theme: Shell Reliability and QA Coverage
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -38,9 +38,12 @@
 - Related AC: AC1, AC2, AC3, AC4, AC5, AC6, AC7, AC8, AC9, AC10, AC11, AC12, AC13.
 - References:
   - `logics/request/req_010_network_scope_workspace_shell_and_global_defaults.md`
+  - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
+  - `src/tests/app.ui.inspector-shell.spec.tsx`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
   - `src/tests/app.ui.settings.spec.tsx`
   - `src/tests/app.ui.validation.spec.tsx`
   - `src/tests/app.ui.networks.spec.tsx`
+  - `src/tests/app.ui.import-export.spec.tsx`
   - `src/tests/app.ui.theme.spec.tsx`
   - `tests/e2e/smoke.spec.ts`

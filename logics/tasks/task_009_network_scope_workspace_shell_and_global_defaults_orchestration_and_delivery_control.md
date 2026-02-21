@@ -2,7 +2,7 @@
 > From version: 0.3.0
 > Understanding: 100%
 > Confidence: 99%
-> Progress: 88%
+> Progress: 100%
 > Complexity: High
 > Theme: Workspace Shell and Navigation Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -29,8 +29,8 @@ Backlog scope covered:
 - [x] 5. Deliver Wave 4 operational controls extraction: floating operations/health panel + header issue badge (`item_060`)
 - [x] 6. Deliver Wave 5 information placement cleanup: summary capsules moved to `Network Scope` and `Settings` header entrypoint cleanup (`item_061`, `item_062`)
 - [x] 7. Deliver Wave 6 contextual inspector floating panel (`open` / `collapsed` / `hidden`) anchored bottom-right (`item_063`)
-- [ ] 8. Deliver Wave 7 regression, accessibility, scroll-layering, and AC traceability closure (`item_059`)
-- [ ] FINAL: Update related Logics docs
+- [x] 8. Deliver Wave 7 regression, accessibility, scroll-layering, and AC traceability closure (`item_059`)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -50,7 +50,7 @@ Backlog scope covered:
   - Wave 4 completed: moved undo/redo + model health actions into a floating panel opened from header right, with issue-count badge and outside/focus/escape close behavior.
   - Wave 5 completed: moved entity counter capsules from header to `Network Scope` and moved `Settings` entrypoint from left navigation to a dedicated header-right action.
   - Wave 6 completed: moved `Inspector context` into a bottom-right floating panel with contextual `open/collapsed/hidden` behavior, narrow-viewport collapse/expand handling, and overlay coexistence safeguards.
-  - Wave 7 pending: regression/accessibility/traceability closure not started.
+  - Wave 7 completed: expanded shell regression coverage (escape/focus-return/focus-loss/scroll-shell stability), closed inspector visibility matrix checks, and fixed e2e smoke navigation for drawer-overlay compatibility.
 - Current blockers:
   - None. Sequence dependencies between shell waves remain mandatory.
 - Main risks to track:
@@ -93,3 +93,12 @@ Backlog scope covered:
   - `npm run typecheck` OK
   - `npm run lint` OK
   - `npm test -- src/tests/app.ui.inspector-shell.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.validation.spec.tsx` OK
+- Validation snapshot (Wave 7):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npm test -- src/tests/app.ui.workspace-shell-regression.spec.tsx src/tests/app.ui.inspector-shell.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.validation.spec.tsx src/tests/app.ui.networks.spec.tsx src/tests/app.ui.settings.spec.tsx src/tests/app.ui.theme.spec.tsx src/tests/app.ui.import-export.spec.tsx` OK
+  - `npm run quality:ui-modularization` OK
+  - `npm run quality:store-modularization` OK
+  - `npm run test:ci` OK
+  - `npm run test:e2e` OK
