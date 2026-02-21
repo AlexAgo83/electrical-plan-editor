@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { App } from "../app/App";
 import type { ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../core/entities";
 import { appActions, appReducer, createAppStore, createInitialState, type AppState } from "../store";
@@ -175,6 +175,10 @@ function switchSubScreen(target: "connector" | "splice" | "node" | "segment" | "
 }
 
 describe("App integration UI", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it("supports undo and redo for modeling actions", () => {
     const store = createAppStore(createInitialState());
     render(<App store={store} />);
@@ -363,6 +367,32 @@ describe("App integration UI", () => {
     const appShell = document.querySelector("main.app-shell");
     expect(appShell).not.toBeNull();
     expect(appShell).toHaveClass("table-density-compact");
+  });
+
+  it("persists settings preferences across remount", () => {
+    const firstStore = createAppStore(createUiIntegrationState());
+    const firstRender = render(<App store={firstStore} />);
+
+    switchScreen("settings");
+    const settingsPanel = getPanelByHeading("Table and list preferences");
+    fireEvent.change(within(settingsPanel).getByLabelText("Table density"), {
+      target: { value: "compact" }
+    });
+    fireEvent.change(within(settingsPanel).getByLabelText("Default sort column"), {
+      target: { value: "technicalId" }
+    });
+    firstRender.unmount();
+
+    const secondStore = createAppStore(createUiIntegrationState());
+    render(<App store={secondStore} />);
+
+    const appShell = document.querySelector("main.app-shell");
+    expect(appShell).not.toBeNull();
+    expect(appShell).toHaveClass("table-density-compact");
+
+    switchScreen("settings");
+    const restoredSettingsPanel = getPanelByHeading("Table and list preferences");
+    expect(within(restoredSettingsPanel).getByLabelText("Default sort column")).toHaveValue("technicalId");
   });
 
   it("filters connectors by occupancy chips", () => {

@@ -87,6 +87,8 @@ const HISTORY_LIMIT = 60;
 const NETWORK_GRID_STEP = 20;
 const NETWORK_MIN_SCALE = 0.6;
 const NETWORK_MAX_SCALE = 2.2;
+const UI_PREFERENCES_SCHEMA_VERSION = 1;
+const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 interface NodePosition {
   x: number;
@@ -99,6 +101,19 @@ type SortDirection = "asc" | "desc";
 interface SortState {
   field: SortField;
   direction: SortDirection;
+}
+
+interface UiPreferencesPayload {
+  schemaVersion: number;
+  tableDensity: TableDensity;
+  defaultSortField: SortField;
+  defaultSortDirection: SortDirection;
+  defaultIdSortDirection: SortDirection;
+  canvasDefaultShowGrid: boolean;
+  canvasDefaultSnapToGrid: boolean;
+  canvasResetZoomPercentInput: string;
+  showShortcutHints: boolean;
+  keyboardShortcutsEnabled: boolean;
 }
 
 interface ConnectorSynthesisRow {
@@ -138,6 +153,29 @@ function isEditableElement(target: EventTarget | null): boolean {
   }
 
   return target.isContentEditable;
+}
+
+function readUiPreferences(): Partial<UiPreferencesPayload> | null {
+  try {
+    const raw = localStorage.getItem(UI_PREFERENCES_STORAGE_KEY);
+    if (raw === null) {
+      return null;
+    }
+
+    const parsed: unknown = JSON.parse(raw);
+    if (typeof parsed !== "object" || parsed === null) {
+      return null;
+    }
+
+    const payload = parsed as Partial<UiPreferencesPayload>;
+    if (payload.schemaVersion !== UI_PREFERENCES_SCHEMA_VERSION) {
+      return null;
+    }
+
+    return payload;
+  } catch {
+    return null;
+  }
 }
 
 function sortByNameAndTechnicalId<T>(
@@ -427,6 +465,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("100");
   const [showShortcutHints, setShowShortcutHints] = useState(true);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
+  const [preferencesHydrated, setPreferencesHydrated] = useState(false);
   const [undoStack, setUndoStack] = useState<ReturnType<AppStore["getState"]>[]>([]);
   const [redoStack, setRedoStack] = useState<ReturnType<AppStore["getState"]>[]>([]);
   const [saveStatus, setSaveStatus] = useState<"saved" | "unsaved" | "error">("saved");
@@ -535,6 +574,88 @@ export function App({ store = appStore }: AppProps): ReactElement {
     return clamp(parsedPercent / 100, NETWORK_MIN_SCALE, NETWORK_MAX_SCALE);
   }, [canvasResetZoomPercentInput]);
   const configuredResetZoomPercent = Math.round(configuredResetScale * 100);
+
+  useEffect(() => {
+    const preferences = readUiPreferences();
+    if (preferences !== null) {
+      const sortField = preferences.defaultSortField === "technicalId" ? "technicalId" : "name";
+      const sortDirection = preferences.defaultSortDirection === "desc" ? "desc" : "asc";
+      const idSortDirection = preferences.defaultIdSortDirection === "desc" ? "desc" : "asc";
+      const showGridDefault =
+        typeof preferences.canvasDefaultShowGrid === "boolean" ? preferences.canvasDefaultShowGrid : true;
+      const snapDefault =
+        typeof preferences.canvasDefaultSnapToGrid === "boolean" ? preferences.canvasDefaultSnapToGrid : false;
+      const rawResetZoomPercent =
+        typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "100";
+      const parsedResetZoomPercent = Number(rawResetZoomPercent);
+      const resetScale = Number.isFinite(parsedResetZoomPercent)
+        ? clamp(parsedResetZoomPercent / 100, NETWORK_MIN_SCALE, NETWORK_MAX_SCALE)
+        : 1;
+
+      setTableDensity(preferences.tableDensity === "compact" ? "compact" : "comfortable");
+      setDefaultSortField(sortField);
+      setDefaultSortDirection(sortDirection);
+      setDefaultIdSortDirection(idSortDirection);
+      setConnectorSort({ field: sortField, direction: sortDirection });
+      setSpliceSort({ field: sortField, direction: sortDirection });
+      setWireSort({ field: sortField, direction: sortDirection });
+      setConnectorSynthesisSort({ field: sortField, direction: sortDirection });
+      setSpliceSynthesisSort({ field: sortField, direction: sortDirection });
+      setNodeIdSortDirection(idSortDirection);
+      setSegmentIdSortDirection(idSortDirection);
+      setCanvasDefaultShowGrid(showGridDefault);
+      setCanvasDefaultSnapToGrid(snapDefault);
+      setShowNetworkGrid(showGridDefault);
+      setSnapNodesToGrid(snapDefault);
+      setCanvasResetZoomPercentInput(rawResetZoomPercent);
+      setNetworkScale(resetScale);
+      setNetworkOffset({ x: 0, y: 0 });
+      setShowShortcutHints(
+        typeof preferences.showShortcutHints === "boolean" ? preferences.showShortcutHints : true
+      );
+      setKeyboardShortcutsEnabled(
+        typeof preferences.keyboardShortcutsEnabled === "boolean" ? preferences.keyboardShortcutsEnabled : true
+      );
+    }
+
+    setPreferencesHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!preferencesHydrated) {
+      return;
+    }
+
+    const payload: UiPreferencesPayload = {
+      schemaVersion: UI_PREFERENCES_SCHEMA_VERSION,
+      tableDensity,
+      defaultSortField,
+      defaultSortDirection,
+      defaultIdSortDirection,
+      canvasDefaultShowGrid,
+      canvasDefaultSnapToGrid,
+      canvasResetZoomPercentInput,
+      showShortcutHints,
+      keyboardShortcutsEnabled
+    };
+
+    try {
+      localStorage.setItem(UI_PREFERENCES_STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      // Ignore storage write failures to preserve runtime behavior.
+    }
+  }, [
+    canvasDefaultShowGrid,
+    canvasDefaultSnapToGrid,
+    canvasResetZoomPercentInput,
+    defaultIdSortDirection,
+    defaultSortDirection,
+    defaultSortField,
+    keyboardShortcutsEnabled,
+    preferencesHydrated,
+    showShortcutHints,
+    tableDensity
+  ]);
   const describeWireEndpoint = useCallback((endpoint: WireEndpoint): string => {
     if (endpoint.kind === "connectorCavity") {
       const connector = connectorMap.get(endpoint.connectorId);
@@ -1398,6 +1519,30 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setShowNetworkGrid(canvasDefaultShowGrid);
     setSnapNodesToGrid(canvasDefaultSnapToGrid);
     resetNetworkViewToConfiguredScale();
+  }
+
+  function resetWorkspacePreferencesToDefaults(): void {
+    const defaultSort: SortState = { field: "name", direction: "asc" };
+    setTableDensity("comfortable");
+    setDefaultSortField("name");
+    setDefaultSortDirection("asc");
+    setDefaultIdSortDirection("asc");
+    setConnectorSort(defaultSort);
+    setSpliceSort(defaultSort);
+    setWireSort(defaultSort);
+    setConnectorSynthesisSort(defaultSort);
+    setSpliceSynthesisSort(defaultSort);
+    setNodeIdSortDirection("asc");
+    setSegmentIdSortDirection("asc");
+    setCanvasDefaultShowGrid(true);
+    setCanvasDefaultSnapToGrid(false);
+    setCanvasResetZoomPercentInput("100");
+    setShowNetworkGrid(true);
+    setSnapNodesToGrid(false);
+    setNetworkScale(1);
+    setNetworkOffset({ x: 0, y: 0 });
+    setShowShortcutHints(true);
+    setKeyboardShortcutsEnabled(true);
   }
 
   useEffect(() => {
@@ -4171,6 +4316,11 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 <span className="technical-id">Ctrl/Cmd + Y</span> Redo alternative shortcut
               </li>
             </ul>
+            <div className="row-actions">
+              <button type="button" onClick={resetWorkspacePreferencesToDefaults}>
+                Reset all UI preferences
+              </button>
+            </div>
           </section>
         </section>
       ) : null}
