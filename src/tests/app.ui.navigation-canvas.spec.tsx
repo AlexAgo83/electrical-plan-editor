@@ -154,13 +154,9 @@ describe("App integration UI - navigation and canvas", () => {
     expect(within(editPanel).getByDisplayValue("C-1")).toBeInTheDocument();
   });
 
-  it("navigates from validation issue to modeling context and returns canvas to select mode", () => {
+  it("navigates from validation issue to modeling context", () => {
     renderAppWithState(createValidationIssueState());
     switchScreen("analysis");
-
-    const networkPanel = getPanelByHeading("Network summary");
-    fireEvent.click(within(networkPanel).getByRole("button", { name: /^Route$/ }));
-    expect(within(networkPanel).getByRole("button", { name: /^Route$/ })).toHaveClass("is-active");
 
     switchScreen("validation");
     const validationPanel = getPanelByHeading("Validation center");
@@ -178,7 +174,7 @@ describe("App integration UI - navigation and canvas", () => {
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/ })).toHaveClass("is-active");
 
     const updatedNetworkPanel = getPanelByHeading("Network summary");
-    expect(within(updatedNetworkPanel).getByRole("button", { name: /^Select$/ })).toHaveClass("is-active");
+    expect(within(updatedNetworkPanel).queryByText("Interaction mode")).not.toBeInTheDocument();
 
     openOperationsHealthPanel();
     const modelHealth = screen.getByRole("region", { name: "Model health" });
@@ -186,7 +182,7 @@ describe("App integration UI - navigation and canvas", () => {
     expect(within(modelHealth).getByText(/\[WARNING\] Occupancy conflict/i)).toBeInTheDocument();
   });
 
-  it("supports alt keyboard shortcuts for workspace navigation and interaction modes", () => {
+  it("supports alt keyboard shortcuts for workspace navigation", () => {
     renderAppWithState(createUiIntegrationState());
 
     fireEvent.keyDown(window, { key: "3", altKey: true });
@@ -204,11 +200,6 @@ describe("App integration UI - navigation and canvas", () => {
     expect(currentZoomLine()).toContain("View: 100% zoom.");
     fireEvent.keyDown(window, { key: "f", altKey: true });
     expect(currentZoomLine()).not.toContain("View: 100% zoom.");
-
-    fireEvent.keyDown(window, { key: "r", altKey: true });
-    expect(within(networkPanel).getByRole("button", { name: /^Route$/ })).toHaveClass("is-active");
-    fireEvent.keyDown(window, { key: "v", altKey: true });
-    expect(within(networkPanel).getByRole("button", { name: /^Select$/ })).toHaveClass("is-active");
   });
 
   it("asks confirmation before regenerating layout when manual positions exist", () => {

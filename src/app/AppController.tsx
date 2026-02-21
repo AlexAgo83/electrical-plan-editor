@@ -1206,8 +1206,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     previousValidationIssueRef,
     nextValidationIssueRef,
     setActiveScreen,
-    setActiveSubScreen,
-    setInteractionMode
+    setActiveSubScreen
   });
 
   const describeNode = useCallback((node: NetworkNode): string => {
@@ -1477,24 +1476,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     resetNetworkViewToConfiguredScale
   });
 
-  const interactionModeHint =
-    interactionMode === "select"
-      ? "Select mode: node drag-and-drop and network selection are active."
-      : interactionMode === "addNode"
-        ? pendingNewNodePosition === null
-          ? "Add Node mode: click on empty canvas area to prepare an intermediate node placement."
-          : `Add Node mode: placement captured at x=${Math.round(pendingNewNodePosition.x)}, y=${Math.round(
-              pendingNewNodePosition.y
-            )}. Complete Node ID then create.`
-        : interactionMode === "addSegment"
-          ? modeAnchorNodeId === null
-            ? "Add Segment mode: click first node, then second node to prefill segment endpoints."
-            : `Add Segment mode: first node '${modeAnchorNodeId}' selected. Click second node.`
-          : interactionMode === "connect"
-            ? modeAnchorNodeId === null
-              ? "Connect mode: click first connector/splice node to set wire endpoint A."
-              : `Connect mode: endpoint A captured on '${modeAnchorNodeId}'. Click second connector/splice node.`
-            : "Route mode: click start node then end node to fill route preview.";
   const currentValidationIssue = getValidationIssueByCursor();
   const issueNavigationScopeIssues = isValidationScreen ? visibleValidationIssues : orderedValidationIssues;
   const issueNavigationScopeLabel = isValidationScreen ? "Filtered issues" : "All issues";
@@ -1556,15 +1537,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const networkSummaryPanel = (
     <NetworkSummaryPanel
-      interactionMode={interactionMode}
-      setInteractionMode={setInteractionMode}
       handleZoomAction={handleZoomAction}
       fitNetworkToContent={fitNetworkToContent}
       showNetworkGrid={showNetworkGrid}
       snapNodesToGrid={snapNodesToGrid}
       toggleShowNetworkGrid={() => setShowNetworkGrid((current) => !current)}
       toggleSnapNodesToGrid={() => setSnapNodesToGrid((current) => !current)}
-      interactionModeHint={interactionModeHint}
       networkScalePercent={networkScalePercent}
       routingGraphNodeCount={routingGraph.nodeIds.length}
       routingGraphSegmentCount={routingGraph.segmentIds.length}

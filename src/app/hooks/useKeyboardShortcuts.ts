@@ -2,7 +2,6 @@ import { useEffect, type MutableRefObject } from "react";
 
 type ScreenId = "networkScope" | "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
-type InteractionMode = "select" | "addNode" | "addSegment" | "connect" | "route";
 
 function isEditableElement(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) {
@@ -27,7 +26,6 @@ interface UseKeyboardShortcutsOptions {
   nextValidationIssueRef: MutableRefObject<() => void>;
   setActiveScreen: (screen: ScreenId) => void;
   setActiveSubScreen: (subScreen: SubScreenId) => void;
-  setInteractionMode: (mode: InteractionMode) => void;
 }
 
 export function useKeyboardShortcuts({
@@ -39,8 +37,7 @@ export function useKeyboardShortcuts({
   previousValidationIssueRef,
   nextValidationIssueRef,
   setActiveScreen,
-  setActiveSubScreen,
-  setInteractionMode
+  setActiveSubScreen
 }: UseKeyboardShortcutsOptions): void {
   useEffect(() => {
     if (!keyboardShortcutsEnabled) {
@@ -129,21 +126,6 @@ export function useKeyboardShortcuts({
         return;
       }
 
-      const modeByKey: Record<string, InteractionMode | undefined> = {
-        v: "select",
-        n: "addNode",
-        g: "addSegment",
-        c: "connect",
-        r: "route"
-      };
-      const targetMode = modeByKey[normalizedKey];
-      if (targetMode !== undefined) {
-        event.preventDefault();
-        if (activeScreenRef.current !== "modeling" && activeScreenRef.current !== "analysis") {
-          setActiveScreen("modeling");
-        }
-        setInteractionMode(targetMode);
-      }
     };
 
     window.addEventListener("keydown", onKeyDown);
@@ -159,7 +141,6 @@ export function useKeyboardShortcuts({
     redoActionRef,
     setActiveScreen,
     setActiveSubScreen,
-    setInteractionMode,
     undoActionRef
   ]);
 }

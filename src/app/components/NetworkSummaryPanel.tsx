@@ -19,15 +19,12 @@ interface NodePosition {
 }
 
 interface NetworkSummaryPanelProps {
-  interactionMode: "select" | "addNode" | "addSegment" | "connect" | "route";
-  setInteractionMode: (mode: "select" | "addNode" | "addSegment" | "connect" | "route") => void;
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
   toggleShowNetworkGrid: () => void;
   toggleSnapNodesToGrid: () => void;
-  interactionModeHint: string;
   networkScalePercent: number;
   routingGraphNodeCount: number;
   routingGraphSegmentCount: number;
@@ -70,15 +67,12 @@ interface NetworkSummaryPanelProps {
 }
 
 export function NetworkSummaryPanel({
-  interactionMode,
-  setInteractionMode,
   handleZoomAction,
   fitNetworkToContent,
   showNetworkGrid,
   snapNodesToGrid,
   toggleShowNetworkGrid,
   toggleSnapNodesToGrid,
-  interactionModeHint,
   networkScalePercent,
   routingGraphNodeCount,
   routingGraphSegmentCount,
@@ -122,25 +116,7 @@ export function NetworkSummaryPanel({
   return (
     <section className="panel">
       <h2>Network summary</h2>
-      <div className="canvas-toolbar" aria-label="Canvas interaction mode">
-        <span>Interaction mode</span>
-        {([
-          ["select", "Select"],
-          ["addNode", "Add Node"],
-          ["addSegment", "Add Segment"],
-          ["connect", "Connect"],
-          ["route", "Route"]
-        ] as const).map(([modeId, label]) => (
-          <button
-            key={modeId}
-            type="button"
-            className={interactionMode === modeId ? "workspace-tab is-active" : "workspace-tab"}
-            onClick={() => setInteractionMode(modeId)}
-          >
-            {label}
-          </button>
-        ))}
-        <span className="canvas-toolbar-separator" />
+      <div className="canvas-toolbar" aria-label="Canvas controls">
         <button type="button" className="workspace-tab" onClick={() => handleZoomAction("out")}>
           Zoom -
         </button>
@@ -172,8 +148,8 @@ export function NetworkSummaryPanel({
         </button>
       </div>
       <p className="meta-line">
-        {interactionModeHint} View: {networkScalePercent}% zoom. Use toolbar buttons to zoom. Hold <strong>Shift</strong> and drag
-        empty canvas to pan.
+        View: {networkScalePercent}% zoom. Use toolbar buttons to zoom. Hold <strong>Shift</strong> and drag empty
+        canvas to pan.
       </p>
       <div className="summary-grid">
         <article>
