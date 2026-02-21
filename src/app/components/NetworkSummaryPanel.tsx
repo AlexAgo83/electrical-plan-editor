@@ -7,8 +7,7 @@ import type {
   Segment,
   SegmentId,
   Splice,
-  SpliceId,
-  Wire
+  SpliceId
 } from "../../core/entities";
 import type { ShortestRouteResult } from "../../core/pathfinding";
 import type { SubNetworkSummary } from "../../store";
@@ -53,11 +52,6 @@ interface NetworkSummaryPanelProps {
   spliceMap: Map<SpliceId, Splice>;
   describeNode: (node: NetworkNode) => string;
   subNetworkSummaries: SubNetworkSummary[];
-  selectedConnector: Connector | null;
-  selectedSplice: Splice | null;
-  selectedNode: NetworkNode | null;
-  selectedSegment: Segment | null;
-  selectedWire: Wire | null;
   routePreviewStartNodeId: string;
   setRoutePreviewStartNodeId: (value: string) => void;
   routePreviewEndNodeId: string;
@@ -101,11 +95,6 @@ export function NetworkSummaryPanel({
   spliceMap,
   describeNode,
   subNetworkSummaries,
-  selectedConnector,
-  selectedSplice,
-  selectedNode,
-  selectedSegment,
-  selectedWire,
   routePreviewStartNodeId,
   setRoutePreviewStartNodeId,
   routePreviewEndNodeId,
@@ -113,64 +102,85 @@ export function NetworkSummaryPanel({
   routePreview,
   onRegenerateLayout
 }: NetworkSummaryPanelProps): ReactElement {
+  const graphStats = [
+    { label: "Graph nodes", value: routingGraphNodeCount },
+    { label: "Graph segments", value: routingGraphSegmentCount },
+    { label: "Adjacency entries", value: totalEdgeEntries }
+  ];
+
   return (
     <section className="panel">
       <h2>Network summary</h2>
-      <div className="canvas-toolbar" aria-label="Canvas controls">
-        <button type="button" className="workspace-tab" onClick={() => handleZoomAction("out")}>
-          Zoom -
-        </button>
-        <button type="button" className="workspace-tab" onClick={() => handleZoomAction("in")}>
-          Zoom +
-        </button>
-        <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
-          Reset view
-        </button>
-        <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
-          Fit network
-        </button>
-        <button type="button" className="workspace-tab" onClick={onRegenerateLayout}>
-          (Re)generate layout
-        </button>
-        <button
-          type="button"
-          className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}
-          onClick={toggleShowNetworkGrid}
-        >
-          Grid
-        </button>
-        <button
-          type="button"
-          className={snapNodesToGrid ? "workspace-tab is-active" : "workspace-tab"}
-          onClick={toggleSnapNodesToGrid}
-        >
-          Snap
-        </button>
-      </div>
-      <p className="meta-line">
-        View: {networkScalePercent}% zoom. Use toolbar buttons to zoom. Hold <strong>Shift</strong> and drag empty
-        canvas to pan.
-      </p>
-      <div className="summary-grid">
-        <article>
-          <h3>Graph nodes</h3>
-          <p>{routingGraphNodeCount}</p>
-        </article>
-        <article>
-          <h3>Graph segments</h3>
-          <p>{routingGraphSegmentCount}</p>
-        </article>
-        <article>
-          <h3>Adjacency entries</h3>
-          <p>{totalEdgeEntries}</p>
-        </article>
-      </div>
-
       <h3 className="summary-title">2D network view</h3>
       {nodes.length === 0 ? (
         <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
       ) : (
         <div className={`network-canvas-shell${isPanningNetwork ? " is-panning" : ""}`}>
+          <div className="network-canvas-floating-controls" aria-label="Canvas controls">
+            <div className="network-canvas-toolbar">
+              <button type="button" className="workspace-tab" onClick={() => handleZoomAction("out")}>
+                Zoom -
+              </button>
+              <button type="button" className="workspace-tab" onClick={() => handleZoomAction("in")}>
+                Zoom +
+              </button>
+              <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
+                Reset view
+              </button>
+              <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
+                Fit network
+              </button>
+              <button type="button" className="workspace-tab" onClick={onRegenerateLayout}>
+                (Re)generate layout
+              </button>
+              <button
+                type="button"
+                className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}
+                onClick={toggleShowNetworkGrid}
+              >
+                Grid
+              </button>
+              <button
+                type="button"
+                className={snapNodesToGrid ? "workspace-tab is-active" : "workspace-tab"}
+                onClick={toggleSnapNodesToGrid}
+              >
+                Snap
+              </button>
+            </div>
+            <p className="meta-line network-canvas-floating-copy">
+              View: {networkScalePercent}% zoom. Use toolbar buttons to zoom. Hold <strong>Shift</strong> and drag
+              empty canvas to pan.
+            </p>
+          </div>
+          <div className="network-canvas-floating-stack">
+            <section className="network-canvas-floating-subnetworks" aria-label="Sub-networks">
+              {subNetworkSummaries.length === 0 ? (
+                <p className="network-canvas-floating-copy">No sub-network tags yet.</p>
+              ) : (
+                <ul className="network-canvas-subnetwork-list">
+                  {subNetworkSummaries.map((group) => (
+                    <li key={group.tag}>
+                      <span className="subnetwork-chip">{group.tag}</span>
+                      <span>
+                        {group.segmentCount} segment(s), {group.totalLengthMm} mm total
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+            <section className="network-canvas-floating-stats" aria-label="Graph statistics">
+              <ul className="network-canvas-stats-list">
+                {graphStats.map((entry) => (
+                  <li key={entry.label}>
+                    <span>{entry.label}</span>
+                    <strong>{entry.value}</strong>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
           <svg
             className="network-svg"
             role="img"
@@ -299,33 +309,8 @@ export function NetworkSummaryPanel({
         </li>
       </ul>
 
-      <h3 className="summary-title">Sub-networks</h3>
-      {subNetworkSummaries.length === 0 ? (
-        <p className="empty-copy">No sub-network tags yet. Segments currently belong to the default group.</p>
-      ) : (
-        <ul className="subnetwork-list">
-          {subNetworkSummaries.map((group) => (
-            <li key={group.tag}>
-              <span className="subnetwork-chip">{group.tag}</span>
-              <span>
-                {group.segmentCount} segment(s), {group.totalLengthMm} mm total
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <h3 className="summary-title">Selection snapshot</h3>
-      <div className="selection-snapshot">
-        <p>Connector: {selectedConnector === null ? "none" : `${selectedConnector.name} (${selectedConnector.technicalId})`}</p>
-        <p>Splice: {selectedSplice === null ? "none" : `${selectedSplice.name} (${selectedSplice.technicalId})`}</p>
-        <p>Node: {selectedNode === null ? "none" : describeNode(selectedNode)}</p>
-        <p>Segment: {selectedSegment === null ? "none" : `${selectedSegment.id} (${selectedSegment.lengthMm} mm)`}</p>
-        <p>Wire: {selectedWire === null ? "none" : `${selectedWire.name} (${selectedWire.technicalId})`}</p>
-      </div>
-
       <h3 className="summary-title">Route preview</h3>
-      <form className="row-form">
+      <form className="row-form network-route-form">
         <label>
           Start node
           <select value={routePreviewStartNodeId} onChange={(event) => setRoutePreviewStartNodeId(event.target.value)}>

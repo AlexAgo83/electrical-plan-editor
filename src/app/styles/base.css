@@ -287,6 +287,26 @@ button {
   background: #1a2c3f;
 }
 
+.app-shell.theme-dark .network-canvas-floating-controls {
+  border-color: #4b6881;
+  background: rgba(22, 38, 54, 0.84);
+}
+
+.app-shell.theme-dark .network-canvas-floating-subnetworks,
+.app-shell.theme-dark .network-canvas-floating-stats {
+  border-color: #4b6881;
+  background: rgba(22, 38, 54, 0.84);
+}
+
+.app-shell.theme-dark .network-canvas-subnetwork-list li,
+.app-shell.theme-dark .network-canvas-stats-list li {
+  color: #b7c9dc;
+}
+
+.app-shell.theme-dark .network-canvas-stats-list strong {
+  color: #e3ecf6;
+}
+
 .app-shell.theme-dark .workspace-shell .workspace-health {
   border-top-color: #365069;
 }

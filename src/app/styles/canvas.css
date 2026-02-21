@@ -90,11 +90,13 @@
 }
 
 .network-canvas-shell {
+  position: relative;
   margin-top: 0.55rem;
   border: 1px solid #c9d9e6;
   border-radius: 0.65rem;
   background: linear-gradient(180deg, #f7fbff, #f0f6fb);
   padding: 0.35rem;
+  overflow: hidden;
 }
 
 .network-canvas-shell.is-panning {
@@ -106,6 +108,107 @@
   width: 100%;
   min-height: 360px;
   touch-action: none;
+}
+
+.network-canvas-floating-controls {
+  position: absolute;
+  top: 0.8rem;
+  left: 0.8rem;
+  z-index: 2;
+  display: grid;
+  gap: 0.35rem;
+  max-width: min(94%, 40rem);
+  border: 1px solid #b9cfdf;
+  border-radius: 0.6rem;
+  background: rgba(244, 250, 255, 0.86);
+  backdrop-filter: blur(6px);
+  padding: 0.4rem;
+}
+
+.network-canvas-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.24rem;
+}
+
+.network-canvas-toolbar .workspace-tab {
+  padding: 0.22rem 0.55rem;
+  font-size: 0.76rem;
+}
+
+.network-canvas-floating-copy {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.25;
+}
+
+.network-canvas-floating-stack {
+  position: absolute;
+  left: 0.8rem;
+  bottom: 0.8rem;
+  z-index: 2;
+  display: grid;
+  align-items: start;
+  gap: 0.35rem;
+  width: fit-content;
+  max-width: min(22rem, calc(100% - 1.6rem));
+}
+
+.network-canvas-floating-subnetworks,
+.network-canvas-floating-stats {
+  border: 1px solid #b9cfdf;
+  border-radius: 0.6rem;
+  background: rgba(244, 250, 255, 0.86);
+  backdrop-filter: blur(6px);
+  padding: 0.35rem 0.45rem;
+  max-width: 100%;
+}
+
+.network-canvas-subnetwork-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.network-canvas-subnetwork-list li {
+  display: grid;
+  justify-items: start;
+  gap: 0.16rem;
+  color: #355067;
+  font-size: 0.77rem;
+}
+
+.network-canvas-subnetwork-list .subnetwork-chip {
+  justify-self: start;
+}
+
+.network-canvas-stats-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.network-canvas-stats-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.7rem;
+  font-size: 0.77rem;
+  color: #355067;
+}
+
+.network-canvas-stats-list strong {
+  font-size: 0.82rem;
+  color: #17374e;
+  font-weight: 700;
+}
+
+.network-route-form {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .network-grid line {
@@ -185,6 +288,7 @@
   list-style: none;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.6rem 0.9rem;
   color: #345167;
   font-size: 0.82rem;
