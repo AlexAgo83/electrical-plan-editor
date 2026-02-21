@@ -1,7 +1,7 @@
 ## task_001_v1_ux_ui_workspace_orchestration_and_delivery_control - V1 UX/UI Workspace Orchestration and Delivery Control
 > From version: 0.1.0
 > Understanding: 99%
-> Confidence: 96%
+> Confidence: 97%
 > Progress: 99% (in finalization)
 > Complexity: High
 > Theme: UX/UI Delivery
@@ -36,7 +36,7 @@ Backlog scope covered:
 - Wave status:
   - Wave 1 delivered: left-rail workspace navigation/layout and contextual inspector interaction model are active, including live nav counters.
   - Wave 2 delivered: canvas usability controls (zoom/pan/grid/snap/legend/fit-to-content), list ergonomics, and advanced entity filters are active.
-  - Wave 3 delivered: validation center grouping/filtering (`category` + `severity`) and `Go to` issue navigation with canvas focus are active.
+  - Wave 3 delivered: validation center grouping/filtering (`category` + `severity` + text search) and `Go to` issue navigation with canvas focus are active.
   - Sidebar model-health snapshot now keeps issue status continuously visible with quick access to all/errors/warnings validation views and issue-by-issue navigation.
   - Keyboard issue navigation (`Alt+J`/`Alt+K`) is active for rapid validation triage.
   - Settings workspace now includes configurable table density, default sort presets, canvas defaults, and shortcut preferences persisted in local storage.

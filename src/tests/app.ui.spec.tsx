@@ -338,6 +338,23 @@ describe("App integration UI", () => {
     expect(within(validationPanel).queryByText("ERROR")).not.toBeInTheDocument();
   });
 
+  it("filters validation issues by text search", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    switchScreen("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    const searchInput = within(validationPanel).getByLabelText("Search validation issues");
+
+    fireEvent.change(searchInput, { target: { value: "manual-ghost" } });
+    expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
+    expect(within(validationPanel).queryByRole("heading", { name: "Route lock validity" })).not.toBeInTheDocument();
+
+    fireEvent.change(searchInput, { target: { value: "route-locked" } });
+    expect(within(validationPanel).getByRole("heading", { name: "Route lock validity" })).toBeInTheDocument();
+    expect(within(validationPanel).queryByRole("heading", { name: "Occupancy conflict" })).not.toBeInTheDocument();
+  });
+
   it("shows model health quick actions and opens validation with severity focus", () => {
     const store = createAppStore(createValidationIssueState());
     render(<App store={store} />);

@@ -1,7 +1,7 @@
 ## item_012_v1_validation_center_and_issue_navigation - V1 Validation Center and Issue Navigation
 > From version: 0.1.0
 > Understanding: 99%
-> Confidence: 95%
+> Confidence: 96%
 > Progress: 100% (completed)
 > Complexity: High
 > Theme: UX/UI Validation Workflow
@@ -35,7 +35,7 @@ Validation feedback is currently distributed across local errors, making it hard
 - Related AC: AC6, AC7.
 - Status update:
   - Dedicated `Validation` workspace is implemented.
-  - Grouped issue list with severity/category filtering and one-click `Go to` navigation is active.
+  - Grouped issue list with severity/category/text filtering and one-click `Go to` navigation is active.
   - `Go to` now restores modeling context and recenters canvas focus on the targeted entity.
   - Sidebar `Model health` snapshot continuously surfaces issue totals and provides quick open actions for all/errors/warnings.
   - Sidebar issue navigator (`Previous issue` / `Next issue`) allows sequential issue review with direct context focus.

@@ -443,6 +443,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [wireRouteFilter, setWireRouteFilter] = useState<"all" | "auto" | "locked">("all");
   const [validationCategoryFilter, setValidationCategoryFilter] = useState<string>("all");
   const [validationSeverityFilter, setValidationSeverityFilter] = useState<ValidationSeverityFilter>("all");
+  const [validationSearchQuery, setValidationSearchQuery] = useState("");
   const [validationIssueCursor, setValidationIssueCursor] = useState(-1);
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
@@ -841,6 +842,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const normalizedNodeSearch = normalizeSearch(nodeSearchQuery);
   const normalizedSegmentSearch = normalizeSearch(segmentSearchQuery);
   const normalizedWireSearch = normalizeSearch(wireSearchQuery);
+  const normalizedValidationSearch = normalizeSearch(validationSearchQuery);
   const connectorOccupiedCountById = useMemo(() => {
     const result = new Map<ConnectorId, number>();
     for (const connector of connectors) {
@@ -1408,9 +1410,16 @@ export function App({ store = appStore }: AppProps): ReactElement {
           return false;
         }
 
+        if (normalizedValidationSearch.length > 0) {
+          const searchable = `${issue.category} ${issue.message} ${issue.subScreen} ${issue.selectionId}`;
+          if (!searchable.toLocaleLowerCase().includes(normalizedValidationSearch)) {
+            return false;
+          }
+        }
+
         return true;
       }),
-    [orderedValidationIssues, validationCategoryFilter, validationSeverityFilter]
+    [normalizedValidationSearch, orderedValidationIssues, validationCategoryFilter, validationSeverityFilter]
   );
   const validationErrorCount = useMemo(
     () => validationIssues.filter((issue) => issue.severity === "error").length,
@@ -2460,6 +2469,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   }
 
   function handleOpenValidationScreen(filter: ValidationSeverityFilter): void {
+    setValidationSearchQuery("");
     setValidationCategoryFilter("all");
     setValidationSeverityFilter(filter);
     setActiveScreen("validation");
@@ -4512,6 +4522,15 @@ export function App({ store = appStore }: AppProps): ReactElement {
             <h2>Validation center</h2>
             <div className="validation-toolbar">
               <span>Issue filters</span>
+              <label className="stack-label list-search">
+                Search
+                <input
+                  aria-label="Search validation issues"
+                  value={validationSearchQuery}
+                  onChange={(event) => setValidationSearchQuery(event.target.value)}
+                  placeholder="Issue text, category, entity"
+                />
+              </label>
               <div className="chip-group" role="group" aria-label="Validation severity filter">
                 {([
                   ["all", "All severities"],
@@ -4551,7 +4570,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
             {validationIssues.length === 0 ? (
               <p className="empty-copy">No integrity issue found in the current model.</p>
             ) : visibleValidationIssues.length === 0 ? (
-              <p className="empty-copy">No integrity issue matches the selected category filter.</p>
+              <p className="empty-copy">No integrity issue matches the current filters/search.</p>
             ) : (
               <div className="validation-groups">
                 {groupedValidationIssues.map(([category, issues]) => (
@@ -4611,7 +4630,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
             <p className="meta-line validation-active-filter">
               Active filters:{" "}
               {validationSeverityFilter === "all" ? "All severities" : validationSeverityFilter === "error" ? "Errors" : "Warnings"} /{" "}
-              {validationCategoryFilter === "all" ? "All categories" : validationCategoryFilter}
+              {validationCategoryFilter === "all" ? "All categories" : validationCategoryFilter} / Search:{" "}
+              {normalizedValidationSearch.length === 0 ? "none" : `"${validationSearchQuery.trim()}"`}
             </p>
           </section>
         </section>
