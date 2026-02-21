@@ -1,4 +1,5 @@
 import {
+  type ChangeEvent,
   type FormEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactElement,
@@ -56,6 +57,13 @@ import {
   selectWires,
   type ThemeMode
 } from "../store";
+import {
+  buildNetworkFilePayload,
+  parseNetworkFilePayload,
+  resolveImportConflicts,
+  serializeNetworkFilePayload,
+  type NetworkImportSummary
+} from "../adapters/portability";
 import { appStore } from "./store";
 import { InspectorContextPanel } from "./components/InspectorContextPanel";
 import { NetworkSummaryPanel } from "./components/NetworkSummaryPanel";
@@ -321,6 +329,11 @@ interface SelectionTarget {
   id: string;
 }
 
+interface ImportExportStatus {
+  kind: "success" | "partial" | "failed";
+  message: string;
+}
+
 export function App({ store = appStore }: AppProps): ReactElement {
   const state = useAppSnapshot(store);
 
@@ -452,6 +465,9 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [newNetworkDescription, setNewNetworkDescription] = useState("");
   const [networkFormError, setNetworkFormError] = useState<string | null>(null);
   const [renameNetworkName, setRenameNetworkName] = useState("");
+  const [selectedExportNetworkIds, setSelectedExportNetworkIds] = useState<NetworkId[]>([]);
+  const [importExportStatus, setImportExportStatus] = useState<ImportExportStatus | null>(null);
+  const [lastImportSummary, setLastImportSummary] = useState<NetworkImportSummary | null>(null);
   const [themeMode, setThemeMode] = useState<ThemeMode>("normal");
   const [tableDensity, setTableDensity] = useState<TableDensity>("comfortable");
   const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
@@ -467,6 +483,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [redoStack, setRedoStack] = useState<ReturnType<AppStore["getState"]>[]>([]);
   const [saveStatus, setSaveStatus] = useState<"saved" | "unsaved" | "error">("saved");
   const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const importFileInputRef = useRef<HTMLInputElement | null>(null);
   const panStartRef = useRef<{
     clientX: number;
     clientY: number;
@@ -676,6 +693,21 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     setRenameNetworkName(activeNetwork.name);
   }, [activeNetwork]);
+
+  useEffect(() => {
+    const availableIds = new Set(networks.map((network) => network.id));
+    setSelectedExportNetworkIds((previous) => {
+      const filtered = previous.filter((networkId) => availableIds.has(networkId));
+      const next =
+        filtered.length > 0
+          ? filtered
+          : activeNetworkId !== null && availableIds.has(activeNetworkId)
+            ? [activeNetworkId]
+            : [];
+      const unchanged = next.length === previous.length && next.every((networkId, index) => previous[index] === networkId);
+      return unchanged ? previous : next;
+    });
+  }, [activeNetworkId, networks]);
 
   useEffect(() => {
     setModeAnchorNodeId(null);
@@ -1757,6 +1789,128 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     dispatchAction(appActions.deleteNetwork(activeNetwork.id));
     setNetworkFormError(null);
+  }
+
+  function toggleSelectedExportNetwork(networkId: NetworkId): void {
+    setSelectedExportNetworkIds((previous) => {
+      if (previous.includes(networkId)) {
+        return previous.filter((id) => id !== networkId);
+      }
+
+      return [...previous, networkId].sort((left, right) => left.localeCompare(right));
+    });
+  }
+
+  function downloadJsonFile(fileName: string, content: string): boolean {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    const blob = new Blob([content], {
+      type: "application/json"
+    });
+    const urlFactory = window.URL ?? globalThis.URL;
+    if (typeof urlFactory.createObjectURL !== "function" || typeof urlFactory.revokeObjectURL !== "function") {
+      return false;
+    }
+
+    const href = urlFactory.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = href;
+    link.download = fileName;
+    link.click();
+    urlFactory.revokeObjectURL(href);
+    return true;
+  }
+
+  function handleExportNetworks(scope: "active" | "selected" | "all"): void {
+    const payload = buildNetworkFilePayload(store.getState(), scope, selectedExportNetworkIds, new Date().toISOString());
+    if (payload.networks.length === 0) {
+      setImportExportStatus({
+        kind: "failed",
+        message: "No network available for the selected export scope."
+      });
+      return;
+    }
+
+    const serialized = serializeNetworkFilePayload(payload);
+    const downloadOk = downloadJsonFile(
+      scope === "active"
+        ? "electrical-network-active.json"
+        : scope === "selected"
+          ? "electrical-network-selected.json"
+          : "electrical-network-all.json",
+      serialized
+    );
+    if (!downloadOk) {
+      setImportExportStatus({
+        kind: "failed",
+        message: "Export is not available in this environment."
+      });
+      return;
+    }
+
+    setImportExportStatus({
+      kind: "success",
+      message: `Exported ${payload.networks.length} network(s) (${scope}).`
+    });
+  }
+
+  function handleOpenImportPicker(): void {
+    importFileInputRef.current?.click();
+  }
+
+  async function handleImportFileChange(event: ChangeEvent<HTMLInputElement>): Promise<void> {
+    const file = event.target.files?.[0];
+    if (file === undefined) {
+      return;
+    }
+
+    const resetInput = () => {
+      event.target.value = "";
+    };
+
+    let rawJson: string;
+    try {
+      rawJson = await file.text();
+    } catch {
+      setImportExportStatus({
+        kind: "failed",
+        message: "Unable to read selected file."
+      });
+      resetInput();
+      return;
+    }
+
+    const parsed = parseNetworkFilePayload(rawJson);
+    if (parsed.payload === null) {
+      setImportExportStatus({
+        kind: "failed",
+        message: parsed.error ?? "Invalid import file."
+      });
+      resetInput();
+      return;
+    }
+
+    const resolved = resolveImportConflicts(parsed.payload, store.getState());
+    setLastImportSummary(resolved.summary);
+
+    if (resolved.networks.length === 0) {
+      setImportExportStatus({
+        kind: "failed",
+        message: "No network was imported. Check file errors."
+      });
+      resetInput();
+      return;
+    }
+
+    dispatchAction(appActions.importNetworks(resolved.networks, resolved.networkStates, true));
+
+    setImportExportStatus({
+      kind: resolved.summary.errors.length > 0 || resolved.summary.warnings.length > 0 ? "partial" : "success",
+      message: `Imported ${resolved.networks.length} network(s).`
+    });
+    resetInput();
   }
 
   function handleRecreateSampleNetwork(): void {
@@ -4773,6 +4927,73 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 Reset sample network to baseline
               </button>
             </div>
+          </section>
+
+          <section className="panel">
+            <h2>Import / Export networks</h2>
+            <p className="meta-line">
+              Export active, selected, or all networks as deterministic JSON payloads. Import preserves existing local data and
+              resolves conflicts with deterministic suffixes.
+            </p>
+            <div className="row-actions">
+              <button type="button" onClick={() => handleExportNetworks("active")} disabled={activeNetworkId === null}>
+                Export active
+              </button>
+              <button
+                type="button"
+                onClick={() => handleExportNetworks("selected")}
+                disabled={selectedExportNetworkIds.length === 0}
+              >
+                Export selected
+              </button>
+              <button type="button" onClick={() => handleExportNetworks("all")} disabled={networks.length === 0}>
+                Export all
+              </button>
+            </div>
+            <fieldset className="inline-fieldset">
+              <legend>Selected networks for export</legend>
+              {networks.length === 0 ? (
+                <p className="empty-copy">No network available.</p>
+              ) : (
+                <div className="settings-grid">
+                  {networks.map((network) => (
+                    <label key={network.id} className="settings-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={selectedExportNetworkIds.includes(network.id)}
+                        onChange={() => toggleSelectedExportNetwork(network.id)}
+                      />
+                      {network.name} (<span className="technical-id">{network.technicalId}</span>)
+                    </label>
+                  ))}
+                </div>
+              )}
+            </fieldset>
+            <div className="row-actions">
+              <button type="button" onClick={handleOpenImportPicker}>
+                Import from file
+              </button>
+              <input
+                ref={importFileInputRef}
+                type="file"
+                accept="application/json,.json"
+                onChange={(event) => {
+                  void handleImportFileChange(event);
+                }}
+                hidden
+              />
+            </div>
+            {importExportStatus !== null ? (
+              <p className={`meta-line import-status is-${importExportStatus.kind}`}>{importExportStatus.message}</p>
+            ) : null}
+            {lastImportSummary !== null ? (
+              <div className="settings-grid">
+                <p className="meta-line">Imported: {lastImportSummary.importedNetworkIds.length}</p>
+                <p className="meta-line">Skipped: {lastImportSummary.skippedNetworkIds.length}</p>
+                <p className="meta-line">Warnings: {lastImportSummary.warnings.length}</p>
+                <p className="meta-line">Errors: {lastImportSummary.errors.length}</p>
+              </div>
+            ) : null}
           </section>
         </section>
       ) : null}

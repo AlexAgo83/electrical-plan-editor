@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Data Portability Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -18,12 +18,12 @@ Backlog scope covered:
 - `item_029_import_export_test_matrix_and_regression_coverage.md`
 
 # Plan
-- [ ] 1. Freeze file payload contract and deterministic serialization rules (`item_025`)
-- [ ] 2. Deliver Wave 1 (`item_026`, `item_027`) and validate parser/migration/conflict integrity
-- [ ] 3. Deliver Wave 2 (`item_028`) and validate end-user import/export UX and feedback paths
-- [ ] 4. Deliver Wave 3 (`item_029`) with AC traceability and full regression coverage
-- [ ] 5. Publish import/export readiness report (status, blockers, residual risks)
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Freeze file payload contract and deterministic serialization rules (`item_025`)
+- [x] 2. Deliver Wave 1 (`item_026`, `item_027`) and validate parser/migration/conflict integrity
+- [x] 3. Deliver Wave 2 (`item_028`) and validate end-user import/export UX and feedback paths
+- [x] 4. Deliver Wave 3 (`item_029`) with AC traceability and full regression coverage
+- [x] 5. Publish import/export readiness report (status, blockers, residual risks)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -34,16 +34,14 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 1 planned: import parser/validation/migration and deterministic conflict deduplication.
-  - Wave 2 planned: UI entry points and user feedback for export/import outcomes.
-  - Wave 3 planned: automated coverage for contract integrity and rollback safety.
-- Current blockers: none (initial planning state).
+  - Wave 1 delivered: deterministic export payload + parser validation + schema `0` to `1` migration + conflict deduplication.
+  - Wave 2 delivered: settings import/export UX with active/selected/all export scopes and import status reporting.
+  - Wave 3 delivered: portability regression coverage + AC traceability (`logics/specs/req_004_network_import_export_traceability.md`).
+- Current blockers: none.
 - Main risks to track:
-  - Partial import commits causing inconsistent network state.
-  - Non-deterministic ID conflict resolution across repeated imports.
-  - Schema compatibility drift between export and import evolution.
+  - Future schema evolution may require additional migration layers beyond v0/v1.
+  - Large-file UX may need progress indicators and chunked processing if dataset size increases.
 - Mitigation strategy:
-  - Stage import in isolated temporary structures before reducer commit.
-  - Enforce deterministic suffixing rules with dedicated tests.
-  - Version payload schema explicitly and keep migration tests for supported versions.
-
+  - Keep parser/migration/conflict logic centralized in `src/adapters/portability/networkFile.ts`.
+  - Preserve deterministic suffix tests and malformed payload tests in CI.
+  - Keep UI failure path non-destructive with explicit status messaging.

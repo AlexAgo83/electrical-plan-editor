@@ -331,3 +331,27 @@ button {
 .app-shell.theme-dark .save-status.is-error {
   color: #ffb4bc;
 }
+
+.import-status.is-success {
+  color: #226041;
+}
+
+.import-status.is-partial {
+  color: #7b4d00;
+}
+
+.import-status.is-failed {
+  color: #8f1e1e;
+}
+
+.app-shell.theme-dark .import-status.is-success {
+  color: #88d9af;
+}
+
+.app-shell.theme-dark .import-status.is-partial {
+  color: #ffd48f;
+}
+
+.app-shell.theme-dark .import-status.is-failed {
+  color: #ffb4bc;
+}
