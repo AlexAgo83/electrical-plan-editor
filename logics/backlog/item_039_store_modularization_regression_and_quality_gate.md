@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 99%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Quality Assurance
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -35,7 +35,10 @@ Store modularization can unintentionally change deterministic transitions. Witho
 - Related AC: AC1, AC2, AC3, AC4, AC5, AC6.
 - References:
   - `logics/request/req_006_large_store_files_split_and_reducer_modularization.md`
+  - `logics/specs/req_006_store_modularization_traceability.md`
   - `.github/workflows/ci.yml`
-  - `src/tests/store.reducer.spec.ts`
+  - `scripts/quality/check-store-modularization.mjs`
+  - `src/tests/store.reducer.entities.spec.ts`
+  - `src/tests/store.reducer.wires.spec.ts`
+  - `src/tests/store.reducer.helpers.spec.ts`
   - `tests/e2e/smoke.spec.ts`
-

@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 55%
 > Complexity: High
 > Theme: Modularization Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -25,8 +25,8 @@ Backlog scope covered:
 # Plan
 - [ ] 1. Freeze module boundary strategy for UI and store split (`item_030`, `item_035`)
 - [ ] 2. Deliver Wave 1 UI decomposition (`item_031`, `item_032`) and validate no behavior drift
-- [ ] 3. Deliver Wave 2 store decomposition (`item_036`, `item_037`) and validate deterministic transitions
-- [ ] 4. Deliver Wave 3 test modularization (`item_033`, `item_038`) and stabilize split-aligned coverage
+- [x] 3. Deliver Wave 2 store decomposition (`item_036`, `item_037`) and validate deterministic transitions
+- [x] 4. Deliver Wave 3 test modularization (`item_033`, `item_038`) and stabilize split-aligned coverage
 - [ ] 5. Deliver Wave 4 quality gates (`item_034`, `item_039`) with AC traceability and file-size policy checks
 - [ ] FINAL: Update related Logics docs
 
@@ -39,11 +39,11 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 1 planned: UI component/hook/style modularization baseline.
-  - Wave 2 planned: reducer module boundaries and deterministic helper extraction.
-  - Wave 3 planned: test suite split for UI and store domains.
-  - Wave 4 planned: regression gates, AC traceability, and file-size compliance checks.
-- Current blockers: none (initial planning state).
+  - Wave 1 in progress: UI component/hook/style modularization baseline (`item_031`, `item_032` pending).
+  - Wave 2 completed: reducer boundaries + helper extraction + domain handler split (`item_035`, `item_036`, `item_037`).
+  - Wave 3 completed: test modularization for UI/store (`item_033`, `item_038`).
+  - Wave 4 in progress: store quality gate delivered (`item_039`), UI quality gate pending (`item_034`).
+- Current blockers: none.
 - Main risks to track:
   - Functional drift caused by module extraction order.
   - Import cycles introduced by aggressive splitting.
@@ -52,4 +52,4 @@ Backlog scope covered:
   - Stage refactor by bounded concerns and keep behavior-preserving checkpoints.
   - Enforce one-way dependency rules between modules.
   - Maintain continuous regression runs across lint/typecheck/unit/e2e at each wave.
-
+  - Enforce store file-size and modularity policy with `npm run quality:store-modularization`.

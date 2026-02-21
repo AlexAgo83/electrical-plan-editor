@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
+    "quality:store-modularization": "node scripts/quality/check-store-modularization.mjs",
     "test": "vitest",
     "test:ci": "vitest run --coverage",
     "test:e2e": "env -u NO_COLOR playwright test --reporter=line"

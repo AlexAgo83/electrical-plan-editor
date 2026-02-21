@@ -43,6 +43,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Store modularization quality gate
+        run: npm run quality:store-modularization
+
       - name: Unit and integration tests
         run: npm run test:ci
 
