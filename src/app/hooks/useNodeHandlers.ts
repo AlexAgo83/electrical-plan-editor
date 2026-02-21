@@ -1,4 +1,4 @@
-import type { Dispatch, FormEvent, SetStateAction } from "react";
+import type { FormEvent } from "react";
 import type { ConnectorId, NetworkNode, NodeId, SpliceId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
@@ -32,7 +32,6 @@ interface UseNodeHandlersParams {
   setNodeFormError: (value: string | null) => void;
   pendingNewNodePosition: NodePosition | null;
   setPendingNewNodePosition: (position: NodePosition | null) => void;
-  setManualNodePositions: Dispatch<SetStateAction<Record<NodeId, NodePosition>>>;
 }
 
 export function useNodeHandlers({
@@ -55,8 +54,7 @@ export function useNodeHandlers({
   setNodeLabel,
   setNodeFormError,
   pendingNewNodePosition,
-  setPendingNewNodePosition,
-  setManualNodePositions
+  setPendingNewNodePosition
 }: UseNodeHandlersParams) {
   function resetNodeForm(): void {
     setNodeFormMode("create");
@@ -145,10 +143,7 @@ export function useNodeHandlers({
     const nextState = store.getState();
     if (nextState.nodes.byId[nodeId] !== undefined) {
       if (pendingNewNodePosition !== null) {
-        setManualNodePositions((previous) => ({
-          ...previous,
-          [nodeId]: pendingNewNodePosition
-        }));
+        dispatchAction(appActions.setNodePosition(nodeId, pendingNewNodePosition), { trackHistory: false });
       }
       dispatchAction(appActions.select({ kind: "node", id: nodeId }));
       resetNodeForm();

@@ -13,7 +13,7 @@ import type {
   Wire,
   WireId
 } from "../core/entities";
-import type { NetworkScopedState, SelectionState, ThemeMode } from "./types";
+import type { LayoutNodePosition, NetworkScopedState, SelectionState, ThemeMode } from "./types";
 
 export type AppAction =
   | {
@@ -81,6 +81,8 @@ export type AppAction =
   | { type: "wire/resetRoute"; payload: { id: WireId } }
   | { type: "wire/upsert"; payload: Wire }
   | { type: "wire/remove"; payload: { id: WireId } }
+  | { type: "layout/setNodePosition"; payload: { nodeId: NodeId; position: LayoutNodePosition } }
+  | { type: "layout/setNodePositions"; payload: { positions: Record<NodeId, LayoutNodePosition> } }
   | { type: "ui/select"; payload: SelectionState }
   | { type: "ui/setThemeMode"; payload: { mode: ThemeMode } }
   | { type: "ui/clearSelection" }
@@ -152,6 +154,14 @@ export const appActions = {
   resetWireRoute: (id: WireId): AppAction => ({ type: "wire/resetRoute", payload: { id } }),
   upsertWire: (payload: Wire): AppAction => ({ type: "wire/upsert", payload }),
   removeWire: (id: WireId): AppAction => ({ type: "wire/remove", payload: { id } }),
+  setNodePosition: (nodeId: NodeId, position: LayoutNodePosition): AppAction => ({
+    type: "layout/setNodePosition",
+    payload: { nodeId, position }
+  }),
+  setNodePositions: (positions: Record<NodeId, LayoutNodePosition>): AppAction => ({
+    type: "layout/setNodePositions",
+    payload: { positions }
+  }),
 
   select: (payload: SelectionState): AppAction => ({ type: "ui/select", payload }),
   setThemeMode: (mode: ThemeMode): AppAction => ({ type: "ui/setThemeMode", payload: { mode } }),

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ConnectorId } from "../core/entities";
+import type { ConnectorId, NodeId } from "../core/entities";
 import { APP_SCHEMA_VERSION } from "../core/schema";
 import {
   STORAGE_KEY,
@@ -43,6 +43,10 @@ function createMemoryStorage(seed: Record<string, string> = {}): MemoryStorage {
 
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
+}
+
+function asNodeId(value: string): NodeId {
+  return value as NodeId;
 }
 
 function createSampleState(): AppState {
@@ -144,6 +148,46 @@ describe("localStorage persistence adapter", () => {
     const loaded = loadState(storage, () => "2026-02-20T11:00:00.000Z");
 
     expect(loaded).toEqual(state);
+  });
+
+  it("migrates persisted schema payloads missing layout positions", () => {
+    const state = createSampleState();
+    const nowIso = "2026-02-20T11:00:00.000Z";
+    const rawSnapshotWithoutPositions = JSON.stringify({
+      schemaVersion: APP_SCHEMA_VERSION,
+      createdAtIso: "2026-02-01T08:00:00.000Z",
+      updatedAtIso: "2026-02-01T09:00:00.000Z",
+      state: {
+        ...state,
+        networkStates: Object.fromEntries(
+          Object.entries(state.networkStates).map(([networkId, scoped]) => [
+            networkId,
+            {
+              connectors: scoped.connectors,
+              splices: scoped.splices,
+              nodes: scoped.nodes,
+              segments: scoped.segments,
+              wires: scoped.wires,
+              connectorCavityOccupancy: scoped.connectorCavityOccupancy,
+              splicePortOccupancy: scoped.splicePortOccupancy
+            }
+          ])
+        )
+      }
+    });
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: rawSnapshotWithoutPositions
+    });
+
+    const loaded = loadState(storage, () => nowIso);
+    const activeNetworkId = loaded.activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected an active network after migration.");
+    }
+
+    expect(loaded.nodePositions).toEqual({});
+    expect(loaded.networkStates[activeNetworkId]?.nodePositions).toEqual({});
   });
 
   it("falls back safely and clears corrupted payload", () => {
@@ -254,5 +298,29 @@ describe("localStorage persistence adapter", () => {
     expect(savedSnapshot.createdAtIso).toBe("2026-02-10T07:00:00.000Z");
     expect(savedSnapshot.updatedAtIso).toBe("2026-02-20T13:00:00.000Z");
     expect(savedSnapshot.state).toEqual(secondState);
+  });
+
+  it("persists and restores node layout positions across save/load", () => {
+    const withNode = appReducer(
+      createInitialState(),
+      appActions.upsertNode({
+        id: asNodeId("N-LAYOUT"),
+        kind: "intermediate",
+        label: "Layout node"
+      })
+    );
+    const positioned = appReducer(withNode, appActions.setNodePosition(asNodeId("N-LAYOUT"), { x: 280, y: 160 }));
+    const storage = createMemoryStorage();
+
+    saveState(positioned, storage, () => "2026-02-20T14:00:00.000Z");
+    const loaded = loadState(storage, () => "2026-02-20T14:01:00.000Z");
+
+    expect(loaded.nodePositions[asNodeId("N-LAYOUT")]).toEqual({ x: 280, y: 160 });
+    const activeNetworkId = loaded.activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network.");
+    }
+    expect(loaded.networkStates[activeNetworkId]?.nodePositions[asNodeId("N-LAYOUT")]).toEqual({ x: 280, y: 160 });
   });
 });

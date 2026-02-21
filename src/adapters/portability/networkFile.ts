@@ -1,6 +1,6 @@
-import type { Network, NetworkId } from "../../core/entities";
+import type { Network, NetworkId, NodeId } from "../../core/entities";
 import { APP_SCHEMA_VERSION } from "../../core/schema";
-import type { AppState, NetworkScopedState } from "../../store";
+import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
 
 export const NETWORK_FILE_SCHEMA_VERSION = 1;
 
@@ -44,6 +44,29 @@ function isEntityState(value: unknown): boolean {
   return isRecord(value) && Array.isArray(value.allIds) && isRecord(value.byId);
 }
 
+function normalizeNodePositions(value: unknown): Record<NodeId, LayoutNodePosition> {
+  if (!isRecord(value)) {
+    return {} as Record<NodeId, LayoutNodePosition>;
+  }
+
+  const normalized = {} as Record<NodeId, LayoutNodePosition>;
+  for (const [nodeId, rawPosition] of Object.entries(value)) {
+    if (!isRecord(rawPosition)) {
+      continue;
+    }
+
+    const x = rawPosition.x;
+    const y = rawPosition.y;
+    if (typeof x !== "number" || typeof y !== "number" || !Number.isFinite(x) || !Number.isFinite(y)) {
+      continue;
+    }
+
+    normalized[nodeId as NodeId] = { x, y };
+  }
+
+  return normalized;
+}
+
 function isNetworkScopedState(value: unknown): value is NetworkScopedState {
   if (!isRecord(value)) {
     return false;
@@ -55,6 +78,7 @@ function isNetworkScopedState(value: unknown): value is NetworkScopedState {
     isEntityState(value.nodes) &&
     isEntityState(value.segments) &&
     isEntityState(value.wires) &&
+    (value.nodePositions === undefined || isRecord(value.nodePositions)) &&
     isRecord(value.connectorCavityOccupancy) &&
     isRecord(value.splicePortOccupancy)
   );
@@ -102,6 +126,7 @@ function normalizeScopedState(scoped: NetworkScopedState): NetworkScopedState {
       allIds: [...scoped.wires.allIds].sort((left, right) => left.localeCompare(right)),
       byId: { ...scoped.wires.byId }
     },
+    nodePositions: normalizeNodePositions(scoped.nodePositions),
     connectorCavityOccupancy: { ...scoped.connectorCavityOccupancy },
     splicePortOccupancy: { ...scoped.splicePortOccupancy }
   };

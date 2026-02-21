@@ -11,7 +11,7 @@ import type {
   Wire,
   WireId
 } from "../../core/entities";
-import type { AppState, EntityState, NetworkScopedState } from "../../store";
+import type { AppState, EntityState, LayoutNodePosition, NetworkScopedState } from "../../store";
 import {
   DEFAULT_NETWORK_CREATED_AT,
   DEFAULT_NETWORK_ID,
@@ -27,6 +27,10 @@ function isIsoDate(value: unknown): value is string {
   return typeof value === "string" && Number.isFinite(Date.parse(value));
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
 function isEntityState(candidate: unknown): candidate is EntityState<unknown, string> {
   if (!isRecord(candidate)) {
     return false;
@@ -35,28 +39,97 @@ function isEntityState(candidate: unknown): candidate is EntityState<unknown, st
   return isRecord(candidate.byId) && Array.isArray(candidate.allIds);
 }
 
-function isCurrentAppState(candidate: unknown): candidate is AppState {
+function normalizeNodePositions(candidate: unknown): Record<NodeId, LayoutNodePosition> {
   if (!isRecord(candidate)) {
-    return false;
+    return {} as Record<NodeId, LayoutNodePosition>;
+  }
+
+  const normalized = {} as Record<NodeId, LayoutNodePosition>;
+  for (const [nodeId, rawPosition] of Object.entries(candidate)) {
+    if (!isRecord(rawPosition)) {
+      continue;
+    }
+
+    const x = rawPosition.x;
+    const y = rawPosition.y;
+    if (!isFiniteNumber(x) || !isFiniteNumber(y)) {
+      continue;
+    }
+
+    normalized[nodeId as NodeId] = { x, y };
+  }
+
+  return normalized;
+}
+
+function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | null {
+  if (!isRecord(candidate)) {
+    return null;
+  }
+
+  if (
+    !isEntityState(candidate.connectors) ||
+    !isEntityState(candidate.splices) ||
+    !isEntityState(candidate.nodes) ||
+    !isEntityState(candidate.segments) ||
+    !isEntityState(candidate.wires) ||
+    !isRecord(candidate.connectorCavityOccupancy) ||
+    !isRecord(candidate.splicePortOccupancy)
+  ) {
+    return null;
+  }
+
+  return {
+    connectors: candidate.connectors as NetworkScopedState["connectors"],
+    splices: candidate.splices as NetworkScopedState["splices"],
+    nodes: candidate.nodes as NetworkScopedState["nodes"],
+    segments: candidate.segments as NetworkScopedState["segments"],
+    wires: candidate.wires as NetworkScopedState["wires"],
+    nodePositions: normalizeNodePositions(candidate.nodePositions),
+    connectorCavityOccupancy: candidate.connectorCavityOccupancy as NetworkScopedState["connectorCavityOccupancy"],
+    splicePortOccupancy: candidate.splicePortOccupancy as NetworkScopedState["splicePortOccupancy"]
+  };
+}
+
+function asCurrentAppState(candidate: unknown): AppState | null {
+  if (!isRecord(candidate)) {
+    return null;
   }
 
   if (candidate.schemaVersion !== APP_SCHEMA_VERSION) {
-    return false;
+    return null;
   }
 
-  return (
-    isEntityState(candidate.networks) &&
-    isRecord(candidate.networkStates) &&
-    isEntityState(candidate.connectors) &&
-    isEntityState(candidate.splices) &&
-    isEntityState(candidate.nodes) &&
-    isEntityState(candidate.segments) &&
-    isEntityState(candidate.wires) &&
-    isRecord(candidate.connectorCavityOccupancy) &&
-    isRecord(candidate.splicePortOccupancy) &&
-    isRecord(candidate.ui) &&
-    isRecord(candidate.meta)
-  );
+  if (
+    !isEntityState(candidate.networks) ||
+    !isRecord(candidate.networkStates) ||
+    !isEntityState(candidate.connectors) ||
+    !isEntityState(candidate.splices) ||
+    !isEntityState(candidate.nodes) ||
+    !isEntityState(candidate.segments) ||
+    !isEntityState(candidate.wires) ||
+    !isRecord(candidate.connectorCavityOccupancy) ||
+    !isRecord(candidate.splicePortOccupancy) ||
+    !isRecord(candidate.ui) ||
+    !isRecord(candidate.meta)
+  ) {
+    return null;
+  }
+
+  const normalizedNetworkStates = {} as AppState["networkStates"];
+  for (const networkId of Object.keys(candidate.networkStates)) {
+    const normalizedScoped = normalizeNetworkScopedState(candidate.networkStates[networkId]);
+    if (normalizedScoped === null) {
+      return null;
+    }
+    normalizedNetworkStates[networkId as keyof AppState["networkStates"]] = normalizedScoped;
+  }
+
+  return {
+    ...(candidate as unknown as AppState),
+    networkStates: normalizedNetworkStates,
+    nodePositions: normalizeNodePositions(candidate.nodePositions)
+  };
 }
 
 interface LegacySingleNetworkState {
@@ -123,8 +196,9 @@ function asCurrentSnapshot(payload: unknown): PersistedStateSnapshotV1 | null {
   const createdAtIso = payload.createdAtIso;
   const updatedAtIso = payload.updatedAtIso;
   const state = payload.state;
+  const normalizedState = asCurrentAppState(state);
 
-  if (!isIsoDate(createdAtIso) || !isIsoDate(updatedAtIso) || !isCurrentAppState(state)) {
+  if (!isIsoDate(createdAtIso) || !isIsoDate(updatedAtIso) || normalizedState === null) {
     return null;
   }
 
@@ -132,7 +206,7 @@ function asCurrentSnapshot(payload: unknown): PersistedStateSnapshotV1 | null {
     schemaVersion: APP_SCHEMA_VERSION,
     createdAtIso,
     updatedAtIso,
-    state
+    state: normalizedState
   };
 }
 
@@ -141,7 +215,7 @@ function asPreTimestampSnapshot(payload: unknown): AppState | null {
     return null;
   }
 
-  return isCurrentAppState(payload.state) ? payload.state : null;
+  return asCurrentAppState(payload.state);
 }
 
 function migrateLegacySingleNetworkState(
@@ -155,6 +229,7 @@ function migrateLegacySingleNetworkState(
     nodes: legacy.nodes,
     segments: legacy.segments,
     wires: legacy.wires,
+    nodePositions: {} as Record<NodeId, LayoutNodePosition>,
     connectorCavityOccupancy: legacy.connectorCavityOccupancy,
     splicePortOccupancy: legacy.splicePortOccupancy
   };
@@ -188,6 +263,7 @@ function migrateLegacySingleNetworkState(
     nodes: scoped.nodes,
     segments: scoped.segments,
     wires: scoped.wires,
+    nodePositions: scoped.nodePositions,
     connectorCavityOccupancy: scoped.connectorCavityOccupancy,
     splicePortOccupancy: scoped.splicePortOccupancy,
     ui: {

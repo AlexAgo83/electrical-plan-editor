@@ -50,6 +50,7 @@ function cloneScopedState(scoped: NetworkScopedState): NetworkScopedState {
       byId: { ...scoped.wires.byId },
       allIds: [...scoped.wires.allIds]
     },
+    nodePositions: { ...scoped.nodePositions },
     connectorCavityOccupancy: { ...scoped.connectorCavityOccupancy },
     splicePortOccupancy: { ...scoped.splicePortOccupancy }
   };

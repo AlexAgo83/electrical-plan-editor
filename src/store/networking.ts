@@ -18,6 +18,7 @@ export function extractScopedState(state: AppState): NetworkScopedState {
     nodes: cloneEntityState(state.nodes),
     segments: cloneEntityState(state.segments),
     wires: cloneEntityState(state.wires),
+    nodePositions: { ...state.nodePositions },
     connectorCavityOccupancy: { ...state.connectorCavityOccupancy },
     splicePortOccupancy: { ...state.splicePortOccupancy }
   };
@@ -31,6 +32,7 @@ export function assignScopedState(state: AppState, scoped: NetworkScopedState): 
     nodes: scoped.nodes,
     segments: scoped.segments,
     wires: scoped.wires,
+    nodePositions: scoped.nodePositions,
     connectorCavityOccupancy: scoped.connectorCavityOccupancy,
     splicePortOccupancy: scoped.splicePortOccupancy
   };
@@ -73,6 +75,7 @@ export function clearActiveScope(state: AppState): AppState {
     nodes: { byId: {} as AppState["nodes"]["byId"], allIds: [] },
     segments: { byId: {} as AppState["segments"]["byId"], allIds: [] },
     wires: { byId: {} as AppState["wires"]["byId"], allIds: [] },
+    nodePositions: {} as AppState["nodePositions"],
     connectorCavityOccupancy: {} as AppState["connectorCavityOccupancy"],
     splicePortOccupancy: {} as AppState["splicePortOccupancy"]
   };

@@ -26,12 +26,18 @@ export interface SelectionState {
 
 export type ThemeMode = "normal" | "dark";
 
+export interface LayoutNodePosition {
+  x: number;
+  y: number;
+}
+
 export interface NetworkScopedState {
   connectors: EntityState<Connector, ConnectorId>;
   splices: EntityState<Splice, SpliceId>;
   nodes: EntityState<NetworkNode, NodeId>;
   segments: EntityState<Segment, SegmentId>;
   wires: EntityState<Wire, WireId>;
+  nodePositions: Record<NodeId, LayoutNodePosition>;
   connectorCavityOccupancy: Record<ConnectorId, Record<number, string>>;
   splicePortOccupancy: Record<SpliceId, Record<number, string>>;
 }
@@ -46,6 +52,7 @@ export interface AppState {
   nodes: EntityState<NetworkNode, NodeId>;
   segments: EntityState<Segment, SegmentId>;
   wires: EntityState<Wire, WireId>;
+  nodePositions: Record<NodeId, LayoutNodePosition>;
   connectorCavityOccupancy: Record<ConnectorId, Record<number, string>>;
   splicePortOccupancy: Record<SpliceId, Record<number, string>>;
   ui: {
@@ -76,6 +83,7 @@ export function createEmptyNetworkScopedState(): NetworkScopedState {
     nodes: createEmptyEntityState<NetworkNode, NodeId>(),
     segments: createEmptyEntityState<Segment, SegmentId>(),
     wires: createEmptyEntityState<Wire, WireId>(),
+    nodePositions: {} as Record<NodeId, LayoutNodePosition>,
     connectorCavityOccupancy: {} as Record<ConnectorId, Record<number, string>>,
     splicePortOccupancy: {} as Record<SpliceId, Record<number, string>>
   };
@@ -108,6 +116,7 @@ export function createInitialState(): AppState {
     nodes: defaultScopedState.nodes,
     segments: defaultScopedState.segments,
     wires: defaultScopedState.wires,
+    nodePositions: defaultScopedState.nodePositions,
     connectorCavityOccupancy: defaultScopedState.connectorCavityOccupancy,
     splicePortOccupancy: defaultScopedState.splicePortOccupancy,
     ui: {

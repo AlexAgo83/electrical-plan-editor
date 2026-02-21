@@ -1,6 +1,7 @@
 import { fireEvent, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  asNodeId,
   createUiIntegrationState,
   createValidationIssueState,
   getPanelByHeading,
@@ -8,7 +9,7 @@ import {
   switchScreen,
   switchSubScreen
 } from "./helpers/app-ui-test-utils";
-import { createInitialState } from "../store";
+import { appActions, appReducer, createInitialState } from "../store";
 
 describe("App integration UI - navigation and canvas", () => {
   beforeEach(() => {
@@ -175,5 +176,23 @@ describe("App integration UI - navigation and canvas", () => {
     expect(within(networkPanel).getByRole("button", { name: /^Route$/ })).toHaveClass("is-active");
     fireEvent.keyDown(window, { key: "v", altKey: true });
     expect(within(networkPanel).getByRole("button", { name: /^Select$/ })).toHaveClass("is-active");
+  });
+
+  it("asks confirmation before regenerating layout when manual positions exist", () => {
+    const state = appReducer(
+      createUiIntegrationState(),
+      appActions.setNodePosition(asNodeId("N-C1"), { x: 64, y: 80 })
+    );
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
+
+    renderAppWithState(state);
+    switchScreen("analysis");
+    switchSubScreen("segment");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "(Re)generate layout" }));
+
+    expect(confirmSpy).toHaveBeenCalledTimes(1);
+    confirmSpy.mockRestore();
   });
 });

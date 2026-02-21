@@ -74,9 +74,13 @@ export function handleNodeActions(state: AppState, action: AppAction): AppState 
         return withError(state, "Cannot remove node while segments are connected to it.");
       }
 
+      const nextNodePositions = { ...state.nodePositions };
+      delete nextNodePositions[action.payload.id];
+
       return bumpRevision({
         ...clearLastError(state),
         nodes: removeEntity(state.nodes, action.payload.id),
+        nodePositions: nextNodePositions,
         ui: shouldClearSelection(state.ui.selected, "node", action.payload.id)
           ? { ...state.ui, selected: null, lastError: null }
           : { ...state.ui, lastError: null }

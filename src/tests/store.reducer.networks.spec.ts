@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ConnectorId, NetworkId } from "../core/entities";
+import type { ConnectorId, NetworkId, NodeId } from "../core/entities";
 import { appActions, appReducer, createInitialState } from "../store";
 
 function asConnectorId(value: string): ConnectorId {
@@ -8,6 +8,10 @@ function asConnectorId(value: string): ConnectorId {
 
 function asNetworkId(value: string): NetworkId {
   return value as NetworkId;
+}
+
+function asNodeId(value: string): NodeId {
+  return value as NodeId;
 }
 
 describe("appReducer network lifecycle", () => {
@@ -95,6 +99,60 @@ describe("appReducer network lifecycle", () => {
     const switchedBack = appReducer(copyEdited, appActions.selectNetwork(activeNetworkId));
     expect(switchedBack.connectors.byId[asConnectorId("C-COPY-ONLY")]).toBeUndefined();
     expect(switchedBack.connectors.byId[asConnectorId("C-A")]).toBeDefined();
+  });
+
+  it("keeps node layout positions isolated per network", () => {
+    const base = appReducer(
+      createInitialState(),
+      appActions.upsertNode({ id: asNodeId("N-1"), kind: "intermediate", label: "Node 1" })
+    );
+    const withPositionInDefault = appReducer(
+      base,
+      appActions.setNodePosition(asNodeId("N-1"), { x: 111, y: 222 })
+    );
+
+    const withSecondNetwork = appReducer(
+      withPositionInDefault,
+      appActions.createNetwork({
+        id: asNetworkId("net-b"),
+        name: "Network B",
+        technicalId: "NET-B",
+        createdAt: "2026-02-21T09:00:00.000Z",
+        updatedAt: "2026-02-21T09:00:00.000Z"
+      })
+    );
+
+    expect(withSecondNetwork.nodePositions[asNodeId("N-1")]).toBeUndefined();
+
+    const withNodeInSecond = appReducer(
+      withSecondNetwork,
+      appActions.upsertNode({ id: asNodeId("N-2"), kind: "intermediate", label: "Node 2" })
+    );
+    const withPositionInSecond = appReducer(
+      withNodeInSecond,
+      appActions.setNodePosition(asNodeId("N-2"), { x: 333, y: 144 })
+    );
+
+    const switchedBack = appReducer(
+      withPositionInSecond,
+      appActions.selectNetwork(base.activeNetworkId as NetworkId)
+    );
+    expect(switchedBack.nodePositions[asNodeId("N-1")]).toEqual({ x: 111, y: 222 });
+    expect(switchedBack.nodePositions[asNodeId("N-2")]).toBeUndefined();
+  });
+
+  it("cleans node layout position when a node is removed", () => {
+    const withNode = appReducer(
+      createInitialState(),
+      appActions.upsertNode({ id: asNodeId("N-REMOVE"), kind: "intermediate", label: "Node remove" })
+    );
+    const withPosition = appReducer(
+      withNode,
+      appActions.setNodePosition(asNodeId("N-REMOVE"), { x: 260, y: 170 })
+    );
+
+    const removed = appReducer(withPosition, appActions.removeNode(asNodeId("N-REMOVE")));
+    expect(removed.nodePositions[asNodeId("N-REMOVE")]).toBeUndefined();
   });
 
   it("deletes active network and applies deterministic fallback", () => {

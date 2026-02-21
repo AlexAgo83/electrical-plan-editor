@@ -2,6 +2,7 @@ import type { AppAction } from "./actions";
 import { syncCurrentScopeToNetworkMap } from "./networking";
 import type { AppState } from "./types";
 import { handleConnectorActions } from "./reducer/connectorReducer";
+import { handleLayoutActions } from "./reducer/layoutReducer";
 import { handleNetworkActions } from "./reducer/networkReducer";
 import { handleNodeActions } from "./reducer/nodeReducer";
 import { handleSegmentActions } from "./reducer/segmentReducer";
@@ -16,7 +17,8 @@ function hasActiveNetworkForDomainActions(state: AppState, action: AppAction): b
     action.type.startsWith("splice/") ||
     action.type.startsWith("node/") ||
     action.type.startsWith("segment/") ||
-    action.type.startsWith("wire/")
+    action.type.startsWith("wire/") ||
+    action.type.startsWith("layout/")
   ) {
     return state.activeNetworkId !== null;
   }
@@ -77,6 +79,11 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "wire/upsert":
     case "wire/remove": {
       return finalizeDomainAction(state, handleWireActions(state, action) ?? state);
+    }
+
+    case "layout/setNodePosition":
+    case "layout/setNodePositions": {
+      return finalizeDomainAction(state, handleLayoutActions(state, action) ?? state);
     }
 
     case "ui/select":

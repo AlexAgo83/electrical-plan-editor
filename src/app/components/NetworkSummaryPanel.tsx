@@ -66,6 +66,7 @@ interface NetworkSummaryPanelProps {
   routePreviewEndNodeId: string;
   setRoutePreviewEndNodeId: (value: string) => void;
   routePreview: ShortestRouteResult | null;
+  onRegenerateLayout: () => void;
 }
 
 export function NetworkSummaryPanel({
@@ -115,7 +116,8 @@ export function NetworkSummaryPanel({
   setRoutePreviewStartNodeId,
   routePreviewEndNodeId,
   setRoutePreviewEndNodeId,
-  routePreview
+  routePreview,
+  onRegenerateLayout
 }: NetworkSummaryPanelProps): ReactElement {
   return (
     <section className="panel">
@@ -150,6 +152,9 @@ export function NetworkSummaryPanel({
         </button>
         <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
           Fit network
+        </button>
+        <button type="button" className="workspace-tab" onClick={onRegenerateLayout}>
+          (Re)generate layout
         </button>
         <button
           type="button"

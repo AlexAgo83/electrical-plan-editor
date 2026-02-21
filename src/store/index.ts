@@ -8,6 +8,7 @@ export {
   createEmptyNetworkScopedState,
   type AppState,
   type EntityState,
+  type LayoutNodePosition,
   type NetworkScopedState,
   type SelectionState,
   type ThemeMode

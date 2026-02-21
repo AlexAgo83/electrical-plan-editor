@@ -63,6 +63,10 @@ export function selectWires(state: AppState): Wire[] {
   return selectCollection(state.wires.byId, state.wires.allIds);
 }
 
+export function selectNodePositions(state: AppState): AppState["nodePositions"] {
+  return state.nodePositions;
+}
+
 export function selectConnectorById(state: AppState, id: ConnectorId): Connector | undefined {
   return state.connectors.byId[id];
 }

@@ -30,6 +30,7 @@ import {
   selectLastError,
   selectNetworkTechnicalIdTaken,
   selectNetworks,
+  selectNodePositions,
   selectNodeById,
   selectNodes,
   selectRoutingGraphIndex,
@@ -366,17 +367,23 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     );
   }, [state, routePreviewStartNodeId, routePreviewEndNodeId]);
   const selectedWireRouteSegmentIds = useMemo(() => new Set(selectedWire?.routeSegmentIds ?? []), [selectedWire]);
-  const autoNodePositions = useMemo(() => createNodePositionMap(nodes), [nodes]);
+  const persistedNodePositions = selectNodePositions(state);
+  const autoNodePositions = useMemo(() => createNodePositionMap(nodes, segments), [nodes, segments]);
   const networkNodePositions = useMemo(() => {
     const merged = { ...autoNodePositions };
     for (const node of nodes) {
+      const persistedPosition = persistedNodePositions[node.id];
+      if (persistedPosition !== undefined) {
+        merged[node.id] = persistedPosition;
+      }
+
       const manualPosition = manualNodePositions[node.id];
       if (manualPosition !== undefined) {
         merged[node.id] = manualPosition;
       }
     }
     return merged;
-  }, [autoNodePositions, manualNodePositions, nodes]);
+  }, [autoNodePositions, manualNodePositions, nodes, persistedNodePositions]);
   const isConnectorSubScreen = activeSubScreen === "connector";
   const isSpliceSubScreen = activeSubScreen === "splice";
   const isNodeSubScreen = activeSubScreen === "node";
@@ -417,6 +424,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
     return `${splice.name} (${splice.technicalId}) / P${endpoint.portIndex}`;
   }, [connectorMap, spliceMap]);
+
+  useEffect(() => {
+    setManualNodePositions({} as Record<NodeId, NodePosition>);
+  }, [activeNetworkId, setManualNodePositions]);
 
   useEffect(() => {
     const validNodeIds = new Set(nodes.map((node) => node.id));
@@ -630,6 +641,27 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setInteractionMode("select");
     }
   });
+  const handleRegenerateLayout = useCallback(() => {
+    if (nodes.length === 0) {
+      return;
+    }
+
+    if (
+      Object.keys(persistedNodePositions).length > 0 &&
+      typeof window !== "undefined" &&
+      typeof window.confirm === "function"
+    ) {
+      const shouldRegenerate = window.confirm(
+        "Regenerate 2D layout for this network? Existing manual positions will be replaced."
+      );
+      if (!shouldRegenerate) {
+        return;
+      }
+    }
+
+    setManualNodePositions({} as Record<NodeId, NodePosition>);
+    dispatchAction(appActions.setNodePositions(createNodePositionMap(nodes, segments)));
+  }, [dispatchAction, nodes, persistedNodePositions, segments, setManualNodePositions]);
   const {
     importFileInputRef,
     selectedExportNetworkIds,
@@ -835,8 +867,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNodeLabel,
     setNodeFormError,
     pendingNewNodePosition,
-    setPendingNewNodePosition,
-    setManualNodePositions
+    setPendingNewNodePosition
   });
 
   const { resetSegmentForm, startSegmentEdit, handleSegmentSubmit, handleSegmentDelete } = useSegmentHandlers({
@@ -998,10 +1029,13 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNetworkOffset,
     draggingNodeId,
     setDraggingNodeId,
+    manualNodePositions,
     setManualNodePositions,
     setIsPanningNetwork,
     panStartRef,
     dispatchAction,
+    persistNodePosition: (nodeId, position) =>
+      dispatchAction(appActions.setNodePosition(nodeId, position), { trackHistory: false }),
     resetNetworkViewToConfiguredScale
   });
 
@@ -1109,6 +1143,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       routePreviewEndNodeId={routePreviewEndNodeId}
       setRoutePreviewEndNodeId={setRoutePreviewEndNodeId}
       routePreview={routePreview}
+      onRegenerateLayout={handleRegenerateLayout}
     />
   );
 

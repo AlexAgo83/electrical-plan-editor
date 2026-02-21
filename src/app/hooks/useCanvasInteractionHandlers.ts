@@ -54,6 +54,7 @@ interface UseCanvasInteractionHandlersParams {
   setNetworkOffset: Dispatch<SetStateAction<NodePosition>>;
   draggingNodeId: NodeId | null;
   setDraggingNodeId: (value: NodeId | null) => void;
+  manualNodePositions: Record<NodeId, NodePosition>;
   setManualNodePositions: Dispatch<SetStateAction<Record<NodeId, NodePosition>>>;
   setIsPanningNetwork: (value: boolean) => void;
   panStartRef: MutableRefObject<
@@ -66,6 +67,7 @@ interface UseCanvasInteractionHandlersParams {
     | null
   >;
   dispatchAction: DispatchAction;
+  persistNodePosition: (nodeId: NodeId, position: NodePosition) => void;
   resetNetworkViewToConfiguredScale: () => void;
 }
 
@@ -111,10 +113,12 @@ export function useCanvasInteractionHandlers({
   setNetworkOffset,
   draggingNodeId,
   setDraggingNodeId,
+  manualNodePositions,
   setManualNodePositions,
   setIsPanningNetwork,
   panStartRef,
   dispatchAction,
+  persistNodePosition,
   resetNetworkViewToConfiguredScale
 }: UseCanvasInteractionHandlersParams) {
   function applyNodeToWireEndpoint(side: "A" | "B", node: NetworkNode): boolean {
@@ -362,6 +366,20 @@ export function useCanvasInteractionHandlers({
 
   function stopNetworkNodeDrag(): void {
     if (draggingNodeId !== null) {
+      const draggedPosition = manualNodePositions[draggingNodeId];
+      if (draggedPosition !== undefined) {
+        persistNodePosition(draggingNodeId, draggedPosition);
+        setManualNodePositions((previous) => {
+          if (previous[draggingNodeId] === undefined) {
+            return previous;
+          }
+
+          const next = { ...previous };
+          delete next[draggingNodeId];
+          return next;
+        });
+      }
+
       setDraggingNodeId(null);
     }
 
