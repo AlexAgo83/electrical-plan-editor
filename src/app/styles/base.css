@@ -612,6 +612,18 @@ button {
   background: #2c5844;
 }
 
+.app-shell.theme-dark .data-table tr.is-selected > td {
+  background: rgba(85, 141, 189, 0.34);
+}
+
+.app-shell.theme-dark .data-table tr.is-wire-highlighted > td {
+  background: rgba(73, 131, 84, 0.34);
+}
+
+.app-shell.theme-dark .data-table tr.is-selected.is-wire-highlighted > td {
+  background: rgba(95, 146, 161, 0.36);
+}
+
 .app-shell.theme-dark .status-chip.is-error {
   background: #653743;
   color: #ffd0d6;
@@ -658,6 +670,10 @@ button {
   stroke: #87a0b8;
 }
 
+.app-shell.theme-dark .network-segment.is-wire-highlighted {
+  stroke: #4f8d2d;
+}
+
 .app-shell.theme-dark .network-segment.is-selected {
   stroke: #7fc5ff;
 }
@@ -689,6 +705,10 @@ button {
 
 .app-shell.theme-dark .legend-line.selected {
   border-top-color: #7fc5ff;
+}
+
+.app-shell.theme-dark .legend-line.wire {
+  border-top-color: #4f8d2d;
 }
 
 .app-shell.theme-dark .save-status.is-saved {
