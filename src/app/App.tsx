@@ -484,6 +484,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const lastInspectorSelectionRef = useRef<string | null>(null);
   const undoActionRef = useRef<() => void>(() => {});
   const redoActionRef = useRef<() => void>(() => {});
+  const activeScreenRef = useRef<ScreenId>("modeling");
 
   const selected = selectSelection(state);
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
@@ -678,6 +679,10 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     return `${splice.name} (${splice.technicalId}) / P${endpoint.portIndex}`;
   }, [connectorMap, spliceMap]);
+
+  useEffect(() => {
+    activeScreenRef.current = activeScreen;
+  }, [activeScreen]);
 
   useEffect(() => {
     const validNodeIds = new Set(nodes.map((node) => node.id));
@@ -1565,26 +1570,76 @@ export function App({ store = appStore }: AppProps): ReactElement {
         return;
       }
 
-      const hasModifier = event.metaKey || event.ctrlKey;
-      if (!hasModifier) {
-        return;
-      }
-
       const normalizedKey = event.key.toLocaleLowerCase();
-      if (normalizedKey === "z") {
-        event.preventDefault();
-        if (event.shiftKey) {
-          redoActionRef.current();
+      const hasCommandModifier = event.metaKey || event.ctrlKey;
+      if (hasCommandModifier) {
+        if (normalizedKey === "z") {
+          event.preventDefault();
+          if (event.shiftKey) {
+            redoActionRef.current();
+            return;
+          }
+
+          undoActionRef.current();
           return;
         }
 
-        undoActionRef.current();
+        if (normalizedKey === "y") {
+          event.preventDefault();
+          redoActionRef.current();
+        }
         return;
       }
 
-      if (normalizedKey === "y") {
+      if (!event.altKey) {
+        return;
+      }
+
+      if (event.shiftKey) {
+        const subScreenByKey: Record<string, SubScreenId | undefined> = {
+          "1": "connector",
+          "2": "splice",
+          "3": "node",
+          "4": "segment",
+          "5": "wire"
+        };
+        const targetSubScreen = subScreenByKey[normalizedKey];
+        if (targetSubScreen !== undefined) {
+          event.preventDefault();
+          const nextScreenForSubScreen = activeScreenRef.current === "analysis" ? "analysis" : "modeling";
+          setActiveScreen(nextScreenForSubScreen);
+          setActiveSubScreen(targetSubScreen);
+          return;
+        }
+      } else {
+        const screenByKey: Record<string, ScreenId | undefined> = {
+          "1": "modeling",
+          "2": "analysis",
+          "3": "validation",
+          "4": "settings"
+        };
+        const targetScreen = screenByKey[normalizedKey];
+        if (targetScreen !== undefined) {
+          event.preventDefault();
+          setActiveScreen(targetScreen);
+          return;
+        }
+      }
+
+      const modeByKey: Record<string, InteractionMode | undefined> = {
+        v: "select",
+        n: "addNode",
+        g: "addSegment",
+        c: "connect",
+        r: "route"
+      };
+      const targetMode = modeByKey[normalizedKey];
+      if (targetMode !== undefined) {
         event.preventDefault();
-        redoActionRef.current();
+        if (activeScreenRef.current !== "modeling" && activeScreenRef.current !== "analysis") {
+          setActiveScreen("modeling");
+        }
+        setInteractionMode(targetMode);
       }
     };
 
@@ -3046,7 +3101,10 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 </button>
               </div>
               {showShortcutHints ? (
-                <p className="shortcut-hints">Shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo.</p>
+                <>
+                  <p className="shortcut-hints">Shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo.</p>
+                  <p className="shortcut-hints">Nav: Alt+1..4 screens, Alt+Shift+1..5 entity tabs, Alt+V/N/G/C/R modes.</p>
+                </>
               ) : null}
             </div>
             <p className={`save-status is-${saveStatus}`}>
@@ -4421,6 +4479,15 @@ export function App({ store = appStore }: AppProps): ReactElement {
               </li>
               <li>
                 <span className="technical-id">Ctrl/Cmd + Y</span> Redo alternative shortcut
+              </li>
+              <li>
+                <span className="technical-id">Alt + 1..4</span> Switch top-level workspace
+              </li>
+              <li>
+                <span className="technical-id">Alt + Shift + 1..5</span> Switch entity sub-screen
+              </li>
+              <li>
+                <span className="technical-id">Alt + V/N/G/C/R</span> Set interaction mode
               </li>
             </ul>
             <div className="row-actions">

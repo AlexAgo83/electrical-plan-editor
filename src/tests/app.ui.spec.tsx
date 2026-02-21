@@ -438,4 +438,39 @@ describe("App integration UI", () => {
     const updatedNetworkPanel = getPanelByHeading("Network summary");
     expect(within(updatedNetworkPanel).getByRole("button", { name: /^Select$/ })).toHaveClass("is-active");
   });
+
+  it("supports alt keyboard shortcuts for workspace navigation and interaction modes", () => {
+    const store = createAppStore(createUiIntegrationState());
+    render(<App store={store} />);
+
+    fireEvent.keyDown(window, { key: "2", altKey: true });
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Analysis$/ })).toHaveClass("is-active");
+
+    fireEvent.keyDown(window, { key: "4", altKey: true, shiftKey: true });
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Segment$/ })).toHaveClass("is-active");
+
+    const networkPanel = getPanelByHeading("Network summary");
+    fireEvent.keyDown(window, { key: "r", altKey: true });
+    expect(within(networkPanel).getByRole("button", { name: /^Route$/ })).toHaveClass("is-active");
+    fireEvent.keyDown(window, { key: "v", altKey: true });
+    expect(within(networkPanel).getByRole("button", { name: /^Select$/ })).toHaveClass("is-active");
+  });
+
+  it("ignores keyboard shortcuts when disabled from settings", () => {
+    const store = createAppStore(createUiIntegrationState());
+    render(<App store={store} />);
+
+    switchScreen("settings");
+    const settingsPanel = getPanelByHeading("Action bar and shortcuts");
+    fireEvent.click(within(settingsPanel).getByLabelText("Enable keyboard shortcuts (undo/redo)"));
+
+    fireEvent.keyDown(window, { key: "2", altKey: true });
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Settings$/ })).toHaveClass("is-active");
+  });
 });
