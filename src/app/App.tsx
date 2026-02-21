@@ -1381,6 +1381,14 @@ export function App({ store = appStore }: AppProps): ReactElement {
       }),
     [validationCategoryFilter, validationIssues, validationSeverityFilter]
   );
+  const validationErrorCount = useMemo(
+    () => validationIssues.filter((issue) => issue.severity === "error").length,
+    [validationIssues]
+  );
+  const validationWarningCount = useMemo(
+    () => validationIssues.filter((issue) => issue.severity === "warning").length,
+    [validationIssues]
+  );
   const groupedValidationIssues = useMemo(() => {
     const grouped = new Map<string, ValidationIssue[]>();
     for (const issue of visibleValidationIssues) {
@@ -1407,6 +1415,14 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     setValidationCategoryFilter("all");
   }, [validationCategories, validationCategoryFilter]);
+
+  const entityCountBySubScreen: Record<SubScreenId, number> = {
+    connector: connectors.length,
+    splice: splices.length,
+    node: nodes.length,
+    segment: segments.length,
+    wire: wires.length
+  };
 
   const lastError = selectLastError(state);
 
@@ -2387,6 +2403,12 @@ export function App({ store = appStore }: AppProps): ReactElement {
     });
   }
 
+  function handleOpenValidationScreen(filter: ValidationSeverityFilter): void {
+    setValidationCategoryFilter("all");
+    setValidationSeverityFilter(filter);
+    setActiveScreen("validation");
+  }
+
   function handleOpenSelectionInInspector(): void {
     if (selectedSubScreen === null) {
       return;
@@ -3134,7 +3156,17 @@ export function App({ store = appStore }: AppProps): ReactElement {
                   className={activeScreen === screenId ? "workspace-tab is-active" : "workspace-tab"}
                   onClick={() => setActiveScreen(screenId)}
                 >
-                  {label}
+                  <span className="workspace-tab-content">
+                    <span>{label}</span>
+                    {screenId === "validation" ? (
+                      <span
+                        className={validationErrorCount > 0 ? "workspace-tab-badge is-error" : "workspace-tab-badge"}
+                        aria-hidden="true"
+                      >
+                        {validationIssues.length}
+                      </span>
+                    ) : null}
+                  </span>
                 </button>
               ))}
             </div>
@@ -3153,7 +3185,12 @@ export function App({ store = appStore }: AppProps): ReactElement {
                     className={activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
                     onClick={() => setActiveSubScreen(subScreenId)}
                   >
-                    {label}
+                    <span className="workspace-tab-content">
+                      <span>{label}</span>
+                      <span className="workspace-tab-badge" aria-hidden="true">
+                        {entityCountBySubScreen[subScreenId]}
+                      </span>
+                    </span>
                   </button>
                 ))}
               </div>
@@ -3189,6 +3226,34 @@ export function App({ store = appStore }: AppProps): ReactElement {
             <p className={`save-status is-${saveStatus}`}>
               State: {saveStatus === "saved" ? "Saved" : saveStatus === "unsaved" ? "Unsaved" : "Error"}
             </p>
+            <section className="workspace-health" aria-label="Model health">
+              <h2>Model health</h2>
+              <p className="meta-line">
+                Total issues: <strong>{validationIssues.length}</strong>
+              </p>
+              <p className="meta-line">
+                Errors: <strong>{validationErrorCount}</strong> / Warnings: <strong>{validationWarningCount}</strong>
+              </p>
+              <div className="row-actions compact">
+                <button type="button" onClick={() => handleOpenValidationScreen("all")}>
+                  Open validation
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOpenValidationScreen("error")}
+                  disabled={validationErrorCount === 0}
+                >
+                  Review errors
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOpenValidationScreen("warning")}
+                  disabled={validationWarningCount === 0}
+                >
+                  Review warnings
+                </button>
+              </div>
+            </section>
           </section>
         </aside>
 
@@ -4438,11 +4503,11 @@ export function App({ store = appStore }: AppProps): ReactElement {
               </article>
               <article>
                 <h3>Errors</h3>
-                <p>{validationIssues.filter((issue) => issue.severity === "error").length}</p>
+                <p>{validationErrorCount}</p>
               </article>
               <article>
                 <h3>Warnings</h3>
-                <p>{validationIssues.filter((issue) => issue.severity === "warning").length}</p>
+                <p>{validationWarningCount}</p>
               </article>
               <article>
                 <h3>Visible</h3>

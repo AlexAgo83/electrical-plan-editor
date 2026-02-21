@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 95%
+> Progress: 97%
 > Complexity: High
 > Theme: UX/UI Information Architecture
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,6 +36,7 @@ The current UX relies on dropdown selectors and fragmented panels, which slows d
 - Status update:
   - Persistent left navigation rail is active with top-level workspace tabs (`Modeling`, `Analysis`, `Validation`, `Settings`).
   - Entity sub-navigation is available from the same rail for modeling/analysis contexts.
+  - Navigation now displays live counters (entity counts for sub-screens and model issue count on `Validation`).
   - Canvas panel is now visible in both modeling and analysis contexts.
   - Responsive workspace behavior keeps sidebar + content split on desktop and stacked flow on narrower viewports.
 - References:

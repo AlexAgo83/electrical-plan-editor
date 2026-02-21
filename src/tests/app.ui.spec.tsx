@@ -338,6 +338,29 @@ describe("App integration UI", () => {
     expect(within(validationPanel).queryByText("ERROR")).not.toBeInTheDocument();
   });
 
+  it("shows model health quick actions and opens validation with severity focus", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    const validationButton = within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Validation$/ });
+    const validationBadgeText = validationButton.querySelector(".workspace-tab-badge")?.textContent?.trim() ?? "0";
+    expect(Number(validationBadgeText)).toBeGreaterThan(0);
+
+    const modelHealth = screen.getByRole("region", { name: "Model health" });
+    expect(within(modelHealth).getByText(/Total issues:/i)).toBeInTheDocument();
+    expect(within(modelHealth).getByRole("button", { name: "Review errors" })).toBeEnabled();
+    expect(within(modelHealth).getByRole("button", { name: "Review warnings" })).toBeEnabled();
+
+    fireEvent.click(within(modelHealth).getByRole("button", { name: "Review errors" }));
+    const validationSummary = getPanelByHeading("Validation summary");
+    expect(within(validationSummary).getByText(/Active filters:\s*Errors \/ All categories/i)).toBeInTheDocument();
+
+    const validationPanel = getPanelByHeading("Validation center");
+    expect(within(validationPanel).queryByText("WARNING")).not.toBeInTheDocument();
+  });
+
   it("applies settings defaults for list sort behavior", () => {
     const store = createAppStore(createConnectorSortingState());
     render(<App store={store} />);
