@@ -1,4 +1,4 @@
-import type { MouseEvent as ReactMouseEvent, ReactElement, WheelEvent as ReactWheelEvent } from "react";
+import { useCallback, useRef, type MouseEvent as ReactMouseEvent, type ReactElement, type WheelEvent as ReactWheelEvent } from "react";
 import type {
   Connector,
   ConnectorId,
@@ -17,11 +17,60 @@ interface NodePosition {
   y: number;
 }
 
+const SVG_EXPORT_STYLE_PROPERTIES = [
+  "fill",
+  "fill-opacity",
+  "stroke",
+  "stroke-opacity",
+  "stroke-width",
+  "stroke-linecap",
+  "stroke-linejoin",
+  "stroke-dasharray",
+  "opacity",
+  "font-family",
+  "font-size",
+  "font-style",
+  "font-weight",
+  "letter-spacing",
+  "text-anchor",
+  "dominant-baseline",
+  "paint-order",
+  "display",
+  "visibility"
+] as const;
+
+function copyComputedStylesToSvgClone(sourceSvg: SVGSVGElement, cloneSvg: SVGSVGElement): void {
+  const sourceElements = [sourceSvg, ...Array.from(sourceSvg.querySelectorAll("*"))] as SVGElement[];
+  const cloneElements = [cloneSvg, ...Array.from(cloneSvg.querySelectorAll("*"))] as SVGElement[];
+  const pairCount = Math.min(sourceElements.length, cloneElements.length);
+
+  for (let index = 0; index < pairCount; index += 1) {
+    const sourceElement = sourceElements[index];
+    const cloneElement = cloneElements[index];
+    if (sourceElement === undefined || cloneElement === undefined) {
+      continue;
+    }
+    const computedStyle = window.getComputedStyle(sourceElement);
+    const inlineStyle = cloneElement.style;
+
+    for (const propertyName of SVG_EXPORT_STYLE_PROPERTIES) {
+      const propertyValue = computedStyle.getPropertyValue(propertyName);
+      if (propertyValue.length > 0) {
+        inlineStyle.setProperty(propertyName, propertyValue);
+      }
+    }
+  }
+}
+
 interface NetworkSummaryPanelProps {
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
+  showNetworkInfoPanels: boolean;
+  showSegmentLengths: boolean;
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
+  toggleShowNetworkInfoPanels: () => void;
+  toggleShowSegmentLengths: () => void;
   toggleShowNetworkGrid: () => void;
   toggleSnapNodesToGrid: () => void;
   networkScalePercent: number;
@@ -63,8 +112,12 @@ interface NetworkSummaryPanelProps {
 export function NetworkSummaryPanel({
   handleZoomAction,
   fitNetworkToContent,
+  showNetworkInfoPanels,
+  showSegmentLengths,
   showNetworkGrid,
   snapNodesToGrid,
+  toggleShowNetworkInfoPanels,
+  toggleShowSegmentLengths,
   toggleShowNetworkGrid,
   toggleSnapNodesToGrid,
   networkScalePercent,
@@ -102,6 +155,7 @@ export function NetworkSummaryPanel({
   routePreview,
   onRegenerateLayout
 }: NetworkSummaryPanelProps): ReactElement {
+  const networkSvgRef = useRef<SVGSVGElement | null>(null);
   const graphStats = [
     { label: "Graph nodes", value: routingGraphNodeCount },
     { label: "Graph segments", value: routingGraphSegmentCount },
@@ -123,6 +177,66 @@ export function NetworkSummaryPanel({
   const horizontalGridLineCount = Math.max(0, Math.ceil((gridEndY - gridStartY) / networkGridStep) + 1);
   const gridXPositions = Array.from({ length: verticalGridLineCount }, (_, index) => gridStartX + index * networkGridStep);
   const gridYPositions = Array.from({ length: horizontalGridLineCount }, (_, index) => gridStartY + index * networkGridStep);
+  const handleExportPlanAsPng = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const sourceSvg = networkSvgRef.current;
+    if (sourceSvg === null) {
+      return;
+    }
+
+    const viewBoxWidth = sourceSvg.viewBox.baseVal.width;
+    const viewBoxHeight = sourceSvg.viewBox.baseVal.height;
+    const fallbackRect = sourceSvg.getBoundingClientRect();
+    const exportWidth = Math.max(1, Math.round(viewBoxWidth > 0 ? viewBoxWidth : fallbackRect.width));
+    const exportHeight = Math.max(1, Math.round(viewBoxHeight > 0 ? viewBoxHeight : fallbackRect.height));
+
+    const svgClone = sourceSvg.cloneNode(true) as SVGSVGElement;
+    svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    svgClone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+    svgClone.setAttribute("width", String(exportWidth));
+    svgClone.setAttribute("height", String(exportHeight));
+    if (!svgClone.getAttribute("viewBox")) {
+      svgClone.setAttribute("viewBox", `0 0 ${exportWidth} ${exportHeight}`);
+    }
+    copyComputedStylesToSvgClone(sourceSvg, svgClone);
+
+    const serializedSvg = new XMLSerializer().serializeToString(svgClone);
+    const svgBlob = new Blob([serializedSvg], { type: "image/svg+xml;charset=utf-8" });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    const image = new Image();
+    image.decoding = "async";
+    image.onload = () => {
+      URL.revokeObjectURL(svgUrl);
+      const exportScale = Math.max(1, Math.ceil(window.devicePixelRatio || 1));
+      const canvas = document.createElement("canvas");
+      canvas.width = exportWidth * exportScale;
+      canvas.height = exportHeight * exportScale;
+
+      const context = canvas.getContext("2d");
+      if (context === null) {
+        return;
+      }
+
+      context.setTransform(exportScale, 0, 0, exportScale, 0, 0);
+      context.drawImage(image, 0, 0, exportWidth, exportHeight);
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const downloadLink = document.createElement("a");
+      downloadLink.href = canvas.toDataURL("image/png");
+      downloadLink.download = `network-plan-${timestamp}.png`;
+      downloadLink.style.display = "none";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(svgUrl);
+    };
+    image.src = svgUrl;
+  }, []);
 
   return (
     <section className="network-summary-stack">
@@ -132,9 +246,26 @@ export function NetworkSummaryPanel({
           <div className="network-summary-header-actions" role="group" aria-label="Network summary display options">
             <button
               type="button"
+              className={showNetworkInfoPanels ? "workspace-tab is-active" : "workspace-tab"}
+              onClick={toggleShowNetworkInfoPanels}
+            >
+              <span className="network-summary-info-icon" aria-hidden="true" />
+              Info
+            </button>
+            <button
+              type="button"
+              className={showSegmentLengths ? "workspace-tab is-active" : "workspace-tab"}
+              onClick={toggleShowSegmentLengths}
+            >
+              <span className="network-summary-length-icon" aria-hidden="true" />
+              Length
+            </button>
+            <button
+              type="button"
               className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}
               onClick={toggleShowNetworkGrid}
             >
+              <span className="network-summary-grid-icon" aria-hidden="true" />
               Grid
             </button>
             <button
@@ -142,7 +273,17 @@ export function NetworkSummaryPanel({
               className={snapNodesToGrid ? "workspace-tab is-active" : "workspace-tab"}
               onClick={toggleSnapNodesToGrid}
             >
+              <span className="network-summary-snap-icon" aria-hidden="true" />
               Snap
+            </button>
+            <button
+              type="button"
+              className="workspace-tab network-summary-export-button"
+              onClick={handleExportPlanAsPng}
+              disabled={nodes.length === 0}
+            >
+              <span className="network-summary-export-icon" aria-hidden="true" />
+              Export PNG
             </button>
           </div>
         </header>
@@ -150,57 +291,62 @@ export function NetworkSummaryPanel({
           <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
         ) : (
           <div className={`network-canvas-shell${isPanningNetwork ? " is-panning" : ""}`}>
-            <div className="network-canvas-floating-controls" aria-label="Canvas controls">
-              <div className="network-canvas-toolbar">
-                <button type="button" className="workspace-tab" onClick={() => handleZoomAction("out")}>
-                  Zoom -
-                </button>
-                <button type="button" className="workspace-tab" onClick={() => handleZoomAction("in")}>
-                  Zoom +
-                </button>
-                <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
-                  Reset view
-                </button>
-                <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
-                  Fit network
-                </button>
-                <button type="button" className="workspace-tab" onClick={onRegenerateLayout}>
-                  Generate
-                </button>
+            {showNetworkInfoPanels ? (
+              <div className="network-canvas-floating-controls" aria-label="Canvas controls">
+                <div className="network-canvas-toolbar">
+                  <button type="button" className="workspace-tab" onClick={() => handleZoomAction("out")}>
+                    Zoom -
+                  </button>
+                  <button type="button" className="workspace-tab" onClick={() => handleZoomAction("in")}>
+                    Zoom +
+                  </button>
+                  <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
+                    Reset view
+                  </button>
+                  <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
+                    Fit network
+                  </button>
+                  <button type="button" className="workspace-tab" onClick={onRegenerateLayout}>
+                    Generate
+                  </button>
+                </div>
+                <p className="meta-line network-canvas-floating-copy">
+                  View: {networkScalePercent}% zoom. Hold <strong>Shift</strong> and drag empty canvas to pan.
+                </p>
               </div>
-              <p className="meta-line network-canvas-floating-copy">
-                View: {networkScalePercent}% zoom. Hold <strong>Shift</strong> and drag empty canvas to pan.
-              </p>
-            </div>
-            <div className="network-canvas-floating-stack">
-              <section className="network-canvas-floating-subnetworks" aria-label="Sub-networks">
-                {subNetworkSummaries.length === 0 ? (
-                  <p className="network-canvas-floating-copy">No sub-network tags yet.</p>
-                ) : (
-                  <ul className="network-canvas-subnetwork-list">
-                    {subNetworkSummaries.map((group) => (
-                      <li key={group.tag}>
-                        <span className="subnetwork-chip">{group.tag}</span>
-                        <span>
-                          {group.segmentCount} segment(s), {group.totalLengthMm} mm total
-                        </span>
+            ) : null}
+            {showNetworkInfoPanels ? (
+              <div className="network-canvas-floating-stack">
+                <section className="network-canvas-floating-subnetworks" aria-label="Sub-networks">
+                  {subNetworkSummaries.length === 0 ? (
+                    <p className="network-canvas-floating-copy">No sub-network tags yet.</p>
+                  ) : (
+                    <ul className="network-canvas-subnetwork-list">
+                      {subNetworkSummaries.map((group) => (
+                        <li key={group.tag}>
+                          <span className="subnetwork-chip">{group.tag}</span>
+                          <span>
+                            {group.segmentCount} segment(s), {group.totalLengthMm} mm total
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+                <section className="network-canvas-floating-stats" aria-label="Graph statistics">
+                  <ul className="network-canvas-stats-list">
+                    {graphStats.map((entry) => (
+                      <li key={entry.label}>
+                        <span>{entry.label}</span>
+                        <strong>{entry.value}</strong>
                       </li>
                     ))}
                   </ul>
-                )}
-              </section>
-              <section className="network-canvas-floating-stats" aria-label="Graph statistics">
-                <ul className="network-canvas-stats-list">
-                  {graphStats.map((entry) => (
-                    <li key={entry.label}>
-                      <span>{entry.label}</span>
-                      <strong>{entry.value}</strong>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </div>
+                </section>
+              </div>
+            ) : null}
             <svg
+              ref={networkSvgRef}
               className="network-svg"
               role="img"
               aria-label="2D network diagram"
@@ -265,6 +411,11 @@ export function NetworkSummaryPanel({
                       <text className="network-segment-label" x={labelX} y={labelY - 6} textAnchor="middle">
                         {segment.id}
                       </text>
+                      {showSegmentLengths ? (
+                        <text className="network-segment-length-label" x={labelX} y={labelY + 6} textAnchor="middle">
+                          {segment.lengthMm} mm
+                        </text>
+                      ) : null}
                     </g>
                   );
                 })}

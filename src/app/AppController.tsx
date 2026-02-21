@@ -323,6 +323,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [networkSort, setNetworkSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [canvasDefaultShowGrid, setCanvasDefaultShowGrid] = useState(true);
   const [canvasDefaultSnapToGrid, setCanvasDefaultSnapToGrid] = useState(true);
+  const [showNetworkInfoPanels, setShowNetworkInfoPanels] = useState(true);
+  const [showSegmentLengths, setShowSegmentLengths] = useState(false);
   const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("100");
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
@@ -1599,6 +1601,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       fitNetworkToContent={fitNetworkToContent}
       showNetworkGrid={showNetworkGrid}
       snapNodesToGrid={snapNodesToGrid}
+      showNetworkInfoPanels={showNetworkInfoPanels}
+      showSegmentLengths={showSegmentLengths}
+      toggleShowNetworkInfoPanels={() => setShowNetworkInfoPanels((current) => !current)}
+      toggleShowSegmentLengths={() => setShowSegmentLengths((current) => !current)}
       toggleShowNetworkGrid={() => setShowNetworkGrid((current) => !current)}
       toggleSnapNodesToGrid={() => setSnapNodesToGrid((current) => !current)}
       networkScalePercent={networkScalePercent}

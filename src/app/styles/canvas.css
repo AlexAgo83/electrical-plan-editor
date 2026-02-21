@@ -31,8 +31,65 @@
 }
 
 .network-summary-header-actions .workspace-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   padding: 0.26rem 0.58rem;
   font-size: 0.78rem;
+}
+
+.network-summary-grid-icon,
+.network-summary-snap-icon,
+.network-summary-info-icon,
+.network-summary-length-icon,
+.network-summary-export-button {
+  display: inline-flex;
+  align-items: center;
+}
+
+.network-summary-grid-icon,
+.network-summary-snap-icon,
+.network-summary-info-icon,
+.network-summary-length-icon {
+  width: 0.82rem;
+  height: 0.82rem;
+  flex: 0 0 0.82rem;
+  background: currentColor;
+}
+
+.network-summary-grid-icon {
+  -webkit-mask: url("/icons/grid_show.svg") center / contain no-repeat;
+  mask: url("/icons/grid_show.svg") center / contain no-repeat;
+}
+
+.network-summary-snap-icon {
+  -webkit-mask: url("/icons/grid_snap.svg") center / contain no-repeat;
+  mask: url("/icons/grid_snap.svg") center / contain no-repeat;
+}
+
+.network-summary-info-icon {
+  -webkit-mask: url("/icons/info.svg") center / contain no-repeat;
+  mask: url("/icons/info.svg") center / contain no-repeat;
+}
+
+.network-summary-length-icon {
+  -webkit-mask: url("/icons/len.svg") center / contain no-repeat;
+  mask: url("/icons/len.svg") center / contain no-repeat;
+}
+
+.network-summary-export-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34rem;
+}
+
+.network-summary-export-icon {
+  width: 0.82rem;
+  height: 0.82rem;
+  flex: 0 0 0.82rem;
+  background: currentColor;
+  -webkit-mask: url("/icons/export_plan.svg") center / contain no-repeat;
+  mask: url("/icons/export_plan.svg") center / contain no-repeat;
 }
 
 .canvas-toolbar > span {
@@ -465,6 +522,12 @@
 .network-segment-label {
   font-size: 10px;
   fill: #38566a;
+  pointer-events: none;
+}
+
+.network-segment-length-label {
+  font-size: 8px;
+  fill: #547086;
   pointer-events: none;
 }
 
