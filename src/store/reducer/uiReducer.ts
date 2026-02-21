@@ -1,0 +1,40 @@
+import type { AppAction } from "../actions";
+import type { AppState } from "../types";
+import { bumpRevision, clearLastError } from "./shared";
+
+export function handleUiActions(state: AppState, action: AppAction): AppState | null {
+  switch (action.type) {
+    case "ui/select": {
+      return bumpRevision({
+        ...clearLastError(state),
+        ui: {
+          ...state.ui,
+          selected: action.payload,
+          lastError: null
+        }
+      });
+    }
+
+    case "ui/clearSelection": {
+      if (state.ui.selected === null) {
+        return clearLastError(state);
+      }
+
+      return bumpRevision({
+        ...clearLastError(state),
+        ui: {
+          ...state.ui,
+          selected: null,
+          lastError: null
+        }
+      });
+    }
+
+    case "ui/clearError": {
+      return clearLastError(state);
+    }
+
+    default:
+      return null;
+  }
+}
