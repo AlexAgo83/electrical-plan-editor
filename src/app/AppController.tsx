@@ -1,8 +1,5 @@
 import {
-  type FormEvent,
-  type MouseEvent as ReactMouseEvent,
   type ReactElement,
-  type WheelEvent as ReactWheelEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -11,23 +8,17 @@ import {
   useSyncExternalStore
 } from "react";
 import type {
-  NetworkId,
-  Connector,
   ConnectorId,
   NetworkNode,
   NodeId,
-  Segment,
   SegmentId,
-  Splice,
   SpliceId,
-  Wire,
   WireEndpoint,
   WireId
 } from "../core/entities";
 import {
   type AppStore,
   appActions,
-  createSampleNetworkState,
   hasSampleNetworkSignature,
   isWorkspaceEmpty,
   selectActiveNetwork,
@@ -63,19 +54,33 @@ import { AnalysisScreen } from "./components/screens/AnalysisScreen";
 import { ModelingScreen } from "./components/screens/ModelingScreen";
 import { SettingsScreen } from "./components/screens/SettingsScreen";
 import { ValidationScreen } from "./components/screens/ValidationScreen";
-import { WorkspaceNavigation } from "./components/WorkspaceNavigation";
+import { AppHeaderAndStats } from "./components/workspace/AppHeaderAndStats";
+import { AnalysisWorkspaceContent } from "./components/workspace/AnalysisWorkspaceContent";
+import { ModelingFormsColumn } from "./components/workspace/ModelingFormsColumn";
+import { ModelingPrimaryTables } from "./components/workspace/ModelingPrimaryTables";
+import { ModelingSecondaryTables } from "./components/workspace/ModelingSecondaryTables";
+import { SettingsWorkspaceContent } from "./components/workspace/SettingsWorkspaceContent";
+import { ValidationWorkspaceContent } from "./components/workspace/ValidationWorkspaceContent";
+import { WorkspaceSidebarPanel } from "./components/workspace/WorkspaceSidebarPanel";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import { useCanvasInteractionHandlers } from "./hooks/useCanvasInteractionHandlers";
 import { useCanvasState } from "./hooks/useCanvasState";
+import { useConnectorHandlers } from "./hooks/useConnectorHandlers";
+import { useEntityListModel } from "./hooks/useEntityListModel";
 import { useEntityFormsState } from "./hooks/useEntityFormsState";
 import { useNetworkImportExport } from "./hooks/useNetworkImportExport";
+import { useNodeHandlers } from "./hooks/useNodeHandlers";
+import { useSelectionHandlers } from "./hooks/useSelectionHandlers";
+import { useSegmentHandlers } from "./hooks/useSegmentHandlers";
+import { useSpliceHandlers } from "./hooks/useSpliceHandlers";
 import { useStoreHistory } from "./hooks/useStoreHistory";
 import { useUiPreferences } from "./hooks/useUiPreferences";
 import { useValidationModel } from "./hooks/useValidationModel";
+import { useWireHandlers } from "./hooks/useWireHandlers";
+import { useWorkspaceHandlers } from "./hooks/useWorkspaceHandlers";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
 import {
-  buildUniqueNetworkTechnicalId,
   clamp,
-  createEntityId,
   createNodePositionMap,
   HISTORY_LIMIT,
   NETWORK_GRID_STEP,
@@ -83,30 +88,15 @@ import {
   NETWORK_MIN_SCALE,
   NETWORK_VIEW_HEIGHT,
   NETWORK_VIEW_WIDTH,
-  nextSortState,
   normalizeSearch,
-  resolveEndpointNodeId,
-  snapToGrid,
-  sortById,
-  sortByNameAndTechnicalId,
-  toPositiveInteger,
-  toPositiveNumber,
 } from "./lib/app-utils";
 import type {
   AppProps,
-  ConnectorSynthesisRow,
   NodePosition,
-  OccupancyFilter,
-  SegmentSubNetworkFilter,
-  SelectionTarget,
   SortDirection,
   SortField,
-  SortState,
-  SpliceSynthesisRow,
   SubScreenId,
   TableDensity,
-  ValidationIssue,
-  ValidationSeverityFilter
 } from "./types/app-controller";
 import "./styles.css";
 
@@ -274,29 +264,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     networkOffset,
     setNetworkOffset
   } = useCanvasState();
-  const [connectorSearchQuery, setConnectorSearchQuery] = useState("");
-  const [spliceSearchQuery, setSpliceSearchQuery] = useState("");
-  const [nodeSearchQuery, setNodeSearchQuery] = useState("");
-  const [segmentSearchQuery, setSegmentSearchQuery] = useState("");
-  const [wireSearchQuery, setWireSearchQuery] = useState("");
-  const [connectorOccupancyFilter, setConnectorOccupancyFilter] = useState<OccupancyFilter>("all");
-  const [spliceOccupancyFilter, setSpliceOccupancyFilter] = useState<OccupancyFilter>("all");
-  const [nodeKindFilter, setNodeKindFilter] = useState<"all" | NetworkNode["kind"]>("all");
-  const [segmentSubNetworkFilter, setSegmentSubNetworkFilter] = useState<SegmentSubNetworkFilter>("all");
-  const [wireRouteFilter, setWireRouteFilter] = useState<"all" | "auto" | "locked">("all");
-  const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
-  const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
-  const [nodeIdSortDirection, setNodeIdSortDirection] = useState<SortDirection>("asc");
-  const [segmentIdSortDirection, setSegmentIdSortDirection] = useState<SortDirection>("asc");
-  const [wireSort, setWireSort] = useState<SortState>({ field: "name", direction: "asc" });
-  const [connectorSynthesisSort, setConnectorSynthesisSort] = useState<SortState>({
-    field: "name",
-    direction: "asc"
-  });
-  const [spliceSynthesisSort, setSpliceSynthesisSort] = useState<SortState>({
-    field: "name",
-    direction: "asc"
-  });
   const [newNetworkName, setNewNetworkName] = useState("");
   const [newNetworkTechnicalId, setNewNetworkTechnicalId] = useState("");
   const [newNetworkDescription, setNewNetworkDescription] = useState("");
@@ -433,48 +400,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   }, [canvasResetZoomPercentInput]);
   const configuredResetZoomPercent = Math.round(configuredResetScale * 100);
 
-  useUiPreferences({
-    networkMinScale: NETWORK_MIN_SCALE,
-    networkMaxScale: NETWORK_MAX_SCALE,
-    themeMode,
-    tableDensity,
-    defaultSortField,
-    defaultSortDirection,
-    defaultIdSortDirection,
-    canvasDefaultShowGrid,
-    canvasDefaultSnapToGrid,
-    canvasResetZoomPercentInput,
-    showShortcutHints,
-    keyboardShortcutsEnabled,
-    preferencesHydrated,
-    setTableDensity,
-    setDefaultSortField,
-    setDefaultSortDirection,
-    setDefaultIdSortDirection,
-    setConnectorSort,
-    setSpliceSort,
-    setWireSort,
-    setConnectorSynthesisSort,
-    setSpliceSynthesisSort,
-    setNodeIdSortDirection,
-    setSegmentIdSortDirection,
-    setCanvasDefaultShowGrid,
-    setCanvasDefaultSnapToGrid,
-    setShowNetworkGrid,
-    setSnapNodesToGrid,
-    setCanvasResetZoomPercentInput,
-    setNetworkScale,
-    setNetworkOffset,
-    setShowShortcutHints,
-    setKeyboardShortcutsEnabled,
-    setThemeMode,
-    setPreferencesHydrated
-  });
-
-  useEffect(() => {
-    store.dispatch(appActions.setThemeMode(themeMode));
-  }, [store, themeMode]);
-
   const describeWireEndpoint = useCallback((endpoint: WireEndpoint): string => {
     if (endpoint.kind === "connectorCavity") {
       const connector = connectorMap.get(endpoint.connectorId);
@@ -528,235 +453,106 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
   }, [interactionMode, setModeAnchorNodeId, setPendingNewNodePosition]);
 
-  const connectorSynthesisRows = useMemo<ConnectorSynthesisRow[]>(() => {
-    if (selectedConnector === null) {
-      return [];
-    }
+  const {
+    connectorSearchQuery,
+    setConnectorSearchQuery,
+    spliceSearchQuery,
+    setSpliceSearchQuery,
+    nodeSearchQuery,
+    setNodeSearchQuery,
+    segmentSearchQuery,
+    setSegmentSearchQuery,
+    wireSearchQuery,
+    setWireSearchQuery,
+    connectorOccupancyFilter,
+    setConnectorOccupancyFilter,
+    spliceOccupancyFilter,
+    setSpliceOccupancyFilter,
+    nodeKindFilter,
+    setNodeKindFilter,
+    segmentSubNetworkFilter,
+    setSegmentSubNetworkFilter,
+    wireRouteFilter,
+    setWireRouteFilter,
+    connectorSort,
+    setConnectorSort,
+    spliceSort,
+    setSpliceSort,
+    nodeIdSortDirection,
+    setNodeIdSortDirection,
+    segmentIdSortDirection,
+    setSegmentIdSortDirection,
+    wireSort,
+    setWireSort,
+    connectorSynthesisSort,
+    setConnectorSynthesisSort,
+    spliceSynthesisSort,
+    setSpliceSynthesisSort,
+    connectorOccupiedCountById,
+    spliceOccupiedCountById,
+    sortedConnectorSynthesisRows,
+    sortedSpliceSynthesisRows,
+    visibleConnectors,
+    visibleSplices,
+    visibleNodes,
+    visibleSegments,
+    visibleWires,
+    segmentsCountByNodeId,
+    getSortIndicator
+  } = useEntityListModel({
+    state,
+    connectors,
+    splices,
+    nodes,
+    segments,
+    wires,
+    connectorMap,
+    spliceMap,
+    selectedConnector,
+    selectedSplice,
+    describeWireEndpoint
+  });
+  useUiPreferences({
+    networkMinScale: NETWORK_MIN_SCALE,
+    networkMaxScale: NETWORK_MAX_SCALE,
+    themeMode,
+    tableDensity,
+    defaultSortField,
+    defaultSortDirection,
+    defaultIdSortDirection,
+    canvasDefaultShowGrid,
+    canvasDefaultSnapToGrid,
+    canvasResetZoomPercentInput,
+    showShortcutHints,
+    keyboardShortcutsEnabled,
+    preferencesHydrated,
+    setTableDensity,
+    setDefaultSortField,
+    setDefaultSortDirection,
+    setDefaultIdSortDirection,
+    setConnectorSort,
+    setSpliceSort,
+    setWireSort,
+    setConnectorSynthesisSort,
+    setSpliceSynthesisSort,
+    setNodeIdSortDirection,
+    setSegmentIdSortDirection,
+    setCanvasDefaultShowGrid,
+    setCanvasDefaultSnapToGrid,
+    setShowNetworkGrid,
+    setSnapNodesToGrid,
+    setCanvasResetZoomPercentInput,
+    setNetworkScale,
+    setNetworkOffset,
+    setShowShortcutHints,
+    setKeyboardShortcutsEnabled,
+    setThemeMode,
+    setPreferencesHydrated
+  });
 
-    return wires.flatMap((wire) => {
-      const entries: ConnectorSynthesisRow[] = [];
-
-      if (wire.endpointA.kind === "connectorCavity" && wire.endpointA.connectorId === selectedConnector.id) {
-        entries.push({
-          wireId: wire.id,
-          wireName: wire.name,
-          wireTechnicalId: wire.technicalId,
-          localEndpointLabel: `C${wire.endpointA.cavityIndex}`,
-          remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
-          lengthMm: wire.lengthMm
-        });
-      }
-
-      if (wire.endpointB.kind === "connectorCavity" && wire.endpointB.connectorId === selectedConnector.id) {
-        entries.push({
-          wireId: wire.id,
-          wireName: wire.name,
-          wireTechnicalId: wire.technicalId,
-          localEndpointLabel: `C${wire.endpointB.cavityIndex}`,
-          remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
-          lengthMm: wire.lengthMm
-        });
-      }
-
-      return entries;
-    });
-  }, [describeWireEndpoint, selectedConnector, wires]);
-
-  const spliceSynthesisRows = useMemo<SpliceSynthesisRow[]>(() => {
-    if (selectedSplice === null) {
-      return [];
-    }
-
-    return wires.flatMap((wire) => {
-      const entries: SpliceSynthesisRow[] = [];
-
-      if (wire.endpointA.kind === "splicePort" && wire.endpointA.spliceId === selectedSplice.id) {
-        entries.push({
-          wireId: wire.id,
-          wireName: wire.name,
-          wireTechnicalId: wire.technicalId,
-          localEndpointLabel: `P${wire.endpointA.portIndex}`,
-          remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
-          lengthMm: wire.lengthMm
-        });
-      }
-
-      if (wire.endpointB.kind === "splicePort" && wire.endpointB.spliceId === selectedSplice.id) {
-        entries.push({
-          wireId: wire.id,
-          wireName: wire.name,
-          wireTechnicalId: wire.technicalId,
-          localEndpointLabel: `P${wire.endpointB.portIndex}`,
-          remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
-          lengthMm: wire.lengthMm
-        });
-      }
-
-      return entries;
-    });
-  }, [describeWireEndpoint, selectedSplice, wires]);
-
-  const sortedConnectors = useMemo(
-    () => sortByNameAndTechnicalId(connectors, connectorSort, (connector) => connector.name, (connector) => connector.technicalId),
-    [connectors, connectorSort]
-  );
-  const sortedSplices = useMemo(
-    () => sortByNameAndTechnicalId(splices, spliceSort, (splice) => splice.name, (splice) => splice.technicalId),
-    [splices, spliceSort]
-  );
-  const sortedNodes = useMemo(() => sortById(nodes, nodeIdSortDirection, (node) => node.id), [nodes, nodeIdSortDirection]);
-  const sortedSegments = useMemo(
-    () => sortById(segments, segmentIdSortDirection, (segment) => segment.id),
-    [segments, segmentIdSortDirection]
-  );
-  const sortedWires = useMemo(
-    () => sortByNameAndTechnicalId(wires, wireSort, (wire) => wire.name, (wire) => wire.technicalId),
-    [wires, wireSort]
-  );
-  const sortedConnectorSynthesisRows = useMemo(
-    () =>
-      sortByNameAndTechnicalId(
-        connectorSynthesisRows,
-        connectorSynthesisSort,
-        (row) => row.wireName,
-        (row) => row.wireTechnicalId
-      ),
-    [connectorSynthesisRows, connectorSynthesisSort]
-  );
-  const sortedSpliceSynthesisRows = useMemo(
-    () =>
-      sortByNameAndTechnicalId(
-        spliceSynthesisRows,
-        spliceSynthesisSort,
-        (row) => row.wireName,
-        (row) => row.wireTechnicalId
-      ),
-    [spliceSynthesisRows, spliceSynthesisSort]
-  );
-  const normalizedConnectorSearch = normalizeSearch(connectorSearchQuery);
-  const normalizedSpliceSearch = normalizeSearch(spliceSearchQuery);
-  const normalizedNodeSearch = normalizeSearch(nodeSearchQuery);
-  const normalizedSegmentSearch = normalizeSearch(segmentSearchQuery);
-  const normalizedWireSearch = normalizeSearch(wireSearchQuery);
-  const connectorOccupiedCountById = useMemo(() => {
-    const result = new Map<ConnectorId, number>();
-    for (const connector of connectors) {
-      const occupiedCount = selectConnectorCavityStatuses(state, connector.id).filter((slot) => slot.isOccupied).length;
-      result.set(connector.id, occupiedCount);
-    }
-
-    return result;
-  }, [connectors, state]);
-  const spliceOccupiedCountById = useMemo(() => {
-    const result = new Map<SpliceId, number>();
-    for (const splice of splices) {
-      const occupiedCount = selectSplicePortStatuses(state, splice.id).filter((slot) => slot.isOccupied).length;
-      result.set(splice.id, occupiedCount);
-    }
-
-    return result;
-  }, [splices, state]);
-  const visibleConnectors = useMemo(
-    () => {
-      return sortedConnectors.filter((connector) => {
-        const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
-        if (connectorOccupancyFilter === "occupied" && occupiedCount === 0) {
-          return false;
-        }
-
-        if (connectorOccupancyFilter === "free" && occupiedCount > 0) {
-          return false;
-        }
-
-        return `${connector.name} ${connector.technicalId}`.toLocaleLowerCase().includes(normalizedConnectorSearch);
-      });
-    },
-    [connectorOccupiedCountById, connectorOccupancyFilter, normalizedConnectorSearch, sortedConnectors]
-  );
-  const visibleSplices = useMemo(
-    () => {
-      return sortedSplices.filter((splice) => {
-        const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
-        if (spliceOccupancyFilter === "occupied" && occupiedCount === 0) {
-          return false;
-        }
-
-        if (spliceOccupancyFilter === "free" && occupiedCount > 0) {
-          return false;
-        }
-
-        return `${splice.name} ${splice.technicalId}`.toLocaleLowerCase().includes(normalizedSpliceSearch);
-      });
-    },
-    [normalizedSpliceSearch, sortedSplices, spliceOccupancyFilter, spliceOccupiedCountById]
-  );
-  const visibleNodes = useMemo(
-    () =>
-      sortedNodes.filter((node) => {
-        if (nodeKindFilter !== "all" && node.kind !== nodeKindFilter) {
-          return false;
-        }
-
-        if (normalizedNodeSearch.length === 0) {
-          return true;
-        }
-
-        if (node.kind === "intermediate") {
-          return `${node.id} ${node.label}`.toLocaleLowerCase().includes(normalizedNodeSearch);
-        }
-
-        if (node.kind === "connector") {
-          const connector = connectorMap.get(node.connectorId);
-          return `${node.id} ${node.connectorId} ${connector?.name ?? ""} ${connector?.technicalId ?? ""}`
-            .toLocaleLowerCase()
-            .includes(normalizedNodeSearch);
-        }
-
-        const splice = spliceMap.get(node.spliceId);
-        return `${node.id} ${node.spliceId} ${splice?.name ?? ""} ${splice?.technicalId ?? ""}`
-          .toLocaleLowerCase()
-          .includes(normalizedNodeSearch);
-      }),
-    [connectorMap, nodeKindFilter, normalizedNodeSearch, sortedNodes, spliceMap]
-  );
-  const visibleSegments = useMemo(
-    () => {
-      return sortedSegments.filter((segment) => {
-        const normalizedSubNetworkTag = segment.subNetworkTag?.trim() ?? "";
-        if (segmentSubNetworkFilter === "default" && normalizedSubNetworkTag.length > 0) {
-          return false;
-        }
-
-        if (segmentSubNetworkFilter === "tagged" && normalizedSubNetworkTag.length === 0) {
-          return false;
-        }
-
-        return `${segment.id} ${segment.nodeA} ${segment.nodeB} ${segment.subNetworkTag ?? ""}`
-          .toLocaleLowerCase()
-          .includes(normalizedSegmentSearch);
-      });
-    },
-    [normalizedSegmentSearch, segmentSubNetworkFilter, sortedSegments]
-  );
-  const visibleWires = useMemo(
-    () =>
-      sortedWires.filter((wire) => {
-        if (wireRouteFilter === "locked" && !wire.isRouteLocked) {
-          return false;
-        }
-
-        if (wireRouteFilter === "auto" && wire.isRouteLocked) {
-          return false;
-        }
-
-        if (normalizedWireSearch.length === 0) {
-          return true;
-        }
-
-        return `${wire.name} ${wire.technicalId}`.toLocaleLowerCase().includes(normalizedWireSearch);
-      }),
-    [normalizedWireSearch, sortedWires, wireRouteFilter]
-  );
+  useEffect(() => {
+    store.dispatch(appActions.setThemeMode(themeMode));
+  }, [store, themeMode]);
   const {
     validationCategoryFilter,
     setValidationCategoryFilter,
@@ -850,235 +646,66 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     dispatchAction
   });
 
-  function handleCreateNetwork(event: FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-
-    const trimmedName = newNetworkName.trim();
-    const trimmedTechnicalId = newNetworkTechnicalId.trim();
-    if (trimmedName.length === 0 || trimmedTechnicalId.length === 0) {
-      setNetworkFormError("Network name and technical ID are required.");
-      return;
-    }
-
-    if (selectNetworkTechnicalIdTaken(store.getState(), trimmedTechnicalId)) {
-      setNetworkFormError(`Network technical ID '${trimmedTechnicalId}' is already used.`);
-      return;
-    }
-
-    const nowIso = new Date().toISOString();
-    const networkId = createEntityId("net") as NetworkId;
-    dispatchAction(
-      appActions.createNetwork({
-        id: networkId,
-        name: trimmedName,
-        technicalId: trimmedTechnicalId,
-        description: newNetworkDescription.trim().length === 0 ? undefined : newNetworkDescription.trim(),
-        createdAt: nowIso,
-        updatedAt: nowIso
-      })
-    );
-
-    if (store.getState().networks.byId[networkId] !== undefined) {
-      setNetworkFormError(null);
-      setNewNetworkName("");
-      setNewNetworkTechnicalId("");
-      setNewNetworkDescription("");
-      return;
-    }
-
-    setNetworkFormError("Unable to create network. Check technical ID uniqueness.");
-  }
-
-  function handleSelectNetwork(nextNetworkId: NetworkId): void {
-    dispatchAction(appActions.selectNetwork(nextNetworkId), { trackHistory: false });
-  }
-
-  function handleRenameActiveNetwork(): void {
-    if (activeNetwork === null) {
-      return;
-    }
-
-    const trimmedName = renameNetworkName.trim();
-    if (trimmedName.length === 0) {
-      setNetworkFormError("Network name must be non-empty.");
-      return;
-    }
-
-    dispatchAction(
-      appActions.renameNetwork(activeNetwork.id, trimmedName, new Date().toISOString(), activeNetwork.description)
-    );
-    setNetworkFormError(null);
-  }
-
-  function handleDuplicateActiveNetwork(): void {
-    if (activeNetwork === null) {
-      return;
-    }
-
-    const existingTechnicalIds = new Set(networks.map((network) => network.technicalId));
-    const technicalId = buildUniqueNetworkTechnicalId(activeNetwork.technicalId, existingTechnicalIds);
-    const nowIso = new Date().toISOString();
-    dispatchAction(
-      appActions.duplicateNetwork(activeNetwork.id, {
-        id: createEntityId("net") as NetworkId,
-        name: `${activeNetwork.name} (Copy)`,
-        technicalId,
-        description: activeNetwork.description,
-        createdAt: nowIso,
-        updatedAt: nowIso
-      })
-    );
-    setNetworkFormError(null);
-  }
-
-  function handleDeleteActiveNetwork(): void {
-    if (activeNetwork === null) {
-      return;
-    }
-
-    if (typeof window !== "undefined" && typeof window.confirm === "function") {
-      const shouldDelete = window.confirm(
-        `Delete network '${activeNetwork.name}' (${activeNetwork.technicalId})?`
-      );
-      if (!shouldDelete) {
-        return;
-      }
-    }
-
-    dispatchAction(appActions.deleteNetwork(activeNetwork.id));
-    setNetworkFormError(null);
-  }
-
-  function handleRecreateSampleNetwork(): void {
-    if (!isCurrentWorkspaceEmpty) {
-      return;
-    }
-
-    replaceStateWithHistory(createSampleNetworkState());
-  }
-
-  function handleResetSampleNetwork(): void {
-    if (!hasBuiltInSampleState) {
-      return;
-    }
-
-    if (typeof window !== "undefined" && typeof window.confirm === "function") {
-      const shouldReset = window.confirm(
-        "Reset the sample network to baseline? This removes any changes made to sample entities."
-      );
-      if (!shouldReset) {
-        return;
-      }
-    }
-
-    replaceStateWithHistory(createSampleNetworkState());
-  }
-
-  function resetNetworkViewToConfiguredScale(): void {
-    setNetworkScale(configuredResetScale);
-    setNetworkOffset({ x: 0, y: 0 });
-  }
-
-  function fitNetworkToContent(): void {
-    if (nodes.length === 0) {
-      return;
-    }
-
-    const positions = nodes
-      .map((node) => networkNodePositions[node.id])
-      .filter((position): position is NodePosition => position !== undefined);
-    if (positions.length === 0) {
-      return;
-    }
-
-    const firstPosition = positions[0];
-    if (firstPosition === undefined) {
-      return;
-    }
-
-    let minX = firstPosition.x;
-    let maxX = firstPosition.x;
-    let minY = firstPosition.y;
-    let maxY = firstPosition.y;
-    for (const position of positions.slice(1)) {
-      if (position.x < minX) {
-        minX = position.x;
-      }
-      if (position.x > maxX) {
-        maxX = position.x;
-      }
-      if (position.y < minY) {
-        minY = position.y;
-      }
-      if (position.y > maxY) {
-        maxY = position.y;
-      }
-    }
-
-    const fitPadding = 36;
-    const contentWidth = Math.max(1, maxX - minX);
-    const contentHeight = Math.max(1, maxY - minY);
-    const availableWidth = Math.max(1, NETWORK_VIEW_WIDTH - fitPadding * 2);
-    const availableHeight = Math.max(1, NETWORK_VIEW_HEIGHT - fitPadding * 2);
-    const fittedScale = clamp(
-      Math.min(availableWidth / contentWidth, availableHeight / contentHeight),
-      NETWORK_MIN_SCALE,
-      NETWORK_MAX_SCALE
-    );
-
-    const centerX = (minX + maxX) / 2;
-    const centerY = (minY + maxY) / 2;
-    setNetworkScale(fittedScale);
-    setNetworkOffset({
-      x: NETWORK_VIEW_WIDTH / 2 - centerX * fittedScale,
-      y: NETWORK_VIEW_HEIGHT / 2 - centerY * fittedScale
-    });
-  }
-
-  function applyListSortDefaults(): void {
-    setConnectorSort({ field: defaultSortField, direction: defaultSortDirection });
-    setSpliceSort({ field: defaultSortField, direction: defaultSortDirection });
-    setWireSort({ field: defaultSortField, direction: defaultSortDirection });
-    setConnectorSynthesisSort({ field: defaultSortField, direction: defaultSortDirection });
-    setSpliceSynthesisSort({ field: defaultSortField, direction: defaultSortDirection });
-    setNodeIdSortDirection(defaultIdSortDirection);
-    setSegmentIdSortDirection(defaultIdSortDirection);
-  }
-
-  function applyCanvasDefaultsNow(): void {
-    setShowNetworkGrid(canvasDefaultShowGrid);
-    setSnapNodesToGrid(canvasDefaultSnapToGrid);
-    resetNetworkViewToConfiguredScale();
-  }
-
-  function handleToggleThemeMode(): void {
-    setThemeMode((current) => (current === "normal" ? "dark" : "normal"));
-  }
-
-  function resetWorkspacePreferencesToDefaults(): void {
-    const defaultSort: SortState = { field: "name", direction: "asc" };
-    setThemeMode("normal");
-    setTableDensity("comfortable");
-    setDefaultSortField("name");
-    setDefaultSortDirection("asc");
-    setDefaultIdSortDirection("asc");
-    setConnectorSort(defaultSort);
-    setSpliceSort(defaultSort);
-    setWireSort(defaultSort);
-    setConnectorSynthesisSort(defaultSort);
-    setSpliceSynthesisSort(defaultSort);
-    setNodeIdSortDirection("asc");
-    setSegmentIdSortDirection("asc");
-    setCanvasDefaultShowGrid(true);
-    setCanvasDefaultSnapToGrid(false);
-    setCanvasResetZoomPercentInput("100");
-    setShowNetworkGrid(true);
-    setSnapNodesToGrid(false);
-    setNetworkScale(1);
-    setNetworkOffset({ x: 0, y: 0 });
-    setShowShortcutHints(true);
-    setKeyboardShortcutsEnabled(true);
-  }
+  const {
+    handleCreateNetwork,
+    handleSelectNetwork,
+    handleRenameActiveNetwork,
+    handleDuplicateActiveNetwork,
+    handleDeleteActiveNetwork,
+    handleRecreateSampleNetwork,
+    handleResetSampleNetwork,
+    resetNetworkViewToConfiguredScale,
+    fitNetworkToContent,
+    applyListSortDefaults,
+    applyCanvasDefaultsNow,
+    handleToggleThemeMode,
+    resetWorkspacePreferencesToDefaults
+  } = useWorkspaceHandlers({
+    store,
+    networks,
+    activeNetwork,
+    newNetworkName,
+    setNewNetworkName,
+    newNetworkTechnicalId,
+    setNewNetworkTechnicalId,
+    newNetworkDescription,
+    setNewNetworkDescription,
+    renameNetworkName,
+    setNetworkFormError,
+    isCurrentWorkspaceEmpty,
+    hasBuiltInSampleState,
+    dispatchAction,
+    replaceStateWithHistory,
+    nodes,
+    networkNodePositions,
+    configuredResetScale,
+    setNetworkScale,
+    setNetworkOffset,
+    canvasDefaultShowGrid,
+    canvasDefaultSnapToGrid,
+    setShowNetworkGrid,
+    setSnapNodesToGrid,
+    defaultSortField,
+    defaultSortDirection,
+    defaultIdSortDirection,
+    setConnectorSort,
+    setSpliceSort,
+    setWireSort,
+    setConnectorSynthesisSort,
+    setSpliceSynthesisSort,
+    setNodeIdSortDirection,
+    setSegmentIdSortDirection,
+    setThemeMode,
+    setTableDensity,
+    setDefaultSortField,
+    setDefaultSortDirection,
+    setDefaultIdSortDirection,
+    setCanvasDefaultShowGrid,
+    setCanvasDefaultSnapToGrid,
+    setCanvasResetZoomPercentInput,
+    setShowShortcutHints,
+    setKeyboardShortcutsEnabled
+  });
 
   useEffect(() => {
     undoActionRef.current = handleUndo;
@@ -1113,15 +740,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setInteractionMode
   });
 
-  function getSortIndicator(sortState: SortState, field: SortField): string {
-    if (sortState.field !== field) {
-      return "";
-    }
-
-    return sortState.direction === "asc" ? "▲" : "▼";
-  }
-
-  function describeNode(node: NetworkNode): string {
+  const describeNode = useCallback((node: NetworkNode): string => {
     if (node.kind === "intermediate") {
       return `Intermediate: ${node.label}`;
     }
@@ -1135,981 +754,256 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
     const splice = spliceMap.get(node.spliceId);
     return splice === undefined ? `Splice node (${node.spliceId})` : `Splice: ${splice.name} (${splice.technicalId})`;
-  }
-
-  function resetConnectorForm(): void {
-    setConnectorFormMode("create");
-    setEditingConnectorId(null);
-    setConnectorName("");
-    setConnectorTechnicalId("");
-    setCavityCount("4");
-    setConnectorFormError(null);
-  }
-
-  function startConnectorEdit(connector: Connector): void {
-    setConnectorFormMode("edit");
-    setEditingConnectorId(connector.id);
-    setConnectorName(connector.name);
-    setConnectorTechnicalId(connector.technicalId);
-    setCavityCount(String(connector.cavityCount));
-    dispatchAction(appActions.select({ kind: "connector", id: connector.id }));
-  }
-
-  function handleConnectorSubmit(event: FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-
-    const trimmedName = connectorName.trim();
-    const trimmedTechnicalId = connectorTechnicalId.trim();
-    const normalizedCavityCount = toPositiveInteger(cavityCount);
-
-    if (trimmedName.length === 0 || trimmedTechnicalId.length === 0 || normalizedCavityCount < 1) {
-      setConnectorFormError("All fields are required and cavity count must be >= 1.");
-      return;
-    }
-    setConnectorFormError(null);
-
-    const connectorId =
-      connectorFormMode === "edit" && editingConnectorId !== null
-        ? editingConnectorId
-        : (createEntityId("conn") as ConnectorId);
-
-    dispatchAction(
-      appActions.upsertConnector({
-        id: connectorId,
-        name: trimmedName,
-        technicalId: trimmedTechnicalId,
-        cavityCount: normalizedCavityCount
-      })
-    );
-
-    const nextState = store.getState();
-    if (nextState.connectors.byId[connectorId] !== undefined) {
-      dispatchAction(appActions.select({ kind: "connector", id: connectorId }));
-      resetConnectorForm();
-    }
-  }
-
-  function handleConnectorDelete(connectorId: ConnectorId): void {
-    dispatchAction(appActions.removeConnector(connectorId));
-
-    if (editingConnectorId === connectorId) {
-      resetConnectorForm();
-    }
-  }
-
-  function handleReserveCavity(event: FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-
-    if (selectedConnectorId === null) {
-      return;
-    }
-
-    const cavityIndex = toPositiveInteger(cavityIndexInput);
-    dispatchAction(appActions.occupyConnectorCavity(selectedConnectorId, cavityIndex, connectorOccupantRefInput));
-  }
-
-  function handleReleaseCavity(cavityIndex: number): void {
-    if (selectedConnectorId === null) {
-      return;
-    }
-
-    dispatchAction(appActions.releaseConnectorCavity(selectedConnectorId, cavityIndex));
-  }
-
-  function resetSpliceForm(): void {
-    setSpliceFormMode("create");
-    setEditingSpliceId(null);
-    setSpliceName("");
-    setSpliceTechnicalId("");
-    setPortCount("4");
-    setSpliceFormError(null);
-  }
-
-  function startSpliceEdit(splice: Splice): void {
-    setSpliceFormMode("edit");
-    setEditingSpliceId(splice.id);
-    setSpliceName(splice.name);
-    setSpliceTechnicalId(splice.technicalId);
-    setPortCount(String(splice.portCount));
-    dispatchAction(appActions.select({ kind: "splice", id: splice.id }));
-  }
-
-  function handleSpliceSubmit(event: FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-
-    const trimmedName = spliceName.trim();
-    const trimmedTechnicalId = spliceTechnicalId.trim();
-    const normalizedPortCount = toPositiveInteger(portCount);
-
-    if (trimmedName.length === 0 || trimmedTechnicalId.length === 0 || normalizedPortCount < 1) {
-      setSpliceFormError("All fields are required and port count must be >= 1.");
-      return;
-    }
-    setSpliceFormError(null);
-
-    const spliceId =
-      spliceFormMode === "edit" && editingSpliceId !== null
-        ? editingSpliceId
-        : (createEntityId("splice") as SpliceId);
-
-    dispatchAction(
-      appActions.upsertSplice({
-        id: spliceId,
-        name: trimmedName,
-        technicalId: trimmedTechnicalId,
-        portCount: normalizedPortCount
-      })
-    );
-
-    const nextState = store.getState();
-    if (nextState.splices.byId[spliceId] !== undefined) {
-      dispatchAction(appActions.select({ kind: "splice", id: spliceId }));
-      resetSpliceForm();
-    }
-  }
-
-  function handleSpliceDelete(spliceId: SpliceId): void {
-    dispatchAction(appActions.removeSplice(spliceId));
-
-    if (editingSpliceId === spliceId) {
-      resetSpliceForm();
-    }
-  }
-
-  function handleReservePort(event: FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-
-    if (selectedSpliceId === null) {
-      return;
-    }
-
-    const portIndex = toPositiveInteger(portIndexInput);
-    dispatchAction(appActions.occupySplicePort(selectedSpliceId, portIndex, spliceOccupantRefInput));
-  }
-
-  function handleReleasePort(portIndex: number): void {
-    if (selectedSpliceId === null) {
-      return;
-    }
-
-    dispatchAction(appActions.releaseSplicePort(selectedSpliceId, portIndex));
-  }
-
-  function resetNodeForm(): void {
-    setNodeFormMode("create");
-    setEditingNodeId(null);
-    setNodeIdInput("");
-    setNodeKind("intermediate");
-    setNodeConnectorId("");
-    setNodeSpliceId("");
-    setNodeLabel("");
-    setNodeFormError(null);
-    setPendingNewNodePosition(null);
-  }
-
-  function startNodeEdit(node: NetworkNode): void {
-    setNodeFormMode("edit");
-    setEditingNodeId(node.id);
-    setNodeIdInput(node.id);
-    setNodeKind(node.kind);
-    setNodeLabel(node.kind === "intermediate" ? node.label : "");
-    setNodeConnectorId(node.kind === "connector" ? node.connectorId : "");
-    setNodeSpliceId(node.kind === "splice" ? node.spliceId : "");
-    dispatchAction(appActions.select({ kind: "node", id: node.id }));
-  }
-
-  function handleNodeSubmit(event: FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-
-    const normalizedNodeId = nodeIdInput.trim();
-    const nodeId = (nodeFormMode === "edit" && editingNodeId !== null
-      ? editingNodeId
-      : normalizedNodeId) as NodeId;
-
-    if (nodeFormMode === "create") {
-      if (normalizedNodeId.length === 0) {
-        setNodeFormError("Node ID is required.");
-        return;
-      }
-
-      if (state.nodes.byId[nodeId] !== undefined) {
-        setNodeFormError(`Node ID '${normalizedNodeId}' already exists.`);
-        return;
-      }
-    }
-
-    if (nodeKind === "intermediate") {
-      const trimmedLabel = nodeLabel.trim();
-      if (trimmedLabel.length === 0) {
-        setNodeFormError("Intermediate node label is required.");
-        return;
-      }
-
-      setNodeFormError(null);
-      dispatchAction(appActions.upsertNode({ id: nodeId, kind: "intermediate", label: trimmedLabel }));
-    }
-
-    if (nodeKind === "connector") {
-      if (nodeConnectorId.length === 0) {
-        setNodeFormError("Select a connector to create a connector node.");
-        return;
-      }
-
-      setNodeFormError(null);
-      dispatchAction(
-        appActions.upsertNode({
-          id: nodeId,
-          kind: "connector",
-          connectorId: nodeConnectorId as ConnectorId
-        })
-      );
-    }
-
-    if (nodeKind === "splice") {
-      if (nodeSpliceId.length === 0) {
-        setNodeFormError("Select a splice to create a splice node.");
-        return;
-      }
-
-      setNodeFormError(null);
-      dispatchAction(
-        appActions.upsertNode({
-          id: nodeId,
-          kind: "splice",
-          spliceId: nodeSpliceId as SpliceId
-        })
-      );
-    }
-
-    const nextState = store.getState();
-    if (nextState.nodes.byId[nodeId] !== undefined) {
-      if (pendingNewNodePosition !== null) {
-        setManualNodePositions((previous) => ({
-          ...previous,
-          [nodeId]: pendingNewNodePosition
-        }));
-      }
-      dispatchAction(appActions.select({ kind: "node", id: nodeId }));
-      resetNodeForm();
-    }
-  }
-
-  function handleNodeDelete(nodeId: NodeId): void {
-    dispatchAction(appActions.removeNode(nodeId));
-
-    if (editingNodeId === nodeId) {
-      resetNodeForm();
-    }
-  }
-
-  function resetSegmentForm(): void {
-    setSegmentFormMode("create");
-    setEditingSegmentId(null);
-    setSegmentIdInput("");
-    setSegmentNodeA("");
-    setSegmentNodeB("");
-    setSegmentLengthMm("120");
-    setSegmentSubNetworkTag("");
-    setSegmentFormError(null);
-  }
-
-  function startSegmentEdit(segment: Segment): void {
-    setSegmentFormMode("edit");
-    setEditingSegmentId(segment.id);
-    setSegmentIdInput(segment.id);
-    setSegmentNodeA(segment.nodeA);
-    setSegmentNodeB(segment.nodeB);
-    setSegmentLengthMm(String(segment.lengthMm));
-    setSegmentSubNetworkTag(segment.subNetworkTag ?? "");
-    dispatchAction(appActions.select({ kind: "segment", id: segment.id }));
-  }
-
-  function handleSegmentSubmit(event: FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-
-    const normalizedSegmentId = segmentIdInput.trim();
-    const segmentId = (segmentFormMode === "edit" && editingSegmentId !== null
-      ? editingSegmentId
-      : normalizedSegmentId) as SegmentId;
-
-    if (segmentFormMode === "create") {
-      if (normalizedSegmentId.length === 0) {
-        setSegmentFormError("Segment ID is required.");
-        return;
-      }
-
-      if (state.segments.byId[segmentId] !== undefined) {
-        setSegmentFormError(`Segment ID '${normalizedSegmentId}' already exists.`);
-        return;
-      }
-    }
-
-    if (segmentNodeA.length === 0 || segmentNodeB.length === 0) {
-      setSegmentFormError("Both segment endpoints are required.");
-      return;
-    }
-
-    const lengthMm = toPositiveNumber(segmentLengthMm);
-    if (lengthMm <= 0) {
-      setSegmentFormError("Segment length must be > 0.");
-      return;
-    }
-
-    setSegmentFormError(null);
-
-    dispatchAction(
-      appActions.upsertSegment({
-        id: segmentId,
-        nodeA: segmentNodeA as NodeId,
-        nodeB: segmentNodeB as NodeId,
-        lengthMm,
-        subNetworkTag: segmentSubNetworkTag
-      })
-    );
-
-    const nextState = store.getState();
-    if (nextState.segments.byId[segmentId] !== undefined) {
-      dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
-      resetSegmentForm();
-    }
-  }
-
-  function handleSegmentDelete(segmentId: SegmentId): void {
-    dispatchAction(appActions.removeSegment(segmentId));
-
-    if (editingSegmentId === segmentId) {
-      resetSegmentForm();
-    }
-  }
-
-  function resetWireForm(): void {
-    setWireFormMode("create");
-    setEditingWireId(null);
-    setWireName("");
-    setWireTechnicalId("");
-    setWireEndpointAKind("connectorCavity");
-    setWireEndpointAConnectorId("");
-    setWireEndpointACavityIndex("1");
-    setWireEndpointASpliceId("");
-    setWireEndpointAPortIndex("1");
-    setWireEndpointBKind("splicePort");
-    setWireEndpointBConnectorId("");
-    setWireEndpointBCavityIndex("1");
-    setWireEndpointBSpliceId("");
-    setWireEndpointBPortIndex("1");
-    setWireForcedRouteInput("");
-    setWireFormError(null);
-  }
-
-  function startWireEdit(wire: Wire): void {
-    setWireFormMode("edit");
-    setEditingWireId(wire.id);
-    setWireName(wire.name);
-    setWireTechnicalId(wire.technicalId);
-    setWireEndpointAKind(wire.endpointA.kind);
-    if (wire.endpointA.kind === "connectorCavity") {
-      setWireEndpointAConnectorId(wire.endpointA.connectorId);
-      setWireEndpointACavityIndex(String(wire.endpointA.cavityIndex));
-      setWireEndpointASpliceId("");
-      setWireEndpointAPortIndex("1");
-    } else {
-      setWireEndpointASpliceId(wire.endpointA.spliceId);
-      setWireEndpointAPortIndex(String(wire.endpointA.portIndex));
-      setWireEndpointAConnectorId("");
-      setWireEndpointACavityIndex("1");
-    }
-
-    setWireEndpointBKind(wire.endpointB.kind);
-    if (wire.endpointB.kind === "connectorCavity") {
-      setWireEndpointBConnectorId(wire.endpointB.connectorId);
-      setWireEndpointBCavityIndex(String(wire.endpointB.cavityIndex));
-      setWireEndpointBSpliceId("");
-      setWireEndpointBPortIndex("1");
-    } else {
-      setWireEndpointBSpliceId(wire.endpointB.spliceId);
-      setWireEndpointBPortIndex(String(wire.endpointB.portIndex));
-      setWireEndpointBConnectorId("");
-      setWireEndpointBCavityIndex("1");
-    }
-
-    setWireForcedRouteInput(wire.routeSegmentIds.join(", "));
-    dispatchAction(appActions.select({ kind: "wire", id: wire.id }));
-  }
-
-  function buildWireEndpoint(side: "A" | "B"): WireEndpoint | null {
-    if (side === "A") {
-      if (wireEndpointAKind === "connectorCavity") {
-        if (wireEndpointAConnectorId.length === 0) {
-          setWireFormError("Endpoint A connector is required.");
-          return null;
-        }
-
-        return {
-          kind: "connectorCavity",
-          connectorId: wireEndpointAConnectorId as ConnectorId,
-          cavityIndex: toPositiveInteger(wireEndpointACavityIndex)
-        };
-      }
-
-      if (wireEndpointASpliceId.length === 0) {
-        setWireFormError("Endpoint A splice is required.");
-        return null;
-      }
-
-      return {
-        kind: "splicePort",
-        spliceId: wireEndpointASpliceId as SpliceId,
-        portIndex: toPositiveInteger(wireEndpointAPortIndex)
-      };
-    }
-
-    if (wireEndpointBKind === "connectorCavity") {
-      if (wireEndpointBConnectorId.length === 0) {
-        setWireFormError("Endpoint B connector is required.");
-        return null;
-      }
-
-      return {
-        kind: "connectorCavity",
-        connectorId: wireEndpointBConnectorId as ConnectorId,
-        cavityIndex: toPositiveInteger(wireEndpointBCavityIndex)
-      };
-    }
-
-    if (wireEndpointBSpliceId.length === 0) {
-      setWireFormError("Endpoint B splice is required.");
-      return null;
-    }
-
-    return {
-      kind: "splicePort",
-      spliceId: wireEndpointBSpliceId as SpliceId,
-      portIndex: toPositiveInteger(wireEndpointBPortIndex)
-    };
-  }
-
-  function handleWireSubmit(event: FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-
-    const normalizedName = wireName.trim();
-    const normalizedTechnicalId = wireTechnicalId.trim();
-    if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
-      setWireFormError("Wire name and technical ID are required.");
-      return;
-    }
-
-    const endpointA = buildWireEndpoint("A");
-    const endpointB = buildWireEndpoint("B");
-    if (endpointA === null || endpointB === null) {
-      return;
-    }
-
-    setWireFormError(null);
-
-    const wireId = wireFormMode === "edit" && editingWireId !== null ? editingWireId : (createEntityId("wire") as WireId);
-    dispatchAction(
-      appActions.saveWire({
-        id: wireId,
-        name: normalizedName,
-        technicalId: normalizedTechnicalId,
-        endpointA,
-        endpointB
-      })
-    );
-
-    const nextState = store.getState();
-    if (nextState.wires.byId[wireId] !== undefined) {
-      dispatchAction(appActions.select({ kind: "wire", id: wireId }));
-      resetWireForm();
-      setWireForcedRouteInput(nextState.wires.byId[wireId].routeSegmentIds.join(", "));
-    }
-  }
-
-  function handleWireDelete(wireId: WireId): void {
-    dispatchAction(appActions.removeWire(wireId));
-    if (editingWireId === wireId) {
-      resetWireForm();
-    }
-  }
-
-  function handleLockWireRoute(): void {
-    if (selectedWire === null) {
-      return;
-    }
-
-    const forcedSegmentIds = wireForcedRouteInput
-      .split(",")
-      .map((token) => token.trim())
-      .filter((token) => token.length > 0) as SegmentId[];
-
-    if (forcedSegmentIds.length === 0) {
-      setWireFormError("Provide at least one segment ID to lock a forced route.");
-      return;
-    }
-
-    setWireFormError(null);
-    dispatchAction(appActions.lockWireRoute(selectedWire.id, forcedSegmentIds));
-  }
-
-  function handleResetWireRoute(): void {
-    if (selectedWire === null) {
-      return;
-    }
-
-    setWireFormError(null);
-    dispatchAction(appActions.resetWireRoute(selectedWire.id));
-    const nextState = store.getState();
-    const updatedWire = nextState.wires.byId[selectedWire.id];
-    if (updatedWire !== undefined) {
-      setWireForcedRouteInput(updatedWire.routeSegmentIds.join(", "));
-    }
-  }
-
-  function resolveSelectionAnchor(target: SelectionTarget): NodePosition | null {
-    if (target.kind === "node") {
-      return networkNodePositions[target.id as NodeId] ?? null;
-    }
-
-    if (target.kind === "segment") {
-      const segment = segmentMap.get(target.id as SegmentId);
-      if (segment === undefined) {
-        return null;
-      }
-
-      const nodeAPosition = networkNodePositions[segment.nodeA];
-      const nodeBPosition = networkNodePositions[segment.nodeB];
-      if (nodeAPosition === undefined || nodeBPosition === undefined) {
-        return null;
-      }
-
-      return {
-        x: (nodeAPosition.x + nodeBPosition.x) / 2,
-        y: (nodeAPosition.y + nodeBPosition.y) / 2
-      };
-    }
-
-    if (target.kind === "connector") {
-      const nodeId = connectorNodeByConnectorId.get(target.id as ConnectorId);
-      if (nodeId === undefined) {
-        return null;
-      }
-
-      return networkNodePositions[nodeId] ?? null;
-    }
-
-    if (target.kind === "splice") {
-      const nodeId = spliceNodeBySpliceId.get(target.id as SpliceId);
-      if (nodeId === undefined) {
-        return null;
-      }
-
-      return networkNodePositions[nodeId] ?? null;
-    }
-
-    const wire = state.wires.byId[target.id as WireId];
-    if (wire === undefined) {
-      return null;
-    }
-
-    const firstSegmentId = wire.routeSegmentIds[0];
-    if (firstSegmentId !== undefined) {
-      const firstSegment = segmentMap.get(firstSegmentId);
-      if (firstSegment !== undefined) {
-        const nodeAPosition = networkNodePositions[firstSegment.nodeA];
-        const nodeBPosition = networkNodePositions[firstSegment.nodeB];
-        if (nodeAPosition !== undefined && nodeBPosition !== undefined) {
-          return {
-            x: (nodeAPosition.x + nodeBPosition.x) / 2,
-            y: (nodeAPosition.y + nodeBPosition.y) / 2
-          };
-        }
-      }
-    }
-
-    const endpointNodeId = resolveEndpointNodeId(wire.endpointA, connectorNodeByConnectorId, spliceNodeBySpliceId);
-    if (endpointNodeId !== null) {
-      return networkNodePositions[endpointNodeId] ?? null;
-    }
-
-    return null;
-  }
-
-  function focusSelectionOnCanvas(target: SelectionTarget): void {
-    const anchor = resolveSelectionAnchor(target);
-    if (anchor === null) {
-      return;
-    }
-
-    setInteractionMode("select");
-    const targetScale = networkScale < 1 ? 1 : networkScale;
-    setNetworkScale(targetScale);
-    setNetworkOffset({
-      x: NETWORK_VIEW_WIDTH / 2 - anchor.x * targetScale,
-      y: NETWORK_VIEW_HEIGHT / 2 - anchor.y * targetScale
-    });
-  }
-
-  function handleFocusCurrentSelectionOnCanvas(): void {
-    if (selected === null) {
-      return;
-    }
-
-    focusSelectionOnCanvas({
-      kind: selected.kind,
-      id: selected.id
-    });
-  }
-
-  function handleValidationIssueGoTo(issue: ValidationIssue): void {
-    setActiveScreen("modeling");
-    setActiveSubScreen(issue.subScreen);
-    dispatchAction(
-      appActions.select({
-        kind: issue.selectionKind,
-        id: issue.selectionId
-      })
-    );
-    focusSelectionOnCanvas({
-      kind: issue.selectionKind,
-      id: issue.selectionId
-    });
-  }
-
-  function handleOpenValidationScreen(filter: ValidationSeverityFilter): void {
-    setValidationSearchQuery("");
-    setValidationCategoryFilter("all");
-    setValidationSeverityFilter(filter);
-    setActiveScreen("validation");
-  }
-
-  function moveValidationIssueCursorInList(direction: 1 | -1, issues: ValidationIssue[]): void {
-    if (issues.length === 0) {
-      return;
-    }
-
-    const currentIssue = getFocusedValidationIssueByCursor();
-    const currentIssueIndex = currentIssue === null ? -1 : issues.findIndex((issue) => issue.id === currentIssue.id);
-    const baseIndex = currentIssueIndex < 0 ? (direction > 0 ? -1 : 0) : currentIssueIndex;
-    const nextIndex = (baseIndex + direction + issues.length) % issues.length;
-    const issue = issues[nextIndex];
-    if (issue === undefined) {
-      return;
-    }
-
-    setValidationIssueCursorFromIssue(issue);
-    handleValidationIssueGoTo(issue);
-  }
-
-  function moveValidationIssueCursor(direction: 1 | -1): void {
-    moveValidationIssueCursorInList(direction, orderedValidationIssues);
-  }
-
-  function moveVisibleValidationIssueCursor(direction: 1 | -1): void {
-    moveValidationIssueCursorInList(direction, visibleValidationIssues);
-  }
-
-  function handleValidationIssueRowGoTo(issue: ValidationIssue): void {
-    setValidationIssueCursorFromIssue(issue);
-    handleValidationIssueGoTo(issue);
-  }
-
-  function handleOpenSelectionInInspector(): void {
-    if (selectedSubScreen === null) {
-      return;
-    }
-
-    setActiveScreen("modeling");
-    setActiveSubScreen(selectedSubScreen);
-  }
-
-  function handleStartSelectedEdit(): void {
-    if (selectedSubScreen === null) {
-      return;
-    }
-
-    setActiveScreen("modeling");
-    setActiveSubScreen(selectedSubScreen);
-
-    if (selectedConnector !== null) {
-      startConnectorEdit(selectedConnector);
-      return;
-    }
-
-    if (selectedSplice !== null) {
-      startSpliceEdit(selectedSplice);
-      return;
-    }
-
-    if (selectedNode !== null) {
-      startNodeEdit(selectedNode);
-      return;
-    }
-
-    if (selectedSegment !== null) {
-      startSegmentEdit(selectedSegment);
-      return;
-    }
-
-    if (selectedWire !== null) {
-      startWireEdit(selectedWire);
-    }
-  }
-
-  function applyNodeToWireEndpoint(side: "A" | "B", node: NetworkNode): boolean {
-    if (node.kind === "intermediate") {
-      setWireFormError("Connect mode only supports connector/splice nodes as wire endpoints.");
-      return false;
-    }
-
-    if (side === "A") {
-      if (node.kind === "connector") {
-        setWireEndpointAKind("connectorCavity");
-        setWireEndpointAConnectorId(node.connectorId);
-      } else {
-        setWireEndpointAKind("splicePort");
-        setWireEndpointASpliceId(node.spliceId);
-      }
-      return true;
-    }
-
-    if (node.kind === "connector") {
-      setWireEndpointBKind("connectorCavity");
-      setWireEndpointBConnectorId(node.connectorId);
-    } else {
-      setWireEndpointBKind("splicePort");
-      setWireEndpointBSpliceId(node.spliceId);
-    }
-    return true;
-  }
-
-  function handleNetworkSegmentClick(segmentId: SegmentId): void {
-    if (interactionMode !== "select") {
-      return;
-    }
-    dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
-  }
-
-  function handleNetworkNodeClick(nodeId: NodeId): void {
-    const node = state.nodes.byId[nodeId];
-    if (node === undefined) {
-      return;
-    }
-
-    if (interactionMode === "select") {
-      dispatchAction(appActions.select({ kind: "node", id: nodeId }));
-      return;
-    }
-
-    if (interactionMode === "addSegment") {
-      setActiveScreen("modeling");
-      setActiveSubScreen("segment");
-      setSegmentFormMode("create");
-      setEditingSegmentId(null);
-      setSegmentFormError(null);
-      if (modeAnchorNodeId === null) {
-        setModeAnchorNodeId(nodeId);
-        setSegmentNodeA(nodeId);
-        setSegmentNodeB("");
-        return;
-      }
-
-      if (modeAnchorNodeId === nodeId) {
-        setModeAnchorNodeId(null);
-        setSegmentNodeB("");
-        return;
-      }
-
-      setSegmentNodeA(modeAnchorNodeId);
-      setSegmentNodeB(nodeId);
-      setModeAnchorNodeId(null);
-      return;
-    }
-
-    if (interactionMode === "route") {
-      setActiveScreen("analysis");
-      setActiveSubScreen("segment");
-      if (routePreviewStartNodeId.length === 0 || routePreviewEndNodeId.length > 0) {
-        setRoutePreviewStartNodeId(nodeId);
-        setRoutePreviewEndNodeId("");
-      } else {
-        setRoutePreviewEndNodeId(nodeId);
-      }
-      return;
-    }
-
-    if (interactionMode === "connect") {
-      setActiveScreen("modeling");
-      setActiveSubScreen("wire");
-      setWireFormMode("create");
-      setEditingWireId(null);
-
-      if (modeAnchorNodeId === null) {
-        if (!applyNodeToWireEndpoint("A", node)) {
-          return;
-        }
-
-        setWireFormError(null);
-        setModeAnchorNodeId(nodeId);
-        return;
-      }
-
-      if (modeAnchorNodeId === nodeId) {
-        setWireFormError("Connect mode expects two distinct endpoint nodes.");
-        return;
-      }
-
-      if (!applyNodeToWireEndpoint("B", node)) {
-        return;
-      }
-
-      setModeAnchorNodeId(null);
-      setWireFormError(null);
-      return;
-    }
-  }
-
-  function handleNetworkCanvasClick(event: ReactMouseEvent<SVGSVGElement>): void {
-    if (interactionMode !== "addNode") {
-      return;
-    }
-
-    if (event.target !== event.currentTarget) {
-      return;
-    }
-
-    const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
-    if (coordinates === null) {
-      return;
-    }
-
-    setActiveScreen("modeling");
-    setActiveSubScreen("node");
-    setNodeFormMode("create");
-    setEditingNodeId(null);
-    setNodeKind("intermediate");
-    setNodeIdInput("");
-    setNodeConnectorId("");
-    setNodeSpliceId("");
-    setNodeLabel(`N-branch-${nodes.length + 1}`);
-    setNodeFormError(null);
-    setPendingNewNodePosition(coordinates);
-  }
-
-  function getLocalSvgPoint(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
-    const bounds = svgElement.getBoundingClientRect();
-    if (bounds.width <= 0 || bounds.height <= 0) {
-      return null;
-    }
-
-    return {
-      x: ((clientX - bounds.left) / bounds.width) * NETWORK_VIEW_WIDTH,
-      y: ((clientY - bounds.top) / bounds.height) * NETWORK_VIEW_HEIGHT
-    };
-  }
-
-  function getSvgCoordinates(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
-    const localPoint = getLocalSvgPoint(svgElement, clientX, clientY);
-    if (localPoint === null) {
-      return null;
-    }
-
-    const localX = localPoint.x;
-    const localY = localPoint.y;
-    const modelX = (localX - networkOffset.x) / networkScale;
-    const modelY = (localY - networkOffset.y) / networkScale;
-    const snappedX = snapNodesToGrid ? snapToGrid(modelX, NETWORK_GRID_STEP) : modelX;
-    const snappedY = snapNodesToGrid ? snapToGrid(modelY, NETWORK_GRID_STEP) : modelY;
-
-    return {
-      x: clamp(snappedX, 20, NETWORK_VIEW_WIDTH - 20),
-      y: clamp(snappedY, 20, NETWORK_VIEW_HEIGHT - 20)
-    };
-  }
-
-  function handleNetworkNodeMouseDown(event: ReactMouseEvent<SVGGElement>, nodeId: NodeId): void {
-    if (interactionMode !== "select") {
-      return;
-    }
-    event.preventDefault();
-    setDraggingNodeId(nodeId);
-    handleNetworkNodeClick(nodeId);
-  }
-
-  function handleNetworkCanvasMouseDown(event: ReactMouseEvent<SVGSVGElement>): void {
-    if (!event.shiftKey) {
-      return;
-    }
-
-    if (event.target !== event.currentTarget) {
-      return;
-    }
-
-    event.preventDefault();
-    panStartRef.current = {
-      clientX: event.clientX,
-      clientY: event.clientY,
-      offsetX: networkOffset.x,
-      offsetY: networkOffset.y
-    };
-    setIsPanningNetwork(true);
-  }
-
-  function handleNetworkWheel(event: ReactWheelEvent<SVGSVGElement>): void {
-    event.preventDefault();
-  }
-
-  function handleZoomAction(target: "in" | "out" | "reset"): void {
-    if (target === "reset") {
-      resetNetworkViewToConfiguredScale();
-      return;
-    }
-
-    setNetworkScale((current) =>
-      clamp(current * (target === "in" ? 1.12 : 0.88), NETWORK_MIN_SCALE, NETWORK_MAX_SCALE)
-    );
-  }
-
-  function handleNetworkMouseMove(event: ReactMouseEvent<SVGSVGElement>): void {
-    if (draggingNodeId === null) {
-      if (panStartRef.current === null) {
-        return;
-      }
-
-      const bounds = event.currentTarget.getBoundingClientRect();
-      if (bounds.width <= 0 || bounds.height <= 0) {
-        return;
-      }
-
-      const deltaX = ((event.clientX - panStartRef.current.clientX) / bounds.width) * NETWORK_VIEW_WIDTH;
-      const deltaY = ((event.clientY - panStartRef.current.clientY) / bounds.height) * NETWORK_VIEW_HEIGHT;
-      setNetworkOffset({
-        x: panStartRef.current.offsetX + deltaX,
-        y: panStartRef.current.offsetY + deltaY
-      });
-      return;
-    }
-
-    const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
-    if (coordinates === null) {
-      return;
-    }
-
-    setManualNodePositions((previous) => ({
-      ...previous,
-      [draggingNodeId]: coordinates
-    }));
-  }
-
-  function stopNetworkNodeDrag(): void {
-    if (draggingNodeId !== null) {
-      setDraggingNodeId(null);
-    }
-
-    if (panStartRef.current !== null) {
-      panStartRef.current = null;
-      setIsPanningNetwork(false);
-    }
-  }
+  }, [connectorMap, spliceMap]);
+  const nodeLabelById = useMemo(() => {
+    const result = new Map<NodeId, string>();
+    for (const node of nodes) {
+      result.set(node.id, describeNode(node));
+    }
+    return result;
+  }, [describeNode, nodes]);
+
+  const {
+    resetConnectorForm,
+    startConnectorEdit,
+    handleConnectorSubmit,
+    handleConnectorDelete,
+    handleReserveCavity,
+    handleReleaseCavity
+  } = useConnectorHandlers({
+    store,
+    dispatchAction,
+    connectorFormMode,
+    setConnectorFormMode,
+    editingConnectorId,
+    setEditingConnectorId,
+    connectorName,
+    setConnectorName,
+    connectorTechnicalId,
+    setConnectorTechnicalId,
+    cavityCount,
+    setCavityCount,
+    setConnectorFormError,
+    selectedConnectorId,
+    cavityIndexInput,
+    connectorOccupantRefInput
+  });
+
+  const {
+    resetSpliceForm,
+    startSpliceEdit,
+    handleSpliceSubmit,
+    handleSpliceDelete,
+    handleReservePort,
+    handleReleasePort
+  } = useSpliceHandlers({
+    store,
+    dispatchAction,
+    spliceFormMode,
+    setSpliceFormMode,
+    editingSpliceId,
+    setEditingSpliceId,
+    spliceName,
+    setSpliceName,
+    spliceTechnicalId,
+    setSpliceTechnicalId,
+    portCount,
+    setPortCount,
+    setSpliceFormError,
+    selectedSpliceId,
+    portIndexInput,
+    spliceOccupantRefInput
+  });
+
+  const { resetNodeForm, startNodeEdit, handleNodeSubmit, handleNodeDelete } = useNodeHandlers({
+    store,
+    state,
+    dispatchAction,
+    nodeFormMode,
+    setNodeFormMode,
+    editingNodeId,
+    setEditingNodeId,
+    nodeIdInput,
+    setNodeIdInput,
+    nodeKind,
+    setNodeKind,
+    nodeConnectorId,
+    setNodeConnectorId,
+    nodeSpliceId,
+    setNodeSpliceId,
+    nodeLabel,
+    setNodeLabel,
+    setNodeFormError,
+    pendingNewNodePosition,
+    setPendingNewNodePosition,
+    setManualNodePositions
+  });
+
+  const { resetSegmentForm, startSegmentEdit, handleSegmentSubmit, handleSegmentDelete } = useSegmentHandlers({
+    store,
+    state,
+    dispatchAction,
+    segmentFormMode,
+    setSegmentFormMode,
+    editingSegmentId,
+    setEditingSegmentId,
+    segmentIdInput,
+    setSegmentIdInput,
+    segmentNodeA,
+    setSegmentNodeA,
+    segmentNodeB,
+    setSegmentNodeB,
+    segmentLengthMm,
+    setSegmentLengthMm,
+    segmentSubNetworkTag,
+    setSegmentSubNetworkTag,
+    setSegmentFormError
+  });
+
+  const {
+    resetWireForm,
+    startWireEdit,
+    handleWireSubmit,
+    handleWireDelete,
+    handleLockWireRoute,
+    handleResetWireRoute
+  } = useWireHandlers({
+    store,
+    dispatchAction,
+    wireFormMode,
+    setWireFormMode,
+    editingWireId,
+    setEditingWireId,
+    wireName,
+    setWireName,
+    wireTechnicalId,
+    setWireTechnicalId,
+    wireEndpointAKind,
+    setWireEndpointAKind,
+    wireEndpointAConnectorId,
+    setWireEndpointAConnectorId,
+    wireEndpointACavityIndex,
+    setWireEndpointACavityIndex,
+    wireEndpointASpliceId,
+    setWireEndpointASpliceId,
+    wireEndpointAPortIndex,
+    setWireEndpointAPortIndex,
+    wireEndpointBKind,
+    setWireEndpointBKind,
+    wireEndpointBConnectorId,
+    setWireEndpointBConnectorId,
+    wireEndpointBCavityIndex,
+    setWireEndpointBCavityIndex,
+    wireEndpointBSpliceId,
+    setWireEndpointBSpliceId,
+    wireEndpointBPortIndex,
+    setWireEndpointBPortIndex,
+    wireForcedRouteInput,
+    setWireForcedRouteInput,
+    setWireFormError,
+    selectedWire
+  });
+
+  const {
+    handleFocusCurrentSelectionOnCanvas,
+    handleOpenValidationScreen,
+    moveValidationIssueCursor,
+    moveVisibleValidationIssueCursor,
+    handleValidationIssueRowGoTo,
+    handleOpenSelectionInInspector,
+    handleStartSelectedEdit
+  } = useSelectionHandlers({
+    state,
+    dispatchAction,
+    segmentMap,
+    networkNodePositions,
+    connectorNodeByConnectorId,
+    spliceNodeBySpliceId,
+    setInteractionMode,
+    networkScale,
+    setNetworkScale,
+    setNetworkOffset,
+    selected,
+    selectedSubScreen,
+    selectedConnector,
+    selectedSplice,
+    selectedNode,
+    selectedSegment,
+    selectedWire,
+    setActiveScreen,
+    setActiveSubScreen,
+    orderedValidationIssues,
+    visibleValidationIssues,
+    getFocusedValidationIssueByCursor,
+    setValidationIssueCursorFromIssue,
+    setValidationSearchQuery,
+    setValidationCategoryFilter,
+    setValidationSeverityFilter,
+    startConnectorEdit,
+    startSpliceEdit,
+    startNodeEdit,
+    startSegmentEdit,
+    startWireEdit
+  });
+
+  const {
+    handleNetworkSegmentClick,
+    handleNetworkNodeClick,
+    handleNetworkCanvasClick,
+    handleNetworkNodeMouseDown,
+    handleNetworkCanvasMouseDown,
+    handleNetworkWheel,
+    handleZoomAction,
+    handleNetworkMouseMove,
+    stopNetworkNodeDrag
+  } = useCanvasInteractionHandlers({
+    state,
+    nodesCount: nodes.length,
+    interactionMode,
+    modeAnchorNodeId,
+    setModeAnchorNodeId,
+    setActiveScreen,
+    setActiveSubScreen,
+    setSegmentFormMode,
+    setEditingSegmentId,
+    setSegmentFormError,
+    setSegmentNodeA,
+    setSegmentNodeB,
+    setRoutePreviewStartNodeId,
+    routePreviewStartNodeId,
+    setRoutePreviewEndNodeId,
+    routePreviewEndNodeId,
+    setWireFormMode,
+    setEditingWireId,
+    setWireFormError,
+    setWireEndpointAKind,
+    setWireEndpointAConnectorId,
+    setWireEndpointASpliceId,
+    setWireEndpointBKind,
+    setWireEndpointBConnectorId,
+    setWireEndpointBSpliceId,
+    setNodeFormMode,
+    setEditingNodeId,
+    setNodeKind,
+    setNodeIdInput,
+    setNodeConnectorId,
+    setNodeSpliceId,
+    setNodeLabel,
+    setNodeFormError,
+    setPendingNewNodePosition,
+    snapNodesToGrid,
+    networkOffset,
+    networkScale,
+    setNetworkScale,
+    setNetworkOffset,
+    draggingNodeId,
+    setDraggingNodeId,
+    setManualNodePositions,
+    setIsPanningNetwork,
+    panStartRef,
+    dispatchAction,
+    resetNetworkViewToConfiguredScale
+  });
 
   const interactionModeHint =
     interactionMode === "select"
@@ -2220,221 +1114,63 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   return (
     <main className={appShellClassName}>
-      <section className="header-block">
-        <h1>Electrical Plan Editor</h1>
-        <p className="meta-line">
-          Active network: <strong>{activeNetworkLabel}</strong>
-        </p>
-        <div className="row-actions compact">
-          <button type="button" onClick={handleToggleThemeMode}>
-            {themeMode === "dark" ? "Switch to normal mode" : "Switch to dark mode"}
-          </button>
-          <span className="meta-line">Theme: {themeMode === "dark" ? "Dark" : "Normal"}</span>
-        </div>
-      </section>
-
-      {lastError !== null ? (
-        <section className="error-banner" role="alert">
-          <p>{lastError}</p>
-          <button type="button" onClick={() => dispatchAction(appActions.clearError())}>
-            Clear
-          </button>
-        </section>
-      ) : null}
-
-      <section className="stats-grid" aria-label="Entity counters">
-        <article>
-          <h2>Connectors</h2>
-          <p>{connectors.length}</p>
-        </article>
-        <article>
-          <h2>Splices</h2>
-          <p>{splices.length}</p>
-        </article>
-        <article>
-          <h2>Nodes</h2>
-          <p>{nodes.length}</p>
-        </article>
-        <article>
-          <h2>Segments</h2>
-          <p>{segments.length}</p>
-        </article>
-        <article>
-          <h2>Wires</h2>
-          <p>{wires.length}</p>
-        </article>
-      </section>
+      <AppHeaderAndStats
+        activeNetworkLabel={activeNetworkLabel}
+        themeMode={themeMode}
+        onToggleThemeMode={handleToggleThemeMode}
+        lastError={lastError}
+        onClearError={() => dispatchAction(appActions.clearError())}
+        connectorCount={connectors.length}
+        spliceCount={splices.length}
+        nodeCount={nodes.length}
+        segmentCount={segments.length}
+        wireCount={wires.length}
+      />
 
       <section className="workspace-shell">
-        <aside className="workspace-sidebar">
-          <WorkspaceNavigation
-            activeScreen={activeScreen}
-            activeSubScreen={activeSubScreen}
-            isModelingScreen={isModelingScreen}
-            isAnalysisScreen={isAnalysisScreen}
-            isValidationScreen={isValidationScreen}
-            validationIssuesCount={validationIssues.length}
-            validationErrorCount={validationErrorCount}
-            entityCountBySubScreen={entityCountBySubScreen}
-            onScreenChange={setActiveScreen}
-            onSubScreenChange={setActiveSubScreen}
-          />
-
-          <section className="workspace-health" aria-label="Network scope">
-            <h2>Network scope</h2>
-            {networks.length === 0 ? (
-              <p className="empty-copy">
-                No network available. Create one to enable modeling and analysis.
-              </p>
-            ) : (
-              <label>
-                Active network
-                <select
-                  value={activeNetworkId ?? ""}
-                  onChange={(event) => handleSelectNetwork(event.target.value as NetworkId)}
-                >
-                  {networks.map((network) => (
-                    <option key={network.id} value={network.id}>
-                      {network.name} ({network.technicalId})
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
-            <div className="row-actions compact">
-              <button type="button" onClick={handleDuplicateActiveNetwork} disabled={!hasActiveNetwork}>
-                Duplicate
-              </button>
-              <button type="button" onClick={handleDeleteActiveNetwork} disabled={!hasActiveNetwork}>
-                Delete
-              </button>
-            </div>
-            <label>
-              Rename active network
-              <input
-                value={renameNetworkName}
-                onChange={(event) => setRenameNetworkName(event.target.value)}
-                placeholder="Network name"
-                disabled={!hasActiveNetwork}
-              />
-            </label>
-            <div className="row-actions compact">
-              <button type="button" onClick={handleRenameActiveNetwork} disabled={!hasActiveNetwork}>
-                Rename
-              </button>
-            </div>
-            <form className="settings-grid" onSubmit={handleCreateNetwork}>
-              <label>
-                New network name
-                <input
-                  value={newNetworkName}
-                  onChange={(event) => setNewNetworkName(event.target.value)}
-                  placeholder="Vehicle platform A"
-                />
-              </label>
-              <label>
-                New network technical ID
-                <input
-                  value={newNetworkTechnicalId}
-                  onChange={(event) => setNewNetworkTechnicalId(event.target.value)}
-                  placeholder="NET-PLAT-A"
-                />
-              </label>
-              <label>
-                Description (optional)
-                <input
-                  value={newNetworkDescription}
-                  onChange={(event) => setNewNetworkDescription(event.target.value)}
-                  placeholder="Optional description"
-                />
-              </label>
-              {networkFormError !== null ? <p className="form-error">{networkFormError}</p> : null}
-              {networkTechnicalIdAlreadyUsed ? (
-                <p className="form-hint danger">Technical ID already used by another network.</p>
-              ) : null}
-              <div className="row-actions compact">
-                <button type="submit">Create network</button>
-              </div>
-            </form>
-          </section>
-
-          <section className="workspace-meta">
-            <div className="workspace-meta-main">
-              <div className="row-actions compact">
-                <button type="button" onClick={handleUndo} disabled={!isUndoAvailable}>
-                  Undo
-                </button>
-                <button type="button" onClick={handleRedo} disabled={!isRedoAvailable}>
-                  Redo
-                </button>
-              </div>
-              {showShortcutHints ? (
-                <>
-                  <p className="shortcut-hints">Shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo.</p>
-                  <p className="shortcut-hints">Nav: Alt+1..4 screens, Alt+Shift+1..5 entity tabs, Alt+V/N/G/C/R modes, Alt+F fit canvas, Alt+J/K issue nav.</p>
-                </>
-              ) : null}
-            </div>
-            <p className={`save-status is-${saveStatus}`}>
-              State: {saveStatus === "saved" ? "Saved" : saveStatus === "unsaved" ? "Unsaved" : "Error"}
-            </p>
-            <section className="workspace-health" aria-label="Model health">
-              <h2>Model health</h2>
-              <p className="meta-line">
-                Total issues: <strong>{validationIssues.length}</strong>
-              </p>
-              <p className="meta-line">
-                Errors: <strong>{validationErrorCount}</strong> / Warnings: <strong>{validationWarningCount}</strong>
-              </p>
-              <p className="meta-line">
-                Issue navigator:{" "}
-                <strong>{issueNavigatorDisplay}</strong>
-              </p>
-              <p className="meta-line">Scope: {issueNavigationScopeLabel}</p>
-              {currentValidationIssue !== null ? (
-                <p className="meta-line">
-                  Current issue:{" "}
-                  <strong>
-                    [{currentValidationIssue.severity.toUpperCase()}] {currentValidationIssue.category}
-                  </strong>
-                </p>
-              ) : null}
-              <div className="row-actions compact">
-                <button type="button" onClick={() => handleOpenValidationScreen("all")}>
-                  Open validation
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleOpenValidationScreen("error")}
-                  disabled={validationErrorCount === 0}
-                >
-                  Review errors
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleOpenValidationScreen("warning")}
-                  disabled={validationWarningCount === 0}
-                >
-                  Review warnings
-                </button>
-                <button
-                  type="button"
-                  onClick={() => moveValidationIssueCursor(-1)}
-                  disabled={orderedValidationIssues.length === 0}
-                >
-                  Previous issue
-                </button>
-                <button
-                  type="button"
-                  onClick={() => moveValidationIssueCursor(1)}
-                  disabled={orderedValidationIssues.length === 0}
-                >
-                  Next issue
-                </button>
-              </div>
-            </section>
-          </section>
-        </aside>
+        <WorkspaceSidebarPanel
+          activeScreen={activeScreen}
+          activeSubScreen={activeSubScreen}
+          isModelingScreen={isModelingScreen}
+          isAnalysisScreen={isAnalysisScreen}
+          isValidationScreen={isValidationScreen}
+          validationIssuesCount={validationIssues.length}
+          validationErrorCount={validationErrorCount}
+          entityCountBySubScreen={entityCountBySubScreen}
+          onScreenChange={setActiveScreen}
+          onSubScreenChange={setActiveSubScreen}
+          networks={networks}
+          activeNetworkId={activeNetworkId}
+          hasActiveNetwork={hasActiveNetwork}
+          handleSelectNetwork={handleSelectNetwork}
+          handleDuplicateActiveNetwork={handleDuplicateActiveNetwork}
+          handleDeleteActiveNetwork={handleDeleteActiveNetwork}
+          renameNetworkName={renameNetworkName}
+          setRenameNetworkName={setRenameNetworkName}
+          handleRenameActiveNetwork={handleRenameActiveNetwork}
+          newNetworkName={newNetworkName}
+          setNewNetworkName={setNewNetworkName}
+          newNetworkTechnicalId={newNetworkTechnicalId}
+          setNewNetworkTechnicalId={setNewNetworkTechnicalId}
+          newNetworkDescription={newNetworkDescription}
+          setNewNetworkDescription={setNewNetworkDescription}
+          networkFormError={networkFormError}
+          networkTechnicalIdAlreadyUsed={networkTechnicalIdAlreadyUsed}
+          handleCreateNetwork={handleCreateNetwork}
+          handleUndo={handleUndo}
+          handleRedo={handleRedo}
+          isUndoAvailable={isUndoAvailable}
+          isRedoAvailable={isRedoAvailable}
+          showShortcutHints={showShortcutHints}
+          saveStatus={saveStatus}
+          validationWarningCount={validationWarningCount}
+          issueNavigatorDisplay={issueNavigatorDisplay}
+          issueNavigationScopeLabel={issueNavigationScopeLabel}
+          currentValidationIssue={currentValidationIssue}
+          orderedValidationIssues={orderedValidationIssues}
+          handleOpenValidationScreen={handleOpenValidationScreen}
+          moveValidationIssueCursor={moveValidationIssueCursor}
+        />
 
         <section className="workspace-content">
       {!hasActiveNetwork ? (
@@ -2447,1554 +1183,297 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       ) : (
         <>
       <ModelingScreen isActive={isModelingScreen}>
-        <>
-      <section className="workspace-stage">
-      <section className="panel-grid workspace-column workspace-column-right">
-        {inspectorContextPanel}
-        <article className="panel" hidden={!isConnectorSubScreen}>
-          <h2>{connectorFormMode === "create" ? "Create Connector" : "Edit Connector"}</h2>
-          <form className="stack-form" onSubmit={handleConnectorSubmit}>
-            <label>
-              Functional name
-              <input
-                value={connectorName}
-                onChange={(event) => setConnectorName(event.target.value)}
-                placeholder="Rear body connector"
-                required
-              />
-            </label>
+        <section className="workspace-stage">
+          <ModelingFormsColumn
+            inspectorContextPanel={inspectorContextPanel}
+            isConnectorSubScreen={isConnectorSubScreen}
+            connectorFormMode={connectorFormMode}
+            handleConnectorSubmit={handleConnectorSubmit}
+            connectorName={connectorName}
+            setConnectorName={setConnectorName}
+            connectorTechnicalId={connectorTechnicalId}
+            setConnectorTechnicalId={setConnectorTechnicalId}
+            connectorTechnicalIdAlreadyUsed={connectorTechnicalIdAlreadyUsed}
+            cavityCount={cavityCount}
+            setCavityCount={setCavityCount}
+            resetConnectorForm={resetConnectorForm}
+            connectorFormError={connectorFormError}
+            isSpliceSubScreen={isSpliceSubScreen}
+            spliceFormMode={spliceFormMode}
+            handleSpliceSubmit={handleSpliceSubmit}
+            spliceName={spliceName}
+            setSpliceName={setSpliceName}
+            spliceTechnicalId={spliceTechnicalId}
+            setSpliceTechnicalId={setSpliceTechnicalId}
+            spliceTechnicalIdAlreadyUsed={spliceTechnicalIdAlreadyUsed}
+            portCount={portCount}
+            setPortCount={setPortCount}
+            resetSpliceForm={resetSpliceForm}
+            spliceFormError={spliceFormError}
+            isNodeSubScreen={isNodeSubScreen}
+            nodeFormMode={nodeFormMode}
+            handleNodeSubmit={handleNodeSubmit}
+            nodeIdInput={nodeIdInput}
+            setNodeIdInput={setNodeIdInput}
+            pendingNewNodePosition={pendingNewNodePosition}
+            nodeKind={nodeKind}
+            setNodeKind={setNodeKind}
+            nodeLabel={nodeLabel}
+            setNodeLabel={setNodeLabel}
+            connectors={connectors}
+            nodeConnectorId={nodeConnectorId}
+            setNodeConnectorId={setNodeConnectorId}
+            splices={splices}
+            nodeSpliceId={nodeSpliceId}
+            setNodeSpliceId={setNodeSpliceId}
+            resetNodeForm={resetNodeForm}
+            nodeFormError={nodeFormError}
+            isSegmentSubScreen={isSegmentSubScreen}
+            segmentFormMode={segmentFormMode}
+            handleSegmentSubmit={handleSegmentSubmit}
+            segmentIdInput={segmentIdInput}
+            setSegmentIdInput={setSegmentIdInput}
+            nodes={nodes}
+            describeNode={describeNode}
+            segmentNodeA={segmentNodeA}
+            setSegmentNodeA={setSegmentNodeA}
+            segmentNodeB={segmentNodeB}
+            setSegmentNodeB={setSegmentNodeB}
+            segmentLengthMm={segmentLengthMm}
+            setSegmentLengthMm={setSegmentLengthMm}
+            segmentSubNetworkTag={segmentSubNetworkTag}
+            setSegmentSubNetworkTag={setSegmentSubNetworkTag}
+            resetSegmentForm={resetSegmentForm}
+            segmentFormError={segmentFormError}
+            isWireSubScreen={isWireSubScreen}
+            wireFormMode={wireFormMode}
+            handleWireSubmit={handleWireSubmit}
+            wireName={wireName}
+            setWireName={setWireName}
+            wireTechnicalId={wireTechnicalId}
+            setWireTechnicalId={setWireTechnicalId}
+            wireTechnicalIdAlreadyUsed={wireTechnicalIdAlreadyUsed}
+            wireEndpointAKind={wireEndpointAKind}
+            setWireEndpointAKind={setWireEndpointAKind}
+            wireEndpointAConnectorId={wireEndpointAConnectorId}
+            setWireEndpointAConnectorId={setWireEndpointAConnectorId}
+            wireEndpointACavityIndex={wireEndpointACavityIndex}
+            setWireEndpointACavityIndex={setWireEndpointACavityIndex}
+            wireEndpointASpliceId={wireEndpointASpliceId}
+            setWireEndpointASpliceId={setWireEndpointASpliceId}
+            wireEndpointAPortIndex={wireEndpointAPortIndex}
+            setWireEndpointAPortIndex={setWireEndpointAPortIndex}
+            wireEndpointBKind={wireEndpointBKind}
+            setWireEndpointBKind={setWireEndpointBKind}
+            wireEndpointBConnectorId={wireEndpointBConnectorId}
+            setWireEndpointBConnectorId={setWireEndpointBConnectorId}
+            wireEndpointBCavityIndex={wireEndpointBCavityIndex}
+            setWireEndpointBCavityIndex={setWireEndpointBCavityIndex}
+            wireEndpointBSpliceId={wireEndpointBSpliceId}
+            setWireEndpointBSpliceId={setWireEndpointBSpliceId}
+            wireEndpointBPortIndex={wireEndpointBPortIndex}
+            setWireEndpointBPortIndex={setWireEndpointBPortIndex}
+            resetWireForm={resetWireForm}
+            wireFormError={wireFormError}
+          />
 
-            <label>
-              Technical ID
-              <input
-                value={connectorTechnicalId}
-                onChange={(event) => setConnectorTechnicalId(event.target.value)}
-                placeholder="C-001"
-                required
-              />
-            </label>
-            {connectorTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
+          <section className="panel-grid workspace-column workspace-column-left">
+            <ModelingPrimaryTables
+              isConnectorSubScreen={isConnectorSubScreen}
+              connectorSearchQuery={connectorSearchQuery}
+              setConnectorSearchQuery={setConnectorSearchQuery}
+              connectorOccupancyFilter={connectorOccupancyFilter}
+              setConnectorOccupancyFilter={setConnectorOccupancyFilter}
+              connectors={connectors}
+              visibleConnectors={visibleConnectors}
+              connectorSort={connectorSort}
+              setConnectorSort={setConnectorSort}
+              getSortIndicator={getSortIndicator}
+              connectorOccupiedCountById={connectorOccupiedCountById}
+              selectedConnectorId={selectedConnectorId}
+              onSelectConnector={(connectorId) => dispatchAction(appActions.select({ kind: "connector", id: connectorId }))}
+              onEditConnector={startConnectorEdit}
+              onDeleteConnector={handleConnectorDelete}
+              isSpliceSubScreen={isSpliceSubScreen}
+              spliceSearchQuery={spliceSearchQuery}
+              setSpliceSearchQuery={setSpliceSearchQuery}
+              spliceOccupancyFilter={spliceOccupancyFilter}
+              setSpliceOccupancyFilter={setSpliceOccupancyFilter}
+              splices={splices}
+              visibleSplices={visibleSplices}
+              spliceSort={spliceSort}
+              setSpliceSort={setSpliceSort}
+              spliceOccupiedCountById={spliceOccupiedCountById}
+              selectedSpliceId={selectedSpliceId}
+              onSelectSplice={(spliceId) => dispatchAction(appActions.select({ kind: "splice", id: spliceId }))}
+              onEditSplice={startSpliceEdit}
+              onDeleteSplice={handleSpliceDelete}
+              isNodeSubScreen={isNodeSubScreen}
+              nodeSearchQuery={nodeSearchQuery}
+              setNodeSearchQuery={setNodeSearchQuery}
+              nodeKindFilter={nodeKindFilter}
+              setNodeKindFilter={setNodeKindFilter}
+              nodes={nodes}
+              visibleNodes={visibleNodes}
+              nodeIdSortDirection={nodeIdSortDirection}
+              setNodeIdSortDirection={setNodeIdSortDirection}
+              segmentsCountByNodeId={segmentsCountByNodeId}
+              selectedNodeId={selectedNodeId}
+              describeNode={describeNode}
+              onSelectNode={(nodeId) => dispatchAction(appActions.select({ kind: "node", id: nodeId }))}
+              onEditNode={startNodeEdit}
+              onDeleteNode={handleNodeDelete}
+            />
 
-            <label>
-              Cavity count
-              <input
-                type="number"
-                min={1}
-                step={1}
-                value={cavityCount}
-                onChange={(event) => setCavityCount(event.target.value)}
-                required
-              />
-            </label>
-
-            <div className="row-actions">
-              <button type="submit" disabled={connectorTechnicalIdAlreadyUsed}>
-                {connectorFormMode === "create" ? "Create" : "Save"}
-              </button>
-              {connectorFormMode === "edit" ? (
-                <button type="button" onClick={resetConnectorForm}>
-                  Cancel edit
-                </button>
-              ) : null}
-            </div>
-            {connectorFormError !== null ? <small className="inline-error">{connectorFormError}</small> : null}
-          </form>
-        </article>
-
-        <article className="panel" hidden={!isSpliceSubScreen}>
-          <h2>{spliceFormMode === "create" ? "Create Splice" : "Edit Splice"}</h2>
-          <form className="stack-form" onSubmit={handleSpliceSubmit}>
-            <label>
-              Functional name
-              <input
-                value={spliceName}
-                onChange={(event) => setSpliceName(event.target.value)}
-                placeholder="Cabin junction"
-                required
-              />
-            </label>
-
-            <label>
-              Technical ID
-              <input
-                value={spliceTechnicalId}
-                onChange={(event) => setSpliceTechnicalId(event.target.value)}
-                placeholder="S-001"
-                required
-              />
-            </label>
-            {spliceTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
-
-            <label>
-              Port count
-              <input
-                type="number"
-                min={1}
-                step={1}
-                value={portCount}
-                onChange={(event) => setPortCount(event.target.value)}
-                required
-              />
-            </label>
-
-            <div className="row-actions">
-              <button type="submit" disabled={spliceTechnicalIdAlreadyUsed}>
-                {spliceFormMode === "create" ? "Create" : "Save"}
-              </button>
-              {spliceFormMode === "edit" ? (
-                <button type="button" onClick={resetSpliceForm}>
-                  Cancel edit
-                </button>
-              ) : null}
-            </div>
-            {spliceFormError !== null ? <small className="inline-error">{spliceFormError}</small> : null}
-          </form>
-        </article>
-
-        <article className="panel" hidden={!isNodeSubScreen}>
-          <h2>{nodeFormMode === "create" ? "Create Node" : "Edit Node"}</h2>
-          <form className="stack-form" onSubmit={handleNodeSubmit}>
-            <label>
-              Node ID
-              <input
-                value={nodeIdInput}
-                onChange={(event) => setNodeIdInput(event.target.value)}
-                placeholder="N-001"
-                disabled={nodeFormMode === "edit"}
-                required
-              />
-            </label>
-            {nodeFormMode === "edit" ? <small className="inline-help">Node ID is immutable in edit mode.</small> : null}
-            {nodeFormMode === "create" && pendingNewNodePosition !== null ? (
-              <small className="inline-help">
-                Canvas placement captured at x={Math.round(pendingNewNodePosition.x)}, y={Math.round(pendingNewNodePosition.y)}.
-              </small>
-            ) : null}
-
-            <label>
-              Node kind
-              <select value={nodeKind} onChange={(event) => setNodeKind(event.target.value as NetworkNode["kind"])}>
-                <option value="intermediate">Intermediate</option>
-                <option value="connector">Connector node</option>
-                <option value="splice">Splice node</option>
-              </select>
-            </label>
-
-            {nodeKind === "intermediate" ? (
-              <label>
-                Label
-                <input
-                  value={nodeLabel}
-                  onChange={(event) => setNodeLabel(event.target.value)}
-                  placeholder="N-branch-01"
-                  required
-                />
-              </label>
-            ) : null}
-
-            {nodeKind === "connector" ? (
-              <label>
-                Connector
-                <select value={nodeConnectorId} onChange={(event) => setNodeConnectorId(event.target.value)} required>
-                  <option value="">Select connector</option>
-                  {connectors.map((connector) => (
-                    <option key={connector.id} value={connector.id}>
-                      {connector.name} ({connector.technicalId})
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
-
-            {nodeKind === "splice" ? (
-              <label>
-                Splice
-                <select value={nodeSpliceId} onChange={(event) => setNodeSpliceId(event.target.value)} required>
-                  <option value="">Select splice</option>
-                  {splices.map((splice) => (
-                    <option key={splice.id} value={splice.id}>
-                      {splice.name} ({splice.technicalId})
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
-
-            <div className="row-actions">
-              <button type="submit">{nodeFormMode === "create" ? "Create" : "Save"}</button>
-              {nodeFormMode === "edit" ? (
-                <button type="button" onClick={resetNodeForm}>
-                  Cancel edit
-                </button>
-              ) : null}
-            </div>
-            {nodeFormError !== null ? <small className="inline-error">{nodeFormError}</small> : null}
-          </form>
-        </article>
-
-        <article className="panel" hidden={!isSegmentSubScreen}>
-          <h2>{segmentFormMode === "create" ? "Create Segment" : "Edit Segment"}</h2>
-          <form className="stack-form" onSubmit={handleSegmentSubmit}>
-            <label>
-              Segment ID
-              <input
-                value={segmentIdInput}
-                onChange={(event) => setSegmentIdInput(event.target.value)}
-                placeholder="SEG-001"
-                disabled={segmentFormMode === "edit"}
-                required
-              />
-            </label>
-            {segmentFormMode === "edit" ? (
-              <small className="inline-help">Segment ID is immutable in edit mode.</small>
-            ) : null}
-
-            <label>
-              Node A
-              <select value={segmentNodeA} onChange={(event) => setSegmentNodeA(event.target.value)} required>
-                <option value="">Select node</option>
-                {nodes.map((node) => (
-                  <option key={node.id} value={node.id}>
-                    {describeNode(node)}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              Node B
-              <select value={segmentNodeB} onChange={(event) => setSegmentNodeB(event.target.value)} required>
-                <option value="">Select node</option>
-                {nodes.map((node) => (
-                  <option key={node.id} value={node.id}>
-                    {describeNode(node)}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              Length (mm)
-              <input
-                type="number"
-                min={0.1}
-                step={0.1}
-                value={segmentLengthMm}
-                onChange={(event) => setSegmentLengthMm(event.target.value)}
-                required
-              />
-            </label>
-
-            <label>
-              Sub-network tag
-              <input
-                value={segmentSubNetworkTag}
-                onChange={(event) => setSegmentSubNetworkTag(event.target.value)}
-                placeholder="front-harness"
-              />
-            </label>
-
-            <div className="row-actions">
-              <button type="submit">{segmentFormMode === "create" ? "Create" : "Save"}</button>
-              {segmentFormMode === "edit" ? (
-                <button type="button" onClick={resetSegmentForm}>
-                  Cancel edit
-                </button>
-              ) : null}
-            </div>
-            {segmentFormError !== null ? <small className="inline-error">{segmentFormError}</small> : null}
-          </form>
-        </article>
-
-        <article className="panel" hidden={!isWireSubScreen}>
-          <h2>{wireFormMode === "create" ? "Create Wire" : "Edit Wire"}</h2>
-          <form className="stack-form" onSubmit={handleWireSubmit}>
-            <label>
-              Functional name
-              <input value={wireName} onChange={(event) => setWireName(event.target.value)} placeholder="Feed wire" required />
-            </label>
-
-            <label>
-              Technical ID
-              <input
-                value={wireTechnicalId}
-                onChange={(event) => setWireTechnicalId(event.target.value)}
-                placeholder="W-001"
-                required
-              />
-            </label>
-            {wireTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
-
-            <div className="form-split">
-              <fieldset className="inline-fieldset">
-                <legend>Endpoint A</legend>
-                <label>
-                  Type
-                  <select value={wireEndpointAKind} onChange={(event) => setWireEndpointAKind(event.target.value as WireEndpoint["kind"])}>
-                    <option value="connectorCavity">Connector cavity</option>
-                    <option value="splicePort">Splice port</option>
-                  </select>
-                </label>
-                {wireEndpointAKind === "connectorCavity" ? (
-                  <>
-                    <label>
-                      Connector
-                      <select value={wireEndpointAConnectorId} onChange={(event) => setWireEndpointAConnectorId(event.target.value)}>
-                        <option value="">Select connector</option>
-                        {connectors.map((connector) => (
-                          <option key={connector.id} value={connector.id}>
-                            {connector.name} ({connector.technicalId})
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label>
-                      Cavity index
-                      <input
-                        type="number"
-                        min={1}
-                        step={1}
-                        value={wireEndpointACavityIndex}
-                        onChange={(event) => setWireEndpointACavityIndex(event.target.value)}
-                      />
-                    </label>
-                  </>
-                ) : (
-                  <>
-                    <label>
-                      Splice
-                      <select value={wireEndpointASpliceId} onChange={(event) => setWireEndpointASpliceId(event.target.value)}>
-                        <option value="">Select splice</option>
-                        {splices.map((splice) => (
-                          <option key={splice.id} value={splice.id}>
-                            {splice.name} ({splice.technicalId})
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label>
-                      Port index
-                      <input
-                        type="number"
-                        min={1}
-                        step={1}
-                        value={wireEndpointAPortIndex}
-                        onChange={(event) => setWireEndpointAPortIndex(event.target.value)}
-                      />
-                    </label>
-                  </>
-                )}
-              </fieldset>
-
-              <fieldset className="inline-fieldset">
-                <legend>Endpoint B</legend>
-                <label>
-                  Type
-                  <select value={wireEndpointBKind} onChange={(event) => setWireEndpointBKind(event.target.value as WireEndpoint["kind"])}>
-                    <option value="connectorCavity">Connector cavity</option>
-                    <option value="splicePort">Splice port</option>
-                  </select>
-                </label>
-                {wireEndpointBKind === "connectorCavity" ? (
-                  <>
-                    <label>
-                      Connector
-                      <select value={wireEndpointBConnectorId} onChange={(event) => setWireEndpointBConnectorId(event.target.value)}>
-                        <option value="">Select connector</option>
-                        {connectors.map((connector) => (
-                          <option key={connector.id} value={connector.id}>
-                            {connector.name} ({connector.technicalId})
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label>
-                      Cavity index
-                      <input
-                        type="number"
-                        min={1}
-                        step={1}
-                        value={wireEndpointBCavityIndex}
-                        onChange={(event) => setWireEndpointBCavityIndex(event.target.value)}
-                      />
-                    </label>
-                  </>
-                ) : (
-                  <>
-                    <label>
-                      Splice
-                      <select value={wireEndpointBSpliceId} onChange={(event) => setWireEndpointBSpliceId(event.target.value)}>
-                        <option value="">Select splice</option>
-                        {splices.map((splice) => (
-                          <option key={splice.id} value={splice.id}>
-                            {splice.name} ({splice.technicalId})
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label>
-                      Port index
-                      <input
-                        type="number"
-                        min={1}
-                        step={1}
-                        value={wireEndpointBPortIndex}
-                        onChange={(event) => setWireEndpointBPortIndex(event.target.value)}
-                      />
-                    </label>
-                  </>
-                )}
-              </fieldset>
-            </div>
-
-            <div className="row-actions">
-              <button type="submit" disabled={wireTechnicalIdAlreadyUsed}>
-                {wireFormMode === "create" ? "Create" : "Save"}
-              </button>
-              {wireFormMode === "edit" ? (
-                <button type="button" onClick={resetWireForm}>
-                  Cancel edit
-                </button>
-              ) : null}
-            </div>
-            {wireFormError !== null ? <small className="inline-error">{wireFormError}</small> : null}
-          </form>
-        </article>
-      </section>
-
-      <section className="panel-grid workspace-column workspace-column-left">
-        <article className="panel" hidden={!isConnectorSubScreen}>
-          <h2>Connectors</h2>
-          <div className="list-toolbar">
-            <label className="stack-label list-search">
-              Search
-              <input
-                aria-label="Search connectors"
-                value={connectorSearchQuery}
-                onChange={(event) => setConnectorSearchQuery(event.target.value)}
-                placeholder="Name or technical ID"
-              />
-            </label>
-            <div className="chip-group" role="group" aria-label="Connector occupancy filter">
-              {([
-                ["all", "All"],
-                ["occupied", "Occupied"],
-                ["free", "Free"]
-              ] as const).map(([filterId, label]) => (
-                <button
-                  key={filterId}
-                  type="button"
-                  className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
-                  onClick={() => setConnectorOccupancyFilter(filterId)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-          {connectors.length === 0 ? (
-            <p className="empty-copy">No connector yet.</p>
-          ) : visibleConnectors.length === 0 ? (
-            <p className="empty-copy">No connector matches the current search/filter.</p>
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() => setConnectorSort((current) => nextSortState(current, "name"))}
-                    >
-                      Name <span className="sort-indicator">{getSortIndicator(connectorSort, "name")}</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() => setConnectorSort((current) => nextSortState(current, "technicalId"))}
-                    >
-                      Technical ID <span className="sort-indicator">{getSortIndicator(connectorSort, "technicalId")}</span>
-                    </button>
-                  </th>
-                  <th>Cavities</th>
-                  <th>Occupied</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visibleConnectors.map((connector) => {
-                  const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
-                  const isSelected = selectedConnectorId === connector.id;
-
-                  return (
-                    <tr key={connector.id} className={isSelected ? "is-selected" : undefined}>
-                      <td>{connector.name}</td>
-                      <td className="technical-id">{connector.technicalId}</td>
-                      <td>{connector.cavityCount}</td>
-                      <td>{occupiedCount}</td>
-                      <td>
-                        <div className="row-actions compact">
-                          <button
-                            type="button"
-                            onClick={() => dispatchAction(appActions.select({ kind: "connector", id: connector.id }))}
-                          >
-                            Select
-                          </button>
-                          <button type="button" onClick={() => startConnectorEdit(connector)}>
-                            Edit
-                          </button>
-                          <button type="button" onClick={() => handleConnectorDelete(connector.id)}>
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </article>
-
-        <article className="panel" hidden={!isSpliceSubScreen}>
-          <h2>Splices</h2>
-          <div className="list-toolbar">
-            <label className="stack-label list-search">
-              Search
-              <input
-                aria-label="Search splices"
-                value={spliceSearchQuery}
-                onChange={(event) => setSpliceSearchQuery(event.target.value)}
-                placeholder="Name or technical ID"
-              />
-            </label>
-            <div className="chip-group" role="group" aria-label="Splice occupancy filter">
-              {([
-                ["all", "All"],
-                ["occupied", "Occupied"],
-                ["free", "Free"]
-              ] as const).map(([filterId, label]) => (
-                <button
-                  key={filterId}
-                  type="button"
-                  className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
-                  onClick={() => setSpliceOccupancyFilter(filterId)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-          {splices.length === 0 ? (
-            <p className="empty-copy">No splice yet.</p>
-          ) : visibleSplices.length === 0 ? (
-            <p className="empty-copy">No splice matches the current search/filter.</p>
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() => setSpliceSort((current) => nextSortState(current, "name"))}
-                    >
-                      Name <span className="sort-indicator">{getSortIndicator(spliceSort, "name")}</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() => setSpliceSort((current) => nextSortState(current, "technicalId"))}
-                    >
-                      Technical ID <span className="sort-indicator">{getSortIndicator(spliceSort, "technicalId")}</span>
-                    </button>
-                  </th>
-                  <th>Ports</th>
-                  <th>Branches</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visibleSplices.map((splice) => {
-                  const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
-                  const isSelected = selectedSpliceId === splice.id;
-
-                  return (
-                    <tr key={splice.id} className={isSelected ? "is-selected" : undefined}>
-                      <td>
-                        <span className="splice-badge">Junction</span> {splice.name}
-                      </td>
-                      <td className="technical-id">{splice.technicalId}</td>
-                      <td>{splice.portCount}</td>
-                      <td>{occupiedCount}</td>
-                      <td>
-                        <div className="row-actions compact">
-                          <button
-                            type="button"
-                            onClick={() => dispatchAction(appActions.select({ kind: "splice", id: splice.id }))}
-                          >
-                            Select
-                          </button>
-                          <button type="button" onClick={() => startSpliceEdit(splice)}>
-                            Edit
-                          </button>
-                          <button type="button" onClick={() => handleSpliceDelete(splice.id)}>
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </article>
-
-        <article className="panel" hidden={!isNodeSubScreen}>
-          <h2>Nodes</h2>
-          <div className="list-toolbar">
-            <label className="stack-label list-search">
-              Search
-              <input
-                aria-label="Search nodes"
-                value={nodeSearchQuery}
-                onChange={(event) => setNodeSearchQuery(event.target.value)}
-                placeholder="ID, label, connector, splice"
-              />
-            </label>
-            <div className="chip-group" role="group" aria-label="Node kind filter">
-              {([
-                ["all", "All"],
-                ["connector", "Connector"],
-                ["splice", "Splice"],
-                ["intermediate", "Intermediate"]
-              ] as const).map(([kindId, label]) => (
-                <button
-                  key={kindId}
-                  type="button"
-                  className={nodeKindFilter === kindId ? "filter-chip is-active" : "filter-chip"}
-                  onClick={() => setNodeKindFilter(kindId)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-          {nodes.length === 0 ? (
-            <p className="empty-copy">No node yet.</p>
-          ) : visibleNodes.length === 0 ? (
-            <p className="empty-copy">No node matches the current search/filter.</p>
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() =>
-                        setNodeIdSortDirection((currentDirection) =>
-                          currentDirection === "asc" ? "desc" : "asc"
-                        )
-                      }
-                    >
-                      ID <span className="sort-indicator">{nodeIdSortDirection === "asc" ? "▲" : "▼"}</span>
-                    </button>
-                  </th>
-                  <th>Kind</th>
-                  <th>Reference</th>
-                  <th>Linked segments</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visibleNodes.map((node) => {
-                  const linkedSegments = segments.filter(
-                    (segment) => segment.nodeA === node.id || segment.nodeB === node.id
-                  ).length;
-                  const isSelected = selectedNodeId === node.id;
-
-                  return (
-                    <tr key={node.id} className={isSelected ? "is-selected" : undefined}>
-                      <td className="technical-id">{node.id}</td>
-                      <td>{node.kind}</td>
-                      <td>{describeNode(node)}</td>
-                      <td>{linkedSegments}</td>
-                      <td>
-                        <div className="row-actions compact">
-                          <button type="button" onClick={() => dispatchAction(appActions.select({ kind: "node", id: node.id }))}>
-                            Select
-                          </button>
-                          <button type="button" onClick={() => startNodeEdit(node)}>
-                            Edit
-                          </button>
-                          <button type="button" onClick={() => handleNodeDelete(node.id)}>
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </article>
-
-        <article className="panel" hidden={!isSegmentSubScreen}>
-          <h2>Segments</h2>
-          <div className="list-toolbar">
-            <label className="stack-label list-search">
-              Search
-              <input
-                aria-label="Search segments"
-                value={segmentSearchQuery}
-                onChange={(event) => setSegmentSearchQuery(event.target.value)}
-                placeholder="ID, node, sub-network"
-              />
-            </label>
-            <div className="chip-group" role="group" aria-label="Segment sub-network filter">
-              {([
-                ["all", "All"],
-                ["default", "Default"],
-                ["tagged", "Tagged"]
-              ] as const).map(([filterId, label]) => (
-                <button
-                  key={filterId}
-                  type="button"
-                  className={segmentSubNetworkFilter === filterId ? "filter-chip is-active" : "filter-chip"}
-                  onClick={() => setSegmentSubNetworkFilter(filterId)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-          {segments.length === 0 ? (
-            <p className="empty-copy">No segment yet.</p>
-          ) : visibleSegments.length === 0 ? (
-            <p className="empty-copy">No segment matches the current search/filter.</p>
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() =>
-                        setSegmentIdSortDirection((currentDirection) =>
-                          currentDirection === "asc" ? "desc" : "asc"
-                        )
-                      }
-                    >
-                      ID <span className="sort-indicator">{segmentIdSortDirection === "asc" ? "▲" : "▼"}</span>
-                    </button>
-                  </th>
-                  <th>Node A</th>
-                  <th>Node B</th>
-                  <th>Length (mm)</th>
-                  <th>Sub-network</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visibleSegments.map((segment) => {
-                  const nodeA = state.nodes.byId[segment.nodeA];
-                  const nodeB = state.nodes.byId[segment.nodeB];
-                  const isSelected = selectedSegmentId === segment.id;
-                  const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
-                  const rowClassName = isSelected
-                    ? "is-selected"
-                    : isWireHighlighted
-                      ? "is-wire-highlighted"
-                      : undefined;
-
-                  return (
-                    <tr key={segment.id} className={rowClassName}>
-                      <td className="technical-id">{segment.id}</td>
-                      <td>{nodeA === undefined ? segment.nodeA : describeNode(nodeA)}</td>
-                      <td>{nodeB === undefined ? segment.nodeB : describeNode(nodeB)}</td>
-                      <td>{segment.lengthMm}</td>
-                      <td>
-                        <span className="subnetwork-chip">{segment.subNetworkTag?.trim() || "(default)"}</span>
-                      </td>
-                      <td>
-                        <div className="row-actions compact">
-                          <button
-                            type="button"
-                            onClick={() => dispatchAction(appActions.select({ kind: "segment", id: segment.id }))}
-                          >
-                            Select
-                          </button>
-                          <button type="button" onClick={() => startSegmentEdit(segment)}>
-                            Edit
-                          </button>
-                          <button type="button" onClick={() => handleSegmentDelete(segment.id)}>
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </article>
-
-        <article className="panel" hidden={!isWireSubScreen}>
-          <h2>Wires</h2>
-          <div className="list-toolbar">
-            <label className="stack-label list-search">
-              Search
-              <input
-                aria-label="Search wires"
-                value={wireSearchQuery}
-                onChange={(event) => setWireSearchQuery(event.target.value)}
-                placeholder="Name or technical ID"
-              />
-            </label>
-            <div className="chip-group" role="group" aria-label="Wire route mode filter">
-              {([
-                ["all", "All"],
-                ["auto", "Auto"],
-                ["locked", "Locked"]
-              ] as const).map(([filterId, label]) => (
-                <button
-                  key={filterId}
-                  type="button"
-                  className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"}
-                  onClick={() => setWireRouteFilter(filterId)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-          {wires.length === 0 ? (
-            <p className="empty-copy">No wire yet.</p>
-          ) : visibleWires.length === 0 ? (
-            <p className="empty-copy">No wire matches the current search/filter.</p>
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() => setWireSort((current) => nextSortState(current, "name"))}
-                    >
-                      Name <span className="sort-indicator">{getSortIndicator(wireSort, "name")}</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() => setWireSort((current) => nextSortState(current, "technicalId"))}
-                    >
-                      Technical ID <span className="sort-indicator">{getSortIndicator(wireSort, "technicalId")}</span>
-                    </button>
-                  </th>
-                  <th>Endpoints</th>
-                  <th>Length (mm)</th>
-                  <th>Route mode</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visibleWires.map((wire) => {
-                  const isSelected = selectedWireId === wire.id;
-
-                  return (
-                    <tr key={wire.id} className={isSelected ? "is-selected" : undefined}>
-                      <td>{wire.name}</td>
-                      <td className="technical-id">{wire.technicalId}</td>
-                      <td>
-                        {describeWireEndpoint(wire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(wire.endpointB)}
-                      </td>
-                      <td>{wire.lengthMm}</td>
-                      <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td>
-                      <td>
-                        <div className="row-actions compact">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setWireForcedRouteInput(wire.routeSegmentIds.join(", "));
-                              dispatchAction(appActions.select({ kind: "wire", id: wire.id }));
-                            }}
-                          >
-                            Select
-                          </button>
-                          <button type="button" onClick={() => startWireEdit(wire)}>
-                            Edit
-                          </button>
-                          <button type="button" onClick={() => handleWireDelete(wire.id)}>
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </article>
-      </section>
-      <section className="panel-grid workspace-column workspace-column-center">{networkSummaryPanel}</section>
-      </section>
-        </>
+            <ModelingSecondaryTables
+              isSegmentSubScreen={isSegmentSubScreen}
+              segmentSearchQuery={segmentSearchQuery}
+              setSegmentSearchQuery={setSegmentSearchQuery}
+              segmentSubNetworkFilter={segmentSubNetworkFilter}
+              setSegmentSubNetworkFilter={setSegmentSubNetworkFilter}
+              segments={segments}
+              visibleSegments={visibleSegments}
+              segmentIdSortDirection={segmentIdSortDirection}
+              setSegmentIdSortDirection={setSegmentIdSortDirection}
+              nodeLabelById={nodeLabelById}
+              selectedSegmentId={selectedSegmentId}
+              selectedWireRouteSegmentIds={selectedWireRouteSegmentIds}
+              onSelectSegment={(segmentId) => dispatchAction(appActions.select({ kind: "segment", id: segmentId }))}
+              onEditSegment={startSegmentEdit}
+              onDeleteSegment={handleSegmentDelete}
+              isWireSubScreen={isWireSubScreen}
+              wireSearchQuery={wireSearchQuery}
+              setWireSearchQuery={setWireSearchQuery}
+              wireRouteFilter={wireRouteFilter}
+              setWireRouteFilter={setWireRouteFilter}
+              wires={wires}
+              visibleWires={visibleWires}
+              wireSort={wireSort}
+              setWireSort={setWireSort}
+              getSortIndicator={getSortIndicator}
+              selectedWireId={selectedWireId}
+              describeWireEndpoint={describeWireEndpoint}
+              onSelectWire={(wire) => {
+                setWireForcedRouteInput(wire.routeSegmentIds.join(", "));
+                dispatchAction(appActions.select({ kind: "wire", id: wire.id }));
+              }}
+              onEditWire={startWireEdit}
+              onDeleteWire={handleWireDelete}
+            />
+          </section>
+          <section className="panel-grid workspace-column workspace-column-center">{networkSummaryPanel}</section>
+        </section>
       </ModelingScreen>
 
       <AnalysisScreen isActive={isAnalysisScreen}>
-      <section className="panel-grid">
-        {inspectorContextPanel}
-        <section className="panel" hidden={!isConnectorSubScreen}>
-          <h2>Connector cavities</h2>
-          {selectedConnector === null ? (
-            <p className="empty-copy">Select a connector to view and manage cavity occupancy.</p>
-          ) : (
-            <>
-              <p className="meta-line">
-                <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
-              </p>
-              <form className="row-form" onSubmit={handleReserveCavity}>
-                <label>
-                  Cavity index
-                  <input
-                    type="number"
-                    min={1}
-                    max={selectedConnector.cavityCount}
-                    step={1}
-                    value={cavityIndexInput}
-                    onChange={(event) => setCavityIndexInput(event.target.value)}
-                    required
-                  />
-                </label>
-
-                <label>
-                  Occupant reference
-                  <input
-                    value={connectorOccupantRefInput}
-                    onChange={(event) => setConnectorOccupantRefInput(event.target.value)}
-                    placeholder="wire-draft-001:A"
-                    required
-                  />
-                </label>
-
-                <button type="submit">Reserve cavity</button>
-              </form>
-
-              <div className="cavity-grid" aria-label="Cavity occupancy grid">
-                {connectorCavityStatuses.map((slot) => (
-                  <article key={slot.cavityIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
-                    <h3>C{slot.cavityIndex}</h3>
-                    <p>{slot.isOccupied ? slot.occupantRef : "Free"}</p>
-                    {slot.isOccupied ? (
-                      <button type="button" onClick={() => handleReleaseCavity(slot.cavityIndex)}>
-                        Release
-                      </button>
-                    ) : null}
-                  </article>
-                ))}
-              </div>
-            </>
-          )}
-        </section>
-
-        <section className="panel" hidden={!isConnectorSubScreen}>
-          <h2>Connector synthesis</h2>
-          {selectedConnector === null ? (
-            <p className="empty-copy">Select a connector to view connected wire synthesis.</p>
-          ) : sortedConnectorSynthesisRows.length === 0 ? (
-            <p className="empty-copy">No wire currently connected to this connector.</p>
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() => setConnectorSynthesisSort((current) => nextSortState(current, "name"))}
-                    >
-                      Wire <span className="sort-indicator">{getSortIndicator(connectorSynthesisSort, "name")}</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() => setConnectorSynthesisSort((current) => nextSortState(current, "technicalId"))}
-                    >
-                      Technical ID{" "}
-                      <span className="sort-indicator">{getSortIndicator(connectorSynthesisSort, "technicalId")}</span>
-                    </button>
-                  </th>
-                  <th>Local cavity</th>
-                  <th>Destination</th>
-                  <th>Length (mm)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedConnectorSynthesisRows.map((row) => (
-                  <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
-                    <td>{row.wireName}</td>
-                    <td className="technical-id">{row.wireTechnicalId}</td>
-                    <td>{row.localEndpointLabel}</td>
-                    <td>{row.remoteEndpointLabel}</td>
-                    <td>{row.lengthMm}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </section>
-
-        <section className="panel" hidden={!isSpliceSubScreen}>
-          <h2>Splice ports</h2>
-          {selectedSplice === null ? (
-            <p className="empty-copy">Select a splice to view and manage port occupancy.</p>
-          ) : (
-            <>
-              <p className="meta-line">
-                <span className="splice-badge">Junction</span> <strong>{selectedSplice.name}</strong> (
-                {selectedSplice.technicalId})
-              </p>
-              <p className="meta-line">Branch count: {splicePortStatuses.filter((slot) => slot.isOccupied).length}</p>
-              <form className="row-form" onSubmit={handleReservePort}>
-                <label>
-                  Port index
-                  <input
-                    type="number"
-                    min={1}
-                    max={selectedSplice.portCount}
-                    step={1}
-                    value={portIndexInput}
-                    onChange={(event) => setPortIndexInput(event.target.value)}
-                    required
-                  />
-                </label>
-
-                <label>
-                  Occupant reference
-                  <input
-                    value={spliceOccupantRefInput}
-                    onChange={(event) => setSpliceOccupantRefInput(event.target.value)}
-                    placeholder="wire-draft-001:B"
-                    required
-                  />
-                </label>
-
-                <button type="submit">Reserve port</button>
-              </form>
-
-              <div className="cavity-grid" aria-label="Splice port occupancy grid">
-                {splicePortStatuses.map((slot) => (
-                  <article key={slot.portIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
-                    <h3>P{slot.portIndex}</h3>
-                    <p>{slot.isOccupied ? slot.occupantRef : "Free"}</p>
-                    {slot.isOccupied ? (
-                      <button type="button" onClick={() => handleReleasePort(slot.portIndex)}>
-                        Release
-                      </button>
-                    ) : null}
-                  </article>
-                ))}
-              </div>
-            </>
-          )}
-        </section>
-
-        <section className="panel" hidden={!isSpliceSubScreen}>
-          <h2>Splice synthesis</h2>
-          {selectedSplice === null ? (
-            <p className="empty-copy">Select a splice to view connected wire synthesis.</p>
-          ) : sortedSpliceSynthesisRows.length === 0 ? (
-            <p className="empty-copy">No wire currently connected to this splice.</p>
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() => setSpliceSynthesisSort((current) => nextSortState(current, "name"))}
-                    >
-                      Wire <span className="sort-indicator">{getSortIndicator(spliceSynthesisSort, "name")}</span>
-                    </button>
-                  </th>
-                  <th>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() => setSpliceSynthesisSort((current) => nextSortState(current, "technicalId"))}
-                    >
-                      Technical ID <span className="sort-indicator">{getSortIndicator(spliceSynthesisSort, "technicalId")}</span>
-                    </button>
-                  </th>
-                  <th>Local port</th>
-                  <th>Destination</th>
-                  <th>Length (mm)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedSpliceSynthesisRows.map((row) => (
-                  <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
-                    <td>{row.wireName}</td>
-                    <td className="technical-id">{row.wireTechnicalId}</td>
-                    <td>{row.localEndpointLabel}</td>
-                    <td>{row.remoteEndpointLabel}</td>
-                    <td>{row.lengthMm}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </section>
-
-        <section className="panel" hidden={!isWireSubScreen}>
-          <h2>Wire route control</h2>
-          {selectedWire === null ? (
-            <p className="empty-copy">Select a wire to lock a forced route or reset to auto shortest path.</p>
-          ) : (
-            <>
-              <p className="meta-line">
-                <strong>{selectedWire.name}</strong> ({selectedWire.technicalId}) - {selectedWire.isRouteLocked ? "Locked" : "Auto"}
-              </p>
-              <p className="meta-line">
-                {describeWireEndpoint(selectedWire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(selectedWire.endpointB)}
-              </p>
-              <p className="meta-line">Current route: {selectedWire.routeSegmentIds.join(" -> ") || "(none)"}</p>
-              <label className="stack-label">
-                Forced route segment IDs (comma-separated)
-                <input
-                  value={wireForcedRouteInput}
-                  onChange={(event) => setWireForcedRouteInput(event.target.value)}
-                  placeholder="segment-1, segment-2, segment-3"
-                />
-              </label>
-              <div className="row-actions">
-                <button type="button" onClick={handleLockWireRoute}>
-                  Lock forced route
-                </button>
-                <button type="button" onClick={handleResetWireRoute}>
-                  Reset to auto route
-                </button>
-              </div>
-              {wireFormError !== null ? <small className="inline-error">{wireFormError}</small> : null}
-            </>
-          )}
-        </section>
-
-        {networkSummaryPanel}
-      </section>
+        <AnalysisWorkspaceContent
+          isConnectorSubScreen={isConnectorSubScreen}
+          isSpliceSubScreen={isSpliceSubScreen}
+          isWireSubScreen={isWireSubScreen}
+          inspectorContextPanel={inspectorContextPanel}
+          networkSummaryPanel={networkSummaryPanel}
+          selectedConnector={selectedConnector}
+          cavityIndexInput={cavityIndexInput}
+          setCavityIndexInput={setCavityIndexInput}
+          connectorOccupantRefInput={connectorOccupantRefInput}
+          setConnectorOccupantRefInput={setConnectorOccupantRefInput}
+          handleReserveCavity={handleReserveCavity}
+          connectorCavityStatuses={connectorCavityStatuses}
+          handleReleaseCavity={handleReleaseCavity}
+          sortedConnectorSynthesisRows={sortedConnectorSynthesisRows}
+          connectorSynthesisSort={connectorSynthesisSort}
+          setConnectorSynthesisSort={setConnectorSynthesisSort}
+          getSortIndicator={getSortIndicator}
+          selectedSplice={selectedSplice}
+          splicePortStatuses={splicePortStatuses}
+          portIndexInput={portIndexInput}
+          setPortIndexInput={setPortIndexInput}
+          spliceOccupantRefInput={spliceOccupantRefInput}
+          setSpliceOccupantRefInput={setSpliceOccupantRefInput}
+          handleReservePort={handleReservePort}
+          handleReleasePort={handleReleasePort}
+          sortedSpliceSynthesisRows={sortedSpliceSynthesisRows}
+          spliceSynthesisSort={spliceSynthesisSort}
+          setSpliceSynthesisSort={setSpliceSynthesisSort}
+          selectedWire={selectedWire}
+          describeWireEndpoint={describeWireEndpoint}
+          wireForcedRouteInput={wireForcedRouteInput}
+          setWireForcedRouteInput={setWireForcedRouteInput}
+          handleLockWireRoute={handleLockWireRoute}
+          handleResetWireRoute={handleResetWireRoute}
+          wireFormError={wireFormError}
+        />
       </AnalysisScreen>
 
       <ValidationScreen isActive={isValidationScreen}>
-        <section className="panel-grid">
-          <section className="panel">
-            <h2>Validation center</h2>
-            <div className="validation-toolbar">
-              <span>Issue filters</span>
-              <label className="stack-label list-search">
-                Search
-                <input
-                  aria-label="Search validation issues"
-                  value={validationSearchQuery}
-                  onChange={(event) => setValidationSearchQuery(event.target.value)}
-                  placeholder="Issue text, category, entity"
-                />
-              </label>
-              <div className="chip-group" role="group" aria-label="Validation severity filter">
-                {([
-                  ["all", "All severities"],
-                  ["error", "Errors"],
-                  ["warning", "Warnings"]
-                ] as const).map(([severity, label]) => {
-                  const severityCount =
-                    severity === "all" ? validationIssuesForSeverityCounts.length : validationSeverityCountByLevel[severity];
-                  return (
-                    <button
-                      key={severity}
-                      type="button"
-                      className={validationSeverityFilter === severity ? "filter-chip is-active" : "filter-chip"}
-                      onClick={() => setValidationSeverityFilter(severity)}
-                      disabled={severityCount === 0 && validationSeverityFilter !== severity}
-                    >
-                      <span>{label}</span>
-                      <span className="filter-chip-count" aria-hidden="true">
-                        ({severityCount})
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="chip-group" role="group" aria-label="Validation category filter">
-                <button
-                  type="button"
-                  className={validationCategoryFilter === "all" ? "filter-chip is-active" : "filter-chip"}
-                  onClick={() => setValidationCategoryFilter("all")}
-                >
-                  <span>All</span>
-                  <span className="filter-chip-count" aria-hidden="true">
-                    ({validationIssuesForCategoryCounts.length})
-                  </span>
-                </button>
-                {validationCategories.map((category) => {
-                  const categoryCount = validationCategoryCountByName.get(category) ?? 0;
-                  return (
-                  <button
-                    key={category}
-                    type="button"
-                    className={validationCategoryFilter === category ? "filter-chip is-active" : "filter-chip"}
-                    onClick={() => setValidationCategoryFilter(category)}
-                    disabled={categoryCount === 0 && validationCategoryFilter !== category}
-                  >
-                    <span>{category}</span>
-                    <span className="filter-chip-count" aria-hidden="true">
-                      ({categoryCount})
-                    </span>
-                  </button>
-                  );
-                })}
-              </div>
-              <div className="row-actions compact">
-                <button
-                  type="button"
-                  onClick={() => moveVisibleValidationIssueCursor(-1)}
-                  disabled={visibleValidationIssues.length === 0}
-                >
-                  Previous issue
-                </button>
-                <button
-                  type="button"
-                  onClick={() => moveVisibleValidationIssueCursor(1)}
-                  disabled={visibleValidationIssues.length === 0}
-                >
-                  Next issue
-                </button>
-                <button type="button" onClick={clearValidationFilters}>
-                  Clear filters
-                </button>
-              </div>
-            </div>
-            {validationIssues.length === 0 ? (
-              <p className="empty-copy">No integrity issue found in the current model.</p>
-            ) : visibleValidationIssues.length === 0 ? (
-              <p className="empty-copy">No integrity issue matches the current filters/search.</p>
-            ) : (
-              <div className="validation-groups">
-                {groupedValidationIssues.map(([category, issues]) => (
-                  <article key={category} className="validation-group">
-                    <h3>{category}</h3>
-                    <table className="data-table">
-                      <thead>
-                        <tr>
-                          <th>Severity</th>
-                          <th>Issue</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {issues.map((issue) => (
-                          <tr
-                            key={issue.id}
-                            className={
-                              findValidationIssueIndex(issue.id) === validationIssueCursor ? "is-selected" : undefined
-                            }
-                          >
-                            <td>
-                              <span className={issue.severity === "error" ? "status-chip is-error" : "status-chip is-warning"}>
-                                {issue.severity.toUpperCase()}
-                              </span>
-                            </td>
-                            <td>{issue.message}</td>
-                            <td>
-                              <button type="button" onClick={() => handleValidationIssueRowGoTo(issue)}>
-                                Go to
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </article>
-                ))}
-              </div>
-            )}
-          </section>
-          <section className="panel">
-            <h2>Validation summary</h2>
-            <div className="summary-grid">
-              <article>
-                <h3>Total issues</h3>
-                <p>{validationIssues.length}</p>
-              </article>
-              <article>
-                <h3>Errors</h3>
-                <p>{validationErrorCount}</p>
-              </article>
-              <article>
-                <h3>Warnings</h3>
-                <p>{validationWarningCount}</p>
-              </article>
-              <article>
-                <h3>Visible</h3>
-                <p>{visibleValidationIssues.length}</p>
-              </article>
-            </div>
-            <p className="meta-line validation-active-filter">
-              Active filters:{" "}
-              {validationSeverityFilter === "all" ? "All severities" : validationSeverityFilter === "error" ? "Errors" : "Warnings"} /{" "}
-              {validationCategoryFilter === "all" ? "All categories" : validationCategoryFilter} / Search:{" "}
-              {normalizedValidationSearch.length === 0 ? "none" : `"${validationSearchQuery.trim()}"`}
-            </p>
-          </section>
-        </section>
+        <ValidationWorkspaceContent
+          validationSearchQuery={validationSearchQuery}
+          setValidationSearchQuery={setValidationSearchQuery}
+          validationSeverityFilter={validationSeverityFilter}
+          setValidationSeverityFilter={setValidationSeverityFilter}
+          validationIssuesForSeverityCounts={validationIssuesForSeverityCounts}
+          validationSeverityCountByLevel={validationSeverityCountByLevel}
+          validationCategoryFilter={validationCategoryFilter}
+          setValidationCategoryFilter={setValidationCategoryFilter}
+          validationIssuesForCategoryCounts={validationIssuesForCategoryCounts}
+          validationCategories={validationCategories}
+          validationCategoryCountByName={validationCategoryCountByName}
+          moveVisibleValidationIssueCursor={moveVisibleValidationIssueCursor}
+          visibleValidationIssues={visibleValidationIssues}
+          clearValidationFilters={clearValidationFilters}
+          validationIssues={validationIssues}
+          groupedValidationIssues={groupedValidationIssues}
+          findValidationIssueIndex={findValidationIssueIndex}
+          validationIssueCursor={validationIssueCursor}
+          handleValidationIssueRowGoTo={handleValidationIssueRowGoTo}
+          validationErrorCount={validationErrorCount}
+          validationWarningCount={validationWarningCount}
+          normalizedValidationSearch={normalizedValidationSearch}
+        />
       </ValidationScreen>
 
       <SettingsScreen isActive={isSettingsScreen}>
-        <section className="panel-grid">
-          <section className="panel">
-            <h2>Table and list preferences</h2>
-            <div className="settings-grid">
-              <label>
-                Theme mode
-                <select value={themeMode} onChange={(event) => setThemeMode(event.target.value as ThemeMode)}>
-                  <option value="normal">Normal</option>
-                  <option value="dark">Dark</option>
-                </select>
-              </label>
-              <label>
-                Table density
-                <select value={tableDensity} onChange={(event) => setTableDensity(event.target.value as TableDensity)}>
-                  <option value="comfortable">Comfortable</option>
-                  <option value="compact">Compact</option>
-                </select>
-              </label>
-              <label>
-                Default sort column
-                <select value={defaultSortField} onChange={(event) => setDefaultSortField(event.target.value as SortField)}>
-                  <option value="name">Name</option>
-                  <option value="technicalId">Technical ID</option>
-                </select>
-              </label>
-              <label>
-                Default sort direction
-                <select
-                  value={defaultSortDirection}
-                  onChange={(event) => setDefaultSortDirection(event.target.value as SortDirection)}
-                >
-                  <option value="asc">Ascending</option>
-                  <option value="desc">Descending</option>
-                </select>
-              </label>
-              <label>
-                Default ID sort direction
-                <select
-                  value={defaultIdSortDirection}
-                  onChange={(event) => setDefaultIdSortDirection(event.target.value as SortDirection)}
-                >
-                  <option value="asc">Ascending</option>
-                  <option value="desc">Descending</option>
-                </select>
-              </label>
-            </div>
-            <div className="row-actions">
-              <button type="button" onClick={applyListSortDefaults}>
-                Apply sort defaults now
-              </button>
-            </div>
-          </section>
-
-          <section className="panel">
-            <h2>Canvas preferences</h2>
-            <div className="settings-grid">
-              <label className="settings-checkbox">
-                <input
-                  type="checkbox"
-                  checked={canvasDefaultShowGrid}
-                  onChange={(event) => setCanvasDefaultShowGrid(event.target.checked)}
-                />
-                Show grid by default
-              </label>
-              <label className="settings-checkbox">
-                <input
-                  type="checkbox"
-                  checked={canvasDefaultSnapToGrid}
-                  onChange={(event) => setCanvasDefaultSnapToGrid(event.target.checked)}
-                />
-                Snap node movement by default
-              </label>
-              <label>
-                Reset zoom target (%)
-                <input
-                  type="number"
-                  min={Math.round(NETWORK_MIN_SCALE * 100)}
-                  max={Math.round(NETWORK_MAX_SCALE * 100)}
-                  step={5}
-                  value={canvasResetZoomPercentInput}
-                  onChange={(event) => setCanvasResetZoomPercentInput(event.target.value)}
-                />
-              </label>
-            </div>
-            <div className="row-actions">
-              <button type="button" onClick={applyCanvasDefaultsNow}>
-                Apply canvas defaults now
-              </button>
-              <button type="button" onClick={() => handleZoomAction("reset")}>
-                Reset current view
-              </button>
-            </div>
-            <p className="meta-line">Configured reset zoom: {configuredResetZoomPercent}%.</p>
-          </section>
-
-          <section className="panel">
-            <h2>Action bar and shortcuts</h2>
-            <div className="settings-grid">
-              <label className="settings-checkbox">
-                <input
-                  type="checkbox"
-                  checked={showShortcutHints}
-                  onChange={(event) => setShowShortcutHints(event.target.checked)}
-                />
-                Show shortcut hints in the action bar
-              </label>
-              <label className="settings-checkbox">
-                <input
-                  type="checkbox"
-                  checked={keyboardShortcutsEnabled}
-                  onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
-                />
-                Enable keyboard shortcuts (undo/redo/navigation/modes)
-              </label>
-            </div>
-            <ul className="subnetwork-list">
-              <li>
-                <span className="technical-id">Ctrl/Cmd + Z</span> Undo last modeling action
-              </li>
-              <li>
-                <span className="technical-id">Ctrl/Cmd + Shift + Z</span> Redo
-              </li>
-              <li>
-                <span className="technical-id">Ctrl/Cmd + Y</span> Redo alternative shortcut
-              </li>
-              <li>
-                <span className="technical-id">Alt + 1..4</span> Switch top-level workspace
-              </li>
-              <li>
-                <span className="technical-id">Alt + Shift + 1..5</span> Switch entity sub-screen
-              </li>
-              <li>
-                <span className="technical-id">Alt + V/N/G/C/R</span> Set interaction mode
-              </li>
-              <li>
-                <span className="technical-id">Alt + F</span> Fit network view to current graph
-              </li>
-              <li>
-                <span className="technical-id">Alt + J / Alt + K</span> Previous / next validation issue
-              </li>
-            </ul>
-            <div className="row-actions">
-              <button type="button" onClick={resetWorkspacePreferencesToDefaults}>
-                Reset all UI preferences
-              </button>
-            </div>
-          </section>
-
-          <section className="panel">
-            <h2>Sample network controls</h2>
-            <p className="meta-line">
-              Workspace empty: {isCurrentWorkspaceEmpty ? "yes" : "no"} / Sample signature detected:{" "}
-              {hasBuiltInSampleState ? "yes" : "no"}.
-            </p>
-            <div className="row-actions">
-              <button type="button" onClick={handleRecreateSampleNetwork} disabled={!isCurrentWorkspaceEmpty}>
-                Recreate sample network (empty workspace only)
-              </button>
-              <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
-                Reset sample network to baseline
-              </button>
-            </div>
-          </section>
-
-          <section className="panel">
-            <h2>Import / Export networks</h2>
-            <p className="meta-line">
-              Export active, selected, or all networks as deterministic JSON payloads. Import preserves existing local data and
-              resolves conflicts with deterministic suffixes.
-            </p>
-            <div className="row-actions">
-              <button type="button" onClick={() => handleExportNetworks("active")} disabled={activeNetworkId === null}>
-                Export active
-              </button>
-              <button
-                type="button"
-                onClick={() => handleExportNetworks("selected")}
-                disabled={selectedExportNetworkIds.length === 0}
-              >
-                Export selected
-              </button>
-              <button type="button" onClick={() => handleExportNetworks("all")} disabled={networks.length === 0}>
-                Export all
-              </button>
-            </div>
-            <fieldset className="inline-fieldset">
-              <legend>Selected networks for export</legend>
-              {networks.length === 0 ? (
-                <p className="empty-copy">No network available.</p>
-              ) : (
-                <div className="settings-grid">
-                  {networks.map((network) => (
-                    <label key={network.id} className="settings-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={selectedExportNetworkIds.includes(network.id)}
-                        onChange={() => toggleSelectedExportNetwork(network.id)}
-                      />
-                      {network.name} (<span className="technical-id">{network.technicalId}</span>)
-                    </label>
-                  ))}
-                </div>
-              )}
-            </fieldset>
-            <div className="row-actions">
-              <button type="button" onClick={handleOpenImportPicker}>
-                Import from file
-              </button>
-              <input
-                ref={importFileInputRef}
-                type="file"
-                accept="application/json,.json"
-                onChange={(event) => {
-                  void handleImportFileChange(event);
-                }}
-                hidden
-              />
-            </div>
-            {importExportStatus !== null ? (
-              <p className={`meta-line import-status is-${importExportStatus.kind}`}>{importExportStatus.message}</p>
-            ) : null}
-            {lastImportSummary !== null ? (
-              <div className="settings-grid">
-                <p className="meta-line">Imported: {lastImportSummary.importedNetworkIds.length}</p>
-                <p className="meta-line">Skipped: {lastImportSummary.skippedNetworkIds.length}</p>
-                <p className="meta-line">Warnings: {lastImportSummary.warnings.length}</p>
-                <p className="meta-line">Errors: {lastImportSummary.errors.length}</p>
-              </div>
-            ) : null}
-          </section>
-        </section>
+        <SettingsWorkspaceContent
+          themeMode={themeMode}
+          setThemeMode={setThemeMode}
+          tableDensity={tableDensity}
+          setTableDensity={setTableDensity}
+          defaultSortField={defaultSortField}
+          setDefaultSortField={setDefaultSortField}
+          defaultSortDirection={defaultSortDirection}
+          setDefaultSortDirection={setDefaultSortDirection}
+          defaultIdSortDirection={defaultIdSortDirection}
+          setDefaultIdSortDirection={setDefaultIdSortDirection}
+          applyListSortDefaults={applyListSortDefaults}
+          canvasDefaultShowGrid={canvasDefaultShowGrid}
+          setCanvasDefaultShowGrid={setCanvasDefaultShowGrid}
+          canvasDefaultSnapToGrid={canvasDefaultSnapToGrid}
+          setCanvasDefaultSnapToGrid={setCanvasDefaultSnapToGrid}
+          canvasResetZoomPercentInput={canvasResetZoomPercentInput}
+          setCanvasResetZoomPercentInput={setCanvasResetZoomPercentInput}
+          configuredResetZoomPercent={configuredResetZoomPercent}
+          applyCanvasDefaultsNow={applyCanvasDefaultsNow}
+          handleZoomAction={handleZoomAction}
+          showShortcutHints={showShortcutHints}
+          setShowShortcutHints={setShowShortcutHints}
+          keyboardShortcutsEnabled={keyboardShortcutsEnabled}
+          setKeyboardShortcutsEnabled={setKeyboardShortcutsEnabled}
+          resetWorkspacePreferencesToDefaults={resetWorkspacePreferencesToDefaults}
+          isCurrentWorkspaceEmpty={isCurrentWorkspaceEmpty}
+          hasBuiltInSampleState={hasBuiltInSampleState}
+          handleRecreateSampleNetwork={handleRecreateSampleNetwork}
+          handleResetSampleNetwork={handleResetSampleNetwork}
+          activeNetworkId={activeNetworkId}
+          selectedExportNetworkIds={selectedExportNetworkIds}
+          handleExportNetworks={handleExportNetworks}
+          networks={networks}
+          toggleSelectedExportNetwork={toggleSelectedExportNetwork}
+          handleOpenImportPicker={handleOpenImportPicker}
+          importFileInputRef={importFileInputRef}
+          handleImportFileChange={handleImportFileChange}
+          importExportStatus={importExportStatus}
+          lastImportSummary={lastImportSummary}
+        />
       </SettingsScreen>
         </>
       )}
