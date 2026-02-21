@@ -23,7 +23,6 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
       .click();
     await ensureNavigationDrawerClosed();
   };
-
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "e-Plan Editor" })).toBeVisible();
   await switchScreen("modeling");
@@ -82,11 +81,22 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
       .click();
     await ensureNavigationDrawerClosed();
   };
+  const openCreateFormIfIdle = async (
+    idleHeading: "Connector form" | "Splice form" | "Node form" | "Segment form" | "Wire form"
+  ) => {
+    const idlePanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: idleHeading }) });
+    if ((await idlePanel.count()) === 0) {
+      return;
+    }
+
+    await idlePanel.getByRole("button", { name: "Create", exact: true }).click();
+  };
 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "e-Plan Editor" })).toBeVisible();
 
   await switchSubScreen("connector");
+  await openCreateFormIfIdle("Connector form");
   const connectorForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Connector" }) });
   await connectorForm.getByLabel("Functional name").fill("Connector 1");
   await connectorForm.getByLabel("Technical ID").fill("C-1");
@@ -94,6 +104,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await connectorForm.getByRole("button", { name: "Create" }).click();
 
   await switchSubScreen("splice");
+  await openCreateFormIfIdle("Splice form");
   const spliceForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Splice" }) });
   await spliceForm.getByLabel("Functional name").fill("Splice 1");
   await spliceForm.getByLabel("Technical ID").fill("S-1");
@@ -101,6 +112,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await spliceForm.getByRole("button", { name: "Create" }).click();
 
   await switchSubScreen("node");
+  await openCreateFormIfIdle("Node form");
   const nodeForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Node" }) });
   await nodeForm.getByLabel("Node ID").fill("NODE-C1");
   await nodeForm.getByLabel("Node kind").selectOption("connector");
@@ -118,6 +130,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await nodeForm.getByRole("button", { name: "Create" }).click();
 
   await switchSubScreen("segment");
+  await openCreateFormIfIdle("Segment form");
   const segmentForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Segment" }) });
   await segmentForm.getByLabel("Segment ID").fill("SEG-A");
   await segmentForm.getByLabel("Node A").selectOption({ label: "Connector: Connector 1 (C-1)" });
@@ -132,6 +145,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await segmentForm.getByRole("button", { name: "Create" }).click();
 
   await switchSubScreen("wire");
+  await openCreateFormIfIdle("Wire form");
   const wireForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Wire" }) });
   await wireForm.getByLabel("Functional name").fill("Wire 1");
   await wireForm.getByLabel("Technical ID").fill("W-1");
@@ -149,19 +163,19 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
 
   await switchScreen("analysis");
   await switchSubScreen("wire");
-  const routeControlPanel = page.locator("section.panel").filter({ has: page.getByRole("heading", { name: "Wire route control" }) });
-  await routeControlPanel.getByRole("button", { name: "Lock forced route" }).click();
-  await expect(routeControlPanel).toContainText("Locked");
-  const currentRouteLine = await routeControlPanel.getByText(/^Current route:/).textContent();
-  const [routeSegmentToEdit] = (currentRouteLine ?? "")
-    .replace("Current route:", "")
-    .split("->")
+  const routeControlPanel = page.locator("section.panel").filter({ has: page.getByRole("heading", { name: "Wire analysis" }) });
+  const routeInputValue = await routeControlPanel.getByLabel("Forced route segment IDs (comma-separated)").inputValue();
+  const [routeSegmentToEdit] = routeInputValue
+    .split(",")
     .map((token) => token.trim())
     .filter((token) => token.length > 0);
 
   if (routeSegmentToEdit === undefined) {
     throw new Error("Expected at least one route segment to edit in E2E flow.");
   }
+
+  await routeControlPanel.getByRole("button", { name: "Lock forced route" }).click();
+  await expect(routeControlPanel).toContainText("Locked route");
 
   await switchScreen("modeling");
   await switchSubScreen("segment");
