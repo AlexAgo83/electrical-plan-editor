@@ -85,7 +85,7 @@ export function WorkspaceNavigation({
       ) : null}
       <p className="meta-line screen-description">
         {activeScreen === "networkScope"
-          ? "Network Scope workspace: network context and global workspace settings."
+          ? "Network Scope workspace: active network context and lifecycle management."
           : isModelingScreen
           ? "Modeling workspace: entity editor + operational lists."
           : isAnalysisScreen

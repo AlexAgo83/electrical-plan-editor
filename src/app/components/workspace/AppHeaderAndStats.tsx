@@ -1,5 +1,6 @@
 import type { ReactElement, RefObject } from "react";
 interface AppHeaderAndStatsProps {
+  headerBlockRef: RefObject<HTMLElement | null>;
   activeNetworkLabel: string;
   isNavigationDrawerOpen: boolean;
   onToggleNavigationDrawer: () => void;
@@ -20,6 +21,7 @@ interface AppHeaderAndStatsProps {
 }
 
 export function AppHeaderAndStats({
+  headerBlockRef,
   activeNetworkLabel,
   isNavigationDrawerOpen,
   onToggleNavigationDrawer,
@@ -40,7 +42,7 @@ export function AppHeaderAndStats({
 }: AppHeaderAndStatsProps): ReactElement {
   return (
     <>
-      <section className="header-block">
+      <section ref={headerBlockRef} className="header-block">
         <button
           ref={navigationToggleButtonRef}
           type="button"

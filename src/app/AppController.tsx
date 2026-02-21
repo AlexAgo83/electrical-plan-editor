@@ -1,4 +1,5 @@
 import {
+  type CSSProperties,
   type ReactElement,
   useCallback,
   useEffect,
@@ -297,6 +298,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [isPwaUpdateReady, setIsPwaUpdateReady] = useState(false);
   const [isNavigationDrawerOpen, setIsNavigationDrawerOpen] = useState(false);
   const [isOperationsPanelOpen, setIsOperationsPanelOpen] = useState(false);
+  const [headerOffsetPx, setHeaderOffsetPx] = useState(96);
   const [viewportWidth, setViewportWidth] = useState(() =>
     typeof window === "undefined" ? 1440 : window.innerWidth
   );
@@ -313,6 +315,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const fitNetworkToContentRef = useRef<() => void>(() => {});
   const previousValidationIssueRef = useRef<() => void>(() => {});
   const nextValidationIssueRef = useRef<() => void>(() => {});
+  const headerBlockRef = useRef<HTMLElement | null>(null);
   const navigationDrawerRef = useRef<HTMLDivElement | null>(null);
   const navigationToggleButtonRef = useRef<HTMLButtonElement | null>(null);
   const operationsPanelRef = useRef<HTMLDivElement | null>(null);
@@ -431,6 +434,13 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   ]
     .filter((token) => token.length > 0)
     .join(" ");
+  const workspaceShellStyle = useMemo(
+    () =>
+      ({
+        "--workspace-header-offset": `${headerOffsetPx}px`
+      }) as CSSProperties,
+    [headerOffsetPx]
+  );
   const configuredResetScale = useMemo(() => {
     const parsedPercent = Number(canvasResetZoomPercentInput);
     if (!Number.isFinite(parsedPercent) || parsedPercent <= 0) {
@@ -497,6 +507,54 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setPendingNewNodePosition(null);
     }
   }, [interactionMode, setModeAnchorNodeId, setPendingNewNodePosition]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    let animationFrameId = 0;
+    const refreshHeaderOffset = () => {
+      animationFrameId = 0;
+      const headerRect = headerBlockRef.current?.getBoundingClientRect();
+      if (headerRect === undefined) {
+        return;
+      }
+
+      const nextOffset = Math.max(0, Math.ceil(headerRect.bottom + 6));
+      setHeaderOffsetPx((current) => (current === nextOffset ? current : nextOffset));
+    };
+    const scheduleRefresh = () => {
+      if (animationFrameId !== 0) {
+        return;
+      }
+
+      animationFrameId = window.requestAnimationFrame(refreshHeaderOffset);
+    };
+
+    scheduleRefresh();
+    window.addEventListener("resize", scheduleRefresh);
+    window.addEventListener("scroll", scheduleRefresh, { passive: true });
+
+    const resizeObserver =
+      typeof ResizeObserver === "undefined" || headerBlockRef.current === null
+        ? null
+        : new ResizeObserver(scheduleRefresh);
+
+    if (resizeObserver !== null && headerBlockRef.current !== null) {
+      resizeObserver.observe(headerBlockRef.current);
+    }
+
+    return () => {
+      if (animationFrameId !== 0) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+
+      window.removeEventListener("resize", scheduleRefresh);
+      window.removeEventListener("scroll", scheduleRefresh);
+      resizeObserver?.disconnect();
+    };
+  }, []);
 
   const {
     connectorSearchQuery,
@@ -936,10 +994,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isNavigationDrawerOpen]);
-
-  useEffect(() => {
-    setIsNavigationDrawerOpen(false);
-  }, [activeScreen, activeSubScreen]);
 
   useEffect(() => {
     if (!isOperationsPanelOpen) {
@@ -1466,6 +1520,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   return (
     <main className={appShellClassName}>
       <AppHeaderAndStats
+        headerBlockRef={headerBlockRef}
         activeNetworkLabel={activeNetworkLabel}
         isNavigationDrawerOpen={isNavigationDrawerOpen}
         onToggleNavigationDrawer={handleToggleNavigationDrawer}
@@ -1485,7 +1540,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         onClearError={() => dispatchAction(appActions.clearError())}
       />
 
-      <section className="workspace-shell">
+      <section className="workspace-shell" style={workspaceShellStyle}>
         <button
           type="button"
           className={isNavigationDrawerOpen ? "workspace-drawer-backdrop is-open" : "workspace-drawer-backdrop"}
@@ -1567,31 +1622,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
               networkFormError={networkFormError}
               networkTechnicalIdAlreadyUsed={networkTechnicalIdAlreadyUsed}
               handleCreateNetwork={handleCreateNetwork}
-              themeMode={themeMode}
-              setThemeMode={setThemeMode}
-              tableDensity={tableDensity}
-              setTableDensity={setTableDensity}
-              defaultSortField={defaultSortField}
-              setDefaultSortField={setDefaultSortField}
-              defaultSortDirection={defaultSortDirection}
-              setDefaultSortDirection={setDefaultSortDirection}
-              defaultIdSortDirection={defaultIdSortDirection}
-              setDefaultIdSortDirection={setDefaultIdSortDirection}
-              applyListSortDefaults={applyListSortDefaults}
-              canvasDefaultShowGrid={canvasDefaultShowGrid}
-              setCanvasDefaultShowGrid={setCanvasDefaultShowGrid}
-              canvasDefaultSnapToGrid={canvasDefaultSnapToGrid}
-              setCanvasDefaultSnapToGrid={setCanvasDefaultSnapToGrid}
-              canvasResetZoomPercentInput={canvasResetZoomPercentInput}
-              setCanvasResetZoomPercentInput={setCanvasResetZoomPercentInput}
-              configuredResetZoomPercent={configuredResetZoomPercent}
-              applyCanvasDefaultsNow={applyCanvasDefaultsNow}
-              handleZoomAction={handleZoomAction}
-              showShortcutHints={showShortcutHints}
-              setShowShortcutHints={setShowShortcutHints}
-              keyboardShortcutsEnabled={keyboardShortcutsEnabled}
-              setKeyboardShortcutsEnabled={setKeyboardShortcutsEnabled}
-              resetWorkspacePreferencesToDefaults={resetWorkspacePreferencesToDefaults}
             />
           </NetworkScopeScreen>
 
@@ -1868,6 +1898,31 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           handleImportFileChange={handleImportFileChange}
           importExportStatus={importExportStatus}
           lastImportSummary={lastImportSummary}
+          themeMode={themeMode}
+          setThemeMode={setThemeMode}
+          tableDensity={tableDensity}
+          setTableDensity={setTableDensity}
+          defaultSortField={defaultSortField}
+          setDefaultSortField={setDefaultSortField}
+          defaultSortDirection={defaultSortDirection}
+          setDefaultSortDirection={setDefaultSortDirection}
+          defaultIdSortDirection={defaultIdSortDirection}
+          setDefaultIdSortDirection={setDefaultIdSortDirection}
+          applyListSortDefaults={applyListSortDefaults}
+          canvasDefaultShowGrid={canvasDefaultShowGrid}
+          setCanvasDefaultShowGrid={setCanvasDefaultShowGrid}
+          canvasDefaultSnapToGrid={canvasDefaultSnapToGrid}
+          setCanvasDefaultSnapToGrid={setCanvasDefaultSnapToGrid}
+          canvasResetZoomPercentInput={canvasResetZoomPercentInput}
+          setCanvasResetZoomPercentInput={setCanvasResetZoomPercentInput}
+          configuredResetZoomPercent={configuredResetZoomPercent}
+          applyCanvasDefaultsNow={applyCanvasDefaultsNow}
+          handleZoomAction={handleZoomAction}
+          showShortcutHints={showShortcutHints}
+          setShowShortcutHints={setShowShortcutHints}
+          keyboardShortcutsEnabled={keyboardShortcutsEnabled}
+          setKeyboardShortcutsEnabled={setKeyboardShortcutsEnabled}
+          resetWorkspacePreferencesToDefaults={resetWorkspacePreferencesToDefaults}
         />
       </SettingsScreen>
             </>

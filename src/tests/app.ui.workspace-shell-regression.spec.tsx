@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createUiIntegrationState, renderAppWithState } from "./helpers/app-ui-test-utils";
 
@@ -60,5 +60,23 @@ describe("App integration UI - workspace shell regression", () => {
     expect(header).toBeInTheDocument();
     expect(document.querySelector(".workspace-drawer")).toBeInTheDocument();
     expect(document.querySelector(".workspace-ops-panel")).toBeInTheDocument();
+  });
+
+  it("keeps the navigation drawer open when switching to modeling or analysis", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    let primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: "Analysis" }));
+    expect(screen.getByRole("button", { name: "Close menu" })).toBeInTheDocument();
+    expect(document.querySelector(".workspace-nav-row.secondary")).not.toBeNull();
+
+    primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: "Modeling" }));
+    expect(screen.getByRole("button", { name: "Close menu" })).toBeInTheDocument();
+    expect(document.querySelector(".workspace-nav-row.secondary")).not.toBeNull();
   });
 });
