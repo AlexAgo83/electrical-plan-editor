@@ -1,8 +1,8 @@
 ## item_066_offline_shell_caching_and_version_invalidation - Offline Shell Caching and Version Invalidation
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 96%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: High
 > Theme: Offline Reliability
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,7 +36,8 @@ PWA support without a robust cache/invalidation strategy can either fail offline
 - Related AC: AC3, AC4, AC6.
 - References:
   - `logics/request/req_011_pwa_enablement_installability_and_offline_reliability.md`
+  - `vite.config.ts`
+  - `src/app/pwa/registerServiceWorker.ts`
   - `src/adapters/persistence/localStorage.ts`
   - `src/tests/persistence.localStorage.spec.ts`
   - `tests/e2e/smoke.spec.ts`
-

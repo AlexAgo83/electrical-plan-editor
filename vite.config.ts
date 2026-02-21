@@ -15,6 +15,10 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: "prompt",
         injectRegister: false,
+        devOptions: {
+          enabled: false,
+          suppressWarnings: true
+        },
         includeAssets: ["app-icon.svg", "icons/icon-192.png", "icons/icon-512.png"],
         manifest: {
           name: "Electrical Plan Editor",
@@ -41,6 +45,26 @@ export default defineConfig(({ mode }) => {
               sizes: "512x512",
               type: "image/png",
               purpose: "maskable"
+            }
+          ]
+        },
+        workbox: {
+          cleanupOutdatedCaches: true,
+          clientsClaim: true,
+          skipWaiting: false,
+          navigateFallback: "/index.html",
+          runtimeCaching: [
+            {
+              urlPattern: ({ request }) => request.destination === "document",
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "app-documents",
+                networkTimeoutSeconds: 3,
+                expiration: {
+                  maxEntries: 20,
+                  maxAgeSeconds: 7 * 24 * 60 * 60
+                }
+              }
             }
           ]
         }
