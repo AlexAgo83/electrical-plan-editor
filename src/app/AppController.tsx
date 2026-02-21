@@ -105,6 +105,7 @@ import type {
   SortField,
   SubScreenId,
   TableDensity,
+  TableFontSize,
 } from "./types/app-controller";
 import "./styles.css";
 
@@ -314,7 +315,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [networkFormMode, setNetworkFormMode] = useState<"create" | "edit" | null>(null);
   const [networkFormTargetId, setNetworkFormTargetId] = useState<NetworkId | null>(null);
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
-  const [tableDensity, setTableDensity] = useState<TableDensity>("comfortable");
+  const [tableDensity, setTableDensity] = useState<TableDensity>("compact");
+  const [tableFontSize, setTableFontSize] = useState<TableFontSize>("normal");
   const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
   const [defaultSortDirection, setDefaultSortDirection] = useState<SortDirection>("asc");
   const [defaultIdSortDirection, setDefaultIdSortDirection] = useState<SortDirection>("asc");
@@ -477,6 +479,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const appShellClassName = [
     "app-shell",
     tableDensity === "compact" ? "table-density-compact" : "",
+    `table-font-${tableFontSize}`,
     ...resolvedThemeClassNames
   ]
     .filter((token) => token.length > 0)
@@ -674,6 +677,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     networkMaxScale: NETWORK_MAX_SCALE,
     themeMode,
     tableDensity,
+    tableFontSize,
     defaultSortField,
     defaultSortDirection,
     defaultIdSortDirection,
@@ -684,6 +688,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     keyboardShortcutsEnabled,
     preferencesHydrated,
     setTableDensity,
+    setTableFontSize,
     setDefaultSortField,
     setDefaultSortDirection,
     setDefaultIdSortDirection,
@@ -877,6 +882,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setSegmentIdSortDirection,
     setThemeMode,
     setTableDensity,
+    setTableFontSize,
     setDefaultSortField,
     setDefaultSortDirection,
     setDefaultIdSortDirection,
@@ -2048,6 +2054,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setThemeMode={setThemeMode}
           tableDensity={tableDensity}
           setTableDensity={setTableDensity}
+          tableFontSize={tableFontSize}
+          setTableFontSize={setTableFontSize}
           defaultSortField={defaultSortField}
           setDefaultSortField={setDefaultSortField}
           defaultSortDirection={defaultSortDirection}

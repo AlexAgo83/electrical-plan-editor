@@ -39,6 +39,7 @@ export interface SpliceSynthesisRow {
 export type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
 export type InteractionMode = "select" | "addNode" | "addSegment" | "connect" | "route";
 export type TableDensity = "comfortable" | "compact";
+export type TableFontSize = "small" | "normal" | "large";
 export type OccupancyFilter = "all" | "occupied" | "free";
 export type SegmentSubNetworkFilter = "all" | "default" | "tagged";
 export type ValidationSeverityFilter = "all" | "error" | "warning";

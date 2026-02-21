@@ -15,7 +15,7 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).toHaveClass("theme-dark");
 
     switchScreen("settings");
-    const settingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Global appearance preferences" }).closest(".panel");
     expect(settingsPanel).not.toBeNull();
     fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "normal" } });
     expect(appShell).toHaveClass("theme-normal");
@@ -31,7 +31,7 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).not.toBeNull();
 
     switchScreen("settings");
-    const settingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Global appearance preferences" }).closest(".panel");
     expect(settingsPanel).not.toBeNull();
 
     fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
@@ -62,7 +62,7 @@ describe("App integration UI - theme mode", () => {
   it("persists dark mode preference across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreen("settings");
-    const firstSettingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
+    const firstSettingsPanel = within(document.body).getByRole("heading", { name: "Global appearance preferences" }).closest(".panel");
     expect(firstSettingsPanel).not.toBeNull();
     fireEvent.change(within(firstSettingsPanel as HTMLElement).getByLabelText("Theme mode"), {
       target: { value: "dark" }
@@ -76,7 +76,7 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).toHaveClass("theme-dark");
 
     switchScreen("settings");
-    const settingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Global appearance preferences" }).closest(".panel");
     expect(settingsPanel).not.toBeNull();
     expect(within(settingsPanel as HTMLElement).getByLabelText("Theme mode")).toHaveValue("dark");
   });
@@ -87,7 +87,7 @@ describe("App integration UI - theme mode", () => {
 
     const before = store.getState();
     switchScreen("settings");
-    const settingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Global appearance preferences" }).closest(".panel");
     expect(settingsPanel).not.toBeNull();
     fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "dark" } });
     const after = store.getState();

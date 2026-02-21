@@ -2,7 +2,7 @@ import type { ChangeEvent, ReactElement, RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
-import type { SortDirection, SortField, TableDensity } from "../../types/app-controller";
+import type { SortDirection, SortField, TableDensity, TableFontSize } from "../../types/app-controller";
 import type { ImportExportStatus } from "../../types/app-controller";
 
 interface SettingsWorkspaceContentProps {
@@ -24,6 +24,8 @@ interface SettingsWorkspaceContentProps {
   setThemeMode: (value: ThemeMode) => void;
   tableDensity: TableDensity;
   setTableDensity: (value: TableDensity) => void;
+  tableFontSize: TableFontSize;
+  setTableFontSize: (value: TableFontSize) => void;
   defaultSortField: SortField;
   setDefaultSortField: (value: SortField) => void;
   defaultSortDirection: SortDirection;
@@ -66,6 +68,8 @@ export function SettingsWorkspaceContent({
   setThemeMode,
   tableDensity,
   setTableDensity,
+  tableFontSize,
+  setTableFontSize,
   defaultSortField,
   setDefaultSortField,
   defaultSortDirection,
@@ -92,10 +96,10 @@ export function SettingsWorkspaceContent({
     <section className="panel-grid settings-panel-grid">
       <section className="panel settings-panel">
         <header className="settings-panel-header">
-          <h2>Table and list preferences</h2>
+          <h2>Global appearance preferences</h2>
           <span className="settings-panel-chip">Display</span>
         </header>
-        <p className="settings-panel-intro">Global defaults for list density and sorting across modeling and analysis views.</p>
+        <p className="settings-panel-intro">Global visual defaults for theme, table typography, density, and sorting across modeling and analysis views.</p>
         <div className="settings-grid">
           <label className="settings-field">
             Theme mode
@@ -113,6 +117,14 @@ export function SettingsWorkspaceContent({
             <select value={tableDensity} onChange={(event) => setTableDensity(event.target.value as TableDensity)}>
               <option value="comfortable">Comfortable</option>
               <option value="compact">Compact</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            Table font size
+            <select value={tableFontSize} onChange={(event) => setTableFontSize(event.target.value as TableFontSize)}>
+              <option value="small">Small</option>
+              <option value="normal">Normal</option>
+              <option value="large">Large</option>
             </select>
           </label>
           <label className="settings-field">

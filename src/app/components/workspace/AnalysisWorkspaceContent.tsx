@@ -229,7 +229,7 @@ export function AnalysisWorkspaceContent({
 
       <section className="panel" hidden={!isConnectorSubScreen}>
         <header className="list-panel-header">
-          <h2>Connector</h2>
+          <h2>Connector analysis</h2>
           <div className="chip-group list-panel-filters" role="group" aria-label="Connector analysis view">
             <button
               type="button"
@@ -421,7 +421,7 @@ export function AnalysisWorkspaceContent({
 
       <section className="panel" hidden={!isSpliceSubScreen}>
         <header className="list-panel-header">
-          <h2>Splice</h2>
+          <h2>Splice analysis</h2>
           <div className="chip-group list-panel-filters" role="group" aria-label="Splice analysis view">
             <button
               type="button"
@@ -617,7 +617,7 @@ export function AnalysisWorkspaceContent({
 
       <section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen}>
         <header className="analysis-wire-route-header">
-          <h2>Wire route control</h2>
+          <h2>Wire analysis</h2>
           {selectedWire !== null ? (
             <span className={selectedWire.isRouteLocked ? "analysis-wire-mode-chip is-locked" : "analysis-wire-mode-chip"}>
               {selectedWire.isRouteLocked ? "Locked route" : "Auto route"}

@@ -354,3 +354,214 @@
   background: linear-gradient(180deg, #5a8bb0, #3f6d8f) !important;
   color: #f2f8fd !important;
 }
+
+.app-shell.theme-slate-neon .settings-panel {
+  border-color: #2f6676;
+  background: linear-gradient(170deg, rgba(18, 52, 68, 0.96) 0%, rgba(15, 42, 56, 0.92) 100%);
+  box-shadow: inset 0 1px 0 rgba(148, 214, 226, 0.08);
+}
+
+.app-shell.theme-slate-neon .settings-panel-intro {
+  color: #a7cdd6;
+}
+
+.app-shell.theme-slate-neon .settings-panel-chip {
+  border-color: #467f8f;
+  background: #1e4b5c;
+  color: #ddfbff;
+}
+
+.app-shell.theme-slate-neon .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-slate-neon .settings-panel .settings-checkbox {
+  color: #d8f6fb;
+}
+
+.app-shell.theme-slate-neon .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-slate-neon .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #0f2a38;
+  border-color: #3e7584;
+  color: #ecfdff;
+}
+
+.app-shell.theme-slate-neon .settings-panel .settings-checkbox:hover {
+  background: rgba(42, 100, 114, 0.32);
+}
+
+.app-shell.theme-slate-neon .settings-actions {
+  border-top-color: rgba(89, 139, 151, 0.5);
+}
+
+.app-shell.theme-slate-neon .settings-shortcut-list li {
+  color: #d3eff5;
+  border-color: #3c7181;
+  background: rgba(17, 46, 59, 0.74);
+}
+
+.app-shell.theme-slate-neon .settings-shortcut-key {
+  border-color: #478091;
+  background: #1f4e60;
+  color: #ddfbff;
+}
+
+.app-shell.theme-paper-blueprint .settings-panel {
+  border-color: #b2c7d9;
+  background: linear-gradient(168deg, rgba(251, 254, 255, 0.97) 0%, rgba(237, 247, 255, 0.88) 100%);
+}
+
+.app-shell.theme-paper-blueprint .settings-panel-intro {
+  color: #4c6a82;
+}
+
+.app-shell.theme-paper-blueprint .settings-panel-chip {
+  border-color: #9cb9ce;
+  background: #deedf8;
+  color: #264c68;
+}
+
+.app-shell.theme-paper-blueprint .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-paper-blueprint .settings-panel .settings-checkbox {
+  color: #254b66;
+}
+
+.app-shell.theme-paper-blueprint .settings-actions {
+  border-top-color: rgba(157, 184, 204, 0.58);
+}
+
+.app-shell.theme-paper-blueprint .settings-shortcut-list li {
+  color: #31556e;
+  border-color: #c1d4e3;
+  background: rgba(247, 252, 255, 0.9);
+}
+
+.app-shell.theme-paper-blueprint .settings-shortcut-key {
+  border-color: #b1c8db;
+  background: #e6f1f9;
+  color: #26506b;
+}
+
+.app-shell.theme-warm-brown .settings-panel {
+  border-color: #d8bfa9;
+  background: linear-gradient(168deg, rgba(255, 248, 241, 0.96) 0%, rgba(245, 231, 215, 0.9) 100%);
+}
+
+.app-shell.theme-warm-brown .settings-panel-intro {
+  color: #6f503a;
+}
+
+.app-shell.theme-warm-brown .settings-panel-chip {
+  border-color: #caa686;
+  background: #f0dcc8;
+  color: #6a4731;
+}
+
+.app-shell.theme-warm-brown .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-warm-brown .settings-panel .settings-checkbox {
+  color: #5f412d;
+}
+
+.app-shell.theme-warm-brown .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-warm-brown .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #fffaf4;
+  border-color: #d0b499;
+  color: #4f3525;
+}
+
+.app-shell.theme-warm-brown .settings-panel .settings-checkbox:hover {
+  background: rgba(224, 191, 161, 0.28);
+}
+
+.app-shell.theme-warm-brown .settings-actions {
+  border-top-color: rgba(198, 165, 134, 0.56);
+}
+
+.app-shell.theme-warm-brown .settings-shortcut-list li {
+  color: #654835;
+  border-color: #d2b79e;
+  background: rgba(255, 248, 240, 0.88);
+}
+
+.app-shell.theme-warm-brown .settings-shortcut-key {
+  border-color: #c9a788;
+  background: #f1dfce;
+  color: #684832;
+}
+
+.app-shell.theme-warm-brown .settings-state-chip {
+  border-color: #c9a98c;
+  background: #f0ddca;
+  color: #654835;
+}
+
+.app-shell.theme-warm-brown .settings-state-chip.is-ok {
+  border-color: #98b285;
+  background: #e7f0de;
+  color: #355535;
+}
+
+.app-shell.theme-warm-brown .settings-state-chip.is-warn {
+  border-color: #d1b579;
+  background: #f8edd8;
+  color: #624512;
+}
+
+.app-shell.theme-warm-brown .settings-export-fieldset {
+  border-color: #cfb297;
+  background: rgba(255, 249, 242, 0.82);
+}
+
+.app-shell.theme-warm-brown .settings-import-summary .meta-line {
+  border-color: #d2b79e;
+  background: rgba(255, 248, 240, 0.8);
+}
+
+.app-shell.theme-warm-brown .settings-import-summary .meta-line strong {
+  color: #5f412d;
+}
+
+.app-shell.theme-deep-green .settings-panel {
+  border-color: #3f6c58;
+  background: linear-gradient(170deg, rgba(20, 49, 38, 0.96) 0%, rgba(16, 40, 31, 0.92) 100%);
+  box-shadow: inset 0 1px 0 rgba(148, 197, 170, 0.08);
+}
+
+.app-shell.theme-deep-green .settings-panel-intro {
+  color: #9fc7ac;
+}
+
+.app-shell.theme-deep-green .settings-panel-chip {
+  border-color: #59896f;
+  background: #234d3b;
+  color: #d8f0df;
+}
+
+.app-shell.theme-deep-green .settings-shortcut-list li {
+  color: #d2ead8;
+  border-color: #4d7a67;
+  background: rgba(17, 42, 33, 0.76);
+}
+
+.app-shell.theme-deep-green .settings-shortcut-key {
+  border-color: #5b8f75;
+  background: #285843;
+  color: #ddf4e4;
+}
+
+.app-shell.theme-deep-green .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-deep-green .settings-panel .settings-checkbox {
+  color: #d8efdf;
+}
+
+.app-shell.theme-deep-green .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-deep-green .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #102a21;
+  border-color: #4d7a66;
+  color: #eaf7ed;
+}
+
+.app-shell.theme-deep-green .settings-panel .settings-checkbox:hover {
+  background: rgba(52, 98, 76, 0.35);
+}
+
+.app-shell.theme-deep-green .settings-actions {
+  border-top-color: rgba(92, 140, 117, 0.5);
+}

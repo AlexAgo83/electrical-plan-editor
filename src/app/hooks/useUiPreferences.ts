@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import type { ThemeMode } from "../../store";
+import type { TableFontSize } from "../types/app-controller";
 
 const UI_PREFERENCES_SCHEMA_VERSION = 1;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
@@ -22,6 +23,7 @@ function normalizeThemeMode(value: unknown): ThemeMode {
 }
 
 type TableDensity = "comfortable" | "compact";
+type TableFontSizePreference = TableFontSize;
 type SortField = "name" | "technicalId";
 type SortDirection = "asc" | "desc";
 
@@ -34,6 +36,7 @@ interface UiPreferencesPayload {
   schemaVersion: number;
   themeMode: ThemeMode;
   tableDensity: TableDensity;
+  tableFontSize: TableFontSizePreference;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
   defaultIdSortDirection: SortDirection;
@@ -76,6 +79,7 @@ interface UseUiPreferencesOptions {
   networkMaxScale: number;
   themeMode: ThemeMode;
   tableDensity: TableDensity;
+  tableFontSize: TableFontSizePreference;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
   defaultIdSortDirection: SortDirection;
@@ -87,6 +91,7 @@ interface UseUiPreferencesOptions {
   preferencesHydrated: boolean;
   setThemeMode: (mode: ThemeMode) => void;
   setTableDensity: (density: TableDensity) => void;
+  setTableFontSize: (value: TableFontSizePreference) => void;
   setDefaultSortField: (field: SortField) => void;
   setDefaultSortDirection: (direction: SortDirection) => void;
   setDefaultIdSortDirection: (direction: SortDirection) => void;
@@ -115,6 +120,7 @@ export function useUiPreferences({
   networkMaxScale,
   themeMode,
   tableDensity,
+  tableFontSize,
   defaultSortField,
   defaultSortDirection,
   defaultIdSortDirection,
@@ -126,6 +132,7 @@ export function useUiPreferences({
   preferencesHydrated,
   setThemeMode,
   setTableDensity,
+  setTableFontSize,
   setDefaultSortField,
   setDefaultSortDirection,
   setDefaultIdSortDirection,
@@ -166,7 +173,12 @@ export function useUiPreferences({
         : 1;
 
       setThemeMode(normalizeThemeMode(preferences.themeMode));
-      setTableDensity(preferences.tableDensity === "compact" ? "compact" : "comfortable");
+      setTableDensity(preferences.tableDensity === "comfortable" ? "comfortable" : "compact");
+      setTableFontSize(
+        preferences.tableFontSize === "small" || preferences.tableFontSize === "large"
+          ? preferences.tableFontSize
+          : "normal"
+      );
       setDefaultSortField(sortField);
       setDefaultSortDirection(sortDirection);
       setDefaultIdSortDirection(idSortDirection);
@@ -215,6 +227,7 @@ export function useUiPreferences({
     setSpliceSort,
     setSpliceSynthesisSort,
     setTableDensity,
+    setTableFontSize,
     setThemeMode,
     setWireSort,
     setConnectorSynthesisSort
@@ -229,6 +242,7 @@ export function useUiPreferences({
       schemaVersion: UI_PREFERENCES_SCHEMA_VERSION,
       themeMode,
       tableDensity,
+      tableFontSize,
       defaultSortField,
       defaultSortDirection,
       defaultIdSortDirection,
@@ -255,6 +269,7 @@ export function useUiPreferences({
     preferencesHydrated,
     showShortcutHints,
     tableDensity,
+    tableFontSize,
     themeMode
   ]);
 }

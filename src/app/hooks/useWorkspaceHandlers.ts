@@ -11,7 +11,7 @@ import {
   clamp,
   createEntityId
 } from "../lib/app-utils";
-import type { NodePosition, SortDirection, SortField, SortState, TableDensity } from "../types/app-controller";
+import type { NodePosition, SortDirection, SortField, SortState, TableDensity, TableFontSize } from "../types/app-controller";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -56,6 +56,7 @@ interface UseWorkspaceHandlersParams {
   setSegmentIdSortDirection: (value: SortDirection) => void;
   setThemeMode: (value: ThemeMode | ((current: ThemeMode) => ThemeMode)) => void;
   setTableDensity: (value: TableDensity) => void;
+  setTableFontSize: (value: TableFontSize) => void;
   setDefaultSortField: (value: SortField) => void;
   setDefaultSortDirection: (value: SortDirection) => void;
   setDefaultIdSortDirection: (value: SortDirection) => void;
@@ -102,6 +103,7 @@ export function useWorkspaceHandlers({
   setSegmentIdSortDirection,
   setThemeMode,
   setTableDensity,
+  setTableFontSize,
   setDefaultSortField,
   setDefaultSortDirection,
   setDefaultIdSortDirection,
@@ -347,7 +349,8 @@ export function useWorkspaceHandlers({
   function resetWorkspacePreferencesToDefaults(): void {
     const defaultSort: SortState = { field: "name", direction: "asc" };
     setThemeMode("dark");
-    setTableDensity("comfortable");
+    setTableDensity("compact");
+    setTableFontSize("normal");
     setDefaultSortField("name");
     setDefaultSortDirection("asc");
     setDefaultIdSortDirection("asc");

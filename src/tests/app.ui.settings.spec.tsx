@@ -20,7 +20,7 @@ describe("App integration UI - settings", () => {
     renderAppWithState(createConnectorSortingState());
 
     switchScreen("settings");
-    const settingsPanel = getPanelByHeading("Table and list preferences");
+    const settingsPanel = getPanelByHeading("Global appearance preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Default sort column"), {
       target: { value: "technicalId" }
     });
@@ -39,7 +39,7 @@ describe("App integration UI - settings", () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreen("settings");
-    const settingsPanel = getPanelByHeading("Table and list preferences");
+    const settingsPanel = getPanelByHeading("Global appearance preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Table density"), {
       target: { value: "compact" }
     });
@@ -49,11 +49,31 @@ describe("App integration UI - settings", () => {
     expect(appShell).toHaveClass("table-density-compact");
   });
 
+  it("uses normal table font size by default and updates table font class from settings", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    const appShell = document.querySelector("main.app-shell");
+    expect(appShell).not.toBeNull();
+    expect(appShell).toHaveClass("table-font-normal");
+
+    switchScreen("settings");
+    const settingsPanel = getPanelByHeading("Global appearance preferences");
+    fireEvent.change(within(settingsPanel).getByLabelText("Table font size"), {
+      target: { value: "small" }
+    });
+    expect(appShell).toHaveClass("table-font-small");
+
+    fireEvent.change(within(settingsPanel).getByLabelText("Table font size"), {
+      target: { value: "large" }
+    });
+    expect(appShell).toHaveClass("table-font-large");
+  });
+
   it("persists settings preferences across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 
     switchScreen("settings");
-    const settingsPanel = getPanelByHeading("Table and list preferences");
+    const settingsPanel = getPanelByHeading("Global appearance preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Table density"), {
       target: { value: "compact" }
     });
@@ -69,7 +89,7 @@ describe("App integration UI - settings", () => {
     expect(appShell).toHaveClass("table-density-compact");
 
     switchScreen("settings");
-    const restoredSettingsPanel = getPanelByHeading("Table and list preferences");
+    const restoredSettingsPanel = getPanelByHeading("Global appearance preferences");
     expect(within(restoredSettingsPanel).getByLabelText("Default sort column")).toHaveValue("technicalId");
   });
 
@@ -79,7 +99,7 @@ describe("App integration UI - settings", () => {
     switchScreen("settings");
     const sampleControlsPanel = getPanelByHeading("Sample network controls");
     const recreateButton = within(sampleControlsPanel).getByRole("button", {
-      name: "Recreate sample network (empty workspace only)"
+      name: "Recreate sample network"
     });
     const resetButton = within(sampleControlsPanel).getByRole("button", {
       name: "Reset sample network to baseline"
