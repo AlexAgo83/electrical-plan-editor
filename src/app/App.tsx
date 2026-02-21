@@ -2475,6 +2475,12 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setActiveScreen("validation");
   }
 
+  function clearValidationFilters(): void {
+    setValidationSearchQuery("");
+    setValidationCategoryFilter("all");
+    setValidationSeverityFilter("all");
+  }
+
   function findValidationIssueIndex(issueId: string): number {
     return orderedValidationIssues.findIndex((candidate) => candidate.id === issueId);
   }
@@ -4598,6 +4604,17 @@ export function App({ store = appStore }: AppProps): ReactElement {
                     {category}
                   </button>
                 ))}
+              </div>
+              <div className="row-actions compact">
+                <button type="button" onClick={() => moveValidationIssueCursor(-1)} disabled={orderedValidationIssues.length === 0}>
+                  Previous issue
+                </button>
+                <button type="button" onClick={() => moveValidationIssueCursor(1)} disabled={orderedValidationIssues.length === 0}>
+                  Next issue
+                </button>
+                <button type="button" onClick={clearValidationFilters}>
+                  Clear filters
+                </button>
               </div>
             </div>
             {validationIssues.length === 0 ? (

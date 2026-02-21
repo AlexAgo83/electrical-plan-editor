@@ -355,6 +355,27 @@ describe("App integration UI", () => {
     expect(within(validationPanel).queryByRole("heading", { name: "Occupancy conflict" })).not.toBeInTheDocument();
   });
 
+  it("clears validation filters and search from toolbar", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    switchScreen("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    const searchInput = within(validationPanel).getByLabelText("Search validation issues");
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
+    fireEvent.change(searchInput, { target: { value: "manual-ghost" } });
+
+    const validationSummary = getPanelByHeading("Validation summary");
+    expect(within(validationSummary).getByText(/Active filters:\s*Warnings \/ All categories \/ Search:\s*"manual-ghost"/i)).toBeInTheDocument();
+
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Clear filters" }));
+
+    expect(searchInput).toHaveValue("");
+    expect(within(validationSummary).getByText(/Active filters:\s*All severities \/ All categories \/ Search:\s*none/i)).toBeInTheDocument();
+    expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
+    expect(within(validationPanel).getByRole("heading", { name: "Route lock validity" })).toBeInTheDocument();
+  });
+
   it("shows model health quick actions and opens validation with severity focus", () => {
     const store = createAppStore(createValidationIssueState());
     render(<App store={store} />);
