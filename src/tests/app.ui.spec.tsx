@@ -411,4 +411,31 @@ describe("App integration UI", () => {
     expect(within(connectorsPanel).getByText("Connector used")).toBeInTheDocument();
     expect(within(connectorsPanel).queryByText("Connector free")).not.toBeInTheDocument();
   });
+
+  it("navigates from validation issue to modeling context and returns canvas to select mode", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    const networkPanel = getPanelByHeading("Network summary");
+    fireEvent.click(within(networkPanel).getByRole("button", { name: /^Route$/ }));
+    expect(within(networkPanel).getByRole("button", { name: /^Route$/ })).toHaveClass("is-active");
+
+    switchScreen("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    const connectorIssue = within(validationPanel).getByText(/Connector 'C1' cavity C2/i);
+    const issueRow = connectorIssue.closest("tr");
+    expect(issueRow).not.toBeNull();
+    fireEvent.click(within(issueRow as HTMLElement).getByRole("button", { name: "Go to" }));
+
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/ })).toHaveClass("is-active");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/ })).toHaveClass("is-active");
+
+    const updatedNetworkPanel = getPanelByHeading("Network summary");
+    expect(within(updatedNetworkPanel).getByRole("button", { name: /^Select$/ })).toHaveClass("is-active");
+  });
 });

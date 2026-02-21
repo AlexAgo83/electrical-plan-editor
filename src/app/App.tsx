@@ -334,6 +334,11 @@ interface ValidationIssue {
   selectionId: string;
 }
 
+interface SelectionTarget {
+  kind: ValidationIssue["selectionKind"];
+  id: string;
+}
+
 export function App({ store = appStore }: AppProps): ReactElement {
   const state = useAppSnapshot(store);
 
@@ -2141,6 +2146,101 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
   }
 
+  function resolveSelectionAnchor(target: SelectionTarget): NodePosition | null {
+    if (target.kind === "node") {
+      return networkNodePositions[target.id as NodeId] ?? null;
+    }
+
+    if (target.kind === "segment") {
+      const segment = segmentMap.get(target.id as SegmentId);
+      if (segment === undefined) {
+        return null;
+      }
+
+      const nodeAPosition = networkNodePositions[segment.nodeA];
+      const nodeBPosition = networkNodePositions[segment.nodeB];
+      if (nodeAPosition === undefined || nodeBPosition === undefined) {
+        return null;
+      }
+
+      return {
+        x: (nodeAPosition.x + nodeBPosition.x) / 2,
+        y: (nodeAPosition.y + nodeBPosition.y) / 2
+      };
+    }
+
+    if (target.kind === "connector") {
+      const nodeId = connectorNodeByConnectorId.get(target.id as ConnectorId);
+      if (nodeId === undefined) {
+        return null;
+      }
+
+      return networkNodePositions[nodeId] ?? null;
+    }
+
+    if (target.kind === "splice") {
+      const nodeId = spliceNodeBySpliceId.get(target.id as SpliceId);
+      if (nodeId === undefined) {
+        return null;
+      }
+
+      return networkNodePositions[nodeId] ?? null;
+    }
+
+    const wire = state.wires.byId[target.id as WireId];
+    if (wire === undefined) {
+      return null;
+    }
+
+    const firstSegmentId = wire.routeSegmentIds[0];
+    if (firstSegmentId !== undefined) {
+      const firstSegment = segmentMap.get(firstSegmentId);
+      if (firstSegment !== undefined) {
+        const nodeAPosition = networkNodePositions[firstSegment.nodeA];
+        const nodeBPosition = networkNodePositions[firstSegment.nodeB];
+        if (nodeAPosition !== undefined && nodeBPosition !== undefined) {
+          return {
+            x: (nodeAPosition.x + nodeBPosition.x) / 2,
+            y: (nodeAPosition.y + nodeBPosition.y) / 2
+          };
+        }
+      }
+    }
+
+    const endpointNodeId = resolveEndpointNodeId(wire.endpointA, connectorNodeByConnectorId, spliceNodeBySpliceId);
+    if (endpointNodeId !== null) {
+      return networkNodePositions[endpointNodeId] ?? null;
+    }
+
+    return null;
+  }
+
+  function focusSelectionOnCanvas(target: SelectionTarget): void {
+    const anchor = resolveSelectionAnchor(target);
+    if (anchor === null) {
+      return;
+    }
+
+    setInteractionMode("select");
+    const targetScale = networkScale < 1 ? 1 : networkScale;
+    setNetworkScale(targetScale);
+    setNetworkOffset({
+      x: NETWORK_VIEW_WIDTH / 2 - anchor.x * targetScale,
+      y: NETWORK_VIEW_HEIGHT / 2 - anchor.y * targetScale
+    });
+  }
+
+  function handleFocusCurrentSelectionOnCanvas(): void {
+    if (selected === null) {
+      return;
+    }
+
+    focusSelectionOnCanvas({
+      kind: selected.kind,
+      id: selected.id
+    });
+  }
+
   function handleValidationIssueGoTo(issue: ValidationIssue): void {
     setActiveScreen("modeling");
     setActiveSubScreen(issue.subScreen);
@@ -2150,6 +2250,10 @@ export function App({ store = appStore }: AppProps): ReactElement {
         id: issue.selectionId
       })
     );
+    focusSelectionOnCanvas({
+      kind: issue.selectionKind,
+      id: issue.selectionId
+    });
   }
 
   function handleOpenSelectionInInspector(): void {
@@ -2549,6 +2653,9 @@ export function App({ store = appStore }: AppProps): ReactElement {
             </button>
             <button type="button" onClick={handleStartSelectedEdit} disabled={selectedSubScreen === null}>
               Edit selected
+            </button>
+            <button type="button" onClick={handleFocusCurrentSelectionOnCanvas} disabled={selectedSubScreen === null}>
+              Focus canvas
             </button>
             <button type="button" onClick={() => dispatchAction(appActions.clearSelection())}>
               Clear selection
