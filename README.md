@@ -4,7 +4,7 @@ A local-first electrical network editor focused on deterministic modeling, routi
 
 The project models connectors, splices, nodes, segments, and wires as a graph, computes shortest routes, and keeps wire lengths synchronized with segment changes.
 
-[![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/Sentry)](LICENSE)
+[![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
 
 ## Table of Contents
 
@@ -14,7 +14,6 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 - [Available Scripts](#available-scripts)
 - [Project Structure](#project-structure)
 - [Quality and CI](#quality-and-ci)
-- [Roadmap and Logics](#roadmap-and-logics)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -84,6 +83,8 @@ Then open the local Vite URL shown in the terminal.
 - `npm run test`: run Vitest in watch mode
 - `npm run test:ci`: run Vitest with coverage
 - `npm run test:e2e`: run Playwright E2E smoke tests
+- `npm run quality:ui-modularization`: enforce UI modularization line-budget gate
+- `npm run quality:store-modularization`: enforce store modularization line-budget gate
 
 ## Project Structure
 
@@ -93,6 +94,7 @@ src/
   core/                   # Domain entities, graph and pathfinding
   store/                  # State management, reducer, selectors, actions
   adapters/persistence/   # Local storage persistence + migrations
+  adapters/portability/   # Network import/export payload adapters
   tests/                  # Unit + integration tests
 
 tests/e2e/                # Playwright end-to-end smoke
@@ -112,21 +114,6 @@ npm run test:e2e
 ```
 
 CI runs the same pipeline in `.github/workflows/ci.yml` on `push` and `pull_request`.
-
-## Roadmap and Logics
-
-Product and delivery planning are tracked in `logics/`:
-
-- Requests: `logics/request/`
-- Backlog items: `logics/backlog/`
-- Orchestration tasks: `logics/tasks/`
-- Architecture references: `logics/architecture/`
-
-Key starting points:
-
-- `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`
-- `logics/request/req_001_v1_ux_ui_operator_workspace.md`
-- `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`
 
 ## Contributing
 
