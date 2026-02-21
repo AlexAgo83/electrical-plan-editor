@@ -181,7 +181,7 @@ export function SettingsWorkspaceContent({
           <li><span className="technical-id">Ctrl/Cmd + Z</span> Undo last modeling action</li>
           <li><span className="technical-id">Ctrl/Cmd + Shift + Z</span> Redo</li>
           <li><span className="technical-id">Ctrl/Cmd + Y</span> Redo alternative shortcut</li>
-          <li><span className="technical-id">Alt + 1..4</span> Switch top-level workspace</li>
+          <li><span className="technical-id">Alt + 1..5</span> Switch top-level workspace</li>
           <li><span className="technical-id">Alt + Shift + 1..5</span> Switch entity sub-screen</li>
           <li><span className="technical-id">Alt + V/N/G/C/R</span> Set interaction mode</li>
           <li><span className="technical-id">Alt + F</span> Fit network view to current graph</li>

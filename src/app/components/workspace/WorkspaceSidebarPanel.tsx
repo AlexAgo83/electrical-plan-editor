@@ -4,7 +4,7 @@ import { WorkspaceNavigation } from "../WorkspaceNavigation";
 import type { SubScreenId, ValidationIssue } from "../../types/app-controller";
 
 interface WorkspaceSidebarPanelProps {
-  activeScreen: "modeling" | "analysis" | "validation" | "settings";
+  activeScreen: "networkScope" | "modeling" | "analysis" | "validation" | "settings";
   activeSubScreen: SubScreenId;
   isModelingScreen: boolean;
   isAnalysisScreen: boolean;
@@ -12,7 +12,7 @@ interface WorkspaceSidebarPanelProps {
   validationIssuesCount: number;
   validationErrorCount: number;
   entityCountBySubScreen: Record<SubScreenId, number>;
-  onScreenChange: (screen: "modeling" | "analysis" | "validation" | "settings") => void;
+  onScreenChange: (screen: "networkScope" | "modeling" | "analysis" | "validation" | "settings") => void;
   onSubScreenChange: (subScreen: SubScreenId) => void;
   networks: Array<{
     id: NetworkId;

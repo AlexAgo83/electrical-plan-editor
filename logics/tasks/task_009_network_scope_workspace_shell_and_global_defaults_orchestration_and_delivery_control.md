@@ -1,8 +1,8 @@
 ## task_009_network_scope_workspace_shell_and_global_defaults_orchestration_and_delivery_control - Network Scope Workspace Shell and Global Defaults Orchestration and Delivery Control
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 13%
 > Complexity: High
 > Theme: Workspace Shell and Navigation Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -22,7 +22,7 @@ Backlog scope covered:
 - `item_063_inspector_context_floating_bottom_right_panel.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 navigation foundation: `Network Scope` primary entry and ordering (`item_055`)
+- [x] 1. Deliver Wave 0 navigation foundation: `Network Scope` primary entry and ordering (`item_055`)
 - [ ] 2. Deliver Wave 1 shell refactor: sticky header + drawer overlay behavior (`item_056`)
 - [ ] 3. Deliver Wave 2 network lifecycle consolidation in `Network Scope` with safeguards (`item_057`)
 - [ ] 4. Deliver Wave 3 global settings relocation and defaults (`dark` + snap enabled) with persistence compatibility (`item_058`)
@@ -43,7 +43,7 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 pending: primary navigation restructuring not started.
+  - Wave 0 completed: added `Network Scope` primary workspace entry, updated navigation order, and introduced explicit separation from entity-level tabs.
   - Wave 1 pending: sticky header and drawer overlay migration not started.
   - Wave 2 pending: lifecycle UI consolidation to `Network Scope` not started.
   - Wave 3 pending: settings relocation/defaults compatibility work not started.
@@ -52,7 +52,7 @@ Backlog scope covered:
   - Wave 6 pending: contextual inspector floating panel behavior not started.
   - Wave 7 pending: regression/accessibility/traceability closure not started.
 - Current blockers:
-  - None at orchestration kickoff. Sequence dependencies between shell waves remain mandatory.
+  - None. Sequence dependencies between shell waves remain mandatory.
 - Main risks to track:
   - Focus/keyboard regressions from overlay drawer and multiple floating panels.
   - Scroll/layering conflicts between sticky header, content viewport, and bottom-right inspector.
@@ -63,4 +63,8 @@ Backlog scope covered:
   - Keep accessibility checks explicit for open/close/focus-return interactions.
   - Validate preference migration and local persistence invariants before closing defaults wave.
   - Maintain AC traceability matrix closure in final regression wave (`item_059`).
-
+- Validation snapshot (Wave 0):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npm test -- src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.settings.spec.tsx src/tests/app.ui.theme.spec.tsx` OK

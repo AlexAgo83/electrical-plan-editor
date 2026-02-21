@@ -40,7 +40,7 @@ interface UseSelectionHandlersParams {
   selectedNode: NetworkNode | null;
   selectedSegment: Segment | null;
   selectedWire: Wire | null;
-  setActiveScreen: (screen: "modeling" | "analysis" | "validation" | "settings") => void;
+  setActiveScreen: (screen: "networkScope" | "modeling" | "analysis" | "validation" | "settings") => void;
   setActiveSubScreen: (screen: SubScreenId) => void;
   orderedValidationIssues: ValidationIssue[];
   visibleValidationIssues: ValidationIssue[];

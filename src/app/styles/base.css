@@ -275,6 +275,10 @@ button {
   color: #9bc3e3;
 }
 
+.app-shell.theme-dark .workspace-nav-divider {
+  color: #9db6ca;
+}
+
 .app-shell.theme-dark .sort-header-button:hover {
   color: #8ec7f5;
 }

@@ -16,6 +16,18 @@ describe("App integration UI - navigation and canvas", () => {
     localStorage.clear();
   });
 
+  it("exposes Network Scope as a primary workspace entry", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    const networkScopeButton = within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Network Scope$/ });
+    fireEvent.click(networkScopeButton);
+    expect(networkScopeButton).toHaveClass("is-active");
+    expect(document.querySelector(".workspace-nav-row.secondary")).toBeNull();
+    expect(getPanelByHeading("Network Scope")).toBeInTheDocument();
+  });
+
   it("supports undo and redo for modeling actions", () => {
     renderAppWithState(createInitialState());
 
@@ -156,7 +168,7 @@ describe("App integration UI - navigation and canvas", () => {
   it("supports alt keyboard shortcuts for workspace navigation and interaction modes", () => {
     renderAppWithState(createUiIntegrationState());
 
-    fireEvent.keyDown(window, { key: "2", altKey: true });
+    fireEvent.keyDown(window, { key: "3", altKey: true });
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
     expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Analysis$/ })).toHaveClass("is-active");

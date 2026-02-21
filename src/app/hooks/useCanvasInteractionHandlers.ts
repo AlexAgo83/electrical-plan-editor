@@ -18,7 +18,7 @@ interface UseCanvasInteractionHandlersParams {
   interactionMode: "select" | "addNode" | "addSegment" | "connect" | "route";
   modeAnchorNodeId: NodeId | null;
   setModeAnchorNodeId: (value: NodeId | null) => void;
-  setActiveScreen: (screen: "modeling" | "analysis" | "validation" | "settings") => void;
+  setActiveScreen: (screen: "networkScope" | "modeling" | "analysis" | "validation" | "settings") => void;
   setActiveSubScreen: (screen: SubScreenId) => void;
   setSegmentFormMode: (mode: "create" | "edit") => void;
   setEditingSegmentId: (id: SegmentId | null) => void;

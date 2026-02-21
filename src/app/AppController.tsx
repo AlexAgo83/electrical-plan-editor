@@ -53,6 +53,7 @@ import { InspectorContextPanel } from "./components/InspectorContextPanel";
 import { NetworkSummaryPanel } from "./components/NetworkSummaryPanel";
 import { AnalysisScreen } from "./components/screens/AnalysisScreen";
 import { ModelingScreen } from "./components/screens/ModelingScreen";
+import { NetworkScopeScreen } from "./components/screens/NetworkScopeScreen";
 import { SettingsScreen } from "./components/screens/SettingsScreen";
 import { ValidationScreen } from "./components/screens/ValidationScreen";
 import { AppHeaderAndStats } from "./components/workspace/AppHeaderAndStats";
@@ -60,6 +61,7 @@ import { AnalysisWorkspaceContent } from "./components/workspace/AnalysisWorkspa
 import { ModelingFormsColumn } from "./components/workspace/ModelingFormsColumn";
 import { ModelingPrimaryTables } from "./components/workspace/ModelingPrimaryTables";
 import { ModelingSecondaryTables } from "./components/workspace/ModelingSecondaryTables";
+import { NetworkScopeWorkspaceContent } from "./components/workspace/NetworkScopeWorkspaceContent";
 import { SettingsWorkspaceContent } from "./components/workspace/SettingsWorkspaceContent";
 import { ValidationWorkspaceContent } from "./components/workspace/ValidationWorkspaceContent";
 import { WorkspaceSidebarPanel } from "./components/workspace/WorkspaceSidebarPanel";
@@ -299,6 +301,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setActiveScreen,
     activeSubScreen,
     setActiveSubScreen,
+    isNetworkScopeScreen,
     isModelingScreen,
     isAnalysisScreen,
     isValidationScreen,
@@ -1219,15 +1222,23 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         />
 
         <section className="workspace-content">
-      {!hasActiveNetwork ? (
-        <section className="panel">
-          <h2>No active network</h2>
-          <p className="empty-copy">
-            Create a network from the sidebar to start modeling connectors, splices, nodes, segments, and wires.
-          </p>
-        </section>
-      ) : (
-        <>
+          <NetworkScopeScreen isActive={isNetworkScopeScreen}>
+            <NetworkScopeWorkspaceContent
+              networks={networks}
+              activeNetworkLabel={activeNetworkLabel}
+              hasActiveNetwork={hasActiveNetwork}
+            />
+          </NetworkScopeScreen>
+
+          {!isNetworkScopeScreen && !hasActiveNetwork ? (
+            <section className="panel">
+              <h2>No active network</h2>
+              <p className="empty-copy">
+                Create a network from the network scope controls to start modeling connectors, splices, nodes, segments, and wires.
+              </p>
+            </section>
+          ) : !isNetworkScopeScreen ? (
+            <>
       <ModelingScreen isActive={isModelingScreen}>
         <section className="workspace-stage">
           <ModelingFormsColumn
@@ -1521,8 +1532,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           lastImportSummary={lastImportSummary}
         />
       </SettingsScreen>
-        </>
-      )}
+            </>
+          ) : null}
         </section>
       </section>
     </main>

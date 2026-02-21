@@ -1,8 +1,8 @@
 ## item_055_network_scope_screen_and_primary_navigation_restructure - Network Scope Screen and Primary Navigation Restructure
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: High
 > Theme: Workspace Information Architecture
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,7 +36,7 @@ Network lifecycle and global context are currently blended into left navigation 
 - References:
   - `logics/request/req_010_network_scope_workspace_shell_and_global_defaults.md`
   - `src/app/components/WorkspaceNavigation.tsx`
+  - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`
   - `src/app/AppController.tsx`
   - `src/app/hooks/useWorkspaceNavigation.ts`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
-

@@ -145,8 +145,9 @@ export function getPanelByHeading(name: string): HTMLElement {
   return panel as HTMLElement;
 }
 
-export function switchScreen(target: "modeling" | "analysis" | "validation" | "settings"): void {
+export function switchScreen(target: "networkScope" | "modeling" | "analysis" | "validation" | "settings"): void {
   const labelByScreen = {
+    networkScope: "Network Scope",
     modeling: "Modeling",
     analysis: "Analysis",
     validation: "Validation",

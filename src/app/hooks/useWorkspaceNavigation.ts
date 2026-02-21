@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
 import type { SelectionState } from "../../store/types";
 
-type ScreenId = "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "networkScope" | "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
 
 interface UseWorkspaceNavigationResult {
@@ -9,6 +9,7 @@ interface UseWorkspaceNavigationResult {
   setActiveScreen: (screen: ScreenId) => void;
   activeSubScreen: SubScreenId;
   setActiveSubScreen: (subScreen: SubScreenId) => void;
+  isNetworkScopeScreen: boolean;
   isModelingScreen: boolean;
   isAnalysisScreen: boolean;
   isValidationScreen: boolean;
@@ -22,6 +23,7 @@ export function useWorkspaceNavigation(selected: SelectionState | null): UseWork
   const activeScreenRef = useRef<ScreenId>("modeling");
   const lastInspectorSelectionRef = useRef<string | null>(null);
 
+  const isNetworkScopeScreen = activeScreen === "networkScope";
   const isModelingScreen = activeScreen === "modeling";
   const isAnalysisScreen = activeScreen === "analysis";
   const isValidationScreen = activeScreen === "validation";
@@ -51,6 +53,7 @@ export function useWorkspaceNavigation(selected: SelectionState | null): UseWork
     setActiveScreen,
     activeSubScreen,
     setActiveSubScreen,
+    isNetworkScopeScreen,
     isModelingScreen,
     isAnalysisScreen,
     isValidationScreen,
