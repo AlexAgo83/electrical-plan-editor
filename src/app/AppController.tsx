@@ -368,7 +368,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   }, [state, routePreviewStartNodeId, routePreviewEndNodeId]);
   const selectedWireRouteSegmentIds = useMemo(() => new Set(selectedWire?.routeSegmentIds ?? []), [selectedWire]);
   const persistedNodePositions = selectNodePositions(state);
-  const autoNodePositions = useMemo(() => createNodePositionMap(nodes, segments), [nodes, segments]);
+  const autoNodePositions = useMemo(
+    () =>
+      createNodePositionMap(nodes, segments, {
+        snapToGrid: snapNodesToGrid,
+        gridStep: NETWORK_GRID_STEP
+      }),
+    [nodes, segments, snapNodesToGrid]
+  );
   const networkNodePositions = useMemo(() => {
     const merged = { ...autoNodePositions };
     for (const node of nodes) {
@@ -660,8 +667,15 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
 
     setManualNodePositions({} as Record<NodeId, NodePosition>);
-    dispatchAction(appActions.setNodePositions(createNodePositionMap(nodes, segments)));
-  }, [dispatchAction, nodes, persistedNodePositions, segments, setManualNodePositions]);
+    dispatchAction(
+      appActions.setNodePositions(
+        createNodePositionMap(nodes, segments, {
+          snapToGrid: snapNodesToGrid,
+          gridStep: NETWORK_GRID_STEP
+        })
+      )
+    );
+  }, [dispatchAction, nodes, persistedNodePositions, segments, setManualNodePositions, snapNodesToGrid]);
   const {
     importFileInputRef,
     selectedExportNetworkIds,

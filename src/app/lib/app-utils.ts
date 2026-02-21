@@ -17,6 +17,11 @@ export const NETWORK_GRID_STEP = 20;
 export const NETWORK_MIN_SCALE = 0.6;
 export const NETWORK_MAX_SCALE = 2.2;
 
+interface NodePositionMapOptions {
+  snapToGrid?: boolean;
+  gridStep?: number;
+}
+
 export function createEntityId(prefix: string): string {
   const randomPart = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
   return `${prefix}-${randomPart}`;
@@ -406,8 +411,11 @@ export function countSegmentCrossings(
 
 export function createNodePositionMap(
   nodes: NetworkNode[],
-  segments: Segment[] = []
+  segments: Segment[] = [],
+  options: NodePositionMapOptions = {}
 ): Record<NodeId, NodePosition> {
+  const shouldSnapToGrid = options.snapToGrid ?? false;
+  const gridStep = options.gridStep ?? NETWORK_GRID_STEP;
   const positions = {} as Record<NodeId, NodePosition>;
   if (nodes.length === 0) {
     return positions;
@@ -493,9 +501,13 @@ export function createNodePositionMap(
       continue;
     }
 
+    const rawX = offsetX + (position.x - minX) * fitScale;
+    const rawY = offsetY + (position.y - minY) * fitScale;
+    const maybeSnappedX = shouldSnapToGrid ? snapToGrid(rawX, gridStep) : rawX;
+    const maybeSnappedY = shouldSnapToGrid ? snapToGrid(rawY, gridStep) : rawY;
     positions[nodeId] = {
-      x: clamp(offsetX + (position.x - minX) * fitScale, 20, NETWORK_VIEW_WIDTH - 20),
-      y: clamp(offsetY + (position.y - minY) * fitScale, 20, NETWORK_VIEW_HEIGHT - 20)
+      x: clamp(maybeSnappedX, 20, NETWORK_VIEW_WIDTH - 20),
+      y: clamp(maybeSnappedY, 20, NETWORK_VIEW_HEIGHT - 20)
     };
   }
 

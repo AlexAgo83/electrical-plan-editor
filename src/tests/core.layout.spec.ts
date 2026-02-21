@@ -67,4 +67,32 @@ describe("2D layout generation", () => {
     expect(nextCrossings).toBeLessThanOrEqual(baselineCrossings);
     expect(nextCrossings).toBe(0);
   });
+
+  it("snaps generated node coordinates to grid when snap option is enabled", () => {
+    const nodes: NetworkNode[] = [
+      { id: asNodeId("N-1"), kind: "intermediate", label: "1" },
+      { id: asNodeId("N-2"), kind: "intermediate", label: "2" },
+      { id: asNodeId("N-3"), kind: "intermediate", label: "3" }
+    ];
+    const segments: Segment[] = [
+      { id: asSegmentId("SEG-1"), nodeA: asNodeId("N-1"), nodeB: asNodeId("N-2"), lengthMm: 10 },
+      { id: asSegmentId("SEG-2"), nodeA: asNodeId("N-2"), nodeB: asNodeId("N-3"), lengthMm: 10 }
+    ];
+
+    const positions = createNodePositionMap(nodes, segments, {
+      snapToGrid: true,
+      gridStep: 20
+    });
+
+    for (const node of nodes) {
+      const position = positions[node.id];
+      expect(position).toBeDefined();
+      if (position === undefined) {
+        continue;
+      }
+
+      expect(position.x % 20).toBe(0);
+      expect(position.y % 20).toBe(0);
+    }
+  });
 });
