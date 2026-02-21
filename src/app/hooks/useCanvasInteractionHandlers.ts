@@ -207,6 +207,16 @@ export function useCanvasInteractionHandlers({
         }
       }
 
+      if (activeSubScreen === "connector" && node.kind === "connector") {
+        dispatchAction(appActions.select({ kind: "connector", id: node.connectorId }));
+        return;
+      }
+
+      if (activeSubScreen === "splice" && node.kind === "splice") {
+        dispatchAction(appActions.select({ kind: "splice", id: node.spliceId }));
+        return;
+      }
+
       dispatchAction(appActions.select({ kind: "node", id: nodeId }));
       return;
     }
