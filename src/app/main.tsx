@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+import { registerServiceWorker } from "./pwa/registerServiceWorker";
 
 const container = document.getElementById("root");
 if (container === null) {
@@ -12,3 +13,15 @@ createRoot(container).render(
     <App />
   </StrictMode>
 );
+
+void registerServiceWorker({
+  onNeedRefresh: () => {
+    window.dispatchEvent(new Event("app:pwa-update-available"));
+  },
+  onOfflineReady: () => {
+    window.dispatchEvent(new Event("app:pwa-offline-ready"));
+  },
+  onRegistrationError: () => {
+    window.dispatchEvent(new Event("app:pwa-registration-error"));
+  }
+});

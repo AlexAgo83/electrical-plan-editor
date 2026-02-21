@@ -2,7 +2,7 @@
 > From version: 0.3.0
 > Understanding: 100%
 > Confidence: 99%
-> Progress: 20%
+> Progress: 40%
 > Complexity: High
 > Theme: PWA Delivery Orchestration
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -19,7 +19,7 @@ Backlog scope covered:
 
 # Plan
 - [x] 1. Deliver Wave 0 PWA baseline: manifest, icons, and Vite build integration (`item_064`)
-- [ ] 2. Deliver Wave 1 service worker registration and update strategy selection (`item_065`)
+- [x] 2. Deliver Wave 1 service worker registration and update strategy selection (`item_065`)
 - [ ] 3. Deliver Wave 2 offline shell caching and deterministic cache invalidation (`item_066`)
 - [ ] 4. Deliver Wave 3 install entrypoint and update/install user feedback (`item_067`)
 - [ ] 5. Deliver Wave 4 regression matrix closure across install/offline/update and browser compatibility (`item_068`)
@@ -37,7 +37,7 @@ Backlog scope covered:
 # Report
 - Wave status:
   - Wave 0 completed: added PWA plugin build integration, manifest metadata, and installability icon assets with successful production build artifact generation (`manifest.webmanifest`, `sw.js`).
-  - Wave 1 pending: service worker lifecycle strategy not started.
+  - Wave 1 completed: added production-only runtime SW registration with prompt-driven update strategy hooks (`onNeedRefresh`/`onOfflineReady`) and deterministic no-op behavior in non-prod paths.
   - Wave 2 pending: offline caching/invalidation implementation not started.
   - Wave 3 pending: install/update UX entrypoint not started.
   - Wave 4 pending: regression and compatibility closure not started.
@@ -57,3 +57,7 @@ Backlog scope covered:
   - `npm run typecheck` OK
   - `npm run lint` OK
   - `npm run build` OK
+- Validation snapshot (Wave 1):
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npm test -- src/tests/pwa.registration.spec.ts src/tests/app.ui.navigation-canvas.spec.tsx` OK

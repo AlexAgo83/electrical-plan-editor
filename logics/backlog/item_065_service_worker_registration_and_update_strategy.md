@@ -1,8 +1,8 @@
 ## item_065_service_worker_registration_and_update_strategy - Service Worker Registration and Update Strategy
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: High
 > Theme: Service Worker Lifecycle Control
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -38,5 +38,6 @@ Without explicit service worker registration and update policy, PWA behavior can
   - `logics/request/req_011_pwa_enablement_installability_and_offline_reliability.md`
   - `vite.config.ts`
   - `src/app/main.tsx`
+  - `src/app/pwa/registerServiceWorker.ts`
+  - `src/tests/pwa.registration.spec.ts`
   - `README.md`
-
