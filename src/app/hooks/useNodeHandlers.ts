@@ -15,8 +15,8 @@ interface UseNodeHandlersParams {
   store: AppStore;
   state: ReturnType<AppStore["getState"]>;
   dispatchAction: DispatchAction;
-  nodeFormMode: "create" | "edit";
-  setNodeFormMode: (mode: "create" | "edit") => void;
+  nodeFormMode: "idle" | "create" | "edit";
+  setNodeFormMode: (mode: "idle" | "create" | "edit") => void;
   editingNodeId: NodeId | null;
   setEditingNodeId: (id: NodeId | null) => void;
   nodeIdInput: string;
@@ -66,6 +66,23 @@ export function useNodeHandlers({
     setNodeLabel("");
     setNodeFormError(null);
     setPendingNewNodePosition(null);
+  }
+
+  function clearNodeForm(): void {
+    setNodeFormMode("idle");
+    setEditingNodeId(null);
+    setNodeIdInput("");
+    setNodeKind("intermediate");
+    setNodeConnectorId("");
+    setNodeSpliceId("");
+    setNodeLabel("");
+    setNodeFormError(null);
+    setPendingNewNodePosition(null);
+  }
+
+  function cancelNodeEdit(): void {
+    clearNodeForm();
+    dispatchAction(appActions.clearSelection(), { trackHistory: false });
   }
 
   function startNodeEdit(node: NetworkNode): void {
@@ -154,12 +171,14 @@ export function useNodeHandlers({
     dispatchAction(appActions.removeNode(nodeId));
 
     if (editingNodeId === nodeId) {
-      resetNodeForm();
+      clearNodeForm();
     }
   }
 
   return {
     resetNodeForm,
+    clearNodeForm,
+    cancelNodeEdit,
     startNodeEdit,
     handleNodeSubmit,
     handleNodeDelete

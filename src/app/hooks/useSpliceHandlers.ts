@@ -14,8 +14,8 @@ type DispatchAction = (
 interface UseSpliceHandlersParams {
   store: AppStore;
   dispatchAction: DispatchAction;
-  spliceFormMode: "create" | "edit";
-  setSpliceFormMode: (mode: "create" | "edit") => void;
+  spliceFormMode: "idle" | "create" | "edit";
+  setSpliceFormMode: (mode: "idle" | "create" | "edit") => void;
   editingSpliceId: SpliceId | null;
   setEditingSpliceId: (id: SpliceId | null) => void;
   spliceName: string;
@@ -55,6 +55,20 @@ export function useSpliceHandlers({
     setSpliceTechnicalId("");
     setPortCount("4");
     setSpliceFormError(null);
+  }
+
+  function clearSpliceForm(): void {
+    setSpliceFormMode("idle");
+    setEditingSpliceId(null);
+    setSpliceName("");
+    setSpliceTechnicalId("");
+    setPortCount("4");
+    setSpliceFormError(null);
+  }
+
+  function cancelSpliceEdit(): void {
+    clearSpliceForm();
+    dispatchAction(appActions.clearSelection(), { trackHistory: false });
   }
 
   function startSpliceEdit(splice: Splice): void {
@@ -104,7 +118,7 @@ export function useSpliceHandlers({
     dispatchAction(appActions.removeSplice(spliceId));
 
     if (editingSpliceId === spliceId) {
-      resetSpliceForm();
+      clearSpliceForm();
     }
   }
 
@@ -129,6 +143,8 @@ export function useSpliceHandlers({
 
   return {
     resetSpliceForm,
+    clearSpliceForm,
+    cancelSpliceEdit,
     startSpliceEdit,
     handleSpliceSubmit,
     handleSpliceDelete,

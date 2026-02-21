@@ -12,7 +12,7 @@ import type { SegmentSubNetworkFilter, SortDirection, SortState } from "../../ty
 
 interface ModelingSecondaryTablesProps {
   isSegmentSubScreen: boolean;
-  segmentFormMode: "create" | "edit";
+  segmentFormMode: "idle" | "create" | "edit";
   onOpenCreateSegment: () => void;
   segmentSubNetworkFilter: SegmentSubNetworkFilter;
   setSegmentSubNetworkFilter: (value: SegmentSubNetworkFilter) => void;
@@ -26,7 +26,7 @@ interface ModelingSecondaryTablesProps {
   onEditSegment: (segment: Segment) => void;
   onDeleteSegment: (segmentId: SegmentId) => void;
   isWireSubScreen: boolean;
-  wireFormMode: "create" | "edit";
+  wireFormMode: "idle" | "create" | "edit";
   onOpenCreateWire: () => void;
   wireRouteFilter: "all" | "auto" | "locked";
   setWireRouteFilter: (value: "all" | "auto" | "locked") => void;

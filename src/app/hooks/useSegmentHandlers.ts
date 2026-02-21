@@ -15,8 +15,8 @@ interface UseSegmentHandlersParams {
   store: AppStore;
   state: ReturnType<AppStore["getState"]>;
   dispatchAction: DispatchAction;
-  segmentFormMode: "create" | "edit";
-  setSegmentFormMode: (mode: "create" | "edit") => void;
+  segmentFormMode: "idle" | "create" | "edit";
+  setSegmentFormMode: (mode: "idle" | "create" | "edit") => void;
   editingSegmentId: SegmentId | null;
   setEditingSegmentId: (id: SegmentId | null) => void;
   segmentIdInput: string;
@@ -61,6 +61,22 @@ export function useSegmentHandlers({
     setSegmentLengthMm("120");
     setSegmentSubNetworkTag("");
     setSegmentFormError(null);
+  }
+
+  function clearSegmentForm(): void {
+    setSegmentFormMode("idle");
+    setEditingSegmentId(null);
+    setSegmentIdInput("");
+    setSegmentNodeA("");
+    setSegmentNodeB("");
+    setSegmentLengthMm("120");
+    setSegmentSubNetworkTag("");
+    setSegmentFormError(null);
+  }
+
+  function cancelSegmentEdit(): void {
+    clearSegmentForm();
+    dispatchAction(appActions.clearSelection(), { trackHistory: false });
   }
 
   function startSegmentEdit(segment: Segment): void {
@@ -128,12 +144,14 @@ export function useSegmentHandlers({
     dispatchAction(appActions.removeSegment(segmentId));
 
     if (editingSegmentId === segmentId) {
-      resetSegmentForm();
+      clearSegmentForm();
     }
   }
 
   return {
     resetSegmentForm,
+    clearSegmentForm,
+    cancelSegmentEdit,
     startSegmentEdit,
     handleSegmentSubmit,
     handleSegmentDelete

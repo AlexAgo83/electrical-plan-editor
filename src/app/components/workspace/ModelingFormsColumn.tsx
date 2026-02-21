@@ -3,7 +3,8 @@ import type { Connector, NetworkNode, Splice, WireEndpoint } from "../../../core
 
 interface ModelingFormsColumnProps {
   isConnectorSubScreen: boolean;
-  connectorFormMode: "create" | "edit";
+  connectorFormMode: "idle" | "create" | "edit";
+  openCreateConnectorForm: () => void;
   handleConnectorSubmit: (event: FormEvent<HTMLFormElement>) => void;
   connectorName: string;
   setConnectorName: (value: string) => void;
@@ -12,10 +13,11 @@ interface ModelingFormsColumnProps {
   connectorTechnicalIdAlreadyUsed: boolean;
   cavityCount: string;
   setCavityCount: (value: string) => void;
-  resetConnectorForm: () => void;
+  cancelConnectorEdit: () => void;
   connectorFormError: string | null;
   isSpliceSubScreen: boolean;
-  spliceFormMode: "create" | "edit";
+  spliceFormMode: "idle" | "create" | "edit";
+  openCreateSpliceForm: () => void;
   handleSpliceSubmit: (event: FormEvent<HTMLFormElement>) => void;
   spliceName: string;
   setSpliceName: (value: string) => void;
@@ -24,10 +26,11 @@ interface ModelingFormsColumnProps {
   spliceTechnicalIdAlreadyUsed: boolean;
   portCount: string;
   setPortCount: (value: string) => void;
-  resetSpliceForm: () => void;
+  cancelSpliceEdit: () => void;
   spliceFormError: string | null;
   isNodeSubScreen: boolean;
-  nodeFormMode: "create" | "edit";
+  nodeFormMode: "idle" | "create" | "edit";
+  openCreateNodeForm: () => void;
   handleNodeSubmit: (event: FormEvent<HTMLFormElement>) => void;
   nodeIdInput: string;
   setNodeIdInput: (value: string) => void;
@@ -42,10 +45,11 @@ interface ModelingFormsColumnProps {
   splices: Splice[];
   nodeSpliceId: string;
   setNodeSpliceId: (value: string) => void;
-  resetNodeForm: () => void;
+  cancelNodeEdit: () => void;
   nodeFormError: string | null;
   isSegmentSubScreen: boolean;
-  segmentFormMode: "create" | "edit";
+  segmentFormMode: "idle" | "create" | "edit";
+  openCreateSegmentForm: () => void;
   handleSegmentSubmit: (event: FormEvent<HTMLFormElement>) => void;
   segmentIdInput: string;
   setSegmentIdInput: (value: string) => void;
@@ -59,10 +63,11 @@ interface ModelingFormsColumnProps {
   setSegmentLengthMm: (value: string) => void;
   segmentSubNetworkTag: string;
   setSegmentSubNetworkTag: (value: string) => void;
-  resetSegmentForm: () => void;
+  cancelSegmentEdit: () => void;
   segmentFormError: string | null;
   isWireSubScreen: boolean;
-  wireFormMode: "create" | "edit";
+  wireFormMode: "idle" | "create" | "edit";
+  openCreateWireForm: () => void;
   handleWireSubmit: (event: FormEvent<HTMLFormElement>) => void;
   wireName: string;
   setWireName: (value: string) => void;
@@ -89,13 +94,14 @@ interface ModelingFormsColumnProps {
   setWireEndpointBSpliceId: (value: string) => void;
   wireEndpointBPortIndex: string;
   setWireEndpointBPortIndex: (value: string) => void;
-  resetWireForm: () => void;
+  cancelWireEdit: () => void;
   wireFormError: string | null;
 }
 
 export function ModelingFormsColumn({
   isConnectorSubScreen,
   connectorFormMode,
+  openCreateConnectorForm,
   handleConnectorSubmit,
   connectorName,
   setConnectorName,
@@ -104,10 +110,11 @@ export function ModelingFormsColumn({
   connectorTechnicalIdAlreadyUsed,
   cavityCount,
   setCavityCount,
-  resetConnectorForm,
+  cancelConnectorEdit,
   connectorFormError,
   isSpliceSubScreen,
   spliceFormMode,
+  openCreateSpliceForm,
   handleSpliceSubmit,
   spliceName,
   setSpliceName,
@@ -116,10 +123,11 @@ export function ModelingFormsColumn({
   spliceTechnicalIdAlreadyUsed,
   portCount,
   setPortCount,
-  resetSpliceForm,
+  cancelSpliceEdit,
   spliceFormError,
   isNodeSubScreen,
   nodeFormMode,
+  openCreateNodeForm,
   handleNodeSubmit,
   nodeIdInput,
   setNodeIdInput,
@@ -134,10 +142,11 @@ export function ModelingFormsColumn({
   splices,
   nodeSpliceId,
   setNodeSpliceId,
-  resetNodeForm,
+  cancelNodeEdit,
   nodeFormError,
   isSegmentSubScreen,
   segmentFormMode,
+  openCreateSegmentForm,
   handleSegmentSubmit,
   segmentIdInput,
   setSegmentIdInput,
@@ -151,10 +160,11 @@ export function ModelingFormsColumn({
   setSegmentLengthMm,
   segmentSubNetworkTag,
   setSegmentSubNetworkTag,
-  resetSegmentForm,
+  cancelSegmentEdit,
   segmentFormError,
   isWireSubScreen,
   wireFormMode,
+  openCreateWireForm,
   handleWireSubmit,
   wireName,
   setWireName,
@@ -181,24 +191,51 @@ export function ModelingFormsColumn({
   setWireEndpointBSpliceId,
   wireEndpointBPortIndex,
   setWireEndpointBPortIndex,
-  resetWireForm,
+  cancelWireEdit,
   wireFormError
 }: ModelingFormsColumnProps): ReactElement {
-  function renderFormHeader(title: string, mode: "create" | "edit"): ReactElement {
+  function renderFormHeader(title: string, mode: "idle" | "create" | "edit"): ReactElement {
     return (
       <header className="network-form-header">
         <h2>{title}</h2>
-        <span className={mode === "create" ? "network-form-mode-chip is-create" : "network-form-mode-chip is-edit"}>
-          {mode === "create" ? "Create mode" : "Edit mode"}
+        <span
+          className={
+            mode === "create"
+              ? "network-form-mode-chip is-create"
+              : mode === "edit"
+                ? "network-form-mode-chip is-edit"
+                : "network-form-mode-chip"
+          }
+        >
+          {mode === "create" ? "Create mode" : mode === "edit" ? "Edit mode" : "Idle"}
         </span>
       </header>
+    );
+  }
+
+  function renderIdleCopy(entityLabel: string, onCreate: () => void): ReactElement {
+    return (
+      <>
+        <p className="empty-copy">
+          Select a {entityLabel} row to view or edit it, or create a new one.
+        </p>
+        <div className="row-actions compact idle-panel-actions">
+          <button type="button" onClick={onCreate}>
+            Create
+          </button>
+        </div>
+      </>
     );
   }
 
   return (
     <section className="panel-grid workspace-column workspace-column-right">
       <article className="panel" hidden={!isConnectorSubScreen}>
-        {renderFormHeader(connectorFormMode === "create" ? "Create Connector" : "Edit Connector", connectorFormMode)}
+        {renderFormHeader(
+          connectorFormMode === "create" ? "Create Connector" : connectorFormMode === "edit" ? "Edit Connector" : "Connector form",
+          connectorFormMode
+        )}
+        {connectorFormMode === "idle" ? renderIdleCopy("connector", openCreateConnectorForm) : (
         <form className="stack-form" onSubmit={handleConnectorSubmit}>
           <label>
             Functional name
@@ -215,14 +252,21 @@ export function ModelingFormsColumn({
           </label>
           <div className="row-actions">
             <button type="submit" disabled={connectorTechnicalIdAlreadyUsed}>{connectorFormMode === "create" ? "Create" : "Save"}</button>
-            {connectorFormMode === "edit" ? <button type="button" onClick={resetConnectorForm}>Cancel edit</button> : null}
+            <button type="button" onClick={cancelConnectorEdit}>
+              {connectorFormMode === "edit" ? "Cancel edit" : "Cancel"}
+            </button>
           </div>
           {connectorFormError !== null ? <small className="inline-error">{connectorFormError}</small> : null}
         </form>
+        )}
       </article>
 
       <article className="panel" hidden={!isSpliceSubScreen}>
-        {renderFormHeader(spliceFormMode === "create" ? "Create Splice" : "Edit Splice", spliceFormMode)}
+        {renderFormHeader(
+          spliceFormMode === "create" ? "Create Splice" : spliceFormMode === "edit" ? "Edit Splice" : "Splice form",
+          spliceFormMode
+        )}
+        {spliceFormMode === "idle" ? renderIdleCopy("splice", openCreateSpliceForm) : (
         <form className="stack-form" onSubmit={handleSpliceSubmit}>
           <label>
             Functional name
@@ -239,14 +283,18 @@ export function ModelingFormsColumn({
           </label>
           <div className="row-actions">
             <button type="submit" disabled={spliceTechnicalIdAlreadyUsed}>{spliceFormMode === "create" ? "Create" : "Save"}</button>
-            {spliceFormMode === "edit" ? <button type="button" onClick={resetSpliceForm}>Cancel edit</button> : null}
+            <button type="button" onClick={cancelSpliceEdit}>
+              {spliceFormMode === "edit" ? "Cancel edit" : "Cancel"}
+            </button>
           </div>
           {spliceFormError !== null ? <small className="inline-error">{spliceFormError}</small> : null}
         </form>
+        )}
       </article>
 
       <article className="panel" hidden={!isNodeSubScreen}>
-        {renderFormHeader(nodeFormMode === "create" ? "Create Node" : "Edit Node", nodeFormMode)}
+        {renderFormHeader(nodeFormMode === "create" ? "Create Node" : nodeFormMode === "edit" ? "Edit Node" : "Node form", nodeFormMode)}
+        {nodeFormMode === "idle" ? renderIdleCopy("node", openCreateNodeForm) : (
         <form className="stack-form" onSubmit={handleNodeSubmit}>
           <label>
             Node ID
@@ -299,14 +347,21 @@ export function ModelingFormsColumn({
 
           <div className="row-actions">
             <button type="submit">{nodeFormMode === "create" ? "Create" : "Save"}</button>
-            {nodeFormMode === "edit" ? <button type="button" onClick={resetNodeForm}>Cancel edit</button> : null}
+            <button type="button" onClick={cancelNodeEdit}>
+              {nodeFormMode === "edit" ? "Cancel edit" : "Cancel"}
+            </button>
           </div>
           {nodeFormError !== null ? <small className="inline-error">{nodeFormError}</small> : null}
         </form>
+        )}
       </article>
 
       <article className="panel" hidden={!isSegmentSubScreen}>
-        {renderFormHeader(segmentFormMode === "create" ? "Create Segment" : "Edit Segment", segmentFormMode)}
+        {renderFormHeader(
+          segmentFormMode === "create" ? "Create Segment" : segmentFormMode === "edit" ? "Edit Segment" : "Segment form",
+          segmentFormMode
+        )}
+        {segmentFormMode === "idle" ? renderIdleCopy("segment", openCreateSegmentForm) : (
         <form className="stack-form" onSubmit={handleSegmentSubmit}>
           <label>
             Segment ID
@@ -337,14 +392,18 @@ export function ModelingFormsColumn({
           </label>
           <div className="row-actions">
             <button type="submit">{segmentFormMode === "create" ? "Create" : "Save"}</button>
-            {segmentFormMode === "edit" ? <button type="button" onClick={resetSegmentForm}>Cancel edit</button> : null}
+            <button type="button" onClick={cancelSegmentEdit}>
+              {segmentFormMode === "edit" ? "Cancel edit" : "Cancel"}
+            </button>
           </div>
           {segmentFormError !== null ? <small className="inline-error">{segmentFormError}</small> : null}
         </form>
+        )}
       </article>
 
       <article className="panel" hidden={!isWireSubScreen}>
-        {renderFormHeader(wireFormMode === "create" ? "Create Wire" : "Edit Wire", wireFormMode)}
+        {renderFormHeader(wireFormMode === "create" ? "Create Wire" : wireFormMode === "edit" ? "Edit Wire" : "Wire form", wireFormMode)}
+        {wireFormMode === "idle" ? renderIdleCopy("wire", openCreateWireForm) : (
         <form className="stack-form" onSubmit={handleWireSubmit}>
           <label>
             Functional name
@@ -439,10 +498,13 @@ export function ModelingFormsColumn({
 
           <div className="row-actions">
             <button type="submit" disabled={wireTechnicalIdAlreadyUsed}>{wireFormMode === "create" ? "Create" : "Save"}</button>
-            {wireFormMode === "edit" ? <button type="button" onClick={resetWireForm}>Cancel edit</button> : null}
+            <button type="button" onClick={cancelWireEdit}>
+              {wireFormMode === "edit" ? "Cancel edit" : "Cancel"}
+            </button>
           </div>
           {wireFormError !== null ? <small className="inline-error">{wireFormError}</small> : null}
         </form>
+        )}
       </article>
     </section>
   );

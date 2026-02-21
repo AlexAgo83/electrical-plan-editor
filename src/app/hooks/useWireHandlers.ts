@@ -21,8 +21,8 @@ type DispatchAction = (
 interface UseWireHandlersParams {
   store: AppStore;
   dispatchAction: DispatchAction;
-  wireFormMode: "create" | "edit";
-  setWireFormMode: (mode: "create" | "edit") => void;
+  wireFormMode: "idle" | "create" | "edit";
+  setWireFormMode: (mode: "idle" | "create" | "edit") => void;
   editingWireId: WireId | null;
   setEditingWireId: (id: WireId | null) => void;
   wireName: string;
@@ -108,6 +108,30 @@ export function useWireHandlers({
     setWireEndpointBPortIndex("1");
     setWireForcedRouteInput("");
     setWireFormError(null);
+  }
+
+  function clearWireForm(): void {
+    setWireFormMode("idle");
+    setEditingWireId(null);
+    setWireName("");
+    setWireTechnicalId("");
+    setWireEndpointAKind("connectorCavity");
+    setWireEndpointAConnectorId("");
+    setWireEndpointACavityIndex("1");
+    setWireEndpointASpliceId("");
+    setWireEndpointAPortIndex("1");
+    setWireEndpointBKind("splicePort");
+    setWireEndpointBConnectorId("");
+    setWireEndpointBCavityIndex("1");
+    setWireEndpointBSpliceId("");
+    setWireEndpointBPortIndex("1");
+    setWireForcedRouteInput("");
+    setWireFormError(null);
+  }
+
+  function cancelWireEdit(): void {
+    clearWireForm();
+    dispatchAction(appActions.clearSelection(), { trackHistory: false });
   }
 
   function startWireEdit(wire: Wire): void {
@@ -237,7 +261,7 @@ export function useWireHandlers({
   function handleWireDelete(wireId: WireId): void {
     dispatchAction(appActions.removeWire(wireId));
     if (editingWireId === wireId) {
-      resetWireForm();
+      clearWireForm();
     }
   }
 
@@ -276,6 +300,8 @@ export function useWireHandlers({
 
   return {
     resetWireForm,
+    clearWireForm,
+    cancelWireEdit,
     startWireEdit,
     handleWireSubmit,
     handleWireDelete,

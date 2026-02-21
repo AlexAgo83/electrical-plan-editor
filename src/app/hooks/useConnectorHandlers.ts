@@ -14,8 +14,8 @@ type DispatchAction = (
 interface UseConnectorHandlersParams {
   store: AppStore;
   dispatchAction: DispatchAction;
-  connectorFormMode: "create" | "edit";
-  setConnectorFormMode: (mode: "create" | "edit") => void;
+  connectorFormMode: "idle" | "create" | "edit";
+  setConnectorFormMode: (mode: "idle" | "create" | "edit") => void;
   editingConnectorId: ConnectorId | null;
   setEditingConnectorId: (id: ConnectorId | null) => void;
   connectorName: string;
@@ -55,6 +55,20 @@ export function useConnectorHandlers({
     setConnectorTechnicalId("");
     setCavityCount("4");
     setConnectorFormError(null);
+  }
+
+  function clearConnectorForm(): void {
+    setConnectorFormMode("idle");
+    setEditingConnectorId(null);
+    setConnectorName("");
+    setConnectorTechnicalId("");
+    setCavityCount("4");
+    setConnectorFormError(null);
+  }
+
+  function cancelConnectorEdit(): void {
+    clearConnectorForm();
+    dispatchAction(appActions.clearSelection(), { trackHistory: false });
   }
 
   function startConnectorEdit(connector: Connector): void {
@@ -104,7 +118,7 @@ export function useConnectorHandlers({
     dispatchAction(appActions.removeConnector(connectorId));
 
     if (editingConnectorId === connectorId) {
-      resetConnectorForm();
+      clearConnectorForm();
     }
   }
 
@@ -129,6 +143,8 @@ export function useConnectorHandlers({
 
   return {
     resetConnectorForm,
+    clearConnectorForm,
+    cancelConnectorEdit,
     startConnectorEdit,
     handleConnectorSubmit,
     handleConnectorDelete,

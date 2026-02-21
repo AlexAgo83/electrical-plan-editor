@@ -95,6 +95,10 @@
   color: #4d677a;
 }
 
+.idle-panel-actions {
+  margin-top: 0.6rem;
+}
+
 .row-form {
   display: grid;
   gap: 0.75rem;

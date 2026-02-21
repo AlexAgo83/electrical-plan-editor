@@ -13,7 +13,7 @@ import type { OccupancyFilter, SortDirection, SortState } from "../../types/app-
 
 interface ModelingPrimaryTablesProps {
   isConnectorSubScreen: boolean;
-  connectorFormMode: "create" | "edit";
+  connectorFormMode: "idle" | "create" | "edit";
   onOpenCreateConnector: () => void;
   connectorOccupancyFilter: OccupancyFilter;
   setConnectorOccupancyFilter: (value: OccupancyFilter) => void;
@@ -27,7 +27,7 @@ interface ModelingPrimaryTablesProps {
   onEditConnector: (connector: Connector) => void;
   onDeleteConnector: (connectorId: ConnectorId) => void;
   isSpliceSubScreen: boolean;
-  spliceFormMode: "create" | "edit";
+  spliceFormMode: "idle" | "create" | "edit";
   onOpenCreateSplice: () => void;
   spliceOccupancyFilter: OccupancyFilter;
   setSpliceOccupancyFilter: (value: OccupancyFilter) => void;
@@ -40,7 +40,7 @@ interface ModelingPrimaryTablesProps {
   onEditSplice: (splice: Splice) => void;
   onDeleteSplice: (spliceId: SpliceId) => void;
   isNodeSubScreen: boolean;
-  nodeFormMode: "create" | "edit";
+  nodeFormMode: "idle" | "create" | "edit";
   onOpenCreateNode: () => void;
   nodeKindFilter: "all" | NetworkNode["kind"];
   setNodeKindFilter: (value: "all" | NetworkNode["kind"]) => void;

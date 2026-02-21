@@ -319,6 +319,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [networkFormError, setNetworkFormError] = useState<string | null>(null);
   const [networkFormMode, setNetworkFormMode] = useState<"create" | "edit" | null>(null);
   const [networkFormTargetId, setNetworkFormTargetId] = useState<NetworkId | null>(null);
+  const [networkFocusRequest, setNetworkFocusRequest] = useState<{ id: NetworkId | null; token: number }>({
+    id: null,
+    token: 0
+  });
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
   const [tableDensity, setTableDensity] = useState<TableDensity>("compact");
   const [tableFontSize, setTableFontSize] = useState<TableFontSize>("normal");
@@ -964,12 +968,29 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     (event: FormEvent<HTMLFormElement>) => {
       if (networkFormMode === "edit") {
         handleUpdateActiveNetwork(event, networkFormTargetId);
+        if (networkFormTargetId !== null && store.getState().networks.byId[networkFormTargetId] !== undefined) {
+          setNetworkFocusRequest((current) => ({
+            id: networkFormTargetId,
+            token: current.token + 1
+          }));
+        }
         return;
       }
 
+      const networkIdsBefore = new Set(store.getState().networks.allIds as NetworkId[]);
       handleCreateNetwork(event);
+      const createdNetworkId =
+        (store
+          .getState()
+          .networks.allIds.find((networkId) => !networkIdsBefore.has(networkId as NetworkId)) as NetworkId | undefined) ?? null;
+      if (createdNetworkId !== null) {
+        setNetworkFocusRequest((current) => ({
+          id: createdNetworkId,
+          token: current.token + 1
+        }));
+      }
     },
-    [handleCreateNetwork, handleUpdateActiveNetwork, networkFormMode, networkFormTargetId]
+    [handleCreateNetwork, handleUpdateActiveNetwork, networkFormMode, networkFormTargetId, store]
   );
 
   useEffect(() => {
@@ -1292,6 +1313,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const {
     resetConnectorForm,
+    clearConnectorForm,
+    cancelConnectorEdit,
     startConnectorEdit,
     handleConnectorSubmit,
     handleConnectorDelete,
@@ -1318,6 +1341,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const {
     resetSpliceForm,
+    clearSpliceForm,
+    cancelSpliceEdit,
     startSpliceEdit,
     handleSpliceSubmit,
     handleSpliceDelete,
@@ -1342,7 +1367,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     spliceOccupantRefInput
   });
 
-  const { resetNodeForm, startNodeEdit, handleNodeSubmit, handleNodeDelete } = useNodeHandlers({
+  const { resetNodeForm, clearNodeForm, cancelNodeEdit, startNodeEdit, handleNodeSubmit, handleNodeDelete } = useNodeHandlers({
     store,
     state,
     dispatchAction,
@@ -1365,7 +1390,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setPendingNewNodePosition
   });
 
-  const { resetSegmentForm, startSegmentEdit, handleSegmentSubmit, handleSegmentDelete } = useSegmentHandlers({
+  const { resetSegmentForm, clearSegmentForm, cancelSegmentEdit, startSegmentEdit, handleSegmentSubmit, handleSegmentDelete } = useSegmentHandlers({
     store,
     state,
     dispatchAction,
@@ -1388,6 +1413,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const {
     resetWireForm,
+    clearWireForm,
+    cancelWireEdit,
     startWireEdit,
     handleWireSubmit,
     handleWireDelete,
@@ -1471,37 +1498,60 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     startWireEdit
   });
 
+  const clearAllModelingForms = useCallback(() => {
+    clearConnectorForm();
+    clearSpliceForm();
+    clearNodeForm();
+    clearSegmentForm();
+    clearWireForm();
+  }, [clearConnectorForm, clearNodeForm, clearSegmentForm, clearSpliceForm, clearWireForm]);
+
   useEffect(() => {
-    if (connectorFormMode === "edit" && selectedSubScreen !== "connector") {
-      resetConnectorForm();
+    if (activeSubScreen !== "connector" && connectorFormMode !== "idle") {
+      clearConnectorForm();
+    } else if (connectorFormMode === "edit" && selectedConnectorId === null) {
+      clearConnectorForm();
     }
 
-    if (spliceFormMode === "edit" && selectedSubScreen !== "splice") {
-      resetSpliceForm();
+    if (activeSubScreen !== "splice" && spliceFormMode !== "idle") {
+      clearSpliceForm();
+    } else if (spliceFormMode === "edit" && selectedSpliceId === null) {
+      clearSpliceForm();
     }
 
-    if (nodeFormMode === "edit" && selectedSubScreen !== "node") {
-      resetNodeForm();
+    if (activeSubScreen !== "node" && nodeFormMode !== "idle") {
+      clearNodeForm();
+    } else if (nodeFormMode === "edit" && selectedNodeId === null) {
+      clearNodeForm();
     }
 
-    if (segmentFormMode === "edit" && selectedSubScreen !== "segment") {
-      resetSegmentForm();
+    if (activeSubScreen !== "segment" && segmentFormMode !== "idle") {
+      clearSegmentForm();
+    } else if (segmentFormMode === "edit" && selectedSegmentId === null) {
+      clearSegmentForm();
     }
 
-    if (wireFormMode === "edit" && selectedSubScreen !== "wire") {
-      resetWireForm();
+    if (activeSubScreen !== "wire" && wireFormMode !== "idle") {
+      clearWireForm();
+    } else if (wireFormMode === "edit" && selectedWireId === null) {
+      clearWireForm();
     }
   }, [
+    clearConnectorForm,
+    clearNodeForm,
+    clearSegmentForm,
+    clearSpliceForm,
+    clearWireForm,
     connectorFormMode,
     nodeFormMode,
-    resetConnectorForm,
-    resetNodeForm,
-    resetSegmentForm,
-    resetSpliceForm,
-    resetWireForm,
+    selectedConnectorId,
+    selectedNodeId,
+    selectedSegmentId,
+    selectedSpliceId,
     segmentFormMode,
-    selectedSubScreen,
+    activeSubScreen,
     spliceFormMode,
+    selectedWireId,
     wireFormMode
   ]);
 
@@ -1627,7 +1677,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       describeNode={describeNode}
       onEditSelected={handleStartSelectedEdit}
       onOpenAnalysis={handleOpenSelectionInAnalysis}
-      onClearSelection={() => dispatchAction(appActions.clearSelection())}
+      onClearSelection={() => {
+        dispatchAction(appActions.clearSelection());
+        clearAllModelingForms();
+      }}
     />
   );
 
@@ -1782,6 +1835,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
               networkFormError={networkFormError}
               networkTechnicalIdAlreadyUsed={networkTechnicalIdAlreadyUsed}
               handleSubmitNetworkForm={handleSubmitNetworkForm}
+              focusRequestedNetworkId={networkFocusRequest.id}
+              focusRequestedNetworkToken={networkFocusRequest.token}
             />
           </NetworkScopeScreen>
 
@@ -1876,6 +1931,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           <ModelingFormsColumn
             isConnectorSubScreen={isConnectorSubScreen}
             connectorFormMode={connectorFormMode}
+            openCreateConnectorForm={resetConnectorForm}
             handleConnectorSubmit={handleConnectorSubmit}
             connectorName={connectorName}
             setConnectorName={setConnectorName}
@@ -1884,10 +1940,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             connectorTechnicalIdAlreadyUsed={connectorTechnicalIdAlreadyUsed}
             cavityCount={cavityCount}
             setCavityCount={setCavityCount}
-            resetConnectorForm={resetConnectorForm}
+            cancelConnectorEdit={cancelConnectorEdit}
             connectorFormError={connectorFormError}
             isSpliceSubScreen={isSpliceSubScreen}
             spliceFormMode={spliceFormMode}
+            openCreateSpliceForm={resetSpliceForm}
             handleSpliceSubmit={handleSpliceSubmit}
             spliceName={spliceName}
             setSpliceName={setSpliceName}
@@ -1896,10 +1953,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             spliceTechnicalIdAlreadyUsed={spliceTechnicalIdAlreadyUsed}
             portCount={portCount}
             setPortCount={setPortCount}
-            resetSpliceForm={resetSpliceForm}
+            cancelSpliceEdit={cancelSpliceEdit}
             spliceFormError={spliceFormError}
             isNodeSubScreen={isNodeSubScreen}
             nodeFormMode={nodeFormMode}
+            openCreateNodeForm={resetNodeForm}
             handleNodeSubmit={handleNodeSubmit}
             nodeIdInput={nodeIdInput}
             setNodeIdInput={setNodeIdInput}
@@ -1914,10 +1972,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             splices={splices}
             nodeSpliceId={nodeSpliceId}
             setNodeSpliceId={setNodeSpliceId}
-            resetNodeForm={resetNodeForm}
+            cancelNodeEdit={cancelNodeEdit}
             nodeFormError={nodeFormError}
             isSegmentSubScreen={isSegmentSubScreen}
             segmentFormMode={segmentFormMode}
+            openCreateSegmentForm={resetSegmentForm}
             handleSegmentSubmit={handleSegmentSubmit}
             segmentIdInput={segmentIdInput}
             setSegmentIdInput={setSegmentIdInput}
@@ -1931,10 +1990,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             setSegmentLengthMm={setSegmentLengthMm}
             segmentSubNetworkTag={segmentSubNetworkTag}
             setSegmentSubNetworkTag={setSegmentSubNetworkTag}
-            resetSegmentForm={resetSegmentForm}
+            cancelSegmentEdit={cancelSegmentEdit}
             segmentFormError={segmentFormError}
             isWireSubScreen={isWireSubScreen}
             wireFormMode={wireFormMode}
+            openCreateWireForm={resetWireForm}
             handleWireSubmit={handleWireSubmit}
             wireName={wireName}
             setWireName={setWireName}
@@ -1961,7 +2021,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             setWireEndpointBSpliceId={setWireEndpointBSpliceId}
             wireEndpointBPortIndex={wireEndpointBPortIndex}
             setWireEndpointBPortIndex={setWireEndpointBPortIndex}
-            resetWireForm={resetWireForm}
+            cancelWireEdit={cancelWireEdit}
             wireFormError={wireFormError}
           />
           <section className="panel-grid workspace-column workspace-column-center">{networkSummaryPanel}</section>

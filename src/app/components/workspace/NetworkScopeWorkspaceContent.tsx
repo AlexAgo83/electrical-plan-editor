@@ -37,6 +37,8 @@ interface NetworkScopeWorkspaceContentProps {
   networkFormError: string | null;
   networkTechnicalIdAlreadyUsed: boolean;
   handleSubmitNetworkForm: (event: FormEvent<HTMLFormElement>) => void;
+  focusRequestedNetworkId: NetworkId | null;
+  focusRequestedNetworkToken: number;
 }
 
 export function NetworkScopeWorkspaceContent({
@@ -60,7 +62,9 @@ export function NetworkScopeWorkspaceContent({
   setNewNetworkDescription,
   networkFormError,
   networkTechnicalIdAlreadyUsed,
-  handleSubmitNetworkForm
+  handleSubmitNetworkForm,
+  focusRequestedNetworkId,
+  focusRequestedNetworkToken
 }: NetworkScopeWorkspaceContentProps): ReactElement {
   const isCreateMode = networkFormMode === "create";
   const isEditMode = networkFormMode === "edit";
@@ -93,13 +97,30 @@ export function NetworkScopeWorkspaceContent({
       return;
     }
 
-    const hasFocusedNetwork = focusedNetworkId !== null && networks.some((network) => network.id === focusedNetworkId);
+    if (focusedNetworkId === null) {
+      return;
+    }
+
+    const hasFocusedNetwork = networks.some((network) => network.id === focusedNetworkId);
     if (hasFocusedNetwork) {
       return;
     }
 
     setFocusedNetworkId(activeNetworkId ?? networks[0]?.id ?? null);
   }, [activeNetworkId, focusedNetworkId, networks]);
+
+  useEffect(() => {
+    if (focusRequestedNetworkId === null) {
+      return;
+    }
+
+    if (!networks.some((network) => network.id === focusRequestedNetworkId)) {
+      return;
+    }
+
+    setFocusedNetworkId(focusRequestedNetworkId);
+  }, [focusRequestedNetworkId, focusRequestedNetworkToken, networks]);
+
   const indicators = [
     { label: "Connectors", value: focusedNetworkCounts?.connectorCount ?? 0 },
     { label: "Splices", value: focusedNetworkCounts?.spliceCount ?? 0 },
@@ -293,6 +314,11 @@ export function NetworkScopeWorkspaceContent({
         {!isFormOpen ? (
           <>
             <p className="empty-copy">Choose Create or Edit from the network scope panel to open this form.</p>
+            <div className="row-actions compact idle-panel-actions">
+              <button type="button" onClick={handleOpenCreateNetworkForm}>
+                Create
+              </button>
+            </div>
           </>
         ) : (
           <form className="settings-grid network-form-grid" onSubmit={handleSubmitNetworkForm}>
@@ -320,7 +346,13 @@ export function NetworkScopeWorkspaceContent({
             {networkTechnicalIdAlreadyUsed ? <p className="form-hint danger">Technical ID already used by another network.</p> : null}
             <div className="row-actions compact network-form-submit-actions">
               <button type="submit">{isCreateMode ? "Create network" : "Save network"}</button>
-              <button type="button" onClick={handleCloseNetworkForm}>
+              <button
+                type="button"
+                onClick={() => {
+                  setFocusedNetworkId(null);
+                  handleCloseNetworkForm();
+                }}
+              >
                 Cancel
               </button>
             </div>
