@@ -113,9 +113,9 @@ export function ModelingPrimaryTables({
   return (
     <>
       <article className="panel" hidden={!isConnectorSubScreen}>
-        <h2>Connectors</h2>
-        <div className="list-toolbar">
-          <div className="chip-group" role="group" aria-label="Connector occupancy filter">
+        <header className="list-panel-header">
+          <h2>Connectors</h2>
+          <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
             {([
               ["all", "All"],
               ["occupied", "Occupied"],
@@ -124,7 +124,7 @@ export function ModelingPrimaryTables({
               <button key={filterId} type="button" className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setConnectorOccupancyFilter(filterId)}>{label}</button>
             ))}
           </div>
-        </div>
+        </header>
         {connectors.length === 0 ? (
           <p className="empty-copy">No connector yet.</p>
         ) : visibleConnectors.length === 0 ? (
@@ -175,9 +175,9 @@ export function ModelingPrimaryTables({
       </article>
 
       <article className="panel" hidden={!isSpliceSubScreen}>
-        <h2>Splices</h2>
-        <div className="list-toolbar">
-          <div className="chip-group" role="group" aria-label="Splice occupancy filter">
+        <header className="list-panel-header">
+          <h2>Splices</h2>
+          <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
             {([
               ["all", "All"],
               ["occupied", "Occupied"],
@@ -186,7 +186,7 @@ export function ModelingPrimaryTables({
               <button key={filterId} type="button" className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSpliceOccupancyFilter(filterId)}>{label}</button>
             ))}
           </div>
-        </div>
+        </header>
         {splices.length === 0 ? (
           <p className="empty-copy">No splice yet.</p>
         ) : visibleSplices.length === 0 ? (

@@ -82,9 +82,9 @@ export function ModelingSecondaryTables({
   return (
     <>
       <article className="panel" hidden={!isSegmentSubScreen}>
-        <h2>Segments</h2>
-        <div className="list-toolbar">
-          <div className="chip-group" role="group" aria-label="Segment sub-network filter">
+        <header className="list-panel-header">
+          <h2>Segments</h2>
+          <div className="chip-group list-panel-filters" role="group" aria-label="Segment sub-network filter">
             {([
               ["all", "All"],
               ["default", "Default"],
@@ -93,7 +93,7 @@ export function ModelingSecondaryTables({
               <button key={filterId} type="button" className={segmentSubNetworkFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSegmentSubNetworkFilter(filterId)}>{label}</button>
             ))}
           </div>
-        </div>
+        </header>
         {segments.length === 0 ? (
           <p className="empty-copy">No segment yet.</p>
         ) : visibleSegments.length === 0 ? (
@@ -149,9 +149,9 @@ export function ModelingSecondaryTables({
       </article>
 
       <article className="panel" hidden={!isWireSubScreen}>
-        <h2>Wires</h2>
-        <div className="list-toolbar">
-          <div className="chip-group" role="group" aria-label="Wire route mode filter">
+        <header className="list-panel-header">
+          <h2>Wires</h2>
+          <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
             {([
               ["all", "All"],
               ["auto", "Auto"],
@@ -160,7 +160,7 @@ export function ModelingSecondaryTables({
               <button key={filterId} type="button" className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setWireRouteFilter(filterId)}>{label}</button>
             ))}
           </div>
-        </div>
+        </header>
         {wires.length === 0 ? (
           <p className="empty-copy">No wire yet.</p>
         ) : visibleWires.length === 0 ? (
