@@ -1,8 +1,8 @@
 ## item_064_pwa_baseline_manifest_icons_and_build_integration - PWA Baseline Manifest, Icons, and Build Integration
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: Medium
 > Theme: PWA Foundation
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -38,5 +38,6 @@ The app is not currently installable as a PWA because core baseline artifacts (m
   - `package.json`
   - `vite.config.ts`
   - `index.html`
+  - `public/icons/icon-192.png`
+  - `public/icons/icon-512.png`
   - `public/app-icon.svg`
-

@@ -1,8 +1,8 @@
 ## task_010_pwa_enablement_installability_and_offline_reliability_orchestration_and_delivery_control - PWA Enablement, Installability, and Offline Reliability Orchestration and Delivery Control
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 20%
 > Complexity: High
 > Theme: PWA Delivery Orchestration
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -18,7 +18,7 @@ Backlog scope covered:
 - `item_068_pwa_regression_matrix_and_browser_compatibility_checks.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 PWA baseline: manifest, icons, and Vite build integration (`item_064`)
+- [x] 1. Deliver Wave 0 PWA baseline: manifest, icons, and Vite build integration (`item_064`)
 - [ ] 2. Deliver Wave 1 service worker registration and update strategy selection (`item_065`)
 - [ ] 3. Deliver Wave 2 offline shell caching and deterministic cache invalidation (`item_066`)
 - [ ] 4. Deliver Wave 3 install entrypoint and update/install user feedback (`item_067`)
@@ -36,7 +36,7 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 pending: PWA baseline not started.
+  - Wave 0 completed: added PWA plugin build integration, manifest metadata, and installability icon assets with successful production build artifact generation (`manifest.webmanifest`, `sw.js`).
   - Wave 1 pending: service worker lifecycle strategy not started.
   - Wave 2 pending: offline caching/invalidation implementation not started.
   - Wave 3 pending: install/update UX entrypoint not started.
@@ -53,4 +53,7 @@ Backlog scope covered:
   - Keep service worker enabled on production paths with predictable dev fallback.
   - Add explicit offline and update smoke checks in regression wave.
   - Keep persistence and portability tests in required validation cadence for every wave.
-
+- Validation snapshot (Wave 0):
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npm run build` OK
