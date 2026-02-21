@@ -85,6 +85,10 @@ UX/UI workspace wave (`task_001`) is in progress:
 - Validation center now supports severity filtering (`All severities`, `Errors`, `Warnings`) in addition to category filters.
 - Validation center now supports text search on issue content/category/entity references.
 - Validation toolbar now includes quick triage actions (`Previous issue`, `Next issue`, `Clear filters`).
+- In Validation screen, `Previous issue` / `Next issue` follow the currently visible filtered issue set.
+- The issue cursor auto-realigns to visible results when filters change in Validation.
+- Validation category chips now expose contextual counts and disable empty categories under current severity/search scope.
+- Validation severity chips now expose contextual counts and disable empty severities under current category/search scope.
 - `Go to` from validation rows now synchronizes the sidebar issue cursor and current-issue summary.
 - Sidebar now includes a `Model health` snapshot with quick actions to open validation, focus on errors/warnings, and step through issues (`Previous`/`Next`).
 - Keyboard shortcuts now include issue-step navigation (`Alt+J` previous issue, `Alt+K` next issue).

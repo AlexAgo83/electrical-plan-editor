@@ -459,12 +459,21 @@ button {
   color: #17374e;
   padding: 0.2rem 0.55rem;
   font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
 }
 
 .filter-chip.is-active {
   background: #17374e;
   color: #fff;
   border-color: #17374e;
+}
+
+.filter-chip-count {
+  font-family: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
+  font-size: 0.72rem;
+  opacity: 0.82;
 }
 
 .technical-id {

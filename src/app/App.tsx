@@ -1399,6 +1399,63 @@ export function App({ store = appStore }: AppProps): ReactElement {
     () => [...new Set(orderedValidationIssues.map((issue) => issue.category))].sort((left, right) => left.localeCompare(right)),
     [orderedValidationIssues]
   );
+  const validationIssuesForCategoryCounts = useMemo(
+    () =>
+      orderedValidationIssues.filter((issue) => {
+        if (validationSeverityFilter !== "all" && issue.severity !== validationSeverityFilter) {
+          return false;
+        }
+
+        if (normalizedValidationSearch.length > 0) {
+          const searchable = `${issue.category} ${issue.message} ${issue.subScreen} ${issue.selectionId}`;
+          if (!searchable.toLocaleLowerCase().includes(normalizedValidationSearch)) {
+            return false;
+          }
+        }
+
+        return true;
+      }),
+    [normalizedValidationSearch, orderedValidationIssues, validationSeverityFilter]
+  );
+  const validationIssuesForSeverityCounts = useMemo(
+    () =>
+      orderedValidationIssues.filter((issue) => {
+        if (validationCategoryFilter !== "all" && issue.category !== validationCategoryFilter) {
+          return false;
+        }
+
+        if (normalizedValidationSearch.length > 0) {
+          const searchable = `${issue.category} ${issue.message} ${issue.subScreen} ${issue.selectionId}`;
+          if (!searchable.toLocaleLowerCase().includes(normalizedValidationSearch)) {
+            return false;
+          }
+        }
+
+        return true;
+      }),
+    [normalizedValidationSearch, orderedValidationIssues, validationCategoryFilter]
+  );
+  const validationCategoryCountByName = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const issue of validationIssuesForCategoryCounts) {
+      counts.set(issue.category, (counts.get(issue.category) ?? 0) + 1);
+    }
+    return counts;
+  }, [validationIssuesForCategoryCounts]);
+  const validationSeverityCountByLevel = useMemo(() => {
+    const counts: Record<Exclude<ValidationSeverityFilter, "all">, number> = {
+      error: 0,
+      warning: 0
+    };
+    for (const issue of validationIssuesForSeverityCounts) {
+      if (issue.severity === "error") {
+        counts.error += 1;
+        continue;
+      }
+      counts.warning += 1;
+    }
+    return counts;
+  }, [validationIssuesForSeverityCounts]);
   const visibleValidationIssues = useMemo(
     () =>
       orderedValidationIssues.filter((issue) => {
@@ -1466,6 +1523,37 @@ export function App({ store = appStore }: AppProps): ReactElement {
       setValidationIssueCursor(0);
     }
   }, [orderedValidationIssues, validationIssueCursor]);
+
+  useEffect(() => {
+    if (!isValidationScreen) {
+      return;
+    }
+
+    if (visibleValidationIssues.length === 0) {
+      if (validationIssueCursor !== -1) {
+        setValidationIssueCursor(-1);
+      }
+      return;
+    }
+
+    const focusedIssue =
+      validationIssueCursor >= 0 && validationIssueCursor < orderedValidationIssues.length
+        ? orderedValidationIssues[validationIssueCursor] ?? null
+        : null;
+    if (focusedIssue !== null && visibleValidationIssues.some((issue) => issue.id === focusedIssue.id)) {
+      return;
+    }
+
+    const firstVisibleIssue = visibleValidationIssues[0];
+    if (firstVisibleIssue === undefined) {
+      return;
+    }
+
+    const firstVisibleIndex = orderedValidationIssues.findIndex((issue) => issue.id === firstVisibleIssue.id);
+    if (firstVisibleIndex >= 0 && firstVisibleIndex !== validationIssueCursor) {
+      setValidationIssueCursor(firstVisibleIndex);
+    }
+  }, [isValidationScreen, orderedValidationIssues, validationIssueCursor, visibleValidationIssues]);
 
   const entityCountBySubScreen: Record<SubScreenId, number> = {
     connector: connectors.length,
@@ -1693,8 +1781,20 @@ export function App({ store = appStore }: AppProps): ReactElement {
     undoActionRef.current = handleUndo;
     redoActionRef.current = handleRedo;
     fitNetworkToContentRef.current = fitNetworkToContent;
-    previousValidationIssueRef.current = () => moveValidationIssueCursor(-1);
-    nextValidationIssueRef.current = () => moveValidationIssueCursor(1);
+    previousValidationIssueRef.current = () => {
+      if (activeScreenRef.current === "validation") {
+        moveVisibleValidationIssueCursor(-1);
+        return;
+      }
+      moveValidationIssueCursor(-1);
+    };
+    nextValidationIssueRef.current = () => {
+      if (activeScreenRef.current === "validation") {
+        moveVisibleValidationIssueCursor(1);
+        return;
+      }
+      moveValidationIssueCursor(1);
+    };
   });
 
   useEffect(() => {
@@ -2497,27 +2597,49 @@ export function App({ store = appStore }: AppProps): ReactElement {
     return orderedValidationIssues[validationIssueCursor] ?? null;
   }
 
-  function moveValidationIssueCursor(direction: 1 | -1): void {
-    if (orderedValidationIssues.length === 0) {
-      return;
+  function getFocusedValidationIssueByCursor(): ValidationIssue | null {
+    if (validationIssueCursor < 0 || validationIssueCursor >= orderedValidationIssues.length) {
+      return null;
     }
 
-    const baseIndex = validationIssueCursor < 0 ? (direction > 0 ? -1 : 0) : validationIssueCursor;
-    const nextIndex = (baseIndex + direction + orderedValidationIssues.length) % orderedValidationIssues.length;
-    const issue = orderedValidationIssues[nextIndex];
-    if (issue === undefined) {
-      return;
-    }
-
-    setValidationIssueCursor(nextIndex);
-    handleValidationIssueGoTo(issue);
+    return orderedValidationIssues[validationIssueCursor] ?? null;
   }
 
-  function handleValidationIssueRowGoTo(issue: ValidationIssue): void {
+  function setValidationIssueCursorFromIssue(issue: ValidationIssue): void {
     const issueIndex = findValidationIssueIndex(issue.id);
     if (issueIndex >= 0) {
       setValidationIssueCursor(issueIndex);
     }
+  }
+
+  function moveValidationIssueCursorInList(direction: 1 | -1, issues: ValidationIssue[]): void {
+    if (issues.length === 0) {
+      return;
+    }
+
+    const currentIssue = getFocusedValidationIssueByCursor();
+    const currentIssueIndex = currentIssue === null ? -1 : issues.findIndex((issue) => issue.id === currentIssue.id);
+    const baseIndex = currentIssueIndex < 0 ? (direction > 0 ? -1 : 0) : currentIssueIndex;
+    const nextIndex = (baseIndex + direction + issues.length) % issues.length;
+    const issue = issues[nextIndex];
+    if (issue === undefined) {
+      return;
+    }
+
+    setValidationIssueCursorFromIssue(issue);
+    handleValidationIssueGoTo(issue);
+  }
+
+  function moveValidationIssueCursor(direction: 1 | -1): void {
+    moveValidationIssueCursorInList(direction, orderedValidationIssues);
+  }
+
+  function moveVisibleValidationIssueCursor(direction: 1 | -1): void {
+    moveValidationIssueCursorInList(direction, visibleValidationIssues);
+  }
+
+  function handleValidationIssueRowGoTo(issue: ValidationIssue): void {
+    setValidationIssueCursorFromIssue(issue);
     handleValidationIssueGoTo(issue);
   }
 
@@ -2857,6 +2979,14 @@ export function App({ store = appStore }: AppProps): ReactElement {
               : `Connect mode: endpoint A captured on '${modeAnchorNodeId}'. Click second connector/splice node.`
             : "Route mode: click start node then end node to fill route preview.";
   const currentValidationIssue = getValidationIssueByCursor();
+  const issueNavigationScopeIssues = isValidationScreen ? visibleValidationIssues : orderedValidationIssues;
+  const issueNavigationScopeLabel = isValidationScreen ? "Filtered issues" : "All issues";
+  const currentIssuePositionInScope =
+    currentValidationIssue === null ? -1 : issueNavigationScopeIssues.findIndex((issue) => issue.id === currentValidationIssue.id);
+  const issueNavigatorDisplay =
+    issueNavigationScopeIssues.length === 0
+      ? "No issue"
+      : `${currentIssuePositionInScope >= 0 ? currentIssuePositionInScope + 1 : 1}/${issueNavigationScopeIssues.length}`;
   const networkScalePercent = Math.round(networkScale * 100);
   const inspectorContextPanel = (
     <article className="panel">
@@ -3349,12 +3479,9 @@ export function App({ store = appStore }: AppProps): ReactElement {
               </p>
               <p className="meta-line">
                 Issue navigator:{" "}
-                <strong>
-                  {orderedValidationIssues.length === 0
-                    ? "No issue"
-                    : `${validationIssueCursor >= 0 ? validationIssueCursor + 1 : 1}/${orderedValidationIssues.length}`}
-                </strong>
+                <strong>{issueNavigatorDisplay}</strong>
               </p>
+              <p className="meta-line">Scope: {issueNavigationScopeLabel}</p>
               {currentValidationIssue !== null ? (
                 <p className="meta-line">
                   Current issue:{" "}
@@ -4575,16 +4702,24 @@ export function App({ store = appStore }: AppProps): ReactElement {
                   ["all", "All severities"],
                   ["error", "Errors"],
                   ["warning", "Warnings"]
-                ] as const).map(([severity, label]) => (
-                  <button
-                    key={severity}
-                    type="button"
-                    className={validationSeverityFilter === severity ? "filter-chip is-active" : "filter-chip"}
-                    onClick={() => setValidationSeverityFilter(severity)}
-                  >
-                    {label}
-                  </button>
-                ))}
+                ] as const).map(([severity, label]) => {
+                  const severityCount =
+                    severity === "all" ? validationIssuesForSeverityCounts.length : validationSeverityCountByLevel[severity];
+                  return (
+                    <button
+                      key={severity}
+                      type="button"
+                      className={validationSeverityFilter === severity ? "filter-chip is-active" : "filter-chip"}
+                      onClick={() => setValidationSeverityFilter(severity)}
+                      disabled={severityCount === 0 && validationSeverityFilter !== severity}
+                    >
+                      <span>{label}</span>
+                      <span className="filter-chip-count" aria-hidden="true">
+                        ({severityCount})
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
               <div className="chip-group" role="group" aria-label="Validation category filter">
                 <button
@@ -4592,24 +4727,42 @@ export function App({ store = appStore }: AppProps): ReactElement {
                   className={validationCategoryFilter === "all" ? "filter-chip is-active" : "filter-chip"}
                   onClick={() => setValidationCategoryFilter("all")}
                 >
-                  All
+                  <span>All</span>
+                  <span className="filter-chip-count" aria-hidden="true">
+                    ({validationIssuesForCategoryCounts.length})
+                  </span>
                 </button>
-                {validationCategories.map((category) => (
+                {validationCategories.map((category) => {
+                  const categoryCount = validationCategoryCountByName.get(category) ?? 0;
+                  return (
                   <button
                     key={category}
                     type="button"
                     className={validationCategoryFilter === category ? "filter-chip is-active" : "filter-chip"}
                     onClick={() => setValidationCategoryFilter(category)}
+                    disabled={categoryCount === 0 && validationCategoryFilter !== category}
                   >
-                    {category}
+                    <span>{category}</span>
+                    <span className="filter-chip-count" aria-hidden="true">
+                      ({categoryCount})
+                    </span>
                   </button>
-                ))}
+                  );
+                })}
               </div>
               <div className="row-actions compact">
-                <button type="button" onClick={() => moveValidationIssueCursor(-1)} disabled={orderedValidationIssues.length === 0}>
+                <button
+                  type="button"
+                  onClick={() => moveVisibleValidationIssueCursor(-1)}
+                  disabled={visibleValidationIssues.length === 0}
+                >
                   Previous issue
                 </button>
-                <button type="button" onClick={() => moveValidationIssueCursor(1)} disabled={orderedValidationIssues.length === 0}>
+                <button
+                  type="button"
+                  onClick={() => moveVisibleValidationIssueCursor(1)}
+                  disabled={visibleValidationIssues.length === 0}
+                >
                   Next issue
                 </button>
                 <button type="button" onClick={clearValidationFilters}>

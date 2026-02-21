@@ -355,6 +355,44 @@ describe("App integration UI", () => {
     expect(within(validationPanel).queryByRole("heading", { name: "Occupancy conflict" })).not.toBeInTheDocument();
   });
 
+  it("shows category chip counts and disables empty categories under current filters", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    switchScreen("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    const searchInput = within(validationPanel).getByLabelText("Search validation issues");
+    fireEvent.change(searchInput, { target: { value: "route-locked" } });
+
+    const allChip = within(validationPanel).getByRole("button", { name: "All" });
+    const routeChip = within(validationPanel).getByRole("button", { name: "Route lock validity" });
+    const occupancyChip = within(validationPanel).getByRole("button", { name: "Occupancy conflict" });
+
+    expect(allChip.textContent).toContain("(1)");
+    expect(routeChip.textContent).toContain("(1)");
+    expect(occupancyChip.textContent).toContain("(0)");
+    expect(occupancyChip).toBeDisabled();
+  });
+
+  it("shows severity chip counts and disables empty severities under current filters", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    switchScreen("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    const searchInput = within(validationPanel).getByLabelText("Search validation issues");
+    fireEvent.change(searchInput, { target: { value: "manual-ghost" } });
+
+    const allSeverityChip = within(validationPanel).getByRole("button", { name: "All severities" });
+    const warningChip = within(validationPanel).getByRole("button", { name: "Warnings" });
+    const errorChip = within(validationPanel).getByRole("button", { name: "Errors" });
+
+    expect(allSeverityChip.textContent).toContain("(1)");
+    expect(warningChip.textContent).toContain("(1)");
+    expect(errorChip.textContent).toContain("(0)");
+    expect(errorChip).toBeDisabled();
+  });
+
   it("clears validation filters and search from toolbar", () => {
     const store = createAppStore(createValidationIssueState());
     render(<App store={store} />);
@@ -374,6 +412,42 @@ describe("App integration UI", () => {
     expect(within(validationSummary).getByText(/Active filters:\s*All severities \/ All categories \/ Search:\s*none/i)).toBeInTheDocument();
     expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
     expect(within(validationPanel).getByRole("heading", { name: "Route lock validity" })).toBeInTheDocument();
+  });
+
+  it("uses visible filtered issues for validation toolbar previous/next navigation", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    switchScreen("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Next issue" }));
+
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/ })).toHaveClass("is-active");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/ })).toHaveClass("is-active");
+  });
+
+  it("aligns model health issue navigator with visible validation filters", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    switchScreen("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    const modelHealth = screen.getByRole("region", { name: "Model health" });
+
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
+    expect(within(modelHealth).getByText("1/1", { selector: "strong" })).toBeInTheDocument();
+    expect(within(modelHealth).getByText("Scope: Filtered issues")).toBeInTheDocument();
+    expect(within(modelHealth).getByText("[WARNING] Occupancy conflict", { selector: "strong" })).toBeInTheDocument();
+
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Errors" }));
+    expect(within(modelHealth).getByText("1/1", { selector: "strong" })).toBeInTheDocument();
+    expect(within(modelHealth).getByText("[ERROR] Route lock validity", { selector: "strong" })).toBeInTheDocument();
   });
 
   it("shows model health quick actions and opens validation with severity focus", () => {
@@ -577,6 +651,20 @@ describe("App integration UI", () => {
     fireEvent.keyDown(window, { key: "j", altKey: true });
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/ })).toHaveClass("is-active");
     expect(within(inspectorPanel).getByText("C1")).toBeInTheDocument();
+  });
+
+  it("uses visible filtered issues for alt keyboard navigation inside validation screen", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    switchScreen("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
+
+    fireEvent.keyDown(window, { key: "k", altKey: true });
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/ })).toHaveClass("is-active");
   });
 
   it("ignores keyboard shortcuts when disabled from settings", () => {

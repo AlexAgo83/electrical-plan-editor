@@ -1,8 +1,8 @@
 ## item_012_v1_validation_center_and_issue_navigation - V1 Validation Center and Issue Navigation
 > From version: 0.1.0
 > Understanding: 99%
-> Confidence: 98%
-> Progress: 100% (completed)
+> Confidence: 100%
+> Progress: 100% (completed, stabilized+)
 > Complexity: High
 > Theme: UX/UI Validation Workflow
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -37,6 +37,10 @@ Validation feedback is currently distributed across local errors, making it hard
   - Dedicated `Validation` workspace is implemented.
   - Grouped issue list with severity/category/text filtering and one-click `Go to` navigation is active.
   - Validation toolbar provides direct triage actions (`Previous issue`, `Next issue`, `Clear filters`) in addition to chips/search.
+  - In Validation screen, issue stepping respects the currently visible filtered issue subset.
+  - Issue cursor auto-realigns to the first visible issue when filters hide the previously focused issue.
+  - Category chips expose contextual counts and disable categories with zero visible issues in the current severity/search scope.
+  - Severity chips expose contextual counts and disable severities with zero visible issues in the current category/search scope.
   - `Go to` now restores modeling context, recenters canvas focus on the targeted entity, and synchronizes the sidebar issue cursor.
   - Sidebar `Model health` snapshot continuously surfaces issue totals and provides quick open actions for all/errors/warnings.
   - Sidebar issue navigator (`Previous issue` / `Next issue`) allows sequential issue review with direct context focus.
