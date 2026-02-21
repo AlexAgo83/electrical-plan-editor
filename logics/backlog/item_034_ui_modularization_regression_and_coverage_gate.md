@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 99%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Quality Assurance
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -35,7 +35,11 @@ Large UI refactors can introduce silent behavior drift. Without explicit regress
 - Related AC: AC1, AC2, AC3, AC4, AC5, AC6.
 - References:
   - `logics/request/req_005_large_ui_files_split_and_hook_extraction.md`
+  - `logics/specs/req_005_ui_modularization_traceability.md`
   - `.github/workflows/ci.yml`
-  - `src/tests/app.ui.spec.tsx`
+  - `scripts/quality/check-ui-modularization.mjs`
+  - `src/tests/app.ui.navigation-canvas.spec.tsx`
+  - `src/tests/app.ui.validation.spec.tsx`
+  - `src/tests/app.ui.settings.spec.tsx`
+  - `src/tests/app.ui.list-ergonomics.spec.tsx`
   - `tests/e2e/smoke.spec.ts`
-

@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 55%
+> Progress: 100%
 > Complexity: High
 > Theme: Modularization Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -23,12 +23,12 @@ Backlog scope covered:
 - `item_039_store_modularization_regression_and_quality_gate.md`
 
 # Plan
-- [ ] 1. Freeze module boundary strategy for UI and store split (`item_030`, `item_035`)
-- [ ] 2. Deliver Wave 1 UI decomposition (`item_031`, `item_032`) and validate no behavior drift
+- [x] 1. Freeze module boundary strategy for UI and store split (`item_030`, `item_035`)
+- [x] 2. Deliver Wave 1 UI decomposition (`item_031`, `item_032`) and validate no behavior drift
 - [x] 3. Deliver Wave 2 store decomposition (`item_036`, `item_037`) and validate deterministic transitions
 - [x] 4. Deliver Wave 3 test modularization (`item_033`, `item_038`) and stabilize split-aligned coverage
-- [ ] 5. Deliver Wave 4 quality gates (`item_034`, `item_039`) with AC traceability and file-size policy checks
-- [ ] FINAL: Update related Logics docs
+- [x] 5. Deliver Wave 4 quality gates (`item_034`, `item_039`) with AC traceability and file-size policy checks
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -39,10 +39,10 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 1 in progress: UI component/hook/style modularization baseline (`item_031`, `item_032` pending).
+  - Wave 1 completed: UI composition/hook/style modularization baseline (`item_030`, `item_031`, `item_032`).
   - Wave 2 completed: reducer boundaries + helper extraction + domain handler split (`item_035`, `item_036`, `item_037`).
   - Wave 3 completed: test modularization for UI/store (`item_033`, `item_038`).
-  - Wave 4 in progress: store quality gate delivered (`item_039`), UI quality gate pending (`item_034`).
+  - Wave 4 completed: UI + store quality gates, AC traceability, and file-size policy enforcement (`item_034`, `item_039`).
 - Current blockers: none.
 - Main risks to track:
   - Functional drift caused by module extraction order.
@@ -52,4 +52,5 @@ Backlog scope covered:
   - Stage refactor by bounded concerns and keep behavior-preserving checkpoints.
   - Enforce one-way dependency rules between modules.
   - Maintain continuous regression runs across lint/typecheck/unit/e2e at each wave.
+  - Enforce UI file-size policy (with documented exceptions) via `npm run quality:ui-modularization`.
   - Enforce store file-size and modularity policy with `npm run quality:store-modularization`.
