@@ -1,5 +1,4 @@
 import {
-  type ChangeEvent,
   type FormEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactElement,
@@ -57,281 +56,64 @@ import {
   selectWires,
   type ThemeMode
 } from "../store";
-import {
-  buildNetworkFilePayload,
-  parseNetworkFilePayload,
-  resolveImportConflicts,
-  serializeNetworkFilePayload,
-  type NetworkImportSummary
-} from "../adapters/portability";
 import { appStore } from "./store";
 import { InspectorContextPanel } from "./components/InspectorContextPanel";
 import { NetworkSummaryPanel } from "./components/NetworkSummaryPanel";
+import { AnalysisScreen } from "./components/screens/AnalysisScreen";
+import { ModelingScreen } from "./components/screens/ModelingScreen";
+import { SettingsScreen } from "./components/screens/SettingsScreen";
+import { ValidationScreen } from "./components/screens/ValidationScreen";
 import { WorkspaceNavigation } from "./components/WorkspaceNavigation";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import { useCanvasState } from "./hooks/useCanvasState";
+import { useEntityFormsState } from "./hooks/useEntityFormsState";
+import { useNetworkImportExport } from "./hooks/useNetworkImportExport";
+import { useStoreHistory } from "./hooks/useStoreHistory";
 import { useUiPreferences } from "./hooks/useUiPreferences";
+import { useValidationModel } from "./hooks/useValidationModel";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
+import {
+  buildUniqueNetworkTechnicalId,
+  clamp,
+  createEntityId,
+  createNodePositionMap,
+  HISTORY_LIMIT,
+  NETWORK_GRID_STEP,
+  NETWORK_MAX_SCALE,
+  NETWORK_MIN_SCALE,
+  NETWORK_VIEW_HEIGHT,
+  NETWORK_VIEW_WIDTH,
+  nextSortState,
+  normalizeSearch,
+  resolveEndpointNodeId,
+  snapToGrid,
+  sortById,
+  sortByNameAndTechnicalId,
+  toPositiveInteger,
+  toPositiveNumber,
+} from "./lib/app-utils";
+import type {
+  AppProps,
+  ConnectorSynthesisRow,
+  NodePosition,
+  OccupancyFilter,
+  SegmentSubNetworkFilter,
+  SelectionTarget,
+  SortDirection,
+  SortField,
+  SortState,
+  SpliceSynthesisRow,
+  SubScreenId,
+  TableDensity,
+  ValidationIssue,
+  ValidationSeverityFilter
+} from "./types/app-controller";
 import "./styles.css";
+
+export type { AppProps } from "./types/app-controller";
 
 function useAppSnapshot(store: AppStore) {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);
-}
-
-function createEntityId(prefix: string): string {
-  const randomPart = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
-  return `${prefix}-${randomPart}`;
-}
-
-function toPositiveInteger(raw: string): number {
-  const parsed = Number(raw);
-  if (!Number.isFinite(parsed)) {
-    return 0;
-  }
-
-  return Math.max(0, Math.trunc(parsed));
-}
-
-function toPositiveNumber(raw: string): number {
-  const parsed = Number(raw);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return 0;
-  }
-
-  return parsed;
-}
-
-function normalizeSearch(raw: string): string {
-  return raw.trim().toLocaleLowerCase();
-}
-
-const NETWORK_VIEW_WIDTH = 760;
-const NETWORK_VIEW_HEIGHT = 420;
-const HISTORY_LIMIT = 60;
-const NETWORK_GRID_STEP = 20;
-const NETWORK_MIN_SCALE = 0.6;
-const NETWORK_MAX_SCALE = 2.2;
-
-interface NodePosition {
-  x: number;
-  y: number;
-}
-
-type SortField = "name" | "technicalId";
-type SortDirection = "asc" | "desc";
-
-interface SortState {
-  field: SortField;
-  direction: SortDirection;
-}
-
-interface ConnectorSynthesisRow {
-  wireId: WireId;
-  wireName: string;
-  wireTechnicalId: string;
-  localEndpointLabel: string;
-  remoteEndpointLabel: string;
-  lengthMm: number;
-}
-
-interface SpliceSynthesisRow {
-  wireId: WireId;
-  wireName: string;
-  wireTechnicalId: string;
-  localEndpointLabel: string;
-  remoteEndpointLabel: string;
-  lengthMm: number;
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
-
-function snapToGrid(value: number, step: number): number {
-  return Math.round(value / step) * step;
-}
-
-function sortByNameAndTechnicalId<T>(
-  items: T[],
-  sortState: SortState,
-  getName: (item: T) => string,
-  getTechnicalId: (item: T) => string
-): T[] {
-  return [...items].sort((left, right) => {
-    const leftPrimary = sortState.field === "name" ? getName(left) : getTechnicalId(left);
-    const rightPrimary = sortState.field === "name" ? getName(right) : getTechnicalId(right);
-    const primaryComparison = leftPrimary.localeCompare(rightPrimary, undefined, { sensitivity: "base" });
-    if (primaryComparison !== 0) {
-      return sortState.direction === "asc" ? primaryComparison : -primaryComparison;
-    }
-
-    const leftSecondary = sortState.field === "name" ? getTechnicalId(left) : getName(left);
-    const rightSecondary = sortState.field === "name" ? getTechnicalId(right) : getName(right);
-    return leftSecondary.localeCompare(rightSecondary, undefined, { sensitivity: "base" });
-  });
-}
-
-function sortById<T>(items: T[], direction: SortDirection, getId: (item: T) => string): T[] {
-  return [...items].sort((left, right) => {
-    const comparison = getId(left).localeCompare(getId(right), undefined, { sensitivity: "base" });
-    return direction === "asc" ? comparison : -comparison;
-  });
-}
-
-function nextSortState(current: SortState, field: SortField): SortState {
-  if (current.field !== field) {
-    return { field, direction: "asc" };
-  }
-
-  return {
-    field,
-    direction: current.direction === "asc" ? "desc" : "asc"
-  };
-}
-
-function buildUniqueNetworkTechnicalId(
-  baseTechnicalId: string,
-  existingTechnicalIds: Set<string>
-): string {
-  if (!existingTechnicalIds.has(baseTechnicalId)) {
-    return baseTechnicalId;
-  }
-
-  let index = 1;
-  let candidate = `${baseTechnicalId}-COPY`;
-  while (existingTechnicalIds.has(candidate)) {
-    index += 1;
-    candidate = `${baseTechnicalId}-COPY-${index}`;
-  }
-
-  return candidate;
-}
-
-function createNodePositionMap(nodes: NetworkNode[]): Record<NodeId, NodePosition> {
-  const positions = {} as Record<NodeId, NodePosition>;
-  if (nodes.length === 0) {
-    return positions;
-  }
-
-  const centerX = NETWORK_VIEW_WIDTH / 2;
-  const centerY = NETWORK_VIEW_HEIGHT / 2;
-  if (nodes.length === 1) {
-    const singleNode = nodes[0];
-    if (singleNode !== undefined) {
-      positions[singleNode.id] = { x: centerX, y: centerY };
-    }
-    return positions;
-  }
-
-  const radius = Math.min(NETWORK_VIEW_WIDTH, NETWORK_VIEW_HEIGHT) * 0.36;
-  const orderedNodes = [...nodes].sort((left, right) => left.id.localeCompare(right.id));
-  orderedNodes.forEach((node, index) => {
-    const angle = -Math.PI / 2 + (2 * Math.PI * index) / orderedNodes.length;
-    positions[node.id] = {
-      x: centerX + radius * Math.cos(angle),
-      y: centerY + radius * Math.sin(angle)
-    };
-  });
-
-  return positions;
-}
-
-function toConnectorOccupancyKey(connectorId: ConnectorId, cavityIndex: number): string {
-  return `${connectorId}:${cavityIndex}`;
-}
-
-function toSpliceOccupancyKey(spliceId: SpliceId, portIndex: number): string {
-  return `${spliceId}:${portIndex}`;
-}
-
-function parseWireOccupantRef(raw: string): { wireId: WireId; side: "A" | "B" } | null {
-  const trimmed = raw.trim();
-  const match = /^wire:([^:]+):(A|B)$/.exec(trimmed);
-  if (match === null) {
-    return null;
-  }
-
-  const wireIdCandidate = match[1];
-  const sideCandidate = match[2];
-  if (wireIdCandidate === undefined || sideCandidate === undefined) {
-    return null;
-  }
-
-  return {
-    wireId: wireIdCandidate as WireId,
-    side: sideCandidate as "A" | "B"
-  };
-}
-
-function resolveEndpointNodeId(
-  endpoint: WireEndpoint,
-  connectorNodeByConnectorId: Map<ConnectorId, NodeId>,
-  spliceNodeBySpliceId: Map<SpliceId, NodeId>
-): NodeId | null {
-  if (endpoint.kind === "connectorCavity") {
-    return connectorNodeByConnectorId.get(endpoint.connectorId) ?? null;
-  }
-
-  return spliceNodeBySpliceId.get(endpoint.spliceId) ?? null;
-}
-
-function isOrderedRouteValid(
-  routeSegmentIds: SegmentId[],
-  startNodeId: NodeId,
-  endNodeId: NodeId,
-  segmentMap: Map<SegmentId, Segment>
-): boolean {
-  let currentNodeId = startNodeId;
-  for (const segmentId of routeSegmentIds) {
-    const segment = segmentMap.get(segmentId);
-    if (segment === undefined) {
-      return false;
-    }
-
-    if (segment.nodeA === currentNodeId) {
-      currentNodeId = segment.nodeB;
-      continue;
-    }
-
-    if (segment.nodeB === currentNodeId) {
-      currentNodeId = segment.nodeA;
-      continue;
-    }
-
-    return false;
-  }
-
-  return currentNodeId === endNodeId;
-}
-
-export interface AppProps {
-  store?: AppStore;
-}
-
-type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
-type InteractionMode = "select" | "addNode" | "addSegment" | "connect" | "route";
-type TableDensity = "comfortable" | "compact";
-type OccupancyFilter = "all" | "occupied" | "free";
-type SegmentSubNetworkFilter = "all" | "default" | "tagged";
-type ValidationSeverityFilter = "all" | "error" | "warning";
-
-interface ValidationIssue {
-  id: string;
-  severity: "error" | "warning";
-  category: string;
-  message: string;
-  subScreen: SubScreenId;
-  selectionKind: "connector" | "splice" | "node" | "segment" | "wire";
-  selectionId: string;
-}
-
-interface SelectionTarget {
-  kind: ValidationIssue["selectionKind"];
-  id: string;
-}
-
-interface ImportExportStatus {
-  kind: "success" | "partial" | "failed";
-  message: string;
 }
 
 export function AppController({ store = appStore }: AppProps): ReactElement {
@@ -370,62 +152,128 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     [nodes]
   );
 
-  const [connectorFormMode, setConnectorFormMode] = useState<"create" | "edit">("create");
-  const [editingConnectorId, setEditingConnectorId] = useState<ConnectorId | null>(null);
-  const [connectorName, setConnectorName] = useState("");
-  const [connectorTechnicalId, setConnectorTechnicalId] = useState("");
-  const [cavityCount, setCavityCount] = useState("4");
-  const [cavityIndexInput, setCavityIndexInput] = useState("1");
-  const [connectorOccupantRefInput, setConnectorOccupantRefInput] = useState("manual-assignment");
-  const [connectorFormError, setConnectorFormError] = useState<string | null>(null);
-
-  const [spliceFormMode, setSpliceFormMode] = useState<"create" | "edit">("create");
-  const [editingSpliceId, setEditingSpliceId] = useState<SpliceId | null>(null);
-  const [spliceName, setSpliceName] = useState("");
-  const [spliceTechnicalId, setSpliceTechnicalId] = useState("");
-  const [portCount, setPortCount] = useState("4");
-  const [portIndexInput, setPortIndexInput] = useState("1");
-  const [spliceOccupantRefInput, setSpliceOccupantRefInput] = useState("manual-assignment");
-  const [spliceFormError, setSpliceFormError] = useState<string | null>(null);
-
-  const [nodeFormMode, setNodeFormMode] = useState<"create" | "edit">("create");
-  const [editingNodeId, setEditingNodeId] = useState<NodeId | null>(null);
-  const [nodeIdInput, setNodeIdInput] = useState("");
-  const [nodeKind, setNodeKind] = useState<NetworkNode["kind"]>("intermediate");
-  const [nodeConnectorId, setNodeConnectorId] = useState("");
-  const [nodeSpliceId, setNodeSpliceId] = useState("");
-  const [nodeLabel, setNodeLabel] = useState("");
-  const [nodeFormError, setNodeFormError] = useState<string | null>(null);
-
-  const [segmentFormMode, setSegmentFormMode] = useState<"create" | "edit">("create");
-  const [editingSegmentId, setEditingSegmentId] = useState<SegmentId | null>(null);
-  const [segmentIdInput, setSegmentIdInput] = useState("");
-  const [segmentNodeA, setSegmentNodeA] = useState("");
-  const [segmentNodeB, setSegmentNodeB] = useState("");
-  const [segmentLengthMm, setSegmentLengthMm] = useState("120");
-  const [segmentSubNetworkTag, setSegmentSubNetworkTag] = useState("");
-  const [segmentFormError, setSegmentFormError] = useState<string | null>(null);
-  const [wireFormMode, setWireFormMode] = useState<"create" | "edit">("create");
-  const [editingWireId, setEditingWireId] = useState<WireId | null>(null);
-  const [wireName, setWireName] = useState("");
-  const [wireTechnicalId, setWireTechnicalId] = useState("");
-  const [wireEndpointAKind, setWireEndpointAKind] = useState<WireEndpoint["kind"]>("connectorCavity");
-  const [wireEndpointAConnectorId, setWireEndpointAConnectorId] = useState("");
-  const [wireEndpointACavityIndex, setWireEndpointACavityIndex] = useState("1");
-  const [wireEndpointASpliceId, setWireEndpointASpliceId] = useState("");
-  const [wireEndpointAPortIndex, setWireEndpointAPortIndex] = useState("1");
-  const [wireEndpointBKind, setWireEndpointBKind] = useState<WireEndpoint["kind"]>("splicePort");
-  const [wireEndpointBConnectorId, setWireEndpointBConnectorId] = useState("");
-  const [wireEndpointBCavityIndex, setWireEndpointBCavityIndex] = useState("1");
-  const [wireEndpointBSpliceId, setWireEndpointBSpliceId] = useState("");
-  const [wireEndpointBPortIndex, setWireEndpointBPortIndex] = useState("1");
-  const [wireForcedRouteInput, setWireForcedRouteInput] = useState("");
-  const [wireFormError, setWireFormError] = useState<string | null>(null);
+  const {
+    connectorFormMode,
+    setConnectorFormMode,
+    editingConnectorId,
+    setEditingConnectorId,
+    connectorName,
+    setConnectorName,
+    connectorTechnicalId,
+    setConnectorTechnicalId,
+    cavityCount,
+    setCavityCount,
+    cavityIndexInput,
+    setCavityIndexInput,
+    connectorOccupantRefInput,
+    setConnectorOccupantRefInput,
+    connectorFormError,
+    setConnectorFormError,
+    spliceFormMode,
+    setSpliceFormMode,
+    editingSpliceId,
+    setEditingSpliceId,
+    spliceName,
+    setSpliceName,
+    spliceTechnicalId,
+    setSpliceTechnicalId,
+    portCount,
+    setPortCount,
+    portIndexInput,
+    setPortIndexInput,
+    spliceOccupantRefInput,
+    setSpliceOccupantRefInput,
+    spliceFormError,
+    setSpliceFormError,
+    nodeFormMode,
+    setNodeFormMode,
+    editingNodeId,
+    setEditingNodeId,
+    nodeIdInput,
+    setNodeIdInput,
+    nodeKind,
+    setNodeKind,
+    nodeConnectorId,
+    setNodeConnectorId,
+    nodeSpliceId,
+    setNodeSpliceId,
+    nodeLabel,
+    setNodeLabel,
+    nodeFormError,
+    setNodeFormError,
+    segmentFormMode,
+    setSegmentFormMode,
+    editingSegmentId,
+    setEditingSegmentId,
+    segmentIdInput,
+    setSegmentIdInput,
+    segmentNodeA,
+    setSegmentNodeA,
+    segmentNodeB,
+    setSegmentNodeB,
+    segmentLengthMm,
+    setSegmentLengthMm,
+    segmentSubNetworkTag,
+    setSegmentSubNetworkTag,
+    segmentFormError,
+    setSegmentFormError,
+    wireFormMode,
+    setWireFormMode,
+    editingWireId,
+    setEditingWireId,
+    wireName,
+    setWireName,
+    wireTechnicalId,
+    setWireTechnicalId,
+    wireEndpointAKind,
+    setWireEndpointAKind,
+    wireEndpointAConnectorId,
+    setWireEndpointAConnectorId,
+    wireEndpointACavityIndex,
+    setWireEndpointACavityIndex,
+    wireEndpointASpliceId,
+    setWireEndpointASpliceId,
+    wireEndpointAPortIndex,
+    setWireEndpointAPortIndex,
+    wireEndpointBKind,
+    setWireEndpointBKind,
+    wireEndpointBConnectorId,
+    setWireEndpointBConnectorId,
+    wireEndpointBCavityIndex,
+    setWireEndpointBCavityIndex,
+    wireEndpointBSpliceId,
+    setWireEndpointBSpliceId,
+    wireEndpointBPortIndex,
+    setWireEndpointBPortIndex,
+    wireForcedRouteInput,
+    setWireForcedRouteInput,
+    wireFormError,
+    setWireFormError
+  } = useEntityFormsState();
   const [routePreviewStartNodeId, setRoutePreviewStartNodeId] = useState("");
   const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
-  const [interactionMode, setInteractionMode] = useState<InteractionMode>("select");
-  const [modeAnchorNodeId, setModeAnchorNodeId] = useState<NodeId | null>(null);
-  const [pendingNewNodePosition, setPendingNewNodePosition] = useState<NodePosition | null>(null);
+  const {
+    interactionMode,
+    setInteractionMode,
+    modeAnchorNodeId,
+    setModeAnchorNodeId,
+    pendingNewNodePosition,
+    setPendingNewNodePosition,
+    manualNodePositions,
+    setManualNodePositions,
+    draggingNodeId,
+    setDraggingNodeId,
+    isPanningNetwork,
+    setIsPanningNetwork,
+    showNetworkGrid,
+    setShowNetworkGrid,
+    snapNodesToGrid,
+    setSnapNodesToGrid,
+    networkScale,
+    setNetworkScale,
+    networkOffset,
+    setNetworkOffset
+  } = useCanvasState();
   const [connectorSearchQuery, setConnectorSearchQuery] = useState("");
   const [spliceSearchQuery, setSpliceSearchQuery] = useState("");
   const [nodeSearchQuery, setNodeSearchQuery] = useState("");
@@ -436,10 +284,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [nodeKindFilter, setNodeKindFilter] = useState<"all" | NetworkNode["kind"]>("all");
   const [segmentSubNetworkFilter, setSegmentSubNetworkFilter] = useState<SegmentSubNetworkFilter>("all");
   const [wireRouteFilter, setWireRouteFilter] = useState<"all" | "auto" | "locked">("all");
-  const [validationCategoryFilter, setValidationCategoryFilter] = useState<string>("all");
-  const [validationSeverityFilter, setValidationSeverityFilter] = useState<ValidationSeverityFilter>("all");
-  const [validationSearchQuery, setValidationSearchQuery] = useState("");
-  const [validationIssueCursor, setValidationIssueCursor] = useState(-1);
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [nodeIdSortDirection, setNodeIdSortDirection] = useState<SortDirection>("asc");
@@ -453,21 +297,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     field: "name",
     direction: "asc"
   });
-  const [manualNodePositions, setManualNodePositions] = useState<Record<NodeId, NodePosition>>({} as Record<NodeId, NodePosition>);
-  const [draggingNodeId, setDraggingNodeId] = useState<NodeId | null>(null);
-  const [isPanningNetwork, setIsPanningNetwork] = useState(false);
-  const [showNetworkGrid, setShowNetworkGrid] = useState(true);
-  const [snapNodesToGrid, setSnapNodesToGrid] = useState(false);
-  const [networkScale, setNetworkScale] = useState(1);
-  const [networkOffset, setNetworkOffset] = useState<NodePosition>({ x: 0, y: 0 });
   const [newNetworkName, setNewNetworkName] = useState("");
   const [newNetworkTechnicalId, setNewNetworkTechnicalId] = useState("");
   const [newNetworkDescription, setNewNetworkDescription] = useState("");
   const [networkFormError, setNetworkFormError] = useState<string | null>(null);
   const [renameNetworkName, setRenameNetworkName] = useState("");
-  const [selectedExportNetworkIds, setSelectedExportNetworkIds] = useState<NetworkId[]>([]);
-  const [importExportStatus, setImportExportStatus] = useState<ImportExportStatus | null>(null);
-  const [lastImportSummary, setLastImportSummary] = useState<NetworkImportSummary | null>(null);
   const [themeMode, setThemeMode] = useState<ThemeMode>("normal");
   const [tableDensity, setTableDensity] = useState<TableDensity>("comfortable");
   const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
@@ -479,11 +313,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [showShortcutHints, setShowShortcutHints] = useState(true);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
-  const [undoStack, setUndoStack] = useState<ReturnType<AppStore["getState"]>[]>([]);
-  const [redoStack, setRedoStack] = useState<ReturnType<AppStore["getState"]>[]>([]);
-  const [saveStatus, setSaveStatus] = useState<"saved" | "unsaved" | "error">("saved");
-  const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const importFileInputRef = useRef<HTMLInputElement | null>(null);
   const panStartRef = useRef<{
     clientX: number;
     clientY: number;
@@ -581,8 +410,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
     return merged;
   }, [autoNodePositions, manualNodePositions, nodes]);
-  const isUndoAvailable = undoStack.length > 0;
-  const isRedoAvailable = redoStack.length > 0;
   const isConnectorSubScreen = activeSubScreen === "connector";
   const isSpliceSubScreen = activeSubScreen === "splice";
   const isNodeSubScreen = activeSubScreen === "node";
@@ -683,7 +510,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
       return changed ? next : previous;
     });
-  }, [nodes]);
+  }, [nodes, setManualNodePositions]);
 
   useEffect(() => {
     if (activeNetwork === null) {
@@ -695,26 +522,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   }, [activeNetwork]);
 
   useEffect(() => {
-    const availableIds = new Set(networks.map((network) => network.id));
-    setSelectedExportNetworkIds((previous) => {
-      const filtered = previous.filter((networkId) => availableIds.has(networkId));
-      const next =
-        filtered.length > 0
-          ? filtered
-          : activeNetworkId !== null && availableIds.has(activeNetworkId)
-            ? [activeNetworkId]
-            : [];
-      const unchanged = next.length === previous.length && next.every((networkId, index) => previous[index] === networkId);
-      return unchanged ? previous : next;
-    });
-  }, [activeNetworkId, networks]);
-
-  useEffect(() => {
     setModeAnchorNodeId(null);
     if (interactionMode !== "addNode") {
       setPendingNewNodePosition(null);
     }
-  }, [interactionMode]);
+  }, [interactionMode, setModeAnchorNodeId, setPendingNewNodePosition]);
 
   const connectorSynthesisRows = useMemo<ConnectorSynthesisRow[]>(() => {
     if (selectedConnector === null) {
@@ -826,7 +638,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const normalizedNodeSearch = normalizeSearch(nodeSearchQuery);
   const normalizedSegmentSearch = normalizeSearch(segmentSearchQuery);
   const normalizedWireSearch = normalizeSearch(wireSearchQuery);
-  const normalizedValidationSearch = normalizeSearch(validationSearchQuery);
   const connectorOccupiedCountById = useMemo(() => {
     const result = new Map<ConnectorId, number>();
     for (const connector of connectors) {
@@ -946,598 +757,45 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       }),
     [normalizedWireSearch, sortedWires, wireRouteFilter]
   );
-  const validationIssues = useMemo<ValidationIssue[]>(() => {
-    const issues: ValidationIssue[] = [];
-
-    const expectedConnectorOccupancy = new Map<string, string>();
-    const expectedSpliceOccupancy = new Map<string, string>();
-
-    function registerExpectedWireOccupancy(endpoint: WireEndpoint, occupantRef: string): void {
-      if (endpoint.kind === "connectorCavity") {
-        const key = toConnectorOccupancyKey(endpoint.connectorId, endpoint.cavityIndex);
-        const existing = expectedConnectorOccupancy.get(key);
-        if (existing !== undefined && existing !== occupantRef) {
-          issues.push({
-            id: `occupancy-duplicate-connector-${key}`,
-            severity: "error",
-            category: "Occupancy conflict",
-            message: `Connector cavity ${endpoint.connectorId}/C${endpoint.cavityIndex} has multiple wire assignments.`,
-            subScreen: "connector",
-            selectionKind: "connector",
-            selectionId: endpoint.connectorId
-          });
-        }
-        expectedConnectorOccupancy.set(key, occupantRef);
-        return;
-      }
-
-      const key = toSpliceOccupancyKey(endpoint.spliceId, endpoint.portIndex);
-      const existing = expectedSpliceOccupancy.get(key);
-      if (existing !== undefined && existing !== occupantRef) {
-        issues.push({
-          id: `occupancy-duplicate-splice-${key}`,
-          severity: "error",
-          category: "Occupancy conflict",
-          message: `Splice port ${endpoint.spliceId}/P${endpoint.portIndex} has multiple wire assignments.`,
-          subScreen: "splice",
-          selectionKind: "splice",
-          selectionId: endpoint.spliceId
-        });
-      }
-      expectedSpliceOccupancy.set(key, occupantRef);
-    }
-
-    for (const node of nodes) {
-      if (node.kind === "connector" && connectorMap.get(node.connectorId) === undefined) {
-        issues.push({
-          id: `node-missing-connector-${node.id}`,
-          severity: "error",
-          category: "Missing reference",
-          message: `Node '${node.id}' references missing connector '${node.connectorId}'.`,
-          subScreen: "node",
-          selectionKind: "node",
-          selectionId: node.id
-        });
-      }
-
-      if (node.kind === "splice" && spliceMap.get(node.spliceId) === undefined) {
-        issues.push({
-          id: `node-missing-splice-${node.id}`,
-          severity: "error",
-          category: "Missing reference",
-          message: `Node '${node.id}' references missing splice '${node.spliceId}'.`,
-          subScreen: "node",
-          selectionKind: "node",
-          selectionId: node.id
-        });
-      }
-
-      if (node.kind === "intermediate" && node.label.trim().length === 0) {
-        issues.push({
-          id: `node-missing-label-${node.id}`,
-          severity: "error",
-          category: "Incomplete required fields",
-          message: `Intermediate node '${node.id}' is missing its label.`,
-          subScreen: "node",
-          selectionKind: "node",
-          selectionId: node.id
-        });
-      }
-    }
-
-    for (const segment of segments) {
-      if (state.nodes.byId[segment.nodeA] === undefined || state.nodes.byId[segment.nodeB] === undefined) {
-        issues.push({
-          id: `segment-missing-node-${segment.id}`,
-          severity: "error",
-          category: "Missing reference",
-          message: `Segment '${segment.id}' has an endpoint that is no longer available.`,
-          subScreen: "segment",
-          selectionKind: "segment",
-          selectionId: segment.id
-        });
-      }
-
-      if (!Number.isFinite(segment.lengthMm) || segment.lengthMm <= 0) {
-        issues.push({
-          id: `segment-invalid-length-${segment.id}`,
-          severity: "error",
-          category: "Incomplete required fields",
-          message: `Segment '${segment.id}' must have a strictly positive length.`,
-          subScreen: "segment",
-          selectionKind: "segment",
-          selectionId: segment.id
-        });
-      }
-    }
-
-    for (const connector of connectors) {
-      if (connector.name.trim().length === 0 || connector.technicalId.trim().length === 0 || connector.cavityCount < 1) {
-        issues.push({
-          id: `connector-required-fields-${connector.id}`,
-          severity: "error",
-          category: "Incomplete required fields",
-          message: `Connector '${connector.id}' is missing required fields or has invalid cavity count.`,
-          subScreen: "connector",
-          selectionKind: "connector",
-          selectionId: connector.id
-        });
-      }
-    }
-
-    for (const splice of splices) {
-      if (splice.name.trim().length === 0 || splice.technicalId.trim().length === 0 || splice.portCount < 1) {
-        issues.push({
-          id: `splice-required-fields-${splice.id}`,
-          severity: "error",
-          category: "Incomplete required fields",
-          message: `Splice '${splice.id}' is missing required fields or has invalid port count.`,
-          subScreen: "splice",
-          selectionKind: "splice",
-          selectionId: splice.id
-        });
-      }
-    }
-
-    for (const wire of wires) {
-      if (wire.endpointA.kind === "connectorCavity" && connectorMap.get(wire.endpointA.connectorId) === undefined) {
-        issues.push({
-          id: `wire-missing-connector-a-${wire.id}`,
-          severity: "error",
-          category: "Missing reference",
-          message: `Wire '${wire.technicalId}' endpoint A references missing connector '${wire.endpointA.connectorId}'.`,
-          subScreen: "wire",
-          selectionKind: "wire",
-          selectionId: wire.id
-        });
-      }
-      if (wire.endpointA.kind === "splicePort" && spliceMap.get(wire.endpointA.spliceId) === undefined) {
-        issues.push({
-          id: `wire-missing-splice-a-${wire.id}`,
-          severity: "error",
-          category: "Missing reference",
-          message: `Wire '${wire.technicalId}' endpoint A references missing splice '${wire.endpointA.spliceId}'.`,
-          subScreen: "wire",
-          selectionKind: "wire",
-          selectionId: wire.id
-        });
-      }
-      if (wire.endpointB.kind === "connectorCavity" && connectorMap.get(wire.endpointB.connectorId) === undefined) {
-        issues.push({
-          id: `wire-missing-connector-b-${wire.id}`,
-          severity: "error",
-          category: "Missing reference",
-          message: `Wire '${wire.technicalId}' endpoint B references missing connector '${wire.endpointB.connectorId}'.`,
-          subScreen: "wire",
-          selectionKind: "wire",
-          selectionId: wire.id
-        });
-      }
-      if (wire.endpointB.kind === "splicePort" && spliceMap.get(wire.endpointB.spliceId) === undefined) {
-        issues.push({
-          id: `wire-missing-splice-b-${wire.id}`,
-          severity: "error",
-          category: "Missing reference",
-          message: `Wire '${wire.technicalId}' endpoint B references missing splice '${wire.endpointB.spliceId}'.`,
-          subScreen: "wire",
-          selectionKind: "wire",
-          selectionId: wire.id
-        });
-      }
-
-      if (wire.name.trim().length === 0 || wire.technicalId.trim().length === 0) {
-        issues.push({
-          id: `wire-required-fields-${wire.id}`,
-          severity: "error",
-          category: "Incomplete required fields",
-          message: `Wire '${wire.id}' is missing required name or technical ID.`,
-          subScreen: "wire",
-          selectionKind: "wire",
-          selectionId: wire.id
-        });
-      }
-
-      registerExpectedWireOccupancy(wire.endpointA, `wire:${wire.id}:A`);
-      registerExpectedWireOccupancy(wire.endpointB, `wire:${wire.id}:B`);
-
-      if (wire.routeSegmentIds.length === 0) {
-        issues.push({
-          id: `wire-empty-route-${wire.id}`,
-          severity: wire.isRouteLocked ? "error" : "warning",
-          category: "Route lock validity",
-          message: wire.isRouteLocked
-            ? `Wire '${wire.technicalId}' is route-locked but has no segment in its forced route.`
-            : `Wire '${wire.technicalId}' currently has an empty auto-route.`,
-          subScreen: "wire",
-          selectionKind: "wire",
-          selectionId: wire.id
-        });
-      }
-
-      const missingRouteSegmentIds = wire.routeSegmentIds.filter((segmentId) => state.segments.byId[segmentId] === undefined);
-      if (missingRouteSegmentIds.length > 0) {
-        issues.push({
-          id: `wire-missing-route-segment-${wire.id}`,
-          severity: "error",
-          category: "Route lock validity",
-          message: `Wire '${wire.technicalId}' route references missing segments: ${missingRouteSegmentIds.join(", ")}.`,
-          subScreen: "wire",
-          selectionKind: "wire",
-          selectionId: wire.id
-        });
-      } else if (wire.routeSegmentIds.length > 0 && wire.isRouteLocked) {
-        const startNodeId = resolveEndpointNodeId(wire.endpointA, connectorNodeByConnectorId, spliceNodeBySpliceId);
-        const endNodeId = resolveEndpointNodeId(wire.endpointB, connectorNodeByConnectorId, spliceNodeBySpliceId);
-        if (startNodeId === null || endNodeId === null) {
-          issues.push({
-            id: `wire-locked-route-missing-endpoint-node-${wire.id}`,
-            severity: "error",
-            category: "Route lock validity",
-            message: `Wire '${wire.technicalId}' is route-locked but at least one endpoint node is missing.`,
-            subScreen: "wire",
-            selectionKind: "wire",
-            selectionId: wire.id
-          });
-        } else if (!isOrderedRouteValid(wire.routeSegmentIds, startNodeId, endNodeId, segmentMap)) {
-          issues.push({
-            id: `wire-locked-route-invalid-chain-${wire.id}`,
-            severity: "error",
-            category: "Route lock validity",
-            message: `Wire '${wire.technicalId}' has an invalid forced route chain between its endpoints.`,
-            subScreen: "wire",
-            selectionKind: "wire",
-            selectionId: wire.id
-          });
-        }
-      }
-    }
-
-    for (const [connectorId, occupancyByCavity] of Object.entries(state.connectorCavityOccupancy)) {
-      const typedConnectorId = connectorId as ConnectorId;
-      for (const [cavityIndexRaw, occupantRef] of Object.entries(occupancyByCavity)) {
-        if (occupantRef.trim().length === 0) {
-          continue;
-        }
-
-        const cavityIndex = Number(cavityIndexRaw);
-        const key = toConnectorOccupancyKey(typedConnectorId, cavityIndex);
-        const expectedRef = expectedConnectorOccupancy.get(key);
-        if (expectedRef === undefined) {
-          issues.push({
-            id: `connector-manual-occupancy-${typedConnectorId}-${cavityIndex}`,
-            severity: "warning",
-            category: "Occupancy conflict",
-            message: `Connector '${typedConnectorId}' cavity C${cavityIndex} is occupied by '${occupantRef}' without linked wire endpoint.`,
-            subScreen: "connector",
-            selectionKind: "connector",
-            selectionId: typedConnectorId
-          });
-          continue;
-        }
-
-        if (expectedRef !== occupantRef) {
-          issues.push({
-            id: `connector-occupancy-mismatch-${typedConnectorId}-${cavityIndex}`,
-            severity: "error",
-            category: "Occupancy conflict",
-            message: `Connector '${typedConnectorId}' cavity C${cavityIndex} occupancy mismatch ('${occupantRef}' vs expected '${expectedRef}').`,
-            subScreen: "connector",
-            selectionKind: "connector",
-            selectionId: typedConnectorId
-          });
-        }
-
-        const parsed = parseWireOccupantRef(occupantRef);
-        if (parsed !== null && state.wires.byId[parsed.wireId] === undefined) {
-          issues.push({
-            id: `connector-occupancy-missing-wire-${typedConnectorId}-${cavityIndex}`,
-            severity: "error",
-            category: "Occupancy conflict",
-            message: `Connector '${typedConnectorId}' cavity C${cavityIndex} references unknown wire '${parsed.wireId}'.`,
-            subScreen: "connector",
-            selectionKind: "connector",
-            selectionId: typedConnectorId
-          });
-        }
-      }
-    }
-
-    for (const [spliceId, occupancyByPort] of Object.entries(state.splicePortOccupancy)) {
-      const typedSpliceId = spliceId as SpliceId;
-      for (const [portIndexRaw, occupantRef] of Object.entries(occupancyByPort)) {
-        if (occupantRef.trim().length === 0) {
-          continue;
-        }
-
-        const portIndex = Number(portIndexRaw);
-        const key = toSpliceOccupancyKey(typedSpliceId, portIndex);
-        const expectedRef = expectedSpliceOccupancy.get(key);
-        if (expectedRef === undefined) {
-          issues.push({
-            id: `splice-manual-occupancy-${typedSpliceId}-${portIndex}`,
-            severity: "warning",
-            category: "Occupancy conflict",
-            message: `Splice '${typedSpliceId}' port P${portIndex} is occupied by '${occupantRef}' without linked wire endpoint.`,
-            subScreen: "splice",
-            selectionKind: "splice",
-            selectionId: typedSpliceId
-          });
-          continue;
-        }
-
-        if (expectedRef !== occupantRef) {
-          issues.push({
-            id: `splice-occupancy-mismatch-${typedSpliceId}-${portIndex}`,
-            severity: "error",
-            category: "Occupancy conflict",
-            message: `Splice '${typedSpliceId}' port P${portIndex} occupancy mismatch ('${occupantRef}' vs expected '${expectedRef}').`,
-            subScreen: "splice",
-            selectionKind: "splice",
-            selectionId: typedSpliceId
-          });
-        }
-
-        const parsed = parseWireOccupantRef(occupantRef);
-        if (parsed !== null && state.wires.byId[parsed.wireId] === undefined) {
-          issues.push({
-            id: `splice-occupancy-missing-wire-${typedSpliceId}-${portIndex}`,
-            severity: "error",
-            category: "Occupancy conflict",
-            message: `Splice '${typedSpliceId}' port P${portIndex} references unknown wire '${parsed.wireId}'.`,
-            subScreen: "splice",
-            selectionKind: "splice",
-            selectionId: typedSpliceId
-          });
-        }
-      }
-    }
-
-    for (const [expectedKey, expectedRef] of expectedConnectorOccupancy) {
-      const [connectorIdRaw, cavityIndexRaw] = expectedKey.split(":");
-      const connectorId = connectorIdRaw as ConnectorId;
-      const cavityIndex = Number(cavityIndexRaw);
-      const actualRef = state.connectorCavityOccupancy[connectorId]?.[cavityIndex];
-      if (actualRef === expectedRef) {
-        continue;
-      }
-
-      issues.push({
-        id: `connector-expected-occupancy-missing-${connectorId}-${cavityIndex}`,
-        severity: "error",
-        category: "Occupancy conflict",
-        message: `Connector '${connectorId}' cavity C${cavityIndex} should be occupied by '${expectedRef}' but current occupancy is '${actualRef ?? "none"}'.`,
-        subScreen: "connector",
-        selectionKind: "connector",
-        selectionId: connectorId
-      });
-    }
-
-    for (const [expectedKey, expectedRef] of expectedSpliceOccupancy) {
-      const [spliceIdRaw, portIndexRaw] = expectedKey.split(":");
-      const spliceId = spliceIdRaw as SpliceId;
-      const portIndex = Number(portIndexRaw);
-      const actualRef = state.splicePortOccupancy[spliceId]?.[portIndex];
-      if (actualRef === expectedRef) {
-        continue;
-      }
-
-      issues.push({
-        id: `splice-expected-occupancy-missing-${spliceId}-${portIndex}`,
-        severity: "error",
-        category: "Occupancy conflict",
-        message: `Splice '${spliceId}' port P${portIndex} should be occupied by '${expectedRef}' but current occupancy is '${actualRef ?? "none"}'.`,
-        subScreen: "splice",
-        selectionKind: "splice",
-        selectionId: spliceId
-      });
-    }
-
-    return issues;
-  }, [
-    connectorMap,
-    connectorNodeByConnectorId,
+  const {
+    validationCategoryFilter,
+    setValidationCategoryFilter,
+    validationSeverityFilter,
+    setValidationSeverityFilter,
+    validationSearchQuery,
+    setValidationSearchQuery,
+    validationIssueCursor,
+    validationIssues,
+    orderedValidationIssues,
+    validationCategories,
+    validationIssuesForCategoryCounts,
+    validationIssuesForSeverityCounts,
+    validationCategoryCountByName,
+    validationSeverityCountByLevel,
+    visibleValidationIssues,
+    validationErrorCount,
+    validationWarningCount,
+    groupedValidationIssues,
+    clearValidationFilters,
+    findValidationIssueIndex,
+    getValidationIssueByCursor,
+    getFocusedValidationIssueByCursor,
+    setValidationIssueCursorFromIssue
+  } = useValidationModel({
+    state,
     connectors,
-    nodes,
-    segmentMap,
-    segments,
-    spliceMap,
-    spliceNodeBySpliceId,
     splices,
-    state.connectorCavityOccupancy,
-    state.nodes.byId,
-    state.segments.byId,
-    state.splicePortOccupancy,
-    state.wires.byId,
-    wires
-  ]);
-
-  const orderedValidationIssues = useMemo(
-    () =>
-      [...validationIssues].sort((left, right) => {
-        const leftSeverityRank = left.severity === "error" ? 0 : 1;
-        const rightSeverityRank = right.severity === "error" ? 0 : 1;
-        if (leftSeverityRank !== rightSeverityRank) {
-          return leftSeverityRank - rightSeverityRank;
-        }
-
-        const categoryComparison = left.category.localeCompare(right.category);
-        if (categoryComparison !== 0) {
-          return categoryComparison;
-        }
-
-        const subScreenComparison = left.subScreen.localeCompare(right.subScreen);
-        if (subScreenComparison !== 0) {
-          return subScreenComparison;
-        }
-
-        const selectionComparison = left.selectionId.localeCompare(right.selectionId);
-        if (selectionComparison !== 0) {
-          return selectionComparison;
-        }
-
-        return left.id.localeCompare(right.id);
-      }),
-    [validationIssues]
-  );
-  const validationCategories = useMemo(
-    () => [...new Set(orderedValidationIssues.map((issue) => issue.category))].sort((left, right) => left.localeCompare(right)),
-    [orderedValidationIssues]
-  );
-  const validationIssuesForCategoryCounts = useMemo(
-    () =>
-      orderedValidationIssues.filter((issue) => {
-        if (validationSeverityFilter !== "all" && issue.severity !== validationSeverityFilter) {
-          return false;
-        }
-
-        if (normalizedValidationSearch.length > 0) {
-          const searchable = `${issue.category} ${issue.message} ${issue.subScreen} ${issue.selectionId}`;
-          if (!searchable.toLocaleLowerCase().includes(normalizedValidationSearch)) {
-            return false;
-          }
-        }
-
-        return true;
-      }),
-    [normalizedValidationSearch, orderedValidationIssues, validationSeverityFilter]
-  );
-  const validationIssuesForSeverityCounts = useMemo(
-    () =>
-      orderedValidationIssues.filter((issue) => {
-        if (validationCategoryFilter !== "all" && issue.category !== validationCategoryFilter) {
-          return false;
-        }
-
-        if (normalizedValidationSearch.length > 0) {
-          const searchable = `${issue.category} ${issue.message} ${issue.subScreen} ${issue.selectionId}`;
-          if (!searchable.toLocaleLowerCase().includes(normalizedValidationSearch)) {
-            return false;
-          }
-        }
-
-        return true;
-      }),
-    [normalizedValidationSearch, orderedValidationIssues, validationCategoryFilter]
-  );
-  const validationCategoryCountByName = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const issue of validationIssuesForCategoryCounts) {
-      counts.set(issue.category, (counts.get(issue.category) ?? 0) + 1);
-    }
-    return counts;
-  }, [validationIssuesForCategoryCounts]);
-  const validationSeverityCountByLevel = useMemo(() => {
-    const counts: Record<Exclude<ValidationSeverityFilter, "all">, number> = {
-      error: 0,
-      warning: 0
-    };
-    for (const issue of validationIssuesForSeverityCounts) {
-      if (issue.severity === "error") {
-        counts.error += 1;
-        continue;
-      }
-      counts.warning += 1;
-    }
-    return counts;
-  }, [validationIssuesForSeverityCounts]);
-  const visibleValidationIssues = useMemo(
-    () =>
-      orderedValidationIssues.filter((issue) => {
-        if (validationCategoryFilter !== "all" && issue.category !== validationCategoryFilter) {
-          return false;
-        }
-
-        if (validationSeverityFilter !== "all" && issue.severity !== validationSeverityFilter) {
-          return false;
-        }
-
-        if (normalizedValidationSearch.length > 0) {
-          const searchable = `${issue.category} ${issue.message} ${issue.subScreen} ${issue.selectionId}`;
-          if (!searchable.toLocaleLowerCase().includes(normalizedValidationSearch)) {
-            return false;
-          }
-        }
-
-        return true;
-      }),
-    [normalizedValidationSearch, orderedValidationIssues, validationCategoryFilter, validationSeverityFilter]
-  );
-  const validationErrorCount = useMemo(
-    () => validationIssues.filter((issue) => issue.severity === "error").length,
-    [validationIssues]
-  );
-  const validationWarningCount = useMemo(
-    () => validationIssues.filter((issue) => issue.severity === "warning").length,
-    [validationIssues]
-  );
-  const groupedValidationIssues = useMemo(() => {
-    const grouped = new Map<string, ValidationIssue[]>();
-    for (const issue of visibleValidationIssues) {
-      const existing = grouped.get(issue.category);
-      if (existing === undefined) {
-        grouped.set(issue.category, [issue]);
-        continue;
-      }
-
-      existing.push(issue);
-    }
-
-    return [...grouped.entries()].sort(([left], [right]) => left.localeCompare(right));
-  }, [visibleValidationIssues]);
-
-  useEffect(() => {
-    if (validationCategoryFilter === "all") {
-      return;
-    }
-
-    if (validationCategories.includes(validationCategoryFilter)) {
-      return;
-    }
-
-    setValidationCategoryFilter("all");
-  }, [validationCategories, validationCategoryFilter]);
-
-  useEffect(() => {
-    if (orderedValidationIssues.length === 0) {
-      setValidationIssueCursor(-1);
-      return;
-    }
-
-    if (validationIssueCursor >= orderedValidationIssues.length) {
-      setValidationIssueCursor(0);
-    }
-  }, [orderedValidationIssues, validationIssueCursor]);
-
-  useEffect(() => {
-    if (!isValidationScreen) {
-      return;
-    }
-
-    if (visibleValidationIssues.length === 0) {
-      if (validationIssueCursor !== -1) {
-        setValidationIssueCursor(-1);
-      }
-      return;
-    }
-
-    const focusedIssue =
-      validationIssueCursor >= 0 && validationIssueCursor < orderedValidationIssues.length
-        ? orderedValidationIssues[validationIssueCursor] ?? null
-        : null;
-    if (focusedIssue !== null && visibleValidationIssues.some((issue) => issue.id === focusedIssue.id)) {
-      return;
-    }
-
-    const firstVisibleIssue = visibleValidationIssues[0];
-    if (firstVisibleIssue === undefined) {
-      return;
-    }
-
-    const firstVisibleIndex = orderedValidationIssues.findIndex((issue) => issue.id === firstVisibleIssue.id);
-    if (firstVisibleIndex >= 0 && firstVisibleIndex !== validationIssueCursor) {
-      setValidationIssueCursor(firstVisibleIndex);
-    }
-  }, [isValidationScreen, orderedValidationIssues, validationIssueCursor, visibleValidationIssues]);
+    nodes,
+    segments,
+    wires,
+    connectorMap,
+    spliceMap,
+    segmentMap,
+    connectorNodeByConnectorId,
+    spliceNodeBySpliceId,
+    isValidationScreen
+  });
+  const normalizedValidationSearch = normalizeSearch(validationSearchQuery);
 
   const entityCountBySubScreen: Record<SubScreenId, number> = {
     connector: connectors.length,
@@ -1553,144 +811,44 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const hasBuiltInSampleState = hasSampleNetworkSignature(state);
 
   const lastError = selectLastError(state);
-
-  useEffect(() => {
-    return () => {
-      if (saveStatusTimeoutRef.current !== null) {
-        clearTimeout(saveStatusTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  function queueSavedStatus(): void {
-    if (saveStatusTimeoutRef.current !== null) {
-      clearTimeout(saveStatusTimeoutRef.current);
+  const {
+    saveStatus,
+    isUndoAvailable,
+    isRedoAvailable,
+    dispatchAction,
+    handleUndo,
+    handleRedo,
+    replaceStateWithHistory
+  } = useStoreHistory({
+    store,
+    historyLimit: HISTORY_LIMIT,
+    onUndoRedoApplied: () => {
+      setModeAnchorNodeId(null);
+      setPendingNewNodePosition(null);
+    },
+    onReplaceStateApplied: () => {
+      setModeAnchorNodeId(null);
+      setPendingNewNodePosition(null);
+      setActiveScreen("modeling");
+      setActiveSubScreen("connector");
+      setInteractionMode("select");
     }
-
-    saveStatusTimeoutRef.current = setTimeout(() => {
-      setSaveStatus((current) => (current === "unsaved" ? "saved" : current));
-      saveStatusTimeoutRef.current = null;
-    }, 250);
-  }
-
-  function dispatchAction(
-    action: Parameters<AppStore["dispatch"]>[0],
-    options?: {
-      trackHistory?: boolean;
-    }
-  ): void {
-    const shouldTrackHistory = options?.trackHistory ?? !action.type.startsWith("ui/");
-    const previousState = store.getState();
-
-    try {
-      store.dispatch(action);
-    } catch {
-      setSaveStatus("error");
-      return;
-    }
-
-    const nextState = store.getState();
-    if (nextState === previousState) {
-      return;
-    }
-
-    if (!shouldTrackHistory) {
-      return;
-    }
-
-    setUndoStack((previous) => {
-      const next = [...previous, previousState];
-      return next.length > HISTORY_LIMIT ? next.slice(next.length - HISTORY_LIMIT) : next;
-    });
-    setRedoStack([]);
-    setSaveStatus("unsaved");
-    queueSavedStatus();
-  }
-
-  function handleUndo(): void {
-    if (undoStack.length === 0) {
-      return;
-    }
-
-    const previousState = undoStack[undoStack.length - 1];
-    if (previousState === undefined) {
-      return;
-    }
-
-    const currentState = store.getState();
-    try {
-      store.replaceState(previousState);
-    } catch {
-      setSaveStatus("error");
-      return;
-    }
-
-    setUndoStack((previous) => previous.slice(0, -1));
-    setRedoStack((previous) => {
-      const next = [...previous, currentState];
-      return next.length > HISTORY_LIMIT ? next.slice(next.length - HISTORY_LIMIT) : next;
-    });
-    setModeAnchorNodeId(null);
-    setPendingNewNodePosition(null);
-    setSaveStatus("unsaved");
-    queueSavedStatus();
-  }
-
-  function handleRedo(): void {
-    if (redoStack.length === 0) {
-      return;
-    }
-
-    const redoState = redoStack[redoStack.length - 1];
-    if (redoState === undefined) {
-      return;
-    }
-
-    const currentState = store.getState();
-    try {
-      store.replaceState(redoState);
-    } catch {
-      setSaveStatus("error");
-      return;
-    }
-
-    setRedoStack((previous) => previous.slice(0, -1));
-    setUndoStack((previous) => {
-      const next = [...previous, currentState];
-      return next.length > HISTORY_LIMIT ? next.slice(next.length - HISTORY_LIMIT) : next;
-    });
-    setModeAnchorNodeId(null);
-    setPendingNewNodePosition(null);
-    setSaveStatus("unsaved");
-    queueSavedStatus();
-  }
-
-  function replaceStateWithHistory(nextState: ReturnType<AppStore["getState"]>): void {
-    const currentState = store.getState();
-    if (nextState === currentState) {
-      return;
-    }
-
-    try {
-      store.replaceState(nextState);
-    } catch {
-      setSaveStatus("error");
-      return;
-    }
-
-    setUndoStack((previous) => {
-      const next = [...previous, currentState];
-      return next.length > HISTORY_LIMIT ? next.slice(next.length - HISTORY_LIMIT) : next;
-    });
-    setRedoStack([]);
-    setModeAnchorNodeId(null);
-    setPendingNewNodePosition(null);
-    setActiveScreen("modeling");
-    setActiveSubScreen("connector");
-    setInteractionMode("select");
-    setSaveStatus("unsaved");
-    queueSavedStatus();
-  }
+  });
+  const {
+    importFileInputRef,
+    selectedExportNetworkIds,
+    importExportStatus,
+    lastImportSummary,
+    toggleSelectedExportNetwork,
+    handleExportNetworks,
+    handleOpenImportPicker,
+    handleImportFileChange
+  } = useNetworkImportExport({
+    store,
+    networks,
+    activeNetworkId,
+    dispatchAction
+  });
 
   function handleCreateNetwork(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -1789,128 +947,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
     dispatchAction(appActions.deleteNetwork(activeNetwork.id));
     setNetworkFormError(null);
-  }
-
-  function toggleSelectedExportNetwork(networkId: NetworkId): void {
-    setSelectedExportNetworkIds((previous) => {
-      if (previous.includes(networkId)) {
-        return previous.filter((id) => id !== networkId);
-      }
-
-      return [...previous, networkId].sort((left, right) => left.localeCompare(right));
-    });
-  }
-
-  function downloadJsonFile(fileName: string, content: string): boolean {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    const blob = new Blob([content], {
-      type: "application/json"
-    });
-    const urlFactory = window.URL ?? globalThis.URL;
-    if (typeof urlFactory.createObjectURL !== "function" || typeof urlFactory.revokeObjectURL !== "function") {
-      return false;
-    }
-
-    const href = urlFactory.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = href;
-    link.download = fileName;
-    link.click();
-    urlFactory.revokeObjectURL(href);
-    return true;
-  }
-
-  function handleExportNetworks(scope: "active" | "selected" | "all"): void {
-    const payload = buildNetworkFilePayload(store.getState(), scope, selectedExportNetworkIds, new Date().toISOString());
-    if (payload.networks.length === 0) {
-      setImportExportStatus({
-        kind: "failed",
-        message: "No network available for the selected export scope."
-      });
-      return;
-    }
-
-    const serialized = serializeNetworkFilePayload(payload);
-    const downloadOk = downloadJsonFile(
-      scope === "active"
-        ? "electrical-network-active.json"
-        : scope === "selected"
-          ? "electrical-network-selected.json"
-          : "electrical-network-all.json",
-      serialized
-    );
-    if (!downloadOk) {
-      setImportExportStatus({
-        kind: "failed",
-        message: "Export is not available in this environment."
-      });
-      return;
-    }
-
-    setImportExportStatus({
-      kind: "success",
-      message: `Exported ${payload.networks.length} network(s) (${scope}).`
-    });
-  }
-
-  function handleOpenImportPicker(): void {
-    importFileInputRef.current?.click();
-  }
-
-  async function handleImportFileChange(event: ChangeEvent<HTMLInputElement>): Promise<void> {
-    const file = event.target.files?.[0];
-    if (file === undefined) {
-      return;
-    }
-
-    const resetInput = () => {
-      event.target.value = "";
-    };
-
-    let rawJson: string;
-    try {
-      rawJson = await file.text();
-    } catch {
-      setImportExportStatus({
-        kind: "failed",
-        message: "Unable to read selected file."
-      });
-      resetInput();
-      return;
-    }
-
-    const parsed = parseNetworkFilePayload(rawJson);
-    if (parsed.payload === null) {
-      setImportExportStatus({
-        kind: "failed",
-        message: parsed.error ?? "Invalid import file."
-      });
-      resetInput();
-      return;
-    }
-
-    const resolved = resolveImportConflicts(parsed.payload, store.getState());
-    setLastImportSummary(resolved.summary);
-
-    if (resolved.networks.length === 0) {
-      setImportExportStatus({
-        kind: "failed",
-        message: "No network was imported. Check file errors."
-      });
-      resetInput();
-      return;
-    }
-
-    dispatchAction(appActions.importNetworks(resolved.networks, resolved.networkStates, true));
-
-    setImportExportStatus({
-      kind: resolved.summary.errors.length > 0 || resolved.summary.warnings.length > 0 ? "partial" : "success",
-      message: `Imported ${resolved.networks.length} network(s).`
-    });
-    resetInput();
   }
 
   function handleRecreateSampleNetwork(): void {
@@ -2746,43 +1782,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setActiveScreen("validation");
   }
 
-  function clearValidationFilters(): void {
-    setValidationSearchQuery("");
-    setValidationCategoryFilter("all");
-    setValidationSeverityFilter("all");
-  }
-
-  function findValidationIssueIndex(issueId: string): number {
-    return orderedValidationIssues.findIndex((candidate) => candidate.id === issueId);
-  }
-
-  function getValidationIssueByCursor(): ValidationIssue | null {
-    if (orderedValidationIssues.length === 0) {
-      return null;
-    }
-
-    if (validationIssueCursor < 0 || validationIssueCursor >= orderedValidationIssues.length) {
-      return orderedValidationIssues[0] ?? null;
-    }
-
-    return orderedValidationIssues[validationIssueCursor] ?? null;
-  }
-
-  function getFocusedValidationIssueByCursor(): ValidationIssue | null {
-    if (validationIssueCursor < 0 || validationIssueCursor >= orderedValidationIssues.length) {
-      return null;
-    }
-
-    return orderedValidationIssues[validationIssueCursor] ?? null;
-  }
-
-  function setValidationIssueCursorFromIssue(issue: ValidationIssue): void {
-    const issueIndex = findValidationIssueIndex(issue.id);
-    if (issueIndex >= 0) {
-      setValidationIssueCursor(issueIndex);
-    }
-  }
-
   function moveValidationIssueCursorInList(direction: 1 | -1, issues: ValidationIssue[]): void {
     if (issues.length === 0) {
       return;
@@ -3447,7 +2446,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         </section>
       ) : (
         <>
-      {isModelingScreen ? (
+      <ModelingScreen isActive={isModelingScreen}>
         <>
       <section className="workspace-stage">
       <section className="panel-grid workspace-column workspace-column-right">
@@ -4353,9 +3352,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       <section className="panel-grid workspace-column workspace-column-center">{networkSummaryPanel}</section>
       </section>
         </>
-      ) : null}
+      </ModelingScreen>
 
-      {isAnalysisScreen ? (
+      <AnalysisScreen isActive={isAnalysisScreen}>
       <section className="panel-grid">
         {inspectorContextPanel}
         <section className="panel" hidden={!isConnectorSubScreen}>
@@ -4599,9 +3598,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
         {networkSummaryPanel}
       </section>
-      ) : null}
+      </AnalysisScreen>
 
-      {isValidationScreen ? (
+      <ValidationScreen isActive={isValidationScreen}>
         <section className="panel-grid">
           <section className="panel">
             <h2>Validation center</h2>
@@ -4762,9 +3761,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             </p>
           </section>
         </section>
-      ) : null}
+      </ValidationScreen>
 
-      {isSettingsScreen ? (
+      <SettingsScreen isActive={isSettingsScreen}>
         <section className="panel-grid">
           <section className="panel">
             <h2>Table and list preferences</h2>
@@ -4996,7 +3995,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             ) : null}
           </section>
         </section>
-      ) : null}
+      </SettingsScreen>
         </>
       )}
         </section>
