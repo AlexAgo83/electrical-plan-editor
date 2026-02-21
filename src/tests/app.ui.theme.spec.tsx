@@ -7,26 +7,26 @@ describe("App integration UI - theme mode", () => {
     localStorage.clear();
   });
 
-  it("toggles between normal and dark mode from settings panel only", () => {
+  it("toggles between dark and normal mode from network scope settings panel", () => {
     renderAppWithState(createUiIntegrationState());
 
     const appShell = document.querySelector("main.app-shell");
     expect(appShell).not.toBeNull();
-    expect(appShell).toHaveClass("theme-normal");
-
-    switchScreen("settings");
-    const settingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
-    expect(settingsPanel).not.toBeNull();
-    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "dark" } });
     expect(appShell).toHaveClass("theme-dark");
 
+    switchScreen("networkScope");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
+    expect(settingsPanel).not.toBeNull();
     fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "normal" } });
     expect(appShell).toHaveClass("theme-normal");
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "dark" } });
+    expect(appShell).toHaveClass("theme-dark");
   });
 
   it("persists dark mode preference across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
-    switchScreen("settings");
+    switchScreen("networkScope");
     const firstSettingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
     expect(firstSettingsPanel).not.toBeNull();
     fireEvent.change(within(firstSettingsPanel as HTMLElement).getByLabelText("Theme mode"), {
@@ -40,7 +40,7 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).not.toBeNull();
     expect(appShell).toHaveClass("theme-dark");
 
-    switchScreen("settings");
+    switchScreen("networkScope");
     const settingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
     expect(settingsPanel).not.toBeNull();
     expect(within(settingsPanel as HTMLElement).getByLabelText("Theme mode")).toHaveValue("dark");
@@ -51,7 +51,7 @@ describe("App integration UI - theme mode", () => {
     const { store } = renderAppWithState(state);
 
     const before = store.getState();
-    switchScreen("settings");
+    switchScreen("networkScope");
     const settingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
     expect(settingsPanel).not.toBeNull();
     fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "dark" } });

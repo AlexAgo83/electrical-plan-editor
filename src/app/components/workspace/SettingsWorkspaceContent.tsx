@@ -1,36 +1,9 @@
 import type { ChangeEvent, ReactElement, RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import type { NetworkId } from "../../../core/entities";
-import type { ThemeMode } from "../../../store";
 import type { ImportExportStatus } from "../../types/app-controller";
-import type { SortDirection, SortField, TableDensity } from "../../types/app-controller";
 
 interface SettingsWorkspaceContentProps {
-  themeMode: ThemeMode;
-  setThemeMode: (value: ThemeMode) => void;
-  tableDensity: TableDensity;
-  setTableDensity: (value: TableDensity) => void;
-  defaultSortField: SortField;
-  setDefaultSortField: (value: SortField) => void;
-  defaultSortDirection: SortDirection;
-  setDefaultSortDirection: (value: SortDirection) => void;
-  defaultIdSortDirection: SortDirection;
-  setDefaultIdSortDirection: (value: SortDirection) => void;
-  applyListSortDefaults: () => void;
-  canvasDefaultShowGrid: boolean;
-  setCanvasDefaultShowGrid: (value: boolean) => void;
-  canvasDefaultSnapToGrid: boolean;
-  setCanvasDefaultSnapToGrid: (value: boolean) => void;
-  canvasResetZoomPercentInput: string;
-  setCanvasResetZoomPercentInput: (value: string) => void;
-  configuredResetZoomPercent: number;
-  applyCanvasDefaultsNow: () => void;
-  handleZoomAction: (target: "in" | "out" | "reset") => void;
-  showShortcutHints: boolean;
-  setShowShortcutHints: (value: boolean) => void;
-  keyboardShortcutsEnabled: boolean;
-  setKeyboardShortcutsEnabled: (value: boolean) => void;
-  resetWorkspacePreferencesToDefaults: () => void;
   isCurrentWorkspaceEmpty: boolean;
   hasBuiltInSampleState: boolean;
   handleRecreateSampleNetwork: () => void;
@@ -48,31 +21,6 @@ interface SettingsWorkspaceContentProps {
 }
 
 export function SettingsWorkspaceContent({
-  themeMode,
-  setThemeMode,
-  tableDensity,
-  setTableDensity,
-  defaultSortField,
-  setDefaultSortField,
-  defaultSortDirection,
-  setDefaultSortDirection,
-  defaultIdSortDirection,
-  setDefaultIdSortDirection,
-  applyListSortDefaults,
-  canvasDefaultShowGrid,
-  setCanvasDefaultShowGrid,
-  canvasDefaultSnapToGrid,
-  setCanvasDefaultSnapToGrid,
-  canvasResetZoomPercentInput,
-  setCanvasResetZoomPercentInput,
-  configuredResetZoomPercent,
-  applyCanvasDefaultsNow,
-  handleZoomAction,
-  showShortcutHints,
-  setShowShortcutHints,
-  keyboardShortcutsEnabled,
-  setKeyboardShortcutsEnabled,
-  resetWorkspacePreferencesToDefaults,
   isCurrentWorkspaceEmpty,
   hasBuiltInSampleState,
   handleRecreateSampleNetwork,
@@ -90,108 +38,6 @@ export function SettingsWorkspaceContent({
 }: SettingsWorkspaceContentProps): ReactElement {
   return (
     <section className="panel-grid">
-      <section className="panel">
-        <h2>Table and list preferences</h2>
-        <div className="settings-grid">
-          <label>
-            Theme mode
-            <select value={themeMode} onChange={(event) => setThemeMode(event.target.value as ThemeMode)}>
-              <option value="normal">Normal</option>
-              <option value="dark">Dark</option>
-            </select>
-          </label>
-          <label>
-            Table density
-            <select value={tableDensity} onChange={(event) => setTableDensity(event.target.value as TableDensity)}>
-              <option value="comfortable">Comfortable</option>
-              <option value="compact">Compact</option>
-            </select>
-          </label>
-          <label>
-            Default sort column
-            <select value={defaultSortField} onChange={(event) => setDefaultSortField(event.target.value as SortField)}>
-              <option value="name">Name</option>
-              <option value="technicalId">Technical ID</option>
-            </select>
-          </label>
-          <label>
-            Default sort direction
-            <select value={defaultSortDirection} onChange={(event) => setDefaultSortDirection(event.target.value as SortDirection)}>
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
-          </label>
-          <label>
-            Default ID sort direction
-            <select value={defaultIdSortDirection} onChange={(event) => setDefaultIdSortDirection(event.target.value as SortDirection)}>
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
-          </label>
-        </div>
-        <div className="row-actions">
-          <button type="button" onClick={applyListSortDefaults}>Apply sort defaults now</button>
-        </div>
-      </section>
-
-      <section className="panel">
-        <h2>Canvas preferences</h2>
-        <div className="settings-grid">
-          <label className="settings-checkbox">
-            <input type="checkbox" checked={canvasDefaultShowGrid} onChange={(event) => setCanvasDefaultShowGrid(event.target.checked)} />
-            Show grid by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultSnapToGrid}
-              onChange={(event) => setCanvasDefaultSnapToGrid(event.target.checked)}
-            />
-            Snap node movement by default
-          </label>
-          <label>
-            Reset zoom target (%)
-            <input type="number" value={canvasResetZoomPercentInput} onChange={(event) => setCanvasResetZoomPercentInput(event.target.value)} />
-          </label>
-        </div>
-        <div className="row-actions">
-          <button type="button" onClick={applyCanvasDefaultsNow}>Apply canvas defaults now</button>
-          <button type="button" onClick={() => handleZoomAction("reset")}>Reset current view</button>
-        </div>
-        <p className="meta-line">Configured reset zoom: {configuredResetZoomPercent}%.</p>
-      </section>
-
-      <section className="panel">
-        <h2>Action bar and shortcuts</h2>
-        <div className="settings-grid">
-          <label className="settings-checkbox">
-            <input type="checkbox" checked={showShortcutHints} onChange={(event) => setShowShortcutHints(event.target.checked)} />
-            Show shortcut hints in the action bar
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={keyboardShortcutsEnabled}
-              onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
-            />
-            Enable keyboard shortcuts (undo/redo/navigation/modes)
-          </label>
-        </div>
-        <ul className="subnetwork-list">
-          <li><span className="technical-id">Ctrl/Cmd + Z</span> Undo last modeling action</li>
-          <li><span className="technical-id">Ctrl/Cmd + Shift + Z</span> Redo</li>
-          <li><span className="technical-id">Ctrl/Cmd + Y</span> Redo alternative shortcut</li>
-          <li><span className="technical-id">Alt + 1..5</span> Switch top-level workspace</li>
-          <li><span className="technical-id">Alt + Shift + 1..5</span> Switch entity sub-screen</li>
-          <li><span className="technical-id">Alt + V/N/G/C/R</span> Set interaction mode</li>
-          <li><span className="technical-id">Alt + F</span> Fit network view to current graph</li>
-          <li><span className="technical-id">Alt + J / Alt + K</span> Previous / next validation issue</li>
-        </ul>
-        <div className="row-actions">
-          <button type="button" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
-        </div>
-      </section>
-
       <section className="panel">
         <h2>Sample network controls</h2>
         <p className="meta-line">

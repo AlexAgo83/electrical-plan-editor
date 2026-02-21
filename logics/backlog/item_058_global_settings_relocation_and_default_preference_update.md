@@ -1,8 +1,8 @@
 ## item_058_global_settings_relocation_and_default_preference_update - Global Settings Relocation and Default Preference Update
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: High
 > Theme: Global Preferences Consistency
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -37,10 +37,11 @@ Global preferences are currently attached to inconsistent navigation contexts, a
 - References:
   - `logics/request/req_010_network_scope_workspace_shell_and_global_defaults.md`
   - `logics/request/req_003_theme_mode_switch_normal_dark.md`
+  - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`
   - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
+  - `src/app/hooks/useWorkspaceHandlers.ts`
   - `src/app/hooks/useUiPreferences.ts`
   - `src/store/reducer/uiReducer.ts`
   - `src/tests/app.ui.settings.spec.tsx`
   - `src/tests/app.ui.theme.spec.tsx`
   - `src/tests/persistence.localStorage.spec.ts`
-

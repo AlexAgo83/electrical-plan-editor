@@ -19,7 +19,7 @@ describe("App integration UI - settings", () => {
   it("applies settings defaults for list sort behavior", () => {
     renderAppWithState(createConnectorSortingState());
 
-    switchScreen("settings");
+    switchScreen("networkScope");
     const settingsPanel = getPanelByHeading("Table and list preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Default sort column"), {
       target: { value: "technicalId" }
@@ -38,7 +38,7 @@ describe("App integration UI - settings", () => {
   it("switches to compact table density from settings", () => {
     renderAppWithState(createUiIntegrationState());
 
-    switchScreen("settings");
+    switchScreen("networkScope");
     const settingsPanel = getPanelByHeading("Table and list preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Table density"), {
       target: { value: "compact" }
@@ -52,7 +52,7 @@ describe("App integration UI - settings", () => {
   it("persists settings preferences across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 
-    switchScreen("settings");
+    switchScreen("networkScope");
     const settingsPanel = getPanelByHeading("Table and list preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Table density"), {
       target: { value: "compact" }
@@ -68,7 +68,7 @@ describe("App integration UI - settings", () => {
     expect(appShell).not.toBeNull();
     expect(appShell).toHaveClass("table-density-compact");
 
-    switchScreen("settings");
+    switchScreen("networkScope");
     const restoredSettingsPanel = getPanelByHeading("Table and list preferences");
     expect(within(restoredSettingsPanel).getByLabelText("Default sort column")).toHaveValue("technicalId");
   });
@@ -133,16 +133,16 @@ describe("App integration UI - settings", () => {
     expect(within(connectorsPanel).getByText("Power Source Connector")).toBeInTheDocument();
   });
 
-  it("ignores keyboard shortcuts when disabled from settings", () => {
+  it("ignores keyboard shortcuts when disabled from network scope preferences", () => {
     renderAppWithState(createUiIntegrationState());
 
-    switchScreen("settings");
+    switchScreen("networkScope");
     const settingsPanel = getPanelByHeading("Action bar and shortcuts");
     fireEvent.click(within(settingsPanel).getByLabelText("Enable keyboard shortcuts (undo/redo/navigation/modes)"));
 
     fireEvent.keyDown(window, { key: "2", altKey: true });
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
-    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Settings$/ })).toHaveClass("is-active");
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Network Scope$/ })).toHaveClass("is-active");
   });
 });

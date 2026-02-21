@@ -312,7 +312,7 @@ export function useWorkspaceHandlers({
 
   function resetWorkspacePreferencesToDefaults(): void {
     const defaultSort: SortState = { field: "name", direction: "asc" };
-    setThemeMode("normal");
+    setThemeMode("dark");
     setTableDensity("comfortable");
     setDefaultSortField("name");
     setDefaultSortDirection("asc");
@@ -325,10 +325,10 @@ export function useWorkspaceHandlers({
     setNodeIdSortDirection("asc");
     setSegmentIdSortDirection("asc");
     setCanvasDefaultShowGrid(true);
-    setCanvasDefaultSnapToGrid(false);
+    setCanvasDefaultSnapToGrid(true);
     setCanvasResetZoomPercentInput("100");
     setShowNetworkGrid(true);
-    setSnapNodesToGrid(false);
+    setSnapNodesToGrid(true);
     setNetworkScale(1);
     setNetworkOffset({ x: 0, y: 0 });
     setShowShortcutHints(true);

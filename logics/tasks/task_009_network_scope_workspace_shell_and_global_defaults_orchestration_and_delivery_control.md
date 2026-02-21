@@ -2,7 +2,7 @@
 > From version: 0.3.0
 > Understanding: 100%
 > Confidence: 98%
-> Progress: 38%
+> Progress: 50%
 > Complexity: High
 > Theme: Workspace Shell and Navigation Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -25,7 +25,7 @@ Backlog scope covered:
 - [x] 1. Deliver Wave 0 navigation foundation: `Network Scope` primary entry and ordering (`item_055`)
 - [x] 2. Deliver Wave 1 shell refactor: sticky header + drawer overlay behavior (`item_056`)
 - [x] 3. Deliver Wave 2 network lifecycle consolidation in `Network Scope` with safeguards (`item_057`)
-- [ ] 4. Deliver Wave 3 global settings relocation and defaults (`dark` + snap enabled) with persistence compatibility (`item_058`)
+- [x] 4. Deliver Wave 3 global settings relocation and defaults (`dark` + snap enabled) with persistence compatibility (`item_058`)
 - [ ] 5. Deliver Wave 4 operational controls extraction: floating operations/health panel + header issue badge (`item_060`)
 - [ ] 6. Deliver Wave 5 information placement cleanup: summary capsules moved to `Network Scope` and `Settings` header entrypoint cleanup (`item_061`, `item_062`)
 - [ ] 7. Deliver Wave 6 contextual inspector floating panel (`open` / `collapsed` / `hidden`) anchored bottom-right (`item_063`)
@@ -46,7 +46,7 @@ Backlog scope covered:
   - Wave 0 completed: added `Network Scope` primary workspace entry, updated navigation order, and introduced explicit separation from entity-level tabs.
   - Wave 1 completed: implemented sticky header, header menu toggle, overlay drawer behavior, outside click/focus close, and escape-to-close with focus return.
   - Wave 2 completed: moved active-network lifecycle controls (select/create/rename/duplicate/delete) into `Network Scope` workspace with existing safeguards preserved.
-  - Wave 3 pending: settings relocation/defaults compatibility work not started.
+  - Wave 3 completed: relocated global preferences to `Network Scope`, kept `Settings` for sample/import-export tools, and switched fresh/reset defaults to dark mode + snap enabled.
   - Wave 4 pending: operations/health floating panel and badge not started.
   - Wave 5 pending: summary capsule relocation and settings entrypoint cleanup not started.
   - Wave 6 pending: contextual inspector floating panel behavior not started.
@@ -76,3 +76,7 @@ Backlog scope covered:
   - `npm run typecheck` OK
   - `npm run lint` OK
   - `npm test -- src/tests/app.ui.networks.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx` OK
+- Validation snapshot (Wave 3):
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npm test -- src/tests/app.ui.settings.spec.tsx src/tests/app.ui.theme.spec.tsx src/tests/app.ui.networks.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx` OK
