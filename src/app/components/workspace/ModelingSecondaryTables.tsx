@@ -13,8 +13,6 @@ interface ModelingSecondaryTablesProps {
   isSegmentSubScreen: boolean;
   segmentFormMode: "create" | "edit";
   onOpenCreateSegment: () => void;
-  segmentSearchQuery: string;
-  setSegmentSearchQuery: (value: string) => void;
   segmentSubNetworkFilter: SegmentSubNetworkFilter;
   setSegmentSubNetworkFilter: (value: SegmentSubNetworkFilter) => void;
   segments: Segment[];
@@ -24,14 +22,11 @@ interface ModelingSecondaryTablesProps {
   nodeLabelById: Map<NodeId, string>;
   selectedSegmentId: SegmentId | null;
   selectedWireRouteSegmentIds: Set<SegmentId>;
-  onSelectSegment: (segmentId: SegmentId) => void;
   onEditSegment: (segment: Segment) => void;
   onDeleteSegment: (segmentId: SegmentId) => void;
   isWireSubScreen: boolean;
   wireFormMode: "create" | "edit";
   onOpenCreateWire: () => void;
-  wireSearchQuery: string;
-  setWireSearchQuery: (value: string) => void;
   wireRouteFilter: "all" | "auto" | "locked";
   setWireRouteFilter: (value: "all" | "auto" | "locked") => void;
   wires: Wire[];
@@ -41,7 +36,6 @@ interface ModelingSecondaryTablesProps {
   getSortIndicator: (sortState: SortState, field: "name" | "technicalId") => string;
   selectedWireId: WireId | null;
   describeWireEndpoint: (endpoint: Wire["endpointA"]) => string;
-  onSelectWire: (wire: Wire) => void;
   onEditWire: (wire: Wire) => void;
   onDeleteWire: (wireId: WireId) => void;
 }
@@ -50,8 +44,6 @@ export function ModelingSecondaryTables({
   isSegmentSubScreen,
   segmentFormMode,
   onOpenCreateSegment,
-  segmentSearchQuery,
-  setSegmentSearchQuery,
   segmentSubNetworkFilter,
   setSegmentSubNetworkFilter,
   segments,
@@ -61,14 +53,11 @@ export function ModelingSecondaryTables({
   nodeLabelById,
   selectedSegmentId,
   selectedWireRouteSegmentIds,
-  onSelectSegment,
   onEditSegment,
   onDeleteSegment,
   isWireSubScreen,
   wireFormMode,
   onOpenCreateWire,
-  wireSearchQuery,
-  setWireSearchQuery,
   wireRouteFilter,
   setWireRouteFilter,
   wires,
@@ -78,7 +67,6 @@ export function ModelingSecondaryTables({
   getSortIndicator,
   selectedWireId,
   describeWireEndpoint,
-  onSelectWire,
   onEditWire,
   onDeleteWire
 }: ModelingSecondaryTablesProps): ReactElement {
@@ -96,7 +84,6 @@ export function ModelingSecondaryTables({
       <article className="panel" hidden={!isSegmentSubScreen}>
         <h2>Segments</h2>
         <div className="list-toolbar">
-          <label className="stack-label list-search">Search<input aria-label="Search segments" value={segmentSearchQuery} onChange={(event) => setSegmentSearchQuery(event.target.value)} placeholder="ID, node, sub-network" /></label>
           <div className="chip-group" role="group" aria-label="Segment sub-network filter">
             {([
               ["all", "All"],
@@ -110,7 +97,7 @@ export function ModelingSecondaryTables({
         {segments.length === 0 ? (
           <p className="empty-copy">No segment yet.</p>
         ) : visibleSegments.length === 0 ? (
-          <p className="empty-copy">No segment matches the current search/filter.</p>
+          <p className="empty-copy">No segment matches the current filters.</p>
         ) : (
           <table className="data-table">
             <thead>
@@ -156,7 +143,6 @@ export function ModelingSecondaryTables({
         )}
         <div className="row-actions compact modeling-list-actions">
           <button type="button" onClick={onOpenCreateSegment}>New</button>
-          <button type="button" onClick={() => focusedSegment !== null && onSelectSegment(focusedSegment.id)} disabled={focusedSegment === null}>Select</button>
           <button type="button" onClick={() => focusedSegment !== null && onEditSegment(focusedSegment)} disabled={focusedSegment === null}>Edit</button>
           <button type="button" className="modeling-list-action-delete" onClick={() => focusedSegment !== null && onDeleteSegment(focusedSegment.id)} disabled={focusedSegment === null || segmentFormMode === "create"}>Delete</button>
         </div>
@@ -165,7 +151,6 @@ export function ModelingSecondaryTables({
       <article className="panel" hidden={!isWireSubScreen}>
         <h2>Wires</h2>
         <div className="list-toolbar">
-          <label className="stack-label list-search">Search<input aria-label="Search wires" value={wireSearchQuery} onChange={(event) => setWireSearchQuery(event.target.value)} placeholder="Name or technical ID" /></label>
           <div className="chip-group" role="group" aria-label="Wire route mode filter">
             {([
               ["all", "All"],
@@ -179,7 +164,7 @@ export function ModelingSecondaryTables({
         {wires.length === 0 ? (
           <p className="empty-copy">No wire yet.</p>
         ) : visibleWires.length === 0 ? (
-          <p className="empty-copy">No wire matches the current search/filter.</p>
+          <p className="empty-copy">No wire matches the current filters.</p>
         ) : (
           <table className="data-table">
             <thead>
@@ -221,7 +206,6 @@ export function ModelingSecondaryTables({
         )}
         <div className="row-actions compact modeling-list-actions">
           <button type="button" onClick={onOpenCreateWire}>New</button>
-          <button type="button" onClick={() => focusedWire !== null && onSelectWire(focusedWire)} disabled={focusedWire === null}>Select</button>
           <button type="button" onClick={() => focusedWire !== null && onEditWire(focusedWire)} disabled={focusedWire === null}>Edit</button>
           <button type="button" className="modeling-list-action-delete" onClick={() => focusedWire !== null && onDeleteWire(focusedWire.id)} disabled={focusedWire === null || wireFormMode === "create"}>Delete</button>
         </div>

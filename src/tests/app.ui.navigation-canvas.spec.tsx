@@ -75,7 +75,7 @@ describe("App integration UI - navigation and canvas", () => {
     switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
-    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
     switchScreen("analysis");
 
     const connectorCavitiesPanel = getPanelByHeading("Connector cavities");
@@ -87,7 +87,7 @@ describe("App integration UI - navigation and canvas", () => {
 
     switchSubScreen("splice");
     const splicesPanel = getPanelByHeading("Splices");
-    fireEvent.click(within(splicesPanel).getByRole("button", { name: "Select" }));
+    fireEvent.click(within(splicesPanel).getByText("Splice 1"));
     switchScreen("analysis");
 
     const splicePortsPanel = getPanelByHeading("Splice ports");
@@ -104,7 +104,7 @@ describe("App integration UI - navigation and canvas", () => {
 
     switchSubScreen("wire");
     const wiresPanel = getPanelByHeading("Wires");
-    fireEvent.click(within(wiresPanel).getByRole("button", { name: "Select" }));
+    fireEvent.click(within(wiresPanel).getByText("Wire 1"));
 
     switchSubScreen("segment");
     expect(within(segmentsPanel).getByText("SEG-A").closest("tr")).toHaveClass("is-wire-highlighted");
@@ -143,7 +143,7 @@ describe("App integration UI - navigation and canvas", () => {
     switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
-    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
     const inspectorPanel = getPanelByHeading("Inspector context");
     expect(within(inspectorPanel).getByText(/Focused entity:/)).toBeInTheDocument();
     expect(within(inspectorPanel).getByText("C1")).toBeInTheDocument();

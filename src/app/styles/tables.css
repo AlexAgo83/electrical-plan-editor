@@ -65,10 +65,6 @@
   margin-bottom: 0.6rem;
 }
 
-.list-search {
-  max-width: 320px;
-}
-
 .chip-group {
   display: flex;
   flex-wrap: wrap;
@@ -143,7 +139,7 @@
 
 .modeling-list-actions {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 0.55rem;
 }
 

@@ -34,38 +34,21 @@ describe("App integration UI - validation", () => {
     expect(within(validationPanel).queryByText("ERROR")).not.toBeInTheDocument();
   });
 
-  it("filters validation issues by text search", () => {
-    renderAppWithState(createValidationIssueState());
-
-    switchScreen("validation");
-    const validationPanel = getPanelByHeading("Validation center");
-    const searchInput = within(validationPanel).getByLabelText("Search validation issues");
-
-    fireEvent.change(searchInput, { target: { value: "manual-ghost" } });
-    expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
-    expect(within(validationPanel).queryByRole("heading", { name: "Route lock validity" })).not.toBeInTheDocument();
-
-    fireEvent.change(searchInput, { target: { value: "route-locked" } });
-    expect(within(validationPanel).getByRole("heading", { name: "Route lock validity" })).toBeInTheDocument();
-    expect(within(validationPanel).queryByRole("heading", { name: "Occupancy conflict" })).not.toBeInTheDocument();
-  });
-
   it("shows category chip counts and disables empty categories under current filters", () => {
     renderAppWithState(createValidationIssueState());
 
     switchScreen("validation");
     const validationPanel = getPanelByHeading("Validation center");
-    const searchInput = within(validationPanel).getByLabelText("Search validation issues");
-    fireEvent.change(searchInput, { target: { value: "route-locked" } });
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
 
     const allChip = within(validationPanel).getByRole("button", { name: "All" });
     const routeChip = within(validationPanel).getByRole("button", { name: "Route lock validity" });
     const occupancyChip = within(validationPanel).getByRole("button", { name: "Occupancy conflict" });
 
     expect(allChip.textContent).toContain("(1)");
-    expect(routeChip.textContent).toContain("(1)");
-    expect(occupancyChip.textContent).toContain("(0)");
-    expect(occupancyChip).toBeDisabled();
+    expect(routeChip.textContent).toContain("(0)");
+    expect(routeChip).toBeDisabled();
+    expect(occupancyChip.textContent).toContain("(1)");
   });
 
   it("shows severity chip counts and disables empty severities under current filters", () => {
@@ -73,8 +56,7 @@ describe("App integration UI - validation", () => {
 
     switchScreen("validation");
     const validationPanel = getPanelByHeading("Validation center");
-    const searchInput = within(validationPanel).getByLabelText("Search validation issues");
-    fireEvent.change(searchInput, { target: { value: "manual-ghost" } });
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Occupancy conflict" }));
 
     const allSeverityChip = within(validationPanel).getByRole("button", { name: "All severities" });
     const warningChip = within(validationPanel).getByRole("button", { name: "Warnings" });
@@ -86,22 +68,20 @@ describe("App integration UI - validation", () => {
     expect(errorChip).toBeDisabled();
   });
 
-  it("clears validation filters and search from toolbar", () => {
+  it("clears validation filters from toolbar", () => {
     renderAppWithState(createValidationIssueState());
 
     switchScreen("validation");
     const validationPanel = getPanelByHeading("Validation center");
-    const searchInput = within(validationPanel).getByLabelText("Search validation issues");
     fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
-    fireEvent.change(searchInput, { target: { value: "manual-ghost" } });
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Occupancy conflict" }));
 
     const validationSummary = getPanelByHeading("Validation summary");
-    expect(within(validationSummary).getByText(/Active filters:\s*Warnings \/ All categories \/ Search:\s*"manual-ghost"/i)).toBeInTheDocument();
+    expect(within(validationSummary).getByText(/Active filters:\s*Warnings \/ Occupancy conflict/i)).toBeInTheDocument();
 
     fireEvent.click(within(validationPanel).getByRole("button", { name: "Clear filters" }));
 
-    expect(searchInput).toHaveValue("");
-    expect(within(validationSummary).getByText(/Active filters:\s*All severities \/ All categories \/ Search:\s*none/i)).toBeInTheDocument();
+    expect(within(validationSummary).getByText(/Active filters:\s*All severities \/ All categories/i)).toBeInTheDocument();
     expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
     expect(within(validationPanel).getByRole("heading", { name: "Route lock validity" })).toBeInTheDocument();
   });

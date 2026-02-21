@@ -14,8 +14,6 @@ interface ModelingPrimaryTablesProps {
   isConnectorSubScreen: boolean;
   connectorFormMode: "create" | "edit";
   onOpenCreateConnector: () => void;
-  connectorSearchQuery: string;
-  setConnectorSearchQuery: (value: string) => void;
   connectorOccupancyFilter: OccupancyFilter;
   setConnectorOccupancyFilter: (value: OccupancyFilter) => void;
   connectors: Connector[];
@@ -25,14 +23,11 @@ interface ModelingPrimaryTablesProps {
   getSortIndicator: (sortState: SortState, field: "name" | "technicalId") => string;
   connectorOccupiedCountById: Map<ConnectorId, number>;
   selectedConnectorId: ConnectorId | null;
-  onSelectConnector: (connectorId: ConnectorId) => void;
   onEditConnector: (connector: Connector) => void;
   onDeleteConnector: (connectorId: ConnectorId) => void;
   isSpliceSubScreen: boolean;
   spliceFormMode: "create" | "edit";
   onOpenCreateSplice: () => void;
-  spliceSearchQuery: string;
-  setSpliceSearchQuery: (value: string) => void;
   spliceOccupancyFilter: OccupancyFilter;
   setSpliceOccupancyFilter: (value: OccupancyFilter) => void;
   splices: Splice[];
@@ -41,14 +36,11 @@ interface ModelingPrimaryTablesProps {
   setSpliceSort: (value: SortState | ((current: SortState) => SortState)) => void;
   spliceOccupiedCountById: Map<SpliceId, number>;
   selectedSpliceId: SpliceId | null;
-  onSelectSplice: (spliceId: SpliceId) => void;
   onEditSplice: (splice: Splice) => void;
   onDeleteSplice: (spliceId: SpliceId) => void;
   isNodeSubScreen: boolean;
   nodeFormMode: "create" | "edit";
   onOpenCreateNode: () => void;
-  nodeSearchQuery: string;
-  setNodeSearchQuery: (value: string) => void;
   nodeKindFilter: "all" | NetworkNode["kind"];
   setNodeKindFilter: (value: "all" | NetworkNode["kind"]) => void;
   nodes: NetworkNode[];
@@ -58,7 +50,6 @@ interface ModelingPrimaryTablesProps {
   segmentsCountByNodeId: Map<NodeId, number>;
   selectedNodeId: NodeId | null;
   describeNode: (node: NetworkNode) => string;
-  onSelectNode: (nodeId: NodeId) => void;
   onEditNode: (node: NetworkNode) => void;
   onDeleteNode: (nodeId: NodeId) => void;
 }
@@ -67,8 +58,6 @@ export function ModelingPrimaryTables({
   isConnectorSubScreen,
   connectorFormMode,
   onOpenCreateConnector,
-  connectorSearchQuery,
-  setConnectorSearchQuery,
   connectorOccupancyFilter,
   setConnectorOccupancyFilter,
   connectors,
@@ -78,14 +67,11 @@ export function ModelingPrimaryTables({
   getSortIndicator,
   connectorOccupiedCountById,
   selectedConnectorId,
-  onSelectConnector,
   onEditConnector,
   onDeleteConnector,
   isSpliceSubScreen,
   spliceFormMode,
   onOpenCreateSplice,
-  spliceSearchQuery,
-  setSpliceSearchQuery,
   spliceOccupancyFilter,
   setSpliceOccupancyFilter,
   splices,
@@ -94,14 +80,11 @@ export function ModelingPrimaryTables({
   setSpliceSort,
   spliceOccupiedCountById,
   selectedSpliceId,
-  onSelectSplice,
   onEditSplice,
   onDeleteSplice,
   isNodeSubScreen,
   nodeFormMode,
   onOpenCreateNode,
-  nodeSearchQuery,
-  setNodeSearchQuery,
   nodeKindFilter,
   setNodeKindFilter,
   nodes,
@@ -111,7 +94,6 @@ export function ModelingPrimaryTables({
   segmentsCountByNodeId,
   selectedNodeId,
   describeNode,
-  onSelectNode,
   onEditNode,
   onDeleteNode
 }: ModelingPrimaryTablesProps): ReactElement {
@@ -133,10 +115,6 @@ export function ModelingPrimaryTables({
       <article className="panel" hidden={!isConnectorSubScreen}>
         <h2>Connectors</h2>
         <div className="list-toolbar">
-          <label className="stack-label list-search">
-            Search
-            <input aria-label="Search connectors" value={connectorSearchQuery} onChange={(event) => setConnectorSearchQuery(event.target.value)} placeholder="Name or technical ID" />
-          </label>
           <div className="chip-group" role="group" aria-label="Connector occupancy filter">
             {([
               ["all", "All"],
@@ -150,7 +128,7 @@ export function ModelingPrimaryTables({
         {connectors.length === 0 ? (
           <p className="empty-copy">No connector yet.</p>
         ) : visibleConnectors.length === 0 ? (
-          <p className="empty-copy">No connector matches the current search/filter.</p>
+          <p className="empty-copy">No connector matches the current filters.</p>
         ) : (
           <table className="data-table">
             <thead>
@@ -191,7 +169,6 @@ export function ModelingPrimaryTables({
         )}
         <div className="row-actions compact modeling-list-actions">
           <button type="button" onClick={onOpenCreateConnector}>New</button>
-          <button type="button" onClick={() => focusedConnector !== null && onSelectConnector(focusedConnector.id)} disabled={focusedConnector === null}>Select</button>
           <button type="button" onClick={() => focusedConnector !== null && onEditConnector(focusedConnector)} disabled={focusedConnector === null}>Edit</button>
           <button type="button" className="modeling-list-action-delete" onClick={() => focusedConnector !== null && onDeleteConnector(focusedConnector.id)} disabled={focusedConnector === null || connectorFormMode === "create"}>Delete</button>
         </div>
@@ -200,10 +177,6 @@ export function ModelingPrimaryTables({
       <article className="panel" hidden={!isSpliceSubScreen}>
         <h2>Splices</h2>
         <div className="list-toolbar">
-          <label className="stack-label list-search">
-            Search
-            <input aria-label="Search splices" value={spliceSearchQuery} onChange={(event) => setSpliceSearchQuery(event.target.value)} placeholder="Name or technical ID" />
-          </label>
           <div className="chip-group" role="group" aria-label="Splice occupancy filter">
             {([
               ["all", "All"],
@@ -217,7 +190,7 @@ export function ModelingPrimaryTables({
         {splices.length === 0 ? (
           <p className="empty-copy">No splice yet.</p>
         ) : visibleSplices.length === 0 ? (
-          <p className="empty-copy">No splice matches the current search/filter.</p>
+          <p className="empty-copy">No splice matches the current filters.</p>
         ) : (
           <table className="data-table">
             <thead>
@@ -258,7 +231,6 @@ export function ModelingPrimaryTables({
         )}
         <div className="row-actions compact modeling-list-actions">
           <button type="button" onClick={onOpenCreateSplice}>New</button>
-          <button type="button" onClick={() => focusedSplice !== null && onSelectSplice(focusedSplice.id)} disabled={focusedSplice === null}>Select</button>
           <button type="button" onClick={() => focusedSplice !== null && onEditSplice(focusedSplice)} disabled={focusedSplice === null}>Edit</button>
           <button type="button" className="modeling-list-action-delete" onClick={() => focusedSplice !== null && onDeleteSplice(focusedSplice.id)} disabled={focusedSplice === null || spliceFormMode === "create"}>Delete</button>
         </div>
@@ -267,10 +239,6 @@ export function ModelingPrimaryTables({
       <article className="panel" hidden={!isNodeSubScreen}>
         <h2>Nodes</h2>
         <div className="list-toolbar">
-          <label className="stack-label list-search">
-            Search
-            <input aria-label="Search nodes" value={nodeSearchQuery} onChange={(event) => setNodeSearchQuery(event.target.value)} placeholder="ID, label, connector, splice" />
-          </label>
           <div className="chip-group" role="group" aria-label="Node kind filter">
             {([
               ["all", "All"],
@@ -285,7 +253,7 @@ export function ModelingPrimaryTables({
         {nodes.length === 0 ? (
           <p className="empty-copy">No node yet.</p>
         ) : visibleNodes.length === 0 ? (
-          <p className="empty-copy">No node matches the current search/filter.</p>
+          <p className="empty-copy">No node matches the current filters.</p>
         ) : (
           <table className="data-table">
             <thead>
@@ -326,7 +294,6 @@ export function ModelingPrimaryTables({
         )}
         <div className="row-actions compact modeling-list-actions">
           <button type="button" onClick={onOpenCreateNode}>New</button>
-          <button type="button" onClick={() => focusedNode !== null && onSelectNode(focusedNode.id)} disabled={focusedNode === null}>Select</button>
           <button type="button" onClick={() => focusedNode !== null && onEditNode(focusedNode)} disabled={focusedNode === null}>Edit</button>
           <button type="button" className="modeling-list-action-delete" onClick={() => focusedNode !== null && onDeleteNode(focusedNode.id)} disabled={focusedNode === null || nodeFormMode === "create"}>Delete</button>
         </div>

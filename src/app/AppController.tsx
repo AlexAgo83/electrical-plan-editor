@@ -96,7 +96,6 @@ import {
   NETWORK_MIN_SCALE,
   NETWORK_VIEW_HEIGHT,
   NETWORK_VIEW_WIDTH,
-  normalizeSearch,
 } from "./lib/app-utils";
 import type {
   AppProps,
@@ -608,16 +607,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   }, []);
 
   const {
-    connectorSearchQuery,
-    setConnectorSearchQuery,
-    spliceSearchQuery,
-    setSpliceSearchQuery,
-    nodeSearchQuery,
-    setNodeSearchQuery,
-    segmentSearchQuery,
-    setSegmentSearchQuery,
-    wireSearchQuery,
-    setWireSearchQuery,
     connectorOccupancyFilter,
     setConnectorOccupancyFilter,
     spliceOccupancyFilter,
@@ -713,7 +702,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setValidationCategoryFilter,
     validationSeverityFilter,
     setValidationSeverityFilter,
-    validationSearchQuery,
     setValidationSearchQuery,
     validationIssueCursor,
     validationIssues,
@@ -746,7 +734,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     spliceNodeBySpliceId,
     isValidationScreen
   });
-  const normalizedValidationSearch = normalizeSearch(validationSearchQuery);
 
   const entityCountBySubScreen: Record<SubScreenId, number> = {
     connector: connectors.length,
@@ -1735,6 +1722,82 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             <>
           <ModelingScreen isActive={isModelingScreen}>
         <section className="workspace-stage">
+          <section className="panel-grid workspace-column workspace-column-left">
+            <ModelingPrimaryTables
+              isConnectorSubScreen={isConnectorSubScreen}
+              connectorFormMode={connectorFormMode}
+              onOpenCreateConnector={resetConnectorForm}
+              connectorOccupancyFilter={connectorOccupancyFilter}
+              setConnectorOccupancyFilter={setConnectorOccupancyFilter}
+              connectors={connectors}
+              visibleConnectors={visibleConnectors}
+              connectorSort={connectorSort}
+              setConnectorSort={setConnectorSort}
+              getSortIndicator={getSortIndicator}
+              connectorOccupiedCountById={connectorOccupiedCountById}
+              selectedConnectorId={selectedConnectorId}
+              onEditConnector={startConnectorEdit}
+              onDeleteConnector={handleConnectorDelete}
+              isSpliceSubScreen={isSpliceSubScreen}
+              spliceFormMode={spliceFormMode}
+              onOpenCreateSplice={resetSpliceForm}
+              spliceOccupancyFilter={spliceOccupancyFilter}
+              setSpliceOccupancyFilter={setSpliceOccupancyFilter}
+              splices={splices}
+              visibleSplices={visibleSplices}
+              spliceSort={spliceSort}
+              setSpliceSort={setSpliceSort}
+              spliceOccupiedCountById={spliceOccupiedCountById}
+              selectedSpliceId={selectedSpliceId}
+              onEditSplice={startSpliceEdit}
+              onDeleteSplice={handleSpliceDelete}
+              isNodeSubScreen={isNodeSubScreen}
+              nodeFormMode={nodeFormMode}
+              onOpenCreateNode={resetNodeForm}
+              nodeKindFilter={nodeKindFilter}
+              setNodeKindFilter={setNodeKindFilter}
+              nodes={nodes}
+              visibleNodes={visibleNodes}
+              nodeIdSortDirection={nodeIdSortDirection}
+              setNodeIdSortDirection={setNodeIdSortDirection}
+              segmentsCountByNodeId={segmentsCountByNodeId}
+              selectedNodeId={selectedNodeId}
+              describeNode={describeNode}
+              onEditNode={startNodeEdit}
+              onDeleteNode={handleNodeDelete}
+            />
+
+            <ModelingSecondaryTables
+              isSegmentSubScreen={isSegmentSubScreen}
+              segmentFormMode={segmentFormMode}
+              onOpenCreateSegment={resetSegmentForm}
+              segmentSubNetworkFilter={segmentSubNetworkFilter}
+              setSegmentSubNetworkFilter={setSegmentSubNetworkFilter}
+              segments={segments}
+              visibleSegments={visibleSegments}
+              segmentIdSortDirection={segmentIdSortDirection}
+              setSegmentIdSortDirection={setSegmentIdSortDirection}
+              nodeLabelById={nodeLabelById}
+              selectedSegmentId={selectedSegmentId}
+              selectedWireRouteSegmentIds={selectedWireRouteSegmentIds}
+              onEditSegment={startSegmentEdit}
+              onDeleteSegment={handleSegmentDelete}
+              isWireSubScreen={isWireSubScreen}
+              wireFormMode={wireFormMode}
+              onOpenCreateWire={resetWireForm}
+              wireRouteFilter={wireRouteFilter}
+              setWireRouteFilter={setWireRouteFilter}
+              wires={wires}
+              visibleWires={visibleWires}
+              wireSort={wireSort}
+              setWireSort={setWireSort}
+              getSortIndicator={getSortIndicator}
+              selectedWireId={selectedWireId}
+              describeWireEndpoint={describeWireEndpoint}
+              onEditWire={startWireEdit}
+              onDeleteWire={handleWireDelete}
+            />
+          </section>
           <ModelingFormsColumn
             isConnectorSubScreen={isConnectorSubScreen}
             connectorFormMode={connectorFormMode}
@@ -1826,101 +1889,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             resetWireForm={resetWireForm}
             wireFormError={wireFormError}
           />
-
-          <section className="panel-grid workspace-column workspace-column-left">
-            <ModelingPrimaryTables
-              isConnectorSubScreen={isConnectorSubScreen}
-              connectorFormMode={connectorFormMode}
-              onOpenCreateConnector={resetConnectorForm}
-              connectorSearchQuery={connectorSearchQuery}
-              setConnectorSearchQuery={setConnectorSearchQuery}
-              connectorOccupancyFilter={connectorOccupancyFilter}
-              setConnectorOccupancyFilter={setConnectorOccupancyFilter}
-              connectors={connectors}
-              visibleConnectors={visibleConnectors}
-              connectorSort={connectorSort}
-              setConnectorSort={setConnectorSort}
-              getSortIndicator={getSortIndicator}
-              connectorOccupiedCountById={connectorOccupiedCountById}
-              selectedConnectorId={selectedConnectorId}
-              onSelectConnector={(connectorId) => dispatchAction(appActions.select({ kind: "connector", id: connectorId }))}
-              onEditConnector={startConnectorEdit}
-              onDeleteConnector={handleConnectorDelete}
-              isSpliceSubScreen={isSpliceSubScreen}
-              spliceFormMode={spliceFormMode}
-              onOpenCreateSplice={resetSpliceForm}
-              spliceSearchQuery={spliceSearchQuery}
-              setSpliceSearchQuery={setSpliceSearchQuery}
-              spliceOccupancyFilter={spliceOccupancyFilter}
-              setSpliceOccupancyFilter={setSpliceOccupancyFilter}
-              splices={splices}
-              visibleSplices={visibleSplices}
-              spliceSort={spliceSort}
-              setSpliceSort={setSpliceSort}
-              spliceOccupiedCountById={spliceOccupiedCountById}
-              selectedSpliceId={selectedSpliceId}
-              onSelectSplice={(spliceId) => dispatchAction(appActions.select({ kind: "splice", id: spliceId }))}
-              onEditSplice={startSpliceEdit}
-              onDeleteSplice={handleSpliceDelete}
-              isNodeSubScreen={isNodeSubScreen}
-              nodeFormMode={nodeFormMode}
-              onOpenCreateNode={resetNodeForm}
-              nodeSearchQuery={nodeSearchQuery}
-              setNodeSearchQuery={setNodeSearchQuery}
-              nodeKindFilter={nodeKindFilter}
-              setNodeKindFilter={setNodeKindFilter}
-              nodes={nodes}
-              visibleNodes={visibleNodes}
-              nodeIdSortDirection={nodeIdSortDirection}
-              setNodeIdSortDirection={setNodeIdSortDirection}
-              segmentsCountByNodeId={segmentsCountByNodeId}
-              selectedNodeId={selectedNodeId}
-              describeNode={describeNode}
-              onSelectNode={(nodeId) => dispatchAction(appActions.select({ kind: "node", id: nodeId }))}
-              onEditNode={startNodeEdit}
-              onDeleteNode={handleNodeDelete}
-            />
-
-            <ModelingSecondaryTables
-              isSegmentSubScreen={isSegmentSubScreen}
-              segmentFormMode={segmentFormMode}
-              onOpenCreateSegment={resetSegmentForm}
-              segmentSearchQuery={segmentSearchQuery}
-              setSegmentSearchQuery={setSegmentSearchQuery}
-              segmentSubNetworkFilter={segmentSubNetworkFilter}
-              setSegmentSubNetworkFilter={setSegmentSubNetworkFilter}
-              segments={segments}
-              visibleSegments={visibleSegments}
-              segmentIdSortDirection={segmentIdSortDirection}
-              setSegmentIdSortDirection={setSegmentIdSortDirection}
-              nodeLabelById={nodeLabelById}
-              selectedSegmentId={selectedSegmentId}
-              selectedWireRouteSegmentIds={selectedWireRouteSegmentIds}
-              onSelectSegment={(segmentId) => dispatchAction(appActions.select({ kind: "segment", id: segmentId }))}
-              onEditSegment={startSegmentEdit}
-              onDeleteSegment={handleSegmentDelete}
-              isWireSubScreen={isWireSubScreen}
-              wireFormMode={wireFormMode}
-              onOpenCreateWire={resetWireForm}
-              wireSearchQuery={wireSearchQuery}
-              setWireSearchQuery={setWireSearchQuery}
-              wireRouteFilter={wireRouteFilter}
-              setWireRouteFilter={setWireRouteFilter}
-              wires={wires}
-              visibleWires={visibleWires}
-              wireSort={wireSort}
-              setWireSort={setWireSort}
-              getSortIndicator={getSortIndicator}
-              selectedWireId={selectedWireId}
-              describeWireEndpoint={describeWireEndpoint}
-              onSelectWire={(wire) => {
-                setWireForcedRouteInput(wire.routeSegmentIds.join(", "));
-                dispatchAction(appActions.select({ kind: "wire", id: wire.id }));
-              }}
-              onEditWire={startWireEdit}
-              onDeleteWire={handleWireDelete}
-            />
-          </section>
           <section className="panel-grid workspace-column workspace-column-center">{networkSummaryPanel}</section>
         </section>
       </ModelingScreen>
@@ -1966,8 +1934,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
       <ValidationScreen isActive={isValidationScreen}>
         <ValidationWorkspaceContent
-          validationSearchQuery={validationSearchQuery}
-          setValidationSearchQuery={setValidationSearchQuery}
           validationSeverityFilter={validationSeverityFilter}
           setValidationSeverityFilter={setValidationSeverityFilter}
           validationIssuesForSeverityCounts={validationIssuesForSeverityCounts}
@@ -1987,7 +1953,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           handleValidationIssueRowGoTo={handleValidationIssueRowGoTo}
           validationErrorCount={validationErrorCount}
           validationWarningCount={validationWarningCount}
-          normalizedValidationSearch={normalizedValidationSearch}
         />
       </ValidationScreen>
 

@@ -37,7 +37,7 @@ describe("App integration UI - inspector floating shell", () => {
     switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
-    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
     expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
     expect(within(getPanelByHeading("Inspector context")).getByText("C1")).toBeInTheDocument();
 
@@ -73,7 +73,7 @@ describe("App integration UI - inspector floating shell", () => {
     switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
-    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
     expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
 
     setViewportWidth(860);
@@ -92,7 +92,7 @@ describe("App integration UI - inspector floating shell", () => {
     switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
-    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
     expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));

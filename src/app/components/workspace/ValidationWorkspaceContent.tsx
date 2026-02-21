@@ -2,8 +2,6 @@ import type { ReactElement } from "react";
 import type { ValidationIssue, ValidationSeverityFilter } from "../../types/app-controller";
 
 interface ValidationWorkspaceContentProps {
-  validationSearchQuery: string;
-  setValidationSearchQuery: (value: string) => void;
   validationSeverityFilter: ValidationSeverityFilter;
   setValidationSeverityFilter: (value: ValidationSeverityFilter) => void;
   validationIssuesForSeverityCounts: ValidationIssue[];
@@ -23,12 +21,9 @@ interface ValidationWorkspaceContentProps {
   handleValidationIssueRowGoTo: (issue: ValidationIssue) => void;
   validationErrorCount: number;
   validationWarningCount: number;
-  normalizedValidationSearch: string;
 }
 
 export function ValidationWorkspaceContent({
-  validationSearchQuery,
-  setValidationSearchQuery,
   validationSeverityFilter,
   setValidationSeverityFilter,
   validationIssuesForSeverityCounts,
@@ -47,8 +42,7 @@ export function ValidationWorkspaceContent({
   validationIssueCursor,
   handleValidationIssueRowGoTo,
   validationErrorCount,
-  validationWarningCount,
-  normalizedValidationSearch
+  validationWarningCount
 }: ValidationWorkspaceContentProps): ReactElement {
   return (
     <section className="panel-grid">
@@ -56,15 +50,6 @@ export function ValidationWorkspaceContent({
         <h2>Validation center</h2>
         <div className="validation-toolbar">
           <span>Issue filters</span>
-          <label className="stack-label list-search">
-            Search
-            <input
-              aria-label="Search validation issues"
-              value={validationSearchQuery}
-              onChange={(event) => setValidationSearchQuery(event.target.value)}
-              placeholder="Issue text, category, entity"
-            />
-          </label>
           <div className="chip-group" role="group" aria-label="Validation severity filter">
             {([
               ["all", "All severities"],
@@ -125,7 +110,7 @@ export function ValidationWorkspaceContent({
         {validationIssues.length === 0 ? (
           <p className="empty-copy">No integrity issue found in the current model.</p>
         ) : visibleValidationIssues.length === 0 ? (
-          <p className="empty-copy">No integrity issue matches the current filters/search.</p>
+          <p className="empty-copy">No integrity issue matches the current filters.</p>
         ) : (
           <div className="validation-groups">
             {groupedValidationIssues.map(([category, issues]) => (
@@ -187,8 +172,7 @@ export function ValidationWorkspaceContent({
         </div>
         <p className="meta-line validation-active-filter">
           Active filters: {validationSeverityFilter === "all" ? "All severities" : validationSeverityFilter === "error" ? "Errors" : "Warnings"} / {" "}
-          {validationCategoryFilter === "all" ? "All categories" : validationCategoryFilter} / Search: {" "}
-          {normalizedValidationSearch.length === 0 ? "none" : `"${validationSearchQuery.trim()}"`}
+          {validationCategoryFilter === "all" ? "All categories" : validationCategoryFilter}
         </p>
       </section>
     </section>

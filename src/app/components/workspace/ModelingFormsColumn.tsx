@@ -184,10 +184,21 @@ export function ModelingFormsColumn({
   resetWireForm,
   wireFormError
 }: ModelingFormsColumnProps): ReactElement {
+  function renderFormHeader(title: string, mode: "create" | "edit"): ReactElement {
+    return (
+      <header className="network-form-header">
+        <h2>{title}</h2>
+        <span className={mode === "create" ? "network-form-mode-chip is-create" : "network-form-mode-chip is-edit"}>
+          {mode === "create" ? "Create mode" : "Edit mode"}
+        </span>
+      </header>
+    );
+  }
+
   return (
     <section className="panel-grid workspace-column workspace-column-right">
       <article className="panel" hidden={!isConnectorSubScreen}>
-        <h2>{connectorFormMode === "create" ? "Create Connector" : "Edit Connector"}</h2>
+        {renderFormHeader(connectorFormMode === "create" ? "Create Connector" : "Edit Connector", connectorFormMode)}
         <form className="stack-form" onSubmit={handleConnectorSubmit}>
           <label>
             Functional name
@@ -211,7 +222,7 @@ export function ModelingFormsColumn({
       </article>
 
       <article className="panel" hidden={!isSpliceSubScreen}>
-        <h2>{spliceFormMode === "create" ? "Create Splice" : "Edit Splice"}</h2>
+        {renderFormHeader(spliceFormMode === "create" ? "Create Splice" : "Edit Splice", spliceFormMode)}
         <form className="stack-form" onSubmit={handleSpliceSubmit}>
           <label>
             Functional name
@@ -235,7 +246,7 @@ export function ModelingFormsColumn({
       </article>
 
       <article className="panel" hidden={!isNodeSubScreen}>
-        <h2>{nodeFormMode === "create" ? "Create Node" : "Edit Node"}</h2>
+        {renderFormHeader(nodeFormMode === "create" ? "Create Node" : "Edit Node", nodeFormMode)}
         <form className="stack-form" onSubmit={handleNodeSubmit}>
           <label>
             Node ID
@@ -295,7 +306,7 @@ export function ModelingFormsColumn({
       </article>
 
       <article className="panel" hidden={!isSegmentSubScreen}>
-        <h2>{segmentFormMode === "create" ? "Create Segment" : "Edit Segment"}</h2>
+        {renderFormHeader(segmentFormMode === "create" ? "Create Segment" : "Edit Segment", segmentFormMode)}
         <form className="stack-form" onSubmit={handleSegmentSubmit}>
           <label>
             Segment ID
@@ -333,7 +344,7 @@ export function ModelingFormsColumn({
       </article>
 
       <article className="panel" hidden={!isWireSubScreen}>
-        <h2>{wireFormMode === "create" ? "Create Wire" : "Edit Wire"}</h2>
+        {renderFormHeader(wireFormMode === "create" ? "Create Wire" : "Edit Wire", wireFormMode)}
         <form className="stack-form" onSubmit={handleWireSubmit}>
           <label>
             Functional name
