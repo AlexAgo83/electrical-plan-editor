@@ -1,7 +1,7 @@
 ## req_010_network_scope_workspace_shell_and_global_defaults - Network Scope Workspace Shell and Global Defaults
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
+> Understanding: 100%
+> Confidence: 98%
 > Complexity: High
 > Theme: Navigation and Workspace Shell Clarity
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -16,7 +16,7 @@
 - Convert the left menu into an overlay drawer that opens/closes from the header and closes on focus loss/click outside.
 - Move `undo/redo` and `model health` controls into a floating panel opened from the right side of the header, with issue-count badge for quick status glance.
 - Move the top summary capsules (item/entity counters currently in header area) into the dedicated `Network Scope` screen.
-- Move `Inspector context` into a floating panel permanently anchored at the bottom-right of the workspace viewport.
+- Move `Inspector context` into a floating panel anchored at the bottom-right with context-aware visibility states (`open` / `collapsed` / `hidden`).
 
 # Context
 Current workspace navigation mixes primary screens, network lifecycle controls, and global preferences in ways that reduce clarity and creates a "patched-in" feeling for network scope operations.
@@ -37,7 +37,7 @@ Architecture references to preserve:
 - Deliver a dedicated "Network Scope" workspace screen for network lifecycle and global workspace preferences.
 - Relocate top summary capsules (counts/quick metrics) from header area into `Network Scope` content.
 - Expose `Settings` as a right-side header action instead of a left-navigation entry.
-- Reposition `Inspector context` as a dedicated floating panel anchored bottom-right across workspace screens.
+- Reposition `Inspector context` as a dedicated bottom-right floating panel with contextual visibility (shown when relevant, collapsed/hidden when not).
 - Refactor primary navigation order and grouping to make network context explicit before modeling.
 - Replace always-visible left sidebar with a drawer overlay controlled by the top header.
 - Keep deterministic local-first behavior, network isolation, and existing validation/routing flows intact.
@@ -92,8 +92,12 @@ Architecture references to preserve:
 
 ### Context inspector floating panel
 - Move `Inspector context` out of static sidebar layout into a floating panel.
-- Keep this panel always docked/anchored at the bottom-right of the workspace viewport.
-- Ensure it remains visible while the underlying screen content scrolls.
+- Keep this panel docked/anchored at the bottom-right when rendered.
+- Apply contextual visibility policy:
+  - `open`: on `Modeling`, `Analysis`, `Validation` when an inspectable selection exists.
+  - `collapsed`: on `Modeling`, `Analysis`, `Validation` when no inspectable selection exists, or on narrow viewports where full panel would occlude workspace actions.
+  - `hidden`: on `Network Scope`, on `Settings`, when no active network exists, and while modal/dialog focus is active.
+- Ensure anchored behavior remains stable while underlying screen content scrolls.
 - Preserve existing inspector actions and selection behavior (open selected entity in inspector, empty-state behavior).
 
 ### Default preferences update
@@ -115,7 +119,8 @@ Architecture references to preserve:
 - AC9: Header shows issue badge for quick glance and panel supports close on outside focus/click with accessible keyboard behavior.
 - AC10: Top summary capsules (counts/quick metrics) are no longer rendered in header area and are rendered in the `Network Scope` screen.
 - AC11: `Settings` is no longer a left-navigation entry and is accessible through a right-side header button.
-- AC12: `Inspector context` is rendered as a floating panel anchored to the bottom-right of the viewport and keeps current inspector interactions.
+- AC12: `Inspector context` is rendered as a floating panel anchored to the bottom-right when displayed and keeps current inspector interactions.
+- AC13: Inspector visibility follows contextual rules: `open` on relevant screens with selection, `collapsed` when low relevance or narrow viewport, `hidden` on `Network Scope`/`Settings`/no active network/modal focus.
 
 ## Non-functional requirements
 - Preserve accessibility for drawer interactions (focus trap/return, escape close semantics).
