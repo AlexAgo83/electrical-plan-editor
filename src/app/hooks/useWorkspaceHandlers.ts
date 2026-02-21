@@ -23,7 +23,6 @@ type DispatchAction = (
 interface UseWorkspaceHandlersParams {
   store: AppStore;
   networks: Network[];
-  activeNetwork: Network | null;
   newNetworkName: string;
   setNewNetworkName: (value: string) => void;
   newNetworkTechnicalId: string;
@@ -52,6 +51,7 @@ interface UseWorkspaceHandlersParams {
   setWireSort: (value: SortState) => void;
   setConnectorSynthesisSort: (value: SortState) => void;
   setSpliceSynthesisSort: (value: SortState) => void;
+  setNetworkSort: (value: SortState) => void;
   setNodeIdSortDirection: (value: SortDirection) => void;
   setSegmentIdSortDirection: (value: SortDirection) => void;
   setThemeMode: (value: ThemeMode | ((current: ThemeMode) => ThemeMode)) => void;
@@ -69,7 +69,6 @@ interface UseWorkspaceHandlersParams {
 export function useWorkspaceHandlers({
   store,
   networks,
-  activeNetwork,
   newNetworkName,
   setNewNetworkName,
   newNetworkTechnicalId,
@@ -98,6 +97,7 @@ export function useWorkspaceHandlers({
   setWireSort,
   setConnectorSynthesisSort,
   setSpliceSynthesisSort,
+  setNetworkSort,
   setNodeIdSortDirection,
   setSegmentIdSortDirection,
   setThemeMode,
@@ -192,20 +192,26 @@ export function useWorkspaceHandlers({
     setNetworkFormError(null);
   }
 
-  function handleDuplicateActiveNetwork(): void {
-    if (activeNetwork === null) {
+  function handleDuplicateNetwork(targetNetworkId: NetworkId | null): void {
+    if (targetNetworkId === null) {
+      return;
+    }
+
+    const targetNetwork = store.getState().networks.byId[targetNetworkId];
+    if (targetNetwork === undefined) {
+      setNetworkFormError("Selected network no longer exists.");
       return;
     }
 
     const existingTechnicalIds = new Set(networks.map((network) => network.technicalId));
-    const technicalId = buildUniqueNetworkTechnicalId(activeNetwork.technicalId, existingTechnicalIds);
+    const technicalId = buildUniqueNetworkTechnicalId(targetNetwork.technicalId, existingTechnicalIds);
     const nowIso = new Date().toISOString();
     dispatchAction(
-      appActions.duplicateNetwork(activeNetwork.id, {
+      appActions.duplicateNetwork(targetNetwork.id, {
         id: createEntityId("net") as NetworkId,
-        name: `${activeNetwork.name} (Copy)`,
+        name: `${targetNetwork.name} (Copy)`,
         technicalId,
-        description: activeNetwork.description,
+        description: targetNetwork.description,
         createdAt: nowIso,
         updatedAt: nowIso
       })
@@ -213,19 +219,25 @@ export function useWorkspaceHandlers({
     setNetworkFormError(null);
   }
 
-  function handleDeleteActiveNetwork(): void {
-    if (activeNetwork === null) {
+  function handleDeleteNetwork(targetNetworkId: NetworkId | null): void {
+    if (targetNetworkId === null) {
+      return;
+    }
+
+    const targetNetwork = store.getState().networks.byId[targetNetworkId];
+    if (targetNetwork === undefined) {
+      setNetworkFormError("Selected network no longer exists.");
       return;
     }
 
     if (typeof window !== "undefined" && typeof window.confirm === "function") {
-      const shouldDelete = window.confirm(`Delete network '${activeNetwork.name}' (${activeNetwork.technicalId})?`);
+      const shouldDelete = window.confirm(`Delete network '${targetNetwork.name}' (${targetNetwork.technicalId})?`);
       if (!shouldDelete) {
         return;
       }
     }
 
-    dispatchAction(appActions.deleteNetwork(activeNetwork.id));
+    dispatchAction(appActions.deleteNetwork(targetNetwork.id));
     setNetworkFormError(null);
   }
 
@@ -316,6 +328,7 @@ export function useWorkspaceHandlers({
   }
 
   function applyListSortDefaults(): void {
+    setNetworkSort({ field: defaultSortField, direction: defaultSortDirection });
     setConnectorSort({ field: defaultSortField, direction: defaultSortDirection });
     setSpliceSort({ field: defaultSortField, direction: defaultSortDirection });
     setWireSort({ field: defaultSortField, direction: defaultSortDirection });
@@ -341,6 +354,7 @@ export function useWorkspaceHandlers({
     setConnectorSort(defaultSort);
     setSpliceSort(defaultSort);
     setWireSort(defaultSort);
+    setNetworkSort(defaultSort);
     setConnectorSynthesisSort(defaultSort);
     setSpliceSynthesisSort(defaultSort);
     setNodeIdSortDirection("asc");
@@ -360,8 +374,8 @@ export function useWorkspaceHandlers({
     handleCreateNetwork,
     handleSelectNetwork,
     handleUpdateActiveNetwork,
-    handleDuplicateActiveNetwork,
-    handleDeleteActiveNetwork,
+    handleDuplicateNetwork,
+    handleDeleteNetwork,
     handleRecreateSampleNetwork,
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,

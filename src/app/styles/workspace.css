@@ -260,6 +260,12 @@
   }
 }
 
+@media (max-width: 800px) {
+  .network-scope-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .network-scope-indicator {
   display: inline-flex;
   align-items: baseline;
@@ -291,8 +297,40 @@
   padding: 0.35rem 0.5rem;
 }
 
+.network-scope-panel {
+  position: relative;
+}
+
 .network-scope-list td {
   vertical-align: middle;
+}
+
+.network-scope-list {
+  table-layout: fixed;
+}
+
+.network-scope-list .network-scope-col-name {
+  width: 44%;
+}
+
+.network-scope-list .network-scope-col-technical-id {
+  width: 38%;
+}
+
+.network-scope-list .network-scope-col-status {
+  width: 18%;
+}
+
+.network-scope-list th,
+.network-scope-list td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.network-scope-list tbody tr {
+  height: 2.8rem;
 }
 
 .network-scope-list .is-focusable-row {
@@ -304,7 +342,7 @@
   outline-offset: -2px;
 }
 
-.network-scope-active-chip {
+.network-scope-status-chip {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
@@ -312,8 +350,117 @@
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+}
+
+.network-scope-status-chip.is-active {
   background: #e6f2e8;
   color: #1d5b2f;
+}
+
+.network-scope-status-chip.is-available {
+  background: #e5edf4;
+  color: #30485c;
+}
+
+.network-scope-create-button {
+  width: 100%;
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+}
+
+.table-density-compact .network-scope-list-shell {
+  padding: 0.22rem 0.35rem;
+}
+
+.network-form-panel {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+}
+
+.network-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.network-form-header h2 {
+  margin: 0;
+}
+
+.network-form-mode-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.16rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: #e5edf4;
+  color: #30485c;
+}
+
+.network-form-mode-chip.is-create {
+  background: #e5f0fb;
+  color: #1e4f79;
+}
+
+.network-form-mode-chip.is-edit {
+  background: #e6f2e8;
+  color: #1d5b2f;
+}
+
+.network-focus-actions {
+  border: 1px dashed #94afc3;
+  border-radius: 0.6rem;
+  background: #f4f9fd;
+  padding: 0.55rem 0.65rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.network-focus-title {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #355268;
+}
+
+.network-form-grid {
+  max-width: 740px;
+  gap: 0.75rem;
+  margin-bottom: 0;
+}
+
+.network-form-grid label {
+  display: grid;
+  gap: 0.34rem;
+}
+
+.network-form-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.network-form-grid input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #bacada;
+  padding: 0.45rem 0.6rem;
+  background: #fff;
+}
+
+.network-form-submit-actions {
+  margin-top: 0.1rem;
+}
+
+.network-delete-button {
+  border-color: #d3a7ad !important;
+  background: #fbeaed !important;
+  color: #8f1e1e !important;
 }
 
 .workspace-sidebar .workspace-nav-row.secondary {

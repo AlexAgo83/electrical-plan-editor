@@ -44,9 +44,19 @@
 }
 
 .sort-indicator {
-  min-width: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.9rem;
+  height: 0.9rem;
+  line-height: 1;
   text-align: center;
   color: #4a6a82;
+  transform-origin: center;
+}
+
+.sort-indicator.is-desc {
+  transform: rotate(180deg);
 }
 
 .list-toolbar {

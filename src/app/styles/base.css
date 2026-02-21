@@ -310,9 +310,44 @@ button {
   border-color: #365069;
 }
 
-.app-shell.theme-dark .network-scope-active-chip {
+.app-shell.theme-dark .network-scope-status-chip.is-active {
   background: #2c5844;
   color: #d7f6e3;
+}
+
+.app-shell.theme-dark .network-scope-status-chip.is-available {
+  background: #365069;
+  color: #dbe9f5;
+}
+
+.app-shell.theme-dark .network-form-mode-chip {
+  background: #365069;
+  color: #dbe9f5;
+}
+
+.app-shell.theme-dark .network-form-mode-chip.is-create {
+  background: #2c4f6a;
+  color: #d2e8fb;
+}
+
+.app-shell.theme-dark .network-form-mode-chip.is-edit {
+  background: #2c5844;
+  color: #d7f6e3;
+}
+
+.app-shell.theme-dark .network-focus-actions {
+  border-color: #4f6b84;
+  background: #1f3448;
+}
+
+.app-shell.theme-dark .network-focus-title {
+  color: #bcd0e2;
+}
+
+.app-shell.theme-dark .network-delete-button {
+  border-color: #8f5660 !important;
+  background: #5b2f37 !important;
+  color: #ffd9de !important;
 }
 
 .app-shell.theme-dark .workspace-tab,
@@ -322,6 +357,7 @@ button {
 .app-shell.theme-dark .error-banner button,
 .app-shell.theme-dark .inspector-context-toggle,
 .app-shell.theme-dark .header-nav-toggle,
+.app-shell.theme-dark .network-scope-create-button,
 .app-shell.theme-dark .header-install-toggle,
 .app-shell.theme-dark .header-update-toggle,
 .app-shell.theme-dark .header-settings-toggle,

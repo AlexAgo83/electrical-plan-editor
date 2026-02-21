@@ -76,6 +76,7 @@ interface UseUiPreferencesOptions {
   setConnectorSort: (state: SortState) => void;
   setSpliceSort: (state: SortState) => void;
   setWireSort: (state: SortState) => void;
+  setNetworkSort: (state: SortState) => void;
   setConnectorSynthesisSort: (state: SortState) => void;
   setSpliceSynthesisSort: (state: SortState) => void;
   setNodeIdSortDirection: (direction: SortDirection) => void;
@@ -114,6 +115,7 @@ export function useUiPreferences({
   setConnectorSort,
   setSpliceSort,
   setWireSort,
+  setNetworkSort,
   setConnectorSynthesisSort,
   setSpliceSynthesisSort,
   setNodeIdSortDirection,
@@ -154,6 +156,7 @@ export function useUiPreferences({
       setConnectorSort({ field: sortField, direction: sortDirection });
       setSpliceSort({ field: sortField, direction: sortDirection });
       setWireSort({ field: sortField, direction: sortDirection });
+      setNetworkSort({ field: sortField, direction: sortDirection });
       setConnectorSynthesisSort({ field: sortField, direction: sortDirection });
       setSpliceSynthesisSort({ field: sortField, direction: sortDirection });
       setNodeIdSortDirection(idSortDirection);
@@ -182,6 +185,7 @@ export function useUiPreferences({
     setDefaultIdSortDirection,
     setDefaultSortDirection,
     setDefaultSortField,
+    setNetworkSort,
     setKeyboardShortcutsEnabled,
     setNetworkOffset,
     setNetworkScale,

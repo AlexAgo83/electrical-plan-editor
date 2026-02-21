@@ -101,6 +101,7 @@ import {
 import type {
   AppProps,
   NodePosition,
+  SortState,
   SortDirection,
   SortField,
   SubScreenId,
@@ -291,6 +292,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
   const [defaultSortDirection, setDefaultSortDirection] = useState<SortDirection>("asc");
   const [defaultIdSortDirection, setDefaultIdSortDirection] = useState<SortDirection>("asc");
+  const [networkSort, setNetworkSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [canvasDefaultShowGrid, setCanvasDefaultShowGrid] = useState(true);
   const [canvasDefaultSnapToGrid, setCanvasDefaultSnapToGrid] = useState(true);
   const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("100");
@@ -657,6 +659,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setConnectorSort,
     setSpliceSort,
     setWireSort,
+    setNetworkSort,
     setConnectorSynthesisSort,
     setSpliceSynthesisSort,
     setNodeIdSortDirection,
@@ -724,8 +727,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     segment: segments.length,
     wire: wires.length
   };
-  const activeNetworkLabel =
-    activeNetwork === null ? "No active network" : `${activeNetwork.name} (${activeNetwork.technicalId})`;
   const hasActiveNetwork = activeNetwork !== null;
   const isCurrentWorkspaceEmpty = isWorkspaceEmpty(state);
   const hasBuiltInSampleState = hasSampleNetworkSignature(state);
@@ -802,8 +803,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     handleCreateNetwork,
     handleSelectNetwork,
     handleUpdateActiveNetwork,
-    handleDuplicateActiveNetwork,
-    handleDeleteActiveNetwork,
+    handleDuplicateNetwork,
+    handleDeleteNetwork,
     handleRecreateSampleNetwork,
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,
@@ -814,7 +815,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   } = useWorkspaceHandlers({
     store,
     networks,
-    activeNetwork,
     newNetworkName,
     setNewNetworkName,
     newNetworkTechnicalId,
@@ -843,6 +843,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setWireSort,
     setConnectorSynthesisSort,
     setSpliceSynthesisSort,
+    setNetworkSort,
     setNodeIdSortDirection,
     setSegmentIdSortDirection,
     setThemeMode,
@@ -1659,17 +1660,17 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           <NetworkScopeScreen isActive={isNetworkScopeScreen}>
             <NetworkScopeWorkspaceContent
               networks={networks}
+              networkSort={networkSort}
+              setNetworkSort={setNetworkSort}
               connectorCount={connectors.length}
               spliceCount={splices.length}
               nodeCount={nodes.length}
               segmentCount={segments.length}
               wireCount={wires.length}
               activeNetworkId={activeNetworkId}
-              activeNetworkLabel={activeNetworkLabel}
-              hasActiveNetwork={hasActiveNetwork}
               handleSelectNetwork={handleSelectNetwork}
-              handleDuplicateActiveNetwork={handleDuplicateActiveNetwork}
-              handleDeleteActiveNetwork={handleDeleteActiveNetwork}
+              handleDuplicateNetwork={handleDuplicateNetwork}
+              handleDeleteNetwork={handleDeleteNetwork}
               networkFormMode={networkFormMode}
               handleOpenCreateNetworkForm={handleOpenCreateNetworkForm}
               handleOpenEditNetworkForm={handleOpenEditNetworkForm}
