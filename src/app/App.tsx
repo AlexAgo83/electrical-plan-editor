@@ -2475,6 +2475,22 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setActiveScreen("validation");
   }
 
+  function findValidationIssueIndex(issueId: string): number {
+    return orderedValidationIssues.findIndex((candidate) => candidate.id === issueId);
+  }
+
+  function getValidationIssueByCursor(): ValidationIssue | null {
+    if (orderedValidationIssues.length === 0) {
+      return null;
+    }
+
+    if (validationIssueCursor < 0 || validationIssueCursor >= orderedValidationIssues.length) {
+      return orderedValidationIssues[0] ?? null;
+    }
+
+    return orderedValidationIssues[validationIssueCursor] ?? null;
+  }
+
   function moveValidationIssueCursor(direction: 1 | -1): void {
     if (orderedValidationIssues.length === 0) {
       return;
@@ -2488,6 +2504,14 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
 
     setValidationIssueCursor(nextIndex);
+    handleValidationIssueGoTo(issue);
+  }
+
+  function handleValidationIssueRowGoTo(issue: ValidationIssue): void {
+    const issueIndex = findValidationIssueIndex(issue.id);
+    if (issueIndex >= 0) {
+      setValidationIssueCursor(issueIndex);
+    }
     handleValidationIssueGoTo(issue);
   }
 
@@ -2826,6 +2850,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
               ? "Connect mode: click first connector/splice node to set wire endpoint A."
               : `Connect mode: endpoint A captured on '${modeAnchorNodeId}'. Click second connector/splice node.`
             : "Route mode: click start node then end node to fill route preview.";
+  const currentValidationIssue = getValidationIssueByCursor();
   const networkScalePercent = Math.round(networkScale * 100);
   const inspectorContextPanel = (
     <article className="panel">
@@ -3324,6 +3349,14 @@ export function App({ store = appStore }: AppProps): ReactElement {
                     : `${validationIssueCursor >= 0 ? validationIssueCursor + 1 : 1}/${orderedValidationIssues.length}`}
                 </strong>
               </p>
+              {currentValidationIssue !== null ? (
+                <p className="meta-line">
+                  Current issue:{" "}
+                  <strong>
+                    [{currentValidationIssue.severity.toUpperCase()}] {currentValidationIssue.category}
+                  </strong>
+                </p>
+              ) : null}
               <div className="row-actions compact">
                 <button type="button" onClick={() => handleOpenValidationScreen("all")}>
                   Open validation
@@ -4586,7 +4619,12 @@ export function App({ store = appStore }: AppProps): ReactElement {
                       </thead>
                       <tbody>
                         {issues.map((issue) => (
-                          <tr key={issue.id}>
+                          <tr
+                            key={issue.id}
+                            className={
+                              findValidationIssueIndex(issue.id) === validationIssueCursor ? "is-selected" : undefined
+                            }
+                          >
                             <td>
                               <span className={issue.severity === "error" ? "status-chip is-error" : "status-chip is-warning"}>
                                 {issue.severity.toUpperCase()}
@@ -4594,7 +4632,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                             </td>
                             <td>{issue.message}</td>
                             <td>
-                              <button type="button" onClick={() => handleValidationIssueGoTo(issue)}>
+                              <button type="button" onClick={() => handleValidationIssueRowGoTo(issue)}>
                                 Go to
                               </button>
                             </td>

@@ -1,7 +1,7 @@
 ## item_012_v1_validation_center_and_issue_navigation - V1 Validation Center and Issue Navigation
 > From version: 0.1.0
 > Understanding: 99%
-> Confidence: 96%
+> Confidence: 97%
 > Progress: 100% (completed)
 > Complexity: High
 > Theme: UX/UI Validation Workflow
@@ -36,10 +36,11 @@ Validation feedback is currently distributed across local errors, making it hard
 - Status update:
   - Dedicated `Validation` workspace is implemented.
   - Grouped issue list with severity/category/text filtering and one-click `Go to` navigation is active.
-  - `Go to` now restores modeling context and recenters canvas focus on the targeted entity.
+  - `Go to` now restores modeling context, recenters canvas focus on the targeted entity, and synchronizes the sidebar issue cursor.
   - Sidebar `Model health` snapshot continuously surfaces issue totals and provides quick open actions for all/errors/warnings.
   - Sidebar issue navigator (`Previous issue` / `Next issue`) allows sequential issue review with direct context focus.
   - Keyboard shortcuts (`Alt+J` / `Alt+K`) support previous/next issue navigation from anywhere in the workspace.
+  - Active issue row highlighting is visible in the validation table when the cursor is set.
   - Planned issue categories are covered: occupancy conflicts, route lock validity, missing references, incomplete required fields.
 - References:
   - `logics/request/req_001_v1_ux_ui_operator_workspace.md`

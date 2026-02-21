@@ -505,6 +505,10 @@ describe("App integration UI", () => {
 
     const updatedNetworkPanel = getPanelByHeading("Network summary");
     expect(within(updatedNetworkPanel).getByRole("button", { name: /^Select$/ })).toHaveClass("is-active");
+
+    const modelHealth = screen.getByRole("region", { name: "Model health" });
+    expect(within(modelHealth).getByText("2/2", { selector: "strong" })).toBeInTheDocument();
+    expect(within(modelHealth).getByText(/\[WARNING\] Occupancy conflict/i)).toBeInTheDocument();
   });
 
   it("supports alt keyboard shortcuts for workspace navigation and interaction modes", () => {
