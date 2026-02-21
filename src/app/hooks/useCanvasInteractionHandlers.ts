@@ -1,5 +1,5 @@
 import type { Dispatch, MouseEvent as ReactMouseEvent, MutableRefObject, SetStateAction, WheelEvent as ReactWheelEvent } from "react";
-import type { NetworkNode, NodeId, SegmentId, WireEndpoint, WireId } from "../../core/entities";
+import type { Connector, NetworkNode, NodeId, Segment, SegmentId, Splice, WireEndpoint, WireId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE, NETWORK_VIEW_HEIGHT, NETWORK_VIEW_WIDTH, clamp, snapToGrid } from "../lib/app-utils";
@@ -18,6 +18,8 @@ interface UseCanvasInteractionHandlersParams {
   interactionMode: "select" | "addNode" | "addSegment" | "connect" | "route";
   modeAnchorNodeId: NodeId | null;
   setModeAnchorNodeId: (value: NodeId | null) => void;
+  isModelingScreen: boolean;
+  activeSubScreen: SubScreenId;
   setActiveScreen: (screen: "networkScope" | "modeling" | "analysis" | "validation" | "settings") => void;
   setActiveSubScreen: (screen: SubScreenId) => void;
   setSegmentFormMode: (mode: "create" | "edit") => void;
@@ -69,6 +71,10 @@ interface UseCanvasInteractionHandlersParams {
   dispatchAction: DispatchAction;
   persistNodePosition: (nodeId: NodeId, position: NodePosition) => void;
   resetNetworkViewToConfiguredScale: () => void;
+  startConnectorEdit: (connector: Connector) => void;
+  startSpliceEdit: (splice: Splice) => void;
+  startNodeEdit: (node: NetworkNode) => void;
+  startSegmentEdit: (segment: Segment) => void;
 }
 
 export function useCanvasInteractionHandlers({
@@ -77,6 +83,8 @@ export function useCanvasInteractionHandlers({
   interactionMode,
   modeAnchorNodeId,
   setModeAnchorNodeId,
+  isModelingScreen,
+  activeSubScreen,
   setActiveScreen,
   setActiveSubScreen,
   setSegmentFormMode,
@@ -119,7 +127,11 @@ export function useCanvasInteractionHandlers({
   panStartRef,
   dispatchAction,
   persistNodePosition,
-  resetNetworkViewToConfiguredScale
+  resetNetworkViewToConfiguredScale,
+  startConnectorEdit,
+  startSpliceEdit,
+  startNodeEdit,
+  startSegmentEdit
 }: UseCanvasInteractionHandlersParams) {
   function applyNodeToWireEndpoint(side: "A" | "B", node: NetworkNode): boolean {
     if (node.kind === "intermediate") {
@@ -152,6 +164,16 @@ export function useCanvasInteractionHandlers({
     if (interactionMode !== "select") {
       return;
     }
+    const segment = state.segments.byId[segmentId];
+    if (segment === undefined) {
+      return;
+    }
+
+    if (isModelingScreen && activeSubScreen === "segment") {
+      startSegmentEdit(segment);
+      return;
+    }
+
     dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
   }
 
@@ -162,13 +184,34 @@ export function useCanvasInteractionHandlers({
     }
 
     if (interactionMode === "select") {
+      if (isModelingScreen) {
+        if (activeSubScreen === "connector" && node.kind === "connector") {
+          const connector = state.connectors.byId[node.connectorId];
+          if (connector !== undefined) {
+            startConnectorEdit(connector);
+            return;
+          }
+        }
+
+        if (activeSubScreen === "splice" && node.kind === "splice") {
+          const splice = state.splices.byId[node.spliceId];
+          if (splice !== undefined) {
+            startSpliceEdit(splice);
+            return;
+          }
+        }
+
+        if (activeSubScreen === "node") {
+          startNodeEdit(node);
+          return;
+        }
+      }
+
       dispatchAction(appActions.select({ kind: "node", id: nodeId }));
       return;
     }
 
     if (interactionMode === "addSegment") {
-      setActiveScreen("modeling");
-      setActiveSubScreen("segment");
       setSegmentFormMode("create");
       setEditingSegmentId(null);
       setSegmentFormError(null);
@@ -192,8 +235,6 @@ export function useCanvasInteractionHandlers({
     }
 
     if (interactionMode === "route") {
-      setActiveScreen("analysis");
-      setActiveSubScreen("segment");
       if (routePreviewStartNodeId.length === 0 || routePreviewEndNodeId.length > 0) {
         setRoutePreviewStartNodeId(nodeId);
         setRoutePreviewEndNodeId("");
@@ -204,8 +245,6 @@ export function useCanvasInteractionHandlers({
     }
 
     if (interactionMode === "connect") {
-      setActiveScreen("modeling");
-      setActiveSubScreen("wire");
       setWireFormMode("create");
       setEditingWireId(null);
 

@@ -237,13 +237,45 @@ export function useSelectionHandlers({
     handleValidationIssueGoTo(issue);
   }
 
+  function resolveSelectedSubScreen(): SubScreenId | null {
+    if (selectedSubScreen !== null) {
+      return selectedSubScreen;
+    }
+
+    if (selected === null) {
+      return null;
+    }
+
+    switch (selected.kind) {
+      case "connector":
+      case "splice":
+      case "node":
+      case "segment":
+      case "wire":
+        return selected.kind;
+      default:
+        return null;
+    }
+  }
+
   function handleOpenSelectionInInspector(): void {
-    if (selectedSubScreen === null) {
+    const targetSubScreen = resolveSelectedSubScreen();
+    if (targetSubScreen === null) {
       return;
     }
 
+    if (selected !== null) {
+      dispatchAction(
+        appActions.select({
+          kind: selected.kind,
+          id: selected.id
+        }),
+        { trackHistory: false }
+      );
+    }
+
     setActiveScreen("modeling");
-    setActiveSubScreen(selectedSubScreen);
+    setActiveSubScreen(targetSubScreen);
   }
 
   function handleStartSelectedEdit(): void {

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
-import type { SelectionState } from "../../store/types";
 
 type ScreenId = "networkScope" | "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
@@ -17,11 +16,10 @@ interface UseWorkspaceNavigationResult {
   activeScreenRef: MutableRefObject<ScreenId>;
 }
 
-export function useWorkspaceNavigation(selected: SelectionState | null): UseWorkspaceNavigationResult {
+export function useWorkspaceNavigation(): UseWorkspaceNavigationResult {
   const [activeScreen, setActiveScreen] = useState<ScreenId>("networkScope");
   const [activeSubScreen, setActiveSubScreen] = useState<SubScreenId>("connector");
   const activeScreenRef = useRef<ScreenId>("networkScope");
-  const lastInspectorSelectionRef = useRef<string | null>(null);
 
   const isNetworkScopeScreen = activeScreen === "networkScope";
   const isModelingScreen = activeScreen === "modeling";
@@ -32,21 +30,6 @@ export function useWorkspaceNavigation(selected: SelectionState | null): UseWork
   useEffect(() => {
     activeScreenRef.current = activeScreen;
   }, [activeScreen]);
-
-  useEffect(() => {
-    const selectionKey = selected === null ? null : `${selected.kind}:${selected.id}`;
-    const hasSelectionChanged = selectionKey !== lastInspectorSelectionRef.current;
-    lastInspectorSelectionRef.current = selectionKey;
-
-    if (!isModelingScreen || selected === null || !hasSelectionChanged) {
-      return;
-    }
-
-    const selectedKind = selected.kind as SubScreenId;
-    if (activeSubScreen !== selectedKind) {
-      setActiveSubScreen(selectedKind);
-    }
-  }, [activeSubScreen, isModelingScreen, selected]);
 
   return {
     activeScreen,

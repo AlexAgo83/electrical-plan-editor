@@ -366,7 +366,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isValidationScreen,
     isSettingsScreen,
     activeScreenRef
-  } = useWorkspaceNavigation(selected);
+  } = useWorkspaceNavigation();
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
   const selectedSpliceId = selected?.kind === "splice" ? (selected.id as SpliceId) : null;
   const selectedNodeId = selected?.kind === "node" ? (selected.id as NodeId) : null;
@@ -1378,7 +1378,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     moveValidationIssueCursor,
     moveVisibleValidationIssueCursor,
     handleValidationIssueRowGoTo,
-    handleOpenSelectionInInspector,
     handleStartSelectedEdit
   } = useSelectionHandlers({
     state,
@@ -1414,6 +1413,40 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     startWireEdit
   });
 
+  useEffect(() => {
+    if (connectorFormMode === "edit" && selectedSubScreen !== "connector") {
+      resetConnectorForm();
+    }
+
+    if (spliceFormMode === "edit" && selectedSubScreen !== "splice") {
+      resetSpliceForm();
+    }
+
+    if (nodeFormMode === "edit" && selectedSubScreen !== "node") {
+      resetNodeForm();
+    }
+
+    if (segmentFormMode === "edit" && selectedSubScreen !== "segment") {
+      resetSegmentForm();
+    }
+
+    if (wireFormMode === "edit" && selectedSubScreen !== "wire") {
+      resetWireForm();
+    }
+  }, [
+    connectorFormMode,
+    nodeFormMode,
+    resetConnectorForm,
+    resetNodeForm,
+    resetSegmentForm,
+    resetSpliceForm,
+    resetWireForm,
+    segmentFormMode,
+    selectedSubScreen,
+    spliceFormMode,
+    wireFormMode
+  ]);
+
   const {
     handleNetworkSegmentClick,
     handleNetworkNodeClick,
@@ -1430,6 +1463,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     interactionMode,
     modeAnchorNodeId,
     setModeAnchorNodeId,
+    isModelingScreen,
+    activeSubScreen,
     setActiveScreen,
     setActiveSubScreen,
     setSegmentFormMode,
@@ -1473,7 +1508,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     dispatchAction,
     persistNodePosition: (nodeId, position) =>
       dispatchAction(appActions.setNodePosition(nodeId, position), { trackHistory: false }),
-    resetNetworkViewToConfiguredScale
+    resetNetworkViewToConfiguredScale,
+    startConnectorEdit,
+    startSpliceEdit,
+    startNodeEdit,
+    startSegmentEdit
   });
 
   const currentValidationIssue = getValidationIssueByCursor();
@@ -1528,7 +1567,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       connectorOccupiedCount={selectedConnectorOccupiedCount}
       spliceOccupiedCount={selectedSpliceOccupiedCount}
       describeNode={describeNode}
-      onOpenInInspector={handleOpenSelectionInInspector}
       onEditSelected={handleStartSelectedEdit}
       onFocusCanvas={handleFocusCurrentSelectionOnCanvas}
       onClearSelection={() => dispatchAction(appActions.clearSelection())}

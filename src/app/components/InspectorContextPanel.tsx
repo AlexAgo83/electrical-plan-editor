@@ -18,7 +18,6 @@ interface InspectorContextPanelProps {
   connectorOccupiedCount: number;
   spliceOccupiedCount: number;
   describeNode: (node: NetworkNode) => string;
-  onOpenInInspector: () => void;
   onEditSelected: () => void;
   onFocusCanvas: () => void;
   onClearSelection: () => void;
@@ -40,7 +39,6 @@ export function InspectorContextPanel({
   connectorOccupiedCount,
   spliceOccupiedCount,
   describeNode,
-  onOpenInInspector,
   onEditSelected,
   onFocusCanvas,
   onClearSelection
@@ -134,11 +132,8 @@ export function InspectorContextPanel({
             ) : null}
           </div>
           <div className="row-actions compact">
-            <button type="button" onClick={onOpenInInspector} disabled={selectedSubScreen === null}>
-              Open in inspector
-            </button>
             <button type="button" onClick={onEditSelected} disabled={selectedSubScreen === null}>
-              Edit selected
+              Edit
             </button>
             <button type="button" onClick={onFocusCanvas} disabled={selectedSubScreen === null}>
               Focus canvas

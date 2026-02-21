@@ -98,17 +98,11 @@ export function ModelingPrimaryTables({
   onDeleteNode
 }: ModelingPrimaryTablesProps): ReactElement {
   const focusedConnector =
-    (selectedConnectorId === null ? null : visibleConnectors.find((connector) => connector.id === selectedConnectorId) ?? null) ??
-    visibleConnectors[0] ??
-    null;
+    selectedConnectorId === null ? null : (visibleConnectors.find((connector) => connector.id === selectedConnectorId) ?? null);
   const focusedSplice =
-    (selectedSpliceId === null ? null : visibleSplices.find((splice) => splice.id === selectedSpliceId) ?? null) ??
-    visibleSplices[0] ??
-    null;
+    selectedSpliceId === null ? null : (visibleSplices.find((splice) => splice.id === selectedSpliceId) ?? null);
   const focusedNode =
-    (selectedNodeId === null ? null : visibleNodes.find((node) => node.id === selectedNodeId) ?? null) ??
-    visibleNodes[0] ??
-    null;
+    selectedNodeId === null ? null : (visibleNodes.find((node) => node.id === selectedNodeId) ?? null);
 
   return (
     <>
@@ -219,7 +213,7 @@ export function ModelingPrimaryTables({
                       }
                     }}
                   >
-                    <td><span className="splice-badge">Junction</span> {splice.name}</td>
+                    <td>{splice.name}</td>
                     <td className="technical-id">{splice.technicalId}</td>
                     <td>{splice.portCount}</td>
                     <td>{occupiedCount}</td>

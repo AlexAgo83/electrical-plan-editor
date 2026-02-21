@@ -71,13 +71,9 @@ export function ModelingSecondaryTables({
   onDeleteWire
 }: ModelingSecondaryTablesProps): ReactElement {
   const focusedSegment =
-    (selectedSegmentId === null ? null : visibleSegments.find((segment) => segment.id === selectedSegmentId) ?? null) ??
-    visibleSegments[0] ??
-    null;
+    selectedSegmentId === null ? null : (visibleSegments.find((segment) => segment.id === selectedSegmentId) ?? null);
   const focusedWire =
-    (selectedWireId === null ? null : visibleWires.find((wire) => wire.id === selectedWireId) ?? null) ??
-    visibleWires[0] ??
-    null;
+    selectedWireId === null ? null : (visibleWires.find((wire) => wire.id === selectedWireId) ?? null);
 
   return (
     <>

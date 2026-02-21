@@ -147,7 +147,7 @@ describe("App integration UI - navigation and canvas", () => {
     const inspectorPanel = getPanelByHeading("Inspector context");
     expect(within(inspectorPanel).getByText(/Focused entity:/)).toBeInTheDocument();
     expect(within(inspectorPanel).getByText("C1")).toBeInTheDocument();
-    fireEvent.click(within(inspectorPanel).getByRole("button", { name: "Edit selected" }));
+    fireEvent.click(within(inspectorPanel).getByRole("button", { name: "Edit" }));
 
     const editPanel = getPanelByHeading("Edit Connector");
     expect(within(editPanel).getByDisplayValue("Connector 1")).toBeInTheDocument();
@@ -200,6 +200,24 @@ describe("App integration UI - navigation and canvas", () => {
     expect(currentZoomLine()).toContain("View: 100% zoom.");
     fireEvent.keyDown(window, { key: "f", altKey: true });
     expect(currentZoomLine()).not.toContain("View: 100% zoom.");
+  });
+
+  it("cancels edit mode when selection focus changes to another entity kind", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreen("modeling");
+    switchSubScreen("node");
+
+    const nodesPanel = getPanelByHeading("Nodes");
+    fireEvent.click(within(nodesPanel).getByText("N-C1"));
+    expect(getPanelByHeading("Edit Node")).toBeInTheDocument();
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const segmentHitbox = networkSummaryPanel.querySelector(".network-segment-hitbox");
+    expect(segmentHitbox).not.toBeNull();
+    fireEvent.click(segmentHitbox as Element);
+
+    expect(screen.queryByRole("heading", { name: "Edit Node" })).not.toBeInTheDocument();
+    expect(getPanelByHeading("Create Node")).toBeInTheDocument();
   });
 
   it("asks confirmation before regenerating layout when manual positions exist", () => {
