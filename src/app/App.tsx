@@ -272,6 +272,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [activeScreen, setActiveScreen] = useState<ScreenId>("modeling");
   const [activeSubScreen, setActiveSubScreen] = useState<SubScreenId>("connector");
   const [interactionMode, setInteractionMode] = useState<InteractionMode>("select");
+  const [modeAnchorNodeId, setModeAnchorNodeId] = useState<NodeId | null>(null);
+  const [pendingNewNodePosition, setPendingNewNodePosition] = useState<NodePosition | null>(null);
   const [connectorSearchQuery, setConnectorSearchQuery] = useState("");
   const [spliceSearchQuery, setSpliceSearchQuery] = useState("");
   const [nodeSearchQuery, setNodeSearchQuery] = useState("");
@@ -412,6 +414,13 @@ export function App({ store = appStore }: AppProps): ReactElement {
       return changed ? next : previous;
     });
   }, [nodes]);
+
+  useEffect(() => {
+    setModeAnchorNodeId(null);
+    if (interactionMode !== "addNode") {
+      setPendingNewNodePosition(null);
+    }
+  }, [interactionMode]);
 
   const connectorSynthesisRows = useMemo<ConnectorSynthesisRow[]>(() => {
     if (selectedConnector === null) {
@@ -905,6 +914,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setNodeSpliceId("");
     setNodeLabel("");
     setNodeFormError(null);
+    setPendingNewNodePosition(null);
   }
 
   function startNodeEdit(node: NetworkNode): void {
@@ -983,6 +993,12 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     const nextState = store.getState();
     if (nextState.nodes.byId[nodeId] !== undefined) {
+      if (pendingNewNodePosition !== null) {
+        setManualNodePositions((previous) => ({
+          ...previous,
+          [nodeId]: pendingNewNodePosition
+        }));
+      }
       store.dispatch(appActions.select({ kind: "node", id: nodeId }));
       resetNodeForm();
     }
@@ -1270,6 +1286,33 @@ export function App({ store = appStore }: AppProps): ReactElement {
     );
   }
 
+  function applyNodeToWireEndpoint(side: "A" | "B", node: NetworkNode): boolean {
+    if (node.kind === "intermediate") {
+      setWireFormError("Connect mode only supports connector/splice nodes as wire endpoints.");
+      return false;
+    }
+
+    if (side === "A") {
+      if (node.kind === "connector") {
+        setWireEndpointAKind("connectorCavity");
+        setWireEndpointAConnectorId(node.connectorId);
+      } else {
+        setWireEndpointAKind("splicePort");
+        setWireEndpointASpliceId(node.spliceId);
+      }
+      return true;
+    }
+
+    if (node.kind === "connector") {
+      setWireEndpointBKind("connectorCavity");
+      setWireEndpointBConnectorId(node.connectorId);
+    } else {
+      setWireEndpointBKind("splicePort");
+      setWireEndpointBSpliceId(node.spliceId);
+    }
+    return true;
+  }
+
   function handleNetworkSegmentClick(segmentId: SegmentId): void {
     if (interactionMode !== "select") {
       return;
@@ -1278,10 +1321,109 @@ export function App({ store = appStore }: AppProps): ReactElement {
   }
 
   function handleNetworkNodeClick(nodeId: NodeId): void {
-    if (interactionMode !== "select") {
+    const node = state.nodes.byId[nodeId];
+    if (node === undefined) {
       return;
     }
-    store.dispatch(appActions.select({ kind: "node", id: nodeId }));
+
+    if (interactionMode === "select") {
+      store.dispatch(appActions.select({ kind: "node", id: nodeId }));
+      return;
+    }
+
+    if (interactionMode === "addSegment") {
+      setActiveScreen("modeling");
+      setActiveSubScreen("segment");
+      setSegmentFormMode("create");
+      setEditingSegmentId(null);
+      setSegmentFormError(null);
+      if (modeAnchorNodeId === null) {
+        setModeAnchorNodeId(nodeId);
+        setSegmentNodeA(nodeId);
+        setSegmentNodeB("");
+        return;
+      }
+
+      if (modeAnchorNodeId === nodeId) {
+        setModeAnchorNodeId(null);
+        setSegmentNodeB("");
+        return;
+      }
+
+      setSegmentNodeA(modeAnchorNodeId);
+      setSegmentNodeB(nodeId);
+      setModeAnchorNodeId(null);
+      return;
+    }
+
+    if (interactionMode === "route") {
+      setActiveScreen("analysis");
+      setActiveSubScreen("segment");
+      if (routePreviewStartNodeId.length === 0 || routePreviewEndNodeId.length > 0) {
+        setRoutePreviewStartNodeId(nodeId);
+        setRoutePreviewEndNodeId("");
+      } else {
+        setRoutePreviewEndNodeId(nodeId);
+      }
+      return;
+    }
+
+    if (interactionMode === "connect") {
+      setActiveScreen("modeling");
+      setActiveSubScreen("wire");
+      setWireFormMode("create");
+      setEditingWireId(null);
+
+      if (modeAnchorNodeId === null) {
+        if (!applyNodeToWireEndpoint("A", node)) {
+          return;
+        }
+
+        setWireFormError(null);
+        setModeAnchorNodeId(nodeId);
+        return;
+      }
+
+      if (modeAnchorNodeId === nodeId) {
+        setWireFormError("Connect mode expects two distinct endpoint nodes.");
+        return;
+      }
+
+      if (!applyNodeToWireEndpoint("B", node)) {
+        return;
+      }
+
+      setModeAnchorNodeId(null);
+      setWireFormError(null);
+      return;
+    }
+  }
+
+  function handleNetworkCanvasClick(event: ReactMouseEvent<SVGSVGElement>): void {
+    if (interactionMode !== "addNode") {
+      return;
+    }
+
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
+    const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
+    if (coordinates === null) {
+      return;
+    }
+
+    setActiveScreen("modeling");
+    setActiveSubScreen("node");
+    setNodeFormMode("create");
+    setEditingNodeId(null);
+    setNodeKind("intermediate");
+    setNodeIdInput("");
+    setNodeConnectorId("");
+    setNodeSpliceId("");
+    setNodeLabel(`N-branch-${nodes.length + 1}`);
+    setNodeFormError(null);
+    setPendingNewNodePosition(coordinates);
   }
 
   function getSvgCoordinates(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
@@ -1330,6 +1472,25 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
   }
 
+  const interactionModeHint =
+    interactionMode === "select"
+      ? "Select mode: node drag-and-drop and network selection are active."
+      : interactionMode === "addNode"
+        ? pendingNewNodePosition === null
+          ? "Add Node mode: click on empty canvas area to prepare an intermediate node placement."
+          : `Add Node mode: placement captured at x=${Math.round(pendingNewNodePosition.x)}, y=${Math.round(
+              pendingNewNodePosition.y
+            )}. Complete Node ID then create.`
+        : interactionMode === "addSegment"
+          ? modeAnchorNodeId === null
+            ? "Add Segment mode: click first node, then second node to prefill segment endpoints."
+            : `Add Segment mode: first node '${modeAnchorNodeId}' selected. Click second node.`
+          : interactionMode === "connect"
+            ? modeAnchorNodeId === null
+              ? "Connect mode: click first connector/splice node to set wire endpoint A."
+              : `Connect mode: endpoint A captured on '${modeAnchorNodeId}'. Click second connector/splice node.`
+            : "Route mode: click start node then end node to fill route preview.";
+
   const networkSummaryPanel = (
     <section className="panel">
       <h2>Network summary</h2>
@@ -1352,11 +1513,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           </button>
         ))}
       </div>
-      <p className="meta-line">
-        {interactionMode === "select"
-          ? "Select mode: node drag-and-drop and network selection are active."
-          : "Other modes are prepared in this wave and will get dedicated canvas gestures next."}
-      </p>
+      <p className="meta-line">{interactionModeHint}</p>
       <div className="summary-grid">
         <article>
           <h3>Graph nodes</h3>
@@ -1382,6 +1539,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
             role="img"
             aria-label="2D network diagram"
             viewBox={`0 0 ${NETWORK_VIEW_WIDTH} ${NETWORK_VIEW_HEIGHT}`}
+            onClick={handleNetworkCanvasClick}
             onMouseMove={handleNetworkMouseMove}
             onMouseUp={stopNetworkNodeDrag}
             onMouseLeave={stopNetworkNodeDrag}
@@ -1416,7 +1574,10 @@ export function App({ store = appStore }: AppProps): ReactElement {
                     y1={nodeAPosition.y}
                     x2={nodeBPosition.x}
                     y2={nodeBPosition.y}
-                    onClick={() => handleNetworkSegmentClick(segment.id)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleNetworkSegmentClick(segment.id);
+                    }}
                   />
                   <text className="network-segment-label" x={labelX} y={labelY - 6} textAnchor="middle">
                     {segment.id}
@@ -1447,7 +1608,10 @@ export function App({ store = appStore }: AppProps): ReactElement {
                   key={node.id}
                   className={nodeClassName}
                   onMouseDown={(event) => handleNetworkNodeMouseDown(event, node.id)}
-                  onClick={() => handleNetworkNodeClick(node.id)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleNetworkNodeClick(node.id);
+                  }}
                 >
                   <title>{describeNode(node)}</title>
                   <circle cx={position.x} cy={position.y} r={17} />
@@ -1734,6 +1898,11 @@ export function App({ store = appStore }: AppProps): ReactElement {
               />
             </label>
             {nodeFormMode === "edit" ? <small className="inline-help">Node ID is immutable in edit mode.</small> : null}
+            {nodeFormMode === "create" && pendingNewNodePosition !== null ? (
+              <small className="inline-help">
+                Canvas placement captured at x={Math.round(pendingNewNodePosition.x)}, y={Math.round(pendingNewNodePosition.y)}.
+              </small>
+            ) : null}
 
             <label>
               Node kind

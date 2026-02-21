@@ -82,7 +82,16 @@ function getPanelByHeading(name: string): HTMLElement {
 }
 
 function switchScreen(target: "modeling" | "analysis"): void {
-  fireEvent.click(screen.getByRole("button", { name: target === "modeling" ? "Modeling" : "Analysis" }));
+  const primaryNavRow = document.querySelector(".workspace-nav-row");
+  if (primaryNavRow === null) {
+    throw new Error("Primary workspace navigation row was not found.");
+  }
+
+  fireEvent.click(
+    within(primaryNavRow as HTMLElement).getByRole("button", {
+      name: target === "modeling" ? /^Modeling$/ : /^Analysis$/
+    })
+  );
 }
 
 function switchSubScreen(target: "connector" | "splice" | "node" | "segment" | "wire"): void {
@@ -93,7 +102,16 @@ function switchSubScreen(target: "connector" | "splice" | "node" | "segment" | "
     segment: "Segment",
     wire: "Wire"
   } as const;
-  fireEvent.click(screen.getByRole("button", { name: labelBySubScreen[target] }));
+  const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+  if (secondaryNavRow === null) {
+    throw new Error("Secondary workspace navigation row was not found.");
+  }
+
+  fireEvent.click(
+    within(secondaryNavRow as HTMLElement).getByRole("button", {
+      name: new RegExp(`^${labelBySubScreen[target]}$`)
+    })
+  );
 }
 
 describe("App integration UI", () => {
