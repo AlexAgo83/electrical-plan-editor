@@ -293,6 +293,28 @@ button {
   background: rgba(26, 44, 63, 0.86);
 }
 
+.app-shell.theme-dark .network-scope-indicator {
+  border-color: #365069;
+  background: #1a2c3f;
+}
+
+.app-shell.theme-dark .network-scope-indicator h2 {
+  color: #b7c9dc;
+}
+
+.app-shell.theme-dark .network-scope-indicator p {
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .network-scope-list-shell {
+  border-color: #365069;
+}
+
+.app-shell.theme-dark .network-scope-active-chip {
+  background: #2c5844;
+  color: #d7f6e3;
+}
+
 .app-shell.theme-dark .workspace-tab,
 .app-shell.theme-dark .filter-chip,
 .app-shell.theme-dark .row-actions button,

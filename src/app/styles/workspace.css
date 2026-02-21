@@ -247,6 +247,75 @@
   border-radius: 0.6rem;
 }
 
+.network-scope-indicators {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+@media (min-width: 1040px) {
+  .network-scope-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.network-scope-indicator {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  border: 1px solid #cbdae6;
+  border-radius: 999px;
+  background: #fff;
+  padding: 0.25rem 0.6rem;
+}
+
+.network-scope-indicator h2 {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #3f596d;
+}
+
+.network-scope-indicator p {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.network-scope-list-shell {
+  max-height: 260px;
+  overflow: auto;
+  margin-bottom: 0.65rem;
+  border: 1px solid #d5e1ea;
+  border-radius: 0.65rem;
+  padding: 0.35rem 0.5rem;
+}
+
+.network-scope-list td {
+  vertical-align: middle;
+}
+
+.network-scope-list .is-focusable-row {
+  cursor: pointer;
+}
+
+.network-scope-list .is-focusable-row:focus-visible {
+  outline: 2px solid #0f6cb8;
+  outline-offset: -2px;
+}
+
+.network-scope-active-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: #e6f2e8;
+  color: #1d5b2f;
+}
+
 .workspace-sidebar .workspace-nav-row.secondary {
   padding-top: 0.45rem;
 }

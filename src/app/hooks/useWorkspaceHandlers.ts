@@ -154,11 +154,17 @@ export function useWorkspaceHandlers({
     dispatchAction(appActions.selectNetwork(nextNetworkId), { trackHistory: false });
   }
 
-  function handleUpdateActiveNetwork(event: FormEvent<HTMLFormElement>): void {
+  function handleUpdateActiveNetwork(event: FormEvent<HTMLFormElement>, targetNetworkId: NetworkId | null): void {
     event.preventDefault();
 
-    if (activeNetwork === null) {
-      setNetworkFormError("No active network selected.");
+    if (targetNetworkId === null) {
+      setNetworkFormError("No network selected for editing.");
+      return;
+    }
+
+    const targetNetwork = store.getState().networks.byId[targetNetworkId];
+    if (targetNetwork === undefined) {
+      setNetworkFormError("Selected network no longer exists.");
       return;
     }
 
@@ -169,14 +175,14 @@ export function useWorkspaceHandlers({
       return;
     }
 
-    if (selectNetworkTechnicalIdTaken(store.getState(), trimmedTechnicalId, activeNetwork.id)) {
+    if (selectNetworkTechnicalIdTaken(store.getState(), trimmedTechnicalId, targetNetworkId)) {
       setNetworkFormError(`Network technical ID '${trimmedTechnicalId}' is already used.`);
       return;
     }
 
     dispatchAction(
       appActions.updateNetwork(
-        activeNetwork.id,
+        targetNetworkId,
         trimmedName,
         trimmedTechnicalId,
         new Date().toISOString(),

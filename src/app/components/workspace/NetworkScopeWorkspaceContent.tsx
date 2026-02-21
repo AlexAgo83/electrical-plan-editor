@@ -1,4 +1,4 @@
-import type { FormEvent, ReactElement } from "react";
+import { useEffect, useState, type FormEvent, type ReactElement } from "react";
 import type { NetworkId } from "../../../core/entities";
 
 interface NetworkScopeWorkspaceContentProps {
@@ -16,7 +16,7 @@ interface NetworkScopeWorkspaceContentProps {
   handleDeleteActiveNetwork: () => void;
   networkFormMode: "create" | "edit" | null;
   handleOpenCreateNetworkForm: () => void;
-  handleOpenEditNetworkForm: () => void;
+  handleOpenEditNetworkForm: (networkId: NetworkId) => void;
   handleCloseNetworkForm: () => void;
   newNetworkName: string;
   setNewNetworkName: (value: string) => void;
@@ -59,30 +59,38 @@ export function NetworkScopeWorkspaceContent({
   const isCreateMode = networkFormMode === "create";
   const isEditMode = networkFormMode === "edit";
   const isFormOpen = isCreateMode || isEditMode;
+  const [focusedNetworkId, setFocusedNetworkId] = useState<NetworkId | null>(activeNetworkId);
+
+  useEffect(() => {
+    if (networks.length === 0) {
+      setFocusedNetworkId(null);
+      return;
+    }
+
+    const hasFocusedNetwork = focusedNetworkId !== null && networks.some((network) => network.id === focusedNetworkId);
+    if (hasFocusedNetwork) {
+      return;
+    }
+
+    setFocusedNetworkId(activeNetworkId ?? networks[0]?.id ?? null);
+  }, [activeNetworkId, focusedNetworkId, networks]);
+  const indicators = [
+    { label: "Connectors", value: connectorCount },
+    { label: "Splices", value: spliceCount },
+    { label: "Nodes", value: nodeCount },
+    { label: "Segments", value: segmentCount },
+    { label: "Wires", value: wireCount }
+  ];
 
   return (
-    <section className="panel-grid">
-      <section className="stats-grid" aria-label="Entity counters">
-        <article>
-          <h2>Connectors</h2>
-          <p>{connectorCount}</p>
-        </article>
-        <article>
-          <h2>Splices</h2>
-          <p>{spliceCount}</p>
-        </article>
-        <article>
-          <h2>Nodes</h2>
-          <p>{nodeCount}</p>
-        </article>
-        <article>
-          <h2>Segments</h2>
-          <p>{segmentCount}</p>
-        </article>
-        <article>
-          <h2>Wires</h2>
-          <p>{wireCount}</p>
-        </article>
+    <section className="panel-grid network-scope-grid">
+      <section className="network-scope-indicators" aria-label="Entity counters">
+        {indicators.map((indicator) => (
+          <article key={indicator.label} className="network-scope-indicator">
+            <h2>{indicator.label}</h2>
+            <p>{indicator.value}</p>
+          </article>
+        ))}
       </section>
 
       <section className="panel">
@@ -96,16 +104,42 @@ export function NetworkScopeWorkspaceContent({
         {networks.length === 0 ? (
           <p className="empty-copy">No network available. Create one to enable modeling and analysis.</p>
         ) : (
-          <label>
-            Active network
-            <select value={activeNetworkId ?? ""} onChange={(event) => handleSelectNetwork(event.target.value as NetworkId)}>
-              {networks.map((network) => (
-                <option key={network.id} value={network.id}>
-                  {network.name} ({network.technicalId})
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="network-scope-list-shell">
+            <table className="data-table network-scope-list" aria-label="Networks list">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Technical ID</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {networks.map((network) => {
+                  const isActive = activeNetworkId === network.id;
+                  const isFocused = focusedNetworkId === network.id;
+                  return (
+                    <tr
+                      key={network.id}
+                      className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
+                      aria-selected={isFocused}
+                      tabIndex={0}
+                      onClick={() => setFocusedNetworkId(network.id)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          setFocusedNetworkId(network.id);
+                        }
+                      }}
+                    >
+                      <td>{network.name}</td>
+                      <td><span className="technical-id">{network.technicalId}</span></td>
+                      <td>{isActive ? <span className="network-scope-active-chip">Active</span> : "Available"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
         <div className="row-actions compact">
           <button type="button" onClick={handleDuplicateActiveNetwork} disabled={!hasActiveNetwork}>
@@ -117,7 +151,26 @@ export function NetworkScopeWorkspaceContent({
           <button type="button" onClick={handleOpenCreateNetworkForm}>
             Create
           </button>
-          <button type="button" onClick={handleOpenEditNetworkForm} disabled={!hasActiveNetwork}>
+          <button
+            type="button"
+            onClick={() => {
+              if (focusedNetworkId !== null) {
+                handleSelectNetwork(focusedNetworkId);
+              }
+            }}
+            disabled={focusedNetworkId === null || focusedNetworkId === activeNetworkId}
+          >
+            Set active
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (focusedNetworkId !== null) {
+                handleOpenEditNetworkForm(focusedNetworkId);
+              }
+            }}
+            disabled={focusedNetworkId === null}
+          >
             Edit
           </button>
         </div>
@@ -162,7 +215,7 @@ export function NetworkScopeWorkspaceContent({
           </form>
         )}
         {isEditMode ? (
-          <p className="meta-line">Edit mode targets the current active network selected on the left panel.</p>
+          <p className="meta-line">Edit mode targets the network currently selected in the list.</p>
         ) : null}
       </section>
 

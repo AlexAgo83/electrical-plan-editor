@@ -18,9 +18,9 @@ interface UseWorkspaceNavigationResult {
 }
 
 export function useWorkspaceNavigation(selected: SelectionState | null): UseWorkspaceNavigationResult {
-  const [activeScreen, setActiveScreen] = useState<ScreenId>("modeling");
+  const [activeScreen, setActiveScreen] = useState<ScreenId>("networkScope");
   const [activeSubScreen, setActiveSubScreen] = useState<SubScreenId>("connector");
-  const activeScreenRef = useRef<ScreenId>("modeling");
+  const activeScreenRef = useRef<ScreenId>("networkScope");
   const lastInspectorSelectionRef = useRef<string | null>(null);
 
   const isNetworkScopeScreen = activeScreen === "networkScope";

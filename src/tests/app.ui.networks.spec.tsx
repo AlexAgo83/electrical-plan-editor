@@ -1,4 +1,4 @@
-import { fireEvent, within } from "@testing-library/react";
+import { fireEvent, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { ConnectorId, NetworkId } from "../core/entities";
 import { appActions, appReducer, createInitialState } from "../store";
@@ -47,15 +47,18 @@ describe("App integration UI - networks", () => {
     const seeded = appReducer(withSecondConnector, appActions.selectNetwork(defaultNetworkId));
 
     renderAppWithState(seeded);
+    switchScreen("modeling");
 
     let connectorsPanel = getPanelByHeading("Connectors");
     expect(within(connectorsPanel).getByText("Default connector")).toBeInTheDocument();
     expect(within(connectorsPanel).queryByText("Connector B")).not.toBeInTheDocument();
 
     switchScreen("networkScope");
-    fireEvent.change(within(document.body).getByLabelText("Active network"), {
-      target: { value: "net-b" }
-    });
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    const networkRow = within(networkScopePanel).getByText("Network B").closest("tr");
+    expect(networkRow).not.toBeNull();
+    fireEvent.click(networkRow as HTMLElement);
+    fireEvent.click(within(networkScopePanel).getByRole("button", { name: "Set active" }));
 
     switchScreen("modeling");
     connectorsPanel = getPanelByHeading("Connectors");
@@ -74,11 +77,16 @@ describe("App integration UI - networks", () => {
     expect(within(document.body).getByRole("button", { name: "Create" })).toBeInTheDocument();
   });
 
-  it("edits the active network through the shared create/edit form", () => {
-    renderAppWithState(createInitialState());
+  it("edits the selected network through the shared create/edit form", async () => {
+    const { store } = renderAppWithState(createInitialState());
     switchScreen("networkScope");
 
-    fireEvent.click(within(document.body).getByRole("button", { name: "Edit" }));
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    const mainNetworkRow = within(networkScopePanel).getByText("Main network").closest("tr");
+    expect(mainNetworkRow).not.toBeNull();
+    fireEvent.click(mainNetworkRow as HTMLElement);
+    fireEvent.click(within(networkScopePanel).getByRole("button", { name: "Edit" }));
+
     const formPanel = getPanelByHeading("Edit network");
 
     expect(within(formPanel).getByLabelText("Network name")).toHaveValue("Main network");
@@ -90,9 +98,15 @@ describe("App integration UI - networks", () => {
     fireEvent.change(within(formPanel).getByLabelText("Network technical ID"), {
       target: { value: "NET-MAIN-UPD" }
     });
+    expect(within(formPanel).getByLabelText("Network name")).toHaveValue("Main network updated");
+    expect(within(formPanel).getByLabelText("Network technical ID")).toHaveValue("NET-MAIN-UPD");
     fireEvent.click(within(formPanel).getByRole("button", { name: "Save network" }));
 
-    const networkScopePanel = getPanelByHeading("Network Scope");
-    expect(within(networkScopePanel).getByText(/Active network:/).textContent).toContain("Main network updated (NET-MAIN-UPD)");
+    await waitFor(() => {
+      const updatedNetwork = store.getState().networks.byId[store.getState().activeNetworkId as NetworkId];
+      expect(updatedNetwork?.name).toBe("Main network updated");
+      expect(updatedNetwork?.technicalId).toBe("NET-MAIN-UPD");
+      expect(within(networkScopePanel).getByText("Main network updated")).toBeInTheDocument();
+    });
   });
 });

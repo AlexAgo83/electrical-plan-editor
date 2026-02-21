@@ -177,7 +177,11 @@ export function switchSubScreen(target: "connector" | "splice" | "node" | "segme
     segment: "Segment",
     wire: "Wire"
   } as const;
-  const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+  let secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+  if (secondaryNavRow === null) {
+    switchScreen("modeling");
+    secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+  }
   if (secondaryNavRow === null) {
     throw new Error("Secondary workspace navigation row was not found.");
   }

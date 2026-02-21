@@ -16,9 +16,9 @@ describe("App integration UI - import/export", () => {
   });
 
   it("keeps active context stable when import file is invalid", async () => {
-    renderAppWithState(createUiIntegrationState());
+    const { store } = renderAppWithState(createUiIntegrationState());
     switchScreen("settings");
-    const initialNetworkLabel = within(document.body).getByText(/Active network:/).textContent;
+    const initialActiveNetworkId = store.getState().activeNetworkId;
 
     const panel = getPanelByHeading("Import / Export networks");
     const fileInput = panel.querySelector('input[type="file"]');
@@ -34,6 +34,6 @@ describe("App integration UI - import/export", () => {
         within(panel).queryByText("Invalid JSON file.") ?? within(panel).getByText("Unable to read selected file.")
       ).toBeInTheDocument();
     });
-    expect(within(document.body).getByText(/Active network:/).textContent).toBe(initialNetworkLabel);
+    expect(store.getState().activeNetworkId).toBe(initialActiveNetworkId);
   });
 });

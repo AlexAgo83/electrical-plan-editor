@@ -25,6 +25,7 @@ describe("App integration UI - inspector floating shell", () => {
 
   it("keeps inspector collapsed when no entity is selected", () => {
     renderAppWithState(createUiIntegrationState());
+    switchScreen("modeling");
 
     const inspectorShell = screen.getByLabelText("Inspector context panel");
     expect(inspectorShell).toHaveClass("is-collapsed");
@@ -33,6 +34,7 @@ describe("App integration UI - inspector floating shell", () => {
 
   it("opens inspector on modeling/analysis/validation when a selection exists", () => {
     renderAppWithState(createUiIntegrationState());
+    switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));
@@ -68,6 +70,7 @@ describe("App integration UI - inspector floating shell", () => {
 
   it("collapses on narrow viewport and supports explicit expand/collapse", () => {
     renderAppWithState(createUiIntegrationState());
+    switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));
@@ -86,6 +89,7 @@ describe("App integration UI - inspector floating shell", () => {
 
   it("hides inspector while drawer or operations panel overlays are open", () => {
     renderAppWithState(createUiIntegrationState());
+    switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));

@@ -11,6 +11,7 @@ import {
 } from "react";
 import type {
   ConnectorId,
+  NetworkId,
   NetworkNode,
   NodeId,
   SegmentId,
@@ -284,6 +285,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [newNetworkDescription, setNewNetworkDescription] = useState("");
   const [networkFormError, setNetworkFormError] = useState<string | null>(null);
   const [networkFormMode, setNetworkFormMode] = useState<"create" | "edit" | null>(null);
+  const [networkFormTargetId, setNetworkFormTargetId] = useState<NetworkId | null>(null);
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
   const [tableDensity, setTableDensity] = useState<TableDensity>("comfortable");
   const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
@@ -384,7 +386,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     selectNetworkTechnicalIdTaken(
       state,
       newNetworkTechnicalId.trim(),
-      networkFormMode === "edit" ? activeNetwork?.id ?? undefined : undefined
+      networkFormMode === "edit" ? networkFormTargetId ?? undefined : undefined
     );
 
   const totalEdgeEntries = routingGraph.nodeIds.reduce(
@@ -510,15 +512,22 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       return;
     }
 
-    if (activeNetwork === null) {
+    if (networkFormTargetId === null) {
       setNetworkFormMode(null);
       return;
     }
 
-    setNewNetworkName(activeNetwork.name);
-    setNewNetworkTechnicalId(activeNetwork.technicalId);
-    setNewNetworkDescription(activeNetwork.description ?? "");
-  }, [activeNetwork, networkFormMode]);
+    const targetNetwork = state.networks.byId[networkFormTargetId];
+    if (targetNetwork === undefined) {
+      setNetworkFormMode(null);
+      setNetworkFormTargetId(null);
+      return;
+    }
+
+    setNewNetworkName(targetNetwork.name);
+    setNewNetworkTechnicalId(targetNetwork.technicalId);
+    setNewNetworkDescription(targetNetwork.description ?? "");
+  }, [networkFormMode, networkFormTargetId, state]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -850,39 +859,43 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const handleOpenCreateNetworkForm = useCallback(() => {
     setNetworkFormMode("create");
+    setNetworkFormTargetId(null);
     setNewNetworkName("");
     setNewNetworkTechnicalId("");
     setNewNetworkDescription("");
     setNetworkFormError(null);
   }, []);
 
-  const handleOpenEditNetworkForm = useCallback(() => {
-    if (activeNetwork === null) {
+  const handleOpenEditNetworkForm = useCallback((networkId: NetworkId) => {
+    const targetNetwork = networks.find((network) => network.id === networkId);
+    if (targetNetwork === undefined) {
       return;
     }
 
     setNetworkFormMode("edit");
-    setNewNetworkName(activeNetwork.name);
-    setNewNetworkTechnicalId(activeNetwork.technicalId);
-    setNewNetworkDescription(activeNetwork.description ?? "");
+    setNetworkFormTargetId(targetNetwork.id);
+    setNewNetworkName(targetNetwork.name);
+    setNewNetworkTechnicalId(targetNetwork.technicalId);
+    setNewNetworkDescription(targetNetwork.description ?? "");
     setNetworkFormError(null);
-  }, [activeNetwork]);
+  }, [networks]);
 
   const handleCloseNetworkForm = useCallback(() => {
     setNetworkFormMode(null);
+    setNetworkFormTargetId(null);
     setNetworkFormError(null);
   }, []);
 
   const handleSubmitNetworkForm = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
       if (networkFormMode === "edit") {
-        handleUpdateActiveNetwork(event);
+        handleUpdateActiveNetwork(event, networkFormTargetId);
         return;
       }
 
       handleCreateNetwork(event);
     },
-    [handleCreateNetwork, handleUpdateActiveNetwork, networkFormMode]
+    [handleCreateNetwork, handleUpdateActiveNetwork, networkFormMode, networkFormTargetId]
   );
 
   const closeNavigationDrawer = useCallback(() => {
@@ -1569,7 +1582,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     <main className={appShellClassName}>
       <AppHeaderAndStats
         headerBlockRef={headerBlockRef}
-        activeNetworkLabel={activeNetworkLabel}
         isNavigationDrawerOpen={isNavigationDrawerOpen}
         onToggleNavigationDrawer={handleToggleNavigationDrawer}
         navigationToggleButtonRef={navigationToggleButtonRef}

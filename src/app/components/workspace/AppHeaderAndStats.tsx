@@ -1,7 +1,6 @@
 import type { ReactElement, RefObject } from "react";
 interface AppHeaderAndStatsProps {
   headerBlockRef: RefObject<HTMLElement | null>;
-  activeNetworkLabel: string;
   isNavigationDrawerOpen: boolean;
   onToggleNavigationDrawer: () => void;
   navigationToggleButtonRef: RefObject<HTMLButtonElement | null>;
@@ -22,7 +21,6 @@ interface AppHeaderAndStatsProps {
 
 export function AppHeaderAndStats({
   headerBlockRef,
-  activeNetworkLabel,
   isNavigationDrawerOpen,
   onToggleNavigationDrawer,
   navigationToggleButtonRef,
@@ -54,9 +52,6 @@ export function AppHeaderAndStats({
           {isNavigationDrawerOpen ? "Close menu" : "Open menu"}
         </button>
         <h1>Electrical Plan Editor</h1>
-        <p className="meta-line">
-          Active network: <strong>{activeNetworkLabel}</strong>
-        </p>
         <div className="header-actions">
           {isInstallPromptAvailable ? (
             <button type="button" className="header-install-toggle" onClick={onInstallApp}>

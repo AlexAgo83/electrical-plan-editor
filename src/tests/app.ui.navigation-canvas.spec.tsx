@@ -45,6 +45,7 @@ describe("App integration UI - navigation and canvas", () => {
 
   it("supports undo and redo for modeling actions", () => {
     renderAppWithState(createInitialState());
+    switchScreen("modeling");
 
     const connectorFormPanel = getPanelByHeading("Create Connector");
     fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
@@ -71,6 +72,7 @@ describe("App integration UI - navigation and canvas", () => {
 
   it("reflects connector cavity occupancy in real time", () => {
     renderAppWithState(createUiIntegrationState());
+    switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));
@@ -138,6 +140,7 @@ describe("App integration UI - navigation and canvas", () => {
 
   it("synchronizes inspector context and allows editing selected connector", () => {
     renderAppWithState(createUiIntegrationState());
+    switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));
@@ -153,6 +156,7 @@ describe("App integration UI - navigation and canvas", () => {
 
   it("navigates from validation issue to modeling context and returns canvas to select mode", () => {
     renderAppWithState(createValidationIssueState());
+    switchScreen("analysis");
 
     const networkPanel = getPanelByHeading("Network summary");
     fireEvent.click(within(networkPanel).getByRole("button", { name: /^Route$/ }));
