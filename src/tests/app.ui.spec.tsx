@@ -332,6 +332,10 @@ describe("App integration UI", () => {
     fireEvent.click(within(validationPanel).getByRole("button", { name: "Occupancy conflict" }));
     expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
     expect(within(validationPanel).queryByRole("heading", { name: "Route lock validity" })).not.toBeInTheDocument();
+
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
+    expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
+    expect(within(validationPanel).queryByText("ERROR")).not.toBeInTheDocument();
   });
 
   it("applies settings defaults for list sort behavior", () => {
@@ -454,6 +458,11 @@ describe("App integration UI", () => {
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Segment$/ })).toHaveClass("is-active");
 
     const networkPanel = getPanelByHeading("Network summary");
+    const currentZoomLine = () => within(networkPanel).getByText(/View: \d+% zoom\./).textContent ?? "";
+    expect(currentZoomLine()).toContain("View: 100% zoom.");
+    fireEvent.keyDown(window, { key: "f", altKey: true });
+    expect(currentZoomLine()).not.toContain("View: 100% zoom.");
+
     fireEvent.keyDown(window, { key: "r", altKey: true });
     expect(within(networkPanel).getByRole("button", { name: /^Route$/ })).toHaveClass("is-active");
     fireEvent.keyDown(window, { key: "v", altKey: true });
@@ -466,7 +475,7 @@ describe("App integration UI", () => {
 
     switchScreen("settings");
     const settingsPanel = getPanelByHeading("Action bar and shortcuts");
-    fireEvent.click(within(settingsPanel).getByLabelText("Enable keyboard shortcuts (undo/redo)"));
+    fireEvent.click(within(settingsPanel).getByLabelText("Enable keyboard shortcuts (undo/redo/navigation/modes)"));
 
     fireEvent.keyDown(window, { key: "2", altKey: true });
     const primaryNavRow = document.querySelector(".workspace-nav-row");

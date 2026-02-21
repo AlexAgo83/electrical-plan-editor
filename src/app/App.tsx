@@ -323,6 +323,7 @@ type InteractionMode = "select" | "addNode" | "addSegment" | "connect" | "route"
 type TableDensity = "comfortable" | "compact";
 type OccupancyFilter = "all" | "occupied" | "free";
 type SegmentSubNetworkFilter = "all" | "default" | "tagged";
+type ValidationSeverityFilter = "all" | "error" | "warning";
 
 interface ValidationIssue {
   id: string;
@@ -441,6 +442,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [segmentSubNetworkFilter, setSegmentSubNetworkFilter] = useState<SegmentSubNetworkFilter>("all");
   const [wireRouteFilter, setWireRouteFilter] = useState<"all" | "auto" | "locked">("all");
   const [validationCategoryFilter, setValidationCategoryFilter] = useState<string>("all");
+  const [validationSeverityFilter, setValidationSeverityFilter] = useState<ValidationSeverityFilter>("all");
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [nodeIdSortDirection, setNodeIdSortDirection] = useState<SortDirection>("asc");
@@ -484,6 +486,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const lastInspectorSelectionRef = useRef<string | null>(null);
   const undoActionRef = useRef<() => void>(() => {});
   const redoActionRef = useRef<() => void>(() => {});
+  const fitNetworkToContentRef = useRef<() => void>(() => {});
   const activeScreenRef = useRef<ScreenId>("modeling");
 
   const selected = selectSelection(state);
@@ -1365,10 +1368,18 @@ export function App({ store = appStore }: AppProps): ReactElement {
   );
   const visibleValidationIssues = useMemo(
     () =>
-      validationCategoryFilter === "all"
-        ? validationIssues
-        : validationIssues.filter((issue) => issue.category === validationCategoryFilter),
-    [validationCategoryFilter, validationIssues]
+      validationIssues.filter((issue) => {
+        if (validationCategoryFilter !== "all" && issue.category !== validationCategoryFilter) {
+          return false;
+        }
+
+        if (validationSeverityFilter !== "all" && issue.severity !== validationSeverityFilter) {
+          return false;
+        }
+
+        return true;
+      }),
+    [validationCategoryFilter, validationIssues, validationSeverityFilter]
   );
   const groupedValidationIssues = useMemo(() => {
     const grouped = new Map<string, ValidationIssue[]>();
@@ -1515,6 +1526,62 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setNetworkOffset({ x: 0, y: 0 });
   }
 
+  function fitNetworkToContent(): void {
+    if (nodes.length === 0) {
+      return;
+    }
+
+    const positions = nodes
+      .map((node) => networkNodePositions[node.id])
+      .filter((position): position is NodePosition => position !== undefined);
+    if (positions.length === 0) {
+      return;
+    }
+
+    const firstPosition = positions[0];
+    if (firstPosition === undefined) {
+      return;
+    }
+
+    let minX = firstPosition.x;
+    let maxX = firstPosition.x;
+    let minY = firstPosition.y;
+    let maxY = firstPosition.y;
+    for (const position of positions.slice(1)) {
+      if (position.x < minX) {
+        minX = position.x;
+      }
+      if (position.x > maxX) {
+        maxX = position.x;
+      }
+      if (position.y < minY) {
+        minY = position.y;
+      }
+      if (position.y > maxY) {
+        maxY = position.y;
+      }
+    }
+
+    const fitPadding = 36;
+    const contentWidth = Math.max(1, maxX - minX);
+    const contentHeight = Math.max(1, maxY - minY);
+    const availableWidth = Math.max(1, NETWORK_VIEW_WIDTH - fitPadding * 2);
+    const availableHeight = Math.max(1, NETWORK_VIEW_HEIGHT - fitPadding * 2);
+    const fittedScale = clamp(
+      Math.min(availableWidth / contentWidth, availableHeight / contentHeight),
+      NETWORK_MIN_SCALE,
+      NETWORK_MAX_SCALE
+    );
+
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    setNetworkScale(fittedScale);
+    setNetworkOffset({
+      x: NETWORK_VIEW_WIDTH / 2 - centerX * fittedScale,
+      y: NETWORK_VIEW_HEIGHT / 2 - centerY * fittedScale
+    });
+  }
+
   function applyListSortDefaults(): void {
     setConnectorSort({ field: defaultSortField, direction: defaultSortDirection });
     setSpliceSort({ field: defaultSortField, direction: defaultSortDirection });
@@ -1558,6 +1625,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   useEffect(() => {
     undoActionRef.current = handleUndo;
     redoActionRef.current = handleRedo;
+    fitNetworkToContentRef.current = fitNetworkToContent;
   });
 
   useEffect(() => {
@@ -1624,6 +1692,14 @@ export function App({ store = appStore }: AppProps): ReactElement {
           setActiveScreen(targetScreen);
           return;
         }
+      }
+
+      if (normalizedKey === "f") {
+        if (activeScreenRef.current === "modeling" || activeScreenRef.current === "analysis") {
+          event.preventDefault();
+          fitNetworkToContentRef.current();
+        }
+        return;
       }
 
       const modeByKey: Record<string, InteractionMode | undefined> = {
@@ -2752,6 +2828,9 @@ export function App({ store = appStore }: AppProps): ReactElement {
         <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
           Reset view
         </button>
+        <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
+          Fit network
+        </button>
         <button
           type="button"
           className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}
@@ -3103,7 +3182,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
               {showShortcutHints ? (
                 <>
                   <p className="shortcut-hints">Shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo.</p>
-                  <p className="shortcut-hints">Nav: Alt+1..4 screens, Alt+Shift+1..5 entity tabs, Alt+V/N/G/C/R modes.</p>
+                  <p className="shortcut-hints">Nav: Alt+1..4 screens, Alt+Shift+1..5 entity tabs, Alt+V/N/G/C/R modes, Alt+F fit canvas.</p>
                 </>
               ) : null}
             </div>
@@ -4273,7 +4352,23 @@ export function App({ store = appStore }: AppProps): ReactElement {
           <section className="panel">
             <h2>Validation center</h2>
             <div className="validation-toolbar">
-              <span>Category filter</span>
+              <span>Issue filters</span>
+              <div className="chip-group" role="group" aria-label="Validation severity filter">
+                {([
+                  ["all", "All severities"],
+                  ["error", "Errors"],
+                  ["warning", "Warnings"]
+                ] as const).map(([severity, label]) => (
+                  <button
+                    key={severity}
+                    type="button"
+                    className={validationSeverityFilter === severity ? "filter-chip is-active" : "filter-chip"}
+                    onClick={() => setValidationSeverityFilter(severity)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
               <div className="chip-group" role="group" aria-label="Validation category filter">
                 <button
                   type="button"
@@ -4355,7 +4450,9 @@ export function App({ store = appStore }: AppProps): ReactElement {
               </article>
             </div>
             <p className="meta-line validation-active-filter">
-              Active filter: {validationCategoryFilter === "all" ? "All categories" : validationCategoryFilter}
+              Active filters:{" "}
+              {validationSeverityFilter === "all" ? "All severities" : validationSeverityFilter === "error" ? "Errors" : "Warnings"} /{" "}
+              {validationCategoryFilter === "all" ? "All categories" : validationCategoryFilter}
             </p>
           </section>
         </section>
@@ -4467,7 +4564,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                   checked={keyboardShortcutsEnabled}
                   onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
                 />
-                Enable keyboard shortcuts (undo/redo)
+                Enable keyboard shortcuts (undo/redo/navigation/modes)
               </label>
             </div>
             <ul className="subnetwork-list">
@@ -4488,6 +4585,9 @@ export function App({ store = appStore }: AppProps): ReactElement {
               </li>
               <li>
                 <span className="technical-id">Alt + V/N/G/C/R</span> Set interaction mode
+              </li>
+              <li>
+                <span className="technical-id">Alt + F</span> Fit network view to current graph
               </li>
             </ul>
             <div className="row-actions">

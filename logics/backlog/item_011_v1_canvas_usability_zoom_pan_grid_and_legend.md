@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 97%
 > Confidence: 93%
-> Progress: 90%
+> Progress: 95%
 > Complexity: Medium
 > Theme: UX/UI Visualization
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -35,6 +35,7 @@ The 2D network representation is currently usable but lacks essential navigation
 - Related AC: AC2, AC7.
 - Status update:
   - Pan and zoom interactions are active on the network canvas (mouse wheel zoom, shift+drag pan, reset view).
+  - Fit-to-content action is available from toolbar and keyboard shortcut (`Alt+F`) to frame graph content.
   - Grid overlay and snap-to-grid toggles are available and applied to node placement/movement.
   - Persistent legend is visible and route/selection visual contrast is improved.
 - References:

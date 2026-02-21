@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 98%
 > Confidence: 94%
-> Progress: 95%
+> Progress: 98%
 > Complexity: High
 > Theme: UX/UI Validation Workflow
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -35,7 +35,7 @@ Validation feedback is currently distributed across local errors, making it hard
 - Related AC: AC6, AC7.
 - Status update:
   - Dedicated `Validation` workspace is implemented.
-  - Grouped issue list with severity, category filtering, and one-click `Go to` navigation is active.
+  - Grouped issue list with severity/category filtering and one-click `Go to` navigation is active.
   - `Go to` now restores modeling context and recenters canvas focus on the targeted entity.
   - Planned issue categories are covered: occupancy conflicts, route lock validity, missing references, incomplete required fields.
 - References:
