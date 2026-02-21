@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Onboarding Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -18,12 +18,12 @@ Backlog scope covered:
 - `item_044_sample_bootstrap_test_matrix_and_regression_coverage.md`
 
 # Plan
-- [ ] 1. Freeze sample fixture contract and schema alignment (`item_040`)
-- [ ] 2. Deliver Wave 1 safe startup bootstrap (`item_041`) and validate no-overwrite guarantees
-- [ ] 3. Deliver Wave 2 user controls (`item_042`) and validate reset/recreate isolation rules
-- [ ] 4. Deliver Wave 3 compatibility checks (`item_043`) across multi-network and import/export workflows
-- [ ] 5. Deliver Wave 4 coverage gate (`item_044`) with AC traceability and regression confidence
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Freeze sample fixture contract and schema alignment (`item_040`)
+- [x] 2. Deliver Wave 1 safe startup bootstrap (`item_041`) and validate no-overwrite guarantees
+- [x] 3. Deliver Wave 2 user controls (`item_042`) and validate reset/recreate isolation rules
+- [x] 4. Deliver Wave 3 compatibility checks (`item_043`) across multi-network and import/export workflows
+- [x] 5. Deliver Wave 4 coverage gate (`item_044`) with AC traceability and regression confidence
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -34,11 +34,11 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 1 planned: deterministic sample fixture and first-run bootstrap safeguards.
-  - Wave 2 planned: explicit sample reset/recreate user controls.
-  - Wave 3 planned: interoperability with multi-network and import/export flows.
-  - Wave 4 planned: automated regression and AC traceability closure.
-- Current blockers: none (initial planning state).
+  - Wave 1 completed: deterministic sample fixture and first-run bootstrap safeguards.
+  - Wave 2 completed: explicit sample reset/recreate user controls.
+  - Wave 3 completed: interoperability checks with multi-network and import/export flows.
+  - Wave 4 completed: automated regression coverage and AC traceability closure.
+- Current blockers: none.
 - Main risks to track:
   - Startup logic accidentally mutating existing persisted user data.
   - Sample fixture drifting from evolving schema/rules.
@@ -47,4 +47,3 @@ Backlog scope covered:
   - Enforce strict first-run guard clauses before bootstrap write paths.
   - Keep fixture versioned and validated against schema contracts.
   - Lock end-to-end regression coverage for startup + roundtrip flows.
-
