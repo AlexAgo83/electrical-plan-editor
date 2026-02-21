@@ -310,10 +310,6 @@ export function useWorkspaceHandlers({
     resetNetworkViewToConfiguredScale();
   }
 
-  function handleToggleThemeMode(): void {
-    setThemeMode((current) => (current === "normal" ? "dark" : "normal"));
-  }
-
   function resetWorkspacePreferencesToDefaults(): void {
     const defaultSort: SortState = { field: "name", direction: "asc" };
     setThemeMode("normal");
@@ -351,7 +347,6 @@ export function useWorkspaceHandlers({
     fitNetworkToContent,
     applyListSortDefaults,
     applyCanvasDefaultsNow,
-    handleToggleThemeMode,
     resetWorkspacePreferencesToDefaults
   };
 }

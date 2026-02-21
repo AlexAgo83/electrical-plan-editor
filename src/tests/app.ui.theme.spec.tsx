@@ -7,23 +7,31 @@ describe("App integration UI - theme mode", () => {
     localStorage.clear();
   });
 
-  it("toggles between normal and dark mode from persistent shell control", () => {
+  it("toggles between normal and dark mode from settings panel only", () => {
     renderAppWithState(createUiIntegrationState());
 
     const appShell = document.querySelector("main.app-shell");
     expect(appShell).not.toBeNull();
     expect(appShell).toHaveClass("theme-normal");
 
-    fireEvent.click(within(document.body).getByRole("button", { name: "Switch to dark mode" }));
+    switchScreen("settings");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
+    expect(settingsPanel).not.toBeNull();
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "dark" } });
     expect(appShell).toHaveClass("theme-dark");
 
-    fireEvent.click(within(document.body).getByRole("button", { name: "Switch to normal mode" }));
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "normal" } });
     expect(appShell).toHaveClass("theme-normal");
   });
 
   it("persists dark mode preference across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
-    fireEvent.click(within(document.body).getByRole("button", { name: "Switch to dark mode" }));
+    switchScreen("settings");
+    const firstSettingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
+    expect(firstSettingsPanel).not.toBeNull();
+    fireEvent.change(within(firstSettingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "dark" }
+    });
     firstRender.unmount();
 
     renderAppWithState(createUiIntegrationState());
@@ -43,7 +51,10 @@ describe("App integration UI - theme mode", () => {
     const { store } = renderAppWithState(state);
 
     const before = store.getState();
-    fireEvent.click(within(document.body).getByRole("button", { name: "Switch to dark mode" }));
+    switchScreen("settings");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Table and list preferences" }).closest(".panel");
+    expect(settingsPanel).not.toBeNull();
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "dark" } });
     const after = store.getState();
 
     expect(after.ui.themeMode).toBe("dark");

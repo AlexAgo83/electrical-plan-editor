@@ -704,7 +704,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     fitNetworkToContent,
     applyListSortDefaults,
     applyCanvasDefaultsNow,
-    handleToggleThemeMode,
     resetWorkspacePreferencesToDefaults
   } = useWorkspaceHandlers({
     store,
@@ -1165,8 +1164,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     <main className={appShellClassName}>
       <AppHeaderAndStats
         activeNetworkLabel={activeNetworkLabel}
-        themeMode={themeMode}
-        onToggleThemeMode={handleToggleThemeMode}
         lastError={lastError}
         onClearError={() => dispatchAction(appActions.clearError())}
         connectorCount={connectors.length}

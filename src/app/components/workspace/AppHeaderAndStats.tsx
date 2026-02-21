@@ -1,10 +1,6 @@
 import type { ReactElement } from "react";
-import type { ThemeMode } from "../../../store";
-
 interface AppHeaderAndStatsProps {
   activeNetworkLabel: string;
-  themeMode: ThemeMode;
-  onToggleThemeMode: () => void;
   lastError: string | null;
   onClearError: () => void;
   connectorCount: number;
@@ -16,8 +12,6 @@ interface AppHeaderAndStatsProps {
 
 export function AppHeaderAndStats({
   activeNetworkLabel,
-  themeMode,
-  onToggleThemeMode,
   lastError,
   onClearError,
   connectorCount,
@@ -33,12 +27,6 @@ export function AppHeaderAndStats({
         <p className="meta-line">
           Active network: <strong>{activeNetworkLabel}</strong>
         </p>
-        <div className="row-actions compact">
-          <button type="button" onClick={onToggleThemeMode}>
-            {themeMode === "dark" ? "Switch to normal mode" : "Switch to dark mode"}
-          </button>
-          <span className="meta-line">Theme: {themeMode === "dark" ? "Dark" : "Normal"}</span>
-        </div>
       </section>
 
       {lastError !== null ? (
