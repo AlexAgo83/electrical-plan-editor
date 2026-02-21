@@ -1330,6 +1330,205 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
   }
 
+  const networkSummaryPanel = (
+    <section className="panel">
+      <h2>Network summary</h2>
+      <div className="canvas-toolbar" aria-label="Canvas interaction mode">
+        <span>Interaction mode</span>
+        {([
+          ["select", "Select"],
+          ["addNode", "Add Node"],
+          ["addSegment", "Add Segment"],
+          ["connect", "Connect"],
+          ["route", "Route"]
+        ] as const).map(([modeId, label]) => (
+          <button
+            key={modeId}
+            type="button"
+            className={interactionMode === modeId ? "workspace-tab is-active" : "workspace-tab"}
+            onClick={() => setInteractionMode(modeId)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <p className="meta-line">
+        {interactionMode === "select"
+          ? "Select mode: node drag-and-drop and network selection are active."
+          : "Other modes are prepared in this wave and will get dedicated canvas gestures next."}
+      </p>
+      <div className="summary-grid">
+        <article>
+          <h3>Graph nodes</h3>
+          <p>{routingGraph.nodeIds.length}</p>
+        </article>
+        <article>
+          <h3>Graph segments</h3>
+          <p>{routingGraph.segmentIds.length}</p>
+        </article>
+        <article>
+          <h3>Adjacency entries</h3>
+          <p>{totalEdgeEntries}</p>
+        </article>
+      </div>
+
+      <h3 className="summary-title">2D network view</h3>
+      {nodes.length === 0 ? (
+        <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
+      ) : (
+        <div className="network-canvas-shell">
+          <svg
+            className="network-svg"
+            role="img"
+            aria-label="2D network diagram"
+            viewBox={`0 0 ${NETWORK_VIEW_WIDTH} ${NETWORK_VIEW_HEIGHT}`}
+            onMouseMove={handleNetworkMouseMove}
+            onMouseUp={stopNetworkNodeDrag}
+            onMouseLeave={stopNetworkNodeDrag}
+          >
+            {segments.map((segment) => {
+              const nodeAPosition = networkNodePositions[segment.nodeA];
+              const nodeBPosition = networkNodePositions[segment.nodeB];
+              if (nodeAPosition === undefined || nodeBPosition === undefined) {
+                return null;
+              }
+
+              const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
+              const isSelectedSegment = selectedSegmentId === segment.id;
+              const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
+                isSelectedSegment ? " is-selected" : ""
+              }`;
+              const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
+              const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
+
+              return (
+                <g key={segment.id}>
+                  <line
+                    className={segmentClassName}
+                    x1={nodeAPosition.x}
+                    y1={nodeAPosition.y}
+                    x2={nodeBPosition.x}
+                    y2={nodeBPosition.y}
+                  />
+                  <line
+                    className="network-segment-hitbox"
+                    x1={nodeAPosition.x}
+                    y1={nodeAPosition.y}
+                    x2={nodeBPosition.x}
+                    y2={nodeBPosition.y}
+                    onClick={() => handleNetworkSegmentClick(segment.id)}
+                  />
+                  <text className="network-segment-label" x={labelX} y={labelY - 6} textAnchor="middle">
+                    {segment.id}
+                  </text>
+                </g>
+              );
+            })}
+
+            {nodes.map((node) => {
+              const position = networkNodePositions[node.id];
+              if (position === undefined) {
+                return null;
+              }
+
+              const nodeKindClass =
+                node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
+              const isSelectedNode = selectedNodeId === node.id;
+              const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}`;
+              const nodeLabel =
+                node.kind === "intermediate"
+                  ? node.label
+                  : node.kind === "connector"
+                    ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
+                    : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
+
+              return (
+                <g
+                  key={node.id}
+                  className={nodeClassName}
+                  onMouseDown={(event) => handleNetworkNodeMouseDown(event, node.id)}
+                  onClick={() => handleNetworkNodeClick(node.id)}
+                >
+                  <title>{describeNode(node)}</title>
+                  <circle cx={position.x} cy={position.y} r={17} />
+                  <text className="network-node-label" x={position.x} y={position.y + 4} textAnchor="middle">
+                    {nodeLabel}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+      )}
+
+      <h3 className="summary-title">Sub-networks</h3>
+      {subNetworkSummaries.length === 0 ? (
+        <p className="empty-copy">No sub-network tags yet. Segments currently belong to the default group.</p>
+      ) : (
+        <ul className="subnetwork-list">
+          {subNetworkSummaries.map((group) => (
+            <li key={group.tag}>
+              <span className="subnetwork-chip">{group.tag}</span>
+              <span>
+                {group.segmentCount} segment(s), {group.totalLengthMm} mm total
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <h3 className="summary-title">Selection snapshot</h3>
+      <div className="selection-snapshot">
+        <p>Connector: {selectedConnector === null ? "none" : `${selectedConnector.name} (${selectedConnector.technicalId})`}</p>
+        <p>Splice: {selectedSplice === null ? "none" : `${selectedSplice.name} (${selectedSplice.technicalId})`}</p>
+        <p>Node: {selectedNode === null ? "none" : describeNode(selectedNode)}</p>
+        <p>Segment: {selectedSegment === null ? "none" : `${selectedSegment.id} (${selectedSegment.lengthMm} mm)`}</p>
+        <p>Wire: {selectedWire === null ? "none" : `${selectedWire.name} (${selectedWire.technicalId})`}</p>
+      </div>
+
+      <h3 className="summary-title">Route preview</h3>
+      <form className="row-form">
+        <label>
+          Start node
+          <select value={routePreviewStartNodeId} onChange={(event) => setRoutePreviewStartNodeId(event.target.value)}>
+            <option value="">Select node</option>
+            {nodes.map((node) => (
+              <option key={node.id} value={node.id}>
+                {describeNode(node)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          End node
+          <select value={routePreviewEndNodeId} onChange={(event) => setRoutePreviewEndNodeId(event.target.value)}>
+            <option value="">Select node</option>
+            {nodes.map((node) => (
+              <option key={node.id} value={node.id}>
+                {describeNode(node)}
+              </option>
+            ))}
+          </select>
+        </label>
+      </form>
+
+      {routePreviewStartNodeId.length > 0 && routePreviewEndNodeId.length > 0 ? (
+        routePreview === null ? (
+          <p className="empty-copy">No route currently exists between the selected nodes.</p>
+        ) : (
+          <div className="selection-snapshot">
+            <p>Length: {routePreview.totalLengthMm} mm</p>
+            <p>Segments: {routePreview.segmentIds.length === 0 ? "(none)" : routePreview.segmentIds.join(" -> ")}</p>
+            <p>Nodes: {routePreview.nodeIds.join(" -> ")}</p>
+          </div>
+        )
+      ) : (
+        <p className="empty-copy">Select start and end nodes to preview shortest path routing.</p>
+      )}
+    </section>
+  );
+
   return (
     <main className="app-shell">
       <section className="header-block">
@@ -1419,7 +1618,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
       {isModelingScreen ? (
         <>
-      <section className="panel-grid">
+      <section className="workspace-stage">
+      <section className="panel-grid workspace-column workspace-column-right">
         <article className="panel" hidden={!isConnectorSubScreen}>
           <h2>{connectorFormMode === "create" ? "Create Connector" : "Edit Connector"}</h2>
           <form className="stack-form" onSubmit={handleConnectorSubmit}>
@@ -1826,7 +2026,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
         </article>
       </section>
 
-      <section className="panel-grid">
+      <section className="panel-grid workspace-column workspace-column-left">
         <article className="panel" hidden={!isConnectorSubScreen}>
           <h2>Connectors</h2>
           <label className="stack-label list-search">
@@ -2260,6 +2460,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </article>
       </section>
+      <section className="panel-grid workspace-column workspace-column-center">{networkSummaryPanel}</section>
+      </section>
         </>
       ) : null}
 
@@ -2504,206 +2706,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
           )}
         </section>
 
-        <section className="panel">
-          <h2>Network summary</h2>
-          <div className="canvas-toolbar" aria-label="Canvas interaction mode">
-            <span>Interaction mode</span>
-            {([
-              ["select", "Select"],
-              ["addNode", "Add Node"],
-              ["addSegment", "Add Segment"],
-              ["connect", "Connect"],
-              ["route", "Route"]
-            ] as const).map(([modeId, label]) => (
-              <button
-                key={modeId}
-                type="button"
-                className={interactionMode === modeId ? "workspace-tab is-active" : "workspace-tab"}
-                onClick={() => setInteractionMode(modeId)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <p className="meta-line">
-            {interactionMode === "select"
-              ? "Select mode: node drag-and-drop and network selection are active."
-              : "Other modes are prepared in this wave and will get dedicated canvas gestures next."}
-          </p>
-          <div className="summary-grid">
-            <article>
-              <h3>Graph nodes</h3>
-              <p>{routingGraph.nodeIds.length}</p>
-            </article>
-            <article>
-              <h3>Graph segments</h3>
-              <p>{routingGraph.segmentIds.length}</p>
-            </article>
-            <article>
-              <h3>Adjacency entries</h3>
-              <p>{totalEdgeEntries}</p>
-            </article>
-          </div>
-
-          <h3 className="summary-title">2D network view</h3>
-          {nodes.length === 0 ? (
-            <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
-          ) : (
-            <div className="network-canvas-shell">
-              <svg
-                className="network-svg"
-                role="img"
-                aria-label="2D network diagram"
-                viewBox={`0 0 ${NETWORK_VIEW_WIDTH} ${NETWORK_VIEW_HEIGHT}`}
-                onMouseMove={handleNetworkMouseMove}
-                onMouseUp={stopNetworkNodeDrag}
-                onMouseLeave={stopNetworkNodeDrag}
-              >
-                {segments.map((segment) => {
-                  const nodeAPosition = networkNodePositions[segment.nodeA];
-                  const nodeBPosition = networkNodePositions[segment.nodeB];
-                  if (nodeAPosition === undefined || nodeBPosition === undefined) {
-                    return null;
-                  }
-
-                  const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
-                  const isSelectedSegment = selectedSegmentId === segment.id;
-                  const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
-                    isSelectedSegment ? " is-selected" : ""
-                  }`;
-                  const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
-                  const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
-
-                  return (
-                    <g key={segment.id}>
-                      <line
-                        className={segmentClassName}
-                        x1={nodeAPosition.x}
-                        y1={nodeAPosition.y}
-                        x2={nodeBPosition.x}
-                        y2={nodeBPosition.y}
-                      />
-                      <line
-                        className="network-segment-hitbox"
-                        x1={nodeAPosition.x}
-                        y1={nodeAPosition.y}
-                        x2={nodeBPosition.x}
-                        y2={nodeBPosition.y}
-                        onClick={() => handleNetworkSegmentClick(segment.id)}
-                      />
-                      <text className="network-segment-label" x={labelX} y={labelY - 6} textAnchor="middle">
-                        {segment.id}
-                      </text>
-                    </g>
-                  );
-                })}
-
-                {nodes.map((node) => {
-                  const position = networkNodePositions[node.id];
-                  if (position === undefined) {
-                    return null;
-                  }
-
-                  const nodeKindClass =
-                    node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
-                  const isSelectedNode = selectedNodeId === node.id;
-                  const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}`;
-                  const nodeLabel =
-                    node.kind === "intermediate"
-                      ? node.label
-                      : node.kind === "connector"
-                        ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
-                        : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
-
-                  return (
-                    <g
-                      key={node.id}
-                      className={nodeClassName}
-                      onMouseDown={(event) => handleNetworkNodeMouseDown(event, node.id)}
-                      onClick={() => handleNetworkNodeClick(node.id)}
-                    >
-                      <title>{describeNode(node)}</title>
-                      <circle cx={position.x} cy={position.y} r={17} />
-                      <text className="network-node-label" x={position.x} y={position.y + 4} textAnchor="middle">
-                        {nodeLabel}
-                      </text>
-                    </g>
-                  );
-                })}
-              </svg>
-            </div>
-          )}
-
-          <h3 className="summary-title">Sub-networks</h3>
-          {subNetworkSummaries.length === 0 ? (
-            <p className="empty-copy">No sub-network tags yet. Segments currently belong to the default group.</p>
-          ) : (
-            <ul className="subnetwork-list">
-              {subNetworkSummaries.map((group) => (
-                <li key={group.tag}>
-                  <span className="subnetwork-chip">{group.tag}</span>
-                  <span>
-                    {group.segmentCount} segment(s), {group.totalLengthMm} mm total
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <h3 className="summary-title">Selection snapshot</h3>
-          <div className="selection-snapshot">
-            <p>
-              Connector: {selectedConnector === null ? "none" : `${selectedConnector.name} (${selectedConnector.technicalId})`}
-            </p>
-            <p>Splice: {selectedSplice === null ? "none" : `${selectedSplice.name} (${selectedSplice.technicalId})`}</p>
-            <p>Node: {selectedNode === null ? "none" : describeNode(selectedNode)}</p>
-            <p>
-              Segment: {selectedSegment === null ? "none" : `${selectedSegment.id} (${selectedSegment.lengthMm} mm)`}
-            </p>
-            <p>Wire: {selectedWire === null ? "none" : `${selectedWire.name} (${selectedWire.technicalId})`}</p>
-          </div>
-
-          <h3 className="summary-title">Route preview</h3>
-          <form className="row-form">
-            <label>
-              Start node
-              <select value={routePreviewStartNodeId} onChange={(event) => setRoutePreviewStartNodeId(event.target.value)}>
-                <option value="">Select node</option>
-                {nodes.map((node) => (
-                  <option key={node.id} value={node.id}>
-                    {describeNode(node)}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              End node
-              <select value={routePreviewEndNodeId} onChange={(event) => setRoutePreviewEndNodeId(event.target.value)}>
-                <option value="">Select node</option>
-                {nodes.map((node) => (
-                  <option key={node.id} value={node.id}>
-                    {describeNode(node)}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </form>
-
-          {routePreviewStartNodeId.length > 0 && routePreviewEndNodeId.length > 0 ? (
-            routePreview === null ? (
-              <p className="empty-copy">No route currently exists between the selected nodes.</p>
-            ) : (
-              <div className="selection-snapshot">
-                <p>Length: {routePreview.totalLengthMm} mm</p>
-                <p>Segments: {routePreview.segmentIds.length === 0 ? "(none)" : routePreview.segmentIds.join(" -> ")}</p>
-                <p>Nodes: {routePreview.nodeIds.join(" -> ")}</p>
-              </div>
-            )
-          ) : (
-            <p className="empty-copy">Select start and end nodes to preview shortest path routing.</p>
-          )}
-        </section>
+        {networkSummaryPanel}
       </section>
       ) : null}
 

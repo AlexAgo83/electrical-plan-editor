@@ -86,6 +86,38 @@ button {
   gap: 1rem;
 }
 
+.workspace-stage {
+  display: grid;
+  gap: 1rem;
+}
+
+.workspace-stage .panel-grid {
+  grid-template-columns: 1fr;
+}
+
+.workspace-column {
+  min-width: 0;
+}
+
+@media (min-width: 1500px) {
+  .workspace-stage {
+    grid-template-columns: minmax(320px, 1fr) minmax(520px, 1.45fr) minmax(320px, 1fr);
+    align-items: start;
+  }
+
+  .workspace-column-left {
+    grid-column: 1;
+  }
+
+  .workspace-column-center {
+    grid-column: 2;
+  }
+
+  .workspace-column-right {
+    grid-column: 3;
+  }
+}
+
 .panel {
   border-radius: 0.75rem;
   border: 1px solid #cbdae6;

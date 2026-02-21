@@ -10,10 +10,17 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
       segment: "Segment",
       wire: "Wire"
     } as const;
-    await page.getByRole("button", { name: labelBySubScreen[value] }).click();
+    await page
+      .locator(".workspace-nav-row.secondary")
+      .getByRole("button", { name: labelBySubScreen[value], exact: true })
+      .click();
   };
   const switchScreen = async (value: "modeling" | "analysis") => {
-    await page.getByRole("button", { name: value === "modeling" ? "Modeling" : "Analysis" }).click();
+    await page
+      .locator(".workspace-nav-row")
+      .first()
+      .getByRole("button", { name: value === "modeling" ? "Modeling" : "Analysis", exact: true })
+      .click();
   };
 
   await page.goto("/");
