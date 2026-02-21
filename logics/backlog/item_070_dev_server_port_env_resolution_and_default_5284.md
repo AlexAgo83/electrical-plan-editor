@@ -1,8 +1,8 @@
 ## item_070_dev_server_port_env_resolution_and_default_5284 - Dev Server Port Env Resolution and Default 5284
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Runtime Endpoint Determinism
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,7 +36,7 @@ Dev/preview/E2E endpoints are hardcoded and disconnected, creating friction when
 - Related AC: AC2, AC3, AC5, AC7.
 - References:
   - `logics/request/req_012_environment_configuration_and_runtime_defaults.md`
+  - `src/config/environment.ts`
   - `vite.config.ts`
   - `playwright.config.ts`
   - `package.json`
-

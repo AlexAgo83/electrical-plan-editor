@@ -2,7 +2,7 @@
 > From version: 0.3.0
 > Understanding: 100%
 > Confidence: 99%
-> Progress: 20%
+> Progress: 40%
 > Complexity: Medium
 > Theme: Env Configuration Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -19,7 +19,7 @@ Backlog scope covered:
 
 # Plan
 - [x] 1. Deliver Wave 0 env contract bootstrap with `.env.example` and tracked defaults (`item_069`)
-- [ ] 2. Deliver Wave 1 runtime resolution for host/port/preview/e2e defaults with `APP_PORT=5284` baseline (`item_070`)
+- [x] 2. Deliver Wave 1 runtime resolution for host/port/preview/e2e defaults with `APP_PORT=5284` baseline (`item_070`)
 - [ ] 3. Deliver Wave 2 validation and deterministic fallback/error policy (`item_071`)
 - [ ] 4. Deliver Wave 3 documentation and onboarding updates (`item_072`)
 - [ ] 5. Deliver Wave 4 regression matrix and CI stability closure (`item_073`)
@@ -35,7 +35,7 @@ Backlog scope covered:
 # Report
 - Wave status:
   - Wave 0 completed: added `.env.example` contract with documented defaults and updated `.gitignore` to keep `.env` local-only.
-  - Wave 1 pending: runtime endpoint resolution not started.
+  - Wave 1 completed: introduced shared env runtime resolver and wired `vite` + `playwright` to `APP_HOST`/`APP_PORT`/`PREVIEW_PORT`/`E2E_BASE_URL` defaults and overrides.
   - Wave 2 pending: validation/fallback policy not started.
   - Wave 3 pending: docs onboarding update not started.
   - Wave 4 pending: regression and CI closure not started.
@@ -51,3 +51,6 @@ Backlog scope covered:
   - Enforce full regression gate execution before request closure.
 - Validation snapshot (Wave 0):
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
+- Validation snapshot (Wave 1):
+  - `npm run typecheck` OK
+  - `npm run lint` OK
