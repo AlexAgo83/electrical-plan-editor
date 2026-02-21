@@ -24,6 +24,7 @@ button {
 }
 
 .app-shell {
+  --theme-primary: #17374e;
   min-height: 100vh;
   width: 100%;
   max-width: 1200px;
@@ -79,6 +80,16 @@ button {
 
 .header-block h1 {
   font-size: 1.28rem;
+}
+
+.header-title {
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+  -webkit-text-stroke: 0.3px rgba(0, 0, 0, 0.45);
+}
+
+.header-title-accent {
+  color: var(--theme-primary);
 }
 
 .header-block .meta-line {
@@ -305,6 +316,7 @@ button {
 }
 
 .app-shell.theme-dark {
+  --theme-primary: #7fc5ff;
   color: #e3ecf6;
 }
 
@@ -781,6 +793,7 @@ button {
 }
 
 .app-shell.theme-slate-neon {
+  --theme-primary: #38e6c8;
   color: #dcfbff;
 }
 
@@ -898,6 +911,7 @@ button {
 }
 
 .app-shell.theme-paper-blueprint {
+  --theme-primary: #2f6f9f;
   color: #12354f;
 }
 
@@ -1003,6 +1017,7 @@ button {
 }
 
 .app-shell.theme-warm-brown {
+  --theme-primary: #9a6b44;
   color: #4e3525;
 }
 
@@ -1092,6 +1107,7 @@ button {
 }
 
 .app-shell.theme-deep-green {
+  --theme-primary: #5bc88f;
   color: #d7ead7;
 }
 

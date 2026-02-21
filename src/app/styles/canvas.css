@@ -630,6 +630,7 @@
 
 .legend-swatch.connector {
   background: #dff0ff;
+  border-radius: 0.2rem;
 }
 
 .legend-swatch.splice {
