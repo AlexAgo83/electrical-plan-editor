@@ -1916,6 +1916,22 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           isWireSubScreen={isWireSubScreen}
           networkSummaryPanel={networkSummaryPanel}
           selectedConnector={selectedConnector}
+          selectedConnectorId={selectedConnectorId}
+          connectorOccupancyFilter={connectorOccupancyFilter}
+          setConnectorOccupancyFilter={setConnectorOccupancyFilter}
+          connectors={connectors}
+          visibleConnectors={visibleConnectors}
+          connectorSort={connectorSort}
+          setConnectorSort={setConnectorSort}
+          connectorOccupiedCountById={connectorOccupiedCountById}
+          onSelectConnector={(connectorId) =>
+            dispatchAction(
+              appActions.select({
+                kind: "connector",
+                id: connectorId
+              })
+            )
+          }
           cavityIndexInput={cavityIndexInput}
           setCavityIndexInput={setCavityIndexInput}
           connectorOccupantRefInput={connectorOccupantRefInput}

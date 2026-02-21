@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type ReactElement } from "react";
 import { nextSortState } from "../../lib/app-utils";
-import type { Connector, Splice, SpliceId, Wire, WireId } from "../../../core/entities";
+import type { Connector, ConnectorId, Splice, SpliceId, Wire, WireId } from "../../../core/entities";
 import type { ConnectorSynthesisRow, SortState, SpliceSynthesisRow } from "../../types/app-controller";
 
 interface OccupancyStatus {
@@ -22,6 +22,15 @@ interface AnalysisWorkspaceContentProps {
   isWireSubScreen: boolean;
   networkSummaryPanel: ReactElement;
   selectedConnector: Connector | null;
+  selectedConnectorId: ConnectorId | null;
+  connectorOccupancyFilter: "all" | "occupied" | "free";
+  setConnectorOccupancyFilter: (value: "all" | "occupied" | "free") => void;
+  connectors: Connector[];
+  visibleConnectors: Connector[];
+  connectorSort: SortState;
+  setConnectorSort: (value: SortState | ((current: SortState) => SortState)) => void;
+  connectorOccupiedCountById: Map<ConnectorId, number>;
+  onSelectConnector: (connectorId: ConnectorId) => void;
   cavityIndexInput: string;
   setCavityIndexInput: (value: string) => void;
   connectorOccupantRefInput: string;
@@ -76,6 +85,15 @@ export function AnalysisWorkspaceContent({
   isWireSubScreen,
   networkSummaryPanel,
   selectedConnector,
+  selectedConnectorId,
+  connectorOccupancyFilter,
+  setConnectorOccupancyFilter,
+  connectors,
+  visibleConnectors,
+  connectorSort,
+  setConnectorSort,
+  connectorOccupiedCountById,
+  onSelectConnector,
   cavityIndexInput,
   setCavityIndexInput,
   connectorOccupantRefInput,
@@ -123,15 +141,114 @@ export function AnalysisWorkspaceContent({
   handleResetWireRoute,
   wireFormError
 }: AnalysisWorkspaceContentProps): ReactElement {
+  const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "synthesis">("cavities");
   const [spliceAnalysisView, setSpliceAnalysisView] = useState<"ports" | "synthesis">("ports");
 
   return (
     <section className="panel-grid analysis-panel-grid">
       <section className="panel" hidden={!isConnectorSubScreen}>
-        <h2>Connector cavities</h2>
-        {selectedConnector === null ? (
-          <p className="empty-copy">Select a connector to view and manage cavity occupancy.</p>
+        <header className="list-panel-header">
+          <h2>Connectors</h2>
+          <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
+            {([
+              ["all", "All"],
+              ["occupied", "Occupied"],
+              ["free", "Free"]
+            ] as const).map(([filterId, label]) => (
+              <button
+                key={filterId}
+                type="button"
+                className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+                onClick={() => setConnectorOccupancyFilter(filterId)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </header>
+        {connectors.length === 0 ? (
+          <p className="empty-copy">No connector yet.</p>
+        ) : visibleConnectors.length === 0 ? (
+          <p className="empty-copy">No connector matches the current filters.</p>
         ) : (
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>
+                  <button
+                    type="button"
+                    className="sort-header-button"
+                    onClick={() => setConnectorSort((current) => nextSortState(current, "name"))}
+                  >
+                    Name <span className="sort-indicator">{getSortIndicator(connectorSort, "name")}</span>
+                  </button>
+                </th>
+                <th>
+                  <button
+                    type="button"
+                    className="sort-header-button"
+                    onClick={() => setConnectorSort((current) => nextSortState(current, "technicalId"))}
+                  >
+                    Technical ID <span className="sort-indicator">{getSortIndicator(connectorSort, "technicalId")}</span>
+                  </button>
+                </th>
+                <th>Cavities</th>
+                <th>Occupied</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleConnectors.map((connector) => {
+                const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
+                const isSelected = selectedConnectorId === connector.id;
+                return (
+                  <tr
+                    key={connector.id}
+                    className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
+                    aria-selected={isSelected}
+                    tabIndex={0}
+                    onClick={() => onSelectConnector(connector.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onSelectConnector(connector.id);
+                      }
+                    }}
+                  >
+                    <td>{connector.name}</td>
+                    <td className="technical-id">{connector.technicalId}</td>
+                    <td>{connector.cavityCount}</td>
+                    <td>{occupiedCount}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section className="panel" hidden={!isConnectorSubScreen}>
+        <header className="list-panel-header">
+          <h2>Connector</h2>
+          <div className="chip-group list-panel-filters" role="group" aria-label="Connector analysis view">
+            <button
+              type="button"
+              className={connectorAnalysisView === "cavities" ? "filter-chip is-active" : "filter-chip"}
+              onClick={() => setConnectorAnalysisView("cavities")}
+            >
+              Cavities
+            </button>
+            <button
+              type="button"
+              className={connectorAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
+              onClick={() => setConnectorAnalysisView("synthesis")}
+            >
+              Synthesis
+            </button>
+          </div>
+        </header>
+        {selectedConnector === null ? (
+          <p className="empty-copy">Select a connector to view cavities and synthesis.</p>
+        ) : connectorAnalysisView === "cavities" ? (
           <>
             <p className="meta-line">
               <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
@@ -177,13 +294,6 @@ export function AnalysisWorkspaceContent({
               ))}
             </div>
           </>
-        )}
-      </section>
-
-      <section className="panel" hidden={!isConnectorSubScreen}>
-        <h2>Connector synthesis</h2>
-        {selectedConnector === null ? (
-          <p className="empty-copy">Select a connector to view connected wire synthesis.</p>
         ) : sortedConnectorSynthesisRows.length === 0 ? (
           <p className="empty-copy">No wire currently connected to this connector.</p>
         ) : (
