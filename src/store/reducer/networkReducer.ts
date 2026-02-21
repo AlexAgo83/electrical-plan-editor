@@ -158,6 +158,36 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       return bumpRevision(nextState);
     }
 
+    case "network/update": {
+      const existing = state.networks.byId[action.payload.id];
+      if (existing === undefined) {
+        return withError(state, "Cannot update unknown network.");
+      }
+
+      const normalizedName = action.payload.name.trim();
+      const normalizedTechnicalId = action.payload.technicalId.trim();
+      if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
+        return withError(state, "Network name and technical ID are required.");
+      }
+
+      if (hasDuplicateNetworkTechnicalId(state, normalizedTechnicalId, action.payload.id)) {
+        return withError(state, `Network technical ID '${normalizedTechnicalId}' is already used.`);
+      }
+
+      const nextState: AppState = {
+        ...clearLastError(state),
+        networks: upsertEntity(state.networks, {
+          ...existing,
+          name: normalizedName,
+          technicalId: normalizedTechnicalId,
+          description: action.payload.description,
+          updatedAt: action.payload.updatedAt
+        })
+      };
+
+      return bumpRevision(nextState);
+    }
+
     case "network/duplicate": {
       const source = state.networks.byId[action.payload.sourceNetworkId];
       if (source === undefined) {

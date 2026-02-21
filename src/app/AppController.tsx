@@ -1,5 +1,6 @@
 import {
   type CSSProperties,
+  type FormEvent,
   type ReactElement,
   useCallback,
   useEffect,
@@ -282,7 +283,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [newNetworkTechnicalId, setNewNetworkTechnicalId] = useState("");
   const [newNetworkDescription, setNewNetworkDescription] = useState("");
   const [networkFormError, setNetworkFormError] = useState<string | null>(null);
-  const [renameNetworkName, setRenameNetworkName] = useState("");
+  const [networkFormMode, setNetworkFormMode] = useState<"create" | "edit" | null>(null);
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
   const [tableDensity, setTableDensity] = useState<TableDensity>("comfortable");
   const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
@@ -379,7 +380,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     wireTechnicalId.trim().length > 0 &&
     selectWireTechnicalIdTaken(state, wireTechnicalId.trim(), wireIdExcludedFromUniqueness);
   const networkTechnicalIdAlreadyUsed =
-    newNetworkTechnicalId.trim().length > 0 && selectNetworkTechnicalIdTaken(state, newNetworkTechnicalId.trim());
+    newNetworkTechnicalId.trim().length > 0 &&
+    selectNetworkTechnicalIdTaken(
+      state,
+      newNetworkTechnicalId.trim(),
+      networkFormMode === "edit" ? activeNetwork?.id ?? undefined : undefined
+    );
 
   const totalEdgeEntries = routingGraph.nodeIds.reduce(
     (sum, nodeId) => sum + (routingGraph.edgesByNodeId[nodeId]?.length ?? 0),
@@ -493,20 +499,26 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   }, [nodes, setManualNodePositions]);
 
   useEffect(() => {
-    if (activeNetwork === null) {
-      setRenameNetworkName("");
-      return;
-    }
-
-    setRenameNetworkName(activeNetwork.name);
-  }, [activeNetwork]);
-
-  useEffect(() => {
     setModeAnchorNodeId(null);
     if (interactionMode !== "addNode") {
       setPendingNewNodePosition(null);
     }
   }, [interactionMode, setModeAnchorNodeId, setPendingNewNodePosition]);
+
+  useEffect(() => {
+    if (networkFormMode !== "edit") {
+      return;
+    }
+
+    if (activeNetwork === null) {
+      setNetworkFormMode(null);
+      return;
+    }
+
+    setNewNetworkName(activeNetwork.name);
+    setNewNetworkTechnicalId(activeNetwork.technicalId);
+    setNewNetworkDescription(activeNetwork.description ?? "");
+  }, [activeNetwork, networkFormMode]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -780,7 +792,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const {
     handleCreateNetwork,
     handleSelectNetwork,
-    handleRenameActiveNetwork,
+    handleUpdateActiveNetwork,
     handleDuplicateActiveNetwork,
     handleDeleteActiveNetwork,
     handleRecreateSampleNetwork,
@@ -800,7 +812,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNewNetworkTechnicalId,
     newNetworkDescription,
     setNewNetworkDescription,
-    renameNetworkName,
     setNetworkFormError,
     isCurrentWorkspaceEmpty,
     hasBuiltInSampleState,
@@ -836,6 +847,43 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setShowShortcutHints,
     setKeyboardShortcutsEnabled
   });
+
+  const handleOpenCreateNetworkForm = useCallback(() => {
+    setNetworkFormMode("create");
+    setNewNetworkName("");
+    setNewNetworkTechnicalId("");
+    setNewNetworkDescription("");
+    setNetworkFormError(null);
+  }, []);
+
+  const handleOpenEditNetworkForm = useCallback(() => {
+    if (activeNetwork === null) {
+      return;
+    }
+
+    setNetworkFormMode("edit");
+    setNewNetworkName(activeNetwork.name);
+    setNewNetworkTechnicalId(activeNetwork.technicalId);
+    setNewNetworkDescription(activeNetwork.description ?? "");
+    setNetworkFormError(null);
+  }, [activeNetwork]);
+
+  const handleCloseNetworkForm = useCallback(() => {
+    setNetworkFormMode(null);
+    setNetworkFormError(null);
+  }, []);
+
+  const handleSubmitNetworkForm = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      if (networkFormMode === "edit") {
+        handleUpdateActiveNetwork(event);
+        return;
+      }
+
+      handleCreateNetwork(event);
+    },
+    [handleCreateNetwork, handleUpdateActiveNetwork, networkFormMode]
+  );
 
   const closeNavigationDrawer = useCallback(() => {
     setIsNavigationDrawerOpen(false);
@@ -1610,9 +1658,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
               handleSelectNetwork={handleSelectNetwork}
               handleDuplicateActiveNetwork={handleDuplicateActiveNetwork}
               handleDeleteActiveNetwork={handleDeleteActiveNetwork}
-              renameNetworkName={renameNetworkName}
-              setRenameNetworkName={setRenameNetworkName}
-              handleRenameActiveNetwork={handleRenameActiveNetwork}
+              networkFormMode={networkFormMode}
+              handleOpenCreateNetworkForm={handleOpenCreateNetworkForm}
+              handleOpenEditNetworkForm={handleOpenEditNetworkForm}
+              handleCloseNetworkForm={handleCloseNetworkForm}
               newNetworkName={newNetworkName}
               setNewNetworkName={setNewNetworkName}
               newNetworkTechnicalId={newNetworkTechnicalId}
@@ -1621,7 +1670,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
               setNewNetworkDescription={setNewNetworkDescription}
               networkFormError={networkFormError}
               networkTechnicalIdAlreadyUsed={networkTechnicalIdAlreadyUsed}
-              handleCreateNetwork={handleCreateNetwork}
+              handleSubmitNetworkForm={handleSubmitNetworkForm}
             />
           </NetworkScopeScreen>
 

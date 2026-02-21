@@ -14,9 +14,10 @@ interface NetworkScopeWorkspaceContentProps {
   handleSelectNetwork: (networkId: NetworkId) => void;
   handleDuplicateActiveNetwork: () => void;
   handleDeleteActiveNetwork: () => void;
-  renameNetworkName: string;
-  setRenameNetworkName: (value: string) => void;
-  handleRenameActiveNetwork: () => void;
+  networkFormMode: "create" | "edit" | null;
+  handleOpenCreateNetworkForm: () => void;
+  handleOpenEditNetworkForm: () => void;
+  handleCloseNetworkForm: () => void;
   newNetworkName: string;
   setNewNetworkName: (value: string) => void;
   newNetworkTechnicalId: string;
@@ -25,7 +26,7 @@ interface NetworkScopeWorkspaceContentProps {
   setNewNetworkDescription: (value: string) => void;
   networkFormError: string | null;
   networkTechnicalIdAlreadyUsed: boolean;
-  handleCreateNetwork: (event: FormEvent<HTMLFormElement>) => void;
+  handleSubmitNetworkForm: (event: FormEvent<HTMLFormElement>) => void;
 }
 
 export function NetworkScopeWorkspaceContent({
@@ -41,9 +42,10 @@ export function NetworkScopeWorkspaceContent({
   handleSelectNetwork,
   handleDuplicateActiveNetwork,
   handleDeleteActiveNetwork,
-  renameNetworkName,
-  setRenameNetworkName,
-  handleRenameActiveNetwork,
+  networkFormMode,
+  handleOpenCreateNetworkForm,
+  handleOpenEditNetworkForm,
+  handleCloseNetworkForm,
   newNetworkName,
   setNewNetworkName,
   newNetworkTechnicalId,
@@ -52,8 +54,12 @@ export function NetworkScopeWorkspaceContent({
   setNewNetworkDescription,
   networkFormError,
   networkTechnicalIdAlreadyUsed,
-  handleCreateNetwork
+  handleSubmitNetworkForm
 }: NetworkScopeWorkspaceContentProps): ReactElement {
+  const isCreateMode = networkFormMode === "create";
+  const isEditMode = networkFormMode === "edit";
+  const isFormOpen = isCreateMode || isEditMode;
+
   return (
     <section className="panel-grid">
       <section className="stats-grid" aria-label="Entity counters">
@@ -108,52 +114,56 @@ export function NetworkScopeWorkspaceContent({
           <button type="button" onClick={handleDeleteActiveNetwork} disabled={!hasActiveNetwork}>
             Delete
           </button>
-        </div>
-        <label>
-          Rename active network
-          <input
-            value={renameNetworkName}
-            onChange={(event) => setRenameNetworkName(event.target.value)}
-            placeholder="Network name"
-            disabled={!hasActiveNetwork}
-          />
-        </label>
-        <div className="row-actions compact">
-          <button type="button" onClick={handleRenameActiveNetwork} disabled={!hasActiveNetwork}>
-            Rename
+          <button type="button" onClick={handleOpenCreateNetworkForm}>
+            Create
+          </button>
+          <button type="button" onClick={handleOpenEditNetworkForm} disabled={!hasActiveNetwork}>
+            Edit
           </button>
         </div>
       </section>
 
       <section className="panel">
-        <h2>Create network</h2>
-        <form className="settings-grid" onSubmit={handleCreateNetwork}>
-          <label>
-            New network name
-            <input value={newNetworkName} onChange={(event) => setNewNetworkName(event.target.value)} placeholder="Vehicle platform A" />
-          </label>
-          <label>
-            New network technical ID
-            <input
-              value={newNetworkTechnicalId}
-              onChange={(event) => setNewNetworkTechnicalId(event.target.value)}
-              placeholder="NET-PLAT-A"
-            />
-          </label>
-          <label>
-            Description (optional)
-            <input
-              value={newNetworkDescription}
-              onChange={(event) => setNewNetworkDescription(event.target.value)}
-              placeholder="Optional description"
-            />
-          </label>
-          {networkFormError !== null ? <p className="form-error">{networkFormError}</p> : null}
-          {networkTechnicalIdAlreadyUsed ? <p className="form-hint danger">Technical ID already used by another network.</p> : null}
-          <div className="row-actions compact">
-            <button type="submit">Create network</button>
-          </div>
-        </form>
+        <h2>{isCreateMode ? "Create network" : isEditMode ? "Edit network" : "Network form"}</h2>
+        {!isFormOpen ? (
+          <>
+            <p className="empty-copy">Choose Create or Edit from the network scope panel to open this form.</p>
+          </>
+        ) : (
+          <form className="settings-grid" onSubmit={handleSubmitNetworkForm}>
+            <label>
+              Network name
+              <input value={newNetworkName} onChange={(event) => setNewNetworkName(event.target.value)} placeholder="Vehicle platform A" />
+            </label>
+            <label>
+              Network technical ID
+              <input
+                value={newNetworkTechnicalId}
+                onChange={(event) => setNewNetworkTechnicalId(event.target.value)}
+                placeholder="NET-PLAT-A"
+              />
+            </label>
+            <label>
+              Description (optional)
+              <input
+                value={newNetworkDescription}
+                onChange={(event) => setNewNetworkDescription(event.target.value)}
+                placeholder="Optional description"
+              />
+            </label>
+            {networkFormError !== null ? <p className="form-error">{networkFormError}</p> : null}
+            {networkTechnicalIdAlreadyUsed ? <p className="form-hint danger">Technical ID already used by another network.</p> : null}
+            <div className="row-actions compact">
+              <button type="submit">{isCreateMode ? "Create network" : "Save network"}</button>
+              <button type="button" onClick={handleCloseNetworkForm}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+        {isEditMode ? (
+          <p className="meta-line">Edit mode targets the current active network selected on the left panel.</p>
+        ) : null}
       </section>
 
     </section>

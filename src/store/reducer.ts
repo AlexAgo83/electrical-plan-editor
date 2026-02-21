@@ -43,6 +43,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "network/create":
     case "network/select":
     case "network/rename":
+    case "network/update":
     case "network/duplicate":
     case "network/delete":
     case "network/importMany": {

@@ -30,7 +30,6 @@ interface UseWorkspaceHandlersParams {
   setNewNetworkTechnicalId: (value: string) => void;
   newNetworkDescription: string;
   setNewNetworkDescription: (value: string) => void;
-  renameNetworkName: string;
   setNetworkFormError: (value: string | null) => void;
   isCurrentWorkspaceEmpty: boolean;
   hasBuiltInSampleState: boolean;
@@ -77,7 +76,6 @@ export function useWorkspaceHandlers({
   setNewNetworkTechnicalId,
   newNetworkDescription,
   setNewNetworkDescription,
-  renameNetworkName,
   setNetworkFormError,
   isCurrentWorkspaceEmpty,
   hasBuiltInSampleState,
@@ -156,18 +154,35 @@ export function useWorkspaceHandlers({
     dispatchAction(appActions.selectNetwork(nextNetworkId), { trackHistory: false });
   }
 
-  function handleRenameActiveNetwork(): void {
+  function handleUpdateActiveNetwork(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+
     if (activeNetwork === null) {
+      setNetworkFormError("No active network selected.");
       return;
     }
 
-    const trimmedName = renameNetworkName.trim();
-    if (trimmedName.length === 0) {
-      setNetworkFormError("Network name must be non-empty.");
+    const trimmedName = newNetworkName.trim();
+    const trimmedTechnicalId = newNetworkTechnicalId.trim();
+    if (trimmedName.length === 0 || trimmedTechnicalId.length === 0) {
+      setNetworkFormError("Network name and technical ID are required.");
       return;
     }
 
-    dispatchAction(appActions.renameNetwork(activeNetwork.id, trimmedName, new Date().toISOString(), activeNetwork.description));
+    if (selectNetworkTechnicalIdTaken(store.getState(), trimmedTechnicalId, activeNetwork.id)) {
+      setNetworkFormError(`Network technical ID '${trimmedTechnicalId}' is already used.`);
+      return;
+    }
+
+    dispatchAction(
+      appActions.updateNetwork(
+        activeNetwork.id,
+        trimmedName,
+        trimmedTechnicalId,
+        new Date().toISOString(),
+        newNetworkDescription.trim().length === 0 ? undefined : newNetworkDescription.trim()
+      )
+    );
     setNetworkFormError(null);
   }
 
@@ -338,7 +353,7 @@ export function useWorkspaceHandlers({
   return {
     handleCreateNetwork,
     handleSelectNetwork,
-    handleRenameActiveNetwork,
+    handleUpdateActiveNetwork,
     handleDuplicateActiveNetwork,
     handleDeleteActiveNetwork,
     handleRecreateSampleNetwork,

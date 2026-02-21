@@ -34,6 +34,16 @@ export type AppAction =
       };
     }
   | {
+      type: "network/update";
+      payload: {
+        id: NetworkId;
+        name: string;
+        technicalId: string;
+        description?: string;
+        updatedAt: string;
+      };
+    }
+  | {
       type: "network/duplicate";
       payload: {
         sourceNetworkId: NetworkId;
@@ -97,6 +107,16 @@ export const appActions = {
   renameNetwork: (id: NetworkId, name: string, updatedAt: string, description?: string): AppAction => ({
     type: "network/rename",
     payload: { id, name, updatedAt, description }
+  }),
+  updateNetwork: (
+    id: NetworkId,
+    name: string,
+    technicalId: string,
+    updatedAt: string,
+    description?: string
+  ): AppAction => ({
+    type: "network/update",
+    payload: { id, name, technicalId, updatedAt, description }
   }),
   duplicateNetwork: (sourceNetworkId: NetworkId, network: Network): AppAction => ({
     type: "network/duplicate",

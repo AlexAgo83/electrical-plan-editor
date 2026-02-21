@@ -188,6 +188,53 @@ describe("appReducer network lifecycle", () => {
     expect(deleted.activeNetworkId).toBe(asNetworkId("net-a"));
   });
 
+  it("updates active network metadata and blocks duplicate technical IDs", () => {
+    const initial = createInitialState();
+    const activeNetworkId = initial.activeNetworkId as NetworkId;
+
+    const updated = appReducer(
+      initial,
+      appActions.updateNetwork(
+        activeNetworkId,
+        "Main network updated",
+        "NET-MAIN-UPD",
+        "2026-02-21T10:00:00.000Z",
+        "Updated description"
+      )
+    );
+    const updatedNetwork = updated.networks.byId[activeNetworkId];
+    expect(updatedNetwork?.name).toBe("Main network updated");
+    expect(updatedNetwork?.technicalId).toBe("NET-MAIN-UPD");
+    expect(updatedNetwork?.description).toBe("Updated description");
+
+    const withAnotherNetwork = appReducer(
+      updated,
+      appActions.createNetwork(
+        {
+          id: asNetworkId("net-other"),
+          name: "Other",
+          technicalId: "NET-OTHER",
+          createdAt: "2026-02-21T10:01:00.000Z",
+          updatedAt: "2026-02-21T10:01:00.000Z"
+        },
+        false
+      )
+    );
+    const duplicateRejected = appReducer(
+      withAnotherNetwork,
+      appActions.updateNetwork(
+        activeNetworkId,
+        "Main network updated",
+        "NET-OTHER",
+        "2026-02-21T10:02:00.000Z",
+        "Updated description"
+      )
+    );
+
+    expect(duplicateRejected.networks.byId[activeNetworkId]?.technicalId).toBe("NET-MAIN-UPD");
+    expect(duplicateRejected.ui.lastError).toContain("already used");
+  });
+
   it("blocks domain writes when no active network exists", () => {
     const initial = createInitialState();
     const onlyNetworkId = initial.activeNetworkId as NetworkId;

@@ -71,6 +71,28 @@ describe("App integration UI - networks", () => {
     switchScreen("networkScope");
 
     expect(within(document.body).getByRole("heading", { name: "Network Scope" })).toBeInTheDocument();
-    expect(within(document.body).getByRole("button", { name: "Create network" })).toBeInTheDocument();
+    expect(within(document.body).getByRole("button", { name: "Create" })).toBeInTheDocument();
+  });
+
+  it("edits the active network through the shared create/edit form", () => {
+    renderAppWithState(createInitialState());
+    switchScreen("networkScope");
+
+    fireEvent.click(within(document.body).getByRole("button", { name: "Edit" }));
+    const formPanel = getPanelByHeading("Edit network");
+
+    expect(within(formPanel).getByLabelText("Network name")).toHaveValue("Main network");
+    expect(within(formPanel).getByLabelText("Network technical ID")).toHaveValue("NET-MAIN");
+
+    fireEvent.change(within(formPanel).getByLabelText("Network name"), {
+      target: { value: "Main network updated" }
+    });
+    fireEvent.change(within(formPanel).getByLabelText("Network technical ID"), {
+      target: { value: "NET-MAIN-UPD" }
+    });
+    fireEvent.click(within(formPanel).getByRole("button", { name: "Save network" }));
+
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    expect(within(networkScopePanel).getByText(/Active network:/).textContent).toContain("Main network updated (NET-MAIN-UPD)");
   });
 });
