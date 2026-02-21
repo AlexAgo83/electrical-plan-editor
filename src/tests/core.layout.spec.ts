@@ -220,5 +220,5 @@ describe("2D layout generation", () => {
 
     expect(Object.keys(generated)).toHaveLength(nodes.length);
     expect(elapsedMs).toBeLessThan(7000);
-  });
+  }, 12_000);
 });

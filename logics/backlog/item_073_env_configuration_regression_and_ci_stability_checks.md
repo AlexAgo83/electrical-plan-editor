@@ -1,8 +1,8 @@
 ## item_073_env_configuration_regression_and_ci_stability_checks - Env Configuration Regression and CI Stability Checks
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Configuration QA Closure
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,9 +36,11 @@ Env-based runtime changes can silently break scripts, CI, and local predictabili
 - Related AC: AC1, AC2, AC3, AC4, AC5, AC6, AC7, AC8.
 - References:
   - `logics/request/req_012_environment_configuration_and_runtime_defaults.md`
+  - `src/config/environment.ts`
   - `vite.config.ts`
   - `playwright.config.ts`
+  - `src/tests/config.environment.spec.ts`
+  - `src/tests/persistence.storage-key.spec.ts`
   - `src/tests/persistence.localStorage.spec.ts`
   - `tests/e2e/smoke.spec.ts`
   - `.github/workflows/ci.yml`
-

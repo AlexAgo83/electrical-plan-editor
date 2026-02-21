@@ -2,7 +2,7 @@
 > From version: 0.3.0
 > Understanding: 100%
 > Confidence: 99%
-> Progress: 80%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Env Configuration Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -22,8 +22,8 @@ Backlog scope covered:
 - [x] 2. Deliver Wave 1 runtime resolution for host/port/preview/e2e defaults with `APP_PORT=5284` baseline (`item_070`)
 - [x] 3. Deliver Wave 2 validation and deterministic fallback/error policy (`item_071`)
 - [x] 4. Deliver Wave 3 documentation and onboarding updates (`item_072`)
-- [ ] 5. Deliver Wave 4 regression matrix and CI stability closure (`item_073`)
-- [ ] FINAL: Update related Logics docs
+- [x] 5. Deliver Wave 4 regression matrix and CI stability closure (`item_073`)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -38,7 +38,7 @@ Backlog scope covered:
   - Wave 1 completed: introduced shared env runtime resolver and wired `vite` + `playwright` to `APP_HOST`/`APP_PORT`/`PREVIEW_PORT`/`E2E_BASE_URL` defaults and overrides.
   - Wave 2 completed: enforced deterministic fallback/warnings for invalid env values and added `VITE_STORAGE_KEY` resolution with explicit persistence-key fallback.
   - Wave 3 completed: documented `.env` bootstrap, supported variables/defaults, fallback behavior, local default URL, and explicit `VITE_*` safety constraints in onboarding docs.
-  - Wave 4 pending: regression and CI closure not started.
+  - Wave 4 completed: closed regression matrix with env parser/storage-key tests and full CI gates (`typecheck`, `lint`, `test:ci`, `test:e2e`) passing under env-backed defaults.
 - Current blockers:
   - None at orchestration kickoff.
 - Main risks to track:
@@ -60,3 +60,9 @@ Backlog scope covered:
   - `npm test -- src/tests/config.environment.spec.ts src/tests/persistence.storage-key.spec.ts src/tests/persistence.localStorage.spec.ts` OK
 - Validation snapshot (Wave 3):
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
+- Validation snapshot (Wave 4):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npm run test:ci` OK
+  - `npm run test:e2e` OK
