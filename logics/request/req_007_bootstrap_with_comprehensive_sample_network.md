@@ -1,7 +1,7 @@
 ## req_007_bootstrap_with_comprehensive_sample_network - Bootstrap with Comprehensive Sample Network
 > From version: 0.1.0
-> Understanding: 98%
-> Confidence: 96%
+> Understanding: 99%
+> Confidence: 97%
 > Complexity: Medium
 > Theme: Onboarding and Demo Data
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -82,4 +82,5 @@ Architecture reference to preserve:
 # References
 - `logics/request/req_002_multi_network_management_and_navigation.md`
 - `logics/request/req_004_network_import_export_file_workflow.md`
+- `logics/tasks/task_006_sample_network_bootstrap_orchestration_and_delivery_control.md`
 - `README.md`
