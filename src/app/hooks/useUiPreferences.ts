@@ -6,6 +6,7 @@ const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 type TableDensity = "comfortable" | "compact";
 type SortField = "name" | "technicalId";
 type SortDirection = "asc" | "desc";
+type ThemeMode = "normal" | "dark";
 
 interface SortState {
   field: SortField;
@@ -14,6 +15,7 @@ interface SortState {
 
 interface UiPreferencesPayload {
   schemaVersion: number;
+  themeMode: ThemeMode;
   tableDensity: TableDensity;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
@@ -55,6 +57,7 @@ function readUiPreferences(): Partial<UiPreferencesPayload> | null {
 interface UseUiPreferencesOptions {
   networkMinScale: number;
   networkMaxScale: number;
+  themeMode: ThemeMode;
   tableDensity: TableDensity;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
@@ -65,6 +68,7 @@ interface UseUiPreferencesOptions {
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
   preferencesHydrated: boolean;
+  setThemeMode: (mode: ThemeMode) => void;
   setTableDensity: (density: TableDensity) => void;
   setDefaultSortField: (field: SortField) => void;
   setDefaultSortDirection: (direction: SortDirection) => void;
@@ -91,6 +95,7 @@ interface UseUiPreferencesOptions {
 export function useUiPreferences({
   networkMinScale,
   networkMaxScale,
+  themeMode,
   tableDensity,
   defaultSortField,
   defaultSortDirection,
@@ -101,6 +106,7 @@ export function useUiPreferences({
   showShortcutHints,
   keyboardShortcutsEnabled,
   preferencesHydrated,
+  setThemeMode,
   setTableDensity,
   setDefaultSortField,
   setDefaultSortDirection,
@@ -140,6 +146,7 @@ export function useUiPreferences({
         ? clamp(parsedResetZoomPercent / 100, networkMinScale, networkMaxScale)
         : 1;
 
+      setThemeMode(preferences.themeMode === "dark" ? "dark" : "normal");
       setTableDensity(preferences.tableDensity === "compact" ? "compact" : "comfortable");
       setDefaultSortField(sortField);
       setDefaultSortDirection(sortDirection);
@@ -187,6 +194,7 @@ export function useUiPreferences({
     setSpliceSort,
     setSpliceSynthesisSort,
     setTableDensity,
+    setThemeMode,
     setWireSort,
     setConnectorSynthesisSort
   ]);
@@ -198,6 +206,7 @@ export function useUiPreferences({
 
     const payload: UiPreferencesPayload = {
       schemaVersion: UI_PREFERENCES_SCHEMA_VERSION,
+      themeMode,
       tableDensity,
       defaultSortField,
       defaultSortDirection,
@@ -224,6 +233,7 @@ export function useUiPreferences({
     keyboardShortcutsEnabled,
     preferencesHydrated,
     showShortcutHints,
-    tableDensity
+    tableDensity,
+    themeMode
   ]);
 }

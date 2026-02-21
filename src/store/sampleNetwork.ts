@@ -80,23 +80,37 @@ export const SAMPLE_NETWORK_SIGNATURE = {
 } as const;
 
 export function isWorkspaceEmpty(state: AppState): boolean {
-  return (
-    state.connectors.allIds.length === 0 &&
-    state.splices.allIds.length === 0 &&
-    state.nodes.allIds.length === 0 &&
-    state.segments.allIds.length === 0 &&
-    state.wires.allIds.length === 0
-  );
+  return state.networks.allIds.every((networkId) => {
+    const scoped = state.networkStates[networkId];
+    if (scoped === undefined) {
+      return true;
+    }
+
+    return (
+      scoped.connectors.allIds.length === 0 &&
+      scoped.splices.allIds.length === 0 &&
+      scoped.nodes.allIds.length === 0 &&
+      scoped.segments.allIds.length === 0 &&
+      scoped.wires.allIds.length === 0
+    );
+  });
 }
 
 export function hasSampleNetworkSignature(state: AppState): boolean {
-  return (
-    SAMPLE_CONNECTOR_IDS.every((id) => state.connectors.byId[id] !== undefined) &&
-    SAMPLE_SPLICE_IDS.every((id) => state.splices.byId[id] !== undefined) &&
-    SAMPLE_NODE_IDS.every((id) => state.nodes.byId[id] !== undefined) &&
-    SAMPLE_SEGMENT_IDS.every((id) => state.segments.byId[id] !== undefined) &&
-    SAMPLE_WIRE_IDS.every((id) => state.wires.byId[id] !== undefined)
-  );
+  return state.networks.allIds.some((networkId) => {
+    const scoped = state.networkStates[networkId];
+    if (scoped === undefined) {
+      return false;
+    }
+
+    return (
+      SAMPLE_CONNECTOR_IDS.every((id) => scoped.connectors.byId[id] !== undefined) &&
+      SAMPLE_SPLICE_IDS.every((id) => scoped.splices.byId[id] !== undefined) &&
+      SAMPLE_NODE_IDS.every((id) => scoped.nodes.byId[id] !== undefined) &&
+      SAMPLE_SEGMENT_IDS.every((id) => scoped.segments.byId[id] !== undefined) &&
+      SAMPLE_WIRE_IDS.every((id) => scoped.wires.byId[id] !== undefined)
+    );
+  });
 }
 
 export function createSampleNetworkState(): AppState {

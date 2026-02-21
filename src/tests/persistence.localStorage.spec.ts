@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ConnectorId } from "../core/entities";
+import { APP_SCHEMA_VERSION } from "../core/schema";
 import {
   STORAGE_KEY,
   loadState,
@@ -56,11 +57,29 @@ function createSampleState(): AppState {
   ].reduce(appReducer, createInitialState());
 }
 
+function toLegacySingleNetworkState(state: AppState): unknown {
+  return {
+    schemaVersion: 1,
+    connectors: state.connectors,
+    splices: state.splices,
+    nodes: state.nodes,
+    segments: state.segments,
+    wires: state.wires,
+    connectorCavityOccupancy: state.connectorCavityOccupancy,
+    splicePortOccupancy: state.splicePortOccupancy,
+    ui: {
+      selected: state.ui.selected,
+      lastError: state.ui.lastError
+    },
+    meta: state.meta
+  };
+}
+
 describe("migratePersistedPayload", () => {
   it("keeps a current schema snapshot unchanged", () => {
     const state = createSampleState();
     const currentSnapshot: PersistedStateSnapshotV1 = {
-      schemaVersion: 1,
+      schemaVersion: APP_SCHEMA_VERSION,
       createdAtIso: "2026-02-10T08:00:00.000Z",
       updatedAtIso: "2026-02-10T08:30:00.000Z",
       state
@@ -77,14 +96,18 @@ describe("migratePersistedPayload", () => {
     const legacyState = createSampleState();
     const nowIso = "2026-02-20T10:00:00.000Z";
 
-    const result = migratePersistedPayload(legacyState, nowIso);
+    const result = migratePersistedPayload(toLegacySingleNetworkState(legacyState), nowIso);
 
     expect(result).not.toBeNull();
     expect(result?.wasMigrated).toBe(true);
-    expect(result?.snapshot.schemaVersion).toBe(1);
+    expect(result?.snapshot.schemaVersion).toBe(APP_SCHEMA_VERSION);
     expect(result?.snapshot.createdAtIso).toBe(nowIso);
     expect(result?.snapshot.updatedAtIso).toBe(nowIso);
-    expect(result?.snapshot.state).toEqual(legacyState);
+    expect(result?.snapshot.state.connectors).toEqual(legacyState.connectors);
+    expect(result?.snapshot.state.splices).toEqual(legacyState.splices);
+    expect(result?.snapshot.state.nodes).toEqual(legacyState.nodes);
+    expect(result?.snapshot.state.segments).toEqual(legacyState.segments);
+    expect(result?.snapshot.state.wires).toEqual(legacyState.wires);
   });
 });
 
@@ -101,7 +124,7 @@ describe("localStorage persistence adapter", () => {
     expect(savedRaw).not.toBeNull();
 
     const savedSnapshot = JSON.parse(savedRaw ?? "{}") as PersistedStateSnapshotV1;
-    expect(savedSnapshot.schemaVersion).toBe(1);
+    expect(savedSnapshot.schemaVersion).toBe(APP_SCHEMA_VERSION);
     expect(savedSnapshot.createdAtIso).toBe(nowIso);
     expect(savedSnapshot.updatedAtIso).toBe(nowIso);
     expect(hasSampleNetworkSignature(savedSnapshot.state)).toBe(true);
@@ -111,7 +134,7 @@ describe("localStorage persistence adapter", () => {
     const state = createSampleState();
     const storage = createMemoryStorage({
       [STORAGE_KEY]: JSON.stringify({
-        schemaVersion: 1,
+        schemaVersion: APP_SCHEMA_VERSION,
         createdAtIso: "2026-02-01T08:00:00.000Z",
         updatedAtIso: "2026-02-01T09:00:00.000Z",
         state
@@ -138,20 +161,24 @@ describe("localStorage persistence adapter", () => {
     const legacyState = createSampleState();
     const nowIso = "2026-02-20T12:00:00.000Z";
     const storage = createMemoryStorage({
-      [STORAGE_KEY]: JSON.stringify(legacyState)
+      [STORAGE_KEY]: JSON.stringify(toLegacySingleNetworkState(legacyState))
     });
 
     const loaded = loadState(storage, () => nowIso);
     const rewritten = storage.read(STORAGE_KEY);
 
-    expect(loaded).toEqual(legacyState);
+    expect(loaded.connectors).toEqual(legacyState.connectors);
+    expect(loaded.splices).toEqual(legacyState.splices);
+    expect(loaded.nodes).toEqual(legacyState.nodes);
+    expect(loaded.segments).toEqual(legacyState.segments);
+    expect(loaded.wires).toEqual(legacyState.wires);
     expect(rewritten).not.toBeNull();
 
     const rewrittenSnapshot = JSON.parse(rewritten ?? "{}") as PersistedStateSnapshotV1;
-    expect(rewrittenSnapshot.schemaVersion).toBe(1);
+    expect(rewrittenSnapshot.schemaVersion).toBe(APP_SCHEMA_VERSION);
     expect(rewrittenSnapshot.createdAtIso).toBe(nowIso);
     expect(rewrittenSnapshot.updatedAtIso).toBe(nowIso);
-    expect(rewrittenSnapshot.state).toEqual(legacyState);
+    expect(rewrittenSnapshot.state).toEqual(loaded);
   });
 
   it("bootstraps sample state when persisted payload is a valid but empty workspace", () => {
@@ -159,7 +186,7 @@ describe("localStorage persistence adapter", () => {
     const nowIso = "2026-02-20T12:30:00.000Z";
     const storage = createMemoryStorage({
       [STORAGE_KEY]: JSON.stringify({
-        schemaVersion: 1,
+        schemaVersion: APP_SCHEMA_VERSION,
         createdAtIso: "2026-02-10T08:00:00.000Z",
         updatedAtIso: "2026-02-10T08:00:00.000Z",
         state: emptyState
@@ -179,7 +206,7 @@ describe("localStorage persistence adapter", () => {
     const existingState = createSampleState();
     const storage = createMemoryStorage({
       [STORAGE_KEY]: JSON.stringify({
-        schemaVersion: 1,
+        schemaVersion: APP_SCHEMA_VERSION,
         createdAtIso: "2026-02-10T08:00:00.000Z",
         updatedAtIso: "2026-02-10T08:30:00.000Z",
         state: existingState
@@ -210,7 +237,7 @@ describe("localStorage persistence adapter", () => {
     );
     const storage = createMemoryStorage({
       [STORAGE_KEY]: JSON.stringify({
-        schemaVersion: 1,
+        schemaVersion: APP_SCHEMA_VERSION,
         createdAtIso: "2026-02-10T07:00:00.000Z",
         updatedAtIso: "2026-02-10T08:00:00.000Z",
         state: firstState
@@ -223,7 +250,7 @@ describe("localStorage persistence adapter", () => {
     expect(raw).not.toBeNull();
 
     const savedSnapshot = JSON.parse(raw ?? "{}") as PersistedStateSnapshotV1;
-    expect(savedSnapshot.schemaVersion).toBe(1);
+    expect(savedSnapshot.schemaVersion).toBe(APP_SCHEMA_VERSION);
     expect(savedSnapshot.createdAtIso).toBe("2026-02-10T07:00:00.000Z");
     expect(savedSnapshot.updatedAtIso).toBe("2026-02-20T13:00:00.000Z");
     expect(savedSnapshot.state).toEqual(secondState);

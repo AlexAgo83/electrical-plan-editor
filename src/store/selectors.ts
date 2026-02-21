@@ -1,4 +1,6 @@
 import type {
+  Network,
+  NetworkId,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -23,6 +25,26 @@ function selectCollection<T, Id extends string>(
 
 export function selectConnectors(state: AppState): Connector[] {
   return selectCollection(state.connectors.byId, state.connectors.allIds);
+}
+
+export function selectNetworks(state: AppState): Network[] {
+  return selectCollection(state.networks.byId, state.networks.allIds);
+}
+
+export function selectNetworkById(state: AppState, id: NetworkId): Network | undefined {
+  return state.networks.byId[id];
+}
+
+export function selectActiveNetworkId(state: AppState): NetworkId | null {
+  return state.activeNetworkId;
+}
+
+export function selectActiveNetwork(state: AppState): Network | null {
+  if (state.activeNetworkId === null) {
+    return null;
+  }
+
+  return state.networks.byId[state.activeNetworkId] ?? null;
 }
 
 export function selectSplices(state: AppState): Splice[] {
@@ -67,6 +89,29 @@ export function selectSelection(state: AppState): SelectionState | null {
 
 export function selectLastError(state: AppState): string | null {
   return state.ui.lastError;
+}
+
+export function selectThemeMode(state: AppState): "normal" | "dark" {
+  return state.ui.themeMode;
+}
+
+export function selectNetworkTechnicalIdTaken(
+  state: AppState,
+  technicalId: string,
+  excludedNetworkId?: NetworkId
+): boolean {
+  return state.networks.allIds.some((id) => {
+    if (excludedNetworkId !== undefined && id === excludedNetworkId) {
+      return false;
+    }
+
+    const network = state.networks.byId[id];
+    if (network === undefined) {
+      return false;
+    }
+
+    return network.technicalId === technicalId;
+  });
 }
 
 export function selectConnectorTechnicalIdTaken(

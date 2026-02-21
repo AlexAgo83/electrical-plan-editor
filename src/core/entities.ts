@@ -1,10 +1,20 @@
 export type Brand<T, B extends string> = T & { readonly __brand: B };
 
+export type NetworkId = Brand<string, "NetworkId">;
 export type ConnectorId = Brand<string, "ConnectorId">;
 export type SpliceId = Brand<string, "SpliceId">;
 export type NodeId = Brand<string, "NodeId">;
 export type SegmentId = Brand<string, "SegmentId">;
 export type WireId = Brand<string, "WireId">;
+
+export interface Network {
+  id: NetworkId;
+  name: string;
+  technicalId: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Connector {
   id: ConnectorId;

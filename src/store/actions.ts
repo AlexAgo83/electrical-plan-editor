@@ -1,4 +1,6 @@
 import type {
+  Network,
+  NetworkId,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -11,9 +13,42 @@ import type {
   Wire,
   WireId
 } from "../core/entities";
-import type { SelectionState } from "./types";
+import type { NetworkScopedState, SelectionState, ThemeMode } from "./types";
 
 export type AppAction =
+  | {
+      type: "network/create";
+      payload: {
+        network: Network;
+        setActive?: boolean;
+      };
+    }
+  | { type: "network/select"; payload: { id: NetworkId } }
+  | {
+      type: "network/rename";
+      payload: {
+        id: NetworkId;
+        name: string;
+        description?: string;
+        updatedAt: string;
+      };
+    }
+  | {
+      type: "network/duplicate";
+      payload: {
+        sourceNetworkId: NetworkId;
+        network: Network;
+      };
+    }
+  | { type: "network/delete"; payload: { id: NetworkId } }
+  | {
+      type: "network/importMany";
+      payload: {
+        networks: Network[];
+        networkStates: Record<NetworkId, NetworkScopedState>;
+        activateFirst?: boolean;
+      };
+    }
   | { type: "connector/upsert"; payload: Connector }
   | { type: "connector/remove"; payload: { id: ConnectorId } }
   | {
@@ -47,10 +82,34 @@ export type AppAction =
   | { type: "wire/upsert"; payload: Wire }
   | { type: "wire/remove"; payload: { id: WireId } }
   | { type: "ui/select"; payload: SelectionState }
+  | { type: "ui/setThemeMode"; payload: { mode: ThemeMode } }
   | { type: "ui/clearSelection" }
   | { type: "ui/clearError" };
 
 export const appActions = {
+  createNetwork: (network: Network, setActive = true): AppAction => ({
+    type: "network/create",
+    payload: { network, setActive }
+  }),
+  selectNetwork: (id: NetworkId): AppAction => ({ type: "network/select", payload: { id } }),
+  renameNetwork: (id: NetworkId, name: string, updatedAt: string, description?: string): AppAction => ({
+    type: "network/rename",
+    payload: { id, name, updatedAt, description }
+  }),
+  duplicateNetwork: (sourceNetworkId: NetworkId, network: Network): AppAction => ({
+    type: "network/duplicate",
+    payload: { sourceNetworkId, network }
+  }),
+  deleteNetwork: (id: NetworkId): AppAction => ({ type: "network/delete", payload: { id } }),
+  importNetworks: (
+    networks: Network[],
+    networkStates: Record<NetworkId, NetworkScopedState>,
+    activateFirst = false
+  ): AppAction => ({
+    type: "network/importMany",
+    payload: { networks, networkStates, activateFirst }
+  }),
+
   upsertConnector: (payload: Connector): AppAction => ({ type: "connector/upsert", payload }),
   removeConnector: (id: ConnectorId): AppAction => ({ type: "connector/remove", payload: { id } }),
   occupyConnectorCavity: (connectorId: ConnectorId, cavityIndex: number, occupantRef: string): AppAction => ({
@@ -95,6 +154,7 @@ export const appActions = {
   removeWire: (id: WireId): AppAction => ({ type: "wire/remove", payload: { id } }),
 
   select: (payload: SelectionState): AppAction => ({ type: "ui/select", payload }),
+  setThemeMode: (mode: ThemeMode): AppAction => ({ type: "ui/setThemeMode", payload: { mode } }),
   clearSelection: (): AppAction => ({ type: "ui/clearSelection" }),
   clearError: (): AppAction => ({ type: "ui/clearError" })
 };

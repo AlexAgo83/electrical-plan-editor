@@ -1,0 +1,128 @@
+import type { NetworkId } from "../core/entities";
+import type { AppState, NetworkScopedState } from "./types";
+
+function cloneEntityState<T, Id extends string>(state: { byId: Record<Id, T>; allIds: Id[] }): {
+  byId: Record<Id, T>;
+  allIds: Id[];
+} {
+  return {
+    byId: { ...state.byId },
+    allIds: [...state.allIds]
+  };
+}
+
+export function extractScopedState(state: AppState): NetworkScopedState {
+  return {
+    connectors: cloneEntityState(state.connectors),
+    splices: cloneEntityState(state.splices),
+    nodes: cloneEntityState(state.nodes),
+    segments: cloneEntityState(state.segments),
+    wires: cloneEntityState(state.wires),
+    connectorCavityOccupancy: { ...state.connectorCavityOccupancy },
+    splicePortOccupancy: { ...state.splicePortOccupancy }
+  };
+}
+
+export function assignScopedState(state: AppState, scoped: NetworkScopedState): AppState {
+  return {
+    ...state,
+    connectors: scoped.connectors,
+    splices: scoped.splices,
+    nodes: scoped.nodes,
+    segments: scoped.segments,
+    wires: scoped.wires,
+    connectorCavityOccupancy: scoped.connectorCavityOccupancy,
+    splicePortOccupancy: scoped.splicePortOccupancy
+  };
+}
+
+export function persistActiveNetworkSnapshot(state: AppState): AppState {
+  if (state.activeNetworkId === null) {
+    return state;
+  }
+
+  return {
+    ...state,
+    networkStates: {
+      ...state.networkStates,
+      [state.activeNetworkId]: extractScopedState(state)
+    }
+  };
+}
+
+export function loadNetworkIntoActiveScope(state: AppState, networkId: NetworkId): AppState {
+  const scoped = state.networkStates[networkId];
+  if (scoped === undefined) {
+    return state;
+  }
+
+  return assignScopedState(
+    {
+      ...state,
+      activeNetworkId: networkId
+    },
+    scoped
+  );
+}
+
+export function clearActiveScope(state: AppState): AppState {
+  return {
+    ...state,
+    connectors: { byId: {} as AppState["connectors"]["byId"], allIds: [] },
+    splices: { byId: {} as AppState["splices"]["byId"], allIds: [] },
+    nodes: { byId: {} as AppState["nodes"]["byId"], allIds: [] },
+    segments: { byId: {} as AppState["segments"]["byId"], allIds: [] },
+    wires: { byId: {} as AppState["wires"]["byId"], allIds: [] },
+    connectorCavityOccupancy: {} as AppState["connectorCavityOccupancy"],
+    splicePortOccupancy: {} as AppState["splicePortOccupancy"]
+  };
+}
+
+export function syncCurrentScopeToNetworkMap(state: AppState): AppState {
+  if (state.activeNetworkId === null) {
+    return state;
+  }
+
+  const snapshot = extractScopedState(state);
+  const existing = state.networkStates[state.activeNetworkId];
+  if (existing === undefined) {
+    return {
+      ...state,
+      networkStates: {
+        ...state.networkStates,
+        [state.activeNetworkId]: snapshot
+      }
+    };
+  }
+
+  return {
+    ...state,
+    networkStates: {
+      ...state.networkStates,
+      [state.activeNetworkId]: snapshot
+    }
+  };
+}
+
+export function buildNetworkDeletionFallback(
+  networks: AppState["networks"],
+  excludedNetworkId: NetworkId
+): NetworkId | null {
+  const remaining = networks.allIds
+    .map((id) => networks.byId[id])
+    .filter((network): network is NonNullable<typeof network> => network !== undefined && network.id !== excludedNetworkId);
+  if (remaining.length === 0) {
+    return null;
+  }
+
+  remaining.sort((left, right) => {
+    const createdComparison = left.createdAt.localeCompare(right.createdAt);
+    if (createdComparison !== 0) {
+      return createdComparison;
+    }
+
+    return left.technicalId.localeCompare(right.technicalId);
+  });
+
+  return remaining[0]?.id ?? null;
+}

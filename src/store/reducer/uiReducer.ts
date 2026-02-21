@@ -34,6 +34,21 @@ export function handleUiActions(state: AppState, action: AppAction): AppState | 
       return clearLastError(state);
     }
 
+    case "ui/setThemeMode": {
+      if (state.ui.themeMode === action.payload.mode) {
+        return clearLastError(state);
+      }
+
+      return bumpRevision({
+        ...clearLastError(state),
+        ui: {
+          ...state.ui,
+          themeMode: action.payload.mode,
+          lastError: null
+        }
+      });
+    }
+
     default:
       return null;
   }

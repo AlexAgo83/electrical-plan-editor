@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { APP_SCHEMA_VERSION } from "../core/schema";
 import {
   STORAGE_KEY,
   loadState,
@@ -6,7 +7,7 @@ import {
   saveState,
   type PersistedStateSnapshotV1
 } from "../adapters/persistence";
-import { createSampleNetworkState, hasSampleNetworkSignature } from "../store";
+import { createSampleNetworkState, hasSampleNetworkSignature, type AppState } from "../store";
 
 interface MemoryStorage extends Pick<Storage, "getItem" | "setItem" | "removeItem"> {
   read: (key: string) => string | null;
@@ -31,6 +32,24 @@ function createMemoryStorage(seed: Record<string, string> = {}): MemoryStorage {
   };
 }
 
+function toLegacySingleNetworkState(state: AppState): unknown {
+  return {
+    schemaVersion: 1,
+    connectors: state.connectors,
+    splices: state.splices,
+    nodes: state.nodes,
+    segments: state.segments,
+    wires: state.wires,
+    connectorCavityOccupancy: state.connectorCavityOccupancy,
+    splicePortOccupancy: state.splicePortOccupancy,
+    ui: {
+      selected: state.ui.selected,
+      lastError: state.ui.lastError
+    },
+    meta: state.meta
+  };
+}
+
 describe("sample network compatibility", () => {
   it("round-trips sample state through persistence snapshot save/load", () => {
     const sample = createSampleNetworkState();
@@ -45,11 +64,11 @@ describe("sample network compatibility", () => {
 
   it("migrates legacy sample payload to current persisted snapshot format", () => {
     const sample = createSampleNetworkState();
-    const migration = migratePersistedPayload(sample, "2026-02-21T10:15:00.000Z");
+    const migration = migratePersistedPayload(toLegacySingleNetworkState(sample), "2026-02-21T10:15:00.000Z");
 
     expect(migration).not.toBeNull();
     expect(migration?.wasMigrated).toBe(true);
-    expect(migration?.snapshot.schemaVersion).toBe(1);
+    expect(migration?.snapshot.schemaVersion).toBe(APP_SCHEMA_VERSION);
     expect(hasSampleNetworkSignature(migration?.snapshot.state ?? sample)).toBe(true);
   });
 
@@ -69,4 +88,3 @@ describe("sample network compatibility", () => {
     expect(hasSampleNetworkSignature(migration?.snapshot.state ?? sample)).toBe(true);
   });
 });
-

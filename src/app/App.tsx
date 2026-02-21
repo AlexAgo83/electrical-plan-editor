@@ -11,6 +11,7 @@ import {
   useSyncExternalStore
 } from "react";
 import type {
+  NetworkId,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -29,11 +30,15 @@ import {
   createSampleNetworkState,
   hasSampleNetworkSignature,
   isWorkspaceEmpty,
+  selectActiveNetwork,
+  selectActiveNetworkId,
   selectConnectorById,
   selectConnectorCavityStatuses,
   selectConnectorTechnicalIdTaken,
   selectConnectors,
   selectLastError,
+  selectNetworkTechnicalIdTaken,
+  selectNetworks,
   selectNodeById,
   selectNodes,
   selectRoutingGraphIndex,
@@ -48,7 +53,8 @@ import {
   selectSubNetworkSummaries,
   selectWireById,
   selectWireTechnicalIdTaken,
-  selectWires
+  selectWires,
+  type ThemeMode
 } from "../store";
 import { appStore } from "./store";
 import { InspectorContextPanel } from "./components/InspectorContextPanel";
@@ -172,6 +178,24 @@ function nextSortState(current: SortState, field: SortField): SortState {
     field,
     direction: current.direction === "asc" ? "desc" : "asc"
   };
+}
+
+function buildUniqueNetworkTechnicalId(
+  baseTechnicalId: string,
+  existingTechnicalIds: Set<string>
+): string {
+  if (!existingTechnicalIds.has(baseTechnicalId)) {
+    return baseTechnicalId;
+  }
+
+  let index = 1;
+  let candidate = `${baseTechnicalId}-COPY`;
+  while (existingTechnicalIds.has(candidate)) {
+    index += 1;
+    candidate = `${baseTechnicalId}-COPY-${index}`;
+  }
+
+  return candidate;
 }
 
 function createNodePositionMap(nodes: NetworkNode[]): Record<NodeId, NodePosition> {
@@ -300,6 +324,9 @@ interface SelectionTarget {
 export function App({ store = appStore }: AppProps): ReactElement {
   const state = useAppSnapshot(store);
 
+  const networks = selectNetworks(state);
+  const activeNetworkId = selectActiveNetworkId(state);
+  const activeNetwork = selectActiveNetwork(state);
   const connectors = selectConnectors(state);
   const splices = selectSplices(state);
   const nodes = selectNodes(state);
@@ -420,6 +447,12 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [snapNodesToGrid, setSnapNodesToGrid] = useState(false);
   const [networkScale, setNetworkScale] = useState(1);
   const [networkOffset, setNetworkOffset] = useState<NodePosition>({ x: 0, y: 0 });
+  const [newNetworkName, setNewNetworkName] = useState("");
+  const [newNetworkTechnicalId, setNewNetworkTechnicalId] = useState("");
+  const [newNetworkDescription, setNewNetworkDescription] = useState("");
+  const [networkFormError, setNetworkFormError] = useState<string | null>(null);
+  const [renameNetworkName, setRenameNetworkName] = useState("");
+  const [themeMode, setThemeMode] = useState<ThemeMode>("normal");
   const [tableDensity, setTableDensity] = useState<TableDensity>("comfortable");
   const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
   const [defaultSortDirection, setDefaultSortDirection] = useState<SortDirection>("asc");
@@ -501,6 +534,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const wireTechnicalIdAlreadyUsed =
     wireTechnicalId.trim().length > 0 &&
     selectWireTechnicalIdTaken(state, wireTechnicalId.trim(), wireIdExcludedFromUniqueness);
+  const networkTechnicalIdAlreadyUsed =
+    newNetworkTechnicalId.trim().length > 0 && selectNetworkTechnicalIdTaken(state, newNetworkTechnicalId.trim());
 
   const totalEdgeEntries = routingGraph.nodeIds.reduce(
     (sum, nodeId) => sum + (routingGraph.edgesByNodeId[nodeId]?.length ?? 0),
@@ -551,6 +586,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   useUiPreferences({
     networkMinScale: NETWORK_MIN_SCALE,
     networkMaxScale: NETWORK_MAX_SCALE,
+    themeMode,
     tableDensity,
     defaultSortField,
     defaultSortDirection,
@@ -581,6 +617,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setNetworkOffset,
     setShowShortcutHints,
     setKeyboardShortcutsEnabled,
+    setThemeMode,
     setPreferencesHydrated
   });
   const describeWireEndpoint = useCallback((endpoint: WireEndpoint): string => {
@@ -619,6 +656,15 @@ export function App({ store = appStore }: AppProps): ReactElement {
       return changed ? next : previous;
     });
   }, [nodes]);
+
+  useEffect(() => {
+    if (activeNetwork === null) {
+      setRenameNetworkName("");
+      return;
+    }
+
+    setRenameNetworkName(activeNetwork.name);
+  }, [activeNetwork]);
 
   useEffect(() => {
     setModeAnchorNodeId(null);
@@ -1457,6 +1503,9 @@ export function App({ store = appStore }: AppProps): ReactElement {
     segment: segments.length,
     wire: wires.length
   };
+  const activeNetworkLabel =
+    activeNetwork === null ? "No active network" : `${activeNetwork.name} (${activeNetwork.technicalId})`;
+  const hasActiveNetwork = activeNetwork !== null;
   const isCurrentWorkspaceEmpty = isWorkspaceEmpty(state);
   const hasBuiltInSampleState = hasSampleNetworkSignature(state);
 
@@ -1598,6 +1647,105 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setInteractionMode("select");
     setSaveStatus("unsaved");
     queueSavedStatus();
+  }
+
+  function handleCreateNetwork(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+
+    const trimmedName = newNetworkName.trim();
+    const trimmedTechnicalId = newNetworkTechnicalId.trim();
+    if (trimmedName.length === 0 || trimmedTechnicalId.length === 0) {
+      setNetworkFormError("Network name and technical ID are required.");
+      return;
+    }
+
+    if (selectNetworkTechnicalIdTaken(store.getState(), trimmedTechnicalId)) {
+      setNetworkFormError(`Network technical ID '${trimmedTechnicalId}' is already used.`);
+      return;
+    }
+
+    const nowIso = new Date().toISOString();
+    const networkId = createEntityId("net") as NetworkId;
+    dispatchAction(
+      appActions.createNetwork({
+        id: networkId,
+        name: trimmedName,
+        technicalId: trimmedTechnicalId,
+        description: newNetworkDescription.trim().length === 0 ? undefined : newNetworkDescription.trim(),
+        createdAt: nowIso,
+        updatedAt: nowIso
+      })
+    );
+
+    if (store.getState().networks.byId[networkId] !== undefined) {
+      setNetworkFormError(null);
+      setNewNetworkName("");
+      setNewNetworkTechnicalId("");
+      setNewNetworkDescription("");
+      return;
+    }
+
+    setNetworkFormError("Unable to create network. Check technical ID uniqueness.");
+  }
+
+  function handleSelectNetwork(nextNetworkId: NetworkId): void {
+    dispatchAction(appActions.selectNetwork(nextNetworkId), { trackHistory: false });
+  }
+
+  function handleRenameActiveNetwork(): void {
+    if (activeNetwork === null) {
+      return;
+    }
+
+    const trimmedName = renameNetworkName.trim();
+    if (trimmedName.length === 0) {
+      setNetworkFormError("Network name must be non-empty.");
+      return;
+    }
+
+    dispatchAction(
+      appActions.renameNetwork(activeNetwork.id, trimmedName, new Date().toISOString(), activeNetwork.description)
+    );
+    setNetworkFormError(null);
+  }
+
+  function handleDuplicateActiveNetwork(): void {
+    if (activeNetwork === null) {
+      return;
+    }
+
+    const existingTechnicalIds = new Set(networks.map((network) => network.technicalId));
+    const technicalId = buildUniqueNetworkTechnicalId(activeNetwork.technicalId, existingTechnicalIds);
+    const nowIso = new Date().toISOString();
+    dispatchAction(
+      appActions.duplicateNetwork(activeNetwork.id, {
+        id: createEntityId("net") as NetworkId,
+        name: `${activeNetwork.name} (Copy)`,
+        technicalId,
+        description: activeNetwork.description,
+        createdAt: nowIso,
+        updatedAt: nowIso
+      })
+    );
+    setNetworkFormError(null);
+  }
+
+  function handleDeleteActiveNetwork(): void {
+    if (activeNetwork === null) {
+      return;
+    }
+
+    if (typeof window !== "undefined" && typeof window.confirm === "function") {
+      const shouldDelete = window.confirm(
+        `Delete network '${activeNetwork.name}' (${activeNetwork.technicalId})?`
+      );
+      if (!shouldDelete) {
+        return;
+      }
+    }
+
+    dispatchAction(appActions.deleteNetwork(activeNetwork.id));
+    setNetworkFormError(null);
   }
 
   function handleRecreateSampleNetwork(): void {
@@ -2905,6 +3053,9 @@ export function App({ store = appStore }: AppProps): ReactElement {
     <main className={appShellClassName}>
       <section className="header-block">
         <h1>Electrical Plan Editor</h1>
+        <p className="meta-line">
+          Active network: <strong>{activeNetworkLabel}</strong>
+        </p>
       </section>
 
       {lastError !== null ? (
@@ -2953,6 +3104,84 @@ export function App({ store = appStore }: AppProps): ReactElement {
             onScreenChange={setActiveScreen}
             onSubScreenChange={setActiveSubScreen}
           />
+
+          <section className="workspace-health" aria-label="Network scope">
+            <h2>Network scope</h2>
+            {networks.length === 0 ? (
+              <p className="empty-copy">
+                No network available. Create one to enable modeling and analysis.
+              </p>
+            ) : (
+              <label>
+                Active network
+                <select
+                  value={activeNetworkId ?? ""}
+                  onChange={(event) => handleSelectNetwork(event.target.value as NetworkId)}
+                >
+                  {networks.map((network) => (
+                    <option key={network.id} value={network.id}>
+                      {network.name} ({network.technicalId})
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <div className="row-actions compact">
+              <button type="button" onClick={handleDuplicateActiveNetwork} disabled={!hasActiveNetwork}>
+                Duplicate
+              </button>
+              <button type="button" onClick={handleDeleteActiveNetwork} disabled={!hasActiveNetwork}>
+                Delete
+              </button>
+            </div>
+            <label>
+              Rename active network
+              <input
+                value={renameNetworkName}
+                onChange={(event) => setRenameNetworkName(event.target.value)}
+                placeholder="Network name"
+                disabled={!hasActiveNetwork}
+              />
+            </label>
+            <div className="row-actions compact">
+              <button type="button" onClick={handleRenameActiveNetwork} disabled={!hasActiveNetwork}>
+                Rename
+              </button>
+            </div>
+            <form className="settings-grid" onSubmit={handleCreateNetwork}>
+              <label>
+                New network name
+                <input
+                  value={newNetworkName}
+                  onChange={(event) => setNewNetworkName(event.target.value)}
+                  placeholder="Vehicle platform A"
+                />
+              </label>
+              <label>
+                New network technical ID
+                <input
+                  value={newNetworkTechnicalId}
+                  onChange={(event) => setNewNetworkTechnicalId(event.target.value)}
+                  placeholder="NET-PLAT-A"
+                />
+              </label>
+              <label>
+                Description (optional)
+                <input
+                  value={newNetworkDescription}
+                  onChange={(event) => setNewNetworkDescription(event.target.value)}
+                  placeholder="Optional description"
+                />
+              </label>
+              {networkFormError !== null ? <p className="form-error">{networkFormError}</p> : null}
+              {networkTechnicalIdAlreadyUsed ? (
+                <p className="form-hint danger">Technical ID already used by another network.</p>
+              ) : null}
+              <div className="row-actions compact">
+                <button type="submit">Create network</button>
+              </div>
+            </form>
+          </section>
 
           <section className="workspace-meta">
             <div className="workspace-meta-main">
@@ -3033,6 +3262,15 @@ export function App({ store = appStore }: AppProps): ReactElement {
         </aside>
 
         <section className="workspace-content">
+      {!hasActiveNetwork ? (
+        <section className="panel">
+          <h2>No active network</h2>
+          <p className="empty-copy">
+            Create a network from the sidebar to start modeling connectors, splices, nodes, segments, and wires.
+          </p>
+        </section>
+      ) : (
+        <>
       {isModelingScreen ? (
         <>
       <section className="workspace-stage">
@@ -4509,6 +4747,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
           </section>
         </section>
       ) : null}
+        </>
+      )}
         </section>
       </section>
     </main>

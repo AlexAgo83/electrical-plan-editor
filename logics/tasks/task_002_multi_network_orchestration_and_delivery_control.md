@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Multi-Network Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -19,12 +19,12 @@ Backlog scope covered:
 - `item_019_multi_network_test_matrix_and_regression_coverage.md`
 
 # Plan
-- [ ] 1. Freeze model and persistence contracts (`item_014`, `item_017`) with explicit migration invariants
-- [ ] 2. Deliver Wave 1 (`item_014`, `item_015`) and validate active-scope UI navigation end-to-end
-- [ ] 3. Deliver Wave 2 (`item_016`, `item_018`) and validate integrity guards + lifecycle fallback determinism
-- [ ] 4. Deliver Wave 3 (`item_019`) with full AC traceability and CI regression coverage
-- [ ] 5. Publish multi-network readiness report (status, blockers, residual risks)
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Freeze model and persistence contracts (`item_014`, `item_017`) with explicit migration invariants
+- [x] 2. Deliver Wave 1 (`item_014`, `item_015`) and validate active-scope UI navigation end-to-end
+- [x] 3. Deliver Wave 2 (`item_016`, `item_018`) and validate integrity guards + lifecycle fallback determinism
+- [x] 4. Deliver Wave 3 (`item_019`) with full AC traceability and CI regression coverage
+- [x] 5. Publish multi-network readiness report (status, blockers, residual risks)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -35,16 +35,14 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 1 planned: state partition and active-network selector/navigation.
-  - Wave 2 planned: ownership guards, cross-network validation isolation, network lifecycle actions.
-  - Wave 3 planned: migration hardening and complete regression/traceability coverage.
-- Current blockers: none (initial planning state).
+  - Wave 1 delivered: `Network` aggregate + active selector/navigation + scoped reducers/selectors.
+  - Wave 2 delivered: network lifecycle (`create/select/rename/duplicate/delete`) + deterministic fallback + no-active-network guard.
+  - Wave 3 delivered: legacy migration to schema v2 + regression coverage + AC traceability doc (`logics/specs/req_002_multi_network_traceability.md`).
+- Current blockers: none.
 - Main risks to track:
-  - Hidden cross-network reference leaks in reducer edge cases.
-  - Migration data loss for legacy snapshots with partial/inconsistent payloads.
-  - UI context desynchronization after delete/duplicate network actions.
+  - Future import/export merges could reintroduce cross-network leakage if snapshot merge constraints are relaxed.
+  - UI complexity growth in sidebar actions may require dedicated components for long-term maintainability.
 - Mitigation strategy:
-  - Enforce reducer-level ownership guards before UI-level protections.
-  - Add deterministic migration fallback with strict tests for legacy payload variants.
-  - Validate lifecycle workflows through E2E scenarios covering create/switch/duplicate/delete.
-
+  - Keep reducer-level active-scope synchronization centralized in `src/store/reducer.ts` + `src/store/networking.ts`.
+  - Preserve migration compatibility tests for legacy payloads in `src/tests/persistence.localStorage.spec.ts`.
+  - Maintain UI/store isolation tests in `src/tests/app.ui.networks.spec.tsx` and `src/tests/store.reducer.networks.spec.ts`.

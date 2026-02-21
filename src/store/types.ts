@@ -1,4 +1,6 @@
 import type {
+  Network,
+  NetworkId,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -22,8 +24,23 @@ export interface SelectionState {
   id: string;
 }
 
+export type ThemeMode = "normal" | "dark";
+
+export interface NetworkScopedState {
+  connectors: EntityState<Connector, ConnectorId>;
+  splices: EntityState<Splice, SpliceId>;
+  nodes: EntityState<NetworkNode, NodeId>;
+  segments: EntityState<Segment, SegmentId>;
+  wires: EntityState<Wire, WireId>;
+  connectorCavityOccupancy: Record<ConnectorId, Record<number, string>>;
+  splicePortOccupancy: Record<SpliceId, Record<number, string>>;
+}
+
 export interface AppState {
   schemaVersion: AppSchemaVersion;
+  networks: EntityState<Network, NetworkId>;
+  activeNetworkId: NetworkId | null;
+  networkStates: Record<NetworkId, NetworkScopedState>;
   connectors: EntityState<Connector, ConnectorId>;
   splices: EntityState<Splice, SpliceId>;
   nodes: EntityState<NetworkNode, NodeId>;
@@ -34,6 +51,7 @@ export interface AppState {
   ui: {
     selected: SelectionState | null;
     lastError: string | null;
+    themeMode: ThemeMode;
   };
   meta: {
     revision: number;
@@ -47,19 +65,55 @@ export function createEmptyEntityState<T, Id extends string>(): EntityState<T, I
   };
 }
 
-export function createInitialState(): AppState {
+export const DEFAULT_NETWORK_ID = "network-main" as NetworkId;
+export const DEFAULT_NETWORK_TECHNICAL_ID = "NET-MAIN";
+export const DEFAULT_NETWORK_CREATED_AT = "2026-01-01T00:00:00.000Z";
+
+export function createEmptyNetworkScopedState(): NetworkScopedState {
   return {
-    schemaVersion: APP_SCHEMA_VERSION,
     connectors: createEmptyEntityState<Connector, ConnectorId>(),
     splices: createEmptyEntityState<Splice, SpliceId>(),
     nodes: createEmptyEntityState<NetworkNode, NodeId>(),
     segments: createEmptyEntityState<Segment, SegmentId>(),
     wires: createEmptyEntityState<Wire, WireId>(),
     connectorCavityOccupancy: {} as Record<ConnectorId, Record<number, string>>,
-    splicePortOccupancy: {} as Record<SpliceId, Record<number, string>>,
+    splicePortOccupancy: {} as Record<SpliceId, Record<number, string>>
+  };
+}
+
+export function createInitialState(): AppState {
+  const defaultScopedState = createEmptyNetworkScopedState();
+  const defaultNetwork: Network = {
+    id: DEFAULT_NETWORK_ID,
+    name: "Main network",
+    technicalId: DEFAULT_NETWORK_TECHNICAL_ID,
+    createdAt: DEFAULT_NETWORK_CREATED_AT,
+    updatedAt: DEFAULT_NETWORK_CREATED_AT
+  };
+
+  return {
+    schemaVersion: APP_SCHEMA_VERSION,
+    networks: {
+      byId: {
+        [defaultNetwork.id]: defaultNetwork
+      } as Record<NetworkId, Network>,
+      allIds: [defaultNetwork.id]
+    },
+    activeNetworkId: defaultNetwork.id,
+    networkStates: {
+      [defaultNetwork.id]: defaultScopedState
+    } as Record<NetworkId, NetworkScopedState>,
+    connectors: defaultScopedState.connectors,
+    splices: defaultScopedState.splices,
+    nodes: defaultScopedState.nodes,
+    segments: defaultScopedState.segments,
+    wires: defaultScopedState.wires,
+    connectorCavityOccupancy: defaultScopedState.connectorCavityOccupancy,
+    splicePortOccupancy: defaultScopedState.splicePortOccupancy,
     ui: {
       selected: null,
-      lastError: null
+      lastError: null,
+      themeMode: "normal"
     },
     meta: {
       revision: 0
