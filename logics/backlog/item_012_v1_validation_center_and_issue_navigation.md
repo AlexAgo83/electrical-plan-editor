@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 98%
 > Confidence: 94%
-> Progress: 99%
+> Progress: 100%
 > Complexity: High
 > Theme: UX/UI Validation Workflow
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -38,6 +38,7 @@ Validation feedback is currently distributed across local errors, making it hard
   - Grouped issue list with severity/category filtering and one-click `Go to` navigation is active.
   - `Go to` now restores modeling context and recenters canvas focus on the targeted entity.
   - Sidebar `Model health` snapshot continuously surfaces issue totals and provides quick open actions for all/errors/warnings.
+  - Sidebar issue navigator (`Previous issue` / `Next issue`) allows sequential issue review with direct context focus.
   - Planned issue categories are covered: occupancy conflicts, route lock validity, missing references, incomplete required fields.
 - References:
   - `logics/request/req_001_v1_ux_ui_operator_workspace.md`

@@ -83,7 +83,7 @@ UX/UI workspace wave (`task_001`) is in progress:
 - Workspace navigation now surfaces live counters (entity counts on sub-screens, issue count on `Validation`).
 - Validation center screen with grouped issues and `Go to` actions is active.
 - Validation center now supports severity filtering (`All severities`, `Errors`, `Warnings`) in addition to category filters.
-- Sidebar now includes a `Model health` snapshot with quick actions to open validation or focus directly on errors/warnings.
+- Sidebar now includes a `Model health` snapshot with quick actions to open validation, focus on errors/warnings, and step through issues (`Previous`/`Next`).
 - List ergonomics now include search on all core lists and filters on node/wire/connector/splice/segment lists.
 - Network canvas is visible in both modeling and analysis workspaces.
 - Canvas controls include `Fit network` (button + `Alt+F`) to frame current topology quickly.

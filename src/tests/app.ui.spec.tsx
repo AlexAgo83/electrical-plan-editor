@@ -361,6 +361,30 @@ describe("App integration UI", () => {
     expect(within(validationPanel).queryByText("WARNING")).not.toBeInTheDocument();
   });
 
+  it("navigates validation issues from model health quick navigator", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    const modelHealth = screen.getByRole("region", { name: "Model health" });
+    expect(within(modelHealth).getByText(/Issue navigator:/i, { selector: "p" })).toBeInTheDocument();
+    expect(within(modelHealth).getByText("1/2", { selector: "strong" })).toBeInTheDocument();
+
+    fireEvent.click(within(modelHealth).getByRole("button", { name: "Next issue" }));
+
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/ })).toHaveClass("is-active");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/ })).toHaveClass("is-active");
+
+    const inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText("W1")).toBeInTheDocument();
+    expect(within(modelHealth).getByText(/Issue navigator:/i, { selector: "p" })).toBeInTheDocument();
+    expect(within(modelHealth).getByText("1/2", { selector: "strong" })).toBeInTheDocument();
+  });
+
   it("applies settings defaults for list sort behavior", () => {
     const store = createAppStore(createConnectorSortingState());
     render(<App store={store} />);

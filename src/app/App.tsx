@@ -443,6 +443,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [wireRouteFilter, setWireRouteFilter] = useState<"all" | "auto" | "locked">("all");
   const [validationCategoryFilter, setValidationCategoryFilter] = useState<string>("all");
   const [validationSeverityFilter, setValidationSeverityFilter] = useState<ValidationSeverityFilter>("all");
+  const [validationIssueCursor, setValidationIssueCursor] = useState(-1);
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [nodeIdSortDirection, setNodeIdSortDirection] = useState<SortDirection>("asc");
@@ -1362,13 +1363,41 @@ export function App({ store = appStore }: AppProps): ReactElement {
     wires
   ]);
 
-  const validationCategories = useMemo(
-    () => [...new Set(validationIssues.map((issue) => issue.category))].sort((left, right) => left.localeCompare(right)),
+  const orderedValidationIssues = useMemo(
+    () =>
+      [...validationIssues].sort((left, right) => {
+        const leftSeverityRank = left.severity === "error" ? 0 : 1;
+        const rightSeverityRank = right.severity === "error" ? 0 : 1;
+        if (leftSeverityRank !== rightSeverityRank) {
+          return leftSeverityRank - rightSeverityRank;
+        }
+
+        const categoryComparison = left.category.localeCompare(right.category);
+        if (categoryComparison !== 0) {
+          return categoryComparison;
+        }
+
+        const subScreenComparison = left.subScreen.localeCompare(right.subScreen);
+        if (subScreenComparison !== 0) {
+          return subScreenComparison;
+        }
+
+        const selectionComparison = left.selectionId.localeCompare(right.selectionId);
+        if (selectionComparison !== 0) {
+          return selectionComparison;
+        }
+
+        return left.id.localeCompare(right.id);
+      }),
     [validationIssues]
+  );
+  const validationCategories = useMemo(
+    () => [...new Set(orderedValidationIssues.map((issue) => issue.category))].sort((left, right) => left.localeCompare(right)),
+    [orderedValidationIssues]
   );
   const visibleValidationIssues = useMemo(
     () =>
-      validationIssues.filter((issue) => {
+      orderedValidationIssues.filter((issue) => {
         if (validationCategoryFilter !== "all" && issue.category !== validationCategoryFilter) {
           return false;
         }
@@ -1379,7 +1408,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
         return true;
       }),
-    [validationCategoryFilter, validationIssues, validationSeverityFilter]
+    [orderedValidationIssues, validationCategoryFilter, validationSeverityFilter]
   );
   const validationErrorCount = useMemo(
     () => validationIssues.filter((issue) => issue.severity === "error").length,
@@ -1415,6 +1444,17 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     setValidationCategoryFilter("all");
   }, [validationCategories, validationCategoryFilter]);
+
+  useEffect(() => {
+    if (orderedValidationIssues.length === 0) {
+      setValidationIssueCursor(-1);
+      return;
+    }
+
+    if (validationIssueCursor >= orderedValidationIssues.length) {
+      setValidationIssueCursor(0);
+    }
+  }, [orderedValidationIssues, validationIssueCursor]);
 
   const entityCountBySubScreen: Record<SubScreenId, number> = {
     connector: connectors.length,
@@ -2409,6 +2449,22 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setActiveScreen("validation");
   }
 
+  function moveValidationIssueCursor(direction: 1 | -1): void {
+    if (orderedValidationIssues.length === 0) {
+      return;
+    }
+
+    const baseIndex = validationIssueCursor < 0 ? (direction > 0 ? -1 : 0) : validationIssueCursor;
+    const nextIndex = (baseIndex + direction + orderedValidationIssues.length) % orderedValidationIssues.length;
+    const issue = orderedValidationIssues[nextIndex];
+    if (issue === undefined) {
+      return;
+    }
+
+    setValidationIssueCursor(nextIndex);
+    handleValidationIssueGoTo(issue);
+  }
+
   function handleOpenSelectionInInspector(): void {
     if (selectedSubScreen === null) {
       return;
@@ -3234,6 +3290,14 @@ export function App({ store = appStore }: AppProps): ReactElement {
               <p className="meta-line">
                 Errors: <strong>{validationErrorCount}</strong> / Warnings: <strong>{validationWarningCount}</strong>
               </p>
+              <p className="meta-line">
+                Issue navigator:{" "}
+                <strong>
+                  {orderedValidationIssues.length === 0
+                    ? "No issue"
+                    : `${validationIssueCursor >= 0 ? validationIssueCursor + 1 : 1}/${orderedValidationIssues.length}`}
+                </strong>
+              </p>
               <div className="row-actions compact">
                 <button type="button" onClick={() => handleOpenValidationScreen("all")}>
                   Open validation
@@ -3251,6 +3315,20 @@ export function App({ store = appStore }: AppProps): ReactElement {
                   disabled={validationWarningCount === 0}
                 >
                   Review warnings
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveValidationIssueCursor(-1)}
+                  disabled={orderedValidationIssues.length === 0}
+                >
+                  Previous issue
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveValidationIssueCursor(1)}
+                  disabled={orderedValidationIssues.length === 0}
+                >
+                  Next issue
                 </button>
               </div>
             </section>
