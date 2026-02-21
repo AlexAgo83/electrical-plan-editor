@@ -25,7 +25,7 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
   };
 
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Electrical Plan Editor" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "e-Plan Editor" })).toBeVisible();
   await switchScreen("modeling");
 
   const connectorsPanel = page
@@ -84,7 +84,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   };
 
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Electrical Plan Editor" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "e-Plan Editor" })).toBeVisible();
 
   await switchSubScreen("connector");
   const connectorForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Connector" }) });

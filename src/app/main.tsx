@@ -8,6 +8,8 @@ if (container === null) {
   throw new Error("Root element was not found.");
 }
 
+document.title = "e-Plan Editor";
+
 createRoot(container).render(
   <StrictMode>
     <App />

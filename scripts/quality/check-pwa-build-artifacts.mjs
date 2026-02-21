@@ -23,11 +23,11 @@ if (workboxFile === undefined) {
 }
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-if (manifest.name !== "Electrical Plan Editor") {
+if (manifest.name !== "e-Plan Editor") {
   throw new Error(`Unexpected manifest name: ${String(manifest.name)}`);
 }
 
-if (manifest.short_name !== "PlanEditor") {
+if (manifest.short_name !== "e-Plan Editor") {
   throw new Error(`Unexpected manifest short_name: ${String(manifest.short_name)}`);
 }
 

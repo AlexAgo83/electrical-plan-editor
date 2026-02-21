@@ -55,7 +55,7 @@ export function AppHeaderAndStats({
         >
           <span className="header-nav-icon" aria-hidden="true" />
         </button>
-        <h1>Electrical Plan Editor</h1>
+        <h1>e-Plan Editor</h1>
         <div className="header-actions">
           {isInstallPromptAvailable ? (
             <button type="button" className="header-install-toggle" onClick={onInstallApp}>

@@ -21,8 +21,8 @@ export default defineConfig(({ mode }) => {
         },
         includeAssets: ["app-icon.svg", "favicon.svg", "icons/icon-192.png", "icons/icon-512.png"],
         manifest: {
-          name: "Electrical Plan Editor",
-          short_name: "PlanEditor",
+          name: "e-Plan Editor",
+          short_name: "e-Plan Editor",
           description: "Local-first electrical network editor with deterministic modeling and validation.",
           start_url: "/",
           scope: "/",
