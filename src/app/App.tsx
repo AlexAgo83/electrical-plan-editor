@@ -2886,25 +2886,6 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
   function handleNetworkWheel(event: ReactWheelEvent<SVGSVGElement>): void {
     event.preventDefault();
-
-    const localPoint = getLocalSvgPoint(event.currentTarget, event.clientX, event.clientY);
-    if (localPoint === null) {
-      return;
-    }
-
-    const zoomFactor = event.deltaY < 0 ? 1.08 : 0.92;
-    const nextScale = clamp(networkScale * zoomFactor, NETWORK_MIN_SCALE, NETWORK_MAX_SCALE);
-    if (nextScale === networkScale) {
-      return;
-    }
-
-    const modelX = (localPoint.x - networkOffset.x) / networkScale;
-    const modelY = (localPoint.y - networkOffset.y) / networkScale;
-    setNetworkScale(nextScale);
-    setNetworkOffset({
-      x: localPoint.x - modelX * nextScale,
-      y: localPoint.y - modelY * nextScale
-    });
   }
 
   function handleZoomAction(target: "in" | "out" | "reset"): void {
@@ -3112,7 +3093,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
         </button>
       </div>
       <p className="meta-line">
-        {interactionModeHint} View: {networkScalePercent}% zoom. Hold <strong>Shift</strong> and drag empty canvas to pan.
+        {interactionModeHint} View: {networkScalePercent}% zoom. Use toolbar buttons to zoom. Hold{" "}
+        <strong>Shift</strong> and drag empty canvas to pan.
       </p>
       <div className="summary-grid">
         <article>

@@ -261,6 +261,22 @@ describe("App integration UI", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-segment").length).toBe(2);
   });
 
+  it("does not change 2D zoom on mouse wheel", () => {
+    const store = createAppStore(createUiIntegrationState());
+    render(<App store={store} />);
+
+    switchScreen("analysis");
+    switchSubScreen("segment");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const currentZoomLine = () => within(networkSummaryPanel).getByText(/View: \d+% zoom\./).textContent ?? "";
+    const zoomBeforeWheel = currentZoomLine();
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+
+    fireEvent.wheel(networkSvg, { deltaY: -200 });
+    expect(currentZoomLine()).toBe(zoomBeforeWheel);
+  });
+
   it("sorts connector list by clicking the Name header", () => {
     const store = createAppStore(createConnectorSortingState());
     render(<App store={store} />);
