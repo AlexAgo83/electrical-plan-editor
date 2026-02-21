@@ -2,7 +2,7 @@ import { fireEvent, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { ConnectorId, NetworkId } from "../core/entities";
 import { appActions, appReducer, createInitialState } from "../store";
-import { getPanelByHeading, renderAppWithState } from "./helpers/app-ui-test-utils";
+import { getPanelByHeading, renderAppWithState, switchScreen } from "./helpers/app-ui-test-utils";
 
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
@@ -52,10 +52,12 @@ describe("App integration UI - networks", () => {
     expect(within(connectorsPanel).getByText("Default connector")).toBeInTheDocument();
     expect(within(connectorsPanel).queryByText("Connector B")).not.toBeInTheDocument();
 
+    switchScreen("networkScope");
     fireEvent.change(within(document.body).getByLabelText("Active network"), {
       target: { value: "net-b" }
     });
 
+    switchScreen("modeling");
     connectorsPanel = getPanelByHeading("Connectors");
     expect(within(connectorsPanel).getByText("Connector B")).toBeInTheDocument();
     expect(within(connectorsPanel).queryByText("Default connector")).not.toBeInTheDocument();
@@ -66,8 +68,9 @@ describe("App integration UI - networks", () => {
     const noNetwork = appReducer(initial, appActions.deleteNetwork(initial.activeNetworkId as NetworkId));
 
     renderAppWithState(noNetwork);
+    switchScreen("networkScope");
 
-    expect(within(document.body).getByRole("heading", { name: "No active network" })).toBeInTheDocument();
+    expect(within(document.body).getByRole("heading", { name: "Network Scope" })).toBeInTheDocument();
     expect(within(document.body).getByRole("button", { name: "Create network" })).toBeInTheDocument();
   });
 });

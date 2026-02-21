@@ -1,5 +1,4 @@
-import type { FormEvent, ReactElement } from "react";
-import type { NetworkId } from "../../../core/entities";
+import type { ReactElement } from "react";
 import { WorkspaceNavigation } from "../WorkspaceNavigation";
 import type { SubScreenId, ValidationIssue } from "../../types/app-controller";
 
@@ -14,28 +13,6 @@ interface WorkspaceSidebarPanelProps {
   entityCountBySubScreen: Record<SubScreenId, number>;
   onScreenChange: (screen: "networkScope" | "modeling" | "analysis" | "validation" | "settings") => void;
   onSubScreenChange: (subScreen: SubScreenId) => void;
-  networks: Array<{
-    id: NetworkId;
-    name: string;
-    technicalId: string;
-  }>;
-  activeNetworkId: NetworkId | null;
-  hasActiveNetwork: boolean;
-  handleSelectNetwork: (networkId: NetworkId) => void;
-  handleDuplicateActiveNetwork: () => void;
-  handleDeleteActiveNetwork: () => void;
-  renameNetworkName: string;
-  setRenameNetworkName: (value: string) => void;
-  handleRenameActiveNetwork: () => void;
-  newNetworkName: string;
-  setNewNetworkName: (value: string) => void;
-  newNetworkTechnicalId: string;
-  setNewNetworkTechnicalId: (value: string) => void;
-  newNetworkDescription: string;
-  setNewNetworkDescription: (value: string) => void;
-  networkFormError: string | null;
-  networkTechnicalIdAlreadyUsed: boolean;
-  handleCreateNetwork: (event: FormEvent<HTMLFormElement>) => void;
   handleUndo: () => void;
   handleRedo: () => void;
   isUndoAvailable: boolean;
@@ -62,24 +39,6 @@ export function WorkspaceSidebarPanel({
   entityCountBySubScreen,
   onScreenChange,
   onSubScreenChange,
-  networks,
-  activeNetworkId,
-  hasActiveNetwork,
-  handleSelectNetwork,
-  handleDuplicateActiveNetwork,
-  handleDeleteActiveNetwork,
-  renameNetworkName,
-  setRenameNetworkName,
-  handleRenameActiveNetwork,
-  newNetworkName,
-  setNewNetworkName,
-  newNetworkTechnicalId,
-  setNewNetworkTechnicalId,
-  newNetworkDescription,
-  setNewNetworkDescription,
-  networkFormError,
-  networkTechnicalIdAlreadyUsed,
-  handleCreateNetwork,
   handleUndo,
   handleRedo,
   isUndoAvailable,
@@ -108,73 +67,6 @@ export function WorkspaceSidebarPanel({
         onScreenChange={onScreenChange}
         onSubScreenChange={onSubScreenChange}
       />
-
-      <section className="workspace-health" aria-label="Network scope">
-        <h2>Network scope</h2>
-        {networks.length === 0 ? (
-          <p className="empty-copy">No network available. Create one to enable modeling and analysis.</p>
-        ) : (
-          <label>
-            Active network
-            <select value={activeNetworkId ?? ""} onChange={(event) => handleSelectNetwork(event.target.value as NetworkId)}>
-              {networks.map((network) => (
-                <option key={network.id} value={network.id}>
-                  {network.name} ({network.technicalId})
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        <div className="row-actions compact">
-          <button type="button" onClick={handleDuplicateActiveNetwork} disabled={!hasActiveNetwork}>
-            Duplicate
-          </button>
-          <button type="button" onClick={handleDeleteActiveNetwork} disabled={!hasActiveNetwork}>
-            Delete
-          </button>
-        </div>
-        <label>
-          Rename active network
-          <input
-            value={renameNetworkName}
-            onChange={(event) => setRenameNetworkName(event.target.value)}
-            placeholder="Network name"
-            disabled={!hasActiveNetwork}
-          />
-        </label>
-        <div className="row-actions compact">
-          <button type="button" onClick={handleRenameActiveNetwork} disabled={!hasActiveNetwork}>
-            Rename
-          </button>
-        </div>
-        <form className="settings-grid" onSubmit={handleCreateNetwork}>
-          <label>
-            New network name
-            <input value={newNetworkName} onChange={(event) => setNewNetworkName(event.target.value)} placeholder="Vehicle platform A" />
-          </label>
-          <label>
-            New network technical ID
-            <input
-              value={newNetworkTechnicalId}
-              onChange={(event) => setNewNetworkTechnicalId(event.target.value)}
-              placeholder="NET-PLAT-A"
-            />
-          </label>
-          <label>
-            Description (optional)
-            <input
-              value={newNetworkDescription}
-              onChange={(event) => setNewNetworkDescription(event.target.value)}
-              placeholder="Optional description"
-            />
-          </label>
-          {networkFormError !== null ? <p className="form-error">{networkFormError}</p> : null}
-          {networkTechnicalIdAlreadyUsed ? <p className="form-hint danger">Technical ID already used by another network.</p> : null}
-          <div className="row-actions compact">
-            <button type="submit">Create network</button>
-          </div>
-        </form>
-      </section>
 
       <section className="workspace-meta">
         <div className="workspace-meta-main">

@@ -1,8 +1,8 @@
 ## item_057_network_scope_lifecycle_ui_extraction_and_safeguards - Network Scope Lifecycle UI Extraction and Safeguards
 > From version: 0.3.0
-> Understanding: 98%
-> Confidence: 96%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Network Lifecycle UX Consolidation
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,8 +36,8 @@ Network lifecycle actions exist in fragmented UI areas, which weakens workflow c
 - References:
   - `logics/request/req_010_network_scope_workspace_shell_and_global_defaults.md`
   - `logics/request/req_002_multi_network_management_and_navigation.md`
-  - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
+  - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`
+  - `src/app/components/workspace/WorkspaceSidebarPanel.tsx`
   - `src/app/hooks/useWorkspaceHandlers.ts`
   - `src/store/reducer/networkReducer.ts`
   - `src/tests/app.ui.networks.spec.tsx`
-
