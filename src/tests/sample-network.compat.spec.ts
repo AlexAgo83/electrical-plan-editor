@@ -1,0 +1,72 @@
+import { describe, expect, it } from "vitest";
+import {
+  STORAGE_KEY,
+  loadState,
+  migratePersistedPayload,
+  saveState,
+  type PersistedStateSnapshotV1
+} from "../adapters/persistence";
+import { createSampleNetworkState, hasSampleNetworkSignature } from "../store";
+
+interface MemoryStorage extends Pick<Storage, "getItem" | "setItem" | "removeItem"> {
+  read: (key: string) => string | null;
+}
+
+function createMemoryStorage(seed: Record<string, string> = {}): MemoryStorage {
+  const entries = new Map(Object.entries(seed));
+
+  return {
+    getItem(key: string) {
+      return entries.get(key) ?? null;
+    },
+    setItem(key: string, value: string) {
+      entries.set(key, value);
+    },
+    removeItem(key: string) {
+      entries.delete(key);
+    },
+    read(key: string) {
+      return entries.get(key) ?? null;
+    }
+  };
+}
+
+describe("sample network compatibility", () => {
+  it("round-trips sample state through persistence snapshot save/load", () => {
+    const sample = createSampleNetworkState();
+    const storage = createMemoryStorage();
+
+    saveState(sample, storage, () => "2026-02-21T10:00:00.000Z");
+    const loaded = loadState(storage, () => "2026-02-21T10:01:00.000Z");
+
+    expect(loaded).toEqual(sample);
+    expect(hasSampleNetworkSignature(loaded)).toBe(true);
+  });
+
+  it("migrates legacy sample payload to current persisted snapshot format", () => {
+    const sample = createSampleNetworkState();
+    const migration = migratePersistedPayload(sample, "2026-02-21T10:15:00.000Z");
+
+    expect(migration).not.toBeNull();
+    expect(migration?.wasMigrated).toBe(true);
+    expect(migration?.snapshot.schemaVersion).toBe(1);
+    expect(hasSampleNetworkSignature(migration?.snapshot.state ?? sample)).toBe(true);
+  });
+
+  it("keeps sample signature after JSON serialization/deserialization of persisted snapshot", () => {
+    const sample = createSampleNetworkState();
+    const storage = createMemoryStorage();
+    saveState(sample, storage, () => "2026-02-21T10:30:00.000Z");
+
+    const raw = storage.read(STORAGE_KEY);
+    expect(raw).not.toBeNull();
+
+    const parsed = JSON.parse(raw ?? "{}") as PersistedStateSnapshotV1;
+    const reEncoded = JSON.parse(JSON.stringify(parsed)) as unknown;
+    const migration = migratePersistedPayload(reEncoded, "2026-02-21T10:31:00.000Z");
+
+    expect(migration).not.toBeNull();
+    expect(hasSampleNetworkSignature(migration?.snapshot.state ?? sample)).toBe(true);
+  });
+});
+
