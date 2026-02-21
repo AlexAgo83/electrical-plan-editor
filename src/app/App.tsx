@@ -75,6 +75,10 @@ function toPositiveNumber(raw: string): number {
   return parsed;
 }
 
+function normalizeSearch(raw: string): string {
+  return raw.trim().toLocaleLowerCase();
+}
+
 const NETWORK_VIEW_WIDTH = 760;
 const NETWORK_VIEW_HEIGHT = 420;
 
@@ -268,6 +272,13 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [activeScreen, setActiveScreen] = useState<ScreenId>("modeling");
   const [activeSubScreen, setActiveSubScreen] = useState<SubScreenId>("connector");
   const [interactionMode, setInteractionMode] = useState<InteractionMode>("select");
+  const [connectorSearchQuery, setConnectorSearchQuery] = useState("");
+  const [spliceSearchQuery, setSpliceSearchQuery] = useState("");
+  const [nodeSearchQuery, setNodeSearchQuery] = useState("");
+  const [segmentSearchQuery, setSegmentSearchQuery] = useState("");
+  const [wireSearchQuery, setWireSearchQuery] = useState("");
+  const [nodeKindFilter, setNodeKindFilter] = useState<"all" | NetworkNode["kind"]>("all");
+  const [wireRouteFilter, setWireRouteFilter] = useState<"all" | "auto" | "locked">("all");
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [nodeIdSortDirection, setNodeIdSortDirection] = useState<SortDirection>("asc");
@@ -506,6 +517,82 @@ export function App({ store = appStore }: AppProps): ReactElement {
         (row) => row.wireTechnicalId
       ),
     [spliceSynthesisRows, spliceSynthesisSort]
+  );
+  const normalizedConnectorSearch = normalizeSearch(connectorSearchQuery);
+  const normalizedSpliceSearch = normalizeSearch(spliceSearchQuery);
+  const normalizedNodeSearch = normalizeSearch(nodeSearchQuery);
+  const normalizedSegmentSearch = normalizeSearch(segmentSearchQuery);
+  const normalizedWireSearch = normalizeSearch(wireSearchQuery);
+  const visibleConnectors = useMemo(
+    () =>
+      sortedConnectors.filter((connector) =>
+        `${connector.name} ${connector.technicalId}`.toLocaleLowerCase().includes(normalizedConnectorSearch)
+      ),
+    [normalizedConnectorSearch, sortedConnectors]
+  );
+  const visibleSplices = useMemo(
+    () =>
+      sortedSplices.filter((splice) =>
+        `${splice.name} ${splice.technicalId}`.toLocaleLowerCase().includes(normalizedSpliceSearch)
+      ),
+    [normalizedSpliceSearch, sortedSplices]
+  );
+  const visibleNodes = useMemo(
+    () =>
+      sortedNodes.filter((node) => {
+        if (nodeKindFilter !== "all" && node.kind !== nodeKindFilter) {
+          return false;
+        }
+
+        if (normalizedNodeSearch.length === 0) {
+          return true;
+        }
+
+        if (node.kind === "intermediate") {
+          return `${node.id} ${node.label}`.toLocaleLowerCase().includes(normalizedNodeSearch);
+        }
+
+        if (node.kind === "connector") {
+          const connector = connectorMap.get(node.connectorId);
+          return `${node.id} ${node.connectorId} ${connector?.name ?? ""} ${connector?.technicalId ?? ""}`
+            .toLocaleLowerCase()
+            .includes(normalizedNodeSearch);
+        }
+
+        const splice = spliceMap.get(node.spliceId);
+        return `${node.id} ${node.spliceId} ${splice?.name ?? ""} ${splice?.technicalId ?? ""}`
+          .toLocaleLowerCase()
+          .includes(normalizedNodeSearch);
+      }),
+    [connectorMap, nodeKindFilter, normalizedNodeSearch, sortedNodes, spliceMap]
+  );
+  const visibleSegments = useMemo(
+    () =>
+      sortedSegments.filter((segment) =>
+        `${segment.id} ${segment.nodeA} ${segment.nodeB} ${segment.subNetworkTag ?? ""}`
+          .toLocaleLowerCase()
+          .includes(normalizedSegmentSearch)
+      ),
+    [normalizedSegmentSearch, sortedSegments]
+  );
+  const visibleWires = useMemo(
+    () =>
+      sortedWires.filter((wire) => {
+        if (wireRouteFilter === "locked" && !wire.isRouteLocked) {
+          return false;
+        }
+
+        if (wireRouteFilter === "auto" && wire.isRouteLocked) {
+          return false;
+        }
+
+        if (normalizedWireSearch.length === 0) {
+          return true;
+        }
+
+        return `${wire.name} ${wire.technicalId}`.toLocaleLowerCase().includes(normalizedWireSearch);
+      }),
+    [normalizedWireSearch, sortedWires, wireRouteFilter]
   );
   const validationIssues = useMemo<ValidationIssue[]>(() => {
     const issues: ValidationIssue[] = [];
@@ -1742,8 +1829,19 @@ export function App({ store = appStore }: AppProps): ReactElement {
       <section className="panel-grid">
         <article className="panel" hidden={!isConnectorSubScreen}>
           <h2>Connectors</h2>
+          <label className="stack-label list-search">
+            Search
+            <input
+              aria-label="Search connectors"
+              value={connectorSearchQuery}
+              onChange={(event) => setConnectorSearchQuery(event.target.value)}
+              placeholder="Name or technical ID"
+            />
+          </label>
           {connectors.length === 0 ? (
             <p className="empty-copy">No connector yet.</p>
+          ) : visibleConnectors.length === 0 ? (
+            <p className="empty-copy">No connector matches the current search.</p>
           ) : (
             <table className="data-table">
               <thead>
@@ -1772,7 +1870,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {sortedConnectors.map((connector) => {
+                {visibleConnectors.map((connector) => {
                   const occupiedCount = selectConnectorCavityStatuses(state, connector.id).filter((slot) => slot.isOccupied)
                     .length;
                   const isSelected = selectedConnectorId === connector.id;
@@ -1780,7 +1878,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                   return (
                     <tr key={connector.id} className={isSelected ? "is-selected" : undefined}>
                       <td>{connector.name}</td>
-                      <td>{connector.technicalId}</td>
+                      <td className="technical-id">{connector.technicalId}</td>
                       <td>{connector.cavityCount}</td>
                       <td>{occupiedCount}</td>
                       <td>
@@ -1809,8 +1907,19 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
         <article className="panel" hidden={!isSpliceSubScreen}>
           <h2>Splices</h2>
+          <label className="stack-label list-search">
+            Search
+            <input
+              aria-label="Search splices"
+              value={spliceSearchQuery}
+              onChange={(event) => setSpliceSearchQuery(event.target.value)}
+              placeholder="Name or technical ID"
+            />
+          </label>
           {splices.length === 0 ? (
             <p className="empty-copy">No splice yet.</p>
+          ) : visibleSplices.length === 0 ? (
+            <p className="empty-copy">No splice matches the current search.</p>
           ) : (
             <table className="data-table">
               <thead>
@@ -1839,7 +1948,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {sortedSplices.map((splice) => {
+                {visibleSplices.map((splice) => {
                   const occupiedCount = selectSplicePortStatuses(state, splice.id).filter((slot) => slot.isOccupied).length;
                   const isSelected = selectedSpliceId === splice.id;
 
@@ -1848,7 +1957,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                       <td>
                         <span className="splice-badge">Junction</span> {splice.name}
                       </td>
-                      <td>{splice.technicalId}</td>
+                      <td className="technical-id">{splice.technicalId}</td>
                       <td>{splice.portCount}</td>
                       <td>{occupiedCount}</td>
                       <td>
@@ -1877,8 +1986,38 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
         <article className="panel" hidden={!isNodeSubScreen}>
           <h2>Nodes</h2>
+          <div className="list-toolbar">
+            <label className="stack-label list-search">
+              Search
+              <input
+                aria-label="Search nodes"
+                value={nodeSearchQuery}
+                onChange={(event) => setNodeSearchQuery(event.target.value)}
+                placeholder="ID, label, connector, splice"
+              />
+            </label>
+            <div className="chip-group" role="group" aria-label="Node kind filter">
+              {([
+                ["all", "All"],
+                ["connector", "Connector"],
+                ["splice", "Splice"],
+                ["intermediate", "Intermediate"]
+              ] as const).map(([kindId, label]) => (
+                <button
+                  key={kindId}
+                  type="button"
+                  className={nodeKindFilter === kindId ? "filter-chip is-active" : "filter-chip"}
+                  onClick={() => setNodeKindFilter(kindId)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           {nodes.length === 0 ? (
             <p className="empty-copy">No node yet.</p>
+          ) : visibleNodes.length === 0 ? (
+            <p className="empty-copy">No node matches the current search/filter.</p>
           ) : (
             <table className="data-table">
               <thead>
@@ -1903,7 +2042,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {sortedNodes.map((node) => {
+                {visibleNodes.map((node) => {
                   const linkedSegments = segments.filter(
                     (segment) => segment.nodeA === node.id || segment.nodeB === node.id
                   ).length;
@@ -1911,7 +2050,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
                   return (
                     <tr key={node.id} className={isSelected ? "is-selected" : undefined}>
-                      <td>{node.id}</td>
+                      <td className="technical-id">{node.id}</td>
                       <td>{node.kind}</td>
                       <td>{describeNode(node)}</td>
                       <td>{linkedSegments}</td>
@@ -1938,8 +2077,19 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
         <article className="panel" hidden={!isSegmentSubScreen}>
           <h2>Segments</h2>
+          <label className="stack-label list-search">
+            Search
+            <input
+              aria-label="Search segments"
+              value={segmentSearchQuery}
+              onChange={(event) => setSegmentSearchQuery(event.target.value)}
+              placeholder="ID, node, sub-network"
+            />
+          </label>
           {segments.length === 0 ? (
             <p className="empty-copy">No segment yet.</p>
+          ) : visibleSegments.length === 0 ? (
+            <p className="empty-copy">No segment matches the current search.</p>
           ) : (
             <table className="data-table">
               <thead>
@@ -1965,7 +2115,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {sortedSegments.map((segment) => {
+                {visibleSegments.map((segment) => {
                   const nodeA = state.nodes.byId[segment.nodeA];
                   const nodeB = state.nodes.byId[segment.nodeB];
                   const isSelected = selectedSegmentId === segment.id;
@@ -1978,7 +2128,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
                   return (
                     <tr key={segment.id} className={rowClassName}>
-                      <td>{segment.id}</td>
+                      <td className="technical-id">{segment.id}</td>
                       <td>{nodeA === undefined ? segment.nodeA : describeNode(nodeA)}</td>
                       <td>{nodeB === undefined ? segment.nodeB : describeNode(nodeB)}</td>
                       <td>{segment.lengthMm}</td>
@@ -2011,8 +2161,37 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
         <article className="panel" hidden={!isWireSubScreen}>
           <h2>Wires</h2>
+          <div className="list-toolbar">
+            <label className="stack-label list-search">
+              Search
+              <input
+                aria-label="Search wires"
+                value={wireSearchQuery}
+                onChange={(event) => setWireSearchQuery(event.target.value)}
+                placeholder="Name or technical ID"
+              />
+            </label>
+            <div className="chip-group" role="group" aria-label="Wire route mode filter">
+              {([
+                ["all", "All"],
+                ["auto", "Auto"],
+                ["locked", "Locked"]
+              ] as const).map(([filterId, label]) => (
+                <button
+                  key={filterId}
+                  type="button"
+                  className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+                  onClick={() => setWireRouteFilter(filterId)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           {wires.length === 0 ? (
             <p className="empty-copy">No wire yet.</p>
+          ) : visibleWires.length === 0 ? (
+            <p className="empty-copy">No wire matches the current search/filter.</p>
           ) : (
             <table className="data-table">
               <thead>
@@ -2042,13 +2221,13 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {sortedWires.map((wire) => {
+                {visibleWires.map((wire) => {
                   const isSelected = selectedWireId === wire.id;
 
                   return (
                     <tr key={wire.id} className={isSelected ? "is-selected" : undefined}>
                       <td>{wire.name}</td>
-                      <td>{wire.technicalId}</td>
+                      <td className="technical-id">{wire.technicalId}</td>
                       <td>
                         {describeWireEndpoint(wire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(wire.endpointB)}
                       </td>
@@ -2177,7 +2356,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 {sortedConnectorSynthesisRows.map((row) => (
                   <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
                     <td>{row.wireName}</td>
-                    <td>{row.wireTechnicalId}</td>
+                    <td className="technical-id">{row.wireTechnicalId}</td>
                     <td>{row.localEndpointLabel}</td>
                     <td>{row.remoteEndpointLabel}</td>
                     <td>{row.lengthMm}</td>
@@ -2280,7 +2459,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                 {sortedSpliceSynthesisRows.map((row) => (
                   <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
                     <td>{row.wireName}</td>
-                    <td>{row.wireTechnicalId}</td>
+                    <td className="technical-id">{row.wireTechnicalId}</td>
                     <td>{row.localEndpointLabel}</td>
                     <td>{row.remoteEndpointLabel}</td>
                     <td>{row.lengthMm}</td>

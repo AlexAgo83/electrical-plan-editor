@@ -267,6 +267,42 @@ button {
   color: #4a6a82;
 }
 
+.list-toolbar {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.list-search {
+  max-width: 320px;
+}
+
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.filter-chip {
+  border: 1px solid #9eb7cc;
+  border-radius: 999px;
+  background: #f8fbfe;
+  color: #17374e;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.8rem;
+}
+
+.filter-chip.is-active {
+  background: #17374e;
+  color: #fff;
+  border-color: #17374e;
+}
+
+.technical-id {
+  font-family: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
+  letter-spacing: 0.01em;
+}
+
 .canvas-toolbar {
   display: flex;
   align-items: center;
