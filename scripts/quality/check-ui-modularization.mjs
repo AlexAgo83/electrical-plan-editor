@@ -55,10 +55,7 @@ const requiredUiModules = [
 
 const forbiddenLegacyFiles = ["src/tests/app.ui.spec.tsx"];
 
-const allowedOversize = {
-  "src/app/App.tsx":
-    "Documented exception: App remains an orchestration-heavy shell while progressive extraction continues; see req_005 traceability."
-};
+const allowedOversize = {};
 
 const targetFiles = [
   "src/app/App.tsx",
