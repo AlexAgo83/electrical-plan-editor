@@ -129,3 +129,205 @@ button {
   margin: 0 0 0.75rem;
   font-size: 1rem;
 }
+
+.form-error {
+  margin: 0;
+  color: #8f1e1e;
+  font-size: 0.82rem;
+}
+
+.form-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #4b6477;
+}
+
+.form-hint.danger {
+  color: #8f1e1e;
+}
+
+:focus-visible {
+  outline: 2px solid #0f6cb8;
+  outline-offset: 2px;
+}
+
+.app-shell.theme-dark {
+  color: #e3ecf6;
+  background: radial-gradient(circle at top right, #23384e 0%, #162738 42%, #0e1b2a 100%);
+}
+
+.app-shell.theme-dark .header-block p,
+.app-shell.theme-dark .meta-line,
+.app-shell.theme-dark .shortcut-hints,
+.app-shell.theme-dark .empty-copy,
+.app-shell.theme-dark .inline-help,
+.app-shell.theme-dark .canvas-toolbar > span,
+.app-shell.theme-dark .summary-grid h3,
+.app-shell.theme-dark .summary-title,
+.app-shell.theme-dark .selection-snapshot p,
+.app-shell.theme-dark .validation-toolbar > span {
+  color: #b7c9dc;
+}
+
+.app-shell.theme-dark .panel,
+.app-shell.theme-dark .workspace-sidebar .workspace-switcher,
+.app-shell.theme-dark .workspace-sidebar .workspace-meta,
+.app-shell.theme-dark .stats-grid article,
+.app-shell.theme-dark .summary-grid article,
+.app-shell.theme-dark .validation-group,
+.app-shell.theme-dark .cavity,
+.app-shell.theme-dark .network-canvas-shell {
+  border-color: #365069;
+  background: #1a2c3f;
+}
+
+.app-shell.theme-dark .workspace-shell .workspace-health {
+  border-top-color: #365069;
+}
+
+.app-shell.theme-dark .workspace-tab,
+.app-shell.theme-dark .filter-chip,
+.app-shell.theme-dark .row-actions button,
+.app-shell.theme-dark .row-form button,
+.app-shell.theme-dark .error-banner button {
+  border-color: #4e6a84;
+  background: #27415a;
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .workspace-tab.is-active,
+.app-shell.theme-dark .filter-chip.is-active {
+  background: #7fc5ff;
+  color: #092038;
+  border-color: #7fc5ff;
+}
+
+.app-shell.theme-dark .workspace-tab-badge {
+  background: #365778;
+  color: #dbe9f5;
+}
+
+.app-shell.theme-dark .workspace-tab-badge.is-error {
+  background: #643c47;
+  color: #ffd3d8;
+}
+
+.app-shell.theme-dark input,
+.app-shell.theme-dark select,
+.app-shell.theme-dark textarea {
+  border-color: #4a6783;
+  background: #112236;
+  color: #e9f1f8;
+}
+
+.app-shell.theme-dark .inline-fieldset {
+  border-color: #47617c;
+}
+
+.app-shell.theme-dark .inline-fieldset legend {
+  color: #b8cbdd;
+}
+
+.app-shell.theme-dark .data-table th,
+.app-shell.theme-dark .data-table td {
+  border-bottom-color: #334d64;
+}
+
+.app-shell.theme-dark .data-table th {
+  color: #bed1e4;
+}
+
+.app-shell.theme-dark .data-table tr.is-selected {
+  background: #274965;
+}
+
+.app-shell.theme-dark .data-table tr.is-wire-highlighted {
+  background: #2c5844;
+}
+
+.app-shell.theme-dark .status-chip.is-error {
+  background: #653743;
+  color: #ffd0d6;
+}
+
+.app-shell.theme-dark .status-chip.is-warning {
+  background: #66502c;
+  color: #ffe3a9;
+}
+
+.app-shell.theme-dark .error-banner {
+  border-color: #7f4a55;
+  background: #4a2830;
+  color: #ffd6dc;
+}
+
+.app-shell.theme-dark .subnetwork-chip {
+  background: #27415a;
+  border-color: #48647f;
+  color: #d5e5f4;
+}
+
+.app-shell.theme-dark .subnetwork-list li {
+  color: #c0d1e2;
+}
+
+.app-shell.theme-dark .sort-indicator {
+  color: #9bc3e3;
+}
+
+.app-shell.theme-dark .sort-header-button:hover {
+  color: #8ec7f5;
+}
+
+.app-shell.theme-dark .network-grid line {
+  stroke: #2f4a60;
+}
+
+.app-shell.theme-dark .network-segment {
+  stroke: #87a0b8;
+}
+
+.app-shell.theme-dark .network-segment.is-selected {
+  stroke: #7fc5ff;
+}
+
+.app-shell.theme-dark .network-segment-label,
+.app-shell.theme-dark .network-node-label {
+  fill: #d4e3f1;
+}
+
+.app-shell.theme-dark .network-node.connector circle {
+  fill: #28506e;
+}
+
+.app-shell.theme-dark .network-node.splice circle {
+  fill: #6f5d3f;
+}
+
+.app-shell.theme-dark .network-node.intermediate circle {
+  fill: #3a5369;
+}
+
+.app-shell.theme-dark .legend-swatch {
+  border-color: #7f9bb4;
+}
+
+.app-shell.theme-dark .legend-line {
+  border-top-color: #87a0b8;
+}
+
+.app-shell.theme-dark .legend-line.selected {
+  border-top-color: #7fc5ff;
+}
+
+.app-shell.theme-dark .save-status.is-saved {
+  color: #88d9af;
+}
+
+.app-shell.theme-dark .save-status.is-unsaved {
+  color: #ffd48f;
+}
+
+.app-shell.theme-dark .save-status.is-error {
+  color: #ffb4bc;
+}

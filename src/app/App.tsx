@@ -572,7 +572,13 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const isSegmentSubScreen = activeSubScreen === "segment";
   const isWireSubScreen = activeSubScreen === "wire";
   const selectedSubScreen = selected?.kind === undefined ? null : (selected.kind as SubScreenId);
-  const appShellClassName = tableDensity === "compact" ? "app-shell table-density-compact" : "app-shell";
+  const appShellClassName = [
+    "app-shell",
+    tableDensity === "compact" ? "table-density-compact" : "",
+    themeMode === "dark" ? "theme-dark" : "theme-normal"
+  ]
+    .filter((token) => token.length > 0)
+    .join(" ");
   const configuredResetScale = useMemo(() => {
     const parsedPercent = Number(canvasResetZoomPercentInput);
     if (!Number.isFinite(parsedPercent) || parsedPercent <= 0) {
@@ -620,6 +626,11 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setThemeMode,
     setPreferencesHydrated
   });
+
+  useEffect(() => {
+    store.dispatch(appActions.setThemeMode(themeMode));
+  }, [store, themeMode]);
+
   const describeWireEndpoint = useCallback((endpoint: WireEndpoint): string => {
     if (endpoint.kind === "connectorCavity") {
       const connector = connectorMap.get(endpoint.connectorId);
@@ -1850,8 +1861,13 @@ export function App({ store = appStore }: AppProps): ReactElement {
     resetNetworkViewToConfiguredScale();
   }
 
+  function handleToggleThemeMode(): void {
+    setThemeMode((current) => (current === "normal" ? "dark" : "normal"));
+  }
+
   function resetWorkspacePreferencesToDefaults(): void {
     const defaultSort: SortState = { field: "name", direction: "asc" };
+    setThemeMode("normal");
     setTableDensity("comfortable");
     setDefaultSortField("name");
     setDefaultSortDirection("asc");
@@ -3056,6 +3072,12 @@ export function App({ store = appStore }: AppProps): ReactElement {
         <p className="meta-line">
           Active network: <strong>{activeNetworkLabel}</strong>
         </p>
+        <div className="row-actions compact">
+          <button type="button" onClick={handleToggleThemeMode}>
+            {themeMode === "dark" ? "Switch to normal mode" : "Switch to dark mode"}
+          </button>
+          <span className="meta-line">Theme: {themeMode === "dark" ? "Dark" : "Normal"}</span>
+        </div>
       </section>
 
       {lastError !== null ? (
@@ -4593,6 +4615,13 @@ export function App({ store = appStore }: AppProps): ReactElement {
           <section className="panel">
             <h2>Table and list preferences</h2>
             <div className="settings-grid">
+              <label>
+                Theme mode
+                <select value={themeMode} onChange={(event) => setThemeMode(event.target.value as ThemeMode)}>
+                  <option value="normal">Normal</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </label>
               <label>
                 Table density
                 <select value={tableDensity} onChange={(event) => setTableDensity(event.target.value as TableDensity)}>

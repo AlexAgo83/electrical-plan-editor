@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UX/UI Theming Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -18,12 +18,12 @@ Backlog scope covered:
 - `item_024_theme_toggle_and_persistence_test_coverage.md`
 
 # Plan
-- [ ] 1. Freeze theme state and persistence contract (`item_020`) with deterministic restore behavior
-- [ ] 2. Deliver Wave 1 (`item_021`, `item_022`) and validate cross-screen theme rendering coherence
-- [ ] 3. Deliver Wave 2 (`item_023`) and validate contrast/focus/accessibility expectations in both modes
-- [ ] 4. Deliver Wave 3 (`item_024`) with AC traceability and CI regression coverage
-- [ ] 5. Publish theme mode readiness report (status, blockers, residual risks)
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Freeze theme state and persistence contract (`item_020`) with deterministic restore behavior
+- [x] 2. Deliver Wave 1 (`item_021`, `item_022`) and validate cross-screen theme rendering coherence
+- [x] 3. Deliver Wave 2 (`item_023`) and validate contrast/focus/accessibility expectations in both modes
+- [x] 4. Deliver Wave 3 (`item_024`) with AC traceability and CI regression coverage
+- [x] 5. Publish theme mode readiness report (status, blockers, residual risks)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -34,16 +34,14 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 1 planned: mode switch control and dark-mode tokenized surface coverage.
-  - Wave 2 planned: accessibility contrast and focus validation in both modes.
-  - Wave 3 planned: automated test matrix for toggle behavior and persistence restore.
-- Current blockers: none (initial planning state).
+  - Wave 1 delivered: persistent theme switch + settings integration + deterministic preference restore.
+  - Wave 2 delivered: dark-mode tokenized surface overrides across workspace, lists, validation, and canvas UI.
+  - Wave 3 delivered: toggle/persistence/non-domain-mutation coverage + AC traceability (`logics/specs/req_003_theme_mode_traceability.md`).
+- Current blockers: none.
 - Main risks to track:
-  - Incomplete dark-mode coverage causing mixed-theme panels.
-  - Reduced readability for secondary text and validation states.
-  - Theme persistence regressions after schema or settings updates.
+  - Future UI additions may bypass theme tokens and introduce mixed-surface regressions.
+  - Contrast could drift if status colors are modified without dual-mode checks.
 - Mitigation strategy:
-  - Centralize theme tokens and avoid ad-hoc per-component overrides.
-  - Add explicit accessibility checks for focus and status states during validation.
-  - Lock regression coverage with unit/UI/E2E tests including reload scenarios.
-
+  - Keep all mode-specific overrides under `.app-shell.theme-dark` and avoid one-off inline colors.
+  - Preserve explicit focus/status overrides and validate with UI integration tests.
+  - Keep persistence/toggle tests in CI as release gates.
