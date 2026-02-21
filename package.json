@@ -14,6 +14,7 @@
     "lint": "eslint .",
     "quality:ui-modularization": "node scripts/quality/check-ui-modularization.mjs",
     "quality:store-modularization": "node scripts/quality/check-store-modularization.mjs",
+    "quality:pwa": "node scripts/quality/check-pwa-build-artifacts.mjs",
     "test": "vitest",
     "test:ci": "vitest run --coverage",
     "test:e2e": "env -u NO_COLOR playwright test --reporter=line"

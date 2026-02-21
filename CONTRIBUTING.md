@@ -45,6 +45,7 @@ npm run lint
 npm run typecheck
 npm run test:ci
 npm run test:e2e
+npm run quality:pwa
 ```
 
 ## Code and Documentation Expectations

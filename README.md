@@ -33,6 +33,7 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - Zoom with toolbar controls (`Zoom -`, `Zoom +`, `Reset view`, `Fit network`)
 - Validation center with grouped issues and issue navigation
 - Local persistence with schema versioning and migrations
+- PWA support (install prompt + offline shell + update readiness in production)
 - Keyboard shortcuts for major workspace actions
 
 ## Tech Stack
@@ -106,6 +107,7 @@ Then open `http://127.0.0.1:5284` (unless overridden).
 - `npm run test:e2e`: run Playwright E2E smoke tests
 - `npm run quality:ui-modularization`: enforce UI modularization line-budget gate
 - `npm run quality:store-modularization`: enforce store modularization line-budget gate
+- `npm run quality:pwa`: validate generated PWA build artifacts (`manifest`, `sw.js`, `workbox-*`)
 
 ## Project Structure
 
@@ -133,9 +135,16 @@ npm run lint
 npm run typecheck
 npm run test:ci
 npm run test:e2e
+npm run quality:pwa
 ```
 
 CI runs the same pipeline in `.github/workflows/ci.yml` on `push` and `pull_request`.
+
+PWA caveats:
+
+- Service worker registration is production-only (`build/preview`) and remains disabled during normal `npm run dev`.
+- Install prompt availability depends on browser capability and secure context (`https` or `localhost`).
+- Offline behavior is guaranteed after the first successful online load of production assets.
 
 ## Contributing
 

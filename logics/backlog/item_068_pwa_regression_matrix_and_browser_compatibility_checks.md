@@ -1,8 +1,8 @@
 ## item_068_pwa_regression_matrix_and_browser_compatibility_checks - PWA Regression Matrix and Browser Compatibility Checks
 > From version: 0.3.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: High
 > Theme: PWA Quality Assurance
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,8 +36,10 @@ PWA rollout introduces cross-cutting risks (installability, offline runtime, upd
 - Related AC: AC1, AC2, AC3, AC4, AC5, AC6, AC7.
 - References:
   - `logics/request/req_011_pwa_enablement_installability_and_offline_reliability.md`
+  - `scripts/quality/check-pwa-build-artifacts.mjs`
+  - `src/tests/pwa.registration.spec.ts`
+  - `src/tests/pwa.header-actions.spec.tsx`
   - `src/tests/persistence.localStorage.spec.ts`
   - `src/tests/app.ui.import-export.spec.tsx`
   - `tests/e2e/smoke.spec.ts`
   - `README.md`
-
