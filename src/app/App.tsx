@@ -26,6 +26,9 @@ import type {
 import {
   type AppStore,
   appActions,
+  createSampleNetworkState,
+  hasSampleNetworkSignature,
+  isWorkspaceEmpty,
   selectConnectorById,
   selectConnectorCavityStatuses,
   selectConnectorTechnicalIdTaken,
@@ -1562,6 +1565,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
     segment: segments.length,
     wire: wires.length
   };
+  const isCurrentWorkspaceEmpty = isWorkspaceEmpty(state);
+  const hasBuiltInSampleState = hasSampleNetworkSignature(state);
 
   const lastError = selectLastError(state);
 
@@ -1674,6 +1679,58 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setPendingNewNodePosition(null);
     setSaveStatus("unsaved");
     queueSavedStatus();
+  }
+
+  function replaceStateWithHistory(nextState: ReturnType<AppStore["getState"]>): void {
+    const currentState = store.getState();
+    if (nextState === currentState) {
+      return;
+    }
+
+    try {
+      store.replaceState(nextState);
+    } catch {
+      setSaveStatus("error");
+      return;
+    }
+
+    setUndoStack((previous) => {
+      const next = [...previous, currentState];
+      return next.length > HISTORY_LIMIT ? next.slice(next.length - HISTORY_LIMIT) : next;
+    });
+    setRedoStack([]);
+    setModeAnchorNodeId(null);
+    setPendingNewNodePosition(null);
+    setActiveScreen("modeling");
+    setActiveSubScreen("connector");
+    setInteractionMode("select");
+    setSaveStatus("unsaved");
+    queueSavedStatus();
+  }
+
+  function handleRecreateSampleNetwork(): void {
+    if (!isCurrentWorkspaceEmpty) {
+      return;
+    }
+
+    replaceStateWithHistory(createSampleNetworkState());
+  }
+
+  function handleResetSampleNetwork(): void {
+    if (!hasBuiltInSampleState) {
+      return;
+    }
+
+    if (typeof window !== "undefined" && typeof window.confirm === "function") {
+      const shouldReset = window.confirm(
+        "Reset the sample network to baseline? This removes any changes made to sample entities."
+      );
+      if (!shouldReset) {
+        return;
+      }
+    }
+
+    replaceStateWithHistory(createSampleNetworkState());
   }
 
   function resetNetworkViewToConfiguredScale(): void {
@@ -4965,6 +5022,22 @@ export function App({ store = appStore }: AppProps): ReactElement {
             <div className="row-actions">
               <button type="button" onClick={resetWorkspacePreferencesToDefaults}>
                 Reset all UI preferences
+              </button>
+            </div>
+          </section>
+
+          <section className="panel">
+            <h2>Sample network controls</h2>
+            <p className="meta-line">
+              Workspace empty: {isCurrentWorkspaceEmpty ? "yes" : "no"} / Sample signature detected:{" "}
+              {hasBuiltInSampleState ? "yes" : "no"}.
+            </p>
+            <div className="row-actions">
+              <button type="button" onClick={handleRecreateSampleNetwork} disabled={!isCurrentWorkspaceEmpty}>
+                Recreate sample network (empty workspace only)
+              </button>
+              <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
+                Reset sample network to baseline
               </button>
             </div>
           </section>

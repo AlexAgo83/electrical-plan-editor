@@ -1,8 +1,15 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "../app/App";
 import type { ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../core/entities";
-import { appActions, appReducer, createAppStore, createInitialState, type AppState } from "../store";
+import {
+  appActions,
+  appReducer,
+  createAppStore,
+  createInitialState,
+  createSampleNetworkState,
+  type AppState
+} from "../store";
 
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
@@ -572,6 +579,68 @@ describe("App integration UI", () => {
     switchScreen("settings");
     const restoredSettingsPanel = getPanelByHeading("Table and list preferences");
     expect(within(restoredSettingsPanel).getByLabelText("Default sort column")).toHaveValue("technicalId");
+  });
+
+  it("recreates sample network from settings when workspace is empty", () => {
+    const store = createAppStore(createInitialState());
+    render(<App store={store} />);
+
+    switchScreen("settings");
+    const sampleControlsPanel = getPanelByHeading("Sample network controls");
+    const recreateButton = within(sampleControlsPanel).getByRole("button", {
+      name: "Recreate sample network (empty workspace only)"
+    });
+    const resetButton = within(sampleControlsPanel).getByRole("button", {
+      name: "Reset sample network to baseline"
+    });
+
+    expect(recreateButton).toBeEnabled();
+    expect(resetButton).toBeDisabled();
+
+    fireEvent.click(recreateButton);
+
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/ })).toHaveClass("is-active");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    expect(within(connectorsPanel).getByText("Power Source Connector")).toBeInTheDocument();
+  });
+
+  it("resets sample network to baseline from settings", () => {
+    const sampled = createSampleNetworkState();
+    const withExtraConnector = appReducer(
+      sampled,
+      appActions.upsertConnector({
+        id: asConnectorId("C-EXTRA"),
+        name: "Extra connector",
+        technicalId: "CONN-EXTRA",
+        cavityCount: 2
+      })
+    );
+    const store = createAppStore(withExtraConnector);
+    render(<App store={store} />);
+
+    switchSubScreen("connector");
+    let connectorsPanel = getPanelByHeading("Connectors");
+    expect(within(connectorsPanel).getByText("Extra connector")).toBeInTheDocument();
+
+    switchScreen("settings");
+    const sampleControlsPanel = getPanelByHeading("Sample network controls");
+    const resetButton = within(sampleControlsPanel).getByRole("button", {
+      name: "Reset sample network to baseline"
+    });
+    expect(resetButton).toBeEnabled();
+
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    fireEvent.click(resetButton);
+    confirmSpy.mockRestore();
+
+    switchScreen("modeling");
+    switchSubScreen("connector");
+    connectorsPanel = getPanelByHeading("Connectors");
+    expect(within(connectorsPanel).queryByText("Extra connector")).not.toBeInTheDocument();
+    expect(within(connectorsPanel).getByText("Power Source Connector")).toBeInTheDocument();
   });
 
   it("filters connectors by occupancy chips", () => {
