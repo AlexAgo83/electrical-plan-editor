@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 45%
+> Progress: 82%
 > Complexity: High
 > Theme: UX/UI Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -19,11 +19,11 @@ Backlog scope covered:
 
 # Plan
 - [x] 1. Freeze UX information architecture and delivery waves (layout, inspector, canvas, validation, list ergonomics)
-- [ ] 2. Deliver Wave 1 (`item_009`, `item_010`) and validate no regression on core modeling/routing workflows
-- [ ] 3. Deliver Wave 2 (`item_011`, `item_013`) with interaction and list ergonomics test coverage
-- [ ] 4. Deliver Wave 3 (`item_012`) and validate issue navigation end-to-end
+- [x] 2. Deliver Wave 1 (`item_009`, `item_010`) and validate no regression on core modeling/routing workflows
+- [x] 3. Deliver Wave 2 (`item_011`, `item_013`) with interaction and list ergonomics test coverage
+- [x] 4. Deliver Wave 3 (`item_012`) and validate issue navigation end-to-end
 - [ ] 5. Publish UX/UI readiness report (status, risks, residual gaps)
-- [ ] FINAL: Update related Logics docs
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -34,9 +34,9 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 1 in progress: item_009 is mostly implemented; item_010 is started (interaction mode baseline only).
-  - Wave 2 started: item_013 is mostly implemented; item_011 baseline scaffolding only.
-  - Wave 3 started: item_012 validation center baseline is active.
+  - Wave 1 delivered: workspace navigation/layout and contextual inspector interaction model are active.
+  - Wave 2 delivered: canvas usability controls (zoom/pan/grid/snap/legend) and list ergonomics are active.
+  - Wave 3 delivered: validation center grouping/filtering and `Go to` issue navigation are active.
 - Current blockers: none.
 - Validation snapshot:
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` passes.
@@ -46,5 +46,5 @@ Backlog scope covered:
   - `npm run test:e2e` passes.
 - Main risks to track:
   - Interaction complexity between canvas modes and deterministic domain constraints.
-  - Inspector unification could introduce UX regressions on existing connector/splice occupancy flows.
+  - Inspector and list dual-entry editing patterns must remain coherent to avoid operator ambiguity.
   - Consistency drift between list actions and inspector behavior across entities.

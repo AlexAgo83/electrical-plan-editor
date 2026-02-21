@@ -64,6 +64,37 @@ function createConnectorSortingState(): AppState {
   ]);
 }
 
+function createValidationIssueState(): AppState {
+  const base = createUiIntegrationState();
+  const connectorId = asConnectorId("C1");
+  const wire = base.wires.byId[asWireId("W1")];
+  if (wire === undefined) {
+    throw new Error("Expected wire W1 in base integration state.");
+  }
+
+  return {
+    ...base,
+    wires: {
+      ...base.wires,
+      byId: {
+        ...base.wires.byId,
+        [wire.id]: {
+          ...wire,
+          isRouteLocked: true,
+          routeSegmentIds: []
+        }
+      }
+    },
+    connectorCavityOccupancy: {
+      ...base.connectorCavityOccupancy,
+      [connectorId]: {
+        ...(base.connectorCavityOccupancy[connectorId] ?? {}),
+        2: "manual-ghost"
+      }
+    }
+  };
+}
+
 function getPanelByHeading(name: string): HTMLElement {
   const heading = screen
     .getAllByRole("heading", { name })
@@ -81,7 +112,13 @@ function getPanelByHeading(name: string): HTMLElement {
   return panel as HTMLElement;
 }
 
-function switchScreen(target: "modeling" | "analysis"): void {
+function switchScreen(target: "modeling" | "analysis" | "validation" | "settings"): void {
+  const labelByScreen = {
+    modeling: "Modeling",
+    analysis: "Analysis",
+    validation: "Validation",
+    settings: "Settings"
+  } as const;
   const primaryNavRow = document.querySelector(".workspace-nav-row");
   if (primaryNavRow === null) {
     throw new Error("Primary workspace navigation row was not found.");
@@ -89,7 +126,7 @@ function switchScreen(target: "modeling" | "analysis"): void {
 
   fireEvent.click(
     within(primaryNavRow as HTMLElement).getByRole("button", {
-      name: target === "modeling" ? /^Modeling$/ : /^Analysis$/
+      name: new RegExp(`^${labelByScreen[target]}$`)
     })
   );
 }
@@ -237,5 +274,36 @@ describe("App integration UI", () => {
     expect(getFirstSegmentId()).toBe("SEG-A");
     fireEvent.click(idSortButton);
     expect(getFirstSegmentId()).toBe("SEG-B");
+  });
+
+  it("synchronizes inspector context and allows editing selected connector", () => {
+    const store = createAppStore(createUiIntegrationState());
+    render(<App store={store} />);
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select" }));
+    const inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText(/Focused entity:/)).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("C1")).toBeInTheDocument();
+    fireEvent.click(within(inspectorPanel).getByRole("button", { name: "Edit selected" }));
+
+    const editPanel = getPanelByHeading("Edit Connector");
+    expect(within(editPanel).getByDisplayValue("Connector 1")).toBeInTheDocument();
+    expect(within(editPanel).getByDisplayValue("C-1")).toBeInTheDocument();
+  });
+
+  it("groups validation issues and supports category filtering", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    switchScreen("validation");
+
+    const validationPanel = getPanelByHeading("Validation center");
+    expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
+    expect(within(validationPanel).getByRole("heading", { name: "Route lock validity" })).toBeInTheDocument();
+
+    fireEvent.click(within(validationPanel).getByRole("button", { name: "Occupancy conflict" }));
+    expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
+    expect(within(validationPanel).queryByRole("heading", { name: "Route lock validity" })).not.toBeInTheDocument();
   });
 });

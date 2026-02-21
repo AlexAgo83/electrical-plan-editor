@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 97%
 > Confidence: 93%
-> Progress: 10%
+> Progress: 90%
 > Complexity: Medium
 > Theme: UX/UI Visualization
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -34,8 +34,9 @@ The 2D network representation is currently usable but lacks essential navigation
 - Dependencies: item_009, item_010.
 - Related AC: AC2, AC7.
 - Status update:
-  - Baseline canvas interaction mode UI is in place.
-  - Pan/zoom, grid/snap controls, and persistent legend remain to implement.
+  - Pan and zoom interactions are active on the network canvas (mouse wheel zoom, shift+drag pan, reset view).
+  - Grid overlay and snap-to-grid toggles are available and applied to node placement/movement.
+  - Persistent legend is visible and route/selection visual contrast is improved.
 - References:
   - `logics/request/req_001_v1_ux_ui_operator_workspace.md`
   - `src/app/App.tsx`

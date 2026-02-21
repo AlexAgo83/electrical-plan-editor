@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 98%
 > Confidence: 94%
-> Progress: 25%
+> Progress: 80%
 > Complexity: High
 > Theme: UX/UI Task Flow
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,7 +36,8 @@ Create/edit operations are spread across multiple panels and do not provide a cl
 - Status update:
   - Interaction mode toolbar is available (`Select`, `Add Node`, `Add Segment`, `Connect`, `Route`).
   - `Select` mode is wired for node/segment selection and node dragging.
-  - Dedicated inspector unification and undo/redo remain pending.
+  - Contextual inspector panel is active with focused entity snapshot and quick actions (`Open in inspector`, `Edit selected`, `Clear selection`).
+  - Undo/redo actions and autosave status (`Saved`, `Unsaved`, `Error`) are active across modeling actions.
 - References:
   - `logics/request/req_001_v1_ux_ui_operator_workspace.md`
   - `src/app/App.tsx`
