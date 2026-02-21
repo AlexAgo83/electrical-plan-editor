@@ -1,0 +1,232 @@
+.canvas-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.canvas-toolbar > span {
+  font-size: 0.85rem;
+  color: #3d596d;
+}
+
+.canvas-toolbar-separator {
+  width: 1px;
+  height: 1.35rem;
+  background: #c7d7e4;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.5rem;
+}
+
+.summary-grid article {
+  border: 1px solid #d3e0ea;
+  border-radius: 0.6rem;
+  padding: 0.55rem;
+  background: #f8fbfe;
+}
+
+.summary-grid h3 {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #3d596d;
+}
+
+.summary-grid p {
+  margin: 0.25rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.summary-title {
+  margin: 0.95rem 0 0.55rem;
+  font-size: 0.9rem;
+  color: #314a5f;
+}
+
+.subnetwork-chip {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #e6f0f8;
+  border: 1px solid #b8cfdf;
+  color: #1f4059;
+  font-size: 0.8rem;
+}
+
+.subnetwork-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.subnetwork-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #2f4d63;
+  font-size: 0.88rem;
+}
+
+.selection-snapshot {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.selection-snapshot p {
+  margin: 0;
+  color: #2c495f;
+  font-size: 0.88rem;
+}
+
+.inspector-snapshot {
+  margin-bottom: 0.6rem;
+}
+
+.network-canvas-shell {
+  margin-top: 0.55rem;
+  border: 1px solid #c9d9e6;
+  border-radius: 0.65rem;
+  background: linear-gradient(180deg, #f7fbff, #f0f6fb);
+  padding: 0.35rem;
+}
+
+.network-canvas-shell.is-panning {
+  cursor: grabbing;
+}
+
+.network-svg {
+  display: block;
+  width: 100%;
+  min-height: 360px;
+  touch-action: none;
+}
+
+.network-grid line {
+  stroke: #d5e1eb;
+  stroke-width: 0.8;
+  pointer-events: none;
+}
+
+.network-segment {
+  stroke: #7f99af;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.network-segment.is-wire-highlighted {
+  stroke: #4f8d2d;
+  stroke-width: 5;
+}
+
+.network-segment.is-selected {
+  stroke: #0f6cb8;
+  stroke-width: 5;
+}
+
+.network-segment-hitbox {
+  stroke: transparent;
+  stroke-width: 16;
+  stroke-linecap: round;
+  cursor: pointer;
+}
+
+.network-segment-label {
+  font-size: 10px;
+  fill: #38566a;
+  pointer-events: none;
+}
+
+.network-node {
+  cursor: pointer;
+}
+
+.network-node:active {
+  cursor: grabbing;
+}
+
+.network-node circle {
+  stroke: #55748d;
+  stroke-width: 2;
+}
+
+.network-node.connector circle {
+  fill: #dff0ff;
+}
+
+.network-node.splice circle {
+  fill: #fdeecf;
+}
+
+.network-node.intermediate circle {
+  fill: #ecf2f7;
+}
+
+.network-node.is-selected circle {
+  stroke: #0f6cb8;
+  stroke-width: 3;
+}
+
+.network-node-label {
+  font-size: 9px;
+  fill: #183549;
+  pointer-events: none;
+}
+
+.network-legend {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 0.9rem;
+  color: #345167;
+  font-size: 0.82rem;
+}
+
+.network-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  border: 2px solid #55748d;
+  display: inline-block;
+}
+
+.legend-swatch.connector {
+  background: #dff0ff;
+}
+
+.legend-swatch.splice {
+  background: #fdeecf;
+}
+
+.legend-swatch.intermediate {
+  background: #ecf2f7;
+}
+
+.legend-line {
+  width: 1.05rem;
+  height: 0;
+  border-top: 3px solid #7f99af;
+  display: inline-block;
+}
+
+.legend-line.selected {
+  border-top-color: #0f6cb8;
+}
+
+.legend-line.wire {
+  border-top-color: #4f8d2d;
+}

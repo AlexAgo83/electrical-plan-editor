@@ -1,0 +1,135 @@
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+  border-bottom: 1px solid #d5e1ea;
+  text-align: left;
+  padding: 0.45rem 0.3rem;
+  vertical-align: top;
+}
+
+.table-density-compact .data-table {
+  font-size: 0.83rem;
+}
+
+.table-density-compact .data-table th,
+.table-density-compact .data-table td {
+  padding: 0.28rem 0.22rem;
+}
+
+.data-table th {
+  color: #3d596d;
+  font-weight: 600;
+}
+
+.sort-header-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+
+.sort-header-button:hover {
+  color: #123a57;
+}
+
+.sort-indicator {
+  min-width: 0.8rem;
+  text-align: center;
+  color: #4a6a82;
+}
+
+.list-toolbar {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.list-search {
+  max-width: 320px;
+}
+
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.filter-chip {
+  border: 1px solid #9eb7cc;
+  border-radius: 999px;
+  background: #f8fbfe;
+  color: #17374e;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.filter-chip.is-active {
+  background: #17374e;
+  color: #fff;
+  border-color: #17374e;
+}
+
+.filter-chip-count {
+  font-family: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
+  font-size: 0.72rem;
+  opacity: 0.82;
+}
+
+.technical-id {
+  font-family: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
+  letter-spacing: 0.01em;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.status-chip.is-error {
+  background: #fde7e7;
+  color: #8f1e1e;
+}
+
+.status-chip.is-warning {
+  background: #fff4d8;
+  color: #7b4d00;
+}
+
+.data-table tr.is-selected {
+  background: #eef6fc;
+}
+
+.data-table tr.is-wire-highlighted {
+  background: #f0f7e8;
+}
+
+.splice-badge {
+  display: inline-block;
+  margin-right: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: #133a57;
+  color: #fff;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}

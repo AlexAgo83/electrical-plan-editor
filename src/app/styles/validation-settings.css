@@ -1,0 +1,45 @@
+.validation-toolbar {
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 0.7rem;
+}
+
+.validation-toolbar > span {
+  font-size: 0.84rem;
+  color: #365166;
+}
+
+.validation-groups {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.validation-group {
+  border: 1px solid #d4e0ea;
+  border-radius: 0.6rem;
+  background: #f9fcff;
+  padding: 0.55rem;
+}
+
+.validation-group h3 {
+  margin: 0 0 0.45rem;
+  font-size: 0.9rem;
+  color: #27465d;
+}
+
+.validation-active-filter {
+  margin-top: 0.65rem;
+}
+
+.settings-grid {
+  display: grid;
+  gap: 0.65rem;
+  margin-bottom: 0.65rem;
+}
+
+.settings-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+}
