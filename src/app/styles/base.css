@@ -242,6 +242,7 @@ button {
 .app-shell.theme-dark .shortcut-hints,
 .app-shell.theme-dark .empty-copy,
 .app-shell.theme-dark .inline-help,
+.app-shell.theme-dark .inspector-collapsed-copy,
 .app-shell.theme-dark .canvas-toolbar > span,
 .app-shell.theme-dark .summary-grid h3,
 .app-shell.theme-dark .summary-title,
@@ -276,6 +277,7 @@ button {
 .app-shell.theme-dark .row-actions button,
 .app-shell.theme-dark .row-form button,
 .app-shell.theme-dark .error-banner button,
+.app-shell.theme-dark .inspector-context-toggle,
 .app-shell.theme-dark .header-nav-toggle,
 .app-shell.theme-dark .header-settings-toggle,
 .app-shell.theme-dark .header-ops-toggle {

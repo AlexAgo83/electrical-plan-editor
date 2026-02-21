@@ -20,7 +20,6 @@ interface AnalysisWorkspaceContentProps {
   isConnectorSubScreen: boolean;
   isSpliceSubScreen: boolean;
   isWireSubScreen: boolean;
-  inspectorContextPanel: ReactElement;
   networkSummaryPanel: ReactElement;
   selectedConnector: Connector | null;
   cavityIndexInput: string;
@@ -58,7 +57,6 @@ export function AnalysisWorkspaceContent({
   isConnectorSubScreen,
   isSpliceSubScreen,
   isWireSubScreen,
-  inspectorContextPanel,
   networkSummaryPanel,
   selectedConnector,
   cavityIndexInput,
@@ -93,7 +91,6 @@ export function AnalysisWorkspaceContent({
 }: AnalysisWorkspaceContentProps): ReactElement {
   return (
     <section className="panel-grid">
-      {inspectorContextPanel}
       <section className="panel" hidden={!isConnectorSubScreen}>
         <h2>Connector cavities</h2>
         {selectedConnector === null ? (

@@ -2,7 +2,6 @@ import type { FormEvent, ReactElement } from "react";
 import type { Connector, NetworkNode, Splice, WireEndpoint } from "../../../core/entities";
 
 interface ModelingFormsColumnProps {
-  inspectorContextPanel: ReactElement;
   isConnectorSubScreen: boolean;
   connectorFormMode: "create" | "edit";
   handleConnectorSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -95,7 +94,6 @@ interface ModelingFormsColumnProps {
 }
 
 export function ModelingFormsColumn({
-  inspectorContextPanel,
   isConnectorSubScreen,
   connectorFormMode,
   handleConnectorSubmit,
@@ -188,7 +186,6 @@ export function ModelingFormsColumn({
 }: ModelingFormsColumnProps): ReactElement {
   return (
     <section className="panel-grid workspace-column workspace-column-right">
-      {inspectorContextPanel}
       <article className="panel" hidden={!isConnectorSubScreen}>
         <h2>{connectorFormMode === "create" ? "Create Connector" : "Edit Connector"}</h2>
         <form className="stack-form" onSubmit={handleConnectorSubmit}>

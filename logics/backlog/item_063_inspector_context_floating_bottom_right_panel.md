@@ -1,8 +1,8 @@
 ## item_063_inspector_context_floating_bottom_right_panel - Inspector Context Floating Bottom-Right Panel
 > From version: 0.3.0
 > Understanding: 100%
-> Confidence: 98%
-> Progress: 0% (context visibility rules refined)
+> Confidence: 99%
+> Progress: 100% (floating panel + visibility matrix delivered)
 > Complexity: Medium
 > Theme: Contextual Inspector Placement
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -43,6 +43,9 @@
   - `logics/request/req_010_network_scope_workspace_shell_and_global_defaults.md`
   - `src/app/components/InspectorContextPanel.tsx`
   - `src/app/AppController.tsx`
+  - `src/app/styles/workspace.css`
+  - `src/app/styles/base.css`
   - `src/app/hooks/useSelectionHandlers.ts`
+  - `src/tests/app.ui.inspector-shell.spec.tsx`
   - `src/tests/app.ui.validation.spec.tsx`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`

@@ -182,6 +182,7 @@ describe("App integration UI - validation", () => {
     expect(secondaryNavRow).not.toBeNull();
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/ })).toHaveClass("is-active");
 
+    fireEvent.click(screen.getByRole("button", { name: "Close operations panel" }));
     const inspectorPanel = getPanelByHeading("Inspector context");
     expect(within(inspectorPanel).getByText("W1")).toBeInTheDocument();
     expect(within(modelHealth).getByText(/Issue navigator:/i, { selector: "p" })).toBeInTheDocument();

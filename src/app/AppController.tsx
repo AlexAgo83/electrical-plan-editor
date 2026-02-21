@@ -286,6 +286,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
   const [isNavigationDrawerOpen, setIsNavigationDrawerOpen] = useState(false);
   const [isOperationsPanelOpen, setIsOperationsPanelOpen] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState(() =>
+    typeof window === "undefined" ? 1440 : window.innerWidth
+  );
+  const [isDialogFocusActive, setIsDialogFocusActive] = useState(false);
+  const [isInspectorExpandedOnNarrowViewport, setIsInspectorExpandedOnNarrowViewport] = useState(false);
   const panStartRef = useRef<{
     clientX: number;
     clientY: number;
@@ -919,6 +924,39 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   }, [isOperationsPanelOpen]);
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const handleResize = (): void => {
+      setViewportWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateDialogFocusState = (): void => {
+      const activeElement = document.activeElement;
+      if (!(activeElement instanceof HTMLElement)) {
+        setIsDialogFocusActive(false);
+        return;
+      }
+
+      setIsDialogFocusActive(activeElement.closest('[role="dialog"], [aria-modal="true"]') !== null);
+    };
+
+    updateDialogFocusState();
+    document.addEventListener("focusin", updateDialogFocusState);
+    return () => {
+      document.removeEventListener("focusin", updateDialogFocusState);
+    };
+  }, []);
+
+  useEffect(() => {
     undoActionRef.current = handleUndo;
     redoActionRef.current = handleRedo;
     fitNetworkToContentRef.current = fitNetworkToContent;
@@ -1254,8 +1292,30 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     selectedSplice === null
       ? 0
       : selectSplicePortStatuses(state, selectedSplice.id).filter((slot) => slot.isOccupied).length;
+  const isInspectorVisibilityScreen = isModelingScreen || isAnalysisScreen || isValidationScreen;
+  const hasInspectableSelection = selected !== null && selectedSubScreen !== null;
+  const isInspectorNarrowViewport = viewportWidth < 960;
+  const isModalDialogFocusActive = isDialogFocusActive || isNavigationDrawerOpen || isOperationsPanelOpen;
+  const isInspectorHidden = !isInspectorVisibilityScreen || !hasActiveNetwork || isModalDialogFocusActive;
+  const isInspectorAutoCollapsed = !hasInspectableSelection || isInspectorNarrowViewport;
+  const canExpandInspectorFromCollapsed = hasInspectableSelection && isInspectorNarrowViewport;
+  const isInspectorOpen =
+    !isInspectorHidden &&
+    (!isInspectorAutoCollapsed || (canExpandInspectorFromCollapsed && isInspectorExpandedOnNarrowViewport));
+
+  useEffect(() => {
+    if (isInspectorHidden || !canExpandInspectorFromCollapsed) {
+      setIsInspectorExpandedOnNarrowViewport(false);
+    }
+  }, [canExpandInspectorFromCollapsed, isInspectorHidden]);
+
   const inspectorContextPanel = (
     <InspectorContextPanel
+      mode={isInspectorOpen ? "open" : "collapsed"}
+      canExpandFromCollapsed={canExpandInspectorFromCollapsed}
+      canCollapseToCollapsed={canExpandInspectorFromCollapsed}
+      onExpandFromCollapsed={() => setIsInspectorExpandedOnNarrowViewport(true)}
+      onCollapseToCollapsed={() => setIsInspectorExpandedOnNarrowViewport(false)}
       selected={selected}
       selectedSubScreen={selectedSubScreen}
       selectedConnector={selectedConnector}
@@ -1463,10 +1523,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             </section>
           ) : !isNetworkScopeScreen ? (
             <>
-      <ModelingScreen isActive={isModelingScreen}>
+          <ModelingScreen isActive={isModelingScreen}>
         <section className="workspace-stage">
           <ModelingFormsColumn
-            inspectorContextPanel={inspectorContextPanel}
             isConnectorSubScreen={isConnectorSubScreen}
             connectorFormMode={connectorFormMode}
             handleConnectorSubmit={handleConnectorSubmit}
@@ -1651,7 +1710,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           isConnectorSubScreen={isConnectorSubScreen}
           isSpliceSubScreen={isSpliceSubScreen}
           isWireSubScreen={isWireSubScreen}
-          inspectorContextPanel={inspectorContextPanel}
           networkSummaryPanel={networkSummaryPanel}
           selectedConnector={selectedConnector}
           cavityIndexInput={cavityIndexInput}
@@ -1735,6 +1793,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           ) : null}
         </section>
       </section>
+      {!isInspectorHidden ? (
+        <aside
+          className={isInspectorOpen ? "workspace-inspector-panel is-open" : "workspace-inspector-panel is-collapsed"}
+          aria-label="Inspector context panel"
+        >
+          {inspectorContextPanel}
+        </aside>
+      ) : null}
     </main>
   );
 }

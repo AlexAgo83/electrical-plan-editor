@@ -3,6 +3,11 @@ import type { Connector, NetworkNode, Segment, Splice, Wire } from "../../core/e
 import type { SelectionState } from "../../store/types";
 
 interface InspectorContextPanelProps {
+  mode: "open" | "collapsed";
+  canExpandFromCollapsed: boolean;
+  canCollapseToCollapsed: boolean;
+  onExpandFromCollapsed: () => void;
+  onCollapseToCollapsed: () => void;
   selected: SelectionState | null;
   selectedSubScreen: "connector" | "splice" | "node" | "segment" | "wire" | null;
   selectedConnector: Connector | null;
@@ -20,6 +25,11 @@ interface InspectorContextPanelProps {
 }
 
 export function InspectorContextPanel({
+  mode,
+  canExpandFromCollapsed,
+  canCollapseToCollapsed,
+  onExpandFromCollapsed,
+  onCollapseToCollapsed,
   selected,
   selectedSubScreen,
   selectedConnector,
@@ -35,10 +45,35 @@ export function InspectorContextPanel({
   onFocusCanvas,
   onClearSelection
 }: InspectorContextPanelProps): ReactElement {
+  const isCollapsed = mode === "collapsed";
+
   return (
-    <article className="panel">
-      <h2>Inspector context</h2>
-      {selected === null ? (
+    <article className={isCollapsed ? "panel inspector-context-panel is-collapsed" : "panel inspector-context-panel"}>
+      <div className="inspector-context-header">
+        <h2>Inspector context</h2>
+        {isCollapsed && canExpandFromCollapsed ? (
+          <button type="button" className="inspector-context-toggle" onClick={onExpandFromCollapsed}>
+            Expand
+          </button>
+        ) : null}
+        {!isCollapsed && canCollapseToCollapsed ? (
+          <button type="button" className="inspector-context-toggle" onClick={onCollapseToCollapsed}>
+            Collapse
+          </button>
+        ) : null}
+      </div>
+      {isCollapsed ? (
+        selected === null ? (
+          <p className="empty-copy">No entity selected. Select a row or a canvas item to inspect details here.</p>
+        ) : (
+          <>
+            <p className="meta-line">
+              Focused entity: <strong>{selected.kind}</strong> <span className="technical-id">{selected.id}</span>
+            </p>
+            <p className="inspector-collapsed-copy">Inspector is collapsed to preserve workspace focus.</p>
+          </>
+        )
+      ) : selected === null ? (
         <p className="empty-copy">No entity selected. Select a row or a canvas item to inspect details here.</p>
       ) : (
         <>
