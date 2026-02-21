@@ -56,6 +56,7 @@ import { NetworkSummaryPanel } from "./components/NetworkSummaryPanel";
 import { WorkspaceNavigation } from "./components/WorkspaceNavigation";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useUiPreferences } from "./hooks/useUiPreferences";
+import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
 import "./styles.css";
 
 function useAppSnapshot(store: AppStore) {
@@ -274,7 +275,6 @@ export interface AppProps {
   store?: AppStore;
 }
 
-type ScreenId = "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
 type InteractionMode = "select" | "addNode" | "addSegment" | "connect" | "route";
 type TableDensity = "comfortable" | "compact";
@@ -383,8 +383,6 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [wireFormError, setWireFormError] = useState<string | null>(null);
   const [routePreviewStartNodeId, setRoutePreviewStartNodeId] = useState("");
   const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
-  const [activeScreen, setActiveScreen] = useState<ScreenId>("modeling");
-  const [activeSubScreen, setActiveSubScreen] = useState<SubScreenId>("connector");
   const [interactionMode, setInteractionMode] = useState<InteractionMode>("select");
   const [modeAnchorNodeId, setModeAnchorNodeId] = useState<NodeId | null>(null);
   const [pendingNewNodePosition, setPendingNewNodePosition] = useState<NodePosition | null>(null);
@@ -442,15 +440,24 @@ export function App({ store = appStore }: AppProps): ReactElement {
     offsetX: number;
     offsetY: number;
   } | null>(null);
-  const lastInspectorSelectionRef = useRef<string | null>(null);
   const undoActionRef = useRef<() => void>(() => {});
   const redoActionRef = useRef<() => void>(() => {});
   const fitNetworkToContentRef = useRef<() => void>(() => {});
   const previousValidationIssueRef = useRef<() => void>(() => {});
   const nextValidationIssueRef = useRef<() => void>(() => {});
-  const activeScreenRef = useRef<ScreenId>("modeling");
 
   const selected = selectSelection(state);
+  const {
+    activeScreen,
+    setActiveScreen,
+    activeSubScreen,
+    setActiveSubScreen,
+    isModelingScreen,
+    isAnalysisScreen,
+    isValidationScreen,
+    isSettingsScreen,
+    activeScreenRef
+  } = useWorkspaceNavigation(selected);
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
   const selectedSpliceId = selected?.kind === "splice" ? (selected.id as SpliceId) : null;
   const selectedNodeId = selected?.kind === "node" ? (selected.id as NodeId) : null;
@@ -522,10 +529,6 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
     return merged;
   }, [autoNodePositions, manualNodePositions, nodes]);
-  const isModelingScreen = activeScreen === "modeling";
-  const isAnalysisScreen = activeScreen === "analysis";
-  const isValidationScreen = activeScreen === "validation";
-  const isSettingsScreen = activeScreen === "settings";
   const isUndoAvailable = undoStack.length > 0;
   const isRedoAvailable = redoStack.length > 0;
   const isConnectorSubScreen = activeSubScreen === "connector";
@@ -599,10 +602,6 @@ export function App({ store = appStore }: AppProps): ReactElement {
   }, [connectorMap, spliceMap]);
 
   useEffect(() => {
-    activeScreenRef.current = activeScreen;
-  }, [activeScreen]);
-
-  useEffect(() => {
     const validNodeIds = new Set(nodes.map((node) => node.id));
     setManualNodePositions((previous) => {
       let changed = false;
@@ -627,21 +626,6 @@ export function App({ store = appStore }: AppProps): ReactElement {
       setPendingNewNodePosition(null);
     }
   }, [interactionMode]);
-
-  useEffect(() => {
-    const selectionKey = selected === null ? null : `${selected.kind}:${selected.id}`;
-    const hasSelectionChanged = selectionKey !== lastInspectorSelectionRef.current;
-    lastInspectorSelectionRef.current = selectionKey;
-
-    if (!isModelingScreen || selected === null || !hasSelectionChanged) {
-      return;
-    }
-
-    const selectedKind = selected.kind as SubScreenId;
-    if (activeSubScreen !== selectedKind) {
-      setActiveSubScreen(selectedKind);
-    }
-  }, [activeSubScreen, isModelingScreen, selected]);
 
   const connectorSynthesisRows = useMemo<ConnectorSynthesisRow[]>(() => {
     if (selectedConnector === null) {
