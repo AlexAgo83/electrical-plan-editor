@@ -9,8 +9,11 @@ The V1 goal is to model connectors, splices, routing segments, and wires as a de
 This repository is currently in **V1 kickoff ready** status:
 - Product request is defined in `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`.
 - Target architecture is defined in `logics/architecture/target_reference_v1_frontend_local_first.md`.
-- Backlog is split into 9 V1 items in `logics/backlog/`.
-- Delivery orchestration lives in `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`.
+- Kickoff backlog is split into 9 V1 items (`item_000`..`item_008`) in `logics/backlog/`.
+- UX/UI extension backlog is defined in `item_009`..`item_013` from `req_001`.
+- Delivery orchestration lives in:
+  - `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`
+  - `logics/tasks/task_001_v1_ux_ui_workspace_orchestration_and_delivery_control.md`
 
 Foundation item `item_000` is implemented:
 - TypeScript strict project scaffold (Vite + React + Vitest + ESLint).
@@ -52,8 +55,8 @@ Wire lifecycle item `item_005` is implemented:
 - Endpoint occupancy enforcement for connector cavities and splice ports.
 
 Network and synthesis views item `item_006` is implemented:
-- Screen selector to switch between `Modeling` and `Analysis` views.
-- Sub-screen selector (`Connector`, `Splice`, `Node`, `Segment`, `Wire`) to focus each entity independently.
+- Workspace tabs to switch between `Modeling`, `Analysis`, `Validation`, and `Settings`.
+- Sub-screen tab navigation (`Connector`, `Splice`, `Node`, `Segment`, `Wire`) for modeling/analysis focus.
 - 2D SVG network diagram for `Node`/`Segment`/`Wire` analysis with selectable nodes and segments.
 - Manual ID entry for node and segment creation (no auto-generated IDs for these entities).
 - Draggable nodes in 2D network view (mouse drag-and-drop).
@@ -74,6 +77,12 @@ Validation and acceptance coverage item `item_008` is implemented:
 - Integration/UI tests cover connector occupancy, splice occupancy, and selected wire route highlight.
 - E2E smoke scenario covers create -> route -> force lock -> recompute flow.
 - CI baseline executes lint, typecheck, unit/integration, and E2E smoke checks.
+
+UX/UI workspace wave (`task_001`) is in progress:
+- Persistent workspace navigation is active.
+- Validation center screen with grouped issues and `Go to` actions is active.
+- List ergonomics now include search on all core lists and filters on node/wire lists.
+- Network canvas is visible in both modeling and analysis workspaces.
 
 ## V1 Scope
 
@@ -128,6 +137,7 @@ python3 logics/skills/logics-flow-manager/scripts/logics_flow.py promote backlog
 - Wave 1: `item_000` to `item_004` (foundation + routing engine).
 - Wave 2: `item_005` to `item_007` (wire lifecycle + views + persistence) - completed.
 - Wave 3: `item_008` (validation matrix and AC1..AC6 automated coverage) - completed.
+- Wave 4: `item_009` to `item_013` (UX/UI workspace overhaul) - in progress.
 
 ## Validation Baseline
 
@@ -143,10 +153,10 @@ npm run test:e2e
 
 GitHub Actions CI is available in `.github/workflows/ci.yml` and runs the same baseline checks on pushes/PRs.
 
-Note: npm-based checks are target validation gates for the upcoming application implementation phase.
-
 ## Key References
 
 - `logics/request/req_000_kickoff_v1_electrical_plan_editor.md`
+- `logics/request/req_001_v1_ux_ui_operator_workspace.md`
 - `logics/architecture/target_reference_v1_frontend_local_first.md`
 - `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`
+- `logics/tasks/task_001_v1_ux_ui_workspace_orchestration_and_delivery_control.md`

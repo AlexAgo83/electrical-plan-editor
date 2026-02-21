@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 98%
 > Confidence: 94%
-> Progress: 0%
+> Progress: 25%
 > Complexity: High
 > Theme: UX/UI Task Flow
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -33,6 +33,10 @@ Create/edit operations are spread across multiple panels and do not provide a cl
 # Notes
 - Dependencies: item_009, item_005.
 - Related AC: AC2, AC3, AC4.
+- Status update:
+  - Interaction mode toolbar is available (`Select`, `Add Node`, `Add Segment`, `Connect`, `Route`).
+  - `Select` mode is wired for node/segment selection and node dragging.
+  - Dedicated inspector unification and undo/redo remain pending.
 - References:
   - `logics/request/req_001_v1_ux_ui_operator_workspace.md`
   - `src/app/App.tsx`

@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 45%
 > Complexity: High
 > Theme: UX/UI Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -18,7 +18,7 @@ Backlog scope covered:
 - `item_013_v1_list_ergonomics_search_filter_action_consistency.md`
 
 # Plan
-- [ ] 1. Freeze UX information architecture and delivery waves (layout, inspector, canvas, validation, list ergonomics)
+- [x] 1. Freeze UX information architecture and delivery waves (layout, inspector, canvas, validation, list ergonomics)
 - [ ] 2. Deliver Wave 1 (`item_009`, `item_010`) and validate no regression on core modeling/routing workflows
 - [ ] 3. Deliver Wave 2 (`item_011`, `item_013`) with interaction and list ergonomics test coverage
 - [ ] 4. Deliver Wave 3 (`item_012`) and validate issue navigation end-to-end
@@ -33,9 +33,18 @@ Backlog scope covered:
 - `npm run test:e2e`
 
 # Report
-- Wave status: not started.
+- Wave status:
+  - Wave 1 in progress: item_009 is mostly implemented; item_010 is started (interaction mode baseline only).
+  - Wave 2 started: item_013 is mostly implemented; item_011 baseline scaffolding only.
+  - Wave 3 started: item_012 validation center baseline is active.
 - Current blockers: none.
+- Validation snapshot:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` passes.
+  - `npm run lint` passes.
+  - `npm run typecheck` passes.
+  - `npm run test:ci` passes.
+  - `npm run test:e2e` passes.
 - Main risks to track:
   - Interaction complexity between canvas modes and deterministic domain constraints.
-  - Potential UX regressions on existing connector/splice occupancy flows.
+  - Inspector unification could introduce UX regressions on existing connector/splice occupancy flows.
   - Consistency drift between list actions and inspector behavior across entities.

@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 98%
 > Confidence: 94%
-> Progress: 0%
+> Progress: 60%
 > Complexity: High
 > Theme: UX/UI Validation Workflow
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -33,7 +33,12 @@ Validation feedback is currently distributed across local errors, making it hard
 # Notes
 - Dependencies: item_009, item_010, item_008.
 - Related AC: AC6, AC7.
+- Status update:
+  - Dedicated `Validation` workspace is implemented.
+  - Grouped issue list with severity and one-click `Go to` navigation is active.
+  - Coverage of all planned issue categories remains incomplete.
 - References:
   - `logics/request/req_001_v1_ux_ui_operator_workspace.md`
+  - `src/app/App.tsx`
   - `src/store/selectors.ts`
   - `src/tests/app.ui.spec.tsx`
