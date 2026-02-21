@@ -11,7 +11,15 @@ import {
   clamp,
   createEntityId
 } from "../lib/app-utils";
-import type { NodePosition, SortDirection, SortField, SortState, TableDensity, TableFontSize } from "../types/app-controller";
+import type {
+  CanvasLabelStrokeMode,
+  NodePosition,
+  SortDirection,
+  SortField,
+  SortState,
+  TableDensity,
+  TableFontSize
+} from "../types/app-controller";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -43,10 +51,12 @@ interface UseWorkspaceHandlersParams {
   canvasDefaultSnapToGrid: boolean;
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
+  canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   setShowNetworkGrid: (value: boolean | ((current: boolean) => boolean)) => void;
   setSnapNodesToGrid: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowNetworkInfoPanels: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowSegmentLengths: (value: boolean | ((current: boolean) => boolean)) => void;
+  setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode | ((current: CanvasLabelStrokeMode) => CanvasLabelStrokeMode)) => void;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
   defaultIdSortDirection: SortDirection;
@@ -68,6 +78,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasDefaultSnapToGrid: (value: boolean) => void;
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
+  setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
   setShowShortcutHints: (value: boolean) => void;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
@@ -96,10 +107,12 @@ export function useWorkspaceHandlers({
   canvasDefaultSnapToGrid,
   canvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
+  canvasDefaultLabelStrokeMode,
   setShowNetworkGrid,
   setSnapNodesToGrid,
   setShowNetworkInfoPanels,
   setShowSegmentLengths,
+  setNetworkLabelStrokeMode,
   defaultSortField,
   defaultSortDirection,
   defaultIdSortDirection,
@@ -121,6 +134,7 @@ export function useWorkspaceHandlers({
   setCanvasDefaultSnapToGrid,
   setCanvasDefaultShowInfoPanels,
   setCanvasDefaultShowSegmentLengths,
+  setCanvasDefaultLabelStrokeMode,
   setCanvasResetZoomPercentInput,
   setShowShortcutHints,
   setKeyboardShortcutsEnabled
@@ -357,6 +371,7 @@ export function useWorkspaceHandlers({
     setSnapNodesToGrid(canvasDefaultSnapToGrid);
     setShowNetworkInfoPanels(canvasDefaultShowInfoPanels);
     setShowSegmentLengths(canvasDefaultShowSegmentLengths);
+    setNetworkLabelStrokeMode(canvasDefaultLabelStrokeMode);
     resetNetworkViewToConfiguredScale();
   }
 
@@ -380,11 +395,13 @@ export function useWorkspaceHandlers({
     setCanvasDefaultSnapToGrid(true);
     setCanvasDefaultShowInfoPanels(true);
     setCanvasDefaultShowSegmentLengths(false);
+    setCanvasDefaultLabelStrokeMode("normal");
     setCanvasResetZoomPercentInput("100");
     setShowNetworkGrid(true);
     setSnapNodesToGrid(true);
     setShowNetworkInfoPanels(true);
     setShowSegmentLengths(false);
+    setNetworkLabelStrokeMode("normal");
     setNetworkScale(1);
     setNetworkOffset({ x: 0, y: 0 });
     setShowShortcutHints(false);

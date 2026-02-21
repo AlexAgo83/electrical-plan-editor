@@ -99,6 +99,7 @@ import {
 } from "./lib/app-utils";
 import type {
   AppProps,
+  CanvasLabelStrokeMode,
   NodePosition,
   SortState,
   SortDirection,
@@ -325,8 +326,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [canvasDefaultSnapToGrid, setCanvasDefaultSnapToGrid] = useState(true);
   const [canvasDefaultShowInfoPanels, setCanvasDefaultShowInfoPanels] = useState(true);
   const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(false);
+  const [canvasDefaultLabelStrokeMode, setCanvasDefaultLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
   const [showNetworkInfoPanels, setShowNetworkInfoPanels] = useState(true);
   const [showSegmentLengths, setShowSegmentLengths] = useState(false);
+  const [networkLabelStrokeMode, setNetworkLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
   const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("100");
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
@@ -689,6 +692,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasDefaultSnapToGrid,
     canvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,
+    canvasDefaultLabelStrokeMode,
     canvasResetZoomPercentInput,
     showShortcutHints,
     keyboardShortcutsEnabled,
@@ -710,10 +714,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultSnapToGrid,
     setCanvasDefaultShowInfoPanels,
     setCanvasDefaultShowSegmentLengths,
+    setCanvasDefaultLabelStrokeMode,
     setShowNetworkGrid,
     setSnapNodesToGrid,
     setShowNetworkInfoPanels,
     setShowSegmentLengths,
+    setNetworkLabelStrokeMode,
     setCanvasResetZoomPercentInput,
     setNetworkScale,
     setNetworkOffset,
@@ -879,10 +885,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasDefaultSnapToGrid,
     canvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,
+    canvasDefaultLabelStrokeMode,
     setShowNetworkGrid,
     setSnapNodesToGrid,
     setShowNetworkInfoPanels,
     setShowSegmentLengths,
+    setNetworkLabelStrokeMode,
     defaultSortField,
     defaultSortDirection,
     defaultIdSortDirection,
@@ -904,6 +912,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultSnapToGrid,
     setCanvasDefaultShowInfoPanels,
     setCanvasDefaultShowSegmentLengths,
+    setCanvasDefaultLabelStrokeMode,
     setCanvasResetZoomPercentInput,
     setShowShortcutHints,
     setKeyboardShortcutsEnabled
@@ -1617,6 +1626,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       snapNodesToGrid={snapNodesToGrid}
       showNetworkInfoPanels={showNetworkInfoPanels}
       showSegmentLengths={showSegmentLengths}
+      labelStrokeMode={networkLabelStrokeMode}
       toggleShowNetworkInfoPanels={() => setShowNetworkInfoPanels((current) => !current)}
       toggleShowSegmentLengths={() => setShowSegmentLengths((current) => !current)}
       toggleShowNetworkGrid={() => setShowNetworkGrid((current) => !current)}
@@ -2091,6 +2101,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setCanvasDefaultShowInfoPanels={setCanvasDefaultShowInfoPanels}
           canvasDefaultShowSegmentLengths={canvasDefaultShowSegmentLengths}
           setCanvasDefaultShowSegmentLengths={setCanvasDefaultShowSegmentLengths}
+          canvasDefaultLabelStrokeMode={canvasDefaultLabelStrokeMode}
+          setCanvasDefaultLabelStrokeMode={setCanvasDefaultLabelStrokeMode}
           canvasResetZoomPercentInput={canvasResetZoomPercentInput}
           setCanvasResetZoomPercentInput={setCanvasResetZoomPercentInput}
           configuredResetZoomPercent={configuredResetZoomPercent}

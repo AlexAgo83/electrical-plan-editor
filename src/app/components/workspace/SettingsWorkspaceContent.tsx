@@ -2,7 +2,13 @@ import type { ChangeEvent, ReactElement, RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
-import type { SortDirection, SortField, TableDensity, TableFontSize } from "../../types/app-controller";
+import type {
+  CanvasLabelStrokeMode,
+  SortDirection,
+  SortField,
+  TableDensity,
+  TableFontSize
+} from "../../types/app-controller";
 import type { ImportExportStatus } from "../../types/app-controller";
 
 interface SettingsWorkspaceContentProps {
@@ -41,6 +47,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   canvasDefaultShowSegmentLengths: boolean;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
+  canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
+  setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   canvasResetZoomPercentInput: string;
   setCanvasResetZoomPercentInput: (value: string) => void;
   configuredResetZoomPercent: number;
@@ -89,6 +97,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
   setCanvasDefaultShowSegmentLengths,
+  canvasDefaultLabelStrokeMode,
+  setCanvasDefaultLabelStrokeMode,
   canvasResetZoomPercentInput,
   setCanvasResetZoomPercentInput,
   configuredResetZoomPercent,
@@ -196,6 +206,17 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasDefaultShowSegmentLengths(event.target.checked)}
             />
             Show segment lengths by default
+          </label>
+          <label className="settings-field">
+            Label stroke mode
+            <select
+              value={canvasDefaultLabelStrokeMode}
+              onChange={(event) => setCanvasDefaultLabelStrokeMode(event.target.value as CanvasLabelStrokeMode)}
+            >
+              <option value="none">Rien</option>
+              <option value="light">Léger</option>
+              <option value="normal">Normal</option>
+            </select>
           </label>
           <label className="settings-field">
             Reset zoom target (%)

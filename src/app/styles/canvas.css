@@ -522,12 +522,22 @@
 .network-segment-label {
   font-size: 10px;
   fill: #38566a;
+  paint-order: stroke fill;
+  stroke: rgba(246, 251, 255, 0.96);
+  stroke-width: 1.8px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
   pointer-events: none;
 }
 
 .network-segment-length-label {
   font-size: 8px;
   fill: #547086;
+  paint-order: stroke fill;
+  stroke: rgba(246, 251, 255, 0.96);
+  stroke-width: 1.6px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
   pointer-events: none;
 }
 
@@ -539,24 +549,24 @@
   cursor: grabbing;
 }
 
-.network-node circle {
+.network-node .network-node-shape {
   stroke: #55748d;
   stroke-width: 2;
 }
 
-.network-node.connector circle {
+.network-node.connector .network-node-shape {
   fill: #dff0ff;
 }
 
-.network-node.splice circle {
+.network-node.splice .network-node-shape {
   fill: #fdeecf;
 }
 
-.network-node.intermediate circle {
+.network-node.intermediate .network-node-shape {
   fill: #ecf2f7;
 }
 
-.network-node.is-selected circle {
+.network-node.is-selected .network-node-shape {
   stroke: #0f6cb8;
   stroke-width: 3;
 }
@@ -564,7 +574,32 @@
 .network-node-label {
   font-size: 9px;
   fill: #183549;
+  paint-order: stroke fill;
+  stroke: rgba(246, 251, 255, 0.96);
+  stroke-width: 1.9px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
   pointer-events: none;
+}
+
+.network-canvas--label-stroke-none .network-segment-label,
+.network-canvas--label-stroke-none .network-segment-length-label,
+.network-canvas--label-stroke-none .network-node-label {
+  paint-order: normal;
+  stroke: none;
+  stroke-width: 0;
+}
+
+.network-canvas--label-stroke-light .network-segment-label {
+  stroke-width: 1.15px;
+}
+
+.network-canvas--label-stroke-light .network-segment-length-label {
+  stroke-width: 1px;
+}
+
+.network-canvas--label-stroke-light .network-node-label {
+  stroke-width: 1.2px;
 }
 
 .network-legend {

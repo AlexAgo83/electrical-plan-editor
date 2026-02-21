@@ -11,6 +11,7 @@ import type {
 } from "../../core/entities";
 import type { ShortestRouteResult } from "../../core/pathfinding";
 import type { SubNetworkSummary } from "../../store";
+import type { CanvasLabelStrokeMode } from "../types/app-controller";
 
 interface NodePosition {
   x: number;
@@ -67,6 +68,7 @@ interface NetworkSummaryPanelProps {
   fitNetworkToContent: () => void;
   showNetworkInfoPanels: boolean;
   showSegmentLengths: boolean;
+  labelStrokeMode: CanvasLabelStrokeMode;
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
   toggleShowNetworkInfoPanels: () => void;
@@ -114,6 +116,7 @@ export function NetworkSummaryPanel({
   fitNetworkToContent,
   showNetworkInfoPanels,
   showSegmentLengths,
+  labelStrokeMode,
   showNetworkGrid,
   snapNodesToGrid,
   toggleShowNetworkInfoPanels,
@@ -347,7 +350,7 @@ export function NetworkSummaryPanel({
             ) : null}
             <svg
               ref={networkSvgRef}
-              className="network-svg"
+              className={`network-svg network-canvas--label-stroke-${labelStrokeMode}`}
               role="img"
               aria-label="2D network diagram"
               viewBox={`0 0 ${networkViewWidth} ${networkViewHeight}`}
@@ -432,10 +435,13 @@ export function NetworkSummaryPanel({
                   const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}`;
                   const nodeLabel =
                     node.kind === "intermediate"
-                      ? node.label
+                      ? node.id
                       : node.kind === "connector"
                         ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
                         : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
+
+                  const connectorWidth = 46;
+                  const connectorHeight = 30;
 
                   return (
                     <g
@@ -448,7 +454,19 @@ export function NetworkSummaryPanel({
                       }}
                     >
                       <title>{describeNode(node)}</title>
-                      <circle cx={position.x} cy={position.y} r={17} />
+                      {node.kind === "connector" ? (
+                        <rect
+                          className="network-node-shape"
+                          x={position.x - connectorWidth / 2}
+                          y={position.y - connectorHeight / 2}
+                          width={connectorWidth}
+                          height={connectorHeight}
+                          rx={7}
+                          ry={7}
+                        />
+                      ) : (
+                        <circle className="network-node-shape" cx={position.x} cy={position.y} r={17} />
+                      )}
                       <text className="network-node-label" x={position.x} y={position.y + 4} textAnchor="middle">
                         {nodeLabel}
                       </text>

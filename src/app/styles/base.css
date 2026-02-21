@@ -710,19 +710,21 @@ button {
 }
 
 .app-shell.theme-dark .network-segment-label,
+.app-shell.theme-dark .network-segment-length-label,
 .app-shell.theme-dark .network-node-label {
   fill: #d4e3f1;
+  stroke: rgba(8, 19, 31, 0.9);
 }
 
-.app-shell.theme-dark .network-node.connector circle {
+.app-shell.theme-dark .network-node.connector .network-node-shape {
   fill: #28506e;
 }
 
-.app-shell.theme-dark .network-node.splice circle {
+.app-shell.theme-dark .network-node.splice .network-node-shape {
   fill: #6f5d3f;
 }
 
-.app-shell.theme-dark .network-node.intermediate circle {
+.app-shell.theme-dark .network-node.intermediate .network-node-shape {
   fill: #3a5369;
 }
 
@@ -883,15 +885,15 @@ button {
   stroke: #38e6c8;
 }
 
-.app-shell.theme-slate-neon .network-node.connector circle {
+.app-shell.theme-slate-neon .network-node.connector .network-node-shape {
   fill: #1f5e70;
 }
 
-.app-shell.theme-slate-neon .network-node.splice circle {
+.app-shell.theme-slate-neon .network-node.splice .network-node-shape {
   fill: #6a6e4d;
 }
 
-.app-shell.theme-slate-neon .network-node.intermediate circle {
+.app-shell.theme-slate-neon .network-node.intermediate .network-node-shape {
   fill: #2f5664;
 }
 

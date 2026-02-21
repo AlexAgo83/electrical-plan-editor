@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { ThemeMode } from "../../store";
-import type { TableFontSize } from "../types/app-controller";
+import type { CanvasLabelStrokeMode, TableFontSize } from "../types/app-controller";
 
 const UI_PREFERENCES_SCHEMA_VERSION = 1;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
@@ -44,6 +44,7 @@ interface UiPreferencesPayload {
   canvasDefaultSnapToGrid: boolean;
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
+  canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
@@ -89,6 +90,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultSnapToGrid: boolean;
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
+  canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
@@ -111,10 +113,12 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultSnapToGrid: (value: boolean) => void;
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
+  setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setShowNetworkGrid: (value: boolean) => void;
   setSnapNodesToGrid: (value: boolean) => void;
   setShowNetworkInfoPanels: (value: boolean) => void;
   setShowSegmentLengths: (value: boolean) => void;
+  setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
   setNetworkScale: (value: number) => void;
   setNetworkOffset: (value: { x: number; y: number }) => void;
@@ -136,6 +140,7 @@ export function useUiPreferences({
   canvasDefaultSnapToGrid,
   canvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
+  canvasDefaultLabelStrokeMode,
   canvasResetZoomPercentInput,
   showShortcutHints,
   keyboardShortcutsEnabled,
@@ -158,10 +163,12 @@ export function useUiPreferences({
   setCanvasDefaultSnapToGrid,
   setCanvasDefaultShowInfoPanels,
   setCanvasDefaultShowSegmentLengths,
+  setCanvasDefaultLabelStrokeMode,
   setShowNetworkGrid,
   setSnapNodesToGrid,
   setShowNetworkInfoPanels,
   setShowSegmentLengths,
+  setNetworkLabelStrokeMode,
   setCanvasResetZoomPercentInput,
   setNetworkScale,
   setNetworkOffset,
@@ -185,6 +192,10 @@ export function useUiPreferences({
         typeof preferences.canvasDefaultShowSegmentLengths === "boolean"
           ? preferences.canvasDefaultShowSegmentLengths
           : false;
+      const labelStrokeModeDefault =
+        preferences.canvasDefaultLabelStrokeMode === "none" || preferences.canvasDefaultLabelStrokeMode === "light"
+          ? preferences.canvasDefaultLabelStrokeMode
+          : "normal";
       const rawResetZoomPercent =
         typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "100";
       const parsedResetZoomPercent = Number(rawResetZoomPercent);
@@ -214,10 +225,12 @@ export function useUiPreferences({
       setCanvasDefaultSnapToGrid(snapDefault);
       setCanvasDefaultShowInfoPanels(showInfoPanelsDefault);
       setCanvasDefaultShowSegmentLengths(showSegmentLengthsDefault);
+      setCanvasDefaultLabelStrokeMode(labelStrokeModeDefault);
       setShowNetworkGrid(showGridDefault);
       setSnapNodesToGrid(snapDefault);
       setShowNetworkInfoPanels(showInfoPanelsDefault);
       setShowSegmentLengths(showSegmentLengthsDefault);
+      setNetworkLabelStrokeMode(labelStrokeModeDefault);
       setCanvasResetZoomPercentInput(rawResetZoomPercent);
       setNetworkScale(resetScale);
       setNetworkOffset({ x: 0, y: 0 });
@@ -235,6 +248,7 @@ export function useUiPreferences({
     setCanvasDefaultSnapToGrid,
     setCanvasDefaultShowInfoPanels,
     setCanvasDefaultShowSegmentLengths,
+    setCanvasDefaultLabelStrokeMode,
     setCanvasResetZoomPercentInput,
     setConnectorSort,
     setDefaultIdSortDirection,
@@ -251,6 +265,7 @@ export function useUiPreferences({
     setShowNetworkInfoPanels,
     setShowShortcutHints,
     setShowSegmentLengths,
+    setNetworkLabelStrokeMode,
     setSnapNodesToGrid,
     setSpliceSort,
     setSpliceSynthesisSort,
@@ -278,6 +293,7 @@ export function useUiPreferences({
       canvasDefaultSnapToGrid,
       canvasDefaultShowInfoPanels,
       canvasDefaultShowSegmentLengths,
+      canvasDefaultLabelStrokeMode,
       canvasResetZoomPercentInput,
       showShortcutHints,
       keyboardShortcutsEnabled
@@ -293,6 +309,7 @@ export function useUiPreferences({
     canvasDefaultSnapToGrid,
     canvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,
+    canvasDefaultLabelStrokeMode,
     canvasResetZoomPercentInput,
     defaultIdSortDirection,
     defaultSortDirection,
