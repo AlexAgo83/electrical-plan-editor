@@ -2,6 +2,7 @@ import {
   type FormEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactElement,
+  type WheelEvent as ReactWheelEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -83,6 +84,9 @@ function normalizeSearch(raw: string): string {
 const NETWORK_VIEW_WIDTH = 760;
 const NETWORK_VIEW_HEIGHT = 420;
 const HISTORY_LIMIT = 60;
+const NETWORK_GRID_STEP = 20;
+const NETWORK_MIN_SCALE = 0.6;
+const NETWORK_MAX_SCALE = 2.2;
 
 interface NodePosition {
   x: number;
@@ -117,6 +121,10 @@ interface SpliceSynthesisRow {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
+}
+
+function snapToGrid(value: number, step: number): number {
+  return Math.round(value / step) * step;
 }
 
 function sortByNameAndTechnicalId<T>(
@@ -298,10 +306,21 @@ export function App({ store = appStore }: AppProps): ReactElement {
   });
   const [manualNodePositions, setManualNodePositions] = useState<Record<NodeId, NodePosition>>({} as Record<NodeId, NodePosition>);
   const [draggingNodeId, setDraggingNodeId] = useState<NodeId | null>(null);
+  const [isPanningNetwork, setIsPanningNetwork] = useState(false);
+  const [showNetworkGrid, setShowNetworkGrid] = useState(true);
+  const [snapNodesToGrid, setSnapNodesToGrid] = useState(false);
+  const [networkScale, setNetworkScale] = useState(1);
+  const [networkOffset, setNetworkOffset] = useState<NodePosition>({ x: 0, y: 0 });
   const [undoStack, setUndoStack] = useState<ReturnType<AppStore["getState"]>[]>([]);
   const [redoStack, setRedoStack] = useState<ReturnType<AppStore["getState"]>[]>([]);
   const [saveStatus, setSaveStatus] = useState<"saved" | "unsaved" | "error">("saved");
   const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const panStartRef = useRef<{
+    clientX: number;
+    clientY: number;
+    offsetX: number;
+    offsetY: number;
+  } | null>(null);
 
   const selected = selectSelection(state);
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
@@ -1545,18 +1564,34 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setPendingNewNodePosition(coordinates);
   }
 
-  function getSvgCoordinates(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
+  function getLocalSvgPoint(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
     const bounds = svgElement.getBoundingClientRect();
     if (bounds.width <= 0 || bounds.height <= 0) {
       return null;
     }
 
-    const localX = ((clientX - bounds.left) / bounds.width) * NETWORK_VIEW_WIDTH;
-    const localY = ((clientY - bounds.top) / bounds.height) * NETWORK_VIEW_HEIGHT;
+    return {
+      x: ((clientX - bounds.left) / bounds.width) * NETWORK_VIEW_WIDTH,
+      y: ((clientY - bounds.top) / bounds.height) * NETWORK_VIEW_HEIGHT
+    };
+  }
+
+  function getSvgCoordinates(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
+    const localPoint = getLocalSvgPoint(svgElement, clientX, clientY);
+    if (localPoint === null) {
+      return null;
+    }
+
+    const localX = localPoint.x;
+    const localY = localPoint.y;
+    const modelX = (localX - networkOffset.x) / networkScale;
+    const modelY = (localY - networkOffset.y) / networkScale;
+    const snappedX = snapNodesToGrid ? snapToGrid(modelX, NETWORK_GRID_STEP) : modelX;
+    const snappedY = snapNodesToGrid ? snapToGrid(modelY, NETWORK_GRID_STEP) : modelY;
 
     return {
-      x: clamp(localX, 20, NETWORK_VIEW_WIDTH - 20),
-      y: clamp(localY, 20, NETWORK_VIEW_HEIGHT - 20)
+      x: clamp(snappedX, 20, NETWORK_VIEW_WIDTH - 20),
+      y: clamp(snappedY, 20, NETWORK_VIEW_HEIGHT - 20)
     };
   }
 
@@ -1569,8 +1604,77 @@ export function App({ store = appStore }: AppProps): ReactElement {
     handleNetworkNodeClick(nodeId);
   }
 
+  function handleNetworkCanvasMouseDown(event: ReactMouseEvent<SVGSVGElement>): void {
+    if (!event.shiftKey) {
+      return;
+    }
+
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
+    event.preventDefault();
+    panStartRef.current = {
+      clientX: event.clientX,
+      clientY: event.clientY,
+      offsetX: networkOffset.x,
+      offsetY: networkOffset.y
+    };
+    setIsPanningNetwork(true);
+  }
+
+  function handleNetworkWheel(event: ReactWheelEvent<SVGSVGElement>): void {
+    event.preventDefault();
+
+    const localPoint = getLocalSvgPoint(event.currentTarget, event.clientX, event.clientY);
+    if (localPoint === null) {
+      return;
+    }
+
+    const zoomFactor = event.deltaY < 0 ? 1.08 : 0.92;
+    const nextScale = clamp(networkScale * zoomFactor, NETWORK_MIN_SCALE, NETWORK_MAX_SCALE);
+    if (nextScale === networkScale) {
+      return;
+    }
+
+    const modelX = (localPoint.x - networkOffset.x) / networkScale;
+    const modelY = (localPoint.y - networkOffset.y) / networkScale;
+    setNetworkScale(nextScale);
+    setNetworkOffset({
+      x: localPoint.x - modelX * nextScale,
+      y: localPoint.y - modelY * nextScale
+    });
+  }
+
+  function handleZoomAction(target: "in" | "out" | "reset"): void {
+    if (target === "reset") {
+      setNetworkScale(1);
+      setNetworkOffset({ x: 0, y: 0 });
+      return;
+    }
+
+    setNetworkScale((current) =>
+      clamp(current * (target === "in" ? 1.12 : 0.88), NETWORK_MIN_SCALE, NETWORK_MAX_SCALE)
+    );
+  }
+
   function handleNetworkMouseMove(event: ReactMouseEvent<SVGSVGElement>): void {
     if (draggingNodeId === null) {
+      if (panStartRef.current === null) {
+        return;
+      }
+
+      const bounds = event.currentTarget.getBoundingClientRect();
+      if (bounds.width <= 0 || bounds.height <= 0) {
+        return;
+      }
+
+      const deltaX = ((event.clientX - panStartRef.current.clientX) / bounds.width) * NETWORK_VIEW_WIDTH;
+      const deltaY = ((event.clientY - panStartRef.current.clientY) / bounds.height) * NETWORK_VIEW_HEIGHT;
+      setNetworkOffset({
+        x: panStartRef.current.offsetX + deltaX,
+        y: panStartRef.current.offsetY + deltaY
+      });
       return;
     }
 
@@ -1588,6 +1692,11 @@ export function App({ store = appStore }: AppProps): ReactElement {
   function stopNetworkNodeDrag(): void {
     if (draggingNodeId !== null) {
       setDraggingNodeId(null);
+    }
+
+    if (panStartRef.current !== null) {
+      panStartRef.current = null;
+      setIsPanningNetwork(false);
     }
   }
 
@@ -1609,6 +1718,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
               ? "Connect mode: click first connector/splice node to set wire endpoint A."
               : `Connect mode: endpoint A captured on '${modeAnchorNodeId}'. Click second connector/splice node.`
             : "Route mode: click start node then end node to fill route preview.";
+  const networkScalePercent = Math.round(networkScale * 100);
 
   const networkSummaryPanel = (
     <section className="panel">
@@ -1631,8 +1741,34 @@ export function App({ store = appStore }: AppProps): ReactElement {
             {label}
           </button>
         ))}
+        <span className="canvas-toolbar-separator" />
+        <button type="button" className="workspace-tab" onClick={() => handleZoomAction("out")}>
+          Zoom -
+        </button>
+        <button type="button" className="workspace-tab" onClick={() => handleZoomAction("in")}>
+          Zoom +
+        </button>
+        <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
+          Reset view
+        </button>
+        <button
+          type="button"
+          className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}
+          onClick={() => setShowNetworkGrid((current) => !current)}
+        >
+          Grid
+        </button>
+        <button
+          type="button"
+          className={snapNodesToGrid ? "workspace-tab is-active" : "workspace-tab"}
+          onClick={() => setSnapNodesToGrid((current) => !current)}
+        >
+          Snap
+        </button>
       </div>
-      <p className="meta-line">{interactionModeHint}</p>
+      <p className="meta-line">
+        {interactionModeHint} View: {networkScalePercent}% zoom. Hold <strong>Shift</strong> and drag empty canvas to pan.
+      </p>
       <div className="summary-grid">
         <article>
           <h3>Graph nodes</h3>
@@ -1652,97 +1788,149 @@ export function App({ store = appStore }: AppProps): ReactElement {
       {nodes.length === 0 ? (
         <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
       ) : (
-        <div className="network-canvas-shell">
+        <div className={`network-canvas-shell${isPanningNetwork ? " is-panning" : ""}`}>
           <svg
             className="network-svg"
             role="img"
             aria-label="2D network diagram"
             viewBox={`0 0 ${NETWORK_VIEW_WIDTH} ${NETWORK_VIEW_HEIGHT}`}
+            onMouseDown={handleNetworkCanvasMouseDown}
             onClick={handleNetworkCanvasClick}
+            onWheel={handleNetworkWheel}
             onMouseMove={handleNetworkMouseMove}
             onMouseUp={stopNetworkNodeDrag}
             onMouseLeave={stopNetworkNodeDrag}
           >
-            {segments.map((segment) => {
-              const nodeAPosition = networkNodePositions[segment.nodeA];
-              const nodeBPosition = networkNodePositions[segment.nodeB];
-              if (nodeAPosition === undefined || nodeBPosition === undefined) {
-                return null;
-              }
+            {showNetworkGrid ? (
+              <g
+                className="network-grid"
+                transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
+              >
+                {Array.from({ length: Math.floor(NETWORK_VIEW_WIDTH / NETWORK_GRID_STEP) + 1 }).map((_, index) => {
+                  const position = index * NETWORK_GRID_STEP;
+                  return (
+                    <line
+                      key={`grid-v-${position}`}
+                      x1={position}
+                      y1={0}
+                      x2={position}
+                      y2={NETWORK_VIEW_HEIGHT}
+                    />
+                  );
+                })}
+                {Array.from({ length: Math.floor(NETWORK_VIEW_HEIGHT / NETWORK_GRID_STEP) + 1 }).map((_, index) => {
+                  const position = index * NETWORK_GRID_STEP;
+                  return (
+                    <line
+                      key={`grid-h-${position}`}
+                      x1={0}
+                      y1={position}
+                      x2={NETWORK_VIEW_WIDTH}
+                      y2={position}
+                    />
+                  );
+                })}
+              </g>
+            ) : null}
+            <g transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
+              {segments.map((segment) => {
+                const nodeAPosition = networkNodePositions[segment.nodeA];
+                const nodeBPosition = networkNodePositions[segment.nodeB];
+                if (nodeAPosition === undefined || nodeBPosition === undefined) {
+                  return null;
+                }
 
-              const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
-              const isSelectedSegment = selectedSegmentId === segment.id;
-              const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
-                isSelectedSegment ? " is-selected" : ""
-              }`;
-              const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
-              const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
+                const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
+                const isSelectedSegment = selectedSegmentId === segment.id;
+                const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
+                  isSelectedSegment ? " is-selected" : ""
+                }`;
+                const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
+                const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
 
-              return (
-                <g key={segment.id}>
-                  <line
-                    className={segmentClassName}
-                    x1={nodeAPosition.x}
-                    y1={nodeAPosition.y}
-                    x2={nodeBPosition.x}
-                    y2={nodeBPosition.y}
-                  />
-                  <line
-                    className="network-segment-hitbox"
-                    x1={nodeAPosition.x}
-                    y1={nodeAPosition.y}
-                    x2={nodeBPosition.x}
-                    y2={nodeBPosition.y}
+                return (
+                  <g key={segment.id}>
+                    <line
+                      className={segmentClassName}
+                      x1={nodeAPosition.x}
+                      y1={nodeAPosition.y}
+                      x2={nodeBPosition.x}
+                      y2={nodeBPosition.y}
+                    />
+                    <line
+                      className="network-segment-hitbox"
+                      x1={nodeAPosition.x}
+                      y1={nodeAPosition.y}
+                      x2={nodeBPosition.x}
+                      y2={nodeBPosition.y}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleNetworkSegmentClick(segment.id);
+                      }}
+                    />
+                    <text className="network-segment-label" x={labelX} y={labelY - 6} textAnchor="middle">
+                      {segment.id}
+                    </text>
+                  </g>
+                );
+              })}
+
+              {nodes.map((node) => {
+                const position = networkNodePositions[node.id];
+                if (position === undefined) {
+                  return null;
+                }
+
+                const nodeKindClass =
+                  node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
+                const isSelectedNode = selectedNodeId === node.id;
+                const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}`;
+                const nodeLabel =
+                  node.kind === "intermediate"
+                    ? node.label
+                    : node.kind === "connector"
+                      ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
+                      : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
+
+                return (
+                  <g
+                    key={node.id}
+                    className={nodeClassName}
+                    onMouseDown={(event) => handleNetworkNodeMouseDown(event, node.id)}
                     onClick={(event) => {
                       event.stopPropagation();
-                      handleNetworkSegmentClick(segment.id);
+                      handleNetworkNodeClick(node.id);
                     }}
-                  />
-                  <text className="network-segment-label" x={labelX} y={labelY - 6} textAnchor="middle">
-                    {segment.id}
-                  </text>
-                </g>
-              );
-            })}
-
-            {nodes.map((node) => {
-              const position = networkNodePositions[node.id];
-              if (position === undefined) {
-                return null;
-              }
-
-              const nodeKindClass =
-                node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
-              const isSelectedNode = selectedNodeId === node.id;
-              const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}`;
-              const nodeLabel =
-                node.kind === "intermediate"
-                  ? node.label
-                  : node.kind === "connector"
-                    ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
-                    : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
-
-              return (
-                <g
-                  key={node.id}
-                  className={nodeClassName}
-                  onMouseDown={(event) => handleNetworkNodeMouseDown(event, node.id)}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    handleNetworkNodeClick(node.id);
-                  }}
-                >
-                  <title>{describeNode(node)}</title>
-                  <circle cx={position.x} cy={position.y} r={17} />
-                  <text className="network-node-label" x={position.x} y={position.y + 4} textAnchor="middle">
-                    {nodeLabel}
-                  </text>
-                </g>
-              );
-            })}
+                  >
+                    <title>{describeNode(node)}</title>
+                    <circle cx={position.x} cy={position.y} r={17} />
+                    <text className="network-node-label" x={position.x} y={position.y + 4} textAnchor="middle">
+                      {nodeLabel}
+                    </text>
+                  </g>
+                );
+              })}
+            </g>
           </svg>
         </div>
       )}
+      <ul className="network-legend">
+        <li>
+          <span className="legend-swatch connector" /> Connector node
+        </li>
+        <li>
+          <span className="legend-swatch splice" /> Splice node
+        </li>
+        <li>
+          <span className="legend-swatch intermediate" /> Intermediate node
+        </li>
+        <li>
+          <span className="legend-line selected" /> Selected segment
+        </li>
+        <li>
+          <span className="legend-line wire" /> Wire highlighted segment
+        </li>
+      </ul>
 
       <h3 className="summary-title">Sub-networks</h3>
       {subNetworkSummaries.length === 0 ? (

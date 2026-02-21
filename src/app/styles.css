@@ -373,6 +373,12 @@ button {
   color: #3d596d;
 }
 
+.canvas-toolbar-separator {
+  width: 1px;
+  height: 1.35rem;
+  background: #c7d7e4;
+}
+
 .status-chip {
   display: inline-flex;
   align-items: center;
@@ -543,10 +549,21 @@ button {
   padding: 0.35rem;
 }
 
+.network-canvas-shell.is-panning {
+  cursor: grabbing;
+}
+
 .network-svg {
   display: block;
   width: 100%;
   min-height: 360px;
+  touch-action: none;
+}
+
+.network-grid line {
+  stroke: #d5e1eb;
+  stroke-width: 0.8;
+  pointer-events: none;
 }
 
 .network-segment {
@@ -612,4 +629,56 @@ button {
   font-size: 9px;
   fill: #183549;
   pointer-events: none;
+}
+
+.network-legend {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 0.9rem;
+  color: #345167;
+  font-size: 0.82rem;
+}
+
+.network-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  border: 2px solid #55748d;
+  display: inline-block;
+}
+
+.legend-swatch.connector {
+  background: #dff0ff;
+}
+
+.legend-swatch.splice {
+  background: #fdeecf;
+}
+
+.legend-swatch.intermediate {
+  background: #ecf2f7;
+}
+
+.legend-line {
+  width: 1.05rem;
+  height: 0;
+  border-top: 3px solid #7f99af;
+  display: inline-block;
+}
+
+.legend-line.selected {
+  border-top-color: #0f6cb8;
+}
+
+.legend-line.wire {
+  border-top-color: #4f8d2d;
 }
