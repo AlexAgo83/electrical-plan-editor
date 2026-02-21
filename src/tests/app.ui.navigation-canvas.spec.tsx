@@ -28,6 +28,17 @@ describe("App integration UI - navigation and canvas", () => {
     expect(getPanelByHeading("Network Scope")).toBeInTheDocument();
   });
 
+  it("toggles the navigation drawer from the header and closes on backdrop click", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    const toggleButton = screen.getByRole("button", { name: "Open menu" });
+    fireEvent.click(toggleButton);
+    expect(screen.getByRole("button", { name: "Close menu" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Close navigation menu" }));
+    expect(screen.getByRole("button", { name: "Open menu" })).toBeInTheDocument();
+  });
+
   it("supports undo and redo for modeling actions", () => {
     renderAppWithState(createInitialState());
 

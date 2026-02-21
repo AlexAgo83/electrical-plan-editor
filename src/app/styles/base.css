@@ -39,6 +39,37 @@ button {
   color: #365166;
 }
 
+.header-block {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #cbdae6;
+  border-radius: 0.75rem;
+  background: rgba(245, 250, 255, 0.95);
+  backdrop-filter: blur(2px);
+}
+
+.header-block h1 {
+  font-size: 1.28rem;
+}
+
+.header-block .meta-line {
+  margin: 0;
+}
+
+.header-nav-toggle {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+}
+
 .error-banner {
   display: flex;
   align-items: center;
@@ -169,6 +200,11 @@ button {
   color: #b7c9dc;
 }
 
+.app-shell.theme-dark .header-block {
+  border-color: #365069;
+  background: rgba(25, 42, 59, 0.94);
+}
+
 .app-shell.theme-dark .panel,
 .app-shell.theme-dark .workspace-sidebar .workspace-switcher,
 .app-shell.theme-dark .workspace-sidebar .workspace-meta,
@@ -189,7 +225,8 @@ button {
 .app-shell.theme-dark .filter-chip,
 .app-shell.theme-dark .row-actions button,
 .app-shell.theme-dark .row-form button,
-.app-shell.theme-dark .error-banner button {
+.app-shell.theme-dark .error-banner button,
+.app-shell.theme-dark .header-nav-toggle {
   border-color: #4e6a84;
   background: #27415a;
   color: #e3ecf6;

@@ -1,6 +1,9 @@
-import type { ReactElement } from "react";
+import type { ReactElement, RefObject } from "react";
 interface AppHeaderAndStatsProps {
   activeNetworkLabel: string;
+  isNavigationDrawerOpen: boolean;
+  onToggleNavigationDrawer: () => void;
+  navigationToggleButtonRef: RefObject<HTMLButtonElement | null>;
   lastError: string | null;
   onClearError: () => void;
   connectorCount: number;
@@ -12,6 +15,9 @@ interface AppHeaderAndStatsProps {
 
 export function AppHeaderAndStats({
   activeNetworkLabel,
+  isNavigationDrawerOpen,
+  onToggleNavigationDrawer,
+  navigationToggleButtonRef,
   lastError,
   onClearError,
   connectorCount,
@@ -23,6 +29,16 @@ export function AppHeaderAndStats({
   return (
     <>
       <section className="header-block">
+        <button
+          ref={navigationToggleButtonRef}
+          type="button"
+          className="header-nav-toggle"
+          onClick={onToggleNavigationDrawer}
+          aria-expanded={isNavigationDrawerOpen}
+          aria-controls="workspace-navigation-drawer"
+        >
+          {isNavigationDrawerOpen ? "Close menu" : "Open menu"}
+        </button>
         <h1>Electrical Plan Editor</h1>
         <p className="meta-line">
           Active network: <strong>{activeNetworkLabel}</strong>

@@ -283,6 +283,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [showShortcutHints, setShowShortcutHints] = useState(true);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
+  const [isNavigationDrawerOpen, setIsNavigationDrawerOpen] = useState(false);
   const panStartRef = useRef<{
     clientX: number;
     clientY: number;
@@ -294,6 +295,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const fitNetworkToContentRef = useRef<() => void>(() => {});
   const previousValidationIssueRef = useRef<() => void>(() => {});
   const nextValidationIssueRef = useRef<() => void>(() => {});
+  const navigationDrawerRef = useRef<HTMLDivElement | null>(null);
+  const navigationToggleButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const selected = selectSelection(state);
   const {
@@ -755,6 +758,77 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setKeyboardShortcutsEnabled
   });
 
+  const closeNavigationDrawer = useCallback(() => {
+    setIsNavigationDrawerOpen(false);
+  }, []);
+
+  const handleToggleNavigationDrawer = useCallback(() => {
+    setIsNavigationDrawerOpen((current) => !current);
+  }, []);
+
+  useEffect(() => {
+    if (!isNavigationDrawerOpen) {
+      return;
+    }
+
+    const handlePointerInteraction = (event: MouseEvent | TouchEvent): void => {
+      if (!(event.target instanceof Node)) {
+        return;
+      }
+
+      if (navigationDrawerRef.current?.contains(event.target)) {
+        return;
+      }
+
+      if (navigationToggleButtonRef.current?.contains(event.target)) {
+        return;
+      }
+
+      setIsNavigationDrawerOpen(false);
+    };
+
+    const handleFocusIn = (event: FocusEvent): void => {
+      if (!(event.target instanceof Node)) {
+        return;
+      }
+
+      if (navigationDrawerRef.current?.contains(event.target)) {
+        return;
+      }
+
+      if (navigationToggleButtonRef.current?.contains(event.target)) {
+        return;
+      }
+
+      setIsNavigationDrawerOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setIsNavigationDrawerOpen(false);
+      navigationToggleButtonRef.current?.focus();
+    };
+
+    document.addEventListener("mousedown", handlePointerInteraction);
+    document.addEventListener("touchstart", handlePointerInteraction, { passive: true });
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerInteraction);
+      document.removeEventListener("touchstart", handlePointerInteraction);
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isNavigationDrawerOpen]);
+
+  useEffect(() => {
+    setIsNavigationDrawerOpen(false);
+  }, [activeScreen, activeSubScreen]);
+
   useEffect(() => {
     undoActionRef.current = handleUndo;
     redoActionRef.current = handleRedo;
@@ -1167,6 +1241,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     <main className={appShellClassName}>
       <AppHeaderAndStats
         activeNetworkLabel={activeNetworkLabel}
+        isNavigationDrawerOpen={isNavigationDrawerOpen}
+        onToggleNavigationDrawer={handleToggleNavigationDrawer}
+        navigationToggleButtonRef={navigationToggleButtonRef}
         lastError={lastError}
         onClearError={() => dispatchAction(appActions.clearError())}
         connectorCount={connectors.length}
@@ -1177,49 +1254,61 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       />
 
       <section className="workspace-shell">
-        <WorkspaceSidebarPanel
-          activeScreen={activeScreen}
-          activeSubScreen={activeSubScreen}
-          isModelingScreen={isModelingScreen}
-          isAnalysisScreen={isAnalysisScreen}
-          isValidationScreen={isValidationScreen}
-          validationIssuesCount={validationIssues.length}
-          validationErrorCount={validationErrorCount}
-          entityCountBySubScreen={entityCountBySubScreen}
-          onScreenChange={setActiveScreen}
-          onSubScreenChange={setActiveSubScreen}
-          networks={networks}
-          activeNetworkId={activeNetworkId}
-          hasActiveNetwork={hasActiveNetwork}
-          handleSelectNetwork={handleSelectNetwork}
-          handleDuplicateActiveNetwork={handleDuplicateActiveNetwork}
-          handleDeleteActiveNetwork={handleDeleteActiveNetwork}
-          renameNetworkName={renameNetworkName}
-          setRenameNetworkName={setRenameNetworkName}
-          handleRenameActiveNetwork={handleRenameActiveNetwork}
-          newNetworkName={newNetworkName}
-          setNewNetworkName={setNewNetworkName}
-          newNetworkTechnicalId={newNetworkTechnicalId}
-          setNewNetworkTechnicalId={setNewNetworkTechnicalId}
-          newNetworkDescription={newNetworkDescription}
-          setNewNetworkDescription={setNewNetworkDescription}
-          networkFormError={networkFormError}
-          networkTechnicalIdAlreadyUsed={networkTechnicalIdAlreadyUsed}
-          handleCreateNetwork={handleCreateNetwork}
-          handleUndo={handleUndo}
-          handleRedo={handleRedo}
-          isUndoAvailable={isUndoAvailable}
-          isRedoAvailable={isRedoAvailable}
-          showShortcutHints={showShortcutHints}
-          saveStatus={saveStatus}
-          validationWarningCount={validationWarningCount}
-          issueNavigatorDisplay={issueNavigatorDisplay}
-          issueNavigationScopeLabel={issueNavigationScopeLabel}
-          currentValidationIssue={currentValidationIssue}
-          orderedValidationIssues={orderedValidationIssues}
-          handleOpenValidationScreen={handleOpenValidationScreen}
-          moveValidationIssueCursor={moveValidationIssueCursor}
+        <button
+          type="button"
+          className={isNavigationDrawerOpen ? "workspace-drawer-backdrop is-open" : "workspace-drawer-backdrop"}
+          aria-label="Close navigation menu"
+          onClick={closeNavigationDrawer}
         />
+        <div
+          id="workspace-navigation-drawer"
+          ref={navigationDrawerRef}
+          className={isNavigationDrawerOpen ? "workspace-drawer is-open" : "workspace-drawer"}
+        >
+          <WorkspaceSidebarPanel
+            activeScreen={activeScreen}
+            activeSubScreen={activeSubScreen}
+            isModelingScreen={isModelingScreen}
+            isAnalysisScreen={isAnalysisScreen}
+            isValidationScreen={isValidationScreen}
+            validationIssuesCount={validationIssues.length}
+            validationErrorCount={validationErrorCount}
+            entityCountBySubScreen={entityCountBySubScreen}
+            onScreenChange={setActiveScreen}
+            onSubScreenChange={setActiveSubScreen}
+            networks={networks}
+            activeNetworkId={activeNetworkId}
+            hasActiveNetwork={hasActiveNetwork}
+            handleSelectNetwork={handleSelectNetwork}
+            handleDuplicateActiveNetwork={handleDuplicateActiveNetwork}
+            handleDeleteActiveNetwork={handleDeleteActiveNetwork}
+            renameNetworkName={renameNetworkName}
+            setRenameNetworkName={setRenameNetworkName}
+            handleRenameActiveNetwork={handleRenameActiveNetwork}
+            newNetworkName={newNetworkName}
+            setNewNetworkName={setNewNetworkName}
+            newNetworkTechnicalId={newNetworkTechnicalId}
+            setNewNetworkTechnicalId={setNewNetworkTechnicalId}
+            newNetworkDescription={newNetworkDescription}
+            setNewNetworkDescription={setNewNetworkDescription}
+            networkFormError={networkFormError}
+            networkTechnicalIdAlreadyUsed={networkTechnicalIdAlreadyUsed}
+            handleCreateNetwork={handleCreateNetwork}
+            handleUndo={handleUndo}
+            handleRedo={handleRedo}
+            isUndoAvailable={isUndoAvailable}
+            isRedoAvailable={isRedoAvailable}
+            showShortcutHints={showShortcutHints}
+            saveStatus={saveStatus}
+            validationWarningCount={validationWarningCount}
+            issueNavigatorDisplay={issueNavigatorDisplay}
+            issueNavigationScopeLabel={issueNavigationScopeLabel}
+            currentValidationIssue={currentValidationIssue}
+            orderedValidationIssues={orderedValidationIssues}
+            handleOpenValidationScreen={handleOpenValidationScreen}
+            moveValidationIssueCursor={moveValidationIssueCursor}
+          />
+        </div>
 
         <section className="workspace-content">
           <NetworkScopeScreen isActive={isNetworkScopeScreen}>

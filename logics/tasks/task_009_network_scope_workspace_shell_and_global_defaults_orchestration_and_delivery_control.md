@@ -2,7 +2,7 @@
 > From version: 0.3.0
 > Understanding: 100%
 > Confidence: 98%
-> Progress: 13%
+> Progress: 25%
 > Complexity: High
 > Theme: Workspace Shell and Navigation Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -23,7 +23,7 @@ Backlog scope covered:
 
 # Plan
 - [x] 1. Deliver Wave 0 navigation foundation: `Network Scope` primary entry and ordering (`item_055`)
-- [ ] 2. Deliver Wave 1 shell refactor: sticky header + drawer overlay behavior (`item_056`)
+- [x] 2. Deliver Wave 1 shell refactor: sticky header + drawer overlay behavior (`item_056`)
 - [ ] 3. Deliver Wave 2 network lifecycle consolidation in `Network Scope` with safeguards (`item_057`)
 - [ ] 4. Deliver Wave 3 global settings relocation and defaults (`dark` + snap enabled) with persistence compatibility (`item_058`)
 - [ ] 5. Deliver Wave 4 operational controls extraction: floating operations/health panel + header issue badge (`item_060`)
@@ -44,7 +44,7 @@ Backlog scope covered:
 # Report
 - Wave status:
   - Wave 0 completed: added `Network Scope` primary workspace entry, updated navigation order, and introduced explicit separation from entity-level tabs.
-  - Wave 1 pending: sticky header and drawer overlay migration not started.
+  - Wave 1 completed: implemented sticky header, header menu toggle, overlay drawer behavior, outside click/focus close, and escape-to-close with focus return.
   - Wave 2 pending: lifecycle UI consolidation to `Network Scope` not started.
   - Wave 3 pending: settings relocation/defaults compatibility work not started.
   - Wave 4 pending: operations/health floating panel and badge not started.
@@ -68,3 +68,7 @@ Backlog scope covered:
   - `npm run typecheck` OK
   - `npm run lint` OK
   - `npm test -- src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.settings.spec.tsx src/tests/app.ui.theme.spec.tsx` OK
+- Validation snapshot (Wave 1):
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npm test -- src/tests/app.ui.navigation-canvas.spec.tsx` OK
