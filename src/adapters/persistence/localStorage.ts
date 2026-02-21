@@ -1,5 +1,5 @@
 import { APP_SCHEMA_VERSION } from "../../core/schema";
-import { createInitialState, type AppState } from "../../store";
+import { createSampleNetworkState, isWorkspaceEmpty, type AppState } from "../../store";
 import { migratePersistedPayload, type PersistedStateSnapshotV1 } from "./migrations";
 
 export const STORAGE_KEY = "electrical-plan-editor.state";
@@ -40,31 +40,57 @@ function safeRemove(storage: Pick<Storage, "removeItem">): void {
   }
 }
 
+function bootstrapSampleState(
+  storage: Pick<Storage, "setItem">,
+  nowIso: string
+): AppState {
+  const sampleState = createSampleNetworkState();
+  const snapshot: PersistedStateSnapshotV1 = {
+    schemaVersion: APP_SCHEMA_VERSION,
+    createdAtIso: nowIso,
+    updatedAtIso: nowIso,
+    state: sampleState
+  };
+
+  try {
+    writeSnapshot(storage, snapshot);
+  } catch {
+    // Ignore write failures and keep deterministic bootstrap state.
+  }
+
+  return sampleState;
+}
+
 export function loadState(storage: StorageLike | null = getDefaultStorage(), nowProvider: IsoNowProvider = getNowIso): AppState {
+  const nowIso = nowProvider();
   if (storage === null) {
-    return createInitialState();
+    return createSampleNetworkState();
   }
 
   try {
     const parsed = readJsonFromStorage(storage);
     if (parsed === null) {
-      return createInitialState();
+      return bootstrapSampleState(storage, nowIso);
     }
 
-    const migration = migratePersistedPayload(parsed, nowProvider());
+    const migration = migratePersistedPayload(parsed, nowIso);
     if (migration === null) {
       safeRemove(storage);
-      return createInitialState();
+      return bootstrapSampleState(storage, nowIso);
     }
 
     if (migration.wasMigrated) {
       writeSnapshot(storage, migration.snapshot);
     }
 
+    if (isWorkspaceEmpty(migration.snapshot.state)) {
+      return bootstrapSampleState(storage, nowIso);
+    }
+
     return migration.snapshot.state;
   } catch {
     safeRemove(storage);
-    return createInitialState();
+    return bootstrapSampleState(storage, nowIso);
   }
 }
 

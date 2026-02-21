@@ -7,7 +7,15 @@ import {
   saveState,
   type PersistedStateSnapshotV1
 } from "../adapters/persistence";
-import { appActions, appReducer, createInitialState, type AppState } from "../store";
+import {
+  appActions,
+  appReducer,
+  createInitialState,
+  createSampleNetworkState,
+  hasSampleNetworkSignature,
+  isWorkspaceEmpty,
+  type AppState
+} from "../store";
 
 interface MemoryStorage extends Pick<Storage, "getItem" | "setItem" | "removeItem"> {
   read: (key: string) => string | null;
@@ -81,6 +89,24 @@ describe("migratePersistedPayload", () => {
 });
 
 describe("localStorage persistence adapter", () => {
+  it("bootstraps sample state on first run when storage is empty", () => {
+    const nowIso = "2026-02-20T10:30:00.000Z";
+    const storage = createMemoryStorage();
+
+    const loaded = loadState(storage, () => nowIso);
+    const savedRaw = storage.read(STORAGE_KEY);
+
+    expect(hasSampleNetworkSignature(loaded)).toBe(true);
+    expect(isWorkspaceEmpty(loaded)).toBe(false);
+    expect(savedRaw).not.toBeNull();
+
+    const savedSnapshot = JSON.parse(savedRaw ?? "{}") as PersistedStateSnapshotV1;
+    expect(savedSnapshot.schemaVersion).toBe(1);
+    expect(savedSnapshot.createdAtIso).toBe(nowIso);
+    expect(savedSnapshot.updatedAtIso).toBe(nowIso);
+    expect(hasSampleNetworkSignature(savedSnapshot.state)).toBe(true);
+  });
+
   it("restores state from a persisted snapshot", () => {
     const state = createSampleState();
     const storage = createMemoryStorage({
@@ -104,8 +130,8 @@ describe("localStorage persistence adapter", () => {
 
     const loaded = loadState(storage, () => "2026-02-20T11:30:00.000Z");
 
-    expect(loaded).toEqual(createInitialState());
-    expect(storage.read(STORAGE_KEY)).toBeNull();
+    expect(hasSampleNetworkSignature(loaded)).toBe(true);
+    expect(storage.read(STORAGE_KEY)).not.toBeNull();
   });
 
   it("migrates legacy payload and rewrites storage using the current snapshot schema", () => {
@@ -126,6 +152,49 @@ describe("localStorage persistence adapter", () => {
     expect(rewrittenSnapshot.createdAtIso).toBe(nowIso);
     expect(rewrittenSnapshot.updatedAtIso).toBe(nowIso);
     expect(rewrittenSnapshot.state).toEqual(legacyState);
+  });
+
+  it("bootstraps sample state when persisted payload is a valid but empty workspace", () => {
+    const emptyState = createInitialState();
+    const nowIso = "2026-02-20T12:30:00.000Z";
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        schemaVersion: 1,
+        createdAtIso: "2026-02-10T08:00:00.000Z",
+        updatedAtIso: "2026-02-10T08:00:00.000Z",
+        state: emptyState
+      } satisfies PersistedStateSnapshotV1)
+    });
+
+    const loaded = loadState(storage, () => nowIso);
+    expect(hasSampleNetworkSignature(loaded)).toBe(true);
+
+    const rewrittenRaw = storage.read(STORAGE_KEY);
+    expect(rewrittenRaw).not.toBeNull();
+    const rewrittenSnapshot = JSON.parse(rewrittenRaw ?? "{}") as PersistedStateSnapshotV1;
+    expect(hasSampleNetworkSignature(rewrittenSnapshot.state)).toBe(true);
+  });
+
+  it("does not overwrite existing non-empty user state", () => {
+    const existingState = createSampleState();
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        schemaVersion: 1,
+        createdAtIso: "2026-02-10T08:00:00.000Z",
+        updatedAtIso: "2026-02-10T08:30:00.000Z",
+        state: existingState
+      } satisfies PersistedStateSnapshotV1)
+    });
+
+    const loaded = loadState(storage, () => "2026-02-20T12:45:00.000Z");
+
+    expect(loaded).toEqual(existingState);
+    expect(hasSampleNetworkSignature(loaded)).toBe(false);
+  });
+
+  it("keeps deterministic built-in sample fixture available from store helper", () => {
+    const sample = createSampleNetworkState();
+    expect(hasSampleNetworkSignature(sample)).toBe(true);
   });
 
   it("saves with schema version and preserves createdAt timestamp across updates", () => {
