@@ -4,6 +4,8 @@ A local-first electrical network editor focused on deterministic modeling, routi
 
 The project models connectors, splices, nodes, segments, and wires as a graph, computes shortest routes, and keeps wire lengths synchronized with segment changes.
 
+[![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/Sentry)](LICENSE)
+
 ## Table of Contents
 
 - [Features](#features)
