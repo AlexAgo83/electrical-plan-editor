@@ -1,7 +1,6 @@
 import type { AppAction } from "../actions";
 import type { AppState } from "../types";
 import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
-import { recomputeAllWiresForNetwork } from "./helpers/wireTransitions";
 
 function hasConnectorNodeConflict(state: AppState, nodeId: string, connectorId: string): boolean {
   return state.nodes.allIds.some((id) => {
@@ -36,7 +35,7 @@ function countSegmentsUsingNode(state: AppState, nodeId: string): number {
   }, 0);
 }
 
-export function handleNodeSegmentActions(state: AppState, action: AppAction): AppState | null {
+export function handleNodeActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "node/upsert": {
       if (action.payload.kind === "connector") {
@@ -81,61 +80,6 @@ export function handleNodeSegmentActions(state: AppState, action: AppAction): Ap
         ui: shouldClearSelection(state.ui.selected, "node", action.payload.id)
           ? { ...state.ui, selected: null, lastError: null }
           : { ...state.ui, lastError: null }
-      });
-    }
-
-    case "segment/upsert": {
-      if (action.payload.nodeA === action.payload.nodeB) {
-        return withError(state, "Segment endpoints must reference two different nodes.");
-      }
-
-      if (state.nodes.byId[action.payload.nodeA] === undefined || state.nodes.byId[action.payload.nodeB] === undefined) {
-        return withError(state, "Segment endpoints must reference existing nodes.");
-      }
-
-      if (!Number.isFinite(action.payload.lengthMm) || action.payload.lengthMm <= 0) {
-        return withError(state, "Segment lengthMm must be a positive number.");
-      }
-
-      const normalizedSubNetworkTag = action.payload.subNetworkTag?.trim();
-      const stateWithUpdatedSegments = {
-        ...clearLastError(state),
-        segments: upsertEntity(state.segments, {
-          ...action.payload,
-          subNetworkTag: normalizedSubNetworkTag === undefined || normalizedSubNetworkTag.length === 0
-            ? undefined
-            : normalizedSubNetworkTag
-        })
-      };
-
-      const recomputed = recomputeAllWiresForNetwork(stateWithUpdatedSegments);
-      if ("error" in recomputed) {
-        return withError(state, recomputed.error);
-      }
-
-      return bumpRevision({
-        ...stateWithUpdatedSegments,
-        wires: recomputed.wires
-      });
-    }
-
-    case "segment/remove": {
-      const stateWithRemovedSegment = {
-        ...clearLastError(state),
-        segments: removeEntity(state.segments, action.payload.id),
-        ui: shouldClearSelection(state.ui.selected, "segment", action.payload.id)
-          ? { ...state.ui, selected: null, lastError: null }
-          : { ...state.ui, lastError: null }
-      };
-
-      const recomputed = recomputeAllWiresForNetwork(stateWithRemovedSegment);
-      if ("error" in recomputed) {
-        return withError(state, recomputed.error);
-      }
-
-      return bumpRevision({
-        ...stateWithRemovedSegment,
-        wires: recomputed.wires
       });
     }
 
