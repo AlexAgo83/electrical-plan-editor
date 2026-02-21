@@ -237,9 +237,9 @@ export function ModelingPrimaryTables({
       </article>
 
       <article className="panel" hidden={!isNodeSubScreen}>
-        <h2>Nodes</h2>
-        <div className="list-toolbar">
-          <div className="chip-group" role="group" aria-label="Node kind filter">
+        <header className="list-panel-header">
+          <h2>Nodes</h2>
+          <div className="chip-group list-panel-filters" role="group" aria-label="Node kind filter">
             {([
               ["all", "All"],
               ["connector", "Connector"],
@@ -249,7 +249,7 @@ export function ModelingPrimaryTables({
               <button key={kindId} type="button" className={nodeKindFilter === kindId ? "filter-chip is-active" : "filter-chip"} onClick={() => setNodeKindFilter(kindId)}>{label}</button>
             ))}
           </div>
-        </div>
+        </header>
         {nodes.length === 0 ? (
           <p className="empty-copy">No node yet.</p>
         ) : visibleNodes.length === 0 ? (

@@ -307,6 +307,64 @@ button {
   color: #e3ecf6;
 }
 
+.app-shell.theme-dark .route-preview-panel {
+  border-color: #44617a;
+  background: linear-gradient(180deg, #1b3046 0%, #182c40 100%);
+}
+
+.app-shell.theme-dark .route-preview-label {
+  color: #b7c9dc;
+}
+
+.app-shell.theme-dark .route-preview-selection-strip {
+  border-color: #47647d;
+  background: rgba(19, 34, 50, 0.72);
+}
+
+.app-shell.theme-dark .route-preview-selection-strip span {
+  color: #a9c0d4;
+}
+
+.app-shell.theme-dark .route-preview-selection-strip strong {
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .route-preview-selection-arrow {
+  color: #7f9bb4;
+}
+
+.app-shell.theme-dark .route-preview-empty {
+  border-color: #48647d;
+  background: rgba(19, 34, 50, 0.72);
+  color: #bfd1e3;
+}
+
+.app-shell.theme-dark .route-preview-status-line p {
+  color: #b3c7d9;
+}
+
+.app-shell.theme-dark .route-preview-status-chip {
+  border-color: #4f8570;
+  background: #254738;
+  color: #d7f6e3;
+}
+
+.app-shell.theme-dark .route-preview-metrics article,
+.app-shell.theme-dark .route-preview-path-grid article {
+  border-color: #48647d;
+  background: rgba(19, 34, 50, 0.72);
+}
+
+.app-shell.theme-dark .route-preview-metrics span,
+.app-shell.theme-dark .route-preview-path-grid h4 {
+  color: #a9c0d4;
+}
+
+.app-shell.theme-dark .route-preview-metrics strong,
+.app-shell.theme-dark .route-preview-path {
+  color: #e3ecf6;
+}
+
 .app-shell.theme-dark .workspace-shell .workspace-health {
   border-top-color: #365069;
 }

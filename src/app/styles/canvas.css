@@ -6,6 +6,35 @@
   margin-bottom: 0.5rem;
 }
 
+.network-summary-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.network-summary-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.55rem;
+}
+
+.network-summary-header h2 {
+  margin: 0;
+}
+
+.network-summary-header-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.28rem;
+}
+
+.network-summary-header-actions .workspace-tab {
+  padding: 0.26rem 0.58rem;
+  font-size: 0.78rem;
+}
+
 .canvas-toolbar > span {
   font-size: 0.85rem;
   color: #3d596d;
@@ -209,6 +238,199 @@
 
 .network-route-form {
   grid-template-columns: minmax(0, 1fr);
+}
+
+.route-preview-panel {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.route-preview-form {
+  margin: 0;
+  gap: 0.55rem;
+}
+
+.route-preview-field {
+  gap: 0.3rem;
+}
+
+.route-preview-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #345167;
+}
+
+.route-preview-form select {
+  font-weight: 600;
+}
+
+.route-preview-selection-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #c5d7e5;
+  border-radius: 0.6rem;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.route-preview-selection-strip article {
+  min-width: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.route-preview-selection-strip span {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4d697d;
+  font-weight: 700;
+}
+
+.route-preview-selection-strip strong {
+  font-size: 0.82rem;
+  color: #15364d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.route-preview-selection-arrow {
+  line-height: 1;
+  font-size: 1rem;
+  color: #5e7a91;
+  font-weight: 700;
+}
+
+.route-preview-empty {
+  margin: 0;
+  padding: 0.5rem 0.55rem;
+  border: 1px dashed #bdd0de;
+  border-radius: 0.55rem;
+  background: rgba(255, 255, 255, 0.5);
+  color: #3d596d;
+  font-size: 0.84rem;
+}
+
+.route-preview-results {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.route-preview-status-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.route-preview-status-line p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #4b667a;
+}
+
+.route-preview-status-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #94c2a2;
+  background: #d9f0df;
+  color: #245339;
+  padding: 0.12rem 0.48rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.route-preview-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.route-preview-metrics article {
+  border: 1px solid #bfd3e2;
+  border-radius: 0.55rem;
+  padding: 0.4rem 0.48rem;
+  background: rgba(255, 255, 255, 0.66);
+  display: grid;
+  gap: 0.1rem;
+}
+
+.route-preview-metrics span {
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #4c687c;
+  font-weight: 700;
+}
+
+.route-preview-metrics strong {
+  font-size: 0.95rem;
+  color: #16364d;
+}
+
+.route-preview-path-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.45rem;
+}
+
+.route-preview-path-grid article {
+  min-width: 0;
+  border: 1px solid #bfd3e2;
+  border-radius: 0.55rem;
+  padding: 0.4rem 0.5rem;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.route-preview-path-grid h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.76rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #4a6579;
+}
+
+.route-preview-path {
+  margin: 0;
+  font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+  font-size: 0.77rem;
+  line-height: 1.35;
+  color: #16384f;
+  word-break: break-word;
+}
+
+@media (max-width: 700px) {
+  .network-summary-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .network-summary-header-actions {
+    justify-content: flex-start;
+  }
+
+  .route-preview-selection-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .route-preview-selection-arrow {
+    display: none;
+  }
+
+  .route-preview-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .route-preview-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .network-grid line {

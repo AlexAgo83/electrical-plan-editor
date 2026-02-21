@@ -214,7 +214,7 @@ describe("App integration UI - navigation and canvas", () => {
     switchSubScreen("segment");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
-    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "(Re)generate layout" }));
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Generate" }));
 
     expect(confirmSpy).toHaveBeenCalledTimes(1);
     confirmSpy.mockRestore();
