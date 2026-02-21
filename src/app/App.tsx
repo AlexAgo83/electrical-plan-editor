@@ -488,6 +488,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const undoActionRef = useRef<() => void>(() => {});
   const redoActionRef = useRef<() => void>(() => {});
   const fitNetworkToContentRef = useRef<() => void>(() => {});
+  const previousValidationIssueRef = useRef<() => void>(() => {});
+  const nextValidationIssueRef = useRef<() => void>(() => {});
   const activeScreenRef = useRef<ScreenId>("modeling");
 
   const selected = selectSelection(state);
@@ -1682,6 +1684,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
     undoActionRef.current = handleUndo;
     redoActionRef.current = handleRedo;
     fitNetworkToContentRef.current = fitNetworkToContent;
+    previousValidationIssueRef.current = () => moveValidationIssueCursor(-1);
+    nextValidationIssueRef.current = () => moveValidationIssueCursor(1);
   });
 
   useEffect(() => {
@@ -1755,6 +1759,18 @@ export function App({ store = appStore }: AppProps): ReactElement {
           event.preventDefault();
           fitNetworkToContentRef.current();
         }
+        return;
+      }
+
+      if (normalizedKey === "j") {
+        event.preventDefault();
+        previousValidationIssueRef.current();
+        return;
+      }
+
+      if (normalizedKey === "k") {
+        event.preventDefault();
+        nextValidationIssueRef.current();
         return;
       }
 
@@ -3275,7 +3291,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
               {showShortcutHints ? (
                 <>
                   <p className="shortcut-hints">Shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo.</p>
-                  <p className="shortcut-hints">Nav: Alt+1..4 screens, Alt+Shift+1..5 entity tabs, Alt+V/N/G/C/R modes, Alt+F fit canvas.</p>
+                  <p className="shortcut-hints">Nav: Alt+1..4 screens, Alt+Shift+1..5 entity tabs, Alt+V/N/G/C/R modes, Alt+F fit canvas, Alt+J/K issue nav.</p>
                 </>
               ) : null}
             </div>
@@ -4731,6 +4747,9 @@ export function App({ store = appStore }: AppProps): ReactElement {
               </li>
               <li>
                 <span className="technical-id">Alt + F</span> Fit network view to current graph
+              </li>
+              <li>
+                <span className="technical-id">Alt + J / Alt + K</span> Previous / next validation issue
               </li>
             </ul>
             <div className="row-actions">

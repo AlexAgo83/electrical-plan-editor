@@ -516,6 +516,27 @@ describe("App integration UI", () => {
     expect(within(networkPanel).getByRole("button", { name: /^Select$/ })).toHaveClass("is-active");
   });
 
+  it("supports alt keyboard shortcuts for sequential validation issue navigation", () => {
+    const store = createAppStore(createValidationIssueState());
+    render(<App store={store} />);
+
+    fireEvent.keyDown(window, { key: "k", altKey: true });
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/ })).toHaveClass("is-active");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/ })).toHaveClass("is-active");
+
+    const inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText("W1")).toBeInTheDocument();
+
+    fireEvent.keyDown(window, { key: "j", altKey: true });
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/ })).toHaveClass("is-active");
+    expect(within(inspectorPanel).getByText("C1")).toBeInTheDocument();
+  });
+
   it("ignores keyboard shortcuts when disabled from settings", () => {
     const store = createAppStore(createUiIntegrationState());
     render(<App store={store} />);
