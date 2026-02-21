@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
 import type { NetworkId } from "../../../core/entities";
 import { nextSortState, sortByNameAndTechnicalId } from "../../lib/app-utils";
+import { downloadCsvFile } from "../../lib/csv";
 import type { SortState } from "../../types/app-controller";
 
 interface NetworkScopeWorkspaceContentProps {
@@ -110,7 +111,30 @@ export function NetworkScopeWorkspaceContent({
   return (
     <section className="panel-grid network-scope-grid">
       <section className="panel network-scope-panel">
-        <h2>Network Scope</h2>
+        <header className="list-panel-header">
+          <h2>Network Scope</h2>
+          <div className="list-panel-header-tools">
+            <button
+              type="button"
+              className="filter-chip table-export-button"
+              onClick={() =>
+                downloadCsvFile(
+                  "network-scope",
+                  ["Name", "Technical ID", "Status"],
+                  sortedNetworks.map((network) => [
+                    network.name,
+                    network.technicalId,
+                    activeNetworkId === network.id ? "Active" : "Available"
+                  ])
+                )
+              }
+              disabled={sortedNetworks.length === 0}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
+            </button>
+          </div>
+        </header>
         {networks.length === 0 ? (
           <p className="empty-copy">No network available. Create one to enable modeling and analysis.</p>
         ) : (

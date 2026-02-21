@@ -237,42 +237,42 @@ export function useSelectionHandlers({
     handleValidationIssueGoTo(issue);
   }
 
-  function resolveSelectedSubScreen(): SubScreenId | null {
-    if (selectedSubScreen !== null) {
-      return selectedSubScreen;
-    }
-
-    if (selected === null) {
-      return null;
-    }
-
-    switch (selected.kind) {
-      case "connector":
-      case "splice":
-      case "node":
-      case "segment":
-      case "wire":
-        return selected.kind;
-      default:
-        return null;
-    }
-  }
-
   function handleOpenSelectionInAnalysis(): void {
-    const targetSubScreen = resolveSelectedSubScreen();
+    const hasConnectorNodeSelection = selectedNode !== null && selectedNode.kind === "connector";
+    const hasSpliceNodeSelection = selectedNode !== null && selectedNode.kind === "splice";
+    const targetSubScreen: SubScreenId | null =
+      selectedConnector !== null || hasConnectorNodeSelection
+        ? "connector"
+        : selectedSplice !== null || hasSpliceNodeSelection
+          ? "splice"
+          : selectedWire !== null
+            ? "wire"
+            : selectedSubScreen === "wire"
+              ? "wire"
+              : null;
+
     if (targetSubScreen === null) {
       return;
     }
 
-    if (targetSubScreen === "node" || targetSubScreen === "segment") {
-      return;
-    }
+    const selectionForAnalysis: SelectionTarget | null =
+      selectedConnector !== null
+        ? { kind: "connector", id: selectedConnector.id }
+        : selectedSplice !== null
+          ? { kind: "splice", id: selectedSplice.id }
+          : selectedWire !== null
+            ? { kind: "wire", id: selectedWire.id }
+            : hasConnectorNodeSelection
+              ? { kind: "connector", id: selectedNode.connectorId }
+              : hasSpliceNodeSelection
+                ? { kind: "splice", id: selectedNode.spliceId }
+                : selected;
 
-    if (selected !== null) {
+    if (selectionForAnalysis !== null) {
       dispatchAction(
         appActions.select({
-          kind: selected.kind,
-          id: selected.id
+          kind: selectionForAnalysis.kind,
+          id: selectionForAnalysis.id
         }),
         { trackHistory: false }
       );

@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { downloadCsvFile } from "../../lib/csv";
 import type { ValidationIssue, ValidationSeverityFilter } from "../../types/app-controller";
 
 interface ValidationWorkspaceContentProps {
@@ -96,6 +97,30 @@ export function ValidationWorkspaceContent({
                 </button>
               );
             })}
+          </div>
+          <div className="list-panel-header-tools">
+            <button
+              type="button"
+              className="filter-chip table-export-button"
+              onClick={() =>
+                downloadCsvFile(
+                  "validation-issues",
+                  ["Category", "Severity", "Issue", "Screen", "Selection kind", "Selection ID"],
+                  visibleValidationIssues.map((issue) => [
+                    issue.category,
+                    issue.severity.toUpperCase(),
+                    issue.message,
+                    issue.subScreen,
+                    issue.selectionKind,
+                    issue.selectionId
+                  ])
+                )
+              }
+              disabled={visibleValidationIssues.length === 0}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
+            </button>
           </div>
           <div className="row-actions compact">
             <button type="button" onClick={() => moveVisibleValidationIssueCursor(-1)} disabled={visibleValidationIssues.length === 0}>

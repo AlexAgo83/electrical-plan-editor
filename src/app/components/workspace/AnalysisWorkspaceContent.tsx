@@ -1,5 +1,6 @@
 import { useState, type FormEvent, type ReactElement } from "react";
 import { nextSortState } from "../../lib/app-utils";
+import { downloadCsvFile } from "../../lib/csv";
 import type { Connector, ConnectorId, Splice, SpliceId, Wire, WireId } from "../../../core/entities";
 import type { ConnectorSynthesisRow, SortState, SpliceSynthesisRow } from "../../types/app-controller";
 
@@ -72,6 +73,7 @@ interface AnalysisWorkspaceContentProps {
   onSelectWire: (wireId: WireId) => void;
   selectedWire: Wire | null;
   describeWireEndpoint: (endpoint: Wire["endpointA"]) => string;
+  describeWireEndpointId: (endpoint: Wire["endpointA"]) => string;
   wireForcedRouteInput: string;
   setWireForcedRouteInput: (value: string) => void;
   handleLockWireRoute: () => void;
@@ -135,6 +137,7 @@ export function AnalysisWorkspaceContent({
   onSelectWire,
   selectedWire,
   describeWireEndpoint,
+  describeWireEndpointId,
   wireForcedRouteInput,
   setWireForcedRouteInput,
   handleLockWireRoute,
@@ -150,21 +153,43 @@ export function AnalysisWorkspaceContent({
       <section className="panel" hidden={!isConnectorSubScreen}>
         <header className="list-panel-header">
           <h2>Connectors</h2>
-          <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
-            {([
-              ["all", "All"],
-              ["occupied", "Occupied"],
-              ["free", "Free"]
-            ] as const).map(([filterId, label]) => (
-              <button
-                key={filterId}
-                type="button"
-                className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
-                onClick={() => setConnectorOccupancyFilter(filterId)}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="list-panel-header-tools">
+            <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
+              {([
+                ["all", "All"],
+                ["occupied", "Occupied"],
+                ["free", "Free"]
+              ] as const).map(([filterId, label]) => (
+                <button
+                  key={filterId}
+                  type="button"
+                  className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+                  onClick={() => setConnectorOccupancyFilter(filterId)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="filter-chip table-export-button"
+              onClick={() =>
+                downloadCsvFile(
+                  "analysis-connectors",
+                  ["Name", "Technical ID", "Cavities", "Occupied"],
+                  visibleConnectors.map((connector) => [
+                    connector.name,
+                    connector.technicalId,
+                    connector.cavityCount,
+                    connectorOccupiedCountById.get(connector.id) ?? 0
+                  ])
+                )
+              }
+              disabled={visibleConnectors.length === 0}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
+            </button>
           </div>
         </header>
         {connectors.length === 0 ? (
@@ -230,20 +255,60 @@ export function AnalysisWorkspaceContent({
       <section className="panel" hidden={!isConnectorSubScreen}>
         <header className="list-panel-header">
           <h2>Connector analysis</h2>
-          <div className="chip-group list-panel-filters" role="group" aria-label="Connector analysis view">
+          <div className="list-panel-header-tools">
+            <div className="chip-group list-panel-filters" role="group" aria-label="Connector analysis view">
+              <button
+                type="button"
+                className={connectorAnalysisView === "cavities" ? "filter-chip is-active" : "filter-chip"}
+                onClick={() => setConnectorAnalysisView("cavities")}
+              >
+                Cavities
+              </button>
+              <button
+                type="button"
+                className={connectorAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
+                onClick={() => setConnectorAnalysisView("synthesis")}
+              >
+                Synthesis
+              </button>
+            </div>
             <button
               type="button"
-              className={connectorAnalysisView === "cavities" ? "filter-chip is-active" : "filter-chip"}
-              onClick={() => setConnectorAnalysisView("cavities")}
+              className="filter-chip table-export-button"
+              onClick={() => {
+                if (connectorAnalysisView === "cavities") {
+                  downloadCsvFile(
+                    `analysis-connector-cavities-${selectedConnector?.technicalId ?? "selection"}`,
+                    ["Cavity", "Status", "Occupant reference"],
+                    connectorCavityStatuses.map((slot) => [
+                      `C${slot.cavityIndex}`,
+                      slot.isOccupied ? "Occupied" : "Free",
+                      slot.occupantRef ?? ""
+                    ])
+                  );
+                  return;
+                }
+                downloadCsvFile(
+                  `analysis-connector-synthesis-${selectedConnector?.technicalId ?? "selection"}`,
+                  ["Wire", "Technical ID", "Local cavity", "Destination", "Length (mm)"],
+                  sortedConnectorSynthesisRows.map((row) => [
+                    row.wireName,
+                    row.wireTechnicalId,
+                    row.localEndpointLabel,
+                    row.remoteEndpointLabel,
+                    row.lengthMm
+                  ])
+                );
+              }}
+              disabled={
+                selectedConnector === null ||
+                (connectorAnalysisView === "cavities"
+                  ? connectorCavityStatuses.length === 0
+                  : sortedConnectorSynthesisRows.length === 0)
+              }
             >
-              Cavities
-            </button>
-            <button
-              type="button"
-              className={connectorAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
-              onClick={() => setConnectorAnalysisView("synthesis")}
-            >
-              Synthesis
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
             </button>
           </div>
         </header>
@@ -342,21 +407,43 @@ export function AnalysisWorkspaceContent({
       <section className="panel" hidden={!isSpliceSubScreen}>
         <header className="list-panel-header">
           <h2>Splices</h2>
-          <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
-            {([
-              ["all", "All"],
-              ["occupied", "Occupied"],
-              ["free", "Free"]
-            ] as const).map(([filterId, label]) => (
-              <button
-                key={filterId}
-                type="button"
-                className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
-                onClick={() => setSpliceOccupancyFilter(filterId)}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="list-panel-header-tools">
+            <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
+              {([
+                ["all", "All"],
+                ["occupied", "Occupied"],
+                ["free", "Free"]
+              ] as const).map(([filterId, label]) => (
+                <button
+                  key={filterId}
+                  type="button"
+                  className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+                  onClick={() => setSpliceOccupancyFilter(filterId)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="filter-chip table-export-button"
+              onClick={() =>
+                downloadCsvFile(
+                  "analysis-splices",
+                  ["Name", "Technical ID", "Ports", "Branches"],
+                  visibleSplices.map((splice) => [
+                    splice.name,
+                    splice.technicalId,
+                    splice.portCount,
+                    spliceOccupiedCountById.get(splice.id) ?? 0
+                  ])
+                )
+              }
+              disabled={visibleSplices.length === 0}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
+            </button>
           </div>
         </header>
         {splices.length === 0 ? (
@@ -422,20 +509,58 @@ export function AnalysisWorkspaceContent({
       <section className="panel" hidden={!isSpliceSubScreen}>
         <header className="list-panel-header">
           <h2>Splice analysis</h2>
-          <div className="chip-group list-panel-filters" role="group" aria-label="Splice analysis view">
+          <div className="list-panel-header-tools">
+            <div className="chip-group list-panel-filters" role="group" aria-label="Splice analysis view">
+              <button
+                type="button"
+                className={spliceAnalysisView === "ports" ? "filter-chip is-active" : "filter-chip"}
+                onClick={() => setSpliceAnalysisView("ports")}
+              >
+                Ports
+              </button>
+              <button
+                type="button"
+                className={spliceAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
+                onClick={() => setSpliceAnalysisView("synthesis")}
+              >
+                Synthesis
+              </button>
+            </div>
             <button
               type="button"
-              className={spliceAnalysisView === "ports" ? "filter-chip is-active" : "filter-chip"}
-              onClick={() => setSpliceAnalysisView("ports")}
+              className="filter-chip table-export-button"
+              onClick={() => {
+                if (spliceAnalysisView === "ports") {
+                  downloadCsvFile(
+                    `analysis-splice-ports-${selectedSplice?.technicalId ?? "selection"}`,
+                    ["Port", "Status", "Occupant reference"],
+                    splicePortStatuses.map((slot) => [
+                      `P${slot.portIndex}`,
+                      slot.isOccupied ? "Occupied" : "Free",
+                      slot.occupantRef ?? ""
+                    ])
+                  );
+                  return;
+                }
+                downloadCsvFile(
+                  `analysis-splice-synthesis-${selectedSplice?.technicalId ?? "selection"}`,
+                  ["Wire", "Technical ID", "Local port", "Destination", "Length (mm)"],
+                  sortedSpliceSynthesisRows.map((row) => [
+                    row.wireName,
+                    row.wireTechnicalId,
+                    row.localEndpointLabel,
+                    row.remoteEndpointLabel,
+                    row.lengthMm
+                  ])
+                );
+              }}
+              disabled={
+                selectedSplice === null ||
+                (spliceAnalysisView === "ports" ? splicePortStatuses.length === 0 : sortedSpliceSynthesisRows.length === 0)
+              }
             >
-              Ports
-            </button>
-            <button
-              type="button"
-              className={spliceAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
-              onClick={() => setSpliceAnalysisView("synthesis")}
-            >
-              Synthesis
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
             </button>
           </div>
         </header>
@@ -535,21 +660,46 @@ export function AnalysisWorkspaceContent({
       <section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen}>
         <header className="list-panel-header">
           <h2>Wires</h2>
-          <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
-            {([
-              ["all", "All"],
-              ["auto", "Auto"],
-              ["locked", "Locked"]
-            ] as const).map(([filterId, label]) => (
-              <button
-                key={filterId}
-                type="button"
-                className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"}
-                onClick={() => setWireRouteFilter(filterId)}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="list-panel-header-tools">
+            <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
+              {([
+                ["all", "All"],
+                ["auto", "Auto"],
+                ["locked", "Locked"]
+              ] as const).map(([filterId, label]) => (
+                <button
+                  key={filterId}
+                  type="button"
+                  className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+                  onClick={() => setWireRouteFilter(filterId)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="filter-chip table-export-button"
+              onClick={() => {
+                const headers = showWireRouteModeColumn
+                  ? ["Name", "Technical ID", "Endpoints", "Begin", "End", "Length (mm)", "Route mode"]
+                  : ["Name", "Technical ID", "Endpoints", "Begin", "End", "Length (mm)"];
+                const rows = visibleWires.map((wire) => {
+                  const endpoints = `${describeWireEndpoint(wire.endpointA)} -> ${describeWireEndpoint(wire.endpointB)}`;
+                  const begin = describeWireEndpointId(wire.endpointA);
+                  const end = describeWireEndpointId(wire.endpointB);
+                  if (showWireRouteModeColumn) {
+                    return [wire.name, wire.technicalId, endpoints, begin, end, wire.lengthMm, wire.isRouteLocked ? "Locked" : "Auto"];
+                  }
+                  return [wire.name, wire.technicalId, endpoints, begin, end, wire.lengthMm];
+                });
+                downloadCsvFile("analysis-wires", headers, rows);
+              }}
+              disabled={visibleWires.length === 0}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
+            </button>
           </div>
         </header>
         {wires.length === 0 ? (

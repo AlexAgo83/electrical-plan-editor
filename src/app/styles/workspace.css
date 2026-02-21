@@ -483,19 +483,6 @@
   gap: 1rem;
 }
 
-.workspace-inspector-scroll-spacer {
-  height: 0;
-  pointer-events: none;
-}
-
-.workspace-inspector-scroll-spacer.is-open {
-  height: clamp(10rem, 24vh, 15rem);
-}
-
-.workspace-inspector-scroll-spacer.is-collapsed {
-  height: clamp(6.2rem, 14vh, 9rem);
-}
-
 .workspace-sidebar .workspace-switcher,
 .workspace-sidebar .workspace-meta {
   border: 1px solid #cbdae6;
@@ -825,7 +812,4 @@
     max-height: calc(100vh - var(--workspace-header-offset) - 0.75rem);
   }
 
-  .workspace-inspector-scroll-spacer.is-open {
-    height: clamp(11rem, 28vh, 17rem);
-  }
 }

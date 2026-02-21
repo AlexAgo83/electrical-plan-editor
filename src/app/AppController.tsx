@@ -9,6 +9,7 @@ import {
   useState,
   useSyncExternalStore
 } from "react";
+import appPackageMetadata from "../../package.json";
 import type {
   ConnectorId,
   NetworkId,
@@ -124,7 +125,10 @@ function useAppSnapshot(store: AppStore) {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);
 }
 
+const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor";
+
 export function AppController({ store = appStore }: AppProps): ReactElement {
+  const currentYear = new Date().getFullYear();
   const state = useAppSnapshot(store);
 
   const networks = selectNetworks(state);
@@ -524,6 +528,15 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
 
     return `${splice.name} (${splice.technicalId}) / P${endpoint.portIndex}`;
+  }, [connectorMap, spliceMap]);
+  const describeWireEndpointId = useCallback((endpoint: WireEndpoint): string => {
+    if (endpoint.kind === "connectorCavity") {
+      const connectorTechnicalId = connectorMap.get(endpoint.connectorId)?.technicalId ?? String(endpoint.connectorId);
+      return `${connectorTechnicalId} / C${endpoint.cavityIndex}`;
+    }
+
+    const spliceTechnicalId = spliceMap.get(endpoint.spliceId)?.technicalId ?? String(endpoint.spliceId);
+    return `${spliceTechnicalId} / P${endpoint.portIndex}`;
   }, [connectorMap, spliceMap]);
 
   useEffect(() => {
@@ -1855,6 +1868,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
               getSortIndicator={getSortIndicator}
               selectedWireId={selectedWireId}
               describeWireEndpoint={describeWireEndpoint}
+              describeWireEndpointId={describeWireEndpointId}
               onEditWire={startWireEdit}
               onDeleteWire={handleWireDelete}
             />
@@ -2032,6 +2046,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           }
           selectedWire={selectedWire}
           describeWireEndpoint={describeWireEndpoint}
+          describeWireEndpointId={describeWireEndpointId}
           wireForcedRouteInput={wireForcedRouteInput}
           setWireForcedRouteInput={setWireForcedRouteInput}
           handleLockWireRoute={handleLockWireRoute}
@@ -2117,18 +2132,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       </SettingsScreen>
             </>
           ) : null}
-          <div
-            aria-hidden="true"
-            className={
-              isInspectorHidden
-                ? "workspace-inspector-scroll-spacer"
-                : isInspectorOpen
-                  ? "workspace-inspector-scroll-spacer is-open"
-                  : "workspace-inspector-scroll-spacer is-collapsed"
-            }
-          />
         </section>
       </section>
+      <a className="app-footer-link" href={APP_REPOSITORY_URL} target="_blank" rel="noopener noreferrer">
+        © {currentYear} e-Plan Editor · v{appPackageMetadata.version}
+      </a>
       {!isInspectorHidden ? (
         <aside
           className={isInspectorOpen ? "workspace-inspector-panel is-open" : "workspace-inspector-panel is-collapsed"}

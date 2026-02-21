@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { nextSortState } from "../../lib/app-utils";
+import { downloadCsvFile } from "../../lib/csv";
 import type {
   NodeId,
   Segment,
@@ -36,6 +37,7 @@ interface ModelingSecondaryTablesProps {
   getSortIndicator: (sortState: SortState, field: "name" | "technicalId") => string;
   selectedWireId: WireId | null;
   describeWireEndpoint: (endpoint: Wire["endpointA"]) => string;
+  describeWireEndpointId: (endpoint: Wire["endpointA"]) => string;
   onEditWire: (wire: Wire) => void;
   onDeleteWire: (wireId: WireId) => void;
 }
@@ -67,6 +69,7 @@ export function ModelingSecondaryTables({
   getSortIndicator,
   selectedWireId,
   describeWireEndpoint,
+  describeWireEndpointId,
   onEditWire,
   onDeleteWire
 }: ModelingSecondaryTablesProps): ReactElement {
@@ -82,14 +85,38 @@ export function ModelingSecondaryTables({
       <article className="panel" hidden={!isSegmentSubScreen}>
         <header className="list-panel-header">
           <h2>Segments</h2>
-          <div className="chip-group list-panel-filters" role="group" aria-label="Segment sub-network filter">
-            {([
-              ["all", "All"],
-              ["default", "Default"],
-              ["tagged", "Tagged"]
-            ] as const).map(([filterId, label]) => (
-              <button key={filterId} type="button" className={segmentSubNetworkFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSegmentSubNetworkFilter(filterId)}>{label}</button>
-            ))}
+          <div className="list-panel-header-tools">
+            <div className="chip-group list-panel-filters" role="group" aria-label="Segment sub-network filter">
+              {([
+                ["all", "All"],
+                ["default", "Default"],
+                ["tagged", "Tagged"]
+              ] as const).map(([filterId, label]) => (
+                <button key={filterId} type="button" className={segmentSubNetworkFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSegmentSubNetworkFilter(filterId)}>{label}</button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="filter-chip table-export-button"
+              onClick={() => {
+                const headers = showSegmentSubNetworkColumn
+                  ? ["ID", "Node A", "Node B", "Length (mm)", "Sub-network"]
+                  : ["ID", "Node A", "Node B", "Length (mm)"];
+                const rows = visibleSegments.map((segment) => {
+                  const nodeA = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
+                  const nodeB = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
+                  if (showSegmentSubNetworkColumn) {
+                    return [segment.id, nodeA, nodeB, segment.lengthMm, segment.subNetworkTag?.trim() || "(default)"];
+                  }
+                  return [segment.id, nodeA, nodeB, segment.lengthMm];
+                });
+                downloadCsvFile("modeling-segments", headers, rows);
+              }}
+              disabled={visibleSegments.length === 0}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
+            </button>
           </div>
         </header>
         {segments.length === 0 ? (
@@ -151,14 +178,39 @@ export function ModelingSecondaryTables({
       <article className="panel" hidden={!isWireSubScreen}>
         <header className="list-panel-header">
           <h2>Wires</h2>
-          <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
-            {([
-              ["all", "All"],
-              ["auto", "Auto"],
-              ["locked", "Locked"]
-            ] as const).map(([filterId, label]) => (
-              <button key={filterId} type="button" className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setWireRouteFilter(filterId)}>{label}</button>
-            ))}
+          <div className="list-panel-header-tools">
+            <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
+              {([
+                ["all", "All"],
+                ["auto", "Auto"],
+                ["locked", "Locked"]
+              ] as const).map(([filterId, label]) => (
+                <button key={filterId} type="button" className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setWireRouteFilter(filterId)}>{label}</button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="filter-chip table-export-button"
+              onClick={() => {
+                const headers = showWireRouteModeColumn
+                  ? ["Name", "Technical ID", "Endpoints", "Begin", "End", "Length (mm)", "Route mode"]
+                  : ["Name", "Technical ID", "Endpoints", "Begin", "End", "Length (mm)"];
+                const rows = visibleWires.map((wire) => {
+                  const endpoints = `${describeWireEndpoint(wire.endpointA)} -> ${describeWireEndpoint(wire.endpointB)}`;
+                  const begin = describeWireEndpointId(wire.endpointA);
+                  const end = describeWireEndpointId(wire.endpointB);
+                  if (showWireRouteModeColumn) {
+                    return [wire.name, wire.technicalId, endpoints, begin, end, wire.lengthMm, wire.isRouteLocked ? "Locked" : "Auto"];
+                  }
+                  return [wire.name, wire.technicalId, endpoints, begin, end, wire.lengthMm];
+                });
+                downloadCsvFile("modeling-wires", headers, rows);
+              }}
+              disabled={visibleWires.length === 0}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
+            </button>
           </div>
         </header>
         {wires.length === 0 ? (

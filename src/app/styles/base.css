@@ -216,6 +216,28 @@ button {
   margin: 0;
 }
 
+.app-footer-link {
+  margin-top: auto;
+  margin-bottom: 0.25rem;
+  width: auto;
+  display: inline-block;
+  justify-self: center;
+  padding: 0.55rem 0;
+  color: #5d768a;
+  font-size: 0.76rem;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-decoration: none;
+  opacity: 0.62;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.app-footer-link:hover,
+.app-footer-link:focus-visible {
+  color: #2f4f68;
+  opacity: 0.94;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -334,8 +356,14 @@ button {
 .app-shell.theme-dark .summary-grid h3,
 .app-shell.theme-dark .summary-title,
 .app-shell.theme-dark .selection-snapshot p,
+.app-shell.theme-dark .app-footer-link,
 .app-shell.theme-dark .validation-toolbar > span {
   color: #b7c9dc;
+}
+
+.app-shell.theme-dark .app-footer-link:hover,
+.app-shell.theme-dark .app-footer-link:focus-visible {
+  color: #d3e5f5;
 }
 
 .app-shell.theme-dark .header-block {

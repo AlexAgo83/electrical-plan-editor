@@ -45,7 +45,10 @@ export function InspectorContextPanel({
 }: InspectorContextPanelProps): ReactElement {
   const isCollapsed = mode === "collapsed";
   const canOpenAnalysis =
-    selectedSubScreen === "connector" || selectedSubScreen === "splice" || selectedSubScreen === "wire";
+    selectedConnector !== null ||
+    selectedSplice !== null ||
+    selectedWire !== null ||
+    (selectedNode !== null && (selectedNode.kind === "connector" || selectedNode.kind === "splice"));
   const detailRows: Array<{ label: string; value: ReactElement | string }> = [];
 
   if (selectedConnector !== null) {

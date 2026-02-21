@@ -78,6 +78,14 @@
   justify-content: flex-end;
 }
 
+.list-panel-header-tools {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
 .chip-group {
   display: flex;
   flex-wrap: wrap;
@@ -106,6 +114,20 @@
   font-family: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
   font-size: 0.72rem;
   opacity: 0.82;
+}
+
+.table-export-button {
+  white-space: nowrap;
+}
+
+.table-export-icon {
+  width: 0.78rem;
+  height: 0.78rem;
+  display: inline-block;
+  flex: 0 0 0.78rem;
+  background: currentColor;
+  -webkit-mask: url("/icons/export_csv.svg") center / contain no-repeat;
+  mask: url("/icons/export_csv.svg") center / contain no-repeat;
 }
 
 .technical-id {
@@ -177,6 +199,10 @@
   }
 
   .list-panel-filters {
+    justify-content: flex-start;
+  }
+
+  .list-panel-header-tools {
     justify-content: flex-start;
   }
 }

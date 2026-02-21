@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { nextSortState } from "../../lib/app-utils";
+import { downloadCsvFile } from "../../lib/csv";
 import type {
   Connector,
   ConnectorId,
@@ -110,14 +111,36 @@ export function ModelingPrimaryTables({
       <article className="panel" hidden={!isConnectorSubScreen}>
         <header className="list-panel-header">
           <h2>Connectors</h2>
-          <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
-            {([
-              ["all", "All"],
-              ["occupied", "Occupied"],
-              ["free", "Free"]
-            ] as const).map(([filterId, label]) => (
-              <button key={filterId} type="button" className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setConnectorOccupancyFilter(filterId)}>{label}</button>
-            ))}
+          <div className="list-panel-header-tools">
+            <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
+              {([
+                ["all", "All"],
+                ["occupied", "Occupied"],
+                ["free", "Free"]
+              ] as const).map(([filterId, label]) => (
+                <button key={filterId} type="button" className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setConnectorOccupancyFilter(filterId)}>{label}</button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="filter-chip table-export-button"
+              onClick={() =>
+                downloadCsvFile(
+                  "modeling-connectors",
+                  ["Name", "Technical ID", "Cavities", "Occupied"],
+                  visibleConnectors.map((connector) => [
+                    connector.name,
+                    connector.technicalId,
+                    connector.cavityCount,
+                    connectorOccupiedCountById.get(connector.id) ?? 0
+                  ])
+                )
+              }
+              disabled={visibleConnectors.length === 0}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
+            </button>
           </div>
         </header>
         {connectors.length === 0 ? (
@@ -172,14 +195,36 @@ export function ModelingPrimaryTables({
       <article className="panel" hidden={!isSpliceSubScreen}>
         <header className="list-panel-header">
           <h2>Splices</h2>
-          <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
-            {([
-              ["all", "All"],
-              ["occupied", "Occupied"],
-              ["free", "Free"]
-            ] as const).map(([filterId, label]) => (
-              <button key={filterId} type="button" className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSpliceOccupancyFilter(filterId)}>{label}</button>
-            ))}
+          <div className="list-panel-header-tools">
+            <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
+              {([
+                ["all", "All"],
+                ["occupied", "Occupied"],
+                ["free", "Free"]
+              ] as const).map(([filterId, label]) => (
+                <button key={filterId} type="button" className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSpliceOccupancyFilter(filterId)}>{label}</button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="filter-chip table-export-button"
+              onClick={() =>
+                downloadCsvFile(
+                  "modeling-splices",
+                  ["Name", "Technical ID", "Ports", "Branches"],
+                  visibleSplices.map((splice) => [
+                    splice.name,
+                    splice.technicalId,
+                    splice.portCount,
+                    spliceOccupiedCountById.get(splice.id) ?? 0
+                  ])
+                )
+              }
+              disabled={visibleSplices.length === 0}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
+            </button>
           </div>
         </header>
         {splices.length === 0 ? (
@@ -234,15 +279,38 @@ export function ModelingPrimaryTables({
       <article className="panel" hidden={!isNodeSubScreen}>
         <header className="list-panel-header">
           <h2>Nodes</h2>
-          <div className="chip-group list-panel-filters" role="group" aria-label="Node kind filter">
-            {([
-              ["all", "All"],
-              ["connector", "Connector"],
-              ["splice", "Splice"],
-              ["intermediate", "Intermediate"]
-            ] as const).map(([kindId, label]) => (
-              <button key={kindId} type="button" className={nodeKindFilter === kindId ? "filter-chip is-active" : "filter-chip"} onClick={() => setNodeKindFilter(kindId)}>{label}</button>
-            ))}
+          <div className="list-panel-header-tools">
+            <div className="chip-group list-panel-filters" role="group" aria-label="Node kind filter">
+              {([
+                ["all", "All"],
+                ["connector", "Connector"],
+                ["splice", "Splice"],
+                ["intermediate", "Intermediate"]
+              ] as const).map(([kindId, label]) => (
+                <button key={kindId} type="button" className={nodeKindFilter === kindId ? "filter-chip is-active" : "filter-chip"} onClick={() => setNodeKindFilter(kindId)}>{label}</button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="filter-chip table-export-button"
+              onClick={() => {
+                const headers = showNodeKindColumn
+                  ? ["ID", "Kind", "Reference", "Linked segments"]
+                  : ["ID", "Reference", "Linked segments"];
+                const rows = visibleNodes.map((node) => {
+                  const linkedSegments = segmentsCountByNodeId.get(node.id) ?? 0;
+                  if (showNodeKindColumn) {
+                    return [node.id, node.kind, describeNode(node), linkedSegments];
+                  }
+                  return [node.id, describeNode(node), linkedSegments];
+                });
+                downloadCsvFile("modeling-nodes", headers, rows);
+              }}
+              disabled={visibleNodes.length === 0}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
+            </button>
           </div>
         </header>
         {nodes.length === 0 ? (
