@@ -78,7 +78,7 @@ Validation and acceptance coverage item `item_008` is implemented:
 - E2E smoke scenario covers create -> route -> force lock -> recompute flow.
 - CI baseline executes lint, typecheck, unit/integration, and E2E smoke checks.
 
-UX/UI workspace wave (`task_001`) is in progress:
+UX/UI workspace wave (`task_001`) is completed:
 - Persistent left-rail workspace navigation is active.
 - Workspace navigation now surfaces live counters (entity counts on sub-screens, issue count on `Validation`).
 - Validation center screen with grouped issues and `Go to` actions is active.
@@ -150,7 +150,7 @@ python3 logics/skills/logics-flow-manager/scripts/logics_flow.py promote backlog
 - Wave 1: `item_000` to `item_004` (foundation + routing engine).
 - Wave 2: `item_005` to `item_007` (wire lifecycle + views + persistence) - completed.
 - Wave 3: `item_008` (validation matrix and AC1..AC6 automated coverage) - completed.
-- Wave 4: `item_009` to `item_013` (UX/UI workspace overhaul) - in progress.
+- Wave 4: `item_009` to `item_013` (UX/UI workspace overhaul) - completed.
 
 ## Validation Baseline
 
