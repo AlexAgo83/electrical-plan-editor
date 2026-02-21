@@ -1,7 +1,7 @@
 import type { AppAction } from "../actions";
 import type { AppState } from "../types";
 import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
-import { recomputeAllWiresForNetwork } from "./wireReducer";
+import { recomputeAllWiresForNetwork } from "./helpers/wireTransitions";
 
 function hasConnectorNodeConflict(state: AppState, nodeId: string, connectorId: string): boolean {
   return state.nodes.allIds.some((id) => {

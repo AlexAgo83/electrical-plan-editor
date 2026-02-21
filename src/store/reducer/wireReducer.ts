@@ -1,8 +1,21 @@
-import type { NodeId, SegmentId, Wire, WireEndpoint, WireId } from "../../core/entities";
+import type { SegmentId } from "../../core/entities";
 import { buildRoutingGraphIndex } from "../../core/graph";
 import { findShortestRoute } from "../../core/pathfinding";
 import type { AppAction } from "../actions";
-import type { AppState, EntityState } from "../types";
+import type { AppState } from "../types";
+import {
+  getEndpointOccupant,
+  getWireEndpointOccupantRef,
+  releaseEndpointOccupant,
+  setEndpointOccupant,
+  type EndpointOccupancyState
+} from "./helpers/occupancy";
+import {
+  computeForcedRouteLength,
+  findNodeIdForEndpoint,
+  getEndpointKey,
+  getEndpointValidationError
+} from "./helpers/wireTransitions";
 import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
 
 function hasDuplicateWireTechnicalId(state: AppState, wireId: string, technicalId: string): boolean {
@@ -18,231 +31,6 @@ function hasDuplicateWireTechnicalId(state: AppState, wireId: string, technicalI
 
     return wire.technicalId === technicalId;
   });
-}
-
-function getEndpointKey(endpoint: WireEndpoint): string {
-  if (endpoint.kind === "connectorCavity") {
-    return `connector:${endpoint.connectorId}:${endpoint.cavityIndex}`;
-  }
-
-  return `splice:${endpoint.spliceId}:${endpoint.portIndex}`;
-}
-
-function getWireEndpointOccupantRef(wireId: WireId, side: "A" | "B"): string {
-  return `wire:${wireId}:${side}`;
-}
-
-export function findNodeIdForEndpoint(state: AppState, endpoint: WireEndpoint): NodeId | undefined {
-  for (const nodeId of state.nodes.allIds) {
-    const node = state.nodes.byId[nodeId];
-    if (node === undefined) {
-      continue;
-    }
-
-    if (endpoint.kind === "connectorCavity" && node.kind === "connector" && node.connectorId === endpoint.connectorId) {
-      return node.id;
-    }
-
-    if (endpoint.kind === "splicePort" && node.kind === "splice" && node.spliceId === endpoint.spliceId) {
-      return node.id;
-    }
-  }
-
-  return undefined;
-}
-
-function getEndpointValidationError(state: AppState, endpoint: WireEndpoint): string | null {
-  if (endpoint.kind === "connectorCavity") {
-    const connector = state.connectors.byId[endpoint.connectorId];
-    if (connector === undefined) {
-      return "Wire endpoint references an unknown connector.";
-    }
-
-    if (!Number.isInteger(endpoint.cavityIndex) || endpoint.cavityIndex < 1 || endpoint.cavityIndex > connector.cavityCount) {
-      return "Wire connector cavity endpoint is out of range.";
-    }
-
-    return null;
-  }
-
-  const splice = state.splices.byId[endpoint.spliceId];
-  if (splice === undefined) {
-    return "Wire endpoint references an unknown splice.";
-  }
-
-  if (!Number.isInteger(endpoint.portIndex) || endpoint.portIndex < 1 || endpoint.portIndex > splice.portCount) {
-    return "Wire splice port endpoint is out of range.";
-  }
-
-  return null;
-}
-
-function getEndpointOccupant(
-  connectorCavityOccupancy: AppState["connectorCavityOccupancy"],
-  splicePortOccupancy: AppState["splicePortOccupancy"],
-  endpoint: WireEndpoint
-): string | undefined {
-  if (endpoint.kind === "connectorCavity") {
-    return connectorCavityOccupancy[endpoint.connectorId]?.[endpoint.cavityIndex];
-  }
-
-  return splicePortOccupancy[endpoint.spliceId]?.[endpoint.portIndex];
-}
-
-function setEndpointOccupant(
-  connectorCavityOccupancy: AppState["connectorCavityOccupancy"],
-  splicePortOccupancy: AppState["splicePortOccupancy"],
-  endpoint: WireEndpoint,
-  occupantRef: string
-): void {
-  if (endpoint.kind === "connectorCavity") {
-    const connectorOccupancy = { ...(connectorCavityOccupancy[endpoint.connectorId] ?? {}) };
-    connectorOccupancy[endpoint.cavityIndex] = occupantRef;
-    connectorCavityOccupancy[endpoint.connectorId] = connectorOccupancy;
-    return;
-  }
-
-  const spliceOccupancy = { ...(splicePortOccupancy[endpoint.spliceId] ?? {}) };
-  spliceOccupancy[endpoint.portIndex] = occupantRef;
-  splicePortOccupancy[endpoint.spliceId] = spliceOccupancy;
-}
-
-function releaseEndpointOccupant(
-  connectorCavityOccupancy: AppState["connectorCavityOccupancy"],
-  splicePortOccupancy: AppState["splicePortOccupancy"],
-  endpoint: WireEndpoint,
-  expectedOccupantRef: string
-): void {
-  if (endpoint.kind === "connectorCavity") {
-    const connectorOccupancy = connectorCavityOccupancy[endpoint.connectorId];
-    if (connectorOccupancy === undefined || connectorOccupancy[endpoint.cavityIndex] !== expectedOccupantRef) {
-      return;
-    }
-
-    const nextConnectorOccupancy = { ...connectorOccupancy };
-    delete nextConnectorOccupancy[endpoint.cavityIndex];
-    if (Object.keys(nextConnectorOccupancy).length === 0) {
-      delete connectorCavityOccupancy[endpoint.connectorId];
-    } else {
-      connectorCavityOccupancy[endpoint.connectorId] = nextConnectorOccupancy;
-    }
-
-    return;
-  }
-
-  const spliceOccupancy = splicePortOccupancy[endpoint.spliceId];
-  if (spliceOccupancy === undefined || spliceOccupancy[endpoint.portIndex] !== expectedOccupantRef) {
-    return;
-  }
-
-  const nextSpliceOccupancy = { ...spliceOccupancy };
-  delete nextSpliceOccupancy[endpoint.portIndex];
-  if (Object.keys(nextSpliceOccupancy).length === 0) {
-    delete splicePortOccupancy[endpoint.spliceId];
-  } else {
-    splicePortOccupancy[endpoint.spliceId] = nextSpliceOccupancy;
-  }
-}
-
-export function computeForcedRouteLength(
-  state: AppState,
-  startNodeId: NodeId,
-  endNodeId: NodeId,
-  segmentIds: SegmentId[]
-): number | null {
-  if (segmentIds.length === 0) {
-    return null;
-  }
-
-  const seenSegmentIds = new Set<string>();
-  let currentNodeId: NodeId = startNodeId;
-  let totalLengthMm = 0;
-
-  for (const segmentId of segmentIds) {
-    if (seenSegmentIds.has(segmentId)) {
-      return null;
-    }
-    seenSegmentIds.add(segmentId);
-
-    const segment = state.segments.byId[segmentId];
-    if (segment === undefined) {
-      return null;
-    }
-
-    if (segment.nodeA === currentNodeId) {
-      currentNodeId = segment.nodeB;
-    } else if (segment.nodeB === currentNodeId) {
-      currentNodeId = segment.nodeA;
-    } else {
-      return null;
-    }
-
-    totalLengthMm += segment.lengthMm;
-  }
-
-  return currentNodeId === endNodeId ? totalLengthMm : null;
-}
-
-export function recomputeAllWiresForNetwork(state: AppState): { wires: EntityState<Wire, WireId> } | { error: string } {
-  if (state.wires.allIds.length === 0) {
-    return { wires: state.wires };
-  }
-
-  const graph = buildRoutingGraphIndex(
-    state.nodes.allIds
-      .map((nodeId) => state.nodes.byId[nodeId])
-      .filter((node): node is NonNullable<typeof node> => node !== undefined),
-    state.segments.allIds
-      .map((segmentId) => state.segments.byId[segmentId])
-      .filter((segment): segment is NonNullable<typeof segment> => segment !== undefined)
-  );
-
-  const nextWiresById: Record<WireId, Wire> = { ...state.wires.byId };
-
-  for (const wireId of state.wires.allIds) {
-    const wire = state.wires.byId[wireId];
-    if (wire === undefined) {
-      continue;
-    }
-
-    const startNodeId = findNodeIdForEndpoint(state, wire.endpointA);
-    const endNodeId = findNodeIdForEndpoint(state, wire.endpointB);
-    if (startNodeId === undefined || endNodeId === undefined) {
-      return { error: `Wire '${wire.technicalId}' has endpoints not mapped to graph nodes.` };
-    }
-
-    if (wire.isRouteLocked) {
-      const forcedLength = computeForcedRouteLength(state, startNodeId, endNodeId, wire.routeSegmentIds);
-      if (forcedLength === null) {
-        return { error: `Locked route for wire '${wire.technicalId}' is no longer valid.` };
-      }
-
-      nextWiresById[wireId] = {
-        ...wire,
-        lengthMm: forcedLength
-      };
-      continue;
-    }
-
-    const shortestRoute = findShortestRoute(graph, startNodeId, endNodeId);
-    if (shortestRoute === null) {
-      return { error: `No route found for wire '${wire.technicalId}'.` };
-    }
-
-    nextWiresById[wireId] = {
-      ...wire,
-      routeSegmentIds: shortestRoute.segmentIds,
-      lengthMm: shortestRoute.totalLengthMm,
-      isRouteLocked: false
-    };
-  }
-
-  return {
-    wires: {
-      byId: nextWiresById,
-      allIds: state.wires.allIds
-    }
-  };
 }
 
 export function handleWireActions(state: AppState, action: AppAction): AppState | null {
@@ -317,34 +105,26 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         isRouteLocked = false;
       }
 
-      const nextConnectorCavityOccupancy = { ...state.connectorCavityOccupancy };
-      const nextSplicePortOccupancy = { ...state.splicePortOccupancy };
+      let occupancyState: EndpointOccupancyState = {
+        connectorCavityOccupancy: state.connectorCavityOccupancy,
+        splicePortOccupancy: state.splicePortOccupancy
+      };
 
       if (existingWire !== undefined) {
-        releaseEndpointOccupant(
-          nextConnectorCavityOccupancy,
-          nextSplicePortOccupancy,
+        occupancyState = releaseEndpointOccupant(
+          occupancyState,
           existingWire.endpointA,
           getWireEndpointOccupantRef(existingWire.id, "A")
         );
-        releaseEndpointOccupant(
-          nextConnectorCavityOccupancy,
-          nextSplicePortOccupancy,
+        occupancyState = releaseEndpointOccupant(
+          occupancyState,
           existingWire.endpointB,
           getWireEndpointOccupantRef(existingWire.id, "B")
         );
       }
 
-      const endpointAOccupant = getEndpointOccupant(
-        nextConnectorCavityOccupancy,
-        nextSplicePortOccupancy,
-        action.payload.endpointA
-      );
-      const endpointBOccupant = getEndpointOccupant(
-        nextConnectorCavityOccupancy,
-        nextSplicePortOccupancy,
-        action.payload.endpointB
-      );
+      const endpointAOccupant = getEndpointOccupant(occupancyState, action.payload.endpointA);
+      const endpointBOccupant = getEndpointOccupant(occupancyState, action.payload.endpointB);
       const endpointAOccupantRef = getWireEndpointOccupantRef(action.payload.id, "A");
       const endpointBOccupantRef = getWireEndpointOccupantRef(action.payload.id, "B");
 
@@ -364,23 +144,13 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         return withError(state, "Wire endpoint B is already occupied.");
       }
 
-      setEndpointOccupant(
-        nextConnectorCavityOccupancy,
-        nextSplicePortOccupancy,
-        action.payload.endpointA,
-        endpointAOccupantRef
-      );
-      setEndpointOccupant(
-        nextConnectorCavityOccupancy,
-        nextSplicePortOccupancy,
-        action.payload.endpointB,
-        endpointBOccupantRef
-      );
+      occupancyState = setEndpointOccupant(occupancyState, action.payload.endpointA, endpointAOccupantRef);
+      occupancyState = setEndpointOccupant(occupancyState, action.payload.endpointB, endpointBOccupantRef);
 
       return bumpRevision({
         ...clearLastError(state),
-        connectorCavityOccupancy: nextConnectorCavityOccupancy,
-        splicePortOccupancy: nextSplicePortOccupancy,
+        connectorCavityOccupancy: occupancyState.connectorCavityOccupancy,
+        splicePortOccupancy: occupancyState.splicePortOccupancy,
         wires: upsertEntity(state.wires, {
           id: action.payload.id,
           name: normalizedName,
@@ -471,25 +241,17 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         return clearLastError(state);
       }
 
-      const nextConnectorCavityOccupancy = { ...state.connectorCavityOccupancy };
-      const nextSplicePortOccupancy = { ...state.splicePortOccupancy };
-      releaseEndpointOccupant(
-        nextConnectorCavityOccupancy,
-        nextSplicePortOccupancy,
-        wire.endpointA,
-        getWireEndpointOccupantRef(wire.id, "A")
-      );
-      releaseEndpointOccupant(
-        nextConnectorCavityOccupancy,
-        nextSplicePortOccupancy,
-        wire.endpointB,
-        getWireEndpointOccupantRef(wire.id, "B")
-      );
+      let occupancyState: EndpointOccupancyState = {
+        connectorCavityOccupancy: state.connectorCavityOccupancy,
+        splicePortOccupancy: state.splicePortOccupancy
+      };
+      occupancyState = releaseEndpointOccupant(occupancyState, wire.endpointA, getWireEndpointOccupantRef(wire.id, "A"));
+      occupancyState = releaseEndpointOccupant(occupancyState, wire.endpointB, getWireEndpointOccupantRef(wire.id, "B"));
 
       return bumpRevision({
         ...clearLastError(state),
-        connectorCavityOccupancy: nextConnectorCavityOccupancy,
-        splicePortOccupancy: nextSplicePortOccupancy,
+        connectorCavityOccupancy: occupancyState.connectorCavityOccupancy,
+        splicePortOccupancy: occupancyState.splicePortOccupancy,
         wires: removeEntity(state.wires, action.payload.id),
         ui: shouldClearSelection(state.ui.selected, "wire", action.payload.id)
           ? { ...state.ui, selected: null, lastError: null }
