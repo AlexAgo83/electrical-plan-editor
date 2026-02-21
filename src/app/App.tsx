@@ -283,6 +283,8 @@ type ScreenId = "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
 type InteractionMode = "select" | "addNode" | "addSegment" | "connect" | "route";
 type TableDensity = "comfortable" | "compact";
+type OccupancyFilter = "all" | "occupied" | "free";
+type SegmentSubNetworkFilter = "all" | "default" | "tagged";
 
 interface ValidationIssue {
   id: string;
@@ -390,7 +392,10 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const [nodeSearchQuery, setNodeSearchQuery] = useState("");
   const [segmentSearchQuery, setSegmentSearchQuery] = useState("");
   const [wireSearchQuery, setWireSearchQuery] = useState("");
+  const [connectorOccupancyFilter, setConnectorOccupancyFilter] = useState<OccupancyFilter>("all");
+  const [spliceOccupancyFilter, setSpliceOccupancyFilter] = useState<OccupancyFilter>("all");
   const [nodeKindFilter, setNodeKindFilter] = useState<"all" | NetworkNode["kind"]>("all");
+  const [segmentSubNetworkFilter, setSegmentSubNetworkFilter] = useState<SegmentSubNetworkFilter>("all");
   const [wireRouteFilter, setWireRouteFilter] = useState<"all" | "auto" | "locked">("all");
   const [validationCategoryFilter, setValidationCategoryFilter] = useState<string>("all");
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
@@ -699,19 +704,57 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const normalizedNodeSearch = normalizeSearch(nodeSearchQuery);
   const normalizedSegmentSearch = normalizeSearch(segmentSearchQuery);
   const normalizedWireSearch = normalizeSearch(wireSearchQuery);
+  const connectorOccupiedCountById = useMemo(() => {
+    const result = new Map<ConnectorId, number>();
+    for (const connector of connectors) {
+      const occupiedCount = selectConnectorCavityStatuses(state, connector.id).filter((slot) => slot.isOccupied).length;
+      result.set(connector.id, occupiedCount);
+    }
+
+    return result;
+  }, [connectors, state]);
+  const spliceOccupiedCountById = useMemo(() => {
+    const result = new Map<SpliceId, number>();
+    for (const splice of splices) {
+      const occupiedCount = selectSplicePortStatuses(state, splice.id).filter((slot) => slot.isOccupied).length;
+      result.set(splice.id, occupiedCount);
+    }
+
+    return result;
+  }, [splices, state]);
   const visibleConnectors = useMemo(
-    () =>
-      sortedConnectors.filter((connector) =>
-        `${connector.name} ${connector.technicalId}`.toLocaleLowerCase().includes(normalizedConnectorSearch)
-      ),
-    [normalizedConnectorSearch, sortedConnectors]
+    () => {
+      return sortedConnectors.filter((connector) => {
+        const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
+        if (connectorOccupancyFilter === "occupied" && occupiedCount === 0) {
+          return false;
+        }
+
+        if (connectorOccupancyFilter === "free" && occupiedCount > 0) {
+          return false;
+        }
+
+        return `${connector.name} ${connector.technicalId}`.toLocaleLowerCase().includes(normalizedConnectorSearch);
+      });
+    },
+    [connectorOccupiedCountById, connectorOccupancyFilter, normalizedConnectorSearch, sortedConnectors]
   );
   const visibleSplices = useMemo(
-    () =>
-      sortedSplices.filter((splice) =>
-        `${splice.name} ${splice.technicalId}`.toLocaleLowerCase().includes(normalizedSpliceSearch)
-      ),
-    [normalizedSpliceSearch, sortedSplices]
+    () => {
+      return sortedSplices.filter((splice) => {
+        const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
+        if (spliceOccupancyFilter === "occupied" && occupiedCount === 0) {
+          return false;
+        }
+
+        if (spliceOccupancyFilter === "free" && occupiedCount > 0) {
+          return false;
+        }
+
+        return `${splice.name} ${splice.technicalId}`.toLocaleLowerCase().includes(normalizedSpliceSearch);
+      });
+    },
+    [normalizedSpliceSearch, sortedSplices, spliceOccupancyFilter, spliceOccupiedCountById]
   );
   const visibleNodes = useMemo(
     () =>
@@ -743,13 +786,23 @@ export function App({ store = appStore }: AppProps): ReactElement {
     [connectorMap, nodeKindFilter, normalizedNodeSearch, sortedNodes, spliceMap]
   );
   const visibleSegments = useMemo(
-    () =>
-      sortedSegments.filter((segment) =>
-        `${segment.id} ${segment.nodeA} ${segment.nodeB} ${segment.subNetworkTag ?? ""}`
+    () => {
+      return sortedSegments.filter((segment) => {
+        const normalizedSubNetworkTag = segment.subNetworkTag?.trim() ?? "";
+        if (segmentSubNetworkFilter === "default" && normalizedSubNetworkTag.length > 0) {
+          return false;
+        }
+
+        if (segmentSubNetworkFilter === "tagged" && normalizedSubNetworkTag.length === 0) {
+          return false;
+        }
+
+        return `${segment.id} ${segment.nodeA} ${segment.nodeB} ${segment.subNetworkTag ?? ""}`
           .toLocaleLowerCase()
-          .includes(normalizedSegmentSearch)
-      ),
-    [normalizedSegmentSearch, sortedSegments]
+          .includes(normalizedSegmentSearch);
+      });
+    },
+    [normalizedSegmentSearch, segmentSubNetworkFilter, sortedSegments]
   );
   const visibleWires = useMemo(
     () =>
@@ -3166,19 +3219,37 @@ export function App({ store = appStore }: AppProps): ReactElement {
       <section className="panel-grid workspace-column workspace-column-left">
         <article className="panel" hidden={!isConnectorSubScreen}>
           <h2>Connectors</h2>
-          <label className="stack-label list-search">
-            Search
-            <input
-              aria-label="Search connectors"
-              value={connectorSearchQuery}
-              onChange={(event) => setConnectorSearchQuery(event.target.value)}
-              placeholder="Name or technical ID"
-            />
-          </label>
+          <div className="list-toolbar">
+            <label className="stack-label list-search">
+              Search
+              <input
+                aria-label="Search connectors"
+                value={connectorSearchQuery}
+                onChange={(event) => setConnectorSearchQuery(event.target.value)}
+                placeholder="Name or technical ID"
+              />
+            </label>
+            <div className="chip-group" role="group" aria-label="Connector occupancy filter">
+              {([
+                ["all", "All"],
+                ["occupied", "Occupied"],
+                ["free", "Free"]
+              ] as const).map(([filterId, label]) => (
+                <button
+                  key={filterId}
+                  type="button"
+                  className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+                  onClick={() => setConnectorOccupancyFilter(filterId)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           {connectors.length === 0 ? (
             <p className="empty-copy">No connector yet.</p>
           ) : visibleConnectors.length === 0 ? (
-            <p className="empty-copy">No connector matches the current search.</p>
+            <p className="empty-copy">No connector matches the current search/filter.</p>
           ) : (
             <table className="data-table">
               <thead>
@@ -3208,8 +3279,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
               </thead>
               <tbody>
                 {visibleConnectors.map((connector) => {
-                  const occupiedCount = selectConnectorCavityStatuses(state, connector.id).filter((slot) => slot.isOccupied)
-                    .length;
+                  const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
                   const isSelected = selectedConnectorId === connector.id;
 
                   return (
@@ -3244,19 +3314,37 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
         <article className="panel" hidden={!isSpliceSubScreen}>
           <h2>Splices</h2>
-          <label className="stack-label list-search">
-            Search
-            <input
-              aria-label="Search splices"
-              value={spliceSearchQuery}
-              onChange={(event) => setSpliceSearchQuery(event.target.value)}
-              placeholder="Name or technical ID"
-            />
-          </label>
+          <div className="list-toolbar">
+            <label className="stack-label list-search">
+              Search
+              <input
+                aria-label="Search splices"
+                value={spliceSearchQuery}
+                onChange={(event) => setSpliceSearchQuery(event.target.value)}
+                placeholder="Name or technical ID"
+              />
+            </label>
+            <div className="chip-group" role="group" aria-label="Splice occupancy filter">
+              {([
+                ["all", "All"],
+                ["occupied", "Occupied"],
+                ["free", "Free"]
+              ] as const).map(([filterId, label]) => (
+                <button
+                  key={filterId}
+                  type="button"
+                  className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+                  onClick={() => setSpliceOccupancyFilter(filterId)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           {splices.length === 0 ? (
             <p className="empty-copy">No splice yet.</p>
           ) : visibleSplices.length === 0 ? (
-            <p className="empty-copy">No splice matches the current search.</p>
+            <p className="empty-copy">No splice matches the current search/filter.</p>
           ) : (
             <table className="data-table">
               <thead>
@@ -3286,7 +3374,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
               </thead>
               <tbody>
                 {visibleSplices.map((splice) => {
-                  const occupiedCount = selectSplicePortStatuses(state, splice.id).filter((slot) => slot.isOccupied).length;
+                  const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
                   const isSelected = selectedSpliceId === splice.id;
 
                   return (
@@ -3414,19 +3502,37 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
         <article className="panel" hidden={!isSegmentSubScreen}>
           <h2>Segments</h2>
-          <label className="stack-label list-search">
-            Search
-            <input
-              aria-label="Search segments"
-              value={segmentSearchQuery}
-              onChange={(event) => setSegmentSearchQuery(event.target.value)}
-              placeholder="ID, node, sub-network"
-            />
-          </label>
+          <div className="list-toolbar">
+            <label className="stack-label list-search">
+              Search
+              <input
+                aria-label="Search segments"
+                value={segmentSearchQuery}
+                onChange={(event) => setSegmentSearchQuery(event.target.value)}
+                placeholder="ID, node, sub-network"
+              />
+            </label>
+            <div className="chip-group" role="group" aria-label="Segment sub-network filter">
+              {([
+                ["all", "All"],
+                ["default", "Default"],
+                ["tagged", "Tagged"]
+              ] as const).map(([filterId, label]) => (
+                <button
+                  key={filterId}
+                  type="button"
+                  className={segmentSubNetworkFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+                  onClick={() => setSegmentSubNetworkFilter(filterId)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           {segments.length === 0 ? (
             <p className="empty-copy">No segment yet.</p>
           ) : visibleSegments.length === 0 ? (
-            <p className="empty-copy">No segment matches the current search.</p>
+            <p className="empty-copy">No segment matches the current search/filter.</p>
           ) : (
             <table className="data-table">
               <thead>

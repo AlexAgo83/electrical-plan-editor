@@ -95,6 +95,29 @@ function createValidationIssueState(): AppState {
   };
 }
 
+function createConnectorOccupancyFilterState(): AppState {
+  return reduceAll([
+    appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector used", technicalId: "C-100", cavityCount: 2 }),
+    appActions.upsertConnector({ id: asConnectorId("C2"), name: "Connector free", technicalId: "C-200", cavityCount: 2 }),
+    appActions.upsertSplice({ id: asSpliceId("S1"), name: "Splice 1", technicalId: "S-1", portCount: 2 }),
+    appActions.upsertNode({ id: asNodeId("N-C1"), kind: "connector", connectorId: asConnectorId("C1") }),
+    appActions.upsertNode({ id: asNodeId("N-S1"), kind: "splice", spliceId: asSpliceId("S1") }),
+    appActions.upsertSegment({
+      id: asSegmentId("SEG-1"),
+      nodeA: asNodeId("N-C1"),
+      nodeB: asNodeId("N-S1"),
+      lengthMm: 30
+    }),
+    appActions.saveWire({
+      id: asWireId("W1"),
+      name: "Wire 1",
+      technicalId: "W-1",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 }
+    })
+  ]);
+}
+
 function getPanelByHeading(name: string): HTMLElement {
   const heading = screen
     .getAllByRole("heading", { name })
@@ -340,5 +363,22 @@ describe("App integration UI", () => {
     const appShell = document.querySelector("main.app-shell");
     expect(appShell).not.toBeNull();
     expect(appShell).toHaveClass("table-density-compact");
+  });
+
+  it("filters connectors by occupancy chips", () => {
+    const store = createAppStore(createConnectorOccupancyFilterState());
+    render(<App store={store} />);
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    expect(within(connectorsPanel).getByText("Connector used")).toBeInTheDocument();
+    expect(within(connectorsPanel).getByText("Connector free")).toBeInTheDocument();
+
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Free" }));
+    expect(within(connectorsPanel).queryByText("Connector used")).not.toBeInTheDocument();
+    expect(within(connectorsPanel).getByText("Connector free")).toBeInTheDocument();
+
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Occupied" }));
+    expect(within(connectorsPanel).getByText("Connector used")).toBeInTheDocument();
+    expect(within(connectorsPanel).queryByText("Connector free")).not.toBeInTheDocument();
   });
 });

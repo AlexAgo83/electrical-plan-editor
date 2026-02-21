@@ -2,7 +2,7 @@
 > From version: 0.1.0
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 80%
+> Progress: 95%
 > Complexity: Medium
 > Theme: UX/UI Data Ergonomics
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -35,9 +35,9 @@ Entity lists are improving with sorting, but operators still need faster lookup 
 - Related AC: AC5, AC7.
 - Status update:
   - Sort + search is available across all core entity lists.
-  - Filter chips are available for node kind and wire route mode.
+  - Filter chips are available for node kind, wire route mode, connector occupancy, splice occupancy, and segment sub-network scope.
   - Technical IDs are visually differentiated with monospace styling in list tables.
-  - Additional filter chips for connector/splice/segment dimensions remain possible.
+  - Row action patterns remain consistent across all list panels (`Select`, `Edit`, `Delete`).
 - References:
   - `logics/request/req_001_v1_ux_ui_operator_workspace.md`
   - `src/app/App.tsx`
