@@ -29,6 +29,19 @@ export function WorkspaceNavigation({
   onSubScreenChange
 }: WorkspaceNavigationProps): ReactElement {
   const showEntityNavigation = isModelingScreen || isAnalysisScreen;
+  const subScreenEntries = isAnalysisScreen
+    ? ([
+        ["connector", "Connector"],
+        ["splice", "Splice"],
+        ["wire", "Wire"]
+      ] as const)
+    : ([
+        ["connector", "Connector"],
+        ["splice", "Splice"],
+        ["node", "Node"],
+        ["segment", "Segment"],
+        ["wire", "Wire"]
+      ] as const);
 
   return (
     <section className="workspace-switcher">
@@ -63,13 +76,7 @@ export function WorkspaceNavigation({
         <section className="workspace-nav-subsection" aria-label="Entity navigation">
           <p className="meta-line workspace-nav-divider">Entity navigation</p>
           <div className="workspace-nav-row secondary">
-            {([
-              ["connector", "Connector"],
-              ["splice", "Splice"],
-              ["node", "Node"],
-              ["segment", "Segment"],
-              ["wire", "Wire"]
-            ] as const).map(([subScreenId, label]) => (
+            {subScreenEntries.map(([subScreenId, label]) => (
               <button
                 key={subScreenId}
                 type="button"

@@ -1,6 +1,6 @@
 import type { FormEvent, ReactElement } from "react";
 import { nextSortState } from "../../lib/app-utils";
-import type { Connector, Splice, Wire } from "../../../core/entities";
+import type { Connector, Splice, Wire, WireId } from "../../../core/entities";
 import type { ConnectorSynthesisRow, SortState, SpliceSynthesisRow } from "../../types/app-controller";
 
 interface OccupancyStatus {
@@ -44,6 +44,14 @@ interface AnalysisWorkspaceContentProps {
   sortedSpliceSynthesisRows: SpliceSynthesisRow[];
   spliceSynthesisSort: SortState;
   setSpliceSynthesisSort: (value: SortState | ((current: SortState) => SortState)) => void;
+  wireRouteFilter: "all" | "auto" | "locked";
+  setWireRouteFilter: (value: "all" | "auto" | "locked") => void;
+  wires: Wire[];
+  visibleWires: Wire[];
+  wireSort: SortState;
+  setWireSort: (value: SortState | ((current: SortState) => SortState)) => void;
+  selectedWireId: WireId | null;
+  onSelectWire: (wireId: WireId) => void;
   selectedWire: Wire | null;
   describeWireEndpoint: (endpoint: Wire["endpointA"]) => string;
   wireForcedRouteInput: string;
@@ -81,6 +89,14 @@ export function AnalysisWorkspaceContent({
   sortedSpliceSynthesisRows,
   spliceSynthesisSort,
   setSpliceSynthesisSort,
+  wireRouteFilter,
+  setWireRouteFilter,
+  wires,
+  visibleWires,
+  wireSort,
+  setWireSort,
+  selectedWireId,
+  onSelectWire,
   selectedWire,
   describeWireEndpoint,
   wireForcedRouteInput,
@@ -90,7 +106,7 @@ export function AnalysisWorkspaceContent({
   wireFormError
 }: AnalysisWorkspaceContentProps): ReactElement {
   return (
-    <section className="panel-grid">
+    <section className="panel-grid analysis-panel-grid">
       <section className="panel" hidden={!isConnectorSubScreen}>
         <h2>Connector cavities</h2>
         {selectedConnector === null ? (
@@ -295,19 +311,128 @@ export function AnalysisWorkspaceContent({
       </section>
 
       <section className="panel" hidden={!isWireSubScreen}>
-        <h2>Wire route control</h2>
+        <header className="list-panel-header">
+          <h2>Wires</h2>
+          <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
+            {([
+              ["all", "All"],
+              ["auto", "Auto"],
+              ["locked", "Locked"]
+            ] as const).map(([filterId, label]) => (
+              <button
+                key={filterId}
+                type="button"
+                className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+                onClick={() => setWireRouteFilter(filterId)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </header>
+        {wires.length === 0 ? (
+          <p className="empty-copy">No wire yet.</p>
+        ) : visibleWires.length === 0 ? (
+          <p className="empty-copy">No wire matches the current filters.</p>
+        ) : (
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>
+                  <button
+                    type="button"
+                    className="sort-header-button"
+                    onClick={() => setWireSort((current) => nextSortState(current, "name"))}
+                  >
+                    Name <span className="sort-indicator">{getSortIndicator(wireSort, "name")}</span>
+                  </button>
+                </th>
+                <th>
+                  <button
+                    type="button"
+                    className="sort-header-button"
+                    onClick={() => setWireSort((current) => nextSortState(current, "technicalId"))}
+                  >
+                    Technical ID <span className="sort-indicator">{getSortIndicator(wireSort, "technicalId")}</span>
+                  </button>
+                </th>
+                <th>Endpoints</th>
+                <th>Length (mm)</th>
+                <th>Route mode</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleWires.map((wire) => {
+                const isSelected = selectedWireId === wire.id;
+                return (
+                  <tr
+                    key={wire.id}
+                    className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
+                    aria-selected={isSelected}
+                    tabIndex={0}
+                    onClick={() => onSelectWire(wire.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onSelectWire(wire.id);
+                      }
+                    }}
+                  >
+                    <td>{wire.name}</td>
+                    <td className="technical-id">{wire.technicalId}</td>
+                    <td>
+                      {describeWireEndpoint(wire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(wire.endpointB)}
+                    </td>
+                    <td>{wire.lengthMm}</td>
+                    <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section className="panel" hidden={!isWireSubScreen}>
+        <header className="analysis-wire-route-header">
+          <h2>Wire route control</h2>
+          {selectedWire !== null ? (
+            <span className={selectedWire.isRouteLocked ? "analysis-wire-mode-chip is-locked" : "analysis-wire-mode-chip"}>
+              {selectedWire.isRouteLocked ? "Locked route" : "Auto route"}
+            </span>
+          ) : null}
+        </header>
         {selectedWire === null ? (
           <p className="empty-copy">Select a wire to lock a forced route or reset to auto shortest path.</p>
         ) : (
-          <>
-            <p className="meta-line">
-              <strong>{selectedWire.name}</strong> ({selectedWire.technicalId}) - {selectedWire.isRouteLocked ? "Locked" : "Auto"}
-            </p>
-            <p className="meta-line">
-              {describeWireEndpoint(selectedWire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(selectedWire.endpointB)}
-            </p>
-            <p className="meta-line">Current route: {selectedWire.routeSegmentIds.join(" -> ") || "(none)"}</p>
-            <label className="stack-label">
+          <div className="analysis-wire-route-content">
+            <article className="analysis-wire-identity">
+              <span className="analysis-wire-identity-label">Selected wire</span>
+              <p className="analysis-wire-identity-value">
+                <strong>{selectedWire.name}</strong> <span className="technical-id">({selectedWire.technicalId})</span>
+              </p>
+            </article>
+
+            <div className="route-preview-selection-strip">
+              <article>
+                <span>Start</span>
+                <strong>{describeWireEndpoint(selectedWire.endpointA)}</strong>
+              </article>
+              <span className="route-preview-selection-arrow" aria-hidden="true">
+                &rarr;
+              </span>
+              <article>
+                <span>End</span>
+                <strong>{describeWireEndpoint(selectedWire.endpointB)}</strong>
+              </article>
+            </div>
+
+            <article className="analysis-wire-route-current">
+              <span>Current route</span>
+              <p className="route-preview-path">{selectedWire.routeSegmentIds.join(" -> ") || "(none)"}</p>
+            </article>
+
+            <label className="stack-label analysis-wire-route-input">
               Forced route segment IDs (comma-separated)
               <input
                 value={wireForcedRouteInput}
@@ -315,7 +440,8 @@ export function AnalysisWorkspaceContent({
                 placeholder="segment-1, segment-2, segment-3"
               />
             </label>
-            <div className="row-actions">
+
+            <div className="row-actions analysis-wire-route-actions">
               <button type="button" onClick={handleLockWireRoute}>
                 Lock forced route
               </button>
@@ -324,11 +450,11 @@ export function AnalysisWorkspaceContent({
               </button>
             </div>
             {wireFormError !== null ? <small className="inline-error">{wireFormError}</small> : null}
-          </>
+          </div>
         )}
       </section>
 
-      {networkSummaryPanel}
+      <section className="analysis-network-summary-row">{networkSummaryPanel}</section>
     </section>
   );
 }

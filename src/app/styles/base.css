@@ -394,6 +394,33 @@ button {
   color: #e3ecf6;
 }
 
+.app-shell.theme-dark .analysis-wire-mode-chip {
+  border-color: #52708b;
+  background: #27415a;
+  color: #d5e5f4;
+}
+
+.app-shell.theme-dark .analysis-wire-mode-chip.is-locked {
+  border-color: #4f8570;
+  background: #254738;
+  color: #d7f6e3;
+}
+
+.app-shell.theme-dark .analysis-wire-identity,
+.app-shell.theme-dark .analysis-wire-route-current {
+  border-color: #48647d;
+  background: rgba(19, 34, 50, 0.72);
+}
+
+.app-shell.theme-dark .analysis-wire-identity-label,
+.app-shell.theme-dark .analysis-wire-route-current span {
+  color: #a9c0d4;
+}
+
+.app-shell.theme-dark .analysis-wire-identity-value {
+  color: #e3ecf6;
+}
+
 .app-shell.theme-dark .workspace-shell .workspace-health {
   border-top-color: #365069;
 }

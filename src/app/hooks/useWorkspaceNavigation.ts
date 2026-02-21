@@ -31,6 +31,16 @@ export function useWorkspaceNavigation(): UseWorkspaceNavigationResult {
     activeScreenRef.current = activeScreen;
   }, [activeScreen]);
 
+  useEffect(() => {
+    if (activeScreen !== "analysis") {
+      return;
+    }
+
+    if (activeSubScreen === "node" || activeSubScreen === "segment") {
+      setActiveSubScreen("connector");
+    }
+  }, [activeScreen, activeSubScreen]);
+
   return {
     activeScreen,
     setActiveScreen,

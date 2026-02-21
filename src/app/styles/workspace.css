@@ -220,6 +220,127 @@
   width: min(360px, calc(100vw - 2rem));
 }
 
+.analysis-network-summary-row {
+  grid-column: 1 / -1;
+}
+
+.analysis-panel-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.analysis-wire-route-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.55rem;
+  margin-bottom: 0.55rem;
+}
+
+.analysis-wire-route-header h2 {
+  margin: 0;
+}
+
+.analysis-wire-mode-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #8cb2c8;
+  background: #deedf7;
+  color: #19415d;
+  padding: 0.14rem 0.52rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.analysis-wire-mode-chip.is-locked {
+  border-color: #82af95;
+  background: #daefe0;
+  color: #244e39;
+}
+
+.analysis-wire-route-content {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.analysis-wire-identity {
+  border: 1px solid #c5d7e5;
+  border-radius: 0.6rem;
+  background: rgba(255, 255, 255, 0.66);
+  padding: 0.45rem 0.55rem;
+  display: grid;
+  gap: 0.12rem;
+}
+
+.analysis-wire-identity-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #4d697d;
+}
+
+.analysis-wire-identity-value {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  color: #15364d;
+}
+
+.analysis-wire-route-current {
+  border: 1px solid #c5d7e5;
+  border-radius: 0.6rem;
+  background: rgba(255, 255, 255, 0.66);
+  padding: 0.45rem 0.55rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.analysis-wire-route-current span {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4d697d;
+  font-weight: 700;
+}
+
+.analysis-wire-route-current .route-preview-path {
+  margin: 0;
+}
+
+.analysis-wire-route-input {
+  margin-top: 0.08rem;
+}
+
+.analysis-wire-route-actions button {
+  min-width: 10.2rem;
+}
+
+@media (min-width: 980px) {
+  .analysis-panel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .analysis-wire-route-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .analysis-wire-route-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .analysis-wire-route-actions button {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 .workspace-inspector-panel .inspector-context-panel {
   pointer-events: auto;
   box-shadow: 0 10px 26px rgba(9, 26, 40, 0.2);

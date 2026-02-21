@@ -110,6 +110,19 @@ export function NetworkSummaryPanel({
   const hasRouteSelection = routePreviewStartNodeId.length > 0 && routePreviewEndNodeId.length > 0;
   const selectedStartNode = nodes.find((node) => node.id === routePreviewStartNodeId) ?? null;
   const selectedEndNode = nodes.find((node) => node.id === routePreviewEndNodeId) ?? null;
+  const effectiveScale = networkScale > 0 ? networkScale : 1;
+  const visibleModelMinX = (0 - networkOffset.x) / effectiveScale;
+  const visibleModelMaxX = (networkViewWidth - networkOffset.x) / effectiveScale;
+  const visibleModelMinY = (0 - networkOffset.y) / effectiveScale;
+  const visibleModelMaxY = (networkViewHeight - networkOffset.y) / effectiveScale;
+  const gridStartX = Math.floor(visibleModelMinX / networkGridStep) * networkGridStep;
+  const gridEndX = Math.ceil(visibleModelMaxX / networkGridStep) * networkGridStep;
+  const gridStartY = Math.floor(visibleModelMinY / networkGridStep) * networkGridStep;
+  const gridEndY = Math.ceil(visibleModelMaxY / networkGridStep) * networkGridStep;
+  const verticalGridLineCount = Math.max(0, Math.ceil((gridEndX - gridStartX) / networkGridStep) + 1);
+  const horizontalGridLineCount = Math.max(0, Math.ceil((gridEndY - gridStartY) / networkGridStep) + 1);
+  const gridXPositions = Array.from({ length: verticalGridLineCount }, (_, index) => gridStartX + index * networkGridStep);
+  const gridYPositions = Array.from({ length: horizontalGridLineCount }, (_, index) => gridStartY + index * networkGridStep);
 
   return (
     <section className="network-summary-stack">
@@ -201,16 +214,14 @@ export function NetworkSummaryPanel({
             >
               {showNetworkGrid ? (
                 <g className="network-grid" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
-                  {Array.from({ length: Math.floor(networkViewWidth / networkGridStep) + 1 }).map((_, index) => {
-                    const position = index * networkGridStep;
+                  {gridXPositions.map((position) => {
                     return (
-                      <line key={`grid-v-${position}`} x1={position} y1={0} x2={position} y2={networkViewHeight} />
+                      <line key={`grid-v-${position}`} x1={position} y1={visibleModelMinY} x2={position} y2={visibleModelMaxY} />
                     );
                   })}
-                  {Array.from({ length: Math.floor(networkViewHeight / networkGridStep) + 1 }).map((_, index) => {
-                    const position = index * networkGridStep;
+                  {gridYPositions.map((position) => {
                     return (
-                      <line key={`grid-h-${position}`} x1={0} y1={position} x2={networkViewWidth} y2={position} />
+                      <line key={`grid-h-${position}`} x1={visibleModelMinX} y1={position} x2={visibleModelMaxX} y2={position} />
                     );
                   })}
                 </g>

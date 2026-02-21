@@ -85,7 +85,12 @@ export function useKeyboardShortcuts({
         const targetSubScreen = subScreenByKey[normalizedKey];
         if (targetSubScreen !== undefined) {
           event.preventDefault();
-          const nextScreenForSubScreen = activeScreenRef.current === "analysis" ? "analysis" : "modeling";
+          const nextScreenForSubScreen =
+            activeScreenRef.current === "analysis" && (targetSubScreen === "node" || targetSubScreen === "segment")
+              ? "modeling"
+              : activeScreenRef.current === "analysis"
+                ? "analysis"
+                : "modeling";
           setActiveScreen(nextScreenForSubScreen);
           setActiveSubScreen(targetSubScreen);
           return;

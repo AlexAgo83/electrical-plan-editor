@@ -379,6 +379,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const selectedNode = selectedNodeId === null ? null : (selectNodeById(state, selectedNodeId) ?? null);
   const selectedSegment = selectedSegmentId === null ? null : (selectSegmentById(state, selectedSegmentId) ?? null);
   const selectedWire = selectedWireId === null ? null : (selectWireById(state, selectedWireId) ?? null);
+  const selectedWireRouteInputValue = selectedWire === null ? "" : selectedWire.routeSegmentIds.join(", ");
 
   const connectorCavityStatuses = useMemo(() => {
     if (selectedConnectorId === null) {
@@ -557,6 +558,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNewNetworkTechnicalId(targetNetwork.technicalId);
     setNewNetworkDescription(targetNetwork.description ?? "");
   }, [networkFormMode, networkFormTargetId, state]);
+
+  useEffect(() => {
+    setWireForcedRouteInput(selectedWireRouteInputValue);
+  }, [selectedWireId, selectedWireRouteInputValue, setWireForcedRouteInput]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -1373,7 +1378,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   });
 
   const {
-    handleFocusCurrentSelectionOnCanvas,
+    handleOpenSelectionInAnalysis,
     handleOpenValidationScreen,
     moveValidationIssueCursor,
     moveVisibleValidationIssueCursor,
@@ -1568,7 +1573,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       spliceOccupiedCount={selectedSpliceOccupiedCount}
       describeNode={describeNode}
       onEditSelected={handleStartSelectedEdit}
-      onFocusCanvas={handleFocusCurrentSelectionOnCanvas}
+      onOpenAnalysis={handleOpenSelectionInAnalysis}
       onClearSelection={() => dispatchAction(appActions.clearSelection())}
     />
   );
@@ -1933,6 +1938,21 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           sortedSpliceSynthesisRows={sortedSpliceSynthesisRows}
           spliceSynthesisSort={spliceSynthesisSort}
           setSpliceSynthesisSort={setSpliceSynthesisSort}
+          wireRouteFilter={wireRouteFilter}
+          setWireRouteFilter={setWireRouteFilter}
+          wires={wires}
+          visibleWires={visibleWires}
+          wireSort={wireSort}
+          setWireSort={setWireSort}
+          selectedWireId={selectedWireId}
+          onSelectWire={(wireId) =>
+            dispatchAction(
+              appActions.select({
+                kind: "wire",
+                id: wireId
+              })
+            )
+          }
           selectedWire={selectedWire}
           describeWireEndpoint={describeWireEndpoint}
           wireForcedRouteInput={wireForcedRouteInput}

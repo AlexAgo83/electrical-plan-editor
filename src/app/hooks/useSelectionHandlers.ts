@@ -258,9 +258,13 @@ export function useSelectionHandlers({
     }
   }
 
-  function handleOpenSelectionInInspector(): void {
+  function handleOpenSelectionInAnalysis(): void {
     const targetSubScreen = resolveSelectedSubScreen();
     if (targetSubScreen === null) {
+      return;
+    }
+
+    if (targetSubScreen === "node" || targetSubScreen === "segment") {
       return;
     }
 
@@ -274,7 +278,7 @@ export function useSelectionHandlers({
       );
     }
 
-    setActiveScreen("modeling");
+    setActiveScreen("analysis");
     setActiveSubScreen(targetSubScreen);
   }
 
@@ -319,7 +323,7 @@ export function useSelectionHandlers({
     moveValidationIssueCursor,
     moveVisibleValidationIssueCursor,
     handleValidationIssueRowGoTo,
-    handleOpenSelectionInInspector,
+    handleOpenSelectionInAnalysis,
     handleStartSelectedEdit
   };
 }

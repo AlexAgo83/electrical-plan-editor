@@ -19,7 +19,7 @@ interface InspectorContextPanelProps {
   spliceOccupiedCount: number;
   describeNode: (node: NetworkNode) => string;
   onEditSelected: () => void;
-  onFocusCanvas: () => void;
+  onOpenAnalysis: () => void;
   onClearSelection: () => void;
 }
 
@@ -40,10 +40,12 @@ export function InspectorContextPanel({
   spliceOccupiedCount,
   describeNode,
   onEditSelected,
-  onFocusCanvas,
+  onOpenAnalysis,
   onClearSelection
 }: InspectorContextPanelProps): ReactElement {
   const isCollapsed = mode === "collapsed";
+  const canOpenAnalysis =
+    selectedSubScreen === "connector" || selectedSubScreen === "splice" || selectedSubScreen === "wire";
   const detailRows: Array<{ label: string; value: ReactElement | string }> = [];
 
   if (selectedConnector !== null) {
@@ -127,8 +129,8 @@ export function InspectorContextPanel({
             <button type="button" onClick={onEditSelected} disabled={selectedSubScreen === null}>
               Edit
             </button>
-            <button type="button" onClick={onFocusCanvas} disabled={selectedSubScreen === null}>
-              Focus canvas
+            <button type="button" onClick={onOpenAnalysis} disabled={!canOpenAnalysis}>
+              Analysis
             </button>
             <button type="button" onClick={onClearSelection}>
               Clear selection
