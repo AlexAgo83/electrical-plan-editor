@@ -1,5 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+test("bootstraps a comprehensive sample network on first launch", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Electrical Plan Editor" })).toBeVisible();
+
+  const connectorsPanel = page
+    .locator("article.panel")
+    .filter({ has: page.getByRole("heading", { name: "Connectors" }) });
+
+  await expect(connectorsPanel).toContainText("Power Source Connector");
+  await expect(connectorsPanel).toContainText("CONN-SRC-01");
+});
+
 test("create -> route -> force -> recompute flow works end-to-end", async ({ page }) => {
   test.setTimeout(60_000);
   const switchSubScreen = async (value: "connector" | "splice" | "node" | "segment" | "wire") => {
@@ -80,7 +92,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await wireForm.getByRole("button", { name: "Create" }).click();
 
   const wiresPanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Wires" }) });
-  const wireRow = wiresPanel.locator("tbody tr").first();
+  const wireRow = wiresPanel.locator("tbody tr").filter({ hasText: "Wire 1" }).first();
   await expect(wireRow).toContainText("100");
   await expect(wireRow).toContainText("Auto");
   await wireRow.getByRole("button", { name: "Select" }).click();
@@ -125,6 +137,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     .locator("article.panel")
     .filter({ has: page.getByRole("heading", { name: "Wires" }) })
     .locator("tbody tr")
+    .filter({ hasText: "Wire 1" })
     .first();
   await expect(refreshedWireRow.locator("td").nth(3)).toHaveText(String(initialWireLength + 40));
 });

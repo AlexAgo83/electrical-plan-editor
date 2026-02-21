@@ -14,7 +14,7 @@
     "lint": "eslint .",
     "test": "vitest",
     "test:ci": "vitest run --coverage",
-    "test:e2e": "playwright test --reporter=line"
+    "test:e2e": "env -u NO_COLOR playwright test --reporter=line"
   },
   "dependencies": {
     "react": "^19.0.0",
