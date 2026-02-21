@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore
 } from "react";
@@ -81,6 +82,7 @@ function normalizeSearch(raw: string): string {
 
 const NETWORK_VIEW_WIDTH = 760;
 const NETWORK_VIEW_HEIGHT = 420;
+const HISTORY_LIMIT = 60;
 
 interface NodePosition {
   x: number;
@@ -296,6 +298,10 @@ export function App({ store = appStore }: AppProps): ReactElement {
   });
   const [manualNodePositions, setManualNodePositions] = useState<Record<NodeId, NodePosition>>({} as Record<NodeId, NodePosition>);
   const [draggingNodeId, setDraggingNodeId] = useState<NodeId | null>(null);
+  const [undoStack, setUndoStack] = useState<ReturnType<AppStore["getState"]>[]>([]);
+  const [redoStack, setRedoStack] = useState<ReturnType<AppStore["getState"]>[]>([]);
+  const [saveStatus, setSaveStatus] = useState<"saved" | "unsaved" | "error">("saved");
+  const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const selected = selectSelection(state);
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
@@ -373,6 +379,8 @@ export function App({ store = appStore }: AppProps): ReactElement {
   const isAnalysisScreen = activeScreen === "analysis";
   const isValidationScreen = activeScreen === "validation";
   const isSettingsScreen = activeScreen === "settings";
+  const isUndoAvailable = undoStack.length > 0;
+  const isRedoAvailable = redoStack.length > 0;
   const isConnectorSubScreen = activeSubScreen === "connector";
   const isSpliceSubScreen = activeSubScreen === "splice";
   const isNodeSubScreen = activeSubScreen === "node";
@@ -723,6 +731,117 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
   const lastError = selectLastError(state);
 
+  useEffect(() => {
+    return () => {
+      if (saveStatusTimeoutRef.current !== null) {
+        clearTimeout(saveStatusTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  function queueSavedStatus(): void {
+    if (saveStatusTimeoutRef.current !== null) {
+      clearTimeout(saveStatusTimeoutRef.current);
+    }
+
+    saveStatusTimeoutRef.current = setTimeout(() => {
+      setSaveStatus((current) => (current === "unsaved" ? "saved" : current));
+      saveStatusTimeoutRef.current = null;
+    }, 250);
+  }
+
+  function dispatchAction(
+    action: Parameters<AppStore["dispatch"]>[0],
+    options?: {
+      trackHistory?: boolean;
+    }
+  ): void {
+    const shouldTrackHistory = options?.trackHistory ?? !action.type.startsWith("ui/");
+    const previousState = store.getState();
+
+    try {
+      store.dispatch(action);
+    } catch {
+      setSaveStatus("error");
+      return;
+    }
+
+    const nextState = store.getState();
+    if (nextState === previousState) {
+      return;
+    }
+
+    if (!shouldTrackHistory) {
+      return;
+    }
+
+    setUndoStack((previous) => {
+      const next = [...previous, previousState];
+      return next.length > HISTORY_LIMIT ? next.slice(next.length - HISTORY_LIMIT) : next;
+    });
+    setRedoStack([]);
+    setSaveStatus("unsaved");
+    queueSavedStatus();
+  }
+
+  function handleUndo(): void {
+    if (undoStack.length === 0) {
+      return;
+    }
+
+    const previousState = undoStack[undoStack.length - 1];
+    if (previousState === undefined) {
+      return;
+    }
+
+    const currentState = store.getState();
+    try {
+      store.replaceState(previousState);
+    } catch {
+      setSaveStatus("error");
+      return;
+    }
+
+    setUndoStack((previous) => previous.slice(0, -1));
+    setRedoStack((previous) => {
+      const next = [...previous, currentState];
+      return next.length > HISTORY_LIMIT ? next.slice(next.length - HISTORY_LIMIT) : next;
+    });
+    setModeAnchorNodeId(null);
+    setPendingNewNodePosition(null);
+    setSaveStatus("unsaved");
+    queueSavedStatus();
+  }
+
+  function handleRedo(): void {
+    if (redoStack.length === 0) {
+      return;
+    }
+
+    const redoState = redoStack[redoStack.length - 1];
+    if (redoState === undefined) {
+      return;
+    }
+
+    const currentState = store.getState();
+    try {
+      store.replaceState(redoState);
+    } catch {
+      setSaveStatus("error");
+      return;
+    }
+
+    setRedoStack((previous) => previous.slice(0, -1));
+    setUndoStack((previous) => {
+      const next = [...previous, currentState];
+      return next.length > HISTORY_LIMIT ? next.slice(next.length - HISTORY_LIMIT) : next;
+    });
+    setModeAnchorNodeId(null);
+    setPendingNewNodePosition(null);
+    setSaveStatus("unsaved");
+    queueSavedStatus();
+  }
+
   function getSortIndicator(sortState: SortState, field: SortField): string {
     if (sortState.field !== field) {
       return "";
@@ -762,7 +881,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setConnectorName(connector.name);
     setConnectorTechnicalId(connector.technicalId);
     setCavityCount(String(connector.cavityCount));
-    store.dispatch(appActions.select({ kind: "connector", id: connector.id }));
+    dispatchAction(appActions.select({ kind: "connector", id: connector.id }));
   }
 
   function handleConnectorSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -783,7 +902,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
         ? editingConnectorId
         : (createEntityId("conn") as ConnectorId);
 
-    store.dispatch(
+    dispatchAction(
       appActions.upsertConnector({
         id: connectorId,
         name: trimmedName,
@@ -794,13 +913,13 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     const nextState = store.getState();
     if (nextState.connectors.byId[connectorId] !== undefined) {
-      store.dispatch(appActions.select({ kind: "connector", id: connectorId }));
+      dispatchAction(appActions.select({ kind: "connector", id: connectorId }));
       resetConnectorForm();
     }
   }
 
   function handleConnectorDelete(connectorId: ConnectorId): void {
-    store.dispatch(appActions.removeConnector(connectorId));
+    dispatchAction(appActions.removeConnector(connectorId));
 
     if (editingConnectorId === connectorId) {
       resetConnectorForm();
@@ -815,7 +934,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
 
     const cavityIndex = toPositiveInteger(cavityIndexInput);
-    store.dispatch(appActions.occupyConnectorCavity(selectedConnectorId, cavityIndex, connectorOccupantRefInput));
+    dispatchAction(appActions.occupyConnectorCavity(selectedConnectorId, cavityIndex, connectorOccupantRefInput));
   }
 
   function handleReleaseCavity(cavityIndex: number): void {
@@ -823,7 +942,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
       return;
     }
 
-    store.dispatch(appActions.releaseConnectorCavity(selectedConnectorId, cavityIndex));
+    dispatchAction(appActions.releaseConnectorCavity(selectedConnectorId, cavityIndex));
   }
 
   function resetSpliceForm(): void {
@@ -841,7 +960,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setSpliceName(splice.name);
     setSpliceTechnicalId(splice.technicalId);
     setPortCount(String(splice.portCount));
-    store.dispatch(appActions.select({ kind: "splice", id: splice.id }));
+    dispatchAction(appActions.select({ kind: "splice", id: splice.id }));
   }
 
   function handleSpliceSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -862,7 +981,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
         ? editingSpliceId
         : (createEntityId("splice") as SpliceId);
 
-    store.dispatch(
+    dispatchAction(
       appActions.upsertSplice({
         id: spliceId,
         name: trimmedName,
@@ -873,13 +992,13 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     const nextState = store.getState();
     if (nextState.splices.byId[spliceId] !== undefined) {
-      store.dispatch(appActions.select({ kind: "splice", id: spliceId }));
+      dispatchAction(appActions.select({ kind: "splice", id: spliceId }));
       resetSpliceForm();
     }
   }
 
   function handleSpliceDelete(spliceId: SpliceId): void {
-    store.dispatch(appActions.removeSplice(spliceId));
+    dispatchAction(appActions.removeSplice(spliceId));
 
     if (editingSpliceId === spliceId) {
       resetSpliceForm();
@@ -894,7 +1013,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
 
     const portIndex = toPositiveInteger(portIndexInput);
-    store.dispatch(appActions.occupySplicePort(selectedSpliceId, portIndex, spliceOccupantRefInput));
+    dispatchAction(appActions.occupySplicePort(selectedSpliceId, portIndex, spliceOccupantRefInput));
   }
 
   function handleReleasePort(portIndex: number): void {
@@ -902,7 +1021,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
       return;
     }
 
-    store.dispatch(appActions.releaseSplicePort(selectedSpliceId, portIndex));
+    dispatchAction(appActions.releaseSplicePort(selectedSpliceId, portIndex));
   }
 
   function resetNodeForm(): void {
@@ -925,7 +1044,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setNodeLabel(node.kind === "intermediate" ? node.label : "");
     setNodeConnectorId(node.kind === "connector" ? node.connectorId : "");
     setNodeSpliceId(node.kind === "splice" ? node.spliceId : "");
-    store.dispatch(appActions.select({ kind: "node", id: node.id }));
+    dispatchAction(appActions.select({ kind: "node", id: node.id }));
   }
 
   function handleNodeSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -956,7 +1075,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
       }
 
       setNodeFormError(null);
-      store.dispatch(appActions.upsertNode({ id: nodeId, kind: "intermediate", label: trimmedLabel }));
+      dispatchAction(appActions.upsertNode({ id: nodeId, kind: "intermediate", label: trimmedLabel }));
     }
 
     if (nodeKind === "connector") {
@@ -966,7 +1085,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
       }
 
       setNodeFormError(null);
-      store.dispatch(
+      dispatchAction(
         appActions.upsertNode({
           id: nodeId,
           kind: "connector",
@@ -982,7 +1101,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
       }
 
       setNodeFormError(null);
-      store.dispatch(
+      dispatchAction(
         appActions.upsertNode({
           id: nodeId,
           kind: "splice",
@@ -999,13 +1118,13 @@ export function App({ store = appStore }: AppProps): ReactElement {
           [nodeId]: pendingNewNodePosition
         }));
       }
-      store.dispatch(appActions.select({ kind: "node", id: nodeId }));
+      dispatchAction(appActions.select({ kind: "node", id: nodeId }));
       resetNodeForm();
     }
   }
 
   function handleNodeDelete(nodeId: NodeId): void {
-    store.dispatch(appActions.removeNode(nodeId));
+    dispatchAction(appActions.removeNode(nodeId));
 
     if (editingNodeId === nodeId) {
       resetNodeForm();
@@ -1031,7 +1150,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setSegmentNodeB(segment.nodeB);
     setSegmentLengthMm(String(segment.lengthMm));
     setSegmentSubNetworkTag(segment.subNetworkTag ?? "");
-    store.dispatch(appActions.select({ kind: "segment", id: segment.id }));
+    dispatchAction(appActions.select({ kind: "segment", id: segment.id }));
   }
 
   function handleSegmentSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -1067,7 +1186,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     setSegmentFormError(null);
 
-    store.dispatch(
+    dispatchAction(
       appActions.upsertSegment({
         id: segmentId,
         nodeA: segmentNodeA as NodeId,
@@ -1079,13 +1198,13 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     const nextState = store.getState();
     if (nextState.segments.byId[segmentId] !== undefined) {
-      store.dispatch(appActions.select({ kind: "segment", id: segmentId }));
+      dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
       resetSegmentForm();
     }
   }
 
   function handleSegmentDelete(segmentId: SegmentId): void {
-    store.dispatch(appActions.removeSegment(segmentId));
+    dispatchAction(appActions.removeSegment(segmentId));
 
     if (editingSegmentId === segmentId) {
       resetSegmentForm();
@@ -1143,7 +1262,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
 
     setWireForcedRouteInput(wire.routeSegmentIds.join(", "));
-    store.dispatch(appActions.select({ kind: "wire", id: wire.id }));
+    dispatchAction(appActions.select({ kind: "wire", id: wire.id }));
   }
 
   function buildWireEndpoint(side: "A" | "B"): WireEndpoint | null {
@@ -1217,7 +1336,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     setWireFormError(null);
 
     const wireId = wireFormMode === "edit" && editingWireId !== null ? editingWireId : (createEntityId("wire") as WireId);
-    store.dispatch(
+    dispatchAction(
       appActions.saveWire({
         id: wireId,
         name: normalizedName,
@@ -1229,14 +1348,14 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
     const nextState = store.getState();
     if (nextState.wires.byId[wireId] !== undefined) {
-      store.dispatch(appActions.select({ kind: "wire", id: wireId }));
+      dispatchAction(appActions.select({ kind: "wire", id: wireId }));
       resetWireForm();
       setWireForcedRouteInput(nextState.wires.byId[wireId].routeSegmentIds.join(", "));
     }
   }
 
   function handleWireDelete(wireId: WireId): void {
-    store.dispatch(appActions.removeWire(wireId));
+    dispatchAction(appActions.removeWire(wireId));
     if (editingWireId === wireId) {
       resetWireForm();
     }
@@ -1258,7 +1377,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
 
     setWireFormError(null);
-    store.dispatch(appActions.lockWireRoute(selectedWire.id, forcedSegmentIds));
+    dispatchAction(appActions.lockWireRoute(selectedWire.id, forcedSegmentIds));
   }
 
   function handleResetWireRoute(): void {
@@ -1267,7 +1386,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
 
     setWireFormError(null);
-    store.dispatch(appActions.resetWireRoute(selectedWire.id));
+    dispatchAction(appActions.resetWireRoute(selectedWire.id));
     const nextState = store.getState();
     const updatedWire = nextState.wires.byId[selectedWire.id];
     if (updatedWire !== undefined) {
@@ -1278,7 +1397,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
   function handleValidationIssueGoTo(issue: ValidationIssue): void {
     setActiveScreen("modeling");
     setActiveSubScreen(issue.subScreen);
-    store.dispatch(
+    dispatchAction(
       appActions.select({
         kind: issue.selectionKind,
         id: issue.selectionId
@@ -1317,7 +1436,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     if (interactionMode !== "select") {
       return;
     }
-    store.dispatch(appActions.select({ kind: "segment", id: segmentId }));
+    dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
   }
 
   function handleNetworkNodeClick(nodeId: NodeId): void {
@@ -1327,7 +1446,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
     }
 
     if (interactionMode === "select") {
-      store.dispatch(appActions.select({ kind: "node", id: nodeId }));
+      dispatchAction(appActions.select({ kind: "node", id: nodeId }));
       return;
     }
 
@@ -1702,7 +1821,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
       {lastError !== null ? (
         <section className="error-banner" role="alert">
           <p>{lastError}</p>
-          <button type="button" onClick={() => store.dispatch(appActions.clearError())}>
+          <button type="button" onClick={() => dispatchAction(appActions.clearError())}>
             Clear
           </button>
         </section>
@@ -1777,6 +1896,20 @@ export function App({ store = appStore }: AppProps): ReactElement {
               : isValidationScreen
                 ? "Validation center: grouped model integrity issues with one-click navigation."
                 : "Settings workspace: workspace preferences and project-level options."}
+        </p>
+      </section>
+
+      <section className="workspace-meta">
+        <div className="row-actions compact">
+          <button type="button" onClick={handleUndo} disabled={!isUndoAvailable}>
+            Undo
+          </button>
+          <button type="button" onClick={handleRedo} disabled={!isRedoAvailable}>
+            Redo
+          </button>
+        </div>
+        <p className={`save-status is-${saveStatus}`}>
+          State: {saveStatus === "saved" ? "Saved" : saveStatus === "unsaved" ? "Unsaved" : "Error"}
         </p>
       </section>
 
@@ -2254,7 +2387,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                         <div className="row-actions compact">
                           <button
                             type="button"
-                            onClick={() => store.dispatch(appActions.select({ kind: "connector", id: connector.id }))}
+                            onClick={() => dispatchAction(appActions.select({ kind: "connector", id: connector.id }))}
                           >
                             Select
                           </button>
@@ -2333,7 +2466,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                         <div className="row-actions compact">
                           <button
                             type="button"
-                            onClick={() => store.dispatch(appActions.select({ kind: "splice", id: splice.id }))}
+                            onClick={() => dispatchAction(appActions.select({ kind: "splice", id: splice.id }))}
                           >
                             Select
                           </button>
@@ -2425,7 +2558,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                       <td>{linkedSegments}</td>
                       <td>
                         <div className="row-actions compact">
-                          <button type="button" onClick={() => store.dispatch(appActions.select({ kind: "node", id: node.id }))}>
+                          <button type="button" onClick={() => dispatchAction(appActions.select({ kind: "node", id: node.id }))}>
                             Select
                           </button>
                           <button type="button" onClick={() => startNodeEdit(node)}>
@@ -2508,7 +2641,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                         <div className="row-actions compact">
                           <button
                             type="button"
-                            onClick={() => store.dispatch(appActions.select({ kind: "segment", id: segment.id }))}
+                            onClick={() => dispatchAction(appActions.select({ kind: "segment", id: segment.id }))}
                           >
                             Select
                           </button>
@@ -2608,7 +2741,7 @@ export function App({ store = appStore }: AppProps): ReactElement {
                             type="button"
                             onClick={() => {
                               setWireForcedRouteInput(wire.routeSegmentIds.join(", "));
-                              store.dispatch(appActions.select({ kind: "wire", id: wire.id }));
+                              dispatchAction(appActions.select({ kind: "wire", id: wire.id }));
                             }}
                           >
                             Select

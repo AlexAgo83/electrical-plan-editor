@@ -115,6 +115,32 @@ function switchSubScreen(target: "connector" | "splice" | "node" | "segment" | "
 }
 
 describe("App integration UI", () => {
+  it("supports undo and redo for modeling actions", () => {
+    const store = createAppStore(createInitialState());
+    render(<App store={store} />);
+
+    const connectorFormPanel = getPanelByHeading("Create Connector");
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
+      target: { value: "Undo test connector" }
+    });
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Technical ID"), {
+      target: { value: "C-UNDO-1" }
+    });
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Cavity count"), {
+      target: { value: "2" }
+    });
+    fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    expect(within(connectorsPanel).getByText("Undo test connector")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    expect(within(connectorsPanel).queryByText("Undo test connector")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Redo" }));
+    expect(within(connectorsPanel).getByText("Undo test connector")).toBeInTheDocument();
+  });
+
   it("reflects connector cavity occupancy in real time", () => {
     const store = createAppStore(createUiIntegrationState());
     render(<App store={store} />);

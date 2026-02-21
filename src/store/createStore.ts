@@ -6,6 +6,7 @@ type StoreListener = () => void;
 
 export interface AppStore {
   dispatch: (action: AppAction) => void;
+  replaceState: (nextState: AppState) => void;
   getState: () => AppState;
   subscribe: (listener: StoreListener) => () => void;
 }
@@ -17,6 +18,15 @@ export function createAppStore(initialState: AppState = createInitialState()): A
   return {
     dispatch(action) {
       const nextState = appReducer(currentState, action);
+      if (nextState === currentState) {
+        return;
+      }
+
+      currentState = nextState;
+      listeners.forEach((listener) => listener());
+    },
+
+    replaceState(nextState) {
       if (nextState === currentState) {
         return;
       }
