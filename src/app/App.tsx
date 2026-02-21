@@ -51,6 +51,11 @@ import {
   selectWires
 } from "../store";
 import { appStore } from "./store";
+import { InspectorContextPanel } from "./components/InspectorContextPanel";
+import { NetworkSummaryPanel } from "./components/NetworkSummaryPanel";
+import { WorkspaceNavigation } from "./components/WorkspaceNavigation";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import { useUiPreferences } from "./hooks/useUiPreferences";
 import "./styles.css";
 
 function useAppSnapshot(store: AppStore) {
@@ -90,8 +95,6 @@ const HISTORY_LIMIT = 60;
 const NETWORK_GRID_STEP = 20;
 const NETWORK_MIN_SCALE = 0.6;
 const NETWORK_MAX_SCALE = 2.2;
-const UI_PREFERENCES_SCHEMA_VERSION = 1;
-const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 interface NodePosition {
   x: number;
@@ -104,19 +107,6 @@ type SortDirection = "asc" | "desc";
 interface SortState {
   field: SortField;
   direction: SortDirection;
-}
-
-interface UiPreferencesPayload {
-  schemaVersion: number;
-  tableDensity: TableDensity;
-  defaultSortField: SortField;
-  defaultSortDirection: SortDirection;
-  defaultIdSortDirection: SortDirection;
-  canvasDefaultShowGrid: boolean;
-  canvasDefaultSnapToGrid: boolean;
-  canvasResetZoomPercentInput: string;
-  showShortcutHints: boolean;
-  keyboardShortcutsEnabled: boolean;
 }
 
 interface ConnectorSynthesisRow {
@@ -143,42 +133,6 @@ function clamp(value: number, min: number, max: number): number {
 
 function snapToGrid(value: number, step: number): number {
   return Math.round(value / step) * step;
-}
-
-function isEditableElement(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) {
-    return false;
-  }
-
-  const tagName = target.tagName;
-  if (tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT") {
-    return true;
-  }
-
-  return target.isContentEditable;
-}
-
-function readUiPreferences(): Partial<UiPreferencesPayload> | null {
-  try {
-    const raw = localStorage.getItem(UI_PREFERENCES_STORAGE_KEY);
-    if (raw === null) {
-      return null;
-    }
-
-    const parsed: unknown = JSON.parse(raw);
-    if (typeof parsed !== "object" || parsed === null) {
-      return null;
-    }
-
-    const payload = parsed as Partial<UiPreferencesPayload>;
-    if (payload.schemaVersion !== UI_PREFERENCES_SCHEMA_VERSION) {
-      return null;
-    }
-
-    return payload;
-  } catch {
-    return null;
-  }
 }
 
 function sortByNameAndTechnicalId<T>(
@@ -591,87 +545,41 @@ export function App({ store = appStore }: AppProps): ReactElement {
   }, [canvasResetZoomPercentInput]);
   const configuredResetZoomPercent = Math.round(configuredResetScale * 100);
 
-  useEffect(() => {
-    const preferences = readUiPreferences();
-    if (preferences !== null) {
-      const sortField = preferences.defaultSortField === "technicalId" ? "technicalId" : "name";
-      const sortDirection = preferences.defaultSortDirection === "desc" ? "desc" : "asc";
-      const idSortDirection = preferences.defaultIdSortDirection === "desc" ? "desc" : "asc";
-      const showGridDefault =
-        typeof preferences.canvasDefaultShowGrid === "boolean" ? preferences.canvasDefaultShowGrid : true;
-      const snapDefault =
-        typeof preferences.canvasDefaultSnapToGrid === "boolean" ? preferences.canvasDefaultSnapToGrid : false;
-      const rawResetZoomPercent =
-        typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "100";
-      const parsedResetZoomPercent = Number(rawResetZoomPercent);
-      const resetScale = Number.isFinite(parsedResetZoomPercent)
-        ? clamp(parsedResetZoomPercent / 100, NETWORK_MIN_SCALE, NETWORK_MAX_SCALE)
-        : 1;
-
-      setTableDensity(preferences.tableDensity === "compact" ? "compact" : "comfortable");
-      setDefaultSortField(sortField);
-      setDefaultSortDirection(sortDirection);
-      setDefaultIdSortDirection(idSortDirection);
-      setConnectorSort({ field: sortField, direction: sortDirection });
-      setSpliceSort({ field: sortField, direction: sortDirection });
-      setWireSort({ field: sortField, direction: sortDirection });
-      setConnectorSynthesisSort({ field: sortField, direction: sortDirection });
-      setSpliceSynthesisSort({ field: sortField, direction: sortDirection });
-      setNodeIdSortDirection(idSortDirection);
-      setSegmentIdSortDirection(idSortDirection);
-      setCanvasDefaultShowGrid(showGridDefault);
-      setCanvasDefaultSnapToGrid(snapDefault);
-      setShowNetworkGrid(showGridDefault);
-      setSnapNodesToGrid(snapDefault);
-      setCanvasResetZoomPercentInput(rawResetZoomPercent);
-      setNetworkScale(resetScale);
-      setNetworkOffset({ x: 0, y: 0 });
-      setShowShortcutHints(
-        typeof preferences.showShortcutHints === "boolean" ? preferences.showShortcutHints : true
-      );
-      setKeyboardShortcutsEnabled(
-        typeof preferences.keyboardShortcutsEnabled === "boolean" ? preferences.keyboardShortcutsEnabled : true
-      );
-    }
-
-    setPreferencesHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (!preferencesHydrated) {
-      return;
-    }
-
-    const payload: UiPreferencesPayload = {
-      schemaVersion: UI_PREFERENCES_SCHEMA_VERSION,
-      tableDensity,
-      defaultSortField,
-      defaultSortDirection,
-      defaultIdSortDirection,
-      canvasDefaultShowGrid,
-      canvasDefaultSnapToGrid,
-      canvasResetZoomPercentInput,
-      showShortcutHints,
-      keyboardShortcutsEnabled
-    };
-
-    try {
-      localStorage.setItem(UI_PREFERENCES_STORAGE_KEY, JSON.stringify(payload));
-    } catch {
-      // Ignore storage write failures to preserve runtime behavior.
-    }
-  }, [
+  useUiPreferences({
+    networkMinScale: NETWORK_MIN_SCALE,
+    networkMaxScale: NETWORK_MAX_SCALE,
+    tableDensity,
+    defaultSortField,
+    defaultSortDirection,
+    defaultIdSortDirection,
     canvasDefaultShowGrid,
     canvasDefaultSnapToGrid,
     canvasResetZoomPercentInput,
-    defaultIdSortDirection,
-    defaultSortDirection,
-    defaultSortField,
+    showShortcutHints,
     keyboardShortcutsEnabled,
     preferencesHydrated,
-    showShortcutHints,
-    tableDensity
-  ]);
+    setTableDensity,
+    setDefaultSortField,
+    setDefaultSortDirection,
+    setDefaultIdSortDirection,
+    setConnectorSort,
+    setSpliceSort,
+    setWireSort,
+    setConnectorSynthesisSort,
+    setSpliceSynthesisSort,
+    setNodeIdSortDirection,
+    setSegmentIdSortDirection,
+    setCanvasDefaultShowGrid,
+    setCanvasDefaultSnapToGrid,
+    setShowNetworkGrid,
+    setSnapNodesToGrid,
+    setCanvasResetZoomPercentInput,
+    setNetworkScale,
+    setNetworkOffset,
+    setShowShortcutHints,
+    setKeyboardShortcutsEnabled,
+    setPreferencesHydrated
+  });
   const describeWireEndpoint = useCallback((endpoint: WireEndpoint): string => {
     if (endpoint.kind === "connectorCavity") {
       const connector = connectorMap.get(endpoint.connectorId);
@@ -1854,114 +1762,18 @@ export function App({ store = appStore }: AppProps): ReactElement {
     };
   });
 
-  useEffect(() => {
-    if (!keyboardShortcutsEnabled) {
-      return;
-    }
-
-    const onKeyDown = (event: KeyboardEvent): void => {
-      if (isEditableElement(event.target)) {
-        return;
-      }
-
-      const normalizedKey = event.key.toLocaleLowerCase();
-      const hasCommandModifier = event.metaKey || event.ctrlKey;
-      if (hasCommandModifier) {
-        if (normalizedKey === "z") {
-          event.preventDefault();
-          if (event.shiftKey) {
-            redoActionRef.current();
-            return;
-          }
-
-          undoActionRef.current();
-          return;
-        }
-
-        if (normalizedKey === "y") {
-          event.preventDefault();
-          redoActionRef.current();
-        }
-        return;
-      }
-
-      if (!event.altKey) {
-        return;
-      }
-
-      if (event.shiftKey) {
-        const subScreenByKey: Record<string, SubScreenId | undefined> = {
-          "1": "connector",
-          "2": "splice",
-          "3": "node",
-          "4": "segment",
-          "5": "wire"
-        };
-        const targetSubScreen = subScreenByKey[normalizedKey];
-        if (targetSubScreen !== undefined) {
-          event.preventDefault();
-          const nextScreenForSubScreen = activeScreenRef.current === "analysis" ? "analysis" : "modeling";
-          setActiveScreen(nextScreenForSubScreen);
-          setActiveSubScreen(targetSubScreen);
-          return;
-        }
-      } else {
-        const screenByKey: Record<string, ScreenId | undefined> = {
-          "1": "modeling",
-          "2": "analysis",
-          "3": "validation",
-          "4": "settings"
-        };
-        const targetScreen = screenByKey[normalizedKey];
-        if (targetScreen !== undefined) {
-          event.preventDefault();
-          setActiveScreen(targetScreen);
-          return;
-        }
-      }
-
-      if (normalizedKey === "f") {
-        if (activeScreenRef.current === "modeling" || activeScreenRef.current === "analysis") {
-          event.preventDefault();
-          fitNetworkToContentRef.current();
-        }
-        return;
-      }
-
-      if (normalizedKey === "j") {
-        event.preventDefault();
-        previousValidationIssueRef.current();
-        return;
-      }
-
-      if (normalizedKey === "k") {
-        event.preventDefault();
-        nextValidationIssueRef.current();
-        return;
-      }
-
-      const modeByKey: Record<string, InteractionMode | undefined> = {
-        v: "select",
-        n: "addNode",
-        g: "addSegment",
-        c: "connect",
-        r: "route"
-      };
-      const targetMode = modeByKey[normalizedKey];
-      if (targetMode !== undefined) {
-        event.preventDefault();
-        if (activeScreenRef.current !== "modeling" && activeScreenRef.current !== "analysis") {
-          setActiveScreen("modeling");
-        }
-        setInteractionMode(targetMode);
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [keyboardShortcutsEnabled]);
+  useKeyboardShortcuts({
+    keyboardShortcutsEnabled,
+    activeScreenRef,
+    undoActionRef,
+    redoActionRef,
+    fitNetworkToContentRef,
+    previousValidationIssueRef,
+    nextValidationIssueRef,
+    setActiveScreen,
+    setActiveSubScreen,
+    setInteractionMode
+  });
 
   function getSortIndicator(sortState: SortState, field: SortField): string {
     if (sortState.field !== field) {
@@ -3026,362 +2838,83 @@ export function App({ store = appStore }: AppProps): ReactElement {
       ? "No issue"
       : `${currentIssuePositionInScope >= 0 ? currentIssuePositionInScope + 1 : 1}/${issueNavigationScopeIssues.length}`;
   const networkScalePercent = Math.round(networkScale * 100);
+  const selectedConnectorOccupiedCount =
+    selectedConnector === null
+      ? 0
+      : selectConnectorCavityStatuses(state, selectedConnector.id).filter((slot) => slot.isOccupied).length;
+  const selectedSpliceOccupiedCount =
+    selectedSplice === null
+      ? 0
+      : selectSplicePortStatuses(state, selectedSplice.id).filter((slot) => slot.isOccupied).length;
   const inspectorContextPanel = (
-    <article className="panel">
-      <h2>Inspector context</h2>
-      {selected === null ? (
-        <p className="empty-copy">No entity selected. Select a row or a canvas item to inspect details here.</p>
-      ) : (
-        <>
-          <p className="meta-line">
-            Focused entity: <strong>{selected.kind}</strong> <span className="technical-id">{selected.id}</span>
-          </p>
-          <div className="selection-snapshot inspector-snapshot">
-            {selectedConnector !== null ? (
-              <>
-                <p>Name: {selectedConnector.name}</p>
-                <p>Technical ID: <span className="technical-id">{selectedConnector.technicalId}</span></p>
-                <p>
-                  Cavities: {selectedConnector.cavityCount} / Occupied:{" "}
-                  {selectConnectorCavityStatuses(state, selectedConnector.id).filter((slot) => slot.isOccupied).length}
-                </p>
-              </>
-            ) : null}
-            {selectedSplice !== null ? (
-              <>
-                <p>Name: {selectedSplice.name}</p>
-                <p>Technical ID: <span className="technical-id">{selectedSplice.technicalId}</span></p>
-                <p>
-                  Ports: {selectedSplice.portCount} / Occupied:{" "}
-                  {selectSplicePortStatuses(state, selectedSplice.id).filter((slot) => slot.isOccupied).length}
-                </p>
-              </>
-            ) : null}
-            {selectedNode !== null ? (
-              <>
-                <p>Node kind: {selectedNode.kind}</p>
-                <p>{describeNode(selectedNode)}</p>
-              </>
-            ) : null}
-            {selectedSegment !== null ? (
-              <>
-                <p>Node A: <span className="technical-id">{selectedSegment.nodeA}</span></p>
-                <p>Node B: <span className="technical-id">{selectedSegment.nodeB}</span></p>
-                <p>Length: {selectedSegment.lengthMm} mm</p>
-              </>
-            ) : null}
-            {selectedWire !== null ? (
-              <>
-                <p>Name: {selectedWire.name}</p>
-                <p>Technical ID: <span className="technical-id">{selectedWire.technicalId}</span></p>
-                <p>
-                  Route mode: {selectedWire.isRouteLocked ? "Locked" : "Auto"} / Segments:{" "}
-                  {selectedWire.routeSegmentIds.length === 0 ? "(none)" : selectedWire.routeSegmentIds.join(" -> ")}
-                </p>
-              </>
-            ) : null}
-          </div>
-          <div className="row-actions compact">
-            <button type="button" onClick={handleOpenSelectionInInspector} disabled={selectedSubScreen === null}>
-              Open in inspector
-            </button>
-            <button type="button" onClick={handleStartSelectedEdit} disabled={selectedSubScreen === null}>
-              Edit selected
-            </button>
-            <button type="button" onClick={handleFocusCurrentSelectionOnCanvas} disabled={selectedSubScreen === null}>
-              Focus canvas
-            </button>
-            <button type="button" onClick={() => dispatchAction(appActions.clearSelection())}>
-              Clear selection
-            </button>
-          </div>
-        </>
-      )}
-    </article>
+    <InspectorContextPanel
+      selected={selected}
+      selectedSubScreen={selectedSubScreen}
+      selectedConnector={selectedConnector}
+      selectedSplice={selectedSplice}
+      selectedNode={selectedNode}
+      selectedSegment={selectedSegment}
+      selectedWire={selectedWire}
+      connectorOccupiedCount={selectedConnectorOccupiedCount}
+      spliceOccupiedCount={selectedSpliceOccupiedCount}
+      describeNode={describeNode}
+      onOpenInInspector={handleOpenSelectionInInspector}
+      onEditSelected={handleStartSelectedEdit}
+      onFocusCanvas={handleFocusCurrentSelectionOnCanvas}
+      onClearSelection={() => dispatchAction(appActions.clearSelection())}
+    />
   );
 
   const networkSummaryPanel = (
-    <section className="panel">
-      <h2>Network summary</h2>
-      <div className="canvas-toolbar" aria-label="Canvas interaction mode">
-        <span>Interaction mode</span>
-        {([
-          ["select", "Select"],
-          ["addNode", "Add Node"],
-          ["addSegment", "Add Segment"],
-          ["connect", "Connect"],
-          ["route", "Route"]
-        ] as const).map(([modeId, label]) => (
-          <button
-            key={modeId}
-            type="button"
-            className={interactionMode === modeId ? "workspace-tab is-active" : "workspace-tab"}
-            onClick={() => setInteractionMode(modeId)}
-          >
-            {label}
-          </button>
-        ))}
-        <span className="canvas-toolbar-separator" />
-        <button type="button" className="workspace-tab" onClick={() => handleZoomAction("out")}>
-          Zoom -
-        </button>
-        <button type="button" className="workspace-tab" onClick={() => handleZoomAction("in")}>
-          Zoom +
-        </button>
-        <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
-          Reset view
-        </button>
-        <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
-          Fit network
-        </button>
-        <button
-          type="button"
-          className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}
-          onClick={() => setShowNetworkGrid((current) => !current)}
-        >
-          Grid
-        </button>
-        <button
-          type="button"
-          className={snapNodesToGrid ? "workspace-tab is-active" : "workspace-tab"}
-          onClick={() => setSnapNodesToGrid((current) => !current)}
-        >
-          Snap
-        </button>
-      </div>
-      <p className="meta-line">
-        {interactionModeHint} View: {networkScalePercent}% zoom. Use toolbar buttons to zoom. Hold{" "}
-        <strong>Shift</strong> and drag empty canvas to pan.
-      </p>
-      <div className="summary-grid">
-        <article>
-          <h3>Graph nodes</h3>
-          <p>{routingGraph.nodeIds.length}</p>
-        </article>
-        <article>
-          <h3>Graph segments</h3>
-          <p>{routingGraph.segmentIds.length}</p>
-        </article>
-        <article>
-          <h3>Adjacency entries</h3>
-          <p>{totalEdgeEntries}</p>
-        </article>
-      </div>
-
-      <h3 className="summary-title">2D network view</h3>
-      {nodes.length === 0 ? (
-        <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
-      ) : (
-        <div className={`network-canvas-shell${isPanningNetwork ? " is-panning" : ""}`}>
-          <svg
-            className="network-svg"
-            role="img"
-            aria-label="2D network diagram"
-            viewBox={`0 0 ${NETWORK_VIEW_WIDTH} ${NETWORK_VIEW_HEIGHT}`}
-            onMouseDown={handleNetworkCanvasMouseDown}
-            onClick={handleNetworkCanvasClick}
-            onWheel={handleNetworkWheel}
-            onMouseMove={handleNetworkMouseMove}
-            onMouseUp={stopNetworkNodeDrag}
-            onMouseLeave={stopNetworkNodeDrag}
-          >
-            {showNetworkGrid ? (
-              <g
-                className="network-grid"
-                transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
-              >
-                {Array.from({ length: Math.floor(NETWORK_VIEW_WIDTH / NETWORK_GRID_STEP) + 1 }).map((_, index) => {
-                  const position = index * NETWORK_GRID_STEP;
-                  return (
-                    <line
-                      key={`grid-v-${position}`}
-                      x1={position}
-                      y1={0}
-                      x2={position}
-                      y2={NETWORK_VIEW_HEIGHT}
-                    />
-                  );
-                })}
-                {Array.from({ length: Math.floor(NETWORK_VIEW_HEIGHT / NETWORK_GRID_STEP) + 1 }).map((_, index) => {
-                  const position = index * NETWORK_GRID_STEP;
-                  return (
-                    <line
-                      key={`grid-h-${position}`}
-                      x1={0}
-                      y1={position}
-                      x2={NETWORK_VIEW_WIDTH}
-                      y2={position}
-                    />
-                  );
-                })}
-              </g>
-            ) : null}
-            <g transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
-              {segments.map((segment) => {
-                const nodeAPosition = networkNodePositions[segment.nodeA];
-                const nodeBPosition = networkNodePositions[segment.nodeB];
-                if (nodeAPosition === undefined || nodeBPosition === undefined) {
-                  return null;
-                }
-
-                const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
-                const isSelectedSegment = selectedSegmentId === segment.id;
-                const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
-                  isSelectedSegment ? " is-selected" : ""
-                }`;
-                const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
-                const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
-
-                return (
-                  <g key={segment.id}>
-                    <line
-                      className={segmentClassName}
-                      x1={nodeAPosition.x}
-                      y1={nodeAPosition.y}
-                      x2={nodeBPosition.x}
-                      y2={nodeBPosition.y}
-                    />
-                    <line
-                      className="network-segment-hitbox"
-                      x1={nodeAPosition.x}
-                      y1={nodeAPosition.y}
-                      x2={nodeBPosition.x}
-                      y2={nodeBPosition.y}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleNetworkSegmentClick(segment.id);
-                      }}
-                    />
-                    <text className="network-segment-label" x={labelX} y={labelY - 6} textAnchor="middle">
-                      {segment.id}
-                    </text>
-                  </g>
-                );
-              })}
-
-              {nodes.map((node) => {
-                const position = networkNodePositions[node.id];
-                if (position === undefined) {
-                  return null;
-                }
-
-                const nodeKindClass =
-                  node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
-                const isSelectedNode = selectedNodeId === node.id;
-                const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}`;
-                const nodeLabel =
-                  node.kind === "intermediate"
-                    ? node.label
-                    : node.kind === "connector"
-                      ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
-                      : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
-
-                return (
-                  <g
-                    key={node.id}
-                    className={nodeClassName}
-                    onMouseDown={(event) => handleNetworkNodeMouseDown(event, node.id)}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleNetworkNodeClick(node.id);
-                    }}
-                  >
-                    <title>{describeNode(node)}</title>
-                    <circle cx={position.x} cy={position.y} r={17} />
-                    <text className="network-node-label" x={position.x} y={position.y + 4} textAnchor="middle">
-                      {nodeLabel}
-                    </text>
-                  </g>
-                );
-              })}
-            </g>
-          </svg>
-        </div>
-      )}
-      <ul className="network-legend">
-        <li>
-          <span className="legend-swatch connector" /> Connector node
-        </li>
-        <li>
-          <span className="legend-swatch splice" /> Splice node
-        </li>
-        <li>
-          <span className="legend-swatch intermediate" /> Intermediate node
-        </li>
-        <li>
-          <span className="legend-line selected" /> Selected segment
-        </li>
-        <li>
-          <span className="legend-line wire" /> Wire highlighted segment
-        </li>
-      </ul>
-
-      <h3 className="summary-title">Sub-networks</h3>
-      {subNetworkSummaries.length === 0 ? (
-        <p className="empty-copy">No sub-network tags yet. Segments currently belong to the default group.</p>
-      ) : (
-        <ul className="subnetwork-list">
-          {subNetworkSummaries.map((group) => (
-            <li key={group.tag}>
-              <span className="subnetwork-chip">{group.tag}</span>
-              <span>
-                {group.segmentCount} segment(s), {group.totalLengthMm} mm total
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <h3 className="summary-title">Selection snapshot</h3>
-      <div className="selection-snapshot">
-        <p>Connector: {selectedConnector === null ? "none" : `${selectedConnector.name} (${selectedConnector.technicalId})`}</p>
-        <p>Splice: {selectedSplice === null ? "none" : `${selectedSplice.name} (${selectedSplice.technicalId})`}</p>
-        <p>Node: {selectedNode === null ? "none" : describeNode(selectedNode)}</p>
-        <p>Segment: {selectedSegment === null ? "none" : `${selectedSegment.id} (${selectedSegment.lengthMm} mm)`}</p>
-        <p>Wire: {selectedWire === null ? "none" : `${selectedWire.name} (${selectedWire.technicalId})`}</p>
-      </div>
-
-      <h3 className="summary-title">Route preview</h3>
-      <form className="row-form">
-        <label>
-          Start node
-          <select value={routePreviewStartNodeId} onChange={(event) => setRoutePreviewStartNodeId(event.target.value)}>
-            <option value="">Select node</option>
-            {nodes.map((node) => (
-              <option key={node.id} value={node.id}>
-                {describeNode(node)}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label>
-          End node
-          <select value={routePreviewEndNodeId} onChange={(event) => setRoutePreviewEndNodeId(event.target.value)}>
-            <option value="">Select node</option>
-            {nodes.map((node) => (
-              <option key={node.id} value={node.id}>
-                {describeNode(node)}
-              </option>
-            ))}
-          </select>
-        </label>
-      </form>
-
-      {routePreviewStartNodeId.length > 0 && routePreviewEndNodeId.length > 0 ? (
-        routePreview === null ? (
-          <p className="empty-copy">No route currently exists between the selected nodes.</p>
-        ) : (
-          <div className="selection-snapshot">
-            <p>Length: {routePreview.totalLengthMm} mm</p>
-            <p>Segments: {routePreview.segmentIds.length === 0 ? "(none)" : routePreview.segmentIds.join(" -> ")}</p>
-            <p>Nodes: {routePreview.nodeIds.join(" -> ")}</p>
-          </div>
-        )
-      ) : (
-        <p className="empty-copy">Select start and end nodes to preview shortest path routing.</p>
-      )}
-    </section>
+    <NetworkSummaryPanel
+      interactionMode={interactionMode}
+      setInteractionMode={setInteractionMode}
+      handleZoomAction={handleZoomAction}
+      fitNetworkToContent={fitNetworkToContent}
+      showNetworkGrid={showNetworkGrid}
+      snapNodesToGrid={snapNodesToGrid}
+      toggleShowNetworkGrid={() => setShowNetworkGrid((current) => !current)}
+      toggleSnapNodesToGrid={() => setSnapNodesToGrid((current) => !current)}
+      interactionModeHint={interactionModeHint}
+      networkScalePercent={networkScalePercent}
+      routingGraphNodeCount={routingGraph.nodeIds.length}
+      routingGraphSegmentCount={routingGraph.segmentIds.length}
+      totalEdgeEntries={totalEdgeEntries}
+      nodes={nodes}
+      segments={segments}
+      isPanningNetwork={isPanningNetwork}
+      networkViewWidth={NETWORK_VIEW_WIDTH}
+      networkViewHeight={NETWORK_VIEW_HEIGHT}
+      networkGridStep={NETWORK_GRID_STEP}
+      networkOffset={networkOffset}
+      networkScale={networkScale}
+      handleNetworkCanvasMouseDown={handleNetworkCanvasMouseDown}
+      handleNetworkCanvasClick={handleNetworkCanvasClick}
+      handleNetworkWheel={handleNetworkWheel}
+      handleNetworkMouseMove={handleNetworkMouseMove}
+      stopNetworkNodeDrag={stopNetworkNodeDrag}
+      networkNodePositions={networkNodePositions}
+      selectedWireRouteSegmentIds={selectedWireRouteSegmentIds}
+      selectedSegmentId={selectedSegmentId}
+      handleNetworkSegmentClick={handleNetworkSegmentClick}
+      selectedNodeId={selectedNodeId}
+      handleNetworkNodeMouseDown={handleNetworkNodeMouseDown}
+      handleNetworkNodeClick={handleNetworkNodeClick}
+      connectorMap={connectorMap}
+      spliceMap={spliceMap}
+      describeNode={describeNode}
+      subNetworkSummaries={subNetworkSummaries}
+      selectedConnector={selectedConnector}
+      selectedSplice={selectedSplice}
+      selectedNode={selectedNode}
+      selectedSegment={selectedSegment}
+      selectedWire={selectedWire}
+      routePreviewStartNodeId={routePreviewStartNodeId}
+      setRoutePreviewStartNodeId={setRoutePreviewStartNodeId}
+      routePreviewEndNodeId={routePreviewEndNodeId}
+      setRoutePreviewEndNodeId={setRoutePreviewEndNodeId}
+      routePreview={routePreview}
+    />
   );
 
   return (
@@ -3424,69 +2957,18 @@ export function App({ store = appStore }: AppProps): ReactElement {
 
       <section className="workspace-shell">
         <aside className="workspace-sidebar">
-          <section className="workspace-switcher">
-            <div className="workspace-nav-row">
-              {([
-                ["modeling", "Modeling"],
-                ["analysis", "Analysis"],
-                ["validation", "Validation"],
-                ["settings", "Settings"]
-              ] as const).map(([screenId, label]) => (
-                <button
-                  key={screenId}
-                  type="button"
-                  className={activeScreen === screenId ? "workspace-tab is-active" : "workspace-tab"}
-                  onClick={() => setActiveScreen(screenId)}
-                >
-                  <span className="workspace-tab-content">
-                    <span>{label}</span>
-                    {screenId === "validation" ? (
-                      <span
-                        className={validationErrorCount > 0 ? "workspace-tab-badge is-error" : "workspace-tab-badge"}
-                        aria-hidden="true"
-                      >
-                        {validationIssues.length}
-                      </span>
-                    ) : null}
-                  </span>
-                </button>
-              ))}
-            </div>
-            {isModelingScreen || isAnalysisScreen ? (
-              <div className="workspace-nav-row secondary">
-                {([
-                  ["connector", "Connector"],
-                  ["splice", "Splice"],
-                  ["node", "Node"],
-                  ["segment", "Segment"],
-                  ["wire", "Wire"]
-                ] as const).map(([subScreenId, label]) => (
-                  <button
-                    key={subScreenId}
-                    type="button"
-                    className={activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
-                    onClick={() => setActiveSubScreen(subScreenId)}
-                  >
-                    <span className="workspace-tab-content">
-                      <span>{label}</span>
-                      <span className="workspace-tab-badge" aria-hidden="true">
-                        {entityCountBySubScreen[subScreenId]}
-                      </span>
-                    </span>
-                  </button>
-                ))}
-              </div>
-            ) : null}
-            <p className="meta-line screen-description">
-              {isModelingScreen
-                ? "Modeling workspace: entity editor + operational lists."
-                : isAnalysisScreen
-                  ? "Analysis workspace: synthesis, route control, and network insight."
-                  : isValidationScreen
-                    ? "Validation center: grouped model integrity issues with one-click navigation."
-                    : "Settings workspace: workspace preferences and project-level options."}
-            </p>
-          </section>
+          <WorkspaceNavigation
+            activeScreen={activeScreen}
+            activeSubScreen={activeSubScreen}
+            isModelingScreen={isModelingScreen}
+            isAnalysisScreen={isAnalysisScreen}
+            isValidationScreen={isValidationScreen}
+            validationIssuesCount={validationIssues.length}
+            validationErrorCount={validationErrorCount}
+            entityCountBySubScreen={entityCountBySubScreen}
+            onScreenChange={setActiveScreen}
+            onSubScreenChange={setActiveSubScreen}
+          />
 
           <section className="workspace-meta">
             <div className="workspace-meta-main">
