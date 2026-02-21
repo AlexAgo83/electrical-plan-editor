@@ -55,7 +55,12 @@ const requiredUiModules = [
 
 const forbiddenLegacyFiles = ["src/tests/app.ui.spec.tsx"];
 
-const allowedOversize = {};
+const allowedOversize = {
+  "src/app/styles/base.css": "Foundation tokens and shared primitives are centralized in one stylesheet for cross-theme consistency.",
+  "src/app/styles/workspace.css": "Workspace shell, header, drawer, and shared panel layouts are grouped to keep shell behavior cohesive.",
+  "src/app/styles/canvas.css": "2D canvas rendering, overlays, floating panels, and interaction visuals are intentionally co-located.",
+  "src/app/styles/validation-settings.css": "Validation center and settings screens share dense control/table styling in one module."
+};
 
 const targetFiles = [
   "src/app/App.tsx",

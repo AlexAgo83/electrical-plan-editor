@@ -47,6 +47,8 @@ describe("App integration UI - navigation and canvas", () => {
     renderAppWithState(createInitialState());
     switchScreen("modeling");
 
+    const idleConnectorFormPanel = getPanelByHeading("Connector form");
+    fireEvent.click(within(idleConnectorFormPanel).getByRole("button", { name: "Create" }));
     const connectorFormPanel = getPanelByHeading("Create Connector");
     fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
       target: { value: "Undo test connector" }
@@ -78,8 +80,8 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
     switchScreen("analysis");
 
-    const connectorCavitiesPanel = getPanelByHeading("Connector cavities");
-    expect(within(connectorCavitiesPanel).getByText("wire:W1:A")).toBeInTheDocument();
+    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    expect(within(connectorAnalysisPanel).getByText("wire:W1:A")).toBeInTheDocument();
   });
 
   it("reflects splice port occupancy in real time", () => {
@@ -90,8 +92,8 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.click(within(splicesPanel).getByText("Splice 1"));
     switchScreen("analysis");
 
-    const splicePortsPanel = getPanelByHeading("Splice ports");
-    expect(within(splicePortsPanel).getByText("wire:W1:B")).toBeInTheDocument();
+    const spliceAnalysisPanel = getPanelByHeading("Splice analysis");
+    expect(within(spliceAnalysisPanel).getByText("wire:W1:B")).toBeInTheDocument();
   });
 
   it("highlights every segment in the selected wire route", () => {
@@ -115,7 +117,6 @@ describe("App integration UI - navigation and canvas", () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreen("analysis");
-    switchSubScreen("segment");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
     expect(within(networkSummaryPanel).getByLabelText("2D network diagram")).toBeInTheDocument();
@@ -127,7 +128,6 @@ describe("App integration UI - navigation and canvas", () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreen("analysis");
-    switchSubScreen("segment");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
     const currentZoomLine = () => within(networkSummaryPanel).getByText(/View: \d+% zoom\./).textContent ?? "";
@@ -217,7 +217,7 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.click(segmentHitbox as Element);
 
     expect(screen.queryByRole("heading", { name: "Edit Node" })).not.toBeInTheDocument();
-    expect(getPanelByHeading("Create Node")).toBeInTheDocument();
+    expect(getPanelByHeading("Node form")).toBeInTheDocument();
   });
 
   it("asks confirmation before regenerating layout when manual positions exist", () => {
@@ -229,7 +229,6 @@ describe("App integration UI - navigation and canvas", () => {
 
     renderAppWithState(state);
     switchScreen("analysis");
-    switchSubScreen("segment");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Generate" }));

@@ -977,12 +977,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         return;
       }
 
-      const networkIdsBefore = new Set(store.getState().networks.allIds as NetworkId[]);
+      const networkIdsBefore = new Set(store.getState().networks.allIds);
       handleCreateNetwork(event);
       const createdNetworkId =
         (store
           .getState()
-          .networks.allIds.find((networkId) => !networkIdsBefore.has(networkId as NetworkId)) as NetworkId | undefined) ?? null;
+          .networks.allIds.find((networkId) => !networkIdsBefore.has(networkId)) ?? null);
       if (createdNetworkId !== null) {
         setNetworkFocusRequest((current) => ({
           id: createdNetworkId,
