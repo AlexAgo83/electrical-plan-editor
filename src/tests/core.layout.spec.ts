@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vitest";
 import type { NetworkNode, NodeId, Segment, SegmentId } from "../core/entities";
 import {
+  countSegmentNodeOverlaps,
+  countSegmentNodeClearanceViolations,
   countSegmentCrossings,
   createNodePositionMap,
   NETWORK_VIEW_HEIGHT,
   NETWORK_VIEW_WIDTH
 } from "../app/lib/app-utils";
 import type { NodePosition } from "../app/types/app-controller";
+import { createSampleNetworkState } from "../store";
 
 function asNodeId(value: string): NodeId {
   return value as NodeId;
@@ -43,6 +46,49 @@ function createBaselineCircularLayout(nodes: NetworkNode[]): Record<NodeId, Node
   });
 
   return positions;
+}
+
+function createSyntheticTopology(nodeCount: number): { nodes: NetworkNode[]; segments: Segment[] } {
+  const nodes: NetworkNode[] = [];
+  const segments: Segment[] = [];
+  for (let index = 0; index < nodeCount; index += 1) {
+    nodes.push({
+      id: asNodeId(`N-${index + 1}`),
+      kind: "intermediate",
+      label: `Node ${index + 1}`
+    });
+  }
+
+  let segmentIndex = 1;
+  const addSegment = (from: number, to: number): void => {
+    if (from === to) {
+      return;
+    }
+    const fromNode = nodes[from];
+    const toNode = nodes[to];
+    if (fromNode === undefined || toNode === undefined) {
+      return;
+    }
+    segments.push({
+      id: asSegmentId(`SEG-PERF-${String(segmentIndex).padStart(4, "0")}`),
+      nodeA: fromNode.id,
+      nodeB: toNode.id,
+      lengthMm: 10
+    });
+    segmentIndex += 1;
+  };
+
+  for (let index = 0; index < nodeCount; index += 1) {
+    addSegment(index, (index + 1) % nodeCount);
+  }
+  for (let index = 0; index < nodeCount; index += 1) {
+    addSegment(index, (index + 9) % nodeCount);
+  }
+  for (let index = 0; index < nodeCount; index += 4) {
+    addSegment(index, (index + 23) % nodeCount);
+  }
+
+  return { nodes, segments };
 }
 
 describe("2D layout generation", () => {
@@ -94,5 +140,85 @@ describe("2D layout generation", () => {
       expect(position.x % 20).toBe(0);
       expect(position.y % 20).toBe(0);
     }
+  });
+
+  it("avoids placing non-endpoint nodes on top of generated segments for sample topology", () => {
+    const sample = createSampleNetworkState();
+    const nodes = sample.nodes.allIds.map((nodeId) => sample.nodes.byId[nodeId]).filter((node): node is NetworkNode => node !== undefined);
+    const segments = sample.segments.allIds
+      .map((segmentId) => sample.segments.byId[segmentId])
+      .filter((segment): segment is Segment => segment !== undefined);
+
+    const generated = createNodePositionMap(nodes, segments, {
+      snapToGrid: true,
+      gridStep: 20
+    });
+    const overlaps: Array<{ segmentId: string; nodeId: string }> = [];
+    const isPointOnSegment = (ax: number, ay: number, bx: number, by: number, px: number, py: number): boolean => {
+      const cross = Math.abs((bx - ax) * (py - ay) - (by - ay) * (px - ax));
+      if (cross > 0.01) {
+        return false;
+      }
+      const minX = Math.min(ax, bx) - 0.01;
+      const maxX = Math.max(ax, bx) + 0.01;
+      const minY = Math.min(ay, by) - 0.01;
+      const maxY = Math.max(ay, by) + 0.01;
+      return px >= minX && px <= maxX && py >= minY && py <= maxY;
+    };
+    for (const segment of segments) {
+      const start = generated[segment.nodeA];
+      const end = generated[segment.nodeB];
+      if (start === undefined || end === undefined) {
+        continue;
+      }
+
+      for (const node of nodes) {
+        if (node.id === segment.nodeA || node.id === segment.nodeB) {
+          continue;
+        }
+
+        const point = generated[node.id];
+        if (point === undefined) {
+          continue;
+        }
+
+        if (isPointOnSegment(start.x, start.y, end.x, end.y, point.x, point.y)) {
+          overlaps.push({ segmentId: segment.id, nodeId: node.id });
+        }
+      }
+    }
+
+    expect(overlaps).toEqual([]);
+    expect(countSegmentNodeOverlaps(segments, generated)).toBe(0);
+    expect(countSegmentNodeClearanceViolations(segments, generated)).toBe(0);
+  });
+
+  it("keeps sample topology crossings bounded after generation", () => {
+    const sample = createSampleNetworkState();
+    const nodes = sample.nodes.allIds.map((nodeId) => sample.nodes.byId[nodeId]).filter((node): node is NetworkNode => node !== undefined);
+    const segments = sample.segments.allIds
+      .map((segmentId) => sample.segments.byId[segmentId])
+      .filter((segment): segment is Segment => segment !== undefined);
+
+    const generated = createNodePositionMap(nodes, segments, {
+      snapToGrid: true,
+      gridStep: 20
+    });
+
+    expect(countSegmentCrossings(segments, generated)).toBeLessThanOrEqual(1);
+  });
+
+  it("keeps layout generation responsive on representative medium topology", () => {
+    const { nodes, segments } = createSyntheticTopology(40);
+    let generated = {} as Record<NodeId, NodePosition>;
+    const start = performance.now();
+    generated = createNodePositionMap(nodes, segments, {
+      snapToGrid: true,
+      gridStep: 20
+    });
+    const elapsedMs = performance.now() - start;
+
+    expect(Object.keys(generated)).toHaveLength(nodes.length);
+    expect(elapsedMs).toBeLessThan(7000);
   });
 });

@@ -1,4 +1,4 @@
-## task_007_req_008_app_shell_completion_orchestration_and_delivery_control - Req 008 App Shell Completion Orchestration and Delivery Control
+## task_007_app_shell_completion_orchestration_and_delivery_control - App Shell Completion Orchestration and Delivery Control
 > From version: 0.2.0
 > Understanding: 99%
 > Confidence: 97%

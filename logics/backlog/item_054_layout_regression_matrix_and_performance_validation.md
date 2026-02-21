@@ -1,8 +1,8 @@
 ## item_054_layout_regression_matrix_and_performance_validation - Layout Regression Matrix and Performance Validation
 > From version: 0.2.0
 > Understanding: 99%
-> Confidence: 95%
-> Progress: 0%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Layout Quality Assurance
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -40,5 +40,6 @@ Layout persistence, generation heuristics, and regeneration UI introduce cross-c
   - `src/tests/persistence.localStorage.spec.ts`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
   - `src/tests/portability.network-file.spec.ts`
+  - `src/tests/core.layout.spec.ts`
   - `src/tests/sample-network.fixture.spec.ts`
   - `tests/e2e/smoke.spec.ts`
