@@ -143,6 +143,7 @@ export function AnalysisWorkspaceContent({
 }: AnalysisWorkspaceContentProps): ReactElement {
   const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "synthesis">("cavities");
   const [spliceAnalysisView, setSpliceAnalysisView] = useState<"ports" | "synthesis">("ports");
+  const showWireRouteModeColumn = wireRouteFilter === "all";
 
   return (
     <section className="panel-grid analysis-panel-grid">
@@ -579,7 +580,7 @@ export function AnalysisWorkspaceContent({
                 </th>
                 <th>Endpoints</th>
                 <th>Length (mm)</th>
-                <th>Route mode</th>
+                {showWireRouteModeColumn ? <th>Route mode</th> : null}
               </tr>
             </thead>
             <tbody>
@@ -605,7 +606,7 @@ export function AnalysisWorkspaceContent({
                       {describeWireEndpoint(wire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(wire.endpointB)}
                     </td>
                     <td>{wire.lengthMm}</td>
-                    <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td>
+                    {showWireRouteModeColumn ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}
                   </tr>
                 );
               })}

@@ -103,6 +103,7 @@ export function ModelingPrimaryTables({
     selectedSpliceId === null ? null : (visibleSplices.find((splice) => splice.id === selectedSpliceId) ?? null);
   const focusedNode =
     selectedNodeId === null ? null : (visibleNodes.find((node) => node.id === selectedNodeId) ?? null);
+  const showNodeKindColumn = nodeKindFilter === "all";
 
   return (
     <>
@@ -253,7 +254,7 @@ export function ModelingPrimaryTables({
             <thead>
               <tr>
                 <th><button type="button" className="sort-header-button" onClick={() => setNodeIdSortDirection((currentDirection) => currentDirection === "asc" ? "desc" : "asc")}>ID <span className="sort-indicator">{nodeIdSortDirection === "asc" ? "▲" : "▼"}</span></button></th>
-                <th>Kind</th>
+                {showNodeKindColumn ? <th>Kind</th> : null}
                 <th>Reference</th>
                 <th>Linked segments</th>
               </tr>
@@ -277,7 +278,7 @@ export function ModelingPrimaryTables({
                     }}
                   >
                     <td className="technical-id">{node.id}</td>
-                    <td>{node.kind}</td>
+                    {showNodeKindColumn ? <td>{node.kind}</td> : null}
                     <td>{describeNode(node)}</td>
                     <td>{linkedSegments}</td>
                   </tr>

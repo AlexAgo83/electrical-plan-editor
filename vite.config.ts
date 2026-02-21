@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
           enabled: false,
           suppressWarnings: true
         },
-        includeAssets: ["app-icon.svg", "icons/icon-192.png", "icons/icon-512.png"],
+        includeAssets: ["app-icon.svg", "favicon.svg", "icons/icon-192.png", "icons/icon-512.png"],
         manifest: {
           name: "Electrical Plan Editor",
           short_name: "PlanEditor",

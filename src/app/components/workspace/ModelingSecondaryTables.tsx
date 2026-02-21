@@ -74,6 +74,8 @@ export function ModelingSecondaryTables({
     selectedSegmentId === null ? null : (visibleSegments.find((segment) => segment.id === selectedSegmentId) ?? null);
   const focusedWire =
     selectedWireId === null ? null : (visibleWires.find((wire) => wire.id === selectedWireId) ?? null);
+  const showSegmentSubNetworkColumn = segmentSubNetworkFilter !== "default";
+  const showWireRouteModeColumn = wireRouteFilter === "all";
 
   return (
     <>
@@ -102,7 +104,7 @@ export function ModelingSecondaryTables({
                 <th>Node A</th>
                 <th>Node B</th>
                 <th>Length (mm)</th>
-                <th>Sub-network</th>
+                {showSegmentSubNetworkColumn ? <th>Sub-network</th> : null}
               </tr>
             </thead>
             <tbody>
@@ -130,7 +132,9 @@ export function ModelingSecondaryTables({
                     <td>{nodeA}</td>
                     <td>{nodeB}</td>
                     <td>{segment.lengthMm}</td>
-                    <td><span className="subnetwork-chip">{segment.subNetworkTag?.trim() || "(default)"}</span></td>
+                    {showSegmentSubNetworkColumn ? (
+                      <td><span className="subnetwork-chip">{segment.subNetworkTag?.trim() || "(default)"}</span></td>
+                    ) : null}
                   </tr>
                 );
               })}
@@ -169,7 +173,7 @@ export function ModelingSecondaryTables({
                 <th><button type="button" className="sort-header-button" onClick={() => setWireSort((current) => nextSortState(current, "technicalId"))}>Technical ID <span className="sort-indicator">{getSortIndicator(wireSort, "technicalId")}</span></button></th>
                 <th>Endpoints</th>
                 <th>Length (mm)</th>
-                <th>Route mode</th>
+                {showWireRouteModeColumn ? <th>Route mode</th> : null}
               </tr>
             </thead>
             <tbody>
@@ -193,7 +197,7 @@ export function ModelingSecondaryTables({
                     <td className="technical-id">{wire.technicalId}</td>
                     <td>{describeWireEndpoint(wire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(wire.endpointB)}</td>
                     <td>{wire.lengthMm}</td>
-                    <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td>
+                    {showWireRouteModeColumn ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}
                   </tr>
                 );
               })}

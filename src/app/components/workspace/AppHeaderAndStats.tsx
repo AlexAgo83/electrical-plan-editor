@@ -49,10 +49,11 @@ export function AppHeaderAndStats({
           type="button"
           className="header-nav-toggle"
           onClick={onToggleNavigationDrawer}
+          aria-label={isNavigationDrawerOpen ? "Close menu" : "Open menu"}
           aria-expanded={isNavigationDrawerOpen}
           aria-controls="workspace-navigation-drawer"
         >
-          {isNavigationDrawerOpen ? "Close menu" : "Open menu"}
+          <span className="header-nav-icon" aria-hidden="true" />
         </button>
         <h1>Electrical Plan Editor</h1>
         <div className="header-actions">
@@ -72,6 +73,7 @@ export function AppHeaderAndStats({
             aria-pressed={isSettingsActive}
             onClick={onOpenSettings}
           >
+            <span className="header-settings-icon" aria-hidden="true" />
             Settings
           </button>
           <button
@@ -82,6 +84,7 @@ export function AppHeaderAndStats({
             aria-expanded={isOperationsPanelOpen}
             aria-controls="workspace-operations-panel"
           >
+            <span className="header-ops-icon" aria-hidden="true" />
             <span>Ops &amp; Health</span>
             <span
               className={validationErrorCount > 0 ? "header-ops-badge is-error" : "header-ops-badge"}

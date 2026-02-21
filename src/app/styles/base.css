@@ -90,6 +90,33 @@ button {
   color: #153048;
   border-radius: 0.5rem;
   padding: 0.35rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+}
+
+.header-nav-icon,
+.header-settings-icon,
+.header-ops-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 0.9rem;
+  background: currentColor;
+}
+
+.header-nav-icon {
+  -webkit-mask: url("/icons/menu.svg") center / contain no-repeat;
+  mask: url("/icons/menu.svg") center / contain no-repeat;
+}
+
+.header-settings-icon {
+  -webkit-mask: url("/icons/settings.svg") center / contain no-repeat;
+  mask: url("/icons/settings.svg") center / contain no-repeat;
+}
+
+.header-ops-icon {
+  -webkit-mask: url("/icons/health.svg") center / contain no-repeat;
+  mask: url("/icons/health.svg") center / contain no-repeat;
 }
 
 .header-actions {
@@ -116,6 +143,9 @@ button {
   border-radius: 0.5rem;
   padding: 0.35rem 0.6rem;
   margin-right: 0.45rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .header-install-toggle,
