@@ -64,6 +64,74 @@
   color: #abc0d4;
 }
 
+.app-shell.theme-slate-neon .workspace-nav-divider {
+  color: #a8d5de;
+}
+
+.app-shell.theme-slate-neon .workspace-nav-divider::after {
+  background: linear-gradient(90deg, rgba(95, 157, 169, 0.62), rgba(95, 157, 169, 0.16));
+}
+
+.app-shell.theme-slate-neon .workspace-nav-subsection {
+  border-color: #356f7f;
+  background: linear-gradient(180deg, rgba(34, 79, 92, 0.46), rgba(20, 51, 64, 0.22));
+}
+
+.app-shell.theme-slate-neon .workspace-switcher .screen-description {
+  color: #b9dfe7;
+}
+
+.app-shell.theme-paper-blueprint .workspace-nav-divider {
+  color: #63839e;
+}
+
+.app-shell.theme-paper-blueprint .workspace-nav-divider::after {
+  background: linear-gradient(90deg, rgba(125, 154, 178, 0.6), rgba(125, 154, 178, 0.18));
+}
+
+.app-shell.theme-paper-blueprint .workspace-nav-subsection {
+  border-color: #bfd2e0;
+  background: linear-gradient(180deg, rgba(228, 239, 248, 0.9), rgba(228, 239, 248, 0.36));
+}
+
+.app-shell.theme-paper-blueprint .workspace-switcher .screen-description {
+  color: #5b778f;
+}
+
+.app-shell.theme-warm-brown .workspace-nav-divider {
+  color: #886851;
+}
+
+.app-shell.theme-warm-brown .workspace-nav-divider::after {
+  background: linear-gradient(90deg, rgba(154, 121, 92, 0.58), rgba(154, 121, 92, 0.16));
+}
+
+.app-shell.theme-warm-brown .workspace-nav-subsection {
+  border-color: #ddc3ab;
+  background: linear-gradient(180deg, rgba(242, 227, 211, 0.84), rgba(242, 227, 211, 0.34));
+}
+
+.app-shell.theme-warm-brown .workspace-switcher .screen-description {
+  color: #795b46;
+}
+
+.app-shell.theme-deep-green .workspace-nav-divider {
+  color: #a2cdb6;
+}
+
+.app-shell.theme-deep-green .workspace-nav-divider::after {
+  background: linear-gradient(90deg, rgba(103, 153, 127, 0.62), rgba(103, 153, 127, 0.16));
+}
+
+.app-shell.theme-deep-green .workspace-nav-subsection {
+  border-color: #46755f;
+  background: linear-gradient(180deg, rgba(44, 87, 67, 0.44), rgba(24, 53, 39, 0.22));
+}
+
+.app-shell.theme-deep-green .workspace-switcher .screen-description {
+  color: #b3dbc3;
+}
+
 .workspace-tab {
   border: 1px solid #9eb7cc;
   border-radius: 999px;
@@ -349,7 +417,7 @@
 .workspace-inspector-panel .inspector-context-panel {
   pointer-events: auto;
   box-shadow: 0 10px 26px rgba(9, 26, 40, 0.2);
-  background: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.54);
   -webkit-backdrop-filter: blur(9px);
   backdrop-filter: blur(9px);
   padding: 0.82rem 0.9rem;

@@ -206,7 +206,7 @@
   max-width: min(94%, 40rem);
   border: 1px solid #b9cfdf;
   border-radius: 0.6rem;
-  background: rgba(244, 250, 255, 0.86);
+  background: rgba(244, 250, 255, 0.72);
   backdrop-filter: blur(6px);
   padding: 0.4rem;
 }
@@ -244,7 +244,7 @@
 .network-canvas-floating-stats {
   border: 1px solid #b9cfdf;
   border-radius: 0.6rem;
-  background: rgba(244, 250, 255, 0.86);
+  background: rgba(244, 250, 255, 0.72);
   backdrop-filter: blur(6px);
   padding: 0.35rem 0.45rem;
   max-width: 100%;
@@ -321,4 +321,3 @@
 .route-preview-form select {
   font-weight: 600;
 }
-

@@ -389,13 +389,13 @@ button {
 
 .app-shell.theme-dark .network-canvas-floating-controls {
   border-color: #4b6881;
-  background: rgba(22, 38, 54, 0.84);
+  background: rgba(22, 38, 54, 0.7);
 }
 
 .app-shell.theme-dark .network-canvas-floating-subnetworks,
 .app-shell.theme-dark .network-canvas-floating-stats {
   border-color: #4b6881;
-  background: rgba(22, 38, 54, 0.84);
+  background: rgba(22, 38, 54, 0.7);
 }
 
 .app-shell.theme-dark .network-canvas-subnetwork-list li,
@@ -406,4 +406,3 @@ button {
 .app-shell.theme-dark .network-canvas-stats-list strong {
   color: #e3ecf6;
 }
-

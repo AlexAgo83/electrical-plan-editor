@@ -69,6 +69,12 @@
   color: #f2f8fd !important;
 }
 
+.app-shell.theme-dark .settings-primary-action:disabled {
+  border-color: #63819a !important;
+  background: #4b6478 !important;
+  color: #d4e0ea !important;
+}
+
 .app-shell.theme-slate-neon .settings-panel {
   border-color: #2f6676;
   background: linear-gradient(170deg, rgba(18, 52, 68, 0.96) 0%, rgba(15, 42, 56, 0.92) 100%);
@@ -117,6 +123,18 @@
   color: #ddfbff;
 }
 
+.app-shell.theme-slate-neon .settings-primary-action {
+  border-color: #55b9a7 !important;
+  background: linear-gradient(180deg, #2ba891, #1f7f70) !important;
+  color: #e9fffb !important;
+}
+
+.app-shell.theme-slate-neon .settings-primary-action:disabled {
+  border-color: #4f7f86 !important;
+  background: #355d66 !important;
+  color: #cfe8eb !important;
+}
+
 .app-shell.theme-paper-blueprint .settings-panel {
   border-color: #b2c7d9;
   background: linear-gradient(168deg, rgba(251, 254, 255, 0.97) 0%, rgba(237, 247, 255, 0.88) 100%);
@@ -151,6 +169,18 @@
   border-color: #b1c8db;
   background: #e6f1f9;
   color: #26506b;
+}
+
+.app-shell.theme-paper-blueprint .settings-primary-action {
+  border-color: #6f98b8 !important;
+  background: linear-gradient(180deg, #4f82ab, #3a6b92) !important;
+  color: #f4f9ff !important;
+}
+
+.app-shell.theme-paper-blueprint .settings-primary-action:disabled {
+  border-color: #b2c7d8 !important;
+  background: #dbe8f2 !important;
+  color: #6a889f !important;
 }
 
 .app-shell.theme-warm-brown .settings-panel {
@@ -232,6 +262,18 @@
   color: #5f412d;
 }
 
+.app-shell.theme-warm-brown .settings-primary-action {
+  border-color: #ba906d !important;
+  background: linear-gradient(180deg, #a67a56, #875f40) !important;
+  color: #fff5ec !important;
+}
+
+.app-shell.theme-warm-brown .settings-primary-action:disabled {
+  border-color: #d3b89e !important;
+  background: #eadccf !important;
+  color: #8c6c52 !important;
+}
+
 .app-shell.theme-deep-green .settings-panel {
   border-color: #3f6c58;
   background: linear-gradient(170deg, rgba(20, 49, 38, 0.96) 0%, rgba(16, 40, 31, 0.92) 100%);
@@ -278,4 +320,16 @@
 
 .app-shell.theme-deep-green .settings-actions {
   border-top-color: rgba(92, 140, 117, 0.5);
+}
+
+.app-shell.theme-deep-green .settings-primary-action {
+  border-color: #5e9c79 !important;
+  background: linear-gradient(180deg, #3f7f5f, #2f674c) !important;
+  color: #edf9f1 !important;
+}
+
+.app-shell.theme-deep-green .settings-primary-action:disabled {
+  border-color: #597766 !important;
+  background: #3e5a4b !important;
+  color: #cfe0d5 !important;
 }

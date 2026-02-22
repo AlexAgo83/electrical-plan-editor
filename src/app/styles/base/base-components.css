@@ -89,7 +89,7 @@
 
 .app-shell.theme-dark .workspace-ops-content.panel,
 .app-shell.theme-dark .workspace-inspector-panel .inspector-context-panel {
-  background: rgba(26, 44, 63, 0.68);
+  background: rgba(26, 44, 63, 0.54);
 }
 
 .app-shell.theme-dark .inspector-context-header h2 {
@@ -410,4 +410,3 @@
 .app-shell.theme-dark .import-status.is-failed {
   color: #ffb4bc;
 }
-
