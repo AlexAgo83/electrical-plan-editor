@@ -55,6 +55,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   NetworkSummaryPanelProps,
   | "labelStrokeMode"
   | "labelSizeMode"
+  | "calloutTextSize"
   | "labelRotationDegrees"
   | "toggleShowNetworkInfoPanels"
   | "toggleShowSegmentLengths"
@@ -76,6 +77,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   setLockEntityMovement: BooleanStateSetter;
   networkLabelStrokeMode: NetworkSummaryPanelProps["labelStrokeMode"];
   networkLabelSizeMode: NetworkSummaryPanelProps["labelSizeMode"];
+  networkCalloutTextSize: NetworkSummaryPanelProps["calloutTextSize"];
   networkLabelRotationDegrees: NetworkSummaryPanelProps["labelRotationDegrees"];
   routingGraph: {
     nodeIds: string[];
@@ -205,6 +207,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     showCableCallouts: params.showCableCallouts,
     labelStrokeMode: params.networkLabelStrokeMode,
     labelSizeMode: params.networkLabelSizeMode,
+    calloutTextSize: params.networkCalloutTextSize,
     labelRotationDegrees: params.networkLabelRotationDegrees,
     toggleShowNetworkInfoPanels: () => params.setShowNetworkInfoPanels((current: boolean) => !current),
     toggleShowSegmentLengths: () => params.setShowSegmentLengths((current: boolean) => !current),
@@ -630,6 +633,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setCanvasDefaultLabelStrokeMode: params.setCanvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode: params.canvasDefaultLabelSizeMode,
     setCanvasDefaultLabelSizeMode: params.setCanvasDefaultLabelSizeMode,
+    canvasDefaultCalloutTextSize: params.canvasDefaultCalloutTextSize,
+    setCanvasDefaultCalloutTextSize: params.setCanvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees: params.canvasDefaultLabelRotationDegrees,
     setCanvasDefaultLabelRotationDegrees: params.setCanvasDefaultLabelRotationDegrees,
     canvasPngExportIncludeBackground: params.canvasPngExportIncludeBackground,

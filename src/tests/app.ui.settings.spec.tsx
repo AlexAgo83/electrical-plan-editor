@@ -98,7 +98,7 @@ describe("App integration UI - settings", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("settings");
-    const canvasSettingsPanel = getPanelByHeading("Canvas preferences");
+    const canvasSettingsPanel = getPanelByHeading("Canvas render preferences");
     fireEvent.change(within(canvasSettingsPanel).getByLabelText("2D label size"), {
       target: { value: "large" }
     });
@@ -121,21 +121,46 @@ describe("App integration UI - settings", () => {
 
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
-    const restoredCanvasSettingsPanel = getPanelByHeading("Canvas preferences");
+    const restoredCanvasSettingsPanel = getPanelByHeading("Canvas render preferences");
     expect(within(restoredCanvasSettingsPanel).getByLabelText("2D label size")).toHaveValue("large");
     expect(within(restoredCanvasSettingsPanel).getByLabelText("2D label rotation")).toHaveValue("45");
+  });
+
+  it("uses normal callout text size by default and updates the network callout text size class from settings", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const canvasSettingsPanel = getPanelByHeading("Canvas render preferences");
+    const calloutTextSizeSelect = within(canvasSettingsPanel).getByLabelText("Callout text size");
+    expect(calloutTextSizeSelect).toHaveValue("normal");
+
+    switchScreenDrawerAware("analysis");
+    let networkSummaryPanel = getPanelByHeading("Network summary");
+    let networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    expect(networkSvg).toHaveClass("network-callout-text-size-normal");
+
+    switchScreenDrawerAware("settings");
+    fireEvent.change(within(getPanelByHeading("Canvas render preferences")).getByLabelText("Callout text size"), {
+      target: { value: "small" }
+    });
+
+    switchScreenDrawerAware("analysis");
+    networkSummaryPanel = getPanelByHeading("Network summary");
+    networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    expect(networkSvg).toHaveClass("network-callout-text-size-small");
   });
 
   it("persists png export background toggle and supports negative 2d label rotation presets", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("settings");
-    const canvasSettingsPanel = getPanelByHeading("Canvas preferences");
-    expect(within(canvasSettingsPanel).getByLabelText("Include background in PNG export")).toBeChecked();
-    fireEvent.change(within(canvasSettingsPanel).getByLabelText("2D label rotation"), {
+    const canvasRenderSettingsPanel = getPanelByHeading("Canvas render preferences");
+    const canvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
+    expect(within(canvasToolsSettingsPanel).getByLabelText("Include background in PNG export")).toBeChecked();
+    fireEvent.change(within(canvasRenderSettingsPanel).getByLabelText("2D label rotation"), {
       target: { value: "-45" }
     });
-    fireEvent.click(within(canvasSettingsPanel).getByLabelText("Include background in PNG export"));
+    fireEvent.click(within(canvasToolsSettingsPanel).getByLabelText("Include background in PNG export"));
 
     switchScreenDrawerAware("analysis");
     const networkSummaryPanel = getPanelByHeading("Network summary");
@@ -146,16 +171,17 @@ describe("App integration UI - settings", () => {
 
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
-    const restoredCanvasSettingsPanel = getPanelByHeading("Canvas preferences");
-    expect(within(restoredCanvasSettingsPanel).getByLabelText("2D label rotation")).toHaveValue("-45");
-    expect(within(restoredCanvasSettingsPanel).getByLabelText("Include background in PNG export")).not.toBeChecked();
+    const restoredCanvasRenderSettingsPanel = getPanelByHeading("Canvas render preferences");
+    const restoredCanvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
+    expect(within(restoredCanvasRenderSettingsPanel).getByLabelText("2D label rotation")).toHaveValue("-45");
+    expect(within(restoredCanvasToolsSettingsPanel).getByLabelText("Include background in PNG export")).not.toBeChecked();
   });
 
   it("applies and persists the default cable callout visibility preference", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("settings");
-    const canvasSettingsPanel = getPanelByHeading("Canvas preferences");
+    const canvasSettingsPanel = getPanelByHeading("Canvas tools preferences");
     const defaultCalloutCheckbox = within(canvasSettingsPanel).getByLabelText(
       "Show connector/splice cable callouts by default"
     );
@@ -172,7 +198,7 @@ describe("App integration UI - settings", () => {
 
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
-    const restoredCanvasSettingsPanel = getPanelByHeading("Canvas preferences");
+    const restoredCanvasSettingsPanel = getPanelByHeading("Canvas tools preferences");
     expect(
       within(restoredCanvasSettingsPanel).getByLabelText("Show connector/splice cable callouts by default")
     ).toBeChecked();

@@ -38,6 +38,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "canvasDefaultShowCableCallouts"
     | "canvasDefaultLabelStrokeMode"
     | "canvasDefaultLabelSizeMode"
+    | "canvasDefaultCalloutTextSize"
     | "canvasDefaultLabelRotationDegrees"
     | "setShowNetworkGrid"
     | "setSnapNodesToGrid"
@@ -47,6 +48,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setShowCableCallouts"
     | "setNetworkLabelStrokeMode"
     | "setNetworkLabelSizeMode"
+    | "setNetworkCalloutTextSize"
     | "setNetworkLabelRotationDegrees"
   >;
   sortDefaults: Pick<WorkspaceHandlersParams, "defaultSortField" | "defaultSortDirection" | "defaultIdSortDirection">;
@@ -77,6 +79,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setCanvasDefaultShowCableCallouts"
     | "setCanvasDefaultLabelStrokeMode"
     | "setCanvasDefaultLabelSizeMode"
+    | "setCanvasDefaultCalloutTextSize"
     | "setCanvasDefaultLabelRotationDegrees"
     | "setCanvasResetZoomPercentInput"
     | "setCanvasPngExportIncludeBackground"

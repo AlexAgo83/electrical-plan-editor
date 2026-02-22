@@ -171,6 +171,8 @@ export function useAppControllerAuxScreenContentDomains({
     setCanvasDefaultLabelStrokeMode: settings.prefs.setCanvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode: settings.prefs.canvasDefaultLabelSizeMode,
     setCanvasDefaultLabelSizeMode: settings.prefs.setCanvasDefaultLabelSizeMode,
+    canvasDefaultCalloutTextSize: settings.prefs.canvasDefaultCalloutTextSize,
+    setCanvasDefaultCalloutTextSize: settings.prefs.setCanvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees: settings.prefs.canvasDefaultLabelRotationDegrees,
     setCanvasDefaultLabelRotationDegrees: settings.prefs.setCanvasDefaultLabelRotationDegrees,
     canvasPngExportIncludeBackground: settings.prefs.canvasPngExportIncludeBackground,

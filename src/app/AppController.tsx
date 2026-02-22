@@ -155,6 +155,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNetworkLabelStrokeMode,
     networkLabelSizeMode,
     setNetworkLabelSizeMode,
+    networkCalloutTextSize,
+    setNetworkCalloutTextSize,
     networkLabelRotationDegrees,
     setNetworkLabelRotationDegrees,
     canvasResetZoomPercentInput,
@@ -231,6 +233,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,
     setCanvasDefaultLabelSizeMode,
+    canvasDefaultCalloutTextSize,
+    setCanvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees,
     setCanvasDefaultLabelRotationDegrees,
     canvasPngExportIncludeBackground,
@@ -502,6 +506,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasDefaultShowCableCallouts,
     canvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,
+    canvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees,
     canvasPngExportIncludeBackground,
     canvasResetZoomPercentInput,
@@ -530,6 +535,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultShowCableCallouts,
     setCanvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelSizeMode,
+    setCanvasDefaultCalloutTextSize,
     setCanvasDefaultLabelRotationDegrees,
     setCanvasPngExportIncludeBackground,
     setShowNetworkGrid,
@@ -540,6 +546,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setShowCableCallouts,
     setNetworkLabelStrokeMode,
     setNetworkLabelSizeMode,
+    setNetworkCalloutTextSize,
     setNetworkLabelRotationDegrees,
     setCanvasResetZoomPercentInput,
     setNetworkScale,
@@ -558,6 +565,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   useEffect(() => {
     setNetworkLabelSizeMode(canvasDefaultLabelSizeMode);
   }, [canvasDefaultLabelSizeMode, setNetworkLabelSizeMode]);
+
+  useEffect(() => {
+    setNetworkCalloutTextSize(canvasDefaultCalloutTextSize);
+  }, [canvasDefaultCalloutTextSize, setNetworkCalloutTextSize]);
 
   useEffect(() => {
     setNetworkLabelRotationDegrees(canvasDefaultLabelRotationDegrees);
@@ -715,6 +726,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       canvasDefaultShowCableCallouts,
       canvasDefaultLabelStrokeMode,
       canvasDefaultLabelSizeMode,
+      canvasDefaultCalloutTextSize,
       canvasDefaultLabelRotationDegrees,
       setShowNetworkGrid,
       setSnapNodesToGrid,
@@ -724,6 +736,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setShowCableCallouts,
       setNetworkLabelStrokeMode,
       setNetworkLabelSizeMode,
+      setNetworkCalloutTextSize,
       setNetworkLabelRotationDegrees
     },
     sortDefaults: {
@@ -756,6 +769,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setCanvasDefaultShowCableCallouts,
       setCanvasDefaultLabelStrokeMode,
       setCanvasDefaultLabelSizeMode,
+      setCanvasDefaultCalloutTextSize,
       setCanvasDefaultLabelRotationDegrees,
       setCanvasResetZoomPercentInput,
       setCanvasPngExportIncludeBackground,
@@ -1220,6 +1234,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         setShowCableCallouts,
         networkLabelStrokeMode,
         networkLabelSizeMode,
+        networkCalloutTextSize,
         networkLabelRotationDegrees,
         networkScalePercent,
         routingGraph,
@@ -1423,6 +1438,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setCanvasDefaultLabelStrokeMode,
           canvasDefaultLabelSizeMode,
           setCanvasDefaultLabelSizeMode,
+          canvasDefaultCalloutTextSize,
+          setCanvasDefaultCalloutTextSize,
           canvasDefaultLabelRotationDegrees,
           setCanvasDefaultLabelRotationDegrees,
           canvasPngExportIncludeBackground,
@@ -1451,6 +1468,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setNetworkLabelStrokeMode,
           networkLabelSizeMode,
           setNetworkLabelSizeMode,
+          networkCalloutTextSize,
+          setNetworkCalloutTextSize,
           networkLabelRotationDegrees,
           setNetworkLabelRotationDegrees,
           canvasResetZoomPercentInput,

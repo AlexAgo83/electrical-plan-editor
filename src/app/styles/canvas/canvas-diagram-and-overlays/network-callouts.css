@@ -146,3 +146,51 @@
 .network-canvas--label-size-extraLarge .network-callout-row-text {
   font-size: 5.2px;
 }
+
+.network-svg.network-callout-text-size-small .network-callout-title {
+  font-size: 6.8px;
+}
+
+.network-svg.network-callout-text-size-small .network-callout-subtitle {
+  font-size: 5.5px;
+}
+
+.network-svg.network-callout-text-size-small .network-callout-group-label {
+  font-size: 4.8px;
+}
+
+.network-svg.network-callout-text-size-small .network-callout-row-text {
+  font-size: 4.3px;
+}
+
+.network-svg.network-callout-text-size-normal .network-callout-title {
+  font-size: 8.8px;
+}
+
+.network-svg.network-callout-text-size-normal .network-callout-subtitle {
+  font-size: 6.9px;
+}
+
+.network-svg.network-callout-text-size-normal .network-callout-group-label {
+  font-size: 5.9px;
+}
+
+.network-svg.network-callout-text-size-normal .network-callout-row-text {
+  font-size: 5.5px;
+}
+
+.network-svg.network-callout-text-size-large .network-callout-title {
+  font-size: 10px;
+}
+
+.network-svg.network-callout-text-size-large .network-callout-subtitle {
+  font-size: 7.6px;
+}
+
+.network-svg.network-callout-text-size-large .network-callout-group-label {
+  font-size: 6.5px;
+}
+
+.network-svg.network-callout-text-size-large .network-callout-row-text {
+  font-size: 6.3px;
+}

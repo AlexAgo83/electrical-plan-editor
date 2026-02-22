@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import type { ThemeMode } from "../../store";
 import type {
+  CanvasCalloutTextSize,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
@@ -65,6 +66,7 @@ interface UiPreferencesPayload {
   canvasDefaultShowCableCallouts: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
+  canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
@@ -117,6 +119,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultShowCableCallouts: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
+  canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
@@ -146,6 +149,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultShowCableCallouts: (value: boolean) => void;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
+  setCanvasDefaultCalloutTextSize: (value: CanvasCalloutTextSize) => void;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
   setShowNetworkGrid: (value: boolean) => void;
@@ -156,6 +160,7 @@ interface UseUiPreferencesOptions {
   setShowCableCallouts: (value: boolean) => void;
   setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setNetworkLabelSizeMode: (value: CanvasLabelSizeMode) => void;
+  setNetworkCalloutTextSize: (value: CanvasCalloutTextSize) => void;
   setNetworkLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
   setNetworkScale: (value: number) => void;
@@ -173,6 +178,10 @@ function normalizeCanvasLabelSizeMode(value: unknown): CanvasLabelSizeMode {
     value === "extraLarge"
     ? value
     : "normal";
+}
+
+function normalizeCanvasCalloutTextSize(value: unknown): CanvasCalloutTextSize {
+  return value === "small" || value === "large" ? value : "normal";
 }
 
 function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotationDegrees {
@@ -196,6 +205,7 @@ export function useUiPreferences({
   canvasDefaultShowCableCallouts,
   canvasDefaultLabelStrokeMode,
   canvasDefaultLabelSizeMode,
+  canvasDefaultCalloutTextSize,
   canvasDefaultLabelRotationDegrees,
   canvasPngExportIncludeBackground,
   canvasResetZoomPercentInput,
@@ -225,6 +235,7 @@ export function useUiPreferences({
   setCanvasDefaultShowCableCallouts,
   setCanvasDefaultLabelStrokeMode,
   setCanvasDefaultLabelSizeMode,
+  setCanvasDefaultCalloutTextSize,
   setCanvasDefaultLabelRotationDegrees,
   setCanvasPngExportIncludeBackground,
   setShowNetworkGrid,
@@ -235,6 +246,7 @@ export function useUiPreferences({
   setShowCableCallouts,
   setNetworkLabelStrokeMode,
   setNetworkLabelSizeMode,
+  setNetworkCalloutTextSize,
   setNetworkLabelRotationDegrees,
   setCanvasResetZoomPercentInput,
   setNetworkScale,
@@ -273,6 +285,7 @@ export function useUiPreferences({
           ? preferences.canvasDefaultLabelStrokeMode
           : "normal";
       const labelSizeModeDefault = normalizeCanvasLabelSizeMode(preferences.canvasDefaultLabelSizeMode);
+      const calloutTextSizeDefault = normalizeCanvasCalloutTextSize(preferences.canvasDefaultCalloutTextSize);
       const labelRotationDegreesDefault = normalizeCanvasLabelRotationDegrees(preferences.canvasDefaultLabelRotationDegrees);
       const rawResetZoomPercent =
         typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "100";
@@ -307,6 +320,7 @@ export function useUiPreferences({
       setCanvasDefaultShowCableCallouts(showCableCalloutsDefault);
       setCanvasDefaultLabelStrokeMode(labelStrokeModeDefault);
       setCanvasDefaultLabelSizeMode(labelSizeModeDefault);
+      setCanvasDefaultCalloutTextSize(calloutTextSizeDefault);
       setCanvasDefaultLabelRotationDegrees(labelRotationDegreesDefault);
       setCanvasPngExportIncludeBackground(
         typeof preferences.canvasPngExportIncludeBackground === "boolean"
@@ -321,6 +335,7 @@ export function useUiPreferences({
       setShowCableCallouts(showCableCalloutsDefault);
       setNetworkLabelStrokeMode(labelStrokeModeDefault);
       setNetworkLabelSizeMode(labelSizeModeDefault);
+      setNetworkCalloutTextSize(calloutTextSizeDefault);
       setNetworkLabelRotationDegrees(labelRotationDegreesDefault);
       setCanvasResetZoomPercentInput(rawResetZoomPercent);
       setNetworkScale(resetScale);
@@ -346,6 +361,7 @@ export function useUiPreferences({
     setCanvasDefaultShowCableCallouts,
     setCanvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelSizeMode,
+    setCanvasDefaultCalloutTextSize,
     setCanvasDefaultLabelRotationDegrees,
     setCanvasPngExportIncludeBackground,
     setCanvasResetZoomPercentInput,
@@ -368,6 +384,7 @@ export function useUiPreferences({
     setShowCableCallouts,
     setNetworkLabelStrokeMode,
     setNetworkLabelSizeMode,
+    setNetworkCalloutTextSize,
     setNetworkLabelRotationDegrees,
     setSnapNodesToGrid,
     setLockEntityMovement,
@@ -401,6 +418,7 @@ export function useUiPreferences({
       canvasDefaultShowCableCallouts,
       canvasDefaultLabelStrokeMode,
       canvasDefaultLabelSizeMode,
+      canvasDefaultCalloutTextSize,
       canvasDefaultLabelRotationDegrees,
       canvasPngExportIncludeBackground,
       canvasResetZoomPercentInput,
@@ -423,6 +441,7 @@ export function useUiPreferences({
     canvasDefaultShowCableCallouts,
     canvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,
+    canvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees,
     canvasPngExportIncludeBackground,
     canvasResetZoomPercentInput,

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ThemeMode } from "../../store";
 import type {
+  CanvasCalloutTextSize,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
@@ -27,6 +28,7 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultShowCableCallouts, setCanvasDefaultShowCableCallouts] = useState(false);
   const [canvasDefaultLabelStrokeMode, setCanvasDefaultLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
   const [canvasDefaultLabelSizeMode, setCanvasDefaultLabelSizeMode] = useState<CanvasLabelSizeMode>("normal");
+  const [canvasDefaultCalloutTextSize, setCanvasDefaultCalloutTextSize] = useState<CanvasCalloutTextSize>("normal");
   const [canvasDefaultLabelRotationDegrees, setCanvasDefaultLabelRotationDegrees] =
     useState<CanvasLabelRotationDegrees>(-20);
   const [canvasPngExportIncludeBackground, setCanvasPngExportIncludeBackground] = useState(true);
@@ -66,6 +68,8 @@ export function useAppControllerPreferencesState() {
     setCanvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,
     setCanvasDefaultLabelSizeMode,
+    canvasDefaultCalloutTextSize,
+    setCanvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees,
     setCanvasDefaultLabelRotationDegrees,
     canvasPngExportIncludeBackground,

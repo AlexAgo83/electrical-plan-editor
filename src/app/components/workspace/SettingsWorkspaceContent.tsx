@@ -3,6 +3,7 @@ import type { NetworkImportSummary } from "../../../adapters/portability";
 import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
 import type {
+  CanvasCalloutTextSize,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
@@ -58,6 +59,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
+  canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
+  setCanvasDefaultCalloutTextSize: (value: CanvasCalloutTextSize) => void;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   canvasPngExportIncludeBackground: boolean;
@@ -121,6 +124,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultLabelStrokeMode,
   canvasDefaultLabelSizeMode,
   setCanvasDefaultLabelSizeMode,
+  canvasDefaultCalloutTextSize,
+  setCanvasDefaultCalloutTextSize,
   canvasDefaultLabelRotationDegrees,
   setCanvasDefaultLabelRotationDegrees,
   canvasPngExportIncludeBackground,
@@ -206,10 +211,10 @@ export function SettingsWorkspaceContent({
 
       <section className="panel settings-panel">
         <header className="settings-panel-header">
-          <h2>Canvas preferences</h2>
-          <span className="settings-panel-chip">Canvas</span>
+          <h2>Canvas tools preferences</h2>
+          <span className="settings-panel-chip">Canvas Tools</span>
         </header>
-        <p className="settings-panel-intro">Default behavior applied to the 2D network view and interaction controls.</p>
+        <p className="settings-panel-intro">Default tool behavior and overlay visibility for the 2D network workspace.</p>
         <div className="settings-grid">
           <label className="settings-checkbox">
             <input type="checkbox" checked={canvasDefaultShowGrid} onChange={(event) => setCanvasDefaultShowGrid(event.target.checked)} />
@@ -255,6 +260,27 @@ export function SettingsWorkspaceContent({
             />
             Show connector/splice cable callouts by default
           </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasPngExportIncludeBackground}
+              onChange={(event) => setCanvasPngExportIncludeBackground(event.target.checked)}
+            />
+            Include background in PNG export
+          </label>
+        </div>
+        <div className="row-actions settings-actions">
+          <button type="button" className="settings-primary-action" onClick={applyCanvasDefaultsNow}>Apply canvas defaults now</button>
+        </div>
+      </section>
+
+      <section className="panel settings-panel">
+        <header className="settings-panel-header">
+          <h2>Canvas render preferences</h2>
+          <span className="settings-panel-chip">Canvas Render</span>
+        </header>
+        <p className="settings-panel-intro">Typography and rendering defaults used for labels, callouts, and view reset behavior.</p>
+        <div className="settings-grid">
           <label className="settings-field">
             Label stroke mode
             <select
@@ -280,6 +306,17 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
+            Callout text size
+            <select
+              value={canvasDefaultCalloutTextSize}
+              onChange={(event) => setCanvasDefaultCalloutTextSize(event.target.value as CanvasCalloutTextSize)}
+            >
+              <option value="small">Small</option>
+              <option value="normal">Normal</option>
+              <option value="large">Large</option>
+            </select>
+          </label>
+          <label className="settings-field">
             2D label rotation
             <select
               value={String(canvasDefaultLabelRotationDegrees)}
@@ -294,24 +331,14 @@ export function SettingsWorkspaceContent({
               <option value="90">90°</option>
             </select>
           </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasPngExportIncludeBackground}
-              onChange={(event) => setCanvasPngExportIncludeBackground(event.target.checked)}
-            />
-            Include background in PNG export
-          </label>
           <label className="settings-field">
             Reset zoom target (%)
             <input type="number" value={canvasResetZoomPercentInput} onChange={(event) => setCanvasResetZoomPercentInput(event.target.value)} />
           </label>
         </div>
         <div className="row-actions settings-actions">
-          <button type="button" className="settings-primary-action" onClick={applyCanvasDefaultsNow}>Apply canvas defaults now</button>
           <button type="button" onClick={() => handleZoomAction("reset")}>Reset current view</button>
         </div>
-        <p className="meta-line settings-meta-compact">Configured reset zoom: {configuredResetZoomPercent}%.</p>
       </section>
 
       <section className="panel settings-panel">
@@ -338,56 +365,6 @@ export function SettingsWorkspaceContent({
           <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
             Reset sample network to baseline
           </button>
-        </div>
-      </section>
-
-      <section className="panel settings-panel">
-        <header className="settings-panel-header">
-          <h2>Action bar and shortcuts</h2>
-          <span className="settings-panel-chip">Shortcuts</span>
-        </header>
-        <p className="settings-panel-intro">Enable keyboard helpers and keep a quick reference of available shortcuts.</p>
-        <div className="settings-grid">
-          <label className="settings-checkbox">
-            <input type="checkbox" checked={showShortcutHints} onChange={(event) => setShowShortcutHints(event.target.checked)} />
-            Show shortcut hints in the action bar
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={keyboardShortcutsEnabled}
-              onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
-            />
-            Enable keyboard shortcuts (undo/redo/navigation/issues/view)
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={showFloatingInspectorPanel}
-              onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
-            />
-            Show floating inspector panel on supported screens
-          </label>
-        </div>
-        <ul className="settings-shortcut-list">
-          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Z</span> <span>Undo last modeling action</span></li>
-          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Shift + Z</span> <span>Redo</span></li>
-          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Y</span> <span>Redo (alternative shortcut)</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + 1..6</span> <span>Switch top-level workspace</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + Shift + 1..5</span> <span>Switch entity sub-screen</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + F</span> <span>Fit network view to current graph</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + J / Alt + K</span> <span>Previous / next validation issue</span></li>
-        </ul>
-      </section>
-
-      <section className="panel settings-panel">
-        <header className="settings-panel-header">
-          <h2>Global preferences</h2>
-          <span className="settings-panel-chip">Defaults</span>
-        </header>
-        <p className="settings-panel-intro">Reset shared UI preferences to their default values across the workspace.</p>
-        <div className="row-actions settings-actions">
-          <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
         </div>
       </section>
 
@@ -454,6 +431,56 @@ export function SettingsWorkspaceContent({
             <p className="meta-line"><span>Errors</span> <strong>{lastImportSummary.errors.length}</strong></p>
           </div>
         ) : null}
+      </section>
+
+      <section className="panel settings-panel">
+        <header className="settings-panel-header">
+          <h2>Global preferences</h2>
+          <span className="settings-panel-chip">Defaults</span>
+        </header>
+        <p className="settings-panel-intro">Reset shared UI preferences to their default values across the workspace.</p>
+        <div className="row-actions settings-actions">
+          <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
+        </div>
+      </section>
+
+      <section className="panel settings-panel">
+        <header className="settings-panel-header">
+          <h2>Action bar and shortcuts</h2>
+          <span className="settings-panel-chip">Shortcuts</span>
+        </header>
+        <p className="settings-panel-intro">Enable keyboard helpers and keep a quick reference of available shortcuts.</p>
+        <div className="settings-grid">
+          <label className="settings-checkbox">
+            <input type="checkbox" checked={showShortcutHints} onChange={(event) => setShowShortcutHints(event.target.checked)} />
+            Show shortcut hints in the action bar
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={keyboardShortcutsEnabled}
+              onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
+            />
+            Enable keyboard shortcuts (undo/redo/navigation/issues/view)
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={showFloatingInspectorPanel}
+              onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
+            />
+            Show floating inspector panel on supported screens
+          </label>
+        </div>
+        <ul className="settings-shortcut-list">
+          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Z</span> <span>Undo last modeling action</span></li>
+          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Shift + Z</span> <span>Redo</span></li>
+          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Y</span> <span>Redo (alternative shortcut)</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + 1..6</span> <span>Switch top-level workspace</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + Shift + 1..5</span> <span>Switch entity sub-screen</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + F</span> <span>Fit network view to current graph</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + J / Alt + K</span> <span>Previous / next validation issue</span></li>
+        </ul>
       </section>
     </section>
   );

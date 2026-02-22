@@ -23,6 +23,7 @@ import type {
 import type { ShortestRouteResult } from "../../core/pathfinding";
 import type { SubNetworkSummary } from "../../store";
 import type {
+  CanvasCalloutTextSize,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
@@ -111,6 +112,7 @@ export interface NetworkSummaryPanelProps {
   showCableCallouts: boolean;
   labelStrokeMode: CanvasLabelStrokeMode;
   labelSizeMode: CanvasLabelSizeMode;
+  calloutTextSize: CanvasCalloutTextSize;
   labelRotationDegrees: CanvasLabelRotationDegrees;
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
@@ -259,19 +261,15 @@ function buildCalloutEntryDisplayLine(entry: CalloutEntry): string {
   return `${entry.name} (${entry.technicalId}) - ${entry.lengthMm} mm`;
 }
 
-function getCalloutRowFontSize(labelSizeMode: CanvasLabelSizeMode): number {
-  switch (labelSizeMode) {
-    case "extraSmall":
-      return 3.7;
+function getCalloutRowFontSize(calloutTextSize: CanvasCalloutTextSize): number {
+  switch (calloutTextSize) {
     case "small":
-      return 4;
+      return 4.3;
     case "large":
-      return 4.9;
-    case "extraLarge":
-      return 5.2;
+      return 6.3;
     case "normal":
     default:
-      return 4.3;
+      return 5.5;
   }
 }
 
@@ -410,9 +408,9 @@ function measureCalloutRowsBlockBBox(
   return null;
 }
 
-function buildCalloutLayoutMetrics(groups: CalloutGroup[], labelSizeMode: CanvasLabelSizeMode): CalloutLayoutMetrics {
+function buildCalloutLayoutMetrics(groups: CalloutGroup[], calloutTextSize: CanvasCalloutTextSize): CalloutLayoutMetrics {
   const rows = groups.flatMap((group) => group.entries.map(buildCalloutEntryDisplayLine));
-  const rowFontSize = getCalloutRowFontSize(labelSizeMode);
+  const rowFontSize = getCalloutRowFontSize(calloutTextSize);
   const topPadding = 0.7;
   const bottomPadding = 0.6;
   const rowGap = 0.45;
@@ -471,6 +469,7 @@ export function NetworkSummaryPanel({
   showCableCallouts,
   labelStrokeMode,
   labelSizeMode,
+  calloutTextSize,
   labelRotationDegrees,
   showNetworkGrid,
   snapNodesToGrid,
@@ -1172,7 +1171,7 @@ export function NetworkSummaryPanel({
             />
             <svg
               ref={networkSvgRef}
-              className={`network-svg network-canvas--label-stroke-${labelStrokeMode} network-canvas--label-size-${labelSizeMode}`}
+              className={`network-svg network-canvas--label-stroke-${labelStrokeMode} network-canvas--label-size-${labelSizeMode} network-callout-text-size-${calloutTextSize}`}
               role="img"
               aria-label="2D network diagram"
               viewBox={`0 0 ${networkViewWidth} ${networkViewHeight}`}
@@ -1364,7 +1363,7 @@ export function NetworkSummaryPanel({
                 })}
 
                 {orderedCableCallouts.map((callout) => {
-                  const layout = buildCalloutLayoutMetrics(callout.groups, labelSizeMode);
+                  const layout = buildCalloutLayoutMetrics(callout.groups, calloutTextSize);
                   const lineEnd = getCalloutFrameEdgePoint(
                     callout.nodePosition,
                     callout.position,
