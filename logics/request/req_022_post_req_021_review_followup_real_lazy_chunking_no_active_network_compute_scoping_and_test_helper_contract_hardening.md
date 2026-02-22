@@ -1,7 +1,7 @@
 ## req_022_post_req_021_review_followup_real_lazy_chunking_no_active_network_compute_scoping_and_test_helper_contract_hardening - Post-req_021 Review Follow-up for Real Lazy Chunking, No-Active-Network Compute Scoping, and Test Helper Contract Hardening
 > From version: 0.5.7
-> Understanding: 100%
-> Confidence: 98%
+> Understanding: 99%
+> Confidence: 99%
 > Complexity: Medium
 > Theme: Follow-up hardening for production lazy-loading realism, compute scoping completeness, and test helper contract clarity
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -101,8 +101,47 @@ Related delivered context:
   - `item_132_strict_navigation_test_helper_contract_hardening_without_auto_repair.md`
   - `item_133_req_022_followup_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
+# Delivery summary
+- Real lazy chunking contract restored in production:
+  - Split eager UI module registry into a dedicated test-only module (`appUiModules.eager.ts`) and loaded it only in Vitest via top-level await.
+  - Production `appUiModules` no longer statically imports the same modules it lazily imports, restoring actual chunk splitting.
+  - Files: `src/app/components/appUiModules.tsx`, `src/app/components/appUiModules.eager.ts`
+- Lazy-path regression coverage preserved:
+  - Existing lazy-path integration regression tests continue to run against the opt-in lazy mode controls and pass after the registry refactor.
+  - File: `src/tests/app.ui.lazy-loading-regression.spec.tsx`
+- No-active-network compute scoping alignment delivered:
+  - `AppController` now gates modeling/analysis/validation/settings content assembly includes by `hasActiveNetwork`, aligning with `AppShellLayout` empty-state precedence.
+  - File: `src/app/AppController.tsx`
+- Async-safe viewport helper contract delivered:
+  - `withViewportWidth(...)` now supports sync and async callbacks with guaranteed cleanup on success and synchronous throw paths.
+  - Files: `src/tests/helpers/app-ui-test-utils.tsx`, `src/tests/app.ui.workspace-shell-regression.spec.tsx`
+- Strict helper contract hardening delivered:
+  - `switchSubScreenStrict(...)` no longer auto-switches to modeling when secondary nav is absent; regression coverage added.
+  - Files: `src/tests/helpers/app-ui-test-utils.tsx`, `src/tests/app.ui.workspace-shell-regression.spec.tsx`
+- Validation closure delivered:
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run quality:ui-modularization`
+  - `npm run quality:store-modularization`
+  - `npx vitest run src/tests/app.ui.lazy-loading-regression.spec.tsx src/tests/app.ui.workspace-shell-regression.spec.tsx src/tests/app.ui.inspector-shell.spec.tsx`
+  - `npm run test:ci`
+  - `npm run test:e2e`
+  - `npm run build`
+  - `npm run quality:pwa`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+
+# AC traceability
+- AC1: Satisfied by the eager-registry split and Vitest-only eager loading path, removing production static imports for lazy targets and restoring real chunking.
+- AC2: Satisfied by passing lazy-path regression tests after the `appUiModules` refactor.
+- AC3: Satisfied by `hasActiveNetwork` gating on non-network-scope content assembly include flags in `AppController`.
+- AC4: Satisfied by overloaded async-safe `withViewportWidth(...)` helper behavior with guaranteed restoration.
+- AC5: Satisfied by strict helper contract hardening (no silent auto-repair) while keeping drawer-aware variants explicit.
+- AC6: Satisfied by passing touched shell/lazy tests and readable helper/test updates.
+- AC7: Satisfied by full closure validation pipeline and Logics lint passing.
+
 # References
 - `src/app/components/appUiModules.tsx`
+- `src/app/components/appUiModules.eager.ts`
 - `src/app/AppController.tsx`
 - `src/app/components/layout/AppShellLayout.tsx`
 - `src/app/hooks/controller/useAppControllerModelingAnalysisScreenDomains.tsx`
@@ -111,5 +150,6 @@ Related delivered context:
 - `src/tests/app.ui.lazy-loading-regression.spec.tsx`
 - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
 - `src/tests/app.ui.inspector-shell.spec.tsx`
+- `logics/tasks/task_021_post_req_021_review_followup_real_lazy_chunking_no_active_network_compute_scoping_and_test_helper_contract_hardening_orchestration_and_delivery_control.md`
 - `logics/request/req_021_app_controller_post_req_020_review_followup_inactive_screen_computation_lazy_test_path_and_shell_test_guardrails.md`
 - `logics/tasks/task_020_app_controller_post_req_020_review_followup_inactive_screen_computation_lazy_test_path_and_shell_test_guardrails_orchestration_and_delivery_control.md`
