@@ -184,7 +184,7 @@
 }
 
 .network-segment.is-selected {
-  stroke: #0f6cb8;
+  stroke: var(--network-selection-color, #0f6cb8);
   stroke-width: 5;
 }
 
@@ -243,7 +243,7 @@
 }
 
 .network-node.is-selected .network-node-shape {
-  stroke: #0f6cb8;
+  stroke: var(--network-selection-color, #0f6cb8);
   stroke-width: 3;
 }
 
@@ -252,9 +252,9 @@
 }
 
 .network-node:focus-visible .network-node-shape {
-  stroke: #0b4f86;
+  stroke: var(--network-selection-focus-color, var(--network-selection-color, #0b4f86));
   stroke-width: 3;
-  filter: drop-shadow(0 0 0.2rem rgba(15, 108, 184, 0.45));
+  filter: drop-shadow(0 0 0.2rem var(--network-selection-glow, rgba(15, 108, 184, 0.45)));
 }
 
 .network-node-label {

@@ -1,3 +1,9 @@
+.app-shell.theme-dark {
+  --network-selection-color: #7fc5ff;
+  --network-selection-focus-color: #7fc5ff;
+  --network-selection-glow: rgba(127, 197, 255, 0.45);
+}
+
 .app-shell.theme-dark .route-preview-panel {
   border-color: #44617a;
   background: linear-gradient(180deg, #1b3046 0%, #182c40 100%);

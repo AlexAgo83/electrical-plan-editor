@@ -1,5 +1,8 @@
 .app-shell.theme-slate-neon {
   --theme-primary: #38e6c8;
+  --network-selection-color: #38e6c8;
+  --network-selection-focus-color: #38e6c8;
+  --network-selection-glow: rgba(56, 230, 200, 0.45);
   color: #dcfbff;
 }
 
@@ -142,6 +145,9 @@
 
 .app-shell.theme-paper-blueprint {
   --theme-primary: #2f6f9f;
+  --network-selection-color: #2f6f9f;
+  --network-selection-focus-color: #2f6f9f;
+  --network-selection-glow: rgba(47, 111, 159, 0.35);
   color: #12354f;
 }
 
@@ -272,6 +278,9 @@
 
 .app-shell.theme-warm-brown {
   --theme-primary: #9a6b44;
+  --network-selection-color: #9a6b44;
+  --network-selection-focus-color: #9a6b44;
+  --network-selection-glow: rgba(154, 107, 68, 0.38);
   color: #4e3525;
 }
 
@@ -386,6 +395,9 @@
 
 .app-shell.theme-deep-green {
   --theme-primary: #5bc88f;
+  --network-selection-color: #5bc88f;
+  --network-selection-focus-color: #5bc88f;
+  --network-selection-glow: rgba(91, 200, 143, 0.42);
   color: #d7ead7;
 }
 
@@ -1537,6 +1549,9 @@
 
 .app-shell.theme-rose-quartz {
   --theme-primary: #d85b8e;
+  --network-selection-color: #cf4c84;
+  --network-selection-focus-color: #cf4c84;
+  --network-selection-glow: rgba(207, 76, 132, 0.4);
   color: #4f2137;
 }
 
@@ -1712,6 +1727,9 @@
 
 .app-shell.theme-lavender-haze {
   --theme-primary: #6f63d9;
+  --network-selection-color: #6355db;
+  --network-selection-focus-color: #6355db;
+  --network-selection-glow: rgba(99, 85, 219, 0.42);
   color: #2f2a5f;
 }
 
@@ -1887,6 +1905,9 @@
 
 .app-shell.theme-burgundy-noir {
   --theme-primary: #b1466e;
+  --network-selection-color: #d56b94;
+  --network-selection-focus-color: #d56b94;
+  --network-selection-glow: rgba(213, 107, 148, 0.45);
   color: #f7eaf0;
 }
 
@@ -2189,6 +2210,9 @@
 
 .app-shell.theme-amber-night {
   --theme-primary: #f1bf3a;
+  --network-selection-color: #f1bf3a;
+  --network-selection-focus-color: #f1bf3a;
+  --network-selection-glow: rgba(241, 191, 58, 0.42);
   color: #fbf0cf;
 }
 
