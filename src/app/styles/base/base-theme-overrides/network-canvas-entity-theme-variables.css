@@ -1,7 +1,7 @@
 .app-shell {
   --network-grid-line-color: #d5e1eb;
   --network-segment-color: #7f99af;
-  --network-wire-highlight-color: #4f8d2d;
+  --network-wire-highlight-color: #39ff14;
   --network-node-stroke-color: #55748d;
   --network-node-connector-fill: #dff0ff;
   --network-node-splice-fill: #fdeecf;
@@ -13,9 +13,12 @@
 }
 
 .app-shell.theme-normal {
+  --network-selection-color: #0f6cb8;
+  --network-selection-focus-color: #0f6cb8;
+  --network-selection-glow: rgba(15, 108, 184, 0.45);
   --network-grid-line-color: #d5e1eb;
   --network-segment-color: #7f99af;
-  --network-wire-highlight-color: #4f8d2d;
+  --network-wire-highlight-color: #39ff14;
   --network-node-stroke-color: #55748d;
   --network-node-connector-fill: #dff0ff;
   --network-node-splice-fill: #fdeecf;
@@ -32,7 +35,7 @@
   --network-selection-glow: rgba(127, 197, 255, 0.45);
   --network-grid-line-color: #49647a;
   --network-segment-color: #8ea8bd;
-  --network-wire-highlight-color: #6ecb8b;
+  --network-wire-highlight-color: #39ff14;
   --network-node-stroke-color: #6f8ba2;
   --network-node-connector-fill: #2b4e70;
   --network-node-splice-fill: #6c5332;
@@ -44,9 +47,12 @@
 }
 
 .app-shell.theme-slate-neon {
+  --network-selection-color: #38e6c8;
+  --network-selection-focus-color: #38e6c8;
+  --network-selection-glow: rgba(56, 230, 200, 0.45);
   --network-grid-line-color: #5a8f9d;
   --network-segment-color: #8bc1cc;
-  --network-wire-highlight-color: #79e0b4;
+  --network-wire-highlight-color: #f4ff1a;
   --network-node-stroke-color: #6ba4b0;
   --network-node-connector-fill: #1d5160;
   --network-node-splice-fill: #5f4e2a;
@@ -58,9 +64,12 @@
 }
 
 .app-shell.theme-paper-blueprint {
+  --network-selection-color: #2f6f9f;
+  --network-selection-focus-color: #2f6f9f;
+  --network-selection-glow: rgba(47, 111, 159, 0.35);
   --network-grid-line-color: #ccdae6;
   --network-segment-color: #6e8eaa;
-  --network-wire-highlight-color: #4d8f63;
+  --network-wire-highlight-color: #39ff14;
   --network-node-stroke-color: #6b89a1;
   --network-node-connector-fill: #e7f2ff;
   --network-node-splice-fill: #fff1d8;
@@ -72,9 +81,12 @@
 }
 
 .app-shell.theme-warm-brown {
+  --network-selection-color: #9a6b44;
+  --network-selection-focus-color: #9a6b44;
+  --network-selection-glow: rgba(154, 107, 68, 0.38);
   --network-grid-line-color: #e1ccb7;
   --network-segment-color: #9a7b61;
-  --network-wire-highlight-color: #6a8f42;
+  --network-wire-highlight-color: #39ff14;
   --network-node-stroke-color: #9a7a62;
   --network-node-connector-fill: #fff1e1;
   --network-node-splice-fill: #f4e1bf;
@@ -86,9 +98,12 @@
 }
 
 .app-shell.theme-deep-green {
+  --network-selection-color: #5bc88f;
+  --network-selection-focus-color: #5bc88f;
+  --network-selection-glow: rgba(91, 200, 143, 0.42);
   --network-grid-line-color: #41695a;
   --network-segment-color: #93bea6;
-  --network-wire-highlight-color: #8be0a6;
+  --network-wire-highlight-color: #f4ff1a;
   --network-node-stroke-color: #5b8e78;
   --network-node-connector-fill: #1d4c40;
   --network-node-splice-fill: #6c5934;
@@ -100,9 +115,12 @@
 }
 
 .app-shell.theme-rose-quartz {
+  --network-selection-color: #cf4c84;
+  --network-selection-focus-color: #cf4c84;
+  --network-selection-glow: rgba(207, 76, 132, 0.4);
   --network-grid-line-color: #e7c7d6;
   --network-segment-color: #bb7c98;
-  --network-wire-highlight-color: #d0819f;
+  --network-wire-highlight-color: #39ff14;
   --network-node-stroke-color: #be7f9b;
   --network-node-connector-fill: #fff0f7;
   --network-node-splice-fill: #ffe6ef;
@@ -114,9 +132,12 @@
 }
 
 .app-shell.theme-lavender-haze {
+  --network-selection-color: #6355db;
+  --network-selection-focus-color: #6355db;
+  --network-selection-glow: rgba(99, 85, 219, 0.42);
   --network-grid-line-color: #d7d1ef;
   --network-segment-color: #8d84cb;
-  --network-wire-highlight-color: #8c76d8;
+  --network-wire-highlight-color: #39ff14;
   --network-node-stroke-color: #8e87cd;
   --network-node-connector-fill: #f1eeff;
   --network-node-splice-fill: #eee7ff;
@@ -128,9 +149,12 @@
 }
 
 .app-shell.theme-burgundy-noir {
+  --network-selection-color: #d56b94;
+  --network-selection-focus-color: #d56b94;
+  --network-selection-glow: rgba(213, 107, 148, 0.45);
   --network-grid-line-color: #5f3748;
   --network-segment-color: #d4a5b7;
-  --network-wire-highlight-color: #ea8fb1;
+  --network-wire-highlight-color: #39ff14;
   --network-node-stroke-color: #9a6277;
   --network-node-connector-fill: #4c2132;
   --network-node-splice-fill: #6b3a46;
@@ -142,9 +166,12 @@
 }
 
 .app-shell.theme-amber-night {
+  --network-selection-color: #f1bf3a;
+  --network-selection-focus-color: #f1bf3a;
+  --network-selection-glow: rgba(241, 191, 58, 0.42);
   --network-grid-line-color: #6b5532;
   --network-segment-color: #d7b57d;
-  --network-wire-highlight-color: #f0c15a;
+  --network-wire-highlight-color: #39ff14;
   --network-node-stroke-color: #a9864b;
   --network-node-connector-fill: #4d3a17;
   --network-node-splice-fill: #6a4714;

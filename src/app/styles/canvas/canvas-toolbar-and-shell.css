@@ -267,14 +267,24 @@
 
 .network-canvas-subnetwork-list li {
   display: grid;
-  justify-items: start;
+  justify-items: stretch;
   gap: 0.16rem;
+  width: 100%;
+  min-width: 0;
   color: #355067;
   font-size: 0.77rem;
 }
 
 .network-canvas-subnetwork-list .subnetwork-chip {
-  justify-self: start;
+  justify-self: stretch;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.network-canvas-subnetwork-list li > span:last-child {
+  display: block;
+  width: 100%;
+  min-width: 0;
 }
 
 .network-canvas-stats-list {
