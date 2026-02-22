@@ -46,3 +46,5 @@ export function useWireEndpointDescriptions({ connectorMap, spliceMap }: UseWire
     describeWireEndpointId
   };
 }
+
+export type WireEndpointDescriptions = ReturnType<typeof useWireEndpointDescriptions>;

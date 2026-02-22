@@ -278,3 +278,5 @@ export function useEntityListModel({
     getSortIndicator
   };
 }
+
+export type EntityListModel = ReturnType<typeof useEntityListModel>;

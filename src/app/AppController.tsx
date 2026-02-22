@@ -1,7 +1,6 @@
 import {
   Suspense,
   type ReactElement,
-  lazy,
   useCallback,
   useEffect,
   useRef,
@@ -29,33 +28,13 @@ import {
   selectSplices,
   selectSubNetworkSummaries,
   selectWireTechnicalIdTaken,
-  selectWires,
+  selectWires
 } from "../store";
 import { appStore } from "./store";
-import { NetworkSummaryPanel as NetworkSummaryPanelEager } from "./components/NetworkSummaryPanel";
-import { AnalysisWorkspaceContainer } from "./components/containers/AnalysisWorkspaceContainer";
-import { ModelingWorkspaceContainer } from "./components/containers/ModelingWorkspaceContainer";
-import { NetworkScopeWorkspaceContainer } from "./components/containers/NetworkScopeWorkspaceContainer";
-import { SettingsWorkspaceContainer } from "./components/containers/SettingsWorkspaceContainer";
-import { ValidationWorkspaceContainer } from "./components/containers/ValidationWorkspaceContainer";
-import { AnalysisScreen as AnalysisScreenEager } from "./components/screens/AnalysisScreen";
-import { ModelingScreen as ModelingScreenEager } from "./components/screens/ModelingScreen";
-import { NetworkScopeScreen as NetworkScopeScreenEager } from "./components/screens/NetworkScopeScreen";
-import { SettingsScreen as SettingsScreenEager } from "./components/screens/SettingsScreen";
-import { ValidationScreen as ValidationScreenEager } from "./components/screens/ValidationScreen";
-import { AppHeaderAndStats } from "./components/workspace/AppHeaderAndStats";
-import { AnalysisWorkspaceContent as AnalysisWorkspaceContentEager } from "./components/workspace/AnalysisWorkspaceContent";
-import { ModelingFormsColumn as ModelingFormsColumnEager } from "./components/workspace/ModelingFormsColumn";
-import { ModelingPrimaryTables as ModelingPrimaryTablesEager } from "./components/workspace/ModelingPrimaryTables";
-import { ModelingSecondaryTables as ModelingSecondaryTablesEager } from "./components/workspace/ModelingSecondaryTables";
-import { NetworkScopeWorkspaceContent as NetworkScopeWorkspaceContentEager } from "./components/workspace/NetworkScopeWorkspaceContent";
-import { OperationsHealthPanel } from "./components/workspace/OperationsHealthPanel";
-import { SettingsWorkspaceContent as SettingsWorkspaceContentEager } from "./components/workspace/SettingsWorkspaceContent";
-import { ValidationWorkspaceContent as ValidationWorkspaceContentEager } from "./components/workspace/ValidationWorkspaceContent";
-import { WorkspaceSidebarPanel } from "./components/workspace/WorkspaceSidebarPanel";
+import { appUiModules } from "./components/appUiModules";
+import { AppShellLayout } from "./components/layout/AppShellLayout";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useCanvasState } from "./hooks/useCanvasState";
-import { useConnectorHandlers } from "./hooks/useConnectorHandlers";
 import { useAppControllerCanvasDisplayState } from "./hooks/useAppControllerCanvasDisplayState";
 import { useAppControllerPreferencesState } from "./hooks/useAppControllerPreferencesState";
 import { useAppControllerLayoutDerivedState } from "./hooks/useAppControllerLayoutDerivedState";
@@ -66,14 +45,12 @@ import {
   useAppControllerSelectionHandlersAssembly,
   useAppControllerWorkspaceHandlersAssembly
 } from "./hooks/controller/useAppControllerHeavyHookAssemblers";
+import { useAppControllerAuxScreenContentDomains } from "./hooks/controller/useAppControllerAuxScreenContentDomains";
+import { useAppControllerModelingAnalysisScreenDomains } from "./hooks/controller/useAppControllerModelingAnalysisScreenDomains";
+import { useAppControllerModelingHandlersOrchestrator } from "./hooks/controller/useAppControllerModelingHandlersOrchestrator";
 import {
-  useAnalysisScreenContentSlice,
   useInspectorContextPanelControllerSlice,
-  useModelingScreenContentSlice,
-  useNetworkScopeScreenContentSlice,
-  useNetworkSummaryPanelControllerSlice,
-  useSettingsScreenContentSlice,
-  useValidationScreenContentSlice
+  useNetworkSummaryPanelControllerSlice
 } from "./hooks/controller/useAppControllerScreenContentSlices";
 import { useEntityListModel } from "./hooks/useEntityListModel";
 import { useEntityFormsState } from "./hooks/useEntityFormsState";
@@ -86,30 +63,28 @@ import { useNetworkScopeFormOrchestration } from "./hooks/useNetworkScopeFormOrc
 import { useNetworkScopeFormState } from "./hooks/useNetworkScopeFormState";
 import { useModelingFormSelectionSync } from "./hooks/useModelingFormSelectionSync";
 import { useNodeDescriptions } from "./hooks/useNodeDescriptions";
-import { useNodeHandlers } from "./hooks/useNodeHandlers";
 import type { BeforeInstallPromptEventLike } from "./hooks/useWorkspaceShellChrome";
-import { useSegmentHandlers } from "./hooks/useSegmentHandlers";
-import { useSpliceHandlers } from "./hooks/useSpliceHandlers";
 import { useStoreHistory } from "./hooks/useStoreHistory";
 import { useUiPreferences } from "./hooks/useUiPreferences";
 import { useValidationModel } from "./hooks/useValidationModel";
 import { useWireEndpointDescriptions } from "./hooks/useWireEndpointDescriptions";
-import { useWireHandlers } from "./hooks/useWireHandlers";
 import { useWorkspaceShellChrome } from "./hooks/useWorkspaceShellChrome";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
+import { buildAppControllerNamespacedCanvasState } from "./hooks/useAppControllerNamespacedCanvasState";
+import { buildAppControllerNamespacedFormsState } from "./hooks/useAppControllerNamespacedFormsState";
 import {
   HISTORY_LIMIT,
   NETWORK_GRID_STEP,
   NETWORK_MAX_SCALE,
   NETWORK_MIN_SCALE,
   NETWORK_VIEW_HEIGHT,
-  NETWORK_VIEW_WIDTH,
+  NETWORK_VIEW_WIDTH
 } from "./lib/app-utils-shared";
 import { createNodePositionMap } from "./lib/app-utils-layout";
 import type {
   AppProps,
   NodePosition,
-  SubScreenId,
+  SubScreenId
 } from "./types/app-controller";
 import "./styles.css";
 
@@ -120,63 +95,25 @@ function useAppSnapshot(store: AppStore) {
 }
 
 const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor";
-const SHOULD_LAZY_LOAD_UI_MODULES = !import.meta.env.VITEST;
-const NetworkSummaryPanelLazy = lazy(() =>
-  import("./components/NetworkSummaryPanel").then((module) => ({ default: module.NetworkSummaryPanel }))
-);
-const AnalysisScreenLazy = lazy(() =>
-  import("./components/screens/AnalysisScreen").then((module) => ({ default: module.AnalysisScreen }))
-);
-const ModelingScreenLazy = lazy(() =>
-  import("./components/screens/ModelingScreen").then((module) => ({ default: module.ModelingScreen }))
-);
-const NetworkScopeScreenLazy = lazy(() =>
-  import("./components/screens/NetworkScopeScreen").then((module) => ({ default: module.NetworkScopeScreen }))
-);
-const SettingsScreenLazy = lazy(() =>
-  import("./components/screens/SettingsScreen").then((module) => ({ default: module.SettingsScreen }))
-);
-const ValidationScreenLazy = lazy(() =>
-  import("./components/screens/ValidationScreen").then((module) => ({ default: module.ValidationScreen }))
-);
-const AnalysisWorkspaceContentLazy = lazy(() =>
-  import("./components/workspace/AnalysisWorkspaceContent").then((module) => ({ default: module.AnalysisWorkspaceContent }))
-);
-const ModelingFormsColumnLazy = lazy(() =>
-  import("./components/workspace/ModelingFormsColumn").then((module) => ({ default: module.ModelingFormsColumn }))
-);
-const ModelingPrimaryTablesLazy = lazy(() =>
-  import("./components/workspace/ModelingPrimaryTables").then((module) => ({ default: module.ModelingPrimaryTables }))
-);
-const ModelingSecondaryTablesLazy = lazy(() =>
-  import("./components/workspace/ModelingSecondaryTables").then((module) => ({ default: module.ModelingSecondaryTables }))
-);
-const NetworkScopeWorkspaceContentLazy = lazy(() =>
-  import("./components/workspace/NetworkScopeWorkspaceContent").then((module) => ({ default: module.NetworkScopeWorkspaceContent }))
-);
-const SettingsWorkspaceContentLazy = lazy(() =>
-  import("./components/workspace/SettingsWorkspaceContent").then((module) => ({ default: module.SettingsWorkspaceContent }))
-);
-const ValidationWorkspaceContentLazy = lazy(() =>
-  import("./components/workspace/ValidationWorkspaceContent").then((module) => ({ default: module.ValidationWorkspaceContent }))
-);
-const NetworkSummaryPanel = SHOULD_LAZY_LOAD_UI_MODULES ? NetworkSummaryPanelLazy : NetworkSummaryPanelEager;
-const AnalysisScreen = SHOULD_LAZY_LOAD_UI_MODULES ? AnalysisScreenLazy : AnalysisScreenEager;
-const ModelingScreen = SHOULD_LAZY_LOAD_UI_MODULES ? ModelingScreenLazy : ModelingScreenEager;
-const NetworkScopeScreen = SHOULD_LAZY_LOAD_UI_MODULES ? NetworkScopeScreenLazy : NetworkScopeScreenEager;
-const SettingsScreen = SHOULD_LAZY_LOAD_UI_MODULES ? SettingsScreenLazy : SettingsScreenEager;
-const ValidationScreen = SHOULD_LAZY_LOAD_UI_MODULES ? ValidationScreenLazy : ValidationScreenEager;
-const AnalysisWorkspaceContent = SHOULD_LAZY_LOAD_UI_MODULES ? AnalysisWorkspaceContentLazy : AnalysisWorkspaceContentEager;
-const ModelingFormsColumn = SHOULD_LAZY_LOAD_UI_MODULES ? ModelingFormsColumnLazy : ModelingFormsColumnEager;
-const ModelingPrimaryTables = SHOULD_LAZY_LOAD_UI_MODULES ? ModelingPrimaryTablesLazy : ModelingPrimaryTablesEager;
-const ModelingSecondaryTables = SHOULD_LAZY_LOAD_UI_MODULES ? ModelingSecondaryTablesLazy : ModelingSecondaryTablesEager;
-const NetworkScopeWorkspaceContent = SHOULD_LAZY_LOAD_UI_MODULES ? NetworkScopeWorkspaceContentLazy : NetworkScopeWorkspaceContentEager;
-const SettingsWorkspaceContent = SHOULD_LAZY_LOAD_UI_MODULES ? SettingsWorkspaceContentLazy : SettingsWorkspaceContentEager;
-const ValidationWorkspaceContent = SHOULD_LAZY_LOAD_UI_MODULES ? ValidationWorkspaceContentLazy : ValidationWorkspaceContentEager;
 
 export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear();
   const state = useAppSnapshot(store);
+  const {
+    NetworkSummaryPanel,
+    AnalysisScreen,
+    ModelingScreen,
+    NetworkScopeScreen,
+    SettingsScreen,
+    ValidationScreen,
+    AnalysisWorkspaceContent,
+    ModelingFormsColumn,
+    ModelingPrimaryTables,
+    ModelingSecondaryTables,
+    NetworkScopeWorkspaceContent,
+    SettingsWorkspaceContent,
+    ValidationWorkspaceContent
+  } = appUiModules;
 
   const networks = selectNetworks(state);
   const activeNetworkId = selectActiveNetworkId(state);
@@ -198,104 +135,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     spliceNodeBySpliceId
   } = useEntityRelationshipMaps(connectors, splices, nodes, segments);
 
-  const {
-    connectorFormMode,
-    setConnectorFormMode,
-    editingConnectorId,
-    setEditingConnectorId,
-    connectorName,
-    setConnectorName,
-    connectorTechnicalId,
-    setConnectorTechnicalId,
-    cavityCount,
-    setCavityCount,
-    cavityIndexInput,
-    setCavityIndexInput,
-    connectorOccupantRefInput,
-    setConnectorOccupantRefInput,
-    connectorFormError,
-    setConnectorFormError,
-    spliceFormMode,
-    setSpliceFormMode,
-    editingSpliceId,
-    setEditingSpliceId,
-    spliceName,
-    setSpliceName,
-    spliceTechnicalId,
-    setSpliceTechnicalId,
-    portCount,
-    setPortCount,
-    portIndexInput,
-    setPortIndexInput,
-    spliceOccupantRefInput,
-    setSpliceOccupantRefInput,
-    spliceFormError,
-    setSpliceFormError,
-    nodeFormMode,
-    setNodeFormMode,
-    editingNodeId,
-    setEditingNodeId,
-    nodeIdInput,
-    setNodeIdInput,
-    nodeKind,
-    setNodeKind,
-    nodeConnectorId,
-    setNodeConnectorId,
-    nodeSpliceId,
-    setNodeSpliceId,
-    nodeLabel,
-    setNodeLabel,
-    nodeFormError,
-    setNodeFormError,
-    segmentFormMode,
-    setSegmentFormMode,
-    editingSegmentId,
-    setEditingSegmentId,
-    segmentIdInput,
-    setSegmentIdInput,
-    segmentNodeA,
-    setSegmentNodeA,
-    segmentNodeB,
-    setSegmentNodeB,
-    segmentLengthMm,
-    setSegmentLengthMm,
-    segmentSubNetworkTag,
-    setSegmentSubNetworkTag,
-    segmentFormError,
-    setSegmentFormError,
-    wireFormMode,
-    setWireFormMode,
-    editingWireId,
-    setEditingWireId,
-    wireName,
-    setWireName,
-    wireTechnicalId,
-    setWireTechnicalId,
-    wireEndpointAKind,
-    setWireEndpointAKind,
-    wireEndpointAConnectorId,
-    setWireEndpointAConnectorId,
-    wireEndpointACavityIndex,
-    setWireEndpointACavityIndex,
-    wireEndpointASpliceId,
-    setWireEndpointASpliceId,
-    wireEndpointAPortIndex,
-    setWireEndpointAPortIndex,
-    wireEndpointBKind,
-    setWireEndpointBKind,
-    wireEndpointBConnectorId,
-    setWireEndpointBConnectorId,
-    wireEndpointBCavityIndex,
-    setWireEndpointBCavityIndex,
-    wireEndpointBSpliceId,
-    setWireEndpointBSpliceId,
-    wireEndpointBPortIndex,
-    setWireEndpointBPortIndex,
-    wireForcedRouteInput,
-    setWireForcedRouteInput,
-    wireFormError,
-    setWireFormError
-  } = useEntityFormsState();
+  const formsState = useEntityFormsState();
+  const forms = buildAppControllerNamespacedFormsState(formsState);
+  const { setWireForcedRouteInput } = formsState;
   const {
     routePreviewStartNodeId,
     setRoutePreviewStartNodeId,
@@ -310,6 +152,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasResetZoomPercentInput,
     setCanvasResetZoomPercentInput
   } = useAppControllerCanvasDisplayState();
+  const canvasState = useCanvasState();
+  const canvas = buildAppControllerNamespacedCanvasState(canvasState);
   const {
     interactionMode,
     setInteractionMode,
@@ -331,7 +175,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNetworkScale,
     networkOffset,
     setNetworkOffset
-  } = useCanvasState();
+  } = canvasState;
   const {
     newNetworkName,
     setNewNetworkName,
@@ -399,6 +243,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
   const deferredInstallPromptRef = useRef<BeforeInstallPromptEventLike | null>(null);
 
+  const selectionEntities = useAppControllerSelectionEntities({ state });
   const {
     selected,
     selectedConnectorId,
@@ -413,11 +258,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     selectedWire,
     selectedWireRouteInputValue,
     selectedSubScreen,
-    connectorCavityStatuses,
-    splicePortStatuses,
     selectedConnectorOccupiedCount,
     selectedSpliceOccupiedCount
-  } = useAppControllerSelectionEntities({ state });
+  } = selectionEntities;
   const {
     activeScreen,
     setActiveScreen,
@@ -453,19 +296,21 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     deferredInstallPromptRef
   });
   const connectorIdExcludedFromUniqueness =
-    connectorFormMode === "edit" ? editingConnectorId ?? undefined : undefined;
+    forms.connector.formMode === "edit" ? forms.connector.editingId ?? undefined : undefined;
   const connectorTechnicalIdAlreadyUsed =
-    connectorTechnicalId.trim().length > 0 &&
-    selectConnectorTechnicalIdTaken(state, connectorTechnicalId.trim(), connectorIdExcludedFromUniqueness);
+    forms.connector.technicalId.trim().length > 0 &&
+    selectConnectorTechnicalIdTaken(state, forms.connector.technicalId.trim(), connectorIdExcludedFromUniqueness);
 
-  const spliceIdExcludedFromUniqueness = spliceFormMode === "edit" ? editingSpliceId ?? undefined : undefined;
+  const spliceIdExcludedFromUniqueness =
+    forms.splice.formMode === "edit" ? forms.splice.editingId ?? undefined : undefined;
   const spliceTechnicalIdAlreadyUsed =
-    spliceTechnicalId.trim().length > 0 &&
-    selectSpliceTechnicalIdTaken(state, spliceTechnicalId.trim(), spliceIdExcludedFromUniqueness);
-  const wireIdExcludedFromUniqueness = wireFormMode === "edit" ? editingWireId ?? undefined : undefined;
+    forms.splice.technicalId.trim().length > 0 &&
+    selectSpliceTechnicalIdTaken(state, forms.splice.technicalId.trim(), spliceIdExcludedFromUniqueness);
+  const wireIdExcludedFromUniqueness =
+    forms.wire.formMode === "edit" ? forms.wire.editingId ?? undefined : undefined;
   const wireTechnicalIdAlreadyUsed =
-    wireTechnicalId.trim().length > 0 &&
-    selectWireTechnicalIdTaken(state, wireTechnicalId.trim(), wireIdExcludedFromUniqueness);
+    forms.wire.technicalId.trim().length > 0 &&
+    selectWireTechnicalIdTaken(state, forms.wire.technicalId.trim(), wireIdExcludedFromUniqueness);
   const networkTechnicalIdAlreadyUsed =
     newNetworkTechnicalId.trim().length > 0 &&
     selectNetworkTechnicalIdTaken(
@@ -484,8 +329,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     state,
     nodes,
     segments,
-    snapNodesToGrid,
-    manualNodePositions,
+    snapNodesToGrid: canvas.viewport.snapNodesToGrid,
+    manualNodePositions: canvas.viewport.manualNodePositions,
     selectedWireRouteSegmentIdsSource: selectedWire?.routeSegmentIds,
     routePreviewStartNodeId,
     routePreviewEndNodeId,
@@ -547,7 +392,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   useEffect(() => {
     setWireForcedRouteInput(selectedWireRouteInputValue);
-  }, [selectedWireId, selectedWireRouteInputValue, setWireForcedRouteInput]);
+  }, [setWireForcedRouteInput, selectedWireId, selectedWireRouteInputValue]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -597,43 +442,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     };
   }, []);
 
-  const {
-    connectorOccupancyFilter,
-    setConnectorOccupancyFilter,
-    spliceOccupancyFilter,
-    setSpliceOccupancyFilter,
-    nodeKindFilter,
-    setNodeKindFilter,
-    segmentSubNetworkFilter,
-    setSegmentSubNetworkFilter,
-    wireRouteFilter,
-    setWireRouteFilter,
-    connectorSort,
-    setConnectorSort,
-    spliceSort,
-    setSpliceSort,
-    nodeIdSortDirection,
-    setNodeIdSortDirection,
-    segmentIdSortDirection,
-    setSegmentIdSortDirection,
-    wireSort,
-    setWireSort,
-    connectorSynthesisSort,
-    setConnectorSynthesisSort,
-    spliceSynthesisSort,
-    setSpliceSynthesisSort,
-    connectorOccupiedCountById,
-    spliceOccupiedCountById,
-    sortedConnectorSynthesisRows,
-    sortedSpliceSynthesisRows,
-    visibleConnectors,
-    visibleSplices,
-    visibleNodes,
-    visibleSegments,
-    visibleWires,
-    segmentsCountByNodeId,
-    getSortIndicator
-  } = useEntityListModel({
+  const entityListModel = useEntityListModel({
     state,
     connectors,
     splices,
@@ -646,6 +455,15 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     selectedSplice,
     describeWireEndpoint
   });
+  const {
+    setConnectorSort,
+    setSpliceSort,
+    setNodeIdSortDirection,
+    setSegmentIdSortDirection,
+    setWireSort,
+    setConnectorSynthesisSort,
+    setSpliceSynthesisSort
+  } = entityListModel;
   useUiPreferences({
     networkMinScale: NETWORK_MIN_SCALE,
     networkMaxScale: NETWORK_MAX_SCALE,
@@ -699,30 +517,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   useEffect(() => {
     store.dispatch(appActions.setThemeMode(themeMode));
   }, [store, themeMode]);
-  const {
-    validationCategoryFilter,
-    setValidationCategoryFilter,
-    validationSeverityFilter,
-    setValidationSeverityFilter,
-    setValidationSearchQuery,
-    validationIssueCursor,
-    validationIssues,
-    orderedValidationIssues,
-    validationCategories,
-    validationIssuesForCategoryCounts,
-    validationIssuesForSeverityCounts,
-    validationCategoryCountByName,
-    validationSeverityCountByLevel,
-    visibleValidationIssues,
-    validationErrorCount,
-    validationWarningCount,
-    groupedValidationIssues,
-    clearValidationFilters,
-    findValidationIssueIndex,
-    getValidationIssueByCursor,
-    getFocusedValidationIssueByCursor,
-    setValidationIssueCursorFromIssue
-  } = useValidationModel({
+  const validationModel = useValidationModel({
     state,
     connectors,
     splices,
@@ -736,6 +531,19 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     spliceNodeBySpliceId,
     isValidationScreen
   });
+  const {
+    setValidationCategoryFilter,
+    setValidationSeverityFilter,
+    setValidationSearchQuery,
+    validationIssues,
+    orderedValidationIssues,
+    visibleValidationIssues,
+    validationErrorCount,
+    validationWarningCount,
+    getValidationIssueByCursor,
+    getFocusedValidationIssueByCursor,
+    setValidationIssueCursorFromIssue
+  } = validationModel;
 
   const entityCountBySubScreen: Record<SubScreenId, number> = {
     connector: connectors.length,
@@ -956,151 +764,105 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const { describeNode, nodeLabelById } = useNodeDescriptions(nodes, connectorMap, spliceMap);
 
-  const {
-    resetConnectorForm,
-    clearConnectorForm,
-    cancelConnectorEdit,
-    startConnectorEdit,
-    handleConnectorSubmit,
-    handleConnectorDelete,
-    handleReserveCavity,
-    handleReleaseCavity
-  } = useConnectorHandlers({
-    store,
-    dispatchAction,
-    connectorFormMode,
-    setConnectorFormMode,
-    editingConnectorId,
-    setEditingConnectorId,
-    connectorName,
-    setConnectorName,
-    connectorTechnicalId,
-    setConnectorTechnicalId,
-    cavityCount,
-    setCavityCount,
-    setConnectorFormError,
-    selectedConnectorId,
-    cavityIndexInput,
-    connectorOccupantRefInput
-  });
-
-  const {
-    resetSpliceForm,
-    clearSpliceForm,
-    cancelSpliceEdit,
-    startSpliceEdit,
-    handleSpliceSubmit,
-    handleSpliceDelete,
-    handleReservePort,
-    handleReleasePort
-  } = useSpliceHandlers({
-    store,
-    dispatchAction,
-    spliceFormMode,
-    setSpliceFormMode,
-    editingSpliceId,
-    setEditingSpliceId,
-    spliceName,
-    setSpliceName,
-    spliceTechnicalId,
-    setSpliceTechnicalId,
-    portCount,
-    setPortCount,
-    setSpliceFormError,
-    selectedSpliceId,
-    portIndexInput,
-    spliceOccupantRefInput
-  });
-
-  const { resetNodeForm, clearNodeForm, cancelNodeEdit, startNodeEdit, handleNodeSubmit, handleNodeDelete } = useNodeHandlers({
+  const modelingHandlers = useAppControllerModelingHandlersOrchestrator({
     store,
     state,
     dispatchAction,
-    nodeFormMode,
-    setNodeFormMode,
-    editingNodeId,
-    setEditingNodeId,
-    nodeIdInput,
-    setNodeIdInput,
-    nodeKind,
-    setNodeKind,
-    nodeConnectorId,
-    setNodeConnectorId,
-    nodeSpliceId,
-    setNodeSpliceId,
-    nodeLabel,
-    setNodeLabel,
-    setNodeFormError,
+    connectorFormMode: formsState.connectorFormMode,
+    setConnectorFormMode: formsState.setConnectorFormMode,
+    editingConnectorId: formsState.editingConnectorId,
+    setEditingConnectorId: formsState.setEditingConnectorId,
+    connectorName: formsState.connectorName,
+    setConnectorName: formsState.setConnectorName,
+    connectorTechnicalId: formsState.connectorTechnicalId,
+    setConnectorTechnicalId: formsState.setConnectorTechnicalId,
+    cavityCount: formsState.cavityCount,
+    setCavityCount: formsState.setCavityCount,
+    setConnectorFormError: formsState.setConnectorFormError,
+    cavityIndexInput: formsState.cavityIndexInput,
+    connectorOccupantRefInput: formsState.connectorOccupantRefInput,
+    spliceFormMode: formsState.spliceFormMode,
+    setSpliceFormMode: formsState.setSpliceFormMode,
+    editingSpliceId: formsState.editingSpliceId,
+    setEditingSpliceId: formsState.setEditingSpliceId,
+    spliceName: formsState.spliceName,
+    setSpliceName: formsState.setSpliceName,
+    spliceTechnicalId: formsState.spliceTechnicalId,
+    setSpliceTechnicalId: formsState.setSpliceTechnicalId,
+    portCount: formsState.portCount,
+    setPortCount: formsState.setPortCount,
+    setSpliceFormError: formsState.setSpliceFormError,
+    portIndexInput: formsState.portIndexInput,
+    spliceOccupantRefInput: formsState.spliceOccupantRefInput,
+    nodeFormMode: formsState.nodeFormMode,
+    setNodeFormMode: formsState.setNodeFormMode,
+    editingNodeId: formsState.editingNodeId,
+    setEditingNodeId: formsState.setEditingNodeId,
+    nodeIdInput: formsState.nodeIdInput,
+    setNodeIdInput: formsState.setNodeIdInput,
+    nodeKind: formsState.nodeKind,
+    setNodeKind: formsState.setNodeKind,
+    nodeConnectorId: formsState.nodeConnectorId,
+    setNodeConnectorId: formsState.setNodeConnectorId,
+    nodeSpliceId: formsState.nodeSpliceId,
+    setNodeSpliceId: formsState.setNodeSpliceId,
+    nodeLabel: formsState.nodeLabel,
+    setNodeLabel: formsState.setNodeLabel,
+    setNodeFormError: formsState.setNodeFormError,
     pendingNewNodePosition,
-    setPendingNewNodePosition
-  });
-
-  const { resetSegmentForm, clearSegmentForm, cancelSegmentEdit, startSegmentEdit, handleSegmentSubmit, handleSegmentDelete } = useSegmentHandlers({
-    store,
-    state,
-    dispatchAction,
-    segmentFormMode,
-    setSegmentFormMode,
-    editingSegmentId,
-    setEditingSegmentId,
-    segmentIdInput,
-    setSegmentIdInput,
-    segmentNodeA,
-    setSegmentNodeA,
-    segmentNodeB,
-    setSegmentNodeB,
-    segmentLengthMm,
-    setSegmentLengthMm,
-    segmentSubNetworkTag,
-    setSegmentSubNetworkTag,
-    setSegmentFormError
-  });
-
-  const {
-    resetWireForm,
-    clearWireForm,
-    cancelWireEdit,
-    startWireEdit,
-    handleWireSubmit,
-    handleWireDelete,
-    handleLockWireRoute,
-    handleResetWireRoute
-  } = useWireHandlers({
-    store,
-    dispatchAction,
-    wireFormMode,
-    setWireFormMode,
-    editingWireId,
-    setEditingWireId,
-    wireName,
-    setWireName,
-    wireTechnicalId,
-    setWireTechnicalId,
-    wireEndpointAKind,
-    setWireEndpointAKind,
-    wireEndpointAConnectorId,
-    setWireEndpointAConnectorId,
-    wireEndpointACavityIndex,
-    setWireEndpointACavityIndex,
-    wireEndpointASpliceId,
-    setWireEndpointASpliceId,
-    wireEndpointAPortIndex,
-    setWireEndpointAPortIndex,
-    wireEndpointBKind,
-    setWireEndpointBKind,
-    wireEndpointBConnectorId,
-    setWireEndpointBConnectorId,
-    wireEndpointBCavityIndex,
-    setWireEndpointBCavityIndex,
-    wireEndpointBSpliceId,
-    setWireEndpointBSpliceId,
-    wireEndpointBPortIndex,
-    setWireEndpointBPortIndex,
-    wireForcedRouteInput,
-    setWireForcedRouteInput,
-    setWireFormError,
+    setPendingNewNodePosition,
+    segmentFormMode: formsState.segmentFormMode,
+    setSegmentFormMode: formsState.setSegmentFormMode,
+    editingSegmentId: formsState.editingSegmentId,
+    setEditingSegmentId: formsState.setEditingSegmentId,
+    segmentIdInput: formsState.segmentIdInput,
+    setSegmentIdInput: formsState.setSegmentIdInput,
+    segmentNodeA: formsState.segmentNodeA,
+    setSegmentNodeA: formsState.setSegmentNodeA,
+    segmentNodeB: formsState.segmentNodeB,
+    setSegmentNodeB: formsState.setSegmentNodeB,
+    segmentLengthMm: formsState.segmentLengthMm,
+    setSegmentLengthMm: formsState.setSegmentLengthMm,
+    segmentSubNetworkTag: formsState.segmentSubNetworkTag,
+    setSegmentSubNetworkTag: formsState.setSegmentSubNetworkTag,
+    setSegmentFormError: formsState.setSegmentFormError,
+    wireFormMode: formsState.wireFormMode,
+    setWireFormMode: formsState.setWireFormMode,
+    editingWireId: formsState.editingWireId,
+    setEditingWireId: formsState.setEditingWireId,
+    wireName: formsState.wireName,
+    setWireName: formsState.setWireName,
+    wireTechnicalId: formsState.wireTechnicalId,
+    setWireTechnicalId: formsState.setWireTechnicalId,
+    wireEndpointAKind: formsState.wireEndpointAKind,
+    setWireEndpointAKind: formsState.setWireEndpointAKind,
+    wireEndpointAConnectorId: formsState.wireEndpointAConnectorId,
+    setWireEndpointAConnectorId: formsState.setWireEndpointAConnectorId,
+    wireEndpointACavityIndex: formsState.wireEndpointACavityIndex,
+    setWireEndpointACavityIndex: formsState.setWireEndpointACavityIndex,
+    wireEndpointASpliceId: formsState.wireEndpointASpliceId,
+    setWireEndpointASpliceId: formsState.setWireEndpointASpliceId,
+    wireEndpointAPortIndex: formsState.wireEndpointAPortIndex,
+    setWireEndpointAPortIndex: formsState.setWireEndpointAPortIndex,
+    wireEndpointBKind: formsState.wireEndpointBKind,
+    setWireEndpointBKind: formsState.setWireEndpointBKind,
+    wireEndpointBConnectorId: formsState.wireEndpointBConnectorId,
+    setWireEndpointBConnectorId: formsState.setWireEndpointBConnectorId,
+    wireEndpointBCavityIndex: formsState.wireEndpointBCavityIndex,
+    setWireEndpointBCavityIndex: formsState.setWireEndpointBCavityIndex,
+    wireEndpointBSpliceId: formsState.wireEndpointBSpliceId,
+    setWireEndpointBSpliceId: formsState.setWireEndpointBSpliceId,
+    wireEndpointBPortIndex: formsState.wireEndpointBPortIndex,
+    setWireEndpointBPortIndex: formsState.setWireEndpointBPortIndex,
+    wireForcedRouteInput: formsState.wireForcedRouteInput,
+    setWireForcedRouteInput: formsState.setWireForcedRouteInput,
+    setWireFormError: formsState.setWireFormError,
+    selectedConnectorId,
+    selectedSpliceId,
     selectedWire
   });
+  const { connector: connectorHandlers, splice: spliceHandlers, node: nodeHandlers, segment: segmentHandlers, wire: wireHandlers } =
+    modelingHandlers;
 
   const {
     handleOpenSelectionInAnalysis,
@@ -1147,31 +909,31 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setValidationSeverityFilter
     },
     editActions: {
-      startConnectorEdit,
-      startSpliceEdit,
-      startNodeEdit,
-      startSegmentEdit,
-      startWireEdit
+      startConnectorEdit: connectorHandlers.startConnectorEdit,
+      startSpliceEdit: spliceHandlers.startSpliceEdit,
+      startNodeEdit: nodeHandlers.startNodeEdit,
+      startSegmentEdit: segmentHandlers.startSegmentEdit,
+      startWireEdit: wireHandlers.startWireEdit
     }
   });
 
   const { clearAllModelingForms } = useModelingFormSelectionSync({
     activeSubScreen,
-    connectorFormMode,
-    spliceFormMode,
-    nodeFormMode,
-    segmentFormMode,
-    wireFormMode,
+    connectorFormMode: formsState.connectorFormMode,
+    spliceFormMode: formsState.spliceFormMode,
+    nodeFormMode: formsState.nodeFormMode,
+    segmentFormMode: formsState.segmentFormMode,
+    wireFormMode: formsState.wireFormMode,
     selectedConnectorId,
     selectedSpliceId,
     selectedNodeId,
     selectedSegmentId,
     selectedWireId,
-    clearConnectorForm,
-    clearSpliceForm,
-    clearNodeForm,
-    clearSegmentForm,
-    clearWireForm
+    clearConnectorForm: connectorHandlers.clearConnectorForm,
+    clearSpliceForm: spliceHandlers.clearSpliceForm,
+    clearNodeForm: nodeHandlers.clearNodeForm,
+    clearSegmentForm: segmentHandlers.clearSegmentForm,
+    clearWireForm: wireHandlers.clearWireForm
   });
 
   const {
@@ -1197,11 +959,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setActiveSubScreen
     },
     segmentForm: {
-      setSegmentFormMode,
-      setEditingSegmentId,
-      setSegmentFormError,
-      setSegmentNodeA,
-      setSegmentNodeB
+      setSegmentFormMode: formsState.setSegmentFormMode,
+      setEditingSegmentId: formsState.setEditingSegmentId,
+      setSegmentFormError: formsState.setSegmentFormError,
+      setSegmentNodeA: formsState.setSegmentNodeA,
+      setSegmentNodeB: formsState.setSegmentNodeB
     },
     routePreview: {
       setRoutePreviewStartNodeId,
@@ -1210,25 +972,25 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       routePreviewEndNodeId
     },
     wireForm: {
-      setWireFormMode,
-      setEditingWireId,
-      setWireFormError,
-      setWireEndpointAKind,
-      setWireEndpointAConnectorId,
-      setWireEndpointASpliceId,
-      setWireEndpointBKind,
-      setWireEndpointBConnectorId,
-      setWireEndpointBSpliceId
+      setWireFormMode: formsState.setWireFormMode,
+      setEditingWireId: formsState.setEditingWireId,
+      setWireFormError: formsState.setWireFormError,
+      setWireEndpointAKind: formsState.setWireEndpointAKind,
+      setWireEndpointAConnectorId: formsState.setWireEndpointAConnectorId,
+      setWireEndpointASpliceId: formsState.setWireEndpointASpliceId,
+      setWireEndpointBKind: formsState.setWireEndpointBKind,
+      setWireEndpointBConnectorId: formsState.setWireEndpointBConnectorId,
+      setWireEndpointBSpliceId: formsState.setWireEndpointBSpliceId
     },
     nodeForm: {
-      setNodeFormMode,
-      setEditingNodeId,
-      setNodeKind,
-      setNodeIdInput,
-      setNodeConnectorId,
-      setNodeSpliceId,
-      setNodeLabel,
-      setNodeFormError,
+      setNodeFormMode: formsState.setNodeFormMode,
+      setEditingNodeId: formsState.setEditingNodeId,
+      setNodeKind: formsState.setNodeKind,
+      setNodeIdInput: formsState.setNodeIdInput,
+      setNodeConnectorId: formsState.setNodeConnectorId,
+      setNodeSpliceId: formsState.setNodeSpliceId,
+      setNodeLabel: formsState.setNodeLabel,
+      setNodeFormError: formsState.setNodeFormError,
       setPendingNewNodePosition
     },
     viewport: {
@@ -1249,10 +1011,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       persistNodePosition: (nodeId, position) =>
         dispatchAction(appActions.setNodePosition(nodeId, position), { trackHistory: false }),
       resetNetworkViewToConfiguredScale,
-      startConnectorEdit,
-      startSpliceEdit,
-      startNodeEdit,
-      startSegmentEdit
+      startConnectorEdit: connectorHandlers.startConnectorEdit,
+      startSpliceEdit: spliceHandlers.startSpliceEdit,
+      startNodeEdit: nodeHandlers.startNodeEdit,
+      startSegmentEdit: segmentHandlers.startSegmentEdit
     }
   });
 
@@ -1349,470 +1111,251 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     routePreview,
     handleRegenerateLayout
   });
-  const { networkScopeWorkspaceContent } = useNetworkScopeScreenContentSlice({
-    NetworkScopeWorkspaceContentComponent: NetworkScopeWorkspaceContent,
-    networks,
-    networkSort,
-    setNetworkSort,
-    networkEntityCountsById,
-    activeNetworkId,
-    handleSelectNetwork,
-    handleDuplicateNetwork,
-    handleDeleteNetwork,
-    networkFormMode,
-    handleOpenCreateNetworkForm,
-    handleOpenEditNetworkForm,
-    handleCloseNetworkForm,
-    newNetworkName,
-    setNewNetworkName,
-    newNetworkTechnicalId,
-    setNewNetworkTechnicalId,
-    newNetworkDescription,
-    setNewNetworkDescription,
-    networkFormError,
-    networkTechnicalIdAlreadyUsed,
-    handleSubmitNetworkForm,
-    networkFocusRequest
-  });
-  const { modelingLeftColumnContent, modelingFormsColumnContent } = useModelingScreenContentSlice({
-    ModelingPrimaryTablesComponent: ModelingPrimaryTables,
-    ModelingSecondaryTablesComponent: ModelingSecondaryTables,
-    ModelingFormsColumnComponent: ModelingFormsColumn,
-    isConnectorSubScreen,
-    connectorFormMode,
-    resetConnectorForm,
-    connectorOccupancyFilter,
-    setConnectorOccupancyFilter,
-    connectors,
-    visibleConnectors,
-    connectorSort,
-    setConnectorSort,
-    getSortIndicator,
-    connectorOccupiedCountById,
-    selectedConnectorId,
-    startConnectorEdit,
-    handleConnectorDelete,
-    isSpliceSubScreen,
-    spliceFormMode,
-    resetSpliceForm,
-    spliceOccupancyFilter,
-    setSpliceOccupancyFilter,
-    splices,
-    visibleSplices,
-    spliceSort,
-    setSpliceSort,
-    spliceOccupiedCountById,
-    selectedSpliceId,
-    startSpliceEdit,
-    handleSpliceDelete,
-    isNodeSubScreen,
-    nodeFormMode,
-    resetNodeForm,
-    nodeKindFilter,
-    setNodeKindFilter,
-    nodes,
-    visibleNodes,
-    nodeIdSortDirection,
-    setNodeIdSortDirection,
-    segmentsCountByNodeId,
-    selectedNodeId,
-    describeNode,
-    startNodeEdit,
-    handleNodeDelete,
-    isSegmentSubScreen,
-    segmentFormMode,
-    resetSegmentForm,
-    segmentSubNetworkFilter,
-    setSegmentSubNetworkFilter,
-    segments,
-    visibleSegments,
-    segmentIdSortDirection,
-    setSegmentIdSortDirection,
-    nodeLabelById,
-    selectedSegmentId,
-    selectedWireRouteSegmentIds,
-    startSegmentEdit,
-    handleSegmentDelete,
-    isWireSubScreen,
-    wireFormMode,
-    resetWireForm,
-    wireRouteFilter,
-    setWireRouteFilter,
-    wires,
-    visibleWires,
-    wireSort,
-    setWireSort,
-    selectedWireId,
-    describeWireEndpoint,
-    describeWireEndpointId,
-    startWireEdit,
-    handleWireDelete,
-    handleConnectorSubmit,
-    connectorName,
-    setConnectorName,
-    connectorTechnicalId,
-    setConnectorTechnicalId,
-    connectorTechnicalIdAlreadyUsed,
-    cavityCount,
-    setCavityCount,
-    cancelConnectorEdit,
-    connectorFormError,
-    handleSpliceSubmit,
-    spliceName,
-    setSpliceName,
-    spliceTechnicalId,
-    setSpliceTechnicalId,
-    spliceTechnicalIdAlreadyUsed,
-    portCount,
-    setPortCount,
-    cancelSpliceEdit,
-    spliceFormError,
-    handleNodeSubmit,
-    nodeIdInput,
-    setNodeIdInput,
-    pendingNewNodePosition,
-    nodeKind,
-    setNodeKind,
-    nodeLabel,
-    setNodeLabel,
-    nodeConnectorId,
-    setNodeConnectorId,
-    nodeSpliceId,
-    setNodeSpliceId,
-    cancelNodeEdit,
-    nodeFormError,
-    handleSegmentSubmit,
-    segmentIdInput,
-    setSegmentIdInput,
-    segmentNodeA,
-    setSegmentNodeA,
-    segmentNodeB,
-    setSegmentNodeB,
-    segmentLengthMm,
-    setSegmentLengthMm,
-    segmentSubNetworkTag,
-    setSegmentSubNetworkTag,
-    cancelSegmentEdit,
-    segmentFormError,
-    handleWireSubmit,
-    wireName,
-    setWireName,
-    wireTechnicalId,
-    setWireTechnicalId,
-    wireTechnicalIdAlreadyUsed,
-    wireEndpointAKind,
-    setWireEndpointAKind,
-    wireEndpointAConnectorId,
-    setWireEndpointAConnectorId,
-    wireEndpointACavityIndex,
-    setWireEndpointACavityIndex,
-    wireEndpointASpliceId,
-    setWireEndpointASpliceId,
-    wireEndpointAPortIndex,
-    setWireEndpointAPortIndex,
-    wireEndpointBKind,
-    setWireEndpointBKind,
-    wireEndpointBConnectorId,
-    setWireEndpointBConnectorId,
-    wireEndpointBCavityIndex,
-    setWireEndpointBCavityIndex,
-    wireEndpointBSpliceId,
-    setWireEndpointBSpliceId,
-    wireEndpointBPortIndex,
-    setWireEndpointBPortIndex,
-    cancelWireEdit,
-    wireFormError
-  });
-  const { analysisWorkspaceContent } = useAnalysisScreenContentSlice({
-    AnalysisWorkspaceContentComponent: AnalysisWorkspaceContent,
-    isConnectorSubScreen,
-    isSpliceSubScreen,
-    isWireSubScreen,
-    networkSummaryPanel,
-    selectedConnector,
-    selectedConnectorId,
-    connectorOccupancyFilter,
-    setConnectorOccupancyFilter,
-    connectors,
-    visibleConnectors,
-    connectorSort,
-    setConnectorSort,
-    connectorOccupiedCountById,
-    onSelectConnector: (connectorId) =>
-      dispatchAction(
-        appActions.select({
-          kind: "connector",
-          id: connectorId
-        })
-      ),
-    cavityIndexInput,
-    setCavityIndexInput,
-    connectorOccupantRefInput,
-    setConnectorOccupantRefInput,
-    handleReserveCavity,
-    connectorCavityStatuses,
-    handleReleaseCavity,
-    sortedConnectorSynthesisRows,
-    connectorSynthesisSort,
-    setConnectorSynthesisSort,
-    getSortIndicator,
-    selectedSplice,
-    selectedSpliceId,
-    spliceOccupancyFilter,
-    setSpliceOccupancyFilter,
-    splices,
-    visibleSplices,
-    spliceSort,
-    setSpliceSort,
-    spliceOccupiedCountById,
-    onSelectSplice: (spliceId) =>
-      dispatchAction(
-        appActions.select({
-          kind: "splice",
-          id: spliceId
-        })
-      ),
-    splicePortStatuses,
-    portIndexInput,
-    setPortIndexInput,
-    spliceOccupantRefInput,
-    setSpliceOccupantRefInput,
-    handleReservePort,
-    handleReleasePort,
-    sortedSpliceSynthesisRows,
-    spliceSynthesisSort,
-    setSpliceSynthesisSort,
-    wireRouteFilter,
-    setWireRouteFilter,
-    wires,
-    visibleWires,
-    wireSort,
-    setWireSort,
-    selectedWireId,
-    onSelectWire: (wireId) =>
-      dispatchAction(
-        appActions.select({
-          kind: "wire",
-          id: wireId
-        })
-      ),
-    selectedWire,
-    describeWireEndpoint,
-    describeWireEndpointId,
-    wireForcedRouteInput,
-    setWireForcedRouteInput,
-    handleLockWireRoute,
-    handleResetWireRoute,
-    wireFormError
-  });
-  const { validationWorkspaceContent } = useValidationScreenContentSlice({
-    ValidationWorkspaceContentComponent: ValidationWorkspaceContent,
-    validationSeverityFilter,
-    setValidationSeverityFilter,
-    validationIssuesForSeverityCounts,
-    validationSeverityCountByLevel,
-    validationCategoryFilter,
-    setValidationCategoryFilter,
-    validationIssuesForCategoryCounts,
-    validationCategories,
-    validationCategoryCountByName,
-    moveVisibleValidationIssueCursor,
-    visibleValidationIssues,
-    clearValidationFilters,
-    validationIssues,
-    groupedValidationIssues,
-    findValidationIssueIndex,
-    validationIssueCursor,
-    handleValidationIssueRowGoTo,
-    validationErrorCount,
-    validationWarningCount
-  });
-  const { settingsWorkspaceContent } = useSettingsScreenContentSlice({
-    SettingsWorkspaceContentComponent: SettingsWorkspaceContent,
-    isCurrentWorkspaceEmpty,
-    hasBuiltInSampleState,
-    handleRecreateSampleNetwork,
-    handleResetSampleNetwork,
-    activeNetworkId,
-    selectedExportNetworkIds,
-    handleExportNetworks,
-    networks,
-    toggleSelectedExportNetwork,
-    handleOpenImportPicker,
-    importFileInputRef,
-    handleImportFileChange,
-    importExportStatus,
-    lastImportSummary,
-    themeMode,
-    setThemeMode,
-    tableDensity,
-    setTableDensity,
-    tableFontSize,
-    setTableFontSize,
-    defaultSortField,
-    setDefaultSortField,
-    defaultSortDirection,
-    setDefaultSortDirection,
-    defaultIdSortDirection,
-    setDefaultIdSortDirection,
-    applyListSortDefaults,
-    canvasDefaultShowGrid,
-    setCanvasDefaultShowGrid,
-    canvasDefaultSnapToGrid,
-    setCanvasDefaultSnapToGrid,
-    canvasDefaultShowInfoPanels,
-    setCanvasDefaultShowInfoPanels,
-    canvasDefaultShowSegmentLengths,
-    setCanvasDefaultShowSegmentLengths,
-    canvasDefaultLabelStrokeMode,
-    setCanvasDefaultLabelStrokeMode,
-    canvasResetZoomPercentInput,
-    setCanvasResetZoomPercentInput,
-    configuredResetZoomPercent,
-    applyCanvasDefaultsNow,
-    handleZoomAction,
-    showShortcutHints,
-    setShowShortcutHints,
-    keyboardShortcutsEnabled,
-    setKeyboardShortcutsEnabled,
-    resetWorkspacePreferencesToDefaults
-  });
+  const { modelingLeftColumnContent, modelingFormsColumnContent, analysisWorkspaceContent } =
+    useAppControllerModelingAnalysisScreenDomains({
+      components: {
+        ModelingPrimaryTablesComponent: ModelingPrimaryTables,
+        ModelingSecondaryTablesComponent: ModelingSecondaryTables,
+        ModelingFormsColumnComponent: ModelingFormsColumn,
+        AnalysisWorkspaceContentComponent: AnalysisWorkspaceContent
+      },
+      screenFlags: {
+        isConnectorSubScreen,
+        isSpliceSubScreen,
+        isNodeSubScreen,
+        isSegmentSubScreen,
+        isWireSubScreen
+      },
+      entities: {
+        connectors,
+        splices,
+        nodes,
+        segments,
+        wires
+      },
+      formsState,
+      modelingHandlers,
+      listModel: entityListModel,
+      selection: selectionEntities,
+      layoutDerived: {
+        selectedWireRouteSegmentIds
+      },
+      pendingNewNodePosition,
+      wireDescriptions: {
+        describeWireEndpoint,
+        describeWireEndpointId
+      },
+      describeNode,
+      nodeLabelById,
+      networkSummaryPanel,
+      connectorTechnicalIdAlreadyUsed,
+      spliceTechnicalIdAlreadyUsed,
+      wireTechnicalIdAlreadyUsed,
+      onSelectConnector: (connectorId) =>
+        dispatchAction(
+          appActions.select({
+            kind: "connector",
+            id: connectorId
+          })
+        ),
+      onSelectSplice: (spliceId) =>
+        dispatchAction(
+          appActions.select({
+            kind: "splice",
+            id: spliceId
+          })
+        ),
+      onSelectWire: (wireId) =>
+        dispatchAction(
+          appActions.select({
+            kind: "wire",
+            id: wireId
+          })
+        )
+    });
+  const { networkScopeWorkspaceContent, validationWorkspaceContent, settingsWorkspaceContent } =
+    useAppControllerAuxScreenContentDomains({
+      components: {
+        NetworkScopeWorkspaceContentComponent: NetworkScopeWorkspaceContent,
+        ValidationWorkspaceContentComponent: ValidationWorkspaceContent,
+        SettingsWorkspaceContentComponent: SettingsWorkspaceContent
+      },
+      networkScope: {
+        networks,
+        networkSort,
+        setNetworkSort,
+        networkEntityCountsById,
+        activeNetworkId,
+        handleSelectNetwork,
+        handleDuplicateNetwork,
+        handleDeleteNetwork,
+        handleOpenCreateNetworkForm,
+        handleOpenEditNetworkForm,
+        handleCloseNetworkForm,
+        networkTechnicalIdAlreadyUsed,
+        handleSubmitNetworkForm,
+        formState: {
+          newNetworkName,
+          setNewNetworkName,
+          newNetworkTechnicalId,
+          setNewNetworkTechnicalId,
+          newNetworkDescription,
+          setNewNetworkDescription,
+          networkFormError,
+          setNetworkFormError,
+          networkFormMode,
+          setNetworkFormMode,
+          networkFormTargetId,
+          setNetworkFormTargetId,
+          networkFocusRequest,
+          setNetworkFocusRequest
+        }
+      },
+      validation: {
+        ...validationModel,
+        moveVisibleValidationIssueCursor,
+        handleValidationIssueRowGoTo
+      },
+      settings: {
+        isCurrentWorkspaceEmpty,
+        hasBuiltInSampleState,
+        handleRecreateSampleNetwork,
+        handleResetSampleNetwork,
+        activeNetworkId,
+        importExport: {
+          importFileInputRef,
+          selectedExportNetworkIds,
+          importExportStatus,
+          lastImportSummary,
+          toggleSelectedExportNetwork,
+          handleExportNetworks,
+          handleOpenImportPicker,
+          handleImportFileChange
+        },
+        networks,
+        prefs: {
+          themeMode,
+          setThemeMode,
+          tableDensity,
+          setTableDensity,
+          tableFontSize,
+          setTableFontSize,
+          defaultSortField,
+          setDefaultSortField,
+          defaultSortDirection,
+          setDefaultSortDirection,
+          defaultIdSortDirection,
+          setDefaultIdSortDirection,
+          networkSort,
+          setNetworkSort,
+          canvasDefaultShowGrid,
+          setCanvasDefaultShowGrid,
+          canvasDefaultSnapToGrid,
+          setCanvasDefaultSnapToGrid,
+          canvasDefaultShowInfoPanels,
+          setCanvasDefaultShowInfoPanels,
+          canvasDefaultShowSegmentLengths,
+          setCanvasDefaultShowSegmentLengths,
+          canvasDefaultLabelStrokeMode,
+          setCanvasDefaultLabelStrokeMode,
+          showShortcutHints,
+          setShowShortcutHints,
+          keyboardShortcutsEnabled,
+          setKeyboardShortcutsEnabled,
+          preferencesHydrated,
+          setPreferencesHydrated
+        },
+        canvasDisplay: {
+          routePreviewStartNodeId,
+          setRoutePreviewStartNodeId,
+          routePreviewEndNodeId,
+          setRoutePreviewEndNodeId,
+          showNetworkInfoPanels,
+          setShowNetworkInfoPanels,
+          showSegmentLengths,
+          setShowSegmentLengths,
+          networkLabelStrokeMode,
+          setNetworkLabelStrokeMode,
+          canvasResetZoomPercentInput,
+          setCanvasResetZoomPercentInput
+        },
+        configuredResetZoomPercent,
+        applyListSortDefaults,
+        applyCanvasDefaultsNow,
+        handleZoomAction,
+        resetWorkspacePreferencesToDefaults
+      }
+    });
 
   return (
     <Suspense fallback={null}>
-      <main className={appShellClassName}>
-      <AppHeaderAndStats
+      <AppShellLayout
+        appShellClassName={appShellClassName}
+        workspaceShellStyle={workspaceShellStyle}
+        appRepositoryUrl={APP_REPOSITORY_URL}
+        currentYear={currentYear}
+        appVersion={appPackageMetadata.version}
         headerBlockRef={headerBlockRef}
-        isNavigationDrawerOpen={isNavigationDrawerOpen}
-        onToggleNavigationDrawer={handleToggleNavigationDrawer}
         navigationToggleButtonRef={navigationToggleButtonRef}
+        operationsButtonRef={operationsButtonRef}
+        navigationDrawerRef={navigationDrawerRef}
+        operationsPanelRef={operationsPanelRef}
+        isNavigationDrawerOpen={isNavigationDrawerOpen}
+        isOperationsPanelOpen={isOperationsPanelOpen}
+        closeNavigationDrawer={closeNavigationDrawer}
+        closeOperationsPanel={closeOperationsPanel}
+        onToggleNavigationDrawer={handleToggleNavigationDrawer}
+        onToggleOperationsPanel={handleToggleOperationsPanel}
         isSettingsActive={isSettingsScreen}
         onOpenSettings={handleOpenSettingsScreen}
         isInstallPromptAvailable={isInstallPromptAvailable}
         onInstallApp={handleInstallApp}
         isPwaUpdateReady={isPwaUpdateReady}
         onApplyPwaUpdate={handleApplyPwaUpdate}
-        isOperationsPanelOpen={isOperationsPanelOpen}
-        onToggleOperationsPanel={handleToggleOperationsPanel}
-        operationsButtonRef={operationsButtonRef}
         validationIssuesCount={validationIssues.length}
         validationErrorCount={validationErrorCount}
+        validationWarningCount={validationWarningCount}
         lastError={lastError}
         onClearError={() => dispatchAction(appActions.clearError())}
+        activeScreen={activeScreen}
+        activeSubScreen={activeSubScreen}
+        isModelingScreen={isModelingScreen}
+        isAnalysisScreen={isAnalysisScreen}
+        isValidationScreen={isValidationScreen}
+        entityCountBySubScreen={entityCountBySubScreen}
+        onScreenChange={setActiveScreen}
+        onSubScreenChange={setActiveSubScreen}
+        handleUndo={handleUndo}
+        handleRedo={handleRedo}
+        isUndoAvailable={isUndoAvailable}
+        isRedoAvailable={isRedoAvailable}
+        showShortcutHints={showShortcutHints}
+        saveStatus={saveStatus}
+        issueNavigatorDisplay={issueNavigatorDisplay}
+        issueNavigationScopeLabel={issueNavigationScopeLabel}
+        currentValidationIssue={currentValidationIssue}
+        orderedValidationIssues={orderedValidationIssues}
+        handleOpenValidationScreen={handleOpenValidationScreen}
+        moveValidationIssueCursor={moveValidationIssueCursor}
+        NetworkScopeScreenComponent={NetworkScopeScreen}
+        ModelingScreenComponent={ModelingScreen}
+        AnalysisScreenComponent={AnalysisScreen}
+        ValidationScreenComponent={ValidationScreen}
+        SettingsScreenComponent={SettingsScreen}
+        isNetworkScopeScreen={isNetworkScopeScreen}
+        hasActiveNetwork={hasActiveNetwork}
+        networkScopeWorkspaceContent={networkScopeWorkspaceContent}
+        modelingLeftColumnContent={modelingLeftColumnContent}
+        modelingFormsColumnContent={modelingFormsColumnContent}
+        networkSummaryPanel={networkSummaryPanel}
+        analysisWorkspaceContent={analysisWorkspaceContent}
+        validationWorkspaceContent={validationWorkspaceContent}
+        settingsWorkspaceContent={settingsWorkspaceContent}
+        isSettingsScreen={isSettingsScreen}
+        isInspectorHidden={isInspectorHidden}
+        isInspectorOpen={isInspectorOpen}
+        inspectorContextPanel={inspectorContextPanel}
       />
-
-      <section className="workspace-shell" style={workspaceShellStyle}>
-        <button
-          type="button"
-          className={isNavigationDrawerOpen ? "workspace-drawer-backdrop is-open" : "workspace-drawer-backdrop"}
-          aria-label="Close navigation menu"
-          onClick={closeNavigationDrawer}
-        />
-        <div
-          id="workspace-navigation-drawer"
-          ref={navigationDrawerRef}
-          className={isNavigationDrawerOpen ? "workspace-drawer is-open" : "workspace-drawer"}
-        >
-          <WorkspaceSidebarPanel
-            activeScreen={activeScreen}
-            activeSubScreen={activeSubScreen}
-            isModelingScreen={isModelingScreen}
-            isAnalysisScreen={isAnalysisScreen}
-            isValidationScreen={isValidationScreen}
-            validationIssuesCount={validationIssues.length}
-            validationErrorCount={validationErrorCount}
-            entityCountBySubScreen={entityCountBySubScreen}
-            onScreenChange={setActiveScreen}
-            onSubScreenChange={setActiveSubScreen}
-          />
-        </div>
-        <button
-          type="button"
-          className={isOperationsPanelOpen ? "workspace-ops-backdrop is-open" : "workspace-ops-backdrop"}
-          aria-label="Close operations panel"
-          onClick={closeOperationsPanel}
-        />
-        <div
-          id="workspace-operations-panel"
-          ref={operationsPanelRef}
-          className={isOperationsPanelOpen ? "workspace-ops-panel is-open" : "workspace-ops-panel"}
-        >
-          <OperationsHealthPanel
-            handleUndo={handleUndo}
-            handleRedo={handleRedo}
-            isUndoAvailable={isUndoAvailable}
-            isRedoAvailable={isRedoAvailable}
-            showShortcutHints={showShortcutHints}
-            saveStatus={saveStatus}
-            validationIssuesCount={validationIssues.length}
-            validationErrorCount={validationErrorCount}
-            validationWarningCount={validationWarningCount}
-            issueNavigatorDisplay={issueNavigatorDisplay}
-            issueNavigationScopeLabel={issueNavigationScopeLabel}
-            currentValidationIssue={currentValidationIssue}
-            orderedValidationIssues={orderedValidationIssues}
-            handleOpenValidationScreen={handleOpenValidationScreen}
-            moveValidationIssueCursor={moveValidationIssueCursor}
-          />
-        </div>
-
-        <section className="workspace-content">
-          <NetworkScopeWorkspaceContainer
-            ScreenComponent={NetworkScopeScreen}
-            isActive={isNetworkScopeScreen}
-            workspaceContent={networkScopeWorkspaceContent}
-          />
-
-          {!isNetworkScopeScreen && !hasActiveNetwork ? (
-            <section className="panel">
-              <h2>No active network</h2>
-              <p className="empty-copy">
-                Create a network from the network scope controls to start modeling connectors, splices, nodes, segments, and wires.
-              </p>
-            </section>
-          ) : !isNetworkScopeScreen ? (
-            <>
-              <ModelingWorkspaceContainer
-                ScreenComponent={ModelingScreen}
-                isActive={isModelingScreen}
-                leftColumnContent={modelingLeftColumnContent}
-                formsColumnContent={modelingFormsColumnContent}
-                networkSummaryPanel={networkSummaryPanel}
-              />
-
-              <AnalysisWorkspaceContainer
-                ScreenComponent={AnalysisScreen}
-                isActive={isAnalysisScreen}
-                workspaceContent={analysisWorkspaceContent}
-              />
-
-              <ValidationWorkspaceContainer
-                ScreenComponent={ValidationScreen}
-                isActive={isValidationScreen}
-                workspaceContent={validationWorkspaceContent}
-              />
-
-              <SettingsWorkspaceContainer
-                ScreenComponent={SettingsScreen}
-                isActive={isSettingsScreen}
-                workspaceContent={settingsWorkspaceContent}
-              />
-            </>
-          ) : null}
-        </section>
-      </section>
-      <a className="app-footer-link" href={APP_REPOSITORY_URL} target="_blank" rel="noopener noreferrer">
-        © {currentYear} e-Plan Editor · v{appPackageMetadata.version}
-      </a>
-      {!isInspectorHidden ? (
-        <aside
-          className={isInspectorOpen ? "workspace-inspector-panel is-open" : "workspace-inspector-panel is-collapsed"}
-          aria-label="Inspector context panel"
-        >
-          {inspectorContextPanel}
-        </aside>
-      ) : null}
-      </main>
     </Suspense>
   );
 }

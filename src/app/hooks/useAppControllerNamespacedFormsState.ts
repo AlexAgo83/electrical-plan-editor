@@ -1,0 +1,121 @@
+import { useEntityFormsState } from "./useEntityFormsState";
+
+export type AppControllerFormsStateFlat = ReturnType<typeof useEntityFormsState>;
+
+export function buildAppControllerNamespacedFormsState(forms: AppControllerFormsStateFlat) {
+  return {
+    connector: {
+      formMode: forms.connectorFormMode,
+      setFormMode: forms.setConnectorFormMode,
+      editingId: forms.editingConnectorId,
+      setEditingId: forms.setEditingConnectorId,
+      name: forms.connectorName,
+      setName: forms.setConnectorName,
+      technicalId: forms.connectorTechnicalId,
+      setTechnicalId: forms.setConnectorTechnicalId,
+      cavityCount: forms.cavityCount,
+      setCavityCount: forms.setCavityCount,
+      cavityIndexInput: forms.cavityIndexInput,
+      setCavityIndexInput: forms.setCavityIndexInput,
+      occupantRefInput: forms.connectorOccupantRefInput,
+      setOccupantRefInput: forms.setConnectorOccupantRefInput,
+      formError: forms.connectorFormError,
+      setFormError: forms.setConnectorFormError
+    },
+    splice: {
+      formMode: forms.spliceFormMode,
+      setFormMode: forms.setSpliceFormMode,
+      editingId: forms.editingSpliceId,
+      setEditingId: forms.setEditingSpliceId,
+      name: forms.spliceName,
+      setName: forms.setSpliceName,
+      technicalId: forms.spliceTechnicalId,
+      setTechnicalId: forms.setSpliceTechnicalId,
+      portCount: forms.portCount,
+      setPortCount: forms.setPortCount,
+      portIndexInput: forms.portIndexInput,
+      setPortIndexInput: forms.setPortIndexInput,
+      occupantRefInput: forms.spliceOccupantRefInput,
+      setOccupantRefInput: forms.setSpliceOccupantRefInput,
+      formError: forms.spliceFormError,
+      setFormError: forms.setSpliceFormError
+    },
+    node: {
+      formMode: forms.nodeFormMode,
+      setFormMode: forms.setNodeFormMode,
+      editingId: forms.editingNodeId,
+      setEditingId: forms.setEditingNodeId,
+      idInput: forms.nodeIdInput,
+      setIdInput: forms.setNodeIdInput,
+      kind: forms.nodeKind,
+      setKind: forms.setNodeKind,
+      connectorId: forms.nodeConnectorId,
+      setConnectorId: forms.setNodeConnectorId,
+      spliceId: forms.nodeSpliceId,
+      setSpliceId: forms.setNodeSpliceId,
+      label: forms.nodeLabel,
+      setLabel: forms.setNodeLabel,
+      formError: forms.nodeFormError,
+      setFormError: forms.setNodeFormError
+    },
+    segment: {
+      formMode: forms.segmentFormMode,
+      setFormMode: forms.setSegmentFormMode,
+      editingId: forms.editingSegmentId,
+      setEditingId: forms.setEditingSegmentId,
+      idInput: forms.segmentIdInput,
+      setIdInput: forms.setSegmentIdInput,
+      nodeA: forms.segmentNodeA,
+      setNodeA: forms.setSegmentNodeA,
+      nodeB: forms.segmentNodeB,
+      setNodeB: forms.setSegmentNodeB,
+      lengthMm: forms.segmentLengthMm,
+      setLengthMm: forms.setSegmentLengthMm,
+      subNetworkTag: forms.segmentSubNetworkTag,
+      setSubNetworkTag: forms.setSegmentSubNetworkTag,
+      formError: forms.segmentFormError,
+      setFormError: forms.setSegmentFormError
+    },
+    wire: {
+      formMode: forms.wireFormMode,
+      setFormMode: forms.setWireFormMode,
+      editingId: forms.editingWireId,
+      setEditingId: forms.setEditingWireId,
+      name: forms.wireName,
+      setName: forms.setWireName,
+      technicalId: forms.wireTechnicalId,
+      setTechnicalId: forms.setWireTechnicalId,
+      endpointAKind: forms.wireEndpointAKind,
+      setEndpointAKind: forms.setWireEndpointAKind,
+      endpointAConnectorId: forms.wireEndpointAConnectorId,
+      setEndpointAConnectorId: forms.setWireEndpointAConnectorId,
+      endpointACavityIndex: forms.wireEndpointACavityIndex,
+      setEndpointACavityIndex: forms.setWireEndpointACavityIndex,
+      endpointASpliceId: forms.wireEndpointASpliceId,
+      setEndpointASpliceId: forms.setWireEndpointASpliceId,
+      endpointAPortIndex: forms.wireEndpointAPortIndex,
+      setEndpointAPortIndex: forms.setWireEndpointAPortIndex,
+      endpointBKind: forms.wireEndpointBKind,
+      setEndpointBKind: forms.setWireEndpointBKind,
+      endpointBConnectorId: forms.wireEndpointBConnectorId,
+      setEndpointBConnectorId: forms.setWireEndpointBConnectorId,
+      endpointBCavityIndex: forms.wireEndpointBCavityIndex,
+      setEndpointBCavityIndex: forms.setWireEndpointBCavityIndex,
+      endpointBSpliceId: forms.wireEndpointBSpliceId,
+      setEndpointBSpliceId: forms.setWireEndpointBSpliceId,
+      endpointBPortIndex: forms.wireEndpointBPortIndex,
+      setEndpointBPortIndex: forms.setWireEndpointBPortIndex,
+      forcedRouteInput: forms.wireForcedRouteInput,
+      setForcedRouteInput: forms.setWireForcedRouteInput,
+      formError: forms.wireFormError,
+      setFormError: forms.setWireFormError
+    }
+  } as const;
+}
+
+export function useAppControllerNamespacedFormsState() {
+  const forms = useEntityFormsState();
+  return buildAppControllerNamespacedFormsState(forms);
+}
+
+export type AppControllerNamespacedFormsState = ReturnType<typeof useAppControllerNamespacedFormsState>;

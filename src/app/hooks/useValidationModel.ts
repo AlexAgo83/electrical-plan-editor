@@ -359,3 +359,5 @@ export function useValidationModel({
     setValidationIssueCursorFromIssue
   };
 }
+
+export type ValidationModel = ReturnType<typeof useValidationModel>;

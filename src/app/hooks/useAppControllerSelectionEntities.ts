@@ -75,3 +75,5 @@ export function useAppControllerSelectionEntities({ state }: UseAppControllerSel
     selectedSpliceOccupiedCount
   };
 }
+
+export type AppControllerSelectionEntitiesModel = ReturnType<typeof useAppControllerSelectionEntities>;

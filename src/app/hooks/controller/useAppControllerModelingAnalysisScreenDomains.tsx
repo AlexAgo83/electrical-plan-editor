@@ -1,0 +1,337 @@
+import type { EntityListModel } from "../useEntityListModel";
+import type { AppControllerFormsStateFlat } from "../useAppControllerNamespacedFormsState";
+import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
+import type { WireEndpointDescriptions } from "../useWireEndpointDescriptions";
+import type { AppControllerModelingHandlersOrchestrator } from "./useAppControllerModelingHandlersOrchestrator";
+import {
+  useAnalysisScreenContentSlice,
+  useModelingScreenContentSlice
+} from "./useAppControllerScreenContentSlices";
+
+type ModelingSliceParams = Parameters<typeof useModelingScreenContentSlice>[0];
+type AnalysisSliceParams = Parameters<typeof useAnalysisScreenContentSlice>[0];
+
+interface UseAppControllerModelingAnalysisScreenDomainsParams {
+  components: Pick<
+    ModelingSliceParams,
+    "ModelingPrimaryTablesComponent" | "ModelingSecondaryTablesComponent" | "ModelingFormsColumnComponent"
+  > &
+    Pick<AnalysisSliceParams, "AnalysisWorkspaceContentComponent">;
+  screenFlags: Pick<
+    ModelingSliceParams,
+    "isConnectorSubScreen" | "isSpliceSubScreen" | "isNodeSubScreen" | "isSegmentSubScreen" | "isWireSubScreen"
+  > &
+    Pick<AnalysisSliceParams, "isConnectorSubScreen" | "isSpliceSubScreen" | "isWireSubScreen">;
+  entities: Pick<
+    ModelingSliceParams,
+    "connectors" | "splices" | "nodes" | "segments" | "wires"
+  >;
+  formsState: AppControllerFormsStateFlat;
+  modelingHandlers: AppControllerModelingHandlersOrchestrator;
+  listModel: Pick<
+    EntityListModel,
+    | "connectorOccupancyFilter"
+    | "setConnectorOccupancyFilter"
+    | "visibleConnectors"
+    | "connectorSort"
+    | "setConnectorSort"
+    | "connectorOccupiedCountById"
+    | "spliceOccupancyFilter"
+    | "setSpliceOccupancyFilter"
+    | "visibleSplices"
+    | "spliceSort"
+    | "setSpliceSort"
+    | "spliceOccupiedCountById"
+    | "nodeKindFilter"
+    | "setNodeKindFilter"
+    | "visibleNodes"
+    | "nodeIdSortDirection"
+    | "setNodeIdSortDirection"
+    | "segmentsCountByNodeId"
+    | "segmentSubNetworkFilter"
+    | "setSegmentSubNetworkFilter"
+    | "visibleSegments"
+    | "segmentIdSortDirection"
+    | "setSegmentIdSortDirection"
+    | "wireRouteFilter"
+    | "setWireRouteFilter"
+    | "visibleWires"
+    | "wireSort"
+    | "setWireSort"
+    | "connectorSynthesisSort"
+    | "setConnectorSynthesisSort"
+    | "spliceSynthesisSort"
+    | "setSpliceSynthesisSort"
+    | "sortedConnectorSynthesisRows"
+    | "sortedSpliceSynthesisRows"
+    | "getSortIndicator"
+  >;
+  selection: Pick<
+    AppControllerSelectionEntitiesModel,
+    | "selectedConnectorId"
+    | "selectedSpliceId"
+    | "selectedNodeId"
+    | "selectedSegmentId"
+    | "selectedWireId"
+    | "selectedConnector"
+    | "selectedSplice"
+    | "selectedWire"
+    | "connectorCavityStatuses"
+    | "splicePortStatuses"
+  >;
+  layoutDerived: Pick<ModelingSliceParams, "selectedWireRouteSegmentIds">;
+  pendingNewNodePosition: ModelingSliceParams["pendingNewNodePosition"];
+  wireDescriptions: WireEndpointDescriptions;
+  describeNode: ModelingSliceParams["describeNode"];
+  nodeLabelById: ModelingSliceParams["nodeLabelById"];
+  networkSummaryPanel: AnalysisSliceParams["networkSummaryPanel"];
+  connectorTechnicalIdAlreadyUsed: ModelingSliceParams["connectorTechnicalIdAlreadyUsed"];
+  spliceTechnicalIdAlreadyUsed: ModelingSliceParams["spliceTechnicalIdAlreadyUsed"];
+  wireTechnicalIdAlreadyUsed: ModelingSliceParams["wireTechnicalIdAlreadyUsed"];
+  onSelectConnector: AnalysisSliceParams["onSelectConnector"];
+  onSelectSplice: AnalysisSliceParams["onSelectSplice"];
+  onSelectWire: AnalysisSliceParams["onSelectWire"];
+}
+
+export function useAppControllerModelingAnalysisScreenDomains({
+  components,
+  screenFlags,
+  entities,
+  formsState,
+  modelingHandlers,
+  listModel,
+  selection,
+  layoutDerived,
+  pendingNewNodePosition,
+  wireDescriptions,
+  describeNode,
+  nodeLabelById,
+  networkSummaryPanel,
+  connectorTechnicalIdAlreadyUsed,
+  spliceTechnicalIdAlreadyUsed,
+  wireTechnicalIdAlreadyUsed,
+  onSelectConnector,
+  onSelectSplice,
+  onSelectWire
+}: UseAppControllerModelingAnalysisScreenDomainsParams) {
+  const { modelingLeftColumnContent, modelingFormsColumnContent } = useModelingScreenContentSlice({
+    ModelingPrimaryTablesComponent: components.ModelingPrimaryTablesComponent,
+    ModelingSecondaryTablesComponent: components.ModelingSecondaryTablesComponent,
+    ModelingFormsColumnComponent: components.ModelingFormsColumnComponent,
+    isConnectorSubScreen: screenFlags.isConnectorSubScreen,
+    connectorFormMode: formsState.connectorFormMode,
+    resetConnectorForm: modelingHandlers.connector.resetConnectorForm,
+    connectorOccupancyFilter: listModel.connectorOccupancyFilter,
+    setConnectorOccupancyFilter: listModel.setConnectorOccupancyFilter,
+    connectors: entities.connectors,
+    visibleConnectors: listModel.visibleConnectors,
+    connectorSort: listModel.connectorSort,
+    setConnectorSort: listModel.setConnectorSort,
+    getSortIndicator: listModel.getSortIndicator,
+    connectorOccupiedCountById: listModel.connectorOccupiedCountById,
+    selectedConnectorId: selection.selectedConnectorId,
+    startConnectorEdit: modelingHandlers.connector.startConnectorEdit,
+    handleConnectorDelete: modelingHandlers.connector.handleConnectorDelete,
+    isSpliceSubScreen: screenFlags.isSpliceSubScreen,
+    spliceFormMode: formsState.spliceFormMode,
+    resetSpliceForm: modelingHandlers.splice.resetSpliceForm,
+    spliceOccupancyFilter: listModel.spliceOccupancyFilter,
+    setSpliceOccupancyFilter: listModel.setSpliceOccupancyFilter,
+    splices: entities.splices,
+    visibleSplices: listModel.visibleSplices,
+    spliceSort: listModel.spliceSort,
+    setSpliceSort: listModel.setSpliceSort,
+    spliceOccupiedCountById: listModel.spliceOccupiedCountById,
+    selectedSpliceId: selection.selectedSpliceId,
+    startSpliceEdit: modelingHandlers.splice.startSpliceEdit,
+    handleSpliceDelete: modelingHandlers.splice.handleSpliceDelete,
+    isNodeSubScreen: screenFlags.isNodeSubScreen,
+    nodeFormMode: formsState.nodeFormMode,
+    resetNodeForm: modelingHandlers.node.resetNodeForm,
+    nodeKindFilter: listModel.nodeKindFilter,
+    setNodeKindFilter: listModel.setNodeKindFilter,
+    nodes: entities.nodes,
+    visibleNodes: listModel.visibleNodes,
+    nodeIdSortDirection: listModel.nodeIdSortDirection,
+    setNodeIdSortDirection: listModel.setNodeIdSortDirection,
+    segmentsCountByNodeId: listModel.segmentsCountByNodeId,
+    selectedNodeId: selection.selectedNodeId,
+    describeNode,
+    startNodeEdit: modelingHandlers.node.startNodeEdit,
+    handleNodeDelete: modelingHandlers.node.handleNodeDelete,
+    isSegmentSubScreen: screenFlags.isSegmentSubScreen,
+    segmentFormMode: formsState.segmentFormMode,
+    resetSegmentForm: modelingHandlers.segment.resetSegmentForm,
+    segmentSubNetworkFilter: listModel.segmentSubNetworkFilter,
+    setSegmentSubNetworkFilter: listModel.setSegmentSubNetworkFilter,
+    segments: entities.segments,
+    visibleSegments: listModel.visibleSegments,
+    segmentIdSortDirection: listModel.segmentIdSortDirection,
+    setSegmentIdSortDirection: listModel.setSegmentIdSortDirection,
+    nodeLabelById,
+    selectedSegmentId: selection.selectedSegmentId,
+    selectedWireRouteSegmentIds: layoutDerived.selectedWireRouteSegmentIds,
+    startSegmentEdit: modelingHandlers.segment.startSegmentEdit,
+    handleSegmentDelete: modelingHandlers.segment.handleSegmentDelete,
+    isWireSubScreen: screenFlags.isWireSubScreen,
+    wireFormMode: formsState.wireFormMode,
+    resetWireForm: modelingHandlers.wire.resetWireForm,
+    wireRouteFilter: listModel.wireRouteFilter,
+    setWireRouteFilter: listModel.setWireRouteFilter,
+    wires: entities.wires,
+    visibleWires: listModel.visibleWires,
+    wireSort: listModel.wireSort,
+    setWireSort: listModel.setWireSort,
+    selectedWireId: selection.selectedWireId,
+    describeWireEndpoint: wireDescriptions.describeWireEndpoint,
+    describeWireEndpointId: wireDescriptions.describeWireEndpointId,
+    startWireEdit: modelingHandlers.wire.startWireEdit,
+    handleWireDelete: modelingHandlers.wire.handleWireDelete,
+    handleConnectorSubmit: modelingHandlers.connector.handleConnectorSubmit,
+    connectorName: formsState.connectorName,
+    setConnectorName: formsState.setConnectorName,
+    connectorTechnicalId: formsState.connectorTechnicalId,
+    setConnectorTechnicalId: formsState.setConnectorTechnicalId,
+    connectorTechnicalIdAlreadyUsed,
+    cavityCount: formsState.cavityCount,
+    setCavityCount: formsState.setCavityCount,
+    cancelConnectorEdit: modelingHandlers.connector.cancelConnectorEdit,
+    connectorFormError: formsState.connectorFormError,
+    handleSpliceSubmit: modelingHandlers.splice.handleSpliceSubmit,
+    spliceName: formsState.spliceName,
+    setSpliceName: formsState.setSpliceName,
+    spliceTechnicalId: formsState.spliceTechnicalId,
+    setSpliceTechnicalId: formsState.setSpliceTechnicalId,
+    spliceTechnicalIdAlreadyUsed,
+    portCount: formsState.portCount,
+    setPortCount: formsState.setPortCount,
+    cancelSpliceEdit: modelingHandlers.splice.cancelSpliceEdit,
+    spliceFormError: formsState.spliceFormError,
+    handleNodeSubmit: modelingHandlers.node.handleNodeSubmit,
+    nodeIdInput: formsState.nodeIdInput,
+    setNodeIdInput: formsState.setNodeIdInput,
+    pendingNewNodePosition,
+    nodeKind: formsState.nodeKind,
+    setNodeKind: formsState.setNodeKind,
+    nodeLabel: formsState.nodeLabel,
+    setNodeLabel: formsState.setNodeLabel,
+    nodeConnectorId: formsState.nodeConnectorId,
+    setNodeConnectorId: formsState.setNodeConnectorId,
+    nodeSpliceId: formsState.nodeSpliceId,
+    setNodeSpliceId: formsState.setNodeSpliceId,
+    cancelNodeEdit: modelingHandlers.node.cancelNodeEdit,
+    nodeFormError: formsState.nodeFormError,
+    handleSegmentSubmit: modelingHandlers.segment.handleSegmentSubmit,
+    segmentIdInput: formsState.segmentIdInput,
+    setSegmentIdInput: formsState.setSegmentIdInput,
+    segmentNodeA: formsState.segmentNodeA,
+    setSegmentNodeA: formsState.setSegmentNodeA,
+    segmentNodeB: formsState.segmentNodeB,
+    setSegmentNodeB: formsState.setSegmentNodeB,
+    segmentLengthMm: formsState.segmentLengthMm,
+    setSegmentLengthMm: formsState.setSegmentLengthMm,
+    segmentSubNetworkTag: formsState.segmentSubNetworkTag,
+    setSegmentSubNetworkTag: formsState.setSegmentSubNetworkTag,
+    cancelSegmentEdit: modelingHandlers.segment.cancelSegmentEdit,
+    segmentFormError: formsState.segmentFormError,
+    handleWireSubmit: modelingHandlers.wire.handleWireSubmit,
+    wireName: formsState.wireName,
+    setWireName: formsState.setWireName,
+    wireTechnicalId: formsState.wireTechnicalId,
+    setWireTechnicalId: formsState.setWireTechnicalId,
+    wireTechnicalIdAlreadyUsed,
+    wireEndpointAKind: formsState.wireEndpointAKind,
+    setWireEndpointAKind: formsState.setWireEndpointAKind,
+    wireEndpointAConnectorId: formsState.wireEndpointAConnectorId,
+    setWireEndpointAConnectorId: formsState.setWireEndpointAConnectorId,
+    wireEndpointACavityIndex: formsState.wireEndpointACavityIndex,
+    setWireEndpointACavityIndex: formsState.setWireEndpointACavityIndex,
+    wireEndpointASpliceId: formsState.wireEndpointASpliceId,
+    setWireEndpointASpliceId: formsState.setWireEndpointASpliceId,
+    wireEndpointAPortIndex: formsState.wireEndpointAPortIndex,
+    setWireEndpointAPortIndex: formsState.setWireEndpointAPortIndex,
+    wireEndpointBKind: formsState.wireEndpointBKind,
+    setWireEndpointBKind: formsState.setWireEndpointBKind,
+    wireEndpointBConnectorId: formsState.wireEndpointBConnectorId,
+    setWireEndpointBConnectorId: formsState.setWireEndpointBConnectorId,
+    wireEndpointBCavityIndex: formsState.wireEndpointBCavityIndex,
+    setWireEndpointBCavityIndex: formsState.setWireEndpointBCavityIndex,
+    wireEndpointBSpliceId: formsState.wireEndpointBSpliceId,
+    setWireEndpointBSpliceId: formsState.setWireEndpointBSpliceId,
+    wireEndpointBPortIndex: formsState.wireEndpointBPortIndex,
+    setWireEndpointBPortIndex: formsState.setWireEndpointBPortIndex,
+    cancelWireEdit: modelingHandlers.wire.cancelWireEdit,
+    wireFormError: formsState.wireFormError
+  });
+
+  const { analysisWorkspaceContent } = useAnalysisScreenContentSlice({
+    AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
+    isConnectorSubScreen: screenFlags.isConnectorSubScreen,
+    isSpliceSubScreen: screenFlags.isSpliceSubScreen,
+    isWireSubScreen: screenFlags.isWireSubScreen,
+    networkSummaryPanel,
+    selectedConnector: selection.selectedConnector,
+    selectedConnectorId: selection.selectedConnectorId,
+    connectorOccupancyFilter: listModel.connectorOccupancyFilter,
+    setConnectorOccupancyFilter: listModel.setConnectorOccupancyFilter,
+    connectors: entities.connectors,
+    visibleConnectors: listModel.visibleConnectors,
+    connectorSort: listModel.connectorSort,
+    setConnectorSort: listModel.setConnectorSort,
+    connectorOccupiedCountById: listModel.connectorOccupiedCountById,
+    onSelectConnector,
+    cavityIndexInput: formsState.cavityIndexInput,
+    setCavityIndexInput: formsState.setCavityIndexInput,
+    connectorOccupantRefInput: formsState.connectorOccupantRefInput,
+    setConnectorOccupantRefInput: formsState.setConnectorOccupantRefInput,
+    handleReserveCavity: modelingHandlers.connector.handleReserveCavity,
+    connectorCavityStatuses: selection.connectorCavityStatuses,
+    handleReleaseCavity: modelingHandlers.connector.handleReleaseCavity,
+    sortedConnectorSynthesisRows: listModel.sortedConnectorSynthesisRows,
+    connectorSynthesisSort: listModel.connectorSynthesisSort,
+    setConnectorSynthesisSort: listModel.setConnectorSynthesisSort,
+    getSortIndicator: listModel.getSortIndicator,
+    selectedSplice: selection.selectedSplice,
+    selectedSpliceId: selection.selectedSpliceId,
+    spliceOccupancyFilter: listModel.spliceOccupancyFilter,
+    setSpliceOccupancyFilter: listModel.setSpliceOccupancyFilter,
+    splices: entities.splices,
+    visibleSplices: listModel.visibleSplices,
+    spliceSort: listModel.spliceSort,
+    setSpliceSort: listModel.setSpliceSort,
+    spliceOccupiedCountById: listModel.spliceOccupiedCountById,
+    onSelectSplice,
+    splicePortStatuses: selection.splicePortStatuses,
+    portIndexInput: formsState.portIndexInput,
+    setPortIndexInput: formsState.setPortIndexInput,
+    spliceOccupantRefInput: formsState.spliceOccupantRefInput,
+    setSpliceOccupantRefInput: formsState.setSpliceOccupantRefInput,
+    handleReservePort: modelingHandlers.splice.handleReservePort,
+    handleReleasePort: modelingHandlers.splice.handleReleasePort,
+    sortedSpliceSynthesisRows: listModel.sortedSpliceSynthesisRows,
+    spliceSynthesisSort: listModel.spliceSynthesisSort,
+    setSpliceSynthesisSort: listModel.setSpliceSynthesisSort,
+    wireRouteFilter: listModel.wireRouteFilter,
+    setWireRouteFilter: listModel.setWireRouteFilter,
+    wires: entities.wires,
+    visibleWires: listModel.visibleWires,
+    wireSort: listModel.wireSort,
+    setWireSort: listModel.setWireSort,
+    selectedWireId: selection.selectedWireId,
+    onSelectWire,
+    selectedWire: selection.selectedWire,
+    describeWireEndpoint: wireDescriptions.describeWireEndpoint,
+    describeWireEndpointId: wireDescriptions.describeWireEndpointId,
+    wireForcedRouteInput: formsState.wireForcedRouteInput,
+    setWireForcedRouteInput: formsState.setWireForcedRouteInput,
+    handleLockWireRoute: modelingHandlers.wire.handleLockWireRoute,
+    handleResetWireRoute: modelingHandlers.wire.handleResetWireRoute,
+    wireFormError: formsState.wireFormError
+  });
+
+  return {
+    modelingLeftColumnContent,
+    modelingFormsColumnContent,
+    analysisWorkspaceContent
+  };
+}

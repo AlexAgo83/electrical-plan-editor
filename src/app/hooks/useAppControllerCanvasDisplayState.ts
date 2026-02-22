@@ -25,3 +25,4 @@ export function useAppControllerCanvasDisplayState() {
   };
 }
 
+export type AppControllerCanvasDisplayStateModel = ReturnType<typeof useAppControllerCanvasDisplayState>;

@@ -188,3 +188,5 @@ export function useNetworkImportExport({
     handleImportFileChange
   };
 }
+
+export type NetworkImportExportModel = ReturnType<typeof useNetworkImportExport>;

@@ -90,3 +90,5 @@ export function useAppControllerLayoutDerivedState({
     networkNodePositions
   };
 }
+
+export type AppControllerLayoutDerivedStateModel = ReturnType<typeof useAppControllerLayoutDerivedState>;

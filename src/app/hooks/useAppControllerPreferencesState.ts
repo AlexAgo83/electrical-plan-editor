@@ -60,3 +60,4 @@ export function useAppControllerPreferencesState() {
   };
 }
 
+export type AppControllerPreferencesStateModel = ReturnType<typeof useAppControllerPreferencesState>;

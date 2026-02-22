@@ -37,3 +37,5 @@ export function useNetworkScopeFormState() {
     setNetworkFocusRequest
   };
 }
+
+export type NetworkScopeFormStateModel = ReturnType<typeof useNetworkScopeFormState>;
