@@ -5,7 +5,7 @@ A local-first electrical network editor focused on deterministic modeling, routi
 The project models connectors, splices, nodes, segments, and wires as a graph, computes shortest routes, and keeps wire lengths synchronized with segment changes.
 
 [![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
-[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v0.5.1-4C8BF5)
+[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v0.5.2-4C8BF5)
 
 ## Table of Contents
 
@@ -24,7 +24,7 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 
 - Production: [https://e-plan-editor.onrender.com](https://e-plan-editor.onrender.com)
 - Hosting: Render Static Site (Blueprint via `render.yaml`)
-- Current version: `0.5.1`
+- Current version: `0.5.2`
 - CI status: see the GitHub Actions badge above
 
 ## Features
@@ -141,16 +141,18 @@ The app is a SPA and can be hosted from `dist/` on any static server/CDN.
 
 ```text
 src/
-  app/                    # React app shell and UI
+  app/                    # React app shell, UI, controller wiring, PWA integration
+  app/pwa/                # PWA registration and update/install UX helpers
   config/                 # Runtime env resolution and defaults
   core/                   # Domain entities, graph and pathfinding
   store/                  # State management, reducer, selectors, actions
+  store/reducer/          # Reducer handlers split by domain concern
   adapters/persistence/   # Local storage persistence + migrations
   adapters/portability/   # Network import/export payload adapters
   tests/                  # Unit + integration tests
 
 tests/e2e/                # Playwright end-to-end smoke
-logics/                   # Product requests, backlog, tasks, architecture
+logics/                   # Product requests, backlog, tasks, architecture, skills
 ```
 
 ## Quality and CI
