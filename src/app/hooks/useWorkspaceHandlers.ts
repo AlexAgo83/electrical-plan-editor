@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import type { Network, NetworkId, NetworkNode, NodeId } from "../../core/entities";
+import type { Connector, ConnectorId, Network, NetworkId, NetworkNode, NodeId, Splice, SpliceId } from "../../core/entities";
 import type { AppStore, ThemeMode } from "../../store";
 import {
   appActions,
@@ -52,7 +52,11 @@ interface UseWorkspaceHandlersParams {
   replaceStateWithHistory: (nextState: ReturnType<typeof createSampleNetworkState>) => void;
   nodes: NetworkNode[];
   networkNodePositions: Record<NodeId, NodePosition>;
+  connectorMap: Map<ConnectorId, Connector>;
+  spliceMap: Map<SpliceId, Splice>;
   configuredResetScale: number;
+  networkScale: number;
+  networkOffset: NodePosition;
   setNetworkScale: (value: number) => void;
   setNetworkOffset: (value: NodePosition) => void;
   canvasDefaultShowGrid: boolean;
@@ -65,6 +69,8 @@ interface UseWorkspaceHandlersParams {
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
+  showCableCallouts: boolean;
+  networkCalloutTextSize: CanvasCalloutTextSize;
   setShowNetworkGrid: (value: boolean | ((current: boolean) => boolean)) => void;
   setSnapNodesToGrid: (value: boolean | ((current: boolean) => boolean)) => void;
   setLockEntityMovement: (value: boolean | ((current: boolean) => boolean)) => void;
@@ -127,7 +133,11 @@ export function useWorkspaceHandlers({
   replaceStateWithHistory,
   nodes,
   networkNodePositions,
+  connectorMap,
+  spliceMap,
   configuredResetScale,
+  networkScale,
+  networkOffset,
   setNetworkScale,
   setNetworkOffset,
   canvasDefaultShowGrid,
@@ -140,6 +150,8 @@ export function useWorkspaceHandlers({
   canvasDefaultLabelSizeMode,
   canvasDefaultCalloutTextSize,
   canvasDefaultLabelRotationDegrees,
+  showCableCallouts,
+  networkCalloutTextSize,
   setShowNetworkGrid,
   setSnapNodesToGrid,
   setLockEntityMovement,
@@ -392,23 +404,120 @@ export function useWorkspaceHandlers({
       }
     }
 
-    // Nodes are positioned by their center coordinates; expand the fit bounds so shapes
-    // (rect/circle) and labels do not visually stick to the viewport edges after fitting.
-    const entityVisualPadding = 28;
-    const fitPadding = 40;
-    const paddedMinX = minX - entityVisualPadding;
-    const paddedMaxX = maxX + entityVisualPadding;
-    const paddedMinY = minY - entityVisualPadding;
-    const paddedMaxY = maxY + entityVisualPadding;
-    const contentWidth = Math.max(1, paddedMaxX - paddedMinX);
-    const contentHeight = Math.max(1, paddedMaxY - paddedMinY);
-    const availableWidth = Math.max(1, NETWORK_VIEW_WIDTH - fitPadding * 2);
-    const availableHeight = Math.max(1, NETWORK_VIEW_HEIGHT - fitPadding * 2);
-    const fittedScale = clamp(
-      Math.min(availableWidth / contentWidth, availableHeight / contentHeight),
-      NETWORK_MIN_SCALE,
-      NETWORK_MAX_SCALE
-    );
+    const computeFitScaleForBounds = (bounds: { minX: number; maxX: number; minY: number; maxY: number }) => {
+      // Nodes are positioned by their center coordinates; expand the fit bounds so shapes
+      // (rect/circle) and labels do not visually stick to the viewport edges after fitting.
+      const entityVisualPadding = 28;
+      const fitPadding = 40;
+      const paddedMinX = bounds.minX - entityVisualPadding;
+      const paddedMaxX = bounds.maxX + entityVisualPadding;
+      const paddedMinY = bounds.minY - entityVisualPadding;
+      const paddedMaxY = bounds.maxY + entityVisualPadding;
+      const contentWidth = Math.max(1, paddedMaxX - paddedMinX);
+      const contentHeight = Math.max(1, paddedMaxY - paddedMinY);
+      const availableWidth = Math.max(1, NETWORK_VIEW_WIDTH - fitPadding * 2);
+      const availableHeight = Math.max(1, NETWORK_VIEW_HEIGHT - fitPadding * 2);
+      const fittedScale = clamp(
+        Math.min(availableWidth / contentWidth, availableHeight / contentHeight),
+        NETWORK_MIN_SCALE,
+        NETWORK_MAX_SCALE
+      );
+
+      return {
+        fitPadding,
+        paddedMinX,
+        paddedMaxX,
+        paddedMinY,
+        paddedMaxY,
+        fittedScale
+      };
+    };
+
+    if (showCableCallouts) {
+      let measuredCalloutBoundsFromDom = false;
+
+      if (typeof document !== "undefined" && networkScale > 0.0001) {
+        const svgElement = document.querySelector(".network-summary-stack .network-svg") as SVGSVGElement | null;
+        const svgRect = svgElement?.getBoundingClientRect();
+        const calloutFrames = svgElement?.querySelectorAll(".network-callout-frame");
+        const hasUsableSvgRect =
+          svgRect !== undefined &&
+          svgRect.width > 0 &&
+          svgRect.height > 0 &&
+          Number.isFinite(svgRect.left) &&
+          Number.isFinite(svgRect.top);
+
+        if (svgElement !== null && hasUsableSvgRect && calloutFrames !== undefined && calloutFrames.length > 0) {
+          const scaleX = NETWORK_VIEW_WIDTH / svgRect.width;
+          const scaleY = NETWORK_VIEW_HEIGHT / svgRect.height;
+
+          calloutFrames.forEach((frame) => {
+            const rect = frame.getBoundingClientRect();
+            if (rect.width <= 0 || rect.height <= 0) {
+              return;
+            }
+
+            const leftSvg = (rect.left - svgRect.left) * scaleX;
+            const rightSvg = (rect.right - svgRect.left) * scaleX;
+            const topSvg = (rect.top - svgRect.top) * scaleY;
+            const bottomSvg = (rect.bottom - svgRect.top) * scaleY;
+
+            const leftModel = (leftSvg - networkOffset.x) / networkScale;
+            const rightModel = (rightSvg - networkOffset.x) / networkScale;
+            const topModel = (topSvg - networkOffset.y) / networkScale;
+            const bottomModel = (bottomSvg - networkOffset.y) / networkScale;
+
+            minX = Math.min(minX, leftModel);
+            maxX = Math.max(maxX, rightModel);
+            minY = Math.min(minY, topModel);
+            maxY = Math.max(maxY, bottomModel);
+            measuredCalloutBoundsFromDom = true;
+          });
+        }
+      }
+
+      if (!measuredCalloutBoundsFromDom) {
+        const initialFit = computeFitScaleForBounds({ minX, maxX, minY, maxY });
+        const safeScale = Math.max(0.05, initialFit.fittedScale);
+        const inverseLabelScale = 1 / safeScale;
+        const estimatedCalloutHalfWidthBySize: Record<CanvasCalloutTextSize, number> = {
+          small: 110,
+          normal: 130,
+          large: 155
+        };
+        const estimatedCalloutHalfHeightBySize: Record<CanvasCalloutTextSize, number> = {
+          small: 42,
+          normal: 52,
+          large: 64
+        };
+        const calloutHalfWidth = estimatedCalloutHalfWidthBySize[networkCalloutTextSize] * inverseLabelScale;
+        const calloutHalfHeight = estimatedCalloutHalfHeightBySize[networkCalloutTextSize] * inverseLabelScale;
+
+        for (const node of nodes) {
+          if (node.kind !== "connector" && node.kind !== "splice") {
+            continue;
+          }
+          const persistedPosition =
+            node.kind === "connector"
+              ? connectorMap.get(node.connectorId)?.cableCalloutPosition
+              : spliceMap.get(node.spliceId)?.cableCalloutPosition;
+          if (persistedPosition === undefined) {
+            continue;
+          }
+
+          minX = Math.min(minX, persistedPosition.x - calloutHalfWidth);
+          maxX = Math.max(maxX, persistedPosition.x + calloutHalfWidth);
+          minY = Math.min(minY, persistedPosition.y - calloutHalfHeight);
+          maxY = Math.max(maxY, persistedPosition.y + calloutHalfHeight);
+        }
+      }
+    }
+    const { paddedMinX, paddedMaxX, paddedMinY, paddedMaxY, fittedScale } = computeFitScaleForBounds({
+      minX,
+      maxX,
+      minY,
+      maxY
+    });
 
     const centerX = (paddedMinX + paddedMaxX) / 2;
     const centerY = (paddedMinY + paddedMaxY) / 2;
