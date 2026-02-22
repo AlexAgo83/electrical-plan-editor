@@ -128,15 +128,28 @@ export function renderAppWithState(state: AppState) {
   return { store, ...render(<App store={store} />) };
 }
 
-export function withViewportWidth(width: number, run: () => void): void {
+export function withViewportWidth<T>(width: number, run: () => Promise<T>): Promise<T>;
+export function withViewportWidth<T>(width: number, run: () => T): T;
+export function withViewportWidth<T>(width: number, run: () => T | Promise<T>): T | Promise<T> {
   const originalInnerWidth = window.innerWidth;
   Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: width });
   fireEvent(window, new Event("resize"));
-  try {
-    run();
-  } finally {
+
+  const restoreViewport = () => {
     Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: originalInnerWidth });
     fireEvent(window, new Event("resize"));
+  };
+
+  try {
+    const result = run();
+    if (result instanceof Promise) {
+      return result.finally(restoreViewport);
+    }
+    restoreViewport();
+    return result;
+  } catch (error) {
+    restoreViewport();
+    throw error;
   }
 }
 
@@ -217,10 +230,9 @@ function switchSubScreenWithMode(target: SubScreenSwitchTarget, mode: "strict" |
   let secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
   if (secondaryNavRow === null) {
     if (mode === "strict") {
-      switchScreenStrict("modeling");
-    } else {
-      switchScreenDrawerAware("modeling");
+      throw new Error("Secondary workspace navigation row was not found.");
     }
+    switchScreenDrawerAware("modeling");
     secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
   }
   if (secondaryNavRow === null) {

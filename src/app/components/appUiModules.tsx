@@ -1,22 +1,17 @@
 import { lazy } from "react";
-import { NetworkSummaryPanel as NetworkSummaryPanelEager } from "./NetworkSummaryPanel";
-import { AnalysisScreen as AnalysisScreenEager } from "./screens/AnalysisScreen";
-import { ModelingScreen as ModelingScreenEager } from "./screens/ModelingScreen";
-import { NetworkScopeScreen as NetworkScopeScreenEager } from "./screens/NetworkScopeScreen";
-import { SettingsScreen as SettingsScreenEager } from "./screens/SettingsScreen";
-import { ValidationScreen as ValidationScreenEager } from "./screens/ValidationScreen";
-import { AnalysisWorkspaceContent as AnalysisWorkspaceContentEager } from "./workspace/AnalysisWorkspaceContent";
-import { ModelingFormsColumn as ModelingFormsColumnEager } from "./workspace/ModelingFormsColumn";
-import { ModelingPrimaryTables as ModelingPrimaryTablesEager } from "./workspace/ModelingPrimaryTables";
-import { ModelingSecondaryTables as ModelingSecondaryTablesEager } from "./workspace/ModelingSecondaryTables";
-import { NetworkScopeWorkspaceContent as NetworkScopeWorkspaceContentEager } from "./workspace/NetworkScopeWorkspaceContent";
-import { SettingsWorkspaceContent as SettingsWorkspaceContentEager } from "./workspace/SettingsWorkspaceContent";
-import { ValidationWorkspaceContent as ValidationWorkspaceContentEager } from "./workspace/ValidationWorkspaceContent";
 
 export type AppUiModuleLoadingMode = "auto" | "eager" | "lazy";
 
+type AppUiModulesRegistry = typeof import("./appUiModules.eager").appUiModulesEager;
+
 let appUiModulesLoadingModeForTests: AppUiModuleLoadingMode = "auto";
 let appUiModulesLazyImportDelayMsForTests = 0;
+let eagerRegistryForTests: AppUiModulesRegistry | null = null;
+
+if (import.meta.env.VITEST) {
+  const eagerModule = await import("./appUiModules.eager");
+  eagerRegistryForTests = eagerModule.appUiModulesEager;
+}
 
 function shouldLazyLoadUiModules(): boolean {
   if (appUiModulesLoadingModeForTests === "lazy") {
@@ -48,80 +43,52 @@ function loadLazyUiModule<TModule, TExport>(
   })();
 }
 
-const NetworkSummaryPanelLazy = lazy(() =>
-  loadLazyUiModule(() => import("./NetworkSummaryPanel"), (module) => module.NetworkSummaryPanel)
-);
-const AnalysisScreenLazy = lazy(() =>
-  loadLazyUiModule(() => import("./screens/AnalysisScreen"), (module) => module.AnalysisScreen)
-);
-const ModelingScreenLazy = lazy(() =>
-  loadLazyUiModule(() => import("./screens/ModelingScreen"), (module) => module.ModelingScreen)
-);
-const NetworkScopeScreenLazy = lazy(() =>
-  loadLazyUiModule(() => import("./screens/NetworkScopeScreen"), (module) => module.NetworkScopeScreen)
-);
-const SettingsScreenLazy = lazy(() =>
-  loadLazyUiModule(() => import("./screens/SettingsScreen"), (module) => module.SettingsScreen)
-);
-const ValidationScreenLazy = lazy(() =>
-  loadLazyUiModule(() => import("./screens/ValidationScreen"), (module) => module.ValidationScreen)
-);
-const AnalysisWorkspaceContentLazy = lazy(() =>
-  loadLazyUiModule(() => import("./workspace/AnalysisWorkspaceContent"), (module) => module.AnalysisWorkspaceContent)
-);
-const ModelingFormsColumnLazy = lazy(() =>
-  loadLazyUiModule(() => import("./workspace/ModelingFormsColumn"), (module) => module.ModelingFormsColumn)
-);
-const ModelingPrimaryTablesLazy = lazy(() =>
-  loadLazyUiModule(() => import("./workspace/ModelingPrimaryTables"), (module) => module.ModelingPrimaryTables)
-);
-const ModelingSecondaryTablesLazy = lazy(() =>
-  loadLazyUiModule(() => import("./workspace/ModelingSecondaryTables"), (module) => module.ModelingSecondaryTables)
-);
-const NetworkScopeWorkspaceContentLazy = lazy(() =>
-  loadLazyUiModule(() => import("./workspace/NetworkScopeWorkspaceContent"), (module) => module.NetworkScopeWorkspaceContent)
-);
-const SettingsWorkspaceContentLazy = lazy(() =>
-  loadLazyUiModule(() => import("./workspace/SettingsWorkspaceContent"), (module) => module.SettingsWorkspaceContent)
-);
-const ValidationWorkspaceContentLazy = lazy(() =>
-  loadLazyUiModule(() => import("./workspace/ValidationWorkspaceContent"), (module) => module.ValidationWorkspaceContent)
-);
-
-const appUiModulesEager = {
-  NetworkSummaryPanel: NetworkSummaryPanelEager,
-  AnalysisScreen: AnalysisScreenEager,
-  ModelingScreen: ModelingScreenEager,
-  NetworkScopeScreen: NetworkScopeScreenEager,
-  SettingsScreen: SettingsScreenEager,
-  ValidationScreen: ValidationScreenEager,
-  AnalysisWorkspaceContent: AnalysisWorkspaceContentEager,
-  ModelingFormsColumn: ModelingFormsColumnEager,
-  ModelingPrimaryTables: ModelingPrimaryTablesEager,
-  ModelingSecondaryTables: ModelingSecondaryTablesEager,
-  NetworkScopeWorkspaceContent: NetworkScopeWorkspaceContentEager,
-  SettingsWorkspaceContent: SettingsWorkspaceContentEager,
-  ValidationWorkspaceContent: ValidationWorkspaceContentEager
-} as const;
-
 const appUiModulesLazy = {
-  NetworkSummaryPanel: NetworkSummaryPanelLazy,
-  AnalysisScreen: AnalysisScreenLazy,
-  ModelingScreen: ModelingScreenLazy,
-  NetworkScopeScreen: NetworkScopeScreenLazy,
-  SettingsScreen: SettingsScreenLazy,
-  ValidationScreen: ValidationScreenLazy,
-  AnalysisWorkspaceContent: AnalysisWorkspaceContentLazy,
-  ModelingFormsColumn: ModelingFormsColumnLazy,
-  ModelingPrimaryTables: ModelingPrimaryTablesLazy,
-  ModelingSecondaryTables: ModelingSecondaryTablesLazy,
-  NetworkScopeWorkspaceContent: NetworkScopeWorkspaceContentLazy,
-  SettingsWorkspaceContent: SettingsWorkspaceContentLazy,
-  ValidationWorkspaceContent: ValidationWorkspaceContentLazy
+  NetworkSummaryPanel: lazy(() =>
+    loadLazyUiModule(() => import("./NetworkSummaryPanel"), (module) => module.NetworkSummaryPanel)
+  ),
+  AnalysisScreen: lazy(() => loadLazyUiModule(() => import("./screens/AnalysisScreen"), (module) => module.AnalysisScreen)),
+  ModelingScreen: lazy(() => loadLazyUiModule(() => import("./screens/ModelingScreen"), (module) => module.ModelingScreen)),
+  NetworkScopeScreen: lazy(() =>
+    loadLazyUiModule(() => import("./screens/NetworkScopeScreen"), (module) => module.NetworkScopeScreen)
+  ),
+  SettingsScreen: lazy(() => loadLazyUiModule(() => import("./screens/SettingsScreen"), (module) => module.SettingsScreen)),
+  ValidationScreen: lazy(() =>
+    loadLazyUiModule(() => import("./screens/ValidationScreen"), (module) => module.ValidationScreen)
+  ),
+  AnalysisWorkspaceContent: lazy(() =>
+    loadLazyUiModule(() => import("./workspace/AnalysisWorkspaceContent"), (module) => module.AnalysisWorkspaceContent)
+  ),
+  ModelingFormsColumn: lazy(() =>
+    loadLazyUiModule(() => import("./workspace/ModelingFormsColumn"), (module) => module.ModelingFormsColumn)
+  ),
+  ModelingPrimaryTables: lazy(() =>
+    loadLazyUiModule(() => import("./workspace/ModelingPrimaryTables"), (module) => module.ModelingPrimaryTables)
+  ),
+  ModelingSecondaryTables: lazy(() =>
+    loadLazyUiModule(() => import("./workspace/ModelingSecondaryTables"), (module) => module.ModelingSecondaryTables)
+  ),
+  NetworkScopeWorkspaceContent: lazy(() =>
+    loadLazyUiModule(() => import("./workspace/NetworkScopeWorkspaceContent"), (module) => module.NetworkScopeWorkspaceContent)
+  ),
+  SettingsWorkspaceContent: lazy(() =>
+    loadLazyUiModule(() => import("./workspace/SettingsWorkspaceContent"), (module) => module.SettingsWorkspaceContent)
+  ),
+  ValidationWorkspaceContent: lazy(() =>
+    loadLazyUiModule(() => import("./workspace/ValidationWorkspaceContent"), (module) => module.ValidationWorkspaceContent)
+  )
 } as const;
+
+function getEagerRegistryForCurrentEnvironment(): AppUiModulesRegistry {
+  if (eagerRegistryForTests === null) {
+    throw new Error("Eager UI modules registry is only available in tests.");
+  }
+
+  return eagerRegistryForTests;
+}
 
 function getActiveAppUiModulesRegistry() {
-  return shouldLazyLoadUiModules() ? appUiModulesLazy : appUiModulesEager;
+  return shouldLazyLoadUiModules() ? appUiModulesLazy : getEagerRegistryForCurrentEnvironment();
 }
 
 export const appUiModules = {

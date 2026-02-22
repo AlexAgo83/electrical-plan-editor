@@ -1150,8 +1150,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       connectorTechnicalIdAlreadyUsed,
       spliceTechnicalIdAlreadyUsed,
       wireTechnicalIdAlreadyUsed,
-      includeModelingContent: isModelingScreen,
-      includeAnalysisContent: isAnalysisScreen,
+      includeModelingContent: hasActiveNetwork && isModelingScreen,
+      includeAnalysisContent: hasActiveNetwork && isAnalysisScreen,
       onSelectConnector: (connectorId) =>
         dispatchAction(
           appActions.select({
@@ -1287,8 +1287,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         resetWorkspacePreferencesToDefaults
       },
       includeNetworkScopeContent: isNetworkScopeScreen,
-      includeValidationContent: isValidationScreen,
-      includeSettingsContent: isSettingsScreen
+      includeValidationContent: hasActiveNetwork && isValidationScreen,
+      includeSettingsContent: hasActiveNetwork && isSettingsScreen
     });
 
   return (

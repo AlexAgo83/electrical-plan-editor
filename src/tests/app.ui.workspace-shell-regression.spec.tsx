@@ -1,6 +1,11 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { createUiIntegrationState, renderAppWithState, withViewportWidth } from "./helpers/app-ui-test-utils";
+import {
+  createUiIntegrationState,
+  renderAppWithState,
+  switchSubScreenStrict,
+  withViewportWidth
+} from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - workspace shell regression", () => {
   beforeEach(() => {
@@ -105,6 +110,24 @@ describe("App integration UI - workspace shell regression", () => {
       expect(drawerPanel).not.toHaveAttribute("inert");
       expect(drawerBackdrop).not.toBeDisabled();
     });
+  });
+
+  it("restores viewport width after awaited callback cleanup", async () => {
+    const originalInnerWidth = window.innerWidth;
+
+    await withViewportWidth(777, async () => {
+      expect(window.innerWidth).toBe(777);
+      await Promise.resolve();
+      expect(window.innerWidth).toBe(777);
+    });
+
+    expect(window.innerWidth).toBe(originalInnerWidth);
+  });
+
+  it("strict sub-screen helper does not auto-switch to modeling when secondary nav is absent", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    expect(() => switchSubScreenStrict("wire")).toThrow("Secondary workspace navigation row was not found.");
   });
 
   it("keeps sticky header and floating shell elements mounted across content scroll", () => {
