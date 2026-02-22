@@ -1,21 +1,31 @@
-# Electrical Plan Editor
+# e-Plan Editor
 
 A local-first electrical network editor focused on deterministic modeling, routing, and validation.
 
 The project models connectors, splices, nodes, segments, and wires as a graph, computes shortest routes, and keeps wire lengths synchronized with segment changes.
 
 [![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v0.5.0-4C8BF5)
 
 ## Table of Contents
 
+- [Live Demo & Status](#live-demo--status)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Available Scripts](#available-scripts)
+- [Deployment](#deployment)
 - [Project Structure](#project-structure)
 - [Quality and CI](#quality-and-ci)
 - [Contributing](#contributing)
 - [License](#license)
+
+## Live Demo & Status
+
+- Production: [https://e-plan-editor.onrender.com](https://e-plan-editor.onrender.com)
+- Hosting: Render Static Site (Blueprint via `render.yaml`)
+- Current version: `0.5.0`
+- CI status: see the GitHub Actions badge above
 
 ## Features
 
@@ -109,6 +119,24 @@ Then open `http://127.0.0.1:5284` (unless overridden).
 - `npm run quality:store-modularization`: enforce store modularization line-budget gate
 - `npm run quality:pwa`: validate generated PWA build artifacts (`manifest`, `sw.js`, `workbox-*`)
 
+## Deployment
+
+### Render (Blueprint)
+
+This repository includes a ready-to-use [`render.yaml`](render.yaml) for static hosting on Render.
+
+1. Push your latest changes to GitHub.
+2. In Render, create a new service with **Blueprint** from this repository.
+3. Render will build with `npm ci && npm run build` and publish `dist/`.
+
+### Any static server
+
+The app is a SPA and can be hosted from `dist/` on any static server/CDN.
+
+- Build: `npm run build`
+- Serve over HTTPS in production (required for full PWA behavior).
+- Configure SPA fallback rewrite to `/index.html`.
+
 ## Project Structure
 
 ```text
@@ -133,12 +161,19 @@ Primary validation commands:
 python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
 npm run lint
 npm run typecheck
+npm run quality:ui-modularization
+npm run quality:store-modularization
 npm run test:ci
 npm run test:e2e
+```
+
+Additional release-oriented validation:
+
+```bash
 npm run quality:pwa
 ```
 
-CI runs the same pipeline in `.github/workflows/ci.yml` on `push` and `pull_request`.
+CI runs the same main pipeline in `.github/workflows/ci.yml` on `push` and `pull_request`.
 
 PWA caveats:
 
