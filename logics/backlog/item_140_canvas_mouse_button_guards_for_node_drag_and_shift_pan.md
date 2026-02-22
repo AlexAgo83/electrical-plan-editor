@@ -2,7 +2,7 @@
 > From version: 0.5.9
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low
 > Theme: Restrict Canvas Drag/Pan Start to Intended Mouse Buttons
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.

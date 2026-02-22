@@ -1,7 +1,7 @@
 ## req_024_post_req_023_review_followup_canvas_node_click_event_dedup_mouse_button_guards_empty_state_coverage_and_test_isolation_guardrails - Post-req_023 Review Follow-up for Canvas Node Click Event Dedup, Mouse Button Guards, Empty-State Coverage, and Test Isolation Guardrails
 > From version: 0.5.9
-> Understanding: 100%
-> Confidence: 98%
+> Understanding: 99%
+> Confidence: 99%
 > Complexity: Medium
 > Theme: Canvas Interaction Hardening and Test Reliability Follow-up
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -105,6 +105,48 @@ Related delivered context:
   - `item_142_app_ui_modules_test_global_control_cleanup_centralization.md`
   - `item_143_layout_responsiveness_test_guardrail_reliability_followup.md`
   - `item_144_req_024_followup_closure_ci_e2e_build_pwa_and_ac_traceability.md`
+
+# Delivery summary
+- Canvas 2D node click deduplication delivered:
+  - Removed duplicate selection/edit side effects from 2D node clicks by keeping selection/edit handling on node `mousedown` only and making node `click` a stop-propagation-only hook.
+  - Added regression coverage that verifies a single `ui/select` dispatch for a single 2D connector node click sequence.
+  - Files: `src/app/components/NetworkSummaryPanel.tsx`, `src/app/hooks/useCanvasInteractionHandlers.ts`, `src/tests/app.ui.navigation-canvas.spec.tsx`
+- Canvas mouse-button guardrails delivered:
+  - Node drag start and shift-pan start now ignore non-primary mouse buttons (`event.button !== 0`).
+  - Added regression coverage for right-click behavior on nodes and shift-pan start on the 2D canvas.
+  - Files: `src/app/hooks/useCanvasInteractionHandlers.ts`, `src/tests/app.ui.navigation-canvas.spec.tsx`
+- Non-settings no-active-network empty-state regression coverage delivered:
+  - Added explicit coverage for `modeling`, `analysis`, and `validation` screens showing the no-active-network empty state.
+  - Preserves the Settings no-active-network accessible path delivered in `req_023`.
+  - Files: `src/tests/app.ui.networks.spec.tsx`, `src/tests/app.ui.settings.spec.tsx`
+- `appUiModules` test-global cleanup/isolation hardening delivered:
+  - Introduced shared `resetAppUiModulesTestControls()` helper and centralized cleanup/reset in `src/tests/setup.ts`.
+  - Lazy-loading regression suite now uses the shared reset helper.
+  - Files: `src/app/components/appUiModules.tsx`, `src/tests/setup.ts`, `src/tests/app.ui.lazy-loading-regression.spec.tsx`
+- Layout responsiveness guardrail follow-up:
+  - Revalidated the current wall-clock guardrail strategy (threshold/comment baseline) in targeted and full runs as part of this task closure.
+  - File: `src/tests/core.layout.spec.ts`
+- Validation closure delivered:
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run quality:ui-modularization`
+  - `npm run quality:store-modularization`
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.networks.spec.tsx src/tests/app.ui.lazy-loading-regression.spec.tsx`
+  - `npx vitest run src/tests/core.layout.spec.ts`
+  - `npm run test:ci`
+  - `npm run test:e2e`
+  - `npm run build`
+  - `npm run quality:pwa`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+
+# AC traceability
+- AC1: Satisfied by 2D node click dedup (single side-effect path) and the new single-dispatch regression test.
+- AC2: Satisfied by primary-button-only guards in node drag and shift-pan handlers with regression coverage.
+- AC3: Satisfied by explicit non-settings no-active-network empty-state regression coverage while preserving Settings accessibility coverage from `req_023`.
+- AC4: Satisfied by centralized cleanup/reset guardrails for `appUiModules` mutable test controls in shared test setup.
+- AC5: Satisfied by targeted/full revalidation of the current layout responsiveness guardrail strategy and its documented variance rationale.
+- AC6: Satisfied by passing targeted and full validation suites.
+- AC7: Satisfied by closure updates across `req_024`, `task_023`, and backlog items `139`..`144`, with Logics lint passing.
 
 # References
 - `src/app/components/NetworkSummaryPanel.tsx`

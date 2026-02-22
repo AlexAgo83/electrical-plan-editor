@@ -2,7 +2,7 @@
 > From version: 0.5.9
 > Understanding: 100%
 > Confidence: 98%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Follow-up Delivery for Canvas Interaction Correctness and Test Reliability
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -19,13 +19,13 @@ Backlog scope covered:
 - `item_144_req_024_followup_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 canvas node click event deduplication and single-side-effect behavior (`item_139`)
-- [ ] 2. Deliver Wave 1 mouse-button guards for node drag and shift-pan canvas interactions (`item_140`)
-- [ ] 3. Deliver Wave 2 no-active-network empty-state regression coverage for non-settings screens (`item_141`)
-- [ ] 4. Deliver Wave 3 `appUiModules` test-global cleanup/isolation centralization (`item_142`)
-- [ ] 5. Deliver Wave 4 layout responsiveness test guardrail reliability follow-up (`item_143`)
-- [ ] 6. Deliver Wave 5 closure: validation/build/PWA pass and `req_024` AC traceability (`item_144`)
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Deliver Wave 0 canvas node click event deduplication and single-side-effect behavior (`item_139`)
+- [x] 2. Deliver Wave 1 mouse-button guards for node drag and shift-pan canvas interactions (`item_140`)
+- [x] 3. Deliver Wave 2 no-active-network empty-state regression coverage for non-settings screens (`item_141`)
+- [x] 4. Deliver Wave 3 `appUiModules` test-global cleanup/isolation centralization (`item_142`)
+- [x] 5. Deliver Wave 4 layout responsiveness test guardrail reliability follow-up (`item_143`)
+- [x] 6. Deliver Wave 5 closure: validation/build/PWA pass and `req_024` AC traceability (`item_144`)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - Documentation / Logics:
@@ -45,14 +45,14 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 pending: remove duplicate side effects from a single 2D node click.
-  - Wave 1 pending: add explicit mouse-button guards for node drag and shift-pan starts.
-  - Wave 2 pending: add explicit non-settings no-active-network empty-state regression coverage.
-  - Wave 3 pending: centralize/strengthen cleanup for `appUiModules` mutable test controls.
-  - Wave 4 pending: harden/document layout responsiveness test reliability guardrail.
-  - Wave 5 pending: full closure validation and `req_024` AC1..AC7 traceability.
+  - Wave 0 completed: 2D node click side effects are no longer double-triggered (`mousedown` remains the single interaction entry-point for selection/edit + drag start).
+  - Wave 1 completed: node drag start and shift-pan start now ignore non-primary mouse buttons.
+  - Wave 2 completed: explicit regression coverage protects non-settings no-active-network empty-state behavior while preserving the Settings path from `req_023`.
+  - Wave 3 completed: `appUiModules` mutable test knobs now have centralized cleanup/reset guardrails in shared test setup (with lazy-loading suite using the shared reset helper).
+  - Wave 4 completed: layout responsiveness guardrail follow-up is documented against the current threshold+comment baseline and revalidated in targeted + full runs.
+  - Wave 5 completed: full validation/build/PWA pass executed and `req_024` AC1..AC7 traceability documented.
 - Current blockers:
-  - None at kickoff.
+  - None.
 - Main risks to track:
   - Event dedup changes accidentally break drag initiation or selection timing.
   - Mouse-button guardrails break current modifier-based workflows.
@@ -67,4 +67,40 @@ Backlog scope covered:
   - Document the perf-guardrail intent and preserve a meaningful threshold/strategy.
 - Validation snapshot (kickoff):
   - `req_023` closure pipeline was green before this follow-up planning task
-  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` pending for this new task/doc set
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK (planning docs)
+- Validation snapshot (targeted implementation verification):
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.networks.spec.tsx src/tests/app.ui.lazy-loading-regression.spec.tsx` OK (22 tests)
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npx vitest run src/tests/core.layout.spec.ts` OK (5 tests)
+- Validation snapshot (final closure):
+  - `npm run lint` OK
+  - `npm run typecheck` OK
+  - `npm run quality:ui-modularization` OK
+  - `npm run quality:store-modularization` OK
+  - `npm run test:ci` OK (27 files / 145 tests)
+  - `npm run test:e2e` OK (2/2)
+  - `npm run build` OK
+  - `npm run quality:pwa` OK
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
+- Delivery snapshot:
+  - Canvas node click dedup + mouse button guards:
+    - `src/app/components/NetworkSummaryPanel.tsx`
+    - `src/app/hooks/useCanvasInteractionHandlers.ts`
+    - `src/tests/app.ui.navigation-canvas.spec.tsx`
+  - Non-settings no-active-network empty-state regression coverage:
+    - `src/tests/app.ui.networks.spec.tsx`
+  - `appUiModules` test-global cleanup centralization:
+    - `src/app/components/appUiModules.tsx`
+    - `src/tests/setup.ts`
+    - `src/tests/app.ui.lazy-loading-regression.spec.tsx`
+  - Layout responsiveness guardrail follow-up validation:
+    - `src/tests/core.layout.spec.ts`
+- AC traceability (`req_024`):
+  - AC1: Satisfied by removing duplicate node-click side effects from the 2D node `<g>` click path (selection/edit remains on `mousedown`) and by the new single-dispatch regression test.
+  - AC2: Satisfied by explicit `event.button === 0` guards for node drag start and shift-pan start, with regression coverage for non-primary buttons.
+  - AC3: Satisfied by new non-settings no-active-network empty-state regression coverage (`modeling` / `analysis` / `validation`) while the `Settings` path remains covered from `req_023`.
+  - AC4: Satisfied by centralized `appUiModules` test-control cleanup in shared test setup and shared reset helper use in lazy-loading regression tests.
+  - AC5: Satisfied by revalidating the layout responsiveness wall-clock guardrail and documenting the threshold/variance strategy currently in place.
+  - AC6: Satisfied by passing targeted and full validation suites.
+  - AC7: Satisfied by this task/request/backlog closure documentation and Logics lint passing.
