@@ -1100,6 +1100,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         selectedSegmentId,
         handleNetworkSegmentClick,
         selectedNodeId,
+        selectedConnectorId,
+        selectedSpliceId,
         handleNetworkNodeMouseDown,
         handleNetworkNodeClick,
         connectorMap,

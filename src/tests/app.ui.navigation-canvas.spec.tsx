@@ -125,6 +125,20 @@ describe("App integration UI - navigation and canvas", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-segment").length).toBe(2);
   });
 
+  it("highlights the corresponding 2D connector node when selecting a connector from the canvas in modeling", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    expect(connectorNode).not.toBeNull();
+    expect(connectorNode).not.toHaveClass("is-selected");
+
+    fireEvent.click(connectorNode as Element);
+
+    expect(connectorNode).toHaveClass("is-selected");
+  });
+
   it("does not change 2D zoom on mouse wheel", () => {
     renderAppWithState(createUiIntegrationState());
 

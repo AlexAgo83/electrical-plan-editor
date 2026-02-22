@@ -100,6 +100,8 @@ export interface NetworkSummaryPanelProps {
   selectedSegmentId: SegmentId | null;
   handleNetworkSegmentClick: (segmentId: SegmentId) => void;
   selectedNodeId: NodeId | null;
+  selectedConnectorId: ConnectorId | null;
+  selectedSpliceId: SpliceId | null;
   handleNetworkNodeMouseDown: (event: ReactMouseEvent<SVGGElement>, nodeId: NodeId) => void;
   handleNetworkNodeClick: (nodeId: NodeId) => void;
   connectorMap: Map<ConnectorId, Connector>;
@@ -148,6 +150,8 @@ export function NetworkSummaryPanel({
   selectedSegmentId,
   handleNetworkSegmentClick,
   selectedNodeId,
+  selectedConnectorId,
+  selectedSpliceId,
   handleNetworkNodeMouseDown,
   handleNetworkNodeClick,
   connectorMap,
@@ -386,7 +390,10 @@ export function NetworkSummaryPanel({
 
                   const nodeKindClass =
                     node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
-                  const isSelectedNode = selectedNodeId === node.id;
+                  const isSelectedNode =
+                    selectedNodeId === node.id ||
+                    (node.kind === "connector" && selectedConnectorId === node.connectorId) ||
+                    (node.kind === "splice" && selectedSpliceId === node.spliceId);
                   const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}`;
                   const nodeLabel =
                     node.kind === "intermediate"
