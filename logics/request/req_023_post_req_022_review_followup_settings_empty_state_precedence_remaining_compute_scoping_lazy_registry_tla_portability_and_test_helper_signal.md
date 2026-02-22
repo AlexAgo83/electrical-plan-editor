@@ -1,7 +1,7 @@
 ## req_023_post_req_022_review_followup_settings_empty_state_precedence_remaining_compute_scoping_lazy_registry_tla_portability_and_test_helper_signal - Post-req_022 Review Follow-up for Settings Empty-State Precedence, Remaining Compute Scoping, Lazy Registry TLA Portability, and Test Helper Signal
 > From version: 0.5.8
-> Understanding: 100%
-> Confidence: 98%
+> Understanding: 99%
+> Confidence: 99%
 > Complexity: Medium
 > Theme: Follow-up hardening for settings accessibility, residual compute scope, lazy registry portability, and test signal quality
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -102,6 +102,46 @@ Related delivered context:
   - `item_136_app_ui_modules_lazy_registry_test_controls_without_top_level_await_portability_risk.md`
   - `item_137_test_helper_alias_signal_hardening_and_explicit_drawer_aware_usage_followup.md`
   - `item_138_req_023_followup_closure_ci_e2e_build_pwa_and_ac_traceability.md`
+
+# Delivery summary
+- Settings/no-active-network correctness restored:
+  - `AppShellLayout` now prioritizes the Settings screen branch before the no-active-network empty-state.
+  - `AppController` now includes Settings workspace content whenever `isSettingsScreen` is active (no `hasActiveNetwork` gate).
+  - Added regression coverage for Settings access with `activeNetworkId = null`.
+  - Files: `src/app/components/layout/AppShellLayout.tsx`, `src/app/AppController.tsx`, `src/tests/app.ui.settings.spec.tsx`
+- Residual `NetworkSummaryPanel` compute scoping reduced:
+  - `NetworkSummaryPanel` assembly is now conditionally performed only for active modeling/analysis paths.
+  - Introduced explicit builder usage for the panel controller slice to avoid unconditional assembly on unrelated screens.
+  - Files: `src/app/AppController.tsx`, `src/app/hooks/controller/useAppControllerScreenContentSlices.tsx`, `src/app/hooks/controller/useAppControllerModelingAnalysisScreenDomains.tsx`
+- `appUiModules` TLA portability risk reduced while preserving lazy chunking/test controls:
+  - Removed top-level await from `src/app/components/appUiModules.tsx`.
+  - Added explicit eager-registry injection for tests and initialized it in `src/tests/setup.ts`.
+  - Preserved `auto` / `eager` / `lazy` test control behavior and lazy-path regression coverage.
+  - Files: `src/app/components/appUiModules.tsx`, `src/app/components/appUiModules.eager.ts`, `src/tests/setup.ts`, `src/tests/app.ui.lazy-loading-regression.spec.tsx`
+- Test helper signal hardening follow-up delivered:
+  - Touched critical suites now use explicit `DrawerAware` helpers instead of legacy aliases.
+  - Shared helper comments now steer new/touched tests toward explicit `Strict` / `DrawerAware` variants.
+  - Files: `src/tests/helpers/app-ui-test-utils.tsx`, `src/tests/app.ui.settings.spec.tsx`, `src/tests/app.ui.navigation-canvas.spec.tsx`, `src/tests/app.ui.validation.spec.tsx`
+- Validation closure delivered:
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run quality:ui-modularization`
+  - `npm run quality:store-modularization`
+  - `npx vitest run src/tests/app.ui.settings.spec.tsx src/tests/app.ui.validation.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.workspace-shell-regression.spec.tsx src/tests/app.ui.lazy-loading-regression.spec.tsx`
+  - `npm run test:ci`
+  - `npm run test:e2e`
+  - `npm run build`
+  - `npm run quality:pwa`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+
+# AC traceability
+- AC1: Satisfied by Settings-first branch precedence in `AppShellLayout` plus `AppController` settings-content include-flag alignment; verified by new no-active-network Settings regression coverage.
+- AC2: Satisfied by preserving the no-active-network empty-state branch for non-settings screens (integration flows remain green).
+- AC3: Satisfied by active-path scoping of `NetworkSummaryPanel` assembly in `AppController`.
+- AC4: Satisfied by removing top-level await from `appUiModules` while preserving test controls and confirming real lazy UI chunks in production build output.
+- AC5: Satisfied by explicit drawer-aware helper usage in touched critical tests and helper contract guidance updates.
+- AC6: Satisfied by passing targeted and full validation suites.
+- AC7: Satisfied by closure documentation updates across `req_023`, `task_022`, and backlog items `134`..`138`, with Logics lint passing.
 
 # References
 - `src/app/components/layout/AppShellLayout.tsx`

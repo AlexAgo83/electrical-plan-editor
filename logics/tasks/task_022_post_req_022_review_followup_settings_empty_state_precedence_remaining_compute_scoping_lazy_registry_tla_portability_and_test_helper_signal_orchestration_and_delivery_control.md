@@ -2,7 +2,7 @@
 > From version: 0.5.8
 > Understanding: 100%
 > Confidence: 98%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Follow-up Delivery for UX Correctness, Residual Compute Scoping, and Lazy Registry/Test Helper Robustness
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -18,12 +18,12 @@ Backlog scope covered:
 - `item_138_req_023_followup_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 Settings/empty-state precedence fix for no-active-network access (`item_134`)
-- [ ] 2. Deliver Wave 1 remaining `NetworkSummaryPanel` compute scoping alignment (`item_135`)
-- [ ] 3. Deliver Wave 2 `appUiModules` lazy registry portability hardening without losing real lazy chunking/test controls (`item_136`)
-- [ ] 4. Deliver Wave 3 test-helper alias signal hardening / explicit drawer-aware usage follow-up (`item_137`)
-- [ ] 5. Deliver Wave 4 closure: validation/build/PWA pass and `req_023` AC traceability (`item_138`)
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Deliver Wave 0 Settings/empty-state precedence fix for no-active-network access (`item_134`)
+- [x] 2. Deliver Wave 1 remaining `NetworkSummaryPanel` compute scoping alignment (`item_135`)
+- [x] 3. Deliver Wave 2 `appUiModules` lazy registry portability hardening without losing real lazy chunking/test controls (`item_136`)
+- [x] 4. Deliver Wave 3 test-helper alias signal hardening / explicit drawer-aware usage follow-up (`item_137`)
+- [x] 5. Deliver Wave 4 closure: validation/build/PWA pass and `req_023` AC traceability (`item_138`)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - Documentation / Logics:
@@ -43,13 +43,13 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 pending: fix Settings vs empty-state precedence when no active network exists.
-  - Wave 1 pending: reduce remaining unconditional `NetworkSummaryPanel` assembly work.
-  - Wave 2 pending: reduce/remove `appUiModules` top-level-await portability risk while preserving lazy chunking and test controls.
-  - Wave 3 pending: improve helper alias/test usage signal for drawer-aware navigation behavior.
-  - Wave 4 pending: full closure validation and `req_023` AC1..AC7 traceability.
+  - Wave 0 completed: `Settings` now renders before the no-active-network empty-state branch in `AppShellLayout`, and `AppController` builds settings content when `isSettingsScreen` even if no active network exists.
+  - Wave 1 completed: `NetworkSummaryPanel` assembly is conditionally scoped to modeling/analysis active-screen paths in `AppController`, avoiding residual assembly work on unrelated screens/empty-state.
+  - Wave 2 completed: `appUiModules` no longer uses top-level await; test eager registry initialization is injected from `src/tests/setup.ts` while production lazy chunking and lazy/eager test controls remain intact.
+  - Wave 3 completed: critical UI tests now use explicit drawer-aware helpers, and helper alias docs signal the preferred explicit variants for touched tests.
+  - Wave 4 completed: full validation/build/PWA pass executed and `req_023` AC1..AC7 traceability documented.
 - Current blockers:
-  - None at kickoff.
+  - None.
 - Main risks to track:
   - Settings precedence fix unintentionally changes empty-state behavior for non-settings screens.
   - NetworkSummaryPanel scoping refactor breaks modeling/analysis content assumptions.
@@ -61,5 +61,45 @@ Backlog scope covered:
   - Verify build output chunking and lazy-path regression tests immediately after registry changes.
   - Prefer explicit test usage migration in touched files over sweeping alias behavior flips.
 - Validation snapshot (kickoff):
-  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` pending for this new task/doc set
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK (planning docs)
   - `req_022` closure pipeline was green before this follow-up planning task
+- Validation snapshot (targeted implementation verification):
+  - `npx vitest run src/tests/app.ui.settings.spec.tsx src/tests/app.ui.validation.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.workspace-shell-regression.spec.tsx src/tests/app.ui.lazy-loading-regression.spec.tsx` OK (42 tests)
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+- Validation snapshot (final closure):
+  - `npm run lint` OK
+  - `npm run typecheck` OK
+  - `npm run quality:ui-modularization` OK
+  - `npm run quality:store-modularization` OK
+  - `npm run test:ci` OK (27 files / 141 tests)
+  - `npm run test:e2e` OK (2/2)
+  - `npm run build` OK (lazy UI chunks emitted; no static+dynamic import chunking warnings for `appUiModules`)
+  - `npm run quality:pwa` OK
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
+- Delivery snapshot:
+  - Settings/no-active-network precedence + content assembly gating alignment:
+    - `src/app/components/layout/AppShellLayout.tsx`
+    - `src/app/AppController.tsx`
+    - `src/tests/app.ui.settings.spec.tsx`
+  - Residual `NetworkSummaryPanel` compute scoping:
+    - `src/app/AppController.tsx`
+    - `src/app/hooks/controller/useAppControllerScreenContentSlices.tsx`
+    - `src/app/hooks/controller/useAppControllerModelingAnalysisScreenDomains.tsx`
+  - `appUiModules` top-level-await portability hardening with preserved lazy/test controls:
+    - `src/app/components/appUiModules.tsx`
+    - `src/tests/setup.ts`
+    - `src/tests/app.ui.lazy-loading-regression.spec.tsx`
+  - Test-helper signal hardening follow-up:
+    - `src/tests/helpers/app-ui-test-utils.tsx`
+    - `src/tests/app.ui.settings.spec.tsx`
+    - `src/tests/app.ui.navigation-canvas.spec.tsx`
+    - `src/tests/app.ui.validation.spec.tsx`
+- AC traceability (`req_023`):
+  - AC1: Satisfied by `AppShellLayout` branch precedence change plus `AppController` settings content include-flag alignment, validated by the new no-active-network settings regression test.
+  - AC2: Satisfied by preserving the no-active-network empty-state branch for non-settings screens (existing shell/network flows remain covered by integration tests).
+  - AC3: Satisfied by conditional `NetworkSummaryPanel` assembly only on modeling/analysis active paths in `AppController`.
+  - AC4: Satisfied by removing top-level await from `appUiModules`, moving eager registry initialization to test setup, and confirming real lazy chunks still emit in production build while lazy-path regression tests pass.
+  - AC5: Satisfied by making drawer-aware helper usage explicit in touched critical tests and documenting alias preference in shared test helpers.
+  - AC6: Satisfied by passing targeted and full validation suites.
+  - AC7: Satisfied by this task/request/backlog closure documentation and Logics lint passing.
