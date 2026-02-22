@@ -355,9 +355,16 @@ export function useWorkspaceHandlers({
       }
     }
 
-    const fitPadding = 36;
-    const contentWidth = Math.max(1, maxX - minX);
-    const contentHeight = Math.max(1, maxY - minY);
+    // Nodes are positioned by their center coordinates; expand the fit bounds so shapes
+    // (rect/circle) and labels do not visually stick to the viewport edges after fitting.
+    const entityVisualPadding = 28;
+    const fitPadding = 40;
+    const paddedMinX = minX - entityVisualPadding;
+    const paddedMaxX = maxX + entityVisualPadding;
+    const paddedMinY = minY - entityVisualPadding;
+    const paddedMaxY = maxY + entityVisualPadding;
+    const contentWidth = Math.max(1, paddedMaxX - paddedMinX);
+    const contentHeight = Math.max(1, paddedMaxY - paddedMinY);
     const availableWidth = Math.max(1, NETWORK_VIEW_WIDTH - fitPadding * 2);
     const availableHeight = Math.max(1, NETWORK_VIEW_HEIGHT - fitPadding * 2);
     const fittedScale = clamp(
@@ -366,8 +373,8 @@ export function useWorkspaceHandlers({
       NETWORK_MAX_SCALE
     );
 
-    const centerX = (minX + maxX) / 2;
-    const centerY = (minY + maxY) / 2;
+    const centerX = (paddedMinX + paddedMaxX) / 2;
+    const centerY = (paddedMinY + paddedMaxY) / 2;
     setNetworkScale(fittedScale);
     setNetworkOffset({
       x: NETWORK_VIEW_WIDTH / 2 - centerX * fittedScale,
