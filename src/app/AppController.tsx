@@ -287,6 +287,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     handleInstallApp,
     handleApplyPwaUpdate
   } = useWorkspaceShellChrome({
+    activeScreen,
     setActiveScreen,
     navigationDrawerRef,
     navigationToggleButtonRef,

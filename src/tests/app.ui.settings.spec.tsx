@@ -132,6 +132,19 @@ describe("App integration UI - settings", () => {
     expect(within(document.body).queryByRole("heading", { name: "No active network" })).not.toBeInTheDocument();
   });
 
+  it("returns to the previous screen when clicking Settings again from the settings screen", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("analysis");
+    expect(getPanelByHeading("Network summary")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    expect(getPanelByHeading("Appearance preferences")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    expect(getPanelByHeading("Network summary")).toBeInTheDocument();
+  });
+
   it("resets sample network to baseline from settings", () => {
     const sampled = createSampleNetworkState();
     const withExtraConnector = appReducer(

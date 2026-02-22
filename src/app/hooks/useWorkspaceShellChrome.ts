@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type MutableRefObject, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type MutableRefObject, type RefObject } from "react";
 import { applyRegisteredServiceWorkerUpdate } from "../pwa/registerServiceWorker";
 
 export interface BeforeInstallPromptEventLike extends Event {
@@ -10,7 +10,8 @@ export interface BeforeInstallPromptEventLike extends Event {
 }
 
 interface UseWorkspaceShellChromeArgs {
-  setActiveScreen: (screen: "settings") => void;
+  activeScreen: "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+  setActiveScreen: (screen: "networkScope" | "modeling" | "analysis" | "validation" | "settings") => void;
   navigationDrawerRef: RefObject<HTMLDivElement | null>;
   navigationToggleButtonRef: RefObject<HTMLButtonElement | null>;
   operationsPanelRef: RefObject<HTMLDivElement | null>;
@@ -19,6 +20,7 @@ interface UseWorkspaceShellChromeArgs {
 }
 
 export function useWorkspaceShellChrome({
+  activeScreen,
   setActiveScreen,
   navigationDrawerRef,
   navigationToggleButtonRef,
@@ -34,6 +36,13 @@ export function useWorkspaceShellChrome({
     typeof window === "undefined" ? 1440 : window.innerWidth
   );
   const [isDialogFocusActive, setIsDialogFocusActive] = useState(false);
+  const previousNonSettingsScreenRef = useRef<"networkScope" | "modeling" | "analysis" | "validation">("modeling");
+
+  useEffect(() => {
+    if (activeScreen !== "settings") {
+      previousNonSettingsScreenRef.current = activeScreen;
+    }
+  }, [activeScreen]);
 
   const closeNavigationDrawer = useCallback(() => {
     setIsNavigationDrawerOpen(false);
@@ -64,10 +73,14 @@ export function useWorkspaceShellChrome({
   }, []);
 
   const handleOpenSettingsScreen = useCallback(() => {
-    setActiveScreen("settings");
+    if (activeScreen === "settings") {
+      setActiveScreen(previousNonSettingsScreenRef.current);
+    } else {
+      setActiveScreen("settings");
+    }
     setIsNavigationDrawerOpen(false);
     setIsOperationsPanelOpen(false);
-  }, [setActiveScreen]);
+  }, [activeScreen, setActiveScreen]);
 
   const handleInstallApp = useCallback(() => {
     const promptEvent = deferredInstallPromptRef.current;
