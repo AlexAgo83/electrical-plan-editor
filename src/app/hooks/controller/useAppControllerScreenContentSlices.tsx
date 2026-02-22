@@ -54,6 +54,8 @@ type InspectorContextPanelControllerSliceParams = Omit<
 type NetworkSummaryPanelControllerSliceParams = Omit<
   NetworkSummaryPanelProps,
   | "labelStrokeMode"
+  | "labelSizeMode"
+  | "labelRotationDegrees"
   | "toggleShowNetworkInfoPanels"
   | "toggleShowSegmentLengths"
   | "toggleShowNetworkGrid"
@@ -71,6 +73,8 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   setSnapNodesToGrid: BooleanStateSetter;
   setLockEntityMovement: BooleanStateSetter;
   networkLabelStrokeMode: NetworkSummaryPanelProps["labelStrokeMode"];
+  networkLabelSizeMode: NetworkSummaryPanelProps["labelSizeMode"];
+  networkLabelRotationDegrees: NetworkSummaryPanelProps["labelRotationDegrees"];
   routingGraph: {
     nodeIds: string[];
     segmentIds: string[];
@@ -197,6 +201,8 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     showNetworkInfoPanels: params.showNetworkInfoPanels,
     showSegmentLengths: params.showSegmentLengths,
     labelStrokeMode: params.networkLabelStrokeMode,
+    labelSizeMode: params.networkLabelSizeMode,
+    labelRotationDegrees: params.networkLabelRotationDegrees,
     toggleShowNetworkInfoPanels: () => params.setShowNetworkInfoPanels((current: boolean) => !current),
     toggleShowSegmentLengths: () => params.setShowSegmentLengths((current: boolean) => !current),
     toggleShowNetworkGrid: () => params.setShowNetworkGrid((current: boolean) => !current),
@@ -606,6 +612,10 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setCanvasDefaultShowSegmentLengths: params.setCanvasDefaultShowSegmentLengths,
     canvasDefaultLabelStrokeMode: params.canvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelStrokeMode: params.setCanvasDefaultLabelStrokeMode,
+    canvasDefaultLabelSizeMode: params.canvasDefaultLabelSizeMode,
+    setCanvasDefaultLabelSizeMode: params.setCanvasDefaultLabelSizeMode,
+    canvasDefaultLabelRotationDegrees: params.canvasDefaultLabelRotationDegrees,
+    setCanvasDefaultLabelRotationDegrees: params.setCanvasDefaultLabelRotationDegrees,
     canvasResetZoomPercentInput: params.canvasResetZoomPercentInput,
     setCanvasResetZoomPercentInput: params.setCanvasResetZoomPercentInput,
     configuredResetZoomPercent: params.configuredResetZoomPercent,

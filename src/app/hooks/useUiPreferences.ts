@@ -1,6 +1,11 @@
 import { useEffect } from "react";
 import type { ThemeMode } from "../../store";
-import type { CanvasLabelStrokeMode, TableFontSize } from "../types/app-controller";
+import type {
+  CanvasLabelRotationDegrees,
+  CanvasLabelSizeMode,
+  CanvasLabelStrokeMode,
+  TableFontSize
+} from "../types/app-controller";
 
 const UI_PREFERENCES_SCHEMA_VERSION = 1;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
@@ -58,6 +63,8 @@ interface UiPreferencesPayload {
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
+  canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
+  canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
@@ -106,6 +113,8 @@ interface UseUiPreferencesOptions {
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
+  canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
+  canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
@@ -131,12 +140,16 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
+  setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
+  setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setShowNetworkGrid: (value: boolean) => void;
   setSnapNodesToGrid: (value: boolean) => void;
   setLockEntityMovement: (value: boolean) => void;
   setShowNetworkInfoPanels: (value: boolean) => void;
   setShowSegmentLengths: (value: boolean) => void;
   setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
+  setNetworkLabelSizeMode: (value: CanvasLabelSizeMode) => void;
+  setNetworkLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
   setNetworkScale: (value: number) => void;
   setNetworkOffset: (value: { x: number; y: number }) => void;
@@ -144,6 +157,14 @@ interface UseUiPreferencesOptions {
   setKeyboardShortcutsEnabled: (value: boolean) => void;
   setShowFloatingInspectorPanel: (value: boolean) => void;
   setPreferencesHydrated: (value: boolean) => void;
+}
+
+function normalizeCanvasLabelSizeMode(value: unknown): CanvasLabelSizeMode {
+  return value === "small" || value === "large" ? value : "normal";
+}
+
+function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotationDegrees {
+  return value === 20 || value === 45 || value === 90 ? value : 0;
 }
 
 export function useUiPreferences({
@@ -161,6 +182,8 @@ export function useUiPreferences({
   canvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
   canvasDefaultLabelStrokeMode,
+  canvasDefaultLabelSizeMode,
+  canvasDefaultLabelRotationDegrees,
   canvasResetZoomPercentInput,
   showShortcutHints,
   keyboardShortcutsEnabled,
@@ -186,12 +209,16 @@ export function useUiPreferences({
   setCanvasDefaultShowInfoPanels,
   setCanvasDefaultShowSegmentLengths,
   setCanvasDefaultLabelStrokeMode,
+  setCanvasDefaultLabelSizeMode,
+  setCanvasDefaultLabelRotationDegrees,
   setShowNetworkGrid,
   setSnapNodesToGrid,
   setLockEntityMovement,
   setShowNetworkInfoPanels,
   setShowSegmentLengths,
   setNetworkLabelStrokeMode,
+  setNetworkLabelSizeMode,
+  setNetworkLabelRotationDegrees,
   setCanvasResetZoomPercentInput,
   setNetworkScale,
   setNetworkOffset,
@@ -224,6 +251,8 @@ export function useUiPreferences({
         preferences.canvasDefaultLabelStrokeMode === "none" || preferences.canvasDefaultLabelStrokeMode === "light"
           ? preferences.canvasDefaultLabelStrokeMode
           : "normal";
+      const labelSizeModeDefault = normalizeCanvasLabelSizeMode(preferences.canvasDefaultLabelSizeMode);
+      const labelRotationDegreesDefault = normalizeCanvasLabelRotationDegrees(preferences.canvasDefaultLabelRotationDegrees);
       const rawResetZoomPercent =
         typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "100";
       const parsedResetZoomPercent = Number(rawResetZoomPercent);
@@ -255,12 +284,16 @@ export function useUiPreferences({
       setCanvasDefaultShowInfoPanels(showInfoPanelsDefault);
       setCanvasDefaultShowSegmentLengths(showSegmentLengthsDefault);
       setCanvasDefaultLabelStrokeMode(labelStrokeModeDefault);
+      setCanvasDefaultLabelSizeMode(labelSizeModeDefault);
+      setCanvasDefaultLabelRotationDegrees(labelRotationDegreesDefault);
       setShowNetworkGrid(showGridDefault);
       setSnapNodesToGrid(snapDefault);
       setLockEntityMovement(lockMovementDefault);
       setShowNetworkInfoPanels(showInfoPanelsDefault);
       setShowSegmentLengths(showSegmentLengthsDefault);
       setNetworkLabelStrokeMode(labelStrokeModeDefault);
+      setNetworkLabelSizeMode(labelSizeModeDefault);
+      setNetworkLabelRotationDegrees(labelRotationDegreesDefault);
       setCanvasResetZoomPercentInput(rawResetZoomPercent);
       setNetworkScale(resetScale);
       setNetworkOffset({ x: 0, y: 0 });
@@ -283,6 +316,8 @@ export function useUiPreferences({
     setCanvasDefaultShowInfoPanels,
     setCanvasDefaultShowSegmentLengths,
     setCanvasDefaultLabelStrokeMode,
+    setCanvasDefaultLabelSizeMode,
+    setCanvasDefaultLabelRotationDegrees,
     setCanvasResetZoomPercentInput,
     setConnectorSort,
     setDefaultIdSortDirection,
@@ -301,6 +336,8 @@ export function useUiPreferences({
     setShowShortcutHints,
     setShowSegmentLengths,
     setNetworkLabelStrokeMode,
+    setNetworkLabelSizeMode,
+    setNetworkLabelRotationDegrees,
     setSnapNodesToGrid,
     setLockEntityMovement,
     setSpliceSort,
@@ -331,6 +368,8 @@ export function useUiPreferences({
       canvasDefaultShowInfoPanels,
       canvasDefaultShowSegmentLengths,
       canvasDefaultLabelStrokeMode,
+      canvasDefaultLabelSizeMode,
+      canvasDefaultLabelRotationDegrees,
       canvasResetZoomPercentInput,
       showShortcutHints,
       keyboardShortcutsEnabled,
@@ -349,6 +388,8 @@ export function useUiPreferences({
     canvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,
     canvasDefaultLabelStrokeMode,
+    canvasDefaultLabelSizeMode,
+    canvasDefaultLabelRotationDegrees,
     canvasResetZoomPercentInput,
     defaultIdSortDirection,
     defaultSortDirection,

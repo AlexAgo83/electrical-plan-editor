@@ -328,6 +328,25 @@ describe("App integration UI - navigation and canvas", () => {
     expect(currentZoomLine()).toBe(zoomBeforeWheel);
   });
 
+  it("keeps 2D labels zoom-invariant using inverse-scale label anchors", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("analysis");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const anchorBefore = networkSummaryPanel.querySelector(".network-segment-label-anchor");
+    expect(anchorBefore).not.toBeNull();
+    const transformBefore = anchorBefore?.getAttribute("transform") ?? "";
+    expect(transformBefore).toContain("scale(1)");
+
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom +" }));
+
+    const anchorAfter = networkSummaryPanel.querySelector(".network-segment-label-anchor");
+    expect(anchorAfter).not.toBeNull();
+    const transformAfter = anchorAfter?.getAttribute("transform") ?? "";
+    expect(transformAfter).not.toBe(transformBefore);
+    expect(transformAfter).not.toContain("scale(1)");
+  });
+
   it("synchronizes inspector context and allows editing selected connector", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");

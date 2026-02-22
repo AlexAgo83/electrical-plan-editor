@@ -17,6 +17,8 @@ import {
   createEntityId
 } from "../lib/app-utils-shared";
 import type {
+  CanvasLabelRotationDegrees,
+  CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
   NodePosition,
   SortDirection,
@@ -58,12 +60,18 @@ interface UseWorkspaceHandlersParams {
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
+  canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
+  canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   setShowNetworkGrid: (value: boolean | ((current: boolean) => boolean)) => void;
   setSnapNodesToGrid: (value: boolean | ((current: boolean) => boolean)) => void;
   setLockEntityMovement: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowNetworkInfoPanels: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowSegmentLengths: (value: boolean | ((current: boolean) => boolean)) => void;
   setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode | ((current: CanvasLabelStrokeMode) => CanvasLabelStrokeMode)) => void;
+  setNetworkLabelSizeMode: (value: CanvasLabelSizeMode | ((current: CanvasLabelSizeMode) => CanvasLabelSizeMode)) => void;
+  setNetworkLabelRotationDegrees: (
+    value: CanvasLabelRotationDegrees | ((current: CanvasLabelRotationDegrees) => CanvasLabelRotationDegrees)
+  ) => void;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
   defaultIdSortDirection: SortDirection;
@@ -87,6 +95,8 @@ interface UseWorkspaceHandlersParams {
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
+  setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
+  setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
   setShowShortcutHints: (value: boolean) => void;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
@@ -118,12 +128,16 @@ export function useWorkspaceHandlers({
   canvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
   canvasDefaultLabelStrokeMode,
+  canvasDefaultLabelSizeMode,
+  canvasDefaultLabelRotationDegrees,
   setShowNetworkGrid,
   setSnapNodesToGrid,
   setLockEntityMovement,
   setShowNetworkInfoPanels,
   setShowSegmentLengths,
   setNetworkLabelStrokeMode,
+  setNetworkLabelSizeMode,
+  setNetworkLabelRotationDegrees,
   defaultSortField,
   defaultSortDirection,
   defaultIdSortDirection,
@@ -147,6 +161,8 @@ export function useWorkspaceHandlers({
   setCanvasDefaultShowInfoPanels,
   setCanvasDefaultShowSegmentLengths,
   setCanvasDefaultLabelStrokeMode,
+  setCanvasDefaultLabelSizeMode,
+  setCanvasDefaultLabelRotationDegrees,
   setCanvasResetZoomPercentInput,
   setShowShortcutHints,
   setKeyboardShortcutsEnabled,
@@ -406,6 +422,8 @@ export function useWorkspaceHandlers({
     setShowNetworkInfoPanels(canvasDefaultShowInfoPanels);
     setShowSegmentLengths(canvasDefaultShowSegmentLengths);
     setNetworkLabelStrokeMode(canvasDefaultLabelStrokeMode);
+    setNetworkLabelSizeMode(canvasDefaultLabelSizeMode);
+    setNetworkLabelRotationDegrees(canvasDefaultLabelRotationDegrees);
     resetNetworkViewToConfiguredScale();
   }
 
@@ -431,6 +449,8 @@ export function useWorkspaceHandlers({
     setCanvasDefaultShowInfoPanels(true);
     setCanvasDefaultShowSegmentLengths(false);
     setCanvasDefaultLabelStrokeMode("normal");
+    setCanvasDefaultLabelSizeMode("normal");
+    setCanvasDefaultLabelRotationDegrees(0);
     setCanvasResetZoomPercentInput("100");
     setShowNetworkGrid(true);
     setSnapNodesToGrid(true);
@@ -438,6 +458,8 @@ export function useWorkspaceHandlers({
     setShowNetworkInfoPanels(true);
     setShowSegmentLengths(false);
     setNetworkLabelStrokeMode("normal");
+    setNetworkLabelSizeMode("normal");
+    setNetworkLabelRotationDegrees(0);
     setNetworkScale(1);
     setNetworkOffset({ x: 0, y: 0 });
     setShowShortcutHints(false);

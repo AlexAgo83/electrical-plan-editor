@@ -21,7 +21,7 @@ import type {
 } from "../../core/entities";
 import type { ShortestRouteResult } from "../../core/pathfinding";
 import type { SubNetworkSummary } from "../../store";
-import type { CanvasLabelStrokeMode } from "../types/app-controller";
+import type { CanvasLabelRotationDegrees, CanvasLabelSizeMode, CanvasLabelStrokeMode } from "../types/app-controller";
 import { NetworkCanvasFloatingInfoPanels } from "./network-summary/NetworkCanvasFloatingInfoPanels";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
 import { NetworkSummaryLegend } from "./network-summary/NetworkSummaryLegend";
@@ -82,6 +82,8 @@ export interface NetworkSummaryPanelProps {
   showNetworkInfoPanels: boolean;
   showSegmentLengths: boolean;
   labelStrokeMode: CanvasLabelStrokeMode;
+  labelSizeMode: CanvasLabelSizeMode;
+  labelRotationDegrees: CanvasLabelRotationDegrees;
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
   lockEntityMovement: boolean;
@@ -134,6 +136,8 @@ export function NetworkSummaryPanel({
   showNetworkInfoPanels,
   showSegmentLengths,
   labelStrokeMode,
+  labelSizeMode,
+  labelRotationDegrees,
   showNetworkGrid,
   snapNodesToGrid,
   lockEntityMovement,
@@ -188,6 +192,7 @@ export function NetworkSummaryPanel({
     { label: "Adjacency entries", value: totalEdgeEntries }
   ];
   const effectiveScale = networkScale > 0 ? networkScale : 1;
+  const inverseLabelScale = 1 / effectiveScale;
   const visibleModelMinX = (0 - networkOffset.x) / effectiveScale;
   const visibleModelMaxX = (networkViewWidth - networkOffset.x) / effectiveScale;
   const visibleModelMinY = (0 - networkOffset.y) / effectiveScale;
@@ -422,7 +427,7 @@ export function NetworkSummaryPanel({
             />
             <svg
               ref={networkSvgRef}
-              className={`network-svg network-canvas--label-stroke-${labelStrokeMode}`}
+              className={`network-svg network-canvas--label-stroke-${labelStrokeMode} network-canvas--label-size-${labelSizeMode}`}
               role="img"
               aria-label="2D network diagram"
               viewBox={`0 0 ${networkViewWidth} ${networkViewHeight}`}
@@ -489,13 +494,37 @@ export function NetworkSummaryPanel({
                           handleNetworkSegmentClick(segment.id);
                         }}
                       />
-                      <text className="network-segment-label" x={labelX} y={labelY - 6} textAnchor="middle">
-                        {segment.id}
-                      </text>
-                      {showSegmentLengths ? (
-                        <text className="network-segment-length-label" x={labelX} y={labelY + 6} textAnchor="middle">
-                          {segment.lengthMm} mm
+                      <g
+                        className="network-segment-label-anchor"
+                        transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
+                      >
+                        <text
+                          className="network-segment-label"
+                          x={0}
+                          y={-6}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 -6)`}
+                        >
+                          {segment.id}
                         </text>
+                      </g>
+                      {showSegmentLengths ? (
+                        <g
+                          className="network-segment-length-label-anchor"
+                          transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
+                        >
+                          <text
+                            className="network-segment-length-label"
+                            x={0}
+                            y={6}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 6)`}
+                          >
+                            {segment.lengthMm} mm
+                          </text>
+                        </g>
                       ) : null}
                     </g>
                   );
@@ -558,9 +587,21 @@ export function NetworkSummaryPanel({
                       ) : (
                         <circle className="network-node-shape" cx={position.x} cy={position.y} r={17} />
                       )}
-                      <text className="network-node-label" x={position.x} y={position.y + 4} textAnchor="middle">
-                        {nodeLabel}
-                      </text>
+                      <g
+                        className="network-node-label-anchor"
+                        transform={`translate(${position.x} ${position.y}) scale(${inverseLabelScale})`}
+                      >
+                        <text
+                          className="network-node-label"
+                          x={0}
+                          y={4}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 4)`}
+                        >
+                          {nodeLabel}
+                        </text>
+                      </g>
                     </g>
                   );
                 })}

@@ -36,12 +36,16 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "canvasDefaultShowInfoPanels"
     | "canvasDefaultShowSegmentLengths"
     | "canvasDefaultLabelStrokeMode"
+    | "canvasDefaultLabelSizeMode"
+    | "canvasDefaultLabelRotationDegrees"
     | "setShowNetworkGrid"
     | "setSnapNodesToGrid"
     | "setLockEntityMovement"
     | "setShowNetworkInfoPanels"
     | "setShowSegmentLengths"
     | "setNetworkLabelStrokeMode"
+    | "setNetworkLabelSizeMode"
+    | "setNetworkLabelRotationDegrees"
   >;
   sortDefaults: Pick<WorkspaceHandlersParams, "defaultSortField" | "defaultSortDirection" | "defaultIdSortDirection">;
   sortSetters: Pick<
@@ -69,6 +73,8 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setCanvasDefaultShowInfoPanels"
     | "setCanvasDefaultShowSegmentLengths"
     | "setCanvasDefaultLabelStrokeMode"
+    | "setCanvasDefaultLabelSizeMode"
+    | "setCanvasDefaultLabelRotationDegrees"
     | "setCanvasResetZoomPercentInput"
     | "setShowShortcutHints"
     | "setKeyboardShortcutsEnabled"

@@ -94,6 +94,38 @@ describe("App integration UI - settings", () => {
     expect(within(restoredSettingsPanel).getByLabelText("Default sort column")).toHaveValue("technicalId");
   });
 
+  it("applies and persists 2d label size and rotation preferences", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const canvasSettingsPanel = getPanelByHeading("Canvas preferences");
+    fireEvent.change(within(canvasSettingsPanel).getByLabelText("2D label size"), {
+      target: { value: "large" }
+    });
+    fireEvent.change(within(canvasSettingsPanel).getByLabelText("2D label rotation"), {
+      target: { value: "45" }
+    });
+
+    switchScreenDrawerAware("analysis");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    expect(networkSvg).toHaveClass("network-canvas--label-size-large");
+
+    const segmentLabelAnchor = networkSummaryPanel.querySelector(".network-segment-label-anchor");
+    const segmentLabel = networkSummaryPanel.querySelector(".network-segment-label-anchor .network-segment-label");
+    expect(segmentLabelAnchor).not.toBeNull();
+    expect(segmentLabel).not.toBeNull();
+    expect(segmentLabel?.getAttribute("transform")).toContain("rotate(45");
+
+    firstRender.unmount();
+
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const restoredCanvasSettingsPanel = getPanelByHeading("Canvas preferences");
+    expect(within(restoredCanvasSettingsPanel).getByLabelText("2D label size")).toHaveValue("large");
+    expect(within(restoredCanvasSettingsPanel).getByLabelText("2D label rotation")).toHaveValue("45");
+  });
+
   it("recreates sample network from settings when workspace is empty", () => {
     renderAppWithState(createInitialState());
 

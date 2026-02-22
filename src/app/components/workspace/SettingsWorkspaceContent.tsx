@@ -3,6 +3,8 @@ import type { NetworkImportSummary } from "../../../adapters/portability";
 import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
 import type {
+  CanvasLabelRotationDegrees,
+  CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
   SortDirection,
   SortField,
@@ -52,6 +54,10 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
+  canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
+  setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
+  canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
+  setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   canvasResetZoomPercentInput: string;
   setCanvasResetZoomPercentInput: (value: string) => void;
   configuredResetZoomPercent: number;
@@ -107,6 +113,10 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultShowSegmentLengths,
   canvasDefaultLabelStrokeMode,
   setCanvasDefaultLabelStrokeMode,
+  canvasDefaultLabelSizeMode,
+  setCanvasDefaultLabelSizeMode,
+  canvasDefaultLabelRotationDegrees,
+  setCanvasDefaultLabelRotationDegrees,
   canvasResetZoomPercentInput,
   setCanvasResetZoomPercentInput,
   configuredResetZoomPercent,
@@ -238,6 +248,29 @@ export function SettingsWorkspaceContent({
               <option value="none">Rien</option>
               <option value="light">Léger</option>
               <option value="normal">Normal</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            2D label size
+            <select
+              value={canvasDefaultLabelSizeMode}
+              onChange={(event) => setCanvasDefaultLabelSizeMode(event.target.value as CanvasLabelSizeMode)}
+            >
+              <option value="small">Small</option>
+              <option value="normal">Normal</option>
+              <option value="large">Large</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            2D label rotation
+            <select
+              value={String(canvasDefaultLabelRotationDegrees)}
+              onChange={(event) => setCanvasDefaultLabelRotationDegrees(Number(event.target.value) as CanvasLabelRotationDegrees)}
+            >
+              <option value="0">0°</option>
+              <option value="20">20°</option>
+              <option value="45">45°</option>
+              <option value="90">90°</option>
             </select>
           </label>
           <label className="settings-field">

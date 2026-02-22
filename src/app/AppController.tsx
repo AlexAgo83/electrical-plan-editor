@@ -151,6 +151,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setShowSegmentLengths,
     networkLabelStrokeMode,
     setNetworkLabelStrokeMode,
+    networkLabelSizeMode,
+    setNetworkLabelSizeMode,
+    networkLabelRotationDegrees,
+    setNetworkLabelRotationDegrees,
     canvasResetZoomPercentInput,
     setCanvasResetZoomPercentInput
   } = useAppControllerCanvasDisplayState();
@@ -221,6 +225,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultShowSegmentLengths,
     canvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelStrokeMode,
+    canvasDefaultLabelSizeMode,
+    setCanvasDefaultLabelSizeMode,
+    canvasDefaultLabelRotationDegrees,
+    setCanvasDefaultLabelRotationDegrees,
     showShortcutHints,
     setShowShortcutHints,
     keyboardShortcutsEnabled,
@@ -486,6 +494,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,
     canvasDefaultLabelStrokeMode,
+    canvasDefaultLabelSizeMode,
+    canvasDefaultLabelRotationDegrees,
     canvasResetZoomPercentInput,
     showShortcutHints,
     keyboardShortcutsEnabled,
@@ -510,12 +520,16 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultShowInfoPanels,
     setCanvasDefaultShowSegmentLengths,
     setCanvasDefaultLabelStrokeMode,
+    setCanvasDefaultLabelSizeMode,
+    setCanvasDefaultLabelRotationDegrees,
     setShowNetworkGrid,
     setSnapNodesToGrid,
     setLockEntityMovement,
     setShowNetworkInfoPanels,
     setShowSegmentLengths,
     setNetworkLabelStrokeMode,
+    setNetworkLabelSizeMode,
+    setNetworkLabelRotationDegrees,
     setCanvasResetZoomPercentInput,
     setNetworkScale,
     setNetworkOffset,
@@ -529,6 +543,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   useEffect(() => {
     store.dispatch(appActions.setThemeMode(themeMode));
   }, [store, themeMode]);
+
+  useEffect(() => {
+    setNetworkLabelSizeMode(canvasDefaultLabelSizeMode);
+  }, [canvasDefaultLabelSizeMode, setNetworkLabelSizeMode]);
+
+  useEffect(() => {
+    setNetworkLabelRotationDegrees(canvasDefaultLabelRotationDegrees);
+  }, [canvasDefaultLabelRotationDegrees, setNetworkLabelRotationDegrees]);
   const validationModel = useValidationModel({
     state,
     connectors,
@@ -680,12 +702,16 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       canvasDefaultShowInfoPanels,
       canvasDefaultShowSegmentLengths,
       canvasDefaultLabelStrokeMode,
+      canvasDefaultLabelSizeMode,
+      canvasDefaultLabelRotationDegrees,
       setShowNetworkGrid,
       setSnapNodesToGrid,
       setLockEntityMovement,
       setShowNetworkInfoPanels,
       setShowSegmentLengths,
-      setNetworkLabelStrokeMode
+      setNetworkLabelStrokeMode,
+      setNetworkLabelSizeMode,
+      setNetworkLabelRotationDegrees
     },
     sortDefaults: {
       defaultSortField,
@@ -715,6 +741,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setCanvasDefaultShowInfoPanels,
       setCanvasDefaultShowSegmentLengths,
       setCanvasDefaultLabelStrokeMode,
+      setCanvasDefaultLabelSizeMode,
+      setCanvasDefaultLabelRotationDegrees,
       setCanvasResetZoomPercentInput,
       setShowShortcutHints,
       setKeyboardShortcutsEnabled,
@@ -1129,6 +1157,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         showSegmentLengths,
         setShowSegmentLengths,
         networkLabelStrokeMode,
+        networkLabelSizeMode,
+        networkLabelRotationDegrees,
         networkScalePercent,
         routingGraph,
         totalEdgeEntries,
@@ -1317,6 +1347,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setCanvasDefaultShowSegmentLengths,
           canvasDefaultLabelStrokeMode,
           setCanvasDefaultLabelStrokeMode,
+          canvasDefaultLabelSizeMode,
+          setCanvasDefaultLabelSizeMode,
+          canvasDefaultLabelRotationDegrees,
+          setCanvasDefaultLabelRotationDegrees,
           showShortcutHints,
           setShowShortcutHints,
           keyboardShortcutsEnabled,
@@ -1337,6 +1371,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setShowSegmentLengths,
           networkLabelStrokeMode,
           setNetworkLabelStrokeMode,
+          networkLabelSizeMode,
+          setNetworkLabelSizeMode,
+          networkLabelRotationDegrees,
+          setNetworkLabelRotationDegrees,
           canvasResetZoomPercentInput,
           setCanvasResetZoomPercentInput
         },

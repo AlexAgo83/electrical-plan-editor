@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { ThemeMode } from "../../store";
 import type {
+  CanvasLabelRotationDegrees,
+  CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
   SortDirection,
   SortField,
@@ -23,6 +25,9 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultShowInfoPanels, setCanvasDefaultShowInfoPanels] = useState(true);
   const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(false);
   const [canvasDefaultLabelStrokeMode, setCanvasDefaultLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
+  const [canvasDefaultLabelSizeMode, setCanvasDefaultLabelSizeMode] = useState<CanvasLabelSizeMode>("normal");
+  const [canvasDefaultLabelRotationDegrees, setCanvasDefaultLabelRotationDegrees] =
+    useState<CanvasLabelRotationDegrees>(0);
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [showFloatingInspectorPanel, setShowFloatingInspectorPanel] = useState(true);
@@ -55,6 +60,10 @@ export function useAppControllerPreferencesState() {
     setCanvasDefaultShowSegmentLengths,
     canvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelStrokeMode,
+    canvasDefaultLabelSizeMode,
+    setCanvasDefaultLabelSizeMode,
+    canvasDefaultLabelRotationDegrees,
+    setCanvasDefaultLabelRotationDegrees,
     showShortcutHints,
     setShowShortcutHints,
     keyboardShortcutsEnabled,

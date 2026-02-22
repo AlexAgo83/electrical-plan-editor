@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { CanvasLabelStrokeMode } from "../types/app-controller";
+import type { CanvasLabelRotationDegrees, CanvasLabelSizeMode, CanvasLabelStrokeMode } from "../types/app-controller";
 
 export function useAppControllerCanvasDisplayState() {
   const [routePreviewStartNodeId, setRoutePreviewStartNodeId] = useState("");
@@ -7,6 +7,8 @@ export function useAppControllerCanvasDisplayState() {
   const [showNetworkInfoPanels, setShowNetworkInfoPanels] = useState(true);
   const [showSegmentLengths, setShowSegmentLengths] = useState(false);
   const [networkLabelStrokeMode, setNetworkLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
+  const [networkLabelSizeMode, setNetworkLabelSizeMode] = useState<CanvasLabelSizeMode>("normal");
+  const [networkLabelRotationDegrees, setNetworkLabelRotationDegrees] = useState<CanvasLabelRotationDegrees>(0);
   const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("100");
 
   return {
@@ -20,6 +22,10 @@ export function useAppControllerCanvasDisplayState() {
     setShowSegmentLengths,
     networkLabelStrokeMode,
     setNetworkLabelStrokeMode,
+    networkLabelSizeMode,
+    setNetworkLabelSizeMode,
+    networkLabelRotationDegrees,
+    setNetworkLabelRotationDegrees,
     canvasResetZoomPercentInput,
     setCanvasResetZoomPercentInput
   };

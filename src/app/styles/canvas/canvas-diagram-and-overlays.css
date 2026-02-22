@@ -210,6 +210,14 @@
   pointer-events: none;
 }
 
+.network-canvas--label-size-small .network-segment-label {
+  font-size: 8px;
+}
+
+.network-canvas--label-size-large .network-segment-label {
+  font-size: 12px;
+}
+
 .network-segment-length-label {
   font-size: 8px;
   fill: var(--network-segment-length-label-color, #547086);
@@ -219,6 +227,14 @@
   stroke-linejoin: round;
   stroke-linecap: round;
   pointer-events: none;
+}
+
+.network-canvas--label-size-small .network-segment-length-label {
+  font-size: 7px;
+}
+
+.network-canvas--label-size-large .network-segment-length-label {
+  font-size: 10px;
 }
 
 .network-node {
@@ -270,6 +286,14 @@
   stroke-linejoin: round;
   stroke-linecap: round;
   pointer-events: none;
+}
+
+.network-canvas--label-size-small .network-node-label {
+  font-size: 8px;
+}
+
+.network-canvas--label-size-large .network-node-label {
+  font-size: 11px;
 }
 
 .network-canvas--label-stroke-none .network-segment-label,
