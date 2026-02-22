@@ -91,11 +91,13 @@ export function InspectorContextPanel({
         <h2>Inspector context</h2>
         {isCollapsed && canExpandFromCollapsed ? (
           <button type="button" className="inspector-context-toggle" onClick={onExpandFromCollapsed}>
+            <span className="inspector-context-toggle-icon" aria-hidden="true" />
             Expand
           </button>
         ) : null}
         {!isCollapsed && canCollapseToCollapsed ? (
           <button type="button" className="inspector-context-toggle" onClick={onCollapseToCollapsed}>
+            <span className="inspector-context-toggle-icon is-collapse" aria-hidden="true" />
             Collapse
           </button>
         ) : null}
@@ -104,12 +106,9 @@ export function InspectorContextPanel({
         selected === null ? (
           <p className="empty-copy">No entity selected. Select a row or a canvas item to inspect details here.</p>
         ) : (
-          <>
-            <p className="meta-line">
-              Focused entity: <strong>{selected.kind}</strong> <span className="technical-id">{selected.id}</span>
-            </p>
-            <p className="inspector-collapsed-copy">Inspector is collapsed to preserve workspace focus.</p>
-          </>
+          <p className="meta-line">
+            Focused entity: <strong>{selected.kind}</strong> <span className="technical-id">{selected.id}</span>
+          </p>
         )
       ) : selected === null ? (
         <p className="empty-copy">No entity selected. Select a row or a canvas item to inspect details here.</p>

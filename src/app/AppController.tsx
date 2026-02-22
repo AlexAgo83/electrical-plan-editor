@@ -1007,8 +1007,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const {
     isInspectorHidden,
     canExpandInspectorFromCollapsed,
+    canCollapseInspectorToCollapsed,
     isInspectorOpen,
-    setIsInspectorExpandedOnNarrowViewport
+    expandInspectorFromCollapsed,
+    collapseInspectorToCollapsed
   } = useInspectorPanelVisibility({
     isModelingScreen,
     isAnalysisScreen,
@@ -1023,7 +1025,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const { inspectorContextPanel } = useInspectorContextPanelControllerSlice({
     isInspectorOpen,
     canExpandInspectorFromCollapsed,
-    setIsInspectorExpandedOnNarrowViewport,
+    canCollapseInspectorToCollapsed,
+    expandInspectorFromCollapsed,
+    collapseInspectorToCollapsed,
     selected,
     selectedSubScreen,
     selectedConnector,

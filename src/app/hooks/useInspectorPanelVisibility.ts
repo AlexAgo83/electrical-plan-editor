@@ -24,27 +24,53 @@ export function useInspectorPanelVisibility({
   isOperationsPanelOpen
 }: UseInspectorPanelVisibilityParams) {
   const [isInspectorExpandedOnNarrowViewport, setIsInspectorExpandedOnNarrowViewport] = useState(false);
+  const [isInspectorCollapsedOnWideViewport, setIsInspectorCollapsedOnWideViewport] = useState(false);
 
   const isInspectorVisibilityScreen = isModelingScreen || isAnalysisScreen;
   const isInspectorNarrowViewport = viewportWidth < 960;
   const isModalDialogFocusActive = isDialogFocusActive || isNavigationDrawerOpen || isOperationsPanelOpen;
   const isInspectorHidden = !showFloatingInspectorPanel || !isInspectorVisibilityScreen || !hasActiveNetwork || isModalDialogFocusActive;
-  const isInspectorAutoCollapsed = !hasInspectableSelection || isInspectorNarrowViewport;
-  const canExpandInspectorFromCollapsed = hasInspectableSelection && isInspectorNarrowViewport;
   const isInspectorOpen =
     !isInspectorHidden &&
-    (!isInspectorAutoCollapsed || (canExpandInspectorFromCollapsed && isInspectorExpandedOnNarrowViewport));
+    hasInspectableSelection &&
+    (isInspectorNarrowViewport ? isInspectorExpandedOnNarrowViewport : !isInspectorCollapsedOnWideViewport);
+  const canExpandInspectorFromCollapsed =
+    !isInspectorHidden &&
+    hasInspectableSelection &&
+    (isInspectorNarrowViewport ? !isInspectorExpandedOnNarrowViewport : isInspectorCollapsedOnWideViewport);
+  const canCollapseInspectorToCollapsed =
+    !isInspectorHidden &&
+    hasInspectableSelection &&
+    (isInspectorNarrowViewport ? isInspectorExpandedOnNarrowViewport : !isInspectorCollapsedOnWideViewport);
 
   useEffect(() => {
-    if (isInspectorHidden || !canExpandInspectorFromCollapsed) {
+    if (isInspectorHidden || !hasInspectableSelection || !isInspectorNarrowViewport) {
       setIsInspectorExpandedOnNarrowViewport(false);
     }
-  }, [canExpandInspectorFromCollapsed, isInspectorHidden]);
+  }, [hasInspectableSelection, isInspectorHidden, isInspectorNarrowViewport]);
+
+  function expandInspectorFromCollapsed(): void {
+    if (isInspectorNarrowViewport) {
+      setIsInspectorExpandedOnNarrowViewport(true);
+      return;
+    }
+    setIsInspectorCollapsedOnWideViewport(false);
+  }
+
+  function collapseInspectorToCollapsed(): void {
+    if (isInspectorNarrowViewport) {
+      setIsInspectorExpandedOnNarrowViewport(false);
+      return;
+    }
+    setIsInspectorCollapsedOnWideViewport(true);
+  }
 
   return {
     isInspectorHidden,
     canExpandInspectorFromCollapsed,
+    canCollapseInspectorToCollapsed,
     isInspectorOpen,
-    setIsInspectorExpandedOnNarrowViewport
+    expandInspectorFromCollapsed,
+    collapseInspectorToCollapsed
   };
 }

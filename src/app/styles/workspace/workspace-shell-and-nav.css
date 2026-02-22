@@ -518,12 +518,29 @@
 }
 
 .inspector-context-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
   border: 1px solid #7a99b3;
   background: #e8f1f8;
   color: #153048;
   border-radius: 0.5rem;
   padding: 0.25rem 0.5rem;
   font-size: 0.78rem;
+}
+
+.inspector-context-toggle-icon {
+  display: inline-flex;
+  width: 0.78rem;
+  height: 0.78rem;
+  flex: 0 0 0.78rem;
+  background: currentColor;
+  -webkit-mask: url("/icons/ico_expand.svg") center / contain no-repeat;
+  mask: url("/icons/ico_expand.svg") center / contain no-repeat;
+}
+
+.inspector-context-toggle-icon.is-collapse {
+  transform: rotate(180deg);
 }
 
 .inspector-context-panel.is-collapsed .meta-line {

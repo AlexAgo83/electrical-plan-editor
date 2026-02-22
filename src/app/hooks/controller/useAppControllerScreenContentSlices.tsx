@@ -41,7 +41,9 @@ type InspectorContextPanelControllerSliceParams = Omit<
 > & {
   isInspectorOpen: boolean;
   canExpandInspectorFromCollapsed: boolean;
-  setIsInspectorExpandedOnNarrowViewport: (expanded: boolean) => void;
+  canCollapseInspectorToCollapsed: boolean;
+  expandInspectorFromCollapsed: () => void;
+  collapseInspectorToCollapsed: () => void;
   selectedConnectorOccupiedCount: number;
   selectedSpliceOccupiedCount: number;
   handleStartSelectedEdit: ComponentProps<typeof InspectorContextPanel>["onEditSelected"];
@@ -152,9 +154,9 @@ export function useInspectorContextPanelControllerSlice(params: InspectorContext
   const inspectorContextPanelProps = {
     mode: params.isInspectorOpen ? "open" : "collapsed",
     canExpandFromCollapsed: params.canExpandInspectorFromCollapsed,
-    canCollapseToCollapsed: params.canExpandInspectorFromCollapsed,
-    onExpandFromCollapsed: () => params.setIsInspectorExpandedOnNarrowViewport(true),
-    onCollapseToCollapsed: () => params.setIsInspectorExpandedOnNarrowViewport(false),
+    canCollapseToCollapsed: params.canCollapseInspectorToCollapsed,
+    onExpandFromCollapsed: params.expandInspectorFromCollapsed,
+    onCollapseToCollapsed: params.collapseInspectorToCollapsed,
     selected: params.selected,
     selectedSubScreen: params.selectedSubScreen,
     selectedConnector: params.selectedConnector,
