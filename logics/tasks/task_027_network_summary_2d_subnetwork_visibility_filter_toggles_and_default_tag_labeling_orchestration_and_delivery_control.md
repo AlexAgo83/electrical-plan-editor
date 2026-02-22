@@ -2,7 +2,7 @@
 > From version: 0.6.2
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Delivery Orchestration for Interactive Subnetwork Visibility Filtering in the 2D Network Summary Panel
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -18,12 +18,12 @@ Backlog scope covered:
 - `item_165_req_028_subnetwork_filter_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 subnetwork floating-panel toggle buttons with active/inactive state UI and a11y semantics (`item_161`)
-- [ ] 2. Deliver Wave 1 2D rendering deemphasis logic (50% opacity for entities not connected to active subnetworks) (`item_162`)
-- [ ] 3. Deliver Wave 2 multi-selection UX completion: `Enable all`, default-all initial state, and `DEFAULT` italic label formatting (`item_163`)
-- [ ] 4. Deliver Wave 3 regression/theme/a11y coverage for subnetwork filter interactions and 2D deemphasis behavior (`item_164`)
-- [ ] 5. Deliver Wave 4 closure: CI/E2E/build/PWA pass and `req_028` AC traceability (`item_165`)
-- [ ] FINAL: Update related Logics docs (request/task/backlog statuses + delivery summary)
+- [x] 1. Deliver Wave 0 subnetwork floating-panel toggle buttons with active/inactive state UI and a11y semantics (`item_161`)
+- [x] 2. Deliver Wave 1 2D rendering deemphasis logic (50% opacity for entities not connected to active subnetworks) (`item_162`)
+- [x] 3. Deliver Wave 2 multi-selection UX completion: `Enable all`, default-all initial state, and `DEFAULT` italic label formatting (`item_163`)
+- [x] 4. Deliver Wave 3 regression/theme/a11y coverage for subnetwork filter interactions and 2D deemphasis behavior (`item_164`)
+- [x] 5. Deliver Wave 4 closure: CI/E2E/build/PWA pass and `req_028` AC traceability (`item_165`)
+- [x] FINAL: Update related Logics docs (request/task/backlog statuses + delivery summary)
 
 # Validation
 - Documentation / Logics:
@@ -46,13 +46,13 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 pending: convert subnetwork informational chips to interactive toggle buttons with clear active/inactive state.
-  - Wave 1 pending: apply visual-only deemphasis (50% opacity) to entities not connected to active subnetworks.
-  - Wave 2 pending: complete multi-selection UX (`Enable all`, default-all active state, `DEFAULT` italic display formatting).
-  - Wave 3 pending: add regression tests and verify theme/a11y coverage for the new controls and deemphasis rendering.
-  - Wave 4 pending: run closure validation suite and record AC traceability.
+  - Wave 0 completed: floating subnetwork chips converted into interactive toggle buttons with active/inactive state UI and `aria-pressed` semantics.
+  - Wave 1 completed: 2D deemphasis rendering applies 50% opacity to segments and nodes not connected to active subnetworks (visual-only filter).
+  - Wave 2 completed: multi-selection UX supports arbitrary toggling, includes `Enable all`, defaults to all-active, and displays `(default)` as italic `DEFAULT`.
+  - Wave 3 completed: navigation-canvas regression tests cover toggle behavior, `Enable all`, `DEFAULT` formatting, and deemphasis rendering; theme/a11y semantics remain compatible.
+  - Wave 4 completed: closure validation suite passed and `req_028` AC traceability documented.
 - Current blockers:
-  - None at kickoff.
+  - None.
 - Main risks to track:
   - Deemphasis membership logic incorrectly classifies nodes connected to mixed/active subnetwork segments.
   - Toggle UI changes enlarge or destabilize the floating panel layout.
@@ -66,14 +66,29 @@ Backlog scope covered:
 - Validation snapshot (kickoff):
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK (`req_028` + backlog items)
 - Delivery snapshot:
-  - To be completed during implementation.
+  - Code:
+    - `src/app/components/network-summary/NetworkCanvasFloatingInfoPanels.tsx` (subnetwork toggle buttons, `Enable all`, `DEFAULT` italic display, pressed-state semantics)
+    - `src/app/components/NetworkSummaryPanel.tsx` (ephemeral subnetwork filter state + 2D deemphasis membership/rendering)
+    - `src/app/styles/canvas/canvas-toolbar-and-shell.css` (compact floating panel/toggle layout updates)
+    - `src/app/styles/canvas/canvas-diagram-and-overlays.css` (inactive entity deemphasis opacity classes)
+    - `src/tests/app.ui.navigation-canvas.spec.tsx` (toggle/deemphasis/default-tag regressions)
+  - Validation results:
+    - `npm run lint` OK
+    - `npm run typecheck` OK
+    - `npm run quality:ui-modularization` OK
+    - `npm run quality:store-modularization` OK
+    - `npm run test:ci` OK (`28` files / `159` tests)
+    - `npm run test:e2e` OK (`2/2`)
+    - `npm run build` OK
+    - `npm run quality:pwa` OK
+    - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
 - AC traceability (`req_028`) target mapping:
-  - AC1 target: Wave 0 (`item_161`) + Wave 3 (`item_164`) + Wave 4 (`item_165`)
-  - AC2 target: Wave 2 (`item_163`) + Wave 3 (`item_164`) + Wave 4 (`item_165`)
-  - AC3 target: Wave 1 (`item_162`) + Wave 3 (`item_164`) + Wave 4 (`item_165`)
-  - AC4 target: Wave 2 (`item_163`) + Wave 3 (`item_164`) + Wave 4 (`item_165`)
-  - AC5 target: Wave 2 (`item_163`) + Wave 4 (`item_165`)
-  - AC6 target: Wave 3 (`item_164`) + Wave 4 (`item_165`) + FINAL docs update
+  - AC1 satisfied: Wave 0 (`item_161`) + Wave 3 (`item_164`) + Wave 4 (`item_165`)
+  - AC2 satisfied: Wave 2 (`item_163`) + Wave 3 (`item_164`) + Wave 4 (`item_165`)
+  - AC3 satisfied: Wave 1 (`item_162`) + Wave 3 (`item_164`) + Wave 4 (`item_165`)
+  - AC4 satisfied: Wave 2 (`item_163`) + Wave 3 (`item_164`) + Wave 4 (`item_165`)
+  - AC5 satisfied: Wave 2 (`item_163`) + Wave 4 (`item_165`)
+  - AC6 satisfied: Wave 3 (`item_164`) + Wave 4 (`item_165`) + FINAL docs update
 
 # References
 - `logics/request/req_028_network_summary_2d_subnetwork_visibility_filter_toggles_and_default_tag_labeling.md`
@@ -89,4 +104,3 @@ Backlog scope covered:
 - `src/app/styles/base/base-theme-overrides/network-canvas-entity-theme-variables.css`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `package.json`
-

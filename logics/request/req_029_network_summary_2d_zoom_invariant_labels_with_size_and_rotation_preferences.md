@@ -1,7 +1,7 @@
 ## req_029_network_summary_2d_zoom_invariant_labels_with_size_and_rotation_preferences - Network Summary 2D Zoom-Invariant Labels with Size and Rotation Preferences
 > From version: 0.6.2
-> Understanding: 100%
-> Confidence: 99%
+> Understanding: 99%
+> Confidence: 100%
 > Complexity: Medium
 > Theme: Readability-Oriented 2D Label Rendering Controls (Zoom Invariance + User Preferences)
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -112,13 +112,15 @@ This request is a display/UX refinement:
 - Rewriting the 2D renderer architecture beyond what is needed to support zoom-invariant labels and preferences.
 
 # Backlog
-- To be created from this request (proposed):
-  - Zoom-invariant 2D label rendering implementation
-  - Settings preference wiring (size + rotation) and UI preference persistence/normalization
-  - Theme/readability verification and regression tests for 2D label behavior
-  - Closure validation + AC traceability
+- Implemented / tracked via:
+  - `item_166_network_summary_2d_zoom_invariant_label_rendering_and_entity_anchoring.md`
+  - `item_167_settings_2d_label_size_and_rotation_preferences_ui_and_persistence_wiring.md`
+  - `item_168_2d_label_preference_defaults_normalization_and_center_rotation_application.md`
+  - `item_169_2d_label_theme_readability_and_regression_coverage_for_zoom_invariant_behavior.md`
+  - `item_170_req_029_2d_label_readability_controls_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # References
+- `logics/tasks/task_028_network_summary_2d_zoom_invariant_labels_with_size_and_rotation_preferences_orchestration_and_delivery_control.md`
 - `src/app/components/NetworkSummaryPanel.tsx`
 - `src/app/styles/canvas/canvas-diagram-and-overlays.css`
 - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
@@ -126,4 +128,3 @@ This request is a display/UX refinement:
 - `src/app/hooks/useWorkspaceHandlers.ts`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `src/tests/app.ui.settings.spec.tsx`
-

@@ -1,7 +1,7 @@
 ## req_028_network_summary_2d_subnetwork_visibility_filter_toggles_and_default_tag_labeling - Network Summary 2D Subnetwork Visibility Filter Toggles and Default Tag Labeling
 > From version: 0.6.2
-> Understanding: 100%
-> Confidence: 99%
+> Understanding: 99%
+> Confidence: 100%
 > Complexity: Medium
 > Theme: Interactive Subnetwork Visibility Filtering in the 2D Network Summary Panel
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -97,18 +97,18 @@ The requested behavior is intentionally non-destructive:
 - Persistence of subnetwork filter state across sessions (unless explicitly added and documented during implementation).
 
 # Backlog
-- To be created from this request (proposed):
-  - Subnetwork toggle-button conversion in floating 2D panel
-  - 2D deemphasis/filter rendering logic for inactive subnetworks
-  - Multi-selection + enable-all control and default-tag display formatting
-  - Theme coverage + regression tests for subnetwork filtering UX
-  - Closure validation + AC traceability
+- Implemented / tracked via:
+  - `item_161_network_summary_subnetwork_toggle_buttons_and_active_state_ui_in_floating_panel.md`
+  - `item_162_network_summary_2d_subnetwork_deemphasis_rendering_for_inactive_filters.md`
+  - `item_163_subnetwork_multiselect_enable_all_control_and_default_tag_display_formatting.md`
+  - `item_164_subnetwork_filter_theme_coverage_accessibility_and_navigation_canvas_regression_tests.md`
+  - `item_165_req_028_subnetwork_filter_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # References
+- `logics/tasks/task_027_network_summary_2d_subnetwork_visibility_filter_toggles_and_default_tag_labeling_orchestration_and_delivery_control.md`
 - `src/app/components/network-summary/NetworkCanvasFloatingInfoPanels.tsx`
 - `src/app/components/NetworkSummaryPanel.tsx`
 - `src/app/styles/canvas/canvas-toolbar-and-shell.css`
 - `src/app/styles/canvas/canvas-diagram-and-overlays.css`
 - `src/app/styles/base/base-theme-overrides/network-canvas-entity-theme-variables.css`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
-
