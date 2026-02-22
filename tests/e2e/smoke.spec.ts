@@ -9,11 +9,22 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
     await expect(page.locator(".workspace-drawer.is-open")).toBeVisible();
   };
   const ensureNavigationDrawerClosed = async () => {
-    const closeMenuButton = page.getByRole("button", { name: "Close menu", exact: true });
-    if ((await closeMenuButton.count()) > 0) {
-      await closeMenuButton.click();
+    const navigationToggle = page.locator(".header-nav-toggle");
+    const backdrop = page.locator(".workspace-drawer-backdrop.is-open");
+    if ((await navigationToggle.getAttribute("aria-expanded")) === "true" && (await backdrop.count()) > 0) {
+      await backdrop.click({ position: { x: 8, y: 8 } });
     }
-    await expect(page.locator(".workspace-drawer.is-open")).toHaveCount(0);
+    if ((await navigationToggle.getAttribute("aria-expanded")) === "true") {
+      await navigationToggle.click();
+    }
+    if ((await navigationToggle.getAttribute("aria-expanded")) === "true") {
+      await page.keyboard.press("Escape");
+    }
+    if ((await navigationToggle.getAttribute("aria-expanded")) === "true") {
+      await page.getByRole("button", { name: "Settings" }).focus();
+    }
+    await expect(navigationToggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.getByRole("button", { name: "Close menu", exact: true })).toHaveCount(0);
   };
   const switchScreen = async (value: "modeling" | "analysis") => {
     await ensureNavigationDrawerOpen();
@@ -45,11 +56,22 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     await expect(page.locator(".workspace-drawer.is-open")).toBeVisible();
   };
   const ensureNavigationDrawerClosed = async () => {
-    const closeMenuButton = page.getByRole("button", { name: "Close menu", exact: true });
-    if ((await closeMenuButton.count()) > 0) {
-      await closeMenuButton.click();
+    const navigationToggle = page.locator(".header-nav-toggle");
+    const backdrop = page.locator(".workspace-drawer-backdrop.is-open");
+    if ((await navigationToggle.getAttribute("aria-expanded")) === "true" && (await backdrop.count()) > 0) {
+      await backdrop.click({ position: { x: 8, y: 8 } });
     }
-    await expect(page.locator(".workspace-drawer.is-open")).toHaveCount(0);
+    if ((await navigationToggle.getAttribute("aria-expanded")) === "true") {
+      await navigationToggle.click();
+    }
+    if ((await navigationToggle.getAttribute("aria-expanded")) === "true") {
+      await page.keyboard.press("Escape");
+    }
+    if ((await navigationToggle.getAttribute("aria-expanded")) === "true") {
+      await page.getByRole("button", { name: "Settings" }).focus();
+    }
+    await expect(navigationToggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.getByRole("button", { name: "Close menu", exact: true })).toHaveCount(0);
   };
 
   const switchSubScreen = async (value: "connector" | "splice" | "node" | "segment" | "wire") => {

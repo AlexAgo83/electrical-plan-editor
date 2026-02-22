@@ -1,0 +1,333 @@
+.route-preview-selection-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #c5d7e5;
+  border-radius: 0.6rem;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.route-preview-selection-strip article {
+  min-width: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.route-preview-selection-strip span {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4d697d;
+  font-weight: 700;
+}
+
+.route-preview-selection-strip strong {
+  font-size: 0.82rem;
+  color: #15364d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.route-preview-selection-arrow {
+  line-height: 1;
+  font-size: 1rem;
+  color: #5e7a91;
+  font-weight: 700;
+}
+
+.route-preview-empty {
+  margin: 0;
+  padding: 0.5rem 0.55rem;
+  border: 1px dashed #bdd0de;
+  border-radius: 0.55rem;
+  background: rgba(255, 255, 255, 0.5);
+  color: #3d596d;
+  font-size: 0.84rem;
+}
+
+.route-preview-results {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.route-preview-status-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.route-preview-status-line p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #4b667a;
+}
+
+.route-preview-status-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #94c2a2;
+  background: #d9f0df;
+  color: #245339;
+  padding: 0.12rem 0.48rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.route-preview-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.route-preview-metrics article {
+  border: 1px solid #bfd3e2;
+  border-radius: 0.55rem;
+  padding: 0.4rem 0.48rem;
+  background: rgba(255, 255, 255, 0.66);
+  display: grid;
+  gap: 0.1rem;
+}
+
+.route-preview-metrics span {
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #4c687c;
+  font-weight: 700;
+}
+
+.route-preview-metrics strong {
+  font-size: 0.95rem;
+  color: #16364d;
+}
+
+.route-preview-path-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.45rem;
+}
+
+.route-preview-path-grid article {
+  min-width: 0;
+  border: 1px solid #bfd3e2;
+  border-radius: 0.55rem;
+  padding: 0.4rem 0.5rem;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.route-preview-path-grid h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.76rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #4a6579;
+}
+
+.route-preview-path {
+  margin: 0;
+  font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+  font-size: 0.77rem;
+  line-height: 1.35;
+  color: #16384f;
+  word-break: break-word;
+}
+
+@media (max-width: 700px) {
+  .network-summary-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .network-summary-header-actions {
+    justify-content: flex-start;
+  }
+
+  .route-preview-selection-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .route-preview-selection-arrow {
+    display: none;
+  }
+
+  .route-preview-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .route-preview-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.network-grid line {
+  stroke: #d5e1eb;
+  stroke-width: 0.8;
+  pointer-events: none;
+}
+
+.network-segment {
+  stroke: #7f99af;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.network-segment.is-wire-highlighted {
+  stroke: #4f8d2d;
+  stroke-width: 5;
+}
+
+.network-segment.is-selected {
+  stroke: #0f6cb8;
+  stroke-width: 5;
+}
+
+.network-segment-hitbox {
+  stroke: transparent;
+  stroke-width: 16;
+  stroke-linecap: round;
+  cursor: pointer;
+}
+
+.network-segment-label {
+  font-size: 10px;
+  fill: #38566a;
+  paint-order: stroke fill;
+  stroke: rgba(246, 251, 255, 0.96);
+  stroke-width: 1.8px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.network-segment-length-label {
+  font-size: 8px;
+  fill: #547086;
+  paint-order: stroke fill;
+  stroke: rgba(246, 251, 255, 0.96);
+  stroke-width: 1.6px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.network-node {
+  cursor: pointer;
+}
+
+.network-node:active {
+  cursor: grabbing;
+}
+
+.network-node .network-node-shape {
+  stroke: #55748d;
+  stroke-width: 2;
+}
+
+.network-node.connector .network-node-shape {
+  fill: #dff0ff;
+}
+
+.network-node.splice .network-node-shape {
+  fill: #fdeecf;
+}
+
+.network-node.intermediate .network-node-shape {
+  fill: #ecf2f7;
+}
+
+.network-node.is-selected .network-node-shape {
+  stroke: #0f6cb8;
+  stroke-width: 3;
+}
+
+.network-node-label {
+  font-size: 9px;
+  fill: #183549;
+  paint-order: stroke fill;
+  stroke: rgba(246, 251, 255, 0.96);
+  stroke-width: 1.9px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.network-canvas--label-stroke-none .network-segment-label,
+.network-canvas--label-stroke-none .network-segment-length-label,
+.network-canvas--label-stroke-none .network-node-label {
+  paint-order: normal;
+  stroke: none;
+  stroke-width: 0;
+}
+
+.network-canvas--label-stroke-light .network-segment-label {
+  stroke-width: 1.15px;
+}
+
+.network-canvas--label-stroke-light .network-segment-length-label {
+  stroke-width: 1px;
+}
+
+.network-canvas--label-stroke-light .network-node-label {
+  stroke-width: 1.2px;
+}
+
+.network-legend {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem 0.9rem;
+  color: #345167;
+  font-size: 0.82rem;
+}
+
+.network-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  border: 2px solid #55748d;
+  display: inline-block;
+}
+
+.legend-swatch.connector {
+  background: #dff0ff;
+  border-radius: 0.2rem;
+}
+
+.legend-swatch.splice {
+  background: #fdeecf;
+}
+
+.legend-swatch.intermediate {
+  background: #ecf2f7;
+}
+
+.legend-line {
+  width: 1.05rem;
+  height: 0;
+  border-top: 3px solid #7f99af;
+  display: inline-block;
+}
+
+.legend-line.selected {
+  border-top-color: #0f6cb8;
+}
+
+.legend-line.wire {
+  border-top-color: #4f8d2d;
+}

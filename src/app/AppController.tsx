@@ -1,7 +1,9 @@
 import {
+  Suspense,
   type CSSProperties,
   type FormEvent,
   type ReactElement,
+  lazy,
   useCallback,
   useEffect,
   useMemo,
@@ -13,7 +15,6 @@ import appPackageMetadata from "../../package.json";
 import type {
   ConnectorId,
   NetworkId,
-  NetworkNode,
   NodeId,
   SegmentId,
   SpliceId,
@@ -54,21 +55,21 @@ import {
 } from "../store";
 import { appStore } from "./store";
 import { InspectorContextPanel } from "./components/InspectorContextPanel";
-import { NetworkSummaryPanel } from "./components/NetworkSummaryPanel";
-import { AnalysisScreen } from "./components/screens/AnalysisScreen";
-import { ModelingScreen } from "./components/screens/ModelingScreen";
-import { NetworkScopeScreen } from "./components/screens/NetworkScopeScreen";
-import { SettingsScreen } from "./components/screens/SettingsScreen";
-import { ValidationScreen } from "./components/screens/ValidationScreen";
+import { NetworkSummaryPanel as NetworkSummaryPanelEager } from "./components/NetworkSummaryPanel";
+import { AnalysisScreen as AnalysisScreenEager } from "./components/screens/AnalysisScreen";
+import { ModelingScreen as ModelingScreenEager } from "./components/screens/ModelingScreen";
+import { NetworkScopeScreen as NetworkScopeScreenEager } from "./components/screens/NetworkScopeScreen";
+import { SettingsScreen as SettingsScreenEager } from "./components/screens/SettingsScreen";
+import { ValidationScreen as ValidationScreenEager } from "./components/screens/ValidationScreen";
 import { AppHeaderAndStats } from "./components/workspace/AppHeaderAndStats";
-import { AnalysisWorkspaceContent } from "./components/workspace/AnalysisWorkspaceContent";
-import { ModelingFormsColumn } from "./components/workspace/ModelingFormsColumn";
-import { ModelingPrimaryTables } from "./components/workspace/ModelingPrimaryTables";
-import { ModelingSecondaryTables } from "./components/workspace/ModelingSecondaryTables";
-import { NetworkScopeWorkspaceContent } from "./components/workspace/NetworkScopeWorkspaceContent";
+import { AnalysisWorkspaceContent as AnalysisWorkspaceContentEager } from "./components/workspace/AnalysisWorkspaceContent";
+import { ModelingFormsColumn as ModelingFormsColumnEager } from "./components/workspace/ModelingFormsColumn";
+import { ModelingPrimaryTables as ModelingPrimaryTablesEager } from "./components/workspace/ModelingPrimaryTables";
+import { ModelingSecondaryTables as ModelingSecondaryTablesEager } from "./components/workspace/ModelingSecondaryTables";
+import { NetworkScopeWorkspaceContent as NetworkScopeWorkspaceContentEager } from "./components/workspace/NetworkScopeWorkspaceContent";
 import { OperationsHealthPanel } from "./components/workspace/OperationsHealthPanel";
-import { SettingsWorkspaceContent } from "./components/workspace/SettingsWorkspaceContent";
-import { ValidationWorkspaceContent } from "./components/workspace/ValidationWorkspaceContent";
+import { SettingsWorkspaceContent as SettingsWorkspaceContentEager } from "./components/workspace/SettingsWorkspaceContent";
+import { ValidationWorkspaceContent as ValidationWorkspaceContentEager } from "./components/workspace/ValidationWorkspaceContent";
 import { WorkspaceSidebarPanel } from "./components/workspace/WorkspaceSidebarPanel";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useCanvasInteractionHandlers } from "./hooks/useCanvasInteractionHandlers";
@@ -76,9 +77,12 @@ import { useCanvasState } from "./hooks/useCanvasState";
 import { useConnectorHandlers } from "./hooks/useConnectorHandlers";
 import { useEntityListModel } from "./hooks/useEntityListModel";
 import { useEntityFormsState } from "./hooks/useEntityFormsState";
+import { useEntityRelationshipMaps } from "./hooks/useEntityRelationshipMaps";
 import { useNetworkImportExport } from "./hooks/useNetworkImportExport";
 import { useNetworkEntityCountsById } from "./hooks/useNetworkEntityCountsById";
+import { useNodeDescriptions } from "./hooks/useNodeDescriptions";
 import { useNodeHandlers } from "./hooks/useNodeHandlers";
+import type { BeforeInstallPromptEventLike } from "./hooks/useWorkspaceShellChrome";
 import { useSelectionHandlers } from "./hooks/useSelectionHandlers";
 import { useSegmentHandlers } from "./hooks/useSegmentHandlers";
 import { useSpliceHandlers } from "./hooks/useSpliceHandlers";
@@ -86,9 +90,9 @@ import { useStoreHistory } from "./hooks/useStoreHistory";
 import { useUiPreferences } from "./hooks/useUiPreferences";
 import { useValidationModel } from "./hooks/useValidationModel";
 import { useWireHandlers } from "./hooks/useWireHandlers";
+import { useWorkspaceShellChrome } from "./hooks/useWorkspaceShellChrome";
 import { useWorkspaceHandlers } from "./hooks/useWorkspaceHandlers";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
-import { applyRegisteredServiceWorkerUpdate } from "./pwa/registerServiceWorker";
 import {
   clamp,
   HISTORY_LIMIT,
@@ -114,19 +118,64 @@ import "./styles.css";
 
 export type { AppProps } from "./types/app-controller";
 
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{
-    outcome: "accepted" | "dismissed";
-    platform: string;
-  }>;
-}
-
 function useAppSnapshot(store: AppStore) {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);
 }
 
 const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor";
+const SHOULD_LAZY_LOAD_UI_MODULES = !import.meta.env.VITEST;
+const NetworkSummaryPanelLazy = lazy(() =>
+  import("./components/NetworkSummaryPanel").then((module) => ({ default: module.NetworkSummaryPanel }))
+);
+const AnalysisScreenLazy = lazy(() =>
+  import("./components/screens/AnalysisScreen").then((module) => ({ default: module.AnalysisScreen }))
+);
+const ModelingScreenLazy = lazy(() =>
+  import("./components/screens/ModelingScreen").then((module) => ({ default: module.ModelingScreen }))
+);
+const NetworkScopeScreenLazy = lazy(() =>
+  import("./components/screens/NetworkScopeScreen").then((module) => ({ default: module.NetworkScopeScreen }))
+);
+const SettingsScreenLazy = lazy(() =>
+  import("./components/screens/SettingsScreen").then((module) => ({ default: module.SettingsScreen }))
+);
+const ValidationScreenLazy = lazy(() =>
+  import("./components/screens/ValidationScreen").then((module) => ({ default: module.ValidationScreen }))
+);
+const AnalysisWorkspaceContentLazy = lazy(() =>
+  import("./components/workspace/AnalysisWorkspaceContent").then((module) => ({ default: module.AnalysisWorkspaceContent }))
+);
+const ModelingFormsColumnLazy = lazy(() =>
+  import("./components/workspace/ModelingFormsColumn").then((module) => ({ default: module.ModelingFormsColumn }))
+);
+const ModelingPrimaryTablesLazy = lazy(() =>
+  import("./components/workspace/ModelingPrimaryTables").then((module) => ({ default: module.ModelingPrimaryTables }))
+);
+const ModelingSecondaryTablesLazy = lazy(() =>
+  import("./components/workspace/ModelingSecondaryTables").then((module) => ({ default: module.ModelingSecondaryTables }))
+);
+const NetworkScopeWorkspaceContentLazy = lazy(() =>
+  import("./components/workspace/NetworkScopeWorkspaceContent").then((module) => ({ default: module.NetworkScopeWorkspaceContent }))
+);
+const SettingsWorkspaceContentLazy = lazy(() =>
+  import("./components/workspace/SettingsWorkspaceContent").then((module) => ({ default: module.SettingsWorkspaceContent }))
+);
+const ValidationWorkspaceContentLazy = lazy(() =>
+  import("./components/workspace/ValidationWorkspaceContent").then((module) => ({ default: module.ValidationWorkspaceContent }))
+);
+const NetworkSummaryPanel = SHOULD_LAZY_LOAD_UI_MODULES ? NetworkSummaryPanelLazy : NetworkSummaryPanelEager;
+const AnalysisScreen = SHOULD_LAZY_LOAD_UI_MODULES ? AnalysisScreenLazy : AnalysisScreenEager;
+const ModelingScreen = SHOULD_LAZY_LOAD_UI_MODULES ? ModelingScreenLazy : ModelingScreenEager;
+const NetworkScopeScreen = SHOULD_LAZY_LOAD_UI_MODULES ? NetworkScopeScreenLazy : NetworkScopeScreenEager;
+const SettingsScreen = SHOULD_LAZY_LOAD_UI_MODULES ? SettingsScreenLazy : SettingsScreenEager;
+const ValidationScreen = SHOULD_LAZY_LOAD_UI_MODULES ? ValidationScreenLazy : ValidationScreenEager;
+const AnalysisWorkspaceContent = SHOULD_LAZY_LOAD_UI_MODULES ? AnalysisWorkspaceContentLazy : AnalysisWorkspaceContentEager;
+const ModelingFormsColumn = SHOULD_LAZY_LOAD_UI_MODULES ? ModelingFormsColumnLazy : ModelingFormsColumnEager;
+const ModelingPrimaryTables = SHOULD_LAZY_LOAD_UI_MODULES ? ModelingPrimaryTablesLazy : ModelingPrimaryTablesEager;
+const ModelingSecondaryTables = SHOULD_LAZY_LOAD_UI_MODULES ? ModelingSecondaryTablesLazy : ModelingSecondaryTablesEager;
+const NetworkScopeWorkspaceContent = SHOULD_LAZY_LOAD_UI_MODULES ? NetworkScopeWorkspaceContentLazy : NetworkScopeWorkspaceContentEager;
+const SettingsWorkspaceContent = SHOULD_LAZY_LOAD_UI_MODULES ? SettingsWorkspaceContentLazy : SettingsWorkspaceContentEager;
+const ValidationWorkspaceContent = SHOULD_LAZY_LOAD_UI_MODULES ? ValidationWorkspaceContentLazy : ValidationWorkspaceContentEager;
 
 export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear();
@@ -144,27 +193,13 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const subNetworkSummaries = selectSubNetworkSummaries(state);
   const networkEntityCountsById = useNetworkEntityCountsById(networks, state.networkStates);
 
-  const connectorMap = useMemo(() => new Map(connectors.map((connector) => [connector.id, connector])), [connectors]);
-  const spliceMap = useMemo(() => new Map(splices.map((splice) => [splice.id, splice])), [splices]);
-  const segmentMap = useMemo(() => new Map(segments.map((segment) => [segment.id, segment])), [segments]);
-  const connectorNodeByConnectorId = useMemo(
-    () =>
-      new Map(
-        nodes
-          .filter((node): node is Extract<NetworkNode, { kind: "connector" }> => node.kind === "connector")
-          .map((node) => [node.connectorId, node.id])
-      ),
-    [nodes]
-  );
-  const spliceNodeBySpliceId = useMemo(
-    () =>
-      new Map(
-        nodes
-          .filter((node): node is Extract<NetworkNode, { kind: "splice" }> => node.kind === "splice")
-          .map((node) => [node.spliceId, node.id])
-      ),
-    [nodes]
-  );
+  const {
+    connectorMap,
+    spliceMap,
+    segmentMap,
+    connectorNodeByConnectorId,
+    spliceNodeBySpliceId
+  } = useEntityRelationshipMaps(connectors, splices, nodes, segments);
 
   const {
     connectorFormMode,
@@ -317,15 +352,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
-  const [isInstallPromptAvailable, setIsInstallPromptAvailable] = useState(false);
-  const [isPwaUpdateReady, setIsPwaUpdateReady] = useState(false);
-  const [isNavigationDrawerOpen, setIsNavigationDrawerOpen] = useState(false);
-  const [isOperationsPanelOpen, setIsOperationsPanelOpen] = useState(false);
   const [headerOffsetPx, setHeaderOffsetPx] = useState(96);
-  const [viewportWidth, setViewportWidth] = useState(() =>
-    typeof window === "undefined" ? 1440 : window.innerWidth
-  );
-  const [isDialogFocusActive, setIsDialogFocusActive] = useState(false);
   const [isInspectorExpandedOnNarrowViewport, setIsInspectorExpandedOnNarrowViewport] = useState(false);
   const panStartRef = useRef<{
     clientX: number;
@@ -343,7 +370,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const navigationToggleButtonRef = useRef<HTMLButtonElement | null>(null);
   const operationsPanelRef = useRef<HTMLDivElement | null>(null);
   const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
-  const deferredInstallPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
+  const deferredInstallPromptRef = useRef<BeforeInstallPromptEventLike | null>(null);
   const hasAutoOpenedNetworkFormRef = useRef(false);
 
   const selected = selectSelection(state);
@@ -359,6 +386,28 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isSettingsScreen,
     activeScreenRef
   } = useWorkspaceNavigation();
+  const {
+    isInstallPromptAvailable,
+    isPwaUpdateReady,
+    isNavigationDrawerOpen,
+    isOperationsPanelOpen,
+    viewportWidth,
+    isDialogFocusActive,
+    closeNavigationDrawer,
+    handleToggleNavigationDrawer,
+    closeOperationsPanel,
+    handleToggleOperationsPanel,
+    handleOpenSettingsScreen,
+    handleInstallApp,
+    handleApplyPwaUpdate
+  } = useWorkspaceShellChrome({
+    setActiveScreen,
+    navigationDrawerRef,
+    navigationToggleButtonRef,
+    operationsPanelRef,
+    operationsButtonRef,
+    deferredInstallPromptRef
+  });
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
   const selectedSpliceId = selected?.kind === "splice" ? (selected.id as SpliceId) : null;
   const selectedNodeId = selected?.kind === "node" ? (selected.id as NodeId) : null;
@@ -981,256 +1030,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     hasAutoOpenedNetworkFormRef.current = true;
   }, [activeNetworkId, handleOpenEditNetworkForm, isNetworkScopeScreen, networkFormMode]);
 
-  const closeNavigationDrawer = useCallback(() => {
-    setIsNavigationDrawerOpen(false);
-  }, []);
-
-  const handleToggleNavigationDrawer = useCallback(() => {
-    setIsNavigationDrawerOpen((current) => {
-      const next = !current;
-      if (next) {
-        setIsOperationsPanelOpen(false);
-      }
-      return next;
-    });
-  }, []);
-
-  const closeOperationsPanel = useCallback(() => {
-    setIsOperationsPanelOpen(false);
-  }, []);
-
-  const handleToggleOperationsPanel = useCallback(() => {
-    setIsOperationsPanelOpen((current) => {
-      const next = !current;
-      if (next) {
-        setIsNavigationDrawerOpen(false);
-      }
-      return next;
-    });
-  }, []);
-
-  const handleOpenSettingsScreen = useCallback(() => {
-    setActiveScreen("settings");
-    setIsNavigationDrawerOpen(false);
-    setIsOperationsPanelOpen(false);
-  }, [setActiveScreen]);
-
-  const handleInstallApp = useCallback(() => {
-    const promptEvent = deferredInstallPromptRef.current;
-    if (promptEvent === null) {
-      return;
-    }
-
-    void (async () => {
-      await promptEvent.prompt();
-      const choice = await promptEvent.userChoice;
-      if (choice.outcome === "accepted") {
-        deferredInstallPromptRef.current = null;
-        setIsInstallPromptAvailable(false);
-      }
-    })();
-  }, []);
-
-  const handleApplyPwaUpdate = useCallback(() => {
-    void (async () => {
-      await applyRegisteredServiceWorkerUpdate();
-      setIsPwaUpdateReady(false);
-    })();
-  }, []);
-
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (event: Event): void => {
-      const promptEvent = event as BeforeInstallPromptEvent;
-      if (typeof promptEvent.prompt !== "function") {
-        return;
-      }
-
-      promptEvent.preventDefault();
-      deferredInstallPromptRef.current = promptEvent;
-      setIsInstallPromptAvailable(true);
-    };
-
-    const handleAppInstalled = (): void => {
-      deferredInstallPromptRef.current = null;
-      setIsInstallPromptAvailable(false);
-    };
-
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
-    window.addEventListener("appinstalled", handleAppInstalled);
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
-      window.removeEventListener("appinstalled", handleAppInstalled);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handlePwaUpdateAvailable = (): void => {
-      setIsPwaUpdateReady(true);
-    };
-
-    const handlePwaRegistrationError = (): void => {
-      setIsPwaUpdateReady(false);
-    };
-
-    window.addEventListener("app:pwa-update-available", handlePwaUpdateAvailable);
-    window.addEventListener("app:pwa-registration-error", handlePwaRegistrationError);
-    return () => {
-      window.removeEventListener("app:pwa-update-available", handlePwaUpdateAvailable);
-      window.removeEventListener("app:pwa-registration-error", handlePwaRegistrationError);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isNavigationDrawerOpen) {
-      return;
-    }
-
-    const handlePointerInteraction = (event: MouseEvent | TouchEvent): void => {
-      if (!(event.target instanceof Node)) {
-        return;
-      }
-
-      if (navigationDrawerRef.current?.contains(event.target)) {
-        return;
-      }
-
-      if (navigationToggleButtonRef.current?.contains(event.target)) {
-        return;
-      }
-
-      setIsNavigationDrawerOpen(false);
-    };
-
-    const handleFocusIn = (event: FocusEvent): void => {
-      if (!(event.target instanceof Node)) {
-        return;
-      }
-
-      if (navigationDrawerRef.current?.contains(event.target)) {
-        return;
-      }
-
-      if (navigationToggleButtonRef.current?.contains(event.target)) {
-        return;
-      }
-
-      setIsNavigationDrawerOpen(false);
-    };
-
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.key !== "Escape") {
-        return;
-      }
-
-      setIsNavigationDrawerOpen(false);
-      navigationToggleButtonRef.current?.focus();
-    };
-
-    document.addEventListener("mousedown", handlePointerInteraction);
-    document.addEventListener("touchstart", handlePointerInteraction, { passive: true });
-    document.addEventListener("focusin", handleFocusIn);
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("mousedown", handlePointerInteraction);
-      document.removeEventListener("touchstart", handlePointerInteraction);
-      document.removeEventListener("focusin", handleFocusIn);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isNavigationDrawerOpen]);
-
-  useEffect(() => {
-    if (!isOperationsPanelOpen) {
-      return;
-    }
-
-    const handlePointerInteraction = (event: MouseEvent | TouchEvent): void => {
-      if (!(event.target instanceof Node)) {
-        return;
-      }
-
-      if (operationsPanelRef.current?.contains(event.target)) {
-        return;
-      }
-
-      if (operationsButtonRef.current?.contains(event.target)) {
-        return;
-      }
-
-      setIsOperationsPanelOpen(false);
-    };
-
-    const handleFocusIn = (event: FocusEvent): void => {
-      if (!(event.target instanceof Node)) {
-        return;
-      }
-
-      if (operationsPanelRef.current?.contains(event.target)) {
-        return;
-      }
-
-      if (operationsButtonRef.current?.contains(event.target)) {
-        return;
-      }
-
-      setIsOperationsPanelOpen(false);
-    };
-
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      if (event.key !== "Escape") {
-        return;
-      }
-
-      setIsOperationsPanelOpen(false);
-      operationsButtonRef.current?.focus();
-    };
-
-    document.addEventListener("mousedown", handlePointerInteraction);
-    document.addEventListener("touchstart", handlePointerInteraction, { passive: true });
-    document.addEventListener("focusin", handleFocusIn);
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("mousedown", handlePointerInteraction);
-      document.removeEventListener("touchstart", handlePointerInteraction);
-      document.removeEventListener("focusin", handleFocusIn);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOperationsPanelOpen]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const handleResize = (): void => {
-      setViewportWidth(window.innerWidth);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    const updateDialogFocusState = (): void => {
-      const activeElement = document.activeElement;
-      if (!(activeElement instanceof HTMLElement)) {
-        setIsDialogFocusActive(false);
-        return;
-      }
-
-      setIsDialogFocusActive(activeElement.closest('[role="dialog"], [aria-modal="true"]') !== null);
-    };
-
-    updateDialogFocusState();
-    document.addEventListener("focusin", updateDialogFocusState);
-    return () => {
-      document.removeEventListener("focusin", updateDialogFocusState);
-    };
-  }, []);
-
   useEffect(() => {
     undoActionRef.current = handleUndo;
     redoActionRef.current = handleRedo;
@@ -1263,28 +1062,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setActiveSubScreen
   });
 
-  const describeNode = useCallback((node: NetworkNode): string => {
-    if (node.kind === "intermediate") {
-      return `Intermediate: ${node.label}`;
-    }
-
-    if (node.kind === "connector") {
-      const connector = connectorMap.get(node.connectorId);
-      return connector === undefined
-        ? `Connector node (${node.connectorId})`
-        : `Connector: ${connector.name} (${connector.technicalId})`;
-    }
-
-    const splice = spliceMap.get(node.spliceId);
-    return splice === undefined ? `Splice node (${node.spliceId})` : `Splice: ${splice.name} (${splice.technicalId})`;
-  }, [connectorMap, spliceMap]);
-  const nodeLabelById = useMemo(() => {
-    const result = new Map<NodeId, string>();
-    for (const node of nodes) {
-      result.set(node.id, describeNode(node));
-    }
-    return result;
-  }, [describeNode, nodes]);
+  const { describeNode, nodeLabelById } = useNodeDescriptions(nodes, connectorMap, spliceMap);
 
   const {
     resetConnectorForm,
@@ -1710,7 +1488,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   );
 
   return (
-    <main className={appShellClassName}>
+    <Suspense fallback={null}>
+      <main className={appShellClassName}>
       <AppHeaderAndStats
         headerBlockRef={headerBlockRef}
         isNavigationDrawerOpen={isNavigationDrawerOpen}
@@ -2180,6 +1959,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           {inspectorContextPanel}
         </aside>
       ) : null}
-    </main>
+      </main>
+    </Suspense>
   );
 }

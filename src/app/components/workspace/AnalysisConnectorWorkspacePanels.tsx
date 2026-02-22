@@ -1,0 +1,290 @@
+import { useState, type ReactElement } from "react";
+import { nextSortState } from "../../lib/app-utils-shared";
+import { downloadCsvFile } from "../../lib/csv";
+import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+
+export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContentProps): ReactElement {
+  const {
+    isConnectorSubScreen,
+    selectedConnector,
+    selectedConnectorId,
+    connectorOccupancyFilter,
+    setConnectorOccupancyFilter,
+    connectors,
+    visibleConnectors,
+    connectorSort,
+    setConnectorSort,
+    connectorOccupiedCountById,
+    onSelectConnector,
+    cavityIndexInput,
+    setCavityIndexInput,
+    connectorOccupantRefInput,
+    setConnectorOccupantRefInput,
+    handleReserveCavity,
+    connectorCavityStatuses,
+    handleReleaseCavity,
+    sortedConnectorSynthesisRows,
+    connectorSynthesisSort,
+    setConnectorSynthesisSort,
+    getSortIndicator
+  } = props;
+  const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "synthesis">("cavities");
+
+  return (
+    <>
+<section className="panel" hidden={!isConnectorSubScreen}>
+  <header className="list-panel-header">
+    <h2>Connectors</h2>
+    <div className="list-panel-header-tools">
+      <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
+        {([
+          ["all", "All"],
+          ["occupied", "Occupied"],
+          ["free", "Free"]
+        ] as const).map(([filterId, label]) => (
+          <button
+            key={filterId}
+            type="button"
+            className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+            onClick={() => setConnectorOccupancyFilter(filterId)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="filter-chip table-export-button"
+        onClick={() =>
+          downloadCsvFile(
+            "analysis-connectors",
+            ["Name", "Technical ID", "Cavities", "Occupied"],
+            visibleConnectors.map((connector) => [
+              connector.name,
+              connector.technicalId,
+              connector.cavityCount,
+              connectorOccupiedCountById.get(connector.id) ?? 0
+            ])
+          )
+        }
+        disabled={visibleConnectors.length === 0}
+      >
+        <span className="table-export-icon" aria-hidden="true" />
+        CSV
+      </button>
+    </div>
+  </header>
+  {connectors.length === 0 ? (
+    <p className="empty-copy">No connector yet.</p>
+  ) : visibleConnectors.length === 0 ? (
+    <p className="empty-copy">No connector matches the current filters.</p>
+  ) : (
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>
+            <button
+              type="button"
+              className="sort-header-button"
+              onClick={() => setConnectorSort((current) => nextSortState(current, "name"))}
+            >
+              Name <span className="sort-indicator">{getSortIndicator(connectorSort, "name")}</span>
+            </button>
+          </th>
+          <th>
+            <button
+              type="button"
+              className="sort-header-button"
+              onClick={() => setConnectorSort((current) => nextSortState(current, "technicalId"))}
+            >
+              Technical ID <span className="sort-indicator">{getSortIndicator(connectorSort, "technicalId")}</span>
+            </button>
+          </th>
+          <th>Cavities</th>
+          <th>Occupied</th>
+        </tr>
+      </thead>
+      <tbody>
+        {visibleConnectors.map((connector) => {
+          const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
+          const isSelected = selectedConnectorId === connector.id;
+          return (
+            <tr
+              key={connector.id}
+              className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
+              aria-selected={isSelected}
+              tabIndex={0}
+              onClick={() => onSelectConnector(connector.id)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onSelectConnector(connector.id);
+                }
+              }}
+            >
+              <td>{connector.name}</td>
+              <td className="technical-id">{connector.technicalId}</td>
+              <td>{connector.cavityCount}</td>
+              <td>{occupiedCount}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  )}
+</section>
+
+<section className="panel" hidden={!isConnectorSubScreen}>
+  <header className="list-panel-header">
+    <h2>Connector analysis</h2>
+    <div className="list-panel-header-tools">
+      <div className="chip-group list-panel-filters" role="group" aria-label="Connector analysis view">
+        <button
+          type="button"
+          className={connectorAnalysisView === "cavities" ? "filter-chip is-active" : "filter-chip"}
+          onClick={() => setConnectorAnalysisView("cavities")}
+        >
+          Cavities
+        </button>
+        <button
+          type="button"
+          className={connectorAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
+          onClick={() => setConnectorAnalysisView("synthesis")}
+        >
+          Synthesis
+        </button>
+      </div>
+      <button
+        type="button"
+        className="filter-chip table-export-button"
+        onClick={() => {
+          if (connectorAnalysisView === "cavities") {
+            downloadCsvFile(
+              `analysis-connector-cavities-${selectedConnector?.technicalId ?? "selection"}`,
+              ["Cavity", "Status", "Occupant reference"],
+              connectorCavityStatuses.map((slot) => [
+                `C${slot.cavityIndex}`,
+                slot.isOccupied ? "Occupied" : "Free",
+                slot.occupantRef ?? ""
+              ])
+            );
+            return;
+          }
+          downloadCsvFile(
+            `analysis-connector-synthesis-${selectedConnector?.technicalId ?? "selection"}`,
+            ["Wire", "Technical ID", "Local cavity", "Destination", "Length (mm)"],
+            sortedConnectorSynthesisRows.map((row) => [
+              row.wireName,
+              row.wireTechnicalId,
+              row.localEndpointLabel,
+              row.remoteEndpointLabel,
+              row.lengthMm
+            ])
+          );
+        }}
+        disabled={
+          selectedConnector === null ||
+          (connectorAnalysisView === "cavities"
+            ? connectorCavityStatuses.length === 0
+            : sortedConnectorSynthesisRows.length === 0)
+        }
+      >
+        <span className="table-export-icon" aria-hidden="true" />
+        CSV
+      </button>
+    </div>
+  </header>
+  {selectedConnector === null ? (
+    <p className="empty-copy">Select a connector to view cavities and synthesis.</p>
+  ) : connectorAnalysisView === "cavities" ? (
+    <>
+      <p className="meta-line">
+        <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
+      </p>
+      <form className="row-form" onSubmit={handleReserveCavity}>
+        <label>
+          Cavity index
+          <input
+            type="number"
+            min={1}
+            max={selectedConnector.cavityCount}
+            step={1}
+            value={cavityIndexInput}
+            onChange={(event) => setCavityIndexInput(event.target.value)}
+            required
+          />
+        </label>
+
+        <label>
+          Occupant reference
+          <input
+            value={connectorOccupantRefInput}
+            onChange={(event) => setConnectorOccupantRefInput(event.target.value)}
+            placeholder="wire-draft-001:A"
+            required
+          />
+        </label>
+
+        <button type="submit">Reserve cavity</button>
+      </form>
+
+      <div className="cavity-grid" aria-label="Cavity occupancy grid">
+        {connectorCavityStatuses.map((slot) => (
+          <article key={slot.cavityIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
+            <h3>C{slot.cavityIndex}</h3>
+            <p>{slot.isOccupied ? slot.occupantRef : "Free"}</p>
+            {slot.isOccupied ? (
+              <button type="button" onClick={() => handleReleaseCavity(slot.cavityIndex)}>
+                Release
+              </button>
+            ) : null}
+          </article>
+        ))}
+      </div>
+    </>
+  ) : sortedConnectorSynthesisRows.length === 0 ? (
+    <p className="empty-copy">No wire currently connected to this connector.</p>
+  ) : (
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>
+            <button
+              type="button"
+              className="sort-header-button"
+              onClick={() => setConnectorSynthesisSort((current) => nextSortState(current, "name"))}
+            >
+              Wire <span className="sort-indicator">{getSortIndicator(connectorSynthesisSort, "name")}</span>
+            </button>
+          </th>
+          <th>
+            <button
+              type="button"
+              className="sort-header-button"
+              onClick={() => setConnectorSynthesisSort((current) => nextSortState(current, "technicalId"))}
+            >
+              Technical ID <span className="sort-indicator">{getSortIndicator(connectorSynthesisSort, "technicalId")}</span>
+            </button>
+          </th>
+          <th>Local cavity</th>
+          <th>Destination</th>
+          <th>Length (mm)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sortedConnectorSynthesisRows.map((row) => (
+          <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
+            <td>{row.wireName}</td>
+            <td className="technical-id">{row.wireTechnicalId}</td>
+            <td>{row.localEndpointLabel}</td>
+            <td>{row.remoteEndpointLabel}</td>
+            <td>{row.lengthMm}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</section>
+    </>
+  );
+}

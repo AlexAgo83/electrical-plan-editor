@@ -1,0 +1,413 @@
+.app-shell.theme-dark .route-preview-panel {
+  border-color: #44617a;
+  background: linear-gradient(180deg, #1b3046 0%, #182c40 100%);
+}
+
+.app-shell.theme-dark .route-preview-label {
+  color: #b7c9dc;
+}
+
+.app-shell.theme-dark .route-preview-selection-strip {
+  border-color: #47647d;
+  background: rgba(19, 34, 50, 0.72);
+}
+
+.app-shell.theme-dark .route-preview-selection-strip span {
+  color: #a9c0d4;
+}
+
+.app-shell.theme-dark .route-preview-selection-strip strong {
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .route-preview-selection-arrow {
+  color: #7f9bb4;
+}
+
+.app-shell.theme-dark .route-preview-empty {
+  border-color: #48647d;
+  background: rgba(19, 34, 50, 0.72);
+  color: #bfd1e3;
+}
+
+.app-shell.theme-dark .route-preview-status-line p {
+  color: #b3c7d9;
+}
+
+.app-shell.theme-dark .route-preview-status-chip {
+  border-color: #4f8570;
+  background: #254738;
+  color: #d7f6e3;
+}
+
+.app-shell.theme-dark .route-preview-metrics article,
+.app-shell.theme-dark .route-preview-path-grid article {
+  border-color: #48647d;
+  background: rgba(19, 34, 50, 0.72);
+}
+
+.app-shell.theme-dark .route-preview-metrics span,
+.app-shell.theme-dark .route-preview-path-grid h4 {
+  color: #a9c0d4;
+}
+
+.app-shell.theme-dark .route-preview-metrics strong,
+.app-shell.theme-dark .route-preview-path {
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .analysis-wire-mode-chip {
+  border-color: #52708b;
+  background: #27415a;
+  color: #d5e5f4;
+}
+
+.app-shell.theme-dark .analysis-wire-mode-chip.is-locked {
+  border-color: #4f8570;
+  background: #254738;
+  color: #d7f6e3;
+}
+
+.app-shell.theme-dark .analysis-wire-identity,
+.app-shell.theme-dark .analysis-wire-route-current {
+  border-color: #48647d;
+  background: rgba(19, 34, 50, 0.72);
+}
+
+.app-shell.theme-dark .analysis-wire-identity-label,
+.app-shell.theme-dark .analysis-wire-route-current span {
+  color: #a9c0d4;
+}
+
+.app-shell.theme-dark .analysis-wire-identity-value {
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .workspace-shell .workspace-health {
+  border-top-color: #365069;
+}
+
+.app-shell.theme-dark .workspace-ops-content.panel,
+.app-shell.theme-dark .workspace-inspector-panel .inspector-context-panel {
+  background: rgba(26, 44, 63, 0.68);
+}
+
+.app-shell.theme-dark .inspector-context-header h2 {
+  color: #a9bfd3;
+}
+
+.app-shell.theme-dark .inspector-entity-label {
+  color: #9eb7cb;
+}
+
+.app-shell.theme-dark .inspector-kind-chip {
+  border-color: #4c6882;
+  background: #27415a;
+  color: #d5e5f4;
+}
+
+.app-shell.theme-dark .inspector-entity-id {
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .inspector-detail-grid dt {
+  color: #9eb7cb;
+}
+
+.app-shell.theme-dark .inspector-detail-grid dd {
+  color: #dce8f4;
+}
+
+.app-shell.theme-dark .network-scope-indicator {
+  border-color: #365069;
+  background: #1a2c3f;
+}
+
+.app-shell.theme-dark .network-scope-indicator h2 {
+  color: #b7c9dc;
+}
+
+.app-shell.theme-dark .network-scope-indicator p {
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .network-scope-indicator-label {
+  color: #b7c9dc;
+}
+
+.app-shell.theme-dark .network-scope-indicator-value {
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .network-scope-list-shell {
+  border-color: #365069;
+}
+
+.app-shell.theme-dark .network-scope-status-chip.is-active {
+  background: #2c5844;
+  color: #d7f6e3;
+}
+
+.app-shell.theme-dark .network-scope-status-chip.is-available {
+  background: #365069;
+  color: #dbe9f5;
+}
+
+.app-shell.theme-dark .network-form-mode-chip {
+  background: #365069;
+  color: #dbe9f5;
+}
+
+.app-shell.theme-dark .network-form-mode-chip.is-create {
+  background: #2c4f6a;
+  color: #d2e8fb;
+}
+
+.app-shell.theme-dark .network-form-mode-chip.is-edit {
+  background: #2c5844;
+  color: #d7f6e3;
+}
+
+.app-shell.theme-dark .network-delete-button {
+  border-color: #8f5660 !important;
+  background: #5b2f37 !important;
+  color: #ffd9de !important;
+}
+
+.app-shell.theme-dark .modeling-list-action-delete {
+  border-color: #8f5660 !important;
+  background: #5b2f37 !important;
+  color: #ffd9de !important;
+}
+
+.app-shell.theme-dark .workspace-tab,
+.app-shell.theme-dark .filter-chip,
+.app-shell.theme-dark .row-actions button,
+.app-shell.theme-dark .row-form button,
+.app-shell.theme-dark .error-banner button,
+.app-shell.theme-dark .inspector-context-toggle,
+.app-shell.theme-dark .header-nav-toggle,
+.app-shell.theme-dark .network-scope-create-button,
+.app-shell.theme-dark .header-install-toggle,
+.app-shell.theme-dark .header-update-toggle,
+.app-shell.theme-dark .header-settings-toggle,
+.app-shell.theme-dark .header-ops-toggle {
+  border-color: #4e6a84;
+  background: #27415a;
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .header-update-toggle {
+  border-color: #5ba777;
+  background: #214538;
+  color: #d7f6e3;
+}
+
+.app-shell.theme-dark .workspace-tab.is-active,
+.app-shell.theme-dark .filter-chip.is-active {
+  background: #7fc5ff;
+  color: #092038;
+  border-color: #7fc5ff;
+}
+
+.app-shell.theme-dark .header-settings-toggle.is-active {
+  background: #7fc5ff;
+  color: #092038;
+  border-color: #7fc5ff;
+}
+
+.app-shell.theme-dark .workspace-tab-badge {
+  background: #365778;
+  color: #dbe9f5;
+}
+
+.app-shell.theme-dark .header-ops-badge {
+  background: #365778;
+  color: #dbe9f5;
+}
+
+.app-shell.theme-dark .workspace-tab-badge.is-error {
+  background: #643c47;
+  color: #ffd3d8;
+}
+
+.app-shell.theme-dark .header-ops-badge.is-error {
+  background: #643c47;
+  color: #ffd3d8;
+}
+
+.app-shell.theme-dark input,
+.app-shell.theme-dark select,
+.app-shell.theme-dark textarea {
+  border-color: #4a6783;
+  background: #112236;
+  color: #e9f1f8;
+}
+
+.app-shell.theme-dark .inline-fieldset {
+  border-color: #47617c;
+}
+
+.app-shell.theme-dark .inline-fieldset legend {
+  color: #b8cbdd;
+}
+
+.app-shell.theme-dark .wire-endpoint-fieldset {
+  border-color: #4d6781;
+  background: linear-gradient(180deg, rgba(19, 35, 50, 0.76), rgba(18, 34, 49, 0.45));
+}
+
+.app-shell.theme-dark .data-table th,
+.app-shell.theme-dark .data-table td {
+  border-bottom-color: #334d64;
+}
+
+.app-shell.theme-dark .data-table th {
+  color: #bed1e4;
+}
+
+.app-shell.theme-dark .data-table tr.is-selected {
+  background: #274965;
+}
+
+.app-shell.theme-dark .data-table tr.is-wire-highlighted {
+  background: #2c5844;
+}
+
+.app-shell.theme-dark .data-table tr.is-selected > td {
+  background: rgba(85, 141, 189, 0.34);
+}
+
+.app-shell.theme-dark .data-table tr.is-wire-highlighted > td {
+  background: rgba(73, 131, 84, 0.34);
+}
+
+.app-shell.theme-dark .data-table tr.is-selected.is-wire-highlighted > td {
+  background: rgba(95, 146, 161, 0.36);
+}
+
+.app-shell.theme-dark .status-chip.is-error {
+  background: #653743;
+  color: #ffd0d6;
+}
+
+.app-shell.theme-dark .status-chip.is-warning {
+  background: #66502c;
+  color: #ffe3a9;
+}
+
+.app-shell.theme-dark .error-banner {
+  border-color: #7f4a55;
+  background: #4a2830;
+  color: #ffd6dc;
+}
+
+.app-shell.theme-dark .subnetwork-chip {
+  background: #27415a;
+  border-color: #48647f;
+  color: #d5e5f4;
+}
+
+.app-shell.theme-dark .subnetwork-list li {
+  color: #c0d1e2;
+}
+
+.app-shell.theme-dark .sort-indicator {
+  color: #9bc3e3;
+}
+
+.app-shell.theme-dark .workspace-nav-divider {
+  color: #9db6ca;
+}
+
+.app-shell.theme-dark .sort-header-button:hover {
+  color: #8ec7f5;
+}
+
+.app-shell.theme-dark .network-grid line {
+  stroke: #2f4a60;
+}
+
+.app-shell.theme-dark .network-segment {
+  stroke: #87a0b8;
+}
+
+.app-shell.theme-dark .network-segment.is-wire-highlighted {
+  stroke: #4f8d2d;
+}
+
+.app-shell.theme-dark .network-segment.is-selected {
+  stroke: #7fc5ff;
+}
+
+.app-shell.theme-dark .network-segment-label,
+.app-shell.theme-dark .network-segment-length-label,
+.app-shell.theme-dark .network-node-label {
+  fill: #d4e3f1;
+  stroke: rgba(8, 19, 31, 0.9);
+}
+
+.app-shell.theme-dark .network-node.connector .network-node-shape {
+  fill: #28506e;
+}
+
+.app-shell.theme-dark .network-node.splice .network-node-shape {
+  fill: #6f5d3f;
+}
+
+.app-shell.theme-dark .network-node.intermediate .network-node-shape {
+  fill: #3a5369;
+}
+
+.app-shell.theme-dark .legend-swatch {
+  border-color: #7f9bb4;
+}
+
+.app-shell.theme-dark .legend-line {
+  border-top-color: #87a0b8;
+}
+
+.app-shell.theme-dark .legend-line.selected {
+  border-top-color: #7fc5ff;
+}
+
+.app-shell.theme-dark .legend-line.wire {
+  border-top-color: #4f8d2d;
+}
+
+.app-shell.theme-dark .save-status.is-saved {
+  color: #88d9af;
+}
+
+.app-shell.theme-dark .save-status.is-unsaved {
+  color: #ffd48f;
+}
+
+.app-shell.theme-dark .save-status.is-error {
+  color: #ffb4bc;
+}
+
+.import-status.is-success {
+  color: #226041;
+}
+
+.import-status.is-partial {
+  color: #7b4d00;
+}
+
+.import-status.is-failed {
+  color: #8f1e1e;
+}
+
+.app-shell.theme-dark .import-status.is-success {
+  color: #88d9af;
+}
+
+.app-shell.theme-dark .import-status.is-partial {
+  color: #ffd48f;
+}
+
+.app-shell.theme-dark .import-status.is-failed {
+  color: #ffb4bc;
+}
+

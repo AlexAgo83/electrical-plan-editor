@@ -12,8 +12,11 @@ import type {
 import type { ShortestRouteResult } from "../../core/pathfinding";
 import type { SubNetworkSummary } from "../../store";
 import type { CanvasLabelStrokeMode } from "../types/app-controller";
+import { NetworkCanvasFloatingInfoPanels } from "./network-summary/NetworkCanvasFloatingInfoPanels";
+import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
+import { NetworkSummaryLegend } from "./network-summary/NetworkSummaryLegend";
 
-interface NodePosition {
+export interface NodePosition {
   x: number;
   y: number;
 }
@@ -63,7 +66,7 @@ function copyComputedStylesToSvgClone(sourceSvg: SVGSVGElement, cloneSvg: SVGSVG
   }
 }
 
-interface NetworkSummaryPanelProps {
+export interface NetworkSummaryPanelProps {
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
   showNetworkInfoPanels: boolean;
@@ -164,9 +167,6 @@ export function NetworkSummaryPanel({
     { label: "Graph segments", value: routingGraphSegmentCount },
     { label: "Adjacency entries", value: totalEdgeEntries }
   ];
-  const hasRouteSelection = routePreviewStartNodeId.length > 0 && routePreviewEndNodeId.length > 0;
-  const selectedStartNode = nodes.find((node) => node.id === routePreviewStartNodeId) ?? null;
-  const selectedEndNode = nodes.find((node) => node.id === routePreviewEndNodeId) ?? null;
   const effectiveScale = networkScale > 0 ? networkScale : 1;
   const visibleModelMinX = (0 - networkOffset.x) / effectiveScale;
   const visibleModelMaxX = (networkViewWidth - networkOffset.x) / effectiveScale;
@@ -294,60 +294,15 @@ export function NetworkSummaryPanel({
           <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
         ) : (
           <div className={`network-canvas-shell${isPanningNetwork ? " is-panning" : ""}`}>
-            {showNetworkInfoPanels ? (
-              <div className="network-canvas-floating-controls" aria-label="Canvas controls">
-                <div className="network-canvas-toolbar">
-                  <button type="button" className="workspace-tab" onClick={() => handleZoomAction("out")}>
-                    Zoom -
-                  </button>
-                  <button type="button" className="workspace-tab" onClick={() => handleZoomAction("in")}>
-                    Zoom +
-                  </button>
-                  <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
-                    Reset view
-                  </button>
-                  <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
-                    Fit network
-                  </button>
-                  <button type="button" className="workspace-tab" onClick={onRegenerateLayout}>
-                    Generate
-                  </button>
-                </div>
-                <p className="meta-line network-canvas-floating-copy">
-                  View: {networkScalePercent}% zoom. Hold <strong>Shift</strong> and drag empty canvas to pan.
-                </p>
-              </div>
-            ) : null}
-            {showNetworkInfoPanels ? (
-              <div className="network-canvas-floating-stack">
-                <section className="network-canvas-floating-subnetworks" aria-label="Sub-networks">
-                  {subNetworkSummaries.length === 0 ? (
-                    <p className="network-canvas-floating-copy">No sub-network tags yet.</p>
-                  ) : (
-                    <ul className="network-canvas-subnetwork-list">
-                      {subNetworkSummaries.map((group) => (
-                        <li key={group.tag}>
-                          <span className="subnetwork-chip">{group.tag}</span>
-                          <span>
-                            {group.segmentCount} segment(s), {group.totalLengthMm} mm total
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </section>
-                <section className="network-canvas-floating-stats" aria-label="Graph statistics">
-                  <ul className="network-canvas-stats-list">
-                    {graphStats.map((entry) => (
-                      <li key={entry.label}>
-                        <span>{entry.label}</span>
-                        <strong>{entry.value}</strong>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              </div>
-            ) : null}
+            <NetworkCanvasFloatingInfoPanels
+              showNetworkInfoPanels={showNetworkInfoPanels}
+              handleZoomAction={handleZoomAction}
+              fitNetworkToContent={fitNetworkToContent}
+              onRegenerateLayout={onRegenerateLayout}
+              networkScalePercent={networkScalePercent}
+              subNetworkSummaries={subNetworkSummaries}
+              graphStats={graphStats}
+            />
             <svg
               ref={networkSvgRef}
               className={`network-svg network-canvas--label-stroke-${labelStrokeMode}`}
@@ -477,108 +432,17 @@ export function NetworkSummaryPanel({
             </svg>
           </div>
         )}
-        <ul className="network-legend">
-          <li>
-            <span className="legend-swatch connector" /> Connector node
-          </li>
-          <li>
-            <span className="legend-swatch splice" /> Splice node
-          </li>
-          <li>
-            <span className="legend-swatch intermediate" /> Intermediate node
-          </li>
-          <li>
-            <span className="legend-line selected" /> Selected segment
-          </li>
-          <li>
-            <span className="legend-line wire" /> Wire highlighted segment
-          </li>
-        </ul>
+        <NetworkSummaryLegend />
       </section>
-
-      <section className="panel route-preview-panel">
-        <h2>Route preview</h2>
-        <form className="row-form network-route-form route-preview-form">
-          <label className="route-preview-field">
-            <span className="route-preview-label">Start node</span>
-            <select value={routePreviewStartNodeId} onChange={(event) => setRoutePreviewStartNodeId(event.target.value)}>
-              <option value="">Select node</option>
-              {nodes.map((node) => (
-                <option key={node.id} value={node.id}>
-                  {describeNode(node)}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="route-preview-field">
-            <span className="route-preview-label">End node</span>
-            <select value={routePreviewEndNodeId} onChange={(event) => setRoutePreviewEndNodeId(event.target.value)}>
-              <option value="">Select node</option>
-              {nodes.map((node) => (
-                <option key={node.id} value={node.id}>
-                  {describeNode(node)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </form>
-
-        <div className="route-preview-selection-strip" aria-live="polite">
-          <article>
-            <span>Start</span>
-            <strong>{selectedStartNode === null ? "Select node" : describeNode(selectedStartNode)}</strong>
-          </article>
-          <span className="route-preview-selection-arrow" aria-hidden="true">
-            →
-          </span>
-          <article>
-            <span>End</span>
-            <strong>{selectedEndNode === null ? "Select node" : describeNode(selectedEndNode)}</strong>
-          </article>
-        </div>
-
-        {hasRouteSelection ? (
-          routePreview === null ? (
-            <p className="route-preview-empty">No route currently exists between the selected start and end nodes.</p>
-          ) : (
-            <div className="route-preview-results">
-              <div className="route-preview-status-line">
-                <span className="route-preview-status-chip">Route found</span>
-                <p>Shortest path computed from current selection.</p>
-              </div>
-              <div className="route-preview-metrics">
-                <article>
-                  <span>Length</span>
-                  <strong>{routePreview.totalLengthMm} mm</strong>
-                </article>
-                <article>
-                  <span>Segments</span>
-                  <strong>{routePreview.segmentIds.length}</strong>
-                </article>
-                <article>
-                  <span>Nodes</span>
-                  <strong>{routePreview.nodeIds.length}</strong>
-                </article>
-              </div>
-              <div className="route-preview-path-grid">
-                <article>
-                  <h4>Segments path</h4>
-                  <p className="route-preview-path">
-                    {routePreview.segmentIds.length === 0 ? "(none)" : routePreview.segmentIds.join(" -> ")}
-                  </p>
-                </article>
-                <article>
-                  <h4>Nodes path</h4>
-                  <p className="route-preview-path">{routePreview.nodeIds.join(" -> ")}</p>
-                </article>
-              </div>
-            </div>
-          )
-        ) : (
-          <p className="route-preview-empty">Select start and end nodes to preview shortest path routing.</p>
-        )}
-      </section>
+      <NetworkRoutePreviewPanel
+        nodes={nodes}
+        describeNode={describeNode}
+        routePreviewStartNodeId={routePreviewStartNodeId}
+        setRoutePreviewStartNodeId={setRoutePreviewStartNodeId}
+        routePreviewEndNodeId={routePreviewEndNodeId}
+        setRoutePreviewEndNodeId={setRoutePreviewEndNodeId}
+        routePreview={routePreview}
+      />
     </section>
   );
 }
