@@ -1,7 +1,7 @@
 ## req_020_app_shell_desktop_overlay_hardening_alignment_and_workspace_suspense_scoping - App Shell Desktop Overlay Hardening Alignment and Workspace Suspense Scoping
 > From version: 0.5.5
-> Understanding: 99%
-> Confidence: 97%
+> Understanding: 100%
+> Confidence: 98%
 > Complexity: Medium
 > Theme: Follow-up hardening for shell accessibility consistency and lazy-loading scoping
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -93,12 +93,49 @@ Related delivered context:
 - Replacing the lazy/eager registry approach introduced in wave-5.
 
 # Backlog
-- To create from this request (proposed):
+- Created and delivered from this request:
   - `item_119_app_shell_drawer_hardening_breakpoint_visibility_contract_alignment.md`
   - `item_120_workspace_suspense_active_screen_scoping_and_inactive_lazy_isolation.md`
   - `item_121_workspace_shell_regression_desktop_breakpoint_overlay_accessibility_coverage.md`
   - `item_122_shell_test_viewport_mutation_cleanup_guardrails.md`
   - `item_123_req_020_followup_hardening_closure_ci_e2e_build_pwa_and_ac_traceability.md`
+
+# Delivery summary
+- Drawer hardening / breakpoint contract alignment delivered:
+  - Removed viewport-gated drawer hardening and aligned hidden drawer semantics (`aria-hidden` / `inert`) with actual hidden state across breakpoints.
+  - Hidden drawer is no longer left focusable/AT-visible on desktop due to JS/CSS mismatch.
+  - File: `src/app/components/layout/AppShellLayout.tsx`
+- Workspace `Suspense` scoping delivered:
+  - Active workspace content is selected before rendering under `Suspense`, so inactive lazy screens no longer suspend the active workspace area.
+  - Shell-level resilience from `req_019` is preserved (no root-level full-shell blanking).
+  - Files: `src/app/components/layout/AppShellLayout.tsx`, `src/app/AppController.tsx`
+- Desktop/breakpoint shell regression coverage delivered:
+  - Added explicit desktop viewport drawer accessibility semantics coverage.
+  - Updated hidden-nav assertions to reflect the now-intentionally hidden/inert drawer state while preserving behavior checks.
+  - Files: `src/tests/app.ui.workspace-shell-regression.spec.tsx`, `src/tests/app.ui.navigation-canvas.spec.tsx`, `src/tests/app.ui.validation.spec.tsx`, `src/tests/app.ui.settings.spec.tsx`
+- Viewport mutation cleanup guardrails delivered:
+  - Introduced `withViewportWidth(...)` helper with `try/finally` restoration to prevent leaking `window.innerWidth` on test failures.
+  - File: `src/tests/app.ui.workspace-shell-regression.spec.tsx`
+- Test helper adaptation delivered:
+  - `switchScreen` / `switchSubScreen` now open the navigation menu when nav buttons are inaccessible and close it afterward to preserve test ergonomics under hidden drawer semantics.
+  - File: `src/tests/helpers/app-ui-test-utils.tsx`
+- Validation closure delivered:
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run test:ci`
+  - `npm run test:e2e`
+  - `npm run build`
+  - `npm run quality:pwa`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+
+# AC traceability
+- AC1: Satisfied by hidden drawer accessibility semantics applied whenever the drawer is visually hidden, across desktop and mobile breakpoints.
+- AC2: Satisfied by removing the JS viewport gating mismatch that previously left the hidden desktop drawer focusable/AT-visible.
+- AC3: Satisfied by active-screen-only workspace rendering before `Suspense`, preventing inactive lazy screens from suspending the active workspace area.
+- AC4: Satisfied by retaining workspace-scoped (not root-scoped) `Suspense`, preserving visible shell chrome during lazy loading.
+- AC5: Satisfied by desktop/breakpoint shell regression coverage and passing tests validating drawer hidden-state semantics.
+- AC6: Satisfied by robust viewport mutation cleanup (`withViewportWidth(...)` with guaranteed restoration) in shell regression tests.
+- AC7: Satisfied by full closure validation pipeline passing and documented in `task_019`.
 
 # References
 - `src/app/components/layout/AppShellLayout.tsx`
@@ -113,6 +150,8 @@ Related delivered context:
 - `src/app/styles/workspace/workspace-panels-and-responsive.css`
 - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
 - `src/tests/app.ui.inspector-shell.spec.tsx`
+- `src/tests/helpers/app-ui-test-utils.tsx`
 - `tests/e2e/smoke.spec.ts`
 - `logics/request/req_019_app_controller_post_wave_5_hardening_accessibility_loading_and_contract_clarity.md`
 - `logics/tasks/task_018_app_controller_post_wave_5_hardening_accessibility_loading_and_contract_clarity_orchestration_and_delivery_control.md`
+- `logics/tasks/task_019_app_shell_desktop_overlay_hardening_alignment_and_workspace_suspense_scoping_orchestration_and_delivery_control.md`
