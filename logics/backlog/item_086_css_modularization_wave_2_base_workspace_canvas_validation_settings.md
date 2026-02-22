@@ -2,7 +2,7 @@
 > From version: 0.5.0
 > Understanding: 97%
 > Confidence: 94%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: CSS Line-Budget Reduction and Styling Ownership
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -41,8 +41,16 @@ Several CSS files remain oversized and are currently tolerated through documente
 - References:
   - `logics/request/req_014_ui_modularization_wave_2_controller_analysis_canvas_and_bundle_optimization.md`
   - `src/app/styles/base.css`
+  - `src/app/styles/base/base-foundation.css`
+  - `src/app/styles/base/base-components.css`
+  - `src/app/styles/base/base-theme-overrides.css`
   - `src/app/styles/workspace.css`
+  - `src/app/styles/workspace/workspace-shell-and-nav.css`
+  - `src/app/styles/workspace/workspace-panels-and-responsive.css`
   - `src/app/styles/canvas.css`
+  - `src/app/styles/canvas/canvas-toolbar-and-shell.css`
+  - `src/app/styles/canvas/canvas-diagram-and-overlays.css`
   - `src/app/styles/validation-settings.css`
+  - `src/app/styles/validation-settings/validation-and-settings-layout.css`
+  - `src/app/styles/validation-settings/validation-and-settings-tables.css`
   - `scripts/quality/check-ui-modularization.mjs`
-

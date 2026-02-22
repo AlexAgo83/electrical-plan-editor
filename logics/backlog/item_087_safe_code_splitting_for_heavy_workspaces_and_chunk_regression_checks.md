@@ -2,7 +2,7 @@
 > From version: 0.5.0
 > Understanding: 96%
 > Confidence: 92%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Runtime Delivery Optimization
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -38,7 +38,11 @@ The app has a relatively large initial bundle and multiple heavyweight workspace
   - `logics/request/req_014_ui_modularization_wave_2_controller_analysis_canvas_and_bundle_optimization.md`
   - `src/app/App.tsx`
   - `src/app/AppController.tsx`
+  - `src/app/components/screens/AnalysisScreen.tsx`
+  - `src/app/components/screens/ModelingScreen.tsx`
+  - `src/app/components/screens/NetworkScopeScreen.tsx`
+  - `src/app/components/screens/SettingsScreen.tsx`
+  - `src/app/components/screens/ValidationScreen.tsx`
   - `vite.config.ts`
   - `package.json`
   - `src/app/pwa/registerServiceWorker.ts`
-

@@ -2,7 +2,7 @@
 > From version: 0.5.0
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Modeling Form Surface Decomposition
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -37,6 +37,13 @@
 - References:
   - `logics/request/req_014_ui_modularization_wave_2_controller_analysis_canvas_and_bundle_optimization.md`
   - `src/app/components/workspace/ModelingFormsColumn.tsx`
+  - `src/app/components/workspace/ModelingFormsColumn.types.ts`
+  - `src/app/components/workspace/ModelingFormsColumn.shared.tsx`
+  - `src/app/components/workspace/ModelingConnectorFormPanel.tsx`
+  - `src/app/components/workspace/ModelingSpliceFormPanel.tsx`
+  - `src/app/components/workspace/ModelingNodeFormPanel.tsx`
+  - `src/app/components/workspace/ModelingSegmentFormPanel.tsx`
+  - `src/app/components/workspace/ModelingWireFormPanel.tsx`
   - `src/app/components/workspace/ModelingPrimaryTables.tsx`
   - `src/app/components/workspace/ModelingSecondaryTables.tsx`
   - `src/app/hooks/useConnectorHandlers.ts`
@@ -44,4 +51,3 @@
   - `src/app/hooks/useNodeHandlers.ts`
   - `src/app/hooks/useSegmentHandlers.ts`
   - `src/app/hooks/useWireHandlers.ts`
-

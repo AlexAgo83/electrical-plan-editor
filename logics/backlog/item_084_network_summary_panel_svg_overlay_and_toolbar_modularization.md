@@ -2,7 +2,7 @@
 > From version: 0.5.0
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: 2D Canvas Surface Decomposition
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -37,8 +37,10 @@
 - References:
   - `logics/request/req_014_ui_modularization_wave_2_controller_analysis_canvas_and_bundle_optimization.md`
   - `src/app/components/NetworkSummaryPanel.tsx`
+  - `src/app/components/network-summary/NetworkCanvasFloatingInfoPanels.tsx`
+  - `src/app/components/network-summary/NetworkSummaryLegend.tsx`
+  - `src/app/components/network-summary/NetworkRoutePreviewPanel.tsx`
   - `src/app/styles/canvas.css`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
   - `src/tests/app.ui.inspector-shell.spec.tsx`
   - `tests/e2e/smoke.spec.ts`
-

@@ -1,8 +1,8 @@
 ## task_013_ui_modularization_wave_2_orchestration_and_delivery_control - UI Modularization Wave 2 Orchestration and Delivery Control
 > From version: 0.5.1
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 22%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: High
 > Theme: Refactor Wave Sequencing and Delivery Safety
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -22,14 +22,14 @@ Backlog scope covered:
 
 # Plan
 - [x] 1. Deliver Wave 0 utility foundation split: decompose `app-utils` and clean imports to reduce cross-cutting refactor friction (`item_082`)
-- [ ] 2. Deliver Wave 1 controller orchestration extraction: reduce `AppController` to composition-first shell (`item_081`)
-- [ ] 3. Deliver Wave 2 analysis workspace modularization: split connector/splice/wire analysis content by sub-screen (`item_083`)
-- [ ] 4. Deliver Wave 3 network summary modularization: split SVG/overlays/toolbar/floating panel concerns (`item_084`)
-- [ ] 5. Deliver Wave 4 modeling forms modularization: extract per-entity form panels and shared scaffolding (`item_085`)
-- [ ] 6. Deliver Wave 5 CSS modularization wave 2: reduce oversized style concentration and update exception documentation (`item_086`)
-- [ ] 7. Deliver Wave 6 runtime delivery optimization: add safe code-splitting and validate chunk/PWA/static-host compatibility (`item_087`)
-- [ ] 8. Deliver Wave 7 closure: full UI/CI regression pass, E2E alignment, AC traceability, and exception cleanup (`item_088`)
-- [ ] FINAL: Update related Logics docs
+- [x] 2. Deliver Wave 1 controller orchestration extraction: reduce `AppController` to composition-first shell (`item_081`)
+- [x] 3. Deliver Wave 2 analysis workspace modularization: split connector/splice/wire analysis content by sub-screen (`item_083`)
+- [x] 4. Deliver Wave 3 network summary modularization: split SVG/overlays/toolbar/floating panel concerns (`item_084`)
+- [x] 5. Deliver Wave 4 modeling forms modularization: extract per-entity form panels and shared scaffolding (`item_085`)
+- [x] 6. Deliver Wave 5 CSS modularization wave 2: reduce oversized style concentration and update exception documentation (`item_086`)
+- [x] 7. Deliver Wave 6 runtime delivery optimization: add safe code-splitting and validate chunk/PWA/static-host compatibility (`item_087`)
+- [x] 8. Deliver Wave 7 closure: full UI/CI regression pass, E2E alignment, AC traceability, and exception cleanup (`item_088`)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - Documentation / Logics:
@@ -54,16 +54,16 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 completed: split `app-utils` into `app-utils-shared` (generic constants/sort/parsing helpers), `app-utils-networking` (occupancy/endpoint/route helpers), and `app-utils-layout` (canvas/layout generation + conflict scoring), migrated app imports to domain modules, and reduced `app-utils.ts` to a compatibility façade.
-  - Wave 1 in progress: extracted `useNetworkEntityCountsById` from `AppController` as a first orchestration slice, replacing an inline `useMemo` block while preserving data flow and behavior.
-  - Wave 2 planned: separate analysis connector/splice/wire UI modules and keep list-first + network-summary layout stable.
-  - Wave 3 planned: decompose `NetworkSummaryPanel` into render layers/overlays/toolbar units without changing 2D interaction behavior.
-  - Wave 4 planned: extract per-entity modeling form panels and shared `idle/create/edit` scaffolding.
-  - Wave 5 planned: reduce CSS line concentration and progressively retire or re-document oversize exceptions.
-  - Wave 6 planned: introduce safe lazy-loading on heavyweight surfaces with static/PWA compatibility checks.
-  - Wave 7 planned: run full regression/CI closure, align tests, and validate AC1..AC9 for `req_014`.
+  - Wave 0 completed: split `app-utils` into `app-utils-shared`, `app-utils-networking`, and `app-utils-layout`, migrated imports, and reduced `app-utils.ts` to a thin compatibility façade.
+  - Wave 1 completed: extracted `useNetworkEntityCountsById`, `useEntityRelationshipMaps`, `useNodeDescriptions`, and `useWorkspaceShellChrome` from `AppController`, reducing the controller from ~2208 to ~1965 lines while preserving shell/navigation/PWA behavior.
+  - Wave 2 completed: split analysis workspace connector/splice/wire panels into dedicated modules and reduced `AnalysisWorkspaceContent.tsx` to a lightweight composition shell.
+  - Wave 3 completed: extracted network summary floating info panels, legend, and route preview subcomponents; reduced `NetworkSummaryPanel.tsx` and preserved 2D behaviors.
+  - Wave 4 completed: extracted per-entity modeling form panels plus shared form scaffolding; reduced `ModelingFormsColumn.tsx` to composition routing.
+  - Wave 5 completed: modularized `base/workspace/canvas/validation-settings` CSS into scoped imported partials and validated build parity after boundary-safe CSS splits.
+  - Wave 6 completed: introduced lazy-loaded screen/workspace surfaces in `AppController` with test-safe eager fallback branch (`import.meta.env.VITEST`) and verified code-split chunks + PWA/static build output.
+  - Wave 7 completed: aligned Playwright smoke drawer-close helper with current shell behavior, removed stale UI modularization oversize exceptions, and passed full validation pipeline.
 - Current blockers:
-  - None at orchestration kickoff.
+  - None.
 - Main risks to track:
   - Behavior drift during controller extraction due to hidden sequencing dependencies between effects/handlers.
   - Regression in 2D network interactions when splitting `NetworkSummaryPanel` SVG layers and overlays.
@@ -90,3 +90,16 @@ Backlog scope covered:
 - Validation snapshot (Wave 1 partial):
   - `npm run lint -- src/app/AppController.tsx src/app/hooks/useNetworkEntityCountsById.ts` OK
   - `npm run typecheck` OK
+- Validation snapshot (Wave 1+ shell extraction):
+  - `npm run lint -- src/app/AppController.tsx src/app/hooks/useWorkspaceShellChrome.ts` OK
+  - `npm run test:ci -- src/tests/app.ui.workspace-shell-regression.spec.tsx src/tests/pwa.header-actions.spec.tsx` OK
+- Validation snapshot (Final closure):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
+  - `npm run lint` OK
+  - `npm run typecheck` OK
+  - `npm run quality:ui-modularization` OK (stale oversize exceptions removed)
+  - `npm run quality:store-modularization` OK
+  - `npm run test:ci` OK (26 files / 134 tests)
+  - `npm run build` OK (lazy chunks generated for screens/workspaces)
+  - `npm run test:e2e` OK (2/2)
+  - `npm run quality:pwa` OK

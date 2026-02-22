@@ -2,7 +2,7 @@
 > From version: 0.5.0
 > Understanding: 99%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Analysis Workspace Modularization
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -37,8 +37,11 @@
 - References:
   - `logics/request/req_014_ui_modularization_wave_2_controller_analysis_canvas_and_bundle_optimization.md`
   - `src/app/components/workspace/AnalysisWorkspaceContent.tsx`
+  - `src/app/components/workspace/AnalysisWorkspaceContent.types.ts`
+  - `src/app/components/workspace/AnalysisConnectorWorkspacePanels.tsx`
+  - `src/app/components/workspace/AnalysisSpliceWorkspacePanels.tsx`
+  - `src/app/components/workspace/AnalysisWireWorkspacePanels.tsx`
   - `src/app/components/workspace/ModelingPrimaryTables.tsx`
   - `src/app/components/workspace/ModelingSecondaryTables.tsx`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
   - `tests/e2e/smoke.spec.ts`
-
