@@ -58,6 +58,32 @@
   align-self: start;
 }
 
+.validation-summary-panel .summary-grid {
+  gap: 0.45rem;
+}
+
+.validation-summary-panel .summary-grid article {
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.55rem;
+  min-height: 0;
+}
+
+.validation-summary-panel .summary-grid h3 {
+  margin: 0 0 0.08rem;
+  font-size: 0.78rem;
+  line-height: 1.15;
+}
+
+.validation-summary-panel .summary-grid p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.05;
+}
+
+.validation-summary-panel .validation-active-filter {
+  margin-top: 0.45rem;
+}
+
 .validation-row-go-to-button {
   border: 1px solid #7a99b3;
   background: #e8f1f8;

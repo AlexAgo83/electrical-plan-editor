@@ -301,11 +301,13 @@
 
 .workspace-ops-backdrop {
   position: fixed;
-  inset: var(--workspace-header-offset) 0 0 0;
+  inset: 0;
   border: 0;
   margin: 0;
   padding: 0;
-  background: rgba(10, 27, 43, 0.24);
+  background: rgba(10, 27, 43, 0.44);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
   opacity: 0;
   pointer-events: none;
   z-index: 52;
@@ -319,28 +321,32 @@
 
 .workspace-ops-panel {
   position: fixed;
-  top: var(--workspace-header-offset);
-  right: 1rem;
-  width: min(470px, calc(100vw - 2rem));
-  transform: translateY(-6px);
-  opacity: 0;
+  inset: var(--workspace-header-offset) 0 0 auto;
+  width: min(470px, 88vw);
+  transform: translateX(108%);
   pointer-events: none;
   z-index: 53;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: transform 0.2s ease;
+  padding: 1rem;
 }
 
 .workspace-ops-panel.is-open {
-  transform: translateY(0);
-  opacity: 1;
+  transform: translateX(0);
   pointer-events: auto;
 }
 
 .workspace-ops-content {
   display: grid;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.88);
-  -webkit-backdrop-filter: blur(9px);
-  backdrop-filter: blur(9px);
+  background: #ffffff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.workspace-ops-panel .workspace-ops-content {
+  max-height: calc(100vh - var(--workspace-header-offset) - 1rem);
+  overflow: auto;
+  scrollbar-gutter: stable;
 }
 
 .workspace-inspector-panel {

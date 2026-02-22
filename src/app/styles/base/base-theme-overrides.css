@@ -2696,6 +2696,40 @@
   color: #ffc98d;
 }
 
+/* Ops drawer is now a side panel like navigation drawer: keep it opaque per theme */
+
+.app-shell.theme-slate-neon .workspace-ops-content.panel {
+  background: #10303f;
+}
+
+.app-shell.theme-paper-blueprint .workspace-ops-content.panel {
+  background: #f6fbff;
+}
+
+.app-shell.theme-warm-brown .workspace-ops-content.panel {
+  background: #fcf4ec;
+}
+
+.app-shell.theme-deep-green .workspace-ops-content.panel {
+  background: #112d23;
+}
+
+.app-shell.theme-rose-quartz .workspace-ops-content.panel {
+  background: #fff6fb;
+}
+
+.app-shell.theme-lavender-haze .workspace-ops-content.panel {
+  background: #f8f7ff;
+}
+
+.app-shell.theme-burgundy-noir .workspace-ops-content.panel {
+  background: #2c0f1a;
+}
+
+.app-shell.theme-amber-night .workspace-ops-content.panel {
+  background: #2a200a;
+}
+
 /* Coverage parity for new themes: forms, settings fieldsets, panel meta copy, action toggles */
 
 .app-shell.theme-rose-quartz .error-banner button,

@@ -365,6 +365,21 @@
   font-size: 0.84rem;
 }
 
+.row-actions.workspace-health-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 0.45rem;
+  margin-top: 0.15rem;
+}
+
+.row-actions.workspace-health-actions > button {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.35rem;
+  padding: 0.4rem 0.7rem;
+}
+
 .row-actions {
   display: flex;
   flex-wrap: wrap;
@@ -388,6 +403,16 @@
 .row-actions button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.workspace-ops-content .row-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.1;
+  min-height: 2.15rem;
+  padding: 0.38rem 0.7rem;
 }
 
 .meta-line {

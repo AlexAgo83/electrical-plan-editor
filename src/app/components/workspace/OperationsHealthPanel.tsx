@@ -73,15 +73,15 @@ export function OperationsHealthPanel({
             Current issue: <strong>[{currentValidationIssue.severity.toUpperCase()}] {currentValidationIssue.category}</strong>
           </p>
         ) : null}
-        <div className="row-actions compact">
+        <div className="row-actions compact workspace-health-actions">
           <button type="button" onClick={() => handleOpenValidationScreen("all")}>
-            Open validation
+            Open
           </button>
           <button type="button" onClick={() => moveValidationIssueCursor(-1)} disabled={orderedValidationIssues.length === 0}>
-            Previous issue
+            Previous
           </button>
           <button type="button" onClick={() => moveValidationIssueCursor(1)} disabled={orderedValidationIssues.length === 0}>
-            Next issue
+            Next
           </button>
         </div>
       </section>
