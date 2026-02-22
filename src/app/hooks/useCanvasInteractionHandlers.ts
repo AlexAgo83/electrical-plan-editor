@@ -1,9 +1,9 @@
 import type { Dispatch, MouseEvent as ReactMouseEvent, MutableRefObject, SetStateAction, WheelEvent as ReactWheelEvent } from "react";
-import type { Connector, NetworkNode, NodeId, Segment, SegmentId, Splice, WireEndpoint, WireId } from "../../core/entities";
+import type { Connector, NetworkNode, NodeId, Segment, SegmentId, Splice } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE, NETWORK_VIEW_HEIGHT, NETWORK_VIEW_WIDTH, clamp, snapToGrid } from "../lib/app-utils-shared";
-import type { NodePosition, SubScreenId } from "../types/app-controller";
+import type { InteractionMode, NodePosition, SubScreenId } from "../types/app-controller";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -15,31 +15,11 @@ type DispatchAction = (
 interface UseCanvasInteractionHandlersParams {
   state: ReturnType<AppStore["getState"]>;
   nodesCount: number;
-  interactionMode: "select" | "addNode" | "addSegment" | "connect" | "route";
-  modeAnchorNodeId: NodeId | null;
-  setModeAnchorNodeId: (value: NodeId | null) => void;
+  interactionMode: InteractionMode;
   isModelingScreen: boolean;
   activeSubScreen: SubScreenId;
   setActiveScreen: (screen: "networkScope" | "modeling" | "analysis" | "validation" | "settings") => void;
   setActiveSubScreen: (screen: SubScreenId) => void;
-  setSegmentFormMode: (mode: "create" | "edit") => void;
-  setEditingSegmentId: (id: SegmentId | null) => void;
-  setSegmentFormError: (value: string | null) => void;
-  setSegmentNodeA: (value: string) => void;
-  setSegmentNodeB: (value: string) => void;
-  setRoutePreviewStartNodeId: (value: string) => void;
-  routePreviewStartNodeId: string;
-  setRoutePreviewEndNodeId: (value: string) => void;
-  routePreviewEndNodeId: string;
-  setWireFormMode: (mode: "create" | "edit") => void;
-  setEditingWireId: (id: WireId | null) => void;
-  setWireFormError: (value: string | null) => void;
-  setWireEndpointAKind: (value: WireEndpoint["kind"]) => void;
-  setWireEndpointAConnectorId: (value: string) => void;
-  setWireEndpointASpliceId: (value: string) => void;
-  setWireEndpointBKind: (value: WireEndpoint["kind"]) => void;
-  setWireEndpointBConnectorId: (value: string) => void;
-  setWireEndpointBSpliceId: (value: string) => void;
   setNodeFormMode: (mode: "create" | "edit") => void;
   setEditingNodeId: (id: NodeId | null) => void;
   setNodeKind: (kind: NetworkNode["kind"]) => void;
@@ -81,30 +61,10 @@ export function useCanvasInteractionHandlers({
   state,
   nodesCount,
   interactionMode,
-  modeAnchorNodeId,
-  setModeAnchorNodeId,
   isModelingScreen,
   activeSubScreen,
   setActiveScreen,
   setActiveSubScreen,
-  setSegmentFormMode,
-  setEditingSegmentId,
-  setSegmentFormError,
-  setSegmentNodeA,
-  setSegmentNodeB,
-  setRoutePreviewStartNodeId,
-  routePreviewStartNodeId,
-  setRoutePreviewEndNodeId,
-  routePreviewEndNodeId,
-  setWireFormMode,
-  setEditingWireId,
-  setWireFormError,
-  setWireEndpointAKind,
-  setWireEndpointAConnectorId,
-  setWireEndpointASpliceId,
-  setWireEndpointBKind,
-  setWireEndpointBConnectorId,
-  setWireEndpointBSpliceId,
   setNodeFormMode,
   setEditingNodeId,
   setNodeKind,
@@ -133,33 +93,6 @@ export function useCanvasInteractionHandlers({
   startNodeEdit,
   startSegmentEdit
 }: UseCanvasInteractionHandlersParams) {
-  function applyNodeToWireEndpoint(side: "A" | "B", node: NetworkNode): boolean {
-    if (node.kind === "intermediate") {
-      setWireFormError("Connect mode only supports connector/splice nodes as wire endpoints.");
-      return false;
-    }
-
-    if (side === "A") {
-      if (node.kind === "connector") {
-        setWireEndpointAKind("connectorCavity");
-        setWireEndpointAConnectorId(node.connectorId);
-      } else {
-        setWireEndpointAKind("splicePort");
-        setWireEndpointASpliceId(node.spliceId);
-      }
-      return true;
-    }
-
-    if (node.kind === "connector") {
-      setWireEndpointBKind("connectorCavity");
-      setWireEndpointBConnectorId(node.connectorId);
-    } else {
-      setWireEndpointBKind("splicePort");
-      setWireEndpointBSpliceId(node.spliceId);
-    }
-    return true;
-  }
-
   function handleNetworkSegmentClick(segmentId: SegmentId): void {
     if (interactionMode !== "select") {
       return;
@@ -177,110 +110,50 @@ export function useCanvasInteractionHandlers({
     dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
   }
 
-  function handleNetworkNodeClick(nodeId: NodeId): void {
+  function handleNetworkNodeActivate(nodeId: NodeId): void {
+    if (interactionMode !== "select") {
+      return;
+    }
+
     const node = state.nodes.byId[nodeId];
     if (node === undefined) {
       return;
     }
 
-    if (interactionMode === "select") {
-      if (isModelingScreen) {
-        if (activeSubScreen === "connector" && node.kind === "connector") {
-          const connector = state.connectors.byId[node.connectorId];
-          if (connector !== undefined) {
-            startConnectorEdit(connector);
-            return;
-          }
-        }
-
-        if (activeSubScreen === "splice" && node.kind === "splice") {
-          const splice = state.splices.byId[node.spliceId];
-          if (splice !== undefined) {
-            startSpliceEdit(splice);
-            return;
-          }
-        }
-
-        if (activeSubScreen === "node") {
-          startNodeEdit(node);
+    if (isModelingScreen) {
+      if (activeSubScreen === "connector" && node.kind === "connector") {
+        const connector = state.connectors.byId[node.connectorId];
+        if (connector !== undefined) {
+          startConnectorEdit(connector);
           return;
         }
-      }
-
-      if (activeSubScreen === "connector" && node.kind === "connector") {
-        dispatchAction(appActions.select({ kind: "connector", id: node.connectorId }));
-        return;
       }
 
       if (activeSubScreen === "splice" && node.kind === "splice") {
-        dispatchAction(appActions.select({ kind: "splice", id: node.spliceId }));
-        return;
-      }
-
-      dispatchAction(appActions.select({ kind: "node", id: nodeId }));
-      return;
-    }
-
-    if (interactionMode === "addSegment") {
-      setSegmentFormMode("create");
-      setEditingSegmentId(null);
-      setSegmentFormError(null);
-      if (modeAnchorNodeId === null) {
-        setModeAnchorNodeId(nodeId);
-        setSegmentNodeA(nodeId);
-        setSegmentNodeB("");
-        return;
-      }
-
-      if (modeAnchorNodeId === nodeId) {
-        setModeAnchorNodeId(null);
-        setSegmentNodeB("");
-        return;
-      }
-
-      setSegmentNodeA(modeAnchorNodeId);
-      setSegmentNodeB(nodeId);
-      setModeAnchorNodeId(null);
-      return;
-    }
-
-    if (interactionMode === "route") {
-      if (routePreviewStartNodeId.length === 0 || routePreviewEndNodeId.length > 0) {
-        setRoutePreviewStartNodeId(nodeId);
-        setRoutePreviewEndNodeId("");
-      } else {
-        setRoutePreviewEndNodeId(nodeId);
-      }
-      return;
-    }
-
-    if (interactionMode === "connect") {
-      setWireFormMode("create");
-      setEditingWireId(null);
-
-      if (modeAnchorNodeId === null) {
-        if (!applyNodeToWireEndpoint("A", node)) {
+        const splice = state.splices.byId[node.spliceId];
+        if (splice !== undefined) {
+          startSpliceEdit(splice);
           return;
         }
-
-        setWireFormError(null);
-        setModeAnchorNodeId(nodeId);
-        return;
       }
 
-      if (modeAnchorNodeId === nodeId) {
-        setWireFormError("Connect mode expects two distinct endpoint nodes.");
+      if (activeSubScreen === "node") {
+        startNodeEdit(node);
         return;
       }
+    }
 
-      if (!applyNodeToWireEndpoint("B", node)) {
-        return;
-      }
-
-      setModeAnchorNodeId(null);
-      setWireFormError(null);
+    if (activeSubScreen === "connector" && node.kind === "connector") {
+      dispatchAction(appActions.select({ kind: "connector", id: node.connectorId }));
       return;
     }
+
+    if (activeSubScreen === "splice" && node.kind === "splice") {
+      dispatchAction(appActions.select({ kind: "splice", id: node.spliceId }));
+      return;
+    }
+
+    dispatchAction(appActions.select({ kind: "node", id: nodeId }));
   }
 
   function handleNetworkCanvasClick(event: ReactMouseEvent<SVGSVGElement>): void {
@@ -350,7 +223,7 @@ export function useCanvasInteractionHandlers({
     }
     event.preventDefault();
     setDraggingNodeId(nodeId);
-    handleNetworkNodeClick(nodeId);
+    handleNetworkNodeActivate(nodeId);
   }
 
   function handleNetworkCanvasMouseDown(event: ReactMouseEvent<SVGSVGElement>): void {
@@ -446,7 +319,7 @@ export function useCanvasInteractionHandlers({
 
   return {
     handleNetworkSegmentClick,
-    handleNetworkNodeClick,
+    handleNetworkNodeActivate,
     handleNetworkCanvasClick,
     handleNetworkNodeMouseDown,
     handleNetworkCanvasMouseDown,

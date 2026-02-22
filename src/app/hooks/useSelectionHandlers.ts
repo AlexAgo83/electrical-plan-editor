@@ -4,6 +4,7 @@ import { appActions } from "../../store";
 import { NETWORK_VIEW_HEIGHT, NETWORK_VIEW_WIDTH } from "../lib/app-utils-shared";
 import { resolveEndpointNodeId } from "../lib/app-utils-networking";
 import type {
+  InteractionMode,
   NodePosition,
   SelectionTarget,
   SubScreenId,
@@ -30,7 +31,7 @@ interface UseSelectionHandlersParams {
   networkNodePositions: Record<NodeId, NodePosition>;
   connectorNodeByConnectorId: Map<ConnectorId, NodeId>;
   spliceNodeBySpliceId: Map<SpliceId, NodeId>;
-  setInteractionMode: (mode: "select" | "addNode" | "addSegment" | "connect" | "route") => void;
+  setInteractionMode: (mode: InteractionMode) => void;
   networkScale: number;
   setNetworkScale: (value: number) => void;
   setNetworkOffset: (value: NodePosition) => void;

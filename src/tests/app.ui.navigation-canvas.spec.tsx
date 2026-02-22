@@ -161,6 +161,21 @@ describe("App integration UI - navigation and canvas", () => {
     dispatchSpy.mockRestore();
   });
 
+  it("supports keyboard activation for 2D connector node selection in modeling", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    expect(connectorNode).not.toBeNull();
+    expect(connectorNode).toHaveAttribute("role", "button");
+    expect(connectorNode).toHaveAttribute("tabindex", "0");
+    expect(connectorNode).not.toHaveClass("is-selected");
+
+    fireEvent.keyDown(connectorNode as Element, { key: "Enter" });
+    expect(connectorNode).toHaveClass("is-selected");
+  });
+
   it("ignores non-primary mouse buttons for 2D node drag selection and shift-pan starts", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");

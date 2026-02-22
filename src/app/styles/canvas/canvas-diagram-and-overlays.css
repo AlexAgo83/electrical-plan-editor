@@ -247,6 +247,16 @@
   stroke-width: 3;
 }
 
+.network-node:focus-visible {
+  outline: none;
+}
+
+.network-node:focus-visible .network-node-shape {
+  stroke: #0b4f86;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 0.2rem rgba(15, 108, 184, 0.45));
+}
+
 .network-node-label {
   font-size: 9px;
   fill: #183549;

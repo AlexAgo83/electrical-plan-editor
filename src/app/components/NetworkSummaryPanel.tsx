@@ -1,4 +1,11 @@
-import { useCallback, useRef, type MouseEvent as ReactMouseEvent, type ReactElement, type WheelEvent as ReactWheelEvent } from "react";
+import {
+  useCallback,
+  useRef,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+  type ReactElement,
+  type WheelEvent as ReactWheelEvent
+} from "react";
 import type {
   Connector,
   ConnectorId,
@@ -103,6 +110,7 @@ export interface NetworkSummaryPanelProps {
   selectedConnectorId: ConnectorId | null;
   selectedSpliceId: SpliceId | null;
   handleNetworkNodeMouseDown: (event: ReactMouseEvent<SVGGElement>, nodeId: NodeId) => void;
+  handleNetworkNodeActivate: (nodeId: NodeId) => void;
   connectorMap: Map<ConnectorId, Connector>;
   spliceMap: Map<SpliceId, Splice>;
   describeNode: (node: NetworkNode) => string;
@@ -152,6 +160,7 @@ export function NetworkSummaryPanel({
   selectedConnectorId,
   selectedSpliceId,
   handleNetworkNodeMouseDown,
+  handleNetworkNodeActivate,
   connectorMap,
   spliceMap,
   describeNode,
@@ -242,6 +251,16 @@ export function NetworkSummaryPanel({
     };
     image.src = svgUrl;
   }, []);
+
+  function handleNetworkNodeKeyDown(event: ReactKeyboardEvent<SVGGElement>, nodeId: NodeId): void {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    handleNetworkNodeActivate(nodeId);
+  }
 
   return (
     <section className="network-summary-stack">
@@ -407,7 +426,12 @@ export function NetworkSummaryPanel({
                     <g
                       key={node.id}
                       className={nodeClassName}
+                      role="button"
+                      tabIndex={0}
+                      focusable="true"
+                      aria-label={`Select ${describeNode(node)}`}
                       onMouseDown={(event) => handleNetworkNodeMouseDown(event, node.id)}
+                      onKeyDown={(event) => handleNetworkNodeKeyDown(event, node.id)}
                       onClick={(event) => {
                         // Selection/editing is handled on mouse-down to support immediate drag interactions.
                         // Keep click from bubbling to future parent click handlers.

@@ -4,7 +4,6 @@ import type { InteractionMode, NodePosition } from "../types/app-controller";
 
 export function useCanvasState() {
   const [interactionMode, setInteractionMode] = useState<InteractionMode>("select");
-  const [modeAnchorNodeId, setModeAnchorNodeId] = useState<NodeId | null>(null);
   const [pendingNewNodePosition, setPendingNewNodePosition] = useState<NodePosition | null>(null);
   const [manualNodePositions, setManualNodePositions] = useState<Record<NodeId, NodePosition>>({} as Record<NodeId, NodePosition>);
   const [draggingNodeId, setDraggingNodeId] = useState<NodeId | null>(null);
@@ -17,8 +16,6 @@ export function useCanvasState() {
   return {
     interactionMode,
     setInteractionMode,
-    modeAnchorNodeId,
-    setModeAnchorNodeId,
     pendingNewNodePosition,
     setPendingNewNodePosition,
     manualNodePositions,

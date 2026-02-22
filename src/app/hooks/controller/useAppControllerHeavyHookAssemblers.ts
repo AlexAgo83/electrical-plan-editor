@@ -157,32 +157,10 @@ interface UseAppControllerCanvasInteractionHandlersAssemblyParams {
     | "state"
     | "nodesCount"
     | "interactionMode"
-    | "modeAnchorNodeId"
-    | "setModeAnchorNodeId"
     | "isModelingScreen"
     | "activeSubScreen"
     | "setActiveScreen"
     | "setActiveSubScreen"
-  >;
-  segmentForm: Pick<
-    CanvasInteractionHandlersParams,
-    "setSegmentFormMode" | "setEditingSegmentId" | "setSegmentFormError" | "setSegmentNodeA" | "setSegmentNodeB"
-  >;
-  routePreview: Pick<
-    CanvasInteractionHandlersParams,
-    "setRoutePreviewStartNodeId" | "routePreviewStartNodeId" | "setRoutePreviewEndNodeId" | "routePreviewEndNodeId"
-  >;
-  wireForm: Pick<
-    CanvasInteractionHandlersParams,
-    | "setWireFormMode"
-    | "setEditingWireId"
-    | "setWireFormError"
-    | "setWireEndpointAKind"
-    | "setWireEndpointAConnectorId"
-    | "setWireEndpointASpliceId"
-    | "setWireEndpointBKind"
-    | "setWireEndpointBConnectorId"
-    | "setWireEndpointBSpliceId"
   >;
   nodeForm: Pick<
     CanvasInteractionHandlersParams,
@@ -224,18 +202,12 @@ interface UseAppControllerCanvasInteractionHandlersAssemblyParams {
 
 export function useAppControllerCanvasInteractionHandlersAssembly({
   core,
-  segmentForm,
-  routePreview,
-  wireForm,
   nodeForm,
   viewport,
   actions
 }: UseAppControllerCanvasInteractionHandlersAssemblyParams) {
   return useCanvasInteractionHandlers({
     ...core,
-    ...segmentForm,
-    ...routePreview,
-    ...wireForm,
     ...nodeForm,
     ...viewport,
     ...actions

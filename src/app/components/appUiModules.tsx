@@ -140,7 +140,12 @@ export function setAppUiModulesEagerRegistryForTests(registry: AppUiModulesRegis
   eagerRegistryForTests = registry;
 }
 
-export function resetAppUiModulesTestControls(): void {
+export function resetAppUiModulesNonRegistryTestControls(): void {
   appUiModulesLoadingModeForTests = "auto";
   appUiModulesLazyImportDelayMsForTests = 0;
+}
+
+// Backward-compatible alias: only resets mode/delay knobs. The eager registry is managed separately in test setup.
+export function resetAppUiModulesTestControls(): void {
+  resetAppUiModulesNonRegistryTestControls();
 }

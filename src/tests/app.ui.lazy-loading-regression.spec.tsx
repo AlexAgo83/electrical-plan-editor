@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
-  resetAppUiModulesTestControls,
+  resetAppUiModulesNonRegistryTestControls,
   setAppUiModulesLazyImportDelayForTests,
   setAppUiModulesLoadingModeForTests
 } from "../app/components/appUiModules";
@@ -14,11 +14,11 @@ import {
 describe("App integration UI - lazy loading regression coverage", () => {
   beforeEach(() => {
     localStorage.clear();
-    resetAppUiModulesTestControls();
+    resetAppUiModulesNonRegistryTestControls();
   });
 
   afterEach(() => {
-    resetAppUiModulesTestControls();
+    resetAppUiModulesNonRegistryTestControls();
   });
 
   it("keeps shell chrome visible while initial workspace lazy modules load", async () => {

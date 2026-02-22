@@ -8,8 +8,6 @@ export function buildAppControllerNamespacedCanvasState(canvas: AppControllerCan
     interaction: {
       interactionMode: canvas.interactionMode,
       setInteractionMode: canvas.setInteractionMode,
-      modeAnchorNodeId: canvas.modeAnchorNodeId,
-      setModeAnchorNodeId: canvas.setModeAnchorNodeId,
       pendingNewNodePosition: canvas.pendingNewNodePosition,
       setPendingNewNodePosition: canvas.setPendingNewNodePosition
     },

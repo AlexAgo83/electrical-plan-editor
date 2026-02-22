@@ -37,7 +37,8 @@ export interface SpliceSynthesisRow {
 }
 
 export type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
-export type InteractionMode = "select" | "addNode" | "addSegment" | "connect" | "route";
+// Product-supported canvas interaction modes (legacy addSegment/connect/route flows removed from UI).
+export type InteractionMode = "select" | "addNode";
 export type TableDensity = "comfortable" | "compact";
 export type TableFontSize = "small" | "normal" | "large";
 export type CanvasLabelStrokeMode = "none" | "light" | "normal";

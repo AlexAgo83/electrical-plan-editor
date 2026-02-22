@@ -3,14 +3,14 @@ import { cleanup } from "@testing-library/react";
 import { afterEach } from "vitest";
 import { appUiModulesEager } from "../app/components/appUiModules.eager";
 import {
-  resetAppUiModulesTestControls,
+  resetAppUiModulesNonRegistryTestControls,
   setAppUiModulesEagerRegistryForTests
 } from "../app/components/appUiModules";
 
 setAppUiModulesEagerRegistryForTests(appUiModulesEager);
 
 afterEach(() => {
-  resetAppUiModulesTestControls();
+  resetAppUiModulesNonRegistryTestControls();
   setAppUiModulesEagerRegistryForTests(appUiModulesEager);
   cleanup();
 });

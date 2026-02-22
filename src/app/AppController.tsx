@@ -156,8 +156,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const {
     interactionMode,
     setInteractionMode,
-    modeAnchorNodeId,
-    setModeAnchorNodeId,
     pendingNewNodePosition,
     setPendingNewNodePosition,
     manualNodePositions,
@@ -383,11 +381,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   }, [nodes, setManualNodePositions]);
 
   useEffect(() => {
-    setModeAnchorNodeId(null);
     if (interactionMode !== "addNode") {
       setPendingNewNodePosition(null);
     }
-  }, [interactionMode, setModeAnchorNodeId, setPendingNewNodePosition]);
+  }, [interactionMode, setPendingNewNodePosition]);
 
   useEffect(() => {
     setWireForcedRouteInput(selectedWireRouteInputValue);
@@ -568,11 +565,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     store,
     historyLimit: HISTORY_LIMIT,
     onUndoRedoApplied: () => {
-      setModeAnchorNodeId(null);
       setPendingNewNodePosition(null);
     },
     onReplaceStateApplied: () => {
-      setModeAnchorNodeId(null);
       setPendingNewNodePosition(null);
       setActiveScreen("modeling");
       setActiveSubScreen("connector");
@@ -937,6 +932,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const {
     handleNetworkSegmentClick,
+    handleNetworkNodeActivate,
     handleNetworkCanvasClick,
     handleNetworkNodeMouseDown,
     handleNetworkCanvasMouseDown,
@@ -949,36 +945,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       state,
       nodesCount: nodes.length,
       interactionMode,
-      modeAnchorNodeId,
-      setModeAnchorNodeId,
       isModelingScreen,
       activeSubScreen,
       setActiveScreen,
       setActiveSubScreen
-    },
-    segmentForm: {
-      setSegmentFormMode: formsState.setSegmentFormMode,
-      setEditingSegmentId: formsState.setEditingSegmentId,
-      setSegmentFormError: formsState.setSegmentFormError,
-      setSegmentNodeA: formsState.setSegmentNodeA,
-      setSegmentNodeB: formsState.setSegmentNodeB
-    },
-    routePreview: {
-      setRoutePreviewStartNodeId,
-      routePreviewStartNodeId,
-      setRoutePreviewEndNodeId,
-      routePreviewEndNodeId
-    },
-    wireForm: {
-      setWireFormMode: formsState.setWireFormMode,
-      setEditingWireId: formsState.setEditingWireId,
-      setWireFormError: formsState.setWireFormError,
-      setWireEndpointAKind: formsState.setWireEndpointAKind,
-      setWireEndpointAConnectorId: formsState.setWireEndpointAConnectorId,
-      setWireEndpointASpliceId: formsState.setWireEndpointASpliceId,
-      setWireEndpointBKind: formsState.setWireEndpointBKind,
-      setWireEndpointBConnectorId: formsState.setWireEndpointBConnectorId,
-      setWireEndpointBSpliceId: formsState.setWireEndpointBSpliceId
     },
     nodeForm: {
       setNodeFormMode: formsState.setNodeFormMode,
@@ -1102,6 +1072,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         selectedConnectorId,
         selectedSpliceId,
         handleNetworkNodeMouseDown,
+        handleNetworkNodeActivate,
         connectorMap,
         spliceMap,
         describeNode,

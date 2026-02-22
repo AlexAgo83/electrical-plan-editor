@@ -217,9 +217,11 @@ describe("2D layout generation", () => {
       gridStep: 20
     });
     const elapsedMs = performance.now() - start;
-    // Coverage instrumentation and parallel test load can add significant wall-clock variance.
-    // Keep a pragmatic guardrail that still catches major regressions without flaking on busy runs.
-    const performanceBudgetMs = 8_000;
+    const configuredBudgetOverride = Number(process.env.LAYOUT_RESPONSIVENESS_BUDGET_MS ?? "");
+    // This remains a wall-clock guardrail by design: it is intentionally coarse and CI-load-sensitive.
+    // Keep the default budget pragmatic, and allow an env override when calibrating slower runners.
+    const performanceBudgetMs =
+      Number.isFinite(configuredBudgetOverride) && configuredBudgetOverride > 0 ? configuredBudgetOverride : 8_000;
 
     expect(Object.keys(generated)).toHaveLength(nodes.length);
     expect(elapsedMs).toBeLessThan(performanceBudgetMs);
