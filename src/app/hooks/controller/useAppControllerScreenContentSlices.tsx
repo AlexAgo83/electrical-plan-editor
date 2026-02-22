@@ -230,7 +230,7 @@ export function useNetworkSummaryPanelControllerSlice(params: NetworkSummaryPane
   };
 }
 
-export function useNetworkScopeScreenContentSlice(params: NetworkScopeScreenContentSliceParams) {
+export function buildNetworkScopeScreenContentSlice(params: NetworkScopeScreenContentSliceParams) {
   const networkScopeWorkspaceProps = {
     networks: params.networks,
     networkSort: params.networkSort,
@@ -263,7 +263,7 @@ export function useNetworkScopeScreenContentSlice(params: NetworkScopeScreenCont
   };
 }
 
-export function useModelingScreenContentSlice(params: ModelingScreenContentSliceParams) {
+export function buildModelingScreenContentSlice(params: ModelingScreenContentSliceParams) {
   const modelingPrimaryTablesProps = {
     isConnectorSubScreen: params.isConnectorSubScreen,
     connectorFormMode: params.connectorFormMode,
@@ -449,7 +449,7 @@ export function useModelingScreenContentSlice(params: ModelingScreenContentSlice
   };
 }
 
-export function useAnalysisScreenContentSlice(params: AnalysisScreenContentSliceParams) {
+export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSliceParams) {
   const analysisWorkspaceContentProps = {
     isConnectorSubScreen: params.isConnectorSubScreen,
     isSpliceSubScreen: params.isSpliceSubScreen,
@@ -520,7 +520,7 @@ export function useAnalysisScreenContentSlice(params: AnalysisScreenContentSlice
   };
 }
 
-export function useValidationScreenContentSlice(params: ValidationScreenContentSliceParams) {
+export function buildValidationScreenContentSlice(params: ValidationScreenContentSliceParams) {
   const validationWorkspaceContentProps = {
     validationSeverityFilter: params.validationSeverityFilter,
     setValidationSeverityFilter: params.setValidationSeverityFilter,
@@ -549,7 +549,7 @@ export function useValidationScreenContentSlice(params: ValidationScreenContentS
   };
 }
 
-export function useSettingsScreenContentSlice(params: SettingsScreenContentSliceParams) {
+export function buildSettingsScreenContentSlice(params: SettingsScreenContentSliceParams) {
   const settingsWorkspaceContentProps = {
     isCurrentWorkspaceEmpty: params.isCurrentWorkspaceEmpty,
     hasBuiltInSampleState: params.hasBuiltInSampleState,
@@ -605,3 +605,10 @@ export function useSettingsScreenContentSlice(params: SettingsScreenContentSlice
     settingsWorkspaceContent: <params.SettingsWorkspaceContentComponent {...settingsWorkspaceContentProps} />
   };
 }
+
+// Compatibility aliases retained while downstream modules migrate from `use*` naming.
+export const useNetworkScopeScreenContentSlice = buildNetworkScopeScreenContentSlice;
+export const useModelingScreenContentSlice = buildModelingScreenContentSlice;
+export const useAnalysisScreenContentSlice = buildAnalysisScreenContentSlice;
+export const useValidationScreenContentSlice = buildValidationScreenContentSlice;
+export const useSettingsScreenContentSlice = buildSettingsScreenContentSlice;

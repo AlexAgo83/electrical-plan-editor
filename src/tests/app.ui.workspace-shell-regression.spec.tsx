@@ -1,18 +1,6 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { createUiIntegrationState, renderAppWithState } from "./helpers/app-ui-test-utils";
-
-function withViewportWidth(width: number, run: () => void): void {
-  const originalInnerWidth = window.innerWidth;
-  Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: width });
-  fireEvent(window, new Event("resize"));
-  try {
-    run();
-  } finally {
-    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: originalInnerWidth });
-    fireEvent(window, new Event("resize"));
-  }
-}
+import { createUiIntegrationState, renderAppWithState, withViewportWidth } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - workspace shell regression", () => {
   beforeEach(() => {

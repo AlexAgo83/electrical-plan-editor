@@ -4,12 +4,12 @@ import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSel
 import type { WireEndpointDescriptions } from "../useWireEndpointDescriptions";
 import type { AppControllerModelingHandlersOrchestrator } from "./useAppControllerModelingHandlersOrchestrator";
 import {
-  useAnalysisScreenContentSlice,
-  useModelingScreenContentSlice
+  buildAnalysisScreenContentSlice,
+  buildModelingScreenContentSlice
 } from "./useAppControllerScreenContentSlices";
 
-type ModelingSliceParams = Parameters<typeof useModelingScreenContentSlice>[0];
-type AnalysisSliceParams = Parameters<typeof useAnalysisScreenContentSlice>[0];
+type ModelingSliceParams = Parameters<typeof buildModelingScreenContentSlice>[0];
+type AnalysisSliceParams = Parameters<typeof buildAnalysisScreenContentSlice>[0];
 
 interface UseAppControllerModelingAnalysisScreenDomainsParams {
   components: Pick<
@@ -91,6 +91,8 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   onSelectConnector: AnalysisSliceParams["onSelectConnector"];
   onSelectSplice: AnalysisSliceParams["onSelectSplice"];
   onSelectWire: AnalysisSliceParams["onSelectWire"];
+  includeModelingContent: boolean;
+  includeAnalysisContent: boolean;
 }
 
 export function useAppControllerModelingAnalysisScreenDomains({
@@ -112,9 +114,12 @@ export function useAppControllerModelingAnalysisScreenDomains({
   wireTechnicalIdAlreadyUsed,
   onSelectConnector,
   onSelectSplice,
-  onSelectWire
+  onSelectWire,
+  includeModelingContent,
+  includeAnalysisContent
 }: UseAppControllerModelingAnalysisScreenDomainsParams) {
-  const { modelingLeftColumnContent, modelingFormsColumnContent } = useModelingScreenContentSlice({
+  const modelingSlice = includeModelingContent
+    ? buildModelingScreenContentSlice({
     ModelingPrimaryTablesComponent: components.ModelingPrimaryTablesComponent,
     ModelingSecondaryTablesComponent: components.ModelingSecondaryTablesComponent,
     ModelingFormsColumnComponent: components.ModelingFormsColumnComponent,
@@ -262,9 +267,11 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setWireEndpointBPortIndex: formsState.setWireEndpointBPortIndex,
     cancelWireEdit: modelingHandlers.wire.cancelWireEdit,
     wireFormError: formsState.wireFormError
-  });
+      })
+    : null;
 
-  const { analysisWorkspaceContent } = useAnalysisScreenContentSlice({
+  const analysisSlice = includeAnalysisContent
+    ? buildAnalysisScreenContentSlice({
     AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
@@ -327,11 +334,12 @@ export function useAppControllerModelingAnalysisScreenDomains({
     handleLockWireRoute: modelingHandlers.wire.handleLockWireRoute,
     handleResetWireRoute: modelingHandlers.wire.handleResetWireRoute,
     wireFormError: formsState.wireFormError
-  });
+      })
+    : null;
 
   return {
-    modelingLeftColumnContent,
-    modelingFormsColumnContent,
-    analysisWorkspaceContent
+    modelingLeftColumnContent: modelingSlice?.modelingLeftColumnContent ?? null,
+    modelingFormsColumnContent: modelingSlice?.modelingFormsColumnContent ?? null,
+    analysisWorkspaceContent: analysisSlice?.analysisWorkspaceContent ?? null
   };
 }

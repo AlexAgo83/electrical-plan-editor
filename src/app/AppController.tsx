@@ -1150,6 +1150,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       connectorTechnicalIdAlreadyUsed,
       spliceTechnicalIdAlreadyUsed,
       wireTechnicalIdAlreadyUsed,
+      includeModelingContent: isModelingScreen,
+      includeAnalysisContent: isAnalysisScreen,
       onSelectConnector: (connectorId) =>
         dispatchAction(
           appActions.select({
@@ -1283,7 +1285,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         applyCanvasDefaultsNow,
         handleZoomAction,
         resetWorkspacePreferencesToDefaults
-      }
+      },
+      includeNetworkScopeContent: isNetworkScopeScreen,
+      includeValidationContent: isValidationScreen,
+      includeSettingsContent: isSettingsScreen
     });
 
   return (

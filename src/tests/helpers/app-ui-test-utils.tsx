@@ -128,6 +128,18 @@ export function renderAppWithState(state: AppState) {
   return { store, ...render(<App store={store} />) };
 }
 
+export function withViewportWidth(width: number, run: () => void): void {
+  const originalInnerWidth = window.innerWidth;
+  Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: width });
+  fireEvent(window, new Event("resize"));
+  try {
+    run();
+  } finally {
+    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: originalInnerWidth });
+    fireEvent(window, new Event("resize"));
+  }
+}
+
 export function getPanelByHeading(name: string): HTMLElement {
   const heading = screen
     .getAllByRole("heading", { name })
@@ -145,7 +157,10 @@ export function getPanelByHeading(name: string): HTMLElement {
   return panel as HTMLElement;
 }
 
-export function switchScreen(target: "networkScope" | "modeling" | "analysis" | "validation" | "settings"): void {
+type ScreenSwitchTarget = "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type SubScreenSwitchTarget = "connector" | "splice" | "node" | "segment" | "wire";
+
+function switchScreenWithMode(target: ScreenSwitchTarget, mode: "strict" | "drawerAware"): void {
   if (target === "settings") {
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
     return;
@@ -162,6 +177,11 @@ export function switchScreen(target: "networkScope" | "modeling" | "analysis" | 
     throw new Error("Primary workspace navigation row was not found.");
   }
   const targetLabel = new RegExp(`^${labelByScreen[target]}$`);
+  if (mode === "strict") {
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: targetLabel }));
+    return;
+  }
+
   let openedNavigationDrawer = false;
   let button = within(primaryNavRow as HTMLElement).queryByRole("button", { name: targetLabel });
 
@@ -186,7 +206,7 @@ export function switchScreen(target: "networkScope" | "modeling" | "analysis" | 
   }
 }
 
-export function switchSubScreen(target: "connector" | "splice" | "node" | "segment" | "wire"): void {
+function switchSubScreenWithMode(target: SubScreenSwitchTarget, mode: "strict" | "drawerAware"): void {
   const labelBySubScreen = {
     connector: "Connector",
     splice: "Splice",
@@ -196,13 +216,22 @@ export function switchSubScreen(target: "connector" | "splice" | "node" | "segme
   } as const;
   let secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
   if (secondaryNavRow === null) {
-    switchScreen("modeling");
+    if (mode === "strict") {
+      switchScreenStrict("modeling");
+    } else {
+      switchScreenDrawerAware("modeling");
+    }
     secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
   }
   if (secondaryNavRow === null) {
     throw new Error("Secondary workspace navigation row was not found.");
   }
   const targetLabel = new RegExp(`^${labelBySubScreen[target]}$`);
+  if (mode === "strict") {
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: targetLabel }));
+    return;
+  }
+
   let openedNavigationDrawer = false;
   let button = within(secondaryNavRow as HTMLElement).queryByRole("button", { name: targetLabel });
 
@@ -226,3 +255,23 @@ export function switchSubScreen(target: "connector" | "splice" | "node" | "segme
     }
   }
 }
+
+export function switchScreenStrict(target: ScreenSwitchTarget): void {
+  switchScreenWithMode(target, "strict");
+}
+
+export function switchScreenDrawerAware(target: ScreenSwitchTarget): void {
+  switchScreenWithMode(target, "drawerAware");
+}
+
+export function switchSubScreenStrict(target: SubScreenSwitchTarget): void {
+  switchSubScreenWithMode(target, "strict");
+}
+
+export function switchSubScreenDrawerAware(target: SubScreenSwitchTarget): void {
+  switchSubScreenWithMode(target, "drawerAware");
+}
+
+// Backward-compatible aliases (drawer-aware) retained for existing tests.
+export const switchScreen = switchScreenDrawerAware;
+export const switchSubScreen = switchSubScreenDrawerAware;

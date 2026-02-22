@@ -4,14 +4,14 @@ import type { NetworkImportExportModel } from "../useNetworkImportExport";
 import type { NetworkScopeFormStateModel } from "../useNetworkScopeFormState";
 import type { ValidationModel } from "../useValidationModel";
 import {
-  useNetworkScopeScreenContentSlice,
-  useSettingsScreenContentSlice,
-  useValidationScreenContentSlice
+  buildNetworkScopeScreenContentSlice,
+  buildSettingsScreenContentSlice,
+  buildValidationScreenContentSlice
 } from "./useAppControllerScreenContentSlices";
 
-type NetworkScopeSliceParams = Parameters<typeof useNetworkScopeScreenContentSlice>[0];
-type ValidationSliceParams = Parameters<typeof useValidationScreenContentSlice>[0];
-type SettingsSliceParams = Parameters<typeof useSettingsScreenContentSlice>[0];
+type NetworkScopeSliceParams = Parameters<typeof buildNetworkScopeScreenContentSlice>[0];
+type ValidationSliceParams = Parameters<typeof buildValidationScreenContentSlice>[0];
+type SettingsSliceParams = Parameters<typeof buildSettingsScreenContentSlice>[0];
 
 interface UseAppControllerAuxScreenContentDomainsParams {
   components: Pick<
@@ -58,15 +58,22 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     handleZoomAction: SettingsSliceParams["handleZoomAction"];
     resetWorkspacePreferencesToDefaults: SettingsSliceParams["resetWorkspacePreferencesToDefaults"];
   };
+  includeNetworkScopeContent: boolean;
+  includeValidationContent: boolean;
+  includeSettingsContent: boolean;
 }
 
 export function useAppControllerAuxScreenContentDomains({
   components,
   networkScope,
   validation,
-  settings
+  settings,
+  includeNetworkScopeContent,
+  includeValidationContent,
+  includeSettingsContent
 }: UseAppControllerAuxScreenContentDomainsParams) {
-  const { networkScopeWorkspaceContent } = useNetworkScopeScreenContentSlice({
+  const networkScopeSlice = includeNetworkScopeContent
+    ? buildNetworkScopeScreenContentSlice({
     NetworkScopeWorkspaceContentComponent: components.NetworkScopeWorkspaceContentComponent,
     networks: networkScope.networks,
     networkSort: networkScope.networkSort,
@@ -90,9 +97,11 @@ export function useAppControllerAuxScreenContentDomains({
     networkTechnicalIdAlreadyUsed: networkScope.networkTechnicalIdAlreadyUsed,
     handleSubmitNetworkForm: networkScope.handleSubmitNetworkForm,
     networkFocusRequest: networkScope.formState.networkFocusRequest
-  });
+      })
+    : null;
 
-  const { validationWorkspaceContent } = useValidationScreenContentSlice({
+  const validationSlice = includeValidationContent
+    ? buildValidationScreenContentSlice({
     ValidationWorkspaceContentComponent: components.ValidationWorkspaceContentComponent,
     validationSeverityFilter: validation.validationSeverityFilter,
     setValidationSeverityFilter: validation.setValidationSeverityFilter,
@@ -113,9 +122,11 @@ export function useAppControllerAuxScreenContentDomains({
     handleValidationIssueRowGoTo: validation.handleValidationIssueRowGoTo,
     validationErrorCount: validation.validationErrorCount,
     validationWarningCount: validation.validationWarningCount
-  });
+      })
+    : null;
 
-  const { settingsWorkspaceContent } = useSettingsScreenContentSlice({
+  const settingsSlice = includeSettingsContent
+    ? buildSettingsScreenContentSlice({
     SettingsWorkspaceContentComponent: components.SettingsWorkspaceContentComponent,
     isCurrentWorkspaceEmpty: settings.isCurrentWorkspaceEmpty,
     hasBuiltInSampleState: settings.hasBuiltInSampleState,
@@ -164,11 +175,12 @@ export function useAppControllerAuxScreenContentDomains({
     keyboardShortcutsEnabled: settings.prefs.keyboardShortcutsEnabled,
     setKeyboardShortcutsEnabled: settings.prefs.setKeyboardShortcutsEnabled,
     resetWorkspacePreferencesToDefaults: settings.resetWorkspacePreferencesToDefaults
-  });
+      })
+    : null;
 
   return {
-    networkScopeWorkspaceContent,
-    validationWorkspaceContent,
-    settingsWorkspaceContent
+    networkScopeWorkspaceContent: networkScopeSlice?.networkScopeWorkspaceContent ?? null,
+    validationWorkspaceContent: validationSlice?.validationWorkspaceContent ?? null,
+    settingsWorkspaceContent: settingsSlice?.settingsWorkspaceContent ?? null
   };
 }
