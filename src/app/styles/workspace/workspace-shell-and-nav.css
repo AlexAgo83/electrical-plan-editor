@@ -132,6 +132,74 @@
   color: #b3dbc3;
 }
 
+.app-shell.theme-rose-quartz .workspace-nav-divider {
+  color: #8a5a72;
+}
+
+.app-shell.theme-rose-quartz .workspace-nav-divider::after {
+  background: linear-gradient(90deg, rgba(189, 126, 154, 0.58), rgba(189, 126, 154, 0.16));
+}
+
+.app-shell.theme-rose-quartz .workspace-nav-subsection {
+  border-color: #d8b6c7;
+  background: linear-gradient(180deg, rgba(246, 232, 239, 0.86), rgba(246, 232, 239, 0.34));
+}
+
+.app-shell.theme-rose-quartz .workspace-switcher .screen-description {
+  color: #7a4b63;
+}
+
+.app-shell.theme-lavender-haze .workspace-nav-divider {
+  color: #6d65ac;
+}
+
+.app-shell.theme-lavender-haze .workspace-nav-divider::after {
+  background: linear-gradient(90deg, rgba(142, 132, 213, 0.58), rgba(142, 132, 213, 0.16));
+}
+
+.app-shell.theme-lavender-haze .workspace-nav-subsection {
+  border-color: #c5bfe9;
+  background: linear-gradient(180deg, rgba(236, 232, 252, 0.86), rgba(236, 232, 252, 0.34));
+}
+
+.app-shell.theme-lavender-haze .workspace-switcher .screen-description {
+  color: #5f5896;
+}
+
+.app-shell.theme-burgundy-noir .workspace-nav-divider {
+  color: #d6b2c1;
+}
+
+.app-shell.theme-burgundy-noir .workspace-nav-divider::after {
+  background: linear-gradient(90deg, rgba(171, 97, 127, 0.62), rgba(171, 97, 127, 0.16));
+}
+
+.app-shell.theme-burgundy-noir .workspace-nav-subsection {
+  border-color: #7a435a;
+  background: linear-gradient(180deg, rgba(72, 27, 42, 0.44), rgba(39, 14, 23, 0.22));
+}
+
+.app-shell.theme-burgundy-noir .workspace-switcher .screen-description {
+  color: #ddb8c8;
+}
+
+.app-shell.theme-amber-night .workspace-nav-divider {
+  color: #ecd89b;
+}
+
+.app-shell.theme-amber-night .workspace-nav-divider::after {
+  background: linear-gradient(90deg, rgba(184, 145, 59, 0.62), rgba(184, 145, 59, 0.16));
+}
+
+.app-shell.theme-amber-night .workspace-nav-subsection {
+  border-color: #7a6531;
+  background: linear-gradient(180deg, rgba(78, 59, 18, 0.44), rgba(42, 31, 11, 0.22));
+}
+
+.app-shell.theme-amber-night .workspace-switcher .screen-description {
+  color: #f0deaa;
+}
+
 .workspace-tab {
   border: 1px solid #9eb7cc;
   border-radius: 999px;

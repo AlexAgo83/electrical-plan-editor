@@ -17,6 +17,18 @@ function normalizeThemeMode(value: unknown): ThemeMode {
       return "warmBrown";
     case "deepGreen":
       return "deepGreen";
+    case "roseQuartz":
+    case "roseLight":
+      return "roseQuartz";
+    case "burgundyNoir":
+    case "bordeauxDark":
+      return "burgundyNoir";
+    case "lavenderHaze":
+    case "violetLight":
+      return "lavenderHaze";
+    case "amberNight":
+    case "amberDark":
+      return "amberNight";
     default:
       return "normal";
   }

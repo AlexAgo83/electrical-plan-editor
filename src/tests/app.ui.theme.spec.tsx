@@ -24,7 +24,7 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).toHaveClass("theme-dark");
   });
 
-  it("supports slate neon and paper blueprint theme variants", () => {
+  it("supports custom theme variants", () => {
     renderAppWithState(createUiIntegrationState());
 
     const appShell = document.querySelector("main.app-shell");
@@ -57,6 +57,34 @@ describe("App integration UI - theme mode", () => {
     });
     expect(appShell).toHaveClass("theme-dark");
     expect(appShell).toHaveClass("theme-deep-green");
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "roseQuartz" }
+    });
+    expect(appShell).toHaveClass("theme-normal");
+    expect(appShell).toHaveClass("theme-paper-blueprint");
+    expect(appShell).toHaveClass("theme-rose-quartz");
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "burgundyNoir" }
+    });
+    expect(appShell).toHaveClass("theme-dark");
+    expect(appShell).not.toHaveClass("theme-deep-green");
+    expect(appShell).toHaveClass("theme-burgundy-noir");
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "lavenderHaze" }
+    });
+    expect(appShell).toHaveClass("theme-normal");
+    expect(appShell).toHaveClass("theme-paper-blueprint");
+    expect(appShell).toHaveClass("theme-lavender-haze");
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "amberNight" }
+    });
+    expect(appShell).toHaveClass("theme-dark");
+    expect(appShell).toHaveClass("theme-deep-green");
+    expect(appShell).toHaveClass("theme-amber-night");
   });
 
   it("persists dark mode preference across remount", () => {

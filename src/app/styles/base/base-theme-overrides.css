@@ -1532,3 +1532,1319 @@
 .app-shell.theme-deep-green .wire-endpoint-fieldset label {
   color: #d7ead7;
 }
+
+/* Theme overlays built on top of existing custom themes for broad coverage */
+
+.app-shell.theme-rose-quartz {
+  --theme-primary: #d85b8e;
+  color: #4f2137;
+}
+
+.app-shell.theme-rose-quartz::before {
+  background:
+    radial-gradient(circle at top right, #fff2f7 0%, #fde8f1 42%, #f6dce8 100%),
+    radial-gradient(circle at bottom left, rgba(216, 91, 142, 0.12) 0%, transparent 52%);
+}
+
+.app-shell.theme-rose-quartz :focus-visible {
+  outline-color: #cf4c84;
+}
+
+.app-shell.theme-rose-quartz .header-block {
+  border-color: #dcb1c5;
+  background: rgba(255, 244, 249, 0.96);
+}
+
+.app-shell.theme-rose-quartz .header-block.is-drawer-open {
+  background: rgba(255, 244, 249, 0.62);
+}
+
+.app-shell.theme-rose-quartz .panel,
+.app-shell.theme-rose-quartz .workspace-sidebar .workspace-switcher,
+.app-shell.theme-rose-quartz .workspace-sidebar .workspace-meta,
+.app-shell.theme-rose-quartz .stats-grid article,
+.app-shell.theme-rose-quartz .summary-grid article,
+.app-shell.theme-rose-quartz .validation-group,
+.app-shell.theme-rose-quartz .cavity,
+.app-shell.theme-rose-quartz .network-canvas-shell {
+  border-color: #d9b1c4;
+  background: rgba(255, 248, 252, 0.95);
+}
+
+.app-shell.theme-rose-quartz .workspace-tab,
+.app-shell.theme-rose-quartz .filter-chip,
+.app-shell.theme-rose-quartz .row-actions button,
+.app-shell.theme-rose-quartz .row-form button,
+.app-shell.theme-rose-quartz .validation-row-go-to-button,
+.app-shell.theme-rose-quartz .header-nav-toggle,
+.app-shell.theme-rose-quartz .header-settings-toggle,
+.app-shell.theme-rose-quartz .header-ops-toggle {
+  border-color: #cc9db4;
+  background: #f7e6ee;
+  color: #51213a;
+}
+
+.app-shell.theme-rose-quartz .workspace-tab.is-active,
+.app-shell.theme-rose-quartz .filter-chip.is-active,
+.app-shell.theme-rose-quartz .header-settings-toggle.is-active {
+  border-color: #cf4c84;
+  background: #cf4c84;
+  color: #fff4f9;
+}
+
+.app-shell.theme-rose-quartz .workspace-tab-badge,
+.app-shell.theme-rose-quartz .header-ops-badge {
+  background: #f2d8e4;
+  color: #6a2d49;
+}
+
+.app-shell.theme-rose-quartz input,
+.app-shell.theme-rose-quartz select,
+.app-shell.theme-rose-quartz textarea {
+  border-color: #cfa9bc;
+  background: #fffafc;
+  color: #4f2137;
+}
+
+.app-shell.theme-rose-quartz .data-table th,
+.app-shell.theme-rose-quartz .data-table td {
+  border-bottom-color: #e5cdd9;
+}
+
+.app-shell.theme-rose-quartz .data-table th {
+  color: #6d3a54;
+}
+
+.app-shell.theme-rose-quartz .data-table tr.is-selected > td {
+  background: rgba(207, 76, 132, 0.18);
+}
+
+.app-shell.theme-rose-quartz .data-table tr.is-wire-highlighted > td {
+  background: rgba(128, 180, 104, 0.16);
+}
+
+.app-shell.theme-rose-quartz .network-grid line {
+  stroke: #dbc5d0;
+}
+
+.app-shell.theme-rose-quartz .network-segment.is-selected {
+  stroke: #cf4c84;
+}
+
+.app-shell.theme-rose-quartz .route-preview-status-chip {
+  border-color: #d08ea9;
+  background: #f6e1ea;
+  color: #6b2746;
+}
+
+.app-shell.theme-rose-quartz .network-canvas-floating-controls,
+.app-shell.theme-rose-quartz .network-canvas-floating-subnetworks,
+.app-shell.theme-rose-quartz .network-canvas-floating-stats {
+  border-color: #d9b1c4;
+  background: rgba(255, 246, 251, 0.72);
+}
+
+.app-shell.theme-rose-quartz .network-canvas-floating-copy,
+.app-shell.theme-rose-quartz .network-canvas-subnetwork-list li,
+.app-shell.theme-rose-quartz .network-canvas-stats-list li {
+  color: #7a4b63;
+}
+
+.app-shell.theme-rose-quartz .network-canvas-stats-list strong {
+  color: #4f2137;
+}
+
+.app-shell.theme-rose-quartz .subnetwork-chip {
+  border-color: #d2a3b9;
+  background: #f7e6ee;
+  color: #5a2540;
+}
+
+.app-shell.theme-lavender-haze {
+  --theme-primary: #6f63d9;
+  color: #2f2a5f;
+}
+
+.app-shell.theme-lavender-haze::before {
+  background:
+    radial-gradient(circle at top right, #f5f3ff 0%, #ece9ff 42%, #e3defa 100%),
+    radial-gradient(circle at bottom left, rgba(111, 99, 217, 0.12) 0%, transparent 56%);
+}
+
+.app-shell.theme-lavender-haze :focus-visible {
+  outline-color: #6355db;
+}
+
+.app-shell.theme-lavender-haze .header-block {
+  border-color: #b9b1eb;
+  background: rgba(247, 245, 255, 0.96);
+}
+
+.app-shell.theme-lavender-haze .header-block.is-drawer-open {
+  background: rgba(247, 245, 255, 0.62);
+}
+
+.app-shell.theme-lavender-haze .panel,
+.app-shell.theme-lavender-haze .workspace-sidebar .workspace-switcher,
+.app-shell.theme-lavender-haze .workspace-sidebar .workspace-meta,
+.app-shell.theme-lavender-haze .stats-grid article,
+.app-shell.theme-lavender-haze .summary-grid article,
+.app-shell.theme-lavender-haze .validation-group,
+.app-shell.theme-lavender-haze .cavity,
+.app-shell.theme-lavender-haze .network-canvas-shell {
+  border-color: #bbb4e7;
+  background: rgba(249, 248, 255, 0.95);
+}
+
+.app-shell.theme-lavender-haze .workspace-tab,
+.app-shell.theme-lavender-haze .filter-chip,
+.app-shell.theme-lavender-haze .row-actions button,
+.app-shell.theme-lavender-haze .row-form button,
+.app-shell.theme-lavender-haze .validation-row-go-to-button,
+.app-shell.theme-lavender-haze .header-nav-toggle,
+.app-shell.theme-lavender-haze .header-settings-toggle,
+.app-shell.theme-lavender-haze .header-ops-toggle {
+  border-color: #a79ee2;
+  background: #ece9fb;
+  color: #312c66;
+}
+
+.app-shell.theme-lavender-haze .workspace-tab.is-active,
+.app-shell.theme-lavender-haze .filter-chip.is-active,
+.app-shell.theme-lavender-haze .header-settings-toggle.is-active {
+  border-color: #6355db;
+  background: #6355db;
+  color: #f7f5ff;
+}
+
+.app-shell.theme-lavender-haze .workspace-tab-badge,
+.app-shell.theme-lavender-haze .header-ops-badge {
+  background: #e2def8;
+  color: #463d91;
+}
+
+.app-shell.theme-lavender-haze input,
+.app-shell.theme-lavender-haze select,
+.app-shell.theme-lavender-haze textarea {
+  border-color: #b9b0e4;
+  background: #fcfbff;
+  color: #312c66;
+}
+
+.app-shell.theme-lavender-haze .data-table th,
+.app-shell.theme-lavender-haze .data-table td {
+  border-bottom-color: #d8d2f1;
+}
+
+.app-shell.theme-lavender-haze .data-table th {
+  color: #5b539f;
+}
+
+.app-shell.theme-lavender-haze .data-table tr.is-selected > td {
+  background: rgba(99, 85, 219, 0.17);
+}
+
+.app-shell.theme-lavender-haze .data-table tr.is-wire-highlighted > td {
+  background: rgba(114, 181, 145, 0.16);
+}
+
+.app-shell.theme-lavender-haze .network-grid line {
+  stroke: #d5d0ee;
+}
+
+.app-shell.theme-lavender-haze .network-segment.is-selected {
+  stroke: #6355db;
+}
+
+.app-shell.theme-lavender-haze .route-preview-status-chip {
+  border-color: #a8a1e4;
+  background: #ece9fb;
+  color: #3c347d;
+}
+
+.app-shell.theme-lavender-haze .network-canvas-floating-controls,
+.app-shell.theme-lavender-haze .network-canvas-floating-subnetworks,
+.app-shell.theme-lavender-haze .network-canvas-floating-stats {
+  border-color: #c5bfe9;
+  background: rgba(247, 246, 255, 0.74);
+}
+
+.app-shell.theme-lavender-haze .network-canvas-floating-copy,
+.app-shell.theme-lavender-haze .network-canvas-subnetwork-list li,
+.app-shell.theme-lavender-haze .network-canvas-stats-list li {
+  color: #5f5896;
+}
+
+.app-shell.theme-lavender-haze .network-canvas-stats-list strong {
+  color: #312c66;
+}
+
+.app-shell.theme-lavender-haze .subnetwork-chip {
+  border-color: #b0a8e6;
+  background: #ece9fb;
+  color: #3f397d;
+}
+
+.app-shell.theme-burgundy-noir {
+  --theme-primary: #b1466e;
+  color: #f7eaf0;
+}
+
+.app-shell.theme-burgundy-noir::before {
+  background:
+    radial-gradient(circle at top right, #3e1224 0%, #2a0d18 42%, #18070d 100%),
+    radial-gradient(circle at bottom left, rgba(177, 70, 110, 0.22) 0%, transparent 56%);
+}
+
+.app-shell.theme-burgundy-noir :focus-visible {
+  outline-color: #d56b94;
+}
+
+.app-shell.theme-burgundy-noir .header-block {
+  border-color: #7f3f58;
+  background: rgba(46, 14, 26, 0.94);
+}
+
+.app-shell.theme-burgundy-noir .header-block.is-drawer-open {
+  background: rgba(46, 14, 26, 0.56);
+}
+
+.app-shell.theme-burgundy-noir .panel,
+.app-shell.theme-burgundy-noir .workspace-sidebar .workspace-switcher,
+.app-shell.theme-burgundy-noir .workspace-sidebar .workspace-meta,
+.app-shell.theme-burgundy-noir .stats-grid article,
+.app-shell.theme-burgundy-noir .summary-grid article,
+.app-shell.theme-burgundy-noir .validation-group,
+.app-shell.theme-burgundy-noir .cavity,
+.app-shell.theme-burgundy-noir .network-canvas-shell {
+  border-color: #743c55;
+  background: #2a0f19;
+}
+
+.app-shell.theme-burgundy-noir .workspace-tab,
+.app-shell.theme-burgundy-noir .filter-chip,
+.app-shell.theme-burgundy-noir .row-actions button,
+.app-shell.theme-burgundy-noir .row-form button,
+.app-shell.theme-burgundy-noir .validation-row-go-to-button,
+.app-shell.theme-burgundy-noir .header-nav-toggle,
+.app-shell.theme-burgundy-noir .header-settings-toggle,
+.app-shell.theme-burgundy-noir .header-ops-toggle {
+  border-color: #83465f;
+  background: #3a1725;
+  color: #f8edf2;
+}
+
+.app-shell.theme-burgundy-noir .workspace-tab.is-active,
+.app-shell.theme-burgundy-noir .filter-chip.is-active,
+.app-shell.theme-burgundy-noir .header-settings-toggle.is-active {
+  border-color: #d56b94;
+  background: #d56b94;
+  color: #2b0c17;
+}
+
+.app-shell.theme-burgundy-noir .workspace-tab-badge,
+.app-shell.theme-burgundy-noir .header-ops-badge {
+  background: #4d2232;
+  color: #f2d4df;
+}
+
+.app-shell.theme-burgundy-noir input,
+.app-shell.theme-burgundy-noir select,
+.app-shell.theme-burgundy-noir textarea {
+  border-color: #7a425c;
+  background: #24101a;
+  color: #f8edf2;
+}
+
+.app-shell.theme-burgundy-noir .data-table th,
+.app-shell.theme-burgundy-noir .data-table td {
+  border-bottom-color: #5b3043;
+}
+
+.app-shell.theme-burgundy-noir .data-table th {
+  color: #e7bfd0;
+}
+
+.app-shell.theme-burgundy-noir .data-table tr.is-selected > td {
+  background: rgba(213, 107, 148, 0.22);
+}
+
+.app-shell.theme-burgundy-noir .data-table tr.is-wire-highlighted > td {
+  background: rgba(177, 70, 110, 0.16);
+}
+
+.app-shell.theme-burgundy-noir .network-grid line {
+  stroke: #563041;
+}
+
+.app-shell.theme-burgundy-noir .network-segment {
+  stroke: #d5a7bb;
+}
+
+.app-shell.theme-burgundy-noir .network-segment.is-wire-highlighted {
+  stroke: #e08cab;
+}
+
+.app-shell.theme-burgundy-noir .network-segment.is-selected {
+  stroke: #d56b94;
+}
+
+.app-shell.theme-burgundy-noir .network-node.connector .network-node-shape {
+  fill: #7a3550;
+}
+
+.app-shell.theme-burgundy-noir .network-node.splice .network-node-shape {
+  fill: #9b4f70;
+}
+
+.app-shell.theme-burgundy-noir .network-node.intermediate .network-node-shape {
+  fill: #5f2a3f;
+}
+
+.app-shell.theme-burgundy-noir .route-preview-status-chip {
+  border-color: #9f5c79;
+  background: #4b2232;
+  color: #f8dbe6;
+}
+
+.app-shell.theme-burgundy-noir .route-preview-panel {
+  border-color: #6d3850;
+  background: linear-gradient(180deg, #2b101a 0%, #240d16 100%);
+}
+
+.app-shell.theme-burgundy-noir .route-preview-selection-strip,
+.app-shell.theme-burgundy-noir .route-preview-empty,
+.app-shell.theme-burgundy-noir .route-preview-metrics article,
+.app-shell.theme-burgundy-noir .route-preview-path-grid article,
+.app-shell.theme-burgundy-noir .analysis-wire-identity,
+.app-shell.theme-burgundy-noir .analysis-wire-route-current {
+  border-color: #6a3950;
+  background: rgba(48, 17, 28, 0.7);
+}
+
+.app-shell.theme-burgundy-noir .route-preview-label,
+.app-shell.theme-burgundy-noir .route-preview-selection-strip span,
+.app-shell.theme-burgundy-noir .route-preview-status-line p,
+.app-shell.theme-burgundy-noir .route-preview-metrics span,
+.app-shell.theme-burgundy-noir .route-preview-path-grid h4,
+.app-shell.theme-burgundy-noir .analysis-wire-identity-label,
+.app-shell.theme-burgundy-noir .analysis-wire-route-current span {
+  color: #ddb8c8;
+}
+
+.app-shell.theme-burgundy-noir .route-preview-selection-strip strong,
+.app-shell.theme-burgundy-noir .route-preview-metrics strong,
+.app-shell.theme-burgundy-noir .route-preview-path,
+.app-shell.theme-burgundy-noir .analysis-wire-identity-value {
+  color: #f9edf2;
+}
+
+.app-shell.theme-burgundy-noir .route-preview-selection-arrow {
+  color: #bd89a0;
+}
+
+.app-shell.theme-burgundy-noir .route-preview-empty {
+  color: #e1c2cf;
+}
+
+.app-shell.theme-burgundy-noir .analysis-wire-mode-chip {
+  border-color: #8b4f68;
+  background: #412031;
+  color: #f7eaf0;
+}
+
+.app-shell.theme-burgundy-noir .analysis-wire-mode-chip.is-locked {
+  border-color: #b76a86;
+  background: #5a293d;
+  color: #ffeaf1;
+}
+
+.app-shell.theme-burgundy-noir .workspace-shell .workspace-health {
+  border-top-color: #6a3950;
+}
+
+.app-shell.theme-burgundy-noir .workspace-ops-content.panel,
+.app-shell.theme-burgundy-noir .workspace-inspector-panel .inspector-context-panel {
+  background: rgba(44, 15, 26, 0.56);
+}
+
+.app-shell.theme-burgundy-noir .workspace-ops-content h2,
+.app-shell.theme-burgundy-noir .workspace-health h2,
+.app-shell.theme-burgundy-noir .inspector-context-header h2 {
+  color: #edcfdb;
+}
+
+.app-shell.theme-burgundy-noir .workspace-health .meta-line,
+.app-shell.theme-burgundy-noir .shortcut-hints,
+.app-shell.theme-burgundy-noir .inspector-collapsed-copy,
+.app-shell.theme-burgundy-noir .inspector-entity-label,
+.app-shell.theme-burgundy-noir .inspector-detail-grid dt {
+  color: #d5aebe;
+}
+
+.app-shell.theme-burgundy-noir .inspector-kind-chip {
+  border-color: #844e64;
+  background: #412031;
+  color: #f4e4eb;
+}
+
+.app-shell.theme-burgundy-noir .inspector-entity-id,
+.app-shell.theme-burgundy-noir .inspector-detail-grid dd {
+  color: #f7eaf0;
+}
+
+.app-shell.theme-burgundy-noir .network-scope-indicator {
+  border-color: #6a3950;
+  background: #2d111c;
+}
+
+.app-shell.theme-burgundy-noir .network-scope-indicator h2,
+.app-shell.theme-burgundy-noir .network-scope-indicator-label {
+  color: #ddb8c8;
+}
+
+.app-shell.theme-burgundy-noir .network-scope-indicator p,
+.app-shell.theme-burgundy-noir .network-scope-indicator-value {
+  color: #f9edf2;
+}
+
+.app-shell.theme-burgundy-noir .network-scope-list-shell {
+  border-color: #6a3950;
+}
+
+.app-shell.theme-burgundy-noir .network-scope-status-chip.is-active,
+.app-shell.theme-burgundy-noir .network-form-mode-chip.is-edit {
+  background: #5a293d;
+  color: #ffeaf1;
+}
+
+.app-shell.theme-burgundy-noir .network-scope-status-chip.is-available,
+.app-shell.theme-burgundy-noir .network-form-mode-chip {
+  background: #412031;
+  color: #f4e4eb;
+}
+
+.app-shell.theme-burgundy-noir .network-form-mode-chip.is-create {
+  background: #6a3049;
+  color: #ffeaf1;
+}
+
+.app-shell.theme-burgundy-noir .header-update-toggle {
+  border-color: #9b5a74;
+  background: #4f2335;
+  color: #f9e4ec;
+}
+
+.app-shell.theme-burgundy-noir .workspace-tab-badge.is-error,
+.app-shell.theme-burgundy-noir .header-ops-badge.is-error {
+  background: #6b2a3f;
+  color: #ffdce6;
+}
+
+.app-shell.theme-burgundy-noir .status-chip.is-error {
+  border-color: #8f5669;
+  background: #5a2939;
+  color: #ffe0e8;
+}
+
+.app-shell.theme-burgundy-noir .status-chip.is-warning {
+  border-color: #9a6076;
+  background: #633044;
+  color: #ffe6ef;
+}
+
+.app-shell.theme-burgundy-noir .cavity.is-occupied {
+  border-color: #8b4f68;
+  background: #341521;
+}
+
+.app-shell.theme-burgundy-noir .cavity button {
+  border-color: #8b4f68;
+  background: #412031;
+  color: #f7eaf0;
+}
+
+.app-shell.theme-burgundy-noir .subnetwork-chip {
+  border-color: #8b4f68;
+  background: #412031;
+  color: #f7eaf0;
+}
+
+.app-shell.theme-burgundy-noir .network-canvas-floating-controls,
+.app-shell.theme-burgundy-noir .network-canvas-floating-subnetworks,
+.app-shell.theme-burgundy-noir .network-canvas-floating-stats {
+  border-color: #7d465d;
+  background: rgba(44, 15, 26, 0.72);
+}
+
+.app-shell.theme-burgundy-noir .network-canvas-floating-copy,
+.app-shell.theme-burgundy-noir .network-canvas-subnetwork-list li,
+.app-shell.theme-burgundy-noir .network-canvas-stats-list li {
+  color: #e2c0cf;
+}
+
+.app-shell.theme-burgundy-noir .network-canvas-stats-list strong {
+  color: #f9edf2;
+}
+
+.app-shell.theme-amber-night {
+  --theme-primary: #f1bf3a;
+  color: #fbf0cf;
+}
+
+.app-shell.theme-amber-night::before {
+  background:
+    radial-gradient(circle at top right, #40300a 0%, #2b2108 42%, #191306 100%),
+    radial-gradient(circle at bottom left, rgba(241, 191, 58, 0.18) 0%, transparent 58%);
+}
+
+.app-shell.theme-amber-night :focus-visible {
+  outline-color: #f1bf3a;
+}
+
+.app-shell.theme-amber-night .header-block {
+  border-color: #7b6731;
+  background: rgba(44, 33, 10, 0.94);
+}
+
+.app-shell.theme-amber-night .header-block.is-drawer-open {
+  background: rgba(44, 33, 10, 0.58);
+}
+
+.app-shell.theme-amber-night .panel,
+.app-shell.theme-amber-night .workspace-sidebar .workspace-switcher,
+.app-shell.theme-amber-night .workspace-sidebar .workspace-meta,
+.app-shell.theme-amber-night .stats-grid article,
+.app-shell.theme-amber-night .summary-grid article,
+.app-shell.theme-amber-night .validation-group,
+.app-shell.theme-amber-night .cavity,
+.app-shell.theme-amber-night .network-canvas-shell {
+  border-color: #6f5d2e;
+  background: #241c0a;
+}
+
+.app-shell.theme-amber-night .workspace-tab,
+.app-shell.theme-amber-night .filter-chip,
+.app-shell.theme-amber-night .row-actions button,
+.app-shell.theme-amber-night .row-form button,
+.app-shell.theme-amber-night .validation-row-go-to-button,
+.app-shell.theme-amber-night .header-nav-toggle,
+.app-shell.theme-amber-night .header-settings-toggle,
+.app-shell.theme-amber-night .header-ops-toggle {
+  border-color: #8c7639;
+  background: #362a0d;
+  color: #fbf0cf;
+}
+
+.app-shell.theme-amber-night .workspace-tab.is-active,
+.app-shell.theme-amber-night .filter-chip.is-active,
+.app-shell.theme-amber-night .header-settings-toggle.is-active {
+  border-color: #f1bf3a;
+  background: #f1bf3a;
+  color: #271e08;
+}
+
+.app-shell.theme-amber-night .workspace-tab-badge,
+.app-shell.theme-amber-night .header-ops-badge {
+  background: #4b3a12;
+  color: #f4df9c;
+}
+
+.app-shell.theme-amber-night input,
+.app-shell.theme-amber-night select,
+.app-shell.theme-amber-night textarea {
+  border-color: #7b6731;
+  background: #211906;
+  color: #fbf0cf;
+}
+
+.app-shell.theme-amber-night .data-table th,
+.app-shell.theme-amber-night .data-table td {
+  border-bottom-color: #564820;
+}
+
+.app-shell.theme-amber-night .data-table th {
+  color: #ecd89b;
+}
+
+.app-shell.theme-amber-night .data-table tr.is-selected > td {
+  background: rgba(241, 191, 58, 0.2);
+}
+
+.app-shell.theme-amber-night .data-table tr.is-wire-highlighted > td {
+  background: rgba(116, 168, 110, 0.18);
+}
+
+.app-shell.theme-amber-night .network-grid line {
+  stroke: #4b3f1e;
+}
+
+.app-shell.theme-amber-night .network-segment.is-selected {
+  stroke: #f1bf3a;
+}
+
+.app-shell.theme-amber-night .route-preview-status-chip {
+  border-color: #9b8341;
+  background: #4b3a12;
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .network-canvas-floating-controls,
+.app-shell.theme-amber-night .network-canvas-floating-subnetworks,
+.app-shell.theme-amber-night .network-canvas-floating-stats {
+  border-color: #7b6731;
+  background: rgba(42, 32, 10, 0.72);
+}
+
+.app-shell.theme-amber-night .network-canvas-floating-copy,
+.app-shell.theme-amber-night .network-canvas-subnetwork-list li,
+.app-shell.theme-amber-night .network-canvas-stats-list li {
+  color: #f0deaa;
+}
+
+.app-shell.theme-amber-night .network-canvas-stats-list strong {
+  color: #fff1c8;
+}
+
+.app-shell.theme-amber-night .subnetwork-chip {
+  border-color: #9b8341;
+  background: #4b3a12;
+  color: #ffe9af;
+}
+
+/* Coverage completion for new theme variants: 2D legend, route-preview sub-panels, inspector */
+
+.app-shell.theme-rose-quartz .network-legend {
+  color: #7a4b63;
+}
+
+.app-shell.theme-rose-quartz .legend-swatch {
+  border-color: #d6b0c2;
+}
+
+.app-shell.theme-rose-quartz .legend-line {
+  border-top-color: #c690a8;
+}
+
+.app-shell.theme-rose-quartz .legend-line.selected {
+  border-top-color: #cf4c84;
+}
+
+.app-shell.theme-rose-quartz .legend-line.wire {
+  border-top-color: #d56f98;
+}
+
+.app-shell.theme-rose-quartz .route-preview-panel {
+  border-color: #d7b0c3;
+  background: linear-gradient(180deg, #fff8fb 0%, #f8eef4 100%);
+}
+
+.app-shell.theme-rose-quartz .route-preview-label,
+.app-shell.theme-rose-quartz .route-preview-selection-strip span,
+.app-shell.theme-rose-quartz .route-preview-status-line p,
+.app-shell.theme-rose-quartz .route-preview-metrics span,
+.app-shell.theme-rose-quartz .route-preview-path-grid h4,
+.app-shell.theme-rose-quartz .analysis-wire-identity-label,
+.app-shell.theme-rose-quartz .analysis-wire-route-current span {
+  color: #86536c;
+}
+
+.app-shell.theme-rose-quartz .route-preview-selection-strip,
+.app-shell.theme-rose-quartz .route-preview-empty,
+.app-shell.theme-rose-quartz .route-preview-metrics article,
+.app-shell.theme-rose-quartz .route-preview-path-grid article,
+.app-shell.theme-rose-quartz .analysis-wire-identity,
+.app-shell.theme-rose-quartz .analysis-wire-route-current {
+  border-color: #dec0cf;
+  background: rgba(255, 247, 251, 0.82);
+}
+
+.app-shell.theme-rose-quartz .route-preview-selection-strip strong,
+.app-shell.theme-rose-quartz .route-preview-metrics strong,
+.app-shell.theme-rose-quartz .route-preview-path,
+.app-shell.theme-rose-quartz .analysis-wire-identity-value {
+  color: #4f2137;
+}
+
+.app-shell.theme-rose-quartz .route-preview-selection-arrow {
+  color: #b97b97;
+}
+
+.app-shell.theme-rose-quartz .route-preview-empty {
+  color: #8a5a72;
+}
+
+.app-shell.theme-rose-quartz .workspace-inspector-panel .inspector-context-panel {
+  background: rgba(255, 246, 251, 0.54);
+}
+
+.app-shell.theme-rose-quartz .inspector-collapsed-copy,
+.app-shell.theme-rose-quartz .inspector-entity-label,
+.app-shell.theme-rose-quartz .inspector-detail-grid dt {
+  color: #86536c;
+}
+
+.app-shell.theme-rose-quartz .inspector-context-header h2 {
+  color: #6c2f4b;
+}
+
+.app-shell.theme-rose-quartz .inspector-kind-chip {
+  border-color: #d2a3b9;
+  background: #f7e6ee;
+  color: #5a2540;
+}
+
+.app-shell.theme-rose-quartz .inspector-entity-id,
+.app-shell.theme-rose-quartz .inspector-detail-grid dd {
+  color: #4f2137;
+}
+
+.app-shell.theme-lavender-haze .network-legend {
+  color: #5f5896;
+}
+
+.app-shell.theme-lavender-haze .legend-swatch {
+  border-color: #c7c0ea;
+}
+
+.app-shell.theme-lavender-haze .legend-line {
+  border-top-color: #a59ddd;
+}
+
+.app-shell.theme-lavender-haze .legend-line.selected {
+  border-top-color: #6355db;
+}
+
+.app-shell.theme-lavender-haze .legend-line.wire {
+  border-top-color: #8a7de1;
+}
+
+.app-shell.theme-lavender-haze .route-preview-panel {
+  border-color: #c3bde8;
+  background: linear-gradient(180deg, #fbfaff 0%, #f0edfd 100%);
+}
+
+.app-shell.theme-lavender-haze .route-preview-label,
+.app-shell.theme-lavender-haze .route-preview-selection-strip span,
+.app-shell.theme-lavender-haze .route-preview-status-line p,
+.app-shell.theme-lavender-haze .route-preview-metrics span,
+.app-shell.theme-lavender-haze .route-preview-path-grid h4,
+.app-shell.theme-lavender-haze .analysis-wire-identity-label,
+.app-shell.theme-lavender-haze .analysis-wire-route-current span {
+  color: #645ca3;
+}
+
+.app-shell.theme-lavender-haze .route-preview-selection-strip,
+.app-shell.theme-lavender-haze .route-preview-empty,
+.app-shell.theme-lavender-haze .route-preview-metrics article,
+.app-shell.theme-lavender-haze .route-preview-path-grid article,
+.app-shell.theme-lavender-haze .analysis-wire-identity,
+.app-shell.theme-lavender-haze .analysis-wire-route-current {
+  border-color: #d0cbef;
+  background: rgba(250, 249, 255, 0.84);
+}
+
+.app-shell.theme-lavender-haze .route-preview-selection-strip strong,
+.app-shell.theme-lavender-haze .route-preview-metrics strong,
+.app-shell.theme-lavender-haze .route-preview-path,
+.app-shell.theme-lavender-haze .analysis-wire-identity-value {
+  color: #312c66;
+}
+
+.app-shell.theme-lavender-haze .route-preview-selection-arrow {
+  color: #988fe1;
+}
+
+.app-shell.theme-lavender-haze .route-preview-empty {
+  color: #6d65ac;
+}
+
+.app-shell.theme-lavender-haze .workspace-inspector-panel .inspector-context-panel {
+  background: rgba(248, 247, 255, 0.56);
+}
+
+.app-shell.theme-lavender-haze .inspector-collapsed-copy,
+.app-shell.theme-lavender-haze .inspector-entity-label,
+.app-shell.theme-lavender-haze .inspector-detail-grid dt {
+  color: #645ca3;
+}
+
+.app-shell.theme-lavender-haze .inspector-context-header h2 {
+  color: #4a438d;
+}
+
+.app-shell.theme-lavender-haze .inspector-kind-chip {
+  border-color: #b0a8e6;
+  background: #ece9fb;
+  color: #3f397d;
+}
+
+.app-shell.theme-lavender-haze .inspector-entity-id,
+.app-shell.theme-lavender-haze .inspector-detail-grid dd {
+  color: #312c66;
+}
+
+.app-shell.theme-burgundy-noir .network-legend {
+  color: #ddb8c8;
+}
+
+.app-shell.theme-burgundy-noir .legend-swatch {
+  border-color: #8b4f68;
+}
+
+.app-shell.theme-burgundy-noir .legend-line {
+  border-top-color: #a15d7a;
+}
+
+.app-shell.theme-burgundy-noir .legend-line.selected {
+  border-top-color: #d56b94;
+}
+
+.app-shell.theme-burgundy-noir .legend-line.wire {
+  border-top-color: #e08cab;
+}
+
+.app-shell.theme-amber-night .network-legend {
+  color: #f0deaa;
+}
+
+.app-shell.theme-amber-night .legend-swatch {
+  border-color: #8f7738;
+}
+
+.app-shell.theme-amber-night .legend-line {
+  border-top-color: #b3913b;
+}
+
+.app-shell.theme-amber-night .legend-line.selected {
+  border-top-color: #f1bf3a;
+}
+
+.app-shell.theme-amber-night .legend-line.wire {
+  border-top-color: #ffd166;
+}
+
+.app-shell.theme-amber-night .route-preview-panel {
+  border-color: #7b6731;
+  background: linear-gradient(180deg, #2b2108 0%, #221a07 100%);
+}
+
+.app-shell.theme-amber-night .route-preview-label,
+.app-shell.theme-amber-night .route-preview-selection-strip span,
+.app-shell.theme-amber-night .route-preview-status-line p,
+.app-shell.theme-amber-night .route-preview-metrics span,
+.app-shell.theme-amber-night .route-preview-path-grid h4,
+.app-shell.theme-amber-night .analysis-wire-identity-label,
+.app-shell.theme-amber-night .analysis-wire-route-current span {
+  color: #dec889;
+}
+
+.app-shell.theme-amber-night .route-preview-selection-strip,
+.app-shell.theme-amber-night .route-preview-empty,
+.app-shell.theme-amber-night .route-preview-metrics article,
+.app-shell.theme-amber-night .route-preview-path-grid article,
+.app-shell.theme-amber-night .analysis-wire-identity,
+.app-shell.theme-amber-night .analysis-wire-route-current {
+  border-color: #6f5d2e;
+  background: rgba(40, 31, 10, 0.72);
+}
+
+.app-shell.theme-amber-night .route-preview-selection-strip strong,
+.app-shell.theme-amber-night .route-preview-metrics strong,
+.app-shell.theme-amber-night .route-preview-path,
+.app-shell.theme-amber-night .analysis-wire-identity-value {
+  color: #fff1c8;
+}
+
+.app-shell.theme-amber-night .route-preview-selection-arrow {
+  color: #c9a24a;
+}
+
+.app-shell.theme-amber-night .route-preview-empty {
+  color: #e6cf94;
+}
+
+.app-shell.theme-amber-night .workspace-inspector-panel .inspector-context-panel {
+  background: rgba(42, 32, 10, 0.56);
+}
+
+.app-shell.theme-amber-night .inspector-collapsed-copy,
+.app-shell.theme-amber-night .inspector-entity-label,
+.app-shell.theme-amber-night .inspector-detail-grid dt {
+  color: #dec889;
+}
+
+.app-shell.theme-amber-night .inspector-context-header h2 {
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .inspector-kind-chip {
+  border-color: #9b8341;
+  background: #4b3a12;
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .inspector-entity-id,
+.app-shell.theme-amber-night .inspector-detail-grid dd {
+  color: #fff1c8;
+}
+
+/* Final text coverage for new themes: canvas info copy, ops/health, validation center copy */
+
+.app-shell.theme-rose-quartz .network-canvas-floating-copy {
+  color: #7a4b63;
+}
+
+.app-shell.theme-rose-quartz .network-canvas-floating-copy strong {
+  color: #5a2540;
+}
+
+.app-shell.theme-lavender-haze .network-canvas-floating-copy {
+  color: #5f5896;
+}
+
+.app-shell.theme-lavender-haze .network-canvas-floating-copy strong {
+  color: #3f397d;
+}
+
+.app-shell.theme-burgundy-noir .network-canvas-floating-copy strong {
+  color: #f7eaf0;
+}
+
+.app-shell.theme-amber-night .network-canvas-floating-copy strong {
+  color: #fff1c8;
+}
+
+.app-shell.theme-rose-quartz .validation-toolbar > span,
+.app-shell.theme-rose-quartz .summary-grid h3,
+.app-shell.theme-rose-quartz .validation-group h3,
+.app-shell.theme-rose-quartz .validation-active-filter {
+  color: #7a4b63;
+}
+
+.app-shell.theme-lavender-haze .validation-toolbar > span,
+.app-shell.theme-lavender-haze .summary-grid h3,
+.app-shell.theme-lavender-haze .validation-group h3,
+.app-shell.theme-lavender-haze .validation-active-filter {
+  color: #5f5896;
+}
+
+.app-shell.theme-burgundy-noir .validation-toolbar > span,
+.app-shell.theme-burgundy-noir .summary-grid h3,
+.app-shell.theme-burgundy-noir .validation-group h3,
+.app-shell.theme-burgundy-noir .validation-active-filter {
+  color: #ddb8c8;
+}
+
+.app-shell.theme-amber-night .validation-toolbar > span,
+.app-shell.theme-amber-night .summary-grid h3,
+.app-shell.theme-amber-night .validation-group h3,
+.app-shell.theme-amber-night .validation-active-filter {
+  color: #f0deaa;
+}
+
+.app-shell.theme-rose-quartz .workspace-shell .workspace-health {
+  border-top-color: #d7b0c3;
+}
+
+.app-shell.theme-rose-quartz .workspace-ops-content.panel,
+.app-shell.theme-rose-quartz .workspace-inspector-panel .inspector-context-panel {
+  background: rgba(255, 246, 251, 0.56);
+}
+
+.app-shell.theme-rose-quartz .workspace-ops-content h2,
+.app-shell.theme-rose-quartz .workspace-health h2 {
+  color: #6c2f4b;
+}
+
+.app-shell.theme-rose-quartz .workspace-health .meta-line,
+.app-shell.theme-rose-quartz .shortcut-hints,
+.app-shell.theme-rose-quartz .inspector-collapsed-copy {
+  color: #86536c;
+}
+
+.app-shell.theme-rose-quartz .save-status.is-saved {
+  color: #9b3f68;
+}
+
+.app-shell.theme-rose-quartz .save-status.is-unsaved {
+  color: #b05279;
+}
+
+.app-shell.theme-rose-quartz .save-status.is-error {
+  color: #b43a5f;
+}
+
+.app-shell.theme-lavender-haze .workspace-shell .workspace-health {
+  border-top-color: #c3bde8;
+}
+
+.app-shell.theme-lavender-haze .workspace-ops-content.panel,
+.app-shell.theme-lavender-haze .workspace-inspector-panel .inspector-context-panel {
+  background: rgba(248, 247, 255, 0.58);
+}
+
+.app-shell.theme-lavender-haze .workspace-ops-content h2,
+.app-shell.theme-lavender-haze .workspace-health h2 {
+  color: #4a438d;
+}
+
+.app-shell.theme-lavender-haze .workspace-health .meta-line,
+.app-shell.theme-lavender-haze .shortcut-hints,
+.app-shell.theme-lavender-haze .inspector-collapsed-copy {
+  color: #645ca3;
+}
+
+.app-shell.theme-lavender-haze .save-status.is-saved {
+  color: #6b5ad0;
+}
+
+.app-shell.theme-lavender-haze .save-status.is-unsaved {
+  color: #8573dd;
+}
+
+.app-shell.theme-lavender-haze .save-status.is-error {
+  color: #8a4fd0;
+}
+
+.app-shell.theme-burgundy-noir .save-status.is-saved {
+  color: #f0b1c8;
+}
+
+.app-shell.theme-burgundy-noir .save-status.is-unsaved {
+  color: #ffc0d7;
+}
+
+.app-shell.theme-burgundy-noir .save-status.is-error {
+  color: #ffd1df;
+}
+
+.app-shell.theme-amber-night .workspace-shell .workspace-health {
+  border-top-color: #7b6731;
+}
+
+.app-shell.theme-amber-night .workspace-ops-content.panel,
+.app-shell.theme-amber-night .workspace-inspector-panel .inspector-context-panel {
+  background: rgba(42, 32, 10, 0.58);
+}
+
+.app-shell.theme-amber-night .workspace-ops-content h2,
+.app-shell.theme-amber-night .workspace-health h2 {
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .workspace-health .meta-line,
+.app-shell.theme-amber-night .shortcut-hints,
+.app-shell.theme-amber-night .inspector-collapsed-copy {
+  color: #dec889;
+}
+
+.app-shell.theme-amber-night .save-status.is-saved {
+  color: #ffe39a;
+}
+
+.app-shell.theme-amber-night .save-status.is-unsaved {
+  color: #ffd166;
+}
+
+.app-shell.theme-amber-night .save-status.is-error {
+  color: #ffc98d;
+}
+
+/* Coverage parity for new themes: forms, settings fieldsets, panel meta copy, action toggles */
+
+.app-shell.theme-rose-quartz .error-banner button,
+.app-shell.theme-rose-quartz .inspector-context-toggle,
+.app-shell.theme-rose-quartz .header-install-toggle,
+.app-shell.theme-rose-quartz .network-scope-create-button {
+  border-color: #cc9db4;
+  background: #f7e6ee;
+  color: #51213a;
+}
+
+.app-shell.theme-rose-quartz .network-form-header h2,
+.app-shell.theme-rose-quartz .network-form-label,
+.app-shell.theme-rose-quartz .stack-label,
+.app-shell.theme-rose-quartz .stack-form label,
+.app-shell.theme-rose-quartz .row-form label,
+.app-shell.theme-rose-quartz .cavity h3 {
+  color: #6c2f4b;
+}
+
+.app-shell.theme-rose-quartz .empty-copy,
+.app-shell.theme-rose-quartz .form-hint,
+.app-shell.theme-rose-quartz .inline-help,
+.app-shell.theme-rose-quartz .panel .meta-line,
+.app-shell.theme-rose-quartz .settings-panel .meta-line,
+.app-shell.theme-rose-quartz .cavity p {
+  color: #86536c;
+}
+
+.app-shell.theme-rose-quartz .form-hint.danger {
+  color: #b43a5f;
+}
+
+.app-shell.theme-rose-quartz .wire-endpoint-fieldset,
+.app-shell.theme-rose-quartz .settings-export-fieldset {
+  border-color: #d9b1c4;
+  background: linear-gradient(180deg, rgba(255, 248, 252, 0.92), rgba(248, 236, 243, 0.7));
+}
+
+.app-shell.theme-rose-quartz .wire-endpoint-fieldset legend,
+.app-shell.theme-rose-quartz .wire-endpoint-fieldset label,
+.app-shell.theme-rose-quartz .settings-export-fieldset legend {
+  color: #5a2540;
+}
+
+.app-shell.theme-rose-quartz .splice-badge {
+  border-color: #cc9db4;
+  background: #f0d2df;
+  color: #5a2540;
+}
+
+.app-shell.theme-lavender-haze .error-banner button,
+.app-shell.theme-lavender-haze .inspector-context-toggle,
+.app-shell.theme-lavender-haze .header-install-toggle,
+.app-shell.theme-lavender-haze .network-scope-create-button {
+  border-color: #bdb3ea;
+  background: #ece9ff;
+  color: #312c66;
+}
+
+.app-shell.theme-lavender-haze .network-form-header h2,
+.app-shell.theme-lavender-haze .network-form-label,
+.app-shell.theme-lavender-haze .stack-label,
+.app-shell.theme-lavender-haze .stack-form label,
+.app-shell.theme-lavender-haze .row-form label,
+.app-shell.theme-lavender-haze .cavity h3 {
+  color: #4a438d;
+}
+
+.app-shell.theme-lavender-haze .empty-copy,
+.app-shell.theme-lavender-haze .form-hint,
+.app-shell.theme-lavender-haze .inline-help,
+.app-shell.theme-lavender-haze .panel .meta-line,
+.app-shell.theme-lavender-haze .settings-panel .meta-line,
+.app-shell.theme-lavender-haze .cavity p {
+  color: #645ca3;
+}
+
+.app-shell.theme-lavender-haze .form-hint.danger {
+  color: #8a4fd0;
+}
+
+.app-shell.theme-lavender-haze .wire-endpoint-fieldset,
+.app-shell.theme-lavender-haze .settings-export-fieldset {
+  border-color: #c7c0ea;
+  background: linear-gradient(180deg, rgba(250, 249, 255, 0.94), rgba(239, 236, 253, 0.76));
+}
+
+.app-shell.theme-lavender-haze .wire-endpoint-fieldset legend,
+.app-shell.theme-lavender-haze .wire-endpoint-fieldset label,
+.app-shell.theme-lavender-haze .settings-export-fieldset legend {
+  color: #3f397d;
+}
+
+.app-shell.theme-lavender-haze .splice-badge {
+  border-color: #bcb2ea;
+  background: #dcd5fb;
+  color: #3f397d;
+}
+
+.app-shell.theme-burgundy-noir .error-banner button,
+.app-shell.theme-burgundy-noir .inspector-context-toggle,
+.app-shell.theme-burgundy-noir .header-install-toggle,
+.app-shell.theme-burgundy-noir .network-scope-create-button {
+  border-color: #83465f;
+  background: #3a1725;
+  color: #f8edf2;
+}
+
+.app-shell.theme-burgundy-noir .network-form-header h2,
+.app-shell.theme-burgundy-noir .network-form-label,
+.app-shell.theme-burgundy-noir .stack-label,
+.app-shell.theme-burgundy-noir .stack-form label,
+.app-shell.theme-burgundy-noir .row-form label,
+.app-shell.theme-burgundy-noir .cavity h3 {
+  color: #edcfdb;
+}
+
+.app-shell.theme-burgundy-noir .empty-copy,
+.app-shell.theme-burgundy-noir .form-hint,
+.app-shell.theme-burgundy-noir .inline-help,
+.app-shell.theme-burgundy-noir .panel .meta-line,
+.app-shell.theme-burgundy-noir .settings-panel .meta-line,
+.app-shell.theme-burgundy-noir .cavity p {
+  color: #d5aebe;
+}
+
+.app-shell.theme-burgundy-noir .form-hint.danger {
+  color: #ffd1df;
+}
+
+.app-shell.theme-burgundy-noir .wire-endpoint-fieldset,
+.app-shell.theme-burgundy-noir .settings-export-fieldset {
+  border-color: #6a3950;
+  background: linear-gradient(180deg, rgba(45, 16, 27, 0.88), rgba(36, 13, 22, 0.62));
+}
+
+.app-shell.theme-burgundy-noir .wire-endpoint-fieldset legend,
+.app-shell.theme-burgundy-noir .wire-endpoint-fieldset label,
+.app-shell.theme-burgundy-noir .settings-export-fieldset legend {
+  color: #f4e4eb;
+}
+
+.app-shell.theme-burgundy-noir .splice-badge {
+  border-color: #8b4f68;
+  background: #412031;
+  color: #f4e4eb;
+}
+
+.app-shell.theme-amber-night .error-banner button,
+.app-shell.theme-amber-night .inspector-context-toggle,
+.app-shell.theme-amber-night .header-install-toggle,
+.app-shell.theme-amber-night .network-scope-create-button {
+  border-color: #8c7639;
+  background: #362a0d;
+  color: #fbf0cf;
+}
+
+.app-shell.theme-amber-night .network-form-header h2,
+.app-shell.theme-amber-night .network-form-label,
+.app-shell.theme-amber-night .stack-label,
+.app-shell.theme-amber-night .stack-form label,
+.app-shell.theme-amber-night .row-form label,
+.app-shell.theme-amber-night .cavity h3 {
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .empty-copy,
+.app-shell.theme-amber-night .form-hint,
+.app-shell.theme-amber-night .inline-help,
+.app-shell.theme-amber-night .panel .meta-line,
+.app-shell.theme-amber-night .settings-panel .meta-line,
+.app-shell.theme-amber-night .cavity p {
+  color: #dec889;
+}
+
+.app-shell.theme-amber-night .form-hint.danger {
+  color: #ffc98d;
+}
+
+.app-shell.theme-amber-night .wire-endpoint-fieldset,
+.app-shell.theme-amber-night .settings-export-fieldset {
+  border-color: #7b6731;
+  background: linear-gradient(180deg, rgba(43, 33, 8, 0.88), rgba(32, 24, 7, 0.62));
+}
+
+.app-shell.theme-amber-night .wire-endpoint-fieldset legend,
+.app-shell.theme-amber-night .wire-endpoint-fieldset label,
+.app-shell.theme-amber-night .settings-export-fieldset legend {
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .splice-badge {
+  border-color: #9b8341;
+  background: #4b3a12;
+  color: #ffe9af;
+}

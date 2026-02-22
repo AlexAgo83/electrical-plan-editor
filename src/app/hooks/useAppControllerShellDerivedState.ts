@@ -24,7 +24,11 @@ export function useAppControllerShellDerivedState({
     slateNeon: ["theme-dark", "theme-slate-neon"],
     paperBlueprint: ["theme-normal", "theme-paper-blueprint"],
     warmBrown: ["theme-normal", "theme-warm-brown"],
-    deepGreen: ["theme-dark", "theme-deep-green"]
+    deepGreen: ["theme-dark", "theme-deep-green"],
+    roseQuartz: ["theme-normal", "theme-paper-blueprint", "theme-rose-quartz"],
+    burgundyNoir: ["theme-dark", "theme-burgundy-noir"],
+    lavenderHaze: ["theme-normal", "theme-paper-blueprint", "theme-lavender-haze"],
+    amberNight: ["theme-dark", "theme-deep-green", "theme-amber-night"]
   };
   const resolvedThemeClassNames = themeClassNamesByMode[themeMode] ?? themeClassNamesByMode.normal;
   const appShellClassName = [
@@ -61,4 +65,3 @@ export function useAppControllerShellDerivedState({
     configuredResetZoomPercent
   };
 }
-

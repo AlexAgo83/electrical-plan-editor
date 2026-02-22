@@ -30,7 +30,11 @@ export type ThemeMode =
   | "slateNeon"
   | "paperBlueprint"
   | "warmBrown"
-  | "deepGreen";
+  | "deepGreen"
+  | "roseQuartz"
+  | "burgundyNoir"
+  | "lavenderHaze"
+  | "amberNight";
 
 export interface LayoutNodePosition {
   x: number;

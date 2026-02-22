@@ -134,6 +134,10 @@ export function SettingsWorkspaceContent({
               <option value="paperBlueprint">Paper Blueprint</option>
               <option value="warmBrown">Warm Brown</option>
               <option value="deepGreen">Deep Green</option>
+              <option value="roseQuartz">Rose Quartz</option>
+              <option value="burgundyNoir">Burgundy Noir</option>
+              <option value="lavenderHaze">Lavender Haze</option>
+              <option value="amberNight">Amber Night</option>
             </select>
           </label>
           <label className="settings-field">
