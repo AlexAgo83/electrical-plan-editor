@@ -709,8 +709,8 @@
 }
 
 .app-shell.theme-paper-blueprint .network-form-mode-chip.is-edit {
-  background: #dff0e4;
-  color: #21593a;
+  background: #dbe9f5;
+  color: #254d69;
 }
 
 .app-shell.theme-paper-blueprint .network-legend {
@@ -869,8 +869,8 @@
 }
 
 .app-shell.theme-warm-brown .network-form-mode-chip.is-edit {
-  background: #e4efdf;
-  color: #315132;
+  background: #efdfd2;
+  color: #6a4a35;
 }
 
 .app-shell.theme-warm-brown .network-legend {
@@ -1660,6 +1660,21 @@
   color: #5a2540;
 }
 
+.app-shell.theme-rose-quartz .network-form-mode-chip {
+  background: #f7e6ee;
+  color: #5a2540;
+}
+
+.app-shell.theme-rose-quartz .network-form-mode-chip.is-create {
+  background: #f0d2df;
+  color: #5a2540;
+}
+
+.app-shell.theme-rose-quartz .network-form-mode-chip.is-edit {
+  background: #ffd9e8;
+  color: #5a2540;
+}
+
 .app-shell.theme-lavender-haze {
   --theme-primary: #6f63d9;
   color: #2f2a5f;
@@ -1783,6 +1798,21 @@
   border-color: #b0a8e6;
   background: #ece9fb;
   color: #3f397d;
+}
+
+.app-shell.theme-lavender-haze .network-form-mode-chip {
+  background: #ece9fb;
+  color: #3f397d;
+}
+
+.app-shell.theme-lavender-haze .network-form-mode-chip.is-create {
+  background: #ddd7ff;
+  color: #3f397d;
+}
+
+.app-shell.theme-lavender-haze .network-form-mode-chip.is-edit {
+  background: #cec6ff;
+  color: #312c66;
 }
 
 .app-shell.theme-burgundy-noir {
@@ -2210,6 +2240,21 @@
   border-color: #9b8341;
   background: #4b3a12;
   color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .network-form-mode-chip {
+  background: #4b3a12;
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .network-form-mode-chip.is-create {
+  background: #5c4717;
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .network-form-mode-chip.is-edit {
+  background: #725720;
+  color: #fff1c8;
 }
 
 /* Coverage completion for new theme variants: 2D legend, route-preview sub-panels, inspector */
