@@ -226,11 +226,10 @@ interface CableCalloutViewModel {
 
 interface CalloutLayoutMetrics {
   width: number;
-  headerTitleY: number;
-  headerSubtitleY: number;
-  groupsStartY: number;
+  rowsStartY: number;
+  rowStep: number;
   height: number;
-  wrappedRowsByGroupKey: Record<string, string[][]>;
+  rows: string[];
 }
 
 interface DraggingCalloutState {
@@ -241,8 +240,8 @@ interface DraggingCalloutState {
 }
 
 const CALLOUT_OFFSET_SCREEN_UNITS = 92;
-const CALLOUT_MIN_WIDTH = 132;
-const CALLOUT_MAX_WIDTH = 260;
+const CALLOUT_MIN_WIDTH = 44;
+const CALLOUT_MAX_WIDTH = 320;
 
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -256,97 +255,124 @@ function normalizeVector(x: number, y: number): { x: number; y: number } {
   return { x: x / magnitude, y: y / magnitude };
 }
 
-function wrapTextByApproxChars(text: string, maxChars: number): string[] {
-  const normalized = text.trim();
-  if (normalized.length === 0) {
-    return [""];
-  }
-
-  const limit = Math.max(8, maxChars);
-  if (normalized.length <= limit) {
-    return [normalized];
-  }
-
-  const words = normalized.split(/\s+/);
-  const lines: string[] = [];
-  let current = "";
-  const flush = () => {
-    if (current.length > 0) {
-      lines.push(current);
-      current = "";
-    }
-  };
-
-  for (const word of words) {
-    if (word.length > limit) {
-      flush();
-      let remaining = word;
-      while (remaining.length > limit) {
-        lines.push(remaining.slice(0, limit));
-        remaining = remaining.slice(limit);
-      }
-      current = remaining;
-      continue;
-    }
-
-    const candidate = current.length === 0 ? word : `${current} ${word}`;
-    if (candidate.length <= limit) {
-      current = candidate;
-    } else {
-      flush();
-      current = word;
-    }
-  }
-  flush();
-
-  return lines.length > 0 ? lines : [normalized];
+function buildCalloutEntryDisplayLine(entry: CalloutEntry): string {
+  return `${entry.name} (${entry.technicalId}) - ${entry.lengthMm} mm`;
 }
 
-function buildCalloutLayoutMetrics(groups: CalloutGroup[]): CalloutLayoutMetrics {
-  const titleChars = 28;
-  const subtitleChars = 34;
-  let longestLineLength = Math.max(titleChars, subtitleChars);
-  for (const group of groups) {
-    longestLineLength = Math.max(longestLineLength, group.label.length);
-    for (const entry of group.entries) {
-      const line = `${entry.name} (${entry.technicalId}) - ${entry.lengthMm} mm`;
-      longestLineLength = Math.max(longestLineLength, line.length);
+function getCalloutRowFontSize(labelSizeMode: CanvasLabelSizeMode): number {
+  switch (labelSizeMode) {
+    case "extraSmall":
+      return 3.7;
+    case "small":
+      return 4;
+    case "large":
+      return 4.9;
+    case "extraLarge":
+      return 5.2;
+    case "normal":
+    default:
+      return 4.3;
+  }
+}
+
+let calloutMeasureCanvas: HTMLCanvasElement | null = null;
+let calloutMeasureSvgText: SVGTextElement | null = null;
+let calloutMeasureSvgRoot: SVGSVGElement | null = null;
+function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
+  const fallback = text.length * fontSizePx * 0.56;
+  if (typeof document === "undefined") {
+    return fallback;
+  }
+  if (!calloutMeasureSvgText || !calloutMeasureSvgRoot) {
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("width", "0");
+    svg.setAttribute("height", "0");
+    svg.setAttribute("aria-hidden", "true");
+    svg.style.position = "absolute";
+    svg.style.left = "-9999px";
+    svg.style.top = "-9999px";
+    svg.style.pointerEvents = "none";
+    svg.style.opacity = "0";
+    const textNode = document.createElementNS(ns, "text");
+    svg.appendChild(textNode);
+    document.body.appendChild(svg);
+    calloutMeasureSvgRoot = svg;
+    calloutMeasureSvgText = textNode;
+  }
+  if (calloutMeasureSvgText) {
+    calloutMeasureSvgText.textContent = text;
+    calloutMeasureSvgText.setAttribute("font-size", String(fontSizePx));
+    calloutMeasureSvgText.setAttribute("font-family", "\"IBM Plex Sans\", \"Segoe UI\", sans-serif");
+    calloutMeasureSvgText.setAttribute("font-weight", "400");
+    try {
+      const measured = calloutMeasureSvgText.getComputedTextLength();
+      if (Number.isFinite(measured) && measured > 0) {
+        return measured;
+      }
+    } catch {
+      // Fall through to canvas/fallback.
     }
   }
-
-  const width = clampNumber(84 + longestLineLength * 3.2, CALLOUT_MIN_WIDTH, CALLOUT_MAX_WIDTH);
-  const maxChars = Math.max(16, Math.floor((width - 18) / 4.8));
-  const wrappedRowsByGroupKey: Record<string, string[][]> = {};
-
-  let y = 0;
-  const paddingTop = 10;
-  const headerTitleY = paddingTop;
-  y = headerTitleY + 9;
-  const headerSubtitleY = y;
-  y += 8;
-  const groupsStartY = y + 3;
-  y = groupsStartY;
-
-  for (const group of groups) {
-    y += 7.5; // group header
-    const wrappedRows: string[][] = [];
-    for (const entry of group.entries) {
-      const line = `${entry.name} (${entry.technicalId}) - ${entry.lengthMm} mm`;
-      const wrapped = wrapTextByApproxChars(line, maxChars);
-      wrappedRows.push(wrapped);
-      y += wrapped.length * 7;
-    }
-    if (group.entries.length === 0) {
-      const wrapped = wrapTextByApproxChars("No connected cables", maxChars);
-      wrappedRows.push(wrapped);
-      y += wrapped.length * 7;
-    }
-    y += 3;
-    wrappedRowsByGroupKey[group.key] = wrappedRows;
+  if (!calloutMeasureCanvas) {
+    calloutMeasureCanvas = document.createElement("canvas");
   }
+  const context = calloutMeasureCanvas.getContext("2d");
+  if (!context) {
+    return fallback;
+  }
+  context.font = `${fontSizePx}px "IBM Plex Sans", "Segoe UI", sans-serif`;
+  return context.measureText(text).width;
+}
 
-  const height = Math.max(42, y + 6);
-  return { width, headerTitleY, headerSubtitleY, groupsStartY, height, wrappedRowsByGroupKey };
+function measureCalloutRowTextMetrics(fontSizePx: number): { topOffset: number; height: number } {
+  const fallback = { topOffset: 0, height: fontSizePx };
+  if (typeof document === "undefined") {
+    return fallback;
+  }
+  if (!calloutMeasureSvgText || !calloutMeasureSvgRoot) {
+    // Reuse width measurer initializer.
+    measureCalloutRowTextWidth("Ag", fontSizePx);
+  }
+  if (!calloutMeasureSvgText) {
+    return fallback;
+  }
+  calloutMeasureSvgText.textContent = "Ag";
+  calloutMeasureSvgText.setAttribute("x", "0");
+  calloutMeasureSvgText.setAttribute("y", "0");
+  calloutMeasureSvgText.setAttribute("font-size", String(fontSizePx));
+  calloutMeasureSvgText.setAttribute("font-family", "system-ui, sans-serif");
+  calloutMeasureSvgText.setAttribute("font-weight", "400");
+  calloutMeasureSvgText.setAttribute("dominant-baseline", "hanging");
+  try {
+    const bbox = calloutMeasureSvgText.getBBox();
+    if (Number.isFinite(bbox.height) && bbox.height > 0) {
+      return { topOffset: bbox.y, height: bbox.height };
+    }
+  } catch {
+    return fallback;
+  }
+  return fallback;
+}
+
+function buildCalloutLayoutMetrics(groups: CalloutGroup[], labelSizeMode: CanvasLabelSizeMode): CalloutLayoutMetrics {
+  const rows = groups.flatMap((group) => group.entries.map(buildCalloutEntryDisplayLine));
+  const rowFontSize = getCalloutRowFontSize(labelSizeMode);
+  const rowTextMetrics = measureCalloutRowTextMetrics(rowFontSize);
+  const rowLineHeight = rowTextMetrics.height;
+  let longestMeasuredRowWidth = 0;
+  for (const row of rows) {
+    longestMeasuredRowWidth = Math.max(longestMeasuredRowWidth, measureCalloutRowTextWidth(row, rowFontSize));
+  }
+  const width = clampNumber(Math.ceil(longestMeasuredRowWidth + 8), CALLOUT_MIN_WIDTH, CALLOUT_MAX_WIDTH);
+  const topPadding = 0.7;
+  const bottomPadding = 0.6;
+  const rowGap = 0.45;
+  const rowsStartY = topPadding - rowTextMetrics.topOffset;
+  const rowStep = rowLineHeight + rowGap;
+  const contentHeight = rows.length > 0 ? rowLineHeight + (rows.length - 1) * rowStep : 0;
+  const height = Math.max(0, topPadding + contentHeight + bottomPadding);
+  return { width, rowsStartY, rowStep, height, rows };
 }
 
 function getCalloutFrameEdgePoint(
@@ -723,6 +749,7 @@ export function NetworkSummaryPanel({
         const draftPosition = draftCalloutPositions[key];
         const persistedPosition = connector.cableCalloutPosition;
         const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
+        const groups = (connectorCalloutGroupsById.get(connector.id) ?? []).filter((group) => group.entries.length > 0);
         models.push({
           key,
           kind: "connector",
@@ -732,7 +759,7 @@ export function NetworkSummaryPanel({
           position,
           title: connector.name,
           subtitle: connector.technicalId,
-          groups: connectorCalloutGroupsById.get(connector.id) ?? [],
+          groups,
           isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
           isSelected: selectedConnectorId === connector.id
         });
@@ -747,6 +774,7 @@ export function NetworkSummaryPanel({
       const draftPosition = draftCalloutPositions[key];
       const persistedPosition = splice.cableCalloutPosition;
       const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
+      const groups = (spliceCalloutGroupsById.get(splice.id) ?? []).filter((group) => group.entries.length > 0);
       models.push({
         key,
         kind: "splice",
@@ -756,7 +784,7 @@ export function NetworkSummaryPanel({
         position,
         title: splice.name,
         subtitle: splice.technicalId,
-        groups: spliceCalloutGroupsById.get(splice.id) ?? [],
+        groups,
         isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
         isSelected: selectedSpliceId === splice.id
       });
@@ -1025,7 +1053,7 @@ export function NetworkSummaryPanel({
               className={showCableCallouts ? "workspace-tab is-active" : "workspace-tab"}
               onClick={toggleShowCableCallouts}
             >
-              <span className="network-summary-info-icon" aria-hidden="true" />
+              <span className="network-summary-callouts-icon" aria-hidden="true" />
               Callouts
             </button>
             <button
@@ -1273,7 +1301,7 @@ export function NetworkSummaryPanel({
                 })}
 
                 {orderedCableCallouts.map((callout) => {
-                  const layout = buildCalloutLayoutMetrics(callout.groups);
+                  const layout = buildCalloutLayoutMetrics(callout.groups, labelSizeMode);
                   const lineEnd = getCalloutFrameEdgePoint(
                     callout.nodePosition,
                     callout.position,
@@ -1286,7 +1314,7 @@ export function NetworkSummaryPanel({
                   }${hoveredCalloutKey === callout.key ? " is-hovered" : ""}${
                     draggingCallout?.key === callout.key ? " is-dragging" : ""
                   }`;
-                  let contentCursorY = layout.groupsStartY;
+                  let contentCursorY = layout.rowsStartY;
 
                   return (
                     <g
@@ -1336,52 +1364,24 @@ export function NetworkSummaryPanel({
                           width={layout.width}
                           height={layout.height}
                         />
-                        <text className="network-callout-title" x={0} y={-layout.height / 2 + layout.headerTitleY} textAnchor="middle">
-                          {callout.title}
-                        </text>
-                        <text
-                          className="network-callout-subtitle"
-                          x={0}
-                          y={-layout.height / 2 + layout.headerSubtitleY}
-                          textAnchor="middle"
-                        >
-                          {callout.subtitle}
-                        </text>
-                        {callout.groups.map((group) => {
-                          const groupHeaderY = -layout.height / 2 + contentCursorY;
-                          const wrappedRows =
-                            layout.wrappedRowsByGroupKey[group.key] ?? [[group.entries.length === 0 ? "No connected cables" : ""]];
-                          contentCursorY += 7.5;
-                          const renderedRows = wrappedRows.map((wrappedRowLines, rowIndex) => {
+                        <g className="network-callout-content">
+                          {layout.rows.map((row, rowIndex) => {
                             const rowY = -layout.height / 2 + contentCursorY;
-                            const row = (
+                            contentCursorY += layout.rowStep;
+                            return (
                               <text
-                                key={`${group.key}-row-${group.entries[rowIndex]?.wireId ?? `empty-${rowIndex}`}`}
+                                key={`${callout.key}-row-${rowIndex}`}
                                 className="network-callout-row-text"
-                                x={-layout.width / 2 + 8}
+                                x={-layout.width / 2 + 4}
                                 y={rowY}
                                 textAnchor="start"
+                                dominantBaseline="hanging"
                               >
-                                {wrappedRowLines.map((line, lineIndex) => (
-                                  <tspan key={`${group.key}-row-${rowIndex}-line-${lineIndex}`} x={-layout.width / 2 + 8} dy={lineIndex === 0 ? 0 : 7}>
-                                    {line}
-                                  </tspan>
-                                ))}
+                                {row}
                               </text>
                             );
-                            contentCursorY += wrappedRowLines.length * 7;
-                            return row;
-                          });
-                          contentCursorY += 3;
-                          return (
-                            <g key={group.key} className="network-callout-group-content">
-                              <text className="network-callout-group-label" x={-layout.width / 2 + 8} y={groupHeaderY} textAnchor="start">
-                                {group.label}
-                              </text>
-                              {renderedRows}
-                            </g>
-                          );
-                        })}
+                          })}
+                        </g>
                       </g>
                     </g>
                   );
