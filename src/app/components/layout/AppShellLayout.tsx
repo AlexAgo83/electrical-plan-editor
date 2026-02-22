@@ -168,6 +168,14 @@ export function AppShellLayout({
         workspaceContent={networkScopeWorkspaceContent}
       />
     );
+  } else if (isSettingsScreen) {
+    activeWorkspaceContent = (
+      <SettingsWorkspaceContainer
+        ScreenComponent={SettingsScreenComponent}
+        isActive={isSettingsScreen}
+        workspaceContent={settingsWorkspaceContent}
+      />
+    );
   } else if (!hasActiveNetwork) {
     activeWorkspaceContent = (
       <section className="panel">
@@ -201,14 +209,6 @@ export function AppShellLayout({
         ScreenComponent={ValidationScreenComponent}
         isActive={isValidationScreen}
         workspaceContent={validationWorkspaceContent}
-      />
-    );
-  } else if (isSettingsScreen) {
-    activeWorkspaceContent = (
-      <SettingsWorkspaceContainer
-        ScreenComponent={SettingsScreenComponent}
-        isActive={isSettingsScreen}
-        workspaceContent={settingsWorkspaceContent}
       />
     );
   } else {

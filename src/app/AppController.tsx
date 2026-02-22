@@ -48,8 +48,8 @@ import { useAppControllerAuxScreenContentDomains } from "./hooks/controller/useA
 import { useAppControllerModelingAnalysisScreenDomains } from "./hooks/controller/useAppControllerModelingAnalysisScreenDomains";
 import { useAppControllerModelingHandlersOrchestrator } from "./hooks/controller/useAppControllerModelingHandlersOrchestrator";
 import {
+  buildNetworkSummaryPanelControllerSlice,
   useInspectorContextPanelControllerSlice,
-  useNetworkSummaryPanelControllerSlice
 } from "./hooks/controller/useAppControllerScreenContentSlices";
 import { useEntityListModel } from "./hooks/useEntityListModel";
 import { useEntityFormsState } from "./hooks/useEntityFormsState";
@@ -1063,53 +1063,57 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       clearAllModelingForms();
     }
   });
-  const { networkSummaryPanel } = useNetworkSummaryPanelControllerSlice({
-    NetworkSummaryPanelComponent: NetworkSummaryPanel,
-    handleZoomAction,
-    fitNetworkToContent,
-    showNetworkGrid,
-    setShowNetworkGrid,
-    snapNodesToGrid,
-    setSnapNodesToGrid,
-    showNetworkInfoPanels,
-    setShowNetworkInfoPanels,
-    showSegmentLengths,
-    setShowSegmentLengths,
-    networkLabelStrokeMode,
-    networkScalePercent,
-    routingGraph,
-    totalEdgeEntries,
-    nodes,
-    segments,
-    isPanningNetwork,
-    networkViewWidth: NETWORK_VIEW_WIDTH,
-    networkViewHeight: NETWORK_VIEW_HEIGHT,
-    networkGridStep: NETWORK_GRID_STEP,
-    networkOffset,
-    networkScale,
-    handleNetworkCanvasMouseDown,
-    handleNetworkCanvasClick,
-    handleNetworkWheel,
-    handleNetworkMouseMove,
-    stopNetworkNodeDrag,
-    networkNodePositions,
-    selectedWireRouteSegmentIds,
-    selectedSegmentId,
-    handleNetworkSegmentClick,
-    selectedNodeId,
-    handleNetworkNodeMouseDown,
-    handleNetworkNodeClick,
-    connectorMap,
-    spliceMap,
-    describeNode,
-    subNetworkSummaries,
-    routePreviewStartNodeId,
-    setRoutePreviewStartNodeId,
-    routePreviewEndNodeId,
-    setRoutePreviewEndNodeId,
-    routePreview,
-    handleRegenerateLayout
-  });
+  const shouldIncludeNetworkSummaryPanel = hasActiveNetwork && (isModelingScreen || isAnalysisScreen);
+  const networkSummaryPanel =
+    shouldIncludeNetworkSummaryPanel
+      ? buildNetworkSummaryPanelControllerSlice({
+        NetworkSummaryPanelComponent: NetworkSummaryPanel,
+        handleZoomAction,
+        fitNetworkToContent,
+        showNetworkGrid,
+        setShowNetworkGrid,
+        snapNodesToGrid,
+        setSnapNodesToGrid,
+        showNetworkInfoPanels,
+        setShowNetworkInfoPanels,
+        showSegmentLengths,
+        setShowSegmentLengths,
+        networkLabelStrokeMode,
+        networkScalePercent,
+        routingGraph,
+        totalEdgeEntries,
+        nodes,
+        segments,
+        isPanningNetwork,
+        networkViewWidth: NETWORK_VIEW_WIDTH,
+        networkViewHeight: NETWORK_VIEW_HEIGHT,
+        networkGridStep: NETWORK_GRID_STEP,
+        networkOffset,
+        networkScale,
+        handleNetworkCanvasMouseDown,
+        handleNetworkCanvasClick,
+        handleNetworkWheel,
+        handleNetworkMouseMove,
+        stopNetworkNodeDrag,
+        networkNodePositions,
+        selectedWireRouteSegmentIds,
+        selectedSegmentId,
+        handleNetworkSegmentClick,
+        selectedNodeId,
+        handleNetworkNodeMouseDown,
+        handleNetworkNodeClick,
+        connectorMap,
+        spliceMap,
+        describeNode,
+        subNetworkSummaries,
+        routePreviewStartNodeId,
+        setRoutePreviewStartNodeId,
+        routePreviewEndNodeId,
+        setRoutePreviewEndNodeId,
+        routePreview,
+        handleRegenerateLayout
+      }).networkSummaryPanel
+      : null;
   const { modelingLeftColumnContent, modelingFormsColumnContent, analysisWorkspaceContent } =
     useAppControllerModelingAnalysisScreenDomains({
       components: {
@@ -1288,7 +1292,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       },
       includeNetworkScopeContent: isNetworkScopeScreen,
       includeValidationContent: hasActiveNetwork && isValidationScreen,
-      includeSettingsContent: hasActiveNetwork && isSettingsScreen
+      includeSettingsContent: isSettingsScreen
     });
 
   return (

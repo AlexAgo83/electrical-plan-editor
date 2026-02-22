@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import type { EntityListModel } from "../useEntityListModel";
 import type { AppControllerFormsStateFlat } from "../useAppControllerNamespacedFormsState";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
@@ -84,7 +85,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   wireDescriptions: WireEndpointDescriptions;
   describeNode: ModelingSliceParams["describeNode"];
   nodeLabelById: ModelingSliceParams["nodeLabelById"];
-  networkSummaryPanel: AnalysisSliceParams["networkSummaryPanel"];
+  networkSummaryPanel: ReactElement | null;
   connectorTechnicalIdAlreadyUsed: ModelingSliceParams["connectorTechnicalIdAlreadyUsed"];
   spliceTechnicalIdAlreadyUsed: ModelingSliceParams["spliceTechnicalIdAlreadyUsed"];
   wireTechnicalIdAlreadyUsed: ModelingSliceParams["wireTechnicalIdAlreadyUsed"];
@@ -271,7 +272,12 @@ export function useAppControllerModelingAnalysisScreenDomains({
     : null;
 
   const analysisSlice = includeAnalysisContent
-    ? buildAnalysisScreenContentSlice({
+    ? (() => {
+      if (networkSummaryPanel === null) {
+        throw new Error("Network summary panel must be available when analysis content is included.");
+      }
+
+      return buildAnalysisScreenContentSlice({
     AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
@@ -334,7 +340,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     handleLockWireRoute: modelingHandlers.wire.handleLockWireRoute,
     handleResetWireRoute: modelingHandlers.wire.handleResetWireRoute,
     wireFormError: formsState.wireFormError
-      })
+      });
+    })()
     : null;
 
   return {

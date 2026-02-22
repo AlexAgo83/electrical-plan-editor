@@ -8,11 +8,6 @@ let appUiModulesLoadingModeForTests: AppUiModuleLoadingMode = "auto";
 let appUiModulesLazyImportDelayMsForTests = 0;
 let eagerRegistryForTests: AppUiModulesRegistry | null = null;
 
-if (import.meta.env.VITEST) {
-  const eagerModule = await import("./appUiModules.eager");
-  eagerRegistryForTests = eagerModule.appUiModulesEager;
-}
-
 function shouldLazyLoadUiModules(): boolean {
   if (appUiModulesLoadingModeForTests === "lazy") {
     return true;
@@ -139,4 +134,8 @@ export function setAppUiModulesLoadingModeForTests(mode: AppUiModuleLoadingMode)
 
 export function setAppUiModulesLazyImportDelayForTests(delayMs: number): void {
   appUiModulesLazyImportDelayMsForTests = Math.max(0, delayMs);
+}
+
+export function setAppUiModulesEagerRegistryForTests(registry: AppUiModulesRegistry | null): void {
+  eagerRegistryForTests = registry;
 }

@@ -61,6 +61,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   | "onRegenerateLayout"
 > & {
   NetworkSummaryPanelComponent: ComponentType<NetworkSummaryPanelProps>;
+  includeNetworkSummaryPanel?: boolean;
   setShowNetworkInfoPanels: BooleanStateSetter;
   setShowSegmentLengths: BooleanStateSetter;
   setShowNetworkGrid: BooleanStateSetter;
@@ -175,7 +176,14 @@ export function useInspectorContextPanelControllerSlice(params: InspectorContext
   };
 }
 
-export function useNetworkSummaryPanelControllerSlice(params: NetworkSummaryPanelControllerSliceParams) {
+export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPanelControllerSliceParams) {
+  if (params.includeNetworkSummaryPanel === false) {
+    return {
+      networkSummaryPanelProps: null,
+      networkSummaryPanel: null
+    };
+  }
+
   const networkSummaryPanelProps = {
     handleZoomAction: params.handleZoomAction,
     fitNetworkToContent: params.fitNetworkToContent,
@@ -612,3 +620,4 @@ export const useModelingScreenContentSlice = buildModelingScreenContentSlice;
 export const useAnalysisScreenContentSlice = buildAnalysisScreenContentSlice;
 export const useValidationScreenContentSlice = buildValidationScreenContentSlice;
 export const useSettingsScreenContentSlice = buildSettingsScreenContentSlice;
+export const useNetworkSummaryPanelControllerSlice = buildNetworkSummaryPanelControllerSlice;

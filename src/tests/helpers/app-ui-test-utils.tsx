@@ -284,6 +284,7 @@ export function switchSubScreenDrawerAware(target: SubScreenSwitchTarget): void 
   switchSubScreenWithMode(target, "drawerAware");
 }
 
-// Backward-compatible aliases (drawer-aware) retained for existing tests.
+// Backward-compatible aliases retained for existing tests.
+// Prefer explicit `Strict` / `DrawerAware` variants in new or touched tests to preserve regression signal.
 export const switchScreen = switchScreenDrawerAware;
 export const switchSubScreen = switchSubScreenDrawerAware;

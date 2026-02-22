@@ -4,7 +4,7 @@ import {
   createValidationIssueState,
   getPanelByHeading,
   renderAppWithState,
-  switchScreen
+  switchScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - validation", () => {
@@ -19,7 +19,7 @@ describe("App integration UI - validation", () => {
   it("groups validation issues and supports category filtering", () => {
     renderAppWithState(createValidationIssueState());
 
-    switchScreen("validation");
+    switchScreenDrawerAware("validation");
 
     const validationPanel = getPanelByHeading("Validation center");
     expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe("App integration UI - validation", () => {
   it("shows category chip counts and disables empty categories under current filters", () => {
     renderAppWithState(createValidationIssueState());
 
-    switchScreen("validation");
+    switchScreenDrawerAware("validation");
     const validationPanel = getPanelByHeading("Validation center");
     fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
 
@@ -54,7 +54,7 @@ describe("App integration UI - validation", () => {
   it("shows severity chip counts and disables empty severities under current filters", () => {
     renderAppWithState(createValidationIssueState());
 
-    switchScreen("validation");
+    switchScreenDrawerAware("validation");
     const validationPanel = getPanelByHeading("Validation center");
     fireEvent.click(within(validationPanel).getByRole("button", { name: "Occupancy conflict" }));
 
@@ -71,7 +71,7 @@ describe("App integration UI - validation", () => {
   it("clears validation filters from toolbar", () => {
     renderAppWithState(createValidationIssueState());
 
-    switchScreen("validation");
+    switchScreenDrawerAware("validation");
     const validationPanel = getPanelByHeading("Validation center");
     fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
     fireEvent.click(within(validationPanel).getByRole("button", { name: "Occupancy conflict" }));
@@ -89,7 +89,7 @@ describe("App integration UI - validation", () => {
   it("uses visible filtered issues for validation toolbar previous/next navigation", () => {
     renderAppWithState(createValidationIssueState());
 
-    switchScreen("validation");
+    switchScreenDrawerAware("validation");
     const validationPanel = getPanelByHeading("Validation center");
     fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
     fireEvent.click(within(validationPanel).getByRole("button", { name: "Next issue" }));
@@ -110,7 +110,7 @@ describe("App integration UI - validation", () => {
   it("aligns model health issue navigator with visible validation filters", () => {
     renderAppWithState(createValidationIssueState());
 
-    switchScreen("validation");
+    switchScreenDrawerAware("validation");
     const validationPanel = getPanelByHeading("Validation center");
     openOperationsHealthPanel();
     const modelHealth = screen.getByRole("region", { name: "Model health" });
@@ -209,7 +209,7 @@ describe("App integration UI - validation", () => {
   it("uses visible filtered issues for alt keyboard navigation inside validation screen", () => {
     renderAppWithState(createValidationIssueState());
 
-    switchScreen("validation");
+    switchScreenDrawerAware("validation");
     const validationPanel = getPanelByHeading("Validation center");
     fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
 

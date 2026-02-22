@@ -1,13 +1,14 @@
 import { fireEvent, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { NetworkId } from "../core/entities";
 import {
   asConnectorId,
   createConnectorSortingState,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
-  switchScreen,
-  switchSubScreen
+  switchScreenDrawerAware,
+  switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 import { appActions, appReducer, createInitialState, createSampleNetworkState } from "../store";
 
@@ -19,7 +20,7 @@ describe("App integration UI - settings", () => {
   it("applies settings defaults for list sort behavior", () => {
     renderAppWithState(createConnectorSortingState());
 
-    switchScreen("settings");
+    switchScreenDrawerAware("settings");
     const settingsPanel = getPanelByHeading("Global appearance preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Default sort column"), {
       target: { value: "technicalId" }
@@ -29,7 +30,7 @@ describe("App integration UI - settings", () => {
     });
     fireEvent.click(within(settingsPanel).getByRole("button", { name: "Apply sort defaults now" }));
 
-    switchScreen("modeling");
+    switchScreenDrawerAware("modeling");
     const connectorsPanel = getPanelByHeading("Connectors");
     const firstConnectorName = connectorsPanel.querySelector("tbody tr td")?.textContent?.trim() ?? "";
     expect(firstConnectorName).toBe("Zulu connector");
@@ -38,7 +39,7 @@ describe("App integration UI - settings", () => {
   it("switches to compact table density from settings", () => {
     renderAppWithState(createUiIntegrationState());
 
-    switchScreen("settings");
+    switchScreenDrawerAware("settings");
     const settingsPanel = getPanelByHeading("Global appearance preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Table density"), {
       target: { value: "compact" }
@@ -56,7 +57,7 @@ describe("App integration UI - settings", () => {
     expect(appShell).not.toBeNull();
     expect(appShell).toHaveClass("table-font-normal");
 
-    switchScreen("settings");
+    switchScreenDrawerAware("settings");
     const settingsPanel = getPanelByHeading("Global appearance preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Table font size"), {
       target: { value: "small" }
@@ -72,7 +73,7 @@ describe("App integration UI - settings", () => {
   it("persists settings preferences across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 
-    switchScreen("settings");
+    switchScreenDrawerAware("settings");
     const settingsPanel = getPanelByHeading("Global appearance preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Table density"), {
       target: { value: "compact" }
@@ -88,7 +89,7 @@ describe("App integration UI - settings", () => {
     expect(appShell).not.toBeNull();
     expect(appShell).toHaveClass("table-density-compact");
 
-    switchScreen("settings");
+    switchScreenDrawerAware("settings");
     const restoredSettingsPanel = getPanelByHeading("Global appearance preferences");
     expect(within(restoredSettingsPanel).getByLabelText("Default sort column")).toHaveValue("technicalId");
   });
@@ -96,7 +97,7 @@ describe("App integration UI - settings", () => {
   it("recreates sample network from settings when workspace is empty", () => {
     renderAppWithState(createInitialState());
 
-    switchScreen("settings");
+    switchScreenDrawerAware("settings");
     const sampleControlsPanel = getPanelByHeading("Sample network controls");
     const recreateButton = within(sampleControlsPanel).getByRole("button", {
       name: "Recreate sample network"
@@ -120,6 +121,17 @@ describe("App integration UI - settings", () => {
     expect(within(connectorsPanel).getByText("Power Source Connector")).toBeInTheDocument();
   });
 
+  it("keeps settings workspace accessible when no active network exists", () => {
+    const initial = createInitialState();
+    const noNetwork = appReducer(initial, appActions.deleteNetwork(initial.activeNetworkId as NetworkId));
+
+    renderAppWithState(noNetwork);
+    switchScreenDrawerAware("settings");
+
+    expect(getPanelByHeading("Global appearance preferences")).toBeInTheDocument();
+    expect(within(document.body).queryByRole("heading", { name: "No active network" })).not.toBeInTheDocument();
+  });
+
   it("resets sample network to baseline from settings", () => {
     const sampled = createSampleNetworkState();
     const withExtraConnector = appReducer(
@@ -133,11 +145,11 @@ describe("App integration UI - settings", () => {
     );
     renderAppWithState(withExtraConnector);
 
-    switchSubScreen("connector");
+    switchSubScreenDrawerAware("connector");
     let connectorsPanel = getPanelByHeading("Connectors");
     expect(within(connectorsPanel).getByText("Extra connector")).toBeInTheDocument();
 
-    switchScreen("settings");
+    switchScreenDrawerAware("settings");
     const sampleControlsPanel = getPanelByHeading("Sample network controls");
     const resetButton = within(sampleControlsPanel).getByRole("button", {
       name: "Reset sample network to baseline"
@@ -148,8 +160,8 @@ describe("App integration UI - settings", () => {
     fireEvent.click(resetButton);
     confirmSpy.mockRestore();
 
-    switchScreen("modeling");
-    switchSubScreen("connector");
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("connector");
     connectorsPanel = getPanelByHeading("Connectors");
     expect(within(connectorsPanel).queryByText("Extra connector")).not.toBeInTheDocument();
     expect(within(connectorsPanel).getByText("Power Source Connector")).toBeInTheDocument();
@@ -158,11 +170,11 @@ describe("App integration UI - settings", () => {
   it("ignores keyboard shortcuts when disabled from settings preferences", () => {
     renderAppWithState(createUiIntegrationState());
 
-    switchScreen("settings");
+    switchScreenDrawerAware("settings");
     const settingsPanel = getPanelByHeading("Action bar and shortcuts");
     fireEvent.click(within(settingsPanel).getByLabelText("Enable keyboard shortcuts (undo/redo/navigation/modes)"));
 
-    switchScreen("networkScope");
+    switchScreenDrawerAware("networkScope");
     fireEvent.keyDown(window, { key: "2", altKey: true });
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();

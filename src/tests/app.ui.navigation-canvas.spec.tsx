@@ -6,8 +6,8 @@ import {
   createValidationIssueState,
   getPanelByHeading,
   renderAppWithState,
-  switchScreen,
-  switchSubScreen
+  switchScreenDrawerAware,
+  switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 import { appActions, appReducer, createInitialState } from "../store";
 
@@ -46,7 +46,7 @@ describe("App integration UI - navigation and canvas", () => {
 
   it("supports undo and redo for modeling actions", () => {
     renderAppWithState(createInitialState());
-    switchScreen("modeling");
+    switchScreenDrawerAware("modeling");
 
     const idleConnectorFormPanel = getPanelByHeading("Connector form");
     fireEvent.click(within(idleConnectorFormPanel).getByRole("button", { name: "Create" }));
@@ -75,11 +75,11 @@ describe("App integration UI - navigation and canvas", () => {
 
   it("reflects connector cavity occupancy in real time", () => {
     renderAppWithState(createUiIntegrationState());
-    switchScreen("modeling");
+    switchScreenDrawerAware("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
-    switchScreen("analysis");
+    switchScreenDrawerAware("analysis");
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
     expect(within(connectorAnalysisPanel).getByText("wire:W1:A")).toBeInTheDocument();
@@ -88,10 +88,10 @@ describe("App integration UI - navigation and canvas", () => {
   it("reflects splice port occupancy in real time", () => {
     renderAppWithState(createUiIntegrationState());
 
-    switchSubScreen("splice");
+    switchSubScreenDrawerAware("splice");
     const splicesPanel = getPanelByHeading("Splices");
     fireEvent.click(within(splicesPanel).getByText("Splice 1"));
-    switchScreen("analysis");
+    switchScreenDrawerAware("analysis");
 
     const spliceAnalysisPanel = getPanelByHeading("Splice analysis");
     expect(within(spliceAnalysisPanel).getByText("wire:W1:B")).toBeInTheDocument();
@@ -100,16 +100,16 @@ describe("App integration UI - navigation and canvas", () => {
   it("highlights every segment in the selected wire route", () => {
     renderAppWithState(createUiIntegrationState());
 
-    switchSubScreen("segment");
+    switchSubScreenDrawerAware("segment");
     const segmentsPanel = getPanelByHeading("Segments");
     expect(within(segmentsPanel).getByText("SEG-A").closest("tr")).not.toHaveClass("is-wire-highlighted");
     expect(within(segmentsPanel).getByText("SEG-B").closest("tr")).not.toHaveClass("is-wire-highlighted");
 
-    switchSubScreen("wire");
+    switchSubScreenDrawerAware("wire");
     const wiresPanel = getPanelByHeading("Wires");
     fireEvent.click(within(wiresPanel).getByText("Wire 1"));
 
-    switchSubScreen("segment");
+    switchSubScreenDrawerAware("segment");
     expect(within(segmentsPanel).getByText("SEG-A").closest("tr")).toHaveClass("is-wire-highlighted");
     expect(within(segmentsPanel).getByText("SEG-B").closest("tr")).toHaveClass("is-wire-highlighted");
   });
@@ -117,7 +117,7 @@ describe("App integration UI - navigation and canvas", () => {
   it("renders the 2D network diagram in analysis", () => {
     renderAppWithState(createUiIntegrationState());
 
-    switchScreen("analysis");
+    switchScreenDrawerAware("analysis");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
     expect(within(networkSummaryPanel).getByLabelText("2D network diagram")).toBeInTheDocument();
@@ -128,7 +128,7 @@ describe("App integration UI - navigation and canvas", () => {
   it("does not change 2D zoom on mouse wheel", () => {
     renderAppWithState(createUiIntegrationState());
 
-    switchScreen("analysis");
+    switchScreenDrawerAware("analysis");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
     const currentZoomLine = () => within(networkSummaryPanel).getByText(/View: \d+% zoom\./).textContent ?? "";
@@ -141,7 +141,7 @@ describe("App integration UI - navigation and canvas", () => {
 
   it("synchronizes inspector context and allows editing selected connector", () => {
     renderAppWithState(createUiIntegrationState());
-    switchScreen("modeling");
+    switchScreenDrawerAware("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
@@ -157,9 +157,9 @@ describe("App integration UI - navigation and canvas", () => {
 
   it("navigates from validation issue to modeling context", () => {
     renderAppWithState(createValidationIssueState());
-    switchScreen("analysis");
+    switchScreenDrawerAware("analysis");
 
-    switchScreen("validation");
+    switchScreenDrawerAware("validation");
     const validationPanel = getPanelByHeading("Validation center");
     const connectorIssue = within(validationPanel).getByText(/Connector 'C1' cavity C2/i);
     const issueRow = connectorIssue.closest("tr");
@@ -213,8 +213,8 @@ describe("App integration UI - navigation and canvas", () => {
 
   it("cancels edit mode when selection focus changes to another entity kind", () => {
     renderAppWithState(createUiIntegrationState());
-    switchScreen("modeling");
-    switchSubScreen("node");
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("node");
 
     const nodesPanel = getPanelByHeading("Nodes");
     fireEvent.click(within(nodesPanel).getByText("N-C1"));
@@ -237,7 +237,7 @@ describe("App integration UI - navigation and canvas", () => {
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
 
     renderAppWithState(state);
-    switchScreen("analysis");
+    switchScreenDrawerAware("analysis");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Generate" }));
