@@ -28,6 +28,20 @@ export function WorkspaceNavigation({
   onScreenChange,
   onSubScreenChange
 }: WorkspaceNavigationProps): ReactElement {
+  const screenIconClassById: Partial<Record<ScreenId, string>> = {
+    home: "is-home",
+    networkScope: "is-network-scope",
+    modeling: "is-edit",
+    analysis: "is-analysis",
+    validation: "is-validation"
+  };
+  const subScreenIconClassById: Record<SubScreenId, string> = {
+    connector: "is-connectors",
+    splice: "is-splices",
+    node: "is-nodes",
+    segment: "is-segments",
+    wire: "is-wires"
+  };
   const showEntityNavigation = isModelingScreen || isAnalysisScreen;
   const subScreenEntries = isAnalysisScreen
     ? ([
@@ -60,6 +74,9 @@ export function WorkspaceNavigation({
             onClick={() => onScreenChange(screenId)}
           >
             <span className="workspace-tab-content">
+              {screenIconClassById[screenId] ? (
+                <span className={`action-button-icon ${screenIconClassById[screenId]}`} aria-hidden="true" />
+              ) : null}
               <span>{label}</span>
               {screenId === "validation" ? (
                 <span
@@ -85,6 +102,7 @@ export function WorkspaceNavigation({
                 onClick={() => onSubScreenChange(subScreenId)}
               >
                 <span className="workspace-tab-content">
+                  <span className={`action-button-icon ${subScreenIconClassById[subScreenId]}`} aria-hidden="true" />
                   <span>{label}</span>
                   <span className="workspace-tab-badge" aria-hidden="true">
                     {entityCountBySubScreen[subScreenId]}

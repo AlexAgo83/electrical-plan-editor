@@ -178,6 +178,14 @@ const QUICK_ENTITY_NAV_ITEMS: Record<
   ]
 };
 
+const SUB_SCREEN_ICON_CLASS_BY_ID: Record<SubScreenId, string> = {
+  connector: "is-connectors",
+  splice: "is-splices",
+  node: "is-nodes",
+  segment: "is-segments",
+  wire: "is-wires"
+};
+
 export function NetworkSummaryPanel({
   handleZoomAction,
   fitNetworkToContent,
@@ -703,6 +711,10 @@ export function NetworkSummaryPanel({
               onClick={() => onQuickEntityNavigation(item.subScreen)}
               aria-pressed={activeSubScreen === item.subScreen}
             >
+              <span
+                className={`action-button-icon network-summary-quick-entity-nav-icon ${SUB_SCREEN_ICON_CLASS_BY_ID[item.subScreen]}`}
+                aria-hidden="true"
+              />
               <span className="network-summary-quick-entity-nav-label">{item.label}</span>
               <span className="filter-chip-count">{entityCountBySubScreen[item.subScreen]}</span>
             </button>

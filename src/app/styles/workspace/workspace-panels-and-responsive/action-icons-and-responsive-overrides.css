@@ -72,6 +72,46 @@
   mask: url("/icons/ico_home_start.svg") center / contain no-repeat;
 }
 
+.action-button-icon.is-home {
+  -webkit-mask: url("/icons/ico_home.svg") center / contain no-repeat;
+  mask: url("/icons/ico_home.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-network-scope {
+  -webkit-mask: url("/icons/ico_home_start.svg") center / contain no-repeat;
+  mask: url("/icons/ico_home_start.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-connectors {
+  -webkit-mask: url("/icons/ico_connectors.svg") center / contain no-repeat;
+  mask: url("/icons/ico_connectors.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-splices {
+  -webkit-mask: url("/icons/ico_splices.svg") center / contain no-repeat;
+  mask: url("/icons/ico_splices.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-nodes {
+  -webkit-mask: url("/icons/ico_nodes.svg") center / contain no-repeat;
+  mask: url("/icons/ico_nodes.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-segments {
+  -webkit-mask: url("/icons/ico_segments.svg") center / contain no-repeat;
+  mask: url("/icons/ico_segments.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-wires {
+  -webkit-mask: url("/icons/ico_wires.svg") center / contain no-repeat;
+  mask: url("/icons/ico_wires.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-validation {
+  -webkit-mask: url("/icons/health.svg") center / contain no-repeat;
+  mask: url("/icons/health.svg") center / contain no-repeat;
+}
+
 .meta-line {
   margin: 0 0 0.75rem;
   color: #365166;

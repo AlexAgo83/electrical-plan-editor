@@ -395,6 +395,12 @@
   min-height: 1.95rem;
 }
 
+.network-summary-quick-entity-nav-icon {
+  width: 0.72rem;
+  height: 0.72rem;
+  flex: 0 0 0.72rem;
+}
+
 .network-summary-quick-entity-nav-label {
   font-weight: 600;
 }
