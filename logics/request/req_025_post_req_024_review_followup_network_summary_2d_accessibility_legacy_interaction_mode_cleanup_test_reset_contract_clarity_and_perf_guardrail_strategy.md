@@ -1,7 +1,7 @@
 ## req_025_post_req_024_review_followup_network_summary_2d_accessibility_legacy_interaction_mode_cleanup_test_reset_contract_clarity_and_perf_guardrail_strategy - Post-req_024 Review Follow-up for Network Summary 2D Accessibility, Legacy Interaction Mode Cleanup, Test Reset Contract Clarity, and Perf Guardrail Strategy
 > From version: 0.5.10
 > Understanding: 100%
-> Confidence: 98%
+> Confidence: 99%
 > Complexity: Medium
 > Theme: Follow-up Hardening for 2D Canvas Accessibility and Legacy/Test Contract Clarity
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -95,6 +95,47 @@ Related delivered context:
   - `item_147_app_ui_modules_test_reset_helper_contract_clarity_and_naming_alignment.md`
   - `item_148_layout_responsiveness_guardrail_strategy_documentation_or_refinement.md`
   - `item_149_req_025_followup_closure_ci_e2e_build_pwa_and_ac_traceability.md`
+
+# Delivery summary
+- 2D network node keyboard accessibility/focus semantics delivered:
+  - Interactive SVG nodes (`.network-node`) are now keyboard-focusable (`tabIndex=0`) with `role="button"` and accessible labels in `NetworkSummaryPanel`.
+  - Enter/Space keyboard activation triggers the same selection/edit activation path as pointer selection (select-only mode path).
+  - Focus-visible styling added for 2D nodes.
+  - Files: `src/app/components/NetworkSummaryPanel.tsx`, `src/app/styles/canvas/canvas-diagram-and-overlays.css`, `src/tests/app.ui.navigation-canvas.spec.tsx`
+- Legacy `interactionMode` cleanup / contract alignment delivered:
+  - Product-supported `InteractionMode` narrowed to `select | addNode` with explicit type comment.
+  - Unsupported legacy runtime branches (`addSegment`, `route`, `connect`) removed from `useCanvasInteractionHandlers`.
+  - Dead `modeAnchorNodeId` canvas state and related resets removed from `useCanvasState`, namespaced adapter, and `AppController`.
+  - Canvas interaction hook assembly and `AppController` call-site simplified accordingly.
+  - Files: `src/app/types/app-controller.ts`, `src/app/hooks/useCanvasInteractionHandlers.ts`, `src/app/hooks/useCanvasState.ts`, `src/app/hooks/useAppControllerNamespacedCanvasState.ts`, `src/app/hooks/controller/useAppControllerHeavyHookAssemblers.ts`, `src/app/AppController.tsx`
+- `appUiModules` test reset contract clarity delivered:
+  - Added explicit `resetAppUiModulesNonRegistryTestControls()` helper (mode/delay only).
+  - Kept `resetAppUiModulesTestControls()` as backward-compatible alias with clarifying comment.
+  - Shared test setup and lazy-loading regression suite migrated to the explicit helper name.
+  - Files: `src/app/components/appUiModules.tsx`, `src/tests/setup.ts`, `src/tests/app.ui.lazy-loading-regression.spec.tsx`
+- Layout responsiveness guardrail strategy follow-up delivered:
+  - Wall-clock guardrail remains intentionally coarse but now documents the strategy more explicitly.
+  - Added optional env override (`LAYOUT_RESPONSIVENESS_BUDGET_MS`) for slower CI calibration.
+  - File: `src/tests/core.layout.spec.ts`
+- Validation closure delivered:
+  - `npm run typecheck`
+  - `npm run lint`
+  - `npm run quality:ui-modularization`
+  - `npm run quality:store-modularization`
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.lazy-loading-regression.spec.tsx src/tests/core.layout.spec.ts`
+  - `npm run test:ci`
+  - `npm run test:e2e`
+  - `npm run build`
+  - `npm run quality:pwa`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+
+# AC traceability
+- AC1: Satisfied by keyboard-focusable/activatable 2D SVG nodes with Enter/Space activation and regression coverage in `src/tests/app.ui.navigation-canvas.spec.tsx`.
+- AC2: Satisfied by narrowing `InteractionMode` to supported modes (`select`, `addNode`) and removing unsupported legacy runtime branches from `useCanvasInteractionHandlers`.
+- AC3: Satisfied by explicit test-reset contract clarification (`resetAppUiModulesNonRegistryTestControls`) and backward-compatible aliasing/documentation.
+- AC4: Satisfied by improved wall-clock guardrail documentation plus optional `LAYOUT_RESPONSIVENESS_BUDGET_MS` override while preserving the regression assertion.
+- AC5: Satisfied by passing targeted and full validation suites.
+- AC6: Satisfied by this request/task/backlog closure documentation and Logics lint passing.
 
 # References
 - `src/app/components/NetworkSummaryPanel.tsx`

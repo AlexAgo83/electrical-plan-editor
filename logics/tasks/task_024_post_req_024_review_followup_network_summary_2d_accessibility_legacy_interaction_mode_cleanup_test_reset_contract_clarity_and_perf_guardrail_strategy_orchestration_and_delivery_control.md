@@ -2,7 +2,7 @@
 > From version: 0.5.10
 > Understanding: 100%
 > Confidence: 98%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Follow-up Delivery for Canvas Accessibility and Runtime/Test Contract Clarity
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -18,12 +18,12 @@ Backlog scope covered:
 - `item_149_req_025_followup_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 2D node keyboard accessibility / focus semantics follow-up (`item_145`)
-- [ ] 2. Deliver Wave 1 legacy `interactionMode` cleanup or explicit deactivation contract alignment (`item_146`)
-- [ ] 3. Deliver Wave 2 `appUiModules` test reset helper contract clarity/naming alignment (`item_147`)
-- [ ] 4. Deliver Wave 3 layout responsiveness guardrail strategy documentation/refinement (`item_148`)
-- [ ] 5. Deliver Wave 4 closure: validation/build/PWA pass and `req_025` AC traceability (`item_149`)
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Deliver Wave 0 2D node keyboard accessibility / focus semantics follow-up (`item_145`)
+- [x] 2. Deliver Wave 1 legacy `interactionMode` cleanup or explicit deactivation contract alignment (`item_146`)
+- [x] 3. Deliver Wave 2 `appUiModules` test reset helper contract clarity/naming alignment (`item_147`)
+- [x] 4. Deliver Wave 3 layout responsiveness guardrail strategy documentation/refinement (`item_148`)
+- [x] 5. Deliver Wave 4 closure: validation/build/PWA pass and `req_025` AC traceability (`item_149`)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - Documentation / Logics:
@@ -43,13 +43,13 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 pending: improve keyboard/focus accessibility for 2D node interactions.
-  - Wave 1 pending: align legacy `interactionMode` code/contracts with the product decision (`select` only).
-  - Wave 2 pending: clarify `appUiModules` test reset helper contract/naming.
-  - Wave 3 pending: document/refine layout responsiveness guardrail strategy.
-  - Wave 4 pending: full closure validation and `req_025` AC1..AC6 traceability.
+  - Wave 0 completed: 2D SVG nodes are keyboard-focusable/activatable (`Enter`/`Space`) with visible focus styling and regression coverage.
+  - Wave 1 completed: legacy unsupported `interactionMode` runtime branches were removed; contracts/types now align with the select-only (+ add-node) supported modes.
+  - Wave 2 completed: `appUiModules` test-reset semantics are clearer via `resetAppUiModulesNonRegistryTestControls()` plus a backward-compatible alias.
+  - Wave 3 completed: layout responsiveness guardrail strategy is documented more explicitly and supports optional env-budget override for CI calibration.
+  - Wave 4 completed: full validation/build/PWA pass executed and `req_025` AC1..AC6 traceability documented.
 - Current blockers:
-  - None at kickoff.
+  - None.
 - Main risks to track:
   - Keyboard-enabling SVG node interactions introduces awkward focus UX or conflicts with pointer flows.
   - Legacy mode cleanup touches code paths still implicitly referenced by tests or internal assumptions.
@@ -62,4 +62,43 @@ Backlog scope covered:
   - Preserve the current guardrail while improving clarity unless data justifies stronger changes.
 - Validation snapshot (kickoff):
   - `req_024` closure pipeline was green before this follow-up planning task
-  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` pending for this new task/doc set
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK (planning docs)
+- Validation snapshot (targeted implementation verification):
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.lazy-loading-regression.spec.tsx src/tests/core.layout.spec.ts` OK (24 tests)
+- Validation snapshot (final closure):
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npm run quality:ui-modularization` OK
+  - `npm run quality:store-modularization` OK
+  - `npm run test:ci` OK (27 files / 146 tests)
+  - `npm run test:e2e` OK (2/2)
+  - `npm run build` OK
+  - `npm run quality:pwa` OK
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
+- Delivery snapshot:
+  - 2D node keyboard accessibility + focus semantics:
+    - `src/app/components/NetworkSummaryPanel.tsx`
+    - `src/app/styles/canvas/canvas-diagram-and-overlays.css`
+    - `src/tests/app.ui.navigation-canvas.spec.tsx`
+  - Legacy `interactionMode` runtime cleanup / contract alignment:
+    - `src/app/types/app-controller.ts`
+    - `src/app/hooks/useCanvasInteractionHandlers.ts`
+    - `src/app/hooks/useCanvasState.ts`
+    - `src/app/hooks/useAppControllerNamespacedCanvasState.ts`
+    - `src/app/hooks/controller/useAppControllerHeavyHookAssemblers.ts`
+    - `src/app/AppController.tsx`
+  - `appUiModules` test reset contract clarity:
+    - `src/app/components/appUiModules.tsx`
+    - `src/tests/setup.ts`
+    - `src/tests/app.ui.lazy-loading-regression.spec.tsx`
+  - Layout responsiveness guardrail strategy follow-up:
+    - `src/tests/core.layout.spec.ts`
+- AC traceability (`req_025`):
+  - AC1: Satisfied by keyboard/focus semantics for interactive 2D nodes (`tabIndex`, `role`, Enter/Space activation), focus-visible styling, and regression coverage.
+  - AC2: Satisfied by narrowing the `InteractionMode` contract to supported modes and removing unsupported legacy runtime branches/dead state from the canvas interaction flow.
+  - AC3: Satisfied by explicit non-registry reset helper naming plus backward-compatible alias/comment for `appUiModules` test controls.
+  - AC4: Satisfied by clearer wall-clock guardrail strategy documentation and optional `LAYOUT_RESPONSIVENESS_BUDGET_MS` override while retaining the regression assertion.
+  - AC5: Satisfied by passing targeted and full validation suites.
+  - AC6: Satisfied by this task/request/backlog closure documentation and Logics lint passing.
