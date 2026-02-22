@@ -260,9 +260,11 @@ export function SettingsWorkspaceContent({
               value={canvasDefaultLabelSizeMode}
               onChange={(event) => setCanvasDefaultLabelSizeMode(event.target.value as CanvasLabelSizeMode)}
             >
+              <option value="extraSmall">Extra small</option>
               <option value="small">Small</option>
               <option value="normal">Normal</option>
               <option value="large">Large</option>
+              <option value="extraLarge">Extra large</option>
             </select>
           </label>
           <label className="settings-field">

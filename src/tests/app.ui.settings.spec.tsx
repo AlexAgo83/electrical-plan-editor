@@ -131,6 +131,7 @@ describe("App integration UI - settings", () => {
 
     switchScreenDrawerAware("settings");
     const canvasSettingsPanel = getPanelByHeading("Canvas preferences");
+    expect(within(canvasSettingsPanel).getByLabelText("Include background in PNG export")).toBeChecked();
     fireEvent.change(within(canvasSettingsPanel).getByLabelText("2D label rotation"), {
       target: { value: "-45" }
     });
@@ -147,7 +148,7 @@ describe("App integration UI - settings", () => {
     switchScreenDrawerAware("settings");
     const restoredCanvasSettingsPanel = getPanelByHeading("Canvas preferences");
     expect(within(restoredCanvasSettingsPanel).getByLabelText("2D label rotation")).toHaveValue("-45");
-    expect(within(restoredCanvasSettingsPanel).getByLabelText("Include background in PNG export")).toBeChecked();
+    expect(within(restoredCanvasSettingsPanel).getByLabelText("Include background in PNG export")).not.toBeChecked();
   });
 
   it("recreates sample network from settings when workspace is empty", () => {

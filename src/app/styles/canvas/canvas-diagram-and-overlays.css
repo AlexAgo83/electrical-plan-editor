@@ -214,8 +214,16 @@
   font-size: 8px;
 }
 
+.network-canvas--label-size-extraSmall .network-segment-label {
+  font-size: 7px;
+}
+
 .network-canvas--label-size-large .network-segment-label {
   font-size: 12px;
+}
+
+.network-canvas--label-size-extraLarge .network-segment-label {
+  font-size: 14px;
 }
 
 .network-segment-length-label {
@@ -233,8 +241,16 @@
   font-size: 7px;
 }
 
+.network-canvas--label-size-extraSmall .network-segment-length-label {
+  font-size: 6px;
+}
+
 .network-canvas--label-size-large .network-segment-length-label {
   font-size: 10px;
+}
+
+.network-canvas--label-size-extraLarge .network-segment-length-label {
+  font-size: 11px;
 }
 
 .network-node {
@@ -292,8 +308,16 @@
   font-size: 8px;
 }
 
+.network-canvas--label-size-extraSmall .network-node-label {
+  font-size: 7px;
+}
+
 .network-canvas--label-size-large .network-node-label {
   font-size: 11px;
+}
+
+.network-canvas--label-size-extraLarge .network-node-label {
+  font-size: 13px;
 }
 
 .network-canvas--label-stroke-none .network-segment-label,

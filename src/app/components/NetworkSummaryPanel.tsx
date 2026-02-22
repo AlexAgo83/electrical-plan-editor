@@ -617,6 +617,7 @@ export function NetworkSummaryPanel({
 
                   const connectorWidth = 46;
                   const connectorHeight = 30;
+                  const spliceDiamondSize = 30;
 
                   return (
                     <g
@@ -644,6 +645,17 @@ export function NetworkSummaryPanel({
                           height={connectorHeight}
                           rx={7}
                           ry={7}
+                        />
+                      ) : node.kind === "splice" ? (
+                        <rect
+                          className="network-node-shape"
+                          x={position.x - spliceDiamondSize / 2}
+                          y={position.y - spliceDiamondSize / 2}
+                          width={spliceDiamondSize}
+                          height={spliceDiamondSize}
+                          rx={5}
+                          ry={5}
+                          transform={`rotate(45 ${position.x} ${position.y})`}
                         />
                       ) : (
                         <circle className="network-node-shape" cx={position.x} cy={position.y} r={17} />

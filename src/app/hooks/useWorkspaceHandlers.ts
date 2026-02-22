@@ -452,8 +452,8 @@ export function useWorkspaceHandlers({
     setCanvasDefaultShowSegmentLengths(false);
     setCanvasDefaultLabelStrokeMode("normal");
     setCanvasDefaultLabelSizeMode("normal");
-    setCanvasDefaultLabelRotationDegrees(0);
-    setCanvasPngExportIncludeBackground(false);
+    setCanvasDefaultLabelRotationDegrees(-20);
+    setCanvasPngExportIncludeBackground(true);
     setCanvasResetZoomPercentInput("100");
     setShowNetworkGrid(true);
     setSnapNodesToGrid(true);
@@ -462,7 +462,7 @@ export function useWorkspaceHandlers({
     setShowSegmentLengths(false);
     setNetworkLabelStrokeMode("normal");
     setNetworkLabelSizeMode("normal");
-    setNetworkLabelRotationDegrees(0);
+    setNetworkLabelRotationDegrees(-20);
     setNetworkScale(1);
     setNetworkOffset({ x: 0, y: 0 });
     setShowShortcutHints(false);

@@ -163,11 +163,16 @@ interface UseUiPreferencesOptions {
 }
 
 function normalizeCanvasLabelSizeMode(value: unknown): CanvasLabelSizeMode {
-  return value === "small" || value === "large" ? value : "normal";
+  return value === "extraSmall" ||
+    value === "small" ||
+    value === "large" ||
+    value === "extraLarge"
+    ? value
+    : "normal";
 }
 
 function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotationDegrees {
-  return value === -90 || value === -45 || value === -20 || value === 20 || value === 45 || value === 90 ? value : 0;
+  return value === -90 || value === -45 || value === -20 || value === 20 || value === 45 || value === 90 ? value : -20;
 }
 
 export function useUiPreferences({
@@ -294,7 +299,7 @@ export function useUiPreferences({
       setCanvasPngExportIncludeBackground(
         typeof preferences.canvasPngExportIncludeBackground === "boolean"
           ? preferences.canvasPngExportIncludeBackground
-          : false
+          : true
       );
       setShowNetworkGrid(showGridDefault);
       setSnapNodesToGrid(snapDefault);

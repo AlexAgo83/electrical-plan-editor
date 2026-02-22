@@ -247,6 +247,17 @@
   border-top: 1px solid rgba(153, 181, 203, 0.55);
 }
 
+.row-actions.settings-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 0.5rem;
+}
+
+.row-actions.settings-actions > button {
+  width: 100%;
+  min-width: 0;
+}
+
 .settings-meta-compact {
   margin-bottom: 0;
 }
