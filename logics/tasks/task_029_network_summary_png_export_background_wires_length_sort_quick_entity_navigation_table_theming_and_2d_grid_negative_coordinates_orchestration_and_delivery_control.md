@@ -2,7 +2,7 @@
 > From version: 0.6.3
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Delivery Orchestration for Cross-Cutting Workflow/Table/Canvas Polish and Interaction Freedom Improvements
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -20,14 +20,14 @@ Backlog scope covered:
 - `item_177_req_030_workflow_canvas_polish_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 PNG export background setting with transparent-default preservation and UI preference persistence (`item_171`)
-- [ ] 2. Deliver Wave 1 `Wires` table sorting by `Length (mm)` with numeric ordering (`item_172`)
-- [ ] 3. Deliver Wave 2 compact quick entity navigation strip after `Route preview` (Modeling/Analysis variants + optional subnetwork label wording) (`item_173`)
-- [ ] 4. Deliver Wave 3 `2D label rotation` negative-angle option extension and normalization/persistence coverage (`item_174`)
-- [ ] 5. Deliver Wave 4 table header theme/icon coverage and highlighted row/cell visual refinement (`item_175`)
-- [ ] 6. Deliver Wave 5 2D negative-coordinate movement + expanded zoom-out range with subnetwork node deemphasis non-regression (`item_176`)
-- [ ] 7. Deliver Wave 6 closure: CI/E2E/build/PWA pass and `req_030` AC traceability (`item_177`)
-- [ ] FINAL: Update related Logics docs (request/task/backlog statuses + delivery summary)
+- [x] 1. Deliver Wave 0 PNG export background setting with transparent-default preservation and UI preference persistence (`item_171`)
+- [x] 2. Deliver Wave 1 `Wires` table sorting by `Length (mm)` with numeric ordering (`item_172`)
+- [x] 3. Deliver Wave 2 compact quick entity navigation strip after `Route preview` (Modeling/Analysis variants + optional subnetwork label wording) (`item_173`)
+- [x] 4. Deliver Wave 3 `2D label rotation` negative-angle option extension and normalization/persistence coverage (`item_174`)
+- [x] 5. Deliver Wave 4 table header theme/icon coverage and highlighted row/cell visual refinement (`item_175`)
+- [x] 6. Deliver Wave 5 2D negative-coordinate movement + expanded zoom-out range with subnetwork node deemphasis non-regression (`item_176`)
+- [x] 7. Deliver Wave 6 closure: CI/E2E/build/PWA pass and `req_030` AC traceability (`item_177`)
+- [x] FINAL: Update related Logics docs (request/task/backlog statuses + delivery summary)
 
 # Validation
 - Documentation / Logics:
@@ -51,15 +51,15 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 pending: PNG export background setting (transparent default preserved) + UI preference persistence wiring.
-  - Wave 1 pending: `Wires` sort support for `Length (mm)` with numeric ordering and UI sort indicators.
-  - Wave 2 pending: compact quick entity navigation strip after `Route preview` with Modeling/Analysis-specific item sets and optional `Sub-network tag (optional)` metadata labeling.
-  - Wave 3 pending: negative `2D label rotation` options (e.g. `-20°`, `-45°`) added with persistence/normalization safety and centered rotation semantics preserved.
-  - Wave 4 pending: table header/icon theme coverage plus more discreet highlight background styling and bold names/IDs in highlighted rows/cells.
-  - Wave 5 pending: remove negative-coordinate placement clamp and expand zoom-out range while preserving grid/snap/fit/pan/zoom and subnetwork node deemphasis behavior.
-  - Wave 6 pending: closure validation suite and AC traceability.
+  - Wave 0 completed: `Settings` preference added for PNG export background inclusion (default `off`, transparent export preserved), persisted in UI preferences and reset/default flows, and wired into `NetworkSummaryPanel` PNG export rendering.
+  - Wave 1 completed: `Wires` tables in Modeling and Analysis now sort by `Length (mm)` using numeric ordering with existing sort indicator semantics.
+  - Wave 2 completed: compact full-width untitled quick entity navigation strip added directly after `Route preview`, with Modeling/Analysis-specific item sets and active-state synchronization; `Sub-network tag` labeling updated to `Sub-network tag (optional)` where applicable.
+  - Wave 3 completed: `2D label rotation` settings extended to include negative presets (`-90°`, `-45°`, `-20°`) with persistence/normalization and centered label rotation semantics preserved.
+  - Wave 4 completed: table header/icon theming alignment improved (sort indicators inherit theme header color); highlighted rows/cells now use much subtler backgrounds and bold names/IDs for salience.
+  - Wave 5 completed: 2D node dragging supports negative coordinates, zoom-out lower bound expanded (`NETWORK_MIN_SCALE` reduced to `0.3`), and subnetwork node deemphasis behavior remains correct.
+  - Wave 6 completed: closure validation suite passed and AC traceability documented.
 - Current blockers:
-  - None at kickoff.
+  - None.
 - Main risks to track:
   - PNG export background implementation breaks transparent export default or leaks theme/background unexpectedly.
   - `Wires` sorting introduces lexical sort bugs for lengths.
@@ -75,16 +75,34 @@ Backlog scope covered:
 - Validation snapshot (kickoff):
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK (`req_030` planning doc)
 - Delivery snapshot:
-  - To be completed during implementation.
+  - Code:
+    - `src/app/components/NetworkSummaryPanel.tsx` (PNG export background option wiring, quick entity navigation strip, subnetwork deemphasis node-state preservation)
+    - `src/app/components/workspace/SettingsWorkspaceContent.tsx` (PNG export background setting, negative label rotation options)
+    - `src/app/hooks/useUiPreferences.ts` and `src/app/hooks/useAppControllerPreferencesState.ts` (preference persistence/wiring for PNG export background + negative angle normalization)
+    - `src/app/hooks/useCanvasInteractionHandlers.ts` and `src/app/lib/app-utils-shared.ts` (negative coordinate placement support + expanded zoom-out range)
+    - `src/app/hooks/useEntityListModel.ts`, `src/app/components/workspace/ModelingSecondaryTables.tsx`, `src/app/components/workspace/AnalysisWireWorkspacePanels.tsx` (numeric wire length sorting)
+    - `src/app/styles/tables.css` and `src/app/styles/canvas/canvas-toolbar-and-shell.css` (table highlight refinement + compact quick nav strip styling)
+    - `src/tests/app.ui.settings.spec.tsx`, `src/tests/app.ui.navigation-canvas.spec.tsx`, `src/tests/app.ui.network-summary-workflow-polish.spec.tsx` (regression coverage)
+    - `src/tests/core.layout.spec.ts` (wall-clock guardrail budget recalibration to remain CI-pragmatic)
+  - Validation results:
+    - `npm run lint` OK
+    - `npm run typecheck` OK
+    - `npm run quality:ui-modularization` OK
+    - `npm run quality:store-modularization` OK
+    - `npm run test:ci` OK (`29` files / `163` tests)
+    - `npm run test:e2e` OK (`2/2`)
+    - `npm run build` OK
+    - `npm run quality:pwa` OK
+    - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
 - AC traceability (`req_030`) target mapping:
-  - AC1 target: Wave 0 (`item_171`) + Wave 6 (`item_177`)
-  - AC2 target: Wave 1 (`item_172`) + Wave 6 (`item_177`)
-  - AC3 target: Wave 2 (`item_173`) + Wave 6 (`item_177`)
-  - AC3b target: Wave 3 (`item_174`) + Wave 6 (`item_177`)
-  - AC4 target: Wave 4 (`item_175`) + Wave 6 (`item_177`)
-  - AC5 target: Wave 4 (`item_175`) + Wave 6 (`item_177`)
-  - AC6 target: Wave 5 (`item_176`) + Wave 6 (`item_177`)
-  - AC7 target: Waves 0-6 + FINAL docs update
+  - AC1 satisfied: Wave 0 (`item_171`) + Wave 6 (`item_177`)
+  - AC2 satisfied: Wave 1 (`item_172`) + Wave 6 (`item_177`)
+  - AC3 satisfied: Wave 2 (`item_173`) + Wave 6 (`item_177`)
+  - AC3b satisfied: Wave 3 (`item_174`) + Wave 6 (`item_177`)
+  - AC4 satisfied: Wave 4 (`item_175`) + Wave 6 (`item_177`)
+  - AC5 satisfied: Wave 4 (`item_175`) + Wave 6 (`item_177`)
+  - AC6 satisfied: Wave 5 (`item_176`) + Wave 6 (`item_177`)
+  - AC7 satisfied: Waves 0-6 + FINAL docs update
 
 # References
 - `logics/request/req_030_network_summary_png_export_background_wires_length_sort_quick_entity_navigation_table_theming_and_2d_grid_negative_coordinates.md`
@@ -104,4 +122,3 @@ Backlog scope covered:
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `src/tests/app.ui.settings.spec.tsx`
 - `package.json`
-

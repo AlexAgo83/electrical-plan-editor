@@ -1,7 +1,7 @@
 ## req_030_network_summary_png_export_background_wires_length_sort_quick_entity_navigation_table_theming_and_2d_grid_negative_coordinates - Network Summary PNG Export Background, Wires Length Sorting, Quick Entity Navigation, Table Theming/Highlight Refinement, and 2D Grid Negative Coordinates
 > From version: 0.6.3
-> Understanding: 100%
-> Confidence: 99%
+> Understanding: 99%
+> Confidence: 100%
 > Complexity: Medium-High
 > Theme: Workflow and Visualization Polish Across Export, Tables, Navigation, Theming, and 2D Canvas Placement
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -129,14 +129,13 @@ This request groups these refinements because they affect the same day-to-day mo
 - Changing network data schema for coordinate storage unless required and explicitly documented.
 
 # Backlog
-- To be created from this request (proposed):
-  - PNG export background setting and persistence wiring
-  - Wires `Length (mm)` sorting support
-  - Compact quick entity navigation strip after `Route preview` with modeling/analysis variants
-  - `2D label rotation` option set extension to include inverse (negative) angles with normalization safety
-  - Table header theme coverage (icons included) + highlight row/cell visual refinement
-  - 2D negative-coordinate movement support and regression coverage
-  - Closure validation + AC traceability
+- `logics/backlog/item_171_network_summary_png_export_background_option_and_ui_preference_persistence.md`
+- `logics/backlog/item_172_wires_table_length_mm_sorting_support_and_numeric_ordering.md`
+- `logics/backlog/item_173_route_preview_adjacent_quick_entity_navigation_strip_modeling_analysis_variants_and_optional_subnetwork_tag.md`
+- `logics/backlog/item_174_settings_2d_label_rotation_negative_angle_option_extension_and_normalization.md`
+- `logics/backlog/item_175_table_header_theme_coverage_with_icons_and_highlight_row_cell_visual_refinement.md`
+- `logics/backlog/item_176_network_summary_2d_negative_coordinate_placement_zoom_out_range_expansion_and_subnetwork_node_deemphasis_non_regression.md`
+- `logics/backlog/item_177_req_030_workflow_canvas_polish_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # References
 - `src/app/components/NetworkSummaryPanel.tsx`
@@ -151,3 +150,4 @@ This request groups these refinements because they affect the same day-to-day mo
 - `src/app/styles/workspace/workspace-panels-and-responsive.css`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `src/tests/app.ui.settings.spec.tsx`
+- `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`

@@ -2,7 +2,7 @@
 > From version: 0.6.3
 > Understanding: 99%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Remove Canvas Placement Constraints While Preserving Deemphasis and Interaction Usability
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -39,7 +39,8 @@ The 2D grid/canvas interaction currently appears to prevent free movement into n
   - `logics/request/req_030_network_summary_png_export_background_wires_length_sort_quick_entity_navigation_table_theming_and_2d_grid_negative_coordinates.md`
   - `src/app/hooks/useCanvasInteractionHandlers.ts`
   - `src/app/hooks/useCanvasState.ts`
+  - `src/app/lib/app-utils-shared.ts`
   - `src/app/hooks/useWorkspaceHandlers.ts`
   - `src/app/components/NetworkSummaryPanel.tsx`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
-
+  - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`

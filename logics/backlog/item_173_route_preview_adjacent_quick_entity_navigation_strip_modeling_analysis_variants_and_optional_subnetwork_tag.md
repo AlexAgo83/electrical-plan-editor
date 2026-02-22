@@ -2,7 +2,7 @@
 > From version: 0.6.3
 > Understanding: 99%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Compact Inline Entity Switching Near Route Preview for Faster Inspection Loops
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -37,8 +37,8 @@ Entity switching currently depends on the larger `Entity navigation` panel. User
 - Related AC: AC3, AC7.
 - References:
   - `logics/request/req_030_network_summary_png_export_background_wires_length_sort_quick_entity_navigation_table_theming_and_2d_grid_negative_coordinates.md`
-  - `src/app/components/workspace/AnalysisWorkspaceContent.tsx`
+  - `src/app/components/NetworkSummaryPanel.tsx`
+  - `src/app/hooks/controller/useAppControllerScreenContentSlices.tsx`
   - `src/app/components/WorkspaceNavigation.tsx`
   - `src/app/hooks/useWorkspaceNavigation.ts`
-  - `src/app/hooks/useIssueNavigatorModel.ts`
-
+  - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`

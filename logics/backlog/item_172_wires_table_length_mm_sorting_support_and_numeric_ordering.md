@@ -2,7 +2,7 @@
 > From version: 0.6.3
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Add Practical Numeric Sorting by Wire Length for Analysis/Modeling Tables
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -34,7 +34,6 @@
 - Related AC: AC2, AC7.
 - References:
   - `logics/request/req_030_network_summary_png_export_background_wires_length_sort_quick_entity_navigation_table_theming_and_2d_grid_negative_coordinates.md`
-  - `src/app/components/workspace/ModelingWireWorkspacePanels.tsx`
+  - `src/app/components/workspace/ModelingSecondaryTables.tsx`
   - `src/app/components/workspace/AnalysisWireWorkspacePanels.tsx`
-  - `src/tests/app.ui.navigation-canvas.spec.tsx`
-
+  - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
