@@ -11,18 +11,16 @@ export function useNodeDescriptions(
 } {
   const describeNode = useCallback((node: NetworkNode): string => {
     if (node.kind === "intermediate") {
-      return `Intermediate: ${node.label}`;
+      return node.label;
     }
 
     if (node.kind === "connector") {
       const connector = connectorMap.get(node.connectorId);
-      return connector === undefined
-        ? `Connector node (${node.connectorId})`
-        : `Connector: ${connector.name} (${connector.technicalId})`;
+      return connector === undefined ? `Connector node (${node.connectorId})` : `${connector.name} (${connector.technicalId})`;
     }
 
     const splice = spliceMap.get(node.spliceId);
-    return splice === undefined ? `Splice node (${node.spliceId})` : `Splice: ${splice.name} (${splice.technicalId})`;
+    return splice === undefined ? `Splice node (${node.spliceId})` : `${splice.name} (${splice.technicalId})`;
   }, [connectorMap, spliceMap]);
 
   const nodeLabelById = useMemo(() => {
