@@ -1,6 +1,6 @@
 {
   "name": "electrical-plan-editor",
-  "version": "0.5.11",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "engines": {
