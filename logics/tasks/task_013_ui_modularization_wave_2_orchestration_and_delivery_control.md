@@ -1,8 +1,8 @@
 ## task_013_ui_modularization_wave_2_orchestration_and_delivery_control - UI Modularization Wave 2 Orchestration and Delivery Control
 > From version: 0.5.1
 > Understanding: 99%
-> Confidence: 96%
-> Progress: 10%
+> Confidence: 97%
+> Progress: 22%
 > Complexity: High
 > Theme: Refactor Wave Sequencing and Delivery Safety
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -21,7 +21,7 @@ Backlog scope covered:
 - `item_088_ui_ci_regression_pass_line_budget_exception_cleanup_and_e2e_alignment.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 utility foundation split: decompose `app-utils` and clean imports to reduce cross-cutting refactor friction (`item_082`)
+- [x] 1. Deliver Wave 0 utility foundation split: decompose `app-utils` and clean imports to reduce cross-cutting refactor friction (`item_082`)
 - [ ] 2. Deliver Wave 1 controller orchestration extraction: reduce `AppController` to composition-first shell (`item_081`)
 - [ ] 3. Deliver Wave 2 analysis workspace modularization: split connector/splice/wire analysis content by sub-screen (`item_083`)
 - [ ] 4. Deliver Wave 3 network summary modularization: split SVG/overlays/toolbar/floating panel concerns (`item_084`)
@@ -54,8 +54,8 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 in progress: extracted generic constants/sort/parsing helpers into `src/app/lib/app-utils-shared.ts` and re-exported from `app-utils.ts` to preserve compatibility while reducing `app-utils.ts` size before import migration cleanup.
-  - Wave 1 planned: extract orchestration hooks/modules from `AppController` while preserving event ordering and behavior parity.
+  - Wave 0 completed: split `app-utils` into `app-utils-shared` (generic constants/sort/parsing helpers), `app-utils-networking` (occupancy/endpoint/route helpers), and `app-utils-layout` (canvas/layout generation + conflict scoring), migrated app imports to domain modules, and reduced `app-utils.ts` to a compatibility façade.
+  - Wave 1 in progress: extracted `useNetworkEntityCountsById` from `AppController` as a first orchestration slice, replacing an inline `useMemo` block while preserving data flow and behavior.
   - Wave 2 planned: separate analysis connector/splice/wire UI modules and keep list-first + network-summary layout stable.
   - Wave 3 planned: decompose `NetworkSummaryPanel` into render layers/overlays/toolbar units without changing 2D interaction behavior.
   - Wave 4 planned: extract per-entity modeling form panels and shared `idle/create/edit` scaffolding.
@@ -83,3 +83,10 @@ Backlog scope covered:
   - `npm run lint` OK
   - `npm run typecheck` OK
   - `npm run test:ci -- src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.networks.spec.tsx` OK
+- Validation snapshot (Wave 0 final):
+  - `npm run lint -- src/app/lib/app-utils.ts src/app/lib/app-utils-shared.ts src/app/lib/app-utils-networking.ts src/app/lib/app-utils-layout.ts src/app/AppController.tsx` OK
+  - `npm run typecheck` OK
+  - `npm run test:ci -- src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.validation.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx src/tests/core.layout.spec.ts src/tests/core.pathfinding.spec.ts` OK
+- Validation snapshot (Wave 1 partial):
+  - `npm run lint -- src/app/AppController.tsx src/app/hooks/useNetworkEntityCountsById.ts` OK
+  - `npm run typecheck` OK

@@ -2,7 +2,7 @@ import type { Dispatch, MouseEvent as ReactMouseEvent, MutableRefObject, SetStat
 import type { Connector, NetworkNode, NodeId, Segment, SegmentId, Splice, WireEndpoint, WireId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
-import { NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE, NETWORK_VIEW_HEIGHT, NETWORK_VIEW_WIDTH, clamp, snapToGrid } from "../lib/app-utils";
+import { NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE, NETWORK_VIEW_HEIGHT, NETWORK_VIEW_WIDTH, clamp, snapToGrid } from "../lib/app-utils-shared";
 import type { NodePosition, SubScreenId } from "../types/app-controller";
 
 type DispatchAction = (

@@ -77,6 +77,7 @@ import { useConnectorHandlers } from "./hooks/useConnectorHandlers";
 import { useEntityListModel } from "./hooks/useEntityListModel";
 import { useEntityFormsState } from "./hooks/useEntityFormsState";
 import { useNetworkImportExport } from "./hooks/useNetworkImportExport";
+import { useNetworkEntityCountsById } from "./hooks/useNetworkEntityCountsById";
 import { useNodeHandlers } from "./hooks/useNodeHandlers";
 import { useSelectionHandlers } from "./hooks/useSelectionHandlers";
 import { useSegmentHandlers } from "./hooks/useSegmentHandlers";
@@ -90,14 +91,14 @@ import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
 import { applyRegisteredServiceWorkerUpdate } from "./pwa/registerServiceWorker";
 import {
   clamp,
-  createNodePositionMap,
   HISTORY_LIMIT,
   NETWORK_GRID_STEP,
   NETWORK_MAX_SCALE,
   NETWORK_MIN_SCALE,
   NETWORK_VIEW_HEIGHT,
   NETWORK_VIEW_WIDTH,
-} from "./lib/app-utils";
+} from "./lib/app-utils-shared";
+import { createNodePositionMap } from "./lib/app-utils-layout";
 import type {
   AppProps,
   CanvasLabelStrokeMode,
@@ -141,33 +142,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const wires = selectWires(state);
   const routingGraph = selectRoutingGraphIndex(state);
   const subNetworkSummaries = selectSubNetworkSummaries(state);
-  const networkEntityCountsById = useMemo(() => {
-    const counts: Partial<
-      Record<
-        NetworkId,
-        {
-          connectorCount: number;
-          spliceCount: number;
-          nodeCount: number;
-          segmentCount: number;
-          wireCount: number;
-        }
-      >
-    > = {};
-
-    for (const network of networks) {
-      const scoped = state.networkStates[network.id];
-      counts[network.id] = {
-        connectorCount: scoped?.connectors.allIds.length ?? 0,
-        spliceCount: scoped?.splices.allIds.length ?? 0,
-        nodeCount: scoped?.nodes.allIds.length ?? 0,
-        segmentCount: scoped?.segments.allIds.length ?? 0,
-        wireCount: scoped?.wires.allIds.length ?? 0
-      };
-    }
-
-    return counts;
-  }, [networks, state.networkStates]);
+  const networkEntityCountsById = useNetworkEntityCountsById(networks, state.networkStates);
 
   const connectorMap = useMemo(() => new Map(connectors.map((connector) => [connector.id, connector])), [connectors]);
   const spliceMap = useMemo(() => new Map(splices.map((splice) => [splice.id, splice])), [splices]);

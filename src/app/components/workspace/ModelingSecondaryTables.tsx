@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { nextSortState } from "../../lib/app-utils";
+import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type {
   NodeId,

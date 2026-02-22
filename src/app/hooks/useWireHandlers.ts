@@ -9,7 +9,7 @@ import type {
 } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
-import { createEntityId, toPositiveInteger } from "../lib/app-utils";
+import { createEntityId, toPositiveInteger } from "../lib/app-utils-shared";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],

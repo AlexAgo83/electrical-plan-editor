@@ -17,7 +17,7 @@ import {
   resolveEndpointNodeId,
   toConnectorOccupancyKey,
   toSpliceOccupancyKey
-} from "../../lib/app-utils";
+} from "../../lib/app-utils-networking";
 import type { ValidationIssue } from "../../types/app-controller";
 
 type AppState = ReturnType<AppStore["getState"]>;

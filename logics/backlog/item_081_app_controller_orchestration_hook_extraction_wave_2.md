@@ -1,8 +1,8 @@
 ## item_081_app_controller_orchestration_hook_extraction_wave_2 - App Controller Orchestration Hook Extraction (Wave 2)
 > From version: 0.5.0
-> Understanding: 98%
-> Confidence: 95%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 96%
+> Progress: 10%
 > Complexity: High
 > Theme: App Orchestration Decoupling
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -37,9 +37,9 @@
 - References:
   - `logics/request/req_014_ui_modularization_wave_2_controller_analysis_canvas_and_bundle_optimization.md`
   - `src/app/AppController.tsx`
+  - `src/app/hooks/useNetworkEntityCountsById.ts`
   - `src/app/hooks/useWorkspaceNavigation.ts`
   - `src/app/hooks/useUiPreferences.ts`
   - `src/app/hooks/useKeyboardShortcuts.ts`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
   - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
-

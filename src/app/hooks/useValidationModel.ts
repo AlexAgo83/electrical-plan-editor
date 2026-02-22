@@ -11,7 +11,7 @@ import type {
   Wire
 } from "../../core/entities";
 import type { AppStore } from "../../store";
-import { normalizeSearch } from "../lib/app-utils";
+import { normalizeSearch } from "../lib/app-utils-shared";
 import { buildValidationIssues } from "./validation/buildValidationIssues";
 import type { ValidationIssue, ValidationSeverityFilter } from "../types/app-controller";
 

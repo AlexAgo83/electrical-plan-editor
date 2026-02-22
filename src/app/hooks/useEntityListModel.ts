@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, Splice, SpliceId, Wire } from "../../core/entities";
 import { selectConnectorCavityStatuses, selectSplicePortStatuses, type AppState } from "../../store";
-import { normalizeSearch, sortById, sortByNameAndTechnicalId } from "../lib/app-utils";
+import { normalizeSearch, sortById, sortByNameAndTechnicalId } from "../lib/app-utils-shared";
 import type {
   ConnectorSynthesisRow,
   OccupancyFilter,

@@ -1,7 +1,8 @@
 import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, SegmentId, Splice, SpliceId, Wire, WireId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
-import { NETWORK_VIEW_HEIGHT, NETWORK_VIEW_WIDTH, resolveEndpointNodeId } from "../lib/app-utils";
+import { NETWORK_VIEW_HEIGHT, NETWORK_VIEW_WIDTH } from "../lib/app-utils-shared";
+import { resolveEndpointNodeId } from "../lib/app-utils-networking";
 import type {
   NodePosition,
   SelectionTarget,

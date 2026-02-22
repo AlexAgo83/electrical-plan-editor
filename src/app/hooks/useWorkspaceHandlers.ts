@@ -10,7 +10,7 @@ import {
   buildUniqueNetworkTechnicalId,
   clamp,
   createEntityId
-} from "../lib/app-utils";
+} from "../lib/app-utils-shared";
 import type {
   CanvasLabelStrokeMode,
   NodePosition,

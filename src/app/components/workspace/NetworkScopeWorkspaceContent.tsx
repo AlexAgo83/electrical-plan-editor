@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
 import type { NetworkId } from "../../../core/entities";
-import { nextSortState, sortByNameAndTechnicalId } from "../../lib/app-utils";
+import { nextSortState, sortByNameAndTechnicalId } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { SortState } from "../../types/app-controller";
 

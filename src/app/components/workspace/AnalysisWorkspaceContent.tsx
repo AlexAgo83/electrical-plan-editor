@@ -1,5 +1,5 @@
 import { useState, type FormEvent, type ReactElement } from "react";
-import { nextSortState } from "../../lib/app-utils";
+import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { Connector, ConnectorId, Splice, SpliceId, Wire, WireId } from "../../../core/entities";
 import type { ConnectorSynthesisRow, SortState, SpliceSynthesisRow } from "../../types/app-controller";
