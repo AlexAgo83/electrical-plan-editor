@@ -1,0 +1,607 @@
+import type { ComponentProps, ComponentType, Dispatch, SetStateAction } from "react";
+import { InspectorContextPanel } from "../../components/InspectorContextPanel";
+
+type NetworkSummaryPanelProps = ComponentProps<typeof import("../../components/NetworkSummaryPanel").NetworkSummaryPanel>;
+type NetworkScopeWorkspaceContentProps = ComponentProps<
+  typeof import("../../components/workspace/NetworkScopeWorkspaceContent").NetworkScopeWorkspaceContent
+>;
+type ModelingPrimaryTablesProps = ComponentProps<
+  typeof import("../../components/workspace/ModelingPrimaryTables").ModelingPrimaryTables
+>;
+type ModelingSecondaryTablesProps = ComponentProps<
+  typeof import("../../components/workspace/ModelingSecondaryTables").ModelingSecondaryTables
+>;
+type ModelingFormsColumnProps = ComponentProps<
+  typeof import("../../components/workspace/ModelingFormsColumn").ModelingFormsColumn
+>;
+type AnalysisWorkspaceContentProps = ComponentProps<
+  typeof import("../../components/workspace/AnalysisWorkspaceContent").AnalysisWorkspaceContent
+>;
+type ValidationWorkspaceContentProps = ComponentProps<
+  typeof import("../../components/workspace/ValidationWorkspaceContent").ValidationWorkspaceContent
+>;
+type SettingsWorkspaceContentProps = ComponentProps<
+  typeof import("../../components/workspace/SettingsWorkspaceContent").SettingsWorkspaceContent
+>;
+
+type BooleanStateSetter = Dispatch<SetStateAction<boolean>>;
+
+type InspectorContextPanelControllerSliceParams = Omit<
+  ComponentProps<typeof InspectorContextPanel>,
+  | "mode"
+  | "canExpandFromCollapsed"
+  | "canCollapseToCollapsed"
+  | "onExpandFromCollapsed"
+  | "onCollapseToCollapsed"
+  | "connectorOccupiedCount"
+  | "spliceOccupiedCount"
+  | "onEditSelected"
+  | "onOpenAnalysis"
+  | "onClearSelection"
+> & {
+  isInspectorOpen: boolean;
+  canExpandInspectorFromCollapsed: boolean;
+  setIsInspectorExpandedOnNarrowViewport: (expanded: boolean) => void;
+  selectedConnectorOccupiedCount: number;
+  selectedSpliceOccupiedCount: number;
+  handleStartSelectedEdit: ComponentProps<typeof InspectorContextPanel>["onEditSelected"];
+  handleOpenSelectionInAnalysis: ComponentProps<typeof InspectorContextPanel>["onOpenAnalysis"];
+  onClearSelection: ComponentProps<typeof InspectorContextPanel>["onClearSelection"];
+};
+
+type NetworkSummaryPanelControllerSliceParams = Omit<
+  NetworkSummaryPanelProps,
+  | "labelStrokeMode"
+  | "toggleShowNetworkInfoPanels"
+  | "toggleShowSegmentLengths"
+  | "toggleShowNetworkGrid"
+  | "toggleSnapNodesToGrid"
+  | "routingGraphNodeCount"
+  | "routingGraphSegmentCount"
+  | "onRegenerateLayout"
+> & {
+  NetworkSummaryPanelComponent: ComponentType<NetworkSummaryPanelProps>;
+  setShowNetworkInfoPanels: BooleanStateSetter;
+  setShowSegmentLengths: BooleanStateSetter;
+  setShowNetworkGrid: BooleanStateSetter;
+  setSnapNodesToGrid: BooleanStateSetter;
+  networkLabelStrokeMode: NetworkSummaryPanelProps["labelStrokeMode"];
+  routingGraph: {
+    nodeIds: string[];
+    segmentIds: string[];
+  };
+  handleRegenerateLayout: NetworkSummaryPanelProps["onRegenerateLayout"];
+};
+
+type NetworkScopeScreenContentSliceParams = Omit<
+  NetworkScopeWorkspaceContentProps,
+  "focusRequestedNetworkId" | "focusRequestedNetworkToken"
+> & {
+  NetworkScopeWorkspaceContentComponent: ComponentType<NetworkScopeWorkspaceContentProps>;
+  networkFocusRequest: {
+    id: NetworkScopeWorkspaceContentProps["focusRequestedNetworkId"];
+    token: NetworkScopeWorkspaceContentProps["focusRequestedNetworkToken"];
+  };
+};
+
+type ModelingScreenContentSliceParams = Omit<
+  ModelingPrimaryTablesProps,
+  | "onOpenCreateConnector"
+  | "onEditConnector"
+  | "onDeleteConnector"
+  | "onOpenCreateSplice"
+  | "onEditSplice"
+  | "onDeleteSplice"
+  | "onOpenCreateNode"
+  | "onEditNode"
+  | "onDeleteNode"
+> &
+  Omit<
+    ModelingSecondaryTablesProps,
+    | "onOpenCreateSegment"
+    | "onEditSegment"
+    | "onDeleteSegment"
+    | "onOpenCreateWire"
+    | "onEditWire"
+    | "onDeleteWire"
+  > &
+  Omit<
+    ModelingFormsColumnProps,
+    "openCreateConnectorForm" | "openCreateSpliceForm" | "openCreateNodeForm" | "openCreateSegmentForm" | "openCreateWireForm"
+  > & {
+    ModelingPrimaryTablesComponent: ComponentType<ModelingPrimaryTablesProps>;
+    ModelingSecondaryTablesComponent: ComponentType<ModelingSecondaryTablesProps>;
+    ModelingFormsColumnComponent: ComponentType<ModelingFormsColumnProps>;
+    resetConnectorForm: ModelingPrimaryTablesProps["onOpenCreateConnector"];
+    startConnectorEdit: ModelingPrimaryTablesProps["onEditConnector"];
+    handleConnectorDelete: ModelingPrimaryTablesProps["onDeleteConnector"];
+    resetSpliceForm: ModelingPrimaryTablesProps["onOpenCreateSplice"];
+    startSpliceEdit: ModelingPrimaryTablesProps["onEditSplice"];
+    handleSpliceDelete: ModelingPrimaryTablesProps["onDeleteSplice"];
+    resetNodeForm: ModelingPrimaryTablesProps["onOpenCreateNode"];
+    startNodeEdit: ModelingPrimaryTablesProps["onEditNode"];
+    handleNodeDelete: ModelingPrimaryTablesProps["onDeleteNode"];
+    resetSegmentForm: ModelingSecondaryTablesProps["onOpenCreateSegment"];
+    startSegmentEdit: ModelingSecondaryTablesProps["onEditSegment"];
+    handleSegmentDelete: ModelingSecondaryTablesProps["onDeleteSegment"];
+    resetWireForm: ModelingSecondaryTablesProps["onOpenCreateWire"];
+    startWireEdit: ModelingSecondaryTablesProps["onEditWire"];
+    handleWireDelete: ModelingSecondaryTablesProps["onDeleteWire"];
+  };
+
+type AnalysisScreenContentSliceParams = Omit<
+  AnalysisWorkspaceContentProps,
+  "onSelectConnector" | "onSelectSplice" | "onSelectWire"
+> & {
+  AnalysisWorkspaceContentComponent: ComponentType<AnalysisWorkspaceContentProps>;
+  onSelectConnector: AnalysisWorkspaceContentProps["onSelectConnector"];
+  onSelectSplice: AnalysisWorkspaceContentProps["onSelectSplice"];
+  onSelectWire: AnalysisWorkspaceContentProps["onSelectWire"];
+};
+
+type ValidationScreenContentSliceParams = ValidationWorkspaceContentProps & {
+  ValidationWorkspaceContentComponent: ComponentType<ValidationWorkspaceContentProps>;
+};
+
+type SettingsScreenContentSliceParams = SettingsWorkspaceContentProps & {
+  SettingsWorkspaceContentComponent: ComponentType<SettingsWorkspaceContentProps>;
+};
+
+export function useInspectorContextPanelControllerSlice(params: InspectorContextPanelControllerSliceParams) {
+  const inspectorContextPanelProps = {
+    mode: params.isInspectorOpen ? "open" : "collapsed",
+    canExpandFromCollapsed: params.canExpandInspectorFromCollapsed,
+    canCollapseToCollapsed: params.canExpandInspectorFromCollapsed,
+    onExpandFromCollapsed: () => params.setIsInspectorExpandedOnNarrowViewport(true),
+    onCollapseToCollapsed: () => params.setIsInspectorExpandedOnNarrowViewport(false),
+    selected: params.selected,
+    selectedSubScreen: params.selectedSubScreen,
+    selectedConnector: params.selectedConnector,
+    selectedSplice: params.selectedSplice,
+    selectedNode: params.selectedNode,
+    selectedSegment: params.selectedSegment,
+    selectedWire: params.selectedWire,
+    connectorOccupiedCount: params.selectedConnectorOccupiedCount,
+    spliceOccupiedCount: params.selectedSpliceOccupiedCount,
+    describeNode: params.describeNode,
+    onEditSelected: params.handleStartSelectedEdit,
+    onOpenAnalysis: params.handleOpenSelectionInAnalysis,
+    onClearSelection: params.onClearSelection
+  } satisfies ComponentProps<typeof InspectorContextPanel>;
+
+  return {
+    inspectorContextPanelProps,
+    inspectorContextPanel: <InspectorContextPanel {...inspectorContextPanelProps} />
+  };
+}
+
+export function useNetworkSummaryPanelControllerSlice(params: NetworkSummaryPanelControllerSliceParams) {
+  const networkSummaryPanelProps = {
+    handleZoomAction: params.handleZoomAction,
+    fitNetworkToContent: params.fitNetworkToContent,
+    showNetworkGrid: params.showNetworkGrid,
+    snapNodesToGrid: params.snapNodesToGrid,
+    showNetworkInfoPanels: params.showNetworkInfoPanels,
+    showSegmentLengths: params.showSegmentLengths,
+    labelStrokeMode: params.networkLabelStrokeMode,
+    toggleShowNetworkInfoPanels: () => params.setShowNetworkInfoPanels((current: boolean) => !current),
+    toggleShowSegmentLengths: () => params.setShowSegmentLengths((current: boolean) => !current),
+    toggleShowNetworkGrid: () => params.setShowNetworkGrid((current: boolean) => !current),
+    toggleSnapNodesToGrid: () => params.setSnapNodesToGrid((current: boolean) => !current),
+    networkScalePercent: params.networkScalePercent,
+    routingGraphNodeCount: params.routingGraph.nodeIds.length,
+    routingGraphSegmentCount: params.routingGraph.segmentIds.length,
+    totalEdgeEntries: params.totalEdgeEntries,
+    nodes: params.nodes,
+    segments: params.segments,
+    isPanningNetwork: params.isPanningNetwork,
+    networkViewWidth: params.networkViewWidth,
+    networkViewHeight: params.networkViewHeight,
+    networkGridStep: params.networkGridStep,
+    networkOffset: params.networkOffset,
+    networkScale: params.networkScale,
+    handleNetworkCanvasMouseDown: params.handleNetworkCanvasMouseDown,
+    handleNetworkCanvasClick: params.handleNetworkCanvasClick,
+    handleNetworkWheel: params.handleNetworkWheel,
+    handleNetworkMouseMove: params.handleNetworkMouseMove,
+    stopNetworkNodeDrag: params.stopNetworkNodeDrag,
+    networkNodePositions: params.networkNodePositions,
+    selectedWireRouteSegmentIds: params.selectedWireRouteSegmentIds,
+    selectedSegmentId: params.selectedSegmentId,
+    handleNetworkSegmentClick: params.handleNetworkSegmentClick,
+    selectedNodeId: params.selectedNodeId,
+    handleNetworkNodeMouseDown: params.handleNetworkNodeMouseDown,
+    handleNetworkNodeClick: params.handleNetworkNodeClick,
+    connectorMap: params.connectorMap,
+    spliceMap: params.spliceMap,
+    describeNode: params.describeNode,
+    subNetworkSummaries: params.subNetworkSummaries,
+    routePreviewStartNodeId: params.routePreviewStartNodeId,
+    setRoutePreviewStartNodeId: params.setRoutePreviewStartNodeId,
+    routePreviewEndNodeId: params.routePreviewEndNodeId,
+    setRoutePreviewEndNodeId: params.setRoutePreviewEndNodeId,
+    routePreview: params.routePreview,
+    onRegenerateLayout: params.handleRegenerateLayout
+  } satisfies NetworkSummaryPanelProps;
+
+  return {
+    networkSummaryPanelProps,
+    networkSummaryPanel: <params.NetworkSummaryPanelComponent {...networkSummaryPanelProps} />
+  };
+}
+
+export function useNetworkScopeScreenContentSlice(params: NetworkScopeScreenContentSliceParams) {
+  const networkScopeWorkspaceProps = {
+    networks: params.networks,
+    networkSort: params.networkSort,
+    setNetworkSort: params.setNetworkSort,
+    networkEntityCountsById: params.networkEntityCountsById,
+    activeNetworkId: params.activeNetworkId,
+    handleSelectNetwork: params.handleSelectNetwork,
+    handleDuplicateNetwork: params.handleDuplicateNetwork,
+    handleDeleteNetwork: params.handleDeleteNetwork,
+    networkFormMode: params.networkFormMode,
+    handleOpenCreateNetworkForm: params.handleOpenCreateNetworkForm,
+    handleOpenEditNetworkForm: params.handleOpenEditNetworkForm,
+    handleCloseNetworkForm: params.handleCloseNetworkForm,
+    newNetworkName: params.newNetworkName,
+    setNewNetworkName: params.setNewNetworkName,
+    newNetworkTechnicalId: params.newNetworkTechnicalId,
+    setNewNetworkTechnicalId: params.setNewNetworkTechnicalId,
+    newNetworkDescription: params.newNetworkDescription,
+    setNewNetworkDescription: params.setNewNetworkDescription,
+    networkFormError: params.networkFormError,
+    networkTechnicalIdAlreadyUsed: params.networkTechnicalIdAlreadyUsed,
+    handleSubmitNetworkForm: params.handleSubmitNetworkForm,
+    focusRequestedNetworkId: params.networkFocusRequest.id,
+    focusRequestedNetworkToken: params.networkFocusRequest.token
+  } satisfies NetworkScopeWorkspaceContentProps;
+
+  return {
+    networkScopeWorkspaceProps,
+    networkScopeWorkspaceContent: <params.NetworkScopeWorkspaceContentComponent {...networkScopeWorkspaceProps} />
+  };
+}
+
+export function useModelingScreenContentSlice(params: ModelingScreenContentSliceParams) {
+  const modelingPrimaryTablesProps = {
+    isConnectorSubScreen: params.isConnectorSubScreen,
+    connectorFormMode: params.connectorFormMode,
+    onOpenCreateConnector: params.resetConnectorForm,
+    connectorOccupancyFilter: params.connectorOccupancyFilter,
+    setConnectorOccupancyFilter: params.setConnectorOccupancyFilter,
+    connectors: params.connectors,
+    visibleConnectors: params.visibleConnectors,
+    connectorSort: params.connectorSort,
+    setConnectorSort: params.setConnectorSort,
+    getSortIndicator: params.getSortIndicator,
+    connectorOccupiedCountById: params.connectorOccupiedCountById,
+    selectedConnectorId: params.selectedConnectorId,
+    onEditConnector: params.startConnectorEdit,
+    onDeleteConnector: params.handleConnectorDelete,
+    isSpliceSubScreen: params.isSpliceSubScreen,
+    spliceFormMode: params.spliceFormMode,
+    onOpenCreateSplice: params.resetSpliceForm,
+    spliceOccupancyFilter: params.spliceOccupancyFilter,
+    setSpliceOccupancyFilter: params.setSpliceOccupancyFilter,
+    splices: params.splices,
+    visibleSplices: params.visibleSplices,
+    spliceSort: params.spliceSort,
+    setSpliceSort: params.setSpliceSort,
+    spliceOccupiedCountById: params.spliceOccupiedCountById,
+    selectedSpliceId: params.selectedSpliceId,
+    onEditSplice: params.startSpliceEdit,
+    onDeleteSplice: params.handleSpliceDelete,
+    isNodeSubScreen: params.isNodeSubScreen,
+    nodeFormMode: params.nodeFormMode,
+    onOpenCreateNode: params.resetNodeForm,
+    nodeKindFilter: params.nodeKindFilter,
+    setNodeKindFilter: params.setNodeKindFilter,
+    nodes: params.nodes,
+    visibleNodes: params.visibleNodes,
+    nodeIdSortDirection: params.nodeIdSortDirection,
+    setNodeIdSortDirection: params.setNodeIdSortDirection,
+    segmentsCountByNodeId: params.segmentsCountByNodeId,
+    selectedNodeId: params.selectedNodeId,
+    describeNode: params.describeNode,
+    onEditNode: params.startNodeEdit,
+    onDeleteNode: params.handleNodeDelete
+  } satisfies ModelingPrimaryTablesProps;
+  const modelingSecondaryTablesProps = {
+    isSegmentSubScreen: params.isSegmentSubScreen,
+    segmentFormMode: params.segmentFormMode,
+    onOpenCreateSegment: params.resetSegmentForm,
+    segmentSubNetworkFilter: params.segmentSubNetworkFilter,
+    setSegmentSubNetworkFilter: params.setSegmentSubNetworkFilter,
+    segments: params.segments,
+    visibleSegments: params.visibleSegments,
+    segmentIdSortDirection: params.segmentIdSortDirection,
+    setSegmentIdSortDirection: params.setSegmentIdSortDirection,
+    nodeLabelById: params.nodeLabelById,
+    selectedSegmentId: params.selectedSegmentId,
+    selectedWireRouteSegmentIds: params.selectedWireRouteSegmentIds,
+    onEditSegment: params.startSegmentEdit,
+    onDeleteSegment: params.handleSegmentDelete,
+    isWireSubScreen: params.isWireSubScreen,
+    wireFormMode: params.wireFormMode,
+    onOpenCreateWire: params.resetWireForm,
+    wireRouteFilter: params.wireRouteFilter,
+    setWireRouteFilter: params.setWireRouteFilter,
+    wires: params.wires,
+    visibleWires: params.visibleWires,
+    wireSort: params.wireSort,
+    setWireSort: params.setWireSort,
+    getSortIndicator: params.getSortIndicator,
+    selectedWireId: params.selectedWireId,
+    describeWireEndpoint: params.describeWireEndpoint,
+    describeWireEndpointId: params.describeWireEndpointId,
+    onEditWire: params.startWireEdit,
+    onDeleteWire: params.handleWireDelete
+  } satisfies ModelingSecondaryTablesProps;
+  const modelingFormsColumnProps = {
+    isConnectorSubScreen: params.isConnectorSubScreen,
+    connectorFormMode: params.connectorFormMode,
+    openCreateConnectorForm: params.resetConnectorForm,
+    handleConnectorSubmit: params.handleConnectorSubmit,
+    connectorName: params.connectorName,
+    setConnectorName: params.setConnectorName,
+    connectorTechnicalId: params.connectorTechnicalId,
+    setConnectorTechnicalId: params.setConnectorTechnicalId,
+    connectorTechnicalIdAlreadyUsed: params.connectorTechnicalIdAlreadyUsed,
+    cavityCount: params.cavityCount,
+    setCavityCount: params.setCavityCount,
+    cancelConnectorEdit: params.cancelConnectorEdit,
+    connectorFormError: params.connectorFormError,
+    isSpliceSubScreen: params.isSpliceSubScreen,
+    spliceFormMode: params.spliceFormMode,
+    openCreateSpliceForm: params.resetSpliceForm,
+    handleSpliceSubmit: params.handleSpliceSubmit,
+    spliceName: params.spliceName,
+    setSpliceName: params.setSpliceName,
+    spliceTechnicalId: params.spliceTechnicalId,
+    setSpliceTechnicalId: params.setSpliceTechnicalId,
+    spliceTechnicalIdAlreadyUsed: params.spliceTechnicalIdAlreadyUsed,
+    portCount: params.portCount,
+    setPortCount: params.setPortCount,
+    cancelSpliceEdit: params.cancelSpliceEdit,
+    spliceFormError: params.spliceFormError,
+    isNodeSubScreen: params.isNodeSubScreen,
+    nodeFormMode: params.nodeFormMode,
+    openCreateNodeForm: params.resetNodeForm,
+    handleNodeSubmit: params.handleNodeSubmit,
+    nodeIdInput: params.nodeIdInput,
+    setNodeIdInput: params.setNodeIdInput,
+    pendingNewNodePosition: params.pendingNewNodePosition,
+    nodeKind: params.nodeKind,
+    setNodeKind: params.setNodeKind,
+    nodeLabel: params.nodeLabel,
+    setNodeLabel: params.setNodeLabel,
+    connectors: params.connectors,
+    nodeConnectorId: params.nodeConnectorId,
+    setNodeConnectorId: params.setNodeConnectorId,
+    splices: params.splices,
+    nodeSpliceId: params.nodeSpliceId,
+    setNodeSpliceId: params.setNodeSpliceId,
+    cancelNodeEdit: params.cancelNodeEdit,
+    nodeFormError: params.nodeFormError,
+    isSegmentSubScreen: params.isSegmentSubScreen,
+    segmentFormMode: params.segmentFormMode,
+    openCreateSegmentForm: params.resetSegmentForm,
+    handleSegmentSubmit: params.handleSegmentSubmit,
+    segmentIdInput: params.segmentIdInput,
+    setSegmentIdInput: params.setSegmentIdInput,
+    nodes: params.nodes,
+    describeNode: params.describeNode,
+    segmentNodeA: params.segmentNodeA,
+    setSegmentNodeA: params.setSegmentNodeA,
+    segmentNodeB: params.segmentNodeB,
+    setSegmentNodeB: params.setSegmentNodeB,
+    segmentLengthMm: params.segmentLengthMm,
+    setSegmentLengthMm: params.setSegmentLengthMm,
+    segmentSubNetworkTag: params.segmentSubNetworkTag,
+    setSegmentSubNetworkTag: params.setSegmentSubNetworkTag,
+    cancelSegmentEdit: params.cancelSegmentEdit,
+    segmentFormError: params.segmentFormError,
+    isWireSubScreen: params.isWireSubScreen,
+    wireFormMode: params.wireFormMode,
+    openCreateWireForm: params.resetWireForm,
+    handleWireSubmit: params.handleWireSubmit,
+    wireName: params.wireName,
+    setWireName: params.setWireName,
+    wireTechnicalId: params.wireTechnicalId,
+    setWireTechnicalId: params.setWireTechnicalId,
+    wireTechnicalIdAlreadyUsed: params.wireTechnicalIdAlreadyUsed,
+    wireEndpointAKind: params.wireEndpointAKind,
+    setWireEndpointAKind: params.setWireEndpointAKind,
+    wireEndpointAConnectorId: params.wireEndpointAConnectorId,
+    setWireEndpointAConnectorId: params.setWireEndpointAConnectorId,
+    wireEndpointACavityIndex: params.wireEndpointACavityIndex,
+    setWireEndpointACavityIndex: params.setWireEndpointACavityIndex,
+    wireEndpointASpliceId: params.wireEndpointASpliceId,
+    setWireEndpointASpliceId: params.setWireEndpointASpliceId,
+    wireEndpointAPortIndex: params.wireEndpointAPortIndex,
+    setWireEndpointAPortIndex: params.setWireEndpointAPortIndex,
+    wireEndpointBKind: params.wireEndpointBKind,
+    setWireEndpointBKind: params.setWireEndpointBKind,
+    wireEndpointBConnectorId: params.wireEndpointBConnectorId,
+    setWireEndpointBConnectorId: params.setWireEndpointBConnectorId,
+    wireEndpointBCavityIndex: params.wireEndpointBCavityIndex,
+    setWireEndpointBCavityIndex: params.setWireEndpointBCavityIndex,
+    wireEndpointBSpliceId: params.wireEndpointBSpliceId,
+    setWireEndpointBSpliceId: params.setWireEndpointBSpliceId,
+    wireEndpointBPortIndex: params.wireEndpointBPortIndex,
+    setWireEndpointBPortIndex: params.setWireEndpointBPortIndex,
+    cancelWireEdit: params.cancelWireEdit,
+    wireFormError: params.wireFormError
+  } satisfies ModelingFormsColumnProps;
+
+  return {
+    modelingPrimaryTablesProps,
+    modelingSecondaryTablesProps,
+    modelingFormsColumnProps,
+    modelingLeftColumnContent: (
+      <>
+        <params.ModelingPrimaryTablesComponent {...modelingPrimaryTablesProps} />
+        <params.ModelingSecondaryTablesComponent {...modelingSecondaryTablesProps} />
+      </>
+    ),
+    modelingFormsColumnContent: <params.ModelingFormsColumnComponent {...modelingFormsColumnProps} />
+  };
+}
+
+export function useAnalysisScreenContentSlice(params: AnalysisScreenContentSliceParams) {
+  const analysisWorkspaceContentProps = {
+    isConnectorSubScreen: params.isConnectorSubScreen,
+    isSpliceSubScreen: params.isSpliceSubScreen,
+    isWireSubScreen: params.isWireSubScreen,
+    networkSummaryPanel: params.networkSummaryPanel,
+    selectedConnector: params.selectedConnector,
+    selectedConnectorId: params.selectedConnectorId,
+    connectorOccupancyFilter: params.connectorOccupancyFilter,
+    setConnectorOccupancyFilter: params.setConnectorOccupancyFilter,
+    connectors: params.connectors,
+    visibleConnectors: params.visibleConnectors,
+    connectorSort: params.connectorSort,
+    setConnectorSort: params.setConnectorSort,
+    connectorOccupiedCountById: params.connectorOccupiedCountById,
+    onSelectConnector: params.onSelectConnector,
+    cavityIndexInput: params.cavityIndexInput,
+    setCavityIndexInput: params.setCavityIndexInput,
+    connectorOccupantRefInput: params.connectorOccupantRefInput,
+    setConnectorOccupantRefInput: params.setConnectorOccupantRefInput,
+    handleReserveCavity: params.handleReserveCavity,
+    connectorCavityStatuses: params.connectorCavityStatuses,
+    handleReleaseCavity: params.handleReleaseCavity,
+    sortedConnectorSynthesisRows: params.sortedConnectorSynthesisRows,
+    connectorSynthesisSort: params.connectorSynthesisSort,
+    setConnectorSynthesisSort: params.setConnectorSynthesisSort,
+    getSortIndicator: params.getSortIndicator,
+    selectedSplice: params.selectedSplice,
+    selectedSpliceId: params.selectedSpliceId,
+    spliceOccupancyFilter: params.spliceOccupancyFilter,
+    setSpliceOccupancyFilter: params.setSpliceOccupancyFilter,
+    splices: params.splices,
+    visibleSplices: params.visibleSplices,
+    spliceSort: params.spliceSort,
+    setSpliceSort: params.setSpliceSort,
+    spliceOccupiedCountById: params.spliceOccupiedCountById,
+    onSelectSplice: params.onSelectSplice,
+    splicePortStatuses: params.splicePortStatuses,
+    portIndexInput: params.portIndexInput,
+    setPortIndexInput: params.setPortIndexInput,
+    spliceOccupantRefInput: params.spliceOccupantRefInput,
+    setSpliceOccupantRefInput: params.setSpliceOccupantRefInput,
+    handleReservePort: params.handleReservePort,
+    handleReleasePort: params.handleReleasePort,
+    sortedSpliceSynthesisRows: params.sortedSpliceSynthesisRows,
+    spliceSynthesisSort: params.spliceSynthesisSort,
+    setSpliceSynthesisSort: params.setSpliceSynthesisSort,
+    wireRouteFilter: params.wireRouteFilter,
+    setWireRouteFilter: params.setWireRouteFilter,
+    wires: params.wires,
+    visibleWires: params.visibleWires,
+    wireSort: params.wireSort,
+    setWireSort: params.setWireSort,
+    selectedWireId: params.selectedWireId,
+    onSelectWire: params.onSelectWire,
+    selectedWire: params.selectedWire,
+    describeWireEndpoint: params.describeWireEndpoint,
+    describeWireEndpointId: params.describeWireEndpointId,
+    wireForcedRouteInput: params.wireForcedRouteInput,
+    setWireForcedRouteInput: params.setWireForcedRouteInput,
+    handleLockWireRoute: params.handleLockWireRoute,
+    handleResetWireRoute: params.handleResetWireRoute,
+    wireFormError: params.wireFormError
+  } satisfies AnalysisWorkspaceContentProps;
+
+  return {
+    analysisWorkspaceContentProps,
+    analysisWorkspaceContent: <params.AnalysisWorkspaceContentComponent {...analysisWorkspaceContentProps} />
+  };
+}
+
+export function useValidationScreenContentSlice(params: ValidationScreenContentSliceParams) {
+  const validationWorkspaceContentProps = {
+    validationSeverityFilter: params.validationSeverityFilter,
+    setValidationSeverityFilter: params.setValidationSeverityFilter,
+    validationIssuesForSeverityCounts: params.validationIssuesForSeverityCounts,
+    validationSeverityCountByLevel: params.validationSeverityCountByLevel,
+    validationCategoryFilter: params.validationCategoryFilter,
+    setValidationCategoryFilter: params.setValidationCategoryFilter,
+    validationIssuesForCategoryCounts: params.validationIssuesForCategoryCounts,
+    validationCategories: params.validationCategories,
+    validationCategoryCountByName: params.validationCategoryCountByName,
+    moveVisibleValidationIssueCursor: params.moveVisibleValidationIssueCursor,
+    visibleValidationIssues: params.visibleValidationIssues,
+    clearValidationFilters: params.clearValidationFilters,
+    validationIssues: params.validationIssues,
+    groupedValidationIssues: params.groupedValidationIssues,
+    findValidationIssueIndex: params.findValidationIssueIndex,
+    validationIssueCursor: params.validationIssueCursor,
+    handleValidationIssueRowGoTo: params.handleValidationIssueRowGoTo,
+    validationErrorCount: params.validationErrorCount,
+    validationWarningCount: params.validationWarningCount
+  } satisfies ValidationWorkspaceContentProps;
+
+  return {
+    validationWorkspaceContentProps,
+    validationWorkspaceContent: <params.ValidationWorkspaceContentComponent {...validationWorkspaceContentProps} />
+  };
+}
+
+export function useSettingsScreenContentSlice(params: SettingsScreenContentSliceParams) {
+  const settingsWorkspaceContentProps = {
+    isCurrentWorkspaceEmpty: params.isCurrentWorkspaceEmpty,
+    hasBuiltInSampleState: params.hasBuiltInSampleState,
+    handleRecreateSampleNetwork: params.handleRecreateSampleNetwork,
+    handleResetSampleNetwork: params.handleResetSampleNetwork,
+    activeNetworkId: params.activeNetworkId,
+    selectedExportNetworkIds: params.selectedExportNetworkIds,
+    handleExportNetworks: params.handleExportNetworks,
+    networks: params.networks,
+    toggleSelectedExportNetwork: params.toggleSelectedExportNetwork,
+    handleOpenImportPicker: params.handleOpenImportPicker,
+    importFileInputRef: params.importFileInputRef,
+    handleImportFileChange: params.handleImportFileChange,
+    importExportStatus: params.importExportStatus,
+    lastImportSummary: params.lastImportSummary,
+    themeMode: params.themeMode,
+    setThemeMode: params.setThemeMode,
+    tableDensity: params.tableDensity,
+    setTableDensity: params.setTableDensity,
+    tableFontSize: params.tableFontSize,
+    setTableFontSize: params.setTableFontSize,
+    defaultSortField: params.defaultSortField,
+    setDefaultSortField: params.setDefaultSortField,
+    defaultSortDirection: params.defaultSortDirection,
+    setDefaultSortDirection: params.setDefaultSortDirection,
+    defaultIdSortDirection: params.defaultIdSortDirection,
+    setDefaultIdSortDirection: params.setDefaultIdSortDirection,
+    applyListSortDefaults: params.applyListSortDefaults,
+    canvasDefaultShowGrid: params.canvasDefaultShowGrid,
+    setCanvasDefaultShowGrid: params.setCanvasDefaultShowGrid,
+    canvasDefaultSnapToGrid: params.canvasDefaultSnapToGrid,
+    setCanvasDefaultSnapToGrid: params.setCanvasDefaultSnapToGrid,
+    canvasDefaultShowInfoPanels: params.canvasDefaultShowInfoPanels,
+    setCanvasDefaultShowInfoPanels: params.setCanvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentLengths: params.canvasDefaultShowSegmentLengths,
+    setCanvasDefaultShowSegmentLengths: params.setCanvasDefaultShowSegmentLengths,
+    canvasDefaultLabelStrokeMode: params.canvasDefaultLabelStrokeMode,
+    setCanvasDefaultLabelStrokeMode: params.setCanvasDefaultLabelStrokeMode,
+    canvasResetZoomPercentInput: params.canvasResetZoomPercentInput,
+    setCanvasResetZoomPercentInput: params.setCanvasResetZoomPercentInput,
+    configuredResetZoomPercent: params.configuredResetZoomPercent,
+    applyCanvasDefaultsNow: params.applyCanvasDefaultsNow,
+    handleZoomAction: params.handleZoomAction,
+    showShortcutHints: params.showShortcutHints,
+    setShowShortcutHints: params.setShowShortcutHints,
+    keyboardShortcutsEnabled: params.keyboardShortcutsEnabled,
+    setKeyboardShortcutsEnabled: params.setKeyboardShortcutsEnabled,
+    resetWorkspacePreferencesToDefaults: params.resetWorkspacePreferencesToDefaults
+  } satisfies SettingsWorkspaceContentProps;
+
+  return {
+    settingsWorkspaceContentProps,
+    settingsWorkspaceContent: <params.SettingsWorkspaceContentComponent {...settingsWorkspaceContentProps} />
+  };
+}

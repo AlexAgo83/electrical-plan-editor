@@ -1,24 +1,15 @@
 import {
   Suspense,
-  type ComponentProps,
-  type CSSProperties,
   type ReactElement,
   lazy,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
   useSyncExternalStore
 } from "react";
 import appPackageMetadata from "../../package.json";
-import type {
-  ConnectorId,
-  NodeId,
-  SegmentId,
-  SpliceId,
-  WireId
-} from "../core/entities";
+import type { NodeId } from "../core/entities";
 import {
   type AppStore,
   appActions,
@@ -26,33 +17,21 @@ import {
   isWorkspaceEmpty,
   selectActiveNetwork,
   selectActiveNetworkId,
-  selectConnectorById,
-  selectConnectorCavityStatuses,
   selectConnectorTechnicalIdTaken,
   selectConnectors,
   selectLastError,
   selectNetworkTechnicalIdTaken,
   selectNetworks,
-  selectNodePositions,
-  selectNodeById,
   selectNodes,
   selectRoutingGraphIndex,
-  selectSegmentById,
   selectSegments,
-  selectSelection,
-  selectShortestRouteBetweenNodes,
-  selectSpliceById,
-  selectSplicePortStatuses,
   selectSpliceTechnicalIdTaken,
   selectSplices,
   selectSubNetworkSummaries,
-  selectWireById,
   selectWireTechnicalIdTaken,
   selectWires,
-  type ThemeMode
 } from "../store";
 import { appStore } from "./store";
-import { InspectorContextPanel } from "./components/InspectorContextPanel";
 import { NetworkSummaryPanel as NetworkSummaryPanelEager } from "./components/NetworkSummaryPanel";
 import { AnalysisWorkspaceContainer } from "./components/containers/AnalysisWorkspaceContainer";
 import { ModelingWorkspaceContainer } from "./components/containers/ModelingWorkspaceContainer";
@@ -75,9 +54,27 @@ import { SettingsWorkspaceContent as SettingsWorkspaceContentEager } from "./com
 import { ValidationWorkspaceContent as ValidationWorkspaceContentEager } from "./components/workspace/ValidationWorkspaceContent";
 import { WorkspaceSidebarPanel } from "./components/workspace/WorkspaceSidebarPanel";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
-import { useCanvasInteractionHandlers } from "./hooks/useCanvasInteractionHandlers";
 import { useCanvasState } from "./hooks/useCanvasState";
 import { useConnectorHandlers } from "./hooks/useConnectorHandlers";
+import { useAppControllerCanvasDisplayState } from "./hooks/useAppControllerCanvasDisplayState";
+import { useAppControllerPreferencesState } from "./hooks/useAppControllerPreferencesState";
+import { useAppControllerLayoutDerivedState } from "./hooks/useAppControllerLayoutDerivedState";
+import { useAppControllerSelectionEntities } from "./hooks/useAppControllerSelectionEntities";
+import { useAppControllerShellDerivedState } from "./hooks/useAppControllerShellDerivedState";
+import {
+  useAppControllerCanvasInteractionHandlersAssembly,
+  useAppControllerSelectionHandlersAssembly,
+  useAppControllerWorkspaceHandlersAssembly
+} from "./hooks/controller/useAppControllerHeavyHookAssemblers";
+import {
+  useAnalysisScreenContentSlice,
+  useInspectorContextPanelControllerSlice,
+  useModelingScreenContentSlice,
+  useNetworkScopeScreenContentSlice,
+  useNetworkSummaryPanelControllerSlice,
+  useSettingsScreenContentSlice,
+  useValidationScreenContentSlice
+} from "./hooks/controller/useAppControllerScreenContentSlices";
 import { useEntityListModel } from "./hooks/useEntityListModel";
 import { useEntityFormsState } from "./hooks/useEntityFormsState";
 import { useEntityRelationshipMaps } from "./hooks/useEntityRelationshipMaps";
@@ -91,7 +88,6 @@ import { useModelingFormSelectionSync } from "./hooks/useModelingFormSelectionSy
 import { useNodeDescriptions } from "./hooks/useNodeDescriptions";
 import { useNodeHandlers } from "./hooks/useNodeHandlers";
 import type { BeforeInstallPromptEventLike } from "./hooks/useWorkspaceShellChrome";
-import { useSelectionHandlers } from "./hooks/useSelectionHandlers";
 import { useSegmentHandlers } from "./hooks/useSegmentHandlers";
 import { useSpliceHandlers } from "./hooks/useSpliceHandlers";
 import { useStoreHistory } from "./hooks/useStoreHistory";
@@ -100,10 +96,8 @@ import { useValidationModel } from "./hooks/useValidationModel";
 import { useWireEndpointDescriptions } from "./hooks/useWireEndpointDescriptions";
 import { useWireHandlers } from "./hooks/useWireHandlers";
 import { useWorkspaceShellChrome } from "./hooks/useWorkspaceShellChrome";
-import { useWorkspaceHandlers } from "./hooks/useWorkspaceHandlers";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
 import {
-  clamp,
   HISTORY_LIMIT,
   NETWORK_GRID_STEP,
   NETWORK_MAX_SCALE,
@@ -114,14 +108,8 @@ import {
 import { createNodePositionMap } from "./lib/app-utils-layout";
 import type {
   AppProps,
-  CanvasLabelStrokeMode,
   NodePosition,
-  SortState,
-  SortDirection,
-  SortField,
   SubScreenId,
-  TableDensity,
-  TableFontSize,
 } from "./types/app-controller";
 import "./styles.css";
 
@@ -308,8 +296,20 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     wireFormError,
     setWireFormError
   } = useEntityFormsState();
-  const [routePreviewStartNodeId, setRoutePreviewStartNodeId] = useState("");
-  const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
+  const {
+    routePreviewStartNodeId,
+    setRoutePreviewStartNodeId,
+    routePreviewEndNodeId,
+    setRoutePreviewEndNodeId,
+    showNetworkInfoPanels,
+    setShowNetworkInfoPanels,
+    showSegmentLengths,
+    setShowSegmentLengths,
+    networkLabelStrokeMode,
+    setNetworkLabelStrokeMode,
+    canvasResetZoomPercentInput,
+    setCanvasResetZoomPercentInput
+  } = useAppControllerCanvasDisplayState();
   const {
     interactionMode,
     setInteractionMode,
@@ -348,25 +348,38 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     networkFocusRequest,
     setNetworkFocusRequest
   } = useNetworkScopeFormState();
-  const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
-  const [tableDensity, setTableDensity] = useState<TableDensity>("compact");
-  const [tableFontSize, setTableFontSize] = useState<TableFontSize>("normal");
-  const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
-  const [defaultSortDirection, setDefaultSortDirection] = useState<SortDirection>("asc");
-  const [defaultIdSortDirection, setDefaultIdSortDirection] = useState<SortDirection>("asc");
-  const [networkSort, setNetworkSort] = useState<SortState>({ field: "name", direction: "asc" });
-  const [canvasDefaultShowGrid, setCanvasDefaultShowGrid] = useState(true);
-  const [canvasDefaultSnapToGrid, setCanvasDefaultSnapToGrid] = useState(true);
-  const [canvasDefaultShowInfoPanels, setCanvasDefaultShowInfoPanels] = useState(true);
-  const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(false);
-  const [canvasDefaultLabelStrokeMode, setCanvasDefaultLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
-  const [showNetworkInfoPanels, setShowNetworkInfoPanels] = useState(true);
-  const [showSegmentLengths, setShowSegmentLengths] = useState(false);
-  const [networkLabelStrokeMode, setNetworkLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
-  const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("100");
-  const [showShortcutHints, setShowShortcutHints] = useState(false);
-  const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
-  const [preferencesHydrated, setPreferencesHydrated] = useState(false);
+  const {
+    themeMode,
+    setThemeMode,
+    tableDensity,
+    setTableDensity,
+    tableFontSize,
+    setTableFontSize,
+    defaultSortField,
+    setDefaultSortField,
+    defaultSortDirection,
+    setDefaultSortDirection,
+    defaultIdSortDirection,
+    setDefaultIdSortDirection,
+    networkSort,
+    setNetworkSort,
+    canvasDefaultShowGrid,
+    setCanvasDefaultShowGrid,
+    canvasDefaultSnapToGrid,
+    setCanvasDefaultSnapToGrid,
+    canvasDefaultShowInfoPanels,
+    setCanvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentLengths,
+    setCanvasDefaultShowSegmentLengths,
+    canvasDefaultLabelStrokeMode,
+    setCanvasDefaultLabelStrokeMode,
+    showShortcutHints,
+    setShowShortcutHints,
+    keyboardShortcutsEnabled,
+    setKeyboardShortcutsEnabled,
+    preferencesHydrated,
+    setPreferencesHydrated
+  } = useAppControllerPreferencesState();
   const [headerOffsetPx, setHeaderOffsetPx] = useState(96);
   const panStartRef = useRef<{
     clientX: number;
@@ -386,7 +399,25 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
   const deferredInstallPromptRef = useRef<BeforeInstallPromptEventLike | null>(null);
 
-  const selected = selectSelection(state);
+  const {
+    selected,
+    selectedConnectorId,
+    selectedSpliceId,
+    selectedNodeId,
+    selectedSegmentId,
+    selectedWireId,
+    selectedConnector,
+    selectedSplice,
+    selectedNode,
+    selectedSegment,
+    selectedWire,
+    selectedWireRouteInputValue,
+    selectedSubScreen,
+    connectorCavityStatuses,
+    splicePortStatuses,
+    selectedConnectorOccupiedCount,
+    selectedSpliceOccupiedCount
+  } = useAppControllerSelectionEntities({ state });
   const {
     activeScreen,
     setActiveScreen,
@@ -421,36 +452,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     operationsButtonRef,
     deferredInstallPromptRef
   });
-  const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
-  const selectedSpliceId = selected?.kind === "splice" ? (selected.id as SpliceId) : null;
-  const selectedNodeId = selected?.kind === "node" ? (selected.id as NodeId) : null;
-  const selectedSegmentId = selected?.kind === "segment" ? (selected.id as SegmentId) : null;
-  const selectedWireId = selected?.kind === "wire" ? (selected.id as WireId) : null;
-
-  const selectedConnector =
-    selectedConnectorId === null ? null : (selectConnectorById(state, selectedConnectorId) ?? null);
-  const selectedSplice = selectedSpliceId === null ? null : (selectSpliceById(state, selectedSpliceId) ?? null);
-  const selectedNode = selectedNodeId === null ? null : (selectNodeById(state, selectedNodeId) ?? null);
-  const selectedSegment = selectedSegmentId === null ? null : (selectSegmentById(state, selectedSegmentId) ?? null);
-  const selectedWire = selectedWireId === null ? null : (selectWireById(state, selectedWireId) ?? null);
-  const selectedWireRouteInputValue = selectedWire === null ? "" : selectedWire.routeSegmentIds.join(", ");
-
-  const connectorCavityStatuses = useMemo(() => {
-    if (selectedConnectorId === null) {
-      return [];
-    }
-
-    return selectConnectorCavityStatuses(state, selectedConnectorId);
-  }, [state, selectedConnectorId]);
-
-  const splicePortStatuses = useMemo(() => {
-    if (selectedSpliceId === null) {
-      return [];
-    }
-
-    return selectSplicePortStatuses(state, selectedSpliceId);
-  }, [state, selectedSpliceId]);
-
   const connectorIdExcludedFromUniqueness =
     connectorFormMode === "edit" ? editingConnectorId ?? undefined : undefined;
   const connectorTechnicalIdAlreadyUsed =
@@ -473,85 +474,41 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       networkFormMode === "edit" ? networkFormTargetId ?? undefined : undefined
     );
 
-  const totalEdgeEntries = routingGraph.nodeIds.reduce(
-    (sum, nodeId) => sum + (routingGraph.edgesByNodeId[nodeId]?.length ?? 0),
-    0
-  );
-  const routePreview = useMemo(() => {
-    if (routePreviewStartNodeId.length === 0 || routePreviewEndNodeId.length === 0) {
-      return null;
-    }
-
-    return selectShortestRouteBetweenNodes(
-      state,
-      routePreviewStartNodeId as NodeId,
-      routePreviewEndNodeId as NodeId
-    );
-  }, [state, routePreviewStartNodeId, routePreviewEndNodeId]);
-  const selectedWireRouteSegmentIds = useMemo(() => new Set(selectedWire?.routeSegmentIds ?? []), [selectedWire]);
-  const persistedNodePositions = selectNodePositions(state);
-  const autoNodePositions = useMemo(
-    () =>
-      createNodePositionMap(nodes, segments, {
-        snapToGrid: snapNodesToGrid,
-        gridStep: NETWORK_GRID_STEP
-      }),
-    [nodes, segments, snapNodesToGrid]
-  );
-  const networkNodePositions = useMemo(() => {
-    const merged = { ...autoNodePositions };
-    for (const node of nodes) {
-      const persistedPosition = persistedNodePositions[node.id];
-      if (persistedPosition !== undefined) {
-        merged[node.id] = persistedPosition;
-      }
-
-      const manualPosition = manualNodePositions[node.id];
-      if (manualPosition !== undefined) {
-        merged[node.id] = manualPosition;
-      }
-    }
-    return merged;
-  }, [autoNodePositions, manualNodePositions, nodes, persistedNodePositions]);
+  const {
+    totalEdgeEntries,
+    routePreview,
+    selectedWireRouteSegmentIds,
+    persistedNodePositions,
+    networkNodePositions
+  } = useAppControllerLayoutDerivedState({
+    state,
+    nodes,
+    segments,
+    snapNodesToGrid,
+    manualNodePositions,
+    selectedWireRouteSegmentIdsSource: selectedWire?.routeSegmentIds,
+    routePreviewStartNodeId,
+    routePreviewEndNodeId,
+    routingGraphNodeIds: routingGraph.nodeIds,
+    routingGraphEdgesByNodeId: routingGraph.edgesByNodeId
+  });
   const isConnectorSubScreen = activeSubScreen === "connector";
   const isSpliceSubScreen = activeSubScreen === "splice";
   const isNodeSubScreen = activeSubScreen === "node";
   const isSegmentSubScreen = activeSubScreen === "segment";
   const isWireSubScreen = activeSubScreen === "wire";
-  const selectedSubScreen = selected?.kind === undefined ? null : (selected.kind as SubScreenId);
-  const themeClassNamesByMode: Record<ThemeMode, string[]> = {
-    normal: ["theme-normal"],
-    dark: ["theme-dark"],
-    slateNeon: ["theme-dark", "theme-slate-neon"],
-    paperBlueprint: ["theme-normal", "theme-paper-blueprint"],
-    warmBrown: ["theme-normal", "theme-warm-brown"],
-    deepGreen: ["theme-dark", "theme-deep-green"]
-  };
-  const resolvedThemeClassNames = themeClassNamesByMode[themeMode] ?? themeClassNamesByMode.normal;
-  const appShellClassName = [
-    "app-shell",
-    tableDensity === "compact" ? "table-density-compact" : "",
-    `table-font-${tableFontSize}`,
-    ...resolvedThemeClassNames
-  ]
-    .filter((token) => token.length > 0)
-    .join(" ");
-  const workspaceShellStyle = useMemo(
-    () =>
-      ({
-        "--workspace-header-offset": `${headerOffsetPx}px`
-      }) as CSSProperties,
-    [headerOffsetPx]
-  );
-  const configuredResetScale = useMemo(() => {
-    const parsedPercent = Number(canvasResetZoomPercentInput);
-    if (!Number.isFinite(parsedPercent) || parsedPercent <= 0) {
-      return 1;
-    }
-
-    return clamp(parsedPercent / 100, NETWORK_MIN_SCALE, NETWORK_MAX_SCALE);
-  }, [canvasResetZoomPercentInput]);
-  const configuredResetZoomPercent = Math.round(configuredResetScale * 100);
+  const {
+    appShellClassName,
+    workspaceShellStyle,
+    configuredResetScale,
+    configuredResetZoomPercent
+  } = useAppControllerShellDerivedState({
+    themeMode,
+    tableDensity,
+    tableFontSize,
+    headerOffsetPx,
+    canvasResetZoomPercentInput
+  });
 
   const { describeWireEndpoint, describeWireEndpointId } = useWireEndpointDescriptions({
     connectorMap,
@@ -872,60 +829,74 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     applyListSortDefaults,
     applyCanvasDefaultsNow,
     resetWorkspacePreferencesToDefaults
-  } = useWorkspaceHandlers({
-    store,
-    networks,
-    newNetworkName,
-    setNewNetworkName,
-    newNetworkTechnicalId,
-    setNewNetworkTechnicalId,
-    newNetworkDescription,
-    setNewNetworkDescription,
-    setNetworkFormError,
-    isCurrentWorkspaceEmpty,
-    hasBuiltInSampleState,
-    dispatchAction,
-    replaceStateWithHistory,
-    nodes,
-    networkNodePositions,
-    configuredResetScale,
-    setNetworkScale,
-    setNetworkOffset,
-    canvasDefaultShowGrid,
-    canvasDefaultSnapToGrid,
-    canvasDefaultShowInfoPanels,
-    canvasDefaultShowSegmentLengths,
-    canvasDefaultLabelStrokeMode,
-    setShowNetworkGrid,
-    setSnapNodesToGrid,
-    setShowNetworkInfoPanels,
-    setShowSegmentLengths,
-    setNetworkLabelStrokeMode,
-    defaultSortField,
-    defaultSortDirection,
-    defaultIdSortDirection,
-    setConnectorSort,
-    setSpliceSort,
-    setWireSort,
-    setConnectorSynthesisSort,
-    setSpliceSynthesisSort,
-    setNetworkSort,
-    setNodeIdSortDirection,
-    setSegmentIdSortDirection,
-    setThemeMode,
-    setTableDensity,
-    setTableFontSize,
-    setDefaultSortField,
-    setDefaultSortDirection,
-    setDefaultIdSortDirection,
-    setCanvasDefaultShowGrid,
-    setCanvasDefaultSnapToGrid,
-    setCanvasDefaultShowInfoPanels,
-    setCanvasDefaultShowSegmentLengths,
-    setCanvasDefaultLabelStrokeMode,
-    setCanvasResetZoomPercentInput,
-    setShowShortcutHints,
-    setKeyboardShortcutsEnabled
+  } = useAppControllerWorkspaceHandlersAssembly({
+    base: {
+      store,
+      networks,
+      dispatchAction,
+      replaceStateWithHistory
+    },
+    networkForm: {
+      newNetworkName,
+      setNewNetworkName,
+      newNetworkTechnicalId,
+      setNewNetworkTechnicalId,
+      newNetworkDescription,
+      setNewNetworkDescription,
+      setNetworkFormError
+    },
+    workspace: {
+      isCurrentWorkspaceEmpty,
+      hasBuiltInSampleState,
+      nodes,
+      networkNodePositions,
+      configuredResetScale,
+      setNetworkScale,
+      setNetworkOffset
+    },
+    canvasDefaults: {
+      canvasDefaultShowGrid,
+      canvasDefaultSnapToGrid,
+      canvasDefaultShowInfoPanels,
+      canvasDefaultShowSegmentLengths,
+      canvasDefaultLabelStrokeMode,
+      setShowNetworkGrid,
+      setSnapNodesToGrid,
+      setShowNetworkInfoPanels,
+      setShowSegmentLengths,
+      setNetworkLabelStrokeMode
+    },
+    sortDefaults: {
+      defaultSortField,
+      defaultSortDirection,
+      defaultIdSortDirection
+    },
+    sortSetters: {
+      setConnectorSort,
+      setSpliceSort,
+      setWireSort,
+      setConnectorSynthesisSort,
+      setSpliceSynthesisSort,
+      setNetworkSort,
+      setNodeIdSortDirection,
+      setSegmentIdSortDirection
+    },
+    preferenceSetters: {
+      setThemeMode,
+      setTableDensity,
+      setTableFontSize,
+      setDefaultSortField,
+      setDefaultSortDirection,
+      setDefaultIdSortDirection,
+      setCanvasDefaultShowGrid,
+      setCanvasDefaultSnapToGrid,
+      setCanvasDefaultShowInfoPanels,
+      setCanvasDefaultShowSegmentLengths,
+      setCanvasDefaultLabelStrokeMode,
+      setCanvasResetZoomPercentInput,
+      setShowShortcutHints,
+      setKeyboardShortcutsEnabled
+    }
   });
   const {
     handleOpenCreateNetworkForm,
@@ -1138,38 +1109,50 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     moveVisibleValidationIssueCursor,
     handleValidationIssueRowGoTo,
     handleStartSelectedEdit
-  } = useSelectionHandlers({
-    state,
-    dispatchAction,
-    segmentMap,
-    networkNodePositions,
-    connectorNodeByConnectorId,
-    spliceNodeBySpliceId,
-    setInteractionMode,
-    networkScale,
-    setNetworkScale,
-    setNetworkOffset,
-    selected,
-    selectedSubScreen,
-    selectedConnector,
-    selectedSplice,
-    selectedNode,
-    selectedSegment,
-    selectedWire,
-    setActiveScreen,
-    setActiveSubScreen,
-    orderedValidationIssues,
-    visibleValidationIssues,
-    getFocusedValidationIssueByCursor,
-    setValidationIssueCursorFromIssue,
-    setValidationSearchQuery,
-    setValidationCategoryFilter,
-    setValidationSeverityFilter,
-    startConnectorEdit,
-    startSpliceEdit,
-    startNodeEdit,
-    startSegmentEdit,
-    startWireEdit
+  } = useAppControllerSelectionHandlersAssembly({
+    core: {
+      state,
+      dispatchAction,
+      segmentMap,
+      networkNodePositions,
+      connectorNodeByConnectorId,
+      spliceNodeBySpliceId
+    },
+    canvasFocus: {
+      setInteractionMode,
+      networkScale,
+      setNetworkScale,
+      setNetworkOffset
+    },
+    selection: {
+      selected,
+      selectedSubScreen,
+      selectedConnector,
+      selectedSplice,
+      selectedNode,
+      selectedSegment,
+      selectedWire
+    },
+    navigation: {
+      setActiveScreen,
+      setActiveSubScreen
+    },
+    validation: {
+      orderedValidationIssues,
+      visibleValidationIssues,
+      getFocusedValidationIssueByCursor,
+      setValidationIssueCursorFromIssue,
+      setValidationSearchQuery,
+      setValidationCategoryFilter,
+      setValidationSeverityFilter
+    },
+    editActions: {
+      startConnectorEdit,
+      startSpliceEdit,
+      startNodeEdit,
+      startSegmentEdit,
+      startWireEdit
+    }
   });
 
   const { clearAllModelingForms } = useModelingFormSelectionSync({
@@ -1201,62 +1184,76 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     handleZoomAction,
     handleNetworkMouseMove,
     stopNetworkNodeDrag
-  } = useCanvasInteractionHandlers({
-    state,
-    nodesCount: nodes.length,
-    interactionMode,
-    modeAnchorNodeId,
-    setModeAnchorNodeId,
-    isModelingScreen,
-    activeSubScreen,
-    setActiveScreen,
-    setActiveSubScreen,
-    setSegmentFormMode,
-    setEditingSegmentId,
-    setSegmentFormError,
-    setSegmentNodeA,
-    setSegmentNodeB,
-    setRoutePreviewStartNodeId,
-    routePreviewStartNodeId,
-    setRoutePreviewEndNodeId,
-    routePreviewEndNodeId,
-    setWireFormMode,
-    setEditingWireId,
-    setWireFormError,
-    setWireEndpointAKind,
-    setWireEndpointAConnectorId,
-    setWireEndpointASpliceId,
-    setWireEndpointBKind,
-    setWireEndpointBConnectorId,
-    setWireEndpointBSpliceId,
-    setNodeFormMode,
-    setEditingNodeId,
-    setNodeKind,
-    setNodeIdInput,
-    setNodeConnectorId,
-    setNodeSpliceId,
-    setNodeLabel,
-    setNodeFormError,
-    setPendingNewNodePosition,
-    snapNodesToGrid,
-    networkOffset,
-    networkScale,
-    setNetworkScale,
-    setNetworkOffset,
-    draggingNodeId,
-    setDraggingNodeId,
-    manualNodePositions,
-    setManualNodePositions,
-    setIsPanningNetwork,
-    panStartRef,
-    dispatchAction,
-    persistNodePosition: (nodeId, position) =>
-      dispatchAction(appActions.setNodePosition(nodeId, position), { trackHistory: false }),
-    resetNetworkViewToConfiguredScale,
-    startConnectorEdit,
-    startSpliceEdit,
-    startNodeEdit,
-    startSegmentEdit
+  } = useAppControllerCanvasInteractionHandlersAssembly({
+    core: {
+      state,
+      nodesCount: nodes.length,
+      interactionMode,
+      modeAnchorNodeId,
+      setModeAnchorNodeId,
+      isModelingScreen,
+      activeSubScreen,
+      setActiveScreen,
+      setActiveSubScreen
+    },
+    segmentForm: {
+      setSegmentFormMode,
+      setEditingSegmentId,
+      setSegmentFormError,
+      setSegmentNodeA,
+      setSegmentNodeB
+    },
+    routePreview: {
+      setRoutePreviewStartNodeId,
+      routePreviewStartNodeId,
+      setRoutePreviewEndNodeId,
+      routePreviewEndNodeId
+    },
+    wireForm: {
+      setWireFormMode,
+      setEditingWireId,
+      setWireFormError,
+      setWireEndpointAKind,
+      setWireEndpointAConnectorId,
+      setWireEndpointASpliceId,
+      setWireEndpointBKind,
+      setWireEndpointBConnectorId,
+      setWireEndpointBSpliceId
+    },
+    nodeForm: {
+      setNodeFormMode,
+      setEditingNodeId,
+      setNodeKind,
+      setNodeIdInput,
+      setNodeConnectorId,
+      setNodeSpliceId,
+      setNodeLabel,
+      setNodeFormError,
+      setPendingNewNodePosition
+    },
+    viewport: {
+      snapNodesToGrid,
+      networkOffset,
+      networkScale,
+      setNetworkScale,
+      setNetworkOffset,
+      draggingNodeId,
+      setDraggingNodeId,
+      manualNodePositions,
+      setManualNodePositions,
+      setIsPanningNetwork,
+      panStartRef
+    },
+    actions: {
+      dispatchAction,
+      persistNodePosition: (nodeId, position) =>
+        dispatchAction(appActions.setNodePosition(nodeId, position), { trackHistory: false }),
+      resetNetworkViewToConfiguredScale,
+      startConnectorEdit,
+      startSpliceEdit,
+      startNodeEdit,
+      startSegmentEdit
+    }
   });
 
   const currentValidationIssue = getValidationIssueByCursor();
@@ -1267,14 +1264,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     visibleValidationIssues
   });
   const networkScalePercent = Math.round(networkScale * 100);
-  const selectedConnectorOccupiedCount =
-    selectedConnector === null
-      ? 0
-      : selectConnectorCavityStatuses(state, selectedConnector.id).filter((slot) => slot.isOccupied).length;
-  const selectedSpliceOccupiedCount =
-    selectedSplice === null
-      ? 0
-      : selectSplicePortStatuses(state, selectedSplice.id).filter((slot) => slot.isOccupied).length;
   const hasInspectableSelection = selected !== null && selectedSubScreen !== null;
   const {
     isInspectorHidden,
@@ -1292,12 +1281,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isNavigationDrawerOpen,
     isOperationsPanelOpen
   });
-  const inspectorContextPanelProps = {
-    mode: isInspectorOpen ? "open" : "collapsed",
-    canExpandFromCollapsed: canExpandInspectorFromCollapsed,
-    canCollapseToCollapsed: canExpandInspectorFromCollapsed,
-    onExpandFromCollapsed: () => setIsInspectorExpandedOnNarrowViewport(true),
-    onCollapseToCollapsed: () => setIsInspectorExpandedOnNarrowViewport(false),
+  const { inspectorContextPanel } = useInspectorContextPanelControllerSlice({
+    isInspectorOpen,
+    canExpandInspectorFromCollapsed,
+    setIsInspectorExpandedOnNarrowViewport,
     selected,
     selectedSubScreen,
     selectedConnector,
@@ -1305,33 +1292,31 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     selectedNode,
     selectedSegment,
     selectedWire,
-    connectorOccupiedCount: selectedConnectorOccupiedCount,
-    spliceOccupiedCount: selectedSpliceOccupiedCount,
+    selectedConnectorOccupiedCount,
+    selectedSpliceOccupiedCount,
     describeNode,
-    onEditSelected: handleStartSelectedEdit,
-    onOpenAnalysis: handleOpenSelectionInAnalysis,
+    handleStartSelectedEdit,
+    handleOpenSelectionInAnalysis,
     onClearSelection: () => {
       dispatchAction(appActions.clearSelection());
       clearAllModelingForms();
     }
-  } satisfies ComponentProps<typeof InspectorContextPanel>;
-  const inspectorContextPanel = <InspectorContextPanel {...inspectorContextPanelProps} />;
-
-  const networkSummaryPanelProps = {
+  });
+  const { networkSummaryPanel } = useNetworkSummaryPanelControllerSlice({
+    NetworkSummaryPanelComponent: NetworkSummaryPanel,
     handleZoomAction,
     fitNetworkToContent,
     showNetworkGrid,
+    setShowNetworkGrid,
     snapNodesToGrid,
+    setSnapNodesToGrid,
     showNetworkInfoPanels,
+    setShowNetworkInfoPanels,
     showSegmentLengths,
-    labelStrokeMode: networkLabelStrokeMode,
-    toggleShowNetworkInfoPanels: () => setShowNetworkInfoPanels((current) => !current),
-    toggleShowSegmentLengths: () => setShowSegmentLengths((current) => !current),
-    toggleShowNetworkGrid: () => setShowNetworkGrid((current) => !current),
-    toggleSnapNodesToGrid: () => setSnapNodesToGrid((current) => !current),
+    setShowSegmentLengths,
+    networkLabelStrokeMode,
     networkScalePercent,
-    routingGraphNodeCount: routingGraph.nodeIds.length,
-    routingGraphSegmentCount: routingGraph.segmentIds.length,
+    routingGraph,
     totalEdgeEntries,
     nodes,
     segments,
@@ -1362,10 +1347,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     routePreviewEndNodeId,
     setRoutePreviewEndNodeId,
     routePreview,
-    onRegenerateLayout: handleRegenerateLayout
-  } satisfies ComponentProps<typeof NetworkSummaryPanelEager>;
-  const networkSummaryPanel = <NetworkSummaryPanel {...networkSummaryPanelProps} />;
-  const networkScopeWorkspaceProps = {
+    handleRegenerateLayout
+  });
+  const { networkScopeWorkspaceContent } = useNetworkScopeScreenContentSlice({
+    NetworkScopeWorkspaceContentComponent: NetworkScopeWorkspaceContent,
     networks,
     networkSort,
     setNetworkSort,
@@ -1387,13 +1372,15 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     networkFormError,
     networkTechnicalIdAlreadyUsed,
     handleSubmitNetworkForm,
-    focusRequestedNetworkId: networkFocusRequest.id,
-    focusRequestedNetworkToken: networkFocusRequest.token
-  } satisfies ComponentProps<typeof NetworkScopeWorkspaceContentEager>;
-  const modelingPrimaryTablesProps = {
+    networkFocusRequest
+  });
+  const { modelingLeftColumnContent, modelingFormsColumnContent } = useModelingScreenContentSlice({
+    ModelingPrimaryTablesComponent: ModelingPrimaryTables,
+    ModelingSecondaryTablesComponent: ModelingSecondaryTables,
+    ModelingFormsColumnComponent: ModelingFormsColumn,
     isConnectorSubScreen,
     connectorFormMode,
-    onOpenCreateConnector: resetConnectorForm,
+    resetConnectorForm,
     connectorOccupancyFilter,
     setConnectorOccupancyFilter,
     connectors,
@@ -1403,11 +1390,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     getSortIndicator,
     connectorOccupiedCountById,
     selectedConnectorId,
-    onEditConnector: startConnectorEdit,
-    onDeleteConnector: handleConnectorDelete,
+    startConnectorEdit,
+    handleConnectorDelete,
     isSpliceSubScreen,
     spliceFormMode,
-    onOpenCreateSplice: resetSpliceForm,
+    resetSpliceForm,
     spliceOccupancyFilter,
     setSpliceOccupancyFilter,
     splices,
@@ -1416,11 +1403,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setSpliceSort,
     spliceOccupiedCountById,
     selectedSpliceId,
-    onEditSplice: startSpliceEdit,
-    onDeleteSplice: handleSpliceDelete,
+    startSpliceEdit,
+    handleSpliceDelete,
     isNodeSubScreen,
     nodeFormMode,
-    onOpenCreateNode: resetNodeForm,
+    resetNodeForm,
     nodeKindFilter,
     setNodeKindFilter,
     nodes,
@@ -1430,13 +1417,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     segmentsCountByNodeId,
     selectedNodeId,
     describeNode,
-    onEditNode: startNodeEdit,
-    onDeleteNode: handleNodeDelete
-  } satisfies ComponentProps<typeof ModelingPrimaryTablesEager>;
-  const modelingSecondaryTablesProps = {
+    startNodeEdit,
+    handleNodeDelete,
     isSegmentSubScreen,
     segmentFormMode,
-    onOpenCreateSegment: resetSegmentForm,
+    resetSegmentForm,
     segmentSubNetworkFilter,
     setSegmentSubNetworkFilter,
     segments,
@@ -1446,28 +1431,22 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     nodeLabelById,
     selectedSegmentId,
     selectedWireRouteSegmentIds,
-    onEditSegment: startSegmentEdit,
-    onDeleteSegment: handleSegmentDelete,
+    startSegmentEdit,
+    handleSegmentDelete,
     isWireSubScreen,
     wireFormMode,
-    onOpenCreateWire: resetWireForm,
+    resetWireForm,
     wireRouteFilter,
     setWireRouteFilter,
     wires,
     visibleWires,
     wireSort,
     setWireSort,
-    getSortIndicator,
     selectedWireId,
     describeWireEndpoint,
     describeWireEndpointId,
-    onEditWire: startWireEdit,
-    onDeleteWire: handleWireDelete
-  } satisfies ComponentProps<typeof ModelingSecondaryTablesEager>;
-  const modelingFormsColumnProps = {
-    isConnectorSubScreen,
-    connectorFormMode,
-    openCreateConnectorForm: resetConnectorForm,
+    startWireEdit,
+    handleWireDelete,
     handleConnectorSubmit,
     connectorName,
     setConnectorName,
@@ -1478,9 +1457,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCavityCount,
     cancelConnectorEdit,
     connectorFormError,
-    isSpliceSubScreen,
-    spliceFormMode,
-    openCreateSpliceForm: resetSpliceForm,
     handleSpliceSubmit,
     spliceName,
     setSpliceName,
@@ -1491,9 +1467,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setPortCount,
     cancelSpliceEdit,
     spliceFormError,
-    isNodeSubScreen,
-    nodeFormMode,
-    openCreateNodeForm: resetNodeForm,
     handleNodeSubmit,
     nodeIdInput,
     setNodeIdInput,
@@ -1502,22 +1475,15 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNodeKind,
     nodeLabel,
     setNodeLabel,
-    connectors,
     nodeConnectorId,
     setNodeConnectorId,
-    splices,
     nodeSpliceId,
     setNodeSpliceId,
     cancelNodeEdit,
     nodeFormError,
-    isSegmentSubScreen,
-    segmentFormMode,
-    openCreateSegmentForm: resetSegmentForm,
     handleSegmentSubmit,
     segmentIdInput,
     setSegmentIdInput,
-    nodes,
-    describeNode,
     segmentNodeA,
     setSegmentNodeA,
     segmentNodeB,
@@ -1528,9 +1494,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setSegmentSubNetworkTag,
     cancelSegmentEdit,
     segmentFormError,
-    isWireSubScreen,
-    wireFormMode,
-    openCreateWireForm: resetWireForm,
     handleWireSubmit,
     wireName,
     setWireName,
@@ -1559,8 +1522,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setWireEndpointBPortIndex,
     cancelWireEdit,
     wireFormError
-  } satisfies ComponentProps<typeof ModelingFormsColumnEager>;
-  const analysisWorkspaceContentProps = {
+  });
+  const { analysisWorkspaceContent } = useAnalysisScreenContentSlice({
+    AnalysisWorkspaceContentComponent: AnalysisWorkspaceContent,
     isConnectorSubScreen,
     isSpliceSubScreen,
     isWireSubScreen,
@@ -1574,7 +1538,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     connectorSort,
     setConnectorSort,
     connectorOccupiedCountById,
-    onSelectConnector: (connectorId: ConnectorId) =>
+    onSelectConnector: (connectorId) =>
       dispatchAction(
         appActions.select({
           kind: "connector",
@@ -1601,7 +1565,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     spliceSort,
     setSpliceSort,
     spliceOccupiedCountById,
-    onSelectSplice: (spliceId: SpliceId) =>
+    onSelectSplice: (spliceId) =>
       dispatchAction(
         appActions.select({
           kind: "splice",
@@ -1625,7 +1589,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     wireSort,
     setWireSort,
     selectedWireId,
-    onSelectWire: (wireId: WireId) =>
+    onSelectWire: (wireId) =>
       dispatchAction(
         appActions.select({
           kind: "wire",
@@ -1640,8 +1604,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     handleLockWireRoute,
     handleResetWireRoute,
     wireFormError
-  } satisfies ComponentProps<typeof AnalysisWorkspaceContentEager>;
-  const validationWorkspaceContentProps = {
+  });
+  const { validationWorkspaceContent } = useValidationScreenContentSlice({
+    ValidationWorkspaceContentComponent: ValidationWorkspaceContent,
     validationSeverityFilter,
     setValidationSeverityFilter,
     validationIssuesForSeverityCounts,
@@ -1661,8 +1626,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     handleValidationIssueRowGoTo,
     validationErrorCount,
     validationWarningCount
-  } satisfies ComponentProps<typeof ValidationWorkspaceContentEager>;
-  const settingsWorkspaceContentProps = {
+  });
+  const { settingsWorkspaceContent } = useSettingsScreenContentSlice({
+    SettingsWorkspaceContentComponent: SettingsWorkspaceContent,
     isCurrentWorkspaceEmpty,
     hasBuiltInSampleState,
     handleRecreateSampleNetwork,
@@ -1710,18 +1676,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     keyboardShortcutsEnabled,
     setKeyboardShortcutsEnabled,
     resetWorkspacePreferencesToDefaults
-  } satisfies ComponentProps<typeof SettingsWorkspaceContentEager>;
-  const modelingLeftColumnContent = (
-    <>
-      <ModelingPrimaryTables {...modelingPrimaryTablesProps} />
-      <ModelingSecondaryTables {...modelingSecondaryTablesProps} />
-    </>
-  );
-  const modelingFormsColumnContent = <ModelingFormsColumn {...modelingFormsColumnProps} />;
-  const analysisWorkspaceContent = <AnalysisWorkspaceContent {...analysisWorkspaceContentProps} />;
-  const validationWorkspaceContent = <ValidationWorkspaceContent {...validationWorkspaceContentProps} />;
-  const settingsWorkspaceContent = <SettingsWorkspaceContent {...settingsWorkspaceContentProps} />;
-  const networkScopeWorkspaceContent = <NetworkScopeWorkspaceContent {...networkScopeWorkspaceProps} />;
+  });
 
   return (
     <Suspense fallback={null}>
