@@ -23,6 +23,7 @@ describe("App integration UI - navigation and canvas", () => {
   it("exposes Network Scope as a primary workspace entry", () => {
     renderAppWithState(createUiIntegrationState());
 
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
     const networkScopeButton = within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Network Scope$/ });
@@ -167,11 +168,15 @@ describe("App integration UI - navigation and canvas", () => {
 
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
-    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/ })).toHaveClass("is-active");
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
 
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
-    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/ })).toHaveClass("is-active");
+    expect(
+      within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })
+    ).toHaveClass("is-active");
 
     const updatedNetworkPanel = getPanelByHeading("Network summary");
     expect(within(updatedNetworkPanel).queryByText("Interaction mode")).not.toBeInTheDocument();
@@ -188,12 +193,16 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.keyDown(window, { key: "3", altKey: true });
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
-    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Analysis$/ })).toHaveClass("is-active");
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Analysis$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
 
     fireEvent.keyDown(window, { key: "4", altKey: true, shiftKey: true });
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
-    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Segment$/ })).toHaveClass("is-active");
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Segment$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
 
     const networkPanel = getPanelByHeading("Network summary");
     const currentZoomLine = () => within(networkPanel).getByText(/View: \d+% zoom\./).textContent ?? "";

@@ -1293,7 +1293,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       appRepositoryUrl={APP_REPOSITORY_URL}
       currentYear={currentYear}
       appVersion={appPackageMetadata.version}
-      viewportWidth={viewportWidth}
       headerBlockRef={headerBlockRef}
       navigationToggleButtonRef={navigationToggleButtonRef}
       operationsButtonRef={operationsButtonRef}

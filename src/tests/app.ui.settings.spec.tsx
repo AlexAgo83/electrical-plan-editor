@@ -112,7 +112,9 @@ describe("App integration UI - settings", () => {
 
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
-    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/ })).toHaveClass("is-active");
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
 
     const connectorsPanel = getPanelByHeading("Connectors");
     expect(within(connectorsPanel).getByText("Power Source Connector")).toBeInTheDocument();
@@ -164,6 +166,8 @@ describe("App integration UI - settings", () => {
     fireEvent.keyDown(window, { key: "2", altKey: true });
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
-    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Network Scope$/ })).toHaveClass("is-active");
+    expect(
+      within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Network Scope$/, hidden: true })
+    ).toHaveClass("is-active");
   });
 });

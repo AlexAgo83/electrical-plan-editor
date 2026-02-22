@@ -96,11 +96,15 @@ describe("App integration UI - validation", () => {
 
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
-    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/ })).toHaveClass("is-active");
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
 
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
-    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/ })).toHaveClass("is-active");
+    expect(
+      within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })
+    ).toHaveClass("is-active");
   });
 
   it("aligns model health issue navigator with visible validation filters", () => {
@@ -126,7 +130,10 @@ describe("App integration UI - validation", () => {
 
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
-    const validationButton = within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Validation$/ });
+    const validationButton = within(primaryNavRow as HTMLElement).getByRole("button", {
+      name: /^Validation$/,
+      hidden: true
+    });
     const validationBadgeText = validationButton.querySelector(".workspace-tab-badge")?.textContent?.trim() ?? "0";
     expect(Number(validationBadgeText)).toBeGreaterThan(0);
 
@@ -156,11 +163,15 @@ describe("App integration UI - validation", () => {
 
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
-    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/ })).toHaveClass("is-active");
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
 
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
-    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/ })).toHaveClass("is-active");
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "Close operations panel" }));
     const inspectorPanel = getPanelByHeading("Inspector context");
@@ -175,17 +186,23 @@ describe("App integration UI - validation", () => {
     fireEvent.keyDown(window, { key: "k", altKey: true });
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
-    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/ })).toHaveClass("is-active");
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
 
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
-    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/ })).toHaveClass("is-active");
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
 
     const inspectorPanel = getPanelByHeading("Inspector context");
     expect(within(inspectorPanel).getByText("W1")).toBeInTheDocument();
 
     fireEvent.keyDown(window, { key: "j", altKey: true });
-    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/ })).toHaveClass("is-active");
+    expect(
+      within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })
+    ).toHaveClass("is-active");
     expect(within(inspectorPanel).getByText("C1")).toBeInTheDocument();
   });
 
@@ -199,6 +216,8 @@ describe("App integration UI - validation", () => {
     fireEvent.keyDown(window, { key: "k", altKey: true });
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
-    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/ })).toHaveClass("is-active");
+    expect(
+      within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })
+    ).toHaveClass("is-active");
   });
 });

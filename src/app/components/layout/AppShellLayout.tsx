@@ -19,7 +19,6 @@ interface AppShellLayoutProps {
   appRepositoryUrl: string;
   currentYear: number;
   appVersion: string;
-  viewportWidth: number;
   headerBlockRef: RefObject<HTMLElement | null>;
   navigationToggleButtonRef: RefObject<HTMLButtonElement | null>;
   operationsButtonRef: RefObject<HTMLButtonElement | null>;
@@ -97,7 +96,6 @@ export function AppShellLayout({
   appRepositoryUrl,
   currentYear,
   appVersion,
-  viewportWidth,
   headerBlockRef,
   navigationToggleButtonRef,
   operationsButtonRef,
@@ -159,8 +157,63 @@ export function AppShellLayout({
   isInspectorOpen,
   inspectorContextPanel
 }: AppShellLayoutProps): ReactElement {
-  const isNavigationDrawerOverlayMode = viewportWidth < 960;
-  const isNavigationDrawerInteractionHidden = isNavigationDrawerOverlayMode && !isNavigationDrawerOpen;
+  const isNavigationDrawerInteractionHidden = !isNavigationDrawerOpen;
+
+  let activeWorkspaceContent: ReactNode;
+  if (isNetworkScopeScreen) {
+    activeWorkspaceContent = (
+      <NetworkScopeWorkspaceContainer
+        ScreenComponent={NetworkScopeScreenComponent}
+        isActive={isNetworkScopeScreen}
+        workspaceContent={networkScopeWorkspaceContent}
+      />
+    );
+  } else if (!hasActiveNetwork) {
+    activeWorkspaceContent = (
+      <section className="panel">
+        <h2>No active network</h2>
+        <p className="empty-copy">
+          Create a network from the network scope controls to start modeling connectors, splices, nodes, segments, and wires.
+        </p>
+      </section>
+    );
+  } else if (isModelingScreen) {
+    activeWorkspaceContent = (
+      <ModelingWorkspaceContainer
+        ScreenComponent={ModelingScreenComponent}
+        isActive={isModelingScreen}
+        leftColumnContent={modelingLeftColumnContent}
+        formsColumnContent={modelingFormsColumnContent}
+        networkSummaryPanel={networkSummaryPanel}
+      />
+    );
+  } else if (isAnalysisScreen) {
+    activeWorkspaceContent = (
+      <AnalysisWorkspaceContainer
+        ScreenComponent={AnalysisScreenComponent}
+        isActive={isAnalysisScreen}
+        workspaceContent={analysisWorkspaceContent}
+      />
+    );
+  } else if (isValidationScreen) {
+    activeWorkspaceContent = (
+      <ValidationWorkspaceContainer
+        ScreenComponent={ValidationScreenComponent}
+        isActive={isValidationScreen}
+        workspaceContent={validationWorkspaceContent}
+      />
+    );
+  } else if (isSettingsScreen) {
+    activeWorkspaceContent = (
+      <SettingsWorkspaceContainer
+        ScreenComponent={SettingsScreenComponent}
+        isActive={isSettingsScreen}
+        workspaceContent={settingsWorkspaceContent}
+      />
+    );
+  } else {
+    activeWorkspaceContent = null;
+  }
 
   return (
     <main className={appShellClassName}>
@@ -251,48 +304,7 @@ export function AppShellLayout({
 
         <section className="workspace-content">
           <Suspense fallback={<WorkspaceLoadingFallback />}>
-            <NetworkScopeWorkspaceContainer
-              ScreenComponent={NetworkScopeScreenComponent}
-              isActive={isNetworkScopeScreen}
-              workspaceContent={networkScopeWorkspaceContent}
-            />
-
-            {!isNetworkScopeScreen && !hasActiveNetwork ? (
-              <section className="panel">
-                <h2>No active network</h2>
-                <p className="empty-copy">
-                  Create a network from the network scope controls to start modeling connectors, splices, nodes, segments, and wires.
-                </p>
-              </section>
-            ) : !isNetworkScopeScreen ? (
-              <>
-                <ModelingWorkspaceContainer
-                  ScreenComponent={ModelingScreenComponent}
-                  isActive={isModelingScreen}
-                  leftColumnContent={modelingLeftColumnContent}
-                  formsColumnContent={modelingFormsColumnContent}
-                  networkSummaryPanel={networkSummaryPanel}
-                />
-
-                <AnalysisWorkspaceContainer
-                  ScreenComponent={AnalysisScreenComponent}
-                  isActive={isAnalysisScreen}
-                  workspaceContent={analysisWorkspaceContent}
-                />
-
-                <ValidationWorkspaceContainer
-                  ScreenComponent={ValidationScreenComponent}
-                  isActive={isValidationScreen}
-                  workspaceContent={validationWorkspaceContent}
-                />
-
-                <SettingsWorkspaceContainer
-                  ScreenComponent={SettingsScreenComponent}
-                  isActive={isSettingsScreen}
-                  workspaceContent={settingsWorkspaceContent}
-                />
-              </>
-            ) : null}
+            {activeWorkspaceContent}
           </Suspense>
         </section>
       </section>

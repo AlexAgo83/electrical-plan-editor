@@ -161,12 +161,29 @@ export function switchScreen(target: "networkScope" | "modeling" | "analysis" | 
   if (primaryNavRow === null) {
     throw new Error("Primary workspace navigation row was not found.");
   }
+  const targetLabel = new RegExp(`^${labelByScreen[target]}$`);
+  let openedNavigationDrawer = false;
+  let button = within(primaryNavRow as HTMLElement).queryByRole("button", { name: targetLabel });
 
-  fireEvent.click(
-    within(primaryNavRow as HTMLElement).getByRole("button", {
-      name: new RegExp(`^${labelByScreen[target]}$`)
-    })
-  );
+  if (button === null) {
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    openedNavigationDrawer = true;
+    const refreshedPrimaryNavRow = document.querySelector(".workspace-nav-row");
+    if (refreshedPrimaryNavRow === null) {
+      throw new Error("Primary workspace navigation row was not found after opening navigation menu.");
+    }
+
+    button = within(refreshedPrimaryNavRow as HTMLElement).getByRole("button", { name: targetLabel });
+  }
+
+  fireEvent.click(button);
+
+  if (openedNavigationDrawer) {
+    const closeMenuButton = screen.queryByRole("button", { name: "Close menu" });
+    if (closeMenuButton !== null) {
+      fireEvent.click(closeMenuButton);
+    }
+  }
 }
 
 export function switchSubScreen(target: "connector" | "splice" | "node" | "segment" | "wire"): void {
@@ -185,10 +202,27 @@ export function switchSubScreen(target: "connector" | "splice" | "node" | "segme
   if (secondaryNavRow === null) {
     throw new Error("Secondary workspace navigation row was not found.");
   }
+  const targetLabel = new RegExp(`^${labelBySubScreen[target]}$`);
+  let openedNavigationDrawer = false;
+  let button = within(secondaryNavRow as HTMLElement).queryByRole("button", { name: targetLabel });
 
-  fireEvent.click(
-    within(secondaryNavRow as HTMLElement).getByRole("button", {
-      name: new RegExp(`^${labelBySubScreen[target]}$`)
-    })
-  );
+  if (button === null) {
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    openedNavigationDrawer = true;
+    const refreshedSecondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    if (refreshedSecondaryNavRow === null) {
+      throw new Error("Secondary workspace navigation row was not found after opening navigation menu.");
+    }
+
+    button = within(refreshedSecondaryNavRow as HTMLElement).getByRole("button", { name: targetLabel });
+  }
+
+  fireEvent.click(button);
+
+  if (openedNavigationDrawer) {
+    const closeMenuButton = screen.queryByRole("button", { name: "Close menu" });
+    if (closeMenuButton !== null) {
+      fireEvent.click(closeMenuButton);
+    }
+  }
 }

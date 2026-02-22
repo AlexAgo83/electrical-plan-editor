@@ -2,6 +2,18 @@ import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createUiIntegrationState, renderAppWithState } from "./helpers/app-ui-test-utils";
 
+function withViewportWidth(width: number, run: () => void): void {
+  const originalInnerWidth = window.innerWidth;
+  Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: width });
+  fireEvent(window, new Event("resize"));
+  try {
+    run();
+  } finally {
+    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: originalInnerWidth });
+    fireEvent(window, new Event("resize"));
+  }
+}
+
 describe("App integration UI - workspace shell regression", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -47,48 +59,64 @@ describe("App integration UI - workspace shell regression", () => {
   });
 
   it("keeps closed drawer and operations overlays out of keyboard and assistive-tech navigation", () => {
-    const originalInnerWidth = window.innerWidth;
-    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: 800 });
-    renderAppWithState(createUiIntegrationState());
-    fireEvent(window, new Event("resize"));
+    withViewportWidth(800, () => {
+      renderAppWithState(createUiIntegrationState());
 
-    const drawerBackdrop = document.querySelector(".workspace-drawer-backdrop");
-    const drawerPanel = document.querySelector("#workspace-navigation-drawer");
-    const opsBackdrop = document.querySelector(".workspace-ops-backdrop");
-    const opsPanel = document.querySelector("#workspace-operations-panel");
+      const drawerBackdrop = document.querySelector(".workspace-drawer-backdrop");
+      const drawerPanel = document.querySelector("#workspace-navigation-drawer");
+      const opsBackdrop = document.querySelector(".workspace-ops-backdrop");
+      const opsPanel = document.querySelector("#workspace-operations-panel");
 
-    expect(drawerBackdrop).not.toBeNull();
-    expect(drawerPanel).not.toBeNull();
-    expect(opsBackdrop).not.toBeNull();
-    expect(opsPanel).not.toBeNull();
+      expect(drawerBackdrop).not.toBeNull();
+      expect(drawerPanel).not.toBeNull();
+      expect(opsBackdrop).not.toBeNull();
+      expect(opsPanel).not.toBeNull();
 
-    expect(drawerBackdrop).toBeDisabled();
-    expect(drawerBackdrop).toHaveAttribute("aria-hidden", "true");
-    expect(drawerBackdrop).toHaveAttribute("tabindex", "-1");
-    expect(drawerPanel).toHaveAttribute("aria-hidden", "true");
-    expect(drawerPanel).toHaveAttribute("inert");
+      expect(drawerBackdrop).toBeDisabled();
+      expect(drawerBackdrop).toHaveAttribute("aria-hidden", "true");
+      expect(drawerBackdrop).toHaveAttribute("tabindex", "-1");
+      expect(drawerPanel).toHaveAttribute("aria-hidden", "true");
+      expect(drawerPanel).toHaveAttribute("inert");
 
-    expect(opsBackdrop).toBeDisabled();
-    expect(opsBackdrop).toHaveAttribute("aria-hidden", "true");
-    expect(opsBackdrop).toHaveAttribute("tabindex", "-1");
-    expect(opsPanel).toHaveAttribute("aria-hidden", "true");
-    expect(opsPanel).toHaveAttribute("inert");
+      expect(opsBackdrop).toBeDisabled();
+      expect(opsBackdrop).toHaveAttribute("aria-hidden", "true");
+      expect(opsBackdrop).toHaveAttribute("tabindex", "-1");
+      expect(opsPanel).toHaveAttribute("aria-hidden", "true");
+      expect(opsPanel).toHaveAttribute("inert");
 
-    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
-    expect(drawerBackdrop).not.toBeDisabled();
-    expect(drawerBackdrop).toHaveAttribute("aria-hidden", "false");
-    expect(drawerPanel).toHaveAttribute("aria-hidden", "false");
-    expect(drawerPanel).not.toHaveAttribute("inert");
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+      expect(drawerBackdrop).not.toBeDisabled();
+      expect(drawerBackdrop).toHaveAttribute("aria-hidden", "false");
+      expect(drawerPanel).toHaveAttribute("aria-hidden", "false");
+      expect(drawerPanel).not.toHaveAttribute("inert");
 
-    fireEvent.click(screen.getByRole("button", { name: "Close menu" }));
-    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
-    expect(opsBackdrop).not.toBeDisabled();
-    expect(opsBackdrop).toHaveAttribute("aria-hidden", "false");
-    expect(opsPanel).toHaveAttribute("aria-hidden", "false");
-    expect(opsPanel).not.toHaveAttribute("inert");
+      fireEvent.click(screen.getByRole("button", { name: "Close menu" }));
+      fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+      expect(opsBackdrop).not.toBeDisabled();
+      expect(opsBackdrop).toHaveAttribute("aria-hidden", "false");
+      expect(opsPanel).toHaveAttribute("aria-hidden", "false");
+      expect(opsPanel).not.toHaveAttribute("inert");
+    });
+  });
 
-    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: originalInnerWidth });
-    fireEvent(window, new Event("resize"));
+  it("keeps hidden drawer accessibility semantics aligned on desktop viewport too", () => {
+    withViewportWidth(1280, () => {
+      renderAppWithState(createUiIntegrationState());
+
+      const drawerPanel = document.querySelector("#workspace-navigation-drawer");
+      const drawerBackdrop = document.querySelector(".workspace-drawer-backdrop");
+
+      expect(drawerPanel).not.toBeNull();
+      expect(drawerBackdrop).not.toBeNull();
+      expect(drawerPanel).toHaveAttribute("aria-hidden", "true");
+      expect(drawerPanel).toHaveAttribute("inert");
+      expect(drawerBackdrop).toBeDisabled();
+
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+      expect(drawerPanel).toHaveAttribute("aria-hidden", "false");
+      expect(drawerPanel).not.toHaveAttribute("inert");
+      expect(drawerBackdrop).not.toBeDisabled();
+    });
   });
 
   it("keeps sticky header and floating shell elements mounted across content scroll", () => {
