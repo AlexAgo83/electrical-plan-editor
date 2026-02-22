@@ -106,12 +106,35 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   const openCreateFormIfIdle = async (
     idleHeading: "Connector form" | "Splice form" | "Node form" | "Segment form" | "Wire form"
   ) => {
-    const idlePanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: idleHeading }) });
-    if ((await idlePanel.count()) === 0) {
+    const createHeadingByIdleHeading = {
+      "Connector form": "Create Connector",
+      "Splice form": "Create Splice",
+      "Node form": "Create Node",
+      "Segment form": "Create Segment",
+      "Wire form": "Create Wire"
+    } as const;
+    const listHeadingByIdleHeading = {
+      "Connector form": "Connectors",
+      "Splice form": "Splices",
+      "Node form": "Nodes",
+      "Segment form": "Segments",
+      "Wire form": "Wires"
+    } as const;
+    const createHeading = createHeadingByIdleHeading[idleHeading];
+    if ((await page.getByRole("heading", { name: createHeading }).count()) > 0) {
       return;
     }
 
-    await idlePanel.getByRole("button", { name: "Create", exact: true }).click();
+    const idlePanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: idleHeading }) });
+    if ((await idlePanel.count()) > 0) {
+      await idlePanel.getByRole("button", { name: "Create", exact: true }).click();
+      return;
+    }
+
+    const listPanel = page.locator("article.panel").filter({
+      has: page.getByRole("heading", { name: listHeadingByIdleHeading[idleHeading] })
+    });
+    await listPanel.getByRole("button", { name: "New", exact: true }).click();
   };
 
   await page.goto("/");
@@ -155,14 +178,14 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await openCreateFormIfIdle("Segment form");
   const segmentForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Segment" }) });
   await segmentForm.getByLabel("Segment ID").fill("SEG-A");
-  await segmentForm.getByLabel("Node A").selectOption({ label: "Connector: Connector 1 (C-1)" });
-  await segmentForm.getByLabel("Node B").selectOption({ label: "Intermediate: MID" });
+  await segmentForm.getByLabel("Node A").selectOption({ label: "Connector 1 (C-1)" });
+  await segmentForm.getByLabel("Node B").selectOption({ label: "MID" });
   await segmentForm.getByLabel("Length (mm)").fill("40");
   await segmentForm.getByRole("button", { name: "Create" }).click();
 
   await segmentForm.getByLabel("Segment ID").fill("SEG-B");
-  await segmentForm.getByLabel("Node A").selectOption({ label: "Intermediate: MID" });
-  await segmentForm.getByLabel("Node B").selectOption({ label: "Splice: Splice 1 (S-1)" });
+  await segmentForm.getByLabel("Node A").selectOption({ label: "MID" });
+  await segmentForm.getByLabel("Node B").selectOption({ label: "Splice 1 (S-1)" });
   await segmentForm.getByLabel("Length (mm)").fill("60");
   await segmentForm.getByRole("button", { name: "Create" }).click();
 

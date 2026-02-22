@@ -86,8 +86,8 @@ describe("App integration UI - validation", () => {
 
     openOperationsHealthPanel();
     const modelHealth = screen.getByRole("region", { name: "Model health" });
-    expect(within(modelHealth).getByRole("button", { name: "Previous issue" })).toBeInTheDocument();
-    expect(within(modelHealth).getByRole("button", { name: "Next issue" })).toBeInTheDocument();
+    expect(within(modelHealth).getByRole("button", { name: "Previous" })).toBeInTheDocument();
+    expect(within(modelHealth).getByRole("button", { name: "Next" })).toBeInTheDocument();
   });
 
   it("aligns model health issue navigator with visible validation filters", () => {
@@ -151,7 +151,7 @@ describe("App integration UI - validation", () => {
     expect(within(modelHealth).queryByRole("button", { name: "Review errors" })).not.toBeInTheDocument();
     expect(within(modelHealth).queryByRole("button", { name: "Review warnings" })).not.toBeInTheDocument();
 
-    fireEvent.click(within(modelHealth).getByRole("button", { name: "Open validation" }));
+    fireEvent.click(within(modelHealth).getByRole("button", { name: "Open" }));
     expect(screen.queryByRole("button", { name: "Close operations panel" })).not.toBeInTheDocument();
 
     const validationSummary = getPanelByHeading("Validation summary");
@@ -169,7 +169,7 @@ describe("App integration UI - validation", () => {
     expect(within(modelHealth).getByText(/Issue navigator:/i, { selector: "p" })).toBeInTheDocument();
     expect(within(modelHealth).getByText("1/2", { selector: "strong" })).toBeInTheDocument();
 
-    fireEvent.click(within(modelHealth).getByRole("button", { name: "Next issue" }));
+    fireEvent.click(within(modelHealth).getByRole("button", { name: "Next" }));
 
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
