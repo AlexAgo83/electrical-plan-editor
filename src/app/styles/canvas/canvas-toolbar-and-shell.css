@@ -42,6 +42,7 @@
 .network-summary-snap-icon,
 .network-summary-lock-move-icon,
 .network-summary-info-icon,
+.network-summary-callouts-icon,
 .network-summary-length-icon,
 .network-summary-export-button {
   display: inline-flex;
@@ -52,6 +53,7 @@
 .network-summary-snap-icon,
 .network-summary-lock-move-icon,
 .network-summary-info-icon,
+.network-summary-callouts-icon,
 .network-summary-length-icon {
   width: 0.82rem;
   height: 0.82rem;
@@ -77,6 +79,11 @@
 .network-summary-info-icon {
   -webkit-mask: url("/icons/info.svg") center / contain no-repeat;
   mask: url("/icons/info.svg") center / contain no-repeat;
+}
+
+.network-summary-callouts-icon {
+  -webkit-mask: url("/icons/ico_wires.svg") center / contain no-repeat;
+  mask: url("/icons/ico_wires.svg") center / contain no-repeat;
 }
 
 .network-summary-length-icon {
