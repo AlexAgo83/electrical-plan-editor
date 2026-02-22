@@ -1,8 +1,8 @@
 ## item_095_app_controller_selection_form_sync_and_derived_view_models_extraction - AppController Selection/Form Sync and Derived View Models Extraction
 > From version: 0.5.1
-> Understanding: 98%
-> Confidence: 95%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: High
 > Theme: Selection-Driven Form Semantics and Derived UI Models
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -31,12 +31,17 @@
 - Urgency: High (major remaining controller complexity source).
 
 # Notes
-- Dependencies: item_094 (recommended), item_096 (optional parallel).
+- Dependencies: item_094 (completed), item_096 (completed in same wave).
 - Blocks: item_099.
 - Related AC: AC1, AC2, AC7.
+- Delivery status: Completed via extraction of selection/form sync and derived UI model helpers (`useModelingFormSelectionSync`, `useWireEndpointDescriptions`, `useIssueNavigatorModel`, `useInspectorPanelVisibility`) with behavior parity in inspector/canvas/navigation flows.
 - References:
   - `logics/request/req_016_app_controller_and_layout_engine_modularization_wave_3.md`
   - `src/app/AppController.tsx`
+  - `src/app/hooks/useModelingFormSelectionSync.ts`
+  - `src/app/hooks/useWireEndpointDescriptions.ts`
+  - `src/app/hooks/useIssueNavigatorModel.ts`
+  - `src/app/hooks/useInspectorPanelVisibility.ts`
   - `src/app/hooks/useSelectionHandlers.ts`
   - `src/app/hooks/useConnectorHandlers.ts`
   - `src/app/hooks/useSpliceHandlers.ts`
@@ -45,4 +50,3 @@
   - `src/app/hooks/useWireHandlers.ts`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
   - `src/tests/app.ui.inspector-shell.spec.tsx`
-

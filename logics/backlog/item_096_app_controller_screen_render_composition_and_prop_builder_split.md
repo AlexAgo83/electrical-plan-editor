@@ -1,8 +1,8 @@
 ## item_096_app_controller_screen_render_composition_and_prop_builder_split - AppController Screen Render Composition and Prop Builder Split
 > From version: 0.5.1
-> Understanding: 98%
-> Confidence: 95%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Screen Composition Readability and Prop Wiring Simplification
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -31,9 +31,10 @@ Even after hook extraction, `AppController.tsx` remains noisy because it still b
 - Urgency: Medium-high (completes wave-3 controller decomposition).
 
 # Notes
-- Dependencies: item_094, item_095 (recommended sequencing).
+- Dependencies: item_094, item_095 (completed before/alongside delivery).
 - Blocks: item_099.
 - Related AC: AC1, AC7, AC8.
+- Delivery status: Completed by reducing `AppController` inline prop wiring via grouped prop-builder objects (Network Scope workspace, Inspector panel, Network Summary panel) while preserving lazy-loaded screen/runtime behavior and render ordering.
 - References:
   - `logics/request/req_016_app_controller_and_layout_engine_modularization_wave_3.md`
   - `src/app/AppController.tsx`
@@ -43,4 +44,3 @@ Even after hook extraction, `AppController.tsx` remains noisy because it still b
   - `src/app/components/workspace/ModelingFormsColumn.tsx`
   - `src/app/components/NetworkSummaryPanel.tsx`
   - `tests/e2e/smoke.spec.ts`
-

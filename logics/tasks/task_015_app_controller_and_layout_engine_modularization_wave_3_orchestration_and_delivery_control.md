@@ -1,8 +1,8 @@
 ## task_015_app_controller_and_layout_engine_modularization_wave_3_orchestration_and_delivery_control - App Controller and Layout Engine Modularization Wave 3 Orchestration and Delivery Control
 > From version: 0.5.1
-> Understanding: 99%
-> Confidence: 96%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: High
 > Theme: Controller and Layout Refactor Wave Sequencing
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -19,13 +19,13 @@ Backlog scope covered:
 - `item_099_wave_3_refactor_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 controller network scope form extraction: modularize Network Scope form lifecycle/orchestration from `AppController` (`item_094`)
-- [ ] 2. Deliver Wave 1 controller selection/form sync and derived view-model extraction: isolate behavior-sensitive orchestration logic (`item_095`)
-- [ ] 3. Deliver Wave 2 screen render composition split: reduce `AppController` JSX/prop wiring noise while preserving lazy-loading behavior (`item_096`)
-- [ ] 4. Deliver Wave 3 layout engine domain split: decompose `app-utils-layout.ts` into focused modules (`item_097`)
-- [ ] 5. Deliver Wave 4 layout regression/performance verification: validate behavior parity and measured responsiveness baseline (`item_098`)
-- [ ] 6. Deliver Wave 5 closure: full CI/E2E/build/PWA regression pass and AC traceability (`item_099`)
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Deliver Wave 0 controller network scope form extraction: modularize Network Scope form lifecycle/orchestration from `AppController` (`item_094`)
+- [x] 2. Deliver Wave 1 controller selection/form sync and derived view-model extraction: isolate behavior-sensitive orchestration logic (`item_095`)
+- [x] 3. Deliver Wave 2 screen render composition split: reduce `AppController` JSX/prop wiring noise while preserving lazy-loading behavior (`item_096`)
+- [x] 4. Deliver Wave 3 layout engine domain split: decompose `app-utils-layout.ts` into focused modules (`item_097`)
+- [x] 5. Deliver Wave 4 layout regression/performance verification: validate behavior parity and measured responsiveness baseline (`item_098`)
+- [x] 6. Deliver Wave 5 closure: full CI/E2E/build/PWA regression pass and AC traceability (`item_099`)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - Documentation / Logics:
@@ -52,14 +52,14 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 planned: extract Network Scope form orchestration (`create/edit/cancel/submit`, auto-open, focus restore) out of `AppController`.
-  - Wave 1 planned: extract selection-to-form sync policies and grouped derived view models to reduce behavior-sensitive controller coupling.
-  - Wave 2 planned: split screen render composition and prop-builder groupings for modeling/analysis/network summary shells.
-  - Wave 3 planned: split `app-utils-layout.ts` into layout-domain modules (geometry/grid/scoring/generation/postprocess/types) while preserving semantics.
-  - Wave 4 planned: run targeted layout regression and responsiveness baseline verification, and apply only measured safe micro-optimizations if needed.
-  - Wave 5 planned: final CI/E2E/build/PWA closure and AC1..AC8 traceability for `req_016`.
+  - Wave 0 completed: extracted Network Scope form state/orchestration into dedicated hooks (`useNetworkScopeFormState`, `useNetworkScopeFormOrchestration`) preserving create/edit/cancel/submit, focus restore, and auto-open edit behavior.
+  - Wave 1 completed: extracted selection/form synchronization and grouped derived UI models (`useModelingFormSelectionSync`, `useWireEndpointDescriptions`, `useIssueNavigatorModel`, `useInspectorPanelVisibility`) to reduce behavior-sensitive coupling in `AppController`.
+  - Wave 2 completed: reduced `AppController` prop wiring noise with grouped prop-builder objects for Network Scope, Inspector, and Network Summary panel composition while preserving lazy-loaded screen boundaries and render order.
+  - Wave 3 completed: decomposed `app-utils-layout.ts` into focused layout modules (`layout/types`, `geometry`, `grid`, `scoring`, `postprocess`, `generation`) and reduced `app-utils-layout.ts` to a thin compatibility façade.
+  - Wave 4 completed: validated layout behavior and responsiveness baseline with targeted layout/canvas integration tests; no additional performance optimization was required.
+  - Wave 5 completed: passed full closure pipeline (`lint`, `typecheck`, quality gates, `test:ci`, `test:e2e`, `build`, `quality:pwa`, Logics lint) and documented AC1..AC8 traceability for `req_016`.
 - Current blockers:
-  - None at kickoff.
+  - None.
 - Main risks to track:
   - Behavior drift in Network Scope form lifecycle during controller extraction (auto-open/edit/focus restore).
   - Regressions in selection/edit synchronization across modeling + inspector + 2D selection flows.
@@ -75,4 +75,23 @@ Backlog scope covered:
 - Validation snapshot (kickoff):
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` pending
   - App baseline should be green before Wave 0 starts
-
+- Validation snapshot (Wave 0-4 targeted refactor verification):
+  - `npm run typecheck` OK
+  - `npm run lint` OK
+  - `npx vitest run src/tests/core.layout.spec.ts src/tests/app.ui.networks.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx` OK (21 tests)
+  - `npx vitest run src/tests/app.ui.inspector-shell.spec.tsx` OK (6 tests)
+- Validation snapshot (Final closure):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
+  - `npm run lint` OK
+  - `npm run typecheck` OK
+  - `npm run quality:ui-modularization` OK
+  - `npm run quality:store-modularization` OK
+  - `npm run test:ci` OK (26 files / 134 tests)
+  - `npm run test:e2e` OK (2/2)
+  - `npm run build` OK (lazy chunks + PWA assets generated)
+  - `npm run quality:pwa` OK
+- AC traceability (`req_016`):
+  - AC1/AC2: `AppController` wave-3 orchestration extraction delivered via dedicated hooks and grouped view-model logic with preserved network-scope + selection/form behavior.
+  - AC3/AC4: `app-utils-layout.ts` replaced by thin façade over `src/app/lib/layout/*` modules with no circular import issues observed (`lint`/`typecheck` green).
+  - AC5/AC6: Layout behavior/responsiveness verified by targeted `core.layout` + navigation/canvas integration tests and E2E smoke; no performance changes added beyond structural split.
+  - AC7/AC8: Full validation/build/PWA quality gates passed, including static build chunking and generated service worker/manifest artifacts.

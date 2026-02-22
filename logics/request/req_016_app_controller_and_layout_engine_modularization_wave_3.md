@@ -1,7 +1,7 @@
 ## req_016_app_controller_and_layout_engine_modularization_wave_3 - App Controller and Layout Engine Modularization (Wave 3)
 > From version: 0.5.1
-> Understanding: 98%
-> Confidence: 95%
+> Understanding: 100%
+> Confidence: 99%
 > Complexity: High
 > Theme: Orchestration Simplification and Layout Engine Decomposition
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -117,7 +117,7 @@ Architecture references to preserve:
 - Store architecture changes or domain model changes in `core/`.
 
 # Backlog
-- To create from this request:
+- Created and delivered from this request:
   - `item_094_app_controller_network_scope_form_orchestration_extraction_wave_3.md`
   - `item_095_app_controller_selection_form_sync_and_derived_view_models_extraction.md`
   - `item_096_app_controller_screen_render_composition_and_prop_builder_split.md`
@@ -125,10 +125,47 @@ Architecture references to preserve:
   - `item_098_layout_split_regression_and_performance_baseline_verification.md`
   - `item_099_wave_3_refactor_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
+# Delivery summary
+- `AppController` wave-3 modularization delivered:
+  - Network Scope form state/orchestration extracted into dedicated hooks (`useNetworkScopeFormState`, `useNetworkScopeFormOrchestration`)
+  - Selection/form synchronization and derived UI model helpers extracted (`useModelingFormSelectionSync`, `useWireEndpointDescriptions`, `useIssueNavigatorModel`, `useInspectorPanelVisibility`)
+  - Large prop wiring reduced via grouped prop-builder objects for inspector/network-scope/network-summary composition
+- Layout engine modularization delivered:
+  - `src/app/lib/app-utils-layout.ts` reduced to a thin compatibility façade
+  - Layout responsibilities split across `src/app/lib/layout/{types,geometry,grid,scoring,postprocess,generation}.ts`
+- Validation closure delivered:
+  - Full local closure pipeline passed (`lint`, `typecheck`, UI/store quality gates, `test:ci`, `test:e2e`, `build`, `quality:pwa`, Logics lint)
+  - Static build chunking and PWA artifact generation remain healthy
+
+# AC traceability
+- AC1: Satisfied by `AppController` wave-3 extraction and regrouping work reducing controller responsibility concentration (orchestration hooks + prop-builder grouping).
+- AC2: Satisfied by extracted Network Scope orchestration and selection/form synchronization hooks with behavior parity verified via integration tests.
+- AC3: Satisfied by layout-domain module split with `app-utils-layout.ts` façade preserving public export surface.
+- AC4: Satisfied by clean module dependency direction in `src/app/lib/layout/*` and green `lint`/`typecheck` (no circular-import issues observed).
+- AC5: Satisfied by targeted layout and app integration regression tests (`core.layout`, navigation/canvas, inspector flows) and passing E2E smoke.
+- AC6: Satisfied by measured-only approach: baseline responsiveness verified via existing layout responsiveness test; no extra optimization changes introduced.
+- AC7: Satisfied by passing `npm run lint`, `npm run typecheck`, `npm run quality:ui-modularization`, `npm run quality:store-modularization`, `npm run test:ci`, `npm run test:e2e`, `npm run build`, and `npm run quality:pwa`.
+- AC8: Satisfied by successful production build with preserved lazy chunks and passing PWA artifact quality gate (`manifest`, `sw.js`, `workbox-*`).
+
 # References
 - `src/app/AppController.tsx`
 - `src/app/lib/app-utils-layout.ts`
+- `src/app/hooks/useNetworkScopeFormState.ts`
+- `src/app/hooks/useNetworkScopeFormOrchestration.ts`
+- `src/app/hooks/useModelingFormSelectionSync.ts`
+- `src/app/hooks/useWireEndpointDescriptions.ts`
+- `src/app/hooks/useIssueNavigatorModel.ts`
+- `src/app/hooks/useInspectorPanelVisibility.ts`
+- `src/app/lib/layout/index.ts`
+- `src/app/lib/layout/generation.ts`
+- `src/app/lib/layout/geometry.ts`
+- `src/app/lib/layout/grid.ts`
+- `src/app/lib/layout/scoring.ts`
+- `src/app/lib/layout/postprocess.ts`
+- `src/app/lib/layout/types.ts`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
+- `src/tests/app.ui.networks.spec.tsx`
+- `src/tests/app.ui.inspector-shell.spec.tsx`
 - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
 - `src/tests/core.layout.spec.ts`
 - `src/tests/core.pathfinding.spec.ts`

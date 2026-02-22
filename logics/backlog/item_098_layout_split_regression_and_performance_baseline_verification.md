@@ -1,8 +1,8 @@
 ## item_098_layout_split_regression_and_performance_baseline_verification - Layout Split Regression and Performance Baseline Verification
 > From version: 0.5.1
-> Understanding: 97%
-> Confidence: 93%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Layout Behavior Safety and Measured Optimization Guardrails
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -31,13 +31,14 @@ After splitting the layout engine utilities, regressions can hide in geometry/sc
 - Urgency: Medium-high (closure gate for layout split wave).
 
 # Notes
-- Dependencies: item_097.
+- Dependencies: item_097 (completed).
 - Blocks: item_099.
 - Related AC: AC5, AC6, AC7.
+- Delivery status: Completed with targeted parity verification (`core.layout`, navigation/canvas, inspector flows, E2E smoke) and responsiveness baseline confirmation from existing medium-topology layout test; no extra optimization changes were needed.
 - References:
   - `logics/request/req_016_app_controller_and_layout_engine_modularization_wave_3.md`
   - `src/tests/core.layout.spec.ts`
   - `src/tests/core.pathfinding.spec.ts`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
+  - `src/tests/app.ui.inspector-shell.spec.tsx`
   - `tests/e2e/smoke.spec.ts`
-

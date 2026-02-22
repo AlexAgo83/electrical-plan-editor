@@ -1,8 +1,8 @@
 ## item_094_app_controller_network_scope_form_orchestration_extraction_wave_3 - AppController Network Scope Form Orchestration Extraction (Wave 3)
 > From version: 0.5.1
-> Understanding: 99%
-> Confidence: 96%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: High
 > Theme: Network Scope Form Lifecycle Decoupling
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -32,13 +32,15 @@
 
 # Notes
 - Blocks: item_099.
-- Dependencies: item_081 completion from `req_014` (already delivered), item_095 (optional parallel).
+- Dependencies: item_081 completion from `req_014` (satisfied), item_095 (completed in same wave).
 - Related AC: AC1, AC2, AC7.
+- Delivery status: Completed via `useNetworkScopeFormState` and `useNetworkScopeFormOrchestration`; preserved create/edit/cancel/submit flow, focus restore, and auto-open edit behavior.
 - References:
   - `logics/request/req_016_app_controller_and_layout_engine_modularization_wave_3.md`
   - `src/app/AppController.tsx`
+  - `src/app/hooks/useNetworkScopeFormState.ts`
+  - `src/app/hooks/useNetworkScopeFormOrchestration.ts`
   - `src/app/hooks/useWorkspaceHandlers.ts`
   - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`
   - `src/tests/app.ui.networks.spec.tsx`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
-
