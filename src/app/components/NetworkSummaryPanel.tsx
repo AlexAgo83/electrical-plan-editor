@@ -1384,10 +1384,10 @@ export function NetworkSummaryPanel({
                         <text
                           className="network-node-label"
                           x={0}
-                          y={4}
+                          y={0}
                           textAnchor="middle"
                           dominantBaseline="middle"
-                          transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 4)`}
+                          transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 0)`}
                         >
                           {nodeLabel}
                         </text>
