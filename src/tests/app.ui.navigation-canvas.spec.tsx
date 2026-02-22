@@ -134,9 +134,52 @@ describe("App integration UI - navigation and canvas", () => {
     expect(connectorNode).not.toBeNull();
     expect(connectorNode).not.toHaveClass("is-selected");
 
+    fireEvent.mouseDown(connectorNode as Element, { button: 0 });
+    fireEvent.mouseUp(connectorNode as Element, { button: 0 });
     fireEvent.click(connectorNode as Element);
 
     expect(connectorNode).toHaveClass("is-selected");
+  });
+
+  it("dispatches connector selection once for a single 2D node click in modeling", () => {
+    const { store } = renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    expect(connectorNode).not.toBeNull();
+
+    const dispatchSpy = vi.spyOn(store, "dispatch");
+    fireEvent.mouseDown(connectorNode as Element, { button: 0 });
+    fireEvent.mouseUp(connectorNode as Element, { button: 0 });
+    fireEvent.click(connectorNode as Element);
+
+    const selectDispatchCalls = dispatchSpy.mock.calls.filter(
+      ([action]) => typeof action === "object" && action !== null && "type" in action && action.type === "ui/select"
+    );
+    expect(selectDispatchCalls).toHaveLength(1);
+    dispatchSpy.mockRestore();
+  });
+
+  it("ignores non-primary mouse buttons for 2D node drag selection and shift-pan starts", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    const canvasShell = networkSummaryPanel.querySelector(".network-canvas-shell");
+
+    expect(connectorNode).not.toBeNull();
+    expect(canvasShell).not.toBeNull();
+    expect(connectorNode).not.toHaveClass("is-selected");
+
+    fireEvent.mouseDown(connectorNode as Element, { button: 2 });
+    expect(connectorNode).not.toHaveClass("is-selected");
+    expect(screen.queryByRole("heading", { name: "Edit Connector" })).not.toBeInTheDocument();
+
+    fireEvent.mouseDown(networkSvg, { button: 2, shiftKey: true });
+    expect(canvasShell).not.toHaveClass("is-panning");
   });
 
   it("does not change 2D zoom on mouse wheel", () => {

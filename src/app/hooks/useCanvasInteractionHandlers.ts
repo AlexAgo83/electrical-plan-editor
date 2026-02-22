@@ -345,6 +345,9 @@ export function useCanvasInteractionHandlers({
     if (interactionMode !== "select") {
       return;
     }
+    if (event.button !== 0) {
+      return;
+    }
     event.preventDefault();
     setDraggingNodeId(nodeId);
     handleNetworkNodeClick(nodeId);
@@ -352,6 +355,9 @@ export function useCanvasInteractionHandlers({
 
   function handleNetworkCanvasMouseDown(event: ReactMouseEvent<SVGSVGElement>): void {
     if (!event.shiftKey) {
+      return;
+    }
+    if (event.button !== 0) {
       return;
     }
 

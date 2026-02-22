@@ -221,7 +221,6 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     selectedConnectorId: params.selectedConnectorId,
     selectedSpliceId: params.selectedSpliceId,
     handleNetworkNodeMouseDown: params.handleNetworkNodeMouseDown,
-    handleNetworkNodeClick: params.handleNetworkNodeClick,
     connectorMap: params.connectorMap,
     spliceMap: params.spliceMap,
     describeNode: params.describeNode,

@@ -103,7 +103,6 @@ export interface NetworkSummaryPanelProps {
   selectedConnectorId: ConnectorId | null;
   selectedSpliceId: SpliceId | null;
   handleNetworkNodeMouseDown: (event: ReactMouseEvent<SVGGElement>, nodeId: NodeId) => void;
-  handleNetworkNodeClick: (nodeId: NodeId) => void;
   connectorMap: Map<ConnectorId, Connector>;
   spliceMap: Map<SpliceId, Splice>;
   describeNode: (node: NetworkNode) => string;
@@ -153,7 +152,6 @@ export function NetworkSummaryPanel({
   selectedConnectorId,
   selectedSpliceId,
   handleNetworkNodeMouseDown,
-  handleNetworkNodeClick,
   connectorMap,
   spliceMap,
   describeNode,
@@ -411,8 +409,9 @@ export function NetworkSummaryPanel({
                       className={nodeClassName}
                       onMouseDown={(event) => handleNetworkNodeMouseDown(event, node.id)}
                       onClick={(event) => {
+                        // Selection/editing is handled on mouse-down to support immediate drag interactions.
+                        // Keep click from bubbling to future parent click handlers.
                         event.stopPropagation();
-                        handleNetworkNodeClick(node.id);
                       }}
                     >
                       <title>{describeNode(node)}</title>

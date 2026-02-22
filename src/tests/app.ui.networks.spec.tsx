@@ -2,7 +2,7 @@ import { fireEvent, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { ConnectorId, NetworkId } from "../core/entities";
 import { appActions, appReducer, createInitialState } from "../store";
-import { getPanelByHeading, renderAppWithState, switchScreen } from "./helpers/app-ui-test-utils";
+import { getPanelByHeading, renderAppWithState, switchScreen, switchScreenDrawerAware } from "./helpers/app-ui-test-utils";
 
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
@@ -75,6 +75,18 @@ describe("App integration UI - networks", () => {
 
     expect(within(document.body).getByRole("heading", { name: "Network Scope" })).toBeInTheDocument();
     expect(within(document.body).getByRole("button", { name: "New" })).toBeInTheDocument();
+  });
+
+  it("shows the no-active-network empty state on non-settings workspace screens", () => {
+    const initial = createInitialState();
+    const noNetwork = appReducer(initial, appActions.deleteNetwork(initial.activeNetworkId as NetworkId));
+
+    renderAppWithState(noNetwork);
+
+    for (const targetScreen of ["modeling", "analysis", "validation"] as const) {
+      switchScreenDrawerAware(targetScreen);
+      expect(within(document.body).getByRole("heading", { name: "No active network" })).toBeInTheDocument();
+    }
   });
 
   it("edits the selected network through the shared create/edit form", async () => {

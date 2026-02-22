@@ -139,3 +139,8 @@ export function setAppUiModulesLazyImportDelayForTests(delayMs: number): void {
 export function setAppUiModulesEagerRegistryForTests(registry: AppUiModulesRegistry | null): void {
   eagerRegistryForTests = registry;
 }
+
+export function resetAppUiModulesTestControls(): void {
+  appUiModulesLoadingModeForTests = "auto";
+  appUiModulesLazyImportDelayMsForTests = 0;
+}

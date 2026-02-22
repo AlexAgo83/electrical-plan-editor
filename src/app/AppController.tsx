@@ -937,7 +937,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const {
     handleNetworkSegmentClick,
-    handleNetworkNodeClick,
     handleNetworkCanvasClick,
     handleNetworkNodeMouseDown,
     handleNetworkCanvasMouseDown,
@@ -1103,7 +1102,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         selectedConnectorId,
         selectedSpliceId,
         handleNetworkNodeMouseDown,
-        handleNetworkNodeClick,
         connectorMap,
         spliceMap,
         describeNode,
