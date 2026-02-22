@@ -258,7 +258,21 @@ export function useCanvasInteractionHandlers({
       return;
     }
 
-    setNetworkScale((current) => clamp(current * (target === "in" ? 1.12 : 0.88), NETWORK_MIN_SCALE, NETWORK_MAX_SCALE));
+    const nextScale = clamp(networkScale * (target === "in" ? 1.12 : 0.88), NETWORK_MIN_SCALE, NETWORK_MAX_SCALE);
+    if (nextScale === networkScale) {
+      return;
+    }
+
+    const viewCenterX = NETWORK_VIEW_WIDTH / 2;
+    const viewCenterY = NETWORK_VIEW_HEIGHT / 2;
+    const centerModelX = (viewCenterX - networkOffset.x) / networkScale;
+    const centerModelY = (viewCenterY - networkOffset.y) / networkScale;
+
+    setNetworkScale(nextScale);
+    setNetworkOffset({
+      x: viewCenterX - centerModelX * nextScale,
+      y: viewCenterY - centerModelY * nextScale
+    });
   }
 
   function handleNetworkMouseMove(event: ReactMouseEvent<SVGSVGElement>): void {
