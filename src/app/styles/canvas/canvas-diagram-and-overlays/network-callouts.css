@@ -1,7 +1,7 @@
 .network-callout-leader-line {
   stroke: var(--network-node-stroke-color, #55748d);
   stroke-width: 0.9;
-  stroke-dasharray: 1.7 1.7;
+  stroke-dasharray: 1.7 2.4;
   stroke-linecap: round;
   opacity: 0.92;
   pointer-events: none;

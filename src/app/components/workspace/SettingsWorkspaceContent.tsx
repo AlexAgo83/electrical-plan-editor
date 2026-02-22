@@ -132,7 +132,6 @@ export function SettingsWorkspaceContent({
   setCanvasPngExportIncludeBackground,
   canvasResetZoomPercentInput,
   setCanvasResetZoomPercentInput,
-  configuredResetZoomPercent,
   applyCanvasDefaultsNow,
   handleZoomAction,
   showShortcutHints,

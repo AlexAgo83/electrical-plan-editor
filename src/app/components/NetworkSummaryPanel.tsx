@@ -1088,6 +1088,27 @@ export function NetworkSummaryPanel({
     handleNetworkNodeActivate(nodeId);
   }
 
+  const renderedCableCallouts = orderedCableCallouts.map((callout) => {
+    const layout = buildCalloutLayoutMetrics(callout.groups, calloutTextSize);
+    const lineEnd = getCalloutFrameEdgePoint(
+      callout.nodePosition,
+      callout.position,
+      layout.width,
+      layout.height,
+      inverseLabelScale
+    );
+    const calloutClassName = `network-callout-group${callout.isDeemphasized ? " is-deemphasized" : ""}${
+      callout.isSelected ? " is-selected" : ""
+    }${hoveredCalloutKey === callout.key ? " is-hovered" : ""}${draggingCallout?.key === callout.key ? " is-dragging" : ""}`;
+
+    return {
+      callout,
+      layout,
+      lineEnd,
+      calloutClassName
+    };
+  });
+
   return (
     <section className="network-summary-stack">
       <section className="panel">
@@ -1182,6 +1203,19 @@ export function NetworkSummaryPanel({
               onMouseUp={stopNetworkInteractions}
               onMouseLeave={stopNetworkInteractions}
             >
+              <g transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
+                {renderedCableCallouts.map(({ callout, lineEnd, calloutClassName }) => (
+                  <g key={`${callout.key}-leader`} className={calloutClassName}>
+                    <line
+                      className="network-callout-leader-line"
+                      x1={callout.nodePosition.x}
+                      y1={callout.nodePosition.y}
+                      x2={lineEnd.x}
+                      y2={lineEnd.y}
+                    />
+                  </g>
+                ))}
+              </g>
               {showNetworkGrid ? (
                 <g className="network-grid" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
                   {gridXPositions.map((position) => {
@@ -1362,20 +1396,7 @@ export function NetworkSummaryPanel({
                   );
                 })}
 
-                {orderedCableCallouts.map((callout) => {
-                  const layout = buildCalloutLayoutMetrics(callout.groups, calloutTextSize);
-                  const lineEnd = getCalloutFrameEdgePoint(
-                    callout.nodePosition,
-                    callout.position,
-                    layout.width,
-                    layout.height,
-                    inverseLabelScale
-                  );
-                  const calloutClassName = `network-callout-group${callout.isDeemphasized ? " is-deemphasized" : ""}${
-                    callout.isSelected ? " is-selected" : ""
-                  }${hoveredCalloutKey === callout.key ? " is-hovered" : ""}${
-                    draggingCallout?.key === callout.key ? " is-dragging" : ""
-                  }`;
+                {renderedCableCallouts.map(({ callout, layout, calloutClassName }) => {
                   let contentCursorY = layout.rowsStartY;
 
                   return (
@@ -1387,13 +1408,6 @@ export function NetworkSummaryPanel({
                         setHoveredCalloutKey((current) => (current === callout.key ? null : current));
                       }}
                     >
-                      <line
-                        className="network-callout-leader-line"
-                        x1={callout.nodePosition.x}
-                        y1={callout.nodePosition.y}
-                        x2={lineEnd.x}
-                        y2={lineEnd.y}
-                      />
                       <g
                         className="network-callout-anchor"
                         transform={`translate(${callout.position.x} ${callout.position.y}) scale(${inverseLabelScale})`}
