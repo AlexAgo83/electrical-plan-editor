@@ -1,0 +1,81 @@
+## task_017_app_controller_decomposition_wave_5_real_loc_reduction_and_composition_root_slimming_orchestration_and_delivery_control - AppController Decomposition Wave 5 (Real LOC Reduction and Composition Root Slimming) Orchestration and Delivery Control
+> From version: 0.5.3
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 0%
+> Complexity: High
+> Theme: Measurable AppController LOC Reduction Sequencing
+> Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
+
+# Context
+Orchestration task for wave-5 `AppController` decomposition introduced by `req_018`. This task coordinates sequencing, validation cadence, and regression mitigation for real LOC reduction work across screen-slice call-site compaction, namespaced state contracts, shell layout extraction, modeling orchestration compaction, lazy/eager wiring compaction, and final closure/AC traceability.
+
+Backlog scope covered:
+- `item_107_app_controller_screen_slice_callsite_compaction_and_domain_hooks.md`
+- `item_108_app_controller_namespaced_state_contracts_and_destructuring_reduction.md`
+- `item_109_app_controller_shell_layout_extraction_and_markup_compaction.md`
+- `item_110_app_controller_modeling_domain_orchestrator_compaction.md`
+- `item_111_app_controller_lazy_import_registry_and_component_wiring_compaction.md`
+- `item_112_app_controller_wave_5_loc_reduction_measurement_and_regression_tracking.md`
+- `item_113_app_controller_wave_5_closure_ci_e2e_build_pwa_and_ac_traceability.md`
+
+# Plan
+- [ ] 1. Deliver Wave 0 screen-slice call-site compaction: reduce large `use*ScreenContentSlice(...)` assembly blocks via domain hooks/contracts (`item_107`)
+- [ ] 2. Deliver Wave 1 namespaced state contract extraction: reduce flat destructuring noise from local state hooks (`item_108`)
+- [ ] 3. Deliver Wave 2 shell layout extraction/compaction: move long shell JSX markup out of `AppController` while preserving behavior (`item_109`)
+- [ ] 4. Deliver Wave 3 modeling-domain orchestrator compaction: simplify connector/splice/node/segment/wire handler plumbing in `AppController` (`item_110`)
+- [ ] 5. Deliver Wave 4 lazy/eager wiring compaction: reduce import and component registry noise while preserving chunk boundaries (`item_111`)
+- [ ] 6. Deliver Wave 5 LOC reduction measurement + regression tracking: document baseline and post-wave deltas with targeted validations (`item_112`)
+- [ ] 7. Deliver Wave 6 closure: full regression/build/PWA pass and AC traceability for `req_018` (`item_113`)
+- [ ] FINAL: Update related Logics docs
+
+# Validation
+- Documentation / Logics:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+- Static analysis / compile safety:
+  - `npm run lint`
+  - `npm run typecheck`
+- Quality gates:
+  - `npm run quality:ui-modularization`
+  - `npm run quality:store-modularization`
+- Automated tests (unit + integration):
+  - `npm run test:ci`
+  - Optional targeted runs per wave (recommended before full closure), e.g.:
+    - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx`
+    - `npx vitest run src/tests/app.ui.workspace-shell-regression.spec.tsx`
+    - `npx vitest run src/tests/app.ui.inspector-shell.spec.tsx`
+    - `npx vitest run src/tests/app.ui.validation.spec.tsx`
+    - `npx vitest run src/tests/app.ui.settings.spec.tsx`
+- End-to-end tests:
+  - `npm run test:e2e`
+- Build / delivery checks:
+  - `npm run build`
+  - `npm run quality:pwa`
+
+# Report
+- Wave status:
+  - Wave 0 planned: reduce screen-content slice call-site assembly in `AppController` through explicit screen-domain hooks/contracts without mega-hook regression.
+  - Wave 1 planned: introduce namespaced local state contracts to reduce large flat destructurings while preserving setter semantics and typing precision.
+  - Wave 2 planned: extract or compact top-level shell layout markup (`header`, drawers, ops panel, footer, inspector) with accessibility/focus behavior parity.
+  - Wave 3 planned: reduce modeling-domain handler plumbing volume in `AppController` via explicit orchestrator layering (not hidden coupling).
+  - Wave 4 planned: compact lazy/eager import and component wiring noise while preserving test-safe eager behavior and chunk boundaries.
+  - Wave 5 planned: track measurable LOC deltas and targeted regression status across wave steps.
+  - Wave 6 planned: run full closure validation and document `req_018` AC1..AC8 traceability.
+- Current blockers:
+  - None at kickoff.
+- Main risks to track:
+  - LOC-focused refactor introduces opaque abstraction and reduces traceability instead of improving it.
+  - Shell extraction breaks overlay/focus/keyboard behavior or changes markup semantics used by tests.
+  - Namespaced state contract refactor weakens typing or setter intent.
+  - Modeling orchestrator compaction creates hidden coupling across handler hooks.
+  - Lazy/eager import compaction alters chunk boundaries or test-safe eager behavior.
+- Mitigation strategy:
+  - Sequence by highest line-volume wins while preserving explicit contracts.
+  - Validate shell/canvas/inspector behavior after each major compaction wave with targeted integration tests.
+  - Track LOC snapshots and compare against wave baseline (~1818 lines) to ensure real reduction.
+  - Prefer small, auditable orchestrator layers over monolithic controller hooks.
+  - Re-run `build` + `quality:pwa` after lazy/eager wiring compaction.
+- Validation snapshot (kickoff):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` pending
+  - Baseline `req_017` closure pipeline should remain green before Wave 0 starts
+
