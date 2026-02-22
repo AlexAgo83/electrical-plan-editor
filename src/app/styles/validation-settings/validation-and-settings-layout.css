@@ -72,6 +72,24 @@
   filter: brightness(0.98);
 }
 
+.validation-issues-table {
+  table-layout: fixed;
+}
+
+.validation-col-severity {
+  width: 8.25rem;
+}
+
+.validation-col-actions {
+  width: 7.25rem;
+}
+
+.validation-actions-cell {
+  text-align: right;
+  width: 1%;
+  white-space: nowrap;
+}
+
 @media (max-width: 860px) {
   .validation-center-header {
     align-items: stretch;

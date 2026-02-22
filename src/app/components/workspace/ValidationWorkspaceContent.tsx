@@ -157,12 +157,17 @@ export function ValidationWorkspaceContent({
             {groupedValidationIssues.map(([category, issues]) => (
               <article key={category} className="validation-group">
                 <h3>{category}</h3>
-                <table className="data-table">
+                <table className="data-table validation-issues-table">
+                  <colgroup>
+                    <col className="validation-col-severity" />
+                    <col className="validation-col-issue" />
+                    <col className="validation-col-actions" />
+                  </colgroup>
                   <thead>
                     <tr>
                       <th>Severity</th>
                       <th>Issue</th>
-                      <th>Actions</th>
+                      <th className="validation-actions-cell">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -178,7 +183,7 @@ export function ValidationWorkspaceContent({
                           </span>
                         </td>
                         <td>{issue.message}</td>
-                        <td>
+                        <td className="validation-actions-cell">
                           <button
                             type="button"
                             className="validation-row-go-to-button"

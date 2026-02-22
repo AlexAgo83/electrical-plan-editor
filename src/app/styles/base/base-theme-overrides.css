@@ -617,12 +617,39 @@
   color: #afd4dd;
 }
 
+.app-shell.theme-slate-neon .analysis-wire-mode-chip {
+  border-color: #4b8594;
+  background: #214f61;
+  color: #e1fbff;
+}
+
+.app-shell.theme-slate-neon .analysis-wire-mode-chip.is-locked {
+  border-color: #58aa7f;
+  background: #214e3a;
+  color: #def6e7;
+}
+
 .app-shell.theme-slate-neon .cavity h3 {
   color: #dff9fd;
 }
 
 .app-shell.theme-slate-neon .cavity p {
   color: #c1e6ee;
+}
+
+.app-shell.theme-slate-neon .cavity button {
+  border-color: #4b8594;
+  background: #214f61;
+  color: #e1fbff;
+}
+
+.app-shell.theme-slate-neon .splice-badge {
+  background: #245f74;
+  color: #ecfdff;
+}
+
+.app-shell.theme-slate-neon .panel .meta-line {
+  color: #c7e8ee;
 }
 
 .app-shell.theme-slate-neon .status-chip.is-error {
@@ -755,12 +782,39 @@
   color: #57748b;
 }
 
+.app-shell.theme-paper-blueprint .analysis-wire-mode-chip {
+  border-color: #9fb9cf;
+  background: #e4eef7;
+  color: #1f4863;
+}
+
+.app-shell.theme-paper-blueprint .analysis-wire-mode-chip.is-locked {
+  border-color: #9dc8ae;
+  background: #e4f2ea;
+  color: #21583a;
+}
+
 .app-shell.theme-paper-blueprint .cavity h3 {
   color: #234c67;
 }
 
 .app-shell.theme-paper-blueprint .cavity p {
   color: #3c5f77;
+}
+
+.app-shell.theme-paper-blueprint .cavity button {
+  border-color: #a4bfd3;
+  background: #e8f1f8;
+  color: #173d58;
+}
+
+.app-shell.theme-paper-blueprint .splice-badge {
+  background: #3f78a3;
+  color: #f4f9ff;
+}
+
+.app-shell.theme-paper-blueprint .panel .meta-line {
+  color: #587790;
 }
 
 .app-shell.theme-paper-blueprint .status-chip.is-error {
@@ -888,12 +942,39 @@
   color: #7a5c48;
 }
 
+.app-shell.theme-warm-brown .analysis-wire-mode-chip {
+  border-color: #d3b89f;
+  background: #f4e6d7;
+  color: #5f412d;
+}
+
+.app-shell.theme-warm-brown .analysis-wire-mode-chip.is-locked {
+  border-color: #aebf95;
+  background: #e6edd8;
+  color: #3f5734;
+}
+
 .app-shell.theme-warm-brown .cavity h3 {
   color: #5f412d;
 }
 
 .app-shell.theme-warm-brown .cavity p {
   color: #684a36;
+}
+
+.app-shell.theme-warm-brown .cavity button {
+  border-color: #cfb296;
+  background: #f4e6d7;
+  color: #5f412d;
+}
+
+.app-shell.theme-warm-brown .splice-badge {
+  background: #8a6248;
+  color: #fff7ef;
+}
+
+.app-shell.theme-warm-brown .panel .meta-line {
+  color: #765945;
 }
 
 .app-shell.theme-warm-brown .status-chip.is-error {
@@ -1026,12 +1107,39 @@
   color: #afcfbc;
 }
 
+.app-shell.theme-deep-green .analysis-wire-mode-chip {
+  border-color: #4d7d69;
+  background: #1f4738;
+  color: #def2e4;
+}
+
+.app-shell.theme-deep-green .analysis-wire-mode-chip.is-locked {
+  border-color: #58aa7f;
+  background: #214e3a;
+  color: #def6e7;
+}
+
 .app-shell.theme-deep-green .cavity h3 {
   color: #d9efdf;
 }
 
 .app-shell.theme-deep-green .cavity p {
   color: #c3dfcc;
+}
+
+.app-shell.theme-deep-green .cavity button {
+  border-color: #5f8f79;
+  background: #294d3f;
+  color: #e3f4e9;
+}
+
+.app-shell.theme-deep-green .splice-badge {
+  background: #2a5a83;
+  color: #eaf6ff;
+}
+
+.app-shell.theme-deep-green .panel .meta-line {
+  color: #c0e0cc;
 }
 
 .app-shell.theme-deep-green .status-chip.is-error {
@@ -1283,12 +1391,23 @@
 }
 
 .app-shell.theme-slate-neon .empty-copy,
-.app-shell.theme-slate-neon .form-hint {
+.app-shell.theme-slate-neon .form-hint,
+.app-shell.theme-slate-neon .inline-help {
   color: #b7dbe4;
 }
 
 .app-shell.theme-slate-neon .form-hint.danger {
   color: #ffb8c0;
+}
+
+.app-shell.theme-slate-neon .wire-endpoint-fieldset {
+  border-color: #397181;
+  background: linear-gradient(180deg, rgba(20, 58, 76, 0.78), rgba(18, 51, 68, 0.42));
+}
+
+.app-shell.theme-slate-neon .wire-endpoint-fieldset legend,
+.app-shell.theme-slate-neon .wire-endpoint-fieldset label {
+  color: #d2f2f8;
 }
 
 .app-shell.theme-paper-blueprint .network-scope-indicator {
@@ -1313,12 +1432,23 @@
 }
 
 .app-shell.theme-paper-blueprint .empty-copy,
-.app-shell.theme-paper-blueprint .form-hint {
+.app-shell.theme-paper-blueprint .form-hint,
+.app-shell.theme-paper-blueprint .inline-help {
   color: #56748d;
 }
 
 .app-shell.theme-paper-blueprint .form-hint.danger {
   color: #a12a38;
+}
+
+.app-shell.theme-paper-blueprint .wire-endpoint-fieldset {
+  border-color: #bfd1e0;
+  background: linear-gradient(180deg, rgba(248, 252, 255, 0.95), rgba(236, 244, 251, 0.72));
+}
+
+.app-shell.theme-paper-blueprint .wire-endpoint-fieldset legend,
+.app-shell.theme-paper-blueprint .wire-endpoint-fieldset label {
+  color: #244a66;
 }
 
 .app-shell.theme-warm-brown .network-scope-indicator {
@@ -1343,12 +1473,23 @@
 }
 
 .app-shell.theme-warm-brown .empty-copy,
-.app-shell.theme-warm-brown .form-hint {
+.app-shell.theme-warm-brown .form-hint,
+.app-shell.theme-warm-brown .inline-help {
   color: #725540;
 }
 
 .app-shell.theme-warm-brown .form-hint.danger {
   color: #9d2430;
+}
+
+.app-shell.theme-warm-brown .wire-endpoint-fieldset {
+  border-color: #d2b79e;
+  background: linear-gradient(180deg, rgba(255, 248, 241, 0.92), rgba(245, 231, 216, 0.64));
+}
+
+.app-shell.theme-warm-brown .wire-endpoint-fieldset legend,
+.app-shell.theme-warm-brown .wire-endpoint-fieldset label {
+  color: #5f412d;
 }
 
 .app-shell.theme-deep-green .network-scope-indicator {
@@ -1373,10 +1514,21 @@
 }
 
 .app-shell.theme-deep-green .empty-copy,
-.app-shell.theme-deep-green .form-hint {
+.app-shell.theme-deep-green .form-hint,
+.app-shell.theme-deep-green .inline-help {
   color: #b3d5c0;
 }
 
 .app-shell.theme-deep-green .form-hint.danger {
   color: #ffc1c8;
+}
+
+.app-shell.theme-deep-green .wire-endpoint-fieldset {
+  border-color: #3f6c59;
+  background: linear-gradient(180deg, rgba(23, 58, 47, 0.82), rgba(21, 50, 40, 0.48));
+}
+
+.app-shell.theme-deep-green .wire-endpoint-fieldset legend,
+.app-shell.theme-deep-green .wire-endpoint-fieldset label {
+  color: #d7ead7;
 }

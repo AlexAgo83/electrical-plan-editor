@@ -144,6 +144,11 @@
   color: #cfe8eb !important;
 }
 
+.app-shell.theme-slate-neon .settings-export-fieldset {
+  border-color: #467f8f;
+  background: rgba(21, 57, 73, 0.76);
+}
+
 .app-shell.theme-slate-neon .settings-export-fieldset legend {
   color: #d5f3f8;
 }
@@ -199,6 +204,11 @@
   border-color: #b2c7d8 !important;
   background: #dbe8f2 !important;
   color: #6a889f !important;
+}
+
+.app-shell.theme-paper-blueprint .settings-export-fieldset {
+  border-color: #b7cddd;
+  background: rgba(245, 251, 255, 0.9);
 }
 
 .app-shell.theme-paper-blueprint .settings-export-fieldset legend {
@@ -356,6 +366,11 @@
 
 .app-shell.theme-deep-green .settings-actions {
   border-top-color: rgba(92, 140, 117, 0.5);
+}
+
+.app-shell.theme-deep-green .settings-export-fieldset {
+  border-color: #4b7a66;
+  background: rgba(18, 47, 37, 0.8);
 }
 
 .app-shell.theme-deep-green .settings-export-fieldset legend {
