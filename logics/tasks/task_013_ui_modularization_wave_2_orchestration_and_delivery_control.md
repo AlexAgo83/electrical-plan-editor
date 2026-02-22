@@ -1,8 +1,8 @@
 ## task_013_ui_modularization_wave_2_orchestration_and_delivery_control - UI Modularization Wave 2 Orchestration and Delivery Control
 > From version: 0.5.1
-> Understanding: 98%
-> Confidence: 95%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 96%
+> Progress: 10%
 > Complexity: High
 > Theme: Refactor Wave Sequencing and Delivery Safety
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -54,7 +54,7 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 planned: split `app-utils` into domain-focused modules to unblock safer downstream component/controller splits.
+  - Wave 0 in progress: extracted generic constants/sort/parsing helpers into `src/app/lib/app-utils-shared.ts` and re-exported from `app-utils.ts` to preserve compatibility while reducing `app-utils.ts` size before import migration cleanup.
   - Wave 1 planned: extract orchestration hooks/modules from `AppController` while preserving event ordering and behavior parity.
   - Wave 2 planned: separate analysis connector/splice/wire UI modules and keep list-first + network-summary layout stable.
   - Wave 3 planned: decompose `NetworkSummaryPanel` into render layers/overlays/toolbar units without changing 2D interaction behavior.
@@ -79,3 +79,7 @@ Backlog scope covered:
 - Validation snapshot (kickoff):
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` pending
   - App CI baseline should remain green before starting Wave 0
+- Validation snapshot (Wave 0 partial):
+  - `npm run lint` OK
+  - `npm run typecheck` OK
+  - `npm run test:ci -- src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.networks.spec.tsx` OK

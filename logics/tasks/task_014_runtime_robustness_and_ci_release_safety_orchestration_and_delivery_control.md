@@ -1,8 +1,8 @@
 ## task_014_runtime_robustness_and_ci_release_safety_orchestration_and_delivery_control - Runtime Robustness and CI Release Safety Orchestration and Delivery Control
 > From version: 0.5.0
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Reliability Hardening Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -18,12 +18,12 @@ Backlog scope covered:
 - `item_093_robustness_regression_tests_for_storage_empty_workspace_and_csv_export.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 persistence adapter access hardening: guard `localStorage` access and add deterministic fallback (`item_089`)
-- [ ] 2. Deliver Wave 1 persistence semantics correction: respect valid empty workspace snapshots while preserving first-run sample bootstrap (`item_090`)
-- [ ] 3. Deliver Wave 2 export robustness hardening: defer CSV Blob URL cleanup safely (`item_091`)
-- [ ] 4. Deliver Wave 3 CI release-safety completion: add `build` + `quality:pwa` to workflow (`item_092`)
-- [ ] 5. Deliver Wave 4 regression closure: add robustness tests, stabilize suite, and validate AC traceability (`item_093`)
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Deliver Wave 0 persistence adapter access hardening: guard `localStorage` access and add deterministic fallback (`item_089`)
+- [x] 2. Deliver Wave 1 persistence semantics correction: respect valid empty workspace snapshots while preserving first-run sample bootstrap (`item_090`)
+- [x] 3. Deliver Wave 2 export robustness hardening: defer CSV Blob URL cleanup safely (`item_091`)
+- [x] 4. Deliver Wave 3 CI release-safety completion: add `build` + `quality:pwa` to workflow (`item_092`)
+- [x] 5. Deliver Wave 4 regression closure: add robustness tests, stabilize suite, and validate AC traceability (`item_093`)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - Documentation / Logics:
@@ -47,13 +47,13 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 planned: guard `window.localStorage` access in persistence adapter default path to prevent boot/runtime crashes in restricted environments.
-  - Wave 1 planned: enforce empty-workspace persistence contract so valid empty snapshots are respected and sample bootstrap is reserved for first-run/corruption fallback.
-  - Wave 2 planned: harden CSV export object URL cleanup timing without changing exported content/UX.
-  - Wave 3 planned: extend CI to validate production build and PWA artifacts in addition to existing checks.
-  - Wave 4 planned: add regression tests for storage failure + empty workspace semantics + CSV lifecycle and close AC1..AC7 for `req_015`.
+  - Wave 0 completed: guarded default `window.localStorage` access in the persistence adapter and returned `null` storage fallback when access throws, preserving deterministic runtime behavior.
+  - Wave 1 completed: updated persistence load semantics to respect valid persisted empty workspaces and reserve sample bootstrap for first-run / invalid payload fallback paths only.
+  - Wave 2 completed: deferred CSV Blob URL cleanup via scheduled revocation while keeping filename/content generation and DOM cleanup behavior unchanged.
+  - Wave 3 completed: extended `.github/workflows/ci.yml` with explicit `npm run build` and `npm run quality:pwa` validation steps.
+  - Wave 4 completed: added regression tests for `localStorage` getter failures, empty workspace persistence semantics, and CSV object URL cleanup timing; validated full local CI-equivalent pipeline.
 - Current blockers:
-  - None at orchestration kickoff.
+  - None.
 - Main risks to track:
   - Unintended behavior drift in sample bootstrap logic affecting first-run onboarding.
   - Silent persistence fallback masking errors if not covered by tests.
@@ -65,6 +65,12 @@ Backlog scope covered:
   - Preserve sample bootstrap tests and add explicit empty-workspace regression cases.
   - Run full CI-equivalent local pipeline before request closure (`build` + `quality:pwa` included).
 - Validation snapshot (kickoff):
-  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` pending
-  - Project baseline CI should be green before Wave 0 starts
-
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
+  - `npm run lint` OK
+  - `npm run typecheck` OK
+  - `npm run quality:ui-modularization` OK
+  - `npm run quality:store-modularization` OK
+  - `npm run test:ci` OK
+  - `npm run test:e2e` OK
+  - `npm run build` OK
+  - `npm run quality:pwa` OK

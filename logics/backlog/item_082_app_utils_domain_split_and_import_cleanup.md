@@ -1,8 +1,8 @@
 ## item_082_app_utils_domain_split_and_import_cleanup - App Utils Domain Split and Import Cleanup
 > From version: 0.5.0
-> Understanding: 98%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 25%
 > Complexity: High
 > Theme: Utility Ownership and Import Clarity
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,7 +36,7 @@
 - References:
   - `logics/request/req_014_ui_modularization_wave_2_controller_analysis_canvas_and_bundle_optimization.md`
   - `src/app/lib/app-utils.ts`
+  - `src/app/lib/app-utils-shared.ts`
   - `src/app/components/workspace/AnalysisWorkspaceContent.tsx`
   - `src/app/components/NetworkSummaryPanel.tsx`
   - `src/app/components/workspace/ModelingFormsColumn.tsx`
-

@@ -35,5 +35,7 @@ export function downloadCsvFile(filenameBase: string, headers: string[], rows: C
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(blobUrl);
+  window.setTimeout(() => {
+    URL.revokeObjectURL(blobUrl);
+  }, 0);
 }

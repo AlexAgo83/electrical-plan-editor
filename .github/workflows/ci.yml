@@ -54,3 +54,9 @@ jobs:
 
       - name: E2E smoke
         run: npm run test:e2e
+
+      - name: Production build
+        run: npm run build
+
+      - name: PWA build artifact quality gate
+        run: npm run quality:pwa

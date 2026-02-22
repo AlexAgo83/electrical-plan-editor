@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ConnectorId, NodeId } from "../core/entities";
 import { APP_SCHEMA_VERSION } from "../core/schema";
 import {
@@ -116,6 +116,10 @@ describe("migratePersistedPayload", () => {
 });
 
 describe("localStorage persistence adapter", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("bootstraps sample state on first run when storage is empty", () => {
     const nowIso = "2026-02-20T10:30:00.000Z";
     const storage = createMemoryStorage();
@@ -225,7 +229,7 @@ describe("localStorage persistence adapter", () => {
     expect(rewrittenSnapshot.state).toEqual(loaded);
   });
 
-  it("bootstraps sample state when persisted payload is a valid but empty workspace", () => {
+  it("restores a valid persisted empty workspace without bootstrapping the sample", () => {
     const emptyState = createInitialState();
     const nowIso = "2026-02-20T12:30:00.000Z";
     const storage = createMemoryStorage({
@@ -238,12 +242,27 @@ describe("localStorage persistence adapter", () => {
     });
 
     const loaded = loadState(storage, () => nowIso);
-    expect(hasSampleNetworkSignature(loaded)).toBe(true);
+    expect(loaded).toEqual(emptyState);
+    expect(isWorkspaceEmpty(loaded)).toBe(true);
+    expect(hasSampleNetworkSignature(loaded)).toBe(false);
 
     const rewrittenRaw = storage.read(STORAGE_KEY);
     expect(rewrittenRaw).not.toBeNull();
     const rewrittenSnapshot = JSON.parse(rewrittenRaw ?? "{}") as PersistedStateSnapshotV1;
-    expect(hasSampleNetworkSignature(rewrittenSnapshot.state)).toBe(true);
+    expect(rewrittenSnapshot.state).toEqual(emptyState);
+  });
+
+  it("falls back safely when the default localStorage accessor throws", () => {
+    vi.spyOn(window, "localStorage", "get").mockImplementation(() => {
+      throw new Error("Storage access blocked");
+    });
+
+    const loaded = loadState(undefined, () => "2026-02-20T12:35:00.000Z");
+    expect(hasSampleNetworkSignature(loaded)).toBe(true);
+
+    expect(() => {
+      saveState(createInitialState(), undefined, () => "2026-02-20T12:36:00.000Z");
+    }).not.toThrow();
   });
 
   it("does not overwrite existing non-empty user state", () => {

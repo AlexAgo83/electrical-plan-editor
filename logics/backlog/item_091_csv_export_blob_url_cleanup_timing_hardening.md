@@ -1,8 +1,8 @@
 ## item_091_csv_export_blob_url_cleanup_timing_hardening - CSV Export Blob URL Cleanup Timing Hardening
 > From version: 0.5.0
-> Understanding: 98%
-> Confidence: 95%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: Low
 > Theme: Browser Compatibility Reliability
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -32,8 +32,7 @@ CSV export currently revokes the Blob object URL immediately after triggering do
 # Notes
 - Blocks: item_093.
 - Related AC: AC4, AC6.
-- References:
+  - References:
   - `logics/request/req_015_runtime_robustness_persistence_empty_workspace_semantics_and_ci_release_safety.md`
   - `src/app/lib/csv.ts`
-  - `src/tests/`
-
+  - `src/tests/csv.export.spec.ts`

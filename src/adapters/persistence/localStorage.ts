@@ -1,6 +1,6 @@
 import { APP_SCHEMA_VERSION } from "../../core/schema";
 import { resolveStorageKey } from "../../config/environment";
-import { createSampleNetworkState, isWorkspaceEmpty, type AppState } from "../../store";
+import { createSampleNetworkState, type AppState } from "../../store";
 import { migratePersistedPayload, type PersistedStateSnapshotV1 } from "./migrations";
 
 const configuredStorageKey =
@@ -16,7 +16,11 @@ function getDefaultStorage(): StorageLike | null {
     return null;
   }
 
-  return window.localStorage;
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
 }
 
 function getNowIso(): string {
@@ -85,10 +89,6 @@ export function loadState(storage: StorageLike | null = getDefaultStorage(), now
 
     if (migration.wasMigrated) {
       writeSnapshot(storage, migration.snapshot);
-    }
-
-    if (isWorkspaceEmpty(migration.snapshot.state)) {
-      return bootstrapSampleState(storage, nowIso);
     }
 
     return migration.snapshot.state;
