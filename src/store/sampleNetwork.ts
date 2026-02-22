@@ -120,31 +120,31 @@ export function createSampleNetworkState(): AppState {
       id: asConnectorId("C-SRC"),
       name: "Power Source Connector",
       technicalId: "CONN-SRC-01",
-      cavityCount: 6
+      cavityCount: 12
     }),
     appActions.upsertConnector({
       id: asConnectorId("C-DST-1"),
       name: "Actuator Connector A",
       technicalId: "CONN-DST-A",
-      cavityCount: 4
+      cavityCount: 8
     }),
     appActions.upsertConnector({
       id: asConnectorId("C-DST-2"),
       name: "Actuator Connector B",
       technicalId: "CONN-DST-B",
-      cavityCount: 4
+      cavityCount: 8
     }),
     appActions.upsertSplice({
       id: asSpliceId("S-J1"),
       name: "Main Junction",
       technicalId: "SPL-J1",
-      portCount: 6
+      portCount: 10
     }),
     appActions.upsertSplice({
       id: asSpliceId("S-J2"),
       name: "Branch Junction",
       technicalId: "SPL-J2",
-      portCount: 4
+      portCount: 8
     }),
     appActions.upsertNode({
       id: asNodeId("N-C-SRC"),
@@ -289,6 +289,76 @@ export function createSampleNetworkState(): AppState {
       technicalId: "WIRE-BRANCH-J2",
       endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 1 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 2 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-006"),
+      name: "Aux Feed Junction 1",
+      technicalId: "WIRE-AUX-J1-1",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 7 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 7 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-007"),
+      name: "Aux Feed Junction 2",
+      technicalId: "WIRE-AUX-J1-2",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 8 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 8 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-008"),
+      name: "Aux Supply Actuator A-1",
+      technicalId: "WIRE-AUX-A-1",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 9 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 5 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-009"),
+      name: "Aux Supply Actuator B-1",
+      technicalId: "WIRE-AUX-B-1",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 10 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 5 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-010"),
+      name: "Branch Return A-1",
+      technicalId: "WIRE-BR-RET-A-1",
+      endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 5 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 6 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-011"),
+      name: "Branch Return A-2",
+      technicalId: "WIRE-BR-RET-A-2",
+      endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 6 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 7 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-012"),
+      name: "Branch Return B-1",
+      technicalId: "WIRE-BR-RET-B-1",
+      endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 7 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 6 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-013"),
+      name: "Branch Return B-2",
+      technicalId: "WIRE-BR-RET-B-2",
+      endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 8 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 7 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-014"),
+      name: "J1 Service Link A",
+      technicalId: "WIRE-J1-SVC-A",
+      endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 9 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 8 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-015"),
+      name: "J1 Service Link B",
+      technicalId: "WIRE-J1-SVC-B",
+      endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 10 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 8 }
     })
   ].reduce(appReducer, createInitialState());
 }
@@ -304,6 +374,48 @@ export function createValidationIssuesSampleNetworkState(): AppState {
       "NET-VALIDATION-SAMPLE",
       "2026-02-22T00:00:00.000Z"
     ),
+    appActions.saveWire({
+      id: asWireId("W-VAL-EX-001"),
+      name: "Validation Extra Feed 1",
+      technicalId: "WIRE-VAL-EX-001",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 4 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 3 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-VAL-EX-002"),
+      name: "Validation Extra Feed 2",
+      technicalId: "WIRE-VAL-EX-002",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 5 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 4 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-VAL-EX-003"),
+      name: "Validation Extra Actuator A-1",
+      technicalId: "WIRE-VAL-EX-003",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 3 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 5 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-VAL-EX-004"),
+      name: "Validation Extra Actuator A-2",
+      technicalId: "WIRE-VAL-EX-004",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 4 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 6 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-VAL-EX-005"),
+      name: "Validation Extra Branch B-1",
+      technicalId: "WIRE-VAL-EX-005",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 3 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 2 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W-VAL-EX-006"),
+      name: "Validation Extra Branch B-2",
+      technicalId: "WIRE-VAL-EX-006",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 4 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 3 }
+    }),
     appActions.occupyConnectorCavity(asConnectorId("C-SRC"), 6, "wire:ghost-wire:A"),
     appActions.occupySplicePort(asSpliceId("S-J2"), 4, "manual-validation-check"),
     appActions.upsertWire({

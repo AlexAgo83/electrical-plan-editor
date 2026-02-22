@@ -5,6 +5,7 @@ import {
   asConnectorId,
   asSpliceId,
   asWireId,
+  createUiIntegrationDenseWiresState,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
@@ -188,5 +189,21 @@ describe("App integration UI - network summary workflow polish", () => {
     const restoredCalloutAnchor = networkSummaryPanel.querySelector(".network-callout-anchor");
     expect(restoredCalloutAnchor).not.toBeNull();
     expect((restoredCalloutAnchor as SVGGElement).getAttribute("transform") ?? "").toBe(transformAfterDrag);
+  });
+
+  it("renders dense callout examples with multiple wires per connector/splice for regression testing", () => {
+    renderAppWithState(createUiIntegrationDenseWiresState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const calloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
+    fireEvent.click(calloutsToggle);
+
+    const calloutFrames = networkSummaryPanel.querySelectorAll(".network-callout-frame");
+    const calloutRows = networkSummaryPanel.querySelectorAll(".network-callout-row-text");
+    expect(calloutFrames.length).toBeGreaterThanOrEqual(4);
+    expect(calloutRows.length).toBeGreaterThanOrEqual(8);
+    expect(networkSummaryPanel).toHaveTextContent("Wire 8");
+    expect(networkSummaryPanel).toHaveTextContent("W-8");
   });
 });

@@ -62,6 +62,100 @@ export function createUiIntegrationState(): AppState {
   ]);
 }
 
+export function createUiIntegrationDenseWiresState(): AppState {
+  return reduceAll([
+    appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 6 }),
+    appActions.upsertConnector({ id: asConnectorId("C2"), name: "Connector 2", technicalId: "C-2", cavityCount: 4 }),
+    appActions.upsertSplice({ id: asSpliceId("S1"), name: "Splice 1", technicalId: "S-1", portCount: 6 }),
+    appActions.upsertSplice({ id: asSpliceId("S2"), name: "Splice 2", technicalId: "S-2", portCount: 4 }),
+    appActions.upsertNode({ id: asNodeId("N-C1"), kind: "connector", connectorId: asConnectorId("C1") }),
+    appActions.upsertNode({ id: asNodeId("N-C2"), kind: "connector", connectorId: asConnectorId("C2") }),
+    appActions.upsertNode({ id: asNodeId("N-MID"), kind: "intermediate", label: "MID" }),
+    appActions.upsertNode({ id: asNodeId("N-S1"), kind: "splice", spliceId: asSpliceId("S1") }),
+    appActions.upsertNode({ id: asNodeId("N-S2"), kind: "splice", spliceId: asSpliceId("S2") }),
+    appActions.upsertSegment({
+      id: asSegmentId("SEG-A"),
+      nodeA: asNodeId("N-C1"),
+      nodeB: asNodeId("N-MID"),
+      lengthMm: 40
+    }),
+    appActions.upsertSegment({
+      id: asSegmentId("SEG-B"),
+      nodeA: asNodeId("N-MID"),
+      nodeB: asNodeId("N-S1"),
+      lengthMm: 60
+    }),
+    appActions.upsertSegment({
+      id: asSegmentId("SEG-C"),
+      nodeA: asNodeId("N-MID"),
+      nodeB: asNodeId("N-C2"),
+      lengthMm: 35
+    }),
+    appActions.upsertSegment({
+      id: asSegmentId("SEG-D"),
+      nodeA: asNodeId("N-MID"),
+      nodeB: asNodeId("N-S2"),
+      lengthMm: 45
+    }),
+    appActions.saveWire({
+      id: asWireId("W1"),
+      name: "Wire 1",
+      technicalId: "W-1",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W2"),
+      name: "Wire 2",
+      technicalId: "W-2",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 2 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 2 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W3"),
+      name: "Wire 3",
+      technicalId: "W-3",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 3 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S2"), portIndex: 1 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W4"),
+      name: "Wire 4",
+      technicalId: "W-4",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 4 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S2"), portIndex: 2 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W5"),
+      name: "Wire 5",
+      technicalId: "W-5",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C2"), cavityIndex: 1 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 3 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W6"),
+      name: "Wire 6",
+      technicalId: "W-6",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C2"), cavityIndex: 2 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 4 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W7"),
+      name: "Wire 7",
+      technicalId: "W-7",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C2"), cavityIndex: 3 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S2"), portIndex: 3 }
+    }),
+    appActions.saveWire({
+      id: asWireId("W8"),
+      name: "Wire 8",
+      technicalId: "W-8",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C2"), cavityIndex: 4 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S2"), portIndex: 4 }
+    })
+  ]);
+}
+
 export function createConnectorSortingState(): AppState {
   return reduceAll([
     appActions.upsertConnector({ id: asConnectorId("C2"), name: "Zulu connector", technicalId: "C-200", cavityCount: 2 }),

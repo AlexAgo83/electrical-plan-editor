@@ -278,6 +278,7 @@ function getCalloutRowFontSize(labelSizeMode: CanvasLabelSizeMode): number {
 let calloutMeasureCanvas: HTMLCanvasElement | null = null;
 let calloutMeasureSvgText: SVGTextElement | null = null;
 let calloutMeasureSvgRoot: SVGSVGElement | null = null;
+let calloutMeasureSvgGroup: SVGGElement | null = null;
 function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
   const fallback = text.length * fontSizePx * 0.56;
   if (typeof document === "undefined") {
@@ -296,9 +297,12 @@ function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
     svg.style.opacity = "0";
     const textNode = document.createElementNS(ns, "text");
     svg.appendChild(textNode);
+    const groupNode = document.createElementNS(ns, "g");
+    svg.appendChild(groupNode);
     document.body.appendChild(svg);
     calloutMeasureSvgRoot = svg;
     calloutMeasureSvgText = textNode;
+    calloutMeasureSvgGroup = groupNode;
   }
   if (calloutMeasureSvgText) {
     calloutMeasureSvgText.textContent = text;
@@ -317,7 +321,12 @@ function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
   if (!calloutMeasureCanvas) {
     calloutMeasureCanvas = document.createElement("canvas");
   }
-  const context = calloutMeasureCanvas.getContext("2d");
+  let context: CanvasRenderingContext2D | null = null;
+  try {
+    context = calloutMeasureCanvas.getContext("2d");
+  } catch {
+    return fallback;
+  }
   if (!context) {
     return fallback;
   }
@@ -341,7 +350,7 @@ function measureCalloutRowTextMetrics(fontSizePx: number): { topOffset: number; 
   calloutMeasureSvgText.setAttribute("x", "0");
   calloutMeasureSvgText.setAttribute("y", "0");
   calloutMeasureSvgText.setAttribute("font-size", String(fontSizePx));
-  calloutMeasureSvgText.setAttribute("font-family", "system-ui, sans-serif");
+  calloutMeasureSvgText.setAttribute("font-family", "\"IBM Plex Sans\", \"Segoe UI\", sans-serif");
   calloutMeasureSvgText.setAttribute("font-weight", "400");
   calloutMeasureSvgText.setAttribute("dominant-baseline", "hanging");
   try {
@@ -355,23 +364,77 @@ function measureCalloutRowTextMetrics(fontSizePx: number): { topOffset: number; 
   return fallback;
 }
 
+function measureCalloutRowsBlockBBox(
+  rows: string[],
+  fontSizePx: number,
+  rowGap: number
+): { x: number; y: number; width: number; height: number } | null {
+  if (rows.length === 0 || typeof document === "undefined") {
+    return null;
+  }
+  if (!calloutMeasureSvgRoot || !calloutMeasureSvgText || !calloutMeasureSvgGroup) {
+    measureCalloutRowTextWidth("Ag", fontSizePx);
+  }
+  if (!calloutMeasureSvgGroup) {
+    return null;
+  }
+
+  const singleRowMetrics = measureCalloutRowTextMetrics(fontSizePx);
+  const rowStep = singleRowMetrics.height + rowGap;
+  calloutMeasureSvgGroup.replaceChildren();
+
+  for (let rowIndex = 0; rowIndex < rows.length; rowIndex += 1) {
+    const row = rows[rowIndex];
+    if (row === undefined) {
+      continue;
+    }
+    const textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    textNode.textContent = row;
+    textNode.setAttribute("x", "0");
+    textNode.setAttribute("y", String(rowIndex * rowStep));
+    textNode.setAttribute("font-size", String(fontSizePx));
+    textNode.setAttribute("font-family", "\"IBM Plex Sans\", \"Segoe UI\", sans-serif");
+    textNode.setAttribute("font-weight", "400");
+    textNode.setAttribute("dominant-baseline", "hanging");
+    calloutMeasureSvgGroup.appendChild(textNode);
+  }
+
+  try {
+    const bbox = calloutMeasureSvgGroup.getBBox();
+    if (Number.isFinite(bbox.width) && Number.isFinite(bbox.height) && bbox.width >= 0 && bbox.height >= 0) {
+      return { x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height };
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
 function buildCalloutLayoutMetrics(groups: CalloutGroup[], labelSizeMode: CanvasLabelSizeMode): CalloutLayoutMetrics {
   const rows = groups.flatMap((group) => group.entries.map(buildCalloutEntryDisplayLine));
   const rowFontSize = getCalloutRowFontSize(labelSizeMode);
+  const topPadding = 0.7;
+  const bottomPadding = 0.6;
+  const rowGap = 0.45;
+  const leftPadding = 4;
+  const rightPadding = 4;
   const rowTextMetrics = measureCalloutRowTextMetrics(rowFontSize);
   const rowLineHeight = rowTextMetrics.height;
+  const rowStep = rowLineHeight + rowGap;
+  const blockBBox = measureCalloutRowsBlockBBox(rows, rowFontSize, rowGap);
+
   let longestMeasuredRowWidth = 0;
   for (const row of rows) {
     longestMeasuredRowWidth = Math.max(longestMeasuredRowWidth, measureCalloutRowTextWidth(row, rowFontSize));
   }
-  const width = clampNumber(Math.ceil(longestMeasuredRowWidth + 8), CALLOUT_MIN_WIDTH, CALLOUT_MAX_WIDTH);
-  const topPadding = 0.7;
-  const bottomPadding = 0.6;
-  const rowGap = 0.45;
-  const rowsStartY = topPadding - rowTextMetrics.topOffset;
-  const rowStep = rowLineHeight + rowGap;
-  const contentHeight = rows.length > 0 ? rowLineHeight + (rows.length - 1) * rowStep : 0;
-  const height = Math.max(0, topPadding + contentHeight + bottomPadding);
+
+  const measuredContentWidth = blockBBox?.width ?? longestMeasuredRowWidth;
+  const measuredContentHeight = blockBBox?.height ?? (rows.length > 0 ? rowLineHeight + (rows.length - 1) * rowStep : 0);
+  const measuredTopOffset = blockBBox?.y ?? rowTextMetrics.topOffset;
+
+  const width = clampNumber(Math.ceil(measuredContentWidth + leftPadding + rightPadding), CALLOUT_MIN_WIDTH, CALLOUT_MAX_WIDTH);
+  const rowsStartY = topPadding - measuredTopOffset;
+  const height = Math.max(0, topPadding + measuredContentHeight + bottomPadding);
   return { width, rowsStartY, rowStep, height, rows };
 }
 
