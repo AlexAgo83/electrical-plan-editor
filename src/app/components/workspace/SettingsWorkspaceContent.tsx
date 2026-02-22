@@ -15,6 +15,7 @@ interface SettingsWorkspaceContentProps {
   isCurrentWorkspaceEmpty: boolean;
   hasBuiltInSampleState: boolean;
   handleRecreateSampleNetwork: () => void;
+  handleRecreateValidationIssuesSampleNetwork: () => void;
   handleResetSampleNetwork: () => void;
   activeNetworkId: NetworkId | null;
   selectedExportNetworkIds: NetworkId[];
@@ -67,6 +68,7 @@ export function SettingsWorkspaceContent({
   isCurrentWorkspaceEmpty,
   hasBuiltInSampleState,
   handleRecreateSampleNetwork,
+  handleRecreateValidationIssuesSampleNetwork,
   handleResetSampleNetwork,
   activeNetworkId,
   selectedExportNetworkIds,
@@ -252,6 +254,9 @@ export function SettingsWorkspaceContent({
           <button type="button" onClick={handleRecreateSampleNetwork} disabled={!isCurrentWorkspaceEmpty}>
             Recreate sample network
           </button>
+          <button type="button" onClick={handleRecreateValidationIssuesSampleNetwork}>
+            Recreate validation issues sample
+          </button>
           <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
             Reset sample network to baseline
           </button>
@@ -332,13 +337,20 @@ export function SettingsWorkspaceContent({
           ) : (
             <div className="settings-grid settings-export-selection-grid">
               {networks.map((network) => (
-                <label key={network.id} className="settings-checkbox">
+                <label key={network.id} className="settings-checkbox settings-export-network-option">
                   <input
                     type="checkbox"
                     checked={selectedExportNetworkIds.includes(network.id)}
                     onChange={() => toggleSelectedExportNetwork(network.id)}
                   />
-                  {network.name} (<span className="technical-id">{network.technicalId}</span>)
+                  <span className="settings-export-network-copy">
+                    <span className="settings-export-network-name">{network.name}</span>
+                    <span className="settings-export-network-technical-id">
+                      <span aria-hidden="true">(</span>
+                      <span className="technical-id">{network.technicalId}</span>
+                      <span aria-hidden="true">)</span>
+                    </span>
+                  </span>
                 </label>
               ))}
             </div>

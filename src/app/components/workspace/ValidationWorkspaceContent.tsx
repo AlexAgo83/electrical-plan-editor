@@ -12,13 +12,12 @@ interface ValidationWorkspaceContentProps {
   validationIssuesForCategoryCounts: ValidationIssue[];
   validationCategories: string[];
   validationCategoryCountByName: Map<string, number>;
-  moveVisibleValidationIssueCursor: (direction: 1 | -1) => void;
   visibleValidationIssues: ValidationIssue[];
-  clearValidationFilters: () => void;
   validationIssues: ValidationIssue[];
   groupedValidationIssues: Array<[string, ValidationIssue[]]>;
   findValidationIssueIndex: (issueId: string) => number;
   validationIssueCursor: number;
+  setValidationIssueCursorFromIssue: (issue: ValidationIssue) => void;
   handleValidationIssueRowGoTo: (issue: ValidationIssue) => void;
   validationErrorCount: number;
   validationWarningCount: number;
@@ -34,21 +33,71 @@ export function ValidationWorkspaceContent({
   validationIssuesForCategoryCounts,
   validationCategories,
   validationCategoryCountByName,
-  moveVisibleValidationIssueCursor,
   visibleValidationIssues,
-  clearValidationFilters,
   validationIssues,
   groupedValidationIssues,
   findValidationIssueIndex,
   validationIssueCursor,
+  setValidationIssueCursorFromIssue,
   handleValidationIssueRowGoTo,
   validationErrorCount,
   validationWarningCount
 }: ValidationWorkspaceContentProps): ReactElement {
   return (
-    <section className="panel-grid">
+    <section className="panel-grid validation-panel-stack">
+      <section className="panel validation-summary-panel">
+        <h2>Validation summary</h2>
+        <div className="summary-grid">
+          <article>
+            <h3>Total issues</h3>
+            <p>{validationIssues.length}</p>
+          </article>
+          <article>
+            <h3>Errors</h3>
+            <p>{validationErrorCount}</p>
+          </article>
+          <article>
+            <h3>Warnings</h3>
+            <p>{validationWarningCount}</p>
+          </article>
+          <article>
+            <h3>Visible</h3>
+            <p>{visibleValidationIssues.length}</p>
+          </article>
+        </div>
+        <p className="meta-line validation-active-filter">
+          Active filters: {validationSeverityFilter === "all" ? "All severities" : validationSeverityFilter === "error" ? "Errors" : "Warnings"} / {" "}
+          {validationCategoryFilter === "all" ? "All categories" : validationCategoryFilter}
+        </p>
+      </section>
       <section className="panel">
-        <h2>Validation center</h2>
+        <header className="validation-center-header">
+          <h2>Validation center</h2>
+          <div className="validation-center-header-actions">
+            <button
+              type="button"
+              className="filter-chip table-export-button"
+              onClick={() =>
+                downloadCsvFile(
+                  "validation-issues",
+                  ["Category", "Severity", "Issue", "Screen", "Selection kind", "Selection ID"],
+                  visibleValidationIssues.map((issue) => [
+                    issue.category,
+                    issue.severity.toUpperCase(),
+                    issue.message,
+                    issue.subScreen,
+                    issue.selectionKind,
+                    issue.selectionId
+                  ])
+                )
+              }
+              disabled={visibleValidationIssues.length === 0}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              CSV
+            </button>
+          </div>
+        </header>
         <div className="validation-toolbar">
           <span>Issue filters</span>
           <div className="chip-group" role="group" aria-label="Validation severity filter">
@@ -98,39 +147,6 @@ export function ValidationWorkspaceContent({
               );
             })}
           </div>
-          <div className="list-panel-header-tools">
-            <button
-              type="button"
-              className="filter-chip table-export-button"
-              onClick={() =>
-                downloadCsvFile(
-                  "validation-issues",
-                  ["Category", "Severity", "Issue", "Screen", "Selection kind", "Selection ID"],
-                  visibleValidationIssues.map((issue) => [
-                    issue.category,
-                    issue.severity.toUpperCase(),
-                    issue.message,
-                    issue.subScreen,
-                    issue.selectionKind,
-                    issue.selectionId
-                  ])
-                )
-              }
-              disabled={visibleValidationIssues.length === 0}
-            >
-              <span className="table-export-icon" aria-hidden="true" />
-              CSV
-            </button>
-          </div>
-          <div className="row-actions compact">
-            <button type="button" onClick={() => moveVisibleValidationIssueCursor(-1)} disabled={visibleValidationIssues.length === 0}>
-              Previous issue
-            </button>
-            <button type="button" onClick={() => moveVisibleValidationIssueCursor(1)} disabled={visibleValidationIssues.length === 0}>
-              Next issue
-            </button>
-            <button type="button" onClick={clearValidationFilters}>Clear filters</button>
-          </div>
         </div>
         {validationIssues.length === 0 ? (
           <p className="empty-copy">No integrity issue found in the current model.</p>
@@ -154,6 +170,7 @@ export function ValidationWorkspaceContent({
                       <tr
                         key={issue.id}
                         className={findValidationIssueIndex(issue.id) === validationIssueCursor ? "is-selected" : undefined}
+                        onClick={() => setValidationIssueCursorFromIssue(issue)}
                       >
                         <td>
                           <span className={issue.severity === "error" ? "status-chip is-error" : "status-chip is-warning"}>
@@ -162,7 +179,11 @@ export function ValidationWorkspaceContent({
                         </td>
                         <td>{issue.message}</td>
                         <td>
-                          <button type="button" onClick={() => handleValidationIssueRowGoTo(issue)}>
+                          <button
+                            type="button"
+                            className="validation-row-go-to-button"
+                            onClick={() => handleValidationIssueRowGoTo(issue)}
+                          >
                             Go to
                           </button>
                         </td>
@@ -174,31 +195,6 @@ export function ValidationWorkspaceContent({
             ))}
           </div>
         )}
-      </section>
-      <section className="panel">
-        <h2>Validation summary</h2>
-        <div className="summary-grid">
-          <article>
-            <h3>Total issues</h3>
-            <p>{validationIssues.length}</p>
-          </article>
-          <article>
-            <h3>Errors</h3>
-            <p>{validationErrorCount}</p>
-          </article>
-          <article>
-            <h3>Warnings</h3>
-            <p>{validationWarningCount}</p>
-          </article>
-          <article>
-            <h3>Visible</h3>
-            <p>{visibleValidationIssues.length}</p>
-          </article>
-        </div>
-        <p className="meta-line validation-active-filter">
-          Active filters: {validationSeverityFilter === "all" ? "All severities" : validationSeverityFilter === "error" ? "Errors" : "Warnings"} / {" "}
-          {validationCategoryFilter === "all" ? "All categories" : validationCategoryFilter}
-        </p>
       </section>
     </section>
   );

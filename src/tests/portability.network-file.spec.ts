@@ -70,7 +70,7 @@ describe("network file portability", () => {
           network: {
             id: existing.activeNetworkId as NetworkId,
             name: "Imported Main",
-            technicalId: "NET-MAIN",
+            technicalId: "NET-MAIN-SAMPLE",
             createdAt: "2026-02-20T10:00:00.000Z",
             updatedAt: "2026-02-20T10:00:00.000Z"
           },
@@ -82,7 +82,7 @@ describe("network file portability", () => {
     const resolved = resolveImportConflicts(payload, existing);
     expect(resolved.networks).toHaveLength(1);
     expect(resolved.networks[0]?.id).toBe(asNetworkId("network-main-import"));
-    expect(resolved.networks[0]?.technicalId).toBe("NET-MAIN-IMP");
+    expect(resolved.networks[0]?.technicalId).toBe("NET-MAIN-SAMPLE-IMP");
     expect(resolved.summary.warnings.length).toBeGreaterThanOrEqual(1);
   });
 

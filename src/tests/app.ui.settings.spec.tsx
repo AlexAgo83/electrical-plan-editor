@@ -121,6 +121,25 @@ describe("App integration UI - settings", () => {
     expect(within(connectorsPanel).getByText("Power Source Connector")).toBeInTheDocument();
   });
 
+  it("recreates a validation issues sample from settings when workspace is empty", () => {
+    renderAppWithState(createInitialState());
+
+    switchScreenDrawerAware("settings");
+    const sampleControlsPanel = getPanelByHeading("Sample network controls");
+    const validationSampleButton = within(sampleControlsPanel).getByRole("button", {
+      name: "Recreate validation issues sample"
+    });
+
+    expect(validationSampleButton).toBeEnabled();
+    fireEvent.click(validationSampleButton);
+
+    switchScreenDrawerAware("validation");
+    expect(getPanelByHeading("Validation center")).toBeInTheDocument();
+    expect(
+      within(document.body).getByText("Wire 'WIRE-VAL-BROKEN' endpoint A references missing connector 'C-GHOST'.")
+    ).toBeInTheDocument();
+  });
+
   it("keeps settings workspace accessible when no active network exists", () => {
     const initial = createInitialState();
     const noNetwork = appReducer(initial, appActions.deleteNetwork(initial.activeNetworkId as NetworkId));

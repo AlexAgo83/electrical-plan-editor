@@ -39,13 +39,13 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     formState: NetworkScopeFormStateModel;
   };
   validation: ValidationModel & {
-    moveVisibleValidationIssueCursor: ValidationSliceParams["moveVisibleValidationIssueCursor"];
     handleValidationIssueRowGoTo: ValidationSliceParams["handleValidationIssueRowGoTo"];
   };
   settings: {
     isCurrentWorkspaceEmpty: SettingsSliceParams["isCurrentWorkspaceEmpty"];
     hasBuiltInSampleState: SettingsSliceParams["hasBuiltInSampleState"];
     handleRecreateSampleNetwork: SettingsSliceParams["handleRecreateSampleNetwork"];
+    handleRecreateValidationIssuesSampleNetwork: SettingsSliceParams["handleRecreateValidationIssuesSampleNetwork"];
     handleResetSampleNetwork: SettingsSliceParams["handleResetSampleNetwork"];
     activeNetworkId: SettingsSliceParams["activeNetworkId"];
     importExport: NetworkImportExportModel;
@@ -112,13 +112,12 @@ export function useAppControllerAuxScreenContentDomains({
     validationIssuesForCategoryCounts: validation.validationIssuesForCategoryCounts,
     validationCategories: validation.validationCategories,
     validationCategoryCountByName: validation.validationCategoryCountByName,
-    moveVisibleValidationIssueCursor: validation.moveVisibleValidationIssueCursor,
     visibleValidationIssues: validation.visibleValidationIssues,
-    clearValidationFilters: validation.clearValidationFilters,
     validationIssues: validation.validationIssues,
     groupedValidationIssues: validation.groupedValidationIssues,
     findValidationIssueIndex: validation.findValidationIssueIndex,
     validationIssueCursor: validation.validationIssueCursor,
+    setValidationIssueCursorFromIssue: validation.setValidationIssueCursorFromIssue,
     handleValidationIssueRowGoTo: validation.handleValidationIssueRowGoTo,
     validationErrorCount: validation.validationErrorCount,
     validationWarningCount: validation.validationWarningCount
@@ -131,6 +130,7 @@ export function useAppControllerAuxScreenContentDomains({
     isCurrentWorkspaceEmpty: settings.isCurrentWorkspaceEmpty,
     hasBuiltInSampleState: settings.hasBuiltInSampleState,
     handleRecreateSampleNetwork: settings.handleRecreateSampleNetwork,
+    handleRecreateValidationIssuesSampleNetwork: settings.handleRecreateValidationIssuesSampleNetwork,
     handleResetSampleNetwork: settings.handleResetSampleNetwork,
     activeNetworkId: settings.activeNetworkId,
     selectedExportNetworkIds: settings.importExport.selectedExportNetworkIds,

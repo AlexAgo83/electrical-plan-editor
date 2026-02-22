@@ -630,6 +630,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     handleDuplicateNetwork,
     handleDeleteNetwork,
     handleRecreateSampleNetwork,
+    handleRecreateValidationIssuesSampleNetwork,
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,
     fitNetworkToContent,
@@ -992,7 +993,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
   });
 
-  const currentValidationIssue = getValidationIssueByCursor();
+  const currentValidationIssue = isValidationScreen
+    ? (getFocusedValidationIssueByCursor() ?? visibleValidationIssues[0] ?? null)
+    : getValidationIssueByCursor();
   const { issueNavigationScopeLabel, issueNavigatorDisplay } = useIssueNavigatorModel({
     isValidationScreen,
     currentValidationIssue,
@@ -1009,7 +1012,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   } = useInspectorPanelVisibility({
     isModelingScreen,
     isAnalysisScreen,
-    isValidationScreen,
     hasActiveNetwork,
     hasInspectableSelection,
     showFloatingInspectorPanel,
@@ -1196,13 +1198,13 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       },
       validation: {
         ...validationModel,
-        moveVisibleValidationIssueCursor,
         handleValidationIssueRowGoTo
       },
       settings: {
         isCurrentWorkspaceEmpty,
         hasBuiltInSampleState,
         handleRecreateSampleNetwork,
+        handleRecreateValidationIssuesSampleNetwork,
         handleResetSampleNetwork,
         activeNetworkId,
         importExport: {

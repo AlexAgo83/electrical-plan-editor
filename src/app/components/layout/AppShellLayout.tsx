@@ -297,7 +297,10 @@ export function AppShellLayout({
             issueNavigationScopeLabel={issueNavigationScopeLabel}
             currentValidationIssue={currentValidationIssue}
             orderedValidationIssues={orderedValidationIssues}
-            handleOpenValidationScreen={handleOpenValidationScreen}
+            handleOpenValidationScreen={(filter) => {
+              closeOperationsPanel();
+              handleOpenValidationScreen(filter);
+            }}
             moveValidationIssueCursor={moveValidationIssueCursor}
           />
         </div>

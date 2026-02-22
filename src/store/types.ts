@@ -79,7 +79,7 @@ export function createEmptyEntityState<T, Id extends string>(): EntityState<T, I
 }
 
 export const DEFAULT_NETWORK_ID = "network-main" as NetworkId;
-export const DEFAULT_NETWORK_TECHNICAL_ID = "NET-MAIN";
+export const DEFAULT_NETWORK_TECHNICAL_ID = "NET-MAIN-SAMPLE";
 export const DEFAULT_NETWORK_CREATED_AT = "2026-01-01T00:00:00.000Z";
 
 export function createEmptyNetworkScopedState(): NetworkScopedState {
@@ -99,7 +99,7 @@ export function createInitialState(): AppState {
   const defaultScopedState = createEmptyNetworkScopedState();
   const defaultNetwork: Network = {
     id: DEFAULT_NETWORK_ID,
-    name: "Main network",
+    name: "Main network sample",
     technicalId: DEFAULT_NETWORK_TECHNICAL_ID,
     createdAt: DEFAULT_NETWORK_CREATED_AT,
     updatedAt: DEFAULT_NETWORK_CREATED_AT

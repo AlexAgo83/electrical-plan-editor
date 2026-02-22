@@ -1,7 +1,12 @@
 import type { FormEvent } from "react";
 import type { Network, NetworkId, NetworkNode, NodeId } from "../../core/entities";
 import type { AppStore, ThemeMode } from "../../store";
-import { appActions, createSampleNetworkState, selectNetworkTechnicalIdTaken } from "../../store";
+import {
+  appActions,
+  createSampleNetworkState,
+  createValidationIssuesSampleNetworkState,
+  selectNetworkTechnicalIdTaken
+} from "../../store";
 import {
   NETWORK_MAX_SCALE,
   NETWORK_MIN_SCALE,
@@ -296,6 +301,19 @@ export function useWorkspaceHandlers({
     replaceStateWithHistory(createSampleNetworkState());
   }
 
+  function handleRecreateValidationIssuesSampleNetwork(): void {
+    if (!isCurrentWorkspaceEmpty && typeof window !== "undefined" && typeof window.confirm === "function") {
+      const shouldReplace = window.confirm(
+        "Replace the current workspace with the validation issues sample? This removes current workspace changes."
+      );
+      if (!shouldReplace) {
+        return;
+      }
+    }
+
+    replaceStateWithHistory(createValidationIssuesSampleNetworkState());
+  }
+
   function resetNetworkViewToConfiguredScale(): void {
     setNetworkScale(configuredResetScale);
     setNetworkOffset({ x: 0, y: 0 });
@@ -418,6 +436,7 @@ export function useWorkspaceHandlers({
     handleDuplicateNetwork,
     handleDeleteNetwork,
     handleRecreateSampleNetwork,
+    handleRecreateValidationIssuesSampleNetwork,
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,
     fitNetworkToContent,

@@ -68,43 +68,26 @@ describe("App integration UI - validation", () => {
     expect(errorChip).toBeDisabled();
   });
 
-  it("clears validation filters from toolbar", () => {
+  it("does not show a clear filters button in validation center", () => {
     renderAppWithState(createValidationIssueState());
 
     switchScreenDrawerAware("validation");
     const validationPanel = getPanelByHeading("Validation center");
-    fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
-    fireEvent.click(within(validationPanel).getByRole("button", { name: "Occupancy conflict" }));
-
-    const validationSummary = getPanelByHeading("Validation summary");
-    expect(within(validationSummary).getByText(/Active filters:\s*Warnings \/ Occupancy conflict/i)).toBeInTheDocument();
-
-    fireEvent.click(within(validationPanel).getByRole("button", { name: "Clear filters" }));
-
-    expect(within(validationSummary).getByText(/Active filters:\s*All severities \/ All categories/i)).toBeInTheDocument();
-    expect(within(validationPanel).getByRole("heading", { name: "Occupancy conflict" })).toBeInTheDocument();
-    expect(within(validationPanel).getByRole("heading", { name: "Route lock validity" })).toBeInTheDocument();
+    expect(within(validationPanel).queryByRole("button", { name: "Clear filters" })).not.toBeInTheDocument();
   });
 
-  it("uses visible filtered issues for validation toolbar previous/next navigation", () => {
+  it("keeps previous/next issue navigation in ops panel only", () => {
     renderAppWithState(createValidationIssueState());
 
     switchScreenDrawerAware("validation");
     const validationPanel = getPanelByHeading("Validation center");
-    fireEvent.click(within(validationPanel).getByRole("button", { name: "Warnings" }));
-    fireEvent.click(within(validationPanel).getByRole("button", { name: "Next issue" }));
+    expect(within(validationPanel).queryByRole("button", { name: "Previous issue" })).not.toBeInTheDocument();
+    expect(within(validationPanel).queryByRole("button", { name: "Next issue" })).not.toBeInTheDocument();
 
-    const primaryNavRow = document.querySelector(".workspace-nav-row");
-    expect(primaryNavRow).not.toBeNull();
-    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/, hidden: true })).toHaveClass(
-      "is-active"
-    );
-
-    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
-    expect(secondaryNavRow).not.toBeNull();
-    expect(
-      within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })
-    ).toHaveClass("is-active");
+    openOperationsHealthPanel();
+    const modelHealth = screen.getByRole("region", { name: "Model health" });
+    expect(within(modelHealth).getByRole("button", { name: "Previous issue" })).toBeInTheDocument();
+    expect(within(modelHealth).getByRole("button", { name: "Next issue" })).toBeInTheDocument();
   });
 
   it("aligns model health issue navigator with visible validation filters", () => {
@@ -125,7 +108,32 @@ describe("App integration UI - validation", () => {
     expect(within(modelHealth).getByText("[ERROR] Route lock validity", { selector: "strong" })).toBeInTheDocument();
   });
 
-  it("shows model health quick actions and opens validation with severity focus", () => {
+  it("updates the focused validation issue when clicking a validation row", () => {
+    renderAppWithState(createValidationIssueState());
+
+    switchScreenDrawerAware("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+
+    const initiallySelectedRow = validationPanel.querySelector("tbody tr.is-selected");
+    expect(initiallySelectedRow).not.toBeNull();
+
+    const warningIssueText = within(validationPanel).getByText(/manual-ghost/i);
+    const warningIssueRow = warningIssueText.closest("tr");
+    expect(warningIssueRow).not.toBeNull();
+
+    fireEvent.click(warningIssueText);
+
+    expect(warningIssueRow).toHaveClass("is-selected");
+    if (initiallySelectedRow !== null && initiallySelectedRow !== warningIssueRow) {
+      expect(initiallySelectedRow).not.toHaveClass("is-selected");
+    }
+
+    openOperationsHealthPanel();
+    const modelHealth = screen.getByRole("region", { name: "Model health" });
+    expect(within(modelHealth).getByText("[WARNING] Occupancy conflict", { selector: "strong" })).toBeInTheDocument();
+  });
+
+  it("shows model health quick actions and closes ops panel when opening validation", () => {
     renderAppWithState(createValidationIssueState());
 
     const primaryNavRow = document.querySelector(".workspace-nav-row");
@@ -140,15 +148,17 @@ describe("App integration UI - validation", () => {
     openOperationsHealthPanel();
     const modelHealth = screen.getByRole("region", { name: "Model health" });
     expect(within(modelHealth).getByText(/Total issues:/i)).toBeInTheDocument();
-    expect(within(modelHealth).getByRole("button", { name: "Review errors" })).toBeEnabled();
-    expect(within(modelHealth).getByRole("button", { name: "Review warnings" })).toBeEnabled();
+    expect(within(modelHealth).queryByRole("button", { name: "Review errors" })).not.toBeInTheDocument();
+    expect(within(modelHealth).queryByRole("button", { name: "Review warnings" })).not.toBeInTheDocument();
 
-    fireEvent.click(within(modelHealth).getByRole("button", { name: "Review errors" }));
+    fireEvent.click(within(modelHealth).getByRole("button", { name: "Open validation" }));
+    expect(screen.queryByRole("button", { name: "Close operations panel" })).not.toBeInTheDocument();
+
     const validationSummary = getPanelByHeading("Validation summary");
-    expect(within(validationSummary).getByText(/Active filters:\s*Errors \/ All categories/i)).toBeInTheDocument();
+    expect(within(validationSummary).getByText(/Active filters:\s*All severities \/ All categories/i)).toBeInTheDocument();
 
     const validationPanel = getPanelByHeading("Validation center");
-    expect(within(validationPanel).queryByText("WARNING")).not.toBeInTheDocument();
+    expect(within(validationPanel).getByText("WARNING")).toBeInTheDocument();
   });
 
   it("navigates validation issues from model health quick navigator", () => {

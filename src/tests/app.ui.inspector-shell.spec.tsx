@@ -40,7 +40,7 @@ describe("App integration UI - inspector floating shell", () => {
     expect(within(getPanelByHeading("Inspector context")).getByText(/No entity selected/i)).toBeInTheDocument();
   });
 
-  it("opens inspector on modeling/analysis/validation when a selection exists", () => {
+  it("opens inspector on modeling and analysis when a selection exists", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
 
@@ -51,13 +51,13 @@ describe("App integration UI - inspector floating shell", () => {
 
     switchScreenDrawerAware("analysis");
     expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
-
-    switchScreenDrawerAware("validation");
-    expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
   });
 
-  it("hides inspector on Network Scope and Settings", () => {
+  it("hides inspector on Validation, Network Scope and Settings", () => {
     renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("validation");
+    expect(screen.queryByLabelText("Inspector context panel")).not.toBeInTheDocument();
 
     switchScreenDrawerAware("networkScope");
     expect(screen.queryByLabelText("Inspector context panel")).not.toBeInTheDocument();

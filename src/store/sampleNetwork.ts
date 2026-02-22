@@ -1,5 +1,6 @@
 import type {
   ConnectorId,
+  NetworkId,
   NodeId,
   SegmentId,
   SpliceId,
@@ -290,4 +291,30 @@ export function createSampleNetworkState(): AppState {
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 2 }
     })
   ].reduce(appReducer, createInitialState());
+}
+
+export function createValidationIssuesSampleNetworkState(): AppState {
+  const base = createSampleNetworkState();
+  const activeNetworkId = base.activeNetworkId as NetworkId;
+
+  return [
+    appActions.updateNetwork(
+      activeNetworkId,
+      "Validation issues sample",
+      "NET-VALIDATION-SAMPLE",
+      "2026-02-22T00:00:00.000Z"
+    ),
+    appActions.occupyConnectorCavity(asConnectorId("C-SRC"), 6, "wire:ghost-wire:A"),
+    appActions.occupySplicePort(asSpliceId("S-J2"), 4, "manual-validation-check"),
+    appActions.upsertWire({
+      id: asWireId("W-VAL-ERR-001"),
+      name: "",
+      technicalId: "WIRE-VAL-BROKEN",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-GHOST"), cavityIndex: 1 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 4 },
+      routeSegmentIds: [],
+      lengthMm: 0,
+      isRouteLocked: true
+    })
+  ].reduce(appReducer, base);
 }

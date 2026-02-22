@@ -77,16 +77,6 @@ export function OperationsHealthPanel({
           <button type="button" onClick={() => handleOpenValidationScreen("all")}>
             Open validation
           </button>
-          <button type="button" onClick={() => handleOpenValidationScreen("error")} disabled={validationErrorCount === 0}>
-            Review errors
-          </button>
-          <button
-            type="button"
-            onClick={() => handleOpenValidationScreen("warning")}
-            disabled={validationWarningCount === 0}
-          >
-            Review warnings
-          </button>
           <button type="button" onClick={() => moveValidationIssueCursor(-1)} disabled={orderedValidationIssues.length === 0}>
             Previous issue
           </button>

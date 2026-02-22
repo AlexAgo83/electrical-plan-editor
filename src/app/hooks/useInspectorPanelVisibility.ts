@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 interface UseInspectorPanelVisibilityParams {
   isModelingScreen: boolean;
   isAnalysisScreen: boolean;
-  isValidationScreen: boolean;
   hasActiveNetwork: boolean;
   hasInspectableSelection: boolean;
   showFloatingInspectorPanel: boolean;
@@ -16,7 +15,6 @@ interface UseInspectorPanelVisibilityParams {
 export function useInspectorPanelVisibility({
   isModelingScreen,
   isAnalysisScreen,
-  isValidationScreen,
   hasActiveNetwork,
   hasInspectableSelection,
   showFloatingInspectorPanel,
@@ -27,7 +25,7 @@ export function useInspectorPanelVisibility({
 }: UseInspectorPanelVisibilityParams) {
   const [isInspectorExpandedOnNarrowViewport, setIsInspectorExpandedOnNarrowViewport] = useState(false);
 
-  const isInspectorVisibilityScreen = isModelingScreen || isAnalysisScreen || isValidationScreen;
+  const isInspectorVisibilityScreen = isModelingScreen || isAnalysisScreen;
   const isInspectorNarrowViewport = viewportWidth < 960;
   const isModalDialogFocusActive = isDialogFocusActive || isNavigationDrawerOpen || isOperationsPanelOpen;
   const isInspectorHidden = !showFloatingInspectorPanel || !isInspectorVisibilityScreen || !hasActiveNetwork || isModalDialogFocusActive;

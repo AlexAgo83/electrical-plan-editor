@@ -4,6 +4,29 @@
   margin-bottom: 0.7rem;
 }
 
+.validation-panel-stack {
+  grid-template-columns: 1fr;
+}
+
+.validation-center-header {
+  margin-bottom: 0.55rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.validation-center-header h2 {
+  margin: 0;
+}
+
+.validation-center-header-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+}
+
 .validation-toolbar > span {
   font-size: 0.84rem;
   color: #365166;
@@ -29,6 +52,35 @@
 
 .validation-active-filter {
   margin-top: 0.65rem;
+}
+
+.validation-summary-panel {
+  align-self: start;
+}
+
+.validation-row-go-to-button {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.55rem;
+  min-width: 4.1rem;
+  line-height: 1.1;
+}
+
+.validation-row-go-to-button:hover:not(:disabled) {
+  filter: brightness(0.98);
+}
+
+@media (max-width: 860px) {
+  .validation-center-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .validation-center-header-actions {
+    justify-content: flex-start;
+  }
 }
 
 .settings-grid {
@@ -181,6 +233,43 @@
 
 .settings-export-selection-grid {
   gap: 0.45rem;
+}
+
+.settings-export-network-option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.5rem;
+}
+
+.settings-export-network-option input {
+  margin-top: 0.18rem;
+}
+
+.settings-export-network-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.settings-export-network-name {
+  line-height: 1.2;
+}
+
+.settings-export-network-technical-id {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.18rem;
+  min-width: 0;
+  font-size: 0.86rem;
+  line-height: 1.2;
+}
+
+.settings-export-network-technical-id .technical-id {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .settings-state-row {

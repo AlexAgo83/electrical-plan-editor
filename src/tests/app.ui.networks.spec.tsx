@@ -94,14 +94,14 @@ describe("App integration UI - networks", () => {
     switchScreen("networkScope");
 
     const networkScopePanel = getPanelByHeading("Network Scope");
-    const mainNetworkRow = within(networkScopePanel).getByText("Main network").closest("tr");
+    const mainNetworkRow = within(networkScopePanel).getByText("Main network sample").closest("tr");
     expect(mainNetworkRow).not.toBeNull();
     fireEvent.click(mainNetworkRow as HTMLElement);
 
     const formPanel = getPanelByHeading("Edit network");
 
-    expect(within(formPanel).getByLabelText("Network name")).toHaveValue("Main network");
-    expect(within(formPanel).getByLabelText("Network technical ID")).toHaveValue("NET-MAIN");
+    expect(within(formPanel).getByLabelText("Network name")).toHaveValue("Main network sample");
+    expect(within(formPanel).getByLabelText("Network technical ID")).toHaveValue("NET-MAIN-SAMPLE");
 
     fireEvent.change(within(formPanel).getByLabelText("Network name"), {
       target: { value: "Main network updated" }
