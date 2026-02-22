@@ -21,7 +21,7 @@ interface ModelingPrimaryTablesProps {
   visibleConnectors: Connector[];
   connectorSort: SortState;
   setConnectorSort: (value: SortState | ((current: SortState) => SortState)) => void;
-  getSortIndicator: (sortState: SortState, field: "name" | "technicalId") => string;
+  getSortIndicator: (sortState: SortState, field: SortState["field"]) => string;
   connectorOccupiedCountById: Map<ConnectorId, number>;
   selectedConnectorId: ConnectorId | null;
   onEditConnector: (connector: Connector) => void;

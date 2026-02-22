@@ -171,6 +171,8 @@ export function useAppControllerAuxScreenContentDomains({
     setCanvasDefaultLabelSizeMode: settings.prefs.setCanvasDefaultLabelSizeMode,
     canvasDefaultLabelRotationDegrees: settings.prefs.canvasDefaultLabelRotationDegrees,
     setCanvasDefaultLabelRotationDegrees: settings.prefs.setCanvasDefaultLabelRotationDegrees,
+    canvasPngExportIncludeBackground: settings.prefs.canvasPngExportIncludeBackground,
+    setCanvasPngExportIncludeBackground: settings.prefs.setCanvasPngExportIncludeBackground,
     canvasResetZoomPercentInput: settings.canvasDisplay.canvasResetZoomPercentInput,
     setCanvasResetZoomPercentInput: settings.canvasDisplay.setCanvasResetZoomPercentInput,
     configuredResetZoomPercent: settings.configuredResetZoomPercent,

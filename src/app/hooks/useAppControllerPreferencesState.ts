@@ -28,6 +28,7 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultLabelSizeMode, setCanvasDefaultLabelSizeMode] = useState<CanvasLabelSizeMode>("normal");
   const [canvasDefaultLabelRotationDegrees, setCanvasDefaultLabelRotationDegrees] =
     useState<CanvasLabelRotationDegrees>(0);
+  const [canvasPngExportIncludeBackground, setCanvasPngExportIncludeBackground] = useState(false);
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [showFloatingInspectorPanel, setShowFloatingInspectorPanel] = useState(true);
@@ -64,6 +65,8 @@ export function useAppControllerPreferencesState() {
     setCanvasDefaultLabelSizeMode,
     canvasDefaultLabelRotationDegrees,
     setCanvasDefaultLabelRotationDegrees,
+    canvasPngExportIncludeBackground,
+    setCanvasPngExportIncludeBackground,
     showShortcutHints,
     setShowShortcutHints,
     keyboardShortcutsEnabled,

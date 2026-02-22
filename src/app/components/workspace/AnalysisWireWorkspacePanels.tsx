@@ -100,7 +100,15 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
             </button>
           </th>
           <th>Endpoints</th>
-          <th>Length (mm)</th>
+          <th>
+            <button
+              type="button"
+              className="sort-header-button"
+              onClick={() => setWireSort((current) => nextSortState(current, "lengthMm"))}
+            >
+              Length (mm) <span className="sort-indicator">{getSortIndicator(wireSort, "lengthMm")}</span>
+            </button>
+          </th>
           {showWireRouteModeColumn ? <th>Route mode</th> : null}
         </tr>
       </thead>

@@ -229,6 +229,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultLabelSizeMode,
     canvasDefaultLabelRotationDegrees,
     setCanvasDefaultLabelRotationDegrees,
+    canvasPngExportIncludeBackground,
+    setCanvasPngExportIncludeBackground,
     showShortcutHints,
     setShowShortcutHints,
     keyboardShortcutsEnabled,
@@ -496,6 +498,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,
     canvasDefaultLabelRotationDegrees,
+    canvasPngExportIncludeBackground,
     canvasResetZoomPercentInput,
     showShortcutHints,
     keyboardShortcutsEnabled,
@@ -522,6 +525,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelSizeMode,
     setCanvasDefaultLabelRotationDegrees,
+    setCanvasPngExportIncludeBackground,
     setShowNetworkGrid,
     setSnapNodesToGrid,
     setLockEntityMovement,
@@ -744,6 +748,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setCanvasDefaultLabelSizeMode,
       setCanvasDefaultLabelRotationDegrees,
       setCanvasResetZoomPercentInput,
+      setCanvasPngExportIncludeBackground,
       setShowShortcutHints,
       setKeyboardShortcutsEnabled,
       setShowFloatingInspectorPanel
@@ -1193,6 +1198,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         routePreviewEndNodeId,
         setRoutePreviewEndNodeId,
         routePreview,
+        quickEntityNavigationMode: isModelingScreen ? "modeling" : "analysis",
+        activeSubScreen,
+        entityCountBySubScreen,
+        onQuickEntityNavigation: setActiveSubScreen,
+        pngExportIncludeBackground: canvasPngExportIncludeBackground,
         handleRegenerateLayout
       }).networkSummaryPanel
       : null;
@@ -1351,6 +1361,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setCanvasDefaultLabelSizeMode,
           canvasDefaultLabelRotationDegrees,
           setCanvasDefaultLabelRotationDegrees,
+          canvasPngExportIncludeBackground,
+          setCanvasPngExportIncludeBackground,
           showShortcutHints,
           setShowShortcutHints,
           keyboardShortcutsEnabled,

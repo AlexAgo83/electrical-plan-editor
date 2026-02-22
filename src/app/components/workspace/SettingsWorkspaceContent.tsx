@@ -58,6 +58,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
+  canvasPngExportIncludeBackground: boolean;
+  setCanvasPngExportIncludeBackground: (value: boolean) => void;
   canvasResetZoomPercentInput: string;
   setCanvasResetZoomPercentInput: (value: string) => void;
   configuredResetZoomPercent: number;
@@ -117,6 +119,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultLabelSizeMode,
   canvasDefaultLabelRotationDegrees,
   setCanvasDefaultLabelRotationDegrees,
+  canvasPngExportIncludeBackground,
+  setCanvasPngExportIncludeBackground,
   canvasResetZoomPercentInput,
   setCanvasResetZoomPercentInput,
   configuredResetZoomPercent,
@@ -267,11 +271,22 @@ export function SettingsWorkspaceContent({
               value={String(canvasDefaultLabelRotationDegrees)}
               onChange={(event) => setCanvasDefaultLabelRotationDegrees(Number(event.target.value) as CanvasLabelRotationDegrees)}
             >
+              <option value="-90">-90°</option>
+              <option value="-45">-45°</option>
+              <option value="-20">-20°</option>
               <option value="0">0°</option>
               <option value="20">20°</option>
               <option value="45">45°</option>
               <option value="90">90°</option>
             </select>
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasPngExportIncludeBackground}
+              onChange={(event) => setCanvasPngExportIncludeBackground(event.target.checked)}
+            />
+            Include background in PNG export
           </label>
           <label className="settings-field">
             Reset zoom target (%)

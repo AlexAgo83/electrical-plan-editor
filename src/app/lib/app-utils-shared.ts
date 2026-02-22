@@ -4,7 +4,7 @@ export const NETWORK_VIEW_WIDTH = 760;
 export const NETWORK_VIEW_HEIGHT = 420;
 export const HISTORY_LIMIT = 60;
 export const NETWORK_GRID_STEP = 20;
-export const NETWORK_MIN_SCALE = 0.6;
+export const NETWORK_MIN_SCALE = 0.3;
 export const NETWORK_MAX_SCALE = 2.2;
 
 export function createEntityId(prefix: string): string {

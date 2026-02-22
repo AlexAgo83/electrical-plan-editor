@@ -21,7 +21,12 @@ import type {
 } from "../../core/entities";
 import type { ShortestRouteResult } from "../../core/pathfinding";
 import type { SubNetworkSummary } from "../../store";
-import type { CanvasLabelRotationDegrees, CanvasLabelSizeMode, CanvasLabelStrokeMode } from "../types/app-controller";
+import type {
+  CanvasLabelRotationDegrees,
+  CanvasLabelSizeMode,
+  CanvasLabelStrokeMode,
+  SubScreenId
+} from "../types/app-controller";
 import { NetworkCanvasFloatingInfoPanels } from "./network-summary/NetworkCanvasFloatingInfoPanels";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
 import { NetworkSummaryLegend } from "./network-summary/NetworkSummaryLegend";
@@ -76,6 +81,26 @@ function copyComputedStylesToSvgClone(sourceSvg: SVGSVGElement, cloneSvg: SVGSVG
   }
 }
 
+function resolveCanvasExportBackgroundFill(shellElement: HTMLElement | null): string | null {
+  if (shellElement === null || typeof window === "undefined") {
+    return null;
+  }
+
+  const style = window.getComputedStyle(shellElement);
+  const backgroundColor = style.backgroundColor.trim();
+  if (backgroundColor.length > 0 && backgroundColor !== "rgba(0, 0, 0, 0)" && backgroundColor !== "transparent") {
+    return backgroundColor;
+  }
+
+  const backgroundImage = style.backgroundImage;
+  if (!backgroundImage.includes("gradient")) {
+    return null;
+  }
+
+  const colorMatch = backgroundImage.match(/(rgba?\([^)]*\)|#[0-9a-fA-F]{3,8})/);
+  return colorMatch?.[1] ?? null;
+}
+
 export interface NetworkSummaryPanelProps {
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
@@ -127,8 +152,31 @@ export interface NetworkSummaryPanelProps {
   routePreviewEndNodeId: string;
   setRoutePreviewEndNodeId: (value: string) => void;
   routePreview: ShortestRouteResult | null;
+  quickEntityNavigationMode: "modeling" | "analysis";
+  activeSubScreen: SubScreenId;
+  entityCountBySubScreen: Record<SubScreenId, number>;
+  onQuickEntityNavigation: (subScreen: SubScreenId) => void;
+  pngExportIncludeBackground: boolean;
   onRegenerateLayout: () => void;
 }
+
+const QUICK_ENTITY_NAV_ITEMS: Record<
+  NetworkSummaryPanelProps["quickEntityNavigationMode"],
+  ReadonlyArray<{ subScreen: SubScreenId; label: string }>
+> = {
+  modeling: [
+    { subScreen: "connector", label: "Connectors" },
+    { subScreen: "splice", label: "Splices" },
+    { subScreen: "node", label: "Nodes" },
+    { subScreen: "segment", label: "Segments" },
+    { subScreen: "wire", label: "Wires" }
+  ],
+  analysis: [
+    { subScreen: "connector", label: "Connectors" },
+    { subScreen: "splice", label: "Splices" },
+    { subScreen: "wire", label: "Wires" }
+  ]
+};
 
 export function NetworkSummaryPanel({
   handleZoomAction,
@@ -181,9 +229,15 @@ export function NetworkSummaryPanel({
   routePreviewEndNodeId,
   setRoutePreviewEndNodeId,
   routePreview,
+  quickEntityNavigationMode,
+  activeSubScreen,
+  entityCountBySubScreen,
+  onQuickEntityNavigation,
+  pngExportIncludeBackground,
   onRegenerateLayout
 }: NetworkSummaryPanelProps): ReactElement {
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
+  const networkCanvasShellRef = useRef<HTMLDivElement | null>(null);
   const subNetworkFilterInitializedRef = useRef(false);
   const [activeSubNetworkTags, setActiveSubNetworkTags] = useState<Set<string>>(new Set());
   const graphStats = [
@@ -325,6 +379,13 @@ export function NetworkSummaryPanel({
       }
 
       context.setTransform(exportScale, 0, 0, exportScale, 0, 0);
+      if (pngExportIncludeBackground) {
+        const backgroundFill = resolveCanvasExportBackgroundFill(networkCanvasShellRef.current);
+        if (backgroundFill !== null) {
+          context.fillStyle = backgroundFill;
+          context.fillRect(0, 0, exportWidth, exportHeight);
+        }
+      }
       context.drawImage(image, 0, 0, exportWidth, exportHeight);
 
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -340,7 +401,7 @@ export function NetworkSummaryPanel({
       URL.revokeObjectURL(svgUrl);
     };
     image.src = svgUrl;
-  }, []);
+  }, [pngExportIncludeBackground]);
 
   function handleNetworkNodeKeyDown(event: ReactKeyboardEvent<SVGGElement>, nodeId: NodeId): void {
     if (event.key !== "Enter" && event.key !== " ") {
@@ -412,7 +473,7 @@ export function NetworkSummaryPanel({
         {nodes.length === 0 ? (
           <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
         ) : (
-          <div className={`network-canvas-shell${isPanningNetwork ? " is-panning" : ""}`}>
+          <div ref={networkCanvasShellRef} className={`network-canvas-shell${isPanningNetwork ? " is-panning" : ""}`}>
             <NetworkCanvasFloatingInfoPanels
               showNetworkInfoPanels={showNetworkInfoPanels}
               handleZoomAction={handleZoomAction}
@@ -620,6 +681,22 @@ export function NetworkSummaryPanel({
         setRoutePreviewEndNodeId={setRoutePreviewEndNodeId}
         routePreview={routePreview}
       />
+      <section className="panel network-summary-quick-entity-nav-panel" aria-label="Quick entity navigation">
+        <div className="network-summary-quick-entity-nav" role="group" aria-label="Quick entity navigation strip">
+          {QUICK_ENTITY_NAV_ITEMS[quickEntityNavigationMode].map((item) => (
+            <button
+              key={item.subScreen}
+              type="button"
+              className={activeSubScreen === item.subScreen ? "filter-chip is-active" : "filter-chip"}
+              onClick={() => onQuickEntityNavigation(item.subScreen)}
+              aria-pressed={activeSubScreen === item.subScreen}
+            >
+              <span className="network-summary-quick-entity-nav-label">{item.label}</span>
+              <span className="filter-chip-count">{entityCountBySubScreen[item.subScreen]}</span>
+            </button>
+          ))}
+        </div>
+      </section>
     </section>
   );
 }

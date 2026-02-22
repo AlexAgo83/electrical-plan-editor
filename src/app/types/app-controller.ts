@@ -10,7 +10,7 @@ export interface NodePosition {
   y: number;
 }
 
-export type SortField = "name" | "technicalId";
+export type SortField = "name" | "technicalId" | "lengthMm";
 export type SortDirection = "asc" | "desc";
 
 export interface SortState {
@@ -43,7 +43,7 @@ export type TableDensity = "comfortable" | "compact";
 export type TableFontSize = "small" | "normal" | "large";
 export type CanvasLabelStrokeMode = "none" | "light" | "normal";
 export type CanvasLabelSizeMode = "small" | "normal" | "large";
-export type CanvasLabelRotationDegrees = 0 | 20 | 45 | 90;
+export type CanvasLabelRotationDegrees = -90 | -45 | -20 | 0 | 20 | 45 | 90;
 export type OccupancyFilter = "all" | "occupied" | "free";
 export type SegmentSubNetworkFilter = "all" | "default" | "tagged";
 export type ValidationSeverityFilter = "all" | "error" | "warning";

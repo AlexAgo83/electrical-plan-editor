@@ -121,7 +121,20 @@ export function useEntityListModel({
   const sortedSplices = useMemo(() => sortByNameAndTechnicalId(splices, spliceSort, (splice) => splice.name, (splice) => splice.technicalId), [splices, spliceSort]);
   const sortedNodes = useMemo(() => sortById(nodes, nodeIdSortDirection, (node) => node.id), [nodes, nodeIdSortDirection]);
   const sortedSegments = useMemo(() => sortById(segments, segmentIdSortDirection, (segment) => segment.id), [segments, segmentIdSortDirection]);
-  const sortedWires = useMemo(() => sortByNameAndTechnicalId(wires, wireSort, (wire) => wire.name, (wire) => wire.technicalId), [wires, wireSort]);
+  const sortedWires = useMemo(() => {
+    if (wireSort.field !== "lengthMm") {
+      return sortByNameAndTechnicalId(wires, wireSort, (wire) => wire.name, (wire) => wire.technicalId);
+    }
+
+    const factor = wireSort.direction === "asc" ? 1 : -1;
+    return [...wires].sort((left, right) => {
+      const delta = (left.lengthMm - right.lengthMm) * factor;
+      if (delta !== 0) {
+        return delta;
+      }
+      return left.technicalId.localeCompare(right.technicalId) * factor;
+    });
+  }, [wires, wireSort]);
   const sortedConnectorSynthesisRows = useMemo(() => sortByNameAndTechnicalId(connectorSynthesisRows, connectorSynthesisSort, (row) => row.wireName, (row) => row.wireTechnicalId), [connectorSynthesisRows, connectorSynthesisSort]);
   const sortedSpliceSynthesisRows = useMemo(() => sortByNameAndTechnicalId(spliceSynthesisRows, spliceSynthesisSort, (row) => row.wireName, (row) => row.wireTechnicalId), [spliceSynthesisRows, spliceSynthesisSort]);
 

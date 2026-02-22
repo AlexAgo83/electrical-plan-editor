@@ -126,6 +126,30 @@ describe("App integration UI - settings", () => {
     expect(within(restoredCanvasSettingsPanel).getByLabelText("2D label rotation")).toHaveValue("45");
   });
 
+  it("persists png export background toggle and supports negative 2d label rotation presets", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const canvasSettingsPanel = getPanelByHeading("Canvas preferences");
+    fireEvent.change(within(canvasSettingsPanel).getByLabelText("2D label rotation"), {
+      target: { value: "-45" }
+    });
+    fireEvent.click(within(canvasSettingsPanel).getByLabelText("Include background in PNG export"));
+
+    switchScreenDrawerAware("analysis");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const segmentLabel = networkSummaryPanel.querySelector(".network-segment-label-anchor .network-segment-label");
+    expect(segmentLabel?.getAttribute("transform")).toContain("rotate(-45");
+
+    firstRender.unmount();
+
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const restoredCanvasSettingsPanel = getPanelByHeading("Canvas preferences");
+    expect(within(restoredCanvasSettingsPanel).getByLabelText("2D label rotation")).toHaveValue("-45");
+    expect(within(restoredCanvasSettingsPanel).getByLabelText("Include background in PNG export")).toBeChecked();
+  });
+
   it("recreates sample network from settings when workspace is empty", () => {
     renderAppWithState(createInitialState());
 

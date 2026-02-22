@@ -375,3 +375,26 @@
 .route-preview-form select {
   font-weight: 600;
 }
+
+.network-summary-quick-entity-nav-panel {
+  padding: 0.45rem 0.55rem;
+}
+
+.network-summary-quick-entity-nav {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.35rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.network-summary-quick-entity-nav .filter-chip {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  min-height: 1.95rem;
+}
+
+.network-summary-quick-entity-nav-label {
+  font-weight: 600;
+}

@@ -40,7 +40,7 @@ export interface AnalysisWorkspaceContentProps {
   sortedConnectorSynthesisRows: ConnectorSynthesisRow[];
   connectorSynthesisSort: SortState;
   setConnectorSynthesisSort: (value: SortState | ((current: SortState) => SortState)) => void;
-  getSortIndicator: (sortState: SortState, field: "name" | "technicalId") => string;
+  getSortIndicator: (sortState: SortState, field: SortState["field"]) => string;
   selectedSplice: Splice | null;
   selectedSpliceId: SpliceId | null;
   spliceOccupancyFilter: "all" | "occupied" | "free";

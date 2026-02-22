@@ -41,7 +41,7 @@ function normalizeThemeMode(value: unknown): ThemeMode {
 
 type TableDensity = "comfortable" | "compact";
 type TableFontSizePreference = TableFontSize;
-type SortField = "name" | "technicalId";
+type SortField = "name" | "technicalId" | "lengthMm";
 type SortDirection = "asc" | "desc";
 
 interface SortState {
@@ -65,6 +65,7 @@ interface UiPreferencesPayload {
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
+  canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
@@ -115,6 +116,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
+  canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
@@ -142,6 +144,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
+  setCanvasPngExportIncludeBackground: (value: boolean) => void;
   setShowNetworkGrid: (value: boolean) => void;
   setSnapNodesToGrid: (value: boolean) => void;
   setLockEntityMovement: (value: boolean) => void;
@@ -164,7 +167,7 @@ function normalizeCanvasLabelSizeMode(value: unknown): CanvasLabelSizeMode {
 }
 
 function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotationDegrees {
-  return value === 20 || value === 45 || value === 90 ? value : 0;
+  return value === -90 || value === -45 || value === -20 || value === 20 || value === 45 || value === 90 ? value : 0;
 }
 
 export function useUiPreferences({
@@ -184,6 +187,7 @@ export function useUiPreferences({
   canvasDefaultLabelStrokeMode,
   canvasDefaultLabelSizeMode,
   canvasDefaultLabelRotationDegrees,
+  canvasPngExportIncludeBackground,
   canvasResetZoomPercentInput,
   showShortcutHints,
   keyboardShortcutsEnabled,
@@ -211,6 +215,7 @@ export function useUiPreferences({
   setCanvasDefaultLabelStrokeMode,
   setCanvasDefaultLabelSizeMode,
   setCanvasDefaultLabelRotationDegrees,
+  setCanvasPngExportIncludeBackground,
   setShowNetworkGrid,
   setSnapNodesToGrid,
   setLockEntityMovement,
@@ -286,6 +291,11 @@ export function useUiPreferences({
       setCanvasDefaultLabelStrokeMode(labelStrokeModeDefault);
       setCanvasDefaultLabelSizeMode(labelSizeModeDefault);
       setCanvasDefaultLabelRotationDegrees(labelRotationDegreesDefault);
+      setCanvasPngExportIncludeBackground(
+        typeof preferences.canvasPngExportIncludeBackground === "boolean"
+          ? preferences.canvasPngExportIncludeBackground
+          : false
+      );
       setShowNetworkGrid(showGridDefault);
       setSnapNodesToGrid(snapDefault);
       setLockEntityMovement(lockMovementDefault);
@@ -318,6 +328,7 @@ export function useUiPreferences({
     setCanvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelSizeMode,
     setCanvasDefaultLabelRotationDegrees,
+    setCanvasPngExportIncludeBackground,
     setCanvasResetZoomPercentInput,
     setConnectorSort,
     setDefaultIdSortDirection,
@@ -370,6 +381,7 @@ export function useUiPreferences({
       canvasDefaultLabelStrokeMode,
       canvasDefaultLabelSizeMode,
       canvasDefaultLabelRotationDegrees,
+      canvasPngExportIncludeBackground,
       canvasResetZoomPercentInput,
       showShortcutHints,
       keyboardShortcutsEnabled,
@@ -390,6 +402,7 @@ export function useUiPreferences({
     canvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,
     canvasDefaultLabelRotationDegrees,
+    canvasPngExportIncludeBackground,
     canvasResetZoomPercentInput,
     defaultIdSortDirection,
     defaultSortDirection,

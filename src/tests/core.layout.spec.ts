@@ -219,9 +219,10 @@ describe("2D layout generation", () => {
     const elapsedMs = performance.now() - start;
     const configuredBudgetOverride = Number(process.env.LAYOUT_RESPONSIVENESS_BUDGET_MS ?? "");
     // This remains a wall-clock guardrail by design: it is intentionally coarse and CI-load-sensitive.
-    // Keep the default budget pragmatic, and allow an env override when calibrating slower runners.
+    // Keep the default budget pragmatic (with headroom for coverage + larger UI suites), and allow
+    // an env override when calibrating slower runners.
     const performanceBudgetMs =
-      Number.isFinite(configuredBudgetOverride) && configuredBudgetOverride > 0 ? configuredBudgetOverride : 8_000;
+      Number.isFinite(configuredBudgetOverride) && configuredBudgetOverride > 0 ? configuredBudgetOverride : 9_000;
 
     expect(Object.keys(generated)).toHaveLength(nodes.length);
     expect(elapsedMs).toBeLessThan(performanceBudgetMs);

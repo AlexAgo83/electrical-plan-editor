@@ -243,6 +243,11 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     routePreviewEndNodeId: params.routePreviewEndNodeId,
     setRoutePreviewEndNodeId: params.setRoutePreviewEndNodeId,
     routePreview: params.routePreview,
+    quickEntityNavigationMode: params.quickEntityNavigationMode,
+    activeSubScreen: params.activeSubScreen,
+    entityCountBySubScreen: params.entityCountBySubScreen,
+    onQuickEntityNavigation: params.onQuickEntityNavigation,
+    pngExportIncludeBackground: params.pngExportIncludeBackground,
     onRegenerateLayout: params.handleRegenerateLayout
   } satisfies NetworkSummaryPanelProps;
 
@@ -616,6 +621,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setCanvasDefaultLabelSizeMode: params.setCanvasDefaultLabelSizeMode,
     canvasDefaultLabelRotationDegrees: params.canvasDefaultLabelRotationDegrees,
     setCanvasDefaultLabelRotationDegrees: params.setCanvasDefaultLabelRotationDegrees,
+    canvasPngExportIncludeBackground: params.canvasPngExportIncludeBackground,
+    setCanvasPngExportIncludeBackground: params.setCanvasPngExportIncludeBackground,
     canvasResetZoomPercentInput: params.canvasResetZoomPercentInput,
     setCanvasResetZoomPercentInput: params.setCanvasResetZoomPercentInput,
     configuredResetZoomPercent: params.configuredResetZoomPercent,

@@ -48,7 +48,8 @@
   height: 0.9rem;
   line-height: 1;
   text-align: center;
-  color: #4a6a82;
+  color: currentColor;
+  opacity: 0.72;
   transform-origin: center;
 }
 
@@ -155,12 +156,28 @@
   color: #7b4d00;
 }
 
-.data-table tr.is-selected {
-  background: #eef6fc;
+.data-table tr.is-selected,
+.data-table tr.is-wire-highlighted {
+  background: transparent !important;
 }
 
-.data-table tr.is-wire-highlighted {
-  background: #f0f7e8;
+.data-table tr.is-selected > td {
+  background: color-mix(in srgb, currentColor 7%, transparent) !important;
+}
+
+.data-table tr.is-wire-highlighted > td {
+  background: color-mix(in srgb, currentColor 6%, transparent) !important;
+}
+
+.data-table tr.is-selected.is-wire-highlighted > td {
+  background: color-mix(in srgb, currentColor 9%, transparent) !important;
+}
+
+.data-table tr.is-selected td:nth-child(-n + 2),
+.data-table tr.is-wire-highlighted td:nth-child(-n + 2),
+.data-table tr.is-selected .technical-id,
+.data-table tr.is-wire-highlighted .technical-id {
+  font-weight: 700;
 }
 
 .data-table tr.is-focusable-row {

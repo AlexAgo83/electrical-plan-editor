@@ -76,6 +76,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setCanvasDefaultLabelSizeMode"
     | "setCanvasDefaultLabelRotationDegrees"
     | "setCanvasResetZoomPercentInput"
+    | "setCanvasPngExportIncludeBackground"
     | "setShowShortcutHints"
     | "setKeyboardShortcutsEnabled"
     | "setShowFloatingInspectorPanel"

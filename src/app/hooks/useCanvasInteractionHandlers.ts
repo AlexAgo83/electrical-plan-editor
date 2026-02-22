@@ -216,8 +216,8 @@ export function useCanvasInteractionHandlers({
     const snappedY = snapNodesToGrid ? snapToGrid(modelY, NETWORK_GRID_STEP) : modelY;
 
     return {
-      x: clamp(snappedX, 20, NETWORK_VIEW_WIDTH - 20),
-      y: clamp(snappedY, 20, NETWORK_VIEW_HEIGHT - 20)
+      x: snappedX,
+      y: snappedY
     };
   }
 

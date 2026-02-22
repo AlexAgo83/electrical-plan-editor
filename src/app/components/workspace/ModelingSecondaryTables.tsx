@@ -34,7 +34,7 @@ interface ModelingSecondaryTablesProps {
   visibleWires: Wire[];
   wireSort: SortState;
   setWireSort: (value: SortState | ((current: SortState) => SortState)) => void;
-  getSortIndicator: (sortState: SortState, field: "name" | "technicalId") => string;
+  getSortIndicator: (sortState: SortState, field: SortState["field"]) => string;
   selectedWireId: WireId | null;
   describeWireEndpoint: (endpoint: Wire["endpointA"]) => string;
   describeWireEndpointId: (endpoint: Wire["endpointA"]) => string;
@@ -243,7 +243,15 @@ export function ModelingSecondaryTables({
                 <th><button type="button" className="sort-header-button" onClick={() => setWireSort((current) => nextSortState(current, "name"))}>Name <span className="sort-indicator">{getSortIndicator(wireSort, "name")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setWireSort((current) => nextSortState(current, "technicalId"))}>Technical ID <span className="sort-indicator">{getSortIndicator(wireSort, "technicalId")}</span></button></th>
                 <th>Endpoints</th>
-                <th>Length (mm)</th>
+                <th>
+                  <button
+                    type="button"
+                    className="sort-header-button"
+                    onClick={() => setWireSort((current) => nextSortState(current, "lengthMm"))}
+                  >
+                    Length (mm) <span className="sort-indicator">{getSortIndicator(wireSort, "lengthMm")}</span>
+                  </button>
+                </th>
                 {showWireRouteModeColumn ? <th>Route mode</th> : null}
               </tr>
             </thead>

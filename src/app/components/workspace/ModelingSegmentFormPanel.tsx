@@ -56,7 +56,7 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
       <input type="number" min={0.1} step={0.1} value={segmentLengthMm} onChange={(event) => setSegmentLengthMm(event.target.value)} required />
     </label>
     <label>
-      Sub-network tag
+      Sub-network tag (optional)
       <input value={segmentSubNetworkTag} onChange={(event) => setSegmentSubNetworkTag(event.target.value)} placeholder="front-harness" />
     </label>
     <div className="row-actions">

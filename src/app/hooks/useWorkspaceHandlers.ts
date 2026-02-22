@@ -97,6 +97,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
+  setCanvasPngExportIncludeBackground: (value: boolean) => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
   setShowShortcutHints: (value: boolean) => void;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
@@ -163,6 +164,7 @@ export function useWorkspaceHandlers({
   setCanvasDefaultLabelStrokeMode,
   setCanvasDefaultLabelSizeMode,
   setCanvasDefaultLabelRotationDegrees,
+  setCanvasPngExportIncludeBackground,
   setCanvasResetZoomPercentInput,
   setShowShortcutHints,
   setKeyboardShortcutsEnabled,
@@ -451,6 +453,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultLabelStrokeMode("normal");
     setCanvasDefaultLabelSizeMode("normal");
     setCanvasDefaultLabelRotationDegrees(0);
+    setCanvasPngExportIncludeBackground(false);
     setCanvasResetZoomPercentInput("100");
     setShowNetworkGrid(true);
     setSnapNodesToGrid(true);
