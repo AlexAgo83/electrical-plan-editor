@@ -40,6 +40,7 @@
 
 .network-summary-grid-icon,
 .network-summary-snap-icon,
+.network-summary-lock-move-icon,
 .network-summary-info-icon,
 .network-summary-length-icon,
 .network-summary-export-button {
@@ -49,6 +50,7 @@
 
 .network-summary-grid-icon,
 .network-summary-snap-icon,
+.network-summary-lock-move-icon,
 .network-summary-info-icon,
 .network-summary-length-icon {
   width: 0.82rem;
@@ -65,6 +67,11 @@
 .network-summary-snap-icon {
   -webkit-mask: url("/icons/grid_snap.svg") center / contain no-repeat;
   mask: url("/icons/grid_snap.svg") center / contain no-repeat;
+}
+
+.network-summary-lock-move-icon {
+  -webkit-mask: url("/icons/ico_lock_move.svg") center / contain no-repeat;
+  mask: url("/icons/ico_lock_move.svg") center / contain no-repeat;
 }
 
 .network-summary-info-icon {

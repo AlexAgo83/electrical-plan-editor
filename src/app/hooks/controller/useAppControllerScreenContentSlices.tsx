@@ -58,6 +58,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   | "toggleShowSegmentLengths"
   | "toggleShowNetworkGrid"
   | "toggleSnapNodesToGrid"
+  | "toggleLockEntityMovement"
   | "routingGraphNodeCount"
   | "routingGraphSegmentCount"
   | "onRegenerateLayout"
@@ -68,6 +69,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   setShowSegmentLengths: BooleanStateSetter;
   setShowNetworkGrid: BooleanStateSetter;
   setSnapNodesToGrid: BooleanStateSetter;
+  setLockEntityMovement: BooleanStateSetter;
   networkLabelStrokeMode: NetworkSummaryPanelProps["labelStrokeMode"];
   routingGraph: {
     nodeIds: string[];
@@ -191,6 +193,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     fitNetworkToContent: params.fitNetworkToContent,
     showNetworkGrid: params.showNetworkGrid,
     snapNodesToGrid: params.snapNodesToGrid,
+    lockEntityMovement: params.lockEntityMovement,
     showNetworkInfoPanels: params.showNetworkInfoPanels,
     showSegmentLengths: params.showSegmentLengths,
     labelStrokeMode: params.networkLabelStrokeMode,
@@ -198,6 +201,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     toggleShowSegmentLengths: () => params.setShowSegmentLengths((current: boolean) => !current),
     toggleShowNetworkGrid: () => params.setShowNetworkGrid((current: boolean) => !current),
     toggleSnapNodesToGrid: () => params.setSnapNodesToGrid((current: boolean) => !current),
+    toggleLockEntityMovement: () => params.setLockEntityMovement((current: boolean) => !current),
     networkScalePercent: params.networkScalePercent,
     routingGraphNodeCount: params.routingGraph.nodeIds.length,
     routingGraphSegmentCount: params.routingGraph.segmentIds.length,
@@ -594,6 +598,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setCanvasDefaultShowGrid: params.setCanvasDefaultShowGrid,
     canvasDefaultSnapToGrid: params.canvasDefaultSnapToGrid,
     setCanvasDefaultSnapToGrid: params.setCanvasDefaultSnapToGrid,
+    canvasDefaultLockEntityMovement: params.canvasDefaultLockEntityMovement,
+    setCanvasDefaultLockEntityMovement: params.setCanvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels: params.canvasDefaultShowInfoPanels,
     setCanvasDefaultShowInfoPanels: params.setCanvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths: params.canvasDefaultShowSegmentLengths,

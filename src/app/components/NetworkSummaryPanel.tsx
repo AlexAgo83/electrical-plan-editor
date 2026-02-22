@@ -81,10 +81,12 @@ export interface NetworkSummaryPanelProps {
   labelStrokeMode: CanvasLabelStrokeMode;
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
+  lockEntityMovement: boolean;
   toggleShowNetworkInfoPanels: () => void;
   toggleShowSegmentLengths: () => void;
   toggleShowNetworkGrid: () => void;
   toggleSnapNodesToGrid: () => void;
+  toggleLockEntityMovement: () => void;
   networkScalePercent: number;
   routingGraphNodeCount: number;
   routingGraphSegmentCount: number;
@@ -131,10 +133,12 @@ export function NetworkSummaryPanel({
   labelStrokeMode,
   showNetworkGrid,
   snapNodesToGrid,
+  lockEntityMovement,
   toggleShowNetworkInfoPanels,
   toggleShowSegmentLengths,
   toggleShowNetworkGrid,
   toggleSnapNodesToGrid,
+  toggleLockEntityMovement,
   networkScalePercent,
   routingGraphNodeCount,
   routingGraphSegmentCount,
@@ -299,6 +303,14 @@ export function NetworkSummaryPanel({
             >
               <span className="network-summary-snap-icon" aria-hidden="true" />
               Snap
+            </button>
+            <button
+              type="button"
+              className={lockEntityMovement ? "workspace-tab is-active" : "workspace-tab"}
+              onClick={toggleLockEntityMovement}
+            >
+              <span className="network-summary-lock-move-icon" aria-hidden="true" />
+              Lock
             </button>
             <button
               type="button"

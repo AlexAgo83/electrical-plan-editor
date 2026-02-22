@@ -19,6 +19,7 @@ export function useAppControllerPreferencesState() {
   const [networkSort, setNetworkSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [canvasDefaultShowGrid, setCanvasDefaultShowGrid] = useState(true);
   const [canvasDefaultSnapToGrid, setCanvasDefaultSnapToGrid] = useState(true);
+  const [canvasDefaultLockEntityMovement, setCanvasDefaultLockEntityMovement] = useState(false);
   const [canvasDefaultShowInfoPanels, setCanvasDefaultShowInfoPanels] = useState(true);
   const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(false);
   const [canvasDefaultLabelStrokeMode, setCanvasDefaultLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
@@ -46,6 +47,8 @@ export function useAppControllerPreferencesState() {
     setCanvasDefaultShowGrid,
     canvasDefaultSnapToGrid,
     setCanvasDefaultSnapToGrid,
+    canvasDefaultLockEntityMovement,
+    setCanvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels,
     setCanvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,

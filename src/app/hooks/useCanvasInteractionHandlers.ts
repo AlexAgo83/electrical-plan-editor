@@ -30,6 +30,7 @@ interface UseCanvasInteractionHandlersParams {
   setNodeFormError: (value: string | null) => void;
   setPendingNewNodePosition: (value: NodePosition | null) => void;
   snapNodesToGrid: boolean;
+  lockEntityMovement: boolean;
   networkOffset: NodePosition;
   networkScale: number;
   setNetworkScale: Dispatch<SetStateAction<number>>;
@@ -75,6 +76,7 @@ export function useCanvasInteractionHandlers({
   setNodeFormError,
   setPendingNewNodePosition,
   snapNodesToGrid,
+  lockEntityMovement,
   networkOffset,
   networkScale,
   setNetworkScale,
@@ -157,11 +159,16 @@ export function useCanvasInteractionHandlers({
   }
 
   function handleNetworkCanvasClick(event: ReactMouseEvent<SVGSVGElement>): void {
-    if (interactionMode !== "addNode") {
+    if (event.target !== event.currentTarget) {
       return;
     }
 
-    if (event.target !== event.currentTarget) {
+    if (interactionMode === "select") {
+      dispatchAction(appActions.clearSelection(), { trackHistory: false });
+      return;
+    }
+
+    if (interactionMode !== "addNode") {
       return;
     }
 
@@ -222,8 +229,11 @@ export function useCanvasInteractionHandlers({
       return;
     }
     event.preventDefault();
-    setDraggingNodeId(nodeId);
     handleNetworkNodeActivate(nodeId);
+    if (lockEntityMovement) {
+      return;
+    }
+    setDraggingNodeId(nodeId);
   }
 
   function handleNetworkCanvasMouseDown(event: ReactMouseEvent<SVGSVGElement>): void {

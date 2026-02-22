@@ -54,6 +54,7 @@ interface UiPreferencesPayload {
   defaultIdSortDirection: SortDirection;
   canvasDefaultShowGrid: boolean;
   canvasDefaultSnapToGrid: boolean;
+  canvasDefaultLockEntityMovement: boolean;
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
@@ -101,6 +102,7 @@ interface UseUiPreferencesOptions {
   defaultIdSortDirection: SortDirection;
   canvasDefaultShowGrid: boolean;
   canvasDefaultSnapToGrid: boolean;
+  canvasDefaultLockEntityMovement: boolean;
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
@@ -125,11 +127,13 @@ interface UseUiPreferencesOptions {
   setSegmentIdSortDirection: (direction: SortDirection) => void;
   setCanvasDefaultShowGrid: (value: boolean) => void;
   setCanvasDefaultSnapToGrid: (value: boolean) => void;
+  setCanvasDefaultLockEntityMovement: (value: boolean) => void;
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setShowNetworkGrid: (value: boolean) => void;
   setSnapNodesToGrid: (value: boolean) => void;
+  setLockEntityMovement: (value: boolean) => void;
   setShowNetworkInfoPanels: (value: boolean) => void;
   setShowSegmentLengths: (value: boolean) => void;
   setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
@@ -153,6 +157,7 @@ export function useUiPreferences({
   defaultIdSortDirection,
   canvasDefaultShowGrid,
   canvasDefaultSnapToGrid,
+  canvasDefaultLockEntityMovement,
   canvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
   canvasDefaultLabelStrokeMode,
@@ -177,11 +182,13 @@ export function useUiPreferences({
   setSegmentIdSortDirection,
   setCanvasDefaultShowGrid,
   setCanvasDefaultSnapToGrid,
+  setCanvasDefaultLockEntityMovement,
   setCanvasDefaultShowInfoPanels,
   setCanvasDefaultShowSegmentLengths,
   setCanvasDefaultLabelStrokeMode,
   setShowNetworkGrid,
   setSnapNodesToGrid,
+  setLockEntityMovement,
   setShowNetworkInfoPanels,
   setShowSegmentLengths,
   setNetworkLabelStrokeMode,
@@ -203,6 +210,10 @@ export function useUiPreferences({
         typeof preferences.canvasDefaultShowGrid === "boolean" ? preferences.canvasDefaultShowGrid : true;
       const snapDefault =
         typeof preferences.canvasDefaultSnapToGrid === "boolean" ? preferences.canvasDefaultSnapToGrid : true;
+      const lockMovementDefault =
+        typeof preferences.canvasDefaultLockEntityMovement === "boolean"
+          ? preferences.canvasDefaultLockEntityMovement
+          : false;
       const showInfoPanelsDefault =
         typeof preferences.canvasDefaultShowInfoPanels === "boolean" ? preferences.canvasDefaultShowInfoPanels : true;
       const showSegmentLengthsDefault =
@@ -240,11 +251,13 @@ export function useUiPreferences({
       setSegmentIdSortDirection(idSortDirection);
       setCanvasDefaultShowGrid(showGridDefault);
       setCanvasDefaultSnapToGrid(snapDefault);
+      setCanvasDefaultLockEntityMovement(lockMovementDefault);
       setCanvasDefaultShowInfoPanels(showInfoPanelsDefault);
       setCanvasDefaultShowSegmentLengths(showSegmentLengthsDefault);
       setCanvasDefaultLabelStrokeMode(labelStrokeModeDefault);
       setShowNetworkGrid(showGridDefault);
       setSnapNodesToGrid(snapDefault);
+      setLockEntityMovement(lockMovementDefault);
       setShowNetworkInfoPanels(showInfoPanelsDefault);
       setShowSegmentLengths(showSegmentLengthsDefault);
       setNetworkLabelStrokeMode(labelStrokeModeDefault);
@@ -266,6 +279,7 @@ export function useUiPreferences({
     networkMinScale,
     setCanvasDefaultShowGrid,
     setCanvasDefaultSnapToGrid,
+    setCanvasDefaultLockEntityMovement,
     setCanvasDefaultShowInfoPanels,
     setCanvasDefaultShowSegmentLengths,
     setCanvasDefaultLabelStrokeMode,
@@ -288,6 +302,7 @@ export function useUiPreferences({
     setShowSegmentLengths,
     setNetworkLabelStrokeMode,
     setSnapNodesToGrid,
+    setLockEntityMovement,
     setSpliceSort,
     setSpliceSynthesisSort,
     setTableDensity,
@@ -312,6 +327,7 @@ export function useUiPreferences({
       defaultIdSortDirection,
       canvasDefaultShowGrid,
       canvasDefaultSnapToGrid,
+      canvasDefaultLockEntityMovement,
       canvasDefaultShowInfoPanels,
       canvasDefaultShowSegmentLengths,
       canvasDefaultLabelStrokeMode,
@@ -329,6 +345,7 @@ export function useUiPreferences({
   }, [
     canvasDefaultShowGrid,
     canvasDefaultSnapToGrid,
+    canvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,
     canvasDefaultLabelStrokeMode,

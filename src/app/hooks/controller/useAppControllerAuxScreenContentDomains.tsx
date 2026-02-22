@@ -159,6 +159,8 @@ export function useAppControllerAuxScreenContentDomains({
     setCanvasDefaultShowGrid: settings.prefs.setCanvasDefaultShowGrid,
     canvasDefaultSnapToGrid: settings.prefs.canvasDefaultSnapToGrid,
     setCanvasDefaultSnapToGrid: settings.prefs.setCanvasDefaultSnapToGrid,
+    canvasDefaultLockEntityMovement: settings.prefs.canvasDefaultLockEntityMovement,
+    setCanvasDefaultLockEntityMovement: settings.prefs.setCanvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels: settings.prefs.canvasDefaultShowInfoPanels,
     setCanvasDefaultShowInfoPanels: settings.prefs.setCanvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths: settings.prefs.canvasDefaultShowSegmentLengths,

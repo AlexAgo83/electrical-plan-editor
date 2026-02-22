@@ -10,6 +10,7 @@ export function useCanvasState() {
   const [isPanningNetwork, setIsPanningNetwork] = useState(false);
   const [showNetworkGrid, setShowNetworkGrid] = useState(true);
   const [snapNodesToGrid, setSnapNodesToGrid] = useState(true);
+  const [lockEntityMovement, setLockEntityMovement] = useState(false);
   const [networkScale, setNetworkScale] = useState(1);
   const [networkOffset, setNetworkOffset] = useState<NodePosition>({ x: 0, y: 0 });
 
@@ -28,6 +29,8 @@ export function useCanvasState() {
     setShowNetworkGrid,
     snapNodesToGrid,
     setSnapNodesToGrid,
+    lockEntityMovement,
+    setLockEntityMovement,
     networkScale,
     setNetworkScale,
     networkOffset,

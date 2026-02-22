@@ -176,6 +176,24 @@ describe("App integration UI - navigation and canvas", () => {
     expect(connectorNode).toHaveClass("is-selected");
   });
 
+  it("clears selection when clicking empty 2D canvas in select mode", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    expect(connectorNode).not.toBeNull();
+
+    fireEvent.mouseDown(connectorNode as Element, { button: 0 });
+    fireEvent.mouseUp(connectorNode as Element, { button: 0 });
+    fireEvent.click(connectorNode as Element);
+    expect(connectorNode).toHaveClass("is-selected");
+
+    fireEvent.click(networkSvg);
+    expect(connectorNode).not.toHaveClass("is-selected");
+  });
+
   it("ignores non-primary mouse buttons for 2D node drag selection and shift-pan starts", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");

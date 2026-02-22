@@ -32,11 +32,13 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     WorkspaceHandlersParams,
     | "canvasDefaultShowGrid"
     | "canvasDefaultSnapToGrid"
+    | "canvasDefaultLockEntityMovement"
     | "canvasDefaultShowInfoPanels"
     | "canvasDefaultShowSegmentLengths"
     | "canvasDefaultLabelStrokeMode"
     | "setShowNetworkGrid"
     | "setSnapNodesToGrid"
+    | "setLockEntityMovement"
     | "setShowNetworkInfoPanels"
     | "setShowSegmentLengths"
     | "setNetworkLabelStrokeMode"
@@ -63,6 +65,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setDefaultIdSortDirection"
     | "setCanvasDefaultShowGrid"
     | "setCanvasDefaultSnapToGrid"
+    | "setCanvasDefaultLockEntityMovement"
     | "setCanvasDefaultShowInfoPanels"
     | "setCanvasDefaultShowSegmentLengths"
     | "setCanvasDefaultLabelStrokeMode"
@@ -178,6 +181,7 @@ interface UseAppControllerCanvasInteractionHandlersAssemblyParams {
   viewport: Pick<
     CanvasInteractionHandlersParams,
     | "snapNodesToGrid"
+    | "lockEntityMovement"
     | "networkOffset"
     | "networkScale"
     | "setNetworkScale"

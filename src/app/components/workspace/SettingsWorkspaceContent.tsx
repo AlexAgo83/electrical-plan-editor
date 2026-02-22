@@ -44,6 +44,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultShowGrid: (value: boolean) => void;
   canvasDefaultSnapToGrid: boolean;
   setCanvasDefaultSnapToGrid: (value: boolean) => void;
+  canvasDefaultLockEntityMovement: boolean;
+  setCanvasDefaultLockEntityMovement: (value: boolean) => void;
   canvasDefaultShowInfoPanels: boolean;
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   canvasDefaultShowSegmentLengths: boolean;
@@ -97,6 +99,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultShowGrid,
   canvasDefaultSnapToGrid,
   setCanvasDefaultSnapToGrid,
+  canvasDefaultLockEntityMovement,
+  setCanvasDefaultLockEntityMovement,
   canvasDefaultShowInfoPanels,
   setCanvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
@@ -200,6 +204,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasDefaultSnapToGrid(event.target.checked)}
             />
             Snap node movement by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultLockEntityMovement}
+              onChange={(event) => setCanvasDefaultLockEntityMovement(event.target.checked)}
+            />
+            Lock node movement by default
           </label>
           <label className="settings-checkbox">
             <input

@@ -54,11 +54,13 @@ interface UseWorkspaceHandlersParams {
   setNetworkOffset: (value: NodePosition) => void;
   canvasDefaultShowGrid: boolean;
   canvasDefaultSnapToGrid: boolean;
+  canvasDefaultLockEntityMovement: boolean;
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   setShowNetworkGrid: (value: boolean | ((current: boolean) => boolean)) => void;
   setSnapNodesToGrid: (value: boolean | ((current: boolean) => boolean)) => void;
+  setLockEntityMovement: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowNetworkInfoPanels: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowSegmentLengths: (value: boolean | ((current: boolean) => boolean)) => void;
   setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode | ((current: CanvasLabelStrokeMode) => CanvasLabelStrokeMode)) => void;
@@ -81,6 +83,7 @@ interface UseWorkspaceHandlersParams {
   setDefaultIdSortDirection: (value: SortDirection) => void;
   setCanvasDefaultShowGrid: (value: boolean) => void;
   setCanvasDefaultSnapToGrid: (value: boolean) => void;
+  setCanvasDefaultLockEntityMovement: (value: boolean) => void;
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
@@ -111,11 +114,13 @@ export function useWorkspaceHandlers({
   setNetworkOffset,
   canvasDefaultShowGrid,
   canvasDefaultSnapToGrid,
+  canvasDefaultLockEntityMovement,
   canvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
   canvasDefaultLabelStrokeMode,
   setShowNetworkGrid,
   setSnapNodesToGrid,
+  setLockEntityMovement,
   setShowNetworkInfoPanels,
   setShowSegmentLengths,
   setNetworkLabelStrokeMode,
@@ -138,6 +143,7 @@ export function useWorkspaceHandlers({
   setDefaultIdSortDirection,
   setCanvasDefaultShowGrid,
   setCanvasDefaultSnapToGrid,
+  setCanvasDefaultLockEntityMovement,
   setCanvasDefaultShowInfoPanels,
   setCanvasDefaultShowSegmentLengths,
   setCanvasDefaultLabelStrokeMode,
@@ -396,6 +402,7 @@ export function useWorkspaceHandlers({
   function applyCanvasDefaultsNow(): void {
     setShowNetworkGrid(canvasDefaultShowGrid);
     setSnapNodesToGrid(canvasDefaultSnapToGrid);
+    setLockEntityMovement(canvasDefaultLockEntityMovement);
     setShowNetworkInfoPanels(canvasDefaultShowInfoPanels);
     setShowSegmentLengths(canvasDefaultShowSegmentLengths);
     setNetworkLabelStrokeMode(canvasDefaultLabelStrokeMode);
@@ -420,12 +427,14 @@ export function useWorkspaceHandlers({
     setSegmentIdSortDirection("asc");
     setCanvasDefaultShowGrid(true);
     setCanvasDefaultSnapToGrid(true);
+    setCanvasDefaultLockEntityMovement(false);
     setCanvasDefaultShowInfoPanels(true);
     setCanvasDefaultShowSegmentLengths(false);
     setCanvasDefaultLabelStrokeMode("normal");
     setCanvasResetZoomPercentInput("100");
     setShowNetworkGrid(true);
     setSnapNodesToGrid(true);
+    setLockEntityMovement(false);
     setShowNetworkInfoPanels(true);
     setShowSegmentLengths(false);
     setNetworkLabelStrokeMode("normal");

@@ -22,6 +22,8 @@ export function buildAppControllerNamespacedCanvasState(canvas: AppControllerCan
       setShowNetworkGrid: canvas.setShowNetworkGrid,
       snapNodesToGrid: canvas.snapNodesToGrid,
       setSnapNodesToGrid: canvas.setSnapNodesToGrid,
+      lockEntityMovement: canvas.lockEntityMovement,
+      setLockEntityMovement: canvas.setLockEntityMovement,
       networkScale: canvas.networkScale,
       setNetworkScale: canvas.setNetworkScale,
       networkOffset: canvas.networkOffset,
