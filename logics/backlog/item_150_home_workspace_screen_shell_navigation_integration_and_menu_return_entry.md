@@ -2,7 +2,7 @@
 > From version: 0.5.11
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Introduce Home as a First-Class Top-Level Screen in the Workspace Navigation
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -34,8 +34,11 @@ The app lacks a dedicated home/landing screen and currently has no explicit top-
 - Dependencies: `req_026` home-screen request.
 - Blocks: item_151, item_152, item_153, item_154, item_155.
 - Related AC: AC1, AC1b, AC3, AC4, AC6.
+- Resolution: Closed via Home top-level screen integration, explicit menu/navigation return entry, and Home-first startup behavior.
 - References:
   - `logics/request/req_026_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub.md`
   - `src/app/AppController.tsx`
   - `src/app/components/layout/AppShellLayout.tsx`
+  - `src/app/components/WorkspaceNavigation.tsx`
   - `src/app/hooks/useWorkspaceShellChrome.ts`
+  - `src/app/hooks/useWorkspaceNavigation.ts`

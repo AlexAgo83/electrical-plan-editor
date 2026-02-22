@@ -2,7 +2,7 @@
 > From version: 0.5.11
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Ensure Home Screen Reliability Across Breakpoints, Themes, and Core Navigation Paths
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -34,10 +34,13 @@ The new home screen changes top-level navigation and adds new UI surfaces; witho
 - Dependencies: item_150, item_151, item_152.
 - Blocks: item_155.
 - Related AC: AC1, AC1b, AC2, AC4, AC6.
+- Resolution: Closed with Home responsive layout + theme coverage and navigation/CTA regression coverage (including Home startup/lazy-path expectation alignment).
 - References:
   - `logics/request/req_026_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub.md`
   - `src/app/styles/base/base-theme-overrides.css`
+  - `src/app/styles/home.css`
   - `src/app/styles/workspace/workspace-shell-and-nav.css`
   - `src/tests/app.ui.theme.spec.tsx`
   - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
-  - `src/tests/app.ui.settings.spec.tsx`
+  - `src/tests/app.ui.home.spec.tsx`
+  - `src/tests/app.ui.lazy-loading-regression.spec.tsx`

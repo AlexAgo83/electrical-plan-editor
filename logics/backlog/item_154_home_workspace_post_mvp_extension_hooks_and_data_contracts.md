@@ -2,7 +2,7 @@
 > From version: 0.5.11
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Prepare Home Screen Architecture for Incremental Post-MVP Modules
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -34,8 +34,11 @@ If the home screen MVP is implemented as a one-off layout without extension boun
 - Dependencies: item_150.
 - Blocks: item_155.
 - Related AC: AC5, AC6.
+- Resolution: Closed with extension-ready Home composition and optional/scaffolded post-MVP module hooks (without making post-MVP modules part of MVP delivery).
 - References:
   - `logics/request/req_026_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub.md`
   - `src/app/AppController.tsx`
   - `src/app/components/layout/AppShellLayout.tsx`
+  - `src/app/components/workspace/HomeWorkspaceContent.tsx`
+  - `src/app/components/containers/HomeWorkspaceContainer.tsx`
   - `src/app/hooks/controller/useAppControllerScreenContentSlices.tsx`

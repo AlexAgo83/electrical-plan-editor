@@ -1,6 +1,6 @@
 ## req_026_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub - Home Workspace Landing Screen for Start/Resume Flows and Post-MVP Hub Evolution
 > From version: 0.5.11
-> Understanding: 99%
+> Understanding: 100%
 > Confidence: 99%
 > Complexity: Medium
 > Theme: Home / Entry Experience for Faster Start and Resume Flows
@@ -115,12 +115,13 @@ These modules should be considered in layout extensibility and data contracts, e
 - Mandatory implementation of all post-MVP modules in the first delivery.
 
 # Backlog
-- To be created from this request (proposed):
-  - Home screen shell + navigation integration
-  - Home MVP content modules (start/resume)
-  - Home responsive/theme coverage and tests
-  - Post-MVP layout extension hooks/data contracts
-  - Closure validation + AC traceability
+- Implemented / tracked via:
+  - `item_150_home_workspace_screen_shell_navigation_integration_and_menu_return_entry.md`
+  - `item_151_home_workspace_mvp_start_and_resume_action_modules.md`
+  - `item_152_home_workspace_quick_shortcuts_and_quick_preferences_modules.md` (MVP de-scope decision documented)
+  - `item_153_home_workspace_responsive_layout_theme_coverage_and_navigation_regression_tests.md`
+  - `item_154_home_workspace_post_mvp_extension_hooks_and_data_contracts.md`
+  - `item_155_req_026_home_screen_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # References
 - `src/app/AppController.tsx`

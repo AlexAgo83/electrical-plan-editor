@@ -2,7 +2,7 @@
 > From version: 0.5.11
 > Understanding: 100%
 > Confidence: 98%
-> Progress: 5%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Final Delivery Gate for Home Workspace Landing Screen MVP and Extension Readiness
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -32,14 +32,15 @@ The home-screen feature spans top-level navigation, new UI content modules, them
 # Notes
 - Dependencies: item_150, item_151, item_152, item_153, item_154.
 - Related AC: AC1, AC1b, AC2, AC3, AC4, AC5, AC6.
+- Resolution: Closed with full validation suite pass and AC traceability documented in `task_025`; later Home follow-up fixes tracked separately under `req_027` / `task_026`.
 - References:
   - `logics/request/req_026_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub.md`
-  - `logics/tasks/task_0xx_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub_orchestration_and_delivery_control.md`
+  - `logics/tasks/task_025_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub_orchestration_and_delivery_control.md`
   - `src/app/AppController.tsx`
   - `src/app/components/layout/AppShellLayout.tsx`
+  - `src/app/components/workspace/HomeWorkspaceContent.tsx`
   - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
-  - `src/app/components/workspace/ValidationWorkspaceContent.tsx`
-  - `src/tests/app.ui.theme.spec.tsx`
-  - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
+  - `src/tests/app.ui.home.spec.tsx`
+  - `src/tests/app.ui.lazy-loading-regression.spec.tsx`
   - `tests/e2e/smoke.spec.ts`
   - `package.json`

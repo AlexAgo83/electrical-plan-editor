@@ -2,7 +2,7 @@
 > From version: 0.5.11
 > Understanding: 99%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Action-First Home Content for Fast Start and Return-to-Work Flows
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -34,9 +34,11 @@ Even with a home screen entry, users still need clear high-value actions to star
 - Dependencies: item_150.
 - Blocks: item_155.
 - Related AC: AC2, AC3, AC4, AC6.
+- Resolution: Closed with Home `Start` + `Resume` modules and workflow-entry CTAs wired to existing app flows (empty/non-empty workspace handling covered).
 - References:
   - `logics/request/req_026_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub.md`
+  - `src/app/components/workspace/HomeWorkspaceContent.tsx`
   - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`
   - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
-  - `src/app/hooks/useWorkspaceHandlers.ts`
-  - `src/store/index.ts`
+  - `src/app/AppController.tsx`
+  - `src/tests/app.ui.home.spec.tsx`
