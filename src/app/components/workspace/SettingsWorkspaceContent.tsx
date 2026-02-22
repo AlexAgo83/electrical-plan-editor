@@ -114,7 +114,7 @@ export function SettingsWorkspaceContent({
     <section className="panel-grid settings-panel-grid">
       <section className="panel settings-panel">
         <header className="settings-panel-header">
-          <h2>Global appearance preferences</h2>
+          <h2>Appearance preferences</h2>
           <span className="settings-panel-chip">Display</span>
         </header>
         <p className="settings-panel-intro">Global visual defaults for theme, table typography, density, and sorting across modeling and analysis views.</p>
@@ -284,6 +284,14 @@ export function SettingsWorkspaceContent({
           <li><span className="technical-id settings-shortcut-key">Alt + F</span> <span>Fit network view to current graph</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + J / Alt + K</span> <span>Previous / next validation issue</span></li>
         </ul>
+      </section>
+
+      <section className="panel settings-panel">
+        <header className="settings-panel-header">
+          <h2>Global preferences</h2>
+          <span className="settings-panel-chip">Defaults</span>
+        </header>
+        <p className="settings-panel-intro">Reset shared UI preferences to their default values across the workspace.</p>
         <div className="row-actions settings-actions">
           <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
         </div>
