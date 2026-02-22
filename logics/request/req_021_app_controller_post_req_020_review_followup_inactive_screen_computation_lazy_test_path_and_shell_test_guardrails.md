@@ -1,7 +1,7 @@
 ## req_021_app_controller_post_req_020_review_followup_inactive_screen_computation_lazy_test_path_and_shell_test_guardrails - AppController Post-req_020 Review Follow-up for Inactive Screen Computation, Lazy Test Path Coverage, and Shell Test Guardrails
 > From version: 0.5.6
-> Understanding: 100%
-> Confidence: 97%
+> Understanding: 99%
+> Confidence: 99%
 > Complexity: Medium
 > Theme: Follow-up hardening after req_020 review (compute scope, lazy coverage, test guardrails)
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -99,6 +99,48 @@ Related delivered context:
   - `item_127_shell_tests_viewport_mutation_cleanup_pattern_generalization.md`
   - `item_128_req_021_followup_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
+# Delivery summary
+- Active-screen domain content assembly scoping delivered:
+  - `AppController` now passes explicit `include*Content` flags to domain screen-content hooks so inactive screen builders are skipped in the common path.
+  - Domain hooks return `null` content for inactive branches while preserving existing render contracts for `AppShellLayout`.
+  - Files: `src/app/AppController.tsx`, `src/app/hooks/controller/useAppControllerModelingAnalysisScreenDomains.tsx`, `src/app/hooks/controller/useAppControllerAuxScreenContentDomains.tsx`
+- Screen-content slice builder naming clarity delivered (hook-rule-safe conditional invocation):
+  - Pure `use*ScreenContentSlice` builders were renamed to `build*ScreenContentSlice` with compatibility aliases retained.
+  - This enables conditional invocation without violating React hook naming expectations in domain hooks.
+  - File: `src/app/hooks/controller/useAppControllerScreenContentSlices.tsx`
+- Lazy-path regression coverage delivered:
+  - `appUiModules` now supports an opt-in test loading mode (`auto` / `eager` / `lazy`) and optional lazy import delay to make `Suspense` fallback behavior observable in tests.
+  - New integration regression tests exercise the real lazy path and assert shell chrome remains visible while workspace fallback is shown.
+  - Files: `src/app/components/appUiModules.tsx`, `src/tests/app.ui.lazy-loading-regression.spec.tsx`
+- Test helper explicitness delivered:
+  - Added explicit navigation helper variants (`switchScreenStrict`, `switchScreenDrawerAware`, `switchSubScreenStrict`, `switchSubScreenDrawerAware`) while retaining backward-compatible aliases.
+  - Shell tests now use explicit drawer-aware switching to document intent under hidden/inert drawer semantics.
+  - Files: `src/tests/helpers/app-ui-test-utils.tsx`, `src/tests/app.ui.inspector-shell.spec.tsx`
+- Viewport cleanup guardrails generalized:
+  - Shared `withViewportWidth(...)` helper introduced and reused in shell tests.
+  - `inspector-shell` now restores viewport width reliably via `afterEach`, and temporary narrow-viewport interactions use the shared helper.
+  - Files: `src/tests/helpers/app-ui-test-utils.tsx`, `src/tests/app.ui.workspace-shell-regression.spec.tsx`, `src/tests/app.ui.inspector-shell.spec.tsx`
+- Validation closure delivered:
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run quality:ui-modularization`
+  - `npm run quality:store-modularization`
+  - `npx vitest run src/tests/app.ui.workspace-shell-regression.spec.tsx src/tests/app.ui.inspector-shell.spec.tsx src/tests/app.ui.lazy-loading-regression.spec.tsx`
+  - `npm run test:ci`
+  - `npm run test:e2e`
+  - `npm run build`
+  - `npm run quality:pwa`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+
+# AC traceability
+- AC1: Satisfied by active-screen include flags and conditional domain builder invocation that skip inactive screen content assembly in the common path.
+- AC2: Satisfied by targeted regressions plus full `test:ci` / `test:e2e` / build validation after compute-scoping changes.
+- AC3: Satisfied by opt-in lazy test mode controls in `appUiModules` and new lazy-path integration regression tests.
+- AC4: Satisfied by lazy-path regression assertions that verify shell chrome stays visible while workspace fallback is rendered.
+- AC5: Satisfied by explicit strict vs drawer-aware screen-switch helper variants and explicit usage in shell tests.
+- AC6: Satisfied by shared viewport cleanup helper and guaranteed viewport restoration in touched shell tests.
+- AC7: Satisfied by full closure validation pipeline and Logics lint passing.
+
 # References
 - `src/app/AppController.tsx`
 - `src/app/components/layout/AppShellLayout.tsx`
@@ -108,5 +150,7 @@ Related delivered context:
 - `src/tests/helpers/app-ui-test-utils.tsx`
 - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
 - `src/tests/app.ui.inspector-shell.spec.tsx`
+- `src/tests/app.ui.lazy-loading-regression.spec.tsx`
 - `logics/request/req_020_app_shell_desktop_overlay_hardening_alignment_and_workspace_suspense_scoping.md`
 - `logics/tasks/task_019_app_shell_desktop_overlay_hardening_alignment_and_workspace_suspense_scoping_orchestration_and_delivery_control.md`
+- `logics/tasks/task_020_app_controller_post_req_020_review_followup_inactive_screen_computation_lazy_test_path_and_shell_test_guardrails_orchestration_and_delivery_control.md`
