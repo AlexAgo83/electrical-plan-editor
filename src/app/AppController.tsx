@@ -54,6 +54,11 @@ import {
 import { appStore } from "./store";
 import { InspectorContextPanel } from "./components/InspectorContextPanel";
 import { NetworkSummaryPanel as NetworkSummaryPanelEager } from "./components/NetworkSummaryPanel";
+import { AnalysisWorkspaceContainer } from "./components/containers/AnalysisWorkspaceContainer";
+import { ModelingWorkspaceContainer } from "./components/containers/ModelingWorkspaceContainer";
+import { NetworkScopeWorkspaceContainer } from "./components/containers/NetworkScopeWorkspaceContainer";
+import { SettingsWorkspaceContainer } from "./components/containers/SettingsWorkspaceContainer";
+import { ValidationWorkspaceContainer } from "./components/containers/ValidationWorkspaceContainer";
 import { AnalysisScreen as AnalysisScreenEager } from "./components/screens/AnalysisScreen";
 import { ModelingScreen as ModelingScreenEager } from "./components/screens/ModelingScreen";
 import { NetworkScopeScreen as NetworkScopeScreenEager } from "./components/screens/NetworkScopeScreen";
@@ -1385,6 +1390,338 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     focusRequestedNetworkId: networkFocusRequest.id,
     focusRequestedNetworkToken: networkFocusRequest.token
   } satisfies ComponentProps<typeof NetworkScopeWorkspaceContentEager>;
+  const modelingPrimaryTablesProps = {
+    isConnectorSubScreen,
+    connectorFormMode,
+    onOpenCreateConnector: resetConnectorForm,
+    connectorOccupancyFilter,
+    setConnectorOccupancyFilter,
+    connectors,
+    visibleConnectors,
+    connectorSort,
+    setConnectorSort,
+    getSortIndicator,
+    connectorOccupiedCountById,
+    selectedConnectorId,
+    onEditConnector: startConnectorEdit,
+    onDeleteConnector: handleConnectorDelete,
+    isSpliceSubScreen,
+    spliceFormMode,
+    onOpenCreateSplice: resetSpliceForm,
+    spliceOccupancyFilter,
+    setSpliceOccupancyFilter,
+    splices,
+    visibleSplices,
+    spliceSort,
+    setSpliceSort,
+    spliceOccupiedCountById,
+    selectedSpliceId,
+    onEditSplice: startSpliceEdit,
+    onDeleteSplice: handleSpliceDelete,
+    isNodeSubScreen,
+    nodeFormMode,
+    onOpenCreateNode: resetNodeForm,
+    nodeKindFilter,
+    setNodeKindFilter,
+    nodes,
+    visibleNodes,
+    nodeIdSortDirection,
+    setNodeIdSortDirection,
+    segmentsCountByNodeId,
+    selectedNodeId,
+    describeNode,
+    onEditNode: startNodeEdit,
+    onDeleteNode: handleNodeDelete
+  } satisfies ComponentProps<typeof ModelingPrimaryTablesEager>;
+  const modelingSecondaryTablesProps = {
+    isSegmentSubScreen,
+    segmentFormMode,
+    onOpenCreateSegment: resetSegmentForm,
+    segmentSubNetworkFilter,
+    setSegmentSubNetworkFilter,
+    segments,
+    visibleSegments,
+    segmentIdSortDirection,
+    setSegmentIdSortDirection,
+    nodeLabelById,
+    selectedSegmentId,
+    selectedWireRouteSegmentIds,
+    onEditSegment: startSegmentEdit,
+    onDeleteSegment: handleSegmentDelete,
+    isWireSubScreen,
+    wireFormMode,
+    onOpenCreateWire: resetWireForm,
+    wireRouteFilter,
+    setWireRouteFilter,
+    wires,
+    visibleWires,
+    wireSort,
+    setWireSort,
+    getSortIndicator,
+    selectedWireId,
+    describeWireEndpoint,
+    describeWireEndpointId,
+    onEditWire: startWireEdit,
+    onDeleteWire: handleWireDelete
+  } satisfies ComponentProps<typeof ModelingSecondaryTablesEager>;
+  const modelingFormsColumnProps = {
+    isConnectorSubScreen,
+    connectorFormMode,
+    openCreateConnectorForm: resetConnectorForm,
+    handleConnectorSubmit,
+    connectorName,
+    setConnectorName,
+    connectorTechnicalId,
+    setConnectorTechnicalId,
+    connectorTechnicalIdAlreadyUsed,
+    cavityCount,
+    setCavityCount,
+    cancelConnectorEdit,
+    connectorFormError,
+    isSpliceSubScreen,
+    spliceFormMode,
+    openCreateSpliceForm: resetSpliceForm,
+    handleSpliceSubmit,
+    spliceName,
+    setSpliceName,
+    spliceTechnicalId,
+    setSpliceTechnicalId,
+    spliceTechnicalIdAlreadyUsed,
+    portCount,
+    setPortCount,
+    cancelSpliceEdit,
+    spliceFormError,
+    isNodeSubScreen,
+    nodeFormMode,
+    openCreateNodeForm: resetNodeForm,
+    handleNodeSubmit,
+    nodeIdInput,
+    setNodeIdInput,
+    pendingNewNodePosition,
+    nodeKind,
+    setNodeKind,
+    nodeLabel,
+    setNodeLabel,
+    connectors,
+    nodeConnectorId,
+    setNodeConnectorId,
+    splices,
+    nodeSpliceId,
+    setNodeSpliceId,
+    cancelNodeEdit,
+    nodeFormError,
+    isSegmentSubScreen,
+    segmentFormMode,
+    openCreateSegmentForm: resetSegmentForm,
+    handleSegmentSubmit,
+    segmentIdInput,
+    setSegmentIdInput,
+    nodes,
+    describeNode,
+    segmentNodeA,
+    setSegmentNodeA,
+    segmentNodeB,
+    setSegmentNodeB,
+    segmentLengthMm,
+    setSegmentLengthMm,
+    segmentSubNetworkTag,
+    setSegmentSubNetworkTag,
+    cancelSegmentEdit,
+    segmentFormError,
+    isWireSubScreen,
+    wireFormMode,
+    openCreateWireForm: resetWireForm,
+    handleWireSubmit,
+    wireName,
+    setWireName,
+    wireTechnicalId,
+    setWireTechnicalId,
+    wireTechnicalIdAlreadyUsed,
+    wireEndpointAKind,
+    setWireEndpointAKind,
+    wireEndpointAConnectorId,
+    setWireEndpointAConnectorId,
+    wireEndpointACavityIndex,
+    setWireEndpointACavityIndex,
+    wireEndpointASpliceId,
+    setWireEndpointASpliceId,
+    wireEndpointAPortIndex,
+    setWireEndpointAPortIndex,
+    wireEndpointBKind,
+    setWireEndpointBKind,
+    wireEndpointBConnectorId,
+    setWireEndpointBConnectorId,
+    wireEndpointBCavityIndex,
+    setWireEndpointBCavityIndex,
+    wireEndpointBSpliceId,
+    setWireEndpointBSpliceId,
+    wireEndpointBPortIndex,
+    setWireEndpointBPortIndex,
+    cancelWireEdit,
+    wireFormError
+  } satisfies ComponentProps<typeof ModelingFormsColumnEager>;
+  const analysisWorkspaceContentProps = {
+    isConnectorSubScreen,
+    isSpliceSubScreen,
+    isWireSubScreen,
+    networkSummaryPanel,
+    selectedConnector,
+    selectedConnectorId,
+    connectorOccupancyFilter,
+    setConnectorOccupancyFilter,
+    connectors,
+    visibleConnectors,
+    connectorSort,
+    setConnectorSort,
+    connectorOccupiedCountById,
+    onSelectConnector: (connectorId: ConnectorId) =>
+      dispatchAction(
+        appActions.select({
+          kind: "connector",
+          id: connectorId
+        })
+      ),
+    cavityIndexInput,
+    setCavityIndexInput,
+    connectorOccupantRefInput,
+    setConnectorOccupantRefInput,
+    handleReserveCavity,
+    connectorCavityStatuses,
+    handleReleaseCavity,
+    sortedConnectorSynthesisRows,
+    connectorSynthesisSort,
+    setConnectorSynthesisSort,
+    getSortIndicator,
+    selectedSplice,
+    selectedSpliceId,
+    spliceOccupancyFilter,
+    setSpliceOccupancyFilter,
+    splices,
+    visibleSplices,
+    spliceSort,
+    setSpliceSort,
+    spliceOccupiedCountById,
+    onSelectSplice: (spliceId: SpliceId) =>
+      dispatchAction(
+        appActions.select({
+          kind: "splice",
+          id: spliceId
+        })
+      ),
+    splicePortStatuses,
+    portIndexInput,
+    setPortIndexInput,
+    spliceOccupantRefInput,
+    setSpliceOccupantRefInput,
+    handleReservePort,
+    handleReleasePort,
+    sortedSpliceSynthesisRows,
+    spliceSynthesisSort,
+    setSpliceSynthesisSort,
+    wireRouteFilter,
+    setWireRouteFilter,
+    wires,
+    visibleWires,
+    wireSort,
+    setWireSort,
+    selectedWireId,
+    onSelectWire: (wireId: WireId) =>
+      dispatchAction(
+        appActions.select({
+          kind: "wire",
+          id: wireId
+        })
+      ),
+    selectedWire,
+    describeWireEndpoint,
+    describeWireEndpointId,
+    wireForcedRouteInput,
+    setWireForcedRouteInput,
+    handleLockWireRoute,
+    handleResetWireRoute,
+    wireFormError
+  } satisfies ComponentProps<typeof AnalysisWorkspaceContentEager>;
+  const validationWorkspaceContentProps = {
+    validationSeverityFilter,
+    setValidationSeverityFilter,
+    validationIssuesForSeverityCounts,
+    validationSeverityCountByLevel,
+    validationCategoryFilter,
+    setValidationCategoryFilter,
+    validationIssuesForCategoryCounts,
+    validationCategories,
+    validationCategoryCountByName,
+    moveVisibleValidationIssueCursor,
+    visibleValidationIssues,
+    clearValidationFilters,
+    validationIssues,
+    groupedValidationIssues,
+    findValidationIssueIndex,
+    validationIssueCursor,
+    handleValidationIssueRowGoTo,
+    validationErrorCount,
+    validationWarningCount
+  } satisfies ComponentProps<typeof ValidationWorkspaceContentEager>;
+  const settingsWorkspaceContentProps = {
+    isCurrentWorkspaceEmpty,
+    hasBuiltInSampleState,
+    handleRecreateSampleNetwork,
+    handleResetSampleNetwork,
+    activeNetworkId,
+    selectedExportNetworkIds,
+    handleExportNetworks,
+    networks,
+    toggleSelectedExportNetwork,
+    handleOpenImportPicker,
+    importFileInputRef,
+    handleImportFileChange,
+    importExportStatus,
+    lastImportSummary,
+    themeMode,
+    setThemeMode,
+    tableDensity,
+    setTableDensity,
+    tableFontSize,
+    setTableFontSize,
+    defaultSortField,
+    setDefaultSortField,
+    defaultSortDirection,
+    setDefaultSortDirection,
+    defaultIdSortDirection,
+    setDefaultIdSortDirection,
+    applyListSortDefaults,
+    canvasDefaultShowGrid,
+    setCanvasDefaultShowGrid,
+    canvasDefaultSnapToGrid,
+    setCanvasDefaultSnapToGrid,
+    canvasDefaultShowInfoPanels,
+    setCanvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentLengths,
+    setCanvasDefaultShowSegmentLengths,
+    canvasDefaultLabelStrokeMode,
+    setCanvasDefaultLabelStrokeMode,
+    canvasResetZoomPercentInput,
+    setCanvasResetZoomPercentInput,
+    configuredResetZoomPercent,
+    applyCanvasDefaultsNow,
+    handleZoomAction,
+    showShortcutHints,
+    setShowShortcutHints,
+    keyboardShortcutsEnabled,
+    setKeyboardShortcutsEnabled,
+    resetWorkspacePreferencesToDefaults
+  } satisfies ComponentProps<typeof SettingsWorkspaceContentEager>;
+  const modelingLeftColumnContent = (
+    <>
+      <ModelingPrimaryTables {...modelingPrimaryTablesProps} />
+      <ModelingSecondaryTables {...modelingSecondaryTablesProps} />
+    </>
+  );
+  const modelingFormsColumnContent = <ModelingFormsColumn {...modelingFormsColumnProps} />;
+  const analysisWorkspaceContent = <AnalysisWorkspaceContent {...analysisWorkspaceContentProps} />;
+  const validationWorkspaceContent = <ValidationWorkspaceContent {...validationWorkspaceContentProps} />;
+  const settingsWorkspaceContent = <SettingsWorkspaceContent {...settingsWorkspaceContentProps} />;
+  const networkScopeWorkspaceContent = <NetworkScopeWorkspaceContent {...networkScopeWorkspaceProps} />;
 
   return (
     <Suspense fallback={null}>
@@ -1465,9 +1802,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         </div>
 
         <section className="workspace-content">
-          <NetworkScopeScreen isActive={isNetworkScopeScreen}>
-            <NetworkScopeWorkspaceContent {...networkScopeWorkspaceProps} />
-          </NetworkScopeScreen>
+          <NetworkScopeWorkspaceContainer
+            ScreenComponent={NetworkScopeScreen}
+            isActive={isNetworkScopeScreen}
+            workspaceContent={networkScopeWorkspaceContent}
+          />
 
           {!isNetworkScopeScreen && !hasActiveNetwork ? (
             <section className="panel">
@@ -1478,347 +1817,31 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             </section>
           ) : !isNetworkScopeScreen ? (
             <>
-          <ModelingScreen isActive={isModelingScreen}>
-        <section className="workspace-stage">
-          <section className="panel-grid workspace-column workspace-column-left">
-            <ModelingPrimaryTables
-              isConnectorSubScreen={isConnectorSubScreen}
-              connectorFormMode={connectorFormMode}
-              onOpenCreateConnector={resetConnectorForm}
-              connectorOccupancyFilter={connectorOccupancyFilter}
-              setConnectorOccupancyFilter={setConnectorOccupancyFilter}
-              connectors={connectors}
-              visibleConnectors={visibleConnectors}
-              connectorSort={connectorSort}
-              setConnectorSort={setConnectorSort}
-              getSortIndicator={getSortIndicator}
-              connectorOccupiedCountById={connectorOccupiedCountById}
-              selectedConnectorId={selectedConnectorId}
-              onEditConnector={startConnectorEdit}
-              onDeleteConnector={handleConnectorDelete}
-              isSpliceSubScreen={isSpliceSubScreen}
-              spliceFormMode={spliceFormMode}
-              onOpenCreateSplice={resetSpliceForm}
-              spliceOccupancyFilter={spliceOccupancyFilter}
-              setSpliceOccupancyFilter={setSpliceOccupancyFilter}
-              splices={splices}
-              visibleSplices={visibleSplices}
-              spliceSort={spliceSort}
-              setSpliceSort={setSpliceSort}
-              spliceOccupiedCountById={spliceOccupiedCountById}
-              selectedSpliceId={selectedSpliceId}
-              onEditSplice={startSpliceEdit}
-              onDeleteSplice={handleSpliceDelete}
-              isNodeSubScreen={isNodeSubScreen}
-              nodeFormMode={nodeFormMode}
-              onOpenCreateNode={resetNodeForm}
-              nodeKindFilter={nodeKindFilter}
-              setNodeKindFilter={setNodeKindFilter}
-              nodes={nodes}
-              visibleNodes={visibleNodes}
-              nodeIdSortDirection={nodeIdSortDirection}
-              setNodeIdSortDirection={setNodeIdSortDirection}
-              segmentsCountByNodeId={segmentsCountByNodeId}
-              selectedNodeId={selectedNodeId}
-              describeNode={describeNode}
-              onEditNode={startNodeEdit}
-              onDeleteNode={handleNodeDelete}
-            />
+              <ModelingWorkspaceContainer
+                ScreenComponent={ModelingScreen}
+                isActive={isModelingScreen}
+                leftColumnContent={modelingLeftColumnContent}
+                formsColumnContent={modelingFormsColumnContent}
+                networkSummaryPanel={networkSummaryPanel}
+              />
 
-            <ModelingSecondaryTables
-              isSegmentSubScreen={isSegmentSubScreen}
-              segmentFormMode={segmentFormMode}
-              onOpenCreateSegment={resetSegmentForm}
-              segmentSubNetworkFilter={segmentSubNetworkFilter}
-              setSegmentSubNetworkFilter={setSegmentSubNetworkFilter}
-              segments={segments}
-              visibleSegments={visibleSegments}
-              segmentIdSortDirection={segmentIdSortDirection}
-              setSegmentIdSortDirection={setSegmentIdSortDirection}
-              nodeLabelById={nodeLabelById}
-              selectedSegmentId={selectedSegmentId}
-              selectedWireRouteSegmentIds={selectedWireRouteSegmentIds}
-              onEditSegment={startSegmentEdit}
-              onDeleteSegment={handleSegmentDelete}
-              isWireSubScreen={isWireSubScreen}
-              wireFormMode={wireFormMode}
-              onOpenCreateWire={resetWireForm}
-              wireRouteFilter={wireRouteFilter}
-              setWireRouteFilter={setWireRouteFilter}
-              wires={wires}
-              visibleWires={visibleWires}
-              wireSort={wireSort}
-              setWireSort={setWireSort}
-              getSortIndicator={getSortIndicator}
-              selectedWireId={selectedWireId}
-              describeWireEndpoint={describeWireEndpoint}
-              describeWireEndpointId={describeWireEndpointId}
-              onEditWire={startWireEdit}
-              onDeleteWire={handleWireDelete}
-            />
-          </section>
-          <ModelingFormsColumn
-            isConnectorSubScreen={isConnectorSubScreen}
-            connectorFormMode={connectorFormMode}
-            openCreateConnectorForm={resetConnectorForm}
-            handleConnectorSubmit={handleConnectorSubmit}
-            connectorName={connectorName}
-            setConnectorName={setConnectorName}
-            connectorTechnicalId={connectorTechnicalId}
-            setConnectorTechnicalId={setConnectorTechnicalId}
-            connectorTechnicalIdAlreadyUsed={connectorTechnicalIdAlreadyUsed}
-            cavityCount={cavityCount}
-            setCavityCount={setCavityCount}
-            cancelConnectorEdit={cancelConnectorEdit}
-            connectorFormError={connectorFormError}
-            isSpliceSubScreen={isSpliceSubScreen}
-            spliceFormMode={spliceFormMode}
-            openCreateSpliceForm={resetSpliceForm}
-            handleSpliceSubmit={handleSpliceSubmit}
-            spliceName={spliceName}
-            setSpliceName={setSpliceName}
-            spliceTechnicalId={spliceTechnicalId}
-            setSpliceTechnicalId={setSpliceTechnicalId}
-            spliceTechnicalIdAlreadyUsed={spliceTechnicalIdAlreadyUsed}
-            portCount={portCount}
-            setPortCount={setPortCount}
-            cancelSpliceEdit={cancelSpliceEdit}
-            spliceFormError={spliceFormError}
-            isNodeSubScreen={isNodeSubScreen}
-            nodeFormMode={nodeFormMode}
-            openCreateNodeForm={resetNodeForm}
-            handleNodeSubmit={handleNodeSubmit}
-            nodeIdInput={nodeIdInput}
-            setNodeIdInput={setNodeIdInput}
-            pendingNewNodePosition={pendingNewNodePosition}
-            nodeKind={nodeKind}
-            setNodeKind={setNodeKind}
-            nodeLabel={nodeLabel}
-            setNodeLabel={setNodeLabel}
-            connectors={connectors}
-            nodeConnectorId={nodeConnectorId}
-            setNodeConnectorId={setNodeConnectorId}
-            splices={splices}
-            nodeSpliceId={nodeSpliceId}
-            setNodeSpliceId={setNodeSpliceId}
-            cancelNodeEdit={cancelNodeEdit}
-            nodeFormError={nodeFormError}
-            isSegmentSubScreen={isSegmentSubScreen}
-            segmentFormMode={segmentFormMode}
-            openCreateSegmentForm={resetSegmentForm}
-            handleSegmentSubmit={handleSegmentSubmit}
-            segmentIdInput={segmentIdInput}
-            setSegmentIdInput={setSegmentIdInput}
-            nodes={nodes}
-            describeNode={describeNode}
-            segmentNodeA={segmentNodeA}
-            setSegmentNodeA={setSegmentNodeA}
-            segmentNodeB={segmentNodeB}
-            setSegmentNodeB={setSegmentNodeB}
-            segmentLengthMm={segmentLengthMm}
-            setSegmentLengthMm={setSegmentLengthMm}
-            segmentSubNetworkTag={segmentSubNetworkTag}
-            setSegmentSubNetworkTag={setSegmentSubNetworkTag}
-            cancelSegmentEdit={cancelSegmentEdit}
-            segmentFormError={segmentFormError}
-            isWireSubScreen={isWireSubScreen}
-            wireFormMode={wireFormMode}
-            openCreateWireForm={resetWireForm}
-            handleWireSubmit={handleWireSubmit}
-            wireName={wireName}
-            setWireName={setWireName}
-            wireTechnicalId={wireTechnicalId}
-            setWireTechnicalId={setWireTechnicalId}
-            wireTechnicalIdAlreadyUsed={wireTechnicalIdAlreadyUsed}
-            wireEndpointAKind={wireEndpointAKind}
-            setWireEndpointAKind={setWireEndpointAKind}
-            wireEndpointAConnectorId={wireEndpointAConnectorId}
-            setWireEndpointAConnectorId={setWireEndpointAConnectorId}
-            wireEndpointACavityIndex={wireEndpointACavityIndex}
-            setWireEndpointACavityIndex={setWireEndpointACavityIndex}
-            wireEndpointASpliceId={wireEndpointASpliceId}
-            setWireEndpointASpliceId={setWireEndpointASpliceId}
-            wireEndpointAPortIndex={wireEndpointAPortIndex}
-            setWireEndpointAPortIndex={setWireEndpointAPortIndex}
-            wireEndpointBKind={wireEndpointBKind}
-            setWireEndpointBKind={setWireEndpointBKind}
-            wireEndpointBConnectorId={wireEndpointBConnectorId}
-            setWireEndpointBConnectorId={setWireEndpointBConnectorId}
-            wireEndpointBCavityIndex={wireEndpointBCavityIndex}
-            setWireEndpointBCavityIndex={setWireEndpointBCavityIndex}
-            wireEndpointBSpliceId={wireEndpointBSpliceId}
-            setWireEndpointBSpliceId={setWireEndpointBSpliceId}
-            wireEndpointBPortIndex={wireEndpointBPortIndex}
-            setWireEndpointBPortIndex={setWireEndpointBPortIndex}
-            cancelWireEdit={cancelWireEdit}
-            wireFormError={wireFormError}
-          />
-          <section className="panel-grid workspace-column workspace-column-center">{networkSummaryPanel}</section>
-        </section>
-      </ModelingScreen>
+              <AnalysisWorkspaceContainer
+                ScreenComponent={AnalysisScreen}
+                isActive={isAnalysisScreen}
+                workspaceContent={analysisWorkspaceContent}
+              />
 
-      <AnalysisScreen isActive={isAnalysisScreen}>
-        <AnalysisWorkspaceContent
-          isConnectorSubScreen={isConnectorSubScreen}
-          isSpliceSubScreen={isSpliceSubScreen}
-          isWireSubScreen={isWireSubScreen}
-          networkSummaryPanel={networkSummaryPanel}
-          selectedConnector={selectedConnector}
-          selectedConnectorId={selectedConnectorId}
-          connectorOccupancyFilter={connectorOccupancyFilter}
-          setConnectorOccupancyFilter={setConnectorOccupancyFilter}
-          connectors={connectors}
-          visibleConnectors={visibleConnectors}
-          connectorSort={connectorSort}
-          setConnectorSort={setConnectorSort}
-          connectorOccupiedCountById={connectorOccupiedCountById}
-          onSelectConnector={(connectorId) =>
-            dispatchAction(
-              appActions.select({
-                kind: "connector",
-                id: connectorId
-              })
-            )
-          }
-          cavityIndexInput={cavityIndexInput}
-          setCavityIndexInput={setCavityIndexInput}
-          connectorOccupantRefInput={connectorOccupantRefInput}
-          setConnectorOccupantRefInput={setConnectorOccupantRefInput}
-          handleReserveCavity={handleReserveCavity}
-          connectorCavityStatuses={connectorCavityStatuses}
-          handleReleaseCavity={handleReleaseCavity}
-          sortedConnectorSynthesisRows={sortedConnectorSynthesisRows}
-          connectorSynthesisSort={connectorSynthesisSort}
-          setConnectorSynthesisSort={setConnectorSynthesisSort}
-          getSortIndicator={getSortIndicator}
-          selectedSplice={selectedSplice}
-          selectedSpliceId={selectedSpliceId}
-          spliceOccupancyFilter={spliceOccupancyFilter}
-          setSpliceOccupancyFilter={setSpliceOccupancyFilter}
-          splices={splices}
-          visibleSplices={visibleSplices}
-          spliceSort={spliceSort}
-          setSpliceSort={setSpliceSort}
-          spliceOccupiedCountById={spliceOccupiedCountById}
-          onSelectSplice={(spliceId) =>
-            dispatchAction(
-              appActions.select({
-                kind: "splice",
-                id: spliceId
-              })
-            )
-          }
-          splicePortStatuses={splicePortStatuses}
-          portIndexInput={portIndexInput}
-          setPortIndexInput={setPortIndexInput}
-          spliceOccupantRefInput={spliceOccupantRefInput}
-          setSpliceOccupantRefInput={setSpliceOccupantRefInput}
-          handleReservePort={handleReservePort}
-          handleReleasePort={handleReleasePort}
-          sortedSpliceSynthesisRows={sortedSpliceSynthesisRows}
-          spliceSynthesisSort={spliceSynthesisSort}
-          setSpliceSynthesisSort={setSpliceSynthesisSort}
-          wireRouteFilter={wireRouteFilter}
-          setWireRouteFilter={setWireRouteFilter}
-          wires={wires}
-          visibleWires={visibleWires}
-          wireSort={wireSort}
-          setWireSort={setWireSort}
-          selectedWireId={selectedWireId}
-          onSelectWire={(wireId) =>
-            dispatchAction(
-              appActions.select({
-                kind: "wire",
-                id: wireId
-              })
-            )
-          }
-          selectedWire={selectedWire}
-          describeWireEndpoint={describeWireEndpoint}
-          describeWireEndpointId={describeWireEndpointId}
-          wireForcedRouteInput={wireForcedRouteInput}
-          setWireForcedRouteInput={setWireForcedRouteInput}
-          handleLockWireRoute={handleLockWireRoute}
-          handleResetWireRoute={handleResetWireRoute}
-          wireFormError={wireFormError}
-        />
-      </AnalysisScreen>
+              <ValidationWorkspaceContainer
+                ScreenComponent={ValidationScreen}
+                isActive={isValidationScreen}
+                workspaceContent={validationWorkspaceContent}
+              />
 
-      <ValidationScreen isActive={isValidationScreen}>
-        <ValidationWorkspaceContent
-          validationSeverityFilter={validationSeverityFilter}
-          setValidationSeverityFilter={setValidationSeverityFilter}
-          validationIssuesForSeverityCounts={validationIssuesForSeverityCounts}
-          validationSeverityCountByLevel={validationSeverityCountByLevel}
-          validationCategoryFilter={validationCategoryFilter}
-          setValidationCategoryFilter={setValidationCategoryFilter}
-          validationIssuesForCategoryCounts={validationIssuesForCategoryCounts}
-          validationCategories={validationCategories}
-          validationCategoryCountByName={validationCategoryCountByName}
-          moveVisibleValidationIssueCursor={moveVisibleValidationIssueCursor}
-          visibleValidationIssues={visibleValidationIssues}
-          clearValidationFilters={clearValidationFilters}
-          validationIssues={validationIssues}
-          groupedValidationIssues={groupedValidationIssues}
-          findValidationIssueIndex={findValidationIssueIndex}
-          validationIssueCursor={validationIssueCursor}
-          handleValidationIssueRowGoTo={handleValidationIssueRowGoTo}
-          validationErrorCount={validationErrorCount}
-          validationWarningCount={validationWarningCount}
-        />
-      </ValidationScreen>
-
-      <SettingsScreen isActive={isSettingsScreen}>
-        <SettingsWorkspaceContent
-          isCurrentWorkspaceEmpty={isCurrentWorkspaceEmpty}
-          hasBuiltInSampleState={hasBuiltInSampleState}
-          handleRecreateSampleNetwork={handleRecreateSampleNetwork}
-          handleResetSampleNetwork={handleResetSampleNetwork}
-          activeNetworkId={activeNetworkId}
-          selectedExportNetworkIds={selectedExportNetworkIds}
-          handleExportNetworks={handleExportNetworks}
-          networks={networks}
-          toggleSelectedExportNetwork={toggleSelectedExportNetwork}
-          handleOpenImportPicker={handleOpenImportPicker}
-          importFileInputRef={importFileInputRef}
-          handleImportFileChange={handleImportFileChange}
-          importExportStatus={importExportStatus}
-          lastImportSummary={lastImportSummary}
-          themeMode={themeMode}
-          setThemeMode={setThemeMode}
-          tableDensity={tableDensity}
-          setTableDensity={setTableDensity}
-          tableFontSize={tableFontSize}
-          setTableFontSize={setTableFontSize}
-          defaultSortField={defaultSortField}
-          setDefaultSortField={setDefaultSortField}
-          defaultSortDirection={defaultSortDirection}
-          setDefaultSortDirection={setDefaultSortDirection}
-          defaultIdSortDirection={defaultIdSortDirection}
-          setDefaultIdSortDirection={setDefaultIdSortDirection}
-          applyListSortDefaults={applyListSortDefaults}
-          canvasDefaultShowGrid={canvasDefaultShowGrid}
-          setCanvasDefaultShowGrid={setCanvasDefaultShowGrid}
-          canvasDefaultSnapToGrid={canvasDefaultSnapToGrid}
-          setCanvasDefaultSnapToGrid={setCanvasDefaultSnapToGrid}
-          canvasDefaultShowInfoPanels={canvasDefaultShowInfoPanels}
-          setCanvasDefaultShowInfoPanels={setCanvasDefaultShowInfoPanels}
-          canvasDefaultShowSegmentLengths={canvasDefaultShowSegmentLengths}
-          setCanvasDefaultShowSegmentLengths={setCanvasDefaultShowSegmentLengths}
-          canvasDefaultLabelStrokeMode={canvasDefaultLabelStrokeMode}
-          setCanvasDefaultLabelStrokeMode={setCanvasDefaultLabelStrokeMode}
-          canvasResetZoomPercentInput={canvasResetZoomPercentInput}
-          setCanvasResetZoomPercentInput={setCanvasResetZoomPercentInput}
-          configuredResetZoomPercent={configuredResetZoomPercent}
-          applyCanvasDefaultsNow={applyCanvasDefaultsNow}
-          handleZoomAction={handleZoomAction}
-          showShortcutHints={showShortcutHints}
-          setShowShortcutHints={setShowShortcutHints}
-          keyboardShortcutsEnabled={keyboardShortcutsEnabled}
-          setKeyboardShortcutsEnabled={setKeyboardShortcutsEnabled}
-          resetWorkspacePreferencesToDefaults={resetWorkspacePreferencesToDefaults}
-        />
-      </SettingsScreen>
+              <SettingsWorkspaceContainer
+                ScreenComponent={SettingsScreen}
+                isActive={isSettingsScreen}
+                workspaceContent={settingsWorkspaceContent}
+              />
             </>
           ) : null}
         </section>
