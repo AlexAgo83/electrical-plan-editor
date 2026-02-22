@@ -2,7 +2,6 @@ services:
   - type: web
     name: e-plan-editor
     runtime: static
-    plan: free
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
     pullRequestPreviewsEnabled: true
