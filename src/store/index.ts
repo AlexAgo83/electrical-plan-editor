@@ -9,6 +9,7 @@ export {
 } from "./sampleNetwork";
 export * from "./selectors";
 export {
+  createEmptyWorkspaceState,
   createInitialState,
   createEmptyNetworkScopedState,
   type AppState,

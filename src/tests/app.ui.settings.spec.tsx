@@ -204,7 +204,7 @@ describe("App integration UI - settings", () => {
 
     switchScreenDrawerAware("settings");
     const settingsPanel = getPanelByHeading("Action bar and shortcuts");
-    fireEvent.click(within(settingsPanel).getByLabelText("Enable keyboard shortcuts (undo/redo/navigation/modes)"));
+    fireEvent.click(within(settingsPanel).getByLabelText("Enable keyboard shortcuts (undo/redo/navigation/issues/view)"));
 
     switchScreenDrawerAware("networkScope");
     fireEvent.keyDown(window, { key: "2", altKey: true });

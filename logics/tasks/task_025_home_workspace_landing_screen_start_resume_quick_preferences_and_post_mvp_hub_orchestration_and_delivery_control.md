@@ -1,14 +1,14 @@
-## task_025_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub_orchestration_and_delivery_control - Home Workspace Landing Screen Orchestration and Delivery Control (Start/Resume, Quick Preferences, Post-MVP Hub Hooks)
+## task_025_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub_orchestration_and_delivery_control - Home Workspace Landing Screen Orchestration and Delivery Control (Start/Resume MVP, Post-MVP Hub Hooks)
 > From version: 0.5.11
-> Understanding: 100%
-> Confidence: 98%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 99%
+> Progress: 5%
 > Complexity: Medium
 > Theme: Delivery Orchestration for Home Workspace Entry Experience
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
 # Context
-Orchestration task for `req_026`. This task coordinates delivery of a new home workspace landing screen focused on action-first startup/resume flows, quick shortcuts/preferences, and extension-ready structure for post-MVP modules.
+Orchestration task for `req_026`. This task coordinates delivery of a new home workspace landing screen focused on action-first startup/resume flows and extension-ready structure for post-MVP modules. The previously planned `Quick shortcuts` / `Quick preferences` Home modules were removed from MVP scope and are tracked as a documented de-scope decision.
 
 Backlog scope covered:
 - `item_150_home_workspace_screen_shell_navigation_integration_and_menu_return_entry.md`
@@ -21,7 +21,7 @@ Backlog scope covered:
 # Plan
 - [ ] 1. Deliver Wave 0 home screen shell + top-level navigation integration + explicit menu return entry (`item_150`)
 - [ ] 2. Deliver Wave 1 home MVP Start/Resume action modules and state-aware summaries (`item_151`)
-- [ ] 3. Deliver Wave 2 home Quick shortcuts + Quick preferences modules using existing handlers/preferences (`item_152`)
+- [ ] 3. Record de-scope of Home Quick shortcuts + Quick preferences MVP modules and preserve post-MVP intent (`item_152`)
 - [ ] 4. Deliver Wave 3 responsive layout/theme coverage and navigation regression tests (`item_153`)
 - [ ] 5. Deliver Wave 4 post-MVP extension hooks / data-contract scaffolding for future home modules (`item_154`)
 - [ ] 6. Deliver Wave 5 closure: CI/E2E/build/PWA pass and `req_026` AC traceability (`item_155`)
@@ -52,7 +52,7 @@ Backlog scope covered:
 - Wave status:
   - Wave 0 pending: home screen shell + menu return entry to be integrated as top-level navigation target.
   - Wave 1 pending: action-first Start/Resume modules to be implemented with empty/non-empty workspace behavior.
-  - Wave 2 pending: quick shortcuts/preferences module wiring to existing handlers/preferences.
+  - Wave 2 pending: document quick shortcuts/preferences de-scope from MVP while preserving post-MVP extensibility intent.
   - Wave 3 pending: responsive + theme coverage and navigation regressions for the new screen.
   - Wave 4 pending: extension hooks/contracts for post-MVP modules (history/session/health/what's-new).
   - Wave 5 pending: closure validation and AC traceability.
@@ -61,7 +61,7 @@ Backlog scope covered:
 - Main risks to track:
   - Home screen navigation integration regresses existing top-level screen switching or shell shortcuts.
   - Home CTAs duplicate logic and drift from existing handlers (create/import/open screens).
-  - Quick preferences duplicate Settings state/behavior instead of reusing persisted preference flows.
+  - Scope drift between `req_026` planning docs and the implemented Home MVP (quick panels removed) creates ambiguous AC closure.
   - Theme coverage gaps appear due to introducing a new panel family/surface.
   - Home MVP grows into a dashboard and loses action-first utility.
 - Mitigation strategy:
@@ -75,7 +75,7 @@ Backlog scope covered:
   - Pending implementation.
 - AC traceability (`req_026`) target mapping:
   - AC1 / AC1b: Wave 0 (`item_150`) + Wave 3 (`item_153`) + Wave 5 (`item_155`)
-  - AC2 / AC3: Waves 1-2 (`item_151`, `item_152`) + Wave 5 (`item_155`)
+  - AC2 / AC3: Waves 1-2 (`item_151`, `item_152` de-scope decision) + Wave 5 (`item_155`)
   - AC4: Wave 3 (`item_153`) + Wave 5 (`item_155`)
   - AC5: Wave 4 (`item_154`) + Wave 5 (`item_155`)
   - AC6: Wave 5 (`item_155`) + FINAL docs update

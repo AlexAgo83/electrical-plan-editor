@@ -1,7 +1,7 @@
-## req_026_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub - Home Workspace Landing Screen for Start/Resume Flows, Quick Preferences, and Post-MVP Hub Evolution
+## req_026_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub - Home Workspace Landing Screen for Start/Resume Flows and Post-MVP Hub Evolution
 > From version: 0.5.11
-> Understanding: 100%
-> Confidence: 98%
+> Understanding: 99%
+> Confidence: 99%
 > Complexity: Medium
 > Theme: Home / Entry Experience for Faster Start and Resume Flows
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -40,12 +40,8 @@ MVP content should include:
 - **Resume section**
   - Continue with active network / current workspace
   - Compact summary (active network name/ID if available, network count, save status)
-- **Quick shortcuts section**
-  - A small curated set of high-value shortcuts/actions (navigation/settings/validation/undo-redo guidance)
-- **Quick preferences section**
-  - Theme selector (or theme quick-open)
-  - Floating inspector visibility toggle
-  - Optional canvas defaults shortcuts if low-cost (grid/snap/lock defaults)
+- **Operational resume CTAs**
+  - Quick routing back into primary workflows (modeling / analysis / validation) from the current workspace context
 
 ### B. UX behavior and navigation integration (high priority)
 - Integrate the home screen into the existing workspace navigation shell as a first-class top-level destination.
@@ -84,7 +80,7 @@ These modules should be considered in layout extensibility and data contracts, e
 ## Information Architecture / Suggested Layout (guidance)
 - Desktop (recommended): 2 columns
   - Left: Start + Resume (primary actions)
-  - Right: Quick shortcuts + Quick preferences
+  - Right: Optional reserved space for future/post-MVP modules
 - Mobile (recommended): single stacked column
 - Optional future expansion:
   - Secondary row/sections for post-MVP modules (history / health / what’s new)
@@ -106,7 +102,7 @@ These modules should be considered in layout extensibility and data contracts, e
 ## Acceptance criteria
 - AC1: A dedicated home screen exists and is accessible as a top-level app screen.
 - AC1b: The workspace menu/navigation includes an explicit control to return to the home screen.
-- AC2: The home screen provides actionable MVP sections for Start, Resume, Quick shortcuts, and Quick preferences.
+- AC2: The home screen provides actionable MVP sections for Start and Resume with workflow-entry CTAs.
 - AC3: The home screen is useful in both empty-workspace and active-workspace states.
 - AC4: The layout is responsive and visually aligned with the existing panel system/themes.
 - AC5: MVP implementation leaves clean extension points for post-MVP modules (history/session/health/what’s new) without structural rewrite.
@@ -121,7 +117,7 @@ These modules should be considered in layout extensibility and data contracts, e
 # Backlog
 - To be created from this request (proposed):
   - Home screen shell + navigation integration
-  - Home MVP content modules (start/resume/shortcuts/preferences)
+  - Home MVP content modules (start/resume)
   - Home responsive/theme coverage and tests
   - Post-MVP layout extension hooks/data contracts
   - Closure validation + AC traceability

@@ -296,7 +296,7 @@ export function SettingsWorkspaceContent({
               checked={keyboardShortcutsEnabled}
               onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
             />
-            Enable keyboard shortcuts (undo/redo/navigation/modes)
+            Enable keyboard shortcuts (undo/redo/navigation/issues/view)
           </label>
           <label className="settings-checkbox">
             <input
@@ -313,7 +313,6 @@ export function SettingsWorkspaceContent({
           <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Y</span> <span>Redo (alternative shortcut)</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + 1..6</span> <span>Switch top-level workspace</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + Shift + 1..5</span> <span>Switch entity sub-screen</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + V/N/G/C/R</span> <span>Set interaction mode</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + F</span> <span>Fit network view to current graph</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + J / Alt + K</span> <span>Previous / next validation issue</span></li>
         </ul>

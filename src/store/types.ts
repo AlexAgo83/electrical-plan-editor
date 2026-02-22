@@ -99,6 +99,31 @@ export function createEmptyNetworkScopedState(): NetworkScopedState {
   };
 }
 
+export function createEmptyWorkspaceState(themeMode: ThemeMode = "normal"): AppState {
+  return {
+    schemaVersion: APP_SCHEMA_VERSION,
+    networks: createEmptyEntityState<Network, NetworkId>(),
+    activeNetworkId: null,
+    networkStates: {} as Record<NetworkId, NetworkScopedState>,
+    connectors: createEmptyEntityState<Connector, ConnectorId>(),
+    splices: createEmptyEntityState<Splice, SpliceId>(),
+    nodes: createEmptyEntityState<NetworkNode, NodeId>(),
+    segments: createEmptyEntityState<Segment, SegmentId>(),
+    wires: createEmptyEntityState<Wire, WireId>(),
+    nodePositions: {} as Record<NodeId, LayoutNodePosition>,
+    connectorCavityOccupancy: {} as Record<ConnectorId, Record<number, string>>,
+    splicePortOccupancy: {} as Record<SpliceId, Record<number, string>>,
+    ui: {
+      selected: null,
+      lastError: null,
+      themeMode
+    },
+    meta: {
+      revision: 0
+    }
+  };
+}
+
 export function createInitialState(): AppState {
   const defaultScopedState = createEmptyNetworkScopedState();
   const defaultNetwork: Network = {

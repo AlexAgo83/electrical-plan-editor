@@ -1,8 +1,8 @@
 ## item_155_req_026_home_screen_closure_ci_e2e_build_pwa_and_ac_traceability - req_026 Home Screen Closure (CI / E2E / Build / PWA / AC Traceability)
 > From version: 0.5.11
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 5%
 > Complexity: Medium
 > Theme: Final Delivery Gate for Home Workspace Landing Screen MVP and Extension Readiness
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -13,7 +13,7 @@ The home-screen feature spans top-level navigation, new UI content modules, them
 # Scope
 - In:
   - Run and stabilize closure validation suite after `req_026` implementation.
-  - Verify navigation, home MVP modules, responsive/theme coverage, and extension-hook decisions.
+  - Verify navigation, Home MVP modules (Start/Resume), responsive/theme coverage, and extension-hook decisions.
   - Document `req_026` AC traceability and final request/task/backlog statuses.
 - Out:
   - New home-screen features beyond approved `req_026` scope.

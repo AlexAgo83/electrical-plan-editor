@@ -1,8 +1,8 @@
 ## item_156_home_create_empty_workspace_cta_new_workspace_behavior_and_preference_preservation - Home `Create empty workspace` CTA New-Workspace Behavior and Preference Preservation
 > From version: 0.6.1
-> Understanding: 99%
-> Confidence: 98%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Make Home Empty-Workspace CTA Behavior Truthful and Creation-Oriented
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.

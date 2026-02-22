@@ -1,5 +1,5 @@
-import { fireEvent, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, screen, within } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import {
   createUiIntegrationState,
   createValidationIssueState,
@@ -37,5 +37,34 @@ describe("home workspace screen", () => {
     fireEvent.click(within(resumePanel).getByRole("button", { name: "Validation" }));
 
     expect(getPanelByHeading("Validation center")).toBeInTheDocument();
+  });
+
+  it("creates a genuinely empty workspace from Home without resetting theme mode", () => {
+    const base = createUiIntegrationState();
+    const initial = {
+      ...base,
+      ui: {
+        ...base.ui,
+        themeMode: "burgundyNoir" as const
+      }
+    };
+    const { store } = renderAppWithState(initial);
+    const previousThemeMode = store.getState().ui.themeMode;
+
+    switchScreenDrawerAware("home");
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    fireEvent.click(screen.getByRole("button", { name: "Create empty workspace" }));
+    confirmSpy.mockRestore();
+
+    const nextState = store.getState();
+    expect(nextState.networks.allIds).toHaveLength(0);
+    expect(nextState.activeNetworkId).toBeNull();
+    expect(nextState.connectors.allIds).toHaveLength(0);
+    expect(nextState.splices.allIds).toHaveLength(0);
+    expect(nextState.nodes.allIds).toHaveLength(0);
+    expect(nextState.segments.allIds).toHaveLength(0);
+    expect(nextState.wires.allIds).toHaveLength(0);
+    expect(nextState.ui.themeMode).toBe(previousThemeMode);
+    expect(getPanelByHeading("Network Scope")).toBeInTheDocument();
   });
 });

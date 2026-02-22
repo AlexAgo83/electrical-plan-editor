@@ -1,8 +1,8 @@
 ## task_026_home_screen_post_review_followup_empty_workspace_cta_truthfulness_shortcut_docs_alignment_lazy_startup_tests_and_logics_scope_sync_orchestration_and_delivery_control - Home Screen Post-Review Follow-up Orchestration and Delivery Control (CTA Truthfulness, Shortcut Docs, Startup Tests, Logics Sync)
 > From version: 0.6.1
 > Understanding: 100%
-> Confidence: 98%
-> Progress: 0%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Delivery Orchestration for Home Post-Review Corrections and Scope Synchronization
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -18,12 +18,12 @@ Backlog scope covered:
 - `item_160_req_027_followup_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 Home CTA truthfulness fix: create a genuine new empty workspace and preserve unrelated preferences (`item_156`)
-- [ ] 2. Deliver Wave 1 Settings shortcut documentation cleanup aligned to implemented keyboard bindings (`item_157`)
-- [ ] 3. Deliver Wave 2 Home-first startup/lazy-loading regression expectation alignment (`item_158`)
-- [ ] 4. Deliver Wave 3 Logics scope/AC synchronization for `req_026` artifacts after quick-panel removal (`item_159`)
-- [ ] 5. Deliver Wave 4 closure: CI/E2E/build/PWA pass and `req_027` AC traceability (`item_160`)
-- [ ] FINAL: Update related Logics docs (request/task/backlog statuses + delivery summary)
+- [x] 1. Deliver Wave 0 Home CTA truthfulness fix: create a genuine new empty workspace and preserve unrelated preferences (`item_156`)
+- [x] 2. Deliver Wave 1 Settings shortcut documentation cleanup aligned to implemented keyboard bindings (`item_157`)
+- [x] 3. Deliver Wave 2 Home-first startup/lazy-loading regression expectation alignment (`item_158`)
+- [x] 4. Deliver Wave 3 Logics scope/AC synchronization for `req_026` artifacts after quick-panel removal (`item_159`)
+- [x] 5. Deliver Wave 4 closure: CI/E2E/build/PWA pass and `req_027` AC traceability (`item_160`)
+- [x] FINAL: Update related Logics docs (request/task/backlog statuses + delivery summary)
 
 # Validation
 - Documentation / Logics:
@@ -47,13 +47,13 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 pending: Home CTA must create a real empty workspace without reset/sample semantics.
-  - Wave 1 pending: obsolete Settings shortcut hints must be removed/updated to match code.
-  - Wave 2 pending: startup/lazy-loading regression tests must be aligned to Home-first launch behavior.
-  - Wave 3 pending: `req_026` planning docs must be synchronized with current Home MVP scope after quick-panel removal.
-  - Wave 4 pending: closure validation and AC traceability.
+  - Wave 0 completed: Home CTA now creates a genuinely empty workspace and preserves current theme mode when replacing the workspace.
+  - Wave 1 completed: Settings shortcut documentation no longer advertises removed interaction-mode shortcuts and matches implemented bindings.
+  - Wave 2 completed: Home-first startup lazy-loading regression expectations updated (`Home` panel heading loaded instead of `Network Scope`).
+  - Wave 3 completed: `req_026` / `task_025` / `item_152` / `item_155` wording synchronized with quick-panel MVP de-scope decision.
+  - Wave 4 completed: closure validation suite passed and AC traceability documented.
 - Current blockers:
-  - None (planning stage).
+  - None.
 - Main risks to track:
   - "Empty workspace" fix accidentally reuses reset/sample paths and keeps misleading semantics.
   - CTA fix unintentionally resets UI preferences or breaks undo/redo history expectations.
@@ -67,13 +67,35 @@ Backlog scope covered:
 - Validation snapshot (kickoff):
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK (request + follow-up planning docs)
 - Delivery snapshot:
-  - Pending implementation.
+  - Code:
+    - `src/store/types.ts` (`createEmptyWorkspaceState(...)`)
+    - `src/store/index.ts` (export)
+    - `src/app/AppController.tsx` (Home CTA wired to true empty workspace + theme preservation)
+    - `src/app/components/workspace/SettingsWorkspaceContent.tsx` (shortcut docs alignment)
+    - `src/tests/app.ui.home.spec.tsx` (CTA regression coverage)
+    - `src/tests/app.ui.settings.spec.tsx` (shortcut toggle label alignment)
+    - `src/tests/app.ui.lazy-loading-regression.spec.tsx` (Home-first startup expectations)
+  - Logics sync:
+    - `logics/request/req_026_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub.md`
+    - `logics/tasks/task_025_home_workspace_landing_screen_start_resume_quick_preferences_and_post_mvp_hub_orchestration_and_delivery_control.md`
+    - `logics/backlog/item_152_home_workspace_quick_shortcuts_and_quick_preferences_modules.md`
+    - `logics/backlog/item_155_req_026_home_screen_closure_ci_e2e_build_pwa_and_ac_traceability.md`
+  - Validation results:
+    - `npm run lint` OK
+    - `npm run typecheck` OK
+    - `npm run quality:ui-modularization` OK
+    - `npm run quality:store-modularization` OK
+    - `npm run test:ci` OK (`28` files / `155` tests)
+    - `npm run test:e2e` OK (`2/2`)
+    - `npm run build` OK
+    - `npm run quality:pwa` OK
+    - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
 - AC traceability (`req_027`) target mapping:
-  - AC1: Wave 0 (`item_156`) + Wave 4 (`item_160`)
-  - AC2: Wave 1 (`item_157`) + Wave 4 (`item_160`)
-  - AC3: Wave 2 (`item_158`) + Wave 4 (`item_160`)
-  - AC4: Wave 3 (`item_159`) + Wave 4 (`item_160`)
-  - AC5: Wave 4 (`item_160`) + FINAL docs update
+  - AC1 satisfied: Wave 0 (`item_156`) + Wave 4 (`item_160`)
+  - AC2 satisfied: Wave 1 (`item_157`) + Wave 4 (`item_160`)
+  - AC3 satisfied: Wave 2 (`item_158`) + Wave 4 (`item_160`)
+  - AC4 satisfied: Wave 3 (`item_159`) + Wave 4 (`item_160`)
+  - AC5 satisfied: Wave 4 (`item_160`) + FINAL docs update
 
 # References
 - `logics/request/req_027_home_screen_post_review_followup_empty_workspace_cta_truthfulness_shortcut_docs_alignment_lazy_startup_tests_and_logics_scope_sync.md`

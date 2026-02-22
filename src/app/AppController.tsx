@@ -11,7 +11,7 @@ import type { NodeId } from "../core/entities";
 import {
   type AppStore,
   appActions,
-  createInitialState,
+  createEmptyWorkspaceState,
   hasSampleNetworkSignature,
   isWorkspaceEmpty,
   selectActiveNetwork,
@@ -1070,11 +1070,18 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       }
     }
 
-    replaceStateWithHistory(createInitialState());
+    replaceStateWithHistory(createEmptyWorkspaceState(state.ui.themeMode));
     setActiveScreen("networkScope");
     setActiveSubScreen("connector");
     setInteractionMode("select");
-  }, [isCurrentWorkspaceEmpty, replaceStateWithHistory, setActiveScreen, setActiveSubScreen, setInteractionMode]);
+  }, [
+    isCurrentWorkspaceEmpty,
+    replaceStateWithHistory,
+    setActiveScreen,
+    setActiveSubScreen,
+    setInteractionMode,
+    state.ui.themeMode
+  ]);
 
   const homeWorkspaceContent = (
     <HomeWorkspaceContent
