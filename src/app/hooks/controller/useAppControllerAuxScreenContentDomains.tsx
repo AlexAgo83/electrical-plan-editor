@@ -174,6 +174,8 @@ export function useAppControllerAuxScreenContentDomains({
     setShowShortcutHints: settings.prefs.setShowShortcutHints,
     keyboardShortcutsEnabled: settings.prefs.keyboardShortcutsEnabled,
     setKeyboardShortcutsEnabled: settings.prefs.setKeyboardShortcutsEnabled,
+    showFloatingInspectorPanel: settings.prefs.showFloatingInspectorPanel,
+    setShowFloatingInspectorPanel: settings.prefs.setShowFloatingInspectorPanel,
     resetWorkspacePreferencesToDefaults: settings.resetWorkspacePreferencesToDefaults
       })
     : null;

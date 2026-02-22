@@ -69,6 +69,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setCanvasResetZoomPercentInput"
     | "setShowShortcutHints"
     | "setKeyboardShortcutsEnabled"
+    | "setShowFloatingInspectorPanel"
   >;
 }
 

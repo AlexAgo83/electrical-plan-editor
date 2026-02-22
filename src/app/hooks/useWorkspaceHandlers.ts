@@ -82,6 +82,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasResetZoomPercentInput: (value: string) => void;
   setShowShortcutHints: (value: boolean) => void;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
+  setShowFloatingInspectorPanel: (value: boolean) => void;
 }
 
 export function useWorkspaceHandlers({
@@ -137,7 +138,8 @@ export function useWorkspaceHandlers({
   setCanvasDefaultLabelStrokeMode,
   setCanvasResetZoomPercentInput,
   setShowShortcutHints,
-  setKeyboardShortcutsEnabled
+  setKeyboardShortcutsEnabled,
+  setShowFloatingInspectorPanel
 }: UseWorkspaceHandlersParams) {
   function handleCreateNetwork(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -406,6 +408,7 @@ export function useWorkspaceHandlers({
     setNetworkOffset({ x: 0, y: 0 });
     setShowShortcutHints(false);
     setKeyboardShortcutsEnabled(true);
+    setShowFloatingInspectorPanel(true);
   }
 
   return {

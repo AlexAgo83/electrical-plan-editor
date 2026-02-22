@@ -48,6 +48,7 @@ interface UiPreferencesPayload {
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
+  showFloatingInspectorPanel: boolean;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -94,6 +95,7 @@ interface UseUiPreferencesOptions {
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
+  showFloatingInspectorPanel: boolean;
   preferencesHydrated: boolean;
   setThemeMode: (mode: ThemeMode) => void;
   setTableDensity: (density: TableDensity) => void;
@@ -124,6 +126,7 @@ interface UseUiPreferencesOptions {
   setNetworkOffset: (value: { x: number; y: number }) => void;
   setShowShortcutHints: (value: boolean) => void;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
+  setShowFloatingInspectorPanel: (value: boolean) => void;
   setPreferencesHydrated: (value: boolean) => void;
 }
 
@@ -144,6 +147,7 @@ export function useUiPreferences({
   canvasResetZoomPercentInput,
   showShortcutHints,
   keyboardShortcutsEnabled,
+  showFloatingInspectorPanel,
   preferencesHydrated,
   setThemeMode,
   setTableDensity,
@@ -174,6 +178,7 @@ export function useUiPreferences({
   setNetworkOffset,
   setShowShortcutHints,
   setKeyboardShortcutsEnabled,
+  setShowFloatingInspectorPanel,
   setPreferencesHydrated
 }: UseUiPreferencesOptions): void {
   useEffect(() => {
@@ -238,6 +243,9 @@ export function useUiPreferences({
       setKeyboardShortcutsEnabled(
         typeof preferences.keyboardShortcutsEnabled === "boolean" ? preferences.keyboardShortcutsEnabled : true
       );
+      setShowFloatingInspectorPanel(
+        typeof preferences.showFloatingInspectorPanel === "boolean" ? preferences.showFloatingInspectorPanel : true
+      );
     }
 
     setPreferencesHydrated(true);
@@ -263,6 +271,7 @@ export function useUiPreferences({
     setSegmentIdSortDirection,
     setShowNetworkGrid,
     setShowNetworkInfoPanels,
+    setShowFloatingInspectorPanel,
     setShowShortcutHints,
     setShowSegmentLengths,
     setNetworkLabelStrokeMode,
@@ -296,7 +305,8 @@ export function useUiPreferences({
       canvasDefaultLabelStrokeMode,
       canvasResetZoomPercentInput,
       showShortcutHints,
-      keyboardShortcutsEnabled
+      keyboardShortcutsEnabled,
+      showFloatingInspectorPanel
     };
 
     try {
@@ -316,6 +326,7 @@ export function useUiPreferences({
     defaultSortField,
     keyboardShortcutsEnabled,
     preferencesHydrated,
+    showFloatingInspectorPanel,
     showShortcutHints,
     tableDensity,
     tableFontSize,

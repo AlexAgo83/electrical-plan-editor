@@ -6,6 +6,7 @@ interface UseInspectorPanelVisibilityParams {
   isValidationScreen: boolean;
   hasActiveNetwork: boolean;
   hasInspectableSelection: boolean;
+  showFloatingInspectorPanel: boolean;
   viewportWidth: number;
   isDialogFocusActive: boolean;
   isNavigationDrawerOpen: boolean;
@@ -18,6 +19,7 @@ export function useInspectorPanelVisibility({
   isValidationScreen,
   hasActiveNetwork,
   hasInspectableSelection,
+  showFloatingInspectorPanel,
   viewportWidth,
   isDialogFocusActive,
   isNavigationDrawerOpen,
@@ -28,7 +30,7 @@ export function useInspectorPanelVisibility({
   const isInspectorVisibilityScreen = isModelingScreen || isAnalysisScreen || isValidationScreen;
   const isInspectorNarrowViewport = viewportWidth < 960;
   const isModalDialogFocusActive = isDialogFocusActive || isNavigationDrawerOpen || isOperationsPanelOpen;
-  const isInspectorHidden = !isInspectorVisibilityScreen || !hasActiveNetwork || isModalDialogFocusActive;
+  const isInspectorHidden = !showFloatingInspectorPanel || !isInspectorVisibilityScreen || !hasActiveNetwork || isModalDialogFocusActive;
   const isInspectorAutoCollapsed = !hasInspectableSelection || isInspectorNarrowViewport;
   const canExpandInspectorFromCollapsed = hasInspectableSelection && isInspectorNarrowViewport;
   const isInspectorOpen =

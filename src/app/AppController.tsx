@@ -218,6 +218,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setShowShortcutHints,
     keyboardShortcutsEnabled,
     setKeyboardShortcutsEnabled,
+    showFloatingInspectorPanel,
+    setShowFloatingInspectorPanel,
     preferencesHydrated,
     setPreferencesHydrated
   } = useAppControllerPreferencesState();
@@ -477,6 +479,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasResetZoomPercentInput,
     showShortcutHints,
     keyboardShortcutsEnabled,
+    showFloatingInspectorPanel,
     preferencesHydrated,
     setTableDensity,
     setTableFontSize,
@@ -506,6 +509,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNetworkOffset,
     setShowShortcutHints,
     setKeyboardShortcutsEnabled,
+    setShowFloatingInspectorPanel,
     setThemeMode,
     setPreferencesHydrated
   });
@@ -697,7 +701,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setCanvasDefaultLabelStrokeMode,
       setCanvasResetZoomPercentInput,
       setShowShortcutHints,
-      setKeyboardShortcutsEnabled
+      setKeyboardShortcutsEnabled,
+      setShowFloatingInspectorPanel
     }
   });
   const {
@@ -1006,6 +1011,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isValidationScreen,
     hasActiveNetwork,
     hasInspectableSelection,
+    showFloatingInspectorPanel,
     viewportWidth,
     isDialogFocusActive,
     isNavigationDrawerOpen,
@@ -1238,6 +1244,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setShowShortcutHints,
           keyboardShortcutsEnabled,
           setKeyboardShortcutsEnabled,
+          showFloatingInspectorPanel,
+          setShowFloatingInspectorPanel,
           preferencesHydrated,
           setPreferencesHydrated
         },

@@ -24,6 +24,7 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultLabelStrokeMode, setCanvasDefaultLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
+  const [showFloatingInspectorPanel, setShowFloatingInspectorPanel] = useState(true);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
 
   return {
@@ -55,6 +56,8 @@ export function useAppControllerPreferencesState() {
     setShowShortcutHints,
     keyboardShortcutsEnabled,
     setKeyboardShortcutsEnabled,
+    showFloatingInspectorPanel,
+    setShowFloatingInspectorPanel,
     preferencesHydrated,
     setPreferencesHydrated
   };

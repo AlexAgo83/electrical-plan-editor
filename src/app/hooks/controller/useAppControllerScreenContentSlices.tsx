@@ -607,6 +607,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setShowShortcutHints: params.setShowShortcutHints,
     keyboardShortcutsEnabled: params.keyboardShortcutsEnabled,
     setKeyboardShortcutsEnabled: params.setKeyboardShortcutsEnabled,
+    showFloatingInspectorPanel: params.showFloatingInspectorPanel,
+    setShowFloatingInspectorPanel: params.setShowFloatingInspectorPanel,
     resetWorkspacePreferencesToDefaults: params.resetWorkspacePreferencesToDefaults
   } satisfies SettingsWorkspaceContentProps;
 

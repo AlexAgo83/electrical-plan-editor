@@ -1,4 +1,4 @@
-import { fireEvent, within } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { NetworkId } from "../core/entities";
 import {
@@ -21,7 +21,7 @@ describe("App integration UI - settings", () => {
     renderAppWithState(createConnectorSortingState());
 
     switchScreenDrawerAware("settings");
-    const settingsPanel = getPanelByHeading("Global appearance preferences");
+    const settingsPanel = getPanelByHeading("Appearance preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Default sort column"), {
       target: { value: "technicalId" }
     });
@@ -40,7 +40,7 @@ describe("App integration UI - settings", () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("settings");
-    const settingsPanel = getPanelByHeading("Global appearance preferences");
+    const settingsPanel = getPanelByHeading("Appearance preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Table density"), {
       target: { value: "compact" }
     });
@@ -58,7 +58,7 @@ describe("App integration UI - settings", () => {
     expect(appShell).toHaveClass("table-font-normal");
 
     switchScreenDrawerAware("settings");
-    const settingsPanel = getPanelByHeading("Global appearance preferences");
+    const settingsPanel = getPanelByHeading("Appearance preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Table font size"), {
       target: { value: "small" }
     });
@@ -74,7 +74,7 @@ describe("App integration UI - settings", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("settings");
-    const settingsPanel = getPanelByHeading("Global appearance preferences");
+    const settingsPanel = getPanelByHeading("Appearance preferences");
     fireEvent.change(within(settingsPanel).getByLabelText("Table density"), {
       target: { value: "compact" }
     });
@@ -90,7 +90,7 @@ describe("App integration UI - settings", () => {
     expect(appShell).toHaveClass("table-density-compact");
 
     switchScreenDrawerAware("settings");
-    const restoredSettingsPanel = getPanelByHeading("Global appearance preferences");
+    const restoredSettingsPanel = getPanelByHeading("Appearance preferences");
     expect(within(restoredSettingsPanel).getByLabelText("Default sort column")).toHaveValue("technicalId");
   });
 
@@ -128,7 +128,7 @@ describe("App integration UI - settings", () => {
     renderAppWithState(noNetwork);
     switchScreenDrawerAware("settings");
 
-    expect(getPanelByHeading("Global appearance preferences")).toBeInTheDocument();
+    expect(getPanelByHeading("Appearance preferences")).toBeInTheDocument();
     expect(within(document.body).queryByRole("heading", { name: "No active network" })).not.toBeInTheDocument();
   });
 
@@ -181,5 +181,24 @@ describe("App integration UI - settings", () => {
     expect(
       within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Network Scope$/, hidden: true })
     ).toHaveClass("is-active");
+  });
+
+  it("hides the floating inspector panel when disabled from settings preferences", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("modeling");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+    expect(screen.getByRole("heading", { name: "Inspector context" })).toBeInTheDocument();
+
+    switchScreenDrawerAware("settings");
+    const shortcutsPanel = getPanelByHeading("Action bar and shortcuts");
+    const inspectorToggle = within(shortcutsPanel).getByLabelText("Show floating inspector panel on supported screens");
+    expect(inspectorToggle).toBeChecked();
+    fireEvent.click(inspectorToggle);
+    expect(inspectorToggle).not.toBeChecked();
+
+    switchScreenDrawerAware("modeling");
+    expect(screen.queryByRole("heading", { name: "Inspector context" })).not.toBeInTheDocument();
   });
 });

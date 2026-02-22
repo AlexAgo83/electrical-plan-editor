@@ -58,6 +58,8 @@ interface SettingsWorkspaceContentProps {
   setShowShortcutHints: (value: boolean) => void;
   keyboardShortcutsEnabled: boolean;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
+  showFloatingInspectorPanel: boolean;
+  setShowFloatingInspectorPanel: (value: boolean) => void;
   resetWorkspacePreferencesToDefaults: () => void;
 }
 
@@ -108,6 +110,8 @@ export function SettingsWorkspaceContent({
   setShowShortcutHints,
   keyboardShortcutsEnabled,
   setKeyboardShortcutsEnabled,
+  showFloatingInspectorPanel,
+  setShowFloatingInspectorPanel,
   resetWorkspacePreferencesToDefaults
 }: SettingsWorkspaceContentProps): ReactElement {
   return (
@@ -272,6 +276,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
             />
             Enable keyboard shortcuts (undo/redo/navigation/modes)
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={showFloatingInspectorPanel}
+              onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
+            />
+            Show floating inspector panel on supported screens
           </label>
         </div>
         <ul className="settings-shortcut-list">
