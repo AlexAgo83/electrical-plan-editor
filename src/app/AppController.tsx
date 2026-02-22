@@ -1,7 +1,7 @@
 import {
   Suspense,
+  type ComponentProps,
   type CSSProperties,
-  type FormEvent,
   type ReactElement,
   lazy,
   useCallback,
@@ -14,11 +14,9 @@ import {
 import appPackageMetadata from "../../package.json";
 import type {
   ConnectorId,
-  NetworkId,
   NodeId,
   SegmentId,
   SpliceId,
-  WireEndpoint,
   WireId
 } from "../core/entities";
 import {
@@ -78,8 +76,13 @@ import { useConnectorHandlers } from "./hooks/useConnectorHandlers";
 import { useEntityListModel } from "./hooks/useEntityListModel";
 import { useEntityFormsState } from "./hooks/useEntityFormsState";
 import { useEntityRelationshipMaps } from "./hooks/useEntityRelationshipMaps";
+import { useInspectorPanelVisibility } from "./hooks/useInspectorPanelVisibility";
+import { useIssueNavigatorModel } from "./hooks/useIssueNavigatorModel";
 import { useNetworkImportExport } from "./hooks/useNetworkImportExport";
 import { useNetworkEntityCountsById } from "./hooks/useNetworkEntityCountsById";
+import { useNetworkScopeFormOrchestration } from "./hooks/useNetworkScopeFormOrchestration";
+import { useNetworkScopeFormState } from "./hooks/useNetworkScopeFormState";
+import { useModelingFormSelectionSync } from "./hooks/useModelingFormSelectionSync";
 import { useNodeDescriptions } from "./hooks/useNodeDescriptions";
 import { useNodeHandlers } from "./hooks/useNodeHandlers";
 import type { BeforeInstallPromptEventLike } from "./hooks/useWorkspaceShellChrome";
@@ -89,6 +92,7 @@ import { useSpliceHandlers } from "./hooks/useSpliceHandlers";
 import { useStoreHistory } from "./hooks/useStoreHistory";
 import { useUiPreferences } from "./hooks/useUiPreferences";
 import { useValidationModel } from "./hooks/useValidationModel";
+import { useWireEndpointDescriptions } from "./hooks/useWireEndpointDescriptions";
 import { useWireHandlers } from "./hooks/useWireHandlers";
 import { useWorkspaceShellChrome } from "./hooks/useWorkspaceShellChrome";
 import { useWorkspaceHandlers } from "./hooks/useWorkspaceHandlers";
@@ -323,16 +327,22 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     networkOffset,
     setNetworkOffset
   } = useCanvasState();
-  const [newNetworkName, setNewNetworkName] = useState("");
-  const [newNetworkTechnicalId, setNewNetworkTechnicalId] = useState("");
-  const [newNetworkDescription, setNewNetworkDescription] = useState("");
-  const [networkFormError, setNetworkFormError] = useState<string | null>(null);
-  const [networkFormMode, setNetworkFormMode] = useState<"create" | "edit" | null>(null);
-  const [networkFormTargetId, setNetworkFormTargetId] = useState<NetworkId | null>(null);
-  const [networkFocusRequest, setNetworkFocusRequest] = useState<{ id: NetworkId | null; token: number }>({
-    id: null,
-    token: 0
-  });
+  const {
+    newNetworkName,
+    setNewNetworkName,
+    newNetworkTechnicalId,
+    setNewNetworkTechnicalId,
+    newNetworkDescription,
+    setNewNetworkDescription,
+    networkFormError,
+    setNetworkFormError,
+    networkFormMode,
+    setNetworkFormMode,
+    networkFormTargetId,
+    setNetworkFormTargetId,
+    networkFocusRequest,
+    setNetworkFocusRequest
+  } = useNetworkScopeFormState();
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
   const [tableDensity, setTableDensity] = useState<TableDensity>("compact");
   const [tableFontSize, setTableFontSize] = useState<TableFontSize>("normal");
@@ -353,7 +363,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
   const [headerOffsetPx, setHeaderOffsetPx] = useState(96);
-  const [isInspectorExpandedOnNarrowViewport, setIsInspectorExpandedOnNarrowViewport] = useState(false);
   const panStartRef = useRef<{
     clientX: number;
     clientY: number;
@@ -371,7 +380,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const operationsPanelRef = useRef<HTMLDivElement | null>(null);
   const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
   const deferredInstallPromptRef = useRef<BeforeInstallPromptEventLike | null>(null);
-  const hasAutoOpenedNetworkFormRef = useRef(false);
 
   const selected = selectSelection(state);
   const {
@@ -540,32 +548,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   }, [canvasResetZoomPercentInput]);
   const configuredResetZoomPercent = Math.round(configuredResetScale * 100);
 
-  const describeWireEndpoint = useCallback((endpoint: WireEndpoint): string => {
-    if (endpoint.kind === "connectorCavity") {
-      const connector = connectorMap.get(endpoint.connectorId);
-      if (connector === undefined) {
-        return `Connector ${endpoint.connectorId} / C${endpoint.cavityIndex}`;
-      }
-
-      return `${connector.name} (${connector.technicalId}) / C${endpoint.cavityIndex}`;
-    }
-
-    const splice = spliceMap.get(endpoint.spliceId);
-    if (splice === undefined) {
-      return `Splice ${endpoint.spliceId} / P${endpoint.portIndex}`;
-    }
-
-    return `${splice.name} (${splice.technicalId}) / P${endpoint.portIndex}`;
-  }, [connectorMap, spliceMap]);
-  const describeWireEndpointId = useCallback((endpoint: WireEndpoint): string => {
-    if (endpoint.kind === "connectorCavity") {
-      const connectorTechnicalId = connectorMap.get(endpoint.connectorId)?.technicalId ?? String(endpoint.connectorId);
-      return `${connectorTechnicalId} / C${endpoint.cavityIndex}`;
-    }
-
-    const spliceTechnicalId = spliceMap.get(endpoint.spliceId)?.technicalId ?? String(endpoint.spliceId);
-    return `${spliceTechnicalId} / P${endpoint.portIndex}`;
-  }, [connectorMap, spliceMap]);
+  const { describeWireEndpoint, describeWireEndpointId } = useWireEndpointDescriptions({
+    connectorMap,
+    spliceMap
+  });
 
   useEffect(() => {
     setManualNodePositions({} as Record<NodeId, NodePosition>);
@@ -596,28 +582,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setPendingNewNodePosition(null);
     }
   }, [interactionMode, setModeAnchorNodeId, setPendingNewNodePosition]);
-
-  useEffect(() => {
-    if (networkFormMode !== "edit") {
-      return;
-    }
-
-    if (networkFormTargetId === null) {
-      setNetworkFormMode(null);
-      return;
-    }
-
-    const targetNetwork = state.networks.byId[networkFormTargetId];
-    if (targetNetwork === undefined) {
-      setNetworkFormMode(null);
-      setNetworkFormTargetId(null);
-      return;
-    }
-
-    setNewNetworkName(targetNetwork.name);
-    setNewNetworkTechnicalId(targetNetwork.technicalId);
-    setNewNetworkDescription(targetNetwork.description ?? "");
-  }, [networkFormMode, networkFormTargetId, state]);
 
   useEffect(() => {
     setWireForcedRouteInput(selectedWireRouteInputValue);
@@ -958,77 +922,29 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setShowShortcutHints,
     setKeyboardShortcutsEnabled
   });
-
-  const handleOpenCreateNetworkForm = useCallback(() => {
-    setNetworkFormMode("create");
-    setNetworkFormTargetId(null);
-    setNewNetworkName("");
-    setNewNetworkTechnicalId("");
-    setNewNetworkDescription("");
-    setNetworkFormError(null);
-  }, []);
-
-  const handleOpenEditNetworkForm = useCallback((networkId: NetworkId) => {
-    const targetNetwork = networks.find((network) => network.id === networkId);
-    if (targetNetwork === undefined) {
-      return;
-    }
-
-    setNetworkFormMode("edit");
-    setNetworkFormTargetId(targetNetwork.id);
-    setNewNetworkName(targetNetwork.name);
-    setNewNetworkTechnicalId(targetNetwork.technicalId);
-    setNewNetworkDescription(targetNetwork.description ?? "");
-    setNetworkFormError(null);
-  }, [networks]);
-
-  const handleCloseNetworkForm = useCallback(() => {
-    setNetworkFormMode(null);
-    setNetworkFormTargetId(null);
-    setNetworkFormError(null);
-  }, []);
-
-  const handleSubmitNetworkForm = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
-      if (networkFormMode === "edit") {
-        handleUpdateActiveNetwork(event, networkFormTargetId);
-        if (networkFormTargetId !== null && store.getState().networks.byId[networkFormTargetId] !== undefined) {
-          setNetworkFocusRequest((current) => ({
-            id: networkFormTargetId,
-            token: current.token + 1
-          }));
-        }
-        return;
-      }
-
-      const networkIdsBefore = new Set(store.getState().networks.allIds);
-      handleCreateNetwork(event);
-      const createdNetworkId =
-        (store
-          .getState()
-          .networks.allIds.find((networkId) => !networkIdsBefore.has(networkId)) ?? null);
-      if (createdNetworkId !== null) {
-        setNetworkFocusRequest((current) => ({
-          id: createdNetworkId,
-          token: current.token + 1
-        }));
-      }
-    },
-    [handleCreateNetwork, handleUpdateActiveNetwork, networkFormMode, networkFormTargetId, store]
-  );
-
-  useEffect(() => {
-    if (!isNetworkScopeScreen || hasAutoOpenedNetworkFormRef.current || networkFormMode === "create") {
-      return;
-    }
-
-    if (activeNetworkId === null) {
-      return;
-    }
-
-    handleOpenEditNetworkForm(activeNetworkId);
-    hasAutoOpenedNetworkFormRef.current = true;
-  }, [activeNetworkId, handleOpenEditNetworkForm, isNetworkScopeScreen, networkFormMode]);
+  const {
+    handleOpenCreateNetworkForm,
+    handleOpenEditNetworkForm,
+    handleCloseNetworkForm,
+    handleSubmitNetworkForm
+  } = useNetworkScopeFormOrchestration({
+    store,
+    networks,
+    activeNetworkId,
+    isNetworkScopeScreen,
+    networksById: state.networks.byId,
+    setNewNetworkName,
+    setNewNetworkTechnicalId,
+    setNewNetworkDescription,
+    setNetworkFormError,
+    networkFormMode,
+    setNetworkFormMode,
+    networkFormTargetId,
+    setNetworkFormTargetId,
+    setNetworkFocusRequest,
+    handleCreateNetwork,
+    handleUpdateActiveNetwork
+  });
 
   useEffect(() => {
     undoActionRef.current = handleUndo;
@@ -1251,62 +1167,24 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     startWireEdit
   });
 
-  const clearAllModelingForms = useCallback(() => {
-    clearConnectorForm();
-    clearSpliceForm();
-    clearNodeForm();
-    clearSegmentForm();
-    clearWireForm();
-  }, [clearConnectorForm, clearNodeForm, clearSegmentForm, clearSpliceForm, clearWireForm]);
-
-  useEffect(() => {
-    if (activeSubScreen !== "connector" && connectorFormMode !== "idle") {
-      clearConnectorForm();
-    } else if (connectorFormMode === "edit" && selectedConnectorId === null) {
-      clearConnectorForm();
-    }
-
-    if (activeSubScreen !== "splice" && spliceFormMode !== "idle") {
-      clearSpliceForm();
-    } else if (spliceFormMode === "edit" && selectedSpliceId === null) {
-      clearSpliceForm();
-    }
-
-    if (activeSubScreen !== "node" && nodeFormMode !== "idle") {
-      clearNodeForm();
-    } else if (nodeFormMode === "edit" && selectedNodeId === null) {
-      clearNodeForm();
-    }
-
-    if (activeSubScreen !== "segment" && segmentFormMode !== "idle") {
-      clearSegmentForm();
-    } else if (segmentFormMode === "edit" && selectedSegmentId === null) {
-      clearSegmentForm();
-    }
-
-    if (activeSubScreen !== "wire" && wireFormMode !== "idle") {
-      clearWireForm();
-    } else if (wireFormMode === "edit" && selectedWireId === null) {
-      clearWireForm();
-    }
-  }, [
-    clearConnectorForm,
-    clearNodeForm,
-    clearSegmentForm,
-    clearSpliceForm,
-    clearWireForm,
+  const { clearAllModelingForms } = useModelingFormSelectionSync({
+    activeSubScreen,
     connectorFormMode,
+    spliceFormMode,
     nodeFormMode,
+    segmentFormMode,
+    wireFormMode,
     selectedConnectorId,
+    selectedSpliceId,
     selectedNodeId,
     selectedSegmentId,
-    selectedSpliceId,
-    segmentFormMode,
-    activeSubScreen,
-    spliceFormMode,
     selectedWireId,
-    wireFormMode
-  ]);
+    clearConnectorForm,
+    clearSpliceForm,
+    clearNodeForm,
+    clearSegmentForm,
+    clearWireForm
+  });
 
   const {
     handleNetworkSegmentClick,
@@ -1377,14 +1255,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   });
 
   const currentValidationIssue = getValidationIssueByCursor();
-  const issueNavigationScopeIssues = isValidationScreen ? visibleValidationIssues : orderedValidationIssues;
-  const issueNavigationScopeLabel = isValidationScreen ? "Filtered issues" : "All issues";
-  const currentIssuePositionInScope =
-    currentValidationIssue === null ? -1 : issueNavigationScopeIssues.findIndex((issue) => issue.id === currentValidationIssue.id);
-  const issueNavigatorDisplay =
-    issueNavigationScopeIssues.length === 0
-      ? "No issue"
-      : `${currentIssuePositionInScope >= 0 ? currentIssuePositionInScope + 1 : 1}/${issueNavigationScopeIssues.length}`;
+  const { issueNavigationScopeLabel, issueNavigatorDisplay } = useIssueNavigatorModel({
+    isValidationScreen,
+    currentValidationIssue,
+    orderedValidationIssues,
+    visibleValidationIssues
+  });
   const networkScalePercent = Math.round(networkScale * 100);
   const selectedConnectorOccupiedCount =
     selectedConnector === null
@@ -1394,98 +1270,121 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     selectedSplice === null
       ? 0
       : selectSplicePortStatuses(state, selectedSplice.id).filter((slot) => slot.isOccupied).length;
-  const isInspectorVisibilityScreen = isModelingScreen || isAnalysisScreen || isValidationScreen;
   const hasInspectableSelection = selected !== null && selectedSubScreen !== null;
-  const isInspectorNarrowViewport = viewportWidth < 960;
-  const isModalDialogFocusActive = isDialogFocusActive || isNavigationDrawerOpen || isOperationsPanelOpen;
-  const isInspectorHidden = !isInspectorVisibilityScreen || !hasActiveNetwork || isModalDialogFocusActive;
-  const isInspectorAutoCollapsed = !hasInspectableSelection || isInspectorNarrowViewport;
-  const canExpandInspectorFromCollapsed = hasInspectableSelection && isInspectorNarrowViewport;
-  const isInspectorOpen =
-    !isInspectorHidden &&
-    (!isInspectorAutoCollapsed || (canExpandInspectorFromCollapsed && isInspectorExpandedOnNarrowViewport));
-
-  useEffect(() => {
-    if (isInspectorHidden || !canExpandInspectorFromCollapsed) {
-      setIsInspectorExpandedOnNarrowViewport(false);
+  const {
+    isInspectorHidden,
+    canExpandInspectorFromCollapsed,
+    isInspectorOpen,
+    setIsInspectorExpandedOnNarrowViewport
+  } = useInspectorPanelVisibility({
+    isModelingScreen,
+    isAnalysisScreen,
+    isValidationScreen,
+    hasActiveNetwork,
+    hasInspectableSelection,
+    viewportWidth,
+    isDialogFocusActive,
+    isNavigationDrawerOpen,
+    isOperationsPanelOpen
+  });
+  const inspectorContextPanelProps = {
+    mode: isInspectorOpen ? "open" : "collapsed",
+    canExpandFromCollapsed: canExpandInspectorFromCollapsed,
+    canCollapseToCollapsed: canExpandInspectorFromCollapsed,
+    onExpandFromCollapsed: () => setIsInspectorExpandedOnNarrowViewport(true),
+    onCollapseToCollapsed: () => setIsInspectorExpandedOnNarrowViewport(false),
+    selected,
+    selectedSubScreen,
+    selectedConnector,
+    selectedSplice,
+    selectedNode,
+    selectedSegment,
+    selectedWire,
+    connectorOccupiedCount: selectedConnectorOccupiedCount,
+    spliceOccupiedCount: selectedSpliceOccupiedCount,
+    describeNode,
+    onEditSelected: handleStartSelectedEdit,
+    onOpenAnalysis: handleOpenSelectionInAnalysis,
+    onClearSelection: () => {
+      dispatchAction(appActions.clearSelection());
+      clearAllModelingForms();
     }
-  }, [canExpandInspectorFromCollapsed, isInspectorHidden]);
+  } satisfies ComponentProps<typeof InspectorContextPanel>;
+  const inspectorContextPanel = <InspectorContextPanel {...inspectorContextPanelProps} />;
 
-  const inspectorContextPanel = (
-    <InspectorContextPanel
-      mode={isInspectorOpen ? "open" : "collapsed"}
-      canExpandFromCollapsed={canExpandInspectorFromCollapsed}
-      canCollapseToCollapsed={canExpandInspectorFromCollapsed}
-      onExpandFromCollapsed={() => setIsInspectorExpandedOnNarrowViewport(true)}
-      onCollapseToCollapsed={() => setIsInspectorExpandedOnNarrowViewport(false)}
-      selected={selected}
-      selectedSubScreen={selectedSubScreen}
-      selectedConnector={selectedConnector}
-      selectedSplice={selectedSplice}
-      selectedNode={selectedNode}
-      selectedSegment={selectedSegment}
-      selectedWire={selectedWire}
-      connectorOccupiedCount={selectedConnectorOccupiedCount}
-      spliceOccupiedCount={selectedSpliceOccupiedCount}
-      describeNode={describeNode}
-      onEditSelected={handleStartSelectedEdit}
-      onOpenAnalysis={handleOpenSelectionInAnalysis}
-      onClearSelection={() => {
-        dispatchAction(appActions.clearSelection());
-        clearAllModelingForms();
-      }}
-    />
-  );
-
-  const networkSummaryPanel = (
-    <NetworkSummaryPanel
-      handleZoomAction={handleZoomAction}
-      fitNetworkToContent={fitNetworkToContent}
-      showNetworkGrid={showNetworkGrid}
-      snapNodesToGrid={snapNodesToGrid}
-      showNetworkInfoPanels={showNetworkInfoPanels}
-      showSegmentLengths={showSegmentLengths}
-      labelStrokeMode={networkLabelStrokeMode}
-      toggleShowNetworkInfoPanels={() => setShowNetworkInfoPanels((current) => !current)}
-      toggleShowSegmentLengths={() => setShowSegmentLengths((current) => !current)}
-      toggleShowNetworkGrid={() => setShowNetworkGrid((current) => !current)}
-      toggleSnapNodesToGrid={() => setSnapNodesToGrid((current) => !current)}
-      networkScalePercent={networkScalePercent}
-      routingGraphNodeCount={routingGraph.nodeIds.length}
-      routingGraphSegmentCount={routingGraph.segmentIds.length}
-      totalEdgeEntries={totalEdgeEntries}
-      nodes={nodes}
-      segments={segments}
-      isPanningNetwork={isPanningNetwork}
-      networkViewWidth={NETWORK_VIEW_WIDTH}
-      networkViewHeight={NETWORK_VIEW_HEIGHT}
-      networkGridStep={NETWORK_GRID_STEP}
-      networkOffset={networkOffset}
-      networkScale={networkScale}
-      handleNetworkCanvasMouseDown={handleNetworkCanvasMouseDown}
-      handleNetworkCanvasClick={handleNetworkCanvasClick}
-      handleNetworkWheel={handleNetworkWheel}
-      handleNetworkMouseMove={handleNetworkMouseMove}
-      stopNetworkNodeDrag={stopNetworkNodeDrag}
-      networkNodePositions={networkNodePositions}
-      selectedWireRouteSegmentIds={selectedWireRouteSegmentIds}
-      selectedSegmentId={selectedSegmentId}
-      handleNetworkSegmentClick={handleNetworkSegmentClick}
-      selectedNodeId={selectedNodeId}
-      handleNetworkNodeMouseDown={handleNetworkNodeMouseDown}
-      handleNetworkNodeClick={handleNetworkNodeClick}
-      connectorMap={connectorMap}
-      spliceMap={spliceMap}
-      describeNode={describeNode}
-      subNetworkSummaries={subNetworkSummaries}
-      routePreviewStartNodeId={routePreviewStartNodeId}
-      setRoutePreviewStartNodeId={setRoutePreviewStartNodeId}
-      routePreviewEndNodeId={routePreviewEndNodeId}
-      setRoutePreviewEndNodeId={setRoutePreviewEndNodeId}
-      routePreview={routePreview}
-      onRegenerateLayout={handleRegenerateLayout}
-    />
-  );
+  const networkSummaryPanelProps = {
+    handleZoomAction,
+    fitNetworkToContent,
+    showNetworkGrid,
+    snapNodesToGrid,
+    showNetworkInfoPanels,
+    showSegmentLengths,
+    labelStrokeMode: networkLabelStrokeMode,
+    toggleShowNetworkInfoPanels: () => setShowNetworkInfoPanels((current) => !current),
+    toggleShowSegmentLengths: () => setShowSegmentLengths((current) => !current),
+    toggleShowNetworkGrid: () => setShowNetworkGrid((current) => !current),
+    toggleSnapNodesToGrid: () => setSnapNodesToGrid((current) => !current),
+    networkScalePercent,
+    routingGraphNodeCount: routingGraph.nodeIds.length,
+    routingGraphSegmentCount: routingGraph.segmentIds.length,
+    totalEdgeEntries,
+    nodes,
+    segments,
+    isPanningNetwork,
+    networkViewWidth: NETWORK_VIEW_WIDTH,
+    networkViewHeight: NETWORK_VIEW_HEIGHT,
+    networkGridStep: NETWORK_GRID_STEP,
+    networkOffset,
+    networkScale,
+    handleNetworkCanvasMouseDown,
+    handleNetworkCanvasClick,
+    handleNetworkWheel,
+    handleNetworkMouseMove,
+    stopNetworkNodeDrag,
+    networkNodePositions,
+    selectedWireRouteSegmentIds,
+    selectedSegmentId,
+    handleNetworkSegmentClick,
+    selectedNodeId,
+    handleNetworkNodeMouseDown,
+    handleNetworkNodeClick,
+    connectorMap,
+    spliceMap,
+    describeNode,
+    subNetworkSummaries,
+    routePreviewStartNodeId,
+    setRoutePreviewStartNodeId,
+    routePreviewEndNodeId,
+    setRoutePreviewEndNodeId,
+    routePreview,
+    onRegenerateLayout: handleRegenerateLayout
+  } satisfies ComponentProps<typeof NetworkSummaryPanelEager>;
+  const networkSummaryPanel = <NetworkSummaryPanel {...networkSummaryPanelProps} />;
+  const networkScopeWorkspaceProps = {
+    networks,
+    networkSort,
+    setNetworkSort,
+    networkEntityCountsById,
+    activeNetworkId,
+    handleSelectNetwork,
+    handleDuplicateNetwork,
+    handleDeleteNetwork,
+    networkFormMode,
+    handleOpenCreateNetworkForm,
+    handleOpenEditNetworkForm,
+    handleCloseNetworkForm,
+    newNetworkName,
+    setNewNetworkName,
+    newNetworkTechnicalId,
+    setNewNetworkTechnicalId,
+    newNetworkDescription,
+    setNewNetworkDescription,
+    networkFormError,
+    networkTechnicalIdAlreadyUsed,
+    handleSubmitNetworkForm,
+    focusRequestedNetworkId: networkFocusRequest.id,
+    focusRequestedNetworkToken: networkFocusRequest.token
+  } satisfies ComponentProps<typeof NetworkScopeWorkspaceContentEager>;
 
   return (
     <Suspense fallback={null}>
@@ -1567,31 +1466,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
         <section className="workspace-content">
           <NetworkScopeScreen isActive={isNetworkScopeScreen}>
-            <NetworkScopeWorkspaceContent
-              networks={networks}
-              networkSort={networkSort}
-              setNetworkSort={setNetworkSort}
-              networkEntityCountsById={networkEntityCountsById}
-              activeNetworkId={activeNetworkId}
-              handleSelectNetwork={handleSelectNetwork}
-              handleDuplicateNetwork={handleDuplicateNetwork}
-              handleDeleteNetwork={handleDeleteNetwork}
-              networkFormMode={networkFormMode}
-              handleOpenCreateNetworkForm={handleOpenCreateNetworkForm}
-              handleOpenEditNetworkForm={handleOpenEditNetworkForm}
-              handleCloseNetworkForm={handleCloseNetworkForm}
-              newNetworkName={newNetworkName}
-              setNewNetworkName={setNewNetworkName}
-              newNetworkTechnicalId={newNetworkTechnicalId}
-              setNewNetworkTechnicalId={setNewNetworkTechnicalId}
-              newNetworkDescription={newNetworkDescription}
-              setNewNetworkDescription={setNewNetworkDescription}
-              networkFormError={networkFormError}
-              networkTechnicalIdAlreadyUsed={networkTechnicalIdAlreadyUsed}
-              handleSubmitNetworkForm={handleSubmitNetworkForm}
-              focusRequestedNetworkId={networkFocusRequest.id}
-              focusRequestedNetworkToken={networkFocusRequest.token}
-            />
+            <NetworkScopeWorkspaceContent {...networkScopeWorkspaceProps} />
           </NetworkScopeScreen>
 
           {!isNetworkScopeScreen && !hasActiveNetwork ? (
