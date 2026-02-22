@@ -1,7 +1,7 @@
 ## req_018_app_controller_decomposition_wave_5_real_loc_reduction_and_composition_root_slimming - AppController Decomposition Wave 5 (Real LOC Reduction and Composition Root Slimming)
 > From version: 0.5.3
-> Understanding: 99%
-> Confidence: 97%
+> Understanding: 100%
+> Confidence: 98%
 > Complexity: High
 > Theme: Real AppController LOC Reduction Without Opaque Abstractions
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -118,7 +118,7 @@ Related delivered baseline to preserve:
 - Context proliferation solely to avoid explicit prop/dependency passing.
 
 # Backlog
-- To create from this request:
+- Created and delivered from this request:
   - `item_107_app_controller_screen_slice_callsite_compaction_and_domain_hooks.md`
   - `item_108_app_controller_namespaced_state_contracts_and_destructuring_reduction.md`
   - `item_109_app_controller_shell_layout_extraction_and_markup_compaction.md`
@@ -127,10 +127,56 @@ Related delivered baseline to preserve:
   - `item_112_app_controller_wave_5_loc_reduction_measurement_and_regression_tracking.md`
   - `item_113_app_controller_wave_5_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
+# Delivery summary
+- Measurable `AppController` LOC reduction delivered:
+  - `src/app/AppController.tsx` reduced from `1818` lines (wave-4 closure baseline) to `1361` lines (`-457`, ~25.1%).
+  - Phase-1 reduction target (`~1400-1550`) achieved.
+  - Phase-2 guidance (`~1050-1300`) partially approached but not fully reached.
+- Screen-slice call-site compaction delivered:
+  - `src/app/hooks/controller/useAppControllerModelingAnalysisScreenDomains.tsx`
+  - `src/app/hooks/controller/useAppControllerAuxScreenContentDomains.tsx`
+- Namespaced state-contract groundwork + AppController usage delivered:
+  - `src/app/hooks/useAppControllerNamespacedFormsState.ts`
+  - `src/app/hooks/useAppControllerNamespacedCanvasState.ts`
+  - `AppController` now uses grouped `formsState`/`forms` and `canvasState`/`canvas` patterns instead of the prior giant flat `useEntityFormsState` destructuring.
+- Shell layout extraction delivered:
+  - `src/app/components/layout/AppShellLayout.tsx`
+- Modeling orchestrator compaction delivered:
+  - `src/app/hooks/controller/useAppControllerModelingHandlersOrchestrator.ts`
+- Lazy/eager wiring compaction delivered:
+  - `src/app/components/appUiModules.tsx` centralizes test-safe eager vs production lazy component resolution
+- Validation closure delivered:
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run quality:ui-modularization`
+  - `npm run quality:store-modularization`
+  - `npm run test:ci`
+  - `npm run test:e2e`
+  - `npm run build`
+  - `npm run quality:pwa`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+
+# AC traceability
+- AC1: Satisfied by measurable LOC reduction (`1818` -> `1361`) and retained composition-root role in `AppController`.
+- AC2: Satisfied by moving large screen-domain slice call-site assembly into explicit domain hooks without mega-hook regression.
+- AC3: Satisfied by reducing flat state noise through grouped `formsState` usage plus namespaced forms/canvas contract helpers integrated in `AppController`.
+- AC4: Satisfied by shell JSX extraction into `AppShellLayout` with preserved overlay/focus/inspector layout behavior.
+- AC5: Satisfied by modeling-domain handler wiring compaction via `useAppControllerModelingHandlersOrchestrator` while preserving explicit subcontracts.
+- AC6: Satisfied by `appUiModules` lazy/eager registry, successful `build`, and passing `quality:pwa` (chunking/PWA artifacts healthy).
+- AC7: Satisfied by targeted UI integration regressions + `test:e2e` smoke passing after wave-5 refactor.
+- AC8: Satisfied by full closure validation pipeline passing and documented in `task_017` / backlog closure.
+
 # References
 - `src/app/AppController.tsx`
+- `src/app/components/layout/AppShellLayout.tsx`
+- `src/app/components/appUiModules.tsx`
 - `src/app/hooks/controller/useAppControllerScreenContentSlices.tsx`
 - `src/app/hooks/controller/useAppControllerHeavyHookAssemblers.ts`
+- `src/app/hooks/controller/useAppControllerModelingAnalysisScreenDomains.tsx`
+- `src/app/hooks/controller/useAppControllerAuxScreenContentDomains.tsx`
+- `src/app/hooks/controller/useAppControllerModelingHandlersOrchestrator.ts`
+- `src/app/hooks/useAppControllerNamespacedFormsState.ts`
+- `src/app/hooks/useAppControllerNamespacedCanvasState.ts`
 - `src/app/hooks/useEntityFormsState.ts`
 - `src/app/hooks/useCanvasState.ts`
 - `src/app/hooks/useConnectorHandlers.ts`
