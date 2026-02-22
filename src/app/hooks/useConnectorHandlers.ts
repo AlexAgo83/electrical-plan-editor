@@ -97,9 +97,12 @@ export function useConnectorHandlers({
       connectorFormMode === "edit" && editingConnectorId !== null
         ? editingConnectorId
         : (createEntityId("conn") as ConnectorId);
+    const existingConnector =
+      connectorFormMode === "edit" && editingConnectorId !== null ? store.getState().connectors.byId[editingConnectorId] : undefined;
 
     dispatchAction(
       appActions.upsertConnector({
+        ...(existingConnector ?? {}),
         id: connectorId,
         name: trimmedName,
         technicalId: trimmedTechnicalId,

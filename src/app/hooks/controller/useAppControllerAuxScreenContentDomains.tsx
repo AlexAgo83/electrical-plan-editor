@@ -165,6 +165,8 @@ export function useAppControllerAuxScreenContentDomains({
     setCanvasDefaultShowInfoPanels: settings.prefs.setCanvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths: settings.prefs.canvasDefaultShowSegmentLengths,
     setCanvasDefaultShowSegmentLengths: settings.prefs.setCanvasDefaultShowSegmentLengths,
+    canvasDefaultShowCableCallouts: settings.prefs.canvasDefaultShowCableCallouts,
+    setCanvasDefaultShowCableCallouts: settings.prefs.setCanvasDefaultShowCableCallouts,
     canvasDefaultLabelStrokeMode: settings.prefs.canvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelStrokeMode: settings.prefs.setCanvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode: settings.prefs.canvasDefaultLabelSizeMode,

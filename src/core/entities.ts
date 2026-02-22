@@ -21,6 +21,10 @@ export interface Connector {
   name: string;
   technicalId: string;
   cavityCount: number;
+  cableCalloutPosition?: {
+    x: number;
+    y: number;
+  };
 }
 
 export interface Splice {
@@ -28,6 +32,10 @@ export interface Splice {
   name: string;
   technicalId: string;
   portCount: number;
+  cableCalloutPosition?: {
+    x: number;
+    y: number;
+  };
 }
 
 export type NetworkNode =

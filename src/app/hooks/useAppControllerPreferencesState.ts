@@ -24,6 +24,7 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultLockEntityMovement, setCanvasDefaultLockEntityMovement] = useState(false);
   const [canvasDefaultShowInfoPanels, setCanvasDefaultShowInfoPanels] = useState(true);
   const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(false);
+  const [canvasDefaultShowCableCallouts, setCanvasDefaultShowCableCallouts] = useState(false);
   const [canvasDefaultLabelStrokeMode, setCanvasDefaultLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
   const [canvasDefaultLabelSizeMode, setCanvasDefaultLabelSizeMode] = useState<CanvasLabelSizeMode>("normal");
   const [canvasDefaultLabelRotationDegrees, setCanvasDefaultLabelRotationDegrees] =
@@ -59,6 +60,8 @@ export function useAppControllerPreferencesState() {
     setCanvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,
     setCanvasDefaultShowSegmentLengths,
+    canvasDefaultShowCableCallouts,
+    setCanvasDefaultShowCableCallouts,
     canvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,

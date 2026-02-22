@@ -17,7 +17,8 @@ import type {
   Segment,
   SegmentId,
   Splice,
-  SpliceId
+  SpliceId,
+  Wire
 } from "../../core/entities";
 import type { ShortestRouteResult } from "../../core/pathfinding";
 import type { SubNetworkSummary } from "../../store";
@@ -30,6 +31,7 @@ import type {
 import { NetworkCanvasFloatingInfoPanels } from "./network-summary/NetworkCanvasFloatingInfoPanels";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
 import { NetworkSummaryLegend } from "./network-summary/NetworkSummaryLegend";
+import { snapToGrid } from "../lib/app-utils-shared";
 
 export interface NodePosition {
   x: number;
@@ -106,6 +108,7 @@ export interface NetworkSummaryPanelProps {
   fitNetworkToContent: () => void;
   showNetworkInfoPanels: boolean;
   showSegmentLengths: boolean;
+  showCableCallouts: boolean;
   labelStrokeMode: CanvasLabelStrokeMode;
   labelSizeMode: CanvasLabelSizeMode;
   labelRotationDegrees: CanvasLabelRotationDegrees;
@@ -114,6 +117,7 @@ export interface NetworkSummaryPanelProps {
   lockEntityMovement: boolean;
   toggleShowNetworkInfoPanels: () => void;
   toggleShowSegmentLengths: () => void;
+  toggleShowCableCallouts: () => void;
   toggleShowNetworkGrid: () => void;
   toggleSnapNodesToGrid: () => void;
   toggleLockEntityMovement: () => void;
@@ -123,6 +127,7 @@ export interface NetworkSummaryPanelProps {
   totalEdgeEntries: number;
   nodes: NetworkNode[];
   segments: Segment[];
+  wires: Wire[];
   isPanningNetwork: boolean;
   networkViewWidth: number;
   networkViewHeight: number;
@@ -156,6 +161,10 @@ export interface NetworkSummaryPanelProps {
   activeSubScreen: SubScreenId;
   entityCountBySubScreen: Record<SubScreenId, number>;
   onQuickEntityNavigation: (subScreen: SubScreenId) => void;
+  onSelectConnectorFromCallout: (connectorId: ConnectorId) => void;
+  onSelectSpliceFromCallout: (spliceId: SpliceId) => void;
+  onPersistConnectorCalloutPosition: (connectorId: ConnectorId, position: NodePosition) => void;
+  onPersistSpliceCalloutPosition: (spliceId: SpliceId, position: NodePosition) => void;
   pngExportIncludeBackground: boolean;
   onRegenerateLayout: () => void;
 }
@@ -186,11 +195,191 @@ const SUB_SCREEN_ICON_CLASS_BY_ID: Record<SubScreenId, string> = {
   wire: "is-wires"
 };
 
+type CalloutTargetKey = `connector:${string}` | `splice:${string}`;
+
+interface CalloutEntry {
+  wireId: string;
+  name: string;
+  technicalId: string;
+  lengthMm: number;
+}
+
+interface CalloutGroup {
+  key: string;
+  label: string;
+  entries: CalloutEntry[];
+}
+
+interface CableCalloutViewModel {
+  key: CalloutTargetKey;
+  kind: "connector" | "splice";
+  entityId: ConnectorId | SpliceId;
+  nodeId: NodeId;
+  nodePosition: NodePosition;
+  position: NodePosition;
+  title: string;
+  subtitle: string;
+  groups: CalloutGroup[];
+  isDeemphasized: boolean;
+  isSelected: boolean;
+}
+
+interface CalloutLayoutMetrics {
+  width: number;
+  headerTitleY: number;
+  headerSubtitleY: number;
+  groupsStartY: number;
+  height: number;
+  wrappedRowsByGroupKey: Record<string, string[][]>;
+}
+
+interface DraggingCalloutState {
+  key: CalloutTargetKey;
+  kind: "connector" | "splice";
+  entityId: ConnectorId | SpliceId;
+  startPosition: NodePosition;
+}
+
+const CALLOUT_OFFSET_SCREEN_UNITS = 92;
+const CALLOUT_MIN_WIDTH = 132;
+const CALLOUT_MAX_WIDTH = 260;
+
+function clampNumber(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function normalizeVector(x: number, y: number): { x: number; y: number } {
+  const magnitude = Math.hypot(x, y);
+  if (magnitude <= 0.0001) {
+    return { x: 0, y: 0 };
+  }
+  return { x: x / magnitude, y: y / magnitude };
+}
+
+function wrapTextByApproxChars(text: string, maxChars: number): string[] {
+  const normalized = text.trim();
+  if (normalized.length === 0) {
+    return [""];
+  }
+
+  const limit = Math.max(8, maxChars);
+  if (normalized.length <= limit) {
+    return [normalized];
+  }
+
+  const words = normalized.split(/\s+/);
+  const lines: string[] = [];
+  let current = "";
+  const flush = () => {
+    if (current.length > 0) {
+      lines.push(current);
+      current = "";
+    }
+  };
+
+  for (const word of words) {
+    if (word.length > limit) {
+      flush();
+      let remaining = word;
+      while (remaining.length > limit) {
+        lines.push(remaining.slice(0, limit));
+        remaining = remaining.slice(limit);
+      }
+      current = remaining;
+      continue;
+    }
+
+    const candidate = current.length === 0 ? word : `${current} ${word}`;
+    if (candidate.length <= limit) {
+      current = candidate;
+    } else {
+      flush();
+      current = word;
+    }
+  }
+  flush();
+
+  return lines.length > 0 ? lines : [normalized];
+}
+
+function buildCalloutLayoutMetrics(groups: CalloutGroup[]): CalloutLayoutMetrics {
+  const titleChars = 28;
+  const subtitleChars = 34;
+  let longestLineLength = Math.max(titleChars, subtitleChars);
+  for (const group of groups) {
+    longestLineLength = Math.max(longestLineLength, group.label.length);
+    for (const entry of group.entries) {
+      const line = `${entry.name} (${entry.technicalId}) - ${entry.lengthMm} mm`;
+      longestLineLength = Math.max(longestLineLength, line.length);
+    }
+  }
+
+  const width = clampNumber(84 + longestLineLength * 3.2, CALLOUT_MIN_WIDTH, CALLOUT_MAX_WIDTH);
+  const maxChars = Math.max(16, Math.floor((width - 18) / 4.8));
+  const wrappedRowsByGroupKey: Record<string, string[][]> = {};
+
+  let y = 0;
+  const paddingTop = 10;
+  const headerTitleY = paddingTop;
+  y = headerTitleY + 9;
+  const headerSubtitleY = y;
+  y += 8;
+  const groupsStartY = y + 3;
+  y = groupsStartY;
+
+  for (const group of groups) {
+    y += 7.5; // group header
+    const wrappedRows: string[][] = [];
+    for (const entry of group.entries) {
+      const line = `${entry.name} (${entry.technicalId}) - ${entry.lengthMm} mm`;
+      const wrapped = wrapTextByApproxChars(line, maxChars);
+      wrappedRows.push(wrapped);
+      y += wrapped.length * 7;
+    }
+    if (group.entries.length === 0) {
+      const wrapped = wrapTextByApproxChars("No connected cables", maxChars);
+      wrappedRows.push(wrapped);
+      y += wrapped.length * 7;
+    }
+    y += 3;
+    wrappedRowsByGroupKey[group.key] = wrappedRows;
+  }
+
+  const height = Math.max(42, y + 6);
+  return { width, headerTitleY, headerSubtitleY, groupsStartY, height, wrappedRowsByGroupKey };
+}
+
+function getCalloutFrameEdgePoint(
+  nodePosition: NodePosition,
+  calloutPosition: NodePosition,
+  width: number,
+  height: number,
+  inverseScale: number
+): NodePosition {
+  const dx = calloutPosition.x - nodePosition.x;
+  const dy = calloutPosition.y - nodePosition.y;
+  if (Math.abs(dx) < 0.0001 && Math.abs(dy) < 0.0001) {
+    return calloutPosition;
+  }
+
+  const halfWidth = (width / 2) * inverseScale;
+  const halfHeight = (height / 2) * inverseScale;
+  const scaleX = Math.abs(dx) < 0.0001 ? Number.POSITIVE_INFINITY : halfWidth / Math.abs(dx);
+  const scaleY = Math.abs(dy) < 0.0001 ? Number.POSITIVE_INFINITY : halfHeight / Math.abs(dy);
+  const t = Math.min(scaleX, scaleY);
+
+  return {
+    x: calloutPosition.x - dx * t,
+    y: calloutPosition.y - dy * t
+  };
+}
+
 export function NetworkSummaryPanel({
   handleZoomAction,
   fitNetworkToContent,
   showNetworkInfoPanels,
   showSegmentLengths,
+  showCableCallouts,
   labelStrokeMode,
   labelSizeMode,
   labelRotationDegrees,
@@ -199,6 +388,7 @@ export function NetworkSummaryPanel({
   lockEntityMovement,
   toggleShowNetworkInfoPanels,
   toggleShowSegmentLengths,
+  toggleShowCableCallouts,
   toggleShowNetworkGrid,
   toggleSnapNodesToGrid,
   toggleLockEntityMovement,
@@ -208,6 +398,7 @@ export function NetworkSummaryPanel({
   totalEdgeEntries,
   nodes,
   segments,
+  wires,
   isPanningNetwork,
   networkViewWidth,
   networkViewHeight,
@@ -241,6 +432,10 @@ export function NetworkSummaryPanel({
   activeSubScreen,
   entityCountBySubScreen,
   onQuickEntityNavigation,
+  onSelectConnectorFromCallout,
+  onSelectSpliceFromCallout,
+  onPersistConnectorCalloutPosition,
+  onPersistSpliceCalloutPosition,
   pngExportIncludeBackground,
   onRegenerateLayout
 }: NetworkSummaryPanelProps): ReactElement {
@@ -342,6 +537,388 @@ export function NetworkSummaryPanel({
   const enableAllSubNetworkTags = useCallback(() => {
     setActiveSubNetworkTags(new Set(allSubNetworkTags));
   }, [allSubNetworkTags]);
+
+  const [hoveredCalloutKey, setHoveredCalloutKey] = useState<CalloutTargetKey | null>(null);
+  const [draggingCallout, setDraggingCallout] = useState<DraggingCalloutState | null>(null);
+  const [draftCalloutPositions, setDraftCalloutPositions] = useState<Record<string, NodePosition>>({});
+
+  const graphCenter = useMemo(() => {
+    const positionedNodes = nodes
+      .map((node) => networkNodePositions[node.id])
+      .filter((position): position is NodePosition => position !== undefined);
+    if (positionedNodes.length === 0) {
+      return { x: 0, y: 0 };
+    }
+    const sum = positionedNodes.reduce(
+      (accumulator, position) => ({
+        x: accumulator.x + position.x,
+        y: accumulator.y + position.y
+      }),
+      { x: 0, y: 0 }
+    );
+    return {
+      x: sum.x / positionedNodes.length,
+      y: sum.y / positionedNodes.length
+    };
+  }, [nodes, networkNodePositions]);
+
+  const connectedSegmentDirectionByNodeId = useMemo(() => {
+    const directions = new Map<NodeId, { x: number; y: number }[]>();
+    for (const node of nodes) {
+      directions.set(node.id, []);
+    }
+    for (const segment of segments) {
+      const positionA = networkNodePositions[segment.nodeA];
+      const positionB = networkNodePositions[segment.nodeB];
+      if (positionA === undefined || positionB === undefined) {
+        continue;
+      }
+      const forward = normalizeVector(positionB.x - positionA.x, positionB.y - positionA.y);
+      const backward = normalizeVector(positionA.x - positionB.x, positionA.y - positionB.y);
+      directions.get(segment.nodeA)?.push(forward);
+      directions.get(segment.nodeB)?.push(backward);
+    }
+    return directions;
+  }, [nodes, segments, networkNodePositions]);
+
+  const connectorCalloutGroupsById = useMemo(() => {
+    const map = new Map<ConnectorId, CalloutGroup[]>();
+    for (const connector of connectorMap.values()) {
+      const groups = Array.from({ length: Math.max(0, connector.cavityCount) }, (_, index) => ({
+        key: `connector:${connector.id}:C${index + 1}`,
+        label: `C${index + 1}`,
+        entries: [] as CalloutEntry[]
+      }));
+      map.set(connector.id, groups);
+    }
+
+    for (const wire of wires) {
+      const endpoints = [wire.endpointA, wire.endpointB];
+      for (const endpoint of endpoints) {
+        if (endpoint.kind !== "connectorCavity") {
+          continue;
+        }
+        const groups = map.get(endpoint.connectorId);
+        if (groups === undefined || endpoint.cavityIndex < 1) {
+          continue;
+        }
+        const groupIndex = endpoint.cavityIndex - 1;
+        if (groupIndex >= groups.length) {
+          continue;
+        }
+        groups[groupIndex]?.entries.push({
+          wireId: wire.id,
+          name: wire.name,
+          technicalId: wire.technicalId,
+          lengthMm: wire.lengthMm
+        });
+      }
+    }
+
+    for (const groups of map.values()) {
+      for (const group of groups) {
+        group.entries.sort(
+          (left, right) =>
+            left.name.localeCompare(right.name) || left.technicalId.localeCompare(right.technicalId)
+        );
+      }
+    }
+    return map;
+  }, [connectorMap, wires]);
+
+  const spliceCalloutGroupsById = useMemo(() => {
+    const map = new Map<SpliceId, CalloutGroup[]>();
+    for (const splice of spliceMap.values()) {
+      const groups = Array.from({ length: Math.max(0, splice.portCount) }, (_, index) => ({
+        key: `splice:${splice.id}:P${index + 1}`,
+        label: `P${index + 1}`,
+        entries: [] as CalloutEntry[]
+      }));
+      map.set(splice.id, groups);
+    }
+
+    for (const wire of wires) {
+      const endpoints = [wire.endpointA, wire.endpointB];
+      for (const endpoint of endpoints) {
+        if (endpoint.kind !== "splicePort") {
+          continue;
+        }
+        const groups = map.get(endpoint.spliceId);
+        if (groups === undefined || endpoint.portIndex < 1) {
+          continue;
+        }
+        const groupIndex = endpoint.portIndex - 1;
+        if (groupIndex >= groups.length) {
+          continue;
+        }
+        groups[groupIndex]?.entries.push({
+          wireId: wire.id,
+          name: wire.name,
+          technicalId: wire.technicalId,
+          lengthMm: wire.lengthMm
+        });
+      }
+    }
+
+    for (const groups of map.values()) {
+      for (const group of groups) {
+        group.entries.sort(
+          (left, right) =>
+            left.name.localeCompare(right.name) || left.technicalId.localeCompare(right.technicalId)
+        );
+      }
+    }
+    return map;
+  }, [spliceMap, wires]);
+
+  const getDefaultCalloutPosition = useCallback(
+    (nodeId: NodeId, nodePosition: NodePosition) => {
+      const connectedDirections = connectedSegmentDirectionByNodeId.get(nodeId) ?? [];
+      let outward = { x: 0, y: 0 };
+      if (connectedDirections.length > 0) {
+        const accumulated = connectedDirections.reduce(
+          (accumulator, direction) => ({
+            x: accumulator.x + direction.x,
+            y: accumulator.y + direction.y
+          }),
+          { x: 0, y: 0 }
+        );
+        outward = normalizeVector(-accumulated.x, -accumulated.y);
+      }
+
+      if (outward.x === 0 && outward.y === 0) {
+        outward = normalizeVector(nodePosition.x - graphCenter.x, nodePosition.y - graphCenter.y);
+      }
+      if (outward.x === 0 && outward.y === 0) {
+        outward = { x: 1, y: -0.4 };
+      }
+
+      const distance = CALLOUT_OFFSET_SCREEN_UNITS * inverseLabelScale;
+      return {
+        x: nodePosition.x + outward.x * distance,
+        y: nodePosition.y + outward.y * distance
+      } satisfies NodePosition;
+    },
+    [connectedSegmentDirectionByNodeId, graphCenter, inverseLabelScale]
+  );
+
+  const cableCalloutViewModels = useMemo(() => {
+    if (!showCableCallouts) {
+      return [] as CableCalloutViewModel[];
+    }
+
+    const models: CableCalloutViewModel[] = [];
+    for (const node of nodes) {
+      const nodePosition = networkNodePositions[node.id];
+      if (nodePosition === undefined || (node.kind !== "connector" && node.kind !== "splice")) {
+        continue;
+      }
+
+      if (node.kind === "connector") {
+        const connector = connectorMap.get(node.connectorId);
+        if (connector === undefined) {
+          continue;
+        }
+        const key = `connector:${connector.id}` as const;
+        const draftPosition = draftCalloutPositions[key];
+        const persistedPosition = connector.cableCalloutPosition;
+        const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
+        models.push({
+          key,
+          kind: "connector",
+          entityId: connector.id,
+          nodeId: node.id,
+          nodePosition,
+          position,
+          title: connector.name,
+          subtitle: connector.technicalId,
+          groups: connectorCalloutGroupsById.get(connector.id) ?? [],
+          isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
+          isSelected: selectedConnectorId === connector.id
+        });
+        continue;
+      }
+
+      const splice = spliceMap.get(node.spliceId);
+      if (splice === undefined) {
+        continue;
+      }
+      const key = `splice:${splice.id}` as const;
+      const draftPosition = draftCalloutPositions[key];
+      const persistedPosition = splice.cableCalloutPosition;
+      const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
+      models.push({
+        key,
+        kind: "splice",
+        entityId: splice.id,
+        nodeId: node.id,
+        nodePosition,
+        position,
+        title: splice.name,
+        subtitle: splice.technicalId,
+        groups: spliceCalloutGroupsById.get(splice.id) ?? [],
+        isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
+        isSelected: selectedSpliceId === splice.id
+      });
+    }
+
+    return models.sort((left, right) => left.title.localeCompare(right.title) || left.subtitle.localeCompare(right.subtitle));
+  }, [
+    showCableCallouts,
+    nodes,
+    networkNodePositions,
+    connectorMap,
+    spliceMap,
+    connectorCalloutGroupsById,
+    spliceCalloutGroupsById,
+    draftCalloutPositions,
+    getDefaultCalloutPosition,
+    isSubNetworkFilteringActive,
+    nodeHasActiveSubNetworkConnection,
+    selectedConnectorId,
+    selectedSpliceId
+  ]);
+
+  const orderedCableCallouts = useMemo(() => {
+    if (cableCalloutViewModels.length <= 1) {
+      return cableCalloutViewModels;
+    }
+
+    const draggingKey = draggingCallout?.key ?? null;
+    return [...cableCalloutViewModels].sort((left, right) => {
+      const weightFor = (key: CalloutTargetKey, isSelected: boolean) => {
+        if (draggingKey === key) {
+          return 3;
+        }
+        if (hoveredCalloutKey === key) {
+          return 2;
+        }
+        if (isSelected) {
+          return 1;
+        }
+        return 0;
+      };
+      const weightDelta = weightFor(left.key, left.isSelected) - weightFor(right.key, right.isSelected);
+      if (weightDelta !== 0) {
+        return weightDelta;
+      }
+      return left.title.localeCompare(right.title) || left.subtitle.localeCompare(right.subtitle);
+    });
+  }, [cableCalloutViewModels, draggingCallout?.key, hoveredCalloutKey]);
+
+  const getSvgCoordinates = useCallback(
+    (svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null => {
+      const bounds = svgElement.getBoundingClientRect();
+      if (bounds.width <= 0 || bounds.height <= 0) {
+        return null;
+      }
+
+      const localX = ((clientX - bounds.left) / bounds.width) * networkViewWidth;
+      const localY = ((clientY - bounds.top) / bounds.height) * networkViewHeight;
+      const modelX = (localX - networkOffset.x) / networkScale;
+      const modelY = (localY - networkOffset.y) / networkScale;
+      return {
+        x: snapNodesToGrid ? snapToGrid(modelX, networkGridStep) : modelX,
+        y: snapNodesToGrid ? snapToGrid(modelY, networkGridStep) : modelY
+      };
+    },
+    [networkGridStep, networkOffset.x, networkOffset.y, networkScale, networkViewHeight, networkViewWidth, snapNodesToGrid]
+  );
+
+  const handleCalloutMouseDown = useCallback(
+    (
+      event: ReactMouseEvent<SVGGElement>,
+      callout: Pick<CableCalloutViewModel, "key" | "kind" | "entityId" | "position">
+    ) => {
+      if (event.button !== 0) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      if (callout.kind === "connector") {
+        onSelectConnectorFromCallout(callout.entityId as ConnectorId);
+      } else {
+        onSelectSpliceFromCallout(callout.entityId as SpliceId);
+      }
+
+      if (lockEntityMovement) {
+        return;
+      }
+
+      setDraggingCallout({
+        key: callout.key,
+        kind: callout.kind,
+        entityId: callout.entityId,
+        startPosition: callout.position
+      });
+      setDraftCalloutPositions((current) => ({
+        ...current,
+        [callout.key]: callout.position
+      }));
+    },
+    [lockEntityMovement, onSelectConnectorFromCallout, onSelectSpliceFromCallout]
+  );
+
+  const handleCanvasMouseMoveWithCallouts = useCallback(
+    (event: ReactMouseEvent<SVGSVGElement>) => {
+      if (draggingCallout === null) {
+        handleNetworkMouseMove(event);
+        return;
+      }
+
+      const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
+      if (coordinates === null) {
+        return;
+      }
+
+      setDraftCalloutPositions((current) => ({
+        ...current,
+        [draggingCallout.key]: coordinates
+      }));
+    },
+    [draggingCallout, getSvgCoordinates, handleNetworkMouseMove]
+  );
+
+  const stopCalloutDrag = useCallback(() => {
+    if (draggingCallout === null) {
+      return;
+    }
+
+    const draftPosition = draftCalloutPositions[draggingCallout.key];
+    if (draftPosition !== undefined) {
+      const changed =
+        Math.abs(draftPosition.x - draggingCallout.startPosition.x) > 0.0001 ||
+        Math.abs(draftPosition.y - draggingCallout.startPosition.y) > 0.0001;
+      if (changed) {
+        if (draggingCallout.kind === "connector") {
+          onPersistConnectorCalloutPosition(draggingCallout.entityId as ConnectorId, draftPosition);
+        } else {
+          onPersistSpliceCalloutPosition(draggingCallout.entityId as SpliceId, draftPosition);
+        }
+      }
+    }
+
+    setDraggingCallout(null);
+    setDraftCalloutPositions((current) => {
+      if (current[draggingCallout.key] === undefined) {
+        return current;
+      }
+      const next = { ...current };
+      delete next[draggingCallout.key];
+      return next;
+    });
+  }, [
+    draggingCallout,
+    draftCalloutPositions,
+    onPersistConnectorCalloutPosition,
+    onPersistSpliceCalloutPosition
+  ]);
+
+  const stopNetworkInteractions = useCallback(() => {
+    stopCalloutDrag();
+    stopNetworkNodeDrag();
+  }, [stopCalloutDrag, stopNetworkNodeDrag]);
 
   const handleExportPlanAsPng = useCallback(() => {
     if (typeof window === "undefined") {
@@ -445,6 +1022,14 @@ export function NetworkSummaryPanel({
             </button>
             <button
               type="button"
+              className={showCableCallouts ? "workspace-tab is-active" : "workspace-tab"}
+              onClick={toggleShowCableCallouts}
+            >
+              <span className="network-summary-info-icon" aria-hidden="true" />
+              Callouts
+            </button>
+            <button
+              type="button"
               className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}
               onClick={toggleShowNetworkGrid}
             >
@@ -503,9 +1088,9 @@ export function NetworkSummaryPanel({
               onMouseDown={handleNetworkCanvasMouseDown}
               onClick={handleNetworkCanvasClick}
               onWheel={handleNetworkWheel}
-              onMouseMove={handleNetworkMouseMove}
-              onMouseUp={stopNetworkNodeDrag}
-              onMouseLeave={stopNetworkNodeDrag}
+              onMouseMove={handleCanvasMouseMoveWithCallouts}
+              onMouseUp={stopNetworkInteractions}
+              onMouseLeave={stopNetworkInteractions}
             >
               {showNetworkGrid ? (
                 <g className="network-grid" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
@@ -682,6 +1267,121 @@ export function NetworkSummaryPanel({
                         >
                           {nodeLabel}
                         </text>
+                      </g>
+                    </g>
+                  );
+                })}
+
+                {orderedCableCallouts.map((callout) => {
+                  const layout = buildCalloutLayoutMetrics(callout.groups);
+                  const lineEnd = getCalloutFrameEdgePoint(
+                    callout.nodePosition,
+                    callout.position,
+                    layout.width,
+                    layout.height,
+                    inverseLabelScale
+                  );
+                  const calloutClassName = `network-callout-group${callout.isDeemphasized ? " is-deemphasized" : ""}${
+                    callout.isSelected ? " is-selected" : ""
+                  }${hoveredCalloutKey === callout.key ? " is-hovered" : ""}${
+                    draggingCallout?.key === callout.key ? " is-dragging" : ""
+                  }`;
+                  let contentCursorY = layout.groupsStartY;
+
+                  return (
+                    <g
+                      key={callout.key}
+                      className={calloutClassName}
+                      onMouseEnter={() => setHoveredCalloutKey(callout.key)}
+                      onMouseLeave={() => {
+                        setHoveredCalloutKey((current) => (current === callout.key ? null : current));
+                      }}
+                    >
+                      <line
+                        className="network-callout-leader-line"
+                        x1={callout.nodePosition.x}
+                        y1={callout.nodePosition.y}
+                        x2={lineEnd.x}
+                        y2={lineEnd.y}
+                      />
+                      <g
+                        className="network-callout-anchor"
+                        transform={`translate(${callout.position.x} ${callout.position.y}) scale(${inverseLabelScale})`}
+                        role="button"
+                        tabIndex={0}
+                        focusable="true"
+                        aria-label={`Select ${callout.kind} ${callout.subtitle}`}
+                        onMouseDown={(event) => handleCalloutMouseDown(event, callout)}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key !== "Enter" && event.key !== " ") {
+                            return;
+                          }
+                          event.preventDefault();
+                          event.stopPropagation();
+                          if (callout.kind === "connector") {
+                            onSelectConnectorFromCallout(callout.entityId as ConnectorId);
+                          } else {
+                            onSelectSpliceFromCallout(callout.entityId as SpliceId);
+                          }
+                        }}
+                      >
+                        <rect
+                          className="network-callout-frame"
+                          x={-layout.width / 2}
+                          y={-layout.height / 2}
+                          width={layout.width}
+                          height={layout.height}
+                        />
+                        <text className="network-callout-title" x={0} y={-layout.height / 2 + layout.headerTitleY} textAnchor="middle">
+                          {callout.title}
+                        </text>
+                        <text
+                          className="network-callout-subtitle"
+                          x={0}
+                          y={-layout.height / 2 + layout.headerSubtitleY}
+                          textAnchor="middle"
+                        >
+                          {callout.subtitle}
+                        </text>
+                        {callout.groups.map((group) => {
+                          const groupHeaderY = -layout.height / 2 + contentCursorY;
+                          const wrappedRows =
+                            layout.wrappedRowsByGroupKey[group.key] ?? [[group.entries.length === 0 ? "No connected cables" : ""]];
+                          contentCursorY += 7.5;
+                          const renderedRows = wrappedRows.map((wrappedRowLines, rowIndex) => {
+                            const rowY = -layout.height / 2 + contentCursorY;
+                            const row = (
+                              <text
+                                key={`${group.key}-row-${group.entries[rowIndex]?.wireId ?? `empty-${rowIndex}`}`}
+                                className="network-callout-row-text"
+                                x={-layout.width / 2 + 8}
+                                y={rowY}
+                                textAnchor="start"
+                              >
+                                {wrappedRowLines.map((line, lineIndex) => (
+                                  <tspan key={`${group.key}-row-${rowIndex}-line-${lineIndex}`} x={-layout.width / 2 + 8} dy={lineIndex === 0 ? 0 : 7}>
+                                    {line}
+                                  </tspan>
+                                ))}
+                              </text>
+                            );
+                            contentCursorY += wrappedRowLines.length * 7;
+                            return row;
+                          });
+                          contentCursorY += 3;
+                          return (
+                            <g key={group.key} className="network-callout-group-content">
+                              <text className="network-callout-group-label" x={-layout.width / 2 + 8} y={groupHeaderY} textAnchor="start">
+                                {group.label}
+                              </text>
+                              {renderedRows}
+                            </g>
+                          );
+                        })}
                       </g>
                     </g>
                   );

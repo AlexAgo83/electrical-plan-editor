@@ -62,6 +62,7 @@ interface UiPreferencesPayload {
   canvasDefaultLockEntityMovement: boolean;
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
+  canvasDefaultShowCableCallouts: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
@@ -113,6 +114,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultLockEntityMovement: boolean;
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
+  canvasDefaultShowCableCallouts: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
@@ -141,6 +143,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultLockEntityMovement: (value: boolean) => void;
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
+  setCanvasDefaultShowCableCallouts: (value: boolean) => void;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
@@ -150,6 +153,7 @@ interface UseUiPreferencesOptions {
   setLockEntityMovement: (value: boolean) => void;
   setShowNetworkInfoPanels: (value: boolean) => void;
   setShowSegmentLengths: (value: boolean) => void;
+  setShowCableCallouts: (value: boolean) => void;
   setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setNetworkLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   setNetworkLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
@@ -189,6 +193,7 @@ export function useUiPreferences({
   canvasDefaultLockEntityMovement,
   canvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
+  canvasDefaultShowCableCallouts,
   canvasDefaultLabelStrokeMode,
   canvasDefaultLabelSizeMode,
   canvasDefaultLabelRotationDegrees,
@@ -217,6 +222,7 @@ export function useUiPreferences({
   setCanvasDefaultLockEntityMovement,
   setCanvasDefaultShowInfoPanels,
   setCanvasDefaultShowSegmentLengths,
+  setCanvasDefaultShowCableCallouts,
   setCanvasDefaultLabelStrokeMode,
   setCanvasDefaultLabelSizeMode,
   setCanvasDefaultLabelRotationDegrees,
@@ -226,6 +232,7 @@ export function useUiPreferences({
   setLockEntityMovement,
   setShowNetworkInfoPanels,
   setShowSegmentLengths,
+  setShowCableCallouts,
   setNetworkLabelStrokeMode,
   setNetworkLabelSizeMode,
   setNetworkLabelRotationDegrees,
@@ -256,6 +263,10 @@ export function useUiPreferences({
       const showSegmentLengthsDefault =
         typeof preferences.canvasDefaultShowSegmentLengths === "boolean"
           ? preferences.canvasDefaultShowSegmentLengths
+          : false;
+      const showCableCalloutsDefault =
+        typeof preferences.canvasDefaultShowCableCallouts === "boolean"
+          ? preferences.canvasDefaultShowCableCallouts
           : false;
       const labelStrokeModeDefault =
         preferences.canvasDefaultLabelStrokeMode === "none" || preferences.canvasDefaultLabelStrokeMode === "light"
@@ -293,6 +304,7 @@ export function useUiPreferences({
       setCanvasDefaultLockEntityMovement(lockMovementDefault);
       setCanvasDefaultShowInfoPanels(showInfoPanelsDefault);
       setCanvasDefaultShowSegmentLengths(showSegmentLengthsDefault);
+      setCanvasDefaultShowCableCallouts(showCableCalloutsDefault);
       setCanvasDefaultLabelStrokeMode(labelStrokeModeDefault);
       setCanvasDefaultLabelSizeMode(labelSizeModeDefault);
       setCanvasDefaultLabelRotationDegrees(labelRotationDegreesDefault);
@@ -306,6 +318,7 @@ export function useUiPreferences({
       setLockEntityMovement(lockMovementDefault);
       setShowNetworkInfoPanels(showInfoPanelsDefault);
       setShowSegmentLengths(showSegmentLengthsDefault);
+      setShowCableCallouts(showCableCalloutsDefault);
       setNetworkLabelStrokeMode(labelStrokeModeDefault);
       setNetworkLabelSizeMode(labelSizeModeDefault);
       setNetworkLabelRotationDegrees(labelRotationDegreesDefault);
@@ -330,6 +343,7 @@ export function useUiPreferences({
     setCanvasDefaultLockEntityMovement,
     setCanvasDefaultShowInfoPanels,
     setCanvasDefaultShowSegmentLengths,
+    setCanvasDefaultShowCableCallouts,
     setCanvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelSizeMode,
     setCanvasDefaultLabelRotationDegrees,
@@ -351,6 +365,7 @@ export function useUiPreferences({
     setShowFloatingInspectorPanel,
     setShowShortcutHints,
     setShowSegmentLengths,
+    setShowCableCallouts,
     setNetworkLabelStrokeMode,
     setNetworkLabelSizeMode,
     setNetworkLabelRotationDegrees,
@@ -383,6 +398,7 @@ export function useUiPreferences({
       canvasDefaultLockEntityMovement,
       canvasDefaultShowInfoPanels,
       canvasDefaultShowSegmentLengths,
+      canvasDefaultShowCableCallouts,
       canvasDefaultLabelStrokeMode,
       canvasDefaultLabelSizeMode,
       canvasDefaultLabelRotationDegrees,
@@ -404,6 +420,7 @@ export function useUiPreferences({
     canvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,
+    canvasDefaultShowCableCallouts,
     canvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,
     canvasDefaultLabelRotationDegrees,

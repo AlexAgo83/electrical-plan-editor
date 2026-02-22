@@ -97,9 +97,12 @@ export function useSpliceHandlers({
       spliceFormMode === "edit" && editingSpliceId !== null
         ? editingSpliceId
         : (createEntityId("splice") as SpliceId);
+    const existingSplice =
+      spliceFormMode === "edit" && editingSpliceId !== null ? store.getState().splices.byId[editingSpliceId] : undefined;
 
     dispatchAction(
       appActions.upsertSplice({
+        ...(existingSplice ?? {}),
         id: spliceId,
         name: trimmedName,
         technicalId: trimmedTechnicalId,

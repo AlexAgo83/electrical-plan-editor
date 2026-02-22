@@ -6,6 +6,7 @@ export function useAppControllerCanvasDisplayState() {
   const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
   const [showNetworkInfoPanels, setShowNetworkInfoPanels] = useState(true);
   const [showSegmentLengths, setShowSegmentLengths] = useState(false);
+  const [showCableCallouts, setShowCableCallouts] = useState(false);
   const [networkLabelStrokeMode, setNetworkLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
   const [networkLabelSizeMode, setNetworkLabelSizeMode] = useState<CanvasLabelSizeMode>("normal");
   const [networkLabelRotationDegrees, setNetworkLabelRotationDegrees] = useState<CanvasLabelRotationDegrees>(0);
@@ -20,6 +21,8 @@ export function useAppControllerCanvasDisplayState() {
     setShowNetworkInfoPanels,
     showSegmentLengths,
     setShowSegmentLengths,
+    showCableCallouts,
+    setShowCableCallouts,
     networkLabelStrokeMode,
     setNetworkLabelStrokeMode,
     networkLabelSizeMode,

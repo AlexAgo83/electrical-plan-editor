@@ -59,6 +59,7 @@ interface UseWorkspaceHandlersParams {
   canvasDefaultLockEntityMovement: boolean;
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
+  canvasDefaultShowCableCallouts: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
@@ -67,6 +68,7 @@ interface UseWorkspaceHandlersParams {
   setLockEntityMovement: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowNetworkInfoPanels: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowSegmentLengths: (value: boolean | ((current: boolean) => boolean)) => void;
+  setShowCableCallouts: (value: boolean | ((current: boolean) => boolean)) => void;
   setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode | ((current: CanvasLabelStrokeMode) => CanvasLabelStrokeMode)) => void;
   setNetworkLabelSizeMode: (value: CanvasLabelSizeMode | ((current: CanvasLabelSizeMode) => CanvasLabelSizeMode)) => void;
   setNetworkLabelRotationDegrees: (
@@ -94,6 +96,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasDefaultLockEntityMovement: (value: boolean) => void;
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
+  setCanvasDefaultShowCableCallouts: (value: boolean) => void;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
@@ -128,6 +131,7 @@ export function useWorkspaceHandlers({
   canvasDefaultLockEntityMovement,
   canvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
+  canvasDefaultShowCableCallouts,
   canvasDefaultLabelStrokeMode,
   canvasDefaultLabelSizeMode,
   canvasDefaultLabelRotationDegrees,
@@ -136,6 +140,7 @@ export function useWorkspaceHandlers({
   setLockEntityMovement,
   setShowNetworkInfoPanels,
   setShowSegmentLengths,
+  setShowCableCallouts,
   setNetworkLabelStrokeMode,
   setNetworkLabelSizeMode,
   setNetworkLabelRotationDegrees,
@@ -161,6 +166,7 @@ export function useWorkspaceHandlers({
   setCanvasDefaultLockEntityMovement,
   setCanvasDefaultShowInfoPanels,
   setCanvasDefaultShowSegmentLengths,
+  setCanvasDefaultShowCableCallouts,
   setCanvasDefaultLabelStrokeMode,
   setCanvasDefaultLabelSizeMode,
   setCanvasDefaultLabelRotationDegrees,
@@ -423,6 +429,7 @@ export function useWorkspaceHandlers({
     setLockEntityMovement(canvasDefaultLockEntityMovement);
     setShowNetworkInfoPanels(canvasDefaultShowInfoPanels);
     setShowSegmentLengths(canvasDefaultShowSegmentLengths);
+    setShowCableCallouts(canvasDefaultShowCableCallouts);
     setNetworkLabelStrokeMode(canvasDefaultLabelStrokeMode);
     setNetworkLabelSizeMode(canvasDefaultLabelSizeMode);
     setNetworkLabelRotationDegrees(canvasDefaultLabelRotationDegrees);
@@ -450,6 +457,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultLockEntityMovement(false);
     setCanvasDefaultShowInfoPanels(true);
     setCanvasDefaultShowSegmentLengths(false);
+    setCanvasDefaultShowCableCallouts(false);
     setCanvasDefaultLabelStrokeMode("normal");
     setCanvasDefaultLabelSizeMode("normal");
     setCanvasDefaultLabelRotationDegrees(-20);
@@ -460,6 +468,7 @@ export function useWorkspaceHandlers({
     setLockEntityMovement(false);
     setShowNetworkInfoPanels(true);
     setShowSegmentLengths(false);
+    setShowCableCallouts(false);
     setNetworkLabelStrokeMode("normal");
     setNetworkLabelSizeMode("normal");
     setNetworkLabelRotationDegrees(-20);

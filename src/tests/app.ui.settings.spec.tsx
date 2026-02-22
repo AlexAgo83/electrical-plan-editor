@@ -151,6 +151,33 @@ describe("App integration UI - settings", () => {
     expect(within(restoredCanvasSettingsPanel).getByLabelText("Include background in PNG export")).not.toBeChecked();
   });
 
+  it("applies and persists the default cable callout visibility preference", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const canvasSettingsPanel = getPanelByHeading("Canvas preferences");
+    const defaultCalloutCheckbox = within(canvasSettingsPanel).getByLabelText(
+      "Show connector/splice cable callouts by default"
+    );
+
+    expect(defaultCalloutCheckbox).not.toBeChecked();
+    fireEvent.click(defaultCalloutCheckbox);
+    fireEvent.click(within(canvasSettingsPanel).getByRole("button", { name: "Apply canvas defaults now" }));
+
+    switchScreenDrawerAware("modeling");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    expect(within(networkSummaryPanel).getByRole("button", { name: "Callouts" })).toHaveClass("is-active");
+
+    firstRender.unmount();
+
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const restoredCanvasSettingsPanel = getPanelByHeading("Canvas preferences");
+    expect(
+      within(restoredCanvasSettingsPanel).getByLabelText("Show connector/splice cable callouts by default")
+    ).toBeChecked();
+  });
+
   it("recreates sample network from settings when workspace is empty", () => {
     renderAppWithState(createInitialState());
 

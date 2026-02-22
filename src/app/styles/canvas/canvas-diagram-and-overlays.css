@@ -1,3 +1,5 @@
+@import "./canvas-diagram-and-overlays/network-callouts.css";
+
 .route-preview-selection-strip {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);

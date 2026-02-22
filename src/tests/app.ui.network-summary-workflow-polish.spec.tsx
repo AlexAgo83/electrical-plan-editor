@@ -134,4 +134,59 @@ describe("App integration UI - network summary workflow polish", () => {
 
     rectSpy.mockRestore();
   });
+
+  it("toggles connector/splice cable callouts, selects linked entities, and persists dragged callout positions", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
+    const calloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
+
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(0);
+
+    fireEvent.click(calloutsToggle);
+    const calloutFrames = networkSummaryPanel.querySelectorAll(".network-callout-frame");
+    expect(calloutFrames.length).toBeGreaterThanOrEqual(2);
+
+    const firstCalloutAnchor = networkSummaryPanel.querySelector(".network-callout-anchor");
+    expect(firstCalloutAnchor).not.toBeNull();
+
+    fireEvent.mouseDown(firstCalloutAnchor as Element, { button: 0, clientX: 220, clientY: 140 });
+    expect(networkSummaryPanel.querySelector(".network-node.connector.is-selected")).not.toBeNull();
+
+    const transformBeforeDrag = (firstCalloutAnchor as SVGGElement).getAttribute("transform") ?? "";
+
+    const rectSpy = vi.spyOn(networkSvg, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({
+          x: 0,
+          y: 0,
+          top: 0,
+          left: 0,
+          width: 800,
+          height: 520,
+          right: 800,
+          bottom: 520,
+          toJSON: () => ({})
+        }) as DOMRect
+    );
+
+    fireEvent.mouseMove(networkSvg, { clientX: 620, clientY: 320 });
+    fireEvent.mouseUp(networkSvg);
+    rectSpy.mockRestore();
+
+    const movedCalloutAnchor = networkSummaryPanel.querySelector(".network-callout-anchor");
+    expect(movedCalloutAnchor).not.toBeNull();
+    const transformAfterDrag = (movedCalloutAnchor as SVGGElement).getAttribute("transform") ?? "";
+    expect(transformAfterDrag).not.toBe(transformBeforeDrag);
+
+    fireEvent.click(calloutsToggle);
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(0);
+    fireEvent.click(calloutsToggle);
+
+    const restoredCalloutAnchor = networkSummaryPanel.querySelector(".network-callout-anchor");
+    expect(restoredCalloutAnchor).not.toBeNull();
+    expect((restoredCalloutAnchor as SVGGElement).getAttribute("transform") ?? "").toBe(transformAfterDrag);
+  });
 });

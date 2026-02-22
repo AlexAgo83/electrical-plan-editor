@@ -1,0 +1,148 @@
+.network-callout-leader-line {
+  stroke: var(--network-node-stroke-color, #55748d);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 3;
+  stroke-linecap: round;
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.network-callout-anchor {
+  cursor: pointer;
+}
+
+.network-callout-anchor:active {
+  cursor: grabbing;
+}
+
+.network-callout-frame {
+  fill: var(--network-node-connector-fill, #dff0ff);
+  fill-opacity: 0.9;
+  stroke: var(--network-node-stroke-color, #55748d);
+  stroke-width: 1.2;
+}
+
+.network-callout-group.is-selected .network-callout-frame {
+  stroke: var(--network-selection-color, #0f6cb8);
+  stroke-width: 1.5;
+}
+
+.network-callout-group.is-hovered .network-callout-frame,
+.network-callout-group.is-dragging .network-callout-frame {
+  filter: drop-shadow(0 0 0.22rem var(--network-selection-glow, rgba(15, 108, 184, 0.28)));
+}
+
+.network-callout-anchor:focus-visible {
+  outline: none;
+}
+
+.network-callout-anchor:focus-visible .network-callout-frame {
+  stroke: var(--network-selection-focus-color, var(--network-selection-color, #0f6cb8));
+  stroke-width: 1.5;
+}
+
+.network-callout-title {
+  font-size: 8px;
+  font-weight: 700;
+  fill: var(--network-node-label-color, #183549);
+  paint-order: stroke fill;
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+  stroke-width: 1px;
+  stroke-linejoin: round;
+}
+
+.network-callout-subtitle {
+  font-size: 6.6px;
+  font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+  font-weight: 600;
+  fill: var(--network-segment-label-color, #38566a);
+  paint-order: stroke fill;
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+  stroke-width: 0.9px;
+  stroke-linejoin: round;
+}
+
+.network-callout-group-label {
+  font-size: 6.4px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  fill: var(--network-segment-length-label-color, #547086);
+  paint-order: stroke fill;
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+  stroke-width: 0.7px;
+  stroke-linejoin: round;
+}
+
+.network-callout-row-text {
+  font-size: 5.9px;
+  fill: var(--network-node-label-color, #183549);
+  paint-order: stroke fill;
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+  stroke-width: 0.65px;
+  stroke-linejoin: round;
+  line-height: 1.2;
+}
+
+.network-canvas--label-size-small .network-callout-title {
+  font-size: 7.3px;
+}
+
+.network-canvas--label-size-small .network-callout-subtitle {
+  font-size: 6.1px;
+}
+
+.network-canvas--label-size-small .network-callout-group-label {
+  font-size: 5.9px;
+}
+
+.network-canvas--label-size-small .network-callout-row-text {
+  font-size: 5.3px;
+}
+
+.network-canvas--label-size-extraSmall .network-callout-title {
+  font-size: 6.8px;
+}
+
+.network-canvas--label-size-extraSmall .network-callout-subtitle {
+  font-size: 5.7px;
+}
+
+.network-canvas--label-size-extraSmall .network-callout-group-label {
+  font-size: 5.5px;
+}
+
+.network-canvas--label-size-extraSmall .network-callout-row-text {
+  font-size: 4.9px;
+}
+
+.network-canvas--label-size-large .network-callout-title {
+  font-size: 9.2px;
+}
+
+.network-canvas--label-size-large .network-callout-subtitle {
+  font-size: 7.2px;
+}
+
+.network-canvas--label-size-large .network-callout-group-label {
+  font-size: 7px;
+}
+
+.network-canvas--label-size-large .network-callout-row-text {
+  font-size: 6.5px;
+}
+
+.network-canvas--label-size-extraLarge .network-callout-title {
+  font-size: 10px;
+}
+
+.network-canvas--label-size-extraLarge .network-callout-subtitle {
+  font-size: 7.8px;
+}
+
+.network-canvas--label-size-extraLarge .network-callout-group-label {
+  font-size: 7.5px;
+}
+
+.network-canvas--label-size-extraLarge .network-callout-row-text {
+  font-size: 6.9px;
+}

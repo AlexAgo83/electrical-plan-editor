@@ -7,7 +7,7 @@ import {
   useSyncExternalStore
 } from "react";
 import appPackageMetadata from "../../package.json";
-import type { NodeId } from "../core/entities";
+import type { ConnectorId, NodeId, SpliceId } from "../core/entities";
 import {
   type AppStore,
   appActions,
@@ -149,6 +149,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setShowNetworkInfoPanels,
     showSegmentLengths,
     setShowSegmentLengths,
+    showCableCallouts,
+    setShowCableCallouts,
     networkLabelStrokeMode,
     setNetworkLabelStrokeMode,
     networkLabelSizeMode,
@@ -223,6 +225,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,
     setCanvasDefaultShowSegmentLengths,
+    canvasDefaultShowCableCallouts,
+    setCanvasDefaultShowCableCallouts,
     canvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,
@@ -495,6 +499,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,
+    canvasDefaultShowCableCallouts,
     canvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,
     canvasDefaultLabelRotationDegrees,
@@ -522,6 +527,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultLockEntityMovement,
     setCanvasDefaultShowInfoPanels,
     setCanvasDefaultShowSegmentLengths,
+    setCanvasDefaultShowCableCallouts,
     setCanvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelSizeMode,
     setCanvasDefaultLabelRotationDegrees,
@@ -531,6 +537,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setLockEntityMovement,
     setShowNetworkInfoPanels,
     setShowSegmentLengths,
+    setShowCableCallouts,
     setNetworkLabelStrokeMode,
     setNetworkLabelSizeMode,
     setNetworkLabelRotationDegrees,
@@ -705,6 +712,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       canvasDefaultLockEntityMovement,
       canvasDefaultShowInfoPanels,
       canvasDefaultShowSegmentLengths,
+      canvasDefaultShowCableCallouts,
       canvasDefaultLabelStrokeMode,
       canvasDefaultLabelSizeMode,
       canvasDefaultLabelRotationDegrees,
@@ -713,6 +721,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setLockEntityMovement,
       setShowNetworkInfoPanels,
       setShowSegmentLengths,
+      setShowCableCallouts,
       setNetworkLabelStrokeMode,
       setNetworkLabelSizeMode,
       setNetworkLabelRotationDegrees
@@ -744,6 +753,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setCanvasDefaultLockEntityMovement,
       setCanvasDefaultShowInfoPanels,
       setCanvasDefaultShowSegmentLengths,
+      setCanvasDefaultShowCableCallouts,
       setCanvasDefaultLabelStrokeMode,
       setCanvasDefaultLabelSizeMode,
       setCanvasDefaultLabelRotationDegrees,
@@ -1041,6 +1051,51 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
   });
 
+  const handleSelectConnectorFromCallout = useCallback(
+    (connectorId: ConnectorId) => {
+      dispatchAction(appActions.select({ kind: "connector", id: connectorId }), { trackHistory: false });
+    },
+    [dispatchAction]
+  );
+  const handleSelectSpliceFromCallout = useCallback(
+    (spliceId: SpliceId) => {
+      dispatchAction(appActions.select({ kind: "splice", id: spliceId }), { trackHistory: false });
+    },
+    [dispatchAction]
+  );
+  const persistConnectorCalloutPosition = useCallback(
+    (connectorId: ConnectorId, position: { x: number; y: number }) => {
+      const existing = connectorMap.get(connectorId);
+      if (existing === undefined) {
+        return;
+      }
+      dispatchAction(
+        appActions.upsertConnector({
+          ...existing,
+          cableCalloutPosition: position
+        }),
+        { trackHistory: false }
+      );
+    },
+    [connectorMap, dispatchAction]
+  );
+  const persistSpliceCalloutPosition = useCallback(
+    (spliceId: SpliceId, position: { x: number; y: number }) => {
+      const existing = spliceMap.get(spliceId);
+      if (existing === undefined) {
+        return;
+      }
+      dispatchAction(
+        appActions.upsertSplice({
+          ...existing,
+          cableCalloutPosition: position
+        }),
+        { trackHistory: false }
+      );
+    },
+    [dispatchAction, spliceMap]
+  );
+
   const currentValidationIssue = isValidationScreen
     ? (getFocusedValidationIssueByCursor() ?? visibleValidationIssues[0] ?? null)
     : getValidationIssueByCursor();
@@ -1161,6 +1216,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         setShowNetworkInfoPanels,
         showSegmentLengths,
         setShowSegmentLengths,
+        showCableCallouts,
+        setShowCableCallouts,
         networkLabelStrokeMode,
         networkLabelSizeMode,
         networkLabelRotationDegrees,
@@ -1169,6 +1226,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         totalEdgeEntries,
         nodes,
         segments,
+        wires,
         isPanningNetwork,
         networkViewWidth: NETWORK_VIEW_WIDTH,
         networkViewHeight: NETWORK_VIEW_HEIGHT,
@@ -1202,6 +1260,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         activeSubScreen,
         entityCountBySubScreen,
         onQuickEntityNavigation: setActiveSubScreen,
+        onSelectConnectorFromCallout: handleSelectConnectorFromCallout,
+        onSelectSpliceFromCallout: handleSelectSpliceFromCallout,
+        onPersistConnectorCalloutPosition: persistConnectorCalloutPosition,
+        onPersistSpliceCalloutPosition: persistSpliceCalloutPosition,
         pngExportIncludeBackground: canvasPngExportIncludeBackground,
         handleRegenerateLayout
       }).networkSummaryPanel
@@ -1355,6 +1417,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setCanvasDefaultShowInfoPanels,
           canvasDefaultShowSegmentLengths,
           setCanvasDefaultShowSegmentLengths,
+          canvasDefaultShowCableCallouts,
+          setCanvasDefaultShowCableCallouts,
           canvasDefaultLabelStrokeMode,
           setCanvasDefaultLabelStrokeMode,
           canvasDefaultLabelSizeMode,
@@ -1381,6 +1445,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setShowNetworkInfoPanels,
           showSegmentLengths,
           setShowSegmentLengths,
+          showCableCallouts,
+          setShowCableCallouts,
           networkLabelStrokeMode,
           setNetworkLabelStrokeMode,
           networkLabelSizeMode,

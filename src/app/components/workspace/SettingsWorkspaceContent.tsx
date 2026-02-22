@@ -52,6 +52,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   canvasDefaultShowSegmentLengths: boolean;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
+  canvasDefaultShowCableCallouts: boolean;
+  setCanvasDefaultShowCableCallouts: (value: boolean) => void;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
@@ -113,6 +115,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
   setCanvasDefaultShowSegmentLengths,
+  canvasDefaultShowCableCallouts,
+  setCanvasDefaultShowCableCallouts,
   canvasDefaultLabelStrokeMode,
   setCanvasDefaultLabelStrokeMode,
   canvasDefaultLabelSizeMode,
@@ -242,6 +246,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasDefaultShowSegmentLengths(event.target.checked)}
             />
             Show segment lengths by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultShowCableCallouts}
+              onChange={(event) => setCanvasDefaultShowCableCallouts(event.target.checked)}
+            />
+            Show connector/splice cable callouts by default
           </label>
           <label className="settings-field">
             Label stroke mode

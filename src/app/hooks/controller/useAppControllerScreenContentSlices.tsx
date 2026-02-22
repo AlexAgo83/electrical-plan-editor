@@ -58,6 +58,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   | "labelRotationDegrees"
   | "toggleShowNetworkInfoPanels"
   | "toggleShowSegmentLengths"
+  | "toggleShowCableCallouts"
   | "toggleShowNetworkGrid"
   | "toggleSnapNodesToGrid"
   | "toggleLockEntityMovement"
@@ -69,6 +70,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   includeNetworkSummaryPanel?: boolean;
   setShowNetworkInfoPanels: BooleanStateSetter;
   setShowSegmentLengths: BooleanStateSetter;
+  setShowCableCallouts: BooleanStateSetter;
   setShowNetworkGrid: BooleanStateSetter;
   setSnapNodesToGrid: BooleanStateSetter;
   setLockEntityMovement: BooleanStateSetter;
@@ -200,11 +202,13 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     lockEntityMovement: params.lockEntityMovement,
     showNetworkInfoPanels: params.showNetworkInfoPanels,
     showSegmentLengths: params.showSegmentLengths,
+    showCableCallouts: params.showCableCallouts,
     labelStrokeMode: params.networkLabelStrokeMode,
     labelSizeMode: params.networkLabelSizeMode,
     labelRotationDegrees: params.networkLabelRotationDegrees,
     toggleShowNetworkInfoPanels: () => params.setShowNetworkInfoPanels((current: boolean) => !current),
     toggleShowSegmentLengths: () => params.setShowSegmentLengths((current: boolean) => !current),
+    toggleShowCableCallouts: () => params.setShowCableCallouts((current: boolean) => !current),
     toggleShowNetworkGrid: () => params.setShowNetworkGrid((current: boolean) => !current),
     toggleSnapNodesToGrid: () => params.setSnapNodesToGrid((current: boolean) => !current),
     toggleLockEntityMovement: () => params.setLockEntityMovement((current: boolean) => !current),
@@ -214,6 +218,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     totalEdgeEntries: params.totalEdgeEntries,
     nodes: params.nodes,
     segments: params.segments,
+    wires: params.wires,
     isPanningNetwork: params.isPanningNetwork,
     networkViewWidth: params.networkViewWidth,
     networkViewHeight: params.networkViewHeight,
@@ -247,6 +252,10 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     activeSubScreen: params.activeSubScreen,
     entityCountBySubScreen: params.entityCountBySubScreen,
     onQuickEntityNavigation: params.onQuickEntityNavigation,
+    onSelectConnectorFromCallout: params.onSelectConnectorFromCallout,
+    onSelectSpliceFromCallout: params.onSelectSpliceFromCallout,
+    onPersistConnectorCalloutPosition: params.onPersistConnectorCalloutPosition,
+    onPersistSpliceCalloutPosition: params.onPersistSpliceCalloutPosition,
     pngExportIncludeBackground: params.pngExportIncludeBackground,
     onRegenerateLayout: params.handleRegenerateLayout
   } satisfies NetworkSummaryPanelProps;
@@ -615,6 +624,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setCanvasDefaultShowInfoPanels: params.setCanvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths: params.canvasDefaultShowSegmentLengths,
     setCanvasDefaultShowSegmentLengths: params.setCanvasDefaultShowSegmentLengths,
+    canvasDefaultShowCableCallouts: params.canvasDefaultShowCableCallouts,
+    setCanvasDefaultShowCableCallouts: params.setCanvasDefaultShowCableCallouts,
     canvasDefaultLabelStrokeMode: params.canvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelStrokeMode: params.setCanvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode: params.canvasDefaultLabelSizeMode,
