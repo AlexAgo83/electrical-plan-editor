@@ -170,7 +170,7 @@ export function getPanelByHeading(name: string): HTMLElement {
   return panel as HTMLElement;
 }
 
-type ScreenSwitchTarget = "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenSwitchTarget = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
 type SubScreenSwitchTarget = "connector" | "splice" | "node" | "segment" | "wire";
 
 function switchScreenWithMode(target: ScreenSwitchTarget, mode: "strict" | "drawerAware"): void {
@@ -180,6 +180,7 @@ function switchScreenWithMode(target: ScreenSwitchTarget, mode: "strict" | "draw
   }
 
   const labelByScreen = {
+    home: "Home",
     networkScope: "Network Scope",
     modeling: "Modeling",
     analysis: "Analysis",

@@ -11,6 +11,7 @@ import type { NodeId } from "../core/entities";
 import {
   type AppStore,
   appActions,
+  createInitialState,
   hasSampleNetworkSignature,
   isWorkspaceEmpty,
   selectActiveNetwork,
@@ -101,11 +102,13 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const {
     NetworkSummaryPanel,
     AnalysisScreen,
+    HomeScreen,
     ModelingScreen,
     NetworkScopeScreen,
     SettingsScreen,
     ValidationScreen,
     AnalysisWorkspaceContent,
+    HomeWorkspaceContent,
     ModelingFormsColumn,
     ModelingPrimaryTables,
     ModelingSecondaryTables,
@@ -269,6 +272,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setActiveScreen,
     activeSubScreen,
     setActiveSubScreen,
+    isHomeScreen,
     isNetworkScopeScreen,
     isModelingScreen,
     isAnalysisScreen,
@@ -1056,6 +1060,50 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       clearAllModelingForms();
     }
   });
+  const handleCreateEmptyWorkspace = useCallback(() => {
+    if (!isCurrentWorkspaceEmpty && typeof window !== "undefined" && typeof window.confirm === "function") {
+      const shouldReplace = window.confirm(
+        "Replace the current workspace with an empty workspace? This removes current workspace changes."
+      );
+      if (!shouldReplace) {
+        return;
+      }
+    }
+
+    replaceStateWithHistory(createInitialState());
+    setActiveScreen("networkScope");
+    setActiveSubScreen("connector");
+    setInteractionMode("select");
+  }, [isCurrentWorkspaceEmpty, replaceStateWithHistory, setActiveScreen, setActiveSubScreen, setInteractionMode]);
+
+  const homeWorkspaceContent = (
+    <HomeWorkspaceContent
+      hasActiveNetwork={hasActiveNetwork}
+      activeNetworkName={activeNetwork?.name ?? null}
+      activeNetworkTechnicalId={activeNetwork?.technicalId ?? null}
+      networkCount={networks.length}
+      saveStatus={saveStatus}
+      validationIssuesCount={validationIssues.length}
+      validationErrorCount={validationErrorCount}
+      validationWarningCount={validationWarningCount}
+      onCreateEmptyWorkspace={handleCreateEmptyWorkspace}
+      onOpenImportPicker={handleOpenImportPicker}
+      importFileInputRef={importFileInputRef}
+      onImportFileChange={handleImportFileChange}
+      importExportStatusMessage={importExportStatus?.message ?? null}
+      lastImportSummary={lastImportSummary}
+      onOpenNetworkScope={() => setActiveScreen("networkScope")}
+      onOpenModeling={() => {
+        setActiveScreen("modeling");
+        setActiveSubScreen("connector");
+      }}
+      onOpenAnalysis={() => {
+        setActiveScreen("analysis");
+        setActiveSubScreen("connector");
+      }}
+      onOpenValidation={() => setActiveScreen("validation")}
+    />
+  );
   const shouldIncludeNetworkSummaryPanel = hasActiveNetwork && (isModelingScreen || isAnalysisScreen);
   const networkSummaryPanel =
     shouldIncludeNetworkSummaryPanel
@@ -1345,12 +1393,15 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       orderedValidationIssues={orderedValidationIssues}
       handleOpenValidationScreen={handleOpenValidationScreen}
       moveValidationIssueCursor={moveValidationIssueCursor}
+      HomeScreenComponent={HomeScreen}
       NetworkScopeScreenComponent={NetworkScopeScreen}
       ModelingScreenComponent={ModelingScreen}
       AnalysisScreenComponent={AnalysisScreen}
       ValidationScreenComponent={ValidationScreen}
       SettingsScreenComponent={SettingsScreen}
+      isHomeScreen={isHomeScreen}
       isNetworkScopeScreen={isNetworkScopeScreen}
+      homeWorkspaceContent={homeWorkspaceContent}
       hasActiveNetwork={hasActiveNetwork}
       networkScopeWorkspaceContent={networkScopeWorkspaceContent}
       modelingLeftColumnContent={modelingLeftColumnContent}

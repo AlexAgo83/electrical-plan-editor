@@ -1,5 +1,6 @@
 import { Suspense, type CSSProperties, type ReactElement, type ReactNode, type RefObject } from "react";
 import { AnalysisWorkspaceContainer } from "../containers/AnalysisWorkspaceContainer";
+import { HomeWorkspaceContainer } from "../containers/HomeWorkspaceContainer";
 import { ModelingWorkspaceContainer } from "../containers/ModelingWorkspaceContainer";
 import { NetworkScopeWorkspaceContainer } from "../containers/NetworkScopeWorkspaceContainer";
 import { SettingsWorkspaceContainer } from "../containers/SettingsWorkspaceContainer";
@@ -62,11 +63,14 @@ interface AppShellLayoutProps {
   handleOpenValidationScreen: OperationsHealthPanelProps["handleOpenValidationScreen"];
   moveValidationIssueCursor: OperationsHealthPanelProps["moveValidationIssueCursor"];
   NetworkScopeScreenComponent: ScreenContainerComponent;
+  HomeScreenComponent: ScreenContainerComponent;
   ModelingScreenComponent: ScreenContainerComponent;
   AnalysisScreenComponent: ScreenContainerComponent;
   ValidationScreenComponent: ScreenContainerComponent;
   SettingsScreenComponent: ScreenContainerComponent;
+  isHomeScreen: boolean;
   isNetworkScopeScreen: boolean;
+  homeWorkspaceContent: ReactNode;
   hasActiveNetwork: boolean;
   networkScopeWorkspaceContent: ReactNode;
   modelingLeftColumnContent: ReactNode;
@@ -139,11 +143,14 @@ export function AppShellLayout({
   handleOpenValidationScreen,
   moveValidationIssueCursor,
   NetworkScopeScreenComponent,
+  HomeScreenComponent,
   ModelingScreenComponent,
   AnalysisScreenComponent,
   ValidationScreenComponent,
   SettingsScreenComponent,
+  isHomeScreen,
   isNetworkScopeScreen,
+  homeWorkspaceContent,
   hasActiveNetwork,
   networkScopeWorkspaceContent,
   modelingLeftColumnContent,
@@ -160,7 +167,15 @@ export function AppShellLayout({
   const isNavigationDrawerInteractionHidden = !isNavigationDrawerOpen;
 
   let activeWorkspaceContent: ReactNode;
-  if (isNetworkScopeScreen) {
+  if (isHomeScreen) {
+    activeWorkspaceContent = (
+      <HomeWorkspaceContainer
+        ScreenComponent={HomeScreenComponent}
+        isActive={isHomeScreen}
+        workspaceContent={homeWorkspaceContent}
+      />
+    );
+  } else if (isNetworkScopeScreen) {
     activeWorkspaceContent = (
       <NetworkScopeWorkspaceContainer
         ScreenComponent={NetworkScopeScreenComponent}

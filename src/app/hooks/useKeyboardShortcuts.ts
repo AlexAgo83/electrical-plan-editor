@@ -1,6 +1,6 @@
 import { useEffect, type MutableRefObject } from "react";
 
-type ScreenId = "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
 
 function isEditableElement(target: EventTarget | null): boolean {
@@ -97,11 +97,12 @@ export function useKeyboardShortcuts({
         }
       } else {
         const screenByKey: Record<string, ScreenId | undefined> = {
-          "1": "networkScope",
-          "2": "modeling",
-          "3": "analysis",
-          "4": "validation",
-          "5": "settings"
+          "1": "home",
+          "2": "networkScope",
+          "3": "modeling",
+          "4": "analysis",
+          "5": "validation",
+          "6": "settings"
         };
         const targetScreen = screenByKey[normalizedKey];
         if (targetScreen !== undefined) {

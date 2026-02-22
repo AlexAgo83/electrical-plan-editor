@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
 
-type ScreenId = "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
 
 interface UseWorkspaceNavigationResult {
@@ -9,6 +9,7 @@ interface UseWorkspaceNavigationResult {
   activeSubScreen: SubScreenId;
   setActiveSubScreen: (subScreen: SubScreenId) => void;
   isNetworkScopeScreen: boolean;
+  isHomeScreen: boolean;
   isModelingScreen: boolean;
   isAnalysisScreen: boolean;
   isValidationScreen: boolean;
@@ -17,10 +18,11 @@ interface UseWorkspaceNavigationResult {
 }
 
 export function useWorkspaceNavigation(): UseWorkspaceNavigationResult {
-  const [activeScreen, setActiveScreen] = useState<ScreenId>("networkScope");
+  const [activeScreen, setActiveScreen] = useState<ScreenId>("home");
   const [activeSubScreen, setActiveSubScreen] = useState<SubScreenId>("connector");
-  const activeScreenRef = useRef<ScreenId>("networkScope");
+  const activeScreenRef = useRef<ScreenId>("home");
 
+  const isHomeScreen = activeScreen === "home";
   const isNetworkScopeScreen = activeScreen === "networkScope";
   const isModelingScreen = activeScreen === "modeling";
   const isAnalysisScreen = activeScreen === "analysis";
@@ -46,6 +48,7 @@ export function useWorkspaceNavigation(): UseWorkspaceNavigationResult {
     setActiveScreen,
     activeSubScreen,
     setActiveSubScreen,
+    isHomeScreen,
     isNetworkScopeScreen,
     isModelingScreen,
     isAnalysisScreen,

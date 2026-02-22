@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 
-type ScreenId = "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
 
 interface WorkspaceNavigationProps {
@@ -47,6 +47,7 @@ export function WorkspaceNavigation({
     <section className="workspace-switcher">
       <div className="workspace-nav-row">
         {([
+          ["home", "Home"],
           ["networkScope", "Network Scope"],
           ["modeling", "Modeling"],
           ["analysis", "Analysis"],
@@ -97,6 +98,8 @@ export function WorkspaceNavigation({
       <p className="meta-line screen-description">
         {activeScreen === "networkScope"
           ? "Network Scope workspace: active network context and lifecycle management."
+          : activeScreen === "home"
+          ? "Home workspace: start, resume, shortcuts, and quick preferences."
           : isModelingScreen
           ? "Modeling workspace: entity editor + operational lists."
           : isAnalysisScreen

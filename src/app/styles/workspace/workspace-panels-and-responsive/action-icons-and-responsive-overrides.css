@@ -57,6 +57,21 @@
   mask: url("/icons/ico_unselect.svg") center / contain no-repeat;
 }
 
+.action-button-icon.is-home-create {
+  -webkit-mask: url("/icons/ico_home_create.svg") center / contain no-repeat;
+  mask: url("/icons/ico_home_create.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-home-import {
+  -webkit-mask: url("/icons/ico_home_import.svg") center / contain no-repeat;
+  mask: url("/icons/ico_home_import.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-home-start {
+  -webkit-mask: url("/icons/ico_home_start.svg") center / contain no-repeat;
+  mask: url("/icons/ico_home_start.svg") center / contain no-repeat;
+}
+
 .meta-line {
   margin: 0 0 0.75rem;
   color: #365166;

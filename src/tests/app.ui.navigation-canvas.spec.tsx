@@ -280,7 +280,7 @@ describe("App integration UI - navigation and canvas", () => {
   it("supports alt keyboard shortcuts for workspace navigation", () => {
     renderAppWithState(createUiIntegrationState());
 
-    fireEvent.keyDown(window, { key: "3", altKey: true });
+    fireEvent.keyDown(window, { key: "4", altKey: true });
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
     expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Analysis$/, hidden: true })).toHaveClass(

@@ -43,6 +43,7 @@ const appUiModulesLazy = {
     loadLazyUiModule(() => import("./NetworkSummaryPanel"), (module) => module.NetworkSummaryPanel)
   ),
   AnalysisScreen: lazy(() => loadLazyUiModule(() => import("./screens/AnalysisScreen"), (module) => module.AnalysisScreen)),
+  HomeScreen: lazy(() => loadLazyUiModule(() => import("./screens/HomeScreen"), (module) => module.HomeScreen)),
   ModelingScreen: lazy(() => loadLazyUiModule(() => import("./screens/ModelingScreen"), (module) => module.ModelingScreen)),
   NetworkScopeScreen: lazy(() =>
     loadLazyUiModule(() => import("./screens/NetworkScopeScreen"), (module) => module.NetworkScopeScreen)
@@ -53,6 +54,9 @@ const appUiModulesLazy = {
   ),
   AnalysisWorkspaceContent: lazy(() =>
     loadLazyUiModule(() => import("./workspace/AnalysisWorkspaceContent"), (module) => module.AnalysisWorkspaceContent)
+  ),
+  HomeWorkspaceContent: lazy(() =>
+    loadLazyUiModule(() => import("./workspace/HomeWorkspaceContent"), (module) => module.HomeWorkspaceContent)
   ),
   ModelingFormsColumn: lazy(() =>
     loadLazyUiModule(() => import("./workspace/ModelingFormsColumn"), (module) => module.ModelingFormsColumn)
@@ -93,6 +97,9 @@ export const appUiModules = {
   get AnalysisScreen() {
     return getActiveAppUiModulesRegistry().AnalysisScreen;
   },
+  get HomeScreen() {
+    return getActiveAppUiModulesRegistry().HomeScreen;
+  },
   get ModelingScreen() {
     return getActiveAppUiModulesRegistry().ModelingScreen;
   },
@@ -107,6 +114,9 @@ export const appUiModules = {
   },
   get AnalysisWorkspaceContent() {
     return getActiveAppUiModulesRegistry().AnalysisWorkspaceContent;
+  },
+  get HomeWorkspaceContent() {
+    return getActiveAppUiModulesRegistry().HomeWorkspaceContent;
   },
   get ModelingFormsColumn() {
     return getActiveAppUiModulesRegistry().ModelingFormsColumn;

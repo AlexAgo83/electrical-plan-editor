@@ -18,7 +18,7 @@ interface UseCanvasInteractionHandlersParams {
   interactionMode: InteractionMode;
   isModelingScreen: boolean;
   activeSubScreen: SubScreenId;
-  setActiveScreen: (screen: "networkScope" | "modeling" | "analysis" | "validation" | "settings") => void;
+  setActiveScreen: (screen: "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings") => void;
   setActiveSubScreen: (screen: SubScreenId) => void;
   setNodeFormMode: (mode: "create" | "edit") => void;
   setEditingNodeId: (id: NodeId | null) => void;
