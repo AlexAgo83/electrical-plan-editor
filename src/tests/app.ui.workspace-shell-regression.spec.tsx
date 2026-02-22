@@ -43,7 +43,52 @@ describe("App integration UI - workspace shell regression", () => {
     expect(screen.getByRole("button", { name: "Close operations panel" })).toBeInTheDocument();
     fireEvent.focus(screen.getByRole("button", { name: "Settings" }));
     expect(screen.getByRole("button", { name: "Ops & Health" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Close operations panel" })).not.toHaveClass("is-open");
+    expect(document.querySelector(".workspace-ops-panel")).not.toHaveClass("is-open");
+  });
+
+  it("keeps closed drawer and operations overlays out of keyboard and assistive-tech navigation", () => {
+    const originalInnerWidth = window.innerWidth;
+    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: 800 });
+    renderAppWithState(createUiIntegrationState());
+    fireEvent(window, new Event("resize"));
+
+    const drawerBackdrop = document.querySelector(".workspace-drawer-backdrop");
+    const drawerPanel = document.querySelector("#workspace-navigation-drawer");
+    const opsBackdrop = document.querySelector(".workspace-ops-backdrop");
+    const opsPanel = document.querySelector("#workspace-operations-panel");
+
+    expect(drawerBackdrop).not.toBeNull();
+    expect(drawerPanel).not.toBeNull();
+    expect(opsBackdrop).not.toBeNull();
+    expect(opsPanel).not.toBeNull();
+
+    expect(drawerBackdrop).toBeDisabled();
+    expect(drawerBackdrop).toHaveAttribute("aria-hidden", "true");
+    expect(drawerBackdrop).toHaveAttribute("tabindex", "-1");
+    expect(drawerPanel).toHaveAttribute("aria-hidden", "true");
+    expect(drawerPanel).toHaveAttribute("inert");
+
+    expect(opsBackdrop).toBeDisabled();
+    expect(opsBackdrop).toHaveAttribute("aria-hidden", "true");
+    expect(opsBackdrop).toHaveAttribute("tabindex", "-1");
+    expect(opsPanel).toHaveAttribute("aria-hidden", "true");
+    expect(opsPanel).toHaveAttribute("inert");
+
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    expect(drawerBackdrop).not.toBeDisabled();
+    expect(drawerBackdrop).toHaveAttribute("aria-hidden", "false");
+    expect(drawerPanel).toHaveAttribute("aria-hidden", "false");
+    expect(drawerPanel).not.toHaveAttribute("inert");
+
+    fireEvent.click(screen.getByRole("button", { name: "Close menu" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    expect(opsBackdrop).not.toBeDisabled();
+    expect(opsBackdrop).toHaveAttribute("aria-hidden", "false");
+    expect(opsPanel).toHaveAttribute("aria-hidden", "false");
+    expect(opsPanel).not.toHaveAttribute("inert");
+
+    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: originalInnerWidth });
+    fireEvent(window, new Event("resize"));
   });
 
   it("keeps sticky header and floating shell elements mounted across content scroll", () => {

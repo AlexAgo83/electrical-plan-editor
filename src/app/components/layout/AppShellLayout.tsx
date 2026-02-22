@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactElement, ReactNode, RefObject } from "react";
+import { Suspense, type CSSProperties, type ReactElement, type ReactNode, type RefObject } from "react";
 import { AnalysisWorkspaceContainer } from "../containers/AnalysisWorkspaceContainer";
 import { ModelingWorkspaceContainer } from "../containers/ModelingWorkspaceContainer";
 import { NetworkScopeWorkspaceContainer } from "../containers/NetworkScopeWorkspaceContainer";
@@ -19,6 +19,7 @@ interface AppShellLayoutProps {
   appRepositoryUrl: string;
   currentYear: number;
   appVersion: string;
+  viewportWidth: number;
   headerBlockRef: RefObject<HTMLElement | null>;
   navigationToggleButtonRef: RefObject<HTMLButtonElement | null>;
   operationsButtonRef: RefObject<HTMLButtonElement | null>;
@@ -81,12 +82,22 @@ interface AppShellLayoutProps {
   inspectorContextPanel: ReactNode;
 }
 
+function WorkspaceLoadingFallback(): ReactElement {
+  return (
+    <section className="panel" aria-live="polite" aria-busy="true">
+      <h2>Loading workspace</h2>
+      <p className="empty-copy">The requested screen is loading.</p>
+    </section>
+  );
+}
+
 export function AppShellLayout({
   appShellClassName,
   workspaceShellStyle,
   appRepositoryUrl,
   currentYear,
   appVersion,
+  viewportWidth,
   headerBlockRef,
   navigationToggleButtonRef,
   operationsButtonRef,
@@ -148,6 +159,9 @@ export function AppShellLayout({
   isInspectorOpen,
   inspectorContextPanel
 }: AppShellLayoutProps): ReactElement {
+  const isNavigationDrawerOverlayMode = viewportWidth < 960;
+  const isNavigationDrawerInteractionHidden = isNavigationDrawerOverlayMode && !isNavigationDrawerOpen;
+
   return (
     <main className={appShellClassName}>
       <AppHeaderAndStats
@@ -175,12 +189,17 @@ export function AppShellLayout({
           type="button"
           className={isNavigationDrawerOpen ? "workspace-drawer-backdrop is-open" : "workspace-drawer-backdrop"}
           aria-label="Close navigation menu"
+          aria-hidden={!isNavigationDrawerOpen}
+          disabled={!isNavigationDrawerOpen}
+          tabIndex={isNavigationDrawerOpen ? 0 : -1}
           onClick={closeNavigationDrawer}
         />
         <div
           id="workspace-navigation-drawer"
           ref={navigationDrawerRef}
           className={isNavigationDrawerOpen ? "workspace-drawer is-open" : "workspace-drawer"}
+          aria-hidden={isNavigationDrawerInteractionHidden}
+          inert={isNavigationDrawerInteractionHidden}
         >
           <WorkspaceSidebarPanel
             activeScreen={activeScreen}
@@ -199,12 +218,17 @@ export function AppShellLayout({
           type="button"
           className={isOperationsPanelOpen ? "workspace-ops-backdrop is-open" : "workspace-ops-backdrop"}
           aria-label="Close operations panel"
+          aria-hidden={!isOperationsPanelOpen}
+          disabled={!isOperationsPanelOpen}
+          tabIndex={isOperationsPanelOpen ? 0 : -1}
           onClick={closeOperationsPanel}
         />
         <div
           id="workspace-operations-panel"
           ref={operationsPanelRef}
           className={isOperationsPanelOpen ? "workspace-ops-panel is-open" : "workspace-ops-panel"}
+          aria-hidden={!isOperationsPanelOpen}
+          inert={!isOperationsPanelOpen}
         >
           <OperationsHealthPanel
             handleUndo={handleUndo}
@@ -226,48 +250,50 @@ export function AppShellLayout({
         </div>
 
         <section className="workspace-content">
-          <NetworkScopeWorkspaceContainer
-            ScreenComponent={NetworkScopeScreenComponent}
-            isActive={isNetworkScopeScreen}
-            workspaceContent={networkScopeWorkspaceContent}
-          />
+          <Suspense fallback={<WorkspaceLoadingFallback />}>
+            <NetworkScopeWorkspaceContainer
+              ScreenComponent={NetworkScopeScreenComponent}
+              isActive={isNetworkScopeScreen}
+              workspaceContent={networkScopeWorkspaceContent}
+            />
 
-          {!isNetworkScopeScreen && !hasActiveNetwork ? (
-            <section className="panel">
-              <h2>No active network</h2>
-              <p className="empty-copy">
-                Create a network from the network scope controls to start modeling connectors, splices, nodes, segments, and wires.
-              </p>
-            </section>
-          ) : !isNetworkScopeScreen ? (
-            <>
-              <ModelingWorkspaceContainer
-                ScreenComponent={ModelingScreenComponent}
-                isActive={isModelingScreen}
-                leftColumnContent={modelingLeftColumnContent}
-                formsColumnContent={modelingFormsColumnContent}
-                networkSummaryPanel={networkSummaryPanel}
-              />
+            {!isNetworkScopeScreen && !hasActiveNetwork ? (
+              <section className="panel">
+                <h2>No active network</h2>
+                <p className="empty-copy">
+                  Create a network from the network scope controls to start modeling connectors, splices, nodes, segments, and wires.
+                </p>
+              </section>
+            ) : !isNetworkScopeScreen ? (
+              <>
+                <ModelingWorkspaceContainer
+                  ScreenComponent={ModelingScreenComponent}
+                  isActive={isModelingScreen}
+                  leftColumnContent={modelingLeftColumnContent}
+                  formsColumnContent={modelingFormsColumnContent}
+                  networkSummaryPanel={networkSummaryPanel}
+                />
 
-              <AnalysisWorkspaceContainer
-                ScreenComponent={AnalysisScreenComponent}
-                isActive={isAnalysisScreen}
-                workspaceContent={analysisWorkspaceContent}
-              />
+                <AnalysisWorkspaceContainer
+                  ScreenComponent={AnalysisScreenComponent}
+                  isActive={isAnalysisScreen}
+                  workspaceContent={analysisWorkspaceContent}
+                />
 
-              <ValidationWorkspaceContainer
-                ScreenComponent={ValidationScreenComponent}
-                isActive={isValidationScreen}
-                workspaceContent={validationWorkspaceContent}
-              />
+                <ValidationWorkspaceContainer
+                  ScreenComponent={ValidationScreenComponent}
+                  isActive={isValidationScreen}
+                  workspaceContent={validationWorkspaceContent}
+                />
 
-              <SettingsWorkspaceContainer
-                ScreenComponent={SettingsScreenComponent}
-                isActive={isSettingsScreen}
-                workspaceContent={settingsWorkspaceContent}
-              />
-            </>
-          ) : null}
+                <SettingsWorkspaceContainer
+                  ScreenComponent={SettingsScreenComponent}
+                  isActive={isSettingsScreen}
+                  workspaceContent={settingsWorkspaceContent}
+                />
+              </>
+            ) : null}
+          </Suspense>
         </section>
       </section>
 

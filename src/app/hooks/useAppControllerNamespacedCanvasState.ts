@@ -2,6 +2,7 @@ import { useCanvasState } from "./useCanvasState";
 
 export type AppControllerCanvasStateFlat = ReturnType<typeof useCanvasState>;
 
+// Adapts an existing canvas state object into namespaced groups; it does not allocate state.
 export function buildAppControllerNamespacedCanvasState(canvas: AppControllerCanvasStateFlat) {
   return {
     interaction: {
@@ -30,10 +31,4 @@ export function buildAppControllerNamespacedCanvasState(canvas: AppControllerCan
     }
   } as const;
 }
-
-export function useAppControllerNamespacedCanvasState() {
-  const canvas = useCanvasState();
-  return buildAppControllerNamespacedCanvasState(canvas);
-}
-
-export type AppControllerNamespacedCanvasState = ReturnType<typeof useAppControllerNamespacedCanvasState>;
+export type AppControllerNamespacedCanvasState = ReturnType<typeof buildAppControllerNamespacedCanvasState>;

@@ -1,7 +1,7 @@
 ## req_019_app_controller_post_wave_5_hardening_accessibility_loading_and_contract_clarity - AppController Post-Wave-5 Hardening (Accessibility, Loading Behavior, and Contract Clarity)
 > From version: 0.5.4
-> Understanding: 99%
-> Confidence: 97%
+> Understanding: 100%
+> Confidence: 98%
 > Complexity: Medium
 > Theme: Post-refactor behavior hardening and API contract clarification
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -96,12 +96,48 @@ Related baseline and delivered context:
 - Rewriting all shell components purely for stylistic reasons.
 
 # Backlog
-- To create from this request (proposed):
+- Created and delivered from this request:
   - `item_114_app_shell_overlay_accessibility_and_focus_isolation_hardening.md`
   - `item_115_app_shell_suspense_boundary_and_lazy_loading_blank_screen_resilience.md`
   - `item_116_namespaced_state_helper_contract_clarity_and_duplicate_state_guardrails.md`
   - `item_117_workspace_shell_regression_tests_hidden_overlay_tab_focus_coverage.md`
   - `item_118_post_wave_5_hardening_closure_ci_e2e_build_pwa_and_ac_traceability.md`
+
+# Delivery summary
+- Overlay accessibility/focus isolation hardening delivered in shell layout:
+  - Closed backdrops are disabled / hidden from AT.
+  - Hidden overlay panels use explicit `aria-hidden` and `inert` isolation.
+  - Navigation drawer hardening is applied in overlay viewport mode (narrow viewport) to preserve existing desktop navigation semantics.
+  - File: `src/app/components/layout/AppShellLayout.tsx`
+- Lazy-loading shell resilience delivered:
+  - Root-level `Suspense` was removed from `AppController`.
+  - `Suspense` boundary moved into `AppShellLayout` around the workspace-content region, with a local loading fallback, preserving visible shell chrome during lazy chunk loading.
+  - Files: `src/app/AppController.tsx`, `src/app/components/layout/AppShellLayout.tsx`
+- Namespaced helper contract clarity delivered:
+  - Removed misleading state-allocating `useAppControllerNamespacedFormsState()` / `useAppControllerNamespacedCanvasState()` wrappers.
+  - Kept explicit builder/adaptor contracts only (`buildAppControllerNamespaced*State`) with intent comments.
+  - Files: `src/app/hooks/useAppControllerNamespacedFormsState.ts`, `src/app/hooks/useAppControllerNamespacedCanvasState.ts`
+- Regression coverage delivered:
+  - Added workspace-shell regression assertions for hidden overlay keyboard/AT isolation semantics.
+  - Updated a shell assertion to reflect hidden (aria-inaccessible) closed overlay behavior.
+  - File: `src/tests/app.ui.workspace-shell-regression.spec.tsx`
+- Validation closure delivered:
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run test:ci`
+  - `npm run test:e2e`
+  - `npm run build`
+  - `npm run quality:pwa`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+
+# AC traceability
+- AC1: Satisfied by explicit closed overlay/backdrop isolation in `AppShellLayout` (`aria-hidden`, disabled backdrops, `inert`) for overlay-mode drawer and operations panel.
+- AC2: Satisfied by preserved shell behavior with passing workspace-shell and inspector-shell regressions (Escape, focus-loss, focus restoration).
+- AC3: Satisfied by removing root `Suspense` blanking risk and scoping lazy loading fallback to the workspace-content region.
+- AC4: Satisfied by retained lazy/eager registry behavior (`appUiModules`) and successful `build` + `quality:pwa` validation.
+- AC5: Satisfied by clarifying namespaced helper contracts to builder/adaptor-only APIs, removing misleading duplicate-state-allocating wrappers.
+- AC6: Satisfied by added workspace-shell regression coverage for hidden overlay keyboard/AT isolation semantics and passing test suite.
+- AC7: Satisfied by full closure validation pipeline passing and documented in `task_018`.
 
 # References
 - `src/app/AppController.tsx`
@@ -112,6 +148,7 @@ Related baseline and delivered context:
 - `src/app/hooks/useAppControllerNamespacedCanvasState.ts`
 - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
 - `src/tests/app.ui.inspector-shell.spec.tsx`
+- `logics/tasks/task_018_app_controller_post_wave_5_hardening_accessibility_loading_and_contract_clarity_orchestration_and_delivery_control.md`
 - `tests/e2e/smoke.spec.ts`
 - `logics/request/req_018_app_controller_decomposition_wave_5_real_loc_reduction_and_composition_root_slimming.md`
 - `logics/tasks/task_017_app_controller_decomposition_wave_5_real_loc_reduction_and_composition_root_slimming_orchestration_and_delivery_control.md`

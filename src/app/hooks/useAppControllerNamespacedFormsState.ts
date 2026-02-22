@@ -2,6 +2,7 @@ import { useEntityFormsState } from "./useEntityFormsState";
 
 export type AppControllerFormsStateFlat = ReturnType<typeof useEntityFormsState>;
 
+// Adapts an existing forms state object into namespaced groups; it does not allocate state.
 export function buildAppControllerNamespacedFormsState(forms: AppControllerFormsStateFlat) {
   return {
     connector: {
@@ -112,10 +113,4 @@ export function buildAppControllerNamespacedFormsState(forms: AppControllerForms
     }
   } as const;
 }
-
-export function useAppControllerNamespacedFormsState() {
-  const forms = useEntityFormsState();
-  return buildAppControllerNamespacedFormsState(forms);
-}
-
-export type AppControllerNamespacedFormsState = ReturnType<typeof useAppControllerNamespacedFormsState>;
+export type AppControllerNamespacedFormsState = ReturnType<typeof buildAppControllerNamespacedFormsState>;
