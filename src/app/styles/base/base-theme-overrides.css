@@ -1675,6 +1675,41 @@
   color: #5a2540;
 }
 
+.app-shell.theme-rose-quartz .analysis-wire-mode-chip {
+  border-color: #d5a7be;
+  background: #f8e7ef;
+  color: #5d2742;
+}
+
+.app-shell.theme-rose-quartz .analysis-wire-mode-chip.is-locked {
+  border-color: #d88cae;
+  background: #ffdce9;
+  color: #5d2742;
+}
+
+.app-shell.theme-rose-quartz .network-scope-indicator {
+  border-color: #ddb9cb;
+  background: #fff7fb;
+}
+
+.app-shell.theme-rose-quartz .network-scope-indicator-label {
+  color: #7e4f66;
+}
+
+.app-shell.theme-rose-quartz .network-scope-indicator-value {
+  color: #4f2137;
+}
+
+.app-shell.theme-rose-quartz .network-scope-status-chip.is-active {
+  background: #ffdce9;
+  color: #5a2540;
+}
+
+.app-shell.theme-rose-quartz .network-scope-status-chip.is-available {
+  background: #f8e7ef;
+  color: #6a3550;
+}
+
 .app-shell.theme-lavender-haze {
   --theme-primary: #6f63d9;
   color: #2f2a5f;
@@ -1813,6 +1848,41 @@
 .app-shell.theme-lavender-haze .network-form-mode-chip.is-edit {
   background: #cec6ff;
   color: #312c66;
+}
+
+.app-shell.theme-lavender-haze .analysis-wire-mode-chip {
+  border-color: #b6afeb;
+  background: #efecff;
+  color: #403a82;
+}
+
+.app-shell.theme-lavender-haze .analysis-wire-mode-chip.is-locked {
+  border-color: #9f96ea;
+  background: #ded8ff;
+  color: #332d70;
+}
+
+.app-shell.theme-lavender-haze .network-scope-indicator {
+  border-color: #ccc6ee;
+  background: #faf9ff;
+}
+
+.app-shell.theme-lavender-haze .network-scope-indicator-label {
+  color: #655ea0;
+}
+
+.app-shell.theme-lavender-haze .network-scope-indicator-value {
+  color: #312c66;
+}
+
+.app-shell.theme-lavender-haze .network-scope-status-chip.is-active {
+  background: #dfd8ff;
+  color: #372f77;
+}
+
+.app-shell.theme-lavender-haze .network-scope-status-chip.is-available {
+  background: #efecff;
+  color: #564e98;
 }
 
 .app-shell.theme-burgundy-noir {
@@ -2255,6 +2325,41 @@
 .app-shell.theme-amber-night .network-form-mode-chip.is-edit {
   background: #725720;
   color: #fff1c8;
+}
+
+.app-shell.theme-amber-night .analysis-wire-mode-chip {
+  border-color: #8b7337;
+  background: #3f2f0d;
+  color: #f6dfa0;
+}
+
+.app-shell.theme-amber-night .analysis-wire-mode-chip.is-locked {
+  border-color: #aa8a35;
+  background: #5a4315;
+  color: #ffeab3;
+}
+
+.app-shell.theme-amber-night .network-scope-indicator {
+  border-color: #6f5d2c;
+  background: #241b08;
+}
+
+.app-shell.theme-amber-night .network-scope-indicator-label {
+  color: #ccb36f;
+}
+
+.app-shell.theme-amber-night .network-scope-indicator-value {
+  color: #fff1c8;
+}
+
+.app-shell.theme-amber-night .network-scope-status-chip.is-active {
+  background: #5f4817;
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .network-scope-status-chip.is-available {
+  background: #3f2f0d;
+  color: #efd89a;
 }
 
 /* Coverage completion for new theme variants: 2D legend, route-preview sub-panels, inspector */
@@ -2759,6 +2864,12 @@
   color: #86536c;
 }
 
+.app-shell.theme-rose-quartz .cavity button {
+  border-color: #d2a2b8;
+  background: #f8e7ef;
+  color: #5a2540;
+}
+
 .app-shell.theme-rose-quartz .form-hint.danger {
   color: #b43a5f;
 }
@@ -2806,6 +2917,12 @@
 .app-shell.theme-lavender-haze .settings-panel .meta-line,
 .app-shell.theme-lavender-haze .cavity p {
   color: #645ca3;
+}
+
+.app-shell.theme-lavender-haze .cavity button {
+  border-color: #b5ace6;
+  background: #efecff;
+  color: #3f397d;
 }
 
 .app-shell.theme-lavender-haze .form-hint.danger {
@@ -2904,6 +3021,12 @@
 .app-shell.theme-amber-night .settings-panel .meta-line,
 .app-shell.theme-amber-night .cavity p {
   color: #dec889;
+}
+
+.app-shell.theme-amber-night .cavity button {
+  border-color: #8c7639;
+  background: #3b2d0f;
+  color: #ffe9af;
 }
 
 .app-shell.theme-amber-night .form-hint.danger {

@@ -60,8 +60,13 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
       <input value={segmentSubNetworkTag} onChange={(event) => setSegmentSubNetworkTag(event.target.value)} placeholder="front-harness" />
     </label>
     <div className="row-actions">
-      <button type="submit">{segmentFormMode === "create" ? "Create" : "Save"}</button>
-      <button type="button" onClick={cancelSegmentEdit}>
+      <button type="submit" className="button-with-icon">
+        {segmentFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
+        {segmentFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
+        {segmentFormMode === "create" ? "Create" : "Save"}
+      </button>
+      <button type="button" className={segmentFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelSegmentEdit}>
+        {segmentFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {segmentFormMode === "edit" ? "Cancel edit" : "Cancel"}
       </button>
     </div>

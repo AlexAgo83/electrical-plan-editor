@@ -185,10 +185,12 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
       </label>
 
       <div className="row-actions analysis-wire-route-actions">
-        <button type="button" onClick={handleLockWireRoute}>
+        <button type="button" className="button-with-icon" onClick={handleLockWireRoute}>
+          <span className="action-button-icon is-lock-move" aria-hidden="true" />
           Lock forced route
         </button>
-        <button type="button" onClick={handleResetWireRoute}>
+        <button type="button" className="button-with-icon" onClick={handleResetWireRoute}>
+          <span className="action-button-icon is-cancel" aria-hidden="true" />
           Reset to auto route
         </button>
       </div>

@@ -28,7 +28,8 @@ export function renderIdleCopy(entityLabel: string, onCreate: () => void): React
         Select a {entityLabel} row to view or edit it, or create a new one.
       </p>
       <div className="row-actions compact idle-panel-actions">
-        <button type="button" onClick={onCreate}>
+        <button type="button" className="button-with-icon" onClick={onCreate}>
+          <span className="action-button-icon is-new" aria-hidden="true" />
           Create
         </button>
       </div>

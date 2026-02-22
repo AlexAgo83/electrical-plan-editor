@@ -41,8 +41,17 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       <input type="number" min={1} step={1} value={cavityCount} onChange={(event) => setCavityCount(event.target.value)} required />
     </label>
     <div className="row-actions">
-      <button type="submit" disabled={connectorTechnicalIdAlreadyUsed}>{connectorFormMode === "create" ? "Create" : "Save"}</button>
-      <button type="button" onClick={cancelConnectorEdit}>
+      <button
+        type="submit"
+        className="button-with-icon"
+        disabled={connectorTechnicalIdAlreadyUsed}
+      >
+        {connectorFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
+        {connectorFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
+        {connectorFormMode === "create" ? "Create" : "Save"}
+      </button>
+      <button type="button" className={connectorFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelConnectorEdit}>
+        {connectorFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {connectorFormMode === "edit" ? "Cancel edit" : "Cancel"}
       </button>
     </div>

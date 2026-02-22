@@ -186,9 +186,28 @@ export function ModelingPrimaryTables({
           </table>
         )}
         <div className="row-actions compact modeling-list-actions">
-          <button type="button" onClick={onOpenCreateConnector}>New</button>
-          <button type="button" onClick={() => focusedConnector !== null && onEditConnector(focusedConnector)} disabled={focusedConnector === null}>Edit</button>
-          <button type="button" className="modeling-list-action-delete" onClick={() => focusedConnector !== null && onDeleteConnector(focusedConnector.id)} disabled={focusedConnector === null || connectorFormMode === "create"}>Delete</button>
+          <button type="button" className="button-with-icon" onClick={onOpenCreateConnector}>
+            <span className="action-button-icon is-new" aria-hidden="true" />
+            New
+          </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => focusedConnector !== null && onEditConnector(focusedConnector)}
+            disabled={focusedConnector === null}
+          >
+            <span className="action-button-icon is-edit" aria-hidden="true" />
+            Edit
+          </button>
+          <button
+            type="button"
+            className="modeling-list-action-delete button-with-icon"
+            onClick={() => focusedConnector !== null && onDeleteConnector(focusedConnector.id)}
+            disabled={focusedConnector === null || connectorFormMode === "create"}
+          >
+            <span className="action-button-icon is-delete" aria-hidden="true" />
+            Delete
+          </button>
         </div>
       </article>
 
@@ -270,9 +289,28 @@ export function ModelingPrimaryTables({
           </table>
         )}
         <div className="row-actions compact modeling-list-actions">
-          <button type="button" onClick={onOpenCreateSplice}>New</button>
-          <button type="button" onClick={() => focusedSplice !== null && onEditSplice(focusedSplice)} disabled={focusedSplice === null}>Edit</button>
-          <button type="button" className="modeling-list-action-delete" onClick={() => focusedSplice !== null && onDeleteSplice(focusedSplice.id)} disabled={focusedSplice === null || spliceFormMode === "create"}>Delete</button>
+          <button type="button" className="button-with-icon" onClick={onOpenCreateSplice}>
+            <span className="action-button-icon is-new" aria-hidden="true" />
+            New
+          </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => focusedSplice !== null && onEditSplice(focusedSplice)}
+            disabled={focusedSplice === null}
+          >
+            <span className="action-button-icon is-edit" aria-hidden="true" />
+            Edit
+          </button>
+          <button
+            type="button"
+            className="modeling-list-action-delete button-with-icon"
+            onClick={() => focusedSplice !== null && onDeleteSplice(focusedSplice.id)}
+            disabled={focusedSplice === null || spliceFormMode === "create"}
+          >
+            <span className="action-button-icon is-delete" aria-hidden="true" />
+            Delete
+          </button>
         </div>
       </article>
 
@@ -356,9 +394,28 @@ export function ModelingPrimaryTables({
           </table>
         )}
         <div className="row-actions compact modeling-list-actions">
-          <button type="button" onClick={onOpenCreateNode}>New</button>
-          <button type="button" onClick={() => focusedNode !== null && onEditNode(focusedNode)} disabled={focusedNode === null}>Edit</button>
-          <button type="button" className="modeling-list-action-delete" onClick={() => focusedNode !== null && onDeleteNode(focusedNode.id)} disabled={focusedNode === null || nodeFormMode === "create"}>Delete</button>
+          <button type="button" className="button-with-icon" onClick={onOpenCreateNode}>
+            <span className="action-button-icon is-new" aria-hidden="true" />
+            New
+          </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => focusedNode !== null && onEditNode(focusedNode)}
+            disabled={focusedNode === null}
+          >
+            <span className="action-button-icon is-edit" aria-hidden="true" />
+            Edit
+          </button>
+          <button
+            type="button"
+            className="modeling-list-action-delete button-with-icon"
+            onClick={() => focusedNode !== null && onDeleteNode(focusedNode.id)}
+            disabled={focusedNode === null || nodeFormMode === "create"}
+          >
+            <span className="action-button-icon is-delete" aria-hidden="true" />
+            Delete
+          </button>
         </div>
       </article>
     </>

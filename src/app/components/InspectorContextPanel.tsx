@@ -128,14 +128,17 @@ export function InspectorContextPanel({
             ))}
           </dl>
           <div className="row-actions compact inspector-actions">
-            <button type="button" onClick={onEditSelected} disabled={selectedSubScreen === null}>
+            <button type="button" className="button-with-icon" onClick={onEditSelected} disabled={selectedSubScreen === null}>
+              <span className="action-button-icon is-edit" aria-hidden="true" />
               Edit
             </button>
-            <button type="button" onClick={onOpenAnalysis} disabled={!canOpenAnalysis}>
+            <button type="button" className="button-with-icon" onClick={onOpenAnalysis} disabled={!canOpenAnalysis}>
+              <span className="action-button-icon is-analysis" aria-hidden="true" />
               Analysis
             </button>
-            <button type="button" onClick={onClearSelection}>
-              Clear selection
+            <button type="button" className="button-with-icon" onClick={onClearSelection}>
+              <span className="action-button-icon is-unselect" aria-hidden="true" />
+              Clear
             </button>
           </div>
         </>

@@ -248,11 +248,13 @@ export function NetworkScopeWorkspaceContent({
           </>
         )}
         <div className="row-actions compact network-scope-list-actions">
-          <button type="button" className="network-scope-create-button" onClick={handleOpenCreateNetworkForm}>
+          <button type="button" className="network-scope-create-button button-with-icon" onClick={handleOpenCreateNetworkForm}>
+            <span className="action-button-icon is-new" aria-hidden="true" />
             New
           </button>
           <button
             type="button"
+            className="button-with-icon"
             onClick={() => {
               if (focusedNetwork !== null) {
                 handleSelectNetwork(focusedNetwork.id);
@@ -260,10 +262,12 @@ export function NetworkScopeWorkspaceContent({
             }}
             disabled={focusedNetwork === null || isCreateMode || focusedNetwork.id === activeNetworkId}
           >
+            <span className="action-button-icon is-active" aria-hidden="true" />
             Set active
           </button>
           <button
             type="button"
+            className="button-with-icon"
             onClick={() => {
               if (focusedNetwork !== null) {
                 handleDuplicateNetwork(focusedNetwork.id);
@@ -271,11 +275,12 @@ export function NetworkScopeWorkspaceContent({
             }}
             disabled={focusedNetwork === null || isCreateMode}
           >
+            <span className="action-button-icon is-duplicate" aria-hidden="true" />
             Duplicate
           </button>
           <button
             type="button"
-            className="network-delete-button"
+            className="network-delete-button button-with-icon"
             onClick={() => {
               if (focusedNetwork !== null) {
                 handleDeleteNetwork(focusedNetwork.id);
@@ -283,6 +288,7 @@ export function NetworkScopeWorkspaceContent({
             }}
             disabled={focusedNetwork === null || isCreateMode}
           >
+            <span className="action-button-icon is-delete" aria-hidden="true" />
             Delete
           </button>
         </div>
@@ -315,7 +321,8 @@ export function NetworkScopeWorkspaceContent({
           <>
             <p className="empty-copy">Choose Create or Edit from the network scope panel to open this form.</p>
             <div className="row-actions compact idle-panel-actions">
-              <button type="button" onClick={handleOpenCreateNetworkForm}>
+              <button type="button" className="button-with-icon" onClick={handleOpenCreateNetworkForm}>
+                <span className="action-button-icon is-new" aria-hidden="true" />
                 Create
               </button>
             </div>
@@ -345,14 +352,20 @@ export function NetworkScopeWorkspaceContent({
             {networkFormError !== null ? <p className="form-error">{networkFormError}</p> : null}
             {networkTechnicalIdAlreadyUsed ? <p className="form-hint danger">Technical ID already used by another network.</p> : null}
             <div className="row-actions compact network-form-submit-actions">
-              <button type="submit">{isCreateMode ? "Create network" : "Save network"}</button>
+              <button type="submit" className={isFormOpen ? "button-with-icon" : undefined}>
+                {isCreateMode ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
+                {isEditMode ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
+                {isCreateMode ? "Create network" : "Save network"}
+              </button>
               <button
                 type="button"
+                className={isEditMode ? "button-with-icon" : undefined}
                 onClick={() => {
                   setFocusedNetworkId(null);
                   handleCloseNetworkForm();
                 }}
               >
+                {isEditMode ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
                 Cancel
               </button>
             </div>

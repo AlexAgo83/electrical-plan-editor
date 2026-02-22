@@ -415,6 +415,73 @@
   padding: 0.38rem 0.7rem;
 }
 
+.row-actions button.button-with-icon,
+.row-form button.button-with-icon,
+.error-banner button.button-with-icon,
+.cavity button.button-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.action-button-icon {
+  width: 0.82rem;
+  height: 0.82rem;
+  flex: 0 0 0.82rem;
+  background: currentColor;
+}
+
+.action-button-icon.is-edit {
+  -webkit-mask: url("/icons/ico_edit.svg") center / contain no-repeat;
+  mask: url("/icons/ico_edit.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-new {
+  -webkit-mask: url("/icons/ico_new.svg") center / contain no-repeat;
+  mask: url("/icons/ico_new.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-active {
+  -webkit-mask: url("/icons/ico_active.svg") center / contain no-repeat;
+  mask: url("/icons/ico_active.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-duplicate {
+  -webkit-mask: url("/icons/ico_duplicate.svg") center / contain no-repeat;
+  mask: url("/icons/ico_duplicate.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-lock-move {
+  -webkit-mask: url("/icons/ico_lock_move.svg") center / contain no-repeat;
+  mask: url("/icons/ico_lock_move.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-delete {
+  -webkit-mask: url("/icons/ico_delete.svg") center / contain no-repeat;
+  mask: url("/icons/ico_delete.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-analysis {
+  -webkit-mask: url("/icons/ico_analysis.svg") center / contain no-repeat;
+  mask: url("/icons/ico_analysis.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-save {
+  -webkit-mask: url("/icons/ico_save.svg") center / contain no-repeat;
+  mask: url("/icons/ico_save.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-cancel {
+  -webkit-mask: url("/icons/ico_cancel.svg") center / contain no-repeat;
+  mask: url("/icons/ico_cancel.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-unselect {
+  -webkit-mask: url("/icons/ico_unselect.svg") center / contain no-repeat;
+  mask: url("/icons/ico_unselect.svg") center / contain no-repeat;
+}
+
 .meta-line {
   margin: 0 0 0.75rem;
   color: #365166;

@@ -81,8 +81,13 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
     ) : null}
 
     <div className="row-actions">
-      <button type="submit">{nodeFormMode === "create" ? "Create" : "Save"}</button>
-      <button type="button" onClick={cancelNodeEdit}>
+      <button type="submit" className="button-with-icon">
+        {nodeFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
+        {nodeFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
+        {nodeFormMode === "create" ? "Create" : "Save"}
+      </button>
+      <button type="button" className={nodeFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelNodeEdit}>
+        {nodeFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {nodeFormMode === "edit" ? "Cancel edit" : "Cancel"}
       </button>
     </div>

@@ -137,8 +137,17 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     </div>
 
     <div className="row-actions">
-      <button type="submit" disabled={wireTechnicalIdAlreadyUsed}>{wireFormMode === "create" ? "Create" : "Save"}</button>
-      <button type="button" onClick={cancelWireEdit}>
+      <button
+        type="submit"
+        className="button-with-icon"
+        disabled={wireTechnicalIdAlreadyUsed}
+      >
+        {wireFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
+        {wireFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
+        {wireFormMode === "create" ? "Create" : "Save"}
+      </button>
+      <button type="button" className={wireFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelWireEdit}>
+        {wireFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {wireFormMode === "edit" ? "Cancel edit" : "Cancel"}
       </button>
     </div>

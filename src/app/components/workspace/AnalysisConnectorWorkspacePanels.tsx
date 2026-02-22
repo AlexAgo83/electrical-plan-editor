@@ -225,7 +225,10 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           />
         </label>
 
-        <button type="submit">Reserve cavity</button>
+        <button type="submit" className="button-with-icon">
+          <span className="action-button-icon is-lock-move" aria-hidden="true" />
+          Reserve cavity
+        </button>
       </form>
 
       <div className="cavity-grid" aria-label="Cavity occupancy grid">
@@ -234,7 +237,8 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             <h3>C{slot.cavityIndex}</h3>
             <p>{slot.isOccupied ? slot.occupantRef : "Free"}</p>
             {slot.isOccupied ? (
-              <button type="button" onClick={() => handleReleaseCavity(slot.cavityIndex)}>
+              <button type="button" className="button-with-icon" onClick={() => handleReleaseCavity(slot.cavityIndex)}>
+                <span className="action-button-icon is-cancel" aria-hidden="true" />
                 Release
               </button>
             ) : null}

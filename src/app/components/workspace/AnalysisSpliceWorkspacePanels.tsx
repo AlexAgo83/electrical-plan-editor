@@ -224,7 +224,10 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
           />
         </label>
 
-        <button type="submit">Reserve port</button>
+        <button type="submit" className="button-with-icon">
+          <span className="action-button-icon is-lock-move" aria-hidden="true" />
+          Reserve port
+        </button>
       </form>
 
       <div className="cavity-grid" aria-label="Splice port occupancy grid">
@@ -233,7 +236,8 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
             <h3>P{slot.portIndex}</h3>
             <p>{slot.isOccupied ? slot.occupantRef : "Free"}</p>
             {slot.isOccupied ? (
-              <button type="button" onClick={() => handleReleasePort(slot.portIndex)}>
+              <button type="button" className="button-with-icon" onClick={() => handleReleasePort(slot.portIndex)}>
+                <span className="action-button-icon is-cancel" aria-hidden="true" />
                 Release
               </button>
             ) : null}

@@ -41,8 +41,17 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       <input type="number" min={1} step={1} value={portCount} onChange={(event) => setPortCount(event.target.value)} required />
     </label>
     <div className="row-actions">
-      <button type="submit" disabled={spliceTechnicalIdAlreadyUsed}>{spliceFormMode === "create" ? "Create" : "Save"}</button>
-      <button type="button" onClick={cancelSpliceEdit}>
+      <button
+        type="submit"
+        className="button-with-icon"
+        disabled={spliceTechnicalIdAlreadyUsed}
+      >
+        {spliceFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
+        {spliceFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
+        {spliceFormMode === "create" ? "Create" : "Save"}
+      </button>
+      <button type="button" className={spliceFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelSpliceEdit}>
+        {spliceFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {spliceFormMode === "edit" ? "Cancel edit" : "Cancel"}
       </button>
     </div>

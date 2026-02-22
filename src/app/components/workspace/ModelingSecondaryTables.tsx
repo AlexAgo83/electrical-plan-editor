@@ -169,9 +169,28 @@ export function ModelingSecondaryTables({
           </table>
         )}
         <div className="row-actions compact modeling-list-actions">
-          <button type="button" onClick={onOpenCreateSegment}>New</button>
-          <button type="button" onClick={() => focusedSegment !== null && onEditSegment(focusedSegment)} disabled={focusedSegment === null}>Edit</button>
-          <button type="button" className="modeling-list-action-delete" onClick={() => focusedSegment !== null && onDeleteSegment(focusedSegment.id)} disabled={focusedSegment === null || segmentFormMode === "create"}>Delete</button>
+          <button type="button" className="button-with-icon" onClick={onOpenCreateSegment}>
+            <span className="action-button-icon is-new" aria-hidden="true" />
+            New
+          </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => focusedSegment !== null && onEditSegment(focusedSegment)}
+            disabled={focusedSegment === null}
+          >
+            <span className="action-button-icon is-edit" aria-hidden="true" />
+            Edit
+          </button>
+          <button
+            type="button"
+            className="modeling-list-action-delete button-with-icon"
+            onClick={() => focusedSegment !== null && onDeleteSegment(focusedSegment.id)}
+            disabled={focusedSegment === null || segmentFormMode === "create"}
+          >
+            <span className="action-button-icon is-delete" aria-hidden="true" />
+            Delete
+          </button>
         </div>
       </article>
 
@@ -257,9 +276,28 @@ export function ModelingSecondaryTables({
           </table>
         )}
         <div className="row-actions compact modeling-list-actions">
-          <button type="button" onClick={onOpenCreateWire}>New</button>
-          <button type="button" onClick={() => focusedWire !== null && onEditWire(focusedWire)} disabled={focusedWire === null}>Edit</button>
-          <button type="button" className="modeling-list-action-delete" onClick={() => focusedWire !== null && onDeleteWire(focusedWire.id)} disabled={focusedWire === null || wireFormMode === "create"}>Delete</button>
+          <button type="button" className="button-with-icon" onClick={onOpenCreateWire}>
+            <span className="action-button-icon is-new" aria-hidden="true" />
+            New
+          </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => focusedWire !== null && onEditWire(focusedWire)}
+            disabled={focusedWire === null}
+          >
+            <span className="action-button-icon is-edit" aria-hidden="true" />
+            Edit
+          </button>
+          <button
+            type="button"
+            className="modeling-list-action-delete button-with-icon"
+            onClick={() => focusedWire !== null && onDeleteWire(focusedWire.id)}
+            disabled={focusedWire === null || wireFormMode === "create"}
+          >
+            <span className="action-button-icon is-delete" aria-hidden="true" />
+            Delete
+          </button>
         </div>
       </article>
     </>
