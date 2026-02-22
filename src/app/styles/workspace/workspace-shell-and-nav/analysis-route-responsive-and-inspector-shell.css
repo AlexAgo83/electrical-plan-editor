@@ -1,0 +1,122 @@
+.analysis-wire-route-current span {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4d697d;
+  font-weight: 700;
+}
+
+.analysis-wire-route-current .route-preview-path {
+  margin: 0;
+}
+
+.analysis-wire-route-input {
+  margin-top: 0.08rem;
+}
+
+.analysis-wire-route-actions button {
+  min-width: 10.2rem;
+}
+
+@media (min-width: 980px) {
+  .analysis-panel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .analysis-wire-route-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .analysis-wire-route-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .analysis-wire-route-actions button {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.workspace-inspector-panel .inspector-context-panel {
+  pointer-events: auto;
+  box-shadow: 0 10px 26px rgba(9, 26, 40, 0.2);
+  background: rgba(255, 255, 255, 0.54);
+  -webkit-backdrop-filter: blur(9px);
+  backdrop-filter: blur(9px);
+  padding: 0.82rem 0.9rem;
+}
+
+.workspace-inspector-panel.is-collapsed .inspector-context-panel {
+  padding: 0.72rem 0.82rem;
+}
+
+.inspector-context-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+  margin-bottom: 0.48rem;
+}
+
+.inspector-context-header h2 {
+  margin: 0;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4f6a7f;
+}
+
+.inspector-context-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.78rem;
+}
+
+.inspector-context-toggle-icon {
+  display: inline-flex;
+  width: 0.78rem;
+  height: 0.78rem;
+  flex: 0 0 0.78rem;
+  background: currentColor;
+  -webkit-mask: url("/icons/ico_expand.svg") center / contain no-repeat;
+  mask: url("/icons/ico_expand.svg") center / contain no-repeat;
+}
+
+.inspector-context-toggle-icon.is-collapse {
+  transform: rotate(180deg);
+}
+
+.inspector-context-panel.is-collapsed .meta-line {
+  margin-bottom: 0.3rem;
+}
+
+.inspector-collapsed-copy {
+  margin: 0;
+  color: #4a6277;
+  font-size: 0.78rem;
+}
+
+.inspector-entity-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.34rem;
+  margin: 0 0 0.45rem;
+}
+
+.inspector-entity-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #5a7386;
+}

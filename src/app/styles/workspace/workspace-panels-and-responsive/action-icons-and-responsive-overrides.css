@@ -1,0 +1,72 @@
+.action-button-icon.is-undo {
+  -webkit-mask: url("/icons/ico_undo.svg") center / contain no-repeat;
+  mask: url("/icons/ico_undo.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-redo {
+  -webkit-mask: url("/icons/ico_redo.svg") center / contain no-repeat;
+  mask: url("/icons/ico_redo.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-prevnext {
+  -webkit-mask: url("/icons/ico_prevnext.svg") center / contain no-repeat;
+  mask: url("/icons/ico_prevnext.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-open {
+  -webkit-mask: url("/icons/ico_open.svg") center / contain no-repeat;
+  mask: url("/icons/ico_open.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-flip-x {
+  transform: scaleX(-1);
+}
+
+.action-button-icon.is-duplicate {
+  -webkit-mask: url("/icons/ico_duplicate.svg") center / contain no-repeat;
+  mask: url("/icons/ico_duplicate.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-lock-move {
+  -webkit-mask: url("/icons/ico_lock_move.svg") center / contain no-repeat;
+  mask: url("/icons/ico_lock_move.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-delete {
+  -webkit-mask: url("/icons/ico_delete.svg") center / contain no-repeat;
+  mask: url("/icons/ico_delete.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-analysis {
+  -webkit-mask: url("/icons/ico_analysis.svg") center / contain no-repeat;
+  mask: url("/icons/ico_analysis.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-save {
+  -webkit-mask: url("/icons/ico_save.svg") center / contain no-repeat;
+  mask: url("/icons/ico_save.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-cancel {
+  -webkit-mask: url("/icons/ico_cancel.svg") center / contain no-repeat;
+  mask: url("/icons/ico_cancel.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-unselect {
+  -webkit-mask: url("/icons/ico_unselect.svg") center / contain no-repeat;
+  mask: url("/icons/ico_unselect.svg") center / contain no-repeat;
+}
+
+.meta-line {
+  margin: 0 0 0.75rem;
+  color: #365166;
+}
+
+@media (max-width: 980px) {
+  .workspace-inspector-panel {
+    inset: auto 0.75rem 0.75rem auto;
+    width: calc(100vw - 1.5rem);
+    max-height: calc(100vh - var(--workspace-header-offset) - 0.75rem);
+  }
+
+}

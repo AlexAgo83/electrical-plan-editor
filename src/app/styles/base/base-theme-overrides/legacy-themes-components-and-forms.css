@@ -1,0 +1,449 @@
+.app-shell.theme-deep-green .workspace-tab.is-active,
+.app-shell.theme-deep-green .filter-chip.is-active,
+.app-shell.theme-deep-green .header-settings-toggle.is-active {
+  background: #5bc88f;
+  color: #0a2618;
+  border-color: #5bc88f;
+}
+
+.app-shell.theme-deep-green .workspace-tab-badge,
+.app-shell.theme-deep-green .header-ops-badge {
+  background: #2a5a49;
+  color: #d5ebdb;
+}
+
+.app-shell.theme-deep-green input,
+.app-shell.theme-deep-green select,
+.app-shell.theme-deep-green textarea {
+  border-color: #4d7a66;
+  background: #102a21;
+  color: #eaf7ed;
+}
+
+.app-shell.theme-deep-green .data-table th,
+.app-shell.theme-deep-green .data-table td {
+  border-bottom-color: #345646;
+}
+
+.app-shell.theme-deep-green .data-table th {
+  color: #c4e0cd;
+}
+
+.app-shell.theme-deep-green .data-table tr.is-selected > td {
+  background: rgba(91, 200, 143, 0.2);
+}
+
+.app-shell.theme-deep-green .data-table tr.is-wire-highlighted > td {
+  background: rgba(111, 190, 88, 0.24);
+}
+
+.app-shell.theme-deep-green .network-grid line {
+  stroke: #2f5544;
+}
+
+.app-shell.theme-deep-green .network-segment.is-selected {
+  stroke: #5bc88f;
+}
+
+.app-shell.theme-deep-green .network-canvas-floating-controls,
+.app-shell.theme-deep-green .network-canvas-floating-subnetworks,
+.app-shell.theme-deep-green .network-canvas-floating-stats {
+  border-color: #4a7d66;
+  background: rgba(18, 45, 35, 0.7);
+}
+
+.app-shell.theme-deep-green .network-canvas-floating-copy,
+.app-shell.theme-deep-green .network-canvas-subnetwork-list li,
+.app-shell.theme-deep-green .network-canvas-stats-list li {
+  color: #d0ead8;
+}
+
+.app-shell.theme-deep-green .network-canvas-stats-list strong {
+  color: #eaf7ed;
+}
+
+.app-shell.theme-deep-green .subnetwork-chip {
+  border-color: #5b8f75;
+  background: #285843;
+  color: #e0f5e6;
+}
+
+.app-shell.theme-slate-neon .settings-panel .meta-line {
+  color: #b7dbe3;
+}
+
+.app-shell.theme-slate-neon .settings-export-fieldset {
+  border-color: #427886;
+  background: rgba(15, 42, 56, 0.72);
+}
+
+.app-shell.theme-slate-neon .settings-export-fieldset legend {
+  color: #cceef5;
+}
+
+.app-shell.theme-slate-neon .network-scope-list-shell {
+  border-color: #356977;
+}
+
+.app-shell.theme-slate-neon .network-scope-status-chip.is-active {
+  background: #1f5a49;
+  color: #d9fff4;
+}
+
+.app-shell.theme-slate-neon .network-scope-status-chip.is-available {
+  background: #274f5e;
+  color: #d5eef4;
+}
+
+.app-shell.theme-slate-neon .network-form-mode-chip {
+  background: #274f5e;
+  color: #d5eef4;
+}
+
+.app-shell.theme-slate-neon .network-form-mode-chip.is-create {
+  background: #225a68;
+  color: #ddfbff;
+}
+
+.app-shell.theme-slate-neon .network-form-mode-chip.is-edit {
+  background: #1f5a49;
+  color: #d9fff4;
+}
+
+.app-shell.theme-slate-neon .network-legend {
+  color: #c9ecf4;
+}
+
+.app-shell.theme-slate-neon .legend-swatch {
+  border-color: #75acba;
+}
+
+.app-shell.theme-slate-neon .legend-line {
+  border-top-color: #79a5b4;
+}
+
+.app-shell.theme-slate-neon .legend-line.selected {
+  border-top-color: #38e6c8;
+}
+
+.app-shell.theme-slate-neon .legend-line.wire {
+  border-top-color: #59cc7a;
+}
+
+.app-shell.theme-slate-neon .route-preview-panel {
+  border-color: #396f7e;
+  background: linear-gradient(180deg, #123647 0%, #102f40 100%);
+}
+
+.app-shell.theme-slate-neon .route-preview-label,
+.app-shell.theme-slate-neon .route-preview-selection-strip span,
+.app-shell.theme-slate-neon .route-preview-status-line p,
+.app-shell.theme-slate-neon .route-preview-metrics span,
+.app-shell.theme-slate-neon .route-preview-path-grid h4 {
+  color: #b9dde5;
+}
+
+.app-shell.theme-slate-neon .route-preview-selection-strip,
+.app-shell.theme-slate-neon .route-preview-empty,
+.app-shell.theme-slate-neon .route-preview-metrics article,
+.app-shell.theme-slate-neon .route-preview-path-grid article,
+.app-shell.theme-slate-neon .analysis-wire-identity,
+.app-shell.theme-slate-neon .analysis-wire-route-current {
+  border-color: #3d7382;
+  background: rgba(12, 36, 48, 0.68);
+}
+
+.app-shell.theme-slate-neon .route-preview-selection-strip strong,
+.app-shell.theme-slate-neon .route-preview-metrics strong,
+.app-shell.theme-slate-neon .route-preview-path,
+.app-shell.theme-slate-neon .analysis-wire-identity-value {
+  color: #edfdff;
+}
+
+.app-shell.theme-slate-neon .route-preview-selection-arrow {
+  color: #79a8b7;
+}
+
+.app-shell.theme-slate-neon .route-preview-empty {
+  color: #c7e8ee;
+}
+
+.app-shell.theme-slate-neon .route-preview-status-chip {
+  border-color: #49b68d;
+  background: #1d5642;
+  color: #ddfff0;
+}
+
+.app-shell.theme-slate-neon .analysis-wire-identity-label,
+.app-shell.theme-slate-neon .analysis-wire-route-current span {
+  color: #afd4dd;
+}
+
+.app-shell.theme-slate-neon .analysis-wire-mode-chip {
+  border-color: #4b8594;
+  background: #214f61;
+  color: #e1fbff;
+}
+
+.app-shell.theme-slate-neon .analysis-wire-mode-chip.is-locked {
+  border-color: #58aa7f;
+  background: #214e3a;
+  color: #def6e7;
+}
+
+.app-shell.theme-slate-neon .cavity h3 {
+  color: #dff9fd;
+}
+
+.app-shell.theme-slate-neon .cavity p {
+  color: #c1e6ee;
+}
+
+.app-shell.theme-slate-neon .cavity button {
+  border-color: #4b8594;
+  background: #214f61;
+  color: #e1fbff;
+}
+
+.app-shell.theme-slate-neon .splice-badge {
+  background: #245f74;
+  color: #ecfdff;
+}
+
+.app-shell.theme-slate-neon .panel .meta-line {
+  color: #c7e8ee;
+}
+
+.app-shell.theme-slate-neon .status-chip.is-error {
+  border-color: #a56a73;
+  background: #5d3138;
+  color: #ffe1e5;
+}
+
+.app-shell.theme-slate-neon .status-chip.is-warning {
+  border-color: #8e7a46;
+  background: #51411f;
+  color: #ffefc8;
+}
+
+.app-shell.theme-slate-neon .validation-toolbar > span,
+.app-shell.theme-slate-neon .summary-grid h3,
+.app-shell.theme-slate-neon .validation-group h3,
+.app-shell.theme-slate-neon .validation-active-filter {
+  color: #b6dbe3;
+}
+
+.app-shell.theme-paper-blueprint .settings-panel .meta-line {
+  color: #4a6982;
+}
+
+.app-shell.theme-paper-blueprint .settings-export-fieldset {
+  border-color: #b8cede;
+  background: rgba(244, 250, 255, 0.8);
+}
+
+.app-shell.theme-paper-blueprint .settings-export-fieldset legend {
+  color: #3c617d;
+}
+
+.app-shell.theme-paper-blueprint .network-scope-list-shell {
+  border-color: #bfd1de;
+}
+
+.app-shell.theme-paper-blueprint .network-scope-status-chip.is-active {
+  background: #dff0e4;
+  color: #21593a;
+}
+
+.app-shell.theme-paper-blueprint .network-scope-status-chip.is-available {
+  background: #e3ecf4;
+  color: #2e4b62;
+}
+
+.app-shell.theme-paper-blueprint .network-form-mode-chip {
+  background: #e3ecf4;
+  color: #2e4b62;
+}
+
+.app-shell.theme-paper-blueprint .network-form-mode-chip.is-create {
+  background: #dcecf8;
+  color: #1f567f;
+}
+
+.app-shell.theme-paper-blueprint .network-form-mode-chip.is-edit {
+  background: #dbe9f5;
+  color: #254d69;
+}
+
+.app-shell.theme-paper-blueprint .network-legend {
+  color: #3f6079;
+}
+
+.app-shell.theme-paper-blueprint .legend-swatch {
+  border-color: #789bb5;
+}
+
+.app-shell.theme-paper-blueprint .legend-line {
+  border-top-color: #7f9eb6;
+}
+
+.app-shell.theme-paper-blueprint .legend-line.selected {
+  border-top-color: #2f6f9f;
+}
+
+.app-shell.theme-paper-blueprint .legend-line.wire {
+  border-top-color: #5ca05f;
+}
+
+.app-shell.theme-paper-blueprint .route-preview-panel {
+  border-color: #b4cada;
+  background: linear-gradient(180deg, #f8fcff 0%, #eef5fc 100%);
+}
+
+.app-shell.theme-paper-blueprint .route-preview-label,
+.app-shell.theme-paper-blueprint .route-preview-selection-strip span,
+.app-shell.theme-paper-blueprint .route-preview-status-line p,
+.app-shell.theme-paper-blueprint .route-preview-metrics span,
+.app-shell.theme-paper-blueprint .route-preview-path-grid h4 {
+  color: #52718a;
+}
+
+.app-shell.theme-paper-blueprint .route-preview-selection-strip,
+.app-shell.theme-paper-blueprint .route-preview-empty,
+.app-shell.theme-paper-blueprint .route-preview-metrics article,
+.app-shell.theme-paper-blueprint .route-preview-path-grid article,
+.app-shell.theme-paper-blueprint .analysis-wire-identity,
+.app-shell.theme-paper-blueprint .analysis-wire-route-current {
+  border-color: #bfd2e1;
+  background: rgba(248, 252, 255, 0.85);
+}
+
+.app-shell.theme-paper-blueprint .route-preview-selection-strip strong,
+.app-shell.theme-paper-blueprint .route-preview-metrics strong,
+.app-shell.theme-paper-blueprint .route-preview-path,
+.app-shell.theme-paper-blueprint .analysis-wire-identity-value {
+  color: #173d58;
+}
+
+.app-shell.theme-paper-blueprint .route-preview-selection-arrow {
+  color: #7394ad;
+}
+
+.app-shell.theme-paper-blueprint .route-preview-empty {
+  color: #587790;
+}
+
+.app-shell.theme-paper-blueprint .route-preview-status-chip {
+  border-color: #84b59a;
+  background: #e3f3ea;
+  color: #21593a;
+}
+
+.app-shell.theme-paper-blueprint .analysis-wire-identity-label,
+.app-shell.theme-paper-blueprint .analysis-wire-route-current span {
+  color: #57748b;
+}
+
+.app-shell.theme-paper-blueprint .analysis-wire-mode-chip {
+  border-color: #9fb9cf;
+  background: #e4eef7;
+  color: #1f4863;
+}
+
+.app-shell.theme-paper-blueprint .analysis-wire-mode-chip.is-locked {
+  border-color: #9dc8ae;
+  background: #e4f2ea;
+  color: #21583a;
+}
+
+.app-shell.theme-paper-blueprint .cavity h3 {
+  color: #234c67;
+}
+
+.app-shell.theme-paper-blueprint .cavity p {
+  color: #3c5f77;
+}
+
+.app-shell.theme-paper-blueprint .cavity button {
+  border-color: #a4bfd3;
+  background: #e8f1f8;
+  color: #173d58;
+}
+
+.app-shell.theme-paper-blueprint .splice-badge {
+  background: #3f78a3;
+  color: #f4f9ff;
+}
+
+.app-shell.theme-paper-blueprint .panel .meta-line {
+  color: #587790;
+}
+
+.app-shell.theme-paper-blueprint .status-chip.is-error {
+  border-color: #d7acb2;
+  background: #fbebee;
+  color: #8f2330;
+}
+
+.app-shell.theme-paper-blueprint .status-chip.is-warning {
+  border-color: #dcc38f;
+  background: #fbf3de;
+  color: #76540f;
+}
+
+.app-shell.theme-paper-blueprint .validation-toolbar > span,
+.app-shell.theme-paper-blueprint .summary-grid h3,
+.app-shell.theme-paper-blueprint .validation-group h3,
+.app-shell.theme-paper-blueprint .validation-active-filter {
+  color: #4c6d86;
+}
+
+.app-shell.theme-warm-brown .settings-panel .meta-line {
+  color: #6c4f3a;
+}
+
+.app-shell.theme-warm-brown .settings-export-fieldset legend {
+  color: #6a4a35;
+}
+
+.app-shell.theme-warm-brown .network-scope-list-shell {
+  border-color: #d3b79e;
+}
+
+.app-shell.theme-warm-brown .network-scope-status-chip.is-active {
+  background: #e4efdf;
+  color: #315132;
+}
+
+.app-shell.theme-warm-brown .network-scope-status-chip.is-available {
+  background: #ead7c6;
+  color: #5f4230;
+}
+
+.app-shell.theme-warm-brown .network-form-mode-chip {
+  background: #ead7c6;
+  color: #5f4230;
+}
+
+.app-shell.theme-warm-brown .network-form-mode-chip.is-create {
+  background: #e8dccd;
+  color: #6a4d2f;
+}
+
+.app-shell.theme-warm-brown .network-form-mode-chip.is-edit {
+  background: #efdfd2;
+  color: #6a4a35;
+}
+
+.app-shell.theme-warm-brown .network-legend {
+  color: #6a4a35;
+}
+
+.app-shell.theme-warm-brown .legend-swatch {
+  border-color: #9e8068;
+}
+
+.app-shell.theme-warm-brown .legend-line {
+  border-top-color: #9a806d;
+}
+

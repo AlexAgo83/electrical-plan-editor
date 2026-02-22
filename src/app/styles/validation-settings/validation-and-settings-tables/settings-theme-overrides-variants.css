@@ -1,0 +1,349 @@
+.app-shell.theme-rose-quartz .settings-state-chip.is-ok {
+  border-color: #d29ab0;
+  background: #f4dbe7;
+  color: #6b2a48;
+}
+
+.app-shell.theme-rose-quartz .settings-state-chip.is-warn {
+  border-color: #d99eb6;
+  background: #f8e2ec;
+  color: #742f4f;
+}
+
+.app-shell.theme-rose-quartz .settings-export-fieldset {
+  border-color: #d8b3c6;
+  background: rgba(255, 247, 251, 0.84);
+}
+
+.app-shell.theme-rose-quartz .settings-export-fieldset legend {
+  color: #6b2f4b;
+}
+
+.app-shell.theme-rose-quartz .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-rose-quartz .settings-export-fieldset .technical-id {
+  color: #5a2540;
+}
+
+.app-shell.theme-rose-quartz .settings-import-summary .meta-line {
+  border-color: #dec0cf;
+  background: rgba(255, 248, 252, 0.82);
+}
+
+.app-shell.theme-rose-quartz .settings-import-summary .meta-line strong {
+  color: #5a2540;
+}
+
+.app-shell.theme-rose-quartz .settings-primary-action {
+  border-color: #d07ba0 !important;
+  background: linear-gradient(180deg, #d56f98, #b9567c) !important;
+  color: #fff7fb !important;
+}
+
+.app-shell.theme-rose-quartz .settings-primary-action:disabled {
+  border-color: #d6b1c3 !important;
+  background: #eddce4 !important;
+  color: #8c6677 !important;
+}
+
+.app-shell.theme-lavender-haze .settings-panel {
+  border-color: #bbb4e7;
+  background: linear-gradient(168deg, rgba(251, 250, 255, 0.97) 0%, rgba(238, 234, 255, 0.9) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.app-shell.theme-lavender-haze .settings-panel-intro {
+  color: #645ca3;
+}
+
+.app-shell.theme-lavender-haze .settings-panel-chip {
+  border-color: #b0a8e6;
+  background: #e9e5fb;
+  color: #4a438d;
+}
+
+.app-shell.theme-lavender-haze .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-lavender-haze .settings-panel .settings-checkbox {
+  color: #3f397d;
+}
+
+.app-shell.theme-lavender-haze .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-lavender-haze .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #fcfbff;
+  border-color: #beb8e6;
+  color: #312c66;
+}
+
+.app-shell.theme-lavender-haze .settings-panel .settings-checkbox:hover {
+  background: rgba(179, 170, 233, 0.22);
+}
+
+.app-shell.theme-lavender-haze .settings-actions {
+  border-top-color: rgba(176, 168, 230, 0.52);
+}
+
+.app-shell.theme-lavender-haze .settings-shortcut-list li {
+  color: #4f488f;
+  border-color: #cfc9ef;
+  background: rgba(251, 250, 255, 0.9);
+}
+
+.app-shell.theme-lavender-haze .settings-shortcut-key {
+  border-color: #beb8e6;
+  background: #ece9fb;
+  color: #4a438d;
+}
+
+.app-shell.theme-lavender-haze .settings-state-chip {
+  border-color: #bbb4e6;
+  background: #e8e5fb;
+  color: #4b448e;
+}
+
+.app-shell.theme-lavender-haze .settings-state-chip.is-ok {
+  border-color: #bea9e8;
+  background: #eee5fb;
+  color: #5a4299;
+}
+
+.app-shell.theme-lavender-haze .settings-state-chip.is-warn {
+  border-color: #c6b2eb;
+  background: #f1eafb;
+  color: #664aa6;
+}
+
+.app-shell.theme-lavender-haze .settings-export-fieldset {
+  border-color: #c3bde8;
+  background: rgba(250, 249, 255, 0.84);
+}
+
+.app-shell.theme-lavender-haze .settings-export-fieldset legend {
+  color: #4f488f;
+}
+
+.app-shell.theme-lavender-haze .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-lavender-haze .settings-export-fieldset .technical-id {
+  color: #3f397d;
+}
+
+.app-shell.theme-lavender-haze .settings-import-summary .meta-line {
+  border-color: #d0cbef;
+  background: rgba(250, 249, 255, 0.82);
+}
+
+.app-shell.theme-lavender-haze .settings-import-summary .meta-line strong {
+  color: #3f397d;
+}
+
+.app-shell.theme-lavender-haze .settings-primary-action {
+  border-color: #8a7de1 !important;
+  background: linear-gradient(180deg, #7869de, #6454d3) !important;
+  color: #f7f5ff !important;
+}
+
+.app-shell.theme-lavender-haze .settings-primary-action:disabled {
+  border-color: #c3bde8 !important;
+  background: #e6e2f4 !important;
+  color: #7f79aa !important;
+}
+
+.app-shell.theme-burgundy-noir .settings-panel {
+  border-color: #743c55;
+  background: linear-gradient(170deg, rgba(44, 15, 26, 0.96) 0%, rgba(36, 12, 20, 0.92) 100%);
+  box-shadow: inset 0 1px 0 rgba(231, 191, 208, 0.05);
+}
+
+.app-shell.theme-burgundy-noir .settings-panel-intro {
+  color: #cfa8b8;
+}
+
+.app-shell.theme-burgundy-noir .settings-panel-chip {
+  border-color: #8b4f68;
+  background: #412031;
+  color: #f2e0e8;
+}
+
+.app-shell.theme-burgundy-noir .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-burgundy-noir .settings-panel .settings-checkbox {
+  color: #edd5de;
+}
+
+.app-shell.theme-burgundy-noir .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-burgundy-noir .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #24101a;
+  border-color: #7a425c;
+  color: #f8edf2;
+}
+
+.app-shell.theme-burgundy-noir .settings-panel .settings-checkbox:hover {
+  background: rgba(120, 66, 92, 0.28);
+}
+
+.app-shell.theme-burgundy-noir .settings-actions {
+  border-top-color: rgba(139, 79, 104, 0.45);
+}
+
+.app-shell.theme-burgundy-noir .settings-shortcut-list li {
+  color: #e4c5d2;
+  border-color: #6f3b53;
+  background: rgba(47, 16, 28, 0.76);
+}
+
+.app-shell.theme-burgundy-noir .settings-shortcut-key {
+  border-color: #8b4f68;
+  background: #412031;
+  color: #f4e4eb;
+}
+
+.app-shell.theme-burgundy-noir .settings-state-chip {
+  border-color: #8b4f68;
+  background: #412031;
+  color: #f4e4eb;
+}
+
+.app-shell.theme-burgundy-noir .settings-state-chip.is-ok {
+  border-color: #a15d7a;
+  background: #512638;
+  color: #ffe5ee;
+}
+
+.app-shell.theme-burgundy-noir .settings-state-chip.is-warn {
+  border-color: #9a6076;
+  background: #633044;
+  color: #ffe6ef;
+}
+
+.app-shell.theme-burgundy-noir .settings-export-fieldset {
+  border-color: #7d465d;
+  background: rgba(44, 15, 26, 0.78);
+}
+
+.app-shell.theme-burgundy-noir .settings-export-fieldset legend {
+  color: #efcfdb;
+}
+
+.app-shell.theme-burgundy-noir .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-burgundy-noir .settings-export-fieldset .technical-id {
+  color: #edd5de;
+}
+
+.app-shell.theme-burgundy-noir .settings-import-summary .meta-line {
+  border-color: #6f3b53;
+  background: rgba(43, 15, 25, 0.76);
+}
+
+.app-shell.theme-burgundy-noir .settings-import-summary .meta-line strong {
+  color: #f7eaf0;
+}
+
+.app-shell.theme-burgundy-noir .settings-primary-action {
+  border-color: #b86b89 !important;
+  background: linear-gradient(180deg, #a55475, #8b4361) !important;
+  color: #fff0f6 !important;
+}
+
+.app-shell.theme-burgundy-noir .settings-primary-action:disabled {
+  border-color: #73505f !important;
+  background: #4b313c !important;
+  color: #d7c0ca !important;
+}
+
+.app-shell.theme-amber-night .settings-panel {
+  border-color: #6f5d2e;
+  background: linear-gradient(170deg, rgba(38, 29, 10, 0.96) 0%, rgba(31, 24, 9, 0.92) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 235, 173, 0.05);
+}
+
+.app-shell.theme-amber-night .settings-panel-intro {
+  color: #dec889;
+}
+
+.app-shell.theme-amber-night .settings-panel-chip {
+  border-color: #9b8341;
+  background: #4b3a12;
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-amber-night .settings-panel .settings-checkbox {
+  color: #f2e3b5;
+}
+
+.app-shell.theme-amber-night .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-amber-night .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #211906;
+  border-color: #7b6731;
+  color: #fbf0cf;
+}
+
+.app-shell.theme-amber-night .settings-panel .settings-checkbox:hover {
+  background: rgba(123, 103, 49, 0.28);
+}
+
+.app-shell.theme-amber-night .settings-actions {
+  border-top-color: rgba(155, 131, 65, 0.46);
+}
+
+.app-shell.theme-amber-night .settings-shortcut-list li {
+  color: #eadcae;
+  border-color: #6f5d2e;
+  background: rgba(40, 31, 10, 0.76);
+}
+
+.app-shell.theme-amber-night .settings-shortcut-key {
+  border-color: #9b8341;
+  background: #4b3a12;
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .settings-state-chip {
+  border-color: #9b8341;
+  background: #4b3a12;
+  color: #ffe9af;
+}
+
+.app-shell.theme-amber-night .settings-state-chip.is-ok {
+  border-color: #b79448;
+  background: #5a4514;
+  color: #ffefbc;
+}
+
+.app-shell.theme-amber-night .settings-state-chip.is-warn {
+  border-color: #c6a24d;
+  background: #694f17;
+  color: #fff2c4;
+}
+
+.app-shell.theme-amber-night .settings-export-fieldset {
+  border-color: #7b6731;
+  background: rgba(42, 32, 10, 0.78);
+}
+
+.app-shell.theme-amber-night .settings-export-fieldset legend {
+  color: #f0deaa;
+}
+
+.app-shell.theme-amber-night .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-amber-night .settings-export-fieldset .technical-id {
+  color: #f2e3b5;
+}
+
+.app-shell.theme-amber-night .settings-import-summary .meta-line {
+  border-color: #6f5d2e;
+  background: rgba(40, 31, 10, 0.76);
+}
+
+.app-shell.theme-amber-night .settings-import-summary .meta-line strong {
+  color: #fff1c8;
+}
+
+.app-shell.theme-amber-night .settings-primary-action {
+  border-color: #d7a93f !important;
+  background: linear-gradient(180deg, #bd8f2a, #9d741a) !important;
+  color: #fff3cf !important;
+}
+
+.app-shell.theme-amber-night .settings-primary-action:disabled {
+  border-color: #7d6b3b !important;
+  background: #534628 !important;
+  color: #d8cca8 !important;
+}

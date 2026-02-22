@@ -1,0 +1,450 @@
+
+.app-shell.theme-dark .settings-shortcut-list li {
+  color: #d2e0ee;
+  border-color: #4e6982;
+  background: rgba(29, 47, 65, 0.78);
+}
+
+.app-shell.theme-dark .settings-shortcut-key {
+  border-color: #5b7894;
+  background: #2b4961;
+  color: #dcebf8;
+}
+
+.app-shell.theme-dark .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-dark .settings-panel .settings-checkbox {
+  color: #d7e6f4;
+}
+
+.app-shell.theme-dark .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-dark .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #122438;
+  border-color: #4a6783;
+  color: #e3ecf6;
+}
+
+.app-shell.theme-dark .settings-panel .settings-checkbox:hover {
+  background: rgba(53, 78, 102, 0.35);
+}
+
+.app-shell.theme-dark .settings-actions {
+  border-top-color: rgba(101, 133, 159, 0.5);
+}
+
+.app-shell.theme-dark .settings-state-chip {
+  border-color: #5a7893;
+  background: #2d4a63;
+  color: #d5e5f2;
+}
+
+.app-shell.theme-dark .settings-state-chip.is-ok {
+  border-color: #4f8c67;
+  background: #214436;
+  color: #d4f2e0;
+}
+
+.app-shell.theme-dark .settings-state-chip.is-warn {
+  border-color: #8a7540;
+  background: #47391a;
+  color: #f5e6c0;
+}
+
+.app-shell.theme-dark .settings-export-fieldset {
+  border-color: #4f6d87;
+  background: rgba(24, 41, 58, 0.72);
+}
+
+.app-shell.theme-dark .settings-export-fieldset legend {
+  color: #c8d9ea;
+}
+
+.app-shell.theme-dark .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-dark .settings-export-fieldset .technical-id {
+  color: #d7e6f4;
+}
+
+.app-shell.theme-dark .settings-import-summary .meta-line {
+  border-color: #4c6881;
+  background: rgba(23, 39, 55, 0.72);
+}
+
+.app-shell.theme-dark .settings-import-summary .meta-line strong {
+  color: #e6f0fa;
+}
+
+.app-shell.theme-dark .settings-primary-action {
+  border-color: #7ea8c9 !important;
+  background: linear-gradient(180deg, #5a8bb0, #3f6d8f) !important;
+  color: #f2f8fd !important;
+}
+
+.app-shell.theme-dark .settings-primary-action:disabled {
+  border-color: #63819a !important;
+  background: #4b6478 !important;
+  color: #d4e0ea !important;
+}
+
+.app-shell.theme-slate-neon .settings-panel {
+  border-color: #2f6676;
+  background: linear-gradient(170deg, rgba(18, 52, 68, 0.96) 0%, rgba(15, 42, 56, 0.92) 100%);
+  box-shadow: inset 0 1px 0 rgba(148, 214, 226, 0.08);
+}
+
+.app-shell.theme-slate-neon .settings-panel-intro {
+  color: #a7cdd6;
+}
+
+.app-shell.theme-slate-neon .settings-panel-chip {
+  border-color: #467f8f;
+  background: #1e4b5c;
+  color: #ddfbff;
+}
+
+.app-shell.theme-slate-neon .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-slate-neon .settings-panel .settings-checkbox {
+  color: #d8f6fb;
+}
+
+.app-shell.theme-slate-neon .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-slate-neon .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #0f2a38;
+  border-color: #3e7584;
+  color: #ecfdff;
+}
+
+.app-shell.theme-slate-neon .settings-panel .settings-checkbox:hover {
+  background: rgba(42, 100, 114, 0.32);
+}
+
+.app-shell.theme-slate-neon .settings-actions {
+  border-top-color: rgba(89, 139, 151, 0.5);
+}
+
+.app-shell.theme-slate-neon .settings-shortcut-list li {
+  color: #d3eff5;
+  border-color: #3c7181;
+  background: rgba(17, 46, 59, 0.74);
+}
+
+.app-shell.theme-slate-neon .settings-shortcut-key {
+  border-color: #478091;
+  background: #1f4e60;
+  color: #ddfbff;
+}
+
+.app-shell.theme-slate-neon .settings-primary-action {
+  border-color: #55b9a7 !important;
+  background: linear-gradient(180deg, #2ba891, #1f7f70) !important;
+  color: #e9fffb !important;
+}
+
+.app-shell.theme-slate-neon .settings-primary-action:disabled {
+  border-color: #4f7f86 !important;
+  background: #355d66 !important;
+  color: #cfe8eb !important;
+}
+
+.app-shell.theme-slate-neon .settings-export-fieldset {
+  border-color: #467f8f;
+  background: rgba(21, 57, 73, 0.76);
+}
+
+.app-shell.theme-slate-neon .settings-export-fieldset legend {
+  color: #d5f3f8;
+}
+
+.app-shell.theme-slate-neon .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-slate-neon .settings-export-fieldset .technical-id {
+  color: #d8f6fb;
+}
+
+.app-shell.theme-paper-blueprint .settings-panel {
+  border-color: #b2c7d9;
+  background: linear-gradient(168deg, rgba(251, 254, 255, 0.97) 0%, rgba(237, 247, 255, 0.88) 100%);
+}
+
+.app-shell.theme-paper-blueprint .settings-panel-intro {
+  color: #4c6a82;
+}
+
+.app-shell.theme-paper-blueprint .settings-panel-chip {
+  border-color: #9cb9ce;
+  background: #deedf8;
+  color: #264c68;
+}
+
+.app-shell.theme-paper-blueprint .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-paper-blueprint .settings-panel .settings-checkbox {
+  color: #254b66;
+}
+
+.app-shell.theme-paper-blueprint .settings-actions {
+  border-top-color: rgba(157, 184, 204, 0.58);
+}
+
+.app-shell.theme-paper-blueprint .settings-shortcut-list li {
+  color: #31556e;
+  border-color: #c1d4e3;
+  background: rgba(247, 252, 255, 0.9);
+}
+
+.app-shell.theme-paper-blueprint .settings-shortcut-key {
+  border-color: #b1c8db;
+  background: #e6f1f9;
+  color: #26506b;
+}
+
+.app-shell.theme-paper-blueprint .settings-primary-action {
+  border-color: #6f98b8 !important;
+  background: linear-gradient(180deg, #4f82ab, #3a6b92) !important;
+  color: #f4f9ff !important;
+}
+
+.app-shell.theme-paper-blueprint .settings-primary-action:disabled {
+  border-color: #b2c7d8 !important;
+  background: #dbe8f2 !important;
+  color: #6a889f !important;
+}
+
+.app-shell.theme-paper-blueprint .settings-export-fieldset {
+  border-color: #b7cddd;
+  background: rgba(245, 251, 255, 0.9);
+}
+
+.app-shell.theme-paper-blueprint .settings-export-fieldset legend {
+  color: #4c6a82;
+}
+
+.app-shell.theme-paper-blueprint .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-paper-blueprint .settings-export-fieldset .technical-id {
+  color: #254b66;
+}
+
+.app-shell.theme-warm-brown .settings-panel {
+  border-color: #d8bfa9;
+  background: linear-gradient(168deg, rgba(255, 248, 241, 0.96) 0%, rgba(245, 231, 215, 0.9) 100%);
+}
+
+.app-shell.theme-warm-brown .settings-panel-intro {
+  color: #6f503a;
+}
+
+.app-shell.theme-warm-brown .settings-panel-chip {
+  border-color: #caa686;
+  background: #f0dcc8;
+  color: #6a4731;
+}
+
+.app-shell.theme-warm-brown .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-warm-brown .settings-panel .settings-checkbox {
+  color: #5f412d;
+}
+
+.app-shell.theme-warm-brown .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-warm-brown .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #fffaf4;
+  border-color: #d0b499;
+  color: #4f3525;
+}
+
+.app-shell.theme-warm-brown .settings-panel .settings-checkbox:hover {
+  background: rgba(224, 191, 161, 0.28);
+}
+
+.app-shell.theme-warm-brown .settings-actions {
+  border-top-color: rgba(198, 165, 134, 0.56);
+}
+
+.app-shell.theme-warm-brown .settings-shortcut-list li {
+  color: #654835;
+  border-color: #d2b79e;
+  background: rgba(255, 248, 240, 0.88);
+}
+
+.app-shell.theme-warm-brown .settings-shortcut-key {
+  border-color: #c9a788;
+  background: #f1dfce;
+  color: #684832;
+}
+
+.app-shell.theme-warm-brown .settings-state-chip {
+  border-color: #c9a98c;
+  background: #f0ddca;
+  color: #654835;
+}
+
+.app-shell.theme-warm-brown .settings-state-chip.is-ok {
+  border-color: #98b285;
+  background: #e7f0de;
+  color: #355535;
+}
+
+.app-shell.theme-warm-brown .settings-state-chip.is-warn {
+  border-color: #d1b579;
+  background: #f8edd8;
+  color: #624512;
+}
+
+.app-shell.theme-warm-brown .settings-export-fieldset {
+  border-color: #cfb297;
+  background: rgba(255, 249, 242, 0.82);
+}
+
+.app-shell.theme-warm-brown .settings-export-fieldset legend {
+  color: #6a4a35;
+}
+
+.app-shell.theme-warm-brown .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-warm-brown .settings-export-fieldset .technical-id {
+  color: #5f412d;
+}
+
+.app-shell.theme-warm-brown .settings-import-summary .meta-line {
+  border-color: #d2b79e;
+  background: rgba(255, 248, 240, 0.8);
+}
+
+.app-shell.theme-warm-brown .settings-import-summary .meta-line strong {
+  color: #5f412d;
+}
+
+.app-shell.theme-warm-brown .settings-primary-action {
+  border-color: #ba906d !important;
+  background: linear-gradient(180deg, #a67a56, #875f40) !important;
+  color: #fff5ec !important;
+}
+
+.app-shell.theme-warm-brown .settings-primary-action:disabled {
+  border-color: #d3b89e !important;
+  background: #eadccf !important;
+  color: #8c6c52 !important;
+}
+
+.app-shell.theme-deep-green .settings-panel {
+  border-color: #3f6c58;
+  background: linear-gradient(170deg, rgba(20, 49, 38, 0.96) 0%, rgba(16, 40, 31, 0.92) 100%);
+  box-shadow: inset 0 1px 0 rgba(148, 197, 170, 0.08);
+}
+
+.app-shell.theme-deep-green .settings-panel-intro {
+  color: #9fc7ac;
+}
+
+.app-shell.theme-deep-green .settings-panel-chip {
+  border-color: #59896f;
+  background: #234d3b;
+  color: #d8f0df;
+}
+
+.app-shell.theme-deep-green .settings-shortcut-list li {
+  color: #d2ead8;
+  border-color: #4d7a67;
+  background: rgba(17, 42, 33, 0.76);
+}
+
+.app-shell.theme-deep-green .settings-shortcut-key {
+  border-color: #5b8f75;
+  background: #285843;
+  color: #ddf4e4;
+}
+
+.app-shell.theme-deep-green .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-deep-green .settings-panel .settings-checkbox {
+  color: #d8efdf;
+}
+
+.app-shell.theme-deep-green .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-deep-green .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #102a21;
+  border-color: #4d7a66;
+  color: #eaf7ed;
+}
+
+.app-shell.theme-deep-green .settings-panel .settings-checkbox:hover {
+  background: rgba(52, 98, 76, 0.35);
+}
+
+.app-shell.theme-deep-green .settings-actions {
+  border-top-color: rgba(92, 140, 117, 0.5);
+}
+
+.app-shell.theme-deep-green .settings-export-fieldset {
+  border-color: #4b7a66;
+  background: rgba(18, 47, 37, 0.8);
+}
+
+.app-shell.theme-deep-green .settings-export-fieldset legend {
+  color: #cde7d6;
+}
+
+.app-shell.theme-deep-green .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-deep-green .settings-export-fieldset .technical-id {
+  color: #d8efdf;
+}
+
+.app-shell.theme-deep-green .settings-primary-action {
+  border-color: #5e9c79 !important;
+  background: linear-gradient(180deg, #3f7f5f, #2f674c) !important;
+  color: #edf9f1 !important;
+}
+
+.app-shell.theme-deep-green .settings-primary-action:disabled {
+  border-color: #597766 !important;
+  background: #3e5a4b !important;
+  color: #cfe0d5 !important;
+}
+
+.app-shell.theme-rose-quartz .settings-panel {
+  border-color: #d9b1c4;
+  background: linear-gradient(168deg, rgba(255, 249, 252, 0.97) 0%, rgba(248, 235, 242, 0.9) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.app-shell.theme-rose-quartz .settings-panel-intro {
+  color: #86536c;
+}
+
+.app-shell.theme-rose-quartz .settings-panel-chip {
+  border-color: #d2a3b9;
+  background: #f4dfea;
+  color: #6c2f4b;
+}
+
+.app-shell.theme-rose-quartz .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-rose-quartz .settings-panel .settings-checkbox {
+  color: #5a2540;
+}
+
+.app-shell.theme-rose-quartz .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-rose-quartz .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #fffafc;
+  border-color: #d6b2c2;
+  color: #4f2137;
+}
+
+.app-shell.theme-rose-quartz .settings-panel .settings-checkbox:hover {
+  background: rgba(222, 171, 196, 0.24);
+}
+
+.app-shell.theme-rose-quartz .settings-actions {
+  border-top-color: rgba(210, 163, 185, 0.5);
+}
+
+.app-shell.theme-rose-quartz .settings-shortcut-list li {
+  color: #66354d;
+  border-color: #dec0cf;
+  background: rgba(255, 249, 252, 0.9);
+}
+
+.app-shell.theme-rose-quartz .settings-shortcut-key {
+  border-color: #d6b2c2;
+  background: #f7e7ef;
+  color: #64314a;
+}
+
+.app-shell.theme-rose-quartz .settings-state-chip {
+  border-color: #d4a9bd;
+  background: #f6e4ed;
+  color: #66354d;
+}
+
