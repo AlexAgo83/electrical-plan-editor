@@ -1,7 +1,7 @@
 ## req_031_network_summary_2d_connector_and_splice_cable_info_frames_with_draggable_callouts - Network Summary 2D Connector/Splice Cable Info Frames with Draggable Callouts
 > From version: 0.6.4
-> Understanding: 97%
-> Confidence: 96%
+> Understanding: 99%
+> Confidence: 98%
 > Complexity: High
 > Theme: 2D Visualization Enrichment with Draggable Callout Frames for Connector/Splice Cable Lists
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -181,9 +181,18 @@ This enables faster topology inspection while preserving the current interaction
 - Dedicated resize handles or manual width management for callouts in V1 (auto-wrap/auto-size only).
 
 # Backlog
-- To be created
+- `logics/backlog/item_178_network_summary_callout_visibility_toggle_and_settings_default_preference_for_connector_splice_cable_frames.md`
+- `logics/backlog/item_179_connector_splice_callout_position_persistence_in_network_model_and_schema_normalization.md`
+- `logics/backlog/item_180_connector_splice_callout_frame_rendering_dashed_leader_lines_and_theme_deemphasis_compatibility.md`
+- `logics/backlog/item_181_connector_splice_callout_default_outward_placement_heuristic_based_on_connected_segments.md`
+- `logics/backlog/item_182_connector_splice_callout_grouped_cable_lists_lengths_sorting_and_compact_typography.md`
+- `logics/backlog/item_183_connector_splice_callout_drag_interactions_selection_sync_lock_snap_and_auto_stacking_priority.md`
+- `logics/backlog/item_184_callout_visibility_png_export_and_canvas_default_apply_interoperability.md`
+- `logics/backlog/item_185_connector_splice_callout_theme_readability_and_navigation_canvas_regression_coverage.md`
+- `logics/backlog/item_186_req_031_connector_splice_callout_frames_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # References
+- `logics/tasks/task_030_network_summary_2d_connector_and_splice_cable_info_frames_with_draggable_callouts_orchestration_and_delivery_control.md`
 - `src/app/components/NetworkSummaryPanel.tsx`
 - `src/app/hooks/useCanvasInteractionHandlers.ts`
 - `src/app/hooks/useWorkspaceHandlers.ts`

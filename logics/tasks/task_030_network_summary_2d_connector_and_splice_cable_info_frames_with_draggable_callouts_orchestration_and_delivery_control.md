@@ -2,7 +2,7 @@
 > From version: 0.6.4
 > Understanding: 98%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Delivery Orchestration for Interactive 2D Connector/Splice Cable Callout Frames, Persistence, and Canvas Workflow Integration
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -22,16 +22,16 @@ Backlog scope covered:
 - `item_186_req_031_connector_splice_callout_frames_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 callout visibility toggle in `Network summary` + `Settings` default preference wiring and runtime default-apply semantics (`item_178`)
-- [ ] 2. Deliver Wave 1 network-model persistence for connector/splice callout positions with normalization/import-export compatibility (`item_179`)
-- [ ] 3. Deliver Wave 2 SVG callout frame rendering + dashed leader lines + theme/deemphasis styling compatibility (`item_180`)
-- [ ] 4. Deliver Wave 3 default outward placement heuristic based on connected segment geometry (deterministic fallback behavior) (`item_181`)
-- [ ] 5. Deliver Wave 4 grouped cable-list content (+ lengths, ordering, empty-state, compact typography) for connector/splice callouts (`item_182`)
-- [ ] 6. Deliver Wave 5 callout drag interactions with lock/snap, selection sync, and auto stacking priority (`item_183`)
-- [ ] 7. Deliver Wave 6 interoperability with PNG export visibility and `Apply canvas defaults now` flow (`item_184`)
-- [ ] 8. Deliver Wave 7 theme/readability verification + regression coverage for navigation-canvas and related workflows (`item_185`)
-- [ ] 9. Deliver Wave 8 closure: CI/E2E/build/PWA pass and `req_031` AC traceability (`item_186`)
-- [ ] FINAL: Update related Logics docs (request/task/backlog statuses + delivery summary)
+- [x] 1. Deliver Wave 0 callout visibility toggle in `Network summary` + `Settings` default preference wiring and runtime default-apply semantics (`item_178`)
+- [x] 2. Deliver Wave 1 network-model persistence for connector/splice callout positions with normalization/import-export compatibility (`item_179`)
+- [x] 3. Deliver Wave 2 SVG callout frame rendering + dashed leader lines + theme/deemphasis styling compatibility (`item_180`)
+- [x] 4. Deliver Wave 3 default outward placement heuristic based on connected segment geometry (deterministic fallback behavior) (`item_181`)
+- [x] 5. Deliver Wave 4 grouped cable-list content (+ lengths, ordering, empty-state, compact typography) for connector/splice callouts (`item_182`)
+- [x] 6. Deliver Wave 5 callout drag interactions with lock/snap, selection sync, and auto stacking priority (`item_183`)
+- [x] 7. Deliver Wave 6 interoperability with PNG export visibility and `Apply canvas defaults now` flow (`item_184`)
+- [x] 8. Deliver Wave 7 theme/readability verification + regression coverage for navigation-canvas and related workflows (`item_185`)
+- [x] 9. Deliver Wave 8 closure: CI/E2E/build/PWA pass and `req_031` AC traceability (`item_186`)
+- [x] FINAL: Update related Logics docs (request/task/backlog statuses + delivery summary)
 
 # Validation
 - Documentation / Logics:
@@ -56,17 +56,17 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 pending: callout visibility toolbar toggle + `Settings` default preference + runtime apply-default semantics.
-  - Wave 1 pending: connector/splice model persistence fields for callout positions + normalization/import-export compatibility.
-  - Wave 2 pending: callout frame and dashed leader line SVG rendering + theme/deemphasis visual compatibility.
-  - Wave 3 pending: connected-segment-based outward placement heuristic with deterministic fallback.
-  - Wave 4 pending: grouped callout content (`cavity/port` preferred, fallback unified list), lengths, ordering, compact typography, and empty-state handling.
-  - Wave 5 pending: drag interactions (whole frame), lock/snap support, selection synchronization, and auto stacking priority.
-  - Wave 6 pending: PNG export visibility interoperability + `Apply canvas defaults now` integration.
-  - Wave 7 pending: regression tests and theme readability verification.
-  - Wave 8 pending: closure validation suite and AC traceability.
+  - Wave 0 completed: `Callouts` toolbar toggle added after `Length`; `Settings` default visibility preference added (default disabled) with UI preference persistence and `Apply canvas defaults now` runtime application.
+  - Wave 1 completed: `connector/splice` entities now support persisted `cableCalloutPosition`; edit handlers preserve optional fields; persistence/import-export normalization path remains compatible.
+  - Wave 2 completed: SVG callout frames render for connectors/splices with thin square-corner frames, dashed leader lines, connector-like palette styling, and theme/deemphasis compatibility.
+  - Wave 3 completed: deterministic outward default placement heuristic implemented using connected segment directions with graph-center fallback.
+  - Wave 4 completed: grouped cable lists rendered by cavity/port with stable ordering (`name`, then `technicalId`), lengths (`mm`), explicit empty-state, and compact typography.
+  - Wave 5 completed: whole-frame dragging implemented with lock/snap rules, linked connector/splice selection sync, persisted position updates, and auto stacking priority for selected/hovered/dragged callouts.
+  - Wave 6 completed: callout visibility integrates with PNG export rendering (visible -> exported, hidden -> omitted) and canvas default application flows.
+  - Wave 7 completed: regression coverage added for callout toggle/render/selection/drag persistence and settings default visibility preference.
+  - Wave 8 completed: closure validation suite passed and AC traceability documented.
 - Current blockers:
-  - None at kickoff.
+  - None.
 - Main risks to track:
   - Model persistence field addition for callout positions complicates import/export compatibility or stale-schema handling.
   - Callout drag interactions conflict with existing node dragging/selection semantics.
@@ -83,18 +83,35 @@ Backlog scope covered:
 - Validation snapshot (kickoff):
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK (`req_031` + backlog planning artifacts)
 - Delivery snapshot:
-  - Not started.
+  - Code:
+    - `src/app/components/NetworkSummaryPanel.tsx` (callout toggle, callout rendering/content, default placement heuristic, drag/selection/stacking, deemphasis + PNG visibility behavior)
+    - `src/app/components/workspace/SettingsWorkspaceContent.tsx` (default callout visibility preference)
+    - `src/app/hooks/useUiPreferences.ts`, `src/app/hooks/useWorkspaceHandlers.ts`, `src/app/hooks/useAppControllerPreferencesState.ts`, `src/app/hooks/useAppControllerCanvasDisplayState.ts` (preference persistence/default apply/runtime wiring)
+    - `src/app/AppController.tsx` and controller slice builders (propagation + model persistence callbacks)
+    - `src/app/hooks/useConnectorHandlers.ts`, `src/app/hooks/useSpliceHandlers.ts`, `src/core/entities.ts` (connector/splice callout position persistence compatibility)
+    - `src/app/styles/canvas/canvas-diagram-and-overlays.css` + `src/app/styles/canvas/canvas-diagram-and-overlays/network-callouts.css` (callout styles)
+    - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`, `src/tests/app.ui.settings.spec.tsx` (regression coverage)
+  - Validation results:
+    - `npm run lint` OK
+    - `npm run typecheck` OK
+    - `npm run quality:ui-modularization` OK
+    - `npm run quality:store-modularization` OK
+    - `npm run test:ci` OK (`29` files / `165` tests)
+    - `npm run test:e2e` OK (`2/2`)
+    - `npm run build` OK
+    - `npm run quality:pwa` OK
+    - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` OK
 - AC traceability (`req_031`) target mapping:
-  - AC1 targeted by Waves 0, 6, 8 (`item_178`, `item_184`, `item_186`)
-  - AC2 targeted by Waves 2, 8 (`item_180`, `item_186`)
-  - AC3 targeted by Waves 2, 8 (`item_180`, `item_186`)
-  - AC4 targeted by Waves 3, 8 (`item_181`, `item_186`)
-  - AC5 targeted by Waves 4, 8 (`item_182`, `item_186`)
-  - AC6 targeted by Waves 1, 5, 8 (`item_179`, `item_183`, `item_186`)
-  - AC7 targeted by Waves 2, 7, 8 (`item_180`, `item_185`, `item_186`)
-  - AC8 targeted by Waves 5, 7, 8 (`item_183`, `item_185`, `item_186`)
-  - AC9 targeted by Waves 0, 6, 8 (`item_178`, `item_184`, `item_186`)
-  - AC10 targeted by Waves 7, 8 + FINAL docs update (`item_185`, `item_186`)
+  - AC1 satisfied by Waves 0, 6, 8 (`item_178`, `item_184`, `item_186`)
+  - AC2 satisfied by Waves 2, 8 (`item_180`, `item_186`)
+  - AC3 satisfied by Waves 2, 8 (`item_180`, `item_186`)
+  - AC4 satisfied by Waves 3, 8 (`item_181`, `item_186`)
+  - AC5 satisfied by Waves 4, 8 (`item_182`, `item_186`)
+  - AC6 satisfied by Waves 1, 5, 8 (`item_179`, `item_183`, `item_186`)
+  - AC7 satisfied by Waves 2, 7, 8 (`item_180`, `item_185`, `item_186`)
+  - AC8 satisfied by Waves 5, 7, 8 (`item_183`, `item_185`, `item_186`)
+  - AC9 satisfied by Waves 0, 6, 8 (`item_178`, `item_184`, `item_186`)
+  - AC10 satisfied by Waves 7, 8 + FINAL docs update (`item_185`, `item_186`)
 
 # References
 - `logics/request/req_031_network_summary_2d_connector_and_splice_cable_info_frames_with_draggable_callouts.md`
