@@ -290,17 +290,17 @@ button {
 
   .workspace-column-left {
     grid-column: 1;
-    grid-row: 1;
+    grid-row: 2;
   }
 
   .workspace-column-center {
     grid-column: 1 / -1;
-    grid-row: 2;
+    grid-row: 1;
   }
 
   .workspace-column-right {
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 2;
   }
 }
 

@@ -11,10 +11,10 @@ export function AnalysisWorkspaceContent(props: AnalysisWorkspaceContentProps): 
 
   return (
     <section className="panel-grid analysis-panel-grid">
+      <section className="analysis-network-summary-row">{networkSummaryPanel}</section>
       <AnalysisConnectorWorkspacePanels {...props} />
       <AnalysisSpliceWorkspacePanels {...props} />
       <AnalysisWireWorkspacePanels {...props} />
-      <section className="analysis-network-summary-row">{networkSummaryPanel}</section>
     </section>
   );
 }

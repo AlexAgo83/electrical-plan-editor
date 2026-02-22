@@ -19,11 +19,10 @@ export function ModelingWorkspaceContainer({
   return (
     <ScreenComponent isActive={isActive}>
       <section className="workspace-stage">
+        <section className="panel-grid workspace-column workspace-column-center">{networkSummaryPanel}</section>
         <section className="panel-grid workspace-column workspace-column-left">{leftColumnContent}</section>
         {formsColumnContent}
-        <section className="panel-grid workspace-column workspace-column-center">{networkSummaryPanel}</section>
       </section>
     </ScreenComponent>
   );
 }
-
