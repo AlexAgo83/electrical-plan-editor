@@ -1,7 +1,7 @@
 ## req_017_app_controller_decomposition_wave_4_screen_containers_and_controller_slices - AppController Decomposition Wave 4 (Screen Containers and Controller Slices)
 > From version: 0.5.2
-> Understanding: 99%
-> Confidence: 97%
+> Understanding: 100%
+> Confidence: 98%
 > Complexity: High
 > Theme: Composition Root Reduction and Screen-Oriented Controller Decomposition
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -136,7 +136,7 @@ Related delivered baseline to preserve:
 - Context proliferation solely to avoid prop passing where explicit contracts are clearer.
 
 # Backlog
-- To create from this request:
+- Created and delivered from this request:
   - `item_100_app_controller_modeling_screen_container_and_prop_wiring_extraction.md`
   - `item_101_app_controller_analysis_validation_settings_networkscope_screen_containers_extraction.md`
   - `item_102_app_controller_screen_domain_controller_slices_extraction.md`
@@ -145,8 +145,54 @@ Related delivered baseline to preserve:
   - `item_105_app_controller_hook_dependency_config_builder_simplification.md`
   - `item_106_app_controller_wave_4_closure_regression_and_ac_traceability.md`
 
+# Delivery summary
+- Screen container extraction delivered:
+  - `src/app/components/containers/ModelingWorkspaceContainer.tsx`
+  - `src/app/components/containers/AnalysisWorkspaceContainer.tsx`
+  - `src/app/components/containers/ValidationWorkspaceContainer.tsx`
+  - `src/app/components/containers/SettingsWorkspaceContainer.tsx`
+  - `src/app/components/containers/NetworkScopeWorkspaceContainer.tsx`
+- Screen/domain controller slice extraction delivered:
+  - `src/app/hooks/controller/useAppControllerScreenContentSlices.tsx` (inspector, network summary, network scope, modeling, analysis, validation, settings composition slices)
+- State packs / derived-state extraction delivered:
+  - `src/app/hooks/useAppControllerPreferencesState.ts`
+  - `src/app/hooks/useAppControllerCanvasDisplayState.ts`
+  - `src/app/hooks/useAppControllerSelectionEntities.ts`
+  - `src/app/hooks/useAppControllerLayoutDerivedState.ts`
+  - `src/app/hooks/useAppControllerShellDerivedState.ts`
+- Hook dependency config simplification delivered:
+  - `src/app/hooks/controller/useAppControllerHeavyHookAssemblers.ts` wraps explicit dependency assembly for `useWorkspaceHandlers`, `useSelectionHandlers`, and `useCanvasInteractionHandlers`
+- `AppController` outcome:
+  - `src/app/AppController.tsx` remains large but is further decomposed around screen containers, controller slices, state packs, derived models, and heavy-hook assembly helpers (`~1840` -> `1818` lines).
+  - Wave-4 reduction target guidance (`~1200` / `~850-1000`) was not fully achieved; this request still materially improves responsibility boundaries and reviewability.
+- Validation closure delivered:
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm run quality:ui-modularization`
+  - `npm run quality:store-modularization`
+  - `npm run test:ci`
+  - `npm run test:e2e`
+  - `npm run build`
+  - `npm run quality:pwa`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+
+# AC traceability
+- AC1: Satisfied in composition-root direction by extracting screen containers, controller slices, state packs, derived hooks, and heavy-hook assembly wrappers from `AppController`; quantitative reduction is modest but responsibility concentration is reduced.
+- AC2: Satisfied by dedicated screen container modules for all target screens with preserved render order and conditional gating semantics.
+- AC3: Satisfied by explicit controller slice modules and assembly wrappers; no mega `useAppControllerLogic()` anti-pattern introduced.
+- AC4: Satisfied by local UI state-pack hooks and derived-state hooks that remove cohesive clusters of local state/selector computation from `AppController`.
+- AC5: Satisfied by successful production build with preserved lazy chunks and passing PWA artifact quality gate.
+- AC6: Satisfied by targeted navigation/canvas/workspace-shell/inspector integration tests plus full `test:ci` and `test:e2e` smoke coverage.
+- AC7: Satisfied by explicit dependency flow and green lint/typecheck/quality gates with no circular-import or hidden-coupling regressions observed.
+- AC8: Satisfied by full closure pipeline passing and documented in task/backlog closure.
+
 # References
 - `src/app/AppController.tsx`
+- `src/app/components/containers/ModelingWorkspaceContainer.tsx`
+- `src/app/components/containers/AnalysisWorkspaceContainer.tsx`
+- `src/app/components/containers/ValidationWorkspaceContainer.tsx`
+- `src/app/components/containers/SettingsWorkspaceContainer.tsx`
+- `src/app/components/containers/NetworkScopeWorkspaceContainer.tsx`
 - `src/app/components/screens/ModelingScreen.tsx`
 - `src/app/components/screens/AnalysisScreen.tsx`
 - `src/app/components/screens/ValidationScreen.tsx`
@@ -169,6 +215,13 @@ Related delivered baseline to preserve:
 - `src/app/hooks/useWireEndpointDescriptions.ts`
 - `src/app/hooks/useIssueNavigatorModel.ts`
 - `src/app/hooks/useInspectorPanelVisibility.ts`
+- `src/app/hooks/controller/useAppControllerScreenContentSlices.tsx`
+- `src/app/hooks/controller/useAppControllerHeavyHookAssemblers.ts`
+- `src/app/hooks/useAppControllerPreferencesState.ts`
+- `src/app/hooks/useAppControllerCanvasDisplayState.ts`
+- `src/app/hooks/useAppControllerSelectionEntities.ts`
+- `src/app/hooks/useAppControllerLayoutDerivedState.ts`
+- `src/app/hooks/useAppControllerShellDerivedState.ts`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
 - `src/tests/app.ui.inspector-shell.spec.tsx`
