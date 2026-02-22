@@ -167,19 +167,19 @@
 }
 
 .network-grid line {
-  stroke: #d5e1eb;
+  stroke: var(--network-grid-line-color, #d5e1eb);
   stroke-width: 0.8;
   pointer-events: none;
 }
 
 .network-segment {
-  stroke: #7f99af;
+  stroke: var(--network-segment-color, #7f99af);
   stroke-width: 3;
   stroke-linecap: round;
 }
 
 .network-segment.is-wire-highlighted {
-  stroke: #4f8d2d;
+  stroke: var(--network-wire-highlight-color, #4f8d2d);
   stroke-width: 5;
 }
 
@@ -197,9 +197,9 @@
 
 .network-segment-label {
   font-size: 10px;
-  fill: #38566a;
+  fill: var(--network-segment-label-color, #38566a);
   paint-order: stroke fill;
-  stroke: rgba(246, 251, 255, 0.96);
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
   stroke-width: 1.8px;
   stroke-linejoin: round;
   stroke-linecap: round;
@@ -208,9 +208,9 @@
 
 .network-segment-length-label {
   font-size: 8px;
-  fill: #547086;
+  fill: var(--network-segment-length-label-color, #547086);
   paint-order: stroke fill;
-  stroke: rgba(246, 251, 255, 0.96);
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
   stroke-width: 1.6px;
   stroke-linejoin: round;
   stroke-linecap: round;
@@ -226,20 +226,20 @@
 }
 
 .network-node .network-node-shape {
-  stroke: #55748d;
+  stroke: var(--network-node-stroke-color, #55748d);
   stroke-width: 2;
 }
 
 .network-node.connector .network-node-shape {
-  fill: #dff0ff;
+  fill: var(--network-node-connector-fill, #dff0ff);
 }
 
 .network-node.splice .network-node-shape {
-  fill: #fdeecf;
+  fill: var(--network-node-splice-fill, #fdeecf);
 }
 
 .network-node.intermediate .network-node-shape {
-  fill: #ecf2f7;
+  fill: var(--network-node-intermediate-fill, #ecf2f7);
 }
 
 .network-node.is-selected .network-node-shape {
@@ -259,9 +259,9 @@
 
 .network-node-label {
   font-size: 9px;
-  fill: #183549;
+  fill: var(--network-node-label-color, #183549);
   paint-order: stroke fill;
-  stroke: rgba(246, 251, 255, 0.96);
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
   stroke-width: 1.9px;
   stroke-linejoin: round;
   stroke-linecap: round;

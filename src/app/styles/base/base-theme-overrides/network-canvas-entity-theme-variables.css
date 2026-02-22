@@ -1,0 +1,326 @@
+.app-shell {
+  --network-grid-line-color: #d5e1eb;
+  --network-segment-color: #7f99af;
+  --network-wire-highlight-color: #4f8d2d;
+  --network-node-stroke-color: #55748d;
+  --network-node-connector-fill: #dff0ff;
+  --network-node-splice-fill: #fdeecf;
+  --network-node-intermediate-fill: #ecf2f7;
+  --network-node-label-color: #183549;
+  --network-segment-label-color: #38566a;
+  --network-segment-length-label-color: #547086;
+  --network-label-stroke-color: rgba(246, 251, 255, 0.96);
+}
+
+.app-shell.theme-normal {
+  --network-grid-line-color: #d5e1eb;
+  --network-segment-color: #7f99af;
+  --network-wire-highlight-color: #4f8d2d;
+  --network-node-stroke-color: #55748d;
+  --network-node-connector-fill: #dff0ff;
+  --network-node-splice-fill: #fdeecf;
+  --network-node-intermediate-fill: #ecf2f7;
+  --network-node-label-color: #183549;
+  --network-segment-label-color: #38566a;
+  --network-segment-length-label-color: #547086;
+  --network-label-stroke-color: rgba(246, 251, 255, 0.96);
+}
+
+.app-shell.theme-dark {
+  --network-selection-color: #7fc5ff;
+  --network-selection-focus-color: #7fc5ff;
+  --network-selection-glow: rgba(127, 197, 255, 0.45);
+  --network-grid-line-color: #49647a;
+  --network-segment-color: #8ea8bd;
+  --network-wire-highlight-color: #6ecb8b;
+  --network-node-stroke-color: #6f8ba2;
+  --network-node-connector-fill: #2b4e70;
+  --network-node-splice-fill: #6c5332;
+  --network-node-intermediate-fill: #31485e;
+  --network-node-label-color: #eef6ff;
+  --network-segment-label-color: #d4e5f4;
+  --network-segment-length-label-color: #b8ccde;
+  --network-label-stroke-color: rgba(13, 22, 32, 0.85);
+}
+
+.app-shell.theme-slate-neon {
+  --network-grid-line-color: #5a8f9d;
+  --network-segment-color: #8bc1cc;
+  --network-wire-highlight-color: #79e0b4;
+  --network-node-stroke-color: #6ba4b0;
+  --network-node-connector-fill: #1d5160;
+  --network-node-splice-fill: #5f4e2a;
+  --network-node-intermediate-fill: #234856;
+  --network-node-label-color: #f0fcff;
+  --network-segment-label-color: #daf7fb;
+  --network-segment-length-label-color: #b8e2ea;
+  --network-label-stroke-color: rgba(8, 25, 30, 0.84);
+}
+
+.app-shell.theme-paper-blueprint {
+  --network-grid-line-color: #ccdae6;
+  --network-segment-color: #6e8eaa;
+  --network-wire-highlight-color: #4d8f63;
+  --network-node-stroke-color: #6b89a1;
+  --network-node-connector-fill: #e7f2ff;
+  --network-node-splice-fill: #fff1d8;
+  --network-node-intermediate-fill: #eef4f9;
+  --network-node-label-color: #1e425d;
+  --network-segment-label-color: #476780;
+  --network-segment-length-label-color: #64809a;
+  --network-label-stroke-color: rgba(255, 255, 255, 0.95);
+}
+
+.app-shell.theme-warm-brown {
+  --network-grid-line-color: #e1ccb7;
+  --network-segment-color: #9a7b61;
+  --network-wire-highlight-color: #6a8f42;
+  --network-node-stroke-color: #9a7a62;
+  --network-node-connector-fill: #fff1e1;
+  --network-node-splice-fill: #f4e1bf;
+  --network-node-intermediate-fill: #f4ece4;
+  --network-node-label-color: #553a2a;
+  --network-segment-label-color: #735744;
+  --network-segment-length-label-color: #8d705b;
+  --network-label-stroke-color: rgba(255, 249, 243, 0.94);
+}
+
+.app-shell.theme-deep-green {
+  --network-grid-line-color: #41695a;
+  --network-segment-color: #93bea6;
+  --network-wire-highlight-color: #8be0a6;
+  --network-node-stroke-color: #5b8e78;
+  --network-node-connector-fill: #1d4c40;
+  --network-node-splice-fill: #6c5934;
+  --network-node-intermediate-fill: #244b3d;
+  --network-node-label-color: #edf9f1;
+  --network-segment-label-color: #d2eadb;
+  --network-segment-length-label-color: #b4d6c0;
+  --network-label-stroke-color: rgba(10, 22, 17, 0.86);
+}
+
+.app-shell.theme-rose-quartz {
+  --network-grid-line-color: #e7c7d6;
+  --network-segment-color: #bb7c98;
+  --network-wire-highlight-color: #d0819f;
+  --network-node-stroke-color: #be7f9b;
+  --network-node-connector-fill: #fff0f7;
+  --network-node-splice-fill: #ffe6ef;
+  --network-node-intermediate-fill: #f8eaf0;
+  --network-node-label-color: #5a2840;
+  --network-segment-label-color: #7a4660;
+  --network-segment-length-label-color: #95607a;
+  --network-label-stroke-color: rgba(255, 247, 251, 0.96);
+}
+
+.app-shell.theme-lavender-haze {
+  --network-grid-line-color: #d7d1ef;
+  --network-segment-color: #8d84cb;
+  --network-wire-highlight-color: #8c76d8;
+  --network-node-stroke-color: #8e87cd;
+  --network-node-connector-fill: #f1eeff;
+  --network-node-splice-fill: #eee7ff;
+  --network-node-intermediate-fill: #f6f4ff;
+  --network-node-label-color: #352f6f;
+  --network-segment-label-color: #5f5896;
+  --network-segment-length-label-color: #7972ae;
+  --network-label-stroke-color: rgba(255, 255, 255, 0.95);
+}
+
+.app-shell.theme-burgundy-noir {
+  --network-grid-line-color: #5f3748;
+  --network-segment-color: #d4a5b7;
+  --network-wire-highlight-color: #ea8fb1;
+  --network-node-stroke-color: #9a6277;
+  --network-node-connector-fill: #4c2132;
+  --network-node-splice-fill: #6b3a46;
+  --network-node-intermediate-fill: #3d1b28;
+  --network-node-label-color: #fff1f6;
+  --network-segment-label-color: #f0d4de;
+  --network-segment-length-label-color: #ddb9c8;
+  --network-label-stroke-color: rgba(25, 8, 14, 0.88);
+}
+
+.app-shell.theme-amber-night {
+  --network-grid-line-color: #6b5532;
+  --network-segment-color: #d7b57d;
+  --network-wire-highlight-color: #f0c15a;
+  --network-node-stroke-color: #a9864b;
+  --network-node-connector-fill: #4d3a17;
+  --network-node-splice-fill: #6a4714;
+  --network-node-intermediate-fill: #3a2c12;
+  --network-node-label-color: #fff3d3;
+  --network-segment-label-color: #efd8ab;
+  --network-segment-length-label-color: #dabb82;
+  --network-label-stroke-color: rgba(22, 16, 6, 0.88);
+}
+
+/* Enforce theme palette application on 2D network entities for all themes,
+   including composed themes that also carry legacy base classes (e.g. theme-dark/theme-deep-green). */
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-grid line {
+  stroke: var(--network-grid-line-color, #d5e1eb);
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-segment {
+  stroke: var(--network-segment-color, #7f99af);
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-segment.is-wire-highlighted {
+  stroke: var(--network-wire-highlight-color, #4f8d2d);
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-segment.is-selected {
+  stroke: var(--network-selection-color, #0f6cb8);
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-segment-label {
+  fill: var(--network-segment-label-color, #38566a);
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-segment-length-label {
+  fill: var(--network-segment-length-label-color, #547086);
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-node .network-node-shape {
+  stroke: var(--network-node-stroke-color, #55748d);
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-node.connector .network-node-shape {
+  fill: var(--network-node-connector-fill, #dff0ff);
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-node.splice .network-node-shape {
+  fill: var(--network-node-splice-fill, #fdeecf);
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-node.intermediate .network-node-shape {
+  fill: var(--network-node-intermediate-fill, #ecf2f7);
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-node-label {
+  fill: var(--network-node-label-color, #183549);
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+}
