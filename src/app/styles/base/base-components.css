@@ -375,6 +375,28 @@
   border-top-color: #4f8d2d;
 }
 
+.app-shell.theme-dark .network-legend {
+  color: #b7c9dc;
+}
+
+.app-shell.theme-dark .validation-group h3 {
+  color: #d2e2f0;
+}
+
+.app-shell.theme-dark .cavity h3 {
+  color: #d9e8f5;
+}
+
+.app-shell.theme-dark .cavity p {
+  color: #c7d9e9;
+}
+
+.app-shell.theme-dark .cavity button {
+  border-color: #5a7791;
+  background: #244057;
+  color: #e3edf6;
+}
+
 .app-shell.theme-dark .save-status.is-saved {
   color: #88d9af;
 }

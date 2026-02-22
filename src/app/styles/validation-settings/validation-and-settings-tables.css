@@ -54,6 +54,15 @@
   background: rgba(24, 41, 58, 0.72);
 }
 
+.app-shell.theme-dark .settings-export-fieldset legend {
+  color: #c8d9ea;
+}
+
+.app-shell.theme-dark .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-dark .settings-export-fieldset .technical-id {
+  color: #d7e6f4;
+}
+
 .app-shell.theme-dark .settings-import-summary .meta-line {
   border-color: #4c6881;
   background: rgba(23, 39, 55, 0.72);
@@ -135,6 +144,15 @@
   color: #cfe8eb !important;
 }
 
+.app-shell.theme-slate-neon .settings-export-fieldset legend {
+  color: #d5f3f8;
+}
+
+.app-shell.theme-slate-neon .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-slate-neon .settings-export-fieldset .technical-id {
+  color: #d8f6fb;
+}
+
 .app-shell.theme-paper-blueprint .settings-panel {
   border-color: #b2c7d9;
   background: linear-gradient(168deg, rgba(251, 254, 255, 0.97) 0%, rgba(237, 247, 255, 0.88) 100%);
@@ -181,6 +199,15 @@
   border-color: #b2c7d8 !important;
   background: #dbe8f2 !important;
   color: #6a889f !important;
+}
+
+.app-shell.theme-paper-blueprint .settings-export-fieldset legend {
+  color: #4c6a82;
+}
+
+.app-shell.theme-paper-blueprint .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-paper-blueprint .settings-export-fieldset .technical-id {
+  color: #254b66;
 }
 
 .app-shell.theme-warm-brown .settings-panel {
@@ -253,6 +280,15 @@
   background: rgba(255, 249, 242, 0.82);
 }
 
+.app-shell.theme-warm-brown .settings-export-fieldset legend {
+  color: #6a4a35;
+}
+
+.app-shell.theme-warm-brown .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-warm-brown .settings-export-fieldset .technical-id {
+  color: #5f412d;
+}
+
 .app-shell.theme-warm-brown .settings-import-summary .meta-line {
   border-color: #d2b79e;
   background: rgba(255, 248, 240, 0.8);
@@ -320,6 +356,15 @@
 
 .app-shell.theme-deep-green .settings-actions {
   border-top-color: rgba(92, 140, 117, 0.5);
+}
+
+.app-shell.theme-deep-green .settings-export-fieldset legend {
+  color: #cde7d6;
+}
+
+.app-shell.theme-deep-green .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-deep-green .settings-export-fieldset .technical-id {
+  color: #d8efdf;
 }
 
 .app-shell.theme-deep-green .settings-primary-action {
