@@ -447,6 +447,30 @@
   mask: url("/icons/ico_active.svg") center / contain no-repeat;
 }
 
+.action-button-icon.is-undo {
+  -webkit-mask: url("/icons/ico_undo.svg") center / contain no-repeat;
+  mask: url("/icons/ico_undo.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-redo {
+  -webkit-mask: url("/icons/ico_redo.svg") center / contain no-repeat;
+  mask: url("/icons/ico_redo.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-prevnext {
+  -webkit-mask: url("/icons/ico_prevnext.svg") center / contain no-repeat;
+  mask: url("/icons/ico_prevnext.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-open {
+  -webkit-mask: url("/icons/ico_open.svg") center / contain no-repeat;
+  mask: url("/icons/ico_open.svg") center / contain no-repeat;
+}
+
+.action-button-icon.is-flip-x {
+  transform: scaleX(-1);
+}
+
 .action-button-icon.is-duplicate {
   -webkit-mask: url("/icons/ico_duplicate.svg") center / contain no-repeat;
   mask: url("/icons/ico_duplicate.svg") center / contain no-repeat;

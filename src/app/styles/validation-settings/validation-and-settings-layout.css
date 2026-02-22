@@ -94,6 +94,13 @@
   line-height: 1.1;
 }
 
+.validation-row-go-to-button.button-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
 .validation-row-go-to-button:hover:not(:disabled) {
   filter: brightness(0.98);
 }

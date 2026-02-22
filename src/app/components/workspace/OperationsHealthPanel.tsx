@@ -40,10 +40,12 @@ export function OperationsHealthPanel({
     <section className="workspace-ops-content panel">
       <h2>Operations and health</h2>
       <div className="row-actions compact">
-        <button type="button" onClick={handleUndo} disabled={!isUndoAvailable}>
+        <button type="button" className="button-with-icon" onClick={handleUndo} disabled={!isUndoAvailable}>
+          <span className="action-button-icon is-undo" aria-hidden="true" />
           Undo
         </button>
-        <button type="button" onClick={handleRedo} disabled={!isRedoAvailable}>
+        <button type="button" className="button-with-icon" onClick={handleRedo} disabled={!isRedoAvailable}>
+          <span className="action-button-icon is-redo" aria-hidden="true" />
           Redo
         </button>
       </div>
@@ -74,14 +76,27 @@ export function OperationsHealthPanel({
           </p>
         ) : null}
         <div className="row-actions compact workspace-health-actions">
-          <button type="button" onClick={() => handleOpenValidationScreen("all")}>
-            Open
-          </button>
-          <button type="button" onClick={() => moveValidationIssueCursor(-1)} disabled={orderedValidationIssues.length === 0}>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => moveValidationIssueCursor(-1)}
+            disabled={orderedValidationIssues.length === 0}
+          >
+            <span className="action-button-icon is-prevnext" aria-hidden="true" />
             Previous
           </button>
-          <button type="button" onClick={() => moveValidationIssueCursor(1)} disabled={orderedValidationIssues.length === 0}>
+          <button type="button" className="button-with-icon" onClick={() => handleOpenValidationScreen("all")}>
+            <span className="action-button-icon is-open" aria-hidden="true" />
+            Open
+          </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => moveValidationIssueCursor(1)}
+            disabled={orderedValidationIssues.length === 0}
+          >
             Next
+            <span className="action-button-icon is-prevnext is-flip-x" aria-hidden="true" />
           </button>
         </div>
       </section>

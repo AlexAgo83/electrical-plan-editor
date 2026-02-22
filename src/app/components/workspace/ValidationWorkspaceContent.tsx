@@ -186,9 +186,10 @@ export function ValidationWorkspaceContent({
                         <td className="validation-actions-cell">
                           <button
                             type="button"
-                            className="validation-row-go-to-button"
+                            className="validation-row-go-to-button button-with-icon"
                             onClick={() => handleValidationIssueRowGoTo(issue)}
                           >
+                            <span className="action-button-icon is-open" aria-hidden="true" />
                             Go to
                           </button>
                         </td>
