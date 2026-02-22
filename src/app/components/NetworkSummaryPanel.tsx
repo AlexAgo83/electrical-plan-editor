@@ -1,6 +1,9 @@
 import {
   useCallback,
+  useEffect,
+  useMemo,
   useRef,
+  useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactElement,
@@ -177,6 +180,8 @@ export function NetworkSummaryPanel({
   onRegenerateLayout
 }: NetworkSummaryPanelProps): ReactElement {
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
+  const subNetworkFilterInitializedRef = useRef(false);
+  const [activeSubNetworkTags, setActiveSubNetworkTags] = useState<Set<string>>(new Set());
   const graphStats = [
     { label: "Graph nodes", value: routingGraphNodeCount },
     { label: "Graph segments", value: routingGraphSegmentCount },
@@ -195,6 +200,82 @@ export function NetworkSummaryPanel({
   const horizontalGridLineCount = Math.max(0, Math.ceil((gridEndY - gridStartY) / networkGridStep) + 1);
   const gridXPositions = Array.from({ length: verticalGridLineCount }, (_, index) => gridStartX + index * networkGridStep);
   const gridYPositions = Array.from({ length: horizontalGridLineCount }, (_, index) => gridStartY + index * networkGridStep);
+  const allSubNetworkTags = useMemo(
+    () => subNetworkSummaries.map((summary) => summary.tag),
+    [subNetworkSummaries]
+  );
+
+  useEffect(() => {
+    if (allSubNetworkTags.length === 0) {
+      subNetworkFilterInitializedRef.current = false;
+      setActiveSubNetworkTags((current) => (current.size === 0 ? current : new Set()));
+      return;
+    }
+
+    setActiveSubNetworkTags((current) => {
+      const next = new Set<string>();
+      const isUninitialized = !subNetworkFilterInitializedRef.current;
+      for (const tag of allSubNetworkTags) {
+        if (isUninitialized || current.has(tag)) {
+          next.add(tag);
+        }
+      }
+      if (isUninitialized) {
+        subNetworkFilterInitializedRef.current = true;
+      }
+      const hasSameSize = next.size === current.size;
+      if (hasSameSize && [...next].every((tag) => current.has(tag))) {
+        return current;
+      }
+      return next;
+    });
+  }, [allSubNetworkTags]);
+
+  const activeSubNetworkTagSet = activeSubNetworkTags as ReadonlySet<string>;
+  const isSubNetworkFilteringActive =
+    allSubNetworkTags.length > 0 && activeSubNetworkTagSet.size < allSubNetworkTags.length;
+
+  const segmentSubNetworkTagById = useMemo(() => {
+    const byId = new Map<SegmentId, string>();
+    for (const segment of segments) {
+      const normalizedTag = segment.subNetworkTag?.trim();
+      byId.set(segment.id, normalizedTag === undefined || normalizedTag.length === 0 ? "(default)" : normalizedTag);
+    }
+    return byId;
+  }, [segments]);
+
+  const nodeHasActiveSubNetworkConnection = useMemo(() => {
+    const byNodeId = new Map<NodeId, boolean>();
+    for (const node of nodes) {
+      byNodeId.set(node.id, false);
+    }
+    for (const segment of segments) {
+      const tag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
+      if (!activeSubNetworkTagSet.has(tag)) {
+        continue;
+      }
+      byNodeId.set(segment.nodeA, true);
+      byNodeId.set(segment.nodeB, true);
+    }
+    return byNodeId;
+  }, [nodes, segments, segmentSubNetworkTagById, activeSubNetworkTagSet]);
+
+  const toggleSubNetworkTag = useCallback((tag: string) => {
+    setActiveSubNetworkTags((current) => {
+      const next = new Set(current);
+      if (next.has(tag)) {
+        next.delete(tag);
+      } else {
+        next.add(tag);
+      }
+      return next;
+    });
+  }, []);
+
+  const enableAllSubNetworkTags = useCallback(() => {
+    setActiveSubNetworkTags(new Set(allSubNetworkTags));
+  }, [allSubNetworkTags]);
+
   const handleExportPlanAsPng = useCallback(() => {
     if (typeof window === "undefined") {
       return;
@@ -334,6 +415,9 @@ export function NetworkSummaryPanel({
               onRegenerateLayout={onRegenerateLayout}
               networkScalePercent={networkScalePercent}
               subNetworkSummaries={subNetworkSummaries}
+              activeSubNetworkTags={activeSubNetworkTagSet}
+              toggleSubNetworkTag={toggleSubNetworkTag}
+              enableAllSubNetworkTags={enableAllSubNetworkTags}
               graphStats={graphStats}
             />
             <svg
@@ -371,16 +455,22 @@ export function NetworkSummaryPanel({
                     return null;
                   }
 
+                  const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
+                  const isSubNetworkDeemphasized =
+                    isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
                   const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
                   const isSelectedSegment = selectedSegmentId === segment.id;
                   const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
                     isSelectedSegment ? " is-selected" : ""
                   }`;
+                  const segmentGroupClassName = `network-entity-group${
+                    isSubNetworkDeemphasized ? " is-deemphasized" : ""
+                  }`;
                   const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
                   const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
 
                   return (
-                    <g key={segment.id}>
+                    <g key={segment.id} className={segmentGroupClassName}>
                       <line
                         className={segmentClassName}
                         x1={nodeAPosition.x}
@@ -417,13 +507,17 @@ export function NetworkSummaryPanel({
                     return null;
                   }
 
+                  const isSubNetworkDeemphasized =
+                    isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false);
                   const nodeKindClass =
                     node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
                   const isSelectedNode =
                     selectedNodeId === node.id ||
                     (node.kind === "connector" && selectedConnectorId === node.connectorId) ||
                     (node.kind === "splice" && selectedSpliceId === node.spliceId);
-                  const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}`;
+                  const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}${
+                    isSubNetworkDeemphasized ? " is-deemphasized" : ""
+                  }`;
                   const nodeLabel =
                     node.kind === "intermediate"
                       ? node.id

@@ -188,6 +188,10 @@
   stroke-width: 5;
 }
 
+.network-entity-group.is-deemphasized {
+  opacity: 0.5;
+}
+
 .network-segment-hitbox {
   stroke: transparent;
   stroke-width: 16;

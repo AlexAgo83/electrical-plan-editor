@@ -2,6 +2,7 @@ import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   asNodeId,
+  asSegmentId,
   createUiIntegrationState,
   createValidationIssueState,
   getPanelByHeading,
@@ -123,6 +124,104 @@ describe("App integration UI - navigation and canvas", () => {
     expect(within(networkSummaryPanel).getByLabelText("2D network diagram")).toBeInTheDocument();
     expect(networkSummaryPanel.querySelectorAll(".network-node").length).toBe(3);
     expect(networkSummaryPanel.querySelectorAll(".network-segment").length).toBe(2);
+  });
+
+  it("renders sub-network filter toggles with DEFAULT formatting and supports enable-all restore", () => {
+    const stateWithTags = appReducer(
+      appReducer(
+        createUiIntegrationState(),
+        appActions.upsertSegment({
+          id: asSegmentId("SEG-A"),
+          nodeA: asNodeId("N-C1"),
+          nodeB: asNodeId("N-MID"),
+          lengthMm: 40,
+          subNetworkTag: "ACT_A"
+        })
+      ),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-B"),
+        nodeA: asNodeId("N-MID"),
+        nodeB: asNodeId("N-S1"),
+        lengthMm: 60
+      })
+    );
+
+    renderAppWithState(stateWithTags);
+    switchScreenDrawerAware("analysis");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const defaultButton = within(networkSummaryPanel).getByRole("button", { name: "DEFAULT" });
+    const actAButton = within(networkSummaryPanel).getByRole("button", { name: "ACT_A" });
+    const enableAllButton = within(networkSummaryPanel).getByRole("button", { name: "Enable all" });
+
+    expect(defaultButton).toHaveAttribute("aria-pressed", "true");
+    expect(defaultButton.querySelector("em")?.textContent).toBe("DEFAULT");
+    expect(actAButton).toHaveAttribute("aria-pressed", "true");
+    expect(enableAllButton).toBeDisabled();
+
+    fireEvent.click(actAButton);
+    expect(actAButton).toHaveAttribute("aria-pressed", "false");
+    expect(enableAllButton).toBeEnabled();
+
+    fireEvent.click(enableAllButton);
+    expect(actAButton).toHaveAttribute("aria-pressed", "true");
+    expect(enableAllButton).toBeDisabled();
+  });
+
+  it("deemphasizes 2d segments and nodes not connected to active subnetworks", () => {
+    const stateWithTags = appReducer(
+      appReducer(
+        createUiIntegrationState(),
+        appActions.upsertSegment({
+          id: asSegmentId("SEG-A"),
+          nodeA: asNodeId("N-C1"),
+          nodeB: asNodeId("N-MID"),
+          lengthMm: 40,
+          subNetworkTag: "POWER_MAIN"
+        })
+      ),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-B"),
+        nodeA: asNodeId("N-MID"),
+        nodeB: asNodeId("N-S1"),
+        lengthMm: 60,
+        subNetworkTag: "BRANCH"
+      })
+    );
+
+    renderAppWithState(stateWithTags);
+    switchScreenDrawerAware("analysis");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BRANCH" }));
+
+    const segmentLabelA = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
+      (label) => label.textContent === "SEG-A"
+    );
+    const segmentLabelB = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
+      (label) => label.textContent === "SEG-B"
+    );
+    expect(segmentLabelA).not.toBeUndefined();
+    expect(segmentLabelB).not.toBeUndefined();
+
+    const segmentGroupA = segmentLabelA?.closest("g.network-entity-group");
+    const segmentGroupB = segmentLabelB?.closest("g.network-entity-group");
+    expect(segmentGroupA).not.toBeNull();
+    expect(segmentGroupB).not.toBeNull();
+    expect(segmentGroupA).not.toHaveClass("is-deemphasized");
+    expect(segmentGroupB).toHaveClass("is-deemphasized");
+
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    const spliceNode = networkSummaryPanel.querySelector(".network-node.splice");
+    const intermediateNode = networkSummaryPanel.querySelector(".network-node.intermediate");
+    expect(connectorNode).not.toBeNull();
+    expect(spliceNode).not.toBeNull();
+    expect(intermediateNode).not.toBeNull();
+
+    expect(connectorNode).not.toHaveClass("is-deemphasized");
+    expect(spliceNode).toHaveClass("is-deemphasized");
+    // MID stays fully visible because it remains connected to the active segment.
+    expect(intermediateNode).not.toHaveClass("is-deemphasized");
   });
 
   it("highlights the corresponding 2D connector node when selecting a connector from the canvas in modeling", () => {

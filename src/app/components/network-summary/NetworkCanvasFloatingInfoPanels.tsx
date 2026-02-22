@@ -13,7 +13,18 @@ interface NetworkCanvasFloatingInfoPanelsProps {
   onRegenerateLayout: () => void;
   networkScalePercent: number;
   subNetworkSummaries: SubNetworkSummary[];
+  activeSubNetworkTags: ReadonlySet<string>;
+  toggleSubNetworkTag: (tag: string) => void;
+  enableAllSubNetworkTags: () => void;
   graphStats: GraphStat[];
+}
+
+function renderSubNetworkTagLabel(tag: string): ReactElement | string {
+  if (tag === "(default)") {
+    return <em>DEFAULT</em>;
+  }
+
+  return tag;
 }
 
 export function NetworkCanvasFloatingInfoPanels({
@@ -23,6 +34,9 @@ export function NetworkCanvasFloatingInfoPanels({
   onRegenerateLayout,
   networkScalePercent,
   subNetworkSummaries,
+  activeSubNetworkTags,
+  toggleSubNetworkTag,
+  enableAllSubNetworkTags,
   graphStats
 }: NetworkCanvasFloatingInfoPanelsProps): ReactElement | null {
   if (!showNetworkInfoPanels) {
@@ -59,16 +73,37 @@ export function NetworkCanvasFloatingInfoPanels({
           {subNetworkSummaries.length === 0 ? (
             <p className="network-canvas-floating-copy">No sub-network tags yet.</p>
           ) : (
-            <ul className="network-canvas-subnetwork-list">
+            <>
+              <div className="network-canvas-subnetwork-actions">
+                <button
+                  type="button"
+                  className="workspace-tab network-canvas-subnetwork-enable-all"
+                  onClick={enableAllSubNetworkTags}
+                  disabled={subNetworkSummaries.every((group) => activeSubNetworkTags.has(group.tag))}
+                >
+                  Enable all
+                </button>
+              </div>
+              <ul className="network-canvas-subnetwork-list">
               {subNetworkSummaries.map((group) => (
                 <li key={group.tag}>
-                  <span className="subnetwork-chip">{group.tag}</span>
+                  <button
+                    type="button"
+                    className={`subnetwork-chip subnetwork-chip-toggle${
+                      activeSubNetworkTags.has(group.tag) ? " is-active" : " is-inactive"
+                    }`}
+                    onClick={() => toggleSubNetworkTag(group.tag)}
+                    aria-pressed={activeSubNetworkTags.has(group.tag)}
+                  >
+                    {renderSubNetworkTagLabel(group.tag)}
+                  </button>
                   <span>
                     {group.segmentCount} segment(s), {group.totalLengthMm} mm total
                   </span>
                 </li>
               ))}
-            </ul>
+              </ul>
+            </>
           )}
         </section>
         <section className="network-canvas-floating-stats" aria-label="Graph statistics">
