@@ -343,4 +343,31 @@ describe("App integration UI - settings", () => {
     switchScreenDrawerAware("modeling");
     expect(screen.queryByRole("heading", { name: "Inspector context" })).not.toBeInTheDocument();
   });
+
+  it("persists global preferences for floating inspector visibility and workspace panel layout", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const globalPreferencesPanel = getPanelByHeading("Global preferences");
+    const inspectorToggle = within(globalPreferencesPanel).getByLabelText("Show floating inspector panel on supported screens");
+    const layoutSelect = within(globalPreferencesPanel).getByLabelText("Workspace panels layout");
+
+    expect(inspectorToggle).toBeChecked();
+    expect(layoutSelect).toHaveValue("singleColumn");
+
+    fireEvent.click(inspectorToggle);
+    fireEvent.change(layoutSelect, {
+      target: { value: "multiColumn" }
+    });
+
+    firstRender.unmount();
+
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const restoredGlobalPreferencesPanel = getPanelByHeading("Global preferences");
+    expect(
+      within(restoredGlobalPreferencesPanel).getByLabelText("Show floating inspector panel on supported screens")
+    ).not.toBeChecked();
+    expect(within(restoredGlobalPreferencesPanel).getByLabelText("Workspace panels layout")).toHaveValue("multiColumn");
+  });
 });

@@ -116,8 +116,8 @@ export function useSegmentHandlers({
     }
 
     const lengthMm = toPositiveNumber(segmentLengthMm);
-    if (lengthMm <= 0) {
-      setSegmentFormError("Segment length must be > 0.");
+    if (lengthMm < 1) {
+      setSegmentFormError("Segment length must be >= 1 mm.");
       return;
     }
 

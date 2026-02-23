@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactElement } from "react";
 import type { NetworkId } from "../../../core/entities";
 import { nextSortState, sortByNameAndTechnicalId } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
@@ -70,6 +70,7 @@ export function NetworkScopeWorkspaceContent({
   const isEditMode = networkFormMode === "edit";
   const isFormOpen = isCreateMode || isEditMode;
   const [focusedNetworkId, setFocusedNetworkId] = useState<NetworkId | null>(activeNetworkId);
+  const rowRefs = useRef<Partial<Record<NetworkId, HTMLTableRowElement | null>>>({});
 
   const sortedNetworks = useMemo(
     () =>
@@ -120,6 +121,13 @@ export function NetworkScopeWorkspaceContent({
 
     setFocusedNetworkId(focusRequestedNetworkId);
   }, [focusRequestedNetworkId, focusRequestedNetworkToken, networks]);
+
+  useEffect(() => {
+    if (focusedNetworkId === null) {
+      return;
+    }
+    rowRefs.current[focusedNetworkId]?.focus();
+  }, [focusedNetworkId, sortedNetworks]);
 
   const indicators = [
     { label: "Connectors", value: focusedNetworkCounts?.connectorCount ?? 0 },
@@ -217,6 +225,9 @@ export function NetworkScopeWorkspaceContent({
                     return (
                       <tr
                         key={network.id}
+                        ref={(element) => {
+                          rowRefs.current[network.id] = element;
+                        }}
                         className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
                         aria-selected={isFocused}
                         tabIndex={0}

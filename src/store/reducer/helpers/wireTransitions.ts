@@ -39,7 +39,7 @@ export function getEndpointValidationError(state: AppState, endpoint: WireEndpoi
     }
 
     if (!isValidSlotIndex(endpoint.cavityIndex, connector.cavityCount)) {
-      return "Wire connector cavity endpoint is out of range.";
+      return "Wire connector way endpoint is out of range.";
     }
 
     return null;

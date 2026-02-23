@@ -58,7 +58,7 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.change(within(connectorFormPanel).getByLabelText("Technical ID"), {
       target: { value: "C-UNDO-1" }
     });
-    fireEvent.change(within(connectorFormPanel).getByLabelText("Cavity count"), {
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Way count"), {
       target: { value: "2" }
     });
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
@@ -369,7 +369,7 @@ describe("App integration UI - navigation and canvas", () => {
 
     switchScreenDrawerAware("validation");
     const validationPanel = getPanelByHeading("Validation center");
-    const connectorIssue = within(validationPanel).getByText(/Connector 'C1' cavity C2/i);
+    const connectorIssue = within(validationPanel).getByText(/Connector 'C1' way C2/i);
     const issueRow = connectorIssue.closest("tr");
     expect(issueRow).not.toBeNull();
     fireEvent.click(within(issueRow as HTMLElement).getByRole("button", { name: "Go to" }));

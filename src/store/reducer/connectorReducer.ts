@@ -51,7 +51,7 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
     case "connector/upsert": {
       const cavityCount = action.payload.cavityCount;
       if (!Number.isInteger(cavityCount) || cavityCount < 1) {
-        return withError(state, "Connector cavityCount must be an integer >= 1.");
+        return withError(state, "Connector wayCount must be an integer >= 1.");
       }
 
       if (hasDuplicateConnectorTechnicalId(state, action.payload.id, action.payload.technicalId)) {
@@ -67,7 +67,7 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
         if (hasOutOfRangeOccupancy) {
           return withError(
             state,
-            "Connector cavityCount cannot be reduced below occupied cavity indexes."
+            "Connector wayCount cannot be reduced below occupied way indexes."
           );
         }
       }
@@ -102,11 +102,11 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
     case "connector/occupyCavity": {
       const connector = state.connectors.byId[action.payload.connectorId];
       if (connector === undefined) {
-        return withError(state, "Cannot occupy cavity on unknown connector.");
+        return withError(state, "Cannot occupy way on unknown connector.");
       }
 
       if (!isValidSlotIndex(action.payload.cavityIndex, connector.cavityCount)) {
-        return withError(state, "Connector cavity index is out of range.");
+        return withError(state, "Connector way index is out of range.");
       }
 
       const occupantRef = action.payload.occupantRef.trim();
@@ -119,7 +119,7 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
       if (currentOccupant !== undefined && currentOccupant !== occupantRef) {
         return withError(
           state,
-          `Cavity ${action.payload.cavityIndex} is already occupied by '${currentOccupant}'.`
+          `Way ${action.payload.cavityIndex} is already occupied by '${currentOccupant}'.`
         );
       }
 
@@ -142,11 +142,11 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
     case "connector/releaseCavity": {
       const connector = state.connectors.byId[action.payload.connectorId];
       if (connector === undefined) {
-        return withError(state, "Cannot release cavity on unknown connector.");
+        return withError(state, "Cannot release way on unknown connector.");
       }
 
       if (!isValidSlotIndex(action.payload.cavityIndex, connector.cavityCount)) {
-        return withError(state, "Connector cavity index is out of range.");
+        return withError(state, "Connector way index is out of range.");
       }
 
       const connectorOccupancy = state.connectorCavityOccupancy[action.payload.connectorId];

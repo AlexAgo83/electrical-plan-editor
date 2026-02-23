@@ -88,7 +88,7 @@ export function useConnectorHandlers({
     const normalizedCavityCount = toPositiveInteger(cavityCount);
 
     if (trimmedName.length === 0 || trimmedTechnicalId.length === 0 || normalizedCavityCount < 1) {
-      setConnectorFormError("All fields are required and cavity count must be >= 1.");
+      setConnectorFormError("All fields are required and way count must be >= 1.");
       return;
     }
     setConnectorFormError(null);

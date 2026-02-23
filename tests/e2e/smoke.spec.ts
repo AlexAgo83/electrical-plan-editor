@@ -145,7 +145,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   const connectorForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Connector" }) });
   await connectorForm.getByLabel("Functional name").fill("Connector 1");
   await connectorForm.getByLabel("Technical ID").fill("C-1");
-  await connectorForm.getByLabel("Cavity count").fill("2");
+  await connectorForm.getByLabel("Way count").fill("2");
   await connectorForm.getByRole("button", { name: "Create" }).click();
 
   await switchSubScreen("splice");
