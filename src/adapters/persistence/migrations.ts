@@ -125,7 +125,7 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     if (typeof networkId !== "string") {
       return null;
     }
-    const network = rawNetworks.byId[networkId as keyof typeof rawNetworks.byId];
+    const network = rawNetworks.byId[networkId];
     if (!isRecord(network)) {
       return null;
     }
@@ -133,7 +133,7 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     if (scoped === null) {
       return null;
     }
-    normalizedNetworkStates[networkId as keyof AppState["networkStates"]] = scoped;
+    normalizedNetworkStates[networkId] = scoped;
   }
 
   const candidateState = {

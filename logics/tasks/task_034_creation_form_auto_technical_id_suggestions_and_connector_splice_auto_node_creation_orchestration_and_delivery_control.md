@@ -1,8 +1,8 @@
 ## task_034_creation_form_auto_technical_id_suggestions_and_connector_splice_auto_node_creation_orchestration_and_delivery_control - Creation Form Auto Technical ID Suggestions and Connector/Splice Auto-Node Creation Orchestration and Delivery Control
 > From version: 0.7.3
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Delivery Orchestration for Creation Flow Ergonomics and Graph Bootstrap Automation
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -25,15 +25,15 @@ Backlog scope covered:
 - `item_210_req_034_creation_flow_ergonomics_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 shared next-available `Technical ID` suggestion helpers and strategy (`item_203`)
-- [ ] 2. Deliver Wave 1 connector/splice create-form `Technical ID` prefill wiring (no overwrite of manual edits) (`item_204`)
-- [ ] 3. Deliver Wave 2 connector creation auto-node bootstrap (linked connector node) (`item_205`)
-- [ ] 4. Deliver Wave 3 splice creation auto-node bootstrap (linked splice node) (`item_206`)
-- [ ] 5. Deliver Wave 4 failure handling/atomicity or compensation for auto-node creation + user feedback (`item_207`)
-- [ ] 6. Deliver Wave 5 post-create selection/focus/form coherence verification and adjustments (`item_208`)
-- [ ] 7. Deliver Wave 6 regression tests for ID suggestions + auto-node creation bootstrap (`item_209`)
-- [ ] 8. Deliver Wave 7 closure: CI-equivalent validation, AC traceability, and Logics updates (`item_210`)
-- [ ] FINAL: Update related Logics docs (request/task/backlog progress + delivery summary)
+- [x] 1. Deliver Wave 0 shared next-available `Technical ID` suggestion helpers and strategy (`item_203`)
+- [x] 2. Deliver Wave 1 connector/splice create-form `Technical ID` prefill wiring (no overwrite of manual edits) (`item_204`)
+- [x] 3. Deliver Wave 2 connector creation auto-node bootstrap (linked connector node) (`item_205`)
+- [x] 4. Deliver Wave 3 splice creation auto-node bootstrap (linked splice node) (`item_206`)
+- [x] 5. Deliver Wave 4 failure handling/atomicity or compensation for auto-node creation + user feedback (`item_207`)
+- [x] 6. Deliver Wave 5 post-create selection/focus/form coherence verification and adjustments (`item_208`)
+- [x] 7. Deliver Wave 6 regression tests for ID suggestions + auto-node creation bootstrap (`item_209`)
+- [x] 8. Deliver Wave 7 closure: CI-equivalent validation, AC traceability, and Logics updates (`item_210`)
+- [x] FINAL: Update related Logics docs (request/task/backlog progress + delivery summary)
 
 # Validation
 - Documentation / Logics:
@@ -57,14 +57,14 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 (ID suggestion helpers/strategy): pending
-  - Wave 1 (create-form prefill wiring): pending
-  - Wave 2 (connector auto-node creation): pending
-  - Wave 3 (splice auto-node creation): pending
-  - Wave 4 (failure handling / atomicity-compensation): pending
-  - Wave 5 (post-create UX coherence): pending
-  - Wave 6 (regression tests): pending
-  - Wave 7 (closure + AC traceability): pending
+  - Wave 0 (ID suggestion helpers/strategy): completed
+  - Wave 1 (create-form prefill wiring): completed
+  - Wave 2 (connector auto-node creation): completed
+  - Wave 3 (splice auto-node creation): completed
+  - Wave 4 (failure handling / atomicity-compensation): completed
+  - Wave 5 (post-create UX coherence): completed
+  - Wave 6 (regression tests): completed
+  - Wave 7 (closure + AC traceability): completed
 - Current blockers:
   - None at kickoff.
 - Main risks to track:
@@ -78,10 +78,26 @@ Backlog scope covered:
   - Gate prefill behavior to new create sessions and avoid effect-driven overwrites after manual input.
   - Define explicit failure policy (atomic or compensated) before finalizing auto-node creation flows.
   - Add targeted UI/store regression coverage for create flows and post-create focus/selection behavior.
-- Validation snapshot (kickoff):
-  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅ (request + planning artifacts)
+- Validation snapshot (completed):
+  - Targeted:
+    - `npm run -s test -- --run src/tests/technical-id-suggestions.spec.ts src/tests/app.ui.navigation-canvas.spec.tsx src/tests/store.reducer.entities.spec.ts` ✅
+    - `npm run -s test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx` ✅ (covered within `test:ci`)
+  - CI-equivalent:
+    - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+    - `npm run -s lint` ✅
+    - `npm run -s typecheck` ✅
+    - `npm run -s quality:ui-modularization` ✅
+    - `npm run -s quality:store-modularization` ✅
+    - `npm run -s test:ci` ✅
+    - `npm run -s test:e2e` ✅ (smoke updated for connector/splice auto-node flow and post-create edit-mode transitions)
+    - `npm run -s build` ✅
+    - `npm run -s quality:pwa` ✅
 - Delivery snapshot:
-  - Pending implementation.
+  - Added shared deterministic technical-ID suggestion helpers (`C-001`, `S-001` style) with collision-safe fallback.
+  - Connector/Splice create forms now prefill suggested technical IDs only on fresh create mode entry (no overwrite of manual edits while typing).
+  - Successful connector/splice creation now auto-creates a linked specialized node with unique generated node ID.
+  - Auto-node creation is part of the same user action from history perspective (`trackHistory: false`) to preserve expected Undo behavior.
+  - Added UI and unit regression coverage for prefill behavior, post-create focus coherence, and auto-node bootstrap.
 - AC traceability (`req_034`) target mapping:
   - AC1 -> `item_203`, `item_204`, `item_209`, `item_210`
   - AC2 -> `item_203`, `item_204`, `item_209`, `item_210`

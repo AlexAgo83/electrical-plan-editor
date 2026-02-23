@@ -1,8 +1,8 @@
 ## task_033_save_data_versioning_backward_compatible_migrations_local_and_file_persistence_orchestration_and_delivery_control - Save/Data Versioning and Backward-Compatible Migrations (Local + File Persistence) Orchestration and Delivery Control
 > From version: 0.7.3
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: High
 > Theme: Delivery Orchestration for Persisted Data Versioning, Migration Safety, and Backward Compatibility
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -30,15 +30,15 @@ Backlog scope covered:
 - `item_202_req_033_save_data_versioning_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 persistence schema version envelope + current version constants/contracts for local/file payloads (`item_195`)
-- [ ] 2. Deliver Wave 1 backward-compatible migration registry/pipeline + legacy/unversioned payload normalization (`item_196`)
-- [ ] 3. Deliver Wave 2 local storage hydration migration flow with safe backup/overwrite semantics and failure protection (`item_197`)
-- [ ] 4. Deliver Wave 3 import/export file version metadata + import migration path + unsupported future-version rejection (`item_198`)
-- [ ] 5. Deliver Wave 4 post-migration validation + fail-safe error/status handling (`item_199`)
-- [ ] 6. Deliver Wave 5 compatibility fixtures and regression coverage for local/file persistence migrations (`item_200`)
-- [ ] 7. Deliver Wave 6 developer workflow documentation for future migration authoring/version bumps (`item_201`)
-- [ ] 8. Deliver Wave 7 closure: CI-equivalent validation, AC traceability, and Logics updates (`item_202`)
-- [ ] FINAL: Update related Logics docs (request/task/backlog progress + delivery summary)
+- [x] 1. Deliver Wave 0 persistence schema version envelope + current version constants/contracts for local/file payloads (`item_195`)
+- [x] 2. Deliver Wave 1 backward-compatible migration registry/pipeline + legacy/unversioned payload normalization (`item_196`)
+- [x] 3. Deliver Wave 2 local storage hydration migration flow with safe backup/overwrite semantics and failure protection (`item_197`)
+- [x] 4. Deliver Wave 3 import/export file version metadata + import migration path + unsupported future-version rejection (`item_198`)
+- [x] 5. Deliver Wave 4 post-migration validation + fail-safe error/status handling (`item_199`)
+- [x] 6. Deliver Wave 5 compatibility fixtures and regression coverage for local/file persistence migrations (`item_200`)
+- [x] 7. Deliver Wave 6 developer workflow documentation for future migration authoring/version bumps (`item_201`)
+- [x] 8. Deliver Wave 7 closure: CI-equivalent validation, AC traceability, and Logics updates (`item_202`)
+- [x] FINAL: Update related Logics docs (request/task/backlog progress + delivery summary)
 
 # Validation
 - Documentation / Logics:
@@ -64,14 +64,14 @@ Backlog scope covered:
 
 # Report
 - Wave status:
-  - Wave 0 (versioned envelope contract): pending
-  - Wave 1 (migration pipeline + legacy normalization): pending
-  - Wave 2 (local hydration + safe backup/overwrite): pending
-  - Wave 3 (file import/export versioning + compatibility/rejection): pending
-  - Wave 4 (post-migration validation + fail-safe handling): pending
-  - Wave 5 (compat fixtures/tests): pending
-  - Wave 6 (developer migration workflow docs): pending
-  - Wave 7 (closure + AC traceability): pending
+  - Wave 0 (versioned envelope contract): completed
+  - Wave 1 (migration pipeline + legacy normalization): completed
+  - Wave 2 (local hydration + safe backup/overwrite): completed
+  - Wave 3 (file import/export versioning + compatibility/rejection): completed
+  - Wave 4 (post-migration validation + fail-safe handling): completed
+  - Wave 5 (compat fixtures/tests): completed
+  - Wave 6 (developer migration workflow docs): completed
+  - Wave 7 (closure + AC traceability): completed
 - Current blockers:
   - None at kickoff.
 - Main risks to track:
@@ -87,10 +87,25 @@ Backlog scope covered:
   - Separate parse -> migrate -> validate -> apply phases with explicit failure returns.
   - Persist upgraded payload only after successful migration + validation + state acceptance.
   - Add targeted regression tests for both success and safe-failure paths (local + file import).
-- Validation snapshot (kickoff):
-  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅ (request + planning artifacts)
+- Validation snapshot (completed):
+  - Targeted:
+    - `npm run -s test -- --run src/tests/persistence.localStorage.spec.ts src/tests/sample-network.compat.spec.ts src/tests/portability.network-file.spec.ts src/tests/app.ui.import-export.spec.tsx` ✅
+  - CI-equivalent:
+    - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+    - `npm run -s lint` ✅
+    - `npm run -s typecheck` ✅
+    - `npm run -s quality:ui-modularization` ✅
+    - `npm run -s quality:store-modularization` ✅
+    - `npm run -s test:ci` ✅
+    - `npm run -s test:e2e` ✅
+    - `npm run -s build` ✅
+    - `npm run -s quality:pwa` ✅
 - Delivery snapshot:
-  - Pending implementation.
+  - Implemented versioned local persistence envelope metadata (`payloadKind`, `schemaVersion`, `appVersion`, `appSchemaVersion`) with backward-compatible migration normalization.
+  - Added explicit local backup preservation (`<storage-key>.backup`) before migration rewrite / unsupported payload fallback.
+  - Added unsupported future-version rejection for local payloads and file imports with safe fallback/no workspace mutation.
+  - Updated network export payload metadata (`appVersion`) and normalized legacy file schema imports to current file schema.
+  - Added/updated regression coverage for local persistence migration safety and file-version compatibility paths.
 - AC traceability (`req_033`) target mapping:
   - AC1 -> `item_196`, `item_197`, `item_200`, `item_202`
   - AC2 -> `item_195`, `item_198`, `item_200`, `item_202`
