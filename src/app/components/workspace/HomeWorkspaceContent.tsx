@@ -84,7 +84,8 @@ export function HomeWorkspaceContent({
                 className="filter-chip onboarding-help-button"
                 onClick={onOpenOnboardingHelp}
               >
-                Help
+                <span className="action-button-icon is-help" aria-hidden="true" />
+                <span>Help</span>
               </button>
             ) : null}
             <span className="settings-panel-chip">Home</span>

@@ -277,7 +277,8 @@ export function ModelingSecondaryTables({
                   className="filter-chip onboarding-help-button"
                   onClick={onOpenSegmentOnboardingHelp}
                 >
-                  Help
+                  <span className="action-button-icon is-help" aria-hidden="true" />
+                  <span>Help</span>
                 </button>
               ) : null}
             </div>
@@ -438,7 +439,8 @@ export function ModelingSecondaryTables({
                   className="filter-chip onboarding-help-button"
                   onClick={onOpenWireOnboardingHelp}
                 >
-                  Help
+                  <span className="action-button-icon is-help" aria-hidden="true" />
+                  <span>Help</span>
                 </button>
               ) : null}
             </div>

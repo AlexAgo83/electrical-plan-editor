@@ -307,7 +307,8 @@ export function ModelingPrimaryTables({
                   className="filter-chip onboarding-help-button"
                   onClick={onOpenConnectorOnboardingHelp}
                 >
-                  Help
+                  <span className="action-button-icon is-help" aria-hidden="true" />
+                  <span>Help</span>
                 </button>
               ) : null}
             </div>
@@ -440,7 +441,8 @@ export function ModelingPrimaryTables({
                   className="filter-chip onboarding-help-button"
                   onClick={onOpenSpliceOnboardingHelp}
                 >
-                  Help
+                  <span className="action-button-icon is-help" aria-hidden="true" />
+                  <span>Help</span>
                 </button>
               ) : null}
             </div>
@@ -575,7 +577,8 @@ export function ModelingPrimaryTables({
                   className="filter-chip onboarding-help-button"
                   onClick={onOpenNodeOnboardingHelp}
                 >
-                  Help
+                  <span className="action-button-icon is-help" aria-hidden="true" />
+                  <span>Help</span>
                 </button>
               ) : null}
             </div>
