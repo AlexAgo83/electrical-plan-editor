@@ -164,7 +164,7 @@ describe("localStorage persistence adapter", () => {
     expect(loaded).toEqual(state);
   });
 
-  it("patches legacy persisted wires missing section and colors to defaults", () => {
+  it("patches legacy persisted wires missing section/colors/side references to defaults", () => {
     const state = createSampleNetworkState();
     const nowIso = "2026-02-20T11:00:00.000Z";
     const stripWireSections = (input: AppState): AppState => ({
@@ -178,7 +178,16 @@ describe("localStorage persistence adapter", () => {
               wireId,
               wire === undefined
                 ? undefined
-                : ({ ...wire, sectionMm2: undefined, primaryColorId: undefined, secondaryColorId: undefined } as unknown)
+                : ({
+                    ...wire,
+                    sectionMm2: undefined,
+                    primaryColorId: undefined,
+                    secondaryColorId: undefined,
+                    endpointAConnectionReference: undefined,
+                    endpointASealReference: undefined,
+                    endpointBConnectionReference: undefined,
+                    endpointBSealReference: undefined
+                  } as unknown)
             ];
           })
         ) as AppState["wires"]["byId"]
@@ -197,7 +206,16 @@ describe("localStorage persistence adapter", () => {
                     wireId,
                     wire === undefined
                       ? undefined
-                      : ({ ...wire, sectionMm2: undefined, primaryColorId: undefined, secondaryColorId: undefined } as unknown)
+                      : ({
+                          ...wire,
+                          sectionMm2: undefined,
+                          primaryColorId: undefined,
+                          secondaryColorId: undefined,
+                          endpointAConnectionReference: undefined,
+                          endpointASealReference: undefined,
+                          endpointBConnectionReference: undefined,
+                          endpointBSealReference: undefined
+                        } as unknown)
                   ];
                 })
               ) as typeof scoped.wires.byId
@@ -221,6 +239,10 @@ describe("localStorage persistence adapter", () => {
     expect(loadedWire?.sectionMm2).toBe(0.5);
     expect(loadedWire?.primaryColorId).toBeNull();
     expect(loadedWire?.secondaryColorId).toBeNull();
+    expect(loadedWire?.endpointAConnectionReference).toBeUndefined();
+    expect(loadedWire?.endpointASealReference).toBeUndefined();
+    expect(loadedWire?.endpointBConnectionReference).toBeUndefined();
+    expect(loadedWire?.endpointBSealReference).toBeUndefined();
 
     const activeNetworkId = loaded.activeNetworkId;
     if (activeNetworkId !== null) {
@@ -228,7 +250,75 @@ describe("localStorage persistence adapter", () => {
       expect(scopedWire?.sectionMm2).toBe(0.5);
       expect(scopedWire?.primaryColorId).toBeNull();
       expect(scopedWire?.secondaryColorId).toBeNull();
+      expect(scopedWire?.endpointAConnectionReference).toBeUndefined();
+      expect(scopedWire?.endpointASealReference).toBeUndefined();
+      expect(scopedWire?.endpointBConnectionReference).toBeUndefined();
+      expect(scopedWire?.endpointBSealReference).toBeUndefined();
     }
+  });
+
+  it("normalizes persisted wire side connection/seal references", () => {
+    const state = createSampleNetworkState();
+    const nowIso = "2026-02-20T11:40:00.000Z";
+    const wireId = state.wires.allIds[0];
+    const activeNetworkId = state.activeNetworkId;
+    expect(wireId).toBeDefined();
+    expect(activeNetworkId).not.toBeNull();
+    if (wireId === undefined || activeNetworkId === null) {
+      throw new Error("Expected sample network wire and active network.");
+    }
+
+    const rawState: AppState = {
+      ...state,
+      wires: {
+        ...state.wires,
+        byId: {
+          ...state.wires.byId,
+          [wireId]: {
+            ...state.wires.byId[wireId]!,
+            endpointAConnectionReference: "  TERM-A-LEGACY  ",
+            endpointASealReference: " ",
+            endpointBConnectionReference: ` ${"C".repeat(130)} `,
+            endpointBSealReference: "  SEAL-B-LEGACY  "
+          }
+        }
+      },
+      networkStates: {
+        ...state.networkStates,
+        [activeNetworkId]: {
+          ...state.networkStates[activeNetworkId]!,
+          wires: {
+            ...state.networkStates[activeNetworkId]!.wires,
+            byId: {
+              ...state.networkStates[activeNetworkId]!.wires.byId,
+              [wireId]: {
+                ...state.networkStates[activeNetworkId]!.wires.byId[wireId]!,
+                endpointAConnectionReference: "  TERM-A-LEGACY  ",
+                endpointASealReference: " ",
+                endpointBConnectionReference: ` ${"C".repeat(130)} `,
+                endpointBSealReference: "  SEAL-B-LEGACY  "
+              }
+            }
+          }
+        }
+      }
+    };
+
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        schemaVersion: APP_SCHEMA_VERSION,
+        createdAtIso: "2026-02-01T08:00:00.000Z",
+        updatedAtIso: "2026-02-01T09:00:00.000Z",
+        state: rawState
+      } satisfies PersistedStateSnapshotV1)
+    });
+
+    const loaded = loadState(storage, () => nowIso);
+    const loadedWire = loaded.wires.byId[wireId];
+    expect(loadedWire?.endpointAConnectionReference).toBe("TERM-A-LEGACY");
+    expect(loadedWire?.endpointASealReference).toBeUndefined();
+    expect(loadedWire?.endpointBConnectionReference).toBe("C".repeat(120));
+    expect(loadedWire?.endpointBSealReference).toBe("SEAL-B-LEGACY");
   });
 
   it("normalizes persisted connector and splice manufacturer references", () => {

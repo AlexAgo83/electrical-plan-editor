@@ -21,6 +21,10 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     wireSecondaryColorId,
     setWireSecondaryColorId,
     wireTechnicalIdAlreadyUsed,
+    wireEndpointAConnectionReference,
+    setWireEndpointAConnectionReference,
+    wireEndpointASealReference,
+    setWireEndpointASealReference,
     wireEndpointAKind,
     setWireEndpointAKind,
     wireEndpointAConnectorId,
@@ -32,6 +36,10 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     wireEndpointAPortIndex,
     setWireEndpointAPortIndex,
     wireEndpointASlotHint,
+    wireEndpointBConnectionReference,
+    setWireEndpointBConnectionReference,
+    wireEndpointBSealReference,
+    setWireEndpointBSealReference,
     wireEndpointBKind,
     setWireEndpointBKind,
     wireEndpointBConnectorId,
@@ -192,6 +200,27 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             ) : null}
           </>
         )}
+        <div className="stack-form">
+          <small className="inline-help">Side A metadata</small>
+          <label>
+            Connection reference
+            <input
+              value={wireEndpointAConnectionReference}
+              onChange={(event) => setWireEndpointAConnectionReference(event.target.value)}
+              maxLength={120}
+              placeholder="Optional"
+            />
+          </label>
+          <label>
+            Seal reference
+            <input
+              value={wireEndpointASealReference}
+              onChange={(event) => setWireEndpointASealReference(event.target.value)}
+              maxLength={120}
+              placeholder="Optional"
+            />
+          </label>
+        </div>
       </fieldset>
 
       <fieldset className="inline-fieldset wire-endpoint-fieldset">
@@ -238,6 +267,27 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             ) : null}
           </>
         )}
+        <div className="stack-form">
+          <small className="inline-help">Side B metadata</small>
+          <label>
+            Connection reference
+            <input
+              value={wireEndpointBConnectionReference}
+              onChange={(event) => setWireEndpointBConnectionReference(event.target.value)}
+              maxLength={120}
+              placeholder="Optional"
+            />
+          </label>
+          <label>
+            Seal reference
+            <input
+              value={wireEndpointBSealReference}
+              onChange={(event) => setWireEndpointBSealReference(event.target.value)}
+              maxLength={120}
+              placeholder="Optional"
+            />
+          </label>
+        </div>
       </fieldset>
     </div>
 

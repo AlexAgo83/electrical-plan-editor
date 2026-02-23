@@ -84,6 +84,10 @@ export interface Wire {
   sectionMm2: number;
   primaryColorId: string | null;
   secondaryColorId: string | null;
+  endpointAConnectionReference?: string;
+  endpointASealReference?: string;
+  endpointBConnectionReference?: string;
+  endpointBSealReference?: string;
   endpointA: WireEndpoint;
   endpointB: WireEndpoint;
   routeSegmentIds: SegmentId[];

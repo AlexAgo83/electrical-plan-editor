@@ -90,6 +90,10 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWirePrimaryColorId: Parameters<typeof useWireHandlers>[0]["setWirePrimaryColorId"];
   wireSecondaryColorId: Parameters<typeof useWireHandlers>[0]["wireSecondaryColorId"];
   setWireSecondaryColorId: Parameters<typeof useWireHandlers>[0]["setWireSecondaryColorId"];
+  wireEndpointAConnectionReference: Parameters<typeof useWireHandlers>[0]["wireEndpointAConnectionReference"];
+  setWireEndpointAConnectionReference: Parameters<typeof useWireHandlers>[0]["setWireEndpointAConnectionReference"];
+  wireEndpointASealReference: Parameters<typeof useWireHandlers>[0]["wireEndpointASealReference"];
+  setWireEndpointASealReference: Parameters<typeof useWireHandlers>[0]["setWireEndpointASealReference"];
   wireEndpointAKind: Parameters<typeof useWireHandlers>[0]["wireEndpointAKind"];
   setWireEndpointAKind: Parameters<typeof useWireHandlers>[0]["setWireEndpointAKind"];
   wireEndpointAConnectorId: Parameters<typeof useWireHandlers>[0]["wireEndpointAConnectorId"];
@@ -100,6 +104,10 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireEndpointASpliceId: Parameters<typeof useWireHandlers>[0]["setWireEndpointASpliceId"];
   wireEndpointAPortIndex: Parameters<typeof useWireHandlers>[0]["wireEndpointAPortIndex"];
   setWireEndpointAPortIndex: Parameters<typeof useWireHandlers>[0]["setWireEndpointAPortIndex"];
+  wireEndpointBConnectionReference: Parameters<typeof useWireHandlers>[0]["wireEndpointBConnectionReference"];
+  setWireEndpointBConnectionReference: Parameters<typeof useWireHandlers>[0]["setWireEndpointBConnectionReference"];
+  wireEndpointBSealReference: Parameters<typeof useWireHandlers>[0]["wireEndpointBSealReference"];
+  setWireEndpointBSealReference: Parameters<typeof useWireHandlers>[0]["setWireEndpointBSealReference"];
   wireEndpointBKind: Parameters<typeof useWireHandlers>[0]["wireEndpointBKind"];
   setWireEndpointBKind: Parameters<typeof useWireHandlers>[0]["setWireEndpointBKind"];
   wireEndpointBConnectorId: Parameters<typeof useWireHandlers>[0]["wireEndpointBConnectorId"];
@@ -200,6 +208,10 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWirePrimaryColorId,
   wireSecondaryColorId,
   setWireSecondaryColorId,
+  wireEndpointAConnectionReference,
+  setWireEndpointAConnectionReference,
+  wireEndpointASealReference,
+  setWireEndpointASealReference,
   wireEndpointAKind,
   setWireEndpointAKind,
   wireEndpointAConnectorId,
@@ -210,6 +222,10 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireEndpointASpliceId,
   wireEndpointAPortIndex,
   setWireEndpointAPortIndex,
+  wireEndpointBConnectionReference,
+  setWireEndpointBConnectionReference,
+  wireEndpointBSealReference,
+  setWireEndpointBSealReference,
   wireEndpointBKind,
   setWireEndpointBKind,
   wireEndpointBConnectorId,
@@ -332,6 +348,10 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWirePrimaryColorId,
     wireSecondaryColorId,
     setWireSecondaryColorId,
+    wireEndpointAConnectionReference,
+    setWireEndpointAConnectionReference,
+    wireEndpointASealReference,
+    setWireEndpointASealReference,
     wireEndpointAKind,
     setWireEndpointAKind,
     wireEndpointAConnectorId,
@@ -342,6 +362,10 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireEndpointASpliceId,
     wireEndpointAPortIndex,
     setWireEndpointAPortIndex,
+    wireEndpointBConnectionReference,
+    setWireEndpointBConnectionReference,
+    wireEndpointBSealReference,
+    setWireEndpointBSealReference,
     wireEndpointBKind,
     setWireEndpointBKind,
     wireEndpointBConnectorId,

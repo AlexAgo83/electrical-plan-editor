@@ -87,6 +87,10 @@ export type AppAction =
         sectionMm2?: number;
         primaryColorId?: string | null;
         secondaryColorId?: string | null;
+        endpointAConnectionReference?: string;
+        endpointASealReference?: string;
+        endpointBConnectionReference?: string;
+        endpointBSealReference?: string;
         endpointA: WireEndpoint;
         endpointB: WireEndpoint;
       };
@@ -172,6 +176,10 @@ export const appActions = {
     sectionMm2?: number;
     primaryColorId?: string | null;
     secondaryColorId?: string | null;
+    endpointAConnectionReference?: string;
+    endpointASealReference?: string;
+    endpointBConnectionReference?: string;
+    endpointBSealReference?: string;
     endpointA: WireEndpoint;
     endpointB: WireEndpoint;
   }): AppAction => ({ type: "wire/save", payload }),
