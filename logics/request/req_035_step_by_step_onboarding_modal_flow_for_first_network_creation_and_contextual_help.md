@@ -1,7 +1,7 @@
 ## req_035_step_by_step_onboarding_modal_flow_for_first_network_creation_and_contextual_help - Step-by-Step Onboarding Modal Flow for First Network Creation and Contextual Help
 > From version: 0.7.3
-> Understanding: 99%
-> Confidence: 97%
+> Understanding: 100%
+> Confidence: 98%
 > Complexity: High
 > Theme: Guided First-Time User Onboarding and Contextual In-App Learning
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -172,7 +172,15 @@ This request introduces a guided onboarding flow that:
 - Advanced analytics/telemetry tracking for onboarding completion.
 
 # Backlog
-- TBD (to be decomposed into onboarding modal shell/state, content model, auto-open persistence, contextual step buttons, navigation+scroll CTA, Home help relaunch, styling, and closure tests)
+- `logics/backlog/item_211_onboarding_modal_flow_shell_step_state_and_dismissable_sequence_controller.md`
+- `logics/backlog/item_212_onboarding_step_content_model_authored_en_copy_and_shared_single_step_full_flow_rendering.md`
+- `logics/backlog/item_213_onboarding_auto_open_on_app_load_with_persisted_opt_out_preference.md`
+- `logics/backlog/item_214_home_help_button_relaunches_full_onboarding_flow_independent_of_auto_open_setting.md`
+- `logics/backlog/item_215_contextual_info_buttons_open_independent_single_step_onboarding_modals_in_relevant_panels.md`
+- `logics/backlog/item_216_onboarding_step_cta_opens_target_screen_and_scrolls_to_relevant_panel.md`
+- `logics/backlog/item_217_onboarding_modal_visual_design_assets_bold_emphasis_responsive_and_accessibility_polish.md`
+- `logics/backlog/item_218_onboarding_flow_regression_tests_for_auto_open_opt_out_contextual_steps_and_navigation_cta.md`
+- `logics/backlog/item_219_req_035_onboarding_flow_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # References
 - `src/app/AppController.tsx`
