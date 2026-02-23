@@ -217,6 +217,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setTableDensity,
     tableFontSize,
     setTableFontSize,
+    defaultWireSectionMm2,
+    setDefaultWireSectionMm2,
     defaultSortField,
     setDefaultSortField,
     defaultSortDirection,
@@ -617,6 +619,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     themeMode,
     tableDensity,
     tableFontSize,
+    defaultWireSectionMm2,
     defaultSortField,
     defaultSortDirection,
     defaultIdSortDirection,
@@ -639,6 +642,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     preferencesHydrated,
     setTableDensity,
     setTableFontSize,
+    setDefaultWireSectionMm2,
     setDefaultSortField,
     setDefaultSortDirection,
     setDefaultIdSortDirection,
@@ -888,6 +892,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setThemeMode,
       setTableDensity,
       setTableFontSize,
+      setDefaultWireSectionMm2,
       setDefaultSortField,
       setDefaultSortDirection,
       setDefaultIdSortDirection,
@@ -1029,6 +1034,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setWireName: formsState.setWireName,
     wireTechnicalId: formsState.wireTechnicalId,
     setWireTechnicalId: formsState.setWireTechnicalId,
+    wireSectionMm2: formsState.wireSectionMm2,
+    setWireSectionMm2: formsState.setWireSectionMm2,
     wireEndpointAKind: formsState.wireEndpointAKind,
     setWireEndpointAKind: formsState.setWireEndpointAKind,
     wireEndpointAConnectorId: formsState.wireEndpointAConnectorId,
@@ -1054,7 +1061,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setWireFormError: formsState.setWireFormError,
     selectedConnectorId,
     selectedSpliceId,
-    selectedWire
+    selectedWire,
+    defaultWireSectionMm2
   });
   const { connector: connectorHandlers, splice: spliceHandlers, node: nodeHandlers, segment: segmentHandlers, wire: wireHandlers } =
     modelingHandlers;
@@ -1613,6 +1621,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setTableDensity,
           tableFontSize,
           setTableFontSize,
+          defaultWireSectionMm2,
+          setDefaultWireSectionMm2,
           defaultSortField,
           setDefaultSortField,
           defaultSortDirection,

@@ -79,6 +79,7 @@ export interface Wire {
   id: WireId;
   name: string;
   technicalId: string;
+  sectionMm2: number;
   endpointA: WireEndpoint;
   endpointB: WireEndpoint;
   routeSegmentIds: SegmentId[];

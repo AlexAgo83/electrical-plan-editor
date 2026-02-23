@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { DEFAULT_WIRE_SECTION_MM2, normalizeWireSectionMm2 } from "../../core/wireSection";
 import type { ThemeMode } from "../../store";
 import type {
   CanvasCalloutTextSize,
@@ -62,6 +63,7 @@ interface UiPreferencesPayload {
   themeMode: ThemeMode;
   tableDensity: TableDensity;
   tableFontSize: TableFontSizePreference;
+  defaultWireSectionMm2: number;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
   defaultIdSortDirection: SortDirection;
@@ -116,6 +118,7 @@ interface UseUiPreferencesOptions {
   themeMode: ThemeMode;
   tableDensity: TableDensity;
   tableFontSize: TableFontSizePreference;
+  defaultWireSectionMm2: number;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
   defaultIdSortDirection: SortDirection;
@@ -139,6 +142,7 @@ interface UseUiPreferencesOptions {
   setThemeMode: (mode: ThemeMode) => void;
   setTableDensity: (density: TableDensity) => void;
   setTableFontSize: (value: TableFontSizePreference) => void;
+  setDefaultWireSectionMm2: (value: number) => void;
   setDefaultSortField: (field: SortField) => void;
   setDefaultSortDirection: (direction: SortDirection) => void;
   setDefaultIdSortDirection: (direction: SortDirection) => void;
@@ -208,6 +212,7 @@ export function useUiPreferences({
   themeMode,
   tableDensity,
   tableFontSize,
+  defaultWireSectionMm2,
   defaultSortField,
   defaultSortDirection,
   defaultIdSortDirection,
@@ -231,6 +236,7 @@ export function useUiPreferences({
   setThemeMode,
   setTableDensity,
   setTableFontSize,
+  setDefaultWireSectionMm2,
   setDefaultSortField,
   setDefaultSortDirection,
   setDefaultIdSortDirection,
@@ -276,6 +282,7 @@ export function useUiPreferences({
     const preferences = readUiPreferences();
     if (preferences !== null) {
       const sortField = preferences.defaultSortField === "technicalId" ? "technicalId" : "name";
+      const defaultWireSectionMm2Value = normalizeWireSectionMm2(preferences.defaultWireSectionMm2) ?? DEFAULT_WIRE_SECTION_MM2;
       const sortDirection = preferences.defaultSortDirection === "desc" ? "desc" : "asc";
       const idSortDirection = preferences.defaultIdSortDirection === "desc" ? "desc" : "asc";
       const showGridDefault =
@@ -317,6 +324,7 @@ export function useUiPreferences({
           ? preferences.tableFontSize
           : "normal"
       );
+      setDefaultWireSectionMm2(defaultWireSectionMm2Value);
       setDefaultSortField(sortField);
       setDefaultSortDirection(sortDirection);
       setDefaultIdSortDirection(idSortDirection);
@@ -384,6 +392,7 @@ export function useUiPreferences({
     setCanvasResetZoomPercentInput,
     setConnectorSort,
     setDefaultIdSortDirection,
+    setDefaultWireSectionMm2,
     setDefaultSortDirection,
     setDefaultSortField,
     setNetworkSort,
@@ -425,6 +434,7 @@ export function useUiPreferences({
       themeMode,
       tableDensity,
       tableFontSize,
+      defaultWireSectionMm2,
       defaultSortField,
       defaultSortDirection,
       defaultIdSortDirection,
@@ -473,6 +483,7 @@ export function useUiPreferences({
     showShortcutHints,
     tableDensity,
     tableFontSize,
+    defaultWireSectionMm2,
     themeMode,
     workspacePanelsLayoutMode
   ]);

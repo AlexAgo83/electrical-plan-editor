@@ -37,6 +37,8 @@ interface SettingsWorkspaceContentProps {
   setTableDensity: (value: TableDensity) => void;
   tableFontSize: TableFontSize;
   setTableFontSize: (value: TableFontSize) => void;
+  defaultWireSectionMm2: number;
+  setDefaultWireSectionMm2: (value: number) => void;
   defaultSortField: SortField;
   setDefaultSortField: (value: SortField) => void;
   defaultSortDirection: SortDirection;
@@ -104,6 +106,8 @@ export function SettingsWorkspaceContent({
   setTableDensity,
   tableFontSize,
   setTableFontSize,
+  defaultWireSectionMm2,
+  setDefaultWireSectionMm2,
   defaultSortField,
   setDefaultSortField,
   defaultSortDirection,
@@ -463,6 +467,22 @@ export function SettingsWorkspaceContent({
               <option value="multiColumn">Responsive multi-column</option>
               <option value="singleColumn">Force single column</option>
             </select>
+          </label>
+          <label className="settings-field">
+            Default wire section (mm²)
+            <input
+              type="number"
+              min={0.01}
+              step={0.01}
+              value={String(defaultWireSectionMm2)}
+              onChange={(event) => {
+                const nextValue = Number(event.target.value.replace(",", "."));
+                if (!Number.isFinite(nextValue) || nextValue <= 0) {
+                  return;
+                }
+                setDefaultWireSectionMm2(nextValue);
+              }}
+            />
           </label>
         </div>
         <div className="row-actions settings-actions">

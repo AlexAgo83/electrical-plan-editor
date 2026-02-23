@@ -74,6 +74,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setThemeMode"
     | "setTableDensity"
     | "setTableFontSize"
+    | "setDefaultWireSectionMm2"
     | "setDefaultSortField"
     | "setDefaultSortDirection"
     | "setDefaultIdSortDirection"

@@ -1,4 +1,5 @@
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
+import { resolveWireSectionMm2 } from "../../core/wireSection";
 import type {
   Connector,
   ConnectorId,
@@ -67,6 +68,26 @@ function normalizeNodePositions(candidate: unknown): Record<NodeId, LayoutNodePo
   return normalized;
 }
 
+function normalizeWireEntityState(candidate: EntityState<Wire, WireId>): EntityState<Wire, WireId> {
+  const byId = {} as EntityState<Wire, WireId>["byId"];
+  for (const wireId of candidate.allIds) {
+    const wire = candidate.byId[wireId];
+    if (wire === undefined) {
+      continue;
+    }
+
+    byId[wireId] = {
+      ...wire,
+      sectionMm2: resolveWireSectionMm2((wire as Partial<Wire>).sectionMm2)
+    };
+  }
+
+  return {
+    allIds: [...candidate.allIds],
+    byId
+  };
+}
+
 function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | null {
   if (!isRecord(candidate)) {
     return null;
@@ -89,7 +110,7 @@ function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | n
     splices: candidate.splices as NetworkScopedState["splices"],
     nodes: candidate.nodes as NetworkScopedState["nodes"],
     segments: candidate.segments as NetworkScopedState["segments"],
-    wires: candidate.wires as NetworkScopedState["wires"],
+    wires: normalizeWireEntityState(candidate.wires as EntityState<Wire, WireId>),
     nodePositions: normalizeNodePositions(candidate.nodePositions),
     connectorCavityOccupancy: candidate.connectorCavityOccupancy as NetworkScopedState["connectorCavityOccupancy"],
     splicePortOccupancy: candidate.splicePortOccupancy as NetworkScopedState["splicePortOccupancy"]
@@ -140,6 +161,7 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     ...(candidate as unknown as AppState),
     schemaVersion: APP_SCHEMA_VERSION,
     networkStates: normalizedNetworkStates,
+    wires: normalizeWireEntityState(candidate.wires as EntityState<Wire, WireId>),
     nodePositions: normalizeNodePositions(candidate.nodePositions)
   } satisfies AppState;
 
@@ -353,7 +375,7 @@ function migrateLegacySingleNetworkStateToCurrent(
     splices: legacy.splices,
     nodes: legacy.nodes,
     segments: legacy.segments,
-    wires: legacy.wires,
+    wires: normalizeWireEntityState(legacy.wires),
     nodePositions: {} as Record<NodeId, LayoutNodePosition>,
     connectorCavityOccupancy: legacy.connectorCavityOccupancy,
     splicePortOccupancy: legacy.splicePortOccupancy

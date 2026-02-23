@@ -74,6 +74,8 @@ export interface ModelingFormsColumnProps {
   setWireName: (value: string) => void;
   wireTechnicalId: string;
   setWireTechnicalId: (value: string) => void;
+  wireSectionMm2: string;
+  setWireSectionMm2: (value: string) => void;
   wireTechnicalIdAlreadyUsed: boolean;
   wireEndpointAKind: WireEndpoint["kind"];
   setWireEndpointAKind: (value: WireEndpoint["kind"]) => void;

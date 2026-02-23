@@ -261,6 +261,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setWireName: formsState.setWireName,
     wireTechnicalId: formsState.wireTechnicalId,
     setWireTechnicalId: formsState.setWireTechnicalId,
+    wireSectionMm2: formsState.wireSectionMm2,
+    setWireSectionMm2: formsState.setWireSectionMm2,
     wireTechnicalIdAlreadyUsed,
     wireEndpointAKind: formsState.wireEndpointAKind,
     setWireEndpointAKind: formsState.setWireEndpointAKind,

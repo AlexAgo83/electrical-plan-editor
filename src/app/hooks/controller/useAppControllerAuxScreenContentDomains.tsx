@@ -150,6 +150,8 @@ export function useAppControllerAuxScreenContentDomains({
     setTableDensity: settings.prefs.setTableDensity,
     tableFontSize: settings.prefs.tableFontSize,
     setTableFontSize: settings.prefs.setTableFontSize,
+    defaultWireSectionMm2: settings.prefs.defaultWireSectionMm2,
+    setDefaultWireSectionMm2: settings.prefs.setDefaultWireSectionMm2,
     defaultSortField: settings.prefs.defaultSortField,
     setDefaultSortField: settings.prefs.setDefaultSortField,
     defaultSortDirection: settings.prefs.defaultSortDirection,

@@ -84,6 +84,7 @@ export type AppAction =
         id: WireId;
         name: string;
         technicalId: string;
+        sectionMm2?: number;
         endpointA: WireEndpoint;
         endpointB: WireEndpoint;
       };
@@ -166,6 +167,7 @@ export const appActions = {
     id: WireId;
     name: string;
     technicalId: string;
+    sectionMm2?: number;
     endpointA: WireEndpoint;
     endpointB: WireEndpoint;
   }): AppAction => ({ type: "wire/save", payload }),
