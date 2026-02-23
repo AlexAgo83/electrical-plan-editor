@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { APP_SCHEMA_VERSION } from "../core/schema";
 import {
   PERSISTED_STATE_PAYLOAD_KIND,
   PERSISTED_STATE_SCHEMA_VERSION,

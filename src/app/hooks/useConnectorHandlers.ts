@@ -3,6 +3,10 @@ import type { Connector, ConnectorId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { createEntityId, toPositiveInteger } from "../lib/app-utils-shared";
+import {
+  suggestAutoConnectorNodeId,
+  suggestNextConnectorTechnicalId
+} from "../lib/technical-id-suggestions";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -49,10 +53,13 @@ export function useConnectorHandlers({
   connectorOccupantRefInput
 }: UseConnectorHandlersParams) {
   function resetConnectorForm(): void {
+    const state = store.getState();
     setConnectorFormMode("create");
     setEditingConnectorId(null);
     setConnectorName("");
-    setConnectorTechnicalId("");
+    setConnectorTechnicalId(
+      suggestNextConnectorTechnicalId(Object.values(state.connectors.byId).map((connector) => connector.technicalId))
+    );
     setCavityCount("4");
     setConnectorFormError(null);
   }
@@ -115,6 +122,34 @@ export function useConnectorHandlers({
     const savedConnector = nextState.connectors.byId[connectorId];
     if (savedConnector !== undefined) {
       if (wasCreateMode) {
+        const existingNodeForConnector = nextState.nodes.allIds.some((nodeId) => {
+          const node = nextState.nodes.byId[nodeId];
+          return node?.kind === "connector" && node.connectorId === connectorId;
+        });
+
+        if (!existingNodeForConnector) {
+          const autoNodeId = suggestAutoConnectorNodeId(savedConnector.technicalId, nextState.nodes.allIds);
+          dispatchAction(
+            appActions.upsertNode({
+              id: autoNodeId,
+              kind: "connector",
+              connectorId
+            }),
+            { trackHistory: false }
+          );
+
+          const stateAfterNodeCreate = store.getState();
+          const linkedNodeExists = stateAfterNodeCreate.nodes.allIds.some((nodeId) => {
+            const node = stateAfterNodeCreate.nodes.byId[nodeId];
+            return node?.kind === "connector" && node.connectorId === connectorId;
+          });
+          if (!linkedNodeExists) {
+            setConnectorFormError(
+              "Connector created, but the linked connector node could not be created automatically. Create it manually in Nodes."
+            );
+          }
+        }
+
         startConnectorEdit(savedConnector);
         return;
       }
