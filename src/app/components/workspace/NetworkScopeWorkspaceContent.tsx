@@ -71,6 +71,7 @@ export function NetworkScopeWorkspaceContent({
   const isFormOpen = isCreateMode || isEditMode;
   const [focusedNetworkId, setFocusedNetworkId] = useState<NetworkId | null>(activeNetworkId);
   const rowRefs = useRef<Partial<Record<NetworkId, HTMLTableRowElement | null>>>({});
+  const lastHandledFocusRequestTokenRef = useRef<number>(-1);
 
   const sortedNetworks = useMemo(
     () =>
@@ -115,19 +116,24 @@ export function NetworkScopeWorkspaceContent({
       return;
     }
 
+    if (lastHandledFocusRequestTokenRef.current === focusRequestedNetworkToken) {
+      return;
+    }
+
     if (!networks.some((network) => network.id === focusRequestedNetworkId)) {
       return;
     }
 
+    lastHandledFocusRequestTokenRef.current = focusRequestedNetworkToken;
     setFocusedNetworkId(focusRequestedNetworkId);
-  }, [focusRequestedNetworkId, focusRequestedNetworkToken, networks]);
-
-  useEffect(() => {
-    if (focusedNetworkId === null) {
+    if (typeof window === "undefined") {
+      rowRefs.current[focusRequestedNetworkId]?.focus();
       return;
     }
-    rowRefs.current[focusedNetworkId]?.focus();
-  }, [focusedNetworkId, sortedNetworks]);
+    window.requestAnimationFrame(() => {
+      rowRefs.current[focusRequestedNetworkId]?.focus();
+    });
+  }, [focusRequestedNetworkId, focusRequestedNetworkToken, networks]);
 
   const indicators = [
     { label: "Connectors", value: focusedNetworkCounts?.connectorCount ?? 0 },
@@ -231,7 +237,8 @@ export function NetworkScopeWorkspaceContent({
                         className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
                         aria-selected={isFocused}
                         tabIndex={0}
-                        onClick={() => {
+                        onClick={(event) => {
+                          event.currentTarget.focus();
                           setFocusedNetworkId(network.id);
                           handleOpenEditNetworkForm(network.id);
                         }}
