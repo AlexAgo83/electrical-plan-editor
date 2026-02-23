@@ -250,6 +250,98 @@ describe("App integration UI - settings", () => {
     ).toBeInTheDocument();
   });
 
+  it("recreates sample networks without deleting user-created networks", () => {
+    const sampled = createSampleNetworkState();
+    const withUserNetwork = appReducer(
+      sampled,
+      appActions.createNetwork({
+        id: ("net-user-custom" as NetworkId),
+        name: "User custom network",
+        technicalId: "NET-USER-CUSTOM",
+        createdAt: "2026-02-24T12:00:00.000Z",
+        updatedAt: "2026-02-24T12:00:00.000Z"
+      })
+    );
+
+    renderAppWithState(withUserNetwork);
+    switchScreenDrawerAware("settings");
+
+    const sampleControlsPanel = getPanelByHeading("Sample network controls");
+    const recreateButton = within(sampleControlsPanel).getByRole("button", { name: "Recreate sample network" });
+    expect(recreateButton).toBeEnabled();
+    fireEvent.click(recreateButton);
+
+    switchScreenDrawerAware("networkScope");
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    expect(within(networkScopePanel).getByText("User custom network")).toBeInTheDocument();
+    expect(within(networkScopePanel).getByText("Lighting branch demo")).toBeInTheDocument();
+    expect(within(networkScopePanel).getByText("Sensor backbone demo")).toBeInTheDocument();
+  });
+
+  it("resets built-in sample networks to baseline without deleting user-created networks", () => {
+    const sampled = createSampleNetworkState();
+    const withUserNetwork = appReducer(
+      sampled,
+      appActions.createNetwork({
+        id: ("net-user-custom" as NetworkId),
+        name: "User custom network",
+        technicalId: "NET-USER-CUSTOM",
+        createdAt: "2026-02-24T12:10:00.000Z",
+        updatedAt: "2026-02-24T12:10:00.000Z"
+      })
+    );
+
+    renderAppWithState(withUserNetwork);
+    switchScreenDrawerAware("settings");
+
+    const sampleControlsPanel = getPanelByHeading("Sample network controls");
+    const resetButton = within(sampleControlsPanel).getByRole("button", {
+      name: "Reset sample network to baseline"
+    });
+    expect(resetButton).toBeEnabled();
+
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    fireEvent.click(resetButton);
+    confirmSpy.mockRestore();
+
+    switchScreenDrawerAware("networkScope");
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    expect(within(networkScopePanel).getByText("User custom network")).toBeInTheDocument();
+    expect(within(networkScopePanel).getByText("Main network sample")).toBeInTheDocument();
+  });
+
+  it("recreates validation issues sample without deleting user-created networks", () => {
+    const sampled = createSampleNetworkState();
+    const withUserNetwork = appReducer(
+      sampled,
+      appActions.createNetwork({
+        id: ("net-user-custom" as NetworkId),
+        name: "User custom network",
+        technicalId: "NET-USER-CUSTOM",
+        createdAt: "2026-02-24T12:20:00.000Z",
+        updatedAt: "2026-02-24T12:20:00.000Z"
+      })
+    );
+
+    renderAppWithState(withUserNetwork);
+    switchScreenDrawerAware("settings");
+    const sampleControlsPanel = getPanelByHeading("Sample network controls");
+    const validationSampleButton = within(sampleControlsPanel).getByRole("button", {
+      name: "Recreate validation issues sample"
+    });
+
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    fireEvent.click(validationSampleButton);
+    confirmSpy.mockRestore();
+
+    switchScreenDrawerAware("networkScope");
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    expect(within(networkScopePanel).getByText("User custom network")).toBeInTheDocument();
+
+    switchScreenDrawerAware("validation");
+    expect(getPanelByHeading("Validation center")).toBeInTheDocument();
+  });
+
   it("keeps settings workspace accessible when no active network exists", () => {
     const initial = createInitialState();
     const noNetwork = appReducer(initial, appActions.deleteNetwork(initial.activeNetworkId as NetworkId));

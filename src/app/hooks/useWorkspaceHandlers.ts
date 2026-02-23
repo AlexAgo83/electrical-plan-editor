@@ -1,8 +1,9 @@
 import type { FormEvent } from "react";
 import type { Connector, ConnectorId, Network, NetworkId, NetworkNode, NodeId, Splice, SpliceId } from "../../core/entities";
-import type { AppStore, ThemeMode } from "../../store";
+import type { AppState, AppStore, ThemeMode } from "../../store";
 import {
   appActions,
+  appReducer,
   createSampleNetworkState,
   createValidationIssuesSampleNetworkState,
   selectNetworkTechnicalIdTaken
@@ -198,6 +199,37 @@ export function useWorkspaceHandlers({
   setShowFloatingInspectorPanel,
   setWorkspacePanelsLayoutMode
 }: UseWorkspaceHandlersParams) {
+  function refreshBuiltInSampleNetworks(
+    sampleFactory: () => AppState,
+    options?: { activateImportedSample?: boolean }
+  ): void {
+    const currentState = store.getState();
+    const sampleState = sampleFactory();
+    const sampleNetworkIds = sampleState.networks.allIds;
+    const sampleActiveNetworkId = sampleState.activeNetworkId;
+
+    let nextState = currentState;
+    for (const sampleNetworkId of sampleNetworkIds) {
+      if (nextState.networks.byId[sampleNetworkId] === undefined) {
+        continue;
+      }
+      nextState = appReducer(nextState, appActions.deleteNetwork(sampleNetworkId));
+    }
+
+    const orderedSampleNetworkIds =
+      options?.activateImportedSample === true && sampleActiveNetworkId !== null
+        ? [sampleActiveNetworkId, ...sampleNetworkIds.filter((networkId) => networkId !== sampleActiveNetworkId)]
+        : sampleNetworkIds;
+    const sampleNetworks = orderedSampleNetworkIds
+      .map((networkId) => sampleState.networks.byId[networkId])
+      .filter((network): network is NonNullable<typeof network> => network !== undefined);
+    const imported = appReducer(
+      nextState,
+      appActions.importNetworks(sampleNetworks, sampleState.networkStates, options?.activateImportedSample ?? false)
+    );
+    replaceStateWithHistory(imported);
+  }
+
   function handleCreateNetwork(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
 
@@ -329,11 +361,9 @@ export function useWorkspaceHandlers({
   }
 
   function handleRecreateSampleNetwork(): void {
-    if (!isCurrentWorkspaceEmpty) {
-      return;
-    }
-
-    replaceStateWithHistory(createSampleNetworkState());
+    refreshBuiltInSampleNetworks(createSampleNetworkState, {
+      activateImportedSample: isCurrentWorkspaceEmpty
+    });
   }
 
   function handleResetSampleNetwork(): void {
@@ -350,20 +380,24 @@ export function useWorkspaceHandlers({
       }
     }
 
-    replaceStateWithHistory(createSampleNetworkState());
+    refreshBuiltInSampleNetworks(createSampleNetworkState, {
+      activateImportedSample: true
+    });
   }
 
   function handleRecreateValidationIssuesSampleNetwork(): void {
     if (!isCurrentWorkspaceEmpty && typeof window !== "undefined" && typeof window.confirm === "function") {
       const shouldReplace = window.confirm(
-        "Replace the current workspace with the validation issues sample? This removes current workspace changes."
+        "Refresh built-in sample networks with the validation issues sample? User-created networks are preserved."
       );
       if (!shouldReplace) {
         return;
       }
     }
 
-    replaceStateWithHistory(createValidationIssuesSampleNetworkState());
+    refreshBuiltInSampleNetworks(createValidationIssuesSampleNetworkState, {
+      activateImportedSample: true
+    });
   }
 
   function resetNetworkViewToConfiguredScale(): void {
