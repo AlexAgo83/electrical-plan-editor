@@ -214,6 +214,53 @@ describe("appReducer entity lifecycle", () => {
     expect(third.ui.lastError).toBe("Only one splice node is allowed per splice.");
   });
 
+  it("renames a node atomically and remaps segments, layout positions, and node selection", () => {
+    const state = reduceAll([
+      appActions.upsertNode({ id: asNodeId("N1"), kind: "intermediate", label: "Node 1" }),
+      appActions.upsertNode({ id: asNodeId("N2"), kind: "intermediate", label: "Node 2" }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG1"),
+        nodeA: asNodeId("N1"),
+        nodeB: asNodeId("N2"),
+        lengthMm: 100
+      }),
+      appActions.setNodePosition(asNodeId("N1"), { x: 10, y: 20 }),
+      appActions.select({ kind: "node", id: "N1" })
+    ]);
+
+    const renamed = appReducer(state, appActions.renameNode(asNodeId("N1"), asNodeId("N1A")));
+
+    expect(renamed.nodes.byId[asNodeId("N1")]).toBeUndefined();
+    expect(renamed.nodes.byId[asNodeId("N1A")]).toBeDefined();
+    expect(renamed.nodes.allIds).toContain(asNodeId("N1A"));
+    expect(renamed.segments.byId[asSegmentId("SEG1")]?.nodeA).toBe(asNodeId("N1A"));
+    expect(renamed.nodePositions[asNodeId("N1")]).toBeUndefined();
+    expect(renamed.nodePositions[asNodeId("N1A")]).toEqual({ x: 10, y: 20 });
+    expect(renamed.ui.selected).toEqual({ kind: "node", id: "N1A" });
+    expect(renamed.ui.lastError).toBeNull();
+  });
+
+  it("rejects node rename when target ID already exists", () => {
+    const state = reduceAll([
+      appActions.upsertNode({ id: asNodeId("N1"), kind: "intermediate", label: "Node 1" }),
+      appActions.upsertNode({ id: asNodeId("N2"), kind: "intermediate", label: "Node 2" })
+    ]);
+
+    const renamed = appReducer(state, appActions.renameNode(asNodeId("N1"), asNodeId("N2")));
+
+    expect(renamed.nodes.byId[asNodeId("N1")]).toBeDefined();
+    expect(renamed.nodes.byId[asNodeId("N2")]).toBeDefined();
+    expect(renamed.ui.lastError).toBe("Node ID 'N2' already exists.");
+  });
+
+  it("treats node rename to the same ID as a safe no-op", () => {
+    const state = reduceAll([appActions.upsertNode({ id: asNodeId("N1"), kind: "intermediate", label: "Node 1" })]);
+
+    const renamed = appReducer(state, appActions.renameNode(asNodeId("N1"), asNodeId("N1")));
+
+    expect(renamed).toBe(state);
+  });
+
   it("rejects invalid segment endpoints and length", () => {
     const withNodes = reduceAll([
       appActions.upsertNode({ id: asNodeId("N1"), kind: "intermediate", label: "Node 1" }),

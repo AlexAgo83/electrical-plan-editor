@@ -33,6 +33,7 @@ interface UseNodeHandlersParams {
   setNodeFormError: (value: string | null) => void;
   pendingNewNodePosition: NodePosition | null;
   setPendingNewNodePosition: (position: NodePosition | null) => void;
+  onNodeIdRenamed?: (fromId: NodeId, toId: NodeId) => void;
 }
 
 export function useNodeHandlers({
@@ -55,7 +56,8 @@ export function useNodeHandlers({
   setNodeLabel,
   setNodeFormError,
   pendingNewNodePosition,
-  setPendingNewNodePosition
+  setPendingNewNodePosition,
+  onNodeIdRenamed
 }: UseNodeHandlersParams) {
   function resetNodeForm(): void {
     const nextState = store.getState();
@@ -104,19 +106,26 @@ export function useNodeHandlers({
 
     const wasCreateMode = nodeFormMode === "create";
     const normalizedNodeId = nodeIdInput.trim();
-    const nodeId = (nodeFormMode === "edit" && editingNodeId !== null ? editingNodeId : normalizedNodeId) as NodeId;
-
-    if (nodeFormMode === "create") {
-      if (normalizedNodeId.length === 0) {
-        setNodeFormError("Node ID is required.");
-        return;
-      }
-
-      if (state.nodes.byId[nodeId] !== undefined) {
-        setNodeFormError(`Node ID '${normalizedNodeId}' already exists.`);
-        return;
-      }
+    if (normalizedNodeId.length === 0) {
+      setNodeFormError("Node ID is required.");
+      return;
     }
+
+    const isEditMode = nodeFormMode === "edit" && editingNodeId !== null;
+    const requestedNodeId = normalizedNodeId as NodeId;
+    const originalNodeId = isEditMode ? editingNodeId : null;
+    const shouldRename = originalNodeId !== null && originalNodeId !== requestedNodeId;
+
+    if (!isEditMode && state.nodes.byId[requestedNodeId] !== undefined) {
+      setNodeFormError(`Node ID '${normalizedNodeId}' already exists.`);
+      return;
+    }
+    if (shouldRename && state.nodes.byId[requestedNodeId] !== undefined) {
+      setNodeFormError(`Node ID '${normalizedNodeId}' already exists.`);
+      return;
+    }
+
+    let nextNodeDraft: NetworkNode;
 
     if (nodeKind === "intermediate") {
       const trimmedLabel = nodeLabel.trim();
@@ -124,54 +133,62 @@ export function useNodeHandlers({
         setNodeFormError("Intermediate node label is required.");
         return;
       }
-
-      setNodeFormError(null);
-      dispatchAction(appActions.upsertNode({ id: nodeId, kind: "intermediate", label: trimmedLabel }));
-    }
-
-    if (nodeKind === "connector") {
+      nextNodeDraft = { id: requestedNodeId, kind: "intermediate", label: trimmedLabel };
+    } else if (nodeKind === "connector") {
       if (nodeConnectorId.length === 0) {
         setNodeFormError("Select a connector to create a connector node.");
         return;
       }
-
-      setNodeFormError(null);
-      dispatchAction(
-        appActions.upsertNode({
-          id: nodeId,
-          kind: "connector",
-          connectorId: nodeConnectorId as ConnectorId
-        })
-      );
-    }
-
-    if (nodeKind === "splice") {
+      nextNodeDraft = {
+        id: requestedNodeId,
+        kind: "connector",
+        connectorId: nodeConnectorId as ConnectorId
+      };
+    } else {
       if (nodeSpliceId.length === 0) {
         setNodeFormError("Select a splice to create a splice node.");
         return;
       }
-
-      setNodeFormError(null);
-      dispatchAction(
-        appActions.upsertNode({
-          id: nodeId,
-          kind: "splice",
-          spliceId: nodeSpliceId as SpliceId
-        })
-      );
+      nextNodeDraft = {
+        id: requestedNodeId,
+        kind: "splice",
+        spliceId: nodeSpliceId as SpliceId
+      };
     }
 
-    const nextState = store.getState();
-    if (nextState.nodes.byId[nodeId] !== undefined) {
-      if (pendingNewNodePosition !== null) {
-        dispatchAction(appActions.setNodePosition(nodeId, pendingNewNodePosition), { trackHistory: false });
+    setNodeFormError(null);
+
+    let effectiveNodeId = requestedNodeId;
+    if (shouldRename && originalNodeId !== null) {
+      dispatchAction(appActions.renameNode(originalNodeId, requestedNodeId));
+      const postRenameState = store.getState();
+      if (postRenameState.nodes.byId[requestedNodeId] === undefined) {
+        setNodeFormError(postRenameState.ui.lastError ?? "Unable to rename node.");
+        return;
       }
-      const savedNode = nextState.nodes.byId[nodeId];
+      effectiveNodeId = requestedNodeId;
+      setEditingNodeId(requestedNodeId);
+      setNodeIdInput(requestedNodeId);
+      onNodeIdRenamed?.(originalNodeId, requestedNodeId);
+      nextNodeDraft = { ...nextNodeDraft, id: requestedNodeId };
+    } else if (originalNodeId !== null) {
+      effectiveNodeId = originalNodeId;
+      nextNodeDraft = { ...nextNodeDraft, id: originalNodeId };
+    }
+
+    dispatchAction(appActions.upsertNode(nextNodeDraft));
+
+    const nextState = store.getState();
+    if (nextState.nodes.byId[effectiveNodeId] !== undefined) {
+      if (pendingNewNodePosition !== null) {
+        dispatchAction(appActions.setNodePosition(effectiveNodeId, pendingNewNodePosition), { trackHistory: false });
+      }
+      const savedNode = nextState.nodes.byId[effectiveNodeId];
       if (savedNode !== undefined && wasCreateMode) {
         startNodeEdit(savedNode);
         return;
       }
-      dispatchAction(appActions.select({ kind: "node", id: nodeId }));
+      dispatchAction(appActions.select({ kind: "node", id: effectiveNodeId }));
       resetNodeForm();
     }
   }

@@ -74,6 +74,7 @@ export type AppAction =
     }
   | { type: "splice/releasePort"; payload: { spliceId: SpliceId; portIndex: number } }
   | { type: "node/upsert"; payload: NetworkNode }
+  | { type: "node/rename"; payload: { fromId: NodeId; toId: NodeId } }
   | { type: "node/remove"; payload: { id: NodeId } }
   | { type: "segment/upsert"; payload: Segment }
   | { type: "segment/remove"; payload: { id: SegmentId } }
@@ -155,6 +156,7 @@ export const appActions = {
   }),
 
   upsertNode: (payload: NetworkNode): AppAction => ({ type: "node/upsert", payload }),
+  renameNode: (fromId: NodeId, toId: NodeId): AppAction => ({ type: "node/rename", payload: { fromId, toId } }),
   removeNode: (id: NodeId): AppAction => ({ type: "node/remove", payload: { id } }),
 
   upsertSegment: (payload: Segment): AppAction => ({ type: "segment/upsert", payload }),

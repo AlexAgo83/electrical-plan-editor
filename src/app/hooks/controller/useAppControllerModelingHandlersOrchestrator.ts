@@ -56,6 +56,7 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setNodeFormError: Parameters<typeof useNodeHandlers>[0]["setNodeFormError"];
   pendingNewNodePosition: Parameters<typeof useNodeHandlers>[0]["pendingNewNodePosition"];
   setPendingNewNodePosition: Parameters<typeof useNodeHandlers>[0]["setPendingNewNodePosition"];
+  onNodeIdRenamed?: Parameters<typeof useNodeHandlers>[0]["onNodeIdRenamed"];
   segmentFormMode: Parameters<typeof useSegmentHandlers>[0]["segmentFormMode"];
   setSegmentFormMode: Parameters<typeof useSegmentHandlers>[0]["setSegmentFormMode"];
   editingSegmentId: Parameters<typeof useSegmentHandlers>[0]["editingSegmentId"];
@@ -154,6 +155,7 @@ export function useAppControllerModelingHandlersOrchestrator({
   setNodeFormError,
   pendingNewNodePosition,
   setPendingNewNodePosition,
+  onNodeIdRenamed,
   segmentFormMode,
   setSegmentFormMode,
   editingSegmentId,
@@ -262,7 +264,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     setNodeLabel,
     setNodeFormError,
     pendingNewNodePosition,
-    setPendingNewNodePosition
+    setPendingNewNodePosition,
+    onNodeIdRenamed
   });
 
   const segment = useSegmentHandlers({
