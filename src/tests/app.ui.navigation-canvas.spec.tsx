@@ -83,7 +83,12 @@ describe("App integration UI - navigation and canvas", () => {
     switchScreenDrawerAware("analysis");
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
-    expect(within(connectorAnalysisPanel).getByText("wire:W1:A")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("Wire W-1 / A")).toBeInTheDocument();
+    const wayIndexInput = within(connectorAnalysisPanel).getByLabelText("Way index") as HTMLInputElement;
+    expect(wayIndexInput.value).toBe("2");
+    fireEvent.change(wayIndexInput, { target: { value: "1" } });
+    expect(within(connectorAnalysisPanel).getByText(/Way C1 is already used/)).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByRole("button", { name: "Reserve way" })).toBeDisabled();
   });
 
   it("reflects splice port occupancy in real time", () => {
@@ -95,7 +100,12 @@ describe("App integration UI - navigation and canvas", () => {
     switchScreenDrawerAware("analysis");
 
     const spliceAnalysisPanel = getPanelByHeading("Splice analysis");
-    expect(within(spliceAnalysisPanel).getByText("wire:W1:B")).toBeInTheDocument();
+    expect(within(spliceAnalysisPanel).getByText("Wire W-1 / B")).toBeInTheDocument();
+    const portIndexInput = within(spliceAnalysisPanel).getByLabelText("Port index") as HTMLInputElement;
+    expect(portIndexInput.value).toBe("2");
+    fireEvent.change(portIndexInput, { target: { value: "1" } });
+    expect(within(spliceAnalysisPanel).getByText(/Port P1 is already used/)).toBeInTheDocument();
+    expect(within(spliceAnalysisPanel).getByRole("button", { name: "Reserve port" })).toBeDisabled();
   });
 
   it("highlights every segment in the selected wire route", () => {

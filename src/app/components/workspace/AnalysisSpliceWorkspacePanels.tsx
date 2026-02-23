@@ -1,4 +1,5 @@
-import { useState, type ReactElement } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
+import { formatOccupantRefForDisplay } from "../../lib/app-utils-networking";
 import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
@@ -12,6 +13,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     setSpliceOccupancyFilter,
     splices,
     visibleSplices,
+    wires,
     spliceSort,
     setSpliceSort,
     spliceOccupiedCountById,
@@ -29,6 +31,50 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     getSortIndicator
   } = props;
   const [spliceAnalysisView, setSpliceAnalysisView] = useState<"ports" | "synthesis">("ports");
+  const wireTechnicalIdById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire.technicalId] as const)), [wires]);
+  const formatOccupantRef = (occupantRef: string | null): string =>
+    occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
+  const nextFreePortIndex = splicePortStatuses.find((slot) => !slot.isOccupied)?.portIndex ?? null;
+  const parsedPortIndex = Number.parseInt(portIndexInput, 10);
+  const portIndexIsInteger = Number.isInteger(parsedPortIndex) && parsedPortIndex > 0;
+  const selectedPortSlot = portIndexIsInteger ? splicePortStatuses.find((slot) => slot.portIndex === parsedPortIndex) ?? null : null;
+  const portIsOccupied = selectedPortSlot?.isOccupied === true;
+  const portIndexOutOfRange =
+    selectedSplice !== null && portIndexIsInteger && (parsedPortIndex < 1 || parsedPortIndex > selectedSplice.portCount);
+  const spliceReserveValidationMessage =
+    selectedSplice === null || portIndexInput.trim() === ""
+      ? null
+      : !portIndexIsInteger
+        ? "Enter a valid port index."
+        : portIndexOutOfRange
+          ? `Port index must be between 1 and ${selectedSplice.portCount}.`
+          : portIsOccupied
+            ? `Port P${parsedPortIndex} is already used (${formatOccupantRef(selectedPortSlot.occupantRef)}).${
+                nextFreePortIndex === null ? " No available ports." : ` Suggested: P${nextFreePortIndex}.`
+              }`
+            : null;
+  const canReservePort =
+    selectedSplice !== null &&
+    portIndexInput.trim() !== "" &&
+    spliceOccupantRefInput.trim() !== "" &&
+    portIndexIsInteger &&
+    !portIndexOutOfRange &&
+    !portIsOccupied;
+
+  useEffect(() => {
+    if (selectedSplice === null || nextFreePortIndex === null) {
+      return;
+    }
+    setPortIndexInput(String(nextFreePortIndex));
+  }, [selectedSpliceId, splicePortStatuses, nextFreePortIndex, selectedSplice, setPortIndexInput]);
+
+  function handleReservePortSubmit(event: FormEvent<HTMLFormElement>): void {
+    if (!canReservePort) {
+      event.preventDefault();
+      return;
+    }
+    handleReservePort(event);
+  }
 
   return (
     <>
@@ -165,7 +211,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
               splicePortStatuses.map((slot) => [
                 `P${slot.portIndex}`,
                 slot.isOccupied ? "Occupied" : "Free",
-                slot.occupantRef ?? ""
+                formatOccupantRef(slot.occupantRef)
               ])
             );
             return;
@@ -200,7 +246,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
         <span className="splice-badge">Junction</span> <strong>{selectedSplice.name}</strong> ({selectedSplice.technicalId})
       </p>
       <p className="meta-line">Branch count: {splicePortStatuses.filter((slot) => slot.isOccupied).length}</p>
-      <form className="row-form" onSubmit={handleReservePort}>
+      <form className="row-form" onSubmit={handleReservePortSubmit}>
         <label>
           Port index
           <input
@@ -210,6 +256,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
             step={1}
             value={portIndexInput}
             onChange={(event) => setPortIndexInput(event.target.value)}
+            aria-invalid={spliceReserveValidationMessage !== null ? true : undefined}
             required
           />
         </label>
@@ -224,17 +271,24 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
           />
         </label>
 
-        <button type="submit" className="button-with-icon">
+        <button type="submit" className="button-with-icon" disabled={!canReservePort}>
           <span className="action-button-icon is-lock-move" aria-hidden="true" />
           Reserve port
         </button>
       </form>
+      {spliceReserveValidationMessage !== null ? <small className="inline-error">{spliceReserveValidationMessage}</small> : null}
+      {spliceReserveValidationMessage === null && nextFreePortIndex !== null ? (
+        <small className="inline-help">Suggested next free port: P{nextFreePortIndex}</small>
+      ) : null}
+      {spliceReserveValidationMessage === null && nextFreePortIndex === null ? (
+        <small className="inline-help">No available ports on this splice.</small>
+      ) : null}
 
       <div className="cavity-grid" aria-label="Splice port occupancy grid">
         {splicePortStatuses.map((slot) => (
           <article key={slot.portIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
             <h3>P{slot.portIndex}</h3>
-            <p>{slot.isOccupied ? slot.occupantRef : "Free"}</p>
+            <p>{slot.isOccupied ? formatOccupantRef(slot.occupantRef) : "Free"}</p>
             {slot.isOccupied ? (
               <button type="button" className="button-with-icon" onClick={() => handleReleasePort(slot.portIndex)}>
                 <span className="action-button-icon is-cancel" aria-hidden="true" />
