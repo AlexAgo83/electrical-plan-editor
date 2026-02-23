@@ -18,6 +18,20 @@
   padding: 1rem;
 }
 
+.onboarding-modal-layer.app-shell {
+  min-height: 0;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  gap: 0;
+  align-content: normal;
+  isolation: auto;
+}
+
+.onboarding-modal-layer.app-shell::before {
+  content: none;
+}
+
 .onboarding-modal-backdrop {
   position: absolute;
   inset: 0;
@@ -31,7 +45,7 @@
   width: min(100%, 42rem);
   border-radius: 0.9rem;
   border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-  background: var(--panel-bg, rgba(255, 255, 255, 0.98));
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 2%, canvas);
   color: inherit;
   box-shadow: 0 1rem 2.2rem rgba(0, 0, 0, 0.24);
   padding: 0.95rem;
@@ -61,8 +75,8 @@
   height: 2.1rem;
   padding: 0 0.35rem;
   border-radius: 0.6rem;
-  background: color-mix(in srgb, currentColor 11%, transparent);
-  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 34%, transparent);
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -145,11 +159,15 @@
 }
 
 .onboarding-modal-next-button {
-  border: 1px solid #7a99b3;
-  background: #e8f1f8;
-  color: #153048;
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 42%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
+  color: inherit;
   border-radius: 0.5rem;
   padding: 0.35rem 0.7rem;
+}
+
+.onboarding-modal-next-button:hover {
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 24%, transparent);
 }
 
 @media (max-width: 640px) {
