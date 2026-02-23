@@ -5,7 +5,8 @@ import type {
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
-  TableFontSize
+  TableFontSize,
+  WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
 const UI_PREFERENCES_SCHEMA_VERSION = 1;
@@ -47,6 +48,7 @@ function normalizeThemeMode(value: unknown): ThemeMode {
 
 type TableDensity = "comfortable" | "compact";
 type TableFontSizePreference = TableFontSize;
+type WorkspacePanelsLayoutPreference = WorkspacePanelsLayoutMode;
 type SortField = "name" | "technicalId" | "lengthMm";
 type SortDirection = "asc" | "desc";
 
@@ -78,6 +80,7 @@ interface UiPreferencesPayload {
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
   showFloatingInspectorPanel: boolean;
+  workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -131,6 +134,7 @@ interface UseUiPreferencesOptions {
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
   showFloatingInspectorPanel: boolean;
+  workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
   preferencesHydrated: boolean;
   setThemeMode: (mode: ThemeMode) => void;
   setTableDensity: (density: TableDensity) => void;
@@ -173,6 +177,7 @@ interface UseUiPreferencesOptions {
   setShowShortcutHints: (value: boolean) => void;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
   setShowFloatingInspectorPanel: (value: boolean) => void;
+  setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutPreference) => void;
   setPreferencesHydrated: (value: boolean) => void;
 }
 
@@ -191,6 +196,10 @@ function normalizeCanvasCalloutTextSize(value: unknown): CanvasCalloutTextSize {
 
 function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotationDegrees {
   return value === -90 || value === -45 || value === -20 || value === 20 || value === 45 || value === 90 ? value : -20;
+}
+
+function normalizeWorkspacePanelsLayoutMode(value: unknown): WorkspacePanelsLayoutPreference {
+  return value === "multiColumn" ? "multiColumn" : "singleColumn";
 }
 
 export function useUiPreferences({
@@ -217,6 +226,7 @@ export function useUiPreferences({
   showShortcutHints,
   keyboardShortcutsEnabled,
   showFloatingInspectorPanel,
+  workspacePanelsLayoutMode,
   preferencesHydrated,
   setThemeMode,
   setTableDensity,
@@ -259,6 +269,7 @@ export function useUiPreferences({
   setShowShortcutHints,
   setKeyboardShortcutsEnabled,
   setShowFloatingInspectorPanel,
+  setWorkspacePanelsLayoutMode,
   setPreferencesHydrated
 }: UseUiPreferencesOptions): void {
   useEffect(() => {
@@ -352,6 +363,7 @@ export function useUiPreferences({
       setShowFloatingInspectorPanel(
         typeof preferences.showFloatingInspectorPanel === "boolean" ? preferences.showFloatingInspectorPanel : true
       );
+      setWorkspacePanelsLayoutMode(normalizeWorkspacePanelsLayoutMode(preferences.workspacePanelsLayoutMode));
     }
 
     setPreferencesHydrated(true);
@@ -399,7 +411,8 @@ export function useUiPreferences({
     setTableFontSize,
     setThemeMode,
     setWireSort,
-    setConnectorSynthesisSort
+    setConnectorSynthesisSort,
+    setWorkspacePanelsLayoutMode
   ]);
 
   useEffect(() => {
@@ -429,7 +442,8 @@ export function useUiPreferences({
       canvasResetZoomPercentInput,
       showShortcutHints,
       keyboardShortcutsEnabled,
-      showFloatingInspectorPanel
+      showFloatingInspectorPanel,
+      workspacePanelsLayoutMode
     };
 
     try {
@@ -459,6 +473,7 @@ export function useUiPreferences({
     showShortcutHints,
     tableDensity,
     tableFontSize,
-    themeMode
+    themeMode,
+    workspacePanelsLayoutMode
   ]);
 }

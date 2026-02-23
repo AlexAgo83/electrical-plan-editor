@@ -26,7 +26,8 @@ import type {
   SortField,
   SortState,
   TableDensity,
-  TableFontSize
+  TableFontSize,
+  WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
 type DispatchAction = (
@@ -115,6 +116,7 @@ interface UseWorkspaceHandlersParams {
   setShowShortcutHints: (value: boolean) => void;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
   setShowFloatingInspectorPanel: (value: boolean) => void;
+  setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
 }
 
 export function useWorkspaceHandlers({
@@ -193,7 +195,8 @@ export function useWorkspaceHandlers({
   setCanvasResetZoomPercentInput,
   setShowShortcutHints,
   setKeyboardShortcutsEnabled,
-  setShowFloatingInspectorPanel
+  setShowFloatingInspectorPanel,
+  setWorkspacePanelsLayoutMode
 }: UseWorkspaceHandlersParams) {
   function handleCreateNetwork(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -596,6 +599,7 @@ export function useWorkspaceHandlers({
     setShowShortcutHints(false);
     setKeyboardShortcutsEnabled(true);
     setShowFloatingInspectorPanel(true);
+    setWorkspacePanelsLayoutMode("singleColumn");
   }
 
   return {

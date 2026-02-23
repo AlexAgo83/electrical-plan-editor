@@ -334,8 +334,8 @@ describe("App integration UI - settings", () => {
     expect(screen.getByRole("heading", { name: "Inspector context" })).toBeInTheDocument();
 
     switchScreenDrawerAware("settings");
-    const shortcutsPanel = getPanelByHeading("Action bar and shortcuts");
-    const inspectorToggle = within(shortcutsPanel).getByLabelText("Show floating inspector panel on supported screens");
+    const globalPreferencesPanel = getPanelByHeading("Global preferences");
+    const inspectorToggle = within(globalPreferencesPanel).getByLabelText("Show floating inspector panel on supported screens");
     expect(inspectorToggle).toBeChecked();
     fireEvent.click(inspectorToggle);
     expect(inspectorToggle).not.toBeChecked();

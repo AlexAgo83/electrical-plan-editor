@@ -1,12 +1,13 @@
 import { useMemo, type CSSProperties } from "react";
 import { clamp, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE } from "../lib/app-utils-shared";
 import type { ThemeMode } from "../../store";
-import type { TableDensity, TableFontSize } from "../types/app-controller";
+import type { TableDensity, TableFontSize, WorkspacePanelsLayoutMode } from "../types/app-controller";
 
 interface UseAppControllerShellDerivedStateParams {
   themeMode: ThemeMode;
   tableDensity: TableDensity;
   tableFontSize: TableFontSize;
+  workspacePanelsLayoutMode: WorkspacePanelsLayoutMode;
   headerOffsetPx: number;
   canvasResetZoomPercentInput: string;
 }
@@ -15,6 +16,7 @@ export function useAppControllerShellDerivedState({
   themeMode,
   tableDensity,
   tableFontSize,
+  workspacePanelsLayoutMode,
   headerOffsetPx,
   canvasResetZoomPercentInput
 }: UseAppControllerShellDerivedStateParams) {
@@ -37,6 +39,7 @@ export function useAppControllerShellDerivedState({
     "app-shell",
     tableDensity === "compact" ? "table-density-compact" : "",
     `table-font-${tableFontSize}`,
+    workspacePanelsLayoutMode === "singleColumn" ? "workspace-panels-layout-single-column" : "",
     ...resolvedThemeClassNames
   ]
     .filter((token) => token.length > 0)

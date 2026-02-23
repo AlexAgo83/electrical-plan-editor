@@ -92,6 +92,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setShowShortcutHints"
     | "setKeyboardShortcutsEnabled"
     | "setShowFloatingInspectorPanel"
+    | "setWorkspacePanelsLayoutMode"
   >;
 }
 

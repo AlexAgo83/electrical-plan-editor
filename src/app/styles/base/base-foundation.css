@@ -304,6 +304,18 @@ button {
   }
 }
 
+.app-shell.workspace-panels-layout-single-column .workspace-stage {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.app-shell.workspace-panels-layout-single-column .workspace-column-left,
+.app-shell.workspace-panels-layout-single-column .workspace-column-center,
+.app-shell.workspace-panels-layout-single-column .workspace-column-right {
+  grid-column: auto;
+  grid-row: auto;
+}
+
 .panel {
   border-radius: 0.75rem;
   border: 1px solid #cbdae6;

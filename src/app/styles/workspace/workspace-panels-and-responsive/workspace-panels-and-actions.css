@@ -102,6 +102,10 @@
   align-items: start;
 }
 
+.app-shell.workspace-panels-layout-single-column .network-scope-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 @media (min-width: 1040px) {
   .network-scope-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

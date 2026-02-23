@@ -9,7 +9,8 @@ import type {
   SortField,
   SortState,
   TableDensity,
-  TableFontSize
+  TableFontSize,
+  WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
 export function useAppControllerPreferencesState() {
@@ -35,6 +36,7 @@ export function useAppControllerPreferencesState() {
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [showFloatingInspectorPanel, setShowFloatingInspectorPanel] = useState(true);
+  const [workspacePanelsLayoutMode, setWorkspacePanelsLayoutMode] = useState<WorkspacePanelsLayoutMode>("singleColumn");
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
 
   return {
@@ -80,6 +82,8 @@ export function useAppControllerPreferencesState() {
     setKeyboardShortcutsEnabled,
     showFloatingInspectorPanel,
     setShowFloatingInspectorPanel,
+    workspacePanelsLayoutMode,
+    setWorkspacePanelsLayoutMode,
     preferencesHydrated,
     setPreferencesHydrated
   };

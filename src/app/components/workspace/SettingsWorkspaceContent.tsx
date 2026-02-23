@@ -10,7 +10,8 @@ import type {
   SortDirection,
   SortField,
   TableDensity,
-  TableFontSize
+  TableFontSize,
+  WorkspacePanelsLayoutMode
 } from "../../types/app-controller";
 import type { ImportExportStatus } from "../../types/app-controller";
 
@@ -76,6 +77,8 @@ interface SettingsWorkspaceContentProps {
   setKeyboardShortcutsEnabled: (value: boolean) => void;
   showFloatingInspectorPanel: boolean;
   setShowFloatingInspectorPanel: (value: boolean) => void;
+  workspacePanelsLayoutMode: WorkspacePanelsLayoutMode;
+  setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
   resetWorkspacePreferencesToDefaults: () => void;
 }
 
@@ -140,6 +143,8 @@ export function SettingsWorkspaceContent({
   setKeyboardShortcutsEnabled,
   showFloatingInspectorPanel,
   setShowFloatingInspectorPanel,
+  workspacePanelsLayoutMode,
+  setWorkspacePanelsLayoutMode,
   resetWorkspacePreferencesToDefaults
 }: SettingsWorkspaceContentProps): ReactElement {
   return (
@@ -439,7 +444,27 @@ export function SettingsWorkspaceContent({
           <h2>Global preferences</h2>
           <span className="settings-panel-chip">Defaults</span>
         </header>
-        <p className="settings-panel-intro">Reset shared UI preferences to their default values across the workspace.</p>
+        <p className="settings-panel-intro">Shared UI preferences applied across workspace screens (outside of screen-specific controls).</p>
+        <div className="settings-grid">
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={showFloatingInspectorPanel}
+              onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
+            />
+            Show floating inspector panel on supported screens
+          </label>
+          <label className="settings-field">
+            Workspace panels layout
+            <select
+              value={workspacePanelsLayoutMode}
+              onChange={(event) => setWorkspacePanelsLayoutMode(event.target.value as WorkspacePanelsLayoutMode)}
+            >
+              <option value="multiColumn">Responsive multi-column</option>
+              <option value="singleColumn">Force single column</option>
+            </select>
+          </label>
+        </div>
         <div className="row-actions settings-actions">
           <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
         </div>
@@ -463,14 +488,6 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
             />
             Enable keyboard shortcuts (undo/redo/navigation/issues/view)
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={showFloatingInspectorPanel}
-              onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
-            />
-            Show floating inspector panel on supported screens
           </label>
         </div>
         <ul className="settings-shortcut-list">

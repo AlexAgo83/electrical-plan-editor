@@ -363,6 +363,44 @@
   gap: 0.6rem;
 }
 
+.route-preview-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.route-preview-panel-header h2 {
+  margin: 0;
+}
+
+.route-preview-panel-toggle {
+  margin-left: auto;
+  min-height: 1.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+}
+
+.route-preview-panel-toggle-icon {
+  width: 0.78rem;
+  height: 0.78rem;
+  flex: 0 0 0.78rem;
+  background: currentColor;
+  -webkit-mask: url("/icons/ico_expand.svg") center / contain no-repeat;
+  mask: url("/icons/ico_expand.svg") center / contain no-repeat;
+  transition: transform 120ms ease;
+}
+
+.route-preview-panel-toggle-icon.is-collapse {
+  transform: rotate(180deg);
+}
+
+.route-preview-panel-body {
+  display: grid;
+  gap: 0.6rem;
+}
+
 .route-preview-form {
   margin: 0;
   gap: 0.55rem;

@@ -245,6 +245,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setKeyboardShortcutsEnabled,
     showFloatingInspectorPanel,
     setShowFloatingInspectorPanel,
+    workspacePanelsLayoutMode,
+    setWorkspacePanelsLayoutMode,
     preferencesHydrated,
     setPreferencesHydrated
   } = useAppControllerPreferencesState();
@@ -377,6 +379,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     themeMode,
     tableDensity,
     tableFontSize,
+    workspacePanelsLayoutMode,
     headerOffsetPx,
     canvasResetZoomPercentInput
   });
@@ -513,6 +516,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     showShortcutHints,
     keyboardShortcutsEnabled,
     showFloatingInspectorPanel,
+    workspacePanelsLayoutMode,
     preferencesHydrated,
     setTableDensity,
     setTableFontSize,
@@ -554,6 +558,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setShowShortcutHints,
     setKeyboardShortcutsEnabled,
     setShowFloatingInspectorPanel,
+    setWorkspacePanelsLayoutMode,
     setThemeMode,
     setPreferencesHydrated
   });
@@ -781,7 +786,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setCanvasPngExportIncludeBackground,
       setShowShortcutHints,
       setKeyboardShortcutsEnabled,
-      setShowFloatingInspectorPanel
+      setShowFloatingInspectorPanel,
+      setWorkspacePanelsLayoutMode
     }
   });
   const {
@@ -1459,6 +1465,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setKeyboardShortcutsEnabled,
           showFloatingInspectorPanel,
           setShowFloatingInspectorPanel,
+          workspacePanelsLayoutMode,
+          setWorkspacePanelsLayoutMode,
           preferencesHydrated,
           setPreferencesHydrated
         },
