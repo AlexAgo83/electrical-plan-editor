@@ -28,6 +28,9 @@ interface UseConnectorHandlersParams {
   setConnectorTechnicalId: (value: string) => void;
   connectorManufacturerReference: string;
   setConnectorManufacturerReference: (value: string) => void;
+  connectorAutoCreateLinkedNode: boolean;
+  setConnectorAutoCreateLinkedNode: (value: boolean) => void;
+  defaultAutoCreateLinkedNodes: boolean;
   cavityCount: string;
   setCavityCount: (value: string) => void;
   setConnectorFormError: (value: string | null) => void;
@@ -49,6 +52,9 @@ export function useConnectorHandlers({
   setConnectorTechnicalId,
   connectorManufacturerReference,
   setConnectorManufacturerReference,
+  connectorAutoCreateLinkedNode,
+  setConnectorAutoCreateLinkedNode,
+  defaultAutoCreateLinkedNodes,
   cavityCount,
   setCavityCount,
   setConnectorFormError,
@@ -65,6 +71,7 @@ export function useConnectorHandlers({
       suggestNextConnectorTechnicalId(Object.values(state.connectors.byId).map((connector) => connector.technicalId))
     );
     setConnectorManufacturerReference("");
+    setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setCavityCount("4");
     setConnectorFormError(null);
   }
@@ -75,6 +82,7 @@ export function useConnectorHandlers({
     setConnectorName("");
     setConnectorTechnicalId("");
     setConnectorManufacturerReference("");
+    setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setCavityCount("4");
     setConnectorFormError(null);
   }
@@ -90,6 +98,7 @@ export function useConnectorHandlers({
     setConnectorName(connector.name);
     setConnectorTechnicalId(connector.technicalId);
     setConnectorManufacturerReference(connector.manufacturerReference ?? "");
+    setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setCavityCount(String(connector.cavityCount));
     dispatchAction(appActions.select({ kind: "connector", id: connector.id }));
   }
@@ -141,7 +150,7 @@ export function useConnectorHandlers({
           return node?.kind === "connector" && node.connectorId === connectorId;
         });
 
-        if (!existingNodeForConnector) {
+        if (connectorAutoCreateLinkedNode && !existingNodeForConnector) {
           const autoNodeId = suggestAutoConnectorNodeId(savedConnector.technicalId, nextState.nodes.allIds);
           dispatchAction(
             appActions.upsertNode({

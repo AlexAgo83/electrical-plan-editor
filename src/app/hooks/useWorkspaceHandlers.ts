@@ -100,6 +100,7 @@ interface UseWorkspaceHandlersParams {
   setTableDensity: (value: TableDensity) => void;
   setTableFontSize: (value: TableFontSize) => void;
   setDefaultWireSectionMm2: (value: number) => void;
+  setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
   setDefaultSortField: (value: SortField) => void;
   setDefaultSortDirection: (value: SortDirection) => void;
   setDefaultIdSortDirection: (value: SortDirection) => void;
@@ -181,6 +182,7 @@ export function useWorkspaceHandlers({
   setTableDensity,
   setTableFontSize,
   setDefaultWireSectionMm2,
+  setDefaultAutoCreateLinkedNodes,
   setDefaultSortField,
   setDefaultSortDirection,
   setDefaultIdSortDirection,
@@ -598,6 +600,7 @@ export function useWorkspaceHandlers({
     setTableDensity("compact");
     setTableFontSize("normal");
     setDefaultWireSectionMm2(0.5);
+    setDefaultAutoCreateLinkedNodes(true);
     setDefaultSortField("name");
     setDefaultSortDirection("asc");
     setDefaultIdSortDirection("asc");

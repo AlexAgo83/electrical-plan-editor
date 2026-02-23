@@ -28,6 +28,9 @@ interface UseSpliceHandlersParams {
   setSpliceTechnicalId: (value: string) => void;
   spliceManufacturerReference: string;
   setSpliceManufacturerReference: (value: string) => void;
+  spliceAutoCreateLinkedNode: boolean;
+  setSpliceAutoCreateLinkedNode: (value: boolean) => void;
+  defaultAutoCreateLinkedNodes: boolean;
   portCount: string;
   setPortCount: (value: string) => void;
   setSpliceFormError: (value: string | null) => void;
@@ -49,6 +52,9 @@ export function useSpliceHandlers({
   setSpliceTechnicalId,
   spliceManufacturerReference,
   setSpliceManufacturerReference,
+  spliceAutoCreateLinkedNode,
+  setSpliceAutoCreateLinkedNode,
+  defaultAutoCreateLinkedNodes,
   portCount,
   setPortCount,
   setSpliceFormError,
@@ -63,6 +69,7 @@ export function useSpliceHandlers({
     setSpliceName("");
     setSpliceTechnicalId(suggestNextSpliceTechnicalId(Object.values(state.splices.byId).map((splice) => splice.technicalId)));
     setSpliceManufacturerReference("");
+    setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setPortCount("4");
     setSpliceFormError(null);
   }
@@ -73,6 +80,7 @@ export function useSpliceHandlers({
     setSpliceName("");
     setSpliceTechnicalId("");
     setSpliceManufacturerReference("");
+    setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setPortCount("4");
     setSpliceFormError(null);
   }
@@ -88,6 +96,7 @@ export function useSpliceHandlers({
     setSpliceName(splice.name);
     setSpliceTechnicalId(splice.technicalId);
     setSpliceManufacturerReference(splice.manufacturerReference ?? "");
+    setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setPortCount(String(splice.portCount));
     dispatchAction(appActions.select({ kind: "splice", id: splice.id }));
   }
@@ -139,7 +148,7 @@ export function useSpliceHandlers({
           return node?.kind === "splice" && node.spliceId === spliceId;
         });
 
-        if (!existingNodeForSplice) {
+        if (spliceAutoCreateLinkedNode && !existingNodeForSplice) {
           const autoNodeId = suggestAutoSpliceNodeId(savedSplice.technicalId, nextState.nodes.allIds);
           dispatchAction(
             appActions.upsertNode({

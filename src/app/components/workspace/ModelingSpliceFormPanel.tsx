@@ -14,6 +14,8 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     setSpliceTechnicalId,
     spliceManufacturerReference,
     setSpliceManufacturerReference,
+    spliceAutoCreateLinkedNode,
+    setSpliceAutoCreateLinkedNode,
     spliceTechnicalIdAlreadyUsed,
     portCount,
     setPortCount,
@@ -50,6 +52,15 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     <label>
       Port count
       <input type="number" min={1} step={1} value={portCount} onChange={(event) => setPortCount(event.target.value)} required />
+    </label>
+    <label className="settings-checkbox">
+      <input
+        type="checkbox"
+        checked={spliceAutoCreateLinkedNode}
+        onChange={(event) => setSpliceAutoCreateLinkedNode(event.target.checked)}
+        disabled={spliceFormMode !== "create"}
+      />
+      Auto-create linked node on splice creation
     </label>
     <div className="row-actions">
       <button

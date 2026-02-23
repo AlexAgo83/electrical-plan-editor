@@ -110,6 +110,9 @@ export function ModelingPrimaryTables({
   const lastAutoFocusedConnectorIdRef = useRef<ConnectorId | null>(null);
   const lastAutoFocusedSpliceIdRef = useRef<SpliceId | null>(null);
   const lastAutoFocusedNodeIdRef = useRef<NodeId | null>(null);
+  const previousConnectorFormModeRef = useRef<typeof connectorFormMode>(connectorFormMode);
+  const previousSpliceFormModeRef = useRef<typeof spliceFormMode>(spliceFormMode);
+  const previousNodeFormModeRef = useRef<typeof nodeFormMode>(nodeFormMode);
   const focusedConnector =
     selectedConnectorId === null ? null : (visibleConnectors.find((connector) => connector.id === selectedConnectorId) ?? null);
   const focusedSplice =
@@ -163,6 +166,51 @@ export function ModelingPrimaryTables({
       return;
     }
     lastAutoFocusedNodeIdRef.current = selectedNodeId;
+    if (typeof window === "undefined") {
+      nodeRowRefs.current[selectedNodeId]?.focus();
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      nodeRowRefs.current[selectedNodeId]?.focus();
+    });
+  }, [nodeFormMode, selectedNodeId]);
+
+  useEffect(() => {
+    const previousMode = previousConnectorFormModeRef.current;
+    previousConnectorFormModeRef.current = connectorFormMode;
+    if (previousMode !== "edit" || connectorFormMode !== "create" || selectedConnectorId === null) {
+      return;
+    }
+    if (typeof window === "undefined") {
+      connectorRowRefs.current[selectedConnectorId]?.focus();
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      connectorRowRefs.current[selectedConnectorId]?.focus();
+    });
+  }, [connectorFormMode, selectedConnectorId]);
+
+  useEffect(() => {
+    const previousMode = previousSpliceFormModeRef.current;
+    previousSpliceFormModeRef.current = spliceFormMode;
+    if (previousMode !== "edit" || spliceFormMode !== "create" || selectedSpliceId === null) {
+      return;
+    }
+    if (typeof window === "undefined") {
+      spliceRowRefs.current[selectedSpliceId]?.focus();
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      spliceRowRefs.current[selectedSpliceId]?.focus();
+    });
+  }, [spliceFormMode, selectedSpliceId]);
+
+  useEffect(() => {
+    const previousMode = previousNodeFormModeRef.current;
+    previousNodeFormModeRef.current = nodeFormMode;
+    if (previousMode !== "edit" || nodeFormMode !== "create" || selectedNodeId === null) {
+      return;
+    }
     if (typeof window === "undefined") {
       nodeRowRefs.current[selectedNodeId]?.focus();
       return;

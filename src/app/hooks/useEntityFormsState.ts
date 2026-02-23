@@ -7,6 +7,7 @@ export function useEntityFormsState() {
   const [connectorName, setConnectorName] = useState("");
   const [connectorTechnicalId, setConnectorTechnicalId] = useState("");
   const [connectorManufacturerReference, setConnectorManufacturerReference] = useState("");
+  const [connectorAutoCreateLinkedNode, setConnectorAutoCreateLinkedNode] = useState(true);
   const [cavityCount, setCavityCount] = useState("4");
   const [cavityIndexInput, setCavityIndexInput] = useState("1");
   const [connectorOccupantRefInput, setConnectorOccupantRefInput] = useState("manual-assignment");
@@ -17,6 +18,7 @@ export function useEntityFormsState() {
   const [spliceName, setSpliceName] = useState("");
   const [spliceTechnicalId, setSpliceTechnicalId] = useState("");
   const [spliceManufacturerReference, setSpliceManufacturerReference] = useState("");
+  const [spliceAutoCreateLinkedNode, setSpliceAutoCreateLinkedNode] = useState(true);
   const [portCount, setPortCount] = useState("4");
   const [portIndexInput, setPortIndexInput] = useState("1");
   const [spliceOccupantRefInput, setSpliceOccupantRefInput] = useState("manual-assignment");
@@ -75,6 +77,8 @@ export function useEntityFormsState() {
     setConnectorTechnicalId,
     connectorManufacturerReference,
     setConnectorManufacturerReference,
+    connectorAutoCreateLinkedNode,
+    setConnectorAutoCreateLinkedNode,
     cavityCount,
     setCavityCount,
     cavityIndexInput,
@@ -93,6 +97,8 @@ export function useEntityFormsState() {
     setSpliceTechnicalId,
     spliceManufacturerReference,
     setSpliceManufacturerReference,
+    spliceAutoCreateLinkedNode,
+    setSpliceAutoCreateLinkedNode,
     portCount,
     setPortCount,
     portIndexInput,

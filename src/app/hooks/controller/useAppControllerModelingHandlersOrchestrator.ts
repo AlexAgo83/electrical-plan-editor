@@ -23,6 +23,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setConnectorTechnicalId: Parameters<typeof useConnectorHandlers>[0]["setConnectorTechnicalId"];
   connectorManufacturerReference: Parameters<typeof useConnectorHandlers>[0]["connectorManufacturerReference"];
   setConnectorManufacturerReference: Parameters<typeof useConnectorHandlers>[0]["setConnectorManufacturerReference"];
+  connectorAutoCreateLinkedNode: Parameters<typeof useConnectorHandlers>[0]["connectorAutoCreateLinkedNode"];
+  setConnectorAutoCreateLinkedNode: Parameters<typeof useConnectorHandlers>[0]["setConnectorAutoCreateLinkedNode"];
   cavityCount: Parameters<typeof useConnectorHandlers>[0]["cavityCount"];
   setCavityCount: Parameters<typeof useConnectorHandlers>[0]["setCavityCount"];
   setConnectorFormError: Parameters<typeof useConnectorHandlers>[0]["setConnectorFormError"];
@@ -38,6 +40,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setSpliceTechnicalId: Parameters<typeof useSpliceHandlers>[0]["setSpliceTechnicalId"];
   spliceManufacturerReference: Parameters<typeof useSpliceHandlers>[0]["spliceManufacturerReference"];
   setSpliceManufacturerReference: Parameters<typeof useSpliceHandlers>[0]["setSpliceManufacturerReference"];
+  spliceAutoCreateLinkedNode: Parameters<typeof useSpliceHandlers>[0]["spliceAutoCreateLinkedNode"];
+  setSpliceAutoCreateLinkedNode: Parameters<typeof useSpliceHandlers>[0]["setSpliceAutoCreateLinkedNode"];
   portCount: Parameters<typeof useSpliceHandlers>[0]["portCount"];
   setPortCount: Parameters<typeof useSpliceHandlers>[0]["setPortCount"];
   setSpliceFormError: Parameters<typeof useSpliceHandlers>[0]["setSpliceFormError"];
@@ -125,6 +129,7 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   selectedSpliceId: Parameters<typeof useSpliceHandlers>[0]["selectedSpliceId"];
   selectedWire: SelectedWire;
   defaultWireSectionMm2: Parameters<typeof useWireHandlers>[0]["defaultWireSectionMm2"];
+  defaultAutoCreateLinkedNodes: boolean;
 }
 
 export function useAppControllerModelingHandlersOrchestrator({
@@ -141,6 +146,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setConnectorTechnicalId,
   connectorManufacturerReference,
   setConnectorManufacturerReference,
+  connectorAutoCreateLinkedNode,
+  setConnectorAutoCreateLinkedNode,
   cavityCount,
   setCavityCount,
   setConnectorFormError,
@@ -156,6 +163,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setSpliceTechnicalId,
   spliceManufacturerReference,
   setSpliceManufacturerReference,
+  spliceAutoCreateLinkedNode,
+  setSpliceAutoCreateLinkedNode,
   portCount,
   setPortCount,
   setSpliceFormError,
@@ -242,7 +251,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   selectedConnectorId,
   selectedSpliceId,
   selectedWire,
-  defaultWireSectionMm2
+  defaultWireSectionMm2,
+  defaultAutoCreateLinkedNodes
 }: UseAppControllerModelingHandlersOrchestratorParams) {
   const connector = useConnectorHandlers({
     store,
@@ -257,6 +267,9 @@ export function useAppControllerModelingHandlersOrchestrator({
     setConnectorTechnicalId,
     connectorManufacturerReference,
     setConnectorManufacturerReference,
+    connectorAutoCreateLinkedNode,
+    setConnectorAutoCreateLinkedNode,
+    defaultAutoCreateLinkedNodes,
     cavityCount,
     setCavityCount,
     setConnectorFormError,
@@ -278,6 +291,9 @@ export function useAppControllerModelingHandlersOrchestrator({
     setSpliceTechnicalId,
     spliceManufacturerReference,
     setSpliceManufacturerReference,
+    spliceAutoCreateLinkedNode,
+    setSpliceAutoCreateLinkedNode,
+    defaultAutoCreateLinkedNodes,
     portCount,
     setPortCount,
     setSpliceFormError,

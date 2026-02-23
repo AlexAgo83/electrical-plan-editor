@@ -119,6 +119,33 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(within(nodesPanel).getByText("Auto node splice (S-001)")).toBeInTheDocument();
   });
 
+  it("allows disabling linked node auto-creation per connector/splice create form", () => {
+    renderAppWithState(createInitialState());
+    switchScreenDrawerAware("modeling");
+
+    fireEvent.click(within(getPanelByHeading("Connector form")).getByRole("button", { name: "Create" }));
+    const connectorFormPanel = getPanelByHeading("Create Connector");
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
+      target: { value: "Manual node connector" }
+    });
+    fireEvent.click(within(connectorFormPanel).getByLabelText("Auto-create linked node on connector creation"));
+    fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
+
+    switchSubScreenDrawerAware("splice");
+    fireEvent.click(within(getPanelByHeading("Splice form")).getByRole("button", { name: "Create" }));
+    const spliceFormPanel = getPanelByHeading("Create Splice");
+    fireEvent.change(within(spliceFormPanel).getByLabelText("Functional name"), {
+      target: { value: "Manual node splice" }
+    });
+    fireEvent.click(within(spliceFormPanel).getByLabelText("Auto-create linked node on splice creation"));
+    fireEvent.click(within(spliceFormPanel).getByRole("button", { name: "Create" }));
+
+    switchSubScreenDrawerAware("node");
+    const nodesPanel = getPanelByHeading("Nodes");
+    expect(within(nodesPanel).queryByText(/Manual node connector/)).not.toBeInTheDocument();
+    expect(within(nodesPanel).queryByText(/Manual node splice/)).not.toBeInTheDocument();
+  });
+
   it("supports optional manufacturer references on connector and splice forms with trim and clear flows", () => {
     const { store } = renderAppWithState(createInitialState());
     switchScreenDrawerAware("modeling");
@@ -197,6 +224,58 @@ describe("App integration UI - creation flow ergonomics", () => {
 
     expect(within(nodesPanel).getByText("N-MID-REN")).toBeInTheDocument();
     expect(within(nodesPanel).queryByText("N-MID")).not.toBeInTheDocument();
+  });
+
+  it("returns focus to the edited row after Save in modeling edit forms", async () => {
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    const connectorRow = within(connectorsPanel).getByText("Connector 1").closest("tr");
+    expect(connectorRow).not.toBeNull();
+    if (connectorRow === null) {
+      throw new Error("Missing connector row for focus test.");
+    }
+    fireEvent.click(connectorRow);
+    const editConnectorPanel = getPanelByHeading("Edit Connector");
+    fireEvent.change(within(editConnectorPanel).getByLabelText("Functional name"), {
+      target: { value: "Power Source Connector Focus" }
+    });
+    fireEvent.click(within(editConnectorPanel).getByRole("button", { name: "Save" }));
+    await waitFor(() => {
+      expect(document.activeElement).toBe(connectorRow);
+    });
+
+    switchSubScreenDrawerAware("node");
+    const nodesPanel = getPanelByHeading("Nodes");
+    const nodeRow = within(nodesPanel).getByText("N-MID").closest("tr");
+    expect(nodeRow).not.toBeNull();
+    if (nodeRow === null) {
+      throw new Error("Missing node row for focus test.");
+    }
+    fireEvent.click(nodeRow);
+    const editNodePanel = getPanelByHeading("Edit Node");
+    fireEvent.change(within(editNodePanel).getByLabelText("Label"), { target: { value: "MID focus" } });
+    fireEvent.click(within(editNodePanel).getByRole("button", { name: "Save" }));
+    await waitFor(() => {
+      expect(document.activeElement).toBe(nodeRow);
+    });
+
+    switchSubScreenDrawerAware("wire");
+    const wiresPanel = getPanelByHeading("Wires");
+    const wireRow = within(wiresPanel).getByText("Wire 1").closest("tr");
+    expect(wireRow).not.toBeNull();
+    if (wireRow === null) {
+      throw new Error("Missing wire row for focus test.");
+    }
+    fireEvent.click(wireRow);
+    const editWirePanel = getPanelByHeading("Edit Wire");
+    fireEvent.change(within(editWirePanel).getByLabelText("Functional name"), { target: { value: "Signal A Focus" } });
+    fireEvent.click(within(editWirePanel).getByRole("button", { name: "Save" }));
+    await waitFor(() => {
+      expect(document.activeElement).toBe(wireRow);
+    });
   });
 
   it("prefills the next free endpoint way/port in wire create mode and keeps manual edits until context changes", () => {
