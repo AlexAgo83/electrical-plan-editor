@@ -1,4 +1,5 @@
 import type { Network, NetworkId, NodeId, Wire, WireId } from "../../core/entities";
+import { normalizeWireColorIds } from "../../core/cableColors";
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
@@ -84,7 +85,8 @@ function normalizeWiresEntityState(
 
     byId[wireId] = {
       ...wire,
-      sectionMm2: resolveWireSectionMm2((wire as Partial<Wire>).sectionMm2)
+      sectionMm2: resolveWireSectionMm2((wire as Partial<Wire>).sectionMm2),
+      ...normalizeWireColorIds((wire as Partial<Wire>).primaryColorId, (wire as Partial<Wire>).secondaryColorId)
     };
   }
 

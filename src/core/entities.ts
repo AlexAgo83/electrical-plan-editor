@@ -80,6 +80,8 @@ export interface Wire {
   name: string;
   technicalId: string;
   sectionMm2: number;
+  primaryColorId: string | null;
+  secondaryColorId: string | null;
   endpointA: WireEndpoint;
   endpointB: WireEndpoint;
   routeSegmentIds: SegmentId[];

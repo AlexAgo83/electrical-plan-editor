@@ -82,6 +82,10 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireTechnicalId: Parameters<typeof useWireHandlers>[0]["setWireTechnicalId"];
   wireSectionMm2: Parameters<typeof useWireHandlers>[0]["wireSectionMm2"];
   setWireSectionMm2: Parameters<typeof useWireHandlers>[0]["setWireSectionMm2"];
+  wirePrimaryColorId: Parameters<typeof useWireHandlers>[0]["wirePrimaryColorId"];
+  setWirePrimaryColorId: Parameters<typeof useWireHandlers>[0]["setWirePrimaryColorId"];
+  wireSecondaryColorId: Parameters<typeof useWireHandlers>[0]["wireSecondaryColorId"];
+  setWireSecondaryColorId: Parameters<typeof useWireHandlers>[0]["setWireSecondaryColorId"];
   wireEndpointAKind: Parameters<typeof useWireHandlers>[0]["wireEndpointAKind"];
   setWireEndpointAKind: Parameters<typeof useWireHandlers>[0]["setWireEndpointAKind"];
   wireEndpointAConnectorId: Parameters<typeof useWireHandlers>[0]["wireEndpointAConnectorId"];
@@ -184,6 +188,10 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireTechnicalId,
   wireSectionMm2,
   setWireSectionMm2,
+  wirePrimaryColorId,
+  setWirePrimaryColorId,
+  wireSecondaryColorId,
+  setWireSecondaryColorId,
   wireEndpointAKind,
   setWireEndpointAKind,
   wireEndpointAConnectorId,
@@ -308,6 +316,10 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireTechnicalId,
     wireSectionMm2,
     setWireSectionMm2,
+    wirePrimaryColorId,
+    setWirePrimaryColorId,
+    wireSecondaryColorId,
+    setWireSecondaryColorId,
     wireEndpointAKind,
     setWireEndpointAKind,
     wireEndpointAConnectorId,

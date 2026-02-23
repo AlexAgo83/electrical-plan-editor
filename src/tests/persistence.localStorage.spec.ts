@@ -164,7 +164,7 @@ describe("localStorage persistence adapter", () => {
     expect(loaded).toEqual(state);
   });
 
-  it("patches legacy persisted wires missing sectionMm2 to the default section", () => {
+  it("patches legacy persisted wires missing section and colors to defaults", () => {
     const state = createSampleNetworkState();
     const nowIso = "2026-02-20T11:00:00.000Z";
     const stripWireSections = (input: AppState): AppState => ({
@@ -174,7 +174,12 @@ describe("localStorage persistence adapter", () => {
         byId: Object.fromEntries(
           input.wires.allIds.map((wireId) => {
             const wire = input.wires.byId[wireId];
-            return [wireId, wire === undefined ? undefined : ({ ...wire, sectionMm2: undefined } as unknown)];
+            return [
+              wireId,
+              wire === undefined
+                ? undefined
+                : ({ ...wire, sectionMm2: undefined, primaryColorId: undefined, secondaryColorId: undefined } as unknown)
+            ];
           })
         ) as AppState["wires"]["byId"]
       },
@@ -188,7 +193,12 @@ describe("localStorage persistence adapter", () => {
               byId: Object.fromEntries(
                 scoped.wires.allIds.map((wireId) => {
                   const wire = scoped.wires.byId[wireId];
-                  return [wireId, wire === undefined ? undefined : ({ ...wire, sectionMm2: undefined } as unknown)];
+                  return [
+                    wireId,
+                    wire === undefined
+                      ? undefined
+                      : ({ ...wire, sectionMm2: undefined, primaryColorId: undefined, secondaryColorId: undefined } as unknown)
+                  ];
                 })
               ) as typeof scoped.wires.byId
             }
@@ -209,11 +219,15 @@ describe("localStorage persistence adapter", () => {
     const loaded = loadState(storage, () => nowIso);
     const loadedWire = loaded.wires.byId[loaded.wires.allIds[0]!];
     expect(loadedWire?.sectionMm2).toBe(0.5);
+    expect(loadedWire?.primaryColorId).toBeNull();
+    expect(loadedWire?.secondaryColorId).toBeNull();
 
     const activeNetworkId = loaded.activeNetworkId;
     if (activeNetworkId !== null) {
       const scopedWire = loaded.networkStates[activeNetworkId]?.wires.byId[loaded.wires.allIds[0]!];
       expect(scopedWire?.sectionMm2).toBe(0.5);
+      expect(scopedWire?.primaryColorId).toBeNull();
+      expect(scopedWire?.secondaryColorId).toBeNull();
     }
   });
 

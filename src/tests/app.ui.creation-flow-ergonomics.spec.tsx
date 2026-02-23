@@ -195,4 +195,36 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.change(within(endpointACreateFieldset).getByLabelText("Way index"), { target: { value: "2" } });
     expect(within(endpointACreateFieldset).getByText(/Suggested: way 5/i)).toBeInTheDocument();
   });
+
+  it("supports optional wire colors with primary/secondary selectors and normalizes duplicate bi-color to mono-color", () => {
+    renderAppWithState(createUiIntegrationDenseWiresState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+
+    fireEvent.click(within(getPanelByHeading("Wire form")).getByRole("button", { name: "Create" }));
+    const createWirePanel = getPanelByHeading("Create Wire");
+    const primaryColorSelect = within(createWirePanel).getByLabelText("Primary color");
+    const secondaryColorSelect = within(createWirePanel).getByLabelText("Secondary color");
+
+    expect(primaryColorSelect).toHaveValue("");
+    expect(secondaryColorSelect).toBeDisabled();
+    expect(within(createWirePanel).getByText("No color")).toBeInTheDocument();
+
+    fireEvent.change(primaryColorSelect, { target: { value: "RD" } });
+    expect(secondaryColorSelect).toBeEnabled();
+    fireEvent.change(secondaryColorSelect, { target: { value: "RD" } });
+
+    const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
+    const endpointBFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint B" });
+    fireEvent.change(within(createWirePanel).getByLabelText("Functional name"), { target: { value: "Color test wire" } });
+    fireEvent.change(within(createWirePanel).getByLabelText("Technical ID"), { target: { value: "W-COLOR-1" } });
+    fireEvent.change(within(endpointAFieldset).getByLabelText("Connector"), { target: { value: "C1" } });
+    fireEvent.change(within(endpointBFieldset).getByLabelText("Splice"), { target: { value: "S1" } });
+    fireEvent.click(within(createWirePanel).getByRole("button", { name: "Create" }));
+
+    const editWirePanel = getPanelByHeading("Edit Wire");
+    expect(within(editWirePanel).getByLabelText("Primary color")).toHaveValue("RD");
+    expect(within(editWirePanel).getByLabelText("Secondary color")).toHaveValue("");
+  });
 });

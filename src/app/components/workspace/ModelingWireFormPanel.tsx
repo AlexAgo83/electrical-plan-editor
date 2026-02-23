@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG } from "../../../core/cableColors";
 import type { WireEndpoint } from "../../../core/entities";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
@@ -15,6 +16,10 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireTechnicalId,
     wireSectionMm2,
     setWireSectionMm2,
+    wirePrimaryColorId,
+    setWirePrimaryColorId,
+    wireSecondaryColorId,
+    setWireSecondaryColorId,
     wireTechnicalIdAlreadyUsed,
     wireEndpointAKind,
     setWireEndpointAKind,
@@ -43,6 +48,26 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     cancelWireEdit,
     wireFormError
   } = props;
+  const primaryColor = wirePrimaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wirePrimaryColorId] : undefined;
+  const secondaryColor = wireSecondaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wireSecondaryColorId] : undefined;
+
+  const swatch = (hex: string | undefined, label: string): ReactElement => (
+    <span
+      aria-hidden="true"
+      title={label}
+      style={{
+        display: "inline-block",
+        width: "0.9rem",
+        height: "0.9rem",
+        borderRadius: "999px",
+        border: "1px solid var(--panel-border, rgba(255,255,255,0.2))",
+        background: hex ?? "transparent",
+        marginRight: "0.35rem",
+        verticalAlign: "text-bottom",
+        boxShadow: hex === undefined ? "inset 0 0 0 1px rgba(255,255,255,0.25)" : undefined
+      }}
+    />
+  );
 
   return (
 <article className="panel" hidden={!isWireSubScreen}>
@@ -69,6 +94,58 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         required
       />
     </label>
+    <label>
+      Primary color
+      <select
+        value={wirePrimaryColorId}
+        onChange={(event) => {
+          const nextPrimary = event.target.value;
+          setWirePrimaryColorId(nextPrimary);
+          if (nextPrimary.length === 0) {
+            setWireSecondaryColorId("");
+          }
+        }}
+      >
+        <option value="">None</option>
+        {CABLE_COLOR_CATALOG.map((color) => (
+          <option key={color.id} value={color.id}>
+            {color.id} - {color.label}
+          </option>
+        ))}
+      </select>
+    </label>
+    <label>
+      Secondary color
+      <select
+        value={wireSecondaryColorId}
+        onChange={(event) => setWireSecondaryColorId(event.target.value)}
+        disabled={wirePrimaryColorId.length === 0}
+      >
+        <option value="">None</option>
+        {CABLE_COLOR_CATALOG.map((color) => (
+          <option key={color.id} value={color.id}>
+            {color.id} - {color.label}
+          </option>
+        ))}
+      </select>
+    </label>
+    <small className="inline-help">
+      {primaryColor === undefined ? (
+        <>No color</>
+      ) : (
+        <>
+          {swatch(primaryColor.hex, primaryColor.label)}
+          {primaryColor.id} {primaryColor.label}
+          {secondaryColor !== undefined ? (
+            <>
+              {" + "}
+              {swatch(secondaryColor.hex, secondaryColor.label)}
+              {secondaryColor.id} {secondaryColor.label}
+            </>
+          ) : null}
+        </>
+      )}
+    </small>
     {wireTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
     <div className="form-split wire-endpoints-grid">
       <fieldset className="inline-fieldset wire-endpoint-fieldset">
