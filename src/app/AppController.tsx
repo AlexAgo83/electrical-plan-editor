@@ -1281,6 +1281,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         activeSubScreen,
         entityCountBySubScreen,
         onQuickEntityNavigation: setActiveSubScreen,
+        onQuickEntityScreenNavigation: (targetScreen) => {
+          setActiveScreen(targetScreen);
+        },
         onSelectConnectorFromCallout: handleSelectConnectorFromCallout,
         onSelectSpliceFromCallout: handleSelectSpliceFromCallout,
         onPersistConnectorCalloutPosition: persistConnectorCalloutPosition,

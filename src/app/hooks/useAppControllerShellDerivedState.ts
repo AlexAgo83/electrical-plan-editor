@@ -29,7 +29,8 @@ export function useAppControllerShellDerivedState({
     burgundyNoir: ["theme-dark", "theme-burgundy-noir"],
     lavenderHaze: ["theme-normal", "theme-paper-blueprint", "theme-lavender-haze"],
     amberNight: ["theme-dark", "theme-deep-green", "theme-amber-night"],
-    cyberpunk: ["theme-dark", "theme-amber-night", "theme-cyberpunk"]
+    cyberpunk: ["theme-dark", "theme-amber-night", "theme-cyberpunk"],
+    olive: ["theme-dark", "theme-deep-green", "theme-olive"]
   };
   const resolvedThemeClassNames = themeClassNamesByMode[themeMode] ?? themeClassNamesByMode.normal;
   const appShellClassName = [

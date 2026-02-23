@@ -37,6 +37,9 @@ function normalizeThemeMode(value: unknown): ThemeMode {
       return "amberNight";
     case "cyberpunk":
       return "cyberpunk";
+    case "olive":
+    case "oliveDark":
+      return "olive";
     default:
       return "normal";
   }

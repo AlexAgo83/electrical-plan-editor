@@ -465,3 +465,81 @@
 .app-shell.theme-cyberpunk .save-status.is-error {
   color: #ff77a6;
 }
+
+.app-shell.theme-olive .validation-toolbar > span,
+.app-shell.theme-olive .summary-grid h3,
+.app-shell.theme-olive .validation-group h3,
+.app-shell.theme-olive .validation-active-filter {
+  color: #d9e2ba;
+}
+
+.app-shell.theme-olive .workspace-ops-content.panel {
+  background: #1b2114;
+}
+
+.app-shell.theme-olive .error-banner button,
+.app-shell.theme-olive .inspector-context-toggle,
+.app-shell.theme-olive .header-install-toggle,
+.app-shell.theme-olive .network-scope-create-button {
+  border-color: #68714d;
+  background: #252d1b;
+  color: #edf2cf;
+}
+
+.app-shell.theme-olive .network-form-header h2,
+.app-shell.theme-olive .network-form-label,
+.app-shell.theme-olive .stack-label,
+.app-shell.theme-olive .stack-form label,
+.app-shell.theme-olive .row-form label,
+.app-shell.theme-olive .cavity h3 {
+  color: #dce4af;
+}
+
+.app-shell.theme-olive .empty-copy,
+.app-shell.theme-olive .form-hint,
+.app-shell.theme-olive .inline-help,
+.app-shell.theme-olive .panel .meta-line,
+.app-shell.theme-olive .settings-panel .meta-line,
+.app-shell.theme-olive .cavity p {
+  color: #bcc89a;
+}
+
+.app-shell.theme-olive .cavity button {
+  border-color: #66704b;
+  background: #262e1c;
+  color: #e8efc8;
+}
+
+.app-shell.theme-olive .form-hint.danger {
+  color: #ffd4c2;
+}
+
+.app-shell.theme-olive .wire-endpoint-fieldset,
+.app-shell.theme-olive .settings-export-fieldset {
+  border-color: #545c3f;
+  background: linear-gradient(180deg, rgba(30, 37, 22, 0.88), rgba(22, 28, 17, 0.62));
+}
+
+.app-shell.theme-olive .wire-endpoint-fieldset legend,
+.app-shell.theme-olive .wire-endpoint-fieldset label,
+.app-shell.theme-olive .settings-export-fieldset legend {
+  color: #e1e8b9;
+}
+
+.app-shell.theme-olive .splice-badge {
+  border-color: #7a8458;
+  background: #313a22;
+  color: #e6edc1;
+}
+
+.app-shell.theme-olive .save-status.is-saved {
+  color: #d6e49a;
+}
+
+.app-shell.theme-olive .save-status.is-unsaved {
+  color: #b7c36a;
+}
+
+.app-shell.theme-olive .save-status.is-error {
+  color: #ffba9e;
+}

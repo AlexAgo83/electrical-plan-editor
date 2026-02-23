@@ -402,6 +402,10 @@
   min-height: 1.95rem;
 }
 
+.network-summary-quick-entity-screen-switch {
+  margin-left: auto;
+}
+
 .network-summary-quick-entity-nav-icon {
   width: 0.72rem;
   height: 0.72rem;

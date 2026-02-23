@@ -255,6 +255,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     activeSubScreen: params.activeSubScreen,
     entityCountBySubScreen: params.entityCountBySubScreen,
     onQuickEntityNavigation: params.onQuickEntityNavigation,
+    onQuickEntityScreenNavigation: params.onQuickEntityScreenNavigation,
     onSelectConnectorFromCallout: params.onSelectConnectorFromCallout,
     onSelectSpliceFromCallout: params.onSelectSpliceFromCallout,
     onPersistConnectorCalloutPosition: params.onPersistConnectorCalloutPosition,

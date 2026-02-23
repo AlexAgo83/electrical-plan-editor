@@ -199,6 +199,23 @@
   --network-label-stroke-color: rgba(10, 9, 25, 0.9);
 }
 
+.app-shell.theme-olive {
+  --network-selection-color: #b7c36a;
+  --network-selection-focus-color: #b7c36a;
+  --network-selection-glow: rgba(183, 195, 106, 0.4);
+  --network-grid-line-color: #596247;
+  --network-segment-color: #b0b991;
+  --network-wire-highlight-color: #dbe870;
+  --network-node-stroke-color: #79825f;
+  --network-node-connector-fill: #2c3720;
+  --network-node-splice-fill: #4a4324;
+  --network-node-intermediate-fill: #323a25;
+  --network-node-label-color: #eef3d0;
+  --network-segment-label-color: #d9e2ba;
+  --network-segment-length-label-color: #c1cba4;
+  --network-label-stroke-color: rgba(14, 18, 10, 0.88);
+}
+
 /* Enforce theme palette application on 2D network entities for all themes,
    including composed themes that also carry legacy base classes (e.g. theme-dark/theme-deep-green). */
 .app-shell:is(
