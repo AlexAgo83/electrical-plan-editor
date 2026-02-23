@@ -93,6 +93,7 @@ export function useConnectorHandlers({
     }
     setConnectorFormError(null);
 
+    const wasCreateMode = connectorFormMode === "create";
     const connectorId =
       connectorFormMode === "edit" && editingConnectorId !== null
         ? editingConnectorId
@@ -111,7 +112,12 @@ export function useConnectorHandlers({
     );
 
     const nextState = store.getState();
-    if (nextState.connectors.byId[connectorId] !== undefined) {
+    const savedConnector = nextState.connectors.byId[connectorId];
+    if (savedConnector !== undefined) {
+      if (wasCreateMode) {
+        startConnectorEdit(savedConnector);
+        return;
+      }
       dispatchAction(appActions.select({ kind: "connector", id: connectorId }));
       resetConnectorForm();
     }

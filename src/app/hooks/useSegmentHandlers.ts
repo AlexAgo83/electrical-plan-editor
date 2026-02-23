@@ -93,6 +93,7 @@ export function useSegmentHandlers({
   function handleSegmentSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
 
+    const wasCreateMode = segmentFormMode === "create";
     const normalizedSegmentId = segmentIdInput.trim();
     const segmentId = (segmentFormMode === "edit" && editingSegmentId !== null
       ? editingSegmentId
@@ -134,7 +135,12 @@ export function useSegmentHandlers({
     );
 
     const nextState = store.getState();
-    if (nextState.segments.byId[segmentId] !== undefined) {
+    const savedSegment = nextState.segments.byId[segmentId];
+    if (savedSegment !== undefined) {
+      if (wasCreateMode) {
+        startSegmentEdit(savedSegment);
+        return;
+      }
       dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
       resetSegmentForm();
     }

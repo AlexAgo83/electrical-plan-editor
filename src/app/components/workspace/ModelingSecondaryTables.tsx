@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { useEffect, useRef, type ReactElement } from "react";
 import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type {
@@ -77,12 +77,52 @@ export function ModelingSecondaryTables({
   onEditWire,
   onDeleteWire
 }: ModelingSecondaryTablesProps): ReactElement {
+  const segmentRowRefs = useRef<Partial<Record<SegmentId, HTMLTableRowElement | null>>>({});
+  const wireRowRefs = useRef<Partial<Record<WireId, HTMLTableRowElement | null>>>({});
+  const lastAutoFocusedSegmentIdRef = useRef<SegmentId | null>(null);
+  const lastAutoFocusedWireIdRef = useRef<WireId | null>(null);
   const focusedSegment =
     selectedSegmentId === null ? null : (visibleSegments.find((segment) => segment.id === selectedSegmentId) ?? null);
   const focusedWire =
     selectedWireId === null ? null : (visibleWires.find((wire) => wire.id === selectedWireId) ?? null);
   const showSegmentSubNetworkColumn = segmentSubNetworkFilter !== "default";
   const showWireRouteModeColumn = wireRouteFilter === "all";
+
+  useEffect(() => {
+    if (segmentFormMode !== "edit" || selectedSegmentId === null) {
+      lastAutoFocusedSegmentIdRef.current = null;
+      return;
+    }
+    if (lastAutoFocusedSegmentIdRef.current === selectedSegmentId) {
+      return;
+    }
+    lastAutoFocusedSegmentIdRef.current = selectedSegmentId;
+    if (typeof window === "undefined") {
+      segmentRowRefs.current[selectedSegmentId]?.focus();
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      segmentRowRefs.current[selectedSegmentId]?.focus();
+    });
+  }, [segmentFormMode, selectedSegmentId]);
+
+  useEffect(() => {
+    if (wireFormMode !== "edit" || selectedWireId === null) {
+      lastAutoFocusedWireIdRef.current = null;
+      return;
+    }
+    if (lastAutoFocusedWireIdRef.current === selectedWireId) {
+      return;
+    }
+    lastAutoFocusedWireIdRef.current = selectedWireId;
+    if (typeof window === "undefined") {
+      wireRowRefs.current[selectedWireId]?.focus();
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      wireRowRefs.current[selectedWireId]?.focus();
+    });
+  }, [wireFormMode, selectedWireId]);
 
   return (
     <>
@@ -148,6 +188,9 @@ export function ModelingSecondaryTables({
                 return (
                   <tr
                     key={segment.id}
+                    ref={(element) => {
+                      segmentRowRefs.current[segment.id] = element;
+                    }}
                     className={rowClassName}
                     aria-selected={isFocused}
                     tabIndex={0}
@@ -278,6 +321,9 @@ export function ModelingSecondaryTables({
                 return (
                   <tr
                     key={wire.id}
+                    ref={(element) => {
+                      wireRowRefs.current[wire.id] = element;
+                    }}
                     className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
                     aria-selected={isFocused}
                     tabIndex={0}

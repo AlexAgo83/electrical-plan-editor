@@ -150,6 +150,33 @@ describe("App integration UI - networks", () => {
     });
   });
 
+  it("sets an available network active on row double click", async () => {
+    const base = createInitialState();
+    const seeded = appReducer(
+      base,
+      appActions.createNetwork({
+        id: asNetworkId("net-b"),
+        name: "Network B",
+        technicalId: "NET-B",
+        createdAt: "2026-02-23T10:05:00.000Z",
+        updatedAt: "2026-02-23T10:05:00.000Z"
+      })
+    );
+
+    renderAppWithState(seeded);
+    switchScreen("networkScope");
+
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    const networkRow = within(networkScopePanel).getByText("Network B").closest("tr");
+    expect(networkRow).not.toBeNull();
+
+    fireEvent.doubleClick(networkRow as HTMLElement);
+
+    await waitFor(() => {
+      expect(within(networkRow as HTMLElement).getByText("Active")).toBeInTheDocument();
+    });
+  });
+
   it("keeps focus in the network form inputs while typing after selecting a row", async () => {
     renderAppWithState(createInitialState());
     switchScreen("networkScope");

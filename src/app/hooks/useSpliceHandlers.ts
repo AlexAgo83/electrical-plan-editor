@@ -93,6 +93,7 @@ export function useSpliceHandlers({
     }
     setSpliceFormError(null);
 
+    const wasCreateMode = spliceFormMode === "create";
     const spliceId =
       spliceFormMode === "edit" && editingSpliceId !== null
         ? editingSpliceId
@@ -111,7 +112,12 @@ export function useSpliceHandlers({
     );
 
     const nextState = store.getState();
-    if (nextState.splices.byId[spliceId] !== undefined) {
+    const savedSplice = nextState.splices.byId[spliceId];
+    if (savedSplice !== undefined) {
+      if (wasCreateMode) {
+        startSpliceEdit(savedSplice);
+        return;
+      }
       dispatchAction(appActions.select({ kind: "splice", id: spliceId }));
       resetSpliceForm();
     }
