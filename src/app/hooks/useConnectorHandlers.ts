@@ -176,8 +176,7 @@ export function useConnectorHandlers({
         startConnectorEdit(savedConnector);
         return;
       }
-      dispatchAction(appActions.select({ kind: "connector", id: connectorId }));
-      resetConnectorForm();
+      startConnectorEdit(savedConnector);
       focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-connectors"]');
     }
   }

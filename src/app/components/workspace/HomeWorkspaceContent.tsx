@@ -78,16 +78,6 @@ export function HomeWorkspaceContent({
         <header className="home-panel-header">
           <h2>Start</h2>
           <div className="home-panel-header-tools">
-            {onOpenOnboardingHelp !== undefined ? (
-              <button
-                type="button"
-                className="filter-chip onboarding-help-button"
-                onClick={onOpenOnboardingHelp}
-              >
-                <span className="action-button-icon is-help" aria-hidden="true" />
-                <span>Help</span>
-              </button>
-            ) : null}
             <span className="settings-panel-chip">Home</span>
           </div>
         </header>
@@ -107,6 +97,12 @@ export function HomeWorkspaceContent({
             <span className="action-button-icon is-home-import" aria-hidden="true" />
             <span>Import from file</span>
           </button>
+          {onOpenOnboardingHelp !== undefined ? (
+            <button type="button" className="button-with-icon" onClick={onOpenOnboardingHelp}>
+              <span className="action-button-icon is-help" aria-hidden="true" />
+              <span>Help</span>
+            </button>
+          ) : null}
         </div>
         <input
           ref={importFileInputRef}

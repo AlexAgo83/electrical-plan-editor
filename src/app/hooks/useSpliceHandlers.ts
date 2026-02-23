@@ -174,8 +174,7 @@ export function useSpliceHandlers({
         startSpliceEdit(savedSplice);
         return;
       }
-      dispatchAction(appActions.select({ kind: "splice", id: spliceId }));
-      resetSpliceForm();
+      startSpliceEdit(savedSplice);
       focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-splices"]');
     }
   }
