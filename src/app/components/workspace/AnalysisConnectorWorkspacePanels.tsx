@@ -1,4 +1,5 @@
-import { useState, type ReactElement } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
+import { formatOccupantRefForDisplay } from "../../lib/app-utils-networking";
 import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
@@ -12,6 +13,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     setConnectorOccupancyFilter,
     connectors,
     visibleConnectors,
+    wires,
     connectorSort,
     setConnectorSort,
     connectorOccupiedCountById,
@@ -29,6 +31,54 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     getSortIndicator
   } = props;
   const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "synthesis">("cavities");
+  const wireTechnicalIdById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire.technicalId] as const)), [wires]);
+  const formatOccupantRef = (occupantRef: string | null): string =>
+    occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
+  const nextFreeCavityIndex = connectorCavityStatuses.find((slot) => !slot.isOccupied)?.cavityIndex ?? null;
+  const parsedCavityIndex = Number.parseInt(cavityIndexInput, 10);
+  const cavityIndexIsInteger = Number.isInteger(parsedCavityIndex) && parsedCavityIndex > 0;
+  const selectedCavitySlot = cavityIndexIsInteger
+    ? connectorCavityStatuses.find((slot) => slot.cavityIndex === parsedCavityIndex) ?? null
+    : null;
+  const cavityIsOccupied = selectedCavitySlot?.isOccupied === true;
+  const cavityIndexOutOfRange =
+    selectedConnector !== null &&
+    cavityIndexIsInteger &&
+    (parsedCavityIndex < 1 || parsedCavityIndex > selectedConnector.cavityCount);
+  const connectorReserveValidationMessage =
+    selectedConnector === null || cavityIndexInput.trim() === ""
+      ? null
+      : !cavityIndexIsInteger
+        ? "Enter a valid way index."
+        : cavityIndexOutOfRange
+          ? `Way index must be between 1 and ${selectedConnector.cavityCount}.`
+          : cavityIsOccupied
+            ? `Way C${parsedCavityIndex} is already used (${formatOccupantRef(selectedCavitySlot.occupantRef)}).${
+                nextFreeCavityIndex === null ? " No available ways." : ` Suggested: C${nextFreeCavityIndex}.`
+              }`
+            : null;
+  const canReserveCavity =
+    selectedConnector !== null &&
+    cavityIndexInput.trim() !== "" &&
+    connectorOccupantRefInput.trim() !== "" &&
+    cavityIndexIsInteger &&
+    !cavityIndexOutOfRange &&
+    !cavityIsOccupied;
+
+  useEffect(() => {
+    if (selectedConnector === null || nextFreeCavityIndex === null) {
+      return;
+    }
+    setCavityIndexInput(String(nextFreeCavityIndex));
+  }, [selectedConnectorId, connectorCavityStatuses, nextFreeCavityIndex, selectedConnector, setCavityIndexInput]);
+
+  function handleReserveCavitySubmit(event: FormEvent<HTMLFormElement>): void {
+    if (!canReserveCavity) {
+      event.preventDefault();
+      return;
+    }
+    handleReserveCavity(event);
+  }
 
   return (
     <>
@@ -165,7 +215,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
               connectorCavityStatuses.map((slot) => [
                 `C${slot.cavityIndex}`,
                 slot.isOccupied ? "Occupied" : "Free",
-                slot.occupantRef ?? ""
+                formatOccupantRef(slot.occupantRef)
               ])
             );
             return;
@@ -201,7 +251,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
       <p className="meta-line">
         <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
       </p>
-      <form className="row-form" onSubmit={handleReserveCavity}>
+      <form className="row-form" onSubmit={handleReserveCavitySubmit}>
         <label>
           Way index
           <input
@@ -211,6 +261,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             step={1}
             value={cavityIndexInput}
             onChange={(event) => setCavityIndexInput(event.target.value)}
+            aria-invalid={connectorReserveValidationMessage !== null ? true : undefined}
             required
           />
         </label>
@@ -225,17 +276,24 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           />
         </label>
 
-        <button type="submit" className="button-with-icon">
+        <button type="submit" className="button-with-icon" disabled={!canReserveCavity}>
           <span className="action-button-icon is-lock-move" aria-hidden="true" />
           Reserve way
         </button>
       </form>
+      {connectorReserveValidationMessage !== null ? <small className="inline-error">{connectorReserveValidationMessage}</small> : null}
+      {connectorReserveValidationMessage === null && nextFreeCavityIndex !== null ? (
+        <small className="inline-help">Suggested next free way: C{nextFreeCavityIndex}</small>
+      ) : null}
+      {connectorReserveValidationMessage === null && nextFreeCavityIndex === null ? (
+        <small className="inline-help">No available ways on this connector.</small>
+      ) : null}
 
       <div className="cavity-grid" aria-label="Way occupancy grid">
         {connectorCavityStatuses.map((slot) => (
           <article key={slot.cavityIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
             <h3>C{slot.cavityIndex}</h3>
-            <p>{slot.isOccupied ? slot.occupantRef : "Free"}</p>
+            <p>{slot.isOccupied ? formatOccupantRef(slot.occupantRef) : "Free"}</p>
             {slot.isOccupied ? (
               <button type="button" className="button-with-icon" onClick={() => handleReleaseCavity(slot.cavityIndex)}>
                 <span className="action-button-icon is-cancel" aria-hidden="true" />

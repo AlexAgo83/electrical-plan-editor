@@ -35,6 +35,16 @@ export function parseWireOccupantRef(raw: string): { wireId: WireId; side: "A" |
   };
 }
 
+export function formatOccupantRefForDisplay(raw: string, wireTechnicalIdById: ReadonlyMap<WireId, string>): string {
+  const parsed = parseWireOccupantRef(raw);
+  if (parsed === null) {
+    return raw;
+  }
+
+  const technicalId = wireTechnicalIdById.get(parsed.wireId) ?? parsed.wireId;
+  return `Wire ${technicalId} / ${parsed.side}`;
+}
+
 export function resolveEndpointNodeId(
   endpoint: WireEndpoint,
   connectorNodeByConnectorId: Map<ConnectorId, NodeId>,
