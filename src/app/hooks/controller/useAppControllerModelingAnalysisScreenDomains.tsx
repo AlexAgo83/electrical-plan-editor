@@ -99,7 +99,8 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   includeModelingContent: boolean;
   includeAnalysisContent: boolean;
   onboardingHelp?: {
-    openConnectorSpliceStep: () => void;
+    openConnectorStep: () => void;
+    openSpliceStep: () => void;
     openNodeStep: () => void;
     openSegmentStep: () => void;
     openWireStep: () => void;
@@ -149,7 +150,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     selectedConnectorId: selection.selectedConnectorId,
     startConnectorEdit: modelingHandlers.connector.startConnectorEdit,
     handleConnectorDelete: modelingHandlers.connector.handleConnectorDelete,
-    onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorSpliceStep,
+    onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorStep,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
     spliceFormMode: formsState.spliceFormMode,
     resetSpliceForm: modelingHandlers.splice.resetSpliceForm,
@@ -163,7 +164,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     selectedSpliceId: selection.selectedSpliceId,
     startSpliceEdit: modelingHandlers.splice.startSpliceEdit,
     handleSpliceDelete: modelingHandlers.splice.handleSpliceDelete,
-    onOpenSpliceOnboardingHelp: onboardingHelp?.openConnectorSpliceStep,
+    onOpenSpliceOnboardingHelp: onboardingHelp?.openSpliceStep,
     isNodeSubScreen: screenFlags.isNodeSubScreen,
     nodeFormMode: formsState.nodeFormMode,
     resetNodeForm: modelingHandlers.node.resetNodeForm,

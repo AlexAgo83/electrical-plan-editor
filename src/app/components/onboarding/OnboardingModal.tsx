@@ -12,8 +12,10 @@ interface OnboardingModalProps {
   onClose: () => void;
   onNext: () => void;
   canGoNext: boolean;
-  onOpenTarget: () => void;
-  openTargetLabel: string;
+  targetActions: ReadonlyArray<{
+    label: string;
+    onClick: () => void;
+  }>;
 }
 
 function renderDescription(step: OnboardingStepDefinition): ReactElement {
@@ -41,8 +43,7 @@ export function OnboardingModal({
   onClose,
   onNext,
   canGoNext,
-  onOpenTarget,
-  openTargetLabel
+  targetActions
 }: OnboardingModalProps): ReactElement | null {
   if (!isOpen) {
     return null;
@@ -70,7 +71,7 @@ export function OnboardingModal({
         <header className="onboarding-modal-header">
           <div className="onboarding-modal-header-main">
             <span className="onboarding-modal-badge" aria-hidden="true">
-              {step.badge}
+              {step.badgeIconClass ? <span className={`action-button-icon ${step.badgeIconClass}`} aria-hidden="true" /> : step.badge}
             </span>
             <div className="onboarding-modal-title-block">
               <h2 id={titleId}>{step.title}</h2>
@@ -98,12 +99,17 @@ export function OnboardingModal({
         </div>
 
         <footer className="onboarding-modal-actions">
-          <button type="button" className="filter-chip" onClick={onOpenTarget}>
-            {openTargetLabel}
-          </button>
+          <div className="onboarding-modal-target-actions">
+            {targetActions.map((action, index) => (
+              <button key={`${action.label}-${index}`} type="button" className="filter-chip" onClick={action.onClick}>
+                {action.label}
+              </button>
+            ))}
+          </div>
           <div className="onboarding-modal-actions-spacer" />
           {isFullFlow ? (
-            <button type="button" className="button-with-icon" onClick={onNext}>
+            <button type="button" className="button-with-icon onboarding-modal-next-button" onClick={onNext}>
+              <span className="action-button-icon is-open" aria-hidden="true" />
               <span>{canGoNext ? "Next" : "Finish"}</span>
             </button>
           ) : null}

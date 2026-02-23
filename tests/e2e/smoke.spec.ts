@@ -1,13 +1,16 @@
+import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
+async function dismissOnboardingIfVisible(page: Page): Promise<void> {
+  const closeOnboardingButton = page.getByRole("button", { name: "Close onboarding", exact: true });
+  if ((await closeOnboardingButton.count()) === 0) {
+    return;
+  }
+  await closeOnboardingButton.click();
+  await expect(page.getByRole("button", { name: "Close onboarding", exact: true })).toHaveCount(0);
+}
+
 test("bootstraps a comprehensive sample network on first launch", async ({ page }) => {
-  const dismissOnboardingIfVisible = async () => {
-    const closeOnboardingButton = page.getByRole("button", { name: "Close onboarding", exact: true });
-    if ((await closeOnboardingButton.count()) > 0) {
-      await closeOnboardingButton.click();
-      await expect(page.getByRole("button", { name: "Close onboarding", exact: true })).toHaveCount(0);
-    }
-  };
   const ensureNavigationDrawerOpen = async () => {
     const navigationToggle = page.locator(".header-nav-toggle");
     if ((await navigationToggle.getAttribute("aria-expanded")) !== "true") {
@@ -43,7 +46,7 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
   };
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "e-Plan Editor" })).toBeVisible();
-  await dismissOnboardingIfVisible();
+  await dismissOnboardingIfVisible(page);
   await switchScreen("modeling");
 
   const connectorsPanel = page
@@ -56,13 +59,6 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
 
 test("create -> route -> force -> recompute flow works end-to-end", async ({ page }) => {
   test.setTimeout(60_000);
-  const dismissOnboardingIfVisible = async () => {
-    const closeOnboardingButton = page.getByRole("button", { name: "Close onboarding", exact: true });
-    if ((await closeOnboardingButton.count()) > 0) {
-      await closeOnboardingButton.click();
-      await expect(page.getByRole("button", { name: "Close onboarding", exact: true })).toHaveCount(0);
-    }
-  };
   const ensureNavigationDrawerOpen = async () => {
     const navigationToggle = page.locator(".header-nav-toggle");
     if ((await navigationToggle.getAttribute("aria-expanded")) !== "true") {
@@ -154,7 +150,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "e-Plan Editor" })).toBeVisible();
-  await dismissOnboardingIfVisible();
+  await dismissOnboardingIfVisible(page);
 
   await switchSubScreen("connector");
   await openCreateFormIfIdle("Connector form");

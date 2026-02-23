@@ -271,15 +271,6 @@ export function ModelingSecondaryTables({
         <header className="list-panel-header">
           <h2>Wires</h2>
           <div className="list-panel-header-tools">
-            {onOpenWireOnboardingHelp !== undefined ? (
-              <button
-                type="button"
-                className="filter-chip onboarding-help-button"
-                onClick={onOpenWireOnboardingHelp}
-              >
-                Help
-              </button>
-            ) : null}
             <div className="list-panel-header-tools-row">
               <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
                 {([
@@ -313,6 +304,15 @@ export function ModelingSecondaryTables({
                 <span className="table-export-icon" aria-hidden="true" />
                 CSV
               </button>
+              {onOpenWireOnboardingHelp !== undefined ? (
+                <button
+                  type="button"
+                  className="filter-chip onboarding-help-button"
+                  onClick={onOpenWireOnboardingHelp}
+                >
+                  Help
+                </button>
+              ) : null}
             </div>
               <div className="list-panel-header-tools-row">
                 <TableFilterBar

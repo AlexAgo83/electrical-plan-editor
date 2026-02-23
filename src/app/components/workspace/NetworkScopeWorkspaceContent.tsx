@@ -24,6 +24,7 @@ interface NetworkScopeWorkspaceContentProps {
   activeNetworkId: NetworkId | null;
   handleSelectNetwork: (networkId: NetworkId) => void;
   handleDuplicateNetwork: (networkId: NetworkId | null) => void;
+  handleExportActiveNetwork: () => void;
   handleDeleteNetwork: (networkId: NetworkId | null) => void;
   networkFormMode: "create" | "edit" | null;
   handleOpenCreateNetworkForm: () => void;
@@ -51,6 +52,7 @@ export function NetworkScopeWorkspaceContent({
   activeNetworkId,
   handleSelectNetwork,
   handleDuplicateNetwork,
+  handleExportActiveNetwork,
   handleDeleteNetwork,
   networkFormMode,
   handleOpenCreateNetworkForm,
@@ -361,6 +363,15 @@ export function NetworkScopeWorkspaceContent({
           >
             <span className="action-button-icon is-duplicate" aria-hidden="true" />
             Duplicate
+          </button>
+          <button
+            type="button"
+            className="button-with-icon network-scope-export-button"
+            onClick={handleExportActiveNetwork}
+            disabled={activeNetworkId === null || isCreateMode}
+          >
+            <span className="action-button-icon is-open" aria-hidden="true" />
+            Export
           </button>
           <button
             type="button"
