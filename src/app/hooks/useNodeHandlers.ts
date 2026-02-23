@@ -189,8 +189,9 @@ export function useNodeHandlers({
         startNodeEdit(savedNode);
         return;
       }
-      dispatchAction(appActions.select({ kind: "node", id: effectiveNodeId }));
-      resetNodeForm();
+      if (savedNode !== undefined) {
+        startNodeEdit(savedNode);
+      }
       focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-nodes"]');
     }
   }

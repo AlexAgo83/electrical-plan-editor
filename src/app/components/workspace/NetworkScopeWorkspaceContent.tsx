@@ -371,7 +371,7 @@ export function NetworkScopeWorkspaceContent({
             onClick={handleExportActiveNetwork}
             disabled={activeNetworkId === null || isCreateMode}
           >
-            <span className="action-button-icon is-open" aria-hidden="true" />
+            <span className="action-button-icon is-home-import" aria-hidden="true" />
             Export
           </button>
           <button

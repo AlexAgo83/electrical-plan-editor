@@ -143,8 +143,7 @@ export function useSegmentHandlers({
         startSegmentEdit(savedSegment);
         return;
       }
-      dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
-      resetSegmentForm();
+      startSegmentEdit(savedSegment);
       focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-segments"]');
     }
   }

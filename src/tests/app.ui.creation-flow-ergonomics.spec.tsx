@@ -256,6 +256,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     await waitFor(() => {
       expect(document.activeElement).toBe(connectorRow);
     });
+    expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
 
     switchSubScreenDrawerAware("node");
     const nodesPanel = getPanelByHeading("Nodes");
@@ -271,6 +272,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     await waitFor(() => {
       expect(document.activeElement).toBe(nodeRow);
     });
+    expect(getPanelByHeading("Edit Node")).toBeInTheDocument();
 
     switchSubScreenDrawerAware("wire");
     const wiresPanel = getPanelByHeading("Wires");
@@ -286,6 +288,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     await waitFor(() => {
       expect(document.activeElement).toBe(wireRow);
     });
+    expect(getPanelByHeading("Edit Wire")).toBeInTheDocument();
   });
 
   it("prefills the next free endpoint way/port in wire create mode and keeps manual edits until context changes", () => {

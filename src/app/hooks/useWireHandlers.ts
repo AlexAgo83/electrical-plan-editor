@@ -601,9 +601,7 @@ export function useWireHandlers({
         startWireEdit(savedWire);
         return;
       }
-      dispatchAction(appActions.select({ kind: "wire", id: wireId }));
-      resetWireForm();
-      setWireForcedRouteInput(savedWire.routeSegmentIds.join(", "));
+      startWireEdit(savedWire);
       focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-wires"]');
     }
   }
