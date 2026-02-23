@@ -1,5 +1,5 @@
 import { fireEvent, screen, within } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createUiIntegrationState,
   createValidationIssueState,
@@ -9,6 +9,10 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("home workspace screen", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it("exposes Home as a primary workspace entry and opens the home panels", () => {
     renderAppWithState(createUiIntegrationState());
 
@@ -65,6 +69,39 @@ describe("home workspace screen", () => {
     expect(nextState.segments.allIds).toHaveLength(0);
     expect(nextState.wires.allIds).toHaveLength(0);
     expect(nextState.ui.themeMode).toBe(previousThemeMode);
+    expect(getPanelByHeading("Network Scope")).toBeInTheDocument();
+  });
+
+  it("auto-opens onboarding, persists opt-out, and allows Home help relaunch", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    expect(screen.getByRole("dialog", { name: "Create your first network" })).toBeInTheDocument();
+    expect(screen.getByText("Step 1 of 5")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
+    const optOutCheckbox = screen.getByLabelText("Do not open automatically on app load");
+    expect(optOutCheckbox).toBeInTheDocument();
+
+    fireEvent.click(optOutCheckbox);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    firstRender.unmount();
+
+    renderAppWithState(createUiIntegrationState());
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+    switchScreenDrawerAware("home");
+    const startPanel = getPanelByHeading("Start");
+    fireEvent.click(within(startPanel).getByRole("button", { name: "Help" }));
+    expect(screen.getByRole("dialog", { name: "Create your first network" })).toBeInTheDocument();
+  });
+
+  it("uses onboarding step CTA to open Network Scope from Home", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    const onboardingDialog = screen.getByRole("dialog", { name: "Create your first network" });
+    const openTargetButton = within(onboardingDialog).getByRole("button", { name: "Open Network Scope" });
+    expect(openTargetButton).toBeInTheDocument();
+    fireEvent.click(openTargetButton);
+
     expect(getPanelByHeading("Network Scope")).toBeInTheDocument();
   });
 });

@@ -294,7 +294,8 @@ export function buildNetworkScopeScreenContentSlice(params: NetworkScopeScreenCo
     networkTechnicalIdAlreadyUsed: params.networkTechnicalIdAlreadyUsed,
     handleSubmitNetworkForm: params.handleSubmitNetworkForm,
     focusRequestedNetworkId: params.networkFocusRequest.id,
-    focusRequestedNetworkToken: params.networkFocusRequest.token
+    focusRequestedNetworkToken: params.networkFocusRequest.token,
+    onOpenOnboardingHelp: params.onOpenOnboardingHelp
   } satisfies NetworkScopeWorkspaceContentProps;
 
   return {
@@ -319,6 +320,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     selectedConnectorId: params.selectedConnectorId,
     onEditConnector: params.startConnectorEdit,
     onDeleteConnector: params.handleConnectorDelete,
+    onOpenConnectorOnboardingHelp: params.onOpenConnectorOnboardingHelp,
     isSpliceSubScreen: params.isSpliceSubScreen,
     spliceFormMode: params.spliceFormMode,
     onOpenCreateSplice: params.resetSpliceForm,
@@ -332,6 +334,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     selectedSpliceId: params.selectedSpliceId,
     onEditSplice: params.startSpliceEdit,
     onDeleteSplice: params.handleSpliceDelete,
+    onOpenSpliceOnboardingHelp: params.onOpenSpliceOnboardingHelp,
     isNodeSubScreen: params.isNodeSubScreen,
     nodeFormMode: params.nodeFormMode,
     onOpenCreateNode: params.resetNodeForm,
@@ -345,7 +348,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     selectedNodeId: params.selectedNodeId,
     describeNode: params.describeNode,
     onEditNode: params.startNodeEdit,
-    onDeleteNode: params.handleNodeDelete
+    onDeleteNode: params.handleNodeDelete,
+    onOpenNodeOnboardingHelp: params.onOpenNodeOnboardingHelp
   } satisfies ModelingPrimaryTablesProps;
   const modelingSecondaryTablesProps = {
     isSegmentSubScreen: params.isSegmentSubScreen,
@@ -378,7 +382,9 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     describeWireEndpoint: params.describeWireEndpoint,
     describeWireEndpointId: params.describeWireEndpointId,
     onEditWire: params.startWireEdit,
-    onDeleteWire: params.handleWireDelete
+    onDeleteWire: params.handleWireDelete,
+    onOpenSegmentOnboardingHelp: params.onOpenSegmentOnboardingHelp,
+    onOpenWireOnboardingHelp: params.onOpenWireOnboardingHelp
   } satisfies ModelingSecondaryTablesProps;
   const modelingFormsColumnProps = {
     isConnectorSubScreen: params.isConnectorSubScreen,
