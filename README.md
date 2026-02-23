@@ -26,7 +26,7 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 
 - Production: [https://e-plan-editor.onrender.com](https://e-plan-editor.onrender.com)
 - Hosting: Render Static Site (Blueprint via `render.yaml`)
-- Current version: `0.7.2`
+- Current version: `0.7.3`
 - CI status: see the GitHub Actions badge above
 
 ## Features
