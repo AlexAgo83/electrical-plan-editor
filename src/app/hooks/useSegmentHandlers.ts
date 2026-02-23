@@ -3,6 +3,7 @@ import type { NodeId, Segment, SegmentId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { toPositiveNumber } from "../lib/app-utils-shared";
+import { suggestNextSegmentId } from "../lib/technical-id-suggestions";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -53,9 +54,10 @@ export function useSegmentHandlers({
   setSegmentFormError
 }: UseSegmentHandlersParams) {
   function resetSegmentForm(): void {
+    const nextState = store.getState();
     setSegmentFormMode("create");
     setEditingSegmentId(null);
-    setSegmentIdInput("");
+    setSegmentIdInput(suggestNextSegmentId(nextState.segments.allIds));
     setSegmentNodeA("");
     setSegmentNodeB("");
     setSegmentLengthMm("120");
