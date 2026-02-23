@@ -49,9 +49,10 @@
 .stack-label input,
 .stack-label select {
   border-radius: 0.5rem;
-  border: 1px solid #bacada;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
   padding: 0.45rem 0.6rem;
-  background: #fff;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  color: inherit;
   width: 100%;
   min-width: 0;
   max-width: 100%;
