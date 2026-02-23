@@ -384,6 +384,92 @@ export function SettingsWorkspaceContent({
 
       <section className="panel settings-panel">
         <header className="settings-panel-header">
+          <h2>Action bar and shortcuts</h2>
+          <span className="settings-panel-chip">Shortcuts</span>
+        </header>
+        <p className="settings-panel-intro">Enable keyboard helpers and keep a quick reference of available shortcuts.</p>
+        <div className="settings-grid">
+          <label className="settings-checkbox">
+            <input type="checkbox" checked={showShortcutHints} onChange={(event) => setShowShortcutHints(event.target.checked)} />
+            Show shortcut hints in the action bar
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={keyboardShortcutsEnabled}
+              onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
+            />
+            Enable keyboard shortcuts (undo/redo/navigation/issues/view)
+          </label>
+        </div>
+        <ul className="settings-shortcut-list">
+          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Z</span> <span>Undo last modeling action</span></li>
+          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Shift + Z</span> <span>Redo</span></li>
+          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Y</span> <span>Redo (alternative shortcut)</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + 1..6</span> <span>Switch top-level workspace</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + Shift + 1..5</span> <span>Switch entity sub-screen</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + F</span> <span>Fit network view to current graph</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + J / Alt + K</span> <span>Previous / next validation issue</span></li>
+        </ul>
+      </section>
+
+      <section className="panel settings-panel">
+        <header className="settings-panel-header">
+          <h2>Global preferences</h2>
+          <span className="settings-panel-chip">Defaults</span>
+        </header>
+        <p className="settings-panel-intro">Shared UI preferences applied across workspace screens (outside of screen-specific controls).</p>
+        <div className="settings-grid">
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={showFloatingInspectorPanel}
+              onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
+            />
+            Show floating inspector panel on supported screens
+          </label>
+          <label className="settings-field">
+            Workspace panels layout
+            <select
+              value={workspacePanelsLayoutMode}
+              onChange={(event) => setWorkspacePanelsLayoutMode(event.target.value as WorkspacePanelsLayoutMode)}
+            >
+              <option value="multiColumn">Responsive multi-column</option>
+              <option value="singleColumn">Force single column</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            Default wire section (mm²)
+            <input
+              type="number"
+              min={0.01}
+              step={0.01}
+              value={String(defaultWireSectionMm2)}
+              onChange={(event) => {
+                const nextValue = Number(event.target.value.replace(",", "."));
+                if (!Number.isFinite(nextValue) || nextValue <= 0) {
+                  return;
+                }
+                setDefaultWireSectionMm2(nextValue);
+              }}
+            />
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={defaultAutoCreateLinkedNodes}
+              onChange={(event) => setDefaultAutoCreateLinkedNodes(event.target.checked)}
+            />
+            Default auto-create linked nodes for connectors/splices
+          </label>
+        </div>
+        <div className="row-actions settings-actions">
+          <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
+        </div>
+      </section>
+
+      <section className="panel settings-panel">
+        <header className="settings-panel-header">
           <h2>Import / Export networks</h2>
           <span className="settings-panel-chip">Portability</span>
         </header>
@@ -445,92 +531,6 @@ export function SettingsWorkspaceContent({
             <p className="meta-line"><span>Errors</span> <strong>{lastImportSummary.errors.length}</strong></p>
           </div>
         ) : null}
-      </section>
-
-      <section className="panel settings-panel">
-        <header className="settings-panel-header">
-          <h2>Global preferences</h2>
-          <span className="settings-panel-chip">Defaults</span>
-        </header>
-        <p className="settings-panel-intro">Shared UI preferences applied across workspace screens (outside of screen-specific controls).</p>
-        <div className="settings-grid">
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={showFloatingInspectorPanel}
-              onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
-            />
-            Show floating inspector panel on supported screens
-          </label>
-          <label className="settings-field">
-            Workspace panels layout
-            <select
-              value={workspacePanelsLayoutMode}
-              onChange={(event) => setWorkspacePanelsLayoutMode(event.target.value as WorkspacePanelsLayoutMode)}
-            >
-              <option value="multiColumn">Responsive multi-column</option>
-              <option value="singleColumn">Force single column</option>
-            </select>
-          </label>
-          <label className="settings-field">
-            Default wire section (mm²)
-            <input
-              type="number"
-              min={0.01}
-              step={0.01}
-              value={String(defaultWireSectionMm2)}
-              onChange={(event) => {
-                const nextValue = Number(event.target.value.replace(",", "."));
-                if (!Number.isFinite(nextValue) || nextValue <= 0) {
-                  return;
-                }
-                setDefaultWireSectionMm2(nextValue);
-              }}
-            />
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={defaultAutoCreateLinkedNodes}
-              onChange={(event) => setDefaultAutoCreateLinkedNodes(event.target.checked)}
-            />
-            Default auto-create linked nodes for connectors/splices
-          </label>
-        </div>
-        <div className="row-actions settings-actions">
-          <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
-        </div>
-      </section>
-
-      <section className="panel settings-panel">
-        <header className="settings-panel-header">
-          <h2>Action bar and shortcuts</h2>
-          <span className="settings-panel-chip">Shortcuts</span>
-        </header>
-        <p className="settings-panel-intro">Enable keyboard helpers and keep a quick reference of available shortcuts.</p>
-        <div className="settings-grid">
-          <label className="settings-checkbox">
-            <input type="checkbox" checked={showShortcutHints} onChange={(event) => setShowShortcutHints(event.target.checked)} />
-            Show shortcut hints in the action bar
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={keyboardShortcutsEnabled}
-              onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
-            />
-            Enable keyboard shortcuts (undo/redo/navigation/issues/view)
-          </label>
-        </div>
-        <ul className="settings-shortcut-list">
-          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Z</span> <span>Undo last modeling action</span></li>
-          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Shift + Z</span> <span>Redo</span></li>
-          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Y</span> <span>Redo (alternative shortcut)</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + 1..6</span> <span>Switch top-level workspace</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + Shift + 1..5</span> <span>Switch entity sub-screen</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + F</span> <span>Fit network view to current graph</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + J / Alt + K</span> <span>Previous / next validation issue</span></li>
-        </ul>
       </section>
     </section>
   );
