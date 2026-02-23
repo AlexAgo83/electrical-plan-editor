@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { useEffect, useRef, type ReactElement } from "react";
 import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type {
@@ -98,6 +98,12 @@ export function ModelingPrimaryTables({
   onEditNode,
   onDeleteNode
 }: ModelingPrimaryTablesProps): ReactElement {
+  const connectorRowRefs = useRef<Partial<Record<ConnectorId, HTMLTableRowElement | null>>>({});
+  const spliceRowRefs = useRef<Partial<Record<SpliceId, HTMLTableRowElement | null>>>({});
+  const nodeRowRefs = useRef<Partial<Record<NodeId, HTMLTableRowElement | null>>>({});
+  const lastAutoFocusedConnectorIdRef = useRef<ConnectorId | null>(null);
+  const lastAutoFocusedSpliceIdRef = useRef<SpliceId | null>(null);
+  const lastAutoFocusedNodeIdRef = useRef<NodeId | null>(null);
   const focusedConnector =
     selectedConnectorId === null ? null : (visibleConnectors.find((connector) => connector.id === selectedConnectorId) ?? null);
   const focusedSplice =
@@ -105,6 +111,60 @@ export function ModelingPrimaryTables({
   const focusedNode =
     selectedNodeId === null ? null : (visibleNodes.find((node) => node.id === selectedNodeId) ?? null);
   const showNodeKindColumn = nodeKindFilter === "all";
+
+  useEffect(() => {
+    if (connectorFormMode !== "edit" || selectedConnectorId === null) {
+      lastAutoFocusedConnectorIdRef.current = null;
+      return;
+    }
+    if (lastAutoFocusedConnectorIdRef.current === selectedConnectorId) {
+      return;
+    }
+    lastAutoFocusedConnectorIdRef.current = selectedConnectorId;
+    if (typeof window === "undefined") {
+      connectorRowRefs.current[selectedConnectorId]?.focus();
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      connectorRowRefs.current[selectedConnectorId]?.focus();
+    });
+  }, [connectorFormMode, selectedConnectorId]);
+
+  useEffect(() => {
+    if (spliceFormMode !== "edit" || selectedSpliceId === null) {
+      lastAutoFocusedSpliceIdRef.current = null;
+      return;
+    }
+    if (lastAutoFocusedSpliceIdRef.current === selectedSpliceId) {
+      return;
+    }
+    lastAutoFocusedSpliceIdRef.current = selectedSpliceId;
+    if (typeof window === "undefined") {
+      spliceRowRefs.current[selectedSpliceId]?.focus();
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      spliceRowRefs.current[selectedSpliceId]?.focus();
+    });
+  }, [spliceFormMode, selectedSpliceId]);
+
+  useEffect(() => {
+    if (nodeFormMode !== "edit" || selectedNodeId === null) {
+      lastAutoFocusedNodeIdRef.current = null;
+      return;
+    }
+    if (lastAutoFocusedNodeIdRef.current === selectedNodeId) {
+      return;
+    }
+    lastAutoFocusedNodeIdRef.current = selectedNodeId;
+    if (typeof window === "undefined") {
+      nodeRowRefs.current[selectedNodeId]?.focus();
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      nodeRowRefs.current[selectedNodeId]?.focus();
+    });
+  }, [nodeFormMode, selectedNodeId]);
 
   return (
     <>
@@ -164,6 +224,9 @@ export function ModelingPrimaryTables({
                 return (
                   <tr
                     key={connector.id}
+                    ref={(element) => {
+                      connectorRowRefs.current[connector.id] = element;
+                    }}
                     className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
                     aria-selected={isFocused}
                     tabIndex={0}
@@ -267,6 +330,9 @@ export function ModelingPrimaryTables({
                 return (
                   <tr
                     key={splice.id}
+                    ref={(element) => {
+                      spliceRowRefs.current[splice.id] = element;
+                    }}
                     className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
                     aria-selected={isFocused}
                     tabIndex={0}
@@ -372,6 +438,9 @@ export function ModelingPrimaryTables({
                 return (
                   <tr
                     key={node.id}
+                    ref={(element) => {
+                      nodeRowRefs.current[node.id] = element;
+                    }}
                     className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
                     aria-selected={isFocused}
                     tabIndex={0}

@@ -1,4 +1,4 @@
-import { fireEvent, screen, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   asNodeId,
@@ -72,6 +72,35 @@ describe("App integration UI - navigation and canvas", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Redo" }));
     expect(within(connectorsPanel).getByText("Undo test connector")).toBeInTheDocument();
+  });
+
+  it("focuses the created connector row and switches the form to edit mode after creation", async () => {
+    renderAppWithState(createInitialState());
+    switchScreenDrawerAware("modeling");
+
+    const idleConnectorFormPanel = getPanelByHeading("Connector form");
+    fireEvent.click(within(idleConnectorFormPanel).getByRole("button", { name: "Create" }));
+    const connectorFormPanel = getPanelByHeading("Create Connector");
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
+      target: { value: "Focused connector" }
+    });
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Technical ID"), {
+      target: { value: "C-FOCUS-1" }
+    });
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Way count"), {
+      target: { value: "3" }
+    });
+    fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    const createdRow = within(connectorsPanel).getByText("Focused connector").closest("tr");
+    expect(createdRow).not.toBeNull();
+    expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(createdRow).toHaveClass("is-selected");
+      expect(document.activeElement).toBe(createdRow);
+    });
   });
 
   it("reflects connector cavity occupancy in real time", () => {

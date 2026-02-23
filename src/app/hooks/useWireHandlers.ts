@@ -239,6 +239,7 @@ export function useWireHandlers({
 
     setWireFormError(null);
 
+    const wasCreateMode = wireFormMode === "create";
     const wireId = wireFormMode === "edit" && editingWireId !== null ? editingWireId : (createEntityId("wire") as WireId);
     dispatchAction(
       appActions.saveWire({
@@ -251,10 +252,15 @@ export function useWireHandlers({
     );
 
     const nextState = store.getState();
-    if (nextState.wires.byId[wireId] !== undefined) {
+    const savedWire = nextState.wires.byId[wireId];
+    if (savedWire !== undefined) {
+      if (wasCreateMode) {
+        startWireEdit(savedWire);
+        return;
+      }
       dispatchAction(appActions.select({ kind: "wire", id: wireId }));
       resetWireForm();
-      setWireForcedRouteInput(nextState.wires.byId[wireId].routeSegmentIds.join(", "));
+      setWireForcedRouteInput(savedWire.routeSegmentIds.join(", "));
     }
   }
 

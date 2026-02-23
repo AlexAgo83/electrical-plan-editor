@@ -88,6 +88,7 @@ export function useNodeHandlers({
   function startNodeEdit(node: NetworkNode): void {
     setNodeFormMode("edit");
     setEditingNodeId(node.id);
+    setPendingNewNodePosition(null);
     setNodeIdInput(node.id);
     setNodeKind(node.kind);
     setNodeLabel(node.kind === "intermediate" ? node.label : "");
@@ -99,6 +100,7 @@ export function useNodeHandlers({
   function handleNodeSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
 
+    const wasCreateMode = nodeFormMode === "create";
     const normalizedNodeId = nodeIdInput.trim();
     const nodeId = (nodeFormMode === "edit" && editingNodeId !== null ? editingNodeId : normalizedNodeId) as NodeId;
 
@@ -161,6 +163,11 @@ export function useNodeHandlers({
     if (nextState.nodes.byId[nodeId] !== undefined) {
       if (pendingNewNodePosition !== null) {
         dispatchAction(appActions.setNodePosition(nodeId, pendingNewNodePosition), { trackHistory: false });
+      }
+      const savedNode = nextState.nodes.byId[nodeId];
+      if (savedNode !== undefined && wasCreateMode) {
+        startNodeEdit(savedNode);
+        return;
       }
       dispatchAction(appActions.select({ kind: "node", id: nodeId }));
       resetNodeForm();

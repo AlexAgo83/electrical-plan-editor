@@ -228,6 +228,7 @@ export function NetworkScopeWorkspaceContent({
                   {sortedNetworks.map((network) => {
                     const isActive = activeNetworkId === network.id;
                     const isFocused = focusedNetworkId === network.id;
+                    const canSetActive = !isCreateMode && !isActive;
                     return (
                       <tr
                         key={network.id}
@@ -241,6 +242,12 @@ export function NetworkScopeWorkspaceContent({
                           event.currentTarget.focus();
                           setFocusedNetworkId(network.id);
                           handleOpenEditNetworkForm(network.id);
+                        }}
+                        onDoubleClick={() => {
+                          if (!canSetActive) {
+                            return;
+                          }
+                          handleSelectNetwork(network.id);
                         }}
                         onKeyDown={(event) => {
                           if (event.key === "Enter" || event.key === " ") {
