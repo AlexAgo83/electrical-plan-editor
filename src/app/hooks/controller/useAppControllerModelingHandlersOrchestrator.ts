@@ -21,6 +21,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setConnectorName: Parameters<typeof useConnectorHandlers>[0]["setConnectorName"];
   connectorTechnicalId: Parameters<typeof useConnectorHandlers>[0]["connectorTechnicalId"];
   setConnectorTechnicalId: Parameters<typeof useConnectorHandlers>[0]["setConnectorTechnicalId"];
+  connectorManufacturerReference: Parameters<typeof useConnectorHandlers>[0]["connectorManufacturerReference"];
+  setConnectorManufacturerReference: Parameters<typeof useConnectorHandlers>[0]["setConnectorManufacturerReference"];
   cavityCount: Parameters<typeof useConnectorHandlers>[0]["cavityCount"];
   setCavityCount: Parameters<typeof useConnectorHandlers>[0]["setCavityCount"];
   setConnectorFormError: Parameters<typeof useConnectorHandlers>[0]["setConnectorFormError"];
@@ -34,6 +36,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setSpliceName: Parameters<typeof useSpliceHandlers>[0]["setSpliceName"];
   spliceTechnicalId: Parameters<typeof useSpliceHandlers>[0]["spliceTechnicalId"];
   setSpliceTechnicalId: Parameters<typeof useSpliceHandlers>[0]["setSpliceTechnicalId"];
+  spliceManufacturerReference: Parameters<typeof useSpliceHandlers>[0]["spliceManufacturerReference"];
+  setSpliceManufacturerReference: Parameters<typeof useSpliceHandlers>[0]["setSpliceManufacturerReference"];
   portCount: Parameters<typeof useSpliceHandlers>[0]["portCount"];
   setPortCount: Parameters<typeof useSpliceHandlers>[0]["setPortCount"];
   setSpliceFormError: Parameters<typeof useSpliceHandlers>[0]["setSpliceFormError"];
@@ -127,6 +131,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setConnectorName,
   connectorTechnicalId,
   setConnectorTechnicalId,
+  connectorManufacturerReference,
+  setConnectorManufacturerReference,
   cavityCount,
   setCavityCount,
   setConnectorFormError,
@@ -140,6 +146,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setSpliceName,
   spliceTechnicalId,
   setSpliceTechnicalId,
+  spliceManufacturerReference,
+  setSpliceManufacturerReference,
   portCount,
   setPortCount,
   setSpliceFormError,
@@ -231,6 +239,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     setConnectorName,
     connectorTechnicalId,
     setConnectorTechnicalId,
+    connectorManufacturerReference,
+    setConnectorManufacturerReference,
     cavityCount,
     setCavityCount,
     setConnectorFormError,
@@ -250,6 +260,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     setSpliceName,
     spliceTechnicalId,
     setSpliceTechnicalId,
+    spliceManufacturerReference,
+    setSpliceManufacturerReference,
     portCount,
     setPortCount,
     setSpliceFormError,

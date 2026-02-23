@@ -119,6 +119,65 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(within(nodesPanel).getByText("Auto node splice (S-001)")).toBeInTheDocument();
   });
 
+  it("supports optional manufacturer references on connector and splice forms with trim and clear flows", () => {
+    const { store } = renderAppWithState(createInitialState());
+    switchScreenDrawerAware("modeling");
+
+    fireEvent.click(within(getPanelByHeading("Connector form")).getByRole("button", { name: "Create" }));
+    const createConnectorPanel = getPanelByHeading("Create Connector");
+    fireEvent.change(within(createConnectorPanel).getByLabelText("Functional name"), {
+      target: { value: "Connector ref test" }
+    });
+    fireEvent.change(within(createConnectorPanel).getByLabelText("Technical ID"), {
+      target: { value: "C-REF-1" }
+    });
+    fireEvent.change(within(createConnectorPanel).getByLabelText("Manufacturer reference"), {
+      target: { value: "  TE-1-967616-1  " }
+    });
+    fireEvent.click(within(createConnectorPanel).getByRole("button", { name: "Create" }));
+
+    let state = store.getState();
+    const connectorId = state.connectors.allIds.find((id) => state.connectors.byId[id]?.technicalId === "C-REF-1");
+    expect(connectorId).toBeDefined();
+    if (connectorId === undefined) {
+      throw new Error("Expected created connector C-REF-1.");
+    }
+    expect(state.connectors.byId[connectorId]?.manufacturerReference).toBe("TE-1-967616-1");
+
+    const editConnectorPanel = getPanelByHeading("Edit Connector");
+    fireEvent.change(within(editConnectorPanel).getByLabelText("Manufacturer reference"), { target: { value: "   " } });
+    fireEvent.click(within(editConnectorPanel).getByRole("button", { name: "Save" }));
+    state = store.getState();
+    expect(state.connectors.byId[connectorId]?.manufacturerReference).toBeUndefined();
+
+    switchSubScreenDrawerAware("splice");
+    fireEvent.click(within(getPanelByHeading("Splice form")).getByRole("button", { name: "Create" }));
+    const createSplicePanel = getPanelByHeading("Create Splice");
+    fireEvent.change(within(createSplicePanel).getByLabelText("Functional name"), {
+      target: { value: "Splice ref test" }
+    });
+    fireEvent.change(within(createSplicePanel).getByLabelText("Technical ID"), {
+      target: { value: "S-REF-1" }
+    });
+    fireEvent.change(within(createSplicePanel).getByLabelText("Manufacturer reference"), {
+      target: { value: "  AMP/SEAL-42  " }
+    });
+    fireEvent.click(within(createSplicePanel).getByRole("button", { name: "Create" }));
+
+    state = store.getState();
+    const spliceId = state.splices.allIds.find((id) => state.splices.byId[id]?.technicalId === "S-REF-1");
+    expect(spliceId).toBeDefined();
+    if (spliceId === undefined) {
+      throw new Error("Expected created splice S-REF-1.");
+    }
+    expect(state.splices.byId[spliceId]?.manufacturerReference).toBe("AMP/SEAL-42");
+
+    const editSplicePanel = getPanelByHeading("Edit Splice");
+    fireEvent.change(within(editSplicePanel).getByLabelText("Manufacturer reference"), { target: { value: " " } });
+    fireEvent.click(within(editSplicePanel).getByRole("button", { name: "Save" }));
+    expect(store.getState().splices.byId[spliceId]?.manufacturerReference).toBeUndefined();
+  });
+
   it("allows editing a node ID in edit mode and saves the renamed node", () => {
     renderAppWithState(createUiIntegrationState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));

@@ -26,6 +26,8 @@ interface UseSpliceHandlersParams {
   setSpliceName: (value: string) => void;
   spliceTechnicalId: string;
   setSpliceTechnicalId: (value: string) => void;
+  spliceManufacturerReference: string;
+  setSpliceManufacturerReference: (value: string) => void;
   portCount: string;
   setPortCount: (value: string) => void;
   setSpliceFormError: (value: string | null) => void;
@@ -45,6 +47,8 @@ export function useSpliceHandlers({
   setSpliceName,
   spliceTechnicalId,
   setSpliceTechnicalId,
+  spliceManufacturerReference,
+  setSpliceManufacturerReference,
   portCount,
   setPortCount,
   setSpliceFormError,
@@ -58,6 +62,7 @@ export function useSpliceHandlers({
     setEditingSpliceId(null);
     setSpliceName("");
     setSpliceTechnicalId(suggestNextSpliceTechnicalId(Object.values(state.splices.byId).map((splice) => splice.technicalId)));
+    setSpliceManufacturerReference("");
     setPortCount("4");
     setSpliceFormError(null);
   }
@@ -67,6 +72,7 @@ export function useSpliceHandlers({
     setEditingSpliceId(null);
     setSpliceName("");
     setSpliceTechnicalId("");
+    setSpliceManufacturerReference("");
     setPortCount("4");
     setSpliceFormError(null);
   }
@@ -81,6 +87,7 @@ export function useSpliceHandlers({
     setEditingSpliceId(splice.id);
     setSpliceName(splice.name);
     setSpliceTechnicalId(splice.technicalId);
+    setSpliceManufacturerReference(splice.manufacturerReference ?? "");
     setPortCount(String(splice.portCount));
     dispatchAction(appActions.select({ kind: "splice", id: splice.id }));
   }
@@ -90,6 +97,11 @@ export function useSpliceHandlers({
 
     const trimmedName = spliceName.trim();
     const trimmedTechnicalId = spliceTechnicalId.trim();
+    const normalizedManufacturerReferenceRaw = spliceManufacturerReference.trim();
+    if (normalizedManufacturerReferenceRaw.length > 120) {
+      setSpliceFormError("Manufacturer reference must be 120 characters or fewer.");
+      return;
+    }
     const normalizedPortCount = toPositiveInteger(portCount);
 
     if (trimmedName.length === 0 || trimmedTechnicalId.length === 0 || normalizedPortCount < 1) {
@@ -112,6 +124,8 @@ export function useSpliceHandlers({
         id: spliceId,
         name: trimmedName,
         technicalId: trimmedTechnicalId,
+        manufacturerReference:
+          normalizedManufacturerReferenceRaw.length === 0 ? undefined : normalizedManufacturerReferenceRaw,
         portCount: normalizedPortCount
       })
     );

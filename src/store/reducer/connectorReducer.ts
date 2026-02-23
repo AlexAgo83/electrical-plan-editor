@@ -25,6 +25,19 @@ function hasDuplicateConnectorTechnicalId(state: AppState, connectorId: string, 
   });
 }
 
+function normalizeManufacturerReference(value: string | undefined): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return undefined;
+  }
+
+  return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
+}
+
 function hasConnectorNodeReference(state: AppState, connectorId: string): boolean {
   return state.nodes.allIds.some((id) => {
     const node = state.nodes.byId[id];
@@ -74,7 +87,10 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
 
       return bumpRevision({
         ...clearLastError(state),
-        connectors: upsertEntity(state.connectors, action.payload)
+        connectors: upsertEntity(state.connectors, {
+          ...action.payload,
+          manufacturerReference: normalizeManufacturerReference(action.payload.manufacturerReference)
+        })
       });
     }
 

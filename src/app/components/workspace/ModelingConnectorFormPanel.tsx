@@ -12,6 +12,8 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     setConnectorName,
     connectorTechnicalId,
     setConnectorTechnicalId,
+    connectorManufacturerReference,
+    setConnectorManufacturerReference,
     connectorTechnicalIdAlreadyUsed,
     cavityCount,
     setCavityCount,
@@ -34,6 +36,15 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     <label>
       Technical ID
       <input value={connectorTechnicalId} onChange={(event) => setConnectorTechnicalId(event.target.value)} placeholder="C-001" required />
+    </label>
+    <label>
+      Manufacturer reference
+      <input
+        value={connectorManufacturerReference}
+        onChange={(event) => setConnectorManufacturerReference(event.target.value)}
+        placeholder="e.g. TE-1-967616-1"
+        maxLength={120}
+      />
     </label>
     {connectorTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
     <label>
