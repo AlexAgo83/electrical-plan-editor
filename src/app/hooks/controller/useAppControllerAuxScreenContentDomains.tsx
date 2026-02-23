@@ -154,6 +154,8 @@ export function useAppControllerAuxScreenContentDomains({
     setTableFontSize: settings.prefs.setTableFontSize,
     defaultWireSectionMm2: settings.prefs.defaultWireSectionMm2,
     setDefaultWireSectionMm2: settings.prefs.setDefaultWireSectionMm2,
+    defaultAutoCreateLinkedNodes: settings.prefs.defaultAutoCreateLinkedNodes,
+    setDefaultAutoCreateLinkedNodes: settings.prefs.setDefaultAutoCreateLinkedNodes,
     defaultSortField: settings.prefs.defaultSortField,
     setDefaultSortField: settings.prefs.setDefaultSortField,
     defaultSortDirection: settings.prefs.defaultSortDirection,

@@ -13,6 +13,8 @@ export interface ModelingFormsColumnProps {
   setConnectorTechnicalId: (value: string) => void;
   connectorManufacturerReference: string;
   setConnectorManufacturerReference: (value: string) => void;
+  connectorAutoCreateLinkedNode: boolean;
+  setConnectorAutoCreateLinkedNode: (value: boolean) => void;
   connectorTechnicalIdAlreadyUsed: boolean;
   cavityCount: string;
   setCavityCount: (value: string) => void;
@@ -28,6 +30,8 @@ export interface ModelingFormsColumnProps {
   setSpliceTechnicalId: (value: string) => void;
   spliceManufacturerReference: string;
   setSpliceManufacturerReference: (value: string) => void;
+  spliceAutoCreateLinkedNode: boolean;
+  setSpliceAutoCreateLinkedNode: (value: boolean) => void;
   spliceTechnicalIdAlreadyUsed: boolean;
   portCount: string;
   setPortCount: (value: string) => void;

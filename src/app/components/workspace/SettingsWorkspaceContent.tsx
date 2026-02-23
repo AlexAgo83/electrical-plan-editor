@@ -39,6 +39,8 @@ interface SettingsWorkspaceContentProps {
   setTableFontSize: (value: TableFontSize) => void;
   defaultWireSectionMm2: number;
   setDefaultWireSectionMm2: (value: number) => void;
+  defaultAutoCreateLinkedNodes: boolean;
+  setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
   defaultSortField: SortField;
   setDefaultSortField: (value: SortField) => void;
   defaultSortDirection: SortDirection;
@@ -108,6 +110,8 @@ export function SettingsWorkspaceContent({
   setTableFontSize,
   defaultWireSectionMm2,
   setDefaultWireSectionMm2,
+  defaultAutoCreateLinkedNodes,
+  setDefaultAutoCreateLinkedNodes,
   defaultSortField,
   setDefaultSortField,
   defaultSortDirection,
@@ -483,6 +487,14 @@ export function SettingsWorkspaceContent({
                 setDefaultWireSectionMm2(nextValue);
               }}
             />
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={defaultAutoCreateLinkedNodes}
+              onChange={(event) => setDefaultAutoCreateLinkedNodes(event.target.checked)}
+            />
+            Default auto-create linked nodes for connectors/splices
           </label>
         </div>
         <div className="row-actions settings-actions">

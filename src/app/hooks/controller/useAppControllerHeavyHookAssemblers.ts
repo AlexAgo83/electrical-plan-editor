@@ -75,6 +75,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setTableDensity"
     | "setTableFontSize"
     | "setDefaultWireSectionMm2"
+    | "setDefaultAutoCreateLinkedNodes"
     | "setDefaultSortField"
     | "setDefaultSortDirection"
     | "setDefaultIdSortDirection"

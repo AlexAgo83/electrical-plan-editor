@@ -90,6 +90,8 @@ export function ModelingSecondaryTables({
   const wireRowRefs = useRef<Partial<Record<WireId, HTMLTableRowElement | null>>>({});
   const lastAutoFocusedSegmentIdRef = useRef<SegmentId | null>(null);
   const lastAutoFocusedWireIdRef = useRef<WireId | null>(null);
+  const previousSegmentFormModeRef = useRef<typeof segmentFormMode>(segmentFormMode);
+  const previousWireFormModeRef = useRef<typeof wireFormMode>(wireFormMode);
   const focusedSegment =
     selectedSegmentId === null ? null : (visibleSegments.find((segment) => segment.id === selectedSegmentId) ?? null);
   const focusedWire =
@@ -132,6 +134,36 @@ export function ModelingSecondaryTables({
       return;
     }
     lastAutoFocusedWireIdRef.current = selectedWireId;
+    if (typeof window === "undefined") {
+      wireRowRefs.current[selectedWireId]?.focus();
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      wireRowRefs.current[selectedWireId]?.focus();
+    });
+  }, [wireFormMode, selectedWireId]);
+
+  useEffect(() => {
+    const previousMode = previousSegmentFormModeRef.current;
+    previousSegmentFormModeRef.current = segmentFormMode;
+    if (previousMode !== "edit" || segmentFormMode !== "create" || selectedSegmentId === null) {
+      return;
+    }
+    if (typeof window === "undefined") {
+      segmentRowRefs.current[selectedSegmentId]?.focus();
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      segmentRowRefs.current[selectedSegmentId]?.focus();
+    });
+  }, [segmentFormMode, selectedSegmentId]);
+
+  useEffect(() => {
+    const previousMode = previousWireFormModeRef.current;
+    previousWireFormModeRef.current = wireFormMode;
+    if (previousMode !== "edit" || wireFormMode !== "create" || selectedWireId === null) {
+      return;
+    }
     if (typeof window === "undefined") {
       wireRowRefs.current[selectedWireId]?.focus();
       return;

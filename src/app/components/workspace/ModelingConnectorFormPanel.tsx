@@ -14,6 +14,8 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     setConnectorTechnicalId,
     connectorManufacturerReference,
     setConnectorManufacturerReference,
+    connectorAutoCreateLinkedNode,
+    setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,
     cavityCount,
     setCavityCount,
@@ -50,6 +52,15 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     <label>
       Way count
       <input type="number" min={1} step={1} value={cavityCount} onChange={(event) => setCavityCount(event.target.value)} required />
+    </label>
+    <label className="settings-checkbox">
+      <input
+        type="checkbox"
+        checked={connectorAutoCreateLinkedNode}
+        onChange={(event) => setConnectorAutoCreateLinkedNode(event.target.checked)}
+        disabled={connectorFormMode !== "create"}
+      />
+      Auto-create linked node on connector creation
     </label>
     <div className="row-actions">
       <button

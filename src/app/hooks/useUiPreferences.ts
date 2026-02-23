@@ -64,6 +64,7 @@ interface UiPreferencesPayload {
   tableDensity: TableDensity;
   tableFontSize: TableFontSizePreference;
   defaultWireSectionMm2: number;
+  defaultAutoCreateLinkedNodes: boolean;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
   defaultIdSortDirection: SortDirection;
@@ -119,6 +120,7 @@ interface UseUiPreferencesOptions {
   tableDensity: TableDensity;
   tableFontSize: TableFontSizePreference;
   defaultWireSectionMm2: number;
+  defaultAutoCreateLinkedNodes: boolean;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
   defaultIdSortDirection: SortDirection;
@@ -143,6 +145,7 @@ interface UseUiPreferencesOptions {
   setTableDensity: (density: TableDensity) => void;
   setTableFontSize: (value: TableFontSizePreference) => void;
   setDefaultWireSectionMm2: (value: number) => void;
+  setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
   setDefaultSortField: (field: SortField) => void;
   setDefaultSortDirection: (direction: SortDirection) => void;
   setDefaultIdSortDirection: (direction: SortDirection) => void;
@@ -213,6 +216,7 @@ export function useUiPreferences({
   tableDensity,
   tableFontSize,
   defaultWireSectionMm2,
+  defaultAutoCreateLinkedNodes,
   defaultSortField,
   defaultSortDirection,
   defaultIdSortDirection,
@@ -237,6 +241,7 @@ export function useUiPreferences({
   setTableDensity,
   setTableFontSize,
   setDefaultWireSectionMm2,
+  setDefaultAutoCreateLinkedNodes,
   setDefaultSortField,
   setDefaultSortDirection,
   setDefaultIdSortDirection,
@@ -283,6 +288,8 @@ export function useUiPreferences({
     if (preferences !== null) {
       const sortField = preferences.defaultSortField === "technicalId" ? "technicalId" : "name";
       const defaultWireSectionMm2Value = normalizeWireSectionMm2(preferences.defaultWireSectionMm2) ?? DEFAULT_WIRE_SECTION_MM2;
+      const defaultAutoCreateLinkedNodesValue =
+        typeof preferences.defaultAutoCreateLinkedNodes === "boolean" ? preferences.defaultAutoCreateLinkedNodes : true;
       const sortDirection = preferences.defaultSortDirection === "desc" ? "desc" : "asc";
       const idSortDirection = preferences.defaultIdSortDirection === "desc" ? "desc" : "asc";
       const showGridDefault =
@@ -325,6 +332,7 @@ export function useUiPreferences({
           : "normal"
       );
       setDefaultWireSectionMm2(defaultWireSectionMm2Value);
+      setDefaultAutoCreateLinkedNodes(defaultAutoCreateLinkedNodesValue);
       setDefaultSortField(sortField);
       setDefaultSortDirection(sortDirection);
       setDefaultIdSortDirection(idSortDirection);
@@ -393,6 +401,7 @@ export function useUiPreferences({
     setConnectorSort,
     setDefaultIdSortDirection,
     setDefaultWireSectionMm2,
+    setDefaultAutoCreateLinkedNodes,
     setDefaultSortDirection,
     setDefaultSortField,
     setNetworkSort,
@@ -435,6 +444,7 @@ export function useUiPreferences({
       tableDensity,
       tableFontSize,
       defaultWireSectionMm2,
+      defaultAutoCreateLinkedNodes,
       defaultSortField,
       defaultSortDirection,
       defaultIdSortDirection,
@@ -484,6 +494,7 @@ export function useUiPreferences({
     tableDensity,
     tableFontSize,
     defaultWireSectionMm2,
+    defaultAutoCreateLinkedNodes,
     themeMode,
     workspacePanelsLayoutMode
   ]);

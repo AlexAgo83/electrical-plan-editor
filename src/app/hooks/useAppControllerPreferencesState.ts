@@ -18,6 +18,7 @@ export function useAppControllerPreferencesState() {
   const [tableDensity, setTableDensity] = useState<TableDensity>("compact");
   const [tableFontSize, setTableFontSize] = useState<TableFontSize>("normal");
   const [defaultWireSectionMm2, setDefaultWireSectionMm2] = useState(0.5);
+  const [defaultAutoCreateLinkedNodes, setDefaultAutoCreateLinkedNodes] = useState(true);
   const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
   const [defaultSortDirection, setDefaultSortDirection] = useState<SortDirection>("asc");
   const [defaultIdSortDirection, setDefaultIdSortDirection] = useState<SortDirection>("asc");
@@ -49,6 +50,8 @@ export function useAppControllerPreferencesState() {
     setTableFontSize,
     defaultWireSectionMm2,
     setDefaultWireSectionMm2,
+    defaultAutoCreateLinkedNodes,
+    setDefaultAutoCreateLinkedNodes,
     defaultSortField,
     setDefaultSortField,
     defaultSortDirection,
