@@ -18,6 +18,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     setConnectorSort,
     connectorOccupiedCountById,
     onSelectConnector,
+    onOpenConnectorOnboardingHelp,
     cavityIndexInput,
     setCavityIndexInput,
     connectorOccupantRefInput,
@@ -122,6 +123,12 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         <span className="table-export-icon" aria-hidden="true" />
         CSV
       </button>
+      {onOpenConnectorOnboardingHelp !== undefined ? (
+        <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenConnectorOnboardingHelp}>
+          <span className="action-button-icon is-help" aria-hidden="true" />
+          <span>Help</span>
+        </button>
+      ) : null}
     </div>
   </header>
   {connectors.length === 0 ? (

@@ -20,6 +20,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     setWireSort,
     selectedWireId,
     onSelectWire,
+    onOpenWireOnboardingHelp,
     selectedWire,
     describeWireEndpoint,
     describeWireEndpointId,
@@ -141,6 +142,12 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           <span className="table-export-icon" aria-hidden="true" />
           CSV
         </button>
+        {onOpenWireOnboardingHelp !== undefined ? (
+          <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenWireOnboardingHelp}>
+            <span className="action-button-icon is-help" aria-hidden="true" />
+            <span>Help</span>
+          </button>
+        ) : null}
       </div>
       <div className="list-panel-header-tools-row">
         <TableFilterBar
