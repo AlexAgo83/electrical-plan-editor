@@ -114,7 +114,7 @@
 
 .meta-line {
   margin: 0 0 0.75rem;
-  color: #365166;
+  color: color-mix(in srgb, currentColor 72%, transparent);
 }
 
 @media (max-width: 980px) {
