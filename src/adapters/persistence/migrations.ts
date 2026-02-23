@@ -80,7 +80,11 @@ function normalizeWireEntityState(candidate: EntityState<Wire, WireId>): EntityS
     byId[wireId] = {
       ...wire,
       sectionMm2: resolveWireSectionMm2((wire as Partial<Wire>).sectionMm2),
-      ...normalizeWireColorIds((wire as Partial<Wire>).primaryColorId, (wire as Partial<Wire>).secondaryColorId)
+      ...normalizeWireColorIds((wire as Partial<Wire>).primaryColorId, (wire as Partial<Wire>).secondaryColorId),
+      endpointAConnectionReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointAConnectionReference),
+      endpointASealReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointASealReference),
+      endpointBConnectionReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointBConnectionReference),
+      endpointBSealReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointBSealReference)
     };
   }
 

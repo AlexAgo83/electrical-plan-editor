@@ -44,6 +44,10 @@ interface UseWireHandlersParams {
   setWirePrimaryColorId: (value: string) => void;
   wireSecondaryColorId: string;
   setWireSecondaryColorId: (value: string) => void;
+  wireEndpointAConnectionReference: string;
+  setWireEndpointAConnectionReference: (value: string) => void;
+  wireEndpointASealReference: string;
+  setWireEndpointASealReference: (value: string) => void;
   wireEndpointAKind: WireEndpoint["kind"];
   setWireEndpointAKind: (value: WireEndpoint["kind"]) => void;
   wireEndpointAConnectorId: string;
@@ -54,6 +58,10 @@ interface UseWireHandlersParams {
   setWireEndpointASpliceId: (value: string) => void;
   wireEndpointAPortIndex: string;
   setWireEndpointAPortIndex: (value: string) => void;
+  wireEndpointBConnectionReference: string;
+  setWireEndpointBConnectionReference: (value: string) => void;
+  wireEndpointBSealReference: string;
+  setWireEndpointBSealReference: (value: string) => void;
   wireEndpointBKind: WireEndpoint["kind"];
   setWireEndpointBKind: (value: WireEndpoint["kind"]) => void;
   wireEndpointBConnectorId: string;
@@ -93,6 +101,10 @@ export function useWireHandlers({
   setWirePrimaryColorId,
   wireSecondaryColorId,
   setWireSecondaryColorId,
+  wireEndpointAConnectionReference,
+  setWireEndpointAConnectionReference,
+  wireEndpointASealReference,
+  setWireEndpointASealReference,
   wireEndpointAKind,
   setWireEndpointAKind,
   wireEndpointAConnectorId,
@@ -103,6 +115,10 @@ export function useWireHandlers({
   setWireEndpointASpliceId,
   wireEndpointAPortIndex,
   setWireEndpointAPortIndex,
+  wireEndpointBConnectionReference,
+  setWireEndpointBConnectionReference,
+  wireEndpointBSealReference,
+  setWireEndpointBSealReference,
   wireEndpointBKind,
   setWireEndpointBKind,
   wireEndpointBConnectorId,
@@ -132,6 +148,15 @@ export function useWireHandlers({
     }
 
     return new Set<string>([`wire:${editingWireId}:A`, `wire:${editingWireId}:B`]);
+  };
+
+  const normalizeWireEndpointReferenceInput = (value: string): string | undefined => {
+    const normalized = value.trim();
+    if (normalized.length === 0) {
+      return undefined;
+    }
+
+    return normalized;
   };
 
   const computeEndpointSlotHint = (side: "A" | "B"): WireEndpointSlotHint | null => {
@@ -363,11 +388,15 @@ export function useWireHandlers({
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
     setWirePrimaryColorId("");
     setWireSecondaryColorId("");
+    setWireEndpointAConnectionReference("");
+    setWireEndpointASealReference("");
     setWireEndpointAKind("connectorCavity");
     setWireEndpointAConnectorId("");
     setWireEndpointACavityIndex("1");
     setWireEndpointASpliceId("");
     setWireEndpointAPortIndex("1");
+    setWireEndpointBConnectionReference("");
+    setWireEndpointBSealReference("");
     setWireEndpointBKind("splicePort");
     setWireEndpointBConnectorId("");
     setWireEndpointBCavityIndex("1");
@@ -389,11 +418,15 @@ export function useWireHandlers({
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
     setWirePrimaryColorId("");
     setWireSecondaryColorId("");
+    setWireEndpointAConnectionReference("");
+    setWireEndpointASealReference("");
     setWireEndpointAKind("connectorCavity");
     setWireEndpointAConnectorId("");
     setWireEndpointACavityIndex("1");
     setWireEndpointASpliceId("");
     setWireEndpointAPortIndex("1");
+    setWireEndpointBConnectionReference("");
+    setWireEndpointBSealReference("");
     setWireEndpointBKind("splicePort");
     setWireEndpointBConnectorId("");
     setWireEndpointBCavityIndex("1");
@@ -418,6 +451,10 @@ export function useWireHandlers({
     setWireSectionMm2(String(wire.sectionMm2));
     setWirePrimaryColorId(wire.primaryColorId ?? "");
     setWireSecondaryColorId(wire.secondaryColorId ?? "");
+    setWireEndpointAConnectionReference(wire.endpointAConnectionReference ?? "");
+    setWireEndpointASealReference(wire.endpointASealReference ?? "");
+    setWireEndpointBConnectionReference(wire.endpointBConnectionReference ?? "");
+    setWireEndpointBSealReference(wire.endpointBSealReference ?? "");
     setWireEndpointAKind(wire.endpointA.kind);
     if (wire.endpointA.kind === "connectorCavity") {
       setWireEndpointAConnectorId(wire.endpointA.connectorId);
@@ -516,6 +553,19 @@ export function useWireHandlers({
       return;
     }
     const normalizedColors = normalizeWireColorIds(wirePrimaryColorId, wireSecondaryColorId);
+    const endpointAConnectionReference = normalizeWireEndpointReferenceInput(wireEndpointAConnectionReference);
+    const endpointASealReference = normalizeWireEndpointReferenceInput(wireEndpointASealReference);
+    const endpointBConnectionReference = normalizeWireEndpointReferenceInput(wireEndpointBConnectionReference);
+    const endpointBSealReference = normalizeWireEndpointReferenceInput(wireEndpointBSealReference);
+    if (
+      (endpointAConnectionReference?.length ?? 0) > 120 ||
+      (endpointASealReference?.length ?? 0) > 120 ||
+      (endpointBConnectionReference?.length ?? 0) > 120 ||
+      (endpointBSealReference?.length ?? 0) > 120
+    ) {
+      setWireFormError("Wire endpoint references must be 120 characters or fewer.");
+      return;
+    }
 
     const endpointA = buildWireEndpoint("A");
     const endpointB = buildWireEndpoint("B");
@@ -535,6 +585,10 @@ export function useWireHandlers({
         sectionMm2: parsedSectionMm2,
         primaryColorId: normalizedColors.primaryColorId,
         secondaryColorId: normalizedColors.secondaryColorId,
+        endpointAConnectionReference,
+        endpointASealReference,
+        endpointBConnectionReference,
+        endpointBSealReference,
         endpointA,
         endpointB
       })

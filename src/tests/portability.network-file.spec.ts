@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ConnectorId, NetworkId, SpliceId } from "../core/entities";
+import type { ConnectorId, NetworkId, SpliceId, WireId } from "../core/entities";
 import {
   buildNetworkFilePayload,
   NETWORK_FILE_PAYLOAD_KIND,
@@ -19,6 +19,10 @@ function asConnectorId(value: string): ConnectorId {
 
 function asSpliceId(value: string): SpliceId {
   return value as SpliceId;
+}
+
+function asWireId(value: string): WireId {
+  return value as WireId;
 }
 
 describe("network file portability", () => {
@@ -69,7 +73,7 @@ describe("network file portability", () => {
     expect(parsed.payload?.networks).toHaveLength(1);
   });
 
-  it("patches imported wires missing section and colors to defaults", () => {
+  it("patches imported wires missing section/colors/side references to defaults", () => {
     const seeded = createSampleNetworkState();
     const payload = buildNetworkFilePayload(seeded, "active", [], "2026-02-21T10:15:00.000Z");
     const firstBundle = payload.networks[0];
@@ -91,12 +95,50 @@ describe("network file portability", () => {
     delete rawWires.byId[firstWireId]?.sectionMm2;
     delete rawWires.byId[firstWireId]?.primaryColorId;
     delete rawWires.byId[firstWireId]?.secondaryColorId;
+    delete rawWires.byId[firstWireId]?.endpointAConnectionReference;
+    delete rawWires.byId[firstWireId]?.endpointASealReference;
+    delete rawWires.byId[firstWireId]?.endpointBConnectionReference;
+    delete rawWires.byId[firstWireId]?.endpointBSealReference;
 
     const parsed = parseNetworkFilePayload(JSON.stringify(rawPayload));
     expect(parsed.error).toBeNull();
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.sectionMm2).toBe(0.5);
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.primaryColorId).toBeNull();
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.secondaryColorId).toBeNull();
+    expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.endpointAConnectionReference).toBeUndefined();
+    expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.endpointASealReference).toBeUndefined();
+    expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.endpointBConnectionReference).toBeUndefined();
+    expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.endpointBSealReference).toBeUndefined();
+  });
+
+  it("normalizes imported wire side connection and seal references", () => {
+    const seeded = createSampleNetworkState();
+    const payload = buildNetworkFilePayload(seeded, "active", [], "2026-02-21T10:16:00.000Z");
+    const rawPayload = JSON.parse(serializeNetworkFilePayload(payload)) as Record<string, unknown>;
+    const rawBundles = rawPayload.networks as Array<Record<string, unknown>>;
+    const rawState = rawBundles[0]?.state as Record<string, unknown>;
+    const rawWires = rawState.wires as { byId: Record<string, Record<string, unknown>>; allIds: string[] };
+    const firstWireId = rawWires.allIds[0];
+    expect(firstWireId).toBeDefined();
+    if (firstWireId === undefined) {
+      throw new Error("Expected an exported wire.");
+    }
+
+    rawWires.byId[firstWireId] = {
+      ...rawWires.byId[firstWireId],
+      endpointAConnectionReference: "  TERM-A-IMP  ",
+      endpointASealReference: " ",
+      endpointBConnectionReference: ` ${"D".repeat(130)} `,
+      endpointBSealReference: "  SEAL-B-IMP  "
+    };
+
+    const parsed = parseNetworkFilePayload(JSON.stringify(rawPayload));
+    expect(parsed.error).toBeNull();
+    const normalizedWire = parsed.payload?.networks[0]?.state.wires.byId[asWireId(firstWireId)];
+    expect(normalizedWire?.endpointAConnectionReference).toBe("TERM-A-IMP");
+    expect(normalizedWire?.endpointASealReference).toBeUndefined();
+    expect(normalizedWire?.endpointBConnectionReference).toBe("D".repeat(120));
+    expect(normalizedWire?.endpointBSealReference).toBe("SEAL-B-IMP");
   });
 
   it("normalizes imported connector and splice manufacturer references", () => {

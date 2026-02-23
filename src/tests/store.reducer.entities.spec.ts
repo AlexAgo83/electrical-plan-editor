@@ -280,6 +280,59 @@ describe("appReducer entity lifecycle", () => {
     expect(third.ui.lastError).toBe("Only one splice node is allowed per splice.");
   });
 
+  it("normalizes optional wire side connection and seal references on save/upsert", () => {
+    const base = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 }),
+      appActions.upsertSplice({ id: asSpliceId("S1"), name: "Splice 1", technicalId: "S-1", portCount: 2 }),
+      appActions.upsertNode({ id: asNodeId("N-C1"), kind: "connector", connectorId: asConnectorId("C1") }),
+      appActions.upsertNode({ id: asNodeId("N-S1"), kind: "splice", spliceId: asSpliceId("S1") }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-1"),
+        nodeA: asNodeId("N-C1"),
+        nodeB: asNodeId("N-S1"),
+        lengthMm: 25
+      })
+    ]);
+
+    const saved = appReducer(
+      base,
+      appActions.saveWire({
+        id: asWireId("W-REF"),
+        name: "Wire refs",
+        technicalId: "W-REF",
+        endpointAConnectionReference: "  TERM-A  ",
+        endpointASealReference: " ",
+        endpointBConnectionReference: "  SPL-B  ",
+        endpointBSealReference: ` ${"S".repeat(130)} `,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 }
+      })
+    );
+
+    const savedWire = saved.wires.byId[asWireId("W-REF")];
+    expect(savedWire).toBeDefined();
+    expect(savedWire?.endpointAConnectionReference).toBe("TERM-A");
+    expect(savedWire?.endpointASealReference).toBeUndefined();
+    expect(savedWire?.endpointBConnectionReference).toBe("SPL-B");
+    expect(savedWire?.endpointBSealReference).toBe("S".repeat(120));
+
+    if (savedWire === undefined) {
+      throw new Error("Expected saved wire W-REF.");
+    }
+
+    const upserted = appReducer(
+      saved,
+      appActions.upsertWire({
+        ...savedWire,
+        endpointAConnectionReference: " ",
+        endpointBSealReference: "  SEAL-B-02  "
+      })
+    );
+    const updatedWire = upserted.wires.byId[asWireId("W-REF")];
+    expect(updatedWire?.endpointAConnectionReference).toBeUndefined();
+    expect(updatedWire?.endpointBSealReference).toBe("SEAL-B-02");
+  });
+
   it("renames a node atomically and remaps segments, layout positions, and node selection", () => {
     const state = reduceAll([
       appActions.upsertNode({ id: asNodeId("N1"), kind: "intermediate", label: "Node 1" }),

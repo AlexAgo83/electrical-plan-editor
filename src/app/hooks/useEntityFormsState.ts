@@ -47,11 +47,15 @@ export function useEntityFormsState() {
   const [wireSectionMm2, setWireSectionMm2] = useState("0.5");
   const [wirePrimaryColorId, setWirePrimaryColorId] = useState("");
   const [wireSecondaryColorId, setWireSecondaryColorId] = useState("");
+  const [wireEndpointAConnectionReference, setWireEndpointAConnectionReference] = useState("");
+  const [wireEndpointASealReference, setWireEndpointASealReference] = useState("");
   const [wireEndpointAKind, setWireEndpointAKind] = useState<WireEndpoint["kind"]>("connectorCavity");
   const [wireEndpointAConnectorId, setWireEndpointAConnectorId] = useState("");
   const [wireEndpointACavityIndex, setWireEndpointACavityIndex] = useState("1");
   const [wireEndpointASpliceId, setWireEndpointASpliceId] = useState("");
   const [wireEndpointAPortIndex, setWireEndpointAPortIndex] = useState("1");
+  const [wireEndpointBConnectionReference, setWireEndpointBConnectionReference] = useState("");
+  const [wireEndpointBSealReference, setWireEndpointBSealReference] = useState("");
   const [wireEndpointBKind, setWireEndpointBKind] = useState<WireEndpoint["kind"]>("splicePort");
   const [wireEndpointBConnectorId, setWireEndpointBConnectorId] = useState("");
   const [wireEndpointBCavityIndex, setWireEndpointBCavityIndex] = useState("1");
@@ -143,6 +147,10 @@ export function useEntityFormsState() {
     setWirePrimaryColorId,
     wireSecondaryColorId,
     setWireSecondaryColorId,
+    wireEndpointAConnectionReference,
+    setWireEndpointAConnectionReference,
+    wireEndpointASealReference,
+    setWireEndpointASealReference,
     wireEndpointAKind,
     setWireEndpointAKind,
     wireEndpointAConnectorId,
@@ -153,6 +161,10 @@ export function useEntityFormsState() {
     setWireEndpointASpliceId,
     wireEndpointAPortIndex,
     setWireEndpointAPortIndex,
+    wireEndpointBConnectionReference,
+    setWireEndpointBConnectionReference,
+    wireEndpointBSealReference,
+    setWireEndpointBSealReference,
     wireEndpointBKind,
     setWireEndpointBKind,
     wireEndpointBConnectorId,

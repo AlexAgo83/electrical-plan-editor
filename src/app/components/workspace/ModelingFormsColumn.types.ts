@@ -85,6 +85,10 @@ export interface ModelingFormsColumnProps {
   wireSecondaryColorId: string;
   setWireSecondaryColorId: (value: string) => void;
   wireTechnicalIdAlreadyUsed: boolean;
+  wireEndpointAConnectionReference: string;
+  setWireEndpointAConnectionReference: (value: string) => void;
+  wireEndpointASealReference: string;
+  setWireEndpointASealReference: (value: string) => void;
   wireEndpointAKind: WireEndpoint["kind"];
   setWireEndpointAKind: (value: WireEndpoint["kind"]) => void;
   wireEndpointAConnectorId: string;
@@ -96,6 +100,10 @@ export interface ModelingFormsColumnProps {
   wireEndpointAPortIndex: string;
   setWireEndpointAPortIndex: (value: string) => void;
   wireEndpointASlotHint: WireEndpointSlotHint | null;
+  wireEndpointBConnectionReference: string;
+  setWireEndpointBConnectionReference: (value: string) => void;
+  wireEndpointBSealReference: string;
+  setWireEndpointBSealReference: (value: string) => void;
   wireEndpointBKind: WireEndpoint["kind"];
   setWireEndpointBKind: (value: WireEndpoint["kind"]) => void;
   wireEndpointBConnectorId: string;

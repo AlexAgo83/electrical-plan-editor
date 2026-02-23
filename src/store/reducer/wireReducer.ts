@@ -35,6 +35,19 @@ function hasDuplicateWireTechnicalId(state: AppState, wireId: string, technicalI
   });
 }
 
+function normalizeWireEndpointReference(value: string | undefined): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return undefined;
+  }
+
+  return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
+}
+
 export function handleWireActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "wire/save": {
@@ -42,6 +55,10 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
       const normalizedTechnicalId = action.payload.technicalId.trim();
       const normalizedSectionMm2 = resolveWireSectionMm2(action.payload.sectionMm2);
       const normalizedColors = normalizeWireColorIds(action.payload.primaryColorId, action.payload.secondaryColorId);
+      const endpointAConnectionReference = normalizeWireEndpointReference(action.payload.endpointAConnectionReference);
+      const endpointASealReference = normalizeWireEndpointReference(action.payload.endpointASealReference);
+      const endpointBConnectionReference = normalizeWireEndpointReference(action.payload.endpointBConnectionReference);
+      const endpointBSealReference = normalizeWireEndpointReference(action.payload.endpointBSealReference);
       if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
         return withError(state, "Wire name and technical ID are required.");
       }
@@ -162,6 +179,10 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           sectionMm2: normalizedSectionMm2,
           primaryColorId: normalizedColors.primaryColorId,
           secondaryColorId: normalizedColors.secondaryColorId,
+          endpointAConnectionReference,
+          endpointASealReference,
+          endpointBConnectionReference,
+          endpointBSealReference,
           endpointA: action.payload.endpointA,
           endpointB: action.payload.endpointB,
           routeSegmentIds,
@@ -239,7 +260,11 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
       const normalizedPayload = {
         ...action.payload,
         sectionMm2: resolveWireSectionMm2(action.payload.sectionMm2),
-        ...normalizeWireColorIds(action.payload.primaryColorId, action.payload.secondaryColorId)
+        ...normalizeWireColorIds(action.payload.primaryColorId, action.payload.secondaryColorId),
+        endpointAConnectionReference: normalizeWireEndpointReference(action.payload.endpointAConnectionReference),
+        endpointASealReference: normalizeWireEndpointReference(action.payload.endpointASealReference),
+        endpointBConnectionReference: normalizeWireEndpointReference(action.payload.endpointBConnectionReference),
+        endpointBSealReference: normalizeWireEndpointReference(action.payload.endpointBSealReference)
       };
       return bumpRevision({
         ...clearLastError(state),
