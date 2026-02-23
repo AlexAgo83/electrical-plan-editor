@@ -94,3 +94,33 @@ export function buildUniqueNetworkTechnicalId(baseTechnicalId: string, existingT
 
   return candidate;
 }
+
+export function focusSelectedTableRowInPanel(panelSelector: string): void {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return;
+  }
+
+  const tryFocus = (remainingFrames: number) => {
+    const panel = document.querySelector(panelSelector);
+    const row = panel?.querySelector<HTMLElement>("tr.is-selected.is-focusable-row");
+    if (row !== undefined && row !== null) {
+      row.focus();
+      if (typeof row.scrollIntoView === "function") {
+        row.scrollIntoView({ block: "nearest" });
+      }
+      return;
+    }
+
+    if (remainingFrames <= 0) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      tryFocus(remainingFrames - 1);
+    });
+  };
+
+  window.requestAnimationFrame(() => {
+    tryFocus(3);
+  });
+}

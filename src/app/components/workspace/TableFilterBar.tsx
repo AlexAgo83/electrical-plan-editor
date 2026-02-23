@@ -27,16 +27,13 @@ export function TableFilterBar({
   placeholder
 }: TableFilterBarProps): ReactElement {
   return (
-    <label
-      className="list-inline-number-filter"
-      style={{ display: "flex", alignItems: "center", gap: "0.5rem", width: "100%" }}
-    >
+    <label className="list-inline-number-filter list-inline-table-filter">
       <span>{label}</span>
       <select
+        className="list-inline-table-filter-select"
         aria-label={fieldLabel}
         value={fieldValue}
         onChange={(event) => onFieldChange(event.target.value)}
-        style={{ flex: "0 0 auto" }}
       >
         {fieldOptions.map((option) => (
           <option key={option.value} value={option.value}>
@@ -45,11 +42,11 @@ export function TableFilterBar({
         ))}
       </select>
       <input
+        className="list-inline-table-filter-input"
         type="text"
         value={queryValue}
         onChange={(event) => onQueryChange(event.target.value)}
         placeholder={placeholder}
-        style={{ flex: "1 1 auto", minWidth: 0 }}
       />
     </label>
   );

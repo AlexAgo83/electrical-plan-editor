@@ -2,7 +2,7 @@ import type { FormEvent } from "react";
 import type { NodeId, Segment, SegmentId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
-import { toPositiveNumber } from "../lib/app-utils-shared";
+import { focusSelectedTableRowInPanel, toPositiveNumber } from "../lib/app-utils-shared";
 import { suggestNextSegmentId } from "../lib/technical-id-suggestions";
 
 type DispatchAction = (
@@ -145,6 +145,7 @@ export function useSegmentHandlers({
       }
       dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
       resetSegmentForm();
+      focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-segments"]');
     }
   }
 

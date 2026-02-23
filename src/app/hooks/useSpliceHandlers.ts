@@ -2,7 +2,7 @@ import type { FormEvent } from "react";
 import type { AppStore } from "../../store";
 import type { Splice, SpliceId } from "../../core/entities";
 import { appActions } from "../../store";
-import { createEntityId, toPositiveInteger } from "../lib/app-utils-shared";
+import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
 import {
   suggestAutoSpliceNodeId,
   suggestNextSpliceTechnicalId
@@ -176,6 +176,7 @@ export function useSpliceHandlers({
       }
       dispatchAction(appActions.select({ kind: "splice", id: spliceId }));
       resetSpliceForm();
+      focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-splices"]');
     }
   }
 

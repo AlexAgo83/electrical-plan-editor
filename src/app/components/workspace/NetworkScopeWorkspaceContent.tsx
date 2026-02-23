@@ -182,15 +182,6 @@ export function NetworkScopeWorkspaceContent({
           <h2>Network Scope</h2>
           <div className="list-panel-header-tools">
             <div className="list-panel-header-tools-row">
-              {onOpenOnboardingHelp !== undefined ? (
-                <button
-                  type="button"
-                  className="filter-chip onboarding-help-button"
-                  onClick={onOpenOnboardingHelp}
-                >
-                  Help
-                </button>
-              ) : null}
               <button
                 type="button"
                 className="filter-chip table-export-button"
@@ -210,6 +201,15 @@ export function NetworkScopeWorkspaceContent({
                 <span className="table-export-icon" aria-hidden="true" />
                 CSV
               </button>
+              {onOpenOnboardingHelp !== undefined ? (
+                <button
+                  type="button"
+                  className="filter-chip onboarding-help-button"
+                  onClick={onOpenOnboardingHelp}
+                >
+                  Help
+                </button>
+              ) : null}
             </div>
             <div className="list-panel-header-tools-row">
               <TableFilterBar
