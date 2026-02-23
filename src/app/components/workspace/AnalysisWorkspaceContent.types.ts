@@ -63,6 +63,8 @@ export interface AnalysisWorkspaceContentProps {
   setSpliceSynthesisSort: (value: SortState | ((current: SortState) => SortState)) => void;
   wireRouteFilter: "all" | "auto" | "locked";
   setWireRouteFilter: (value: "all" | "auto" | "locked") => void;
+  wireEndpointFilterQuery: string;
+  setWireEndpointFilterQuery: (value: string) => void;
   wires: Wire[];
   visibleWires: Wire[];
   wireSort: SortState;

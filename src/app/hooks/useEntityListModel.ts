@@ -54,6 +54,7 @@ export function useEntityListModel({
   const [nodeIdSortDirection, setNodeIdSortDirection] = useState<SortDirection>("asc");
   const [segmentIdSortDirection, setSegmentIdSortDirection] = useState<SortDirection>("asc");
   const [wireSort, setWireSort] = useState<SortState>({ field: "name", direction: "asc" });
+  const [wireEndpointFilterQuery, setWireEndpointFilterQuery] = useState("");
   const [connectorSynthesisSort, setConnectorSynthesisSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSynthesisSort, setSpliceSynthesisSort] = useState<SortState>({ field: "name", direction: "asc" });
 
@@ -143,6 +144,7 @@ export function useEntityListModel({
   const normalizedNodeSearch = normalizeSearch(nodeSearchQuery);
   const normalizedSegmentSearch = normalizeSearch(segmentSearchQuery);
   const normalizedWireSearch = normalizeSearch(wireSearchQuery);
+  const normalizedWireEndpointFilter = normalizeSearch(wireEndpointFilterQuery);
 
   const connectorOccupiedCountById = useMemo(() => {
     const result = new Map<ConnectorId, number>();
@@ -218,11 +220,18 @@ export function useEntityListModel({
     if (wireRouteFilter === "auto" && wire.isRouteLocked) {
       return false;
     }
+    if (normalizedWireEndpointFilter.length > 0) {
+      const endpointSearchText =
+        `${describeWireEndpoint(wire.endpointA)} ${describeWireEndpoint(wire.endpointB)}`.toLocaleLowerCase();
+      if (!endpointSearchText.includes(normalizedWireEndpointFilter)) {
+        return false;
+      }
+    }
     if (normalizedWireSearch.length === 0) {
       return true;
     }
     return `${wire.name} ${wire.technicalId}`.toLocaleLowerCase().includes(normalizedWireSearch);
-  }), [normalizedWireSearch, sortedWires, wireRouteFilter]);
+  }), [describeWireEndpoint, normalizedWireEndpointFilter, normalizedWireSearch, sortedWires, wireRouteFilter]);
 
   const segmentsCountByNodeId = useMemo(() => {
     const result = new Map<NodeId, number>();
@@ -264,6 +273,8 @@ export function useEntityListModel({
     setSegmentSubNetworkFilter,
     wireRouteFilter,
     setWireRouteFilter,
+    wireEndpointFilterQuery,
+    setWireEndpointFilterQuery,
     connectorSort,
     setConnectorSort,
     spliceSort,

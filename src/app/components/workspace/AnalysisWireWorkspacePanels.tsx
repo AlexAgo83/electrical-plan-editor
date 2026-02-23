@@ -8,6 +8,8 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     isWireSubScreen,
     wireRouteFilter,
     setWireRouteFilter,
+    wireEndpointFilterQuery,
+    setWireEndpointFilterQuery,
     wires,
     visibleWires,
     wireSort,
@@ -32,45 +34,58 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   <header className="list-panel-header">
     <h2>Wires</h2>
     <div className="list-panel-header-tools">
-      <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
-        {([
-          ["all", "All"],
-          ["auto", "Auto"],
-          ["locked", "Locked"]
-        ] as const).map(([filterId, label]) => (
-          <button
-            key={filterId}
-            type="button"
-            className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"}
-            onClick={() => setWireRouteFilter(filterId)}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="list-panel-header-tools-row">
+        <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
+          {([
+            ["all", "All"],
+            ["auto", "Auto"],
+            ["locked", "Locked"]
+          ] as const).map(([filterId, label]) => (
+            <button
+              key={filterId}
+              type="button"
+              className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+              onClick={() => setWireRouteFilter(filterId)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="filter-chip table-export-button"
+          onClick={() => {
+            const headers = showWireRouteModeColumn
+              ? ["Name", "Technical ID", "Endpoints", "Begin", "End", "Length (mm)", "Route mode"]
+              : ["Name", "Technical ID", "Endpoints", "Begin", "End", "Length (mm)"];
+            const rows = visibleWires.map((wire) => {
+              const endpoints = `${describeWireEndpoint(wire.endpointA)} -> ${describeWireEndpoint(wire.endpointB)}`;
+              const begin = describeWireEndpointId(wire.endpointA);
+              const end = describeWireEndpointId(wire.endpointB);
+              if (showWireRouteModeColumn) {
+                return [wire.name, wire.technicalId, endpoints, begin, end, wire.lengthMm, wire.isRouteLocked ? "Locked" : "Auto"];
+              }
+              return [wire.name, wire.technicalId, endpoints, begin, end, wire.lengthMm];
+            });
+            downloadCsvFile("analysis-wires", headers, rows);
+          }}
+          disabled={visibleWires.length === 0}
+        >
+          <span className="table-export-icon" aria-hidden="true" />
+          CSV
+        </button>
       </div>
-      <button
-        type="button"
-        className="filter-chip table-export-button"
-        onClick={() => {
-          const headers = showWireRouteModeColumn
-            ? ["Name", "Technical ID", "Endpoints", "Begin", "End", "Length (mm)", "Route mode"]
-            : ["Name", "Technical ID", "Endpoints", "Begin", "End", "Length (mm)"];
-          const rows = visibleWires.map((wire) => {
-            const endpoints = `${describeWireEndpoint(wire.endpointA)} -> ${describeWireEndpoint(wire.endpointB)}`;
-            const begin = describeWireEndpointId(wire.endpointA);
-            const end = describeWireEndpointId(wire.endpointB);
-            if (showWireRouteModeColumn) {
-              return [wire.name, wire.technicalId, endpoints, begin, end, wire.lengthMm, wire.isRouteLocked ? "Locked" : "Auto"];
-            }
-            return [wire.name, wire.technicalId, endpoints, begin, end, wire.lengthMm];
-          });
-          downloadCsvFile("analysis-wires", headers, rows);
-        }}
-        disabled={visibleWires.length === 0}
-      >
-        <span className="table-export-icon" aria-hidden="true" />
-        CSV
-      </button>
+      <div className="list-panel-header-tools-row">
+        <label className="list-inline-number-filter">
+          <span>Endpoint filter</span>
+          <input
+            type="text"
+            value={wireEndpointFilterQuery}
+            onChange={(event) => setWireEndpointFilterQuery(event.target.value)}
+            placeholder="Connector/Splice or ID"
+          />
+        </label>
+      </div>
     </div>
   </header>
   {wires.length === 0 ? (

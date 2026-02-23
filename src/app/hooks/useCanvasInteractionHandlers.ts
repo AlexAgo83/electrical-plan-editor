@@ -259,7 +259,9 @@ export function useCanvasInteractionHandlers({
   }
 
   function handleNetworkWheel(event: ReactWheelEvent<SVGSVGElement>): void {
-    event.preventDefault();
+    if (event.cancelable) {
+      event.preventDefault();
+    }
   }
 
   function handleZoomAction(target: "in" | "out" | "reset"): void {

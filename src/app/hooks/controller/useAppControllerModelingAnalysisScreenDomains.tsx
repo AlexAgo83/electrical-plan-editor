@@ -56,6 +56,8 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
     | "setSegmentIdSortDirection"
     | "wireRouteFilter"
     | "setWireRouteFilter"
+    | "wireEndpointFilterQuery"
+    | "setWireEndpointFilterQuery"
     | "visibleWires"
     | "wireSort"
     | "setWireSort"
@@ -184,6 +186,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     resetWireForm: modelingHandlers.wire.resetWireForm,
     wireRouteFilter: listModel.wireRouteFilter,
     setWireRouteFilter: listModel.setWireRouteFilter,
+    wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
+    setWireEndpointFilterQuery: listModel.setWireEndpointFilterQuery,
     wires: entities.wires,
     visibleWires: listModel.visibleWires,
     wireSort: listModel.wireSort,
@@ -326,6 +330,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setSpliceSynthesisSort: listModel.setSpliceSynthesisSort,
     wireRouteFilter: listModel.wireRouteFilter,
     setWireRouteFilter: listModel.setWireRouteFilter,
+    wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
+    setWireEndpointFilterQuery: listModel.setWireEndpointFilterQuery,
     wires: entities.wires,
     visibleWires: listModel.visibleWires,
     wireSort: listModel.wireSort,
