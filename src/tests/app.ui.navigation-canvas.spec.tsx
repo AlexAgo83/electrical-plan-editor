@@ -392,6 +392,41 @@ describe("App integration UI - navigation and canvas", () => {
     expect(within(editPanel).getByDisplayValue("C-1")).toBeInTheDocument();
   });
 
+  it("keeps connector selection context when switching from modeling to analysis", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const modelingConnectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(modelingConnectorsPanel).getByText("Connector 1"));
+
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Analysis$/, hidden: true }));
+
+    const analysisConnectorsPanel = getPanelByHeading("Connectors");
+    const selectedRow = within(analysisConnectorsPanel).getByText("Connector 1").closest("tr");
+    expect(selectedRow).toHaveClass("is-selected");
+    expect(getPanelByHeading("Connector analysis")).toBeInTheDocument();
+  });
+
+  it("keeps analysis selection context when switching back to modeling", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("analysis");
+
+    const analysisConnectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(analysisConnectorsPanel).getByText("Connector 1"));
+
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/, hidden: true }));
+
+    const modelingConnectorsPanel = getPanelByHeading("Connectors");
+    const selectedRow = within(modelingConnectorsPanel).getByText("Connector 1").closest("tr");
+    expect(selectedRow).toHaveClass("is-selected");
+    const editPanel = getPanelByHeading("Edit Connector");
+    expect(within(editPanel).getByDisplayValue("Connector 1")).toBeInTheDocument();
+  });
+
   it("navigates from validation issue to modeling context", () => {
     renderAppWithState(createValidationIssueState());
     switchScreenDrawerAware("analysis");

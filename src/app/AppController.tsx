@@ -834,18 +834,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     };
   });
 
-  useKeyboardShortcuts({
-    keyboardShortcutsEnabled,
-    activeScreenRef,
-    undoActionRef,
-    redoActionRef,
-    fitNetworkToContentRef,
-    previousValidationIssueRef,
-    nextValidationIssueRef,
-    setActiveScreen,
-    setActiveSubScreen
-  });
-
   const { describeNode, nodeLabelById } = useNodeDescriptions(nodes, connectorMap, spliceMap);
 
   const modelingHandlers = useAppControllerModelingHandlersOrchestrator({
@@ -999,6 +987,72 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       startSegmentEdit: segmentHandlers.startSegmentEdit,
       startWireEdit: wireHandlers.startWireEdit
     }
+  });
+
+  const handleWorkspaceScreenChange = useCallback((targetScreen: "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings") => {
+    if (targetScreen === "analysis") {
+      const hasConnectorNodeSelection = selectedNode !== null && selectedNode.kind === "connector";
+      const hasSpliceNodeSelection = selectedNode !== null && selectedNode.kind === "splice";
+      const analysisSubScreen =
+        selectedConnector !== null || hasConnectorNodeSelection
+          ? "connector"
+          : selectedSplice !== null || hasSpliceNodeSelection
+            ? "splice"
+            : selectedWire !== null || activeSubScreen === "wire"
+              ? "wire"
+              : "connector";
+
+      if (selectedConnector !== null) {
+        dispatchAction(appActions.select({ kind: "connector", id: selectedConnector.id }), { trackHistory: false });
+      } else if (selectedSplice !== null) {
+        dispatchAction(appActions.select({ kind: "splice", id: selectedSplice.id }), { trackHistory: false });
+      } else if (selectedWire !== null) {
+        dispatchAction(appActions.select({ kind: "wire", id: selectedWire.id }), { trackHistory: false });
+      } else if (hasConnectorNodeSelection) {
+        dispatchAction(appActions.select({ kind: "connector", id: selectedNode.connectorId }), { trackHistory: false });
+      } else if (hasSpliceNodeSelection) {
+        dispatchAction(appActions.select({ kind: "splice", id: selectedNode.spliceId }), { trackHistory: false });
+      }
+
+      setActiveScreen("analysis");
+      setActiveSubScreen(analysisSubScreen);
+      return;
+    }
+
+    if (targetScreen === "modeling") {
+      if (selected !== null && selectedSubScreen !== null) {
+        handleStartSelectedEdit();
+        return;
+      }
+      setActiveScreen("modeling");
+      return;
+    }
+
+    setActiveScreen(targetScreen);
+  }, [
+    activeSubScreen,
+    dispatchAction,
+    handleStartSelectedEdit,
+    selected,
+    selectedConnector,
+    selectedNode,
+    selectedSplice,
+    selectedSubScreen,
+    selectedWire,
+    setActiveScreen,
+    setActiveSubScreen
+  ]);
+
+  useKeyboardShortcuts({
+    keyboardShortcutsEnabled,
+    activeScreenRef,
+    undoActionRef,
+    redoActionRef,
+    fitNetworkToContentRef,
+    previousValidationIssueRef,
+    nextValidationIssueRef,
+    setActiveScreen: handleWorkspaceScreenChange,
+    setActiveSubScreen
   });
 
   const { clearAllModelingForms } = useModelingFormSelectionSync({
@@ -1213,16 +1267,15 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       onImportFileChange={handleImportFileChange}
       importExportStatusMessage={importExportStatus?.message ?? null}
       lastImportSummary={lastImportSummary}
-      onOpenNetworkScope={() => setActiveScreen("networkScope")}
+      onOpenNetworkScope={() => handleWorkspaceScreenChange("networkScope")}
       onOpenModeling={() => {
-        setActiveScreen("modeling");
+        handleWorkspaceScreenChange("modeling");
         setActiveSubScreen("connector");
       }}
       onOpenAnalysis={() => {
-        setActiveScreen("analysis");
-        setActiveSubScreen("connector");
+        handleWorkspaceScreenChange("analysis");
       }}
-      onOpenValidation={() => setActiveScreen("validation")}
+      onOpenValidation={() => handleWorkspaceScreenChange("validation")}
     />
   );
   const shouldIncludeNetworkSummaryPanel = hasActiveNetwork && (isModelingScreen || isAnalysisScreen);
@@ -1288,7 +1341,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         entityCountBySubScreen,
         onQuickEntityNavigation: setActiveSubScreen,
         onQuickEntityScreenNavigation: (targetScreen) => {
-          setActiveScreen(targetScreen);
+          handleWorkspaceScreenChange(targetScreen);
         },
         onSelectConnectorFromCallout: handleSelectConnectorFromCallout,
         onSelectSpliceFromCallout: handleSelectSpliceFromCallout,
@@ -1538,7 +1591,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isAnalysisScreen={isAnalysisScreen}
       isValidationScreen={isValidationScreen}
       entityCountBySubScreen={entityCountBySubScreen}
-      onScreenChange={setActiveScreen}
+      onScreenChange={handleWorkspaceScreenChange}
       onSubScreenChange={setActiveSubScreen}
       handleUndo={handleUndo}
       handleRedo={handleRedo}
