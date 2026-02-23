@@ -36,6 +36,32 @@
   color: #ffc1c8;
 }
 
+.app-shell.theme-olive .workspace-health .meta-line,
+.app-shell.theme-olive .shortcut-hints,
+.app-shell.theme-olive .inspector-collapsed-copy {
+  color: #c0cba3;
+}
+
+.app-shell.theme-olive .inspector-context-header h2 {
+  color: #dce4af;
+}
+
+.app-shell.theme-olive .inspector-entity-label,
+.app-shell.theme-olive .inspector-detail-grid dt {
+  color: #b8c393;
+}
+
+.app-shell.theme-olive .inspector-kind-chip {
+  border-color: #707b53;
+  background: #313a22;
+  color: #e8efc8;
+}
+
+.app-shell.theme-olive .inspector-entity-id,
+.app-shell.theme-olive .inspector-detail-grid dd {
+  color: #eef3d0;
+}
+
 .app-shell.theme-slate-neon .network-scope-indicator {
   border-color: #397181;
   background: #143a4c;
@@ -170,6 +196,19 @@
 
 .app-shell.theme-deep-green .network-scope-indicator-value {
   color: #eaf7ed;
+}
+
+.app-shell.theme-olive .network-scope-indicator {
+  border-color: #5a6442;
+  background: #202715;
+}
+
+.app-shell.theme-olive .network-scope-indicator-label {
+  color: #bcc89a;
+}
+
+.app-shell.theme-olive .network-scope-indicator-value {
+  color: #eef3d0;
 }
 
 .app-shell.theme-deep-green .network-form-header h2,
@@ -445,4 +484,3 @@
   background: #e2def8;
   color: #463d91;
 }
-

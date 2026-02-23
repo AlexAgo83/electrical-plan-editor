@@ -395,3 +395,54 @@
 .legend-line.wire {
   border-top-color: #4f8d2d;
 }
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night,
+  .theme-cyberpunk,
+  .theme-olive
+) .legend-line {
+  border-top-color: var(--network-segment-color, #7f99af);
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night,
+  .theme-cyberpunk,
+  .theme-olive
+) .legend-line.selected {
+  border-top-color: var(--network-selection-color, #0f6cb8);
+}
+
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night,
+  .theme-cyberpunk,
+  .theme-olive
+) .legend-line.wire {
+  border-top-color: var(--network-wire-highlight-color, #4f8d2d);
+}

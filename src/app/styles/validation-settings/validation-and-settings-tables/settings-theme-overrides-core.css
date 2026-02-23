@@ -394,6 +394,98 @@
   color: #cfe0d5 !important;
 }
 
+.app-shell.theme-olive .settings-panel {
+  border-color: #545c3f;
+  background: linear-gradient(170deg, rgba(28, 34, 20, 0.96) 0%, rgba(23, 29, 17, 0.92) 100%);
+  box-shadow: inset 0 1px 0 rgba(183, 195, 106, 0.08);
+}
+
+.app-shell.theme-olive .settings-panel-intro {
+  color: #bcc89a;
+}
+
+.app-shell.theme-olive .settings-panel-chip {
+  border-color: #707b53;
+  background: #313a22;
+  color: #e6edc1;
+}
+
+.app-shell.theme-olive .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell.theme-olive .settings-panel .settings-checkbox {
+  color: #dce4af;
+}
+
+.app-shell.theme-olive .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell.theme-olive .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: #171d11;
+  border-color: #636c48;
+  color: #eef3d0;
+}
+
+.app-shell.theme-olive .settings-panel .settings-checkbox:hover {
+  background: rgba(88, 102, 58, 0.24);
+}
+
+.app-shell.theme-olive .settings-actions {
+  border-top-color: rgba(104, 113, 77, 0.5);
+}
+
+.app-shell.theme-olive .settings-shortcut-list li {
+  color: #d8e0ba;
+  border-color: #596247;
+  background: rgba(24, 30, 17, 0.78);
+}
+
+.app-shell.theme-olive .settings-shortcut-key {
+  border-color: #707b53;
+  background: #313a22;
+  color: #eaf0cb;
+}
+
+.app-shell.theme-olive .settings-state-chip {
+  border-color: #6a7450;
+  background: #262e1c;
+  color: #dde6bf;
+}
+
+.app-shell.theme-olive .settings-state-chip.is-ok {
+  border-color: #7f9251;
+  background: #313d1f;
+  color: #e7f0c8;
+}
+
+.app-shell.theme-olive .settings-state-chip.is-warn {
+  border-color: #8c8750;
+  background: #3a3518;
+  color: #f3ebc6;
+}
+
+.app-shell.theme-olive .settings-export-fieldset .settings-checkbox,
+.app-shell.theme-olive .settings-export-fieldset .technical-id {
+  color: #dce4af;
+}
+
+.app-shell.theme-olive .settings-import-summary .meta-line {
+  border-color: #596247;
+  background: rgba(25, 31, 18, 0.78);
+}
+
+.app-shell.theme-olive .settings-import-summary .meta-line strong {
+  color: #eef3d0;
+}
+
+.app-shell.theme-olive .settings-primary-action {
+  border-color: #9dad61 !important;
+  background: linear-gradient(180deg, #83974c, #68793e) !important;
+  color: #151a0b !important;
+}
+
+.app-shell.theme-olive .settings-primary-action:disabled {
+  border-color: #697351 !important;
+  background: #434a31 !important;
+  color: #ccd6ad !important;
+}
+
 .app-shell.theme-rose-quartz .settings-panel {
   border-color: #d9b1c4;
   background: linear-gradient(168deg, rgba(255, 249, 252, 0.97) 0%, rgba(248, 235, 242, 0.9) 100%);
@@ -447,4 +539,3 @@
   background: #f6e4ed;
   color: #66354d;
 }
-
