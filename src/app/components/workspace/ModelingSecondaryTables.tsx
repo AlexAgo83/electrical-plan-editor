@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactElement } from "react";
 import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
+import { TableFilterBar } from "./TableFilterBar";
 import type {
   NodeId,
   Segment,
@@ -31,6 +32,8 @@ interface ModelingSecondaryTablesProps {
   onOpenCreateWire: () => void;
   wireRouteFilter: "all" | "auto" | "locked";
   setWireRouteFilter: (value: "all" | "auto" | "locked") => void;
+  wireFilterField: "endpoints" | "name" | "technicalId" | "any";
+  setWireFilterField: (value: "endpoints" | "name" | "technicalId" | "any") => void;
   wireEndpointFilterQuery: string;
   setWireEndpointFilterQuery: (value: string) => void;
   wires: Wire[];
@@ -67,6 +70,8 @@ export function ModelingSecondaryTables({
   onOpenCreateWire,
   wireRouteFilter,
   setWireRouteFilter,
+  wireFilterField,
+  setWireFilterField,
   wireEndpointFilterQuery,
   setWireEndpointFilterQuery,
   wires,
@@ -91,6 +96,14 @@ export function ModelingSecondaryTables({
     selectedWireId === null ? null : (visibleWires.find((wire) => wire.id === selectedWireId) ?? null);
   const showSegmentSubNetworkColumn = segmentSubNetworkFilter !== "default";
   const showWireRouteModeColumn = wireRouteFilter === "all";
+  const wireFilterPlaceholder =
+    wireFilterField === "endpoints"
+      ? "Connector/Splice or ID"
+      : wireFilterField === "name"
+        ? "Wire name"
+        : wireFilterField === "technicalId"
+          ? "Technical ID"
+          : "Name, technical ID, endpoint...";
 
   useEffect(() => {
     if (segmentFormMode !== "edit" || selectedSegmentId === null) {
@@ -301,17 +314,23 @@ export function ModelingSecondaryTables({
                 CSV
               </button>
             </div>
-            <div className="list-panel-header-tools-row">
-              <label className="list-inline-number-filter">
-                <span>Endpoint filter</span>
-                <input
-                  type="text"
-                  value={wireEndpointFilterQuery}
-                  onChange={(event) => setWireEndpointFilterQuery(event.target.value)}
-                  placeholder="Connector/Splice or ID"
+              <div className="list-panel-header-tools-row">
+                <TableFilterBar
+                  label="Filter"
+                  fieldLabel="Wire filter field"
+                  fieldValue={wireFilterField}
+                  onFieldChange={(value) => setWireFilterField(value as "endpoints" | "name" | "technicalId" | "any")}
+                  fieldOptions={[
+                    { value: "endpoints", label: "Endpoints" },
+                    { value: "name", label: "Wire name" },
+                    { value: "technicalId", label: "Technical ID" },
+                    { value: "any", label: "Any" }
+                  ]}
+                  queryValue={wireEndpointFilterQuery}
+                  onQueryChange={setWireEndpointFilterQuery}
+                  placeholder={wireFilterPlaceholder}
                 />
-              </label>
-            </div>
+              </div>
           </div>
         </header>
         {wires.length === 0 ? (

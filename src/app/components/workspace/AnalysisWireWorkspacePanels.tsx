@@ -2,12 +2,15 @@ import type { ReactElement } from "react";
 import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { TableFilterBar } from "./TableFilterBar";
 
 export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps): ReactElement {
   const {
     isWireSubScreen,
     wireRouteFilter,
     setWireRouteFilter,
+    wireFilterField,
+    setWireFilterField,
     wireEndpointFilterQuery,
     setWireEndpointFilterQuery,
     wires,
@@ -27,6 +30,14 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     wireFormError
   } = props;
   const showWireRouteModeColumn = wireRouteFilter === "all";
+  const wireFilterPlaceholder =
+    wireFilterField === "endpoints"
+      ? "Connector/Splice or ID"
+      : wireFilterField === "name"
+        ? "Wire name"
+        : wireFilterField === "technicalId"
+          ? "Technical ID"
+          : "Name, technical ID, endpoint...";
 
   return (
     <>
@@ -76,15 +87,21 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
         </button>
       </div>
       <div className="list-panel-header-tools-row">
-        <label className="list-inline-number-filter">
-          <span>Endpoint filter</span>
-          <input
-            type="text"
-            value={wireEndpointFilterQuery}
-            onChange={(event) => setWireEndpointFilterQuery(event.target.value)}
-            placeholder="Connector/Splice or ID"
-          />
-        </label>
+        <TableFilterBar
+          label="Filter"
+          fieldLabel="Wire filter field"
+          fieldValue={wireFilterField}
+          onFieldChange={(value) => setWireFilterField(value as "endpoints" | "name" | "technicalId" | "any")}
+          fieldOptions={[
+            { value: "endpoints", label: "Endpoints" },
+            { value: "name", label: "Wire name" },
+            { value: "technicalId", label: "Technical ID" },
+            { value: "any", label: "Any" }
+          ]}
+          queryValue={wireEndpointFilterQuery}
+          onQueryChange={setWireEndpointFilterQuery}
+          placeholder={wireFilterPlaceholder}
+        />
       </div>
     </div>
   </header>
