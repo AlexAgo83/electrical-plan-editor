@@ -24,6 +24,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireEndpointASpliceId,
     wireEndpointAPortIndex,
     setWireEndpointAPortIndex,
+    wireEndpointASlotHint,
     wireEndpointBKind,
     setWireEndpointBKind,
     wireEndpointBConnectorId,
@@ -34,6 +35,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireEndpointBSpliceId,
     wireEndpointBPortIndex,
     setWireEndpointBPortIndex,
+    wireEndpointBSlotHint,
     connectors,
     splices,
     cancelWireEdit,
@@ -77,6 +79,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               Way index
               <input type="number" min={1} step={1} value={wireEndpointACavityIndex} onChange={(event) => setWireEndpointACavityIndex(event.target.value)} />
             </label>
+            {wireEndpointASlotHint !== null ? (
+              <small className={wireEndpointASlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointASlotHint.message}</small>
+            ) : null}
           </>
         ) : (
           <>
@@ -91,6 +96,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               Port index
               <input type="number" min={1} step={1} value={wireEndpointAPortIndex} onChange={(event) => setWireEndpointAPortIndex(event.target.value)} />
             </label>
+            {wireEndpointASlotHint !== null ? (
+              <small className={wireEndpointASlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointASlotHint.message}</small>
+            ) : null}
           </>
         )}
       </fieldset>
@@ -117,6 +125,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               Way index
               <input type="number" min={1} step={1} value={wireEndpointBCavityIndex} onChange={(event) => setWireEndpointBCavityIndex(event.target.value)} />
             </label>
+            {wireEndpointBSlotHint !== null ? (
+              <small className={wireEndpointBSlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointBSlotHint.message}</small>
+            ) : null}
           </>
         ) : (
           <>
@@ -131,6 +142,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               Port index
               <input type="number" min={1} step={1} value={wireEndpointBPortIndex} onChange={(event) => setWireEndpointBPortIndex(event.target.value)} />
             </label>
+            {wireEndpointBSlotHint !== null ? (
+              <small className={wireEndpointBSlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointBSlotHint.message}</small>
+            ) : null}
           </>
         )}
       </fieldset>

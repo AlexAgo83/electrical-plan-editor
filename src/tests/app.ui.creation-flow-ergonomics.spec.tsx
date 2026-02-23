@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createInitialState } from "../store";
 import {
+  createUiIntegrationDenseWiresState,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
@@ -137,5 +138,61 @@ describe("App integration UI - creation flow ergonomics", () => {
 
     expect(within(nodesPanel).getByText("N-MID-REN")).toBeInTheDocument();
     expect(within(nodesPanel).queryByText("N-MID")).not.toBeInTheDocument();
+  });
+
+  it("prefills the next free endpoint way/port in wire create mode and keeps manual edits until context changes", () => {
+    renderAppWithState(createUiIntegrationDenseWiresState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+
+    const idleWireFormPanel = getPanelByHeading("Wire form");
+    fireEvent.click(within(idleWireFormPanel).getByRole("button", { name: "Create" }));
+    const createWirePanel = getPanelByHeading("Create Wire");
+
+    const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
+    const endpointBFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint B" });
+
+    fireEvent.change(within(endpointAFieldset).getByLabelText("Connector"), { target: { value: "C1" } });
+    expect(within(endpointAFieldset).getByLabelText("Way index")).toHaveValue(5);
+
+    fireEvent.change(within(endpointBFieldset).getByLabelText("Splice"), { target: { value: "S1" } });
+    expect(within(endpointBFieldset).getByLabelText("Port index")).toHaveValue(5);
+
+    fireEvent.change(within(endpointAFieldset).getByLabelText("Way index"), { target: { value: "6" } });
+    fireEvent.change(within(createWirePanel).getByLabelText("Functional name"), { target: { value: "Draft wire" } });
+    expect(within(endpointAFieldset).getByLabelText("Way index")).toHaveValue(6);
+
+    fireEvent.change(within(endpointAFieldset).getByLabelText("Connector"), { target: { value: "C2" } });
+    expect(within(endpointAFieldset).getByLabelText("Way index")).toHaveValue(6);
+
+    fireEvent.change(within(endpointAFieldset).getByLabelText("Connector"), { target: { value: "C1" } });
+    expect(within(endpointAFieldset).getByLabelText("Way index")).toHaveValue(5);
+  });
+
+  it("shows endpoint occupancy hints in wire create/edit and excludes the edited wire current slot", () => {
+    renderAppWithState(createUiIntegrationDenseWiresState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+
+    const wiresPanel = getPanelByHeading("Wires");
+    fireEvent.click(within(wiresPanel).getByText("Wire 1"));
+    const editWirePanel = getPanelByHeading("Edit Wire");
+    const endpointAEditFieldset = within(editWirePanel).getByRole("group", { name: "Endpoint A" });
+
+    expect(within(endpointAEditFieldset).queryByText(/already occupied/i)).not.toBeInTheDocument();
+    fireEvent.change(within(endpointAEditFieldset).getByLabelText("Way index"), { target: { value: "2" } });
+    expect(within(endpointAEditFieldset).getByText(/Way 2 is already occupied/i)).toBeInTheDocument();
+
+    fireEvent.click(within(editWirePanel).getByRole("button", { name: "Cancel edit" }));
+
+    const idleWireFormPanel = getPanelByHeading("Wire form");
+    fireEvent.click(within(idleWireFormPanel).getByRole("button", { name: "Create" }));
+    const createWirePanel = getPanelByHeading("Create Wire");
+    const endpointACreateFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
+    fireEvent.change(within(endpointACreateFieldset).getByLabelText("Connector"), { target: { value: "C1" } });
+    fireEvent.change(within(endpointACreateFieldset).getByLabelText("Way index"), { target: { value: "2" } });
+    expect(within(endpointACreateFieldset).getByText(/Suggested: way 5/i)).toBeInTheDocument();
   });
 });

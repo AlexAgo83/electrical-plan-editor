@@ -469,6 +469,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setWireEndpointASpliceId: params.setWireEndpointASpliceId,
     wireEndpointAPortIndex: params.wireEndpointAPortIndex,
     setWireEndpointAPortIndex: params.setWireEndpointAPortIndex,
+    wireEndpointASlotHint: params.wireEndpointASlotHint,
     wireEndpointBKind: params.wireEndpointBKind,
     setWireEndpointBKind: params.setWireEndpointBKind,
     wireEndpointBConnectorId: params.wireEndpointBConnectorId,
@@ -479,6 +480,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setWireEndpointBSpliceId: params.setWireEndpointBSpliceId,
     wireEndpointBPortIndex: params.wireEndpointBPortIndex,
     setWireEndpointBPortIndex: params.setWireEndpointBPortIndex,
+    wireEndpointBSlotHint: params.wireEndpointBSlotHint,
     cancelWireEdit: params.cancelWireEdit,
     wireFormError: params.wireFormError
   } satisfies ModelingFormsColumnProps;
