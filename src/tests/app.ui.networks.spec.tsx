@@ -149,4 +149,28 @@ describe("App integration UI - networks", () => {
       expect(document.activeElement).toBe(networkRow);
     });
   });
+
+  it("keeps focus in the network form inputs while typing after selecting a row", async () => {
+    renderAppWithState(createInitialState());
+    switchScreen("networkScope");
+
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    const mainNetworkRow = within(networkScopePanel).getByText("Main network sample").closest("tr");
+    expect(mainNetworkRow).not.toBeNull();
+    fireEvent.click(mainNetworkRow as HTMLElement);
+
+    const formPanel = getPanelByHeading("Edit network");
+    const nameInput = within(formPanel).getByLabelText("Network name");
+    (nameInput as HTMLInputElement).focus();
+    expect(document.activeElement).toBe(nameInput);
+
+    fireEvent.change(nameInput, {
+      target: { value: "Main network sample X" }
+    });
+
+    await waitFor(() => {
+      expect(nameInput).toHaveValue("Main network sample X");
+      expect(document.activeElement).toBe(nameInput);
+    });
+  });
 });
