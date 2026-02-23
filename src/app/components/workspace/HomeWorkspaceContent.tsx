@@ -94,6 +94,10 @@ export function HomeWorkspaceContent({
           Start a new workspace flow, import existing data, or open workspace management controls.
         </p>
         <div className="row-actions home-primary-actions">
+          <button type="button" className="button-with-icon" onClick={onOpenNetworkScope}>
+            <span className="action-button-icon is-home-start" aria-hidden="true" />
+            <span>Open Network Scope</span>
+          </button>
           <button type="button" className="button-with-icon" onClick={onCreateEmptyWorkspace}>
             <span className="action-button-icon is-home-create" aria-hidden="true" />
             <span>Create empty workspace</span>
@@ -101,10 +105,6 @@ export function HomeWorkspaceContent({
           <button type="button" className="button-with-icon" onClick={onOpenImportPicker}>
             <span className="action-button-icon is-home-import" aria-hidden="true" />
             <span>Import from file</span>
-          </button>
-          <button type="button" className="button-with-icon" onClick={onOpenNetworkScope}>
-            <span className="action-button-icon is-home-start" aria-hidden="true" />
-            <span>Open Network Scope</span>
           </button>
         </div>
         <input

@@ -11,7 +11,7 @@ import { normalizeWireColorIds } from "../../core/cableColors";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { DEFAULT_WIRE_SECTION_MM2 } from "../../core/wireSection";
-import { createEntityId, toPositiveInteger } from "../lib/app-utils-shared";
+import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
 import { suggestNextWireTechnicalId } from "../lib/technical-id-suggestions";
 import {
   findNextAvailableConnectorWay,
@@ -604,6 +604,7 @@ export function useWireHandlers({
       dispatchAction(appActions.select({ kind: "wire", id: wireId }));
       resetWireForm();
       setWireForcedRouteInput(savedWire.routeSegmentIds.join(", "));
+      focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-wires"]');
     }
   }
 

@@ -2,6 +2,7 @@ import type { FormEvent } from "react";
 import type { ConnectorId, NetworkNode, NodeId, SpliceId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
+import { focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestNextNodeId } from "../lib/technical-id-suggestions";
 import type { NodePosition } from "../types/app-controller";
 
@@ -190,6 +191,7 @@ export function useNodeHandlers({
       }
       dispatchAction(appActions.select({ kind: "node", id: effectiveNodeId }));
       resetNodeForm();
+      focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-nodes"]');
     }
   }
 

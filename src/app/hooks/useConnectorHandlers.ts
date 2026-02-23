@@ -2,7 +2,7 @@ import type { FormEvent } from "react";
 import type { Connector, ConnectorId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
-import { createEntityId, toPositiveInteger } from "../lib/app-utils-shared";
+import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
 import {
   suggestAutoConnectorNodeId,
   suggestNextConnectorTechnicalId
@@ -178,6 +178,7 @@ export function useConnectorHandlers({
       }
       dispatchAction(appActions.select({ kind: "connector", id: connectorId }));
       resetConnectorForm();
+      focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-connectors"]');
     }
   }
 

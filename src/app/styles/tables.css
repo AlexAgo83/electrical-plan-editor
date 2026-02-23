@@ -135,6 +135,33 @@
   outline-offset: 1px;
 }
 
+.list-inline-table-filter {
+  width: 100%;
+}
+
+.list-inline-table-filter-select {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 0.84rem;
+  line-height: 1.2;
+  padding: 0.32rem 1.8rem 0.32rem 0.65rem;
+  min-height: 1.95rem;
+}
+
+.list-inline-table-filter-select:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 35%, transparent);
+  outline-offset: 1px;
+}
+
+.list-inline-table-filter-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .chip-group {
   display: flex;
   flex-wrap: wrap;

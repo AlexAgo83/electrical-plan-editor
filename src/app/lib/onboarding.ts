@@ -57,7 +57,7 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
       screen: "modeling",
       subScreen: "connector",
       panelSelector: '[data-onboarding-panel="modeling-connectors"]',
-      panelLabel: "Connectors"
+      panelLabel: "Connectors / Splices"
     }
   },
   {
