@@ -34,7 +34,8 @@ export type ThemeMode =
   | "roseQuartz"
   | "burgundyNoir"
   | "lavenderHaze"
-  | "amberNight";
+  | "amberNight"
+  | "cyberpunk";
 
 export interface LayoutNodePosition {
   x: number;

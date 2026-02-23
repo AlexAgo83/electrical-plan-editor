@@ -387,3 +387,81 @@
   background: #4b3a12;
   color: #ffe9af;
 }
+
+.app-shell.theme-cyberpunk .validation-toolbar > span,
+.app-shell.theme-cyberpunk .summary-grid h3,
+.app-shell.theme-cyberpunk .validation-group h3,
+.app-shell.theme-cyberpunk .validation-active-filter {
+  color: #d4f5ff;
+}
+
+.app-shell.theme-cyberpunk .workspace-ops-content.panel {
+  background: #120d28;
+}
+
+.app-shell.theme-cyberpunk .error-banner button,
+.app-shell.theme-cyberpunk .inspector-context-toggle,
+.app-shell.theme-cyberpunk .header-install-toggle,
+.app-shell.theme-cyberpunk .network-scope-create-button {
+  border-color: #5a4d98;
+  background: #1a1438;
+  color: #eafcff;
+}
+
+.app-shell.theme-cyberpunk .network-form-header h2,
+.app-shell.theme-cyberpunk .network-form-label,
+.app-shell.theme-cyberpunk .stack-label,
+.app-shell.theme-cyberpunk .stack-form label,
+.app-shell.theme-cyberpunk .row-form label,
+.app-shell.theme-cyberpunk .cavity h3 {
+  color: #fff200;
+}
+
+.app-shell.theme-cyberpunk .empty-copy,
+.app-shell.theme-cyberpunk .form-hint,
+.app-shell.theme-cyberpunk .inline-help,
+.app-shell.theme-cyberpunk .panel .meta-line,
+.app-shell.theme-cyberpunk .settings-panel .meta-line,
+.app-shell.theme-cyberpunk .cavity p {
+  color: #c0b7ee;
+}
+
+.app-shell.theme-cyberpunk .cavity button {
+  border-color: #53478d;
+  background: #1f173f;
+  color: #e8fbff;
+}
+
+.app-shell.theme-cyberpunk .form-hint.danger {
+  color: #ff9abf;
+}
+
+.app-shell.theme-cyberpunk .wire-endpoint-fieldset,
+.app-shell.theme-cyberpunk .settings-export-fieldset {
+  border-color: #46397a;
+  background: linear-gradient(180deg, rgba(22, 15, 46, 0.9), rgba(15, 12, 34, 0.66));
+}
+
+.app-shell.theme-cyberpunk .wire-endpoint-fieldset legend,
+.app-shell.theme-cyberpunk .wire-endpoint-fieldset label,
+.app-shell.theme-cyberpunk .settings-export-fieldset legend {
+  color: #dcf8ff;
+}
+
+.app-shell.theme-cyberpunk .splice-badge {
+  border-color: #42c4dd;
+  background: #17394b;
+  color: #dcf8ff;
+}
+
+.app-shell.theme-cyberpunk .save-status.is-saved {
+  color: #8be9fb;
+}
+
+.app-shell.theme-cyberpunk .save-status.is-unsaved {
+  color: #fff200;
+}
+
+.app-shell.theme-cyberpunk .save-status.is-error {
+  color: #ff77a6;
+}

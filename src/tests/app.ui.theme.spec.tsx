@@ -85,6 +85,13 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).toHaveClass("theme-dark");
     expect(appShell).toHaveClass("theme-deep-green");
     expect(appShell).toHaveClass("theme-amber-night");
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "cyberpunk" }
+    });
+    expect(appShell).toHaveClass("theme-dark");
+    expect(appShell).toHaveClass("theme-amber-night");
+    expect(appShell).toHaveClass("theme-cyberpunk");
   });
 
   it("persists dark mode preference across remount", () => {

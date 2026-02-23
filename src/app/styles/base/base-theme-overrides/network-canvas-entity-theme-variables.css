@@ -182,6 +182,23 @@
   --network-label-stroke-color: rgba(22, 16, 6, 0.88);
 }
 
+.app-shell.theme-cyberpunk {
+  --network-selection-color: #fff200;
+  --network-selection-focus-color: #fff200;
+  --network-selection-glow: rgba(255, 242, 0, 0.42);
+  --network-grid-line-color: #4a3a84;
+  --network-segment-color: #7fd4f1;
+  --network-wire-highlight-color: #f7094a;
+  --network-node-stroke-color: #6f5cb8;
+  --network-node-connector-fill: #173b52;
+  --network-node-splice-fill: #5b173d;
+  --network-node-intermediate-fill: #241a46;
+  --network-node-label-color: #fff8d1;
+  --network-segment-label-color: #d8f5ff;
+  --network-segment-length-label-color: #bfe7f7;
+  --network-label-stroke-color: rgba(10, 9, 25, 0.9);
+}
+
 /* Enforce theme palette application on 2D network entities for all themes,
    including composed themes that also carry legacy base classes (e.g. theme-dark/theme-deep-green). */
 .app-shell:is(

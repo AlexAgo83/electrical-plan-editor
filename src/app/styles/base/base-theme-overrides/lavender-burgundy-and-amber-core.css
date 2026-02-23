@@ -442,3 +442,179 @@
   background: rgba(44, 33, 10, 0.58);
 }
 
+/* Cyberpunk theme composes theme-dark + theme-amber-night and overrides the palette with
+   yellow/cyan/magenta accents inspired by Cyberpunk 2077 promo/logo colors. */
+.app-shell.theme-cyberpunk {
+  --theme-primary: #fff200;
+  --network-selection-color: #fff200;
+  --network-selection-focus-color: #fff200;
+  --network-selection-glow: rgba(255, 242, 0, 0.42);
+  color: #f7f5ff;
+}
+
+.app-shell.theme-cyberpunk::before {
+  background:
+    radial-gradient(circle at 12% 14%, rgba(247, 9, 74, 0.16) 0%, transparent 40%),
+    radial-gradient(circle at 87% 12%, rgba(66, 196, 221, 0.2) 0%, transparent 42%),
+    linear-gradient(180deg, #090813 0%, #0d1024 46%, #120a24 100%);
+}
+
+.app-shell.theme-cyberpunk :focus-visible {
+  outline-color: #fff200;
+}
+
+.app-shell.theme-cyberpunk .header-block {
+  border-color: #4d4082;
+  background: rgba(13, 11, 30, 0.94);
+}
+
+.app-shell.theme-cyberpunk .header-block.is-drawer-open {
+  background: rgba(13, 11, 30, 0.58);
+}
+
+.app-shell.theme-cyberpunk .panel,
+.app-shell.theme-cyberpunk .workspace-sidebar .workspace-switcher,
+.app-shell.theme-cyberpunk .workspace-sidebar .workspace-meta,
+.app-shell.theme-cyberpunk .stats-grid article,
+.app-shell.theme-cyberpunk .summary-grid article,
+.app-shell.theme-cyberpunk .validation-group,
+.app-shell.theme-cyberpunk .cavity,
+.app-shell.theme-cyberpunk .network-canvas-shell {
+  border-color: #44376f;
+  background: #120d28;
+}
+
+.app-shell.theme-cyberpunk .workspace-tab,
+.app-shell.theme-cyberpunk .filter-chip,
+.app-shell.theme-cyberpunk .row-actions button,
+.app-shell.theme-cyberpunk .row-form button,
+.app-shell.theme-cyberpunk .validation-row-go-to-button,
+.app-shell.theme-cyberpunk .header-nav-toggle,
+.app-shell.theme-cyberpunk .header-settings-toggle,
+.app-shell.theme-cyberpunk .header-ops-toggle {
+  border-color: #5b4d98;
+  background: #1a1438;
+  color: #f6f5ff;
+}
+
+.app-shell.theme-cyberpunk .workspace-tab.is-active,
+.app-shell.theme-cyberpunk .filter-chip.is-active,
+.app-shell.theme-cyberpunk .header-settings-toggle.is-active {
+  border-color: #fff200;
+  background: #fff200;
+  color: #19150a;
+}
+
+.app-shell.theme-cyberpunk .workspace-tab-badge,
+.app-shell.theme-cyberpunk .header-ops-badge {
+  background: #291f52;
+  color: #d8f6ff;
+}
+
+.app-shell.theme-cyberpunk .workspace-tab-badge.is-error,
+.app-shell.theme-cyberpunk .header-ops-badge.is-error {
+  background: #5d173d;
+  color: #ffd7e8;
+}
+
+.app-shell.theme-cyberpunk input,
+.app-shell.theme-cyberpunk select,
+.app-shell.theme-cyberpunk textarea {
+  border-color: #51448a;
+  background: #0f0c22;
+  color: #f7f5ff;
+}
+
+.app-shell.theme-cyberpunk .data-table th,
+.app-shell.theme-cyberpunk .data-table td {
+  border-bottom-color: #3b2f66;
+}
+
+.app-shell.theme-cyberpunk .data-table th {
+  color: #f8ec95;
+}
+
+.app-shell.theme-cyberpunk .data-table tr.is-selected > td {
+  background: rgba(255, 242, 0, 0.16);
+}
+
+.app-shell.theme-cyberpunk .data-table tr.is-wire-highlighted > td {
+  background: rgba(66, 196, 221, 0.14);
+}
+
+.app-shell.theme-cyberpunk .network-grid line {
+  stroke: #42346f;
+}
+
+.app-shell.theme-cyberpunk .network-segment {
+  stroke: #8bd7f3;
+}
+
+.app-shell.theme-cyberpunk .network-segment.is-wire-highlighted {
+  stroke: #f7094a;
+}
+
+.app-shell.theme-cyberpunk .network-segment.is-selected {
+  stroke: #fff200;
+}
+
+.app-shell.theme-cyberpunk .route-preview-status-chip,
+.app-shell.theme-cyberpunk .analysis-wire-mode-chip {
+  border-color: #54478d;
+  background: #1b153b;
+  color: #dff8ff;
+}
+
+.app-shell.theme-cyberpunk .analysis-wire-mode-chip.is-locked {
+  border-color: #f7094a;
+  background: #36112a;
+  color: #ffe3ee;
+}
+
+.app-shell.theme-cyberpunk .network-canvas-floating-controls,
+.app-shell.theme-cyberpunk .network-canvas-floating-subnetworks,
+.app-shell.theme-cyberpunk .network-canvas-floating-stats {
+  border-color: #4b4084;
+  background: rgba(16, 13, 35, 0.78);
+}
+
+.app-shell.theme-cyberpunk .network-canvas-floating-copy,
+.app-shell.theme-cyberpunk .network-canvas-subnetwork-list li,
+.app-shell.theme-cyberpunk .network-canvas-stats-list li {
+  color: #d3ecff;
+}
+
+.app-shell.theme-cyberpunk .network-canvas-stats-list strong {
+  color: #fff5b0;
+}
+
+.app-shell.theme-cyberpunk .subnetwork-chip,
+.app-shell.theme-cyberpunk .network-form-mode-chip,
+.app-shell.theme-cyberpunk .network-scope-status-chip.is-available {
+  border-color: #53478d;
+  background: #1f173f;
+  color: #e9fbff;
+}
+
+.app-shell.theme-cyberpunk .network-form-mode-chip.is-create {
+  background: #42c4dd;
+  color: #08161a;
+}
+
+.app-shell.theme-cyberpunk .network-form-mode-chip.is-edit,
+.app-shell.theme-cyberpunk .network-scope-status-chip.is-active {
+  background: #fff200;
+  color: #191507;
+}
+
+.app-shell.theme-cyberpunk .status-chip.is-error {
+  border-color: #a43a69;
+  background: #43132f;
+  color: #ffdbe8;
+}
+
+.app-shell.theme-cyberpunk .status-chip.is-warning {
+  border-color: #9a8d2c;
+  background: #3a3410;
+  color: #fff4b5;
+}

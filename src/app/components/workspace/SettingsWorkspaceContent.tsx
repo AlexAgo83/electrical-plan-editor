@@ -164,6 +164,7 @@ export function SettingsWorkspaceContent({
               <option value="burgundyNoir">Burgundy Noir</option>
               <option value="lavenderHaze">Lavender Haze</option>
               <option value="amberNight">Amber Night</option>
+              <option value="cyberpunk">Cyberpunk</option>
             </select>
           </label>
           <label className="settings-field">
