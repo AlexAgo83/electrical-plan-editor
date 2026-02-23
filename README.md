@@ -7,6 +7,8 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 [![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v0.7.2-4C8BF5)
 
+<img width="1185" height="735" alt="image" src="https://github.com/user-attachments/assets/5bbc5dcd-69af-480c-8055-0aa4a317e847" />
+
 ## Table of Contents
 
 - [Live Demo & Status](#live-demo--status)
