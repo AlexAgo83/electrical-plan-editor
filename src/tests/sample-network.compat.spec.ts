@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { APP_SCHEMA_VERSION } from "../core/schema";
 import {
+  PERSISTED_STATE_PAYLOAD_KIND,
+  PERSISTED_STATE_SCHEMA_VERSION,
   STORAGE_KEY,
   loadState,
   migratePersistedPayload,
@@ -68,7 +70,8 @@ describe("sample network compatibility", () => {
 
     expect(migration).not.toBeNull();
     expect(migration?.wasMigrated).toBe(true);
-    expect(migration?.snapshot.schemaVersion).toBe(APP_SCHEMA_VERSION);
+    expect(migration?.snapshot.schemaVersion).toBe(PERSISTED_STATE_SCHEMA_VERSION);
+    expect(migration?.snapshot.payloadKind).toBe(PERSISTED_STATE_PAYLOAD_KIND);
     expect(hasSampleNetworkSignature(migration?.snapshot.state ?? sample)).toBe(true);
   });
 

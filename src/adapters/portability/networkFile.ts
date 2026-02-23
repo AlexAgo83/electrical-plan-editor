@@ -1,8 +1,9 @@
 import type { Network, NetworkId, NodeId } from "../../core/entities";
-import { APP_SCHEMA_VERSION } from "../../core/schema";
+import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
 
-export const NETWORK_FILE_SCHEMA_VERSION = 1;
+export const NETWORK_FILE_SCHEMA_VERSION = 2;
+export const NETWORK_FILE_PAYLOAD_KIND = "electrical-plan-editor.network-export";
 
 export type NetworkExportScope = "active" | "selected" | "all";
 
@@ -12,10 +13,12 @@ export interface ExportedNetworkBundle {
 }
 
 export interface NetworkFilePayloadV1 {
-  schemaVersion: typeof NETWORK_FILE_SCHEMA_VERSION;
+  payloadKind?: typeof NETWORK_FILE_PAYLOAD_KIND;
+  schemaVersion: number;
   exportedAt: string;
   source: {
     app: "electrical-plan-editor";
+    appVersion?: string;
     appSchemaVersion: number;
   };
   networks: ExportedNetworkBundle[];
@@ -206,10 +209,12 @@ export function buildNetworkFilePayload(
     .sort((left, right) => left.network.technicalId.localeCompare(right.network.technicalId));
 
   return {
+    payloadKind: NETWORK_FILE_PAYLOAD_KIND,
     schemaVersion: NETWORK_FILE_SCHEMA_VERSION,
     exportedAt,
     source: {
       app: "electrical-plan-editor",
+      appVersion: APP_RELEASE_VERSION,
       appSchemaVersion: APP_SCHEMA_VERSION
     },
     networks: bundles
@@ -256,19 +261,42 @@ export function parseNetworkFilePayload(rawJson: string): { payload: NetworkFile
     };
   }
 
-  if (schemaVersion !== 1 && schemaVersion !== 0) {
+  if (typeof schemaVersion !== "number" || !Number.isInteger(schemaVersion)) {
+    return {
+      payload: null,
+      error: "Invalid payload structure: missing or invalid schemaVersion."
+    };
+  }
+
+  if (schemaVersion > NETWORK_FILE_SCHEMA_VERSION) {
+    return {
+      payload: null,
+      error: `Unsupported file schema version '${String(schemaVersion)}' (newer than supported ${NETWORK_FILE_SCHEMA_VERSION}).`
+    };
+  }
+
+  if (schemaVersion !== 0 && schemaVersion !== 1 && schemaVersion !== 2) {
     return {
       payload: null,
       error: `Unsupported file schema version '${String(schemaVersion)}'.`
     };
   }
 
+  const rawSource = parsed.source;
+  const sourceRecord = isRecord(rawSource) ? rawSource : {};
+  const sourceAppVersion =
+    typeof sourceRecord.appVersion === "string" && sourceRecord.appVersion.trim().length > 0
+      ? sourceRecord.appVersion
+      : "unknown";
+
   return {
     payload: {
+      payloadKind: NETWORK_FILE_PAYLOAD_KIND,
       schemaVersion: NETWORK_FILE_SCHEMA_VERSION,
       exportedAt,
       source: {
         app: "electrical-plan-editor",
+        appVersion: sourceAppVersion,
         appSchemaVersion: APP_SCHEMA_VERSION
       },
       networks: parsedBundles.map((bundle) => ({
