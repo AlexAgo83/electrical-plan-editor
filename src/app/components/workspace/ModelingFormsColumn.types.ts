@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import type { Connector, NetworkNode, Splice, WireEndpoint } from "../../../core/entities";
+import type { WireEndpointSlotHint } from "../../hooks/useWireHandlers";
 
 export interface ModelingFormsColumnProps {
   isConnectorSubScreen: boolean;
@@ -84,6 +85,7 @@ export interface ModelingFormsColumnProps {
   setWireEndpointASpliceId: (value: string) => void;
   wireEndpointAPortIndex: string;
   setWireEndpointAPortIndex: (value: string) => void;
+  wireEndpointASlotHint: WireEndpointSlotHint | null;
   wireEndpointBKind: WireEndpoint["kind"];
   setWireEndpointBKind: (value: WireEndpoint["kind"]) => void;
   wireEndpointBConnectorId: string;
@@ -94,6 +96,7 @@ export interface ModelingFormsColumnProps {
   setWireEndpointBSpliceId: (value: string) => void;
   wireEndpointBPortIndex: string;
   setWireEndpointBPortIndex: (value: string) => void;
+  wireEndpointBSlotHint: WireEndpointSlotHint | null;
   cancelWireEdit: () => void;
   wireFormError: string | null;
 }

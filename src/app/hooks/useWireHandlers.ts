@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import { useCallback, useEffect, useRef, type FormEvent } from "react";
 import type {
   ConnectorId,
   SegmentId,
@@ -11,6 +11,12 @@ import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { createEntityId, toPositiveInteger } from "../lib/app-utils-shared";
 import { suggestNextWireTechnicalId } from "../lib/technical-id-suggestions";
+import {
+  findNextAvailableConnectorWay,
+  findNextAvailableSplicePort,
+  getConnectorWayOccupant,
+  getSplicePortOccupant
+} from "../lib/wire-endpoint-slot-helpers";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -56,6 +62,11 @@ interface UseWireHandlersParams {
   selectedWire: Wire | null;
 }
 
+export interface WireEndpointSlotHint {
+  tone: "error" | "help";
+  message: string;
+}
+
 export function useWireHandlers({
   store,
   dispatchAction,
@@ -92,8 +103,241 @@ export function useWireHandlers({
   setWireFormError,
   selectedWire
 }: UseWireHandlersParams) {
+  const endpointAIndexTouchedByUserRef = useRef(false);
+  const endpointBIndexTouchedByUserRef = useRef(false);
+  const lastEndpointAContextRef = useRef<string>("");
+  const lastEndpointBContextRef = useRef<string>("");
+
+  const buildExcludedOccupantRefs = (): ReadonlySet<string> => {
+    if (editingWireId === null) {
+      return new Set<string>();
+    }
+
+    return new Set<string>([`wire:${editingWireId}:A`, `wire:${editingWireId}:B`]);
+  };
+
+  const computeEndpointSlotHint = (side: "A" | "B"): WireEndpointSlotHint | null => {
+    const snapshot = store.getState();
+    const excluded = buildExcludedOccupantRefs();
+
+    if (side === "A") {
+      if (wireEndpointAKind === "connectorCavity") {
+        if (wireEndpointAConnectorId.length === 0) {
+          return null;
+        }
+        const connector = snapshot.connectors.byId[wireEndpointAConnectorId as ConnectorId];
+        if (connector === undefined) {
+          return null;
+        }
+        const cavityIndex = toPositiveInteger(wireEndpointACavityIndex);
+        if (cavityIndex <= 0) {
+          return null;
+        }
+        const occupant = getConnectorWayOccupant(snapshot, connector.id, cavityIndex);
+        if (occupant === undefined || excluded.has(occupant)) {
+          return null;
+        }
+        const nextFree = findNextAvailableConnectorWay(snapshot, connector.id, connector.cavityCount, excluded);
+        if (nextFree === null) {
+          return { tone: "error", message: "Way is already occupied. No available ways on selected connector." };
+        }
+        if (nextFree === cavityIndex) {
+          return null;
+        }
+        return { tone: "error", message: `Way ${cavityIndex} is already occupied. Suggested: way ${nextFree}.` };
+      }
+
+      if (wireEndpointASpliceId.length === 0) {
+        return null;
+      }
+      const splice = snapshot.splices.byId[wireEndpointASpliceId as SpliceId];
+      if (splice === undefined) {
+        return null;
+      }
+      const portIndex = toPositiveInteger(wireEndpointAPortIndex);
+      if (portIndex <= 0) {
+        return null;
+      }
+      const occupant = getSplicePortOccupant(snapshot, splice.id, portIndex);
+      if (occupant === undefined || excluded.has(occupant)) {
+        return null;
+      }
+      const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice.portCount, excluded);
+      if (nextFree === null) {
+        return { tone: "error", message: "Port is already occupied. No available ports on selected splice." };
+      }
+      if (nextFree === portIndex) {
+        return null;
+      }
+      return { tone: "error", message: `Port ${portIndex} is already occupied. Suggested: port ${nextFree}.` };
+    }
+
+    if (wireEndpointBKind === "connectorCavity") {
+      if (wireEndpointBConnectorId.length === 0) {
+        return null;
+      }
+      const connector = snapshot.connectors.byId[wireEndpointBConnectorId as ConnectorId];
+      if (connector === undefined) {
+        return null;
+      }
+      const cavityIndex = toPositiveInteger(wireEndpointBCavityIndex);
+      if (cavityIndex <= 0) {
+        return null;
+      }
+      const occupant = getConnectorWayOccupant(snapshot, connector.id, cavityIndex);
+      if (occupant === undefined || excluded.has(occupant)) {
+        return null;
+      }
+      const nextFree = findNextAvailableConnectorWay(snapshot, connector.id, connector.cavityCount, excluded);
+      if (nextFree === null) {
+        return { tone: "error", message: "Way is already occupied. No available ways on selected connector." };
+      }
+      if (nextFree === cavityIndex) {
+        return null;
+      }
+      return { tone: "error", message: `Way ${cavityIndex} is already occupied. Suggested: way ${nextFree}.` };
+    }
+
+    if (wireEndpointBSpliceId.length === 0) {
+      return null;
+    }
+    const splice = snapshot.splices.byId[wireEndpointBSpliceId as SpliceId];
+    if (splice === undefined) {
+      return null;
+    }
+    const portIndex = toPositiveInteger(wireEndpointBPortIndex);
+    if (portIndex <= 0) {
+      return null;
+    }
+    const occupant = getSplicePortOccupant(snapshot, splice.id, portIndex);
+    if (occupant === undefined || excluded.has(occupant)) {
+      return null;
+    }
+    const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice.portCount, excluded);
+    if (nextFree === null) {
+      return { tone: "error", message: "Port is already occupied. No available ports on selected splice." };
+    }
+    if (nextFree === portIndex) {
+      return null;
+    }
+    return { tone: "error", message: `Port ${portIndex} is already occupied. Suggested: port ${nextFree}.` };
+  };
+
+  const prefillNextAvailableEndpointIndex = useCallback(
+    (side: "A" | "B"): void => {
+      if (wireFormMode !== "create") {
+        return;
+      }
+
+      const snapshot = store.getState();
+      const excluded = new Set<string>();
+
+      if (side === "A") {
+        if (wireEndpointAKind === "connectorCavity") {
+          if (wireEndpointAConnectorId.length === 0 || endpointAIndexTouchedByUserRef.current) {
+            return;
+          }
+          const connector = snapshot.connectors.byId[wireEndpointAConnectorId as ConnectorId];
+          if (connector === undefined) {
+            return;
+          }
+          const nextFree = findNextAvailableConnectorWay(snapshot, connector.id, connector.cavityCount, excluded);
+          if (nextFree !== null && String(nextFree) !== wireEndpointACavityIndex) {
+            setWireEndpointACavityIndex(String(nextFree));
+          }
+          return;
+        }
+        if (wireEndpointASpliceId.length === 0 || endpointAIndexTouchedByUserRef.current) {
+          return;
+        }
+        const splice = snapshot.splices.byId[wireEndpointASpliceId as SpliceId];
+        if (splice === undefined) {
+          return;
+        }
+        const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice.portCount, excluded);
+        if (nextFree !== null && String(nextFree) !== wireEndpointAPortIndex) {
+          setWireEndpointAPortIndex(String(nextFree));
+        }
+        return;
+      }
+
+      if (wireEndpointBKind === "connectorCavity") {
+        if (wireEndpointBConnectorId.length === 0 || endpointBIndexTouchedByUserRef.current) {
+          return;
+        }
+        const connector = snapshot.connectors.byId[wireEndpointBConnectorId as ConnectorId];
+        if (connector === undefined) {
+          return;
+        }
+        const nextFree = findNextAvailableConnectorWay(snapshot, connector.id, connector.cavityCount, excluded);
+        if (nextFree !== null && String(nextFree) !== wireEndpointBCavityIndex) {
+          setWireEndpointBCavityIndex(String(nextFree));
+        }
+        return;
+      }
+      if (wireEndpointBSpliceId.length === 0 || endpointBIndexTouchedByUserRef.current) {
+        return;
+      }
+      const splice = snapshot.splices.byId[wireEndpointBSpliceId as SpliceId];
+      if (splice === undefined) {
+        return;
+      }
+      const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice.portCount, excluded);
+      if (nextFree !== null && String(nextFree) !== wireEndpointBPortIndex) {
+        setWireEndpointBPortIndex(String(nextFree));
+      }
+    },
+    [
+      store,
+      wireFormMode,
+      wireEndpointAKind,
+      wireEndpointAConnectorId,
+      wireEndpointACavityIndex,
+      wireEndpointASpliceId,
+      wireEndpointAPortIndex,
+      wireEndpointBKind,
+      wireEndpointBConnectorId,
+      wireEndpointBCavityIndex,
+      wireEndpointBSpliceId,
+      wireEndpointBPortIndex,
+      setWireEndpointACavityIndex,
+      setWireEndpointAPortIndex,
+      setWireEndpointBCavityIndex,
+      setWireEndpointBPortIndex
+    ]
+  );
+
+  const endpointAContextKey =
+    wireEndpointAKind === "connectorCavity"
+      ? `connector:${wireEndpointAConnectorId}`
+      : `splice:${wireEndpointASpliceId}`;
+  const endpointBContextKey =
+    wireEndpointBKind === "connectorCavity"
+      ? `connector:${wireEndpointBConnectorId}`
+      : `splice:${wireEndpointBSpliceId}`;
+
+  useEffect(() => {
+    if (lastEndpointAContextRef.current !== endpointAContextKey) {
+      endpointAIndexTouchedByUserRef.current = false;
+      lastEndpointAContextRef.current = endpointAContextKey;
+    }
+    prefillNextAvailableEndpointIndex("A");
+  }, [endpointAContextKey, wireFormMode, wireEndpointAKind, wireEndpointACavityIndex, wireEndpointAPortIndex, prefillNextAvailableEndpointIndex]);
+
+  useEffect(() => {
+    if (lastEndpointBContextRef.current !== endpointBContextKey) {
+      endpointBIndexTouchedByUserRef.current = false;
+      lastEndpointBContextRef.current = endpointBContextKey;
+    }
+    prefillNextAvailableEndpointIndex("B");
+  }, [endpointBContextKey, wireFormMode, wireEndpointBKind, wireEndpointBCavityIndex, wireEndpointBPortIndex, prefillNextAvailableEndpointIndex]);
+
   function resetWireForm(): void {
     const state = store.getState();
+    endpointAIndexTouchedByUserRef.current = false;
+    endpointBIndexTouchedByUserRef.current = false;
+    lastEndpointAContextRef.current = "";
+    lastEndpointBContextRef.current = "";
     setWireFormMode("create");
     setEditingWireId(null);
     setWireName("");
@@ -113,6 +357,10 @@ export function useWireHandlers({
   }
 
   function clearWireForm(): void {
+    endpointAIndexTouchedByUserRef.current = false;
+    endpointBIndexTouchedByUserRef.current = false;
+    lastEndpointAContextRef.current = "";
+    lastEndpointBContextRef.current = "";
     setWireFormMode("idle");
     setEditingWireId(null);
     setWireName("");
@@ -137,6 +385,8 @@ export function useWireHandlers({
   }
 
   function startWireEdit(wire: Wire): void {
+    endpointAIndexTouchedByUserRef.current = false;
+    endpointBIndexTouchedByUserRef.current = false;
     setWireFormMode("edit");
     setEditingWireId(wire.id);
     setWireName(wire.name);
@@ -311,6 +561,24 @@ export function useWireHandlers({
     clearWireForm,
     cancelWireEdit,
     startWireEdit,
+    setWireEndpointACavityIndex: (value: string) => {
+      endpointAIndexTouchedByUserRef.current = true;
+      setWireEndpointACavityIndex(value);
+    },
+    setWireEndpointAPortIndex: (value: string) => {
+      endpointAIndexTouchedByUserRef.current = true;
+      setWireEndpointAPortIndex(value);
+    },
+    setWireEndpointBCavityIndex: (value: string) => {
+      endpointBIndexTouchedByUserRef.current = true;
+      setWireEndpointBCavityIndex(value);
+    },
+    setWireEndpointBPortIndex: (value: string) => {
+      endpointBIndexTouchedByUserRef.current = true;
+      setWireEndpointBPortIndex(value);
+    },
+    wireEndpointASlotHint: computeEndpointSlotHint("A"),
+    wireEndpointBSlotHint: computeEndpointSlotHint("B"),
     handleWireSubmit,
     handleWireDelete,
     handleLockWireRoute,
