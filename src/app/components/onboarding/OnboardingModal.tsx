@@ -3,6 +3,7 @@ import type { OnboardingModalMode, OnboardingStepDefinition } from "../../lib/on
 
 interface OnboardingModalProps {
   isOpen: boolean;
+  themeHostClassName?: string;
   mode: OnboardingModalMode;
   step: OnboardingStepDefinition;
   stepIndex: number;
@@ -34,6 +35,7 @@ function renderDescription(step: OnboardingStepDefinition): ReactElement {
 
 export function OnboardingModal({
   isOpen,
+  themeHostClassName,
   mode,
   step,
   stepIndex,
@@ -54,7 +56,7 @@ export function OnboardingModal({
   const progressLabel = `Step ${stepIndex + 1} of ${totalSteps}`;
 
   return (
-    <div className="onboarding-modal-layer" role="presentation">
+    <div className={themeHostClassName ? `onboarding-modal-layer ${themeHostClassName}` : "onboarding-modal-layer"} role="presentation">
       <button
         type="button"
         className="onboarding-modal-backdrop"
@@ -62,7 +64,7 @@ export function OnboardingModal({
         onClick={onClose}
       />
       <section
-        className="onboarding-modal"
+        className="onboarding-modal panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

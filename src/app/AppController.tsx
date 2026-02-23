@@ -1864,6 +1864,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       {activeOnboardingStep !== undefined ? (
         <OnboardingModal
           isOpen={isOnboardingOpen}
+          themeHostClassName={appShellClassName}
           mode={onboardingModalMode}
           step={activeOnboardingStep}
           stepIndex={onboardingModalMode === "full" ? onboardingStepIndex : ONBOARDING_STEPS.findIndex((step) => step.id === activeOnboardingStep.id)}
