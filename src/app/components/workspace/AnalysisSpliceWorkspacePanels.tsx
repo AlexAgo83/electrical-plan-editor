@@ -18,6 +18,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     setSpliceSort,
     spliceOccupiedCountById,
     onSelectSplice,
+    onOpenSpliceOnboardingHelp,
     splicePortStatuses,
     portIndexInput,
     setPortIndexInput,
@@ -118,6 +119,12 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
         <span className="table-export-icon" aria-hidden="true" />
         CSV
       </button>
+      {onOpenSpliceOnboardingHelp !== undefined ? (
+        <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenSpliceOnboardingHelp}>
+          <span className="action-button-icon is-help" aria-hidden="true" />
+          <span>Help</span>
+        </button>
+      ) : null}
     </div>
   </header>
   {splices.length === 0 ? (

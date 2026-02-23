@@ -30,6 +30,7 @@ export interface AnalysisWorkspaceContentProps {
   setConnectorSort: (value: SortState | ((current: SortState) => SortState)) => void;
   connectorOccupiedCountById: Map<ConnectorId, number>;
   onSelectConnector: (connectorId: ConnectorId) => void;
+  onOpenConnectorOnboardingHelp?: () => void;
   cavityIndexInput: string;
   setCavityIndexInput: (value: string) => void;
   connectorOccupantRefInput: string;
@@ -51,6 +52,7 @@ export interface AnalysisWorkspaceContentProps {
   setSpliceSort: (value: SortState | ((current: SortState) => SortState)) => void;
   spliceOccupiedCountById: Map<SpliceId, number>;
   onSelectSplice: (spliceId: SpliceId) => void;
+  onOpenSpliceOnboardingHelp?: () => void;
   splicePortStatuses: SplicePortStatus[];
   portIndexInput: string;
   setPortIndexInput: (value: string) => void;
@@ -73,6 +75,7 @@ export interface AnalysisWorkspaceContentProps {
   setWireSort: (value: SortState | ((current: SortState) => SortState)) => void;
   selectedWireId: WireId | null;
   onSelectWire: (wireId: WireId) => void;
+  onOpenWireOnboardingHelp?: () => void;
   selectedWire: Wire | null;
   describeWireEndpoint: (endpoint: Wire["endpointA"]) => string;
   describeWireEndpointId: (endpoint: Wire["endpointA"]) => string;
