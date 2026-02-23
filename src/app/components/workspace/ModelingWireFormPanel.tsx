@@ -60,7 +60,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         <label>
           Type
           <select value={wireEndpointAKind} onChange={(event) => setWireEndpointAKind(event.target.value as WireEndpoint["kind"])}>
-            <option value="connectorCavity">Connector cavity</option>
+            <option value="connectorCavity">Connector way</option>
             <option value="splicePort">Splice port</option>
           </select>
         </label>
@@ -74,7 +74,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               </select>
             </label>
             <label>
-              Cavity index
+              Way index
               <input type="number" min={1} step={1} value={wireEndpointACavityIndex} onChange={(event) => setWireEndpointACavityIndex(event.target.value)} />
             </label>
           </>
@@ -100,7 +100,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         <label>
           Type
           <select value={wireEndpointBKind} onChange={(event) => setWireEndpointBKind(event.target.value as WireEndpoint["kind"])}>
-            <option value="connectorCavity">Connector cavity</option>
+            <option value="connectorCavity">Connector way</option>
             <option value="splicePort">Splice port</option>
           </select>
         </label>
@@ -114,7 +114,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               </select>
             </label>
             <label>
-              Cavity index
+              Way index
               <input type="number" min={1} step={1} value={wireEndpointBCavityIndex} onChange={(event) => setWireEndpointBCavityIndex(event.target.value)} />
             </label>
           </>

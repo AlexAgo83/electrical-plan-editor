@@ -58,7 +58,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         onClick={() =>
           downloadCsvFile(
             "analysis-connectors",
-            ["Name", "Technical ID", "Cavities", "Occupied"],
+            ["Name", "Technical ID", "Ways", "Occupied"],
             visibleConnectors.map((connector) => [
               connector.name,
               connector.technicalId,
@@ -100,7 +100,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
               Technical ID <span className="sort-indicator">{getSortIndicator(connectorSort, "technicalId")}</span>
             </button>
           </th>
-          <th>Cavities</th>
+          <th>Ways</th>
           <th>Occupied</th>
         </tr>
       </thead>
@@ -144,7 +144,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           className={connectorAnalysisView === "cavities" ? "filter-chip is-active" : "filter-chip"}
           onClick={() => setConnectorAnalysisView("cavities")}
         >
-          Cavities
+          Ways
         </button>
         <button
           type="button"
@@ -160,8 +160,8 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         onClick={() => {
           if (connectorAnalysisView === "cavities") {
             downloadCsvFile(
-              `analysis-connector-cavities-${selectedConnector?.technicalId ?? "selection"}`,
-              ["Cavity", "Status", "Occupant reference"],
+              `analysis-connector-ways-${selectedConnector?.technicalId ?? "selection"}`,
+              ["Way", "Status", "Occupant reference"],
               connectorCavityStatuses.map((slot) => [
                 `C${slot.cavityIndex}`,
                 slot.isOccupied ? "Occupied" : "Free",
@@ -172,7 +172,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           }
           downloadCsvFile(
             `analysis-connector-synthesis-${selectedConnector?.technicalId ?? "selection"}`,
-            ["Wire", "Technical ID", "Local cavity", "Destination", "Length (mm)"],
+            ["Wire", "Technical ID", "Local way", "Destination", "Length (mm)"],
             sortedConnectorSynthesisRows.map((row) => [
               row.wireName,
               row.wireTechnicalId,
@@ -195,7 +195,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     </div>
   </header>
   {selectedConnector === null ? (
-    <p className="empty-copy">Select a connector to view cavities and synthesis.</p>
+    <p className="empty-copy">Select a connector to view ways and synthesis.</p>
   ) : connectorAnalysisView === "cavities" ? (
     <>
       <p className="meta-line">
@@ -203,7 +203,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
       </p>
       <form className="row-form" onSubmit={handleReserveCavity}>
         <label>
-          Cavity index
+          Way index
           <input
             type="number"
             min={1}
@@ -227,11 +227,11 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
 
         <button type="submit" className="button-with-icon">
           <span className="action-button-icon is-lock-move" aria-hidden="true" />
-          Reserve cavity
+          Reserve way
         </button>
       </form>
 
-      <div className="cavity-grid" aria-label="Cavity occupancy grid">
+      <div className="cavity-grid" aria-label="Way occupancy grid">
         {connectorCavityStatuses.map((slot) => (
           <article key={slot.cavityIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
             <h3>C{slot.cavityIndex}</h3>
@@ -270,7 +270,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
               Technical ID <span className="sort-indicator">{getSortIndicator(connectorSynthesisSort, "technicalId")}</span>
             </button>
           </th>
-          <th>Local cavity</th>
+          <th>Local way</th>
           <th>Destination</th>
           <th>Length (mm)</th>
         </tr>

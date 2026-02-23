@@ -120,4 +120,33 @@ describe("App integration UI - networks", () => {
       expect(within(networkScopePanel).getByText("NET-MAIN-UPD")).toBeInTheDocument();
     });
   });
+
+  it("focuses a network row on single click while opening the edit form", async () => {
+    const base = createInitialState();
+    const seeded = appReducer(
+      base,
+      appActions.createNetwork({
+        id: asNetworkId("net-b"),
+        name: "Network B",
+        technicalId: "NET-B",
+        createdAt: "2026-02-23T10:00:00.000Z",
+        updatedAt: "2026-02-23T10:00:00.000Z"
+      })
+    );
+
+    renderAppWithState(seeded);
+    switchScreen("networkScope");
+
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    const networkRow = within(networkScopePanel).getByText("Network B").closest("tr");
+    expect(networkRow).not.toBeNull();
+
+    fireEvent.click(networkRow as HTMLElement);
+
+    expect(getPanelByHeading("Edit network")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(networkRow).toHaveClass("is-selected");
+      expect(document.activeElement).toBe(networkRow);
+    });
+  });
 });

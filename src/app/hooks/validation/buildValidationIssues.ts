@@ -63,7 +63,7 @@ export function buildValidationIssues({
           id: `occupancy-duplicate-connector-${key}`,
           severity: "error",
           category: "Occupancy conflict",
-          message: `Connector cavity ${endpoint.connectorId}/C${endpoint.cavityIndex} has multiple wire assignments.`,
+          message: `Connector way ${endpoint.connectorId}/C${endpoint.cavityIndex} has multiple wire assignments.`,
           subScreen: "connector",
           selectionKind: "connector",
           selectionId: endpoint.connectorId
@@ -140,12 +140,12 @@ export function buildValidationIssues({
       });
     }
 
-    if (!Number.isFinite(segment.lengthMm) || segment.lengthMm <= 0) {
+    if (!Number.isFinite(segment.lengthMm) || segment.lengthMm < 1) {
       issues.push({
         id: `segment-invalid-length-${segment.id}`,
         severity: "error",
         category: "Incomplete required fields",
-        message: `Segment '${segment.id}' must have a strictly positive length.`,
+        message: `Segment '${segment.id}' must have a length >= 1 mm.`,
         subScreen: "segment",
         selectionKind: "segment",
         selectionId: segment.id
@@ -159,7 +159,7 @@ export function buildValidationIssues({
         id: `connector-required-fields-${connector.id}`,
         severity: "error",
         category: "Incomplete required fields",
-        message: `Connector '${connector.id}' is missing required fields or has invalid cavity count.`,
+        message: `Connector '${connector.id}' is missing required fields or has invalid way count.`,
         subScreen: "connector",
         selectionKind: "connector",
         selectionId: connector.id
@@ -309,7 +309,7 @@ export function buildValidationIssues({
           id: `connector-manual-occupancy-${typedConnectorId}-${cavityIndex}`,
           severity: "warning",
           category: "Occupancy conflict",
-          message: `Connector '${typedConnectorId}' cavity C${cavityIndex} is occupied by '${occupantRef}' without linked wire endpoint.`,
+          message: `Connector '${typedConnectorId}' way C${cavityIndex} is occupied by '${occupantRef}' without linked wire endpoint.`,
           subScreen: "connector",
           selectionKind: "connector",
           selectionId: typedConnectorId
@@ -322,7 +322,7 @@ export function buildValidationIssues({
           id: `connector-occupancy-mismatch-${typedConnectorId}-${cavityIndex}`,
           severity: "error",
           category: "Occupancy conflict",
-          message: `Connector '${typedConnectorId}' cavity C${cavityIndex} occupancy mismatch ('${occupantRef}' vs expected '${expectedRef}').`,
+          message: `Connector '${typedConnectorId}' way C${cavityIndex} occupancy mismatch ('${occupantRef}' vs expected '${expectedRef}').`,
           subScreen: "connector",
           selectionKind: "connector",
           selectionId: typedConnectorId
@@ -335,7 +335,7 @@ export function buildValidationIssues({
           id: `connector-occupancy-missing-wire-${typedConnectorId}-${cavityIndex}`,
           severity: "error",
           category: "Occupancy conflict",
-          message: `Connector '${typedConnectorId}' cavity C${cavityIndex} references unknown wire '${parsed.wireId}'.`,
+          message: `Connector '${typedConnectorId}' way C${cavityIndex} references unknown wire '${parsed.wireId}'.`,
           subScreen: "connector",
           selectionKind: "connector",
           selectionId: typedConnectorId
@@ -407,7 +407,7 @@ export function buildValidationIssues({
       id: `connector-expected-occupancy-missing-${connectorId}-${cavityIndex}`,
       severity: "error",
       category: "Occupancy conflict",
-      message: `Connector '${connectorId}' cavity C${cavityIndex} should be occupied by '${expectedRef}' but current occupancy is '${actualRef ?? "none"}'.`,
+      message: `Connector '${connectorId}' way C${cavityIndex} should be occupied by '${expectedRef}' but current occupancy is '${actualRef ?? "none"}'.`,
       subScreen: "connector",
       selectionKind: "connector",
       selectionId: connectorId

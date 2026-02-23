@@ -114,7 +114,7 @@ describe("appReducer entity lifecycle", () => {
     expect(secondConnectorOccupancy).toBeDefined();
     expect(firstConnectorOccupancy?.[2]).toBe("wire-draft-1:A");
     expect(secondConnectorOccupancy?.[2]).toBe("wire-draft-1:A");
-    expect(second.ui.lastError).toBe("Cavity 2 is already occupied by 'wire-draft-1:A'.");
+    expect(second.ui.lastError).toBe("Way 2 is already occupied by 'wire-draft-1:A'.");
   });
 
   it("clears connector occupancy on connector removal", () => {
@@ -254,7 +254,7 @@ describe("appReducer entity lifecycle", () => {
       })
     );
     expect(invalidLength.segments.byId[asSegmentId("SEG-INVALID-C")]).toBeUndefined();
-    expect(invalidLength.ui.lastError).toBe("Segment lengthMm must be a positive number.");
+    expect(invalidLength.ui.lastError).toBe("Segment lengthMm must be >= 1.");
   });
 
   it("blocks node and connector removal when graph references exist", () => {
@@ -279,4 +279,3 @@ describe("appReducer entity lifecycle", () => {
     expect(removeConnector.ui.lastError).toBe("Cannot remove connector while a connector node references it.");
   });
 });
-

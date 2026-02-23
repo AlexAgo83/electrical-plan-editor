@@ -54,7 +54,7 @@ export function InspectorContextPanel({
   if (selectedConnector !== null) {
     detailRows.push({ label: "Name", value: selectedConnector.name });
     detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedConnector.technicalId}</span> });
-    detailRows.push({ label: "Cavities", value: `${selectedConnector.cavityCount} / Occupied ${connectorOccupiedCount}` });
+    detailRows.push({ label: "Ways", value: `${selectedConnector.cavityCount} / Occupied ${connectorOccupiedCount}` });
   }
 
   if (selectedSplice !== null) {

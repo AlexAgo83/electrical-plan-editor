@@ -53,7 +53,7 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
     </label>
     <label>
       Length (mm)
-      <input type="number" min={0.1} step={0.1} value={segmentLengthMm} onChange={(event) => setSegmentLengthMm(event.target.value)} required />
+      <input type="number" min={1} step={0.1} value={segmentLengthMm} onChange={(event) => setSegmentLengthMm(event.target.value)} required />
     </label>
     <label>
       Sub-network tag (optional)

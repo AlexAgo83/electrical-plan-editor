@@ -37,7 +37,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     </label>
     {connectorTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
     <label>
-      Cavity count
+      Way count
       <input type="number" min={1} step={1} value={cavityCount} onChange={(event) => setCavityCount(event.target.value)} required />
     </label>
     <div className="row-actions">

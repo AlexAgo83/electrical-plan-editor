@@ -818,6 +818,9 @@ export function NetworkSummaryPanel({
         const persistedPosition = connector.cableCalloutPosition;
         const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
         const groups = (connectorCalloutGroupsById.get(connector.id) ?? []).filter((group) => group.entries.length > 0);
+        if (groups.length === 0) {
+          continue;
+        }
         models.push({
           key,
           kind: "connector",
@@ -843,6 +846,9 @@ export function NetworkSummaryPanel({
       const persistedPosition = splice.cableCalloutPosition;
       const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
       const groups = (spliceCalloutGroupsById.get(splice.id) ?? []).filter((group) => group.entries.length > 0);
+      if (groups.length === 0) {
+        continue;
+      }
       models.push({
         key,
         kind: "splice",

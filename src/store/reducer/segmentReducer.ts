@@ -14,8 +14,8 @@ export function handleSegmentActions(state: AppState, action: AppAction): AppSta
         return withError(state, "Segment endpoints must reference existing nodes.");
       }
 
-      if (!Number.isFinite(action.payload.lengthMm) || action.payload.lengthMm <= 0) {
-        return withError(state, "Segment lengthMm must be a positive number.");
+      if (!Number.isFinite(action.payload.lengthMm) || action.payload.lengthMm < 1) {
+        return withError(state, "Segment lengthMm must be >= 1.");
       }
 
       const normalizedSubNetworkTag = action.payload.subNetworkTag?.trim();

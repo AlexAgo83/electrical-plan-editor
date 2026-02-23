@@ -127,7 +127,7 @@ export function ModelingPrimaryTables({
               onClick={() =>
                 downloadCsvFile(
                   "modeling-connectors",
-                  ["Name", "Technical ID", "Cavities", "Occupied"],
+                  ["Name", "Technical ID", "Ways", "Occupied"],
                   visibleConnectors.map((connector) => [
                     connector.name,
                     connector.technicalId,
@@ -153,7 +153,7 @@ export function ModelingPrimaryTables({
               <tr>
                 <th><button type="button" className="sort-header-button" onClick={() => setConnectorSort((current) => nextSortState(current, "name"))}>Name <span className="sort-indicator">{getSortIndicator(connectorSort, "name")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setConnectorSort((current) => nextSortState(current, "technicalId"))}>Technical ID <span className="sort-indicator">{getSortIndicator(connectorSort, "technicalId")}</span></button></th>
-                <th>Cavities</th>
+                <th>Ways</th>
                 <th>Occupied</th>
               </tr>
             </thead>
