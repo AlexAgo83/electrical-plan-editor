@@ -437,7 +437,7 @@ export function useWorkspaceHandlers({
       let measuredCalloutBoundsFromDom = false;
 
       if (typeof document !== "undefined" && networkScale > 0.0001) {
-        const svgElement = document.querySelector(".network-summary-stack .network-svg") as SVGSVGElement | null;
+        const svgElement = document.querySelector<SVGSVGElement>(".network-summary-stack .network-svg");
         const svgRect = svgElement?.getBoundingClientRect();
         const calloutFrames = svgElement?.querySelectorAll(".network-callout-frame");
         const hasUsableSvgRect =
