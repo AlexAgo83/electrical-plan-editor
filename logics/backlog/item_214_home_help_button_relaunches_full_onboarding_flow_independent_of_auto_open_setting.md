@@ -37,4 +37,3 @@ Users need a manual way to relaunch onboarding from Home even after disabling au
   - `src/app/components/workspace/HomeWorkspaceContent.tsx`
   - `src/app/AppController.tsx`
   - `src/tests/app.ui.home.spec.tsx`
-

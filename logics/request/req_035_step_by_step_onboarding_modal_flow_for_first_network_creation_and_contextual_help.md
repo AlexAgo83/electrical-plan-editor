@@ -8,7 +8,7 @@
 
 # Needs
 - Add a step-by-step onboarding flow to guide users through creating their first network.
-- The onboarding must be a sequence of modals with progress indication (`Etape X sur X`) and next-step navigation.
+- The onboarding must be a sequence of modals with progress indication (`Step X of X`) and next-step navigation.
 - The onboarding modal can be closed at any time.
 - The onboarding should auto-open on every app load by default, with a persisted checkbox option to disable future auto-open behavior.
 - Each onboarding step must also be openable independently (single-step modal) from contextual info/help buttons inside the relevant panel/screen.
@@ -25,6 +25,21 @@ This request introduces a guided onboarding flow that:
 - remains optional (dismissable and disableable),
 - and supports contextual just-in-time help per step after the initial onboarding.
 
+## Implementation decisions (confirmed)
+- Onboarding UI chrome labels must be English-only (progress/actions/checkbox text).
+- Full-flow re-open behavior resets to step 1 (no resume-from-last-step behavior in this request).
+- Auto-open is enabled by default for both new and existing users until they opt out.
+- The auto-open opt-out checkbox is available in both:
+  - full onboarding flow modal
+  - single-step contextual help modal
+- Step CTA behavior when already on the relevant screen/context should remain available and adapt to a context action (recommended: `Scroll to panel` / `Show panel`) rather than disappearing.
+- Step CTA navigation/scroll behavior should be best-effort and non-blocking:
+  - navigate to target screen
+  - attempt panel scroll/focus
+  - fail gracefully if a target panel is temporarily unavailable
+- Step 2 (`Connectors` / `Splices`) should have contextual help entry points in both relevant panels, opening the same step content.
+- Contextual info/help button placement should be standardized in panel headers for consistency.
+
 ## Objectives
 - Provide an onboarding flow that explains the recommended creation sequence for first-time users.
 - Make onboarding persistent and user-controlled (auto-open by default, but can be disabled).
@@ -36,21 +51,22 @@ This request introduces a guided onboarding flow that:
 ### A. Step-by-step onboarding flow (full flow) as modal sequence (high priority)
 - Implement a full onboarding flow composed of a sequence of modals (or one modal with step pagination) with `5` steps.
 - Each step must show:
-  - progress label in French style: `Etape X sur 5`
-  - a `Suivant` button (except last step, which may use a finish/close action)
+  - progress label in English: `Step X of 5`
+  - a `Next` button (except last step, which may use a finish/close action)
   - a close action (X and/or button) so the user can exit anytime
 - Flow behavior:
-  - next/previous navigation design can be chosen, but `Suivant` is required
+  - next/previous navigation design can be chosen, but `Next` is required
   - closing early must be safe and not corrupt app state
-  - re-opening should resume from step 1 unless otherwise specified
+  - re-opening full flow resets to step 1
 
 ### B. Auto-open on app load with persisted opt-out (high priority)
 - By default, the onboarding flow should open automatically when the app loads.
 - Add a checkbox in the onboarding modal UI to disable automatic future opening (persisted value).
 - Persistence requirements:
   - value must survive reloads (local persistence)
-  - default behavior for existing users should be explicitly defined (recommended: auto-open enabled until user opts out)
+  - default behavior for existing users is explicit: auto-open enabled until user opts out
 - Ensure the user can still manually relaunch onboarding later even if auto-open is disabled.
+- The opt-out checkbox should be available in both full-flow and single-step onboarding modal variants.
 
 ### C. Onboarding content (5 steps) with domain-specific explanations (high priority)
 - The flow must include the following 5 steps.
@@ -63,36 +79,38 @@ This request introduces a guided onboarding flow that:
   - use clear, concrete onboarding wording for first-time users
   - avoid literal translation if a clearer onboarding phrasing exists
 
-1. `Etape 1` - Créer un nouveau réseau
+1. `Step 1` - Create a new network
    - Meaning guidance: this is the harness plan / wiring plan
 
-2. `Etape 2` - Créer sa banque de connecteurs et splices
+2. `Step 2` - Build the connectors and splices library
    - Meaning guidance: this is the hardware toolbox; define connectors/splices and the ways/ports available to use in a network
 
-3. `Etape 3` - Créer des nodes représentant et associant connecteurs / splices / hubs intermédiaires dans le réseau
+3. `Step 3` - Create nodes representing connectors, splices, and intermediate hubs in the network
    - Meaning guidance: create nodes to represent and link connectors / splices / intermediate hubs in the network
 
-4. `Etape 4` - Créer les segments entre les différents nodes
+4. `Step 4` - Create segments between nodes
    - Meaning guidance: create segments between nodes to define physical links and lengths
 
-5. `Etape 5` - Créer les câbles
+5. `Step 5` - Create wires/cables
    - Meaning guidance: create cables that travel across segments from element A to element B
 
 - Content requirements:
   - descriptions must be clear and pedagogical
   - important words must be emphasized in bold
-  - domain/business content in modal titles and descriptions must be English (not French)
-  - UI chrome labels (e.g. progress pattern) may remain aligned with product language decisions
+  - domain/business content in modal titles and descriptions must be English
+  - UI chrome labels (e.g. progress pattern, actions, checkbox text) must also be English
 
 ### D. Independent single-step help modals (contextual info buttons) (high priority)
 - Each onboarding step must be openable independently via an info/help button in the corresponding UI context.
 - Examples:
   - `Connectors` panel info button opens only the connector/splice step content
+  - `Splices` panel info button opens only the same connector/splice step content
   - `Nodes` panel info button opens only the nodes step content
 - Single-step modal behavior:
   - shows only the relevant step (not the full sequence)
   - can still be closed freely
   - should visually match the full onboarding modal style
+  - includes the auto-open opt-out checkbox (same persisted preference, English wording)
 
 ### E. Relaunch onboarding from Home screen (high priority)
 - Add a `Help` button (or similar CTA) on the Home screen to relaunch the full onboarding flow at any time.
@@ -102,6 +120,7 @@ This request introduces a guided onboarding flow that:
 - For each onboarding step, if the user is not already on the corresponding screen, include a button in the modal to:
   - open the relevant screen
   - scroll to the relevant panel
+- If the user is already on the corresponding screen/context, keep a context action (recommended label: `Scroll to panel`) instead of removing the CTA.
 - Example mappings (to confirm during implementation):
   - Step 1 -> `Network Scope` screen / network panel
   - Step 2 -> `Modeling > Connector` (and/or splice panel in the same area)
@@ -109,15 +128,16 @@ This request introduces a guided onboarding flow that:
   - Step 4 -> `Modeling > Segment`
   - Step 5 -> `Modeling > Wire`
 - Scrolling behavior must be reliable and accessible (focus/scroll timing with lazy-loaded content considered).
+- CTA behavior should be best-effort and non-blocking if the target panel is temporarily unavailable.
 
 ### G. Modal appearance and UX presentation (medium-high priority)
 - Modal UI requirements:
   - title
   - asset/icon (preferably topic-specific icon already used in UI if available)
   - description text
-  - step progress label (`Etape X sur 5`)
+  - step progress label (`Step X of 5`)
   - actions (close, next, open target screen/panel as applicable)
-  - persisted checkbox (`Ne plus ouvrir automatiquement` or equivalent wording)
+  - persisted checkbox (English wording, e.g. `Do not open automatically`)
 - Styling expectations:
   - descriptions are concrete and readable
   - important terms in bold
@@ -125,7 +145,7 @@ This request introduces a guided onboarding flow that:
   - coherent with current theme system
 - Content language expectation:
   - business/domain explanatory text is EN
-  - avoid FR-only domain copy in step descriptions
+  - UI chrome labels are also EN throughout this request
 
 ## Non-functional requirements
 - Do not block users from using the app (onboarding must always be dismissable).
@@ -156,7 +176,7 @@ This request introduces a guided onboarding flow that:
   - `npm run quality:pwa`
 
 ## Acceptance criteria
-- AC1: A 5-step onboarding flow is available as a sequence of modals with `Etape X sur 5` and `Suivant`.
+- AC1: A 5-step onboarding flow is available as a sequence of modals with `Step X of 5` and `Next`.
 - AC2: The onboarding modal can be closed at any time without breaking app state.
 - AC3: The onboarding auto-opens on app load by default, with a persisted checkbox allowing users to disable future auto-open.
 - AC4: Each onboarding step can be opened independently via a contextual info/help button in the relevant UI panel.
@@ -164,11 +184,16 @@ This request introduces a guided onboarding flow that:
 - AC6: Each step includes a CTA that opens the corresponding screen and scrolls to the relevant panel when needed.
 - AC7: Modal UI includes title, asset/icon, clear description, and actions; important words are bold in descriptions.
 - AC8: Onboarding behavior (auto-open, opt-out, relaunch, contextual steps, navigation CTA) is covered by regression tests.
+- AC9: Onboarding UI chrome labels (progress, actions, checkbox wording) are English-only.
+- AC10: The auto-open opt-out checkbox is available in both full-flow and single-step onboarding modals.
+- AC11: Step CTA remains available in-context (adapts to a scroll/focus action when already on the target screen/panel) and fails gracefully if the target panel is temporarily unavailable.
+- AC12: Step 2 contextual help is reachable from both `Connectors` and `Splices` panel info buttons while reusing the same step content.
+- AC13: Contextual onboarding info/help buttons use a standardized placement pattern in panel headers.
 
 ## Out of scope
 - Full interactive tutorial validation (e.g., checking that the user completed each real modeling action before proceeding).
 - Video/tutorial media uploads or remote CMS-driven onboarding content.
-- Multi-language localization framework rollout (copy can be French-first for this feature).
+- Multi-language localization framework rollout.
 - Advanced analytics/telemetry tracking for onboarding completion.
 
 # Backlog

@@ -32,10 +32,9 @@
 # Notes
 - Dependencies: `req_035`, item_211, item_212, item_213, item_214, item_215, item_216, item_217, item_218.
 - Blocks: none (closure item).
-- Related AC: AC1, AC2, AC3, AC4, AC5, AC6, AC7, AC8.
+- Related AC: AC1, AC2, AC3, AC4, AC5, AC6, AC7, AC8, AC9, AC10, AC11, AC12, AC13.
 - References:
   - `logics/request/req_035_step_by_step_onboarding_modal_flow_for_first_network_creation_and_contextual_help.md`
   - `logics/tasks/task_035_step_by_step_onboarding_modal_flow_for_first_network_creation_and_contextual_help_orchestration_and_delivery_control.md`
   - `.github/workflows/ci.yml`
   - `package.json`
-

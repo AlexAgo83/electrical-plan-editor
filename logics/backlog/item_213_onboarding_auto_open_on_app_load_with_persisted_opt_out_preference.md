@@ -15,8 +15,9 @@ The onboarding must auto-open by default on app load, but users also need a pers
   - Implement auto-open behavior on app load (default enabled).
   - Add and persist the onboarding auto-open opt-out checkbox value.
   - Ensure the checkbox state survives reloads.
-  - Define behavior for existing users (recommended default still auto-open until they opt out).
+  - Apply explicit behavior for existing users: auto-open enabled until they opt out.
   - Ensure disabling auto-open does not remove manual relaunch capability.
+  - Reuse the same persisted preference in both full-flow and single-step onboarding modals.
 - Out:
   - Home Help button relaunch wiring (handled separately).
   - Contextual single-step buttons.
@@ -25,6 +26,7 @@ The onboarding must auto-open by default on app load, but users also need a pers
 - Onboarding auto-opens on app load by default.
 - Users can disable future auto-open via a persisted checkbox.
 - The persisted preference is respected after reload.
+- Existing users also default to auto-open until they opt out.
 
 # Priority
 - Impact: High.
@@ -33,10 +35,9 @@ The onboarding must auto-open by default on app load, but users also need a pers
 # Notes
 - Dependencies: `req_035`, item_211, item_212.
 - Blocks: item_214, item_218, item_219.
-- Related AC: AC3, AC8.
+- Related AC: AC3, AC8, AC10.
 - References:
   - `logics/request/req_035_step_by_step_onboarding_modal_flow_for_first_network_creation_and_contextual_help.md`
   - `src/app/AppController.tsx`
   - `src/app/hooks/useUiPreferences.ts`
   - `src/tests/persistence.localStorage.spec.ts`
-
