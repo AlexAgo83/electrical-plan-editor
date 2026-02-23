@@ -61,7 +61,7 @@ describe("network file portability", () => {
     expect(parsed.payload?.networks).toHaveLength(1);
   });
 
-  it("patches imported wires missing sectionMm2 to the default section", () => {
+  it("patches imported wires missing section and colors to defaults", () => {
     const seeded = createSampleNetworkState();
     const payload = buildNetworkFilePayload(seeded, "active", [], "2026-02-21T10:15:00.000Z");
     const firstBundle = payload.networks[0];
@@ -81,10 +81,14 @@ describe("network file portability", () => {
     const rawState = rawBundles[0]?.state as Record<string, unknown>;
     const rawWires = rawState.wires as { byId: Record<string, Record<string, unknown>>; allIds: string[] };
     delete rawWires.byId[firstWireId]?.sectionMm2;
+    delete rawWires.byId[firstWireId]?.primaryColorId;
+    delete rawWires.byId[firstWireId]?.secondaryColorId;
 
     const parsed = parseNetworkFilePayload(JSON.stringify(rawPayload));
     expect(parsed.error).toBeNull();
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.sectionMm2).toBe(0.5);
+    expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.primaryColorId).toBeNull();
+    expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.secondaryColorId).toBeNull();
   });
 
   it("resolves import conflicts with deterministic suffixes", () => {

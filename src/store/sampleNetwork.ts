@@ -428,6 +428,8 @@ export function createValidationIssuesSampleNetworkState(): AppState {
       name: "",
       technicalId: "WIRE-VAL-BROKEN",
       sectionMm2: 0.5,
+      primaryColorId: null,
+      secondaryColorId: null,
       endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-GHOST"), cavityIndex: 1 },
       endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 4 },
       routeSegmentIds: [],

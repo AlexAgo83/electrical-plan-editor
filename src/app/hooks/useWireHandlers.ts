@@ -7,6 +7,7 @@ import type {
   WireEndpoint,
   WireId
 } from "../../core/entities";
+import { normalizeWireColorIds } from "../../core/cableColors";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { DEFAULT_WIRE_SECTION_MM2 } from "../../core/wireSection";
@@ -39,6 +40,10 @@ interface UseWireHandlersParams {
   setWireTechnicalId: (value: string) => void;
   wireSectionMm2: string;
   setWireSectionMm2: (value: string) => void;
+  wirePrimaryColorId: string;
+  setWirePrimaryColorId: (value: string) => void;
+  wireSecondaryColorId: string;
+  setWireSecondaryColorId: (value: string) => void;
   wireEndpointAKind: WireEndpoint["kind"];
   setWireEndpointAKind: (value: WireEndpoint["kind"]) => void;
   wireEndpointAConnectorId: string;
@@ -84,6 +89,10 @@ export function useWireHandlers({
   setWireTechnicalId,
   wireSectionMm2,
   setWireSectionMm2,
+  wirePrimaryColorId,
+  setWirePrimaryColorId,
+  wireSecondaryColorId,
+  setWireSecondaryColorId,
   wireEndpointAKind,
   setWireEndpointAKind,
   wireEndpointAConnectorId,
@@ -352,6 +361,8 @@ export function useWireHandlers({
     setWireName("");
     setWireTechnicalId(suggestNextWireTechnicalId(Object.values(state.wires.byId).map((wire) => wire.technicalId)));
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
+    setWirePrimaryColorId("");
+    setWireSecondaryColorId("");
     setWireEndpointAKind("connectorCavity");
     setWireEndpointAConnectorId("");
     setWireEndpointACavityIndex("1");
@@ -376,6 +387,8 @@ export function useWireHandlers({
     setWireName("");
     setWireTechnicalId("");
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
+    setWirePrimaryColorId("");
+    setWireSecondaryColorId("");
     setWireEndpointAKind("connectorCavity");
     setWireEndpointAConnectorId("");
     setWireEndpointACavityIndex("1");
@@ -403,6 +416,8 @@ export function useWireHandlers({
     setWireName(wire.name);
     setWireTechnicalId(wire.technicalId);
     setWireSectionMm2(String(wire.sectionMm2));
+    setWirePrimaryColorId(wire.primaryColorId ?? "");
+    setWireSecondaryColorId(wire.secondaryColorId ?? "");
     setWireEndpointAKind(wire.endpointA.kind);
     if (wire.endpointA.kind === "connectorCavity") {
       setWireEndpointAConnectorId(wire.endpointA.connectorId);
@@ -500,6 +515,7 @@ export function useWireHandlers({
       setWireFormError("Wire section must be a positive value in mm².");
       return;
     }
+    const normalizedColors = normalizeWireColorIds(wirePrimaryColorId, wireSecondaryColorId);
 
     const endpointA = buildWireEndpoint("A");
     const endpointB = buildWireEndpoint("B");
@@ -517,6 +533,8 @@ export function useWireHandlers({
         name: normalizedName,
         technicalId: normalizedTechnicalId,
         sectionMm2: parsedSectionMm2,
+        primaryColorId: normalizedColors.primaryColorId,
+        secondaryColorId: normalizedColors.secondaryColorId,
         endpointA,
         endpointB
       })

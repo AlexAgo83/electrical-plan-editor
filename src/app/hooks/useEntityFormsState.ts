@@ -43,6 +43,8 @@ export function useEntityFormsState() {
   const [wireName, setWireName] = useState("");
   const [wireTechnicalId, setWireTechnicalId] = useState("");
   const [wireSectionMm2, setWireSectionMm2] = useState("0.5");
+  const [wirePrimaryColorId, setWirePrimaryColorId] = useState("");
+  const [wireSecondaryColorId, setWireSecondaryColorId] = useState("");
   const [wireEndpointAKind, setWireEndpointAKind] = useState<WireEndpoint["kind"]>("connectorCavity");
   const [wireEndpointAConnectorId, setWireEndpointAConnectorId] = useState("");
   const [wireEndpointACavityIndex, setWireEndpointACavityIndex] = useState("1");
@@ -131,6 +133,10 @@ export function useEntityFormsState() {
     setWireTechnicalId,
     wireSectionMm2,
     setWireSectionMm2,
+    wirePrimaryColorId,
+    setWirePrimaryColorId,
+    wireSecondaryColorId,
+    setWireSecondaryColorId,
     wireEndpointAKind,
     setWireEndpointAKind,
     wireEndpointAConnectorId,
