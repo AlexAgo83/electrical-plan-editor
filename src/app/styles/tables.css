@@ -97,9 +97,10 @@
 }
 
 .list-inline-number-filter {
-  display: grid;
-  gap: 0.22rem;
-  justify-items: end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
   min-width: 0;
 }
 
@@ -109,10 +110,11 @@
   font-weight: 600;
   letter-spacing: 0.02em;
   opacity: 0.85;
+  white-space: nowrap;
 }
 
 .list-inline-number-filter > input {
-  width: min(100%, 22rem);
+  width: min(100%, 20rem);
   min-width: 14rem;
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
@@ -274,7 +276,9 @@
   }
 
   .list-inline-number-filter {
-    justify-items: start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 0.35rem;
   }
 
   .list-inline-number-filter > input {
