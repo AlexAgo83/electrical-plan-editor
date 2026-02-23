@@ -13,6 +13,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireName,
     wireTechnicalId,
     setWireTechnicalId,
+    wireSectionMm2,
+    setWireSectionMm2,
     wireTechnicalIdAlreadyUsed,
     wireEndpointAKind,
     setWireEndpointAKind,
@@ -54,6 +56,18 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     <label>
       Technical ID
       <input value={wireTechnicalId} onChange={(event) => setWireTechnicalId(event.target.value)} placeholder="W-001" required />
+    </label>
+    <label>
+      Section (mm²)
+      <input
+        type="number"
+        min={0.01}
+        step={0.01}
+        value={wireSectionMm2}
+        onChange={(event) => setWireSectionMm2(event.target.value)}
+        placeholder="0.5"
+        required
+      />
     </label>
     {wireTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
     <div className="form-split wire-endpoints-grid">

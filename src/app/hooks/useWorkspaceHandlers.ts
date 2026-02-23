@@ -99,6 +99,7 @@ interface UseWorkspaceHandlersParams {
   setThemeMode: (value: ThemeMode | ((current: ThemeMode) => ThemeMode)) => void;
   setTableDensity: (value: TableDensity) => void;
   setTableFontSize: (value: TableFontSize) => void;
+  setDefaultWireSectionMm2: (value: number) => void;
   setDefaultSortField: (value: SortField) => void;
   setDefaultSortDirection: (value: SortDirection) => void;
   setDefaultIdSortDirection: (value: SortDirection) => void;
@@ -179,6 +180,7 @@ export function useWorkspaceHandlers({
   setThemeMode,
   setTableDensity,
   setTableFontSize,
+  setDefaultWireSectionMm2,
   setDefaultSortField,
   setDefaultSortDirection,
   setDefaultIdSortDirection,
@@ -595,6 +597,7 @@ export function useWorkspaceHandlers({
     setThemeMode("dark");
     setTableDensity("compact");
     setTableFontSize("normal");
+    setDefaultWireSectionMm2(0.5);
     setDefaultSortField("name");
     setDefaultSortDirection("asc");
     setDefaultIdSortDirection("asc");

@@ -1,4 +1,5 @@
 import type { SegmentId } from "../../core/entities";
+import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { buildRoutingGraphIndex } from "../../core/graph";
 import { findShortestRoute } from "../../core/pathfinding";
 import type { AppAction } from "../actions";
@@ -38,6 +39,7 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
     case "wire/save": {
       const normalizedName = action.payload.name.trim();
       const normalizedTechnicalId = action.payload.technicalId.trim();
+      const normalizedSectionMm2 = resolveWireSectionMm2(action.payload.sectionMm2);
       if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
         return withError(state, "Wire name and technical ID are required.");
       }
@@ -155,6 +157,7 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           id: action.payload.id,
           name: normalizedName,
           technicalId: normalizedTechnicalId,
+          sectionMm2: normalizedSectionMm2,
           endpointA: action.payload.endpointA,
           endpointB: action.payload.endpointB,
           routeSegmentIds,
@@ -229,9 +232,13 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
     }
 
     case "wire/upsert": {
+      const normalizedPayload = {
+        ...action.payload,
+        sectionMm2: resolveWireSectionMm2(action.payload.sectionMm2)
+      };
       return bumpRevision({
         ...clearLastError(state),
-        wires: upsertEntity(state.wires, action.payload)
+        wires: upsertEntity(state.wires, normalizedPayload)
       });
     }
 

@@ -462,4 +462,29 @@ describe("App integration UI - settings", () => {
     ).not.toBeChecked();
     expect(within(restoredGlobalPreferencesPanel).getByLabelText("Workspace panels layout")).toHaveValue("multiColumn");
   });
+
+  it("prefills new wire section from global settings and persists the default wire section preference", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const globalPreferencesPanel = getPanelByHeading("Global preferences");
+    const defaultWireSectionInput = within(globalPreferencesPanel).getByLabelText("Default wire section (mm²)");
+    expect(defaultWireSectionInput).toHaveValue(0.5);
+
+    fireEvent.change(defaultWireSectionInput, { target: { value: "0.75" } });
+    expect(defaultWireSectionInput).toHaveValue(0.75);
+
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+    fireEvent.click(within(getPanelByHeading("Wire form")).getByRole("button", { name: "Create" }));
+    const createWirePanel = getPanelByHeading("Create Wire");
+    expect(within(createWirePanel).getByLabelText("Section (mm²)")).toHaveValue(0.75);
+
+    firstRender.unmount();
+
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const restoredGlobalPreferencesPanel = getPanelByHeading("Global preferences");
+    expect(within(restoredGlobalPreferencesPanel).getByLabelText("Default wire section (mm²)")).toHaveValue(0.75);
+  });
 });

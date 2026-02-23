@@ -9,6 +9,7 @@ import type {
 } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
+import { DEFAULT_WIRE_SECTION_MM2 } from "../../core/wireSection";
 import { createEntityId, toPositiveInteger } from "../lib/app-utils-shared";
 import { suggestNextWireTechnicalId } from "../lib/technical-id-suggestions";
 import {
@@ -36,6 +37,8 @@ interface UseWireHandlersParams {
   setWireName: (value: string) => void;
   wireTechnicalId: string;
   setWireTechnicalId: (value: string) => void;
+  wireSectionMm2: string;
+  setWireSectionMm2: (value: string) => void;
   wireEndpointAKind: WireEndpoint["kind"];
   setWireEndpointAKind: (value: WireEndpoint["kind"]) => void;
   wireEndpointAConnectorId: string;
@@ -60,6 +63,7 @@ interface UseWireHandlersParams {
   setWireForcedRouteInput: (value: string) => void;
   setWireFormError: (value: string | null) => void;
   selectedWire: Wire | null;
+  defaultWireSectionMm2: number;
 }
 
 export interface WireEndpointSlotHint {
@@ -78,6 +82,8 @@ export function useWireHandlers({
   setWireName,
   wireTechnicalId,
   setWireTechnicalId,
+  wireSectionMm2,
+  setWireSectionMm2,
   wireEndpointAKind,
   setWireEndpointAKind,
   wireEndpointAConnectorId,
@@ -101,8 +107,11 @@ export function useWireHandlers({
   wireForcedRouteInput,
   setWireForcedRouteInput,
   setWireFormError,
-  selectedWire
+  selectedWire,
+  defaultWireSectionMm2
 }: UseWireHandlersParams) {
+  const effectiveDefaultWireSectionMm2 =
+    Number.isFinite(defaultWireSectionMm2) && defaultWireSectionMm2 > 0 ? defaultWireSectionMm2 : DEFAULT_WIRE_SECTION_MM2;
   const endpointAIndexTouchedByUserRef = useRef(false);
   const endpointBIndexTouchedByUserRef = useRef(false);
   const lastEndpointAContextRef = useRef<string>("");
@@ -342,6 +351,7 @@ export function useWireHandlers({
     setEditingWireId(null);
     setWireName("");
     setWireTechnicalId(suggestNextWireTechnicalId(Object.values(state.wires.byId).map((wire) => wire.technicalId)));
+    setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
     setWireEndpointAKind("connectorCavity");
     setWireEndpointAConnectorId("");
     setWireEndpointACavityIndex("1");
@@ -365,6 +375,7 @@ export function useWireHandlers({
     setEditingWireId(null);
     setWireName("");
     setWireTechnicalId("");
+    setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
     setWireEndpointAKind("connectorCavity");
     setWireEndpointAConnectorId("");
     setWireEndpointACavityIndex("1");
@@ -391,6 +402,7 @@ export function useWireHandlers({
     setEditingWireId(wire.id);
     setWireName(wire.name);
     setWireTechnicalId(wire.technicalId);
+    setWireSectionMm2(String(wire.sectionMm2));
     setWireEndpointAKind(wire.endpointA.kind);
     if (wire.endpointA.kind === "connectorCavity") {
       setWireEndpointAConnectorId(wire.endpointA.connectorId);
@@ -482,6 +494,12 @@ export function useWireHandlers({
       setWireFormError("Wire name and technical ID are required.");
       return;
     }
+    const normalizedSectionInput = wireSectionMm2.replace(",", ".").trim();
+    const parsedSectionMm2 = Number(normalizedSectionInput);
+    if (!Number.isFinite(parsedSectionMm2) || parsedSectionMm2 <= 0) {
+      setWireFormError("Wire section must be a positive value in mm².");
+      return;
+    }
 
     const endpointA = buildWireEndpoint("A");
     const endpointB = buildWireEndpoint("B");
@@ -498,6 +516,7 @@ export function useWireHandlers({
         id: wireId,
         name: normalizedName,
         technicalId: normalizedTechnicalId,
+        sectionMm2: parsedSectionMm2,
         endpointA,
         endpointB
       })

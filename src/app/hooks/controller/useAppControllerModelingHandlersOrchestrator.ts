@@ -80,6 +80,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireName: Parameters<typeof useWireHandlers>[0]["setWireName"];
   wireTechnicalId: Parameters<typeof useWireHandlers>[0]["wireTechnicalId"];
   setWireTechnicalId: Parameters<typeof useWireHandlers>[0]["setWireTechnicalId"];
+  wireSectionMm2: Parameters<typeof useWireHandlers>[0]["wireSectionMm2"];
+  setWireSectionMm2: Parameters<typeof useWireHandlers>[0]["setWireSectionMm2"];
   wireEndpointAKind: Parameters<typeof useWireHandlers>[0]["wireEndpointAKind"];
   setWireEndpointAKind: Parameters<typeof useWireHandlers>[0]["setWireEndpointAKind"];
   wireEndpointAConnectorId: Parameters<typeof useWireHandlers>[0]["wireEndpointAConnectorId"];
@@ -106,6 +108,7 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   selectedConnectorId: Parameters<typeof useConnectorHandlers>[0]["selectedConnectorId"];
   selectedSpliceId: Parameters<typeof useSpliceHandlers>[0]["selectedSpliceId"];
   selectedWire: SelectedWire;
+  defaultWireSectionMm2: Parameters<typeof useWireHandlers>[0]["defaultWireSectionMm2"];
 }
 
 export function useAppControllerModelingHandlersOrchestrator({
@@ -179,6 +182,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireName,
   wireTechnicalId,
   setWireTechnicalId,
+  wireSectionMm2,
+  setWireSectionMm2,
   wireEndpointAKind,
   setWireEndpointAKind,
   wireEndpointAConnectorId,
@@ -204,7 +209,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireFormError,
   selectedConnectorId,
   selectedSpliceId,
-  selectedWire
+  selectedWire,
+  defaultWireSectionMm2
 }: UseAppControllerModelingHandlersOrchestratorParams) {
   const connector = useConnectorHandlers({
     store,
@@ -300,6 +306,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireName,
     wireTechnicalId,
     setWireTechnicalId,
+    wireSectionMm2,
+    setWireSectionMm2,
     wireEndpointAKind,
     setWireEndpointAKind,
     wireEndpointAConnectorId,
@@ -323,7 +331,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     wireForcedRouteInput,
     setWireForcedRouteInput,
     setWireFormError,
-    selectedWire
+    selectedWire,
+    defaultWireSectionMm2
   });
 
   return {

@@ -1,5 +1,6 @@
-import type { Network, NetworkId, NodeId } from "../../core/entities";
+import type { Network, NetworkId, NodeId, Wire, WireId } from "../../core/entities";
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
+import { resolveWireSectionMm2 } from "../../core/wireSection";
 import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
 
 export const NETWORK_FILE_SCHEMA_VERSION = 2;
@@ -70,6 +71,29 @@ function normalizeNodePositions(value: unknown): Record<NodeId, LayoutNodePositi
   return normalized;
 }
 
+function normalizeWiresEntityState(
+  wires: NetworkScopedState["wires"]
+): NetworkScopedState["wires"] {
+  const byId = {} as Record<WireId, Wire>;
+
+  for (const wireId of wires.allIds) {
+    const wire = wires.byId[wireId];
+    if (wire === undefined) {
+      continue;
+    }
+
+    byId[wireId] = {
+      ...wire,
+      sectionMm2: resolveWireSectionMm2((wire as Partial<Wire>).sectionMm2)
+    };
+  }
+
+  return {
+    allIds: [...wires.allIds],
+    byId
+  };
+}
+
 function isNetworkScopedState(value: unknown): value is NetworkScopedState {
   if (!isRecord(value)) {
     return false;
@@ -127,7 +151,7 @@ function normalizeScopedState(scoped: NetworkScopedState): NetworkScopedState {
     },
     wires: {
       allIds: [...scoped.wires.allIds].sort((left, right) => left.localeCompare(right)),
-      byId: { ...scoped.wires.byId }
+      byId: normalizeWiresEntityState(scoped.wires).byId
     },
     nodePositions: normalizeNodePositions(scoped.nodePositions),
     connectorCavityOccupancy: { ...scoped.connectorCavityOccupancy },

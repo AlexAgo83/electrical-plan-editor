@@ -7,7 +7,7 @@ import {
   resolveImportConflicts,
   serializeNetworkFilePayload
 } from "../adapters/portability";
-import { appActions, appReducer, createEmptyNetworkScopedState, createInitialState } from "../store";
+import { appActions, appReducer, createEmptyNetworkScopedState, createInitialState, createSampleNetworkState } from "../store";
 
 function asNetworkId(value: string): NetworkId {
   return value as NetworkId;
@@ -59,6 +59,32 @@ describe("network file portability", () => {
     expect(parsed.payload?.payloadKind).toBe(NETWORK_FILE_PAYLOAD_KIND);
     expect(parsed.payload?.schemaVersion).toBe(2);
     expect(parsed.payload?.networks).toHaveLength(1);
+  });
+
+  it("patches imported wires missing sectionMm2 to the default section", () => {
+    const seeded = createSampleNetworkState();
+    const payload = buildNetworkFilePayload(seeded, "active", [], "2026-02-21T10:15:00.000Z");
+    const firstBundle = payload.networks[0];
+    expect(firstBundle).toBeDefined();
+    if (firstBundle === undefined) {
+      throw new Error("Expected an exported network bundle.");
+    }
+
+    const firstWireId = firstBundle.state.wires.allIds[0];
+    expect(firstWireId).toBeDefined();
+    if (firstWireId === undefined) {
+      throw new Error("Expected at least one wire in exported sample payload.");
+    }
+
+    const rawPayload = JSON.parse(serializeNetworkFilePayload(payload)) as Record<string, unknown>;
+    const rawBundles = rawPayload.networks as Array<Record<string, unknown>>;
+    const rawState = rawBundles[0]?.state as Record<string, unknown>;
+    const rawWires = rawState.wires as { byId: Record<string, Record<string, unknown>>; allIds: string[] };
+    delete rawWires.byId[firstWireId]?.sectionMm2;
+
+    const parsed = parseNetworkFilePayload(JSON.stringify(rawPayload));
+    expect(parsed.error).toBeNull();
+    expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.sectionMm2).toBe(0.5);
   });
 
   it("resolves import conflicts with deterministic suffixes", () => {
