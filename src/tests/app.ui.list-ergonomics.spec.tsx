@@ -1,4 +1,4 @@
-import { fireEvent, within } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createSampleNetworkState } from "../store";
 import {
@@ -92,5 +92,54 @@ describe("App integration UI - list ergonomics", () => {
     fireEvent.change(within(wiresPanel).getByPlaceholderText("Technical ID"), { target: { value: "WIRE-B-SECONDARY" } });
     expect(within(wiresPanel).getByText("Secondary Feed B")).toBeInTheDocument();
     expect(within(wiresPanel).queryByText("Feed Main Junction")).not.toBeInTheDocument();
+  });
+
+  it("uses field selector filter bars in modeling connectors, splices, nodes, and segments panels", () => {
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreen("modeling");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.change(within(connectorsPanel).getByLabelText("Connector filter field"), {
+      target: { value: "name" }
+    });
+    fireEvent.change(within(connectorsPanel).getByPlaceholderText("Connector name"), {
+      target: { value: "Connector 1" }
+    });
+    expect(within(connectorsPanel).getByText("Connector 1")).toBeInTheDocument();
+    expect(within(connectorsPanel).queryByText("Connector 2")).not.toBeInTheDocument();
+
+    switchSubScreen("splice");
+    const splicesPanel = getPanelByHeading("Splices");
+    fireEvent.change(within(splicesPanel).getByLabelText("Splice filter field"), {
+      target: { value: "name" }
+    });
+    fireEvent.change(within(splicesPanel).getByPlaceholderText("Splice name"), {
+      target: { value: "Splice 1" }
+    });
+    expect(within(splicesPanel).getByText("Splice 1")).toBeInTheDocument();
+    expect(within(splicesPanel).queryByText("Splice 2")).not.toBeInTheDocument();
+
+    switchSubScreen("node");
+    const nodesPanel = getPanelByHeading("Nodes");
+    fireEvent.change(within(nodesPanel).getByLabelText("Node filter field"), {
+      target: { value: "id" }
+    });
+    fireEvent.change(within(nodesPanel).getByPlaceholderText("Node ID"), {
+      target: { value: "N-MID" }
+    });
+    expect(within(nodesPanel).getByText("N-MID")).toBeInTheDocument();
+    expect(within(nodesPanel).queryByText("N-C1")).not.toBeInTheDocument();
+
+    switchSubScreen("segment");
+    const segmentsPanel = getPanelByHeading("Segments");
+    fireEvent.change(within(segmentsPanel).getByLabelText("Segment filter field"), {
+      target: { value: "id" }
+    });
+    fireEvent.change(within(segmentsPanel).getByPlaceholderText("Segment ID"), {
+      target: { value: "SEG-A" }
+    });
+    expect(within(segmentsPanel).getByText("SEG-A")).toBeInTheDocument();
+    expect(within(segmentsPanel).queryByText("SEG-B")).not.toBeInTheDocument();
   });
 });

@@ -27,6 +27,10 @@ interface UseEntityListModelParams {
 }
 
 export type WireFilterField = "endpoints" | "name" | "technicalId" | "any";
+export type ConnectorFilterField = "name" | "technicalId" | "any";
+export type SpliceFilterField = "name" | "technicalId" | "any";
+export type NodeFilterField = "id" | "kind" | "reference" | "any";
+export type SegmentFilterField = "id" | "nodeA" | "nodeB" | "subNetwork" | "any";
 
 export function useEntityListModel({
   state,
@@ -46,6 +50,10 @@ export function useEntityListModel({
   const [nodeSearchQuery, setNodeSearchQuery] = useState("");
   const [segmentSearchQuery, setSegmentSearchQuery] = useState("");
   const [wireSearchQuery, setWireSearchQuery] = useState("");
+  const [connectorFilterField, setConnectorFilterField] = useState<ConnectorFilterField>("any");
+  const [spliceFilterField, setSpliceFilterField] = useState<SpliceFilterField>("any");
+  const [nodeFilterField, setNodeFilterField] = useState<NodeFilterField>("any");
+  const [segmentFilterField, setSegmentFilterField] = useState<SegmentFilterField>("any");
   const [connectorOccupancyFilter, setConnectorOccupancyFilter] = useState<OccupancyFilter>("all");
   const [spliceOccupancyFilter, setSpliceOccupancyFilter] = useState<OccupancyFilter>("all");
   const [nodeKindFilter, setNodeKindFilter] = useState<"all" | NetworkNode["kind"]>("all");
@@ -165,6 +173,27 @@ export function useEntityListModel({
     return result;
   }, [splices, state]);
 
+  const nodeReferenceSearchById = useMemo(() => {
+    const result = new Map<NodeId, string>();
+    for (const node of nodes) {
+      if (node.kind === "intermediate") {
+        result.set(node.id, `${node.label}`.toLocaleLowerCase());
+        continue;
+      }
+      if (node.kind === "connector") {
+        const connector = connectorMap.get(node.connectorId);
+        result.set(
+          node.id,
+          `${node.connectorId} ${connector?.name ?? ""} ${connector?.technicalId ?? ""}`.toLocaleLowerCase()
+        );
+        continue;
+      }
+      const splice = spliceMap.get(node.spliceId);
+      result.set(node.id, `${node.spliceId} ${splice?.name ?? ""} ${splice?.technicalId ?? ""}`.toLocaleLowerCase());
+    }
+    return result;
+  }, [connectorMap, nodes, spliceMap]);
+
   const visibleConnectors = useMemo(() => sortedConnectors.filter((connector) => {
     const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
     if (connectorOccupancyFilter === "occupied" && occupiedCount === 0) {
@@ -173,8 +202,19 @@ export function useEntityListModel({
     if (connectorOccupancyFilter === "free" && occupiedCount > 0) {
       return false;
     }
-    return `${connector.name} ${connector.technicalId}`.toLocaleLowerCase().includes(normalizedConnectorSearch);
-  }), [connectorOccupiedCountById, connectorOccupancyFilter, normalizedConnectorSearch, sortedConnectors]);
+    if (normalizedConnectorSearch.length === 0) {
+      return true;
+    }
+    const nameSearchText = connector.name.toLocaleLowerCase();
+    const technicalIdSearchText = connector.technicalId.toLocaleLowerCase();
+    return (
+      connectorFilterField === "name"
+        ? nameSearchText
+        : connectorFilterField === "technicalId"
+          ? technicalIdSearchText
+          : `${nameSearchText} ${technicalIdSearchText}`
+    ).includes(normalizedConnectorSearch);
+  }), [connectorFilterField, connectorOccupiedCountById, connectorOccupancyFilter, normalizedConnectorSearch, sortedConnectors]);
 
   const visibleSplices = useMemo(() => sortedSplices.filter((splice) => {
     const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
@@ -184,8 +224,19 @@ export function useEntityListModel({
     if (spliceOccupancyFilter === "free" && occupiedCount > 0) {
       return false;
     }
-    return `${splice.name} ${splice.technicalId}`.toLocaleLowerCase().includes(normalizedSpliceSearch);
-  }), [normalizedSpliceSearch, sortedSplices, spliceOccupancyFilter, spliceOccupiedCountById]);
+    if (normalizedSpliceSearch.length === 0) {
+      return true;
+    }
+    const nameSearchText = splice.name.toLocaleLowerCase();
+    const technicalIdSearchText = splice.technicalId.toLocaleLowerCase();
+    return (
+      spliceFilterField === "name"
+        ? nameSearchText
+        : spliceFilterField === "technicalId"
+          ? technicalIdSearchText
+          : `${nameSearchText} ${technicalIdSearchText}`
+    ).includes(normalizedSpliceSearch);
+  }), [normalizedSpliceSearch, sortedSplices, spliceFilterField, spliceOccupancyFilter, spliceOccupiedCountById]);
 
   const visibleNodes = useMemo(() => sortedNodes.filter((node) => {
     if (nodeKindFilter !== "all" && node.kind !== nodeKindFilter) {
@@ -194,16 +245,19 @@ export function useEntityListModel({
     if (normalizedNodeSearch.length === 0) {
       return true;
     }
-    if (node.kind === "intermediate") {
-      return `${node.id} ${node.label}`.toLocaleLowerCase().includes(normalizedNodeSearch);
-    }
-    if (node.kind === "connector") {
-      const connector = connectorMap.get(node.connectorId);
-      return `${node.id} ${node.connectorId} ${connector?.name ?? ""} ${connector?.technicalId ?? ""}`.toLocaleLowerCase().includes(normalizedNodeSearch);
-    }
-    const splice = spliceMap.get(node.spliceId);
-    return `${node.id} ${node.spliceId} ${splice?.name ?? ""} ${splice?.technicalId ?? ""}`.toLocaleLowerCase().includes(normalizedNodeSearch);
-  }), [connectorMap, nodeKindFilter, normalizedNodeSearch, sortedNodes, spliceMap]);
+    const idSearchText = node.id.toLocaleLowerCase();
+    const kindSearchText = node.kind.toLocaleLowerCase();
+    const referenceSearchText = nodeReferenceSearchById.get(node.id) ?? "";
+    return (
+      nodeFilterField === "id"
+        ? idSearchText
+        : nodeFilterField === "kind"
+          ? kindSearchText
+          : nodeFilterField === "reference"
+            ? referenceSearchText
+            : `${idSearchText} ${kindSearchText} ${referenceSearchText}`
+    ).includes(normalizedNodeSearch);
+  }), [nodeFilterField, nodeKindFilter, nodeReferenceSearchById, normalizedNodeSearch, sortedNodes]);
 
   const visibleSegments = useMemo(() => sortedSegments.filter((segment) => {
     const normalizedSubNetworkTag = segment.subNetworkTag?.trim() ?? "";
@@ -213,8 +267,26 @@ export function useEntityListModel({
     if (segmentSubNetworkFilter === "tagged" && normalizedSubNetworkTag.length === 0) {
       return false;
     }
-    return `${segment.id} ${segment.nodeA} ${segment.nodeB} ${segment.subNetworkTag ?? ""}`.toLocaleLowerCase().includes(normalizedSegmentSearch);
-  }), [normalizedSegmentSearch, segmentSubNetworkFilter, sortedSegments]);
+    if (normalizedSegmentSearch.length === 0) {
+      return true;
+    }
+    const idSearchText = segment.id.toLocaleLowerCase();
+    const nodeASearchText = `${segment.nodeA} ${nodeReferenceSearchById.get(segment.nodeA) ?? ""}`.toLocaleLowerCase();
+    const nodeBSearchText = `${segment.nodeB} ${nodeReferenceSearchById.get(segment.nodeB) ?? ""}`.toLocaleLowerCase();
+    const subNetworkSearchText =
+      normalizedSubNetworkTag.length === 0 ? "(default) default".toLocaleLowerCase() : normalizedSubNetworkTag.toLocaleLowerCase();
+    return (
+      segmentFilterField === "id"
+        ? idSearchText
+        : segmentFilterField === "nodeA"
+          ? nodeASearchText
+          : segmentFilterField === "nodeB"
+            ? nodeBSearchText
+            : segmentFilterField === "subNetwork"
+              ? subNetworkSearchText
+              : `${idSearchText} ${nodeASearchText} ${nodeBSearchText} ${subNetworkSearchText}`
+    ).includes(normalizedSegmentSearch);
+  }), [nodeReferenceSearchById, normalizedSegmentSearch, segmentFilterField, segmentSubNetworkFilter, sortedSegments]);
 
   const visibleWires = useMemo(() => sortedWires.filter((wire) => {
     if (wireRouteFilter === "locked" && !wire.isRouteLocked) {
@@ -276,6 +348,14 @@ export function useEntityListModel({
     setSegmentSearchQuery,
     wireSearchQuery,
     setWireSearchQuery,
+    connectorFilterField,
+    setConnectorFilterField,
+    spliceFilterField,
+    setSpliceFilterField,
+    nodeFilterField,
+    setNodeFilterField,
+    segmentFilterField,
+    setSegmentFilterField,
     connectorOccupancyFilter,
     setConnectorOccupancyFilter,
     spliceOccupancyFilter,

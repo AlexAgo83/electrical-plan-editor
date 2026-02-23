@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactElement } from "react";
 import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
+import { TableFilterBar } from "./TableFilterBar";
 import type {
   Connector,
   ConnectorId,
@@ -17,6 +18,10 @@ interface ModelingPrimaryTablesProps {
   onOpenCreateConnector: () => void;
   connectorOccupancyFilter: OccupancyFilter;
   setConnectorOccupancyFilter: (value: OccupancyFilter) => void;
+  connectorFilterField: "name" | "technicalId" | "any";
+  setConnectorFilterField: (value: "name" | "technicalId" | "any") => void;
+  connectorFilterQuery: string;
+  setConnectorFilterQuery: (value: string) => void;
   connectors: Connector[];
   visibleConnectors: Connector[];
   connectorSort: SortState;
@@ -32,6 +37,10 @@ interface ModelingPrimaryTablesProps {
   onOpenCreateSplice: () => void;
   spliceOccupancyFilter: OccupancyFilter;
   setSpliceOccupancyFilter: (value: OccupancyFilter) => void;
+  spliceFilterField: "name" | "technicalId" | "any";
+  setSpliceFilterField: (value: "name" | "technicalId" | "any") => void;
+  spliceFilterQuery: string;
+  setSpliceFilterQuery: (value: string) => void;
   splices: Splice[];
   visibleSplices: Splice[];
   spliceSort: SortState;
@@ -46,6 +55,10 @@ interface ModelingPrimaryTablesProps {
   onOpenCreateNode: () => void;
   nodeKindFilter: "all" | NetworkNode["kind"];
   setNodeKindFilter: (value: "all" | NetworkNode["kind"]) => void;
+  nodeFilterField: "id" | "kind" | "reference" | "any";
+  setNodeFilterField: (value: "id" | "kind" | "reference" | "any") => void;
+  nodeFilterQuery: string;
+  setNodeFilterQuery: (value: string) => void;
   nodes: NetworkNode[];
   visibleNodes: NetworkNode[];
   nodeIdSortDirection: SortDirection;
@@ -64,6 +77,10 @@ export function ModelingPrimaryTables({
   onOpenCreateConnector,
   connectorOccupancyFilter,
   setConnectorOccupancyFilter,
+  connectorFilterField,
+  setConnectorFilterField,
+  connectorFilterQuery,
+  setConnectorFilterQuery,
   connectors,
   visibleConnectors,
   connectorSort,
@@ -79,6 +96,10 @@ export function ModelingPrimaryTables({
   onOpenCreateSplice,
   spliceOccupancyFilter,
   setSpliceOccupancyFilter,
+  spliceFilterField,
+  setSpliceFilterField,
+  spliceFilterQuery,
+  setSpliceFilterQuery,
   splices,
   visibleSplices,
   spliceSort,
@@ -93,6 +114,10 @@ export function ModelingPrimaryTables({
   onOpenCreateNode,
   nodeKindFilter,
   setNodeKindFilter,
+  nodeFilterField,
+  setNodeFilterField,
+  nodeFilterQuery,
+  setNodeFilterQuery,
   nodes,
   visibleNodes,
   nodeIdSortDirection,
@@ -120,6 +145,26 @@ export function ModelingPrimaryTables({
   const focusedNode =
     selectedNodeId === null ? null : (visibleNodes.find((node) => node.id === selectedNodeId) ?? null);
   const showNodeKindColumn = nodeKindFilter === "all";
+  const connectorFilterPlaceholder =
+    connectorFilterField === "name"
+      ? "Connector name"
+      : connectorFilterField === "technicalId"
+        ? "Technical ID"
+        : "Name or technical ID";
+  const spliceFilterPlaceholder =
+    spliceFilterField === "name"
+      ? "Splice name"
+      : spliceFilterField === "technicalId"
+        ? "Technical ID"
+        : "Name or technical ID";
+  const nodeFilterPlaceholder =
+    nodeFilterField === "id"
+      ? "Node ID"
+      : nodeFilterField === "kind"
+        ? "connector / splice / intermediate"
+        : nodeFilterField === "reference"
+          ? "Reference"
+          : "ID, kind, reference...";
 
   useEffect(() => {
     if (connectorFormMode !== "edit" || selectedConnectorId === null) {
@@ -226,44 +271,62 @@ export function ModelingPrimaryTables({
         <header className="list-panel-header">
           <h2>Connectors</h2>
           <div className="list-panel-header-tools">
-            {onOpenConnectorOnboardingHelp !== undefined ? (
+            <div className="list-panel-header-tools-row">
+              <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
+                {([
+                  ["all", "All"],
+                  ["occupied", "Occupied"],
+                  ["free", "Free"]
+                ] as const).map(([filterId, label]) => (
+                  <button key={filterId} type="button" className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setConnectorOccupancyFilter(filterId)}>{label}</button>
+                ))}
+              </div>
               <button
                 type="button"
-                className="filter-chip onboarding-help-button"
-                onClick={onOpenConnectorOnboardingHelp}
+                className="filter-chip table-export-button"
+                onClick={() =>
+                  downloadCsvFile(
+                    "modeling-connectors",
+                    ["Name", "Technical ID", "Ways", "Occupied"],
+                    visibleConnectors.map((connector) => [
+                      connector.name,
+                      connector.technicalId,
+                      connector.cavityCount,
+                      connectorOccupiedCountById.get(connector.id) ?? 0
+                    ])
+                  )
+                }
+                disabled={visibleConnectors.length === 0}
               >
-                Help
+                <span className="table-export-icon" aria-hidden="true" />
+                CSV
               </button>
-            ) : null}
-            <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
-              {([
-                ["all", "All"],
-                ["occupied", "Occupied"],
-                ["free", "Free"]
-              ] as const).map(([filterId, label]) => (
-                <button key={filterId} type="button" className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setConnectorOccupancyFilter(filterId)}>{label}</button>
-              ))}
+              {onOpenConnectorOnboardingHelp !== undefined ? (
+                <button
+                  type="button"
+                  className="filter-chip onboarding-help-button"
+                  onClick={onOpenConnectorOnboardingHelp}
+                >
+                  Help
+                </button>
+              ) : null}
             </div>
-            <button
-              type="button"
-              className="filter-chip table-export-button"
-              onClick={() =>
-                downloadCsvFile(
-                  "modeling-connectors",
-                  ["Name", "Technical ID", "Ways", "Occupied"],
-                  visibleConnectors.map((connector) => [
-                    connector.name,
-                    connector.technicalId,
-                    connector.cavityCount,
-                    connectorOccupiedCountById.get(connector.id) ?? 0
-                  ])
-                )
-              }
-              disabled={visibleConnectors.length === 0}
-            >
-              <span className="table-export-icon" aria-hidden="true" />
-              CSV
-            </button>
+            <div className="list-panel-header-tools-row">
+              <TableFilterBar
+                label="Filter"
+                fieldLabel="Connector filter field"
+                fieldValue={connectorFilterField}
+                onFieldChange={(value) => setConnectorFilterField(value as "name" | "technicalId" | "any")}
+                fieldOptions={[
+                  { value: "name", label: "Name" },
+                  { value: "technicalId", label: "Technical ID" },
+                  { value: "any", label: "Any" }
+                ]}
+                queryValue={connectorFilterQuery}
+                onQueryChange={setConnectorFilterQuery}
+                placeholder={connectorFilterPlaceholder}
+              />
+            </div>
           </div>
         </header>
         {connectors.length === 0 ? (
@@ -341,44 +404,62 @@ export function ModelingPrimaryTables({
         <header className="list-panel-header">
           <h2>Splices</h2>
           <div className="list-panel-header-tools">
-            {onOpenSpliceOnboardingHelp !== undefined ? (
+            <div className="list-panel-header-tools-row">
+              <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
+                {([
+                  ["all", "All"],
+                  ["occupied", "Occupied"],
+                  ["free", "Free"]
+                ] as const).map(([filterId, label]) => (
+                  <button key={filterId} type="button" className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSpliceOccupancyFilter(filterId)}>{label}</button>
+                ))}
+              </div>
               <button
                 type="button"
-                className="filter-chip onboarding-help-button"
-                onClick={onOpenSpliceOnboardingHelp}
+                className="filter-chip table-export-button"
+                onClick={() =>
+                  downloadCsvFile(
+                    "modeling-splices",
+                    ["Name", "Technical ID", "Ports", "Branches"],
+                    visibleSplices.map((splice) => [
+                      splice.name,
+                      splice.technicalId,
+                      splice.portCount,
+                      spliceOccupiedCountById.get(splice.id) ?? 0
+                    ])
+                  )
+                }
+                disabled={visibleSplices.length === 0}
               >
-                Help
+                <span className="table-export-icon" aria-hidden="true" />
+                CSV
               </button>
-            ) : null}
-            <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
-              {([
-                ["all", "All"],
-                ["occupied", "Occupied"],
-                ["free", "Free"]
-              ] as const).map(([filterId, label]) => (
-                <button key={filterId} type="button" className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSpliceOccupancyFilter(filterId)}>{label}</button>
-              ))}
+              {onOpenSpliceOnboardingHelp !== undefined ? (
+                <button
+                  type="button"
+                  className="filter-chip onboarding-help-button"
+                  onClick={onOpenSpliceOnboardingHelp}
+                >
+                  Help
+                </button>
+              ) : null}
             </div>
-            <button
-              type="button"
-              className="filter-chip table-export-button"
-              onClick={() =>
-                downloadCsvFile(
-                  "modeling-splices",
-                  ["Name", "Technical ID", "Ports", "Branches"],
-                  visibleSplices.map((splice) => [
-                    splice.name,
-                    splice.technicalId,
-                    splice.portCount,
-                    spliceOccupiedCountById.get(splice.id) ?? 0
-                  ])
-                )
-              }
-              disabled={visibleSplices.length === 0}
-            >
-              <span className="table-export-icon" aria-hidden="true" />
-              CSV
-            </button>
+            <div className="list-panel-header-tools-row">
+              <TableFilterBar
+                label="Filter"
+                fieldLabel="Splice filter field"
+                fieldValue={spliceFilterField}
+                onFieldChange={(value) => setSpliceFilterField(value as "name" | "technicalId" | "any")}
+                fieldOptions={[
+                  { value: "name", label: "Name" },
+                  { value: "technicalId", label: "Technical ID" },
+                  { value: "any", label: "Any" }
+                ]}
+                queryValue={spliceFilterQuery}
+                onQueryChange={setSpliceFilterQuery}
+                placeholder={spliceFilterPlaceholder}
+              />
+            </div>
           </div>
         </header>
         {splices.length === 0 ? (
@@ -456,46 +537,65 @@ export function ModelingPrimaryTables({
         <header className="list-panel-header">
           <h2>Nodes</h2>
           <div className="list-panel-header-tools">
-            {onOpenNodeOnboardingHelp !== undefined ? (
+            <div className="list-panel-header-tools-row">
+              <div className="chip-group list-panel-filters" role="group" aria-label="Node kind filter">
+                {([
+                  ["all", "All"],
+                  ["connector", "Connector"],
+                  ["splice", "Splice"],
+                  ["intermediate", "Intermediate"]
+                ] as const).map(([kindId, label]) => (
+                  <button key={kindId} type="button" className={nodeKindFilter === kindId ? "filter-chip is-active" : "filter-chip"} onClick={() => setNodeKindFilter(kindId)}>{label}</button>
+                ))}
+              </div>
               <button
                 type="button"
-                className="filter-chip onboarding-help-button"
-                onClick={onOpenNodeOnboardingHelp}
+                className="filter-chip table-export-button"
+                onClick={() => {
+                  const headers = showNodeKindColumn
+                    ? ["ID", "Kind", "Reference", "Linked segments"]
+                    : ["ID", "Reference", "Linked segments"];
+                  const rows = visibleNodes.map((node) => {
+                    const linkedSegments = segmentsCountByNodeId.get(node.id) ?? 0;
+                    if (showNodeKindColumn) {
+                      return [node.id, node.kind, describeNode(node), linkedSegments];
+                    }
+                    return [node.id, describeNode(node), linkedSegments];
+                  });
+                  downloadCsvFile("modeling-nodes", headers, rows);
+                }}
+                disabled={visibleNodes.length === 0}
               >
-                Help
+                <span className="table-export-icon" aria-hidden="true" />
+                CSV
               </button>
-            ) : null}
-            <div className="chip-group list-panel-filters" role="group" aria-label="Node kind filter">
-              {([
-                ["all", "All"],
-                ["connector", "Connector"],
-                ["splice", "Splice"],
-                ["intermediate", "Intermediate"]
-              ] as const).map(([kindId, label]) => (
-                <button key={kindId} type="button" className={nodeKindFilter === kindId ? "filter-chip is-active" : "filter-chip"} onClick={() => setNodeKindFilter(kindId)}>{label}</button>
-              ))}
+              {onOpenNodeOnboardingHelp !== undefined ? (
+                <button
+                  type="button"
+                  className="filter-chip onboarding-help-button"
+                  onClick={onOpenNodeOnboardingHelp}
+                >
+                  Help
+                </button>
+              ) : null}
             </div>
-            <button
-              type="button"
-              className="filter-chip table-export-button"
-              onClick={() => {
-                const headers = showNodeKindColumn
-                  ? ["ID", "Kind", "Reference", "Linked segments"]
-                  : ["ID", "Reference", "Linked segments"];
-                const rows = visibleNodes.map((node) => {
-                  const linkedSegments = segmentsCountByNodeId.get(node.id) ?? 0;
-                  if (showNodeKindColumn) {
-                    return [node.id, node.kind, describeNode(node), linkedSegments];
-                  }
-                  return [node.id, describeNode(node), linkedSegments];
-                });
-                downloadCsvFile("modeling-nodes", headers, rows);
-              }}
-              disabled={visibleNodes.length === 0}
-            >
-              <span className="table-export-icon" aria-hidden="true" />
-              CSV
-            </button>
+            <div className="list-panel-header-tools-row">
+              <TableFilterBar
+                label="Filter"
+                fieldLabel="Node filter field"
+                fieldValue={nodeFilterField}
+                onFieldChange={(value) => setNodeFilterField(value as "id" | "kind" | "reference" | "any")}
+                fieldOptions={[
+                  { value: "id", label: "Node ID" },
+                  { value: "kind", label: "Kind" },
+                  { value: "reference", label: "Reference" },
+                  { value: "any", label: "Any" }
+                ]}
+                queryValue={nodeFilterQuery}
+                onQueryChange={setNodeFilterQuery}
+                placeholder={nodeFilterPlaceholder}
+              />
+            </div>
           </div>
         </header>
         {nodes.length === 0 ? (

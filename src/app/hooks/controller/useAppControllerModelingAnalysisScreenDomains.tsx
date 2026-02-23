@@ -33,24 +33,40 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
     EntityListModel,
     | "connectorOccupancyFilter"
     | "setConnectorOccupancyFilter"
+    | "connectorFilterField"
+    | "setConnectorFilterField"
+    | "connectorSearchQuery"
+    | "setConnectorSearchQuery"
     | "visibleConnectors"
     | "connectorSort"
     | "setConnectorSort"
     | "connectorOccupiedCountById"
     | "spliceOccupancyFilter"
     | "setSpliceOccupancyFilter"
+    | "spliceFilterField"
+    | "setSpliceFilterField"
+    | "spliceSearchQuery"
+    | "setSpliceSearchQuery"
     | "visibleSplices"
     | "spliceSort"
     | "setSpliceSort"
     | "spliceOccupiedCountById"
     | "nodeKindFilter"
     | "setNodeKindFilter"
+    | "nodeFilterField"
+    | "setNodeFilterField"
+    | "nodeSearchQuery"
+    | "setNodeSearchQuery"
     | "visibleNodes"
     | "nodeIdSortDirection"
     | "setNodeIdSortDirection"
     | "segmentsCountByNodeId"
     | "segmentSubNetworkFilter"
     | "setSegmentSubNetworkFilter"
+    | "segmentFilterField"
+    | "setSegmentFilterField"
+    | "segmentSearchQuery"
+    | "setSegmentSearchQuery"
     | "visibleSegments"
     | "segmentIdSortDirection"
     | "setSegmentIdSortDirection"
@@ -141,6 +157,10 @@ export function useAppControllerModelingAnalysisScreenDomains({
     resetConnectorForm: modelingHandlers.connector.resetConnectorForm,
     connectorOccupancyFilter: listModel.connectorOccupancyFilter,
     setConnectorOccupancyFilter: listModel.setConnectorOccupancyFilter,
+    connectorFilterField: listModel.connectorFilterField,
+    setConnectorFilterField: listModel.setConnectorFilterField,
+    connectorFilterQuery: listModel.connectorSearchQuery,
+    setConnectorFilterQuery: listModel.setConnectorSearchQuery,
     connectors: entities.connectors,
     visibleConnectors: listModel.visibleConnectors,
     connectorSort: listModel.connectorSort,
@@ -156,6 +176,10 @@ export function useAppControllerModelingAnalysisScreenDomains({
     resetSpliceForm: modelingHandlers.splice.resetSpliceForm,
     spliceOccupancyFilter: listModel.spliceOccupancyFilter,
     setSpliceOccupancyFilter: listModel.setSpliceOccupancyFilter,
+    spliceFilterField: listModel.spliceFilterField,
+    setSpliceFilterField: listModel.setSpliceFilterField,
+    spliceFilterQuery: listModel.spliceSearchQuery,
+    setSpliceFilterQuery: listModel.setSpliceSearchQuery,
     splices: entities.splices,
     visibleSplices: listModel.visibleSplices,
     spliceSort: listModel.spliceSort,
@@ -170,6 +194,10 @@ export function useAppControllerModelingAnalysisScreenDomains({
     resetNodeForm: modelingHandlers.node.resetNodeForm,
     nodeKindFilter: listModel.nodeKindFilter,
     setNodeKindFilter: listModel.setNodeKindFilter,
+    nodeFilterField: listModel.nodeFilterField,
+    setNodeFilterField: listModel.setNodeFilterField,
+    nodeFilterQuery: listModel.nodeSearchQuery,
+    setNodeFilterQuery: listModel.setNodeSearchQuery,
     nodes: entities.nodes,
     visibleNodes: listModel.visibleNodes,
     nodeIdSortDirection: listModel.nodeIdSortDirection,
@@ -185,6 +213,10 @@ export function useAppControllerModelingAnalysisScreenDomains({
     resetSegmentForm: modelingHandlers.segment.resetSegmentForm,
     segmentSubNetworkFilter: listModel.segmentSubNetworkFilter,
     setSegmentSubNetworkFilter: listModel.setSegmentSubNetworkFilter,
+    segmentFilterField: listModel.segmentFilterField,
+    setSegmentFilterField: listModel.setSegmentFilterField,
+    segmentFilterQuery: listModel.segmentSearchQuery,
+    setSegmentFilterQuery: listModel.setSegmentSearchQuery,
     segments: entities.segments,
     visibleSegments: listModel.visibleSegments,
     segmentIdSortDirection: listModel.segmentIdSortDirection,

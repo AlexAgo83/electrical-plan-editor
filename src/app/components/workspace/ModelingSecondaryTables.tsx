@@ -17,6 +17,10 @@ interface ModelingSecondaryTablesProps {
   onOpenCreateSegment: () => void;
   segmentSubNetworkFilter: SegmentSubNetworkFilter;
   setSegmentSubNetworkFilter: (value: SegmentSubNetworkFilter) => void;
+  segmentFilterField: "id" | "nodeA" | "nodeB" | "subNetwork" | "any";
+  setSegmentFilterField: (value: "id" | "nodeA" | "nodeB" | "subNetwork" | "any") => void;
+  segmentFilterQuery: string;
+  setSegmentFilterQuery: (value: string) => void;
   segments: Segment[];
   visibleSegments: Segment[];
   segmentIdSortDirection: SortDirection;
@@ -55,6 +59,10 @@ export function ModelingSecondaryTables({
   onOpenCreateSegment,
   segmentSubNetworkFilter,
   setSegmentSubNetworkFilter,
+  segmentFilterField,
+  setSegmentFilterField,
+  segmentFilterQuery,
+  setSegmentFilterQuery,
   segments,
   visibleSegments,
   segmentIdSortDirection,
@@ -98,6 +106,16 @@ export function ModelingSecondaryTables({
     selectedWireId === null ? null : (visibleWires.find((wire) => wire.id === selectedWireId) ?? null);
   const showSegmentSubNetworkColumn = segmentSubNetworkFilter !== "default";
   const showWireRouteModeColumn = wireRouteFilter === "all";
+  const segmentFilterPlaceholder =
+    segmentFilterField === "id"
+      ? "Segment ID"
+      : segmentFilterField === "nodeA"
+        ? "Node A"
+        : segmentFilterField === "nodeB"
+          ? "Node B"
+          : segmentFilterField === "subNetwork"
+            ? "Sub-network"
+            : "ID, nodes, sub-network...";
   const wireFilterPlaceholder =
     wireFilterField === "endpoints"
       ? "Connector/Splice or ID"
@@ -179,46 +197,66 @@ export function ModelingSecondaryTables({
         <header className="list-panel-header">
           <h2>Segments</h2>
           <div className="list-panel-header-tools">
-            {onOpenSegmentOnboardingHelp !== undefined ? (
+            <div className="list-panel-header-tools-row">
+              <div className="chip-group list-panel-filters" role="group" aria-label="Segment sub-network filter">
+                {([
+                  ["all", "All"],
+                  ["default", "Default"],
+                  ["tagged", "Tagged"]
+                ] as const).map(([filterId, label]) => (
+                  <button key={filterId} type="button" className={segmentSubNetworkFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSegmentSubNetworkFilter(filterId)}>{label}</button>
+                ))}
+              </div>
               <button
                 type="button"
-                className="filter-chip onboarding-help-button"
-                onClick={onOpenSegmentOnboardingHelp}
+                className="filter-chip table-export-button"
+                onClick={() => {
+                  const headers = showSegmentSubNetworkColumn
+                    ? ["ID", "Node A", "Node B", "Length (mm)", "Sub-network"]
+                    : ["ID", "Node A", "Node B", "Length (mm)"];
+                  const rows = visibleSegments.map((segment) => {
+                    const nodeA = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
+                    const nodeB = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
+                    if (showSegmentSubNetworkColumn) {
+                      return [segment.id, nodeA, nodeB, segment.lengthMm, segment.subNetworkTag?.trim() || "(default)"];
+                    }
+                    return [segment.id, nodeA, nodeB, segment.lengthMm];
+                  });
+                  downloadCsvFile("modeling-segments", headers, rows);
+                }}
+                disabled={visibleSegments.length === 0}
               >
-                Help
+                <span className="table-export-icon" aria-hidden="true" />
+                CSV
               </button>
-            ) : null}
-            <div className="chip-group list-panel-filters" role="group" aria-label="Segment sub-network filter">
-              {([
-                ["all", "All"],
-                ["default", "Default"],
-                ["tagged", "Tagged"]
-              ] as const).map(([filterId, label]) => (
-                <button key={filterId} type="button" className={segmentSubNetworkFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSegmentSubNetworkFilter(filterId)}>{label}</button>
-              ))}
+              {onOpenSegmentOnboardingHelp !== undefined ? (
+                <button
+                  type="button"
+                  className="filter-chip onboarding-help-button"
+                  onClick={onOpenSegmentOnboardingHelp}
+                >
+                  Help
+                </button>
+              ) : null}
             </div>
-            <button
-              type="button"
-              className="filter-chip table-export-button"
-              onClick={() => {
-                const headers = showSegmentSubNetworkColumn
-                  ? ["ID", "Node A", "Node B", "Length (mm)", "Sub-network"]
-                  : ["ID", "Node A", "Node B", "Length (mm)"];
-                const rows = visibleSegments.map((segment) => {
-                  const nodeA = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
-                  const nodeB = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
-                  if (showSegmentSubNetworkColumn) {
-                    return [segment.id, nodeA, nodeB, segment.lengthMm, segment.subNetworkTag?.trim() || "(default)"];
-                  }
-                  return [segment.id, nodeA, nodeB, segment.lengthMm];
-                });
-                downloadCsvFile("modeling-segments", headers, rows);
-              }}
-              disabled={visibleSegments.length === 0}
-            >
-              <span className="table-export-icon" aria-hidden="true" />
-              CSV
-            </button>
+            <div className="list-panel-header-tools-row">
+              <TableFilterBar
+                label="Filter"
+                fieldLabel="Segment filter field"
+                fieldValue={segmentFilterField}
+                onFieldChange={(value) => setSegmentFilterField(value as "id" | "nodeA" | "nodeB" | "subNetwork" | "any")}
+                fieldOptions={[
+                  { value: "id", label: "Segment ID" },
+                  { value: "nodeA", label: "Node A" },
+                  { value: "nodeB", label: "Node B" },
+                  { value: "subNetwork", label: "Sub-network" },
+                  { value: "any", label: "Any" }
+                ]}
+                queryValue={segmentFilterQuery}
+                onQueryChange={setSegmentFilterQuery}
+                placeholder={segmentFilterPlaceholder}
+              />
+            </div>
           </div>
         </header>
         {segments.length === 0 ? (
