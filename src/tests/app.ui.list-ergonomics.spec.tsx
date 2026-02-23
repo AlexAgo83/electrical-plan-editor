@@ -72,16 +72,25 @@ describe("App integration UI - list ergonomics", () => {
     expect(within(connectorsPanel).queryByText("Connector free")).not.toBeInTheDocument();
   });
 
-  it("filters wires by endpoint text", () => {
+  it("filters wires with a field selector and generic filter input", () => {
     renderAppWithState(createSampleNetworkState());
 
     switchSubScreen("wire");
     const wiresPanel = getPanelByHeading("Wires");
     expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
     expect(within(wiresPanel).getByText("Secondary Feed B")).toBeInTheDocument();
+    expect(within(wiresPanel).getByText("Filter")).toBeInTheDocument();
 
-    fireEvent.change(within(wiresPanel).getByLabelText(/Endpoint filter/i), { target: { value: "SPL-J1" } });
+    const wireFilterFieldSelect = within(wiresPanel).getByLabelText("Wire filter field");
+    const wireFilterInput = within(wiresPanel).getByPlaceholderText("Connector/Splice or ID");
+
+    fireEvent.change(wireFilterInput, { target: { value: "SPL-J1" } });
     expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
     expect(within(wiresPanel).queryByText("Secondary Feed B")).not.toBeInTheDocument();
+
+    fireEvent.change(wireFilterFieldSelect, { target: { value: "technicalId" } });
+    fireEvent.change(within(wiresPanel).getByPlaceholderText("Technical ID"), { target: { value: "WIRE-B-SECONDARY" } });
+    expect(within(wiresPanel).getByText("Secondary Feed B")).toBeInTheDocument();
+    expect(within(wiresPanel).queryByText("Feed Main Junction")).not.toBeInTheDocument();
   });
 });

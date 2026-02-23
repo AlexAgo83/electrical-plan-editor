@@ -200,4 +200,34 @@ describe("App integration UI - networks", () => {
       expect(document.activeElement).toBe(nameInput);
     });
   });
+
+  it("filters the network scope table with a field selector without changing the panel layout", () => {
+    const seeded = appReducer(
+      createInitialState(),
+      appActions.createNetwork({
+        id: asNetworkId("net-validation"),
+        name: "Validation issues sample",
+        technicalId: "NET-VALIDATION-SAMPLE",
+        createdAt: "2026-02-23T10:10:00.000Z",
+        updatedAt: "2026-02-23T10:10:00.000Z"
+      })
+    );
+    renderAppWithState(seeded);
+    switchScreen("networkScope");
+
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    expect(within(networkScopePanel).getByText("Main network sample")).toBeInTheDocument();
+    expect(within(networkScopePanel).getByText("Validation issues sample")).toBeInTheDocument();
+    expect(within(networkScopePanel).getByText("Filter")).toBeInTheDocument();
+
+    fireEvent.change(within(networkScopePanel).getByLabelText("Network filter field"), {
+      target: { value: "technicalId" }
+    });
+    fireEvent.change(within(networkScopePanel).getByPlaceholderText("Technical ID"), {
+      target: { value: "NET-VALIDATION-SAMPLE" }
+    });
+
+    expect(within(networkScopePanel).getByText("Validation issues sample")).toBeInTheDocument();
+    expect(within(networkScopePanel).queryByText("Main network sample")).not.toBeInTheDocument();
+  });
 });

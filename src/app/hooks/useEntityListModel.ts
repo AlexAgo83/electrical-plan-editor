@@ -26,6 +26,8 @@ interface UseEntityListModelParams {
   describeWireEndpoint: (endpoint: Wire["endpointA"]) => string;
 }
 
+export type WireFilterField = "endpoints" | "name" | "technicalId" | "any";
+
 export function useEntityListModel({
   state,
   connectors,
@@ -49,6 +51,7 @@ export function useEntityListModel({
   const [nodeKindFilter, setNodeKindFilter] = useState<"all" | NetworkNode["kind"]>("all");
   const [segmentSubNetworkFilter, setSegmentSubNetworkFilter] = useState<SegmentSubNetworkFilter>("all");
   const [wireRouteFilter, setWireRouteFilter] = useState<"all" | "auto" | "locked">("all");
+  const [wireFilterField, setWireFilterField] = useState<WireFilterField>("endpoints");
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [nodeIdSortDirection, setNodeIdSortDirection] = useState<SortDirection>("asc");
@@ -144,7 +147,7 @@ export function useEntityListModel({
   const normalizedNodeSearch = normalizeSearch(nodeSearchQuery);
   const normalizedSegmentSearch = normalizeSearch(segmentSearchQuery);
   const normalizedWireSearch = normalizeSearch(wireSearchQuery);
-  const normalizedWireEndpointFilter = normalizeSearch(wireEndpointFilterQuery);
+  const normalizedWireFilterQuery = normalizeSearch(wireEndpointFilterQuery);
 
   const connectorOccupiedCountById = useMemo(() => {
     const result = new Map<ConnectorId, number>();
@@ -220,10 +223,20 @@ export function useEntityListModel({
     if (wireRouteFilter === "auto" && wire.isRouteLocked) {
       return false;
     }
-    if (normalizedWireEndpointFilter.length > 0) {
+    if (normalizedWireFilterQuery.length > 0) {
       const endpointSearchText =
         `${describeWireEndpoint(wire.endpointA)} ${describeWireEndpoint(wire.endpointB)}`.toLocaleLowerCase();
-      if (!endpointSearchText.includes(normalizedWireEndpointFilter)) {
+      const nameSearchText = wire.name.toLocaleLowerCase();
+      const technicalIdSearchText = wire.technicalId.toLocaleLowerCase();
+      const matchesSelectedField =
+        wireFilterField === "endpoints"
+          ? endpointSearchText.includes(normalizedWireFilterQuery)
+          : wireFilterField === "name"
+            ? nameSearchText.includes(normalizedWireFilterQuery)
+            : wireFilterField === "technicalId"
+              ? technicalIdSearchText.includes(normalizedWireFilterQuery)
+              : `${nameSearchText} ${technicalIdSearchText} ${endpointSearchText}`.includes(normalizedWireFilterQuery);
+      if (!matchesSelectedField) {
         return false;
       }
     }
@@ -231,7 +244,7 @@ export function useEntityListModel({
       return true;
     }
     return `${wire.name} ${wire.technicalId}`.toLocaleLowerCase().includes(normalizedWireSearch);
-  }), [describeWireEndpoint, normalizedWireEndpointFilter, normalizedWireSearch, sortedWires, wireRouteFilter]);
+  }), [describeWireEndpoint, normalizedWireFilterQuery, normalizedWireSearch, sortedWires, wireFilterField, wireRouteFilter]);
 
   const segmentsCountByNodeId = useMemo(() => {
     const result = new Map<NodeId, number>();
@@ -273,6 +286,8 @@ export function useEntityListModel({
     setSegmentSubNetworkFilter,
     wireRouteFilter,
     setWireRouteFilter,
+    wireFilterField,
+    setWireFilterField,
     wireEndpointFilterQuery,
     setWireEndpointFilterQuery,
     connectorSort,

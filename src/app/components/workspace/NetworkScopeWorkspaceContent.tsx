@@ -3,6 +3,7 @@ import type { NetworkId } from "../../../core/entities";
 import { nextSortState, sortByNameAndTechnicalId } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { SortState } from "../../types/app-controller";
+import { TableFilterBar } from "./TableFilterBar";
 
 interface NetworkScopeWorkspaceContentProps {
   networks: Array<{ id: NetworkId; name: string; technicalId: string }>;
@@ -68,10 +69,13 @@ export function NetworkScopeWorkspaceContent({
   focusRequestedNetworkToken,
   onOpenOnboardingHelp
 }: NetworkScopeWorkspaceContentProps): ReactElement {
+  type NetworkScopeFilterField = "name" | "technicalId" | "any";
   const isCreateMode = networkFormMode === "create";
   const isEditMode = networkFormMode === "edit";
   const isFormOpen = isCreateMode || isEditMode;
   const [focusedNetworkId, setFocusedNetworkId] = useState<NetworkId | null>(activeNetworkId);
+  const [networkFilterField, setNetworkFilterField] = useState<NetworkScopeFilterField>("any");
+  const [networkFilterQuery, setNetworkFilterQuery] = useState("");
   const rowRefs = useRef<Partial<Record<NetworkId, HTMLTableRowElement | null>>>({});
   const lastHandledFocusRequestTokenRef = useRef<number>(-1);
 
@@ -94,6 +98,30 @@ export function NetworkScopeWorkspaceContent({
     }
     return networkSort.direction;
   };
+  const normalizedNetworkFilterQuery = networkFilterQuery.trim().toLocaleLowerCase();
+  const visibleNetworks = useMemo(() => {
+    if (normalizedNetworkFilterQuery.length === 0) {
+      return sortedNetworks;
+    }
+
+    return sortedNetworks.filter((network) => {
+      const nameText = network.name.toLocaleLowerCase();
+      const technicalIdText = network.technicalId.toLocaleLowerCase();
+      if (networkFilterField === "name") {
+        return nameText.includes(normalizedNetworkFilterQuery);
+      }
+      if (networkFilterField === "technicalId") {
+        return technicalIdText.includes(normalizedNetworkFilterQuery);
+      }
+      return `${nameText} ${technicalIdText}`.includes(normalizedNetworkFilterQuery);
+    });
+  }, [networkFilterField, normalizedNetworkFilterQuery, sortedNetworks]);
+  const networkFilterPlaceholder =
+    networkFilterField === "name"
+      ? "Network name"
+      : networkFilterField === "technicalId"
+        ? "Technical ID"
+        : "Name or technical ID";
 
   useEffect(() => {
     if (networks.length === 0) {
@@ -151,38 +179,58 @@ export function NetworkScopeWorkspaceContent({
         <header className="list-panel-header">
           <h2>Network Scope</h2>
           <div className="list-panel-header-tools">
-            {onOpenOnboardingHelp !== undefined ? (
+            <div className="list-panel-header-tools-row">
+              {onOpenOnboardingHelp !== undefined ? (
+                <button
+                  type="button"
+                  className="filter-chip onboarding-help-button"
+                  onClick={onOpenOnboardingHelp}
+                >
+                  Help
+                </button>
+              ) : null}
               <button
                 type="button"
-                className="filter-chip onboarding-help-button"
-                onClick={onOpenOnboardingHelp}
+                className="filter-chip table-export-button"
+                onClick={() =>
+                  downloadCsvFile(
+                    "network-scope",
+                    ["Name", "Technical ID", "Status"],
+                    visibleNetworks.map((network) => [
+                      network.name,
+                      network.technicalId,
+                      activeNetworkId === network.id ? "Active" : "Available"
+                    ])
+                  )
+                }
+                disabled={visibleNetworks.length === 0}
               >
-                Help
+                <span className="table-export-icon" aria-hidden="true" />
+                CSV
               </button>
-            ) : null}
-            <button
-              type="button"
-              className="filter-chip table-export-button"
-              onClick={() =>
-                downloadCsvFile(
-                  "network-scope",
-                  ["Name", "Technical ID", "Status"],
-                  sortedNetworks.map((network) => [
-                    network.name,
-                    network.technicalId,
-                    activeNetworkId === network.id ? "Active" : "Available"
-                  ])
-                )
-              }
-              disabled={sortedNetworks.length === 0}
-            >
-              <span className="table-export-icon" aria-hidden="true" />
-              CSV
-            </button>
+            </div>
+            <div className="list-panel-header-tools-row">
+              <TableFilterBar
+                label="Filter"
+                fieldLabel="Network filter field"
+                fieldValue={networkFilterField}
+                onFieldChange={(value) => setNetworkFilterField(value as NetworkScopeFilterField)}
+                fieldOptions={[
+                  { value: "any", label: "Any" },
+                  { value: "name", label: "Name" },
+                  { value: "technicalId", label: "Technical ID" }
+                ]}
+                queryValue={networkFilterQuery}
+                onQueryChange={setNetworkFilterQuery}
+                placeholder={networkFilterPlaceholder}
+              />
+            </div>
           </div>
         </header>
         {networks.length === 0 ? (
           <p className="empty-copy">No network available. Create one to enable modeling and analysis.</p>
+        ) : visibleNetworks.length === 0 ? (
+          <p className="empty-copy">No network matches the current filters.</p>
         ) : (
           <>
             <div className="network-scope-list-shell">
@@ -236,7 +284,7 @@ export function NetworkScopeWorkspaceContent({
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedNetworks.map((network) => {
+                  {visibleNetworks.map((network) => {
                     const isActive = activeNetworkId === network.id;
                     const isFocused = focusedNetworkId === network.id;
                     const canSetActive = !isCreateMode && !isActive;
