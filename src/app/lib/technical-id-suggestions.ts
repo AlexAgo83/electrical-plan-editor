@@ -53,6 +53,18 @@ export function suggestNextSpliceTechnicalId(existingTechnicalIds: Iterable<stri
   return suggestNextTechnicalId(existingTechnicalIds, "S");
 }
 
+export function suggestNextWireTechnicalId(existingTechnicalIds: Iterable<string>): string {
+  return suggestNextTechnicalId(existingTechnicalIds, "W");
+}
+
+export function suggestNextNodeId(existingNodeIds: Iterable<string>): string {
+  return suggestNextTechnicalId(existingNodeIds, "N");
+}
+
+export function suggestNextSegmentId(existingSegmentIds: Iterable<string>): string {
+  return suggestNextTechnicalId(existingSegmentIds, "SEG");
+}
+
 function sanitizeNodeIdToken(value: string): string {
   const token = value
     .trim()
@@ -80,4 +92,3 @@ export function suggestAutoConnectorNodeId(connectorTechnicalId: string, existin
 export function suggestAutoSpliceNodeId(spliceTechnicalId: string, existingNodeIds: Iterable<string>): NodeId {
   return suggestAutoNodeId(existingNodeIds, `N-SPLICE-${sanitizeNodeIdToken(spliceTechnicalId)}`);
 }
-

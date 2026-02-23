@@ -10,6 +10,7 @@ import type {
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { createEntityId, toPositiveInteger } from "../lib/app-utils-shared";
+import { suggestNextWireTechnicalId } from "../lib/technical-id-suggestions";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -92,10 +93,11 @@ export function useWireHandlers({
   selectedWire
 }: UseWireHandlersParams) {
   function resetWireForm(): void {
+    const state = store.getState();
     setWireFormMode("create");
     setEditingWireId(null);
     setWireName("");
-    setWireTechnicalId("");
+    setWireTechnicalId(suggestNextWireTechnicalId(Object.values(state.wires.byId).map((wire) => wire.technicalId)));
     setWireEndpointAKind("connectorCavity");
     setWireEndpointAConnectorId("");
     setWireEndpointACavityIndex("1");

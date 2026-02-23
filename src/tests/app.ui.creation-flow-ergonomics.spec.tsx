@@ -13,7 +13,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     localStorage.clear();
   });
 
-  it("prefills connector and splice technical IDs in create mode and does not overwrite manual edits while typing", () => {
+  it("prefills IDs in create mode for connectors, splices, nodes, segments, and wires without overwriting manual edits", () => {
     renderAppWithState(createInitialState());
     switchScreenDrawerAware("modeling");
 
@@ -35,6 +35,24 @@ describe("App integration UI - creation flow ergonomics", () => {
     const createSplicePanel = getPanelByHeading("Create Splice");
     const spliceTechnicalIdInput = within(createSplicePanel).getByLabelText("Technical ID");
     expect(spliceTechnicalIdInput).toHaveValue("S-001");
+
+    switchSubScreenDrawerAware("node");
+    const idleNodeFormPanel = getPanelByHeading("Node form");
+    fireEvent.click(within(idleNodeFormPanel).getByRole("button", { name: "Create" }));
+    const createNodePanel = getPanelByHeading("Create Node");
+    expect(within(createNodePanel).getByLabelText("Node ID")).toHaveValue("N-001");
+
+    switchSubScreenDrawerAware("segment");
+    const idleSegmentFormPanel = getPanelByHeading("Segment form");
+    fireEvent.click(within(idleSegmentFormPanel).getByRole("button", { name: "Create" }));
+    const createSegmentPanel = getPanelByHeading("Create Segment");
+    expect(within(createSegmentPanel).getByLabelText("Segment ID")).toHaveValue("SEG-001");
+
+    switchSubScreenDrawerAware("wire");
+    const idleWireFormPanel = getPanelByHeading("Wire form");
+    fireEvent.click(within(idleWireFormPanel).getByRole("button", { name: "Create" }));
+    const createWirePanel = getPanelByHeading("Create Wire");
+    expect(within(createWirePanel).getByLabelText("Technical ID")).toHaveValue("W-001");
   });
 
   it("focuses the created connector row and switches the form to edit mode after creation", async () => {

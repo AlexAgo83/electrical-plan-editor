@@ -2,6 +2,7 @@ import type { FormEvent } from "react";
 import type { ConnectorId, NetworkNode, NodeId, SpliceId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
+import { suggestNextNodeId } from "../lib/technical-id-suggestions";
 import type { NodePosition } from "../types/app-controller";
 
 type DispatchAction = (
@@ -57,9 +58,10 @@ export function useNodeHandlers({
   setPendingNewNodePosition
 }: UseNodeHandlersParams) {
   function resetNodeForm(): void {
+    const nextState = store.getState();
     setNodeFormMode("create");
     setEditingNodeId(null);
-    setNodeIdInput("");
+    setNodeIdInput(suggestNextNodeId(nextState.nodes.allIds));
     setNodeKind("intermediate");
     setNodeConnectorId("");
     setNodeSpliceId("");
