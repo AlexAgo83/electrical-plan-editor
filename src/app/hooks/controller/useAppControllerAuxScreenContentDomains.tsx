@@ -35,6 +35,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     | "handleCloseNetworkForm"
     | "networkTechnicalIdAlreadyUsed"
     | "handleSubmitNetworkForm"
+    | "onOpenOnboardingHelp"
   > & {
     formState: NetworkScopeFormStateModel;
   };
@@ -96,6 +97,7 @@ export function useAppControllerAuxScreenContentDomains({
     networkFormError: networkScope.formState.networkFormError,
     networkTechnicalIdAlreadyUsed: networkScope.networkTechnicalIdAlreadyUsed,
     handleSubmitNetworkForm: networkScope.handleSubmitNetworkForm,
+    onOpenOnboardingHelp: networkScope.onOpenOnboardingHelp,
     networkFocusRequest: networkScope.formState.networkFocusRequest
       })
     : null;

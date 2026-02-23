@@ -1,0 +1,151 @@
+.onboarding-help-button {
+  white-space: nowrap;
+}
+
+.home-panel-header-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.onboarding-modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.onboarding-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(11, 17, 22, 0.48);
+  cursor: pointer;
+}
+
+.onboarding-modal {
+  position: relative;
+  width: min(100%, 42rem);
+  border-radius: 0.9rem;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  background: var(--panel-bg, rgba(255, 255, 255, 0.98));
+  color: inherit;
+  box-shadow: 0 1rem 2.2rem rgba(0, 0, 0, 0.24);
+  padding: 0.95rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.onboarding-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.onboarding-modal-header-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.onboarding-modal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.1rem;
+  height: 2.1rem;
+  padding: 0 0.35rem;
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, currentColor 11%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.onboarding-modal-title-block {
+  min-width: 0;
+}
+
+.onboarding-modal-title-block h2 {
+  margin: 0;
+  line-height: 1.15;
+}
+
+.onboarding-modal-progress {
+  margin: 0.15rem 0 0;
+  font-size: 0.76rem;
+  opacity: 0.82;
+}
+
+.onboarding-modal-close {
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font: inherit;
+  font-size: 0.84rem;
+}
+
+.onboarding-modal-body {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.onboarding-modal-description {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.onboarding-modal-target {
+  margin: 0;
+  font-size: 0.84rem;
+  opacity: 0.9;
+}
+
+.onboarding-modal-checkbox {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.84rem;
+  min-width: 0;
+}
+
+.onboarding-modal-checkbox input {
+  margin-top: 0.15rem;
+}
+
+.onboarding-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.onboarding-modal-actions-spacer {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 640px) {
+  .onboarding-modal {
+    padding: 0.8rem;
+  }
+
+  .onboarding-modal-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .onboarding-modal-close {
+    align-self: flex-end;
+  }
+
+  .onboarding-modal-actions-spacer {
+    display: none;
+  }
+}

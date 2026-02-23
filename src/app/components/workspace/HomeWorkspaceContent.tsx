@@ -27,6 +27,7 @@ interface HomeWorkspaceContentProps {
   onOpenModeling: () => void;
   onOpenAnalysis: () => void;
   onOpenValidation: () => void;
+  onOpenOnboardingHelp?: () => void;
   postMvpModules?: HomeWorkspacePostMvpModules;
 }
 
@@ -59,6 +60,7 @@ export function HomeWorkspaceContent({
   onOpenModeling,
   onOpenAnalysis,
   onOpenValidation,
+  onOpenOnboardingHelp,
   postMvpModules
 }: HomeWorkspaceContentProps): ReactElement {
   const homeExtensionEntries = [
@@ -75,7 +77,18 @@ export function HomeWorkspaceContent({
       <section className="panel home-panel">
         <header className="home-panel-header">
           <h2>Start</h2>
-          <span className="settings-panel-chip">Home</span>
+          <div className="home-panel-header-tools">
+            {onOpenOnboardingHelp !== undefined ? (
+              <button
+                type="button"
+                className="filter-chip onboarding-help-button"
+                onClick={onOpenOnboardingHelp}
+              >
+                Help
+              </button>
+            ) : null}
+            <span className="settings-panel-chip">Home</span>
+          </div>
         </header>
         <p className="settings-panel-intro">
           Start a new workspace flow, import existing data, or open workspace management controls.

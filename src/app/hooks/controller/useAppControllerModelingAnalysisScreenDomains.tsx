@@ -96,6 +96,12 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   onSelectWire: AnalysisSliceParams["onSelectWire"];
   includeModelingContent: boolean;
   includeAnalysisContent: boolean;
+  onboardingHelp?: {
+    openConnectorSpliceStep: () => void;
+    openNodeStep: () => void;
+    openSegmentStep: () => void;
+    openWireStep: () => void;
+  };
 }
 
 export function useAppControllerModelingAnalysisScreenDomains({
@@ -119,7 +125,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
   onSelectSplice,
   onSelectWire,
   includeModelingContent,
-  includeAnalysisContent
+  includeAnalysisContent,
+  onboardingHelp
 }: UseAppControllerModelingAnalysisScreenDomainsParams) {
   const modelingSlice = includeModelingContent
     ? buildModelingScreenContentSlice({
@@ -140,6 +147,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     selectedConnectorId: selection.selectedConnectorId,
     startConnectorEdit: modelingHandlers.connector.startConnectorEdit,
     handleConnectorDelete: modelingHandlers.connector.handleConnectorDelete,
+    onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorSpliceStep,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
     spliceFormMode: formsState.spliceFormMode,
     resetSpliceForm: modelingHandlers.splice.resetSpliceForm,
@@ -153,6 +161,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     selectedSpliceId: selection.selectedSpliceId,
     startSpliceEdit: modelingHandlers.splice.startSpliceEdit,
     handleSpliceDelete: modelingHandlers.splice.handleSpliceDelete,
+    onOpenSpliceOnboardingHelp: onboardingHelp?.openConnectorSpliceStep,
     isNodeSubScreen: screenFlags.isNodeSubScreen,
     nodeFormMode: formsState.nodeFormMode,
     resetNodeForm: modelingHandlers.node.resetNodeForm,
@@ -167,6 +176,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     describeNode,
     startNodeEdit: modelingHandlers.node.startNodeEdit,
     handleNodeDelete: modelingHandlers.node.handleNodeDelete,
+    onOpenNodeOnboardingHelp: onboardingHelp?.openNodeStep,
     isSegmentSubScreen: screenFlags.isSegmentSubScreen,
     segmentFormMode: formsState.segmentFormMode,
     resetSegmentForm: modelingHandlers.segment.resetSegmentForm,
@@ -181,6 +191,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     selectedWireRouteSegmentIds: layoutDerived.selectedWireRouteSegmentIds,
     startSegmentEdit: modelingHandlers.segment.startSegmentEdit,
     handleSegmentDelete: modelingHandlers.segment.handleSegmentDelete,
+    onOpenSegmentOnboardingHelp: onboardingHelp?.openSegmentStep,
     isWireSubScreen: screenFlags.isWireSubScreen,
     wireFormMode: formsState.wireFormMode,
     resetWireForm: modelingHandlers.wire.resetWireForm,
@@ -197,6 +208,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     describeWireEndpointId: wireDescriptions.describeWireEndpointId,
     startWireEdit: modelingHandlers.wire.startWireEdit,
     handleWireDelete: modelingHandlers.wire.handleWireDelete,
+    onOpenWireOnboardingHelp: onboardingHelp?.openWireStep,
     handleConnectorSubmit: modelingHandlers.connector.handleConnectorSubmit,
     connectorName: formsState.connectorName,
     setConnectorName: formsState.setConnectorName,

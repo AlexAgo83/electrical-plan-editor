@@ -26,6 +26,7 @@ interface ModelingPrimaryTablesProps {
   selectedConnectorId: ConnectorId | null;
   onEditConnector: (connector: Connector) => void;
   onDeleteConnector: (connectorId: ConnectorId) => void;
+  onOpenConnectorOnboardingHelp?: () => void;
   isSpliceSubScreen: boolean;
   spliceFormMode: "idle" | "create" | "edit";
   onOpenCreateSplice: () => void;
@@ -39,6 +40,7 @@ interface ModelingPrimaryTablesProps {
   selectedSpliceId: SpliceId | null;
   onEditSplice: (splice: Splice) => void;
   onDeleteSplice: (spliceId: SpliceId) => void;
+  onOpenSpliceOnboardingHelp?: () => void;
   isNodeSubScreen: boolean;
   nodeFormMode: "idle" | "create" | "edit";
   onOpenCreateNode: () => void;
@@ -53,6 +55,7 @@ interface ModelingPrimaryTablesProps {
   describeNode: (node: NetworkNode) => string;
   onEditNode: (node: NetworkNode) => void;
   onDeleteNode: (nodeId: NodeId) => void;
+  onOpenNodeOnboardingHelp?: () => void;
 }
 
 export function ModelingPrimaryTables({
@@ -70,6 +73,7 @@ export function ModelingPrimaryTables({
   selectedConnectorId,
   onEditConnector,
   onDeleteConnector,
+  onOpenConnectorOnboardingHelp,
   isSpliceSubScreen,
   spliceFormMode,
   onOpenCreateSplice,
@@ -83,6 +87,7 @@ export function ModelingPrimaryTables({
   selectedSpliceId,
   onEditSplice,
   onDeleteSplice,
+  onOpenSpliceOnboardingHelp,
   isNodeSubScreen,
   nodeFormMode,
   onOpenCreateNode,
@@ -96,7 +101,8 @@ export function ModelingPrimaryTables({
   selectedNodeId,
   describeNode,
   onEditNode,
-  onDeleteNode
+  onDeleteNode,
+  onOpenNodeOnboardingHelp
 }: ModelingPrimaryTablesProps): ReactElement {
   const connectorRowRefs = useRef<Partial<Record<ConnectorId, HTMLTableRowElement | null>>>({});
   const spliceRowRefs = useRef<Partial<Record<SpliceId, HTMLTableRowElement | null>>>({});
@@ -168,10 +174,19 @@ export function ModelingPrimaryTables({
 
   return (
     <>
-      <article className="panel" hidden={!isConnectorSubScreen}>
+      <article className="panel" hidden={!isConnectorSubScreen} data-onboarding-panel="modeling-connectors">
         <header className="list-panel-header">
           <h2>Connectors</h2>
           <div className="list-panel-header-tools">
+            {onOpenConnectorOnboardingHelp !== undefined ? (
+              <button
+                type="button"
+                className="filter-chip onboarding-help-button"
+                onClick={onOpenConnectorOnboardingHelp}
+              >
+                Help
+              </button>
+            ) : null}
             <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
               {([
                 ["all", "All"],
@@ -274,10 +289,19 @@ export function ModelingPrimaryTables({
         </div>
       </article>
 
-      <article className="panel" hidden={!isSpliceSubScreen}>
+      <article className="panel" hidden={!isSpliceSubScreen} data-onboarding-panel="modeling-splices">
         <header className="list-panel-header">
           <h2>Splices</h2>
           <div className="list-panel-header-tools">
+            {onOpenSpliceOnboardingHelp !== undefined ? (
+              <button
+                type="button"
+                className="filter-chip onboarding-help-button"
+                onClick={onOpenSpliceOnboardingHelp}
+              >
+                Help
+              </button>
+            ) : null}
             <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
               {([
                 ["all", "All"],
@@ -380,10 +404,19 @@ export function ModelingPrimaryTables({
         </div>
       </article>
 
-      <article className="panel" hidden={!isNodeSubScreen}>
+      <article className="panel" hidden={!isNodeSubScreen} data-onboarding-panel="modeling-nodes">
         <header className="list-panel-header">
           <h2>Nodes</h2>
           <div className="list-panel-header-tools">
+            {onOpenNodeOnboardingHelp !== undefined ? (
+              <button
+                type="button"
+                className="filter-chip onboarding-help-button"
+                onClick={onOpenNodeOnboardingHelp}
+              >
+                Help
+              </button>
+            ) : null}
             <div className="chip-group list-panel-filters" role="group" aria-label="Node kind filter">
               {([
                 ["all", "All"],

@@ -33,6 +33,7 @@ import {
 import { appStore } from "./store";
 import { appUiModules } from "./components/appUiModules";
 import { AppShellLayout } from "./components/layout/AppShellLayout";
+import { OnboardingModal } from "./components/onboarding/OnboardingModal";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useCanvasState } from "./hooks/useCanvasState";
 import { useAppControllerCanvasDisplayState } from "./hooks/useAppControllerCanvasDisplayState";
@@ -81,6 +82,13 @@ import {
   NETWORK_VIEW_WIDTH
 } from "./lib/app-utils-shared";
 import { createNodePositionMap } from "./lib/app-utils-layout";
+import {
+  ONBOARDING_STEPS,
+  getOnboardingStepById,
+  readOnboardingAutoOpenEnabled,
+  writeOnboardingAutoOpenEnabled,
+  type OnboardingStepId
+} from "./lib/onboarding";
 import type {
   AppProps,
   NodePosition,
@@ -268,6 +276,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const operationsPanelRef = useRef<HTMLDivElement | null>(null);
   const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
   const deferredInstallPromptRef = useRef<BeforeInstallPromptEventLike | null>(null);
+  const onboardingAutoOpenAttemptedRef = useRef(false);
 
   const selectionEntities = useAppControllerSelectionEntities({ state });
   const {
@@ -300,6 +309,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isSettingsScreen,
     activeScreenRef
   } = useWorkspaceNavigation();
+  const [onboardingModalMode, setOnboardingModalMode] = useState<"full" | "single">("full");
+  const [onboardingStepIndex, setOnboardingStepIndex] = useState(0);
+  const [onboardingSingleStepId, setOnboardingSingleStepId] = useState<OnboardingStepId>("networkScope");
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabled] = useState<boolean>(() => readOnboardingAutoOpenEnabled());
   const {
     isInstallPromptAvailable,
     isPwaUpdateReady,
@@ -388,6 +402,111 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     connectorMap,
     spliceMap
   });
+
+  const setOnboardingAutoOpenEnabledPersisted = useCallback((enabled: boolean) => {
+    setOnboardingAutoOpenEnabled(enabled);
+    writeOnboardingAutoOpenEnabled(enabled);
+  }, []);
+
+  const openFullOnboarding = useCallback(() => {
+    setOnboardingModalMode("full");
+    setOnboardingStepIndex(0);
+    setIsOnboardingOpen(true);
+  }, []);
+
+  const openSingleStepOnboarding = useCallback((stepId: OnboardingStepId) => {
+    setOnboardingModalMode("single");
+    setOnboardingSingleStepId(stepId);
+    setIsOnboardingOpen(true);
+  }, []);
+
+  useEffect(() => {
+    if (onboardingAutoOpenAttemptedRef.current) {
+      return;
+    }
+    onboardingAutoOpenAttemptedRef.current = true;
+    if (!onboardingAutoOpenEnabled) {
+      return;
+    }
+    openFullOnboarding();
+  }, [onboardingAutoOpenEnabled, openFullOnboarding]);
+
+  const focusOnboardingTargetPanel = useCallback((panelSelector: string) => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    let attempts = 0;
+    const tryFocus = () => {
+      const panel = document.querySelector(panelSelector);
+      if (panel instanceof HTMLElement) {
+        panel.scrollIntoView({ block: "start", behavior: "smooth" });
+        const focusTarget =
+          panel.querySelector<HTMLElement>("button, [tabindex], input, select, textarea") ??
+          panel.querySelector<HTMLElement>("h2");
+        focusTarget?.focus?.();
+        return;
+      }
+
+      attempts += 1;
+      if (attempts < 10 && typeof window !== "undefined") {
+        window.requestAnimationFrame(tryFocus);
+      }
+    };
+
+    if (typeof window !== "undefined") {
+      window.requestAnimationFrame(tryFocus);
+    } else {
+      tryFocus();
+    }
+  }, []);
+
+  const activeOnboardingStep =
+    onboardingModalMode === "full" ? ONBOARDING_STEPS[onboardingStepIndex] : getOnboardingStepById(onboardingSingleStepId);
+
+  const isOnboardingStepAlreadyInContext =
+    activeOnboardingStep !== undefined &&
+    activeScreen === activeOnboardingStep.target.screen &&
+    (activeOnboardingStep.target.subScreen === undefined || activeSubScreen === activeOnboardingStep.target.subScreen);
+
+  const onboardingTargetActionLabel =
+    activeOnboardingStep === undefined
+      ? "Open target"
+      : isOnboardingStepAlreadyInContext
+        ? `Scroll to ${activeOnboardingStep.target.panelLabel}`
+        : `Open ${activeOnboardingStep.target.panelLabel}`;
+
+  const handleOnboardingOpenTarget = useCallback(() => {
+    if (activeOnboardingStep === undefined) {
+      return;
+    }
+
+    if (activeOnboardingStep.target.screen === "networkScope") {
+      setActiveScreen("networkScope");
+    } else {
+      setActiveScreen("modeling");
+      if (activeOnboardingStep.target.subScreen !== undefined) {
+        setActiveSubScreen(activeOnboardingStep.target.subScreen);
+      }
+    }
+
+    focusOnboardingTargetPanel(activeOnboardingStep.target.panelSelector);
+  }, [activeOnboardingStep, focusOnboardingTargetPanel, setActiveScreen, setActiveSubScreen]);
+
+  const handleOnboardingNext = useCallback(() => {
+    if (onboardingModalMode !== "full") {
+      setIsOnboardingOpen(false);
+      return;
+    }
+
+    setOnboardingStepIndex((current) => {
+      if (current >= ONBOARDING_STEPS.length - 1) {
+        setIsOnboardingOpen(false);
+        return current;
+      }
+      return current + 1;
+    });
+  }, [onboardingModalMode]);
 
   useEffect(() => {
     setManualNodePositions({} as Record<NodeId, NodePosition>);
@@ -1276,6 +1395,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         handleWorkspaceScreenChange("analysis");
       }}
       onOpenValidation={() => handleWorkspaceScreenChange("validation")}
+      onOpenOnboardingHelp={openFullOnboarding}
     />
   );
   const shouldIncludeNetworkSummaryPanel = hasActiveNetwork && (isModelingScreen || isAnalysisScreen);
@@ -1385,6 +1505,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         describeWireEndpoint,
         describeWireEndpointId
       },
+      onboardingHelp: {
+        openConnectorSpliceStep: () => openSingleStepOnboarding("connectorSpliceLibrary"),
+        openNodeStep: () => openSingleStepOnboarding("nodes"),
+        openSegmentStep: () => openSingleStepOnboarding("segments"),
+        openWireStep: () => openSingleStepOnboarding("wires")
+      },
       describeNode,
       nodeLabelById,
       networkSummaryPanel,
@@ -1436,6 +1562,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         handleCloseNetworkForm,
         networkTechnicalIdAlreadyUsed,
         handleSubmitNetworkForm,
+        onOpenOnboardingHelp: () => openSingleStepOnboarding("networkScope"),
         formState: {
           newNetworkName,
           setNewNetworkName,
@@ -1557,7 +1684,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     });
 
   return (
-    <AppShellLayout
+    <>
+      <AppShellLayout
       appShellClassName={appShellClassName}
       workspaceShellStyle={workspaceShellStyle}
       appRepositoryUrl={APP_REPOSITORY_URL}
@@ -1626,6 +1754,23 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isInspectorHidden={isInspectorHidden}
       isInspectorOpen={isInspectorOpen}
       inspectorContextPanel={inspectorContextPanel}
-    />
+      />
+      {activeOnboardingStep !== undefined ? (
+        <OnboardingModal
+          isOpen={isOnboardingOpen}
+          mode={onboardingModalMode}
+          step={activeOnboardingStep}
+          stepIndex={onboardingModalMode === "full" ? onboardingStepIndex : ONBOARDING_STEPS.findIndex((step) => step.id === activeOnboardingStep.id)}
+          totalSteps={ONBOARDING_STEPS.length}
+          autoOpenEnabled={onboardingAutoOpenEnabled}
+          onSetAutoOpenEnabled={setOnboardingAutoOpenEnabledPersisted}
+          onClose={() => setIsOnboardingOpen(false)}
+          onNext={handleOnboardingNext}
+          canGoNext={onboardingModalMode !== "full" || onboardingStepIndex < ONBOARDING_STEPS.length - 1}
+          onOpenTarget={handleOnboardingOpenTarget}
+          openTargetLabel={onboardingTargetActionLabel}
+        />
+      ) : null}
+    </>
   );
 }

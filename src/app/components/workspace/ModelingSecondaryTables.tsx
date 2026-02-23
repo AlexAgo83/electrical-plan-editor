@@ -25,6 +25,7 @@ interface ModelingSecondaryTablesProps {
   selectedWireRouteSegmentIds: Set<SegmentId>;
   onEditSegment: (segment: Segment) => void;
   onDeleteSegment: (segmentId: SegmentId) => void;
+  onOpenSegmentOnboardingHelp?: () => void;
   isWireSubScreen: boolean;
   wireFormMode: "idle" | "create" | "edit";
   onOpenCreateWire: () => void;
@@ -42,6 +43,7 @@ interface ModelingSecondaryTablesProps {
   describeWireEndpointId: (endpoint: Wire["endpointA"]) => string;
   onEditWire: (wire: Wire) => void;
   onDeleteWire: (wireId: WireId) => void;
+  onOpenWireOnboardingHelp?: () => void;
 }
 
 export function ModelingSecondaryTables({
@@ -59,6 +61,7 @@ export function ModelingSecondaryTables({
   selectedWireRouteSegmentIds,
   onEditSegment,
   onDeleteSegment,
+  onOpenSegmentOnboardingHelp,
   isWireSubScreen,
   wireFormMode,
   onOpenCreateWire,
@@ -75,7 +78,8 @@ export function ModelingSecondaryTables({
   describeWireEndpoint,
   describeWireEndpointId,
   onEditWire,
-  onDeleteWire
+  onDeleteWire,
+  onOpenWireOnboardingHelp
 }: ModelingSecondaryTablesProps): ReactElement {
   const segmentRowRefs = useRef<Partial<Record<SegmentId, HTMLTableRowElement | null>>>({});
   const wireRowRefs = useRef<Partial<Record<WireId, HTMLTableRowElement | null>>>({});
@@ -126,10 +130,19 @@ export function ModelingSecondaryTables({
 
   return (
     <>
-      <article className="panel" hidden={!isSegmentSubScreen}>
+      <article className="panel" hidden={!isSegmentSubScreen} data-onboarding-panel="modeling-segments">
         <header className="list-panel-header">
           <h2>Segments</h2>
           <div className="list-panel-header-tools">
+            {onOpenSegmentOnboardingHelp !== undefined ? (
+              <button
+                type="button"
+                className="filter-chip onboarding-help-button"
+                onClick={onOpenSegmentOnboardingHelp}
+              >
+                Help
+              </button>
+            ) : null}
             <div className="chip-group list-panel-filters" role="group" aria-label="Segment sub-network filter">
               {([
                 ["all", "All"],
@@ -241,10 +254,19 @@ export function ModelingSecondaryTables({
         </div>
       </article>
 
-      <article className="panel" hidden={!isWireSubScreen}>
+      <article className="panel" hidden={!isWireSubScreen} data-onboarding-panel="modeling-wires">
         <header className="list-panel-header">
           <h2>Wires</h2>
           <div className="list-panel-header-tools">
+            {onOpenWireOnboardingHelp !== undefined ? (
+              <button
+                type="button"
+                className="filter-chip onboarding-help-button"
+                onClick={onOpenWireOnboardingHelp}
+              >
+                Help
+              </button>
+            ) : null}
             <div className="list-panel-header-tools-row">
               <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
                 {([

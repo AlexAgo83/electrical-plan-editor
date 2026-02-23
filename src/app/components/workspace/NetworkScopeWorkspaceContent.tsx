@@ -39,6 +39,7 @@ interface NetworkScopeWorkspaceContentProps {
   handleSubmitNetworkForm: (event: FormEvent<HTMLFormElement>) => void;
   focusRequestedNetworkId: NetworkId | null;
   focusRequestedNetworkToken: number;
+  onOpenOnboardingHelp?: () => void;
 }
 
 export function NetworkScopeWorkspaceContent({
@@ -64,7 +65,8 @@ export function NetworkScopeWorkspaceContent({
   networkTechnicalIdAlreadyUsed,
   handleSubmitNetworkForm,
   focusRequestedNetworkId,
-  focusRequestedNetworkToken
+  focusRequestedNetworkToken,
+  onOpenOnboardingHelp
 }: NetworkScopeWorkspaceContentProps): ReactElement {
   const isCreateMode = networkFormMode === "create";
   const isEditMode = networkFormMode === "edit";
@@ -145,10 +147,19 @@ export function NetworkScopeWorkspaceContent({
 
   return (
     <section className="panel-grid network-scope-grid">
-      <section className="panel network-scope-panel">
+      <section className="panel network-scope-panel" data-onboarding-panel="network-scope">
         <header className="list-panel-header">
           <h2>Network Scope</h2>
           <div className="list-panel-header-tools">
+            {onOpenOnboardingHelp !== undefined ? (
+              <button
+                type="button"
+                className="filter-chip onboarding-help-button"
+                onClick={onOpenOnboardingHelp}
+              >
+                Help
+              </button>
+            ) : null}
             <button
               type="button"
               className="filter-chip table-export-button"
