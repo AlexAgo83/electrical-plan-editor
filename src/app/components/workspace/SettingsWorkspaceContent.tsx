@@ -362,7 +362,7 @@ export function SettingsWorkspaceContent({
           </span>
         </div>
         <div className="row-actions settings-actions">
-          <button type="button" onClick={handleRecreateSampleNetwork} disabled={!isCurrentWorkspaceEmpty}>
+          <button type="button" onClick={handleRecreateSampleNetwork}>
             Recreate sample network
           </button>
           <button type="button" onClick={handleRecreateValidationIssuesSampleNetwork}>
