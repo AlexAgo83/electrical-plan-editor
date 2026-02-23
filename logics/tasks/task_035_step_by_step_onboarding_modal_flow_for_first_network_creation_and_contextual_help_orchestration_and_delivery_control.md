@@ -17,6 +17,16 @@ Orchestration task for `req_035`. This task coordinates delivery of a guided onb
 - step CTAs that navigate to the right screen/panel and scroll to the target context,
 - modal visual/accessibility polish and regression coverage.
 
+Confirmed implementation decisions for this request:
+- Onboarding UI chrome labels are English-only (progress/actions/checkbox wording).
+- Full-flow re-open resets to step 1 (no resume state).
+- Auto-open is enabled by default for both new and existing users until opt-out.
+- The auto-open opt-out checkbox is available in both full-flow and single-step contextual modals.
+- Step CTA remains available when already in the relevant context and adapts to a context action (recommended: `Scroll to panel`) rather than disappearing.
+- Step CTA navigation/scroll is best-effort and non-blocking if a target panel is temporarily unavailable.
+- Step 2 contextual help is reachable from both `Connectors` and `Splices` panel headers and opens the same shared step content.
+- Contextual info/help buttons use a standardized panel-header placement pattern.
+
 Backlog scope covered:
 - `item_211_onboarding_modal_flow_shell_step_state_and_dismissable_sequence_controller.md`
 - `item_212_onboarding_step_content_model_authored_en_copy_and_shared_single_step_full_flow_rendering.md`
@@ -79,6 +89,8 @@ Backlog scope covered:
   - Persisted opt-out behavior can race with app-load auto-open timing and lazy UI mounting.
   - Panel scrolling after navigation may be flaky without stable target anchors and timing guards.
   - Contextual info buttons may clutter panel headers if placement is not standardized.
+  - EN-only UI chrome labels may drift if action/progress/checkbox text is partially reused from existing localized labels.
+  - Step CTA behavior can feel inconsistent if "already on target" mode hides the action instead of adapting it.
   - Onboarding copy/emphasis rendering may become hard to maintain if descriptions are encoded as raw HTML instead of structured content.
 - Mitigation strategy:
   - Build a shared onboarding controller + content model before wiring entry points.
@@ -86,6 +98,8 @@ Backlog scope covered:
   - Use stable target anchors/refs and deferred scroll sequencing for navigation CTA.
   - Reuse existing icons and dialog patterns for consistency and lower implementation risk.
   - Add targeted UI tests for persistence + entry points + navigation CTA behavior early.
+  - Define explicit English label constants/copy for progress/actions/checkbox in the shared onboarding renderer.
+  - Standardize contextual info-button placement in panel headers before broad wiring.
 - Validation snapshot (kickoff):
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅ (request + planning artifacts)
 - Delivery snapshot:
@@ -99,6 +113,11 @@ Backlog scope covered:
   - AC6 -> `item_212`, `item_216`, `item_218`, `item_219`
   - AC7 -> `item_212`, `item_217`, `item_218`, `item_219`
   - AC8 -> `item_213`, `item_214`, `item_215`, `item_216`, `item_217`, `item_218`, `item_219`
+  - AC9 -> `item_211`, `item_212`, `item_217`, `item_218`, `item_219`
+  - AC10 -> `item_211`, `item_213`, `item_215`, `item_217`, `item_218`, `item_219`
+  - AC11 -> `item_216`, `item_218`, `item_219`
+  - AC12 -> `item_212`, `item_215`, `item_218`, `item_219`
+  - AC13 -> `item_215`, `item_217`, `item_218`, `item_219`
 
 # References
 - `logics/request/req_035_step_by_step_onboarding_modal_flow_for_first_network_creation_and_contextual_help.md`

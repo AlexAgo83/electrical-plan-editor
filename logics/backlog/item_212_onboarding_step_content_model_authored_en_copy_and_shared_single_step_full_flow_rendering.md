@@ -19,14 +19,16 @@ The onboarding requires authored English step titles/descriptions and must suppo
     - single-step contextual help modal
   - Include structure for title, description, asset/icon, and target screen/panel metadata.
   - Ensure descriptions support bold emphasis for important words.
+  - Define English UI chrome text used by shared onboarding rendering (progress/actions/checkbox wording) or a shared copy source for it.
 - Out:
   - Auto-open preference persistence.
   - Trigger/button wiring in Home or contextual panels.
 
 # Acceptance criteria
-- Final onboarding business content is authored in English (not literal FR copy).
+- Final onboarding business content is authored in English (not a literal source-copy translation).
 - Step content is stored/reused in a shared model for both sequence and single-step modes.
 - Step rendering supports title, description, icon/asset, and emphasis formatting needs.
+- Shared onboarding rendering supports English-only UI chrome labels.
 
 # Priority
 - Impact: High.
@@ -35,11 +37,10 @@ The onboarding requires authored English step titles/descriptions and must suppo
 # Notes
 - Dependencies: `req_035`, item_211.
 - Blocks: item_214, item_215, item_216, item_217, item_218, item_219.
-- Related AC: AC1, AC4, AC6, AC7.
+- Related AC: AC1, AC4, AC6, AC7, AC9, AC12.
 - References:
   - `logics/request/req_035_step_by_step_onboarding_modal_flow_for_first_network_creation_and_contextual_help.md`
   - `src/app/components/workspace/HomeWorkspaceContent.tsx`
   - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`
   - `src/app/components/workspace/ModelingPrimaryTables.tsx`
   - `src/app/components/workspace/ModelingSecondaryTables.tsx`
-

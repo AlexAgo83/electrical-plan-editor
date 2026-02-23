@@ -13,10 +13,12 @@ The onboarding feature requires a reusable modal flow controller that supports a
 # Scope
 - In:
   - Implement onboarding modal shell/controller state for a 5-step sequence.
-  - Support progress indicator (`Etape X sur 5`) and `Suivant` navigation.
+  - Support progress indicator (`Step X of 5`) and `Next` navigation.
   - Support close/dismiss at any step without corrupting app state.
   - Define flow open/close APIs reusable by auto-open, Home Help relaunch, and contextual single-step modals.
-  - Ensure reopening full flow resets to step 1 unless explicitly specified otherwise.
+  - Ensure reopening full flow resets to step 1.
+  - Support single-step contextual modal mode using the same shell/controller infrastructure.
+  - Ensure the shell can render the auto-open opt-out checkbox in both full-flow and single-step modes.
 - Out:
   - Persisted auto-open preference wiring.
   - Step content authoring/copy.
@@ -26,6 +28,7 @@ The onboarding feature requires a reusable modal flow controller that supports a
 - A full onboarding modal flow can open, advance through steps, and close safely.
 - Progress label and next-step action are present for sequence mode.
 - Flow controller can be invoked externally (not hard-wired to one screen only).
+- Shell/controller supports both full-flow and single-step modal variants.
 
 # Priority
 - Impact: High.
@@ -34,9 +37,8 @@ The onboarding feature requires a reusable modal flow controller that supports a
 # Notes
 - Dependencies: `req_035`.
 - Blocks: item_212, item_213, item_214, item_215, item_216, item_217, item_218, item_219.
-- Related AC: AC1, AC2.
+- Related AC: AC1, AC2, AC9, AC10.
 - References:
   - `logics/request/req_035_step_by_step_onboarding_modal_flow_for_first_network_creation_and_contextual_help.md`
   - `src/app/AppController.tsx`
   - `src/app/components/layout/AppShellLayout.tsx`
-

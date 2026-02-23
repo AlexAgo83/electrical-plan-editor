@@ -18,6 +18,10 @@ Onboarding spans modal state, persistence, Home entry points, contextual help tr
   - Test contextual single-step help modal triggers.
   - Test onboarding step CTA navigation to target screen/panel (including scroll behavior as feasible).
   - Cover at least one modal content rendering assertion (title/progress/actions).
+  - Cover English-only UI chrome labels (progress/actions/checkbox wording).
+  - Cover single-step modal opt-out checkbox presence/behavior.
+  - Cover CTA adapted behavior when already on the target screen/context (if implemented in UI as specified).
+  - Cover connectors + splices contextual entry points mapping to the same shared step.
 - Out:
   - Full CI closure reporting (handled separately).
   - Exhaustive visual snapshot coverage unless already part of project strategy.
@@ -25,6 +29,7 @@ Onboarding spans modal state, persistence, Home entry points, contextual help tr
 # Acceptance criteria
 - Automated tests cover key onboarding behaviors: auto-open, opt-out persistence, relaunch, contextual step open, and navigation CTA.
 - Tests validate regressions on at least Home + one modeling panel context.
+- Tests cover English-only onboarding chrome labels and shared Step 2 contextual entry points.
 
 # Priority
 - Impact: Very High.
@@ -33,10 +38,9 @@ Onboarding spans modal state, persistence, Home entry points, contextual help tr
 # Notes
 - Dependencies: `req_035`, item_213, item_214, item_215, item_216, item_217.
 - Blocks: item_219.
-- Related AC: AC3, AC4, AC5, AC6, AC7, AC8.
+- Related AC: AC3, AC4, AC5, AC6, AC7, AC8, AC9, AC10, AC11, AC12, AC13.
 - References:
   - `logics/request/req_035_step_by_step_onboarding_modal_flow_for_first_network_creation_and_contextual_help.md`
   - `src/tests/app.ui.home.spec.tsx`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
   - `src/tests/persistence.localStorage.spec.ts`
-
