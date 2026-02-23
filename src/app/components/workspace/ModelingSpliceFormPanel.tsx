@@ -12,6 +12,8 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     setSpliceName,
     spliceTechnicalId,
     setSpliceTechnicalId,
+    spliceManufacturerReference,
+    setSpliceManufacturerReference,
     spliceTechnicalIdAlreadyUsed,
     portCount,
     setPortCount,
@@ -34,6 +36,15 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     <label>
       Technical ID
       <input value={spliceTechnicalId} onChange={(event) => setSpliceTechnicalId(event.target.value)} placeholder="S-001" required />
+    </label>
+    <label>
+      Manufacturer reference
+      <input
+        value={spliceManufacturerReference}
+        onChange={(event) => setSpliceManufacturerReference(event.target.value)}
+        placeholder="e.g. TE-1-967616-1"
+        maxLength={120}
+      />
     </label>
     {spliceTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
     <label>

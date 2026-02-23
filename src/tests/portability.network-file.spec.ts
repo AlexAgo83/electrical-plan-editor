@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { NetworkId } from "../core/entities";
+import type { ConnectorId, NetworkId, SpliceId } from "../core/entities";
 import {
   buildNetworkFilePayload,
   NETWORK_FILE_PAYLOAD_KIND,
@@ -11,6 +11,14 @@ import { appActions, appReducer, createEmptyNetworkScopedState, createInitialSta
 
 function asNetworkId(value: string): NetworkId {
   return value as NetworkId;
+}
+
+function asConnectorId(value: string): ConnectorId {
+  return value as ConnectorId;
+}
+
+function asSpliceId(value: string): SpliceId {
+  return value as SpliceId;
 }
 
 describe("network file portability", () => {
@@ -89,6 +97,39 @@ describe("network file portability", () => {
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.sectionMm2).toBe(0.5);
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.primaryColorId).toBeNull();
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.secondaryColorId).toBeNull();
+  });
+
+  it("normalizes imported connector and splice manufacturer references", () => {
+    const seeded = createSampleNetworkState();
+    const payload = buildNetworkFilePayload(seeded, "active", [], "2026-02-21T10:17:00.000Z");
+    const rawPayload = JSON.parse(serializeNetworkFilePayload(payload)) as Record<string, unknown>;
+    const rawBundles = rawPayload.networks as Array<Record<string, unknown>>;
+    const rawState = rawBundles[0]?.state as Record<string, unknown>;
+    const rawConnectors = rawState.connectors as { byId: Record<string, Record<string, unknown>>; allIds: string[] };
+    const rawSplices = rawState.splices as { byId: Record<string, Record<string, unknown>>; allIds: string[] };
+    const firstConnectorId = rawConnectors.allIds[0];
+    const firstSpliceId = rawSplices.allIds[0];
+    expect(firstConnectorId).toBeDefined();
+    expect(firstSpliceId).toBeDefined();
+    if (firstConnectorId === undefined || firstSpliceId === undefined) {
+      throw new Error("Expected exported sample payload to include connectors and splices.");
+    }
+
+    rawConnectors.byId[firstConnectorId] = {
+      ...rawConnectors.byId[firstConnectorId],
+      manufacturerReference: ` ${"A".repeat(130)} `
+    };
+    rawSplices.byId[firstSpliceId] = {
+      ...rawSplices.byId[firstSpliceId],
+      manufacturerReference: " "
+    };
+
+    const parsed = parseNetworkFilePayload(JSON.stringify(rawPayload));
+    expect(parsed.error).toBeNull();
+    expect(parsed.payload).not.toBeNull();
+    const normalizedState = parsed.payload?.networks[0]?.state;
+    expect(normalizedState?.connectors.byId[asConnectorId(firstConnectorId)]?.manufacturerReference).toBe("A".repeat(120));
+    expect(normalizedState?.splices.byId[asSpliceId(firstSpliceId)]?.manufacturerReference).toBeUndefined();
   });
 
   it("resolves import conflicts with deterministic suffixes", () => {

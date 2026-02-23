@@ -26,6 +26,8 @@ interface UseConnectorHandlersParams {
   setConnectorName: (value: string) => void;
   connectorTechnicalId: string;
   setConnectorTechnicalId: (value: string) => void;
+  connectorManufacturerReference: string;
+  setConnectorManufacturerReference: (value: string) => void;
   cavityCount: string;
   setCavityCount: (value: string) => void;
   setConnectorFormError: (value: string | null) => void;
@@ -45,6 +47,8 @@ export function useConnectorHandlers({
   setConnectorName,
   connectorTechnicalId,
   setConnectorTechnicalId,
+  connectorManufacturerReference,
+  setConnectorManufacturerReference,
   cavityCount,
   setCavityCount,
   setConnectorFormError,
@@ -60,6 +64,7 @@ export function useConnectorHandlers({
     setConnectorTechnicalId(
       suggestNextConnectorTechnicalId(Object.values(state.connectors.byId).map((connector) => connector.technicalId))
     );
+    setConnectorManufacturerReference("");
     setCavityCount("4");
     setConnectorFormError(null);
   }
@@ -69,6 +74,7 @@ export function useConnectorHandlers({
     setEditingConnectorId(null);
     setConnectorName("");
     setConnectorTechnicalId("");
+    setConnectorManufacturerReference("");
     setCavityCount("4");
     setConnectorFormError(null);
   }
@@ -83,6 +89,7 @@ export function useConnectorHandlers({
     setEditingConnectorId(connector.id);
     setConnectorName(connector.name);
     setConnectorTechnicalId(connector.technicalId);
+    setConnectorManufacturerReference(connector.manufacturerReference ?? "");
     setCavityCount(String(connector.cavityCount));
     dispatchAction(appActions.select({ kind: "connector", id: connector.id }));
   }
@@ -92,6 +99,11 @@ export function useConnectorHandlers({
 
     const trimmedName = connectorName.trim();
     const trimmedTechnicalId = connectorTechnicalId.trim();
+    const normalizedManufacturerReferenceRaw = connectorManufacturerReference.trim();
+    if (normalizedManufacturerReferenceRaw.length > 120) {
+      setConnectorFormError("Manufacturer reference must be 120 characters or fewer.");
+      return;
+    }
     const normalizedCavityCount = toPositiveInteger(cavityCount);
 
     if (trimmedName.length === 0 || trimmedTechnicalId.length === 0 || normalizedCavityCount < 1) {
@@ -114,6 +126,8 @@ export function useConnectorHandlers({
         id: connectorId,
         name: trimmedName,
         technicalId: trimmedTechnicalId,
+        manufacturerReference:
+          normalizedManufacturerReferenceRaw.length === 0 ? undefined : normalizedManufacturerReferenceRaw,
         cavityCount: normalizedCavityCount
       })
     );

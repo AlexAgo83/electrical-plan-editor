@@ -90,6 +90,61 @@ function normalizeWireEntityState(candidate: EntityState<Wire, WireId>): EntityS
   };
 }
 
+function normalizeManufacturerReference(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return undefined;
+  }
+
+  return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
+}
+
+function normalizeConnectorEntityState(
+  candidate: EntityState<Connector, ConnectorId>
+): EntityState<Connector, ConnectorId> {
+  const byId = {} as EntityState<Connector, ConnectorId>["byId"];
+  for (const connectorId of candidate.allIds) {
+    const connector = candidate.byId[connectorId];
+    if (connector === undefined) {
+      continue;
+    }
+
+    byId[connectorId] = {
+      ...connector,
+      manufacturerReference: normalizeManufacturerReference((connector as Partial<Connector>).manufacturerReference)
+    };
+  }
+
+  return {
+    allIds: [...candidate.allIds],
+    byId
+  };
+}
+
+function normalizeSpliceEntityState(candidate: EntityState<Splice, SpliceId>): EntityState<Splice, SpliceId> {
+  const byId = {} as EntityState<Splice, SpliceId>["byId"];
+  for (const spliceId of candidate.allIds) {
+    const splice = candidate.byId[spliceId];
+    if (splice === undefined) {
+      continue;
+    }
+
+    byId[spliceId] = {
+      ...splice,
+      manufacturerReference: normalizeManufacturerReference((splice as Partial<Splice>).manufacturerReference)
+    };
+  }
+
+  return {
+    allIds: [...candidate.allIds],
+    byId
+  };
+}
+
 function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | null {
   if (!isRecord(candidate)) {
     return null;
@@ -108,8 +163,8 @@ function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | n
   }
 
   return {
-    connectors: candidate.connectors as NetworkScopedState["connectors"],
-    splices: candidate.splices as NetworkScopedState["splices"],
+    connectors: normalizeConnectorEntityState(candidate.connectors as EntityState<Connector, ConnectorId>),
+    splices: normalizeSpliceEntityState(candidate.splices as EntityState<Splice, SpliceId>),
     nodes: candidate.nodes as NetworkScopedState["nodes"],
     segments: candidate.segments as NetworkScopedState["segments"],
     wires: normalizeWireEntityState(candidate.wires as EntityState<Wire, WireId>),
@@ -163,6 +218,8 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     ...(candidate as unknown as AppState),
     schemaVersion: APP_SCHEMA_VERSION,
     networkStates: normalizedNetworkStates,
+    connectors: normalizeConnectorEntityState(candidate.connectors as EntityState<Connector, ConnectorId>),
+    splices: normalizeSpliceEntityState(candidate.splices as EntityState<Splice, SpliceId>),
     wires: normalizeWireEntityState(candidate.wires as EntityState<Wire, WireId>),
     nodePositions: normalizeNodePositions(candidate.nodePositions)
   } satisfies AppState;
@@ -373,8 +430,8 @@ function migrateLegacySingleNetworkStateToCurrent(
 ): AppState {
   const seeded = createInitialState();
   const scoped: NetworkScopedState = {
-    connectors: legacy.connectors,
-    splices: legacy.splices,
+    connectors: normalizeConnectorEntityState(legacy.connectors),
+    splices: normalizeSpliceEntityState(legacy.splices),
     nodes: legacy.nodes,
     segments: legacy.segments,
     wires: normalizeWireEntityState(legacy.wires),

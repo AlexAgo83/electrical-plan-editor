@@ -11,6 +11,8 @@ export interface ModelingFormsColumnProps {
   setConnectorName: (value: string) => void;
   connectorTechnicalId: string;
   setConnectorTechnicalId: (value: string) => void;
+  connectorManufacturerReference: string;
+  setConnectorManufacturerReference: (value: string) => void;
   connectorTechnicalIdAlreadyUsed: boolean;
   cavityCount: string;
   setCavityCount: (value: string) => void;
@@ -24,6 +26,8 @@ export interface ModelingFormsColumnProps {
   setSpliceName: (value: string) => void;
   spliceTechnicalId: string;
   setSpliceTechnicalId: (value: string) => void;
+  spliceManufacturerReference: string;
+  setSpliceManufacturerReference: (value: string) => void;
   spliceTechnicalIdAlreadyUsed: boolean;
   portCount: string;
   setPortCount: (value: string) => void;

@@ -21,6 +21,7 @@ export interface Connector {
   name: string;
   technicalId: string;
   cavityCount: number;
+  manufacturerReference?: string;
   cableCalloutPosition?: {
     x: number;
     y: number;
@@ -32,6 +33,7 @@ export interface Splice {
   name: string;
   technicalId: string;
   portCount: number;
+  manufacturerReference?: string;
   cableCalloutPosition?: {
     x: number;
     y: number;

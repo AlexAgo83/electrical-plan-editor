@@ -231,6 +231,91 @@ describe("localStorage persistence adapter", () => {
     }
   });
 
+  it("normalizes persisted connector and splice manufacturer references", () => {
+    const state = createSampleNetworkState();
+    const nowIso = "2026-02-20T11:30:00.000Z";
+    const connectorId = state.connectors.allIds[0];
+    const spliceId = state.splices.allIds[0];
+    expect(connectorId).toBeDefined();
+    expect(spliceId).toBeDefined();
+    if (connectorId === undefined || spliceId === undefined) {
+      throw new Error("Expected sample network to include at least one connector and one splice.");
+    }
+
+    const activeNetworkId = state.activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected an active network.");
+    }
+
+    const legacyStateWithRawRefs: AppState = {
+      ...state,
+      connectors: {
+        ...state.connectors,
+        byId: {
+          ...state.connectors.byId,
+          [connectorId]: {
+            ...state.connectors.byId[connectorId]!,
+            manufacturerReference: "  TE-1-967616-1  "
+          }
+        }
+      },
+      splices: {
+        ...state.splices,
+        byId: {
+          ...state.splices.byId,
+          [spliceId]: {
+            ...state.splices.byId[spliceId]!,
+            manufacturerReference: " "
+          }
+        }
+      },
+      networkStates: {
+        ...state.networkStates,
+        [activeNetworkId]: {
+          ...state.networkStates[activeNetworkId]!,
+          connectors: {
+            ...state.networkStates[activeNetworkId]!.connectors,
+            byId: {
+              ...state.networkStates[activeNetworkId]!.connectors.byId,
+              [connectorId]: {
+                ...state.networkStates[activeNetworkId]!.connectors.byId[connectorId]!,
+                manufacturerReference: ` ${"B".repeat(130)} `
+              }
+            }
+          },
+          splices: {
+            ...state.networkStates[activeNetworkId]!.splices,
+            byId: {
+              ...state.networkStates[activeNetworkId]!.splices.byId,
+              [spliceId]: {
+                ...state.networkStates[activeNetworkId]!.splices.byId[spliceId]!,
+                manufacturerReference: "  AMP/SEAL-42  "
+              }
+            }
+          }
+        }
+      }
+    };
+
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        schemaVersion: APP_SCHEMA_VERSION,
+        createdAtIso: "2026-02-01T08:00:00.000Z",
+        updatedAtIso: "2026-02-01T09:00:00.000Z",
+        state: legacyStateWithRawRefs
+      } satisfies PersistedStateSnapshotV1)
+    });
+
+    const loaded = loadState(storage, () => nowIso);
+    expect(loaded.connectors.byId[connectorId]?.manufacturerReference).toBe("B".repeat(120));
+    expect(loaded.splices.byId[spliceId]?.manufacturerReference).toBe("AMP/SEAL-42");
+
+    const loadedScoped = loaded.networkStates[activeNetworkId];
+    expect(loadedScoped?.connectors.byId[connectorId]?.manufacturerReference).toBe("B".repeat(120));
+    expect(loadedScoped?.splices.byId[spliceId]?.manufacturerReference).toBe("AMP/SEAL-42");
+  });
+
   it("migrates persisted schema payloads missing layout positions", () => {
     const state = createSampleState();
     const nowIso = "2026-02-20T11:00:00.000Z";

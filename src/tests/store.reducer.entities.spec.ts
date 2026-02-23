@@ -107,6 +107,36 @@ describe("appReducer entity lifecycle", () => {
     expect(second.ui.lastError).toBe("Connector technical ID 'C-1' is already used.");
   });
 
+  it("normalizes optional connector manufacturer references", () => {
+    const state = reduceAll([
+      appActions.upsertConnector({
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 2,
+        manufacturerReference: "  TE-1-967616-1  "
+      }),
+      appActions.upsertConnector({
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 2,
+        manufacturerReference: " "
+      }),
+      appActions.upsertConnector({
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 2,
+        manufacturerReference: `  ${"A".repeat(130)}  `
+      })
+    ]);
+
+    const connector = state.connectors.byId[asConnectorId("C1")];
+    expect(connector?.manufacturerReference).toHaveLength(120);
+    expect(connector?.manufacturerReference).toBe("A".repeat(120));
+  });
+
   it("enforces single occupancy per connector cavity", () => {
     const first = reduceAll([
       appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 4 }),
@@ -145,6 +175,36 @@ describe("appReducer entity lifecycle", () => {
 
     expect(second.splices.byId[asSpliceId("S2")]).toBeUndefined();
     expect(second.ui.lastError).toBe("Splice technical ID 'S-1' is already used.");
+  });
+
+  it("normalizes optional splice manufacturer references and allows duplicates across connector/splice", () => {
+    const state = reduceAll([
+      appActions.upsertConnector({
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 2,
+        manufacturerReference: " PN-123 "
+      }),
+      appActions.upsertSplice({
+        id: asSpliceId("S1"),
+        name: "Splice 1",
+        technicalId: "S-1",
+        portCount: 2,
+        manufacturerReference: " PN-123 "
+      }),
+      appActions.upsertSplice({
+        id: asSpliceId("S1"),
+        name: "Splice 1",
+        technicalId: "S-1",
+        portCount: 2,
+        manufacturerReference: ""
+      })
+    ]);
+
+    expect(state.connectors.byId[asConnectorId("C1")]?.manufacturerReference).toBe("PN-123");
+    expect(state.splices.byId[asSpliceId("S1")]?.manufacturerReference).toBeUndefined();
+    expect(state.ui.lastError).toBeNull();
   });
 
   it("enforces single occupancy per splice port", () => {

@@ -25,6 +25,19 @@ function hasDuplicateSpliceTechnicalId(state: AppState, spliceId: string, techni
   });
 }
 
+function normalizeManufacturerReference(value: string | undefined): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return undefined;
+  }
+
+  return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
+}
+
 function hasSpliceNodeReference(state: AppState, spliceId: string): boolean {
   return state.nodes.allIds.some((id) => {
     const node = state.nodes.byId[id];
@@ -74,7 +87,10 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
 
       return bumpRevision({
         ...clearLastError(state),
-        splices: upsertEntity(state.splices, action.payload)
+        splices: upsertEntity(state.splices, {
+          ...action.payload,
+          manufacturerReference: normalizeManufacturerReference(action.payload.manufacturerReference)
+        })
       });
     }
 

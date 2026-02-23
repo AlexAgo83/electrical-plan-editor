@@ -1,4 +1,4 @@
-import type { Network, NetworkId, NodeId, Wire, WireId } from "../../core/entities";
+import type { Connector, ConnectorId, Network, NetworkId, NodeId, Splice, SpliceId, Wire, WireId } from "../../core/entities";
 import { normalizeWireColorIds } from "../../core/cableColors";
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
@@ -96,6 +96,61 @@ function normalizeWiresEntityState(
   };
 }
 
+function normalizeManufacturerReference(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return undefined;
+  }
+
+  return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
+}
+
+function normalizeConnectorsEntityState(
+  connectors: NetworkScopedState["connectors"]
+): NetworkScopedState["connectors"] {
+  const byId = {} as Record<ConnectorId, Connector>;
+  for (const connectorId of connectors.allIds) {
+    const connector = connectors.byId[connectorId];
+    if (connector === undefined) {
+      continue;
+    }
+
+    byId[connectorId] = {
+      ...connector,
+      manufacturerReference: normalizeManufacturerReference((connector as Partial<Connector>).manufacturerReference)
+    };
+  }
+
+  return {
+    allIds: [...connectors.allIds],
+    byId
+  };
+}
+
+function normalizeSplicesEntityState(splices: NetworkScopedState["splices"]): NetworkScopedState["splices"] {
+  const byId = {} as Record<SpliceId, Splice>;
+  for (const spliceId of splices.allIds) {
+    const splice = splices.byId[spliceId];
+    if (splice === undefined) {
+      continue;
+    }
+
+    byId[spliceId] = {
+      ...splice,
+      manufacturerReference: normalizeManufacturerReference((splice as Partial<Splice>).manufacturerReference)
+    };
+  }
+
+  return {
+    allIds: [...splices.allIds],
+    byId
+  };
+}
+
 function isNetworkScopedState(value: unknown): value is NetworkScopedState {
   if (!isRecord(value)) {
     return false;
@@ -137,11 +192,11 @@ function normalizeScopedState(scoped: NetworkScopedState): NetworkScopedState {
   return {
     connectors: {
       allIds: [...scoped.connectors.allIds].sort((left, right) => left.localeCompare(right)),
-      byId: { ...scoped.connectors.byId }
+      byId: normalizeConnectorsEntityState(scoped.connectors).byId
     },
     splices: {
       allIds: [...scoped.splices.allIds].sort((left, right) => left.localeCompare(right)),
-      byId: { ...scoped.splices.byId }
+      byId: normalizeSplicesEntityState(scoped.splices).byId
     },
     nodes: {
       allIds: [...scoped.nodes.allIds].sort((left, right) => left.localeCompare(right)),
