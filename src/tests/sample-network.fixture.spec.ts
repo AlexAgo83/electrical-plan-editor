@@ -23,6 +23,10 @@ describe("sample network fixture", () => {
   it("creates a comprehensive deterministic sample state", () => {
     const state = createSampleNetworkState();
 
+    expect(state.networks.allIds.length).toBeGreaterThanOrEqual(3);
+    expect(Object.values(state.networks.byId).map((network) => network.technicalId)).toEqual(
+      expect.arrayContaining(["NET-MAIN-SAMPLE", "NET-LIGHTING-DEMO", "NET-SENSOR-BB-DEMO"])
+    );
     expect(state.connectors.allIds.length).toBeGreaterThanOrEqual(3);
     expect(state.splices.allIds.length).toBeGreaterThanOrEqual(2);
     expect(state.nodes.allIds.length).toBeGreaterThanOrEqual(8);
@@ -64,4 +68,3 @@ describe("sample network fixture", () => {
     expect(hasSampleNetworkSignature(initialState)).toBe(false);
   });
 });
-
