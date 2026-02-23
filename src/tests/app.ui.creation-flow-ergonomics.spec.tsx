@@ -170,12 +170,17 @@ describe("App integration UI - creation flow ergonomics", () => {
       throw new Error("Expected created connector C-REF-1.");
     }
     expect(state.connectors.byId[connectorId]?.manufacturerReference).toBe("TE-1-967616-1");
+    let inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText("Manufacturer reference")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("TE-1-967616-1")).toBeInTheDocument();
 
     const editConnectorPanel = getPanelByHeading("Edit Connector");
     fireEvent.change(within(editConnectorPanel).getByLabelText("Manufacturer reference"), { target: { value: "   " } });
     fireEvent.click(within(editConnectorPanel).getByRole("button", { name: "Save" }));
     state = store.getState();
     expect(state.connectors.byId[connectorId]?.manufacturerReference).toBeUndefined();
+    inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).queryByText("TE-1-967616-1")).not.toBeInTheDocument();
 
     switchSubScreenDrawerAware("splice");
     fireEvent.click(within(getPanelByHeading("Splice form")).getByRole("button", { name: "Create" }));
@@ -198,11 +203,16 @@ describe("App integration UI - creation flow ergonomics", () => {
       throw new Error("Expected created splice S-REF-1.");
     }
     expect(state.splices.byId[spliceId]?.manufacturerReference).toBe("AMP/SEAL-42");
+    inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText("Manufacturer reference")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("AMP/SEAL-42")).toBeInTheDocument();
 
     const editSplicePanel = getPanelByHeading("Edit Splice");
     fireEvent.change(within(editSplicePanel).getByLabelText("Manufacturer reference"), { target: { value: " " } });
     fireEvent.click(within(editSplicePanel).getByRole("button", { name: "Save" }));
     expect(store.getState().splices.byId[spliceId]?.manufacturerReference).toBeUndefined();
+    inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).queryByText("AMP/SEAL-42")).not.toBeInTheDocument();
   });
 
   it("allows editing a node ID in edit mode and saves the renamed node", () => {
@@ -364,6 +374,16 @@ describe("App integration UI - creation flow ergonomics", () => {
     const editWirePanel = getPanelByHeading("Edit Wire");
     expect(within(editWirePanel).getByLabelText("Primary color")).toHaveValue("RD");
     expect(within(editWirePanel).getByLabelText("Secondary color")).toHaveValue("");
+    const wiresPanel = getPanelByHeading("Wires");
+    const wireRow = within(wiresPanel).getByText("Color test wire").closest("tr");
+    expect(wireRow).not.toBeNull();
+    if (wireRow !== null) {
+      expect(within(wireRow).getByText("0.5")).toBeInTheDocument();
+      expect(within(wireRow).getByText("RD")).toBeInTheDocument();
+    }
+    const inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText("Cable colors")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("Red")).toBeInTheDocument();
   });
 
   it("supports optional wire side connection and seal references with trim, non-destructive endpoint type changes, and clear on save", () => {
@@ -394,6 +414,13 @@ describe("App integration UI - creation flow ergonomics", () => {
       target: { value: " " }
     });
     fireEvent.click(within(createWirePanel).getByRole("button", { name: "Create" }));
+    let inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText("Endpoint A connection ref")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("TERM-A-01")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("Endpoint A seal ref")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("SEAL-A-01")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("Endpoint B connection ref")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("SPL-CONN-B")).toBeInTheDocument();
 
     const editWirePanel = getPanelByHeading("Edit Wire");
     const endpointAEditFieldset = within(editWirePanel).getByRole("group", { name: "Endpoint A" });
@@ -431,5 +458,9 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(savedWire?.endpointASealReference).toBeUndefined();
     expect(savedWire?.endpointBConnectionReference).toBeUndefined();
     expect(savedWire?.endpointBSealReference).toBeUndefined();
+    inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText("TERM-A-01")).toBeInTheDocument();
+    expect(within(inspectorPanel).queryByText("SEAL-A-01")).not.toBeInTheDocument();
+    expect(within(inspectorPanel).queryByText("SPL-CONN-B")).not.toBeInTheDocument();
   });
 });

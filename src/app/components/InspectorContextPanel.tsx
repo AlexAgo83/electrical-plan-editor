@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { CABLE_COLOR_BY_ID } from "../../core/cableColors";
 import type { Connector, NetworkNode, Segment, Splice, Wire } from "../../core/entities";
 import type { SelectionState } from "../../store/types";
 
@@ -43,6 +44,47 @@ export function InspectorContextPanel({
   onOpenAnalysis,
   onClearSelection
 }: InspectorContextPanelProps): ReactElement {
+  function renderCableColorSwatches(primaryColorId: string | null, secondaryColorId: string | null): ReactElement | string {
+    if (primaryColorId === null) {
+      return "No color";
+    }
+
+    const primary = CABLE_COLOR_BY_ID[primaryColorId];
+    const secondary = secondaryColorId === null ? null : CABLE_COLOR_BY_ID[secondaryColorId];
+    const colorLabel =
+      secondaryColorId === null
+        ? primary?.label ?? `Unknown (${primaryColorId})`
+        : `${primary?.label ?? `Unknown (${primaryColorId})`} / ${secondary?.label ?? `Unknown (${secondaryColorId})`}`;
+    const colorCode = secondaryColorId === null ? primaryColorId : `${primaryColorId}/${secondaryColorId}`;
+
+    const swatchStyleBase = {
+      display: "inline-block",
+      width: "0.75rem",
+      height: "0.75rem",
+      borderRadius: "999px",
+      border: "1px solid rgba(255,255,255,0.25)",
+      verticalAlign: "middle"
+    } satisfies React.CSSProperties;
+    const unknownSwatchColor = "#7a7a7a";
+
+    return (
+      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }} title={colorLabel}>
+        <span
+          aria-hidden="true"
+          style={{ ...swatchStyleBase, background: primary?.hex ?? unknownSwatchColor }}
+        />
+        {secondary !== null || secondaryColorId !== null ? (
+          <span
+            aria-hidden="true"
+            style={{ ...swatchStyleBase, background: secondary?.hex ?? unknownSwatchColor }}
+          />
+        ) : null}
+        <span className="technical-id">{colorCode}</span>
+        <span>{colorLabel}</span>
+      </span>
+    );
+  }
+
   const isCollapsed = mode === "collapsed";
   const canOpenAnalysis =
     selectedConnector !== null ||
@@ -54,12 +96,18 @@ export function InspectorContextPanel({
   if (selectedConnector !== null) {
     detailRows.push({ label: "Name", value: selectedConnector.name });
     detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedConnector.technicalId}</span> });
+    if ((selectedConnector.manufacturerReference?.trim() ?? "").length > 0) {
+      detailRows.push({ label: "Manufacturer reference", value: selectedConnector.manufacturerReference as string });
+    }
     detailRows.push({ label: "Ways", value: `${selectedConnector.cavityCount} / Occupied ${connectorOccupiedCount}` });
   }
 
   if (selectedSplice !== null) {
     detailRows.push({ label: "Name", value: selectedSplice.name });
     detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedSplice.technicalId}</span> });
+    if ((selectedSplice.manufacturerReference?.trim() ?? "").length > 0) {
+      detailRows.push({ label: "Manufacturer reference", value: selectedSplice.manufacturerReference as string });
+    }
     detailRows.push({ label: "Ports", value: `${selectedSplice.portCount} / Occupied ${spliceOccupiedCount}` });
   }
 
@@ -77,6 +125,23 @@ export function InspectorContextPanel({
   if (selectedWire !== null) {
     detailRows.push({ label: "Name", value: selectedWire.name });
     detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedWire.technicalId}</span> });
+    detailRows.push({ label: "Section", value: `${selectedWire.sectionMm2} mm²` });
+    detailRows.push({
+      label: "Cable colors",
+      value: renderCableColorSwatches(selectedWire.primaryColorId, selectedWire.secondaryColorId)
+    });
+    if ((selectedWire.endpointAConnectionReference?.trim() ?? "").length > 0) {
+      detailRows.push({ label: "Endpoint A connection ref", value: selectedWire.endpointAConnectionReference as string });
+    }
+    if ((selectedWire.endpointASealReference?.trim() ?? "").length > 0) {
+      detailRows.push({ label: "Endpoint A seal ref", value: selectedWire.endpointASealReference as string });
+    }
+    if ((selectedWire.endpointBConnectionReference?.trim() ?? "").length > 0) {
+      detailRows.push({ label: "Endpoint B connection ref", value: selectedWire.endpointBConnectionReference as string });
+    }
+    if ((selectedWire.endpointBSealReference?.trim() ?? "").length > 0) {
+      detailRows.push({ label: "Endpoint B seal ref", value: selectedWire.endpointBSealReference as string });
+    }
     detailRows.push({
       label: "Route",
       value: `${selectedWire.isRouteLocked ? "Locked" : "Auto"} / ${
