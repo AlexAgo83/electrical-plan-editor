@@ -3,6 +3,10 @@ import type { AppStore } from "../../store";
 import type { Splice, SpliceId } from "../../core/entities";
 import { appActions } from "../../store";
 import { createEntityId, toPositiveInteger } from "../lib/app-utils-shared";
+import {
+  suggestAutoSpliceNodeId,
+  suggestNextSpliceTechnicalId
+} from "../lib/technical-id-suggestions";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -49,10 +53,11 @@ export function useSpliceHandlers({
   spliceOccupantRefInput
 }: UseSpliceHandlersParams) {
   function resetSpliceForm(): void {
+    const state = store.getState();
     setSpliceFormMode("create");
     setEditingSpliceId(null);
     setSpliceName("");
-    setSpliceTechnicalId("");
+    setSpliceTechnicalId(suggestNextSpliceTechnicalId(Object.values(state.splices.byId).map((splice) => splice.technicalId)));
     setPortCount("4");
     setSpliceFormError(null);
   }
@@ -115,6 +120,34 @@ export function useSpliceHandlers({
     const savedSplice = nextState.splices.byId[spliceId];
     if (savedSplice !== undefined) {
       if (wasCreateMode) {
+        const existingNodeForSplice = nextState.nodes.allIds.some((nodeId) => {
+          const node = nextState.nodes.byId[nodeId];
+          return node?.kind === "splice" && node.spliceId === spliceId;
+        });
+
+        if (!existingNodeForSplice) {
+          const autoNodeId = suggestAutoSpliceNodeId(savedSplice.technicalId, nextState.nodes.allIds);
+          dispatchAction(
+            appActions.upsertNode({
+              id: autoNodeId,
+              kind: "splice",
+              spliceId
+            }),
+            { trackHistory: false }
+          );
+
+          const stateAfterNodeCreate = store.getState();
+          const linkedNodeExists = stateAfterNodeCreate.nodes.allIds.some((nodeId) => {
+            const node = stateAfterNodeCreate.nodes.byId[nodeId];
+            return node?.kind === "splice" && node.spliceId === spliceId;
+          });
+          if (!linkedNodeExists) {
+            setSpliceFormError(
+              "Splice created, but the linked splice node could not be created automatically. Create it manually in Nodes."
+            );
+          }
+        }
+
         startSpliceEdit(savedSplice);
         return;
       }
