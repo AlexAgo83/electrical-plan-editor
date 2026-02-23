@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactElement } from "react";
+import { CABLE_COLOR_BY_ID } from "../../../core/cableColors";
 import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { TableFilterBar } from "./TableFilterBar";
@@ -124,6 +125,47 @@ export function ModelingSecondaryTables({
         : wireFilterField === "technicalId"
           ? "Technical ID"
           : "Name, technical ID, endpoint...";
+
+  function renderWireColorCell(wire: Wire): ReactElement {
+    if (wire.primaryColorId === null) {
+      return <span className="meta-line">No color</span>;
+    }
+    const primary = CABLE_COLOR_BY_ID[wire.primaryColorId];
+    const secondary = wire.secondaryColorId === null ? null : CABLE_COLOR_BY_ID[wire.secondaryColorId];
+    const colorCode = wire.secondaryColorId === null ? wire.primaryColorId : `${wire.primaryColorId}/${wire.secondaryColorId}`;
+    const colorLabel =
+      wire.secondaryColorId === null
+        ? (primary?.label ?? `Unknown (${wire.primaryColorId})`)
+        : `${primary?.label ?? `Unknown (${wire.primaryColorId})`} / ${secondary?.label ?? `Unknown (${wire.secondaryColorId})`}`;
+
+    return (
+      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }} title={colorLabel}>
+        <span
+          aria-hidden="true"
+          style={{
+            width: "0.7rem",
+            height: "0.7rem",
+            borderRadius: "999px",
+            border: "1px solid rgba(255,255,255,0.25)",
+            background: primary?.hex ?? "#7a7a7a"
+          }}
+        />
+        {wire.secondaryColorId !== null ? (
+          <span
+            aria-hidden="true"
+            style={{
+              width: "0.7rem",
+              height: "0.7rem",
+              borderRadius: "999px",
+              border: "1px solid rgba(255,255,255,0.25)",
+              background: secondary?.hex ?? "#7a7a7a"
+            }}
+          />
+        ) : null}
+        <span className="technical-id">{colorCode}</span>
+      </span>
+    );
+  }
 
   useEffect(() => {
     if (segmentFormMode !== "edit" || selectedSegmentId === null) {
@@ -356,16 +398,32 @@ export function ModelingSecondaryTables({
                 className="filter-chip table-export-button"
                 onClick={() => {
                   const headers = showWireRouteModeColumn
-                    ? ["Name", "Technical ID", "Endpoints", "Begin", "End", "Length (mm)", "Route mode"]
-                    : ["Name", "Technical ID", "Endpoints", "Begin", "End", "Length (mm)"];
+                    ? ["Name", "Technical ID", "Section (mm²)", "Color", "Endpoints", "Begin", "End", "Length (mm)", "Route mode"]
+                    : ["Name", "Technical ID", "Section (mm²)", "Color", "Endpoints", "Begin", "End", "Length (mm)"];
                   const rows = visibleWires.map((wire) => {
                     const endpoints = `${describeWireEndpoint(wire.endpointA)} -> ${describeWireEndpoint(wire.endpointB)}`;
                     const begin = describeWireEndpointId(wire.endpointA);
                     const end = describeWireEndpointId(wire.endpointB);
+                    const colorCode =
+                      wire.primaryColorId === null
+                        ? "No color"
+                        : wire.secondaryColorId === null
+                          ? wire.primaryColorId
+                          : `${wire.primaryColorId}/${wire.secondaryColorId}`;
                     if (showWireRouteModeColumn) {
-                      return [wire.name, wire.technicalId, endpoints, begin, end, wire.lengthMm, wire.isRouteLocked ? "Locked" : "Auto"];
+                      return [
+                        wire.name,
+                        wire.technicalId,
+                        wire.sectionMm2,
+                        colorCode,
+                        endpoints,
+                        begin,
+                        end,
+                        wire.lengthMm,
+                        wire.isRouteLocked ? "Locked" : "Auto"
+                      ];
                     }
-                    return [wire.name, wire.technicalId, endpoints, begin, end, wire.lengthMm];
+                    return [wire.name, wire.technicalId, wire.sectionMm2, colorCode, endpoints, begin, end, wire.lengthMm];
                   });
                   downloadCsvFile("modeling-wires", headers, rows);
                 }}
@@ -413,6 +471,8 @@ export function ModelingSecondaryTables({
               <tr>
                 <th><button type="button" className="sort-header-button" onClick={() => setWireSort((current) => nextSortState(current, "name"))}>Name <span className="sort-indicator">{getSortIndicator(wireSort, "name")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setWireSort((current) => nextSortState(current, "technicalId"))}>Technical ID <span className="sort-indicator">{getSortIndicator(wireSort, "technicalId")}</span></button></th>
+                <th>Section (mm²)</th>
+                <th>Color</th>
                 <th>Endpoints</th>
                 <th>
                   <button
@@ -448,6 +508,8 @@ export function ModelingSecondaryTables({
                   >
                     <td>{wire.name}</td>
                     <td className="technical-id">{wire.technicalId}</td>
+                    <td>{wire.sectionMm2}</td>
+                    <td>{renderWireColorCell(wire)}</td>
                     <td>{describeWireEndpoint(wire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(wire.endpointB)}</td>
                     <td>{wire.lengthMm}</td>
                     {showWireRouteModeColumn ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}
