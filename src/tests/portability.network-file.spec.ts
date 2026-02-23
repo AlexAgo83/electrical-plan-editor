@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { NetworkId } from "../core/entities";
 import {
   buildNetworkFilePayload,
+  NETWORK_FILE_PAYLOAD_KIND,
   parseNetworkFilePayload,
   resolveImportConflicts,
   serializeNetworkFilePayload
@@ -28,6 +29,9 @@ describe("network file portability", () => {
     const payloadA = buildNetworkFilePayload(seeded, "all", [], "2026-02-21T10:00:00.000Z");
     const payloadB = buildNetworkFilePayload(seeded, "all", [], "2026-02-21T10:00:00.000Z");
 
+    expect(payloadA.payloadKind).toBe(NETWORK_FILE_PAYLOAD_KIND);
+    expect(payloadA.schemaVersion).toBe(2);
+    expect(payloadA.source.appVersion).toBe("0.7.4");
     expect(serializeNetworkFilePayload(payloadA)).toBe(serializeNetworkFilePayload(payloadB));
   });
 
@@ -52,7 +56,8 @@ describe("network file portability", () => {
     const parsed = parseNetworkFilePayload(JSON.stringify(legacyPayload));
     expect(parsed.error).toBeNull();
     expect(parsed.payload).not.toBeNull();
-    expect(parsed.payload?.schemaVersion).toBe(1);
+    expect(parsed.payload?.payloadKind).toBe(NETWORK_FILE_PAYLOAD_KIND);
+    expect(parsed.payload?.schemaVersion).toBe(2);
     expect(parsed.payload?.networks).toHaveLength(1);
   });
 
@@ -63,6 +68,7 @@ describe("network file portability", () => {
       exportedAt: "2026-02-21T10:20:00.000Z",
       source: {
         app: "electrical-plan-editor" as const,
+        appVersion: "0.7.3",
         appSchemaVersion: 2
       },
       networks: [
@@ -90,5 +96,23 @@ describe("network file portability", () => {
     const malformed = parseNetworkFilePayload("{\"schemaVersion\":1,\"networks\":[]}");
     expect(malformed.payload).toBeNull();
     expect(malformed.error).not.toBeNull();
+  });
+
+  it("rejects unsupported future-version payloads with a clear error", () => {
+    const futurePayload = {
+      payloadKind: NETWORK_FILE_PAYLOAD_KIND,
+      schemaVersion: 99,
+      exportedAt: "2026-02-21T10:10:00.000Z",
+      source: {
+        app: "electrical-plan-editor",
+        appVersion: "9.9.9",
+        appSchemaVersion: 99
+      },
+      networks: []
+    };
+
+    const parsed = parseNetworkFilePayload(JSON.stringify(futurePayload));
+    expect(parsed.payload).toBeNull();
+    expect(parsed.error).toMatch(/newer than supported/i);
   });
 });

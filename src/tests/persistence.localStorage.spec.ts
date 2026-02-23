@@ -2,6 +2,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ConnectorId, NodeId } from "../core/entities";
 import { APP_SCHEMA_VERSION } from "../core/schema";
 import {
+  PERSISTED_STATE_PAYLOAD_KIND,
+  PERSISTED_STATE_SCHEMA_VERSION,
+  STORAGE_BACKUP_KEY,
   STORAGE_KEY,
   loadState,
   migratePersistedPayload,
@@ -83,7 +86,10 @@ describe("migratePersistedPayload", () => {
   it("keeps a current schema snapshot unchanged", () => {
     const state = createSampleState();
     const currentSnapshot: PersistedStateSnapshotV1 = {
-      schemaVersion: APP_SCHEMA_VERSION,
+      payloadKind: PERSISTED_STATE_PAYLOAD_KIND,
+      schemaVersion: PERSISTED_STATE_SCHEMA_VERSION,
+      appVersion: "0.7.4",
+      appSchemaVersion: APP_SCHEMA_VERSION,
       createdAtIso: "2026-02-10T08:00:00.000Z",
       updatedAtIso: "2026-02-10T08:30:00.000Z",
       state
@@ -104,7 +110,8 @@ describe("migratePersistedPayload", () => {
 
     expect(result).not.toBeNull();
     expect(result?.wasMigrated).toBe(true);
-    expect(result?.snapshot.schemaVersion).toBe(APP_SCHEMA_VERSION);
+    expect(result?.snapshot.schemaVersion).toBe(PERSISTED_STATE_SCHEMA_VERSION);
+    expect(result?.snapshot.payloadKind).toBe(PERSISTED_STATE_PAYLOAD_KIND);
     expect(result?.snapshot.createdAtIso).toBe(nowIso);
     expect(result?.snapshot.updatedAtIso).toBe(nowIso);
     expect(result?.snapshot.state.connectors).toEqual(legacyState.connectors);
@@ -132,7 +139,10 @@ describe("localStorage persistence adapter", () => {
     expect(savedRaw).not.toBeNull();
 
     const savedSnapshot = JSON.parse(savedRaw ?? "{}") as PersistedStateSnapshotV1;
-    expect(savedSnapshot.schemaVersion).toBe(APP_SCHEMA_VERSION);
+    expect(savedSnapshot.schemaVersion).toBe(PERSISTED_STATE_SCHEMA_VERSION);
+    expect(savedSnapshot.payloadKind).toBe(PERSISTED_STATE_PAYLOAD_KIND);
+    expect(savedSnapshot.appVersion).toBe("0.7.4");
+    expect(savedSnapshot.appSchemaVersion).toBe(APP_SCHEMA_VERSION);
     expect(savedSnapshot.createdAtIso).toBe(nowIso);
     expect(savedSnapshot.updatedAtIso).toBe(nowIso);
     expect(hasSampleNetworkSignature(savedSnapshot.state)).toBe(true);
@@ -223,7 +233,8 @@ describe("localStorage persistence adapter", () => {
     expect(rewritten).not.toBeNull();
 
     const rewrittenSnapshot = JSON.parse(rewritten ?? "{}") as PersistedStateSnapshotV1;
-    expect(rewrittenSnapshot.schemaVersion).toBe(APP_SCHEMA_VERSION);
+    expect(rewrittenSnapshot.schemaVersion).toBe(PERSISTED_STATE_SCHEMA_VERSION);
+    expect(rewrittenSnapshot.payloadKind).toBe(PERSISTED_STATE_PAYLOAD_KIND);
     expect(rewrittenSnapshot.createdAtIso).toBe(nowIso);
     expect(rewrittenSnapshot.updatedAtIso).toBe(nowIso);
     expect(rewrittenSnapshot.state).toEqual(loaded);
@@ -313,7 +324,8 @@ describe("localStorage persistence adapter", () => {
     expect(raw).not.toBeNull();
 
     const savedSnapshot = JSON.parse(raw ?? "{}") as PersistedStateSnapshotV1;
-    expect(savedSnapshot.schemaVersion).toBe(APP_SCHEMA_VERSION);
+    expect(savedSnapshot.schemaVersion).toBe(PERSISTED_STATE_SCHEMA_VERSION);
+    expect(savedSnapshot.payloadKind).toBe(PERSISTED_STATE_PAYLOAD_KIND);
     expect(savedSnapshot.createdAtIso).toBe("2026-02-10T07:00:00.000Z");
     expect(savedSnapshot.updatedAtIso).toBe("2026-02-20T13:00:00.000Z");
     expect(savedSnapshot.state).toEqual(secondState);
@@ -341,5 +353,32 @@ describe("localStorage persistence adapter", () => {
       throw new Error("Expected active network.");
     }
     expect(loaded.networkStates[activeNetworkId]?.nodePositions[asNodeId("N-LAYOUT")]).toEqual({ x: 280, y: 160 });
+  });
+
+  it("backs up unsupported future-version payloads before replacing local storage", () => {
+    const futurePayload = {
+      payloadKind: PERSISTED_STATE_PAYLOAD_KIND,
+      schemaVersion: PERSISTED_STATE_SCHEMA_VERSION + 10,
+      appVersion: "9.9.9",
+      appSchemaVersion: APP_SCHEMA_VERSION + 10,
+      createdAtIso: "2026-02-01T08:00:00.000Z",
+      updatedAtIso: "2026-02-01T08:05:00.000Z",
+      state: createSampleState()
+    };
+    const rawFuture = JSON.stringify(futurePayload);
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: rawFuture
+    });
+
+    const loaded = loadState(storage, () => "2026-02-20T15:00:00.000Z");
+
+    expect(hasSampleNetworkSignature(loaded)).toBe(true);
+    expect(loaded.ui.lastError).toMatch(/newer app version/i);
+
+    const backupRaw = storage.read(STORAGE_BACKUP_KEY);
+    expect(backupRaw).not.toBeNull();
+    const backup = JSON.parse(backupRaw ?? "{}") as { raw?: string; reason?: string };
+    expect(backup.raw).toBe(rawFuture);
+    expect(backup.reason).toContain("unsupportedFutureVersion");
   });
 });

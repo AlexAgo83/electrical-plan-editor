@@ -1,4 +1,4 @@
-import { APP_SCHEMA_VERSION } from "../../core/schema";
+import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import type {
   Connector,
   ConnectorId,
@@ -19,7 +19,12 @@ import {
   createInitialState
 } from "../../store/types";
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+export const PERSISTED_STATE_SCHEMA_VERSION = 2;
+export const PERSISTED_STATE_PAYLOAD_KIND = "electrical-plan-editor.workspace-state";
+
+type PlainObject = Record<string, unknown>;
+
+function isRecord(value: unknown): value is PlainObject {
   return typeof value === "object" && value !== null;
 }
 
@@ -91,12 +96,8 @@ function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | n
   };
 }
 
-function asCurrentAppState(candidate: unknown): AppState | null {
+function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | null {
   if (!isRecord(candidate)) {
-    return null;
-  }
-
-  if (candidate.schemaVersion !== APP_SCHEMA_VERSION) {
     return null;
   }
 
@@ -116,20 +117,60 @@ function asCurrentAppState(candidate: unknown): AppState | null {
     return null;
   }
 
+  const rawNetworks = candidate.networks as AppState["networks"];
+  const rawNetworkStates = candidate.networkStates;
   const normalizedNetworkStates = {} as AppState["networkStates"];
-  for (const networkId of Object.keys(candidate.networkStates)) {
-    const normalizedScoped = normalizeNetworkScopedState(candidate.networkStates[networkId]);
-    if (normalizedScoped === null) {
+
+  for (const networkId of rawNetworks.allIds) {
+    if (typeof networkId !== "string") {
       return null;
     }
-    normalizedNetworkStates[networkId as keyof AppState["networkStates"]] = normalizedScoped;
+    const network = rawNetworks.byId[networkId as keyof typeof rawNetworks.byId];
+    if (!isRecord(network)) {
+      return null;
+    }
+    const scoped = normalizeNetworkScopedState(rawNetworkStates[networkId]);
+    if (scoped === null) {
+      return null;
+    }
+    normalizedNetworkStates[networkId as keyof AppState["networkStates"]] = scoped;
   }
 
-  return {
+  const candidateState = {
     ...(candidate as unknown as AppState),
+    schemaVersion: APP_SCHEMA_VERSION,
     networkStates: normalizedNetworkStates,
     nodePositions: normalizeNodePositions(candidate.nodePositions)
+  } satisfies AppState;
+
+  const knownNetworkIds = new Set(candidateState.networks.allIds);
+  let nextActiveNetworkId = candidateState.activeNetworkId;
+  if (nextActiveNetworkId !== null && !knownNetworkIds.has(nextActiveNetworkId)) {
+    nextActiveNetworkId = candidateState.networks.allIds[0] ?? null;
+  }
+
+  const nextState: AppState = {
+    ...candidateState,
+    activeNetworkId: nextActiveNetworkId
   };
+
+  if (nextActiveNetworkId !== null) {
+    const activeScoped = normalizedNetworkStates[nextActiveNetworkId];
+    if (activeScoped === undefined) {
+      return null;
+    }
+
+    nextState.connectors = activeScoped.connectors;
+    nextState.splices = activeScoped.splices;
+    nextState.nodes = activeScoped.nodes;
+    nextState.segments = activeScoped.segments;
+    nextState.wires = activeScoped.wires;
+    nextState.nodePositions = activeScoped.nodePositions;
+    nextState.connectorCavityOccupancy = activeScoped.connectorCavityOccupancy;
+    nextState.splicePortOccupancy = activeScoped.splicePortOccupancy;
+  }
+
+  return nextState;
 }
 
 interface LegacySingleNetworkState {
@@ -173,39 +214,123 @@ function isLegacySingleNetworkState(candidate: unknown): candidate is LegacySing
 }
 
 export interface PersistedStateSnapshotV1 {
-  schemaVersion: typeof APP_SCHEMA_VERSION;
+  schemaVersion: number;
   createdAtIso: string;
   updatedAtIso: string;
   state: AppState;
+  payloadKind?: string;
+  appVersion?: string;
+  appSchemaVersion?: number;
+}
+
+export interface PersistedStateSnapshot
+  extends Omit<PersistedStateSnapshotV1, "schemaVersion" | "payloadKind" | "appVersion" | "appSchemaVersion"> {
+  schemaVersion: typeof PERSISTED_STATE_SCHEMA_VERSION;
+  payloadKind: typeof PERSISTED_STATE_PAYLOAD_KIND;
+  appVersion: string;
+  appSchemaVersion: typeof APP_SCHEMA_VERSION;
 }
 
 export interface PersistenceMigrationResult {
-  snapshot: PersistedStateSnapshotV1;
+  snapshot: PersistedStateSnapshot;
   wasMigrated: boolean;
+  diagnostics: string[];
 }
 
-function asCurrentSnapshot(payload: unknown): PersistedStateSnapshotV1 | null {
+export interface PersistenceMigrationFailure {
+  code: "unsupportedFutureVersion" | "invalidPayload";
+  message: string;
+}
+
+export type PersistenceMigrationAttempt =
+  | ({ ok: true } & PersistenceMigrationResult)
+  | {
+      ok: false;
+      error: PersistenceMigrationFailure;
+    };
+
+function buildCurrentSnapshotEnvelope(
+  state: AppState,
+  createdAtIso: string,
+  updatedAtIso: string
+): PersistedStateSnapshot {
+  return {
+    payloadKind: PERSISTED_STATE_PAYLOAD_KIND,
+    schemaVersion: PERSISTED_STATE_SCHEMA_VERSION,
+    appVersion: APP_RELEASE_VERSION,
+    appSchemaVersion: APP_SCHEMA_VERSION,
+    createdAtIso,
+    updatedAtIso,
+    state: {
+      ...state,
+      schemaVersion: APP_SCHEMA_VERSION
+    }
+  };
+}
+
+function asCurrentVersionedSnapshot(payload: unknown): PersistedStateSnapshot | null {
   if (!isRecord(payload)) {
     return null;
   }
 
-  if (payload.schemaVersion !== APP_SCHEMA_VERSION) {
+  if (
+    payload.payloadKind !== PERSISTED_STATE_PAYLOAD_KIND ||
+    payload.schemaVersion !== PERSISTED_STATE_SCHEMA_VERSION ||
+    typeof payload.appVersion !== "string" ||
+    payload.appVersion.trim().length === 0 ||
+    payload.appSchemaVersion !== APP_SCHEMA_VERSION
+  ) {
     return null;
   }
 
   const createdAtIso = payload.createdAtIso;
   const updatedAtIso = payload.updatedAtIso;
-  const state = payload.state;
-  const normalizedState = asCurrentAppState(state);
+  if (!isIsoDate(createdAtIso) || !isIsoDate(updatedAtIso)) {
+    return null;
+  }
 
-  if (!isIsoDate(createdAtIso) || !isIsoDate(updatedAtIso) || normalizedState === null) {
+  const normalizedState = normalizeAndValidateCurrentAppState(payload.state);
+  if (normalizedState === null) {
+    return null;
+  }
+
+  return buildCurrentSnapshotEnvelope(normalizedState, createdAtIso, updatedAtIso);
+}
+
+interface LegacyTimestampedSnapshotV1 {
+  schemaVersion: number;
+  createdAtIso: string;
+  updatedAtIso: string;
+  state: AppState;
+}
+
+function asLegacyTimestampedSnapshotV1(payload: unknown): LegacyTimestampedSnapshotV1 | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  if (
+    payload.schemaVersion !== APP_SCHEMA_VERSION ||
+    typeof payload.createdAtIso !== "string" ||
+    typeof payload.updatedAtIso !== "string" ||
+    !("state" in payload)
+  ) {
+    return null;
+  }
+
+  if (!isIsoDate(payload.createdAtIso) || !isIsoDate(payload.updatedAtIso)) {
+    return null;
+  }
+
+  const normalizedState = normalizeAndValidateCurrentAppState(payload.state);
+  if (normalizedState === null) {
     return null;
   }
 
   return {
-    schemaVersion: APP_SCHEMA_VERSION,
-    createdAtIso,
-    updatedAtIso,
+    schemaVersion: 1,
+    createdAtIso: payload.createdAtIso,
+    updatedAtIso: payload.updatedAtIso,
     state: normalizedState
   };
 }
@@ -215,10 +340,10 @@ function asPreTimestampSnapshot(payload: unknown): AppState | null {
     return null;
   }
 
-  return asCurrentAppState(payload.state);
+  return normalizeAndValidateCurrentAppState(payload.state);
 }
 
-function migrateLegacySingleNetworkState(
+function migrateLegacySingleNetworkStateToCurrent(
   legacy: LegacySingleNetworkState,
   nowIso: string
 ): AppState {
@@ -277,25 +402,133 @@ function migrateLegacySingleNetworkState(
   };
 }
 
-export function migratePersistedPayload(payload: unknown, nowIso: string): PersistenceMigrationResult | null {
-  const currentSnapshot = asCurrentSnapshot(payload);
+type PipelineVersion = 1 | 2;
+const CURRENT_PIPELINE_VERSION: PipelineVersion = 2;
+
+interface PipelineSnapshot {
+  version: PipelineVersion;
+  createdAtIso: string;
+  updatedAtIso: string;
+  state: AppState;
+}
+
+type MigrationStep = (snapshot: PipelineSnapshot) => PipelineSnapshot;
+
+const PIPELINE_MIGRATIONS: Record<Exclude<PipelineVersion, typeof CURRENT_PIPELINE_VERSION>, MigrationStep> = {
+  1: (snapshot) => ({
+    ...snapshot,
+    version: 2
+  })
+};
+
+function runPipeline(initial: PipelineSnapshot): { snapshot: PipelineSnapshot; diagnostics: string[] } {
+  const diagnostics: string[] = [];
+  let current = initial;
+  while (current.version < CURRENT_PIPELINE_VERSION) {
+    const step = PIPELINE_MIGRATIONS[current.version as keyof typeof PIPELINE_MIGRATIONS];
+    diagnostics.push(`Applied persistence migration v${current.version} -> v${current.version + 1}.`);
+    current = step(current);
+  }
+  return { snapshot: current, diagnostics };
+}
+
+function detectUnsupportedFutureVersion(payload: unknown): PersistenceMigrationFailure | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  const version = payload.schemaVersion;
+  if (typeof version === "number" && Number.isInteger(version) && version > PERSISTED_STATE_SCHEMA_VERSION) {
+    return {
+      code: "unsupportedFutureVersion",
+      message: `Unsupported persisted data schema version '${version}'. This data was likely created by a newer app version.`
+    };
+  }
+
+  return null;
+}
+
+function validatePostMigrationState(state: AppState): string[] {
+  const diagnostics: string[] = [];
+  const networkIds = state.networks.allIds;
+  const networkIdSet = new Set<string>(networkIds);
+  if (networkIds.length === 0 && state.activeNetworkId !== null) {
+    diagnostics.push("Active network ID is set while no networks exist; active selection was normalized.");
+  }
+
+  for (const networkId of networkIds) {
+    if (state.networkStates[networkId] === undefined) {
+      diagnostics.push(`Missing network state for '${networkId}'.`);
+    }
+  }
+
+  for (const networkId of Object.keys(state.networkStates)) {
+    if (!networkIdSet.has(networkId)) {
+      diagnostics.push(`Orphan network state '${networkId}' was dropped during normalization.`);
+    }
+  }
+
+  return diagnostics;
+}
+
+export function migratePersistedPayloadDetailed(payload: unknown, nowIso: string): PersistenceMigrationAttempt {
+  const currentSnapshot = asCurrentVersionedSnapshot(payload);
   if (currentSnapshot !== null) {
     return {
+      ok: true,
       snapshot: currentSnapshot,
-      wasMigrated: false
+      wasMigrated: false,
+      diagnostics: validatePostMigrationState(currentSnapshot.state)
+    };
+  }
+
+  const futureError = detectUnsupportedFutureVersion(payload);
+  if (futureError !== null) {
+    return {
+      ok: false,
+      error: futureError
+    };
+  }
+
+  const legacyTimestamped = asLegacyTimestampedSnapshotV1(payload);
+  if (legacyTimestamped !== null) {
+    const pipeline = runPipeline({
+      version: legacyTimestamped.schemaVersion as PipelineVersion,
+      createdAtIso: legacyTimestamped.createdAtIso,
+      updatedAtIso: legacyTimestamped.updatedAtIso,
+      state: legacyTimestamped.state
+    });
+
+    return {
+      ok: true,
+      snapshot: buildCurrentSnapshotEnvelope(
+        pipeline.snapshot.state,
+        pipeline.snapshot.createdAtIso,
+        pipeline.snapshot.updatedAtIso
+      ),
+      wasMigrated: true,
+      diagnostics: [...pipeline.diagnostics, ...validatePostMigrationState(pipeline.snapshot.state)]
     };
   }
 
   const currentStateWithoutTimestamp = asPreTimestampSnapshot(payload);
   if (currentStateWithoutTimestamp !== null) {
+    const pipeline = runPipeline({
+      version: 1,
+      createdAtIso: nowIso,
+      updatedAtIso: nowIso,
+      state: currentStateWithoutTimestamp
+    });
+
     return {
-      snapshot: {
-        schemaVersion: APP_SCHEMA_VERSION,
-        createdAtIso: nowIso,
-        updatedAtIso: nowIso,
-        state: currentStateWithoutTimestamp
-      },
-      wasMigrated: true
+      ok: true,
+      snapshot: buildCurrentSnapshotEnvelope(
+        pipeline.snapshot.state,
+        pipeline.snapshot.createdAtIso,
+        pipeline.snapshot.updatedAtIso
+      ),
+      wasMigrated: true,
+      diagnostics: ["Normalized legacy untimestamped persisted payload.", ...pipeline.diagnostics, ...validatePostMigrationState(pipeline.snapshot.state)]
     };
   }
 
@@ -305,17 +538,49 @@ export function migratePersistedPayload(payload: unknown, nowIso: string): Persi
       ? payload.state
       : null;
 
-  if (legacyState === null) {
+  if (legacyState !== null) {
+    const migratedState = migrateLegacySingleNetworkStateToCurrent(legacyState, nowIso);
+    const pipeline = runPipeline({
+      version: 1,
+      createdAtIso: nowIso,
+      updatedAtIso: nowIso,
+      state: migratedState
+    });
+
+    return {
+      ok: true,
+      snapshot: buildCurrentSnapshotEnvelope(
+        pipeline.snapshot.state,
+        pipeline.snapshot.createdAtIso,
+        pipeline.snapshot.updatedAtIso
+      ),
+      wasMigrated: true,
+      diagnostics: [
+        "Normalized legacy single-network payload into multi-network workspace format.",
+        ...pipeline.diagnostics,
+        ...validatePostMigrationState(pipeline.snapshot.state)
+      ]
+    };
+  }
+
+  return {
+    ok: false,
+    error: {
+      code: "invalidPayload",
+      message: "Persisted payload is invalid or unsupported."
+    }
+  };
+}
+
+export function migratePersistedPayload(payload: unknown, nowIso: string): PersistenceMigrationResult | null {
+  const result = migratePersistedPayloadDetailed(payload, nowIso);
+  if (!result.ok) {
     return null;
   }
 
   return {
-    snapshot: {
-      schemaVersion: APP_SCHEMA_VERSION,
-      createdAtIso: nowIso,
-      updatedAtIso: nowIso,
-      state: migrateLegacySingleNetworkState(legacyState, nowIso)
-    },
-    wasMigrated: true
+    snapshot: result.snapshot,
+    wasMigrated: result.wasMigrated,
+    diagnostics: result.diagnostics
   };
 }
