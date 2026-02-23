@@ -65,6 +65,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case "node/upsert":
+    case "node/rename":
     case "node/remove": {
       return finalizeDomainAction(state, handleNodeActions(state, action) ?? state);
     }

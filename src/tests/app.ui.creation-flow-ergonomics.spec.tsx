@@ -1,7 +1,8 @@
-import { fireEvent, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createInitialState } from "../store";
 import {
+  createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
   switchScreenDrawerAware,
@@ -115,5 +116,26 @@ describe("App integration UI - creation flow ergonomics", () => {
     const nodesPanel = getPanelByHeading("Nodes");
     expect(within(nodesPanel).getByText("Auto node connector (C-001)")).toBeInTheDocument();
     expect(within(nodesPanel).getByText("Auto node splice (S-001)")).toBeInTheDocument();
+  });
+
+  it("allows editing a node ID in edit mode and saves the renamed node", () => {
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("node");
+
+    const nodesPanel = getPanelByHeading("Nodes");
+    fireEvent.click(within(nodesPanel).getByText("N-MID"));
+
+    const editNodePanel = getPanelByHeading("Edit Node");
+    const nodeIdInput = within(editNodePanel).getByLabelText("Node ID");
+    expect(nodeIdInput).toBeEnabled();
+    expect(within(editNodePanel).getByText(/Changing Node ID renames the node/i)).toBeInTheDocument();
+
+    fireEvent.change(nodeIdInput, { target: { value: "N-MID-REN" } });
+    fireEvent.click(within(editNodePanel).getByRole("button", { name: "Save" }));
+
+    expect(within(nodesPanel).getByText("N-MID-REN")).toBeInTheDocument();
+    expect(within(nodesPanel).queryByText("N-MID")).not.toBeInTheDocument();
   });
 });

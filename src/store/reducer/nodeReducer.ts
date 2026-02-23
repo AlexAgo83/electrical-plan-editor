@@ -68,6 +68,88 @@ export function handleNodeActions(state: AppState, action: AppAction): AppState 
       });
     }
 
+    case "node/rename": {
+      const rawFromId = action.payload.fromId;
+      const rawToId = action.payload.toId;
+      const fromId = rawFromId.trim() as typeof rawFromId;
+      const toId = rawToId.trim() as typeof rawToId;
+
+      if (fromId.length === 0 || state.nodes.byId[fromId] === undefined) {
+        return withError(state, "Cannot rename unknown node.");
+      }
+      if (toId.length === 0) {
+        return withError(state, "Node ID is required.");
+      }
+      if (fromId === toId) {
+        return clearLastError(state);
+      }
+      if (state.nodes.byId[toId] !== undefined) {
+        return withError(state, `Node ID '${toId}' already exists.`);
+      }
+
+      const existingNode = state.nodes.byId[fromId];
+      if (existingNode === undefined) {
+        return withError(state, "Cannot rename unknown node.");
+      }
+
+      const nextNodesById = { ...state.nodes.byId };
+      delete nextNodesById[fromId];
+      nextNodesById[toId] = { ...existingNode, id: toId };
+
+      const nextNodesAllIds = [...state.nodes.allIds.filter((candidate) => candidate !== fromId), toId].sort((a, b) =>
+        a.localeCompare(b)
+      );
+
+      let segmentsChanged = false;
+      const nextSegmentsById = { ...state.segments.byId };
+      for (const segmentId of state.segments.allIds) {
+        const segment = state.segments.byId[segmentId];
+        if (segment === undefined) {
+          continue;
+        }
+        if (segment.nodeA !== fromId && segment.nodeB !== fromId) {
+          continue;
+        }
+        segmentsChanged = true;
+        nextSegmentsById[segmentId] = {
+          ...segment,
+          nodeA: segment.nodeA === fromId ? toId : segment.nodeA,
+          nodeB: segment.nodeB === fromId ? toId : segment.nodeB
+        };
+      }
+
+      const nextNodePositions = { ...state.nodePositions };
+      if (nextNodePositions[fromId] !== undefined) {
+        nextNodePositions[toId] = nextNodePositions[fromId];
+        delete nextNodePositions[fromId];
+      }
+
+      const nextSelected =
+        state.ui.selected?.kind === "node" && state.ui.selected.id === fromId
+          ? { kind: "node" as const, id: toId }
+          : state.ui.selected;
+
+      return bumpRevision({
+        ...clearLastError(state),
+        nodes: {
+          byId: nextNodesById,
+          allIds: nextNodesAllIds
+        },
+        segments: segmentsChanged
+          ? {
+            ...state.segments,
+            byId: nextSegmentsById
+          }
+          : state.segments,
+        nodePositions: nextNodePositions,
+        ui: {
+          ...state.ui,
+          selected: nextSelected,
+          lastError: null
+        }
+      });
+    }
+
     case "node/remove": {
       const linkedSegments = countSegmentsUsingNode(state, action.payload.id);
       if (linkedSegments > 0) {

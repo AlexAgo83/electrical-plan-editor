@@ -33,9 +33,9 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
   <form className="stack-form" onSubmit={handleNodeSubmit}>
     <label>
       Node ID
-      <input value={nodeIdInput} onChange={(event) => setNodeIdInput(event.target.value)} placeholder="N-001" disabled={nodeFormMode === "edit"} required />
+      <input value={nodeIdInput} onChange={(event) => setNodeIdInput(event.target.value)} placeholder="N-001" required />
     </label>
-    {nodeFormMode === "edit" ? <small className="inline-help">Node ID is immutable in edit mode.</small> : null}
+    {nodeFormMode === "edit" ? <small className="inline-help">Changing Node ID renames the node and remaps connected references.</small> : null}
     {nodeFormMode === "create" && pendingNewNodePosition !== null ? (
       <small className="inline-help">Canvas placement captured at x={Math.round(pendingNewNodePosition.x)}, y={Math.round(pendingNewNodePosition.y)}.</small>
     ) : null}

@@ -1002,6 +1002,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNodeFormError: formsState.setNodeFormError,
     pendingNewNodePosition,
     setPendingNewNodePosition,
+    onNodeIdRenamed: (fromId, toId) => {
+      setRoutePreviewStartNodeId((current) => (current === fromId ? toId : current));
+      setRoutePreviewEndNodeId((current) => (current === fromId ? toId : current));
+    },
     segmentFormMode: formsState.segmentFormMode,
     setSegmentFormMode: formsState.setSegmentFormMode,
     editingSegmentId: formsState.editingSegmentId,
