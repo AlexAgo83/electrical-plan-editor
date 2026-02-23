@@ -87,6 +87,7 @@ import {
   getOnboardingStepById,
   readOnboardingAutoOpenEnabled,
   writeOnboardingAutoOpenEnabled,
+  type OnboardingStepDefinition,
   type OnboardingStepId
 } from "./lib/onboarding";
 import type {
@@ -97,6 +98,8 @@ import type {
 import "./styles.css";
 
 export type { AppProps } from "./types/app-controller";
+
+type OnboardingStepTarget = OnboardingStepDefinition["target"];
 
 function useAppSnapshot(store: AppStore) {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);
@@ -314,6 +317,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [onboardingModalMode, setOnboardingModalMode] = useState<"full" | "single">("full");
   const [onboardingStepIndex, setOnboardingStepIndex] = useState(0);
   const [onboardingSingleStepId, setOnboardingSingleStepId] = useState<OnboardingStepId>("networkScope");
+  const [onboardingSingleStepTargetOverride, setOnboardingSingleStepTargetOverride] = useState<OnboardingStepTarget | null>(null);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabled] = useState<boolean>(() => readOnboardingAutoOpenEnabled());
   const {
@@ -413,12 +417,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const openFullOnboarding = useCallback(() => {
     setOnboardingModalMode("full");
     setOnboardingStepIndex(0);
+    setOnboardingSingleStepTargetOverride(null);
     setIsOnboardingOpen(true);
   }, []);
 
-  const openSingleStepOnboarding = useCallback((stepId: OnboardingStepId) => {
+  const openSingleStepOnboarding = useCallback((stepId: OnboardingStepId, targetOverride?: OnboardingStepTarget) => {
     setOnboardingModalMode("single");
     setOnboardingSingleStepId(stepId);
+    setOnboardingSingleStepTargetOverride(targetOverride ?? null);
     setIsOnboardingOpen(true);
   }, []);
 
@@ -465,35 +471,85 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const activeOnboardingStep =
     onboardingModalMode === "full" ? ONBOARDING_STEPS[onboardingStepIndex] : getOnboardingStepById(onboardingSingleStepId);
+  const activeOnboardingPrimaryTarget =
+    onboardingModalMode === "single" && onboardingSingleStepTargetOverride !== null
+      ? onboardingSingleStepTargetOverride
+      : activeOnboardingStep?.target;
 
   const isOnboardingStepAlreadyInContext =
-    activeOnboardingStep !== undefined &&
-    activeScreen === activeOnboardingStep.target.screen &&
-    (activeOnboardingStep.target.subScreen === undefined || activeSubScreen === activeOnboardingStep.target.subScreen);
+    activeOnboardingPrimaryTarget !== undefined &&
+    activeScreen === activeOnboardingPrimaryTarget.screen &&
+    (activeOnboardingPrimaryTarget.subScreen === undefined || activeSubScreen === activeOnboardingPrimaryTarget.subScreen);
 
   const onboardingTargetActionLabel =
-    activeOnboardingStep === undefined
+    activeOnboardingPrimaryTarget === undefined
       ? "Open target"
       : isOnboardingStepAlreadyInContext
-        ? `Scroll to ${activeOnboardingStep.target.panelLabel}`
-        : `Open ${activeOnboardingStep.target.panelLabel}`;
+        ? `Scroll to ${activeOnboardingPrimaryTarget.panelLabel}`
+        : `Open ${activeOnboardingPrimaryTarget.panelLabel}`;
 
-  const handleOnboardingOpenTarget = useCallback(() => {
-    if (activeOnboardingStep === undefined) {
-      return;
-    }
-
-    if (activeOnboardingStep.target.screen === "networkScope") {
+  const openOnboardingTarget = useCallback((target: OnboardingStepTarget) => {
+    if (target.screen === "networkScope") {
       setActiveScreen("networkScope");
     } else {
       setActiveScreen("modeling");
-      if (activeOnboardingStep.target.subScreen !== undefined) {
-        setActiveSubScreen(activeOnboardingStep.target.subScreen);
+      if (target.subScreen !== undefined) {
+        setActiveSubScreen(target.subScreen);
       }
     }
 
-    focusOnboardingTargetPanel(activeOnboardingStep.target.panelSelector);
-  }, [activeOnboardingStep, focusOnboardingTargetPanel, setActiveScreen, setActiveSubScreen]);
+    focusOnboardingTargetPanel(target.panelSelector);
+  }, [focusOnboardingTargetPanel, setActiveScreen, setActiveSubScreen]);
+
+  const handleOnboardingOpenTarget = useCallback(() => {
+    if (activeOnboardingPrimaryTarget === undefined) {
+      return;
+    }
+    openOnboardingTarget(activeOnboardingPrimaryTarget);
+  }, [activeOnboardingPrimaryTarget, openOnboardingTarget]);
+
+  const onboardingConnectorSpliceTargetActions =
+    activeOnboardingStep?.id === "connectorSpliceLibrary"
+      ? (() => {
+          const connectorsTarget: OnboardingStepTarget = {
+            screen: "modeling",
+            subScreen: "connector",
+            panelSelector: '[data-onboarding-panel="modeling-connectors"]',
+            panelLabel: "Connectors"
+          };
+          const splicesTarget: OnboardingStepTarget = {
+            screen: "modeling",
+            subScreen: "splice",
+            panelSelector: '[data-onboarding-panel="modeling-splices"]',
+            panelLabel: "Splices"
+          };
+          const primaryIsSplices = activeOnboardingPrimaryTarget?.subScreen === "splice";
+          const primaryTarget = primaryIsSplices ? splicesTarget : connectorsTarget;
+          const secondaryTarget = primaryIsSplices ? connectorsTarget : splicesTarget;
+          const isPrimaryAlreadyInContext =
+            activeScreen === primaryTarget.screen &&
+            (primaryTarget.subScreen === undefined || activeSubScreen === primaryTarget.subScreen);
+          const isSecondaryAlreadyInContext =
+            activeScreen === secondaryTarget.screen &&
+            (secondaryTarget.subScreen === undefined || activeSubScreen === secondaryTarget.subScreen);
+          return [
+            {
+              label: isPrimaryAlreadyInContext ? `Scroll to ${primaryTarget.panelLabel}` : `Open ${primaryTarget.panelLabel}`,
+              onClick: () => openOnboardingTarget(primaryTarget)
+            },
+            {
+              label: isSecondaryAlreadyInContext ? `Scroll to ${secondaryTarget.panelLabel}` : `Open ${secondaryTarget.panelLabel}`,
+              onClick: () => openOnboardingTarget(secondaryTarget)
+            }
+          ];
+        })()
+      : null;
+
+  const onboardingTargetActions = activeOnboardingStep === undefined
+    ? []
+    : activeOnboardingStep.id === "connectorSpliceLibrary"
+      ? (onboardingConnectorSpliceTargetActions ?? [])
+      : [{ label: onboardingTargetActionLabel, onClick: handleOnboardingOpenTarget }];
 
   const handleOnboardingNext = useCallback(() => {
     if (onboardingModalMode !== "full") {
@@ -1534,7 +1590,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         describeWireEndpointId
       },
       onboardingHelp: {
-        openConnectorSpliceStep: () => openSingleStepOnboarding("connectorSpliceLibrary"),
+        openConnectorStep: () => openSingleStepOnboarding("connectorSpliceLibrary"),
+        openSpliceStep: () =>
+          openSingleStepOnboarding("connectorSpliceLibrary", {
+            screen: "modeling",
+            subScreen: "splice",
+            panelSelector: '[data-onboarding-panel="modeling-splices"]',
+            panelLabel: "Splices"
+          }),
         openNodeStep: () => openSingleStepOnboarding("nodes"),
         openSegmentStep: () => openSingleStepOnboarding("segments"),
         openWireStep: () => openSingleStepOnboarding("wires")
@@ -1584,6 +1647,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         activeNetworkId,
         handleSelectNetwork,
         handleDuplicateNetwork,
+        handleExportActiveNetwork: () => handleExportNetworks("active"),
         handleDeleteNetwork,
         handleOpenCreateNetworkForm,
         handleOpenEditNetworkForm,
@@ -1797,8 +1861,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           onClose={() => setIsOnboardingOpen(false)}
           onNext={handleOnboardingNext}
           canGoNext={onboardingModalMode !== "full" || onboardingStepIndex < ONBOARDING_STEPS.length - 1}
-          onOpenTarget={handleOnboardingOpenTarget}
-          openTargetLabel={onboardingTargetActionLabel}
+          targetActions={onboardingTargetActions}
         />
       ) : null}
     </>

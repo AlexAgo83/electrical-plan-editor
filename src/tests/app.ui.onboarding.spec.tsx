@@ -24,12 +24,15 @@ describe("App integration UI - onboarding", () => {
     const connectorsHelpDialog = screen.getByRole("dialog", { name: "Build the connectors and splices library" });
     expect(within(connectorsHelpDialog).getByLabelText("Do not open automatically on app load")).toBeInTheDocument();
     expect(within(connectorsHelpDialog).getByRole("button", { name: "Scroll to Connectors" })).toBeInTheDocument();
+    expect(within(connectorsHelpDialog).getByRole("button", { name: "Open Splices" })).toBeInTheDocument();
     fireEvent.click(within(connectorsHelpDialog).getByRole("button", { name: "Close onboarding" }));
 
     switchSubScreenDrawerAware("splice");
     const splicesPanel = getPanelByHeading("Splices");
     fireEvent.click(within(splicesPanel).getByRole("button", { name: "Help" }));
 
-    expect(screen.getByRole("dialog", { name: "Build the connectors and splices library" })).toBeInTheDocument();
+    const splicesHelpDialog = screen.getByRole("dialog", { name: "Build the connectors and splices library" });
+    expect(within(splicesHelpDialog).getByRole("button", { name: "Scroll to Splices" })).toBeInTheDocument();
+    expect(within(splicesHelpDialog).getByRole("button", { name: "Open Connectors" })).toBeInTheDocument();
   });
 });

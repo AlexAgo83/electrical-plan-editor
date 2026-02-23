@@ -12,6 +12,7 @@ export interface OnboardingStepDefinition {
   id: OnboardingStepId;
   title: string;
   badge: string;
+  badgeIconClass?: string;
   description: OnboardingStepDescriptionPart[];
   target: {
     screen: "networkScope" | "modeling";
@@ -28,10 +29,11 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
     id: "networkScope",
     title: "Create your first network",
     badge: "N1",
+    badgeIconClass: "is-network-scope",
     description: [
       { text: "Start in " },
       { text: "Network Scope", strong: true },
-      { text: " to create the harness/wiring plan container you will model." }
+      { text: " to create the harness/wiring plan container you will model, duplicate, and export." }
     ],
     target: {
       screen: "networkScope",
@@ -43,12 +45,13 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
     id: "connectorSpliceLibrary",
     title: "Build the connectors and splices library",
     badge: "LIB",
+    badgeIconClass: "is-connectors",
     description: [
       { text: "Define reusable " },
       { text: "connectors", strong: true },
       { text: ", " },
       { text: "splices", strong: true },
-      { text: ", and their available ways/ports before placing them in the network." }
+      { text: ", manufacturer references, and available ways/ports before placing them in the network. Create forms can also auto-create linked nodes." }
     ],
     target: {
       screen: "modeling",
@@ -61,10 +64,11 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
     id: "nodes",
     title: "Create nodes for network points",
     badge: "ND",
+    badgeIconClass: "is-nodes",
     description: [
       { text: "Create " },
       { text: "nodes", strong: true },
-      { text: " to represent connectors, splices, and intermediate hubs in the network graph." }
+      { text: " to represent connectors, splices, and intermediate hubs in the network graph. You can rename node IDs safely in edit mode." }
     ],
     target: {
       screen: "modeling",
@@ -77,10 +81,11 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
     id: "segments",
     title: "Create segments between nodes",
     badge: "SG",
+    badgeIconClass: "is-segments",
     description: [
       { text: "Use " },
       { text: "segments", strong: true },
-      { text: " to define physical links and lengths between nodes." }
+      { text: " to define physical links and lengths between nodes used by routed wires and route previews." }
     ],
     target: {
       screen: "modeling",
@@ -93,10 +98,11 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
     id: "wires",
     title: "Create wires and cables",
     badge: "WR",
+    badgeIconClass: "is-wires",
     description: [
       { text: "Create " },
       { text: "wires/cables", strong: true },
-      { text: " and route them across segments from endpoint A to endpoint B." }
+      { text: " and route them across segments from endpoint A to endpoint B. Wire forms support section (mm²), optional colors, endpoint references, and endpoint occupancy guidance." }
     ],
     target: {
       screen: "modeling",

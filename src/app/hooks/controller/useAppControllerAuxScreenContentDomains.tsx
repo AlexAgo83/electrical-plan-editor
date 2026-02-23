@@ -29,6 +29,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     | "activeNetworkId"
     | "handleSelectNetwork"
     | "handleDuplicateNetwork"
+    | "handleExportActiveNetwork"
     | "handleDeleteNetwork"
     | "handleOpenCreateNetworkForm"
     | "handleOpenEditNetworkForm"
@@ -83,6 +84,7 @@ export function useAppControllerAuxScreenContentDomains({
     activeNetworkId: networkScope.activeNetworkId,
     handleSelectNetwork: networkScope.handleSelectNetwork,
     handleDuplicateNetwork: networkScope.handleDuplicateNetwork,
+    handleExportActiveNetwork: networkScope.handleExportActiveNetwork,
     handleDeleteNetwork: networkScope.handleDeleteNetwork,
     networkFormMode: networkScope.formState.networkFormMode,
     handleOpenCreateNetworkForm: networkScope.handleOpenCreateNetworkForm,

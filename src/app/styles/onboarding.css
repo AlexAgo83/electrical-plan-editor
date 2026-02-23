@@ -67,6 +67,12 @@
   letter-spacing: 0.02em;
 }
 
+.onboarding-modal-badge .action-button-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: 0 0 0.95rem;
+}
+
 .onboarding-modal-title-block {
   min-width: 0;
 }
@@ -127,8 +133,23 @@
   flex-wrap: wrap;
 }
 
+.onboarding-modal-target-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
 .onboarding-modal-actions-spacer {
   flex: 1 1 auto;
+}
+
+.onboarding-modal-next-button {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.7rem;
 }
 
 @media (max-width: 640px) {
@@ -147,5 +168,9 @@
 
   .onboarding-modal-actions-spacer {
     display: none;
+  }
+
+  .onboarding-modal-target-actions {
+    width: 100%;
   }
 }
