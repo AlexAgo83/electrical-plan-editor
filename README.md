@@ -35,10 +35,12 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - Connectors with cavity occupancy
   - Splices with port occupancy
   - Graph nodes and weighted segments
-  - Wires with endpoint constraints
+  - Wires with endpoint constraints, section (`mm²`), optional mono/bi-color, and per-side connection/seal references
+- Editable node IDs with atomic graph-safe rename (segments/positions/selection remap)
 - Automatic shortest-path routing (Dijkstra-based)
 - Forced route lock/reset for wires
 - Automatic wire length recomputation after segment edits
+- Wire endpoint occupancy validation with next-free way/port prefill in create flows
 - 2D network view:
   - Node drag-and-drop
   - Pan with `Shift + drag`
@@ -46,9 +48,12 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - Callout overlays with configurable visibility and text size (`small`, `normal`, `large`)
   - Canvas defaults for grid/snap/lock/overlays/segment lengths/callouts and PNG background export
 - Quick entity navigation in the canvas with contextual `Modeling` / `Analysis` switch (when available)
+- Step-by-step onboarding modal with contextual panel help entry points and persistent auto-open opt-out
 - Table ergonomics:
-  - Wire endpoint text filter (`Connector/Splice or ID`)
-  - Segment minimum length filter (`mm`)
+  - Reusable `Filter` bars with field selector + full-width input (`Wires`, `Network Scope`, `Connectors`, `Splices`, `Nodes`, `Segments`)
+  - Occupancy/kind/route/sub-network chip filters remain available alongside table filter bars
+- Settings defaults for wire section prefill and connector/splice auto-create linked-node behavior
+- Optional manufacturer references for connectors/splices, surfaced in forms and inspector
 - Validation center with grouped issues and issue navigation
 - Theme presets including `Cyberpunk` and `Olive`
 - Local persistence with schema versioning and migrations

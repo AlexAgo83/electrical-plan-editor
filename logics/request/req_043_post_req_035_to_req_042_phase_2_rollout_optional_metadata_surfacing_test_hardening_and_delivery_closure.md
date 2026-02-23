@@ -1,7 +1,7 @@
 ## req_043_post_req_035_to_req_042_phase_2_rollout_optional_metadata_surfacing_test_hardening_and_delivery_closure - Post req_035-042 Follow-up: Phase-2 Rollout, Optional Metadata Surfacing, Test Hardening, and Delivery Closure
 > From version: 0.8.0
-> Understanding: 97%
-> Confidence: 95%
+> Understanding: 99%
+> Confidence: 98%
 > Complexity: Medium-High
 > Theme: Follow-up Delivery Completion and Quality Hardening After req_035-042 Baseline Implementation
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -32,6 +32,19 @@
 - reusable table filter bar pilot for `Wires` + `Network Scope` (`req_042`)
 
 What remains is intentionally outside the baseline acceptance scope, but still important for product completeness, UX consistency, and engineering hygiene.
+
+## Delivery status snapshot (`task_044`)
+- Implemented in checkpointed waves with per-wave commits and targeted validations.
+- Delivered follow-up scope includes:
+  - onboarding polish + copy refresh
+  - edit-form `Save` row focus restoration (table-backed modeling forms)
+  - connector/splice auto-node create checkbox + shared Settings default
+  - `Wires` action-row `Help` alignment + `Network Scope` export action
+  - filter-bar phase-2 rollout to modeling `Connectors` / `Splices` / `Nodes` / `Segments`
+  - metadata surfacing in wire tables/inspector and inspector reference fields
+  - test hardening (`canvas` JSDOM mock + E2E onboarding dismiss helper)
+  - README targeted refresh + `logics` closure docs/checklist sync
+- Final validation gate and exact command snapshots are tracked in `task_044`.
 
 ## Follow-up scope principles (recommended)
 - Do not reopen baseline functional scope already accepted for `req_035`-`req_042` unless a regression is identified.
@@ -241,7 +254,6 @@ What remains is intentionally outside the baseline acceptance scope, but still i
 - AC10: Onboarding step badges use the corresponding existing feature icons (or documented fallback per step), the `Next`/`Finish` action matches the intended primary button look-and-feel, and the shared `Connectors / Splices` step exposes both `Open Connectors` and `Open Splices`.
 - AC11: Contextual onboarding opened from `Splices` supports best-effort navigation/scroll to the `Splices` panel just like other contextual onboarding entry points.
 - AC12: Successful `Save` in edit forms restores focus to the edited entity row (for the supported table-backed forms in scope), without breaking selection/edit state.
-- AC13: Connector and splice forms expose an auto-node creation checkbox (default on) and Settings provides a pre-set default used for create flows.
 - AC13: Connector and splice forms expose an auto-node creation checkbox (default on) and Settings provides a pre-set default used for create flows (recommended baseline: one shared preference unless a different choice is documented).
 - AC14: `Wires` keeps `Help` on the same action row as `ALL` / `Auto` / `Locked` / `CSV`, and `Network Scope` exposes an `Export` action under `Duplicate`.
 - AC15: Onboarding descriptions are updated to reflect the current feature set introduced by `req_036`-`req_042` (or documented per-step defer rationale is provided).
