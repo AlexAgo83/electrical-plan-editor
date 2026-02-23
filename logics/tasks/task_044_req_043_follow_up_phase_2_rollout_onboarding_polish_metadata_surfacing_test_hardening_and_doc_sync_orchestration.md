@@ -2,7 +2,7 @@
 > From version: 0.8.0
 > Understanding: 99%
 > Confidence: 98%
-> Progress: 90%
+> Progress: 100%
 > Complexity: Very High
 > Theme: Follow-up Delivery Orchestration for Post req_035-042 UX, Surfacing, Hardening, and Closure Work
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -79,9 +79,9 @@ Rationale:
 - [x] Wave 4. Panel action-row consistency (`Help` alignment) + `Network Scope` export action (`item_266`)
 - [x] Wave 5. Table filter-bar phase-2 rollout to `Connectors`, `Splices`, `Nodes`, `Segments` (`item_255`)
 - [x] Wave 6. Optional metadata surfacing in additional views (wire/connector/splice; optional export additions as low-risk) (`item_256`, `item_257`)
-- [ ] Wave 7. README review/update (`item_268`), Logics closure/traceability updates (`item_259`), and manual QA checklist (`item_260`)
-- [ ] Wave 8. Final closure validation, CI-equivalent checks, build/PWA/E2E, AC traceability, and delivery report (`item_261`)
-- [ ] FINAL. Update all related `.md` files to final state (request/task/backlog items/closure notes/QA docs) and verify no stale statuses remain
+- [x] Wave 7. README review/update (`item_268`), Logics closure/traceability updates (`item_259`), and manual QA checklist (`item_260`)
+- [x] Wave 8. Final closure validation, CI-equivalent checks, build/PWA/E2E, AC traceability, and delivery report (`item_261`)
+- [x] FINAL. Update all related `.md` files to final state (request/task/backlog items/closure notes/QA docs) and verify no stale statuses remain
 
 # Validation gates
 ## A. Minimum wave gate (apply after each Wave 0-7)
@@ -150,9 +150,9 @@ Rationale:
   - Wave 4 (action-row consistency + Network Scope export): delivered
   - Wave 5 (filter-bar phase-2 rollout): delivered
   - Wave 6 (metadata surfacing): delivered
-  - Wave 7 (README + Logics closure + QA checklist): pending
-  - Wave 8 (final closure validation + AC traceability): pending
-  - FINAL (`.md` synchronization verification): pending
+  - Wave 7 (README + Logics closure + QA checklist): delivered
+  - Wave 8 (final closure validation + AC traceability): delivered
+  - FINAL (`.md` synchronization verification): delivered
 - Checkpoint commits:
   - Wave 0: `f3c7f3d` (combined with Wave 1 + Wave 4 baseline polish/actions checkpoint)
   - Wave 1: `f3c7f3d` (combined checkpoint: onboarding polish + copy refresh + related action-row follow-up work)
@@ -161,26 +161,39 @@ Rationale:
   - Wave 4: `f3c7f3d` (`Wires` Help alignment + `Network Scope` Export)
   - Wave 5: `15f486a` (filter-bar phase-2 rollout to modeling `Connectors`/`Splices`/`Nodes`/`Segments`)
   - Wave 6: `3f3b19b` (metadata surfacing in inspector + wire tables + targeted regressions)
-  - Wave 7: pending
-  - Wave 8: pending
-  - FINAL: pending
+  - Wave 7: `9a063eb` (README targeted refresh + req_043/task_044 sync seed + `item_255`-`item_268` delivery docs + QA checklist doc)
+  - Wave 8: this closure pass (final gate rerun after test-only fixes; committed after task_044 final report update)
+  - FINAL: this closure pass (task_044 final report + validation snapshot + `.md` sync verification)
 - Current blockers:
-  - None at kickoff.
-- Validation snapshot (through Wave 6):
+  - None.
+- Validation snapshot (through Wave 8 / FINAL):
   - Wave 0/1/4 checkpoint (`f3c7f3d`): `lint`, `typecheck`, targeted onboarding/home/networks/list ergonomics tests, `test:e2e` ✅
   - Wave 2/3 checkpoint (`2c2d34c`): `typecheck`, targeted `creation-flow-ergonomics` + `settings` tests, `lint` ✅
   - Wave 5 checkpoint (`15f486a`): `typecheck`, targeted `list-ergonomics`, `lint` ✅
   - Wave 6 checkpoint (`3f3b19b`): `typecheck`, targeted `creation-flow-ergonomics` + `inspector-shell`, `lint` ✅
+  - Wave 7 checkpoint (`9a063eb`): `lint`, `typecheck`, targeted tests, `logics_lint` ✅ (README + closure docs/checklist sync)
+  - Wave 8 / FINAL closure rerun (post test-fix stabilization):
+    - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+    - `npm run -s lint` ✅
+    - `npm run -s typecheck` ✅
+    - `npm run -s quality:ui-modularization` ✅
+    - `npm run -s quality:store-modularization` ✅
+    - `npm run -s test:ci` ✅ (`33` files / `211` tests)
+    - `npm run -s build` ✅
+    - `npm run -s quality:pwa` ✅
+    - `npm run -s test:e2e` ✅ (`2` tests)
 - Delivery snapshot:
-  - Waves 0-6 delivered.
-  - Remaining closure work: Wave 7 docs/README/QA sync + Wave 8 final validation gate + final `.md` sync verification.
-- Documentation synchronization checklist (to complete at end):
-  - `req_043` final delivered scope/defers/AC traceability updated
-  - `task_044` progress/report/validation/commit SHAs updated
-  - related `item_255`...`item_268` statuses/notes updated
-  - any touched prior tasks/closure notes updated with defer references as needed
-  - manual QA checklist doc/status updated (`logics/tasks/task_044_req_043_manual_qa_checklist_req_035_to_req_043_follow_up_bundle.md`)
-  - README review outcome recorded (changed or no-change rationale)
+  - Waves 0-8 delivered with checkpoint commits.
+  - FINAL `.md` synchronization verification completed for the req_043 follow-up bundle (`req_043`, `task_044`, itemized closure docs/checklist, README refresh previously landed).
+  - Final closure included test-only stability fixes after metadata/table-column changes:
+    - split settings defaults test into `src/tests/app.ui.settings-wire-defaults.spec.tsx` to satisfy UI modularization gate
+    - updated wire length column assertions/selectors in `src/tests/app.ui.network-summary-workflow-polish.spec.tsx` and `tests/e2e/smoke.spec.ts` after wire table metadata columns were added
+- Documentation synchronization checklist (completed in Wave 7 / FINAL):
+  - `req_043` delivered scope/traceability snapshot refreshed
+  - `task_044` progress/report/validation/commit checkpoints updated to final state
+  - related `item_255`...`item_268` delivery outcome docs created/synced (Wave 7 baseline)
+  - manual QA checklist doc authored and linked (`logics/tasks/task_044_req_043_manual_qa_checklist_req_035_to_req_043_follow_up_bundle.md`)
+  - README review outcome recorded and targeted refresh applied (`README.md`)
 
 # References
 - `logics/request/req_043_post_req_035_to_req_042_phase_2_rollout_optional_metadata_surfacing_test_hardening_and_delivery_closure.md`

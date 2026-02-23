@@ -209,7 +209,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await expect(wireRow).toContainText("100");
   await expect(wireRow).toContainText("Auto");
   await wireRow.click();
-  const initialWireLengthRaw = await wireRow.locator("td").nth(3).textContent();
+  const initialWireLengthRaw = await wireRow.locator("td").nth(5).textContent();
   const initialWireLength = Number(initialWireLengthRaw ?? "0");
 
   await switchScreen("analysis");
@@ -249,5 +249,5 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     .locator("tbody tr")
     .filter({ hasText: "Wire 1" })
     .first();
-  await expect(refreshedWireRow.locator("td").nth(3)).toHaveText(String(initialWireLength + 40));
+  await expect(refreshedWireRow.locator("td").nth(5)).toHaveText(String(initialWireLength + 40));
 });
