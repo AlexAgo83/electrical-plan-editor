@@ -164,6 +164,35 @@ tests/e2e/                # Playwright end-to-end smoke
 logics/                   # Product requests, backlog, tasks, architecture, skills
 ```
 
+## Persistence Versioning
+
+The app uses explicit versioned payload contracts for both local storage and network export files.
+
+- Local workspace persistence:
+  - primary key: configured `VITE_STORAGE_KEY` (default `electrical-plan-editor.state`)
+  - backup key: `<storage-key>.backup` (written before destructive migration replacement or unsupported/failed payload fallback)
+  - payload includes:
+    - `payloadKind`
+    - `schemaVersion`
+    - `appVersion`
+    - `appSchemaVersion`
+    - timestamps + serialized `state`
+- Network export/import files:
+  - include explicit file `schemaVersion` + source metadata (`appVersion`, `appSchemaVersion`)
+  - legacy file payloads are normalized on import
+  - unsupported future file versions are rejected safely (no workspace mutation)
+
+Migration authoring workflow (future schema evolution):
+
+1. Add/adjust payload shape support in `src/adapters/persistence/migrations.ts` (local storage) and/or `src/adapters/portability/networkFile.ts` (file import/export).
+2. Keep migration steps incremental and deterministic (`vN -> vN+1`), with a single entry point for runtime hydration/import.
+3. Add regression fixtures/tests for:
+   - legacy/unversioned payload
+   - current payload
+   - unsupported future version
+   - malformed payload
+4. Run the full validation pipeline (`lint`, `typecheck`, `test:ci`, `test:e2e`, `build`, `quality:pwa`).
+
 ## Quality and CI
 
 Primary validation commands:
