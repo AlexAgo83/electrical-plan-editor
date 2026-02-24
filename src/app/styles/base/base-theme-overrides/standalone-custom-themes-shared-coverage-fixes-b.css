@@ -1,0 +1,240 @@
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .cavity.is-occupied {
+  border-color: color-mix(in srgb, var(--custom-selection) 40%, var(--custom-panel-border));
+  background: color-mix(in srgb, var(--custom-selection) 14%, var(--custom-panel-bg));
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .cavity h3 {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .cavity p {
+  color: var(--custom-muted-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .cavity button {
+  border-color: color-mix(in srgb, var(--custom-button-border) 78%, var(--custom-panel-border));
+  background: color-mix(in srgb, var(--custom-button-bg) 88%, var(--custom-panel-bg));
+  color: var(--custom-button-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .status-chip.is-error {
+  border-color: color-mix(in srgb, #b64545 50%, var(--custom-panel-border));
+  background: color-mix(in srgb, #b64545 14%, var(--custom-panel-bg));
+  color: color-mix(in srgb, #ffbaba 42%, var(--custom-strong-text));
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .status-chip.is-warning {
+  border-color: color-mix(in srgb, #b5852d 48%, var(--custom-panel-border));
+  background: color-mix(in srgb, #b5852d 14%, var(--custom-panel-bg));
+  color: color-mix(in srgb, #ffe2a2 44%, var(--custom-strong-text));
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .data-table tr.is-selected {
+  background: color-mix(in srgb, var(--custom-row-selected-bg) 30%, transparent);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .data-table tr.is-wire-highlighted {
+  background: color-mix(in srgb, var(--custom-row-wire-highlight-bg) 30%, transparent);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .data-table tr.is-selected.is-wire-highlighted > td {
+  background: color-mix(in srgb, var(--custom-row-selected-bg) 58%, var(--custom-row-wire-highlight-bg)) !important;
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .route-preview-empty {
+  color: var(--custom-muted-text);
+  border-color: color-mix(in srgb, var(--custom-panel-border) 70%, transparent);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .route-preview-status-chip {
+  border-color: color-mix(in srgb, var(--custom-selection) 42%, var(--custom-panel-border));
+  background: color-mix(in srgb, var(--custom-selection) 18%, var(--custom-panel-bg));
+  color: var(--custom-strong-text);
+}
