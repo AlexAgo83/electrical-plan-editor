@@ -36,7 +36,15 @@ export type ThemeMode =
   | "lavenderHaze"
   | "amberNight"
   | "cyberpunk"
-  | "olive";
+  | "olive"
+  | "steelBlue"
+  | "forestGraphite"
+  | "petrolSlate"
+  | "copperNight"
+  | "mossTaupe"
+  | "navyAsh"
+  | "charcoalPlum"
+  | "smokedTeal";
 
 export interface LayoutNodePosition {
   x: number;

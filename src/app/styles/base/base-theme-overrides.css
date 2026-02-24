@@ -8,3 +8,8 @@
 @import "./base-theme-overrides/new-themes-validation-ops-and-forms.css";
 @import "./base-theme-overrides/cyberpunk-and-olive-validation-ops-and-forms.css";
 @import "./base-theme-overrides/network-canvas-entity-theme-variables.css";
+@import "./base-theme-overrides/standalone-custom-midrange-themes-shared-a.css";
+@import "./base-theme-overrides/standalone-custom-midrange-themes-shared-b.css";
+@import "./base-theme-overrides/standalone-custom-midrange-themes-shared-c.css";
+@import "./base-theme-overrides/standalone-custom-midrange-themes-palettes-a.css";
+@import "./base-theme-overrides/standalone-custom-midrange-themes-palettes-b.css";

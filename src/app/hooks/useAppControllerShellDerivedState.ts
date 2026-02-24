@@ -32,7 +32,15 @@ export function useAppControllerShellDerivedState({
     lavenderHaze: ["theme-normal", "theme-paper-blueprint", "theme-lavender-haze"],
     amberNight: ["theme-dark", "theme-deep-green", "theme-amber-night"],
     cyberpunk: ["theme-dark", "theme-amber-night", "theme-cyberpunk"],
-    olive: ["theme-dark", "theme-deep-green", "theme-olive"]
+    olive: ["theme-dark", "theme-deep-green", "theme-olive"],
+    steelBlue: ["theme-steel-blue"],
+    forestGraphite: ["theme-forest-graphite"],
+    petrolSlate: ["theme-petrol-slate"],
+    copperNight: ["theme-copper-night"],
+    mossTaupe: ["theme-moss-taupe"],
+    navyAsh: ["theme-navy-ash"],
+    charcoalPlum: ["theme-charcoal-plum"],
+    smokedTeal: ["theme-smoked-teal"]
   };
   const resolvedThemeClassNames = themeClassNamesByMode[themeMode] ?? themeClassNamesByMode.normal;
   const appShellClassName = [

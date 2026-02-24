@@ -1,0 +1,136 @@
+
+.app-shell.theme-moss-taupe {
+  --custom-shell-bg-top: #24251f;
+  --custom-shell-bg-bottom: #2b2d24;
+  --custom-shell-text: #e6e8d8;
+  --custom-panel-bg: rgba(40, 42, 34, 0.86);
+  --custom-panel-border: #666c52;
+  --custom-button-bg: #4a503a;
+  --custom-button-border: #78815f;
+  --custom-button-text: #f2f6df;
+  --custom-button-active-text: #1d2114;
+  --custom-badge-bg: #575d43;
+  --custom-badge-text: #e7eccf;
+  --custom-input-bg: #1e2019;
+  --custom-input-border: #6a7357;
+  --custom-input-text: #f1f5df;
+  --custom-table-border: #5e634d;
+  --custom-table-head-bg: rgba(39, 41, 33, 0.94);
+  --custom-row-selected-bg: rgba(178, 197, 109, 0.18);
+  --custom-row-wire-highlight-bg: rgba(126, 205, 112, 0.15);
+  --custom-muted-text: #cad1b3;
+  --custom-strong-text: #f2f4e6;
+  --custom-label-stroke: rgba(18, 20, 15, 0.86);
+  --custom-selection: #b5c66d;
+  --custom-accent: #95a660;
+  --custom-accent-2: #7c8f5d;
+  --custom-grid: #59604a;
+  --custom-segment: #b1b892;
+  --custom-wire-highlight: #76d36e;
+  --custom-node-stroke: #8f9772;
+  --custom-node-connector-fill: #4a563b;
+  --custom-node-splice-fill: #766742;
+  --custom-node-intermediate-fill: #444b39;
+}
+
+.app-shell.theme-navy-ash {
+  --custom-shell-bg-top: #17202a;
+  --custom-shell-bg-bottom: #1d2730;
+  --custom-shell-text: #dde5ec;
+  --custom-panel-bg: rgba(26, 36, 45, 0.86);
+  --custom-panel-border: #4f6477;
+  --custom-button-bg: #2b4255;
+  --custom-button-border: #63809b;
+  --custom-button-text: #edf5fb;
+  --custom-button-active-text: #0f1921;
+  --custom-badge-bg: #395268;
+  --custom-badge-text: #dfeaf4;
+  --custom-input-bg: #121b23;
+  --custom-input-border: #577088;
+  --custom-input-text: #eef5fa;
+  --custom-table-border: #4a5f70;
+  --custom-table-head-bg: rgba(24, 34, 42, 0.94);
+  --custom-row-selected-bg: rgba(125, 171, 214, 0.19);
+  --custom-row-wire-highlight-bg: rgba(137, 207, 114, 0.14);
+  --custom-muted-text: #bdc9d4;
+  --custom-strong-text: #edf3f8;
+  --custom-label-stroke: rgba(11, 15, 20, 0.88);
+  --custom-selection: #8ab2d8;
+  --custom-accent: #729dc9;
+  --custom-accent-2: #9fb3c8;
+  --custom-grid: #4e6374;
+  --custom-segment: #97aabb;
+  --custom-wire-highlight: #86d66b;
+  --custom-node-stroke: #7a8e9f;
+  --custom-node-connector-fill: #31495e;
+  --custom-node-splice-fill: #6f5b3b;
+  --custom-node-intermediate-fill: #344453;
+}
+
+.app-shell.theme-charcoal-plum {
+  --custom-shell-bg-top: #241f2a;
+  --custom-shell-bg-bottom: #2a2430;
+  --custom-shell-text: #ece0ef;
+  --custom-panel-bg: rgba(39, 33, 46, 0.86);
+  --custom-panel-border: #6d5c7c;
+  --custom-button-bg: #4a3a59;
+  --custom-button-border: #88739c;
+  --custom-button-text: #faefff;
+  --custom-button-active-text: #1d1424;
+  --custom-badge-bg: #594666;
+  --custom-badge-text: #f1e4f8;
+  --custom-input-bg: #1d1822;
+  --custom-input-border: #785f8c;
+  --custom-input-text: #f8f0fc;
+  --custom-table-border: #64566f;
+  --custom-table-head-bg: rgba(36, 30, 42, 0.94);
+  --custom-row-selected-bg: rgba(191, 122, 220, 0.18);
+  --custom-row-wire-highlight-bg: rgba(132, 210, 121, 0.14);
+  --custom-muted-text: #d2c2d8;
+  --custom-strong-text: #f6edf8;
+  --custom-label-stroke: rgba(16, 12, 19, 0.88);
+  --custom-selection: #c48adc;
+  --custom-accent: #a96ac7;
+  --custom-accent-2: #8f739f;
+  --custom-grid: #61566d;
+  --custom-segment: #b19dbd;
+  --custom-wire-highlight: #7fd06d;
+  --custom-node-stroke: #8f7aa0;
+  --custom-node-connector-fill: #4a3f66;
+  --custom-node-splice-fill: #756041;
+  --custom-node-intermediate-fill: #433a55;
+}
+
+.app-shell.theme-smoked-teal {
+  --custom-shell-bg-top: #122026;
+  --custom-shell-bg-bottom: #16262d;
+  --custom-shell-text: #dce9e8;
+  --custom-panel-bg: rgba(22, 39, 45, 0.86);
+  --custom-panel-border: #446a72;
+  --custom-button-bg: #24525a;
+  --custom-button-border: #5e9197;
+  --custom-button-text: #eaf9f8;
+  --custom-button-active-text: #0d1d21;
+  --custom-badge-bg: #2f666d;
+  --custom-badge-text: #d9f0ee;
+  --custom-input-bg: #102026;
+  --custom-input-border: #4f7c82;
+  --custom-input-text: #edf9f8;
+  --custom-table-border: #3f6368;
+  --custom-table-head-bg: rgba(20, 37, 43, 0.94);
+  --custom-row-selected-bg: rgba(114, 224, 206, 0.18);
+  --custom-row-wire-highlight-bg: rgba(175, 217, 105, 0.14);
+  --custom-muted-text: #b8cecd;
+  --custom-strong-text: #edf8f8;
+  --custom-label-stroke: rgba(9, 17, 19, 0.88);
+  --custom-selection: #79d6cb;
+  --custom-accent: #4eb9ac;
+  --custom-accent-2: #7fbab7;
+  --custom-grid: #3f666c;
+  --custom-segment: #8fb4b7;
+  --custom-wire-highlight: #b3d86a;
+  --custom-node-stroke: #6d9699;
+  --custom-node-connector-fill: #2a5960;
+  --custom-node-splice-fill: #6f5b38;
+  --custom-node-intermediate-fill: #2b4c52;
+}
