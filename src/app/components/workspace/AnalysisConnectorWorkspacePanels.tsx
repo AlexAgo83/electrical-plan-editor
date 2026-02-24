@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
+import { CABLE_COLOR_BY_ID } from "../../../core/cableColors";
 import { formatOccupantRefForDisplay } from "../../lib/app-utils-networking";
-import { nextSortState } from "../../lib/app-utils-shared";
+import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 import { TableFilterBar } from "./TableFilterBar";
@@ -19,8 +20,6 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     connectors,
     visibleConnectors,
     wires,
-    connectorSort,
-    setConnectorSort,
     connectorOccupiedCountById,
     onSelectConnector,
     onOpenConnectorOnboardingHelp,
@@ -32,16 +31,57 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     connectorCavityStatuses,
     handleReleaseCavity,
     sortedConnectorSynthesisRows,
-    connectorSynthesisSort,
-    setConnectorSynthesisSort,
-    getSortIndicator
+    connectorSynthesisSort: _connectorSynthesisSort,
+    setConnectorSynthesisSort: _setConnectorSynthesisSort,
+    getSortIndicator: _getSortIndicator
   } = props;
+  type ConnectorAnalysisTableSortField = "name" | "technicalId" | "manufacturerReference" | "cavityCount" | "occupiedCount";
+  type ConnectorSynthesisTableSortField = "name" | "technicalId" | "localWay" | "destination" | "lengthMm";
   const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "synthesis">("cavities");
+  const [connectorTableSort, setConnectorTableSort] = useState<{ field: ConnectorAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
+  const [connectorSynthesisTableSort, setConnectorSynthesisTableSort] = useState<{ field: ConnectorSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const connectorFilterPlaceholder =
     connectorFilterField === "name" ? "Connector name" : connectorFilterField === "technicalId" ? "Technical ID" : "Name or technical ID...";
+  const sortedVisibleConnectors = useMemo(
+    () =>
+      sortByTableColumns(
+        visibleConnectors,
+        connectorTableSort,
+        (connector, field) => {
+          if (field === "name") return connector.name;
+          if (field === "technicalId") return connector.technicalId;
+          if (field === "manufacturerReference") return connector.manufacturerReference;
+          if (field === "cavityCount") return connector.cavityCount;
+          return connectorOccupiedCountById.get(connector.id) ?? 0;
+        },
+        (connector) => connector.id
+      ),
+    [connectorOccupiedCountById, connectorTableSort, visibleConnectors]
+  );
   const wireTechnicalIdById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire.technicalId] as const)), [wires]);
+  const wireById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire] as const)), [wires]);
   const formatOccupantRef = (occupantRef: string | null): string =>
     occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
+  const sortedConnectorSynthesisRowsByColumns = useMemo(
+    () =>
+      sortByTableColumns(
+        sortedConnectorSynthesisRows,
+        connectorSynthesisTableSort,
+        (row, field) => {
+          if (field === "name") return row.wireName;
+          if (field === "technicalId") return row.wireTechnicalId;
+          if (field === "localWay") return row.localEndpointLabel;
+          if (field === "destination") return row.remoteEndpointLabel;
+          return row.lengthMm;
+        },
+        (row) => `${row.wireId}-${row.localEndpointLabel}`
+      ),
+    [connectorSynthesisTableSort, sortedConnectorSynthesisRows]
+  );
+  const connectorListSortIndicator = (field: ConnectorAnalysisTableSortField) =>
+    connectorTableSort.field === field ? (connectorTableSort.direction === "asc" ? "▲" : "▼") : "";
+  const connectorSynthesisSortIndicator = (field: ConnectorSynthesisTableSortField) =>
+    connectorSynthesisTableSort.field === field ? (connectorSynthesisTableSort.direction === "asc" ? "▲" : "▼") : "";
   const nextFreeCavityIndex = connectorCavityStatuses.find((slot) => !slot.isOccupied)?.cavityIndex ?? null;
   const parsedCavityIndex = Number.parseInt(cavityIndexInput, 10);
   const cavityIndexIsInteger = Number.isInteger(parsedCavityIndex) && parsedCavityIndex > 0;
@@ -117,16 +157,17 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           onClick={() =>
             downloadCsvFile(
               "analysis-connectors",
-              ["Name", "Technical ID", "Ways", "Occupied"],
-              visibleConnectors.map((connector) => [
+              ["Name", "Technical ID", "Mfr Ref", "Ways", "Occupied"],
+              sortedVisibleConnectors.map((connector) => [
                 connector.name,
                 connector.technicalId,
+                connector.manufacturerReference ?? "",
                 connector.cavityCount,
                 connectorOccupiedCountById.get(connector.id) ?? 0
               ])
             )
           }
-          disabled={visibleConnectors.length === 0}
+          disabled={sortedVisibleConnectors.length === 0}
         >
           <span className="table-export-icon" aria-hidden="true" />
           CSV
@@ -158,7 +199,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   </header>
   {connectors.length === 0 ? (
     <p className="empty-copy">No connector yet.</p>
-  ) : visibleConnectors.length === 0 ? (
+  ) : sortedVisibleConnectors.length === 0 ? (
     <p className="empty-copy">No connector matches the current filters.</p>
   ) : (
     <table className="data-table">
@@ -168,26 +209,49 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             <button
               type="button"
               className="sort-header-button"
-              onClick={() => setConnectorSort((current) => nextSortState(current, "name"))}
+              onClick={() =>
+                setConnectorTableSort((current) => ({
+                  field: "name",
+                  direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc"
+                }))
+              }
             >
-              Name <span className="sort-indicator">{getSortIndicator(connectorSort, "name")}</span>
+              Name <span className="sort-indicator">{connectorListSortIndicator("name")}</span>
             </button>
           </th>
           <th>
             <button
               type="button"
               className="sort-header-button"
-              onClick={() => setConnectorSort((current) => nextSortState(current, "technicalId"))}
+              onClick={() =>
+                setConnectorTableSort((current) => ({
+                  field: "technicalId",
+                  direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc"
+                }))
+              }
             >
-              Technical ID <span className="sort-indicator">{getSortIndicator(connectorSort, "technicalId")}</span>
+              Technical ID <span className="sort-indicator">{connectorListSortIndicator("technicalId")}</span>
             </button>
           </th>
-          <th>Ways</th>
-          <th>Occupied</th>
+          <th>
+            <button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>
+              Mfr Ref <span className="sort-indicator">{connectorListSortIndicator("manufacturerReference")}</span>
+            </button>
+          </th>
+          <th>
+            <button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "cavityCount", direction: current.field === "cavityCount" && current.direction === "asc" ? "desc" : "asc" }))}>
+              Ways <span className="sort-indicator">{connectorListSortIndicator("cavityCount")}</span>
+            </button>
+          </th>
+          <th>
+            <button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "occupiedCount", direction: current.field === "occupiedCount" && current.direction === "asc" ? "desc" : "asc" }))}>
+              Occupied <span className="sort-indicator">{connectorListSortIndicator("occupiedCount")}</span>
+            </button>
+          </th>
         </tr>
       </thead>
       <tbody>
-        {visibleConnectors.map((connector) => {
+        {sortedVisibleConnectors.map((connector) => {
           const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
           const isSelected = selectedConnectorId === connector.id;
           return (
@@ -206,6 +270,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             >
               <td>{connector.name}</td>
               <td className="technical-id">{connector.technicalId}</td>
+              <td className="technical-id">{connector.manufacturerReference ?? ""}</td>
               <td>{connector.cavityCount}</td>
               <td>{occupiedCount}</td>
             </tr>
@@ -254,8 +319,8 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           }
           downloadCsvFile(
             `analysis-connector-synthesis-${selectedConnector?.technicalId ?? "selection"}`,
-            ["Wire", "Technical ID", "Local way", "Destination", "Length (mm)"],
-            sortedConnectorSynthesisRows.map((row) => [
+              ["Wire", "Technical ID", "Local way", "Destination", "Length (mm)"],
+            sortedConnectorSynthesisRowsByColumns.map((row) => [
               row.wireName,
               row.wireTechnicalId,
               row.localEndpointLabel,
@@ -268,7 +333,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           selectedConnector === null ||
           (connectorAnalysisView === "cavities"
             ? connectorCavityStatuses.length === 0
-            : sortedConnectorSynthesisRows.length === 0)
+            : sortedConnectorSynthesisRowsByColumns.length === 0)
         }
       >
         <span className="table-export-icon" aria-hidden="true" />
@@ -336,7 +401,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         ))}
       </div>
     </>
-  ) : sortedConnectorSynthesisRows.length === 0 ? (
+  ) : sortedConnectorSynthesisRowsByColumns.length === 0 ? (
     <p className="empty-copy">No wire currently connected to this connector.</p>
   ) : (
     <table className="data-table">
@@ -346,35 +411,46 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             <button
               type="button"
               className="sort-header-button"
-              onClick={() => setConnectorSynthesisSort((current) => nextSortState(current, "name"))}
+              onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" }))}
             >
-              Wire <span className="sort-indicator">{getSortIndicator(connectorSynthesisSort, "name")}</span>
+              Wire <span className="sort-indicator">{connectorSynthesisSortIndicator("name")}</span>
             </button>
           </th>
           <th>
             <button
               type="button"
               className="sort-header-button"
-              onClick={() => setConnectorSynthesisSort((current) => nextSortState(current, "technicalId"))}
+              onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" }))}
             >
-              Technical ID <span className="sort-indicator">{getSortIndicator(connectorSynthesisSort, "technicalId")}</span>
+              Technical ID <span className="sort-indicator">{connectorSynthesisSortIndicator("technicalId")}</span>
             </button>
           </th>
-          <th>Local way</th>
-          <th>Destination</th>
-          <th>Length (mm)</th>
+          <th><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "localWay", direction: current.field === "localWay" && current.direction === "asc" ? "desc" : "asc" }))}>Local way <span className="sort-indicator">{connectorSynthesisSortIndicator("localWay")}</span></button></th>
+          <th><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "destination", direction: current.field === "destination" && current.direction === "asc" ? "desc" : "asc" }))}>Destination <span className="sort-indicator">{connectorSynthesisSortIndicator("destination")}</span></button></th>
+          <th><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>Length (mm) <span className="sort-indicator">{connectorSynthesisSortIndicator("lengthMm")}</span></button></th>
         </tr>
       </thead>
       <tbody>
-        {sortedConnectorSynthesisRows.map((row) => (
+        {sortedConnectorSynthesisRowsByColumns.map((row) => {
+          const wire = wireById.get(row.wireId);
+          const primary = wire?.primaryColorId === null || wire?.primaryColorId === undefined ? null : (CABLE_COLOR_BY_ID[wire.primaryColorId] ?? null);
+          const secondary = wire?.secondaryColorId === null || wire?.secondaryColorId === undefined ? null : (CABLE_COLOR_BY_ID[wire.secondaryColorId] ?? null);
+          return (
           <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
-            <td>{row.wireName}</td>
+            <td>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
+                {primary !== null ? <span aria-hidden="true" style={{ width: "0.7rem", height: "0.7rem", borderRadius: "999px", border: "1px solid rgba(255,255,255,0.25)", background: primary.hex }} /> : null}
+                {secondary !== null ? <span aria-hidden="true" style={{ width: "0.7rem", height: "0.7rem", borderRadius: "999px", border: "1px solid rgba(255,255,255,0.25)", background: secondary.hex }} /> : null}
+                <span>{row.wireName}</span>
+              </span>
+            </td>
             <td className="technical-id">{row.wireTechnicalId}</td>
             <td>{row.localEndpointLabel}</td>
             <td>{row.remoteEndpointLabel}</td>
             <td>{row.lengthMm}</td>
           </tr>
-        ))}
+          );
+        })}
       </tbody>
     </table>
   )}

@@ -80,6 +80,56 @@ export function nextSortState(current: SortState, field: SortField): SortState {
   };
 }
 
+export type SortablePrimitive = string | number | null | undefined;
+
+function isEmptySortableValue(value: SortablePrimitive): boolean {
+  if (value === null || value === undefined) {
+    return true;
+  }
+  return typeof value === "string" && value.trim().length === 0;
+}
+
+export function compareSortableValues(left: SortablePrimitive, right: SortablePrimitive, direction: SortDirection): number {
+  const leftEmpty = isEmptySortableValue(left);
+  const rightEmpty = isEmptySortableValue(right);
+  if (leftEmpty && rightEmpty) {
+    return 0;
+  }
+  if (leftEmpty) {
+    return 1;
+  }
+  if (rightEmpty) {
+    return -1;
+  }
+
+  if (typeof left === "number" && typeof right === "number") {
+    const delta = left - right;
+    if (delta === 0) {
+      return 0;
+    }
+    return direction === "asc" ? delta : -delta;
+  }
+
+  const comparison = String(left).localeCompare(String(right), undefined, { sensitivity: "base" });
+  return direction === "asc" ? comparison : -comparison;
+}
+
+export function sortByTableColumns<T, Field extends string>(
+  items: T[],
+  sortState: { field: Field; direction: SortDirection },
+  getValue: (item: T, field: Field) => SortablePrimitive,
+  getTieBreaker?: (item: T) => string
+): T[] {
+  const fallback = getTieBreaker ?? (() => "");
+  return [...items].sort((left, right) => {
+    const primary = compareSortableValues(getValue(left, sortState.field), getValue(right, sortState.field), sortState.direction);
+    if (primary !== 0) {
+      return primary;
+    }
+    return fallback(left).localeCompare(fallback(right), undefined, { sensitivity: "base" });
+  });
+}
+
 export function buildUniqueNetworkTechnicalId(baseTechnicalId: string, existingTechnicalIds: Set<string>): string {
   if (!existingTechnicalIds.has(baseTechnicalId)) {
     return baseTechnicalId;
