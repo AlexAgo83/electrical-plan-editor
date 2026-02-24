@@ -9,6 +9,10 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - settings wire/create defaults", () => {
+  function clickNewFromPanel(panelHeading: "Connectors" | "Splices" | "Wires"): void {
+    fireEvent.click(within(getPanelByHeading(panelHeading)).getByRole("button", { name: "New" }));
+  }
+
   beforeEach(() => {
     localStorage.clear();
   });
@@ -32,19 +36,19 @@ describe("App integration UI - settings wire/create defaults", () => {
 
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("wire");
-    fireEvent.click(within(getPanelByHeading("Wire form")).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Wires");
     const createWirePanel = getPanelByHeading("Create Wire");
     expect(within(createWirePanel).getByLabelText("Section (mm²)")).toHaveValue(0.75);
     fireEvent.click(within(createWirePanel).getByRole("button", { name: "Cancel" }));
 
     switchSubScreenDrawerAware("connector");
-    fireEvent.click(within(getPanelByHeading("Connector form")).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Connectors");
     const createConnectorPanel = getPanelByHeading("Create Connector");
     expect(within(createConnectorPanel).getByLabelText("Auto-create linked node on connector creation")).not.toBeChecked();
     fireEvent.click(within(createConnectorPanel).getByRole("button", { name: "Cancel" }));
 
     switchSubScreenDrawerAware("splice");
-    fireEvent.click(within(getPanelByHeading("Splice form")).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Splices");
     const createSplicePanel = getPanelByHeading("Create Splice");
     expect(within(createSplicePanel).getByLabelText("Auto-create linked node on splice creation")).not.toBeChecked();
 

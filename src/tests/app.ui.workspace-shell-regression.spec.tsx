@@ -151,7 +151,7 @@ describe("App integration UI - workspace shell regression", () => {
     renderAppWithState(createUiIntegrationState());
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
-    let primaryNavRow = document.querySelector(".workspace-nav-row");
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
 
     fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: "Modeling" }));
