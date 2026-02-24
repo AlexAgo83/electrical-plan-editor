@@ -196,6 +196,12 @@
   white-space: nowrap;
 }
 
+.table-export-button,
+.onboarding-help-button {
+  border-style: dashed;
+  border-width: 2px;
+}
+
 .table-export-icon {
   width: 0.78rem;
   height: 0.78rem;
