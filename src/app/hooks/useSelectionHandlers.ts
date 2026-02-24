@@ -240,45 +240,45 @@ export function useSelectionHandlers({
   }
 
   function handleOpenSelectionInAnalysis(): void {
-    const hasConnectorNodeSelection = selectedNode !== null && selectedNode.kind === "connector";
-    const hasSpliceNodeSelection = selectedNode !== null && selectedNode.kind === "splice";
     const targetSubScreen: SubScreenId | null =
-      selectedConnector !== null || hasConnectorNodeSelection
+      selectedConnector !== null
         ? "connector"
-        : selectedSplice !== null || hasSpliceNodeSelection
+        : selectedSplice !== null
           ? "splice"
-          : selectedWire !== null
-            ? "wire"
-            : selectedSubScreen === "wire"
-              ? "wire"
-              : null;
-
-    if (targetSubScreen === null) {
-      return;
-    }
+          : selectedNode !== null || selectedSubScreen === "node"
+            ? "node"
+            : selectedSegment !== null || selectedSubScreen === "segment"
+              ? "segment"
+              : selectedWire !== null
+                ? "wire"
+                : selectedSubScreen === "wire"
+                  ? "wire"
+                  : null;
 
     const selectionForAnalysis: SelectionTarget | null =
       selectedConnector !== null
         ? { kind: "connector", id: selectedConnector.id }
         : selectedSplice !== null
           ? { kind: "splice", id: selectedSplice.id }
-          : selectedWire !== null
-            ? { kind: "wire", id: selectedWire.id }
-            : hasConnectorNodeSelection
-              ? { kind: "connector", id: selectedNode.connectorId }
-              : hasSpliceNodeSelection
-                ? { kind: "splice", id: selectedNode.spliceId }
+          : selectedNode !== null
+            ? { kind: "node", id: selectedNode.id }
+            : selectedSegment !== null
+              ? { kind: "segment", id: selectedSegment.id }
+              : selectedWire !== null
+                ? { kind: "wire", id: selectedWire.id }
                 : selected;
 
-    if (selectionForAnalysis !== null) {
-      dispatchAction(
-        appActions.select({
-          kind: selectionForAnalysis.kind,
-          id: selectionForAnalysis.id
-        }),
-        { trackHistory: false }
-      );
+    if (targetSubScreen === null || selectionForAnalysis === null) {
+      return;
     }
+
+    dispatchAction(
+      appActions.select({
+        kind: selectionForAnalysis.kind,
+        id: selectionForAnalysis.id
+      }),
+      { trackHistory: false }
+    );
 
     setActiveScreen("analysis");
     setActiveSubScreen(targetSubScreen);

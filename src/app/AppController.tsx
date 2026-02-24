@@ -1204,27 +1204,29 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const handleWorkspaceScreenChange = useCallback((targetScreen: "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings") => {
     if (targetScreen === "analysis") {
-      const hasConnectorNodeSelection = selectedNode !== null && selectedNode.kind === "connector";
-      const hasSpliceNodeSelection = selectedNode !== null && selectedNode.kind === "splice";
       const analysisSubScreen =
-        selectedConnector !== null || hasConnectorNodeSelection
+        selectedConnector !== null
           ? "connector"
-          : selectedSplice !== null || hasSpliceNodeSelection
+          : selectedSplice !== null
             ? "splice"
-            : selectedWire !== null || activeSubScreen === "wire"
-              ? "wire"
-              : "connector";
+            : selectedNode !== null || activeSubScreen === "node"
+              ? "node"
+              : selectedSegment !== null || activeSubScreen === "segment"
+                ? "segment"
+                : selectedWire !== null || activeSubScreen === "wire"
+                  ? "wire"
+                  : "connector";
 
       if (selectedConnector !== null) {
         dispatchAction(appActions.select({ kind: "connector", id: selectedConnector.id }), { trackHistory: false });
       } else if (selectedSplice !== null) {
         dispatchAction(appActions.select({ kind: "splice", id: selectedSplice.id }), { trackHistory: false });
+      } else if (selectedNode !== null) {
+        dispatchAction(appActions.select({ kind: "node", id: selectedNode.id }), { trackHistory: false });
+      } else if (selectedSegment !== null) {
+        dispatchAction(appActions.select({ kind: "segment", id: selectedSegment.id }), { trackHistory: false });
       } else if (selectedWire !== null) {
         dispatchAction(appActions.select({ kind: "wire", id: selectedWire.id }), { trackHistory: false });
-      } else if (hasConnectorNodeSelection) {
-        dispatchAction(appActions.select({ kind: "connector", id: selectedNode.connectorId }), { trackHistory: false });
-      } else if (hasSpliceNodeSelection) {
-        dispatchAction(appActions.select({ kind: "splice", id: selectedNode.spliceId }), { trackHistory: false });
       }
 
       setActiveScreen("analysis");

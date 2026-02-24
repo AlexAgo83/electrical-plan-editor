@@ -89,8 +89,9 @@ export function InspectorContextPanel({
   const canOpenAnalysis =
     selectedConnector !== null ||
     selectedSplice !== null ||
-    selectedWire !== null ||
-    (selectedNode !== null && (selectedNode.kind === "connector" || selectedNode.kind === "splice"));
+    selectedNode !== null ||
+    selectedSegment !== null ||
+    selectedWire !== null;
   const detailRows: Array<{ label: string; value: ReactElement | string }> = [];
 
   if (selectedConnector !== null) {
