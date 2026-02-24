@@ -39,6 +39,9 @@ export function handleNodeActions(state: AppState, action: AppAction): AppState 
   switch (action.type) {
     case "node/upsert": {
       const normalizedNodeId = action.payload.id.trim() as typeof action.payload.id;
+      if (normalizedNodeId.length === 0) {
+        return withError(state, "Node ID is required.");
+      }
       if (action.payload.kind === "connector") {
         if (state.connectors.byId[action.payload.connectorId] === undefined) {
           return withError(state, "Cannot create connector node for unknown connector.");

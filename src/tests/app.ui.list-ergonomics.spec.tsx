@@ -83,6 +83,7 @@ describe("App integration UI - list ergonomics", () => {
 
     const wireFilterFieldSelect = within(wiresPanel).getByLabelText("Wire filter field");
     const wireFilterInput = within(wiresPanel).getByPlaceholderText("Connector/Splice or ID");
+    expect(within(wiresPanel).getByLabelText("Wire filter field query")).toBe(wireFilterInput);
 
     fireEvent.change(wireFilterInput, { target: { value: "SPL-J1" } });
     expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();

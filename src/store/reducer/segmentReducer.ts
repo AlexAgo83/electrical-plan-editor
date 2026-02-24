@@ -7,6 +7,9 @@ export function handleSegmentActions(state: AppState, action: AppAction): AppSta
   switch (action.type) {
     case "segment/upsert": {
       const normalizedSegmentId = action.payload.id.trim() as typeof action.payload.id;
+      if (normalizedSegmentId.length === 0) {
+        return withError(state, "Segment ID is required.");
+      }
       if (action.payload.nodeA === action.payload.nodeB) {
         return withError(state, "Segment endpoints must reference two different nodes.");
       }

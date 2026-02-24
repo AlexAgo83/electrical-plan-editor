@@ -140,6 +140,39 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).not.toHaveClass("theme-paper-blueprint");
   });
 
+  it("renders representative workspace surfaces under standalone themes beyond shell class wiring", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    const appShell = document.querySelector("main.app-shell");
+    expect(appShell).not.toBeNull();
+
+    switchScreen("settings");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Appearance preferences" }).closest(".panel");
+    expect(settingsPanel).not.toBeNull();
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "petrolSlate" }
+    });
+    expect(appShell).toHaveClass("theme-petrol-slate");
+    expect(within(settingsPanel as HTMLElement).getByLabelText("Theme mode")).toBeInTheDocument();
+    expect(within(settingsPanel as HTMLElement).getByRole("button", { name: /Apply sort defaults now/i })).toBeInTheDocument();
+
+    switchScreen("validation");
+    expect(within(document.body).getByRole("heading", { name: "Validation center" })).toBeInTheDocument();
+
+    switchScreen("settings");
+    const settingsPanelAgain = within(document.body).getByRole("heading", { name: "Appearance preferences" }).closest(".panel");
+    expect(settingsPanelAgain).not.toBeNull();
+    fireEvent.change(within(settingsPanelAgain as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "sagePaper" }
+    });
+    expect(appShell).toHaveClass("theme-sage-paper");
+
+    switchScreen("analysis");
+    expect(within(document.body).getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
+    expect(within(document.body).getByRole("heading", { name: "Route preview" })).toBeInTheDocument();
+  });
+
   it("persists dark mode preference across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreen("settings");
