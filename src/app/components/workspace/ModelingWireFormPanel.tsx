@@ -123,15 +123,18 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       </select>
     </label>
     {isFreeColorMode ? (
-      <label>
-        Free color label
-        <input
-          value={wireFreeColorLabel}
-          onChange={(event) => setWireFreeColorLabel(event.target.value)}
-          maxLength={MAX_FREE_WIRE_COLOR_LABEL_LENGTH}
-          placeholder="Beige/Brown mix"
-        />
-      </label>
+      <>
+        <label>
+          Free color label
+          <input
+            value={wireFreeColorLabel}
+            onChange={(event) => setWireFreeColorLabel(event.target.value)}
+            maxLength={MAX_FREE_WIRE_COLOR_LABEL_LENGTH}
+            placeholder="Optional (e.g. Beige/Brown mix)"
+          />
+        </label>
+        <small className="inline-help">Leave empty to keep the cable color free (unspecified) for plan execution.</small>
+      </>
     ) : null}
     {!isFreeColorMode ? (
       <>
@@ -190,7 +193,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
           >
             Free
           </span>
-          {wireFreeColorLabel.trim().length === 0 ? "Enter a free color label" : wireFreeColorLabel.trim()}
+          {wireFreeColorLabel.trim().length === 0 ? "Free color left unspecified" : wireFreeColorLabel.trim()}
         </>
       ) : primaryColor === undefined ? (
         <>No color</>
