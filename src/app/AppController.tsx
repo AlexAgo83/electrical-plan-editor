@@ -1156,7 +1156,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     modelingHandlers;
 
   const {
-    handleOpenSelectionInAnalysis,
     handleOpenValidationScreen,
     moveValidationIssueCursor,
     moveVisibleValidationIssueCursor,
@@ -1445,7 +1444,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     selectedSpliceOccupiedCount,
     describeNode,
     handleStartSelectedEdit,
-    handleOpenSelectionInAnalysis,
     onClearSelection: () => {
       dispatchAction(appActions.clearSelection());
       clearAllModelingForms();

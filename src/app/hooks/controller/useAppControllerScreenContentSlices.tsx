@@ -36,7 +36,6 @@ type InspectorContextPanelControllerSliceParams = Omit<
   | "connectorOccupiedCount"
   | "spliceOccupiedCount"
   | "onEditSelected"
-  | "onOpenAnalysis"
   | "onClearSelection"
 > & {
   isInspectorOpen: boolean;
@@ -47,7 +46,6 @@ type InspectorContextPanelControllerSliceParams = Omit<
   selectedConnectorOccupiedCount: number;
   selectedSpliceOccupiedCount: number;
   handleStartSelectedEdit: ComponentProps<typeof InspectorContextPanel>["onEditSelected"];
-  handleOpenSelectionInAnalysis: ComponentProps<typeof InspectorContextPanel>["onOpenAnalysis"];
   onClearSelection: ComponentProps<typeof InspectorContextPanel>["onClearSelection"];
 };
 
@@ -180,7 +178,6 @@ export function useInspectorContextPanelControllerSlice(params: InspectorContext
     spliceOccupiedCount: params.selectedSpliceOccupiedCount,
     describeNode: params.describeNode,
     onEditSelected: params.handleStartSelectedEdit,
-    onOpenAnalysis: params.handleOpenSelectionInAnalysis,
     onClearSelection: params.onClearSelection
   } satisfies ComponentProps<typeof InspectorContextPanel>;
 

@@ -20,7 +20,6 @@ interface InspectorContextPanelProps {
   spliceOccupiedCount: number;
   describeNode: (node: NetworkNode) => string;
   onEditSelected: () => void;
-  onOpenAnalysis: () => void;
   onClearSelection: () => void;
 }
 
@@ -41,7 +40,6 @@ export function InspectorContextPanel({
   spliceOccupiedCount,
   describeNode,
   onEditSelected,
-  onOpenAnalysis,
   onClearSelection
 }: InspectorContextPanelProps): ReactElement {
   function renderCableColorSwatches(
@@ -115,12 +113,6 @@ export function InspectorContextPanel({
   }
 
   const isCollapsed = mode === "collapsed";
-  const canOpenAnalysis =
-    selectedConnector !== null ||
-    selectedSplice !== null ||
-    selectedNode !== null ||
-    selectedSegment !== null ||
-    selectedWire !== null;
   const detailRows: Array<{ label: string; value: ReactElement | string }> = [];
 
   if (selectedConnector !== null) {
@@ -230,11 +222,7 @@ export function InspectorContextPanel({
           <div className="row-actions compact inspector-actions">
             <button type="button" className="button-with-icon" onClick={onEditSelected} disabled={selectedSubScreen === null}>
               <span className="action-button-icon is-edit" aria-hidden="true" />
-              Edit
-            </button>
-            <button type="button" className="button-with-icon" onClick={onOpenAnalysis} disabled={!canOpenAnalysis}>
-              <span className="action-button-icon is-analysis" aria-hidden="true" />
-              Analysis
+              Select
             </button>
             <button type="button" className="button-with-icon" onClick={onClearSelection}>
               <span className="action-button-icon is-unselect" aria-hidden="true" />
