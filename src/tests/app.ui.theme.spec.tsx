@@ -169,8 +169,12 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).toHaveClass("theme-sage-paper");
 
     switchScreen("analysis");
-    expect(within(document.body).getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
+    expect(within(document.body).queryByRole("heading", { name: "Connector analysis" })).toBeNull();
     expect(within(document.body).getByRole("heading", { name: "Route preview" })).toBeInTheDocument();
+    const connectorsPanel = within(document.body).getByRole("heading", { name: "Connectors" }).closest(".panel");
+    expect(connectorsPanel).not.toBeNull();
+    fireEvent.click(within(connectorsPanel as HTMLElement).getByText("Connector 1"));
+    expect(within(document.body).getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
   });
 
   it("persists dark mode preference across remount", () => {

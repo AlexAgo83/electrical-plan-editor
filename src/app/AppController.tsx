@@ -1259,6 +1259,19 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setActiveSubScreen
   ]);
 
+  const handleWorkspaceDrawerScreenChange = useCallback(
+    (targetScreen: "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings") => {
+      if (targetScreen === "modeling") {
+        setIsModelingAnalysisFocused(false);
+        setActiveScreen("modeling");
+        return;
+      }
+
+      handleWorkspaceScreenChange(targetScreen);
+    },
+    [handleWorkspaceScreenChange, setActiveScreen, setIsModelingAnalysisFocused]
+  );
+
   useEffect(() => {
     if (activeScreen === "analysis" || (activeScreen === "modeling" && isModelingAnalysisFocused)) {
       setLastAnalysisSubScreen(activeSubScreen);
@@ -1409,6 +1422,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   });
   const networkScalePercent = Math.round(networkScale * 100);
   const hasInspectableSelection = selected !== null && selectedSubScreen !== null;
+  const hasActiveEntityForm =
+    formsState.connectorFormMode !== "idle" ||
+    formsState.spliceFormMode !== "idle" ||
+    formsState.nodeFormMode !== "idle" ||
+    formsState.segmentFormMode !== "idle" ||
+    formsState.wireFormMode !== "idle";
   const {
     isInspectorHidden,
     canExpandInspectorFromCollapsed,
@@ -1810,6 +1829,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       includeValidationContent: hasActiveNetwork && isValidationScreen,
       includeSettingsContent: isSettingsScreen
     });
+  const modelingFormsColumnContentForLayout =
+    hasInspectableSelection || hasActiveEntityForm ? modelingFormsColumnContent : null;
+  const analysisWorkspaceContentForLayout = hasInspectableSelection ? analysisWorkspaceContent : null;
 
   return (
     <>
@@ -1847,7 +1869,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isAnalysisScreen={isAnalysisScreen}
       isValidationScreen={isValidationScreen}
       entityCountBySubScreen={entityCountBySubScreen}
-      onScreenChange={handleWorkspaceScreenChange}
+      onScreenChange={handleWorkspaceDrawerScreenChange}
       onSubScreenChange={setActiveSubScreen}
       handleUndo={handleUndo}
       handleRedo={handleRedo}
@@ -1873,9 +1895,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       hasActiveNetwork={hasActiveNetwork}
       networkScopeWorkspaceContent={networkScopeWorkspaceContent}
       modelingLeftColumnContent={modelingLeftColumnContent}
-      modelingFormsColumnContent={modelingFormsColumnContent}
+      modelingFormsColumnContent={modelingFormsColumnContentForLayout}
       networkSummaryPanel={networkSummaryPanel}
-      analysisWorkspaceContent={analysisWorkspaceContent}
+      analysisWorkspaceContent={analysisWorkspaceContentForLayout}
       validationWorkspaceContent={validationWorkspaceContent}
       settingsWorkspaceContent={settingsWorkspaceContent}
       isSettingsScreen={isSettingsScreen}

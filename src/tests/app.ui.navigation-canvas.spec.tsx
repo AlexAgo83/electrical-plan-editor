@@ -45,12 +45,27 @@ describe("App integration UI - navigation and canvas", () => {
     expect(screen.getByRole("button", { name: "Open menu" })).toBeInTheDocument();
   });
 
+  it("keeps drawer open for Modeling but closes it for other primary entries", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    let primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/ }));
+    expect(screen.getByRole("button", { name: "Close menu" })).toBeInTheDocument();
+
+    primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Validation$/ }));
+    expect(screen.getByRole("button", { name: "Open menu" })).toBeInTheDocument();
+  });
+
   it("supports undo and redo for modeling actions", () => {
     renderAppWithState(createInitialState());
     switchScreenDrawerAware("modeling");
 
-    const idleConnectorFormPanel = getPanelByHeading("Connector form");
-    fireEvent.click(within(idleConnectorFormPanel).getByRole("button", { name: "Create" }));
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "New" }));
     const connectorFormPanel = getPanelByHeading("Create Connector");
     fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
       target: { value: "Undo test connector" }
@@ -63,7 +78,6 @@ describe("App integration UI - navigation and canvas", () => {
     });
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
 
-    const connectorsPanel = getPanelByHeading("Connectors");
     expect(within(connectorsPanel).getByText("Undo test connector")).toBeInTheDocument();
 
     openOperationsHealthPanel();
@@ -449,7 +463,7 @@ describe("App integration UI - navigation and canvas", () => {
     expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/, hidden: true })).toHaveClass(
       "is-active"
     );
-    expect(getPanelByHeading("Wire analysis")).toBeInTheDocument();
+    expect(getPanelByHeading("Wires")).toBeInTheDocument();
 
     fireEvent.keyDown(window, { key: "4", altKey: true, shiftKey: true });
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");

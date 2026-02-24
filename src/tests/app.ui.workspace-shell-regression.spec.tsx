@@ -146,7 +146,7 @@ describe("App integration UI - workspace shell regression", () => {
     expect(document.querySelector(".workspace-ops-panel")).toBeInTheDocument();
   });
 
-  it("keeps the navigation drawer open when switching within unified modeling workspace", () => {
+  it("keeps the drawer open for Modeling but closes it after entity navigation selection", () => {
     renderAppWithState(createUiIntegrationState());
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
@@ -160,11 +160,31 @@ describe("App integration UI - workspace shell regression", () => {
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
     fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: "Wire" }));
+    expect(screen.getByRole("button", { name: "Open menu" })).toBeInTheDocument();
+  });
+
+  it("keeps the drawer open on Modeling click even when a selection already exists", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    fireEvent.click(screen.getByRole("button", { name: /Modeling/i }));
+    const connectorsPanel = screen.getByRole("heading", { name: "Connectors" }).closest(".panel");
+    expect(connectorsPanel).not.toBeNull();
+    fireEvent.click(within(connectorsPanel as HTMLElement).getByText("Connector 1"));
+
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /Home/i, hidden: true }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    const drawerPrimaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(drawerPrimaryNavRow).not.toBeNull();
+    fireEvent.click(within(drawerPrimaryNavRow as HTMLElement).getByRole("button", { name: /Modeling/i }));
+
     expect(screen.getByRole("button", { name: "Close menu" })).toBeInTheDocument();
     expect(document.querySelector(".workspace-nav-row.secondary")).not.toBeNull();
   });
 
-  it("keeps a single Modeling primary entry and shows analysis panels in Modeling", () => {
+  it("keeps a single Modeling primary entry and hides form/analysis panels until selection", () => {
     renderAppWithState(createUiIntegrationState());
 
     const primaryNavRowBefore = document.querySelector(".workspace-nav-row");
@@ -177,8 +197,14 @@ describe("App integration UI - workspace shell regression", () => {
     const modelingTab = within(primaryNavRowAfter as HTMLElement).getByRole("button", { name: /Modeling/i, hidden: true });
     expect(modelingTab).toHaveClass("is-active");
     expect(screen.getAllByRole("heading", { name: "Connectors" })).toHaveLength(1);
+    expect(screen.queryByRole("heading", { name: "Connector analysis" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Connector form" })).toBeNull();
+
+    const connectorsPanel = screen.getByRole("heading", { name: "Connectors" }).closest(".panel");
+    expect(connectorsPanel).not.toBeNull();
+    fireEvent.click(within(connectorsPanel as HTMLElement).getByText("Connector 1"));
     expect(screen.getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Connector form" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Edit Connector" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Switch to analysis view" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Switch to editing" })).toBeNull();
   });
@@ -192,6 +218,9 @@ describe("App integration UI - workspace shell regression", () => {
 
     const quickEntityNav = screen.getByRole("group", { name: "Quick entity navigation strip" });
     fireEvent.click(within(quickEntityNav).getByRole("button", { name: /Connectors 1/i }));
+    let connectorsPanel = screen.getByRole("heading", { name: "Connectors" }).closest(".panel");
+    expect(connectorsPanel).not.toBeNull();
+    fireEvent.click(within(connectorsPanel as HTMLElement).getByText("Connector 1"));
     expect(screen.getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
 
     const connectorFilterInput = screen.getByRole("textbox", { name: "Connector filter field query" });
@@ -205,6 +234,9 @@ describe("App integration UI - workspace shell regression", () => {
     expect(primaryNavRowReturn).not.toBeNull();
     fireEvent.click(within(primaryNavRowReturn as HTMLElement).getByRole("button", { name: /Modeling/i, hidden: true }));
 
+    connectorsPanel = screen.getByRole("heading", { name: "Connectors" }).closest(".panel");
+    expect(connectorsPanel).not.toBeNull();
+    fireEvent.click(within(connectorsPanel as HTMLElement).getByText("Connector 1"));
     expect(screen.getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Connector filter field query" })).toHaveValue("C-1");
   });
