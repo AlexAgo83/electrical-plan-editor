@@ -379,6 +379,19 @@ export function NetworkScopeWorkspaceContent({
         )}
         <div className="row-actions compact network-scope-list-actions">
           <div className="network-scope-list-actions-row">
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={() => {
+                if (focusedNetwork !== null) {
+                  handleOpenNetworkInModeling(focusedNetwork.id);
+                }
+              }}
+              disabled={focusedNetwork === null || isCreateMode}
+            >
+              <span className="action-button-icon is-open" aria-hidden="true" />
+              Open
+            </button>
             <button type="button" className="network-scope-create-button button-with-icon" onClick={handleOpenCreateNetworkForm}>
               <span className="action-button-icon is-new" aria-hidden="true" />
               New
@@ -395,47 +408,6 @@ export function NetworkScopeWorkspaceContent({
             >
               <span className="action-button-icon is-duplicate" aria-hidden="true" />
               Duplicate
-            </button>
-            <button
-              type="button"
-              className="network-delete-button button-with-icon"
-              onClick={() => {
-                if (focusedNetwork !== null) {
-                  handleDeleteNetwork(focusedNetwork.id);
-                }
-              }}
-              disabled={focusedNetwork === null || isCreateMode}
-            >
-              <span className="action-button-icon is-delete" aria-hidden="true" />
-              Delete
-            </button>
-          </div>
-          <div className="network-scope-list-actions-row">
-            <button
-              type="button"
-              className="button-with-icon"
-              onClick={() => {
-                if (focusedNetwork !== null) {
-                  handleOpenNetworkInModeling(focusedNetwork.id);
-                }
-              }}
-              disabled={focusedNetwork === null || isCreateMode}
-            >
-              <span className="action-button-icon is-open" aria-hidden="true" />
-              Open
-            </button>
-            <button
-              type="button"
-              className="button-with-icon"
-              onClick={() => {
-                if (focusedNetwork !== null) {
-                  handleSelectNetwork(focusedNetwork.id);
-                }
-              }}
-              disabled={focusedNetwork === null || isCreateMode || focusedNetwork.id === activeNetworkId}
-            >
-              <span className="action-button-icon is-active" aria-hidden="true" />
-              Set active
             </button>
             <button
               type="button"
@@ -513,6 +485,36 @@ export function NetworkScopeWorkspaceContent({
                 {isEditMode ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
                 {isCreateMode ? "Create network" : "Save network"}
               </button>
+              {isEditMode ? (
+                <button
+                  type="button"
+                  className="button-with-icon"
+                  onClick={() => {
+                    if (focusedNetwork !== null) {
+                      handleSelectNetwork(focusedNetwork.id);
+                    }
+                  }}
+                  disabled={focusedNetwork === null || focusedNetwork.id === activeNetworkId}
+                >
+                  <span className="action-button-icon is-active" aria-hidden="true" />
+                  Set active
+                </button>
+              ) : null}
+              {isEditMode ? (
+                <button
+                  type="button"
+                  className="network-delete-button button-with-icon"
+                  onClick={() => {
+                    if (focusedNetwork !== null) {
+                      handleDeleteNetwork(focusedNetwork.id);
+                    }
+                  }}
+                  disabled={focusedNetwork === null}
+                >
+                  <span className="action-button-icon is-delete" aria-hidden="true" />
+                  Delete
+                </button>
+              ) : null}
               <button
                 type="button"
                 className={isEditMode ? "button-with-icon" : undefined}
