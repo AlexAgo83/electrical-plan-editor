@@ -62,13 +62,15 @@ function hasWireEndpointReferenceOnSplice(state: AppState, spliceId: string): bo
 export function handleSpliceActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "splice/upsert": {
+      const normalizedName = action.payload.name.trim();
+      const normalizedTechnicalId = action.payload.technicalId.trim();
       const portCount = action.payload.portCount;
       if (!Number.isInteger(portCount) || portCount < 1) {
         return withError(state, "Splice portCount must be an integer >= 1.");
       }
 
-      if (hasDuplicateSpliceTechnicalId(state, action.payload.id, action.payload.technicalId)) {
-        return withError(state, `Splice technical ID '${action.payload.technicalId}' is already used.`);
+      if (hasDuplicateSpliceTechnicalId(state, action.payload.id, normalizedTechnicalId)) {
+        return withError(state, `Splice technical ID '${normalizedTechnicalId}' is already used.`);
       }
 
       const occupancy = state.splicePortOccupancy[action.payload.id];
@@ -89,6 +91,8 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
         ...clearLastError(state),
         splices: upsertEntity(state.splices, {
           ...action.payload,
+          name: normalizedName,
+          technicalId: normalizedTechnicalId,
           manufacturerReference: normalizeManufacturerReference(action.payload.manufacturerReference)
         })
       });

@@ -259,6 +259,8 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
     case "wire/upsert": {
       const normalizedPayload = {
         ...action.payload,
+        name: action.payload.name.trim(),
+        technicalId: action.payload.technicalId.trim(),
         sectionMm2: resolveWireSectionMm2(action.payload.sectionMm2),
         ...normalizeWireColorIds(action.payload.primaryColorId, action.payload.secondaryColorId),
         endpointAConnectionReference: normalizeWireEndpointReference(action.payload.endpointAConnectionReference),

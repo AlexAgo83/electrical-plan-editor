@@ -62,13 +62,15 @@ function hasWireEndpointReferenceOnConnector(state: AppState, connectorId: strin
 export function handleConnectorActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "connector/upsert": {
+      const normalizedName = action.payload.name.trim();
+      const normalizedTechnicalId = action.payload.technicalId.trim();
       const cavityCount = action.payload.cavityCount;
       if (!Number.isInteger(cavityCount) || cavityCount < 1) {
         return withError(state, "Connector wayCount must be an integer >= 1.");
       }
 
-      if (hasDuplicateConnectorTechnicalId(state, action.payload.id, action.payload.technicalId)) {
-        return withError(state, `Connector technical ID '${action.payload.technicalId}' is already used.`);
+      if (hasDuplicateConnectorTechnicalId(state, action.payload.id, normalizedTechnicalId)) {
+        return withError(state, `Connector technical ID '${normalizedTechnicalId}' is already used.`);
       }
 
       const occupancy = state.connectorCavityOccupancy[action.payload.id];
@@ -89,6 +91,8 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
         ...clearLastError(state),
         connectors: upsertEntity(state.connectors, {
           ...action.payload,
+          name: normalizedName,
+          technicalId: normalizedTechnicalId,
           manufacturerReference: normalizeManufacturerReference(action.payload.manufacturerReference)
         })
       });

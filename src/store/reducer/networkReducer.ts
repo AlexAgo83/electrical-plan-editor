@@ -67,6 +67,14 @@ function withUiResetSelection(state: AppState): AppState {
   };
 }
 
+function normalizeOptionalText(value: string | undefined): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  const normalized = value.trim();
+  return normalized.length === 0 ? undefined : normalized;
+}
+
 export function handleNetworkActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "network/create": {
@@ -89,7 +97,8 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       const nextNetwork = {
         ...network,
         name: normalizedName,
-        technicalId: normalizedTechnicalId
+        technicalId: normalizedTechnicalId,
+        description: normalizeOptionalText(network.description)
       };
       let nextState: AppState = {
         ...persisted,
@@ -150,7 +159,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         networks: upsertEntity(state.networks, {
           ...existing,
           name: normalizedName,
-          description: action.payload.description,
+          description: normalizeOptionalText(action.payload.description),
           updatedAt: action.payload.updatedAt
         })
       };
@@ -180,7 +189,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           ...existing,
           name: normalizedName,
           technicalId: normalizedTechnicalId,
-          description: action.payload.description,
+          description: normalizeOptionalText(action.payload.description),
           updatedAt: action.payload.updatedAt
         })
       };
@@ -221,7 +230,8 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           networks: upsertEntity(persisted.networks, {
             ...duplicated,
             name: normalizedName,
-            technicalId: normalizedTechnicalId
+            technicalId: normalizedTechnicalId,
+            description: normalizeOptionalText(duplicated.description)
           }),
           networkStates: {
             ...persisted.networkStates,

@@ -38,12 +38,13 @@ function countSegmentsUsingNode(state: AppState, nodeId: string): number {
 export function handleNodeActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "node/upsert": {
+      const normalizedNodeId = action.payload.id.trim() as typeof action.payload.id;
       if (action.payload.kind === "connector") {
         if (state.connectors.byId[action.payload.connectorId] === undefined) {
           return withError(state, "Cannot create connector node for unknown connector.");
         }
 
-        if (hasConnectorNodeConflict(state, action.payload.id, action.payload.connectorId)) {
+        if (hasConnectorNodeConflict(state, normalizedNodeId, action.payload.connectorId)) {
           return withError(state, "Only one connector node is allowed per connector.");
         }
       }
@@ -53,7 +54,7 @@ export function handleNodeActions(state: AppState, action: AppAction): AppState 
           return withError(state, "Cannot create splice node for unknown splice.");
         }
 
-        if (hasSpliceNodeConflict(state, action.payload.id, action.payload.spliceId)) {
+        if (hasSpliceNodeConflict(state, normalizedNodeId, action.payload.spliceId)) {
           return withError(state, "Only one splice node is allowed per splice.");
         }
       }
@@ -62,9 +63,21 @@ export function handleNodeActions(state: AppState, action: AppAction): AppState 
         return withError(state, "Intermediate node label must be non-empty.");
       }
 
+      const normalizedPayload =
+        action.payload.kind === "intermediate"
+          ? {
+              ...action.payload,
+              id: normalizedNodeId,
+              label: action.payload.label.trim()
+            }
+          : {
+              ...action.payload,
+              id: normalizedNodeId
+            };
+
       return bumpRevision({
         ...clearLastError(state),
-        nodes: upsertEntity(state.nodes, action.payload)
+        nodes: upsertEntity(state.nodes, normalizedPayload)
       });
     }
 
