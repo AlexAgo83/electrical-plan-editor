@@ -186,6 +186,8 @@ const QUICK_ENTITY_NAV_ITEMS: Record<
   analysis: [
     { subScreen: "connector", label: "Connectors" },
     { subScreen: "splice", label: "Splices" },
+    { subScreen: "node", label: "Nodes" },
+    { subScreen: "segment", label: "Segments" },
     { subScreen: "wire", label: "Wires" }
   ]
 };
@@ -535,7 +537,11 @@ export function NetworkSummaryPanel({
   const subNetworkFilterInitializedRef = useRef(false);
   const [activeSubNetworkTags, setActiveSubNetworkTags] = useState<Set<string>>(new Set());
   const canQuickSwitchToAnalysis =
-    activeSubScreen === "connector" || activeSubScreen === "splice" || activeSubScreen === "wire";
+    activeSubScreen === "connector" ||
+    activeSubScreen === "splice" ||
+    activeSubScreen === "node" ||
+    activeSubScreen === "segment" ||
+    activeSubScreen === "wire";
   const quickEntityScreenSwitchTarget =
     quickEntityNavigationMode === "modeling" ? (canQuickSwitchToAnalysis ? "analysis" : null) : "modeling";
   const graphStats = [

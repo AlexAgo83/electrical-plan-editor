@@ -47,6 +47,8 @@ export function WorkspaceNavigation({
     ? ([
         ["connector", "Connector"],
         ["splice", "Splice"],
+        ["node", "Node"],
+        ["segment", "Segment"],
         ["wire", "Wire"]
       ] as const)
     : ([
