@@ -2,7 +2,7 @@
 > From version: 0.9.1
 > Understanding: 99%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Delivery orchestration for unified Modeling workspace, migrated Analysis panels, and compatibility navigation alias in req_048
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -63,12 +63,12 @@ Rationale:
 - Finish with state continuity hardening and regression updates once the merged flow is functionally complete.
 
 # Plan
-- [ ] Wave 0. Unified `Modeling` workspace composition scaffolding for analysis panel access (`item_297`)
-- [ ] Wave 1. Migrate analysis panel components into unified `Modeling` flow (`item_298`)
-- [ ] Wave 2. `Analysis` nav entry alias/redirect to `Modeling` analysis-focused mode with last-panel restore / `Wires` fallback (`item_299`)
-- [ ] Wave 3. Unified selection/panel-state continuity and regression hardening (`item_300`)
-- [ ] Wave 4. Closure: final validation, AC traceability, and `logics` synchronization (`item_301`)
-- [ ] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary + defer notes)
+- [x] Wave 0. Unified `Modeling` workspace composition scaffolding for analysis panel access (`item_297`)
+- [x] Wave 1. Migrate analysis panel components into unified `Modeling` flow (`item_298`)
+- [x] Wave 2. `Analysis` nav entry alias/redirect to `Modeling` analysis-focused mode with last-panel restore / `Wires` fallback (`item_299`)
+- [x] Wave 3. Unified selection/panel-state continuity and regression hardening (`item_300`)
+- [x] Wave 4. Closure: final validation, AC traceability, and `logics` synchronization (`item_301`)
+- [x] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary + defer notes)
 
 # Validation gates
 ## A. Minimum wave gate (apply after Waves 0-3)
@@ -124,22 +124,30 @@ Rationale:
 
 # Report
 - Wave status:
-  - Wave 0 (unified Modeling composition scaffolding): pending
-  - Wave 1 (analysis panel component migration): pending
-  - Wave 2 (Analysis alias/redirect + restore/fallback): pending
-  - Wave 3 (state continuity + regression hardening): pending
-  - Wave 4 (closure + AC traceability): pending
-  - FINAL (`.md` synchronization): pending
+  - Wave 0 (unified Modeling composition scaffolding): completed
+  - Wave 1 (analysis panel component migration): completed
+  - Wave 2 (Analysis alias/redirect + restore/fallback): completed
+  - Wave 3 (state continuity + regression hardening): completed
+  - Wave 4 (closure + AC traceability): completed
+  - FINAL (`.md` synchronization): completed
 - Current blockers:
   - None.
 - Main risks to track:
-  - Some current tests or navigation helpers may hard-code `Analysis` as a distinct screen and require coordinated updates.
-  - Merged composition can expose hidden assumptions around panel visibility and lazy module loading.
-  - Last-analysis-panel restore behavior must avoid invalid stale panel keys after future panel changes.
+  - Phase 2 cleanup (full legacy `Analysis` wrapper/path removal) is intentionally deferred; compatibility alias remains by design.
+  - Future panel taxonomy changes should keep `lastAnalysisSubScreen` restore keys synchronized to avoid stale panel fallback churn.
 - Validation snapshot:
-  - Not started.
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s build` ✅
+  - `npm run -s test:ci` ✅ (`34` files / `232` tests)
+  - Targeted UI suites run during delivery/hardening (`workspace-shell-regression`, `networks`, `list-ergonomics`, `theme`, `network-summary-workflow-polish`, `navigation-canvas`) ✅
 - Delivery snapshot:
-  - Not started.
+  - `ed81e64` `ui: improve table readability and unify analysis into modeling` (Phase 1 composition + panel integration + alias baseline)
+  - `819d511` `ui: preserve analysis panel state across modeling alias toggles` (state continuity hardening + duplicate network summary removal)
+  - `1086f80` `test: align workspace specs with modeling-analysis alias behavior` (regression suite alignment for alias fallback and active-tab expectations)
 - AC traceability (`req_048`) target mapping (planned):
   - AC1 -> `item_297`, `item_298`, `item_301`
   - AC2 -> `item_298`, `item_300`, `item_301`
