@@ -199,7 +199,8 @@
 }
 
 .table-export-button,
-.onboarding-help-button {
+.onboarding-help-button,
+.network-summary-export-button {
   border-style: dashed;
   border-width: 2px;
 }

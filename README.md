@@ -55,7 +55,7 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 - Settings defaults for wire section prefill and connector/splice auto-create linked-node behavior
 - Optional manufacturer references for connectors/splices, surfaced in forms and inspector
 - Validation center with grouped issues and issue navigation
-- Theme presets including `Cyberpunk` and `Olive`
+- Theme presets including multiple light and dark themes
 - Local persistence with schema versioning and migrations
 - PWA support (install prompt + offline shell + update readiness in production)
 - Keyboard shortcuts for major workspace actions

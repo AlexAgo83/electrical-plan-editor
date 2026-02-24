@@ -267,20 +267,24 @@
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 0.35rem;
+  gap: 0.16rem;
 }
 
 .settings-shortcut-list li {
   display: grid;
-  grid-template-columns: minmax(11.5rem, max-content) minmax(0, 1fr);
+  grid-template-columns: minmax(8.75rem, max-content) minmax(0, 1fr);
   align-items: start;
-  column-gap: 0.65rem;
+  column-gap: 0.34rem;
   color: #2f4d63;
-  line-height: 1.3;
-  padding: 0.32rem 0.44rem;
-  border: 1px solid #c7d8e6;
-  border-radius: 0.45rem;
-  background: rgba(248, 252, 255, 0.88);
+  line-height: 1.12;
+  padding: 0.14rem 0.22rem;
+}
+
+.settings-shortcut-list li > span:last-child {
+  font-size: 0.78em;
+  line-height: 1.05;
+  justify-self: stretch;
+  text-align: right;
 }
 
 .settings-shortcut-key {
@@ -290,42 +294,46 @@
   border-radius: 0.38rem;
   border: 1px solid #b6ccdd;
   background: #eaf3fa;
-  padding: 0.08rem 0.36rem;
+  padding: 0.03rem 0.2rem;
+  line-height: 1.05;
+  font-size: 0.82em;
 }
 
 .settings-export-selection-grid {
-  gap: 0.45rem;
+  gap: 0.2rem;
 }
 
 .settings-export-network-option {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
-  gap: 0.5rem;
+  gap: 0.35rem;
+  padding: 0.1rem 0.2rem;
+  border-radius: 0.45rem;
 }
 
 .settings-export-network-option input {
-  margin-top: 0.18rem;
+  margin-top: 0.1rem;
 }
 
 .settings-export-network-copy {
   min-width: 0;
   display: grid;
-  gap: 0.1rem;
+  gap: 0.02rem;
 }
 
 .settings-export-network-name {
-  line-height: 1.2;
+  line-height: 1.12;
 }
 
 .settings-export-network-technical-id {
   display: inline-flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.18rem;
+  gap: 0.12rem;
   min-width: 0;
-  font-size: 0.86rem;
-  line-height: 1.2;
+  font-size: 0.82rem;
+  line-height: 1.08;
 }
 
 .settings-export-network-technical-id .technical-id {
@@ -405,7 +413,7 @@
 @media (max-width: 860px) {
   .settings-shortcut-list li {
     grid-template-columns: minmax(0, 1fr);
-    row-gap: 0.15rem;
+    row-gap: 0.04rem;
   }
 
   .settings-panel .settings-grid > label:not(.settings-checkbox) input,
