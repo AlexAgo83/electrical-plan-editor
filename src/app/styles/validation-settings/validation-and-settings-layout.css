@@ -29,7 +29,13 @@
 
 .validation-toolbar > span {
   font-size: 0.84rem;
-  color: #365166;
+  color: inherit;
+  opacity: 0.88;
+}
+
+.validation-toolbar .filter-chip:disabled {
+  opacity: 0.58;
+  -webkit-text-fill-color: currentColor;
 }
 
 .validation-groups {
@@ -47,7 +53,7 @@
 .validation-group h3 {
   margin: 0 0 0.45rem;
   font-size: 0.9rem;
-  color: #27465d;
+  color: inherit;
 }
 
 .validation-active-filter {
