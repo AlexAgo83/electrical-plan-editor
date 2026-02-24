@@ -12,9 +12,11 @@ export {
   createEmptyWorkspaceState,
   createInitialState,
   createEmptyNetworkScopedState,
+  cloneNetworkSummaryViewState,
   type AppState,
   type EntityState,
   type LayoutNodePosition,
+  type NetworkSummaryViewState,
   type NetworkScopedState,
   type SelectionState,
   type ThemeMode

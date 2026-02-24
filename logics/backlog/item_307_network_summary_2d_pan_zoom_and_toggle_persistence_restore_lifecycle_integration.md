@@ -2,7 +2,7 @@
 > From version: 0.9.2
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Canvas interaction and restore lifecycle wiring for per-network 2D view resume
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.

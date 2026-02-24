@@ -735,6 +735,68 @@ describe("localStorage persistence adapter", () => {
     expect(loaded.networkStates[activeNetworkId]?.nodePositions[asNodeId("N-LAYOUT")]).toEqual({ x: 280, y: 160 });
   });
 
+  it("persists valid network summary view-state and drops malformed persisted view-state payloads", () => {
+    const state = createSampleState();
+    const activeNetworkId = state.activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network.");
+    }
+
+    const persistedViewState = {
+      scale: 1.15,
+      offset: { x: 48, y: -22 },
+      showNetworkInfoPanels: false,
+      showSegmentLengths: true,
+      showCableCallouts: true,
+      showNetworkGrid: false,
+      snapNodesToGrid: false,
+      lockEntityMovement: true
+    } as const;
+
+    const withViewState: AppState = {
+      ...state,
+      networkStates: {
+        ...state.networkStates,
+        [activeNetworkId]: {
+          ...state.networkStates[activeNetworkId]!,
+          networkSummaryViewState: persistedViewState
+        }
+      }
+    };
+
+    const storage = createMemoryStorage();
+    saveState(withViewState, storage, () => "2026-02-20T14:10:00.000Z");
+    const loaded = loadState(storage, () => "2026-02-20T14:11:00.000Z");
+    expect(loaded.networkStates[activeNetworkId]?.networkSummaryViewState).toEqual(persistedViewState);
+
+    const malformedSnapshot = JSON.stringify({
+      schemaVersion: APP_SCHEMA_VERSION,
+      createdAtIso: "2026-02-10T08:00:00.000Z",
+      updatedAtIso: "2026-02-10T08:30:00.000Z",
+      state: {
+        ...withViewState,
+        networkStates: {
+          ...withViewState.networkStates,
+          [activeNetworkId]: {
+            ...withViewState.networkStates[activeNetworkId]!,
+            networkSummaryViewState: {
+              scale: "oops",
+              offset: { x: 12, y: null },
+              showNetworkInfoPanels: false
+            }
+          }
+        }
+      }
+    } satisfies PersistedStateSnapshotV1);
+
+    const malformedStorage = createMemoryStorage({
+      [STORAGE_KEY]: malformedSnapshot
+    });
+    const normalized = loadState(malformedStorage, () => "2026-02-20T14:12:00.000Z");
+    expect(normalized.networkStates[activeNetworkId]?.networkSummaryViewState).toBeUndefined();
+  });
+
   it("backs up unsupported future-version payloads before replacing local storage", () => {
     const futurePayload = {
       payloadKind: PERSISTED_STATE_PAYLOAD_KIND,

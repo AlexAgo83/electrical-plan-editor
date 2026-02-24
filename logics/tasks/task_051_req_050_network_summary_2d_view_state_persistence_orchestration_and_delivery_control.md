@@ -2,7 +2,7 @@
 > From version: 0.9.2
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Delivery orchestration for per-network 2D view-state persistence (viewport + canvas toggles)
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -58,12 +58,12 @@ Rationale:
 - Finish with full matrix validation and `logics` closure synchronization.
 
 # Plan
-- [ ] Wave 0. Network-scoped 2D view-state schema extension (`scale + offset + Info/Length/Callouts/Grid/Snap/Lock`) (`item_306`)
-- [ ] Wave 1. Canvas pan/zoom + toggle persistence and restore lifecycle integration (`item_307`)
-- [ ] Wave 2. Persistence migration/defaulting for 2D view-state (`item_308`)
-- [ ] Wave 3. Regression coverage for reload + per-network restore (`item_309`)
-- [ ] Wave 4. Closure: full validation matrix, AC traceability, and `logics` synchronization (`item_310`)
-- [ ] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary)
+- [x] Wave 0. Network-scoped 2D view-state schema extension (`scale + offset + Info/Length/Callouts/Grid/Snap/Lock`) (`item_306`)
+- [x] Wave 1. Canvas pan/zoom + toggle persistence and restore lifecycle integration (`item_307`)
+- [x] Wave 2. Persistence migration/defaulting for 2D view-state (`item_308`)
+- [x] Wave 3. Regression coverage for reload + per-network restore (`item_309`)
+- [x] Wave 4. Closure: full validation matrix, AC traceability, and `logics` synchronization (`item_310`)
+- [x] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary)
 
 # Validation gates
 ## A. Minimum wave gate (apply after Waves 0-3)
@@ -115,27 +115,40 @@ Rationale:
 
 # Report
 - Wave status:
-  - Wave 0 (schema extension): pending
-  - Wave 1 (runtime persistence/restore wiring): pending
-  - Wave 2 (migration/defaulting): pending
-  - Wave 3 (regression coverage): pending
-  - Wave 4 (closure + AC traceability): pending
-  - FINAL (`.md` synchronization): pending
+  - Wave 0 (schema extension): completed
+  - Wave 1 (runtime persistence/restore wiring): completed
+  - Wave 2 (migration/defaulting): completed
+  - Wave 3 (regression coverage): completed
+  - Wave 4 (closure + AC traceability): completed
+  - FINAL (`.md` synchronization): completed
 - Current blockers:
   - None.
 - Main risks to track:
-  - Restore timing regressions during active-network switch/hydration.
-  - Interaction performance regressions if persistence writes are too granular.
+  - Restore/persist effect ordering regressions (covered by targeted UI tests; a skip-next-persist guard was added).
+  - Future drift in Home/nav UI copy causing unrelated CI regressions (several tests were realigned during closure).
 - Validation snapshot:
-  - Not started.
-- AC traceability (`req_050`) target mapping (planned):
-  - AC1 -> `item_307`, verified in `item_309`/`item_310`
-  - AC2 -> `item_307`, verified in `item_309`/`item_310`
-  - AC3 -> `item_307`, verified in `item_309`/`item_310`
-  - AC4 -> `item_307`, verified in `item_309`/`item_310`
-  - AC5 -> `item_308`, verified in `item_310`
-  - AC6 -> `item_307`, verified in `item_310`
-  - AC7 -> `item_309`, verified in `item_310`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅ (1 warning: `react-hooks/exhaustive-deps` on `src/app/AppController.tsx` restore effect; intentional dependency restriction to avoid overwrite loops)
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s build` ✅
+  - `npm run -s test:ci` ✅ (35 files, 241 tests)
+  - `npm run -s test:e2e` ✅ (2 tests)
+  - Targeted verification for `req_050` surfaces ✅:
+    - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
+    - `src/tests/persistence.localStorage.spec.ts`
+    - `src/tests/app.ui.networks.spec.tsx`
+    - `src/tests/store.reducer.networks.spec.ts`
+- AC traceability (`req_050`) delivery mapping (actual):
+  - AC1 -> `item_307`, verified by `item_309` UI reload restore test + `item_310` validation matrix
+  - AC2 -> `item_307`, verified by `item_309` UI reload restore test (Info/Length/Callouts/Grid/Snap/Lock) + `item_310`
+  - AC3 -> `item_307`, verified by `item_309` per-network switch restore test + `item_310`
+  - AC4 -> `item_307`, covered by runtime persistence wiring and retained canvas action behavior in full regression matrix (`item_310`)
+  - AC5 -> `item_308`, verified by persistence migration/defaulting tests + `item_310`
+  - AC6 -> `item_307`, verified by `trackHistory: false` dispatch usage and reducer behavior review + regression suite (`item_310`)
+  - AC7 -> `item_309`, verified by targeted + CI/E2E validation in `item_310`
 
 # References
 - `logics/request/req_050_network_summary_2d_viewport_zoom_pan_persistence_per_network_resume_and_restore.md`
@@ -156,4 +169,3 @@ Rationale:
 - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `src/tests/app.ui.networks.spec.tsx`
-

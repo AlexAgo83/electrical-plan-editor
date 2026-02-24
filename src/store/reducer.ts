@@ -42,6 +42,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case "network/create":
     case "network/select":
+    case "network/setSummaryViewState":
     case "network/rename":
     case "network/update":
     case "network/duplicate":

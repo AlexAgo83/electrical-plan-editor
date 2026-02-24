@@ -1,7 +1,7 @@
 ## req_050_network_summary_2d_viewport_zoom_pan_persistence_per_network_resume_and_restore - Network Summary 2D View State Persistence (Zoom + Pan + View Toggles) for Per-Network Resume and Restore
 > From version: 0.9.2
-> Understanding: 99%
-> Confidence: 98%
+> Understanding: 100%
+> Confidence: 99%
 > Complexity: Medium
 > Theme: UX Continuity and State Persistence for 2D Workspace View Resume
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -128,6 +128,23 @@ The codebase already persists network-scoped editing state (entities, node posit
 - AC5: Existing persisted workspaces created before this feature still load successfully via migration/defaulting.
 - AC6: View-state persistence does not pollute undo/redo history for model-edit actions.
 - AC7: Targeted regression tests and persistence safety checks pass.
+
+## Delivery status (2026-02-24)
+- Implemented in application/store/persistence layers:
+  - network-scoped `networkSummaryViewState` schema (`scale`, `offset`, `Info/Length/Callouts/Grid/Snap/Lock`)
+  - runtime restore on active-network load/switch and runtime persist on view-state changes
+  - migration/defaulting normalization for malformed or missing persisted payloads
+  - no undo/redo pollution for view-state writes (`trackHistory: false`)
+- Regression coverage added:
+  - reload-equivalent rehydrate restores viewport + toggles
+  - per-network switch restores independent viewport + toggles
+  - persistence adapter test covers valid save/load + malformed payload drop
+- Validation summary:
+  - targeted suites ✅
+  - `test:ci` ✅
+  - `test:e2e` ✅
+  - `build` ✅
+  - `logics_lint` ✅
 
 ## Out of scope
 - Cross-device/cloud sync of viewport state.

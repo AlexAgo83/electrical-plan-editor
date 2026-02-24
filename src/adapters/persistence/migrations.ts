@@ -13,7 +13,7 @@ import type {
   Wire,
   WireId
 } from "../../core/entities";
-import type { AppState, EntityState, LayoutNodePosition, NetworkScopedState } from "../../store";
+import type { AppState, EntityState, LayoutNodePosition, NetworkScopedState, NetworkSummaryViewState } from "../../store";
 import {
   DEFAULT_NETWORK_CREATED_AT,
   DEFAULT_NETWORK_ID,
@@ -99,6 +99,50 @@ function normalizeWireEntityState(candidate: EntityState<Wire, WireId>): EntityS
   };
 }
 
+function normalizeNetworkSummaryViewState(candidate: unknown): NetworkSummaryViewState | undefined {
+  if (!isRecord(candidate)) {
+    return undefined;
+  }
+
+  if (!isFiniteNumber(candidate.scale) || !isRecord(candidate.offset)) {
+    return undefined;
+  }
+
+  const offsetX = candidate.offset.x;
+  const offsetY = candidate.offset.y;
+  if (!isFiniteNumber(offsetX) || !isFiniteNumber(offsetY)) {
+    return undefined;
+  }
+
+  const showNetworkInfoPanels = candidate.showNetworkInfoPanels;
+  const showSegmentLengths = candidate.showSegmentLengths;
+  const showCableCallouts = candidate.showCableCallouts;
+  const showNetworkGrid = candidate.showNetworkGrid;
+  const snapNodesToGrid = candidate.snapNodesToGrid;
+  const lockEntityMovement = candidate.lockEntityMovement;
+  if (
+    typeof showNetworkInfoPanels !== "boolean" ||
+    typeof showSegmentLengths !== "boolean" ||
+    typeof showCableCallouts !== "boolean" ||
+    typeof showNetworkGrid !== "boolean" ||
+    typeof snapNodesToGrid !== "boolean" ||
+    typeof lockEntityMovement !== "boolean"
+  ) {
+    return undefined;
+  }
+
+  return {
+    scale: candidate.scale,
+    offset: { x: offsetX, y: offsetY },
+    showNetworkInfoPanels,
+    showSegmentLengths,
+    showCableCallouts,
+    showNetworkGrid,
+    snapNodesToGrid,
+    lockEntityMovement
+  };
+}
+
 function normalizeManufacturerReference(value: unknown): string | undefined {
   if (typeof value !== "string") {
     return undefined;
@@ -179,7 +223,8 @@ function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | n
     wires: normalizeWireEntityState(candidate.wires as EntityState<Wire, WireId>),
     nodePositions: normalizeNodePositions(candidate.nodePositions),
     connectorCavityOccupancy: candidate.connectorCavityOccupancy as NetworkScopedState["connectorCavityOccupancy"],
-    splicePortOccupancy: candidate.splicePortOccupancy as NetworkScopedState["splicePortOccupancy"]
+    splicePortOccupancy: candidate.splicePortOccupancy as NetworkScopedState["splicePortOccupancy"],
+    networkSummaryViewState: normalizeNetworkSummaryViewState(candidate.networkSummaryViewState)
   };
 }
 

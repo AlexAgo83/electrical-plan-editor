@@ -59,6 +59,17 @@ export interface LayoutNodePosition {
   y: number;
 }
 
+export interface NetworkSummaryViewState {
+  scale: number;
+  offset: LayoutNodePosition;
+  showNetworkInfoPanels: boolean;
+  showSegmentLengths: boolean;
+  showCableCallouts: boolean;
+  showNetworkGrid: boolean;
+  snapNodesToGrid: boolean;
+  lockEntityMovement: boolean;
+}
+
 export interface NetworkScopedState {
   connectors: EntityState<Connector, ConnectorId>;
   splices: EntityState<Splice, SpliceId>;
@@ -68,6 +79,7 @@ export interface NetworkScopedState {
   nodePositions: Record<NodeId, LayoutNodePosition>;
   connectorCavityOccupancy: Record<ConnectorId, Record<number, string>>;
   splicePortOccupancy: Record<SpliceId, Record<number, string>>;
+  networkSummaryViewState?: NetworkSummaryViewState;
 }
 
 export interface AppState {
@@ -114,6 +126,19 @@ export function createEmptyNetworkScopedState(): NetworkScopedState {
     nodePositions: {} as Record<NodeId, LayoutNodePosition>,
     connectorCavityOccupancy: {} as Record<ConnectorId, Record<number, string>>,
     splicePortOccupancy: {} as Record<SpliceId, Record<number, string>>
+  };
+}
+
+export function cloneNetworkSummaryViewState(
+  viewState: NetworkSummaryViewState | undefined
+): NetworkSummaryViewState | undefined {
+  if (viewState === undefined) {
+    return undefined;
+  }
+
+  return {
+    ...viewState,
+    offset: { ...viewState.offset }
   };
 }
 

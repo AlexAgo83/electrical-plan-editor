@@ -1,6 +1,7 @@
 import type { NetworkId } from "../../core/entities";
 import type { AppAction } from "../actions";
 import {
+  cloneNetworkSummaryViewState,
   createEmptyNetworkScopedState,
   type AppState,
   type NetworkScopedState
@@ -52,8 +53,33 @@ function cloneScopedState(scoped: NetworkScopedState): NetworkScopedState {
     },
     nodePositions: { ...scoped.nodePositions },
     connectorCavityOccupancy: { ...scoped.connectorCavityOccupancy },
-    splicePortOccupancy: { ...scoped.splicePortOccupancy }
+    splicePortOccupancy: { ...scoped.splicePortOccupancy },
+    networkSummaryViewState: cloneNetworkSummaryViewState(scoped.networkSummaryViewState)
   };
+}
+
+function isSameNetworkSummaryViewState(
+  left: NetworkScopedState["networkSummaryViewState"],
+  right: NetworkScopedState["networkSummaryViewState"]
+): boolean {
+  if (left === right) {
+    return true;
+  }
+  if (left === undefined || right === undefined) {
+    return false;
+  }
+
+  return (
+    left.scale === right.scale &&
+    left.offset.x === right.offset.x &&
+    left.offset.y === right.offset.y &&
+    left.showNetworkInfoPanels === right.showNetworkInfoPanels &&
+    left.showSegmentLengths === right.showSegmentLengths &&
+    left.showCableCallouts === right.showCableCallouts &&
+    left.showNetworkGrid === right.showNetworkGrid &&
+    left.snapNodesToGrid === right.snapNodesToGrid &&
+    left.lockEntityMovement === right.lockEntityMovement
+  );
 }
 
 function withUiResetSelection(state: AppState): AppState {
@@ -141,6 +167,33 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       );
 
       return bumpRevision(switched);
+    }
+
+    case "network/setSummaryViewState": {
+      const { id, viewState } = action.payload;
+      if (state.networks.byId[id] === undefined) {
+        return withError(state, "Cannot update view state for unknown network.");
+      }
+
+      const existingScoped = state.networkStates[id];
+      if (existingScoped === undefined) {
+        return withError(state, "Cannot update view state: network snapshot is missing.");
+      }
+
+      if (isSameNetworkSummaryViewState(existingScoped.networkSummaryViewState, viewState)) {
+        return state;
+      }
+
+      return {
+        ...clearLastError(state),
+        networkStates: {
+          ...state.networkStates,
+          [id]: {
+            ...existingScoped,
+            networkSummaryViewState: cloneNetworkSummaryViewState(viewState)
+          }
+        }
+      };
     }
 
     case "network/rename": {

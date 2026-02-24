@@ -28,7 +28,8 @@ describe("home workspace screen", () => {
     switchScreenDrawerAware("home");
 
     const resumePanel = getPanelByHeading("Workspace");
-    expect(within(resumePanel).getByText(/Active network: Main network sample/i)).toBeInTheDocument();
+    expect(within(resumePanel).getByText(/Active network:/i, { selector: ".home-resume-copy-label" })).toBeInTheDocument();
+    expect(within(resumePanel).getByText("Main network sample", { selector: ".home-resume-copy-value" })).toBeInTheDocument();
     expect(within(resumePanel).getByText("Networks")).toBeInTheDocument();
     expect(within(resumePanel).getByText("State")).toBeInTheDocument();
   });
