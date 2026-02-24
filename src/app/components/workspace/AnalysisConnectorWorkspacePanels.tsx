@@ -453,8 +453,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
               </span>
             </td>
             <td className="technical-id">
-              <span>{row.wireTechnicalId}</span>
-              {row.wireName.trim().length > 0 ? <span className="table-secondary-line">{row.wireName}</span> : null}
+              {row.wireTechnicalId}
             </td>
             <td>{row.localEndpointLabel}</td>
             <td>{row.remoteEndpointLabel}</td>

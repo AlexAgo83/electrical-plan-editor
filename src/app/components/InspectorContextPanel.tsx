@@ -177,6 +177,13 @@ export function InspectorContextPanel({
     });
   }
 
+  const focusedEntityDisplayId =
+    selectedConnector?.technicalId ??
+    selectedSplice?.technicalId ??
+    selectedWire?.technicalId ??
+    selected?.id ??
+    "";
+
   return (
     <article className={isCollapsed ? "panel inspector-context-panel is-collapsed" : "panel inspector-context-panel"}>
       <div className="inspector-context-header">
@@ -199,7 +206,7 @@ export function InspectorContextPanel({
           <p className="empty-copy">No entity selected. Select a row or a canvas item to inspect details here.</p>
         ) : (
           <p className="meta-line">
-            Focused entity: <strong>{selected.kind}</strong> <span className="technical-id">{selected.id}</span>
+            Focused entity: <strong>{selected.kind}</strong> <span className="technical-id">{focusedEntityDisplayId}</span>
           </p>
         )
       ) : selected === null ? (
@@ -209,7 +216,7 @@ export function InspectorContextPanel({
           <div className="inspector-entity-line">
             <span className="inspector-entity-label">Focused entity:</span>
             <span className="inspector-kind-chip">{selected.kind}</span>
-            <span className="technical-id inspector-entity-id">{selected.id}</span>
+            <span className="technical-id inspector-entity-id">{focusedEntityDisplayId}</span>
           </div>
           <dl className="inspector-detail-grid">
             {detailRows.map((row) => (

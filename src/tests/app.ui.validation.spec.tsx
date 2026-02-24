@@ -185,7 +185,7 @@ describe("App integration UI - validation", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Close operations panel" }));
     const inspectorPanel = getPanelByHeading("Inspector context");
-    expect(within(inspectorPanel).getByText("W1")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("W-1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
     expect(within(modelHealth).getByText(/Issue navigator:/i, { selector: "p" })).toBeInTheDocument();
     expect(within(modelHealth).getByText("1/2", { selector: "strong" })).toBeInTheDocument();
   });
@@ -207,13 +207,13 @@ describe("App integration UI - validation", () => {
     );
 
     const inspectorPanel = getPanelByHeading("Inspector context");
-    expect(within(inspectorPanel).getByText("W1")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("W-1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
 
     fireEvent.keyDown(window, { key: "j", altKey: true });
     expect(
       within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })
     ).toHaveClass("is-active");
-    expect(within(inspectorPanel).getByText("C1")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("C-1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
   });
 
   it("uses visible filtered issues for alt keyboard navigation inside validation screen", () => {

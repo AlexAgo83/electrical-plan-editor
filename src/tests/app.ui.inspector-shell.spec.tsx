@@ -47,7 +47,9 @@ describe("App integration UI - inspector floating shell", () => {
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
     expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
-    expect(within(getPanelByHeading("Inspector context")).getByText("C1")).toBeInTheDocument();
+    expect(
+      within(getPanelByHeading("Inspector context")).getByText("C-1", { selector: ".inspector-entity-id" })
+    ).toBeInTheDocument();
 
     switchScreenDrawerAware("analysis");
     expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
