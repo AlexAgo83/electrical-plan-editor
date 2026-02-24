@@ -43,8 +43,8 @@ describe("App integration UI - network summary workflow polish", () => {
 
     switchScreenDrawerAware("analysis");
     const analysisQuickNavPanel = screen.getByRole("region", { name: "Quick entity navigation" });
-    expect(within(analysisQuickNavPanel).queryByRole("button", { name: /Nodes/i })).not.toBeInTheDocument();
-    expect(within(analysisQuickNavPanel).queryByRole("button", { name: /Segments/i })).not.toBeInTheDocument();
+    expect(within(analysisQuickNavPanel).getByRole("button", { name: /Nodes/i })).toBeInTheDocument();
+    expect(within(analysisQuickNavPanel).getByRole("button", { name: /Segments/i })).toBeInTheDocument();
     expect(within(analysisQuickNavPanel).getByRole("button", { name: /Wires/i })).toBeInTheDocument();
   });
 

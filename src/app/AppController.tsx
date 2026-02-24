@@ -1251,6 +1251,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     selected,
     selectedConnector,
     selectedNode,
+    selectedSegment,
     selectedSplice,
     selectedSubScreen,
     selectedWire,
