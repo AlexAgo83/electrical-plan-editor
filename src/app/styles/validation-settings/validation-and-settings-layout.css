@@ -203,6 +203,7 @@
   display: grid;
   gap: 0.32rem;
   align-content: start;
+  min-width: 0;
   font-size: 0.92rem;
   color: #25475f;
 }
@@ -222,6 +223,14 @@
   max-width: 100%;
   color: #153048;
   font: inherit;
+}
+
+.settings-panel .settings-grid > label:not(.settings-checkbox) input {
+  width: 100%;
+}
+
+.settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  width: 100%;
 }
 
 .settings-panel .settings-checkbox {

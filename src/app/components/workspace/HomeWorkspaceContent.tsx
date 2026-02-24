@@ -72,9 +72,9 @@ export function HomeWorkspaceContent({
 
   return (
     <section className="home-workspace-grid" aria-label="Home workspace">
-      <section className="panel home-panel">
+      <section className="panel home-panel home-quick-start-panel">
         <header className="home-panel-header">
-          <h2>Start</h2>
+          <h2>Quick start</h2>
           <div className="home-panel-header-tools">
             <span className="settings-panel-chip">Home</span>
           </div>
@@ -115,10 +115,10 @@ export function HomeWorkspaceContent({
         ) : null}
       </section>
 
-      <section className="panel home-panel">
+      <section className="panel home-panel home-workspace-resume-panel">
         <header className="home-panel-header">
-          <h2>Resume</h2>
-          <span className="settings-panel-chip">Workspace</span>
+          <h2>Workspace</h2>
+          <span className="settings-panel-chip">Active</span>
         </header>
         <p className="settings-panel-intro home-resume-intro">
           Continue where you left off using the current workspace context and active network.
@@ -144,14 +144,22 @@ export function HomeWorkspaceContent({
           </article>
         </div>
         <p className="meta-line home-resume-copy">
-          {hasActiveNetwork && activeNetworkName !== null && activeNetworkTechnicalId !== null
-            ? `Active network: ${activeNetworkName} (${activeNetworkTechnicalId})`
-            : "No active network selected. Open Network Scope to choose or create one."}
+          {hasActiveNetwork && activeNetworkName !== null && activeNetworkTechnicalId !== null ? (
+            <>
+              <span className="home-resume-copy-label">Active network:</span>
+              {" "}
+              <span className="home-resume-copy-value">{activeNetworkName}</span>
+              {" "}
+              <span className="home-resume-copy-id">({activeNetworkTechnicalId})</span>
+            </>
+          ) : (
+            "No active network selected. Open Network Scope to choose or create one."
+          )}
         </p>
         <div className="row-actions home-resume-actions">
           <button type="button" className="button-with-icon" onClick={onOpenModeling} disabled={!hasActiveNetwork}>
             <span className="action-button-icon is-edit" aria-hidden="true" />
-            <span>Modeling</span>
+            <span>Resume</span>
           </button>
           <button type="button" className="button-with-icon" onClick={onOpenValidation} disabled={!hasActiveNetwork}>
             <span className="action-button-icon is-open" aria-hidden="true" />
