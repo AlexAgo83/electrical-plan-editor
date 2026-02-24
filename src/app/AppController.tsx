@@ -1624,7 +1624,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       },
       describeNode,
       nodeLabelById,
-      networkSummaryPanel,
       connectorTechnicalIdAlreadyUsed,
       spliceTechnicalIdAlreadyUsed,
       wireTechnicalIdAlreadyUsed,

@@ -1,4 +1,3 @@
-import type { ReactElement } from "react";
 import type { EntityListModel } from "../useEntityListModel";
 import type { AppControllerFormsStateFlat } from "../useAppControllerNamespacedFormsState";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
@@ -107,7 +106,6 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   wireDescriptions: WireEndpointDescriptions;
   describeNode: ModelingSliceParams["describeNode"];
   nodeLabelById: ModelingSliceParams["nodeLabelById"];
-  networkSummaryPanel: ReactElement | null;
   connectorTechnicalIdAlreadyUsed: ModelingSliceParams["connectorTechnicalIdAlreadyUsed"];
   spliceTechnicalIdAlreadyUsed: ModelingSliceParams["spliceTechnicalIdAlreadyUsed"];
   wireTechnicalIdAlreadyUsed: ModelingSliceParams["wireTechnicalIdAlreadyUsed"];
