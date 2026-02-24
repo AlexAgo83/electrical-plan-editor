@@ -273,11 +273,22 @@ function switchScreenWithMode(target: ScreenSwitchTarget, mode: "strict" | "draw
     return;
   }
 
+  if (target === "analysis") {
+    switchScreenWithMode("modeling", mode);
+    const quickSwitchButton =
+      screen.queryByRole("button", { name: "Switch to analysis view" }) ??
+      screen.queryByRole("button", { name: "Switch to analysis" });
+    if (quickSwitchButton === null) {
+      throw new Error("Analysis view switch button was not found from Modeling workspace.");
+    }
+    fireEvent.click(quickSwitchButton);
+    return;
+  }
+
   const labelByScreen = {
     home: "Home",
     networkScope: "Network Scope",
     modeling: "Modeling",
-    analysis: "Analysis",
     validation: "Validation"
   } as const;
   const primaryNavRow = document.querySelector(".workspace-nav-row");
