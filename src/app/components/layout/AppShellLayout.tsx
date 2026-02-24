@@ -76,7 +76,6 @@ interface AppShellLayoutProps {
   modelingFormsColumnContent: ReactNode;
   networkSummaryPanel: ReactNode;
   analysisWorkspaceContent: ReactNode;
-  isModelingAnalysisFocused: boolean;
   validationWorkspaceContent: ReactNode;
   settingsWorkspaceContent: ReactNode;
   isSettingsScreen: boolean;
@@ -157,7 +156,6 @@ export function AppShellLayout({
   modelingFormsColumnContent,
   networkSummaryPanel,
   analysisWorkspaceContent,
-  isModelingAnalysisFocused,
   validationWorkspaceContent,
   settingsWorkspaceContent,
   isSettingsScreen,
@@ -210,7 +208,6 @@ export function AppShellLayout({
         formsColumnContent={modelingFormsColumnContent}
         networkSummaryPanel={networkSummaryPanel}
         analysisWorkspaceContent={analysisWorkspaceContent}
-        isAnalysisFocused={isModelingAnalysisFocused}
       />
     );
   } else if (isAnalysisScreen) {
@@ -222,7 +219,6 @@ export function AppShellLayout({
         formsColumnContent={modelingFormsColumnContent}
         networkSummaryPanel={networkSummaryPanel}
         analysisWorkspaceContent={analysisWorkspaceContent}
-        isAnalysisFocused
       />
     );
   } else if (isValidationScreen) {

@@ -53,6 +53,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
     onSelectSegment,
     onOpenSegmentOnboardingHelp,
     wires,
+    showEntityTables = true,
     describeWireEndpoint
   } = props;
 
@@ -202,7 +203,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
 
   return (
     <>
-      <section className="panel" hidden={!isNodeSubScreen}>
+      <section className="panel" hidden={!isNodeSubScreen || !showEntityTables}>
         <header className="list-panel-header">
           <h2>Nodes</h2>
           <div className="list-panel-header-tools">
@@ -360,7 +361,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
         )}
       </section>
 
-      <section className="panel" hidden={!isSegmentSubScreen}>
+      <section className="panel" hidden={!isSegmentSubScreen || !showEntityTables}>
         <header className="list-panel-header">
           <h2>Segments</h2>
           <div className="list-panel-header-tools">

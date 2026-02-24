@@ -254,11 +254,9 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     setRoutePreviewEndNodeId: params.setRoutePreviewEndNodeId,
     routePreview: params.routePreview,
     quickEntityNavigationMode: params.quickEntityNavigationMode,
-    isAnalysisFocusedMode: params.isAnalysisFocusedMode,
     activeSubScreen: params.activeSubScreen,
     entityCountBySubScreen: params.entityCountBySubScreen,
     onQuickEntityNavigation: params.onQuickEntityNavigation,
-    onQuickEntityScreenNavigation: params.onQuickEntityScreenNavigation,
     onSelectConnectorFromCallout: params.onSelectConnectorFromCallout,
     onSelectSpliceFromCallout: params.onSelectSpliceFromCallout,
     onPersistConnectorCalloutPosition: params.onPersistConnectorCalloutPosition,
@@ -550,6 +548,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
 
 export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSliceParams) {
   const analysisWorkspaceContentProps = {
+    showEntityTables: false,
     isConnectorSubScreen: params.isConnectorSubScreen,
     isSpliceSubScreen: params.isSpliceSubScreen,
     isNodeSubScreen: params.isNodeSubScreen,

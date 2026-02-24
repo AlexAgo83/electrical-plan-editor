@@ -16,6 +16,7 @@ export interface SplicePortStatus extends OccupancyStatus {
 }
 
 export interface AnalysisWorkspaceContentProps {
+  showEntityTables?: boolean;
   isConnectorSubScreen: boolean;
   isSpliceSubScreen: boolean;
   isNodeSubScreen: boolean;

@@ -24,6 +24,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     onSelectWire,
     onOpenWireOnboardingHelp,
     selectedWire,
+    showEntityTables = true,
     describeWireEndpoint,
     describeWireEndpointId,
     getSortIndicator: _getSortIndicator,
@@ -75,7 +76,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           : "Name, technical ID, endpoint...";
   return (
     <>
-<section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen}>
+<section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen || !showEntityTables}>
   <header className="list-panel-header">
     <h2>Wires</h2>
     <div className="list-panel-header-tools">

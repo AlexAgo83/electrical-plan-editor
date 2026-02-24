@@ -1561,13 +1561,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         setRoutePreviewEndNodeId,
         routePreview,
         quickEntityNavigationMode: isModelingScreen && !isModelingAnalysisFocused ? "modeling" : "analysis",
-        isAnalysisFocusedMode: isModelingAnalysisFocused,
         activeSubScreen,
         entityCountBySubScreen,
         onQuickEntityNavigation: setActiveSubScreen,
-        onQuickEntityScreenNavigation: (targetScreen) => {
-          handleWorkspaceScreenChange(targetScreen);
-        },
         onSelectConnectorFromCallout: handleSelectConnectorFromCallout,
         onSelectSpliceFromCallout: handleSelectSpliceFromCallout,
         onPersistConnectorCalloutPosition: persistConnectorCalloutPosition,
@@ -1882,7 +1878,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       modelingFormsColumnContent={modelingFormsColumnContent}
       networkSummaryPanel={networkSummaryPanel}
       analysisWorkspaceContent={analysisWorkspaceContent}
-      isModelingAnalysisFocused={isModelingAnalysisFocused}
       validationWorkspaceContent={validationWorkspaceContent}
       settingsWorkspaceContent={settingsWorkspaceContent}
       isSettingsScreen={isSettingsScreen}

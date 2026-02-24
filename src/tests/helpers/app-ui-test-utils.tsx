@@ -275,13 +275,6 @@ function switchScreenWithMode(target: ScreenSwitchTarget, mode: "strict" | "draw
 
   if (target === "analysis") {
     switchScreenWithMode("modeling", mode);
-    const quickSwitchButton =
-      screen.queryByRole("button", { name: "Switch to analysis view" }) ??
-      screen.queryByRole("button", { name: "Switch to analysis" });
-    if (quickSwitchButton === null) {
-      throw new Error("Analysis view switch button was not found from Modeling workspace.");
-    }
-    fireEvent.click(quickSwitchButton);
     return;
   }
 

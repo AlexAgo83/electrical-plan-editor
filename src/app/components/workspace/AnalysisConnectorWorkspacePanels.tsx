@@ -31,6 +31,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     handleReserveCavity,
     connectorCavityStatuses,
     handleReleaseCavity,
+    showEntityTables = true,
     sortedConnectorSynthesisRows,
     connectorSynthesisSort: _connectorSynthesisSort,
     setConnectorSynthesisSort: _setConnectorSynthesisSort,
@@ -134,7 +135,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
 
   return (
     <>
-<section className="panel" hidden={!isConnectorSubScreen}>
+<section className="panel" hidden={!isConnectorSubScreen || !showEntityTables}>
   <header className="list-panel-header">
     <h2>Connectors</h2>
     <div className="list-panel-header-tools">
