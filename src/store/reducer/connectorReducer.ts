@@ -65,6 +65,12 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
       const normalizedName = action.payload.name.trim();
       const normalizedTechnicalId = action.payload.technicalId.trim();
       const cavityCount = action.payload.cavityCount;
+      if (action.payload.id.trim().length === 0) {
+        return withError(state, "Connector ID is required.");
+      }
+      if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
+        return withError(state, "Connector name and technical ID are required.");
+      }
       if (!Number.isInteger(cavityCount) || cavityCount < 1) {
         return withError(state, "Connector wayCount must be an integer >= 1.");
       }

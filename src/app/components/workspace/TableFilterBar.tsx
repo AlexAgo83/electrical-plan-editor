@@ -34,6 +34,8 @@ export function TableFilterBar({
           ...fieldOptions.filter((option) => option.value !== "any")
         ];
 
+  const queryAriaLabel = `${fieldLabel} query`;
+
   return (
     <label className="list-inline-number-filter list-inline-table-filter">
       <span>{label}</span>
@@ -52,6 +54,7 @@ export function TableFilterBar({
       <input
         className="list-inline-table-filter-input"
         type="text"
+        aria-label={queryAriaLabel}
         value={queryValue}
         onChange={(event) => onQueryChange(event.target.value)}
         placeholder={placeholder}

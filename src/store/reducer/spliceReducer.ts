@@ -65,6 +65,12 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
       const normalizedName = action.payload.name.trim();
       const normalizedTechnicalId = action.payload.technicalId.trim();
       const portCount = action.payload.portCount;
+      if (action.payload.id.trim().length === 0) {
+        return withError(state, "Splice ID is required.");
+      }
+      if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
+        return withError(state, "Splice name and technical ID are required.");
+      }
       if (!Number.isInteger(portCount) || portCount < 1) {
         return withError(state, "Splice portCount must be an integer >= 1.");
       }

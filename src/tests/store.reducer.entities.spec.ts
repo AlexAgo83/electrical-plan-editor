@@ -107,6 +107,21 @@ describe("appReducer entity lifecycle", () => {
     expect(second.ui.lastError).toBe("Connector technical ID 'C-1' is already used.");
   });
 
+  it("rejects connector upsert when required fields are empty after trim", () => {
+    const state = appReducer(
+      createInitialState(),
+      appActions.upsertConnector({
+        id: asConnectorId("C1"),
+        name: "   ",
+        technicalId: "   ",
+        cavityCount: 2
+      })
+    );
+
+    expect(state.connectors.byId[asConnectorId("C1")]).toBeUndefined();
+    expect(state.ui.lastError).toBe("Connector name and technical ID are required.");
+  });
+
   it("normalizes optional connector manufacturer references", () => {
     const state = reduceAll([
       appActions.upsertConnector({
@@ -175,6 +190,21 @@ describe("appReducer entity lifecycle", () => {
 
     expect(second.splices.byId[asSpliceId("S2")]).toBeUndefined();
     expect(second.ui.lastError).toBe("Splice technical ID 'S-1' is already used.");
+  });
+
+  it("rejects splice upsert when required fields are empty after trim", () => {
+    const state = appReducer(
+      createInitialState(),
+      appActions.upsertSplice({
+        id: asSpliceId("S1"),
+        name: "   ",
+        technicalId: "   ",
+        portCount: 2
+      })
+    );
+
+    expect(state.splices.byId[asSpliceId("S1")]).toBeUndefined();
+    expect(state.ui.lastError).toBe("Splice name and technical ID are required.");
   });
 
   it("normalizes optional splice manufacturer references and allows duplicates across connector/splice", () => {
@@ -255,6 +285,20 @@ describe("appReducer entity lifecycle", () => {
     );
     expect(missingSpliceNode.nodes.byId[asNodeId("N-SPLICE")]).toBeUndefined();
     expect(missingSpliceNode.ui.lastError).toBe("Cannot create splice node for unknown splice.");
+  });
+
+  it("rejects node upsert when node ID is empty after trim", () => {
+    const state = appReducer(
+      createInitialState(),
+      appActions.upsertNode({
+        id: asNodeId("   "),
+        kind: "intermediate",
+        label: "Node"
+      })
+    );
+
+    expect(state.nodes.allIds).toHaveLength(0);
+    expect(state.ui.lastError).toBe("Node ID is required.");
   });
 
   it("allows only one specialized node per connector or splice", () => {
@@ -421,6 +465,18 @@ describe("appReducer entity lifecycle", () => {
     );
     expect(invalidLength.segments.byId[asSegmentId("SEG-INVALID-C")]).toBeUndefined();
     expect(invalidLength.ui.lastError).toBe("Segment lengthMm must be >= 1.");
+
+    const emptyId = appReducer(
+      withNodes,
+      appActions.upsertSegment({
+        id: asSegmentId("   "),
+        nodeA: asNodeId("N1"),
+        nodeB: asNodeId("N2"),
+        lengthMm: 10
+      })
+    );
+    expect(emptyId.segments.allIds).toHaveLength(0);
+    expect(emptyId.ui.lastError).toBe("Segment ID is required.");
   });
 
   it("blocks node and connector removal when graph references exist", () => {
