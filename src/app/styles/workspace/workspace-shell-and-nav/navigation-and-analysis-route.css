@@ -290,13 +290,14 @@
 
 .workspace-drawer.is-open {
   transform: translateX(0);
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .workspace-drawer .workspace-sidebar {
   max-height: calc(100vh - var(--workspace-header-offset) - 1rem);
   overflow: auto;
   padding-right: 0.15rem;
+  pointer-events: auto;
 }
 
 .workspace-ops-backdrop {

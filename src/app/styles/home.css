@@ -7,6 +7,16 @@
   min-width: 0;
 }
 
+.home-quick-start-panel,
+.home-workspace-resume-panel {
+  align-self: stretch;
+}
+
+.home-quick-start-panel {
+  display: flex;
+  flex-direction: column;
+}
+
 .home-panel-header {
   display: flex;
   align-items: center;
@@ -19,12 +29,9 @@
   margin: 0;
 }
 
-.home-start-intro {
-  margin-bottom: 1rem;
-}
-
-.home-resume-intro {
-  margin-bottom: 1rem;
+.home-panel .settings-panel-intro.home-start-intro,
+.home-panel .settings-panel-intro.home-resume-intro {
+  margin: 0 0 1rem;
 }
 
 .home-primary-actions,
@@ -36,6 +43,7 @@
 
 .home-primary-actions {
   grid-template-columns: minmax(0, 1fr);
+  margin-top: auto;
 }
 
 .home-resume-actions {
@@ -93,6 +101,28 @@
 
 .home-resume-copy {
   margin-top: 0.65rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(120, 145, 166, 0.28);
+  background: rgba(120, 145, 166, 0.08);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.home-resume-copy-label {
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.home-resume-copy-value {
+  font-weight: 700;
+}
+
+.home-resume-copy-id {
+  font-size: 0.84em;
+  opacity: 0.9;
 }
 
 .home-preferences-grid {

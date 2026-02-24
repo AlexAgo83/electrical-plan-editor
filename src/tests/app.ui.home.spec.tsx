@@ -18,8 +18,8 @@ describe("home workspace screen", () => {
 
     switchScreenDrawerAware("home");
 
-    expect(getPanelByHeading("Start")).toBeInTheDocument();
-    expect(getPanelByHeading("Resume")).toBeInTheDocument();
+    expect(getPanelByHeading("Quick start")).toBeInTheDocument();
+    expect(getPanelByHeading("Workspace")).toBeInTheDocument();
   });
 
   it("shows active workspace resume summary details", () => {
@@ -27,7 +27,7 @@ describe("home workspace screen", () => {
 
     switchScreenDrawerAware("home");
 
-    const resumePanel = getPanelByHeading("Resume");
+    const resumePanel = getPanelByHeading("Workspace");
     expect(within(resumePanel).getByText(/Active network: Main network sample/i)).toBeInTheDocument();
     expect(within(resumePanel).getByText("Networks")).toBeInTheDocument();
     expect(within(resumePanel).getByText("State")).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe("home workspace screen", () => {
     renderAppWithState(createValidationIssueState());
 
     switchScreenDrawerAware("home");
-    const resumePanel = getPanelByHeading("Resume");
+    const resumePanel = getPanelByHeading("Workspace");
     fireEvent.click(within(resumePanel).getByRole("button", { name: "Validation" }));
 
     expect(getPanelByHeading("Validation center")).toBeInTheDocument();
@@ -89,7 +89,7 @@ describe("home workspace screen", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
     switchScreenDrawerAware("home");
-    const resumePanel = getPanelByHeading("Resume");
+    const resumePanel = getPanelByHeading("Workspace");
     fireEvent.click(within(resumePanel).getByRole("button", { name: "Help" }));
     expect(screen.getByRole("dialog", { name: "Create your first network" })).toBeInTheDocument();
   });
