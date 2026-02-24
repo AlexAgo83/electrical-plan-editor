@@ -27,7 +27,8 @@
   stroke: #d5d0ee;
 }
 
-.app-shell.theme-lavender-haze .network-segment.is-selected {
+.app-shell.theme-lavender-haze .network-segment.is-selected,
+.app-shell.theme-lavender-haze .network-node.is-selected .network-node-shape {
   stroke: #6355db;
 }
 
@@ -213,7 +214,8 @@
   stroke: #e08cab;
 }
 
-.app-shell.theme-burgundy-noir .network-segment.is-selected {
+.app-shell.theme-burgundy-noir .network-segment.is-selected,
+.app-shell.theme-burgundy-noir .network-node.is-selected .network-node-shape {
   stroke: #d56b94;
 }
 
@@ -441,4 +443,3 @@
 .app-shell.theme-amber-night .header-block.is-drawer-open {
   background: rgba(44, 33, 10, 0.58);
 }
-

@@ -66,7 +66,8 @@
   stroke: #4b3f1e;
 }
 
-.app-shell.theme-amber-night .network-segment.is-selected {
+.app-shell.theme-amber-night .network-segment.is-selected,
+.app-shell.theme-amber-night .network-node.is-selected .network-node-shape {
   stroke: #f1bf3a;
 }
 
@@ -447,4 +448,3 @@
 .app-shell.theme-burgundy-noir .network-canvas-floating-copy strong {
   color: #f7eaf0;
 }
-

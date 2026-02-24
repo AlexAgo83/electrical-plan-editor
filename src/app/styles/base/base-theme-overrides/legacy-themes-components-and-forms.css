@@ -41,7 +41,8 @@
   stroke: #2f5544;
 }
 
-.app-shell.theme-deep-green .network-segment.is-selected {
+.app-shell.theme-deep-green .network-segment.is-selected,
+.app-shell.theme-deep-green .network-node.is-selected .network-node-shape {
   stroke: #5bc88f;
 }
 
@@ -446,4 +447,3 @@
 .app-shell.theme-warm-brown .legend-line {
   border-top-color: #9a806d;
 }
-
