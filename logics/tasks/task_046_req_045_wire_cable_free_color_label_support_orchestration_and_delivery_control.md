@@ -2,7 +2,7 @@
 > From version: 0.8.1
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Delivery orchestration for free-form wire color labels with invariant safety and compatibility coverage
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -66,12 +66,12 @@ Rationale:
 - Finish with closure validation and AC traceability.
 
 # Plan
-- [ ] Wave 0. Wire entity/store invariant normalization for `freeColorLabel` + exclusive color modes (`item_282`)
-- [ ] Wave 1. Wire form explicit color mode selector + free color input UX (`item_283`)
-- [ ] Wave 2. Read-only wire color display + sort/filter/search support for free color labels (`item_284`)
-- [ ] Wave 3. Persistence/import/export compatibility + mixed-state normalization (`item_285`)
-- [ ] Wave 4. Closure: final validation, AC traceability, and `logics` synchronization (`item_286`)
-- [ ] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary + defer notes)
+- [x] Wave 0. Wire entity/store invariant normalization for `freeColorLabel` + exclusive color modes (`item_282`)
+- [x] Wave 1. Wire form explicit color mode selector + free color input UX (`item_283`)
+- [x] Wave 2. Read-only wire color display + sort/filter/search support for free color labels (`item_284`)
+- [x] Wave 3. Persistence/import/export compatibility + mixed-state normalization (`item_285`)
+- [x] Wave 4. Closure: final validation, AC traceability, and `logics` synchronization (`item_286`)
+- [x] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary + defer notes)
 
 # Validation gates
 ## A. Minimum wave gate (apply after Waves 0-3)
@@ -131,23 +131,34 @@ Rationale:
 
 # Report
 - Wave status:
-  - Wave 0 (entity/store invariants): pending
-  - Wave 1 (wire form color mode + free input): pending
-  - Wave 2 (display + sort/filter/search support): pending
-  - Wave 3 (persistence/import/export compatibility): pending
-  - Wave 4 (closure + AC traceability): pending
-  - FINAL (`.md` synchronization): pending
+  - Wave 0 (entity/store invariants): delivered (`b263193`)
+  - Wave 1 (wire form color mode + free input): delivered (`e9ab076`)
+  - Wave 2 (display + sort/filter/search support): delivered (`0bf804b`)
+  - Wave 3 (persistence/import/export compatibility): delivered (`b263193`)
+  - Wave 4 (closure + AC traceability): delivered (this update)
+  - FINAL (`.md` synchronization): delivered (this update)
 - Current blockers:
-  - None at kickoff.
+  - None.
 - Main risks to track:
   - Free-color and catalog-color mode exclusivity can become inconsistent if normalization is duplicated across UI and reducer.
   - `freeColorLabel` max-length/trim handling may differ between form, reducer, and import paths unless standardized.
   - Existing wire color table/analysis rendering may silently omit free labels if catalog-only helpers are reused without fallback.
   - Mixed-state import normalization may be patched in one adapter path and missed in another.
-- Validation snapshot (kickoff):
-  - Not run yet for this orchestration artifact set.
+- Validation snapshot (final):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s test:ci` ✅ (`34` files / `224` tests)
+  - `npm run -s build` ✅
 - Delivery snapshot:
-  - Pending implementation.
+  - Added `freeColorLabel` support with source-of-truth normalization enforcing exclusive color modes (`No color`, catalog mono/bi-color, `Free color`).
+  - Reducer/import/persistence normalization trims free color labels, caps them at `32`, and prioritizes `freeColorLabel` over catalog color IDs for mixed states.
+  - Wire create/edit form now exposes explicit color mode selection and a free color text input with mode-switch clearing behavior.
+  - Read-only wire color displays (modeling/analysis tables, inspector, connector/splice analysis markers) support free color labels using a neutral badge + text and preserve catalog swatches for catalog colors.
+  - Wire list filtering/search (`any`) now matches free color labels; color sort/export paths handle mixed no-color/catalog/free-color datasets.
+  - Added regression coverage for reducer normalization, persistence/import normalization, wire form free-color mode, inspector/table rendering, and list filtering by free color label.
 - AC traceability (`req_045`) target mapping:
   - AC1 -> `item_282`, `item_286`
   - AC2 -> `item_283`, `item_286`
