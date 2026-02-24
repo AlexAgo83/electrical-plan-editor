@@ -1,5 +1,4 @@
 import { Suspense, type CSSProperties, type ReactElement, type ReactNode, type RefObject } from "react";
-import { AnalysisWorkspaceContainer } from "../containers/AnalysisWorkspaceContainer";
 import { HomeWorkspaceContainer } from "../containers/HomeWorkspaceContainer";
 import { ModelingWorkspaceContainer } from "../containers/ModelingWorkspaceContainer";
 import { NetworkScopeWorkspaceContainer } from "../containers/NetworkScopeWorkspaceContainer";
@@ -77,6 +76,7 @@ interface AppShellLayoutProps {
   modelingFormsColumnContent: ReactNode;
   networkSummaryPanel: ReactNode;
   analysisWorkspaceContent: ReactNode;
+  isModelingAnalysisFocused: boolean;
   validationWorkspaceContent: ReactNode;
   settingsWorkspaceContent: ReactNode;
   isSettingsScreen: boolean;
@@ -157,6 +157,7 @@ export function AppShellLayout({
   modelingFormsColumnContent,
   networkSummaryPanel,
   analysisWorkspaceContent,
+  isModelingAnalysisFocused,
   validationWorkspaceContent,
   settingsWorkspaceContent,
   isSettingsScreen,
@@ -208,14 +209,20 @@ export function AppShellLayout({
         leftColumnContent={modelingLeftColumnContent}
         formsColumnContent={modelingFormsColumnContent}
         networkSummaryPanel={networkSummaryPanel}
+        analysisWorkspaceContent={analysisWorkspaceContent}
+        isAnalysisFocused={isModelingAnalysisFocused}
       />
     );
   } else if (isAnalysisScreen) {
     activeWorkspaceContent = (
-      <AnalysisWorkspaceContainer
+      <ModelingWorkspaceContainer
         ScreenComponent={AnalysisScreenComponent}
         isActive={isAnalysisScreen}
-        workspaceContent={analysisWorkspaceContent}
+        leftColumnContent={modelingLeftColumnContent}
+        formsColumnContent={modelingFormsColumnContent}
+        networkSummaryPanel={networkSummaryPanel}
+        analysisWorkspaceContent={analysisWorkspaceContent}
+        isAnalysisFocused
       />
     );
   } else if (isValidationScreen) {

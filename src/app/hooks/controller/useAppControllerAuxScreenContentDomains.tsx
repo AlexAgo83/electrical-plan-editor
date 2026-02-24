@@ -28,6 +28,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     | "networkEntityCountsById"
     | "activeNetworkId"
     | "handleSelectNetwork"
+    | "handleOpenNetworkInModeling"
     | "handleDuplicateNetwork"
     | "handleExportActiveNetwork"
     | "handleDeleteNetwork"
@@ -83,6 +84,7 @@ export function useAppControllerAuxScreenContentDomains({
     networkEntityCountsById: networkScope.networkEntityCountsById,
     activeNetworkId: networkScope.activeNetworkId,
     handleSelectNetwork: networkScope.handleSelectNetwork,
+    handleOpenNetworkInModeling: networkScope.handleOpenNetworkInModeling,
     handleDuplicateNetwork: networkScope.handleDuplicateNetwork,
     handleExportActiveNetwork: networkScope.handleExportActiveNetwork,
     handleDeleteNetwork: networkScope.handleDeleteNetwork,

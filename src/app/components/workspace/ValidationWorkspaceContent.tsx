@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactElement } from "react";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { ValidationIssue, ValidationSeverityFilter } from "../../types/app-controller";
+import { TableEntryCountFooter } from "./TableEntryCountFooter";
 
 interface ValidationWorkspaceContentProps {
   validationSeverityFilter: ValidationSeverityFilter;
@@ -183,7 +184,10 @@ export function ValidationWorkspaceContent({
         {validationIssues.length === 0 ? (
           <p className="empty-copy">No integrity issue found in the current model.</p>
         ) : visibleValidationIssues.length === 0 ? (
-          <p className="empty-copy">No integrity issue matches the current filters.</p>
+          <>
+            <p className="empty-copy">No integrity issue matches the current filters.</p>
+            <TableEntryCountFooter count={0} />
+          </>
         ) : (
           <div className="validation-groups">
             {sortedValidationGroups.map(([category, issues]) => (
@@ -241,6 +245,7 @@ export function ValidationWorkspaceContent({
                     ))}
                   </tbody>
                 </table>
+                <TableEntryCountFooter count={issues.length} />
               </article>
             ))}
           </div>

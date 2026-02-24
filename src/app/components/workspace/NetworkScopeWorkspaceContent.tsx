@@ -3,6 +3,7 @@ import type { NetworkId } from "../../../core/entities";
 import { focusElementWithoutScroll, nextSortState, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { SortState } from "../../types/app-controller";
+import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
 interface NetworkScopeWorkspaceContentProps {
@@ -23,6 +24,7 @@ interface NetworkScopeWorkspaceContentProps {
   >;
   activeNetworkId: NetworkId | null;
   handleSelectNetwork: (networkId: NetworkId) => void;
+  handleOpenNetworkInModeling: (networkId: NetworkId) => void;
   handleDuplicateNetwork: (networkId: NetworkId | null) => void;
   handleExportActiveNetwork: () => void;
   handleDeleteNetwork: (networkId: NetworkId | null) => void;
@@ -51,6 +53,7 @@ export function NetworkScopeWorkspaceContent({
   networkEntityCountsById,
   activeNetworkId,
   handleSelectNetwork,
+  handleOpenNetworkInModeling,
   handleDuplicateNetwork,
   handleExportActiveNetwork,
   handleDeleteNetwork,
@@ -251,7 +254,10 @@ export function NetworkScopeWorkspaceContent({
         {networks.length === 0 ? (
           <p className="empty-copy">No network available. Create one to enable modeling and analysis.</p>
         ) : visibleNetworks.length === 0 ? (
-          <p className="empty-copy">No network matches the current filters.</p>
+          <>
+            <p className="empty-copy">No network matches the current filters.</p>
+            <TableEntryCountFooter count={0} />
+          </>
         ) : (
           <>
             <div className="network-scope-list-shell">
@@ -368,61 +374,79 @@ export function NetworkScopeWorkspaceContent({
                 </tbody>
               </table>
             </div>
+            <TableEntryCountFooter count={visibleNetworks.length} />
           </>
         )}
         <div className="row-actions compact network-scope-list-actions">
-          <button type="button" className="network-scope-create-button button-with-icon" onClick={handleOpenCreateNetworkForm}>
-            <span className="action-button-icon is-new" aria-hidden="true" />
-            New
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => {
-              if (focusedNetwork !== null) {
-                handleSelectNetwork(focusedNetwork.id);
-              }
-            }}
-            disabled={focusedNetwork === null || isCreateMode || focusedNetwork.id === activeNetworkId}
-          >
-            <span className="action-button-icon is-active" aria-hidden="true" />
-            Set active
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => {
-              if (focusedNetwork !== null) {
-                handleDuplicateNetwork(focusedNetwork.id);
-              }
-            }}
-            disabled={focusedNetwork === null || isCreateMode}
-          >
-            <span className="action-button-icon is-duplicate" aria-hidden="true" />
-            Duplicate
-          </button>
-          <button
-            type="button"
-            className="button-with-icon network-scope-export-button"
-            onClick={handleExportActiveNetwork}
-            disabled={activeNetworkId === null || isCreateMode}
-          >
-            <span className="action-button-icon is-home-import" aria-hidden="true" />
-            Export
-          </button>
-          <button
-            type="button"
-            className="network-delete-button button-with-icon"
-            onClick={() => {
-              if (focusedNetwork !== null) {
-                handleDeleteNetwork(focusedNetwork.id);
-              }
-            }}
-            disabled={focusedNetwork === null || isCreateMode}
-          >
-            <span className="action-button-icon is-delete" aria-hidden="true" />
-            Delete
-          </button>
+          <div className="network-scope-list-actions-row">
+            <button type="button" className="network-scope-create-button button-with-icon" onClick={handleOpenCreateNetworkForm}>
+              <span className="action-button-icon is-new" aria-hidden="true" />
+              New
+            </button>
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={() => {
+                if (focusedNetwork !== null) {
+                  handleDuplicateNetwork(focusedNetwork.id);
+                }
+              }}
+              disabled={focusedNetwork === null || isCreateMode}
+            >
+              <span className="action-button-icon is-duplicate" aria-hidden="true" />
+              Duplicate
+            </button>
+            <button
+              type="button"
+              className="network-delete-button button-with-icon"
+              onClick={() => {
+                if (focusedNetwork !== null) {
+                  handleDeleteNetwork(focusedNetwork.id);
+                }
+              }}
+              disabled={focusedNetwork === null || isCreateMode}
+            >
+              <span className="action-button-icon is-delete" aria-hidden="true" />
+              Delete
+            </button>
+          </div>
+          <div className="network-scope-list-actions-row">
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={() => {
+                if (focusedNetwork !== null) {
+                  handleOpenNetworkInModeling(focusedNetwork.id);
+                }
+              }}
+              disabled={focusedNetwork === null || isCreateMode}
+            >
+              <span className="action-button-icon is-open" aria-hidden="true" />
+              Open
+            </button>
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={() => {
+                if (focusedNetwork !== null) {
+                  handleSelectNetwork(focusedNetwork.id);
+                }
+              }}
+              disabled={focusedNetwork === null || isCreateMode || focusedNetwork.id === activeNetworkId}
+            >
+              <span className="action-button-icon is-active" aria-hidden="true" />
+              Set active
+            </button>
+            <button
+              type="button"
+              className="button-with-icon network-scope-export-button"
+              onClick={handleExportActiveNetwork}
+              disabled={activeNetworkId === null || isCreateMode}
+            >
+              <span className="action-button-icon is-home-import" aria-hidden="true" />
+              Export
+            </button>
+          </div>
         </div>
       </section>
 

@@ -221,18 +221,19 @@
 
 .network-scope-list-actions {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.35rem;
   margin-top: 0.55rem;
+}
+
+.network-scope-list-actions-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
 }
 
 .network-scope-list-actions button {
   width: 100%;
-}
-
-.network-scope-export-button {
-  grid-column: 3;
-  grid-row: 2;
 }
 
 .table-density-compact .network-scope-list-shell {

@@ -96,6 +96,24 @@ describe("App integration UI - list ergonomics", () => {
     expect(within(wiresPanel).queryByText("Feed Main Junction")).not.toBeInTheDocument();
   });
 
+  it("splits wire endpoints into Endpoint A and Endpoint B columns and updates the displayed entry count footer when filtering", () => {
+    renderAppWithState(createSampleNetworkState());
+
+    switchSubScreen("wire");
+    const wiresPanel = getPanelByHeading("Wires");
+
+    expect(within(wiresPanel).getByRole("button", { name: /Endpoint A/i })).toBeInTheDocument();
+    expect(within(wiresPanel).getByRole("button", { name: /Endpoint B/i })).toBeInTheDocument();
+    expect(within(wiresPanel).queryByRole("button", { name: /^Endpoints$/i })).not.toBeInTheDocument();
+    expect(within(wiresPanel).getByText(/entries$/i)).toBeInTheDocument();
+
+    const wireFilterFieldSelect = within(wiresPanel).getByLabelText("Wire filter field");
+    fireEvent.change(wireFilterFieldSelect, { target: { value: "technicalId" } });
+    fireEvent.change(within(wiresPanel).getByPlaceholderText("Technical ID"), { target: { value: "WIRE-B-SECONDARY" } });
+
+    expect(within(wiresPanel).getByText("1 entry")).toBeInTheDocument();
+  });
+
   it("filters wires by free color label through the generic any-field filter and renders the free color text", () => {
     const state = createSampleNetworkState();
     const firstWireId = state.wires.allIds[0];
