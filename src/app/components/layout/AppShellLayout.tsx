@@ -281,8 +281,16 @@ export function AppShellLayout({
             validationIssuesCount={validationIssuesCount}
             validationErrorCount={validationErrorCount}
             entityCountBySubScreen={entityCountBySubScreen}
-            onScreenChange={onScreenChange}
-            onSubScreenChange={onSubScreenChange}
+            onScreenChange={(screen) => {
+              onScreenChange(screen);
+              if (screen !== "modeling") {
+                closeNavigationDrawer();
+              }
+            }}
+            onSubScreenChange={(subScreen) => {
+              onSubScreenChange(subScreen);
+              closeNavigationDrawer();
+            }}
           />
         </div>
         <button
