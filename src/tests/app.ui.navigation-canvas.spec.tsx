@@ -84,8 +84,8 @@ describe("App integration UI - navigation and canvas", () => {
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
     expect(within(connectorAnalysisPanel).getByText("Wire W-1 / A")).toBeInTheDocument();
-    const wayIndexInput = within(connectorAnalysisPanel).getByLabelText("Way index") as HTMLInputElement;
-    expect(wayIndexInput.value).toBe("2");
+    const wayIndexInput = within(connectorAnalysisPanel).getByLabelText("Way index");
+    expect(wayIndexInput).toHaveValue(2);
     fireEvent.change(wayIndexInput, { target: { value: "1" } });
     expect(within(connectorAnalysisPanel).getByText(/Way C1 is already used/)).toBeInTheDocument();
     expect(within(connectorAnalysisPanel).getByRole("button", { name: "Reserve way" })).toBeDisabled();
@@ -101,8 +101,8 @@ describe("App integration UI - navigation and canvas", () => {
 
     const spliceAnalysisPanel = getPanelByHeading("Splice analysis");
     expect(within(spliceAnalysisPanel).getByText("Wire W-1 / B")).toBeInTheDocument();
-    const portIndexInput = within(spliceAnalysisPanel).getByLabelText("Port index") as HTMLInputElement;
-    expect(portIndexInput.value).toBe("2");
+    const portIndexInput = within(spliceAnalysisPanel).getByLabelText("Port index");
+    expect(portIndexInput).toHaveValue(2);
     fireEvent.change(portIndexInput, { target: { value: "1" } });
     expect(within(spliceAnalysisPanel).getByText(/Port P1 is already used/)).toBeInTheDocument();
     expect(within(spliceAnalysisPanel).getByRole("button", { name: "Reserve port" })).toBeDisabled();
@@ -488,10 +488,8 @@ describe("App integration UI - navigation and canvas", () => {
       appActions.setNodePosition(asNodeId("N-C1"), { x: 64, y: 80 })
     );
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
-
     renderAppWithState(state);
     switchScreenDrawerAware("analysis");
-
     const networkSummaryPanel = getPanelByHeading("Network summary");
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Generate" }));
 

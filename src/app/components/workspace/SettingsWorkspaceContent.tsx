@@ -168,17 +168,25 @@ export function SettingsWorkspaceContent({
             Theme mode
             <select value={themeMode} onChange={(event) => setThemeMode(event.target.value as ThemeMode)}>
               <option value="normal">Light</option>
+              <option value="paperBlueprint">Paper Blueprint (Light)</option>
+              <option value="warmBrown">Warm Brown (Light)</option>
+              <option value="roseQuartz">Rose Quartz (Light)</option>
+              <option value="lavenderHaze">Lavender Haze (Light)</option>
               <option value="dark">Dark</option>
-              <option value="slateNeon">Slate Neon</option>
-              <option value="paperBlueprint">Paper Blueprint</option>
-              <option value="warmBrown">Warm Brown</option>
-              <option value="deepGreen">Deep Green</option>
-              <option value="roseQuartz">Rose Quartz</option>
-              <option value="burgundyNoir">Burgundy Noir</option>
-              <option value="lavenderHaze">Lavender Haze</option>
-              <option value="amberNight">Amber Night</option>
-              <option value="cyberpunk">Cyberpunk</option>
-              <option value="olive">Olive</option>
+              <option value="slateNeon">Slate Neon (Dark)</option>
+              <option value="deepGreen">Deep Green (Dark)</option>
+              <option value="burgundyNoir">Burgundy Noir (Dark)</option>
+              <option value="amberNight">Amber Night (Dark)</option>
+              <option value="cyberpunk">Cyberpunk (Dark)</option>
+              <option value="olive">Olive (Dark)</option>
+              <option value="steelBlue">Steel Blue (Dark)</option>
+              <option value="forestGraphite">Forest Graphite (Dark)</option>
+              <option value="petrolSlate">Petrol Slate (Dark)</option>
+              <option value="copperNight">Copper Night (Dark)</option>
+              <option value="mossTaupe">Moss Taupe (Dark)</option>
+              <option value="navyAsh">Navy Ash (Dark)</option>
+              <option value="charcoalPlum">Charcoal Plum (Dark)</option>
+              <option value="smokedTeal">Smoked Teal (Dark)</option>
             </select>
           </label>
           <label className="settings-field">
@@ -220,71 +228,6 @@ export function SettingsWorkspaceContent({
         </div>
         <div className="row-actions settings-actions">
           <button type="button" className="settings-primary-action" onClick={applyListSortDefaults}>Apply sort defaults now</button>
-        </div>
-      </section>
-
-      <section className="panel settings-panel">
-        <header className="settings-panel-header">
-          <h2>Canvas tools preferences</h2>
-          <span className="settings-panel-chip">Canvas Tools</span>
-        </header>
-        <p className="settings-panel-intro">Default tool behavior and overlay visibility for the 2D network workspace.</p>
-        <div className="settings-grid">
-          <label className="settings-checkbox">
-            <input type="checkbox" checked={canvasDefaultShowGrid} onChange={(event) => setCanvasDefaultShowGrid(event.target.checked)} />
-            Show grid by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultSnapToGrid}
-              onChange={(event) => setCanvasDefaultSnapToGrid(event.target.checked)}
-            />
-            Snap node movement by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultLockEntityMovement}
-              onChange={(event) => setCanvasDefaultLockEntityMovement(event.target.checked)}
-            />
-            Lock node movement by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultShowInfoPanels}
-              onChange={(event) => setCanvasDefaultShowInfoPanels(event.target.checked)}
-            />
-            Show info overlays by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultShowSegmentLengths}
-              onChange={(event) => setCanvasDefaultShowSegmentLengths(event.target.checked)}
-            />
-            Show segment lengths by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultShowCableCallouts}
-              onChange={(event) => setCanvasDefaultShowCableCallouts(event.target.checked)}
-            />
-            Show connector/splice cable callouts by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasPngExportIncludeBackground}
-              onChange={(event) => setCanvasPngExportIncludeBackground(event.target.checked)}
-            />
-            Include background in PNG export
-          </label>
-        </div>
-        <div className="row-actions settings-actions">
-          <button type="button" className="settings-primary-action" onClick={applyCanvasDefaultsNow}>Apply canvas defaults now</button>
         </div>
       </section>
 
@@ -357,28 +300,66 @@ export function SettingsWorkspaceContent({
 
       <section className="panel settings-panel">
         <header className="settings-panel-header">
-          <h2>Sample network controls</h2>
-          <span className="settings-panel-chip">Sample</span>
+          <h2>Canvas tools preferences</h2>
+          <span className="settings-panel-chip">Canvas Tools</span>
         </header>
-        <p className="settings-panel-intro">Quickly recreate baseline demo data when testing flows or resetting your sandbox.</p>
-        <div className="settings-state-row" aria-label="Sample workspace status">
-          <span className={isCurrentWorkspaceEmpty ? "settings-state-chip is-ok" : "settings-state-chip"}>
-            Workspace: {isCurrentWorkspaceEmpty ? "empty" : "loaded"}
-          </span>
-          <span className={hasBuiltInSampleState ? "settings-state-chip is-ok" : "settings-state-chip is-warn"}>
-            Sample signature: {hasBuiltInSampleState ? "detected" : "missing"}
-          </span>
+        <p className="settings-panel-intro">Default tool behavior and overlay visibility for the 2D network workspace.</p>
+        <div className="settings-grid">
+          <label className="settings-checkbox">
+            <input type="checkbox" checked={canvasDefaultShowGrid} onChange={(event) => setCanvasDefaultShowGrid(event.target.checked)} />
+            Show grid by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultSnapToGrid}
+              onChange={(event) => setCanvasDefaultSnapToGrid(event.target.checked)}
+            />
+            Snap node movement by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultLockEntityMovement}
+              onChange={(event) => setCanvasDefaultLockEntityMovement(event.target.checked)}
+            />
+            Lock node movement by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultShowInfoPanels}
+              onChange={(event) => setCanvasDefaultShowInfoPanels(event.target.checked)}
+            />
+            Show info overlays by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultShowSegmentLengths}
+              onChange={(event) => setCanvasDefaultShowSegmentLengths(event.target.checked)}
+            />
+            Show segment lengths by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultShowCableCallouts}
+              onChange={(event) => setCanvasDefaultShowCableCallouts(event.target.checked)}
+            />
+            Show connector/splice cable callouts by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasPngExportIncludeBackground}
+              onChange={(event) => setCanvasPngExportIncludeBackground(event.target.checked)}
+            />
+            Include background in PNG export
+          </label>
         </div>
         <div className="row-actions settings-actions">
-          <button type="button" onClick={handleRecreateSampleNetwork}>
-            Recreate sample network
-          </button>
-          <button type="button" onClick={handleRecreateValidationIssuesSampleNetwork}>
-            Recreate validation issues sample
-          </button>
-          <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
-            Reset sample network to baseline
-          </button>
+          <button type="button" className="settings-primary-action" onClick={applyCanvasDefaultsNow}>Apply canvas defaults now</button>
         </div>
       </section>
 
@@ -465,6 +446,33 @@ export function SettingsWorkspaceContent({
         </div>
         <div className="row-actions settings-actions">
           <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
+        </div>
+      </section>
+
+      <section className="panel settings-panel">
+        <header className="settings-panel-header">
+          <h2>Sample network controls</h2>
+          <span className="settings-panel-chip">Sample</span>
+        </header>
+        <p className="settings-panel-intro">Quickly recreate baseline demo data when testing flows or resetting your sandbox.</p>
+        <div className="settings-state-row" aria-label="Sample workspace status">
+          <span className={isCurrentWorkspaceEmpty ? "settings-state-chip is-ok" : "settings-state-chip"}>
+            Workspace: {isCurrentWorkspaceEmpty ? "empty" : "loaded"}
+          </span>
+          <span className={hasBuiltInSampleState ? "settings-state-chip is-ok" : "settings-state-chip is-warn"}>
+            Sample signature: {hasBuiltInSampleState ? "detected" : "missing"}
+          </span>
+        </div>
+        <div className="row-actions settings-actions">
+          <button type="button" onClick={handleRecreateSampleNetwork}>
+            Recreate sample network
+          </button>
+          <button type="button" onClick={handleRecreateValidationIssuesSampleNetwork}>
+            Recreate validation issues sample
+          </button>
+          <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
+            Reset sample network to baseline
+          </button>
         </div>
       </section>
 

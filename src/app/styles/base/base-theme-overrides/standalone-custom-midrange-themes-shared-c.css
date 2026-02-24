@@ -1,0 +1,146 @@
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-scope-indicator {
+  border-color: var(--custom-panel-border);
+  background: color-mix(in srgb, var(--custom-panel-bg) 92%, transparent);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-scope-indicator-label {
+  color: var(--custom-muted-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-scope-indicator-value {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-node.connector .network-node-shape {
+  fill: var(--custom-node-connector-fill);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-node.splice .network-node-shape {
+  fill: var(--custom-node-splice-fill);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-node.intermediate .network-node-shape {
+  fill: var(--custom-node-intermediate-fill);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-canvas-floating-controls,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-canvas-floating-subnetworks,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-canvas-floating-stats {
+  border-color: var(--custom-panel-border);
+  background: color-mix(in srgb, var(--custom-panel-bg) 88%, transparent);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-canvas-floating-copy,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-canvas-subnetwork-list li,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-canvas-stats-list li {
+  color: var(--custom-muted-text);
+}
+

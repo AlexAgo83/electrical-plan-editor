@@ -42,6 +42,22 @@ function normalizeThemeMode(value: unknown): ThemeMode {
     case "olive":
     case "oliveDark":
       return "olive";
+    case "steelBlue":
+      return "steelBlue";
+    case "forestGraphite":
+      return "forestGraphite";
+    case "petrolSlate":
+      return "petrolSlate";
+    case "copperNight":
+      return "copperNight";
+    case "mossTaupe":
+      return "mossTaupe";
+    case "navyAsh":
+      return "navyAsh";
+    case "charcoalPlum":
+      return "charcoalPlum";
+    case "smokedTeal":
+      return "smokedTeal";
     default:
       return "normal";
   }

@@ -1,0 +1,492 @@
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) {
+  color: var(--custom-shell-text);
+  background:
+    radial-gradient(120% 120% at 12% 0%, color-mix(in srgb, var(--custom-accent) 14%, transparent), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, color-mix(in srgb, var(--custom-accent-2) 12%, transparent), transparent 58%),
+    linear-gradient(180deg, var(--custom-shell-bg-top), var(--custom-shell-bg-bottom));
+  --network-selection-color: var(--custom-selection);
+  --network-selection-focus-color: var(--custom-selection);
+  --network-selection-glow: color-mix(in srgb, var(--custom-selection) 40%, transparent);
+  --network-grid-line-color: var(--custom-grid);
+  --network-segment-color: var(--custom-segment);
+  --network-wire-highlight-color: var(--custom-wire-highlight);
+  --network-node-stroke-color: var(--custom-node-stroke);
+  --network-node-connector-fill: var(--custom-node-connector-fill);
+  --network-node-splice-fill: var(--custom-node-splice-fill);
+  --network-node-intermediate-fill: var(--custom-node-intermediate-fill);
+  --network-node-label-color: var(--custom-strong-text);
+  --network-segment-label-color: var(--custom-strong-text);
+  --network-segment-length-label-color: var(--custom-muted-text);
+  --network-label-stroke-color: var(--custom-label-stroke);
+  --theme-primary: var(--custom-selection);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+)::before {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--custom-accent) 10%, transparent), transparent 60%),
+    linear-gradient(315deg, color-mix(in srgb, var(--custom-accent-2) 10%, transparent), transparent 62%);
+  opacity: 1;
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) :focus-visible {
+  outline-color: color-mix(in srgb, var(--custom-selection) 55%, white 12%);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .header-block {
+  border-color: var(--custom-panel-border);
+  background: color-mix(in srgb, var(--custom-panel-bg) 92%, transparent);
+  color: var(--custom-shell-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .panel,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .workspace-sidebar .workspace-switcher,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .workspace-sidebar .workspace-meta,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .stats-grid article,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .summary-grid article,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .validation-group,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .cavity,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-canvas-shell {
+  border-color: var(--custom-panel-border);
+  background: var(--custom-panel-bg);
+  color: var(--custom-shell-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .workspace-tab,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .filter-chip,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .row-actions button,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .row-form button,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .validation-row-go-to-button,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .error-banner button,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .inspector-context-toggle,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .header-nav-toggle,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-scope-create-button,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .header-install-toggle,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .header-update-toggle,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .header-settings-toggle,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .header-ops-toggle {
+  border-color: var(--custom-button-border);
+  background: var(--custom-button-bg);
+  color: var(--custom-button-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .workspace-tab.is-active,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .filter-chip.is-active,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .header-settings-toggle.is-active {
+  background: var(--custom-selection);
+  border-color: var(--custom-selection);
+  color: var(--custom-button-active-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .workspace-tab-badge,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .header-ops-badge {
+  background: var(--custom-badge-bg);
+  color: var(--custom-badge-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) input,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) select,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) textarea {
+  border-color: var(--custom-input-border);
+  background: var(--custom-input-bg);
+  color: var(--custom-input-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .stack-form input:not([type="checkbox"]):not([type="radio"]),
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .stack-form select,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .row-form input:not([type="checkbox"]):not([type="radio"]),
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .row-form select,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .stack-label input,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .stack-label select {
+  border-color: var(--custom-input-border);
+  background: var(--custom-input-bg);
+  color: var(--custom-input-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .data-table th,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .data-table td {
+  border-color: var(--custom-table-border);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .data-table th {
+  background: var(--custom-table-head-bg);
+  color: var(--custom-muted-text);
+}
+
