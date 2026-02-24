@@ -31,6 +31,14 @@ export function getWireColorCsvValue(wire: Pick<Wire, "primaryColorId" | "second
   return getWireColorCode(wire);
 }
 
+function getFreeColorCellText(wire: Pick<Wire, "primaryColorId" | "secondaryColorId" | "freeColorLabel">): string {
+  const colorLabel = getWireColorLabel(wire);
+  if (colorLabel === "Free color (unspecified)") {
+    return "Unspecified";
+  }
+  return colorLabel.replace(/^Free:\s*/, "");
+}
+
 export function renderWireColorCellValue(
   wire: Pick<Wire, "primaryColorId" | "secondaryColorId" | "freeColorLabel">
 ): ReactElement {
@@ -39,7 +47,7 @@ export function renderWireColorCellValue(
     return (
       <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }} title={colorLabel}>
         <span aria-hidden="true" style={neutralBadgeStyle}>Free</span>
-        <span>{colorLabel.replace(/^Free:\s*/, "")}</span>
+        <span>{getFreeColorCellText(wire)}</span>
       </span>
     );
   }

@@ -110,6 +110,7 @@ describe("App integration UI - list ergonomics", () => {
 
     state.wires.byId[firstWireId] = {
       ...state.wires.byId[firstWireId]!,
+      colorMode: "free",
       primaryColorId: "RD",
       secondaryColorId: "BU",
       freeColorLabel: `  ${targetLabel}  `
@@ -122,6 +123,7 @@ describe("App integration UI - list ergonomics", () => {
           ...state.networkStates[activeNetworkId]!.wires.byId,
           [firstWireId]: {
             ...state.networkStates[activeNetworkId]!.wires.byId[firstWireId]!,
+            colorMode: "free",
             primaryColorId: "RD",
             secondaryColorId: "BU",
             freeColorLabel: `  ${targetLabel}  `
@@ -140,6 +142,54 @@ describe("App integration UI - list ergonomics", () => {
     fireEvent.change(wireFilterFieldSelect, { target: { value: "any" } });
     fireEvent.change(within(wiresPanel).getByPlaceholderText("Name, technical ID, endpoint..."), {
       target: { value: "beige/brown" }
+    });
+
+    expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
+    expect(within(wiresPanel).queryByText("Secondary Feed B")).not.toBeInTheDocument();
+  });
+
+  it("distinguishes free unspecified wire colors from no-color and makes them discoverable via any-field filter", () => {
+    const state = createSampleNetworkState();
+    const firstWireId = state.wires.allIds[0];
+    const activeNetworkId = state.activeNetworkId;
+    if (firstWireId === undefined || activeNetworkId === null) {
+      throw new Error("Expected sample state with active network and wires.");
+    }
+
+    state.wires.byId[firstWireId] = {
+      ...state.wires.byId[firstWireId]!,
+      colorMode: "free",
+      primaryColorId: "RD",
+      secondaryColorId: "BU",
+      freeColorLabel: null
+    };
+    state.networkStates[activeNetworkId] = {
+      ...state.networkStates[activeNetworkId]!,
+      wires: {
+        ...state.networkStates[activeNetworkId]!.wires,
+        byId: {
+          ...state.networkStates[activeNetworkId]!.wires.byId,
+          [firstWireId]: {
+            ...state.networkStates[activeNetworkId]!.wires.byId[firstWireId]!,
+            colorMode: "free",
+            primaryColorId: "RD",
+            secondaryColorId: "BU",
+            freeColorLabel: null
+          }
+        }
+      }
+    };
+
+    renderAppWithState(state);
+    switchSubScreen("wire");
+
+    const wiresPanel = getPanelByHeading("Wires");
+    expect(within(wiresPanel).getByText("Unspecified")).toBeInTheDocument();
+
+    const wireFilterFieldSelect = within(wiresPanel).getByLabelText("Wire filter field");
+    fireEvent.change(wireFilterFieldSelect, { target: { value: "any" } });
+    fireEvent.change(within(wiresPanel).getByPlaceholderText("Name, technical ID, endpoint..."), {
+      target: { value: "free" }
     });
 
     expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();

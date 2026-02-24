@@ -53,6 +53,7 @@ describe("App integration UI - wire free color mode", () => {
       throw new Error("Expected saved free-color wire.");
     }
     const savedWire = state.wires.byId[savedWireId];
+    expect(savedWire?.colorMode).toBe("free");
     expect(savedWire?.primaryColorId).toBeNull();
     expect(savedWire?.secondaryColorId).toBeNull();
     expect(savedWire?.freeColorLabel).toBe("Beige/Brown mix");
@@ -67,5 +68,55 @@ describe("App integration UI - wire free color mode", () => {
     const inspectorPanel = getPanelByHeading("Inspector context");
     expect(within(inspectorPanel).getByText("Cable colors")).toBeInTheDocument();
     expect(within(inspectorPanel).getByText("Free: Beige/Brown mix")).toBeInTheDocument();
+  });
+
+  it("allows saving free color mode with an empty label and preserves it as a distinct unspecified state", () => {
+    const { store } = renderAppWithState(createUiIntegrationDenseWiresState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+
+    fireEvent.click(within(getPanelByHeading("Wire form")).getByRole("button", { name: "Create" }));
+    const createWirePanel = getPanelByHeading("Create Wire");
+    const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
+    const endpointBFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint B" });
+
+    fireEvent.change(within(createWirePanel).getByLabelText("Color mode"), { target: { value: "free" } });
+    expect(within(createWirePanel).getByText("Free color left unspecified")).toBeInTheDocument();
+
+    fireEvent.change(within(createWirePanel).getByLabelText("Functional name"), {
+      target: { value: "Free color unspecified wire" }
+    });
+    fireEvent.change(within(createWirePanel).getByLabelText("Technical ID"), { target: { value: "W-FREE-UI-EMPTY-1" } });
+    fireEvent.change(within(endpointAFieldset).getByLabelText("Connector"), { target: { value: "C1" } });
+    fireEvent.change(within(endpointBFieldset).getByLabelText("Splice"), { target: { value: "S1" } });
+    fireEvent.click(within(createWirePanel).getByRole("button", { name: "Create" }));
+
+    const editWirePanel = getPanelByHeading("Edit Wire");
+    expect(within(editWirePanel).getByLabelText("Color mode")).toHaveValue("free");
+    expect(within(editWirePanel).getByLabelText("Free color label")).toHaveValue("");
+
+    const state = store.getState();
+    const savedWireId = state.wires.allIds.find((id) => state.wires.byId[id]?.technicalId === "W-FREE-UI-EMPTY-1");
+    if (savedWireId === undefined) {
+      throw new Error("Expected saved free-color unspecified wire.");
+    }
+
+    const savedWire = state.wires.byId[savedWireId];
+    expect(savedWire?.colorMode).toBe("free");
+    expect(savedWire?.primaryColorId).toBeNull();
+    expect(savedWire?.secondaryColorId).toBeNull();
+    expect(savedWire?.freeColorLabel).toBeNull();
+
+    const wiresPanel = getPanelByHeading("Wires");
+    const wireRow = within(wiresPanel).getByText("Free color unspecified wire").closest("tr");
+    expect(wireRow).not.toBeNull();
+    if (wireRow !== null) {
+      expect(within(wireRow).getByText("Unspecified")).toBeInTheDocument();
+    }
+
+    const inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText("Free color (unspecified)")).toBeInTheDocument();
+    expect(within(inspectorPanel).queryByText("No color")).not.toBeInTheDocument();
   });
 });

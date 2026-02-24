@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { CABLE_COLOR_BY_ID, getWireColorLabel, isWireFreeColorMode } from "../../core/cableColors";
+import { CABLE_COLOR_BY_ID, getWireColorLabel, isWireFreeColorMode, type WireColorMode } from "../../core/cableColors";
 import type { Connector, NetworkNode, Segment, Splice, Wire } from "../../core/entities";
 import type { SelectionState } from "../../store/types";
 
@@ -45,13 +45,15 @@ export function InspectorContextPanel({
   onClearSelection
 }: InspectorContextPanelProps): ReactElement {
   function renderCableColorSwatches(
+    colorMode: WireColorMode | null | undefined,
     primaryColorId: string | null,
     secondaryColorId: string | null,
     freeColorLabel?: string | null
   ): ReactElement | string {
-    if (isWireFreeColorMode({ primaryColorId, secondaryColorId, freeColorLabel })) {
+    const wireColor = { colorMode, primaryColorId, secondaryColorId, freeColorLabel };
+    if (isWireFreeColorMode(wireColor)) {
       return (
-        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }} title={getWireColorLabel({ primaryColorId, secondaryColorId, freeColorLabel })}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }} title={getWireColorLabel(wireColor)}>
           <span
             aria-hidden="true"
             style={{
@@ -67,7 +69,7 @@ export function InspectorContextPanel({
           >
             Free
           </span>
-          <span>{getWireColorLabel({ primaryColorId, secondaryColorId, freeColorLabel })}</span>
+          <span>{getWireColorLabel(wireColor)}</span>
         </span>
       );
     }
@@ -156,7 +158,12 @@ export function InspectorContextPanel({
     detailRows.push({ label: "Section", value: `${selectedWire.sectionMm2} mm²` });
     detailRows.push({
       label: "Cable colors",
-      value: renderCableColorSwatches(selectedWire.primaryColorId, selectedWire.secondaryColorId, selectedWire.freeColorLabel)
+      value: renderCableColorSwatches(
+        selectedWire.colorMode,
+        selectedWire.primaryColorId,
+        selectedWire.secondaryColorId,
+        selectedWire.freeColorLabel
+      )
     });
     if ((selectedWire.endpointAConnectionReference?.trim() ?? "").length > 0) {
       detailRows.push({ label: "Endpoint A connection ref", value: selectedWire.endpointAConnectionReference as string });

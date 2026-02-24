@@ -8,6 +8,7 @@ import type {
   WireId
 } from "../../core/entities";
 import {
+  getNormalizedWireColorMode,
   MAX_FREE_WIRE_COLOR_LABEL_LENGTH,
   normalizeFreeWireColorLabel,
   normalizeWireColorState
@@ -465,13 +466,14 @@ export function useWireHandlers({
     setWireName(wire.name);
     setWireTechnicalId(wire.technicalId);
     setWireSectionMm2(String(wire.sectionMm2));
+    const normalizedWireColorMode = getNormalizedWireColorMode(wire);
     const normalizedFreeColorLabel = normalizeFreeWireColorLabel(wire.freeColorLabel);
-    if (normalizedFreeColorLabel !== null) {
+    if (normalizedWireColorMode === "free") {
       setWireColorMode("free");
       setWirePrimaryColorId("");
       setWireSecondaryColorId("");
-      setWireFreeColorLabel(normalizedFreeColorLabel);
-    } else if ((wire.primaryColorId ?? "").length > 0) {
+      setWireFreeColorLabel(normalizedFreeColorLabel ?? "");
+    } else if (normalizedWireColorMode === "catalog" && (wire.primaryColorId ?? "").length > 0) {
       setWireColorMode("catalog");
       setWirePrimaryColorId(wire.primaryColorId ?? "");
       setWireSecondaryColorId(wire.secondaryColorId ?? "");
@@ -585,18 +587,16 @@ export function useWireHandlers({
     }
     let normalizedColors = normalizeWireColorState(null, null, null);
     if (wireColorMode === "catalog") {
-      normalizedColors = normalizeWireColorState(wirePrimaryColorId, wireSecondaryColorId, null);
+      normalizedColors = normalizeWireColorState(wirePrimaryColorId, wireSecondaryColorId, null, "catalog");
     } else if (wireColorMode === "free") {
       const trimmedFreeColorLabel = wireFreeColorLabel.trim();
-      if (trimmedFreeColorLabel.length === 0) {
-        setWireFormError("Free color label is required in Free color mode.");
-        return;
-      }
       if (trimmedFreeColorLabel.length > MAX_FREE_WIRE_COLOR_LABEL_LENGTH) {
         setWireFormError(`Free color label must be ${MAX_FREE_WIRE_COLOR_LABEL_LENGTH} characters or fewer.`);
         return;
       }
-      normalizedColors = normalizeWireColorState(null, null, wireFreeColorLabel);
+      normalizedColors = normalizeWireColorState(null, null, wireFreeColorLabel, "free");
+    } else {
+      normalizedColors = normalizeWireColorState(null, null, null, "none");
     }
     const endpointAConnectionReference = normalizeWireEndpointReferenceInput(wireEndpointAConnectionReference);
     const endpointASealReference = normalizeWireEndpointReferenceInput(wireEndpointASealReference);
@@ -628,6 +628,7 @@ export function useWireHandlers({
         name: normalizedName,
         technicalId: normalizedTechnicalId,
         sectionMm2: parsedSectionMm2,
+        colorMode: normalizedColors.colorMode,
         primaryColorId: normalizedColors.primaryColorId,
         secondaryColorId: normalizedColors.secondaryColorId,
         freeColorLabel: normalizedColors.freeColorLabel,
