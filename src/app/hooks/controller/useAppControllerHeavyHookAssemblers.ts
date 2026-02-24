@@ -224,6 +224,7 @@ interface UseAppControllerCanvasInteractionHandlersAssemblyParams {
     | "startSpliceEdit"
     | "startNodeEdit"
     | "startSegmentEdit"
+    | "onExternalSelectionInteraction"
   >;
 }
 

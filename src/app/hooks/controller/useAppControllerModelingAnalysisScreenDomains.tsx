@@ -116,6 +116,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   onSelectWire: AnalysisSliceParams["onSelectWire"];
   includeModelingContent: boolean;
   includeAnalysisContent: boolean;
+  markSelectionPanelsFromTable?: () => void;
   onboardingHelp?: {
     openConnectorStep: () => void;
     openSpliceStep: () => void;
@@ -148,6 +149,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   onSelectWire,
   includeModelingContent,
   includeAnalysisContent,
+  markSelectionPanelsFromTable,
   onboardingHelp
 }: UseAppControllerModelingAnalysisScreenDomainsParams) {
   const modelingSlice = includeModelingContent
@@ -171,7 +173,10 @@ export function useAppControllerModelingAnalysisScreenDomains({
     getSortIndicator: listModel.getSortIndicator,
     connectorOccupiedCountById: listModel.connectorOccupiedCountById,
     selectedConnectorId: selection.selectedConnectorId,
-    startConnectorEdit: modelingHandlers.connector.startConnectorEdit,
+    startConnectorEdit: (connector) => {
+      markSelectionPanelsFromTable?.();
+      modelingHandlers.connector.startConnectorEdit(connector);
+    },
     handleConnectorDelete: modelingHandlers.connector.handleConnectorDelete,
     onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorStep,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
@@ -189,7 +194,10 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setSpliceSort: listModel.setSpliceSort,
     spliceOccupiedCountById: listModel.spliceOccupiedCountById,
     selectedSpliceId: selection.selectedSpliceId,
-    startSpliceEdit: modelingHandlers.splice.startSpliceEdit,
+    startSpliceEdit: (splice) => {
+      markSelectionPanelsFromTable?.();
+      modelingHandlers.splice.startSpliceEdit(splice);
+    },
     handleSpliceDelete: modelingHandlers.splice.handleSpliceDelete,
     onOpenSpliceOnboardingHelp: onboardingHelp?.openSpliceStep,
     isNodeSubScreen: screenFlags.isNodeSubScreen,
@@ -208,7 +216,10 @@ export function useAppControllerModelingAnalysisScreenDomains({
     segmentsCountByNodeId: listModel.segmentsCountByNodeId,
     selectedNodeId: selection.selectedNodeId,
     describeNode,
-    startNodeEdit: modelingHandlers.node.startNodeEdit,
+    startNodeEdit: (node) => {
+      markSelectionPanelsFromTable?.();
+      modelingHandlers.node.startNodeEdit(node);
+    },
     handleNodeDelete: modelingHandlers.node.handleNodeDelete,
     onOpenNodeOnboardingHelp: onboardingHelp?.openNodeStep,
     isSegmentSubScreen: screenFlags.isSegmentSubScreen,
@@ -227,7 +238,10 @@ export function useAppControllerModelingAnalysisScreenDomains({
     nodeLabelById,
     selectedSegmentId: selection.selectedSegmentId,
     selectedWireRouteSegmentIds: layoutDerived.selectedWireRouteSegmentIds,
-    startSegmentEdit: modelingHandlers.segment.startSegmentEdit,
+    startSegmentEdit: (segment) => {
+      markSelectionPanelsFromTable?.();
+      modelingHandlers.segment.startSegmentEdit(segment);
+    },
     handleSegmentDelete: modelingHandlers.segment.handleSegmentDelete,
     onOpenSegmentOnboardingHelp: onboardingHelp?.openSegmentStep,
     isWireSubScreen: screenFlags.isWireSubScreen,
@@ -246,7 +260,10 @@ export function useAppControllerModelingAnalysisScreenDomains({
     selectedWireId: selection.selectedWireId,
     describeWireEndpoint: wireDescriptions.describeWireEndpoint,
     describeWireEndpointId: wireDescriptions.describeWireEndpointId,
-    startWireEdit: modelingHandlers.wire.startWireEdit,
+    startWireEdit: (wire) => {
+      markSelectionPanelsFromTable?.();
+      modelingHandlers.wire.startWireEdit(wire);
+    },
     handleWireDelete: modelingHandlers.wire.handleWireDelete,
     onOpenWireOnboardingHelp: onboardingHelp?.openWireStep,
     handleConnectorSubmit: modelingHandlers.connector.handleConnectorSubmit,

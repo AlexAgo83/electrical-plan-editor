@@ -56,6 +56,7 @@ interface UseCanvasInteractionHandlersParams {
   startSpliceEdit: (splice: Splice) => void;
   startNodeEdit: (node: NetworkNode) => void;
   startSegmentEdit: (segment: Segment) => void;
+  onExternalSelectionInteraction?: () => void;
 }
 
 export function useCanvasInteractionHandlers({
@@ -93,7 +94,8 @@ export function useCanvasInteractionHandlers({
   startConnectorEdit,
   startSpliceEdit,
   startNodeEdit,
-  startSegmentEdit
+  startSegmentEdit,
+  onExternalSelectionInteraction
 }: UseCanvasInteractionHandlersParams) {
   function handleNetworkSegmentClick(segmentId: SegmentId): void {
     if (interactionMode !== "select") {
@@ -105,10 +107,12 @@ export function useCanvasInteractionHandlers({
     }
 
     if (isModelingScreen && activeSubScreen === "segment") {
+      onExternalSelectionInteraction?.();
       startSegmentEdit(segment);
       return;
     }
 
+    onExternalSelectionInteraction?.();
     dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
   }
 
@@ -126,6 +130,7 @@ export function useCanvasInteractionHandlers({
       if (activeSubScreen === "connector" && node.kind === "connector") {
         const connector = state.connectors.byId[node.connectorId];
         if (connector !== undefined) {
+          onExternalSelectionInteraction?.();
           startConnectorEdit(connector);
           return;
         }
@@ -134,27 +139,32 @@ export function useCanvasInteractionHandlers({
       if (activeSubScreen === "splice" && node.kind === "splice") {
         const splice = state.splices.byId[node.spliceId];
         if (splice !== undefined) {
+          onExternalSelectionInteraction?.();
           startSpliceEdit(splice);
           return;
         }
       }
 
       if (activeSubScreen === "node") {
+        onExternalSelectionInteraction?.();
         startNodeEdit(node);
         return;
       }
     }
 
     if (activeSubScreen === "connector" && node.kind === "connector") {
+      onExternalSelectionInteraction?.();
       dispatchAction(appActions.select({ kind: "connector", id: node.connectorId }));
       return;
     }
 
     if (activeSubScreen === "splice" && node.kind === "splice") {
+      onExternalSelectionInteraction?.();
       dispatchAction(appActions.select({ kind: "splice", id: node.spliceId }));
       return;
     }
 
+    onExternalSelectionInteraction?.();
     dispatchAction(appActions.select({ kind: "node", id: nodeId }));
   }
 
@@ -164,6 +174,7 @@ export function useCanvasInteractionHandlers({
     }
 
     if (interactionMode === "select") {
+      onExternalSelectionInteraction?.();
       dispatchAction(appActions.clearSelection(), { trackHistory: false });
       return;
     }

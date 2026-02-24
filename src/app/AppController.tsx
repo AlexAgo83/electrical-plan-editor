@@ -318,6 +318,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   } = useWorkspaceNavigation();
   const [isModelingAnalysisFocused, setIsModelingAnalysisFocused] = useState(false);
   const [lastAnalysisSubScreen, setLastAnalysisSubScreen] = useState<"connector" | "splice" | "node" | "segment" | "wire">("wire");
+  const [detailPanelsSelectionSource, setDetailPanelsSelectionSource] = useState<"table" | "external">("external");
   const [onboardingModalMode, setOnboardingModalMode] = useState<"full" | "single">("full");
   const [onboardingStepIndex, setOnboardingStepIndex] = useState(0);
   const [onboardingSingleStepId, setOnboardingSingleStepId] = useState<OnboardingStepId>("networkScope");
@@ -1272,6 +1273,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     [handleWorkspaceScreenChange, setActiveScreen, setIsModelingAnalysisFocused]
   );
 
+  const markDetailPanelsSelectionSourceAsTable = useCallback(() => {
+    setDetailPanelsSelectionSource("table");
+  }, []);
+
+  const markDetailPanelsSelectionSourceAsExternal = useCallback(() => {
+    setDetailPanelsSelectionSource("external");
+  }, []);
+
   useEffect(() => {
     if (activeScreen === "analysis" || (activeScreen === "modeling" && isModelingAnalysisFocused)) {
       setLastAnalysisSubScreen(activeSubScreen);
@@ -1362,21 +1371,24 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       startConnectorEdit: connectorHandlers.startConnectorEdit,
       startSpliceEdit: spliceHandlers.startSpliceEdit,
       startNodeEdit: nodeHandlers.startNodeEdit,
-      startSegmentEdit: segmentHandlers.startSegmentEdit
+      startSegmentEdit: segmentHandlers.startSegmentEdit,
+      onExternalSelectionInteraction: markDetailPanelsSelectionSourceAsExternal
     }
   });
 
   const handleSelectConnectorFromCallout = useCallback(
     (connectorId: ConnectorId) => {
+      markDetailPanelsSelectionSourceAsExternal();
       dispatchAction(appActions.select({ kind: "connector", id: connectorId }), { trackHistory: false });
     },
-    [dispatchAction]
+    [dispatchAction, markDetailPanelsSelectionSourceAsExternal]
   );
   const handleSelectSpliceFromCallout = useCallback(
     (spliceId: SpliceId) => {
+      markDetailPanelsSelectionSourceAsExternal();
       dispatchAction(appActions.select({ kind: "splice", id: spliceId }), { trackHistory: false });
     },
-    [dispatchAction]
+    [dispatchAction, markDetailPanelsSelectionSourceAsExternal]
   );
   const persistConnectorCalloutPosition = useCallback(
     (connectorId: ConnectorId, position: { x: number; y: number }) => {
@@ -1422,6 +1434,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   });
   const networkScalePercent = Math.round(networkScale * 100);
   const hasInspectableSelection = selected !== null && selectedSubScreen !== null;
+  const hasTableInspectableSelection = hasInspectableSelection && detailPanelsSelectionSource === "table";
   const hasActiveEntityForm =
     formsState.connectorFormMode !== "idle" ||
     formsState.spliceFormMode !== "idle" ||
@@ -1641,43 +1654,54 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       connectorTechnicalIdAlreadyUsed,
       spliceTechnicalIdAlreadyUsed,
       wireTechnicalIdAlreadyUsed,
+      markSelectionPanelsFromTable: markDetailPanelsSelectionSourceAsTable,
       includeModelingContent: hasActiveNetwork && isModelingScreen,
       includeAnalysisContent: hasActiveNetwork && (isAnalysisScreen || isModelingScreen),
-      onSelectConnector: (connectorId) =>
+      onSelectConnector: (connectorId) => {
+        markDetailPanelsSelectionSourceAsTable();
         dispatchAction(
           appActions.select({
             kind: "connector",
             id: connectorId
           })
-        ),
-      onSelectSplice: (spliceId) =>
+        );
+      },
+      onSelectSplice: (spliceId) => {
+        markDetailPanelsSelectionSourceAsTable();
         dispatchAction(
           appActions.select({
             kind: "splice",
             id: spliceId
           })
-        ),
-      onSelectNode: (nodeId) =>
+        );
+      },
+      onSelectNode: (nodeId) => {
+        markDetailPanelsSelectionSourceAsTable();
         dispatchAction(
           appActions.select({
             kind: "node",
             id: nodeId
           })
-        ),
-      onSelectSegment: (segmentId) =>
+        );
+      },
+      onSelectSegment: (segmentId) => {
+        markDetailPanelsSelectionSourceAsTable();
         dispatchAction(
           appActions.select({
             kind: "segment",
             id: segmentId
           })
-        ),
-      onSelectWire: (wireId) =>
+        );
+      },
+      onSelectWire: (wireId) => {
+        markDetailPanelsSelectionSourceAsTable();
         dispatchAction(
           appActions.select({
             kind: "wire",
             id: wireId
           })
-        )
+        );
+      }
     });
   const { networkScopeWorkspaceContent, validationWorkspaceContent, settingsWorkspaceContent } =
     useAppControllerAuxScreenContentDomains({
@@ -1829,9 +1853,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       includeValidationContent: hasActiveNetwork && isValidationScreen,
       includeSettingsContent: isSettingsScreen
     });
+  useEffect(() => {
+    if (!hasInspectableSelection) {
+      setDetailPanelsSelectionSource("external");
+    }
+  }, [hasInspectableSelection]);
   const modelingFormsColumnContentForLayout =
-    hasInspectableSelection || hasActiveEntityForm ? modelingFormsColumnContent : null;
-  const analysisWorkspaceContentForLayout = hasInspectableSelection ? analysisWorkspaceContent : null;
+    hasTableInspectableSelection || hasActiveEntityForm ? modelingFormsColumnContent : null;
+  const analysisWorkspaceContentForLayout = hasTableInspectableSelection ? analysisWorkspaceContent : null;
 
   return (
     <>
