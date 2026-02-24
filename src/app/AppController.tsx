@@ -1435,6 +1435,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const networkScalePercent = Math.round(networkScale * 100);
   const hasInspectableSelection = selected !== null && selectedSubScreen !== null;
   const hasTableInspectableSelection = hasInspectableSelection && detailPanelsSelectionSource === "table";
+  const hasTableSelectionForActiveSubScreen = hasTableInspectableSelection && selectedSubScreen === activeSubScreen;
   const hasActiveEntityForm =
     formsState.connectorFormMode !== "idle" ||
     formsState.spliceFormMode !== "idle" ||
@@ -1859,8 +1860,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
   }, [hasInspectableSelection]);
   const modelingFormsColumnContentForLayout =
-    hasTableInspectableSelection || hasActiveEntityForm ? modelingFormsColumnContent : null;
-  const analysisWorkspaceContentForLayout = hasTableInspectableSelection ? analysisWorkspaceContent : null;
+    hasTableSelectionForActiveSubScreen || hasActiveEntityForm ? modelingFormsColumnContent : null;
+  const analysisWorkspaceContentForLayout = hasTableSelectionForActiveSubScreen ? analysisWorkspaceContent : null;
 
   return (
     <>

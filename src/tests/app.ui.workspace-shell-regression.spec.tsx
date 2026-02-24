@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   createUiIntegrationState,
   renderAppWithState,
+  switchSubScreenDrawerAware,
   switchSubScreenStrict,
   withViewportWidth
 } from "./helpers/app-ui-test-utils";
@@ -239,5 +240,21 @@ describe("App integration UI - workspace shell regression", () => {
     fireEvent.click(within(connectorsPanel as HTMLElement).getByText("Connector 1"));
     expect(screen.getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Connector filter field query" })).toHaveValue("C-1");
+  });
+
+  it("hides form and analysis columns when switching to another sub-screen without matching table selection", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    fireEvent.click(screen.getByRole("button", { name: /Modeling/i }));
+    const connectorsPanel = screen.getByRole("heading", { name: "Connectors" }).closest(".panel");
+    expect(connectorsPanel).not.toBeNull();
+    fireEvent.click(within(connectorsPanel as HTMLElement).getByText("Connector 1"));
+    expect(screen.getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Edit Connector" })).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("wire");
+
+    expect(screen.queryByRole("heading", { name: "Wire analysis" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Wire form" })).toBeNull();
   });
 });
