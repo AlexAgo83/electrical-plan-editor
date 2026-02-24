@@ -229,7 +229,7 @@
 
 .row-actions.network-scope-list-actions .network-scope-list-actions-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.35rem;
   width: 100%;
 }
@@ -283,7 +283,9 @@
 }
 
 .network-form-grid {
-  max-width: 740px;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
   gap: 0.75rem;
   margin-bottom: 0;
 }
@@ -300,6 +302,7 @@
 
 .network-form-grid input {
   width: 100%;
+  min-width: 0;
   border-radius: 0.5rem;
   border: 1px solid #bacada;
   padding: 0.45rem 0.6rem;

@@ -1526,9 +1526,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         handleWorkspaceScreenChange("modeling");
         setActiveSubScreen("connector");
       }}
-      onOpenAnalysis={() => {
-        handleWorkspaceScreenChange("analysis");
-      }}
       onOpenValidation={() => handleWorkspaceScreenChange("validation")}
       onOpenOnboardingHelp={openFullOnboarding}
     />

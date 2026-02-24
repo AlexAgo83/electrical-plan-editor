@@ -89,8 +89,8 @@ describe("home workspace screen", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
     switchScreenDrawerAware("home");
-    const startPanel = getPanelByHeading("Start");
-    fireEvent.click(within(startPanel).getByRole("button", { name: "Help" }));
+    const resumePanel = getPanelByHeading("Resume");
+    fireEvent.click(within(resumePanel).getByRole("button", { name: "Help" }));
     expect(screen.getByRole("dialog", { name: "Create your first network" })).toBeInTheDocument();
   });
 

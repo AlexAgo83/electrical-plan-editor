@@ -19,6 +19,14 @@
   margin: 0;
 }
 
+.home-start-intro {
+  margin-bottom: 1rem;
+}
+
+.home-resume-intro {
+  margin-bottom: 1rem;
+}
+
 .home-primary-actions,
 .home-resume-actions,
 .home-shortcut-actions {

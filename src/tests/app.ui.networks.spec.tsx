@@ -58,7 +58,8 @@ describe("App integration UI - networks", () => {
     const networkRow = within(networkScopePanel).getByText("Network B").closest("tr");
     expect(networkRow).not.toBeNull();
     fireEvent.click(networkRow as HTMLElement);
-    fireEvent.click(within(networkScopePanel).getByRole("button", { name: "Set active" }));
+    const formPanel = getPanelByHeading("Edit network");
+    fireEvent.click(within(formPanel).getByRole("button", { name: "Set active" }));
 
     switchScreen("modeling");
     connectorsPanel = getPanelByHeading("Connectors");

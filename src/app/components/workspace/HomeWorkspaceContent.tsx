@@ -25,7 +25,6 @@ interface HomeWorkspaceContentProps {
   lastImportSummary: NetworkImportSummary | null;
   onOpenNetworkScope: () => void;
   onOpenModeling: () => void;
-  onOpenAnalysis: () => void;
   onOpenValidation: () => void;
   onOpenOnboardingHelp?: () => void;
   postMvpModules?: HomeWorkspacePostMvpModules;
@@ -58,7 +57,6 @@ export function HomeWorkspaceContent({
   lastImportSummary,
   onOpenNetworkScope,
   onOpenModeling,
-  onOpenAnalysis,
   onOpenValidation,
   onOpenOnboardingHelp,
   postMvpModules
@@ -81,7 +79,7 @@ export function HomeWorkspaceContent({
             <span className="settings-panel-chip">Home</span>
           </div>
         </header>
-        <p className="settings-panel-intro">
+        <p className="settings-panel-intro home-start-intro">
           Start a new workspace flow, import existing data, or open workspace management controls.
         </p>
         <div className="row-actions home-primary-actions">
@@ -97,12 +95,6 @@ export function HomeWorkspaceContent({
             <span className="action-button-icon is-home-import" aria-hidden="true" />
             <span>Import from file</span>
           </button>
-          {onOpenOnboardingHelp !== undefined ? (
-            <button type="button" className="button-with-icon" onClick={onOpenOnboardingHelp}>
-              <span className="action-button-icon is-help" aria-hidden="true" />
-              <span>Help</span>
-            </button>
-          ) : null}
         </div>
         <input
           ref={importFileInputRef}
@@ -128,7 +120,7 @@ export function HomeWorkspaceContent({
           <h2>Resume</h2>
           <span className="settings-panel-chip">Workspace</span>
         </header>
-        <p className="settings-panel-intro">
+        <p className="settings-panel-intro home-resume-intro">
           Continue where you left off using the current workspace context and active network.
         </p>
         <div className="summary-grid home-summary-grid" aria-label="Workspace summary">
@@ -161,14 +153,16 @@ export function HomeWorkspaceContent({
             <span className="action-button-icon is-edit" aria-hidden="true" />
             <span>Modeling</span>
           </button>
-          <button type="button" className="button-with-icon" onClick={onOpenAnalysis} disabled={!hasActiveNetwork}>
-            <span className="action-button-icon is-analysis" aria-hidden="true" />
-            <span>Analysis</span>
-          </button>
           <button type="button" className="button-with-icon" onClick={onOpenValidation} disabled={!hasActiveNetwork}>
             <span className="action-button-icon is-open" aria-hidden="true" />
             <span>Validation</span>
           </button>
+          {onOpenOnboardingHelp !== undefined ? (
+            <button type="button" className="button-with-icon" onClick={onOpenOnboardingHelp}>
+              <span className="action-button-icon is-help" aria-hidden="true" />
+              <span>Help</span>
+            </button>
+          ) : null}
         </div>
       </section>
 
