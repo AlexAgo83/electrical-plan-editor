@@ -336,7 +336,8 @@
   stroke: #dbc5d0;
 }
 
-.app-shell.theme-rose-quartz .network-segment.is-selected {
+.app-shell.theme-rose-quartz .network-segment.is-selected,
+.app-shell.theme-rose-quartz .network-node.is-selected .network-node-shape {
   stroke: #cf4c84;
 }
 

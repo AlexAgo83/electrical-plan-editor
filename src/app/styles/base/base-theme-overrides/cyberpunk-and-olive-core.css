@@ -110,7 +110,8 @@
   stroke: #f7094a;
 }
 
-.app-shell.theme-cyberpunk .network-segment.is-selected {
+.app-shell.theme-cyberpunk .network-segment.is-selected,
+.app-shell.theme-cyberpunk .network-node.is-selected .network-node-shape {
   stroke: #fff200;
 }
 
@@ -285,7 +286,8 @@
   stroke: #dbe870;
 }
 
-.app-shell.theme-olive .network-segment.is-selected {
+.app-shell.theme-olive .network-segment.is-selected,
+.app-shell.theme-olive .network-node.is-selected .network-node-shape {
   stroke: #b7c36a;
 }
 

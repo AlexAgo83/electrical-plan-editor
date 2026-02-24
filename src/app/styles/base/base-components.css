@@ -346,7 +346,8 @@
   stroke: var(--network-wire-highlight-color, #4f8d2d);
 }
 
-.app-shell.theme-dark .network-segment.is-selected {
+.app-shell.theme-dark .network-segment.is-selected,
+.app-shell.theme-dark .network-node.is-selected .network-node-shape {
   stroke: var(--network-selection-color, #7fc5ff);
 }
 

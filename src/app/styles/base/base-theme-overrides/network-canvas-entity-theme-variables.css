@@ -274,7 +274,19 @@
   .theme-lavender-haze,
   .theme-burgundy-noir,
   .theme-amber-night
-) .network-segment.is-selected {
+) .network-segment.is-selected,
+.app-shell:is(
+  .theme-normal,
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-paper-blueprint,
+  .theme-warm-brown,
+  .theme-deep-green,
+  .theme-rose-quartz,
+  .theme-lavender-haze,
+  .theme-burgundy-noir,
+  .theme-amber-night
+) .network-node.is-selected .network-node-shape {
   stroke: var(--network-selection-color, #0f6cb8);
 }
 

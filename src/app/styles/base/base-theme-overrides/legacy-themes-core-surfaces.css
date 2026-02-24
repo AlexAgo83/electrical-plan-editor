@@ -104,7 +104,8 @@
   stroke: #59cc7a;
 }
 
-.app-shell.theme-slate-neon .network-segment.is-selected {
+.app-shell.theme-slate-neon .network-segment.is-selected,
+.app-shell.theme-slate-neon .network-node.is-selected .network-node-shape {
   stroke: #38e6c8;
 }
 
@@ -249,7 +250,8 @@
   stroke: #b8cbda;
 }
 
-.app-shell.theme-paper-blueprint .network-segment.is-selected {
+.app-shell.theme-paper-blueprint .network-segment.is-selected,
+.app-shell.theme-paper-blueprint .network-node.is-selected .network-node-shape {
   stroke: #2f6f9f;
 }
 
@@ -366,7 +368,8 @@
   stroke: #dac8b8;
 }
 
-.app-shell.theme-warm-brown .network-segment.is-selected {
+.app-shell.theme-warm-brown .network-segment.is-selected,
+.app-shell.theme-warm-brown .network-node.is-selected .network-node-shape {
   stroke: #9a6b44;
 }
 
@@ -447,4 +450,3 @@
   background: #1f4a3a;
   color: #ddf3e2;
 }
-
