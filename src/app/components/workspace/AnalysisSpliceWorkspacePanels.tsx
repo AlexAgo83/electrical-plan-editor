@@ -3,6 +3,7 @@ import { formatOccupantRefForDisplay } from "../../lib/app-utils-networking";
 import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { TableFilterBar } from "./TableFilterBar";
 
 export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentProps): ReactElement {
   const {
@@ -11,6 +12,10 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     selectedSpliceId,
     spliceOccupancyFilter,
     setSpliceOccupancyFilter,
+    spliceFilterField,
+    setSpliceFilterField,
+    spliceFilterQuery,
+    setSpliceFilterQuery,
     splices,
     visibleSplices,
     wires,
@@ -32,6 +37,8 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     getSortIndicator
   } = props;
   const [spliceAnalysisView, setSpliceAnalysisView] = useState<"ports" | "synthesis">("ports");
+  const spliceFilterPlaceholder =
+    spliceFilterField === "name" ? "Splice name" : spliceFilterField === "technicalId" ? "Technical ID" : "Name or technical ID...";
   const wireTechnicalIdById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire.technicalId] as const)), [wires]);
   const formatOccupantRef = (occupantRef: string | null): string =>
     occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
@@ -83,48 +90,66 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
   <header className="list-panel-header">
     <h2>Splices</h2>
     <div className="list-panel-header-tools">
-      <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
-        {([
-          ["all", "All"],
-          ["occupied", "Occupied"],
-          ["free", "Free"]
-        ] as const).map(([filterId, label]) => (
-          <button
-            key={filterId}
-            type="button"
-            className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
-            onClick={() => setSpliceOccupancyFilter(filterId)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      <button
-        type="button"
-        className="filter-chip table-export-button"
-        onClick={() =>
-          downloadCsvFile(
-            "analysis-splices",
-            ["Name", "Technical ID", "Ports", "Branches"],
-            visibleSplices.map((splice) => [
-              splice.name,
-              splice.technicalId,
-              splice.portCount,
-              spliceOccupiedCountById.get(splice.id) ?? 0
-            ])
-          )
-        }
-        disabled={visibleSplices.length === 0}
-      >
-        <span className="table-export-icon" aria-hidden="true" />
-        CSV
-      </button>
-      {onOpenSpliceOnboardingHelp !== undefined ? (
-        <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenSpliceOnboardingHelp}>
-          <span className="action-button-icon is-help" aria-hidden="true" />
-          <span>Help</span>
+      <div className="list-panel-header-tools-row">
+        <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
+          {([
+            ["all", "All"],
+            ["occupied", "Occupied"],
+            ["free", "Free"]
+          ] as const).map(([filterId, label]) => (
+            <button
+              key={filterId}
+              type="button"
+              className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+              onClick={() => setSpliceOccupancyFilter(filterId)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="filter-chip table-export-button"
+          onClick={() =>
+            downloadCsvFile(
+              "analysis-splices",
+              ["Name", "Technical ID", "Ports", "Branches"],
+              visibleSplices.map((splice) => [
+                splice.name,
+                splice.technicalId,
+                splice.portCount,
+                spliceOccupiedCountById.get(splice.id) ?? 0
+              ])
+            )
+          }
+          disabled={visibleSplices.length === 0}
+        >
+          <span className="table-export-icon" aria-hidden="true" />
+          CSV
         </button>
-      ) : null}
+        {onOpenSpliceOnboardingHelp !== undefined ? (
+          <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenSpliceOnboardingHelp}>
+            <span className="action-button-icon is-help" aria-hidden="true" />
+            <span>Help</span>
+          </button>
+        ) : null}
+      </div>
+      <div className="list-panel-header-tools-row">
+        <TableFilterBar
+          label="Filter"
+          fieldLabel="Splice filter field"
+          fieldValue={spliceFilterField}
+          onFieldChange={(value) => setSpliceFilterField(value as "name" | "technicalId" | "any")}
+          fieldOptions={[
+            { value: "name", label: "Name" },
+            { value: "technicalId", label: "Technical ID" },
+            { value: "any", label: "Any" }
+          ]}
+          queryValue={spliceFilterQuery}
+          onQueryChange={setSpliceFilterQuery}
+          placeholder={spliceFilterPlaceholder}
+        />
+      </div>
     </div>
   </header>
   {splices.length === 0 ? (
