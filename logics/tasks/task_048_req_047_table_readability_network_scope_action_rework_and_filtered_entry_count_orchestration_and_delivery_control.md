@@ -2,7 +2,7 @@
 > From version: 0.9.1
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Delivery orchestration for cross-surface UI readability polish and Network Scope operator-flow improvements in req_047
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -60,12 +60,12 @@ Rationale:
 - Finish feature work with `Network Scope` action rework (`Open` semantics + layout), then run closure validation and AC traceability.
 
 # Plan
-- [ ] Wave 0. Shared filterable-table displayed-entry count footer rollout (`item_294`)
-- [ ] Wave 1. `Wires` table endpoint column split (`item_292`)
-- [ ] Wave 2. Connector/splice analysis wire name subrow beneath technical ID (`item_293`)
-- [ ] Wave 3. `Network Scope` action area `Open` button + two-row grouping rework (`item_295`)
-- [ ] Wave 4. Closure: final validation, AC traceability, and `logics` synchronization (`item_296`)
-- [ ] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary + defer notes)
+- [x] Wave 0. Shared filterable-table displayed-entry count footer rollout (`item_294`)
+- [x] Wave 1. `Wires` table endpoint column split (`item_292`)
+- [x] Wave 2. Connector/splice analysis wire name subrow beneath technical ID (`item_293`)
+- [x] Wave 3. `Network Scope` action area `Open` button + two-row grouping rework (`item_295`)
+- [x] Wave 4. Closure: final validation, AC traceability, and `logics` synchronization (`item_296`)
+- [x] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary + defer notes)
 
 # Validation gates
 ## A. Minimum wave gate (apply after Waves 0-3)
@@ -120,12 +120,12 @@ Rationale:
 
 # Report
 - Wave status:
-  - Wave 0 (shared filterable-table footer): pending
-  - Wave 1 (`Wires` endpoint split): pending
-  - Wave 2 (connector/splice analysis name subrow): pending
-  - Wave 3 (`Network Scope` `Open` + action row grouping): pending
-  - Wave 4 (closure + AC traceability): pending
-  - FINAL (`.md` synchronization): pending
+  - Wave 0 (shared filterable-table footer): completed
+  - Wave 1 (`Wires` endpoint split): completed
+  - Wave 2 (connector/splice analysis name subrow): completed
+  - Wave 3 (`Network Scope` `Open` + action row grouping): completed
+  - Wave 4 (closure + AC traceability): completed
+  - FINAL (`.md` synchronization): completed
 - Current blockers:
   - None.
 - Main risks to track:
@@ -133,9 +133,17 @@ Rationale:
   - `Open` action semantics (`set active` + navigate) may require coordination across network-scope handlers and workspace navigation helpers.
   - `Wires` endpoint split can expose latent column-width assumptions in desktop layouts.
 - Validation snapshot:
-  - Not started.
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s build` ✅
+  - `npm run -s test:ci` ✅ (`34` files / `232` tests)
+  - Targeted UI suites run during delivery/hardening (`list-ergonomics`, `networks`, `workspace-shell-regression`, `theme`, `network-summary-workflow-polish`, `navigation-canvas`) ✅
 - Delivery snapshot:
-  - Not started.
+  - `ed81e64` `ui: improve table readability and unify analysis into modeling` (delivered req_047 feature items alongside req_048 Phase 1 scaffolding)
+  - `1086f80` `test: align workspace specs with modeling-analysis alias behavior` (closure regression alignment after merged navigation behavior)
 - AC traceability (`req_047`) target mapping (planned):
   - AC1, AC2 -> `item_292`, `item_296`
   - AC3 -> `item_293`, `item_296`
