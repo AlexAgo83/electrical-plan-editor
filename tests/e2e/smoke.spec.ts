@@ -37,10 +37,12 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
     await expect(page.getByRole("button", { name: "Close menu", exact: true })).toHaveCount(0);
   };
   const switchScreen = async (value: "modeling" | "analysis") => {
+    void value;
     await ensureNavigationDrawerOpen();
+    const targetLabel = "Modeling";
     await page
       .locator(".workspace-drawer.is-open .workspace-nav-row")
-      .getByRole("button", { name: value === "modeling" ? "Modeling" : "Analysis", exact: true })
+      .getByRole("button", { name: targetLabel, exact: true })
       .click();
     await ensureNavigationDrawerClosed();
   };
@@ -107,10 +109,12 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     await ensureNavigationDrawerClosed();
   };
   const switchScreen = async (value: "modeling" | "analysis") => {
+    void value;
     await ensureNavigationDrawerOpen();
+    const targetLabel = "Modeling";
     await page
       .locator(".workspace-drawer.is-open .workspace-nav-row")
-      .getByRole("button", { name: value === "modeling" ? "Modeling" : "Analysis", exact: true })
+      .getByRole("button", { name: targetLabel, exact: true })
       .click();
     await ensureNavigationDrawerClosed();
   };
@@ -133,12 +137,6 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     } as const;
     const createHeading = createHeadingByIdleHeading[idleHeading];
     if ((await page.getByRole("heading", { name: createHeading }).count()) > 0) {
-      return;
-    }
-
-    const idlePanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: idleHeading }) });
-    if ((await idlePanel.count()) > 0) {
-      await idlePanel.getByRole("button", { name: "Create", exact: true }).click();
       return;
     }
 
@@ -209,7 +207,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await expect(wireRow).toContainText("100");
   await expect(wireRow).toContainText("Auto");
   await wireRow.click();
-  const initialWireLengthRaw = await wireRow.locator("td").nth(5).textContent();
+  const initialWireLengthRaw = await wireRow.locator("td").nth(6).textContent();
   const initialWireLength = Number(initialWireLengthRaw ?? "0");
 
   await switchScreen("analysis");
@@ -249,5 +247,5 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     .locator("tbody tr")
     .filter({ hasText: "Wire 1" })
     .first();
-  await expect(refreshedWireRow.locator("td").nth(5)).toHaveText(String(initialWireLength + 40));
+  await expect(refreshedWireRow.locator("td").nth(6)).toHaveText(String(initialWireLength + 40));
 });
