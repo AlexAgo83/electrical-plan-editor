@@ -333,7 +333,7 @@
 
 .workspace-ops-panel.is-open {
   transform: translateX(0);
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .workspace-ops-content {
@@ -348,6 +348,7 @@
   max-height: calc(100vh - var(--workspace-header-offset) - 1rem);
   overflow: auto;
   scrollbar-gutter: stable;
+  pointer-events: auto;
 }
 
 .workspace-inspector-panel {
