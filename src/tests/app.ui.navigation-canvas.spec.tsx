@@ -366,7 +366,7 @@ describe("App integration UI - navigation and canvas", () => {
     const inspectorPanel = getPanelByHeading("Inspector context");
     expect(within(inspectorPanel).getByText(/Focused entity:/)).toBeInTheDocument();
     expect(within(inspectorPanel).getByText("C1")).toBeInTheDocument();
-    fireEvent.click(within(inspectorPanel).getByRole("button", { name: "Edit" }));
+    fireEvent.click(within(inspectorPanel).getByRole("button", { name: "Select" }));
 
     const editPanel = getPanelByHeading("Edit Connector");
     expect(within(editPanel).getByDisplayValue("Connector 1")).toBeInTheDocument();
