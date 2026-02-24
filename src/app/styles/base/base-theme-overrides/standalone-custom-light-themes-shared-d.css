@@ -1,0 +1,253 @@
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-shortcut-list li {
+  color: var(--custom-muted-text);
+  border-color: color-mix(in srgb, var(--custom-panel-border) 72%, transparent);
+  background: color-mix(in srgb, var(--custom-panel-bg) 82%, transparent);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-shortcut-key {
+  border-color: color-mix(in srgb, var(--custom-input-border) 76%, var(--custom-panel-border));
+  background: color-mix(in srgb, var(--custom-input-bg) 82%, var(--custom-shell-bg-bottom));
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-state-chip {
+  border-color: color-mix(in srgb, var(--custom-button-border) 82%, var(--custom-panel-border));
+  background: color-mix(in srgb, var(--custom-badge-bg) 80%, var(--custom-panel-bg));
+  color: var(--custom-badge-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-state-chip.is-ok {
+  border-color: color-mix(in srgb, var(--custom-wire-highlight) 55%, var(--custom-panel-border));
+  background: color-mix(in srgb, var(--custom-wire-highlight) 20%, var(--custom-panel-bg));
+  color: color-mix(in srgb, var(--custom-shell-text) 96%, white 4%);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-state-chip.is-warn {
+  border-color: color-mix(in srgb, #d9b46b 58%, var(--custom-panel-border));
+  background: color-mix(in srgb, #d9b46b 14%, var(--custom-panel-bg));
+  color: color-mix(in srgb, var(--custom-shell-text) 96%, white 4%);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-export-fieldset {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 78%, transparent);
+  background: color-mix(in srgb, var(--custom-panel-bg) 84%, transparent);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-export-fieldset legend,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-export-fieldset .settings-checkbox,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-export-fieldset .technical-id {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-import-summary .meta-line {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 70%, transparent);
+  background: color-mix(in srgb, var(--custom-panel-bg) 84%, transparent);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-import-summary .meta-line strong {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-primary-action {
+  border-color: color-mix(in srgb, var(--custom-selection) 72%, var(--custom-button-border)) !important;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--custom-selection) 40%, var(--custom-button-bg)),
+    color-mix(in srgb, var(--custom-selection) 22%, var(--custom-button-bg))
+  ) !important;
+  color: var(--custom-strong-text) !important;
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-primary-action:disabled {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 68%, transparent) !important;
+  background: color-mix(in srgb, var(--custom-panel-bg) 88%, var(--custom-shell-bg-bottom)) !important;
+  color: var(--custom-muted-text) !important;
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .workspace-health .meta-line,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .shortcut-hints,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .inspector-collapsed-copy,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-legend {
+  color: var(--custom-muted-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .legend-swatch {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 70%, white 10%);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .legend-line {
+  border-top-color: var(--custom-segment);
+}
+

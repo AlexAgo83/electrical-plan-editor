@@ -42,6 +42,22 @@ function normalizeThemeMode(value: unknown): ThemeMode {
     case "olive":
     case "oliveDark":
       return "olive";
+    case "mistGray":
+      return "mistGray";
+    case "sagePaper":
+      return "sagePaper";
+    case "sandSlate":
+      return "sandSlate";
+    case "iceBlue":
+      return "iceBlue";
+    case "softTeal":
+      return "softTeal";
+    case "dustyRose":
+      return "dustyRose";
+    case "paleOlive":
+      return "paleOlive";
+    case "cloudLavender":
+      return "cloudLavender";
     case "steelBlue":
       return "steelBlue";
     case "forestGraphite":

@@ -5,26 +5,16 @@
   .theme-copper-night,
   .theme-moss-taupe,
   .theme-navy-ash,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) {
-  color: var(--custom-shell-text);
-  background: transparent;
-  --network-selection-color: var(--custom-selection);
-  --network-selection-focus-color: var(--custom-selection);
-  --network-selection-glow: color-mix(in srgb, var(--custom-selection) 40%, transparent);
-  --network-grid-line-color: var(--custom-grid);
-  --network-segment-color: var(--custom-segment);
-  --network-wire-highlight-color: var(--custom-wire-highlight);
-  --network-node-stroke-color: var(--custom-node-stroke);
-  --network-node-connector-fill: var(--custom-node-connector-fill);
-  --network-node-splice-fill: var(--custom-node-splice-fill);
-  --network-node-intermediate-fill: var(--custom-node-intermediate-fill);
-  --network-node-label-color: var(--custom-strong-text);
-  --network-segment-label-color: var(--custom-strong-text);
-  --network-segment-length-label-color: var(--custom-muted-text);
-  --network-label-stroke-color: var(--custom-label-stroke);
-  --theme-primary: var(--custom-selection);
+) .settings-export-fieldset .technical-id {
+  color: var(--custom-strong-text);
 }
 
 .app-shell:is(
@@ -36,12 +26,9 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-)::before {
-  background:
-    radial-gradient(120% 120% at 12% 0%, color-mix(in srgb, var(--custom-accent) 14%, transparent), transparent 54%),
-    radial-gradient(120% 120% at 100% 100%, color-mix(in srgb, var(--custom-accent-2) 12%, transparent), transparent 58%),
-    linear-gradient(180deg, var(--custom-shell-bg-top), var(--custom-shell-bg-bottom));
-  opacity: 1;
+) .settings-import-summary .meta-line {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 70%, transparent);
+  background: color-mix(in srgb, var(--custom-panel-bg) 84%, transparent);
 }
 
 .app-shell:is(
@@ -53,8 +40,8 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) :focus-visible {
-  outline-color: color-mix(in srgb, var(--custom-selection) 55%, white 12%);
+) .settings-import-summary .meta-line strong {
+  color: var(--custom-strong-text);
 }
 
 .app-shell:is(
@@ -66,10 +53,14 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .header-block {
-  border-color: color-mix(in srgb, var(--custom-panel-border) 72%, var(--custom-shell-bg-bottom));
-  background: color-mix(in srgb, var(--custom-panel-bg) 72%, var(--custom-shell-bg-bottom));
-  color: var(--custom-shell-text);
+) .settings-primary-action {
+  border-color: color-mix(in srgb, var(--custom-selection) 72%, var(--custom-button-border)) !important;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--custom-selection) 40%, var(--custom-button-bg)),
+    color-mix(in srgb, var(--custom-selection) 22%, var(--custom-button-bg))
+  ) !important;
+  color: var(--custom-strong-text) !important;
 }
 
 .app-shell:is(
@@ -81,80 +72,10 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .panel,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .workspace-sidebar .workspace-switcher,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .workspace-sidebar .workspace-meta,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .stats-grid article,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .summary-grid article,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .validation-group,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .cavity,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .network-canvas-shell {
-  border-color: color-mix(in srgb, var(--custom-panel-border) 70%, var(--custom-shell-bg-bottom));
-  background: color-mix(in srgb, var(--custom-panel-bg) 74%, var(--custom-shell-bg-bottom));
-  color: var(--custom-shell-text);
+) .settings-primary-action:disabled {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 68%, transparent) !important;
+  background: color-mix(in srgb, var(--custom-panel-bg) 88%, var(--custom-shell-bg-bottom)) !important;
+  color: var(--custom-muted-text) !important;
 }
 
 .app-shell:is(
@@ -166,7 +87,7 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .workspace-tab,
+) .workspace-health .meta-line,
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -176,7 +97,7 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .filter-chip,
+) .shortcut-hints,
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -186,7 +107,7 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .row-actions button,
+) .inspector-collapsed-copy,
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -196,7 +117,10 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .row-form button,
+) .network-legend {
+  color: var(--custom-muted-text);
+}
+
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -206,7 +130,10 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .validation-row-go-to-button,
+) .legend-swatch {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 70%, white 10%);
+}
+
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -216,7 +143,10 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .error-banner button,
+) .legend-line {
+  border-top-color: var(--custom-segment);
+}
+
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -226,7 +156,10 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .inspector-context-toggle,
+) .legend-line.selected {
+  border-top-color: var(--network-selection-color);
+}
+
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -236,7 +169,10 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .header-nav-toggle,
+) .legend-line.wire {
+  border-top-color: var(--network-wire-highlight-color);
+}
+
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -246,7 +182,10 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .network-scope-create-button,
+) .network-canvas-stats-list strong {
+  color: var(--custom-strong-text);
+}
+
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -256,7 +195,7 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .header-install-toggle,
+) .inspector-entity-label,
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -266,7 +205,10 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .header-update-toggle,
+) .inspector-detail-grid dt {
+  color: var(--custom-muted-text);
+}
+
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -276,7 +218,7 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .header-settings-toggle,
+) .inspector-entity-id,
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -286,9 +228,22 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .header-ops-toggle {
-  border-color: var(--custom-button-border);
-  background: var(--custom-button-bg);
+) .inspector-detail-grid dd {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .inspector-kind-chip {
+  border-color: color-mix(in srgb, var(--custom-button-border) 86%, white 6%);
+  background: color-mix(in srgb, var(--custom-button-bg) 88%, var(--custom-panel-bg));
   color: var(--custom-button-text);
 }
 
@@ -301,7 +256,7 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .workspace-tab.is-active,
+) .network-form-header h2,
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -311,7 +266,7 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .filter-chip.is-active,
+) .network-form-label,
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -321,10 +276,58 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .header-settings-toggle.is-active {
-  background: var(--custom-selection);
-  border-color: var(--custom-selection);
-  color: var(--custom-button-active-text);
+) .stack-label,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .stack-form label,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .row-form label,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .inline-fieldset legend,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .wire-endpoint-fieldset legend,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .wire-endpoint-fieldset label {
+  color: color-mix(in srgb, var(--custom-shell-text) 96%, white 4%);
 }
 
 .app-shell:is(
@@ -336,7 +339,7 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .workspace-tab-badge,
+) .empty-copy,
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -346,11 +349,7 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) .header-ops-badge {
-  background: var(--custom-badge-bg);
-  color: var(--custom-badge-text);
-}
-
+) .form-hint,
 .app-shell:is(
   .theme-steel-blue,
   .theme-forest-graphite,
@@ -360,130 +359,62 @@
   .theme-navy-ash,
   .theme-charcoal-plum,
   .theme-smoked-teal
-) input,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) select,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) textarea {
-  border-color: color-mix(in srgb, var(--custom-input-border) 68%, var(--custom-panel-border));
-  background: color-mix(in srgb, var(--custom-input-bg) 76%, var(--custom-shell-bg-bottom));
-  color: var(--custom-input-text);
-}
-
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .stack-form input:not([type="checkbox"]):not([type="radio"]),
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .stack-form select,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .row-form input:not([type="checkbox"]):not([type="radio"]),
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .row-form select,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .stack-label input,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .stack-label select {
-  border-color: color-mix(in srgb, var(--custom-input-border) 68%, var(--custom-panel-border));
-  background: color-mix(in srgb, var(--custom-input-bg) 76%, var(--custom-shell-bg-bottom));
-  color: var(--custom-input-text);
-}
-
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .data-table th,
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .data-table td {
-  border-color: var(--custom-table-border);
-}
-
-.app-shell:is(
-  .theme-steel-blue,
-  .theme-forest-graphite,
-  .theme-petrol-slate,
-  .theme-copper-night,
-  .theme-moss-taupe,
-  .theme-navy-ash,
-  .theme-charcoal-plum,
-  .theme-smoked-teal
-) .data-table th {
-  background: color-mix(in srgb, var(--custom-table-head-bg) 78%, var(--custom-shell-bg-bottom));
+) .inline-help {
   color: var(--custom-muted-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .form-hint.danger {
+  color: #ffc2cb;
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .wire-endpoint-fieldset {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 78%, white 8%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--custom-panel-bg) 80%, var(--custom-shell-bg-top)),
+    color-mix(in srgb, var(--custom-panel-bg) 62%, var(--custom-shell-bg-bottom))
+  );
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .network-delete-button,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .modeling-list-action-delete {
+  border-color: color-mix(in srgb, #ff8d9a 55%, var(--custom-panel-border)) !important;
+  background: color-mix(in srgb, #8c2230 60%, var(--custom-panel-bg)) !important;
+  color: #ffe4e8 !important;
 }

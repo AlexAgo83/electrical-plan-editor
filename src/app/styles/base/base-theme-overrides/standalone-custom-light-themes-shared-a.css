@@ -1,0 +1,489 @@
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) {
+  color: var(--custom-shell-text);
+  background: transparent;
+  --network-selection-color: var(--custom-selection);
+  --network-selection-focus-color: var(--custom-selection);
+  --network-selection-glow: color-mix(in srgb, var(--custom-selection) 40%, transparent);
+  --network-grid-line-color: var(--custom-grid);
+  --network-segment-color: var(--custom-segment);
+  --network-wire-highlight-color: var(--custom-wire-highlight);
+  --network-node-stroke-color: var(--custom-node-stroke);
+  --network-node-connector-fill: var(--custom-node-connector-fill);
+  --network-node-splice-fill: var(--custom-node-splice-fill);
+  --network-node-intermediate-fill: var(--custom-node-intermediate-fill);
+  --network-node-label-color: var(--custom-strong-text);
+  --network-segment-label-color: var(--custom-strong-text);
+  --network-segment-length-label-color: var(--custom-muted-text);
+  --network-label-stroke-color: var(--custom-label-stroke);
+  --theme-primary: var(--custom-selection);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+)::before {
+  background:
+    radial-gradient(120% 120% at 12% 0%, color-mix(in srgb, var(--custom-accent) 14%, transparent), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, color-mix(in srgb, var(--custom-accent-2) 12%, transparent), transparent 58%),
+    linear-gradient(180deg, var(--custom-shell-bg-top), var(--custom-shell-bg-bottom));
+  opacity: 1;
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) :focus-visible {
+  outline-color: color-mix(in srgb, var(--custom-selection) 55%, white 12%);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .header-block {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 72%, var(--custom-shell-bg-bottom));
+  background: color-mix(in srgb, var(--custom-panel-bg) 72%, var(--custom-shell-bg-bottom));
+  color: var(--custom-shell-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .panel,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .workspace-sidebar .workspace-switcher,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .workspace-sidebar .workspace-meta,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .stats-grid article,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .summary-grid article,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .validation-group,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .cavity,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-canvas-shell {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 70%, var(--custom-shell-bg-bottom));
+  background: color-mix(in srgb, var(--custom-panel-bg) 74%, var(--custom-shell-bg-bottom));
+  color: var(--custom-shell-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .workspace-tab,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .filter-chip,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .row-actions button,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .row-form button,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .validation-row-go-to-button,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .error-banner button,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .inspector-context-toggle,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .header-nav-toggle,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-scope-create-button,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .header-install-toggle,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .header-update-toggle,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .header-settings-toggle,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .header-ops-toggle {
+  border-color: var(--custom-button-border);
+  background: var(--custom-button-bg);
+  color: var(--custom-button-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .workspace-tab.is-active,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .filter-chip.is-active,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .header-settings-toggle.is-active {
+  background: var(--custom-selection);
+  border-color: var(--custom-selection);
+  color: var(--custom-button-active-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .workspace-tab-badge,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .header-ops-badge {
+  background: var(--custom-badge-bg);
+  color: var(--custom-badge-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) input,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) select,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) textarea {
+  border-color: color-mix(in srgb, var(--custom-input-border) 68%, var(--custom-panel-border));
+  background: color-mix(in srgb, var(--custom-input-bg) 76%, var(--custom-shell-bg-bottom));
+  color: var(--custom-input-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .stack-form input:not([type="checkbox"]):not([type="radio"]),
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .stack-form select,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .row-form input:not([type="checkbox"]):not([type="radio"]),
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .row-form select,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .stack-label input,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .stack-label select {
+  border-color: color-mix(in srgb, var(--custom-input-border) 68%, var(--custom-panel-border));
+  background: color-mix(in srgb, var(--custom-input-bg) 76%, var(--custom-shell-bg-bottom));
+  color: var(--custom-input-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .data-table th,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .data-table td {
+  border-color: var(--custom-table-border);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .data-table th {
+  background: color-mix(in srgb, var(--custom-table-head-bg) 78%, var(--custom-shell-bg-bottom));
+  color: var(--custom-muted-text);
+}

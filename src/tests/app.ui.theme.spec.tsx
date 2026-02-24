@@ -120,6 +120,26 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).not.toHaveClass("theme-normal");
   });
 
+  it("supports standalone light custom themes without stacking legacy theme classes", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    const appShell = document.querySelector("main.app-shell");
+    expect(appShell).not.toBeNull();
+
+    switchScreen("settings");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Appearance preferences" }).closest(".panel");
+    expect(settingsPanel).not.toBeNull();
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "sagePaper" }
+    });
+
+    expect(appShell).toHaveClass("theme-sage-paper");
+    expect(appShell).not.toHaveClass("theme-dark");
+    expect(appShell).not.toHaveClass("theme-normal");
+    expect(appShell).not.toHaveClass("theme-paper-blueprint");
+  });
+
   it("persists dark mode preference across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreen("settings");

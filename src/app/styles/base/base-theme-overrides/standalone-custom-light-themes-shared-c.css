@@ -1,0 +1,279 @@
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-scope-indicator {
+  border-color: var(--custom-panel-border);
+  background: color-mix(in srgb, var(--custom-panel-bg) 92%, transparent);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-scope-indicator-label {
+  color: var(--custom-muted-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-scope-indicator-value {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-node.connector .network-node-shape {
+  fill: var(--custom-node-connector-fill);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-node.splice .network-node-shape {
+  fill: var(--custom-node-splice-fill);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-node.intermediate .network-node-shape {
+  fill: var(--custom-node-intermediate-fill);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-canvas-floating-controls,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-canvas-floating-subnetworks,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-canvas-floating-stats {
+  border-color: var(--custom-panel-border);
+  background: color-mix(in srgb, var(--custom-panel-bg) 88%, transparent);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-canvas-floating-copy,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-canvas-subnetwork-list li,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-canvas-stats-list li {
+  color: var(--custom-muted-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-panel {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 76%, white 6%);
+  background: linear-gradient(
+    170deg,
+    color-mix(in srgb, var(--custom-panel-bg) 78%, var(--custom-shell-bg-top)) 0%,
+    color-mix(in srgb, var(--custom-panel-bg) 72%, var(--custom-shell-bg-bottom)) 100%
+  );
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--custom-strong-text) 10%, transparent);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-panel h2 {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-panel-intro {
+  color: var(--custom-muted-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-panel-chip {
+  border-color: color-mix(in srgb, var(--custom-button-border) 88%, white 8%);
+  background: color-mix(in srgb, var(--custom-badge-bg) 78%, var(--custom-panel-bg));
+  color: var(--custom-badge-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-panel .settings-checkbox {
+  color: color-mix(in srgb, var(--custom-shell-text) 96%, white 4%);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: color-mix(in srgb, var(--custom-input-bg) 78%, var(--custom-shell-bg-bottom));
+  border-color: color-mix(in srgb, var(--custom-input-border) 78%, var(--custom-panel-border));
+  color: var(--custom-input-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-panel .settings-checkbox:hover {
+  background: color-mix(in srgb, var(--custom-selection) 14%, transparent);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-actions {
+  border-top-color: color-mix(in srgb, var(--custom-panel-border) 54%, transparent);
+}

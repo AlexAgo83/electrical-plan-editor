@@ -170,6 +170,14 @@ export function SettingsWorkspaceContent({
               <option value="normal">Light</option>
               <option value="paperBlueprint">Paper Blueprint (Light)</option>
               <option value="warmBrown">Warm Brown (Light)</option>
+              <option value="mistGray">Mist Gray (Light)</option>
+              <option value="sagePaper">Sage Paper (Light)</option>
+              <option value="sandSlate">Sand Slate (Light)</option>
+              <option value="iceBlue">Ice Blue (Light)</option>
+              <option value="softTeal">Soft Teal (Light)</option>
+              <option value="dustyRose">Dusty Rose (Light)</option>
+              <option value="paleOlive">Pale Olive (Light)</option>
+              <option value="cloudLavender">Cloud Lavender (Light)</option>
               <option value="roseQuartz">Rose Quartz (Light)</option>
               <option value="lavenderHaze">Lavender Haze (Light)</option>
               <option value="dark">Dark</option>
