@@ -219,21 +219,24 @@
   padding: 0.35rem 0.6rem;
 }
 
-.network-scope-list-actions {
+.row-actions.network-scope-list-actions {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.35rem;
   margin-top: 0.55rem;
+  width: 100%;
 }
 
-.network-scope-list-actions-row {
+.row-actions.network-scope-list-actions .network-scope-list-actions-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.35rem;
+  width: 100%;
 }
 
-.network-scope-list-actions button {
+.row-actions.network-scope-list-actions button {
   width: 100%;
+  min-width: 0;
 }
 
 .table-density-compact .network-scope-list-shell {
