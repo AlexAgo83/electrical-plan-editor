@@ -17,6 +17,9 @@
 - In `Connectors` / `Splices` analysis, show wire color swatches next to the wire label (reusing the wire table color circle design).
 - In cable callouts, display wire `section` after `length`.
 - Refine `sub-network` display behavior for `(default)` values in tables and the 2D render info panel (hide noisy default labels and hide `Enable all` when no non-default sub-networks exist).
+- Ensure theme styling is correctly applied to all table column headers, including sort chevrons/icons.
+- When clicking an element in the 2D render/canvas, keep selection/focus behavior but **remove the automatic viewport scroll to the corresponding table row** (applies across screens that currently auto-scroll focused rows).
+- Address review findings around reducer invariants, filter-bar accessibility labeling, and theme regression test coverage.
 
 # Context
 Recent deliveries introduced and/or expanded wire metadata and references:
@@ -36,11 +39,15 @@ This request focuses on **surfacing and navigation quality**:
 - better visual cable identification in connector/splice analysis via color swatches
 - editable `segmentId` ergonomics aligned with the existing editable `nodeId` pattern
 - reduced UI noise around `(default)` sub-network labels in tables and render2d controls
+- consistent theming on sortable table headers (label + chevron)
+- less disruptive cross-panel scroll behavior after 2D selection (selection sync without forced table jump)
+- stronger store invariants and regression safety (reducers/a11y/theme coverage)
 
 ## Scope clarification (important)
 - “All tables” means **tabular data lists/grids in workspace screens** (Modeling / Analysis / Network Scope / Validation and similar table-based panels).
 - Non-tabular lists (for example checkbox lists in Settings portability panels) are out of scope unless they are rendered as actual sortable tables.
 - If a panel has a table-like layout but currently lacks a stable column model, implementation may require defining one first; this must be documented.
+- Recommended baseline for this request: interpret “all tables” as **workspace tables only** (Modeling / Analysis / Network Scope / Validation tabular surfaces), excluding Settings lists.
 
 ## Recommended implementation strategy (baseline)
 - Deliver in waves with checkpoint commits and targeted validations.
@@ -61,8 +68,9 @@ This request focuses on **surfacing and navigation quality**:
 - Callout wire detail line:
   - append section after length (recommended formatting example: `240 mm • 0.5 mm²`)
 - `Wires` analysis “add infos”:
-  - minimum implementation should document exactly what was added (e.g. section, color, endpoint metadata, route details, references)
-  - if multiple options exist, prefer information that improves troubleshooting and traceability without bloating the panel
+  - minimum required baseline (recommended): `section`, wire color(s), and endpoint references (connection/seal when present)
+  - implementation should document exactly what was added
+  - if multiple extras are possible, prefer information that improves troubleshooting and traceability without bloating the panel
 - `segmentId` editability:
   - follow the same user expectations as `nodeId` (editable field in edit mode)
   - recommended implementation pattern: atomic rename action in store/reducer with reference remap, not delete/recreate
@@ -70,6 +78,23 @@ This request focuses on **surfacing and navigation quality**:
   - if value is `(default)`, hide it in the table `Sub-network` column (render empty instead of literal default tag)
   - hide `(default)` from the render2d info/filter panel sub-network listing text
   - if there are no non-default sub-networks, hide the `Enable all` button in the render2d sub-network controls
+- Table header theming:
+  - apply theme colors consistently to all column header labels and sort chevrons/icons
+  - avoid fallback/default browser/icon colors that break theme contrast or visual consistency
+- 2D click -> table synchronization behavior:
+  - keep entity selection synchronized across canvas/render2d and panels
+  - do **not** auto-scroll the workspace to the table row when selection originates from a render2d click
+  - applies to all screens/panels with table focus-scroll behavior (not just one entity type)
+- Sorting empty/optional values:
+  - recommended baseline: empty/undefined values sort to the bottom in both ascending and descending modes (stable UX for optional columns)
+- `Nodes` / `Segments` analysis placement:
+  - implement as dedicated `Analysis` panels/sub-views (same discovery pattern as existing `Connectors` / `Splices` / `Wires` analysis), not as ad-hoc blocks inside other panels
+- `Segments` analysis wire listing baseline:
+  - minimum recommended wire identity display = wire label + technical ID
+- Review follow-up hardening:
+  - reducers should enforce required-field non-empty invariants after trimming (store remains source of truth)
+  - `TableFilterBar` text input should have explicit accessible labeling (not placeholder-only)
+  - theme tests should cover at least a minimal set of rendered surfaces beyond class wiring (to reduce visual regressions slipping through)
 
 ## Objectives
 - Provide consistent sort interactions on all tabular data surfaces.
@@ -79,6 +104,9 @@ This request focuses on **surfacing and navigation quality**:
 - Keep column ordering and labeling coherent across Modeling and Analysis views.
 - Extend entity ID edit ergonomics by enabling safe `segmentId` editing.
 - Reduce default sub-network label noise in table and render2d sub-network UI.
+- Ensure sortable column headers (including chevrons) are fully theme-consistent across legacy and standalone themes.
+- Preserve canvas-to-table selection sync while removing forced auto-scroll jumps triggered by render2d clicks.
+- Fix review-identified robustness gaps (required-field reducer validation, filter-bar a11y labeling, theme regression test depth).
 
 ## Functional Scope
 ### A. Sortability completion for all table columns (highest priority)
@@ -92,6 +120,7 @@ This request focuses on **surfacing and navigation quality**:
 - Sorting behavior requirements:
   - deterministic ascending/descending behavior
   - stable handling of empty/undefined values
+  - recommended baseline: empty/undefined values remain grouped at the bottom in both sort directions for optional columns
   - no runtime crashes when sorting optional/mixed content
   - consistent sort indicators / interaction affordance
 - If a column is intentionally unsortable for a valid reason (extremely rare), document the reason explicitly in implementation/closure notes.
@@ -109,7 +138,7 @@ This request focuses on **surfacing and navigation quality**:
 - If table width pressure becomes an issue, document column order/width tradeoffs made.
 
 ### C. `Nodes` Analysis view/panel (high priority)
-- Add an `Analysis` surface for `Nodes` similar in spirit to existing `Connectors` / `Splices` / `Wires` analysis patterns.
+- Add a dedicated `Analysis` surface/panel for `Nodes` similar in spirit to existing `Connectors` / `Splices` / `Wires` analysis patterns.
 - Core use case:
   - list/select nodes
   - inspect associated segments
@@ -122,14 +151,14 @@ This request focuses on **surfacing and navigation quality**:
 - Table/list elements in the new panel must follow the sortability completion rule (sortable columns where applicable).
 
 ### D. `Segments` Analysis view/panel (high priority)
-- Add an `Analysis` surface for `Segments`.
+- Add a dedicated `Analysis` surface/panel for `Segments`.
 - Core use case:
   - list/select segments
   - inspect wires traversing the selected segment
 - Recommended baseline info in segment analysis:
   - segment identity (ID, endpoints, optional sub-network tag)
   - list of traversing wires
-  - useful wire identifiers (name and/or technical ID)
+  - minimum recommended wire identity display: wire label + technical ID
   - length context if helpful and low-risk
 - Where wire colors are already available, surfacing them here is a plus if trivial, but the minimum required addition is the list of traversing wires.
 - Table/list elements in the new panel must follow the sortability completion rule (sortable columns where applicable).
@@ -138,7 +167,11 @@ This request focuses on **surfacing and navigation quality**:
 - Reorder `Wires` table columns so `Section` is immediately before `Length`.
 - Apply consistently to all relevant wire tables (Modeling and Analysis wire tables, where the columns are present).
 - In `Wires` analysis, add additional useful information and document the final chosen scope.
-  - Examples (non-prescriptive): section, colors, manufacturer-related endpoint metadata, per-side references, endpoint occupancy hints, route/segment count context
+  - Minimum required baseline (recommended):
+    - wire `section`
+    - wire color(s)
+    - endpoint references (connection/seal references when present)
+  - Optional extras (if low-risk): endpoint occupancy hints, route/segment count context, additional endpoint metadata, etc.
   - Avoid clutter; prefer high-value fields that support diagnostics and traceability
 - Any newly surfaced wire-analysis fields should render optional values safely and remain theme-consistent.
 
@@ -175,7 +208,41 @@ This request focuses on **surfacing and navigation quality**:
   - avoid leaving awkward spacing/layout gaps
 - Keep behavior deterministic when non-default sub-networks later appear (the `Enable all` button should return when relevant).
 
-### I. Callout wire detail enrichment (`length` + `section`) (medium-high priority)
+### I. Table header theming completion (medium-high priority)
+- Apply theme styling to all table column headers across in-scope tabular panels, including:
+  - header label text
+  - sort indicators / chevrons / sort icons
+  - active-sorted vs inactive header states (where visually differentiated)
+- Ensure headers do not regress to default/fallback colors in any theme family:
+  - legacy themes
+  - standalone dark themes
+  - standalone light themes
+- Preserve sufficient contrast in both active and inactive sort states.
+
+### J. Render2D click selection sync without forced table auto-scroll (high priority)
+- When a user clicks/selects an entity from the render2d/canvas surface:
+  - preserve current selection synchronization and panel/entity focus behavior
+  - **do not** auto-scroll the workspace/table viewport to the matching row
+- This applies across all screens with table-backed selection behavior and row-focus scroll logic (for example Modeling/Analysis screens where table row focus currently scrolls into view).
+- The change should not break keyboard-driven row focus behavior or explicit list-driven focus interactions.
+- Preserve row selection/highlight synchronization and related panel sync; only remove the viewport jump when the selection origin is render2d/canvas.
+- If architecture currently uses a shared focus helper for both table-origin and canvas-origin selection:
+  - split or parameterize the behavior so canvas-origin selections can skip scroll while retaining selection/focus state updates.
+
+### K. Review follow-up hardening (high priority)
+- Reducer invariants (store-level source of truth):
+  - enforce non-empty required fields after trimming in relevant reducers (at minimum the reducers identified in review: connector/splice/node/segment upserts)
+  - avoid relying solely on UI-form validation for required IDs/names/technical IDs
+- `TableFilterBar` accessibility:
+  - ensure the text input has an explicit accessible name/label (not placeholder-only)
+  - preserve current layout and field-selector UX while improving labeling semantics
+- Theme regression testing:
+  - add/strengthen tests so standalone theme regressions are less likely to pass when class wiring is correct but component surfaces remain unthemed
+  - minimum baseline should validate a small representative set of rendered surfaces (not just shell class names), and document the chosen coverage
+- Implementation sequencing recommendation:
+  - tackle reducer invariants + `TableFilterBar` accessibility + theme regression-test hardening early in the request (before broad table sortability rollout), to reduce cumulative regression risk
+
+### L. Callout wire detail enrichment (`length` + `section`) (medium-high priority)
 - In wire/cable callout UI (network summary callout / related cable callout surfaces), append the wire `section` after `length`.
 - Formatting should remain concise and readable.
 - Optional/legacy-safe behavior:
@@ -186,11 +253,15 @@ This request focuses on **surfacing and navigation quality**:
 - Preserve existing selection, focus, row activation, and form-edit workflows while adding sortability and new columns.
 - Maintain table performance and avoid expensive recomputation per render for sortable derived columns.
 - Use deterministic comparator logic for formatted values (sort on normalized data, not visual label artifacts when possible).
+- Keep sort behavior for optional/empty values consistent across tables (recommended baseline: empties bottom in both directions).
 - Keep header labels compact and readable on common widths.
 - Reuse existing components/styles for wire color swatches and table cells when possible.
 - Preserve theme compatibility (legacy + standalone themes) for newly added columns, badges, callout text, and analysis panels.
+- Preserve theme compatibility (legacy + standalone themes) for table headers and sort chevrons/icons.
 - Preserve data integrity and reference consistency when enabling `segmentId` rename (atomic rename + remap semantics).
 - Keep `(default)` sub-network display cleanup consistent across table rendering and render2d controls (no mixed literal/hidden behavior in equivalent contexts).
+- Preserve keyboard/table-origin focus ergonomics while removing only render2d-origin forced scrolling.
+- Keep reducer validation authoritative even if UI validations regress.
 
 ## Validation and regression safety
 - Recommended implementation validation per wave:
@@ -209,15 +280,21 @@ This request focuses on **surfacing and navigation quality**:
 ## Acceptance criteria
 - AC1: All columns in all in-scope tabular panels are sortable, with deterministic ascending/descending behavior and safe handling of empty/optional values.
 - AC2: `Connectors` and `Splices` tables expose a sortable `manufacturerReference` column with an abbreviated header label (recommended `Mfr Ref`) and clean empty-value rendering.
-- AC3: A `Nodes` analysis surface exists and lists associated segments for the selected node, including segment length.
-- AC4: A `Segments` analysis surface exists and lists wires traversing the selected segment.
+- AC3: A dedicated `Nodes` analysis surface exists and lists associated segments for the selected node, including segment length.
+- AC4: A dedicated `Segments` analysis surface exists and lists wires traversing the selected segment with at least wire label + technical ID.
 - AC5: In `Wires` tables, the `Section` column appears immediately before the `Length` column (where both columns are present).
 - AC6: `segmentId` can be edited safely in the segment edit flow using a rename strategy that preserves data integrity and reference consistency (with clear collision/invalid handling).
-- AC7: `Wires` analysis is enriched with additional information beyond the previous baseline, and the delivered additions are explicitly documented.
+- AC7: `Wires` analysis is enriched with at least `section`, wire color(s), and endpoint references (when present) beyond the previous baseline, and the delivered additions are explicitly documented.
 - AC8: `Connectors` / `Splices` analysis wire entries include wire color swatches reusing the wire-table visual design while preserving the wire label text.
 - AC9: `(default)` sub-network is hidden in relevant `Sub-network` table cells and in the render2d sub-network info panel, and `Enable all` is hidden when no non-default sub-networks exist.
-- AC10: Wire/cable callouts display wire `section` after `length` (with safe fallback behavior if section is absent).
-- AC11: Regression coverage or documented targeted validation exists for sortability completion and the newly added analysis/table/callout/segment-rename/sub-network-display surfaces.
+- AC10: Table column headers (including sort chevrons/icons) are theme-consistent across legacy and standalone themes, without fallback/default icon colors.
+- AC11: Clicking an entity in render2d/canvas keeps selection synchronization but no longer auto-scrolls the workspace/table to the corresponding row (across in-scope table-backed screens), while table-origin focus interactions continue to behave correctly.
+- AC12: Store reducers enforce required-field non-empty invariants after trimming for the reviewed entity upsert paths (at minimum connector/splice/node/segment).
+- AC13: `TableFilterBar` text inputs are explicitly labeled for accessibility (not placeholder-only).
+- AC14: Theme regression tests cover at least a minimal representative set of rendered surfaces beyond shell class wiring for standalone themes, or a defer rationale is documented.
+- AC15: Wire/cable callouts display wire `section` after `length` (with safe fallback behavior if section is absent).
+- AC16: Sorting across optional-value columns follows a consistent documented strategy (recommended baseline: empty/undefined values bottom in both directions).
+- AC17: Regression coverage or documented targeted validation exists for sortability completion and the newly added analysis/table/callout/segment-rename/sub-network-display/header-theming/render2d-scroll/review-hardening surfaces.
 
 ## Out of scope
 - Redesigning all tables into a new table framework/component library.
@@ -235,7 +312,10 @@ This request focuses on **surfacing and navigation quality**:
 - `logics/backlog/item_275_connectors_splices_analysis_wire_color_swatches_reusing_wire_table_design.md`
 - `logics/backlog/item_276_callout_wire_length_and_section_display_enrichment.md`
 - `logics/backlog/item_277_sub_network_default_display_cleanup_in_tables_and_render2d_controls.md`
-- `logics/backlog/item_278_req_044_table_sortability_and_analysis_enrichment_closure_ci_build_and_ac_traceability.md`
+- `logics/backlog/item_278_table_header_theming_completion_including_sort_chevrons_across_all_themes.md`
+- `logics/backlog/item_279_render2d_selection_sync_without_forced_table_autoscroll.md`
+- `logics/backlog/item_280_review_followup_reducer_invariants_table_filterbar_a11y_and_theme_regression_tests.md`
+- `logics/backlog/item_281_req_044_table_sortability_and_analysis_enrichment_closure_ci_build_and_ac_traceability.md`
 
 # References
 - `src/app/components/workspace/ModelingPrimaryTables.tsx`
