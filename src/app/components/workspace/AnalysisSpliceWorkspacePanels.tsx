@@ -37,6 +37,11 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     setSpliceSynthesisSort: _setSpliceSynthesisSort,
     getSortIndicator: _getSortIndicator
   } = props;
+  void _spliceSort;
+  void _setSpliceSort;
+  void _spliceSynthesisSort;
+  void _setSpliceSynthesisSort;
+  void _getSortIndicator;
   type SpliceAnalysisTableSortField = "name" | "technicalId" | "manufacturerReference" | "portCount" | "branchCount";
   type SpliceSynthesisTableSortField = "name" | "technicalId" | "localPort" | "destination" | "lengthMm";
   const [spliceAnalysisView, setSpliceAnalysisView] = useState<"ports" | "synthesis">("ports");
