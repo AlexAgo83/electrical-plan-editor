@@ -81,6 +81,7 @@ describe("App integration UI - navigation and canvas", () => {
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
     switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("connector");
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
     expect(within(connectorAnalysisPanel).getByText("Wire W-1 / A")).toBeInTheDocument();
@@ -98,6 +99,7 @@ describe("App integration UI - navigation and canvas", () => {
     const splicesPanel = getPanelByHeading("Splices");
     fireEvent.click(within(splicesPanel).getByText("Splice 1"));
     switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("splice");
 
     const spliceAnalysisPanel = getPanelByHeading("Splice analysis");
     expect(within(spliceAnalysisPanel).getByText("Wire W-1 / B")).toBeInTheDocument();
@@ -381,6 +383,7 @@ describe("App integration UI - navigation and canvas", () => {
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
     fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Analysis$/, hidden: true }));
+    switchSubScreenDrawerAware("connector");
 
     const analysisConnectorsPanel = getPanelByHeading("Connectors");
     const selectedRow = within(analysisConnectorsPanel).getByText("Connector 1").closest("tr");
@@ -391,6 +394,7 @@ describe("App integration UI - navigation and canvas", () => {
   it("keeps analysis selection context when switching back to modeling", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("connector");
 
     const analysisConnectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(analysisConnectorsPanel).getByText("Connector 1"));
@@ -444,9 +448,10 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.keyDown(window, { key: "4", altKey: true });
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
-    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Analysis$/, hidden: true })).toHaveClass(
+    expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/, hidden: true })).toHaveClass(
       "is-active"
     );
+    expect(getPanelByHeading("Wire analysis")).toBeInTheDocument();
 
     fireEvent.keyDown(window, { key: "4", altKey: true, shiftKey: true });
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");

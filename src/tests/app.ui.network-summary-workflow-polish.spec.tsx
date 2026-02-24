@@ -86,9 +86,9 @@ describe("App integration UI - network summary workflow polish", () => {
     const rows = Array.from(wiresPanel.querySelectorAll("tbody tr"));
     expect(rows).toHaveLength(2);
     expect(rows[0]?.querySelector("td")?.textContent).toContain("Wire 2");
-    expect(rows[0]?.children[5]?.textContent?.trim()).toBe("25");
+    expect(rows[0]?.children[6]?.textContent?.trim()).toBe("25");
     expect(rows[1]?.querySelector("td")?.textContent).toContain("Wire 1");
-    expect(rows[1]?.children[5]?.textContent?.trim()).toBe("120");
+    expect(rows[1]?.children[6]?.textContent?.trim()).toBe("120");
   });
 
   it("supports deeper zoom-out floor and allows dragging nodes to negative coordinates", () => {

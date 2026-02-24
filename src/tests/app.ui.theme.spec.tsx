@@ -169,7 +169,7 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).toHaveClass("theme-sage-paper");
 
     switchScreen("analysis");
-    expect(within(document.body).getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
+    expect(within(document.body).getByRole("heading", { name: "Wire analysis" })).toBeInTheDocument();
     expect(within(document.body).getByRole("heading", { name: "Route preview" })).toBeInTheDocument();
   });
 
