@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactElement } from "react";
 import type { NetworkId } from "../../../core/entities";
-import { nextSortState, sortByNameAndTechnicalId } from "../../lib/app-utils-shared";
+import { focusElementWithoutScroll, nextSortState, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { SortState } from "../../types/app-controller";
 import { TableFilterBar } from "./TableFilterBar";
@@ -72,33 +72,51 @@ export function NetworkScopeWorkspaceContent({
   onOpenOnboardingHelp
 }: NetworkScopeWorkspaceContentProps): ReactElement {
   type NetworkScopeFilterField = "name" | "technicalId" | "any";
+  type NetworkScopeTableSortField = "name" | "technicalId" | "status";
   const isCreateMode = networkFormMode === "create";
   const isEditMode = networkFormMode === "edit";
   const isFormOpen = isCreateMode || isEditMode;
   const [focusedNetworkId, setFocusedNetworkId] = useState<NetworkId | null>(activeNetworkId);
   const [networkFilterField, setNetworkFilterField] = useState<NetworkScopeFilterField>("any");
   const [networkFilterQuery, setNetworkFilterQuery] = useState("");
+  const [networkTableSort, setNetworkTableSort] = useState<{ field: NetworkScopeTableSortField; direction: "asc" | "desc" }>({
+    field: networkSort.field === "technicalId" ? "technicalId" : "name",
+    direction: networkSort.direction
+  });
   const rowRefs = useRef<Partial<Record<NetworkId, HTMLTableRowElement | null>>>({});
   const lastHandledFocusRequestTokenRef = useRef<number>(-1);
 
   const sortedNetworks = useMemo(
     () =>
-      sortByNameAndTechnicalId(
+      sortByTableColumns(
         networks,
-        networkSort,
-        (network) => network.name,
-        (network) => network.technicalId
+        networkTableSort,
+        (network, field) => {
+          if (field === "name") return network.name;
+          if (field === "technicalId") return network.technicalId;
+          return activeNetworkId === network.id ? "active" : "available";
+        },
+        (network) => `${network.technicalId}::${network.name}`
       ),
-    [networkSort, networks]
+    [activeNetworkId, networkTableSort, networks]
   );
   const focusedNetwork = focusedNetworkId === null ? null : networks.find((network) => network.id === focusedNetworkId) ?? null;
   const focusedNetworkCounts =
     focusedNetworkId === null ? null : networkEntityCountsById[focusedNetworkId] ?? null;
-  const networkSortIndicator = (field: "name" | "technicalId"): "asc" | "desc" | null => {
-    if (networkSort.field !== field) {
+  const networkSortIndicator = (field: NetworkScopeTableSortField): "asc" | "desc" | null => {
+    if (networkTableSort.field !== field) {
       return null;
     }
-    return networkSort.direction;
+    return networkTableSort.direction;
+  };
+  const setNetworkTableSortField = (field: NetworkScopeTableSortField) => {
+    setNetworkTableSort((current) => ({
+      field,
+      direction: current.field === field && current.direction === "asc" ? "desc" : "asc"
+    }));
+    if (field === "name" || field === "technicalId") {
+      setNetworkSort((current) => nextSortState(current, field));
+    }
   };
   const normalizedNetworkFilterQuery = networkFilterQuery.trim().toLocaleLowerCase();
   const visibleNetworks = useMemo(() => {
@@ -159,11 +177,11 @@ export function NetworkScopeWorkspaceContent({
     lastHandledFocusRequestTokenRef.current = focusRequestedNetworkToken;
     setFocusedNetworkId(focusRequestedNetworkId);
     if (typeof window === "undefined") {
-      rowRefs.current[focusRequestedNetworkId]?.focus();
+      focusElementWithoutScroll(rowRefs.current[focusRequestedNetworkId]);
       return;
     }
     window.requestAnimationFrame(() => {
-      rowRefs.current[focusRequestedNetworkId]?.focus();
+      focusElementWithoutScroll(rowRefs.current[focusRequestedNetworkId]);
     });
   }, [focusRequestedNetworkId, focusRequestedNetworkToken, networks]);
 
@@ -249,7 +267,7 @@ export function NetworkScopeWorkspaceContent({
                       <button
                         type="button"
                         className="sort-header-button"
-                        onClick={() => setNetworkSort((current) => nextSortState(current, "name"))}
+                        onClick={() => setNetworkTableSortField("name")}
                       >
                         Name{" "}
                         <span
@@ -268,7 +286,7 @@ export function NetworkScopeWorkspaceContent({
                       <button
                         type="button"
                         className="sort-header-button"
-                        onClick={() => setNetworkSort((current) => nextSortState(current, "technicalId"))}
+                        onClick={() => setNetworkTableSortField("technicalId")}
                       >
                         Technical ID{" "}
                         <span
@@ -283,7 +301,25 @@ export function NetworkScopeWorkspaceContent({
                         </span>
                       </button>
                     </th>
-                    <th>Status</th>
+                    <th>
+                      <button
+                        type="button"
+                        className="sort-header-button"
+                        onClick={() => setNetworkTableSortField("status")}
+                      >
+                        Status{" "}
+                        <span
+                          className={
+                            networkSortIndicator("status") === null
+                              ? "sort-indicator"
+                              : `sort-indicator is-${networkSortIndicator("status")}`
+                          }
+                          aria-hidden="true"
+                        >
+                          {networkSortIndicator("status") === null ? "" : "▲"}
+                        </span>
+                      </button>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>

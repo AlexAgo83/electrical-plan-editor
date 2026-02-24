@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
-import { sortByTableColumns } from "../../lib/app-utils-shared";
+import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { TableFilterBar } from "./TableFilterBar";
 import type {
@@ -237,11 +237,11 @@ export function ModelingPrimaryTables({
     }
     lastAutoFocusedConnectorIdRef.current = selectedConnectorId;
     if (typeof window === "undefined") {
-      connectorRowRefs.current[selectedConnectorId]?.focus();
+      focusElementWithoutScroll(connectorRowRefs.current[selectedConnectorId]);
       return;
     }
     window.requestAnimationFrame(() => {
-      connectorRowRefs.current[selectedConnectorId]?.focus();
+      focusElementWithoutScroll(connectorRowRefs.current[selectedConnectorId]);
     });
   }, [connectorFormMode, selectedConnectorId]);
 
@@ -255,11 +255,11 @@ export function ModelingPrimaryTables({
     }
     lastAutoFocusedSpliceIdRef.current = selectedSpliceId;
     if (typeof window === "undefined") {
-      spliceRowRefs.current[selectedSpliceId]?.focus();
+      focusElementWithoutScroll(spliceRowRefs.current[selectedSpliceId]);
       return;
     }
     window.requestAnimationFrame(() => {
-      spliceRowRefs.current[selectedSpliceId]?.focus();
+      focusElementWithoutScroll(spliceRowRefs.current[selectedSpliceId]);
     });
   }, [spliceFormMode, selectedSpliceId]);
 
@@ -273,11 +273,11 @@ export function ModelingPrimaryTables({
     }
     lastAutoFocusedNodeIdRef.current = selectedNodeId;
     if (typeof window === "undefined") {
-      nodeRowRefs.current[selectedNodeId]?.focus();
+      focusElementWithoutScroll(nodeRowRefs.current[selectedNodeId]);
       return;
     }
     window.requestAnimationFrame(() => {
-      nodeRowRefs.current[selectedNodeId]?.focus();
+      focusElementWithoutScroll(nodeRowRefs.current[selectedNodeId]);
     });
   }, [nodeFormMode, selectedNodeId]);
 
@@ -288,11 +288,11 @@ export function ModelingPrimaryTables({
       return;
     }
     if (typeof window === "undefined") {
-      connectorRowRefs.current[selectedConnectorId]?.focus();
+      focusElementWithoutScroll(connectorRowRefs.current[selectedConnectorId]);
       return;
     }
     window.requestAnimationFrame(() => {
-      connectorRowRefs.current[selectedConnectorId]?.focus();
+      focusElementWithoutScroll(connectorRowRefs.current[selectedConnectorId]);
     });
   }, [connectorFormMode, selectedConnectorId]);
 
@@ -303,11 +303,11 @@ export function ModelingPrimaryTables({
       return;
     }
     if (typeof window === "undefined") {
-      spliceRowRefs.current[selectedSpliceId]?.focus();
+      focusElementWithoutScroll(spliceRowRefs.current[selectedSpliceId]);
       return;
     }
     window.requestAnimationFrame(() => {
-      spliceRowRefs.current[selectedSpliceId]?.focus();
+      focusElementWithoutScroll(spliceRowRefs.current[selectedSpliceId]);
     });
   }, [spliceFormMode, selectedSpliceId]);
 
@@ -318,11 +318,11 @@ export function ModelingPrimaryTables({
       return;
     }
     if (typeof window === "undefined") {
-      nodeRowRefs.current[selectedNodeId]?.focus();
+      focusElementWithoutScroll(nodeRowRefs.current[selectedNodeId]);
       return;
     }
     window.requestAnimationFrame(() => {
-      nodeRowRefs.current[selectedNodeId]?.focus();
+      focusElementWithoutScroll(nodeRowRefs.current[selectedNodeId]);
     });
   }, [nodeFormMode, selectedNodeId]);
 

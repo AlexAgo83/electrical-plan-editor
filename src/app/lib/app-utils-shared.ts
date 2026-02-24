@@ -174,3 +174,14 @@ export function focusSelectedTableRowInPanel(panelSelector: string): void {
     tryFocus(3);
   });
 }
+
+export function focusElementWithoutScroll(element: HTMLElement | null | undefined): void {
+  if (element === null || element === undefined) {
+    return;
+  }
+  try {
+    element.focus({ preventScroll: true });
+  } catch {
+    element.focus();
+  }
+}

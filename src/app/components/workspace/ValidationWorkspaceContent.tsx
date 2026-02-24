@@ -1,4 +1,5 @@
-import type { ReactElement } from "react";
+import { useMemo, useState, type ReactElement } from "react";
+import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { ValidationIssue, ValidationSeverityFilter } from "../../types/app-controller";
 
@@ -43,6 +44,37 @@ export function ValidationWorkspaceContent({
   validationErrorCount,
   validationWarningCount
 }: ValidationWorkspaceContentProps): ReactElement {
+  type ValidationTableSortField = "severity" | "issue" | "actions";
+  const [validationTableSort, setValidationTableSort] = useState<{ field: ValidationTableSortField; direction: "asc" | "desc" }>({
+    field: "severity",
+    direction: "asc"
+  });
+  const sortedValidationGroups = useMemo(
+    () =>
+      groupedValidationIssues.map(([category, issues]) => [
+        category,
+        sortByTableColumns(
+          issues,
+          validationTableSort,
+          (issue, field) => {
+            if (field === "severity") return issue.severity;
+            if (field === "issue") return issue.message;
+            return `${issue.subScreen}:${issue.selectionKind}:${issue.selectionId}`;
+          },
+          (issue) => issue.id
+        )
+      ] as const),
+    [groupedValidationIssues, validationTableSort]
+  );
+  const validationTableSortIndicator = (field: ValidationTableSortField) =>
+    validationTableSort.field === field ? (validationTableSort.direction === "asc" ? "▲" : "▼") : "";
+  const toggleValidationTableSort = (field: ValidationTableSortField) => {
+    setValidationTableSort((current) => ({
+      field,
+      direction: current.field === field && current.direction === "asc" ? "desc" : "asc"
+    }));
+  };
+
   return (
     <section className="panel-grid validation-panel-stack">
       <section className="panel validation-summary-panel">
@@ -154,7 +186,7 @@ export function ValidationWorkspaceContent({
           <p className="empty-copy">No integrity issue matches the current filters.</p>
         ) : (
           <div className="validation-groups">
-            {groupedValidationIssues.map(([category, issues]) => (
+            {sortedValidationGroups.map(([category, issues]) => (
               <article key={category} className="validation-group">
                 <h3>{category}</h3>
                 <table className="data-table validation-issues-table">
@@ -165,9 +197,21 @@ export function ValidationWorkspaceContent({
                   </colgroup>
                   <thead>
                     <tr>
-                      <th>Severity</th>
-                      <th>Issue</th>
-                      <th className="validation-actions-cell">Actions</th>
+                      <th>
+                        <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("severity")}>
+                          Severity <span className="sort-indicator">{validationTableSortIndicator("severity")}</span>
+                        </button>
+                      </th>
+                      <th>
+                        <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("issue")}>
+                          Issue <span className="sort-indicator">{validationTableSortIndicator("issue")}</span>
+                        </button>
+                      </th>
+                      <th className="validation-actions-cell">
+                        <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("actions")}>
+                          Actions <span className="sort-indicator">{validationTableSortIndicator("actions")}</span>
+                        </button>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>

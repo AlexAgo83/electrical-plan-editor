@@ -1634,6 +1634,20 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             id: spliceId
           })
         ),
+      onSelectNode: (nodeId) =>
+        dispatchAction(
+          appActions.select({
+            kind: "node",
+            id: nodeId
+          })
+        ),
+      onSelectSegment: (segmentId) =>
+        dispatchAction(
+          appActions.select({
+            kind: "segment",
+            id: segmentId
+          })
+        ),
       onSelectWire: (wireId) =>
         dispatchAction(
           appActions.select({
