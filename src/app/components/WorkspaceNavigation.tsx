@@ -66,13 +66,16 @@ export function WorkspaceNavigation({
           ["home", "Home"],
           ["networkScope", "Network Scope"],
           ["modeling", "Modeling"],
-          ["analysis", "Analysis"],
           ["validation", "Validation"]
         ] as const).map(([screenId, label]) => (
           <button
             key={screenId}
             type="button"
-            className={activeScreen === screenId ? "workspace-tab is-active" : "workspace-tab"}
+            className={
+              activeScreen === screenId || (screenId === "modeling" && isAnalysisScreen)
+                ? "workspace-tab is-active"
+                : "workspace-tab"
+            }
             onClick={() => onScreenChange(screenId)}
           >
             <span className="workspace-tab-content">
@@ -120,11 +123,9 @@ export function WorkspaceNavigation({
           ? "Network Scope workspace: active network context and lifecycle management."
           : activeScreen === "home"
           ? "Home workspace: start, resume, shortcuts, and quick preferences."
-          : isModelingScreen
-          ? "Modeling workspace: entity editor + operational lists."
-          : isAnalysisScreen
-            ? "Analysis workspace: synthesis, route control, and network insight."
-            : isValidationScreen
+          : isModelingScreen || isAnalysisScreen
+          ? "Modeling workspace: entity editor, operational lists, and analysis panels."
+          : isValidationScreen
               ? "Validation center: grouped model integrity issues with one-click navigation."
               : "Settings workspace: workspace preferences and project-level options."}
       </p>

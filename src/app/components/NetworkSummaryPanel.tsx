@@ -550,7 +550,7 @@ export function NetworkSummaryPanel({
     quickEntityScreenSwitchTarget === null
       ? null
       : quickEntityScreenSwitchTarget === "analysis"
-        ? "Analysis"
+        ? "Analysis view"
         : isAnalysisFocusedMode
           ? "Editing"
           : "Modeling";
@@ -558,7 +558,7 @@ export function NetworkSummaryPanel({
     quickEntityScreenSwitchTarget === null
       ? null
       : quickEntityScreenSwitchTarget === "analysis"
-        ? "Switch to analysis"
+        ? "Switch to analysis view"
         : isAnalysisFocusedMode
           ? "Switch to editing"
           : "Switch to modeling";

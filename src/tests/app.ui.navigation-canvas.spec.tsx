@@ -373,16 +373,14 @@ describe("App integration UI - navigation and canvas", () => {
     expect(within(editPanel).getByDisplayValue("C-1")).toBeInTheDocument();
   });
 
-  it("keeps connector selection context when switching from modeling to analysis", () => {
+  it("keeps connector selection context when switching from modeling to analysis view", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
 
     const modelingConnectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(modelingConnectorsPanel).getByText("Connector 1"));
 
-    const primaryNavRow = document.querySelector(".workspace-nav-row");
-    expect(primaryNavRow).not.toBeNull();
-    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Analysis$/, hidden: true }));
+    switchScreenDrawerAware("analysis");
     switchSubScreenDrawerAware("connector");
 
     const analysisConnectorsPanel = getPanelByHeading("Connectors");
