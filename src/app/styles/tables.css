@@ -19,7 +19,7 @@
 }
 
 .data-table th {
-  color: #3d596d;
+  color: var(--table-header-color, color-mix(in srgb, currentColor 68%, transparent));
   font-weight: 600;
 }
 
@@ -37,7 +37,8 @@
 }
 
 .sort-header-button:hover {
-  color: #123a57;
+  color: var(--table-header-hover-color, currentColor);
+  filter: brightness(1.08);
 }
 
 .sort-indicator {

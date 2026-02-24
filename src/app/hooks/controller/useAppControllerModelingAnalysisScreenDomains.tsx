@@ -22,7 +22,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
     ModelingSliceParams,
     "isConnectorSubScreen" | "isSpliceSubScreen" | "isNodeSubScreen" | "isSegmentSubScreen" | "isWireSubScreen"
   > &
-    Pick<AnalysisSliceParams, "isConnectorSubScreen" | "isSpliceSubScreen" | "isWireSubScreen">;
+    Pick<AnalysisSliceParams, "isConnectorSubScreen" | "isSpliceSubScreen" | "isNodeSubScreen" | "isSegmentSubScreen" | "isWireSubScreen">;
   entities: Pick<
     ModelingSliceParams,
     "connectors" | "splices" | "nodes" | "segments" | "wires"
@@ -96,6 +96,8 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
     | "selectedWireId"
     | "selectedConnector"
     | "selectedSplice"
+    | "selectedNode"
+    | "selectedSegment"
     | "selectedWire"
     | "connectorCavityStatuses"
     | "splicePortStatuses"
@@ -111,6 +113,8 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   wireTechnicalIdAlreadyUsed: ModelingSliceParams["wireTechnicalIdAlreadyUsed"];
   onSelectConnector: AnalysisSliceParams["onSelectConnector"];
   onSelectSplice: AnalysisSliceParams["onSelectSplice"];
+  onSelectNode: AnalysisSliceParams["onSelectNode"];
+  onSelectSegment: AnalysisSliceParams["onSelectSegment"];
   onSelectWire: AnalysisSliceParams["onSelectWire"];
   includeModelingContent: boolean;
   includeAnalysisContent: boolean;
@@ -142,6 +146,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
   wireTechnicalIdAlreadyUsed,
   onSelectConnector,
   onSelectSplice,
+  onSelectNode,
+  onSelectSegment,
   onSelectWire,
   includeModelingContent,
   includeAnalysisContent,
@@ -358,6 +364,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
+    isNodeSubScreen: screenFlags.isNodeSubScreen,
+    isSegmentSubScreen: screenFlags.isSegmentSubScreen,
     isWireSubScreen: screenFlags.isWireSubScreen,
     networkSummaryPanel,
     selectedConnector: selection.selectedConnector,
@@ -411,6 +419,33 @@ export function useAppControllerModelingAnalysisScreenDomains({
     sortedSpliceSynthesisRows: listModel.sortedSpliceSynthesisRows,
     spliceSynthesisSort: listModel.spliceSynthesisSort,
     setSpliceSynthesisSort: listModel.setSpliceSynthesisSort,
+    nodeKindFilter: listModel.nodeKindFilter,
+    setNodeKindFilter: listModel.setNodeKindFilter,
+    nodeFilterField: listModel.nodeFilterField,
+    setNodeFilterField: listModel.setNodeFilterField,
+    nodeFilterQuery: listModel.nodeSearchQuery,
+    setNodeFilterQuery: listModel.setNodeSearchQuery,
+    nodes: entities.nodes,
+    visibleNodes: listModel.visibleNodes,
+    segmentsCountByNodeId: listModel.segmentsCountByNodeId,
+    selectedNodeId: selection.selectedNodeId,
+    selectedNode: selection.selectedNode,
+    selectedSegment: selection.selectedSegment,
+    onSelectNode,
+    onOpenNodeOnboardingHelp: onboardingHelp?.openNodeStep,
+    describeNode,
+    nodeLabelById,
+    segmentSubNetworkFilter: listModel.segmentSubNetworkFilter,
+    setSegmentSubNetworkFilter: listModel.setSegmentSubNetworkFilter,
+    segmentFilterField: listModel.segmentFilterField,
+    setSegmentFilterField: listModel.setSegmentFilterField,
+    segmentFilterQuery: listModel.segmentSearchQuery,
+    setSegmentFilterQuery: listModel.setSegmentSearchQuery,
+    segments: entities.segments,
+    visibleSegments: listModel.visibleSegments,
+    selectedSegmentId: selection.selectedSegmentId,
+    onSelectSegment,
+    onOpenSegmentOnboardingHelp: onboardingHelp?.openSegmentStep,
     wireRouteFilter: listModel.wireRouteFilter,
     setWireRouteFilter: listModel.setWireRouteFilter,
     wireFilterField: listModel.wireFilterField,

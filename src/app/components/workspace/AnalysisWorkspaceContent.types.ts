@@ -1,6 +1,6 @@
 import type { FormEvent, ReactElement } from "react";
-import type { Connector, ConnectorId, Splice, SpliceId, Wire, WireId } from "../../../core/entities";
-import type { ConnectorSynthesisRow, SortState, SpliceSynthesisRow } from "../../types/app-controller";
+import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, SegmentId, Splice, SpliceId, Wire, WireId } from "../../../core/entities";
+import type { ConnectorSynthesisRow, SegmentSubNetworkFilter, SortState, SpliceSynthesisRow } from "../../types/app-controller";
 
 interface OccupancyStatus {
   isOccupied: boolean;
@@ -18,6 +18,8 @@ export interface SplicePortStatus extends OccupancyStatus {
 export interface AnalysisWorkspaceContentProps {
   isConnectorSubScreen: boolean;
   isSpliceSubScreen: boolean;
+  isNodeSubScreen: boolean;
+  isSegmentSubScreen: boolean;
   isWireSubScreen: boolean;
   networkSummaryPanel: ReactElement;
   selectedConnector: Connector | null;
@@ -71,6 +73,33 @@ export interface AnalysisWorkspaceContentProps {
   sortedSpliceSynthesisRows: SpliceSynthesisRow[];
   spliceSynthesisSort: SortState;
   setSpliceSynthesisSort: (value: SortState | ((current: SortState) => SortState)) => void;
+  nodeKindFilter: "all" | NetworkNode["kind"];
+  setNodeKindFilter: (value: "all" | NetworkNode["kind"]) => void;
+  nodeFilterField: "id" | "reference" | "kind" | "any";
+  setNodeFilterField: (value: "id" | "reference" | "kind" | "any") => void;
+  nodeFilterQuery: string;
+  setNodeFilterQuery: (value: string) => void;
+  nodes: NetworkNode[];
+  visibleNodes: NetworkNode[];
+  segmentsCountByNodeId: Map<NodeId, number>;
+  selectedNodeId: NodeId | null;
+  selectedNode: NetworkNode | null;
+  selectedSegment: Segment | null;
+  onSelectNode: (nodeId: NodeId) => void;
+  onOpenNodeOnboardingHelp?: () => void;
+  describeNode: (node: NetworkNode) => string;
+  nodeLabelById: Map<NodeId, string>;
+  segmentSubNetworkFilter: SegmentSubNetworkFilter;
+  setSegmentSubNetworkFilter: (value: SegmentSubNetworkFilter) => void;
+  segmentFilterField: "id" | "nodeA" | "nodeB" | "subNetwork" | "any";
+  setSegmentFilterField: (value: "id" | "nodeA" | "nodeB" | "subNetwork" | "any") => void;
+  segmentFilterQuery: string;
+  setSegmentFilterQuery: (value: string) => void;
+  segments: Segment[];
+  visibleSegments: Segment[];
+  selectedSegmentId: SegmentId | null;
+  onSelectSegment: (segmentId: SegmentId) => void;
+  onOpenSegmentOnboardingHelp?: () => void;
   wireRouteFilter: "all" | "auto" | "locked";
   setWireRouteFilter: (value: "all" | "auto" | "locked") => void;
   wireFilterField: "endpoints" | "name" | "technicalId" | "any";

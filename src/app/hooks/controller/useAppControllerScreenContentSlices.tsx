@@ -144,11 +144,13 @@ type ModelingScreenContentSliceParams = Omit<
 
 type AnalysisScreenContentSliceParams = Omit<
   AnalysisWorkspaceContentProps,
-  "onSelectConnector" | "onSelectSplice" | "onSelectWire"
+  "onSelectConnector" | "onSelectSplice" | "onSelectNode" | "onSelectSegment" | "onSelectWire"
 > & {
   AnalysisWorkspaceContentComponent: ComponentType<AnalysisWorkspaceContentProps>;
   onSelectConnector: AnalysisWorkspaceContentProps["onSelectConnector"];
   onSelectSplice: AnalysisWorkspaceContentProps["onSelectSplice"];
+  onSelectNode: AnalysisWorkspaceContentProps["onSelectNode"];
+  onSelectSegment: AnalysisWorkspaceContentProps["onSelectSegment"];
   onSelectWire: AnalysisWorkspaceContentProps["onSelectWire"];
 };
 
@@ -544,6 +546,8 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
   const analysisWorkspaceContentProps = {
     isConnectorSubScreen: params.isConnectorSubScreen,
     isSpliceSubScreen: params.isSpliceSubScreen,
+    isNodeSubScreen: params.isNodeSubScreen,
+    isSegmentSubScreen: params.isSegmentSubScreen,
     isWireSubScreen: params.isWireSubScreen,
     networkSummaryPanel: params.networkSummaryPanel,
     selectedConnector: params.selectedConnector,
@@ -597,6 +601,33 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
     sortedSpliceSynthesisRows: params.sortedSpliceSynthesisRows,
     spliceSynthesisSort: params.spliceSynthesisSort,
     setSpliceSynthesisSort: params.setSpliceSynthesisSort,
+    nodeKindFilter: params.nodeKindFilter,
+    setNodeKindFilter: params.setNodeKindFilter,
+    nodeFilterField: params.nodeFilterField,
+    setNodeFilterField: params.setNodeFilterField,
+    nodeFilterQuery: params.nodeFilterQuery,
+    setNodeFilterQuery: params.setNodeFilterQuery,
+    nodes: params.nodes,
+    visibleNodes: params.visibleNodes,
+    segmentsCountByNodeId: params.segmentsCountByNodeId,
+    selectedNodeId: params.selectedNodeId,
+    selectedNode: params.selectedNode,
+    selectedSegment: params.selectedSegment,
+    onSelectNode: params.onSelectNode,
+    onOpenNodeOnboardingHelp: params.onOpenNodeOnboardingHelp,
+    describeNode: params.describeNode,
+    nodeLabelById: params.nodeLabelById,
+    segmentSubNetworkFilter: params.segmentSubNetworkFilter,
+    setSegmentSubNetworkFilter: params.setSegmentSubNetworkFilter,
+    segmentFilterField: params.segmentFilterField,
+    setSegmentFilterField: params.setSegmentFilterField,
+    segmentFilterQuery: params.segmentFilterQuery,
+    setSegmentFilterQuery: params.setSegmentFilterQuery,
+    segments: params.segments,
+    visibleSegments: params.visibleSegments,
+    selectedSegmentId: params.selectedSegmentId,
+    onSelectSegment: params.onSelectSegment,
+    onOpenSegmentOnboardingHelp: params.onOpenSegmentOnboardingHelp,
     wireRouteFilter: params.wireRouteFilter,
     setWireRouteFilter: params.setWireRouteFilter,
     wireFilterField: params.wireFilterField,

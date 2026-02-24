@@ -1,6 +1,6 @@
-import { useEffect, useRef, type ReactElement } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { CABLE_COLOR_BY_ID } from "../../../core/cableColors";
-import { nextSortState } from "../../lib/app-utils-shared";
+import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { TableFilterBar } from "./TableFilterBar";
 import type {
@@ -66,8 +66,8 @@ export function ModelingSecondaryTables({
   setSegmentFilterQuery,
   segments,
   visibleSegments,
-  segmentIdSortDirection,
-  setSegmentIdSortDirection,
+  segmentIdSortDirection: _segmentIdSortDirection,
+  setSegmentIdSortDirection: _setSegmentIdSortDirection,
   nodeLabelById,
   selectedSegmentId,
   selectedWireRouteSegmentIds,
@@ -85,9 +85,9 @@ export function ModelingSecondaryTables({
   setWireEndpointFilterQuery,
   wires,
   visibleWires,
-  wireSort,
-  setWireSort,
-  getSortIndicator,
+  wireSort: _wireSort,
+  setWireSort: _setWireSort,
+  getSortIndicator: _getSortIndicator,
   selectedWireId,
   describeWireEndpoint,
   describeWireEndpointId,
@@ -95,6 +95,8 @@ export function ModelingSecondaryTables({
   onDeleteWire,
   onOpenWireOnboardingHelp
 }: ModelingSecondaryTablesProps): ReactElement {
+  type SegmentTableSortField = "id" | "nodeA" | "nodeB" | "lengthMm" | "subNetwork";
+  type WireTableSortField = "name" | "technicalId" | "sectionMm2" | "color" | "endpoints" | "lengthMm" | "routeMode";
   const segmentRowRefs = useRef<Partial<Record<SegmentId, HTMLTableRowElement | null>>>({});
   const wireRowRefs = useRef<Partial<Record<WireId, HTMLTableRowElement | null>>>({});
   const lastAutoFocusedSegmentIdRef = useRef<SegmentId | null>(null);
@@ -125,6 +127,62 @@ export function ModelingSecondaryTables({
         : wireFilterField === "technicalId"
           ? "Technical ID"
           : "Name, technical ID, endpoint...";
+  const [segmentTableSort, setSegmentTableSort] = useState<{ field: SegmentTableSortField; direction: "asc" | "desc" }>({
+    field: "id",
+    direction: "asc"
+  });
+  const [wireTableSort, setWireTableSort] = useState<{ field: WireTableSortField; direction: "asc" | "desc" }>({
+    field: "name",
+    direction: "asc"
+  });
+  const sortedVisibleSegments = useMemo(
+    () =>
+      sortByTableColumns(
+        visibleSegments,
+        segmentTableSort,
+        (segment, field) => {
+          const nodeA = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
+          const nodeB = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
+          const subNetwork = segment.subNetworkTag?.trim() ?? "";
+          if (field === "id") return segment.id;
+          if (field === "nodeA") return nodeA;
+          if (field === "nodeB") return nodeB;
+          if (field === "lengthMm") return segment.lengthMm;
+          return subNetwork;
+        },
+        (segment) => segment.id
+      ),
+    [nodeLabelById, segmentTableSort, visibleSegments]
+  );
+  const sortedVisibleWires = useMemo(
+    () =>
+      sortByTableColumns(
+        visibleWires,
+        wireTableSort,
+        (wire, field) => {
+          const endpoints = `${describeWireEndpoint(wire.endpointA)} -> ${describeWireEndpoint(wire.endpointB)}`;
+          const colorCode =
+            wire.primaryColorId === null
+              ? ""
+              : wire.secondaryColorId === null
+                ? wire.primaryColorId
+                : `${wire.primaryColorId}/${wire.secondaryColorId}`;
+          if (field === "name") return wire.name;
+          if (field === "technicalId") return wire.technicalId;
+          if (field === "sectionMm2") return wire.sectionMm2;
+          if (field === "color") return colorCode;
+          if (field === "endpoints") return endpoints;
+          if (field === "lengthMm") return wire.lengthMm;
+          return wire.isRouteLocked ? "Locked" : "Auto";
+        },
+        (wire) => wire.id
+      ),
+    [describeWireEndpoint, visibleWires, wireTableSort]
+  );
+  const segmentSortIndicator = (field: SegmentTableSortField) =>
+    segmentTableSort.field === field ? (segmentTableSort.direction === "asc" ? "▲" : "▼") : "";
+  const wireSortIndicator = (field: WireTableSortField) =>
+    wireTableSort.field === field ? (wireTableSort.direction === "asc" ? "▲" : "▼") : "";
 
   function renderWireColorCell(wire: Wire): ReactElement {
     if (wire.primaryColorId === null) {
@@ -177,11 +235,11 @@ export function ModelingSecondaryTables({
     }
     lastAutoFocusedSegmentIdRef.current = selectedSegmentId;
     if (typeof window === "undefined") {
-      segmentRowRefs.current[selectedSegmentId]?.focus();
+      focusElementWithoutScroll(segmentRowRefs.current[selectedSegmentId]);
       return;
     }
     window.requestAnimationFrame(() => {
-      segmentRowRefs.current[selectedSegmentId]?.focus();
+      focusElementWithoutScroll(segmentRowRefs.current[selectedSegmentId]);
     });
   }, [segmentFormMode, selectedSegmentId]);
 
@@ -195,11 +253,11 @@ export function ModelingSecondaryTables({
     }
     lastAutoFocusedWireIdRef.current = selectedWireId;
     if (typeof window === "undefined") {
-      wireRowRefs.current[selectedWireId]?.focus();
+      focusElementWithoutScroll(wireRowRefs.current[selectedWireId]);
       return;
     }
     window.requestAnimationFrame(() => {
-      wireRowRefs.current[selectedWireId]?.focus();
+      focusElementWithoutScroll(wireRowRefs.current[selectedWireId]);
     });
   }, [wireFormMode, selectedWireId]);
 
@@ -210,11 +268,11 @@ export function ModelingSecondaryTables({
       return;
     }
     if (typeof window === "undefined") {
-      segmentRowRefs.current[selectedSegmentId]?.focus();
+      focusElementWithoutScroll(segmentRowRefs.current[selectedSegmentId]);
       return;
     }
     window.requestAnimationFrame(() => {
-      segmentRowRefs.current[selectedSegmentId]?.focus();
+      focusElementWithoutScroll(segmentRowRefs.current[selectedSegmentId]);
     });
   }, [segmentFormMode, selectedSegmentId]);
 
@@ -225,11 +283,11 @@ export function ModelingSecondaryTables({
       return;
     }
     if (typeof window === "undefined") {
-      wireRowRefs.current[selectedWireId]?.focus();
+      focusElementWithoutScroll(wireRowRefs.current[selectedWireId]);
       return;
     }
     window.requestAnimationFrame(() => {
-      wireRowRefs.current[selectedWireId]?.focus();
+      focusElementWithoutScroll(wireRowRefs.current[selectedWireId]);
     });
   }, [wireFormMode, selectedWireId]);
 
@@ -256,7 +314,7 @@ export function ModelingSecondaryTables({
                   const headers = showSegmentSubNetworkColumn
                     ? ["ID", "Node A", "Node B", "Length (mm)", "Sub-network"]
                     : ["ID", "Node A", "Node B", "Length (mm)"];
-                  const rows = visibleSegments.map((segment) => {
+                  const rows = sortedVisibleSegments.map((segment) => {
                     const nodeA = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
                     const nodeB = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
                     if (showSegmentSubNetworkColumn) {
@@ -266,7 +324,7 @@ export function ModelingSecondaryTables({
                   });
                   downloadCsvFile("modeling-segments", headers, rows);
                 }}
-                disabled={visibleSegments.length === 0}
+                disabled={sortedVisibleSegments.length === 0}
               >
                 <span className="table-export-icon" aria-hidden="true" />
                 CSV
@@ -304,21 +362,21 @@ export function ModelingSecondaryTables({
         </header>
         {segments.length === 0 ? (
           <p className="empty-copy">No segment yet.</p>
-        ) : visibleSegments.length === 0 ? (
+        ) : sortedVisibleSegments.length === 0 ? (
           <p className="empty-copy">No segment matches the current filters.</p>
         ) : (
           <table className="data-table">
             <thead>
               <tr>
-                <th><button type="button" className="sort-header-button" onClick={() => setSegmentIdSortDirection((currentDirection) => currentDirection === "asc" ? "desc" : "asc")}>ID <span className="sort-indicator">{segmentIdSortDirection === "asc" ? "▲" : "▼"}</span></button></th>
-                <th>Node A</th>
-                <th>Node B</th>
-                <th>Length (mm)</th>
-                {showSegmentSubNetworkColumn ? <th>Sub-network</th> : null}
+                <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" }))}>ID <span className="sort-indicator">{segmentSortIndicator("id")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "nodeA", direction: current.field === "nodeA" && current.direction === "asc" ? "desc" : "asc" }))}>Node A <span className="sort-indicator">{segmentSortIndicator("nodeA")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "nodeB", direction: current.field === "nodeB" && current.direction === "asc" ? "desc" : "asc" }))}>Node B <span className="sort-indicator">{segmentSortIndicator("nodeB")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>Length (mm) <span className="sort-indicator">{segmentSortIndicator("lengthMm")}</span></button></th>
+                {showSegmentSubNetworkColumn ? <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "subNetwork", direction: current.field === "subNetwork" && current.direction === "asc" ? "desc" : "asc" }))}>Sub-network <span className="sort-indicator">{segmentSortIndicator("subNetwork")}</span></button></th> : null}
               </tr>
             </thead>
             <tbody>
-              {visibleSegments.map((segment) => {
+              {sortedVisibleSegments.map((segment) => {
                 const nodeA = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
                 const nodeB = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
                 const isFocused = focusedSegment?.id === segment.id;
@@ -399,9 +457,9 @@ export function ModelingSecondaryTables({
                 className="filter-chip table-export-button"
                 onClick={() => {
                   const headers = showWireRouteModeColumn
-                    ? ["Name", "Technical ID", "Section (mm²)", "Color", "Endpoints", "Begin", "End", "Length (mm)", "Route mode"]
-                    : ["Name", "Technical ID", "Section (mm²)", "Color", "Endpoints", "Begin", "End", "Length (mm)"];
-                  const rows = visibleWires.map((wire) => {
+                    ? ["Name", "Technical ID", "Color", "Endpoints", "Begin", "End", "Section (mm²)", "Length (mm)", "Route mode"]
+                    : ["Name", "Technical ID", "Color", "Endpoints", "Begin", "End", "Section (mm²)", "Length (mm)"];
+                  const rows = sortedVisibleWires.map((wire) => {
                     const endpoints = `${describeWireEndpoint(wire.endpointA)} -> ${describeWireEndpoint(wire.endpointB)}`;
                     const begin = describeWireEndpointId(wire.endpointA);
                     const end = describeWireEndpointId(wire.endpointB);
@@ -415,20 +473,20 @@ export function ModelingSecondaryTables({
                       return [
                         wire.name,
                         wire.technicalId,
-                        wire.sectionMm2,
                         colorCode,
                         endpoints,
                         begin,
                         end,
+                        wire.sectionMm2,
                         wire.lengthMm,
                         wire.isRouteLocked ? "Locked" : "Auto"
                       ];
                     }
-                    return [wire.name, wire.technicalId, wire.sectionMm2, colorCode, endpoints, begin, end, wire.lengthMm];
+                    return [wire.name, wire.technicalId, colorCode, endpoints, begin, end, wire.sectionMm2, wire.lengthMm];
                   });
                   downloadCsvFile("modeling-wires", headers, rows);
                 }}
-                disabled={visibleWires.length === 0}
+                disabled={sortedVisibleWires.length === 0}
               >
                 <span className="table-export-icon" aria-hidden="true" />
                 CSV
@@ -465,31 +523,23 @@ export function ModelingSecondaryTables({
         </header>
         {wires.length === 0 ? (
           <p className="empty-copy">No wire yet.</p>
-        ) : visibleWires.length === 0 ? (
+        ) : sortedVisibleWires.length === 0 ? (
           <p className="empty-copy">No wire matches the current filters.</p>
         ) : (
           <table className="data-table">
             <thead>
               <tr>
-                <th><button type="button" className="sort-header-button" onClick={() => setWireSort((current) => nextSortState(current, "name"))}>Name <span className="sort-indicator">{getSortIndicator(wireSort, "name")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => setWireSort((current) => nextSortState(current, "technicalId"))}>Technical ID <span className="sort-indicator">{getSortIndicator(wireSort, "technicalId")}</span></button></th>
-                <th>Section (mm²)</th>
-                <th>Color</th>
-                <th>Endpoints</th>
-                <th>
-                  <button
-                    type="button"
-                    className="sort-header-button"
-                    onClick={() => setWireSort((current) => nextSortState(current, "lengthMm"))}
-                  >
-                    Length (mm) <span className="sort-indicator">{getSortIndicator(wireSort, "lengthMm")}</span>
-                  </button>
-                </th>
-                {showWireRouteModeColumn ? <th>Route mode</th> : null}
+                <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" }))}>Name <span className="sort-indicator">{wireSortIndicator("name")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" }))}>Technical ID <span className="sort-indicator">{wireSortIndicator("technicalId")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "color", direction: current.field === "color" && current.direction === "asc" ? "desc" : "asc" }))}>Color <span className="sort-indicator">{wireSortIndicator("color")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpoints", direction: current.field === "endpoints" && current.direction === "asc" ? "desc" : "asc" }))}>Endpoints <span className="sort-indicator">{wireSortIndicator("endpoints")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "sectionMm2", direction: current.field === "sectionMm2" && current.direction === "asc" ? "desc" : "asc" }))}>Section (mm²) <span className="sort-indicator">{wireSortIndicator("sectionMm2")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>Length (mm) <span className="sort-indicator">{wireSortIndicator("lengthMm")}</span></button></th>
+                {showWireRouteModeColumn ? <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "routeMode", direction: current.field === "routeMode" && current.direction === "asc" ? "desc" : "asc" }))}>Route mode <span className="sort-indicator">{wireSortIndicator("routeMode")}</span></button></th> : null}
               </tr>
             </thead>
             <tbody>
-              {visibleWires.map((wire) => {
+              {sortedVisibleWires.map((wire) => {
                 const isFocused = focusedWire?.id === wire.id;
                 return (
                   <tr
@@ -510,9 +560,9 @@ export function ModelingSecondaryTables({
                   >
                     <td>{wire.name}</td>
                     <td className="technical-id">{wire.technicalId}</td>
-                    <td>{wire.sectionMm2}</td>
                     <td>{renderWireColorCell(wire)}</td>
                     <td>{describeWireEndpoint(wire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(wire.endpointB)}</td>
+                    <td>{wire.sectionMm2}</td>
                     <td>{wire.lengthMm}</td>
                     {showWireRouteModeColumn ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}
                   </tr>
