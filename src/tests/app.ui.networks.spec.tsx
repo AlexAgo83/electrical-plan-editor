@@ -66,6 +66,51 @@ describe("App integration UI - networks", () => {
     expect(within(connectorsPanel).queryByText("Default connector")).not.toBeInTheDocument();
   });
 
+  it("opens the focused network in modeling and sets it active from Network Scope", () => {
+    const base = createInitialState();
+    const defaultNetworkId = base.activeNetworkId as NetworkId;
+    const withDefaultConnector = appReducer(
+      base,
+      appActions.upsertConnector({
+        id: asConnectorId("C-DEFAULT"),
+        name: "Default connector",
+        technicalId: "C-DEFAULT",
+        cavityCount: 2
+      })
+    );
+    const withSecondNetwork = appReducer(
+      withDefaultConnector,
+      appActions.createNetwork({
+        id: asNetworkId("net-b"),
+        name: "Network B",
+        technicalId: "NET-B",
+        createdAt: "2026-02-21T09:00:00.000Z",
+        updatedAt: "2026-02-21T09:00:00.000Z"
+      })
+    );
+    const withSecondConnector = appReducer(
+      withSecondNetwork,
+      appActions.upsertConnector({
+        id: asConnectorId("C-B"),
+        name: "Connector B",
+        technicalId: "C-B",
+        cavityCount: 3
+      })
+    );
+    const seeded = appReducer(withSecondConnector, appActions.selectNetwork(defaultNetworkId));
+
+    renderAppWithState(seeded);
+    switchScreen("networkScope");
+
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    fireEvent.click(within(networkScopePanel).getByText("Network B").closest("tr") as HTMLElement);
+    fireEvent.click(within(networkScopePanel).getByRole("button", { name: "Open" }));
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    expect(within(connectorsPanel).getByText("Connector B")).toBeInTheDocument();
+    expect(within(connectorsPanel).queryByText("Default connector")).not.toBeInTheDocument();
+  });
+
   it("shows explicit empty state when no active network exists", () => {
     const initial = createInitialState();
     const noNetwork = appReducer(initial, appActions.deleteNetwork(initial.activeNetworkId as NetworkId));

@@ -4,6 +4,7 @@ import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
 export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContentProps): ReactElement {
@@ -203,11 +204,15 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   {connectors.length === 0 ? (
     <p className="empty-copy">No connector yet.</p>
   ) : sortedVisibleConnectors.length === 0 ? (
-    <p className="empty-copy">No connector matches the current filters.</p>
+    <>
+      <p className="empty-copy">No connector matches the current filters.</p>
+      <TableEntryCountFooter count={0} />
+    </>
   ) : (
-    <table className="data-table">
-      <thead>
-        <tr>
+    <>
+      <table className="data-table">
+        <thead>
+          <tr>
           <th>
             <button
               type="button"
@@ -251,36 +256,38 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
               Occupied <span className="sort-indicator">{connectorListSortIndicator("occupiedCount")}</span>
             </button>
           </th>
-        </tr>
-      </thead>
-      <tbody>
-        {sortedVisibleConnectors.map((connector) => {
-          const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
-          const isSelected = selectedConnectorId === connector.id;
-          return (
-            <tr
-              key={connector.id}
-              className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
-              aria-selected={isSelected}
-              tabIndex={0}
-              onClick={() => onSelectConnector(connector.id)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  onSelectConnector(connector.id);
-                }
-              }}
-            >
-              <td>{connector.name}</td>
-              <td className="technical-id">{connector.technicalId}</td>
-              <td className="technical-id">{connector.manufacturerReference ?? ""}</td>
-              <td>{connector.cavityCount}</td>
-              <td>{occupiedCount}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedVisibleConnectors.map((connector) => {
+            const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
+            const isSelected = selectedConnectorId === connector.id;
+            return (
+              <tr
+                key={connector.id}
+                className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
+                aria-selected={isSelected}
+                tabIndex={0}
+                onClick={() => onSelectConnector(connector.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelectConnector(connector.id);
+                  }
+                }}
+              >
+                <td>{connector.name}</td>
+                <td className="technical-id">{connector.technicalId}</td>
+                <td className="technical-id">{connector.manufacturerReference ?? ""}</td>
+                <td>{connector.cavityCount}</td>
+                <td>{occupiedCount}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <TableEntryCountFooter count={sortedVisibleConnectors.length} />
+    </>
   )}
 </section>
 
@@ -444,7 +451,10 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
                 <span>{row.wireName}</span>
               </span>
             </td>
-            <td className="technical-id">{row.wireTechnicalId}</td>
+            <td className="technical-id">
+              <span>{row.wireTechnicalId}</span>
+              {row.wireName.trim().length > 0 ? <span className="table-secondary-line">{row.wireName}</span> : null}
+            </td>
             <td>{row.localEndpointLabel}</td>
             <td>{row.remoteEndpointLabel}</td>
             <td>{row.lengthMm}</td>

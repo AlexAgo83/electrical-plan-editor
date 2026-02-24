@@ -316,6 +316,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isSettingsScreen,
     activeScreenRef
   } = useWorkspaceNavigation();
+  const [isModelingAnalysisFocused, setIsModelingAnalysisFocused] = useState(false);
+  const [lastAnalysisSubScreen, setLastAnalysisSubScreen] = useState<"connector" | "splice" | "node" | "segment" | "wire">("wire");
   const [onboardingModalMode, setOnboardingModalMode] = useState<"full" | "single">("full");
   const [onboardingStepIndex, setOnboardingStepIndex] = useState(0);
   const [onboardingSingleStepId, setOnboardingSingleStepId] = useState<OnboardingStepId>("networkScope");
@@ -1208,18 +1210,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const handleWorkspaceScreenChange = useCallback((targetScreen: "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings") => {
     if (targetScreen === "analysis") {
-      const analysisSubScreen =
-        selectedConnector !== null
-          ? "connector"
-          : selectedSplice !== null
-            ? "splice"
-            : selectedNode !== null || activeSubScreen === "node"
-              ? "node"
-              : selectedSegment !== null || activeSubScreen === "segment"
-                ? "segment"
-                : selectedWire !== null || activeSubScreen === "wire"
-                  ? "wire"
-                  : "connector";
+      const analysisSubScreen = lastAnalysisSubScreen;
 
       if (selectedConnector !== null) {
         dispatchAction(appActions.select({ kind: "connector", id: selectedConnector.id }), { trackHistory: false });
@@ -1233,12 +1224,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         dispatchAction(appActions.select({ kind: "wire", id: selectedWire.id }), { trackHistory: false });
       }
 
-      setActiveScreen("analysis");
+      setIsModelingAnalysisFocused(true);
+      setActiveScreen("modeling");
       setActiveSubScreen(analysisSubScreen);
       return;
     }
 
     if (targetScreen === "modeling") {
+      setIsModelingAnalysisFocused(false);
       if (selected !== null && selectedSubScreen !== null) {
         handleStartSelectedEdit();
         return;
@@ -1247,11 +1240,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       return;
     }
 
+    if (targetScreen !== "settings") {
+      setIsModelingAnalysisFocused(false);
+    }
     setActiveScreen(targetScreen);
   }, [
-    activeSubScreen,
     dispatchAction,
     handleStartSelectedEdit,
+    lastAnalysisSubScreen,
     selected,
     selectedConnector,
     selectedNode,
@@ -1259,9 +1255,16 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     selectedSplice,
     selectedSubScreen,
     selectedWire,
+    setIsModelingAnalysisFocused,
     setActiveScreen,
     setActiveSubScreen
   ]);
+
+  useEffect(() => {
+    if (activeScreen === "analysis" || (activeScreen === "modeling" && isModelingAnalysisFocused)) {
+      setLastAnalysisSubScreen(activeSubScreen);
+    }
+  }, [activeScreen, activeSubScreen, isModelingAnalysisFocused]);
 
   useKeyboardShortcuts({
     keyboardShortcutsEnabled,
@@ -1557,7 +1560,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         routePreviewEndNodeId,
         setRoutePreviewEndNodeId,
         routePreview,
-        quickEntityNavigationMode: isModelingScreen ? "modeling" : "analysis",
+        quickEntityNavigationMode: isModelingScreen && !isModelingAnalysisFocused ? "modeling" : "analysis",
         activeSubScreen,
         entityCountBySubScreen,
         onQuickEntityNavigation: setActiveSubScreen,
@@ -1626,7 +1629,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       spliceTechnicalIdAlreadyUsed,
       wireTechnicalIdAlreadyUsed,
       includeModelingContent: hasActiveNetwork && isModelingScreen,
-      includeAnalysisContent: hasActiveNetwork && isAnalysisScreen,
+      includeAnalysisContent: hasActiveNetwork && (isAnalysisScreen || (isModelingScreen && isModelingAnalysisFocused)),
       onSelectConnector: (connectorId) =>
         dispatchAction(
           appActions.select({
@@ -1677,6 +1680,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         networkEntityCountsById,
         activeNetworkId,
         handleSelectNetwork,
+        handleOpenNetworkInModeling: (networkId) => {
+          handleSelectNetwork(networkId);
+          handleWorkspaceScreenChange("modeling");
+        },
         handleDuplicateNetwork,
         handleExportActiveNetwork: () => handleExportNetworks("active"),
         handleDeleteNetwork,
@@ -1875,6 +1882,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       modelingFormsColumnContent={modelingFormsColumnContent}
       networkSummaryPanel={networkSummaryPanel}
       analysisWorkspaceContent={analysisWorkspaceContent}
+      isModelingAnalysisFocused={isModelingAnalysisFocused}
       validationWorkspaceContent={validationWorkspaceContent}
       settingsWorkspaceContent={settingsWorkspaceContent}
       isSettingsScreen={isSettingsScreen}

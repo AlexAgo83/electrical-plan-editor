@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
+import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 import type {
   Connector,
@@ -430,10 +431,14 @@ export function ModelingPrimaryTables({
         {connectors.length === 0 ? (
           <p className="empty-copy">No connector yet.</p>
         ) : sortedVisibleConnectors.length === 0 ? (
-          <p className="empty-copy">No connector matches the current filters.</p>
+          <>
+            <p className="empty-copy">No connector matches the current filters.</p>
+            <TableEntryCountFooter count={0} />
+          </>
         ) : (
-          <table className="data-table">
-            <thead>
+          <>
+            <table className="data-table">
+              <thead>
               <tr>
                 <th><button type="button" className="sort-header-button" onClick={() => { setConnectorTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); setConnectorSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{connectorSortIndicator("name")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => { setConnectorTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setConnectorSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>Technical ID <span className="sort-indicator">{connectorSortIndicator("technicalId")}</span></button></th>
@@ -441,8 +446,8 @@ export function ModelingPrimaryTables({
                 <th><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "cavityCount", direction: current.field === "cavityCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ways <span className="sort-indicator">{connectorSortIndicator("cavityCount")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "occupiedCount", direction: current.field === "occupiedCount" && current.direction === "asc" ? "desc" : "asc" }))}>Occupied <span className="sort-indicator">{connectorSortIndicator("occupiedCount")}</span></button></th>
               </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
               {sortedVisibleConnectors.map((connector) => {
                 const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
                 const isFocused = focusedConnector?.id === connector.id;
@@ -471,8 +476,10 @@ export function ModelingPrimaryTables({
                   </tr>
                 );
               })}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+            <TableEntryCountFooter count={sortedVisibleConnectors.length} />
+          </>
         )}
         <div className="row-actions compact modeling-list-actions">
           <button type="button" className="button-with-icon" onClick={onOpenCreateConnector}>
@@ -567,10 +574,14 @@ export function ModelingPrimaryTables({
         {splices.length === 0 ? (
           <p className="empty-copy">No splice yet.</p>
         ) : sortedVisibleSplices.length === 0 ? (
-          <p className="empty-copy">No splice matches the current filters.</p>
+          <>
+            <p className="empty-copy">No splice matches the current filters.</p>
+            <TableEntryCountFooter count={0} />
+          </>
         ) : (
-          <table className="data-table">
-            <thead>
+          <>
+            <table className="data-table">
+              <thead>
               <tr>
                 <th><button type="button" className="sort-header-button" onClick={() => { setSpliceTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); setSpliceSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{spliceSortIndicator("name")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => { setSpliceTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setSpliceSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>Technical ID <span className="sort-indicator">{spliceSortIndicator("technicalId")}</span></button></th>
@@ -578,8 +589,8 @@ export function ModelingPrimaryTables({
                 <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "portCount", direction: current.field === "portCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ports <span className="sort-indicator">{spliceSortIndicator("portCount")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "branchCount", direction: current.field === "branchCount" && current.direction === "asc" ? "desc" : "asc" }))}>Branches <span className="sort-indicator">{spliceSortIndicator("branchCount")}</span></button></th>
               </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
               {sortedVisibleSplices.map((splice) => {
                 const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
                 const isFocused = focusedSplice?.id === splice.id;
@@ -608,8 +619,10 @@ export function ModelingPrimaryTables({
                   </tr>
                 );
               })}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+            <TableEntryCountFooter count={sortedVisibleSplices.length} />
+          </>
         )}
         <div className="row-actions compact modeling-list-actions">
           <button type="button" className="button-with-icon" onClick={onOpenCreateSplice}>
@@ -706,18 +719,22 @@ export function ModelingPrimaryTables({
         {nodes.length === 0 ? (
           <p className="empty-copy">No node yet.</p>
         ) : sortedVisibleNodes.length === 0 ? (
-          <p className="empty-copy">No node matches the current filters.</p>
+          <>
+            <p className="empty-copy">No node matches the current filters.</p>
+            <TableEntryCountFooter count={0} />
+          </>
         ) : (
-          <table className="data-table">
-            <thead>
+          <>
+            <table className="data-table">
+              <thead>
               <tr>
                 <th><button type="button" className="sort-header-button" onClick={() => { setNodeTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" })); setNodeIdSortDirection((current) => current === "asc" ? "desc" : "asc"); }}>ID <span className="sort-indicator">{nodeSortIndicator("id")}</span></button></th>
                 {showNodeKindColumn ? <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "kind", direction: current.field === "kind" && current.direction === "asc" ? "desc" : "asc" }))}>Kind <span className="sort-indicator">{nodeSortIndicator("kind")}</span></button></th> : null}
                 <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "reference", direction: current.field === "reference" && current.direction === "asc" ? "desc" : "asc" }))}>Reference <span className="sort-indicator">{nodeSortIndicator("reference")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "linkedSegments", direction: current.field === "linkedSegments" && current.direction === "asc" ? "desc" : "asc" }))}>Linked segments <span className="sort-indicator">{nodeSortIndicator("linkedSegments")}</span></button></th>
               </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
               {sortedVisibleNodes.map((node) => {
                 const linkedSegments = segmentsCountByNodeId.get(node.id) ?? 0;
                 const isFocused = focusedNode?.id === node.id;
@@ -745,8 +762,10 @@ export function ModelingPrimaryTables({
                   </tr>
                 );
               })}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+            <TableEntryCountFooter count={sortedVisibleNodes.length} />
+          </>
         )}
         <div className="row-actions compact modeling-list-actions">
           <button type="button" className="button-with-icon" onClick={onOpenCreateNode}>

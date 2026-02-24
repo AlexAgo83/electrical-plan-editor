@@ -4,6 +4,7 @@ import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
 export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps): ReactElement {
@@ -35,7 +36,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   void _wireSort;
   void _setWireSort;
   void _getSortIndicator;
-  type WireAnalysisTableSortField = "name" | "technicalId" | "color" | "endpoints" | "sectionMm2" | "lengthMm" | "routeMode";
+  type WireAnalysisTableSortField = "name" | "technicalId" | "color" | "endpointA" | "endpointB" | "sectionMm2" | "lengthMm" | "routeMode";
   const [wireAnalysisTableSort, setWireAnalysisTableSort] = useState<{ field: WireAnalysisTableSortField; direction: "asc" | "desc" }>({
     field: "name",
     direction: "asc"
@@ -47,11 +48,13 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
         visibleWires,
         wireAnalysisTableSort,
         (wire, field) => {
-          const endpoints = `${describeWireEndpoint(wire.endpointA)} -> ${describeWireEndpoint(wire.endpointB)}`;
+          const endpointA = describeWireEndpoint(wire.endpointA);
+          const endpointB = describeWireEndpoint(wire.endpointB);
           if (field === "name") return wire.name;
           if (field === "technicalId") return wire.technicalId;
           if (field === "color") return getWireColorSortValue(wire);
-          if (field === "endpoints") return endpoints;
+          if (field === "endpointA") return endpointA;
+          if (field === "endpointB") return endpointB;
           if (field === "sectionMm2") return wire.sectionMm2;
           if (field === "lengthMm") return wire.lengthMm;
           return wire.isRouteLocked ? "Locked" : "Auto";
@@ -156,144 +159,163 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   {wires.length === 0 ? (
     <p className="empty-copy">No wire yet.</p>
   ) : sortedVisibleWires.length === 0 ? (
-    <p className="empty-copy">No wire matches the current filters.</p>
+    <>
+      <p className="empty-copy">No wire matches the current filters.</p>
+      <TableEntryCountFooter count={0} />
+    </>
   ) : (
-    <table className="data-table">
-      <thead>
-        <tr>
-          <th>
-            <button
-              type="button"
-              className="sort-header-button"
-              onClick={() =>
-                setWireAnalysisTableSort((current) => ({
-                  field: "name",
-                  direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc"
-                }))
-              }
-            >
-              Name <span className="sort-indicator">{wireListSortIndicator("name")}</span>
-            </button>
-          </th>
-          <th>
-            <button
-              type="button"
-              className="sort-header-button"
-              onClick={() =>
-                setWireAnalysisTableSort((current) => ({
-                  field: "technicalId",
-                  direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc"
-                }))
-              }
-            >
-              Technical ID <span className="sort-indicator">{wireListSortIndicator("technicalId")}</span>
-            </button>
-          </th>
-          <th>
-            <button
-              type="button"
-              className="sort-header-button"
-              onClick={() =>
-                setWireAnalysisTableSort((current) => ({
-                  field: "color",
-                  direction: current.field === "color" && current.direction === "asc" ? "desc" : "asc"
-                }))
-              }
-            >
-              Color <span className="sort-indicator">{wireListSortIndicator("color")}</span>
-            </button>
-          </th>
-          <th>
-            <button
-              type="button"
-              className="sort-header-button"
-              onClick={() =>
-                setWireAnalysisTableSort((current) => ({
-                  field: "endpoints",
-                  direction: current.field === "endpoints" && current.direction === "asc" ? "desc" : "asc"
-                }))
-              }
-            >
-              Endpoints <span className="sort-indicator">{wireListSortIndicator("endpoints")}</span>
-            </button>
-          </th>
-          <th>
-            <button
-              type="button"
-              className="sort-header-button"
-              onClick={() =>
-                setWireAnalysisTableSort((current) => ({
-                  field: "sectionMm2",
-                  direction: current.field === "sectionMm2" && current.direction === "asc" ? "desc" : "asc"
-                }))
-              }
-            >
-              Section (mm²) <span className="sort-indicator">{wireListSortIndicator("sectionMm2")}</span>
-            </button>
-          </th>
-          <th>
-            <button
-              type="button"
-              className="sort-header-button"
-              onClick={() =>
-                setWireAnalysisTableSort((current) => ({
-                  field: "lengthMm",
-                  direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc"
-                }))
-              }
-            >
-              Length (mm) <span className="sort-indicator">{wireListSortIndicator("lengthMm")}</span>
-            </button>
-          </th>
-          {showWireRouteModeColumn ? (
+    <>
+      <table className="data-table">
+        <thead>
+          <tr>
             <th>
               <button
                 type="button"
                 className="sort-header-button"
                 onClick={() =>
                   setWireAnalysisTableSort((current) => ({
-                    field: "routeMode",
-                    direction: current.field === "routeMode" && current.direction === "asc" ? "desc" : "asc"
+                    field: "name",
+                    direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc"
                   }))
                 }
               >
-                Route mode <span className="sort-indicator">{wireListSortIndicator("routeMode")}</span>
+                Name <span className="sort-indicator">{wireListSortIndicator("name")}</span>
               </button>
             </th>
-          ) : null}
-        </tr>
-      </thead>
-      <tbody>
-        {sortedVisibleWires.map((wire) => {
-          const isSelected = selectedWireId === wire.id;
-          return (
-            <tr
-              key={wire.id}
-              className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
-              aria-selected={isSelected}
-              tabIndex={0}
-              onClick={() => onSelectWire(wire.id)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  onSelectWire(wire.id);
+            <th>
+              <button
+                type="button"
+                className="sort-header-button"
+                onClick={() =>
+                  setWireAnalysisTableSort((current) => ({
+                    field: "technicalId",
+                    direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc"
+                  }))
                 }
-              }}
-            >
-              <td>{wire.name}</td>
-              <td className="technical-id">{wire.technicalId}</td>
-              <td>{renderWireColorCellValue(wire)}</td>
-              <td>
-                {describeWireEndpoint(wire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(wire.endpointB)}
-              </td>
-              <td>{wire.sectionMm2}</td>
-              <td>{wire.lengthMm}</td>
-              {showWireRouteModeColumn ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+              >
+                Technical ID <span className="sort-indicator">{wireListSortIndicator("technicalId")}</span>
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
+                className="sort-header-button"
+                onClick={() =>
+                  setWireAnalysisTableSort((current) => ({
+                    field: "color",
+                    direction: current.field === "color" && current.direction === "asc" ? "desc" : "asc"
+                  }))
+                }
+              >
+                Color <span className="sort-indicator">{wireListSortIndicator("color")}</span>
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
+                className="sort-header-button"
+                onClick={() =>
+                  setWireAnalysisTableSort((current) => ({
+                    field: "endpointA",
+                    direction: current.field === "endpointA" && current.direction === "asc" ? "desc" : "asc"
+                  }))
+                }
+              >
+                Endpoint A <span className="sort-indicator">{wireListSortIndicator("endpointA")}</span>
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
+                className="sort-header-button"
+                onClick={() =>
+                  setWireAnalysisTableSort((current) => ({
+                    field: "endpointB",
+                    direction: current.field === "endpointB" && current.direction === "asc" ? "desc" : "asc"
+                  }))
+                }
+              >
+                Endpoint B <span className="sort-indicator">{wireListSortIndicator("endpointB")}</span>
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
+                className="sort-header-button"
+                onClick={() =>
+                  setWireAnalysisTableSort((current) => ({
+                    field: "sectionMm2",
+                    direction: current.field === "sectionMm2" && current.direction === "asc" ? "desc" : "asc"
+                  }))
+                }
+              >
+                Section (mm²) <span className="sort-indicator">{wireListSortIndicator("sectionMm2")}</span>
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
+                className="sort-header-button"
+                onClick={() =>
+                  setWireAnalysisTableSort((current) => ({
+                    field: "lengthMm",
+                    direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc"
+                  }))
+                }
+              >
+                Length (mm) <span className="sort-indicator">{wireListSortIndicator("lengthMm")}</span>
+              </button>
+            </th>
+            {showWireRouteModeColumn ? (
+              <th>
+                <button
+                  type="button"
+                  className="sort-header-button"
+                  onClick={() =>
+                    setWireAnalysisTableSort((current) => ({
+                      field: "routeMode",
+                      direction: current.field === "routeMode" && current.direction === "asc" ? "desc" : "asc"
+                    }))
+                  }
+                >
+                  Route mode <span className="sort-indicator">{wireListSortIndicator("routeMode")}</span>
+                </button>
+              </th>
+            ) : null}
+          </tr>
+        </thead>
+        <tbody>
+          {sortedVisibleWires.map((wire) => {
+            const isSelected = selectedWireId === wire.id;
+            return (
+              <tr
+                key={wire.id}
+                className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
+                aria-selected={isSelected}
+                tabIndex={0}
+                onClick={() => onSelectWire(wire.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelectWire(wire.id);
+                  }
+                }}
+              >
+                <td>{wire.name}</td>
+                <td className="technical-id">{wire.technicalId}</td>
+                <td>{renderWireColorCellValue(wire)}</td>
+                <td>{describeWireEndpoint(wire.endpointA)}</td>
+                <td>{describeWireEndpoint(wire.endpointB)}</td>
+                <td>{wire.sectionMm2}</td>
+                <td>{wire.lengthMm}</td>
+                {showWireRouteModeColumn ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <TableEntryCountFooter count={sortedVisibleWires.length} />
+    </>
   )}
 </section>
 

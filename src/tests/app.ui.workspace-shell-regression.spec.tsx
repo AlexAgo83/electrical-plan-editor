@@ -163,4 +163,19 @@ describe("App integration UI - workspace shell regression", () => {
     expect(screen.getByRole("button", { name: "Close menu" })).toBeInTheDocument();
     expect(document.querySelector(".workspace-nav-row.secondary")).not.toBeNull();
   });
+
+  it("treats Analysis as a compatibility alias that lands in modeling with analysis panels", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    const primaryNavRowBefore = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRowBefore).not.toBeNull();
+    fireEvent.click(within(primaryNavRowBefore as HTMLElement).getByRole("button", { name: /Analysis/i, hidden: true }));
+
+    const primaryNavRowAfter = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRowAfter).not.toBeNull();
+    const modelingTab = within(primaryNavRowAfter as HTMLElement).getByRole("button", { name: /Modeling/i, hidden: true });
+    expect(modelingTab).toHaveClass("is-active");
+    expect(screen.getByRole("heading", { name: "Wire analysis" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Connector form" })).not.toBeInTheDocument();
+  });
 });

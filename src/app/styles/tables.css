@@ -221,6 +221,26 @@
   letter-spacing: 0.01em;
 }
 
+.table-entry-count-footer {
+  margin: 0.45rem 0 0;
+  text-align: right;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  opacity: 0.78;
+}
+
+.table-entry-count-footer + .row-actions {
+  margin-top: 0.45rem;
+}
+
+.table-secondary-line {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.84em;
+  line-height: 1.2;
+  opacity: 0.75;
+}
+
 .status-chip {
   display: inline-flex;
   align-items: center;

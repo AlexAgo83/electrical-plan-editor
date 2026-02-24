@@ -4,6 +4,7 @@ import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
 export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentProps): ReactElement {
@@ -203,11 +204,15 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
   {splices.length === 0 ? (
     <p className="empty-copy">No splice yet.</p>
   ) : sortedVisibleSplices.length === 0 ? (
-    <p className="empty-copy">No splice matches the current filters.</p>
+    <>
+      <p className="empty-copy">No splice matches the current filters.</p>
+      <TableEntryCountFooter count={0} />
+    </>
   ) : (
-    <table className="data-table">
-      <thead>
-        <tr>
+    <>
+      <table className="data-table">
+        <thead>
+          <tr>
           <th>
             <button
               type="button"
@@ -229,36 +234,38 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
           <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{spliceListSortIndicator("manufacturerReference")}</span></button></th>
           <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "portCount", direction: current.field === "portCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ports <span className="sort-indicator">{spliceListSortIndicator("portCount")}</span></button></th>
           <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "branchCount", direction: current.field === "branchCount" && current.direction === "asc" ? "desc" : "asc" }))}>Branches <span className="sort-indicator">{spliceListSortIndicator("branchCount")}</span></button></th>
-        </tr>
-      </thead>
-      <tbody>
-        {sortedVisibleSplices.map((splice) => {
-          const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
-          const isSelected = selectedSpliceId === splice.id;
-          return (
-            <tr
-              key={splice.id}
-              className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
-              aria-selected={isSelected}
-              tabIndex={0}
-              onClick={() => onSelectSplice(splice.id)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  onSelectSplice(splice.id);
-                }
-              }}
-            >
-              <td>{splice.name}</td>
-              <td className="technical-id">{splice.technicalId}</td>
-              <td className="technical-id">{splice.manufacturerReference ?? ""}</td>
-              <td>{splice.portCount}</td>
-              <td>{occupiedCount}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedVisibleSplices.map((splice) => {
+            const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
+            const isSelected = selectedSpliceId === splice.id;
+            return (
+              <tr
+                key={splice.id}
+                className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
+                aria-selected={isSelected}
+                tabIndex={0}
+                onClick={() => onSelectSplice(splice.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelectSplice(splice.id);
+                  }
+                }}
+              >
+                <td>{splice.name}</td>
+                <td className="technical-id">{splice.technicalId}</td>
+                <td className="technical-id">{splice.manufacturerReference ?? ""}</td>
+                <td>{splice.portCount}</td>
+                <td>{occupiedCount}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <TableEntryCountFooter count={sortedVisibleSplices.length} />
+    </>
   )}
 </section>
 
@@ -421,7 +428,10 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
                 <span>{row.wireName}</span>
               </span>
             </td>
-            <td className="technical-id">{row.wireTechnicalId}</td>
+            <td className="technical-id">
+              <span>{row.wireTechnicalId}</span>
+              {row.wireName.trim().length > 0 ? <span className="table-secondary-line">{row.wireName}</span> : null}
+            </td>
             <td>{row.localEndpointLabel}</td>
             <td>{row.remoteEndpointLabel}</td>
             <td>{row.lengthMm}</td>

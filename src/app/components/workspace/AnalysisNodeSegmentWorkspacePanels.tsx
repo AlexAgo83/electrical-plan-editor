@@ -5,6 +5,7 @@ import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { renderWireColorCellValue } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
 function formatSubNetworkDisplay(tag: string | undefined): string {
@@ -262,18 +263,22 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
         {nodes.length === 0 ? (
           <p className="empty-copy">No node yet.</p>
         ) : sortedVisibleNodes.length === 0 ? (
-          <p className="empty-copy">No node matches the current filters.</p>
+          <>
+            <p className="empty-copy">No node matches the current filters.</p>
+            <TableEntryCountFooter count={0} />
+          </>
         ) : (
-          <table className="data-table">
-            <thead>
+          <>
+            <table className="data-table">
+              <thead>
               <tr>
                 <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("id"))}>ID <span className="sort-indicator">{indicator(nodeTableSort, "id")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("kind"))}>Kind <span className="sort-indicator">{indicator(nodeTableSort, "kind")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("reference"))}>Reference <span className="sort-indicator">{indicator(nodeTableSort, "reference")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("linkedSegments"))}>Linked segments <span className="sort-indicator">{indicator(nodeTableSort, "linkedSegments")}</span></button></th>
               </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
               {sortedVisibleNodes.map((node) => {
                 const isSelected = selectedNodeId === node.id;
                 return (
@@ -297,8 +302,10 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                   </tr>
                 );
               })}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+            <TableEntryCountFooter count={sortedVisibleNodes.length} />
+          </>
         )}
       </section>
 
@@ -420,10 +427,14 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
         {segments.length === 0 ? (
           <p className="empty-copy">No segment yet.</p>
         ) : sortedVisibleSegments.length === 0 ? (
-          <p className="empty-copy">No segment matches the current filters.</p>
+          <>
+            <p className="empty-copy">No segment matches the current filters.</p>
+            <TableEntryCountFooter count={0} />
+          </>
         ) : (
-          <table className="data-table">
-            <thead>
+          <>
+            <table className="data-table">
+              <thead>
               <tr>
                 <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("id"))}>ID <span className="sort-indicator">{indicator(segmentTableSort, "id")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("nodeA"))}>Node A <span className="sort-indicator">{indicator(segmentTableSort, "nodeA")}</span></button></th>
@@ -431,8 +442,8 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                 <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("subNetwork"))}>Sub-network <span className="sort-indicator">{indicator(segmentTableSort, "subNetwork")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("lengthMm"))}>Length (mm) <span className="sort-indicator">{indicator(segmentTableSort, "lengthMm")}</span></button></th>
               </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
               {sortedVisibleSegments.map((segment) => {
                 const isSelected = selectedSegmentId === segment.id;
                 return (
@@ -457,8 +468,10 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                   </tr>
                 );
               })}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+            <TableEntryCountFooter count={sortedVisibleSegments.length} />
+          </>
         )}
       </section>
 

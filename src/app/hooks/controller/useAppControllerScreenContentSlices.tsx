@@ -280,6 +280,7 @@ export function buildNetworkScopeScreenContentSlice(params: NetworkScopeScreenCo
     networkEntityCountsById: params.networkEntityCountsById,
     activeNetworkId: params.activeNetworkId,
     handleSelectNetwork: params.handleSelectNetwork,
+    handleOpenNetworkInModeling: params.handleOpenNetworkInModeling,
     handleDuplicateNetwork: params.handleDuplicateNetwork,
     handleExportActiveNetwork: params.handleExportActiveNetwork,
     handleDeleteNetwork: params.handleDeleteNetwork,
