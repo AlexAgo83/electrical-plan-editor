@@ -2,6 +2,7 @@ import type { AppAction } from "./actions";
 import { syncCurrentScopeToNetworkMap } from "./networking";
 import type { AppState } from "./types";
 import { handleConnectorActions } from "./reducer/connectorReducer";
+import { handleCatalogActions } from "./reducer/catalogReducer";
 import { handleLayoutActions } from "./reducer/layoutReducer";
 import { handleNetworkActions } from "./reducer/networkReducer";
 import { handleNodeActions } from "./reducer/nodeReducer";
@@ -14,6 +15,7 @@ import { withError } from "./reducer/shared";
 function hasActiveNetworkForDomainActions(state: AppState, action: AppAction): boolean {
   if (
     action.type.startsWith("connector/") ||
+    action.type.startsWith("catalog/") ||
     action.type.startsWith("splice/") ||
     action.type.startsWith("node/") ||
     action.type.startsWith("segment/") ||
@@ -56,6 +58,11 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "connector/occupyCavity":
     case "connector/releaseCavity": {
       return finalizeDomainAction(state, handleConnectorActions(state, action) ?? state);
+    }
+
+    case "catalog/upsert":
+    case "catalog/remove": {
+      return finalizeDomainAction(state, handleCatalogActions(state, action) ?? state);
     }
 
     case "splice/upsert":

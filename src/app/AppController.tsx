@@ -7,7 +7,7 @@ import {
   useSyncExternalStore
 } from "react";
 import appPackageMetadata from "../../package.json";
-import type { ConnectorId, NodeId, SpliceId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NodeId, SpliceId } from "../core/entities";
 import {
   type AppStore,
   appActions,
@@ -18,6 +18,8 @@ import {
   selectActiveNetworkId,
   selectConnectorTechnicalIdTaken,
   selectConnectors,
+  selectCatalogItems,
+  selectCatalogManufacturerReferenceTaken,
   selectLastError,
   selectNetworkTechnicalIdTaken,
   selectNetworks,
@@ -37,6 +39,7 @@ import { AppShellLayout } from "./components/layout/AppShellLayout";
 import { OnboardingModal } from "./components/onboarding/OnboardingModal";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useCanvasState } from "./hooks/useCanvasState";
+import { useCatalogHandlers } from "./hooks/useCatalogHandlers";
 import { useAppControllerCanvasDisplayState } from "./hooks/useAppControllerCanvasDisplayState";
 import { useAppControllerPreferencesState } from "./hooks/useAppControllerPreferencesState";
 import { useAppControllerLayoutDerivedState } from "./hooks/useAppControllerLayoutDerivedState";
@@ -72,6 +75,8 @@ import { useValidationModel } from "./hooks/useValidationModel";
 import { useWireEndpointDescriptions } from "./hooks/useWireEndpointDescriptions";
 import { useWorkspaceShellChrome } from "./hooks/useWorkspaceShellChrome";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
+import { ModelingCatalogFormPanel } from "./components/workspace/ModelingCatalogFormPanel";
+import { ModelingCatalogListPanel } from "./components/workspace/ModelingCatalogListPanel";
 import { buildAppControllerNamespacedCanvasState } from "./hooks/useAppControllerNamespacedCanvasState";
 import { buildAppControllerNamespacedFormsState } from "./hooks/useAppControllerNamespacedFormsState";
 import {
@@ -156,6 +161,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     activeNetworkId === null ? undefined : state.networkStates[activeNetworkId]?.networkSummaryViewState;
   const activeNetwork = selectActiveNetwork(state);
   const connectors = selectConnectors(state);
+  const catalogItems = selectCatalogItems(state);
   const splices = selectSplices(state);
   const nodes = selectNodes(state);
   const segments = selectSegments(state);
@@ -329,6 +335,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     selectedConnectorOccupiedCount,
     selectedSpliceOccupiedCount
   } = selectionEntities;
+  const selectedCatalogItemId = selected?.kind === "catalog" ? (selected.id as CatalogItemId) : null;
   const {
     activeScreen,
     setActiveScreen,
@@ -385,6 +392,15 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const spliceTechnicalIdAlreadyUsed =
     forms.splice.technicalId.trim().length > 0 &&
     selectSpliceTechnicalIdTaken(state, forms.splice.technicalId.trim(), spliceIdExcludedFromUniqueness);
+  const catalogItemIdExcludedFromUniqueness =
+    formsState.catalogFormMode === "edit" ? formsState.editingCatalogItemId ?? undefined : undefined;
+  const catalogManufacturerReferenceAlreadyUsed =
+    formsState.catalogManufacturerReference.trim().length > 0 &&
+    selectCatalogManufacturerReferenceTaken(
+      state,
+      formsState.catalogManufacturerReference.trim(),
+      catalogItemIdExcludedFromUniqueness
+    );
   const wireIdExcludedFromUniqueness =
     forms.wire.formMode === "edit" ? forms.wire.editingId ?? undefined : undefined;
   const wireTechnicalIdAlreadyUsed =
@@ -416,6 +432,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     routingGraphNodeIds: routingGraph.nodeIds,
     routingGraphEdgesByNodeId: routingGraph.edgesByNodeId
   });
+  const isCatalogSubScreen = activeSubScreen === "catalog";
   const isConnectorSubScreen = activeSubScreen === "connector";
   const isSpliceSubScreen = activeSubScreen === "splice";
   const isNodeSubScreen = activeSubScreen === "node";
@@ -576,8 +593,42 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         })()
       : null;
 
+  const onboardingCatalogTargetActions =
+    activeOnboardingStep?.id === "catalog"
+      ? (() => {
+          const catalogListTarget: OnboardingStepTarget = {
+            screen: "modeling",
+            subScreen: "catalog",
+            panelSelector: '[data-onboarding-panel="modeling-catalog"]',
+            panelLabel: "Catalog"
+          };
+          const catalogEditTarget: OnboardingStepTarget = {
+            screen: "modeling",
+            subScreen: "catalog",
+            panelSelector: '[data-onboarding-panel="modeling-catalog-edit"]',
+            panelLabel: "Edit catalog item"
+          };
+          const isListInContext =
+            activeScreen === catalogListTarget.screen &&
+            activeSubScreen === catalogListTarget.subScreen;
+          const isEditInContext = isListInContext;
+          return [
+            {
+              label: isListInContext ? "Scroll to Catalog" : "Open Catalog",
+              onClick: () => openOnboardingTarget(catalogListTarget)
+            },
+            {
+              label: isEditInContext ? "Scroll to Edit catalog item" : "Open Edit catalog item",
+              onClick: () => openOnboardingTarget(catalogEditTarget)
+            }
+          ];
+        })()
+      : null;
+
   const onboardingTargetActions = activeOnboardingStep === undefined
     ? []
+    : activeOnboardingStep.id === "catalog"
+      ? (onboardingCatalogTargetActions ?? [])
     : activeOnboardingStep.id === "connectorSpliceLibrary"
       ? (onboardingConnectorSpliceTargetActions ?? [])
       : [{ label: onboardingTargetActionLabel, onClick: handleOnboardingOpenTarget }];
@@ -819,6 +870,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   } = validationModel;
 
   const entityCountBySubScreen: Record<SubScreenId, number> = {
+    catalog: catalogItems.length,
     connector: connectors.length,
     splice: splices.length,
     node: nodes.length,
@@ -850,6 +902,26 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setActiveSubScreen("connector");
       setInteractionMode("select");
     }
+  });
+
+  const catalogHandlers = useCatalogHandlers({
+    store,
+    dispatchAction,
+    catalogFormMode: formsState.catalogFormMode,
+    setCatalogFormMode: formsState.setCatalogFormMode,
+    editingCatalogItemId: formsState.editingCatalogItemId,
+    setEditingCatalogItemId: formsState.setEditingCatalogItemId,
+    catalogManufacturerReference: formsState.catalogManufacturerReference,
+    setCatalogManufacturerReference: formsState.setCatalogManufacturerReference,
+    catalogConnectionCount: formsState.catalogConnectionCount,
+    setCatalogConnectionCount: formsState.setCatalogConnectionCount,
+    catalogName: formsState.catalogName,
+    setCatalogName: formsState.setCatalogName,
+    catalogUnitPriceExclTax: formsState.catalogUnitPriceExclTax,
+    setCatalogUnitPriceExclTax: formsState.setCatalogUnitPriceExclTax,
+    catalogUrl: formsState.catalogUrl,
+    setCatalogUrl: formsState.setCatalogUrl,
+    setCatalogFormError: formsState.setCatalogFormError
   });
 
   useEffect(() => {
@@ -912,6 +984,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
     skipNextPerNetworkViewPersistRef.current = didScheduleRestore;
     hasAppliedPerNetworkViewRestoreRef.current = true;
+    // Intentionally reacts to network/preference changes only; current local view flags are read to decide whether restore is needed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     activeNetworkId,
     activeNetworkSummaryViewState,
@@ -1190,6 +1264,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setConnectorName: formsState.setConnectorName,
     connectorTechnicalId: formsState.connectorTechnicalId,
     setConnectorTechnicalId: formsState.setConnectorTechnicalId,
+    connectorCatalogItemId: formsState.connectorCatalogItemId,
+    setConnectorCatalogItemId: formsState.setConnectorCatalogItemId,
     connectorManufacturerReference: formsState.connectorManufacturerReference,
     setConnectorManufacturerReference: formsState.setConnectorManufacturerReference,
     connectorAutoCreateLinkedNode: formsState.connectorAutoCreateLinkedNode,
@@ -1207,6 +1283,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setSpliceName: formsState.setSpliceName,
     spliceTechnicalId: formsState.spliceTechnicalId,
     setSpliceTechnicalId: formsState.setSpliceTechnicalId,
+    spliceCatalogItemId: formsState.spliceCatalogItemId,
+    setSpliceCatalogItemId: formsState.setSpliceCatalogItemId,
     spliceManufacturerReference: formsState.spliceManufacturerReference,
     setSpliceManufacturerReference: formsState.setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode: formsState.spliceAutoCreateLinkedNode,
@@ -1309,6 +1387,28 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   });
   const { connector: connectorHandlers, splice: spliceHandlers, node: nodeHandlers, segment: segmentHandlers, wire: wireHandlers } =
     modelingHandlers;
+
+  const handleCreateConnectorFromCatalog = useCallback(
+    (catalogItemId: CatalogItemId) => {
+      setIsModelingAnalysisFocused(false);
+      setActiveScreen("modeling");
+      setActiveSubScreen("connector");
+      connectorHandlers.resetConnectorForm();
+      connectorHandlers.syncDerivedConnectorCatalogFields?.(catalogItemId);
+    },
+    [connectorHandlers, setActiveScreen, setActiveSubScreen, setIsModelingAnalysisFocused]
+  );
+
+  const handleCreateSpliceFromCatalog = useCallback(
+    (catalogItemId: CatalogItemId) => {
+      setIsModelingAnalysisFocused(false);
+      setActiveScreen("modeling");
+      setActiveSubScreen("splice");
+      spliceHandlers.resetSpliceForm();
+      spliceHandlers.syncDerivedSpliceCatalogFields?.(catalogItemId);
+    },
+    [setActiveScreen, setActiveSubScreen, setIsModelingAnalysisFocused, spliceHandlers]
+  );
 
   const {
     handleOpenValidationScreen,
@@ -1437,7 +1537,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   useEffect(() => {
     if (activeScreen === "analysis" || (activeScreen === "modeling" && isModelingAnalysisFocused)) {
-      setLastAnalysisSubScreen(activeSubScreen);
+      if (activeSubScreen !== "catalog") {
+        setLastAnalysisSubScreen(activeSubScreen);
+      }
     }
   }, [activeScreen, activeSubScreen, isModelingAnalysisFocused]);
 
@@ -1471,6 +1573,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     clearSegmentForm: segmentHandlers.clearSegmentForm,
     clearWireForm: wireHandlers.clearWireForm
   });
+  useEffect(() => {
+    if (activeSubScreen !== "catalog" && formsState.catalogFormMode !== "idle") {
+      catalogHandlers.clearCatalogForm();
+    }
+  }, [activeSubScreen, catalogHandlers, formsState.catalogFormMode]);
 
   const {
     handleNetworkSegmentClick,
@@ -1587,10 +1694,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     visibleValidationIssues
   });
   const networkScalePercent = Math.round(networkScale * 100);
-  const hasInspectableSelection = selected !== null && selectedSubScreen !== null;
+  const hasInspectableSelection = selected !== null && selectedSubScreen !== null && selectedSubScreen !== "catalog";
   const hasTableInspectableSelection = hasInspectableSelection && detailPanelsSelectionSource === "table";
   const hasTableSelectionForActiveSubScreen = hasTableInspectableSelection && selectedSubScreen === activeSubScreen;
   const hasActiveEntityForm =
+    formsState.catalogFormMode !== "idle" ||
     formsState.connectorFormMode !== "idle" ||
     formsState.spliceFormMode !== "idle" ||
     formsState.nodeFormMode !== "idle" ||
@@ -1614,6 +1722,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isNavigationDrawerOpen,
     isOperationsPanelOpen
   });
+  const inspectableSelectedSubScreen =
+    selectedSubScreen === "catalog" ? null : selectedSubScreen;
   const { inspectorContextPanel } = useInspectorContextPanelControllerSlice({
     isInspectorOpen,
     canExpandInspectorFromCollapsed,
@@ -1621,7 +1731,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     expandInspectorFromCollapsed,
     collapseInspectorToCollapsed,
     selected,
-    selectedSubScreen,
+    selectedSubScreen: inspectableSelectedSubScreen,
     selectedConnector,
     selectedSplice,
     selectedNode,
@@ -1770,6 +1880,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         isWireSubScreen
       },
       entities: {
+        catalogItems,
         connectors,
         splices,
         nodes,
@@ -1789,6 +1900,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         describeWireEndpointId
       },
       onboardingHelp: {
+        openCatalogStep: () => openSingleStepOnboarding("catalog"),
         openConnectorStep: () => openSingleStepOnboarding("connectorSpliceLibrary"),
         openSpliceStep: () =>
           openSingleStepOnboarding("connectorSpliceLibrary", {
@@ -1809,6 +1921,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       markSelectionPanelsFromTable: markDetailPanelsSelectionSourceAsTable,
       includeModelingContent: hasActiveNetwork && isModelingScreen,
       includeAnalysisContent: hasActiveNetwork && (isAnalysisScreen || isModelingScreen),
+      openCatalogSubScreen: () => {
+        handleWorkspaceScreenChange("modeling");
+        setActiveSubScreen("catalog");
+      },
       onSelectConnector: (connectorId) => {
         markDetailPanelsSelectionSourceAsTable();
         dispatchAction(
@@ -1855,6 +1971,49 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         );
       }
     });
+  const catalogModelingLeftColumnContent = (
+    <ModelingCatalogListPanel
+      isCatalogSubScreen={isCatalogSubScreen}
+      catalogItems={catalogItems}
+      selectedCatalogItemId={selectedCatalogItemId}
+      catalogFormMode={formsState.catalogFormMode}
+      onOpenCreateCatalogItem={catalogHandlers.resetCatalogForm}
+      onEditCatalogItem={catalogHandlers.startCatalogEdit}
+      onDeleteCatalogItem={catalogHandlers.handleCatalogDelete}
+      onCreateConnectorFromCatalog={handleCreateConnectorFromCatalog}
+      onCreateSpliceFromCatalog={handleCreateSpliceFromCatalog}
+      onOpenCatalogOnboardingHelp={() => openSingleStepOnboarding("catalog")}
+    />
+  );
+  const catalogModelingFormsColumnContent = (
+    <section className="panel-grid workspace-column workspace-column-right">
+      <ModelingCatalogFormPanel
+        isCatalogSubScreen={isCatalogSubScreen}
+        catalogFormMode={formsState.catalogFormMode}
+        openCreateCatalogForm={catalogHandlers.resetCatalogForm}
+        handleCatalogSubmit={catalogHandlers.handleCatalogSubmit}
+        catalogManufacturerReference={formsState.catalogManufacturerReference}
+        setCatalogManufacturerReference={formsState.setCatalogManufacturerReference}
+        catalogConnectionCount={formsState.catalogConnectionCount}
+        setCatalogConnectionCount={formsState.setCatalogConnectionCount}
+        catalogName={formsState.catalogName}
+        setCatalogName={formsState.setCatalogName}
+        catalogUnitPriceExclTax={formsState.catalogUnitPriceExclTax}
+        setCatalogUnitPriceExclTax={formsState.setCatalogUnitPriceExclTax}
+        catalogUrl={formsState.catalogUrl}
+        setCatalogUrl={formsState.setCatalogUrl}
+        catalogManufacturerReferenceAlreadyUsed={catalogManufacturerReferenceAlreadyUsed}
+        cancelCatalogEdit={catalogHandlers.cancelCatalogEdit}
+        catalogFormError={formsState.catalogFormError}
+      />
+    </section>
+  );
+  const modelingLeftColumnContentForSubScreen =
+    isCatalogSubScreen ? catalogModelingLeftColumnContent : modelingLeftColumnContent;
+  const modelingFormsColumnContentForSubScreen =
+    isCatalogSubScreen ? catalogModelingFormsColumnContent : modelingFormsColumnContent;
+  const analysisWorkspaceContentForSubScreen =
+    isCatalogSubScreen ? null : analysisWorkspaceContent;
   const { networkScopeWorkspaceContent, validationWorkspaceContent, settingsWorkspaceContent } =
     useAppControllerAuxScreenContentDomains({
       components: {
@@ -2011,8 +2170,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
   }, [hasInspectableSelection]);
   const modelingFormsColumnContentForLayout =
-    hasTableSelectionForActiveSubScreen || hasActiveEntityForm ? modelingFormsColumnContent : null;
-  const analysisWorkspaceContentForLayout = hasTableSelectionForActiveSubScreen ? analysisWorkspaceContent : null;
+    hasTableSelectionForActiveSubScreen || hasActiveEntityForm || isCatalogSubScreen
+      ? modelingFormsColumnContentForSubScreen
+      : null;
+  const analysisWorkspaceContentForLayout =
+    isCatalogSubScreen ? null : hasTableSelectionForActiveSubScreen ? analysisWorkspaceContentForSubScreen : null;
 
   return (
     <>
@@ -2075,7 +2237,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       homeWorkspaceContent={homeWorkspaceContent}
       hasActiveNetwork={hasActiveNetwork}
       networkScopeWorkspaceContent={networkScopeWorkspaceContent}
-      modelingLeftColumnContent={modelingLeftColumnContent}
+      modelingLeftColumnContent={modelingLeftColumnContentForSubScreen}
       modelingFormsColumnContent={modelingFormsColumnContentForLayout}
       networkSummaryPanel={networkSummaryPanel}
       analysisWorkspaceContent={analysisWorkspaceContentForLayout}

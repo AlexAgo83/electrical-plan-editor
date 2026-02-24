@@ -3,6 +3,7 @@ import type { WireColorMode } from "./cableColors";
 export type Brand<T, B extends string> = T & { readonly __brand: B };
 
 export type NetworkId = Brand<string, "NetworkId">;
+export type CatalogItemId = Brand<string, "CatalogItemId">;
 export type ConnectorId = Brand<string, "ConnectorId">;
 export type SpliceId = Brand<string, "SpliceId">;
 export type NodeId = Brand<string, "NodeId">;
@@ -23,6 +24,7 @@ export interface Connector {
   name: string;
   technicalId: string;
   cavityCount: number;
+  catalogItemId?: CatalogItemId;
   manufacturerReference?: string;
   cableCalloutPosition?: {
     x: number;
@@ -35,11 +37,21 @@ export interface Splice {
   name: string;
   technicalId: string;
   portCount: number;
+  catalogItemId?: CatalogItemId;
   manufacturerReference?: string;
   cableCalloutPosition?: {
     x: number;
     y: number;
   };
+}
+
+export interface CatalogItem {
+  id: CatalogItemId;
+  manufacturerReference: string;
+  connectionCount: number;
+  name?: string;
+  unitPriceExclTax?: number;
+  url?: string;
 }
 
 export type NetworkNode =

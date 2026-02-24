@@ -1,8 +1,10 @@
 import type { FormEvent } from "react";
-import type { Connector, NetworkNode, Splice, WireEndpoint } from "../../../core/entities";
+import type { CatalogItem, Connector, NetworkNode, Splice, WireEndpoint } from "../../../core/entities";
 import type { WireEndpointSlotHint } from "../../hooks/useWireHandlers";
 
 export interface ModelingFormsColumnProps {
+  catalogItems: CatalogItem[];
+  openCatalogSubScreen: () => void;
   isConnectorSubScreen: boolean;
   connectorFormMode: "idle" | "create" | "edit";
   openCreateConnectorForm: () => void;
@@ -11,6 +13,8 @@ export interface ModelingFormsColumnProps {
   setConnectorName: (value: string) => void;
   connectorTechnicalId: string;
   setConnectorTechnicalId: (value: string) => void;
+  connectorCatalogItemId: string;
+  setConnectorCatalogItemId: (value: string) => void;
   connectorManufacturerReference: string;
   setConnectorManufacturerReference: (value: string) => void;
   connectorAutoCreateLinkedNode: boolean;
@@ -28,6 +32,8 @@ export interface ModelingFormsColumnProps {
   setSpliceName: (value: string) => void;
   spliceTechnicalId: string;
   setSpliceTechnicalId: (value: string) => void;
+  spliceCatalogItemId: string;
+  setSpliceCatalogItemId: (value: string) => void;
   spliceManufacturerReference: string;
   setSpliceManufacturerReference: (value: string) => void;
   spliceAutoCreateLinkedNode: boolean;

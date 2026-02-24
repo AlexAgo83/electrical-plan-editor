@@ -1,12 +1,9 @@
 import type { FormEvent } from "react";
+import type { CatalogItemId, Splice, SpliceId } from "../../core/entities";
 import type { AppStore } from "../../store";
-import type { Splice, SpliceId } from "../../core/entities";
 import { appActions } from "../../store";
-import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
-import {
-  suggestAutoSpliceNodeId,
-  suggestNextSpliceTechnicalId
-} from "../lib/technical-id-suggestions";
+import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
+import { suggestAutoSpliceNodeId, suggestNextSpliceTechnicalId } from "../lib/technical-id-suggestions";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -26,6 +23,8 @@ interface UseSpliceHandlersParams {
   setSpliceName: (value: string) => void;
   spliceTechnicalId: string;
   setSpliceTechnicalId: (value: string) => void;
+  spliceCatalogItemId: string;
+  setSpliceCatalogItemId: (value: string) => void;
   spliceManufacturerReference: string;
   setSpliceManufacturerReference: (value: string) => void;
   spliceAutoCreateLinkedNode: boolean;
@@ -39,6 +38,10 @@ interface UseSpliceHandlersParams {
   spliceOccupantRefInput: string;
 }
 
+function toCatalogItemId(raw: string): CatalogItemId | null {
+  return raw.trim().length === 0 ? null : (raw as CatalogItemId);
+}
+
 export function useSpliceHandlers({
   store,
   dispatchAction,
@@ -50,27 +53,58 @@ export function useSpliceHandlers({
   setSpliceName,
   spliceTechnicalId,
   setSpliceTechnicalId,
-  spliceManufacturerReference,
+  spliceCatalogItemId,
+  setSpliceCatalogItemId,
+  spliceManufacturerReference: _spliceManufacturerReference,
   setSpliceManufacturerReference,
   spliceAutoCreateLinkedNode,
   setSpliceAutoCreateLinkedNode,
   defaultAutoCreateLinkedNodes,
-  portCount,
+  portCount: _portCount,
   setPortCount,
   setSpliceFormError,
   selectedSpliceId,
   portIndexInput,
   spliceOccupantRefInput
 }: UseSpliceHandlersParams) {
+  void _spliceManufacturerReference;
+  void _portCount;
+
+  function syncDerivedSpliceCatalogFields(nextCatalogItemId: string): void {
+    setSpliceCatalogItemId(nextCatalogItemId);
+    const catalogItem = store.getState().catalogItems.byId[nextCatalogItemId as CatalogItemId];
+    if (catalogItem === undefined) {
+      setSpliceManufacturerReference("");
+      return;
+    }
+    setSpliceManufacturerReference(catalogItem.manufacturerReference);
+    setPortCount(String(catalogItem.connectionCount));
+  }
+
   function resetSpliceForm(): void {
     const state = store.getState();
+    const firstCatalogItem = state.catalogItems.allIds
+      .map((catalogItemId) => state.catalogItems.byId[catalogItemId])
+      .find((item): item is NonNullable<typeof item> => item !== undefined);
+    if (firstCatalogItem === undefined) {
+      setSpliceFormMode("create");
+      setEditingSpliceId(null);
+      setSpliceName("");
+      setSpliceTechnicalId(suggestNextSpliceTechnicalId(Object.values(state.splices.byId).map((splice) => splice.technicalId)));
+      setSpliceCatalogItemId("");
+      setSpliceManufacturerReference("");
+      setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
+      setPortCount("4");
+      setSpliceFormError("Create a catalog item first to define manufacturer reference and connection count.");
+      return;
+    }
+
     setSpliceFormMode("create");
     setEditingSpliceId(null);
     setSpliceName("");
     setSpliceTechnicalId(suggestNextSpliceTechnicalId(Object.values(state.splices.byId).map((splice) => splice.technicalId)));
-    setSpliceManufacturerReference("");
+    syncDerivedSpliceCatalogFields(firstCatalogItem.id);
     setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
-    setPortCount("4");
     setSpliceFormError(null);
   }
 
@@ -79,6 +113,7 @@ export function useSpliceHandlers({
     setEditingSpliceId(null);
     setSpliceName("");
     setSpliceTechnicalId("");
+    setSpliceCatalogItemId("");
     setSpliceManufacturerReference("");
     setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setPortCount("4");
@@ -95,9 +130,15 @@ export function useSpliceHandlers({
     setEditingSpliceId(splice.id);
     setSpliceName(splice.name);
     setSpliceTechnicalId(splice.technicalId);
-    setSpliceManufacturerReference(splice.manufacturerReference ?? "");
+    if (splice.catalogItemId !== undefined && store.getState().catalogItems.byId[splice.catalogItemId] !== undefined) {
+      syncDerivedSpliceCatalogFields(splice.catalogItemId);
+    } else {
+      setSpliceCatalogItemId("");
+      setSpliceManufacturerReference(splice.manufacturerReference ?? "");
+      setPortCount(String(splice.portCount));
+    }
     setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
-    setPortCount(String(splice.portCount));
+    setSpliceFormError(null);
     dispatchAction(appActions.select({ kind: "splice", id: splice.id }));
   }
 
@@ -106,13 +147,14 @@ export function useSpliceHandlers({
 
     const trimmedName = spliceName.trim();
     const trimmedTechnicalId = spliceTechnicalId.trim();
-    const normalizedManufacturerReferenceRaw = spliceManufacturerReference.trim();
-    if (normalizedManufacturerReferenceRaw.length > 120) {
-      setSpliceFormError("Manufacturer reference must be 120 characters or fewer.");
+    const selectedCatalogItemId = toCatalogItemId(spliceCatalogItemId);
+    const selectedCatalogItem = selectedCatalogItemId === null ? undefined : store.getState().catalogItems.byId[selectedCatalogItemId];
+    if (selectedCatalogItem === undefined) {
+      setSpliceFormError("Select a catalog item first.");
       return;
     }
-    const normalizedPortCount = toPositiveInteger(portCount);
 
+    const normalizedPortCount = selectedCatalogItem.connectionCount;
     if (trimmedName.length === 0 || trimmedTechnicalId.length === 0 || normalizedPortCount < 1) {
       setSpliceFormError("All fields are required and port count must be >= 1.");
       return;
@@ -121,9 +163,7 @@ export function useSpliceHandlers({
 
     const wasCreateMode = spliceFormMode === "create";
     const spliceId =
-      spliceFormMode === "edit" && editingSpliceId !== null
-        ? editingSpliceId
-        : (createEntityId("splice") as SpliceId);
+      spliceFormMode === "edit" && editingSpliceId !== null ? editingSpliceId : (createEntityId("splice") as SpliceId);
     const existingSplice =
       spliceFormMode === "edit" && editingSpliceId !== null ? store.getState().splices.byId[editingSpliceId] : undefined;
 
@@ -133,8 +173,8 @@ export function useSpliceHandlers({
         id: spliceId,
         name: trimmedName,
         technicalId: trimmedTechnicalId,
-        manufacturerReference:
-          normalizedManufacturerReferenceRaw.length === 0 ? undefined : normalizedManufacturerReferenceRaw,
+        catalogItemId: selectedCatalogItem.id,
+        manufacturerReference: selectedCatalogItem.manufacturerReference,
         portCount: normalizedPortCount
       })
     );
@@ -194,7 +234,7 @@ export function useSpliceHandlers({
       return;
     }
 
-    const portIndex = toPositiveInteger(portIndexInput);
+    const portIndex = Math.max(0, Math.trunc(Number(portIndexInput)));
     dispatchAction(appActions.occupySplicePort(selectedSpliceId, portIndex, spliceOccupantRefInput));
   }
 
@@ -214,6 +254,7 @@ export function useSpliceHandlers({
     handleSpliceSubmit,
     handleSpliceDelete,
     handleReservePort,
-    handleReleasePort
+    handleReleasePort,
+    syncDerivedSpliceCatalogFields
   };
 }

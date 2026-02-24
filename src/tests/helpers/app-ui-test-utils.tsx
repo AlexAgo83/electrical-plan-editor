@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { App } from "../../app/App";
-import type { ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../core/entities";
+import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../core/entities";
 import {
   appActions,
   appReducer,
@@ -11,6 +11,10 @@ import {
 
 export function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
+}
+
+export function asCatalogItemId(value: string): CatalogItemId {
+  return value as CatalogItemId;
 }
 
 export function asSpliceId(value: string): SpliceId {
@@ -265,7 +269,7 @@ export function getPanelByHeading(name: string): HTMLElement {
 }
 
 type ScreenSwitchTarget = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
-type SubScreenSwitchTarget = "connector" | "splice" | "node" | "segment" | "wire";
+type SubScreenSwitchTarget = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
 
 function switchScreenWithMode(target: ScreenSwitchTarget, mode: "strict" | "drawerAware"): void {
   if (target === "settings") {
@@ -320,6 +324,7 @@ function switchScreenWithMode(target: ScreenSwitchTarget, mode: "strict" | "draw
 
 function switchSubScreenWithMode(target: SubScreenSwitchTarget, mode: "strict" | "drawerAware"): void {
   const labelBySubScreen = {
+    catalog: "Catalog",
     connector: "Connector",
     splice: "Splice",
     node: "Node",

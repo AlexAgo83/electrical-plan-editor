@@ -31,6 +31,10 @@ function hasDuplicateNetworkTechnicalId(
 
 function cloneScopedState(scoped: NetworkScopedState): NetworkScopedState {
   return {
+    catalogItems: {
+      byId: { ...scoped.catalogItems.byId },
+      allIds: [...scoped.catalogItems.allIds]
+    },
     connectors: {
       byId: { ...scoped.connectors.byId },
       allIds: [...scoped.connectors.allIds]

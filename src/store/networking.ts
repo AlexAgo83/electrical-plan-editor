@@ -14,6 +14,7 @@ function cloneEntityState<T, Id extends string>(state: { byId: Record<Id, T>; al
 export function extractScopedState(state: AppState): NetworkScopedState {
   const existingScoped = state.activeNetworkId === null ? undefined : state.networkStates[state.activeNetworkId];
   return {
+    catalogItems: cloneEntityState(state.catalogItems),
     connectors: cloneEntityState(state.connectors),
     splices: cloneEntityState(state.splices),
     nodes: cloneEntityState(state.nodes),
@@ -29,6 +30,7 @@ export function extractScopedState(state: AppState): NetworkScopedState {
 export function assignScopedState(state: AppState, scoped: NetworkScopedState): AppState {
   return {
     ...state,
+    catalogItems: scoped.catalogItems,
     connectors: scoped.connectors,
     splices: scoped.splices,
     nodes: scoped.nodes,
@@ -72,6 +74,7 @@ export function loadNetworkIntoActiveScope(state: AppState, networkId: NetworkId
 export function clearActiveScope(state: AppState): AppState {
   return {
     ...state,
+    catalogItems: { byId: {} as AppState["catalogItems"]["byId"], allIds: [] },
     connectors: { byId: {} as AppState["connectors"]["byId"], allIds: [] },
     splices: { byId: {} as AppState["splices"]["byId"], allIds: [] },
     nodes: { byId: {} as AppState["nodes"]["byId"], allIds: [] },

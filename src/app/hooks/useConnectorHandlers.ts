@@ -1,12 +1,9 @@
 import type { FormEvent } from "react";
-import type { Connector, ConnectorId } from "../../core/entities";
+import type { CatalogItemId, Connector, ConnectorId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
-import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
-import {
-  suggestAutoConnectorNodeId,
-  suggestNextConnectorTechnicalId
-} from "../lib/technical-id-suggestions";
+import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
+import { suggestAutoConnectorNodeId, suggestNextConnectorTechnicalId } from "../lib/technical-id-suggestions";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -26,6 +23,8 @@ interface UseConnectorHandlersParams {
   setConnectorName: (value: string) => void;
   connectorTechnicalId: string;
   setConnectorTechnicalId: (value: string) => void;
+  connectorCatalogItemId: string;
+  setConnectorCatalogItemId: (value: string) => void;
   connectorManufacturerReference: string;
   setConnectorManufacturerReference: (value: string) => void;
   connectorAutoCreateLinkedNode: boolean;
@@ -39,6 +38,10 @@ interface UseConnectorHandlersParams {
   connectorOccupantRefInput: string;
 }
 
+function toCatalogItemId(raw: string): CatalogItemId | null {
+  return raw.trim().length === 0 ? null : (raw as CatalogItemId);
+}
+
 export function useConnectorHandlers({
   store,
   dispatchAction,
@@ -50,29 +53,62 @@ export function useConnectorHandlers({
   setConnectorName,
   connectorTechnicalId,
   setConnectorTechnicalId,
-  connectorManufacturerReference,
+  connectorCatalogItemId,
+  setConnectorCatalogItemId,
+  connectorManufacturerReference: _connectorManufacturerReference,
   setConnectorManufacturerReference,
   connectorAutoCreateLinkedNode,
   setConnectorAutoCreateLinkedNode,
   defaultAutoCreateLinkedNodes,
-  cavityCount,
+  cavityCount: _cavityCount,
   setCavityCount,
   setConnectorFormError,
   selectedConnectorId,
   cavityIndexInput,
   connectorOccupantRefInput
 }: UseConnectorHandlersParams) {
+  void _connectorManufacturerReference;
+  void _cavityCount;
+
+  function syncDerivedConnectorCatalogFields(nextCatalogItemId: string): void {
+    setConnectorCatalogItemId(nextCatalogItemId);
+    const catalogItem = store.getState().catalogItems.byId[nextCatalogItemId as CatalogItemId];
+    if (catalogItem === undefined) {
+      setConnectorManufacturerReference("");
+      return;
+    }
+    setConnectorManufacturerReference(catalogItem.manufacturerReference);
+    setCavityCount(String(catalogItem.connectionCount));
+  }
+
   function resetConnectorForm(): void {
     const state = store.getState();
+    const firstCatalogItem = state.catalogItems.allIds
+      .map((catalogItemId) => state.catalogItems.byId[catalogItemId])
+      .find((item): item is NonNullable<typeof item> => item !== undefined);
+    if (firstCatalogItem === undefined) {
+      setConnectorFormMode("create");
+      setEditingConnectorId(null);
+      setConnectorName("");
+      setConnectorTechnicalId(
+        suggestNextConnectorTechnicalId(Object.values(state.connectors.byId).map((connector) => connector.technicalId))
+      );
+      setConnectorCatalogItemId("");
+      setConnectorManufacturerReference("");
+      setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
+      setCavityCount("4");
+      setConnectorFormError("Create a catalog item first to define manufacturer reference and connection count.");
+      return;
+    }
+
     setConnectorFormMode("create");
     setEditingConnectorId(null);
     setConnectorName("");
     setConnectorTechnicalId(
       suggestNextConnectorTechnicalId(Object.values(state.connectors.byId).map((connector) => connector.technicalId))
     );
-    setConnectorManufacturerReference("");
+    syncDerivedConnectorCatalogFields(firstCatalogItem.id);
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
-    setCavityCount("4");
     setConnectorFormError(null);
   }
 
@@ -81,6 +117,7 @@ export function useConnectorHandlers({
     setEditingConnectorId(null);
     setConnectorName("");
     setConnectorTechnicalId("");
+    setConnectorCatalogItemId("");
     setConnectorManufacturerReference("");
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setCavityCount("4");
@@ -97,9 +134,15 @@ export function useConnectorHandlers({
     setEditingConnectorId(connector.id);
     setConnectorName(connector.name);
     setConnectorTechnicalId(connector.technicalId);
-    setConnectorManufacturerReference(connector.manufacturerReference ?? "");
+    if (connector.catalogItemId !== undefined && store.getState().catalogItems.byId[connector.catalogItemId] !== undefined) {
+      syncDerivedConnectorCatalogFields(connector.catalogItemId);
+    } else {
+      setConnectorCatalogItemId("");
+      setConnectorManufacturerReference(connector.manufacturerReference ?? "");
+      setCavityCount(String(connector.cavityCount));
+    }
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
-    setCavityCount(String(connector.cavityCount));
+    setConnectorFormError(null);
     dispatchAction(appActions.select({ kind: "connector", id: connector.id }));
   }
 
@@ -108,13 +151,16 @@ export function useConnectorHandlers({
 
     const trimmedName = connectorName.trim();
     const trimmedTechnicalId = connectorTechnicalId.trim();
-    const normalizedManufacturerReferenceRaw = connectorManufacturerReference.trim();
-    if (normalizedManufacturerReferenceRaw.length > 120) {
-      setConnectorFormError("Manufacturer reference must be 120 characters or fewer.");
+    const selectedCatalogItemId = toCatalogItemId(connectorCatalogItemId);
+    const selectedCatalogItem =
+      selectedCatalogItemId === null ? undefined : store.getState().catalogItems.byId[selectedCatalogItemId];
+
+    if (selectedCatalogItem === undefined) {
+      setConnectorFormError("Select a catalog item first.");
       return;
     }
-    const normalizedCavityCount = toPositiveInteger(cavityCount);
 
+    const normalizedCavityCount = selectedCatalogItem.connectionCount;
     if (trimmedName.length === 0 || trimmedTechnicalId.length === 0 || normalizedCavityCount < 1) {
       setConnectorFormError("All fields are required and way count must be >= 1.");
       return;
@@ -135,8 +181,8 @@ export function useConnectorHandlers({
         id: connectorId,
         name: trimmedName,
         technicalId: trimmedTechnicalId,
-        manufacturerReference:
-          normalizedManufacturerReferenceRaw.length === 0 ? undefined : normalizedManufacturerReferenceRaw,
+        catalogItemId: selectedCatalogItem.id,
+        manufacturerReference: selectedCatalogItem.manufacturerReference,
         cavityCount: normalizedCavityCount
       })
     );
@@ -196,7 +242,7 @@ export function useConnectorHandlers({
       return;
     }
 
-    const cavityIndex = toPositiveInteger(cavityIndexInput);
+    const cavityIndex = Math.max(0, Math.trunc(Number(cavityIndexInput)));
     dispatchAction(appActions.occupyConnectorCavity(selectedConnectorId, cavityIndex, connectorOccupantRefInput));
   }
 
@@ -216,6 +262,7 @@ export function useConnectorHandlers({
     handleConnectorSubmit,
     handleConnectorDelete,
     handleReserveCavity,
-    handleReleaseCavity
+    handleReleaseCavity,
+    syncDerivedConnectorCatalogFields
   };
 }

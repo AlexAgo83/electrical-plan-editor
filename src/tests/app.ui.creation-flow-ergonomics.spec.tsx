@@ -1,7 +1,8 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { createInitialState } from "../store";
+import { appActions, appReducer, createInitialState } from "../store";
 import {
+  asCatalogItemId,
   createUiIntegrationDenseWiresState,
   createUiIntegrationState,
   getPanelByHeading,
@@ -11,13 +12,22 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - creation flow ergonomics", () => {
+  function createInitialStateWithCatalog() {
+    const withPrimaryCatalog = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({ id: asCatalogItemId("CAT-4"), manufacturerReference: "CAT-REF-4", connectionCount: 4 })
+    );
+    return appReducer(
+      withPrimaryCatalog,
+      appActions.upsertCatalogItem({ id: asCatalogItemId("CAT-2"), manufacturerReference: "CAT-REF-2", connectionCount: 2 })
+    );
+  }
+
   function clickNewFromPanel(panelHeading: "Connectors" | "Splices" | "Nodes" | "Segments" | "Wires"): void {
     fireEvent.click(within(getPanelByHeading(panelHeading)).getByRole("button", { name: "New" }));
   }
 
-  beforeEach(() => {
-    localStorage.clear();
-  });
+  beforeEach(() => localStorage.clear());
 
   it("prefills IDs in create mode for connectors, splices, nodes, segments, and wires without overwriting manual edits", () => {
     renderAppWithState(createInitialState());
@@ -57,7 +67,7 @@ describe("App integration UI - creation flow ergonomics", () => {
   }, 10_000);
 
   it("focuses the created connector row and switches the form to edit mode after creation", async () => {
-    renderAppWithState(createInitialState());
+    renderAppWithState(createInitialStateWithCatalog());
     switchScreenDrawerAware("modeling");
 
     clickNewFromPanel("Connectors");
@@ -67,9 +77,6 @@ describe("App integration UI - creation flow ergonomics", () => {
     });
     fireEvent.change(within(connectorFormPanel).getByLabelText("Technical ID"), {
       target: { value: "C-FOCUS-1" }
-    });
-    fireEvent.change(within(connectorFormPanel).getByLabelText("Way count"), {
-      target: { value: "3" }
     });
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
 
@@ -85,7 +92,7 @@ describe("App integration UI - creation flow ergonomics", () => {
   });
 
   it("auto-creates linked connector and splice nodes when creating entities", () => {
-    renderAppWithState(createInitialState());
+    renderAppWithState(createInitialStateWithCatalog());
     switchScreenDrawerAware("modeling");
 
     clickNewFromPanel("Connectors");
@@ -93,9 +100,10 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
       target: { value: "Auto node connector" }
     });
-    fireEvent.change(within(connectorFormPanel).getByLabelText("Way count"), {
-      target: { value: "2" }
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Catalog item (manufacturer reference)"), {
+      target: { value: "CAT-2" }
     });
+    expect(within(connectorFormPanel).getByLabelText("Way count (from catalog)")).toHaveValue(2);
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
 
     switchSubScreenDrawerAware("splice");
@@ -104,9 +112,10 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.change(within(spliceFormPanel).getByLabelText("Functional name"), {
       target: { value: "Auto node splice" }
     });
-    fireEvent.change(within(spliceFormPanel).getByLabelText("Port count"), {
-      target: { value: "2" }
+    fireEvent.change(within(spliceFormPanel).getByLabelText("Catalog item (manufacturer reference)"), {
+      target: { value: "CAT-2" }
     });
+    expect(within(spliceFormPanel).getByLabelText("Port count (from catalog)")).toHaveValue(2);
     fireEvent.click(within(spliceFormPanel).getByRole("button", { name: "Create" }));
 
     switchSubScreenDrawerAware("node");
@@ -142,8 +151,8 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(within(nodesPanel).queryByText(/Manual node splice/)).not.toBeInTheDocument();
   });
 
-  it("supports optional manufacturer references on connector and splice forms with trim and clear flows", () => {
-    const { store } = renderAppWithState(createInitialState());
+  it("uses catalog selector for connector and splice forms and updates derived manufacturer references/counts", () => {
+    const { store } = renderAppWithState(createInitialStateWithCatalog());
     switchScreenDrawerAware("modeling");
 
     clickNewFromPanel("Connectors");
@@ -154,9 +163,12 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.change(within(createConnectorPanel).getByLabelText("Technical ID"), {
       target: { value: "C-REF-1" }
     });
-    fireEvent.change(within(createConnectorPanel).getByLabelText("Manufacturer reference"), {
-      target: { value: "  TE-1-967616-1  " }
+    expect(within(createConnectorPanel).queryByLabelText("Manufacturer reference")).not.toBeInTheDocument();
+    fireEvent.change(within(createConnectorPanel).getByLabelText("Catalog item (manufacturer reference)"), {
+      target: { value: "CAT-2" }
     });
+    expect(within(createConnectorPanel).getByLabelText("Way count (from catalog)")).toHaveValue(2);
+    expect(within(createConnectorPanel).getByText("Manufacturer reference: CAT-REF-2")).toBeInTheDocument();
     fireEvent.click(within(createConnectorPanel).getByRole("button", { name: "Create" }));
 
     let state = store.getState();
@@ -165,18 +177,25 @@ describe("App integration UI - creation flow ergonomics", () => {
     if (connectorId === undefined) {
       throw new Error("Expected created connector C-REF-1.");
     }
-    expect(state.connectors.byId[connectorId]?.manufacturerReference).toBe("TE-1-967616-1");
+    expect(state.connectors.byId[connectorId]?.manufacturerReference).toBe("CAT-REF-2");
+    expect(state.connectors.byId[connectorId]?.catalogItemId).toBe("CAT-2");
+    expect(state.connectors.byId[connectorId]?.cavityCount).toBe(2);
     let inspectorPanel = getPanelByHeading("Inspector context");
     expect(within(inspectorPanel).getByText("Manufacturer reference")).toBeInTheDocument();
-    expect(within(inspectorPanel).getByText("TE-1-967616-1")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("CAT-REF-2")).toBeInTheDocument();
 
     const editConnectorPanel = getPanelByHeading("Edit Connector");
-    fireEvent.change(within(editConnectorPanel).getByLabelText("Manufacturer reference"), { target: { value: "   " } });
+    fireEvent.change(within(editConnectorPanel).getByLabelText("Catalog item (manufacturer reference)"), {
+      target: { value: "CAT-4" }
+    });
+    expect(within(editConnectorPanel).getByLabelText("Way count (from catalog)")).toHaveValue(4);
     fireEvent.click(within(editConnectorPanel).getByRole("button", { name: "Save" }));
     state = store.getState();
-    expect(state.connectors.byId[connectorId]?.manufacturerReference).toBeUndefined();
+    expect(state.connectors.byId[connectorId]?.manufacturerReference).toBe("CAT-REF-4");
+    expect(state.connectors.byId[connectorId]?.catalogItemId).toBe("CAT-4");
+    expect(state.connectors.byId[connectorId]?.cavityCount).toBe(4);
     inspectorPanel = getPanelByHeading("Inspector context");
-    expect(within(inspectorPanel).queryByText("TE-1-967616-1")).not.toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("CAT-REF-4")).toBeInTheDocument();
 
     switchSubScreenDrawerAware("splice");
     clickNewFromPanel("Splices");
@@ -187,9 +206,12 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.change(within(createSplicePanel).getByLabelText("Technical ID"), {
       target: { value: "S-REF-1" }
     });
-    fireEvent.change(within(createSplicePanel).getByLabelText("Manufacturer reference"), {
-      target: { value: "  AMP/SEAL-42  " }
+    expect(within(createSplicePanel).queryByLabelText("Manufacturer reference")).not.toBeInTheDocument();
+    fireEvent.change(within(createSplicePanel).getByLabelText("Catalog item (manufacturer reference)"), {
+      target: { value: "CAT-2" }
     });
+    expect(within(createSplicePanel).getByLabelText("Port count (from catalog)")).toHaveValue(2);
+    expect(within(createSplicePanel).getByText("Manufacturer reference: CAT-REF-2")).toBeInTheDocument();
     fireEvent.click(within(createSplicePanel).getByRole("button", { name: "Create" }));
 
     state = store.getState();
@@ -198,17 +220,24 @@ describe("App integration UI - creation flow ergonomics", () => {
     if (spliceId === undefined) {
       throw new Error("Expected created splice S-REF-1.");
     }
-    expect(state.splices.byId[spliceId]?.manufacturerReference).toBe("AMP/SEAL-42");
+    expect(state.splices.byId[spliceId]?.manufacturerReference).toBe("CAT-REF-2");
+    expect(state.splices.byId[spliceId]?.catalogItemId).toBe("CAT-2");
+    expect(state.splices.byId[spliceId]?.portCount).toBe(2);
     inspectorPanel = getPanelByHeading("Inspector context");
     expect(within(inspectorPanel).getByText("Manufacturer reference")).toBeInTheDocument();
-    expect(within(inspectorPanel).getByText("AMP/SEAL-42")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("CAT-REF-2")).toBeInTheDocument();
 
     const editSplicePanel = getPanelByHeading("Edit Splice");
-    fireEvent.change(within(editSplicePanel).getByLabelText("Manufacturer reference"), { target: { value: " " } });
+    fireEvent.change(within(editSplicePanel).getByLabelText("Catalog item (manufacturer reference)"), {
+      target: { value: "CAT-4" }
+    });
+    expect(within(editSplicePanel).getByLabelText("Port count (from catalog)")).toHaveValue(4);
     fireEvent.click(within(editSplicePanel).getByRole("button", { name: "Save" }));
-    expect(store.getState().splices.byId[spliceId]?.manufacturerReference).toBeUndefined();
+    expect(store.getState().splices.byId[spliceId]?.manufacturerReference).toBe("CAT-REF-4");
+    expect(store.getState().splices.byId[spliceId]?.catalogItemId).toBe("CAT-4");
+    expect(store.getState().splices.byId[spliceId]?.portCount).toBe(4);
     inspectorPanel = getPanelByHeading("Inspector context");
-    expect(within(inspectorPanel).queryByText("AMP/SEAL-42")).not.toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("CAT-REF-4")).toBeInTheDocument();
   });
 
   it("allows editing a node ID in edit mode and saves the renamed node", () => {

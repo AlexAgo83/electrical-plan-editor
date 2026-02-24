@@ -21,6 +21,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setConnectorName: Parameters<typeof useConnectorHandlers>[0]["setConnectorName"];
   connectorTechnicalId: Parameters<typeof useConnectorHandlers>[0]["connectorTechnicalId"];
   setConnectorTechnicalId: Parameters<typeof useConnectorHandlers>[0]["setConnectorTechnicalId"];
+  connectorCatalogItemId: Parameters<typeof useConnectorHandlers>[0]["connectorCatalogItemId"];
+  setConnectorCatalogItemId: Parameters<typeof useConnectorHandlers>[0]["setConnectorCatalogItemId"];
   connectorManufacturerReference: Parameters<typeof useConnectorHandlers>[0]["connectorManufacturerReference"];
   setConnectorManufacturerReference: Parameters<typeof useConnectorHandlers>[0]["setConnectorManufacturerReference"];
   connectorAutoCreateLinkedNode: Parameters<typeof useConnectorHandlers>[0]["connectorAutoCreateLinkedNode"];
@@ -38,6 +40,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setSpliceName: Parameters<typeof useSpliceHandlers>[0]["setSpliceName"];
   spliceTechnicalId: Parameters<typeof useSpliceHandlers>[0]["spliceTechnicalId"];
   setSpliceTechnicalId: Parameters<typeof useSpliceHandlers>[0]["setSpliceTechnicalId"];
+  spliceCatalogItemId: Parameters<typeof useSpliceHandlers>[0]["spliceCatalogItemId"];
+  setSpliceCatalogItemId: Parameters<typeof useSpliceHandlers>[0]["setSpliceCatalogItemId"];
   spliceManufacturerReference: Parameters<typeof useSpliceHandlers>[0]["spliceManufacturerReference"];
   setSpliceManufacturerReference: Parameters<typeof useSpliceHandlers>[0]["setSpliceManufacturerReference"];
   spliceAutoCreateLinkedNode: Parameters<typeof useSpliceHandlers>[0]["spliceAutoCreateLinkedNode"];
@@ -148,6 +152,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setConnectorName,
   connectorTechnicalId,
   setConnectorTechnicalId,
+  connectorCatalogItemId,
+  setConnectorCatalogItemId,
   connectorManufacturerReference,
   setConnectorManufacturerReference,
   connectorAutoCreateLinkedNode,
@@ -165,6 +171,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setSpliceName,
   spliceTechnicalId,
   setSpliceTechnicalId,
+  spliceCatalogItemId,
+  setSpliceCatalogItemId,
   spliceManufacturerReference,
   setSpliceManufacturerReference,
   spliceAutoCreateLinkedNode,
@@ -273,6 +281,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     setConnectorName,
     connectorTechnicalId,
     setConnectorTechnicalId,
+    connectorCatalogItemId,
+    setConnectorCatalogItemId,
     connectorManufacturerReference,
     setConnectorManufacturerReference,
     connectorAutoCreateLinkedNode,
@@ -297,6 +307,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     setSpliceName,
     spliceTechnicalId,
     setSpliceTechnicalId,
+    spliceCatalogItemId,
+    setSpliceCatalogItemId,
     spliceManufacturerReference,
     setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode,

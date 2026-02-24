@@ -1,6 +1,6 @@
 import type { SubScreenId } from "../types/app-controller";
 
-export type OnboardingStepId = "networkScope" | "connectorSpliceLibrary" | "nodes" | "segments" | "wires";
+export type OnboardingStepId = "networkScope" | "catalog" | "connectorSpliceLibrary" | "nodes" | "segments" | "wires";
 export type OnboardingModalMode = "full" | "single";
 
 export interface OnboardingStepDescriptionPart {
@@ -42,6 +42,23 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
     }
   },
   {
+    id: "catalog",
+    title: "Create catalog items first",
+    badge: "CAT",
+    badgeIconClass: "is-catalog",
+    description: [
+      { text: "Create " },
+      { text: "catalog items", strong: true },
+      { text: " first to define reusable manufacturer references and connection counts before creating connectors or splices. Connector/splice forms then reuse the selected catalog item." }
+    ],
+    target: {
+      screen: "modeling",
+      subScreen: "catalog",
+      panelSelector: '[data-onboarding-panel="modeling-catalog"]',
+      panelLabel: "Catalog"
+    }
+  },
+  {
     id: "connectorSpliceLibrary",
     title: "Build the connectors and splices library",
     badge: "LIB",
@@ -51,7 +68,9 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
       { text: "connectors", strong: true },
       { text: ", " },
       { text: "splices", strong: true },
-      { text: ", manufacturer references, and available ways/ports before placing them in the network. Create forms can also auto-create linked nodes." }
+      { text: " from " },
+      { text: "catalog items", strong: true },
+      { text: " before placing them in the network. Create forms can also auto-create linked nodes." }
     ],
     target: {
       screen: "modeling",

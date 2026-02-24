@@ -24,7 +24,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
     Pick<AnalysisSliceParams, "isConnectorSubScreen" | "isSpliceSubScreen" | "isNodeSubScreen" | "isSegmentSubScreen" | "isWireSubScreen">;
   entities: Pick<
     ModelingSliceParams,
-    "connectors" | "splices" | "nodes" | "segments" | "wires"
+    "catalogItems" | "connectors" | "splices" | "nodes" | "segments" | "wires"
   >;
   formsState: AppControllerFormsStateFlat;
   modelingHandlers: AppControllerModelingHandlersOrchestrator;
@@ -116,8 +116,10 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   onSelectWire: AnalysisSliceParams["onSelectWire"];
   includeModelingContent: boolean;
   includeAnalysisContent: boolean;
+  openCatalogSubScreen: () => void;
   markSelectionPanelsFromTable?: () => void;
   onboardingHelp?: {
+    openCatalogStep: () => void;
     openConnectorStep: () => void;
     openSpliceStep: () => void;
     openNodeStep: () => void;
@@ -149,6 +151,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   onSelectWire,
   includeModelingContent,
   includeAnalysisContent,
+  openCatalogSubScreen,
   markSelectionPanelsFromTable,
   onboardingHelp
 }: UseAppControllerModelingAnalysisScreenDomainsParams) {
@@ -157,6 +160,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     ModelingPrimaryTablesComponent: components.ModelingPrimaryTablesComponent,
     ModelingSecondaryTablesComponent: components.ModelingSecondaryTablesComponent,
     ModelingFormsColumnComponent: components.ModelingFormsColumnComponent,
+    catalogItems: entities.catalogItems,
+    openCatalogSubScreen,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     connectorFormMode: formsState.connectorFormMode,
     resetConnectorForm: modelingHandlers.connector.resetConnectorForm,
@@ -271,6 +276,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setConnectorName: formsState.setConnectorName,
     connectorTechnicalId: formsState.connectorTechnicalId,
     setConnectorTechnicalId: formsState.setConnectorTechnicalId,
+    connectorCatalogItemId: formsState.connectorCatalogItemId,
+    setConnectorCatalogItemId:
+      modelingHandlers.connector.syncDerivedConnectorCatalogFields ?? formsState.setConnectorCatalogItemId,
     connectorManufacturerReference: formsState.connectorManufacturerReference,
     setConnectorManufacturerReference: formsState.setConnectorManufacturerReference,
     connectorAutoCreateLinkedNode: formsState.connectorAutoCreateLinkedNode,
@@ -285,6 +293,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setSpliceName: formsState.setSpliceName,
     spliceTechnicalId: formsState.spliceTechnicalId,
     setSpliceTechnicalId: formsState.setSpliceTechnicalId,
+    spliceCatalogItemId: formsState.spliceCatalogItemId,
+    setSpliceCatalogItemId:
+      modelingHandlers.splice.syncDerivedSpliceCatalogFields ?? formsState.setSpliceCatalogItemId,
     spliceManufacturerReference: formsState.spliceManufacturerReference,
     setSpliceManufacturerReference: formsState.setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode: formsState.spliceAutoCreateLinkedNode,

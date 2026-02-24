@@ -1,7 +1,7 @@
 import { useEffect, type MutableRefObject } from "react";
 
 type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
-type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
+type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
 
 function isEditableElement(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) {
@@ -76,17 +76,19 @@ export function useKeyboardShortcuts({
 
       if (event.shiftKey) {
         const subScreenByKey: Record<string, SubScreenId | undefined> = {
-          "1": "connector",
-          "2": "splice",
-          "3": "node",
-          "4": "segment",
-          "5": "wire"
+          "1": "catalog",
+          "2": "connector",
+          "3": "splice",
+          "4": "node",
+          "5": "segment",
+          "6": "wire"
         };
         const targetSubScreen = subScreenByKey[normalizedKey];
         if (targetSubScreen !== undefined) {
           event.preventDefault();
           const nextScreenForSubScreen =
-            activeScreenRef.current === "analysis" && (targetSubScreen === "node" || targetSubScreen === "segment")
+            activeScreenRef.current === "analysis" &&
+            (targetSubScreen === "catalog" || targetSubScreen === "node" || targetSubScreen === "segment")
               ? "modeling"
               : activeScreenRef.current === "analysis"
                 ? "analysis"

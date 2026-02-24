@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 
 type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
-type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
+type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
 
 interface WorkspaceNavigationProps {
   activeScreen: ScreenId;
@@ -36,6 +36,7 @@ export function WorkspaceNavigation({
     validation: "is-validation"
   };
   const subScreenIconClassById: Record<SubScreenId, string> = {
+    catalog: "is-catalog",
     connector: "is-connectors",
     splice: "is-splices",
     node: "is-nodes",
@@ -52,6 +53,7 @@ export function WorkspaceNavigation({
         ["wire", "Wire"]
       ] as const)
     : ([
+        ["catalog", "Catalog"],
         ["connector", "Connector"],
         ["splice", "Splice"],
         ["node", "Node"],

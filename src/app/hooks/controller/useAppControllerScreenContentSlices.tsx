@@ -405,6 +405,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     onOpenWireOnboardingHelp: params.onOpenWireOnboardingHelp
   } satisfies ModelingSecondaryTablesProps;
   const modelingFormsColumnProps = {
+    catalogItems: params.catalogItems,
+    openCatalogSubScreen: params.openCatalogSubScreen,
     isConnectorSubScreen: params.isConnectorSubScreen,
     connectorFormMode: params.connectorFormMode,
     openCreateConnectorForm: params.resetConnectorForm,
@@ -413,6 +415,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setConnectorName: params.setConnectorName,
     connectorTechnicalId: params.connectorTechnicalId,
     setConnectorTechnicalId: params.setConnectorTechnicalId,
+    connectorCatalogItemId: params.connectorCatalogItemId,
+    setConnectorCatalogItemId: params.setConnectorCatalogItemId,
     connectorManufacturerReference: params.connectorManufacturerReference,
     setConnectorManufacturerReference: params.setConnectorManufacturerReference,
     connectorAutoCreateLinkedNode: params.connectorAutoCreateLinkedNode,
@@ -430,6 +434,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setSpliceName: params.setSpliceName,
     spliceTechnicalId: params.spliceTechnicalId,
     setSpliceTechnicalId: params.setSpliceTechnicalId,
+    spliceCatalogItemId: params.spliceCatalogItemId,
+    setSpliceCatalogItemId: params.setSpliceCatalogItemId,
     spliceManufacturerReference: params.spliceManufacturerReference,
     setSpliceManufacturerReference: params.setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode: params.spliceAutoCreateLinkedNode,

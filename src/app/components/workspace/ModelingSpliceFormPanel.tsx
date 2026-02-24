@@ -12,16 +12,19 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     setSpliceName,
     spliceTechnicalId,
     setSpliceTechnicalId,
+    catalogItems,
+    openCatalogSubScreen,
+    spliceCatalogItemId,
+    setSpliceCatalogItemId,
     spliceManufacturerReference,
-    setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode,
     setSpliceAutoCreateLinkedNode,
     spliceTechnicalIdAlreadyUsed,
     portCount,
-    setPortCount,
     cancelSpliceEdit,
     spliceFormError
   } = props;
+  const hasCatalogItems = catalogItems.length > 0;
 
   return (
 <article className="panel" hidden={!isSpliceSubScreen}>
@@ -40,18 +43,37 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       <input value={spliceTechnicalId} onChange={(event) => setSpliceTechnicalId(event.target.value)} placeholder="S-001" required />
     </label>
     <label>
-      Manufacturer reference
-      <input
-        value={spliceManufacturerReference}
-        onChange={(event) => setSpliceManufacturerReference(event.target.value)}
-        placeholder="e.g. TE-1-967616-1"
-        maxLength={120}
-      />
+      Catalog item (manufacturer reference)
+      <select
+        value={spliceCatalogItemId}
+        onChange={(event) => setSpliceCatalogItemId(event.target.value)}
+        required
+        disabled={!hasCatalogItems}
+      >
+        <option value="">Select a catalog item</option>
+        {catalogItems.map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.manufacturerReference}
+          </option>
+        ))}
+      </select>
     </label>
+    {!hasCatalogItems ? (
+      <div className="row-actions compact">
+        <small className="inline-error">Create a catalog item first to define manufacturer reference and connection count.</small>
+        <button type="button" className="button-with-icon" onClick={openCatalogSubScreen}>
+          <span className="action-button-icon is-catalog" aria-hidden="true" />
+          Open Catalog
+        </button>
+      </div>
+    ) : null}
+    {spliceManufacturerReference.trim().length > 0 ? (
+      <small className="meta-line">Manufacturer reference: {spliceManufacturerReference}</small>
+    ) : null}
     {spliceTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
     <label>
-      Port count
-      <input type="number" min={1} step={1} value={portCount} onChange={(event) => setPortCount(event.target.value)} required />
+      Port count (from catalog)
+      <input type="number" min={1} step={1} value={portCount} readOnly required />
     </label>
     <label className="settings-checkbox">
       <input
@@ -66,7 +88,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       <button
         type="submit"
         className="button-with-icon"
-        disabled={spliceTechnicalIdAlreadyUsed}
+        disabled={spliceTechnicalIdAlreadyUsed || !hasCatalogItems || spliceCatalogItemId.trim().length === 0}
       >
         {spliceFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
         {spliceFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}

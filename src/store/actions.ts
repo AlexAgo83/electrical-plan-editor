@@ -1,6 +1,8 @@
 import type {
   Network,
   NetworkId,
+  CatalogItem,
+  CatalogItemId,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -61,6 +63,8 @@ export type AppAction =
         activateFirst?: boolean;
       };
     }
+  | { type: "catalog/upsert"; payload: CatalogItem }
+  | { type: "catalog/remove"; payload: { id: CatalogItemId } }
   | { type: "connector/upsert"; payload: Connector }
   | { type: "connector/remove"; payload: { id: ConnectorId } }
   | {
@@ -148,6 +152,9 @@ export const appActions = {
     type: "network/importMany",
     payload: { networks, networkStates, activateFirst }
   }),
+
+  upsertCatalogItem: (payload: CatalogItem): AppAction => ({ type: "catalog/upsert", payload }),
+  removeCatalogItem: (id: CatalogItemId): AppAction => ({ type: "catalog/remove", payload: { id } }),
 
   upsertConnector: (payload: Connector): AppAction => ({ type: "connector/upsert", payload }),
   removeConnector: (id: ConnectorId): AppAction => ({ type: "connector/remove", payload: { id } }),

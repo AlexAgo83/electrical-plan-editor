@@ -38,6 +38,19 @@ function normalizeManufacturerReference(value: string | undefined): string | und
   return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
 }
 
+function hasWireEndpointIndexOutOfRange(state: AppState, connectorId: string, cavityCount: number): boolean {
+  return state.wires.allIds.some((id) => {
+    const wire = state.wires.byId[id];
+    if (wire === undefined) {
+      return false;
+    }
+    return (
+      (wire.endpointA.kind === "connectorCavity" && wire.endpointA.connectorId === connectorId && wire.endpointA.cavityIndex > cavityCount) ||
+      (wire.endpointB.kind === "connectorCavity" && wire.endpointB.connectorId === connectorId && wire.endpointB.cavityIndex > cavityCount)
+    );
+  });
+}
+
 function hasConnectorNodeReference(state: AppState, connectorId: string): boolean {
   return state.nodes.allIds.some((id) => {
     const node = state.nodes.byId[id];
@@ -64,13 +77,22 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
     case "connector/upsert": {
       const normalizedName = action.payload.name.trim();
       const normalizedTechnicalId = action.payload.technicalId.trim();
-      const cavityCount = action.payload.cavityCount;
+      let cavityCount = action.payload.cavityCount;
       if (action.payload.id.trim().length === 0) {
         return withError(state, "Connector ID is required.");
       }
       if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
         return withError(state, "Connector name and technical ID are required.");
       }
+      const linkedCatalogItem =
+        action.payload.catalogItemId === undefined ? undefined : state.catalogItems.byId[action.payload.catalogItemId];
+      if (action.payload.catalogItemId !== undefined && linkedCatalogItem === undefined) {
+        return withError(state, "Connector catalog item is invalid.");
+      }
+      if (linkedCatalogItem !== undefined) {
+        cavityCount = linkedCatalogItem.connectionCount;
+      }
+
       if (!Number.isInteger(cavityCount) || cavityCount < 1) {
         return withError(state, "Connector wayCount must be an integer >= 1.");
       }
@@ -92,6 +114,9 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
           );
         }
       }
+      if (hasWireEndpointIndexOutOfRange(state, action.payload.id, cavityCount)) {
+        return withError(state, "Connector wayCount cannot be reduced below wire endpoint way indexes.");
+      }
 
       return bumpRevision({
         ...clearLastError(state),
@@ -99,7 +124,11 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
           ...action.payload,
           name: normalizedName,
           technicalId: normalizedTechnicalId,
-          manufacturerReference: normalizeManufacturerReference(action.payload.manufacturerReference)
+          cavityCount,
+          manufacturerReference:
+            linkedCatalogItem !== undefined
+              ? linkedCatalogItem.manufacturerReference
+              : normalizeManufacturerReference(action.payload.manufacturerReference)
         })
       });
     }

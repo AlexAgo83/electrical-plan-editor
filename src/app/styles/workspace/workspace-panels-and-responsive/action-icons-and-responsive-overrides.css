@@ -82,6 +82,11 @@
   mask: url("/icons/ico_home_start.svg") center / contain no-repeat;
 }
 
+.action-button-icon.is-catalog {
+  -webkit-mask: url("/icons/ico_catalog.svg") center / contain no-repeat;
+  mask: url("/icons/ico_catalog.svg") center / contain no-repeat;
+}
+
 .action-button-icon.is-connectors {
   -webkit-mask: url("/icons/ico_connectors.svg") center / contain no-repeat;
   mask: url("/icons/ico_connectors.svg") center / contain no-repeat;

@@ -1,11 +1,21 @@
 import { useState } from "react";
-import type { ConnectorId, NetworkNode, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
+import type { CatalogItemId, ConnectorId, NetworkNode, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
 
 export function useEntityFormsState() {
+  const [catalogFormMode, setCatalogFormMode] = useState<"idle" | "create" | "edit">("idle");
+  const [editingCatalogItemId, setEditingCatalogItemId] = useState<CatalogItemId | null>(null);
+  const [catalogManufacturerReference, setCatalogManufacturerReference] = useState("");
+  const [catalogConnectionCount, setCatalogConnectionCount] = useState("4");
+  const [catalogName, setCatalogName] = useState("");
+  const [catalogUnitPriceExclTax, setCatalogUnitPriceExclTax] = useState("");
+  const [catalogUrl, setCatalogUrl] = useState("");
+  const [catalogFormError, setCatalogFormError] = useState<string | null>(null);
+
   const [connectorFormMode, setConnectorFormMode] = useState<"idle" | "create" | "edit">("idle");
   const [editingConnectorId, setEditingConnectorId] = useState<ConnectorId | null>(null);
   const [connectorName, setConnectorName] = useState("");
   const [connectorTechnicalId, setConnectorTechnicalId] = useState("");
+  const [connectorCatalogItemId, setConnectorCatalogItemId] = useState("");
   const [connectorManufacturerReference, setConnectorManufacturerReference] = useState("");
   const [connectorAutoCreateLinkedNode, setConnectorAutoCreateLinkedNode] = useState(true);
   const [cavityCount, setCavityCount] = useState("4");
@@ -17,6 +27,7 @@ export function useEntityFormsState() {
   const [editingSpliceId, setEditingSpliceId] = useState<SpliceId | null>(null);
   const [spliceName, setSpliceName] = useState("");
   const [spliceTechnicalId, setSpliceTechnicalId] = useState("");
+  const [spliceCatalogItemId, setSpliceCatalogItemId] = useState("");
   const [spliceManufacturerReference, setSpliceManufacturerReference] = useState("");
   const [spliceAutoCreateLinkedNode, setSpliceAutoCreateLinkedNode] = useState(true);
   const [portCount, setPortCount] = useState("4");
@@ -69,6 +80,22 @@ export function useEntityFormsState() {
   const [wireFormError, setWireFormError] = useState<string | null>(null);
 
   return {
+    catalogFormMode,
+    setCatalogFormMode,
+    editingCatalogItemId,
+    setEditingCatalogItemId,
+    catalogManufacturerReference,
+    setCatalogManufacturerReference,
+    catalogConnectionCount,
+    setCatalogConnectionCount,
+    catalogName,
+    setCatalogName,
+    catalogUnitPriceExclTax,
+    setCatalogUnitPriceExclTax,
+    catalogUrl,
+    setCatalogUrl,
+    catalogFormError,
+    setCatalogFormError,
     connectorFormMode,
     setConnectorFormMode,
     editingConnectorId,
@@ -77,6 +104,8 @@ export function useEntityFormsState() {
     setConnectorName,
     connectorTechnicalId,
     setConnectorTechnicalId,
+    connectorCatalogItemId,
+    setConnectorCatalogItemId,
     connectorManufacturerReference,
     setConnectorManufacturerReference,
     connectorAutoCreateLinkedNode,
@@ -97,6 +126,8 @@ export function useEntityFormsState() {
     setSpliceName,
     spliceTechnicalId,
     setSpliceTechnicalId,
+    spliceCatalogItemId,
+    setSpliceCatalogItemId,
     spliceManufacturerReference,
     setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode,
