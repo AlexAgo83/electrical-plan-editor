@@ -1,4 +1,4 @@
-# Changelog (since `4edefdd2ce0abe96e25a25b8a4e7a98420fa02b1`, version `0.7.4`)
+# Changelog (since version `0.7.4` to version `0.8.1`)
 
 This changelog summarizes **product-visible changes** delivered after version `0.7.4`, up to the current state of the repository (now `0.8.1`).
 
