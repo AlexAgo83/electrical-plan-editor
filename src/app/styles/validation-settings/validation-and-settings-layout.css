@@ -115,6 +115,11 @@
   table-layout: fixed;
 }
 
+.validation-issues-table th,
+.validation-issues-table td {
+  vertical-align: middle;
+}
+
 .validation-col-severity {
   width: 8.25rem;
 }
