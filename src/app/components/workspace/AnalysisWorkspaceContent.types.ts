@@ -1,4 +1,4 @@
-import type { FormEvent, ReactElement } from "react";
+import type { FormEvent } from "react";
 import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, SegmentId, Splice, SpliceId, Wire, WireId } from "../../../core/entities";
 import type { ConnectorSynthesisRow, SegmentSubNetworkFilter, SortState, SpliceSynthesisRow } from "../../types/app-controller";
 
@@ -21,7 +21,6 @@ export interface AnalysisWorkspaceContentProps {
   isNodeSubScreen: boolean;
   isSegmentSubScreen: boolean;
   isWireSubScreen: boolean;
-  networkSummaryPanel: ReactElement;
   selectedConnector: Connector | null;
   selectedConnectorId: ConnectorId | null;
   connectorOccupancyFilter: "all" | "occupied" | "free";
