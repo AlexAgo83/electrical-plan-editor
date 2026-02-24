@@ -14,7 +14,7 @@ import type {
   WireId
 } from "../core/entities";
 import type { WireColorMode } from "../core/cableColors";
-import type { LayoutNodePosition, NetworkScopedState, SelectionState, ThemeMode } from "./types";
+import type { LayoutNodePosition, NetworkScopedState, NetworkSummaryViewState, SelectionState, ThemeMode } from "./types";
 
 export type AppAction =
   | {
@@ -25,6 +25,7 @@ export type AppAction =
       };
     }
   | { type: "network/select"; payload: { id: NetworkId } }
+  | { type: "network/setSummaryViewState"; payload: { id: NetworkId; viewState: NetworkSummaryViewState } }
   | {
       type: "network/rename";
       payload: {
@@ -116,6 +117,10 @@ export const appActions = {
     payload: { network, setActive }
   }),
   selectNetwork: (id: NetworkId): AppAction => ({ type: "network/select", payload: { id } }),
+  setNetworkSummaryViewState: (id: NetworkId, viewState: NetworkSummaryViewState): AppAction => ({
+    type: "network/setSummaryViewState",
+    payload: { id, viewState }
+  }),
   renameNetwork: (id: NetworkId, name: string, updatedAt: string, description?: string): AppAction => ({
     type: "network/rename",
     payload: { id, name, updatedAt, description }

@@ -1,5 +1,6 @@
-import { fireEvent, screen, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { NetworkId } from "../core/entities";
 import { appActions, appReducer } from "../store";
 import {
   asConnectorId,
@@ -12,6 +13,37 @@ import {
   switchScreenDrawerAware,
   switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
+
+function asNetworkId(value: string): NetworkId {
+  return value as NetworkId;
+}
+
+function getNetworkSummaryViewportTransform(panel: HTMLElement): string {
+  const networkSvg = within(panel).getByLabelText("2D network diagram");
+  const transformGroup = networkSvg.querySelector("g[transform]");
+  if (transformGroup === null) {
+    throw new Error("Viewport transform group not found.");
+  }
+  return transformGroup.getAttribute("transform") ?? "";
+}
+
+function getDisplayToggleButton(panel: HTMLElement, label: "Info" | "Length" | "Callouts" | "Grid" | "Snap" | "Lock"): HTMLButtonElement {
+  return within(panel).getByRole("button", { name: label });
+}
+
+function expectDisplayToggles(
+  panel: HTMLElement,
+  expected: Record<"Info" | "Length" | "Callouts" | "Grid" | "Snap" | "Lock", boolean>
+): void {
+  (Object.entries(expected) as Array<[keyof typeof expected, boolean]>).forEach(([label, isActive]) => {
+    const button = getDisplayToggleButton(panel, label);
+    if (isActive) {
+      expect(button).toHaveClass("is-active");
+    } else {
+      expect(button).not.toHaveClass("is-active");
+    }
+  });
+}
 
 describe("App integration UI - network summary workflow polish", () => {
   beforeEach(() => {
@@ -216,5 +248,195 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(calloutRows.length).toBeGreaterThanOrEqual(8);
     expect(networkSummaryPanel).toHaveTextContent("Wire 8");
     expect(networkSummaryPanel).toHaveTextContent("W-8");
+  });
+
+  it("persists network summary zoom/pan and display toggles across reload-equivalent rehydrate", async () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
+    const rectSpy = vi.spyOn(networkSvg, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({
+          x: 0,
+          y: 0,
+          top: 0,
+          left: 0,
+          width: 800,
+          height: 520,
+          right: 800,
+          bottom: 520,
+          toJSON: () => ({})
+        }) as DOMRect
+    );
+
+    const initialToggleState = {
+      Info: getDisplayToggleButton(networkSummaryPanel, "Info").classList.contains("is-active"),
+      Length: getDisplayToggleButton(networkSummaryPanel, "Length").classList.contains("is-active"),
+      Callouts: getDisplayToggleButton(networkSummaryPanel, "Callouts").classList.contains("is-active"),
+      Grid: getDisplayToggleButton(networkSummaryPanel, "Grid").classList.contains("is-active"),
+      Snap: getDisplayToggleButton(networkSummaryPanel, "Snap").classList.contains("is-active"),
+      Lock: getDisplayToggleButton(networkSummaryPanel, "Lock").classList.contains("is-active")
+    } as const;
+
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom +" }));
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom +" }));
+    fireEvent.mouseDown(networkSvg, { button: 0, shiftKey: true, clientX: 240, clientY: 180 });
+    fireEvent.mouseMove(networkSvg, { clientX: 360, clientY: 250 });
+    fireEvent.mouseUp(networkSvg, { clientX: 360, clientY: 250 });
+
+    (Object.keys(initialToggleState) as Array<keyof typeof initialToggleState>).forEach((label) => {
+      fireEvent.click(getDisplayToggleButton(networkSummaryPanel, label));
+    });
+
+    const activeNetworkId = firstRender.store.getState().activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network.");
+    }
+
+    await waitFor(() => {
+      const persisted = firstRender.store.getState().networkStates[activeNetworkId]?.networkSummaryViewState;
+      expect(persisted).toBeDefined();
+      expect(persisted?.offset.x ?? 0).not.toBe(0);
+      expect(persisted?.offset.y ?? 0).not.toBe(0);
+    });
+
+    const persistedViewState = firstRender.store.getState().networkStates[activeNetworkId]?.networkSummaryViewState;
+    expect(persistedViewState).toBeDefined();
+    if (persistedViewState === undefined) {
+      throw new Error("Expected persisted network summary view state.");
+    }
+    const expectedToggleState = {
+      Info: !initialToggleState.Info,
+      Length: !initialToggleState.Length,
+      Callouts: !initialToggleState.Callouts,
+      Grid: !initialToggleState.Grid,
+      Snap: !initialToggleState.Snap,
+      Lock: !initialToggleState.Lock
+    } as const;
+
+    rectSpy.mockRestore();
+    firstRender.unmount();
+
+    renderAppWithState(firstRender.store.getState());
+    switchScreenDrawerAware("modeling");
+
+    await waitFor(() => {
+      const rehydratedPanel = getPanelByHeading("Network summary");
+      expectDisplayToggles(rehydratedPanel, expectedToggleState);
+      expect(getNetworkSummaryViewportTransform(rehydratedPanel)).toBe(
+        `translate(${persistedViewState.offset.x} ${persistedViewState.offset.y}) scale(${persistedViewState.scale})`
+      );
+    });
+  });
+
+  it("restores independent network summary viewport and display toggles per network when switching active network", async () => {
+    const base = createUiIntegrationState();
+    const networkAId = base.activeNetworkId;
+    expect(networkAId).not.toBeNull();
+    if (networkAId === null) {
+      throw new Error("Expected active network.");
+    }
+
+    const withDuplicate = appReducer(
+      base,
+      appActions.duplicateNetwork(networkAId, {
+        id: asNetworkId("net-b"),
+        name: "Network B",
+        technicalId: "NET-B",
+        createdAt: "2026-02-24T10:00:00.000Z",
+        updatedAt: "2026-02-24T10:00:00.000Z"
+      })
+    );
+    const networkBId = asNetworkId("net-b");
+    const seeded = appReducer(withDuplicate, appActions.selectNetwork(networkAId));
+    const scopedA = seeded.networkStates[networkAId];
+    const scopedB = seeded.networkStates[networkBId];
+    expect(scopedA).toBeDefined();
+    expect(scopedB).toBeDefined();
+    if (scopedA === undefined || scopedB === undefined) {
+      throw new Error("Expected network scoped states for both networks.");
+    }
+
+    const seededState = {
+      ...seeded,
+      networkStates: {
+        ...seeded.networkStates,
+        [networkAId]: {
+          ...scopedA,
+          networkSummaryViewState: {
+            scale: 1.25,
+            offset: { x: 120, y: -40 },
+            showNetworkInfoPanels: false,
+            showSegmentLengths: true,
+            showCableCallouts: true,
+            showNetworkGrid: false,
+            snapNodesToGrid: false,
+            lockEntityMovement: true
+          }
+        },
+        [networkBId]: {
+          ...scopedB,
+          networkSummaryViewState: {
+            scale: 0.8,
+            offset: { x: -90, y: 75 },
+            showNetworkInfoPanels: true,
+            showSegmentLengths: false,
+            showCableCallouts: false,
+            showNetworkGrid: true,
+            snapNodesToGrid: true,
+            lockEntityMovement: false
+          }
+        }
+      }
+    };
+
+    const { store } = renderAppWithState(seededState);
+    switchScreenDrawerAware("modeling");
+
+    await waitFor(() => {
+      const panel = getPanelByHeading("Network summary");
+      expect(getNetworkSummaryViewportTransform(panel)).toBe("translate(120 -40) scale(1.25)");
+      expectDisplayToggles(panel, {
+        Info: false,
+        Length: true,
+        Callouts: true,
+        Grid: false,
+        Snap: false,
+        Lock: true
+      });
+    });
+
+    store.dispatch(appActions.selectNetwork(networkBId));
+
+    await waitFor(() => {
+      const panel = getPanelByHeading("Network summary");
+      expect(getNetworkSummaryViewportTransform(panel)).toBe("translate(-90 75) scale(0.8)");
+      expectDisplayToggles(panel, {
+        Info: true,
+        Length: false,
+        Callouts: false,
+        Grid: true,
+        Snap: true,
+        Lock: false
+      });
+    });
+
+    store.dispatch(appActions.selectNetwork(networkAId));
+
+    await waitFor(() => {
+      const panel = getPanelByHeading("Network summary");
+      expect(getNetworkSummaryViewportTransform(panel)).toBe("translate(120 -40) scale(1.25)");
+      expectDisplayToggles(panel, {
+        Info: false,
+        Length: true,
+        Callouts: true,
+        Grid: false,
+        Snap: false,
+        Lock: true
+      });
+    });
   });
 });

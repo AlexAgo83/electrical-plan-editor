@@ -1,5 +1,5 @@
 import type { NetworkId } from "../core/entities";
-import type { AppState, NetworkScopedState } from "./types";
+import { cloneNetworkSummaryViewState, type AppState, type NetworkScopedState } from "./types";
 
 function cloneEntityState<T, Id extends string>(state: { byId: Record<Id, T>; allIds: Id[] }): {
   byId: Record<Id, T>;
@@ -12,6 +12,7 @@ function cloneEntityState<T, Id extends string>(state: { byId: Record<Id, T>; al
 }
 
 export function extractScopedState(state: AppState): NetworkScopedState {
+  const existingScoped = state.activeNetworkId === null ? undefined : state.networkStates[state.activeNetworkId];
   return {
     connectors: cloneEntityState(state.connectors),
     splices: cloneEntityState(state.splices),
@@ -20,7 +21,8 @@ export function extractScopedState(state: AppState): NetworkScopedState {
     wires: cloneEntityState(state.wires),
     nodePositions: { ...state.nodePositions },
     connectorCavityOccupancy: { ...state.connectorCavityOccupancy },
-    splicePortOccupancy: { ...state.splicePortOccupancy }
+    splicePortOccupancy: { ...state.splicePortOccupancy },
+    networkSummaryViewState: cloneNetworkSummaryViewState(existingScoped?.networkSummaryViewState)
   };
 }
 

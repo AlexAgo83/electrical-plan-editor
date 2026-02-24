@@ -30,12 +30,12 @@ describe("App integration UI - lazy loading regression coverage", () => {
     expect(screen.getByRole("button", { name: "Settings" })).toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: "Loading workspace" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Settings" })).toBeInTheDocument();
-    expect(await screen.findByRole("heading", { name: "Start" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Quick start" })).toBeInTheDocument();
   });
 
   it("shows workspace fallback for a lazily loaded screen switch without blanking shell chrome", async () => {
     renderAppWithState(createUiIntegrationState());
-    expect(await screen.findByRole("heading", { name: "Start" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Quick start" })).toBeInTheDocument();
 
     setAppUiModulesLoadingModeForTests("lazy");
     setAppUiModulesLazyImportDelayForTests(25);

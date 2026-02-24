@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   createUiIntegrationState,
   renderAppWithState,
+  switchScreenDrawerAware,
   switchSubScreenDrawerAware,
   switchSubScreenStrict,
   withViewportWidth
@@ -167,7 +168,7 @@ describe("App integration UI - workspace shell regression", () => {
   it("keeps the drawer open on Modeling click even when a selection already exists", () => {
     renderAppWithState(createUiIntegrationState());
 
-    fireEvent.click(screen.getByRole("button", { name: /Modeling/i }));
+    switchScreenDrawerAware("modeling");
     const connectorsPanel = screen.getByRole("heading", { name: "Connectors" }).closest(".panel");
     expect(connectorsPanel).not.toBeNull();
     fireEvent.click(within(connectorsPanel as HTMLElement).getByText("Connector 1"));
@@ -245,7 +246,7 @@ describe("App integration UI - workspace shell regression", () => {
   it("hides form and analysis columns when switching to another sub-screen without matching table selection", () => {
     renderAppWithState(createUiIntegrationState());
 
-    fireEvent.click(screen.getByRole("button", { name: /Modeling/i }));
+    switchScreenDrawerAware("modeling");
     const connectorsPanel = screen.getByRole("heading", { name: "Connectors" }).closest(".panel");
     expect(connectorsPanel).not.toBeNull();
     fireEvent.click(within(connectorsPanel as HTMLElement).getByText("Connector 1"));
