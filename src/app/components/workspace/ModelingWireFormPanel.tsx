@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG } from "../../../core/cableColors";
+import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG, MAX_FREE_WIRE_COLOR_LABEL_LENGTH } from "../../../core/cableColors";
 import type { WireEndpoint } from "../../../core/entities";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
@@ -16,10 +16,14 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireTechnicalId,
     wireSectionMm2,
     setWireSectionMm2,
+    wireColorMode,
+    setWireColorMode,
     wirePrimaryColorId,
     setWirePrimaryColorId,
     wireSecondaryColorId,
     setWireSecondaryColorId,
+    wireFreeColorLabel,
+    setWireFreeColorLabel,
     wireTechnicalIdAlreadyUsed,
     wireEndpointAConnectionReference,
     setWireEndpointAConnectionReference,
@@ -58,6 +62,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
   } = props;
   const primaryColor = wirePrimaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wirePrimaryColorId] : undefined;
   const secondaryColor = wireSecondaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wireSecondaryColorId] : undefined;
+  const isCatalogColorMode = wireColorMode === "catalog";
+  const isFreeColorMode = wireColorMode === "free";
 
   const swatch = (hex: string | undefined, label: string): ReactElement => (
     <span
@@ -103,6 +109,33 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       />
     </label>
     <label>
+      Color mode
+      <select
+        value={wireColorMode}
+        onChange={(event) => {
+          const nextMode = event.target.value as "none" | "catalog" | "free";
+          setWireColorMode(nextMode);
+        }}
+      >
+        <option value="none">No color</option>
+        <option value="catalog">Catalog color</option>
+        <option value="free">Free color</option>
+      </select>
+    </label>
+    {isFreeColorMode ? (
+      <label>
+        Free color label
+        <input
+          value={wireFreeColorLabel}
+          onChange={(event) => setWireFreeColorLabel(event.target.value)}
+          maxLength={MAX_FREE_WIRE_COLOR_LABEL_LENGTH}
+          placeholder="Beige/Brown mix"
+        />
+      </label>
+    ) : null}
+    {!isFreeColorMode ? (
+      <>
+    <label>
       Primary color
       <select
         value={wirePrimaryColorId}
@@ -113,6 +146,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             setWireSecondaryColorId("");
           }
         }}
+        disabled={!isCatalogColorMode}
       >
         <option value="">None</option>
         {CABLE_COLOR_CATALOG.map((color) => (
@@ -127,7 +161,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       <select
         value={wireSecondaryColorId}
         onChange={(event) => setWireSecondaryColorId(event.target.value)}
-        disabled={wirePrimaryColorId.length === 0}
+        disabled={!isCatalogColorMode || wirePrimaryColorId.length === 0}
       >
         <option value="">None</option>
         {CABLE_COLOR_CATALOG.map((color) => (
@@ -137,8 +171,28 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         ))}
       </select>
     </label>
+      </>
+    ) : null}
     <small className="inline-help">
-      {primaryColor === undefined ? (
+      {isFreeColorMode ? (
+        <>
+          <span
+            aria-hidden="true"
+            style={{
+              display: "inline-block",
+              minWidth: "2.2rem",
+              padding: "0.05rem 0.35rem",
+              borderRadius: "999px",
+              border: "1px solid var(--panel-border, rgba(255,255,255,0.2))",
+              marginRight: "0.35rem",
+              textAlign: "center"
+            }}
+          >
+            Free
+          </span>
+          {wireFreeColorLabel.trim().length === 0 ? "Enter a free color label" : wireFreeColorLabel.trim()}
+        </>
+      ) : primaryColor === undefined ? (
         <>No color</>
       ) : (
         <>

@@ -7,7 +7,11 @@ import type {
   WireEndpoint,
   WireId
 } from "../../core/entities";
-import { normalizeWireColorIds } from "../../core/cableColors";
+import {
+  MAX_FREE_WIRE_COLOR_LABEL_LENGTH,
+  normalizeFreeWireColorLabel,
+  normalizeWireColorState
+} from "../../core/cableColors";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { DEFAULT_WIRE_SECTION_MM2 } from "../../core/wireSection";
@@ -40,10 +44,14 @@ interface UseWireHandlersParams {
   setWireTechnicalId: (value: string) => void;
   wireSectionMm2: string;
   setWireSectionMm2: (value: string) => void;
+  wireColorMode: "none" | "catalog" | "free";
+  setWireColorMode: (value: "none" | "catalog" | "free") => void;
   wirePrimaryColorId: string;
   setWirePrimaryColorId: (value: string) => void;
   wireSecondaryColorId: string;
   setWireSecondaryColorId: (value: string) => void;
+  wireFreeColorLabel: string;
+  setWireFreeColorLabel: (value: string) => void;
   wireEndpointAConnectionReference: string;
   setWireEndpointAConnectionReference: (value: string) => void;
   wireEndpointASealReference: string;
@@ -97,10 +105,14 @@ export function useWireHandlers({
   setWireTechnicalId,
   wireSectionMm2,
   setWireSectionMm2,
+  wireColorMode,
+  setWireColorMode,
   wirePrimaryColorId,
   setWirePrimaryColorId,
   wireSecondaryColorId,
   setWireSecondaryColorId,
+  wireFreeColorLabel,
+  setWireFreeColorLabel,
   wireEndpointAConnectionReference,
   setWireEndpointAConnectionReference,
   wireEndpointASealReference,
@@ -386,8 +398,10 @@ export function useWireHandlers({
     setWireName("");
     setWireTechnicalId(suggestNextWireTechnicalId(Object.values(state.wires.byId).map((wire) => wire.technicalId)));
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
+    setWireColorMode("none");
     setWirePrimaryColorId("");
     setWireSecondaryColorId("");
+    setWireFreeColorLabel("");
     setWireEndpointAConnectionReference("");
     setWireEndpointASealReference("");
     setWireEndpointAKind("connectorCavity");
@@ -416,8 +430,10 @@ export function useWireHandlers({
     setWireName("");
     setWireTechnicalId("");
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
+    setWireColorMode("none");
     setWirePrimaryColorId("");
     setWireSecondaryColorId("");
+    setWireFreeColorLabel("");
     setWireEndpointAConnectionReference("");
     setWireEndpointASealReference("");
     setWireEndpointAKind("connectorCavity");
@@ -449,8 +465,23 @@ export function useWireHandlers({
     setWireName(wire.name);
     setWireTechnicalId(wire.technicalId);
     setWireSectionMm2(String(wire.sectionMm2));
-    setWirePrimaryColorId(wire.primaryColorId ?? "");
-    setWireSecondaryColorId(wire.secondaryColorId ?? "");
+    const normalizedFreeColorLabel = normalizeFreeWireColorLabel(wire.freeColorLabel);
+    if (normalizedFreeColorLabel !== null) {
+      setWireColorMode("free");
+      setWirePrimaryColorId("");
+      setWireSecondaryColorId("");
+      setWireFreeColorLabel(normalizedFreeColorLabel);
+    } else if ((wire.primaryColorId ?? "").length > 0) {
+      setWireColorMode("catalog");
+      setWirePrimaryColorId(wire.primaryColorId ?? "");
+      setWireSecondaryColorId(wire.secondaryColorId ?? "");
+      setWireFreeColorLabel("");
+    } else {
+      setWireColorMode("none");
+      setWirePrimaryColorId("");
+      setWireSecondaryColorId("");
+      setWireFreeColorLabel("");
+    }
     setWireEndpointAConnectionReference(wire.endpointAConnectionReference ?? "");
     setWireEndpointASealReference(wire.endpointASealReference ?? "");
     setWireEndpointBConnectionReference(wire.endpointBConnectionReference ?? "");
@@ -552,7 +583,21 @@ export function useWireHandlers({
       setWireFormError("Wire section must be a positive value in mm².");
       return;
     }
-    const normalizedColors = normalizeWireColorIds(wirePrimaryColorId, wireSecondaryColorId);
+    let normalizedColors = normalizeWireColorState(null, null, null);
+    if (wireColorMode === "catalog") {
+      normalizedColors = normalizeWireColorState(wirePrimaryColorId, wireSecondaryColorId, null);
+    } else if (wireColorMode === "free") {
+      const trimmedFreeColorLabel = wireFreeColorLabel.trim();
+      if (trimmedFreeColorLabel.length === 0) {
+        setWireFormError("Free color label is required in Free color mode.");
+        return;
+      }
+      if (trimmedFreeColorLabel.length > MAX_FREE_WIRE_COLOR_LABEL_LENGTH) {
+        setWireFormError(`Free color label must be ${MAX_FREE_WIRE_COLOR_LABEL_LENGTH} characters or fewer.`);
+        return;
+      }
+      normalizedColors = normalizeWireColorState(null, null, wireFreeColorLabel);
+    }
     const endpointAConnectionReference = normalizeWireEndpointReferenceInput(wireEndpointAConnectionReference);
     const endpointASealReference = normalizeWireEndpointReferenceInput(wireEndpointASealReference);
     const endpointBConnectionReference = normalizeWireEndpointReferenceInput(wireEndpointBConnectionReference);
@@ -585,6 +630,7 @@ export function useWireHandlers({
         sectionMm2: parsedSectionMm2,
         primaryColorId: normalizedColors.primaryColorId,
         secondaryColorId: normalizedColors.secondaryColorId,
+        freeColorLabel: normalizedColors.freeColorLabel,
         endpointAConnectionReference,
         endpointASealReference,
         endpointBConnectionReference,
@@ -651,6 +697,21 @@ export function useWireHandlers({
     clearWireForm,
     cancelWireEdit,
     startWireEdit,
+    setWireColorModeAndResetIncompatibleValues: (value: "none" | "catalog" | "free") => {
+      setWireColorMode(value);
+      if (value === "none") {
+        setWirePrimaryColorId("");
+        setWireSecondaryColorId("");
+        setWireFreeColorLabel("");
+        return;
+      }
+      if (value === "catalog") {
+        setWireFreeColorLabel("");
+        return;
+      }
+      setWirePrimaryColorId("");
+      setWireSecondaryColorId("");
+    },
     setWireEndpointACavityIndex: (value: string) => {
       endpointAIndexTouchedByUserRef.current = true;
       setWireEndpointACavityIndex(value);
