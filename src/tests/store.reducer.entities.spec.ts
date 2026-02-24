@@ -377,6 +377,59 @@ describe("appReducer entity lifecycle", () => {
     expect(updatedWire?.endpointBSealReference).toBe("SEAL-B-02");
   });
 
+  it("normalizes free wire color labels and enforces exclusivity with catalog colors", () => {
+    const base = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 }),
+      appActions.upsertSplice({ id: asSpliceId("S1"), name: "Splice 1", technicalId: "S-1", portCount: 2 }),
+      appActions.upsertNode({ id: asNodeId("N-C1"), kind: "connector", connectorId: asConnectorId("C1") }),
+      appActions.upsertNode({ id: asNodeId("N-S1"), kind: "splice", spliceId: asSpliceId("S1") }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-1"),
+        nodeA: asNodeId("N-C1"),
+        nodeB: asNodeId("N-S1"),
+        lengthMm: 25
+      })
+    ]);
+
+    const withFreeColor = appReducer(
+      base,
+      appActions.upsertWire({
+        id: asWireId("W-FREE-1"),
+        name: "Wire free",
+        technicalId: "W-FREE-1",
+        sectionMm2: 0.5,
+        primaryColorId: "RD",
+        secondaryColorId: "BU",
+        freeColorLabel: "  Beige/Brown mix temporary vendor spec  ",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        routeSegmentIds: [asSegmentId("SEG-1")],
+        lengthMm: 25,
+        isRouteLocked: false
+      })
+    );
+
+    const freeWire = withFreeColor.wires.byId[asWireId("W-FREE-1")];
+    expect(freeWire?.primaryColorId).toBeNull();
+    expect(freeWire?.secondaryColorId).toBeNull();
+    expect(freeWire?.freeColorLabel).toBe("Beige/Brown mix temporary vendor");
+    expect(freeWire?.freeColorLabel).toHaveLength(32);
+
+    const withCatalogColor = appReducer(
+      withFreeColor,
+      appActions.upsertWire({
+        ...(freeWire as NonNullable<typeof freeWire>),
+        freeColorLabel: " ",
+        primaryColorId: "RD",
+        secondaryColorId: "RD"
+      })
+    );
+    const catalogWire = withCatalogColor.wires.byId[asWireId("W-FREE-1")];
+    expect(catalogWire?.freeColorLabel).toBeNull();
+    expect(catalogWire?.primaryColorId).toBe("RD");
+    expect(catalogWire?.secondaryColorId).toBeNull();
+  });
+
   it("renames a node atomically and remaps segments, layout positions, and node selection", () => {
     const state = reduceAll([
       appActions.upsertNode({ id: asNodeId("N1"), kind: "intermediate", label: "Node 1" }),

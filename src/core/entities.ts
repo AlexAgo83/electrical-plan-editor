@@ -84,6 +84,7 @@ export interface Wire {
   sectionMm2: number;
   primaryColorId: string | null;
   secondaryColorId: string | null;
+  freeColorLabel?: string | null;
   endpointAConnectionReference?: string;
   endpointASealReference?: string;
   endpointBConnectionReference?: string;

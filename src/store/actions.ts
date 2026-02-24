@@ -88,6 +88,7 @@ export type AppAction =
         sectionMm2?: number;
         primaryColorId?: string | null;
         secondaryColorId?: string | null;
+        freeColorLabel?: string | null;
         endpointAConnectionReference?: string;
         endpointASealReference?: string;
         endpointBConnectionReference?: string;
@@ -178,6 +179,7 @@ export const appActions = {
     sectionMm2?: number;
     primaryColorId?: string | null;
     secondaryColorId?: string | null;
+    freeColorLabel?: string | null;
     endpointAConnectionReference?: string;
     endpointASealReference?: string;
     endpointBConnectionReference?: string;

@@ -1,4 +1,5 @@
 export type CableColorId = string;
+export const MAX_FREE_WIRE_COLOR_LABEL_LENGTH = 32;
 
 export interface CableColorDefinition {
   id: CableColorId;
@@ -73,4 +74,120 @@ export function normalizeWireColorIds(
     primaryColorId: primary,
     secondaryColorId: secondary
   };
+}
+
+export function normalizeFreeWireColorLabel(value: unknown): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return null;
+  }
+
+  return normalized.length > MAX_FREE_WIRE_COLOR_LABEL_LENGTH
+    ? normalized.slice(0, MAX_FREE_WIRE_COLOR_LABEL_LENGTH)
+    : normalized;
+}
+
+export function normalizeWireColorState(
+  primaryColorId: unknown,
+  secondaryColorId: unknown,
+  freeColorLabel: unknown
+): {
+  primaryColorId: CableColorId | null;
+  secondaryColorId: CableColorId | null;
+  freeColorLabel: string | null;
+} {
+  const normalizedFreeColorLabel = normalizeFreeWireColorLabel(freeColorLabel);
+  if (normalizedFreeColorLabel !== null) {
+    return {
+      primaryColorId: null,
+      secondaryColorId: null,
+      freeColorLabel: normalizedFreeColorLabel
+    };
+  }
+
+  const normalizedCatalogColors = normalizeWireColorIds(primaryColorId, secondaryColorId);
+  return {
+    ...normalizedCatalogColors,
+    freeColorLabel: null
+  };
+}
+
+type WireColorLike = {
+  primaryColorId?: string | null;
+  secondaryColorId?: string | null;
+  freeColorLabel?: string | null;
+};
+
+export function isWireFreeColorMode(value: WireColorLike): boolean {
+  return normalizeFreeWireColorLabel(value.freeColorLabel) !== null;
+}
+
+export function getWireColorCode(value: WireColorLike): string {
+  const freeColorLabel = normalizeFreeWireColorLabel(value.freeColorLabel);
+  if (freeColorLabel !== null) {
+    return `FREE:${freeColorLabel}`;
+  }
+
+  const normalized = normalizeWireColorIds(value.primaryColorId, value.secondaryColorId);
+  if (normalized.primaryColorId === null) {
+    return "";
+  }
+
+  return normalized.secondaryColorId === null
+    ? normalized.primaryColorId
+    : `${normalized.primaryColorId}/${normalized.secondaryColorId}`;
+}
+
+export function getWireColorLabel(value: WireColorLike): string {
+  const freeColorLabel = normalizeFreeWireColorLabel(value.freeColorLabel);
+  if (freeColorLabel !== null) {
+    return `Free: ${freeColorLabel}`;
+  }
+
+  const normalized = normalizeWireColorIds(value.primaryColorId, value.secondaryColorId);
+  if (normalized.primaryColorId === null) {
+    return "No color";
+  }
+
+  const primary = CABLE_COLOR_BY_ID[normalized.primaryColorId];
+  if (normalized.secondaryColorId === null) {
+    return primary?.label ?? `Unknown (${normalized.primaryColorId})`;
+  }
+
+  const secondary = CABLE_COLOR_BY_ID[normalized.secondaryColorId];
+  return `${primary?.label ?? `Unknown (${normalized.primaryColorId})`} / ${secondary?.label ?? `Unknown (${normalized.secondaryColorId})`}`;
+}
+
+export function getWireColorSortValue(value: WireColorLike): string {
+  const freeColorLabel = normalizeFreeWireColorLabel(value.freeColorLabel);
+  if (freeColorLabel !== null) {
+    return `2:${freeColorLabel.toLocaleLowerCase()}`;
+  }
+
+  const normalized = normalizeWireColorIds(value.primaryColorId, value.secondaryColorId);
+  if (normalized.primaryColorId === null) {
+    return "0:";
+  }
+
+  return `1:${getWireColorCode(normalized).toLocaleLowerCase()} ${getWireColorLabel(normalized).toLocaleLowerCase()}`;
+}
+
+export function getWireColorSearchText(value: WireColorLike): string {
+  const freeColorLabel = normalizeFreeWireColorLabel(value.freeColorLabel);
+  if (freeColorLabel !== null) {
+    return `free ${freeColorLabel}`.toLocaleLowerCase();
+  }
+
+  const normalized = normalizeWireColorIds(value.primaryColorId, value.secondaryColorId);
+  if (normalized.primaryColorId === null) {
+    return "no color".toLocaleLowerCase();
+  }
+
+  const code = getWireColorCode(normalized);
+  const label = getWireColorLabel(normalized);
+  return `${code} ${label}`.toLocaleLowerCase();
 }

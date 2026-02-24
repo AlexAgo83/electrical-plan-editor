@@ -183,6 +183,7 @@ describe("localStorage persistence adapter", () => {
                     sectionMm2: undefined,
                     primaryColorId: undefined,
                     secondaryColorId: undefined,
+                    freeColorLabel: undefined,
                     endpointAConnectionReference: undefined,
                     endpointASealReference: undefined,
                     endpointBConnectionReference: undefined,
@@ -211,6 +212,7 @@ describe("localStorage persistence adapter", () => {
                           sectionMm2: undefined,
                           primaryColorId: undefined,
                           secondaryColorId: undefined,
+                          freeColorLabel: undefined,
                           endpointAConnectionReference: undefined,
                           endpointASealReference: undefined,
                           endpointBConnectionReference: undefined,
@@ -239,6 +241,7 @@ describe("localStorage persistence adapter", () => {
     expect(loadedWire?.sectionMm2).toBe(0.5);
     expect(loadedWire?.primaryColorId).toBeNull();
     expect(loadedWire?.secondaryColorId).toBeNull();
+    expect(loadedWire?.freeColorLabel).toBeNull();
     expect(loadedWire?.endpointAConnectionReference).toBeUndefined();
     expect(loadedWire?.endpointASealReference).toBeUndefined();
     expect(loadedWire?.endpointBConnectionReference).toBeUndefined();
@@ -250,6 +253,7 @@ describe("localStorage persistence adapter", () => {
       expect(scopedWire?.sectionMm2).toBe(0.5);
       expect(scopedWire?.primaryColorId).toBeNull();
       expect(scopedWire?.secondaryColorId).toBeNull();
+      expect(scopedWire?.freeColorLabel).toBeNull();
       expect(scopedWire?.endpointAConnectionReference).toBeUndefined();
       expect(scopedWire?.endpointASealReference).toBeUndefined();
       expect(scopedWire?.endpointBConnectionReference).toBeUndefined();
@@ -319,6 +323,71 @@ describe("localStorage persistence adapter", () => {
     expect(loadedWire?.endpointASealReference).toBeUndefined();
     expect(loadedWire?.endpointBConnectionReference).toBe("C".repeat(120));
     expect(loadedWire?.endpointBSealReference).toBe("SEAL-B-LEGACY");
+  });
+
+  it("normalizes persisted mixed wire color state by prioritizing freeColorLabel", () => {
+    const state = createSampleNetworkState();
+    const nowIso = "2026-02-20T11:50:00.000Z";
+    const wireId = state.wires.allIds[0];
+    const activeNetworkId = state.activeNetworkId;
+    expect(wireId).toBeDefined();
+    expect(activeNetworkId).not.toBeNull();
+    if (wireId === undefined || activeNetworkId === null) {
+      throw new Error("Expected sample network wire and active network.");
+    }
+
+    const rawState: AppState = {
+      ...state,
+      wires: {
+        ...state.wires,
+        byId: {
+          ...state.wires.byId,
+          [wireId]: {
+            ...state.wires.byId[wireId]!,
+            primaryColorId: "RD",
+            secondaryColorId: "BU",
+            freeColorLabel: "  vendor beige/brown  "
+          }
+        }
+      },
+      networkStates: {
+        ...state.networkStates,
+        [activeNetworkId]: {
+          ...state.networkStates[activeNetworkId]!,
+          wires: {
+            ...state.networkStates[activeNetworkId]!.wires,
+            byId: {
+              ...state.networkStates[activeNetworkId]!.wires.byId,
+              [wireId]: {
+                ...state.networkStates[activeNetworkId]!.wires.byId[wireId]!,
+                primaryColorId: "RD",
+                secondaryColorId: "BU",
+                freeColorLabel: "  vendor beige/brown  "
+              }
+            }
+          }
+        }
+      }
+    };
+
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        schemaVersion: APP_SCHEMA_VERSION,
+        createdAtIso: "2026-02-01T08:00:00.000Z",
+        updatedAtIso: "2026-02-01T09:00:00.000Z",
+        state: rawState
+      } satisfies PersistedStateSnapshotV1)
+    });
+
+    const loaded = loadState(storage, () => nowIso);
+    const normalizedWire = loaded.wires.byId[wireId];
+    expect(normalizedWire?.primaryColorId).toBeNull();
+    expect(normalizedWire?.secondaryColorId).toBeNull();
+    expect(normalizedWire?.freeColorLabel).toBe("vendor beige/brown");
+    const scopedWire = loaded.networkStates[activeNetworkId]?.wires.byId[wireId];
+    expect(scopedWire?.primaryColorId).toBeNull();
+    expect(scopedWire?.secondaryColorId).toBeNull();
+    expect(scopedWire?.freeColorLabel).toBe("vendor beige/brown");
   });
 
   it("normalizes persisted connector and splice manufacturer references", () => {

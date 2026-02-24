@@ -1,5 +1,5 @@
 import type { Connector, ConnectorId, Network, NetworkId, NodeId, Splice, SpliceId, Wire, WireId } from "../../core/entities";
-import { normalizeWireColorIds } from "../../core/cableColors";
+import { normalizeWireColorState } from "../../core/cableColors";
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
@@ -86,7 +86,11 @@ function normalizeWiresEntityState(
     byId[wireId] = {
       ...wire,
       sectionMm2: resolveWireSectionMm2((wire as Partial<Wire>).sectionMm2),
-      ...normalizeWireColorIds((wire as Partial<Wire>).primaryColorId, (wire as Partial<Wire>).secondaryColorId),
+      ...normalizeWireColorState(
+        (wire as Partial<Wire>).primaryColorId,
+        (wire as Partial<Wire>).secondaryColorId,
+        (wire as Partial<Wire>).freeColorLabel
+      ),
       endpointAConnectionReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointAConnectionReference),
       endpointASealReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointASealReference),
       endpointBConnectionReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointBConnectionReference),
