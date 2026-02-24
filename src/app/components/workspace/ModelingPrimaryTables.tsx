@@ -83,6 +83,8 @@ export function ModelingPrimaryTables({
   setConnectorFilterQuery,
   connectors,
   visibleConnectors,
+  connectorSort,
+  setConnectorSort,
   connectorOccupiedCountById,
   selectedConnectorId,
   onEditConnector,
@@ -99,6 +101,8 @@ export function ModelingPrimaryTables({
   setSpliceFilterQuery,
   splices,
   visibleSplices,
+  spliceSort,
+  setSpliceSort,
   spliceOccupiedCountById,
   selectedSpliceId,
   onEditSplice,
@@ -115,6 +119,8 @@ export function ModelingPrimaryTables({
   setNodeFilterQuery,
   nodes,
   visibleNodes,
+  nodeIdSortDirection,
+  setNodeIdSortDirection,
   segmentsCountByNodeId,
   selectedNodeId,
   describeNode,
@@ -173,6 +179,35 @@ export function ModelingPrimaryTables({
     field: "id",
     direction: "asc"
   });
+  useEffect(() => {
+    if (connectorSort.field !== "name" && connectorSort.field !== "technicalId") {
+      return;
+    }
+    const nextField: ConnectorTableSortField = connectorSort.field;
+    setConnectorTableSort((current) =>
+      current.field === nextField && current.direction === connectorSort.direction
+        ? current
+        : { field: nextField, direction: connectorSort.direction }
+    );
+  }, [connectorSort]);
+  useEffect(() => {
+    if (spliceSort.field !== "name" && spliceSort.field !== "technicalId") {
+      return;
+    }
+    const nextField: SpliceTableSortField = spliceSort.field;
+    setSpliceTableSort((current) =>
+      current.field === nextField && current.direction === spliceSort.direction
+        ? current
+        : { field: nextField, direction: spliceSort.direction }
+    );
+  }, [spliceSort]);
+  useEffect(() => {
+    setNodeTableSort((current) =>
+      current.field === "id" && current.direction === nodeIdSortDirection
+        ? current
+        : { field: "id", direction: nodeIdSortDirection }
+    );
+  }, [nodeIdSortDirection]);
   const sortedVisibleConnectors = useMemo(
     () =>
       sortByTableColumns(
@@ -400,8 +435,8 @@ export function ModelingPrimaryTables({
           <table className="data-table">
             <thead>
               <tr>
-                <th><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" }))}>Name <span className="sort-indicator">{connectorSortIndicator("name")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" }))}>Technical ID <span className="sort-indicator">{connectorSortIndicator("technicalId")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => { setConnectorTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); setConnectorSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{connectorSortIndicator("name")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => { setConnectorTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setConnectorSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>Technical ID <span className="sort-indicator">{connectorSortIndicator("technicalId")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{connectorSortIndicator("manufacturerReference")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "cavityCount", direction: current.field === "cavityCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ways <span className="sort-indicator">{connectorSortIndicator("cavityCount")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "occupiedCount", direction: current.field === "occupiedCount" && current.direction === "asc" ? "desc" : "asc" }))}>Occupied <span className="sort-indicator">{connectorSortIndicator("occupiedCount")}</span></button></th>
@@ -537,8 +572,8 @@ export function ModelingPrimaryTables({
           <table className="data-table">
             <thead>
               <tr>
-                <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" }))}>Name <span className="sort-indicator">{spliceSortIndicator("name")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" }))}>Technical ID <span className="sort-indicator">{spliceSortIndicator("technicalId")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => { setSpliceTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); setSpliceSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{spliceSortIndicator("name")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => { setSpliceTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setSpliceSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>Technical ID <span className="sort-indicator">{spliceSortIndicator("technicalId")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{spliceSortIndicator("manufacturerReference")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "portCount", direction: current.field === "portCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ports <span className="sort-indicator">{spliceSortIndicator("portCount")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "branchCount", direction: current.field === "branchCount" && current.direction === "asc" ? "desc" : "asc" }))}>Branches <span className="sort-indicator">{spliceSortIndicator("branchCount")}</span></button></th>
@@ -676,7 +711,7 @@ export function ModelingPrimaryTables({
           <table className="data-table">
             <thead>
               <tr>
-                <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" }))}>ID <span className="sort-indicator">{nodeSortIndicator("id")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => { setNodeTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" })); setNodeIdSortDirection((current) => current === "asc" ? "desc" : "asc"); }}>ID <span className="sort-indicator">{nodeSortIndicator("id")}</span></button></th>
                 {showNodeKindColumn ? <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "kind", direction: current.field === "kind" && current.direction === "asc" ? "desc" : "asc" }))}>Kind <span className="sort-indicator">{nodeSortIndicator("kind")}</span></button></th> : null}
                 <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "reference", direction: current.field === "reference" && current.direction === "asc" ? "desc" : "asc" }))}>Reference <span className="sort-indicator">{nodeSortIndicator("reference")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "linkedSegments", direction: current.field === "linkedSegments" && current.direction === "asc" ? "desc" : "asc" }))}>Linked segments <span className="sort-indicator">{nodeSortIndicator("linkedSegments")}</span></button></th>

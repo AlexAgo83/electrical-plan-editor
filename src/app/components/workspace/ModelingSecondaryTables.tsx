@@ -95,6 +95,7 @@ export function ModelingSecondaryTables({
   onDeleteWire,
   onOpenWireOnboardingHelp
 }: ModelingSecondaryTablesProps): ReactElement {
+  void _getSortIndicator;
   type SegmentTableSortField = "id" | "nodeA" | "nodeB" | "lengthMm" | "subNetwork";
   type WireTableSortField = "name" | "technicalId" | "sectionMm2" | "color" | "endpoints" | "lengthMm" | "routeMode";
   const segmentRowRefs = useRef<Partial<Record<SegmentId, HTMLTableRowElement | null>>>({});
@@ -135,6 +136,25 @@ export function ModelingSecondaryTables({
     field: "name",
     direction: "asc"
   });
+  useEffect(() => {
+    setSegmentTableSort((current) =>
+      current.field === "id" && current.direction === _segmentIdSortDirection
+        ? current
+        : { field: "id", direction: _segmentIdSortDirection }
+    );
+  }, [_segmentIdSortDirection]);
+  useEffect(() => {
+    if (_wireSort.field !== "name" && _wireSort.field !== "technicalId" && _wireSort.field !== "lengthMm") {
+      return;
+    }
+    const field =
+      _wireSort.field === "lengthMm" ? "lengthMm" : _wireSort.field;
+    setWireTableSort((current) =>
+      current.field === field && current.direction === _wireSort.direction
+        ? current
+        : { field, direction: _wireSort.direction }
+    );
+  }, [_wireSort]);
   const sortedVisibleSegments = useMemo(
     () =>
       sortByTableColumns(
@@ -368,7 +388,7 @@ export function ModelingSecondaryTables({
           <table className="data-table">
             <thead>
               <tr>
-                <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" }))}>ID <span className="sort-indicator">{segmentSortIndicator("id")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => { setSegmentTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" })); _setSegmentIdSortDirection((current) => current === "asc" ? "desc" : "asc"); }}>ID <span className="sort-indicator">{segmentSortIndicator("id")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "nodeA", direction: current.field === "nodeA" && current.direction === "asc" ? "desc" : "asc" }))}>Node A <span className="sort-indicator">{segmentSortIndicator("nodeA")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "nodeB", direction: current.field === "nodeB" && current.direction === "asc" ? "desc" : "asc" }))}>Node B <span className="sort-indicator">{segmentSortIndicator("nodeB")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>Length (mm) <span className="sort-indicator">{segmentSortIndicator("lengthMm")}</span></button></th>
@@ -529,12 +549,12 @@ export function ModelingSecondaryTables({
           <table className="data-table">
             <thead>
               <tr>
-                <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" }))}>Name <span className="sort-indicator">{wireSortIndicator("name")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" }))}>Technical ID <span className="sort-indicator">{wireSortIndicator("technicalId")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{wireSortIndicator("name")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>Technical ID <span className="sort-indicator">{wireSortIndicator("technicalId")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "color", direction: current.field === "color" && current.direction === "asc" ? "desc" : "asc" }))}>Color <span className="sort-indicator">{wireSortIndicator("color")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpoints", direction: current.field === "endpoints" && current.direction === "asc" ? "desc" : "asc" }))}>Endpoints <span className="sort-indicator">{wireSortIndicator("endpoints")}</span></button></th>
                 <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "sectionMm2", direction: current.field === "sectionMm2" && current.direction === "asc" ? "desc" : "asc" }))}>Section (mm²) <span className="sort-indicator">{wireSortIndicator("sectionMm2")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>Length (mm) <span className="sort-indicator">{wireSortIndicator("lengthMm")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" })); }}>Length (mm) <span className="sort-indicator">{wireSortIndicator("lengthMm")}</span></button></th>
                 {showWireRouteModeColumn ? <th><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "routeMode", direction: current.field === "routeMode" && current.direction === "asc" ? "desc" : "asc" }))}>Route mode <span className="sort-indicator">{wireSortIndicator("routeMode")}</span></button></th> : null}
               </tr>
             </thead>

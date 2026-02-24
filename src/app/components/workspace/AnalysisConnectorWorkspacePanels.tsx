@@ -35,6 +35,9 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     setConnectorSynthesisSort: _setConnectorSynthesisSort,
     getSortIndicator: _getSortIndicator
   } = props;
+  void _connectorSynthesisSort;
+  void _setConnectorSynthesisSort;
+  void _getSortIndicator;
   type ConnectorAnalysisTableSortField = "name" | "technicalId" | "manufacturerReference" | "cavityCount" | "occupiedCount";
   type ConnectorSynthesisTableSortField = "name" | "technicalId" | "localWay" | "destination" | "lengthMm";
   const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "synthesis">("cavities");

@@ -2,7 +2,7 @@
 > From version: 0.8.1
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Very High
 > Theme: Delivery Orchestration for Tabular UX Completion, Analysis Expansion, and Cross-Cutting Hardening in req_044
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -71,17 +71,17 @@ Rationale:
 - Finish with theming and display polish once the major UI surfaces are in place.
 
 # Plan
-- [ ] Wave 0. Review follow-up hardening early pass (`item_280`): reducer invariants, `TableFilterBar` a11y labeling, theme regression-test baseline
-- [ ] Wave 1. Shared sortability completion audit + comparator rollout (`item_269`)
-- [ ] Wave 2. `segmentId` editability via atomic rename and reference remap (`item_274`)
-- [ ] Wave 3. Connector/splice table `manufacturerReference` column + sortability (`item_270`)
-- [ ] Wave 4. `Wires` table column order + wire analysis enrichment baseline (`item_273`)
-- [ ] Wave 5. Dedicated `Nodes` and `Segments` analysis panels (`item_271`, `item_272`)
-- [ ] Wave 6. Connector/splice analysis wire color swatches + callout length/section enrichment (`item_275`, `item_276`)
-- [ ] Wave 7. Sub-network `(default)` display cleanup + render2d selection sync without forced auto-scroll (`item_277`, `item_279`)
-- [ ] Wave 8. Table header theming completion including sort chevrons across all themes (`item_278`)
-- [ ] Wave 9. Closure: final validation, AC traceability, and `logics` synchronization (`item_281`)
-- [ ] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary + defer notes)
+- [x] Wave 0. Review follow-up hardening early pass (`item_280`): reducer invariants, `TableFilterBar` a11y labeling, theme regression-test baseline
+- [x] Wave 1. Shared sortability completion audit + comparator rollout (`item_269`)
+- [x] Wave 2. `segmentId` editability via atomic rename and reference remap (`item_274`)
+- [x] Wave 3. Connector/splice table `manufacturerReference` column + sortability (`item_270`)
+- [x] Wave 4. `Wires` table column order + wire analysis enrichment baseline (`item_273`)
+- [x] Wave 5. Dedicated `Nodes` and `Segments` analysis panels (`item_271`, `item_272`)
+- [x] Wave 6. Connector/splice analysis wire color swatches + callout length/section enrichment (`item_275`, `item_276`)
+- [x] Wave 7. Sub-network `(default)` display cleanup + render2d selection sync without forced auto-scroll (`item_277`, `item_279`)
+- [x] Wave 8. Table header theming completion including sort chevrons across all themes (`item_278`)
+- [x] Wave 9. Closure: final validation, AC traceability, and `logics` synchronization (`item_281`)
+- [x] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary + defer notes)
 
 # Validation gates
 ## A. Minimum wave gate (apply after Waves 0-8)
@@ -139,29 +139,47 @@ Rationale:
 
 # Report
 - Wave status:
-  - Wave 0 (review hardening): pending
-  - Wave 1 (shared sortability audit/comparators): pending
-  - Wave 2 (`segmentId` editability): pending
-  - Wave 3 (connector/splice `Mfr Ref` columns): pending
-  - Wave 4 (wires table order + wire analysis enrichment): pending
-  - Wave 5 (nodes/segments analysis panels): pending
-  - Wave 6 (analysis swatches + callout section): pending
-  - Wave 7 (sub-network default cleanup + render2d no-autoscroll): pending
-  - Wave 8 (table header theming/chevrons): pending
-  - Wave 9 (closure + AC traceability): pending
-  - FINAL (`.md` synchronization verification): pending
+  - Wave 0 (review hardening): delivered (`f1e99ad`)
+  - Wave 1 (shared sortability audit/comparators): delivered (rolled into `5fc8048`, plus shared helper in `f1e99ad`)
+  - Wave 2 (`segmentId` editability): delivered (`f31f6d6`)
+  - Wave 3 (connector/splice `Mfr Ref` columns): delivered (`5234f29`)
+  - Wave 4 (wires table order + wire analysis enrichment): delivered (`5fc8048`, plus `1f54390`)
+  - Wave 5 (nodes/segments analysis panels): delivered (`5fc8048`)
+  - Wave 6 (analysis swatches + callout section): delivered (`5234f29`, `1f54390`)
+  - Wave 7 (sub-network default cleanup + render2d no-autoscroll): delivered (`1f54390`, `5fc8048`)
+  - Wave 8 (table header theming/chevrons): delivered (`5fc8048`)
+  - Wave 9 (closure + AC traceability): delivered (this update)
+  - FINAL (`.md` synchronization verification): delivered (this update)
 - Current blockers:
-  - None at kickoff.
+  - None.
 - Main risks to track:
   - “All columns sortable” can become a hidden long-tail if there is no upfront audit and explicit defer list.
   - New analysis panels can diverge in interaction patterns from existing analysis panels if built ad hoc.
   - Render2D-origin focus/scroll logic may share helpers with table-origin focus and require origin-aware behavior.
   - Theme header/chevron fixes can become fragmented across theme files if not centralized.
   - `segmentId` rename can break route/callout/analysis references if remap coverage is incomplete.
-- Validation snapshot (kickoff):
-  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` — recommended before/after task/item doc edits.
+- Validation snapshot (final):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s test:ci` ✅ (`33` files / `219` tests)
+  - `npm run -s build` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s test:e2e` ✅ (`2` tests)
 - Delivery snapshot:
-  - Pending implementation.
+  - Review follow-up hardening delivered (reducers required-field invariants after trim, `TableFilterBar` text input explicit labeling, stronger theme surface regression checks).
+  - Full segment ID editability delivered with atomic `segment/rename` and wire-route + selection remap.
+  - Sortability expanded across in-scope workspace tables and columns, including Modeling/Analysis tables, Network Scope status column, and Validation issue tables.
+  - `Connectors` / `Splices` tables now expose sortable `Mfr Ref` columns in Modeling + Analysis.
+  - Dedicated `Nodes` and `Segments` analysis panels delivered (sortable lists + associated segment / traversing wire detail tables).
+  - `Wires` Modeling/Analysis tables reordered so `Section` is immediately before `Length`; wire analysis now surfaces section/color/endpoint refs.
+  - Connector/splice analysis synthesis rows render cable color swatches next to wire labels.
+  - Callouts now include wire section after length.
+  - `(default)` sub-network labels hidden in table/render2d contexts and `Enable all` hidden when only default exists.
+  - Table headers / sort chevrons use theme-aware styling.
+  - Table auto-focus behavior was changed to no-scroll (`preventScroll`) for auto-selection focus flows to remove disruptive viewport jumps from render2d-driven selections.
 - AC traceability (`req_044`) target mapping:
   - AC1 -> `item_269`, plus affected feature items and `item_281`
   - AC2 -> `item_270`, `item_281`

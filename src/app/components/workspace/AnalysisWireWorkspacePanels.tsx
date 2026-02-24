@@ -31,6 +31,9 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     handleResetWireRoute,
     wireFormError
   } = props;
+  void _wireSort;
+  void _setWireSort;
+  void _getSortIndicator;
   type WireAnalysisTableSortField = "name" | "technicalId" | "color" | "endpoints" | "sectionMm2" | "lengthMm" | "routeMode";
   const [wireAnalysisTableSort, setWireAnalysisTableSort] = useState<{ field: WireAnalysisTableSortField; direction: "asc" | "desc" }>({
     field: "name",

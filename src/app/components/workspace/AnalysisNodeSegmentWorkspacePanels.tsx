@@ -1,4 +1,4 @@
-import { useMemo, useState, type Dispatch, type ReactElement, type SetStateAction } from "react";
+import { useMemo, useState, type ReactElement } from "react";
 import { CABLE_COLOR_BY_ID } from "../../../core/cableColors";
 import type { NetworkNode, Wire } from "../../../core/entities";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
@@ -235,10 +235,11 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
 
   const indicator = <T extends string>(state: { field: T; direction: "asc" | "desc" }, field: T) =>
     state.field === field ? (state.direction === "asc" ? "▲" : "▼") : "";
-  const toggleSort = (
-    setter: Dispatch<SetStateAction<{ field: any; direction: "asc" | "desc" }>>,
-    field: string
-  ) => setter((current) => ({ field, direction: current.field === field && current.direction === "asc" ? "desc" : "asc" }));
+  const buildToggleSortUpdater = <T extends string>(field: T) =>
+    (current: { field: T; direction: "asc" | "desc" }): { field: T; direction: "asc" | "desc" } => ({
+      field,
+      direction: current.field === field && current.direction === "asc" ? "desc" : "asc"
+    });
 
   return (
     <>
@@ -308,10 +309,10 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
           <table className="data-table">
             <thead>
               <tr>
-                <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setNodeTableSort, "id")}>ID <span className="sort-indicator">{indicator(nodeTableSort, "id")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setNodeTableSort, "kind")}>Kind <span className="sort-indicator">{indicator(nodeTableSort, "kind")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setNodeTableSort, "reference")}>Reference <span className="sort-indicator">{indicator(nodeTableSort, "reference")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setNodeTableSort, "linkedSegments")}>Linked segments <span className="sort-indicator">{indicator(nodeTableSort, "linkedSegments")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("id"))}>ID <span className="sort-indicator">{indicator(nodeTableSort, "id")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("kind"))}>Kind <span className="sort-indicator">{indicator(nodeTableSort, "kind")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("reference"))}>Reference <span className="sort-indicator">{indicator(nodeTableSort, "reference")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("linkedSegments"))}>Linked segments <span className="sort-indicator">{indicator(nodeTableSort, "linkedSegments")}</span></button></th>
               </tr>
             </thead>
             <tbody>
@@ -367,11 +368,11 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setNodeSegmentsSort, "segmentId")}>Segment ID <span className="sort-indicator">{indicator(nodeSegmentsSort, "segmentId")}</span></button></th>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setNodeSegmentsSort, "peerNode")}>Peer node <span className="sort-indicator">{indicator(nodeSegmentsSort, "peerNode")}</span></button></th>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setNodeSegmentsSort, "lengthMm")}>Length (mm) <span className="sort-indicator">{indicator(nodeSegmentsSort, "lengthMm")}</span></button></th>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setNodeSegmentsSort, "subNetwork")}>Sub-network <span className="sort-indicator">{indicator(nodeSegmentsSort, "subNetwork")}</span></button></th>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setNodeSegmentsSort, "wireCount")}>Wires <span className="sort-indicator">{indicator(nodeSegmentsSort, "wireCount")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("segmentId"))}>Segment ID <span className="sort-indicator">{indicator(nodeSegmentsSort, "segmentId")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("peerNode"))}>Peer node <span className="sort-indicator">{indicator(nodeSegmentsSort, "peerNode")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("lengthMm"))}>Length (mm) <span className="sort-indicator">{indicator(nodeSegmentsSort, "lengthMm")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("subNetwork"))}>Sub-network <span className="sort-indicator">{indicator(nodeSegmentsSort, "subNetwork")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("wireCount"))}>Wires <span className="sort-indicator">{indicator(nodeSegmentsSort, "wireCount")}</span></button></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -466,11 +467,11 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
           <table className="data-table">
             <thead>
               <tr>
-                <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentTableSort, "id")}>ID <span className="sort-indicator">{indicator(segmentTableSort, "id")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentTableSort, "nodeA")}>Node A <span className="sort-indicator">{indicator(segmentTableSort, "nodeA")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentTableSort, "nodeB")}>Node B <span className="sort-indicator">{indicator(segmentTableSort, "nodeB")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentTableSort, "subNetwork")}>Sub-network <span className="sort-indicator">{indicator(segmentTableSort, "subNetwork")}</span></button></th>
-                <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentTableSort, "lengthMm")}>Length (mm) <span className="sort-indicator">{indicator(segmentTableSort, "lengthMm")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("id"))}>ID <span className="sort-indicator">{indicator(segmentTableSort, "id")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("nodeA"))}>Node A <span className="sort-indicator">{indicator(segmentTableSort, "nodeA")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("nodeB"))}>Node B <span className="sort-indicator">{indicator(segmentTableSort, "nodeB")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("subNetwork"))}>Sub-network <span className="sort-indicator">{indicator(segmentTableSort, "subNetwork")}</span></button></th>
+                <th><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("lengthMm"))}>Length (mm) <span className="sort-indicator">{indicator(segmentTableSort, "lengthMm")}</span></button></th>
               </tr>
             </thead>
             <tbody>
@@ -529,13 +530,13 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentWiresSort, "name")}>Name <span className="sort-indicator">{indicator(segmentWiresSort, "name")}</span></button></th>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentWiresSort, "technicalId")}>Technical ID <span className="sort-indicator">{indicator(segmentWiresSort, "technicalId")}</span></button></th>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentWiresSort, "color")}>Color <span className="sort-indicator">{indicator(segmentWiresSort, "color")}</span></button></th>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentWiresSort, "endpoints")}>Endpoints <span className="sort-indicator">{indicator(segmentWiresSort, "endpoints")}</span></button></th>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentWiresSort, "sectionMm2")}>Section (mm²) <span className="sort-indicator">{indicator(segmentWiresSort, "sectionMm2")}</span></button></th>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentWiresSort, "lengthMm")}>Length (mm) <span className="sort-indicator">{indicator(segmentWiresSort, "lengthMm")}</span></button></th>
-                    <th><button type="button" className="sort-header-button" onClick={() => toggleSort(setSegmentWiresSort, "routeMode")}>Route mode <span className="sort-indicator">{indicator(segmentWiresSort, "routeMode")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("name"))}>Name <span className="sort-indicator">{indicator(segmentWiresSort, "name")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("technicalId"))}>Technical ID <span className="sort-indicator">{indicator(segmentWiresSort, "technicalId")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("color"))}>Color <span className="sort-indicator">{indicator(segmentWiresSort, "color")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("endpoints"))}>Endpoints <span className="sort-indicator">{indicator(segmentWiresSort, "endpoints")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("sectionMm2"))}>Section (mm²) <span className="sort-indicator">{indicator(segmentWiresSort, "sectionMm2")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("lengthMm"))}>Length (mm) <span className="sort-indicator">{indicator(segmentWiresSort, "lengthMm")}</span></button></th>
+                    <th><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("routeMode"))}>Route mode <span className="sort-indicator">{indicator(segmentWiresSort, "routeMode")}</span></button></th>
                   </tr>
                 </thead>
                 <tbody>
