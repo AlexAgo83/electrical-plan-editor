@@ -1,0 +1,163 @@
+.app-shell.theme-soft-teal {
+  --custom-shell-bg-top: #d8ebe9;
+  --custom-shell-bg-bottom: #cfe4e2;
+  --custom-shell-text: #153835;
+  --custom-panel-bg: rgba(230, 244, 242, 0.9);
+  --custom-panel-border: #8eb9b3;
+  --custom-button-bg: #dcf0ed;
+  --custom-button-border: #7faea7;
+  --custom-button-text: #204b46;
+  --custom-button-active-text: #102c28;
+  --custom-badge-bg: #cde6e3;
+  --custom-badge-text: #214c47;
+  --custom-input-bg: #e2f1ef;
+  --custom-input-border: #88b3ad;
+  --custom-input-text: #1d4642;
+  --custom-table-border: #a1c9c3;
+  --custom-table-head-bg: rgba(220, 238, 235, 0.92);
+  --custom-row-selected-bg: rgba(74, 162, 150, 0.17);
+  --custom-row-wire-highlight-bg: rgba(132, 183, 82, 0.14);
+  --custom-muted-text: #547c77;
+  --custom-strong-text: #153733;
+  --custom-label-stroke: rgba(246, 252, 251, 0.94);
+  --custom-selection: #4fa79c;
+  --custom-accent: #7fc9bf;
+  --custom-accent-2: #a5d8d1;
+  --custom-grid: #abd1cc;
+  --custom-segment: #6f9b95;
+  --custom-wire-highlight: #7baa49;
+  --custom-node-stroke: #739f99;
+  --custom-node-connector-fill: #a8ddd7;
+  --custom-node-splice-fill: #c9bb92;
+  --custom-node-intermediate-fill: #c0e0dc;
+}
+
+body:has(.app-shell.theme-soft-teal) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(127, 201, 191, 0.18), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(165, 216, 209, 0.16), transparent 58%),
+    linear-gradient(180deg, #d8ebe9, #cfe4e2);
+}
+
+.app-shell.theme-dusty-rose {
+  --custom-shell-bg-top: #efe0e5;
+  --custom-shell-bg-bottom: #e7d7dd;
+  --custom-shell-text: #402433;
+  --custom-panel-bg: rgba(249, 238, 243, 0.9);
+  --custom-panel-border: #c4a0af;
+  --custom-button-bg: #f2e2e8;
+  --custom-button-border: #b78d9d;
+  --custom-button-text: #5a3145;
+  --custom-button-active-text: #2f1622;
+  --custom-badge-bg: #e8d1d9;
+  --custom-badge-text: #5b3146;
+  --custom-input-bg: #f5e6eb;
+  --custom-input-border: #bf97a6;
+  --custom-input-text: #542f42;
+  --custom-table-border: #cfb0bc;
+  --custom-table-head-bg: rgba(241, 228, 234, 0.92);
+  --custom-row-selected-bg: rgba(165, 102, 129, 0.16);
+  --custom-row-wire-highlight-bg: rgba(132, 178, 95, 0.13);
+  --custom-muted-text: #836172;
+  --custom-strong-text: #442739;
+  --custom-label-stroke: rgba(253, 248, 250, 0.94);
+  --custom-selection: #a76884;
+  --custom-accent: #cf93aa;
+  --custom-accent-2: #dab2c0;
+  --custom-grid: #d0b6c0;
+  --custom-segment: #9c7887;
+  --custom-wire-highlight: #78a84e;
+  --custom-node-stroke: #9f7f8d;
+  --custom-node-connector-fill: #e1bfd0;
+  --custom-node-splice-fill: #d6bc97;
+  --custom-node-intermediate-fill: #e7cfda;
+}
+
+body:has(.app-shell.theme-dusty-rose) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(207, 147, 170, 0.18), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(218, 178, 192, 0.16), transparent 58%),
+    linear-gradient(180deg, #efe0e5, #e7d7dd);
+}
+
+.app-shell.theme-pale-olive {
+  --custom-shell-bg-top: #e5e8d7;
+  --custom-shell-bg-bottom: #dde1cf;
+  --custom-shell-text: #32381b;
+  --custom-panel-bg: rgba(242, 245, 231, 0.9);
+  --custom-panel-border: #b4bd91;
+  --custom-button-bg: #ebefd9;
+  --custom-button-border: #a4af7f;
+  --custom-button-text: #4a5624;
+  --custom-button-active-text: #23290f;
+  --custom-badge-bg: #dee6c9;
+  --custom-badge-text: #4a5525;
+  --custom-input-bg: #edf1dd;
+  --custom-input-border: #acb889;
+  --custom-input-text: #465022;
+  --custom-table-border: #c1caa5;
+  --custom-table-head-bg: rgba(234, 239, 218, 0.92);
+  --custom-row-selected-bg: rgba(132, 151, 74, 0.16);
+  --custom-row-wire-highlight-bg: rgba(88, 162, 109, 0.14);
+  --custom-muted-text: #707953;
+  --custom-strong-text: #343b1c;
+  --custom-label-stroke: rgba(250, 252, 244, 0.94);
+  --custom-selection: #889c4c;
+  --custom-accent: #b0bf7a;
+  --custom-accent-2: #cfd9a4;
+  --custom-grid: #c4cbac;
+  --custom-segment: #8e9870;
+  --custom-wire-highlight: #4fa065;
+  --custom-node-stroke: #909a74;
+  --custom-node-connector-fill: #d4dfae;
+  --custom-node-splice-fill: #d3bc8a;
+  --custom-node-intermediate-fill: #dfe6c2;
+}
+
+body:has(.app-shell.theme-pale-olive) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(176, 191, 122, 0.18), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(207, 217, 164, 0.16), transparent 58%),
+    linear-gradient(180deg, #e5e8d7, #dde1cf);
+}
+
+.app-shell.theme-cloud-lavender {
+  --custom-shell-bg-top: #e7e3ef;
+  --custom-shell-bg-bottom: #ded9e9;
+  --custom-shell-text: #2f2750;
+  --custom-panel-bg: rgba(244, 241, 251, 0.9);
+  --custom-panel-border: #b6abce;
+  --custom-button-bg: #ece7f7;
+  --custom-button-border: #a294c1;
+  --custom-button-text: #4a3f74;
+  --custom-button-active-text: #22183e;
+  --custom-badge-bg: #e0d8f1;
+  --custom-badge-text: #4b4075;
+  --custom-input-bg: #f0ebf8;
+  --custom-input-border: #aca1c7;
+  --custom-input-text: #473d70;
+  --custom-table-border: #c3bbd8;
+  --custom-table-head-bg: rgba(236, 231, 247, 0.92);
+  --custom-row-selected-bg: rgba(132, 109, 183, 0.16);
+  --custom-row-wire-highlight-bg: rgba(108, 174, 96, 0.13);
+  --custom-muted-text: #6f6691;
+  --custom-strong-text: #312853;
+  --custom-label-stroke: rgba(251, 249, 254, 0.94);
+  --custom-selection: #8f7ac3;
+  --custom-accent: #b39fdb;
+  --custom-accent-2: #cfc2e9;
+  --custom-grid: #c6bed8;
+  --custom-segment: #8f84b0;
+  --custom-wire-highlight: #6ea75b;
+  --custom-node-stroke: #9085b1;
+  --custom-node-connector-fill: #d2c4ef;
+  --custom-node-splice-fill: #d3bc97;
+  --custom-node-intermediate-fill: #ddd2f1;
+}
+
+body:has(.app-shell.theme-cloud-lavender) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(179, 159, 219, 0.18), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(207, 194, 233, 0.16), transparent 58%),
+    linear-gradient(180deg, #e7e3ef, #ded9e9);
+}

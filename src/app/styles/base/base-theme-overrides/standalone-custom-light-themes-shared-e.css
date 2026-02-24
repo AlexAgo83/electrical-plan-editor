@@ -1,0 +1,420 @@
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-export-fieldset .technical-id {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-import-summary .meta-line {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 70%, transparent);
+  background: color-mix(in srgb, var(--custom-panel-bg) 84%, transparent);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-import-summary .meta-line strong {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-primary-action {
+  border-color: color-mix(in srgb, var(--custom-selection) 72%, var(--custom-button-border)) !important;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--custom-selection) 40%, var(--custom-button-bg)),
+    color-mix(in srgb, var(--custom-selection) 22%, var(--custom-button-bg))
+  ) !important;
+  color: var(--custom-strong-text) !important;
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .settings-primary-action:disabled {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 68%, transparent) !important;
+  background: color-mix(in srgb, var(--custom-panel-bg) 88%, var(--custom-shell-bg-bottom)) !important;
+  color: var(--custom-muted-text) !important;
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .workspace-health .meta-line,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .shortcut-hints,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .inspector-collapsed-copy,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-legend {
+  color: var(--custom-muted-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .legend-swatch {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 70%, white 10%);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .legend-line {
+  border-top-color: var(--custom-segment);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .legend-line.selected {
+  border-top-color: var(--network-selection-color);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .legend-line.wire {
+  border-top-color: var(--network-wire-highlight-color);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-canvas-stats-list strong {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .inspector-entity-label,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .inspector-detail-grid dt {
+  color: var(--custom-muted-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .inspector-entity-id,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .inspector-detail-grid dd {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .inspector-kind-chip {
+  border-color: color-mix(in srgb, var(--custom-button-border) 86%, white 6%);
+  background: color-mix(in srgb, var(--custom-button-bg) 88%, var(--custom-panel-bg));
+  color: var(--custom-button-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-form-header h2,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-form-label,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .stack-label,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .stack-form label,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .row-form label,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .inline-fieldset legend,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .wire-endpoint-fieldset legend,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .wire-endpoint-fieldset label {
+  color: color-mix(in srgb, var(--custom-shell-text) 96%, white 4%);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .empty-copy,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .form-hint,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .inline-help {
+  color: var(--custom-muted-text);
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .form-hint.danger {
+  color: #ffc2cb;
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .wire-endpoint-fieldset {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 78%, white 8%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--custom-panel-bg) 80%, var(--custom-shell-bg-top)),
+    color-mix(in srgb, var(--custom-panel-bg) 62%, var(--custom-shell-bg-bottom))
+  );
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .network-delete-button,
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .modeling-list-action-delete {
+  border-color: color-mix(in srgb, #ff8d9a 55%, var(--custom-panel-border)) !important;
+  background: color-mix(in srgb, #8c2230 60%, var(--custom-panel-bg)) !important;
+  color: #ffe4e8 !important;
+}

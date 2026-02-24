@@ -11,5 +11,15 @@
 @import "./base-theme-overrides/standalone-custom-midrange-themes-shared-a.css";
 @import "./base-theme-overrides/standalone-custom-midrange-themes-shared-b.css";
 @import "./base-theme-overrides/standalone-custom-midrange-themes-shared-c.css";
+@import "./base-theme-overrides/standalone-custom-midrange-themes-shared-d.css";
+@import "./base-theme-overrides/standalone-custom-midrange-themes-shared-e.css";
 @import "./base-theme-overrides/standalone-custom-midrange-themes-palettes-a.css";
 @import "./base-theme-overrides/standalone-custom-midrange-themes-palettes-b.css";
+@import "./base-theme-overrides/standalone-custom-light-themes-shared-a.css";
+@import "./base-theme-overrides/standalone-custom-light-themes-shared-b.css";
+@import "./base-theme-overrides/standalone-custom-light-themes-shared-c.css";
+@import "./base-theme-overrides/standalone-custom-light-themes-shared-d.css";
+@import "./base-theme-overrides/standalone-custom-light-themes-shared-e.css";
+@import "./base-theme-overrides/standalone-custom-light-themes-palettes-a.css";
+@import "./base-theme-overrides/standalone-custom-light-themes-palettes-b.css";
+@import "./base-theme-overrides/standalone-custom-themes-shared-coverage-fixes.css";
