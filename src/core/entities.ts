@@ -1,3 +1,5 @@
+import type { WireColorMode } from "./cableColors";
+
 export type Brand<T, B extends string> = T & { readonly __brand: B };
 
 export type NetworkId = Brand<string, "NetworkId">;
@@ -82,6 +84,7 @@ export interface Wire {
   name: string;
   technicalId: string;
   sectionMm2: number;
+  colorMode?: WireColorMode;
   primaryColorId: string | null;
   secondaryColorId: string | null;
   freeColorLabel?: string | null;

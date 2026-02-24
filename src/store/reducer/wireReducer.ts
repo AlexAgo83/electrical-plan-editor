@@ -57,7 +57,8 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
       const normalizedColors = normalizeWireColorState(
         action.payload.primaryColorId,
         action.payload.secondaryColorId,
-        action.payload.freeColorLabel
+        action.payload.freeColorLabel,
+        action.payload.colorMode
       );
       const endpointAConnectionReference = normalizeWireEndpointReference(action.payload.endpointAConnectionReference);
       const endpointASealReference = normalizeWireEndpointReference(action.payload.endpointASealReference);
@@ -181,6 +182,7 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           name: normalizedName,
           technicalId: normalizedTechnicalId,
           sectionMm2: normalizedSectionMm2,
+          colorMode: normalizedColors.colorMode,
           primaryColorId: normalizedColors.primaryColorId,
           secondaryColorId: normalizedColors.secondaryColorId,
           freeColorLabel: normalizedColors.freeColorLabel,
@@ -270,7 +272,8 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         ...normalizeWireColorState(
           action.payload.primaryColorId,
           action.payload.secondaryColorId,
-          action.payload.freeColorLabel
+          action.payload.freeColorLabel,
+          action.payload.colorMode
         ),
         endpointAConnectionReference: normalizeWireEndpointReference(action.payload.endpointAConnectionReference),
         endpointASealReference: normalizeWireEndpointReference(action.payload.endpointASealReference),

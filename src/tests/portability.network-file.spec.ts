@@ -158,6 +158,7 @@ describe("network file portability", () => {
 
     rawWires.byId[firstWireId] = {
       ...rawWires.byId[firstWireId],
+      colorMode: undefined,
       primaryColorId: "RD",
       secondaryColorId: "BU",
       freeColorLabel: "  legacy free color  "
@@ -168,7 +169,37 @@ describe("network file portability", () => {
     const normalizedWire = parsed.payload?.networks[0]?.state.wires.byId[asWireId(firstWireId)];
     expect(normalizedWire?.primaryColorId).toBeNull();
     expect(normalizedWire?.secondaryColorId).toBeNull();
+    expect(normalizedWire?.colorMode).toBe("free");
     expect(normalizedWire?.freeColorLabel).toBe("legacy free color");
+  });
+
+  it("preserves imported explicit free color mode with empty label as free unspecified", () => {
+    const seeded = createSampleNetworkState();
+    const payload = buildNetworkFilePayload(seeded, "active", [], "2026-02-21T10:19:00.000Z");
+    const rawPayload = JSON.parse(serializeNetworkFilePayload(payload)) as Record<string, unknown>;
+    const rawBundles = rawPayload.networks as Array<Record<string, unknown>>;
+    const rawState = rawBundles[0]?.state as Record<string, unknown>;
+    const rawWires = rawState.wires as { byId: Record<string, Record<string, unknown>>; allIds: string[] };
+    const firstWireId = rawWires.allIds[0];
+    if (firstWireId === undefined) {
+      throw new Error("Expected an exported wire.");
+    }
+
+    rawWires.byId[firstWireId] = {
+      ...rawWires.byId[firstWireId],
+      colorMode: "free",
+      primaryColorId: "RD",
+      secondaryColorId: "BU",
+      freeColorLabel: " "
+    };
+
+    const parsed = parseNetworkFilePayload(JSON.stringify(rawPayload));
+    expect(parsed.error).toBeNull();
+    const normalizedWire = parsed.payload?.networks[0]?.state.wires.byId[asWireId(firstWireId)];
+    expect(normalizedWire?.colorMode).toBe("free");
+    expect(normalizedWire?.primaryColorId).toBeNull();
+    expect(normalizedWire?.secondaryColorId).toBeNull();
+    expect(normalizedWire?.freeColorLabel).toBeNull();
   });
 
   it("normalizes imported connector and splice manufacturer references", () => {

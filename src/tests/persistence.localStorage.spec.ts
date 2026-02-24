@@ -344,6 +344,7 @@ describe("localStorage persistence adapter", () => {
           ...state.wires.byId,
           [wireId]: {
             ...state.wires.byId[wireId]!,
+            colorMode: undefined,
             primaryColorId: "RD",
             secondaryColorId: "BU",
             freeColorLabel: "  vendor beige/brown  "
@@ -360,6 +361,7 @@ describe("localStorage persistence adapter", () => {
               ...state.networkStates[activeNetworkId]!.wires.byId,
               [wireId]: {
                 ...state.networkStates[activeNetworkId]!.wires.byId[wireId]!,
+                colorMode: undefined,
                 primaryColorId: "RD",
                 secondaryColorId: "BU",
                 freeColorLabel: "  vendor beige/brown  "
@@ -383,11 +385,78 @@ describe("localStorage persistence adapter", () => {
     const normalizedWire = loaded.wires.byId[wireId];
     expect(normalizedWire?.primaryColorId).toBeNull();
     expect(normalizedWire?.secondaryColorId).toBeNull();
+    expect(normalizedWire?.colorMode).toBe("free");
     expect(normalizedWire?.freeColorLabel).toBe("vendor beige/brown");
     const scopedWire = loaded.networkStates[activeNetworkId]?.wires.byId[wireId];
     expect(scopedWire?.primaryColorId).toBeNull();
     expect(scopedWire?.secondaryColorId).toBeNull();
+    expect(scopedWire?.colorMode).toBe("free");
     expect(scopedWire?.freeColorLabel).toBe("vendor beige/brown");
+  });
+
+  it("preserves explicit free color mode with an empty freeColorLabel as unspecified", () => {
+    const state = createSampleNetworkState();
+    const nowIso = "2026-02-20T11:55:00.000Z";
+    const wireId = state.wires.allIds[0];
+    const activeNetworkId = state.activeNetworkId;
+    if (wireId === undefined || activeNetworkId === null) {
+      throw new Error("Expected sample network wire and active network.");
+    }
+
+    const rawState: AppState = {
+      ...state,
+      wires: {
+        ...state.wires,
+        byId: {
+          ...state.wires.byId,
+          [wireId]: {
+            ...state.wires.byId[wireId]!,
+            colorMode: "free",
+            primaryColorId: "RD",
+            secondaryColorId: "BU",
+            freeColorLabel: " "
+          }
+        }
+      },
+      networkStates: {
+        ...state.networkStates,
+        [activeNetworkId]: {
+          ...state.networkStates[activeNetworkId]!,
+          wires: {
+            ...state.networkStates[activeNetworkId]!.wires,
+            byId: {
+              ...state.networkStates[activeNetworkId]!.wires.byId,
+              [wireId]: {
+                ...state.networkStates[activeNetworkId]!.wires.byId[wireId]!,
+                colorMode: "free",
+                primaryColorId: "RD",
+                secondaryColorId: "BU",
+                freeColorLabel: " "
+              }
+            }
+          }
+        }
+      }
+    };
+
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        schemaVersion: APP_SCHEMA_VERSION,
+        createdAtIso: "2026-02-01T08:00:00.000Z",
+        updatedAtIso: "2026-02-01T09:00:00.000Z",
+        state: rawState
+      } satisfies PersistedStateSnapshotV1)
+    });
+
+    const loaded = loadState(storage, () => nowIso);
+    const normalizedWire = loaded.wires.byId[wireId];
+    expect(normalizedWire?.colorMode).toBe("free");
+    expect(normalizedWire?.primaryColorId).toBeNull();
+    expect(normalizedWire?.secondaryColorId).toBeNull();
+    expect(normalizedWire?.freeColorLabel).toBeNull();
+    const scopedWire = loaded.networkStates[activeNetworkId]?.wires.byId[wireId];
+    expect(scopedWire?.colorMode).toBe("free");
+    expect(scopedWire?.freeColorLabel).toBeNull();
   });
 
   it("normalizes persisted connector and splice manufacturer references", () => {
