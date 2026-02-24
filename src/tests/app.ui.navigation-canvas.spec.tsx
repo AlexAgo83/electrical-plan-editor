@@ -136,7 +136,7 @@ describe("App integration UI - navigation and canvas", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-segment").length).toBe(2);
   });
 
-  it("renders sub-network filter toggles with DEFAULT formatting and supports enable-all restore", () => {
+  it("hides default sub-network toggle and supports enable-all restore for tagged subnetworks", () => {
     const stateWithTags = appReducer(
       appReducer(
         createUiIntegrationState(),
@@ -160,12 +160,10 @@ describe("App integration UI - navigation and canvas", () => {
     switchScreenDrawerAware("analysis");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
-    const defaultButton = within(networkSummaryPanel).getByRole("button", { name: "DEFAULT" });
     const actAButton = within(networkSummaryPanel).getByRole("button", { name: "ACT_A" });
     const enableAllButton = within(networkSummaryPanel).getByRole("button", { name: "Enable all" });
 
-    expect(defaultButton).toHaveAttribute("aria-pressed", "true");
-    expect(defaultButton.querySelector("em")?.textContent).toBe("DEFAULT");
+    expect(within(networkSummaryPanel).queryByRole("button", { name: "DEFAULT" })).not.toBeInTheDocument();
     expect(actAButton).toHaveAttribute("aria-pressed", "true");
     expect(enableAllButton).toBeDisabled();
 

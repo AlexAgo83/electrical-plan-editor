@@ -260,7 +260,7 @@ export function ModelingSecondaryTables({
                     const nodeA = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
                     const nodeB = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
                     if (showSegmentSubNetworkColumn) {
-                      return [segment.id, nodeA, nodeB, segment.lengthMm, segment.subNetworkTag?.trim() || "(default)"];
+                      return [segment.id, nodeA, nodeB, segment.lengthMm, segment.subNetworkTag?.trim() || ""];
                     }
                     return [segment.id, nodeA, nodeB, segment.lengthMm];
                   });
@@ -346,7 +346,7 @@ export function ModelingSecondaryTables({
                     <td>{nodeB}</td>
                     <td>{segment.lengthMm}</td>
                     {showSegmentSubNetworkColumn ? (
-                      <td><span className="subnetwork-chip">{segment.subNetworkTag?.trim() || "(default)"}</span></td>
+                      <td>{(segment.subNetworkTag?.trim().length ?? 0) > 0 ? <span className="subnetwork-chip">{segment.subNetworkTag?.trim()}</span> : null}</td>
                     ) : null}
                   </tr>
                 );

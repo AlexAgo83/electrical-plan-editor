@@ -205,6 +205,7 @@ interface CalloutEntry {
   name: string;
   technicalId: string;
   lengthMm: number;
+  sectionMm2: number;
 }
 
 interface CalloutGroup {
@@ -259,7 +260,7 @@ function normalizeVector(x: number, y: number): { x: number; y: number } {
 }
 
 function buildCalloutEntryDisplayLine(entry: CalloutEntry): string {
-  return `${entry.name} (${entry.technicalId}) - ${entry.lengthMm} mm`;
+  return `${entry.name} (${entry.technicalId}) - ${entry.lengthMm} mm - ${entry.sectionMm2} mm²`;
 }
 
 function getCalloutRowFontSize(calloutTextSize: CanvasCalloutTextSize): number {
@@ -704,7 +705,8 @@ export function NetworkSummaryPanel({
           wireId: wire.id,
           name: wire.name,
           technicalId: wire.technicalId,
-          lengthMm: wire.lengthMm
+          lengthMm: wire.lengthMm,
+          sectionMm2: wire.sectionMm2
         });
       }
     }
@@ -749,7 +751,8 @@ export function NetworkSummaryPanel({
           wireId: wire.id,
           name: wire.name,
           technicalId: wire.technicalId,
-          lengthMm: wire.lengthMm
+          lengthMm: wire.lengthMm,
+          sectionMm2: wire.sectionMm2
         });
       }
     }

@@ -42,6 +42,8 @@ export function NetworkCanvasFloatingInfoPanels({
   if (!showNetworkInfoPanels) {
     return null;
   }
+  const visibleSubNetworkSummaries = subNetworkSummaries.filter((summary) => summary.tag !== "(default)");
+  const hasOnlyDefaultSubNetwork = subNetworkSummaries.length > 0 && visibleSubNetworkSummaries.length === 0;
 
   return (
     <>
@@ -70,22 +72,24 @@ export function NetworkCanvasFloatingInfoPanels({
 
       <div className="network-canvas-floating-stack">
         <section className="network-canvas-floating-subnetworks" aria-label="Sub-networks">
-          {subNetworkSummaries.length === 0 ? (
+          {subNetworkSummaries.length === 0 || hasOnlyDefaultSubNetwork ? (
             <p className="network-canvas-floating-copy">No sub-network tags yet.</p>
           ) : (
             <>
-              <div className="network-canvas-subnetwork-actions">
-                <button
-                  type="button"
-                  className="workspace-tab network-canvas-subnetwork-enable-all"
-                  onClick={enableAllSubNetworkTags}
-                  disabled={subNetworkSummaries.every((group) => activeSubNetworkTags.has(group.tag))}
-                >
-                  Enable all
-                </button>
-              </div>
+              {visibleSubNetworkSummaries.length > 0 ? (
+                <div className="network-canvas-subnetwork-actions">
+                  <button
+                    type="button"
+                    className="workspace-tab network-canvas-subnetwork-enable-all"
+                    onClick={enableAllSubNetworkTags}
+                    disabled={visibleSubNetworkSummaries.every((group) => activeSubNetworkTags.has(group.tag))}
+                  >
+                    Enable all
+                  </button>
+                </div>
+              ) : null}
               <ul className="network-canvas-subnetwork-list">
-              {subNetworkSummaries.map((group) => (
+              {visibleSubNetworkSummaries.map((group) => (
                 <li key={group.tag}>
                   <button
                     type="button"
