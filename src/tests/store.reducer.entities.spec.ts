@@ -424,6 +424,52 @@ describe("appReducer entity lifecycle", () => {
     expect(renamed).toBe(state);
   });
 
+  it("renames a segment atomically and remaps wire routes plus segment selection", () => {
+    const state = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 }),
+      appActions.upsertSplice({ id: asSpliceId("S1"), name: "Splice 1", technicalId: "S-1", portCount: 2 }),
+      appActions.upsertNode({ id: asNodeId("N1"), kind: "intermediate", label: "Node 1" }),
+      appActions.upsertNode({ id: asNodeId("N2"), kind: "intermediate", label: "Node 2" }),
+      appActions.upsertSegment({ id: asSegmentId("SEG1"), nodeA: asNodeId("N1"), nodeB: asNodeId("N2"), lengthMm: 100 }),
+      appActions.upsertWire({
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "W-1",
+        sectionMm2: 0.5,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        routeSegmentIds: [asSegmentId("SEG1")],
+        lengthMm: 100,
+        isRouteLocked: true
+      }),
+      appActions.select({ kind: "segment", id: "SEG1" })
+    ]);
+
+    const renamed = appReducer(state, appActions.renameSegment(asSegmentId("SEG1"), asSegmentId("SEG1A")));
+
+    expect(renamed.segments.byId[asSegmentId("SEG1")]).toBeUndefined();
+    expect(renamed.segments.byId[asSegmentId("SEG1A")]).toBeDefined();
+    expect(renamed.wires.byId[asWireId("W1")]?.routeSegmentIds).toEqual([asSegmentId("SEG1A")]);
+    expect(renamed.ui.selected).toEqual({ kind: "segment", id: "SEG1A" });
+    expect(renamed.ui.lastError).toBeNull();
+  });
+
+  it("rejects segment rename when target ID already exists", () => {
+    const state = reduceAll([
+      appActions.upsertNode({ id: asNodeId("N1"), kind: "intermediate", label: "Node 1" }),
+      appActions.upsertNode({ id: asNodeId("N2"), kind: "intermediate", label: "Node 2" }),
+      appActions.upsertSegment({ id: asSegmentId("SEG1"), nodeA: asNodeId("N1"), nodeB: asNodeId("N2"), lengthMm: 100 }),
+      appActions.upsertSegment({ id: asSegmentId("SEG2"), nodeA: asNodeId("N2"), nodeB: asNodeId("N1"), lengthMm: 120 })
+    ]);
+
+    const renamed = appReducer(state, appActions.renameSegment(asSegmentId("SEG1"), asSegmentId("SEG2")));
+
+    expect(renamed.segments.byId[asSegmentId("SEG1")]).toBeDefined();
+    expect(renamed.ui.lastError).toBe("Segment ID 'SEG2' already exists.");
+  });
+
   it("rejects invalid segment endpoints and length", () => {
     const withNodes = reduceAll([
       appActions.upsertNode({ id: asNodeId("N1"), kind: "intermediate", label: "Node 1" }),

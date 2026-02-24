@@ -34,9 +34,9 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
   <form className="stack-form" onSubmit={handleSegmentSubmit}>
     <label>
       Segment ID
-      <input value={segmentIdInput} onChange={(event) => setSegmentIdInput(event.target.value)} placeholder="SEG-001" disabled={segmentFormMode === "edit"} required />
+      <input value={segmentIdInput} onChange={(event) => setSegmentIdInput(event.target.value)} placeholder="SEG-001" required />
     </label>
-    {segmentFormMode === "edit" ? <small className="inline-help">Segment ID is immutable in edit mode.</small> : null}
+    {segmentFormMode === "edit" ? <small className="inline-help">Editing Segment ID performs an atomic rename.</small> : null}
     <label>
       Node A
       <select value={segmentNodeA} onChange={(event) => setSegmentNodeA(event.target.value)} required>

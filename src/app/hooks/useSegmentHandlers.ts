@@ -97,17 +97,24 @@ export function useSegmentHandlers({
 
     const wasCreateMode = segmentFormMode === "create";
     const normalizedSegmentId = segmentIdInput.trim();
-    const segmentId = (segmentFormMode === "edit" && editingSegmentId !== null
+    let segmentId = (segmentFormMode === "edit" && editingSegmentId !== null
       ? editingSegmentId
       : normalizedSegmentId) as SegmentId;
 
+    if (normalizedSegmentId.length === 0) {
+      setSegmentFormError("Segment ID is required.");
+      return;
+    }
+
     if (segmentFormMode === "create") {
-      if (normalizedSegmentId.length === 0) {
-        setSegmentFormError("Segment ID is required.");
+      if (state.segments.byId[segmentId] !== undefined) {
+        setSegmentFormError(`Segment ID '${normalizedSegmentId}' already exists.`);
         return;
       }
+    }
 
-      if (state.segments.byId[segmentId] !== undefined) {
+    if (segmentFormMode === "edit" && editingSegmentId !== null && normalizedSegmentId !== editingSegmentId) {
+      if (state.segments.byId[normalizedSegmentId as SegmentId] !== undefined) {
         setSegmentFormError(`Segment ID '${normalizedSegmentId}' already exists.`);
         return;
       }
@@ -125,6 +132,17 @@ export function useSegmentHandlers({
     }
 
     setSegmentFormError(null);
+
+    if (segmentFormMode === "edit" && editingSegmentId !== null && normalizedSegmentId !== editingSegmentId) {
+      dispatchAction(appActions.renameSegment(editingSegmentId, normalizedSegmentId as SegmentId));
+      const stateAfterRename = store.getState();
+      if (stateAfterRename.ui.lastError !== null) {
+        setSegmentFormError(stateAfterRename.ui.lastError);
+        return;
+      }
+      segmentId = normalizedSegmentId as SegmentId;
+      setEditingSegmentId(segmentId);
+    }
 
     dispatchAction(
       appActions.upsertSegment({

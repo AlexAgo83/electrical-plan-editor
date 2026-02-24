@@ -71,6 +71,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case "segment/upsert":
+    case "segment/rename":
     case "segment/remove": {
       return finalizeDomainAction(state, handleSegmentActions(state, action) ?? state);
     }
