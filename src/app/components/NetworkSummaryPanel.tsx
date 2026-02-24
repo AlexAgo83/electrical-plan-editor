@@ -160,11 +160,9 @@ export interface NetworkSummaryPanelProps {
   setRoutePreviewEndNodeId: (value: string) => void;
   routePreview: ShortestRouteResult | null;
   quickEntityNavigationMode: "modeling" | "analysis";
-  isAnalysisFocusedMode: boolean;
   activeSubScreen: SubScreenId;
   entityCountBySubScreen: Record<SubScreenId, number>;
   onQuickEntityNavigation: (subScreen: SubScreenId) => void;
-  onQuickEntityScreenNavigation: (targetScreen: "modeling" | "analysis") => void;
   onSelectConnectorFromCallout: (connectorId: ConnectorId) => void;
   onSelectSpliceFromCallout: (spliceId: SpliceId) => void;
   onPersistConnectorCalloutPosition: (connectorId: ConnectorId, position: NodePosition) => void;
@@ -522,11 +520,9 @@ export function NetworkSummaryPanel({
   setRoutePreviewEndNodeId,
   routePreview,
   quickEntityNavigationMode,
-  isAnalysisFocusedMode,
   activeSubScreen,
   entityCountBySubScreen,
   onQuickEntityNavigation,
-  onQuickEntityScreenNavigation,
   onSelectConnectorFromCallout,
   onSelectSpliceFromCallout,
   onPersistConnectorCalloutPosition,
@@ -538,30 +534,6 @@ export function NetworkSummaryPanel({
   const networkCanvasShellRef = useRef<HTMLDivElement | null>(null);
   const subNetworkFilterInitializedRef = useRef(false);
   const [activeSubNetworkTags, setActiveSubNetworkTags] = useState<Set<string>>(new Set());
-  const canQuickSwitchToAnalysis =
-    activeSubScreen === "connector" ||
-    activeSubScreen === "splice" ||
-    activeSubScreen === "node" ||
-    activeSubScreen === "segment" ||
-    activeSubScreen === "wire";
-  const quickEntityScreenSwitchTarget =
-    quickEntityNavigationMode === "modeling" ? (canQuickSwitchToAnalysis ? "analysis" : null) : "modeling";
-  const quickEntityScreenSwitchLabel =
-    quickEntityScreenSwitchTarget === null
-      ? null
-      : quickEntityScreenSwitchTarget === "analysis"
-        ? "Analysis view"
-        : isAnalysisFocusedMode
-          ? "Editing"
-          : "Modeling";
-  const quickEntityScreenSwitchAriaLabel =
-    quickEntityScreenSwitchTarget === null
-      ? null
-      : quickEntityScreenSwitchTarget === "analysis"
-        ? "Switch to analysis view"
-        : isAnalysisFocusedMode
-          ? "Switch to editing"
-          : "Switch to modeling";
   const graphStats = [
     { label: "Graph nodes", value: routingGraphNodeCount },
     { label: "Graph segments", value: routingGraphSegmentCount },
@@ -1534,22 +1506,6 @@ export function NetworkSummaryPanel({
               <span className="filter-chip-count">{entityCountBySubScreen[item.subScreen]}</span>
             </button>
           ))}
-          {quickEntityScreenSwitchTarget !== null ? (
-            <button
-              type="button"
-              className="filter-chip network-summary-quick-entity-screen-switch"
-              onClick={() => onQuickEntityScreenNavigation(quickEntityScreenSwitchTarget)}
-              aria-label={quickEntityScreenSwitchAriaLabel ?? undefined}
-            >
-              <span
-                className={`action-button-icon network-summary-quick-entity-nav-icon ${
-                  quickEntityScreenSwitchTarget === "analysis" ? "is-analysis" : "is-edit"
-                }`}
-                aria-hidden="true"
-              />
-              <span className="network-summary-quick-entity-nav-label">{quickEntityScreenSwitchLabel}</span>
-            </button>
-          ) : null}
         </div>
       </section>
     </section>

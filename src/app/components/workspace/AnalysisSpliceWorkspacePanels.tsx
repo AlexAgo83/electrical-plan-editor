@@ -33,6 +33,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     setSpliceOccupantRefInput,
     handleReservePort,
     handleReleasePort,
+    showEntityTables = true,
     sortedSpliceSynthesisRows,
     spliceSynthesisSort: _spliceSynthesisSort,
     setSpliceSynthesisSort: _setSpliceSynthesisSort,
@@ -134,7 +135,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
 
   return (
     <>
-<section className="panel" hidden={!isSpliceSubScreen}>
+<section className="panel" hidden={!isSpliceSubScreen || !showEntityTables}>
   <header className="list-panel-header">
     <h2>Splices</h2>
     <div className="list-panel-header-tools">

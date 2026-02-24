@@ -146,7 +146,7 @@ describe("App integration UI - workspace shell regression", () => {
     expect(document.querySelector(".workspace-ops-panel")).toBeInTheDocument();
   });
 
-  it("keeps the navigation drawer open when switching to modeling and analysis view", () => {
+  it("keeps the navigation drawer open when switching within unified modeling workspace", () => {
     renderAppWithState(createUiIntegrationState());
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
@@ -154,40 +154,41 @@ describe("App integration UI - workspace shell regression", () => {
     expect(primaryNavRow).not.toBeNull();
 
     fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: "Modeling" }));
-    fireEvent.click(screen.getByRole("button", { name: "Switch to analysis view" }));
     expect(screen.getByRole("button", { name: "Close menu" })).toBeInTheDocument();
     expect(document.querySelector(".workspace-nav-row.secondary")).not.toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: "Switch to editing" }));
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: "Wire" }));
     expect(screen.getByRole("button", { name: "Close menu" })).toBeInTheDocument();
     expect(document.querySelector(".workspace-nav-row.secondary")).not.toBeNull();
   });
 
-  it("keeps a single Modeling primary entry and opens analysis panels from Modeling", () => {
+  it("keeps a single Modeling primary entry and shows analysis panels in Modeling", () => {
     renderAppWithState(createUiIntegrationState());
 
     const primaryNavRowBefore = document.querySelector(".workspace-nav-row");
     expect(primaryNavRowBefore).not.toBeNull();
     expect(within(primaryNavRowBefore as HTMLElement).queryByRole("button", { name: /^Analysis$/i, hidden: true })).toBeNull();
     fireEvent.click(within(primaryNavRowBefore as HTMLElement).getByRole("button", { name: /Modeling/i, hidden: true }));
-    fireEvent.click(screen.getByRole("button", { name: "Switch to analysis view" }));
 
     const primaryNavRowAfter = document.querySelector(".workspace-nav-row");
     expect(primaryNavRowAfter).not.toBeNull();
     const modelingTab = within(primaryNavRowAfter as HTMLElement).getByRole("button", { name: /Modeling/i, hidden: true });
     expect(modelingTab).toHaveClass("is-active");
-    expect(screen.getByRole("heading", { name: "Wire analysis" })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Connector form" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Switch to editing" })).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { name: "Connectors" })).toHaveLength(1);
+    expect(screen.getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Connector form" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Switch to analysis view" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Switch to editing" })).toBeNull();
   });
 
-  it("restores the last analysis sub-panel and preserves analysis filter state across modeling toggles", () => {
+  it("preserves analysis filter state across unified modeling navigation", () => {
     renderAppWithState(createUiIntegrationState());
 
     let primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
     fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /Modeling/i, hidden: true }));
-    fireEvent.click(screen.getByRole("button", { name: "Switch to analysis view" }));
 
     const quickEntityNav = screen.getByRole("group", { name: "Quick entity navigation strip" });
     fireEvent.click(within(quickEntityNav).getByRole("button", { name: /Connectors 1/i }));
@@ -199,9 +200,10 @@ describe("App integration UI - workspace shell regression", () => {
 
     primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
-    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /Modeling/i, hidden: true }));
-
-    fireEvent.click(screen.getByRole("button", { name: "Switch to analysis view" }));
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /Home/i, hidden: true }));
+    const primaryNavRowReturn = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRowReturn).not.toBeNull();
+    fireEvent.click(within(primaryNavRowReturn as HTMLElement).getByRole("button", { name: /Modeling/i, hidden: true }));
 
     expect(screen.getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Connector filter field query" })).toHaveValue("C-1");

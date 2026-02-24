@@ -8,7 +8,6 @@ interface ModelingWorkspaceContainerProps {
   formsColumnContent: ReactNode;
   networkSummaryPanel: ReactNode;
   analysisWorkspaceContent?: ReactNode;
-  isAnalysisFocused?: boolean;
 }
 
 export function ModelingWorkspaceContainer({
@@ -17,8 +16,7 @@ export function ModelingWorkspaceContainer({
   leftColumnContent,
   formsColumnContent,
   networkSummaryPanel,
-  analysisWorkspaceContent = null,
-  isAnalysisFocused = false
+  analysisWorkspaceContent = null
 }: ModelingWorkspaceContainerProps): ReactElement {
   const hasAnalysisWorkspaceContent = analysisWorkspaceContent !== null;
 
@@ -26,21 +24,15 @@ export function ModelingWorkspaceContainer({
     <ScreenComponent isActive={isActive}>
       <section className="workspace-stage">
         <section className="panel-grid workspace-column workspace-column-center">{networkSummaryPanel}</section>
-        <section
-          className="panel-grid workspace-column workspace-column-left"
-          hidden={isAnalysisFocused && hasAnalysisWorkspaceContent}
-        >
+        <section className="panel-grid workspace-column workspace-column-left">
           {leftColumnContent}
         </section>
         {hasAnalysisWorkspaceContent ? (
-          <section
-            className="panel-grid workspace-column workspace-column-left"
-            hidden={!isAnalysisFocused}
-          >
+          <section className="panel-grid workspace-column workspace-column-left">
             {analysisWorkspaceContent}
           </section>
         ) : null}
-        {!isAnalysisFocused ? formsColumnContent : null}
+        {formsColumnContent}
       </section>
     </ScreenComponent>
   );
