@@ -6,6 +6,7 @@ import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upser
 export function handleSegmentActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "segment/upsert": {
+      const normalizedSegmentId = action.payload.id.trim() as typeof action.payload.id;
       if (action.payload.nodeA === action.payload.nodeB) {
         return withError(state, "Segment endpoints must reference two different nodes.");
       }
@@ -23,6 +24,7 @@ export function handleSegmentActions(state: AppState, action: AppAction): AppSta
         ...clearLastError(state),
         segments: upsertEntity(state.segments, {
           ...action.payload,
+          id: normalizedSegmentId,
           subNetworkTag: normalizedSubNetworkTag === undefined || normalizedSubNetworkTag.length === 0
             ? undefined
             : normalizedSubNetworkTag

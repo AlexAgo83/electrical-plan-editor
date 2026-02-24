@@ -69,8 +69,8 @@
   .theme-charcoal-plum,
   .theme-smoked-teal
 ) .header-block {
-  border-color: var(--custom-panel-border);
-  background: color-mix(in srgb, var(--custom-panel-bg) 92%, transparent);
+  border-color: color-mix(in srgb, var(--custom-panel-border) 72%, var(--custom-shell-bg-bottom));
+  background: color-mix(in srgb, var(--custom-panel-bg) 72%, var(--custom-shell-bg-bottom));
   color: var(--custom-shell-text);
 }
 
@@ -154,8 +154,8 @@
   .theme-charcoal-plum,
   .theme-smoked-teal
 ) .network-canvas-shell {
-  border-color: var(--custom-panel-border);
-  background: var(--custom-panel-bg);
+  border-color: color-mix(in srgb, var(--custom-panel-border) 70%, var(--custom-shell-bg-bottom));
+  background: color-mix(in srgb, var(--custom-panel-bg) 74%, var(--custom-shell-bg-bottom));
   color: var(--custom-shell-text);
 }
 
@@ -383,8 +383,8 @@
   .theme-charcoal-plum,
   .theme-smoked-teal
 ) textarea {
-  border-color: var(--custom-input-border);
-  background: var(--custom-input-bg);
+  border-color: color-mix(in srgb, var(--custom-input-border) 68%, var(--custom-panel-border));
+  background: color-mix(in srgb, var(--custom-input-bg) 76%, var(--custom-shell-bg-bottom));
   color: var(--custom-input-text);
 }
 
@@ -448,8 +448,8 @@
   .theme-charcoal-plum,
   .theme-smoked-teal
 ) .stack-label select {
-  border-color: var(--custom-input-border);
-  background: var(--custom-input-bg);
+  border-color: color-mix(in srgb, var(--custom-input-border) 68%, var(--custom-panel-border));
+  background: color-mix(in srgb, var(--custom-input-bg) 76%, var(--custom-shell-bg-bottom));
   color: var(--custom-input-text);
 }
 
@@ -486,7 +486,6 @@
   .theme-charcoal-plum,
   .theme-smoked-teal
 ) .data-table th {
-  background: var(--custom-table-head-bg);
+  background: color-mix(in srgb, var(--custom-table-head-bg) 78%, var(--custom-shell-bg-bottom));
   color: var(--custom-muted-text);
 }
-
