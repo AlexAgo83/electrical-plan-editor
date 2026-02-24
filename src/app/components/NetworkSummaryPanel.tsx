@@ -160,6 +160,7 @@ export interface NetworkSummaryPanelProps {
   setRoutePreviewEndNodeId: (value: string) => void;
   routePreview: ShortestRouteResult | null;
   quickEntityNavigationMode: "modeling" | "analysis";
+  isAnalysisFocusedMode: boolean;
   activeSubScreen: SubScreenId;
   entityCountBySubScreen: Record<SubScreenId, number>;
   onQuickEntityNavigation: (subScreen: SubScreenId) => void;
@@ -521,6 +522,7 @@ export function NetworkSummaryPanel({
   setRoutePreviewEndNodeId,
   routePreview,
   quickEntityNavigationMode,
+  isAnalysisFocusedMode,
   activeSubScreen,
   entityCountBySubScreen,
   onQuickEntityNavigation,
@@ -544,6 +546,22 @@ export function NetworkSummaryPanel({
     activeSubScreen === "wire";
   const quickEntityScreenSwitchTarget =
     quickEntityNavigationMode === "modeling" ? (canQuickSwitchToAnalysis ? "analysis" : null) : "modeling";
+  const quickEntityScreenSwitchLabel =
+    quickEntityScreenSwitchTarget === null
+      ? null
+      : quickEntityScreenSwitchTarget === "analysis"
+        ? "Analysis"
+        : isAnalysisFocusedMode
+          ? "Editing"
+          : "Modeling";
+  const quickEntityScreenSwitchAriaLabel =
+    quickEntityScreenSwitchTarget === null
+      ? null
+      : quickEntityScreenSwitchTarget === "analysis"
+        ? "Switch to analysis"
+        : isAnalysisFocusedMode
+          ? "Switch to editing"
+          : "Switch to modeling";
   const graphStats = [
     { label: "Graph nodes", value: routingGraphNodeCount },
     { label: "Graph segments", value: routingGraphSegmentCount },
@@ -1521,7 +1539,7 @@ export function NetworkSummaryPanel({
               type="button"
               className="filter-chip network-summary-quick-entity-screen-switch"
               onClick={() => onQuickEntityScreenNavigation(quickEntityScreenSwitchTarget)}
-              aria-label={quickEntityScreenSwitchTarget === "analysis" ? "Switch to analysis" : "Switch to modeling"}
+              aria-label={quickEntityScreenSwitchAriaLabel ?? undefined}
             >
               <span
                 className={`action-button-icon network-summary-quick-entity-nav-icon ${
@@ -1529,9 +1547,7 @@ export function NetworkSummaryPanel({
                 }`}
                 aria-hidden="true"
               />
-              <span className="network-summary-quick-entity-nav-label">
-                {quickEntityScreenSwitchTarget === "analysis" ? "Analysis" : "Modeling"}
-              </span>
+              <span className="network-summary-quick-entity-nav-label">{quickEntityScreenSwitchLabel}</span>
             </button>
           ) : null}
         </div>

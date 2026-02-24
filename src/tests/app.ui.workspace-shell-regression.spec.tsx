@@ -177,6 +177,7 @@ describe("App integration UI - workspace shell regression", () => {
     expect(modelingTab).toHaveClass("is-active");
     expect(screen.getByRole("heading", { name: "Wire analysis" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Connector form" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Switch to editing" })).toBeInTheDocument();
   });
 
   it("restores the last analysis sub-panel and preserves analysis filter state across modeling toggles", () => {
