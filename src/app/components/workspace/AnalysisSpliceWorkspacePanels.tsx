@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
+import { CABLE_COLOR_BY_ID } from "../../../core/cableColors";
 import { formatOccupantRefForDisplay } from "../../lib/app-utils-networking";
-import { nextSortState } from "../../lib/app-utils-shared";
+import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 import { TableFilterBar } from "./TableFilterBar";
@@ -19,8 +20,8 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     splices,
     visibleSplices,
     wires,
-    spliceSort,
-    setSpliceSort,
+    spliceSort: _spliceSort,
+    setSpliceSort: _setSpliceSort,
     spliceOccupiedCountById,
     onSelectSplice,
     onOpenSpliceOnboardingHelp,
@@ -32,16 +33,57 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     handleReservePort,
     handleReleasePort,
     sortedSpliceSynthesisRows,
-    spliceSynthesisSort,
-    setSpliceSynthesisSort,
-    getSortIndicator
+    spliceSynthesisSort: _spliceSynthesisSort,
+    setSpliceSynthesisSort: _setSpliceSynthesisSort,
+    getSortIndicator: _getSortIndicator
   } = props;
+  type SpliceAnalysisTableSortField = "name" | "technicalId" | "manufacturerReference" | "portCount" | "branchCount";
+  type SpliceSynthesisTableSortField = "name" | "technicalId" | "localPort" | "destination" | "lengthMm";
   const [spliceAnalysisView, setSpliceAnalysisView] = useState<"ports" | "synthesis">("ports");
+  const [spliceTableSort, setSpliceTableSort] = useState<{ field: SpliceAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
+  const [spliceSynthesisTableSort, setSpliceSynthesisTableSort] = useState<{ field: SpliceSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const spliceFilterPlaceholder =
     spliceFilterField === "name" ? "Splice name" : spliceFilterField === "technicalId" ? "Technical ID" : "Name or technical ID...";
+  const sortedVisibleSplices = useMemo(
+    () =>
+      sortByTableColumns(
+        visibleSplices,
+        spliceTableSort,
+        (splice, field) => {
+          if (field === "name") return splice.name;
+          if (field === "technicalId") return splice.technicalId;
+          if (field === "manufacturerReference") return splice.manufacturerReference;
+          if (field === "portCount") return splice.portCount;
+          return spliceOccupiedCountById.get(splice.id) ?? 0;
+        },
+        (splice) => splice.id
+      ),
+    [spliceOccupiedCountById, spliceTableSort, visibleSplices]
+  );
   const wireTechnicalIdById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire.technicalId] as const)), [wires]);
+  const wireById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire] as const)), [wires]);
   const formatOccupantRef = (occupantRef: string | null): string =>
     occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
+  const sortedSpliceSynthesisRowsByColumns = useMemo(
+    () =>
+      sortByTableColumns(
+        sortedSpliceSynthesisRows,
+        spliceSynthesisTableSort,
+        (row, field) => {
+          if (field === "name") return row.wireName;
+          if (field === "technicalId") return row.wireTechnicalId;
+          if (field === "localPort") return row.localEndpointLabel;
+          if (field === "destination") return row.remoteEndpointLabel;
+          return row.lengthMm;
+        },
+        (row) => `${row.wireId}-${row.localEndpointLabel}`
+      ),
+    [sortedSpliceSynthesisRows, spliceSynthesisTableSort]
+  );
+  const spliceListSortIndicator = (field: SpliceAnalysisTableSortField) =>
+    spliceTableSort.field === field ? (spliceTableSort.direction === "asc" ? "▲" : "▼") : "";
+  const spliceSynthesisSortIndicator = (field: SpliceSynthesisTableSortField) =>
+    spliceSynthesisTableSort.field === field ? (spliceSynthesisTableSort.direction === "asc" ? "▲" : "▼") : "";
   const nextFreePortIndex = splicePortStatuses.find((slot) => !slot.isOccupied)?.portIndex ?? null;
   const parsedPortIndex = Number.parseInt(portIndexInput, 10);
   const portIndexIsInteger = Number.isInteger(parsedPortIndex) && parsedPortIndex > 0;
@@ -113,16 +155,17 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
           onClick={() =>
             downloadCsvFile(
               "analysis-splices",
-              ["Name", "Technical ID", "Ports", "Branches"],
-              visibleSplices.map((splice) => [
+              ["Name", "Technical ID", "Mfr Ref", "Ports", "Branches"],
+              sortedVisibleSplices.map((splice) => [
                 splice.name,
                 splice.technicalId,
+                splice.manufacturerReference ?? "",
                 splice.portCount,
                 spliceOccupiedCountById.get(splice.id) ?? 0
               ])
             )
           }
-          disabled={visibleSplices.length === 0}
+          disabled={sortedVisibleSplices.length === 0}
         >
           <span className="table-export-icon" aria-hidden="true" />
           CSV
@@ -154,7 +197,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
   </header>
   {splices.length === 0 ? (
     <p className="empty-copy">No splice yet.</p>
-  ) : visibleSplices.length === 0 ? (
+  ) : sortedVisibleSplices.length === 0 ? (
     <p className="empty-copy">No splice matches the current filters.</p>
   ) : (
     <table className="data-table">
@@ -164,26 +207,27 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
             <button
               type="button"
               className="sort-header-button"
-              onClick={() => setSpliceSort((current) => nextSortState(current, "name"))}
+              onClick={() => setSpliceTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" }))}
             >
-              Name <span className="sort-indicator">{getSortIndicator(spliceSort, "name")}</span>
+              Name <span className="sort-indicator">{spliceListSortIndicator("name")}</span>
             </button>
           </th>
           <th>
             <button
               type="button"
               className="sort-header-button"
-              onClick={() => setSpliceSort((current) => nextSortState(current, "technicalId"))}
+              onClick={() => setSpliceTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" }))}
             >
-              Technical ID <span className="sort-indicator">{getSortIndicator(spliceSort, "technicalId")}</span>
+              Technical ID <span className="sort-indicator">{spliceListSortIndicator("technicalId")}</span>
             </button>
           </th>
-          <th>Ports</th>
-          <th>Branches</th>
+          <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{spliceListSortIndicator("manufacturerReference")}</span></button></th>
+          <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "portCount", direction: current.field === "portCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ports <span className="sort-indicator">{spliceListSortIndicator("portCount")}</span></button></th>
+          <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "branchCount", direction: current.field === "branchCount" && current.direction === "asc" ? "desc" : "asc" }))}>Branches <span className="sort-indicator">{spliceListSortIndicator("branchCount")}</span></button></th>
         </tr>
       </thead>
       <tbody>
-        {visibleSplices.map((splice) => {
+        {sortedVisibleSplices.map((splice) => {
           const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
           const isSelected = selectedSpliceId === splice.id;
           return (
@@ -202,6 +246,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
             >
               <td>{splice.name}</td>
               <td className="technical-id">{splice.technicalId}</td>
+              <td className="technical-id">{splice.manufacturerReference ?? ""}</td>
               <td>{splice.portCount}</td>
               <td>{occupiedCount}</td>
             </tr>
@@ -251,7 +296,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
           downloadCsvFile(
             `analysis-splice-synthesis-${selectedSplice?.technicalId ?? "selection"}`,
             ["Wire", "Technical ID", "Local port", "Destination", "Length (mm)"],
-            sortedSpliceSynthesisRows.map((row) => [
+            sortedSpliceSynthesisRowsByColumns.map((row) => [
               row.wireName,
               row.wireTechnicalId,
               row.localEndpointLabel,
@@ -262,7 +307,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
         }}
         disabled={
           selectedSplice === null ||
-          (spliceAnalysisView === "ports" ? splicePortStatuses.length === 0 : sortedSpliceSynthesisRows.length === 0)
+          (spliceAnalysisView === "ports" ? splicePortStatuses.length === 0 : sortedSpliceSynthesisRowsByColumns.length === 0)
         }
       >
         <span className="table-export-icon" aria-hidden="true" />
@@ -331,7 +376,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
         ))}
       </div>
     </>
-  ) : sortedSpliceSynthesisRows.length === 0 ? (
+  ) : sortedSpliceSynthesisRowsByColumns.length === 0 ? (
     <p className="empty-copy">No wire currently connected to this splice.</p>
   ) : (
     <table className="data-table">
@@ -341,35 +386,46 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
             <button
               type="button"
               className="sort-header-button"
-              onClick={() => setSpliceSynthesisSort((current) => nextSortState(current, "name"))}
+              onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" }))}
             >
-              Wire <span className="sort-indicator">{getSortIndicator(spliceSynthesisSort, "name")}</span>
+              Wire <span className="sort-indicator">{spliceSynthesisSortIndicator("name")}</span>
             </button>
           </th>
           <th>
             <button
               type="button"
               className="sort-header-button"
-              onClick={() => setSpliceSynthesisSort((current) => nextSortState(current, "technicalId"))}
+              onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" }))}
             >
-              Technical ID <span className="sort-indicator">{getSortIndicator(spliceSynthesisSort, "technicalId")}</span>
+              Technical ID <span className="sort-indicator">{spliceSynthesisSortIndicator("technicalId")}</span>
             </button>
           </th>
-          <th>Local port</th>
-          <th>Destination</th>
-          <th>Length (mm)</th>
+          <th><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "localPort", direction: current.field === "localPort" && current.direction === "asc" ? "desc" : "asc" }))}>Local port <span className="sort-indicator">{spliceSynthesisSortIndicator("localPort")}</span></button></th>
+          <th><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "destination", direction: current.field === "destination" && current.direction === "asc" ? "desc" : "asc" }))}>Destination <span className="sort-indicator">{spliceSynthesisSortIndicator("destination")}</span></button></th>
+          <th><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>Length (mm) <span className="sort-indicator">{spliceSynthesisSortIndicator("lengthMm")}</span></button></th>
         </tr>
       </thead>
       <tbody>
-        {sortedSpliceSynthesisRows.map((row) => (
+        {sortedSpliceSynthesisRowsByColumns.map((row) => {
+          const wire = wireById.get(row.wireId);
+          const primary = wire?.primaryColorId === null || wire?.primaryColorId === undefined ? null : (CABLE_COLOR_BY_ID[wire.primaryColorId] ?? null);
+          const secondary = wire?.secondaryColorId === null || wire?.secondaryColorId === undefined ? null : (CABLE_COLOR_BY_ID[wire.secondaryColorId] ?? null);
+          return (
           <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
-            <td>{row.wireName}</td>
+            <td>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
+                {primary !== null ? <span aria-hidden="true" style={{ width: "0.7rem", height: "0.7rem", borderRadius: "999px", border: "1px solid rgba(255,255,255,0.25)", background: primary.hex }} /> : null}
+                {secondary !== null ? <span aria-hidden="true" style={{ width: "0.7rem", height: "0.7rem", borderRadius: "999px", border: "1px solid rgba(255,255,255,0.25)", background: secondary.hex }} /> : null}
+                <span>{row.wireName}</span>
+              </span>
+            </td>
             <td className="technical-id">{row.wireTechnicalId}</td>
             <td>{row.localEndpointLabel}</td>
             <td>{row.remoteEndpointLabel}</td>
             <td>{row.lengthMm}</td>
           </tr>
-        ))}
+          );
+        })}
       </tbody>
     </table>
   )}
