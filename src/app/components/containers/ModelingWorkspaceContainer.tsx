@@ -20,13 +20,26 @@ export function ModelingWorkspaceContainer({
   analysisWorkspaceContent = null,
   isAnalysisFocused = false
 }: ModelingWorkspaceContainerProps): ReactElement {
+  const hasAnalysisWorkspaceContent = analysisWorkspaceContent !== null;
+
   return (
     <ScreenComponent isActive={isActive}>
       <section className="workspace-stage">
         <section className="panel-grid workspace-column workspace-column-center">{networkSummaryPanel}</section>
-        <section className="panel-grid workspace-column workspace-column-left">
-          {isAnalysisFocused && analysisWorkspaceContent !== null ? analysisWorkspaceContent : leftColumnContent}
+        <section
+          className="panel-grid workspace-column workspace-column-left"
+          hidden={isAnalysisFocused && hasAnalysisWorkspaceContent}
+        >
+          {leftColumnContent}
         </section>
+        {hasAnalysisWorkspaceContent ? (
+          <section
+            className="panel-grid workspace-column workspace-column-left"
+            hidden={!isAnalysisFocused}
+          >
+            {analysisWorkspaceContent}
+          </section>
+        ) : null}
         {!isAnalysisFocused ? formsColumnContent : null}
       </section>
     </ScreenComponent>

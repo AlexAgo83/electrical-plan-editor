@@ -1629,7 +1629,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       spliceTechnicalIdAlreadyUsed,
       wireTechnicalIdAlreadyUsed,
       includeModelingContent: hasActiveNetwork && isModelingScreen,
-      includeAnalysisContent: hasActiveNetwork && (isAnalysisScreen || (isModelingScreen && isModelingAnalysisFocused)),
+      includeAnalysisContent: hasActiveNetwork && (isAnalysisScreen || isModelingScreen),
       onSelectConnector: (connectorId) =>
         dispatchAction(
           appActions.select({
