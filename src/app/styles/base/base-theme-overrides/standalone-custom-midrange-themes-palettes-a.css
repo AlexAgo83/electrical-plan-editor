@@ -32,6 +32,13 @@
   --custom-node-intermediate-fill: #2d4a61;
 }
 
+body:has(.app-shell.theme-steel-blue) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(91, 168, 221, 0.16), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(142, 194, 234, 0.14), transparent 58%),
+    linear-gradient(180deg, #0f2231, #122838);
+}
+
 .app-shell.theme-forest-graphite {
   --custom-shell-bg-top: #13201c;
   --custom-shell-bg-bottom: #1a2724;
@@ -64,6 +71,13 @@
   --custom-node-connector-fill: #285243;
   --custom-node-splice-fill: #665938;
   --custom-node-intermediate-fill: #2a473d;
+}
+
+body:has(.app-shell.theme-forest-graphite) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(100, 176, 139, 0.16), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(152, 200, 180, 0.14), transparent 58%),
+    linear-gradient(180deg, #13201c, #1a2724);
 }
 
 .app-shell.theme-petrol-slate {
@@ -100,6 +114,13 @@
   --custom-node-intermediate-fill: #294650;
 }
 
+body:has(.app-shell.theme-petrol-slate) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(77, 178, 187, 0.16), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(142, 195, 204, 0.14), transparent 58%),
+    linear-gradient(180deg, #10232a, #162830);
+}
+
 .app-shell.theme-copper-night {
   --custom-shell-bg-top: #261b16;
   --custom-shell-bg-bottom: #2d201a;
@@ -132,4 +153,11 @@
   --custom-node-connector-fill: #6f4f3b;
   --custom-node-splice-fill: #87693c;
   --custom-node-intermediate-fill: #614537;
+}
+
+body:has(.app-shell.theme-copper-night) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(213, 131, 75, 0.14), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(193, 141, 103, 0.12), transparent 58%),
+    linear-gradient(180deg, #261b16, #2d201a);
 }

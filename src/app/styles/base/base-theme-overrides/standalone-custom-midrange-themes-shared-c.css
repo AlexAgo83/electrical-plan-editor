@@ -144,3 +144,136 @@
   color: var(--custom-muted-text);
 }
 
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .settings-panel {
+  border-color: color-mix(in srgb, var(--custom-panel-border) 76%, white 6%);
+  background: linear-gradient(
+    170deg,
+    color-mix(in srgb, var(--custom-panel-bg) 78%, var(--custom-shell-bg-top)) 0%,
+    color-mix(in srgb, var(--custom-panel-bg) 72%, var(--custom-shell-bg-bottom)) 100%
+  );
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--custom-strong-text) 10%, transparent);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .settings-panel h2 {
+  color: var(--custom-strong-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .settings-panel-intro {
+  color: var(--custom-muted-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .settings-panel-chip {
+  border-color: color-mix(in srgb, var(--custom-button-border) 88%, white 8%);
+  background: color-mix(in srgb, var(--custom-badge-bg) 78%, var(--custom-panel-bg));
+  color: var(--custom-badge-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .settings-panel .settings-grid > label:not(.settings-checkbox),
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .settings-panel .settings-checkbox {
+  color: color-mix(in srgb, var(--custom-shell-text) 96%, white 4%);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  background: color-mix(in srgb, var(--custom-input-bg) 78%, var(--custom-shell-bg-bottom));
+  border-color: color-mix(in srgb, var(--custom-input-border) 78%, var(--custom-panel-border));
+  color: var(--custom-input-text);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .settings-panel .settings-checkbox:hover {
+  background: color-mix(in srgb, var(--custom-selection) 14%, transparent);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal
+) .settings-actions {
+  border-top-color: color-mix(in srgb, var(--custom-panel-border) 54%, transparent);
+}

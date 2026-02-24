@@ -33,6 +33,13 @@
   --custom-node-intermediate-fill: #444b39;
 }
 
+body:has(.app-shell.theme-moss-taupe) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(149, 166, 96, 0.14), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(124, 143, 93, 0.12), transparent 58%),
+    linear-gradient(180deg, #24251f, #2b2d24);
+}
+
 .app-shell.theme-navy-ash {
   --custom-shell-bg-top: #17202a;
   --custom-shell-bg-bottom: #1d2730;
@@ -65,6 +72,13 @@
   --custom-node-connector-fill: #31495e;
   --custom-node-splice-fill: #6f5b3b;
   --custom-node-intermediate-fill: #344453;
+}
+
+body:has(.app-shell.theme-navy-ash) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(114, 157, 201, 0.14), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(159, 179, 200, 0.12), transparent 58%),
+    linear-gradient(180deg, #17202a, #1d2730);
 }
 
 .app-shell.theme-charcoal-plum {
@@ -101,6 +115,13 @@
   --custom-node-intermediate-fill: #433a55;
 }
 
+body:has(.app-shell.theme-charcoal-plum) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(169, 106, 199, 0.14), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(143, 115, 159, 0.12), transparent 58%),
+    linear-gradient(180deg, #241f2a, #2a2430);
+}
+
 .app-shell.theme-smoked-teal {
   --custom-shell-bg-top: #122026;
   --custom-shell-bg-bottom: #16262d;
@@ -133,4 +154,11 @@
   --custom-node-connector-fill: #2a5960;
   --custom-node-splice-fill: #6f5b38;
   --custom-node-intermediate-fill: #2b4c52;
+}
+
+body:has(.app-shell.theme-smoked-teal) {
+  background:
+    radial-gradient(120% 120% at 12% 0%, rgba(78, 185, 172, 0.14), transparent 54%),
+    radial-gradient(120% 120% at 100% 100%, rgba(127, 186, 183, 0.12), transparent 58%),
+    linear-gradient(180deg, #122026, #16262d);
 }
