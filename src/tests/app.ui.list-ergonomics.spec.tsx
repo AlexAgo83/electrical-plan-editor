@@ -67,7 +67,8 @@ describe("App integration UI - list ergonomics", () => {
     expect(within(connectorsPanel).queryByText("Connector used")).not.toBeInTheDocument();
     expect(within(connectorsPanel).getByText("Connector free")).toBeInTheDocument();
 
-    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Occupied" }));
+    const occupancyChipGroup = within(connectorsPanel).getByRole("group", { name: "Connector occupancy filter" });
+    fireEvent.click(within(occupancyChipGroup).getByRole("button", { name: "Occupied" }));
     expect(within(connectorsPanel).getByText("Connector used")).toBeInTheDocument();
     expect(within(connectorsPanel).queryByText("Connector free")).not.toBeInTheDocument();
   });
