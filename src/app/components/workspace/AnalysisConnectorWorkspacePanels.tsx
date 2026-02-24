@@ -3,6 +3,7 @@ import { formatOccupantRefForDisplay } from "../../lib/app-utils-networking";
 import { nextSortState } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { TableFilterBar } from "./TableFilterBar";
 
 export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContentProps): ReactElement {
   const {
@@ -11,6 +12,10 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     selectedConnectorId,
     connectorOccupancyFilter,
     setConnectorOccupancyFilter,
+    connectorFilterField,
+    setConnectorFilterField,
+    connectorFilterQuery,
+    setConnectorFilterQuery,
     connectors,
     visibleConnectors,
     wires,
@@ -32,6 +37,8 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     getSortIndicator
   } = props;
   const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "synthesis">("cavities");
+  const connectorFilterPlaceholder =
+    connectorFilterField === "name" ? "Connector name" : connectorFilterField === "technicalId" ? "Technical ID" : "Name or technical ID...";
   const wireTechnicalIdById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire.technicalId] as const)), [wires]);
   const formatOccupantRef = (occupantRef: string | null): string =>
     occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
@@ -87,48 +94,66 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   <header className="list-panel-header">
     <h2>Connectors</h2>
     <div className="list-panel-header-tools">
-      <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
-        {([
-          ["all", "All"],
-          ["occupied", "Occupied"],
-          ["free", "Free"]
-        ] as const).map(([filterId, label]) => (
-          <button
-            key={filterId}
-            type="button"
-            className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
-            onClick={() => setConnectorOccupancyFilter(filterId)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      <button
-        type="button"
-        className="filter-chip table-export-button"
-        onClick={() =>
-          downloadCsvFile(
-            "analysis-connectors",
-            ["Name", "Technical ID", "Ways", "Occupied"],
-            visibleConnectors.map((connector) => [
-              connector.name,
-              connector.technicalId,
-              connector.cavityCount,
-              connectorOccupiedCountById.get(connector.id) ?? 0
-            ])
-          )
-        }
-        disabled={visibleConnectors.length === 0}
-      >
-        <span className="table-export-icon" aria-hidden="true" />
-        CSV
-      </button>
-      {onOpenConnectorOnboardingHelp !== undefined ? (
-        <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenConnectorOnboardingHelp}>
-          <span className="action-button-icon is-help" aria-hidden="true" />
-          <span>Help</span>
+      <div className="list-panel-header-tools-row">
+        <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
+          {([
+            ["all", "All"],
+            ["occupied", "Occupied"],
+            ["free", "Free"]
+          ] as const).map(([filterId, label]) => (
+            <button
+              key={filterId}
+              type="button"
+              className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+              onClick={() => setConnectorOccupancyFilter(filterId)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="filter-chip table-export-button"
+          onClick={() =>
+            downloadCsvFile(
+              "analysis-connectors",
+              ["Name", "Technical ID", "Ways", "Occupied"],
+              visibleConnectors.map((connector) => [
+                connector.name,
+                connector.technicalId,
+                connector.cavityCount,
+                connectorOccupiedCountById.get(connector.id) ?? 0
+              ])
+            )
+          }
+          disabled={visibleConnectors.length === 0}
+        >
+          <span className="table-export-icon" aria-hidden="true" />
+          CSV
         </button>
-      ) : null}
+        {onOpenConnectorOnboardingHelp !== undefined ? (
+          <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenConnectorOnboardingHelp}>
+            <span className="action-button-icon is-help" aria-hidden="true" />
+            <span>Help</span>
+          </button>
+        ) : null}
+      </div>
+      <div className="list-panel-header-tools-row">
+        <TableFilterBar
+          label="Filter"
+          fieldLabel="Connector filter field"
+          fieldValue={connectorFilterField}
+          onFieldChange={(value) => setConnectorFilterField(value as "name" | "technicalId" | "any")}
+          fieldOptions={[
+            { value: "name", label: "Name" },
+            { value: "technicalId", label: "Technical ID" },
+            { value: "any", label: "Any" }
+          ]}
+          queryValue={connectorFilterQuery}
+          onQueryChange={setConnectorFilterQuery}
+          placeholder={connectorFilterPlaceholder}
+        />
+      </div>
     </div>
   </header>
   {connectors.length === 0 ? (

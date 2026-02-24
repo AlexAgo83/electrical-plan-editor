@@ -24,6 +24,10 @@ export interface AnalysisWorkspaceContentProps {
   selectedConnectorId: ConnectorId | null;
   connectorOccupancyFilter: "all" | "occupied" | "free";
   setConnectorOccupancyFilter: (value: "all" | "occupied" | "free") => void;
+  connectorFilterField: "name" | "technicalId" | "any";
+  setConnectorFilterField: (value: "name" | "technicalId" | "any") => void;
+  connectorFilterQuery: string;
+  setConnectorFilterQuery: (value: string) => void;
   connectors: Connector[];
   visibleConnectors: Connector[];
   connectorSort: SortState;
@@ -46,6 +50,10 @@ export interface AnalysisWorkspaceContentProps {
   selectedSpliceId: SpliceId | null;
   spliceOccupancyFilter: "all" | "occupied" | "free";
   setSpliceOccupancyFilter: (value: "all" | "occupied" | "free") => void;
+  spliceFilterField: "name" | "technicalId" | "any";
+  setSpliceFilterField: (value: "name" | "technicalId" | "any") => void;
+  spliceFilterQuery: string;
+  setSpliceFilterQuery: (value: string) => void;
   splices: Splice[];
   visibleSplices: Splice[];
   spliceSort: SortState;
