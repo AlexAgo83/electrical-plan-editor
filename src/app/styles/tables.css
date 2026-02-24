@@ -233,14 +233,6 @@
   margin-top: 0.45rem;
 }
 
-.table-secondary-line {
-  display: block;
-  margin-top: 0.1rem;
-  font-size: 0.84em;
-  line-height: 1.2;
-  opacity: 0.75;
-}
-
 .status-chip {
   display: inline-flex;
   align-items: center;
