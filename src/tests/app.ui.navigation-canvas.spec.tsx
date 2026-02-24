@@ -1,6 +1,7 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  asCatalogItemId,
   asNodeId,
   asSegmentId,
   createUiIntegrationState,
@@ -12,9 +13,14 @@ import {
 import { appActions, appReducer, createInitialState } from "../store";
 
 describe("App integration UI - navigation and canvas", () => {
-  function openOperationsHealthPanel(): void {
-    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+  function createInitialStateWithCatalog() {
+    return appReducer(createInitialState(), appActions.upsertCatalogItem({
+      id: asCatalogItemId("CAT-UNDO"),
+      manufacturerReference: "UNDO-CAT-REF",
+      connectionCount: 4
+    }));
   }
+  const openOperationsHealthPanel = () => fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
 
   beforeEach(() => {
     localStorage.clear();
@@ -60,21 +66,14 @@ describe("App integration UI - navigation and canvas", () => {
   });
 
   it("supports undo and redo for modeling actions", () => {
-    renderAppWithState(createInitialState());
+    renderAppWithState(createInitialStateWithCatalog());
     switchScreenDrawerAware("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByRole("button", { name: "New" }));
     const connectorFormPanel = getPanelByHeading("Create Connector");
-    fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
-      target: { value: "Undo test connector" }
-    });
-    fireEvent.change(within(connectorFormPanel).getByLabelText("Technical ID"), {
-      target: { value: "C-UNDO-1" }
-    });
-    fireEvent.change(within(connectorFormPanel).getByLabelText("Way count"), {
-      target: { value: "2" }
-    });
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), { target: { value: "Undo test connector" } });
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Technical ID"), { target: { value: "C-UNDO-1" } });
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
 
     expect(within(connectorsPanel).getByText("Undo test connector")).toBeInTheDocument();
@@ -440,15 +439,15 @@ describe("App integration UI - navigation and canvas", () => {
   it("supports alt keyboard shortcuts for workspace navigation", () => {
     renderAppWithState(createUiIntegrationState());
 
-    fireEvent.keyDown(window, { key: "4", altKey: true });
+    fireEvent.keyDown(window, { key: "3", altKey: true });
     const primaryNavRow = document.querySelector(".workspace-nav-row");
     expect(primaryNavRow).not.toBeNull();
     expect(within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Modeling$/, hidden: true })).toHaveClass(
       "is-active"
     );
-    expect(getPanelByHeading("Wires")).toBeInTheDocument();
+    expect(getPanelByHeading("Connectors")).toBeInTheDocument();
 
-    fireEvent.keyDown(window, { key: "4", altKey: true, shiftKey: true });
+    fireEvent.keyDown(window, { key: "5", altKey: true, shiftKey: true });
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Segment$/, hidden: true })).toHaveClass(

@@ -38,6 +38,19 @@ function normalizeManufacturerReference(value: string | undefined): string | und
   return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
 }
 
+function hasWireEndpointIndexOutOfRange(state: AppState, spliceId: string, portCount: number): boolean {
+  return state.wires.allIds.some((id) => {
+    const wire = state.wires.byId[id];
+    if (wire === undefined) {
+      return false;
+    }
+    return (
+      (wire.endpointA.kind === "splicePort" && wire.endpointA.spliceId === spliceId && wire.endpointA.portIndex > portCount) ||
+      (wire.endpointB.kind === "splicePort" && wire.endpointB.spliceId === spliceId && wire.endpointB.portIndex > portCount)
+    );
+  });
+}
+
 function hasSpliceNodeReference(state: AppState, spliceId: string): boolean {
   return state.nodes.allIds.some((id) => {
     const node = state.nodes.byId[id];
@@ -64,13 +77,22 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
     case "splice/upsert": {
       const normalizedName = action.payload.name.trim();
       const normalizedTechnicalId = action.payload.technicalId.trim();
-      const portCount = action.payload.portCount;
+      let portCount = action.payload.portCount;
       if (action.payload.id.trim().length === 0) {
         return withError(state, "Splice ID is required.");
       }
       if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
         return withError(state, "Splice name and technical ID are required.");
       }
+      const linkedCatalogItem =
+        action.payload.catalogItemId === undefined ? undefined : state.catalogItems.byId[action.payload.catalogItemId];
+      if (action.payload.catalogItemId !== undefined && linkedCatalogItem === undefined) {
+        return withError(state, "Splice catalog item is invalid.");
+      }
+      if (linkedCatalogItem !== undefined) {
+        portCount = linkedCatalogItem.connectionCount;
+      }
+
       if (!Number.isInteger(portCount) || portCount < 1) {
         return withError(state, "Splice portCount must be an integer >= 1.");
       }
@@ -92,6 +114,9 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
           );
         }
       }
+      if (hasWireEndpointIndexOutOfRange(state, action.payload.id, portCount)) {
+        return withError(state, "Splice portCount cannot be reduced below wire endpoint port indexes.");
+      }
 
       return bumpRevision({
         ...clearLastError(state),
@@ -99,7 +124,11 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
           ...action.payload,
           name: normalizedName,
           technicalId: normalizedTechnicalId,
-          manufacturerReference: normalizeManufacturerReference(action.payload.manufacturerReference)
+          portCount,
+          manufacturerReference:
+            linkedCatalogItem !== undefined
+              ? linkedCatalogItem.manufacturerReference
+              : normalizeManufacturerReference(action.payload.manufacturerReference)
         })
       });
     }

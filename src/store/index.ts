@@ -8,6 +8,7 @@ export {
   isWorkspaceEmpty
 } from "./sampleNetwork";
 export * from "./selectors";
+export * from "./catalog";
 export {
   createEmptyWorkspaceState,
   createInitialState,

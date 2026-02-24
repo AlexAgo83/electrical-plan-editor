@@ -1,6 +1,8 @@
 import type {
   Network,
   NetworkId,
+  CatalogItem,
+  CatalogItemId,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -25,6 +27,10 @@ function selectCollection<T, Id extends string>(
 
 export function selectConnectors(state: AppState): Connector[] {
   return selectCollection(state.connectors.byId, state.connectors.allIds);
+}
+
+export function selectCatalogItems(state: AppState): CatalogItem[] {
+  return selectCollection(state.catalogItems.byId, state.catalogItems.allIds);
 }
 
 export function selectNetworks(state: AppState): Network[] {
@@ -69,6 +75,10 @@ export function selectNodePositions(state: AppState): AppState["nodePositions"] 
 
 export function selectConnectorById(state: AppState, id: ConnectorId): Connector | undefined {
   return state.connectors.byId[id];
+}
+
+export function selectCatalogItemById(state: AppState, id: CatalogItemId): CatalogItem | undefined {
+  return state.catalogItems.byId[id];
 }
 
 export function selectSpliceById(state: AppState, id: SpliceId): Splice | undefined {
@@ -134,6 +144,20 @@ export function selectConnectorTechnicalIdTaken(
     }
 
     return connector.technicalId === technicalId;
+  });
+}
+
+export function selectCatalogManufacturerReferenceTaken(
+  state: AppState,
+  manufacturerReference: string,
+  excludedCatalogItemId?: CatalogItemId
+): boolean {
+  return state.catalogItems.allIds.some((id) => {
+    if (excludedCatalogItemId !== undefined && id === excludedCatalogItemId) {
+      return false;
+    }
+    const item = state.catalogItems.byId[id];
+    return item?.manufacturerReference === manufacturerReference;
   });
 }
 

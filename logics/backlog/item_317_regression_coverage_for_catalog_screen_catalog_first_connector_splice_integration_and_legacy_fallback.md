@@ -2,7 +2,7 @@
 > From version: 0.9.4
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Regression safety for catalog navigation/UI, legacy bootstrap, and connector/splice catalog integration rules
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -38,6 +38,15 @@
 - Urgency: High.
 
 # Notes
+- Delivery snapshot:
+  - Added catalog UI regression coverage in `src/tests/app.ui.catalog.spec.tsx` (nav/order, quick-nav, catalog-first blocking, URL validation, catalog->connector flow).
+  - Added catalog reducer safety coverage in `src/tests/store.reducer.catalog.spec.ts` (propagation, delete guard, unsafe reduction guard).
+  - Updated existing UI regressions for catalog-first workflow and shortcut/onboarding changes:
+    - `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
+    - `src/tests/app.ui.navigation-canvas.spec.tsx`
+    - `src/tests/app.ui.home.spec.tsx`
+    - `src/tests/app.ui.settings-wire-defaults.spec.tsx`
+  - Updated E2E smoke flow to create a catalog item before connector/splice creation: `tests/e2e/smoke.spec.ts`
 - Dependencies: `req_051`, item_312, item_313, item_314, item_315, item_316.
 - Blocks: item_318.
 - Related AC: AC1-AC19.
@@ -46,4 +55,3 @@
   - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
   - `src/tests/app.ui.onboarding.spec.tsx`
   - `src/tests/persistence.localStorage.spec.ts`
-

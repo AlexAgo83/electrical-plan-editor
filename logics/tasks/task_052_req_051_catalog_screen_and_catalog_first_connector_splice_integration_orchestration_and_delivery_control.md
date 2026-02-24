@@ -1,8 +1,8 @@
 ## task_052_req_051_catalog_screen_and_catalog_first_connector_splice_integration_orchestration_and_delivery_control - req_051 Orchestration: Catalog Screen and Catalog-First Connector/Splice Integration Delivery Control
 > From version: 0.9.4
-> Understanding: 98%
-> Confidence: 95%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: High
 > Theme: Delivery orchestration for network-scoped catalog, connector/splice catalog-first workflow, legacy fallback, and onboarding updates
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -65,15 +65,15 @@ Rationale:
 - Add regressions after runtime behavior stabilizes.
 
 # Plan
-- [ ] Wave 0. Network-scoped catalog domain model, store schema, and `catalogItemId` contracts (`item_311`)
-- [ ] Wave 1. Persistence migration/import fallback, legacy bootstrap, and deterministic collision handling (`item_312`)
-- [ ] Wave 2. Catalog modeling sub-screen navigation, icon, quick-nav, and panel composition (`item_313`)
-- [ ] Wave 3. Catalog list/edit CRUD UI, validation, strict URL handling, and V1 ergonomics (`item_314`)
-- [ ] Wave 4. Connector/splice catalog-first form integration, derived counts, and integrity guards (`item_315`)
-- [ ] Wave 5. Onboarding catalog-step insertion and catalog-first guidance updates (`item_316`)
-- [ ] Wave 6. Regression coverage for catalog, legacy fallback, connector/splice integration, and onboarding (`item_317`)
-- [ ] Wave 7. Closure: full validation matrix, AC traceability, and `logics` synchronization (`item_318`)
-- [ ] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary)
+- [x] Wave 0. Network-scoped catalog domain model, store schema, and `catalogItemId` contracts (`item_311`)
+- [x] Wave 1. Persistence migration/import fallback, legacy bootstrap, and deterministic collision handling (`item_312`)
+- [x] Wave 2. Catalog modeling sub-screen navigation, icon, quick-nav, and panel composition (`item_313`)
+- [x] Wave 3. Catalog list/edit CRUD UI, validation, strict URL handling, and V1 ergonomics (`item_314`)
+- [x] Wave 4. Connector/splice catalog-first form integration, derived counts, and integrity guards (`item_315`)
+- [x] Wave 5. Onboarding catalog-step insertion and catalog-first guidance updates (`item_316`)
+- [x] Wave 6. Regression coverage for catalog, legacy fallback, connector/splice integration, and onboarding (`item_317`)
+- [x] Wave 7. Closure: full validation matrix, AC traceability, and `logics` synchronization (`item_318`)
+- [x] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary)
 
 # Validation gates
 ## A. Minimum wave gate (apply after Waves 0-6)
@@ -130,15 +130,15 @@ Rationale:
 
 # Report
 - Wave status:
-  - Wave 0 (schema/link contract): pending
-  - Wave 1 (migration/import fallback): pending
-  - Wave 2 (Catalog nav/screen composition): pending
-  - Wave 3 (Catalog CRUD UI/validation): pending
-  - Wave 4 (connector/splice catalog-first integration): pending
-  - Wave 5 (onboarding adaptation): pending
-  - Wave 6 (regression coverage): pending
-  - Wave 7 (closure + AC traceability): pending
-  - FINAL (`.md` synchronization): pending
+  - Wave 0 (schema/link contract): completed
+  - Wave 1 (migration/import fallback): completed
+  - Wave 2 (Catalog nav/screen composition): completed
+  - Wave 3 (Catalog CRUD UI/validation): completed
+  - Wave 4 (connector/splice catalog-first integration): completed
+  - Wave 5 (onboarding adaptation): completed
+  - Wave 6 (regression coverage): completed
+  - Wave 7 (closure + AC traceability): completed
+  - FINAL (`.md` synchronization): completed
 - Current blockers:
   - None.
 - Main risks to track:
@@ -146,7 +146,23 @@ Rationale:
   - Integrity-guard false negatives on occupancy/endpoint usage checks.
   - UX dead-ends if connector/splice creation is blocked without clear Catalog CTA.
 - Validation snapshot:
-  - Not started.
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s build` ✅
+  - `npm run -s test:ci` ✅ (`37` files / `245` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
+- Delivery summary:
+  - Implemented network-scoped `Catalog` domain/store + `catalogItemId` link contract for connectors/splices.
+  - Implemented persistence migration/import legacy fallback bootstrap and deterministic collision suffixing.
+  - Added modeling `Catalog` sub-screen/navigation (drawer + nav row + quick-nav) and dedicated icon wiring.
+  - Added catalog CRUD UI (list/filter/sort/form, URL validation, create connector/splice actions, no analysis panel).
+  - Enforced catalog-first connector/splice forms with derived counts and integrity guards.
+  - Added onboarding `Catalog` step (position 2 / 6-step flow) and contextual target actions.
+  - Added/updated regression coverage (UI, reducer, e2e flow) and fixed follow-on regressions.
 - AC traceability (`req_051`) target mapping (planned):
   - AC1-AC4 -> `item_313`, verified in `item_317`/`item_318`
   - AC5-AC7 -> `item_314`, verified in `item_317`/`item_318`
@@ -173,4 +189,3 @@ Rationale:
 - `src/adapters/persistence/localStorage.ts`
 - `src/tests/app.ui.onboarding.spec.tsx`
 - `src/tests/persistence.localStorage.spec.ts`
-

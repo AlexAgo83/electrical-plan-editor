@@ -2,6 +2,8 @@ import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import { normalizeWireColorState } from "../../core/cableColors";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import type {
+  CatalogItem,
+  CatalogItemId,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -13,6 +15,7 @@ import type {
   Wire,
   WireId
 } from "../../core/entities";
+import { bootstrapCatalogForScopedState, normalizeCatalogItem, normalizeManufacturerReference } from "../../store/catalog";
 import type { AppState, EntityState, LayoutNodePosition, NetworkScopedState, NetworkSummaryViewState } from "../../store";
 import {
   DEFAULT_NETWORK_CREATED_AT,
@@ -143,19 +146,6 @@ function normalizeNetworkSummaryViewState(candidate: unknown): NetworkSummaryVie
   };
 }
 
-function normalizeManufacturerReference(value: unknown): string | undefined {
-  if (typeof value !== "string") {
-    return undefined;
-  }
-
-  const normalized = value.trim();
-  if (normalized.length === 0) {
-    return undefined;
-  }
-
-  return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
-}
-
 function normalizeConnectorEntityState(
   candidate: EntityState<Connector, ConnectorId>
 ): EntityState<Connector, ConnectorId> {
@@ -198,12 +188,29 @@ function normalizeSpliceEntityState(candidate: EntityState<Splice, SpliceId>): E
   };
 }
 
+function normalizeCatalogEntityState(
+  candidate: EntityState<CatalogItem, CatalogItemId>
+): EntityState<CatalogItem, CatalogItemId> {
+  const byId = {} as EntityState<CatalogItem, CatalogItemId>["byId"];
+  const allIds: CatalogItemId[] = [];
+  for (const catalogItemId of candidate.allIds) {
+    const item = normalizeCatalogItem(candidate.byId[catalogItemId] as Partial<CatalogItem>);
+    if (item === null) {
+      continue;
+    }
+    byId[catalogItemId] = item;
+    allIds.push(catalogItemId);
+  }
+  return { byId, allIds };
+}
+
 function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | null {
   if (!isRecord(candidate)) {
     return null;
   }
 
   if (
+    (candidate.catalogItems !== undefined && !isEntityState(candidate.catalogItems)) ||
     !isEntityState(candidate.connectors) ||
     !isEntityState(candidate.splices) ||
     !isEntityState(candidate.nodes) ||
@@ -215,7 +222,11 @@ function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | n
     return null;
   }
 
-  return {
+  return bootstrapCatalogForScopedState({
+    catalogItems:
+      candidate.catalogItems !== undefined
+        ? normalizeCatalogEntityState(candidate.catalogItems as EntityState<CatalogItem, CatalogItemId>)
+        : ({ byId: {}, allIds: [] } as NetworkScopedState["catalogItems"]),
     connectors: normalizeConnectorEntityState(candidate.connectors as EntityState<Connector, ConnectorId>),
     splices: normalizeSpliceEntityState(candidate.splices as EntityState<Splice, SpliceId>),
     nodes: candidate.nodes as NetworkScopedState["nodes"],
@@ -225,7 +236,7 @@ function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | n
     connectorCavityOccupancy: candidate.connectorCavityOccupancy as NetworkScopedState["connectorCavityOccupancy"],
     splicePortOccupancy: candidate.splicePortOccupancy as NetworkScopedState["splicePortOccupancy"],
     networkSummaryViewState: normalizeNetworkSummaryViewState(candidate.networkSummaryViewState)
-  };
+  });
 }
 
 function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | null {
@@ -236,6 +247,7 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
   if (
     !isEntityState(candidate.networks) ||
     !isRecord(candidate.networkStates) ||
+    (candidate.catalogItems !== undefined && !isEntityState(candidate.catalogItems)) ||
     !isEntityState(candidate.connectors) ||
     !isEntityState(candidate.splices) ||
     !isEntityState(candidate.nodes) ||
@@ -272,6 +284,10 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     ...(candidate as unknown as AppState),
     schemaVersion: APP_SCHEMA_VERSION,
     networkStates: normalizedNetworkStates,
+    catalogItems:
+      candidate.catalogItems !== undefined
+        ? normalizeCatalogEntityState(candidate.catalogItems as EntityState<CatalogItem, CatalogItemId>)
+        : ({ byId: {}, allIds: [] } as AppState["catalogItems"]),
     connectors: normalizeConnectorEntityState(candidate.connectors as EntityState<Connector, ConnectorId>),
     splices: normalizeSpliceEntityState(candidate.splices as EntityState<Splice, SpliceId>),
     wires: normalizeWireEntityState(candidate.wires as EntityState<Wire, WireId>),
@@ -296,6 +312,7 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     }
 
     nextState.connectors = activeScoped.connectors;
+    nextState.catalogItems = activeScoped.catalogItems;
     nextState.splices = activeScoped.splices;
     nextState.nodes = activeScoped.nodes;
     nextState.segments = activeScoped.segments;
@@ -303,6 +320,9 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     nextState.nodePositions = activeScoped.nodePositions;
     nextState.connectorCavityOccupancy = activeScoped.connectorCavityOccupancy;
     nextState.splicePortOccupancy = activeScoped.splicePortOccupancy;
+  }
+  if (nextActiveNetworkId === null && candidate.catalogItems === undefined) {
+    nextState.catalogItems = { byId: {}, allIds: [] } as AppState["catalogItems"];
   }
 
   return nextState;
@@ -484,6 +504,7 @@ function migrateLegacySingleNetworkStateToCurrent(
 ): AppState {
   const seeded = createInitialState();
   const scoped: NetworkScopedState = {
+    catalogItems: { byId: {} as Record<CatalogItemId, CatalogItem>, allIds: [] },
     connectors: normalizeConnectorEntityState(legacy.connectors),
     splices: normalizeSpliceEntityState(legacy.splices),
     nodes: legacy.nodes,
@@ -493,6 +514,7 @@ function migrateLegacySingleNetworkStateToCurrent(
     connectorCavityOccupancy: legacy.connectorCavityOccupancy,
     splicePortOccupancy: legacy.splicePortOccupancy
   };
+  const catalogBootstrappedScoped = bootstrapCatalogForScopedState(scoped);
 
   const defaultNetwork = seeded.networks.byId[DEFAULT_NETWORK_ID];
   if (defaultNetwork === undefined) {
@@ -516,16 +538,17 @@ function migrateLegacySingleNetworkStateToCurrent(
     },
     activeNetworkId: network.id,
     networkStates: {
-      [network.id]: scoped
+      [network.id]: catalogBootstrappedScoped
     } as AppState["networkStates"],
-    connectors: scoped.connectors,
-    splices: scoped.splices,
-    nodes: scoped.nodes,
-    segments: scoped.segments,
-    wires: scoped.wires,
-    nodePositions: scoped.nodePositions,
-    connectorCavityOccupancy: scoped.connectorCavityOccupancy,
-    splicePortOccupancy: scoped.splicePortOccupancy,
+    catalogItems: catalogBootstrappedScoped.catalogItems,
+    connectors: catalogBootstrappedScoped.connectors,
+    splices: catalogBootstrappedScoped.splices,
+    nodes: catalogBootstrappedScoped.nodes,
+    segments: catalogBootstrappedScoped.segments,
+    wires: catalogBootstrappedScoped.wires,
+    nodePositions: catalogBootstrappedScoped.nodePositions,
+    connectorCavityOccupancy: catalogBootstrappedScoped.connectorCavityOccupancy,
+    splicePortOccupancy: catalogBootstrappedScoped.splicePortOccupancy,
     ui: {
       selected: legacy.ui.selected,
       lastError: legacy.ui.lastError,

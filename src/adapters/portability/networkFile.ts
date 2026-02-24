@@ -1,8 +1,21 @@
-import type { Connector, ConnectorId, Network, NetworkId, NodeId, Splice, SpliceId, Wire, WireId } from "../../core/entities";
+import type {
+  CatalogItem,
+  CatalogItemId,
+  Connector,
+  ConnectorId,
+  Network,
+  NetworkId,
+  NodeId,
+  Splice,
+  SpliceId,
+  Wire,
+  WireId
+} from "../../core/entities";
 import { normalizeWireColorState } from "../../core/cableColors";
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
+import { bootstrapCatalogForScopedState, normalizeCatalogItem, normalizeManufacturerReference } from "../../store/catalog";
 
 export const NETWORK_FILE_SCHEMA_VERSION = 2;
 export const NETWORK_FILE_PAYLOAD_KIND = "electrical-plan-editor.network-export";
@@ -105,19 +118,6 @@ function normalizeWiresEntityState(
   };
 }
 
-function normalizeManufacturerReference(value: unknown): string | undefined {
-  if (typeof value !== "string") {
-    return undefined;
-  }
-
-  const normalized = value.trim();
-  if (normalized.length === 0) {
-    return undefined;
-  }
-
-  return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
-}
-
 function normalizeConnectorsEntityState(
   connectors: NetworkScopedState["connectors"]
 ): NetworkScopedState["connectors"] {
@@ -160,6 +160,28 @@ function normalizeSplicesEntityState(splices: NetworkScopedState["splices"]): Ne
   };
 }
 
+function normalizeCatalogItemsEntityState(
+  catalogItems: NetworkScopedState["catalogItems"] | undefined
+): NetworkScopedState["catalogItems"] {
+  const empty = { byId: {} as Record<CatalogItemId, CatalogItem>, allIds: [] as CatalogItemId[] };
+  if (catalogItems === undefined) {
+    return empty;
+  }
+
+  const byId = {} as Record<CatalogItemId, CatalogItem>;
+  const allIds: CatalogItemId[] = [];
+  for (const catalogItemId of catalogItems.allIds) {
+    const normalized = normalizeCatalogItem(catalogItems.byId[catalogItemId] as Partial<CatalogItem>);
+    if (normalized === null) {
+      continue;
+    }
+    byId[catalogItemId] = normalized;
+    allIds.push(catalogItemId);
+  }
+  allIds.sort((left, right) => left.localeCompare(right));
+  return { byId, allIds };
+}
+
 function isNetworkScopedState(value: unknown): value is NetworkScopedState {
   if (!isRecord(value)) {
     return false;
@@ -167,6 +189,7 @@ function isNetworkScopedState(value: unknown): value is NetworkScopedState {
 
   return (
     isEntityState(value.connectors) &&
+    (value.catalogItems === undefined || isEntityState(value.catalogItems)) &&
     isEntityState(value.splices) &&
     isEntityState(value.nodes) &&
     isEntityState(value.segments) &&
@@ -198,7 +221,8 @@ function isExportedNetworkBundle(value: unknown): value is ExportedNetworkBundle
 }
 
 function normalizeScopedState(scoped: NetworkScopedState): NetworkScopedState {
-  return {
+  return bootstrapCatalogForScopedState({
+    catalogItems: normalizeCatalogItemsEntityState(scoped.catalogItems),
     connectors: {
       allIds: [...scoped.connectors.allIds].sort((left, right) => left.localeCompare(right)),
       byId: normalizeConnectorsEntityState(scoped.connectors).byId
@@ -222,7 +246,7 @@ function normalizeScopedState(scoped: NetworkScopedState): NetworkScopedState {
     nodePositions: normalizeNodePositions(scoped.nodePositions),
     connectorCavityOccupancy: { ...scoped.connectorCavityOccupancy },
     splicePortOccupancy: { ...scoped.splicePortOccupancy }
-  };
+  });
 }
 
 function canonicalize(value: unknown): unknown {

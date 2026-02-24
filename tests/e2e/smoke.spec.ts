@@ -97,8 +97,9 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     await expect(page.getByRole("button", { name: "Close menu", exact: true })).toHaveCount(0);
   };
 
-  const switchSubScreen = async (value: "connector" | "splice" | "node" | "segment" | "wire") => {
+  const switchSubScreen = async (value: "catalog" | "connector" | "splice" | "node" | "segment" | "wire") => {
     const labelBySubScreen = {
+      catalog: "Catalog",
       connector: "Connector",
       splice: "Splice",
       node: "Node",
@@ -158,12 +159,19 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await expect(page.getByRole("heading", { name: "e-Plan Editor" })).toBeVisible();
   await dismissOnboardingIfVisible(page);
 
+  await switchSubScreen("catalog");
+  const catalogPanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Catalog" }) });
+  await catalogPanel.getByRole("button", { name: "Create catalog item" }).click();
+  const catalogForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create catalog item" }) });
+  await catalogForm.getByLabel("Manufacturer reference").fill("E2E-CATALOG-2");
+  await catalogForm.getByLabel("Connection count").fill("2");
+  await catalogForm.getByRole("button", { name: "Create" }).click();
+
   await switchSubScreen("connector");
   await openCreateFormIfIdle("Connector form");
   const connectorForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Connector" }) });
   await connectorForm.getByLabel("Functional name").fill("Connector 1");
   await connectorForm.getByLabel("Technical ID").fill("C-1");
-  await connectorForm.getByLabel("Way count").fill("2");
   await connectorForm.getByRole("button", { name: "Create" }).click();
 
   await switchSubScreen("splice");
@@ -171,7 +179,6 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   const spliceForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Splice" }) });
   await spliceForm.getByLabel("Functional name").fill("Splice 1");
   await spliceForm.getByLabel("Technical ID").fill("S-1");
-  await spliceForm.getByLabel("Port count").fill("2");
   await spliceForm.getByRole("button", { name: "Create" }).click();
 
   await switchSubScreen("node");

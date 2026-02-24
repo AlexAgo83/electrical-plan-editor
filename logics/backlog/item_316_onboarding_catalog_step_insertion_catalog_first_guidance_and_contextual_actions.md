@@ -2,7 +2,7 @@
 > From version: 0.9.4
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Extend onboarding flow with a Catalog-first step and update connector/splice guidance accordingly
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.

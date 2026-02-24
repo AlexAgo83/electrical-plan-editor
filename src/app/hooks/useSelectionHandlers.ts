@@ -20,7 +20,7 @@ type DispatchAction = (
 ) => void;
 
 interface SelectionRef {
-  kind: ValidationIssue["selectionKind"];
+  kind: ValidationIssue["selectionKind"] | "catalog";
   id: string;
 }
 
@@ -176,7 +176,7 @@ export function useSelectionHandlers({
   }
 
   function handleFocusCurrentSelectionOnCanvas(): void {
-    if (selected === null) {
+    if (selected === null || selected.kind === "catalog") {
       return;
     }
 
@@ -266,7 +266,9 @@ export function useSelectionHandlers({
               ? { kind: "segment", id: selectedSegment.id }
               : selectedWire !== null
                 ? { kind: "wire", id: selectedWire.id }
-                : selected;
+                : selected !== null && selected.kind !== "catalog"
+                  ? { kind: selected.kind, id: selected.id }
+                  : null;
 
     if (targetSubScreen === null || selectionForAnalysis === null) {
       return;

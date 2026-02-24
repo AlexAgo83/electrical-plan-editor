@@ -1,6 +1,8 @@
 import type {
   Network,
   NetworkId,
+  CatalogItem,
+  CatalogItemId,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -20,7 +22,7 @@ export interface EntityState<T, Id extends string> {
 }
 
 export interface SelectionState {
-  kind: "connector" | "splice" | "node" | "segment" | "wire";
+  kind: "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
   id: string;
 }
 
@@ -71,6 +73,7 @@ export interface NetworkSummaryViewState {
 }
 
 export interface NetworkScopedState {
+  catalogItems: EntityState<CatalogItem, CatalogItemId>;
   connectors: EntityState<Connector, ConnectorId>;
   splices: EntityState<Splice, SpliceId>;
   nodes: EntityState<NetworkNode, NodeId>;
@@ -87,6 +90,7 @@ export interface AppState {
   networks: EntityState<Network, NetworkId>;
   activeNetworkId: NetworkId | null;
   networkStates: Record<NetworkId, NetworkScopedState>;
+  catalogItems: EntityState<CatalogItem, CatalogItemId>;
   connectors: EntityState<Connector, ConnectorId>;
   splices: EntityState<Splice, SpliceId>;
   nodes: EntityState<NetworkNode, NodeId>;
@@ -118,6 +122,7 @@ export const DEFAULT_NETWORK_CREATED_AT = "2026-01-01T00:00:00.000Z";
 
 export function createEmptyNetworkScopedState(): NetworkScopedState {
   return {
+    catalogItems: createEmptyEntityState<CatalogItem, CatalogItemId>(),
     connectors: createEmptyEntityState<Connector, ConnectorId>(),
     splices: createEmptyEntityState<Splice, SpliceId>(),
     nodes: createEmptyEntityState<NetworkNode, NodeId>(),
@@ -148,6 +153,7 @@ export function createEmptyWorkspaceState(themeMode: ThemeMode = "normal"): AppS
     networks: createEmptyEntityState<Network, NetworkId>(),
     activeNetworkId: null,
     networkStates: {} as Record<NetworkId, NetworkScopedState>,
+    catalogItems: createEmptyEntityState<CatalogItem, CatalogItemId>(),
     connectors: createEmptyEntityState<Connector, ConnectorId>(),
     splices: createEmptyEntityState<Splice, SpliceId>(),
     nodes: createEmptyEntityState<NetworkNode, NodeId>(),
@@ -189,6 +195,7 @@ export function createInitialState(): AppState {
     networkStates: {
       [defaultNetwork.id]: defaultScopedState
     } as Record<NetworkId, NetworkScopedState>,
+    catalogItems: defaultScopedState.catalogItems,
     connectors: defaultScopedState.connectors,
     splices: defaultScopedState.splices,
     nodes: defaultScopedState.nodes,

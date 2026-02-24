@@ -77,7 +77,7 @@ describe("home workspace screen", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 
     expect(screen.getByRole("dialog", { name: "Create your first network" })).toBeInTheDocument();
-    expect(screen.getByText("Step 1 of 5")).toBeInTheDocument();
+    expect(screen.getByText("Step 1 of 6")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
     const optOutCheckbox = screen.getByLabelText("Do not open automatically on app load");
     expect(optOutCheckbox).toBeInTheDocument();

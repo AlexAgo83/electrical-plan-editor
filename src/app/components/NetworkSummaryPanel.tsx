@@ -176,6 +176,7 @@ const QUICK_ENTITY_NAV_ITEMS: Record<
   ReadonlyArray<{ subScreen: SubScreenId; label: string }>
 > = {
   modeling: [
+    { subScreen: "catalog", label: "Catalog" },
     { subScreen: "connector", label: "Connectors" },
     { subScreen: "splice", label: "Splices" },
     { subScreen: "node", label: "Nodes" },
@@ -192,6 +193,7 @@ const QUICK_ENTITY_NAV_ITEMS: Record<
 };
 
 const SUB_SCREEN_ICON_CLASS_BY_ID: Record<SubScreenId, string> = {
+  catalog: "is-catalog",
   connector: "is-connectors",
   splice: "is-splices",
   node: "is-nodes",

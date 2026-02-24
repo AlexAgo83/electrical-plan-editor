@@ -12,16 +12,19 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     setConnectorName,
     connectorTechnicalId,
     setConnectorTechnicalId,
+    catalogItems,
+    openCatalogSubScreen,
+    connectorCatalogItemId,
+    setConnectorCatalogItemId,
     connectorManufacturerReference,
-    setConnectorManufacturerReference,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,
     cavityCount,
-    setCavityCount,
     cancelConnectorEdit,
     connectorFormError
   } = props;
+  const hasCatalogItems = catalogItems.length > 0;
 
   return (
 <article className="panel" hidden={!isConnectorSubScreen}>
@@ -40,18 +43,37 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       <input value={connectorTechnicalId} onChange={(event) => setConnectorTechnicalId(event.target.value)} placeholder="C-001" required />
     </label>
     <label>
-      Manufacturer reference
-      <input
-        value={connectorManufacturerReference}
-        onChange={(event) => setConnectorManufacturerReference(event.target.value)}
-        placeholder="e.g. TE-1-967616-1"
-        maxLength={120}
-      />
+      Catalog item (manufacturer reference)
+      <select
+        value={connectorCatalogItemId}
+        onChange={(event) => setConnectorCatalogItemId(event.target.value)}
+        required
+        disabled={!hasCatalogItems}
+      >
+        <option value="">Select a catalog item</option>
+        {catalogItems.map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.manufacturerReference}
+          </option>
+        ))}
+      </select>
     </label>
+    {!hasCatalogItems ? (
+      <div className="row-actions compact">
+        <small className="inline-error">Create a catalog item first to define manufacturer reference and connection count.</small>
+        <button type="button" className="button-with-icon" onClick={openCatalogSubScreen}>
+          <span className="action-button-icon is-catalog" aria-hidden="true" />
+          Open Catalog
+        </button>
+      </div>
+    ) : null}
+    {connectorManufacturerReference.trim().length > 0 ? (
+      <small className="meta-line">Manufacturer reference: {connectorManufacturerReference}</small>
+    ) : null}
     {connectorTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
     <label>
-      Way count
-      <input type="number" min={1} step={1} value={cavityCount} onChange={(event) => setCavityCount(event.target.value)} required />
+      Way count (from catalog)
+      <input type="number" min={1} step={1} value={cavityCount} readOnly required />
     </label>
     <label className="settings-checkbox">
       <input
@@ -66,7 +88,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       <button
         type="submit"
         className="button-with-icon"
-        disabled={connectorTechnicalIdAlreadyUsed}
+        disabled={connectorTechnicalIdAlreadyUsed || !hasCatalogItems || connectorCatalogItemId.trim().length === 0}
       >
         {connectorFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
         {connectorFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}

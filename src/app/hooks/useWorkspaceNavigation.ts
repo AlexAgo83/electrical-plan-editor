@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
 
 type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
-type SubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
+type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
 
 interface UseWorkspaceNavigationResult {
   activeScreen: ScreenId;
