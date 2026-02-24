@@ -90,10 +90,14 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireTechnicalId: Parameters<typeof useWireHandlers>[0]["setWireTechnicalId"];
   wireSectionMm2: Parameters<typeof useWireHandlers>[0]["wireSectionMm2"];
   setWireSectionMm2: Parameters<typeof useWireHandlers>[0]["setWireSectionMm2"];
+  wireColorMode: Parameters<typeof useWireHandlers>[0]["wireColorMode"];
+  setWireColorMode: Parameters<typeof useWireHandlers>[0]["setWireColorMode"];
   wirePrimaryColorId: Parameters<typeof useWireHandlers>[0]["wirePrimaryColorId"];
   setWirePrimaryColorId: Parameters<typeof useWireHandlers>[0]["setWirePrimaryColorId"];
   wireSecondaryColorId: Parameters<typeof useWireHandlers>[0]["wireSecondaryColorId"];
   setWireSecondaryColorId: Parameters<typeof useWireHandlers>[0]["setWireSecondaryColorId"];
+  wireFreeColorLabel: Parameters<typeof useWireHandlers>[0]["wireFreeColorLabel"];
+  setWireFreeColorLabel: Parameters<typeof useWireHandlers>[0]["setWireFreeColorLabel"];
   wireEndpointAConnectionReference: Parameters<typeof useWireHandlers>[0]["wireEndpointAConnectionReference"];
   setWireEndpointAConnectionReference: Parameters<typeof useWireHandlers>[0]["setWireEndpointAConnectionReference"];
   wireEndpointASealReference: Parameters<typeof useWireHandlers>[0]["wireEndpointASealReference"];
@@ -213,10 +217,14 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireTechnicalId,
   wireSectionMm2,
   setWireSectionMm2,
+  wireColorMode,
+  setWireColorMode,
   wirePrimaryColorId,
   setWirePrimaryColorId,
   wireSecondaryColorId,
   setWireSecondaryColorId,
+  wireFreeColorLabel,
+  setWireFreeColorLabel,
   wireEndpointAConnectionReference,
   setWireEndpointAConnectionReference,
   wireEndpointASealReference,
@@ -360,10 +368,14 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireTechnicalId,
     wireSectionMm2,
     setWireSectionMm2,
+    wireColorMode,
+    setWireColorMode,
     wirePrimaryColorId,
     setWirePrimaryColorId,
     wireSecondaryColorId,
     setWireSecondaryColorId,
+    wireFreeColorLabel,
+    setWireFreeColorLabel,
     wireEndpointAConnectionReference,
     setWireEndpointAConnectionReference,
     wireEndpointASealReference,

@@ -84,10 +84,14 @@ export interface ModelingFormsColumnProps {
   setWireTechnicalId: (value: string) => void;
   wireSectionMm2: string;
   setWireSectionMm2: (value: string) => void;
+  wireColorMode: "none" | "catalog" | "free";
+  setWireColorMode: (value: "none" | "catalog" | "free") => void;
   wirePrimaryColorId: string;
   setWirePrimaryColorId: (value: string) => void;
   wireSecondaryColorId: string;
   setWireSecondaryColorId: (value: string) => void;
+  wireFreeColorLabel: string;
+  setWireFreeColorLabel: (value: string) => void;
   wireTechnicalIdAlreadyUsed: boolean;
   wireEndpointAConnectionReference: string;
   setWireEndpointAConnectionReference: (value: string) => void;
