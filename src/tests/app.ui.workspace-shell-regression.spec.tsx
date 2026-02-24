@@ -178,4 +178,31 @@ describe("App integration UI - workspace shell regression", () => {
     expect(screen.getByRole("heading", { name: "Wire analysis" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Connector form" })).not.toBeInTheDocument();
   });
+
+  it("restores the last analysis sub-panel and preserves analysis filter state across modeling toggles", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    let primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /Analysis/i, hidden: true }));
+
+    const quickEntityNav = screen.getByRole("group", { name: "Quick entity navigation strip" });
+    fireEvent.click(within(quickEntityNav).getByRole("button", { name: /Connectors 1/i }));
+    expect(screen.getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
+
+    const connectorFilterInput = screen.getByRole("textbox", { name: "Connector filter field query" });
+    fireEvent.change(connectorFilterInput, { target: { value: "C-1" } });
+    expect(connectorFilterInput).toHaveValue("C-1");
+
+    primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /Modeling/i, hidden: true }));
+
+    primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /Analysis/i, hidden: true }));
+
+    expect(screen.getByRole("heading", { name: "Connector analysis" })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Connector filter field query" })).toHaveValue("C-1");
+  });
 });

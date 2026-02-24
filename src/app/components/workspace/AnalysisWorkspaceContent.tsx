@@ -8,11 +8,8 @@ import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.t
 export type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 
 export function AnalysisWorkspaceContent(props: AnalysisWorkspaceContentProps): ReactElement {
-  const { networkSummaryPanel } = props;
-
   return (
     <section className="panel-grid analysis-panel-grid">
-      <section className="analysis-network-summary-row">{networkSummaryPanel}</section>
       <AnalysisConnectorWorkspacePanels {...props} />
       <AnalysisSpliceWorkspacePanels {...props} />
       <AnalysisNodeSegmentWorkspacePanels {...props} />
