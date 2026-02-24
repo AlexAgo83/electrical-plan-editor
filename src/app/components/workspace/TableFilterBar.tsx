@@ -51,14 +51,25 @@ export function TableFilterBar({
           </option>
         ))}
       </select>
-      <input
-        className="list-inline-table-filter-input"
-        type="text"
-        aria-label={queryAriaLabel}
-        value={queryValue}
-        onChange={(event) => onQueryChange(event.target.value)}
-        placeholder={placeholder}
-      />
+      <div className="list-inline-table-filter-input-shell">
+        <input
+          className="list-inline-table-filter-input"
+          type="text"
+          aria-label={queryAriaLabel}
+          value={queryValue}
+          onChange={(event) => onQueryChange(event.target.value)}
+          placeholder={placeholder}
+        />
+        <button
+          type="button"
+          className="list-inline-table-filter-clear"
+          aria-label={`Clear ${label.toLowerCase()} query`}
+          onClick={() => onQueryChange("")}
+          disabled={queryValue.length === 0}
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
     </label>
   );
 }
