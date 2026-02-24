@@ -264,6 +264,22 @@ describe("App integration UI - navigation and canvas", () => {
     expect(connectorNode).toHaveClass("is-selected");
   });
 
+  it("keeps analysis and form panels hidden for CAD-only selection until a table row is selected", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+
+    const connectorNode = screen.getByRole("button", { name: "Select Connector 1 (C-1)" });
+    fireEvent.mouseDown(connectorNode, { button: 0 });
+    fireEvent.mouseUp(connectorNode, { button: 0 });
+    fireEvent.click(connectorNode);
+
+    const inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText("N-C1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Connector analysis" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Edit Connector" })).toBeNull();
+  });
+
   it("dispatches connector selection once for a single 2D node click in modeling", () => {
     const { store } = renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
@@ -494,7 +510,7 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.click(segmentHitbox as Element);
 
     expect(screen.queryByRole("heading", { name: "Edit Node" })).not.toBeInTheDocument();
-    expect(getPanelByHeading("Node form")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Node form" })).toBeNull();
   });
 
   it("asks confirmation before regenerating layout when manual positions exist", () => {
