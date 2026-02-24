@@ -26,6 +26,14 @@ export function TableFilterBar({
   onQueryChange,
   placeholder
 }: TableFilterBarProps): ReactElement {
+  const orderedFieldOptions =
+    fieldOptions.find((option) => option.value === "any") === undefined
+      ? fieldOptions
+      : [
+          ...fieldOptions.filter((option) => option.value === "any"),
+          ...fieldOptions.filter((option) => option.value !== "any")
+        ];
+
   return (
     <label className="list-inline-number-filter list-inline-table-filter">
       <span>{label}</span>
@@ -35,7 +43,7 @@ export function TableFilterBar({
         value={fieldValue}
         onChange={(event) => onFieldChange(event.target.value)}
       >
-        {fieldOptions.map((option) => (
+        {orderedFieldOptions.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
