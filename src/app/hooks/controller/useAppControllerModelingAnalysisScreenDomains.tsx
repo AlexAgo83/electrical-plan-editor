@@ -140,7 +140,6 @@ export function useAppControllerModelingAnalysisScreenDomains({
   wireDescriptions,
   describeNode,
   nodeLabelById,
-  networkSummaryPanel,
   connectorTechnicalIdAlreadyUsed,
   spliceTechnicalIdAlreadyUsed,
   wireTechnicalIdAlreadyUsed,
@@ -360,10 +359,6 @@ export function useAppControllerModelingAnalysisScreenDomains({
 
   const analysisSlice = includeAnalysisContent
     ? (() => {
-      if (networkSummaryPanel === null) {
-        throw new Error("Network summary panel must be available when analysis content is included.");
-      }
-
       return buildAnalysisScreenContentSlice({
     AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
@@ -371,7 +366,6 @@ export function useAppControllerModelingAnalysisScreenDomains({
     isNodeSubScreen: screenFlags.isNodeSubScreen,
     isSegmentSubScreen: screenFlags.isSegmentSubScreen,
     isWireSubScreen: screenFlags.isWireSubScreen,
-    networkSummaryPanel,
     selectedConnector: selection.selectedConnector,
     selectedConnectorId: selection.selectedConnectorId,
     connectorOccupancyFilter: listModel.connectorOccupancyFilter,

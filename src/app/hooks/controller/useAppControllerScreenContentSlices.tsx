@@ -554,7 +554,6 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
     isNodeSubScreen: params.isNodeSubScreen,
     isSegmentSubScreen: params.isSegmentSubScreen,
     isWireSubScreen: params.isWireSubScreen,
-    networkSummaryPanel: params.networkSummaryPanel,
     selectedConnector: params.selectedConnector,
     selectedConnectorId: params.selectedConnectorId,
     connectorOccupancyFilter: params.connectorOccupancyFilter,
