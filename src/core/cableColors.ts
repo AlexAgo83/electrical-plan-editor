@@ -1,4 +1,5 @@
 export type CableColorId = string;
+export type WireColorMode = "none" | "catalog" | "free";
 export const MAX_FREE_WIRE_COLOR_LABEL_LENGTH = 32;
 
 export interface CableColorDefinition {
@@ -94,15 +95,30 @@ export function normalizeFreeWireColorLabel(value: unknown): string | null {
 export function normalizeWireColorState(
   primaryColorId: unknown,
   secondaryColorId: unknown,
-  freeColorLabel: unknown
+  freeColorLabel: unknown,
+  colorMode?: unknown
 ): {
+  colorMode: WireColorMode;
   primaryColorId: CableColorId | null;
   secondaryColorId: CableColorId | null;
   freeColorLabel: string | null;
 } {
+  const normalizedMode =
+    colorMode === "none" || colorMode === "catalog" || colorMode === "free" ? colorMode : null;
   const normalizedFreeColorLabel = normalizeFreeWireColorLabel(freeColorLabel);
-  if (normalizedFreeColorLabel !== null) {
+
+  if (normalizedMode === "none") {
     return {
+      colorMode: "none",
+      primaryColorId: null,
+      secondaryColorId: null,
+      freeColorLabel: null
+    };
+  }
+
+  if (normalizedMode === "free") {
+    return {
+      colorMode: "free",
       primaryColorId: null,
       secondaryColorId: null,
       freeColorLabel: normalizedFreeColorLabel
@@ -110,29 +126,70 @@ export function normalizeWireColorState(
   }
 
   const normalizedCatalogColors = normalizeWireColorIds(primaryColorId, secondaryColorId);
+  if (normalizedMode === "catalog") {
+    if (normalizedCatalogColors.primaryColorId === null) {
+      return {
+        colorMode: "none",
+        primaryColorId: null,
+        secondaryColorId: null,
+        freeColorLabel: null
+      };
+    }
+
+    return {
+      colorMode: "catalog",
+      ...normalizedCatalogColors,
+      freeColorLabel: null
+    };
+  }
+
+  if (normalizedFreeColorLabel !== null) {
+    return {
+      colorMode: "free",
+      primaryColorId: null,
+      secondaryColorId: null,
+      freeColorLabel: normalizedFreeColorLabel
+    };
+  }
+
   return {
+    colorMode: normalizedCatalogColors.primaryColorId === null ? "none" : "catalog",
     ...normalizedCatalogColors,
     freeColorLabel: null
   };
 }
 
 type WireColorLike = {
+  colorMode?: WireColorMode | null;
   primaryColorId?: string | null;
   secondaryColorId?: string | null;
   freeColorLabel?: string | null;
 };
 
+export function getNormalizedWireColorMode(value: WireColorLike): WireColorMode {
+  return normalizeWireColorState(
+    value.primaryColorId,
+    value.secondaryColorId,
+    value.freeColorLabel,
+    value.colorMode
+  ).colorMode;
+}
+
 export function isWireFreeColorMode(value: WireColorLike): boolean {
-  return normalizeFreeWireColorLabel(value.freeColorLabel) !== null;
+  return getNormalizedWireColorMode(value) === "free";
 }
 
 export function getWireColorCode(value: WireColorLike): string {
-  const freeColorLabel = normalizeFreeWireColorLabel(value.freeColorLabel);
-  if (freeColorLabel !== null) {
-    return `FREE:${freeColorLabel}`;
+  const normalized = normalizeWireColorState(
+    value.primaryColorId,
+    value.secondaryColorId,
+    value.freeColorLabel,
+    value.colorMode
+  );
+  if (normalized.colorMode === "free") {
+    return normalized.freeColorLabel === null ? "FREE" : `FREE:${normalized.freeColorLabel}`;
   }
 
-  const normalized = normalizeWireColorIds(value.primaryColorId, value.secondaryColorId);
   if (normalized.primaryColorId === null) {
     return "";
   }
@@ -143,12 +200,16 @@ export function getWireColorCode(value: WireColorLike): string {
 }
 
 export function getWireColorLabel(value: WireColorLike): string {
-  const freeColorLabel = normalizeFreeWireColorLabel(value.freeColorLabel);
-  if (freeColorLabel !== null) {
-    return `Free: ${freeColorLabel}`;
+  const normalized = normalizeWireColorState(
+    value.primaryColorId,
+    value.secondaryColorId,
+    value.freeColorLabel,
+    value.colorMode
+  );
+  if (normalized.colorMode === "free") {
+    return normalized.freeColorLabel === null ? "Free color (unspecified)" : `Free: ${normalized.freeColorLabel}`;
   }
 
-  const normalized = normalizeWireColorIds(value.primaryColorId, value.secondaryColorId);
   if (normalized.primaryColorId === null) {
     return "No color";
   }
@@ -163,26 +224,39 @@ export function getWireColorLabel(value: WireColorLike): string {
 }
 
 export function getWireColorSortValue(value: WireColorLike): string {
-  const freeColorLabel = normalizeFreeWireColorLabel(value.freeColorLabel);
-  if (freeColorLabel !== null) {
-    return `2:${freeColorLabel.toLocaleLowerCase()}`;
+  const normalized = normalizeWireColorState(
+    value.primaryColorId,
+    value.secondaryColorId,
+    value.freeColorLabel,
+    value.colorMode
+  );
+  if (normalized.colorMode === "free") {
+    if (normalized.freeColorLabel === null) {
+      return "1:free unspecified";
+    }
+    return `2:${normalized.freeColorLabel.toLocaleLowerCase()}`;
   }
 
-  const normalized = normalizeWireColorIds(value.primaryColorId, value.secondaryColorId);
   if (normalized.primaryColorId === null) {
     return "0:";
   }
 
-  return `1:${getWireColorCode(normalized).toLocaleLowerCase()} ${getWireColorLabel(normalized).toLocaleLowerCase()}`;
+  return `3:${getWireColorCode(normalized).toLocaleLowerCase()} ${getWireColorLabel(normalized).toLocaleLowerCase()}`;
 }
 
 export function getWireColorSearchText(value: WireColorLike): string {
-  const freeColorLabel = normalizeFreeWireColorLabel(value.freeColorLabel);
-  if (freeColorLabel !== null) {
-    return `free ${freeColorLabel}`.toLocaleLowerCase();
+  const normalized = normalizeWireColorState(
+    value.primaryColorId,
+    value.secondaryColorId,
+    value.freeColorLabel,
+    value.colorMode
+  );
+  if (normalized.colorMode === "free") {
+    return normalized.freeColorLabel === null
+      ? "free color unspecified".toLocaleLowerCase()
+      : `free ${normalized.freeColorLabel}`.toLocaleLowerCase();
   }
 
-  const normalized = normalizeWireColorIds(value.primaryColorId, value.secondaryColorId);
   if (normalized.primaryColorId === null) {
     return "no color".toLocaleLowerCase();
   }

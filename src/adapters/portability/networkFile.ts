@@ -89,7 +89,8 @@ function normalizeWiresEntityState(
       ...normalizeWireColorState(
         (wire as Partial<Wire>).primaryColorId,
         (wire as Partial<Wire>).secondaryColorId,
-        (wire as Partial<Wire>).freeColorLabel
+        (wire as Partial<Wire>).freeColorLabel,
+        (wire as Partial<Wire>).colorMode
       ),
       endpointAConnectionReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointAConnectionReference),
       endpointASealReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointASealReference),

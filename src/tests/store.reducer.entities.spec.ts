@@ -412,6 +412,7 @@ describe("appReducer entity lifecycle", () => {
     const freeWire = withFreeColor.wires.byId[asWireId("W-FREE-1")];
     expect(freeWire?.primaryColorId).toBeNull();
     expect(freeWire?.secondaryColorId).toBeNull();
+    expect(freeWire?.colorMode).toBe("free");
     expect(freeWire?.freeColorLabel).toBe("Beige/Brown mix temporary vendor");
     expect(freeWire?.freeColorLabel).toHaveLength(32);
 
@@ -419,12 +420,14 @@ describe("appReducer entity lifecycle", () => {
       withFreeColor,
       appActions.upsertWire({
         ...(freeWire as NonNullable<typeof freeWire>),
+        colorMode: "catalog",
         freeColorLabel: " ",
         primaryColorId: "RD",
         secondaryColorId: "RD"
       })
     );
     const catalogWire = withCatalogColor.wires.byId[asWireId("W-FREE-1")];
+    expect(catalogWire?.colorMode).toBe("catalog");
     expect(catalogWire?.freeColorLabel).toBeNull();
     expect(catalogWire?.primaryColorId).toBe("RD");
     expect(catalogWire?.secondaryColorId).toBeNull();

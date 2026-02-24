@@ -13,6 +13,7 @@ import type {
   Wire,
   WireId
 } from "../core/entities";
+import type { WireColorMode } from "../core/cableColors";
 import type { LayoutNodePosition, NetworkScopedState, SelectionState, ThemeMode } from "./types";
 
 export type AppAction =
@@ -86,6 +87,7 @@ export type AppAction =
         name: string;
         technicalId: string;
         sectionMm2?: number;
+        colorMode?: WireColorMode;
         primaryColorId?: string | null;
         secondaryColorId?: string | null;
         freeColorLabel?: string | null;
@@ -177,6 +179,7 @@ export const appActions = {
     name: string;
     technicalId: string;
     sectionMm2?: number;
+    colorMode?: WireColorMode;
     primaryColorId?: string | null;
     secondaryColorId?: string | null;
     freeColorLabel?: string | null;
