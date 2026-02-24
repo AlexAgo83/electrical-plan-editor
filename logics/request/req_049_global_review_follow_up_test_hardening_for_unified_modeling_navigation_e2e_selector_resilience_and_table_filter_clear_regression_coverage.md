@@ -1,7 +1,7 @@
 ## req_049_global_review_follow_up_test_hardening_for_unified_modeling_navigation_e2e_selector_resilience_and_table_filter_clear_regression_coverage - Global Review Follow-up: Test Hardening for Unified Modeling Navigation, E2E Selector Resilience, and Table Filter Clear Regression Coverage
 > From version: 0.9.2
-> Understanding: 95%
-> Confidence: 94%
+> Understanding: 100%
+> Confidence: 99%
 > Complexity: Medium
 > Theme: Post-merge Test Reliability and Regression Safety Hardening
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -101,6 +101,25 @@ This request converts those review findings into a coherent hardening request so
 - AC4: UI test modularization gate remains green after test hardening and any necessary test file split(s).
 - AC5: `test:e2e` passes for the smoke suite after helper/selector hardening.
 - AC6: Full CI-facing validation matrix remains green after the hardening wave.
+
+## Delivery status
+- Status: delivered (`req_049` completed)
+- Implemented:
+  - e2e smoke helper semantic alignment to unified `Modeling` workspace (`tests/e2e/smoke.spec.ts`)
+  - header-driven e2e table column lookup for resilient wire/segment length assertions (`tests/e2e/smoke.spec.ts`)
+  - shared `TableFilterBar` clear-action regression coverage (query reset + row restore + footer count sync) (`src/tests/app.ui.list-ergonomics.spec.tsx`)
+- Closure validation:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s build` ✅
+  - `npm run -s test:ci` ✅ (`35/35` suites, `238/238` tests)
+  - `npm run -s test:e2e` ✅ (`2/2` tests)
+- Closure note:
+  - During full-matrix validation, `src/tests/app.ui.network-summary-workflow-polish.spec.tsx` was updated to match the current deep zoom-out visible floor behavior after the zoom-range expansion change (asserts `<= 5%` visible floor instead of legacy `30%`).
 
 ## Out of scope
 - New workspace navigation features or reintroduction of an `Analysis` top-level menu entry.
