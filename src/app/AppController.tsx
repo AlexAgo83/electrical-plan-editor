@@ -1561,6 +1561,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         setRoutePreviewEndNodeId,
         routePreview,
         quickEntityNavigationMode: isModelingScreen && !isModelingAnalysisFocused ? "modeling" : "analysis",
+        isAnalysisFocusedMode: isModelingAnalysisFocused,
         activeSubScreen,
         entityCountBySubScreen,
         onQuickEntityNavigation: setActiveSubScreen,

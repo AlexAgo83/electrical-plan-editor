@@ -254,6 +254,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     setRoutePreviewEndNodeId: params.setRoutePreviewEndNodeId,
     routePreview: params.routePreview,
     quickEntityNavigationMode: params.quickEntityNavigationMode,
+    isAnalysisFocusedMode: params.isAnalysisFocusedMode,
     activeSubScreen: params.activeSubScreen,
     entityCountBySubScreen: params.entityCountBySubScreen,
     onQuickEntityNavigation: params.onQuickEntityNavigation,
