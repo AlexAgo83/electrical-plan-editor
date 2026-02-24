@@ -96,6 +96,56 @@ describe("App integration UI - list ergonomics", () => {
     expect(within(wiresPanel).queryByText("Feed Main Junction")).not.toBeInTheDocument();
   });
 
+  it("filters wires by free color label through the generic any-field filter and renders the free color text", () => {
+    const state = createSampleNetworkState();
+    const firstWireId = state.wires.allIds[0];
+    if (firstWireId === undefined) {
+      throw new Error("Expected a sample wire.");
+    }
+    const activeNetworkId = state.activeNetworkId;
+    if (activeNetworkId === null) {
+      throw new Error("Expected an active network.");
+    }
+    const targetLabel = "Beige/Brown mix";
+
+    state.wires.byId[firstWireId] = {
+      ...state.wires.byId[firstWireId]!,
+      primaryColorId: "RD",
+      secondaryColorId: "BU",
+      freeColorLabel: `  ${targetLabel}  `
+    };
+    state.networkStates[activeNetworkId] = {
+      ...state.networkStates[activeNetworkId]!,
+      wires: {
+        ...state.networkStates[activeNetworkId]!.wires,
+        byId: {
+          ...state.networkStates[activeNetworkId]!.wires.byId,
+          [firstWireId]: {
+            ...state.networkStates[activeNetworkId]!.wires.byId[firstWireId]!,
+            primaryColorId: "RD",
+            secondaryColorId: "BU",
+            freeColorLabel: `  ${targetLabel}  `
+          }
+        }
+      }
+    };
+
+    renderAppWithState(state);
+    switchSubScreen("wire");
+
+    const wiresPanel = getPanelByHeading("Wires");
+    expect(within(wiresPanel).getByText(targetLabel)).toBeInTheDocument();
+
+    const wireFilterFieldSelect = within(wiresPanel).getByLabelText("Wire filter field");
+    fireEvent.change(wireFilterFieldSelect, { target: { value: "any" } });
+    fireEvent.change(within(wiresPanel).getByPlaceholderText("Name, technical ID, endpoint..."), {
+      target: { value: "beige/brown" }
+    });
+
+    expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
+    expect(within(wiresPanel).queryByText("Secondary Feed B")).not.toBeInTheDocument();
+  });
+
   it("uses field selector filter bars in modeling connectors, splices, nodes, and segments panels", () => {
     renderAppWithState(createUiIntegrationState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));

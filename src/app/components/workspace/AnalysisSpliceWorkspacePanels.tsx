@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
-import { CABLE_COLOR_BY_ID } from "../../../core/cableColors";
 import { formatOccupantRefForDisplay } from "../../lib/app-utils-networking";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
+import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 import { TableFilterBar } from "./TableFilterBar";
 
@@ -413,14 +413,11 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
       <tbody>
         {sortedSpliceSynthesisRowsByColumns.map((row) => {
           const wire = wireById.get(row.wireId);
-          const primary = wire?.primaryColorId === null || wire?.primaryColorId === undefined ? null : (CABLE_COLOR_BY_ID[wire.primaryColorId] ?? null);
-          const secondary = wire?.secondaryColorId === null || wire?.secondaryColorId === undefined ? null : (CABLE_COLOR_BY_ID[wire.secondaryColorId] ?? null);
           return (
           <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
             <td>
               <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
-                {primary !== null ? <span aria-hidden="true" style={{ width: "0.7rem", height: "0.7rem", borderRadius: "999px", border: "1px solid rgba(255,255,255,0.25)", background: primary.hex }} /> : null}
-                {secondary !== null ? <span aria-hidden="true" style={{ width: "0.7rem", height: "0.7rem", borderRadius: "999px", border: "1px solid rgba(255,255,255,0.25)", background: secondary.hex }} /> : null}
+                {renderWireColorPrefixMarker(wire)}
                 <span>{row.wireName}</span>
               </span>
             </td>

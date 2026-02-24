@@ -439,6 +439,17 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(savedWire?.primaryColorId).toBeNull();
     expect(savedWire?.secondaryColorId).toBeNull();
     expect(savedWire?.freeColorLabel).toBe("Beige/Brown mix");
+
+    const wiresPanel = getPanelByHeading("Wires");
+    const wireRow = within(wiresPanel).getByText("Free color wire").closest("tr");
+    expect(wireRow).not.toBeNull();
+    if (wireRow !== null) {
+      expect(within(wireRow).getByText("Beige/Brown mix")).toBeInTheDocument();
+    }
+
+    const inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText("Cable colors")).toBeInTheDocument();
+    expect(within(inspectorPanel).getByText("Free: Beige/Brown mix")).toBeInTheDocument();
   });
 
   it("supports optional wire side connection and seal references with trim, non-destructive endpoint type changes, and clear on save", () => {
