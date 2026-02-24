@@ -231,6 +231,8 @@ interface CableCalloutViewModel {
 
 interface CalloutLayoutMetrics {
   width: number;
+  titleStartY: number;
+  subtitleStartY: number | null;
   rowsStartY: number;
   rowStep: number;
   height: number;
@@ -274,6 +276,45 @@ function getCalloutRowFontSize(calloutTextSize: CanvasCalloutTextSize): number {
     default:
       return 5.5;
   }
+}
+
+function getCalloutTitleFontSize(calloutTextSize: CanvasCalloutTextSize): number {
+  switch (calloutTextSize) {
+    case "small":
+      return 6.8;
+    case "large":
+      return 10;
+    case "normal":
+    default:
+      return 8.8;
+  }
+}
+
+function getCalloutSubtitleFontSize(calloutTextSize: CanvasCalloutTextSize): number {
+  switch (calloutTextSize) {
+    case "small":
+      return 5.5;
+    case "large":
+      return 7.6;
+    case "normal":
+    default:
+      return 6.9;
+  }
+}
+
+function buildCalloutHeaderDisplay(name: string, technicalId: string): { title: string; subtitle: string } {
+  const trimmedName = name.trim();
+  const trimmedTechnicalId = technicalId.trim();
+  if (trimmedName.length > 0) {
+    if (trimmedTechnicalId.length > 0 && trimmedTechnicalId !== trimmedName) {
+      return { title: trimmedName, subtitle: trimmedTechnicalId };
+    }
+    return { title: trimmedName, subtitle: "" };
+  }
+  if (trimmedTechnicalId.length > 0) {
+    return { title: trimmedTechnicalId, subtitle: "" };
+  }
+  return { title: "(unnamed)", subtitle: "" };
 }
 
 let calloutMeasureCanvas: HTMLCanvasElement | null = null;
@@ -411,32 +452,59 @@ function measureCalloutRowsBlockBBox(
   return null;
 }
 
-function buildCalloutLayoutMetrics(groups: CalloutGroup[], calloutTextSize: CanvasCalloutTextSize): CalloutLayoutMetrics {
+function buildCalloutLayoutMetrics(
+  title: string,
+  subtitle: string,
+  groups: CalloutGroup[],
+  calloutTextSize: CanvasCalloutTextSize
+): CalloutLayoutMetrics {
   const rows = groups.flatMap((group) => group.entries.map(buildCalloutEntryDisplayLine));
   const rowFontSize = getCalloutRowFontSize(calloutTextSize);
-  const topPadding = 0.7;
-  const bottomPadding = 0.6;
+  const titleFontSize = getCalloutTitleFontSize(calloutTextSize);
+  const subtitleFontSize = getCalloutSubtitleFontSize(calloutTextSize);
+  const topPadding = 0.9;
+  const bottomPadding = 2.8;
+  const subtitleTopGap = subtitle.length > 0 ? 0.25 : 0;
+  const subtitleBottomGap = subtitle.length > 0 ? 0.55 : 0;
+  const titleBottomGap = rows.length > 0 ? 0.7 : 0;
   const rowGap = 0.45;
   const leftPadding = 4;
   const rightPadding = 4;
+  const titleTextMetrics = measureCalloutRowTextMetrics(titleFontSize);
+  const titleLineHeight = titleTextMetrics.height;
+  const subtitleTextMetrics = subtitle.length > 0 ? measureCalloutRowTextMetrics(subtitleFontSize) : null;
+  const subtitleLineHeight = subtitleTextMetrics?.height ?? 0;
   const rowTextMetrics = measureCalloutRowTextMetrics(rowFontSize);
   const rowLineHeight = rowTextMetrics.height;
   const rowStep = rowLineHeight + rowGap;
   const blockBBox = measureCalloutRowsBlockBBox(rows, rowFontSize, rowGap);
+  const measuredTitleWidth = measureCalloutRowTextWidth(title, titleFontSize);
+  const measuredSubtitleWidth = subtitle.length > 0 ? measureCalloutRowTextWidth(subtitle, subtitleFontSize) : 0;
 
   let longestMeasuredRowWidth = 0;
   for (const row of rows) {
     longestMeasuredRowWidth = Math.max(longestMeasuredRowWidth, measureCalloutRowTextWidth(row, rowFontSize));
   }
 
-  const measuredContentWidth = blockBBox?.width ?? longestMeasuredRowWidth;
+  const measuredContentWidth = Math.max(blockBBox?.width ?? longestMeasuredRowWidth, measuredTitleWidth, measuredSubtitleWidth);
   const measuredContentHeight = blockBBox?.height ?? (rows.length > 0 ? rowLineHeight + (rows.length - 1) * rowStep : 0);
   const measuredTopOffset = blockBBox?.y ?? rowTextMetrics.topOffset;
+  const titleStartY = topPadding - titleTextMetrics.topOffset;
+  const subtitleStartY =
+    subtitle.length > 0 && subtitleTextMetrics !== null
+      ? titleStartY + titleLineHeight + subtitleTopGap - subtitleTextMetrics.topOffset
+      : null;
+  const headerBottomY =
+    subtitleStartY === null
+      ? titleStartY + titleLineHeight
+      : subtitleStartY + subtitleLineHeight + subtitleBottomGap;
+  const rowsStartY = headerBottomY + titleBottomGap - measuredTopOffset;
 
   const width = clampNumber(Math.ceil(measuredContentWidth + leftPadding + rightPadding), CALLOUT_MIN_WIDTH, CALLOUT_MAX_WIDTH);
-  const rowsStartY = topPadding - measuredTopOffset;
-  const height = Math.max(0, topPadding + measuredContentHeight + bottomPadding);
-  return { width, rowsStartY, rowStep, height, rows };
+  const headerHeight =
+    titleLineHeight + (subtitleStartY === null ? 0 : subtitleTopGap + subtitleLineHeight + subtitleBottomGap);
+  const height = Math.max(0, topPadding + headerHeight + titleBottomGap + measuredContentHeight + bottomPadding);
+  return { width, titleStartY, subtitleStartY, rowsStartY, rowStep, height, rows };
 }
 
 function getCalloutFrameEdgePoint(
@@ -820,6 +888,7 @@ export function NetworkSummaryPanel({
         if (groups.length === 0) {
           continue;
         }
+        const header = buildCalloutHeaderDisplay(connector.name, connector.technicalId);
         models.push({
           key,
           kind: "connector",
@@ -827,8 +896,8 @@ export function NetworkSummaryPanel({
           nodeId: node.id,
           nodePosition,
           position,
-          title: connector.name,
-          subtitle: connector.technicalId,
+          title: header.title,
+          subtitle: header.subtitle,
           groups,
           isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
           isSelected: selectedConnectorId === connector.id
@@ -848,6 +917,7 @@ export function NetworkSummaryPanel({
       if (groups.length === 0) {
         continue;
       }
+      const header = buildCalloutHeaderDisplay(splice.name, splice.technicalId);
       models.push({
         key,
         kind: "splice",
@@ -855,8 +925,8 @@ export function NetworkSummaryPanel({
         nodeId: node.id,
         nodePosition,
         position,
-        title: splice.name,
-        subtitle: splice.technicalId,
+        title: header.title,
+        subtitle: header.subtitle,
         groups,
         isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
         isSelected: selectedSpliceId === splice.id
@@ -1100,7 +1170,7 @@ export function NetworkSummaryPanel({
   }
 
   const renderedCableCallouts = orderedCableCallouts.map((callout) => {
-    const layout = buildCalloutLayoutMetrics(callout.groups, calloutTextSize);
+    const layout = buildCalloutLayoutMetrics(callout.title, "", callout.groups, calloutTextSize);
     const lineEnd = getCalloutFrameEdgePoint(
       callout.nodePosition,
       callout.position,
@@ -1452,6 +1522,26 @@ export function NetworkSummaryPanel({
                           height={layout.height}
                         />
                         <g className="network-callout-content">
+                          <text
+                            className="network-callout-title"
+                            x={-layout.width / 2 + 4}
+                            y={-layout.height / 2 + layout.titleStartY}
+                            textAnchor="start"
+                            dominantBaseline="hanging"
+                          >
+                            {callout.title}
+                          </text>
+                          {layout.subtitleStartY !== null ? (
+                            <text
+                              className="network-callout-subtitle"
+                              x={-layout.width / 2 + 4}
+                              y={-layout.height / 2 + layout.subtitleStartY}
+                              textAnchor="start"
+                              dominantBaseline="hanging"
+                            >
+                              {callout.subtitle}
+                            </text>
+                          ) : null}
                           {layout.rows.map((row, rowIndex) => {
                             const rowY = -layout.height / 2 + contentCursorY;
                             contentCursorY += layout.rowStep;
