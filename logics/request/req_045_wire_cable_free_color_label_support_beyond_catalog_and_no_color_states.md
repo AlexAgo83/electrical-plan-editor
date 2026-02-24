@@ -1,7 +1,7 @@
 ## req_045_wire_cable_free_color_label_support_beyond_catalog_and_no_color_states - Wire/Cable Free Color Label Support Beyond Catalog and No-Color States
 > From version: 0.8.1
-> Understanding: 97%
-> Confidence: 95%
+> Understanding: 99%
+> Confidence: 97%
 > Complexity: Medium-High
 > Theme: Flexible Cable Identification with Free-Form Color Labels While Preserving Canonical Color Catalog Flows
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -180,3 +180,6 @@ This creates a gap for real-world identification workflows where a **free-form c
 - `src/tests/portability.network-file.spec.ts`
 - `src/tests/persistence.localStorage.spec.ts`
 - `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
+- `src/tests/app.ui.wire-free-color-mode.spec.tsx`
+- `src/tests/app.ui.list-ergonomics.spec.tsx`
+- `logics/tasks/task_046_req_045_wire_cable_free_color_label_support_orchestration_and_delivery_control.md`
