@@ -11,6 +11,10 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - creation flow ergonomics", () => {
+  function clickNewFromPanel(panelHeading: "Connectors" | "Splices" | "Nodes" | "Segments" | "Wires"): void {
+    fireEvent.click(within(getPanelByHeading(panelHeading)).getByRole("button", { name: "New" }));
+  }
+
   beforeEach(() => {
     localStorage.clear();
   });
@@ -19,8 +23,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     renderAppWithState(createInitialState());
     switchScreenDrawerAware("modeling");
 
-    const idleConnectorFormPanel = getPanelByHeading("Connector form");
-    fireEvent.click(within(idleConnectorFormPanel).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Connectors");
     const createConnectorPanel = getPanelByHeading("Create Connector");
     const connectorTechnicalIdInput = within(createConnectorPanel).getByLabelText("Technical ID");
     expect(connectorTechnicalIdInput).toHaveValue("C-001");
@@ -32,27 +35,23 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(connectorTechnicalIdInput).toHaveValue("C-CUSTOM-42");
 
     switchSubScreenDrawerAware("splice");
-    const idleSpliceFormPanel = getPanelByHeading("Splice form");
-    fireEvent.click(within(idleSpliceFormPanel).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Splices");
     const createSplicePanel = getPanelByHeading("Create Splice");
     const spliceTechnicalIdInput = within(createSplicePanel).getByLabelText("Technical ID");
     expect(spliceTechnicalIdInput).toHaveValue("S-001");
 
     switchSubScreenDrawerAware("node");
-    const idleNodeFormPanel = getPanelByHeading("Node form");
-    fireEvent.click(within(idleNodeFormPanel).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Nodes");
     const createNodePanel = getPanelByHeading("Create Node");
     expect(within(createNodePanel).getByLabelText("Node ID")).toHaveValue("N-001");
 
     switchSubScreenDrawerAware("segment");
-    const idleSegmentFormPanel = getPanelByHeading("Segment form");
-    fireEvent.click(within(idleSegmentFormPanel).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Segments");
     const createSegmentPanel = getPanelByHeading("Create Segment");
     expect(within(createSegmentPanel).getByLabelText("Segment ID")).toHaveValue("SEG-001");
 
     switchSubScreenDrawerAware("wire");
-    const idleWireFormPanel = getPanelByHeading("Wire form");
-    fireEvent.click(within(idleWireFormPanel).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Wires");
     const createWirePanel = getPanelByHeading("Create Wire");
     expect(within(createWirePanel).getByLabelText("Technical ID")).toHaveValue("W-001");
   }, 10_000);
@@ -61,8 +60,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     renderAppWithState(createInitialState());
     switchScreenDrawerAware("modeling");
 
-    const idleConnectorFormPanel = getPanelByHeading("Connector form");
-    fireEvent.click(within(idleConnectorFormPanel).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Connectors");
     const connectorFormPanel = getPanelByHeading("Create Connector");
     fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
       target: { value: "Focused connector" }
@@ -90,8 +88,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     renderAppWithState(createInitialState());
     switchScreenDrawerAware("modeling");
 
-    const idleConnectorFormPanel = getPanelByHeading("Connector form");
-    fireEvent.click(within(idleConnectorFormPanel).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Connectors");
     const connectorFormPanel = getPanelByHeading("Create Connector");
     fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
       target: { value: "Auto node connector" }
@@ -102,8 +99,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
 
     switchSubScreenDrawerAware("splice");
-    const idleSpliceFormPanel = getPanelByHeading("Splice form");
-    fireEvent.click(within(idleSpliceFormPanel).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Splices");
     const spliceFormPanel = getPanelByHeading("Create Splice");
     fireEvent.change(within(spliceFormPanel).getByLabelText("Functional name"), {
       target: { value: "Auto node splice" }
@@ -123,7 +119,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     renderAppWithState(createInitialState());
     switchScreenDrawerAware("modeling");
 
-    fireEvent.click(within(getPanelByHeading("Connector form")).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Connectors");
     const connectorFormPanel = getPanelByHeading("Create Connector");
     fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
       target: { value: "Manual node connector" }
@@ -132,7 +128,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
 
     switchSubScreenDrawerAware("splice");
-    fireEvent.click(within(getPanelByHeading("Splice form")).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Splices");
     const spliceFormPanel = getPanelByHeading("Create Splice");
     fireEvent.change(within(spliceFormPanel).getByLabelText("Functional name"), {
       target: { value: "Manual node splice" }
@@ -150,7 +146,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     const { store } = renderAppWithState(createInitialState());
     switchScreenDrawerAware("modeling");
 
-    fireEvent.click(within(getPanelByHeading("Connector form")).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Connectors");
     const createConnectorPanel = getPanelByHeading("Create Connector");
     fireEvent.change(within(createConnectorPanel).getByLabelText("Functional name"), {
       target: { value: "Connector ref test" }
@@ -183,7 +179,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(within(inspectorPanel).queryByText("TE-1-967616-1")).not.toBeInTheDocument();
 
     switchSubScreenDrawerAware("splice");
-    fireEvent.click(within(getPanelByHeading("Splice form")).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Splices");
     const createSplicePanel = getPanelByHeading("Create Splice");
     fireEvent.change(within(createSplicePanel).getByLabelText("Functional name"), {
       target: { value: "Splice ref test" }
@@ -297,8 +293,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("wire");
 
-    const idleWireFormPanel = getPanelByHeading("Wire form");
-    fireEvent.click(within(idleWireFormPanel).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Wires");
     const createWirePanel = getPanelByHeading("Create Wire");
 
     const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
@@ -338,8 +333,7 @@ describe("App integration UI - creation flow ergonomics", () => {
 
     fireEvent.click(within(editWirePanel).getByRole("button", { name: "Cancel edit" }));
 
-    const idleWireFormPanel = getPanelByHeading("Wire form");
-    fireEvent.click(within(idleWireFormPanel).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Wires");
     const createWirePanel = getPanelByHeading("Create Wire");
     const endpointACreateFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
     fireEvent.change(within(endpointACreateFieldset).getByLabelText("Connector"), { target: { value: "C1" } });
@@ -353,7 +347,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("wire");
 
-    fireEvent.click(within(getPanelByHeading("Wire form")).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Wires");
     const createWirePanel = getPanelByHeading("Create Wire");
     const colorModeSelect = within(createWirePanel).getByLabelText("Color mode");
 
@@ -402,7 +396,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("wire");
 
-    fireEvent.click(within(getPanelByHeading("Wire form")).getByRole("button", { name: "Create" }));
+    clickNewFromPanel("Wires");
     const createWirePanel = getPanelByHeading("Create Wire");
     const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
     const endpointBFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint B" });

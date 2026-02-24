@@ -177,6 +177,23 @@ describe("App integration UI - settings", () => {
     expect(within(restoredCanvasToolsSettingsPanel).getByLabelText("Include background in PNG export")).not.toBeChecked();
   });
 
+  it("persists the 0 degree 2d label rotation preset across remount", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const canvasRenderSettingsPanel = getPanelByHeading("Canvas render preferences");
+    fireEvent.change(within(canvasRenderSettingsPanel).getByLabelText("2D label rotation"), {
+      target: { value: "0" }
+    });
+
+    firstRender.unmount();
+
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const restoredCanvasRenderSettingsPanel = getPanelByHeading("Canvas render preferences");
+    expect(within(restoredCanvasRenderSettingsPanel).getByLabelText("2D label rotation")).toHaveValue("0");
+  });
+
   it("applies and persists the default cable callout visibility preference", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 

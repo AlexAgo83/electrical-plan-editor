@@ -119,7 +119,20 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     !portIsOccupied;
 
   useEffect(() => {
-    if (selectedSplice === null || nextFreePortIndex === null) {
+    if (selectedSplice === null) {
+      return;
+    }
+    if (nextFreePortIndex === null) {
+      setPortIndexInput("");
+      return;
+    }
+    if (nextFreePortIndex < 1 || nextFreePortIndex > selectedSplice.portCount) {
+      setPortIndexInput("");
+      return;
+    }
+    const suggestedSlot = splicePortStatuses.find((slot) => slot.portIndex === nextFreePortIndex) ?? null;
+    if (suggestedSlot === null || suggestedSlot.isOccupied) {
+      setPortIndexInput("");
       return;
     }
     setPortIndexInput(String(nextFreePortIndex));

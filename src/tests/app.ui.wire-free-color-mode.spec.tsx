@@ -9,6 +9,10 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - wire free color mode", () => {
+  function clickNewWire(): void {
+    fireEvent.click(within(getPanelByHeading("Wires")).getByRole("button", { name: "New" }));
+  }
+
   beforeEach(() => {
     localStorage.clear();
   });
@@ -19,7 +23,7 @@ describe("App integration UI - wire free color mode", () => {
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("wire");
 
-    fireEvent.click(within(getPanelByHeading("Wire form")).getByRole("button", { name: "Create" }));
+    clickNewWire();
     const createWirePanel = getPanelByHeading("Create Wire");
     const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
     const endpointBFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint B" });
@@ -76,7 +80,7 @@ describe("App integration UI - wire free color mode", () => {
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("wire");
 
-    fireEvent.click(within(getPanelByHeading("Wire form")).getByRole("button", { name: "Create" }));
+    clickNewWire();
     const createWirePanel = getPanelByHeading("Create Wire");
     const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
     const endpointBFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint B" });

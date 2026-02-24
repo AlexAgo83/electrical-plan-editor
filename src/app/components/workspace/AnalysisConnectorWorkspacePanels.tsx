@@ -119,11 +119,30 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     !cavityIsOccupied;
 
   useEffect(() => {
-    if (selectedConnector === null || nextFreeCavityIndex === null) {
+    if (selectedConnector === null) {
+      return;
+    }
+    if (nextFreeCavityIndex === null) {
+      setCavityIndexInput("");
+      return;
+    }
+    if (nextFreeCavityIndex < 1 || nextFreeCavityIndex > selectedConnector.cavityCount) {
+      setCavityIndexInput("");
+      return;
+    }
+    const suggestedSlot = connectorCavityStatuses.find((slot) => slot.cavityIndex === nextFreeCavityIndex) ?? null;
+    if (suggestedSlot === null || suggestedSlot.isOccupied) {
+      setCavityIndexInput("");
       return;
     }
     setCavityIndexInput(String(nextFreeCavityIndex));
-  }, [selectedConnectorId, connectorCavityStatuses, nextFreeCavityIndex, selectedConnector, setCavityIndexInput]);
+  }, [
+    selectedConnectorId,
+    connectorCavityStatuses,
+    nextFreeCavityIndex,
+    selectedConnector,
+    setCavityIndexInput
+  ]);
 
   function handleReserveCavitySubmit(event: FormEvent<HTMLFormElement>): void {
     if (!canReserveCavity) {

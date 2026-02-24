@@ -234,7 +234,9 @@ function normalizeCanvasCalloutTextSize(value: unknown): CanvasCalloutTextSize {
 }
 
 function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotationDegrees {
-  return value === -90 || value === -45 || value === -20 || value === 20 || value === 45 || value === 90 ? value : -20;
+  return value === -90 || value === -45 || value === -20 || value === 0 || value === 20 || value === 45 || value === 90
+    ? value
+    : -20;
 }
 
 function normalizeWorkspacePanelsLayoutMode(value: unknown): WorkspacePanelsLayoutPreference {
