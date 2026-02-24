@@ -2,7 +2,7 @@
 > From version: 0.9.2
 > Understanding: 98%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Regression coverage for shared table filter clear UX
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -35,6 +35,7 @@ The shared `TableFilterBar` now includes a clear (`×`) action in the filter tex
 - Dependencies: `req_049`.
 - Blocks: item_305.
 - Related AC: AC3, AC6.
+- Delivery: completed with explicit regression coverage in `src/tests/app.ui.list-ergonomics.spec.tsx` for clear-button presence/disabled state, query reset, row restore, and footer-count consistency.
 - References:
   - `logics/request/req_049_global_review_follow_up_test_hardening_for_unified_modeling_navigation_e2e_selector_resilience_and_table_filter_clear_regression_coverage.md`
   - `src/app/components/workspace/TableFilterBar.tsx`

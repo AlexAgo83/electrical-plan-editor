@@ -99,10 +99,21 @@ describe("App integration UI - network summary workflow polish", () => {
     const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
     const zoomOutButton = within(networkSummaryPanel).getByRole("button", { name: "Zoom -" });
 
-    for (let index = 0; index < 12; index += 1) {
+    let previousZoomStatusText = "";
+    let zoomStatusText = "";
+    for (let index = 0; index < 48; index += 1) {
       fireEvent.click(zoomOutButton);
+      zoomStatusText =
+        networkSummaryPanel.querySelector(".network-canvas-floating-copy")?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+      if (zoomStatusText === previousZoomStatusText) {
+        break;
+      }
+      previousZoomStatusText = zoomStatusText;
     }
-    expect(within(networkSummaryPanel).getByText(/View: 30% zoom\./)).toBeInTheDocument();
+    const zoomPercentMatch = zoomStatusText.match(/View:\s*(\d+)% zoom\./);
+    const zoomPercent = Number(zoomPercentMatch?.[1] ?? Number.NaN);
+    expect(Number.isFinite(zoomPercent)).toBe(true);
+    expect(zoomPercent).toBeLessThanOrEqual(5);
 
     const rectSpy = vi.spyOn(networkSvg, "getBoundingClientRect").mockImplementation(
       () =>

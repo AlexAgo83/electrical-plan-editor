@@ -2,7 +2,7 @@
 > From version: 0.9.2
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: E2E selector hardening against table layout evolution
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -33,6 +33,7 @@ Recent UI improvements (for example `Wires` table `Endpoints` split into `Endpoi
 - Dependencies: `req_049`.
 - Blocks: item_305.
 - Related AC: AC2, AC5, AC6.
+- Delivery: completed via header-driven column lookup helper in `tests/e2e/smoke.spec.ts` replacing brittle wire/segment length `td.nth(...)` assertions.
 - References:
   - `logics/request/req_049_global_review_follow_up_test_hardening_for_unified_modeling_navigation_e2e_selector_resilience_and_table_filter_clear_regression_coverage.md`
   - `tests/e2e/smoke.spec.ts`

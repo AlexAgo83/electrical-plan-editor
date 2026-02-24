@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
 async function dismissOnboardingIfVisible(page: Page): Promise<void> {
@@ -8,6 +8,18 @@ async function dismissOnboardingIfVisible(page: Page): Promise<void> {
   }
   await closeOnboardingButton.click();
   await expect(page.getByRole("button", { name: "Close onboarding", exact: true })).toHaveCount(0);
+}
+
+async function getColumnIndexByHeaderLabel(panel: Locator, headerLabel: string): Promise<number> {
+  const headerCells = panel.locator("thead th");
+  const headerCount = await headerCells.count();
+  for (let index = 0; index < headerCount; index += 1) {
+    const headerText = (await headerCells.nth(index).innerText()).replace(/\s+/g, " ").trim();
+    if (headerText.includes(headerLabel)) {
+      return index;
+    }
+  }
+  throw new Error(`Unable to find table header containing "${headerLabel}".`);
 }
 
 test("bootstraps a comprehensive sample network on first launch", async ({ page }) => {
@@ -36,20 +48,18 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
     await expect(navigationToggle).toHaveAttribute("aria-expanded", "false");
     await expect(page.getByRole("button", { name: "Close menu", exact: true })).toHaveCount(0);
   };
-  const switchScreen = async (value: "modeling" | "analysis") => {
-    void value;
+  const openModelingWorkspace = async () => {
     await ensureNavigationDrawerOpen();
-    const targetLabel = "Modeling";
     await page
       .locator(".workspace-drawer.is-open .workspace-nav-row")
-      .getByRole("button", { name: targetLabel, exact: true })
+      .getByRole("button", { name: "Modeling", exact: true })
       .click();
     await ensureNavigationDrawerClosed();
   };
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "e-Plan Editor" })).toBeVisible();
   await dismissOnboardingIfVisible(page);
-  await switchScreen("modeling");
+  await openModelingWorkspace();
 
   const connectorsPanel = page
     .locator("article.panel")
@@ -108,13 +118,11 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
       .click();
     await ensureNavigationDrawerClosed();
   };
-  const switchScreen = async (value: "modeling" | "analysis") => {
-    void value;
+  const openModelingWorkspace = async () => {
     await ensureNavigationDrawerOpen();
-    const targetLabel = "Modeling";
     await page
       .locator(".workspace-drawer.is-open .workspace-nav-row")
-      .getByRole("button", { name: targetLabel, exact: true })
+      .getByRole("button", { name: "Modeling", exact: true })
       .click();
     await ensureNavigationDrawerClosed();
   };
@@ -204,13 +212,14 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
 
   const wiresPanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Wires" }) });
   const wireRow = wiresPanel.locator("tbody tr").filter({ hasText: "Wire 1" }).first();
+  const wiresLengthColumnIndex = await getColumnIndexByHeaderLabel(wiresPanel, "Length (mm)");
   await expect(wireRow).toContainText("100");
   await expect(wireRow).toContainText("Auto");
   await wireRow.click();
-  const initialWireLengthRaw = await wireRow.locator("td").nth(6).textContent();
+  const initialWireLengthRaw = await wireRow.locator("td").nth(wiresLengthColumnIndex).textContent();
   const initialWireLength = Number(initialWireLengthRaw ?? "0");
 
-  await switchScreen("analysis");
+  await openModelingWorkspace();
   await switchSubScreen("wire");
   const routeControlPanel = page.locator("section.panel").filter({ has: page.getByRole("heading", { name: "Wire analysis" }) });
   const routeInputValue = await routeControlPanel.getByLabel("Forced route segment IDs (comma-separated)").inputValue();
@@ -226,11 +235,12 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await routeControlPanel.getByRole("button", { name: "Lock forced route" }).click();
   await expect(routeControlPanel).toContainText("Locked route");
 
-  await switchScreen("modeling");
+  await openModelingWorkspace();
   await switchSubScreen("segment");
   const segmentsPanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Segments" }) });
+  const segmentsLengthColumnIndex = await getColumnIndexByHeaderLabel(segmentsPanel, "Length (mm)");
   const targetSegmentRow = segmentsPanel.locator("tbody tr").filter({ hasText: routeSegmentToEdit }).first();
-  const targetSegmentLengthRaw = await targetSegmentRow.locator("td").nth(3).textContent();
+  const targetSegmentLengthRaw = await targetSegmentRow.locator("td").nth(segmentsLengthColumnIndex).textContent();
   const targetSegmentLength = Number(targetSegmentLengthRaw ?? "0");
   const updatedSegmentLength = targetSegmentLength + 40;
   await targetSegmentRow.click();
@@ -247,5 +257,5 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     .locator("tbody tr")
     .filter({ hasText: "Wire 1" })
     .first();
-  await expect(refreshedWireRow.locator("td").nth(6)).toHaveText(String(initialWireLength + 40));
+  await expect(refreshedWireRow.locator("td").nth(wiresLengthColumnIndex)).toHaveText(String(initialWireLength + 40));
 });

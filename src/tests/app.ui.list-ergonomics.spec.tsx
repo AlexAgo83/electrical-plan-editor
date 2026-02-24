@@ -114,6 +114,45 @@ describe("App integration UI - list ergonomics", () => {
     expect(within(wiresPanel).getByText("1 entry")).toBeInTheDocument();
   });
 
+  it("exposes a shared filter clear action that resets the query and restores rows and footer count", () => {
+    renderAppWithState(createSampleNetworkState());
+
+    switchSubScreen("wire");
+    const wiresPanel = getPanelByHeading("Wires");
+    const wireFilterInput = within(wiresPanel).getByLabelText("Wire filter field query");
+    const clearFilterButton = within(wiresPanel).getByRole("button", { name: "Clear filter query" });
+    const getEntryCountFooterText = () =>
+      wiresPanel.querySelector(".table-entry-count-footer")?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+    const getVisibleWireRowCount = () => wiresPanel.querySelectorAll("tbody tr").length;
+    const initialVisibleWireRowCount = getVisibleWireRowCount();
+
+    expect(clearFilterButton).toBeDisabled();
+    expect(getEntryCountFooterText()).toBe(
+      `${initialVisibleWireRowCount} ${initialVisibleWireRowCount === 1 ? "entry" : "entries"}`
+    );
+
+    fireEvent.change(wireFilterInput, { target: { value: "SPL-J1" } });
+    const filteredVisibleWireRowCount = getVisibleWireRowCount();
+    expect(clearFilterButton).not.toBeDisabled();
+    expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
+    expect(within(wiresPanel).queryByText("Secondary Feed B")).not.toBeInTheDocument();
+    expect(filteredVisibleWireRowCount).toBeGreaterThan(0);
+    expect(filteredVisibleWireRowCount).toBeLessThan(initialVisibleWireRowCount);
+    expect(getEntryCountFooterText()).toBe(
+      `${filteredVisibleWireRowCount} ${filteredVisibleWireRowCount === 1 ? "entry" : "entries"}`
+    );
+
+    fireEvent.click(clearFilterButton);
+    expect(wireFilterInput).toHaveValue("");
+    expect(clearFilterButton).toBeDisabled();
+    expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
+    expect(within(wiresPanel).getByText("Secondary Feed B")).toBeInTheDocument();
+    expect(getVisibleWireRowCount()).toBe(initialVisibleWireRowCount);
+    expect(getEntryCountFooterText()).toBe(
+      `${initialVisibleWireRowCount} ${initialVisibleWireRowCount === 1 ? "entry" : "entries"}`
+    );
+  });
+
   it("filters wires by free color label through the generic any-field filter and renders the free color text", () => {
     const state = createSampleNetworkState();
     const firstWireId = state.wires.allIds[0];
