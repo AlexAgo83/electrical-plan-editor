@@ -2,7 +2,7 @@
 > From version: 0.8.1
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: User-visible semantic distinction between “No color” and “Free color (unspecified)”
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,6 +36,7 @@ Read-only wire color surfaces and helper utilities currently treat wire color pr
 - Urgency: Medium-High.
 
 # Notes
+- Delivery status: Delivered in `req_046` implementation (see `task_047` report and commits `3d1e12b`, `0e2c97b`).
 - Dependencies: `req_046`, item_287.
 - Blocks: item_291.
 - Related AC: AC4, AC5, AC6, AC8.
@@ -49,4 +50,3 @@ Read-only wire color surfaces and helper utilities currently treat wire color pr
   - `src/app/hooks/useEntityListModel.ts`
   - `src/tests/app.ui.list-ergonomics.spec.tsx`
   - `src/tests/app.ui.wire-free-color-mode.spec.tsx`
-

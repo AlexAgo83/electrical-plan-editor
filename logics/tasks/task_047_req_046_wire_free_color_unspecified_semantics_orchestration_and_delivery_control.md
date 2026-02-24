@@ -2,7 +2,7 @@
 > From version: 0.8.1
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Delivery orchestration for explicit wire color mode semantics and free-color unspecified intent preservation
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -59,12 +59,12 @@ Rationale:
 - Finish with validation and closure documentation.
 
 # Plan
-- [ ] Wave 0. Persisted wire color mode semantics + reducer/store normalization (`item_287`)
-- [ ] Wave 1. Wire form free-color optional empty-label UX and copy (`item_288`)
-- [ ] Wave 2. Read-only display + sort/filter/export semantics for free unspecified vs no-color (`item_289`)
-- [ ] Wave 3. Persistence/import/export migration and compatibility inference from implicit state (`item_290`)
-- [ ] Wave 4. Closure: final validation, AC traceability, and `logics` synchronization (`item_291`)
-- [ ] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary + defer notes)
+- [x] Wave 0. Persisted wire color mode semantics + reducer/store normalization (`item_287`)
+- [x] Wave 1. Wire form free-color optional empty-label UX and copy (`item_288`)
+- [x] Wave 2. Read-only display + sort/filter/export semantics for free unspecified vs no-color (`item_289`)
+- [x] Wave 3. Persistence/import/export migration and compatibility inference from implicit state (`item_290`)
+- [x] Wave 4. Closure: final validation, AC traceability, and `logics` synchronization (`item_291`)
+- [x] FINAL. Update related `.md` files to final state (request/task/backlog progress + delivery summary + defer notes)
 
 # Validation gates
 ## A. Minimum wave gate (apply after Waves 0-3)
@@ -119,22 +119,35 @@ Rationale:
 
 # Report
 - Wave status:
-  - Wave 0 (persisted color mode semantics): pending
-  - Wave 1 (form UX optional empty free label): pending
-  - Wave 2 (display/sort/filter/export semantics): pending
-  - Wave 3 (persistence/import/export compatibility inference): pending
-  - Wave 4 (closure + AC traceability): pending
-  - FINAL (`.md` synchronization): pending
+  - Wave 0 (persisted color mode semantics): delivered (`3d1e12b`)
+  - Wave 1 (form UX optional empty free label): delivered (`0e2c97b`)
+  - Wave 2 (display/sort/filter/export semantics): delivered (`0e2c97b`)
+  - Wave 3 (persistence/import/export compatibility inference): delivered (`3d1e12b`)
+  - Wave 4 (closure + AC traceability): delivered (this update)
+  - FINAL (`.md` synchronization): delivered (this update)
 - Current blockers:
-  - None at kickoff.
+  - None.
 - Main risks to track:
-  - Introducing explicit color mode may require schema/fixture updates across many tests and sample states.
-  - Existing free-color helpers may assume `freeColorLabel` presence and need semantic fallback paths for empty free mode.
-  - Backward compatibility inference from `req_045` implicit state must be documented and tested to avoid ambiguous migration behavior.
-- Validation snapshot (kickoff):
-  - Not run yet for this orchestration artifact set.
+  - Resolved: inspector wire color rendering initially reconstructed color payloads without `colorMode`, collapsing free-unspecified back to `No color`; fixed by passing persisted `colorMode` through inspector rendering.
+  - Resolved: existing persistence/import/list tests mutated sample wires without clearing inherited `colorMode: \"none\"`; updated fixtures to either set explicit mode or simulate legacy missing mode.
+- Validation snapshot (final):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s test:ci` ✅ (`34` files / `228` tests)
+  - `npm run -s build` ✅
 - Delivery snapshot:
-  - Pending implementation.
+  - Added explicit persisted wire `colorMode` semantics (`none` / `catalog` / `free`) with centralized normalization in `src/core/cableColors.ts`.
+  - `free` mode now supports empty `freeColorLabel` (stored as `null`) and remains distinct from `No color` via persisted `colorMode`.
+  - Reducer and action payloads now carry normalized wire color mode; store normalization preserves exclusivity between catalog colors and free mode.
+  - Persistence and portability adapters infer missing mode deterministically for legacy `req_045` data and preserve explicit `free` unspecified intent on load/import/export.
+  - Wire form UX no longer blocks empty free-color labels and explains the “left unspecified” meaning.
+  - Read-only wire color helpers/surfaces (including inspector and table/list/filter/search/export paths) distinguish `No color`, `Free color (unspecified)`, `Free color: <label>`, and catalog colors.
+  - Added regression coverage for reducer, persistence/import compatibility inference, free-unspecified UI save/edit rendering, and wire list filtering/search for free-unspecified entries.
+- Delivery notes / deviations:
+  - Waves were implemented in two combined code commits for efficiency (`Wave 0 + 3`, then `Wave 1 + 2`), followed by a separate closure/docs sync step.
 - AC traceability (`req_046`) target mapping:
   - AC1 -> `item_287`, `item_288`, `item_291`
   - AC2 -> `item_287`, `item_290`, `item_291`
@@ -170,3 +183,4 @@ Rationale:
 - `src/tests/app.ui.list-ergonomics.spec.tsx`
 - `package.json`
 - `.github/workflows/ci.yml`
+- `logics/tasks/task_047_req_046_wire_free_color_unspecified_semantics_orchestration_and_delivery_control.md`

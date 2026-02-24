@@ -2,7 +2,7 @@
 > From version: 0.8.1
 > Understanding: 98%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Compatibility and migration path for explicit wire color mode semantics after req_045
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,6 +36,7 @@
 - Urgency: High.
 
 # Notes
+- Delivery status: Delivered in `req_046` implementation (see `task_047` report and commit `3d1e12b`).
 - Dependencies: `req_046`, item_287.
 - Blocks: item_291.
 - Related AC: AC2, AC6, AC7, AC8.
@@ -47,4 +48,3 @@
   - `src/tests/persistence.localStorage.spec.ts`
   - `src/tests/portability.network-file.spec.ts`
   - `src/tests/store.reducer.entities.spec.ts`
-
