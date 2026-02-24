@@ -1,7 +1,7 @@
 ## req_046_wire_free_color_mode_without_label_as_deliberate_unspecified_color_placeholder - Wire Free Color Mode Without Label as Deliberate Unspecified Color Placeholder
 > From version: 0.8.1
-> Understanding: 98%
-> Confidence: 96%
+> Understanding: 99%
+> Confidence: 97%
 > Complexity: Medium-High
 > Theme: Distinguishing “No Color” from “Free Color (Unspecified)” in Wire/Cable Identification
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -41,7 +41,7 @@ This request is a **follow-up corrective extension** to `req_045` after implemen
 - `req_045` delivered free-color labels and explicit UI mode selection.
 - `req_046` refines the semantics so `Free color` may be intentionally empty and remains distinguishable from `No color`.
 
-## Implementation decisions (recommended baseline)
+## Implementation decisions (validated implementation baseline)
 - Introduce a persisted explicit wire color mode field (recommended: `colorMode`) as source-of-truth for semantic intent.
 - Keep `freeColorLabel` optional in `Free color` mode:
   - `Free color` + label => free color annotated
@@ -168,6 +168,22 @@ This request is a **follow-up corrective extension** to `req_045` after implemen
 - Regulatory/electrical semantics derived from “free color”.
 - Reworking all color-related UI copy across the whole app beyond touched wire color surfaces.
 
+## Delivery status (implemented)
+- Delivered via `task_047`.
+- Finalized semantic source-of-truth:
+  - persisted wire `colorMode` (`none` / `catalog` / `free`)
+  - `freeColorLabel` remains optional and trims to `null` when empty
+  - `free` + empty label is valid and preserved distinctly from `No color`
+- Legacy compatibility implemented:
+  - missing `colorMode` infers deterministically from existing color fields
+  - mixed legacy states without explicit mode still prioritize `freeColorLabel`
+- User-facing behavior implemented:
+  - wire form allows saving `Free color` with empty label and explains “left unspecified”
+  - read-only surfaces distinguish `No color`, `Free color (unspecified)`, `Free color: <label>`, and catalog colors
+  - wire color sort/search/export paths remain deterministic and free-unspecified searchable
+- Validation closure completed:
+  - `logics` lint, lint, typecheck, UI/store modularization gates, `test:ci`, and build all green (see `task_047` report)
+
 # Backlog
 - `logics/backlog/item_287_wire_color_mode_persisted_semantic_state_for_none_catalog_and_free.md`
 - `logics/backlog/item_288_wire_form_free_color_optional_empty_label_and_unspecified_copy.md`
@@ -178,6 +194,7 @@ This request is a **follow-up corrective extension** to `req_045` after implemen
 # References
 - `logics/request/req_045_wire_cable_free_color_label_support_beyond_catalog_and_no_color_states.md`
 - `logics/tasks/task_046_req_045_wire_cable_free_color_label_support_orchestration_and_delivery_control.md`
+- `logics/tasks/task_047_req_046_wire_free_color_unspecified_semantics_orchestration_and_delivery_control.md`
 - `src/core/cableColors.ts`
 - `src/core/entities.ts`
 - `src/store/actions.ts`

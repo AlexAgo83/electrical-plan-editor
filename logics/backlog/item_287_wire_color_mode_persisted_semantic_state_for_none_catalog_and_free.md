@@ -2,7 +2,7 @@
 > From version: 0.8.1
 > Understanding: 98%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Source-of-truth wire color semantics that preserve intent across no-color, catalog-color, and free-color modes
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,6 +36,7 @@
 - Urgency: High.
 
 # Notes
+- Delivery status: Delivered in `req_046` implementation (see `task_047` report and commits `3d1e12b`, `0e2c97b`).
 - Dependencies: `req_046`, `req_045`, `req_039`.
 - Blocks: item_288, item_289, item_290, item_291.
 - Related AC: AC1, AC2, AC6, AC8.
@@ -47,4 +48,3 @@
   - `src/store/actions.ts`
   - `src/store/reducer/wireReducer.ts`
   - `src/tests/store.reducer.entities.spec.ts`
-

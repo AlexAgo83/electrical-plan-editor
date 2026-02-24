@@ -2,7 +2,7 @@
 > From version: 0.8.1
 > Understanding: 98%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Form UX refinement for deliberate free-color placeholders without mandatory text labels
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -33,6 +33,7 @@ The `req_045` wire form requires a non-empty free-color label in `Free color` mo
 - Urgency: High.
 
 # Notes
+- Delivery status: Delivered in `req_046` implementation (see `task_047` report and commits `0e2c97b`).
 - Dependencies: `req_046`, item_287.
 - Blocks: item_291.
 - Related AC: AC1, AC3, AC6, AC8.
@@ -43,4 +44,3 @@ The `req_045` wire form requires a non-empty free-color label in `Free color` mo
   - `src/app/hooks/useEntityFormsState.ts`
   - `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
   - `src/tests/app.ui.wire-free-color-mode.spec.tsx`
-
