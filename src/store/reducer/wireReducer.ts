@@ -1,5 +1,5 @@
 import type { SegmentId } from "../../core/entities";
-import { normalizeWireColorIds } from "../../core/cableColors";
+import { normalizeWireColorState } from "../../core/cableColors";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { buildRoutingGraphIndex } from "../../core/graph";
 import { findShortestRoute } from "../../core/pathfinding";
@@ -54,7 +54,11 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
       const normalizedName = action.payload.name.trim();
       const normalizedTechnicalId = action.payload.technicalId.trim();
       const normalizedSectionMm2 = resolveWireSectionMm2(action.payload.sectionMm2);
-      const normalizedColors = normalizeWireColorIds(action.payload.primaryColorId, action.payload.secondaryColorId);
+      const normalizedColors = normalizeWireColorState(
+        action.payload.primaryColorId,
+        action.payload.secondaryColorId,
+        action.payload.freeColorLabel
+      );
       const endpointAConnectionReference = normalizeWireEndpointReference(action.payload.endpointAConnectionReference);
       const endpointASealReference = normalizeWireEndpointReference(action.payload.endpointASealReference);
       const endpointBConnectionReference = normalizeWireEndpointReference(action.payload.endpointBConnectionReference);
@@ -179,6 +183,7 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           sectionMm2: normalizedSectionMm2,
           primaryColorId: normalizedColors.primaryColorId,
           secondaryColorId: normalizedColors.secondaryColorId,
+          freeColorLabel: normalizedColors.freeColorLabel,
           endpointAConnectionReference,
           endpointASealReference,
           endpointBConnectionReference,
@@ -262,7 +267,11 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         name: action.payload.name.trim(),
         technicalId: action.payload.technicalId.trim(),
         sectionMm2: resolveWireSectionMm2(action.payload.sectionMm2),
-        ...normalizeWireColorIds(action.payload.primaryColorId, action.payload.secondaryColorId),
+        ...normalizeWireColorState(
+          action.payload.primaryColorId,
+          action.payload.secondaryColorId,
+          action.payload.freeColorLabel
+        ),
         endpointAConnectionReference: normalizeWireEndpointReference(action.payload.endpointAConnectionReference),
         endpointASealReference: normalizeWireEndpointReference(action.payload.endpointASealReference),
         endpointBConnectionReference: normalizeWireEndpointReference(action.payload.endpointBConnectionReference),
