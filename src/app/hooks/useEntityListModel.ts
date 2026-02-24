@@ -60,7 +60,7 @@ export function useEntityListModel({
   const [nodeKindFilter, setNodeKindFilter] = useState<"all" | NetworkNode["kind"]>("all");
   const [segmentSubNetworkFilter, setSegmentSubNetworkFilter] = useState<SegmentSubNetworkFilter>("all");
   const [wireRouteFilter, setWireRouteFilter] = useState<"all" | "auto" | "locked">("all");
-  const [wireFilterField, setWireFilterField] = useState<WireFilterField>("endpoints");
+  const [wireFilterField, setWireFilterField] = useState<WireFilterField>("any");
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [nodeIdSortDirection, setNodeIdSortDirection] = useState<SortDirection>("asc");
