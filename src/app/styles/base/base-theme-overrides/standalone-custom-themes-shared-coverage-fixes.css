@@ -555,3 +555,48 @@
 ) .data-table tr.is-selected.is-wire-highlighted > td {
   background: color-mix(in srgb, var(--custom-row-selected-bg) 58%, var(--custom-row-wire-highlight-bg)) !important;
 }
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .route-preview-empty {
+  color: var(--custom-muted-text);
+  border-color: color-mix(in srgb, var(--custom-panel-border) 70%, transparent);
+}
+
+.app-shell:is(
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender
+) .route-preview-status-chip {
+  border-color: color-mix(in srgb, var(--custom-selection) 42%, var(--custom-panel-border));
+  background: color-mix(in srgb, var(--custom-selection) 18%, var(--custom-panel-bg));
+  color: var(--custom-strong-text);
+}
