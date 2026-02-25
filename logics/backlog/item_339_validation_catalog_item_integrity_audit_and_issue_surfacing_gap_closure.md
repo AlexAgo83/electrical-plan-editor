@@ -1,8 +1,8 @@
 ## item_339_validation_catalog_item_integrity_audit_and_issue_surfacing_gap_closure - Validation catalog item integrity audit and issue surfacing gap closure
 > From version: 0.9.6
-> Understanding: 97%
-> Confidence: 91%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Validation rule/surfacing hardening for catalog item integrity issues
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -33,6 +33,9 @@ Users report that Validation appears not to surface catalog item errors reliably
 - Dependencies: `req_059`, `req_053`.
 - Blocks: `item_340`, `item_341`, `task_056`.
 - Related AC: req_059 AC1, AC2.
+- Delivery notes:
+  - `buildValidationIssues` surfaces intrinsic catalog-item integrity issues under `Catalog integrity` (trimmed manufacturer reference, invalid connection count, invalid URL, duplicate manufacturer reference).
+  - Catalog-item issue generation remains deterministic and coexists with connector/splice catalog-link integrity checks.
 - References:
   - `logics/request/req_059_validation_support_for_catalog_item_errors_with_dedicated_sample_coverage.md`
   - `logics/request/req_053_validation_catalog_integrity_issues_and_catalog_go_to_navigation_support.md`

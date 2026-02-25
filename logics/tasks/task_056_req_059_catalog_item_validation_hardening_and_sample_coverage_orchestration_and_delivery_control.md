@@ -1,8 +1,8 @@
 ## task_056_req_059_catalog_item_validation_hardening_and_sample_coverage_orchestration_and_delivery_control - req_059 catalog item validation hardening and sample coverage orchestration and delivery control
 > From version: 0.9.6
-> Understanding: 97% (scope is a req_053 follow-up: rule/surfacing audit + dedicated sample + UI regression hardening)
-> Confidence: 91% (can be delivered in three focused waves with clear validation checkpoints)
-> Progress: 0%
+> Understanding: 99% (delivered as a req_053 follow-up across validation rules, reproducible samples, and Validation UI regression paths)
+> Confidence: 96% (implementation is stable and covered by targeted Validation tests plus the final validation matrix)
+> Progress: 100%
 > Complexity: Medium
 > Theme: Orchestration for req_059 validation hardening on catalog-item issues and sample coverage
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -38,12 +38,12 @@ These changes touch the validation pipeline, sample/fixture builders, and Valida
 - `logics/backlog/item_341_validation_ui_catalog_item_category_filters_and_go_to_regression_hardening.md`
 
 # Plan
-- [ ] 1. Audit and close validation rule/surfacing gaps for intrinsic catalog-item errors (`item_339`)
-- [ ] 2. Add deterministic invalid sample/fixture coverage for catalog-item validation error reproduction (`item_340`)
-- [ ] 3. Harden Validation UI category/filter/go-to behavior and regression tests using the new coverage (`item_341`)
-- [ ] 4. Run targeted validation suites and fix regressions
-- [ ] 5. Run final validation matrix
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Audit and close validation rule/surfacing gaps for intrinsic catalog-item errors (`item_339`)
+- [x] 2. Add deterministic invalid sample/fixture coverage for catalog-item validation error reproduction (`item_340`)
+- [x] 3. Harden Validation UI category/filter/go-to behavior and regression tests using the new coverage (`item_341`)
+- [x] 4. Run targeted validation suites and fix regressions
+- [x] 5. Run final validation matrix
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -65,8 +65,10 @@ These changes touch the validation pipeline, sample/fixture builders, and Valida
   - Validation UI assertions may become brittle if tied to exact wording instead of stable category/behavior contracts.
   - Rule duplication risk with `req_053` if gap closure reimplements already-delivered logic without auditing first.
 - Delivery notes:
-  - Prefer explicit invalid fixture variants over mutating the default sample.
-  - If user feedback reveals a specific catalog error not currently covered, record it as a concrete regression test case under `item_341`.
+  - Intrinsic catalog-item validation issue generation/surfacing is implemented in `buildValidationIssues` under the `Catalog integrity` category (trimmed manufacturer reference, invalid connection count, invalid URL, duplicate manufacturer reference).
+  - Dedicated sample/fixture regression coverage was added without invalidating default happy-path demos.
+  - Validation UI regression coverage includes catalog-item issue category filtering and `Go to` navigation to Catalog item editing.
+  - Final validation matrix re-run and passing in current workspace state: `logics_lint`, `lint`, `typecheck`, `build`, `quality:ui-modularization`, `quality:store-modularization`, `quality:pwa`, `test:ci`, `test:e2e`.
 
 # References
 - `logics/request/req_059_validation_support_for_catalog_item_errors_with_dedicated_sample_coverage.md`
@@ -75,4 +77,6 @@ These changes touch the validation pipeline, sample/fixture builders, and Valida
 - `logics/backlog/item_340_dedicated_sample_fixture_for_catalog_item_validation_error_reproduction_and_regression_coverage.md`
 - `logics/backlog/item_341_validation_ui_catalog_item_category_filters_and_go_to_regression_hardening.md`
 - `src/app/hooks/validation/buildValidationIssues.ts`
+- `src/tests/sample-network.fixture.spec.ts`
+- `src/tests/portability.network-file.spec.ts`
 - `src/tests/app.ui.validation.spec.tsx`
