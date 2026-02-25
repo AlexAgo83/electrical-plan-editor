@@ -23,12 +23,29 @@ async function getColumnIndexByHeaderLabel(panel: Locator, headerLabel: string):
 }
 
 test("bootstraps a comprehensive sample network on first launch", async ({ page }) => {
+  const findVisibleSidebarButtonByText = async (
+    selector: ".workspace-nav-row" | ".workspace-nav-row.secondary",
+    text: string
+  ): Promise<Locator | null> => {
+    const buttons = page.locator(`${selector} button`).filter({ hasText: text });
+    const buttonCount = await buttons.count();
+    for (let index = 0; index < buttonCount; index += 1) {
+      const candidate = buttons.nth(index);
+      if (await candidate.isVisible()) {
+        return candidate;
+      }
+    }
+    return null;
+  };
   const ensureNavigationDrawerOpen = async () => {
     const navigationToggle = page.locator(".header-nav-toggle");
+    if ((await findVisibleSidebarButtonByText(".workspace-nav-row", "Modeling")) !== null) {
+      return;
+    }
     if ((await navigationToggle.getAttribute("aria-expanded")) !== "true") {
       await navigationToggle.click();
     }
-    await expect(page.locator(".workspace-drawer.is-open")).toBeVisible();
+    await expect(page.locator(".workspace-nav-row").first()).toBeVisible();
   };
   const ensureNavigationDrawerClosed = async () => {
     const navigationToggle = page.locator(".header-nav-toggle");
@@ -50,10 +67,13 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
   };
   const openModelingWorkspace = async () => {
     await ensureNavigationDrawerOpen();
-    await page
-      .locator(".workspace-drawer.is-open .workspace-nav-row")
-      .getByRole("button", { name: "Modeling", exact: true })
-      .click();
+    const modelingButton = await findVisibleSidebarButtonByText(".workspace-nav-row", "Modeling");
+    if (modelingButton === null) {
+      throw new Error("Unable to find a visible Modeling navigation button.");
+    }
+    await modelingButton.evaluate((element) => {
+      (element as HTMLButtonElement).click();
+    });
     await ensureNavigationDrawerClosed();
   };
   await page.goto("/");
@@ -71,12 +91,29 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
 
 test("create -> route -> force -> recompute flow works end-to-end", async ({ page }) => {
   test.setTimeout(60_000);
+  const findVisibleSidebarButtonByText = async (
+    selector: ".workspace-nav-row" | ".workspace-nav-row.secondary",
+    text: string
+  ): Promise<Locator | null> => {
+    const buttons = page.locator(`${selector} button`).filter({ hasText: text });
+    const buttonCount = await buttons.count();
+    for (let index = 0; index < buttonCount; index += 1) {
+      const candidate = buttons.nth(index);
+      if (await candidate.isVisible()) {
+        return candidate;
+      }
+    }
+    return null;
+  };
   const ensureNavigationDrawerOpen = async () => {
     const navigationToggle = page.locator(".header-nav-toggle");
+    if ((await findVisibleSidebarButtonByText(".workspace-nav-row", "Modeling")) !== null) {
+      return;
+    }
     if ((await navigationToggle.getAttribute("aria-expanded")) !== "true") {
       await navigationToggle.click();
     }
-    await expect(page.locator(".workspace-drawer.is-open")).toBeVisible();
+    await expect(page.locator(".workspace-nav-row").first()).toBeVisible();
   };
   const ensureNavigationDrawerClosed = async () => {
     const navigationToggle = page.locator(".header-nav-toggle");
@@ -107,16 +144,24 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
       wire: "Wire"
     } as const;
     await ensureNavigationDrawerOpen();
-    if ((await page.locator(".workspace-drawer.is-open .workspace-nav-row.secondary").count()) === 0) {
-      await page
-        .locator(".workspace-drawer.is-open .workspace-nav-row")
-        .getByRole("button", { name: "Modeling", exact: true })
-        .click();
+    let subScreenButton = await findVisibleSidebarButtonByText(".workspace-nav-row.secondary", labelBySubScreen[value]);
+    if (subScreenButton === null) {
+      const modelingButton = await findVisibleSidebarButtonByText(".workspace-nav-row", "Modeling");
+      if (modelingButton === null) {
+        throw new Error("Unable to find a visible Modeling navigation button.");
+      }
+      await modelingButton.evaluate((element) => {
+        (element as HTMLButtonElement).click();
+      });
+
+      // In CI, the drawer can briefly rerender/close during the screen switch.
+      await ensureNavigationDrawerOpen();
+      subScreenButton = await findVisibleSidebarButtonByText(".workspace-nav-row.secondary", labelBySubScreen[value]);
     }
-    const subScreenButton = page
-      .locator(".workspace-drawer.is-open .workspace-nav-row.secondary")
-      .getByRole("button", { name: labelBySubScreen[value], exact: true });
-    await subScreenButton.scrollIntoViewIfNeeded();
+
+    if (subScreenButton === null) {
+      throw new Error(`Unable to find a visible ${labelBySubScreen[value]} navigation button.`);
+    }
     await subScreenButton.evaluate((element) => {
       (element as HTMLButtonElement).click();
     });
@@ -124,10 +169,13 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   };
   const openModelingWorkspace = async () => {
     await ensureNavigationDrawerOpen();
-    await page
-      .locator(".workspace-drawer.is-open .workspace-nav-row")
-      .getByRole("button", { name: "Modeling", exact: true })
-      .click();
+    const modelingButton = await findVisibleSidebarButtonByText(".workspace-nav-row", "Modeling");
+    if (modelingButton === null) {
+      throw new Error("Unable to find a visible Modeling navigation button.");
+    }
+    await modelingButton.evaluate((element) => {
+      (element as HTMLButtonElement).click();
+    });
     await ensureNavigationDrawerClosed();
   };
   const openCreateFormIfIdle = async (
@@ -157,14 +205,27 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     });
     await listPanel.getByRole("button", { name: "New", exact: true }).click();
   };
+  const openCatalogCreateFormIfIdle = async () => {
+    if ((await page.getByRole("heading", { name: "Create catalog item" }).count()) > 0) {
+      return;
+    }
+
+    const catalogPanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Catalog" }) });
+    const emptyStateCreateButton = catalogPanel.getByRole("button", { name: "Create catalog item", exact: true });
+    if ((await emptyStateCreateButton.count()) > 0) {
+      await emptyStateCreateButton.click();
+      return;
+    }
+
+    await catalogPanel.getByRole("button", { name: "New", exact: true }).click();
+  };
 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "e-Plan Editor" })).toBeVisible();
   await dismissOnboardingIfVisible(page);
 
   await switchSubScreen("catalog");
-  const catalogPanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Catalog" }) });
-  await catalogPanel.getByRole("button", { name: "Create catalog item" }).click();
+  await openCatalogCreateFormIfIdle();
   const catalogForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create catalog item" }) });
   await catalogForm.getByLabel("Manufacturer reference").fill("E2E-CATALOG-2");
   await catalogForm.getByLabel("Connection count").fill("2");

@@ -52,6 +52,27 @@ describe("sample network fixture", () => {
     expect(lockedWire?.lengthMm).toBe(120);
   });
 
+  it("assigns catalog items to sample connectors and splices across built-in demo networks", () => {
+    const state = createSampleNetworkState();
+    const sampleTechnicalIds = new Set(["NET-MAIN-SAMPLE", "NET-LIGHTING-DEMO", "NET-SENSOR-BB-DEMO"]);
+
+    for (const networkId of state.networks.allIds) {
+      const network = state.networks.byId[networkId];
+      const scoped = state.networkStates[networkId];
+      if (network === undefined || scoped === undefined || !sampleTechnicalIds.has(network.technicalId)) {
+        continue;
+      }
+
+      expect(scoped.catalogItems.allIds.length).toBeGreaterThan(0);
+      for (const connectorId of scoped.connectors.allIds) {
+        expect(scoped.connectors.byId[connectorId]?.catalogItemId).toBeDefined();
+      }
+      for (const spliceId of scoped.splices.allIds) {
+        expect(scoped.splices.byId[spliceId]?.catalogItemId).toBeDefined();
+      }
+    }
+  });
+
   it("keeps source connector occupancy coherent for seeded wires", () => {
     const state = createSampleNetworkState();
     const sourceOccupancy = state.connectorCavityOccupancy[asConnectorId("C-SRC")];

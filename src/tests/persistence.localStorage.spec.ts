@@ -498,7 +498,8 @@ describe("localStorage persistence adapter", () => {
           ...state.connectors.byId,
           [connectorId]: {
             ...state.connectors.byId[connectorId]!,
-            manufacturerReference: "  TE-1-967616-1  "
+            manufacturerReference: "  TE-1-967616-1  ",
+            catalogItemId: undefined
           }
         }
       },
@@ -508,7 +509,8 @@ describe("localStorage persistence adapter", () => {
           ...state.splices.byId,
           [spliceId]: {
             ...state.splices.byId[spliceId]!,
-            manufacturerReference: " "
+            manufacturerReference: " ",
+            catalogItemId: undefined
           }
         }
       },
@@ -522,7 +524,8 @@ describe("localStorage persistence adapter", () => {
               ...state.networkStates[activeNetworkId]!.connectors.byId,
               [connectorId]: {
                 ...state.networkStates[activeNetworkId]!.connectors.byId[connectorId]!,
-                manufacturerReference: ` ${"B".repeat(130)} `
+                manufacturerReference: ` ${"B".repeat(130)} `,
+                catalogItemId: undefined
               }
             }
           },
@@ -532,7 +535,8 @@ describe("localStorage persistence adapter", () => {
               ...state.networkStates[activeNetworkId]!.splices.byId,
               [spliceId]: {
                 ...state.networkStates[activeNetworkId]!.splices.byId[spliceId]!,
-                manufacturerReference: "  AMP/SEAL-42  "
+                manufacturerReference: "  AMP/SEAL-42  ",
+                catalogItemId: undefined
               }
             }
           }

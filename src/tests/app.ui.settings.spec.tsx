@@ -246,6 +246,10 @@ describe("App integration UI - settings", () => {
 
     const connectorsPanel = getPanelByHeading("Connectors");
     expect(within(connectorsPanel).getByText("Power Source Connector")).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("catalog");
+    const catalogPanel = getPanelByHeading("Catalog");
+    expect(within(catalogPanel).getByText("SAMPLE-CAT-SRC-12W")).toBeInTheDocument();
   });
 
   it("recreates a validation issues sample from settings when workspace is empty", () => {

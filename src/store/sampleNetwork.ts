@@ -1,5 +1,4 @@
 import type {
-  CatalogItemId,
   ConnectorId,
   NetworkId,
   NodeId,
@@ -10,13 +9,16 @@ import type {
 import { appActions, type AppAction } from "./actions";
 import { appReducer } from "./reducer";
 import { buildAdditionalSampleNetworkDemoActions } from "./sampleNetworkAdditionalDemos";
+import {
+  buildMainSampleCatalogActions,
+  buildValidationSampleCatalogActions,
+  mainSampleCatalogIds,
+  validationSampleCatalogIds
+} from "./sampleNetworkCatalog";
 import { createInitialState, type AppState } from "./types";
 
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
-}
-function asCatalogItemId(value: string): CatalogItemId {
-  return value as CatalogItemId;
 }
 function asSpliceId(value: string): SpliceId {
   return value as SpliceId;
@@ -117,35 +119,41 @@ export function hasSampleNetworkSignature(state: AppState): boolean {
 
 export function createSampleNetworkState(): AppState {
   const actions: AppAction[] = [
+    ...buildMainSampleCatalogActions(),
     appActions.upsertConnector({
       id: asConnectorId("C-SRC"),
       name: "Power Source Connector",
       technicalId: "CONN-SRC-01",
-      cavityCount: 12
+      cavityCount: 12,
+      catalogItemId: mainSampleCatalogIds.powerSource12Way
     }),
     appActions.upsertConnector({
       id: asConnectorId("C-DST-1"),
       name: "Actuator Connector A",
       technicalId: "CONN-DST-A",
-      cavityCount: 8
+      cavityCount: 8,
+      catalogItemId: mainSampleCatalogIds.actuator8Way
     }),
     appActions.upsertConnector({
       id: asConnectorId("C-DST-2"),
       name: "Actuator Connector B",
       technicalId: "CONN-DST-B",
-      cavityCount: 8
+      cavityCount: 8,
+      catalogItemId: mainSampleCatalogIds.actuator8Way
     }),
     appActions.upsertSplice({
       id: asSpliceId("S-J1"),
       name: "Main Junction",
       technicalId: "SPL-J1",
-      portCount: 10
+      portCount: 10,
+      catalogItemId: mainSampleCatalogIds.mainJunction10Port
     }),
     appActions.upsertSplice({
       id: asSpliceId("S-J2"),
       name: "Branch Junction",
       technicalId: "SPL-J2",
-      portCount: 8
+      portCount: 8,
+      catalogItemId: mainSampleCatalogIds.branchJunction8Port
     }),
     appActions.upsertNode({
       id: asNodeId("N-C-SRC"),
@@ -379,10 +387,6 @@ export function createValidationIssuesSampleNetworkState(): AppState {
     throw new Error("Expected validation sample connectors/splices in base sample.");
   }
 
-  const catalogPowerSrc12w = asCatalogItemId("CAT-VALID-SRC-12W");
-  const catalogActuator8w = asCatalogItemId("CAT-VALID-ACT-8W");
-  const catalogMainJunction10p = asCatalogItemId("CAT-VALID-J1-10P");
-  const catalogBranchJunction8p = asCatalogItemId("CAT-VALID-J2-8P");
   return [
     appActions.updateNetwork(
       activeNetworkId,
@@ -390,53 +394,26 @@ export function createValidationIssuesSampleNetworkState(): AppState {
       "NET-VALIDATION-SAMPLE",
       "2026-02-22T00:00:00.000Z"
     ),
-    appActions.upsertCatalogItem({
-      id: catalogPowerSrc12w,
-      manufacturerReference: "VAL-CAT-SRC-12W",
-      name: "Validation source connector 12-way",
-      connectionCount: 12,
-      unitPriceExclTax: 12
-    }),
-    appActions.upsertCatalogItem({
-      id: catalogActuator8w,
-      manufacturerReference: "VAL-CAT-ACT-8W",
-      name: "Validation actuator connector 8-way",
-      connectionCount: 8,
-      unitPriceExclTax: 8.5
-    }),
-    appActions.upsertCatalogItem({
-      id: catalogMainJunction10p,
-      manufacturerReference: "VAL-CAT-J1-10P",
-      name: "Validation main junction 10-port",
-      connectionCount: 10,
-      unitPriceExclTax: 6.25
-    }),
-    appActions.upsertCatalogItem({
-      id: catalogBranchJunction8p,
-      manufacturerReference: "VAL-CAT-J2-8P",
-      name: "Validation branch junction 8-port",
-      connectionCount: 8,
-      unitPriceExclTax: 5.5
-    }),
+    ...buildValidationSampleCatalogActions(),
     appActions.upsertConnector({
       ...connectorSrc,
-      catalogItemId: catalogPowerSrc12w
+      catalogItemId: validationSampleCatalogIds.powerSource12Way
     }),
     appActions.upsertConnector({
       ...connectorDst1,
-      catalogItemId: catalogActuator8w
+      catalogItemId: validationSampleCatalogIds.actuator8Way
     }),
     appActions.upsertConnector({
       ...connectorDst2,
-      catalogItemId: catalogActuator8w
+      catalogItemId: validationSampleCatalogIds.actuator8Way
     }),
     appActions.upsertSplice({
       ...spliceJ1,
-      catalogItemId: catalogMainJunction10p
+      catalogItemId: validationSampleCatalogIds.mainJunction10Port
     }),
     appActions.upsertSplice({
       ...spliceJ2,
-      catalogItemId: catalogBranchJunction8p
+      catalogItemId: validationSampleCatalogIds.branchJunction8Port
     }),
     appActions.saveWire({
       id: asWireId("W-VAL-EX-001"),
