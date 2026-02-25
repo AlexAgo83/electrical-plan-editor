@@ -1121,6 +1121,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     handleDeleteNetwork,
     handleRecreateSampleNetwork,
     handleRecreateValidationIssuesSampleNetwork,
+    handleRecreateCatalogValidationIssuesSampleNetwork,
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,
     fitNetworkToContent,
@@ -2148,6 +2149,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         hasBuiltInSampleState,
         handleRecreateSampleNetwork,
         handleRecreateValidationIssuesSampleNetwork,
+        handleRecreateCatalogValidationIssuesSampleNetwork,
         handleResetSampleNetwork,
         activeNetworkId,
         importExport: {

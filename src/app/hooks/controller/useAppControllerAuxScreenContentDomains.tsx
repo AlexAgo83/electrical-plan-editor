@@ -49,6 +49,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     hasBuiltInSampleState: SettingsSliceParams["hasBuiltInSampleState"];
     handleRecreateSampleNetwork: SettingsSliceParams["handleRecreateSampleNetwork"];
     handleRecreateValidationIssuesSampleNetwork: SettingsSliceParams["handleRecreateValidationIssuesSampleNetwork"];
+    handleRecreateCatalogValidationIssuesSampleNetwork: SettingsSliceParams["handleRecreateCatalogValidationIssuesSampleNetwork"];
     handleResetSampleNetwork: SettingsSliceParams["handleResetSampleNetwork"];
     activeNetworkId: SettingsSliceParams["activeNetworkId"];
     importExport: NetworkImportExportModel;
@@ -137,6 +138,7 @@ export function useAppControllerAuxScreenContentDomains({
     hasBuiltInSampleState: settings.hasBuiltInSampleState,
     handleRecreateSampleNetwork: settings.handleRecreateSampleNetwork,
     handleRecreateValidationIssuesSampleNetwork: settings.handleRecreateValidationIssuesSampleNetwork,
+    handleRecreateCatalogValidationIssuesSampleNetwork: settings.handleRecreateCatalogValidationIssuesSampleNetwork,
     handleResetSampleNetwork: settings.handleResetSampleNetwork,
     activeNetworkId: settings.activeNetworkId,
     selectedExportNetworkIds: settings.importExport.selectedExportNetworkIds,

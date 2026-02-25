@@ -4,6 +4,7 @@ import type { AppState, AppStore, ThemeMode } from "../../store";
 import {
   appActions,
   appReducer,
+  createCatalogValidationIssuesSampleNetworkState,
   createSampleNetworkState,
   createValidationIssuesSampleNetworkState,
   selectNetworkTechnicalIdTaken
@@ -411,6 +412,21 @@ export function useWorkspaceHandlers({
     });
   }
 
+  function handleRecreateCatalogValidationIssuesSampleNetwork(): void {
+    if (!isCurrentWorkspaceEmpty && typeof window !== "undefined" && typeof window.confirm === "function") {
+      const shouldReplace = window.confirm(
+        "Refresh built-in sample networks with the catalog validation issues sample? User-created networks are preserved."
+      );
+      if (!shouldReplace) {
+        return;
+      }
+    }
+
+    refreshBuiltInSampleNetworks(createCatalogValidationIssuesSampleNetworkState, {
+      activateImportedSample: true
+    });
+  }
+
   function resetNetworkViewToConfiguredScale(): void {
     setNetworkScale(configuredResetScale);
     setNetworkOffset({ x: 0, y: 0 });
@@ -660,6 +676,7 @@ export function useWorkspaceHandlers({
     handleDeleteNetwork,
     handleRecreateSampleNetwork,
     handleRecreateValidationIssuesSampleNetwork,
+    handleRecreateCatalogValidationIssuesSampleNetwork,
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,
     fitNetworkToContent,

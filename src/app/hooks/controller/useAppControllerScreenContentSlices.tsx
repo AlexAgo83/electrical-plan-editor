@@ -700,6 +700,7 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     hasBuiltInSampleState: params.hasBuiltInSampleState,
     handleRecreateSampleNetwork: params.handleRecreateSampleNetwork,
     handleRecreateValidationIssuesSampleNetwork: params.handleRecreateValidationIssuesSampleNetwork,
+    handleRecreateCatalogValidationIssuesSampleNetwork: params.handleRecreateCatalogValidationIssuesSampleNetwork,
     handleResetSampleNetwork: params.handleResetSampleNetwork,
     activeNetworkId: params.activeNetworkId,
     selectedExportNetworkIds: params.selectedExportNetworkIds,
