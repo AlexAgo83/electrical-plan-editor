@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactElement } from "react";
 import type { CatalogItem, CatalogItemId } from "../../../core/entities";
+import { getTableAriaSort } from "../../lib/accessibility";
 import { compareSortableValues } from "../../lib/app-utils-shared";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
@@ -139,22 +140,22 @@ export function ModelingCatalogListPanel({
           <table className="data-table">
             <thead>
               <tr>
-                <th>
+                <th aria-sort={getTableAriaSort(sortState, "manufacturerReference")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("manufacturerReference")}>
                     Manufacturer ref <span className="sort-indicator">{sortIndicator("manufacturerReference")}</span>
                   </button>
                 </th>
-                <th>
+                <th aria-sort={getTableAriaSort(sortState, "name")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("name")}>
                     Name <span className="sort-indicator">{sortIndicator("name")}</span>
                   </button>
                 </th>
-                <th>
+                <th aria-sort={getTableAriaSort(sortState, "connectionCount")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("connectionCount")}>
                     Connections <span className="sort-indicator">{sortIndicator("connectionCount")}</span>
                   </button>
                 </th>
-                <th>
+                <th aria-sort={getTableAriaSort(sortState, "unitPriceExclTax")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("unitPriceExclTax")}>
                     Unit price HT <span className="sort-indicator">{sortIndicator("unitPriceExclTax")}</span>
                   </button>

@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactElement } from "react";
 import { getWireColorLabel, getWireColorSortValue } from "../../../core/cableColors";
+import { getTableAriaSort } from "../../lib/accessibility";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
@@ -169,7 +170,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
       <table className="data-table">
         <thead>
           <tr>
-            <th>
+            <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "name")}>
               <button
                 type="button"
                 className="sort-header-button"
@@ -183,7 +184,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 Name <span className="sort-indicator">{wireListSortIndicator("name")}</span>
               </button>
             </th>
-            <th>
+            <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "technicalId")}>
               <button
                 type="button"
                 className="sort-header-button"
@@ -197,7 +198,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 Technical ID <span className="sort-indicator">{wireListSortIndicator("technicalId")}</span>
               </button>
             </th>
-            <th>
+            <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "color")}>
               <button
                 type="button"
                 className="sort-header-button"
@@ -211,7 +212,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 Color <span className="sort-indicator">{wireListSortIndicator("color")}</span>
               </button>
             </th>
-            <th>
+            <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "endpointA")}>
               <button
                 type="button"
                 className="sort-header-button"
@@ -225,7 +226,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 Endpoint A <span className="sort-indicator">{wireListSortIndicator("endpointA")}</span>
               </button>
             </th>
-            <th>
+            <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "endpointB")}>
               <button
                 type="button"
                 className="sort-header-button"
@@ -239,7 +240,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 Endpoint B <span className="sort-indicator">{wireListSortIndicator("endpointB")}</span>
               </button>
             </th>
-            <th>
+            <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "sectionMm2")}>
               <button
                 type="button"
                 className="sort-header-button"
@@ -253,7 +254,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 Section (mm²) <span className="sort-indicator">{wireListSortIndicator("sectionMm2")}</span>
               </button>
             </th>
-            <th>
+            <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "lengthMm")}>
               <button
                 type="button"
                 className="sort-header-button"
@@ -268,7 +269,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
               </button>
             </th>
             {showWireRouteModeColumn ? (
-              <th>
+              <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "routeMode")}>
                 <button
                   type="button"
                   className="sort-header-button"

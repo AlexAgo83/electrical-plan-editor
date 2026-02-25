@@ -38,6 +38,11 @@ export function AppHeaderAndStats({
   lastError,
   onClearError
 }: AppHeaderAndStatsProps): ReactElement {
+  const opsStatusDescription = `${validationIssuesCount} validation issue${validationIssuesCount === 1 ? "" : "s"}${
+    validationErrorCount > 0
+      ? `, ${validationErrorCount} error${validationErrorCount === 1 ? "" : "s"}`
+      : ", no errors"
+  }`;
   return (
     <>
       <section
@@ -85,6 +90,7 @@ export function AppHeaderAndStats({
             onClick={onToggleOperationsPanel}
             aria-expanded={isOperationsPanelOpen}
             aria-controls="workspace-operations-panel"
+            aria-description={opsStatusDescription}
           >
             <span className="header-ops-icon" aria-hidden="true" />
             <span>Ops &amp; Health</span>

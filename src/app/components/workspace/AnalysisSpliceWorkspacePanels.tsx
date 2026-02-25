@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
+import { getTableAriaSort } from "../../lib/accessibility";
 import { formatOccupantRefForDisplay } from "../../lib/app-utils-networking";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
@@ -227,7 +228,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
       <table className="data-table">
         <thead>
           <tr>
-          <th>
+          <th aria-sort={getTableAriaSort(spliceTableSort, "name")}>
             <button
               type="button"
               className="sort-header-button"
@@ -236,7 +237,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
               Name <span className="sort-indicator">{spliceListSortIndicator("name")}</span>
             </button>
           </th>
-          <th>
+          <th aria-sort={getTableAriaSort(spliceTableSort, "technicalId")}>
             <button
               type="button"
               className="sort-header-button"
@@ -245,9 +246,9 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
               Technical ID <span className="sort-indicator">{spliceListSortIndicator("technicalId")}</span>
             </button>
           </th>
-          <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{spliceListSortIndicator("manufacturerReference")}</span></button></th>
-          <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "portCount", direction: current.field === "portCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ports <span className="sort-indicator">{spliceListSortIndicator("portCount")}</span></button></th>
-          <th><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "branchCount", direction: current.field === "branchCount" && current.direction === "asc" ? "desc" : "asc" }))}>Branches <span className="sort-indicator">{spliceListSortIndicator("branchCount")}</span></button></th>
+          <th aria-sort={getTableAriaSort(spliceTableSort, "manufacturerReference")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{spliceListSortIndicator("manufacturerReference")}</span></button></th>
+          <th aria-sort={getTableAriaSort(spliceTableSort, "portCount")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "portCount", direction: current.field === "portCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ports <span className="sort-indicator">{spliceListSortIndicator("portCount")}</span></button></th>
+          <th aria-sort={getTableAriaSort(spliceTableSort, "branchCount")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "branchCount", direction: current.field === "branchCount" && current.direction === "asc" ? "desc" : "asc" }))}>Branches <span className="sort-indicator">{spliceListSortIndicator("branchCount")}</span></button></th>
           </tr>
         </thead>
         <tbody>
@@ -408,7 +409,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     <table className="data-table">
       <thead>
         <tr>
-          <th>
+          <th aria-sort={getTableAriaSort(spliceSynthesisTableSort, "name")}>
             <button
               type="button"
               className="sort-header-button"
@@ -417,7 +418,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
               Wire <span className="sort-indicator">{spliceSynthesisSortIndicator("name")}</span>
             </button>
           </th>
-          <th>
+          <th aria-sort={getTableAriaSort(spliceSynthesisTableSort, "technicalId")}>
             <button
               type="button"
               className="sort-header-button"
@@ -426,9 +427,9 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
               Technical ID <span className="sort-indicator">{spliceSynthesisSortIndicator("technicalId")}</span>
             </button>
           </th>
-          <th><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "localPort", direction: current.field === "localPort" && current.direction === "asc" ? "desc" : "asc" }))}>Local port <span className="sort-indicator">{spliceSynthesisSortIndicator("localPort")}</span></button></th>
-          <th><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "destination", direction: current.field === "destination" && current.direction === "asc" ? "desc" : "asc" }))}>Destination <span className="sort-indicator">{spliceSynthesisSortIndicator("destination")}</span></button></th>
-          <th><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>Length (mm) <span className="sort-indicator">{spliceSynthesisSortIndicator("lengthMm")}</span></button></th>
+          <th aria-sort={getTableAriaSort(spliceSynthesisTableSort, "localPort")}><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "localPort", direction: current.field === "localPort" && current.direction === "asc" ? "desc" : "asc" }))}>Local port <span className="sort-indicator">{spliceSynthesisSortIndicator("localPort")}</span></button></th>
+          <th aria-sort={getTableAriaSort(spliceSynthesisTableSort, "destination")}><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "destination", direction: current.field === "destination" && current.direction === "asc" ? "desc" : "asc" }))}>Destination <span className="sort-indicator">{spliceSynthesisSortIndicator("destination")}</span></button></th>
+          <th aria-sort={getTableAriaSort(spliceSynthesisTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>Length (mm) <span className="sort-indicator">{spliceSynthesisSortIndicator("lengthMm")}</span></button></th>
         </tr>
       </thead>
       <tbody>

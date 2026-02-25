@@ -69,7 +69,15 @@ export function OnboardingModal({
     closeButtonRef.current?.focus();
 
     return () => {
-      previousFocusedElementRef.current?.focus();
+      const previousFocusedElement = previousFocusedElementRef.current;
+      if (previousFocusedElement?.isConnected) {
+        previousFocusedElement.focus();
+      } else {
+        const fallbackFocusTarget = document.querySelector<HTMLElement>(
+          ".header-settings-toggle, .header-nav-toggle, .header-ops-toggle, button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
+        );
+        fallbackFocusTarget?.focus();
+      }
       previousFocusedElementRef.current = null;
     };
   }, [isOpen, step.id]);
