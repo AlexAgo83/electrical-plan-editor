@@ -5,6 +5,7 @@ import type { AppStore } from "../../store";
 type AppState = ReturnType<AppStore["getState"]>;
 
 interface NetworkEntityCounts {
+  catalogCount: number;
   connectorCount: number;
   spliceCount: number;
   nodeCount: number;
@@ -22,6 +23,7 @@ export function useNetworkEntityCountsById(
     for (const network of networks) {
       const scoped = networkStates[network.id];
       counts[network.id] = {
+        catalogCount: scoped?.catalogItems.allIds.length ?? 0,
         connectorCount: scoped?.connectors.allIds.length ?? 0,
         spliceCount: scoped?.splices.allIds.length ?? 0,
         nodeCount: scoped?.nodes.allIds.length ?? 0,

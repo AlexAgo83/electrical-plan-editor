@@ -2037,8 +2037,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       onOpenCreateCatalogItem={catalogHandlers.resetCatalogForm}
       onEditCatalogItem={catalogHandlers.startCatalogEdit}
       onDeleteCatalogItem={catalogHandlers.handleCatalogDelete}
-      onCreateConnectorFromCatalog={handleCreateConnectorFromCatalog}
-      onCreateSpliceFromCatalog={handleCreateSpliceFromCatalog}
       onOpenCatalogOnboardingHelp={() => openSingleStepOnboarding("catalog")}
     />
   );
@@ -2078,6 +2076,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       selectedCatalogItemManufacturerReference={selectedCatalogItem?.manufacturerReference ?? null}
       linkedConnectors={selectedCatalogItemId === null ? [] : connectors.filter((connector) => connector.catalogItemId === selectedCatalogItemId)}
       linkedSplices={selectedCatalogItemId === null ? [] : splices.filter((splice) => splice.catalogItemId === selectedCatalogItemId)}
+      onCreateConnectorFromCatalog={handleCreateConnectorFromCatalog}
+      onCreateSpliceFromCatalog={handleCreateSpliceFromCatalog}
       onOpenConnector={handleOpenConnectorFromCatalogAnalysis}
       onOpenSplice={handleOpenSpliceFromCatalogAnalysis}
     />

@@ -53,7 +53,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
         <option value="">Select a catalog item</option>
         {catalogItems.map((item) => (
           <option key={item.id} value={item.id}>
-            {item.manufacturerReference}
+            {item.manufacturerReference} ({item.connectionCount})
           </option>
         ))}
       </select>

@@ -42,6 +42,30 @@ function toCatalogItemId(raw: string): CatalogItemId | null {
   return raw.trim().length === 0 ? null : (raw as CatalogItemId);
 }
 
+function hasConnectorOccupancyIndexAboveLimit(store: AppStore, connectorId: ConnectorId, maxCavityCount: number): boolean {
+  const occupancy = store.getState().connectorCavityOccupancy[connectorId];
+  if (occupancy === undefined) {
+    return false;
+  }
+  return Object.keys(occupancy)
+    .map((key) => Number(key))
+    .some((index) => Number.isFinite(index) && index > maxCavityCount);
+}
+
+function hasConnectorWireEndpointIndexAboveLimit(store: AppStore, connectorId: ConnectorId, maxCavityCount: number): boolean {
+  const state = store.getState();
+  return state.wires.allIds.some((wireId) => {
+    const wire = state.wires.byId[wireId];
+    if (wire === undefined) {
+      return false;
+    }
+    return (
+      (wire.endpointA.kind === "connectorCavity" && wire.endpointA.connectorId === connectorId && wire.endpointA.cavityIndex > maxCavityCount) ||
+      (wire.endpointB.kind === "connectorCavity" && wire.endpointB.connectorId === connectorId && wire.endpointB.cavityIndex > maxCavityCount)
+    );
+  });
+}
+
 export function useConnectorHandlers({
   store,
   dispatchAction,
@@ -71,14 +95,28 @@ export function useConnectorHandlers({
   void _cavityCount;
 
   function syncDerivedConnectorCatalogFields(nextCatalogItemId: string): void {
-    setConnectorCatalogItemId(nextCatalogItemId);
     const catalogItem = store.getState().catalogItems.byId[nextCatalogItemId as CatalogItemId];
     if (catalogItem === undefined) {
+      setConnectorCatalogItemId(nextCatalogItemId);
       setConnectorManufacturerReference("");
       return;
     }
+
+    if (connectorFormMode === "edit" && editingConnectorId !== null) {
+      if (hasConnectorOccupancyIndexAboveLimit(store, editingConnectorId, catalogItem.connectionCount)) {
+        setConnectorFormError("Selected catalog item is incompatible: occupied way indexes exceed the catalog connection count.");
+        return;
+      }
+      if (hasConnectorWireEndpointIndexAboveLimit(store, editingConnectorId, catalogItem.connectionCount)) {
+        setConnectorFormError("Selected catalog item is incompatible: wire endpoint way indexes exceed the catalog connection count.");
+        return;
+      }
+    }
+
+    setConnectorCatalogItemId(nextCatalogItemId);
     setConnectorManufacturerReference(catalogItem.manufacturerReference);
     setCavityCount(String(catalogItem.connectionCount));
+    setConnectorFormError(null);
   }
 
   function resetConnectorForm(): void {

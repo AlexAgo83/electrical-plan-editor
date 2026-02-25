@@ -8,6 +8,8 @@ interface CatalogAnalysisWorkspaceContentProps {
   selectedCatalogItemManufacturerReference: string | null;
   linkedConnectors: Connector[];
   linkedSplices: Splice[];
+  onCreateConnectorFromCatalog: (catalogItemId: CatalogItemId) => void;
+  onCreateSpliceFromCatalog: (catalogItemId: CatalogItemId) => void;
   onOpenConnector: (connectorId: ConnectorId) => void;
   onOpenSplice: (spliceId: SpliceId) => void;
 }
@@ -16,12 +18,18 @@ function CatalogUsageTableSection({
   heading,
   rows,
   technicalIdLabel,
-  onGoTo
+  onGoTo,
+  createLabel,
+  createIconClass,
+  onCreate
 }: {
   heading: "Connectors" | "Splices";
   rows: Array<Connector | Splice>;
   technicalIdLabel: "Technical ID";
   onGoTo: (id: string) => void;
+  createLabel: "Create Connector" | "Create Splice";
+  createIconClass: "is-connectors" | "is-splices";
+  onCreate: () => void;
 }): ReactElement {
   if (rows.length === 0) {
     return (
@@ -30,6 +38,12 @@ function CatalogUsageTableSection({
           <h2>{heading}</h2>
         </header>
         <p className="empty-copy">No linked {heading.toLocaleLowerCase()} for the selected catalog item.</p>
+        <div className="row-actions compact">
+          <button type="button" className="button-with-icon" onClick={onCreate}>
+            <span className={`action-button-icon ${createIconClass}`} aria-hidden="true" />
+            {createLabel}
+          </button>
+        </div>
       </article>
     );
   }
@@ -67,6 +81,12 @@ function CatalogUsageTableSection({
         </tbody>
       </table>
       <TableEntryCountFooter count={rows.length} />
+      <div className="row-actions compact">
+        <button type="button" className="button-with-icon" onClick={onCreate}>
+          <span className={`action-button-icon ${createIconClass}`} aria-hidden="true" />
+          {createLabel}
+        </button>
+      </div>
     </article>
   );
 }
@@ -77,6 +97,8 @@ export function CatalogAnalysisWorkspaceContent({
   selectedCatalogItemManufacturerReference,
   linkedConnectors,
   linkedSplices,
+  onCreateConnectorFromCatalog,
+  onCreateSpliceFromCatalog,
   onOpenConnector,
   onOpenSplice
 }: CatalogAnalysisWorkspaceContentProps): ReactElement {
@@ -115,12 +137,18 @@ export function CatalogAnalysisWorkspaceContent({
             heading="Connectors"
             rows={linkedConnectors}
             technicalIdLabel="Technical ID"
+            createLabel="Create Connector"
+            createIconClass="is-connectors"
+            onCreate={() => onCreateConnectorFromCatalog(selectedCatalogItemId)}
             onGoTo={(id) => onOpenConnector(id as ConnectorId)}
           />
           <CatalogUsageTableSection
             heading="Splices"
             rows={linkedSplices}
             technicalIdLabel="Technical ID"
+            createLabel="Create Splice"
+            createIconClass="is-splices"
+            onCreate={() => onCreateSpliceFromCatalog(selectedCatalogItemId)}
             onGoTo={(id) => onOpenSplice(id as SpliceId)}
           />
         </>
