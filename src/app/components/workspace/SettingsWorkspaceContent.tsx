@@ -195,6 +195,7 @@ export function SettingsWorkspaceContent({
               <option value="cloudLavender">Cloud Lavender (Light)</option>
               <option value="roseQuartz">Rose Quartz (Light)</option>
               <option value="lavenderHaze">Lavender Haze (Light)</option>
+              <option value="circleMobilityLight">Circle Mobility (Light)</option>
               <option value="dark">Dark</option>
               <option value="slateNeon">Slate Neon (Dark)</option>
               <option value="deepGreen">Deep Green (Dark)</option>
@@ -210,6 +211,7 @@ export function SettingsWorkspaceContent({
               <option value="navyAsh">Navy Ash (Dark)</option>
               <option value="charcoalPlum">Charcoal Plum (Dark)</option>
               <option value="smokedTeal">Smoked Teal (Dark)</option>
+              <option value="circleMobilityDark">Circle Mobility (Dark)</option>
             </select>
           </label>
           <label className="settings-field">

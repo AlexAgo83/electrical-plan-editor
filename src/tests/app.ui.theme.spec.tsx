@@ -99,6 +99,22 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).toHaveClass("theme-dark");
     expect(appShell).toHaveClass("theme-deep-green");
     expect(appShell).toHaveClass("theme-olive");
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "circleMobilityLight" }
+    });
+    expect(appShell).toHaveClass("theme-sage-paper");
+    expect(appShell).toHaveClass("theme-circle-mobility-light");
+    expect(appShell).not.toHaveClass("theme-normal");
+    expect(appShell).not.toHaveClass("theme-dark");
+
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "circleMobilityDark" }
+    });
+    expect(appShell).toHaveClass("theme-petrol-slate");
+    expect(appShell).toHaveClass("theme-circle-mobility-dark");
+    expect(appShell).not.toHaveClass("theme-normal");
+    expect(appShell).not.toHaveClass("theme-dark");
   });
 
   it("supports standalone midrange custom themes without stacking legacy theme classes", () => {
@@ -140,6 +156,30 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).not.toHaveClass("theme-paper-blueprint");
   });
 
+  it("persists Circle Mobility theme preference across remount", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreen("settings");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Appearance preferences" }).closest(".panel");
+    expect(settingsPanel).not.toBeNull();
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "circleMobilityDark" }
+    });
+    firstRender.unmount();
+
+    renderAppWithState(createUiIntegrationState());
+
+    const appShell = document.querySelector("main.app-shell");
+    expect(appShell).not.toBeNull();
+    expect(appShell).toHaveClass("theme-circle-mobility-dark");
+    expect(appShell).toHaveClass("theme-petrol-slate");
+
+    switchScreen("settings");
+    const restoredSettingsPanel = within(document.body).getByRole("heading", { name: "Appearance preferences" }).closest(".panel");
+    expect(restoredSettingsPanel).not.toBeNull();
+    expect(within(restoredSettingsPanel as HTMLElement).getByLabelText("Theme mode")).toHaveValue("circleMobilityDark");
+  });
+
   it("renders representative workspace surfaces under standalone themes beyond shell class wiring", () => {
     renderAppWithState(createUiIntegrationState());
 
@@ -167,6 +207,11 @@ describe("App integration UI - theme mode", () => {
       target: { value: "sagePaper" }
     });
     expect(appShell).toHaveClass("theme-sage-paper");
+
+    fireEvent.change(within(settingsPanelAgain as HTMLElement).getByLabelText("Theme mode"), {
+      target: { value: "circleMobilityLight" }
+    });
+    expect(appShell).toHaveClass("theme-circle-mobility-light");
 
     switchScreen("analysis");
     expect(within(document.body).queryByRole("heading", { name: "Connector analysis" })).toBeNull();

@@ -75,6 +75,12 @@ function normalizeThemeMode(value: unknown): ThemeMode {
       return "charcoalPlum";
     case "smokedTeal":
       return "smokedTeal";
+    case "circleMobilityLight":
+    case "circleLight":
+      return "circleMobilityLight";
+    case "circleMobilityDark":
+    case "circleDark":
+      return "circleMobilityDark";
     default:
       return "normal";
   }
