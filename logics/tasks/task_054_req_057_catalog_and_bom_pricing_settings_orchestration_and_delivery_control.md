@@ -2,7 +2,7 @@
 > From version: 0.9.6
 > Understanding: 97% (scope decisions locked: EUR default, 20% TVA default, workspace scope, optional tax with greyed rate field)
 > Confidence: 91% (delivery can be sequenced cleanly on top of req_051/req_056 surfaces)
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Orchestration for req_057 settings + catalog pricing UI + conditional BOM TTC export
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -43,12 +43,12 @@ This should be delivered in a controlled sequence to avoid regressions in existi
 - `logics/backlog/item_335_catalog_price_ui_currency_display_beside_excl_tax_unit_prices.md`
 
 # Plan
-- [ ] 1. Implement settings foundation (`item_333`): workspace pricing settings state/persistence, defaults, normalization, and disabled tax-rate field UX
-- [ ] 2. Implement catalog UI currency display (`item_335`) using req_057 symbol/code display rules without changing HT storage semantics
-- [ ] 3. Implement BOM TTC conditional export (`item_334`): preserve HT outputs, add TTC column/total only when tax is enabled, add pricing metadata context
-- [ ] 4. Run targeted regression suites for settings/catalog/BOM and fix discovered issues
-- [ ] 5. Run final validation matrix (lint/typecheck/quality/build/tests/e2e)
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Implement settings foundation (`item_333`): workspace pricing settings state/persistence, defaults, normalization, and disabled tax-rate field UX
+- [x] 2. Implement catalog UI currency display (`item_335`) using req_057 symbol/code display rules without changing HT storage semantics
+- [x] 3. Implement BOM TTC conditional export (`item_334`): preserve HT outputs, add TTC column/total only when tax is enabled, add pricing metadata context
+- [x] 4. Run targeted regression suites for settings/catalog/BOM and fix discovered issues
+- [x] 5. Run final validation matrix (lint/typecheck/quality/build/tests/e2e)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -74,8 +74,11 @@ This should be delivered in a controlled sequence to avoid regressions in existi
   - BOM CSV schema changes may break existing HT-only tests if TTC columns are inserted without deterministic ordering/versioned expectations.
   - Catalog UI display updates may create inconsistent symbol/code formatting across list vs form.
 - Delivery notes:
-  - Update this task after each backlog item with validation snapshot and any scope clarifications.
-  - If implementation reveals CSV schema compatibility concerns, record the chosen column order and metadata row contract explicitly in `req_057` and `item_334`.
+  - Implemented `item_333`, `item_334`, and `item_335` in code (workspace currency + tax settings, catalog currency surfacing, BOM HT/TTC conditional export with pricing context rows).
+  - Chosen BOM export contract: pricing context is appended as CSV rows (`PRICING CONTEXT`) and TTC columns/totals are emitted only when tax is enabled.
+  - Targeted validation executed and passing: `app.ui.settings`, `app.ui.settings-pricing`, `app.ui.catalog`, `network-summary-bom-csv`, `app.ui.network-summary-bom-export`.
+  - Full validation matrix executed and passing in this implementation pass: `logics_lint`, `lint`, `typecheck`, `quality:ui-modularization`, `quality:store-modularization`, `build`, `quality:pwa`, `test:ci`, `test:e2e`.
+  - To satisfy `quality:ui-modularization`, pricing-specific settings tests were split into `src/tests/app.ui.settings-pricing.spec.tsx`, keeping `src/tests/app.ui.settings.spec.tsx` under the 500-line gate.
 
 # References
 - `logics/request/req_057_catalog_and_bom_settings_currency_and_tax_defaults.md`

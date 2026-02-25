@@ -181,18 +181,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     connectorNodeByConnectorId,
     spliceNodeBySpliceId
   } = useEntityRelationshipMaps(connectors, splices, nodes, segments);
-  const networkSummaryBomCsvExport = useMemo(
-    () => buildNetworkSummaryBomCsvExport(catalogItems, connectors, splices),
-    [catalogItems, connectors, splices]
-  );
-  const canExportBomCsv = networkSummaryBomCsvExport.rows.length > 1;
-  const handleExportBomCsv = useCallback(() => {
-    if (!canExportBomCsv) {
-      return;
-    }
-    downloadCsvFile("network-bom", networkSummaryBomCsvExport.headers, networkSummaryBomCsvExport.rows);
-  }, [canExportBomCsv, networkSummaryBomCsvExport]);
-
   const formsState = useEntityFormsState();
   const forms = buildAppControllerNamespacedFormsState(formsState);
   const { setWireForcedRouteInput } = formsState;
@@ -265,6 +253,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setTableDensity,
     tableFontSize,
     setTableFontSize,
+    workspaceCurrencyCode,
+    setWorkspaceCurrencyCode,
+    workspaceTaxEnabled,
+    setWorkspaceTaxEnabled,
+    workspaceTaxRatePercent,
+    setWorkspaceTaxRatePercent,
     defaultWireSectionMm2,
     setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
@@ -310,6 +304,18 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     preferencesHydrated,
     setPreferencesHydrated
   } = useAppControllerPreferencesState();
+  const networkSummaryBomCsvExport = useMemo(
+    () =>
+      buildNetworkSummaryBomCsvExport(catalogItems, connectors, splices, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent),
+    [catalogItems, connectors, splices, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent]
+  );
+  const canExportBomCsv = networkSummaryBomCsvExport.itemRowCount > 0;
+  const handleExportBomCsv = useCallback(() => {
+    if (!canExportBomCsv) {
+      return;
+    }
+    downloadCsvFile("network-bom", networkSummaryBomCsvExport.headers, networkSummaryBomCsvExport.rows);
+  }, [canExportBomCsv, networkSummaryBomCsvExport]);
   const [headerOffsetPx, setHeaderOffsetPx] = useState(96);
   const panStartRef = useRef<{
     clientX: number;
@@ -761,6 +767,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     themeMode,
     tableDensity,
     tableFontSize,
+    workspaceCurrencyCode,
+    workspaceTaxEnabled,
+    workspaceTaxRatePercent,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     defaultSortField,
@@ -785,6 +794,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     preferencesHydrated,
     setTableDensity,
     setTableFontSize,
+    setWorkspaceCurrencyCode,
+    setWorkspaceTaxEnabled,
+    setWorkspaceTaxRatePercent,
     setDefaultWireSectionMm2,
     setDefaultAutoCreateLinkedNodes,
     setDefaultSortField,
@@ -1187,6 +1199,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setThemeMode,
       setTableDensity,
       setTableFontSize,
+      setWorkspaceCurrencyCode,
+      setWorkspaceTaxEnabled,
+      setWorkspaceTaxRatePercent,
       setDefaultWireSectionMm2,
       setDefaultAutoCreateLinkedNodes,
       setDefaultSortField,
@@ -2023,6 +2038,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       catalogItems={catalogItems}
       selectedCatalogItemId={selectedCatalogItemId}
       catalogFormMode={formsState.catalogFormMode}
+      workspaceCurrencyCode={workspaceCurrencyCode}
       isSelectedCatalogItemReferenced={
         selectedCatalogItemId !== null &&
         (connectors.some((connector) => connector.catalogItemId === selectedCatalogItemId) ||
@@ -2047,6 +2063,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         setCatalogConnectionCount={formsState.setCatalogConnectionCount}
         catalogName={formsState.catalogName}
         setCatalogName={formsState.setCatalogName}
+        workspaceCurrencyCode={workspaceCurrencyCode}
         catalogUnitPriceExclTax={formsState.catalogUnitPriceExclTax}
         setCatalogUnitPriceExclTax={formsState.setCatalogUnitPriceExclTax}
         catalogUrl={formsState.catalogUrl}
@@ -2151,6 +2168,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setTableDensity,
           tableFontSize,
           setTableFontSize,
+          workspaceCurrencyCode,
+          setWorkspaceCurrencyCode,
+          workspaceTaxEnabled,
+          setWorkspaceTaxEnabled,
+          workspaceTaxRatePercent,
+          setWorkspaceTaxRatePercent,
           defaultWireSectionMm2,
           setDefaultWireSectionMm2,
           defaultAutoCreateLinkedNodes,

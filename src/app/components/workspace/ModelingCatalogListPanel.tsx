@@ -2,6 +2,8 @@ import { useMemo, useState, type ReactElement } from "react";
 import type { CatalogItem, CatalogItemId } from "../../../core/entities";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { compareSortableValues } from "../../lib/app-utils-shared";
+import { formatPriceWithCurrencySymbol } from "../../lib/pricing";
+import type { WorkspaceCurrencyCode } from "../../types/app-controller";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
@@ -14,6 +16,7 @@ interface ModelingCatalogListPanelProps {
   catalogItems: CatalogItem[];
   selectedCatalogItemId: CatalogItemId | null;
   catalogFormMode: "idle" | "create" | "edit";
+  workspaceCurrencyCode: WorkspaceCurrencyCode;
   isSelectedCatalogItemReferenced: boolean;
   onOpenCreateCatalogItem: () => void;
   onEditCatalogItem: (item: CatalogItem) => void;
@@ -26,6 +29,7 @@ export function ModelingCatalogListPanel({
   catalogItems,
   selectedCatalogItemId,
   catalogFormMode,
+  workspaceCurrencyCode,
   isSelectedCatalogItemReferenced,
   onOpenCreateCatalogItem,
   onEditCatalogItem,
@@ -157,7 +161,7 @@ export function ModelingCatalogListPanel({
                 </th>
                 <th aria-sort={getTableAriaSort(sortState, "unitPriceExclTax")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("unitPriceExclTax")}>
-                    Unit price HT <span className="sort-indicator">{sortIndicator("unitPriceExclTax")}</span>
+                    Unit price HT ({workspaceCurrencyCode}) <span className="sort-indicator">{sortIndicator("unitPriceExclTax")}</span>
                   </button>
                 </th>
               </tr>
@@ -182,7 +186,7 @@ export function ModelingCatalogListPanel({
                     <td className="technical-id">{item.manufacturerReference}</td>
                     <td>{item.name ?? ""}</td>
                     <td>{item.connectionCount}</td>
-                    <td>{item.unitPriceExclTax ?? ""}</td>
+                    <td>{formatPriceWithCurrencySymbol(item.unitPriceExclTax, workspaceCurrencyCode)}</td>
                   </tr>
                 );
               })}

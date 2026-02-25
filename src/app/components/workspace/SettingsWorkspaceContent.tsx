@@ -11,6 +11,7 @@ import type {
   SortField,
   TableDensity,
   TableFontSize,
+  WorkspaceCurrencyCode,
   WorkspacePanelsLayoutMode
 } from "../../types/app-controller";
 import type { ImportExportStatus } from "../../types/app-controller";
@@ -37,6 +38,12 @@ interface SettingsWorkspaceContentProps {
   setTableDensity: (value: TableDensity) => void;
   tableFontSize: TableFontSize;
   setTableFontSize: (value: TableFontSize) => void;
+  workspaceCurrencyCode: WorkspaceCurrencyCode;
+  setWorkspaceCurrencyCode: (value: WorkspaceCurrencyCode) => void;
+  workspaceTaxEnabled: boolean;
+  setWorkspaceTaxEnabled: (value: boolean) => void;
+  workspaceTaxRatePercent: number;
+  setWorkspaceTaxRatePercent: (value: number) => void;
   defaultWireSectionMm2: number;
   setDefaultWireSectionMm2: (value: number) => void;
   defaultAutoCreateLinkedNodes: boolean;
@@ -108,6 +115,12 @@ export function SettingsWorkspaceContent({
   setTableDensity,
   tableFontSize,
   setTableFontSize,
+  workspaceCurrencyCode,
+  setWorkspaceCurrencyCode,
+  workspaceTaxEnabled,
+  setWorkspaceTaxEnabled,
+  workspaceTaxRatePercent,
+  setWorkspaceTaxRatePercent,
   defaultWireSectionMm2,
   setDefaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
@@ -400,6 +413,60 @@ export function SettingsWorkspaceContent({
           <li><span className="technical-id settings-shortcut-key">Alt + F</span> <span>Fit network view to current graph</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + J / Alt + K</span> <span>Previous / next validation issue</span></li>
         </ul>
+      </section>
+
+      <section className="panel settings-panel">
+        <header className="settings-panel-header">
+          <h2>Catalog & BOM setup</h2>
+          <span className="settings-panel-chip">Pricing</span>
+        </header>
+        <p className="settings-panel-intro">
+          Workspace pricing context for catalog and BOM flows. Catalog prices stay stored as excl. tax values.
+        </p>
+        <p className="meta-line">
+          Tax/VAT settings only affect BOM calculations/export context. Disabling tax keeps HT-only outputs and preserves the last tax rate.
+        </p>
+        <div className="settings-grid">
+          <label className="settings-field">
+            Currency (Catalog/BOM)
+            <select
+              value={workspaceCurrencyCode}
+              onChange={(event) => setWorkspaceCurrencyCode(event.target.value as WorkspaceCurrencyCode)}
+            >
+              <option value="EUR">EUR (€)</option>
+              <option value="USD">USD ($)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="CAD">CAD (C$)</option>
+              <option value="CHF">CHF</option>
+            </select>
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={workspaceTaxEnabled}
+              onChange={(event) => setWorkspaceTaxEnabled(event.target.checked)}
+            />
+            Enable tax / VAT (TVA)
+          </label>
+          <label className="settings-field">
+            Tax rate (%)
+            <input
+              type="number"
+              min={0}
+              max={1000}
+              step={0.01}
+              value={String(workspaceTaxRatePercent)}
+              onChange={(event) => {
+                const nextValue = Number(event.target.value.replace(",", "."));
+                if (!Number.isFinite(nextValue) || nextValue < 0) {
+                  return;
+                }
+                setWorkspaceTaxRatePercent(Math.min(1000, nextValue));
+              }}
+              disabled={!workspaceTaxEnabled}
+            />
+          </label>
+        </div>
       </section>
 
       <section className="panel settings-panel">

@@ -2,7 +2,7 @@
 > From version: 0.9.6
 > Understanding: 95%
 > Confidence: 89%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: BOM pricing export extension with conditional TTC outputs and tax-aware totals
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -43,6 +43,7 @@
 - Dependencies: `req_057`, `req_056`, `item_333`.
 - Blocks: `task_054` final validation/closure.
 - Related AC: req_057 AC4, AC4a, AC6.
+- Chosen export context contract: append `PRICING CONTEXT` metadata rows (`Currency`, `Tax enabled`, `Tax rate (%)`) after summary rows.
 - References:
   - `logics/request/req_056_bom_csv_export_from_network_summary_header_for_rendered_catalog_backed_components.md`
   - `logics/request/req_057_catalog_and_bom_settings_currency_and_tax_defaults.md`

@@ -259,4 +259,39 @@ describe("App integration UI - catalog", () => {
     expect(spliceCatalogSelect).toHaveValue(catalogLargeId);
     expect(within(spliceFormPanel).getByLabelText("Port count (from catalog)")).toHaveValue(6);
   });
+
+  it("applies the selected workspace currency to catalog price list and form labels", () => {
+    const pricedCatalogItemId = asCatalogItemId("CAT-PRICE");
+    const state = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: pricedCatalogItemId,
+        manufacturerReference: "CAT-PRICE",
+        name: "Priced item",
+        connectionCount: 4,
+        unitPriceExclTax: 3.5
+      })
+    );
+
+    renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+
+    switchScreenDrawerAware("settings");
+    const pricingSettingsPanel = getPanelByHeading("Catalog & BOM setup");
+    fireEvent.change(within(pricingSettingsPanel).getByLabelText("Currency (Catalog/BOM)"), {
+      target: { value: "GBP" }
+    });
+
+    switchScreenDrawerAware("modeling");
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    expect(within(catalogPanel).getByText("3.50 £")).toBeInTheDocument();
+
+    fireEvent.click(within(catalogPanel).getByText("CAT-PRICE"));
+    const catalogFormPanel = getPanelByHeading("Edit catalog item");
+    expect(within(catalogFormPanel).getByLabelText("Unit price (excl. tax) [GBP]")).toBeInTheDocument();
+  });
 });

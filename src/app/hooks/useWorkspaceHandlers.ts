@@ -28,6 +28,7 @@ import type {
   SortState,
   TableDensity,
   TableFontSize,
+  WorkspaceCurrencyCode,
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
@@ -99,6 +100,9 @@ interface UseWorkspaceHandlersParams {
   setThemeMode: (value: ThemeMode | ((current: ThemeMode) => ThemeMode)) => void;
   setTableDensity: (value: TableDensity) => void;
   setTableFontSize: (value: TableFontSize) => void;
+  setWorkspaceCurrencyCode: (value: WorkspaceCurrencyCode) => void;
+  setWorkspaceTaxEnabled: (value: boolean) => void;
+  setWorkspaceTaxRatePercent: (value: number) => void;
   setDefaultWireSectionMm2: (value: number) => void;
   setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
   setDefaultSortField: (value: SortField) => void;
@@ -181,6 +185,9 @@ export function useWorkspaceHandlers({
   setThemeMode,
   setTableDensity,
   setTableFontSize,
+  setWorkspaceCurrencyCode,
+  setWorkspaceTaxEnabled,
+  setWorkspaceTaxRatePercent,
   setDefaultWireSectionMm2,
   setDefaultAutoCreateLinkedNodes,
   setDefaultSortField,
@@ -599,6 +606,9 @@ export function useWorkspaceHandlers({
     setThemeMode("dark");
     setTableDensity("compact");
     setTableFontSize("normal");
+    setWorkspaceCurrencyCode("EUR");
+    setWorkspaceTaxEnabled(true);
+    setWorkspaceTaxRatePercent(20);
     setDefaultWireSectionMm2(0.5);
     setDefaultAutoCreateLinkedNodes(true);
     setDefaultSortField("name");

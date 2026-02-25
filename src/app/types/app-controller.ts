@@ -41,6 +41,7 @@ export type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment
 export type InteractionMode = "select" | "addNode";
 export type TableDensity = "comfortable" | "compact";
 export type TableFontSize = "small" | "normal" | "large";
+export type WorkspaceCurrencyCode = "EUR" | "USD" | "GBP" | "CAD" | "CHF";
 export type WorkspacePanelsLayoutMode = "multiColumn" | "singleColumn";
 export type CanvasLabelStrokeMode = "none" | "light" | "normal";
 export type CanvasLabelSizeMode = "extraSmall" | "small" | "normal" | "large" | "extraLarge";
