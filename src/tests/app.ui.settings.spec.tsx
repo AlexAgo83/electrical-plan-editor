@@ -496,5 +496,4 @@ describe("App integration UI - settings", () => {
     expect(within(restoredGlobalPreferencesPanel).getByLabelText("Workspace panels layout")).toHaveValue("singleColumn");
     expect(within(restoredGlobalPreferencesPanel).getByLabelText("Workspace panels layout")).toBeDisabled();
   });
-
 });
