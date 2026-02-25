@@ -1,8 +1,8 @@
 ## task_057_req_060_accessibility_hardening_for_network_summary_modal_and_semantics_orchestration_and_delivery_control - req_060 accessibility hardening for network summary, modal, and semantics orchestration and delivery control
 > From version: 0.9.6
-> Understanding: 97% (scope spans three focused a11y hardening areas: interactive SVG, modal focus behavior, and table/navigation semantics)
-> Confidence: 91% (cross-cutting but localized changes with clear test targets)
-> Progress: 0%
+> Understanding: 99% (all six req_060 accessibility fixes are covered across SVG semantics, modal focus, tables, Validation rows, and issue counters)
+> Confidence: 96% (changes are stable and validated by focused UI tests plus the full CI/e2e matrix)
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Orchestration for req_060 accessibility hardening and regression safety
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -39,12 +39,12 @@ The app already has good accessibility building blocks in parts of the shell and
 - `logics/backlog/item_344_sortable_table_aria_sort_validation_row_keyboard_selection_and_issue_counter_accessible_names.md`
 
 # Plan
-- [ ] 1. Fix `Network summary` interactive SVG semantics and add keyboard parity for selectable segments (`item_342`)
-- [ ] 2. Harden onboarding modal focus management (`initial focus`, trap/containment, `Escape`, focus return) with tests (`item_343`)
-- [ ] 3. Add table/navigation semantics hardening (`aria-sort`, Validation row keyboard selection, issue counter accessible names) and regression coverage (`item_344`)
-- [ ] 4. Run targeted UI/a11y regression suites and fix failures
-- [ ] 5. Run final validation matrix
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Fix `Network summary` interactive SVG semantics and add keyboard parity for selectable segments (`item_342`)
+- [x] 2. Harden onboarding modal focus management (`initial focus`, trap/containment, `Escape`, focus return) with tests (`item_343`)
+- [x] 3. Add table/navigation semantics hardening (`aria-sort`, Validation row keyboard selection, issue counter accessible names) and regression coverage (`item_344`)
+- [x] 4. Run targeted UI/a11y regression suites and fix failures
+- [x] 5. Run final validation matrix
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -68,8 +68,10 @@ The app already has good accessibility building blocks in parts of the shell and
   - Modal focus-trap tests can be brittle if tied to implementation details instead of user-observable focus behavior.
   - `aria-sort` rollout across many tables may drift if not implemented with a reusable pattern/helper.
 - Delivery notes:
-  - Prefer explicit, documented accessibility contracts (especially for the interactive SVG root and Validation row behavior).
-  - When counts stay visually `aria-hidden`, ensure equivalent count info is included in accessible names/text and covered by tests.
+  - `Network summary` interactive SVG semantics were hardened and segment hitboxes gained keyboard activation parity (`role="button"`, focusability, accessible labels, `Enter`/`Space` activation).
+  - Onboarding modal focus behavior was hardened (initial focus, focus containment in normal tab flow, `Escape` dismissal, focus return) with regression tests.
+  - Sortable tables now expose `aria-sort`, Validation rows support keyboard selection parity, and issue counters in navigation/header are exposed via accessible names/text.
+  - Final validation matrix re-run and passing in current workspace state: `logics_lint`, `lint`, `typecheck`, `build`, `quality:ui-modularization`, `quality:store-modularization`, `quality:pwa`, `test:ci`, `test:e2e`.
 
 # References
 - `logics/request/req_060_accessibility_hardening_for_interactive_network_summary_modal_focus_sortable_tables_and_validation_navigation.md`
@@ -81,4 +83,7 @@ The app already has good accessibility building blocks in parts of the shell and
 - `src/app/components/workspace/ValidationWorkspaceContent.tsx`
 - `src/app/components/WorkspaceNavigation.tsx`
 - `src/app/components/workspace/AppHeaderAndStats.tsx`
-
+- `src/tests/app.ui.navigation-canvas.spec.tsx`
+- `src/tests/app.ui.onboarding.spec.tsx`
+- `src/tests/app.ui.validation.spec.tsx`
+- `src/tests/app.ui.workspace-shell-regression.spec.tsx`

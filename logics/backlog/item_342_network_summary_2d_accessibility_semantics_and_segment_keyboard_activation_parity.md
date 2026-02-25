@@ -1,8 +1,8 @@
 ## item_342_network_summary_2d_accessibility_semantics_and_segment_keyboard_activation_parity - Network summary 2D accessibility semantics and segment keyboard activation parity
 > From version: 0.9.6
-> Understanding: 97%
-> Confidence: 92%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Interactive SVG accessibility semantics and keyboard parity for segments
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -34,9 +34,11 @@ The `Network summary` 2D SVG is currently exposed with static-image semantics wh
 - Dependencies: `req_060`.
 - Blocks: `task_057`.
 - Related AC: req_060 AC1, AC2.
+- Delivery notes:
+  - `Network summary` interactive SVG keeps an accessible label while avoiding misleading static-image semantics.
+  - Segment hitbox targets are keyboard focusable/activatable with button semantics and accessible labels (`Select segment ...`), preserving node/callout interactions.
 - References:
   - `logics/request/req_060_accessibility_hardening_for_interactive_network_summary_modal_focus_sortable_tables_and_validation_navigation.md`
   - `src/app/components/NetworkSummaryPanel.tsx`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
   - `src/tests/app.ui.navigation-canvas-validation-bridge.spec.tsx`
-

@@ -1,8 +1,8 @@
 ## item_344_sortable_table_aria_sort_validation_row_keyboard_selection_and_issue_counter_accessible_names - Sortable table aria-sort, Validation row keyboard selection, and issue counter accessible names
 > From version: 0.9.6
-> Understanding: 97%
-> Confidence: 91%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Cross-screen accessibility semantics consistency for tables, Validation, and shell/navigation counters
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,6 +36,10 @@ Several app surfaces rely on visual state only or click-only interaction pattern
 - Dependencies: `req_060`.
 - Blocks: `task_057` closure.
 - Related AC: req_060 AC4, AC5, AC6.
+- Delivery notes:
+  - Sortable tables expose `aria-sort` (including Validation and representative Modeling/Analysis tables) with regression coverage.
+  - Validation rows support keyboard selection parity without regressing row-level `Go to`.
+  - Primary navigation/header issue counters are exposed through accessible names/text while preserving visual badges.
 - References:
   - `logics/request/req_060_accessibility_hardening_for_interactive_network_summary_modal_focus_sortable_tables_and_validation_navigation.md`
   - `src/app/components/workspace/ValidationWorkspaceContent.tsx`
@@ -46,4 +50,3 @@ Several app surfaces rely on visual state only or click-only interaction pattern
   - `src/app/components/workspace/AppHeaderAndStats.tsx`
   - `src/tests/app.ui.validation.spec.tsx`
   - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
-

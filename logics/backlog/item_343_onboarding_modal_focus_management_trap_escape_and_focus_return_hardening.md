@@ -1,8 +1,8 @@
 ## item_343_onboarding_modal_focus_management_trap_escape_and_focus_return_hardening - Onboarding modal focus management trap, Escape, and focus-return hardening
 > From version: 0.9.6
-> Understanding: 98%
-> Confidence: 93%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Modal accessibility focus management hardening
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -36,9 +36,11 @@ The onboarding modal exposes basic dialog semantics (`role="dialog"`, `aria-moda
 - Dependencies: `req_060`.
 - Blocks: `task_057`.
 - Related AC: req_060 AC3.
+- Delivery notes:
+  - Onboarding modal focus management now covers deterministic initial focus, focus containment during tab navigation, `Escape` close, and focus return to the trigger.
+  - Regression tests exercise user-visible focus behavior rather than internal implementation details.
 - References:
   - `logics/request/req_060_accessibility_hardening_for_interactive_network_summary_modal_focus_sortable_tables_and_validation_navigation.md`
   - `src/app/components/onboarding/OnboardingModal.tsx`
   - `src/app/AppController.tsx`
   - `src/tests/app.ui.onboarding.spec.tsx`
-
