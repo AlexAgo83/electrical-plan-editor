@@ -1,8 +1,8 @@
 ## task_055_req_058_network_summary_2d_text_layering_orchestration_and_delivery_control - req_058 network summary 2d text layering orchestration and delivery control
 > From version: 0.9.6
-> Understanding: 97% (scope localized to 2D layer order + interaction safety + regression coverage)
-> Confidence: 92% (delivery sequence is straightforward with `NetworkSummaryPanel` + tests)
-> Progress: 0%
+> Understanding: 99% (implemented via explicit SVG layer groups + focused regression coverage extraction)
+> Confidence: 96% (targeted and full validation matrix passed after layering refactor and test modularization split)
+> Progress: 100%
 > Complexity: Medium
 > Theme: Orchestration for req_058 2D text layering readability fix and regression safety
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -37,12 +37,12 @@ The work should be delivered in a controlled order:
 - `logics/backlog/item_338_regression_coverage_for_network_summary_2d_text_layering_order_and_occlusion_cases.md`
 
 # Plan
-- [ ] 1. Implement deterministic 2D SVG layer ordering so labels/text paint above nodes and segments (`item_336`)
-- [ ] 2. Validate/harden pointer and interaction behavior after layering changes (`item_337`)
-- [ ] 3. Add regression coverage for text layering order and occlusion scenarios (`item_338`)
-- [ ] 4. Run targeted 2D render/interaction test suites and fix regressions
-- [ ] 5. Run final validation matrix
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Implement deterministic 2D SVG layer ordering so labels/text paint above nodes and segments (`item_336`)
+- [x] 2. Validate/harden pointer and interaction behavior after layering changes (`item_337`)
+- [x] 3. Add regression coverage for text layering order and occlusion scenarios (`item_338`)
+- [x] 4. Run targeted 2D render/interaction test suites and fix regressions
+- [x] 5. Run final validation matrix
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -55,6 +55,7 @@ The work should be delivered in a controlled order:
 
 # Targeted validation guidance (recommended during implementation)
 - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx`
+- `npx vitest run src/tests/app.ui.network-summary-layering.spec.tsx`
 - `npx vitest run src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
 - `npx vitest run src/tests/core.layout.spec.ts`
 
@@ -64,8 +65,13 @@ The work should be delivered in a controlled order:
   - Text-on-top fix may alter pointer event routing if text becomes interactive unintentionally.
   - Structural test assertions may become brittle if tied to low-level DOM details instead of stable layer groups.
 - Delivery notes:
-  - Record the chosen layer/group ordering contract explicitly in code comments or component structure if non-obvious.
-  - If a representative visual bug case is reproduced, document it in the tests added under `item_338`.
+  - Implemented explicit SVG graph layers in `NetworkSummaryPanel`: `network-graph-layer-segments`, `...-nodes`, `...-labels`, and `...-callouts`, with labels rendered after geometry layers.
+  - Segment and node labels were moved to the dedicated labels layer while preserving deemphasis class propagation and existing selection/highlight styling.
+  - Pointer/interaction behavior remained stable because text labels already use non-interactive pointer behavior; segment hitboxes and node controls remain in geometry layers.
+  - Added `src/tests/app.ui.network-summary-layering.spec.tsx` for structural layer-order and inverse-scale label-anchor regression checks.
+  - Updated `src/tests/app.ui.navigation-canvas.spec.tsx` assertions to target selected segment geometry in the new segments layer instead of assuming label+segment DOM co-location.
+  - Targeted validation executed and passing: `app.ui.navigation-canvas`, `app.ui.network-summary-layering`, `app.ui.network-summary-workflow-polish`, `core.layout`.
+  - Final validation matrix executed and passing: `logics_lint`, `lint`, `typecheck`, `quality:ui-modularization`, `quality:store-modularization`, `build`, `quality:pwa`, `test:ci`, `test:e2e`.
 
 # References
 - `logics/request/req_058_network_summary_2d_text_labels_must_render_above_nodes_and_segments.md`
@@ -74,4 +80,5 @@ The work should be delivered in a controlled order:
 - `logics/backlog/item_338_regression_coverage_for_network_summary_2d_text_layering_order_and_occlusion_cases.md`
 - `src/app/components/NetworkSummaryPanel.tsx`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
+- `src/tests/app.ui.network-summary-layering.spec.tsx`
 - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`

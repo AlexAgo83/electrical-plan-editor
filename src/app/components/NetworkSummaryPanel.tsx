@@ -1206,6 +1206,72 @@ export function NetworkSummaryPanel({
     };
   });
 
+  const renderedSegments = segments.flatMap((segment) => {
+    const nodeAPosition = networkNodePositions[segment.nodeA];
+    const nodeBPosition = networkNodePositions[segment.nodeB];
+    if (nodeAPosition === undefined || nodeBPosition === undefined) {
+      return [];
+    }
+
+    const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
+    const isSubNetworkDeemphasized = isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
+    const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
+    const isSelectedSegment = selectedSegmentId === segment.id;
+    const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
+      isSelectedSegment ? " is-selected" : ""
+    }`;
+    const segmentGroupClassName = `network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`;
+    const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
+    const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
+
+    return [
+      {
+        segment,
+        nodeAPosition,
+        nodeBPosition,
+        segmentClassName,
+        segmentGroupClassName,
+        labelX,
+        labelY
+      }
+    ];
+  });
+
+  const renderedNodes = nodes.flatMap((node) => {
+    const position = networkNodePositions[node.id];
+    if (position === undefined) {
+      return [];
+    }
+
+    const isSubNetworkDeemphasized =
+      isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false);
+    const nodeKindClass =
+      node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
+    const isSelectedNode =
+      selectedNodeId === node.id ||
+      (node.kind === "connector" && selectedConnectorId === node.connectorId) ||
+      (node.kind === "splice" && selectedSpliceId === node.spliceId);
+    const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}${
+      isSubNetworkDeemphasized ? " is-deemphasized" : ""
+    }`;
+    const nodeLabel =
+      node.kind === "intermediate"
+        ? node.id
+        : node.kind === "connector"
+          ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
+          : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
+
+    return [
+      {
+        node,
+        position,
+        nodeClassName,
+        nodeLabel,
+        isSubNetworkDeemphasized
+      }
+    ];
+  });
+
   return (
     <section className="network-summary-stack">
       <section className="panel">
@@ -1335,121 +1401,46 @@ export function NetworkSummaryPanel({
                   })}
                 </g>
               ) : null}
-              <g transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
-                {segments.map((segment) => {
-                  const nodeAPosition = networkNodePositions[segment.nodeA];
-                  const nodeBPosition = networkNodePositions[segment.nodeB];
-                  if (nodeAPosition === undefined || nodeBPosition === undefined) {
-                    return null;
-                  }
+              <g className="network-graph-layer network-graph-layer-segments" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
+                {renderedSegments.map(({ segment, nodeAPosition, nodeBPosition, segmentClassName, segmentGroupClassName }) => (
+                  <g key={segment.id} className={segmentGroupClassName} data-segment-id={segment.id}>
+                    <line
+                      className={segmentClassName}
+                      x1={nodeAPosition.x}
+                      y1={nodeAPosition.y}
+                      x2={nodeBPosition.x}
+                      y2={nodeBPosition.y}
+                    />
+                    <line
+                      className="network-segment-hitbox"
+                      x1={nodeAPosition.x}
+                      y1={nodeAPosition.y}
+                      x2={nodeBPosition.x}
+                      y2={nodeBPosition.y}
+                      role="button"
+                      tabIndex={0}
+                      focusable="true"
+                      aria-label={`Select segment ${segment.id}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleNetworkSegmentClick(segment.id);
+                      }}
+                      onKeyDown={(event) => handleNetworkSegmentKeyDown(event, segment.id)}
+                    />
+                  </g>
+                ))}
+              </g>
 
-                  const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
-                  const isSubNetworkDeemphasized =
-                    isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
-                  const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
-                  const isSelectedSegment = selectedSegmentId === segment.id;
-                  const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
-                    isSelectedSegment ? " is-selected" : ""
-                  }`;
-                  const segmentGroupClassName = `network-entity-group${
-                    isSubNetworkDeemphasized ? " is-deemphasized" : ""
-                  }`;
-                  const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
-                  const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
-
-                  return (
-                    <g key={segment.id} className={segmentGroupClassName}>
-                      <line
-                        className={segmentClassName}
-                        x1={nodeAPosition.x}
-                        y1={nodeAPosition.y}
-                        x2={nodeBPosition.x}
-                        y2={nodeBPosition.y}
-                      />
-                      <line
-                        className="network-segment-hitbox"
-                        x1={nodeAPosition.x}
-                        y1={nodeAPosition.y}
-                        x2={nodeBPosition.x}
-                        y2={nodeBPosition.y}
-                        role="button"
-                        tabIndex={0}
-                        focusable="true"
-                        aria-label={`Select segment ${segment.id}`}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleNetworkSegmentClick(segment.id);
-                        }}
-                        onKeyDown={(event) => handleNetworkSegmentKeyDown(event, segment.id)}
-                      />
-                      <g
-                        className="network-segment-label-anchor"
-                        transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
-                      >
-                        <text
-                          className="network-segment-label"
-                          x={0}
-                          y={-6}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 -6)`}
-                        >
-                          {segment.id}
-                        </text>
-                      </g>
-                      {showSegmentLengths ? (
-                        <g
-                          className="network-segment-length-label-anchor"
-                          transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
-                        >
-                          <text
-                            className="network-segment-length-label"
-                            x={0}
-                            y={6}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                            transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 6)`}
-                          >
-                            {segment.lengthMm} mm
-                          </text>
-                        </g>
-                      ) : null}
-                    </g>
-                  );
-                })}
-
-                {nodes.map((node) => {
-                  const position = networkNodePositions[node.id];
-                  if (position === undefined) {
-                    return null;
-                  }
-
-                  const isSubNetworkDeemphasized =
-                    isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false);
-                  const nodeKindClass =
-                    node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
-                  const isSelectedNode =
-                    selectedNodeId === node.id ||
-                    (node.kind === "connector" && selectedConnectorId === node.connectorId) ||
-                    (node.kind === "splice" && selectedSpliceId === node.spliceId);
-                  const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}${
-                    isSubNetworkDeemphasized ? " is-deemphasized" : ""
-                  }`;
-                  const nodeLabel =
-                    node.kind === "intermediate"
-                      ? node.id
-                      : node.kind === "connector"
-                        ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
-                        : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
-
+              <g className="network-graph-layer network-graph-layer-nodes" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
+                {renderedNodes.map(({ node, position, nodeClassName }) => {
                   const connectorWidth = 46;
                   const connectorHeight = 30;
                   const spliceDiamondSize = 30;
-
                   return (
                     <g
                       key={node.id}
                       className={nodeClassName}
+                      data-node-id={node.id}
                       role="button"
                       tabIndex={0}
                       focusable="true"
@@ -1487,25 +1478,78 @@ export function NetworkSummaryPanel({
                       ) : (
                         <circle className="network-node-shape" cx={position.x} cy={position.y} r={17} />
                       )}
-                      <g
-                        className="network-node-label-anchor"
-                        transform={`translate(${position.x} ${position.y}) scale(${inverseLabelScale})`}
-                      >
-                        <text
-                          className="network-node-label"
-                          x={0}
-                          y={0}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 0)`}
-                        >
-                          {nodeLabel}
-                        </text>
-                      </g>
                     </g>
                   );
                 })}
+              </g>
 
+              <g className="network-graph-layer network-graph-layer-labels" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
+                {renderedSegments.map(({ segment, segmentGroupClassName, labelX, labelY }) => (
+                  <g key={`${segment.id}-labels`} className={segmentGroupClassName} data-segment-id={segment.id}>
+                    <g
+                      className="network-segment-label-anchor"
+                      transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
+                    >
+                      <text
+                        className="network-segment-label"
+                        x={0}
+                        y={-6}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 -6)`}
+                      >
+                        {segment.id}
+                      </text>
+                    </g>
+                    {showSegmentLengths ? (
+                      <g
+                        className="network-segment-length-label-anchor"
+                        transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
+                      >
+                        <text
+                          className="network-segment-length-label"
+                          x={0}
+                          y={6}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 6)`}
+                        >
+                          {segment.lengthMm} mm
+                        </text>
+                      </g>
+                    ) : null}
+                  </g>
+                ))}
+
+                {renderedNodes.map(({ node, position, nodeLabel, isSubNetworkDeemphasized }) => (
+                  <g
+                    key={`${node.id}-label`}
+                    className={`network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`}
+                    data-node-id={node.id}
+                  >
+                    <g
+                      className="network-node-label-anchor"
+                      transform={`translate(${position.x} ${position.y}) scale(${inverseLabelScale})`}
+                    >
+                      <text
+                        className="network-node-label"
+                        x={0}
+                        y={0}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 0)`}
+                      >
+                        {nodeLabel}
+                      </text>
+                    </g>
+                  </g>
+                ))}
+              </g>
+
+              <g
+                className="network-graph-layer network-graph-layer-callouts"
+                transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
+              >
                 {renderedCableCallouts.map(({ callout, layout, calloutClassName }) => {
                   let contentCursorY = layout.rowsStartY;
 

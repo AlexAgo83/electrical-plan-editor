@@ -1,8 +1,8 @@
 ## item_338_regression_coverage_for_network_summary_2d_text_layering_order_and_occlusion_cases - Regression coverage for network summary 2D text layering order and occlusion cases
 > From version: 0.9.6
-> Understanding: 96%
-> Confidence: 92%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Regression coverage for 2D text layering and occlusion scenarios
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -33,7 +33,11 @@ Without explicit regression coverage, future render refactors can silently reint
 - Dependencies: `req_058`, `item_336`, `item_337`.
 - Blocks: `task_055` closure.
 - Related AC: req_058 AC4.
+- Delivery notes:
+  - Added a dedicated integration spec for layering contract assertions and label zoom-invariant anchors.
+  - Updated navigation canvas regression coverage to assert selected segment styling from the segment geometry layer (no longer coupled to label group nesting).
 - References:
   - `logics/request/req_058_network_summary_2d_text_labels_must_render_above_nodes_and_segments.md`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
+  - `src/tests/app.ui.network-summary-layering.spec.tsx`
   - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`

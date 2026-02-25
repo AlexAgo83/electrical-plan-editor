@@ -1,8 +1,8 @@
 ## item_336_network_summary_2d_render_layer_ordering_so_labels_paint_above_nodes_and_segments - Network summary 2D render layer ordering so labels paint above nodes and segments
 > From version: 0.9.6
-> Understanding: 97%
-> Confidence: 93%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: 2D render SVG layer ordering for label readability
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -33,6 +33,9 @@ The `Network summary` 2D SVG render can paint text behind nodes/segments dependi
 - Dependencies: `req_058`.
 - Blocks: `item_337`, `item_338`, `task_055`.
 - Related AC: req_058 AC1, AC2.
+- Delivery notes:
+  - `NetworkSummaryPanel` now renders explicit SVG graph layers (`segments`, `nodes`, `labels`, `callouts`) to make text paint order deterministic.
+  - Segment and node label groups were moved into the dedicated labels layer while preserving deemphasis classes and selection visuals.
 - References:
   - `logics/request/req_058_network_summary_2d_text_labels_must_render_above_nodes_and_segments.md`
   - `src/app/components/NetworkSummaryPanel.tsx`
