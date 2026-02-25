@@ -81,6 +81,7 @@ export function NetworkScopeWorkspaceContent({
   const isEditMode = networkFormMode === "edit";
   const isFormOpen = isCreateMode || isEditMode;
   const [focusedNetworkId, setFocusedNetworkId] = useState<NetworkId | null>(null);
+  const [hasExplicitNetworkSelection, setHasExplicitNetworkSelection] = useState(false);
   const [networkFilterField, setNetworkFilterField] = useState<NetworkScopeFilterField>("any");
   const [networkFilterQuery, setNetworkFilterQuery] = useState("");
   const [networkTableSort, setNetworkTableSort] = useState<{ field: NetworkScopeTableSortField; direction: "asc" | "desc" }>({
@@ -105,7 +106,7 @@ export function NetworkScopeWorkspaceContent({
     [activeNetworkId, networkTableSort, networks]
   );
   const focusedNetwork = focusedNetworkId === null ? null : networks.find((network) => network.id === focusedNetworkId) ?? null;
-  const showNetworkFormPanel = isCreateMode || (isEditMode && focusedNetwork !== null);
+  const showNetworkFormPanel = isCreateMode || (isEditMode && focusedNetwork !== null && hasExplicitNetworkSelection);
   const focusedNetworkCounts =
     focusedNetworkId === null ? null : networkEntityCountsById[focusedNetworkId] ?? null;
   const networkSortIndicator = (field: NetworkScopeTableSortField): "asc" | "desc" | null => {
@@ -189,6 +190,25 @@ export function NetworkScopeWorkspaceContent({
       focusElementWithoutScroll(rowRefs.current[focusRequestedNetworkId]);
     });
   }, [focusRequestedNetworkId, focusRequestedNetworkToken, networks]);
+
+  useEffect(() => {
+    if (!isEditMode || focusedNetwork !== null) {
+      return;
+    }
+
+    handleCloseNetworkForm();
+  }, [focusedNetwork, handleCloseNetworkForm, isEditMode]);
+
+  useEffect(() => {
+    if (isCreateMode) {
+      setHasExplicitNetworkSelection(false);
+      return;
+    }
+
+    if (!isEditMode) {
+      setHasExplicitNetworkSelection(false);
+    }
+  }, [isCreateMode, isEditMode]);
 
   const indicators = [
     { label: "Catalog", value: focusedNetworkCounts?.catalogCount ?? 0 },
@@ -348,6 +368,7 @@ export function NetworkScopeWorkspaceContent({
                         onClick={(event) => {
                           event.currentTarget.focus();
                           setFocusedNetworkId(network.id);
+                          setHasExplicitNetworkSelection(true);
                           handleOpenEditNetworkForm(network.id);
                         }}
                         onDoubleClick={() => {
@@ -360,6 +381,7 @@ export function NetworkScopeWorkspaceContent({
                           if (event.key === "Enter" || event.key === " ") {
                             event.preventDefault();
                             setFocusedNetworkId(network.id);
+                            setHasExplicitNetworkSelection(true);
                             handleOpenEditNetworkForm(network.id);
                           }
                         }}
@@ -513,6 +535,7 @@ export function NetworkScopeWorkspaceContent({
                 className={isEditMode ? "button-with-icon" : undefined}
                 onClick={() => {
                   setFocusedNetworkId(null);
+                  setHasExplicitNetworkSelection(false);
                   handleCloseNetworkForm();
                 }}
               >

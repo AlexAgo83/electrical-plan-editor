@@ -617,24 +617,13 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             panelSelector: '[data-onboarding-panel="modeling-catalog"]',
             panelLabel: "Catalog"
           };
-          const catalogEditTarget: OnboardingStepTarget = {
-            screen: "modeling",
-            subScreen: "catalog",
-            panelSelector: '[data-onboarding-panel="modeling-catalog-edit"]',
-            panelLabel: "Edit catalog item"
-          };
           const isListInContext =
             activeScreen === catalogListTarget.screen &&
             activeSubScreen === catalogListTarget.subScreen;
-          const isEditInContext = isListInContext;
           return [
             {
               label: isListInContext ? "Scroll to Catalog" : "Open Catalog",
               onClick: () => openOnboardingTarget(catalogListTarget)
-            },
-            {
-              label: isEditInContext ? "Scroll to Edit catalog item" : "Open Edit catalog item",
-              onClick: () => openOnboardingTarget(catalogEditTarget)
             }
           ];
         })()
