@@ -41,6 +41,7 @@ describe("App integration UI - navigation and canvas validation bridge", () => {
 
     const updatedNetworkPanel = getPanelByHeading("Network summary");
     expect(within(updatedNetworkPanel).queryByText("Interaction mode")).not.toBeInTheDocument();
+    expect(getPanelByHeading("Connector analysis")).toBeInTheDocument();
 
     openOperationsHealthPanel();
     const modelHealth = screen.getByRole("region", { name: "Model health" });
