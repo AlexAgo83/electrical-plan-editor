@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactElement } from "react";
 import type { NetworkId } from "../../../core/entities";
+import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, nextSortState, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { SortState } from "../../types/app-controller";
@@ -292,7 +293,7 @@ export function NetworkScopeWorkspaceContent({
                 </colgroup>
                 <thead>
                   <tr>
-                    <th>
+                    <th aria-sort={getTableAriaSort(networkTableSort, "name")}>
                       <button
                         type="button"
                         className="sort-header-button"
@@ -311,7 +312,7 @@ export function NetworkScopeWorkspaceContent({
                         </span>
                       </button>
                     </th>
-                    <th>
+                    <th aria-sort={getTableAriaSort(networkTableSort, "technicalId")}>
                       <button
                         type="button"
                         className="sort-header-button"
@@ -330,7 +331,7 @@ export function NetworkScopeWorkspaceContent({
                         </span>
                       </button>
                     </th>
-                    <th>
+                    <th aria-sort={getTableAriaSort(networkTableSort, "status")}>
                       <button
                         type="button"
                         className="sort-header-button"

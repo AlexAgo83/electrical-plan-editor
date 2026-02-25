@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactElement } from "react";
+import { getTableAriaSort } from "../../lib/accessibility";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { ValidationIssue, ValidationSeverityFilter } from "../../types/app-controller";
@@ -201,17 +202,17 @@ export function ValidationWorkspaceContent({
                   </colgroup>
                   <thead>
                     <tr>
-                      <th>
+                      <th aria-sort={getTableAriaSort(validationTableSort, "severity")}>
                         <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("severity")}>
                           Severity <span className="sort-indicator">{validationTableSortIndicator("severity")}</span>
                         </button>
                       </th>
-                      <th>
+                      <th aria-sort={getTableAriaSort(validationTableSort, "issue")}>
                         <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("issue")}>
                           Issue <span className="sort-indicator">{validationTableSortIndicator("issue")}</span>
                         </button>
                       </th>
-                      <th className="validation-actions-cell">
+                      <th className="validation-actions-cell" aria-sort={getTableAriaSort(validationTableSort, "actions")}>
                         <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("actions")}>
                           Actions <span className="sort-indicator">{validationTableSortIndicator("actions")}</span>
                         </button>
@@ -222,8 +223,22 @@ export function ValidationWorkspaceContent({
                     {issues.map((issue) => (
                       <tr
                         key={issue.id}
-                        className={findValidationIssueIndex(issue.id) === validationIssueCursor ? "is-selected" : undefined}
+                        className={
+                          findValidationIssueIndex(issue.id) === validationIssueCursor ? "is-selected is-focusable-row" : "is-focusable-row"
+                        }
+                        aria-selected={findValidationIssueIndex(issue.id) === validationIssueCursor}
+                        tabIndex={0}
                         onClick={() => setValidationIssueCursorFromIssue(issue)}
+                        onKeyDown={(event) => {
+                          if (event.target !== event.currentTarget) {
+                            return;
+                          }
+                          if (event.key !== "Enter" && event.key !== " ") {
+                            return;
+                          }
+                          event.preventDefault();
+                          setValidationIssueCursorFromIssue(issue);
+                        }}
                       >
                         <td>
                           <span className={issue.severity === "error" ? "status-chip is-error" : "status-chip is-warning"}>
@@ -235,7 +250,10 @@ export function ValidationWorkspaceContent({
                           <button
                             type="button"
                             className="validation-row-go-to-button button-with-icon"
-                            onClick={() => handleValidationIssueRowGoTo(issue)}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleValidationIssueRowGoTo(issue);
+                            }}
                           >
                             <span className="action-button-icon is-open" aria-hidden="true" />
                             Go to

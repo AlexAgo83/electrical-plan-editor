@@ -28,6 +28,11 @@ export function WorkspaceNavigation({
   onScreenChange,
   onSubScreenChange
 }: WorkspaceNavigationProps): ReactElement {
+  const validationCounterDescription = `${validationIssuesCount} issue${validationIssuesCount === 1 ? "" : "s"}${
+    validationErrorCount > 0
+      ? `, ${validationErrorCount} error${validationErrorCount === 1 ? "" : "s"}`
+      : ", no errors"
+  }`;
   const screenIconClassById: Partial<Record<ScreenId, string>> = {
     home: "is-home",
     networkScope: "is-network-scope",
@@ -78,6 +83,7 @@ export function WorkspaceNavigation({
                 ? "workspace-tab is-active"
                 : "workspace-tab"
             }
+            aria-description={screenId === "validation" ? validationCounterDescription : undefined}
             onClick={() => onScreenChange(screenId)}
           >
             <span className="workspace-tab-content">
@@ -86,12 +92,14 @@ export function WorkspaceNavigation({
               ) : null}
               <span>{label}</span>
               {screenId === "validation" ? (
-                <span
-                  className={validationErrorCount > 0 ? "workspace-tab-badge is-error" : "workspace-tab-badge"}
-                  aria-hidden="true"
-                >
-                  {validationIssuesCount}
-                </span>
+                <>
+                  <span
+                    className={validationErrorCount > 0 ? "workspace-tab-badge is-error" : "workspace-tab-badge"}
+                    aria-hidden="true"
+                  >
+                    {validationIssuesCount}
+                  </span>
+                </>
               ) : null}
             </span>
           </button>

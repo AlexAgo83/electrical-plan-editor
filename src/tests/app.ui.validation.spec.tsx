@@ -14,6 +14,25 @@ describe("App integration UI - validation", () => {
     fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
   }
 
+  function closeOnboardingIfOpen(): void {
+    const closeOnboardingButton = screen.queryByRole("button", { name: "Close onboarding" });
+    if (closeOnboardingButton !== null) {
+      fireEvent.click(closeOnboardingButton);
+    }
+  }
+
+  function expectFocusedEntityVisible(expectedEditPanelHeading: string, expectedTechnicalId: string): void {
+    const inspectorHeading = screen.queryByRole("heading", { name: "Inspector context" });
+    if (inspectorHeading !== null) {
+      const inspectorPanel = getPanelByHeading("Inspector context");
+      expect(within(inspectorPanel).getByText(expectedTechnicalId, { selector: ".inspector-entity-id" })).toBeInTheDocument();
+      return;
+    }
+
+    const editPanel = getPanelByHeading(expectedEditPanelHeading);
+    expect(within(editPanel).getByDisplayValue(expectedTechnicalId)).toBeInTheDocument();
+  }
+
   beforeEach(() => {
     localStorage.clear();
   });
@@ -135,6 +154,44 @@ describe("App integration UI - validation", () => {
     expect(within(modelHealth).getByText("[WARNING] Occupancy conflict", { selector: "strong" })).toBeInTheDocument();
   });
 
+  it("supports keyboard row selection in validation center without using the Go to button", () => {
+    renderAppWithState(createValidationIssueState());
+
+    switchScreenDrawerAware("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    const warningIssueRow = within(validationPanel).getByText(/manual-ghost/i).closest("tr");
+    expect(warningIssueRow).not.toBeNull();
+    expect(warningIssueRow).toHaveAttribute("tabindex", "0");
+
+    fireEvent.keyDown(warningIssueRow as HTMLElement, { key: "Enter" });
+    expect(warningIssueRow).toHaveClass("is-selected");
+
+    openOperationsHealthPanel();
+    const modelHealth = screen.getByRole("region", { name: "Model health" });
+    expect(within(modelHealth).getByText("[WARNING] Occupancy conflict", { selector: "strong" })).toBeInTheDocument();
+  });
+
+  it("exposes validation table sort state via aria-sort", () => {
+    renderAppWithState(createValidationIssueState());
+
+    switchScreenDrawerAware("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    const firstValidationGroup = validationPanel.querySelector(".validation-group");
+    expect(firstValidationGroup).not.toBeNull();
+
+    const severityHeader = within(firstValidationGroup as HTMLElement).getByRole("button", { name: /Severity/ }).closest("th");
+    const issueHeader = within(firstValidationGroup as HTMLElement).getByRole("button", { name: /Issue/ }).closest("th");
+    expect(severityHeader).toHaveAttribute("aria-sort", "ascending");
+    expect(issueHeader).toHaveAttribute("aria-sort", "none");
+
+    fireEvent.click(within(firstValidationGroup as HTMLElement).getByRole("button", { name: /Issue/ }));
+    expect(severityHeader).toHaveAttribute("aria-sort", "none");
+    expect(issueHeader).toHaveAttribute("aria-sort", "ascending");
+
+    fireEvent.click(within(firstValidationGroup as HTMLElement).getByRole("button", { name: /Issue/ }));
+    expect(issueHeader).toHaveAttribute("aria-sort", "descending");
+  });
+
   it("shows model health quick actions and closes ops panel when opening validation", () => {
     renderAppWithState(createValidationIssueState());
 
@@ -163,8 +220,21 @@ describe("App integration UI - validation", () => {
     expect(within(validationPanel).getByText("WARNING")).toBeInTheDocument();
   });
 
+  it("exposes validation and ops issue counters to assistive technologies via descriptions", () => {
+    renderAppWithState(createValidationIssueState());
+
+    const primaryNavRow = document.querySelector(".workspace-nav-row");
+    expect(primaryNavRow).not.toBeNull();
+    const validationButton = within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Validation$/, hidden: true });
+    expect(validationButton.getAttribute("aria-description")).toMatch(/issue/i);
+
+    const opsButton = screen.getByRole("button", { name: "Ops & Health" });
+    expect(opsButton.getAttribute("aria-description")).toMatch(/validation issue/i);
+  });
+
   it("navigates validation issues from model health quick navigator", () => {
     renderAppWithState(createValidationIssueState());
+    closeOnboardingIfOpen();
 
     openOperationsHealthPanel();
     const modelHealth = screen.getByRole("region", { name: "Model health" });
@@ -186,14 +256,14 @@ describe("App integration UI - validation", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Close operations panel" }));
-    const inspectorPanel = getPanelByHeading("Inspector context");
-    expect(within(inspectorPanel).getByText("W-1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
+    expectFocusedEntityVisible("Edit Wire", "W-1");
     expect(within(modelHealth).getByText(/Issue navigator:/i, { selector: "p" })).toBeInTheDocument();
     expect(within(modelHealth).getByText("1/2", { selector: "strong" })).toBeInTheDocument();
   });
 
   it("supports alt keyboard shortcuts for sequential validation issue navigation", () => {
     renderAppWithState(createValidationIssueState());
+    closeOnboardingIfOpen();
 
     fireEvent.keyDown(window, { key: "k", altKey: true });
     const primaryNavRow = document.querySelector(".workspace-nav-row");
@@ -208,18 +278,18 @@ describe("App integration UI - validation", () => {
       "is-active"
     );
 
-    const inspectorPanel = getPanelByHeading("Inspector context");
-    expect(within(inspectorPanel).getByText("W-1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
+    expectFocusedEntityVisible("Edit Wire", "W-1");
 
     fireEvent.keyDown(window, { key: "j", altKey: true });
     expect(
       within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })
     ).toHaveClass("is-active");
-    expect(within(inspectorPanel).getByText("C-1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
+    expectFocusedEntityVisible("Edit Connector", "C-1");
   });
 
   it("uses visible filtered issues for alt keyboard navigation inside validation screen", () => {
     renderAppWithState(createValidationIssueState());
+    closeOnboardingIfOpen();
 
     switchScreenDrawerAware("validation");
     const validationPanel = getPanelByHeading("Validation center");

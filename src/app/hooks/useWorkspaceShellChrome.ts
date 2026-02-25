@@ -281,9 +281,20 @@ export function useWorkspaceShellChrome({
   }, []);
 
   useEffect(() => {
+    const scheduleDialogFocusStateUpdate = (): void => {
+      queueMicrotask(() => {
+        updateDialogFocusState();
+      });
+    };
+
     const updateDialogFocusState = (): void => {
       const activeElement = document.activeElement;
       if (!(activeElement instanceof HTMLElement)) {
+        setIsDialogFocusActive(false);
+        return;
+      }
+
+      if (!activeElement.isConnected) {
         setIsDialogFocusActive(false);
         return;
       }
@@ -292,9 +303,14 @@ export function useWorkspaceShellChrome({
     };
 
     updateDialogFocusState();
+    const observer = new MutationObserver(scheduleDialogFocusStateUpdate);
+    observer.observe(document.body, { childList: true, subtree: true });
     document.addEventListener("focusin", updateDialogFocusState);
+    document.addEventListener("focusout", scheduleDialogFocusStateUpdate);
     return () => {
+      observer.disconnect();
       document.removeEventListener("focusin", updateDialogFocusState);
+      document.removeEventListener("focusout", scheduleDialogFocusStateUpdate);
     };
   }, []);
 
