@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
 import type { OnboardingModalMode, OnboardingStepDefinition } from "../../lib/onboarding";
 
 interface OnboardingModalProps {
@@ -33,6 +33,14 @@ function renderDescription(step: OnboardingStepDefinition): ReactElement {
   );
 }
 
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+  ).filter((element) => !element.hasAttribute("hidden") && element.getAttribute("aria-hidden") !== "true");
+}
+
 export function OnboardingModal({
   isOpen,
   themeHostClassName,
@@ -47,6 +55,25 @@ export function OnboardingModal({
   canGoNext,
   targetActions
 }: OnboardingModalProps): ReactElement | null {
+  const dialogRef = useRef<HTMLElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const previousFocusedElementRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    previousFocusedElementRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeButtonRef.current?.focus();
+
+    return () => {
+      previousFocusedElementRef.current?.focus();
+      previousFocusedElementRef.current = null;
+    };
+  }, [isOpen, step.id]);
+
   if (!isOpen) {
     return null;
   }
@@ -54,6 +81,50 @@ export function OnboardingModal({
   const isFullFlow = mode === "full";
   const titleId = `onboarding-modal-title-${step.id}`;
   const progressLabel = `Step ${stepIndex + 1} of ${totalSteps}`;
+  const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      onClose();
+      return;
+    }
+
+    if (event.key !== "Tab") {
+      return;
+    }
+
+    const dialogElement = dialogRef.current;
+    if (dialogElement === null) {
+      return;
+    }
+
+    const focusableElements = getFocusableElements(dialogElement);
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      dialogElement.focus();
+      return;
+    }
+
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements[focusableElements.length - 1];
+    if (firstFocusable === undefined || lastFocusable === undefined) {
+      return;
+    }
+
+    const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (event.shiftKey) {
+      if (activeElement === firstFocusable || activeElement === dialogElement) {
+        event.preventDefault();
+        lastFocusable.focus();
+      }
+      return;
+    }
+
+    if (activeElement === lastFocusable) {
+      event.preventDefault();
+      firstFocusable.focus();
+    }
+  };
 
   return (
     <div className={themeHostClassName ? `onboarding-modal-layer ${themeHostClassName}` : "onboarding-modal-layer"} role="presentation">
@@ -64,11 +135,14 @@ export function OnboardingModal({
         onClick={onClose}
       />
       <section
+        ref={dialogRef}
         className="onboarding-modal panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={`${titleId}-description`}
+        tabIndex={-1}
+        onKeyDown={handleDialogKeyDown}
       >
         <header className="onboarding-modal-header">
           <div className="onboarding-modal-header-main">
@@ -80,7 +154,7 @@ export function OnboardingModal({
               {isFullFlow ? <p className="onboarding-modal-progress">{progressLabel}</p> : <p className="onboarding-modal-progress">Context help</p>}
             </div>
           </div>
-          <button type="button" className="onboarding-modal-close" onClick={onClose} aria-label="Close onboarding">
+          <button ref={closeButtonRef} type="button" className="onboarding-modal-close" onClick={onClose} aria-label="Close onboarding">
             Close
           </button>
         </header>
