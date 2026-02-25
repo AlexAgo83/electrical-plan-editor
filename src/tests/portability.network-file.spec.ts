@@ -264,8 +264,6 @@ describe("network file portability", () => {
       throw new Error("Expected exported sample payload to include connectors and splices.");
     }
 
-    const connectorCount = Number(rawConnectors.byId[firstConnectorId]?.cavityCount);
-    const spliceCount = Number(rawSplices.byId[firstSpliceId]?.portCount);
     rawConnectors.byId[firstConnectorId] = {
       ...rawConnectors.byId[firstConnectorId],
       technicalId: "Conn / Legacy 01",
@@ -284,8 +282,8 @@ describe("network file portability", () => {
     const parsed = parseNetworkFilePayload(JSON.stringify(rawPayload));
     expect(parsed.error).toBeNull();
     const normalizedState = parsed.payload?.networks[0]?.state;
-    const expectedConnectorPlaceholder = `LEGACY-NOREF-C-CONN-LEGACY-01 [${connectorCount}c]`;
-    const expectedSplicePlaceholder = `LEGACY-NOREF-S-SPLICE-LEGACY-2 [${spliceCount}p]`;
+    const expectedConnectorPlaceholder = "LEGACY-NOREF-C-CONN-LEGACY-01";
+    const expectedSplicePlaceholder = "LEGACY-NOREF-S-SPLICE-LEGACY-2";
     expect(normalizedState?.connectors.byId[asConnectorId(firstConnectorId)]?.manufacturerReference).toBe(
       expectedConnectorPlaceholder
     );
