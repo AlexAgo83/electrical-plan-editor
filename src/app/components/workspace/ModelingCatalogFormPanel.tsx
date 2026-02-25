@@ -1,5 +1,6 @@
 import type { FormEvent, ReactElement } from "react";
 import { isValidCatalogUrlInput } from "../../../store";
+import type { WorkspaceCurrencyCode } from "../../types/app-controller";
 import { renderFormHeader } from "./ModelingFormsColumn.shared";
 
 interface ModelingCatalogFormPanelProps {
@@ -13,6 +14,7 @@ interface ModelingCatalogFormPanelProps {
   setCatalogConnectionCount: (value: string) => void;
   catalogName: string;
   setCatalogName: (value: string) => void;
+  workspaceCurrencyCode: WorkspaceCurrencyCode;
   catalogUnitPriceExclTax: string;
   setCatalogUnitPriceExclTax: (value: string) => void;
   catalogUrl: string;
@@ -33,6 +35,7 @@ export function ModelingCatalogFormPanel({
   setCatalogConnectionCount,
   catalogName,
   setCatalogName,
+  workspaceCurrencyCode,
   catalogUnitPriceExclTax,
   setCatalogUnitPriceExclTax,
   catalogUrl,
@@ -82,7 +85,7 @@ export function ModelingCatalogFormPanel({
             <input value={catalogName} onChange={(event) => setCatalogName(event.target.value)} placeholder="Optional display name" />
           </label>
           <label>
-            Unit price (excl. tax)
+            Unit price (excl. tax) [{workspaceCurrencyCode}]
             <input
               type="number"
               min={0}

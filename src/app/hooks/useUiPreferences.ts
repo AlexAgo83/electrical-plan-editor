@@ -7,6 +7,7 @@ import type {
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
   TableFontSize,
+  WorkspaceCurrencyCode,
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
@@ -95,6 +96,9 @@ interface UiPreferencesPayload {
   themeMode: ThemeMode;
   tableDensity: TableDensity;
   tableFontSize: TableFontSizePreference;
+  workspaceCurrencyCode: WorkspaceCurrencyCode;
+  workspaceTaxEnabled: boolean;
+  workspaceTaxRatePercent: number;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
   defaultSortField: SortField;
@@ -151,6 +155,9 @@ interface UseUiPreferencesOptions {
   themeMode: ThemeMode;
   tableDensity: TableDensity;
   tableFontSize: TableFontSizePreference;
+  workspaceCurrencyCode: WorkspaceCurrencyCode;
+  workspaceTaxEnabled: boolean;
+  workspaceTaxRatePercent: number;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
   defaultSortField: SortField;
@@ -176,6 +183,9 @@ interface UseUiPreferencesOptions {
   setThemeMode: (mode: ThemeMode) => void;
   setTableDensity: (density: TableDensity) => void;
   setTableFontSize: (value: TableFontSizePreference) => void;
+  setWorkspaceCurrencyCode: (value: WorkspaceCurrencyCode) => void;
+  setWorkspaceTaxEnabled: (value: boolean) => void;
+  setWorkspaceTaxRatePercent: (value: number) => void;
   setDefaultWireSectionMm2: (value: number) => void;
   setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
   setDefaultSortField: (field: SortField) => void;
@@ -243,12 +253,34 @@ function normalizeWorkspacePanelsLayoutMode(value: unknown): WorkspacePanelsLayo
   return value === "multiColumn" ? "multiColumn" : "singleColumn";
 }
 
+function normalizeWorkspaceCurrencyCode(value: unknown): WorkspaceCurrencyCode {
+  return value === "USD" || value === "GBP" || value === "CAD" || value === "CHF" ? value : "EUR";
+}
+
+function normalizeWorkspaceTaxEnabled(value: unknown): boolean {
+  return typeof value === "boolean" ? value : true;
+}
+
+function normalizeWorkspaceTaxRatePercent(value: unknown): number {
+  const parsed = typeof value === "string" ? Number(value) : value;
+  if (!Number.isFinite(parsed)) {
+    return 20;
+  }
+  if (Number(parsed) < 0 || Number(parsed) > 1000) {
+    return 20;
+  }
+  return Number(parsed);
+}
+
 export function useUiPreferences({
   networkMinScale,
   networkMaxScale,
   themeMode,
   tableDensity,
   tableFontSize,
+  workspaceCurrencyCode,
+  workspaceTaxEnabled,
+  workspaceTaxRatePercent,
   defaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
   defaultSortField,
@@ -274,6 +306,9 @@ export function useUiPreferences({
   setThemeMode,
   setTableDensity,
   setTableFontSize,
+  setWorkspaceCurrencyCode,
+  setWorkspaceTaxEnabled,
+  setWorkspaceTaxRatePercent,
   setDefaultWireSectionMm2,
   setDefaultAutoCreateLinkedNodes,
   setDefaultSortField,
@@ -365,6 +400,9 @@ export function useUiPreferences({
           ? preferences.tableFontSize
           : "normal"
       );
+      setWorkspaceCurrencyCode(normalizeWorkspaceCurrencyCode(preferences.workspaceCurrencyCode));
+      setWorkspaceTaxEnabled(normalizeWorkspaceTaxEnabled(preferences.workspaceTaxEnabled));
+      setWorkspaceTaxRatePercent(normalizeWorkspaceTaxRatePercent(preferences.workspaceTaxRatePercent));
       setDefaultWireSectionMm2(defaultWireSectionMm2Value);
       setDefaultAutoCreateLinkedNodes(defaultAutoCreateLinkedNodesValue);
       setDefaultSortField(sortField);
@@ -461,6 +499,9 @@ export function useUiPreferences({
     setSpliceSynthesisSort,
     setTableDensity,
     setTableFontSize,
+    setWorkspaceCurrencyCode,
+    setWorkspaceTaxEnabled,
+    setWorkspaceTaxRatePercent,
     setThemeMode,
     setWireSort,
     setConnectorSynthesisSort,
@@ -477,6 +518,9 @@ export function useUiPreferences({
       themeMode,
       tableDensity,
       tableFontSize,
+      workspaceCurrencyCode,
+      workspaceTaxEnabled,
+      workspaceTaxRatePercent,
       defaultWireSectionMm2,
       defaultAutoCreateLinkedNodes,
       defaultSortField,
@@ -527,6 +571,9 @@ export function useUiPreferences({
     showShortcutHints,
     tableDensity,
     tableFontSize,
+    workspaceCurrencyCode,
+    workspaceTaxEnabled,
+    workspaceTaxRatePercent,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     themeMode,

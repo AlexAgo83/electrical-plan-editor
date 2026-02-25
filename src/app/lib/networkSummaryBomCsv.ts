@@ -1,4 +1,5 @@
 import type { CatalogItem, Connector, Splice } from "../../core/entities";
+import type { WorkspaceCurrencyCode } from "../types/app-controller";
 import type { CsvCellValue } from "./csv";
 
 interface BomAggregateRow {
@@ -10,6 +11,7 @@ interface BomAggregateRow {
 export interface NetworkSummaryBomCsvExport {
   headers: string[];
   rows: CsvCellValue[][];
+  itemRowCount: number;
 }
 
 function formatOptionalMoney(value: number | undefined): string {
@@ -29,8 +31,16 @@ function formatRowMoney(quantity: number, unitPrice: number | undefined): string
 export function buildNetworkSummaryBomCsvExport(
   catalogItems: CatalogItem[],
   connectors: Connector[],
-  splices: Splice[]
+  splices: Splice[],
+  workspaceCurrencyCode: WorkspaceCurrencyCode = "EUR",
+  workspaceTaxEnabled = true,
+  workspaceTaxRatePercent = 20
 ): NetworkSummaryBomCsvExport {
+  const normalizedTaxEnabled = workspaceTaxEnabled === true;
+  const normalizedTaxRatePercent = Number.isFinite(workspaceTaxRatePercent)
+    ? Math.min(1000, Math.max(0, workspaceTaxRatePercent))
+    : 20;
+  const taxMultiplier = 1 + normalizedTaxRatePercent / 100;
   const catalogById = new Map(catalogItems.map((item) => [item.id, item] as const));
   const aggregates = new Map<string, BomAggregateRow>();
 
@@ -89,17 +99,24 @@ export function buildNetworkSummaryBomCsvExport(
     "Connector quantity",
     "Splice quantity",
     "Component quantity",
-    "Unit price (excl. tax)",
-    "Line total (excl. tax)",
+    `Unit price (excl. tax, ${workspaceCurrencyCode})`,
+    `Line total (excl. tax, ${workspaceCurrencyCode})`,
+    ...(normalizedTaxEnabled ? [`Line total (incl. tax, ${workspaceCurrencyCode})`] : []),
     "URL"
   ];
 
   let pricedRowsTotal = 0;
+  let pricedRowsTotalInclTax = 0;
   const rows: CsvCellValue[][] = orderedRows.map(({ catalogItem, connectorQuantity, spliceQuantity }) => {
     const componentQuantity = connectorQuantity + spliceQuantity;
     const unitPrice = catalogItem.unitPriceExclTax;
+    const lineTotalExclTax =
+      unitPrice !== undefined && Number.isFinite(unitPrice) ? componentQuantity * unitPrice : undefined;
     if (unitPrice !== undefined && Number.isFinite(unitPrice)) {
       pricedRowsTotal += componentQuantity * unitPrice;
+      if (normalizedTaxEnabled) {
+        pricedRowsTotalInclTax += componentQuantity * unitPrice * taxMultiplier;
+      }
     }
     return [
       catalogItem.manufacturerReference,
@@ -110,11 +127,24 @@ export function buildNetworkSummaryBomCsvExport(
       componentQuantity,
       formatOptionalMoney(unitPrice),
       formatRowMoney(componentQuantity, unitPrice),
+      ...(normalizedTaxEnabled
+        ? [lineTotalExclTax === undefined ? "" : (lineTotalExclTax * taxMultiplier).toFixed(2)]
+        : []),
       catalogItem.url ?? ""
     ];
   });
 
-  rows.push(["TOTAL (priced rows only)", "", "", "", "", "", "", pricedRowsTotal.toFixed(2), ""]);
+  rows.push(
+    normalizedTaxEnabled
+      ? ["TOTAL (priced rows only)", "", "", "", "", "", "", pricedRowsTotal.toFixed(2), "", ""]
+      : ["TOTAL (priced rows only)", "", "", "", "", "", "", pricedRowsTotal.toFixed(2), ""]
+  );
+  if (normalizedTaxEnabled) {
+    rows.push(["TOTAL TTC (priced rows only)", "", "", "", "", "", "", "", pricedRowsTotalInclTax.toFixed(2), ""]);
+  }
+  rows.push(["PRICING CONTEXT", "Currency", workspaceCurrencyCode]);
+  rows.push(["PRICING CONTEXT", "Tax enabled", normalizedTaxEnabled ? "true" : "false"]);
+  rows.push(["PRICING CONTEXT", "Tax rate (%)", normalizedTaxRatePercent.toFixed(2)]);
 
-  return { headers, rows };
+  return { headers, rows, itemRowCount: orderedRows.length };
 }

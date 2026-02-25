@@ -10,6 +10,7 @@ import type {
   SortState,
   TableDensity,
   TableFontSize,
+  WorkspaceCurrencyCode,
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
@@ -17,6 +18,9 @@ export function useAppControllerPreferencesState() {
   const [themeMode, setThemeMode] = useState<ThemeMode>("dark");
   const [tableDensity, setTableDensity] = useState<TableDensity>("compact");
   const [tableFontSize, setTableFontSize] = useState<TableFontSize>("normal");
+  const [workspaceCurrencyCode, setWorkspaceCurrencyCode] = useState<WorkspaceCurrencyCode>("EUR");
+  const [workspaceTaxEnabled, setWorkspaceTaxEnabled] = useState(true);
+  const [workspaceTaxRatePercent, setWorkspaceTaxRatePercent] = useState(20);
   const [defaultWireSectionMm2, setDefaultWireSectionMm2] = useState(0.5);
   const [defaultAutoCreateLinkedNodes, setDefaultAutoCreateLinkedNodes] = useState(true);
   const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
@@ -48,6 +52,12 @@ export function useAppControllerPreferencesState() {
     setTableDensity,
     tableFontSize,
     setTableFontSize,
+    workspaceCurrencyCode,
+    setWorkspaceCurrencyCode,
+    workspaceTaxEnabled,
+    setWorkspaceTaxEnabled,
+    workspaceTaxRatePercent,
+    setWorkspaceTaxRatePercent,
     defaultWireSectionMm2,
     setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
