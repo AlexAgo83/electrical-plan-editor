@@ -15,23 +15,18 @@ import { createInitialState, type AppState } from "./types";
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
 }
-
 function asCatalogItemId(value: string): CatalogItemId {
   return value as CatalogItemId;
 }
-
 function asSpliceId(value: string): SpliceId {
   return value as SpliceId;
 }
-
 function asNodeId(value: string): NodeId {
   return value as NodeId;
 }
-
 function asSegmentId(value: string): SegmentId {
   return value as SegmentId;
 }
-
 function asWireId(value: string): WireId {
   return value as WireId;
 }
@@ -366,7 +361,6 @@ export function createSampleNetworkState(): AppState {
       endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 10 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 8 }
     }),
-
     ...buildAdditionalSampleNetworkDemoActions()
   ];
 
@@ -389,7 +383,6 @@ export function createValidationIssuesSampleNetworkState(): AppState {
   const catalogActuator8w = asCatalogItemId("CAT-VALID-ACT-8W");
   const catalogMainJunction10p = asCatalogItemId("CAT-VALID-J1-10P");
   const catalogBranchJunction8p = asCatalogItemId("CAT-VALID-J2-8P");
-
   return [
     appActions.updateNetwork(
       activeNetworkId,
