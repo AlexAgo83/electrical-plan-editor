@@ -45,22 +45,27 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - Node drag-and-drop
   - Pan with `Shift + drag`
   - Zoom with toolbar controls (`Zoom -`, `Zoom +`, `Reset view`, `Fit network`)
+  - Deterministic SVG layering for readability (segment/node labels render above geometry)
   - Callout overlays with configurable visibility and text size (`small`, `normal`, `large`)
   - Canvas defaults for grid/snap/lock/overlays/segment lengths/callouts and PNG background export
+  - Keyboard-accessible segment selection with labeled hit targets and improved interactive SVG semantics
 - Quick entity navigation in the canvas with contextual `Modeling` / `Analysis` switch (when available)
 - Network-scoped `Catalog` with catalog-first connector/splice creation (manufacturer reference + connection count driven by catalog items)
 - New network bootstrap seeds `3` default catalog items (`CAT-2W-STD`, `CAT-6P-STD`, `CAT-8W-STD`) with deterministic names/prices
 - Catalog analysis panel showing linked connector/splice usage for the selected catalog item with `Go to` navigation to Modeling edit flows
+- Catalog/BOM pricing workspace settings (currency + optional tax/VAT + tax rate defaults) with local persistence and reset support
+- Catalog price UI displays workspace currency in list/form surfaces
 - Step-by-step onboarding modal with contextual panel help entry points and persistent auto-open opt-out
+- Accessibility hardening across modal/table/navigation flows (modal focus management, `aria-sort`, Validation keyboard row selection, screen-reader-visible issue counters)
 - Table ergonomics:
   - Reusable `Filter` bars with field selector + full-width input (`Wires`, `Network Scope`, `Connectors`, `Splices`, `Nodes`, `Segments`)
   - Occupancy/kind/route/sub-network chip filters remain available alongside table filter bars
-- Settings defaults for wire section prefill and connector/splice auto-create linked-node behavior
-- Validation center with grouped issues, issue navigation, and catalog integrity checks (`Catalog` records + connector/splice catalog-link audits)
+- Settings defaults for wire section prefill, connector/splice auto-create linked-node behavior, and Catalog/BOM pricing context
+- Validation center with grouped issues, issue navigation, and catalog integrity checks (`Catalog` records, catalog-item errors, connector/splice catalog-link audits)
 - Legacy save/import normalization for missing connector/splice manufacturer references via deterministic catalog placeholders
 - `Network summary` header exports:
   - `Export PNG`
-  - `Export BOM CSV` (catalog-aggregated BOM with connector/splice quantities and unit/line totals when priced)
+  - `Export BOM CSV` (catalog-aggregated BOM with pricing context metadata, HT totals, and conditional TTC columns/totals when tax is enabled)
 - Theme presets including multiple light and dark themes
 - Local persistence with schema versioning and migrations
 - PWA support (install prompt + offline shell + update readiness in production)
