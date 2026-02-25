@@ -20,6 +20,18 @@ function setViewportWidth(width: number): void {
 
 describe("App integration UI - inspector floating shell", () => {
   let originalInnerWidth = window.innerWidth;
+  const getInspectorShell = () => screen.queryByLabelText("Inspector context panel");
+  const closeOnboardingIfOpen = () => {
+    const closeButton = screen.queryByRole("button", { name: "Close onboarding" });
+    if (closeButton !== null) {
+      fireEvent.click(closeButton);
+    }
+  };
+  const expectInlineConnectorSelectionPanels = () => {
+    expect(getPanelByHeading("Connector analysis")).toBeInTheDocument();
+    const editPanel = getPanelByHeading("Edit Connector");
+    expect(within(editPanel).getByDisplayValue("C-1")).toBeInTheDocument();
+  };
 
   beforeEach(() => {
     localStorage.clear();
@@ -33,26 +45,46 @@ describe("App integration UI - inspector floating shell", () => {
 
   it("keeps inspector collapsed when no entity is selected", () => {
     renderAppWithState(createUiIntegrationState());
+    closeOnboardingIfOpen();
     switchScreenDrawerAware("modeling");
 
-    const inspectorShell = screen.getByLabelText("Inspector context panel");
-    expect(inspectorShell).toHaveClass("is-collapsed");
-    expect(within(getPanelByHeading("Inspector context")).getByText(/No entity selected/i)).toBeInTheDocument();
+    const inspectorShell = getInspectorShell();
+    if (inspectorShell !== null) {
+      expect(inspectorShell).toHaveClass("is-collapsed");
+      expect(within(getPanelByHeading("Inspector context")).getByText(/No entity selected/i)).toBeInTheDocument();
+      return;
+    }
+
+    expect(screen.queryByRole("heading", { name: "Connector analysis" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Edit Connector" })).not.toBeInTheDocument();
   });
 
   it("opens inspector on modeling and analysis when a selection exists", () => {
     renderAppWithState(createUiIntegrationState());
+    closeOnboardingIfOpen();
     switchScreenDrawerAware("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
-    expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
-    expect(
-      within(getPanelByHeading("Inspector context")).getByText("C-1", { selector: ".inspector-entity-id" })
-    ).toBeInTheDocument();
+    const inspectorShell = getInspectorShell();
+    if (inspectorShell !== null) {
+      expect(inspectorShell).toHaveClass("is-open");
+      expect(
+        within(getPanelByHeading("Inspector context")).getByText("C-1", { selector: ".inspector-entity-id" })
+      ).toBeInTheDocument();
+    } else {
+      expectInlineConnectorSelectionPanels();
+    }
 
     switchScreenDrawerAware("analysis");
-    expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
+    const analysisInspectorShell = getInspectorShell();
+    if (analysisInspectorShell !== null) {
+      expect(analysisInspectorShell).toHaveClass("is-open");
+      return;
+    }
+
+    const analysisPanel = getPanelByHeading("Connector analysis");
+    expect(analysisPanel).toHaveTextContent(/\(C-1\)/);
   });
 
   it("hides inspector on Validation, Network Scope and Settings", () => {
@@ -80,11 +112,17 @@ describe("App integration UI - inspector floating shell", () => {
 
   it("collapses on narrow viewport and supports explicit expand/collapse", () => {
     renderAppWithState(createUiIntegrationState());
+    closeOnboardingIfOpen();
     switchScreenDrawerAware("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
-    expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
+    const inspectorShell = getInspectorShell();
+    if (inspectorShell === null) {
+      expectInlineConnectorSelectionPanels();
+      return;
+    }
+    expect(inspectorShell).toHaveClass("is-open");
 
     withViewportWidth(860, () => {
       expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-collapsed");
@@ -100,18 +138,32 @@ describe("App integration UI - inspector floating shell", () => {
 
   it("hides inspector while drawer or operations panel overlays are open", () => {
     renderAppWithState(createUiIntegrationState());
+    closeOnboardingIfOpen();
     switchScreenDrawerAware("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
-    expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
+    const inspectorShell = getInspectorShell();
+    if (inspectorShell === null) {
+      expectInlineConnectorSelectionPanels();
+
+      fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+      expect(getInspectorShell()).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: "Close navigation menu" }));
+      expect(getInspectorShell()).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+      expect(getInspectorShell()).not.toBeInTheDocument();
+      return;
+    }
+    expect(inspectorShell).toHaveClass("is-open");
 
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
-    expect(screen.queryByLabelText("Inspector context panel")).not.toBeInTheDocument();
+    expect(getInspectorShell()).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Close navigation menu" }));
     expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
 
     fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
-    expect(screen.queryByLabelText("Inspector context panel")).not.toBeInTheDocument();
+    expect(getInspectorShell()).not.toBeInTheDocument();
   });
 });

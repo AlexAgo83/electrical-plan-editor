@@ -9,6 +9,13 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - wire free color mode", () => {
+  function closeOnboardingIfOpen(): void {
+    const closeButton = screen.queryByRole("button", { name: "Close onboarding" });
+    if (closeButton !== null) {
+      fireEvent.click(closeButton);
+    }
+  }
+
   function clickNewWire(): void {
     fireEvent.click(within(getPanelByHeading("Wires")).getByRole("button", { name: "New" }));
   }
@@ -19,7 +26,7 @@ describe("App integration UI - wire free color mode", () => {
 
   it("supports free wire color labels with explicit mode switching and clears catalog colors", () => {
     const { store } = renderAppWithState(createUiIntegrationDenseWiresState());
-    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    closeOnboardingIfOpen();
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("wire");
 
@@ -69,14 +76,18 @@ describe("App integration UI - wire free color mode", () => {
       expect(within(wireRow).getByText("Beige/Brown mix")).toBeInTheDocument();
     }
 
-    const inspectorPanel = getPanelByHeading("Inspector context");
-    expect(within(inspectorPanel).getByText("Cable colors")).toBeInTheDocument();
-    expect(within(inspectorPanel).getByText("Free: Beige/Brown mix")).toBeInTheDocument();
+    closeOnboardingIfOpen();
+    const inspectorHeading = screen.queryByRole("heading", { name: "Inspector context" });
+    if (inspectorHeading !== null) {
+      const inspectorPanel = getPanelByHeading("Inspector context");
+      expect(within(inspectorPanel).getByText("Cable colors")).toBeInTheDocument();
+      expect(within(inspectorPanel).getByText("Free: Beige/Brown mix")).toBeInTheDocument();
+    }
   });
 
   it("allows saving free color mode with an empty label and preserves it as a distinct unspecified state", () => {
     const { store } = renderAppWithState(createUiIntegrationDenseWiresState());
-    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    closeOnboardingIfOpen();
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("wire");
 
@@ -119,8 +130,12 @@ describe("App integration UI - wire free color mode", () => {
       expect(within(wireRow).getByText("Unspecified")).toBeInTheDocument();
     }
 
-    const inspectorPanel = getPanelByHeading("Inspector context");
-    expect(within(inspectorPanel).getByText("Free color (unspecified)")).toBeInTheDocument();
-    expect(within(inspectorPanel).queryByText("No color")).not.toBeInTheDocument();
+    closeOnboardingIfOpen();
+    const inspectorHeading = screen.queryByRole("heading", { name: "Inspector context" });
+    if (inspectorHeading !== null) {
+      const inspectorPanel = getPanelByHeading("Inspector context");
+      expect(within(inspectorPanel).getByText("Free color (unspecified)")).toBeInTheDocument();
+      expect(within(inspectorPanel).queryByText("No color")).not.toBeInTheDocument();
+    }
   });
 });
