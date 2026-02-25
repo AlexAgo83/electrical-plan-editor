@@ -1,4 +1,4 @@
-import { useCallback, useEffect, type Dispatch, type FormEvent, type SetStateAction } from "react";
+import { useCallback, useEffect, useRef, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import type { Network, NetworkId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import type { NetworkFocusRequest, NetworkFormMode } from "./useNetworkScopeFormState";
@@ -41,7 +41,7 @@ export function useNetworkScopeFormOrchestration({
   handleUpdateActiveNetwork
 }: UseNetworkScopeFormOrchestrationParams) {
   void activeNetworkId;
-  void isNetworkScopeScreen;
+  const wasNetworkScopeScreenRef = useRef(false);
   const handleOpenCreateNetworkForm = useCallback(() => {
     setNetworkFormMode("create");
     setNetworkFormTargetId(null);
@@ -121,6 +121,20 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkTechnicalId(targetNetwork.technicalId);
     setNewNetworkDescription(targetNetwork.description ?? "");
   }, [networkFormMode, networkFormTargetId, networksById, setNetworkFormMode, setNetworkFormTargetId, setNewNetworkDescription, setNewNetworkName, setNewNetworkTechnicalId]);
+
+  useEffect(() => {
+    const wasVisible = wasNetworkScopeScreenRef.current;
+    wasNetworkScopeScreenRef.current = isNetworkScopeScreen;
+
+    if (!isNetworkScopeScreen || wasVisible) {
+      return;
+    }
+
+    // Entering Network Scope should always start with no form open.
+    setNetworkFormMode(null);
+    setNetworkFormTargetId(null);
+    setNetworkFormError(null);
+  }, [isNetworkScopeScreen, networkFormMode, setNetworkFormError, setNetworkFormMode, setNetworkFormTargetId]);
 
   return {
     handleOpenCreateNetworkForm,

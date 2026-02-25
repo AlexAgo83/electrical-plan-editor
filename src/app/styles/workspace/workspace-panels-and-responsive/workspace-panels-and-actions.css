@@ -249,6 +249,10 @@
   align-content: start;
 }
 
+.network-form-panel[hidden] {
+  display: none !important;
+}
+
 .network-form-header {
   display: flex;
   align-items: center;

@@ -1,4 +1,4 @@
-import { fireEvent, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { ConnectorId, NetworkId } from "../core/entities";
 import { appActions, appReducer, createInitialState } from "../store";
@@ -13,6 +13,33 @@ function asNetworkId(value: string): NetworkId {
 }
 
 describe("App integration UI - networks", () => {
+  it("does not show the network form panel on Network Scope until a row is explicitly selected", () => {
+    renderAppWithState(createInitialState());
+    switchScreen("networkScope");
+
+    expect(getPanelByHeading("Network Scope")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Edit network" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Create network" })).not.toBeInTheDocument();
+  });
+
+  it("hides the edit network panel again when returning to Network Scope", () => {
+    renderAppWithState(createInitialState());
+
+    switchScreen("networkScope");
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    const mainNetworkRow = within(networkScopePanel).getByText("Main network sample").closest("tr");
+    expect(mainNetworkRow).not.toBeNull();
+    fireEvent.click(mainNetworkRow as HTMLElement);
+    expect(getPanelByHeading("Edit network")).toBeInTheDocument();
+
+    switchScreen("modeling");
+    switchScreen("networkScope");
+
+    expect(getPanelByHeading("Network Scope")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Edit network" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Create network" })).not.toBeInTheDocument();
+  });
+
   it("switches active network and keeps entity lists isolated", () => {
     const base = createInitialState();
     const defaultNetworkId = base.activeNetworkId as NetworkId;

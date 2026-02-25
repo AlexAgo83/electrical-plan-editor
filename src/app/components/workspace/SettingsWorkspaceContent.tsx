@@ -422,6 +422,7 @@ export function SettingsWorkspaceContent({
             <select
               value={workspacePanelsLayoutMode}
               onChange={(event) => setWorkspacePanelsLayoutMode(event.target.value as WorkspacePanelsLayoutMode)}
+              disabled
             >
               <option value="multiColumn">Responsive multi-column</option>
               <option value="singleColumn">Force single column</option>
