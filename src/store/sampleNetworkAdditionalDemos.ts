@@ -7,6 +7,12 @@ import type {
   WireId
 } from "../core/entities";
 import { appActions, type AppAction } from "./actions";
+import {
+  buildLightingDemoCatalogActions,
+  buildSensorDemoCatalogActions,
+  lightingDemoCatalogIds,
+  sensorDemoCatalogIds
+} from "./sampleNetworkCatalog";
 
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
@@ -46,29 +52,34 @@ export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
       false
     ),
     appActions.selectNetwork(asNetworkId("network-lighting-demo")),
+    ...buildLightingDemoCatalogActions(),
     appActions.upsertConnector({
       id: asConnectorId("L-C-SRC"),
       name: "Lighting Source Connector",
       technicalId: "L-CONN-SRC",
-      cavityCount: 6
+      cavityCount: 6,
+      catalogItemId: lightingDemoCatalogIds.source6Way
     }),
     appActions.upsertConnector({
       id: asConnectorId("L-C-FRONT"),
       name: "Front Lamp Connector",
       technicalId: "L-CONN-FRONT",
-      cavityCount: 4
+      cavityCount: 4,
+      catalogItemId: lightingDemoCatalogIds.lamp4Way
     }),
     appActions.upsertConnector({
       id: asConnectorId("L-C-REAR"),
       name: "Rear Lamp Connector",
       technicalId: "L-CONN-REAR",
-      cavityCount: 4
+      cavityCount: 4,
+      catalogItemId: lightingDemoCatalogIds.lamp4Way
     }),
     appActions.upsertSplice({
       id: asSpliceId("L-S-SPLIT"),
       name: "Lighting Split Splice",
       technicalId: "L-SPL-SPLIT",
-      portCount: 4
+      portCount: 4,
+      catalogItemId: lightingDemoCatalogIds.split4Port
     }),
     appActions.upsertNode({ id: asNodeId("L-N-SRC"), kind: "connector", connectorId: asConnectorId("L-C-SRC") }),
     appActions.upsertNode({ id: asNodeId("L-N-FRONT"), kind: "connector", connectorId: asConnectorId("L-C-FRONT") }),
@@ -137,35 +148,41 @@ export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
       false
     ),
     appActions.selectNetwork(asNetworkId("network-sensor-backbone-demo")),
+    ...buildSensorDemoCatalogActions(),
     appActions.upsertConnector({
       id: asConnectorId("S-C-ECU"),
       name: "ECU Connector",
       technicalId: "S-CONN-ECU",
-      cavityCount: 12
+      cavityCount: 12,
+      catalogItemId: sensorDemoCatalogIds.ecu12Way
     }),
     appActions.upsertConnector({
       id: asConnectorId("S-C-A"),
       name: "Sensor A Connector",
       technicalId: "S-CONN-A",
-      cavityCount: 4
+      cavityCount: 4,
+      catalogItemId: sensorDemoCatalogIds.sensor4Way
     }),
     appActions.upsertConnector({
       id: asConnectorId("S-C-B"),
       name: "Sensor B Connector",
       technicalId: "S-CONN-B",
-      cavityCount: 4
+      cavityCount: 4,
+      catalogItemId: sensorDemoCatalogIds.sensor4Way
     }),
     appActions.upsertConnector({
       id: asConnectorId("S-C-C"),
       name: "Sensor C Connector",
       technicalId: "S-CONN-C",
-      cavityCount: 4
+      cavityCount: 4,
+      catalogItemId: sensorDemoCatalogIds.sensor4Way
     }),
     appActions.upsertSplice({
       id: asSpliceId("S-S-GND"),
       name: "Sensor Ground Splice",
       technicalId: "S-SPL-GND",
-      portCount: 6
+      portCount: 6,
+      catalogItemId: sensorDemoCatalogIds.groundSplice6Port
     }),
     appActions.upsertNode({ id: asNodeId("S-N-ECU"), kind: "connector", connectorId: asConnectorId("S-C-ECU") }),
     appActions.upsertNode({ id: asNodeId("S-N-A"), kind: "connector", connectorId: asConnectorId("S-C-A") }),
@@ -253,4 +270,3 @@ export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
     appActions.selectNetwork(asNetworkId("network-main"))
   ];
 }
-
