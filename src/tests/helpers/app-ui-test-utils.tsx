@@ -170,13 +170,94 @@ export function createConnectorSortingState(): AppState {
 export function createValidationIssueState(): AppState {
   const base = createUiIntegrationState();
   const connectorId = asConnectorId("C1");
+  const spliceId = asSpliceId("S1");
+  const catalogItemId = asCatalogItemId("catalog-validation-2");
+  const activeNetworkId = base.activeNetworkId;
   const wire = base.wires.byId[asWireId("W1")];
   if (wire === undefined) {
     throw new Error("Expected wire W1 in base integration state.");
   }
+  if (activeNetworkId === null) {
+    throw new Error("Expected active network in base integration state.");
+  }
+  const activeNetworkState = base.networkStates[activeNetworkId];
+  if (activeNetworkState === undefined) {
+    throw new Error("Expected active network scoped state.");
+  }
+  const connector = base.connectors.byId[connectorId];
+  const splice = base.splices.byId[spliceId];
+  if (connector === undefined || splice === undefined) {
+    throw new Error("Expected base connector and splice.");
+  }
+
+  const linkedCatalogItem = {
+    id: catalogItemId,
+    manufacturerReference: "CAT-VALIDATION-2",
+    connectionCount: 2
+  } as const;
 
   return {
     ...base,
+    catalogItems: {
+      byId: {
+        ...base.catalogItems.byId,
+        [catalogItemId]: linkedCatalogItem
+      },
+      allIds: [...base.catalogItems.allIds, catalogItemId]
+    },
+    connectors: {
+      ...base.connectors,
+      byId: {
+        ...base.connectors.byId,
+        [connectorId]: {
+          ...connector,
+          catalogItemId
+        }
+      }
+    },
+    splices: {
+      ...base.splices,
+      byId: {
+        ...base.splices.byId,
+        [spliceId]: {
+          ...splice,
+          catalogItemId
+        }
+      }
+    },
+    networkStates: {
+      ...base.networkStates,
+      [activeNetworkId]: {
+        ...activeNetworkState,
+        catalogItems: {
+          byId: {
+            ...activeNetworkState.catalogItems.byId,
+            [catalogItemId]: linkedCatalogItem
+          },
+          allIds: [...activeNetworkState.catalogItems.allIds, catalogItemId]
+        },
+        connectors: {
+          ...activeNetworkState.connectors,
+          byId: {
+            ...activeNetworkState.connectors.byId,
+            [connectorId]: {
+              ...activeNetworkState.connectors.byId[connectorId]!,
+              catalogItemId
+            }
+          }
+        },
+        splices: {
+          ...activeNetworkState.splices,
+          byId: {
+            ...activeNetworkState.splices.byId,
+            [spliceId]: {
+              ...activeNetworkState.splices.byId[spliceId]!,
+              catalogItemId
+            }
+          }
+        }
+      }
+    },
     wires: {
       ...base.wires,
       byId: {

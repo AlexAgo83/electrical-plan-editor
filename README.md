@@ -48,13 +48,19 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - Callout overlays with configurable visibility and text size (`small`, `normal`, `large`)
   - Canvas defaults for grid/snap/lock/overlays/segment lengths/callouts and PNG background export
 - Quick entity navigation in the canvas with contextual `Modeling` / `Analysis` switch (when available)
+- Network-scoped `Catalog` with catalog-first connector/splice creation (manufacturer reference + connection count driven by catalog items)
+- New network bootstrap seeds `3` default catalog items (`CAT-2W-STD`, `CAT-6P-STD`, `CAT-8W-STD`) with deterministic names/prices
+- Catalog analysis panel showing linked connector/splice usage for the selected catalog item with `Go to` navigation to Modeling edit flows
 - Step-by-step onboarding modal with contextual panel help entry points and persistent auto-open opt-out
 - Table ergonomics:
   - Reusable `Filter` bars with field selector + full-width input (`Wires`, `Network Scope`, `Connectors`, `Splices`, `Nodes`, `Segments`)
   - Occupancy/kind/route/sub-network chip filters remain available alongside table filter bars
 - Settings defaults for wire section prefill and connector/splice auto-create linked-node behavior
-- Optional manufacturer references for connectors/splices, surfaced in forms and inspector
-- Validation center with grouped issues and issue navigation
+- Validation center with grouped issues, issue navigation, and catalog integrity checks (`Catalog` records + connector/splice catalog-link audits)
+- Legacy save/import normalization for missing connector/splice manufacturer references via deterministic catalog placeholders
+- `Network summary` header exports:
+  - `Export PNG`
+  - `Export BOM CSV` (catalog-aggregated BOM with connector/splice quantities and unit/line totals when priced)
 - Theme presets including multiple light and dark themes
 - Local persistence with schema versioning and migrations
 - PWA support (install prompt + offline shell + update readiness in production)

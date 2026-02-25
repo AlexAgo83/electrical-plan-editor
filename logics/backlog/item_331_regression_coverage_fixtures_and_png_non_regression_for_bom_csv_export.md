@@ -2,7 +2,7 @@
 > From version: 0.9.5
 > Understanding: 99% (CSV icon regression expectation added)
 > Confidence: 96% (BOM header regression scope clarified)
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Regression safety for BOM CSV export aggregation, CSV formatting edge cases, and PNG export coexistence
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.

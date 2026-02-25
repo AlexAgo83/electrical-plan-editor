@@ -168,6 +168,8 @@ export interface NetworkSummaryPanelProps {
   onPersistConnectorCalloutPosition: (connectorId: ConnectorId, position: NodePosition) => void;
   onPersistSpliceCalloutPosition: (spliceId: SpliceId, position: NodePosition) => void;
   pngExportIncludeBackground: boolean;
+  canExportBomCsv: boolean;
+  onExportBomCsv: () => void;
   onRegenerateLayout: () => void;
 }
 
@@ -598,6 +600,8 @@ export function NetworkSummaryPanel({
   onPersistConnectorCalloutPosition,
   onPersistSpliceCalloutPosition,
   pngExportIncludeBackground,
+  canExportBomCsv,
+  onExportBomCsv,
   onRegenerateLayout
 }: NetworkSummaryPanelProps): ReactElement {
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
@@ -1254,6 +1258,15 @@ export function NetworkSummaryPanel({
             >
               <span className="network-summary-export-icon" aria-hidden="true" />
               Export PNG
+            </button>
+            <button
+              type="button"
+              className="workspace-tab network-summary-export-button"
+              onClick={onExportBomCsv}
+              disabled={!canExportBomCsv}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              Export BOM CSV
             </button>
           </div>
         </header>

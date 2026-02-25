@@ -2,6 +2,7 @@ import {
   type ReactElement,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore
@@ -77,6 +78,7 @@ import { useWorkspaceShellChrome } from "./hooks/useWorkspaceShellChrome";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
 import { ModelingCatalogFormPanel } from "./components/workspace/ModelingCatalogFormPanel";
 import { ModelingCatalogListPanel } from "./components/workspace/ModelingCatalogListPanel";
+import { CatalogAnalysisWorkspaceContent } from "./components/workspace/CatalogAnalysisWorkspaceContent";
 import { buildAppControllerNamespacedCanvasState } from "./hooks/useAppControllerNamespacedCanvasState";
 import { buildAppControllerNamespacedFormsState } from "./hooks/useAppControllerNamespacedFormsState";
 import {
@@ -88,6 +90,8 @@ import {
   NETWORK_VIEW_WIDTH
 } from "./lib/app-utils-shared";
 import { createNodePositionMap } from "./lib/app-utils-layout";
+import { downloadCsvFile } from "./lib/csv";
+import { buildNetworkSummaryBomCsvExport } from "./lib/networkSummaryBomCsv";
 import {
   ONBOARDING_STEPS,
   getOnboardingStepById,
@@ -177,6 +181,17 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     connectorNodeByConnectorId,
     spliceNodeBySpliceId
   } = useEntityRelationshipMaps(connectors, splices, nodes, segments);
+  const networkSummaryBomCsvExport = useMemo(
+    () => buildNetworkSummaryBomCsvExport(catalogItems, connectors, splices),
+    [catalogItems, connectors, splices]
+  );
+  const canExportBomCsv = networkSummaryBomCsvExport.rows.length > 1;
+  const handleExportBomCsv = useCallback(() => {
+    if (!canExportBomCsv) {
+      return;
+    }
+    downloadCsvFile("network-bom", networkSummaryBomCsvExport.headers, networkSummaryBomCsvExport.rows);
+  }, [canExportBomCsv, networkSummaryBomCsvExport]);
 
   const formsState = useEntityFormsState();
   const forms = buildAppControllerNamespacedFormsState(formsState);
@@ -1410,6 +1425,36 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     [setActiveScreen, setActiveSubScreen, setIsModelingAnalysisFocused, spliceHandlers]
   );
 
+  const handleOpenConnectorFromCatalogAnalysis = useCallback(
+    (connectorId: ConnectorId) => {
+      const connector = connectorMap.get(connectorId);
+      if (connector === undefined) {
+        return;
+      }
+      setDetailPanelsSelectionSource("table");
+      setIsModelingAnalysisFocused(false);
+      setActiveScreen("modeling");
+      setActiveSubScreen("connector");
+      connectorHandlers.startConnectorEdit(connector);
+    },
+    [connectorHandlers, connectorMap, setActiveScreen, setActiveSubScreen, setIsModelingAnalysisFocused]
+  );
+
+  const handleOpenSpliceFromCatalogAnalysis = useCallback(
+    (spliceId: SpliceId) => {
+      const splice = spliceMap.get(spliceId);
+      if (splice === undefined) {
+        return;
+      }
+      setDetailPanelsSelectionSource("table");
+      setIsModelingAnalysisFocused(false);
+      setActiveScreen("modeling");
+      setActiveSubScreen("splice");
+      spliceHandlers.startSpliceEdit(splice);
+    },
+    [setActiveScreen, setActiveSubScreen, setIsModelingAnalysisFocused, spliceHandlers, spliceMap]
+  );
+
   const {
     handleOpenValidationScreen,
     moveValidationIssueCursor,
@@ -1456,6 +1501,13 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     editActions: {
       startConnectorEdit: connectorHandlers.startConnectorEdit,
+      startCatalogEditFromValidation: (catalogItemId) => {
+        const item = state.catalogItems.byId[catalogItemId as CatalogItemId];
+        if (item === undefined) {
+          return;
+        }
+        catalogHandlers.startCatalogEdit(item);
+      },
       startSpliceEdit: spliceHandlers.startSpliceEdit,
       startNodeEdit: nodeHandlers.startNodeEdit,
       startSegmentEdit: segmentHandlers.startSegmentEdit,
@@ -1699,6 +1751,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const hasTableInspectableSelection = hasInspectableSelection && detailPanelsSelectionSource === "table";
   const hasTableSelectionForActiveSubScreen = hasTableInspectableSelection && selectedSubScreen === activeSubScreen;
   const hasInspectableSelectionForActiveSubScreen = hasInspectableSelection && selectedSubScreen === activeSubScreen;
+  const hasCatalogSelectionForActiveSubScreen = isCatalogSubScreen && selectedCatalogItemId !== null;
   const hasActiveEntityForm =
     formsState.catalogFormMode !== "idle" ||
     formsState.connectorFormMode !== "idle" ||
@@ -1863,6 +1916,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         onPersistConnectorCalloutPosition: persistConnectorCalloutPosition,
         onPersistSpliceCalloutPosition: persistSpliceCalloutPosition,
         pngExportIncludeBackground: canvasPngExportIncludeBackground,
+        canExportBomCsv,
+        onExportBomCsv: handleExportBomCsv,
         handleRegenerateLayout
       }).networkSummaryPanel
       : null;
@@ -2014,8 +2069,21 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isCatalogSubScreen ? catalogModelingLeftColumnContent : modelingLeftColumnContent;
   const modelingFormsColumnContentForSubScreen =
     isCatalogSubScreen ? catalogModelingFormsColumnContent : modelingFormsColumnContent;
+  const selectedCatalogItem =
+    selectedCatalogItemId === null ? null : (catalogItems.find((item) => item.id === selectedCatalogItemId) ?? null);
+  const catalogAnalysisWorkspaceContent = (
+    <CatalogAnalysisWorkspaceContent
+      isCatalogSubScreen={isCatalogSubScreen}
+      selectedCatalogItemId={selectedCatalogItemId}
+      selectedCatalogItemManufacturerReference={selectedCatalogItem?.manufacturerReference ?? null}
+      linkedConnectors={selectedCatalogItemId === null ? [] : connectors.filter((connector) => connector.catalogItemId === selectedCatalogItemId)}
+      linkedSplices={selectedCatalogItemId === null ? [] : splices.filter((splice) => splice.catalogItemId === selectedCatalogItemId)}
+      onOpenConnector={handleOpenConnectorFromCatalogAnalysis}
+      onOpenSplice={handleOpenSpliceFromCatalogAnalysis}
+    />
+  );
   const analysisWorkspaceContentForSubScreen =
-    isCatalogSubScreen ? null : analysisWorkspaceContent;
+    isCatalogSubScreen ? catalogAnalysisWorkspaceContent : analysisWorkspaceContent;
   const { networkScopeWorkspaceContent, validationWorkspaceContent, settingsWorkspaceContent } =
     useAppControllerAuxScreenContentDomains({
       components: {
@@ -2176,7 +2244,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       ? modelingFormsColumnContentForSubScreen
       : null;
   const analysisWorkspaceContentForLayout =
-    isCatalogSubScreen ? null : hasInspectableSelectionForActiveSubScreen ? analysisWorkspaceContentForSubScreen : null;
+    isCatalogSubScreen
+      ? (hasCatalogSelectionForActiveSubScreen ? analysisWorkspaceContentForSubScreen : null)
+      : hasInspectableSelectionForActiveSubScreen
+        ? analysisWorkspaceContentForSubScreen
+        : null;
 
   return (
     <>

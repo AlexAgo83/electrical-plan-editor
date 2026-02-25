@@ -1,7 +1,10 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { createInitialState } from "../store";
+import { appActions, appReducer, createInitialState } from "../store";
 import {
+  asCatalogItemId,
+  asConnectorId,
+  asSpliceId,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
@@ -94,6 +97,75 @@ describe("App integration UI - catalog", () => {
 
     const refreshedConnectorsPanel = getPanelByHeading("Connectors");
     expect(within(refreshedConnectorsPanel).getByText("Catalog-first connector")).toBeInTheDocument();
+    expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
+  });
+
+  it("shows catalog analysis usage sections and navigates to linked connector/splice editing", () => {
+    const catalogItemId = asCatalogItemId("CAT-ANALYSIS");
+    const state = appReducer(
+      appReducer(
+        appReducer(
+          createUiIntegrationState(),
+          appActions.upsertCatalogItem({
+            id: catalogItemId,
+            manufacturerReference: "CAT-ANALYSIS",
+            name: "Analysis sample item",
+            connectionCount: 2,
+            unitPriceExclTax: 3.5
+          })
+        ),
+        appActions.upsertConnector({
+          id: asConnectorId("C1"),
+          name: "Connector 1",
+          technicalId: "C-1",
+          cavityCount: 2,
+          catalogItemId
+        })
+      ),
+      appActions.upsertSplice({
+        id: asSpliceId("S1"),
+        name: "Splice 1",
+        technicalId: "S-1",
+        portCount: 2,
+        catalogItemId
+      })
+    );
+
+    renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    fireEvent.click(within(catalogPanel).getByText("CAT-ANALYSIS"));
+
+    const catalogAnalysisPanel = getPanelByHeading("Catalog analysis");
+    const catalogAnalysisGrid = catalogAnalysisPanel.closest(".analysis-panel-grid");
+    expect(catalogAnalysisGrid).not.toBeNull();
+    expect(within(catalogAnalysisPanel).getByText("CAT-ANALYSIS")).toBeInTheDocument();
+    expect(within(catalogAnalysisPanel).getByText("1 connectors / 1 splices")).toBeInTheDocument();
+    expect(within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Connectors" })).toBeInTheDocument();
+    expect(within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Splices" })).toBeInTheDocument();
+
+    const splicesUsageHeading = within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Splices" });
+    const splicesUsagePanel = splicesUsageHeading.closest(".panel");
+    expect(splicesUsagePanel).not.toBeNull();
+    expect(within(splicesUsagePanel as HTMLElement).getByText("Splice 1")).toBeInTheDocument();
+    fireEvent.click(within(splicesUsagePanel as HTMLElement).getByRole("button", { name: "Go to" }));
+    expect(getPanelByHeading("Edit Splice")).toBeInTheDocument();
+
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+    fireEvent.click(within(getPanelByHeading("Catalog")).getByText("CAT-ANALYSIS"));
+    const refreshedAnalysisGrid = getPanelByHeading("Catalog analysis").closest(".analysis-panel-grid");
+    expect(refreshedAnalysisGrid).not.toBeNull();
+    const connectorsUsageHeading = within(refreshedAnalysisGrid as HTMLElement).getByRole("heading", { name: "Connectors" });
+    const connectorsUsagePanel = connectorsUsageHeading.closest(".panel");
+    expect(connectorsUsagePanel).not.toBeNull();
+    expect(within(connectorsUsagePanel as HTMLElement).getByText("Connector 1")).toBeInTheDocument();
+    fireEvent.click(within(connectorsUsagePanel as HTMLElement).getByRole("button", { name: "Go to" }));
     expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
   });
 });

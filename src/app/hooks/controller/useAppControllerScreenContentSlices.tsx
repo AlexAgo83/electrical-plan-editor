@@ -259,6 +259,8 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     onPersistConnectorCalloutPosition: params.onPersistConnectorCalloutPosition,
     onPersistSpliceCalloutPosition: params.onPersistSpliceCalloutPosition,
     pngExportIncludeBackground: params.pngExportIncludeBackground,
+    canExportBomCsv: params.canExportBomCsv,
+    onExportBomCsv: params.onExportBomCsv,
     onRegenerateLayout: params.handleRegenerateLayout
   } satisfies NetworkSummaryPanelProps;
 

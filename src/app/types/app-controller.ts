@@ -56,12 +56,12 @@ export interface ValidationIssue {
   category: string;
   message: string;
   subScreen: SubScreenId;
-  selectionKind: "connector" | "splice" | "node" | "segment" | "wire";
+  selectionKind: "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
   selectionId: string;
 }
 
 export interface SelectionTarget {
-  kind: ValidationIssue["selectionKind"];
+  kind: Exclude<ValidationIssue["selectionKind"], "catalog">;
   id: string;
 }
 

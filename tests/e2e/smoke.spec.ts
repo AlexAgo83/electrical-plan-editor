@@ -113,10 +113,13 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
         .getByRole("button", { name: "Modeling", exact: true })
         .click();
     }
-    await page
+    const subScreenButton = page
       .locator(".workspace-drawer.is-open .workspace-nav-row.secondary")
-      .getByRole("button", { name: labelBySubScreen[value], exact: true })
-      .click();
+      .getByRole("button", { name: labelBySubScreen[value], exact: true });
+    await subScreenButton.scrollIntoViewIfNeeded();
+    await subScreenButton.evaluate((element) => {
+      (element as HTMLButtonElement).click();
+    });
     await ensureNavigationDrawerClosed();
   };
   const openModelingWorkspace = async () => {

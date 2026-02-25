@@ -53,6 +53,7 @@ interface UseSelectionHandlersParams {
   setValidationCategoryFilter: (value: string) => void;
   setValidationSeverityFilter: (value: ValidationSeverityFilter) => void;
   startConnectorEdit: (connector: Connector) => void;
+  startCatalogEditFromValidation?: (catalogItemId: string) => void;
   startSpliceEdit: (splice: Splice) => void;
   startNodeEdit: (node: NetworkNode) => void;
   startSegmentEdit: (segment: Segment) => void;
@@ -88,6 +89,7 @@ export function useSelectionHandlers({
   setValidationCategoryFilter,
   setValidationSeverityFilter,
   startConnectorEdit,
+  startCatalogEditFromValidation,
   startSpliceEdit,
   startNodeEdit,
   startSegmentEdit,
@@ -192,16 +194,22 @@ export function useSelectionHandlers({
     markDetailPanelsSelectionSourceAsTable();
     setActiveScreen("modeling");
     setActiveSubScreen(issue.subScreen);
+    if (issue.selectionKind === "catalog" && startCatalogEditFromValidation !== undefined) {
+      startCatalogEditFromValidation(issue.selectionId);
+      return;
+    }
     dispatchAction(
       appActions.select({
         kind: issue.selectionKind,
         id: issue.selectionId
       })
     );
-    focusSelectionOnCanvas({
-      kind: issue.selectionKind,
-      id: issue.selectionId
-    });
+    if (issue.selectionKind !== "catalog") {
+      focusSelectionOnCanvas({
+        kind: issue.selectionKind,
+        id: issue.selectionId
+      });
+    }
   }
 
   function handleOpenValidationScreen(filter: ValidationSeverityFilter): void {

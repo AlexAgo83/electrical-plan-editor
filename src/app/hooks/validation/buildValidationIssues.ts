@@ -1,4 +1,5 @@
 import type {
+  CatalogItem,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -11,6 +12,7 @@ import type {
   WireEndpoint
 } from "../../../core/entities";
 import type { AppStore } from "../../../store";
+import { isValidCatalogUrlInput } from "../../../store";
 import {
   isOrderedRouteValid,
   parseWireOccupantRef,
@@ -50,9 +52,80 @@ export function buildValidationIssues({
   spliceNodeBySpliceId
 }: BuildValidationIssuesParams): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
+  const catalogIntegrityCategory = "Catalog integrity";
 
   const expectedConnectorOccupancy = new Map<string, string>();
   const expectedSpliceOccupancy = new Map<string, string>();
+
+  const catalogItems: CatalogItem[] = state.catalogItems.allIds
+    .map((catalogItemId) => state.catalogItems.byId[catalogItemId])
+    .filter((item): item is CatalogItem => item !== undefined);
+
+  const duplicateCatalogItemsByReference = new Map<string, CatalogItem[]>();
+  for (const item of catalogItems) {
+    const normalizedRef = item.manufacturerReference.trim();
+    if (normalizedRef.length === 0) {
+      issues.push({
+        id: `catalog-empty-manufacturer-reference-${item.id}`,
+        severity: "error",
+        category: catalogIntegrityCategory,
+        message: `Catalog item '${item.id}' is missing manufacturer reference.`,
+        subScreen: "catalog",
+        selectionKind: "catalog",
+        selectionId: item.id
+      });
+    } else {
+      const duplicateBucket = duplicateCatalogItemsByReference.get(normalizedRef);
+      if (duplicateBucket === undefined) {
+        duplicateCatalogItemsByReference.set(normalizedRef, [item]);
+      } else {
+        duplicateBucket.push(item);
+      }
+    }
+
+    if (!Number.isInteger(item.connectionCount) || item.connectionCount < 1) {
+      issues.push({
+        id: `catalog-invalid-connection-count-${item.id}`,
+        severity: "error",
+        category: catalogIntegrityCategory,
+        message: `Catalog item '${item.manufacturerReference || item.id}' has invalid connection count '${String(item.connectionCount)}'.`,
+        subScreen: "catalog",
+        selectionKind: "catalog",
+        selectionId: item.id
+      });
+    }
+
+    if (item.url !== undefined && !isValidCatalogUrlInput(item.url)) {
+      issues.push({
+        id: `catalog-invalid-url-${item.id}`,
+        severity: "error",
+        category: catalogIntegrityCategory,
+        message: `Catalog item '${item.manufacturerReference || item.id}' has an invalid URL.`,
+        subScreen: "catalog",
+        selectionKind: "catalog",
+        selectionId: item.id
+      });
+    }
+  }
+  const shouldValidateMissingCatalogLinks = catalogItems.length > 0;
+
+  for (const [manufacturerReference, duplicateItems] of duplicateCatalogItemsByReference) {
+    if (duplicateItems.length < 2) {
+      continue;
+    }
+    const sortedDuplicateItems = [...duplicateItems].sort((left, right) => left.id.localeCompare(right.id));
+    for (const item of sortedDuplicateItems) {
+      issues.push({
+        id: `catalog-duplicate-manufacturer-reference-${manufacturerReference}-${item.id}`,
+        severity: "error",
+        category: catalogIntegrityCategory,
+        message: `Catalog manufacturer reference '${manufacturerReference}' is duplicated.`,
+        subScreen: "catalog",
+        selectionKind: "catalog",
+        selectionId: item.id
+      });
+    }
+  }
 
   function registerExpectedWireOccupancy(endpoint: WireEndpoint, occupantRef: string): void {
     if (endpoint.kind === "connectorCavity") {
@@ -165,6 +238,45 @@ export function buildValidationIssues({
         selectionId: connector.id
       });
     }
+
+    const connectorCatalogItemId = connector.catalogItemId;
+    if (connectorCatalogItemId === undefined) {
+      if (!shouldValidateMissingCatalogLinks) {
+        continue;
+      }
+      issues.push({
+        id: `connector-missing-catalog-link-${connector.id}`,
+        severity: "error",
+        category: catalogIntegrityCategory,
+        message: `Connector '${connector.technicalId}' is missing a catalog selection (catalogItemId).`,
+        subScreen: "connector",
+        selectionKind: "connector",
+        selectionId: connector.id
+      });
+    } else {
+      const linkedCatalogItem = state.catalogItems.byId[connectorCatalogItemId];
+      if (linkedCatalogItem === undefined) {
+        issues.push({
+          id: `connector-broken-catalog-link-${connector.id}`,
+          severity: "error",
+          category: catalogIntegrityCategory,
+          message: `Connector '${connector.technicalId}' references missing catalog item '${connectorCatalogItemId}'.`,
+          subScreen: "connector",
+          selectionKind: "connector",
+          selectionId: connector.id
+        });
+      } else if (linkedCatalogItem.connectionCount !== connector.cavityCount) {
+        issues.push({
+          id: `connector-catalog-capacity-mismatch-${connector.id}`,
+          severity: "error",
+          category: catalogIntegrityCategory,
+          message: `Connector '${connector.technicalId}' way count (${connector.cavityCount}) does not match catalog '${linkedCatalogItem.manufacturerReference}' connection count (${linkedCatalogItem.connectionCount}).`,
+          subScreen: "connector",
+          selectionKind: "connector",
+          selectionId: connector.id
+        });
+      }
+    }
   }
 
   for (const splice of splices) {
@@ -178,6 +290,45 @@ export function buildValidationIssues({
         selectionKind: "splice",
         selectionId: splice.id
       });
+    }
+
+    const spliceCatalogItemId = splice.catalogItemId;
+    if (spliceCatalogItemId === undefined) {
+      if (!shouldValidateMissingCatalogLinks) {
+        continue;
+      }
+      issues.push({
+        id: `splice-missing-catalog-link-${splice.id}`,
+        severity: "error",
+        category: catalogIntegrityCategory,
+        message: `Splice '${splice.technicalId}' is missing a catalog selection (catalogItemId).`,
+        subScreen: "splice",
+        selectionKind: "splice",
+        selectionId: splice.id
+      });
+    } else {
+      const linkedCatalogItem = state.catalogItems.byId[spliceCatalogItemId];
+      if (linkedCatalogItem === undefined) {
+        issues.push({
+          id: `splice-broken-catalog-link-${splice.id}`,
+          severity: "error",
+          category: catalogIntegrityCategory,
+          message: `Splice '${splice.technicalId}' references missing catalog item '${spliceCatalogItemId}'.`,
+          subScreen: "splice",
+          selectionKind: "splice",
+          selectionId: splice.id
+        });
+      } else if (linkedCatalogItem.connectionCount !== splice.portCount) {
+        issues.push({
+          id: `splice-catalog-capacity-mismatch-${splice.id}`,
+          severity: "error",
+          category: catalogIntegrityCategory,
+          message: `Splice '${splice.technicalId}' port count (${splice.portCount}) does not match catalog '${linkedCatalogItem.manufacturerReference}' connection count (${linkedCatalogItem.connectionCount}).`,
+          subScreen: "splice",
+          selectionKind: "splice",
+          selectionId: splice.id
+        });
+      }
     }
   }
 

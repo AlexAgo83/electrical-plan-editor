@@ -2,7 +2,7 @@
 > From version: 0.9.5
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Enable navigation from Catalog analysis usage rows to connector/splice modeling flows with reactive updates
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.

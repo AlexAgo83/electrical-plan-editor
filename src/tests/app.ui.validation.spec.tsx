@@ -1,7 +1,9 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  asCatalogItemId,
   createValidationIssueState,
+  createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
   switchScreenDrawerAware
@@ -229,5 +231,68 @@ describe("App integration UI - validation", () => {
     expect(
       within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })
     ).toHaveClass("is-active");
+  });
+
+  it("surfaces catalog integrity issues and supports go-to navigation to Catalog", () => {
+    const base = createUiIntegrationState();
+    const catalogItemId = asCatalogItemId("CAT-BROKEN");
+    const activeNetworkId = base.activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network.");
+    }
+
+    const stateWithCatalogValidationIssue = {
+      ...base,
+      catalogItems: {
+        byId: {
+          ...base.catalogItems.byId,
+          [catalogItemId]: {
+            id: catalogItemId,
+            manufacturerReference: "CAT-BROKEN",
+            connectionCount: 4,
+            url: "notaurl"
+          }
+        },
+        allIds: [...base.catalogItems.allIds, catalogItemId]
+      },
+      networkStates: {
+        ...base.networkStates,
+        [activeNetworkId]: {
+          ...base.networkStates[activeNetworkId]!,
+          catalogItems: {
+            byId: {
+              ...base.networkStates[activeNetworkId]!.catalogItems.byId,
+              [catalogItemId]: {
+                id: catalogItemId,
+                manufacturerReference: "CAT-BROKEN",
+                connectionCount: 4,
+                url: "notaurl"
+              }
+            },
+            allIds: [...base.networkStates[activeNetworkId]!.catalogItems.allIds, catalogItemId]
+          }
+        }
+      }
+    };
+
+    renderAppWithState(stateWithCatalogValidationIssue);
+    switchScreenDrawerAware("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    expect(within(validationPanel).getByRole("button", { name: /Catalog integrity/i })).toBeInTheDocument();
+
+    fireEvent.click(within(validationPanel).getByRole("button", { name: /Catalog integrity/i }));
+    const issueRow = within(validationPanel).getByText(/CAT-BROKEN.*invalid URL/i).closest("tr");
+    expect(issueRow).not.toBeNull();
+    fireEvent.click(within(issueRow as HTMLElement).getByRole("button", { name: "Go to" }));
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
+    expect(getPanelByHeading("Catalog")).toBeInTheDocument();
+    const editCatalogPanel = getPanelByHeading("Edit catalog item");
+    expect(within(editCatalogPanel).getByDisplayValue("CAT-BROKEN")).toBeInTheDocument();
   });
 });

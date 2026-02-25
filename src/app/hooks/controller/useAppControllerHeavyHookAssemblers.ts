@@ -155,7 +155,12 @@ interface UseAppControllerSelectionHandlersAssemblyParams {
   >;
   editActions: Pick<
     SelectionHandlersParams,
-    "startConnectorEdit" | "startSpliceEdit" | "startNodeEdit" | "startSegmentEdit" | "startWireEdit"
+    | "startConnectorEdit"
+    | "startCatalogEditFromValidation"
+    | "startSpliceEdit"
+    | "startNodeEdit"
+    | "startSegmentEdit"
+    | "startWireEdit"
   >;
 }
 
