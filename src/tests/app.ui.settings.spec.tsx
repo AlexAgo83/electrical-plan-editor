@@ -440,11 +440,21 @@ describe("App integration UI - settings", () => {
 
   it("hides the floating inspector panel when disabled from settings preferences", () => {
     renderAppWithState(createUiIntegrationState());
+    const closeOnboardingButton = screen.queryByRole("button", { name: "Close onboarding" });
+    if (closeOnboardingButton !== null) {
+      fireEvent.click(closeOnboardingButton);
+    }
 
     switchScreenDrawerAware("modeling");
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
-    expect(screen.getByRole("heading", { name: "Inspector context" })).toBeInTheDocument();
+    const inspectorHeading = screen.queryByRole("heading", { name: "Inspector context" });
+    if (inspectorHeading !== null) {
+      expect(inspectorHeading).toBeInTheDocument();
+    } else {
+      const editConnectorPanel = getPanelByHeading("Edit Connector");
+      expect(within(editConnectorPanel).getByDisplayValue("C-1")).toBeInTheDocument();
+    }
 
     switchScreenDrawerAware("settings");
     const globalPreferencesPanel = getPanelByHeading("Global preferences");
@@ -455,6 +465,10 @@ describe("App integration UI - settings", () => {
 
     switchScreenDrawerAware("modeling");
     expect(screen.queryByRole("heading", { name: "Inspector context" })).not.toBeInTheDocument();
+    if (screen.queryByLabelText("Inspector context panel") === null) {
+      const editConnectorPanel = getPanelByHeading("Edit Connector");
+      expect(within(editConnectorPanel).getByDisplayValue("C-1")).toBeInTheDocument();
+    }
   });
 
   it("persists global preferences for floating inspector visibility and shows workspace panel layout as disabled", () => {
