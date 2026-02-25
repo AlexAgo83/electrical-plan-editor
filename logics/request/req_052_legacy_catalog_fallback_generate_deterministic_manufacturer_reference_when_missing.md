@@ -1,7 +1,7 @@
 ## req_052_legacy_catalog_fallback_generate_deterministic_manufacturer_reference_when_missing - Legacy Catalog Fallback: Generate Deterministic Catalog Manufacturer References When Missing
 > From version: 0.9.5
-> Understanding: 99%
-> Confidence: 97%
+> Understanding: 100% (defaults clarified + backlog/task linkage added)
+> Confidence: 98% (implementation choices narrowed and decomposed)
 > Complexity: Medium
 > Theme: Improve req_051 legacy compatibility by auto-bootstrapping catalog items even when connector/splice manufacturer references are missing
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -37,13 +37,17 @@ When `manufacturerReference` is missing/empty, the fallback currently skips cata
   - deterministic across repeated loads/imports of the same payload,
   - unique within the network catalog,
   - readable enough for user cleanup/renaming later.
-- Recommended V1 pattern (deterministic placeholder):
+- V1 pattern is **mandated** (deterministic placeholder):
   - connector-derived: `LEGACY-NOREF-C-{stableSourceToken} [<count>c]`
   - splice-derived: `LEGACY-NOREF-S-{stableSourceToken} [<count>p]`
-- `stableSourceToken` may derive from (implementation choice, deterministic):
-  - legacy entity `technicalId` (preferred if present),
-  - otherwise internal entity id,
-  - optionally normalized/sluggified.
+- `stableSourceToken` derivation contract (deterministic):
+  - use legacy entity `technicalId` first (preferred when present),
+  - otherwise fall back to internal entity id,
+  - normalize via slugification for stable readability/safety.
+- `stableSourceToken` normalization contract (V1):
+  - ASCII uppercased slug
+  - allowed characters: `A-Z`, `0-9`, `-`, `_`
+  - collapse/replace unsupported characters deterministically
 - If collision still occurs, append a deterministic suffix (`-2`, `-3`, etc.) using the same collision-resolution strategy as the existing legacy bootstrap.
 
 ## C. Catalog linking and entity synchronization (high priority)
@@ -82,11 +86,20 @@ When `manufacturerReference` is missing/empty, the fallback currently skips cata
 - AC4: Repeated load/import of the same legacy payload does not create duplicate catalog items or rename churn.
 - AC5: Import fallback behavior matches load/migration fallback behavior for missing manufacturer-reference legacy entities.
 - AC6: Entities with invalid capacity still do not produce generated catalog items.
+- AC7: Generated placeholder references follow the mandated `LEGACY-NOREF-{C|S}-{token} [<count>{c|p}]` pattern with deterministic token fallback and slug normalization.
 
 # Out of scope
 - UI surfacing/badging of generated legacy placeholders.
 - Bulk user actions to rename generated placeholder references.
 - Changes to catalog-first creation UX for new entities.
+
+# Backlog
+- `logics/backlog/item_319_legacy_catalog_fallback_missing_manufacturer_reference_generated_placeholder_and_catalog_link_resolution.md`
+- `logics/backlog/item_320_regression_coverage_for_legacy_no_manufacturer_reference_catalog_fallback_load_and_import_determinism.md`
+- `logics/backlog/item_332_req_052_to_req_056_catalog_follow_ups_bundle_closure_ci_build_and_ac_traceability.md`
+
+# Orchestration task
+- `logics/tasks/task_053_req_052_to_req_056_catalog_follow_ups_bundle_orchestration_and_delivery_control.md`
 
 # References
 - `logics/request/req_051_catalog_screen_with_catalog_item_crud_navigation_integration_and_required_manufacturer_reference_connection_count.md`
