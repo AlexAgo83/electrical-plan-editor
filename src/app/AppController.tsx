@@ -2034,6 +2034,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       catalogItems={catalogItems}
       selectedCatalogItemId={selectedCatalogItemId}
       catalogFormMode={formsState.catalogFormMode}
+      isSelectedCatalogItemReferenced={
+        selectedCatalogItemId !== null &&
+        (connectors.some((connector) => connector.catalogItemId === selectedCatalogItemId) ||
+          splices.some((splice) => splice.catalogItemId === selectedCatalogItemId))
+      }
       onOpenCreateCatalogItem={catalogHandlers.resetCatalogForm}
       onEditCatalogItem={catalogHandlers.startCatalogEdit}
       onDeleteCatalogItem={catalogHandlers.handleCatalogDelete}

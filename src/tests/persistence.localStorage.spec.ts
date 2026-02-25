@@ -576,8 +576,8 @@ describe("localStorage persistence adapter", () => {
     const connector = state.connectors.byId[connectorId]!;
     const splice = state.splices.byId[spliceId]!;
     const scoped = state.networkStates[activeNetworkId]!;
-    const expectedConnectorPlaceholder = `LEGACY-NOREF-C-CONN-LEGACY-01 [${connector.cavityCount}c]`;
-    const expectedSplicePlaceholder = `LEGACY-NOREF-S-SPLICE-LEGACY-2 [${splice.portCount}p]`;
+    const expectedConnectorPlaceholder = "LEGACY-NOREF-C-CONN-LEGACY-01";
+    const expectedSplicePlaceholder = "LEGACY-NOREF-S-SPLICE-LEGACY-2";
     const legacyRawState: AppState = {
       ...state,
       connectors: {

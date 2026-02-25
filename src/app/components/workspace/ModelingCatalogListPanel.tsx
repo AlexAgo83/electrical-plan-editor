@@ -13,6 +13,7 @@ interface ModelingCatalogListPanelProps {
   catalogItems: CatalogItem[];
   selectedCatalogItemId: CatalogItemId | null;
   catalogFormMode: "idle" | "create" | "edit";
+  isSelectedCatalogItemReferenced: boolean;
   onOpenCreateCatalogItem: () => void;
   onEditCatalogItem: (item: CatalogItem) => void;
   onDeleteCatalogItem: (catalogItemId: CatalogItemId) => void;
@@ -24,6 +25,7 @@ export function ModelingCatalogListPanel({
   catalogItems,
   selectedCatalogItemId,
   catalogFormMode,
+  isSelectedCatalogItemReferenced,
   onOpenCreateCatalogItem,
   onEditCatalogItem,
   onDeleteCatalogItem,
@@ -207,7 +209,7 @@ export function ModelingCatalogListPanel({
           type="button"
           className="modeling-list-action-delete button-with-icon"
           onClick={() => selectedCatalogItem !== null && onDeleteCatalogItem(selectedCatalogItem.id)}
-          disabled={selectedCatalogItem === null || catalogFormMode === "create"}
+          disabled={selectedCatalogItem === null || catalogFormMode === "create" || isSelectedCatalogItemReferenced}
         >
           <span className="action-button-icon is-delete" aria-hidden="true" />
           Delete

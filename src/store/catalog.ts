@@ -117,11 +117,16 @@ function buildMissingManufacturerReferencePlaceholder(
   sourceToken: string,
   connectionCount: number
 ): string {
-  return `LEGACY-NOREF-${kind === "connector" ? "C" : "S"}-${sourceToken} [${connectionCount}${kind === "connector" ? "c" : "p"}]`;
+  void connectionCount;
+  return `LEGACY-NOREF-${kind === "connector" ? "C" : "S"}-${sourceToken}`;
 }
 
 function legacySuffix(kind: LegacySourceKind, connectionCount: number): string {
   return ` [legacy-${connectionCount}${kind === "connector" ? "c" : "p"}]`;
+}
+
+function legacyNoRefCollisionSuffix(kind: LegacySourceKind, connectionCount: number): string {
+  return `-LEGACY-${connectionCount}${kind === "connector" ? "C" : "P"}`;
 }
 
 function resolveUniqueManufacturerReference(base: string, taken: Set<string>, preferredSuffix: string): string {
@@ -254,10 +259,13 @@ export function bootstrapCatalogForScopedState(scoped: NetworkScopedState): Netw
     }
 
     if (exactExisting !== undefined && exactExisting.connectionCount !== connectionCount) {
+      const preferredSuffix = manufacturerReference.startsWith("LEGACY-NOREF-")
+        ? legacyNoRefCollisionSuffix(sourceKind, connectionCount)
+        : legacySuffix(sourceKind, connectionCount);
       const uniqueManufacturerReference = resolveUniqueManufacturerReference(
         manufacturerReference,
         takenRefs,
-        legacySuffix(sourceKind, connectionCount)
+        preferredSuffix
       );
       const id = buildStableLegacyCatalogId(sourceKind, sourceId, uniqueManufacturerReference, connectionCount, takenCatalogIds);
       const item: CatalogItem = {

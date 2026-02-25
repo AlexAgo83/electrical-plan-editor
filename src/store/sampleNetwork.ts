@@ -1,4 +1,5 @@
 import type {
+  CatalogItemId,
   ConnectorId,
   NetworkId,
   NodeId,
@@ -13,6 +14,10 @@ import { createInitialState, type AppState } from "./types";
 
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
+}
+
+function asCatalogItemId(value: string): CatalogItemId {
+  return value as CatalogItemId;
 }
 
 function asSpliceId(value: string): SpliceId {
@@ -371,6 +376,19 @@ export function createSampleNetworkState(): AppState {
 export function createValidationIssuesSampleNetworkState(): AppState {
   const base = createSampleNetworkState();
   const activeNetworkId = base.activeNetworkId as NetworkId;
+  const connectorSrc = base.connectors.byId[asConnectorId("C-SRC")];
+  const connectorDst1 = base.connectors.byId[asConnectorId("C-DST-1")];
+  const connectorDst2 = base.connectors.byId[asConnectorId("C-DST-2")];
+  const spliceJ1 = base.splices.byId[asSpliceId("S-J1")];
+  const spliceJ2 = base.splices.byId[asSpliceId("S-J2")];
+  if (connectorSrc === undefined || connectorDst1 === undefined || connectorDst2 === undefined || spliceJ1 === undefined || spliceJ2 === undefined) {
+    throw new Error("Expected validation sample connectors/splices in base sample.");
+  }
+
+  const catalogPowerSrc12w = asCatalogItemId("CAT-VALID-SRC-12W");
+  const catalogActuator8w = asCatalogItemId("CAT-VALID-ACT-8W");
+  const catalogMainJunction10p = asCatalogItemId("CAT-VALID-J1-10P");
+  const catalogBranchJunction8p = asCatalogItemId("CAT-VALID-J2-8P");
 
   return [
     appActions.updateNetwork(
@@ -379,6 +397,54 @@ export function createValidationIssuesSampleNetworkState(): AppState {
       "NET-VALIDATION-SAMPLE",
       "2026-02-22T00:00:00.000Z"
     ),
+    appActions.upsertCatalogItem({
+      id: catalogPowerSrc12w,
+      manufacturerReference: "VAL-CAT-SRC-12W",
+      name: "Validation source connector 12-way",
+      connectionCount: 12,
+      unitPriceExclTax: 12
+    }),
+    appActions.upsertCatalogItem({
+      id: catalogActuator8w,
+      manufacturerReference: "VAL-CAT-ACT-8W",
+      name: "Validation actuator connector 8-way",
+      connectionCount: 8,
+      unitPriceExclTax: 8.5
+    }),
+    appActions.upsertCatalogItem({
+      id: catalogMainJunction10p,
+      manufacturerReference: "VAL-CAT-J1-10P",
+      name: "Validation main junction 10-port",
+      connectionCount: 10,
+      unitPriceExclTax: 6.25
+    }),
+    appActions.upsertCatalogItem({
+      id: catalogBranchJunction8p,
+      manufacturerReference: "VAL-CAT-J2-8P",
+      name: "Validation branch junction 8-port",
+      connectionCount: 8,
+      unitPriceExclTax: 5.5
+    }),
+    appActions.upsertConnector({
+      ...connectorSrc,
+      catalogItemId: catalogPowerSrc12w
+    }),
+    appActions.upsertConnector({
+      ...connectorDst1,
+      catalogItemId: catalogActuator8w
+    }),
+    appActions.upsertConnector({
+      ...connectorDst2,
+      catalogItemId: catalogActuator8w
+    }),
+    appActions.upsertSplice({
+      ...spliceJ1,
+      catalogItemId: catalogMainJunction10p
+    }),
+    appActions.upsertSplice({
+      ...spliceJ2,
+      catalogItemId: catalogBranchJunction8p
+    }),
     appActions.saveWire({
       id: asWireId("W-VAL-EX-001"),
       name: "Validation Extra Feed 1",

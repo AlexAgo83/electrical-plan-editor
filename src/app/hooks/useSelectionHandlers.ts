@@ -198,12 +198,42 @@ export function useSelectionHandlers({
       startCatalogEditFromValidation(issue.selectionId);
       return;
     }
-    dispatchAction(
-      appActions.select({
-        kind: issue.selectionKind,
-        id: issue.selectionId
-      })
-    );
+    if (issue.selectionKind === "connector") {
+      const connector = state.connectors.byId[issue.selectionId as ConnectorId];
+      if (connector !== undefined) {
+        startConnectorEdit(connector);
+      } else {
+        dispatchAction(appActions.select({ kind: "connector", id: issue.selectionId }));
+      }
+    } else if (issue.selectionKind === "splice") {
+      const splice = state.splices.byId[issue.selectionId as SpliceId];
+      if (splice !== undefined) {
+        startSpliceEdit(splice);
+      } else {
+        dispatchAction(appActions.select({ kind: "splice", id: issue.selectionId }));
+      }
+    } else if (issue.selectionKind === "node") {
+      const node = state.nodes.byId[issue.selectionId as NodeId];
+      if (node !== undefined) {
+        startNodeEdit(node);
+      } else {
+        dispatchAction(appActions.select({ kind: "node", id: issue.selectionId }));
+      }
+    } else if (issue.selectionKind === "segment") {
+      const segment = state.segments.byId[issue.selectionId as SegmentId];
+      if (segment !== undefined) {
+        startSegmentEdit(segment);
+      } else {
+        dispatchAction(appActions.select({ kind: "segment", id: issue.selectionId }));
+      }
+    } else {
+      const wire = state.wires.byId[issue.selectionId as WireId];
+      if (wire !== undefined) {
+        startWireEdit(wire);
+      } else {
+        dispatchAction(appActions.select({ kind: "wire", id: issue.selectionId }));
+      }
+    }
     if (issue.selectionKind !== "catalog") {
       focusSelectionOnCanvas({
         kind: issue.selectionKind,
