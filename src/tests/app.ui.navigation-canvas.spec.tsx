@@ -150,6 +150,16 @@ describe("App integration UI - navigation and canvas", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-segment").length).toBe(2);
   });
 
+  it("exposes the 2D diagram as an interactive surface and not as a static image role", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("analysis");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const diagram = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    expect(diagram.tagName.toLowerCase()).toBe("svg");
+    expect(diagram).not.toHaveAttribute("role", "img");
+  });
+
   it("hides default sub-network toggle and supports enable-all restore for tagged subnetworks", () => {
     const stateWithTags = appReducer(
       appReducer(
@@ -312,6 +322,22 @@ describe("App integration UI - navigation and canvas", () => {
 
     fireEvent.keyDown(connectorNode as Element, { key: "Enter" });
     expect(connectorNode).toHaveClass("is-selected");
+  });
+
+  it("supports keyboard activation for 2D segment selection in analysis", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("analysis");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const segmentHitbox = within(networkSummaryPanel).getByRole("button", { name: "Select segment SEG-A" });
+    expect(segmentHitbox).toHaveAttribute("tabindex", "0");
+
+    fireEvent.keyDown(segmentHitbox, { key: "Enter" });
+
+    const selectedSegmentLabel = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
+      (label) => label.textContent === "SEG-A"
+    );
+    expect(selectedSegmentLabel?.closest("g.network-entity-group")?.querySelector(".network-segment")).toHaveClass("is-selected");
   });
 
   it("clears selection when clicking empty 2D canvas in select mode", () => {

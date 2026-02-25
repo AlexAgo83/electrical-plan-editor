@@ -1175,6 +1175,16 @@ export function NetworkSummaryPanel({
     handleNetworkNodeActivate(nodeId);
   }
 
+  function handleNetworkSegmentKeyDown(event: ReactKeyboardEvent<SVGLineElement>, segmentId: SegmentId): void {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    handleNetworkSegmentClick(segmentId);
+  }
+
   const renderedCableCallouts = orderedCableCallouts.map((callout) => {
     const layout = buildCalloutLayoutMetrics(callout.title, "", callout.groups, calloutTextSize);
     const lineEnd = getCalloutFrameEdgePoint(
@@ -1289,7 +1299,6 @@ export function NetworkSummaryPanel({
             <svg
               ref={networkSvgRef}
               className={`network-svg network-canvas--label-stroke-${labelStrokeMode} network-canvas--label-size-${labelSizeMode} network-callout-text-size-${calloutTextSize}`}
-              role="img"
               aria-label="2D network diagram"
               viewBox={`0 0 ${networkViewWidth} ${networkViewHeight}`}
               onMouseDown={handleNetworkCanvasMouseDown}
@@ -1363,10 +1372,15 @@ export function NetworkSummaryPanel({
                         y1={nodeAPosition.y}
                         x2={nodeBPosition.x}
                         y2={nodeBPosition.y}
+                        role="button"
+                        tabIndex={0}
+                        focusable="true"
+                        aria-label={`Select segment ${segment.id}`}
                         onClick={(event) => {
                           event.stopPropagation();
                           handleNetworkSegmentClick(segment.id);
                         }}
+                        onKeyDown={(event) => handleNetworkSegmentKeyDown(event, segment.id)}
                       />
                       <g
                         className="network-segment-label-anchor"

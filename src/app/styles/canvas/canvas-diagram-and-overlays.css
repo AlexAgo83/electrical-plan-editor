@@ -201,6 +201,12 @@
   cursor: pointer;
 }
 
+.network-segment-hitbox:focus-visible {
+  stroke: var(--network-selection-focus-color, var(--network-selection-color, #0f6cb8));
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+
 .network-segment-label {
   font-size: 10px;
   fill: var(--network-segment-label-color, #38566a);
