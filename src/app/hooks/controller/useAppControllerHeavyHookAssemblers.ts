@@ -142,7 +142,7 @@ interface UseAppControllerSelectionHandlersAssemblyParams {
     | "selectedSegment"
     | "selectedWire"
   >;
-  navigation: Pick<SelectionHandlersParams, "setActiveScreen" | "setActiveSubScreen">;
+  navigation: Pick<SelectionHandlersParams, "setActiveScreen" | "setActiveSubScreen" | "markDetailPanelsSelectionSourceAsTable">;
   validation: Pick<
     SelectionHandlersParams,
     | "orderedValidationIssues"

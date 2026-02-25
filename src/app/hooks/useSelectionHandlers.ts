@@ -44,6 +44,7 @@ interface UseSelectionHandlersParams {
   selectedWire: Wire | null;
   setActiveScreen: (screen: "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings") => void;
   setActiveSubScreen: (screen: SubScreenId) => void;
+  markDetailPanelsSelectionSourceAsTable: () => void;
   orderedValidationIssues: ValidationIssue[];
   visibleValidationIssues: ValidationIssue[];
   getFocusedValidationIssueByCursor: () => ValidationIssue | null;
@@ -78,6 +79,7 @@ export function useSelectionHandlers({
   selectedWire,
   setActiveScreen,
   setActiveSubScreen,
+  markDetailPanelsSelectionSourceAsTable,
   orderedValidationIssues,
   visibleValidationIssues,
   getFocusedValidationIssueByCursor,
@@ -187,6 +189,7 @@ export function useSelectionHandlers({
   }
 
   function handleValidationIssueGoTo(issue: ValidationIssue): void {
+    markDetailPanelsSelectionSourceAsTable();
     setActiveScreen("modeling");
     setActiveSubScreen(issue.subScreen);
     dispatchAction(

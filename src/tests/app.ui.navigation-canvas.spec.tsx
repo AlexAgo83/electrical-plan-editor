@@ -260,6 +260,7 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.click(connectorNode as Element);
 
     expect(connectorNode).toHaveClass("is-selected");
+    expect(getPanelByHeading("Connector analysis")).toBeInTheDocument();
   });
 
   it("keeps analysis and form panels hidden for CAD-only selection until a table row is selected", () => {

@@ -1442,7 +1442,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     navigation: {
       setActiveScreen,
-      setActiveSubScreen
+      setActiveSubScreen,
+      markDetailPanelsSelectionSourceAsTable: () => setDetailPanelsSelectionSource("table")
     },
     validation: {
       orderedValidationIssues,
@@ -1697,6 +1698,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const hasInspectableSelection = selected !== null && selectedSubScreen !== null && selectedSubScreen !== "catalog";
   const hasTableInspectableSelection = hasInspectableSelection && detailPanelsSelectionSource === "table";
   const hasTableSelectionForActiveSubScreen = hasTableInspectableSelection && selectedSubScreen === activeSubScreen;
+  const hasInspectableSelectionForActiveSubScreen = hasInspectableSelection && selectedSubScreen === activeSubScreen;
   const hasActiveEntityForm =
     formsState.catalogFormMode !== "idle" ||
     formsState.connectorFormMode !== "idle" ||
@@ -2174,7 +2176,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       ? modelingFormsColumnContentForSubScreen
       : null;
   const analysisWorkspaceContentForLayout =
-    isCatalogSubScreen ? null : hasTableSelectionForActiveSubScreen ? analysisWorkspaceContentForSubScreen : null;
+    isCatalogSubScreen ? null : hasInspectableSelectionForActiveSubScreen ? analysisWorkspaceContentForSubScreen : null;
 
   return (
     <>
