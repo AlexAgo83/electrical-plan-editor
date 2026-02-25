@@ -80,7 +80,7 @@ export function NetworkScopeWorkspaceContent({
   const isCreateMode = networkFormMode === "create";
   const isEditMode = networkFormMode === "edit";
   const isFormOpen = isCreateMode || isEditMode;
-  const [focusedNetworkId, setFocusedNetworkId] = useState<NetworkId | null>(activeNetworkId);
+  const [focusedNetworkId, setFocusedNetworkId] = useState<NetworkId | null>(null);
   const [networkFilterField, setNetworkFilterField] = useState<NetworkScopeFilterField>("any");
   const [networkFilterQuery, setNetworkFilterQuery] = useState("");
   const [networkTableSort, setNetworkTableSort] = useState<{ field: NetworkScopeTableSortField; direction: "asc" | "desc" }>({
@@ -105,6 +105,7 @@ export function NetworkScopeWorkspaceContent({
     [activeNetworkId, networkTableSort, networks]
   );
   const focusedNetwork = focusedNetworkId === null ? null : networks.find((network) => network.id === focusedNetworkId) ?? null;
+  const showNetworkFormPanel = isCreateMode || (isEditMode && focusedNetwork !== null);
   const focusedNetworkCounts =
     focusedNetworkId === null ? null : networkEntityCountsById[focusedNetworkId] ?? null;
   const networkSortIndicator = (field: NetworkScopeTableSortField): "asc" | "desc" | null => {
@@ -424,9 +425,9 @@ export function NetworkScopeWorkspaceContent({
         </div>
       </section>
 
-      <section className="panel network-form-panel">
+      <section className="panel network-form-panel" hidden={!showNetworkFormPanel}>
         <header className="network-form-header">
-          <h2>{isCreateMode ? "Create network" : isEditMode ? "Edit network" : "Network form"}</h2>
+          <h2>{isCreateMode ? "Create network" : "Edit network"}</h2>
           <span
             className={
               isCreateMode
@@ -436,7 +437,7 @@ export function NetworkScopeWorkspaceContent({
                   : "network-form-mode-chip"
             }
           >
-            {isCreateMode ? "Create mode" : isEditMode ? "Edit mode" : "Idle"}
+            {isCreateMode ? "Create mode" : "Edit mode"}
           </span>
         </header>
         <section className="network-scope-indicators network-scope-indicators-form" aria-label="Focused network entity counters">
@@ -447,17 +448,7 @@ export function NetworkScopeWorkspaceContent({
             </article>
           ))}
         </section>
-        {!isFormOpen ? (
-          <>
-            <p className="empty-copy">Choose Create or Edit from the network scope panel to open this form.</p>
-            <div className="row-actions compact idle-panel-actions">
-              <button type="button" className="button-with-icon" onClick={handleOpenCreateNetworkForm}>
-                <span className="action-button-icon is-new" aria-hidden="true" />
-                Create
-              </button>
-            </div>
-          </>
-        ) : (
+        {showNetworkFormPanel ? (
           <form className="settings-grid network-form-grid" onSubmit={handleSubmitNetworkForm}>
             <label className="stack-label">
               <span className="network-form-label">Network name</span>
@@ -530,7 +521,7 @@ export function NetworkScopeWorkspaceContent({
               </button>
             </div>
           </form>
-        )}
+        ) : null}
       </section>
 
     </section>

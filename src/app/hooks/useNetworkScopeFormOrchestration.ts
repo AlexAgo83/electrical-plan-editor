@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, type Dispatch, type FormEvent, type SetStateAction } from "react";
+import { useCallback, useEffect, type Dispatch, type FormEvent, type SetStateAction } from "react";
 import type { Network, NetworkId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import type { NetworkFocusRequest, NetworkFormMode } from "./useNetworkScopeFormState";
@@ -40,8 +40,8 @@ export function useNetworkScopeFormOrchestration({
   handleCreateNetwork,
   handleUpdateActiveNetwork
 }: UseNetworkScopeFormOrchestrationParams) {
-  const hasAutoOpenedNetworkFormRef = useRef(false);
-
+  void activeNetworkId;
+  void isNetworkScopeScreen;
   const handleOpenCreateNetworkForm = useCallback(() => {
     setNetworkFormMode("create");
     setNetworkFormTargetId(null);
@@ -121,19 +121,6 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkTechnicalId(targetNetwork.technicalId);
     setNewNetworkDescription(targetNetwork.description ?? "");
   }, [networkFormMode, networkFormTargetId, networksById, setNetworkFormMode, setNetworkFormTargetId, setNewNetworkDescription, setNewNetworkName, setNewNetworkTechnicalId]);
-
-  useEffect(() => {
-    if (!isNetworkScopeScreen || hasAutoOpenedNetworkFormRef.current || networkFormMode === "create") {
-      return;
-    }
-
-    if (activeNetworkId === null) {
-      return;
-    }
-
-    handleOpenEditNetworkForm(activeNetworkId);
-    hasAutoOpenedNetworkFormRef.current = true;
-  }, [activeNetworkId, handleOpenEditNetworkForm, isNetworkScopeScreen, networkFormMode]);
 
   return {
     handleOpenCreateNetworkForm,
