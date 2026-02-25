@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { ConnectorId, NodeId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NodeId } from "../core/entities";
 import { APP_SCHEMA_VERSION } from "../core/schema";
 import {
   PERSISTED_STATE_PAYLOAD_KIND,
@@ -48,17 +48,28 @@ function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
 }
 
+function asCatalogItemId(value: string): CatalogItemId {
+  return value as CatalogItemId;
+}
+
 function asNodeId(value: string): NodeId {
   return value as NodeId;
 }
 
 function createSampleState(): AppState {
   return [
+    appActions.upsertCatalogItem({
+      id: asCatalogItemId("catalog-c1"),
+      manufacturerReference: "CONN-TEST-2W",
+      connectionCount: 2
+    }),
     appActions.upsertConnector({
       id: asConnectorId("C1"),
       name: "Connector 1",
       technicalId: "C-1",
-      cavityCount: 2
+      cavityCount: 2,
+      manufacturerReference: "CONN-TEST-2W",
+      catalogItemId: asCatalogItemId("catalog-c1")
     }),
     appActions.occupyConnectorCavity(asConnectorId("C1"), 1, "wire:W1:A")
   ].reduce(appReducer, createInitialState());
@@ -114,7 +125,10 @@ describe("migratePersistedPayload", () => {
     expect(result?.snapshot.payloadKind).toBe(PERSISTED_STATE_PAYLOAD_KIND);
     expect(result?.snapshot.createdAtIso).toBe(nowIso);
     expect(result?.snapshot.updatedAtIso).toBe(nowIso);
-    expect(result?.snapshot.state.connectors).toEqual(legacyState.connectors);
+    expect(result?.snapshot.state.connectors.allIds).toEqual(legacyState.connectors.allIds);
+    const migratedConnector = result?.snapshot.state.connectors.byId[asConnectorId("C1")];
+    expect(migratedConnector?.manufacturerReference).toBe("CONN-TEST-2W");
+    expect(migratedConnector?.catalogItemId).toBeDefined();
     expect(result?.snapshot.state.splices).toEqual(legacyState.splices);
     expect(result?.snapshot.state.nodes).toEqual(legacyState.nodes);
     expect(result?.snapshot.state.segments).toEqual(legacyState.segments);
@@ -544,6 +558,114 @@ describe("localStorage persistence adapter", () => {
     expect(loadedScoped?.splices.byId[spliceId]?.manufacturerReference).toBe("AMP/SEAL-42");
   });
 
+  it("bootstraps deterministic legacy placeholders for missing connector/splice manufacturer references", () => {
+    const state = createSampleNetworkState();
+    const activeNetworkId = state.activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network.");
+    }
+    const connectorId = state.connectors.allIds[0];
+    const spliceId = state.splices.allIds[0];
+    expect(connectorId).toBeDefined();
+    expect(spliceId).toBeDefined();
+    if (connectorId === undefined || spliceId === undefined) {
+      throw new Error("Expected sample connector/splice.");
+    }
+
+    const connector = state.connectors.byId[connectorId]!;
+    const splice = state.splices.byId[spliceId]!;
+    const scoped = state.networkStates[activeNetworkId]!;
+    const expectedConnectorPlaceholder = `LEGACY-NOREF-C-CONN-LEGACY-01 [${connector.cavityCount}c]`;
+    const expectedSplicePlaceholder = `LEGACY-NOREF-S-SPLICE-LEGACY-2 [${splice.portCount}p]`;
+    const legacyRawState: AppState = {
+      ...state,
+      connectors: {
+        ...state.connectors,
+        byId: {
+          ...state.connectors.byId,
+          [connectorId]: {
+            ...connector,
+            technicalId: "Conn / Legacy 01",
+            manufacturerReference: " ",
+            catalogItemId: undefined
+          }
+        }
+      },
+      splices: {
+        ...state.splices,
+        byId: {
+          ...state.splices.byId,
+          [spliceId]: {
+            ...splice,
+            technicalId: "splice:legacy?2",
+            manufacturerReference: "",
+            catalogItemId: undefined
+          }
+        }
+      },
+      networkStates: {
+        ...state.networkStates,
+        [activeNetworkId]: {
+          ...scoped,
+          connectors: {
+            ...scoped.connectors,
+            byId: {
+              ...scoped.connectors.byId,
+              [connectorId]: {
+                ...scoped.connectors.byId[connectorId]!,
+                technicalId: "Conn / Legacy 01",
+                manufacturerReference: " ",
+                catalogItemId: undefined
+              }
+            }
+          },
+          splices: {
+            ...scoped.splices,
+            byId: {
+              ...scoped.splices.byId,
+              [spliceId]: {
+                ...scoped.splices.byId[spliceId]!,
+                technicalId: "splice:legacy?2",
+                manufacturerReference: "",
+                catalogItemId: undefined
+              }
+            }
+          },
+          catalogItems: { byId: {} as typeof scoped.catalogItems.byId, allIds: [] }
+        }
+      },
+      catalogItems: { byId: {} as typeof state.catalogItems.byId, allIds: [] }
+    };
+
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        schemaVersion: APP_SCHEMA_VERSION,
+        createdAtIso: "2026-02-01T08:00:00.000Z",
+        updatedAtIso: "2026-02-01T09:00:00.000Z",
+        state: legacyRawState
+      } satisfies PersistedStateSnapshotV1)
+    });
+
+    const loaded = loadState(storage, () => "2026-02-22T09:00:00.000Z");
+    const loadedConnector = loaded.connectors.byId[connectorId];
+    const loadedSplice = loaded.splices.byId[spliceId];
+    expect(loadedConnector?.manufacturerReference).toBe(expectedConnectorPlaceholder);
+    expect(loadedSplice?.manufacturerReference).toBe(expectedSplicePlaceholder);
+    expect(loadedConnector?.catalogItemId).toBeDefined();
+    expect(loadedSplice?.catalogItemId).toBeDefined();
+    if (loadedConnector?.catalogItemId !== undefined) {
+      expect(loaded.catalogItems.byId[loadedConnector.catalogItemId]?.manufacturerReference).toBe(
+        expectedConnectorPlaceholder
+      );
+    }
+    if (loadedSplice?.catalogItemId !== undefined) {
+      expect(loaded.catalogItems.byId[loadedSplice.catalogItemId]?.manufacturerReference).toBe(
+        expectedSplicePlaceholder
+      );
+    }
+  });
+
   it("migrates persisted schema payloads missing layout positions", () => {
     const state = createSampleState();
     const nowIso = "2026-02-20T11:00:00.000Z";
@@ -605,7 +727,9 @@ describe("localStorage persistence adapter", () => {
     const loaded = loadState(storage, () => nowIso);
     const rewritten = storage.read(STORAGE_KEY);
 
-    expect(loaded.connectors).toEqual(legacyState.connectors);
+    expect(loaded.connectors.allIds).toEqual(legacyState.connectors.allIds);
+    expect(loaded.connectors.byId[asConnectorId("C1")]?.manufacturerReference).toBe("CONN-TEST-2W");
+    expect(loaded.connectors.byId[asConnectorId("C1")]?.catalogItemId).toBeDefined();
     expect(loaded.splices).toEqual(legacyState.splices);
     expect(loaded.nodes).toEqual(legacyState.nodes);
     expect(loaded.segments).toEqual(legacyState.segments);

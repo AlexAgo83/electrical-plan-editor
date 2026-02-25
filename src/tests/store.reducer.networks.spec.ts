@@ -255,4 +255,84 @@ describe("appReducer network lifecycle", () => {
     expect(attemptedWrite.connectors.byId[asConnectorId("C-NONE")]).toBeUndefined();
     expect(attemptedWrite.ui.lastError).toBe("No active network selected. Create or select a network first.");
   });
+
+  it("seeds exactly three default catalog items when creating a new network", () => {
+    const created = appReducer(
+      createInitialState(),
+      appActions.createNetwork({
+        id: asNetworkId("net-seeded"),
+        name: "Seeded network",
+        technicalId: "NET-SEEDED",
+        createdAt: "2026-03-01T10:00:00.000Z",
+        updatedAt: "2026-03-01T10:00:00.000Z"
+      })
+    );
+
+    expect(created.activeNetworkId).toBe(asNetworkId("net-seeded"));
+    expect(created.catalogItems.allIds).toHaveLength(3);
+
+    const refs = created.catalogItems.allIds
+      .map((id) => created.catalogItems.byId[id]?.manufacturerReference)
+      .filter((value): value is string => typeof value === "string");
+    expect(refs).toEqual(["CAT-2W-STD", "CAT-6P-STD", "CAT-8W-STD"]);
+
+    const findCatalogItemByRef = (manufacturerReference: string) =>
+      created.catalogItems.allIds
+        .map((id) => created.catalogItems.byId[id])
+        .find((item) => item?.manufacturerReference === manufacturerReference);
+
+    expect(findCatalogItemByRef("CAT-2W-STD")?.name).toBe("2-way standard connector");
+    expect(findCatalogItemByRef("CAT-2W-STD")?.unitPriceExclTax).toBe(5);
+    expect(findCatalogItemByRef("CAT-6P-STD")?.name).toBe("6-port standard splice");
+    expect(findCatalogItemByRef("CAT-6P-STD")?.unitPriceExclTax).toBe(8.5);
+    expect(findCatalogItemByRef("CAT-8W-STD")?.name).toBe("8-way standard connector");
+    expect(findCatalogItemByRef("CAT-8W-STD")?.unitPriceExclTax).toBe(12);
+  });
+
+  it("does not inject default catalog seeds on network import", () => {
+    const importedNetworkId = asNetworkId("net-import");
+    const importedState = {
+      ...createInitialState(),
+      networks: {
+        byId: {} as ReturnType<typeof createInitialState>["networks"]["byId"],
+        allIds: [] as NetworkId[]
+      },
+      activeNetworkId: null,
+      networkStates: {} as ReturnType<typeof createInitialState>["networkStates"]
+    };
+    const importedScoped = importedState.networkStates;
+    void importedScoped;
+
+    const result = appReducer(
+      createInitialState(),
+      appActions.importNetworks(
+        [
+          {
+            id: importedNetworkId,
+            name: "Imported",
+            technicalId: "NET-IMPORTED",
+            createdAt: "2026-03-02T10:00:00.000Z",
+            updatedAt: "2026-03-02T10:00:00.000Z"
+          }
+        ],
+        {
+          [importedNetworkId]: {
+            catalogItems: { byId: {} as ReturnType<typeof createInitialState>["catalogItems"]["byId"], allIds: [] },
+            connectors: { byId: {} as ReturnType<typeof createInitialState>["connectors"]["byId"], allIds: [] },
+            splices: { byId: {} as ReturnType<typeof createInitialState>["splices"]["byId"], allIds: [] },
+            nodes: { byId: {} as ReturnType<typeof createInitialState>["nodes"]["byId"], allIds: [] },
+            segments: { byId: {} as ReturnType<typeof createInitialState>["segments"]["byId"], allIds: [] },
+            wires: { byId: {} as ReturnType<typeof createInitialState>["wires"]["byId"], allIds: [] },
+            nodePositions: {} as ReturnType<typeof createInitialState>["nodePositions"],
+            connectorCavityOccupancy: {} as ReturnType<typeof createInitialState>["connectorCavityOccupancy"],
+            splicePortOccupancy: {} as ReturnType<typeof createInitialState>["splicePortOccupancy"]
+          }
+        },
+        true
+      )
+    );
+
+    expect(result.activeNetworkId).toBe(importedNetworkId);
+    expect(result.catalogItems.allIds).toEqual([]);
+  });
 });

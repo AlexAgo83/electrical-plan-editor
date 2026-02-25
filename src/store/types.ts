@@ -134,6 +134,40 @@ export function createEmptyNetworkScopedState(): NetworkScopedState {
   };
 }
 
+export function createSeededNetworkScopedState(): NetworkScopedState {
+  const scoped = createEmptyNetworkScopedState();
+  const seededCatalogItems: CatalogItem[] = [
+    {
+      id: "catalog-seed-2w-std" as CatalogItemId,
+      manufacturerReference: "CAT-2W-STD",
+      name: "2-way standard connector",
+      connectionCount: 2,
+      unitPriceExclTax: 5.0
+    },
+    {
+      id: "catalog-seed-6p-std" as CatalogItemId,
+      manufacturerReference: "CAT-6P-STD",
+      name: "6-port standard splice",
+      connectionCount: 6,
+      unitPriceExclTax: 8.5
+    },
+    {
+      id: "catalog-seed-8w-std" as CatalogItemId,
+      manufacturerReference: "CAT-8W-STD",
+      name: "8-way standard connector",
+      connectionCount: 8,
+      unitPriceExclTax: 12.0
+    }
+  ];
+
+  for (const item of seededCatalogItems) {
+    scoped.catalogItems.byId[item.id] = item;
+    scoped.catalogItems.allIds.push(item.id);
+  }
+
+  return scoped;
+}
+
 export function cloneNetworkSummaryViewState(
   viewState: NetworkSummaryViewState | undefined
 ): NetworkSummaryViewState | undefined {

@@ -231,8 +231,75 @@ describe("network file portability", () => {
     expect(parsed.error).toBeNull();
     expect(parsed.payload).not.toBeNull();
     const normalizedState = parsed.payload?.networks[0]?.state;
-    expect(normalizedState?.connectors.byId[asConnectorId(firstConnectorId)]?.manufacturerReference).toBe("A".repeat(120));
-    expect(normalizedState?.splices.byId[asSpliceId(firstSpliceId)]?.manufacturerReference).toBeUndefined();
+    const normalizedConnector = normalizedState?.connectors.byId[asConnectorId(firstConnectorId)];
+    const normalizedSplice = normalizedState?.splices.byId[asSpliceId(firstSpliceId)];
+    expect(normalizedConnector?.catalogItemId).toBeDefined();
+    expect(normalizedSplice?.catalogItemId).toBeDefined();
+    if (normalizedConnector?.catalogItemId !== undefined) {
+      expect(normalizedConnector.manufacturerReference).toBe(
+        normalizedState?.catalogItems.byId[normalizedConnector.catalogItemId]?.manufacturerReference
+      );
+    }
+    if (normalizedSplice?.catalogItemId !== undefined) {
+      expect(normalizedSplice.manufacturerReference).toBe(
+        normalizedState?.catalogItems.byId[normalizedSplice.catalogItemId]?.manufacturerReference
+      );
+    }
+  });
+
+  it("bootstraps deterministic placeholder catalog refs on import when connector/splice manufacturer refs are missing", () => {
+    const seeded = createSampleNetworkState();
+    const payload = buildNetworkFilePayload(seeded, "active", [], "2026-02-21T10:19:00.000Z");
+    const rawPayload = JSON.parse(serializeNetworkFilePayload(payload)) as Record<string, unknown>;
+    const rawBundles = rawPayload.networks as Array<Record<string, unknown>>;
+    const rawState = rawBundles[0]?.state as Record<string, unknown>;
+    const rawConnectors = rawState.connectors as { byId: Record<string, Record<string, unknown>>; allIds: string[] };
+    const rawSplices = rawState.splices as { byId: Record<string, Record<string, unknown>>; allIds: string[] };
+    const rawCatalogItems = rawState.catalogItems as { byId: Record<string, Record<string, unknown>>; allIds: string[] };
+    const firstConnectorId = rawConnectors.allIds[0];
+    const firstSpliceId = rawSplices.allIds[0];
+    expect(firstConnectorId).toBeDefined();
+    expect(firstSpliceId).toBeDefined();
+    if (firstConnectorId === undefined || firstSpliceId === undefined) {
+      throw new Error("Expected exported sample payload to include connectors and splices.");
+    }
+
+    const connectorCount = Number(rawConnectors.byId[firstConnectorId]?.cavityCount);
+    const spliceCount = Number(rawSplices.byId[firstSpliceId]?.portCount);
+    rawConnectors.byId[firstConnectorId] = {
+      ...rawConnectors.byId[firstConnectorId],
+      technicalId: "Conn / Legacy 01",
+      manufacturerReference: " ",
+      catalogItemId: undefined
+    };
+    rawSplices.byId[firstSpliceId] = {
+      ...rawSplices.byId[firstSpliceId],
+      technicalId: "splice:legacy?2",
+      manufacturerReference: "",
+      catalogItemId: undefined
+    };
+    rawCatalogItems.byId = {};
+    rawCatalogItems.allIds = [];
+
+    const parsed = parseNetworkFilePayload(JSON.stringify(rawPayload));
+    expect(parsed.error).toBeNull();
+    const normalizedState = parsed.payload?.networks[0]?.state;
+    const expectedConnectorPlaceholder = `LEGACY-NOREF-C-CONN-LEGACY-01 [${connectorCount}c]`;
+    const expectedSplicePlaceholder = `LEGACY-NOREF-S-SPLICE-LEGACY-2 [${spliceCount}p]`;
+    expect(normalizedState?.connectors.byId[asConnectorId(firstConnectorId)]?.manufacturerReference).toBe(
+      expectedConnectorPlaceholder
+    );
+    expect(normalizedState?.splices.byId[asSpliceId(firstSpliceId)]?.manufacturerReference).toBe(expectedSplicePlaceholder);
+    const connectorCatalogItemId = normalizedState?.connectors.byId[asConnectorId(firstConnectorId)]?.catalogItemId;
+    const spliceCatalogItemId = normalizedState?.splices.byId[asSpliceId(firstSpliceId)]?.catalogItemId;
+    expect(connectorCatalogItemId).toBeDefined();
+    expect(spliceCatalogItemId).toBeDefined();
+    if (connectorCatalogItemId !== undefined) {
+      expect(normalizedState?.catalogItems.byId[connectorCatalogItemId]?.manufacturerReference).toBe(expectedConnectorPlaceholder);
+    }
+    if (spliceCatalogItemId !== undefined) {
+      expect(normalizedState?.catalogItems.byId[spliceCatalogItemId]?.manufacturerReference).toBe(expectedSplicePlaceholder);
+    }
   });
 
   it("resolves import conflicts with deterministic suffixes", () => {

@@ -1,8 +1,8 @@
 ## task_053_req_052_to_req_056_catalog_follow_ups_bundle_orchestration_and_delivery_control - req_052 to req_056 Orchestration: Catalog Follow-ups Bundle Delivery Control
 > From version: 0.9.5
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Understanding: 100% (implemented and validated)
+> Confidence: 99% (full validation matrix executed, one E2E helper adjusted for drawer overflow)
+> Progress: 100%
 > Complexity: High
 > Theme: Bundle orchestration for catalog follow-up requests covering legacy fallback placeholders, validation catalog integrity, seeded defaults, catalog analysis panel, and BOM CSV export
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -64,15 +64,15 @@ Rationale:
 - Keep regressions and closure explicit rather than implicit.
 
 # Plan
-- [ ] Wave 0. New-network seeded catalog defaults with deterministic names/prices and no-reseed guards (`item_324`)
-- [ ] Wave 1. Legacy missing-manufacturer fallback placeholder generation and catalog link resolution (`item_319`)
-- [ ] Wave 2. Validation catalog target navigation + catalog integrity/link rules (`item_321`, `item_322`)
-- [ ] Wave 3. Catalog analysis panel composition, usage listing, and row navigation/reactive updates (`item_326`, `item_327`)
-- [ ] Wave 4. BOM CSV aggregation/serialization engine + Network summary header export action integration (`item_329`, `item_330`)
-- [ ] Wave 5. Regression and fixture coverage across the bundle (`item_320`, `item_323`, `item_325`, `item_328`, `item_331`)
-- [ ] Wave 6. Closure: full validation matrix, AC traceability, and `logics` synchronization (`item_332`)
-- [ ] FINAL. Update related `.md` files to final state (requests/backlog/task progress + delivery summary)
-- [ ] FINAL+. Update `README.md` to reflect delivered catalog follow-ups (seeded catalog defaults, catalog validation/analysis, BOM CSV export) if user-facing behavior changed
+- [x] Wave 0. New-network seeded catalog defaults with deterministic names/prices and no-reseed guards (`item_324`)
+- [x] Wave 1. Legacy missing-manufacturer fallback placeholder generation and catalog link resolution (`item_319`)
+- [x] Wave 2. Validation catalog target navigation + catalog integrity/link rules (`item_321`, `item_322`)
+- [x] Wave 3. Catalog analysis panel composition, usage listing, and row navigation/reactive updates (`item_326`, `item_327`)
+- [x] Wave 4. BOM CSV aggregation/serialization engine + Network summary header export action integration (`item_329`, `item_330`)
+- [x] Wave 5. Regression and fixture coverage across the bundle (`item_320`, `item_323`, `item_325`, `item_328`, `item_331`)
+- [x] Wave 6. Closure: full validation matrix, AC traceability, and `logics` synchronization (`item_332`)
+- [x] FINAL. Update related `.md` files to final state (requests/backlog/task progress + delivery summary)
+- [x] FINAL+. Update `README.md` to reflect delivered catalog follow-ups (seeded catalog defaults, catalog validation/analysis, BOM CSV export) if user-facing behavior changed
 
 # Validation gates
 ## A. Minimum wave gate (apply after each Wave 0-5)
@@ -129,23 +129,36 @@ Rationale:
 
 # Report
 - Wave status:
-  - Wave 0 (seeded catalog defaults): pending
-  - Wave 1 (legacy no-ref placeholder fallback): pending
-  - Wave 2 (validation catalog integrity/nav): pending
-  - Wave 3 (catalog analysis panel): pending
-  - Wave 4 (BOM CSV export): pending
-  - Wave 5 (regression coverage bundle): pending
-  - Wave 6 (closure + AC traceability): pending
-  - FINAL (`.md` synchronization): pending
-  - FINAL+ (`README.md` update): pending
+  - Wave 0 (seeded catalog defaults): completed
+  - Wave 1 (legacy no-ref placeholder fallback): completed
+  - Wave 2 (validation catalog integrity/nav): completed
+  - Wave 3 (catalog analysis panel): completed
+  - Wave 4 (BOM CSV export): completed
+  - Wave 5 (regression coverage bundle): completed
+  - Wave 6 (closure + AC traceability): completed
+  - FINAL (`.md` synchronization): completed
+  - FINAL+ (`README.md` update): completed
 - Current blockers:
-  - None (specs are clarified and linted).
+  - None.
 - Main risks to track:
-  - Placeholder naming determinism, validation issue granularity stability, seeded-price fixture coupling, CSV escaping correctness.
+  - Residual risk reduced to normal regression drift on future nav-layout changes (E2E helper now scrolls/clicks drawer sub-tabs robustly).
 - Validation snapshot:
-  - Not started for implementation waves.
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s build` ✅
+  - `npm run -s test:ci` ✅ (`39` files / `254` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests; drawer secondary-nav click helper hardened for viewport overflow)
 - Delivery summary:
-  - Pending implementation.
+  - Implemented `req_052` deterministic legacy no-ref catalog placeholder generation and catalog link fallback on load/import.
+  - Implemented `req_053` catalog integrity validation issues, catalog-targeted `Go to`, and validation/category regression coverage.
+  - Implemented `req_054` seeded network-scoped catalog defaults (3 deterministic items with names/prices) on new network creation.
+  - Implemented `req_055` Catalog analysis panel with usage summary, connector/splice sections, and row navigation back to Modeling edit flows.
+  - Implemented `req_056` BOM CSV export (aggregated by catalog item) in `Network summary` header, using the existing CSV export icon and preserving PNG export behavior.
+  - Updated fixtures/samples/regressions for catalog normalization and seeded/default behavior, including sample compat round-trip expectations.
 
 # References
 - `logics/request/req_052_legacy_catalog_fallback_generate_deterministic_manufacturer_reference_when_missing.md`

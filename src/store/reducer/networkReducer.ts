@@ -2,7 +2,7 @@ import type { NetworkId } from "../../core/entities";
 import type { AppAction } from "../actions";
 import {
   cloneNetworkSummaryViewState,
-  createEmptyNetworkScopedState,
+  createSeededNetworkScopedState,
   type AppState,
   type NetworkScopedState
 } from "../types";
@@ -135,7 +135,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         networks: upsertEntity(persisted.networks, nextNetwork),
         networkStates: {
           ...persisted.networkStates,
-          [network.id]: createEmptyNetworkScopedState()
+          [network.id]: createSeededNetworkScopedState()
         }
       };
 

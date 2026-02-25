@@ -101,6 +101,25 @@ function stableSlug(value: string): string {
   return slug.length === 0 ? "item" : slug.slice(0, 48);
 }
 
+function buildLegacyNoRefToken(value: string): string {
+  const normalized = value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9_-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return normalized.length === 0 ? "ITEM" : normalized.slice(0, 48);
+}
+
+function buildMissingManufacturerReferencePlaceholder(
+  kind: LegacySourceKind,
+  sourceToken: string,
+  connectionCount: number
+): string {
+  return `LEGACY-NOREF-${kind === "connector" ? "C" : "S"}-${sourceToken} [${connectionCount}${kind === "connector" ? "c" : "p"}]`;
+}
+
 function legacySuffix(kind: LegacySourceKind, connectionCount: number): string {
   return ` [legacy-${connectionCount}${kind === "connector" ? "c" : "p"}]`;
 }
@@ -278,10 +297,20 @@ export function bootstrapCatalogForScopedState(scoped: NetworkScopedState): Netw
       continue;
     }
 
-    const manufacturerReference = normalizeManufacturerReference(connector.manufacturerReference);
-    if (manufacturerReference === undefined || !Number.isInteger(connector.cavityCount) || connector.cavityCount < 1) {
+    if (!Number.isInteger(connector.cavityCount) || connector.cavityCount < 1) {
       continue;
     }
+    const manufacturerReference =
+      normalizeManufacturerReference(connector.manufacturerReference) ??
+      buildMissingManufacturerReferencePlaceholder(
+        "connector",
+        buildLegacyNoRefToken(
+          typeof connector.technicalId === "string" && connector.technicalId.trim().length > 0
+            ? connector.technicalId
+            : connectorId
+        ),
+        connector.cavityCount
+      );
 
     const item = ensureCatalogItem("connector", connectorId, manufacturerReference, connector.cavityCount);
     nextScoped.connectors.byId[connectorId] = syncConnectorFromCatalog(connector, item);
@@ -299,10 +328,18 @@ export function bootstrapCatalogForScopedState(scoped: NetworkScopedState): Netw
       continue;
     }
 
-    const manufacturerReference = normalizeManufacturerReference(splice.manufacturerReference);
-    if (manufacturerReference === undefined || !Number.isInteger(splice.portCount) || splice.portCount < 1) {
+    if (!Number.isInteger(splice.portCount) || splice.portCount < 1) {
       continue;
     }
+    const manufacturerReference =
+      normalizeManufacturerReference(splice.manufacturerReference) ??
+      buildMissingManufacturerReferencePlaceholder(
+        "splice",
+        buildLegacyNoRefToken(
+          typeof splice.technicalId === "string" && splice.technicalId.trim().length > 0 ? splice.technicalId : spliceId
+        ),
+        splice.portCount
+      );
 
     const item = ensureCatalogItem("splice", spliceId, manufacturerReference, splice.portCount);
     nextScoped.splices.byId[spliceId] = syncSpliceFromCatalog(splice, item);

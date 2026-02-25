@@ -2,7 +2,7 @@
 > From version: 0.9.5
 > Understanding: 99% (CSV icon asset contract added)
 > Confidence: 96% (UI integration contract narrowed)
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Add BOM CSV export action in Network summary header next to Export PNG and wire it to browser download flow
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
