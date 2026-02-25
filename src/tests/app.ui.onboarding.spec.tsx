@@ -35,4 +35,48 @@ describe("App integration UI - onboarding", () => {
     expect(within(splicesHelpDialog).getByRole("button", { name: "Scroll to Splices" })).toBeInTheDocument();
     expect(within(splicesHelpDialog).getByRole("button", { name: "Open Connectors" })).toBeInTheDocument();
   });
+
+  it("moves focus into onboarding modal and restores focus to the trigger on Escape close", () => {
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    const helpButton = within(connectorsPanel).getByRole("button", { name: "Help" });
+    helpButton.focus();
+    expect(helpButton).toHaveFocus();
+
+    fireEvent.click(helpButton);
+
+    const dialog = screen.getByRole("dialog", { name: "Build the connectors and splices library" });
+    const closeButton = within(dialog).getByRole("button", { name: "Close onboarding" });
+    expect(closeButton).toHaveFocus();
+
+    fireEvent.keyDown(dialog, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Build the connectors and splices library" })).toBeNull();
+    expect(helpButton).toHaveFocus();
+  });
+
+  it("keeps keyboard tab navigation trapped inside the onboarding modal", () => {
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Help" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Build the connectors and splices library" });
+    const closeButton = within(dialog).getByRole("button", { name: "Close onboarding" });
+    const lastTargetAction = within(dialog).getByRole("button", { name: "Open Splices" });
+
+    lastTargetAction.focus();
+    expect(lastTargetAction).toHaveFocus();
+    fireEvent.keyDown(lastTargetAction, { key: "Tab" });
+    expect(closeButton).toHaveFocus();
+
+    closeButton.focus();
+    expect(closeButton).toHaveFocus();
+    fireEvent.keyDown(closeButton, { key: "Tab", shiftKey: true });
+    expect(lastTargetAction).toHaveFocus();
+  });
 });
