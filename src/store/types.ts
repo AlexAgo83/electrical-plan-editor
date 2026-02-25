@@ -54,7 +54,9 @@ export type ThemeMode =
   | "mossTaupe"
   | "navyAsh"
   | "charcoalPlum"
-  | "smokedTeal";
+  | "smokedTeal"
+  | "circleMobilityLight"
+  | "circleMobilityDark";
 
 export interface LayoutNodePosition {
   x: number;

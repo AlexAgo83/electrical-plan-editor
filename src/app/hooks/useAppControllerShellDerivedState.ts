@@ -48,7 +48,9 @@ export function useAppControllerShellDerivedState({
     mossTaupe: ["theme-moss-taupe"],
     navyAsh: ["theme-navy-ash"],
     charcoalPlum: ["theme-charcoal-plum"],
-    smokedTeal: ["theme-smoked-teal"]
+    smokedTeal: ["theme-smoked-teal"],
+    circleMobilityLight: ["theme-sage-paper", "theme-circle-mobility-light"],
+    circleMobilityDark: ["theme-petrol-slate", "theme-circle-mobility-dark"]
   };
   const resolvedThemeClassNames = themeClassNamesByMode[themeMode] ?? themeClassNamesByMode.normal;
   const appShellClassName = [
