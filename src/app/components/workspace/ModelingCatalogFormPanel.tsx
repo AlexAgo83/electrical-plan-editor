@@ -1,6 +1,6 @@
 import type { FormEvent, ReactElement } from "react";
 import { isValidCatalogUrlInput } from "../../../store";
-import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
+import { renderFormHeader } from "./ModelingFormsColumn.shared";
 
 interface ModelingCatalogFormPanelProps {
   isCatalogSubScreen: boolean;
@@ -25,7 +25,7 @@ interface ModelingCatalogFormPanelProps {
 export function ModelingCatalogFormPanel({
   isCatalogSubScreen,
   catalogFormMode,
-  openCreateCatalogForm,
+  openCreateCatalogForm: _openCreateCatalogForm,
   handleCatalogSubmit,
   catalogManufacturerReference,
   setCatalogManufacturerReference,
@@ -41,17 +41,17 @@ export function ModelingCatalogFormPanel({
   cancelCatalogEdit,
   catalogFormError
 }: ModelingCatalogFormPanelProps): ReactElement {
+  void _openCreateCatalogForm;
   const hasUrlValidationError = catalogUrl.trim().length > 0 && !isValidCatalogUrlInput(catalogUrl);
+  const showPanel = isCatalogSubScreen && catalogFormMode !== "idle";
 
   return (
-    <article className="panel" hidden={!isCatalogSubScreen} data-onboarding-panel="modeling-catalog-edit">
+    <article className="panel" hidden={!showPanel} data-onboarding-panel="modeling-catalog-edit">
       {renderFormHeader(
-        catalogFormMode === "create" ? "Create catalog item" : catalogFormMode === "edit" ? "Edit catalog item" : "Edit catalog item",
+        catalogFormMode === "create" ? "Create catalog item" : "Edit catalog item",
         catalogFormMode
       )}
-      {catalogFormMode === "idle" ? (
-        renderIdleCopy("catalog item", openCreateCatalogForm)
-      ) : (
+      {catalogFormMode !== "idle" ? (
         <form className="stack-form" onSubmit={handleCatalogSubmit}>
           <label>
             Manufacturer reference
@@ -129,10 +129,9 @@ export function ModelingCatalogFormPanel({
           </div>
           {catalogFormError !== null ? <small className="inline-error">{catalogFormError}</small> : null}
         </form>
-      )}
+      ) : null}
     </article>
   );
 }
 
 export type { ModelingCatalogFormPanelProps };
-

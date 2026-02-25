@@ -14,6 +14,7 @@ interface NetworkScopeWorkspaceContentProps {
     Record<
       NetworkId,
       {
+        catalogCount: number;
         connectorCount: number;
         spliceCount: number;
         nodeCount: number;
@@ -189,6 +190,7 @@ export function NetworkScopeWorkspaceContent({
   }, [focusRequestedNetworkId, focusRequestedNetworkToken, networks]);
 
   const indicators = [
+    { label: "Catalog", value: focusedNetworkCounts?.catalogCount ?? 0 },
     { label: "Connectors", value: focusedNetworkCounts?.connectorCount ?? 0 },
     { label: "Splices", value: focusedNetworkCounts?.spliceCount ?? 0 },
     { label: "Nodes", value: focusedNetworkCounts?.nodeCount ?? 0 },

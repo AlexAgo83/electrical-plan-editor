@@ -16,8 +16,6 @@ interface ModelingCatalogListPanelProps {
   onOpenCreateCatalogItem: () => void;
   onEditCatalogItem: (item: CatalogItem) => void;
   onDeleteCatalogItem: (catalogItemId: CatalogItemId) => void;
-  onCreateConnectorFromCatalog: (catalogItemId: CatalogItemId) => void;
-  onCreateSpliceFromCatalog: (catalogItemId: CatalogItemId) => void;
   onOpenCatalogOnboardingHelp?: () => void;
 }
 
@@ -29,8 +27,6 @@ export function ModelingCatalogListPanel({
   onOpenCreateCatalogItem,
   onEditCatalogItem,
   onDeleteCatalogItem,
-  onCreateConnectorFromCatalog,
-  onCreateSpliceFromCatalog,
   onOpenCatalogOnboardingHelp
 }: ModelingCatalogListPanelProps): ReactElement {
   const [filterField, setFilterField] = useState<CatalogFilterField>("any");
@@ -216,28 +212,9 @@ export function ModelingCatalogListPanel({
           <span className="action-button-icon is-delete" aria-hidden="true" />
           Delete
         </button>
-        <button
-          type="button"
-          className="button-with-icon"
-          onClick={() => selectedCatalogItem !== null && onCreateConnectorFromCatalog(selectedCatalogItem.id)}
-          disabled={selectedCatalogItem === null}
-        >
-          <span className="action-button-icon is-connectors" aria-hidden="true" />
-          Create Connector
-        </button>
-        <button
-          type="button"
-          className="button-with-icon"
-          onClick={() => selectedCatalogItem !== null && onCreateSpliceFromCatalog(selectedCatalogItem.id)}
-          disabled={selectedCatalogItem === null}
-        >
-          <span className="action-button-icon is-splices" aria-hidden="true" />
-          Create Splice
-        </button>
       </div>
     </article>
   );
 }
 
 export type { ModelingCatalogListPanelProps };
-

@@ -12,7 +12,7 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - network summary BOM export", () => {
-  it("renders Export BOM CSV to the right of Export PNG and uses the CSV export icon", () => {
+  it("renders BOM to the right of PNG and uses the CSV export icon", () => {
     const catalogItemId = asCatalogItemId("CAT-BOM");
     const withCatalog = appReducer(
       appReducer(
@@ -56,8 +56,8 @@ describe("App integration UI - network summary BOM export", () => {
       switchScreenDrawerAware("modeling");
 
       const networkSummaryPanel = getPanelByHeading("Network summary");
-      const exportPngButton = within(networkSummaryPanel).getByRole("button", { name: "Export PNG" });
-      const exportBomButton = within(networkSummaryPanel).getByRole("button", { name: "Export BOM CSV" });
+      const exportPngButton = within(networkSummaryPanel).getByRole("button", { name: "PNG" });
+      const exportBomButton = within(networkSummaryPanel).getByRole("button", { name: "BOM" });
 
       const actionButtons = Array.from(networkSummaryPanel.querySelectorAll("header .workspace-tab"));
       expect(actionButtons.indexOf(exportBomButton)).toBeGreaterThan(actionButtons.indexOf(exportPngButton));

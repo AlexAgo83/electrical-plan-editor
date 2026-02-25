@@ -1257,7 +1257,7 @@ export function NetworkSummaryPanel({
               disabled={nodes.length === 0}
             >
               <span className="network-summary-export-icon" aria-hidden="true" />
-              Export PNG
+              PNG
             </button>
             <button
               type="button"
@@ -1266,7 +1266,7 @@ export function NetworkSummaryPanel({
               disabled={!canExportBomCsv}
             >
               <span className="table-export-icon" aria-hidden="true" />
-              Export BOM CSV
+              BOM
             </button>
           </div>
         </header>

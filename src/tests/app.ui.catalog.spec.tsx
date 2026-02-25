@@ -38,7 +38,8 @@ describe("App integration UI - catalog", () => {
 
     fireEvent.click(within(quickNavGroup as HTMLElement).getByRole("button", { name: /^Catalog\b/i }));
     expect(getPanelByHeading("Catalog")).toBeInTheDocument();
-    expect(getPanelByHeading("Edit catalog item")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Catalog item form" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Edit catalog item" })).not.toBeInTheDocument();
   });
 
   it("enforces catalog-first connector creation and supports catalog creation with URL validation", () => {
@@ -80,10 +81,15 @@ describe("App integration UI - catalog", () => {
 
     expect(within(catalogPanel).getByText("TE-1-967616-1")).toBeInTheDocument();
     fireEvent.click(within(catalogPanel).getByText("TE-1-967616-1"));
-    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Create Connector" }));
+    const catalogAnalysisGrid = getPanelByHeading("Catalog analysis").closest(".analysis-panel-grid");
+    expect(catalogAnalysisGrid).not.toBeNull();
+    const connectorsUsageHeading = within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Connectors" });
+    const connectorsUsagePanel = connectorsUsageHeading.closest(".panel");
+    expect(connectorsUsagePanel).not.toBeNull();
+    fireEvent.click(within(connectorsUsagePanel as HTMLElement).getByRole("button", { name: "Create Connector" }));
 
     connectorFormPanel = getPanelByHeading("Create Connector");
-    expect(within(connectorFormPanel).getByDisplayValue("TE-1-967616-1")).toBeInTheDocument();
+    expect(within(connectorFormPanel).getByDisplayValue(/TE-1-967616-1 \(6\)/)).toBeInTheDocument();
     expect(within(connectorFormPanel).getByText("Manufacturer reference: TE-1-967616-1")).toBeInTheDocument();
     expect(within(connectorFormPanel).getByLabelText("Way count (from catalog)")).toHaveValue(6);
 
@@ -167,5 +173,89 @@ describe("App integration UI - catalog", () => {
     expect(within(connectorsUsagePanel as HTMLElement).getByText("Connector 1")).toBeInTheDocument();
     fireEvent.click(within(connectorsUsagePanel as HTMLElement).getByRole("button", { name: "Go to" }));
     expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
+  });
+
+  it("shows immediate validation when selecting an incompatible catalog item in connector and splice forms", () => {
+    const catalogLargeId = asCatalogItemId("CAT-LARGE");
+    const catalogSmallId = asCatalogItemId("CAT-SMALL");
+    const connectorId = asConnectorId("CONN-PROTECTED");
+    const spliceId = asSpliceId("SPLICE-PROTECTED");
+
+    const state = appReducer(
+      appReducer(
+        appReducer(
+          appReducer(
+            appReducer(
+              appReducer(
+                createInitialState(),
+                appActions.upsertCatalogItem({
+                  id: catalogLargeId,
+                  manufacturerReference: "CAT-6",
+                  connectionCount: 6
+                })
+              ),
+              appActions.upsertCatalogItem({
+                id: catalogSmallId,
+                manufacturerReference: "CAT-2",
+                connectionCount: 2
+              })
+            ),
+            appActions.upsertConnector({
+              id: connectorId,
+              name: "Protected connector",
+              technicalId: "C-PROTECTED",
+              cavityCount: 6,
+              catalogItemId: catalogLargeId
+            })
+          ),
+          appActions.occupyConnectorCavity(connectorId, 4, "WIRE-A")
+        ),
+        appActions.upsertSplice({
+          id: spliceId,
+          name: "Protected splice",
+          technicalId: "S-PROTECTED",
+          portCount: 6,
+          catalogItemId: catalogLargeId
+        })
+      ),
+      appActions.occupySplicePort(spliceId, 4, "WIRE-B")
+    );
+
+    renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector/, hidden: true }));
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Protected connector"));
+
+    const connectorFormPanel = getPanelByHeading("Edit Connector");
+    const connectorCatalogSelect = within(connectorFormPanel).getByLabelText("Catalog item (manufacturer reference)");
+    fireEvent.change(connectorCatalogSelect, { target: { value: catalogSmallId } });
+    expect(
+      within(connectorFormPanel).getByText(
+        "Selected catalog item is incompatible: occupied way indexes exceed the catalog connection count."
+      )
+    ).toBeInTheDocument();
+    expect(connectorCatalogSelect).toHaveValue(catalogLargeId);
+    expect(within(connectorFormPanel).getByLabelText("Way count (from catalog)")).toHaveValue(6);
+
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Splice/, hidden: true }));
+    const splicesPanel = getPanelByHeading("Splices");
+    fireEvent.click(within(splicesPanel).getByText("Protected splice"));
+
+    const spliceFormPanel = getPanelByHeading("Edit Splice");
+    const spliceCatalogSelect = within(spliceFormPanel).getByLabelText("Catalog item (manufacturer reference)");
+    fireEvent.change(spliceCatalogSelect, { target: { value: catalogSmallId } });
+    expect(
+      within(spliceFormPanel).getByText(
+        "Selected catalog item is incompatible: occupied port indexes exceed the catalog connection count."
+      )
+    ).toBeInTheDocument();
+    expect(spliceCatalogSelect).toHaveValue(catalogLargeId);
+    expect(within(spliceFormPanel).getByLabelText("Port count (from catalog)")).toHaveValue(6);
   });
 });
