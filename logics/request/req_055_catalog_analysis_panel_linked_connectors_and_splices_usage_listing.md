@@ -1,7 +1,7 @@
 ## req_055_catalog_analysis_panel_linked_connectors_and_splices_usage_listing - Catalog Analysis Panel: Linked Connectors and Splices Usage Listing
 > From version: 0.9.5
-> Understanding: 97%
-> Confidence: 96%
+> Understanding: 100% (analysis defaults clarified + backlog/task linkage added)
+> Confidence: 97% (analysis interaction contract narrowed and decomposed)
 > Complexity: Medium
 > Theme: Add an Analysis panel to the Catalog screen to inspect connector/splice usage of the selected catalog item
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -37,13 +37,21 @@ This request reverses one UX decision from `req_051` ("no analysis panel for Cat
 - Each entry should identify:
   - entity type (`Connector` / `Splice`)
   - user-visible label/name (or fallback technical identifier if unnamed)
+  - technical identifier (`technicalId`)
   - key reference metadata useful for quick scanning (implementation choice, consistent with existing analysis rows)
-- Recommended grouping:
-  - grouped sections by entity type (`Connectors`, `Splices`)
+- V1 row identity recommendation (accepted):
+  - display `name` and `technicalId` together when available to reduce ambiguity in dense catalogs
+- V1 grouping contract:
+  - grouped sections by entity type (`Connectors`, `Splices`) (two distinct sections, not a single mixed table)
   - show empty-state text when no linked entities exist
+- Recommended V1 summary (low-cost enhancement, include if layout permits without churn):
+  - lightweight usage summary in the panel header/body (e.g. `X connectors / Y splices`)
 
 ## C. Interaction and navigation (high priority)
 - Selecting/clicking an analysis row should navigate/open the corresponding entity edit panel (`Connector` or `Splice`) using existing modeling navigation patterns.
+- V1 navigation mode contract:
+  - open `Modeling` on the target entity sub-screen (connector/splice) with the selected entity focused
+  - do not force a dedicated `analysis` screen transition for this interaction
 - If the current app pattern uses `Go to` buttons in analysis tables, reuse the same interaction style for consistency.
 - Returning to `Catalog` should preserve expected selection behavior where feasible (no regression requirement on existing navigation flows).
 
@@ -71,6 +79,7 @@ This request reverses one UX decision from `req_051` ("no analysis panel for Cat
 # Validation and regression safety
 - Add/extend tests for:
   - selected catalog item shows linked connectors and linked splices in analysis panel
+  - analysis rows expose enough identity to distinguish entities (`name` + `technicalId`, with fallback when name missing)
   - no selection -> analysis empty-state placeholder
   - no linked entities -> analysis empty-state for selected item
   - clicking a linked connector/splice in analysis opens the correct entity screen/panel
@@ -81,6 +90,7 @@ This request reverses one UX decision from `req_051` ("no analysis panel for Cat
 - AC1: The `Catalog` screen includes an analysis panel/column consistent with other modeling screens.
 - AC2: Selecting a catalog item displays linked `Connectors` and `Splices` that reference that item.
 - AC3: Analysis entries support navigation to the corresponding connector/splice edit flow.
+- AC3a: Catalog analysis row navigation opens the target entity in `Modeling` mode on the correct connector/splice sub-screen.
 - AC4: The analysis panel handles no-selection and no-usage cases with clear empty states.
 - AC5: Catalog CRUD behavior and catalog-first connector/splice creation workflow remain functional after the layout change.
 
@@ -88,6 +98,15 @@ This request reverses one UX decision from `req_051` ("no analysis panel for Cat
 - Aggregated metrics/charts for catalog usage (counts by type, cost rollups, etc.).
 - In-panel bulk operations on linked connectors/splices.
 - Validation/error surfacing for broken catalog links (covered by `req_053` if implemented).
+
+# Backlog
+- `logics/backlog/item_326_catalog_analysis_panel_composition_usage_sections_and_usage_summary_for_selected_catalog_item.md`
+- `logics/backlog/item_327_catalog_analysis_row_navigation_to_connector_splice_modeling_and_reactive_usage_refresh.md`
+- `logics/backlog/item_328_regression_coverage_for_catalog_analysis_panel_usage_listing_and_navigation.md`
+- `logics/backlog/item_332_req_052_to_req_056_catalog_follow_ups_bundle_closure_ci_build_and_ac_traceability.md`
+
+# Orchestration task
+- `logics/tasks/task_053_req_052_to_req_056_catalog_follow_ups_bundle_orchestration_and_delivery_control.md`
 
 # References
 - `logics/request/req_051_catalog_screen_with_catalog_item_crud_navigation_integration_and_required_manufacturer_reference_connection_count.md`
