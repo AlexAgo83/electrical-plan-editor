@@ -117,7 +117,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         required
       />
     </label>
-    <label>
+    <label className="settings-checkbox">
       <input
         type="checkbox"
         checked={wireFuseEnabled}
@@ -129,7 +129,12 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       <>
         <label>
           Fuse catalog item
-          <select value={wireFuseCatalogItemId} onChange={(event) => setWireFuseCatalogItemId(event.target.value)}>
+          <select
+            value={wireFuseCatalogItemId}
+            onChange={(event) => setWireFuseCatalogItemId(event.target.value)}
+            required={wireFuseEnabled}
+            aria-required={wireFuseEnabled}
+          >
             <option value="">Select catalog item</option>
             {selectedFuseCatalogItemMissing ? (
               <option value={wireFuseCatalogItemId}>

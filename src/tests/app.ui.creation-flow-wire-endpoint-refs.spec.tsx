@@ -201,12 +201,14 @@ describe("App integration UI - creation flow wire endpoint references", () => {
     fireEvent.change(within(endpointBFieldset).getByLabelText("Port index"), { target: { value: "2" } });
 
     fireEvent.click(within(createWirePanel).getByLabelText("Fuse"));
-    expect(within(createWirePanel).getByLabelText("Fuse catalog item")).toBeInTheDocument();
+    const fuseCatalogSelect = within(createWirePanel).getByLabelText("Fuse catalog item");
+    expect(fuseCatalogSelect).toBeInTheDocument();
+    expect(fuseCatalogSelect).toBeRequired();
 
     fireEvent.click(within(createWirePanel).getByRole("button", { name: "Create" }));
-    expect(within(createWirePanel).getByText("Fuse catalog item is required.")).toBeInTheDocument();
+    const blockedBeforeCatalogSelection = Object.values(store.getState().wires.byId).find((wire) => wire.technicalId === "W-FUSE-1");
+    expect(blockedBeforeCatalogSelection).toBeUndefined();
 
-    const fuseCatalogSelect = within(createWirePanel).getByLabelText("Fuse catalog item");
     expect(within(fuseCatalogSelect).getByRole("option", { name: /CAT-FUSE-UI/i })).toBeInTheDocument();
     fireEvent.change(fuseCatalogSelect, {
       target: { value: "catalog-fuse-ui" }
