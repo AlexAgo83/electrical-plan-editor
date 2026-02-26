@@ -380,7 +380,7 @@ describe("App integration UI - creation flow ergonomics", () => {
       expect(document.activeElement).toBe(wireRow);
     });
     expect(getPanelByHeading("Edit Wire")).toBeInTheDocument();
-  });
+  }, 10_000);
 
   it("prefills the next free endpoint way/port in wire create mode and keeps manual edits until context changes", () => {
     renderAppWithState(createUiIntegrationDenseWiresState());

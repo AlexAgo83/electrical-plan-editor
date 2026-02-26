@@ -365,4 +365,66 @@ describe("App integration UI - validation", () => {
     const editCatalogPanel = getPanelByHeading("Edit catalog item");
     expect(within(editCatalogPanel).getByDisplayValue("CAT-BROKEN")).toBeInTheDocument();
   });
+
+  it("surfaces case-insensitive duplicate catalog manufacturer references", () => {
+    const base = createUiIntegrationState();
+    const activeNetworkId = base.activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network.");
+    }
+
+    const duplicateA = asCatalogItemId("CAT-DUP-A");
+    const duplicateB = asCatalogItemId("CAT-DUP-B");
+    const stateWithDuplicateRefs = {
+      ...base,
+      catalogItems: {
+        byId: {
+          ...base.catalogItems.byId,
+          [duplicateA]: {
+            id: duplicateA,
+            manufacturerReference: "CAT-DUP",
+            connectionCount: 2
+          },
+          [duplicateB]: {
+            id: duplicateB,
+            manufacturerReference: "cat-dup",
+            connectionCount: 4
+          }
+        },
+        allIds: [...base.catalogItems.allIds, duplicateA, duplicateB]
+      },
+      networkStates: {
+        ...base.networkStates,
+        [activeNetworkId]: {
+          ...base.networkStates[activeNetworkId]!,
+          catalogItems: {
+            byId: {
+              ...base.networkStates[activeNetworkId]!.catalogItems.byId,
+              [duplicateA]: {
+                id: duplicateA,
+                manufacturerReference: "CAT-DUP",
+                connectionCount: 2
+              },
+              [duplicateB]: {
+                id: duplicateB,
+                manufacturerReference: "cat-dup",
+                connectionCount: 4
+              }
+            },
+            allIds: [...base.networkStates[activeNetworkId]!.catalogItems.allIds, duplicateA, duplicateB]
+          }
+        }
+      }
+    };
+
+    renderAppWithState(stateWithDuplicateRefs);
+    switchScreenDrawerAware("validation");
+    const validationPanel = getPanelByHeading("Validation center");
+    fireEvent.click(within(validationPanel).getByRole("button", { name: /Catalog integrity/i }));
+
+    expect(
+      within(validationPanel).getAllByText(/Catalog manufacturer reference 'CAT-DUP' is duplicated\./i)
+    ).toHaveLength(2);
+  });
 });

@@ -52,7 +52,7 @@ describe("catalogCsv", () => {
     ]);
   });
 
-  it("enforces strict headers and reports duplicate rows as warnings with last-row-wins", () => {
+  it("enforces strict headers and rejects duplicate rows case-insensitively", () => {
     const invalidHeaders = parseCatalogCsvImportText("Ref,Count\r\nA,2");
     expect(invalidHeaders.rows).toEqual([]);
     expect(invalidHeaders.issues).toHaveLength(1);
@@ -62,23 +62,23 @@ describe("catalogCsv", () => {
       [
         CATALOG_CSV_HEADERS.join(","),
         "REF-1,2,First,1.5,https://example.com/a",
-        "REF-1,3,Override,2.5,https://example.com/b"
+        "ref-1,3,Override,2.5,https://example.com/b"
       ].join("\r\n")
     );
 
     expect(duplicateRows.issues).toEqual([
       expect.objectContaining({
-        kind: "warning",
+        kind: "error",
         rowNumber: 3
       })
     ]);
     expect(duplicateRows.rows).toEqual([
       {
         manufacturerReference: "REF-1",
-        connectionCount: 3,
-        name: "Override",
-        unitPriceExclTax: 2.5,
-        url: "https://example.com/b"
+        connectionCount: 2,
+        name: "First",
+        unitPriceExclTax: 1.5,
+        url: "https://example.com/a"
       }
     ]);
   });

@@ -16,6 +16,7 @@ import type {
 } from "../core/entities";
 import { buildRoutingGraphIndex, type RoutingGraphIndex } from "../core/graph";
 import { findShortestRoute, type ShortestRouteResult } from "../core/pathfinding";
+import { normalizeManufacturerReferenceKey } from "./catalog";
 import type { AppState, SelectionState, ThemeMode } from "./types";
 
 function selectCollection<T, Id extends string>(
@@ -152,12 +153,16 @@ export function selectCatalogManufacturerReferenceTaken(
   manufacturerReference: string,
   excludedCatalogItemId?: CatalogItemId
 ): boolean {
+  const referenceKey = normalizeManufacturerReferenceKey(manufacturerReference);
+  if (referenceKey === undefined) {
+    return false;
+  }
   return state.catalogItems.allIds.some((id) => {
     if (excludedCatalogItemId !== undefined && id === excludedCatalogItemId) {
       return false;
     }
     const item = state.catalogItems.byId[id];
-    return item?.manufacturerReference === manufacturerReference;
+    return item !== undefined && normalizeManufacturerReferenceKey(item.manufacturerReference) === referenceKey;
   });
 }
 

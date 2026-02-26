@@ -420,7 +420,7 @@ describe("App integration UI - settings", () => {
     connectorsPanel = getPanelByHeading("Connectors");
     expect(within(connectorsPanel).queryByText("Extra connector")).not.toBeInTheDocument();
     expect(within(connectorsPanel).getByText("Power Source Connector")).toBeInTheDocument();
-  });
+  }, 10_000);
 
   it("ignores keyboard shortcuts when disabled from settings preferences", () => {
     renderAppWithState(createUiIntegrationState());

@@ -168,6 +168,44 @@ describe("appReducer wire lifecycle and routing", () => {
     });
   });
 
+  it("normalizes fuse catalog item IDs by trimming before lookup and persistence", () => {
+    const baseState = reduceAll([
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-FUSE"),
+        manufacturerReference: "FUSE-10A-BLADE",
+        connectionCount: 2
+      }),
+      appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 }),
+      appActions.upsertSplice({ id: asSpliceId("S1"), name: "Splice 1", technicalId: "S-1", portCount: 2 }),
+      appActions.upsertNode({ id: asNodeId("N-C1"), kind: "connector", connectorId: asConnectorId("C1") }),
+      appActions.upsertNode({ id: asNodeId("N-S1"), kind: "splice", spliceId: asSpliceId("S1") }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG1"),
+        nodeA: asNodeId("N-C1"),
+        nodeB: asNodeId("N-S1"),
+        lengthMm: 50
+      })
+    ]);
+
+    const savedWire = appReducer(
+      baseState,
+      appActions.saveWire({
+        id: asWireId("WFUSE-TRIM"),
+        name: "Fuse wire trimmed",
+        technicalId: "W-FUSE-TRIM",
+        protection: { kind: "fuse", catalogItemId: asCatalogItemId("  CAT-FUSE  ") },
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 }
+      })
+    );
+
+    expect(savedWire.ui.lastError).toBeNull();
+    expect(savedWire.wires.byId[asWireId("WFUSE-TRIM")]?.protection).toEqual({
+      kind: "fuse",
+      catalogItemId: asCatalogItemId("CAT-FUSE")
+    });
+  });
+
   it("recomputes unlocked wire route when segment lengths change", () => {
     const first = reduceAll([
       appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 }),

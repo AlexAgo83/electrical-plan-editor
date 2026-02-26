@@ -1,4 +1,4 @@
-import type { SegmentId, WireProtection } from "../../core/entities";
+import type { CatalogItemId, SegmentId, WireProtection } from "../../core/entities";
 import { normalizeWireColorState } from "../../core/cableColors";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { buildRoutingGraphIndex } from "../../core/graph";
@@ -60,7 +60,9 @@ function normalizeWireProtection(
     return { protection: undefined, error: "Wire protection kind is unsupported." };
   }
 
-  const catalogItemId = protection.catalogItemId.trim().length > 0 ? protection.catalogItemId : undefined;
+  const normalizedCatalogItemId = protection.catalogItemId.trim();
+  const catalogItemId =
+    normalizedCatalogItemId.length > 0 ? (normalizedCatalogItemId as CatalogItemId) : undefined;
   if (catalogItemId === undefined) {
     return { protection: undefined, error: "Fuse wire must reference a catalog item." };
   }

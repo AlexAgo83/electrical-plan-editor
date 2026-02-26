@@ -17,6 +17,7 @@ import {
   createEmptyWorkspaceState,
   hasSampleNetworkSignature,
   isWorkspaceEmpty,
+  normalizeManufacturerReferenceKey,
   selectActiveNetwork,
   selectActiveNetworkId,
   selectConnectorTechnicalIdTaken,
@@ -1211,9 +1212,24 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       return;
     }
 
-    const existingByManufacturerReference = new Map(
-      currentCatalogItems.map((item) => [item.manufacturerReference.trim(), item] as const)
-    );
+    const existingByManufacturerReference = new Map<string, (typeof currentCatalogItems)[number]>();
+    for (const item of currentCatalogItems) {
+      const normalizedReferenceKey = normalizeManufacturerReferenceKey(item.manufacturerReference);
+      if (normalizedReferenceKey === undefined) {
+        continue;
+      }
+      const existing = existingByManufacturerReference.get(normalizedReferenceKey);
+      if (existing !== undefined && existing.id !== item.id) {
+        setCatalogCsvImportExportStatus({
+          kind: "failed",
+          message: `Catalog import blocked: existing catalog has duplicate manufacturer reference '${item.manufacturerReference}'.`
+        });
+        setCatalogCsvLastImportSummaryLine("Catalog CSV import aborted: resolve existing catalog duplicate references first.");
+        resetInput();
+        return;
+      }
+      existingByManufacturerReference.set(normalizedReferenceKey, item);
+    }
 
     let nextState =
       currentState.ui.lastError === null
@@ -1229,7 +1245,19 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     let updatedCount = 0;
 
     for (const row of parsed.rows) {
-      const existing = existingByManufacturerReference.get(row.manufacturerReference);
+      const normalizedReferenceKey = normalizeManufacturerReferenceKey(row.manufacturerReference);
+      if (normalizedReferenceKey === undefined) {
+        setCatalogCsvImportExportStatus({
+          kind: "failed",
+          message: "Catalog import failed: invalid manufacturer reference."
+        });
+        setCatalogCsvLastImportSummaryLine(
+          `Catalog CSV import aborted after ${createdCount + updatedCount} row(s); ${warningCount} warnings in file.`
+        );
+        resetInput();
+        return;
+      }
+      const existing = existingByManufacturerReference.get(normalizedReferenceKey);
       const nextCatalogItemId = existing?.id ?? (createEntityId("catalog") as CatalogItemId);
       const candidateState = appReducer(
         nextState,
@@ -1262,6 +1290,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         updatedCount += 1;
       }
       nextState = candidateState;
+      const upsertedItem = candidateState.catalogItems.byId[nextCatalogItemId];
+      if (upsertedItem !== undefined) {
+        existingByManufacturerReference.set(normalizedReferenceKey, upsertedItem);
+      }
     }
 
     replaceStateWithHistory(nextState);

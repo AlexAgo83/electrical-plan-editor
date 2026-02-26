@@ -10,6 +10,32 @@ const asSegmentId = (value: string) => value as SegmentId;
 const asWireId = (value: string) => value as WireId;
 
 describe("store reducer - catalog", () => {
+  it("rejects case-insensitive duplicate manufacturer references", () => {
+    const firstCatalogId = asCatalogItemId("CAT-REF-A");
+    const secondCatalogId = asCatalogItemId("CAT-REF-B");
+    const seeded = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: firstCatalogId,
+        manufacturerReference: "REF-A",
+        connectionCount: 2
+      })
+    );
+
+    const rejected = appReducer(
+      seeded,
+      appActions.upsertCatalogItem({
+        id: secondCatalogId,
+        manufacturerReference: "ref-a",
+        connectionCount: 2
+      })
+    );
+
+    expect(rejected.catalogItems.byId[firstCatalogId]).toBeDefined();
+    expect(rejected.catalogItems.byId[secondCatalogId]).toBeUndefined();
+    expect(rejected.ui.lastError).toContain("already used");
+  });
+
   it("propagates manufacturer reference and connection count changes to linked connectors and splices", () => {
     const catalogId = asCatalogItemId("CAT-1");
     const connectorId = asConnectorId("C1");

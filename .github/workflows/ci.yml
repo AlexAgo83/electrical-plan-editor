@@ -52,11 +52,23 @@ jobs:
       - name: Unit and integration tests
         run: npm run test:ci
 
+      - name: UI coverage report (informational, non-blocking)
+        run: npm run coverage:ui:report
+        continue-on-error: true
+
+      - name: UI slow test top-N (informational, non-blocking)
+        run: npm run test:ci:ui:slow-top
+        continue-on-error: true
+
       - name: E2E smoke
         run: npm run test:e2e
 
       - name: Production build
         run: npm run build
+
+      - name: Bundle metrics report (informational, non-blocking)
+        run: npm run bundle:metrics:report
+        continue-on-error: true
 
       - name: PWA build artifact quality gate
         run: npm run quality:pwa

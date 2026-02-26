@@ -6,18 +6,23 @@ import {
   normalizeCatalogName,
   normalizeCatalogUnitPriceExclTax,
   normalizeCatalogUrl,
-  normalizeManufacturerReference
+  normalizeManufacturerReference,
+  normalizeManufacturerReferenceKey
 } from "../catalog";
 import type { AppState } from "../types";
 import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
 
 function hasDuplicateManufacturerReference(state: AppState, catalogItemId: string, manufacturerReference: string): boolean {
+  const referenceKey = normalizeManufacturerReferenceKey(manufacturerReference);
+  if (referenceKey === undefined) {
+    return false;
+  }
   return state.catalogItems.allIds.some((id) => {
     if (id === catalogItemId) {
       return false;
     }
     const item = state.catalogItems.byId[id];
-    return item?.manufacturerReference === manufacturerReference;
+    return item !== undefined && normalizeManufacturerReferenceKey(item.manufacturerReference) === referenceKey;
   });
 }
 

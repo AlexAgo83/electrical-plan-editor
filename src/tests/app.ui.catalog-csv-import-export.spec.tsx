@@ -82,9 +82,8 @@ describe("App integration UI - catalog CSV import/export", () => {
 
     const csvText = [
       CATALOG_CSV_HEADERS.join(","),
-      "REF-1,4,Updated item,1.25,https://example.com/ref-1",
-      "REF-2,3,New item,2.00,https://example.com/ref-2",
-      "REF-2,5,New item override,2.50,https://example.com/ref-2b"
+      "ref-1,4,Updated item,1.25,https://example.com/ref-1",
+      "REF-2,5,New item,2.50,https://example.com/ref-2"
     ].join("\r\n");
     const file = new File([csvText], "catalog-import.csv", { type: "text/csv" });
     Object.defineProperty(file, "text", {
@@ -103,9 +102,9 @@ describe("App integration UI - catalog CSV import/export", () => {
     expect(confirmSpy).toHaveBeenCalledTimes(1);
     expect(catalogPanel).not.toHaveAttribute("hidden");
     expect(
-      within(catalogPanel).getByText(/Last catalog CSV import \(catalog-import\.csv\): 2 rows, 1 warnings, 0 errors\./)
+      within(catalogPanel).getByText(/Last catalog CSV import \(catalog-import\.csv\): 2 rows, 0 warnings, 0 errors\./)
     ).toBeInTheDocument();
-    expect(within(catalogPanel).getByText("REF-1")).toBeInTheDocument();
+    expect(within(catalogPanel).getByText("ref-1")).toBeInTheDocument();
     expect(within(catalogPanel).getByText("REF-2")).toBeInTheDocument();
 
     const catalogByRef = Object.values(store.getState().catalogItems.byId).reduce<Record<string, { connectionCount: number; name?: string }>>(
@@ -120,13 +119,13 @@ describe("App integration UI - catalog CSV import/export", () => {
       },
       {}
     );
-    expect(catalogByRef["REF-1"]).toEqual({
+    expect(catalogByRef["ref-1"]).toEqual({
       connectionCount: 4,
       name: "Updated item"
     });
     expect(catalogByRef["REF-2"]).toEqual({
       connectionCount: 5,
-      name: "New item override"
+      name: "New item"
     });
   });
 });

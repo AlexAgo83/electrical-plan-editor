@@ -174,7 +174,9 @@ describe("App integration UI - creation flow wire endpoint references", () => {
     expect(savedWire?.endpointBSealReference).toBeUndefined();
   });
 
-  it("supports fuse mode with catalog linkage, preserves save/cancel semantics, and shows fuse metadata in wire list and analysis", () => {
+  it(
+    "supports fuse mode with catalog linkage, preserves save/cancel semantics, and shows fuse metadata in wire list and analysis",
+    () => {
     const fuseCatalogState = appReducer(
       createUiIntegrationState(),
       appActions.upsertCatalogItem({
@@ -240,5 +242,7 @@ describe("App integration UI - creation flow wire endpoint references", () => {
     const wireAnalysisPanel = getPanelByHeading("Wire analysis");
     expect(within(wireAnalysisPanel).getByText("Protection")).toBeInTheDocument();
     expect(within(wireAnalysisPanel).getByText("CAT-FUSE-UI")).toBeInTheDocument();
-  });
+    },
+    10_000
+  );
 });

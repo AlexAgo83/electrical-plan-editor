@@ -12,7 +12,7 @@ import type {
   WireEndpoint
 } from "../../../core/entities";
 import type { AppStore } from "../../../store";
-import { isValidCatalogUrlInput } from "../../../store";
+import { isValidCatalogUrlInput, normalizeManufacturerReferenceKey } from "../../../store";
 import {
   isOrderedRouteValid,
   parseWireOccupantRef,
@@ -61,10 +61,11 @@ export function buildValidationIssues({
     .map((catalogItemId) => state.catalogItems.byId[catalogItemId])
     .filter((item): item is CatalogItem => item !== undefined);
 
-  const duplicateCatalogItemsByReference = new Map<string, CatalogItem[]>();
+  const duplicateCatalogItemsByReference = new Map<string, { label: string; items: CatalogItem[] }>();
   for (const item of catalogItems) {
-    const normalizedRef = item.manufacturerReference.trim();
-    if (normalizedRef.length === 0) {
+    const normalizedRefLabel = item.manufacturerReference.trim();
+    const normalizedRefKey = normalizeManufacturerReferenceKey(item.manufacturerReference);
+    if (normalizedRefKey === undefined) {
       issues.push({
         id: `catalog-empty-manufacturer-reference-${item.id}`,
         severity: "error",
@@ -75,11 +76,14 @@ export function buildValidationIssues({
         selectionId: item.id
       });
     } else {
-      const duplicateBucket = duplicateCatalogItemsByReference.get(normalizedRef);
+      const duplicateBucket = duplicateCatalogItemsByReference.get(normalizedRefKey);
       if (duplicateBucket === undefined) {
-        duplicateCatalogItemsByReference.set(normalizedRef, [item]);
+        duplicateCatalogItemsByReference.set(normalizedRefKey, {
+          label: normalizedRefLabel,
+          items: [item]
+        });
       } else {
-        duplicateBucket.push(item);
+        duplicateBucket.items.push(item);
       }
     }
 
@@ -109,17 +113,17 @@ export function buildValidationIssues({
   }
   const shouldValidateMissingCatalogLinks = catalogItems.length > 0;
 
-  for (const [manufacturerReference, duplicateItems] of duplicateCatalogItemsByReference) {
+  for (const { label, items: duplicateItems } of duplicateCatalogItemsByReference.values()) {
     if (duplicateItems.length < 2) {
       continue;
     }
     const sortedDuplicateItems = [...duplicateItems].sort((left, right) => left.id.localeCompare(right.id));
     for (const item of sortedDuplicateItems) {
       issues.push({
-        id: `catalog-duplicate-manufacturer-reference-${manufacturerReference}-${item.id}`,
+        id: `catalog-duplicate-manufacturer-reference-${label}-${item.id}`,
         severity: "error",
         category: catalogIntegrityCategory,
-        message: `Catalog manufacturer reference '${manufacturerReference}' is duplicated.`,
+        message: `Catalog manufacturer reference '${label}' is duplicated.`,
         subScreen: "catalog",
         selectionKind: "catalog",
         selectionId: item.id

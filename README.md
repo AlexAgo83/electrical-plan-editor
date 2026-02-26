@@ -139,6 +139,13 @@ Then open `http://127.0.0.1:5284` (unless overridden).
 - `npm run typecheck`: run TypeScript checks
 - `npm run test`: run Vitest in watch mode
 - `npm run test:ci`: run Vitest with coverage
+- `npm run test:ci:fast`: run a faster non-UI Vitest subset (complementary to `test:ci`)
+- `npm run test:ci:ui`: run UI-focused Vitest subset (`app.ui*` specs)
+- `npm run test:ci:slow-top`: print top-10 slowest tests from a Vitest run (informational)
+- `npm run test:ci:ui:slow-top`: print top-10 slowest UI tests (informational)
+- `npm run coverage:ui:report`: emit `src/app/**` coverage report (informational, non-blocking)
+- `npm run bundle:metrics:report`: report main JS chunk + total JS gzip with non-blocking warning budgets
+- `npm run build:bundle:report`: run production build then bundle metrics report
 - `npm run test:e2e`: run Playwright E2E smoke tests
 - `npm run quality:ui-modularization`: enforce UI modularization line-budget gate
 - `npm run quality:store-modularization`: enforce store modularization line-budget gate
@@ -231,6 +238,18 @@ npm run quality:pwa
 ```
 
 CI runs the same main pipeline in `.github/workflows/ci.yml` on `push` and `pull_request`.
+
+Additional non-blocking CI observability:
+
+- `coverage:ui:report` for `src/app/**` coverage visibility
+- `test:ci:ui:slow-top` for top-N slow UI test reporting
+- `bundle:metrics:report` for main-chunk and total-gzip size visibility
+- these signals are informational and do not replace canonical `test:ci`
+
+Form validation doctrine (current targeted scope):
+
+- native HTML validation guards simple required/number constraints first (`catalog`, `wire`)
+- inline custom errors remain for business and cross-field rules (catalog URL policy, uniqueness, endpoint/business integrity)
 
 Local E2E note:
 

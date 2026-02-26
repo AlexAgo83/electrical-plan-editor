@@ -1,8 +1,8 @@
 ## task_066_req_068_review_followups_hardening_coverage_bundle_perf_and_test_reliability_orchestration_and_delivery_control - req_068 review follow-ups hardening, coverage, bundle perf, and test reliability orchestration and delivery control
 > From version: 0.9.10
 > Understanding: 96% (umbrella orchestration for phased engineering-quality improvements spanning reducer/catalog hardening, CI signal, bundle performance, and form-validation consistency)
-> Confidence: 90% (scope is broad but manageable with phased execution and strict validation gates)
-> Progress: 0%
+> Confidence: 94% (phased delivery landed with full validation matrix green)
+> Progress: 100%
 > Complexity: High
 > Theme: Quality follow-up orchestration after broad project review
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -44,13 +44,13 @@ Default execution strategy from `req_068`:
 - `logics/backlog/item_377_regression_coverage_for_req_068_quality_followups_hardening_ci_perf_and_validation_consistency.md`
 
 # Phase plan
-- [ ] Phase 1 (Quick wins hardening): deliver `item_369`, `item_370`, `item_371`
-- [ ] Phase 1 regression coverage updates: deliver relevant parts of `item_377`
-- [ ] Phase 2 (Quality signal / CI observability): deliver `item_372`, `item_373`
-- [ ] Phase 3 (Bundle measurement + perf quick wins): deliver `item_374`, `item_375`
-- [ ] Phase 4 (Validation consistency review and targeted harmonization): deliver `item_376`
-- [ ] Final regression sweep and close `item_377`
-- [ ] FINAL: sync request/backlog/task docs and record delivery notes
+- [x] Phase 1 (Quick wins hardening): deliver `item_369`, `item_370`, `item_371`
+- [x] Phase 1 regression coverage updates: deliver relevant parts of `item_377`
+- [x] Phase 2 (Quality signal / CI observability): deliver `item_372`, `item_373`
+- [x] Phase 3 (Bundle measurement + perf quick wins): deliver `item_374`, `item_375`
+- [x] Phase 4 (Validation consistency review and targeted harmonization): deliver `item_376`
+- [x] Final regression sweep and close `item_377`
+- [x] FINAL: sync request/backlog/task docs and record delivery notes
 
 # Validation gates
 ## Minimum gate (after each phase)
@@ -77,13 +77,16 @@ Default execution strategy from `req_068`:
 
 # Report
 - Current blockers: none.
-- Risks to track:
-  - Scope creep across phases (umbrella request turns into long-running “cleanup” stream).
-  - CI signal additions becoming noisy or ignored if not clearly labeled.
-  - Bundle split changes regressing lazy-loading UX or PWA behavior.
-  - Validation consistency work causing UX churn across forms without clear doctrine adoption.
-- Execution recommendation:
-  - Start with Phase 1 quick wins immediately (`item_369`..`item_371`) before perf/test tooling work.
+- Delivered scope summary:
+  - `item_369`..`item_371`: case-insensitive catalog reference policy (`trim + lower`) applied across reducers/import/validation; fuse `catalogItemId` trim hardening; load path no longer silently auto-renames duplicate references.
+  - `item_372`..`item_373`: added `coverage:ui:report`, `test:ci:fast`, `test:ci:ui`, `test:ci:slow-top`, `test:ci:ui:slow-top`; CI informational non-blocking steps for UI coverage and slow UI test top-N.
+  - `item_374`..`item_375`: added bundle metrics reporting (`bundle:metrics:report`) and manual chunking quick win (`vendor-react`, `vendor-pwa`) reducing main chunk from ~548 kB to ~353 kB (raw).
+  - `item_376`: wire/catalog handlers now gate on native form validity before inline business-rule validation; doctrine documented in README and covered by dedicated UI tests.
+  - `item_377`: regression coverage expanded for catalog case-insensitive behavior, CSV conflict policy, persistence/load duplicate handling, and validation doctrine behavior.
+- Validation gate status:
+  - Full gate passed (`logics_lint`, `lint`, `typecheck`, `quality:*`, `build`, `test:ci`, `test:e2e`).
+- Residual risk notes:
+  - Some heavy UI tests remain close to timeout limits under full coverage load; targeted per-test timeouts were raised where needed for stability without reducing assertions.
 
 # References
 - `logics/request/req_068_review_followups_hardening_coverage_bundle_perf_and_test_reliability.md`
@@ -95,3 +98,7 @@ Default execution strategy from `req_068`:
 - `src/app/hooks/useWireHandlers.ts`
 - `src/app/components/workspace/ModelingWireFormPanel.tsx`
 - `src/tests/app.ui.list-ergonomics.spec.tsx`
+- `scripts/quality/report-ui-coverage.mjs`
+- `scripts/quality/report-slowest-tests.mjs`
+- `scripts/quality/report-bundle-metrics.mjs`
+- `.github/workflows/ci.yml`
