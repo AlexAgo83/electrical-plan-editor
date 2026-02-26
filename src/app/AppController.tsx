@@ -1923,9 +1923,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         onPersistSpliceCalloutPosition: persistSpliceCalloutPosition,
         pngExportIncludeBackground: canvasPngExportIncludeBackground,
         canExportBomCsv,
-        workspaceCurrencyCode,
-        workspaceTaxEnabled,
-        workspaceTaxRatePercent,
         onExportBomCsv: handleExportBomCsv,
         handleRegenerateLayout
       }).networkSummaryPanel
