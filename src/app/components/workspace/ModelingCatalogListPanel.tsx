@@ -113,11 +113,12 @@ export function ModelingCatalogListPanel({
             {onExportCatalogCsv !== undefined ? (
               <button
                 type="button"
-                className="filter-chip"
+                className="filter-chip onboarding-help-button"
                 onClick={onExportCatalogCsv}
                 disabled={catalogItems.length === 0}
               >
-                Export CSV
+                <span className="table-export-icon" aria-hidden="true" />
+                <span>Export CSV</span>
               </button>
             ) : null}
             {onOpenCatalogOnboardingHelp !== undefined ? (
@@ -218,11 +219,16 @@ export function ModelingCatalogListPanel({
         </>
       )}
 
-      <div className="row-actions compact modeling-list-actions">
+      <div className="row-actions compact modeling-list-actions catalog-modeling-list-actions">
         <button type="button" className="button-with-icon" onClick={onOpenCreateCatalogItem}>
           <span className="action-button-icon is-new" aria-hidden="true" />
           New
         </button>
+        {onOpenCatalogCsvImportPicker !== undefined ? (
+          <button type="button" onClick={onOpenCatalogCsvImportPicker}>
+            Import CSV
+          </button>
+        ) : null}
         <button
           type="button"
           className="button-with-icon"
@@ -232,11 +238,6 @@ export function ModelingCatalogListPanel({
           <span className="action-button-icon is-edit" aria-hidden="true" />
           Edit
         </button>
-        {onOpenCatalogCsvImportPicker !== undefined ? (
-          <button type="button" onClick={onOpenCatalogCsvImportPicker}>
-            Import CSV
-          </button>
-        ) : null}
         <button
           type="button"
           className="modeling-list-action-delete button-with-icon"
