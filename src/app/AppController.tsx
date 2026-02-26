@@ -1122,6 +1122,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     handleRecreateSampleNetwork,
     handleRecreateValidationIssuesSampleNetwork,
     handleRecreateCatalogValidationIssuesSampleNetwork,
+    handleRecreatePricingBomQaSampleNetwork,
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,
     fitNetworkToContent,
@@ -1922,6 +1923,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         onPersistSpliceCalloutPosition: persistSpliceCalloutPosition,
         pngExportIncludeBackground: canvasPngExportIncludeBackground,
         canExportBomCsv,
+        workspaceCurrencyCode,
+        workspaceTaxEnabled,
+        workspaceTaxRatePercent,
         onExportBomCsv: handleExportBomCsv,
         handleRegenerateLayout
       }).networkSummaryPanel
@@ -2150,6 +2154,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         handleRecreateSampleNetwork,
         handleRecreateValidationIssuesSampleNetwork,
         handleRecreateCatalogValidationIssuesSampleNetwork,
+        handleRecreatePricingBomQaSampleNetwork,
         handleResetSampleNetwork,
         activeNetworkId,
         importExport: {

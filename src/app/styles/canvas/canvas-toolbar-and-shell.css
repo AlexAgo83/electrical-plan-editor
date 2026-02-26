@@ -23,6 +23,16 @@
   margin: 0;
 }
 
+.network-summary-header-copy {
+  min-width: 0;
+}
+
+.network-summary-bom-pricing-context {
+  margin: 0.18rem 0 0;
+  font-size: 0.75rem;
+  color: var(--custom-muted-text, #4a4f6a);
+}
+
 .network-summary-header-actions {
   display: inline-flex;
   align-items: center;
