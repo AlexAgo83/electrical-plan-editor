@@ -53,11 +53,14 @@ describe("App integration UI - catalog CSV import/export", () => {
     expect(headerToolsRows.length).toBeGreaterThan(0);
     const headerButtons = within(headerToolsRows[0] as HTMLElement).getAllByRole("button");
     expect(headerButtons.map((button) => button.textContent?.trim() ?? "")).toEqual(["Export CSV", "Help"]);
+    const exportButton = within(headerToolsRows[0] as HTMLElement).getByRole("button", { name: "Export CSV" });
+    expect(exportButton).toHaveClass("onboarding-help-button");
+    expect(exportButton.querySelector(".table-export-icon")).not.toBeNull();
 
     const actionsRow = catalogPanel.querySelector(".row-actions.compact.modeling-list-actions");
     expect(actionsRow).not.toBeNull();
     const actionButtons = within(actionsRow as HTMLElement).getAllByRole("button");
-    expect(actionButtons.map((button) => button.textContent?.trim() ?? "")).toEqual(["New", "Edit", "Import CSV", "Delete"]);
+    expect(actionButtons.map((button) => button.textContent?.trim() ?? "")).toEqual(["New", "Import CSV", "Edit", "Delete"]);
 
     Object.defineProperty(URL, "createObjectURL", {
       configurable: true,
@@ -70,7 +73,7 @@ describe("App integration UI - catalog CSV import/export", () => {
       value: vi.fn()
     });
     vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
-    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Export CSV" }));
+    fireEvent.click(exportButton);
     expect(within(catalogPanel).getByText("Exported 1 catalog item(s).")).toBeInTheDocument();
 
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);

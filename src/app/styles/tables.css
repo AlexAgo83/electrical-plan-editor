@@ -370,6 +370,14 @@
   width: 100%;
 }
 
+.catalog-modeling-list-actions {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.catalog-modeling-list-actions button {
+  white-space: nowrap;
+}
+
 .modeling-list-action-delete {
   border-color: #d3a7ad !important;
   background: #fbeaed !important;
@@ -379,6 +387,12 @@
 @media (max-width: 860px) {
   .modeling-list-actions {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .catalog-modeling-list-actions {
+    grid-template-columns: repeat(4, minmax(max-content, 1fr));
+    overflow-x: auto;
+    align-items: stretch;
   }
 
   .list-panel-header {
