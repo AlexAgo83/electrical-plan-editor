@@ -1,7 +1,7 @@
 ## req_069_ci_observability_execution_order_test_segmentation_and_ui_test_reliability - CI observability execution order, test segmentation hardening, and UI test reliability follow-up
 > From version: 0.9.11
-> Understanding: 96% (focused follow-up request after req_068 delivery to improve CI diagnostic signal quality and reduce test-runtime fragility)
-> Confidence: 93% (scope is narrow, actionable, and mostly tooling/test-architecture level)
+> Understanding: 98% (default decisions are now explicit for CI `always` scope, segmentation boundaries, and timeout/coverage strategy)
+> Confidence: 95% (delivery path is clear and bounded with low ambiguity)
 > Complexity: Medium
 > Theme: CI signal robustness and test reliability hardening
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -29,33 +29,41 @@ Current residual risks:
 - Reduce UI test fragility without weakening regression intent.
 
 # Default decisions
-- CI observability steps should run with `if: always()` (still non-blocking).
+- CI observability steps with `if: always()` scope (still non-blocking):
+  - `coverage:ui:report`
+  - `test:ci:ui:slow-top`
+- `bundle:metrics:report` remains informational/non-blocking but only runs when `build` succeeded.
 - `test:ci` remains canonical and unchanged in role.
-- Segmentation should move toward explicit glob/domain contracts rather than prefix-only filename assumptions.
-- Timeout increases are acceptable only as short-term mitigations; root-cause stabilization remains the target.
+- Segmentation should use explicit glob/domain contracts (not prefix-only filename assumptions).
+- `pwa.*` test files default to the fast/core lane (not the UI-heavy lane).
+- No hard CI runtime threshold in V1; use trend-based monitoring with top-N slow tests.
+- Existing `10_000ms` timeout exceptions are accepted as temporary debt; new timeout increases require explicit rationale.
+- Keep `coverage:ui:report` as a separate run in V1 for clarity/simplicity; optimize duplication later only if needed.
 
 # Functional scope
 ## A. CI execution-order hardening (high priority)
 - Ensure informational observability steps execute even after upstream failures:
   - UI coverage report
   - slow-test top-N report
-  - bundle metrics report (when build artifacts are available)
+- Keep bundle metrics report informational/non-blocking, but tied to successful build artifacts.
 - Keep these steps non-blocking.
 - Make logs explicit that they are diagnostic signals and not release gates.
 
 ## B. Segmentation contract hardening (high priority)
 - Rework `test:ci:fast` and `test:ci:ui` segmentation to rely on stable explicit targeting (paths/patterns/contracts), not only `app.ui*` naming.
+- Keep `pwa.*` tests in `test:ci:fast` by default unless future data justifies reassignment.
 - Ensure combined segmented runs approximate the same test universe as canonical `test:ci`.
 - Document the segmentation policy in README and/or testing docs.
 
 ## C. UI test reliability follow-up (medium-high priority)
 - Identify top recurrent slow tests from slow-top reporting.
 - Apply targeted stabilizations (fixture shaping, setup reuse, await strategy, interaction batching, DOM query tightening) before adding more timeout exceptions.
+- Preserve existing temporary `10_000ms` exceptions but track them as explicit debt.
 - Keep runtime-oriented changes assertion-preserving.
 
 ## D. Coverage/reporting efficiency follow-up (medium priority)
-- Evaluate reducing duplicate CI work between `test:ci` and `coverage:ui:report`.
-- Keep UI coverage visibility intact while reducing redundant full-suite executions when possible.
+- Keep the separate `coverage:ui:report` run in V1.
+- Re-evaluate duplicate CI work later if observability cost becomes problematic.
 
 # Non-functional requirements
 - No regression in release confidence: canonical `test:ci` + `test:e2e` remain required.
@@ -75,11 +83,12 @@ Current residual risks:
   - `npm run -s test:e2e`
 
 # Acceptance criteria
-- AC1: Informational CI observability steps run even when earlier validation steps fail.
+- AC1: `coverage:ui:report` and `test:ci:ui:slow-top` run even when earlier validation steps fail (`if: always()`), remaining non-blocking.
 - AC2: `test:ci:fast` / `test:ci:ui` segmentation contract is explicit and documented.
 - AC3: Segmented commands remain complementary to canonical `test:ci`, not replacements.
-- AC4: At least the top unstable UI tests receive root-cause stabilization work or explicit documented rationale when deferred.
-- AC5: No material regression in CI runtime reliability and debugging clarity.
+- AC4: `bundle:metrics:report` remains informational/non-blocking and runs only on successful build artifacts.
+- AC5: At least the top unstable UI tests receive root-cause stabilization work or explicit documented rationale when deferred.
+- AC6: No material regression in CI runtime reliability and debugging clarity.
 
 # Out of scope
 - Replacing Vitest/Playwright tooling.
@@ -87,7 +96,14 @@ Current residual risks:
 - Turning informational observability into strict blocking thresholds in this request.
 
 # Backlog
-- To be derived from this request (new items for CI execution order, segmentation contract, and UI test stabilization).
+- `logics/backlog/item_378_ci_workflow_observability_execution_order_always_run_non_blocking_ui_signals.md`
+- `logics/backlog/item_379_test_ci_segmentation_contract_explicit_globs_and_pwa_fast_lane_assignment.md`
+- `logics/backlog/item_380_ui_test_reliability_stabilization_wave_1_for_top_slow_specs.md`
+- `logics/backlog/item_381_coverage_ui_report_v1_separate_execution_and_cost_baseline_tracking.md`
+- `logics/backlog/item_382_regression_coverage_for_req_069_ci_observability_segmentation_and_ui_reliability.md`
+
+# Orchestration task
+- `logics/tasks/task_067_req_069_ci_observability_execution_order_test_segmentation_and_ui_test_reliability_orchestration_and_delivery_control.md`
 
 # References
 - `.github/workflows/ci.yml`
