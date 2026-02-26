@@ -233,11 +233,6 @@ body:has(.app-shell.theme-circle-mobility-dark) {
   color: var(--cm-badge-text-error);
 }
 
-.app-shell.theme-circle-mobility-light .network-summary-bom-pricing-context,
-.app-shell.theme-circle-mobility-dark .network-summary-bom-pricing-context {
-  color: var(--cm-text-secondary);
-}
-
 .app-shell.theme-circle-mobility-light .network-canvas-floating-controls,
 .app-shell.theme-circle-mobility-light .network-canvas-floating-subnetworks,
 .app-shell.theme-circle-mobility-light .network-canvas-floating-stats,

@@ -260,9 +260,6 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     onPersistSpliceCalloutPosition: params.onPersistSpliceCalloutPosition,
     pngExportIncludeBackground: params.pngExportIncludeBackground,
     canExportBomCsv: params.canExportBomCsv,
-    workspaceCurrencyCode: params.workspaceCurrencyCode,
-    workspaceTaxEnabled: params.workspaceTaxEnabled,
-    workspaceTaxRatePercent: params.workspaceTaxRatePercent,
     onExportBomCsv: params.onExportBomCsv,
     onRegenerateLayout: params.handleRegenerateLayout
   } satisfies NetworkSummaryPanelProps;

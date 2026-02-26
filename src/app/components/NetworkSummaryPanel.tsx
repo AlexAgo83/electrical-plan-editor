@@ -27,8 +27,7 @@ import type {
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
-  SubScreenId,
-  WorkspaceCurrencyCode
+  SubScreenId
 } from "../types/app-controller";
 import { NetworkCanvasFloatingInfoPanels } from "./network-summary/NetworkCanvasFloatingInfoPanels";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
@@ -105,21 +104,6 @@ function resolveCanvasExportBackgroundFill(shellElement: HTMLElement | null): st
   return colorMatch?.[1] ?? null;
 }
 
-function formatBomPricingContext(
-  workspaceCurrencyCode: WorkspaceCurrencyCode,
-  workspaceTaxEnabled: boolean,
-  workspaceTaxRatePercent: number
-): string {
-  if (workspaceTaxEnabled !== true) {
-    return `BOM CSV pricing: ${workspaceCurrencyCode} · HT only`;
-  }
-
-  const normalizedTaxRatePercent = Number.isFinite(workspaceTaxRatePercent)
-    ? Math.min(1000, Math.max(0, workspaceTaxRatePercent))
-    : 20;
-  return `BOM CSV pricing: ${workspaceCurrencyCode} · TTC ${normalizedTaxRatePercent.toFixed(2)}%`;
-}
-
 export interface NetworkSummaryPanelProps {
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
@@ -185,9 +169,6 @@ export interface NetworkSummaryPanelProps {
   onPersistSpliceCalloutPosition: (spliceId: SpliceId, position: NodePosition) => void;
   pngExportIncludeBackground: boolean;
   canExportBomCsv: boolean;
-  workspaceCurrencyCode: WorkspaceCurrencyCode;
-  workspaceTaxEnabled: boolean;
-  workspaceTaxRatePercent: number;
   onExportBomCsv: () => void;
   onRegenerateLayout: () => void;
 }
@@ -620,9 +601,6 @@ export function NetworkSummaryPanel({
   onPersistSpliceCalloutPosition,
   pngExportIncludeBackground,
   canExportBomCsv,
-  workspaceCurrencyCode,
-  workspaceTaxEnabled,
-  workspaceTaxRatePercent,
   onExportBomCsv,
   onRegenerateLayout
 }: NetworkSummaryPanelProps): ReactElement {
@@ -635,10 +613,6 @@ export function NetworkSummaryPanel({
     { label: "Graph segments", value: routingGraphSegmentCount },
     { label: "Adjacency entries", value: totalEdgeEntries }
   ];
-  const bomPricingContextLabel = useMemo(
-    () => formatBomPricingContext(workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent),
-    [workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent]
-  );
   const effectiveScale = networkScale > 0 ? networkScale : 1;
   const inverseLabelScale = 1 / effectiveScale;
   const visibleModelMinX = (0 - networkOffset.x) / effectiveScale;
@@ -1302,10 +1276,7 @@ export function NetworkSummaryPanel({
     <section className="network-summary-stack">
       <section className="panel">
         <header className="network-summary-header">
-          <div className="network-summary-header-copy">
-            <h2>Network summary</h2>
-            <p className="network-summary-bom-pricing-context">{bomPricingContextLabel}</p>
-          </div>
+          <h2>Network summary</h2>
           <div className="network-summary-header-actions" role="group" aria-label="Network summary display options">
             <button
               type="button"
@@ -1369,7 +1340,6 @@ export function NetworkSummaryPanel({
               className="workspace-tab network-summary-export-button"
               onClick={onExportBomCsv}
               disabled={!canExportBomCsv}
-              title={bomPricingContextLabel}
             >
               <span className="table-export-icon" aria-hidden="true" />
               BOM

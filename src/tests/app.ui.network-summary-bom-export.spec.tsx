@@ -58,8 +58,8 @@ describe("App integration UI - network summary BOM export", () => {
       const networkSummaryPanel = getPanelByHeading("Network summary");
       const exportPngButton = within(networkSummaryPanel).getByRole("button", { name: "PNG" });
       const exportBomButton = within(networkSummaryPanel).getByRole("button", { name: "BOM" });
-      expect(within(networkSummaryPanel).getByText("BOM CSV pricing: EUR · TTC 20.00%")).toBeInTheDocument();
-      expect(exportBomButton).toHaveAttribute("title", "BOM CSV pricing: EUR · TTC 20.00%");
+      expect(within(networkSummaryPanel).queryByText(/BOM CSV pricing:/i)).toBeNull();
+      expect(exportBomButton).not.toHaveAttribute("title");
 
       const actionButtons = Array.from(networkSummaryPanel.querySelectorAll("header .workspace-tab"));
       expect(actionButtons.indexOf(exportBomButton)).toBeGreaterThan(actionButtons.indexOf(exportPngButton));
@@ -79,7 +79,7 @@ describe("App integration UI - network summary BOM export", () => {
     }
   });
 
-  it("surfaces updated workspace currency and tax mode in network summary BOM pricing context", () => {
+  it("keeps the BOM export button visible after changing currency and tax settings", () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("settings");
@@ -91,10 +91,7 @@ describe("App integration UI - network summary BOM export", () => {
 
     switchScreenDrawerAware("modeling");
     const networkSummaryPanel = getPanelByHeading("Network summary");
-    expect(within(networkSummaryPanel).getByText("BOM CSV pricing: GBP · HT only")).toBeInTheDocument();
-    expect(within(networkSummaryPanel).getByRole("button", { name: "BOM" })).toHaveAttribute(
-      "title",
-      "BOM CSV pricing: GBP · HT only"
-    );
+    expect(within(networkSummaryPanel).queryByText(/BOM CSV pricing:/i)).toBeNull();
+    expect(within(networkSummaryPanel).getByRole("button", { name: "BOM" })).toBeInTheDocument();
   });
 });
