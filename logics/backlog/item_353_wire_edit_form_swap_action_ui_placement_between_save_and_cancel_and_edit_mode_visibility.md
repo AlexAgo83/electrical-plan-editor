@@ -1,8 +1,8 @@
 ## item_353_wire_edit_form_swap_action_ui_placement_between_save_and_cancel_and_edit_mode_visibility - Wire edit form swap action UI placement between Save and Cancel and edit-mode visibility
 > From version: 0.9.8
-> Understanding: 99% (user-specified placement is explicit: between `Save` and `Cancel edit` in `Edit Wire`)
-> Confidence: 96%
-> Progress: 0%
+> Understanding: 100% (placement, icon usage, and exact V1 label `Swap endpoints` are explicit for `Edit Wire`)
+> Confidence: 97%
+> Progress: 1%
 > Complexity: Medium
 > Theme: Wire form UI action integration and placement ergonomics
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -15,7 +15,7 @@ Even if endpoint swap logic exists, users cannot use it effectively unless the a
   - Add a new wire-form action button for endpoint swap.
   - Placement contract in `Edit Wire`:
     - `Save`
-    - `Swap endpoints` (or equivalent)
+    - `Swap endpoints`
     - `Cancel edit`
   - Show the swap action only in `Edit Wire` mode.
   - Use the provided swap icon asset `public/icons/ico_swap.svg` with a visible text label.
@@ -29,6 +29,7 @@ Even if endpoint swap logic exists, users cannot use it effectively unless the a
 - `Edit Wire` action row includes the new swap action between `Save` and `Cancel edit`.
 - Swap action is hidden in `Create Wire` mode (V1).
 - Swap action uses `public/icons/ico_swap.svg` and keeps a visible text label (not icon-only).
+- Swap action visible label is exactly `Swap endpoints` (V1).
 - Clicking the swap action does not submit the form or exit edit mode.
 - Existing `Save` and `Cancel edit` actions remain functional and visually coherent.
 

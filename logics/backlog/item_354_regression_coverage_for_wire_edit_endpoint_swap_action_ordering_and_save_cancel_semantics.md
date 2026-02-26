@@ -1,8 +1,8 @@
 ## item_354_regression_coverage_for_wire_edit_endpoint_swap_action_ordering_and_save_cancel_semantics - Regression coverage for wire edit endpoint swap action ordering and save/cancel semantics
 > From version: 0.9.8
-> Understanding: 98%
-> Confidence: 95%
-> Progress: 0%
+> Understanding: 99%
+> Confidence: 96%
+> Progress: 1%
 > Complexity: Medium-High
 > Theme: Regression safety for wire edit endpoint swap feature
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -13,6 +13,7 @@ The endpoint swap feature affects wire edit state, action ordering, and save/can
 # Scope
 - In:
   - Add UI regression tests for `Edit Wire` action row ordering (`Save`, `Swap`, `Cancel edit`) and icon+label presence for the swap action.
+  - Add a regression assertion that no confirmation dialog is opened on swap click.
   - Add endpoint swap correctness tests (kind/id/index + connection/seal refs).
   - Add tests confirming swap is draft-only (no auto-save, no edit-mode exit).
   - Add save-after-swap persistence tests.
@@ -24,6 +25,7 @@ The endpoint swap feature affects wire edit state, action ordering, and save/can
 # Acceptance criteria
 - Automated tests verify action placement and edit-only visibility of the swap button.
 - Automated tests verify swap action icon contract (`ico_swap.svg` usage) and visible label (not icon-only).
+- Automated tests verify the visible label is `Swap endpoints` and swap click does not prompt confirmation.
 - Automated tests verify endpoint swap correctness including metadata fields.
 - Automated tests verify save/cancel semantics remain correct after swap usage.
 - Existing wire form/create/edit regression suites remain green.
