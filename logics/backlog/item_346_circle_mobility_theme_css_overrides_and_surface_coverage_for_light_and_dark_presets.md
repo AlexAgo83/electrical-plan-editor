@@ -1,8 +1,8 @@
 ## item_346_circle_mobility_theme_css_overrides_and_surface_coverage_for_light_and_dark_presets - Circle Mobility theme CSS overrides and surface coverage for light and dark presets
 > From version: 0.9.7
-> Understanding: 96%
-> Confidence: 90%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: CSS theme implementation and representative surface coverage for Circle Mobility branding
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -34,9 +34,14 @@ Even with a theme-mode contract, Circle Mobility presets will feel incomplete if
 - Dependencies: `req_061`, `item_345`.
 - Blocks: `item_347`, `task_058`.
 - Related AC: req_061 AC2, AC4.
+- Delivery:
+  - Implemented Circle Mobility light/dark override pack with branded shell, panel, table, form, badge, and canvas-floating surface coverage.
+  - Applied Circle gradients intentionally to header accents and active interaction states while preserving readable text contrast.
+  - Centralized repeated palette/gradient values in `--cm-*` variables to reduce override drift.
 - References:
   - `logics/request/req_061_circle_mobility_brand_light_and_dark_theme_presets.md`
   - `src/app/styles/base/base-theme-overrides.css`
+  - `src/app/styles/base/base-theme-overrides/circle-mobility-brand-themes.css`
   - `src/app/styles/base/base-theme-overrides/standalone-custom-light-themes-palettes-a.css`
   - `src/app/styles/base/base-theme-overrides/standalone-custom-midrange-themes-palettes-a.css`
   - `src/app/styles/base/base-theme-overrides/network-canvas-entity-theme-variables.css`

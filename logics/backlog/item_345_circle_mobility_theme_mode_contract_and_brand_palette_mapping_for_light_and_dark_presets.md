@@ -1,8 +1,8 @@
 ## item_345_circle_mobility_theme_mode_contract_and_brand_palette_mapping_for_light_and_dark_presets - Circle Mobility theme mode contract and brand palette mapping for light and dark presets
 > From version: 0.9.7
-> Understanding: 96%
-> Confidence: 91%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Theme mode extension and palette-to-token mapping for Circle Mobility presets
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -33,8 +33,14 @@ The app supports many themes, but there are no presets aligned with the Circle M
 - Dependencies: `req_061`.
 - Blocks: `item_346`, `item_347`, `task_058`.
 - Related AC: req_061 AC1, AC2.
+- Delivery:
+  - Added `ThemeMode` ids `circleMobilityLight` / `circleMobilityDark` and Settings selector labels.
+  - Wired persistence normalization for new modes (including compatibility aliases `circleLight` / `circleDark`).
+  - Mapped Circle Mobility palette + gradients into shared `--cm-*` tokens consumed by the override pack.
 - References:
   - `logics/request/req_061_circle_mobility_brand_light_and_dark_theme_presets.md`
   - `src/store/types.ts`
   - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
   - `src/store/reducer/uiReducer.ts`
+  - `src/app/hooks/useUiPreferences.ts`
+  - `src/app/styles/base/base-theme-overrides/circle-mobility-brand-themes.css`

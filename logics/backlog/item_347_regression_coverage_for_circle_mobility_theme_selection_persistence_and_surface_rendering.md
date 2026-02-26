@@ -1,8 +1,8 @@
 ## item_347_regression_coverage_for_circle_mobility_theme_selection_persistence_and_surface_rendering - Regression coverage for Circle Mobility theme selection, persistence, and surface rendering
 > From version: 0.9.7
-> Understanding: 97%
-> Confidence: 92%
-> Progress: 0%
+> Understanding: 100%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Regression coverage for new Circle Mobility theme presets
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -34,6 +34,10 @@ Theme additions can regress existing preset behavior, persistence, or representa
 - Dependencies: `req_061`, `item_345`, `item_346`.
 - Blocks: `task_058` closure.
 - Related AC: req_061 AC3, AC4, AC5.
+- Delivery:
+  - Extended theme UI regression coverage for Circle Mobility light/dark preset selection and app-shell class assertions.
+  - Added remount persistence coverage for Circle Mobility preset selection.
+  - Added representative surface assertions to ensure styling applies beyond shell class wiring.
 - References:
   - `logics/request/req_061_circle_mobility_brand_light_and_dark_theme_presets.md`
   - `src/tests/app.ui.theme.spec.tsx`

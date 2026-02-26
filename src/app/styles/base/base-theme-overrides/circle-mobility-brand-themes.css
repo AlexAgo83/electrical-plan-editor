@@ -1,83 +1,180 @@
+:root {
+  --cm-brand-primary: #05082c;
+  --cm-brand-primary-hover: #032b6b;
+  --cm-brand-primary-active: #021e4a;
+  --cm-brand-primary-light: #0e369b;
+  --cm-brand-accent-blue: #48caf3;
+  --cm-brand-accent-azur: #82f4ee;
+  --cm-brand-accent-pink: #ba0fb6;
+  --cm-brand-bg-main: #05082c;
+  --cm-brand-bg-elevated: #0a0f3e;
+  --cm-brand-bg-card: #12175a;
+  --cm-brand-bg-light: #f7dfd7;
+  --cm-brand-text-dark-primary: #ffffff;
+  --cm-brand-text-dark-secondary: #c8cbe6;
+  --cm-brand-text-disabled: #6e7396;
+  --cm-brand-text-light-primary: #05082c;
+  --cm-brand-text-light-secondary: #4a4f6a;
+  --cm-brand-border-dark: #1e2466;
+  --cm-brand-border-light: #dddcdb;
+  --cm-gradient-primary: linear-gradient(180deg, #0e369b, #05082c);
+  --cm-gradient-tech: linear-gradient(120deg, #48caf3 0%, #0e369b 42%, #05082c 100%);
+  --cm-gradient-tech-light: linear-gradient(120deg, #48caf3 0%, #0e369b 46%, #05082c 100%);
+  --cm-gradient-brand: linear-gradient(120deg, #ba0fb6 0%, #05082c 100%);
+}
+
+.app-shell.theme-circle-mobility-light,
+.app-shell.theme-circle-mobility-dark {
+  --cm-accent-blue: var(--cm-brand-accent-blue);
+  --cm-accent-azur: var(--cm-brand-accent-azur);
+  --cm-accent-pink: var(--cm-brand-accent-pink);
+  --cm-primary: var(--cm-brand-primary);
+  --cm-primary-hover: var(--cm-brand-primary-hover);
+  --cm-primary-active: var(--cm-brand-primary-active);
+  --cm-primary-light: var(--cm-brand-primary-light);
+  --cm-primary-gradient: var(--cm-gradient-primary);
+  --cm-tech-gradient: var(--cm-gradient-tech);
+  --cm-tech-gradient-header: var(--cm-gradient-tech-light);
+}
+
 .app-shell.theme-circle-mobility-light {
-  --custom-shell-bg-top: #f7dfd7;
-  --custom-shell-bg-bottom: #f3d9d2;
-  --custom-shell-text: #05082c;
-  --custom-panel-bg: rgba(255, 250, 248, 0.9);
-  --custom-panel-border: #dddcdb;
-  --custom-button-bg: #fbefeb;
-  --custom-button-border: #48caf3;
-  --custom-button-text: #032b6b;
-  --custom-button-active-text: #ffffff;
+  --cm-surface-shell-top: var(--cm-brand-bg-light);
+  --cm-surface-shell-bottom: #f3d9d2;
+  --cm-surface-panel: rgba(255, 250, 248, 0.9);
+  --cm-surface-button: #fbefeb;
+  --cm-surface-input: #fff8f5;
+  --cm-surface-table-head: rgba(248, 240, 235, 0.92);
+  --cm-text-primary: var(--cm-brand-text-light-primary);
+  --cm-text-secondary: var(--cm-brand-text-light-secondary);
+  --cm-text-strong: var(--cm-brand-text-light-primary);
+  --cm-border: var(--cm-brand-border-light);
+  --cm-selection: var(--cm-primary-light);
+  --cm-active-border: var(--cm-primary-light);
+  --cm-active-text: #ffffff;
+  --cm-badge-text: var(--cm-primary-hover);
+  --cm-badge-text-error: #7e0a7b;
+  --cm-badge-bg: rgba(72, 202, 243, 0.2);
+  --cm-badge-bg-error: rgba(186, 15, 182, 0.14);
+  --cm-row-selected: rgba(72, 202, 243, 0.14);
+  --cm-row-wire-highlight: rgba(186, 15, 182, 0.09);
+  --cm-label-stroke: rgba(255, 255, 255, 0.95);
+  --cm-grid: color-mix(in srgb, var(--cm-accent-blue) 28%, var(--cm-primary) 16%, white);
+  --cm-segment: var(--cm-primary-hover);
+  --cm-wire-highlight: var(--cm-accent-pink);
+  --cm-node-stroke: var(--cm-primary-light);
+  --cm-node-connector-fill: #b8efff;
+  --cm-node-splice-fill: #ffdfe3;
+  --cm-node-intermediate-fill: #d5fbf7;
+  --cm-floating-border: color-mix(in srgb, var(--cm-accent-blue) 45%, var(--cm-brand-border-light));
+
+  --custom-shell-bg-top: var(--cm-surface-shell-top);
+  --custom-shell-bg-bottom: var(--cm-surface-shell-bottom);
+  --custom-shell-text: var(--cm-text-primary);
+  --custom-panel-bg: var(--cm-surface-panel);
+  --custom-panel-border: var(--cm-border);
+  --custom-button-bg: var(--cm-surface-button);
+  --custom-button-border: var(--cm-accent-blue);
+  --custom-button-text: var(--cm-primary-hover);
+  --custom-button-active-text: var(--cm-active-text);
   --custom-badge-bg: rgba(72, 202, 243, 0.16);
-  --custom-badge-text: #032b6b;
-  --custom-input-bg: #fff8f5;
-  --custom-input-border: #dddcdb;
-  --custom-input-text: #05082c;
-  --custom-table-border: #dddcdb;
-  --custom-table-head-bg: rgba(248, 240, 235, 0.92);
-  --custom-row-selected-bg: rgba(72, 202, 243, 0.14);
-  --custom-row-wire-highlight-bg: rgba(186, 15, 182, 0.09);
-  --custom-muted-text: #4a4f6a;
-  --custom-strong-text: #05082c;
-  --custom-label-stroke: rgba(255, 255, 255, 0.95);
-  --custom-selection: #0e369b;
-  --custom-accent: #48caf3;
-  --custom-accent-2: #82f4ee;
-  --custom-grid: color-mix(in srgb, #48caf3 28%, #05082c 16%, white);
-  --custom-segment: #032b6b;
-  --custom-wire-highlight: #ba0fb6;
-  --custom-node-stroke: #0e369b;
-  --custom-node-connector-fill: #b8efff;
-  --custom-node-splice-fill: #ffdfe3;
-  --custom-node-intermediate-fill: #d5fbf7;
+  --custom-badge-text: var(--cm-badge-text);
+  --custom-input-bg: var(--cm-surface-input);
+  --custom-input-border: var(--cm-border);
+  --custom-input-text: var(--cm-text-primary);
+  --custom-table-border: var(--cm-border);
+  --custom-table-head-bg: var(--cm-surface-table-head);
+  --custom-row-selected-bg: var(--cm-row-selected);
+  --custom-row-wire-highlight-bg: var(--cm-row-wire-highlight);
+  --custom-muted-text: var(--cm-text-secondary);
+  --custom-strong-text: var(--cm-text-strong);
+  --custom-label-stroke: var(--cm-label-stroke);
+  --custom-selection: var(--cm-selection);
+  --custom-accent: var(--cm-accent-blue);
+  --custom-accent-2: var(--cm-accent-azur);
+  --custom-grid: var(--cm-grid);
+  --custom-segment: var(--cm-segment);
+  --custom-wire-highlight: var(--cm-wire-highlight);
+  --custom-node-stroke: var(--cm-node-stroke);
+  --custom-node-connector-fill: var(--cm-node-connector-fill);
+  --custom-node-splice-fill: var(--cm-node-splice-fill);
+  --custom-node-intermediate-fill: var(--cm-node-intermediate-fill);
 }
 
 body:has(.app-shell.theme-circle-mobility-light) {
   background:
-    radial-gradient(120% 120% at 8% 0%, color-mix(in srgb, #48caf3 22%, transparent), transparent 55%),
-    radial-gradient(120% 120% at 100% 100%, color-mix(in srgb, #ba0fb6 14%, transparent), transparent 60%),
-    linear-gradient(180deg, #f7dfd7, #f3d9d2);
+    radial-gradient(120% 120% at 8% 0%, color-mix(in srgb, var(--cm-brand-accent-blue) 22%, transparent), transparent 55%),
+    radial-gradient(120% 120% at 100% 100%, color-mix(in srgb, var(--cm-brand-accent-pink) 14%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--cm-brand-bg-light), #f3d9d2);
 }
 
 .app-shell.theme-circle-mobility-dark {
-  --custom-shell-bg-top: #05082c;
-  --custom-shell-bg-bottom: #0a0f3e;
-  --custom-shell-text: #ffffff;
-  --custom-panel-bg: rgba(10, 15, 62, 0.88);
-  --custom-panel-border: #1e2466;
-  --custom-button-bg: #0a0f3e;
-  --custom-button-border: #48caf3;
-  --custom-button-text: #c8cbe6;
-  --custom-button-active-text: #ffffff;
-  --custom-badge-bg: rgba(72, 202, 243, 0.2);
-  --custom-badge-text: #d8fbff;
-  --custom-input-bg: #05082c;
-  --custom-input-border: #1e2466;
-  --custom-input-text: #ffffff;
-  --custom-table-border: #1e2466;
-  --custom-table-head-bg: rgba(5, 8, 44, 0.94);
-  --custom-row-selected-bg: rgba(72, 202, 243, 0.18);
-  --custom-row-wire-highlight-bg: rgba(186, 15, 182, 0.14);
-  --custom-muted-text: #c8cbe6;
-  --custom-strong-text: #ffffff;
-  --custom-label-stroke: rgba(5, 8, 44, 0.92);
-  --custom-selection: #48caf3;
-  --custom-accent: #48caf3;
-  --custom-accent-2: #ba0fb6;
-  --custom-grid: color-mix(in srgb, #48caf3 30%, #1e2466);
-  --custom-segment: #82f4ee;
-  --custom-wire-highlight: #ba0fb6;
-  --custom-node-stroke: #48caf3;
-  --custom-node-connector-fill: #0e369b;
-  --custom-node-splice-fill: #4b1452;
-  --custom-node-intermediate-fill: #12175a;
+  --cm-surface-shell-top: var(--cm-brand-bg-main);
+  --cm-surface-shell-bottom: var(--cm-brand-bg-elevated);
+  --cm-surface-panel: rgba(10, 15, 62, 0.88);
+  --cm-surface-button: var(--cm-brand-bg-elevated);
+  --cm-surface-input: var(--cm-brand-bg-main);
+  --cm-surface-table-head: rgba(5, 8, 44, 0.94);
+  --cm-text-primary: var(--cm-brand-text-dark-primary);
+  --cm-text-secondary: var(--cm-brand-text-dark-secondary);
+  --cm-text-strong: var(--cm-brand-text-dark-primary);
+  --cm-border: var(--cm-brand-border-dark);
+  --cm-selection: var(--cm-accent-blue);
+  --cm-active-border: var(--cm-accent-blue);
+  --cm-active-text: #ffffff;
+  --cm-badge-text: #dffcff;
+  --cm-badge-text-error: #ffd3ff;
+  --cm-badge-bg: rgba(72, 202, 243, 0.2);
+  --cm-badge-bg-error: rgba(186, 15, 182, 0.2);
+  --cm-row-selected: rgba(72, 202, 243, 0.18);
+  --cm-row-wire-highlight: rgba(186, 15, 182, 0.14);
+  --cm-label-stroke: rgba(5, 8, 44, 0.92);
+  --cm-grid: color-mix(in srgb, var(--cm-accent-blue) 30%, var(--cm-brand-border-dark));
+  --cm-segment: var(--cm-accent-azur);
+  --cm-wire-highlight: var(--cm-accent-pink);
+  --cm-node-stroke: var(--cm-accent-blue);
+  --cm-node-connector-fill: var(--cm-primary-light);
+  --cm-node-splice-fill: #4b1452;
+  --cm-node-intermediate-fill: var(--cm-brand-bg-card);
+  --cm-floating-border: color-mix(in srgb, var(--cm-accent-blue) 48%, var(--cm-brand-border-dark));
+
+  --custom-shell-bg-top: var(--cm-surface-shell-top);
+  --custom-shell-bg-bottom: var(--cm-surface-shell-bottom);
+  --custom-shell-text: var(--cm-text-primary);
+  --custom-panel-bg: var(--cm-surface-panel);
+  --custom-panel-border: var(--cm-border);
+  --custom-button-bg: var(--cm-surface-button);
+  --custom-button-border: var(--cm-accent-blue);
+  --custom-button-text: var(--cm-text-secondary);
+  --custom-button-active-text: var(--cm-active-text);
+  --custom-badge-bg: var(--cm-badge-bg);
+  --custom-badge-text: var(--cm-badge-text);
+  --custom-input-bg: var(--cm-surface-input);
+  --custom-input-border: var(--cm-border);
+  --custom-input-text: var(--cm-text-primary);
+  --custom-table-border: var(--cm-border);
+  --custom-table-head-bg: var(--cm-surface-table-head);
+  --custom-row-selected-bg: var(--cm-row-selected);
+  --custom-row-wire-highlight-bg: var(--cm-row-wire-highlight);
+  --custom-muted-text: var(--cm-text-secondary);
+  --custom-strong-text: var(--cm-text-strong);
+  --custom-label-stroke: var(--cm-label-stroke);
+  --custom-selection: var(--cm-selection);
+  --custom-accent: var(--cm-accent-blue);
+  --custom-accent-2: var(--cm-accent-pink);
+  --custom-grid: var(--cm-grid);
+  --custom-segment: var(--cm-segment);
+  --custom-wire-highlight: var(--cm-wire-highlight);
+  --custom-node-stroke: var(--cm-node-stroke);
+  --custom-node-connector-fill: var(--cm-node-connector-fill);
+  --custom-node-splice-fill: var(--cm-node-splice-fill);
+  --custom-node-intermediate-fill: var(--cm-node-intermediate-fill);
 }
 
 body:has(.app-shell.theme-circle-mobility-dark) {
   background:
-    radial-gradient(120% 120% at 8% 0%, color-mix(in srgb, #48caf3 18%, transparent), transparent 55%),
-    radial-gradient(120% 120% at 100% 100%, color-mix(in srgb, #ba0fb6 20%, transparent), transparent 62%),
-    linear-gradient(180deg, #05082c, #0a0f3e);
+    radial-gradient(120% 120% at 8% 0%, color-mix(in srgb, var(--cm-brand-accent-blue) 18%, transparent), transparent 55%),
+    radial-gradient(120% 120% at 100% 100%, color-mix(in srgb, var(--cm-brand-accent-pink) 20%, transparent), transparent 62%),
+    linear-gradient(180deg, var(--cm-brand-bg-main), var(--cm-brand-bg-elevated));
 }
 
 .app-shell.theme-circle-mobility-light .header-block,
@@ -96,67 +193,49 @@ body:has(.app-shell.theme-circle-mobility-dark) {
 }
 
 .app-shell.theme-circle-mobility-light .header-block::after {
-  background: linear-gradient(120deg, #48caf3 0%, #0e369b 46%, #05082c 100%);
+  background: var(--cm-tech-gradient-header);
 }
 
 .app-shell.theme-circle-mobility-dark .header-block::after {
-  background: linear-gradient(120deg, #48caf3 0%, #0e369b 42%, #05082c 100%);
+  background: var(--cm-tech-gradient);
 }
 
 .app-shell.theme-circle-mobility-light .workspace-tab.is-active,
 .app-shell.theme-circle-mobility-light .filter-chip.is-active,
 .app-shell.theme-circle-mobility-light .header-settings-toggle.is-active,
-.app-shell.theme-circle-mobility-light .settings-primary-action {
-  border-color: #0e369b !important;
-  background: linear-gradient(180deg, #0e369b, #05082c) !important;
-  color: #ffffff !important;
-}
-
+.app-shell.theme-circle-mobility-light .settings-primary-action,
 .app-shell.theme-circle-mobility-dark .workspace-tab.is-active,
 .app-shell.theme-circle-mobility-dark .filter-chip.is-active,
 .app-shell.theme-circle-mobility-dark .header-settings-toggle.is-active,
 .app-shell.theme-circle-mobility-dark .settings-primary-action {
-  border-color: #48caf3 !important;
-  background: linear-gradient(180deg, #0e369b, #05082c) !important;
-  color: #ffffff !important;
+  border-color: var(--cm-active-border) !important;
+  background: var(--cm-primary-gradient) !important;
+  color: var(--cm-active-text) !important;
 }
 
 .app-shell.theme-circle-mobility-light .workspace-tab-badge,
-.app-shell.theme-circle-mobility-light .header-ops-badge {
-  border-color: #48caf3;
-  background: rgba(72, 202, 243, 0.2);
-  color: #032b6b;
-}
-
+.app-shell.theme-circle-mobility-light .header-ops-badge,
 .app-shell.theme-circle-mobility-dark .workspace-tab-badge,
 .app-shell.theme-circle-mobility-dark .header-ops-badge {
-  border-color: #48caf3;
-  background: rgba(72, 202, 243, 0.2);
-  color: #dffcff;
+  border-color: var(--cm-accent-blue);
+  background: var(--cm-badge-bg);
+  color: var(--cm-badge-text);
 }
 
 .app-shell.theme-circle-mobility-light .workspace-tab-badge.is-error,
-.app-shell.theme-circle-mobility-light .header-ops-badge.is-error {
-  border-color: #ba0fb6;
-  background: rgba(186, 15, 182, 0.14);
-  color: #7e0a7b;
-}
-
+.app-shell.theme-circle-mobility-light .header-ops-badge.is-error,
 .app-shell.theme-circle-mobility-dark .workspace-tab-badge.is-error,
 .app-shell.theme-circle-mobility-dark .header-ops-badge.is-error {
-  border-color: #ba0fb6;
-  background: rgba(186, 15, 182, 0.2);
-  color: #ffd3ff;
+  border-color: var(--cm-accent-pink);
+  background: var(--cm-badge-bg-error);
+  color: var(--cm-badge-text-error);
 }
 
 .app-shell.theme-circle-mobility-light .network-canvas-floating-controls,
 .app-shell.theme-circle-mobility-light .network-canvas-floating-subnetworks,
-.app-shell.theme-circle-mobility-light .network-canvas-floating-stats {
-  border-color: color-mix(in srgb, #48caf3 45%, #dddcdb);
-}
-
+.app-shell.theme-circle-mobility-light .network-canvas-floating-stats,
 .app-shell.theme-circle-mobility-dark .network-canvas-floating-controls,
 .app-shell.theme-circle-mobility-dark .network-canvas-floating-subnetworks,
 .app-shell.theme-circle-mobility-dark .network-canvas-floating-stats {
-  border-color: color-mix(in srgb, #48caf3 48%, #1e2466);
+  border-color: var(--cm-floating-border);
 }

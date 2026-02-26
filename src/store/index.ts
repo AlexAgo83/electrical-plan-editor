@@ -3,11 +3,11 @@ export { createAppStore, type AppStore } from "./createStore";
 export { appReducer } from "./reducer";
 export {
   createSampleNetworkState,
-  createCatalogValidationIssuesSampleNetworkState,
   createValidationIssuesSampleNetworkState,
   hasSampleNetworkSignature,
   isWorkspaceEmpty
 } from "./sampleNetwork";
+export { createCatalogValidationIssuesSampleNetworkState } from "./sampleNetworkCatalogValidationSample";
 export * from "./selectors";
 export * from "./catalog";
 export {
