@@ -1,8 +1,8 @@
 ## task_058_req_061_circle_mobility_brand_theme_presets_light_and_dark_orchestration_and_delivery_control - req_061 Circle Mobility brand theme presets (light and dark) orchestration and delivery control
 > From version: 0.9.7
-> Understanding: 97% (scope is a branded theming addition: 2 presets + palette mapping + CSS coverage + regression hardening)
-> Confidence: 91% (theme system and tests are already established, but surface coverage breadth requires sequencing)
-> Progress: 0%
+> Understanding: 100% (delivered: theme mode contract, Circle Mobility palette mapping, CSS surface overrides, regression coverage)
+> Confidence: 96% (implementation validated on targeted theme/settings suites; remaining visual tuning can iterate without contract changes)
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Orchestration for req_061 Circle Mobility branded theme preset rollout
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -44,12 +44,12 @@ The rollout should be sequenced to keep responsibilities clear:
 - `logics/backlog/item_347_regression_coverage_for_circle_mobility_theme_selection_persistence_and_surface_rendering.md`
 
 # Plan
-- [ ] 1. Add Circle Mobility theme mode contract and palette mapping (`item_345`)
-- [ ] 2. Implement CSS overrides and representative surface coverage for Circle Mobility light/dark presets (`item_346`)
-- [ ] 3. Extend regression coverage for selection, persistence, and representative rendering (`item_347`)
-- [ ] 4. Run targeted theme/settings UI suites and fix regressions
-- [ ] 5. Run final validation matrix
-- [ ] FINAL: Update related Logics docs
+- [x] 1. Add Circle Mobility theme mode contract and palette mapping (`item_345`)
+- [x] 2. Implement CSS overrides and representative surface coverage for Circle Mobility light/dark presets (`item_346`)
+- [x] 3. Extend regression coverage for selection, persistence, and representative rendering (`item_347`)
+- [x] 4. Run targeted theme/settings UI suites and fix regressions
+- [x] 5. Run final validation matrix (project gates rerun in this pass include restored `quality:store-modularization`)
+- [x] FINAL: Update related Logics docs
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -69,14 +69,16 @@ The rollout should be sequenced to keep responsibilities clear:
 - `npx vitest run src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
 
 # Report
-- Current blockers: none.
-- Risks to track:
-  - New presets may render only shell classes correctly while leaving representative surfaces unreadable or mismatched.
-  - Adding `ThemeMode` values may break persistence normalization or settings selector coverage if wiring is incomplete.
-  - Theme CSS layering can drift across split override files if the placement/import strategy is inconsistent.
+- Current blockers: none for `req_061` delivery. (Separate historical gate regression from `src/store/sampleNetwork.ts` line count was addressed by modularizing the catalog-validation sample factory.)
+- Risks tracked / mitigations:
+  - Shell-only wiring risk mitigated by Circle Mobility CSS override pack and representative surface assertions in `src/tests/app.ui.theme.spec.tsx`.
+  - Theme persistence regression risk mitigated by `ThemeMode` normalization support in `useUiPreferences` (including alias tolerance) and remount coverage.
+  - Theme override drift risk reduced by centralizing Circle Mobility palette/gradient tokens in `--cm-*` CSS variables.
 - Delivery notes:
-  - Prefer explicit palette mapping comments/notes when introducing Circle Mobility colors/gradients into existing override packs.
-  - Keep gradients intentional (headers/active states/highlights) to avoid lowering readability on data-dense surfaces.
+  - Added two presets (`circleMobilityLight`, `circleMobilityDark`) to the theme contract + Settings selector.
+  - Implemented branded CSS overlays with shared Circle Mobility tokens and targeted surface overrides (header accents, active chips/buttons, badges, canvas floating chrome).
+  - Extended theme UI tests for preset selection, persistence, and representative surfaces.
+  - Synced `logics` backlog/task docs after implementation.
 
 # References
 - `logics/request/req_061_circle_mobility_brand_light_and_dark_theme_presets.md`
