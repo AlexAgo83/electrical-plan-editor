@@ -55,6 +55,54 @@ describe("App integration UI - list ergonomics", () => {
     expect(getFirstSegmentId()).toBe("SEG-B");
   });
 
+  it("splits segment-analysis traversing wires endpoints into Endpoint A and Endpoint B columns with sortable split fields", () => {
+    renderAppWithState(createSampleNetworkState());
+
+    switchSubScreen("segment");
+    const modelingSegmentsPanel = getPanelByHeading("Segments");
+    fireEvent.click(within(modelingSegmentsPanel).getByText("SEG-002"));
+
+    switchScreen("analysis");
+    switchSubScreen("segment");
+    const segmentAnalysisPanel = getPanelByHeading("Segment analysis");
+
+    const endpointASortButton = within(segmentAnalysisPanel).getByRole("button", { name: /Endpoint A/i });
+    const endpointBSortButton = within(segmentAnalysisPanel).getByRole("button", { name: /Endpoint B/i });
+    expect(endpointASortButton).toBeInTheDocument();
+    expect(endpointBSortButton).toBeInTheDocument();
+    expect(within(segmentAnalysisPanel).queryByRole("button", { name: /^Endpoints$/i })).not.toBeInTheDocument();
+
+    const getColumnValues = (columnIndex: number): string[] =>
+      Array.from(segmentAnalysisPanel.querySelectorAll(`tbody tr td:nth-child(${columnIndex})`)).map((cell) =>
+        cell.textContent?.replace(/\s+/g, " ").trim() ?? ""
+      );
+
+    const endpointAHeaderCell = endpointASortButton.closest("th");
+    const endpointBHeaderCell = endpointBSortButton.closest("th");
+    expect(endpointAHeaderCell).not.toBeNull();
+    expect(endpointBHeaderCell).not.toBeNull();
+    if (endpointAHeaderCell === null || endpointBHeaderCell === null) {
+      throw new Error("Expected endpoint sort header cells.");
+    }
+
+    fireEvent.click(endpointASortButton);
+    expect(endpointAHeaderCell).toHaveAttribute("aria-sort", "ascending");
+    const endpointAAsc = getColumnValues(4);
+    expect(endpointAAsc.length).toBeGreaterThan(1);
+    expect(endpointAAsc).toEqual([...endpointAAsc].sort((a, b) => a.localeCompare(b)));
+
+    fireEvent.click(endpointASortButton);
+    expect(endpointAHeaderCell).toHaveAttribute("aria-sort", "descending");
+    const endpointADesc = getColumnValues(4);
+    expect(endpointADesc).toEqual([...endpointADesc].sort((a, b) => b.localeCompare(a)));
+
+    fireEvent.click(endpointBSortButton);
+    expect(endpointBHeaderCell).toHaveAttribute("aria-sort", "ascending");
+    const endpointBAsc = getColumnValues(5);
+    expect(endpointBAsc.length).toBeGreaterThan(1);
+    expect(endpointBAsc).toEqual([...endpointBAsc].sort((a, b) => a.localeCompare(b)));
+  });
+
   it("filters connectors by occupancy chips", () => {
     renderAppWithState(createConnectorOccupancyFilterState());
     switchScreen("modeling");

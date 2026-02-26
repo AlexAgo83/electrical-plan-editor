@@ -273,6 +273,60 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(within(nodesPanel).queryByText("N-MID")).not.toBeInTheDocument();
   });
 
+  it("swaps segment nodes in edit mode only and preserves non-node fields until Save", () => {
+    const { store } = renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("segment");
+
+    clickNewFromPanel("Segments");
+    const createSegmentPanel = getPanelByHeading("Create Segment");
+    expect(within(createSegmentPanel).queryByRole("button", { name: "Swap nodes" })).not.toBeInTheDocument();
+    fireEvent.click(within(createSegmentPanel).getByRole("button", { name: "Cancel" }));
+
+    const segmentsPanel = getPanelByHeading("Segments");
+    fireEvent.click(within(segmentsPanel).getByText("SEG-A"));
+    const editSegmentPanel = getPanelByHeading("Edit Segment");
+    const actionButtons = within(editSegmentPanel).getAllByRole("button");
+    expect(actionButtons.map((button) => button.textContent?.trim())).toEqual(["Save", "Swap nodes", "Cancel edit"]);
+
+    fireEvent.change(within(editSegmentPanel).getByLabelText("Length (mm)"), { target: { value: "123" } });
+    fireEvent.change(within(editSegmentPanel).getByLabelText("Sub-network tag (optional)"), { target: { value: "branch-x" } });
+    fireEvent.click(within(editSegmentPanel).getByRole("button", { name: "Swap nodes" }));
+
+    const segmentBeforeSave = Object.values(store.getState().segments.byId).find((segment) => segment.id === "SEG-A");
+    expect(segmentBeforeSave?.nodeA).toBe("N-C1");
+    expect(segmentBeforeSave?.nodeB).toBe("N-MID");
+    expect(segmentBeforeSave?.lengthMm).toBe(40);
+    expect(segmentBeforeSave?.subNetworkTag).toBeUndefined();
+
+    const swappedEditSegmentPanel = getPanelByHeading("Edit Segment");
+    expect(within(swappedEditSegmentPanel).getByLabelText("Node A")).toHaveValue("N-MID");
+    expect(within(swappedEditSegmentPanel).getByLabelText("Node B")).toHaveValue("N-C1");
+    expect(within(swappedEditSegmentPanel).getByLabelText("Length (mm)")).toHaveValue(123);
+    expect(within(swappedEditSegmentPanel).getByLabelText("Sub-network tag (optional)")).toHaveValue("branch-x");
+
+    fireEvent.click(within(swappedEditSegmentPanel).getByRole("button", { name: "Cancel edit" }));
+    fireEvent.click(within(getPanelByHeading("Segments")).getByText("SEG-A"));
+
+    const reopenedEditSegmentPanel = getPanelByHeading("Edit Segment");
+    expect(within(reopenedEditSegmentPanel).getByLabelText("Node A")).toHaveValue("N-C1");
+    expect(within(reopenedEditSegmentPanel).getByLabelText("Node B")).toHaveValue("N-MID");
+    expect(within(reopenedEditSegmentPanel).getByLabelText("Length (mm)")).toHaveValue(40);
+    expect(within(reopenedEditSegmentPanel).getByLabelText("Sub-network tag (optional)")).toHaveValue("");
+
+    fireEvent.change(within(reopenedEditSegmentPanel).getByLabelText("Length (mm)"), { target: { value: "222" } });
+    fireEvent.change(within(reopenedEditSegmentPanel).getByLabelText("Sub-network tag (optional)"), { target: { value: "rear" } });
+    fireEvent.click(within(reopenedEditSegmentPanel).getByRole("button", { name: "Swap nodes" }));
+    fireEvent.click(within(getPanelByHeading("Edit Segment")).getByRole("button", { name: "Save" }));
+
+    const savedSegment = Object.values(store.getState().segments.byId).find((segment) => segment.id === "SEG-A");
+    expect(savedSegment?.nodeA).toBe("N-MID");
+    expect(savedSegment?.nodeB).toBe("N-C1");
+    expect(savedSegment?.lengthMm).toBe(222);
+    expect(savedSegment?.subNetworkTag).toBe("rear");
+  });
+
   it("returns focus to the edited row after Save in modeling edit forms", async () => {
     renderAppWithState(createUiIntegrationState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));

@@ -66,6 +66,7 @@ export interface ModelingFormsColumnProps {
   segmentFormMode: "idle" | "create" | "edit";
   openCreateSegmentForm: () => void;
   handleSegmentSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  handleSwapSegmentNodes: () => void;
   segmentIdInput: string;
   setSegmentIdInput: (value: string) => void;
   nodes: NetworkNode[];
@@ -84,6 +85,7 @@ export interface ModelingFormsColumnProps {
   wireFormMode: "idle" | "create" | "edit";
   openCreateWireForm: () => void;
   handleWireSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  handleSwapWireEndpoints: () => void;
   wireName: string;
   setWireName: (value: string) => void;
   wireTechnicalId: string;

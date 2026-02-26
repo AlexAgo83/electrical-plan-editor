@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 96%
 > Confidence: 91%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Undo/redo behavior consistency and history hygiene
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -38,4 +38,5 @@ Undo/redo becomes unreliable or noisy without explicit rules for grouping bulk m
   - `logics/request/req_066_global_undo_redo_history_for_modeling_and_catalog_mutations.md`
   - `logics/request/req_062_catalog_csv_import_export_actions_and_round_trip_support.md`
   - `src/store/index.ts`
-
+  - `src/app/hooks/useStoreHistory.ts`
+  - `src/app/AppController.tsx`

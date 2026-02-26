@@ -61,7 +61,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
   type NodeTableSortField = "id" | "kind" | "reference" | "linkedSegments";
   type NodeAssociatedSegmentsSortField = "segmentId" | "peerNode" | "lengthMm" | "subNetwork" | "wireCount";
   type SegmentTableSortField = "id" | "nodeA" | "nodeB" | "subNetwork" | "lengthMm";
-  type SegmentTraversingWiresSortField = "name" | "technicalId" | "color" | "endpoints" | "sectionMm2" | "lengthMm" | "routeMode";
+  type SegmentTraversingWiresSortField = "name" | "technicalId" | "color" | "endpointA" | "endpointB" | "sectionMm2" | "lengthMm" | "routeMode";
 
   const [nodeTableSort, setNodeTableSort] = useState<{ field: NodeTableSortField; direction: "asc" | "desc" }>({
     field: "id",
@@ -161,11 +161,13 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
         segmentTraversingWires,
         segmentWiresSort,
         (wire, field) => {
-          const endpoints = `${describeWireEndpoint(wire.endpointA)} -> ${describeWireEndpoint(wire.endpointB)}`;
+          const endpointA = describeWireEndpoint(wire.endpointA);
+          const endpointB = describeWireEndpoint(wire.endpointB);
           if (field === "name") return wire.name;
           if (field === "technicalId") return wire.technicalId;
           if (field === "color") return getWireColorSortValue(wire);
-          if (field === "endpoints") return endpoints;
+          if (field === "endpointA") return endpointA;
+          if (field === "endpointB") return endpointB;
           if (field === "sectionMm2") return wire.sectionMm2;
           if (field === "lengthMm") return wire.lengthMm;
           return wire.isRouteLocked ? "Locked" : "Auto";
@@ -506,7 +508,8 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                     <th aria-sort={getTableAriaSort(segmentWiresSort, "name")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("name"))}>Name <span className="sort-indicator">{indicator(segmentWiresSort, "name")}</span></button></th>
                     <th aria-sort={getTableAriaSort(segmentWiresSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("technicalId"))}>Technical ID <span className="sort-indicator">{indicator(segmentWiresSort, "technicalId")}</span></button></th>
                     <th aria-sort={getTableAriaSort(segmentWiresSort, "color")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("color"))}>Color <span className="sort-indicator">{indicator(segmentWiresSort, "color")}</span></button></th>
-                    <th aria-sort={getTableAriaSort(segmentWiresSort, "endpoints")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("endpoints"))}>Endpoints <span className="sort-indicator">{indicator(segmentWiresSort, "endpoints")}</span></button></th>
+                    <th aria-sort={getTableAriaSort(segmentWiresSort, "endpointA")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("endpointA"))}>Endpoint A <span className="sort-indicator">{indicator(segmentWiresSort, "endpointA")}</span></button></th>
+                    <th aria-sort={getTableAriaSort(segmentWiresSort, "endpointB")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("endpointB"))}>Endpoint B <span className="sort-indicator">{indicator(segmentWiresSort, "endpointB")}</span></button></th>
                     <th aria-sort={getTableAriaSort(segmentWiresSort, "sectionMm2")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("sectionMm2"))}>Section (mm²) <span className="sort-indicator">{indicator(segmentWiresSort, "sectionMm2")}</span></button></th>
                     <th aria-sort={getTableAriaSort(segmentWiresSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("lengthMm"))}>Length (mm) <span className="sort-indicator">{indicator(segmentWiresSort, "lengthMm")}</span></button></th>
                     <th aria-sort={getTableAriaSort(segmentWiresSort, "routeMode")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("routeMode"))}>Route mode <span className="sort-indicator">{indicator(segmentWiresSort, "routeMode")}</span></button></th>
@@ -518,7 +521,8 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                       <td>{wire.name}</td>
                       <td className="technical-id">{wire.technicalId}</td>
                       <td>{renderWireColorCell(wire)}</td>
-                      <td>{describeWireEndpoint(wire.endpointA)} <strong>&rarr;</strong> {describeWireEndpoint(wire.endpointB)}</td>
+                      <td>{describeWireEndpoint(wire.endpointA)}</td>
+                      <td>{describeWireEndpoint(wire.endpointB)}</td>
                       <td>{wire.sectionMm2}</td>
                       <td>{wire.lengthMm}</td>
                       <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td>

@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 100% (UI placements plus V1 policy decisions are locked: match key, duplicate handling, strict import validation + strict headers, schema without internal ID, non-empty-catalog confirmation, local Catalog summary)
 > Confidence: 95% (contract is implementation-ready; remaining risk is execution/regression only)
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Orchestration for catalog CSV portability features (export + import) and UI integration
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -52,13 +52,13 @@ Because imports can mutate many catalog rows, delivery should be sequenced to st
 - `logics/backlog/item_351_regression_coverage_for_catalog_csv_import_export_round_trip_and_action_placement.md`
 
 # Plan
-- [ ] 1. Implement catalog CSV export schema/serialization/download contract (`item_348`)
-- [ ] 2. Implement catalog CSV import parser, row mapping, conflict policy, and error reporting (`item_349`)
-- [ ] 3. Integrate Catalog UI actions with requested placement and browser workflows (`item_350`)
-- [ ] 4. Add regression coverage for UI placement, import/export behavior, and round-trip smoke paths (`item_351`)
-- [ ] 5. Run targeted validation suites and fix regressions
-- [ ] 6. Run final validation matrix
-- [ ] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
+- [x] 1. Implement catalog CSV export schema/serialization/download contract (`item_348`)
+- [x] 2. Implement catalog CSV import parser, row mapping, conflict policy, and error reporting (`item_349`)
+- [x] 3. Integrate Catalog UI actions with requested placement and browser workflows (`item_350`)
+- [x] 4. Add regression coverage for UI placement, import/export behavior, and round-trip smoke paths (`item_351`)
+- [x] 5. Run targeted validation suites and fix regressions
+- [x] 6. Run final validation matrix
+- [x] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -93,6 +93,26 @@ Because imports can mutate many catalog rows, delivery should be sequenced to st
   - Include duplicate-resolution warnings in the import summary (`last row wins` cases).
   - Keep import summary local to Catalog and do not reuse Settings import/export status state.
   - Preserve `Delete` danger semantics and `Help` discoverability when inserting the new actions.
+  - Implement import application as a single atomic state replace (`replaceStateWithHistory`) to keep one undo checkpoint per CSV import.
+  - Restore `Catalog` sub-screen after atomic replace to prevent navigation drift caused by generic replace-state callbacks.
+  - Shared helper `catalogCsv.ts` now owns the schema constants, export row builder, strict parser, and row-level validation rules.
+- Validation snapshot (targeted):
+  - `npx vitest run src/tests/catalog.csv-import-export.spec.ts src/tests/app.ui.catalog-csv-import-export.spec.tsx` ✅ (`2` files / `3` tests)
+- Validation snapshot (final):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s build` ✅
+  - `npm run -s test:ci` ✅ (`46` files / `282` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
+- Delivery summary:
+  - Added Catalog CSV export/import helper and strict V1 schema contract in `src/app/lib/catalogCsv.ts`.
+  - Added Catalog panel CSV export/import actions with required placements and local status/summary rendering.
+  - Implemented non-empty catalog confirmation + deterministic merge/upsert import matching by trimmed `manufacturerReference`.
+  - Added targeted regression tests for helper parsing/export and Catalog UI placement/import workflow.
 
 # References
 - `logics/request/req_062_catalog_csv_import_export_actions_and_round_trip_support.md`
@@ -101,6 +121,10 @@ Because imports can mutate many catalog rows, delivery should be sequenced to st
 - `logics/backlog/item_350_catalog_panel_csv_export_import_action_placement_and_browser_file_workflow_integration.md`
 - `logics/backlog/item_351_regression_coverage_for_catalog_csv_import_export_round_trip_and_action_placement.md`
 - `src/app/components/workspace/ModelingCatalogListPanel.tsx`
+- `src/app/AppController.tsx`
+- `src/app/lib/catalogCsv.ts`
 - `src/app/lib/csv.ts`
 - `src/store/catalog.ts`
 - `src/tests/app.ui.catalog.spec.tsx`
+- `src/tests/app.ui.catalog-csv-import-export.spec.tsx`
+- `src/tests/catalog.csv-import-export.spec.ts`

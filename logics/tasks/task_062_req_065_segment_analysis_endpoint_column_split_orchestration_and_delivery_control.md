@@ -1,8 +1,8 @@
 ## task_062_req_065_segment_analysis_endpoint_column_split_orchestration_and_delivery_control - req_065 Segment analysis endpoint column split orchestration and delivery control
 > From version: 0.9.8
 > Understanding: 100% (scope is locked: split `Endpoints` into ordered `Endpoint A` then `Endpoint B` columns in `Segments > Segment analysis`, with individually sortable split fields and no legacy `Endpoints` header fallback)
-> Confidence: 97% (target table and sort wiring are localized in `AnalysisNodeSegmentWorkspacePanels`, leaving low-risk UI/table updates plus regression coverage)
-> Progress: 0%
+> Confidence: 99% (localized table/sort change delivered and validated with targeted suites plus full matrix)
+> Progress: 100%
 > Complexity: Medium
 > Theme: Orchestration for segment-analysis traversing-wires endpoint column split delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -40,12 +40,12 @@ This change affects:
 - `logics/backlog/item_360_regression_coverage_for_segment_analysis_endpoint_column_split_and_sort_semantics.md`
 
 # Plan
-- [ ] 1. Split segment-analysis traversing-wires `Endpoints` column into `Endpoint A` and `Endpoint B` while preserving endpoint-side rendering semantics (`item_358`)
-- [ ] 2. Update traversing-wires sort contract, header wiring, and `aria-sort` semantics for split endpoint columns (`item_359`)
-- [ ] 3. Add regression coverage for header split, endpoint placement, and endpoint-column sorting semantics (`item_360`)
-- [ ] 4. Run targeted segment-analysis validation suites and fix regressions
-- [ ] 5. Run final validation matrix
-- [ ] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
+- [x] 1. Split segment-analysis traversing-wires `Endpoints` column into `Endpoint A` and `Endpoint B` while preserving endpoint-side rendering semantics (`item_358`)
+- [x] 2. Update traversing-wires sort contract, header wiring, and `aria-sort` semantics for split endpoint columns (`item_359`)
+- [x] 3. Add regression coverage for header split, endpoint placement, and endpoint-column sorting semantics (`item_360`)
+- [x] 4. Run targeted segment-analysis validation suites and fix regressions
+- [x] 5. Run final validation matrix
+- [x] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -65,6 +65,18 @@ This change affects:
 
 # Report
 - Current blockers: none.
+- Validation snapshot (delivery):
+  - `npx vitest run src/tests/app.ui.list-ergonomics.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx` ✅
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s build` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s test:ci` ✅ (`44` files / `279` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
 - Risks to track:
   - Endpoint split updates headers/cells but leaves stale `endpoints` sort field references in state or comparators.
   - `aria-sort` regresses due to mismatched header sort keys after introducing `endpointA`/`endpointB`.
@@ -76,6 +88,9 @@ This change affects:
   - Lock column order as `Endpoint A` then `Endpoint B`; remove the combined `Endpoints` header entirely in the target table.
   - If the table width becomes crowded, adjust column wrapping/width behavior without changing data semantics.
   - Add dedicated assertions for absence of the combined `Endpoints` header in the target table to lock the UX change.
+  - Delivered the split in `Segment analysis` traversing-wires table: separate `Endpoint A` and `Endpoint B` columns replace the legacy combined `Endpoints` column.
+  - Updated sort wiring and `aria-sort` semantics to use independent `endpointA` / `endpointB` sort fields with lexicographic comparison of displayed endpoint text.
+  - Added integration regression coverage in `app.ui.list-ergonomics.spec.tsx` verifying header split, legacy-header removal, and sortable behavior for both split endpoint columns.
 
 # References
 - `logics/request/req_065_segment_analysis_split_endpoints_column_into_endpoint_a_and_endpoint_b.md`

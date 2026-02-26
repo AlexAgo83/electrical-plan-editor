@@ -8,6 +8,7 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
     segmentFormMode,
     openCreateSegmentForm,
     handleSegmentSubmit,
+    handleSwapSegmentNodes,
     segmentIdInput,
     setSegmentIdInput,
     nodes,
@@ -65,6 +66,12 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
         {segmentFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {segmentFormMode === "create" ? "Create" : "Save"}
       </button>
+      {segmentFormMode === "edit" ? (
+        <button type="button" className="button-with-icon" onClick={handleSwapSegmentNodes}>
+          <span className="action-button-icon is-swap" aria-hidden="true" />
+          Swap nodes
+        </button>
+      ) : null}
       <button type="button" className={segmentFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelSegmentEdit}>
         {segmentFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {segmentFormMode === "edit" ? "Cancel edit" : "Cancel"}

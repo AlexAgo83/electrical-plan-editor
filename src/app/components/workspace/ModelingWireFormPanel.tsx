@@ -10,6 +10,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     wireFormMode,
     openCreateWireForm,
     handleWireSubmit,
+    handleSwapWireEndpoints,
     wireName,
     setWireName,
     wireTechnicalId,
@@ -358,6 +359,12 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         {wireFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {wireFormMode === "create" ? "Create" : "Save"}
       </button>
+      {wireFormMode === "edit" ? (
+        <button type="button" className="button-with-icon" onClick={handleSwapWireEndpoints}>
+          <span className="action-button-icon is-swap" aria-hidden="true" />
+          Swap endpoints
+        </button>
+      ) : null}
       <button type="button" className={wireFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelWireEdit}>
         {wireFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {wireFormMode === "edit" ? "Cancel edit" : "Cancel"}

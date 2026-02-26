@@ -1,8 +1,8 @@
 ## task_060_req_063_wire_edit_endpoint_swap_action_orchestration_and_delivery_control - req_063 Wire edit endpoint swap action orchestration and delivery control
 > From version: 0.9.8
 > Understanding: 100% (feature scope is locked, including icon asset, exact label `Swap endpoints`, and no-confirm draft-only swap semantics)
-> Confidence: 97% (UX decisions are now fully specified, leaving mostly implementation and regression execution)
-> Progress: 1%
+> Confidence: 99% (implementation delivered and validated with targeted suites plus full matrix)
+> Progress: 100%
 > Complexity: Medium
 > Theme: Orchestration for wire edit endpoint A/B swap action delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -44,12 +44,12 @@ Locked V1 UI decisions:
 - `logics/backlog/item_354_regression_coverage_for_wire_edit_endpoint_swap_action_ordering_and_save_cancel_semantics.md`
 
 # Plan
-- [ ] 1. Implement wire edit endpoint swap draft-state transform and preserve non-endpoint fields (`item_352`)
-- [ ] 2. Add `Edit Wire` swap action with requested placement and edit-only visibility (`item_353`)
-- [ ] 3. Add regression coverage for ordering, swap correctness, and save/cancel semantics (`item_354`)
-- [ ] 4. Run targeted wire-form validation suites and fix regressions
-- [ ] 5. Run final validation matrix
-- [ ] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
+- [x] 1. Implement wire edit endpoint swap draft-state transform and preserve non-endpoint fields (`item_352`)
+- [x] 2. Add `Edit Wire` swap action with requested placement and edit-only visibility (`item_353`)
+- [x] 3. Add regression coverage for ordering, swap correctness, and save/cancel semantics (`item_354`)
+- [x] 4. Run targeted wire-form validation suites and fix regressions
+- [x] 5. Run final validation matrix
+- [x] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -70,6 +70,20 @@ Locked V1 UI decisions:
 
 # Report
 - Current blockers: none.
+- Validation snapshot (delivery):
+  - `npx vitest run src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.creation-flow-ergonomics.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.wire-free-color-mode.spec.tsx` ✅
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s build` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s test:ci` ✅ (`44` files / `277` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
 - Risks to track:
   - Swap implementation forgets endpoint-side metadata fields (`connection reference` / `seal reference`).
   - Swap button accidentally submits form (`type="submit"` regression) or exits edit mode.
@@ -81,6 +95,10 @@ Locked V1 UI decisions:
   - Use the provided `ico_swap.svg` asset with text label for discoverability and parity with existing icon+label form actions.
   - Keep swap as a one-click draft action with no confirm prompt; rely on `Cancel edit` for reversal if needed.
   - Prefer a dedicated regression test for endpoint swap correctness if existing wire specs approach line-limit gates.
+  - Partial implementation started: draft endpoint A/B swap handler is wired through the controller to `ModelingWireFormPanel`, with the `Swap endpoints` button inserted between `Save` and `Cancel edit` in edit mode only.
+  - Added a targeted integration regression test covering create-mode absence (edit-only visibility), button order, draft-only (non-submit) semantics, cancel rollback, and persisted save semantics for endpoint-side metadata.
+  - Final validation matrix completed successfully (including `build`, `quality:pwa`, `test:ci`, and `test:e2e`) after targeted wire-form regressions.
+  - `Swap endpoints` is edit-only, non-submit (`type="button"`), and preserves endpoint-side metadata while swapping endpoint selectors and types in draft state.
 
 # References
 - `logics/request/req_063_wire_edit_swap_endpoint_a_b_action_between_save_and_cancel.md`
