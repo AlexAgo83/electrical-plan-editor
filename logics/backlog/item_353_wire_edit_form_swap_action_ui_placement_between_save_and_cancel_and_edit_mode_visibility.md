@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 100% (placement, icon usage, and exact V1 label `Swap endpoints` are explicit for `Edit Wire`)
 > Confidence: 97%
-> Progress: 1%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Wire form UI action integration and placement ergonomics
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
