@@ -1,8 +1,8 @@
 ## task_060_req_063_wire_edit_endpoint_swap_action_orchestration_and_delivery_control - req_063 Wire edit endpoint swap action orchestration and delivery control
 > From version: 0.9.8
-> Understanding: 100% (feature scope is locked, including swap icon asset usage `ico_swap.svg` with text label in Edit Wire action row)
-> Confidence: 96% (icon asset is available and wire form is controlled, leaving mostly implementation and regression execution)
-> Progress: 0%
+> Understanding: 100% (feature scope is locked, including icon asset, exact label `Swap endpoints`, and no-confirm draft-only swap semantics)
+> Confidence: 97% (UX decisions are now fully specified, leaving mostly implementation and regression execution)
+> Progress: 1%
 > Complexity: Medium
 > Theme: Orchestration for wire edit endpoint A/B swap action delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -18,8 +18,10 @@ The feature touches:
 - derived endpoint hints,
 - save/cancel semantics and regression coverage.
 
-Locked V1 UI decision:
+Locked V1 UI decisions:
 - swap action uses `public/icons/ico_swap.svg` with a visible text label (not icon-only)
+- visible label is `Swap endpoints`
+- no confirmation dialog before swap (draft-only reversible action)
 
 # Objective
 - Deliver a deterministic `Swap Endpoint A/B` action in `Edit Wire` with the requested placement and no regressions to existing wire create/edit workflows.
@@ -77,6 +79,7 @@ Locked V1 UI decision:
   - Implement swap as an explicit draft-state transform (not via synthetic field events).
   - Keep the action edit-only in V1 to limit scope and avoid create-mode UX churn.
   - Use the provided `ico_swap.svg` asset with text label for discoverability and parity with existing icon+label form actions.
+  - Keep swap as a one-click draft action with no confirm prompt; rely on `Cancel edit` for reversal if needed.
   - Prefer a dedicated regression test for endpoint swap correctness if existing wire specs approach line-limit gates.
 
 # References

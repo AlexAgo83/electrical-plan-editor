@@ -1,7 +1,7 @@
 ## req_063_wire_edit_swap_endpoint_a_b_action_between_save_and_cancel - Wire edit endpoint A/B swap action between Save and Cancel edit
 > From version: 0.9.8
-> Understanding: 100% (placement is explicit and an icon asset `ico_swap.svg` is now available for the swap action)
-> Confidence: 96% (icon availability reduces UI integration ambiguity; scope remains a focused controlled-form enhancement)
+> Understanding: 100% (placement, icon usage, label `Swap endpoints`, and no-confirm V1 behavior are now explicit)
+> Confidence: 97% (V1 UX semantics are now locked, reducing ambiguity before implementation)
 > Complexity: Medium
 > Theme: Wire editing ergonomics / endpoint form operations / modeling UX
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -57,6 +57,9 @@ Today, reversing endpoints requires manual edits across both fieldsets and is er
   - no store mutation
   - no implicit submit/save
   - no auto-close of edit mode
+- V1 confirmation policy (locked):
+  - no confirmation dialog before swap
+  - action is directly reversible in draft before `Save`
 
 ## C. Derived hints and validation interaction (high priority)
 - After swap, all endpoint-dependent derived hints must refresh consistently:
@@ -77,12 +80,11 @@ Today, reversing endpoints requires manual edits across both fieldsets and is er
   - route fields (if any route state is edited elsewhere)
 
 ## E. UX and semantics (medium priority)
-- Recommended label options:
-  - `Swap A/B` (compact)
-  - `Swap endpoints` (clearer)
-- V1 recommendation:
-  - use a clear text label (`Swap endpoints`) unless row width constraints are severe
+- Label contract (V1, locked):
+  - visible label: `Swap endpoints`
+- V1 UX policy:
   - use the provided swap icon asset with text (`icon + text`) for discoverability
+  - no confirmation prompt (swap is draft-only and reversible before save)
 - Icon contract (V1, locked):
   - use `public/icons/ico_swap.svg` for the swap action icon
   - preserve text label alongside the icon (do not use icon-only button in V1)
@@ -104,6 +106,7 @@ Today, reversing endpoints requires manual edits across both fieldsets and is er
 # Validation and regression safety
 - Add/extend tests for:
   - `Edit Wire` action row contains `Save`, `Swap`, `Cancel edit` in the correct order
+  - swap click does not open a confirmation dialog
   - swapping connector/splice endpoint combinations preserves metadata references per side
   - swap updates endpoint fieldset values and derived slot hints
   - submit after swap persists the swapped endpoints
@@ -113,6 +116,7 @@ Today, reversing endpoints requires manual edits across both fieldsets and is er
 # Acceptance criteria
 - AC1: `Edit Wire` exposes a swap action between `Save` and `Cancel edit`.
 - AC1a: The swap action uses the provided swap icon asset (`public/icons/ico_swap.svg`) with a visible text label.
+- AC1b: The visible swap action label is `Swap endpoints`.
 - AC2: Clicking the swap action swaps the full endpoint form state between `Endpoint A` and `Endpoint B` (kind, target ids, indexes, connection/seal references).
 - AC3: Swap is draft-only (no auto-save, no edit-mode exit) and preserves non-endpoint wire fields.
 - AC4: Derived endpoint hints/conditional fields remain coherent after swap.
