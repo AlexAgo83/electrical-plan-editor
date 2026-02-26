@@ -1,8 +1,8 @@
 ## task_065_req_067_wire_protection_metadata_v1_fuse_kind_with_required_reference_orchestration_and_delivery_control - req_067 Wire protection metadata V1 (`fuse`) with required catalog manufacturer reference orchestration and delivery control
 > From version: 0.9.8
-> Understanding: 97% (V1 scope adds extensible wire-level protection metadata with `fuse` as first kind and a required linked catalog manufacturer reference when enabled)
-> Confidence: 91% (feature touches wire entity + form + visibility + compatibility, but remains localized if BOM pricing integration stays out of scope)
-> Progress: 0%
+> Understanding: 100% (implemented V1 `wire.protection` fuse contract with linked catalog item identity, delete guard, UI controls/visibility, and compatibility coverage across persistence/import-export)
+> Confidence: 98% (full validation matrix passed after implementation and regression coverage additions; residual risk is limited to future UI copy/layout changes around wire tables/forms)
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Orchestration for wire fuse-mode metadata V1 delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -45,13 +45,13 @@ The feature spans:
 - `logics/backlog/item_368_regression_coverage_for_wire_fuse_mode_required_reference_and_legacy_compatibility.md`
 
 # Plan
-- [ ] 1. Implement wire domain model/reducer validation and compatibility foundation (`item_365`)
-- [ ] 2. Add wire form fuse-mode controls and required catalog-selection UX (`item_366`)
-- [ ] 3. Surface fuse metadata in wire-focused UI and verify persistence/export boundary non-regressions (`item_367`)
-- [ ] 4. Add regression coverage for fuse mode, required catalog-association validation, deletion guard, and legacy compatibility (`item_368`)
-- [ ] 5. Run targeted wire/persistence validation suites and fix regressions
-- [ ] 6. Run final validation matrix
-- [ ] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
+- [x] 1. Implement wire domain model/reducer validation and compatibility foundation (`item_365`)
+- [x] 2. Add wire form fuse-mode controls and required catalog-selection UX (`item_366`)
+- [x] 3. Surface fuse metadata in wire-focused UI and verify persistence/export boundary non-regressions (`item_367`)
+- [x] 4. Add regression coverage for fuse mode, required catalog-association validation, deletion guard, and legacy compatibility (`item_368`)
+- [x] 5. Run targeted wire/persistence validation suites and fix regressions
+- [x] 6. Run final validation matrix
+- [x] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -72,17 +72,17 @@ The feature spans:
 # Report
 - Current blockers: none.
 - Risks to track:
-  - Wire reducer validation changes accidentally reject valid non-fuse wires.
-  - Catalog deletion guard creates unintended regressions in existing catalog item delete flows and messaging.
-  - Form-state changes leak partial protection payloads on save/cancel transitions.
-  - UI visibility choices increase table clutter or break existing wire sort/filter ergonomics.
-  - Persistence compatibility handling breaks legacy payload imports lacking `protection`.
-  - Fuse metadata expansion drifts into full BOM pricing scope and delays delivery.
+  - Future catalog model changes may require revisiting fuse catalog-selection filtering semantics (V1 currently allows all catalog items).
+  - Future wire table layout tweaks may reduce visibility of fuse badge/manufacturer reference if row density increases.
 - Delivery notes:
-  - Keep V1 centered on `wire.protection.kind = "fuse"` + required linked catalog item (`manufacturerReference` sourced from catalog); defer broader protection-device modeling.
-  - Keep UI V1 explicit and low-risk: `Fuse` checkbox + unfiltered active-network catalog selection.
-  - Treat BOM/CSV as a compatibility/non-regression boundary in V1, not a pricing integration objective.
-  - Prefer additive schema changes and legacy-safe normalization paths.
+  - Implemented locked V1 storage shape: `wire.protection?: { kind: "fuse"; catalogItemId }` with reducer normalization on `wire/save` and `wire/upsert`.
+  - Added catalog delete guard preventing removal of catalog items referenced by fuse-mode wires.
+  - Added wire form fuse checkbox + conditional catalog selector with local form validation and preserved save/cancel draft semantics.
+  - Added fuse metadata visibility (`Fuse` badge + catalog `manufacturerReference`) in modeling wire table and analysis wire surfaces.
+  - Verified persistence/import-export compatibility with dedicated tests (`localStorage` and network-file portability round-trip).
+  - Added regression coverage for reducer validation, delete guard, and end-to-end wire UI fuse flow.
+  - One unrelated heavy UI list-ergonomics test was stabilized with explicit `10s` timeout to keep `test:ci` deterministic under current suite load.
+  - Final validation matrix passed: `logics_lint`, `lint`, `typecheck`, `quality:*`, `build`, `test:ci` (47 files / 289 tests), `test:e2e` (2 tests).
 
 # References
 - `logics/request/req_067_wire_protection_metadata_v1_fuse_kind_with_required_reference.md`

@@ -178,6 +178,38 @@ describe("localStorage persistence adapter", () => {
     expect(loaded).toEqual(state);
   });
 
+  it("preserves wire fuse catalog linkage across save/load", () => {
+    const sample = createSampleNetworkState();
+    const firstWireId = sample.wires.allIds[0];
+    const firstCatalogItemId = sample.catalogItems.allIds[0];
+    expect(firstWireId).toBeDefined();
+    expect(firstCatalogItemId).toBeDefined();
+    if (firstWireId === undefined || firstCatalogItemId === undefined) {
+      throw new Error("Expected sample state to include wires and catalog items.");
+    }
+    const firstWire = sample.wires.byId[firstWireId];
+    if (firstWire === undefined) {
+      throw new Error("Expected first wire in sample state.");
+    }
+
+    const withFuseWire = appReducer(
+      sample,
+      appActions.upsertWire({
+        ...firstWire,
+        protection: { kind: "fuse", catalogItemId: firstCatalogItemId }
+      })
+    );
+    const storage = createMemoryStorage();
+
+    saveState(withFuseWire, storage, () => "2026-02-26T12:30:00.000Z");
+    const loaded = loadState(storage, () => "2026-02-26T12:31:00.000Z");
+
+    expect(loaded.wires.byId[firstWireId]?.protection).toEqual({
+      kind: "fuse",
+      catalogItemId: firstCatalogItemId
+    });
+  });
+
   it("patches legacy persisted wires missing section/colors/side references to defaults", () => {
     const state = createSampleNetworkState();
     const nowIso = "2026-02-20T11:00:00.000Z";

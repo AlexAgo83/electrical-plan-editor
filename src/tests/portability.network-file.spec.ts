@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ConnectorId, NetworkId, SpliceId, WireId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NetworkId, SpliceId, WireId } from "../core/entities";
 import {
   buildNetworkFilePayload,
   NETWORK_FILE_PAYLOAD_KIND,
@@ -23,6 +23,10 @@ function asSpliceId(value: string): SpliceId {
 
 function asWireId(value: string): WireId {
   return value as WireId;
+}
+
+function asCatalogItemId(value: string): CatalogItemId {
+  return value as CatalogItemId;
 }
 
 describe("network file portability", () => {
@@ -111,6 +115,38 @@ describe("network file portability", () => {
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.endpointASealReference).toBeUndefined();
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.endpointBConnectionReference).toBeUndefined();
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.endpointBSealReference).toBeUndefined();
+  });
+
+  it("preserves wire fuse catalog linkage across export/import round-trip", () => {
+    const sample = createSampleNetworkState();
+    const firstWireId = sample.wires.allIds[0];
+    const firstCatalogItemId = sample.catalogItems.allIds[0];
+    expect(firstWireId).toBeDefined();
+    expect(firstCatalogItemId).toBeDefined();
+    if (firstWireId === undefined || firstCatalogItemId === undefined) {
+      throw new Error("Expected sample payload to include wires and catalog items.");
+    }
+
+    const firstWire = sample.wires.byId[firstWireId];
+    if (firstWire === undefined) {
+      throw new Error("Expected first wire in sample.");
+    }
+
+    const withFuseWire = appReducer(
+      sample,
+      appActions.upsertWire({
+        ...firstWire,
+        protection: { kind: "fuse", catalogItemId: asCatalogItemId(firstCatalogItemId) }
+      })
+    );
+
+    const payload = buildNetworkFilePayload(withFuseWire, "active", [], "2026-02-26T12:00:00.000Z");
+    const parsed = parseNetworkFilePayload(serializeNetworkFilePayload(payload));
+    expect(parsed.error).toBeNull();
+    expect(parsed.payload?.networks[0]?.state.wires.byId[asWireId(firstWireId)]?.protection).toEqual({
+      kind: "fuse",
+      catalogItemId: asCatalogItemId(firstCatalogItemId)
+    });
   });
 
   it("normalizes imported wire side connection and seal references", () => {

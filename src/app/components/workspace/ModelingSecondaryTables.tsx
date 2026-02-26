@@ -7,6 +7,7 @@ import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireCo
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 import type {
+  CatalogItem,
   NodeId,
   Segment,
   SegmentId,
@@ -44,6 +45,7 @@ interface ModelingSecondaryTablesProps {
   setWireFilterField: (value: "endpoints" | "name" | "technicalId" | "any") => void;
   wireEndpointFilterQuery: string;
   setWireEndpointFilterQuery: (value: string) => void;
+  catalogItems: CatalogItem[];
   wires: Wire[];
   visibleWires: Wire[];
   wireSort: SortState;
@@ -86,6 +88,7 @@ export function ModelingSecondaryTables({
   setWireFilterField,
   wireEndpointFilterQuery,
   setWireEndpointFilterQuery,
+  catalogItems,
   wires,
   visibleWires,
   wireSort: _wireSort,
@@ -139,6 +142,7 @@ export function ModelingSecondaryTables({
     field: "name",
     direction: "asc"
   });
+  const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   useEffect(() => {
     setSegmentTableSort((current) =>
       current.field === "id" && current.direction === _segmentIdSortDirection
@@ -202,6 +206,12 @@ export function ModelingSecondaryTables({
     segmentTableSort.field === field ? (segmentTableSort.direction === "asc" ? "▲" : "▼") : "";
   const wireSortIndicator = (field: WireTableSortField) =>
     wireTableSort.field === field ? (wireTableSort.direction === "asc" ? "▲" : "▼") : "";
+  const getWireFuseManufacturerReference = (wire: Wire): string | null => {
+    if (wire.protection?.kind !== "fuse") {
+      return null;
+    }
+    return catalogItemById.get(wire.protection.catalogItemId)?.manufacturerReference ?? "(missing catalog item)";
+  };
 
   useEffect(() => {
     if (segmentFormMode !== "edit" || selectedSegmentId === null) {
@@ -525,6 +535,7 @@ export function ModelingSecondaryTables({
               <tbody>
                 {sortedVisibleWires.map((wire) => {
                   const isFocused = focusedWire?.id === wire.id;
+                  const fuseManufacturerReference = getWireFuseManufacturerReference(wire);
                   return (
                     <tr
                       key={wire.id}
@@ -542,7 +553,15 @@ export function ModelingSecondaryTables({
                         }
                       }}
                     >
-                      <td>{wire.name}</td>
+                      <td>
+                        <div>{wire.name}</div>
+                        {fuseManufacturerReference !== null ? (
+                          <div className="wire-fuse-inline">
+                            <span className="status-chip wire-fuse-chip">Fuse</span>
+                            <span className="technical-id">{fuseManufacturerReference}</span>
+                          </div>
+                        ) : null}
+                      </td>
                       <td className="technical-id">{wire.technicalId}</td>
                       <td>{renderWireColorCellValue(wire)}</td>
                       <td>{describeWireEndpoint(wire.endpointA)}</td>

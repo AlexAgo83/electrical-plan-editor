@@ -62,6 +62,8 @@ export function useEntityFormsState() {
   const [wirePrimaryColorId, setWirePrimaryColorId] = useState("");
   const [wireSecondaryColorId, setWireSecondaryColorId] = useState("");
   const [wireFreeColorLabel, setWireFreeColorLabel] = useState("");
+  const [wireFuseEnabled, setWireFuseEnabled] = useState(false);
+  const [wireFuseCatalogItemId, setWireFuseCatalogItemId] = useState("");
   const [wireEndpointAConnectionReference, setWireEndpointAConnectionReference] = useState("");
   const [wireEndpointASealReference, setWireEndpointASealReference] = useState("");
   const [wireEndpointAKind, setWireEndpointAKind] = useState<WireEndpoint["kind"]>("connectorCavity");
@@ -190,6 +192,10 @@ export function useEntityFormsState() {
     setWireSecondaryColorId,
     wireFreeColorLabel,
     setWireFreeColorLabel,
+    wireFuseEnabled,
+    setWireFuseEnabled,
+    wireFuseCatalogItemId,
+    setWireFuseCatalogItemId,
     wireEndpointAConnectionReference,
     setWireEndpointAConnectionReference,
     wireEndpointASealReference,

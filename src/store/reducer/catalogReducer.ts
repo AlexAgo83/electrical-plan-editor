@@ -193,6 +193,13 @@ export function handleCatalogActions(state: AppState, action: AppAction): AppSta
       if (isReferencedBySplice) {
         return withError(state, "Cannot remove catalog item while splices reference it.");
       }
+      const isReferencedByFuseWire = state.wires.allIds.some((wireId) => {
+        const wire = state.wires.byId[wireId];
+        return wire?.protection?.kind === "fuse" && wire.protection.catalogItemId === action.payload.id;
+      });
+      if (isReferencedByFuseWire) {
+        return withError(state, "Cannot remove catalog item while fuse wires reference it.");
+      }
 
       return bumpRevision({
         ...clearLastError(state),

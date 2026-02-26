@@ -100,6 +100,10 @@ export interface ModelingFormsColumnProps {
   setWireSecondaryColorId: (value: string) => void;
   wireFreeColorLabel: string;
   setWireFreeColorLabel: (value: string) => void;
+  wireFuseEnabled: boolean;
+  setWireFuseEnabled: (value: boolean) => void;
+  wireFuseCatalogItemId: string;
+  setWireFuseCatalogItemId: (value: string) => void;
   wireTechnicalIdAlreadyUsed: boolean;
   wireEndpointAConnectionReference: string;
   setWireEndpointAConnectionReference: (value: string) => void;

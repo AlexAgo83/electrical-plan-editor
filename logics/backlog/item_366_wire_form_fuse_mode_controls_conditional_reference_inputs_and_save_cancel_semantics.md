@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 96%
 > Confidence: 92%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Wire form UX for fuse mode and required catalog association
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -42,4 +42,6 @@ Even if the wire data model supports fuse metadata, users still need a clear wir
   - `logics/request/req_067_wire_protection_metadata_v1_fuse_kind_with_required_reference.md`
   - `src/app/components/workspace/ModelingWireFormPanel.tsx`
   - `src/app/hooks/useWireHandlers.ts`
+  - `src/app/hooks/useEntityFormsState.ts`
+  - `src/app/AppController.tsx`
   - `src/app/components/workspace/ModelingFormsColumn.types.ts`

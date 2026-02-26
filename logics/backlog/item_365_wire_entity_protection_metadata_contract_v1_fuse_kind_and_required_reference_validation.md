@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 95%
 > Confidence: 92%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Wire domain model extension and validation for protection metadata
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -44,4 +44,6 @@ The wire entity cannot currently express protection semantics, so users cannot m
   - `src/core/entities.ts`
   - `src/store/catalog.ts`
   - `src/store/reducer/wireReducer.ts`
+  - `src/store/reducer/catalogReducer.ts`
+  - `src/store/actions.ts`
   - `src/store/index.ts`

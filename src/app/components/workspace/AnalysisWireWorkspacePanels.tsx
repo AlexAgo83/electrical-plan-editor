@@ -17,6 +17,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     setWireFilterField,
     wireEndpointFilterQuery,
     setWireEndpointFilterQuery,
+    catalogItems,
     wires,
     visibleWires,
     wireSort: _wireSort,
@@ -43,6 +44,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     field: "name",
     direction: "asc"
   });
+  const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   const showWireRouteModeColumn = wireRouteFilter === "all";
   const sortedVisibleWires = useMemo(
     () =>
@@ -74,7 +76,13 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
         ? "Wire name"
         : wireFilterField === "technicalId"
           ? "Technical ID"
-          : "Name, technical ID, endpoint...";
+        : "Name, technical ID, endpoint...";
+  const getWireFuseManufacturerReference = (wire: (typeof visibleWires)[number]): string | null => {
+    if (wire.protection?.kind !== "fuse") {
+      return null;
+    }
+    return catalogItemById.get(wire.protection.catalogItemId)?.manufacturerReference ?? "(missing catalog item)";
+  };
   return (
     <>
 <section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen || !showEntityTables}>
@@ -289,6 +297,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
         <tbody>
           {sortedVisibleWires.map((wire) => {
             const isSelected = selectedWireId === wire.id;
+            const fuseManufacturerReference = getWireFuseManufacturerReference(wire);
             return (
               <tr
                 key={wire.id}
@@ -303,7 +312,15 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }
                 }}
               >
-                <td>{wire.name}</td>
+                <td>
+                  <div>{wire.name}</div>
+                  {fuseManufacturerReference !== null ? (
+                    <div className="wire-fuse-inline">
+                      <span className="status-chip wire-fuse-chip">Fuse</span>
+                      <span className="technical-id">{fuseManufacturerReference}</span>
+                    </div>
+                  ) : null}
+                </td>
                 <td className="technical-id">{wire.technicalId}</td>
                 <td>{renderWireColorCellValue(wire)}</td>
                 <td>{describeWireEndpoint(wire.endpointA)}</td>
@@ -343,6 +360,14 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           Section {selectedWire.sectionMm2} mm² • {getWireColorLabel(selectedWire)}
         </p>
       </article>
+      {getWireFuseManufacturerReference(selectedWire) !== null ? (
+          <article className="analysis-wire-route-current">
+            <span>Protection</span>
+            <p className="route-preview-path">
+              <span className="status-chip wire-fuse-chip">Fuse</span> {getWireFuseManufacturerReference(selectedWire)}
+            </p>
+          </article>
+      ) : null}
 
       <div className="route-preview-selection-strip">
         <article>

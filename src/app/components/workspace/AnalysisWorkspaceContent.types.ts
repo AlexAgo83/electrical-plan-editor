@@ -1,5 +1,17 @@
 import type { FormEvent } from "react";
-import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, SegmentId, Splice, SpliceId, Wire, WireId } from "../../../core/entities";
+import type {
+  CatalogItem,
+  Connector,
+  ConnectorId,
+  NetworkNode,
+  NodeId,
+  Segment,
+  SegmentId,
+  Splice,
+  SpliceId,
+  Wire,
+  WireId
+} from "../../../core/entities";
 import type { ConnectorSynthesisRow, SegmentSubNetworkFilter, SortState, SpliceSynthesisRow } from "../../types/app-controller";
 
 interface OccupancyStatus {
@@ -106,6 +118,7 @@ export interface AnalysisWorkspaceContentProps {
   setWireFilterField: (value: "endpoints" | "name" | "technicalId" | "any") => void;
   wireEndpointFilterQuery: string;
   setWireEndpointFilterQuery: (value: string) => void;
+  catalogItems: CatalogItem[];
   wires: Wire[];
   visibleWires: Wire[];
   wireSort: SortState;

@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 94%
 > Confidence: 90%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Fuse metadata visibility after save and non-regression across persistence/export boundaries
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -42,3 +42,5 @@ If fuse metadata is saved but not visible in wire-focused UI or not preserved ac
   - `src/app/components/workspace/AnalysisWireWorkspacePanels.tsx`
   - `src/app/AppController.tsx`
   - `src/store/index.ts`
+  - `src/tests/persistence.localStorage.spec.ts`
+  - `src/tests/portability.network-file.spec.ts`
