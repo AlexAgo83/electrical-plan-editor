@@ -215,8 +215,10 @@ body:has(.app-shell.theme-circle-mobility-dark) {
 
 .app-shell.theme-circle-mobility-light .workspace-tab-badge,
 .app-shell.theme-circle-mobility-light .header-ops-badge,
+.app-shell.theme-circle-mobility-light .filter-chip-count,
 .app-shell.theme-circle-mobility-dark .workspace-tab-badge,
-.app-shell.theme-circle-mobility-dark .header-ops-badge {
+.app-shell.theme-circle-mobility-dark .header-ops-badge,
+.app-shell.theme-circle-mobility-dark .filter-chip-count {
   border-color: var(--cm-accent-blue);
   background: var(--cm-badge-bg);
   color: var(--cm-badge-text);
@@ -229,6 +231,11 @@ body:has(.app-shell.theme-circle-mobility-dark) {
   border-color: var(--cm-accent-pink);
   background: var(--cm-badge-bg-error);
   color: var(--cm-badge-text-error);
+}
+
+.app-shell.theme-circle-mobility-light .network-summary-bom-pricing-context,
+.app-shell.theme-circle-mobility-dark .network-summary-bom-pricing-context {
+  color: var(--cm-text-secondary);
 }
 
 .app-shell.theme-circle-mobility-light .network-canvas-floating-controls,

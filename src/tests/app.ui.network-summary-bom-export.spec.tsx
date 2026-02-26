@@ -58,6 +58,8 @@ describe("App integration UI - network summary BOM export", () => {
       const networkSummaryPanel = getPanelByHeading("Network summary");
       const exportPngButton = within(networkSummaryPanel).getByRole("button", { name: "PNG" });
       const exportBomButton = within(networkSummaryPanel).getByRole("button", { name: "BOM" });
+      expect(within(networkSummaryPanel).getByText("BOM CSV pricing: EUR · TTC 20.00%")).toBeInTheDocument();
+      expect(exportBomButton).toHaveAttribute("title", "BOM CSV pricing: EUR · TTC 20.00%");
 
       const actionButtons = Array.from(networkSummaryPanel.querySelectorAll("header .workspace-tab"));
       expect(actionButtons.indexOf(exportBomButton)).toBeGreaterThan(actionButtons.indexOf(exportPngButton));
@@ -75,5 +77,24 @@ describe("App integration UI - network summary BOM export", () => {
         Object.defineProperty(URL, "revokeObjectURL", originalRevokeObjectUrl);
       }
     }
+  });
+
+  it("surfaces updated workspace currency and tax mode in network summary BOM pricing context", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const pricingSettingsPanel = getPanelByHeading("Catalog & BOM setup");
+    fireEvent.change(within(pricingSettingsPanel).getByLabelText("Currency (Catalog/BOM)"), {
+      target: { value: "GBP" }
+    });
+    fireEvent.click(within(pricingSettingsPanel).getByLabelText("Enable tax / VAT (TVA)"));
+
+    switchScreenDrawerAware("modeling");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    expect(within(networkSummaryPanel).getByText("BOM CSV pricing: GBP · HT only")).toBeInTheDocument();
+    expect(within(networkSummaryPanel).getByRole("button", { name: "BOM" })).toHaveAttribute(
+      "title",
+      "BOM CSV pricing: GBP · HT only"
+    );
   });
 });

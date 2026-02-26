@@ -8,6 +8,7 @@ export {
   isWorkspaceEmpty
 } from "./sampleNetwork";
 export { createCatalogValidationIssuesSampleNetworkState } from "./sampleNetworkCatalogValidationSample";
+export { createPricingBomQaSampleNetworkState } from "./sampleNetworkPricingQaSample";
 export * from "./selectors";
 export * from "./catalog";
 export {

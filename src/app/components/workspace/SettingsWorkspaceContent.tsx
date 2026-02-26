@@ -22,6 +22,7 @@ interface SettingsWorkspaceContentProps {
   handleRecreateSampleNetwork: () => void;
   handleRecreateValidationIssuesSampleNetwork: () => void;
   handleRecreateCatalogValidationIssuesSampleNetwork: () => void;
+  handleRecreatePricingBomQaSampleNetwork: () => void;
   handleResetSampleNetwork: () => void;
   activeNetworkId: NetworkId | null;
   selectedExportNetworkIds: NetworkId[];
@@ -100,6 +101,7 @@ export function SettingsWorkspaceContent({
   handleRecreateSampleNetwork,
   handleRecreateValidationIssuesSampleNetwork,
   handleRecreateCatalogValidationIssuesSampleNetwork,
+  handleRecreatePricingBomQaSampleNetwork,
   handleResetSampleNetwork,
   activeNetworkId,
   selectedExportNetworkIds,
@@ -534,7 +536,7 @@ export function SettingsWorkspaceContent({
           <h2>Sample network controls</h2>
           <span className="settings-panel-chip">Sample</span>
         </header>
-        <p className="settings-panel-intro">Quickly recreate baseline demo data when testing flows or resetting your sandbox.</p>
+        <p className="settings-panel-intro">Quickly recreate baseline and QA-oriented sample data when testing flows or resetting your sandbox.</p>
         <div className="settings-state-row" aria-label="Sample workspace status">
           <span className={isCurrentWorkspaceEmpty ? "settings-state-chip is-ok" : "settings-state-chip"}>
             Workspace: {isCurrentWorkspaceEmpty ? "empty" : "loaded"}
@@ -552,6 +554,9 @@ export function SettingsWorkspaceContent({
           </button>
           <button type="button" onClick={handleRecreateCatalogValidationIssuesSampleNetwork}>
             Recreate catalog validation issues sample
+          </button>
+          <button type="button" onClick={handleRecreatePricingBomQaSampleNetwork}>
+            Recreate pricing / BOM QA sample
           </button>
           <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
             Reset sample network to baseline

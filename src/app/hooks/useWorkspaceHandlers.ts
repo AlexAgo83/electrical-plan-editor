@@ -5,6 +5,7 @@ import {
   appActions,
   appReducer,
   createCatalogValidationIssuesSampleNetworkState,
+  createPricingBomQaSampleNetworkState,
   createSampleNetworkState,
   createValidationIssuesSampleNetworkState,
   selectNetworkTechnicalIdTaken
@@ -427,6 +428,21 @@ export function useWorkspaceHandlers({
     });
   }
 
+  function handleRecreatePricingBomQaSampleNetwork(): void {
+    if (!isCurrentWorkspaceEmpty && typeof window !== "undefined" && typeof window.confirm === "function") {
+      const shouldReplace = window.confirm(
+        "Refresh built-in sample networks with the pricing / BOM QA sample? User-created networks are preserved."
+      );
+      if (!shouldReplace) {
+        return;
+      }
+    }
+
+    refreshBuiltInSampleNetworks(createPricingBomQaSampleNetworkState, {
+      activateImportedSample: true
+    });
+  }
+
   function resetNetworkViewToConfiguredScale(): void {
     setNetworkScale(configuredResetScale);
     setNetworkOffset({ x: 0, y: 0 });
@@ -677,6 +693,7 @@ export function useWorkspaceHandlers({
     handleRecreateSampleNetwork,
     handleRecreateValidationIssuesSampleNetwork,
     handleRecreateCatalogValidationIssuesSampleNetwork,
+    handleRecreatePricingBomQaSampleNetwork,
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,
     fitNetworkToContent,
