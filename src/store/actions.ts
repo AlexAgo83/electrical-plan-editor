@@ -12,6 +12,7 @@ import type {
   Splice,
   SpliceId,
   WireEndpoint,
+  WireProtection,
   Wire,
   WireId
 } from "../core/entities";
@@ -100,6 +101,7 @@ export type AppAction =
         endpointASealReference?: string;
         endpointBConnectionReference?: string;
         endpointBSealReference?: string;
+        protection?: WireProtection;
         endpointA: WireEndpoint;
         endpointB: WireEndpoint;
       };
@@ -199,6 +201,7 @@ export const appActions = {
     endpointASealReference?: string;
     endpointBConnectionReference?: string;
     endpointBSealReference?: string;
+    protection?: WireProtection;
     endpointA: WireEndpoint;
     endpointB: WireEndpoint;
   }): AppAction => ({ type: "wire/save", payload }),

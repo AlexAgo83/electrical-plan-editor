@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { CatalogItemId } from "../core/entities";
 import { appActions, appReducer } from "../store";
 import {
   asConnectorId,
@@ -8,6 +9,8 @@ import {
   asWireId,
   reduceAll
 } from "./helpers/store-reducer-test-utils";
+
+const asCatalogItemId = (value: string) => value as CatalogItemId;
 
 describe("appReducer wire lifecycle and routing", () => {
   it("creates a wire with automatic shortest route and endpoint occupancy", () => {
@@ -115,6 +118,56 @@ describe("appReducer wire lifecycle and routing", () => {
     expect(state.ui.lastError).toBe("Wire endpoint A is already occupied.");
   });
 
+  it("validates fuse catalog association and persists fuse protection on save", () => {
+    const baseState = reduceAll([
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-FUSE"),
+        manufacturerReference: "FUSE-10A-BLADE",
+        connectionCount: 2
+      }),
+      appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 }),
+      appActions.upsertSplice({ id: asSpliceId("S1"), name: "Splice 1", technicalId: "S-1", portCount: 2 }),
+      appActions.upsertNode({ id: asNodeId("N-C1"), kind: "connector", connectorId: asConnectorId("C1") }),
+      appActions.upsertNode({ id: asNodeId("N-S1"), kind: "splice", spliceId: asSpliceId("S1") }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG1"),
+        nodeA: asNodeId("N-C1"),
+        nodeB: asNodeId("N-S1"),
+        lengthMm: 50
+      })
+    ]);
+
+    const invalidMissingCatalog = appReducer(
+      baseState,
+      appActions.saveWire({
+        id: asWireId("WFUSE-BAD"),
+        name: "Fuse wire",
+        technicalId: "W-FUSE-BAD",
+        protection: { kind: "fuse", catalogItemId: asCatalogItemId("CAT-MISSING") },
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 }
+      })
+    );
+    expect(invalidMissingCatalog.wires.byId[asWireId("WFUSE-BAD")]).toBeUndefined();
+    expect(invalidMissingCatalog.ui.lastError).toBe("Fuse wire references a missing catalog item.");
+
+    const validFuseWire = appReducer(
+      baseState,
+      appActions.saveWire({
+        id: asWireId("WFUSE-OK"),
+        name: "Fuse wire",
+        technicalId: "W-FUSE-OK",
+        protection: { kind: "fuse", catalogItemId: asCatalogItemId("CAT-FUSE") },
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 }
+      })
+    );
+    expect(validFuseWire.wires.byId[asWireId("WFUSE-OK")]?.protection).toEqual({
+      kind: "fuse",
+      catalogItemId: asCatalogItemId("CAT-FUSE")
+    });
+  });
+
   it("recomputes unlocked wire route when segment lengths change", () => {
     const first = reduceAll([
       appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 }),
@@ -218,4 +271,3 @@ describe("appReducer wire lifecycle and routing", () => {
     expect(wire?.lengthMm).toBe(40);
   });
 });
-

@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
-import type { CatalogItemId, ConnectorId, SpliceId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../core/entities";
 import { appActions, appReducer, createInitialState } from "../store";
 
 const asCatalogItemId = (value: string) => value as CatalogItemId;
 const asConnectorId = (value: string) => value as ConnectorId;
 const asSpliceId = (value: string) => value as SpliceId;
+const asNodeId = (value: string) => value as NodeId;
+const asSegmentId = (value: string) => value as SegmentId;
+const asWireId = (value: string) => value as WireId;
 
 describe("store reducer - catalog", () => {
   it("propagates manufacturer reference and connection count changes to linked connectors and splices", () => {
@@ -85,5 +88,51 @@ describe("store reducer - catalog", () => {
     expect(afterReductionAttempt.catalogItems.byId[catalogId]?.connectionCount).toBe(4);
     expect(afterReductionAttempt.connectors.byId[connectorId]?.cavityCount).toBe(4);
     expect(afterReductionAttempt.ui.lastError).toContain("Catalog connection count cannot be reduced");
+  });
+
+  it("blocks removing a catalog item referenced by a fuse-mode wire", () => {
+    const catalogId = asCatalogItemId("CAT-FUSE-LOCKED");
+    const connectorId = asConnectorId("C-FUSE");
+    const spliceId = asSpliceId("S-FUSE");
+
+    const seeded = [
+      appActions.upsertCatalogItem({
+        id: catalogId,
+        manufacturerReference: "FUSE-LOCKED-REF",
+        connectionCount: 2
+      }),
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "Fuse connector",
+        technicalId: "C-FUSE-1",
+        cavityCount: 2
+      }),
+      appActions.upsertSplice({
+        id: spliceId,
+        name: "Fuse splice",
+        technicalId: "S-FUSE-1",
+        portCount: 2
+      }),
+      appActions.upsertNode({ id: asNodeId("N-C-FUSE"), kind: "connector", connectorId }),
+      appActions.upsertNode({ id: asNodeId("N-S-FUSE"), kind: "splice", spliceId }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-FUSE"),
+        nodeA: asNodeId("N-C-FUSE"),
+        nodeB: asNodeId("N-S-FUSE"),
+        lengthMm: 25
+      }),
+      appActions.saveWire({
+        id: asWireId("W-FUSE-LOCK"),
+        name: "Fuse wire",
+        technicalId: "W-FUSE-LOCK",
+        protection: { kind: "fuse", catalogItemId: catalogId },
+        endpointA: { kind: "connectorCavity", connectorId, cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId, portIndex: 1 }
+      })
+    ].reduce(appReducer, createInitialState());
+
+    const afterDeleteAttempt = appReducer(seeded, appActions.removeCatalogItem(catalogId));
+    expect(afterDeleteAttempt.catalogItems.byId[catalogId]).toBeDefined();
+    expect(afterDeleteAttempt.ui.lastError).toBe("Cannot remove catalog item while fuse wires reference it.");
   });
 });

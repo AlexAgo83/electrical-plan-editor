@@ -102,6 +102,10 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireSecondaryColorId: Parameters<typeof useWireHandlers>[0]["setWireSecondaryColorId"];
   wireFreeColorLabel: Parameters<typeof useWireHandlers>[0]["wireFreeColorLabel"];
   setWireFreeColorLabel: Parameters<typeof useWireHandlers>[0]["setWireFreeColorLabel"];
+  wireFuseEnabled: Parameters<typeof useWireHandlers>[0]["wireFuseEnabled"];
+  setWireFuseEnabled: Parameters<typeof useWireHandlers>[0]["setWireFuseEnabled"];
+  wireFuseCatalogItemId: Parameters<typeof useWireHandlers>[0]["wireFuseCatalogItemId"];
+  setWireFuseCatalogItemId: Parameters<typeof useWireHandlers>[0]["setWireFuseCatalogItemId"];
   wireEndpointAConnectionReference: Parameters<typeof useWireHandlers>[0]["wireEndpointAConnectionReference"];
   setWireEndpointAConnectionReference: Parameters<typeof useWireHandlers>[0]["setWireEndpointAConnectionReference"];
   wireEndpointASealReference: Parameters<typeof useWireHandlers>[0]["wireEndpointASealReference"];
@@ -233,6 +237,10 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireSecondaryColorId,
   wireFreeColorLabel,
   setWireFreeColorLabel,
+  wireFuseEnabled,
+  setWireFuseEnabled,
+  wireFuseCatalogItemId,
+  setWireFuseCatalogItemId,
   wireEndpointAConnectionReference,
   setWireEndpointAConnectionReference,
   wireEndpointASealReference,
@@ -388,6 +396,10 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireSecondaryColorId,
     wireFreeColorLabel,
     setWireFreeColorLabel,
+    wireFuseEnabled,
+    setWireFuseEnabled,
+    wireFuseCatalogItemId,
+    setWireFuseCatalogItemId,
     wireEndpointAConnectionReference,
     setWireEndpointAConnectionReference,
     wireEndpointASealReference,

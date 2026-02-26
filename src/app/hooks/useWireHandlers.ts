@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, type FormEvent } from "react";
 import type {
+  CatalogItemId,
   ConnectorId,
   SegmentId,
   SpliceId,
@@ -53,6 +54,10 @@ interface UseWireHandlersParams {
   setWireSecondaryColorId: (value: string) => void;
   wireFreeColorLabel: string;
   setWireFreeColorLabel: (value: string) => void;
+  wireFuseEnabled: boolean;
+  setWireFuseEnabled: (value: boolean) => void;
+  wireFuseCatalogItemId: string;
+  setWireFuseCatalogItemId: (value: string) => void;
   wireEndpointAConnectionReference: string;
   setWireEndpointAConnectionReference: (value: string) => void;
   wireEndpointASealReference: string;
@@ -114,6 +119,10 @@ export function useWireHandlers({
   setWireSecondaryColorId,
   wireFreeColorLabel,
   setWireFreeColorLabel,
+  wireFuseEnabled,
+  setWireFuseEnabled,
+  wireFuseCatalogItemId,
+  setWireFuseCatalogItemId,
   wireEndpointAConnectionReference,
   setWireEndpointAConnectionReference,
   wireEndpointASealReference,
@@ -403,6 +412,8 @@ export function useWireHandlers({
     setWirePrimaryColorId("");
     setWireSecondaryColorId("");
     setWireFreeColorLabel("");
+    setWireFuseEnabled(false);
+    setWireFuseCatalogItemId("");
     setWireEndpointAConnectionReference("");
     setWireEndpointASealReference("");
     setWireEndpointAKind("connectorCavity");
@@ -435,6 +446,8 @@ export function useWireHandlers({
     setWirePrimaryColorId("");
     setWireSecondaryColorId("");
     setWireFreeColorLabel("");
+    setWireFuseEnabled(false);
+    setWireFuseCatalogItemId("");
     setWireEndpointAConnectionReference("");
     setWireEndpointASealReference("");
     setWireEndpointAKind("connectorCavity");
@@ -519,6 +532,13 @@ export function useWireHandlers({
     setWireEndpointASealReference(wire.endpointASealReference ?? "");
     setWireEndpointBConnectionReference(wire.endpointBConnectionReference ?? "");
     setWireEndpointBSealReference(wire.endpointBSealReference ?? "");
+    if (wire.protection?.kind === "fuse") {
+      setWireFuseEnabled(true);
+      setWireFuseCatalogItemId(wire.protection.catalogItemId);
+    } else {
+      setWireFuseEnabled(false);
+      setWireFuseCatalogItemId("");
+    }
     setWireEndpointAKind(wire.endpointA.kind);
     if (wire.endpointA.kind === "connectorCavity") {
       setWireEndpointAConnectorId(wire.endpointA.connectorId);
@@ -601,6 +621,40 @@ export function useWireHandlers({
     };
   }
 
+  function buildWireProtection():
+    | {
+        kind: "fuse";
+        catalogItemId: CatalogItemId;
+      }
+    | undefined
+    | null {
+    if (!wireFuseEnabled) {
+      return undefined;
+    }
+
+    const normalizedCatalogItemId = wireFuseCatalogItemId.trim();
+    if (normalizedCatalogItemId.length === 0) {
+      setWireFormError("Fuse catalog item is required.");
+      return null;
+    }
+
+    const catalogItem = store.getState().catalogItems.byId[normalizedCatalogItemId as CatalogItemId];
+    if (catalogItem === undefined) {
+      setWireFormError("Selected fuse catalog item no longer exists.");
+      return null;
+    }
+
+    if (catalogItem.manufacturerReference.trim().length === 0) {
+      setWireFormError("Selected fuse catalog item is missing a manufacturer reference.");
+      return null;
+    }
+
+    return {
+      kind: "fuse",
+      catalogItemId: normalizedCatalogItemId as CatalogItemId
+    };
+  }
+
   function handleWireSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
 
@@ -649,6 +703,11 @@ export function useWireHandlers({
       return;
     }
 
+    const protection = buildWireProtection();
+    if (protection === null) {
+      return;
+    }
+
     setWireFormError(null);
 
     const wasCreateMode = wireFormMode === "create";
@@ -667,6 +726,7 @@ export function useWireHandlers({
         endpointASealReference,
         endpointBConnectionReference,
         endpointBSealReference,
+        protection,
         endpointA,
         endpointB
       })

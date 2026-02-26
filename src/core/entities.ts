@@ -91,6 +91,12 @@ export type WireEndpoint =
       portIndex: number;
     };
 
+export type WireProtection =
+  | {
+      kind: "fuse";
+      catalogItemId: CatalogItemId;
+    };
+
 export interface Wire {
   id: WireId;
   name: string;
@@ -106,6 +112,7 @@ export interface Wire {
   endpointBSealReference?: string;
   endpointA: WireEndpoint;
   endpointB: WireEndpoint;
+  protection?: WireProtection;
   routeSegmentIds: SegmentId[];
   lengthMm: number;
   isRouteLocked: boolean;

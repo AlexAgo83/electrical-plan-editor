@@ -327,6 +327,23 @@
   color: #7b4d00;
 }
 
+.wire-fuse-chip {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  color: inherit;
+  margin-right: 0.35rem;
+  padding-inline: 0.4rem;
+}
+
+.wire-fuse-inline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.12rem;
+  font-size: 0.82em;
+  opacity: 0.9;
+}
+
 .data-table tr.is-selected,
 .data-table tr.is-wire-highlighted {
   background: transparent !important;

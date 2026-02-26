@@ -1,4 +1,4 @@
-import type { SegmentId } from "../../core/entities";
+import type { SegmentId, WireProtection } from "../../core/entities";
 import { normalizeWireColorState } from "../../core/cableColors";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { buildRoutingGraphIndex } from "../../core/graph";
@@ -48,6 +48,41 @@ function normalizeWireEndpointReference(value: string | undefined): string | und
   return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
 }
 
+function normalizeWireProtection(
+  state: AppState,
+  protection: WireProtection | undefined
+): { protection: WireProtection | undefined; error: string | null } {
+  if (protection === undefined) {
+    return { protection: undefined, error: null };
+  }
+
+  if (protection.kind !== "fuse") {
+    return { protection: undefined, error: "Wire protection kind is unsupported." };
+  }
+
+  const catalogItemId = protection.catalogItemId.trim().length > 0 ? protection.catalogItemId : undefined;
+  if (catalogItemId === undefined) {
+    return { protection: undefined, error: "Fuse wire must reference a catalog item." };
+  }
+
+  const catalogItem = state.catalogItems.byId[catalogItemId];
+  if (catalogItem === undefined) {
+    return { protection: undefined, error: "Fuse wire references a missing catalog item." };
+  }
+
+  if (catalogItem.manufacturerReference.trim().length === 0) {
+    return { protection: undefined, error: "Fuse wire catalog item must have a manufacturer reference." };
+  }
+
+  return {
+    protection: {
+      kind: "fuse",
+      catalogItemId
+    },
+    error: null
+  };
+}
+
 export function handleWireActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "wire/save": {
@@ -64,8 +99,12 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
       const endpointASealReference = normalizeWireEndpointReference(action.payload.endpointASealReference);
       const endpointBConnectionReference = normalizeWireEndpointReference(action.payload.endpointBConnectionReference);
       const endpointBSealReference = normalizeWireEndpointReference(action.payload.endpointBSealReference);
+      const normalizedProtectionResult = normalizeWireProtection(state, action.payload.protection);
       if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
         return withError(state, "Wire name and technical ID are required.");
+      }
+      if (normalizedProtectionResult.error !== null) {
+        return withError(state, normalizedProtectionResult.error);
       }
 
       if (hasDuplicateWireTechnicalId(state, action.payload.id, normalizedTechnicalId)) {
@@ -190,6 +229,7 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           endpointASealReference,
           endpointBConnectionReference,
           endpointBSealReference,
+          protection: normalizedProtectionResult.protection,
           endpointA: action.payload.endpointA,
           endpointB: action.payload.endpointB,
           routeSegmentIds,
@@ -264,6 +304,10 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
     }
 
     case "wire/upsert": {
+      const normalizedProtectionResult = normalizeWireProtection(state, action.payload.protection);
+      if (normalizedProtectionResult.error !== null) {
+        return withError(state, normalizedProtectionResult.error);
+      }
       const normalizedPayload = {
         ...action.payload,
         name: action.payload.name.trim(),
@@ -278,7 +322,8 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         endpointAConnectionReference: normalizeWireEndpointReference(action.payload.endpointAConnectionReference),
         endpointASealReference: normalizeWireEndpointReference(action.payload.endpointASealReference),
         endpointBConnectionReference: normalizeWireEndpointReference(action.payload.endpointBConnectionReference),
-        endpointBSealReference: normalizeWireEndpointReference(action.payload.endpointBSealReference)
+        endpointBSealReference: normalizeWireEndpointReference(action.payload.endpointBSealReference),
+        protection: normalizedProtectionResult.protection
       };
       return bumpRevision({
         ...clearLastError(state),

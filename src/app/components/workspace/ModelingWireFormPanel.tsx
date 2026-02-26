@@ -25,6 +25,10 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireSecondaryColorId,
     wireFreeColorLabel,
     setWireFreeColorLabel,
+    wireFuseEnabled,
+    setWireFuseEnabled,
+    wireFuseCatalogItemId,
+    setWireFuseCatalogItemId,
     wireTechnicalIdAlreadyUsed,
     wireEndpointAConnectionReference,
     setWireEndpointAConnectionReference,
@@ -56,6 +60,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     wireEndpointBPortIndex,
     setWireEndpointBPortIndex,
     wireEndpointBSlotHint,
+    catalogItems,
     connectors,
     splices,
     cancelWireEdit,
@@ -65,6 +70,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
   const secondaryColor = wireSecondaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wireSecondaryColorId] : undefined;
   const isCatalogColorMode = wireColorMode === "catalog";
   const isFreeColorMode = wireColorMode === "free";
+  const selectedFuseCatalogItemMissing =
+    wireFuseCatalogItemId.trim().length > 0 &&
+    !catalogItems.some((item) => item.id === wireFuseCatalogItemId);
 
   const swatch = (hex: string | undefined, label: string): ReactElement => (
     <span
@@ -109,6 +117,36 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         required
       />
     </label>
+    <label>
+      <input
+        type="checkbox"
+        checked={wireFuseEnabled}
+        onChange={(event) => setWireFuseEnabled(event.target.checked)}
+      />{" "}
+      Fuse
+    </label>
+    {wireFuseEnabled ? (
+      <>
+        <label>
+          Fuse catalog item
+          <select value={wireFuseCatalogItemId} onChange={(event) => setWireFuseCatalogItemId(event.target.value)}>
+            <option value="">Select catalog item</option>
+            {selectedFuseCatalogItemMissing ? (
+              <option value={wireFuseCatalogItemId}>
+                Missing catalog item ({wireFuseCatalogItemId})
+              </option>
+            ) : null}
+            {catalogItems.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.manufacturerReference}
+                {item.name?.trim() ? ` - ${item.name.trim()}` : ""}
+              </option>
+            ))}
+          </select>
+        </label>
+        <small className="inline-help">Fuse reference is taken from the linked catalog item's manufacturer reference.</small>
+      </>
+    ) : null}
     <label>
       Color mode
       <select

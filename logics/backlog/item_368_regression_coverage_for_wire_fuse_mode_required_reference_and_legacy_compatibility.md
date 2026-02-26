@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 95%
 > Confidence: 91%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Regression safety for wire fuse-mode workflows and compatibility
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -39,5 +39,7 @@ Wire fuse-mode support spans entity validation, form UX, and persistence compati
 - References:
   - `logics/request/req_067_wire_protection_metadata_v1_fuse_kind_with_required_reference.md`
   - `src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx`
-  - `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
-  - `src/tests/app.ui.navigation-canvas.spec.tsx`
+  - `src/tests/store.reducer.wires.spec.ts`
+  - `src/tests/store.reducer.catalog.spec.ts`
+  - `src/tests/persistence.localStorage.spec.ts`
+  - `src/tests/portability.network-file.spec.ts`
