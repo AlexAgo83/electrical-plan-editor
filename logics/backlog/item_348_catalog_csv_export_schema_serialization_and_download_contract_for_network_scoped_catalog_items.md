@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 97%
 > Confidence: 94%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Catalog CSV export engine + schema contract
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -40,5 +40,7 @@ The Catalog screen lacks a CSV export engine/contract, so users cannot bulk revi
 - References:
   - `logics/request/req_062_catalog_csv_import_export_actions_and_round_trip_support.md`
   - `src/app/lib/csv.ts`
+  - `src/app/lib/catalogCsv.ts`
+  - `src/app/AppController.tsx`
   - `src/store/catalog.ts`
   - `src/core/entities.ts`

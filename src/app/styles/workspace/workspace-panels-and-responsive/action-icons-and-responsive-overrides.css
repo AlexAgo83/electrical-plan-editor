@@ -47,6 +47,11 @@
   mask: url("/icons/ico_save.svg") center / contain no-repeat;
 }
 
+.action-button-icon.is-swap {
+  -webkit-mask: url("/icons/ico_swap.svg") center / contain no-repeat;
+  mask: url("/icons/ico_swap.svg") center / contain no-repeat;
+}
+
 .action-button-icon.is-cancel {
   -webkit-mask: url("/icons/ico_cancel.svg") center / contain no-repeat;
   mask: url("/icons/ico_cancel.svg") center / contain no-repeat;

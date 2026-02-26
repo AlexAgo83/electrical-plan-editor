@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 97% (V1 scope is a global undo/redo feature for workspace-domain mutations with UI actions, shortcuts, history boundaries, and explicit UI-state exclusions)
 > Confidence: 92% (cross-cutting state/history work is tractable but requires careful sequencing and regression coverage)
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Orchestration for global undo/redo delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -42,13 +42,13 @@ V1 scope intentionally excludes UI-only state (theme/preferences/navigation/sele
 - `logics/backlog/item_364_regression_coverage_for_global_undo_redo_mutations_shortcuts_and_scope_exclusions.md`
 
 # Plan
-- [ ] 1. Implement history foundation for workspace-domain mutation tracking and deterministic undo/redo transitions (`item_361`)
-- [ ] 2. Integrate visible undo/redo UI actions plus keyboard shortcuts with input-focus guards (`item_362`)
-- [ ] 3. Harden history grouping, no-op filtering, and reset boundaries for bulk/replacement flows (`item_363`)
-- [ ] 4. Add regression coverage for representative mutations, shortcuts, scope exclusions, and redo-branch semantics (`item_364`)
-- [ ] 5. Run targeted undo/redo validation suites and fix regressions
-- [ ] 6. Run final validation matrix
-- [ ] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
+- [x] 1. Implement history foundation for workspace-domain mutation tracking and deterministic undo/redo transitions (`item_361`)
+- [x] 2. Integrate visible undo/redo UI actions plus keyboard shortcuts with input-focus guards (`item_362`)
+- [x] 3. Harden history grouping, no-op filtering, and reset boundaries for bulk/replacement flows (`item_363`)
+- [x] 4. Add regression coverage for representative mutations, shortcuts, scope exclusions, and redo-branch semantics (`item_364`)
+- [x] 5. Run targeted undo/redo validation suites and fix regressions
+- [x] 6. Run final validation matrix
+- [x] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -80,6 +80,25 @@ V1 scope intentionally excludes UI-only state (theme/preferences/navigation/sele
   - Define history stack size cap and grouping behavior early to prevent churn during test hardening.
   - Treat bulk mutations (samples/imports) as atomic undo steps in V1 for predictable UX.
   - Add focused shortcut tests with input-focus guards to avoid common regressions.
+  - Core undo/redo feature infrastructure and UI wiring were already present in workspace code; this delivery closed req/task coverage and validation gaps (notably catalog-import atomicity and UI-only exclusion assertions).
+  - Catalog CSV import (`req_062`) now participates in global history as one atomic undo step via `replaceStateWithHistory`, aligning with V1 grouping goals.
+- Validation snapshot (targeted):
+  - `npx vitest run src/tests/app.ui.undo-redo-global.spec.tsx` ✅ (`1` file / `2` tests)
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx` ✅
+- Validation snapshot (final):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s build` ✅
+  - `npm run -s test:ci` ✅ (`47` files / `284` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
+- Delivery summary:
+  - Confirmed and validated global undo/redo foundation (`useStoreHistory`) with domain-mutation tracking and UI-action exclusions.
+  - Confirmed visible `Undo` / `Redo` actions and keyboard shortcuts (`Ctrl/Cmd+Z`, `Shift+Ctrl/Cmd+Z`, `Ctrl+Y`) with input-focus guards.
+  - Added dedicated regression coverage for redo-branch clearing, shortcut focus guard behavior, UI-only theme exclusion, and atomic catalog CSV import undo/redo.
 
 # References
 - `logics/request/req_066_global_undo_redo_history_for_modeling_and_catalog_mutations.md`
@@ -88,7 +107,12 @@ V1 scope intentionally excludes UI-only state (theme/preferences/navigation/sele
 - `logics/backlog/item_363_undo_redo_history_grouping_no_op_filtering_and_reset_boundaries.md`
 - `logics/backlog/item_364_regression_coverage_for_global_undo_redo_mutations_shortcuts_and_scope_exclusions.md`
 - `src/app/AppController.tsx`
+- `src/app/hooks/useStoreHistory.ts`
+- `src/app/hooks/useKeyboardShortcuts.ts`
+- `src/app/components/workspace/OperationsHealthPanel.tsx`
 - `src/store/index.ts`
 - `src/app/hooks/useWorkspaceHandlers.ts`
 - `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
+- `src/tests/app.ui.undo-redo-global.spec.tsx`
+- `src/tests/app.ui.catalog-csv-import-export.spec.tsx`

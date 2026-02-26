@@ -1,8 +1,8 @@
 ## task_061_req_064_segment_edit_node_swap_action_orchestration_and_delivery_control - req_064 Segment edit node swap action orchestration and delivery control
 > From version: 0.9.8
 > Understanding: 99% (focused segment-edit ergonomics feature with exact UI placement and draft-only swap semantics)
-> Confidence: 96% (segment form scope is small and controlled; main work is regression-safe UI integration)
-> Progress: 0%
+> Confidence: 99% (implementation delivered and validated with targeted suites plus full matrix)
+> Progress: 100%
 > Complexity: Medium
 > Theme: Orchestration for segment edit node A/B swap action delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -41,12 +41,12 @@ The feature touches:
 - `logics/backlog/item_357_regression_coverage_for_segment_edit_node_swap_action_ordering_and_save_cancel_semantics.md`
 
 # Plan
-- [ ] 1. Implement segment edit node swap draft-state transform and preserve non-node fields (`item_355`)
-- [ ] 2. Add `Edit Segment` swap action with requested placement, icon, and edit-only visibility (`item_356`)
-- [ ] 3. Add regression coverage for ordering, swap correctness, and save/cancel semantics (`item_357`)
-- [ ] 4. Run targeted segment-form validation suites and fix regressions
-- [ ] 5. Run final validation matrix
-- [ ] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
+- [x] 1. Implement segment edit node swap draft-state transform and preserve non-node fields (`item_355`)
+- [x] 2. Add `Edit Segment` swap action with requested placement, icon, and edit-only visibility (`item_356`)
+- [x] 3. Add regression coverage for ordering, swap correctness, and save/cancel semantics (`item_357`)
+- [x] 4. Run targeted segment-form validation suites and fix regressions
+- [x] 5. Run final validation matrix
+- [x] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -66,6 +66,19 @@ The feature touches:
 
 # Report
 - Current blockers: none.
+- Validation snapshot (delivery):
+  - `npx vitest run src/tests/app.ui.creation-flow-ergonomics.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.network-summary-workflow-polish.spec.tsx` ✅
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s build` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s test:ci` ✅ (`44` files / `278` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
 - Risks to track:
   - Swap implementation accidentally touches non-node fields (`Length`, `Sub-network tag`, `Segment ID`).
   - Swap button accidentally submits form or exits edit mode.
@@ -76,6 +89,9 @@ The feature touches:
   - Keep the action edit-only in V1 to avoid create-mode UX churn.
   - Reuse `public/icons/ico_swap.svg` with a visible text label for consistency with recent swap-action requests.
   - Do not auto-recompute `Length (mm)` or `Sub-network tag`; swap is limited to `Node A` / `Node B` draft values.
+  - Delivered `Swap nodes` as an edit-only, non-submit (`type="button"`) action placed between `Save` and `Cancel edit` in `Edit Segment`.
+  - Added integration regression coverage for create-mode absence, edit-mode button ordering, draft-only semantics, cancel rollback, and save persistence while preserving non-node fields (`Length`, `Sub-network tag`, `Segment ID`).
+  - Final validation matrix completed successfully after the targeted segment-form regression passes.
 
 # References
 - `logics/request/req_064_segment_edit_swap_node_a_b_action_between_save_and_cancel.md`

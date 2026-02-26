@@ -81,6 +81,18 @@ export function useSegmentHandlers({
     dispatchAction(appActions.clearSelection(), { trackHistory: false });
   }
 
+  function handleSwapSegmentNodes(): void {
+    if (segmentFormMode !== "edit") {
+      return;
+    }
+
+    const nextNodeA = segmentNodeB;
+    const nextNodeB = segmentNodeA;
+    setSegmentNodeA(nextNodeA);
+    setSegmentNodeB(nextNodeB);
+    setSegmentFormError(null);
+  }
+
   function startSegmentEdit(segment: Segment): void {
     setSegmentFormMode("edit");
     setEditingSegmentId(segment.id);
@@ -178,6 +190,7 @@ export function useSegmentHandlers({
     resetSegmentForm,
     clearSegmentForm,
     cancelSegmentEdit,
+    handleSwapSegmentNodes,
     startSegmentEdit,
     handleSegmentSubmit,
     handleSegmentDelete

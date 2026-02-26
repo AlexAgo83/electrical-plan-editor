@@ -1,4 +1,5 @@
 import {
+  type ChangeEvent,
   type ReactElement,
   useCallback,
   useEffect,
@@ -11,6 +12,7 @@ import appPackageMetadata from "../../package.json";
 import type { CatalogItemId, ConnectorId, NodeId, SpliceId } from "../core/entities";
 import {
   type AppStore,
+  appReducer,
   appActions,
   createEmptyWorkspaceState,
   hasSampleNetworkSignature,
@@ -87,9 +89,11 @@ import {
   NETWORK_MAX_SCALE,
   NETWORK_MIN_SCALE,
   NETWORK_VIEW_HEIGHT,
-  NETWORK_VIEW_WIDTH
+  NETWORK_VIEW_WIDTH,
+  createEntityId
 } from "./lib/app-utils-shared";
 import { createNodePositionMap } from "./lib/app-utils-layout";
+import { buildCatalogCsvExport, parseCatalogCsvImportText } from "./lib/catalogCsv";
 import { downloadCsvFile } from "./lib/csv";
 import { buildNetworkSummaryBomCsvExport } from "./lib/networkSummaryBomCsv";
 import {
@@ -102,6 +106,7 @@ import {
 } from "./lib/onboarding";
 import type {
   AppProps,
+  ImportExportStatus,
   NodePosition,
   SubScreenId
 } from "./types/app-controller";
@@ -1112,6 +1117,165 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     activeNetworkId,
     dispatchAction
   });
+  const catalogCsvImportFileInputRef = useRef<HTMLInputElement | null>(null);
+  const [catalogCsvImportExportStatus, setCatalogCsvImportExportStatus] = useState<ImportExportStatus | null>(null);
+  const [catalogCsvLastImportSummaryLine, setCatalogCsvLastImportSummaryLine] = useState<string | null>(null);
+
+  function handleExportCatalogCsv(): void {
+    if (catalogItems.length === 0) {
+      setCatalogCsvImportExportStatus({
+        kind: "failed",
+        message: "No catalog item available for export."
+      });
+      return;
+    }
+
+    const { headers, rows } = buildCatalogCsvExport(catalogItems);
+    downloadCsvFile("Catalog Export", headers, rows);
+    setCatalogCsvImportExportStatus({
+      kind: "success",
+      message: `Exported ${rows.length} catalog item(s).`
+    });
+  }
+
+  function handleOpenCatalogCsvImportPicker(): void {
+    catalogCsvImportFileInputRef.current?.click();
+  }
+
+  async function handleCatalogCsvImportFileChange(event: ChangeEvent<HTMLInputElement>): Promise<void> {
+    const file = event.target.files?.[0];
+    if (file === undefined) {
+      return;
+    }
+
+    const resetInput = () => {
+      event.target.value = "";
+    };
+
+    let rawCsv: string;
+    try {
+      rawCsv = await file.text();
+    } catch {
+      setCatalogCsvImportExportStatus({
+        kind: "failed",
+        message: "Unable to read selected CSV file."
+      });
+      resetInput();
+      return;
+    }
+
+    const parsed = parseCatalogCsvImportText(rawCsv);
+    const warningCount = parsed.issues.filter((issue) => issue.kind === "warning").length;
+    const errorIssues = parsed.issues.filter((issue) => issue.kind === "error");
+    if (errorIssues.length > 0) {
+      const firstError = errorIssues[0];
+      setCatalogCsvImportExportStatus({
+        kind: "failed",
+        message:
+          firstError === undefined
+            ? "Catalog CSV import failed."
+            : `CSV row ${firstError.rowNumber}: ${firstError.message}`
+      });
+      setCatalogCsvLastImportSummaryLine(
+        `Catalog CSV import aborted: ${parsed.rows.length} parsed rows / ${warningCount} warnings / ${errorIssues.length} errors.`
+      );
+      resetInput();
+      return;
+    }
+
+    if (parsed.rows.length === 0) {
+      setCatalogCsvImportExportStatus({
+        kind: "failed",
+        message: "CSV contains no catalog data rows."
+      });
+      setCatalogCsvLastImportSummaryLine(null);
+      resetInput();
+      return;
+    }
+
+    const currentState = store.getState();
+    const currentCatalogItems = selectCatalogItems(currentState);
+    if (
+      currentCatalogItems.length > 0 &&
+      typeof window !== "undefined" &&
+      typeof window.confirm === "function" &&
+      !window.confirm(
+        `Import ${parsed.rows.length} catalog row(s) into the current catalog? Existing items are matched by manufacturer reference.`
+      )
+    ) {
+      setCatalogCsvImportExportStatus({
+        kind: "failed",
+        message: "Catalog CSV import canceled."
+      });
+      resetInput();
+      return;
+    }
+
+    const existingByManufacturerReference = new Map(
+      currentCatalogItems.map((item) => [item.manufacturerReference.trim(), item] as const)
+    );
+
+    let nextState =
+      currentState.ui.lastError === null
+        ? currentState
+        : {
+            ...currentState,
+            ui: {
+              ...currentState.ui,
+              lastError: null
+            }
+          };
+    let createdCount = 0;
+    let updatedCount = 0;
+
+    for (const row of parsed.rows) {
+      const existing = existingByManufacturerReference.get(row.manufacturerReference);
+      const nextCatalogItemId = existing?.id ?? (createEntityId("catalog") as CatalogItemId);
+      const candidateState = appReducer(
+        nextState,
+        appActions.upsertCatalogItem({
+          ...(existing ?? {}),
+          id: nextCatalogItemId,
+          manufacturerReference: row.manufacturerReference,
+          connectionCount: row.connectionCount,
+          name: row.name,
+          unitPriceExclTax: row.unitPriceExclTax,
+          url: row.url
+        })
+      );
+
+      if (candidateState.ui.lastError !== null) {
+        setCatalogCsvImportExportStatus({
+          kind: "failed",
+          message: `Catalog import failed on '${row.manufacturerReference}': ${candidateState.ui.lastError}`
+        });
+        setCatalogCsvLastImportSummaryLine(
+          `Catalog CSV import aborted after ${createdCount + updatedCount} row(s); ${warningCount} warnings in file.`
+        );
+        resetInput();
+        return;
+      }
+
+      if (existing === undefined) {
+        createdCount += 1;
+      } else {
+        updatedCount += 1;
+      }
+      nextState = candidateState;
+    }
+
+    replaceStateWithHistory(nextState);
+    setActiveScreen("modeling");
+    setActiveSubScreen("catalog");
+    setCatalogCsvImportExportStatus({
+      kind: warningCount > 0 ? "partial" : "success",
+      message: `Imported ${parsed.rows.length} catalog row(s): ${createdCount} created / ${updatedCount} updated.`
+    });
+    setCatalogCsvLastImportSummaryLine(
+      `Last catalog CSV import (${file.name}): ${parsed.rows.length} rows, ${warningCount} warnings, ${errorIssues.length} errors.`
+    );
+    resetInput();
+  }
 
   const {
     handleCreateNetwork,
@@ -2049,6 +2213,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       onOpenCreateCatalogItem={catalogHandlers.resetCatalogForm}
       onEditCatalogItem={catalogHandlers.startCatalogEdit}
       onDeleteCatalogItem={catalogHandlers.handleCatalogDelete}
+      onExportCatalogCsv={handleExportCatalogCsv}
+      onOpenCatalogCsvImportPicker={handleOpenCatalogCsvImportPicker}
+      catalogCsvImportFileInputRef={catalogCsvImportFileInputRef}
+      onCatalogCsvImportFileChange={handleCatalogCsvImportFileChange}
+      catalogCsvImportExportStatus={catalogCsvImportExportStatus}
+      catalogCsvLastImportSummaryLine={catalogCsvLastImportSummaryLine}
       onOpenCatalogOnboardingHelp={() => openSingleStepOnboarding("catalog")}
     />
   );

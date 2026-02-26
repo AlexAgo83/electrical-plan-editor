@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 95%
 > Confidence: 91%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Regression safety for global undo/redo behavior
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -39,5 +39,6 @@ Undo/redo is a cross-cutting feature with high regression risk. Without targeted
   - `logics/request/req_066_global_undo_redo_history_for_modeling_and_catalog_mutations.md`
   - `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
+  - `src/tests/app.ui.undo-redo-global.spec.tsx`
+  - `src/tests/app.ui.catalog-csv-import-export.spec.tsx`
   - `src/app/AppController.tsx`
-

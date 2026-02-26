@@ -1,9 +1,9 @@
-import { useMemo, useState, type ReactElement } from "react";
+import { useMemo, useState, type ChangeEvent, type ReactElement, type RefObject } from "react";
 import type { CatalogItem, CatalogItemId } from "../../../core/entities";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { compareSortableValues } from "../../lib/app-utils-shared";
 import { formatPriceWithCurrencySymbol } from "../../lib/pricing";
-import type { WorkspaceCurrencyCode } from "../../types/app-controller";
+import type { ImportExportStatus, WorkspaceCurrencyCode } from "../../types/app-controller";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
@@ -21,6 +21,12 @@ interface ModelingCatalogListPanelProps {
   onOpenCreateCatalogItem: () => void;
   onEditCatalogItem: (item: CatalogItem) => void;
   onDeleteCatalogItem: (catalogItemId: CatalogItemId) => void;
+  onExportCatalogCsv?: () => void;
+  onOpenCatalogCsvImportPicker?: () => void;
+  catalogCsvImportFileInputRef?: RefObject<HTMLInputElement | null>;
+  onCatalogCsvImportFileChange?: (event: ChangeEvent<HTMLInputElement>) => Promise<void> | void;
+  catalogCsvImportExportStatus?: ImportExportStatus | null;
+  catalogCsvLastImportSummaryLine?: string | null;
   onOpenCatalogOnboardingHelp?: () => void;
 }
 
@@ -34,6 +40,12 @@ export function ModelingCatalogListPanel({
   onOpenCreateCatalogItem,
   onEditCatalogItem,
   onDeleteCatalogItem,
+  onExportCatalogCsv,
+  onOpenCatalogCsvImportPicker,
+  catalogCsvImportFileInputRef,
+  onCatalogCsvImportFileChange,
+  catalogCsvImportExportStatus = null,
+  catalogCsvLastImportSummaryLine = null,
   onOpenCatalogOnboardingHelp
 }: ModelingCatalogListPanelProps): ReactElement {
   const [filterField, setFilterField] = useState<CatalogFilterField>("any");
@@ -98,6 +110,16 @@ export function ModelingCatalogListPanel({
         <h2>Catalog</h2>
         <div className="list-panel-header-tools">
           <div className="list-panel-header-tools-row">
+            {onExportCatalogCsv !== undefined ? (
+              <button
+                type="button"
+                className="filter-chip"
+                onClick={onExportCatalogCsv}
+                disabled={catalogItems.length === 0}
+              >
+                Export CSV
+              </button>
+            ) : null}
             {onOpenCatalogOnboardingHelp !== undefined ? (
               <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenCatalogOnboardingHelp}>
                 <span className="action-button-icon is-help" aria-hidden="true" />
@@ -210,6 +232,11 @@ export function ModelingCatalogListPanel({
           <span className="action-button-icon is-edit" aria-hidden="true" />
           Edit
         </button>
+        {onOpenCatalogCsvImportPicker !== undefined ? (
+          <button type="button" onClick={onOpenCatalogCsvImportPicker}>
+            Import CSV
+          </button>
+        ) : null}
         <button
           type="button"
           className="modeling-list-action-delete button-with-icon"
@@ -220,6 +247,21 @@ export function ModelingCatalogListPanel({
           Delete
         </button>
       </div>
+      {catalogCsvImportFileInputRef !== undefined && onCatalogCsvImportFileChange !== undefined ? (
+        <input
+          ref={catalogCsvImportFileInputRef}
+          type="file"
+          accept="text/csv,.csv"
+          hidden
+          onChange={(event) => {
+            void onCatalogCsvImportFileChange(event);
+          }}
+        />
+      ) : null}
+      {catalogCsvImportExportStatus !== null ? (
+        <p className={`meta-line import-status is-${catalogCsvImportExportStatus.kind}`}>{catalogCsvImportExportStatus.message}</p>
+      ) : null}
+      {catalogCsvLastImportSummaryLine !== null ? <p className="meta-line">{catalogCsvLastImportSummaryLine}</p> : null}
     </article>
   );
 }

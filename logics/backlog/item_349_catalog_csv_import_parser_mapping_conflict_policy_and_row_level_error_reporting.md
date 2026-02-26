@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 97%
 > Confidence: 93%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Catalog CSV import parsing and deterministic upsert behavior
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -46,5 +46,7 @@ Even with catalog CSV export, users cannot bulk-create or bulk-update catalog it
   - `logics/request/req_062_catalog_csv_import_export_actions_and_round_trip_support.md`
   - `src/core/entities.ts`
   - `src/store/catalog.ts`
+  - `src/app/lib/catalogCsv.ts`
+  - `src/app/AppController.tsx`
   - `src/app/hooks/useCatalogHandlers.ts`
   - `src/app/hooks/validation/buildValidationIssues.ts`

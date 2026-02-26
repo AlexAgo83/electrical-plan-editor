@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 97%
 > Confidence: 93%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: State history foundation for global undo/redo
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -39,4 +39,4 @@ Global undo/redo requires a reliable history foundation that captures workspace-
   - `logics/request/req_066_global_undo_redo_history_for_modeling_and_catalog_mutations.md`
   - `src/store/index.ts`
   - `src/app/AppController.tsx`
-
+  - `src/app/hooks/useStoreHistory.ts`

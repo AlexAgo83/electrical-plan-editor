@@ -458,6 +458,37 @@ export function useWireHandlers({
     dispatchAction(appActions.clearSelection(), { trackHistory: false });
   }
 
+  function handleSwapWireEndpoints(): void {
+    if (wireFormMode !== "edit") {
+      return;
+    }
+
+    const nextEndpointAConnectionReference = wireEndpointBConnectionReference;
+    const nextEndpointASealReference = wireEndpointBSealReference;
+    const nextEndpointAKind = wireEndpointBKind;
+    const nextEndpointAConnectorId = wireEndpointBConnectorId;
+    const nextEndpointACavityIndex = wireEndpointBCavityIndex;
+    const nextEndpointASpliceId = wireEndpointBSpliceId;
+    const nextEndpointAPortIndex = wireEndpointBPortIndex;
+
+    setWireEndpointAConnectionReference(nextEndpointAConnectionReference);
+    setWireEndpointASealReference(nextEndpointASealReference);
+    setWireEndpointAKind(nextEndpointAKind);
+    setWireEndpointAConnectorId(nextEndpointAConnectorId);
+    setWireEndpointACavityIndex(nextEndpointACavityIndex);
+    setWireEndpointASpliceId(nextEndpointASpliceId);
+    setWireEndpointAPortIndex(nextEndpointAPortIndex);
+
+    setWireEndpointBConnectionReference(wireEndpointAConnectionReference);
+    setWireEndpointBSealReference(wireEndpointASealReference);
+    setWireEndpointBKind(wireEndpointAKind);
+    setWireEndpointBConnectorId(wireEndpointAConnectorId);
+    setWireEndpointBCavityIndex(wireEndpointACavityIndex);
+    setWireEndpointBSpliceId(wireEndpointASpliceId);
+    setWireEndpointBPortIndex(wireEndpointAPortIndex);
+    setWireFormError(null);
+  }
+
   function startWireEdit(wire: Wire): void {
     endpointAIndexTouchedByUserRef.current = false;
     endpointBIndexTouchedByUserRef.current = false;
@@ -732,6 +763,7 @@ export function useWireHandlers({
     wireEndpointASlotHint: computeEndpointSlotHint("A"),
     wireEndpointBSlotHint: computeEndpointSlotHint("B"),
     handleWireSubmit,
+    handleSwapWireEndpoints,
     handleWireDelete,
     handleLockWireRoute,
     handleResetWireRoute

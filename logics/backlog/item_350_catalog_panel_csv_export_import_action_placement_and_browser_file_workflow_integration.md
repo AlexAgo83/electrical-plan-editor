@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 99% (user specified exact button placements for both export and import actions)
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Catalog UI action integration for CSV portability workflows
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -53,4 +53,5 @@ CSV export/import capabilities are not discoverable unless they are integrated i
   - `src/app/components/workspace/ModelingCatalogListPanel.tsx`
   - `src/app/components/workspace/ModelingPrimaryTables.tsx`
   - `src/app/AppController.tsx`
+  - `src/tests/app.ui.catalog-csv-import-export.spec.tsx`
   - `src/app/hooks/controller/useAppControllerScreenContentSlices.tsx`

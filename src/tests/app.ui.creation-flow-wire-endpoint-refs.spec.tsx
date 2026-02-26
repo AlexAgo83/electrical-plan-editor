@@ -1,6 +1,7 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  createUiIntegrationState,
   createUiIntegrationDenseWiresState,
   getPanelByHeading,
   renderAppWithState,
@@ -99,5 +100,75 @@ describe("App integration UI - creation flow wire endpoint references", () => {
       expect(within(inspectorPanel).queryByText("SEAL-A-01")).not.toBeInTheDocument();
       expect(within(inspectorPanel).queryByText("SPL-CONN-B")).not.toBeInTheDocument();
     }
+  });
+
+  it("swaps wire edit endpoints as a draft action between Save and Cancel edit and preserves side metadata on save only", () => {
+    const { store } = renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+
+    clickNewFromPanel("Wires");
+    const createWirePanel = getPanelByHeading("Create Wire");
+    expect(within(createWirePanel).queryByRole("button", { name: "Swap endpoints" })).not.toBeInTheDocument();
+    fireEvent.click(within(createWirePanel).getByRole("button", { name: "Cancel" }));
+
+    const wiresPanel = getPanelByHeading("Wires");
+    fireEvent.click(within(wiresPanel).getByText("Wire 1"));
+
+    const editWirePanel = getPanelByHeading("Edit Wire");
+    const actionButtons = within(editWirePanel).getAllByRole("button");
+    expect(actionButtons.map((button) => button.textContent?.trim())).toEqual(["Save", "Swap endpoints", "Cancel edit"]);
+
+    const endpointAFieldset = within(editWirePanel).getByRole("group", { name: "Endpoint A" });
+    const endpointBFieldset = within(editWirePanel).getByRole("group", { name: "Endpoint B" });
+    fireEvent.change(within(endpointAFieldset).getByLabelText("Connection reference"), { target: { value: "TERM-A-DRAFT" } });
+    fireEvent.change(within(endpointBFieldset).getByLabelText("Seal reference"), { target: { value: "SEAL-B-DRAFT" } });
+
+    fireEvent.click(within(editWirePanel).getByRole("button", { name: "Swap endpoints" }));
+
+    const draftWireBeforeSave = Object.values(store.getState().wires.byId).find((wire) => wire.technicalId === "W-1");
+    expect(draftWireBeforeSave?.endpointA.kind).toBe("connectorCavity");
+    expect(draftWireBeforeSave?.endpointB.kind).toBe("splicePort");
+    expect(draftWireBeforeSave?.endpointAConnectionReference).toBeUndefined();
+    expect(draftWireBeforeSave?.endpointBSealReference).toBeUndefined();
+
+    const swappedEditWirePanel = getPanelByHeading("Edit Wire");
+    const swappedEndpointAFieldset = within(swappedEditWirePanel).getByRole("group", { name: "Endpoint A" });
+    const swappedEndpointBFieldset = within(swappedEditWirePanel).getByRole("group", { name: "Endpoint B" });
+    expect(within(swappedEndpointAFieldset).getByLabelText("Type")).toHaveValue("splicePort");
+    expect(within(swappedEndpointAFieldset).getByLabelText("Splice")).toHaveValue("S1");
+    expect(within(swappedEndpointAFieldset).getByLabelText("Port index")).toHaveValue(1);
+    expect(within(swappedEndpointAFieldset).getByLabelText("Connection reference")).toHaveValue("");
+    expect(within(swappedEndpointAFieldset).getByLabelText("Seal reference")).toHaveValue("SEAL-B-DRAFT");
+    expect(within(swappedEndpointBFieldset).getByLabelText("Type")).toHaveValue("connectorCavity");
+    expect(within(swappedEndpointBFieldset).getByLabelText("Connector")).toHaveValue("C1");
+    expect(within(swappedEndpointBFieldset).getByLabelText("Way index")).toHaveValue(1);
+    expect(within(swappedEndpointBFieldset).getByLabelText("Connection reference")).toHaveValue("TERM-A-DRAFT");
+    expect(within(swappedEndpointBFieldset).getByLabelText("Seal reference")).toHaveValue("");
+
+    fireEvent.click(within(swappedEditWirePanel).getByRole("button", { name: "Cancel edit" }));
+    fireEvent.click(within(getPanelByHeading("Wires")).getByText("Wire 1"));
+
+    const reopenedEditWirePanel = getPanelByHeading("Edit Wire");
+    const reopenedEndpointAFieldset = within(reopenedEditWirePanel).getByRole("group", { name: "Endpoint A" });
+    const reopenedEndpointBFieldset = within(reopenedEditWirePanel).getByRole("group", { name: "Endpoint B" });
+    expect(within(reopenedEndpointAFieldset).getByLabelText("Type")).toHaveValue("connectorCavity");
+    expect(within(reopenedEndpointBFieldset).getByLabelText("Type")).toHaveValue("splicePort");
+    expect(within(reopenedEndpointAFieldset).getByLabelText("Connection reference")).toHaveValue("");
+    expect(within(reopenedEndpointBFieldset).getByLabelText("Seal reference")).toHaveValue("");
+
+    fireEvent.change(within(reopenedEndpointAFieldset).getByLabelText("Connection reference"), { target: { value: "TERM-A-SAVE" } });
+    fireEvent.change(within(reopenedEndpointBFieldset).getByLabelText("Seal reference"), { target: { value: "SEAL-B-SAVE" } });
+    fireEvent.click(within(reopenedEditWirePanel).getByRole("button", { name: "Swap endpoints" }));
+    fireEvent.click(within(getPanelByHeading("Edit Wire")).getByRole("button", { name: "Save" }));
+
+    const savedWire = Object.values(store.getState().wires.byId).find((wire) => wire.technicalId === "W-1");
+    expect(savedWire?.endpointA.kind).toBe("splicePort");
+    expect(savedWire?.endpointB.kind).toBe("connectorCavity");
+    expect(savedWire?.endpointAConnectionReference).toBeUndefined();
+    expect(savedWire?.endpointASealReference).toBe("SEAL-B-SAVE");
+    expect(savedWire?.endpointBConnectionReference).toBe("TERM-A-SAVE");
+    expect(savedWire?.endpointBSealReference).toBeUndefined();
   });
 });

@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 99%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Cross-request delivery coordination for the active task queue (`req_062`..`req_066`)
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -51,12 +51,12 @@ Rationale:
 - Finish with global undo/redo (`req_066`) last, since it is the most cross-cutting and may interact with many mutation paths introduced earlier.
 
 # Plan
-- [ ] Step 1. Deliver `task_060` (`req_063` Wire edit endpoint swap action) + validations + docs sync
-- [ ] Step 2. Deliver `task_061` (`req_064` Segment edit node swap action) + validations + docs sync
-- [ ] Step 3. Deliver `task_062` (`req_065` Segment analysis endpoint column split) + validations + docs sync
-- [ ] Step 4. Deliver `task_059` (`req_062` Catalog CSV import/export) + validations + docs sync
-- [ ] Step 5. Deliver `task_063` (`req_066` Global undo/redo history) + validations + docs sync
-- [ ] Step 6. Final cross-queue integration validation + `logics` synchronization + delivery summary
+- [x] Step 1. Deliver `task_060` (`req_063` Wire edit endpoint swap action) + validations + docs sync
+- [x] Step 2. Deliver `task_061` (`req_064` Segment edit node swap action) + validations + docs sync
+- [x] Step 3. Deliver `task_062` (`req_065` Segment analysis endpoint column split) + validations + docs sync
+- [x] Step 4. Deliver `task_059` (`req_062` Catalog CSV import/export) + validations + docs sync
+- [x] Step 5. Deliver `task_063` (`req_066` Global undo/redo history) + validations + docs sync
+- [x] Step 6. Final cross-queue integration validation + `logics` synchronization + delivery summary
 
 # Validation gates
 ## A. Minimum step gate (apply after each Step 1-5)
@@ -105,12 +105,12 @@ Rationale:
 
 # Report
 - Step status:
-  - Step 1 (`task_060` / `req_063`): pending
-  - Step 2 (`task_061` / `req_064`): pending
-  - Step 3 (`task_062` / `req_065`): pending
-  - Step 4 (`task_059` / `req_062`): pending
-  - Step 5 (`task_063` / `req_066`): pending
-  - Step 6 (final integration gate + summary): pending
+  - Step 1 (`task_060` / `req_063`): completed (full validation matrix passed; checkpoint commit pending)
+  - Step 2 (`task_061` / `req_064`): completed (full validation matrix passed; checkpoint commit pending)
+  - Step 3 (`task_062` / `req_065`): completed (full validation matrix passed; checkpoint commit pending)
+  - Step 4 (`task_059` / `req_062`): completed (full validation matrix passed; checkpoint commit pending)
+  - Step 5 (`task_063` / `req_066`): completed (validation + coverage closure delivered; checkpoint commit pending)
+  - Step 6 (final integration gate + summary): completed (full matrix passed; checkpoint commit pending)
 - Checkpoint commits:
   - Step 1: pending
   - Step 2: pending
@@ -123,8 +123,94 @@ Rationale:
 - Validation snapshot (kickoff):
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
   - Active queue identified from `logics/tasks`: `task_059`, `task_060`, `task_061`, `task_062`, `task_063` (all non-`100%`)
+- Validation snapshot (Step 1 final):
+  - `npx vitest run src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.creation-flow-ergonomics.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.wire-free-color-mode.spec.tsx` ✅
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s build` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s test:ci` ✅ (`44` files / `277` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
+- Validation snapshot (Step 2 final):
+  - `npx vitest run src/tests/app.ui.creation-flow-ergonomics.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.network-summary-workflow-polish.spec.tsx` ✅
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s build` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s test:ci` ✅ (`44` files / `278` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
+- Validation snapshot (Step 3 final):
+  - `npx vitest run src/tests/app.ui.list-ergonomics.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx` ✅
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s build` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s test:ci` ✅ (`44` files / `279` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
+- Validation snapshot (Step 4 final):
+  - `npx vitest run src/tests/catalog.csv-import-export.spec.ts src/tests/app.ui.catalog-csv-import-export.spec.tsx` ✅ (`2` files / `3` tests)
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s build` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s test:ci` ✅ (`46` files / `282` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
+- Validation snapshot (Step 5 final):
+  - `npx vitest run src/tests/app.ui.undo-redo-global.spec.tsx` ✅ (`1` file / `2` tests)
+  - `npx vitest run src/tests/app.ui.navigation-canvas.spec.tsx` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s build` ✅
+  - `npm run -s test:ci` ✅ (`47` files / `284` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
+- Validation snapshot (Step 6 final integration gate):
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s quality:store-modularization` ✅
+  - `npm run -s quality:pwa` ✅
+  - `npm run -s build` ✅
+  - `npm run -s test:ci` ✅ (`47` files / `284` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
 - Delivery snapshot:
-  - Super-orchestration task created; implementation steps not started under this coordinator.
+  - Super-orchestration task created and Step 1 (`task_060`) started.
+  - `req_063` delivery landed in workspace: wire edit `Swap endpoints` button (edit-only, placed between `Save` and `Cancel edit`) with draft-state A/B endpoint swap behavior and icon wiring.
+  - Targeted regression coverage now verifies create-mode absence, edit-mode button ordering, draft-only semantics, cancel rollback, and save persistence behavior for swapped endpoint-side metadata.
+  - Step 1 is now functionally complete and validated; next work can start on Step 2 (`task_061` / `req_064`) once a checkpoint commit is created.
+  - `req_064` delivery landed in workspace: segment edit `Swap nodes` button (edit-only, placed between `Save` and `Cancel edit`) with draft-state Node A/B swap behavior and icon wiring.
+  - Targeted regression coverage verifies create-mode absence, edit-mode button ordering, draft-only semantics, cancel rollback, and save persistence while preserving non-node fields (`Length`, `Sub-network tag`, `Segment ID`).
+  - Step 2 is now functionally complete and validated; next work can start on Step 3 (`task_062` / `req_065`) once a checkpoint commit is created.
+  - `req_065` delivery landed in workspace: `Segment analysis` traversing-wires table now uses split `Endpoint A` / `Endpoint B` columns instead of the combined `Endpoints` column.
+  - Sort contract and `aria-sort` semantics are split across `endpointA` / `endpointB`, with integration regression coverage verifying both sort paths and legacy-header removal.
+  - Step 3 is now functionally complete and validated; next work can start on Step 4 (`task_059` / `req_062`) once a checkpoint commit is created.
+  - `req_062` delivery landed in workspace: Catalog panel now exposes `Export CSV` (header tools row before `Help`) and `Import CSV` (bottom row between `Edit` and `Delete`) with local status/summary feedback.
+  - Catalog CSV helper (`catalogCsv.ts`) centralizes strict V1 schema headers, export row generation, and import parsing/validation with deterministic `last row wins` duplicate handling.
+  - Import applies as a single atomic history checkpoint via `replaceStateWithHistory`, preserving undo/redo ergonomics and restoring the `Catalog` sub-screen after replace-state callbacks.
+  - Step 4 is now functionally complete and validated; next work can start on Step 5 (`task_063` / `req_066`) once a checkpoint commit is created.
+  - `req_066` runtime feature was already present in workspace (history stack, UI actions, shortcuts); Step 5 closed the remaining validation/documentation gap and added dedicated regression coverage for shortcut focus guards, redo-branch clearing, UI-only exclusions, and atomic catalog CSV import undo/redo.
+  - Final cross-queue validation rerun passed after Step 5 coverage additions, bringing the active queue (`req_062`..`req_066`) to implementation-complete status in the working tree.
 
 # References
 - `logics/tasks/task_059_req_062_catalog_csv_import_export_orchestration_and_delivery_control.md`

@@ -2,7 +2,7 @@
 > From version: 0.9.8
 > Understanding: 96%
 > Confidence: 92%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Undo/redo UX integration and keyboard ergonomics
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -42,4 +42,5 @@ Even with a history engine, undo/redo provides limited value without discoverabl
   - `logics/request/req_066_global_undo_redo_history_for_modeling_and_catalog_mutations.md`
   - `src/app/AppController.tsx`
   - `src/app/hooks/useWorkspaceHandlers.ts`
-
+  - `src/app/hooks/useKeyboardShortcuts.ts`
+  - `src/app/components/workspace/OperationsHealthPanel.tsx`
