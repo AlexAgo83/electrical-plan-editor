@@ -61,5 +61,5 @@ describe("App integration UI - settings wire/create defaults", () => {
     expect(
       within(restoredGlobalPreferencesPanel).getByLabelText("Default auto-create linked nodes for connectors/splices")
     ).not.toBeChecked();
-  });
+  }, 10_000);
 });

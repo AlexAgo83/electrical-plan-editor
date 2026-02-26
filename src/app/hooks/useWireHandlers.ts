@@ -657,6 +657,10 @@ export function useWireHandlers({
 
   function handleWireSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
+    if (typeof event.currentTarget.reportValidity === "function" && !event.currentTarget.reportValidity()) {
+      setWireFormError(null);
+      return;
+    }
 
     const normalizedName = wireName.trim();
     const normalizedTechnicalId = wireTechnicalId.trim();

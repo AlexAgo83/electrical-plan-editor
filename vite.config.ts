@@ -78,6 +78,21 @@ export default defineConfig(({ mode }) => {
       host: env.appHost,
       port: env.previewPort
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) {
+              return "vendor-react";
+            }
+            if (id.includes("node_modules/workbox-window")) {
+              return "vendor-pwa";
+            }
+            return undefined;
+          }
+        }
+      }
+    },
     test: {
       environment: "jsdom",
       setupFiles: ["src/tests/setup.ts"],

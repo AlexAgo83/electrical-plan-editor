@@ -1,5 +1,5 @@
 import type { CatalogItem } from "../../core/entities";
-import { isValidCatalogUrlInput } from "../../store";
+import { isValidCatalogUrlInput, normalizeManufacturerReferenceKey } from "../../store";
 import type { CsvCellValue } from "./csv";
 
 export const CATALOG_CSV_HEADERS = [
@@ -167,7 +167,7 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
   }
 
   const dataRows = rows.slice(1);
-  const rawRowsByManufacturerRef = new Map<string, { rowNumber: number; values: string[] }>();
+  const rawRowsByManufacturerRef = new Map<string, { rowNumber: number; values: string[]; manufacturerReference: string }>();
 
   for (let dataIndex = 0; dataIndex < dataRows.length; dataIndex += 1) {
     const values = dataRows[dataIndex] ?? [];
@@ -196,20 +196,30 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
       continue;
     }
 
-    const existing = rawRowsByManufacturerRef.get(manufacturerReference);
+    const manufacturerReferenceKey = normalizeManufacturerReferenceKey(manufacturerReference);
+    if (manufacturerReferenceKey === undefined) {
+      issues.push({
+        kind: "error",
+        rowNumber,
+        message: "Manufacturer reference is required."
+      });
+      continue;
+    }
+
+    const existing = rawRowsByManufacturerRef.get(manufacturerReferenceKey);
     if (existing !== undefined) {
       issues.push({
-        kind: "warning",
+        kind: "error",
         rowNumber,
-        message: `Duplicate manufacturer reference '${manufacturerReference}' in import file (last row wins).`
+        message: `Duplicate manufacturer reference '${manufacturerReference}' in import file (already defined at row ${existing.rowNumber}).`
       });
+      continue;
     }
-    rawRowsByManufacturerRef.set(manufacturerReference, { rowNumber, values });
+    rawRowsByManufacturerRef.set(manufacturerReferenceKey, { rowNumber, values, manufacturerReference });
   }
 
   const parsedRows: CatalogCsvImportRow[] = [];
-  for (const { rowNumber, values } of rawRowsByManufacturerRef.values()) {
-    const manufacturerReference = (values[0] ?? "").trim();
+  for (const { rowNumber, values, manufacturerReference } of rawRowsByManufacturerRef.values()) {
     const connectionCountText = values[1]?.trim() ?? "";
     const connectionCount = Number(connectionCountText);
     if (!Number.isFinite(connectionCount) || !Number.isInteger(connectionCount) || connectionCount < 1) {

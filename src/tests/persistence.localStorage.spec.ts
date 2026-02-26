@@ -702,6 +702,68 @@ describe("localStorage persistence adapter", () => {
     }
   });
 
+  it("keeps case-variant duplicate catalog manufacturer references unchanged on load", () => {
+    const state = createSampleState();
+    const activeNetworkId = state.activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network.");
+    }
+
+    const duplicateCatalogId = asCatalogItemId("catalog-c2");
+    const scoped = state.networkStates[activeNetworkId];
+    expect(scoped).toBeDefined();
+    if (scoped === undefined) {
+      throw new Error("Expected scoped state for active network.");
+    }
+
+    const legacyStateWithCaseVariantDuplicate: AppState = {
+      ...state,
+      catalogItems: {
+        byId: {
+          ...state.catalogItems.byId,
+          [duplicateCatalogId]: {
+            id: duplicateCatalogId,
+            manufacturerReference: "conn-test-2w",
+            connectionCount: 2
+          }
+        },
+        allIds: [...state.catalogItems.allIds, duplicateCatalogId]
+      },
+      networkStates: {
+        ...state.networkStates,
+        [activeNetworkId]: {
+          ...scoped,
+          catalogItems: {
+            byId: {
+              ...scoped.catalogItems.byId,
+              [duplicateCatalogId]: {
+                id: duplicateCatalogId,
+                manufacturerReference: "conn-test-2w",
+                connectionCount: 2
+              }
+            },
+            allIds: [...scoped.catalogItems.allIds, duplicateCatalogId]
+          }
+        }
+      }
+    };
+
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        schemaVersion: APP_SCHEMA_VERSION,
+        createdAtIso: "2026-02-01T08:00:00.000Z",
+        updatedAtIso: "2026-02-01T09:00:00.000Z",
+        state: legacyStateWithCaseVariantDuplicate
+      } satisfies PersistedStateSnapshotV1)
+    });
+
+    const loaded = loadState(storage, () => "2026-02-22T09:00:00.000Z");
+    expect(loaded.catalogItems.byId[asCatalogItemId("catalog-c1")]?.manufacturerReference).toBe("CONN-TEST-2W");
+    expect(loaded.catalogItems.byId[duplicateCatalogId]?.manufacturerReference).toBe("conn-test-2w");
+    expect(loaded.catalogItems.allIds).toContain(duplicateCatalogId);
+  });
+
   it("migrates persisted schema payloads missing layout positions", () => {
     const state = createSampleState();
     const nowIso = "2026-02-20T11:00:00.000Z";

@@ -32,6 +32,11 @@ export function normalizeManufacturerReference(value: unknown): string | undefin
     : normalized;
 }
 
+export function normalizeManufacturerReferenceKey(value: unknown): string | undefined {
+  const normalized = normalizeManufacturerReference(value);
+  return normalized === undefined ? undefined : normalized.toLowerCase();
+}
+
 export function normalizeCatalogName(value: unknown): string | undefined {
   if (typeof value !== "string") {
     return undefined;
@@ -129,19 +134,26 @@ function legacyNoRefCollisionSuffix(kind: LegacySourceKind, connectionCount: num
   return `-LEGACY-${connectionCount}${kind === "connector" ? "C" : "P"}`;
 }
 
-function resolveUniqueManufacturerReference(base: string, taken: Set<string>, preferredSuffix: string): string {
-  if (!taken.has(base)) {
-    taken.add(base);
+function resolveUniqueManufacturerReference(base: string, takenKeys: Set<string>, preferredSuffix: string): string {
+  const baseKey = normalizeManufacturerReferenceKey(base);
+  if (baseKey === undefined) {
+    return base;
+  }
+
+  if (!takenKeys.has(baseKey)) {
+    takenKeys.add(baseKey);
     return base;
   }
 
   let attempt = `${base}${preferredSuffix}`;
   let index = 2;
-  while (taken.has(attempt)) {
+  let attemptKey = normalizeManufacturerReferenceKey(attempt);
+  while (attemptKey === undefined || takenKeys.has(attemptKey)) {
     attempt = `${base}${preferredSuffix}-${index}`;
     index += 1;
+    attemptKey = normalizeManufacturerReferenceKey(attempt);
   }
-  taken.add(attempt);
+  takenKeys.add(attemptKey);
   return attempt;
 }
 
@@ -177,24 +189,19 @@ function normalizeCatalogCollection(
   next.byId = {} as NetworkScopedState["catalogItems"]["byId"];
   next.allIds = [];
 
-  const takenRefs = new Set<string>();
+  const seenIds = new Set<string>();
   for (const id of catalogItems.allIds) {
     const rawItem = catalogItems.byId[id];
     const normalized = normalizeCatalogItem(rawItem === undefined ? {} : (rawItem as Partial<CatalogItem>));
     if (normalized === null) {
       continue;
     }
-    const uniqueManufacturerReference = resolveUniqueManufacturerReference(
-      normalized.manufacturerReference,
-      takenRefs,
-      " [duplicate]"
-    );
-    const finalItem =
-      uniqueManufacturerReference === normalized.manufacturerReference
-        ? normalized
-        : { ...normalized, manufacturerReference: uniqueManufacturerReference };
-    next.byId[finalItem.id] = finalItem;
-    next.allIds.push(finalItem.id);
+    if (seenIds.has(normalized.id)) {
+      continue;
+    }
+    seenIds.add(normalized.id);
+    next.byId[normalized.id] = normalized;
+    next.allIds.push(normalized.id);
   }
 
   next.allIds.sort((left, right) => left.localeCompare(right));
@@ -205,9 +212,13 @@ function findCatalogItemByManufacturerReference(
   catalogItems: NetworkScopedState["catalogItems"],
   manufacturerReference: string
 ): CatalogItem | undefined {
+  const targetKey = normalizeManufacturerReferenceKey(manufacturerReference);
+  if (targetKey === undefined) {
+    return undefined;
+  }
   for (const id of catalogItems.allIds) {
     const item = catalogItems.byId[id];
-    if (item?.manufacturerReference === manufacturerReference) {
+    if (item !== undefined && normalizeManufacturerReferenceKey(item.manufacturerReference) === targetKey) {
       return item;
     }
   }
@@ -241,9 +252,9 @@ export function bootstrapCatalogForScopedState(scoped: NetworkScopedState): Netw
   };
 
   const takenCatalogIds = new Set<string>(nextScoped.catalogItems.allIds);
-  const takenRefs = new Set<string>(
+  const takenReferenceKeys = new Set<string>(
     nextScoped.catalogItems.allIds
-      .map((id) => nextScoped.catalogItems.byId[id]?.manufacturerReference)
+      .map((id) => normalizeManufacturerReferenceKey(nextScoped.catalogItems.byId[id]?.manufacturerReference))
       .filter((value): value is string => typeof value === "string")
   );
 
@@ -264,7 +275,7 @@ export function bootstrapCatalogForScopedState(scoped: NetworkScopedState): Netw
         : legacySuffix(sourceKind, connectionCount);
       const uniqueManufacturerReference = resolveUniqueManufacturerReference(
         manufacturerReference,
-        takenRefs,
+        takenReferenceKeys,
         preferredSuffix
       );
       const id = buildStableLegacyCatalogId(sourceKind, sourceId, uniqueManufacturerReference, connectionCount, takenCatalogIds);
@@ -279,7 +290,7 @@ export function bootstrapCatalogForScopedState(scoped: NetworkScopedState): Netw
       return item;
     }
 
-    const uniqueManufacturerReference = resolveUniqueManufacturerReference(manufacturerReference, takenRefs, "");
+    const uniqueManufacturerReference = resolveUniqueManufacturerReference(manufacturerReference, takenReferenceKeys, "");
     const id = buildStableLegacyCatalogId(sourceKind, sourceId, uniqueManufacturerReference, connectionCount, takenCatalogIds);
     const item: CatalogItem = {
       id,

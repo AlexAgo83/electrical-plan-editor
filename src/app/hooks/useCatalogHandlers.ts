@@ -2,7 +2,7 @@ import type { FormEvent } from "react";
 import type { CatalogItem, CatalogItemId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions, isValidCatalogUrlInput } from "../../store";
-import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
+import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -103,9 +103,14 @@ export function useCatalogHandlers({
 
   function handleCatalogSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
+    if (typeof event.currentTarget.reportValidity === "function" && !event.currentTarget.reportValidity()) {
+      setCatalogFormError(null);
+      return;
+    }
 
     const manufacturerReference = catalogManufacturerReference.trim();
-    const connectionCount = toPositiveInteger(catalogConnectionCount);
+    const parsedConnectionCount = Number(catalogConnectionCount);
+    const connectionCount = Number.isInteger(parsedConnectionCount) && parsedConnectionCount > 0 ? parsedConnectionCount : 0;
     const unitPriceExclTax = normalizeOptionalNumber(catalogUnitPriceExclTax);
     const url = catalogUrl.trim();
 
@@ -176,4 +181,3 @@ export function useCatalogHandlers({
     handleCatalogDelete
   };
 }
-
