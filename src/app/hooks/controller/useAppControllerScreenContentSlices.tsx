@@ -285,6 +285,7 @@ export function buildNetworkScopeScreenContentSlice(params: NetworkScopeScreenCo
     handleDuplicateNetwork: params.handleDuplicateNetwork,
     handleExportActiveNetwork: params.handleExportActiveNetwork,
     handleDeleteNetwork: params.handleDeleteNetwork,
+    undoHistoryEntries: params.undoHistoryEntries,
     networkFormMode: params.networkFormMode,
     handleOpenCreateNetworkForm: params.handleOpenCreateNetworkForm,
     handleOpenEditNetworkForm: params.handleOpenEditNetworkForm,

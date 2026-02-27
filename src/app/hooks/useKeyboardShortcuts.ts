@@ -21,6 +21,7 @@ interface UseKeyboardShortcutsOptions {
   activeScreenRef: MutableRefObject<ScreenId>;
   undoActionRef: MutableRefObject<() => void>;
   redoActionRef: MutableRefObject<() => void>;
+  exportActiveNetworkRef: MutableRefObject<() => void>;
   fitNetworkToContentRef: MutableRefObject<() => void>;
   previousValidationIssueRef: MutableRefObject<() => void>;
   nextValidationIssueRef: MutableRefObject<() => void>;
@@ -33,6 +34,7 @@ export function useKeyboardShortcuts({
   activeScreenRef,
   undoActionRef,
   redoActionRef,
+  exportActiveNetworkRef,
   fitNetworkToContentRef,
   previousValidationIssueRef,
   nextValidationIssueRef,
@@ -40,17 +42,25 @@ export function useKeyboardShortcuts({
   setActiveSubScreen
 }: UseKeyboardShortcutsOptions): void {
   useEffect(() => {
-    if (!keyboardShortcutsEnabled) {
-      return;
-    }
-
     const onKeyDown = (event: KeyboardEvent): void => {
+      const normalizedKey = event.key.toLocaleLowerCase();
+      const hasCommandModifier = event.metaKey || event.ctrlKey;
+
+      if (hasCommandModifier && normalizedKey === "s") {
+        event.preventDefault();
+        event.stopPropagation();
+        exportActiveNetworkRef.current();
+        return;
+      }
+
+      if (!keyboardShortcutsEnabled) {
+        return;
+      }
+
       if (isEditableElement(event.target)) {
         return;
       }
 
-      const normalizedKey = event.key.toLocaleLowerCase();
-      const hasCommandModifier = event.metaKey || event.ctrlKey;
       if (hasCommandModifier) {
         if (normalizedKey === "z") {
           event.preventDefault();
@@ -142,6 +152,7 @@ export function useKeyboardShortcuts({
     };
   }, [
     activeScreenRef,
+    exportActiveNetworkRef,
     fitNetworkToContentRef,
     keyboardShortcutsEnabled,
     nextValidationIssueRef,

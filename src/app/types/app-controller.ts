@@ -1,4 +1,4 @@
-import type { ConnectorId, NodeId, SpliceId, WireId } from "../../core/entities";
+import type { ConnectorId, NetworkId, NodeId, SpliceId, WireId } from "../../core/entities";
 import type { AppStore } from "../../store";
 
 export interface AppProps {
@@ -50,6 +50,18 @@ export type CanvasLabelRotationDegrees = -90 | -45 | -20 | 0 | 20 | 45 | 90;
 export type OccupancyFilter = "all" | "occupied" | "free";
 export type SegmentSubNetworkFilter = "all" | "default" | "tagged";
 export type ValidationSeverityFilter = "all" | "error" | "warning";
+
+export type UndoHistoryTargetKind = "network" | "catalog" | "connector" | "splice" | "node" | "segment" | "wire" | "layout" | "workspace";
+
+export interface UndoHistoryEntry {
+  sequence: number;
+  actionType: string;
+  targetKind: UndoHistoryTargetKind;
+  targetId: string | null;
+  networkId: NetworkId | null;
+  label: string;
+  timestampIso: string;
+}
 
 export interface ValidationIssue {
   id: string;

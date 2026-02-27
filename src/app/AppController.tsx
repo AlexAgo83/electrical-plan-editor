@@ -346,6 +346,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   } | null>(null);
   const undoActionRef = useRef<() => void>(() => {});
   const redoActionRef = useRef<() => void>(() => {});
+  const exportActiveNetworkRef = useRef<() => void>(() => {});
   const fitNetworkToContentRef = useRef<() => void>(() => {});
   const previousValidationIssueRef = useRef<() => void>(() => {});
   const nextValidationIssueRef = useRef<() => void>(() => {});
@@ -966,6 +967,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     saveStatus,
     isUndoAvailable,
     isRedoAvailable,
+    undoHistoryEntries,
     dispatchAction,
     handleUndo,
     handleRedo,
@@ -1513,6 +1515,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   useEffect(() => {
     undoActionRef.current = handleUndo;
     redoActionRef.current = handleRedo;
+    exportActiveNetworkRef.current = () => handleExportNetworks("active");
     fitNetworkToContentRef.current = fitNetworkToContent;
     previousValidationIssueRef.current = () => {
       if (activeScreenRef.current === "validation") {
@@ -1871,6 +1874,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     activeScreenRef,
     undoActionRef,
     redoActionRef,
+    exportActiveNetworkRef,
     fitNetworkToContentRef,
     previousValidationIssueRef,
     nextValidationIssueRef,
@@ -2404,6 +2408,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         handleDuplicateNetwork,
         handleExportActiveNetwork: () => handleExportNetworks("active"),
         handleDeleteNetwork,
+        undoHistoryEntries,
         handleOpenCreateNetworkForm,
         handleOpenEditNetworkForm,
         handleCloseNetworkForm,

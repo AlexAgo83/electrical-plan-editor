@@ -47,7 +47,7 @@ describe("App integration UI - network summary layering", () => {
     const anchorBefore = networkSummaryPanel.querySelector(".network-segment-label-anchor");
     expect(anchorBefore).not.toBeNull();
     const transformBefore = anchorBefore?.getAttribute("transform") ?? "";
-    expect(transformBefore).toContain("scale(1)");
+    expect(transformBefore).toContain("scale(1.666");
 
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom +" }));
 
@@ -55,7 +55,7 @@ describe("App integration UI - network summary layering", () => {
     expect(anchorAfter).not.toBeNull();
     const transformAfter = anchorAfter?.getAttribute("transform") ?? "";
     expect(transformAfter).not.toBe(transformBefore);
-    expect(transformAfter).not.toContain("scale(1)");
+    expect(transformAfter).not.toContain("scale(1.666");
   });
 
   it("centers segment ID labels when segment lengths are hidden", () => {

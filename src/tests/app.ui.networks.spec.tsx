@@ -18,8 +18,57 @@ describe("App integration UI - networks", () => {
     switchScreen("networkScope");
 
     expect(getPanelByHeading("Network Scope")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Recent changes" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Edit network" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Create network" })).not.toBeInTheDocument();
+  });
+
+  it("renders active-network recent changes between Network Scope and Edit network, then hides for another active network without history", async () => {
+    const base = createInitialState();
+    const defaultNetworkId = base.activeNetworkId as NetworkId;
+    const withSecondNetwork = appReducer(
+      base,
+      appActions.createNetwork({
+        id: asNetworkId("net-b"),
+        name: "Network B",
+        technicalId: "NET-B",
+        createdAt: "2026-02-27T10:00:00.000Z",
+        updatedAt: "2026-02-27T10:00:00.000Z"
+      })
+    );
+    const seeded = appReducer(withSecondNetwork, appActions.selectNetwork(defaultNetworkId));
+    renderAppWithState(seeded);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+
+    switchScreen("networkScope");
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    fireEvent.click(within(networkScopePanel).getByText("Main network sample").closest("tr") as HTMLElement);
+    const editFormPanel = getPanelByHeading("Edit network");
+    fireEvent.change(within(editFormPanel).getByLabelText("Description (optional)"), { target: { value: "Recent change update" } });
+    fireEvent.click(within(editFormPanel).getByRole("button", { name: "Save network" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();
+    });
+
+    const recentChangesHeading = screen.getByRole("heading", { name: "Recent changes" });
+    const editHeading = screen.getByRole("heading", { name: "Edit network" });
+    const networkScopeHeading = screen.getByRole("heading", { name: "Network Scope" });
+    expect(networkScopeHeading.compareDocumentPosition(recentChangesHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    expect(recentChangesHeading.compareDocumentPosition(editHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+
+    const recentChangesPanel = recentChangesHeading.closest(".panel");
+    expect(recentChangesPanel).not.toBeNull();
+    expect(within(recentChangesPanel as HTMLElement).getByText("Network 'NET-MAIN-SAMPLE' updated")).toBeInTheDocument();
+    const firstTime = (recentChangesPanel as HTMLElement).querySelector("time")?.textContent ?? "";
+    expect(firstTime).toMatch(/^\d{2}:\d{2}:\d{2}$/);
+
+    fireEvent.click(within(networkScopePanel).getByText("Network B").closest("tr") as HTMLElement);
+    fireEvent.click(within(getPanelByHeading("Edit network")).getByRole("button", { name: "Set active" }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole("heading", { name: "Recent changes" })).not.toBeInTheDocument();
+    });
   });
 
   it("hides the edit network panel again when returning to Network Scope", () => {

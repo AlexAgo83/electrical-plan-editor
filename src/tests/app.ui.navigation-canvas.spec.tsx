@@ -444,9 +444,9 @@ describe("App integration UI - navigation and canvas", () => {
 
     const networkPanel = getPanelByHeading("Network summary");
     const currentZoomLine = () => within(networkPanel).getByText(/View: \d+% zoom\./).textContent ?? "";
-    expect(currentZoomLine()).toContain("View: 100% zoom.");
+    expect(currentZoomLine()).toContain("View: 60% zoom.");
     fireEvent.keyDown(window, { key: "f", altKey: true });
-    expect(currentZoomLine()).not.toContain("View: 100% zoom.");
+    expect(currentZoomLine()).not.toContain("View: 60% zoom.");
   });
 
   it("cancels edit mode when selection focus changes to another entity kind", () => {

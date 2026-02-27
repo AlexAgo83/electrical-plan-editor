@@ -32,6 +32,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     | "handleDuplicateNetwork"
     | "handleExportActiveNetwork"
     | "handleDeleteNetwork"
+    | "undoHistoryEntries"
     | "handleOpenCreateNetworkForm"
     | "handleOpenEditNetworkForm"
     | "handleCloseNetworkForm"
@@ -90,6 +91,7 @@ export function useAppControllerAuxScreenContentDomains({
     handleDuplicateNetwork: networkScope.handleDuplicateNetwork,
     handleExportActiveNetwork: networkScope.handleExportActiveNetwork,
     handleDeleteNetwork: networkScope.handleDeleteNetwork,
+    undoHistoryEntries: networkScope.undoHistoryEntries,
     networkFormMode: networkScope.formState.networkFormMode,
     handleOpenCreateNetworkForm: networkScope.handleOpenCreateNetworkForm,
     handleOpenEditNetworkForm: networkScope.handleOpenEditNetworkForm,

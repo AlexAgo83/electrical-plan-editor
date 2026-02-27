@@ -3,7 +3,7 @@ import type { NetworkId } from "../../../core/entities";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, nextSortState, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
-import type { SortState } from "../../types/app-controller";
+import type { SortState, UndoHistoryEntry } from "../../types/app-controller";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
@@ -30,6 +30,7 @@ interface NetworkScopeWorkspaceContentProps {
   handleDuplicateNetwork: (networkId: NetworkId | null) => void;
   handleExportActiveNetwork: () => void;
   handleDeleteNetwork: (networkId: NetworkId | null) => void;
+  undoHistoryEntries: UndoHistoryEntry[];
   networkFormMode: "create" | "edit" | null;
   handleOpenCreateNetworkForm: () => void;
   handleOpenEditNetworkForm: (networkId: NetworkId) => void;
@@ -59,6 +60,7 @@ export function NetworkScopeWorkspaceContent({
   handleDuplicateNetwork,
   handleExportActiveNetwork,
   handleDeleteNetwork,
+  undoHistoryEntries,
   networkFormMode,
   handleOpenCreateNetworkForm,
   handleOpenEditNetworkForm,
@@ -149,6 +151,15 @@ export function NetworkScopeWorkspaceContent({
       : networkFilterField === "technicalId"
         ? "Technical ID"
         : "Name or technical ID";
+  const recentChangesForActiveNetwork = useMemo(
+    () =>
+      undoHistoryEntries
+        .filter((entry) => entry.networkId === activeNetworkId)
+        .slice(-10)
+        .reverse(),
+    [activeNetworkId, undoHistoryEntries]
+  );
+  const showRecentChangesPanel = recentChangesForActiveNetwork.length > 0;
 
   useEffect(() => {
     if (networks.length === 0) {
@@ -447,6 +458,32 @@ export function NetworkScopeWorkspaceContent({
           </div>
         </div>
       </section>
+
+      {showRecentChangesPanel ? (
+        <section className="panel network-recent-changes-panel" aria-label="Recent changes for active network">
+          <header className="network-recent-changes-header">
+            <h2>Recent changes</h2>
+          </header>
+          <div className="network-recent-changes-list-shell">
+            <ul className="network-recent-changes-list" aria-label="Recent changes list">
+              {recentChangesForActiveNetwork.map((entry) => (
+                <li key={entry.sequence} className="network-recent-changes-item">
+                  <time dateTime={entry.timestampIso} className="network-recent-changes-time">
+                    {new Date(entry.timestampIso).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                      hour12: false
+                    })}
+                  </time>
+                  <span className="network-recent-changes-label">{entry.label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <TableEntryCountFooter count={recentChangesForActiveNetwork.length} />
+        </section>
+      ) : null}
 
       <section className="panel network-form-panel" hidden={!showNetworkFormPanel}>
         <header className="network-form-header">
