@@ -1,7 +1,7 @@
 ## req_078_update_app_button_breathing_glow_and_timestamped_save_filename - update app button breathing glow and timestamped save filename
 > From version: 0.9.16
-> Understanding: 98% (two focused UX/export refinements: update button animation behavior and save/export file naming)
-> Confidence: 96% (both changes are localized and low-risk with targeted regression tests)
+> Understanding: 100% (lazy-loading behavior is now locked with explicit batch and trigger policy)
+> Confidence: 98% (implementation path is fully specified for animation, filenames, and changelog incremental loading)
 
 # Needs
 - The `Update app` header action should use a smooth breathing glow and should not blink.
@@ -27,6 +27,10 @@
   - Include local-export timestamp in filename.
   - Use a filesystem-safe format (no `:` or `.`), e.g. `YYYY-MM-DDTHH-mm-ss-SSSZ`.
   - Keep current scope prefix semantics (`active`, `selected`, `all`) and append timestamp.
+- Home changelog lazy-loading policy:
+  - initial batch size: `4` changelog entries.
+  - incremental batch size: `+4` entries.
+  - loading trigger: `IntersectionObserver` on a bottom sentinel inside the changelog panel (avoid raw scroll-event coupling).
 
 # Functional scope
 ## A. Update app button animation behavior
@@ -48,6 +52,7 @@
 - Keep initial render lightweight by showing only the first chunk of changelog cards.
 - Load/render next chunks when the user scrolls near the end of the changelog panel (infinite-scroll behavior).
 - Preserve current changelog ordering and content rendering semantics.
+- Use the locked V1 policy (`4` initial + `4` per near-end trigger via sentinel observer).
 
 # Non-functional requirements
 - No regression in PWA update workflow behavior.
@@ -77,6 +82,7 @@
 - AC5: Filename timestamp format is filesystem-safe and deterministic.
 - AC6: Export payload content/schema remains unchanged.
 - AC7: Home changelog feed supports lazy loading on scroll (infinite-scroll style) while preserving entry order.
+- AC7a: lazy-loading batch contract is deterministic (`4` initial, `+4` incremental, sentinel-based near-end trigger).
 
 # Out of scope
 - Redesign of other header button animations.
@@ -96,4 +102,7 @@
 - `src/tests/app.ui.home.spec.tsx`
 
 # Backlog
-- (none yet)
+- `logics/backlog/item_405_update_app_button_breathing_glow_motion_policy_and_theme_safety.md`
+- `logics/backlog/item_406_timestamped_network_export_filename_contract_scope_preservation.md`
+- `logics/backlog/item_407_home_changelog_feed_progressive_lazy_loading_on_scroll.md`
+- `logics/backlog/item_408_req_078_update_glow_export_filename_and_changelog_lazy_loading_closure_validation_and_traceability.md`
