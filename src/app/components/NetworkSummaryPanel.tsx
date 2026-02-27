@@ -1272,6 +1272,8 @@ export function NetworkSummaryPanel({
     ];
   });
 
+  const segmentIdLabelOffsetY = showSegmentLengths ? -6 : 0;
+
   return (
     <section className="network-summary-stack">
       <section className="panel">
@@ -1493,10 +1495,14 @@ export function NetworkSummaryPanel({
                       <text
                         className="network-segment-label"
                         x={0}
-                        y={-6}
+                        y={segmentIdLabelOffsetY}
                         textAnchor="middle"
                         dominantBaseline="middle"
-                        transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 -6)`}
+                        transform={
+                          labelRotationDegrees === 0
+                            ? undefined
+                            : `rotate(${labelRotationDegrees} 0 ${segmentIdLabelOffsetY})`
+                        }
                       >
                         {segment.id}
                       </text>
