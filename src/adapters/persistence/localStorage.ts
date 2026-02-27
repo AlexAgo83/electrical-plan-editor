@@ -46,6 +46,11 @@ function readRawFromStorageSafe(storage: Pick<Storage, "getItem">): string | nul
   }
 }
 
+function isValidIsoDate(value: string): boolean {
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp);
+}
+
 function readJson(raw: string): unknown {
   return JSON.parse(raw) as unknown;
 }
@@ -158,7 +163,7 @@ function resolveCreatedAtIsoFromRaw(
     const parsed = readJson(raw);
     if (typeof parsed === "object" && parsed !== null && "createdAtIso" in parsed) {
       const createdAtIso = (parsed as { createdAtIso?: unknown }).createdAtIso;
-      if (typeof createdAtIso === "string" && createdAtIso.length > 0) {
+      if (typeof createdAtIso === "string" && createdAtIso.length > 0 && isValidIsoDate(createdAtIso)) {
         return createdAtIso;
       }
     }

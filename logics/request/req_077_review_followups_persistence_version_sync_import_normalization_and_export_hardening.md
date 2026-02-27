@@ -1,7 +1,7 @@
 ## req_077_review_followups_persistence_version_sync_import_normalization_and_export_hardening - review followups persistence version sync import normalization and export hardening
 > From version: 0.9.16
-> Understanding: 99% (timestamp-normalization contract is now explicitly defined with deterministic fallback rules)
-> Confidence: 97% (implementation ambiguity is reduced by locking import-time normalization policy)
+> Understanding: 100% (all planned hardening points are implemented and validated with CI-equivalent coverage lanes)
+> Confidence: 99% (delivery is backed by targeted tests plus segmentation/fast/ui validation gates)
 
 # Needs
 - A global technical review identified several reliability and safety follow-ups across persistence and import/export flows.
@@ -101,6 +101,10 @@
 - Introducing cloud sync/back-end persistence.
 - Broad refactors unrelated to identified review findings.
 
+# Delivery status
+- Status: delivered.
+- Task: `logics/tasks/task_071_super_orchestration_delivery_execution_for_req_077_and_req_078_with_validation_gates.md`.
+
 # References
 - `src/adapters/persistence/localStorage.ts`
 - `src/adapters/persistence/migrations.ts`
@@ -114,10 +118,10 @@
 - `src/tests/csv.export.spec.ts`
 
 # Backlog
-- `logics/backlog/item_398_persistence_load_guard_when_storage_read_throws_and_safe_fallback_continuity.md`
-- `logics/backlog/item_399_app_release_version_single_source_of_truth_from_package_json.md`
-- `logics/backlog/item_400_network_import_timestamp_normalization_and_warning_diagnostics.md`
-- `logics/backlog/item_401_persistence_save_state_created_at_stability_without_full_payload_reparse.md`
-- `logics/backlog/item_402_csv_export_formula_injection_neutralization_contract.md`
-- `logics/backlog/item_403_json_export_download_revoke_timing_hardening.md`
-- `logics/backlog/item_404_req_077_hardening_bundle_closure_validation_and_traceability.md`
+- `logics/backlog/item_398_persistence_load_guard_when_storage_read_throws_and_safe_fallback_continuity.md` (done)
+- `logics/backlog/item_399_app_release_version_single_source_of_truth_from_package_json.md` (done)
+- `logics/backlog/item_400_network_import_timestamp_normalization_and_warning_diagnostics.md` (done)
+- `logics/backlog/item_401_persistence_save_state_created_at_stability_without_full_payload_reparse.md` (done)
+- `logics/backlog/item_402_csv_export_formula_injection_neutralization_contract.md` (done)
+- `logics/backlog/item_403_json_export_download_revoke_timing_hardening.md` (done)
+- `logics/backlog/item_404_req_077_hardening_bundle_closure_validation_and_traceability.md` (done)
