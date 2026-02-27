@@ -225,6 +225,7 @@ Primary validation commands:
 python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
 npm run lint
 npm run typecheck
+npm run test:ci:segmentation:check
 npm run quality:ui-modularization
 npm run quality:store-modularization
 npm run test:ci
@@ -246,6 +247,8 @@ Additional non-blocking CI observability:
 - `test:ci:ui:slow-top` for top-N slow UI test reporting
 - `bundle:metrics:report` for main-chunk and total-gzip size visibility
 - these signals are informational and do not replace canonical `test:ci`
+- in CI, `coverage:ui:report` and `test:ci:ui:slow-top` are configured with `if: always()` so they still run after upstream failures
+- in CI, `bundle:metrics:report` stays informational and runs only when the production build step succeeds
 
 Segmented test contract:
 

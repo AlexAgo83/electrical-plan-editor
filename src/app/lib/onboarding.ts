@@ -121,7 +121,10 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
     description: [
       { text: "Create " },
       { text: "wires/cables", strong: true },
-      { text: " and route them across segments from endpoint A to endpoint B. Wire forms support section (mm²), optional colors, endpoint references, and endpoint occupancy guidance." }
+      { text: " and route them across segments from endpoint A to endpoint B. Wire forms support section (mm²), optional colors, endpoint references, and endpoint occupancy guidance." },
+      { text: " You can also enable " },
+      { text: "Fuse", strong: true },
+      { text: " mode and link it to a catalog item manufacturer reference when modeling protected wires." }
     ],
     target: {
       screen: "modeling",
