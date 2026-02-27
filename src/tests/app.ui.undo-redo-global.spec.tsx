@@ -102,6 +102,8 @@ describe("App integration UI - global undo/redo", () => {
     fireEvent.change(fileInput as HTMLInputElement, {
       target: { files: [file] }
     });
+    const confirmDialog = await screen.findByRole("dialog", { name: "Import catalog CSV" });
+    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Confirm" }));
 
     await waitFor(() => {
       catalogPanel = getPanelByHeading("Catalog");

@@ -40,6 +40,7 @@ import {
 import { appStore } from "./store";
 import { appUiModules } from "./components/appUiModules";
 import { AppShellLayout } from "./components/layout/AppShellLayout";
+import { ConfirmDialog } from "./components/dialogs/ConfirmDialog";
 import { OnboardingModal } from "./components/onboarding/OnboardingModal";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useCanvasState } from "./hooks/useCanvasState";
@@ -111,11 +112,21 @@ import type {
   NodePosition,
   SubScreenId
 } from "./types/app-controller";
+import type { ConfirmDialogIntent, ConfirmDialogRequest } from "./types/confirm-dialog";
 import "./styles.css";
 
 export type { AppProps } from "./types/app-controller";
 
 type OnboardingStepTarget = OnboardingStepDefinition["target"];
+
+interface ActiveConfirmDialogState {
+  title: string;
+  message: string;
+  confirmLabel: string;
+  cancelLabel: string;
+  intent: ConfirmDialogIntent;
+  closeOnBackdrop: boolean;
+}
 
 function useAppSnapshot(store: AppStore) {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);
@@ -345,6 +356,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
   const deferredInstallPromptRef = useRef<BeforeInstallPromptEventLike | null>(null);
   const onboardingAutoOpenAttemptedRef = useRef(false);
+  const confirmDialogResolveRef = useRef<((confirmed: boolean) => void) | null>(null);
   const hasAppliedPerNetworkViewRestoreRef = useRef(false);
   const skipNextPerNetworkViewPersistRef = useRef(false);
 
@@ -389,6 +401,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [onboardingSingleStepTargetOverride, setOnboardingSingleStepTargetOverride] = useState<OnboardingStepTarget | null>(null);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabled] = useState<boolean>(() => readOnboardingAutoOpenEnabled());
+  const [activeConfirmDialog, setActiveConfirmDialog] = useState<ActiveConfirmDialogState | null>(null);
   const {
     isInstallPromptAvailable,
     isPwaUpdateReady,
@@ -491,6 +504,40 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const setOnboardingAutoOpenEnabledPersisted = useCallback((enabled: boolean) => {
     setOnboardingAutoOpenEnabled(enabled);
     writeOnboardingAutoOpenEnabled(enabled);
+  }, []);
+
+  const closeActiveConfirmDialog = useCallback((confirmed: boolean) => {
+    const resolve = confirmDialogResolveRef.current;
+    confirmDialogResolveRef.current = null;
+    setActiveConfirmDialog(null);
+    resolve?.(confirmed);
+  }, []);
+
+  const requestConfirmation = useCallback((request: ConfirmDialogRequest): Promise<boolean> => {
+    return new Promise<boolean>((resolve) => {
+      const activeResolve = confirmDialogResolveRef.current;
+      if (activeResolve !== null) {
+        activeResolve(false);
+      }
+
+      confirmDialogResolveRef.current = resolve;
+      setActiveConfirmDialog({
+        title: request.title,
+        message: request.message,
+        confirmLabel: request.confirmLabel ?? "Confirm",
+        cancelLabel: request.cancelLabel ?? "Cancel",
+        intent: request.intent ?? "neutral",
+        closeOnBackdrop: request.closeOnBackdrop ?? true
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      const resolve = confirmDialogResolveRef.current;
+      confirmDialogResolveRef.current = null;
+      resolve?.(false);
+    };
   }, []);
 
   const openFullOnboarding = useCallback(() => {
@@ -1087,33 +1134,33 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   ]);
 
   const handleRegenerateLayout = useCallback(() => {
-    if (nodes.length === 0) {
-      return;
-    }
-
-    if (
-      Object.keys(persistedNodePositions).length > 0 &&
-      typeof window !== "undefined" &&
-      typeof window.confirm === "function"
-    ) {
-      const shouldRegenerate = window.confirm(
-        "Regenerate 2D layout for this network? Existing manual positions will be replaced."
-      );
-      if (!shouldRegenerate) {
+    void (async () => {
+      if (nodes.length === 0) {
         return;
       }
-    }
 
-    setManualNodePositions({} as Record<NodeId, NodePosition>);
-    dispatchAction(
-      appActions.setNodePositions(
-        createNodePositionMap(nodes, segments, {
-          snapToGrid: snapNodesToGrid,
-          gridStep: NETWORK_GRID_STEP
-        })
-      )
-    );
-  }, [dispatchAction, nodes, persistedNodePositions, segments, setManualNodePositions, snapNodesToGrid]);
+      if (Object.keys(persistedNodePositions).length > 0) {
+        const shouldRegenerate = await requestConfirmation({
+          title: "Regenerate 2D layout",
+          message: "Regenerate 2D layout for this network? Existing manual positions will be replaced.",
+          intent: "warning"
+        });
+        if (!shouldRegenerate) {
+          return;
+        }
+      }
+
+      setManualNodePositions({} as Record<NodeId, NodePosition>);
+      dispatchAction(
+        appActions.setNodePositions(
+          createNodePositionMap(nodes, segments, {
+            snapToGrid: snapNodesToGrid,
+            gridStep: NETWORK_GRID_STEP
+          })
+        )
+      );
+    })();
+  }, [dispatchAction, nodes, persistedNodePositions, requestConfirmation, segments, setManualNodePositions, snapNodesToGrid]);
   const {
     importFileInputRef,
     selectedExportNetworkIds,
@@ -1207,20 +1254,20 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
     const currentState = store.getState();
     const currentCatalogItems = selectCatalogItems(currentState);
-    if (
-      currentCatalogItems.length > 0 &&
-      typeof window !== "undefined" &&
-      typeof window.confirm === "function" &&
-      !window.confirm(
-        `Import ${parsed.rows.length} catalog row(s) into the current catalog? Existing items are matched by manufacturer reference.`
-      )
-    ) {
-      setCatalogCsvImportExportStatus({
-        kind: "failed",
-        message: "Catalog CSV import canceled."
+    if (currentCatalogItems.length > 0) {
+      const shouldContinue = await requestConfirmation({
+        title: "Import catalog CSV",
+        message: `Import ${parsed.rows.length} catalog row(s) into the current catalog? Existing items are matched by manufacturer reference.`,
+        intent: "warning"
       });
-      resetInput();
-      return;
+      if (!shouldContinue) {
+        setCatalogCsvImportExportStatus({
+          kind: "failed",
+          message: "Catalog CSV import canceled."
+        });
+        resetInput();
+        return;
+      }
     }
 
     const existingByManufacturerReference = new Map<string, (typeof currentCatalogItems)[number]>();
@@ -1341,7 +1388,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       store,
       networks,
       dispatchAction,
-      replaceStateWithHistory
+      replaceStateWithHistory,
+      confirmAction: requestConfirmation
     },
     networkForm: {
       newNetworkName,
@@ -2022,22 +2070,27 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
   });
   const handleCreateEmptyWorkspace = useCallback(() => {
-    if (!isCurrentWorkspaceEmpty && typeof window !== "undefined" && typeof window.confirm === "function") {
-      const shouldReplace = window.confirm(
-        "Replace the current workspace with an empty workspace? This removes current workspace changes."
-      );
-      if (!shouldReplace) {
-        return;
+    void (async () => {
+      if (!isCurrentWorkspaceEmpty) {
+        const shouldReplace = await requestConfirmation({
+          title: "Create empty workspace",
+          message: "Replace the current workspace with an empty workspace? This removes current workspace changes.",
+          intent: "warning"
+        });
+        if (!shouldReplace) {
+          return;
+        }
       }
-    }
 
-    replaceStateWithHistory(createEmptyWorkspaceState(state.ui.themeMode));
-    setActiveScreen("networkScope");
-    setActiveSubScreen("connector");
-    setInteractionMode("select");
+      replaceStateWithHistory(createEmptyWorkspaceState(state.ui.themeMode));
+      setActiveScreen("networkScope");
+      setActiveSubScreen("connector");
+      setInteractionMode("select");
+    })();
   }, [
     isCurrentWorkspaceEmpty,
     replaceStateWithHistory,
+    requestConfirmation,
     setActiveScreen,
     setActiveSubScreen,
     setInteractionMode,
@@ -2578,6 +2631,20 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isInspectorOpen={isInspectorOpen}
       inspectorContextPanel={inspectorContextPanel}
       />
+      {activeConfirmDialog !== null ? (
+        <ConfirmDialog
+          isOpen={activeConfirmDialog !== null}
+          themeHostClassName={appShellClassName}
+          title={activeConfirmDialog.title}
+          message={activeConfirmDialog.message}
+          confirmLabel={activeConfirmDialog.confirmLabel}
+          cancelLabel={activeConfirmDialog.cancelLabel}
+          intent={activeConfirmDialog.intent}
+          closeOnBackdrop={activeConfirmDialog.closeOnBackdrop}
+          onConfirm={() => closeActiveConfirmDialog(true)}
+          onCancel={() => closeActiveConfirmDialog(false)}
+        />
+      ) : null}
       {activeOnboardingStep !== undefined ? (
         <OnboardingModal
           isOpen={isOnboardingOpen}

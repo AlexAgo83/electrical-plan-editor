@@ -176,6 +176,37 @@ button {
   color: #19542d;
 }
 
+.header-update-toggle.is-ready-glow {
+  box-shadow:
+    0 0 0.18rem color-mix(in srgb, currentColor 22%, transparent),
+    0 0 0.62rem color-mix(in srgb, currentColor 30%, transparent),
+    0 0 1.08rem color-mix(in srgb, currentColor 34%, transparent);
+  animation: header-update-glow-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes header-update-glow-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0.18rem color-mix(in srgb, currentColor 18%, transparent),
+      0 0 0.56rem color-mix(in srgb, currentColor 26%, transparent),
+      0 0 0.95rem color-mix(in srgb, currentColor 30%, transparent);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0.24rem color-mix(in srgb, currentColor 28%, transparent),
+      0 0 0.74rem color-mix(in srgb, currentColor 38%, transparent),
+      0 0 1.2rem color-mix(in srgb, currentColor 44%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-update-toggle.is-ready-glow {
+    animation: none;
+  }
+}
+
 .header-settings-toggle.is-active {
   background: #17374e;
   color: #fff;

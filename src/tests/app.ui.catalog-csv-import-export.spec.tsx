@@ -76,7 +76,6 @@ describe("App integration UI - catalog CSV import/export", () => {
     fireEvent.click(exportButton);
     expect(within(catalogPanel).getByText("Exported 1 catalog item(s).")).toBeInTheDocument();
 
-    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
     const fileInput = catalogPanel.querySelector('input[type="file"][accept="text/csv,.csv"]');
     expect(fileInput).not.toBeNull();
 
@@ -93,13 +92,14 @@ describe("App integration UI - catalog CSV import/export", () => {
     fireEvent.change(fileInput as HTMLInputElement, {
       target: { files: [file] }
     });
+    const confirmDialog = await screen.findByRole("dialog", { name: "Import catalog CSV" });
+    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Confirm" }));
 
     await waitFor(() => {
       catalogPanel = getPanelByHeading("Catalog");
       expect(within(catalogPanel).getByText("Imported 2 catalog row(s): 1 created / 1 updated.")).toBeInTheDocument();
     });
 
-    expect(confirmSpy).toHaveBeenCalledTimes(1);
     expect(catalogPanel).not.toHaveAttribute("hidden");
     expect(
       within(catalogPanel).getByText(/Last catalog CSV import \(catalog-import\.csv\): 2 rows, 0 warnings, 0 errors\./)

@@ -1,0 +1,100 @@
+.confirm-dialog-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.confirm-dialog-layer.app-shell {
+  min-height: 0;
+  width: auto;
+  max-width: none;
+  margin: 0;
+  gap: 0;
+  align-content: normal;
+  isolation: auto;
+}
+
+.confirm-dialog-layer.app-shell::before {
+  content: none;
+}
+
+.confirm-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(11, 17, 22, 0.48);
+  cursor: pointer;
+}
+
+.confirm-dialog {
+  position: relative;
+  width: min(100%, 33rem);
+  border-radius: 0.9rem;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 2%, canvas);
+  color: inherit;
+  box-shadow: 0 1rem 2.2rem rgba(0, 0, 0, 0.24);
+  padding: 0.95rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.confirm-dialog.is-warning {
+  border-color: color-mix(in srgb, #b5751f 62%, transparent);
+}
+
+.confirm-dialog.is-danger {
+  border-color: color-mix(in srgb, #b04343 62%, transparent);
+}
+
+.confirm-dialog-header h2 {
+  margin: 0;
+  line-height: 1.15;
+}
+
+.confirm-dialog-message {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.confirm-dialog-cancel {
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  background: transparent;
+  color: inherit;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.7rem;
+}
+
+.confirm-dialog-confirm {
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 42%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
+  color: inherit;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.7rem;
+}
+
+.confirm-dialog.is-warning .confirm-dialog-confirm {
+  border-color: color-mix(in srgb, #b5751f 64%, transparent);
+  background: color-mix(in srgb, #b5751f 18%, transparent);
+}
+
+.confirm-dialog.is-danger .confirm-dialog-confirm {
+  border-color: color-mix(in srgb, #b04343 64%, transparent);
+  background: color-mix(in srgb, #b04343 18%, transparent);
+}
+
+@media (max-width: 640px) {
+  .confirm-dialog {
+    padding: 0.8rem;
+  }
+}
