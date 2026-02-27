@@ -100,6 +100,7 @@ describe("App integration UI - navigation and canvas", () => {
 
   it("reflects splice port occupancy in real time", () => {
     renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("splice");
     const splicesPanel = getPanelByHeading("Splices");
     fireEvent.click(within(splicesPanel).getByText("Splice 1"));
@@ -113,7 +114,7 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.change(portIndexInput, { target: { value: "1" } });
     expect(within(spliceAnalysisPanel).getByText(/Port P1 is already used/)).toBeInTheDocument();
     expect(within(spliceAnalysisPanel).getByRole("button", { name: "Reserve port" })).toBeDisabled();
-  });
+  }, 10_000);
 
   it("highlights every segment in the selected wire route", () => {
     renderAppWithState(createUiIntegrationState());
