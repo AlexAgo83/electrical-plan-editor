@@ -4,6 +4,7 @@ import { createSampleNetworkState } from "../store";
 import {
   createConnectorOccupancyFilterState,
   createConnectorSortingState,
+  createUiIntegrationDenseWiresState,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
@@ -56,11 +57,11 @@ describe("App integration UI - list ergonomics", () => {
   });
 
   it("splits segment-analysis traversing wires endpoints into Endpoint A and Endpoint B columns with sortable split fields", () => {
-    renderAppWithState(createSampleNetworkState());
+    renderAppWithState(createUiIntegrationDenseWiresState());
 
     switchSubScreen("segment");
     const modelingSegmentsPanel = getPanelByHeading("Segments");
-    fireEvent.click(within(modelingSegmentsPanel).getByText("SEG-002"));
+    fireEvent.click(within(modelingSegmentsPanel).getByText("SEG-B"));
 
     switchScreen("analysis");
     switchSubScreen("segment");

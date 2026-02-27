@@ -1,8 +1,8 @@
 ## item_379_test_ci_segmentation_contract_explicit_globs_and_pwa_fast_lane_assignment - Test CI segmentation contract with explicit globs and `pwa.*` fast-lane assignment
 > From version: 0.9.11
-> Understanding: 95%
-> Confidence: 92%
-> Progress: 0%
+> Understanding: 98%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Deterministic segmented test command boundaries
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -31,7 +31,7 @@ Current segmentation (`test:ci:fast` vs `test:ci:ui`) is overly coupled to filen
 
 # Notes
 - Dependencies: `req_069`.
-- Blocks: `item_382`, `task_067`.
+- Blocks: none (delivered in `task_067`).
 - Related AC: AC2, AC3, AC6.
 - References:
   - `logics/request/req_069_ci_observability_execution_order_test_segmentation_and_ui_test_reliability.md`
@@ -39,3 +39,15 @@ Current segmentation (`test:ci:fast` vs `test:ci:ui`) is overly coupled to filen
   - `README.md`
   - `src/tests/pwa.header-actions.spec.tsx`
 
+# Delivery notes
+- Introduced explicit segmented lane contract script:
+  - `scripts/quality/run-vitest-segmented.mjs`
+- Updated scripts:
+  - `test:ci:segmentation:check`
+  - `test:ci:fast`
+  - `test:ci:ui`
+  - `test:ci:ui:slow-top`
+- Contract is explicit allowlist-based for the UI lane (not wildcard-only naming assumptions).
+- Kept `pwa.*` specs in fast lane by design and validated this via contract checks.
+- Added CI gate:
+  - `Test segmentation contract` (`npm run test:ci:segmentation:check`)

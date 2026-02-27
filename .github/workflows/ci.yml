@@ -43,6 +43,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Test segmentation contract
+        run: npm run test:ci:segmentation:check
+
       - name: UI modularization quality gate
         run: npm run quality:ui-modularization
 
@@ -52,23 +55,27 @@ jobs:
       - name: Unit and integration tests
         run: npm run test:ci
 
-      - name: UI coverage report (informational, non-blocking)
-        run: npm run coverage:ui:report
-        continue-on-error: true
-
-      - name: UI slow test top-N (informational, non-blocking)
-        run: npm run test:ci:ui:slow-top
-        continue-on-error: true
-
       - name: E2E smoke
         run: npm run test:e2e
 
       - name: Production build
+        id: production_build
         run: npm run build
 
       - name: Bundle metrics report (informational, non-blocking)
+        if: ${{ steps.production_build.outcome == 'success' }}
         run: npm run bundle:metrics:report
         continue-on-error: true
 
       - name: PWA build artifact quality gate
         run: npm run quality:pwa
+
+      - name: UI coverage report (informational, non-blocking)
+        if: ${{ always() }}
+        run: npm run coverage:ui:report
+        continue-on-error: true
+
+      - name: UI slow test top-N (informational, non-blocking)
+        if: ${{ always() }}
+        run: npm run test:ci:ui:slow-top
+        continue-on-error: true

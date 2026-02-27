@@ -1,8 +1,8 @@
 ## item_381_coverage_ui_report_v1_separate_execution_and_cost_baseline_tracking - `coverage:ui:report` V1 separate execution and CI cost baseline tracking
 > From version: 0.9.11
-> Understanding: 94%
-> Confidence: 90%
-> Progress: 0%
+> Understanding: 97%
+> Confidence: 93%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Coverage observability clarity with explicit duplication/cost trade-off management
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -31,7 +31,7 @@ Keeping `coverage:ui:report` as a separate CI run improves clarity but introduce
 
 # Notes
 - Dependencies: `req_069`, `item_378`.
-- Blocks: `item_382`, `task_067`.
+- Blocks: none (delivered in `task_067`).
 - Related AC: AC1, AC6.
 - References:
   - `logics/request/req_069_ci_observability_execution_order_test_segmentation_and_ui_test_reliability.md`
@@ -39,3 +39,13 @@ Keeping `coverage:ui:report` as a separate CI run improves clarity but introduce
   - `scripts/quality/report-ui-coverage.mjs`
   - `package.json`
   - `README.md`
+
+# Delivery notes
+- Kept `coverage:ui:report` as a separate informational non-blocking execution in CI.
+- Added explicit CI semantics:
+  - step is now `if: ${{ always() }}`
+  - still `continue-on-error: true`
+- Kept cost visibility explicit through:
+  - separate script identity in `package.json`
+  - clear README documentation and CI step labeling
+- Revisit trigger documented as budget/runtime-pressure follow-up (no hard threshold added in V1).

@@ -20,10 +20,11 @@
     "build:bundle:report": "npm run -s build && npm run -s bundle:metrics:report",
     "test": "vitest",
     "test:ci": "vitest run --coverage",
-    "test:ci:fast": "vitest run --exclude=src/tests/app.ui*.spec.ts --exclude=src/tests/app.ui*.spec.tsx",
-    "test:ci:ui": "vitest run src/tests/app.ui*.spec.ts src/tests/app.ui*.spec.tsx",
+    "test:ci:segmentation:check": "node scripts/quality/run-vitest-segmented.mjs check",
+    "test:ci:fast": "node scripts/quality/run-vitest-segmented.mjs fast",
+    "test:ci:ui": "node scripts/quality/run-vitest-segmented.mjs ui",
     "test:ci:slow-top": "node scripts/quality/report-slowest-tests.mjs --top=10",
-    "test:ci:ui:slow-top": "node scripts/quality/report-slowest-tests.mjs --top=10 src/tests/app.ui*.spec.ts src/tests/app.ui*.spec.tsx",
+    "test:ci:ui:slow-top": "node scripts/quality/run-vitest-segmented.mjs ui-slow-top --top=10",
     "test:e2e": "env -u NO_COLOR playwright test --reporter=line"
   },
   "dependencies": {

@@ -1,8 +1,8 @@
 ## item_380_ui_test_reliability_stabilization_wave_1_for_top_slow_specs - UI test reliability stabilization wave 1 for top slow/unstable specs
 > From version: 0.9.11
-> Understanding: 95%
-> Confidence: 92%
-> Progress: 0%
+> Understanding: 97%
+> Confidence: 93%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Targeted UI test stability improvements without regression-signal dilution
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -32,7 +32,7 @@ Some UI integration tests are repeatedly among the slowest and require increased
 
 # Notes
 - Dependencies: `req_069`, `item_379`.
-- Blocks: `item_382`, `task_067`.
+- Blocks: none (delivered in `task_067`).
 - Related AC: AC5, AC6.
 - References:
   - `logics/request/req_069_ci_observability_execution_order_test_segmentation_and_ui_test_reliability.md`
@@ -41,3 +41,14 @@ Some UI integration tests are repeatedly among the slowest and require increased
   - `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
   - `src/tests/app.ui.settings-wire-defaults.spec.tsx`
   - `src/tests/app.ui.settings.spec.tsx`
+
+# Delivery notes
+- Applied fixture-shaping stabilization to top slow UI tests:
+  - `src/tests/app.ui.list-ergonomics.spec.tsx`
+    - switched the segment-analysis endpoint split test from heavyweight sample network to `createUiIntegrationDenseWiresState()`.
+  - `src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx`
+    - switched the optional endpoint-reference flow from dense multi-wire fixture to `createUiIntegrationWideEndpointsState()`.
+  - `src/tests/helpers/app-ui-test-utils.tsx`
+    - added `createUiIntegrationWideEndpointsState()` targeted fixture.
+- Preserved assertions/intent; no timeout inflation added.
+- Maintained the documented timeout debt policy (`10_000ms` exceptions remain temporary, no new increases).
