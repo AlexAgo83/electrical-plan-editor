@@ -77,6 +77,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultCalloutTextSize: (value: CanvasCalloutTextSize) => void;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
+  canvasDefaultAutoSegmentLabelRotation: boolean;
+  setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   canvasPngExportIncludeBackground: boolean;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
   canvasResetZoomPercentInput: string;
@@ -156,6 +158,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultCalloutTextSize,
   canvasDefaultLabelRotationDegrees,
   setCanvasDefaultLabelRotationDegrees,
+  canvasDefaultAutoSegmentLabelRotation,
+  setCanvasDefaultAutoSegmentLabelRotation,
   canvasPngExportIncludeBackground,
   setCanvasPngExportIncludeBackground,
   canvasResetZoomPercentInput,
@@ -313,6 +317,16 @@ export function SettingsWorkspaceContent({
               <option value="20">20°</option>
               <option value="45">45°</option>
               <option value="90">90°</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            Auto segment label rotation
+            <select
+              value={canvasDefaultAutoSegmentLabelRotation ? "yes" : "no"}
+              onChange={(event) => setCanvasDefaultAutoSegmentLabelRotation(event.target.value === "yes")}
+            >
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
             </select>
           </label>
           <label className="settings-field">

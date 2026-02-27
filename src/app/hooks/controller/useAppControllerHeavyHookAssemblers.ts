@@ -44,6 +44,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "canvasDefaultLabelSizeMode"
     | "canvasDefaultCalloutTextSize"
     | "canvasDefaultLabelRotationDegrees"
+    | "canvasDefaultAutoSegmentLabelRotation"
     | "showCableCallouts"
     | "networkCalloutTextSize"
     | "setShowNetworkGrid"
@@ -56,6 +57,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setNetworkLabelSizeMode"
     | "setNetworkCalloutTextSize"
     | "setNetworkLabelRotationDegrees"
+    | "setNetworkAutoSegmentLabelRotation"
   >;
   sortDefaults: Pick<WorkspaceHandlersParams, "defaultSortField" | "defaultSortDirection" | "defaultIdSortDirection">;
   sortSetters: Pick<
@@ -92,6 +94,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setCanvasDefaultLabelSizeMode"
     | "setCanvasDefaultCalloutTextSize"
     | "setCanvasDefaultLabelRotationDegrees"
+    | "setCanvasDefaultAutoSegmentLabelRotation"
     | "setCanvasResetZoomPercentInput"
     | "setCanvasPngExportIncludeBackground"
     | "setShowShortcutHints"
