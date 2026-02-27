@@ -10,7 +10,7 @@ interface ParsedVersion {
   patch: number;
 }
 
-const ROOT_CHANGELOG_MODULES = import.meta.glob<string>("../../../CHANGELOGS_*.md", {
+const ROOT_CHANGELOG_MODULES = import.meta.glob<string>("../../../changelogs/CHANGELOGS_*.md", {
   query: "?raw",
   import: "default",
   eager: true
@@ -41,8 +41,10 @@ function compareVersionsDesc(left: ParsedVersion, right: ParsedVersion): number 
   return right.patch - left.patch;
 }
 
-export function buildHomeChangelogEntries(): HomeChangelogEntry[] {
-  const entriesWithVersion = Object.entries(ROOT_CHANGELOG_MODULES).flatMap(([sourcePath, content]) => {
+export function buildHomeChangelogEntriesFromModules(
+  modulesBySourcePath: Readonly<Record<string, string>>
+): HomeChangelogEntry[] {
+  const entriesWithVersion = Object.entries(modulesBySourcePath).flatMap(([sourcePath, content]) => {
     const parsedVersion = parseVersionFromSourcePath(sourcePath);
     if (parsedVersion === null) {
       return [];
@@ -70,6 +72,10 @@ export function buildHomeChangelogEntries(): HomeChangelogEntry[] {
     content: entry.content.trim(),
     sourcePath: entry.sourcePath
   }));
+}
+
+export function buildHomeChangelogEntries(): HomeChangelogEntry[] {
+  return buildHomeChangelogEntriesFromModules(ROOT_CHANGELOG_MODULES);
 }
 
 export const HOME_CHANGELOG_ENTRIES = buildHomeChangelogEntries();
