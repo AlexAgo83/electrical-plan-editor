@@ -147,7 +147,7 @@ Then open `http://127.0.0.1:5284` (unless overridden).
 - `npm run coverage:ui:report`: emit `src/app/**` coverage report (informational, non-blocking)
 - `npm run bundle:metrics:report`: report main JS chunk + total JS gzip with non-blocking warning budgets
 - `npm run build:bundle:report`: run production build then bundle metrics report
-- `npm run ci:local`: run the local CI-equivalent blocking pipeline (logics lint + lint + typecheck + segmentation check + quality gates + test:ci + test:e2e + build + pwa quality)
+- `npm run ci:local`: run the local CI-equivalent blocking pipeline (logics lint + lint + typecheck + segmentation check + quality gates + test:ci:fast + test:ci:ui + test:e2e + build + pwa quality)
 - `npm run test:e2e`: run Playwright E2E smoke tests
 - `npm run quality:ui-modularization`: enforce UI modularization line-budget gate
 - `npm run quality:store-modularization`: enforce store modularization line-budget gate
@@ -216,7 +216,7 @@ Migration authoring workflow (future schema evolution):
    - current payload
    - unsupported future version
    - malformed payload
-4. Run the full validation pipeline (`lint`, `typecheck`, `test:ci`, `test:e2e`, `build`, `quality:pwa`).
+4. Run the full validation pipeline (`npm run ci:local`).
 
 ## Quality and CI
 
@@ -235,14 +235,10 @@ npm run typecheck
 npm run test:ci:segmentation:check
 npm run quality:ui-modularization
 npm run quality:store-modularization
-npm run test:ci
+npm run test:ci:fast -- --coverage
+npm run test:ci:ui
 npm run test:e2e
 npm run build
-```
-
-Additional release-oriented validation:
-
-```bash
 npm run quality:pwa
 ```
 
@@ -253,15 +249,15 @@ Additional non-blocking CI observability:
 - `coverage:ui:report` for `src/app/**` coverage visibility
 - `test:ci:ui:slow-top` for top-N slow UI test reporting
 - `bundle:metrics:report` for main-chunk and total-gzip size visibility
-- these signals are informational and do not replace canonical `test:ci`
-- in CI, `coverage:ui:report` and `test:ci:ui:slow-top` are configured with `if: always()` so they still run after upstream failures
+- these signals are informational and do not replace blocking CI gates
+- in CI, `coverage:ui:report` and `test:ci:ui:slow-top` are configured with `if: success()` so they run only when prior blocking steps pass
 - in CI, `bundle:metrics:report` stays informational and runs only when the production build step succeeds
 
 Segmented test contract:
 
 - explicit lane ownership is defined in `scripts/quality/run-vitest-segmented.mjs`
 - `test:ci:segmentation:check` verifies the lane contract and fails on drift
-- canonical `test:ci` remains the required full-suite command; segmented lanes are complementary triage tools
+- CI uses `test:ci:fast` + `test:ci:ui` as required lanes; `test:ci` remains available as a full-suite local command
 
 Form validation doctrine (current targeted scope):
 
