@@ -13,6 +13,7 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   store: AppStore;
   state: StateSnapshot;
   dispatchAction: DispatchAction;
+  confirmAction: Parameters<typeof useConnectorHandlers>[0]["confirmAction"];
   connectorFormMode: Parameters<typeof useConnectorHandlers>[0]["connectorFormMode"];
   setConnectorFormMode: Parameters<typeof useConnectorHandlers>[0]["setConnectorFormMode"];
   editingConnectorId: Parameters<typeof useConnectorHandlers>[0]["editingConnectorId"];
@@ -148,6 +149,7 @@ export function useAppControllerModelingHandlersOrchestrator({
   store,
   state,
   dispatchAction,
+  confirmAction,
   connectorFormMode,
   setConnectorFormMode,
   editingConnectorId,
@@ -281,6 +283,7 @@ export function useAppControllerModelingHandlersOrchestrator({
   const connector = useConnectorHandlers({
     store,
     dispatchAction,
+    confirmAction,
     connectorFormMode,
     setConnectorFormMode,
     editingConnectorId,
@@ -307,6 +310,7 @@ export function useAppControllerModelingHandlersOrchestrator({
   const splice = useSpliceHandlers({
     store,
     dispatchAction,
+    confirmAction,
     spliceFormMode,
     setSpliceFormMode,
     editingSpliceId,
@@ -334,6 +338,7 @@ export function useAppControllerModelingHandlersOrchestrator({
     store,
     state,
     dispatchAction,
+    confirmAction,
     nodeFormMode,
     setNodeFormMode,
     editingNodeId,
@@ -358,6 +363,7 @@ export function useAppControllerModelingHandlersOrchestrator({
     store,
     state,
     dispatchAction,
+    confirmAction,
     segmentFormMode,
     setSegmentFormMode,
     editingSegmentId,
@@ -378,6 +384,7 @@ export function useAppControllerModelingHandlersOrchestrator({
   const wire = useWireHandlers({
     store,
     dispatchAction,
+    confirmAction,
     wireFormMode,
     setWireFormMode,
     editingWireId,

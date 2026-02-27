@@ -4,6 +4,7 @@ import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { focusSelectedTableRowInPanel, toPositiveNumber } from "../lib/app-utils-shared";
 import { suggestNextSegmentId } from "../lib/technical-id-suggestions";
+import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -16,6 +17,7 @@ interface UseSegmentHandlersParams {
   store: AppStore;
   state: ReturnType<AppStore["getState"]>;
   dispatchAction: DispatchAction;
+  confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
   segmentFormMode: "idle" | "create" | "edit";
   setSegmentFormMode: (mode: "idle" | "create" | "edit") => void;
   editingSegmentId: SegmentId | null;
@@ -37,6 +39,7 @@ export function useSegmentHandlers({
   store,
   state,
   dispatchAction,
+  confirmAction,
   segmentFormMode,
   setSegmentFormMode,
   editingSegmentId,
@@ -179,11 +182,28 @@ export function useSegmentHandlers({
   }
 
   function handleSegmentDelete(segmentId: SegmentId): void {
-    dispatchAction(appActions.removeSegment(segmentId));
-
-    if (editingSegmentId === segmentId) {
-      clearSegmentForm();
+    const segment = store.getState().segments.byId[segmentId];
+    if (segment === undefined) {
+      return;
     }
+
+    void (async () => {
+      const shouldDelete = await confirmAction({
+        title: "Delete segment",
+        message: `Delete segment '${segment.id}' (${segment.nodeA} -> ${segment.nodeB})?`,
+        confirmLabel: "Delete",
+        cancelLabel: "Cancel",
+        intent: "danger"
+      });
+      if (!shouldDelete) {
+        return;
+      }
+
+      dispatchAction(appActions.removeSegment(segmentId));
+      if (editingSegmentId === segmentId) {
+        clearSegmentForm();
+      }
+    })();
   }
 
   return {

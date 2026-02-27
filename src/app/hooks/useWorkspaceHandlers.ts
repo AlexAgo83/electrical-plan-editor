@@ -375,6 +375,8 @@ export function useWorkspaceHandlers({
       const shouldDelete = await confirmAction({
         title: "Delete network",
         message: `Delete network '${targetNetwork.name}' (${targetNetwork.technicalId})?`,
+        confirmLabel: "Delete",
+        cancelLabel: "Cancel",
         intent: "danger"
       });
       if (!shouldDelete) {
