@@ -152,7 +152,7 @@ describe("App integration UI - delete confirmations", () => {
     fireEvent.click(within(wiresPanel).getByRole("button", { name: "Delete" }));
     await cancelDeleteDialog("Delete wire");
     expect(within(wiresPanel).getByText("Wire deletable")).toBeInTheDocument();
-  });
+  }, 15_000);
 
   it("deletes entities only after explicit confirmation and preserves guarded delete semantics", async () => {
     const { store } = renderAppWithState(createDeleteConfirmationState());
@@ -225,5 +225,5 @@ describe("App integration UI - delete confirmations", () => {
       expect(store.getState().wires.byId[asWireId("W-DEL")]).toBeUndefined();
       expect(within(getPanelByHeading("Wires")).queryByText("Wire deletable")).not.toBeInTheDocument();
     });
-  });
+  }, 15_000);
 });

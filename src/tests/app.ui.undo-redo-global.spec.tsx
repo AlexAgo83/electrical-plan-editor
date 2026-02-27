@@ -124,4 +124,26 @@ describe("App integration UI - global undo/redo", () => {
     expect(catalogValues).toEqual(["UNDO-CAT-NEW", "UNDO-CAT-REF"]);
     expect(store.getState().catalogItems.byId[asCatalogItemId("CAT-UNDO")]?.connectionCount).toBe(6);
   });
+
+  it("keeps Network Scope recent changes aligned with undo stack", () => {
+    renderAppWithState(createStateWithCatalog());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "New" }));
+    const connectorFormPanel = getPanelByHeading("Create Connector");
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), { target: { value: "Undo stack recent change" } });
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Technical ID"), { target: { value: "C-UNDO-SYNC" } });
+    fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
+
+    switchScreenDrawerAware("networkScope");
+    expect(getPanelByHeading("Recent changes")).toBeInTheDocument();
+    expect(screen.getByText("Connector 'C-UNDO-SYNC' created")).toBeInTheDocument();
+
+    openOpsPanel();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    expect(screen.queryByRole("heading", { name: "Recent changes" })).not.toBeInTheDocument();
+  });
 });

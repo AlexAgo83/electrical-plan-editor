@@ -313,6 +313,57 @@ describe("App integration UI - settings", () => {
     ).toHaveClass("is-active");
   });
 
+  it("overrides Ctrl+S even when keyboard shortcuts are disabled and input is focused", async () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+
+    const shortcutPanel = getPanelByHeading("Action bar and shortcuts");
+    fireEvent.click(within(shortcutPanel).getByLabelText("Enable keyboard shortcuts (undo/redo/navigation/issues/view)"));
+
+    const appearancePanel = getPanelByHeading("Appearance preferences");
+    const focusedInput = within(appearancePanel).getByLabelText("Theme mode");
+    (focusedInput as HTMLSelectElement).focus();
+
+    const shortcutEvent = new KeyboardEvent("keydown", {
+      key: "s",
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true
+    });
+    focusedInput.dispatchEvent(shortcutEvent);
+
+    expect(shortcutEvent.defaultPrevented).toBe(true);
+
+    const importExportPanel = getPanelByHeading("Import / Export networks");
+    await waitFor(() => {
+      expect(
+        within(importExportPanel).queryByText("Exported 1 network(s) (active).") ??
+          within(importExportPanel).getByText("Export is not available in this environment.")
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("overrides Ctrl+S without active network and keeps app-level export error feedback", async () => {
+    const initialState = createInitialState();
+    const noActiveNetworkState = appReducer(initialState, appActions.deleteNetwork(initialState.activeNetworkId as NetworkId));
+    renderAppWithState(noActiveNetworkState);
+    switchScreenDrawerAware("settings");
+
+    const shortcutEvent = new KeyboardEvent("keydown", {
+      key: "s",
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true
+    });
+    window.dispatchEvent(shortcutEvent);
+    expect(shortcutEvent.defaultPrevented).toBe(true);
+
+    const importExportPanel = getPanelByHeading("Import / Export networks");
+    await waitFor(() => {
+      expect(within(importExportPanel).getByText("No network available for the selected export scope.")).toBeInTheDocument();
+    });
+  });
+
   it("hides the floating inspector panel when disabled from settings preferences", () => {
     renderAppWithState(createUiIntegrationState());
     const closeOnboardingButton = screen.queryByRole("button", { name: "Close onboarding" });
