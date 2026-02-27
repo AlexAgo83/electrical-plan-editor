@@ -333,6 +333,8 @@ describe("App integration UI - settings", () => {
     focusedInput.dispatchEvent(shortcutEvent);
 
     expect(shortcutEvent.defaultPrevented).toBe(true);
+    const confirmDialog = await screen.findByRole("dialog", { name: "Save active network" });
+    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Save" }));
 
     const importExportPanel = getPanelByHeading("Import / Export networks");
     await waitFor(() => {

@@ -1179,6 +1179,38 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     activeNetworkId,
     dispatchAction
   });
+
+  const handleSaveActiveNetworkWithConfirmation = useCallback(() => {
+    if (activeNetworkId === null) {
+      handleExportNetworks("active");
+      return;
+    }
+
+    void (async () => {
+      const shouldSave = await requestConfirmation({
+        title: "Save active network",
+        message: "Export the active network now?",
+        confirmLabel: "Save",
+        intent: "neutral"
+      });
+      if (!shouldSave) {
+        return;
+      }
+
+      handleExportNetworks("active");
+    })();
+  }, [activeNetworkId, handleExportNetworks, requestConfirmation]);
+  const handleExportNetworksWithActiveSaveConfirmation = useCallback(
+    (scope: "active" | "selected" | "all") => {
+      if (scope !== "active") {
+        handleExportNetworks(scope);
+        return;
+      }
+
+      handleSaveActiveNetworkWithConfirmation();
+    },
+    [handleExportNetworks, handleSaveActiveNetworkWithConfirmation]
+  );
   const catalogCsvImportFileInputRef = useRef<HTMLInputElement | null>(null);
   const [catalogCsvImportExportStatus, setCatalogCsvImportExportStatus] = useState<ImportExportStatus | null>(null);
   const [catalogCsvLastImportSummaryLine, setCatalogCsvLastImportSummaryLine] = useState<string | null>(null);
@@ -1515,7 +1547,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   useEffect(() => {
     undoActionRef.current = handleUndo;
     redoActionRef.current = handleRedo;
-    exportActiveNetworkRef.current = () => handleExportNetworks("active");
+    exportActiveNetworkRef.current = handleSaveActiveNetworkWithConfirmation;
     fitNetworkToContentRef.current = fitNetworkToContent;
     previousValidationIssueRef.current = () => {
       if (activeScreenRef.current === "validation") {
@@ -2406,7 +2438,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           handleWorkspaceScreenChange("modeling");
         },
         handleDuplicateNetwork,
-        handleExportActiveNetwork: () => handleExportNetworks("active"),
+        handleExportActiveNetwork: handleSaveActiveNetworkWithConfirmation,
         handleDeleteNetwork,
         undoHistoryEntries,
         handleOpenCreateNetworkForm,
@@ -2451,7 +2483,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           importExportStatus,
           lastImportSummary,
           toggleSelectedExportNetwork,
-          handleExportNetworks,
+          handleExportNetworks: handleExportNetworksWithActiveSaveConfirmation,
           handleOpenImportPicker,
           handleImportFileChange
         },
