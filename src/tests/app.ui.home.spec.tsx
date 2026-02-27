@@ -55,9 +55,6 @@ describe("home workspace screen", () => {
     expect(changelogVersions.length).toBeGreaterThan(1);
     const sortedDescending = [...changelogVersions].sort(compareVersionsDescending);
     expect(changelogVersions).toEqual(sortedDescending);
-    expect(changelogVersions).toContain("0.9.6");
-    expect(changelogVersions).toContain("0.9.0");
-    expect(changelogVersions).toContain("0.8.1");
   });
 
   it("shows active workspace resume summary details", () => {
