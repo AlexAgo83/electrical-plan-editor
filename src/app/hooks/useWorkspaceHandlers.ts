@@ -680,7 +680,7 @@ export function useWorkspaceHandlers({
 
   function resetWorkspacePreferencesToDefaults(): void {
     const defaultSort: SortState = { field: "name", direction: "asc" };
-    setThemeMode("dark");
+    setThemeMode("warmBrown");
     setTableDensity("compact");
     setTableFontSize("normal");
     setWorkspaceCurrencyCode("EUR");
