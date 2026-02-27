@@ -6,6 +6,7 @@ interface ConfirmDialogProps {
   themeHostClassName?: string;
   title: string;
   message: string;
+  details?: string;
   confirmLabel?: string;
   cancelLabel?: string;
   intent?: ConfirmDialogIntent;
@@ -27,6 +28,7 @@ export function ConfirmDialog({
   themeHostClassName,
   title,
   message,
+  details,
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   intent = "neutral",
@@ -72,6 +74,8 @@ export function ConfirmDialog({
         ? "is-warning"
         : "is-neutral";
   const titleId = `confirm-dialog-title-${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
+  const descriptionId = `${titleId}-description`;
+  const detailsId = `${titleId}-details`;
 
   const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
     if (event.key === "Escape") {
@@ -137,16 +141,22 @@ export function ConfirmDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        aria-describedby={`${titleId}-description`}
+        aria-describedby={details !== undefined && details.length > 0 ? `${descriptionId} ${detailsId}` : descriptionId}
         tabIndex={-1}
         onKeyDown={handleDialogKeyDown}
       >
         <header className="confirm-dialog-header">
           <h2 id={titleId}>{title}</h2>
         </header>
-        <p id={`${titleId}-description`} className="confirm-dialog-message">
+        <p id={descriptionId} className="confirm-dialog-message">
           {message}
         </p>
+        {details !== undefined && details.length > 0 ? (
+          <p id={detailsId} className="confirm-dialog-details">
+            <span className="confirm-dialog-details-label">Filename</span>
+            <code className="confirm-dialog-details-code">{details}</code>
+          </p>
+        ) : null}
         <footer className="confirm-dialog-actions">
           <button ref={cancelButtonRef} type="button" className="confirm-dialog-cancel" onClick={onCancel}>
             {cancelLabel}

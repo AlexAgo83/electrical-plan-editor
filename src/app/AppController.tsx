@@ -67,7 +67,7 @@ import { useEntityFormsState } from "./hooks/useEntityFormsState";
 import { useEntityRelationshipMaps } from "./hooks/useEntityRelationshipMaps";
 import { useInspectorPanelVisibility } from "./hooks/useInspectorPanelVisibility";
 import { useIssueNavigatorModel } from "./hooks/useIssueNavigatorModel";
-import { useNetworkImportExport } from "./hooks/useNetworkImportExport";
+import { buildNetworkExportFilename, useNetworkImportExport } from "./hooks/useNetworkImportExport";
 import { useNetworkEntityCountsById } from "./hooks/useNetworkEntityCountsById";
 import { useNetworkScopeFormOrchestration } from "./hooks/useNetworkScopeFormOrchestration";
 import { useNetworkScopeFormState } from "./hooks/useNetworkScopeFormState";
@@ -122,6 +122,7 @@ type OnboardingStepTarget = OnboardingStepDefinition["target"];
 interface ActiveConfirmDialogState {
   title: string;
   message: string;
+  details?: string;
   confirmLabel: string;
   cancelLabel: string;
   intent: ConfirmDialogIntent;
@@ -525,6 +526,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setActiveConfirmDialog({
         title: request.title,
         message: request.message,
+        details: request.details,
         confirmLabel: request.confirmLabel ?? "Confirm",
         cancelLabel: request.cancelLabel ?? "Cancel",
         intent: request.intent ?? "neutral",
@@ -1187,9 +1189,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
 
     void (async () => {
+      const exportedAtIso = new Date().toISOString();
+      const fileName = buildNetworkExportFilename("active", exportedAtIso);
       const shouldSave = await requestConfirmation({
         title: "Save active network",
         message: "Export the active network now?",
+        details: fileName,
         confirmLabel: "Save",
         intent: "neutral"
       });
@@ -1197,7 +1202,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         return;
       }
 
-      handleExportNetworks("active");
+      handleExportNetworks("active", exportedAtIso);
     })();
   }, [activeNetworkId, handleExportNetworks, requestConfirmation]);
   const handleExportNetworksWithActiveSaveConfirmation = useCallback(
@@ -2676,6 +2681,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           themeHostClassName={appShellClassName}
           title={activeConfirmDialog.title}
           message={activeConfirmDialog.message}
+          details={activeConfirmDialog.details}
           confirmLabel={activeConfirmDialog.confirmLabel}
           cancelLabel={activeConfirmDialog.cancelLabel}
           intent={activeConfirmDialog.intent}
