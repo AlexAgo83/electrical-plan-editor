@@ -60,6 +60,31 @@
   line-height: 1.4;
 }
 
+.confirm-dialog-details {
+  margin: -0.15rem 0 0;
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  display: grid;
+  gap: 0.3rem;
+}
+
+.confirm-dialog-details-label {
+  font-size: 0.72rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.78;
+}
+
+.confirm-dialog-details-code {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
 .confirm-dialog-actions {
   display: flex;
   align-items: center;

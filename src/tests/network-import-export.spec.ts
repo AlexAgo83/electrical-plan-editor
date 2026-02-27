@@ -25,13 +25,14 @@ describe("network import/export helpers", () => {
 
   it("builds scope-distinct export filenames with filesystem-safe timestamps", () => {
     const exportedAtIso = "2026-02-27T12:34:56.789Z";
-    expect(buildNetworkExportFilename("active", exportedAtIso)).toBe(
-      "electrical-network-active-2026-02-27T12-34-56-789Z.json"
-    );
-    expect(buildNetworkExportFilename("selected", exportedAtIso)).toBe(
-      "electrical-network-selected-2026-02-27T12-34-56-789Z.json"
-    );
-    expect(buildNetworkExportFilename("all", exportedAtIso)).toBe("electrical-network-all-2026-02-27T12-34-56-789Z.json");
+    const activeFilename = buildNetworkExportFilename("active", exportedAtIso);
+    const selectedFilename = buildNetworkExportFilename("selected", exportedAtIso);
+    const allFilename = buildNetworkExportFilename("all", exportedAtIso);
+
+    expect(activeFilename).toMatch(/^electrical-network-active-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/);
+    expect(selectedFilename).toMatch(/^electrical-network-selected-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/);
+    expect(allFilename).toMatch(/^electrical-network-all-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/);
+    expect(activeFilename).not.toContain(".789");
   });
 
   it("defers JSON blob URL revoke until after click dispatch", () => {
@@ -53,9 +54,9 @@ describe("network import/export helpers", () => {
       capturedDownloadName = this.download;
     });
 
-    const ok = downloadJsonFile("electrical-network-active-2026-02-27T12-34-56-789Z.json", "{\"hello\":\"world\"}");
+    const ok = downloadJsonFile("electrical-network-active-2026-02-27_13-34-56.json", "{\"hello\":\"world\"}");
     expect(ok).toBe(true);
-    expect(capturedDownloadName).toBe("electrical-network-active-2026-02-27T12-34-56-789Z.json");
+    expect(capturedDownloadName).toBe("electrical-network-active-2026-02-27_13-34-56.json");
     expect(revokeObjectUrl).not.toHaveBeenCalled();
 
     vi.runAllTimers();

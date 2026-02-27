@@ -25,13 +25,29 @@ interface UseNetworkImportExportResult {
   importExportStatus: ImportExportStatus | null;
   lastImportSummary: NetworkImportSummary | null;
   toggleSelectedExportNetwork: (networkId: NetworkId) => void;
-  handleExportNetworks: (scope: "active" | "selected" | "all") => void;
+  handleExportNetworks: (scope: "active" | "selected" | "all", exportedAtIsoOverride?: string) => void;
   handleOpenImportPicker: () => void;
   handleImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
 }
 
+function pad2(value: number): string {
+  return value.toString().padStart(2, "0");
+}
+
 function toFilesystemSafeTimestamp(exportedAtIso: string): string {
-  return exportedAtIso.replace(/[:.]/g, "-");
+  const exportedAt = new Date(exportedAtIso);
+  if (Number.isNaN(exportedAt.getTime())) {
+    const withoutMilliseconds = exportedAtIso.replace(/\.\d{3}(?=Z$)/, "");
+    return withoutMilliseconds.replace(/[:.]/g, "-").replace("T", "_").replace(/Z$/i, "");
+  }
+
+  const year = exportedAt.getFullYear();
+  const month = pad2(exportedAt.getMonth() + 1);
+  const day = pad2(exportedAt.getDate());
+  const hour = pad2(exportedAt.getHours());
+  const minute = pad2(exportedAt.getMinutes());
+  const second = pad2(exportedAt.getSeconds());
+  return `${year}-${month}-${day}_${hour}-${minute}-${second}`;
 }
 
 export function buildNetworkExportFilename(scope: NetworkExportScope, exportedAtIso: string): string {
@@ -98,8 +114,8 @@ export function useNetworkImportExport({
     });
   }
 
-  function handleExportNetworks(scope: "active" | "selected" | "all"): void {
-    const exportedAtIso = new Date().toISOString();
+  function handleExportNetworks(scope: "active" | "selected" | "all", exportedAtIsoOverride?: string): void {
+    const exportedAtIso = exportedAtIsoOverride ?? new Date().toISOString();
     const payload = buildNetworkFilePayload(store.getState(), scope, selectedExportNetworkIds, exportedAtIso);
     if (payload.networks.length === 0) {
       setImportExportStatus({
