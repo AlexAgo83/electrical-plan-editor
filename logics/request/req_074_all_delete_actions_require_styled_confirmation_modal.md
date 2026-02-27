@@ -1,7 +1,7 @@
 ## req_074_all_delete_actions_require_styled_confirmation_modal - Require confirmation modal for every delete action
 > From version: 0.9.14
-> Understanding: 99% (the ask is to enforce a confirmation modal before every delete mutation)
-> Confidence: 97% (confirm infrastructure already exists and can be reused across delete handlers)
+> Understanding: 100% (scope and completion status are confirmed: confirmation modal now gates all delete mutations)
+> Confidence: 99% (delivered behavior is covered by targeted UI delete-confirmation tests)
 > Complexity: Medium
 > Theme: Destructive-action safety and UX consistency
 > Reminder: Update Understanding/Confidence and references when editing this doc.
@@ -97,6 +97,16 @@ Delete action entry points are surfaced in modeling/catalog panels:
 - Non-delete destructive actions already tracked in other requests (e.g. reset/replace flows).
 - Backend/API permission model changes.
 - Major redesign of list/table layouts.
+
+# Delivery status
+- Status: delivered.
+- Task: `logics/tasks/task_068_req_074_all_delete_actions_require_styled_confirmation_modal_orchestration_and_delivery_control.md`.
+
+# Backlog
+- `logics/backlog/item_383_delete_confirmation_orchestration_across_catalog_and_modeling_handlers.md` (done)
+- `logics/backlog/item_384_delete_confirmation_modal_copy_intent_and_identity_consistency.md` (done)
+- `logics/backlog/item_385_regression_coverage_for_delete_confirmation_across_entities.md` (done)
+- `logics/backlog/item_386_req_074_delete_confirmation_policy_closure_validation_and_traceability.md` (done)
 
 # References
 - `src/app/AppController.tsx`

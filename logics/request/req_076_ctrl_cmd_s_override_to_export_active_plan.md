@@ -1,7 +1,7 @@
 ## req_076_ctrl_cmd_s_override_to_export_active_plan - Override Ctrl/Cmd+S to export active plan instead of browser page save
 > From version: 0.9.14
-> Understanding: 98% (intercept Ctrl/Cmd+S and trigger app-level save/download for the active plan, not browser page save)
-> Confidence: 96% (shortcut plumbing already exists; this is mostly keyboard routing + export action wiring)
+> Understanding: 100% (scope and delivered behavior are confirmed: Ctrl/Cmd+S now routes to app export and blocks browser save)
+> Confidence: 99% (shortcut interception and no-active-network behavior are covered by targeted UI tests)
 > Complexity: Small-Medium
 > Theme: Keyboard productivity and UX consistency
 > Reminder: Update Understanding/Confidence and references when editing this doc.
@@ -90,6 +90,15 @@
 - Changing export format or file naming strategy.
 - Introducing backend/cloud save.
 - Intercepting browser menu actions outside keyboard events.
+
+# Delivery status
+- Status: delivered.
+- Task: `logics/tasks/task_069_super_orchestration_delivery_execution_for_req_075_and_req_076_with_validation_gates.md`.
+
+# Backlog
+- `logics/backlog/item_391_ctrl_cmd_s_global_interception_and_default_prevent_contract.md` (done)
+- `logics/backlog/item_392_ctrl_cmd_s_export_wiring_to_network_scope_export_path.md` (done)
+- `logics/backlog/item_393_req_076_ctrl_cmd_s_override_closure_validation_and_traceability.md` (done)
 
 # References
 - `src/app/hooks/useKeyboardShortcuts.ts`
