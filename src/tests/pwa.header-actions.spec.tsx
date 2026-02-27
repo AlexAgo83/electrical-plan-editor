@@ -46,7 +46,9 @@ describe("PWA header actions", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
     window.dispatchEvent(new Event("app:pwa-update-available"));
-    fireEvent.click(await screen.findByRole("button", { name: "Update ready" }));
+    const updateReadyButton = await screen.findByRole("button", { name: "Update ready" });
+    expect(updateReadyButton).toHaveClass("is-ready-glow");
+    fireEvent.click(updateReadyButton);
 
     await waitFor(() => {
       expect(screen.queryByRole("button", { name: "Update ready" })).not.toBeInTheDocument();

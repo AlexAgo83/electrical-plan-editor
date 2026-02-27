@@ -472,13 +472,12 @@ describe("App integration UI - navigation and canvas", () => {
       createUiIntegrationState(),
       appActions.setNodePosition(asNodeId("N-C1"), { x: 64, y: 80 })
     );
-    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
     renderAppWithState(state);
     switchScreenDrawerAware("analysis");
     const networkSummaryPanel = getPanelByHeading("Network summary");
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Generate" }));
-
-    expect(confirmSpy).toHaveBeenCalledTimes(1);
-    confirmSpy.mockRestore();
+    const confirmDialog = screen.getByRole("dialog", { name: "Regenerate 2D layout" });
+    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByRole("dialog", { name: "Regenerate 2D layout" })).not.toBeInTheDocument();
   });
 });

@@ -1,5 +1,5 @@
-import { fireEvent, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
   createUiIntegrationState,
   createValidationIssueState,
@@ -65,7 +65,7 @@ describe("home workspace screen", () => {
     expect(getPanelByHeading("Validation center")).toBeInTheDocument();
   });
 
-  it("creates a genuinely empty workspace from Home without resetting theme mode", () => {
+  it("creates a genuinely empty workspace from Home without resetting theme mode", async () => {
     const base = createUiIntegrationState();
     const initial = {
       ...base,
@@ -76,12 +76,19 @@ describe("home workspace screen", () => {
     };
     const { store } = renderAppWithState(initial);
     const previousThemeMode = store.getState().ui.themeMode;
+    const closeOnboardingButton = screen.queryByRole("button", { name: "Close onboarding" });
+    if (closeOnboardingButton !== null) {
+      fireEvent.click(closeOnboardingButton);
+    }
 
     switchScreenDrawerAware("home");
-    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
     fireEvent.click(screen.getByRole("button", { name: "Create empty workspace" }));
-    confirmSpy.mockRestore();
+    const confirmDialog = screen.getByRole("dialog", { name: "Create empty workspace" });
+    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Confirm" }));
 
+    await waitFor(() => {
+      expect(store.getState().networks.allIds).toHaveLength(0);
+    });
     const nextState = store.getState();
     expect(nextState.networks.allIds).toHaveLength(0);
     expect(nextState.activeNetworkId).toBeNull();

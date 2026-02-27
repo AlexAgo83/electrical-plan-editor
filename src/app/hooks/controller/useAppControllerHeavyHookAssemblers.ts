@@ -7,7 +7,7 @@ type SelectionHandlersParams = Parameters<typeof useSelectionHandlers>[0];
 type CanvasInteractionHandlersParams = Parameters<typeof useCanvasInteractionHandlers>[0];
 
 interface UseAppControllerWorkspaceHandlersAssemblyParams {
-  base: Pick<WorkspaceHandlersParams, "store" | "networks" | "dispatchAction" | "replaceStateWithHistory">;
+  base: Pick<WorkspaceHandlersParams, "store" | "networks" | "dispatchAction" | "replaceStateWithHistory" | "confirmAction">;
   networkForm: Pick<
     WorkspaceHandlersParams,
     | "newNetworkName"

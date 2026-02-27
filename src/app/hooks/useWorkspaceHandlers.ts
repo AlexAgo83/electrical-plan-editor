@@ -1,6 +1,7 @@
 import type { FormEvent } from "react";
 import type { Connector, ConnectorId, Network, NetworkId, NetworkNode, NodeId, Splice, SpliceId } from "../../core/entities";
 import type { AppState, AppStore, ThemeMode } from "../../store";
+import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import {
   appActions,
   appReducer,
@@ -129,6 +130,7 @@ interface UseWorkspaceHandlersParams {
   setKeyboardShortcutsEnabled: (value: boolean) => void;
   setShowFloatingInspectorPanel: (value: boolean) => void;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
+  confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
 }
 
 export function useWorkspaceHandlers({
@@ -216,7 +218,8 @@ export function useWorkspaceHandlers({
   setShowShortcutHints,
   setKeyboardShortcutsEnabled,
   setShowFloatingInspectorPanel,
-  setWorkspacePanelsLayoutMode
+  setWorkspacePanelsLayoutMode,
+  confirmAction
 }: UseWorkspaceHandlersParams) {
   function refreshBuiltInSampleNetworks(
     sampleFactory: () => AppState,
@@ -368,15 +371,19 @@ export function useWorkspaceHandlers({
       return;
     }
 
-    if (typeof window !== "undefined" && typeof window.confirm === "function") {
-      const shouldDelete = window.confirm(`Delete network '${targetNetwork.name}' (${targetNetwork.technicalId})?`);
+    void (async () => {
+      const shouldDelete = await confirmAction({
+        title: "Delete network",
+        message: `Delete network '${targetNetwork.name}' (${targetNetwork.technicalId})?`,
+        intent: "danger"
+      });
       if (!shouldDelete) {
         return;
       }
-    }
 
-    dispatchAction(appActions.deleteNetwork(targetNetwork.id));
-    setNetworkFormError(null);
+      dispatchAction(appActions.deleteNetwork(targetNetwork.id));
+      setNetworkFormError(null);
+    })();
   }
 
   function handleRecreateSampleNetwork(): void {
@@ -390,63 +397,92 @@ export function useWorkspaceHandlers({
       return;
     }
 
-    if (typeof window !== "undefined" && typeof window.confirm === "function") {
-      const shouldReset = window.confirm(
-        "Reset the sample network to baseline? This removes any changes made to sample entities."
-      );
+    void (async () => {
+      const shouldReset = await confirmAction({
+        title: "Reset sample network",
+        message: "Reset the sample network to baseline? This removes any changes made to sample entities.",
+        intent: "warning"
+      });
       if (!shouldReset) {
         return;
       }
-    }
 
-    refreshBuiltInSampleNetworks(createSampleNetworkState, {
-      activateImportedSample: true
-    });
+      refreshBuiltInSampleNetworks(createSampleNetworkState, {
+        activateImportedSample: true
+      });
+    })();
   }
 
   function handleRecreateValidationIssuesSampleNetwork(): void {
-    if (!isCurrentWorkspaceEmpty && typeof window !== "undefined" && typeof window.confirm === "function") {
-      const shouldReplace = window.confirm(
-        "Refresh built-in sample networks with the validation issues sample? User-created networks are preserved."
-      );
+    if (isCurrentWorkspaceEmpty) {
+      refreshBuiltInSampleNetworks(createValidationIssuesSampleNetworkState, {
+        activateImportedSample: true
+      });
+      return;
+    }
+
+    void (async () => {
+      const shouldReplace = await confirmAction({
+        title: "Replace built-in sample content",
+        message: "Refresh built-in sample networks with the validation issues sample? User-created networks are preserved.",
+        intent: "warning"
+      });
       if (!shouldReplace) {
         return;
       }
-    }
 
-    refreshBuiltInSampleNetworks(createValidationIssuesSampleNetworkState, {
-      activateImportedSample: true
-    });
+      refreshBuiltInSampleNetworks(createValidationIssuesSampleNetworkState, {
+        activateImportedSample: true
+      });
+    })();
   }
 
   function handleRecreateCatalogValidationIssuesSampleNetwork(): void {
-    if (!isCurrentWorkspaceEmpty && typeof window !== "undefined" && typeof window.confirm === "function") {
-      const shouldReplace = window.confirm(
-        "Refresh built-in sample networks with the catalog validation issues sample? User-created networks are preserved."
-      );
+    if (isCurrentWorkspaceEmpty) {
+      refreshBuiltInSampleNetworks(createCatalogValidationIssuesSampleNetworkState, {
+        activateImportedSample: true
+      });
+      return;
+    }
+
+    void (async () => {
+      const shouldReplace = await confirmAction({
+        title: "Replace built-in sample content",
+        message: "Refresh built-in sample networks with the catalog validation issues sample? User-created networks are preserved.",
+        intent: "warning"
+      });
       if (!shouldReplace) {
         return;
       }
-    }
 
-    refreshBuiltInSampleNetworks(createCatalogValidationIssuesSampleNetworkState, {
-      activateImportedSample: true
-    });
+      refreshBuiltInSampleNetworks(createCatalogValidationIssuesSampleNetworkState, {
+        activateImportedSample: true
+      });
+    })();
   }
 
   function handleRecreatePricingBomQaSampleNetwork(): void {
-    if (!isCurrentWorkspaceEmpty && typeof window !== "undefined" && typeof window.confirm === "function") {
-      const shouldReplace = window.confirm(
-        "Refresh built-in sample networks with the pricing / BOM QA sample? User-created networks are preserved."
-      );
+    if (isCurrentWorkspaceEmpty) {
+      refreshBuiltInSampleNetworks(createPricingBomQaSampleNetworkState, {
+        activateImportedSample: true
+      });
+      return;
+    }
+
+    void (async () => {
+      const shouldReplace = await confirmAction({
+        title: "Replace built-in sample content",
+        message: "Refresh built-in sample networks with the pricing / BOM QA sample? User-created networks are preserved.",
+        intent: "warning"
+      });
       if (!shouldReplace) {
         return;
       }
-    }
 
-    refreshBuiltInSampleNetworks(createPricingBomQaSampleNetworkState, {
-      activateImportedSample: true
-    });
+      refreshBuiltInSampleNetworks(createPricingBomQaSampleNetworkState, {
+        activateImportedSample: true
+      });
+    })();
   }
 
   function resetNetworkViewToConfiguredScale(): void {

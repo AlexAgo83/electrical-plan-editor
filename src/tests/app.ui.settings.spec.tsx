@@ -1,5 +1,5 @@
-import { fireEvent, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
 import type { NetworkId } from "../core/entities";
 import {
   asConnectorId,
@@ -194,9 +194,9 @@ describe("App integration UI - settings", () => {
     });
     expect(resetButton).toBeEnabled();
 
-    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
     fireEvent.click(resetButton);
-    confirmSpy.mockRestore();
+    const confirmDialog = screen.getByRole("dialog", { name: "Reset sample network" });
+    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Confirm" }));
 
     switchScreenDrawerAware("networkScope");
     const networkScopePanel = getPanelByHeading("Network Scope");
@@ -224,9 +224,9 @@ describe("App integration UI - settings", () => {
       name: "Recreate validation issues sample"
     });
 
-    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
     fireEvent.click(validationSampleButton);
-    confirmSpy.mockRestore();
+    const confirmDialog = screen.getByRole("dialog", { name: "Replace built-in sample content" });
+    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Confirm" }));
 
     switchScreenDrawerAware("networkScope");
     const networkScopePanel = getPanelByHeading("Network Scope");
@@ -260,7 +260,7 @@ describe("App integration UI - settings", () => {
     expect(getPanelByHeading("Network summary")).toBeInTheDocument();
   });
 
-  it("resets sample network to baseline from settings", () => {
+  it("resets sample network to baseline from settings", async () => {
     const sampled = createSampleNetworkState();
     const withExtraConnector = appReducer(
       sampled,
@@ -284,14 +284,16 @@ describe("App integration UI - settings", () => {
     });
     expect(resetButton).toBeEnabled();
 
-    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
     fireEvent.click(resetButton);
-    confirmSpy.mockRestore();
+    const confirmDialog = screen.getByRole("dialog", { name: "Reset sample network" });
+    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Confirm" }));
 
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("connector");
     connectorsPanel = getPanelByHeading("Connectors");
-    expect(within(connectorsPanel).queryByText("Extra connector")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(within(connectorsPanel).queryByText("Extra connector")).not.toBeInTheDocument();
+    });
     expect(within(connectorsPanel).getByText("Power Source Connector")).toBeInTheDocument();
   }, 10_000);
 

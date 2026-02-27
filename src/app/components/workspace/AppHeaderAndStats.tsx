@@ -70,7 +70,7 @@ export function AppHeaderAndStats({
             </button>
           ) : null}
           {isPwaUpdateReady ? (
-            <button type="button" className="header-update-toggle" onClick={onApplyPwaUpdate}>
+            <button type="button" className="header-update-toggle is-ready-glow" onClick={onApplyPwaUpdate}>
               Update ready
             </button>
           ) : null}
