@@ -189,6 +189,19 @@ tests/e2e/                # Playwright end-to-end smoke
 logics/                   # Product requests, backlog, tasks, architecture, skills
 ```
 
+## Logics Skills Usage Profile
+
+This repository ships a broad Logics skills kit under `logics/skills/`, but day-to-day usage is intentionally focused.
+
+- Core (actively used in this project):
+  - `logics-doc-linter` (mandatory in local/CI validation)
+  - `logics-flow-manager` (request/backlog/task lifecycle management)
+- Secondary (used on demand):
+  - `logics-bootstrapper` (initial structure checks/bootstrapping)
+  - MCP skill references (`logics-mcp-*`) when external connector setup is required
+- Optional toolbox:
+  - all other skills remain available, but are not part of the default delivery workflow for this repo
+
 ## Persistence Versioning
 
 The app uses explicit versioned payload contracts for both local storage and network export files.
