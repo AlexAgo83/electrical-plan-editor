@@ -114,6 +114,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   onSelectNode: AnalysisSliceParams["onSelectNode"];
   onSelectSegment: AnalysisSliceParams["onSelectSegment"];
   onSelectWire: AnalysisSliceParams["onSelectWire"];
+  onGoToWireFromAnalysis: AnalysisSliceParams["onGoToWireFromAnalysis"];
   includeModelingContent: boolean;
   includeAnalysisContent: boolean;
   openCatalogSubScreen: () => void;
@@ -149,6 +150,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   onSelectNode,
   onSelectSegment,
   onSelectWire,
+  onGoToWireFromAnalysis,
   includeModelingContent,
   includeAnalysisContent,
   openCatalogSubScreen,
@@ -489,6 +491,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setWireSort: listModel.setWireSort,
     selectedWireId: selection.selectedWireId,
     onSelectWire,
+    onGoToWireFromAnalysis,
     onOpenWireOnboardingHelp: onboardingHelp?.openWireStep,
     selectedWire: selection.selectedWire,
     describeWireEndpoint: wireDescriptions.describeWireEndpoint,

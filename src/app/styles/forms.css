@@ -156,6 +156,12 @@
   color: #24445c;
 }
 
+.cavity-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
 .cavity button {
   justify-self: start;
   border: 1px solid #7a99b3;

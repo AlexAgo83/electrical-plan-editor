@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
 import { getTableAriaSort } from "../../lib/accessibility";
-import { formatOccupantRefForDisplay } from "../../lib/app-utils-networking";
+import { formatOccupantRefForDisplay, parseWireOccupantRef } from "../../lib/app-utils-networking";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
@@ -34,6 +34,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     setSpliceOccupantRefInput,
     handleReservePort,
     handleReleasePort,
+    onGoToWireFromAnalysis,
     showEntityTables = true,
     sortedSpliceSynthesisRows,
     spliceSynthesisSort: _spliceSynthesisSort,
@@ -389,18 +390,41 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
       ) : null}
 
       <div className="cavity-grid" aria-label="Splice port occupancy grid">
-        {splicePortStatuses.map((slot) => (
-          <article key={slot.portIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
-            <h3>P{slot.portIndex}</h3>
-            <p>{slot.isOccupied ? formatOccupantRef(slot.occupantRef) : "Free"}</p>
-            {slot.isOccupied ? (
-              <button type="button" className="button-with-icon" onClick={() => handleReleasePort(slot.portIndex)}>
-                <span className="action-button-icon is-cancel" aria-hidden="true" />
-                Release
-              </button>
-            ) : null}
-          </article>
-        ))}
+        {splicePortStatuses.map((slot) => {
+          const parsedOccupantRef = slot.occupantRef === null ? null : parseWireOccupantRef(slot.occupantRef);
+          const canGoToWire =
+            parsedOccupantRef !== null &&
+            wireById.has(parsedOccupantRef.wireId);
+
+          return (
+            <article key={slot.portIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
+              <h3>P{slot.portIndex}</h3>
+              <p>{slot.isOccupied ? formatOccupantRef(slot.occupantRef) : "Free"}</p>
+              {slot.isOccupied ? (
+                <div className="cavity-actions">
+                  <button
+                    type="button"
+                    className="validation-row-go-to-button button-with-icon"
+                    disabled={!canGoToWire}
+                    onClick={() => {
+                      if (!canGoToWire || parsedOccupantRef === null) {
+                        return;
+                      }
+                      onGoToWireFromAnalysis(parsedOccupantRef.wireId);
+                    }}
+                  >
+                    <span className="action-button-icon is-open" aria-hidden="true" />
+                    Go to
+                  </button>
+                  <button type="button" className="button-with-icon" onClick={() => handleReleasePort(slot.portIndex)}>
+                    <span className="action-button-icon is-cancel" aria-hidden="true" />
+                    Release
+                  </button>
+                </div>
+              ) : null}
+            </article>
+          );
+        })}
       </div>
     </>
   ) : sortedSpliceSynthesisRowsByColumns.length === 0 ? (

@@ -660,6 +660,7 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
     setWireSort: params.setWireSort,
     selectedWireId: params.selectedWireId,
     onSelectWire: params.onSelectWire,
+    onGoToWireFromAnalysis: params.onGoToWireFromAnalysis,
     onOpenWireOnboardingHelp: params.onOpenWireOnboardingHelp,
     selectedWire: params.selectedWire,
     describeWireEndpoint: params.describeWireEndpoint,

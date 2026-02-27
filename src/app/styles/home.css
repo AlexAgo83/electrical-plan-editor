@@ -3,18 +3,35 @@
   gap: 1rem;
 }
 
+.home-left-column {
+  min-width: 0;
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
 .home-panel {
   min-width: 0;
 }
 
 .home-quick-start-panel,
 .home-workspace-resume-panel {
+  align-self: start;
+}
+
+.home-whats-new-panel {
   align-self: stretch;
 }
 
 .home-quick-start-panel {
   display: flex;
   flex-direction: column;
+}
+
+.home-whats-new-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .home-panel-header {
@@ -30,7 +47,8 @@
 }
 
 .home-panel .settings-panel-intro.home-start-intro,
-.home-panel .settings-panel-intro.home-resume-intro {
+.home-panel .settings-panel-intro.home-resume-intro,
+.home-panel .settings-panel-intro.home-whats-new-intro {
   margin: 0 0 1rem;
 }
 
@@ -155,6 +173,87 @@
   grid-column: 1 / -1;
 }
 
+.home-whats-new-scroll {
+  margin-top: 0.05rem;
+  display: grid;
+  gap: 0.85rem;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 0.25rem;
+}
+
+.home-changelog-entry {
+  border: 1px solid rgba(120, 145, 166, 0.28);
+  border-radius: 0.65rem;
+  background: rgba(120, 145, 166, 0.08);
+  padding: 0.7rem 0.8rem;
+}
+
+.home-changelog-version-heading {
+  margin: 0 0 0.5rem;
+  font-size: 0.92rem;
+}
+
+.home-changelog-markdown > :first-child {
+  margin-top: 0;
+}
+
+.home-changelog-markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.home-changelog-markdown h1,
+.home-changelog-markdown h2,
+.home-changelog-markdown h3,
+.home-changelog-markdown h4,
+.home-changelog-markdown h5,
+.home-changelog-markdown h6 {
+  margin: 0.65rem 0 0.35rem;
+  font-size: 0.92rem;
+  line-height: 1.25;
+}
+
+.home-changelog-markdown p,
+.home-changelog-markdown li,
+.home-changelog-markdown blockquote {
+  margin: 0.35rem 0;
+  line-height: 1.35;
+}
+
+.home-changelog-markdown ul,
+.home-changelog-markdown ol {
+  margin: 0.35rem 0 0.5rem 1.15rem;
+  padding: 0;
+}
+
+.home-changelog-markdown code {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.8rem;
+}
+
+.home-changelog-markdown pre {
+  margin: 0.45rem 0;
+  padding: 0.5rem 0.55rem;
+  border-radius: 0.45rem;
+  overflow-x: auto;
+  background: rgba(21, 48, 72, 0.08);
+}
+
+.home-changelog-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.45rem 0;
+  font-size: 0.84rem;
+}
+
+.home-changelog-markdown th,
+.home-changelog-markdown td {
+  border: 1px solid rgba(120, 145, 166, 0.3);
+  padding: 0.35rem 0.45rem;
+  text-align: left;
+  vertical-align: top;
+}
+
 .home-extension-grid {
   display: grid;
   gap: 0.8rem;
@@ -176,6 +275,12 @@
   .home-workspace-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
+  }
+
+  .home-whats-new-panel {
+    grid-column: 2;
+    grid-row: 1;
+    max-height: calc(100vh - 11.5rem);
   }
 }
 

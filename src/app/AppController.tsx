@@ -2247,6 +2247,16 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
             id: wireId
           })
         );
+      },
+      onGoToWireFromAnalysis: (wireId) => {
+        markDetailPanelsSelectionSourceAsTable();
+        setActiveSubScreen("wire");
+        dispatchAction(
+          appActions.select({
+            kind: "wire",
+            id: wireId
+          })
+        );
       }
     });
   const catalogModelingLeftColumnContent = (
