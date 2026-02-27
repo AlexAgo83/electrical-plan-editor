@@ -147,6 +147,7 @@ Then open `http://127.0.0.1:5284` (unless overridden).
 - `npm run coverage:ui:report`: emit `src/app/**` coverage report (informational, non-blocking)
 - `npm run bundle:metrics:report`: report main JS chunk + total JS gzip with non-blocking warning budgets
 - `npm run build:bundle:report`: run production build then bundle metrics report
+- `npm run ci:local`: run the local CI-equivalent blocking pipeline (logics lint + lint + typecheck + segmentation check + quality gates + test:ci + test:e2e + build + pwa quality)
 - `npm run test:e2e`: run Playwright E2E smoke tests
 - `npm run quality:ui-modularization`: enforce UI modularization line-budget gate
 - `npm run quality:store-modularization`: enforce store modularization line-budget gate
@@ -220,6 +221,12 @@ Migration authoring workflow (future schema evolution):
 ## Quality and CI
 
 Primary validation commands:
+
+```bash
+npm run ci:local
+```
+
+Equivalent expanded command list:
 
 ```bash
 python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
