@@ -7,12 +7,12 @@ describe("App integration UI - theme mode", () => {
     localStorage.clear();
   });
 
-  it("toggles between dark and normal mode from settings panel", () => {
+  it("starts in warm brown mode and toggles theme mode from settings panel", () => {
     renderAppWithState(createUiIntegrationState());
 
     const appShell = document.querySelector("main.app-shell");
     expect(appShell).not.toBeNull();
-    expect(appShell).toHaveClass("theme-dark");
+    expect(appShell).toHaveClass("theme-warm-brown");
 
     switchScreen("settings");
     const settingsPanel = within(document.body).getByRole("heading", { name: "Appearance preferences" }).closest(".panel");

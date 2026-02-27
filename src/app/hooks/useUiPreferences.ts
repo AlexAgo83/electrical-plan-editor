@@ -82,7 +82,7 @@ function normalizeThemeMode(value: unknown): ThemeMode {
     case "circleDark":
       return "circleMobilityDark";
     default:
-      return "normal";
+      return "warmBrown";
   }
 }
 
