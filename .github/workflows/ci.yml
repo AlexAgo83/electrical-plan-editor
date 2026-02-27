@@ -52,8 +52,11 @@ jobs:
       - name: Store modularization quality gate
         run: npm run quality:store-modularization
 
-      - name: Unit and integration tests
-        run: npm run test:ci
+      - name: Fast lane tests (coverage)
+        run: npm run test:ci:fast -- --coverage
+
+      - name: UI lane tests
+        run: npm run test:ci:ui
 
       - name: E2E smoke
         run: npm run test:e2e
@@ -71,11 +74,11 @@ jobs:
         run: npm run quality:pwa
 
       - name: UI coverage report (informational, non-blocking)
-        if: ${{ always() }}
+        if: ${{ success() }}
         run: npm run coverage:ui:report
         continue-on-error: true
 
       - name: UI slow test top-N (informational, non-blocking)
-        if: ${{ always() }}
+        if: ${{ success() }}
         run: npm run test:ci:ui:slow-top
         continue-on-error: true

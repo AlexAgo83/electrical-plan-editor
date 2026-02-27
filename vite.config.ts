@@ -5,6 +5,7 @@ import { resolveRuntimeEnvironment } from "./src/config/environment";
 
 export default defineConfig(({ mode }) => {
   const env = resolveRuntimeEnvironment(loadEnv(mode, process.cwd(), ""));
+  const isCi = process.env.CI === "true";
   for (const warning of env.warnings) {
     console.warn(`[env] ${warning}`);
   }
@@ -98,6 +99,9 @@ export default defineConfig(({ mode }) => {
       setupFiles: ["src/tests/setup.ts"],
       include: ["src/tests/**/*.spec.ts", "src/tests/**/*.spec.tsx"],
       exclude: ["tests/e2e/**"],
+      pool: isCi ? "forks" : undefined,
+      minWorkers: isCi ? 1 : undefined,
+      maxWorkers: isCi ? "50%" : undefined,
       coverage: {
         provider: "v8",
         reporter: ["text", "html"],

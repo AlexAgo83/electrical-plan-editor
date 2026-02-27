@@ -26,7 +26,7 @@
     "test:ci:slow-top": "node scripts/quality/report-slowest-tests.mjs --top=10",
     "test:ci:ui:slow-top": "node scripts/quality/run-vitest-segmented.mjs ui-slow-top --top=10",
     "test:e2e": "env -u NO_COLOR playwright test --reporter=line",
-    "ci:local": "python3 logics/skills/logics-doc-linter/scripts/logics_lint.py && npm run -s lint && npm run -s typecheck && npm run -s test:ci:segmentation:check && npm run -s quality:ui-modularization && npm run -s quality:store-modularization && npm run -s test:ci && npm run -s test:e2e && npm run -s build && npm run -s quality:pwa"
+    "ci:local": "python3 logics/skills/logics-doc-linter/scripts/logics_lint.py && npm run -s lint && npm run -s typecheck && npm run -s test:ci:segmentation:check && npm run -s quality:ui-modularization && npm run -s quality:store-modularization && npm run -s test:ci:fast -- --coverage && npm run -s test:ci:ui && npm run -s test:e2e && npm run -s build && npm run -s quality:pwa"
   },
   "dependencies": {
     "react": "^19.0.0",
