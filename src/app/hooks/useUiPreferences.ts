@@ -404,7 +404,7 @@ export function useUiPreferences({
           ? preferences.canvasDefaultAutoSegmentLabelRotation
           : false;
       const rawResetZoomPercent =
-        typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "100";
+        typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "60";
       const parsedResetZoomPercent = Number(rawResetZoomPercent);
       const resetScale = Number.isFinite(parsedResetZoomPercent)
         ? clamp(parsedResetZoomPercent / 100, networkMinScale, networkMaxScale)

@@ -711,7 +711,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultLabelRotationDegrees(0);
     setCanvasDefaultAutoSegmentLabelRotation(false);
     setCanvasPngExportIncludeBackground(true);
-    setCanvasResetZoomPercentInput("100");
+    setCanvasResetZoomPercentInput("60");
     setShowNetworkGrid(true);
     setSnapNodesToGrid(true);
     setLockEntityMovement(false);
