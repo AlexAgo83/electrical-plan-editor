@@ -1,7 +1,7 @@
 ## req_073_pwa_update_ready_button_glow_when_available - Add glowy emphasis when `Update ready` is available
 > From version: 0.9.13
-> Understanding: 99% (the ask is UI-only: when the PWA update action is available, the `Update ready` button should visually glow)
-> Confidence: 97% (localized to header action rendering and theme-aware button styling)
+> Understanding: 100% (scope and delivered behavior are confirmed: `Update ready` now carries a dedicated glow emphasis state when update is available)
+> Confidence: 99% (implemented styling/state contract is covered by targeted PWA header-action tests)
 > Complexity: Low
 > Theme: PWA update visibility and action discoverability
 > Reminder: Update Understanding/Confidence and references when editing this doc.
@@ -90,6 +90,13 @@ Update availability is driven by PWA events handled in shell hooks:
 - Redesign of the whole header action system.
 - New PWA update logic or service worker lifecycle changes.
 - Changing button label/content beyond current `Update ready` text.
+
+# Delivery status
+- Status: delivered.
+- Task: `logics/tasks/task_070_super_orchestration_closure_validation_for_req_070_to_req_073.md`.
+
+# Backlog
+- `logics/backlog/item_397_req_073_pwa_update_ready_glow_closure_validation_and_traceability.md` (done)
 
 # References
 - `src/app/components/workspace/AppHeaderAndStats.tsx`
