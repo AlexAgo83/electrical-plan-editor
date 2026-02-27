@@ -22,6 +22,7 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.networks.spec.tsx",
   "src/tests/app.ui.onboarding.spec.tsx",
   "src/tests/app.ui.settings-pricing.spec.tsx",
+  "src/tests/app.ui.settings-canvas-render.spec.tsx",
   "src/tests/app.ui.settings-samples.spec.tsx",
   "src/tests/app.ui.settings-wire-defaults.spec.tsx",
   "src/tests/app.ui.settings.spec.tsx",
