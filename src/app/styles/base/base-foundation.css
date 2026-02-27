@@ -181,23 +181,25 @@ button {
     0 0 0.18rem color-mix(in srgb, currentColor 22%, transparent),
     0 0 0.62rem color-mix(in srgb, currentColor 30%, transparent),
     0 0 1.08rem color-mix(in srgb, currentColor 34%, transparent);
-  animation: header-update-glow-pulse 1.8s ease-in-out infinite;
+  animation: header-update-glow-breathe 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-@keyframes header-update-glow-pulse {
+@keyframes header-update-glow-breathe {
   0%,
   100% {
     box-shadow:
       0 0 0.18rem color-mix(in srgb, currentColor 18%, transparent),
       0 0 0.56rem color-mix(in srgb, currentColor 26%, transparent),
       0 0 0.95rem color-mix(in srgb, currentColor 30%, transparent);
+    filter: saturate(98%);
   }
 
-  50% {
+  48% {
     box-shadow:
-      0 0 0.24rem color-mix(in srgb, currentColor 28%, transparent),
-      0 0 0.74rem color-mix(in srgb, currentColor 38%, transparent),
-      0 0 1.2rem color-mix(in srgb, currentColor 44%, transparent);
+      0 0 0.28rem color-mix(in srgb, currentColor 30%, transparent),
+      0 0 0.8rem color-mix(in srgb, currentColor 40%, transparent),
+      0 0 1.26rem color-mix(in srgb, currentColor 46%, transparent);
+    filter: saturate(110%);
   }
 }
 

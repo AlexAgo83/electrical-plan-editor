@@ -16,6 +16,7 @@ export const STORAGE_BACKUP_KEY = `${STORAGE_KEY}.backup`;
 
 type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 type IsoNowProvider = () => string;
+const createdAtIsoCache = new WeakMap<object, string>();
 
 function getDefaultStorage(): StorageLike | null {
   if (typeof window === "undefined") {
@@ -35,6 +36,14 @@ function getNowIso(): string {
 
 function readRawFromStorage(storage: Pick<Storage, "getItem">): string | null {
   return storage.getItem(STORAGE_KEY);
+}
+
+function readRawFromStorageSafe(storage: Pick<Storage, "getItem">): string | null {
+  try {
+    return readRawFromStorage(storage);
+  } catch {
+    return null;
+  }
 }
 
 function readJson(raw: string): unknown {
@@ -93,6 +102,7 @@ function bootstrapSampleState(
 
   try {
     writeSnapshot(storage, snapshot);
+    createdAtIsoCache.set(storage as object, snapshot.createdAtIso);
   } catch {
     // Ignore write failures and keep deterministic bootstrap state.
   }
@@ -106,8 +116,10 @@ export function loadState(storage: StorageLike | null = getDefaultStorage(), now
     return createSampleNetworkState();
   }
 
+  let rawFromInitialRead: string | null = null;
   try {
-    const raw = readRawFromStorage(storage);
+    const raw = readRawFromStorageSafe(storage);
+    rawFromInitialRead = raw;
     if (raw === null) {
       return bootstrapSampleState(storage, nowIso);
     }
@@ -123,9 +135,10 @@ export function loadState(storage: StorageLike | null = getDefaultStorage(), now
       writeSnapshot(storage, migration.snapshot);
     }
 
+    createdAtIsoCache.set(storage as object, migration.snapshot.createdAtIso);
     return migration.snapshot.state;
   } catch {
-    const raw = readRawFromStorage(storage);
+    const raw = rawFromInitialRead ?? readRawFromStorageSafe(storage);
     if (raw !== null) {
       safeWriteBackup(storage, raw, "load-json-parse-or-runtime-error", nowIso);
     }
@@ -133,18 +146,42 @@ export function loadState(storage: StorageLike | null = getDefaultStorage(), now
   }
 }
 
+function resolveCreatedAtIsoFromRaw(
+  raw: string | null,
+  fallbackIso: string
+): string {
+  if (raw === null) {
+    return fallbackIso;
+  }
+
+  try {
+    const parsed = readJson(raw);
+    if (typeof parsed === "object" && parsed !== null && "createdAtIso" in parsed) {
+      const createdAtIso = (parsed as { createdAtIso?: unknown }).createdAtIso;
+      if (typeof createdAtIso === "string" && createdAtIso.length > 0) {
+        return createdAtIso;
+      }
+    }
+  } catch {
+    // Ignore malformed persisted payloads and fall back to updatedAtIso.
+  }
+
+  return fallbackIso;
+}
+
 function resolveCreatedAtIso(
   storage: Pick<Storage, "getItem">,
   updatedAtIso: string
 ): string {
-  try {
-    const raw = readRawFromStorage(storage);
-    if (raw === null) {
-      return updatedAtIso;
-    }
+  const cached = createdAtIsoCache.get(storage as object);
+  if (cached !== undefined) {
+    return cached;
+  }
 
-    const migration = migratePersistedPayloadDetailed(readJson(raw), updatedAtIso);
-    return migration.ok ? migration.snapshot.createdAtIso : updatedAtIso;
+  try {
+    const resolved = resolveCreatedAtIsoFromRaw(readRawFromStorageSafe(storage), updatedAtIso);
+    createdAtIsoCache.set(storage as object, resolved);
+    return resolved;
   } catch {
     return updatedAtIso;
   }
@@ -172,6 +209,7 @@ export function saveState(
 
   try {
     writeSnapshot(storage, snapshot);
+    createdAtIsoCache.set(storage as object, snapshot.createdAtIso);
   } catch {
     // Ignore storage write failures to keep reducer flow deterministic.
   }

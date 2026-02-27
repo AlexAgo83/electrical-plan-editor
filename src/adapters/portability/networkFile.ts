@@ -280,6 +280,60 @@ function dedupeWithSuffix(base: string, taken: Set<string>, suffix: string): str
   return candidate;
 }
 
+function parseIsoDate(value: string): number | null {
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? null : timestamp;
+}
+
+function normalizeImportedNetworkTimestamps(
+  network: Network,
+  importBaseIso: string,
+  warnings: string[]
+): Pick<Network, "createdAt" | "updatedAt"> {
+  const rawCreatedAt = network.createdAt.trim();
+  const rawUpdatedAt = network.updatedAt.trim();
+  const createdAtMs = parseIsoDate(rawCreatedAt);
+  const updatedAtMs = parseIsoDate(rawUpdatedAt);
+
+  let normalizedCreatedAt = rawCreatedAt;
+  let normalizedUpdatedAt = rawUpdatedAt;
+  const appliedFixes: string[] = [];
+
+  if (createdAtMs === null && updatedAtMs !== null) {
+    normalizedCreatedAt = rawUpdatedAt;
+    appliedFixes.push("createdAt<-updatedAt");
+  } else if (createdAtMs !== null && updatedAtMs === null) {
+    normalizedUpdatedAt = rawCreatedAt;
+    appliedFixes.push("updatedAt<-createdAt");
+  } else if (createdAtMs === null && updatedAtMs === null) {
+    normalizedCreatedAt = importBaseIso;
+    normalizedUpdatedAt = importBaseIso;
+    appliedFixes.push("createdAt/updatedAt<-importBaseIso");
+  }
+
+  const normalizedCreatedAtMs = parseIsoDate(normalizedCreatedAt);
+  const normalizedUpdatedAtMs = parseIsoDate(normalizedUpdatedAt);
+  if (
+    normalizedCreatedAtMs !== null &&
+    normalizedUpdatedAtMs !== null &&
+    normalizedUpdatedAtMs < normalizedCreatedAtMs
+  ) {
+    normalizedUpdatedAt = normalizedCreatedAt;
+    appliedFixes.push("updatedAt>=createdAt");
+  }
+
+  if (appliedFixes.length > 0) {
+    warnings.push(
+      `Network '${network.technicalId}' timestamps were normalized (${appliedFixes.join(", ")}).`
+    );
+  }
+
+  return {
+    createdAt: normalizedCreatedAt,
+    updatedAt: normalizedUpdatedAt
+  };
+}
+
 function resolveNetworkIdsForScope(
   state: AppState,
   scope: NetworkExportScope,
@@ -428,6 +482,7 @@ export function resolveImportConflicts(
   payload: NetworkFilePayloadV1,
   existingState: AppState
 ): NetworkImportResult {
+  const importBaseIso = new Date().toISOString();
   const existingTechnicalIds = new Set(existingState.networks.allIds.map((id) => existingState.networks.byId[id]?.technicalId ?? ""));
   const existingIds = new Set(existingState.networks.allIds.map((id) => id as string));
 
@@ -470,11 +525,14 @@ export function resolveImportConflicts(
     existingTechnicalIds.add(importedTechnicalId);
 
     const networkId = importedId as NetworkId;
+    const normalizedTimestamps = normalizeImportedNetworkTimestamps(sourceNetwork, importBaseIso, summary.warnings);
     networks.push({
       ...sourceNetwork,
       id: networkId,
       name: normalizedName,
-      technicalId: importedTechnicalId
+      technicalId: importedTechnicalId,
+      createdAt: normalizedTimestamps.createdAt,
+      updatedAt: normalizedTimestamps.updatedAt
     });
     networkStates[networkId] = normalizeScopedState(bundle.state);
     summary.importedNetworkIds.push(networkId);

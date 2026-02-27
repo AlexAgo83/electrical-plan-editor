@@ -5,7 +5,10 @@ function formatCsvCell(value: CsvCellValue): string {
     return "";
   }
 
-  const text = String(value);
+  const text =
+    typeof value === "string" && /^[=+\-@]/.test(value)
+      ? `'${value}`
+      : String(value);
   if (!/[",\n\r]/.test(text)) {
     return text;
   }
@@ -18,13 +21,17 @@ function normalizeFileName(value: string): string {
   return normalized.length > 0 ? normalized : "export";
 }
 
+export function buildCsvContent(headers: string[], rows: CsvCellValue[][]): string {
+  const lines = [headers, ...rows].map((row) => row.map((cell) => formatCsvCell(cell)).join(","));
+  return lines.join("\r\n");
+}
+
 export function downloadCsvFile(filenameBase: string, headers: string[], rows: CsvCellValue[][]): void {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return;
   }
 
-  const lines = [headers, ...rows].map((row) => row.map((cell) => formatCsvCell(cell)).join(","));
-  const csvContent = lines.join("\r\n");
+  const csvContent = buildCsvContent(headers, rows);
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
   const blobUrl = URL.createObjectURL(blob);
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");

@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
+import { HOME_CHANGELOG_ENTRIES } from "../app/lib/changelogFeed";
 import {
   createUiIntegrationState,
   createValidationIssueState,
@@ -55,6 +56,53 @@ describe("home workspace screen", () => {
     expect(changelogVersions.length).toBeGreaterThan(1);
     const sortedDescending = [...changelogVersions].sort(compareVersionsDescending);
     expect(changelogVersions).toEqual(sortedDescending);
+  });
+
+  it("progressively loads changelog entries when the feed-end sentinel intersects", async () => {
+    const observedTargets: Element[] = [];
+    const observerCallbacks: Array<
+      (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => void
+    > = [];
+    const originalIntersectionObserver = globalThis.IntersectionObserver;
+
+    class MockIntersectionObserver implements IntersectionObserver {
+      readonly root: Element | null = null;
+      readonly rootMargin = "0px";
+      readonly thresholds: ReadonlyArray<number> = [0];
+      constructor(callback: IntersectionObserverCallback) {
+        observerCallbacks.push(callback);
+      }
+      observe(target: Element): void {
+        observedTargets.push(target);
+      }
+      unobserve(): void {}
+      disconnect(): void {}
+      takeRecords(): IntersectionObserverEntry[] {
+        return [];
+      }
+    }
+
+    globalThis.IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
+    try {
+      renderAppWithState(createUiIntegrationState());
+      switchScreenDrawerAware("home");
+
+      const whatsNewPanel = getPanelByHeading("What's new");
+      const initialVisible = whatsNewPanel.querySelectorAll("[data-changelog-version]").length;
+      expect(initialVisible).toBe(Math.min(4, HOME_CHANGELOG_ENTRIES.length));
+      expect(observerCallbacks.length).toBeGreaterThan(0);
+      expect(observedTargets.length).toBeGreaterThan(0);
+
+      const sentinelTarget = observedTargets[0]!;
+      observerCallbacks[0]!([{ isIntersecting: true, target: sentinelTarget } as IntersectionObserverEntry], {} as IntersectionObserver);
+
+      await waitFor(() => {
+        const nextVisible = whatsNewPanel.querySelectorAll("[data-changelog-version]").length;
+        expect(nextVisible).toBe(Math.min(HOME_CHANGELOG_ENTRIES.length, initialVisible + 4));
+      });
+    } finally {
+      globalThis.IntersectionObserver = originalIntersectionObserver;
+    }
   });
 
   it("shows active workspace resume summary details", () => {

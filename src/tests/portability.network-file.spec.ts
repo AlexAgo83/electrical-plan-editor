@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogItemId, ConnectorId, NetworkId, SpliceId, WireId } from "../core/entities";
+import { APP_RELEASE_VERSION } from "../core/schema";
 import {
   buildNetworkFilePayload,
   NETWORK_FILE_PAYLOAD_KIND,
@@ -47,7 +48,7 @@ describe("network file portability", () => {
 
     expect(payloadA.payloadKind).toBe(NETWORK_FILE_PAYLOAD_KIND);
     expect(payloadA.schemaVersion).toBe(2);
-    expect(payloadA.source.appVersion).toBe("0.7.4");
+    expect(payloadA.source.appVersion).toBe(APP_RELEASE_VERSION);
     expect(serializeNetworkFilePayload(payloadA)).toBe(serializeNetworkFilePayload(payloadB));
   });
 
@@ -365,6 +366,77 @@ describe("network file portability", () => {
     expect(resolved.networks[0]?.id).toBe(asNetworkId("network-main-import"));
     expect(resolved.networks[0]?.technicalId).toBe("NET-MAIN-SAMPLE-IMP");
     expect(resolved.summary.warnings.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("normalizes malformed imported network timestamps with deterministic fallbacks", () => {
+    const existing = createInitialState();
+    const payload = {
+      schemaVersion: 2 as const,
+      exportedAt: "2026-02-21T10:20:00.000Z",
+      source: {
+        app: "electrical-plan-editor" as const,
+        appVersion: APP_RELEASE_VERSION,
+        appSchemaVersion: 2
+      },
+      networks: [
+        {
+          network: {
+            id: asNetworkId("imp-1"),
+            name: "Imported 1",
+            technicalId: "IMP-1",
+            createdAt: "not-a-date",
+            updatedAt: "2026-02-20T10:00:00.000Z"
+          },
+          state: createEmptyNetworkScopedState()
+        },
+        {
+          network: {
+            id: asNetworkId("imp-2"),
+            name: "Imported 2",
+            technicalId: "IMP-2",
+            createdAt: "2026-02-20T10:01:00.000Z",
+            updatedAt: "invalid-date"
+          },
+          state: createEmptyNetworkScopedState()
+        },
+        {
+          network: {
+            id: asNetworkId("imp-3"),
+            name: "Imported 3",
+            technicalId: "IMP-3",
+            createdAt: "nope",
+            updatedAt: "nope-too"
+          },
+          state: createEmptyNetworkScopedState()
+        },
+        {
+          network: {
+            id: asNetworkId("imp-4"),
+            name: "Imported 4",
+            technicalId: "IMP-4",
+            createdAt: "2026-02-20T10:20:00.000Z",
+            updatedAt: "2026-02-20T10:10:00.000Z"
+          },
+          state: createEmptyNetworkScopedState()
+        }
+      ]
+    };
+
+    const resolved = resolveImportConflicts(payload, existing);
+    expect(resolved.networks).toHaveLength(4);
+
+    const importedOne = resolved.networks.find((network) => network.technicalId === "IMP-1");
+    const importedTwo = resolved.networks.find((network) => network.technicalId === "IMP-2");
+    const importedThree = resolved.networks.find((network) => network.technicalId === "IMP-3");
+    const importedFour = resolved.networks.find((network) => network.technicalId === "IMP-4");
+    expect(importedOne?.createdAt).toBe("2026-02-20T10:00:00.000Z");
+    expect(importedOne?.updatedAt).toBe("2026-02-20T10:00:00.000Z");
+    expect(importedTwo?.createdAt).toBe("2026-02-20T10:01:00.000Z");
+    expect(importedTwo?.updatedAt).toBe("2026-02-20T10:01:00.000Z");
+    expect(importedThree?.createdAt).toBe(importedThree?.updatedAt);
+    expect(Date.parse(importedThree?.createdAt ?? "")).not.toBeNaN();
+    expect(importedFour?.updatedAt).toBe(importedFour?.createdAt);
+    expect(resolved.summary.warnings.length).toBeGreaterThanOrEqual(4);
   });
 
   it("rejects malformed payloads", () => {

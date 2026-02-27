@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CatalogItemId, ConnectorId, NodeId } from "../core/entities";
-import { APP_SCHEMA_VERSION } from "../core/schema";
+import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../core/schema";
 import {
   PERSISTED_STATE_PAYLOAD_KIND,
   PERSISTED_STATE_SCHEMA_VERSION,
@@ -99,7 +99,7 @@ describe("migratePersistedPayload", () => {
     const currentSnapshot: PersistedStateSnapshotV1 = {
       payloadKind: PERSISTED_STATE_PAYLOAD_KIND,
       schemaVersion: PERSISTED_STATE_SCHEMA_VERSION,
-      appVersion: "0.7.4",
+      appVersion: APP_RELEASE_VERSION,
       appSchemaVersion: APP_SCHEMA_VERSION,
       createdAtIso: "2026-02-10T08:00:00.000Z",
       updatedAtIso: "2026-02-10T08:30:00.000Z",
@@ -155,7 +155,7 @@ describe("localStorage persistence adapter", () => {
     const savedSnapshot = JSON.parse(savedRaw ?? "{}") as PersistedStateSnapshotV1;
     expect(savedSnapshot.schemaVersion).toBe(PERSISTED_STATE_SCHEMA_VERSION);
     expect(savedSnapshot.payloadKind).toBe(PERSISTED_STATE_PAYLOAD_KIND);
-    expect(savedSnapshot.appVersion).toBe("0.7.4");
+    expect(savedSnapshot.appVersion).toBe(APP_RELEASE_VERSION);
     expect(savedSnapshot.appSchemaVersion).toBe(APP_SCHEMA_VERSION);
     expect(savedSnapshot.createdAtIso).toBe(nowIso);
     expect(savedSnapshot.updatedAtIso).toBe(nowIso);
@@ -815,6 +815,21 @@ describe("localStorage persistence adapter", () => {
     expect(storage.read(STORAGE_KEY)).not.toBeNull();
   });
 
+  it("falls back safely when storage getItem throws at load time", () => {
+    const storage = {
+      getItem: vi.fn(() => {
+        throw new Error("read blocked");
+      }),
+      setItem: vi.fn(),
+      removeItem: vi.fn()
+    };
+
+    const loaded = loadState(storage, () => "2026-02-20T11:35:00.000Z");
+
+    expect(hasSampleNetworkSignature(loaded)).toBe(true);
+    expect(storage.setItem).toHaveBeenCalled();
+  });
+
   it("migrates legacy payload and rewrites storage using the current snapshot schema", () => {
     const legacyState = createSampleState();
     const nowIso = "2026-02-20T12:00:00.000Z";
@@ -931,6 +946,38 @@ describe("localStorage persistence adapter", () => {
     expect(savedSnapshot.createdAtIso).toBe("2026-02-10T07:00:00.000Z");
     expect(savedSnapshot.updatedAtIso).toBe("2026-02-20T13:00:00.000Z");
     expect(savedSnapshot.state).toEqual(secondState);
+  });
+
+  it("preserves createdAt across saves even when storage reads throw", () => {
+    const state = createSampleState();
+    const nextState = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: asConnectorId("C3"),
+        name: "Connector 3",
+        technicalId: "C-3",
+        cavityCount: 6
+      })
+    );
+    const storedValues = new Map<string, string>();
+    const throwingReadStorage = {
+      getItem: vi.fn(() => {
+        throw new Error("read blocked");
+      }),
+      setItem: vi.fn((key: string, value: string) => {
+        storedValues.set(key, value);
+      }),
+      removeItem: vi.fn()
+    };
+
+    saveState(state, throwingReadStorage, () => "2026-02-20T13:10:00.000Z");
+    saveState(nextState, throwingReadStorage, () => "2026-02-20T13:11:00.000Z");
+
+    const raw = storedValues.get(STORAGE_KEY);
+    expect(raw).toBeDefined();
+    const snapshot = JSON.parse(raw ?? "{}") as PersistedStateSnapshotV1;
+    expect(snapshot.createdAtIso).toBe("2026-02-20T13:10:00.000Z");
+    expect(snapshot.updatedAtIso).toBe("2026-02-20T13:11:00.000Z");
   });
 
   it("persists and restores node layout positions across save/load", () => {
