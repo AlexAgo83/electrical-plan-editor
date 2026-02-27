@@ -74,6 +74,7 @@ interface UseWorkspaceHandlersParams {
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
+  canvasDefaultAutoSegmentLabelRotation: boolean;
   showCableCallouts: boolean;
   networkCalloutTextSize: CanvasCalloutTextSize;
   setShowNetworkGrid: (value: boolean | ((current: boolean) => boolean)) => void;
@@ -88,6 +89,7 @@ interface UseWorkspaceHandlersParams {
   setNetworkLabelRotationDegrees: (
     value: CanvasLabelRotationDegrees | ((current: CanvasLabelRotationDegrees) => CanvasLabelRotationDegrees)
   ) => void;
+  setNetworkAutoSegmentLabelRotation: (value: boolean | ((current: boolean) => boolean)) => void;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
   defaultIdSortDirection: SortDirection;
@@ -120,6 +122,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   setCanvasDefaultCalloutTextSize: (value: CanvasCalloutTextSize) => void;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
+  setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
   setShowShortcutHints: (value: boolean) => void;
@@ -161,6 +164,7 @@ export function useWorkspaceHandlers({
   canvasDefaultLabelSizeMode,
   canvasDefaultCalloutTextSize,
   canvasDefaultLabelRotationDegrees,
+  canvasDefaultAutoSegmentLabelRotation,
   showCableCallouts,
   networkCalloutTextSize,
   setShowNetworkGrid,
@@ -173,6 +177,7 @@ export function useWorkspaceHandlers({
   setNetworkLabelSizeMode,
   setNetworkCalloutTextSize,
   setNetworkLabelRotationDegrees,
+  setNetworkAutoSegmentLabelRotation,
   defaultSortField,
   defaultSortDirection,
   defaultIdSortDirection,
@@ -205,6 +210,7 @@ export function useWorkspaceHandlers({
   setCanvasDefaultLabelSizeMode,
   setCanvasDefaultCalloutTextSize,
   setCanvasDefaultLabelRotationDegrees,
+  setCanvasDefaultAutoSegmentLabelRotation,
   setCanvasPngExportIncludeBackground,
   setCanvasResetZoomPercentInput,
   setShowShortcutHints,
@@ -630,6 +636,7 @@ export function useWorkspaceHandlers({
     setNetworkLabelSizeMode(canvasDefaultLabelSizeMode);
     setNetworkCalloutTextSize(canvasDefaultCalloutTextSize);
     setNetworkLabelRotationDegrees(canvasDefaultLabelRotationDegrees);
+    setNetworkAutoSegmentLabelRotation(canvasDefaultAutoSegmentLabelRotation);
     resetNetworkViewToConfiguredScale();
   }
 
@@ -664,6 +671,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultLabelSizeMode("normal");
     setCanvasDefaultCalloutTextSize("normal");
     setCanvasDefaultLabelRotationDegrees(-20);
+    setCanvasDefaultAutoSegmentLabelRotation(false);
     setCanvasPngExportIncludeBackground(true);
     setCanvasResetZoomPercentInput("100");
     setShowNetworkGrid(true);
@@ -676,6 +684,7 @@ export function useWorkspaceHandlers({
     setNetworkLabelSizeMode("normal");
     setNetworkCalloutTextSize("normal");
     setNetworkLabelRotationDegrees(-20);
+    setNetworkAutoSegmentLabelRotation(false);
     setNetworkScale(1);
     setNetworkOffset({ x: 0, y: 0 });
     setShowShortcutHints(false);

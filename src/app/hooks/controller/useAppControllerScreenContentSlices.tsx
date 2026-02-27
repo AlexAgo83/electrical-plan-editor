@@ -55,6 +55,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   | "labelSizeMode"
   | "calloutTextSize"
   | "labelRotationDegrees"
+  | "autoSegmentLabelRotation"
   | "toggleShowNetworkInfoPanels"
   | "toggleShowSegmentLengths"
   | "toggleShowCableCallouts"
@@ -77,6 +78,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   networkLabelSizeMode: NetworkSummaryPanelProps["labelSizeMode"];
   networkCalloutTextSize: NetworkSummaryPanelProps["calloutTextSize"];
   networkLabelRotationDegrees: NetworkSummaryPanelProps["labelRotationDegrees"];
+  networkAutoSegmentLabelRotation: NetworkSummaryPanelProps["autoSegmentLabelRotation"];
   routingGraph: {
     nodeIds: string[];
     segmentIds: string[];
@@ -208,6 +210,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     labelSizeMode: params.networkLabelSizeMode,
     calloutTextSize: params.networkCalloutTextSize,
     labelRotationDegrees: params.networkLabelRotationDegrees,
+    autoSegmentLabelRotation: params.networkAutoSegmentLabelRotation,
     toggleShowNetworkInfoPanels: () => params.setShowNetworkInfoPanels((current: boolean) => !current),
     toggleShowSegmentLengths: () => params.setShowSegmentLengths((current: boolean) => !current),
     toggleShowCableCallouts: () => params.setShowCableCallouts((current: boolean) => !current),
@@ -764,6 +767,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setCanvasDefaultCalloutTextSize: params.setCanvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees: params.canvasDefaultLabelRotationDegrees,
     setCanvasDefaultLabelRotationDegrees: params.setCanvasDefaultLabelRotationDegrees,
+    canvasDefaultAutoSegmentLabelRotation: params.canvasDefaultAutoSegmentLabelRotation,
+    setCanvasDefaultAutoSegmentLabelRotation: params.setCanvasDefaultAutoSegmentLabelRotation,
     canvasPngExportIncludeBackground: params.canvasPngExportIncludeBackground,
     setCanvasPngExportIncludeBackground: params.setCanvasPngExportIncludeBackground,
     canvasResetZoomPercentInput: params.canvasResetZoomPercentInput,

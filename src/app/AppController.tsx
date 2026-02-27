@@ -209,6 +209,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNetworkCalloutTextSize,
     networkLabelRotationDegrees,
     setNetworkLabelRotationDegrees,
+    networkAutoSegmentLabelRotation,
+    setNetworkAutoSegmentLabelRotation,
     canvasResetZoomPercentInput,
     setCanvasResetZoomPercentInput
   } = useAppControllerCanvasDisplayState();
@@ -297,6 +299,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees,
     setCanvasDefaultLabelRotationDegrees,
+    canvasDefaultAutoSegmentLabelRotation,
+    setCanvasDefaultAutoSegmentLabelRotation,
     canvasPngExportIncludeBackground,
     setCanvasPngExportIncludeBackground,
     showShortcutHints,
@@ -791,6 +795,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasDefaultLabelSizeMode,
     canvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees,
+    canvasDefaultAutoSegmentLabelRotation,
     canvasPngExportIncludeBackground,
     canvasResetZoomPercentInput,
     showShortcutHints,
@@ -826,6 +831,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultLabelSizeMode,
     setCanvasDefaultCalloutTextSize,
     setCanvasDefaultLabelRotationDegrees,
+    setCanvasDefaultAutoSegmentLabelRotation,
     setCanvasPngExportIncludeBackground,
     setShowNetworkGrid,
     setSnapNodesToGrid,
@@ -837,6 +843,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNetworkLabelSizeMode,
     setNetworkCalloutTextSize,
     setNetworkLabelRotationDegrees,
+    setNetworkAutoSegmentLabelRotation,
     setCanvasResetZoomPercentInput,
     setNetworkScale,
     setNetworkOffset,
@@ -863,6 +870,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   useEffect(() => {
     setNetworkLabelRotationDegrees(canvasDefaultLabelRotationDegrees);
   }, [canvasDefaultLabelRotationDegrees, setNetworkLabelRotationDegrees]);
+
+  useEffect(() => {
+    setNetworkAutoSegmentLabelRotation(canvasDefaultAutoSegmentLabelRotation);
+  }, [canvasDefaultAutoSegmentLabelRotation, setNetworkAutoSegmentLabelRotation]);
   const validationModel = useValidationModel({
     state,
     connectors,
@@ -1365,6 +1376,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       canvasDefaultLabelSizeMode,
       canvasDefaultCalloutTextSize,
       canvasDefaultLabelRotationDegrees,
+      canvasDefaultAutoSegmentLabelRotation,
       showCableCallouts,
       networkCalloutTextSize,
       setShowNetworkGrid,
@@ -1376,7 +1388,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setNetworkLabelStrokeMode,
       setNetworkLabelSizeMode,
       setNetworkCalloutTextSize,
-      setNetworkLabelRotationDegrees
+      setNetworkLabelRotationDegrees,
+      setNetworkAutoSegmentLabelRotation
     },
     sortDefaults: {
       defaultSortField,
@@ -1415,6 +1428,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setCanvasDefaultLabelSizeMode,
       setCanvasDefaultCalloutTextSize,
       setCanvasDefaultLabelRotationDegrees,
+      setCanvasDefaultAutoSegmentLabelRotation,
       setCanvasResetZoomPercentInput,
       setCanvasPngExportIncludeBackground,
       setShowShortcutHints,
@@ -2078,6 +2092,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         networkLabelSizeMode,
         networkCalloutTextSize,
         networkLabelRotationDegrees,
+        networkAutoSegmentLabelRotation,
         networkScalePercent,
         routingGraph,
         totalEdgeEntries,
@@ -2416,6 +2431,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setCanvasDefaultCalloutTextSize,
           canvasDefaultLabelRotationDegrees,
           setCanvasDefaultLabelRotationDegrees,
+          canvasDefaultAutoSegmentLabelRotation,
+          setCanvasDefaultAutoSegmentLabelRotation,
           canvasPngExportIncludeBackground,
           setCanvasPngExportIncludeBackground,
           showShortcutHints,
@@ -2448,6 +2465,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setNetworkCalloutTextSize,
           networkLabelRotationDegrees,
           setNetworkLabelRotationDegrees,
+          networkAutoSegmentLabelRotation,
+          setNetworkAutoSegmentLabelRotation,
           canvasResetZoomPercentInput,
           setCanvasResetZoomPercentInput
         },

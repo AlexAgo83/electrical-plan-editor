@@ -114,6 +114,7 @@ export interface NetworkSummaryPanelProps {
   labelSizeMode: CanvasLabelSizeMode;
   calloutTextSize: CanvasCalloutTextSize;
   labelRotationDegrees: CanvasLabelRotationDegrees;
+  autoSegmentLabelRotation: boolean;
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
   lockEntityMovement: boolean;
@@ -256,6 +257,21 @@ const CALLOUT_MAX_WIDTH = 320;
 
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
+}
+
+function normalizeReadableSegmentLabelAngle(angleDegrees: number): number {
+  let normalized = angleDegrees % 360;
+  if (normalized > 180) {
+    normalized -= 360;
+  } else if (normalized <= -180) {
+    normalized += 360;
+  }
+  if (normalized > 90) {
+    normalized -= 180;
+  } else if (normalized < -90) {
+    normalized += 180;
+  }
+  return normalized;
 }
 
 function normalizeVector(x: number, y: number): { x: number; y: number } {
@@ -546,6 +562,7 @@ export function NetworkSummaryPanel({
   labelSizeMode,
   calloutTextSize,
   labelRotationDegrees,
+  autoSegmentLabelRotation,
   showNetworkGrid,
   snapNodesToGrid,
   lockEntityMovement,
@@ -1223,6 +1240,12 @@ export function NetworkSummaryPanel({
     const segmentGroupClassName = `network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`;
     const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
     const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
+    const segmentVectorX = nodeBPosition.x - nodeAPosition.x;
+    const segmentVectorY = nodeBPosition.y - nodeAPosition.y;
+    const segmentAngleDegrees = normalizeReadableSegmentLabelAngle(
+      (Math.atan2(segmentVectorY, segmentVectorX) * 180) / Math.PI
+    );
+    const segmentLabelRotationDegrees = autoSegmentLabelRotation ? segmentAngleDegrees : labelRotationDegrees;
 
     return [
       {
@@ -1232,7 +1255,8 @@ export function NetworkSummaryPanel({
         segmentClassName,
         segmentGroupClassName,
         labelX,
-        labelY
+        labelY,
+        segmentLabelRotationDegrees
       }
     ];
   });
@@ -1486,7 +1510,7 @@ export function NetworkSummaryPanel({
               </g>
 
               <g className="network-graph-layer network-graph-layer-labels" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
-                {renderedSegments.map(({ segment, segmentGroupClassName, labelX, labelY }) => (
+                {renderedSegments.map(({ segment, segmentGroupClassName, labelX, labelY, segmentLabelRotationDegrees }) => (
                   <g key={`${segment.id}-labels`} className={segmentGroupClassName} data-segment-id={segment.id}>
                     <g
                       className="network-segment-label-anchor"
@@ -1499,9 +1523,9 @@ export function NetworkSummaryPanel({
                         textAnchor="middle"
                         dominantBaseline="middle"
                         transform={
-                          labelRotationDegrees === 0
+                          segmentLabelRotationDegrees === 0
                             ? undefined
-                            : `rotate(${labelRotationDegrees} 0 ${segmentIdLabelOffsetY})`
+                            : `rotate(${segmentLabelRotationDegrees} 0 ${segmentIdLabelOffsetY})`
                         }
                       >
                         {segment.id}
@@ -1518,7 +1542,9 @@ export function NetworkSummaryPanel({
                           y={6}
                           textAnchor="middle"
                           dominantBaseline="middle"
-                          transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 6)`}
+                          transform={
+                            segmentLabelRotationDegrees === 0 ? undefined : `rotate(${segmentLabelRotationDegrees} 0 6)`
+                          }
                         >
                           {segment.lengthMm} mm
                         </text>

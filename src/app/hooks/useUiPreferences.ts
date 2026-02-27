@@ -120,6 +120,7 @@ interface UiPreferencesPayload {
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
+  canvasDefaultAutoSegmentLabelRotation: boolean;
   canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
@@ -179,6 +180,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
+  canvasDefaultAutoSegmentLabelRotation: boolean;
   canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
@@ -215,6 +217,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   setCanvasDefaultCalloutTextSize: (value: CanvasCalloutTextSize) => void;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
+  setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
   setShowNetworkGrid: (value: boolean) => void;
   setSnapNodesToGrid: (value: boolean) => void;
@@ -226,6 +229,7 @@ interface UseUiPreferencesOptions {
   setNetworkLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   setNetworkCalloutTextSize: (value: CanvasCalloutTextSize) => void;
   setNetworkLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
+  setNetworkAutoSegmentLabelRotation: (value: boolean) => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
   setNetworkScale: (value: number) => void;
   setNetworkOffset: (value: { x: number; y: number }) => void;
@@ -302,6 +306,7 @@ export function useUiPreferences({
   canvasDefaultLabelSizeMode,
   canvasDefaultCalloutTextSize,
   canvasDefaultLabelRotationDegrees,
+  canvasDefaultAutoSegmentLabelRotation,
   canvasPngExportIncludeBackground,
   canvasResetZoomPercentInput,
   showShortcutHints,
@@ -338,6 +343,7 @@ export function useUiPreferences({
   setCanvasDefaultLabelSizeMode,
   setCanvasDefaultCalloutTextSize,
   setCanvasDefaultLabelRotationDegrees,
+  setCanvasDefaultAutoSegmentLabelRotation,
   setCanvasPngExportIncludeBackground,
   setShowNetworkGrid,
   setSnapNodesToGrid,
@@ -349,6 +355,7 @@ export function useUiPreferences({
   setNetworkLabelSizeMode,
   setNetworkCalloutTextSize,
   setNetworkLabelRotationDegrees,
+  setNetworkAutoSegmentLabelRotation,
   setCanvasResetZoomPercentInput,
   setNetworkScale,
   setNetworkOffset,
@@ -392,6 +399,10 @@ export function useUiPreferences({
       const labelSizeModeDefault = normalizeCanvasLabelSizeMode(preferences.canvasDefaultLabelSizeMode);
       const calloutTextSizeDefault = normalizeCanvasCalloutTextSize(preferences.canvasDefaultCalloutTextSize);
       const labelRotationDegreesDefault = normalizeCanvasLabelRotationDegrees(preferences.canvasDefaultLabelRotationDegrees);
+      const autoSegmentLabelRotationDefault =
+        typeof preferences.canvasDefaultAutoSegmentLabelRotation === "boolean"
+          ? preferences.canvasDefaultAutoSegmentLabelRotation
+          : false;
       const rawResetZoomPercent =
         typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "100";
       const parsedResetZoomPercent = Number(rawResetZoomPercent);
@@ -432,6 +443,7 @@ export function useUiPreferences({
       setCanvasDefaultLabelSizeMode(labelSizeModeDefault);
       setCanvasDefaultCalloutTextSize(calloutTextSizeDefault);
       setCanvasDefaultLabelRotationDegrees(labelRotationDegreesDefault);
+      setCanvasDefaultAutoSegmentLabelRotation(autoSegmentLabelRotationDefault);
       setCanvasPngExportIncludeBackground(
         typeof preferences.canvasPngExportIncludeBackground === "boolean"
           ? preferences.canvasPngExportIncludeBackground
@@ -447,6 +459,7 @@ export function useUiPreferences({
       setNetworkLabelSizeMode(labelSizeModeDefault);
       setNetworkCalloutTextSize(calloutTextSizeDefault);
       setNetworkLabelRotationDegrees(labelRotationDegreesDefault);
+      setNetworkAutoSegmentLabelRotation(autoSegmentLabelRotationDefault);
       setCanvasResetZoomPercentInput(rawResetZoomPercent);
       setNetworkScale(resetScale);
       setNetworkOffset({ x: 0, y: 0 });
@@ -474,6 +487,7 @@ export function useUiPreferences({
     setCanvasDefaultLabelSizeMode,
     setCanvasDefaultCalloutTextSize,
     setCanvasDefaultLabelRotationDegrees,
+    setCanvasDefaultAutoSegmentLabelRotation,
     setCanvasPngExportIncludeBackground,
     setCanvasResetZoomPercentInput,
     setConnectorSort,
@@ -499,6 +513,7 @@ export function useUiPreferences({
     setNetworkLabelSizeMode,
     setNetworkCalloutTextSize,
     setNetworkLabelRotationDegrees,
+    setNetworkAutoSegmentLabelRotation,
     setSnapNodesToGrid,
     setLockEntityMovement,
     setSpliceSort,
@@ -542,6 +557,7 @@ export function useUiPreferences({
       canvasDefaultLabelSizeMode,
       canvasDefaultCalloutTextSize,
       canvasDefaultLabelRotationDegrees,
+      canvasDefaultAutoSegmentLabelRotation,
       canvasPngExportIncludeBackground,
       canvasResetZoomPercentInput,
       showShortcutHints,
@@ -566,6 +582,7 @@ export function useUiPreferences({
     canvasDefaultLabelSizeMode,
     canvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees,
+    canvasDefaultAutoSegmentLabelRotation,
     canvasPngExportIncludeBackground,
     canvasResetZoomPercentInput,
     defaultIdSortDirection,
