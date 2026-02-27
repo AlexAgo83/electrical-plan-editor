@@ -1,7 +1,7 @@
 ## req_072_replace_system_modals_with_styled_app_dialogs - Replace system modals with styled in-app dialogs
 > From version: 0.9.13
-> Understanding: 98% (the ask is to stop using browser/system confirmation dialogs and use styled app dialogs aligned with onboarding modal UX)
-> Confidence: 95% (scope is clear and mostly UI orchestration with existing modal patterns)
+> Understanding: 100% (scope and delivered behavior are confirmed: app confirmation flows are routed through styled in-app dialogs instead of browser/system confirms)
+> Confidence: 99% (implementation is active in controller/handlers and covered by targeted confirmation-flow tests)
 > Complexity: Medium
 > Theme: UX consistency, accessibility, and deterministic modal behavior
 > Reminder: Update Understanding/Confidence and references when editing this doc.
@@ -115,6 +115,13 @@ This request is to align all system confirmations with an app-level modal patter
 - Replacing browser APIs that are inherently native-controlled and non-stylable (e.g. platform install prompt UI).
 - Redesigning onboarding modal content itself.
 - Changing business rules or mutation semantics behind confirmation actions.
+
+# Delivery status
+- Status: delivered.
+- Task: `logics/tasks/task_070_super_orchestration_closure_validation_for_req_070_to_req_073.md`.
+
+# Backlog
+- `logics/backlog/item_396_req_072_styled_confirmation_dialogs_closure_validation_and_traceability.md` (done)
 
 # References
 - `src/app/AppController.tsx`

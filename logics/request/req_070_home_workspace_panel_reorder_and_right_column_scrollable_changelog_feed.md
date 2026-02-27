@@ -1,7 +1,7 @@
 ## req_070_home_workspace_panel_reorder_and_right_column_scrollable_changelog_feed - Home workspace panel reorder and right-column scrollable changelog feed
 > From version: 0.9.12
-> Understanding: 97% (the request is to reshape Home layout only: move `Workspace` under `Quick start`, and dedicate the right column to a long, stacked changelog feed inside a scrollable panel spanning two vertical cells)
-> Confidence: 94% (scope is localized to Home composition and styles, with low domain-model risk)
+> Understanding: 100% (scope and delivered behavior are confirmed: Home now stacks `Workspace` under `Quick start` and renders a right-column scrollable changelog feed)
+> Confidence: 99% (implemented behavior is covered by targeted Home/changelog tests and integrated in production UI)
 > Complexity: Medium
 > Theme: Home information architecture and release-notes discoverability
 > Reminder: Update Understanding/Confidence and references when you edit this doc.
@@ -126,6 +126,13 @@ The request introduces a more intentional two-column structure:
 - Full markdown feature parity rendering (tables/code blocks/theme plugins) in V1.
 - External changelog fetching from remote APIs.
 - Home redesign beyond the specific panel ordering and changelog-feed layout request.
+
+# Delivery status
+- Status: delivered.
+- Task: `logics/tasks/task_070_super_orchestration_closure_validation_for_req_070_to_req_073.md`.
+
+# Backlog
+- `logics/backlog/item_394_req_070_home_workspace_changelog_feed_closure_validation_and_traceability.md` (done)
 
 # References
 - `src/app/components/workspace/HomeWorkspaceContent.tsx`

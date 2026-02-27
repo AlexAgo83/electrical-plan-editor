@@ -1,7 +1,7 @@
 ## req_071_connector_and_splice_analysis_add_go_to_wire_action_before_release - Connector/Splice analysis: add `Go to` wire action before `Release`
 > From version: 0.9.12
-> Understanding: 99% (request is UI/analysis-only: add a `Go to` button before `Release` in both connector and splice occupancy cards, and open the related wire when it exists)
-> Confidence: 96% (scope is localized and uses existing occupancy/wire-selection primitives)
+> Understanding: 100% (scope and delivered behavior are confirmed: connector/splice occupancy cards now show `Go to` before `Release` and route to wire analysis when resolvable)
+> Confidence: 99% (implemented behavior is covered by dedicated analysis go-to-wire regression tests)
 > Complexity: Low-Medium
 > Theme: Analysis navigation ergonomics between occupancy and wire detail
 > Reminder: Update Understanding/Confidence and references when editing this doc.
@@ -109,6 +109,13 @@ The app already has wire navigation primitives (`onSelectWire`, wire sub-screen)
 - Adding `Go to` actions in synthesis tables (outside occupancy cards) in this request.
 - New occupant-reference formats or store-level schema changes.
 - Reworking broader analysis navigation UX beyond this targeted shortcut.
+
+# Delivery status
+- Status: delivered.
+- Task: `logics/tasks/task_070_super_orchestration_closure_validation_for_req_070_to_req_073.md`.
+
+# Backlog
+- `logics/backlog/item_395_req_071_analysis_go_to_wire_action_closure_validation_and_traceability.md` (done)
 
 # References
 - `src/app/components/workspace/AnalysisConnectorWorkspacePanels.tsx`
