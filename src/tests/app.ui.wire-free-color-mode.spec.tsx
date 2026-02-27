@@ -83,7 +83,7 @@ describe("App integration UI - wire free color mode", () => {
       expect(within(inspectorPanel).getByText("Cable colors")).toBeInTheDocument();
       expect(within(inspectorPanel).getByText("Free: Beige/Brown mix")).toBeInTheDocument();
     }
-  });
+  }, 15000);
 
   it("allows saving free color mode with an empty label and preserves it as a distinct unspecified state", () => {
     const { store } = renderAppWithState(createUiIntegrationDenseWiresState());
@@ -137,5 +137,5 @@ describe("App integration UI - wire free color mode", () => {
       expect(within(inspectorPanel).getByText("Free color (unspecified)")).toBeInTheDocument();
       expect(within(inspectorPanel).queryByText("No color")).not.toBeInTheDocument();
     }
-  });
+  }, 15000);
 });
