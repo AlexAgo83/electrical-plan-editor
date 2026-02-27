@@ -2,7 +2,7 @@
 > From version: 0.9.14
 > Understanding: 98% (coordinate two coupled requests: active-network recent-changes panel from undo history and global Ctrl/Cmd+S export override)
 > Confidence: 95% (scope is well-bounded with existing history/shortcut/export infrastructure)
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Cross-request delivery orchestration for history observability and keyboard save behavior
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -56,12 +56,12 @@ Rationale:
 - Deliver req_076 interception first, then wire to export path, then run broad closure validation.
 
 # Plan
-- [ ] Step 1. Deliver req_075 history metadata sidecar and stack synchronization (`item_387`)
-- [ ] Step 2. Deliver req_075 Network Scope panel placement/visibility and entry rendering (`item_388`, `item_389`)
-- [ ] Step 3. Deliver req_076 global `Ctrl/Cmd+S` interception contract (`item_391`)
-- [ ] Step 4. Deliver req_076 export-path wiring and no-active-network behavior (`item_392`)
-- [ ] Step 5. Run req_075/req_076 targeted + full validation matrix and close traceability (`item_390`, `item_393`)
-- [ ] FINAL. Update all related `logics` docs (request/backlog/task progress + delivery summary)
+- [x] Step 1. Deliver req_075 history metadata sidecar and stack synchronization (`item_387`)
+- [x] Step 2. Deliver req_075 Network Scope panel placement/visibility and entry rendering (`item_388`, `item_389`)
+- [x] Step 3. Deliver req_076 global `Ctrl/Cmd+S` interception contract (`item_391`)
+- [x] Step 4. Deliver req_076 export-path wiring and no-active-network behavior (`item_392`)
+- [x] Step 5. Run req_075/req_076 targeted + full validation matrix and close traceability (`item_390`, `item_393`)
+- [x] FINAL. Update all related `logics` docs (request/backlog/task progress + delivery summary)
 
 # Validation gates
 ## A. Minimum step gate (after each Step 1-4)
@@ -99,9 +99,9 @@ Rationale:
 
 # Report
 - Current blockers: none.
-- Current status: orchestration created, implementation pending.
-- Validation snapshot (kickoff):
-  - Not run yet for this task.
+- Current status: delivered and validated.
+- Validation snapshot:
+  - `npx vitest run src/tests/app.ui.networks.spec.tsx src/tests/app.ui.undo-redo-global.spec.tsx src/tests/app.ui.settings.spec.tsx` ✅
 
 # References
 - `logics/request/req_075_network_scope_recent_changes_panel_from_undo_history.md`

@@ -2,7 +2,7 @@
 > From version: 0.9.14
 > Understanding: 98% (scope is to enforce styled confirmation modal before every delete mutation in UI flows)
 > Confidence: 95% (existing confirmation infrastructure can be reused with handler-level integration and targeted regression coverage)
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Destructive-action safety rollout across catalog/modeling/network delete paths
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -41,12 +41,12 @@ The orchestration must keep behavior stable:
 - `logics/backlog/item_386_req_074_delete_confirmation_policy_closure_validation_and_traceability.md`
 
 # Plan
-- [ ] 1. Deliver Wave 0 handler orchestration so all delete-capable handlers require `confirmAction` (`item_383`)
-- [ ] 2. Deliver Wave 1 standardized delete modal copy/intent/labels with explicit entity identity (`item_384`)
-- [ ] 3. Deliver Wave 2 regression coverage for confirm/cancel/guarded-delete behavior across entities (`item_385`)
-- [ ] 4. Run targeted validation suites and fix regressions
-- [ ] 5. Run full validation matrix and close req_074 traceability (`item_386`)
-- [ ] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
+- [x] 1. Deliver Wave 0 handler orchestration so all delete-capable handlers require `confirmAction` (`item_383`)
+- [x] 2. Deliver Wave 1 standardized delete modal copy/intent/labels with explicit entity identity (`item_384`)
+- [x] 3. Deliver Wave 2 regression coverage for confirm/cancel/guarded-delete behavior across entities (`item_385`)
+- [x] 4. Run targeted validation suites and fix regressions
+- [x] 5. Run full validation matrix and close req_074 traceability (`item_386`)
+- [x] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -66,7 +66,9 @@ The orchestration must keep behavior stable:
 
 # Report
 - Current blockers: none.
-- Current status: pending implementation start.
+- Current status: delivered and validated.
+- Validation snapshot:
+  - `npx vitest run src/tests/app.ui.delete-confirmations.spec.tsx` ✅
 - Risks to track:
   - Missing a delete entrypoint in less-used panel flows.
   - Copy drift if entity-specific messages are duplicated instead of centralized.
