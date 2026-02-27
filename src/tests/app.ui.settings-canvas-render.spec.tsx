@@ -150,7 +150,9 @@ describe("App integration UI - settings canvas render", () => {
     switchScreenDrawerAware("settings");
     const canvasSettingsPanel = getPanelByHeading("Canvas render preferences");
     const calloutTextSizeSelect = within(canvasSettingsPanel).getByLabelText("Callout text size");
+    const labelRotationSelect = within(canvasSettingsPanel).getByLabelText("2D label rotation");
     expect(calloutTextSizeSelect).toHaveValue("normal");
+    expect(labelRotationSelect).toHaveValue("0");
 
     switchScreenDrawerAware("analysis");
     let networkSummaryPanel = getPanelByHeading("Network summary");

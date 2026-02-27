@@ -706,7 +706,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultLabelStrokeMode("normal");
     setCanvasDefaultLabelSizeMode("normal");
     setCanvasDefaultCalloutTextSize("normal");
-    setCanvasDefaultLabelRotationDegrees(-20);
+    setCanvasDefaultLabelRotationDegrees(0);
     setCanvasDefaultAutoSegmentLabelRotation(false);
     setCanvasPngExportIncludeBackground(true);
     setCanvasResetZoomPercentInput("100");
@@ -719,7 +719,7 @@ export function useWorkspaceHandlers({
     setNetworkLabelStrokeMode("normal");
     setNetworkLabelSizeMode("normal");
     setNetworkCalloutTextSize("normal");
-    setNetworkLabelRotationDegrees(-20);
+    setNetworkLabelRotationDegrees(0);
     setNetworkAutoSegmentLabelRotation(false);
     setNetworkScale(1);
     setNetworkOffset({ x: 0, y: 0 });
