@@ -57,4 +57,20 @@ describe("App integration UI - network summary layering", () => {
     expect(transformAfter).not.toBe(transformBefore);
     expect(transformAfter).not.toContain("scale(1)");
   });
+
+  it("centers segment ID labels when segment lengths are hidden", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("analysis");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const lengthToggleButton = within(networkSummaryPanel).getByRole("button", { name: "Length" });
+    if (lengthToggleButton.classList.contains("is-active")) {
+      fireEvent.click(lengthToggleButton);
+    }
+
+    const segmentIdLabel = networkSummaryPanel.querySelector(".network-segment-label");
+    expect(segmentIdLabel).not.toBeNull();
+    expect(segmentIdLabel?.getAttribute("y")).toBe("0");
+    expect(networkSummaryPanel.querySelector(".network-segment-length-label")).toBeNull();
+  });
 });
