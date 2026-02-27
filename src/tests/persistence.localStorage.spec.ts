@@ -948,6 +948,35 @@ describe("localStorage persistence adapter", () => {
     expect(savedSnapshot.state).toEqual(secondState);
   });
 
+  it("falls back to current save timestamp when persisted createdAtIso is malformed", () => {
+    const initialState = createSampleState();
+    const updatedState = appReducer(
+      initialState,
+      appActions.upsertConnector({
+        id: asConnectorId("C4"),
+        name: "Connector 4",
+        technicalId: "C-4",
+        cavityCount: 2
+      })
+    );
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        schemaVersion: APP_SCHEMA_VERSION,
+        createdAtIso: "invalid-created-at",
+        updatedAtIso: "2026-02-10T08:00:00.000Z",
+        state: initialState
+      } satisfies PersistedStateSnapshotV1)
+    });
+
+    saveState(updatedState, storage, () => "2026-02-20T13:20:00.000Z");
+
+    const raw = storage.read(STORAGE_KEY);
+    expect(raw).not.toBeNull();
+    const savedSnapshot = JSON.parse(raw ?? "{}") as PersistedStateSnapshotV1;
+    expect(savedSnapshot.createdAtIso).toBe("2026-02-20T13:20:00.000Z");
+    expect(savedSnapshot.updatedAtIso).toBe("2026-02-20T13:20:00.000Z");
+  });
+
   it("preserves createdAt across saves even when storage reads throw", () => {
     const state = createSampleState();
     const nextState = appReducer(

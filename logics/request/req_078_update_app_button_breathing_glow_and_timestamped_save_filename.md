@@ -1,7 +1,7 @@
 ## req_078_update_app_button_breathing_glow_and_timestamped_save_filename - update app button breathing glow and timestamped save filename
 > From version: 0.9.16
-> Understanding: 100% (lazy-loading behavior is now locked with explicit batch and trigger policy)
-> Confidence: 98% (implementation path is fully specified for animation, filenames, and changelog incremental loading)
+> Understanding: 100% (animation, timestamped filenames, and lazy-loading behavior are implemented with locked V1 contracts)
+> Confidence: 99% (delivery is validated by targeted tests and full UI lane execution)
 
 # Needs
 - The `Update app` header action should use a smooth breathing glow and should not blink.
@@ -89,6 +89,10 @@
 - Changing save/export payload structure.
 - Server-side save history features.
 
+# Delivery status
+- Status: delivered.
+- Task: `logics/tasks/task_071_super_orchestration_delivery_execution_for_req_077_and_req_078_with_validation_gates.md`.
+
 # References
 - `logics/request/req_073_pwa_update_ready_button_glow_when_available.md`
 - `logics/request/req_076_ctrl_cmd_s_override_to_export_active_plan.md`
@@ -102,7 +106,7 @@
 - `src/tests/app.ui.home.spec.tsx`
 
 # Backlog
-- `logics/backlog/item_405_update_app_button_breathing_glow_motion_policy_and_theme_safety.md`
-- `logics/backlog/item_406_timestamped_network_export_filename_contract_scope_preservation.md`
-- `logics/backlog/item_407_home_changelog_feed_progressive_lazy_loading_on_scroll.md`
-- `logics/backlog/item_408_req_078_update_glow_export_filename_and_changelog_lazy_loading_closure_validation_and_traceability.md`
+- `logics/backlog/item_405_update_app_button_breathing_glow_motion_policy_and_theme_safety.md` (done)
+- `logics/backlog/item_406_timestamped_network_export_filename_contract_scope_preservation.md` (done)
+- `logics/backlog/item_407_home_changelog_feed_progressive_lazy_loading_on_scroll.md` (done)
+- `logics/backlog/item_408_req_078_update_glow_export_filename_and_changelog_lazy_loading_closure_validation_and_traceability.md` (done)
