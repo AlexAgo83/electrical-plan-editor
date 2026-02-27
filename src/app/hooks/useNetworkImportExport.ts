@@ -1,5 +1,6 @@
 import { type ChangeEvent, type MutableRefObject, useEffect, useRef, useState } from "react";
 import { type Network, type NetworkId } from "../../core/entities";
+import type { NetworkExportScope } from "../../adapters/portability";
 import type { AppStore } from "../../store";
 import {
   buildNetworkFilePayload,
@@ -27,6 +28,38 @@ interface UseNetworkImportExportResult {
   handleExportNetworks: (scope: "active" | "selected" | "all") => void;
   handleOpenImportPicker: () => void;
   handleImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
+}
+
+function toFilesystemSafeTimestamp(exportedAtIso: string): string {
+  return exportedAtIso.replace(/[:.]/g, "-");
+}
+
+export function buildNetworkExportFilename(scope: NetworkExportScope, exportedAtIso: string): string {
+  return `electrical-network-${scope}-${toFilesystemSafeTimestamp(exportedAtIso)}.json`;
+}
+
+export function downloadJsonFile(fileName: string, content: string): boolean {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return false;
+  }
+
+  const blob = new Blob([content], {
+    type: "application/json"
+  });
+  const urlFactory = window.URL ?? globalThis.URL;
+  if (typeof urlFactory.createObjectURL !== "function" || typeof urlFactory.revokeObjectURL !== "function") {
+    return false;
+  }
+
+  const href = urlFactory.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = href;
+  link.download = fileName;
+  link.click();
+  window.setTimeout(() => {
+    urlFactory.revokeObjectURL(href);
+  }, 0);
+  return true;
 }
 
 export function useNetworkImportExport({
@@ -65,30 +98,9 @@ export function useNetworkImportExport({
     });
   }
 
-  function downloadJsonFile(fileName: string, content: string): boolean {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    const blob = new Blob([content], {
-      type: "application/json"
-    });
-    const urlFactory = window.URL ?? globalThis.URL;
-    if (typeof urlFactory.createObjectURL !== "function" || typeof urlFactory.revokeObjectURL !== "function") {
-      return false;
-    }
-
-    const href = urlFactory.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = href;
-    link.download = fileName;
-    link.click();
-    urlFactory.revokeObjectURL(href);
-    return true;
-  }
-
   function handleExportNetworks(scope: "active" | "selected" | "all"): void {
-    const payload = buildNetworkFilePayload(store.getState(), scope, selectedExportNetworkIds, new Date().toISOString());
+    const exportedAtIso = new Date().toISOString();
+    const payload = buildNetworkFilePayload(store.getState(), scope, selectedExportNetworkIds, exportedAtIso);
     if (payload.networks.length === 0) {
       setImportExportStatus({
         kind: "failed",
@@ -98,14 +110,7 @@ export function useNetworkImportExport({
     }
 
     const serialized = serializeNetworkFilePayload(payload);
-    const downloadOk = downloadJsonFile(
-      scope === "active"
-        ? "electrical-network-active.json"
-        : scope === "selected"
-          ? "electrical-network-selected.json"
-          : "electrical-network-all.json",
-      serialized
-    );
+    const downloadOk = downloadJsonFile(buildNetworkExportFilename(scope, exportedAtIso), serialized);
     if (!downloadOk) {
       setImportExportStatus({
         kind: "failed",

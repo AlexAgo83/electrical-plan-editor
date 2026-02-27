@@ -1,8 +1,11 @@
-import type { ChangeEvent, ReactElement, ReactNode, RefObject } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import { HOME_CHANGELOG_ENTRIES } from "../../lib/changelogFeed";
+
+const CHANGELOG_INITIAL_BATCH_SIZE = 4;
+const CHANGELOG_INCREMENT_BATCH_SIZE = 4;
 
 interface HomeWorkspacePostMvpModules {
   sessionSummary?: ReactNode;
@@ -70,6 +73,56 @@ export function HomeWorkspaceContent({
   ] as const;
 
   const hasPostMvpModules = homeExtensionEntries.some(([, , content]) => content !== undefined && content !== null);
+  const [visibleChangelogCount, setVisibleChangelogCount] = useState(() =>
+    Math.min(CHANGELOG_INITIAL_BATCH_SIZE, HOME_CHANGELOG_ENTRIES.length)
+  );
+  const changelogScrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const changelogSentinelRef = useRef<HTMLDivElement | null>(null);
+  const canLoadMoreChangelogs = visibleChangelogCount < HOME_CHANGELOG_ENTRIES.length;
+  const visibleChangelogEntries = HOME_CHANGELOG_ENTRIES.slice(0, visibleChangelogCount);
+
+  useEffect(() => {
+    setVisibleChangelogCount(Math.min(CHANGELOG_INITIAL_BATCH_SIZE, HOME_CHANGELOG_ENTRIES.length));
+  }, []);
+
+  useEffect(() => {
+    if (!canLoadMoreChangelogs) {
+      return;
+    }
+
+    if (typeof IntersectionObserver !== "function") {
+      setVisibleChangelogCount(HOME_CHANGELOG_ENTRIES.length);
+      return;
+    }
+
+    const root = changelogScrollContainerRef.current;
+    const sentinel = changelogSentinelRef.current;
+    if (root === null || sentinel === null) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const isIntersecting = entries.some((entry) => entry.isIntersecting);
+        if (!isIntersecting) {
+          return;
+        }
+        setVisibleChangelogCount((current) =>
+          Math.min(current + CHANGELOG_INCREMENT_BATCH_SIZE, HOME_CHANGELOG_ENTRIES.length)
+        );
+      },
+      {
+        root,
+        rootMargin: "0px 0px 18% 0px",
+        threshold: 0.01
+      }
+    );
+
+    observer.observe(sentinel);
+    return () => {
+      observer.disconnect();
+    };
+  }, [canLoadMoreChangelogs]);
 
   return (
     <section className="home-workspace-grid" aria-label="Home workspace">
@@ -184,11 +237,17 @@ export function HomeWorkspaceContent({
         <p className="settings-panel-intro home-whats-new-intro">
           Latest release notes from available changelog files.
         </p>
-        <div className="home-whats-new-scroll" aria-label="Changelog feed" tabIndex={0}>
+        <div
+          ref={changelogScrollContainerRef}
+          className="home-whats-new-scroll"
+          aria-label="Changelog feed"
+          tabIndex={0}
+          data-visible-changelog-count={visibleChangelogCount}
+        >
           {HOME_CHANGELOG_ENTRIES.length === 0 ? (
             <p className="empty-copy">No changelog available.</p>
           ) : (
-            HOME_CHANGELOG_ENTRIES.map((entry) => (
+            visibleChangelogEntries.map((entry) => (
               <article key={entry.sourcePath} className="home-changelog-entry" aria-label={`Changelog v${entry.version}`}>
                 <h3 className="home-changelog-version-heading" data-changelog-version={entry.version}>
                   v{entry.version}
@@ -199,6 +258,7 @@ export function HomeWorkspaceContent({
               </article>
             ))
           )}
+          {canLoadMoreChangelogs ? <div ref={changelogSentinelRef} className="home-changelog-sentinel" aria-hidden="true" /> : null}
         </div>
       </section>
 
