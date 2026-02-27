@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   asCatalogItemId,
   createUiIntegrationState,
-  createUiIntegrationDenseWiresState,
+  createUiIntegrationWideEndpointsState,
   getPanelByHeading,
   renderAppWithState,
   switchScreenDrawerAware,
@@ -23,7 +23,7 @@ describe("App integration UI - creation flow wire endpoint references", () => {
   beforeEach(() => localStorage.clear());
 
   it("supports optional wire side connection and seal references with trim, non-destructive endpoint type changes, and clear on save", () => {
-    const { store } = renderAppWithState(createUiIntegrationDenseWiresState());
+    const { store } = renderAppWithState(createUiIntegrationWideEndpointsState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("wire");

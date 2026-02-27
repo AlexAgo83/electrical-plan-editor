@@ -139,10 +139,11 @@ Then open `http://127.0.0.1:5284` (unless overridden).
 - `npm run typecheck`: run TypeScript checks
 - `npm run test`: run Vitest in watch mode
 - `npm run test:ci`: run Vitest with coverage
-- `npm run test:ci:fast`: run a faster non-UI Vitest subset (complementary to `test:ci`)
-- `npm run test:ci:ui`: run UI-focused Vitest subset (`app.ui*` specs)
+- `npm run test:ci:segmentation:check`: validate explicit segmented-lane contract (`scripts/quality/run-vitest-segmented.mjs`)
+- `npm run test:ci:fast`: run non-UI lane via explicit segmented contract (complementary to `test:ci`; keeps `pwa.*` in fast lane)
+- `npm run test:ci:ui`: run UI lane via explicit segmented contract
 - `npm run test:ci:slow-top`: print top-10 slowest tests from a Vitest run (informational)
-- `npm run test:ci:ui:slow-top`: print top-10 slowest UI tests (informational)
+- `npm run test:ci:ui:slow-top`: print top-10 slowest UI-lane tests from explicit segmented contract (informational)
 - `npm run coverage:ui:report`: emit `src/app/**` coverage report (informational, non-blocking)
 - `npm run bundle:metrics:report`: report main JS chunk + total JS gzip with non-blocking warning budgets
 - `npm run build:bundle:report`: run production build then bundle metrics report
@@ -246,10 +247,20 @@ Additional non-blocking CI observability:
 - `bundle:metrics:report` for main-chunk and total-gzip size visibility
 - these signals are informational and do not replace canonical `test:ci`
 
+Segmented test contract:
+
+- explicit lane ownership is defined in `scripts/quality/run-vitest-segmented.mjs`
+- `test:ci:segmentation:check` verifies the lane contract and fails on drift
+- canonical `test:ci` remains the required full-suite command; segmented lanes are complementary triage tools
+
 Form validation doctrine (current targeted scope):
 
 - native HTML validation guards simple required/number constraints first (`catalog`, `wire`)
 - inline custom errors remain for business and cross-field rules (catalog URL policy, uniqueness, endpoint/business integrity)
+
+UI reliability note:
+
+- existing targeted `10_000ms` UI test timeout exceptions are tracked as temporary debt; new increases require explicit rationale
 
 Local E2E note:
 

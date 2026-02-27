@@ -1,8 +1,8 @@
 ## task_067_req_069_ci_observability_execution_order_test_segmentation_and_ui_test_reliability_orchestration_and_delivery_control - req_069 CI observability execution order, test segmentation, and UI test reliability orchestration and delivery control
 > From version: 0.9.11
-> Understanding: 97% (orchestration scope and default decisions are explicit: always-run informational CI signals, explicit segmentation contracts, and targeted UI stabilization)
-> Confidence: 93% (delivery is straightforward if phased with regression safety gates)
-> Progress: 0%
+> Understanding: 99% (delivery completed with CI semantics, explicit segmented-lane contract, targeted UI fixture stabilization, and full validation matrix green)
+> Confidence: 96% (scope landed with low ambiguity and reproducible validation evidence)
+> Progress: 100%
 > Complexity: High
 > Theme: CI/test reliability orchestration after req_068 quality follow-ups
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
@@ -43,12 +43,12 @@ Default policy is intentionally conservative:
 - `logics/backlog/item_382_regression_coverage_for_req_069_ci_observability_segmentation_and_ui_reliability.md`
 
 # Phase plan
-- [ ] Phase 1 (CI workflow semantics): deliver `item_378` and validate always-run/non-blocking behavior.
-- [ ] Phase 2 (segmentation contract): deliver `item_379` with explicit globs/contracts and docs updates.
-- [ ] Phase 3 (UI reliability wave 1): deliver `item_380` with targeted stabilization work.
-- [ ] Phase 4 (coverage-run cost clarity): deliver `item_381` and document revisit triggers.
-- [ ] Final regression sweep and close `item_382`.
-- [ ] FINAL: sync request/backlog/task docs and close with validation report.
+- [x] Phase 1 (CI workflow semantics): delivered `item_378` and validated always-run/non-blocking behavior.
+- [x] Phase 2 (segmentation contract): delivered `item_379` with explicit contract script and docs updates.
+- [x] Phase 3 (UI reliability wave 1): delivered `item_380` with targeted fixture-shaping stabilization.
+- [x] Phase 4 (coverage-run cost clarity): delivered `item_381` and documented separate-run rationale.
+- [x] Final regression sweep and close `item_382`.
+- [x] FINAL: synced request/backlog/task docs and captured validation report.
 
 # Validation gates
 ## Minimum gate (after each phase)
@@ -76,15 +76,31 @@ Default policy is intentionally conservative:
 # Report
 - Current blockers: none.
 - Delivery status:
-  - Not started. Task initialized with phased orchestration and validation gates.
+  - Complete.
+  - `item_378`: CI observability now uses explicit `if: always()` for UI coverage + UI slow-top, non-blocking preserved.
+  - `item_379`: segmented commands now use explicit allowlist contract via `scripts/quality/run-vitest-segmented.mjs`; `pwa.*` kept in fast lane; CI includes `test:ci:segmentation:check`.
+  - `item_380`: top slow UI tests stabilized via targeted fixture shaping without timeout inflation.
+  - `item_381`: `coverage:ui:report` remains separate and informational with clear CI labeling/cost visibility.
+  - `item_382`: regression guardrails and full validation matrix executed successfully.
+- Validation gate status:
+  - Passed: `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+  - Passed: `npm run -s lint`
+  - Passed: `npm run -s typecheck`
+  - Passed: `npm run -s quality:ui-modularization`
+  - Passed: `npm run -s quality:store-modularization`
+  - Passed: `npm run -s quality:pwa`
+  - Passed: `npm run -s build`
+  - Passed: `npm run -s test:ci`
+  - Passed: `npm run -s test:e2e`
 - Residual risk notes:
-  - If stabilization changes are too broad, test intent can drift; require assertion-preserving reviews on UI reliability PRs.
+  - UI suites remain the dominant runtime cost; additional wave(s) can further split heavy specs while keeping assertion intent stable.
 
 # References
 - `logics/request/req_069_ci_observability_execution_order_test_segmentation_and_ui_test_reliability.md`
 - `.github/workflows/ci.yml`
 - `package.json`
 - `README.md`
+- `scripts/quality/run-vitest-segmented.mjs`
 - `scripts/quality/report-ui-coverage.mjs`
 - `scripts/quality/report-slowest-tests.mjs`
 - `scripts/quality/report-bundle-metrics.mjs`

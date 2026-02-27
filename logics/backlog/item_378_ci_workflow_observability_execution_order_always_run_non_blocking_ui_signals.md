@@ -1,8 +1,8 @@
 ## item_378_ci_workflow_observability_execution_order_always_run_non_blocking_ui_signals - CI workflow observability execution order with always-run non-blocking UI signals
 > From version: 0.9.11
-> Understanding: 96%
-> Confidence: 93%
-> Progress: 0%
+> Understanding: 98%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Medium
 > Theme: CI diagnostic signal availability under failure conditions
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
@@ -30,10 +30,17 @@ Informational CI signals (`coverage:ui:report`, `test:ci:ui:slow-top`) are curre
 
 # Notes
 - Dependencies: `req_069`.
-- Blocks: `item_382`, `task_067`.
+- Blocks: none (delivered in `task_067`).
 - Related AC: AC1, AC4, AC6.
 - References:
   - `logics/request/req_069_ci_observability_execution_order_test_segmentation_and_ui_test_reliability.md`
   - `.github/workflows/ci.yml`
   - `package.json`
 
+# Delivery notes
+- Added `if: ${{ always() }}` to:
+  - `UI coverage report (informational, non-blocking)`
+  - `UI slow test top-N (informational, non-blocking)`
+- Kept both observability steps non-blocking (`continue-on-error: true`).
+- Added explicit build gating for bundle metrics with `id: production_build` and:
+  - `if: ${{ steps.production_build.outcome == 'success' }}`

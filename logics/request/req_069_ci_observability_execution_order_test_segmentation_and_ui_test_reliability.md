@@ -1,7 +1,7 @@
 ## req_069_ci_observability_execution_order_test_segmentation_and_ui_test_reliability - CI observability execution order, test segmentation hardening, and UI test reliability follow-up
 > From version: 0.9.11
-> Understanding: 98% (default decisions are now explicit for CI `always` scope, segmentation boundaries, and timeout/coverage strategy)
-> Confidence: 95% (delivery path is clear and bounded with low ambiguity)
+> Understanding: 99% (delivery completed with explicit CI always-run semantics, segmented lane contract guardrails, and targeted UI stabilization)
+> Confidence: 96% (acceptance criteria are implemented and validated through the full matrix)
 > Complexity: Medium
 > Theme: CI signal robustness and test reliability hardening
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -19,9 +19,8 @@ Recent quality work (req_068) delivered:
 - validation-doctrine alignment for wire/catalog forms
 
 Current residual risks:
-- informational CI jobs do not run if `test:ci` fails earlier in the pipeline
-- segmented commands are file-name-coupled rather than explicitly scoped
-- heavy UI tests remain near timeout limits under full coverage runs
+- UI suites still dominate runtime cost and can benefit from additional stabilization waves
+- segmented lane contract requires intentional updates when adding new UI spec files (by design)
 
 # Objective
 - Ensure diagnostic observability still runs when the main suite fails.
@@ -90,6 +89,10 @@ Current residual risks:
 - AC5: At least the top unstable UI tests receive root-cause stabilization work or explicit documented rationale when deferred.
 - AC6: No material regression in CI runtime reliability and debugging clarity.
 
+# Delivery status
+- Delivered via `task_067`.
+- Full validation matrix executed and green (`logics_lint`, `lint`, `typecheck`, `quality:*`, `build`, `test:ci`, `test:e2e`).
+
 # Out of scope
 - Replacing Vitest/Playwright tooling.
 - Rewriting the entire UI integration suite architecture in one pass.
@@ -108,6 +111,7 @@ Current residual risks:
 # References
 - `.github/workflows/ci.yml`
 - `package.json`
+- `scripts/quality/run-vitest-segmented.mjs`
 - `scripts/quality/report-ui-coverage.mjs`
 - `scripts/quality/report-slowest-tests.mjs`
 - `scripts/quality/report-bundle-metrics.mjs`
