@@ -208,7 +208,7 @@
 }
 
 .network-segment-label {
-  font-size: 10px;
+  font-size: 9px;
   fill: var(--network-segment-label-color, #38566a);
   paint-order: stroke fill;
   stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
@@ -227,11 +227,11 @@
 }
 
 .network-canvas--label-size-large .network-segment-label {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .network-canvas--label-size-extraLarge .network-segment-label {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .network-segment-length-label {
