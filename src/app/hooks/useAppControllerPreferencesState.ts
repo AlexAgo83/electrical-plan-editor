@@ -37,7 +37,7 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultLabelSizeMode, setCanvasDefaultLabelSizeMode] = useState<CanvasLabelSizeMode>("normal");
   const [canvasDefaultCalloutTextSize, setCanvasDefaultCalloutTextSize] = useState<CanvasCalloutTextSize>("normal");
   const [canvasDefaultLabelRotationDegrees, setCanvasDefaultLabelRotationDegrees] =
-    useState<CanvasLabelRotationDegrees>(-20);
+    useState<CanvasLabelRotationDegrees>(0);
   const [canvasDefaultAutoSegmentLabelRotation, setCanvasDefaultAutoSegmentLabelRotation] = useState(false);
   const [canvasPngExportIncludeBackground, setCanvasPngExportIncludeBackground] = useState(true);
   const [showShortcutHints, setShowShortcutHints] = useState(false);
