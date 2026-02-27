@@ -1,0 +1,52 @@
+.network-recent-changes-panel {
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+}
+
+.network-recent-changes-header h2 {
+  margin: 0;
+}
+
+.network-recent-changes-list-shell {
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 5%, transparent);
+  padding: 0.18rem 0;
+  max-height: 14rem;
+  overflow: auto;
+}
+
+.network-recent-changes-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.network-recent-changes-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.62rem;
+  align-items: baseline;
+  padding: 0.58rem 0.72rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.network-recent-changes-item:last-child {
+  border-bottom: 0;
+}
+
+.network-recent-changes-time {
+  font-family: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
+  font-size: 0.76rem;
+  color: color-mix(in srgb, currentColor 70%, transparent);
+}
+
+.network-recent-changes-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.87rem;
+  color: inherit;
+}

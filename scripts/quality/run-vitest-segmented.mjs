@@ -8,6 +8,7 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.catalog.spec.tsx",
   "src/tests/app.ui.creation-flow-ergonomics.spec.tsx",
   "src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx",
+  "src/tests/app.ui.delete-confirmations.spec.tsx",
   "src/tests/app.ui.form-validation-doctrine.spec.tsx",
   "src/tests/app.ui.home.spec.tsx",
   "src/tests/app.ui.import-export.spec.tsx",
