@@ -19,6 +19,7 @@ import { appActions } from "../../store";
 import { DEFAULT_WIRE_SECTION_MM2 } from "../../core/wireSection";
 import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
 import { suggestNextWireTechnicalId } from "../lib/technical-id-suggestions";
+import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import {
   findNextAvailableConnectorWay,
   findNextAvailableSplicePort,
@@ -36,6 +37,7 @@ type DispatchAction = (
 interface UseWireHandlersParams {
   store: AppStore;
   dispatchAction: DispatchAction;
+  confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
   wireFormMode: "idle" | "create" | "edit";
   setWireFormMode: (mode: "idle" | "create" | "edit") => void;
   editingWireId: WireId | null;
@@ -101,6 +103,7 @@ export interface WireEndpointSlotHint {
 export function useWireHandlers({
   store,
   dispatchAction,
+  confirmAction,
   wireFormMode,
   setWireFormMode,
   editingWireId,
@@ -749,10 +752,30 @@ export function useWireHandlers({
   }
 
   function handleWireDelete(wireId: WireId): void {
-    dispatchAction(appActions.removeWire(wireId));
-    if (editingWireId === wireId) {
-      clearWireForm();
+    const wire = store.getState().wires.byId[wireId];
+    if (wire === undefined) {
+      return;
     }
+
+    const wireIdentity =
+      wire.name.trim().length === 0 ? `'${wire.technicalId}'` : `'${wire.name}' (${wire.technicalId})`;
+    void (async () => {
+      const shouldDelete = await confirmAction({
+        title: "Delete wire",
+        message: `Delete wire ${wireIdentity}?`,
+        confirmLabel: "Delete",
+        cancelLabel: "Cancel",
+        intent: "danger"
+      });
+      if (!shouldDelete) {
+        return;
+      }
+
+      dispatchAction(appActions.removeWire(wireId));
+      if (editingWireId === wireId) {
+        clearWireForm();
+      }
+    })();
   }
 
   function handleLockWireRoute(): void {

@@ -3,6 +3,7 @@ import type { CatalogItem, CatalogItemId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions, isValidCatalogUrlInput } from "../../store";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
+import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -14,6 +15,7 @@ type DispatchAction = (
 interface UseCatalogHandlersParams {
   store: AppStore;
   dispatchAction: DispatchAction;
+  confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
   catalogFormMode: "idle" | "create" | "edit";
   setCatalogFormMode: (mode: "idle" | "create" | "edit") => void;
   editingCatalogItemId: CatalogItemId | null;
@@ -46,6 +48,7 @@ function normalizeOptionalNumber(raw: string): number | undefined {
 export function useCatalogHandlers({
   store,
   dispatchAction,
+  confirmAction,
   catalogFormMode,
   setCatalogFormMode,
   editingCatalogItemId,
@@ -166,10 +169,32 @@ export function useCatalogHandlers({
   }
 
   function handleCatalogDelete(catalogItemId: CatalogItemId): void {
-    dispatchAction(appActions.removeCatalogItem(catalogItemId));
-    if (editingCatalogItemId === catalogItemId) {
-      clearCatalogForm();
+    const catalogItem = store.getState().catalogItems.byId[catalogItemId];
+    if (catalogItem === undefined) {
+      return;
     }
+
+    const formattedIdentity =
+      catalogItem.name === undefined || catalogItem.name.trim().length === 0
+        ? `'${catalogItem.manufacturerReference}'`
+        : `'${catalogItem.manufacturerReference}' (${catalogItem.name.trim()})`;
+    void (async () => {
+      const shouldDelete = await confirmAction({
+        title: "Delete catalog item",
+        message: `Delete catalog item ${formattedIdentity}?`,
+        confirmLabel: "Delete",
+        cancelLabel: "Cancel",
+        intent: "danger"
+      });
+      if (!shouldDelete) {
+        return;
+      }
+
+      dispatchAction(appActions.removeCatalogItem(catalogItemId));
+      if (editingCatalogItemId === catalogItemId) {
+        clearCatalogForm();
+      }
+    })();
   }
 
   return {

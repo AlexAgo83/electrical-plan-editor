@@ -987,6 +987,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const catalogHandlers = useCatalogHandlers({
     store,
     dispatchAction,
+    confirmAction: requestConfirmation,
     catalogFormMode: formsState.catalogFormMode,
     setCatalogFormMode: formsState.setCatalogFormMode,
     editingCatalogItemId: formsState.editingCatalogItemId,
@@ -1535,6 +1536,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     store,
     state,
     dispatchAction,
+    confirmAction: requestConfirmation,
     connectorFormMode: formsState.connectorFormMode,
     setConnectorFormMode: formsState.setConnectorFormMode,
     editingConnectorId: formsState.editingConnectorId,

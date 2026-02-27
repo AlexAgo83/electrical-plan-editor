@@ -4,6 +4,7 @@ import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestAutoSpliceNodeId, suggestNextSpliceTechnicalId } from "../lib/technical-id-suggestions";
+import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -15,6 +16,7 @@ type DispatchAction = (
 interface UseSpliceHandlersParams {
   store: AppStore;
   dispatchAction: DispatchAction;
+  confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
   spliceFormMode: "idle" | "create" | "edit";
   setSpliceFormMode: (mode: "idle" | "create" | "edit") => void;
   editingSpliceId: SpliceId | null;
@@ -69,6 +71,7 @@ function hasSpliceWireEndpointIndexAboveLimit(store: AppStore, spliceId: SpliceI
 export function useSpliceHandlers({
   store,
   dispatchAction,
+  confirmAction,
   spliceFormMode,
   setSpliceFormMode,
   editingSpliceId,
@@ -258,11 +261,28 @@ export function useSpliceHandlers({
   }
 
   function handleSpliceDelete(spliceId: SpliceId): void {
-    dispatchAction(appActions.removeSplice(spliceId));
-
-    if (editingSpliceId === spliceId) {
-      clearSpliceForm();
+    const splice = store.getState().splices.byId[spliceId];
+    if (splice === undefined) {
+      return;
     }
+
+    void (async () => {
+      const shouldDelete = await confirmAction({
+        title: "Delete splice",
+        message: `Delete splice '${splice.name}' (${splice.technicalId})?`,
+        confirmLabel: "Delete",
+        cancelLabel: "Cancel",
+        intent: "danger"
+      });
+      if (!shouldDelete) {
+        return;
+      }
+
+      dispatchAction(appActions.removeSplice(spliceId));
+      if (editingSpliceId === spliceId) {
+        clearSpliceForm();
+      }
+    })();
   }
 
   function handleReservePort(event: FormEvent<HTMLFormElement>): void {

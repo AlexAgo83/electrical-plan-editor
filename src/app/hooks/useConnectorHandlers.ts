@@ -4,6 +4,7 @@ import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestAutoConnectorNodeId, suggestNextConnectorTechnicalId } from "../lib/technical-id-suggestions";
+import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -15,6 +16,7 @@ type DispatchAction = (
 interface UseConnectorHandlersParams {
   store: AppStore;
   dispatchAction: DispatchAction;
+  confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
   connectorFormMode: "idle" | "create" | "edit";
   setConnectorFormMode: (mode: "idle" | "create" | "edit") => void;
   editingConnectorId: ConnectorId | null;
@@ -69,6 +71,7 @@ function hasConnectorWireEndpointIndexAboveLimit(store: AppStore, connectorId: C
 export function useConnectorHandlers({
   store,
   dispatchAction,
+  confirmAction,
   connectorFormMode,
   setConnectorFormMode,
   editingConnectorId,
@@ -266,11 +269,28 @@ export function useConnectorHandlers({
   }
 
   function handleConnectorDelete(connectorId: ConnectorId): void {
-    dispatchAction(appActions.removeConnector(connectorId));
-
-    if (editingConnectorId === connectorId) {
-      clearConnectorForm();
+    const connector = store.getState().connectors.byId[connectorId];
+    if (connector === undefined) {
+      return;
     }
+
+    void (async () => {
+      const shouldDelete = await confirmAction({
+        title: "Delete connector",
+        message: `Delete connector '${connector.name}' (${connector.technicalId})?`,
+        confirmLabel: "Delete",
+        cancelLabel: "Cancel",
+        intent: "danger"
+      });
+      if (!shouldDelete) {
+        return;
+      }
+
+      dispatchAction(appActions.removeConnector(connectorId));
+      if (editingConnectorId === connectorId) {
+        clearConnectorForm();
+      }
+    })();
   }
 
   function handleReserveCavity(event: FormEvent<HTMLFormElement>): void {

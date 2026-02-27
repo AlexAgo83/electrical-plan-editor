@@ -5,6 +5,7 @@ import { appActions } from "../../store";
 import { focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestNextNodeId } from "../lib/technical-id-suggestions";
 import type { NodePosition } from "../types/app-controller";
+import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -17,6 +18,7 @@ interface UseNodeHandlersParams {
   store: AppStore;
   state: ReturnType<AppStore["getState"]>;
   dispatchAction: DispatchAction;
+  confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
   nodeFormMode: "idle" | "create" | "edit";
   setNodeFormMode: (mode: "idle" | "create" | "edit") => void;
   editingNodeId: NodeId | null;
@@ -41,6 +43,7 @@ export function useNodeHandlers({
   store,
   state,
   dispatchAction,
+  confirmAction,
   nodeFormMode,
   setNodeFormMode,
   editingNodeId,
@@ -197,11 +200,30 @@ export function useNodeHandlers({
   }
 
   function handleNodeDelete(nodeId: NodeId): void {
-    dispatchAction(appActions.removeNode(nodeId));
-
-    if (editingNodeId === nodeId) {
-      clearNodeForm();
+    const node = store.getState().nodes.byId[nodeId];
+    if (node === undefined) {
+      return;
     }
+
+    const nodeIdentity =
+      node.kind === "intermediate" ? `'${node.id}' (${node.label})` : `'${node.id}'`;
+    void (async () => {
+      const shouldDelete = await confirmAction({
+        title: "Delete node",
+        message: `Delete node ${nodeIdentity}?`,
+        confirmLabel: "Delete",
+        cancelLabel: "Cancel",
+        intent: "danger"
+      });
+      if (!shouldDelete) {
+        return;
+      }
+
+      dispatchAction(appActions.removeNode(nodeId));
+      if (editingNodeId === nodeId) {
+        clearNodeForm();
+      }
+    })();
   }
 
   return {
