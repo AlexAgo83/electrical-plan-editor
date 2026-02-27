@@ -20,6 +20,27 @@ describe("home workspace screen", () => {
 
     expect(getPanelByHeading("Quick start")).toBeInTheDocument();
     expect(getPanelByHeading("Workspace")).toBeInTheDocument();
+    expect(getPanelByHeading("What's new")).toBeInTheDocument();
+  });
+
+  it("renders an auto-detected changelog feed in descending version order", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("home");
+
+    const whatsNewPanel = getPanelByHeading("What's new");
+    const changelogFeed = within(whatsNewPanel).getByLabelText("Changelog feed");
+    expect(changelogFeed).toHaveAttribute("tabindex", "0");
+
+    const changelogVersions = Array.from(
+      whatsNewPanel.querySelectorAll("[data-changelog-version]")
+    ).map((entry) => entry.getAttribute("data-changelog-version"));
+
+    expect(changelogVersions.length).toBeGreaterThan(1);
+    expect(changelogVersions[0]).toBe("0.9.12");
+    expect(changelogVersions).toContain("0.9.6");
+    expect(changelogVersions).toContain("0.9.0");
+    expect(changelogVersions).toContain("0.8.1");
   });
 
   it("shows active workspace resume summary details", () => {

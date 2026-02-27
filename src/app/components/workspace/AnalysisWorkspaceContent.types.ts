@@ -125,6 +125,7 @@ export interface AnalysisWorkspaceContentProps {
   setWireSort: (value: SortState | ((current: SortState) => SortState)) => void;
   selectedWireId: WireId | null;
   onSelectWire: (wireId: WireId) => void;
+  onGoToWireFromAnalysis: (wireId: WireId) => void;
   onOpenWireOnboardingHelp?: () => void;
   selectedWire: Wire | null;
   describeWireEndpoint: (endpoint: Wire["endpointA"]) => string;
