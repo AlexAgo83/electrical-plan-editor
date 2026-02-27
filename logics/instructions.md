@@ -32,13 +32,19 @@ Use the following indicators in request/backlog/task items:
 
 This repository uses a reusable Logics skills kit (usually imported as a submodule under `logics/skills/`).
 
+Core workflow in this project:
+
+- Lint Logics docs (required in CI/local): `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
 - Create/promote request/backlog/task docs: `python3 logics/skills/logics-flow-manager/scripts/logics_flow.py`
-- Lint Logics docs: `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
-- Bootstrap folders (this script): `python3 logics/skills/logics-bootstrapper/scripts/logics_bootstrap.py`
+
+On-demand workflow:
+
+- Bootstrap folders (one-time or structural checks): `python3 logics/skills/logics-bootstrapper/scripts/logics_bootstrap.py`
+- Other skills in `logics/skills/` are optional and should be used only when they match a concrete need.
 
 ## MCP
 
-Available MCP skills include:
+Available MCP skills (optional, connector-specific) include:
 
 - Chrome DevTools: `logics/skills/logics-mcp-chrome-devtools/SKILL.md`
 - Terminal: `logics/skills/logics-mcp-terminal/SKILL.md`
