@@ -9,6 +9,20 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("home workspace screen", () => {
+  function compareVersionsDescending(left: string, right: string): number {
+    const leftParts = left.split(".").map((part) => Number.parseInt(part, 10));
+    const rightParts = right.split(".").map((part) => Number.parseInt(part, 10));
+    const maxLength = Math.max(leftParts.length, rightParts.length);
+    for (let index = 0; index < maxLength; index += 1) {
+      const leftValue = leftParts[index] ?? 0;
+      const rightValue = rightParts[index] ?? 0;
+      if (leftValue !== rightValue) {
+        return rightValue - leftValue;
+      }
+    }
+    return 0;
+  }
+
   beforeEach(() => {
     localStorage.clear();
   });
@@ -34,10 +48,13 @@ describe("home workspace screen", () => {
 
     const changelogVersions = Array.from(
       whatsNewPanel.querySelectorAll("[data-changelog-version]")
-    ).map((entry) => entry.getAttribute("data-changelog-version"));
+    )
+      .map((entry) => entry.getAttribute("data-changelog-version"))
+      .filter((version): version is string => version !== null);
 
     expect(changelogVersions.length).toBeGreaterThan(1);
-    expect(changelogVersions[0]).toBe("0.9.12");
+    const sortedDescending = [...changelogVersions].sort(compareVersionsDescending);
+    expect(changelogVersions).toEqual(sortedDescending);
     expect(changelogVersions).toContain("0.9.6");
     expect(changelogVersions).toContain("0.9.0");
     expect(changelogVersions).toContain("0.8.1");
