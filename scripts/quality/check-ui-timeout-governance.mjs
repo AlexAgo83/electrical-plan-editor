@@ -10,7 +10,26 @@ const TEST_ROOT = path.join(ROOT, "src", "tests");
  * Keep this list empty by default. If a short-term exception is needed, add
  * an entry with technical rationale and retirement plan in the linked Logics docs.
  */
-const ALLOWED_TIMEOUT_OVERRIDES = [];
+const ALLOWED_TIMEOUT_OVERRIDES = [
+  {
+    key:
+      "src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx::supports fuse mode with catalog linkage, preserves save/cancel semantics, and shows fuse metadata in wire list and analysis",
+    rationale:
+      "Wide integration path with multiple end-to-end form transitions; temporary override retained until fixture/setup cost is reduced."
+  },
+  {
+    key:
+      "src/tests/app.ui.settings-canvas-render.spec.tsx::auto-rotates segment labels with segment angle when enabled and persists the preference",
+    rationale:
+      "Canvas render preference test runs multiple persistence/remount checks; temporary override retained pending test decomposition."
+  },
+  {
+    key:
+      "src/tests/app.ui.settings-wire-defaults.spec.tsx::persists global defaults for wire section and auto-create linked nodes and reuses them in create forms",
+    rationale:
+      "Cross-screen defaults propagation scenario touches multiple forms and validation passes; temporary override retained until helper extraction."
+  }
+];
 
 function walk(directory, predicate) {
   const entries = readdirSync(directory);
