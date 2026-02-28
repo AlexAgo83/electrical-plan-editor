@@ -330,7 +330,7 @@ describe("App integration UI - network summary workflow polish", () => {
         `translate(${persistedViewState.offset.x} ${persistedViewState.offset.y}) scale(${persistedViewState.scale})`
       );
     });
-  }, 10_000);
+  });
 
   it("restores independent network summary viewport and display toggles per network when switching active network", async () => {
     const base = createUiIntegrationState();

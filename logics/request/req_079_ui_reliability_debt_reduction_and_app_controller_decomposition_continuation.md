@@ -1,8 +1,8 @@
 ## req_079_ui_reliability_debt_reduction_and_app_controller_decomposition_continuation - UI reliability debt reduction and app controller decomposition continuation
 > From version: 0.9.17
 > Status: In Progress
-> Understanding: 95%
-> Confidence: 90%
+> Understanding: 98%
+> Confidence: 94%
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -69,6 +69,17 @@
 - Refactor can accidentally alter behavior if extraction boundaries are not contract-tested.
 - Overfitting tests to current internals can make future refactors harder.
 - Time spent on reliability can drift without strict top-slow prioritization.
+
+# Evidence
+- Wave 1 (`item_409`) targeted slow/flaky UI tests and removed explicit timeout overrides:
+  - baseline scan (pre-change): `rg -n "},\\s*10_000\\)|,\\s*10_000\\)|15000|15_000" src/tests` -> `15` explicit timeout matches.
+  - post-change scan: `rg -n "10_000|15_000|15000" src/tests` -> no matches.
+- Slow-top diagnostic executed:
+  - `npm run -s test:ci:ui:slow-top` -> top-10 slow tests all below `5s` in this wave snapshot.
+- Regression validation executed:
+  - targeted: `npx vitest run` on touched UI specs (`delete confirmations`, `creation-flow`, `navigation`, `settings`, `list ergonomics`, `wire free mode`, `network summary polish`, `undo/redo`) -> pass.
+  - lane: `npm run -s test:ci:ui` -> pass (`30` files, `193` tests).
+  - safety: `npm run -s typecheck` -> pass.
 
 # Delivery status
 - Status: in progress.

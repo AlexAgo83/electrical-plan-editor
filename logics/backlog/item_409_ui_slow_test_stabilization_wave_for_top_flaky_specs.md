@@ -1,9 +1,9 @@
 ## item_409_ui_slow_test_stabilization_wave_for_top_flaky_specs - UI slow test stabilization wave for top flaky specs
 > From version: 0.9.17
-> Status: In Progress
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 10%
+> Status: Done
+> Understanding: 98%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Quality
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -28,11 +28,11 @@ Several UI integration specs remain slow/fragile and depend on high timeout budg
 - AC5: The wave contributes to a net reduction of at least `30%` on existing targeted `10_000ms` timeout exceptions.
 
 # AC Traceability
-- AC1 -> Slow-spec list captured from reporting output. Proof: pending.
-- AC2 -> Test stabilization commits and spec diffs. Proof: pending.
-- AC3 -> Re-run evidence (`test:ci:ui` / targeted tests). Proof: pending.
-- AC4 -> Documented timeout rationale when kept. Proof: pending.
-- AC5 -> Baseline vs post-wave timeout exception count shows >=30% reduction. Proof: pending.
+- AC1 -> Slow-spec list captured from reporting output. Proof: `npm run -s test:ci:ui:slow-top`.
+- AC2 -> Targeted stabilization updates applied in UI test specs, including split of oversized delete-confirmation scenarios and timeout removal in previously exception-tagged specs. Proof: `src/tests/app.ui.delete-confirmations.spec.tsx` and touched UI test files.
+- AC3 -> Re-run evidence (`test:ci:ui` / targeted tests). Proof: `npx vitest run ...` on touched specs + `npm run -s test:ci:ui` (30 files, 193 tests passed).
+- AC4 -> No remaining timeout exception requires rationale in this wave because explicit per-test overrides were removed. Proof: `rg -n "10_000|15_000|15000" src/tests` returns no matches.
+- AC5 -> Baseline vs post-wave timeout exception count exceeds the required reduction. Proof: baseline `15` explicit matches -> post-wave `0` matches (100% reduction, >=30% target).
 
 # Priority
 - Impact:

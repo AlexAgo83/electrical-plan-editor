@@ -49,5 +49,5 @@ describe("App integration UI - navigation and canvas validation bridge", () => {
     const modelHealth = screen.getByRole("region", { name: "Model health" });
     expect(within(modelHealth).getByText("2/2", { selector: "strong" })).toBeInTheDocument();
     expect(within(modelHealth).getByText(/\[WARNING\] Occupancy conflict/i)).toBeInTheDocument();
-  }, 10_000);
+  });
 });
