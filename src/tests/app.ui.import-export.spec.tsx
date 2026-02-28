@@ -20,6 +20,7 @@ describe("App integration UI - import/export", () => {
     switchScreen("settings");
 
     const panel = getPanelByHeading("Import / Export networks");
+    expect(panel).toHaveClass("settings-panel--import-export");
     const grid = panel.querySelector(".settings-import-export-grid");
     expect(grid).not.toBeNull();
 
