@@ -1246,6 +1246,11 @@ export function NetworkSummaryPanel({
       (Math.atan2(segmentVectorY, segmentVectorX) * 180) / Math.PI
     );
     const segmentLabelRotationDegrees = autoSegmentLabelRotation ? segmentAngleDegrees : labelRotationDegrees;
+    const segmentLabelRotationRadians = (segmentLabelRotationDegrees * Math.PI) / 180;
+    const segmentLabelOffsetDistance = showSegmentLengths ? 6 : 0;
+    // Keep ID/length split along the label-normal axis, including when labels are auto-rotated.
+    const segmentLengthLabelOffsetX = -Math.sin(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
+    const segmentLengthLabelOffsetY = Math.cos(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
 
     return [
       {
@@ -1256,7 +1261,11 @@ export function NetworkSummaryPanel({
         segmentGroupClassName,
         labelX,
         labelY,
-        segmentLabelRotationDegrees
+        segmentLabelRotationDegrees,
+        segmentIdLabelX: -segmentLengthLabelOffsetX,
+        segmentIdLabelY: -segmentLengthLabelOffsetY,
+        segmentLengthLabelX: segmentLengthLabelOffsetX,
+        segmentLengthLabelY: segmentLengthLabelOffsetY
       }
     ];
   });
@@ -1295,8 +1304,6 @@ export function NetworkSummaryPanel({
       }
     ];
   });
-
-  const segmentIdLabelOffsetY = showSegmentLengths ? -6 : 0;
 
   return (
     <section className="network-summary-stack">
@@ -1510,48 +1517,62 @@ export function NetworkSummaryPanel({
               </g>
 
               <g className="network-graph-layer network-graph-layer-labels" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
-                {renderedSegments.map(({ segment, segmentGroupClassName, labelX, labelY, segmentLabelRotationDegrees }) => (
-                  <g key={`${segment.id}-labels`} className={segmentGroupClassName} data-segment-id={segment.id}>
-                    <g
-                      className="network-segment-label-anchor"
-                      transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
-                    >
-                      <text
-                        className="network-segment-label"
-                        x={0}
-                        y={segmentIdLabelOffsetY}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        transform={
-                          segmentLabelRotationDegrees === 0
-                            ? undefined
-                            : `rotate(${segmentLabelRotationDegrees} 0 ${segmentIdLabelOffsetY})`
-                        }
-                      >
-                        {segment.id}
-                      </text>
-                    </g>
-                    {showSegmentLengths ? (
+                {renderedSegments.map(
+                  ({
+                    segment,
+                    segmentGroupClassName,
+                    labelX,
+                    labelY,
+                    segmentLabelRotationDegrees,
+                    segmentIdLabelX,
+                    segmentIdLabelY,
+                    segmentLengthLabelX,
+                    segmentLengthLabelY
+                  }) => (
+                    <g key={`${segment.id}-labels`} className={segmentGroupClassName} data-segment-id={segment.id}>
                       <g
-                        className="network-segment-length-label-anchor"
+                        className="network-segment-label-anchor"
                         transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
                       >
                         <text
-                          className="network-segment-length-label"
-                          x={0}
-                          y={6}
+                          className="network-segment-label"
+                          x={segmentIdLabelX}
+                          y={segmentIdLabelY}
                           textAnchor="middle"
                           dominantBaseline="middle"
                           transform={
-                            segmentLabelRotationDegrees === 0 ? undefined : `rotate(${segmentLabelRotationDegrees} 0 6)`
+                            segmentLabelRotationDegrees === 0
+                              ? undefined
+                              : `rotate(${segmentLabelRotationDegrees} ${segmentIdLabelX} ${segmentIdLabelY})`
                           }
                         >
-                          {segment.lengthMm} mm
+                          {segment.id}
                         </text>
                       </g>
-                    ) : null}
-                  </g>
-                ))}
+                      {showSegmentLengths ? (
+                        <g
+                          className="network-segment-length-label-anchor"
+                          transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
+                        >
+                          <text
+                            className="network-segment-length-label"
+                            x={segmentLengthLabelX}
+                            y={segmentLengthLabelY}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            transform={
+                              segmentLabelRotationDegrees === 0
+                                ? undefined
+                                : `rotate(${segmentLabelRotationDegrees} ${segmentLengthLabelX} ${segmentLengthLabelY})`
+                            }
+                          >
+                            {segment.lengthMm} mm
+                          </text>
+                        </g>
+                      ) : null}
+                    </g>
+                  )
+                )}
 
                 {renderedNodes.map(({ node, position, nodeLabel, isSubNetworkDeemphasized }) => (
                   <g

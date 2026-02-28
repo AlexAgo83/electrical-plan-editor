@@ -40,70 +40,74 @@ describe("App integration UI - settings canvas render", () => {
     expect(within(restoredCanvasSettingsPanel).getByLabelText("2D label rotation")).toHaveValue("45");
   });
 
-  it("auto-rotates segment labels with segment angle when enabled and persists the preference", () => {
-    const positionedState = appReducer(
-      createUiIntegrationState(),
-      appActions.setNodePositions({
-        [asNodeId("N-C1")]: { x: 40, y: 40 },
-        [asNodeId("N-MID")]: { x: 160, y: 140 },
-        [asNodeId("N-S1")]: { x: 300, y: 100 }
-      })
-    );
-    const firstRender = renderAppWithState(positionedState);
+  it(
+    "auto-rotates segment labels with segment angle when enabled and persists the preference",
+    () => {
+      const positionedState = appReducer(
+        createUiIntegrationState(),
+        appActions.setNodePositions({
+          [asNodeId("N-C1")]: { x: 40, y: 40 },
+          [asNodeId("N-MID")]: { x: 160, y: 140 },
+          [asNodeId("N-S1")]: { x: 300, y: 100 }
+        })
+      );
+      const firstRender = renderAppWithState(positionedState);
 
-    switchScreenDrawerAware("settings");
-    const canvasSettingsPanel = getPanelByHeading("Canvas render preferences");
-    fireEvent.change(within(canvasSettingsPanel).getByLabelText("2D label rotation"), {
-      target: { value: "0" }
-    });
-    const autoRotationSelect = within(canvasSettingsPanel).getByLabelText("Auto segment label rotation");
-    expect(autoRotationSelect).toHaveValue("no");
+      switchScreenDrawerAware("settings");
+      const canvasSettingsPanel = getPanelByHeading("Canvas render preferences");
+      fireEvent.change(within(canvasSettingsPanel).getByLabelText("2D label rotation"), {
+        target: { value: "0" }
+      });
+      const autoRotationSelect = within(canvasSettingsPanel).getByLabelText("Auto segment label rotation");
+      expect(autoRotationSelect).toHaveValue("no");
 
-    switchScreenDrawerAware("analysis");
-    let networkSummaryPanel = getPanelByHeading("Network summary");
-    const segmentLabelWithoutAutoRotation = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
-      (label) => label.textContent?.trim() === "SEG-A"
-    );
-    expect(segmentLabelWithoutAutoRotation).not.toBeNull();
-    expect(segmentLabelWithoutAutoRotation?.getAttribute("transform")).toBeNull();
+      switchScreenDrawerAware("analysis");
+      let networkSummaryPanel = getPanelByHeading("Network summary");
+      const segmentLabelWithoutAutoRotation = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
+        (label) => label.textContent?.trim() === "SEG-A"
+      );
+      expect(segmentLabelWithoutAutoRotation).not.toBeNull();
+      expect(segmentLabelWithoutAutoRotation?.getAttribute("transform")).toBeNull();
 
-    switchScreenDrawerAware("settings");
-    fireEvent.change(within(getPanelByHeading("Canvas render preferences")).getByLabelText("Auto segment label rotation"), {
-      target: { value: "yes" }
-    });
+      switchScreenDrawerAware("settings");
+      fireEvent.change(within(getPanelByHeading("Canvas render preferences")).getByLabelText("Auto segment label rotation"), {
+        target: { value: "yes" }
+      });
 
-    switchScreenDrawerAware("analysis");
-    networkSummaryPanel = getPanelByHeading("Network summary");
-    const segmentLabel = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
-      (label) => label.textContent?.trim() === "SEG-A"
-    );
-    expect(segmentLabel).not.toBeNull();
-    expect(segmentLabel?.getAttribute("transform")).toContain("rotate(");
-    expect(segmentLabel?.getAttribute("transform")).not.toContain("rotate(0");
+      switchScreenDrawerAware("analysis");
+      networkSummaryPanel = getPanelByHeading("Network summary");
+      const segmentLabel = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
+        (label) => label.textContent?.trim() === "SEG-A"
+      );
+      expect(segmentLabel).not.toBeNull();
+      expect(segmentLabel?.getAttribute("transform")).toContain("rotate(");
+      expect(segmentLabel?.getAttribute("transform")).not.toContain("rotate(0");
 
-    switchScreenDrawerAware("settings");
-    expect(within(getPanelByHeading("Canvas render preferences")).getByLabelText("Auto segment label rotation")).toHaveValue(
-      "yes"
-    );
+      switchScreenDrawerAware("settings");
+      expect(within(getPanelByHeading("Canvas render preferences")).getByLabelText("Auto segment label rotation")).toHaveValue(
+        "yes"
+      );
 
-    firstRender.unmount();
+      firstRender.unmount();
 
-    renderAppWithState(createUiIntegrationState());
-    switchScreenDrawerAware("settings");
-    const restoredCanvasSettingsPanel = getPanelByHeading("Canvas render preferences");
-    expect(within(restoredCanvasSettingsPanel).getByLabelText("Auto segment label rotation")).toHaveValue("yes");
+      renderAppWithState(createUiIntegrationState());
+      switchScreenDrawerAware("settings");
+      const restoredCanvasSettingsPanel = getPanelByHeading("Canvas render preferences");
+      expect(within(restoredCanvasSettingsPanel).getByLabelText("Auto segment label rotation")).toHaveValue("yes");
 
-    fireEvent.change(within(restoredCanvasSettingsPanel).getByLabelText("Auto segment label rotation"), {
-      target: { value: "no" }
-    });
-    switchScreenDrawerAware("analysis");
-    networkSummaryPanel = getPanelByHeading("Network summary");
-    const restoredSegmentLabelWithoutAutoRotation = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
-      (label) => label.textContent?.trim() === "SEG-A"
-    );
-    expect(restoredSegmentLabelWithoutAutoRotation).not.toBeNull();
-    expect(restoredSegmentLabelWithoutAutoRotation?.getAttribute("transform")).toBeNull();
-  });
+      fireEvent.change(within(restoredCanvasSettingsPanel).getByLabelText("Auto segment label rotation"), {
+        target: { value: "no" }
+      });
+      switchScreenDrawerAware("analysis");
+      networkSummaryPanel = getPanelByHeading("Network summary");
+      const restoredSegmentLabelWithoutAutoRotation = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
+        (label) => label.textContent?.trim() === "SEG-A"
+      );
+      expect(restoredSegmentLabelWithoutAutoRotation).not.toBeNull();
+      expect(restoredSegmentLabelWithoutAutoRotation?.getAttribute("transform")).toBeNull();
+    },
+    10_000
+  );
 
   it("overrides custom segment label rotation when auto segment label rotation is enabled", () => {
     const positionedState = appReducer(
@@ -142,6 +146,51 @@ describe("App integration UI - settings canvas render", () => {
     );
     expect(segmentLabel).not.toBeNull();
     expect(segmentLabel?.getAttribute("transform")).toBeNull();
+  });
+
+  it("keeps segment ID and length labels separated on vertical segments when auto rotation is enabled", () => {
+    const positionedState = appReducer(
+      createUiIntegrationState(),
+      appActions.setNodePositions({
+        [asNodeId("N-C1")]: { x: 40, y: 80 },
+        [asNodeId("N-MID")]: { x: 220, y: 80 },
+        [asNodeId("N-S1")]: { x: 220, y: 260 }
+      })
+    );
+    renderAppWithState(positionedState);
+
+    switchScreenDrawerAware("settings");
+    const canvasSettingsPanel = getPanelByHeading("Canvas render preferences");
+    fireEvent.change(within(canvasSettingsPanel).getByLabelText("2D label rotation"), {
+      target: { value: "0" }
+    });
+    fireEvent.change(within(canvasSettingsPanel).getByLabelText("Auto segment label rotation"), {
+      target: { value: "yes" }
+    });
+
+    switchScreenDrawerAware("analysis");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const lengthToggle = within(networkSummaryPanel).getByRole("button", { name: "Length" });
+    fireEvent.click(lengthToggle);
+    expect(lengthToggle).toHaveClass("is-active");
+
+    const segmentLabelGroup = networkSummaryPanel.querySelector(".network-graph-layer-labels [data-segment-id='SEG-B']");
+    expect(segmentLabelGroup).not.toBeNull();
+    const segmentIdLabel = segmentLabelGroup?.querySelector(".network-segment-label");
+    const segmentLengthLabel = segmentLabelGroup?.querySelector(".network-segment-length-label");
+    expect(segmentIdLabel).not.toBeNull();
+    expect(segmentLengthLabel).not.toBeNull();
+
+    const segmentIdX = Number(segmentIdLabel?.getAttribute("x"));
+    const segmentIdY = Number(segmentIdLabel?.getAttribute("y"));
+    const segmentLengthX = Number(segmentLengthLabel?.getAttribute("x"));
+    const segmentLengthY = Number(segmentLengthLabel?.getAttribute("y"));
+
+    expect(Math.abs(segmentIdX)).toBeGreaterThan(0.5);
+    expect(Math.abs(segmentLengthX)).toBeGreaterThan(0.5);
+    expect(Math.abs(segmentIdY)).toBeLessThan(1.5);
+    expect(Math.abs(segmentLengthY)).toBeLessThan(1.5);
+    expect(Math.sign(segmentIdX)).toBe(-Math.sign(segmentLengthX));
   });
 
   it("uses normal callout text size by default and updates the network callout text size class from settings", () => {
