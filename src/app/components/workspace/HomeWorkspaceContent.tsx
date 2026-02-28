@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
+import { useEffect, useId, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { NetworkImportSummary } from "../../../adapters/portability";
@@ -43,6 +43,131 @@ function formatSaveStatus(saveStatus: HomeWorkspaceContentProps["saveStatus"]): 
     return "Unsaved";
   }
   return "Error";
+}
+
+interface ChangelogCollapsibleSection {
+  title: string;
+  body: string;
+}
+
+interface ChangelogSectionsSplit {
+  beforeCollapsibleSections: string;
+  collapsibleSections: ChangelogCollapsibleSection[];
+}
+
+const COLLAPSIBLE_SECTION_START_TITLE = "Product and UX Changes";
+const LEVEL_TWO_HEADING_MATCHER = /^ {0,3}##\s+(.+?)\s*#*\s*$/;
+
+function normalizeHeadingTitle(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function readLevelTwoHeadingTitle(line: string): string | null {
+  const match = line.match(LEVEL_TWO_HEADING_MATCHER);
+  if (match === null) {
+    return null;
+  }
+  const title = match[1];
+  if (title === undefined) {
+    return null;
+  }
+  return title.trim();
+}
+
+function splitCollapsibleSections(markdown: string): ChangelogSectionsSplit | null {
+  const lines = markdown.split(/\r?\n/);
+  const levelTwoHeadings: Array<{ index: number; title: string }> = [];
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (line === undefined) {
+      continue;
+    }
+    const headingTitle = readLevelTwoHeadingTitle(line);
+    if (headingTitle !== null) {
+      levelTwoHeadings.push({ index, title: headingTitle });
+    }
+  }
+
+  if (levelTwoHeadings.length === 0) {
+    return null;
+  }
+
+  const startHeadingIndex = levelTwoHeadings.findIndex(
+    (heading) => normalizeHeadingTitle(heading.title) === normalizeHeadingTitle(COLLAPSIBLE_SECTION_START_TITLE)
+  );
+  if (startHeadingIndex === -1) {
+    return null;
+  }
+
+  const firstCollapsibleHeading = levelTwoHeadings[startHeadingIndex];
+  if (firstCollapsibleHeading === undefined) {
+    return null;
+  }
+
+  const collapsibleSections = levelTwoHeadings.slice(startHeadingIndex).map((heading, index, headings) => {
+    const nextHeading = headings[index + 1];
+    const sectionEndIndex = nextHeading?.index ?? lines.length;
+    return {
+      title: heading.title,
+      body: lines.slice(heading.index + 1, sectionEndIndex).join("\n").trim()
+    };
+  });
+
+  return {
+    beforeCollapsibleSections: lines.slice(0, firstCollapsibleHeading.index).join("\n").trim(),
+    collapsibleSections
+  };
+}
+
+function ChangelogEntryMarkdown({ content }: { content: string }): ReactElement {
+  const [expandedSections, setExpandedSections] = useState<Record<number, boolean>>({});
+  const collapsibleSections = splitCollapsibleSections(content);
+  const collapsibleSectionsIdPrefix = useId();
+
+  if (collapsibleSections === null) {
+    return <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>;
+  }
+
+  return (
+    <>
+      {collapsibleSections.beforeCollapsibleSections.length > 0 ? (
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{collapsibleSections.beforeCollapsibleSections}</ReactMarkdown>
+      ) : null}
+      {collapsibleSections.collapsibleSections.map((section, index) => {
+        const panelId = `${collapsibleSectionsIdPrefix}-${index}`;
+        const isExpanded = expandedSections[index] === true;
+
+        return (
+          <section key={`${section.title}-${index}`} className="home-changelog-collapsible" data-changelog-collapsible={section.title}>
+            <button
+              type="button"
+              className="home-changelog-collapsible-toggle"
+              aria-expanded={isExpanded}
+              aria-controls={panelId}
+              onClick={() => {
+                setExpandedSections((current) => ({
+                  ...current,
+                  [index]: !isExpanded
+                }));
+              }}
+            >
+              {section.title}
+            </button>
+            {isExpanded ? (
+              <div id={panelId} className="home-changelog-collapsible-content">
+                {section.body.length > 0 ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.body}</ReactMarkdown>
+                ) : (
+                  <p className="meta-line">No listed changes in this section.</p>
+                )}
+              </div>
+            ) : null}
+          </section>
+        );
+      })}
+    </>
+  );
 }
 
 export function HomeWorkspaceContent({
@@ -253,7 +378,7 @@ export function HomeWorkspaceContent({
                   v{entry.version}
                 </h3>
                 <div className="home-changelog-markdown">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{entry.content}</ReactMarkdown>
+                  <ChangelogEntryMarkdown content={entry.content} />
                 </div>
               </article>
             ))

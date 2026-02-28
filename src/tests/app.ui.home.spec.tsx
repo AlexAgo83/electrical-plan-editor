@@ -105,6 +105,43 @@ describe("home workspace screen", () => {
     }
   });
 
+  it("collapses Product and UX Changes and following sections by default, then toggles on click", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("home");
+
+    const whatsNewPanel = getPanelByHeading("What's new");
+    const productUxToggles = within(whatsNewPanel).getAllByRole("button", { name: "Product and UX Changes" });
+    expect(productUxToggles.length).toBeGreaterThan(0);
+    const productUxToggle = productUxToggles[0];
+    if (productUxToggle === undefined) {
+      throw new Error("Expected at least one Product and UX Changes toggle in the changelog feed.");
+    }
+    expect(productUxToggle).toHaveAttribute("aria-expanded", "false");
+    expect(within(whatsNewPanel).queryByText("Home, Onboarding, and Release Visibility (req_070)")).not.toBeInTheDocument();
+
+    fireEvent.click(productUxToggle);
+    expect(productUxToggle).toHaveAttribute("aria-expanded", "true");
+    expect(within(whatsNewPanel).getByText("Home, Onboarding, and Release Visibility (req_070)")).toBeInTheDocument();
+
+    fireEvent.click(productUxToggle);
+    expect(productUxToggle).toHaveAttribute("aria-expanded", "false");
+    expect(within(whatsNewPanel).queryByText("Home, Onboarding, and Release Visibility (req_070)")).not.toBeInTheDocument();
+
+    const engineeringToggles = within(whatsNewPanel).getAllByRole("button", { name: "Engineering Quality, CI, and Reliability" });
+    expect(engineeringToggles.length).toBeGreaterThan(0);
+    const engineeringToggle = engineeringToggles[0];
+    if (engineeringToggle === undefined) {
+      throw new Error("Expected at least one Engineering Quality, CI, and Reliability toggle in the changelog feed.");
+    }
+    expect(engineeringToggle).toHaveAttribute("aria-expanded", "false");
+    expect(within(whatsNewPanel).queryByText("Updated segmented Vitest lane contract to include new UI specs.")).not.toBeInTheDocument();
+
+    fireEvent.click(engineeringToggle);
+    expect(engineeringToggle).toHaveAttribute("aria-expanded", "true");
+    expect(within(whatsNewPanel).getByText("Updated segmented Vitest lane contract to include new UI specs.")).toBeInTheDocument();
+  });
+
   it("shows active workspace resume summary details", () => {
     renderAppWithState(createUiIntegrationState());
 

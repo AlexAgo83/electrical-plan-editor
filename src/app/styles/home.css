@@ -206,6 +206,44 @@
   margin-bottom: 0;
 }
 
+.home-changelog-collapsible {
+  margin: 0.65rem 0;
+  border: 1px solid rgba(120, 145, 166, 0.3);
+  border-radius: 0.55rem;
+  background: rgba(120, 145, 166, 0.06);
+}
+
+.home-changelog-collapsible-toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 0.5rem 0.62rem;
+  text-align: left;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.home-changelog-collapsible-toggle::before {
+  content: "▸";
+  font-size: 0.85rem;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.home-changelog-collapsible-toggle[aria-expanded="true"]::before {
+  content: "▾";
+}
+
+.home-changelog-collapsible-content {
+  padding: 0 0.62rem 0.58rem;
+}
+
 .home-changelog-markdown h1,
 .home-changelog-markdown h2,
 .home-changelog-markdown h3,
