@@ -225,6 +225,13 @@ button {
   border-color: #17374e;
 }
 
+@media (max-width: 900px) {
+  .header-settings-label,
+  .header-ops-label {
+    display: none;
+  }
+}
+
 .header-ops-badge {
   display: inline-flex;
   align-items: center;
