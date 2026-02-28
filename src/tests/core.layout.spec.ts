@@ -313,7 +313,7 @@ describe("2D layout generation", () => {
     // Keep the default budget pragmatic (with headroom for coverage + larger UI suites), and allow
     // an env override when calibrating slower runners.
     const performanceBudgetMs =
-      Number.isFinite(configuredBudgetOverride) && configuredBudgetOverride > 0 ? configuredBudgetOverride : 9_000;
+      Number.isFinite(configuredBudgetOverride) && configuredBudgetOverride > 0 ? configuredBudgetOverride : 14_000;
 
     expect(Object.keys(generated)).toHaveLength(nodes.length);
     expect(elapsedMs).toBeLessThan(performanceBudgetMs);

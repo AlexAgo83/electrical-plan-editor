@@ -117,16 +117,21 @@ describe("home workspace screen", () => {
     if (productUxToggle === undefined) {
       throw new Error("Expected at least one Product and UX Changes toggle in the changelog feed.");
     }
+    const productUxSection = productUxToggle.closest("section");
+    expect(productUxSection).not.toBeNull();
+    if (productUxSection === null) {
+      throw new Error("Expected Product and UX Changes toggle to be rendered inside a collapsible section container.");
+    }
     expect(productUxToggle).toHaveAttribute("aria-expanded", "false");
-    expect(within(whatsNewPanel).queryByText("Home, Onboarding, and Release Visibility (req_070)")).not.toBeInTheDocument();
+    expect(productUxSection.querySelector(".home-changelog-collapsible-content")).toBeNull();
 
     fireEvent.click(productUxToggle);
     expect(productUxToggle).toHaveAttribute("aria-expanded", "true");
-    expect(within(whatsNewPanel).getByText("Home, Onboarding, and Release Visibility (req_070)")).toBeInTheDocument();
+    expect(productUxSection.querySelector(".home-changelog-collapsible-content")).not.toBeNull();
 
     fireEvent.click(productUxToggle);
     expect(productUxToggle).toHaveAttribute("aria-expanded", "false");
-    expect(within(whatsNewPanel).queryByText("Home, Onboarding, and Release Visibility (req_070)")).not.toBeInTheDocument();
+    expect(productUxSection.querySelector(".home-changelog-collapsible-content")).toBeNull();
 
     const engineeringToggles = within(whatsNewPanel).getAllByRole("button", { name: "Engineering Quality, CI, and Reliability" });
     expect(engineeringToggles.length).toBeGreaterThan(0);
@@ -134,21 +139,31 @@ describe("home workspace screen", () => {
     if (engineeringToggle === undefined) {
       throw new Error("Expected at least one Engineering Quality, CI, and Reliability toggle in the changelog feed.");
     }
+    const engineeringSection = engineeringToggle.closest("section");
+    expect(engineeringSection).not.toBeNull();
+    if (engineeringSection === null) {
+      throw new Error("Expected Engineering Quality toggle to be rendered inside a collapsible section container.");
+    }
     expect(engineeringToggle).toHaveAttribute("aria-expanded", "false");
-    expect(within(whatsNewPanel).queryByText("Updated segmented Vitest lane contract to include new UI specs.")).not.toBeInTheDocument();
+    expect(engineeringSection.querySelector(".home-changelog-collapsible-content")).toBeNull();
 
     fireEvent.click(engineeringToggle);
     expect(engineeringToggle).toHaveAttribute("aria-expanded", "true");
-    expect(within(whatsNewPanel).getByText("Updated segmented Vitest lane contract to include new UI specs.")).toBeInTheDocument();
+    expect(engineeringSection.querySelector(".home-changelog-collapsible-content")).not.toBeNull();
 
     const changelog096Article = within(whatsNewPanel).getByLabelText("Changelog v0.9.6");
     const uxWorkspaceToggle = within(changelog096Article).getByRole("button", { name: "UX / Navigation / Workspace" });
+    const uxWorkspaceSection = uxWorkspaceToggle.closest("section");
+    expect(uxWorkspaceSection).not.toBeNull();
+    if (uxWorkspaceSection === null) {
+      throw new Error("Expected UX/Navigation toggle to be rendered inside a collapsible section container.");
+    }
     expect(uxWorkspaceToggle).toHaveAttribute("aria-expanded", "false");
-    expect(within(changelog096Article).queryByText("Home Workspace Polish")).not.toBeInTheDocument();
+    expect(uxWorkspaceSection.querySelector(".home-changelog-collapsible-content")).toBeNull();
 
     fireEvent.click(uxWorkspaceToggle);
     expect(uxWorkspaceToggle).toHaveAttribute("aria-expanded", "true");
-    expect(within(changelog096Article).getByText("Home Workspace Polish")).toBeInTheDocument();
+    expect(uxWorkspaceSection.querySelector(".home-changelog-collapsible-content")).not.toBeNull();
   });
 
   it("shows active workspace resume summary details", () => {
