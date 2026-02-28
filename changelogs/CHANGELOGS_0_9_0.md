@@ -1,6 +1,12 @@
-# Changelog (since version `0.8.1` to  version `0.9.0`)
+# Changelog (`0.8.1 → 0.9.0`)
 
-This changelog summarizes **product-visible changes** delivered since commit `0a53bd1ceb7c27516bcfd84e7f6a83251c7c31b0`, up to the current repository state (`0.9.0`).
+## Major Highlights
+
+- Delivered a major UX foundation pass across onboarding, navigation, Home workspace flow, and editing ergonomics.
+- Added substantial wire model enrichment: endpoint occupancy intelligence, cable section support, mono/bi-color handling, and endpoint-side metadata.
+- Expanded analysis capabilities with new `Nodes` and `Segments` analysis panels plus stronger occupancy/release workflows.
+- Completed broad table sorting/filtering normalization across Modeling, Analysis, Network Scope, and Validation surfaces.
+- Introduced a large standalone theme expansion (light + dark) and hardened visual consistency/accessibility/quality gates across the app.
 
 ## Guided Onboarding and In-App Help
 

@@ -1,6 +1,4 @@
-# Changelog (since version `0.9.0` to version `0.9.6`)
-
-This changelog summarizes **product-visible changes** delivered since commit `989dd72e5e83154154e6f3dc585dd845ef546946`, up to the current repository state (`0.9.6` / `9d13fdb`).
+# Changelog (`0.9.0 → 0.9.6`)
 
 ## Major Highlights
 
@@ -161,4 +159,3 @@ This changelog summarizes **product-visible changes** delivered since commit `98
   - BOM export
   - Validation `Go to`
   - Network Scope panel visibility
-
