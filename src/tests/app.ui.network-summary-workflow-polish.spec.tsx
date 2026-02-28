@@ -234,6 +234,53 @@ describe("App integration UI - network summary workflow polish", () => {
     expect((restoredCalloutAnchor as SVGGElement).getAttribute("transform") ?? "").toBe(transformAfterDrag);
   });
 
+  it("resets persisted callout positions when generating a new 2D layout", async () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
+
+    const firstCalloutAnchor = networkSummaryPanel.querySelector(".network-callout-anchor");
+    expect(firstCalloutAnchor).not.toBeNull();
+    fireEvent.mouseDown(firstCalloutAnchor as Element, { button: 0, clientX: 220, clientY: 140 });
+
+    const rectSpy = vi.spyOn(networkSvg, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({
+          x: 0,
+          y: 0,
+          top: 0,
+          left: 0,
+          width: 800,
+          height: 520,
+          right: 800,
+          bottom: 520,
+          toJSON: () => ({})
+        }) as DOMRect
+    );
+    fireEvent.mouseMove(networkSvg, { clientX: 700, clientY: 420 });
+    fireEvent.mouseUp(networkSvg);
+    rectSpy.mockRestore();
+
+    const selectedCalloutAnchorBeforeGenerate = networkSummaryPanel.querySelector(
+      ".network-callout-group.is-selected .network-callout-anchor"
+    );
+    expect(selectedCalloutAnchorBeforeGenerate).not.toBeNull();
+    const draggedTransform = (selectedCalloutAnchorBeforeGenerate as SVGGElement).getAttribute("transform") ?? "";
+
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Generate" }));
+
+    await waitFor(() => {
+      const selectedCalloutAnchorAfterGenerate = networkSummaryPanel.querySelector(
+        ".network-callout-group.is-selected .network-callout-anchor"
+      );
+      expect(selectedCalloutAnchorAfterGenerate).not.toBeNull();
+      expect((selectedCalloutAnchorAfterGenerate as SVGGElement).getAttribute("transform") ?? "").not.toBe(draggedTransform);
+    });
+  });
+
   it("renders dense callout examples with multiple wires per connector/splice for regression testing", () => {
     renderAppWithState(createUiIntegrationDenseWiresState());
     switchScreenDrawerAware("modeling");

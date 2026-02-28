@@ -1117,17 +1117,40 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         }
       }
 
+      const regeneratedPositions = createNodePositionMap(nodes, segments, {
+        snapToGrid: snapNodesToGrid,
+        gridStep: NETWORK_GRID_STEP
+      });
+      let nextState = appReducer(state, appActions.setNodePositions(regeneratedPositions));
+
+      for (const connector of Object.values(nextState.connectors.byId)) {
+        if (connector === undefined || connector.cableCalloutPosition === undefined) {
+          continue;
+        }
+        const connectorWithoutCalloutPosition = { ...connector, cableCalloutPosition: undefined };
+        nextState = appReducer(nextState, appActions.upsertConnector(connectorWithoutCalloutPosition));
+      }
+      for (const splice of Object.values(nextState.splices.byId)) {
+        if (splice === undefined || splice.cableCalloutPosition === undefined) {
+          continue;
+        }
+        const spliceWithoutCalloutPosition = { ...splice, cableCalloutPosition: undefined };
+        nextState = appReducer(nextState, appActions.upsertSplice(spliceWithoutCalloutPosition));
+      }
+
       setManualNodePositions({} as Record<NodeId, NodePosition>);
-      dispatchAction(
-        appActions.setNodePositions(
-          createNodePositionMap(nodes, segments, {
-            snapToGrid: snapNodesToGrid,
-            gridStep: NETWORK_GRID_STEP
-          })
-        )
-      );
+      replaceStateWithHistory(nextState);
     })();
-  }, [dispatchAction, nodes, persistedNodePositions, requestConfirmation, segments, setManualNodePositions, snapNodesToGrid]);
+  }, [
+    nodes,
+    persistedNodePositions,
+    replaceStateWithHistory,
+    requestConfirmation,
+    segments,
+    setManualNodePositions,
+    snapNodesToGrid,
+    state
+  ]);
   const {
     importFileInputRef,
     selectedExportNetworkIds,
