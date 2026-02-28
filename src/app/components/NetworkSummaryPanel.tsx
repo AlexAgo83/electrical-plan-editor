@@ -1124,10 +1124,20 @@ export function NetworkSummaryPanel({
         return;
       }
 
-      setDraftCalloutPositions((current) => ({
-        ...current,
-        [draggingCallout.key]: coordinates
-      }));
+      setDraftCalloutPositions((current) => {
+        const previousPosition = current[draggingCallout.key];
+        if (
+          previousPosition !== undefined &&
+          Math.abs(previousPosition.x - coordinates.x) <= 0.0001 &&
+          Math.abs(previousPosition.y - coordinates.y) <= 0.0001
+        ) {
+          return current;
+        }
+        return {
+          ...current,
+          [draggingCallout.key]: coordinates
+        };
+      });
     },
     [draggingCallout, getSvgCoordinates, handleNetworkMouseMove]
   );

@@ -5,6 +5,11 @@ import { bumpRevision, clearLastError } from "./shared";
 export function handleUiActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "ui/select": {
+      const currentSelection = state.ui.selected;
+      if (currentSelection?.kind === action.payload.kind && currentSelection.id === action.payload.id) {
+        return clearLastError(state);
+      }
+
       return bumpRevision({
         ...clearLastError(state),
         ui: {

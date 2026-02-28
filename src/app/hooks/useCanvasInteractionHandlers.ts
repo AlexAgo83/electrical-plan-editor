@@ -311,9 +311,16 @@ export function useCanvasInteractionHandlers({
 
       const deltaX = ((event.clientX - panStartRef.current.clientX) / bounds.width) * NETWORK_VIEW_WIDTH;
       const deltaY = ((event.clientY - panStartRef.current.clientY) / bounds.height) * NETWORK_VIEW_HEIGHT;
-      setNetworkOffset({
-        x: panStartRef.current.offsetX + deltaX,
-        y: panStartRef.current.offsetY + deltaY
+      const nextOffsetX = panStartRef.current.offsetX + deltaX;
+      const nextOffsetY = panStartRef.current.offsetY + deltaY;
+      setNetworkOffset((current) => {
+        if (Math.abs(current.x - nextOffsetX) <= 0.0001 && Math.abs(current.y - nextOffsetY) <= 0.0001) {
+          return current;
+        }
+        return {
+          x: nextOffsetX,
+          y: nextOffsetY
+        };
       });
       return;
     }
@@ -323,10 +330,20 @@ export function useCanvasInteractionHandlers({
       return;
     }
 
-    setManualNodePositions((previous) => ({
-      ...previous,
-      [draggingNodeId]: coordinates
-    }));
+    setManualNodePositions((previous) => {
+      const previousPosition = previous[draggingNodeId];
+      if (
+        previousPosition !== undefined &&
+        Math.abs(previousPosition.x - coordinates.x) <= 0.0001 &&
+        Math.abs(previousPosition.y - coordinates.y) <= 0.0001
+      ) {
+        return previous;
+      }
+      return {
+        ...previous,
+        [draggingNodeId]: coordinates
+      };
+    });
   }
 
   function stopNetworkNodeDrag(): void {
