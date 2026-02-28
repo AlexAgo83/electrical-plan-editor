@@ -199,12 +199,13 @@
   stroke-width: 16;
   stroke-linecap: round;
   cursor: pointer;
+  outline: none;
 }
 
+.network-segment-hitbox:focus,
 .network-segment-hitbox:focus-visible {
-  stroke: var(--network-selection-focus-color, var(--network-selection-color, #0f6cb8));
-  stroke-width: 10;
-  stroke-linecap: round;
+  outline: none;
+  stroke: transparent;
 }
 
 .network-segment-label {
