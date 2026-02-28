@@ -1500,34 +1500,35 @@ export function NetworkSummaryPanel({
             </button>
           </div>
         </header>
-        {nodes.length === 0 ? (
-          <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
-        ) : (
-          <div ref={networkCanvasShellRef} className={`network-canvas-shell${isPanningNetwork ? " is-panning" : ""}`}>
-            <NetworkCanvasFloatingInfoPanels
-              showNetworkInfoPanels={showNetworkInfoPanels}
-              handleZoomAction={handleZoomAction}
-              fitNetworkToContent={fitNetworkToContent}
-              onRegenerateLayout={onRegenerateLayout}
-              networkScalePercent={networkScalePercent}
-              subNetworkSummaries={subNetworkSummaries}
-              activeSubNetworkTags={activeSubNetworkTagSet}
-              toggleSubNetworkTag={toggleSubNetworkTag}
-              enableAllSubNetworkTags={enableAllSubNetworkTags}
-              graphStats={graphStats}
-            />
-            <svg
-              ref={networkSvgRef}
-              className={`network-svg network-canvas--label-stroke-${labelStrokeMode} network-canvas--label-size-${labelSizeMode} network-callout-text-size-${calloutTextSize}`}
-              aria-label="2D network diagram"
-              viewBox={`0 0 ${networkViewWidth} ${networkViewHeight}`}
-              onMouseDown={handleNetworkCanvasMouseDown}
-              onClick={handleNetworkCanvasClick}
-              onWheel={handleNetworkWheel}
-              onMouseMove={handleCanvasMouseMoveWithCallouts}
-              onMouseUp={stopNetworkInteractions}
-              onMouseLeave={stopNetworkInteractions}
-            >
+        <div className="network-summary-canvas-region">
+          {nodes.length === 0 ? (
+            <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
+          ) : (
+            <div ref={networkCanvasShellRef} className={`network-canvas-shell${isPanningNetwork ? " is-panning" : ""}`}>
+              <NetworkCanvasFloatingInfoPanels
+                showNetworkInfoPanels={showNetworkInfoPanels}
+                handleZoomAction={handleZoomAction}
+                fitNetworkToContent={fitNetworkToContent}
+                onRegenerateLayout={onRegenerateLayout}
+                networkScalePercent={networkScalePercent}
+                subNetworkSummaries={subNetworkSummaries}
+                activeSubNetworkTags={activeSubNetworkTagSet}
+                toggleSubNetworkTag={toggleSubNetworkTag}
+                enableAllSubNetworkTags={enableAllSubNetworkTags}
+                graphStats={graphStats}
+              />
+              <svg
+                ref={networkSvgRef}
+                className={`network-svg network-canvas--label-stroke-${labelStrokeMode} network-canvas--label-size-${labelSizeMode} network-callout-text-size-${calloutTextSize}`}
+                aria-label="2D network diagram"
+                viewBox={`0 0 ${networkViewWidth} ${networkViewHeight}`}
+                onMouseDown={handleNetworkCanvasMouseDown}
+                onClick={handleNetworkCanvasClick}
+                onWheel={handleNetworkWheel}
+                onMouseMove={handleCanvasMouseMoveWithCallouts}
+                onMouseUp={stopNetworkInteractions}
+                onMouseLeave={stopNetworkInteractions}
+              >
               <g transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
                 {renderedCableCallouts.map(({ callout, lineEnd, calloutClassName }) => (
                   <g key={`${callout.key}-leader`} className={calloutClassName}>
@@ -1813,9 +1814,10 @@ export function NetworkSummaryPanel({
                   );
                 })}
               </g>
-            </svg>
-          </div>
-        )}
+              </svg>
+            </div>
+          )}
+        </div>
         <NetworkSummaryLegend />
       </section>
       <NetworkRoutePreviewPanel

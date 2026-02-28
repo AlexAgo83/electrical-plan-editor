@@ -444,6 +444,50 @@
   }
 }
 
+@media (max-width: 670px) {
+  .list-panel-header-tools,
+  .list-panel-header-tools-row {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .list-inline-table-filter {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0.35rem;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .list-inline-table-filter > span {
+    white-space: normal;
+  }
+
+  .list-inline-table-filter-select,
+  .list-inline-table-filter-input,
+  .list-inline-number-filter > input {
+    width: 100%;
+    min-width: 0 !important;
+    max-width: 100%;
+  }
+
+  .table-export-button {
+    white-space: normal;
+  }
+
+  .data-table {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  .data-table th,
+  .data-table td {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
 .splice-badge {
   display: inline-block;
   margin-right: 0.35rem;

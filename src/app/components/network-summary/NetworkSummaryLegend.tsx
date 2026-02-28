@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 
 export function NetworkSummaryLegend(): ReactElement {
   return (
-    <ul className="network-legend">
+    <ul className="network-legend network-summary-legend">
       <li>
         <span className="legend-swatch connector" /> Connector node
       </li>

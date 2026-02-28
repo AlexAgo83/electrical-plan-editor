@@ -382,6 +382,18 @@
   gap: 0.32rem;
 }
 
+@media (max-width: 670px) {
+  .route-preview-panel-header {
+    flex-wrap: wrap;
+  }
+
+  .route-preview-panel-toggle {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .route-preview-panel-toggle-icon {
   width: 0.78rem;
   height: 0.78rem;
