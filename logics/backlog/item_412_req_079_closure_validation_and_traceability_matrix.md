@@ -1,9 +1,9 @@
 ## item_412_req_079_closure_validation_and_traceability_matrix - Req 079 closure validation and traceability matrix
 > From version: 0.9.17
-> Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Status: Done
+> Understanding: 98%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Process
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -28,11 +28,11 @@
 - AC5: Remaining risks/debt are explicitly documented when criteria are partially deferred.
 
 # AC Traceability
-- AC1 -> AC-to-evidence mapping is documented in task/report artifacts. Proof: pending.
-- AC2 -> Validation command outputs are linked/summarized. Proof: pending.
-- AC3 -> Cross-references and statuses are synchronized across docs. Proof: pending.
-- AC4 -> `req_079` includes a dedicated `Evidence` block with commands/files/commits. Proof: pending.
-- AC5 -> Deferred points include rationale and follow-up references. Proof: pending.
+- AC1 -> AC-to-evidence mapping is documented in task/report artifacts. Proof: `task_072` section `Req_079 AC Matrix`.
+- AC2 -> Validation command outputs are linked/summarized. Proof: `task_072` report + `req_079` evidence section (`lint`, `typecheck`, targeted vitest, `test:ci:ui`, logics lint, governance gate).
+- AC3 -> Cross-references and statuses are synchronized across docs. Proof: `req_079`, `item_409..412`, and `task_072` now aligned with delivered status/progress.
+- AC4 -> `req_079` includes a dedicated `Evidence` block with commands/files/commits. Proof: section `# Evidence` in `req_079`.
+- AC5 -> Deferred points include rationale and follow-up references. Proof: no deferred points remain for `req_079` closure scope in this wave.
 
 # Priority
 - Impact:

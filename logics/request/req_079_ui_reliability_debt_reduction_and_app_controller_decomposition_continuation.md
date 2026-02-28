@@ -1,8 +1,8 @@
 ## req_079_ui_reliability_debt_reduction_and_app_controller_decomposition_continuation - UI reliability debt reduction and app controller decomposition continuation
 > From version: 0.9.17
-> Status: In Progress
-> Understanding: 98%
-> Confidence: 94%
+> Status: Done
+> Understanding: 100%
+> Confidence: 98%
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -12,8 +12,8 @@
 - Continue decomposing `AppController.tsx` to lower complexity and regression risk while preserving current behavior.
 
 # Context
-- The project explicitly tracks targeted `10_000ms` timeout exceptions as temporary debt in README.
-- The main controller file remains very large (`src/app/AppController.tsx`, ~2700+ LOC), which increases review/debug cost.
+- The project now enforces UI timeout governance through a dedicated quality gate (`quality:ui-timeout-governance`) in local and CI blocking flows.
+- The main controller file remains large (`src/app/AppController.tsx`, ~2600+ LOC), so decomposition still matters to keep review/debug cost under control.
 - Recent delivery waves added features quickly; now a hardening/refactoring pass is needed to keep delivery speed sustainable.
 
 # Objective
@@ -80,13 +80,23 @@
   - targeted: `npx vitest run` on touched UI specs (`delete confirmations`, `creation-flow`, `navigation`, `settings`, `list ergonomics`, `wire free mode`, `network summary polish`, `undo/redo`) -> pass.
   - lane: `npm run -s test:ci:ui` -> pass (`30` files, `193` tests).
   - safety: `npm run -s typecheck` -> pass.
+- Wave 2 (`item_410`) timeout governance/rationale enforcement delivered:
+  - quality gate added: `scripts/quality/check-ui-timeout-governance.mjs`.
+  - local blocking flow updated: `ci:local` now includes `npm run -s quality:ui-timeout-governance`.
+  - CI workflow updated: GitHub Actions now includes `UI timeout governance quality gate`.
+  - governance check current snapshot: `npm run -s quality:ui-timeout-governance` -> pass (`30` UI spec files checked, `0` allowlisted overrides).
+- Wave 3 (`item_411`) app controller decomposition continuation delivered:
+  - extracted modal orchestration into `src/app/hooks/controller/useConfirmDialogController.ts`.
+  - extracted save/export confirmation orchestration into `src/app/hooks/controller/useAppControllerSaveExportActions.ts`.
+  - `AppController` reduced from `2711` to `2637` lines in this wave while preserving behavior contracts.
+  - regression validation: `npm run -s test:ci:ui` -> pass (`30` files, `193` tests), plus `npm run -s lint` and `npm run -s typecheck` -> pass.
 
 # Delivery status
-- Status: in progress.
+- Status: delivered.
 - Task: `logics/tasks/task_072_super_orchestration_delivery_execution_for_req_079_with_validation_gates.md`.
 
 # Backlog
-- [item_409_ui_slow_test_stabilization_wave_for_top_flaky_specs](../backlog/item_409_ui_slow_test_stabilization_wave_for_top_flaky_specs.md)
-- [item_410_ui_timeout_debt_governance_and_rationale_enforcement](../backlog/item_410_ui_timeout_debt_governance_and_rationale_enforcement.md)
-- [item_411_app_controller_decomposition_continuation_by_orchestration_slice_extraction](../backlog/item_411_app_controller_decomposition_continuation_by_orchestration_slice_extraction.md)
-- [item_412_req_079_closure_validation_and_traceability_matrix](../backlog/item_412_req_079_closure_validation_and_traceability_matrix.md)
+- [item_409_ui_slow_test_stabilization_wave_for_top_flaky_specs](../backlog/item_409_ui_slow_test_stabilization_wave_for_top_flaky_specs.md) (done)
+- [item_410_ui_timeout_debt_governance_and_rationale_enforcement](../backlog/item_410_ui_timeout_debt_governance_and_rationale_enforcement.md) (done)
+- [item_411_app_controller_decomposition_continuation_by_orchestration_slice_extraction](../backlog/item_411_app_controller_decomposition_continuation_by_orchestration_slice_extraction.md) (done)
+- [item_412_req_079_closure_validation_and_traceability_matrix](../backlog/item_412_req_079_closure_validation_and_traceability_matrix.md) (done)

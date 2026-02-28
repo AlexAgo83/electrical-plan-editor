@@ -55,9 +55,11 @@ import {
   useAppControllerSelectionHandlersAssembly,
   useAppControllerWorkspaceHandlersAssembly
 } from "./hooks/controller/useAppControllerHeavyHookAssemblers";
+import { useAppControllerSaveExportActions } from "./hooks/controller/useAppControllerSaveExportActions";
 import { useAppControllerAuxScreenContentDomains } from "./hooks/controller/useAppControllerAuxScreenContentDomains";
 import { useAppControllerModelingAnalysisScreenDomains } from "./hooks/controller/useAppControllerModelingAnalysisScreenDomains";
 import { useAppControllerModelingHandlersOrchestrator } from "./hooks/controller/useAppControllerModelingHandlersOrchestrator";
+import { useConfirmDialogController } from "./hooks/controller/useConfirmDialogController";
 import {
   buildNetworkSummaryPanelControllerSlice,
   useInspectorContextPanelControllerSlice,
@@ -67,7 +69,7 @@ import { useEntityFormsState } from "./hooks/useEntityFormsState";
 import { useEntityRelationshipMaps } from "./hooks/useEntityRelationshipMaps";
 import { useInspectorPanelVisibility } from "./hooks/useInspectorPanelVisibility";
 import { useIssueNavigatorModel } from "./hooks/useIssueNavigatorModel";
-import { buildNetworkExportFilename, useNetworkImportExport } from "./hooks/useNetworkImportExport";
+import { useNetworkImportExport } from "./hooks/useNetworkImportExport";
 import { useNetworkEntityCountsById } from "./hooks/useNetworkEntityCountsById";
 import { useNetworkScopeFormOrchestration } from "./hooks/useNetworkScopeFormOrchestration";
 import { useNetworkScopeFormState } from "./hooks/useNetworkScopeFormState";
@@ -112,22 +114,11 @@ import type {
   NodePosition,
   SubScreenId
 } from "./types/app-controller";
-import type { ConfirmDialogIntent, ConfirmDialogRequest } from "./types/confirm-dialog";
 import "./styles.css";
 
 export type { AppProps } from "./types/app-controller";
 
 type OnboardingStepTarget = OnboardingStepDefinition["target"];
-
-interface ActiveConfirmDialogState {
-  title: string;
-  message: string;
-  details?: string;
-  confirmLabel: string;
-  cancelLabel: string;
-  intent: ConfirmDialogIntent;
-  closeOnBackdrop: boolean;
-}
 
 function useAppSnapshot(store: AppStore) {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);
@@ -358,7 +349,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
   const deferredInstallPromptRef = useRef<BeforeInstallPromptEventLike | null>(null);
   const onboardingAutoOpenAttemptedRef = useRef(false);
-  const confirmDialogResolveRef = useRef<((confirmed: boolean) => void) | null>(null);
   const hasAppliedPerNetworkViewRestoreRef = useRef(false);
   const skipNextPerNetworkViewPersistRef = useRef(false);
 
@@ -403,7 +393,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const [onboardingSingleStepTargetOverride, setOnboardingSingleStepTargetOverride] = useState<OnboardingStepTarget | null>(null);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabled] = useState<boolean>(() => readOnboardingAutoOpenEnabled());
-  const [activeConfirmDialog, setActiveConfirmDialog] = useState<ActiveConfirmDialogState | null>(null);
+  const { activeConfirmDialog, requestConfirmation, closeActiveConfirmDialog } = useConfirmDialogController();
   const {
     isInstallPromptAvailable,
     isPwaUpdateReady,
@@ -506,41 +496,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const setOnboardingAutoOpenEnabledPersisted = useCallback((enabled: boolean) => {
     setOnboardingAutoOpenEnabled(enabled);
     writeOnboardingAutoOpenEnabled(enabled);
-  }, []);
-
-  const closeActiveConfirmDialog = useCallback((confirmed: boolean) => {
-    const resolve = confirmDialogResolveRef.current;
-    confirmDialogResolveRef.current = null;
-    setActiveConfirmDialog(null);
-    resolve?.(confirmed);
-  }, []);
-
-  const requestConfirmation = useCallback((request: ConfirmDialogRequest): Promise<boolean> => {
-    return new Promise<boolean>((resolve) => {
-      const activeResolve = confirmDialogResolveRef.current;
-      if (activeResolve !== null) {
-        activeResolve(false);
-      }
-
-      confirmDialogResolveRef.current = resolve;
-      setActiveConfirmDialog({
-        title: request.title,
-        message: request.message,
-        details: request.details,
-        confirmLabel: request.confirmLabel ?? "Confirm",
-        cancelLabel: request.cancelLabel ?? "Cancel",
-        intent: request.intent ?? "neutral",
-        closeOnBackdrop: request.closeOnBackdrop ?? true
-      });
-    });
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      const resolve = confirmDialogResolveRef.current;
-      confirmDialogResolveRef.current = null;
-      resolve?.(false);
-    };
   }, []);
 
   const openFullOnboarding = useCallback(() => {
@@ -1181,41 +1136,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     activeNetworkId,
     dispatchAction
   });
-
-  const handleSaveActiveNetworkWithConfirmation = useCallback(() => {
-    if (activeNetworkId === null) {
-      handleExportNetworks("active");
-      return;
-    }
-
-    void (async () => {
-      const exportedAtIso = new Date().toISOString();
-      const fileName = buildNetworkExportFilename("active", exportedAtIso);
-      const shouldSave = await requestConfirmation({
-        title: "Save active network",
-        message: "Export the active network now?",
-        details: fileName,
-        confirmLabel: "Save",
-        intent: "neutral"
-      });
-      if (!shouldSave) {
-        return;
-      }
-
-      handleExportNetworks("active", exportedAtIso);
-    })();
-  }, [activeNetworkId, handleExportNetworks, requestConfirmation]);
-  const handleExportNetworksWithActiveSaveConfirmation = useCallback(
-    (scope: "active" | "selected" | "all") => {
-      if (scope !== "active") {
-        handleExportNetworks(scope);
-        return;
-      }
-
-      handleSaveActiveNetworkWithConfirmation();
-    },
-    [handleExportNetworks, handleSaveActiveNetworkWithConfirmation]
-  );
+  const { handleSaveActiveNetworkWithConfirmation, handleExportNetworksWithActiveSaveConfirmation } =
+    useAppControllerSaveExportActions({
+      activeNetworkId,
+      handleExportNetworks,
+      requestConfirmation
+    });
   const catalogCsvImportFileInputRef = useRef<HTMLInputElement | null>(null);
   const [catalogCsvImportExportStatus, setCatalogCsvImportExportStatus] = useState<ImportExportStatus | null>(null);
   const [catalogCsvLastImportSummaryLine, setCatalogCsvLastImportSummaryLine] = useState<string | null>(null);

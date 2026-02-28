@@ -49,6 +49,9 @@ jobs:
       - name: UI modularization quality gate
         run: npm run quality:ui-modularization
 
+      - name: UI timeout governance quality gate
+        run: npm run quality:ui-timeout-governance
+
       - name: Store modularization quality gate
         run: npm run quality:store-modularization
 
