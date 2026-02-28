@@ -160,12 +160,19 @@
 
 .settings-panel-grid {
   align-items: start;
+  container-type: inline-size;
+  container-name: settings-panels-grid;
 }
 
 .settings-panel--import-export {
-  grid-column: span 2;
   container-type: inline-size;
   container-name: settings-import-export-panel;
+}
+
+@container settings-panels-grid (min-width: 656px) {
+  .settings-panel--import-export {
+    grid-column: span 2;
+  }
 }
 
 .settings-panel {

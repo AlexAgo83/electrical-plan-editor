@@ -78,10 +78,11 @@ export function AppHeaderAndStats({
             type="button"
             className={isSettingsActive ? "header-settings-toggle is-active" : "header-settings-toggle"}
             aria-pressed={isSettingsActive}
+            aria-label="Settings"
             onClick={onOpenSettings}
           >
             <span className="header-settings-icon" aria-hidden="true" />
-            Settings
+            <span className="header-settings-label">Settings</span>
           </button>
           <button
             ref={operationsButtonRef}
@@ -90,10 +91,11 @@ export function AppHeaderAndStats({
             onClick={onToggleOperationsPanel}
             aria-expanded={isOperationsPanelOpen}
             aria-controls="workspace-operations-panel"
+            aria-label="Ops & Health"
             aria-description={opsStatusDescription}
           >
             <span className="header-ops-icon" aria-hidden="true" />
-            <span>Ops &amp; Health</span>
+            <span className="header-ops-label">Ops &amp; Health</span>
             <span
               className={validationErrorCount > 0 ? "header-ops-badge is-error" : "header-ops-badge"}
               aria-hidden="true"
