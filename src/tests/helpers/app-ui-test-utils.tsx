@@ -336,15 +336,18 @@ export function renderAppWithState(state: AppState) {
   return { store, ...render(<App store={store} />) };
 }
 
-export function withViewportWidth<T>(width: number, run: () => Promise<T>): Promise<T>;
-export function withViewportWidth<T>(width: number, run: () => T): T;
-export function withViewportWidth<T>(width: number, run: () => T | Promise<T>): T | Promise<T> {
+export function withViewportSize<T>(size: { width: number; height: number }, run: () => Promise<T>): Promise<T>;
+export function withViewportSize<T>(size: { width: number; height: number }, run: () => T): T;
+export function withViewportSize<T>(size: { width: number; height: number }, run: () => T | Promise<T>): T | Promise<T> {
   const originalInnerWidth = window.innerWidth;
-  Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: width });
+  const originalInnerHeight = window.innerHeight;
+  Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: size.width });
+  Object.defineProperty(window, "innerHeight", { configurable: true, writable: true, value: size.height });
   fireEvent(window, new Event("resize"));
 
   const restoreViewport = () => {
     Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: originalInnerWidth });
+    Object.defineProperty(window, "innerHeight", { configurable: true, writable: true, value: originalInnerHeight });
     fireEvent(window, new Event("resize"));
   };
 
@@ -359,6 +362,12 @@ export function withViewportWidth<T>(width: number, run: () => T | Promise<T>): 
     restoreViewport();
     throw error;
   }
+}
+
+export function withViewportWidth<T>(width: number, run: () => Promise<T>): Promise<T>;
+export function withViewportWidth<T>(width: number, run: () => T): T;
+export function withViewportWidth<T>(width: number, run: () => T | Promise<T>): T | Promise<T> {
+  return withViewportSize({ width, height: window.innerHeight }, run);
 }
 
 export function getPanelByHeading(name: string): HTMLElement {

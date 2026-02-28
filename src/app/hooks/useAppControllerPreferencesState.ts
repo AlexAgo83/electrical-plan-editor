@@ -33,6 +33,7 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultShowInfoPanels, setCanvasDefaultShowInfoPanels] = useState(true);
   const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(false);
   const [canvasDefaultShowCableCallouts, setCanvasDefaultShowCableCallouts] = useState(false);
+  const [canvasDefaultShowSelectedCalloutOnly, setCanvasDefaultShowSelectedCalloutOnly] = useState(false);
   const [canvasDefaultLabelStrokeMode, setCanvasDefaultLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
   const [canvasDefaultLabelSizeMode, setCanvasDefaultLabelSizeMode] = useState<CanvasLabelSizeMode>("normal");
   const [canvasDefaultCalloutTextSize, setCanvasDefaultCalloutTextSize] = useState<CanvasCalloutTextSize>("normal");
@@ -83,6 +84,8 @@ export function useAppControllerPreferencesState() {
     setCanvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts,
     setCanvasDefaultShowCableCallouts,
+    canvasDefaultShowSelectedCalloutOnly,
+    setCanvasDefaultShowSelectedCalloutOnly,
     canvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,

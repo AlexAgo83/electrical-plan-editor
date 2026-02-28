@@ -71,6 +71,7 @@ interface UseWorkspaceHandlersParams {
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultShowCableCallouts: boolean;
+  canvasDefaultShowSelectedCalloutOnly: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
@@ -84,6 +85,7 @@ interface UseWorkspaceHandlersParams {
   setShowNetworkInfoPanels: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowSegmentLengths: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowCableCallouts: (value: boolean | ((current: boolean) => boolean)) => void;
+  setShowSelectedCalloutOnly: (value: boolean | ((current: boolean) => boolean)) => void;
   setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode | ((current: CanvasLabelStrokeMode) => CanvasLabelStrokeMode)) => void;
   setNetworkLabelSizeMode: (value: CanvasLabelSizeMode | ((current: CanvasLabelSizeMode) => CanvasLabelSizeMode)) => void;
   setNetworkCalloutTextSize: (value: CanvasCalloutTextSize | ((current: CanvasCalloutTextSize) => CanvasCalloutTextSize)) => void;
@@ -119,6 +121,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   setCanvasDefaultShowCableCallouts: (value: boolean) => void;
+  setCanvasDefaultShowSelectedCalloutOnly: (value: boolean) => void;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   setCanvasDefaultCalloutTextSize: (value: CanvasCalloutTextSize) => void;
@@ -162,6 +165,7 @@ export function useWorkspaceHandlers({
   canvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
   canvasDefaultShowCableCallouts,
+  canvasDefaultShowSelectedCalloutOnly,
   canvasDefaultLabelStrokeMode,
   canvasDefaultLabelSizeMode,
   canvasDefaultCalloutTextSize,
@@ -175,6 +179,7 @@ export function useWorkspaceHandlers({
   setShowNetworkInfoPanels,
   setShowSegmentLengths,
   setShowCableCallouts,
+  setShowSelectedCalloutOnly,
   setNetworkLabelStrokeMode,
   setNetworkLabelSizeMode,
   setNetworkCalloutTextSize,
@@ -208,6 +213,7 @@ export function useWorkspaceHandlers({
   setCanvasDefaultShowInfoPanels,
   setCanvasDefaultShowSegmentLengths,
   setCanvasDefaultShowCableCallouts,
+  setCanvasDefaultShowSelectedCalloutOnly,
   setCanvasDefaultLabelStrokeMode,
   setCanvasDefaultLabelSizeMode,
   setCanvasDefaultCalloutTextSize,
@@ -670,6 +676,7 @@ export function useWorkspaceHandlers({
     setShowNetworkInfoPanels(canvasDefaultShowInfoPanels);
     setShowSegmentLengths(canvasDefaultShowSegmentLengths);
     setShowCableCallouts(canvasDefaultShowCableCallouts);
+    setShowSelectedCalloutOnly(canvasDefaultShowSelectedCalloutOnly);
     setNetworkLabelStrokeMode(canvasDefaultLabelStrokeMode);
     setNetworkLabelSizeMode(canvasDefaultLabelSizeMode);
     setNetworkCalloutTextSize(canvasDefaultCalloutTextSize);
@@ -705,6 +712,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultShowInfoPanels(true);
     setCanvasDefaultShowSegmentLengths(false);
     setCanvasDefaultShowCableCallouts(false);
+    setCanvasDefaultShowSelectedCalloutOnly(false);
     setCanvasDefaultLabelStrokeMode("normal");
     setCanvasDefaultLabelSizeMode("normal");
     setCanvasDefaultCalloutTextSize("normal");
@@ -718,6 +726,7 @@ export function useWorkspaceHandlers({
     setShowNetworkInfoPanels(true);
     setShowSegmentLengths(false);
     setShowCableCallouts(false);
+    setShowSelectedCalloutOnly(false);
     setNetworkLabelStrokeMode("normal");
     setNetworkLabelSizeMode("normal");
     setNetworkCalloutTextSize("normal");

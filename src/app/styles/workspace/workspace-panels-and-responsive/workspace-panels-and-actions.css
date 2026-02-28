@@ -112,7 +112,7 @@
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 900px) {
   .network-scope-grid {
     grid-template-columns: minmax(0, 1fr);
   }

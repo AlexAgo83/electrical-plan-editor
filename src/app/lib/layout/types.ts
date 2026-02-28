@@ -13,8 +13,8 @@ export interface LocalLayout {
 }
 
 export type VisualConflictRank = readonly [
+  crossings: number,
   nodeOverlaps: number,
   clearanceViolations: number,
-  crossings: number,
   score: number
 ];

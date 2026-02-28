@@ -8,18 +8,28 @@ import {
 } from "../app-utils-shared";
 import type { NodePositionMapOptions } from "./types";
 
-export function listNudgeCandidates(source: NodePosition, options: NodePositionMapOptions): NodePosition[] {
+interface NudgeCandidateSearchOptions {
+  multipliers?: readonly number[];
+  diagonalDepth?: number;
+}
+
+export function listNudgeCandidates(
+  source: NodePosition,
+  options: NodePositionMapOptions,
+  searchOptions: NudgeCandidateSearchOptions = {}
+): NodePosition[] {
   const shouldSnapToGrid = options.snapToGrid ?? false;
   const gridStep = options.gridStep ?? NETWORK_GRID_STEP;
   const nudgeStep = shouldSnapToGrid ? gridStep : 12;
-  const offsets = [1, -1, 2, -2, 3, -3];
+  const offsets = searchOptions.multipliers ?? [1, -1, 2, -2, 3, -3];
+  const diagonalDepth = Math.max(1, Math.min(offsets.length, searchOptions.diagonalDepth ?? 4));
   const rawCandidates = [] as NodePosition[];
   for (const offset of offsets) {
     rawCandidates.push({ x: source.x + nudgeStep * offset, y: source.y });
     rawCandidates.push({ x: source.x, y: source.y + nudgeStep * offset });
   }
-  for (const xOffset of offsets.slice(0, 4)) {
-    for (const yOffset of offsets.slice(0, 4)) {
+  for (const xOffset of offsets.slice(0, diagonalDepth)) {
+    for (const yOffset of offsets.slice(0, diagonalDepth)) {
       if (Math.abs(xOffset) !== Math.abs(yOffset)) {
         continue;
       }

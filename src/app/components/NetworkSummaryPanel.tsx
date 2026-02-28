@@ -110,6 +110,7 @@ export interface NetworkSummaryPanelProps {
   showNetworkInfoPanels: boolean;
   showSegmentLengths: boolean;
   showCableCallouts: boolean;
+  showSelectedCalloutOnly: boolean;
   labelStrokeMode: CanvasLabelStrokeMode;
   labelSizeMode: CanvasLabelSizeMode;
   calloutTextSize: CanvasCalloutTextSize;
@@ -558,6 +559,7 @@ export function NetworkSummaryPanel({
   showNetworkInfoPanels,
   showSegmentLengths,
   showCableCallouts,
+  showSelectedCalloutOnly,
   labelStrokeMode,
   labelSizeMode,
   calloutTextSize,
@@ -956,9 +958,34 @@ export function NetworkSummaryPanel({
       });
     }
 
-    return models.sort((left, right) => left.title.localeCompare(right.title) || left.subtitle.localeCompare(right.subtitle));
+    const sortedModels = models.sort((left, right) => left.title.localeCompare(right.title) || left.subtitle.localeCompare(right.subtitle));
+    if (!showSelectedCalloutOnly) {
+      return sortedModels;
+    }
+
+    let selectedCalloutKey =
+      selectedConnectorId !== null
+        ? (`connector:${selectedConnectorId}` as const)
+        : selectedSpliceId !== null
+          ? (`splice:${selectedSpliceId}` as const)
+          : null;
+    if (selectedCalloutKey === null && selectedNodeId !== null) {
+      const selectedNode = nodes.find((entry) => entry.id === selectedNodeId);
+      if (selectedNode?.kind === "connector") {
+        selectedCalloutKey = `connector:${selectedNode.connectorId}` as const;
+      } else if (selectedNode?.kind === "splice") {
+        selectedCalloutKey = `splice:${selectedNode.spliceId}` as const;
+      }
+    }
+    if (selectedCalloutKey === null) {
+      return [] as CableCalloutViewModel[];
+    }
+
+    const selectedCallout = sortedModels.find((entry) => entry.key === selectedCalloutKey);
+    return selectedCallout === undefined ? [] as CableCalloutViewModel[] : [selectedCallout];
   }, [
     showCableCallouts,
+    showSelectedCalloutOnly,
     nodes,
     networkNodePositions,
     connectorMap,
@@ -970,7 +997,8 @@ export function NetworkSummaryPanel({
     isSubNetworkFilteringActive,
     nodeHasActiveSubNetworkConnection,
     selectedConnectorId,
-    selectedSpliceId
+    selectedSpliceId,
+    selectedNodeId
   ]);
 
   const orderedCableCallouts = useMemo(() => {

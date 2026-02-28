@@ -397,6 +397,29 @@
   border-color: #b8cedf;
 }
 
+.settings-import-export-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: start;
+}
+
+.settings-import-export-actions-column {
+  display: grid;
+  gap: 0.65rem;
+  align-content: start;
+}
+
+.settings-import-export-actions-column .settings-actions {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.settings-import-export-selection-column {
+  margin: 0;
+}
+
 .settings-import-summary {
   margin-top: 0.1rem;
   display: grid;
@@ -428,6 +451,16 @@
 .settings-primary-action:disabled {
   background: #9ab4c8 !important;
   color: #eaf1f7 !important;
+}
+
+@media (max-width: 900px) {
+  .settings-import-export-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-import-export-selection-column {
+    order: 2;
+  }
 }
 
 @media (max-width: 860px) {

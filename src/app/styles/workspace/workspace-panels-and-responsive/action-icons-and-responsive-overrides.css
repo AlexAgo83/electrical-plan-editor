@@ -127,7 +127,7 @@
   color: color-mix(in srgb, currentColor 72%, transparent);
 }
 
-@media (max-width: 980px) {
+@media (max-width: 900px) {
   .workspace-inspector-panel {
     inset: auto 0.75rem 0.75rem auto;
     width: calc(100vw - 1.5rem);

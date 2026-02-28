@@ -116,6 +116,7 @@ interface UiPreferencesPayload {
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultShowCableCallouts: boolean;
+  canvasDefaultShowSelectedCalloutOnly: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
@@ -176,6 +177,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultShowInfoPanels: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultShowCableCallouts: boolean;
+  canvasDefaultShowSelectedCalloutOnly: boolean;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
   canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
@@ -213,6 +215,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   setCanvasDefaultShowCableCallouts: (value: boolean) => void;
+  setCanvasDefaultShowSelectedCalloutOnly: (value: boolean) => void;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   setCanvasDefaultCalloutTextSize: (value: CanvasCalloutTextSize) => void;
@@ -225,6 +228,7 @@ interface UseUiPreferencesOptions {
   setShowNetworkInfoPanels: (value: boolean) => void;
   setShowSegmentLengths: (value: boolean) => void;
   setShowCableCallouts: (value: boolean) => void;
+  setShowSelectedCalloutOnly: (value: boolean) => void;
   setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   setNetworkLabelSizeMode: (value: CanvasLabelSizeMode) => void;
   setNetworkCalloutTextSize: (value: CanvasCalloutTextSize) => void;
@@ -302,6 +306,7 @@ export function useUiPreferences({
   canvasDefaultShowInfoPanels,
   canvasDefaultShowSegmentLengths,
   canvasDefaultShowCableCallouts,
+  canvasDefaultShowSelectedCalloutOnly,
   canvasDefaultLabelStrokeMode,
   canvasDefaultLabelSizeMode,
   canvasDefaultCalloutTextSize,
@@ -339,6 +344,7 @@ export function useUiPreferences({
   setCanvasDefaultShowInfoPanels,
   setCanvasDefaultShowSegmentLengths,
   setCanvasDefaultShowCableCallouts,
+  setCanvasDefaultShowSelectedCalloutOnly,
   setCanvasDefaultLabelStrokeMode,
   setCanvasDefaultLabelSizeMode,
   setCanvasDefaultCalloutTextSize,
@@ -351,6 +357,7 @@ export function useUiPreferences({
   setShowNetworkInfoPanels,
   setShowSegmentLengths,
   setShowCableCallouts,
+  setShowSelectedCalloutOnly,
   setNetworkLabelStrokeMode,
   setNetworkLabelSizeMode,
   setNetworkCalloutTextSize,
@@ -391,6 +398,10 @@ export function useUiPreferences({
       const showCableCalloutsDefault =
         typeof preferences.canvasDefaultShowCableCallouts === "boolean"
           ? preferences.canvasDefaultShowCableCallouts
+          : false;
+      const showSelectedCalloutOnlyDefault =
+        typeof preferences.canvasDefaultShowSelectedCalloutOnly === "boolean"
+          ? preferences.canvasDefaultShowSelectedCalloutOnly
           : false;
       const labelStrokeModeDefault =
         preferences.canvasDefaultLabelStrokeMode === "none" || preferences.canvasDefaultLabelStrokeMode === "light"
@@ -439,6 +450,7 @@ export function useUiPreferences({
       setCanvasDefaultShowInfoPanels(showInfoPanelsDefault);
       setCanvasDefaultShowSegmentLengths(showSegmentLengthsDefault);
       setCanvasDefaultShowCableCallouts(showCableCalloutsDefault);
+      setCanvasDefaultShowSelectedCalloutOnly(showSelectedCalloutOnlyDefault);
       setCanvasDefaultLabelStrokeMode(labelStrokeModeDefault);
       setCanvasDefaultLabelSizeMode(labelSizeModeDefault);
       setCanvasDefaultCalloutTextSize(calloutTextSizeDefault);
@@ -455,6 +467,7 @@ export function useUiPreferences({
       setShowNetworkInfoPanels(showInfoPanelsDefault);
       setShowSegmentLengths(showSegmentLengthsDefault);
       setShowCableCallouts(showCableCalloutsDefault);
+      setShowSelectedCalloutOnly(showSelectedCalloutOnlyDefault);
       setNetworkLabelStrokeMode(labelStrokeModeDefault);
       setNetworkLabelSizeMode(labelSizeModeDefault);
       setNetworkCalloutTextSize(calloutTextSizeDefault);
@@ -483,6 +496,7 @@ export function useUiPreferences({
     setCanvasDefaultShowInfoPanels,
     setCanvasDefaultShowSegmentLengths,
     setCanvasDefaultShowCableCallouts,
+    setCanvasDefaultShowSelectedCalloutOnly,
     setCanvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelSizeMode,
     setCanvasDefaultCalloutTextSize,
@@ -509,6 +523,7 @@ export function useUiPreferences({
     setShowShortcutHints,
     setShowSegmentLengths,
     setShowCableCallouts,
+    setShowSelectedCalloutOnly,
     setNetworkLabelStrokeMode,
     setNetworkLabelSizeMode,
     setNetworkCalloutTextSize,
@@ -553,6 +568,7 @@ export function useUiPreferences({
       canvasDefaultShowInfoPanels,
       canvasDefaultShowSegmentLengths,
       canvasDefaultShowCableCallouts,
+      canvasDefaultShowSelectedCalloutOnly,
       canvasDefaultLabelStrokeMode,
       canvasDefaultLabelSizeMode,
       canvasDefaultCalloutTextSize,
@@ -578,6 +594,7 @@ export function useUiPreferences({
     canvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts,
+    canvasDefaultShowSelectedCalloutOnly,
     canvasDefaultLabelStrokeMode,
     canvasDefaultLabelSizeMode,
     canvasDefaultCalloutTextSize,

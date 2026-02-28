@@ -12,6 +12,7 @@ export function useAppControllerCanvasDisplayState() {
   const [showNetworkInfoPanels, setShowNetworkInfoPanels] = useState(true);
   const [showSegmentLengths, setShowSegmentLengths] = useState(false);
   const [showCableCallouts, setShowCableCallouts] = useState(false);
+  const [showSelectedCalloutOnly, setShowSelectedCalloutOnly] = useState(false);
   const [networkLabelStrokeMode, setNetworkLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
   const [networkLabelSizeMode, setNetworkLabelSizeMode] = useState<CanvasLabelSizeMode>("normal");
   const [networkCalloutTextSize, setNetworkCalloutTextSize] = useState<CanvasCalloutTextSize>("normal");
@@ -30,6 +31,8 @@ export function useAppControllerCanvasDisplayState() {
     setShowSegmentLengths,
     showCableCallouts,
     setShowCableCallouts,
+    showSelectedCalloutOnly,
+    setShowSelectedCalloutOnly,
     networkLabelStrokeMode,
     setNetworkLabelStrokeMode,
     networkLabelSizeMode,

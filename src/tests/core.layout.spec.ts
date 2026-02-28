@@ -9,6 +9,7 @@ import {
   NETWORK_VIEW_WIDTH
 } from "../app/lib/app-utils";
 import type { NodePosition } from "../app/types/app-controller";
+import { isVisualConflictRankBetter } from "../app/lib/layout/scoring";
 import { createSampleNetworkState } from "../store";
 
 function asNodeId(value: string): NodeId {
@@ -88,6 +89,32 @@ function createSyntheticTopology(nodeCount: number): { nodes: NetworkNode[]; seg
     addSegment(index, (index + 23) % nodeCount);
   }
 
+  return { nodes, segments };
+}
+
+function createUserLikeProblematicTopology(): { nodes: NetworkNode[]; segments: Segment[] } {
+  const nodes: NetworkNode[] = [
+    { id: asNodeId("N-U1"), kind: "intermediate", label: "U1" },
+    { id: asNodeId("N-U2"), kind: "intermediate", label: "U2" },
+    { id: asNodeId("N-U3"), kind: "intermediate", label: "U3" },
+    { id: asNodeId("N-U4"), kind: "intermediate", label: "U4" },
+    { id: asNodeId("N-U5"), kind: "intermediate", label: "U5" },
+    { id: asNodeId("N-U6"), kind: "intermediate", label: "U6" },
+    { id: asNodeId("N-U7"), kind: "intermediate", label: "U7" },
+    { id: asNodeId("N-U8"), kind: "intermediate", label: "U8" }
+  ];
+  const segments: Segment[] = [
+    { id: asSegmentId("SEG-U01"), nodeA: asNodeId("N-U1"), nodeB: asNodeId("N-U5"), lengthMm: 120 },
+    { id: asSegmentId("SEG-U02"), nodeA: asNodeId("N-U2"), nodeB: asNodeId("N-U6"), lengthMm: 120 },
+    { id: asSegmentId("SEG-U03"), nodeA: asNodeId("N-U3"), nodeB: asNodeId("N-U7"), lengthMm: 120 },
+    { id: asSegmentId("SEG-U04"), nodeA: asNodeId("N-U4"), nodeB: asNodeId("N-U8"), lengthMm: 120 },
+    { id: asSegmentId("SEG-U05"), nodeA: asNodeId("N-U1"), nodeB: asNodeId("N-U6"), lengthMm: 80 },
+    { id: asSegmentId("SEG-U06"), nodeA: asNodeId("N-U2"), nodeB: asNodeId("N-U7"), lengthMm: 80 },
+    { id: asSegmentId("SEG-U07"), nodeA: asNodeId("N-U3"), nodeB: asNodeId("N-U8"), lengthMm: 80 },
+    { id: asSegmentId("SEG-U08"), nodeA: asNodeId("N-U4"), nodeB: asNodeId("N-U5"), lengthMm: 80 },
+    { id: asSegmentId("SEG-U09"), nodeA: asNodeId("N-U1"), nodeB: asNodeId("N-U2"), lengthMm: 40 },
+    { id: asSegmentId("SEG-U10"), nodeA: asNodeId("N-U7"), nodeB: asNodeId("N-U8"), lengthMm: 40 }
+  ];
   return { nodes, segments };
 }
 
@@ -206,6 +233,70 @@ describe("2D layout generation", () => {
     });
 
     expect(countSegmentCrossings(segments, generated)).toBeLessThanOrEqual(1);
+  });
+
+  it("uses crossing count as the first layout rank comparator", () => {
+    expect(isVisualConflictRankBetter([1, 4, 8, 999], [2, 0, 0, 100])).toBe(true);
+    expect(isVisualConflictRankBetter([2, 0, 0, 100], [1, 4, 8, 999])).toBe(false);
+  });
+
+  it("improves fixed 3-fixture crossing benchmark with no fixture regression", () => {
+    const sample = createSampleNetworkState();
+    const sampleNodes = sample.nodes.allIds
+      .map((nodeId) => sample.nodes.byId[nodeId])
+      .filter((node): node is NetworkNode => node !== undefined);
+    const sampleSegments = sample.segments.allIds
+      .map((segmentId) => sample.segments.byId[segmentId])
+      .filter((segment): segment is Segment => segment !== undefined);
+    const denseSynthetic = createSyntheticTopology(32);
+    const userLikeProblematic = createUserLikeProblematicTopology();
+
+    const fixtures = [
+      {
+        name: "sample",
+        nodes: sampleNodes,
+        segments: sampleSegments
+      },
+      {
+        name: "dense-synthetic",
+        nodes: denseSynthetic.nodes,
+        segments: denseSynthetic.segments
+      },
+      {
+        name: "user-like-problematic",
+        nodes: userLikeProblematic.nodes,
+        segments: userLikeProblematic.segments
+      }
+    ] as const;
+
+    const benchmark = fixtures.map((fixture) => {
+      const baselineCrossings = countSegmentCrossings(
+        fixture.segments,
+        createBaselineCircularLayout(fixture.nodes)
+      );
+      const generatedCrossings = countSegmentCrossings(
+        fixture.segments,
+        createNodePositionMap(fixture.nodes, fixture.segments, {
+          snapToGrid: true,
+          gridStep: 20
+        })
+      );
+      return {
+        name: fixture.name,
+        baselineCrossings,
+        generatedCrossings
+      };
+    });
+
+    const strictReductionCount = benchmark.filter(
+      (fixture) => fixture.generatedCrossings < fixture.baselineCrossings
+    ).length;
+    const regressionCount = benchmark.filter(
+      (fixture) => fixture.generatedCrossings > fixture.baselineCrossings
+    ).length;
+
+    expect(strictReductionCount).toBeGreaterThanOrEqual(2);
+    expect(regressionCount).toBe(0);
   });
 
   it("keeps layout generation responsive on representative medium topology", () => {

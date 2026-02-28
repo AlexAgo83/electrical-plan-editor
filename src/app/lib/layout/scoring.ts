@@ -130,7 +130,7 @@ export function getVisualConflictRank(
   const nodeOverlaps = countSegmentNodeOverlaps(segments, nodePositions);
   const clearanceViolations = countSegmentNodeClearanceViolations(segments, nodePositions);
   const score = crossings * 400 + nodeOverlaps * 120 + clearanceViolations * 24;
-  return [nodeOverlaps, clearanceViolations, crossings, score];
+  return [crossings, nodeOverlaps, clearanceViolations, score];
 }
 
 export function isVisualConflictRankBetter(candidate: VisualConflictRank, current: VisualConflictRank): boolean {

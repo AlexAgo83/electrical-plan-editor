@@ -4,10 +4,13 @@ import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../core/schema";
 import {
   PERSISTED_STATE_PAYLOAD_KIND,
   PERSISTED_STATE_SCHEMA_VERSION,
+  RECENT_CHANGES_STORAGE_KEY,
   STORAGE_BACKUP_KEY,
   STORAGE_KEY,
   loadState,
+  loadRecentChangesMetadata,
   migratePersistedPayload,
+  saveRecentChangesMetadata,
   saveState,
   type PersistedStateSnapshotV1
 } from "../adapters/persistence";
@@ -1093,6 +1096,58 @@ describe("localStorage persistence adapter", () => {
     });
     const normalized = loadState(malformedStorage, () => "2026-02-20T14:12:00.000Z");
     expect(normalized.networkStates[activeNetworkId]?.networkSummaryViewState).toBeUndefined();
+  });
+
+  it("persists bounded recent-change metadata in a local sidecar payload", () => {
+    const storage = createMemoryStorage();
+    const entries = [
+      {
+        sequence: 1,
+        actionType: "network/update",
+        targetKind: "network",
+        targetId: "NET-A",
+        networkId: null,
+        label: "Network 'NET-A' updated",
+        timestampIso: "2026-02-28T10:00:00.000Z"
+      },
+      {
+        sequence: 2,
+        actionType: "connector/upsert",
+        targetKind: "connector",
+        targetId: "C-1",
+        networkId: null,
+        label: "Connector 'C-1' created",
+        timestampIso: "2026-02-28T10:01:00.000Z"
+      },
+      {
+        sequence: 3,
+        actionType: "segment/upsert",
+        targetKind: "segment",
+        targetId: "SEG-1",
+        networkId: null,
+        label: "Segment 'SEG-1' created",
+        timestampIso: "2026-02-28T10:02:00.000Z"
+      }
+    ] as const;
+
+    saveRecentChangesMetadata([...entries], 2, storage, () => "2026-02-28T10:03:00.000Z");
+    const raw = storage.read(RECENT_CHANGES_STORAGE_KEY);
+    expect(raw).not.toBeNull();
+
+    const loaded = loadRecentChangesMetadata(60, storage);
+    expect(loaded.map((entry) => entry.sequence)).toEqual([2, 3]);
+    expect(loaded.map((entry) => entry.label)).toEqual([
+      "Connector 'C-1' created",
+      "Segment 'SEG-1' created"
+    ]);
+  });
+
+  it("returns empty recent-change metadata when sidecar payload is malformed", () => {
+    const storage = createMemoryStorage({
+      [RECENT_CHANGES_STORAGE_KEY]: "{\"schemaVersion\":1,\"entries\":\"invalid\"}"
+    });
+    const loaded = loadRecentChangesMetadata(60, storage);
+    expect(loaded).toEqual([]);
   });
 
   it("backs up unsupported future-version payloads before replacing local storage", () => {
