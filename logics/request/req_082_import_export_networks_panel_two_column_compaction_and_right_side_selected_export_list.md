@@ -1,8 +1,8 @@
 ## req_082_import_export_networks_panel_two_column_compaction_and_right_side_selected_export_list - Import/Export networks panel two-column compaction with right-side selected export list
 > From version: 0.9.18
 > Status: Draft
-> Understanding: 99%
-> Confidence: 97%
+> Understanding: 100%
+> Confidence: 98%
 > Complexity: Low
 > Theme: UI
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -38,6 +38,7 @@
 - Decision 2: `Selected networks for export` lives in the right column.
 - Decision 3: `Import from file` is grouped under export actions in the left column to reduce vertical spread.
 - Decision 4: Keep two columns whenever space allows; collapse to one column only when two readable columns are no longer possible.
+- Decision 5: Align responsive collapse behavior with shared mobile contract baseline (`<= 900px`), while preserving readability-first fallback logic.
 
 # Functional behavior contract
 - Desktop/tablet:
@@ -45,7 +46,8 @@
   - left column: intro/meta + export actions + `Import from file`;
   - right column: `Selected networks for export` fieldset.
 - Mobile/narrow width:
-  - columns collapse back to a single-column stack only when available width cannot sustain two readable columns.
+  - columns collapse back to a single-column stack when available width cannot sustain two readable columns;
+  - baseline responsive contract aligns with the shared `<= 900px` mobile threshold.
 - Functional behavior remains unchanged:
   - export buttons trigger existing handlers;
   - selection checkboxes still drive `Export selected`;

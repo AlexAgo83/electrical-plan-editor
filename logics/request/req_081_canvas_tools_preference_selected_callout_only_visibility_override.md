@@ -1,8 +1,8 @@
 ## req_081_canvas_tools_preference_selected_callout_only_visibility_override - Canvas tools preference for selected-callout-only visibility override
 > From version: 0.9.18
 > Status: Draft
-> Understanding: 98%
-> Confidence: 96%
+> Understanding: 99%
+> Confidence: 97%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -37,6 +37,7 @@
 - Decision 1: Option placement is in `Canvas tools preferences`.
 - Decision 2: Default remains `off` to preserve current behavior for existing users.
 - Decision 3: When enabled, filtering is selection-driven and overrides full callout visibility.
+- Decision 4: Selection source is strictly the active store selection; hover/focus states must not affect selected-callout-only rendering.
 
 # Functional behavior contract
 - With `selected-callout-only = false`:
@@ -45,6 +46,7 @@
   - if selected entity is a connector with a non-empty callout payload, only that connector callout is rendered;
   - if selected entity is a splice with a non-empty callout payload, only that splice callout is rendered;
   - if no entity is selected, or selected entity has no callout payload, no callout is rendered;
+  - hover/focus-only states do not render callouts in this mode unless the store selection is eligible;
   - if global `Callouts` toggle is off, no callout is rendered regardless of selection.
 
 # Acceptance criteria
