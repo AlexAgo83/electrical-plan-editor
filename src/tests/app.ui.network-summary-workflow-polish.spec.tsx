@@ -250,6 +250,40 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(networkSummaryPanel).toHaveTextContent("W-8");
   });
 
+  it("keeps offscreen callouts non-interactive in the callout layer", () => {
+    const baseState = createUiIntegrationState();
+    const connector = baseState.connectors.byId[asConnectorId("C1")];
+    if (connector === undefined) {
+      throw new Error("Expected connector C1 in base integration state.");
+    }
+    const withOffscreenConnectorCallout = appReducer(
+      baseState,
+      appActions.upsertConnector({
+        ...connector,
+        cableCalloutPosition: { x: 10_000, y: 10_000 }
+      })
+    );
+
+    renderAppWithState(withOffscreenConnectorCallout);
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
+
+    const calloutAnchors = Array.from(networkSummaryPanel.querySelectorAll(".network-callout-anchor"));
+    expect(calloutAnchors.length).toBeGreaterThanOrEqual(2);
+    const offscreenAnchor = calloutAnchors.find((anchor) => (anchor.getAttribute("transform") ?? "").includes("10000"));
+    expect(offscreenAnchor).toBeDefined();
+    expect(offscreenAnchor?.getAttribute("tabindex")).toBe("-1");
+    expect(offscreenAnchor).toHaveAttribute("aria-hidden", "true");
+    expect(offscreenAnchor?.getAttribute("style") ?? "").toContain("pointer-events: none");
+
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    expect(connectorNode).not.toBeNull();
+    fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 200, clientY: 150 });
+    expect(networkSummaryPanel.querySelector(".network-node.connector.is-selected")).not.toBeNull();
+  });
+
   it("filters callouts to selected connector/splice only when selected-callout-only preference is enabled", () => {
     renderAppWithState(createUiIntegrationDenseWiresState());
 
