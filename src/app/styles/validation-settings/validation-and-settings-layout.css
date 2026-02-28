@@ -162,6 +162,12 @@
   align-items: start;
 }
 
+.settings-panel--import-export {
+  grid-column: span 2;
+  container-type: inline-size;
+  container-name: settings-import-export-panel;
+}
+
 .settings-panel {
   display: grid;
   align-content: start;
@@ -399,7 +405,7 @@
 
 .settings-import-export-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.7rem;
   align-items: start;
 }
@@ -418,6 +424,12 @@
 
 .settings-import-export-selection-column {
   margin: 0;
+}
+
+@container settings-import-export-panel (min-width: 656px) {
+  .settings-import-export-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
 }
 
 .settings-import-summary {
@@ -451,16 +463,6 @@
 .settings-primary-action:disabled {
   background: #9ab4c8 !important;
   color: #eaf1f7 !important;
-}
-
-@media (max-width: 900px) {
-  .settings-import-export-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .settings-import-export-selection-column {
-    order: 2;
-  }
 }
 
 @media (max-width: 860px) {

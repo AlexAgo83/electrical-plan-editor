@@ -563,40 +563,7 @@ export function SettingsWorkspaceContent({
         </div>
       </section>
 
-      <section className="panel settings-panel">
-        <header className="settings-panel-header">
-          <h2>Sample network controls</h2>
-          <span className="settings-panel-chip">Sample</span>
-        </header>
-        <p className="settings-panel-intro">Quickly recreate baseline and QA-oriented sample data when testing flows or resetting your sandbox.</p>
-        <div className="settings-state-row" aria-label="Sample workspace status">
-          <span className={isCurrentWorkspaceEmpty ? "settings-state-chip is-ok" : "settings-state-chip"}>
-            Workspace: {isCurrentWorkspaceEmpty ? "empty" : "loaded"}
-          </span>
-          <span className={hasBuiltInSampleState ? "settings-state-chip is-ok" : "settings-state-chip is-warn"}>
-            Sample signature: {hasBuiltInSampleState ? "detected" : "missing"}
-          </span>
-        </div>
-        <div className="row-actions settings-actions">
-          <button type="button" onClick={handleRecreateSampleNetwork}>
-            Recreate sample network
-          </button>
-          <button type="button" onClick={handleRecreateValidationIssuesSampleNetwork}>
-            Recreate validation issues sample
-          </button>
-          <button type="button" onClick={handleRecreateCatalogValidationIssuesSampleNetwork}>
-            Recreate catalog validation issues sample
-          </button>
-          <button type="button" onClick={handleRecreatePricingBomQaSampleNetwork}>
-            Recreate pricing / BOM QA sample
-          </button>
-          <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
-            Reset sample network to baseline
-          </button>
-        </div>
-      </section>
-
-      <section className="panel settings-panel">
+      <section className="panel settings-panel settings-panel--import-export">
         <header className="settings-panel-header">
           <h2>Import / Export networks</h2>
           <span className="settings-panel-chip">Portability</span>
@@ -663,6 +630,39 @@ export function SettingsWorkspaceContent({
             <p className="meta-line"><span>Errors</span> <strong>{lastImportSummary.errors.length}</strong></p>
           </div>
         ) : null}
+      </section>
+
+      <section className="panel settings-panel">
+        <header className="settings-panel-header">
+          <h2>Sample network controls</h2>
+          <span className="settings-panel-chip">Sample</span>
+        </header>
+        <p className="settings-panel-intro">Quickly recreate baseline and QA-oriented sample data when testing flows or resetting your sandbox.</p>
+        <div className="settings-state-row" aria-label="Sample workspace status">
+          <span className={isCurrentWorkspaceEmpty ? "settings-state-chip is-ok" : "settings-state-chip"}>
+            Workspace: {isCurrentWorkspaceEmpty ? "empty" : "loaded"}
+          </span>
+          <span className={hasBuiltInSampleState ? "settings-state-chip is-ok" : "settings-state-chip is-warn"}>
+            Sample signature: {hasBuiltInSampleState ? "detected" : "missing"}
+          </span>
+        </div>
+        <div className="row-actions settings-actions">
+          <button type="button" onClick={handleRecreateSampleNetwork}>
+            Recreate sample network
+          </button>
+          <button type="button" onClick={handleRecreateValidationIssuesSampleNetwork}>
+            Recreate validation issues sample
+          </button>
+          <button type="button" onClick={handleRecreateCatalogValidationIssuesSampleNetwork}>
+            Recreate catalog validation issues sample
+          </button>
+          <button type="button" onClick={handleRecreatePricingBomQaSampleNetwork}>
+            Recreate pricing / BOM QA sample
+          </button>
+          <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
+            Reset sample network to baseline
+          </button>
+        </div>
       </section>
     </section>
   );
