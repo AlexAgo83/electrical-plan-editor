@@ -77,6 +77,17 @@ describe("appReducer entity lifecycle", () => {
     expect(nextState.connectors.byId[asConnectorId("C1")]).toBeUndefined();
   });
 
+  it("does not bump revision when selecting the already-selected entity", () => {
+    const selectedState = appReducer(createInitialState(), appActions.select({ kind: "connector", id: "C1" }));
+    const revisionBefore = selectedState.meta.revision;
+
+    const nextState = appReducer(selectedState, appActions.select({ kind: "connector", id: "C1" }));
+
+    expect(nextState).toBe(selectedState);
+    expect(nextState.meta.revision).toBe(revisionBefore);
+    expect(nextState.ui.selected).toEqual({ kind: "connector", id: "C1" });
+  });
+
   it("keeps ids stable when updating an existing entity", () => {
     const first = reduceAll([
       appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 })

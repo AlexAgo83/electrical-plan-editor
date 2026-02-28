@@ -281,36 +281,44 @@ export function useWorkspaceShellChrome({
   }, []);
 
   useEffect(() => {
-    const scheduleDialogFocusStateUpdate = (): void => {
-      queueMicrotask(() => {
-        updateDialogFocusState();
-      });
-    };
-
+    let animationFrameId = 0;
     const updateDialogFocusState = (): void => {
+      animationFrameId = 0;
       const activeElement = document.activeElement;
       if (!(activeElement instanceof HTMLElement)) {
-        setIsDialogFocusActive(false);
+        setIsDialogFocusActive((current) => (current ? false : current));
         return;
       }
 
       if (!activeElement.isConnected) {
-        setIsDialogFocusActive(false);
+        setIsDialogFocusActive((current) => (current ? false : current));
         return;
       }
 
-      setIsDialogFocusActive(activeElement.closest('[role="dialog"], [aria-modal="true"]') !== null);
+      const nextIsDialogFocusActive = activeElement.closest('[role="dialog"], [aria-modal="true"]') !== null;
+      setIsDialogFocusActive((current) => (current === nextIsDialogFocusActive ? current : nextIsDialogFocusActive));
+    };
+
+    const scheduleDialogFocusStateUpdate = (): void => {
+      if (animationFrameId !== 0) {
+        return;
+      }
+      animationFrameId = window.requestAnimationFrame(updateDialogFocusState);
     };
 
     updateDialogFocusState();
-    const observer = new MutationObserver(scheduleDialogFocusStateUpdate);
-    observer.observe(document.body, { childList: true, subtree: true });
     document.addEventListener("focusin", updateDialogFocusState);
     document.addEventListener("focusout", scheduleDialogFocusStateUpdate);
+    document.addEventListener("mousedown", scheduleDialogFocusStateUpdate, { capture: true });
+    document.addEventListener("touchstart", scheduleDialogFocusStateUpdate, { passive: true, capture: true });
     return () => {
-      observer.disconnect();
+      if (animationFrameId !== 0) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
       document.removeEventListener("focusin", updateDialogFocusState);
       document.removeEventListener("focusout", scheduleDialogFocusStateUpdate);
+      document.removeEventListener("mousedown", scheduleDialogFocusStateUpdate, { capture: true });
+      document.removeEventListener("touchstart", scheduleDialogFocusStateUpdate, { capture: true });
     };
   }, []);
 
