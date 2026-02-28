@@ -1,6 +1,12 @@
-# Changelog (since version `0.7.4` to version `0.8.1`)
+# Changelog (`0.7.4 → 0.8.1`)
 
-This changelog summarizes **product-visible changes** delivered after version `0.7.4`, up to the current state of the repository (now `0.8.1`).
+## Major Highlights
+
+- Hardened persistence and compatibility with versioned local-storage envelopes, migration safety, and portability regression coverage.
+- Improved creation ergonomics with technical ID suggestions and expanded auto-create linked-node controls for connector/splice workflows.
+- Delivered a broad onboarding and contextual-help rollout (guided modal flow, persisted opt-out, and in-panel relaunch entry points).
+- Added major wire-model capabilities: endpoint occupancy intelligence, section (`mm²`), mono/bi-color support, and endpoint-side metadata.
+- Expanded themes and UX consistency across workspace panels, tables, canvas/inspector surfaces, and shared action/button styling.
 
 ## Data Safety, Persistence, and Compatibility
 

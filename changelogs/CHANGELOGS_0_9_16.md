@@ -1,6 +1,4 @@
-# Changelog (since version `0.9.12` to version `0.9.16`)
-
-This changelog summarizes delivered changes since commit `977ff608937b5c502e19d6ef8caf3f1d7594030f` (version `0.9.12` baseline), up to the current repository state (`0.9.16` / `d689b69`).
+# Changelog (`0.9.12 → 0.9.16`)
 
 ## Major Highlights
 

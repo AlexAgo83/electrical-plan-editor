@@ -55,7 +55,7 @@ interface ChangelogSectionsSplit {
   collapsibleSections: ChangelogCollapsibleSection[];
 }
 
-const COLLAPSIBLE_SECTION_START_TITLE = "Product and UX Changes";
+const MAJOR_HIGHLIGHTS_SECTION_TITLE = "Major Highlights";
 const LEVEL_TWO_HEADING_MATCHER = /^ {0,3}##\s+(.+?)\s*#*\s*$/;
 
 function normalizeHeadingTitle(value: string): string {
@@ -93,10 +93,15 @@ function splitCollapsibleSections(markdown: string): ChangelogSectionsSplit | nu
     return null;
   }
 
-  const startHeadingIndex = levelTwoHeadings.findIndex(
-    (heading) => normalizeHeadingTitle(heading.title) === normalizeHeadingTitle(COLLAPSIBLE_SECTION_START_TITLE)
+  const majorHighlightsIndex = levelTwoHeadings.findIndex(
+    (heading) => normalizeHeadingTitle(heading.title) === normalizeHeadingTitle(MAJOR_HIGHLIGHTS_SECTION_TITLE)
   );
-  if (startHeadingIndex === -1) {
+  if (majorHighlightsIndex === -1) {
+    return null;
+  }
+
+  const startHeadingIndex = majorHighlightsIndex + 1;
+  if (startHeadingIndex >= levelTwoHeadings.length) {
     return null;
   }
 

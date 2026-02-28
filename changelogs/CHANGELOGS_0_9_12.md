@@ -1,6 +1,4 @@
-# Changelog (since version `0.9.6` to version `0.9.12`)
-
-This changelog summarizes delivered changes since commit `407d071b5919c2c908dfa7a3350693a972f1db64` (version `0.9.6` baseline), up to the current repository state (`0.9.12` / `55f9515`).
+# Changelog (`0.9.6 → 0.9.12`)
 
 ## Major Highlights
 
@@ -97,4 +95,3 @@ This changelog summarizes delivered changes since commit `407d071b5919c2c908dfa7
 - Refreshed README notes for CI and onboarding/fuse guidance.
 - Updated README media/image asset.
 - Split oversized settings UI integration test coverage into modular files to satisfy UI modularization quality gates.
-

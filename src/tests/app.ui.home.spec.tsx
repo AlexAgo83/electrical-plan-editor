@@ -105,7 +105,7 @@ describe("home workspace screen", () => {
     }
   });
 
-  it("collapses Product and UX Changes and following sections by default, then toggles on click", () => {
+  it("keeps Major Highlights visible and collapses following sections by default, then toggles on click", () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("home");
@@ -140,6 +140,15 @@ describe("home workspace screen", () => {
     fireEvent.click(engineeringToggle);
     expect(engineeringToggle).toHaveAttribute("aria-expanded", "true");
     expect(within(whatsNewPanel).getByText("Updated segmented Vitest lane contract to include new UI specs.")).toBeInTheDocument();
+
+    const changelog096Article = within(whatsNewPanel).getByLabelText("Changelog v0.9.6");
+    const uxWorkspaceToggle = within(changelog096Article).getByRole("button", { name: "UX / Navigation / Workspace" });
+    expect(uxWorkspaceToggle).toHaveAttribute("aria-expanded", "false");
+    expect(within(changelog096Article).queryByText("Home Workspace Polish")).not.toBeInTheDocument();
+
+    fireEvent.click(uxWorkspaceToggle);
+    expect(uxWorkspaceToggle).toHaveAttribute("aria-expanded", "true");
+    expect(within(changelog096Article).getByText("Home Workspace Polish")).toBeInTheDocument();
   });
 
   it("shows active workspace resume summary details", () => {
