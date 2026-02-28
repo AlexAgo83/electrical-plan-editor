@@ -150,6 +150,7 @@ Then open `http://127.0.0.1:5284` (unless overridden).
 - `npm run ci:local`: run the local CI-equivalent blocking pipeline (logics lint + lint + typecheck + segmentation check + quality gates + test:ci:fast + test:ci:ui + test:e2e + build + pwa quality)
 - `npm run test:e2e`: run Playwright E2E smoke tests
 - `npm run quality:ui-modularization`: enforce UI modularization line-budget gate
+- `npm run quality:ui-timeout-governance`: enforce UI test timeout-override governance (no explicit per-test timeout override unless allowlisted)
 - `npm run quality:store-modularization`: enforce store modularization line-budget gate
 - `npm run quality:pwa`: validate generated PWA build artifacts (`manifest`, `sw.js`, `workbox-*`)
 
@@ -247,6 +248,7 @@ npm run lint
 npm run typecheck
 npm run test:ci:segmentation:check
 npm run quality:ui-modularization
+npm run quality:ui-timeout-governance
 npm run quality:store-modularization
 npm run test:ci:fast -- --coverage
 npm run test:ci:ui
@@ -279,7 +281,8 @@ Form validation doctrine (current targeted scope):
 
 UI reliability note:
 
-- existing targeted `10_000ms` UI test timeout exceptions are tracked as temporary debt; new increases require explicit rationale
+- explicit per-test UI timeout overrides are disallowed by default and enforced by `npm run quality:ui-timeout-governance`
+- temporary exceptions, if strictly necessary, must be explicitly allowlisted in `scripts/quality/check-ui-timeout-governance.mjs` with rationale and retirement plan
 
 Local E2E note:
 

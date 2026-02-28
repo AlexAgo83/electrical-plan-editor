@@ -1,9 +1,9 @@
 ## item_411_app_controller_decomposition_continuation_by_orchestration_slice_extraction - App controller decomposition continuation by orchestration slice extraction
 > From version: 0.9.17
-> Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Status: Done
+> Understanding: 97%
+> Confidence: 94%
+> Progress: 100%
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -28,10 +28,10 @@
 - AC4: Lint/typecheck/UI CI pass after decomposition changes.
 
 # AC Traceability
-- AC1 -> New orchestration module/hook files introduced and integrated. Proof: pending.
-- AC2 -> `AppController` diff shows responsibility reduction. Proof: pending.
-- AC3 -> Impacted flows validated via targeted tests/manual checks. Proof: pending.
-- AC4 -> `lint`, `typecheck`, `test:ci:ui` evidence captured. Proof: pending.
+- AC1 -> New orchestration module/hook files introduced and integrated. Proof: `src/app/hooks/controller/useConfirmDialogController.ts` and `src/app/hooks/controller/useAppControllerSaveExportActions.ts`, wired in `src/app/AppController.tsx`.
+- AC2 -> `AppController` responsibility surface reduced measurably. Proof: `src/app/AppController.tsx` reduced from `2711` to `2637` lines in this wave and removed inline modal/save-export orchestration blocks.
+- AC3 -> Impacted UI contracts validated after extraction. Proof: targeted vitest bundle + full UI lane pass (`30` files, `193` tests).
+- AC4 -> `lint`, `typecheck`, `test:ci:ui` evidence captured. Proof: all green in this wave snapshot.
 
 # Priority
 - Impact:

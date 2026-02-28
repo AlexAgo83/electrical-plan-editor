@@ -1,9 +1,9 @@
 ## task_072_super_orchestration_delivery_execution_for_req_079_with_validation_gates - Super orchestration delivery execution for req_079 with validation gates
 > From version: 0.9.17
-> Status: In Progress
-> Understanding: 95%
-> Confidence: 92%
-> Progress: 35%
+> Status: Done
+> Understanding: 99%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -60,18 +60,26 @@ The scope is cross-cutting (tests, controller architecture, and process evidence
 
 # Plan
 - [x] 1. Baseline and prioritize top slow/flaky UI specs, then implement root-cause stabilizations (`item_409`)
-- [ ] 2. Apply timeout debt governance and rationale enforcement, including inventory/classification (`item_410`)
-- [ ] 3. Extract and integrate an `AppController` orchestration slice with behavior parity checks (`item_411`)
-- [ ] 4. Build req_079 closure traceability matrix and synchronize all linked docs (`item_412`)
-- [ ] FINAL: Update related Logics docs
+- [x] 2. Apply timeout debt governance and rationale enforcement, including inventory/classification (`item_410`)
+- [x] 3. Extract and integrate an `AppController` orchestration slice with behavior parity checks (`item_411`)
+- [x] 4. Build req_079 closure traceability matrix and synchronize all linked docs (`item_412`)
+- [x] FINAL: Update related Logics docs
 
 # AC Traceability
 - AC1 -> Reliability pass on top slow/flaky specs is delivered in Step 1. Proof: `item_409` done; `npm run -s test:ci:ui:slow-top` executed.
-- AC2 -> Timeout governance policy and enforcement are delivered in Step 2. Proof: pending.
-- AC3 -> Timeout debt is reduced or explicitly justified through Steps 1-2. Proof: Step 1 contribution validated (`rg -n "10_000|15_000|15000" src/tests` -> no matches).
-- AC4 -> `AppController` decomposition continuation is delivered in Step 3. Proof: pending.
-- AC5 -> Validation gate commands pass through Step 4 closure checks. Proof: partial gate passed in Step 1 (`npm run -s typecheck`, targeted vitest runs, `npm run -s test:ci:ui`).
-- AC6 -> Request/backlog/task synchronization is delivered in Step 4 and FINAL step. Proof: partial synchronization done (`item_409` + task progress updated).
+- AC2 -> Timeout governance policy and enforcement are delivered in Step 2. Proof: `scripts/quality/check-ui-timeout-governance.mjs` + CI/local integration.
+- AC3 -> Timeout debt is reduced or explicitly justified through Steps 1-2. Proof: baseline `15` explicit timeout overrides -> current `0`; governance gate blocks reintroduction without policy-managed allowlist.
+- AC4 -> `AppController` decomposition continuation is delivered in Step 3. Proof: extracted hooks `useConfirmDialogController` + `useAppControllerSaveExportActions`; `AppController` reduced from `2711` to `2637` lines.
+- AC5 -> Validation gate commands pass through Step 4 closure checks. Proof: partial gates passed in Steps 1-3 (`npm run -s lint`, `npm run -s typecheck`, `npm run -s test:ci:segmentation:check`, `npm run -s quality:ui-timeout-governance`, `npm run -s test:ci:ui`).
+- AC6 -> Request/backlog/task synchronization is delivered in Step 4 and FINAL step. Proof: statuses and evidence synchronized across `req_079`, `item_409..412`, and `task_072`.
+
+# Req_079 AC Matrix
+- AC1 (`req_079`) -> delivered by `item_409`. Evidence: UI slow-top report + stabilization diffs + timeout override removal.
+- AC2 (`req_079`) -> delivered by `item_410`. Evidence: `scripts/quality/check-ui-timeout-governance.mjs`, CI/local integration.
+- AC3 (`req_079`) -> delivered by `item_409` + `item_410`. Evidence: baseline `15` explicit overrides -> current `0` + governance gate enforcement.
+- AC4 (`req_079`) -> delivered by `item_411`. Evidence: extracted hooks (`useConfirmDialogController`, `useAppControllerSaveExportActions`) and reduced `AppController` surface.
+- AC5 (`req_079`) -> validated by gates. Evidence: `npm run -s lint`, `npm run -s typecheck`, targeted vitest runs, `npm run -s test:ci:ui`, `npm run -s quality:ui-timeout-governance`.
+- AC6 (`req_079`) -> delivered by `item_412`. Evidence: synchronized statuses/traceability across request, backlog, and task docs with explicit request evidence block.
 
 # Validation gates
 ## A. Minimum wave gate (after each implementation step)
@@ -94,19 +102,23 @@ The scope is cross-cutting (tests, controller architecture, and process evidence
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] Linked request/backlog/task docs updated.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] Validation commands executed and results captured.
+- [x] Linked request/backlog/task docs updated.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report
 - Current blockers: none.
-- Current status: Step 1 completed (`item_409` done), Step 2 ready.
+- Current status: req_079 delivery and closure validation completed.
 - Validation snapshot:
   - `npm run -s test:ci:ui:slow-top` ✅
   - `npx vitest run` on touched UI specs ✅
   - `npm run -s test:ci:ui` ✅ (`30` files, `193` tests)
+  - `npm run -s test:ci:segmentation:check` ✅
+  - `npm run -s quality:ui-timeout-governance` ✅
+  - `npm run -s lint` ✅
   - `npm run -s typecheck` ✅
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
 
 # References
 - `logics/request/req_079_ui_reliability_debt_reduction_and_app_controller_decomposition_continuation.md`
