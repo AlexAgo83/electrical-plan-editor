@@ -1,8 +1,8 @@
 ## req_083_app_wide_mobile_mode_enablement_and_removal_of_global_700px_min_width_constraint - App-wide mobile mode enablement with removal of global 700px minimum width constraint
 > From version: 0.9.18
 > Status: Draft
-> Understanding: 97%
-> Confidence: 94%
+> Understanding: 98%
+> Confidence: 95%
 > Complexity: High
 > Theme: UI
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -39,6 +39,9 @@
 - Decision 4: Keep a single mobile breakpoint contract (baseline `<= 900px`) shared by CSS rules and any JS viewport logic to avoid drift.
 - Decision 5: Use overflow-safe grid/flex patterns (`minmax(0, 1fr)`, `min-width: 0` on shrinking children) as default in mobile refactors.
 - Decision 6: Any mobile drawer/overlay introduced in this wave must include deterministic body scroll lock/unlock cleanup.
+- Decision 7: Mobile validation baseline includes both viewport profiles:
+  - `360x800`,
+  - `390x844`.
 
 # Proven mobile patterns to reuse
 - Breakpoint contract:
@@ -68,7 +71,7 @@
 
 # Acceptance criteria
 - AC1: Global `body` style no longer enforces `min-width: 700px`.
-- AC2: Main app flows are usable on narrow viewport widths (target baseline: `360px` CSS width) without mandatory horizontal page scroll.
+- AC2: Main app flows are usable on narrow viewport widths (baseline profiles: `360x800` and `390x844`) without mandatory horizontal page scroll.
 - AC3: Existing responsive components preserve desktop behavior and collapse gracefully on narrow screens.
 - AC4: Import/export/settings and network summary controls remain accessible and operable in mobile mode.
 - AC5: No critical visual clipping/overlap regressions are introduced in supported themes for targeted screens.

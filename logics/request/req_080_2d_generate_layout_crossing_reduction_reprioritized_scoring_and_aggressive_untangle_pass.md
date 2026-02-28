@@ -1,8 +1,8 @@
 ## req_080_2d_generate_layout_crossing_reduction_reprioritized_scoring_and_aggressive_untangle_pass - 2D generate layout crossing reduction with reprioritized scoring and aggressive untangle pass
 > From version: 0.9.18
 > Status: Draft
-> Understanding: 97%
-> Confidence: 95%
+> Understanding: 98%
+> Confidence: 96%
 > Complexity: Medium
 > Theme: 2D Representation Reliability
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -37,9 +37,16 @@
 - Decision 1: Extend local move exploration beyond current conservative offsets and increase convergence budget.
 - Decision 2: Reorder scoring/ranking so crossing count is evaluated before other penalties.
 - Decision 3: Add a secondary aggressive untangling phase to escape local minima when standard refinement plateaus.
+- Decision 4: Use a fixed crossing benchmark set with 3 fixtures:
+  - built-in sample network fixture,
+  - dense synthetic topology fixture,
+  - user-like problematic topology fixture (known crossing case).
+- Decision 5: Acceptance threshold is:
+  - strict crossing reduction on at least 2 fixtures out of 3;
+  - no crossing increase on the remaining fixture.
 
 # Acceptance criteria
-- AC1: On representative dense fixtures used in tests, `Generate` produces strictly fewer crossings than the current baseline.
+- AC1: On the fixed 3-fixture benchmark set, `Generate` produces strictly fewer crossings than baseline on at least `2/3` fixtures and never increases crossings on the remaining fixture.
 - AC2: Candidate ranking places crossing count as the highest-priority comparator in layout refinement.
 - AC3: A second aggressive untangling pass executes when needed and improves or preserves best score deterministically.
 - AC4: Existing layout-related tests and CI quality gates pass after implementation (`lint`, `typecheck`, `test:ci`).
@@ -49,7 +56,7 @@
 - `npm run -s lint`
 - `npm run -s typecheck`
 - `npm run -s test:ci`
-- targeted layout tests around `generation`, `postprocess`, and `scoring`
+- targeted layout tests around `generation`, `postprocess`, and `scoring` on the fixed 3-fixture benchmark set
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
 
 # Definition of Ready (DoR)

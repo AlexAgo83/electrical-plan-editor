@@ -1,8 +1,8 @@
 ## req_084_network_scope_recent_changes_persistence_across_app_relaunch - Persist Network Scope recent changes across app relaunch
 > From version: 0.9.18
 > Status: Draft
-> Understanding: 98%
-> Confidence: 95%
+> Understanding: 99%
+> Confidence: 96%
 > Complexity: Medium
 > Theme: Network-level observability and persistence
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -28,6 +28,7 @@
   - keep active-network filtering and newest-first rendering behavior.
 - Out:
   - full cross-session Undo/Redo snapshot restoration;
+  - adding recent-change metadata to network import/export file payloads;
   - server-side audit log architecture;
   - cross-device sync of local history metadata.
 
@@ -36,6 +37,7 @@
 - Decision 2: Keep panel rendering contract from `req_075` (last 10 displayed, newest first, active-network scoped).
 - Decision 3: Apply bounded retention to persisted metadata (same cap policy as history limit contract).
 - Decision 4: Maintain backward-compatible persistence migration behavior for existing local payloads.
+- Decision 5: Persist recent-change metadata in local workspace persistence only; do not include this metadata in network import/export JSON files.
 
 # Functional behavior contract
 - On normal usage:
@@ -48,6 +50,8 @@
   - switching active network shows only that network's entries.
 - Empty behavior:
   - if active-network recent entries are empty, panel remains hidden (unchanged contract).
+- Import/export boundary:
+  - recent-change metadata persistence is local-only and remains excluded from network file import/export contract.
 
 # Acceptance criteria
 - AC1: After creating/updating entities and remounting/reloading, `Recent changes` remains visible for the active network with restored entries.
@@ -55,7 +59,8 @@
 - AC3: Persisted recent-change metadata remains bounded by configured history retention policy.
 - AC4: Network-scoped filtering remains correct after reload and network switch.
 - AC5: Existing `req_075` panel hide behavior remains unchanged when active-network history is empty.
-- AC6: `lint`, `typecheck`, and relevant tests pass with new persistence coverage.
+- AC6: Recent-change metadata is persisted locally only and is not added to network file import/export payload contracts.
+- AC7: `lint`, `typecheck`, and relevant tests pass with new persistence coverage.
 
 # Validation and regression safety
 - `npm run -s lint`
@@ -63,6 +68,7 @@
 - `npm run -s test -- src/tests/app.ui.networks.spec.tsx`
 - `npm run -s test -- src/tests/app.ui.undo-redo-global.spec.tsx`
 - `npm run -s test -- src/tests/persistence.localStorage.spec.ts`
+- `npm run -s test -- src/tests/network-import-export.spec.ts`
 - `npm run -s test:ci`
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
 
