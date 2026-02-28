@@ -255,6 +255,7 @@ interface DraggingCalloutState {
 const CALLOUT_OFFSET_SCREEN_UNITS = 92;
 const CALLOUT_MIN_WIDTH = 44;
 const CALLOUT_MAX_WIDTH = 320;
+const CALLOUT_LAYOUT_CACHE_MAX_ENTRIES = 512;
 
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -342,6 +343,25 @@ let calloutMeasureCanvas: HTMLCanvasElement | null = null;
 let calloutMeasureSvgText: SVGTextElement | null = null;
 let calloutMeasureSvgRoot: SVGSVGElement | null = null;
 let calloutMeasureSvgGroup: SVGGElement | null = null;
+const calloutLayoutCache = new Map<string, CalloutLayoutMetrics>();
+
+function buildCalloutRows(groups: CalloutGroup[]): string[] {
+  return groups.flatMap((group) => group.entries.map(buildCalloutEntryDisplayLine));
+}
+
+function buildCalloutLayoutCacheKey(
+  title: string,
+  subtitle: string,
+  rows: string[],
+  calloutTextSize: CanvasCalloutTextSize
+): string {
+  return JSON.stringify({
+    calloutTextSize,
+    title,
+    subtitle,
+    rows
+  });
+}
 function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
   const fallback = text.length * fontSizePx * 0.56;
   if (typeof document === "undefined") {
@@ -479,7 +499,12 @@ function buildCalloutLayoutMetrics(
   groups: CalloutGroup[],
   calloutTextSize: CanvasCalloutTextSize
 ): CalloutLayoutMetrics {
-  const rows = groups.flatMap((group) => group.entries.map(buildCalloutEntryDisplayLine));
+  const rows = buildCalloutRows(groups);
+  const cacheKey = buildCalloutLayoutCacheKey(title, subtitle, rows, calloutTextSize);
+  const cached = calloutLayoutCache.get(cacheKey);
+  if (cached !== undefined) {
+    return cached;
+  }
   const rowFontSize = getCalloutRowFontSize(calloutTextSize);
   const titleFontSize = getCalloutTitleFontSize(calloutTextSize);
   const subtitleFontSize = getCalloutSubtitleFontSize(calloutTextSize);
@@ -525,7 +550,12 @@ function buildCalloutLayoutMetrics(
   const headerHeight =
     titleLineHeight + (subtitleStartY === null ? 0 : subtitleTopGap + subtitleLineHeight + subtitleBottomGap);
   const height = Math.max(0, topPadding + headerHeight + titleBottomGap + measuredContentHeight + bottomPadding);
-  return { width, titleStartY, subtitleStartY, rowsStartY, rowStep, height, rows };
+  const layout = { width, titleStartY, subtitleStartY, rowsStartY, rowStep, height, rows } satisfies CalloutLayoutMetrics;
+  if (calloutLayoutCache.size >= CALLOUT_LAYOUT_CACHE_MAX_ENTRIES) {
+    calloutLayoutCache.clear();
+  }
+  calloutLayoutCache.set(cacheKey, layout);
+  return layout;
 }
 
 function getCalloutFrameEdgePoint(
@@ -1230,108 +1260,161 @@ export function NetworkSummaryPanel({
     handleNetworkSegmentClick(segmentId);
   }
 
-  const renderedCableCallouts = orderedCableCallouts.map((callout) => {
-    const layout = buildCalloutLayoutMetrics(callout.title, "", callout.groups, calloutTextSize);
-    const lineEnd = getCalloutFrameEdgePoint(
-      callout.nodePosition,
-      callout.position,
-      layout.width,
-      layout.height,
-      inverseLabelScale
-    );
-    const calloutClassName = `network-callout-group${callout.isDeemphasized ? " is-deemphasized" : ""}${
-      callout.isSelected ? " is-selected" : ""
-    }${hoveredCalloutKey === callout.key ? " is-hovered" : ""}${draggingCallout?.key === callout.key ? " is-dragging" : ""}`;
+  const renderedCableCallouts = useMemo(() => {
+    const draggingCalloutKey = draggingCallout?.key ?? null;
+    return orderedCableCallouts.map((callout) => {
+      const layout = buildCalloutLayoutMetrics(callout.title, "", callout.groups, calloutTextSize);
+      const halfWidthInModelUnits = (layout.width / 2) * inverseLabelScale;
+      const halfHeightInModelUnits = (layout.height / 2) * inverseLabelScale;
+      const isVisibleInViewport = !(
+        callout.position.x + halfWidthInModelUnits < visibleModelMinX ||
+        callout.position.x - halfWidthInModelUnits > visibleModelMaxX ||
+        callout.position.y + halfHeightInModelUnits < visibleModelMinY ||
+        callout.position.y - halfHeightInModelUnits > visibleModelMaxY
+      );
+      const lineEnd = getCalloutFrameEdgePoint(
+        callout.nodePosition,
+        callout.position,
+        layout.width,
+        layout.height,
+        inverseLabelScale
+      );
+      const calloutClassName = `network-callout-group${callout.isDeemphasized ? " is-deemphasized" : ""}${
+        callout.isSelected ? " is-selected" : ""
+      }${hoveredCalloutKey === callout.key ? " is-hovered" : ""}${
+        draggingCalloutKey === callout.key ? " is-dragging" : ""
+      }`;
 
-    return {
-      callout,
-      layout,
-      lineEnd,
-      calloutClassName
-    };
-  });
+      return {
+        callout,
+        layout,
+        lineEnd,
+        calloutClassName,
+        isVisibleInViewport
+      };
+    });
+  }, [
+    orderedCableCallouts,
+    calloutTextSize,
+    inverseLabelScale,
+    hoveredCalloutKey,
+    draggingCallout?.key,
+    visibleModelMinX,
+    visibleModelMaxX,
+    visibleModelMinY,
+    visibleModelMaxY
+  ]);
 
-  const renderedSegments = segments.flatMap((segment) => {
-    const nodeAPosition = networkNodePositions[segment.nodeA];
-    const nodeBPosition = networkNodePositions[segment.nodeB];
-    if (nodeAPosition === undefined || nodeBPosition === undefined) {
-      return [];
-    }
+  const renderedSegments = useMemo(
+    () =>
+      segments.flatMap((segment) => {
+        const nodeAPosition = networkNodePositions[segment.nodeA];
+        const nodeBPosition = networkNodePositions[segment.nodeB];
+        if (nodeAPosition === undefined || nodeBPosition === undefined) {
+          return [];
+        }
 
-    const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
-    const isSubNetworkDeemphasized = isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
-    const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
-    const isSelectedSegment = selectedSegmentId === segment.id;
-    const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
-      isSelectedSegment ? " is-selected" : ""
-    }`;
-    const segmentGroupClassName = `network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`;
-    const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
-    const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
-    const segmentVectorX = nodeBPosition.x - nodeAPosition.x;
-    const segmentVectorY = nodeBPosition.y - nodeAPosition.y;
-    const segmentAngleDegrees = normalizeReadableSegmentLabelAngle(
-      (Math.atan2(segmentVectorY, segmentVectorX) * 180) / Math.PI
-    );
-    const segmentLabelRotationDegrees = autoSegmentLabelRotation ? segmentAngleDegrees : labelRotationDegrees;
-    const segmentLabelRotationRadians = (segmentLabelRotationDegrees * Math.PI) / 180;
-    const segmentLabelOffsetDistance = showSegmentLengths ? 6 : 0;
-    // Keep ID/length split along the label-normal axis, including when labels are auto-rotated.
-    const segmentLengthLabelOffsetX = -Math.sin(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
-    const segmentLengthLabelOffsetY = Math.cos(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
+        const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
+        const isSubNetworkDeemphasized = isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
+        const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
+        const isSelectedSegment = selectedSegmentId === segment.id;
+        const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
+          isSelectedSegment ? " is-selected" : ""
+        }`;
+        const segmentGroupClassName = `network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`;
+        const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
+        const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
+        const segmentVectorX = nodeBPosition.x - nodeAPosition.x;
+        const segmentVectorY = nodeBPosition.y - nodeAPosition.y;
+        const segmentAngleDegrees = normalizeReadableSegmentLabelAngle(
+          (Math.atan2(segmentVectorY, segmentVectorX) * 180) / Math.PI
+        );
+        const segmentLabelRotationDegrees = autoSegmentLabelRotation ? segmentAngleDegrees : labelRotationDegrees;
+        const segmentLabelRotationRadians = (segmentLabelRotationDegrees * Math.PI) / 180;
+        const segmentLabelOffsetDistance = showSegmentLengths ? 6 : 0;
+        // Keep ID/length split along the label-normal axis, including when labels are auto-rotated.
+        const segmentLengthLabelOffsetX = -Math.sin(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
+        const segmentLengthLabelOffsetY = Math.cos(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
 
-    return [
-      {
-        segment,
-        nodeAPosition,
-        nodeBPosition,
-        segmentClassName,
-        segmentGroupClassName,
-        labelX,
-        labelY,
-        segmentLabelRotationDegrees,
-        segmentIdLabelX: -segmentLengthLabelOffsetX,
-        segmentIdLabelY: -segmentLengthLabelOffsetY,
-        segmentLengthLabelX: segmentLengthLabelOffsetX,
-        segmentLengthLabelY: segmentLengthLabelOffsetY
-      }
-    ];
-  });
+        return [
+          {
+            segment,
+            nodeAPosition,
+            nodeBPosition,
+            segmentClassName,
+            segmentGroupClassName,
+            labelX,
+            labelY,
+            segmentLabelRotationDegrees,
+            segmentIdLabelX: -segmentLengthLabelOffsetX,
+            segmentIdLabelY: -segmentLengthLabelOffsetY,
+            segmentLengthLabelX: segmentLengthLabelOffsetX,
+            segmentLengthLabelY: segmentLengthLabelOffsetY
+          }
+        ];
+      }),
+    [
+      segments,
+      networkNodePositions,
+      segmentSubNetworkTagById,
+      isSubNetworkFilteringActive,
+      activeSubNetworkTagSet,
+      selectedWireRouteSegmentIds,
+      selectedSegmentId,
+      autoSegmentLabelRotation,
+      labelRotationDegrees,
+      showSegmentLengths
+    ]
+  );
 
-  const renderedNodes = nodes.flatMap((node) => {
-    const position = networkNodePositions[node.id];
-    if (position === undefined) {
-      return [];
-    }
+  const renderedNodes = useMemo(
+    () =>
+      nodes.flatMap((node) => {
+        const position = networkNodePositions[node.id];
+        if (position === undefined) {
+          return [];
+        }
 
-    const isSubNetworkDeemphasized =
-      isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false);
-    const nodeKindClass =
-      node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
-    const isSelectedNode =
-      selectedNodeId === node.id ||
-      (node.kind === "connector" && selectedConnectorId === node.connectorId) ||
-      (node.kind === "splice" && selectedSpliceId === node.spliceId);
-    const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}${
-      isSubNetworkDeemphasized ? " is-deemphasized" : ""
-    }`;
-    const nodeLabel =
-      node.kind === "intermediate"
-        ? node.id
-        : node.kind === "connector"
-          ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
-          : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
+        const isSubNetworkDeemphasized =
+          isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false);
+        const nodeKindClass =
+          node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
+        const isSelectedNode =
+          selectedNodeId === node.id ||
+          (node.kind === "connector" && selectedConnectorId === node.connectorId) ||
+          (node.kind === "splice" && selectedSpliceId === node.spliceId);
+        const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}${
+          isSubNetworkDeemphasized ? " is-deemphasized" : ""
+        }`;
+        const nodeLabel =
+          node.kind === "intermediate"
+            ? node.id
+            : node.kind === "connector"
+              ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
+              : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
 
-    return [
-      {
-        node,
-        position,
-        nodeClassName,
-        nodeLabel,
-        isSubNetworkDeemphasized
-      }
-    ];
-  });
+        return [
+          {
+            node,
+            position,
+            nodeClassName,
+            nodeLabel,
+            isSubNetworkDeemphasized
+          }
+        ];
+      }),
+    [
+      nodes,
+      networkNodePositions,
+      isSubNetworkFilteringActive,
+      nodeHasActiveSubNetworkConnection,
+      selectedNodeId,
+      selectedConnectorId,
+      selectedSpliceId,
+      connectorMap,
+      spliceMap
+    ]
+  );
 
   return (
     <section className="network-summary-stack">
@@ -1631,7 +1714,7 @@ export function NetworkSummaryPanel({
                 className="network-graph-layer network-graph-layer-callouts"
                 transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
               >
-                {renderedCableCallouts.map(({ callout, layout, calloutClassName }) => {
+                {renderedCableCallouts.map(({ callout, layout, calloutClassName, isVisibleInViewport }) => {
                   let contentCursorY = layout.rowsStartY;
 
                   return (
@@ -1647,9 +1730,11 @@ export function NetworkSummaryPanel({
                         className="network-callout-anchor"
                         transform={`translate(${callout.position.x} ${callout.position.y}) scale(${inverseLabelScale})`}
                         role="button"
-                        tabIndex={0}
-                        focusable="true"
+                        tabIndex={isVisibleInViewport ? 0 : -1}
+                        focusable={isVisibleInViewport ? "true" : "false"}
+                        aria-hidden={isVisibleInViewport ? undefined : true}
                         aria-label={`Select ${callout.kind} ${callout.subtitle}`}
+                        style={isVisibleInViewport ? undefined : { pointerEvents: "none" }}
                         onMouseDown={(event) => handleCalloutMouseDown(event, callout)}
                         onClick={(event) => {
                           event.preventDefault();
