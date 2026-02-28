@@ -68,7 +68,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     clickNewFromPanel("Wires");
     const createWirePanel = getPanelByHeading("Create Wire");
     expect(within(createWirePanel).getByLabelText("Technical ID")).toHaveValue("W-001");
-  }, 10_000);
+  });
 
   it("focuses the created connector row and switches the form to edit mode after creation", async () => {
     renderAppWithState(createInitialStateWithCatalog());
@@ -380,7 +380,7 @@ describe("App integration UI - creation flow ergonomics", () => {
       expect(document.activeElement).toBe(wireRow);
     });
     expect(getPanelByHeading("Edit Wire")).toBeInTheDocument();
-  }, 10_000);
+  });
 
   it("prefills the next free endpoint way/port in wire create mode and keeps manual edits until context changes", () => {
     renderAppWithState(createUiIntegrationDenseWiresState());

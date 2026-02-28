@@ -66,7 +66,7 @@ describe("App integration UI - global undo/redo", () => {
 
     openOpsPanel();
     expect(screen.getByRole("button", { name: "Redo" })).toBeDisabled();
-  }, 10_000);
+  });
 
   it("treats catalog CSV import as one undo step and excludes theme-only changes from history", async () => {
     const { store } = renderAppWithState(createStateWithCatalog());

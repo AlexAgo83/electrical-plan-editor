@@ -1,9 +1,9 @@
 ## task_072_super_orchestration_delivery_execution_for_req_079_with_validation_gates - Super orchestration delivery execution for req_079 with validation gates
 > From version: 0.9.17
 > Status: In Progress
-> Understanding: 92%
-> Confidence: 88%
-> Progress: 10%
+> Understanding: 95%
+> Confidence: 92%
+> Progress: 35%
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -59,19 +59,19 @@ The scope is cross-cutting (tests, controller architecture, and process evidence
   - `item_412` is only complete if AC traceability exists in task artifacts and an `Evidence` block is added in `req_079`.
 
 # Plan
-- [ ] 1. Baseline and prioritize top slow/flaky UI specs, then implement root-cause stabilizations (`item_409`)
+- [x] 1. Baseline and prioritize top slow/flaky UI specs, then implement root-cause stabilizations (`item_409`)
 - [ ] 2. Apply timeout debt governance and rationale enforcement, including inventory/classification (`item_410`)
 - [ ] 3. Extract and integrate an `AppController` orchestration slice with behavior parity checks (`item_411`)
 - [ ] 4. Build req_079 closure traceability matrix and synchronize all linked docs (`item_412`)
 - [ ] FINAL: Update related Logics docs
 
 # AC Traceability
-- AC1 -> Reliability pass on top slow/flaky specs is delivered in Step 1. Proof: pending.
+- AC1 -> Reliability pass on top slow/flaky specs is delivered in Step 1. Proof: `item_409` done; `npm run -s test:ci:ui:slow-top` executed.
 - AC2 -> Timeout governance policy and enforcement are delivered in Step 2. Proof: pending.
-- AC3 -> Timeout debt is reduced or explicitly justified through Steps 1-2. Proof: pending.
+- AC3 -> Timeout debt is reduced or explicitly justified through Steps 1-2. Proof: Step 1 contribution validated (`rg -n "10_000|15_000|15000" src/tests` -> no matches).
 - AC4 -> `AppController` decomposition continuation is delivered in Step 3. Proof: pending.
-- AC5 -> Validation gate commands pass through Step 4 closure checks. Proof: pending.
-- AC6 -> Request/backlog/task synchronization is delivered in Step 4 and FINAL step. Proof: pending.
+- AC5 -> Validation gate commands pass through Step 4 closure checks. Proof: partial gate passed in Step 1 (`npm run -s typecheck`, targeted vitest runs, `npm run -s test:ci:ui`).
+- AC6 -> Request/backlog/task synchronization is delivered in Step 4 and FINAL step. Proof: partial synchronization done (`item_409` + task progress updated).
 
 # Validation gates
 ## A. Minimum wave gate (after each implementation step)
@@ -101,8 +101,12 @@ The scope is cross-cutting (tests, controller architecture, and process evidence
 
 # Report
 - Current blockers: none.
-- Current status: implementation started.
-- Validation snapshot: pending.
+- Current status: Step 1 completed (`item_409` done), Step 2 ready.
+- Validation snapshot:
+  - `npm run -s test:ci:ui:slow-top` ✅
+  - `npx vitest run` on touched UI specs ✅
+  - `npm run -s test:ci:ui` ✅ (`30` files, `193` tests)
+  - `npm run -s typecheck` ✅
 
 # References
 - `logics/request/req_079_ui_reliability_debt_reduction_and_app_controller_decomposition_continuation.md`

@@ -114,7 +114,7 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.change(portIndexInput, { target: { value: "1" } });
     expect(within(spliceAnalysisPanel).getByText(/Port P1 is already used/)).toBeInTheDocument();
     expect(within(spliceAnalysisPanel).getByRole("button", { name: "Reserve port" })).toBeDisabled();
-  }, 10_000);
+  });
 
   it("highlights every segment in the selected wire route", () => {
     renderAppWithState(createUiIntegrationState());

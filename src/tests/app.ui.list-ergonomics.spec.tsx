@@ -102,7 +102,7 @@ describe("App integration UI - list ergonomics", () => {
     const endpointBAsc = getColumnValues(5);
     expect(endpointBAsc.length).toBeGreaterThan(1);
     expect(endpointBAsc).toEqual([...endpointBAsc].sort((a, b) => a.localeCompare(b)));
-  }, 10_000);
+  });
 
   it("filters connectors by occupancy chips", () => {
     renderAppWithState(createConnectorOccupancyFilterState());

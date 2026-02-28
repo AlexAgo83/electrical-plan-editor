@@ -77,6 +77,75 @@ async function confirmDeleteDialog(title: string): Promise<void> {
   fireEvent.click(within(confirmDialog).getByRole("button", { name: "Delete" }));
 }
 
+type DeleteEntityCase = {
+  entity: string;
+  subScreen: "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
+  panelHeading: "Catalog" | "Connectors" | "Splices" | "Nodes" | "Segments" | "Wires";
+  rowText: string;
+  dialogTitle: string;
+};
+
+function openModelingDeleteScenario() {
+  const renderResult = renderAppWithState(createDeleteConfirmationState());
+  fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+  switchScreenDrawerAware("modeling");
+  return renderResult;
+}
+
+function triggerEntityDelete(caseData: DeleteEntityCase): void {
+  switchSubScreenDrawerAware(caseData.subScreen);
+  const panel = getPanelByHeading(caseData.panelHeading);
+  fireEvent.click(within(panel).getByText(caseData.rowText));
+  fireEvent.click(within(panel).getByRole("button", { name: "Delete" }));
+}
+
+const cancelDeleteCases: DeleteEntityCase[] = [
+  {
+    entity: "catalog item",
+    subScreen: "catalog",
+    panelHeading: "Catalog",
+    rowText: "CAT-DEL",
+    dialogTitle: "Delete catalog item"
+  },
+  {
+    entity: "connector",
+    subScreen: "connector",
+    panelHeading: "Connectors",
+    rowText: "Connector deletable",
+    dialogTitle: "Delete connector"
+  },
+  {
+    entity: "splice",
+    subScreen: "splice",
+    panelHeading: "Splices",
+    rowText: "Splice deletable",
+    dialogTitle: "Delete splice"
+  },
+  {
+    entity: "node",
+    subScreen: "node",
+    panelHeading: "Nodes",
+    rowText: "N-DEL",
+    dialogTitle: "Delete node"
+  },
+  {
+    entity: "segment",
+    subScreen: "segment",
+    panelHeading: "Segments",
+    rowText: "SEG-DEL",
+    dialogTitle: "Delete segment"
+  },
+  {
+    entity: "wire",
+    subScreen: "wire",
+    panelHeading: "Wires",
+    rowText: "Wire deletable",
+    dialogTitle: "Delete wire"
+  }
+];
+
+const confirmDeleteCases: DeleteEntityCase[] = cancelDeleteCases.filter(({ subScreen }) => subScreen !== "connector");
+
 describe("App integration UI - delete confirmations", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -105,70 +174,43 @@ describe("App integration UI - delete confirmations", () => {
     });
   });
 
-  it("requires confirmation for delete actions and keeps entities when canceled", async () => {
-    renderAppWithState(createDeleteConfirmationState());
-    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+  it.each(cancelDeleteCases)("requires confirmation for delete actions and keeps $entity when canceled", async (caseData) => {
+    openModelingDeleteScenario();
+    triggerEntityDelete(caseData);
+    await cancelDeleteDialog(caseData.dialogTitle);
+    expect(within(getPanelByHeading(caseData.panelHeading)).getByText(caseData.rowText)).toBeInTheDocument();
+  });
 
-    switchScreenDrawerAware("modeling");
-
-    switchSubScreenDrawerAware("catalog");
-    const catalogPanel = getPanelByHeading("Catalog");
-    fireEvent.click(within(catalogPanel).getByText("CAT-DEL"));
-    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Delete" }));
-    await cancelDeleteDialog("Delete catalog item");
-    expect(within(catalogPanel).getByText("CAT-DEL")).toBeInTheDocument();
-
-    switchSubScreenDrawerAware("connector");
-    const connectorsPanel = getPanelByHeading("Connectors");
-    fireEvent.click(within(connectorsPanel).getByText("Connector deletable"));
-    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Delete" }));
-    await cancelDeleteDialog("Delete connector");
-    expect(within(connectorsPanel).getByText("Connector deletable")).toBeInTheDocument();
-
-    switchSubScreenDrawerAware("splice");
-    const splicesPanel = getPanelByHeading("Splices");
-    fireEvent.click(within(splicesPanel).getByText("Splice deletable"));
-    fireEvent.click(within(splicesPanel).getByRole("button", { name: "Delete" }));
-    await cancelDeleteDialog("Delete splice");
-    expect(within(splicesPanel).getByText("Splice deletable")).toBeInTheDocument();
-
-    switchSubScreenDrawerAware("node");
-    const nodesPanel = getPanelByHeading("Nodes");
-    fireEvent.click(within(nodesPanel).getByText("N-DEL"));
-    fireEvent.click(within(nodesPanel).getByRole("button", { name: "Delete" }));
-    await cancelDeleteDialog("Delete node");
-    expect(within(nodesPanel).getByText("N-DEL")).toBeInTheDocument();
-
-    switchSubScreenDrawerAware("segment");
-    const segmentsPanel = getPanelByHeading("Segments");
-    fireEvent.click(within(segmentsPanel).getByText("SEG-DEL"));
-    fireEvent.click(within(segmentsPanel).getByRole("button", { name: "Delete" }));
-    await cancelDeleteDialog("Delete segment");
-    expect(within(segmentsPanel).getByText("SEG-DEL")).toBeInTheDocument();
-
-    switchSubScreenDrawerAware("wire");
-    const wiresPanel = getPanelByHeading("Wires");
-    fireEvent.click(within(wiresPanel).getByText("Wire deletable"));
-    fireEvent.click(within(wiresPanel).getByRole("button", { name: "Delete" }));
-    await cancelDeleteDialog("Delete wire");
-    expect(within(wiresPanel).getByText("Wire deletable")).toBeInTheDocument();
-  }, 15_000);
-
-  it("deletes entities only after explicit confirmation and preserves guarded delete semantics", async () => {
-    const { store } = renderAppWithState(createDeleteConfirmationState());
-    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
-
-    switchScreenDrawerAware("modeling");
-
-    switchSubScreenDrawerAware("catalog");
-    const catalogPanel = getPanelByHeading("Catalog");
-    fireEvent.click(within(catalogPanel).getByText("CAT-DEL"));
-    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Delete" }));
-    await confirmDeleteDialog("Delete catalog item");
+  it.each(confirmDeleteCases)("deletes $entity only after explicit confirmation", async (caseData) => {
+    const { store } = openModelingDeleteScenario();
+    triggerEntityDelete(caseData);
+    await confirmDeleteDialog(caseData.dialogTitle);
     await waitFor(() => {
-      expect(store.getState().catalogItems.byId[asCatalogItemId("CAT-DEL")]).toBeUndefined();
-      expect(within(getPanelByHeading("Catalog")).queryByText("CAT-DEL")).not.toBeInTheDocument();
+      expect(within(getPanelByHeading(caseData.panelHeading)).queryByText(caseData.rowText)).not.toBeInTheDocument();
+      switch (caseData.subScreen) {
+        case "catalog":
+          expect(store.getState().catalogItems.byId[asCatalogItemId("CAT-DEL")]).toBeUndefined();
+          break;
+        case "splice":
+          expect(store.getState().splices.byId[asSpliceId("S-DEL")]).toBeUndefined();
+          break;
+        case "node":
+          expect(store.getState().nodes.byId[asNodeId("N-DEL")]).toBeUndefined();
+          break;
+        case "segment":
+          expect(store.getState().segments.byId[asSegmentId("SEG-DEL")]).toBeUndefined();
+          break;
+        case "wire":
+          expect(store.getState().wires.byId[asWireId("W-DEL")]).toBeUndefined();
+          break;
+        default:
+          throw new Error(`Unhandled delete case: ${caseData.subScreen}`);
+      }
     });
+  });
+
+  it("preserves guarded connector delete semantics and deletes deletable connector after confirmation", async () => {
+    const { store } = openModelingDeleteScenario();
 
     switchSubScreenDrawerAware("connector");
     const connectorsPanel = getPanelByHeading("Connectors");
@@ -185,45 +227,5 @@ describe("App integration UI - delete confirmations", () => {
       expect(store.getState().connectors.byId[asConnectorId("C-DEL")]).toBeUndefined();
       expect(within(getPanelByHeading("Connectors")).queryByText("Connector deletable")).not.toBeInTheDocument();
     });
-
-    switchSubScreenDrawerAware("splice");
-    const splicesPanel = getPanelByHeading("Splices");
-    fireEvent.click(within(splicesPanel).getByText("Splice deletable"));
-    fireEvent.click(within(splicesPanel).getByRole("button", { name: "Delete" }));
-    await confirmDeleteDialog("Delete splice");
-    await waitFor(() => {
-      expect(store.getState().splices.byId[asSpliceId("S-DEL")]).toBeUndefined();
-      expect(within(getPanelByHeading("Splices")).queryByText("Splice deletable")).not.toBeInTheDocument();
-    });
-
-    switchSubScreenDrawerAware("node");
-    const nodesPanel = getPanelByHeading("Nodes");
-    fireEvent.click(within(nodesPanel).getByText("N-DEL"));
-    fireEvent.click(within(nodesPanel).getByRole("button", { name: "Delete" }));
-    await confirmDeleteDialog("Delete node");
-    await waitFor(() => {
-      expect(store.getState().nodes.byId[asNodeId("N-DEL")]).toBeUndefined();
-      expect(within(getPanelByHeading("Nodes")).queryByText("N-DEL")).not.toBeInTheDocument();
-    });
-
-    switchSubScreenDrawerAware("segment");
-    const segmentsPanel = getPanelByHeading("Segments");
-    fireEvent.click(within(segmentsPanel).getByText("SEG-DEL"));
-    fireEvent.click(within(segmentsPanel).getByRole("button", { name: "Delete" }));
-    await confirmDeleteDialog("Delete segment");
-    await waitFor(() => {
-      expect(store.getState().segments.byId[asSegmentId("SEG-DEL")]).toBeUndefined();
-      expect(within(getPanelByHeading("Segments")).queryByText("SEG-DEL")).not.toBeInTheDocument();
-    });
-
-    switchSubScreenDrawerAware("wire");
-    const wiresPanel = getPanelByHeading("Wires");
-    fireEvent.click(within(wiresPanel).getByText("Wire deletable"));
-    fireEvent.click(within(wiresPanel).getByRole("button", { name: "Delete" }));
-    await confirmDeleteDialog("Delete wire");
-    await waitFor(() => {
-      expect(store.getState().wires.byId[asWireId("W-DEL")]).toBeUndefined();
-      expect(within(getPanelByHeading("Wires")).queryByText("Wire deletable")).not.toBeInTheDocument();
-    });
-  }, 15_000);
+  });
 });
