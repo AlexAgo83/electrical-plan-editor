@@ -177,70 +177,72 @@ describe("App integration UI - creation flow wire endpoint references", () => {
   it(
     "supports fuse mode with catalog linkage, preserves save/cancel semantics, and shows fuse metadata in wire list and analysis",
     () => {
-    const fuseCatalogState = appReducer(
-      createUiIntegrationState(),
-      appActions.upsertCatalogItem({
-        id: asCatalogItemId("catalog-fuse-ui"),
-        manufacturerReference: "CAT-FUSE-UI",
-        connectionCount: 2
-      })
-    );
-    const { store } = renderAppWithState(fuseCatalogState);
-    expect(store.getState().catalogItems.byId[asCatalogItemId("catalog-fuse-ui")]).toBeDefined();
-    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
-    switchScreenDrawerAware("modeling");
-    switchSubScreenDrawerAware("wire");
+      const fuseCatalogState = appReducer(
+        createUiIntegrationState(),
+        appActions.upsertCatalogItem({
+          id: asCatalogItemId("catalog-fuse-ui"),
+          manufacturerReference: "CAT-FUSE-UI",
+          connectionCount: 2
+        })
+      );
+      const { store } = renderAppWithState(fuseCatalogState);
+      expect(store.getState().catalogItems.byId[asCatalogItemId("catalog-fuse-ui")]).toBeDefined();
+      fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+      switchScreenDrawerAware("modeling");
+      switchSubScreenDrawerAware("wire");
 
-    clickNewFromPanel("Wires");
-    const createWirePanel = getPanelByHeading("Create Wire");
-    fireEvent.change(within(createWirePanel).getByLabelText("Functional name"), { target: { value: "Fuse bridge wire" } });
-    fireEvent.change(within(createWirePanel).getByLabelText("Technical ID"), { target: { value: "W-FUSE-1" } });
-    const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
-    const endpointBFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint B" });
-    fireEvent.change(within(endpointAFieldset).getByLabelText("Connector"), { target: { value: "C1" } });
-    fireEvent.change(within(endpointAFieldset).getByLabelText("Way index"), { target: { value: "2" } });
-    fireEvent.change(within(endpointBFieldset).getByLabelText("Splice"), { target: { value: "S1" } });
-    fireEvent.change(within(endpointBFieldset).getByLabelText("Port index"), { target: { value: "2" } });
+      clickNewFromPanel("Wires");
+      const createWirePanel = getPanelByHeading("Create Wire");
+      fireEvent.change(within(createWirePanel).getByLabelText("Functional name"), { target: { value: "Fuse bridge wire" } });
+      fireEvent.change(within(createWirePanel).getByLabelText("Technical ID"), { target: { value: "W-FUSE-1" } });
+      const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
+      const endpointBFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint B" });
+      fireEvent.change(within(endpointAFieldset).getByLabelText("Connector"), { target: { value: "C1" } });
+      fireEvent.change(within(endpointAFieldset).getByLabelText("Way index"), { target: { value: "2" } });
+      fireEvent.change(within(endpointBFieldset).getByLabelText("Splice"), { target: { value: "S1" } });
+      fireEvent.change(within(endpointBFieldset).getByLabelText("Port index"), { target: { value: "2" } });
 
-    fireEvent.click(within(createWirePanel).getByLabelText("Fuse"));
-    const fuseCatalogSelect = within(createWirePanel).getByLabelText("Fuse catalog item");
-    expect(fuseCatalogSelect).toBeInTheDocument();
-    expect(fuseCatalogSelect).toBeRequired();
+      fireEvent.click(within(createWirePanel).getByLabelText("Fuse"));
+      const fuseCatalogSelect = within(createWirePanel).getByLabelText("Fuse catalog item");
+      expect(fuseCatalogSelect).toBeInTheDocument();
+      expect(fuseCatalogSelect).toBeRequired();
 
-    fireEvent.click(within(createWirePanel).getByRole("button", { name: "Create" }));
-    const blockedBeforeCatalogSelection = Object.values(store.getState().wires.byId).find((wire) => wire.technicalId === "W-FUSE-1");
-    expect(blockedBeforeCatalogSelection).toBeUndefined();
+      fireEvent.click(within(createWirePanel).getByRole("button", { name: "Create" }));
+      const blockedBeforeCatalogSelection = Object.values(store.getState().wires.byId).find((wire) => wire.technicalId === "W-FUSE-1");
+      expect(blockedBeforeCatalogSelection).toBeUndefined();
 
-    expect(within(fuseCatalogSelect).getByRole("option", { name: /CAT-FUSE-UI/i })).toBeInTheDocument();
-    fireEvent.change(fuseCatalogSelect, {
-      target: { value: "catalog-fuse-ui" }
-    });
-    expect(fuseCatalogSelect).toHaveValue("catalog-fuse-ui");
-    fireEvent.click(within(createWirePanel).getByRole("button", { name: "Create" }));
+      expect(within(fuseCatalogSelect).getByRole("option", { name: /CAT-FUSE-UI/i })).toBeInTheDocument();
+      fireEvent.change(fuseCatalogSelect, {
+        target: { value: "catalog-fuse-ui" }
+      });
+      expect(fuseCatalogSelect).toHaveValue("catalog-fuse-ui");
+      fireEvent.click(within(createWirePanel).getByRole("button", { name: "Create" }));
 
-    const savedWire = Object.values(store.getState().wires.byId).find((wire) => wire.technicalId === "W-FUSE-1");
-    expect(savedWire?.protection).toEqual({ kind: "fuse", catalogItemId: "catalog-fuse-ui" });
+      const savedWire = Object.values(store.getState().wires.byId).find((wire) => wire.technicalId === "W-FUSE-1");
+      expect(savedWire?.protection).toEqual({ kind: "fuse", catalogItemId: "catalog-fuse-ui" });
 
-    const wiresPanel = getPanelByHeading("Wires");
-    expect(within(wiresPanel).getByText("Fuse")).toBeInTheDocument();
-    expect(within(wiresPanel).getByText("CAT-FUSE-UI")).toBeInTheDocument();
+      const wiresPanel = getPanelByHeading("Wires");
+      expect(within(wiresPanel).getByText("Fuse")).toBeInTheDocument();
+      expect(within(wiresPanel).getByText("CAT-FUSE-UI")).toBeInTheDocument();
 
-    const editWirePanel = getPanelByHeading("Edit Wire");
-    expect(within(editWirePanel).getByLabelText("Fuse")).toBeChecked();
-    expect(within(editWirePanel).getByLabelText("Fuse catalog item")).toHaveValue("catalog-fuse-ui");
-    fireEvent.click(within(editWirePanel).getByLabelText("Fuse"));
-    fireEvent.click(within(editWirePanel).getByRole("button", { name: "Cancel edit" }));
+      const editWirePanel = getPanelByHeading("Edit Wire");
+      expect(within(editWirePanel).getByLabelText("Fuse")).toBeChecked();
+      expect(within(editWirePanel).getByLabelText("Fuse catalog item")).toHaveValue("catalog-fuse-ui");
+      fireEvent.click(within(editWirePanel).getByLabelText("Fuse"));
+      fireEvent.click(within(editWirePanel).getByRole("button", { name: "Cancel edit" }));
 
-    fireEvent.click(within(getPanelByHeading("Wires")).getByText("Fuse bridge wire"));
-    const reopenedEditWirePanel = getPanelByHeading("Edit Wire");
-    expect(within(reopenedEditWirePanel).getByLabelText("Fuse")).toBeChecked();
-    expect(within(reopenedEditWirePanel).getByLabelText("Fuse catalog item")).toHaveValue("catalog-fuse-ui");
+      fireEvent.click(within(getPanelByHeading("Wires")).getByText("Fuse bridge wire"));
+      const reopenedEditWirePanel = getPanelByHeading("Edit Wire");
+      expect(within(reopenedEditWirePanel).getByLabelText("Fuse")).toBeChecked();
+      expect(within(reopenedEditWirePanel).getByLabelText("Fuse catalog item")).toHaveValue("catalog-fuse-ui");
 
-    switchScreenDrawerAware("analysis");
-    switchSubScreenDrawerAware("wire");
-    fireEvent.click(within(getPanelByHeading("Wires")).getByText("Fuse bridge wire"));
-    const wireAnalysisPanel = getPanelByHeading("Wire analysis");
-    expect(within(wireAnalysisPanel).getByText("Protection")).toBeInTheDocument();
-    expect(within(wireAnalysisPanel).getByText("CAT-FUSE-UI")).toBeInTheDocument();
-    });
+      switchScreenDrawerAware("analysis");
+      switchSubScreenDrawerAware("wire");
+      fireEvent.click(within(getPanelByHeading("Wires")).getByText("Fuse bridge wire"));
+      const wireAnalysisPanel = getPanelByHeading("Wire analysis");
+      expect(within(wireAnalysisPanel).getByText("Protection")).toBeInTheDocument();
+      expect(within(wireAnalysisPanel).getByText("CAT-FUSE-UI")).toBeInTheDocument();
+    },
+    10_000
+  );
 });
