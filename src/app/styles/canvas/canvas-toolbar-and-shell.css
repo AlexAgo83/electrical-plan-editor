@@ -8,7 +8,9 @@
 
 .network-summary-stack {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
+  min-width: 0;
 }
 
 .network-summary-header {
@@ -360,7 +362,9 @@
 
 .route-preview-panel {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.6rem;
+  min-width: 0;
 }
 
 .route-preview-panel-header {
@@ -384,13 +388,15 @@
 
 @media (max-width: 670px) {
   .route-preview-panel-header {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   .route-preview-panel-toggle {
-    margin-left: 0;
-    width: 100%;
-    justify-content: center;
+    margin-left: auto;
+    width: auto;
+    justify-content: flex-start;
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
 }
 
@@ -410,16 +416,22 @@
 
 .route-preview-panel-body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.6rem;
+  min-width: 0;
 }
 
 .route-preview-form {
   margin: 0;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.55rem;
+  min-width: 0;
 }
 
 .route-preview-field {
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.3rem;
+  min-width: 0;
 }
 
 .route-preview-label {

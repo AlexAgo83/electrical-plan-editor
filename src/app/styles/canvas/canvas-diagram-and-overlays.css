@@ -139,6 +139,10 @@
   word-break: break-word;
 }
 
+.network-summary-mobile-unavailable {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .network-summary-header {
     flex-direction: column;
@@ -175,6 +179,11 @@
   .network-summary-canvas-region,
   .network-summary-legend {
     display: none !important;
+  }
+
+  .network-summary-mobile-unavailable {
+    display: block;
+    margin: 0.35rem 0 0;
   }
 }
 
