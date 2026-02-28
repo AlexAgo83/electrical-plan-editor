@@ -69,6 +69,9 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   canvasDefaultShowCableCallouts: boolean;
   setCanvasDefaultShowCableCallouts: (value: boolean) => void;
+  canvasDefaultShowSelectedCalloutOnly: boolean;
+  setCanvasDefaultShowSelectedCalloutOnly: (value: boolean) => void;
+  setShowSelectedCalloutOnly: (value: boolean) => void;
   canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
   setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
   canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
@@ -150,6 +153,9 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultShowSegmentLengths,
   canvasDefaultShowCableCallouts,
   setCanvasDefaultShowCableCallouts,
+  canvasDefaultShowSelectedCalloutOnly,
+  setCanvasDefaultShowSelectedCalloutOnly,
+  setShowSelectedCalloutOnly,
   canvasDefaultLabelStrokeMode,
   setCanvasDefaultLabelStrokeMode,
   canvasDefaultLabelSizeMode,
@@ -393,6 +399,18 @@ export function SettingsWorkspaceContent({
           <label className="settings-checkbox">
             <input
               type="checkbox"
+              checked={canvasDefaultShowSelectedCalloutOnly}
+              onChange={(event) => {
+                const { checked } = event.target;
+                setCanvasDefaultShowSelectedCalloutOnly(checked);
+                setShowSelectedCalloutOnly(checked);
+              }}
+            />
+            Show only selected connector/splice callout
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
               checked={canvasPngExportIncludeBackground}
               onChange={(event) => setCanvasPngExportIncludeBackground(event.target.checked)}
             />
@@ -589,48 +607,52 @@ export function SettingsWorkspaceContent({
         <p className="meta-line">
           Export active, selected, or all networks as deterministic JSON payloads. Import preserves existing local data and resolves conflicts with deterministic suffixes.
         </p>
-        <div className="row-actions settings-actions">
-          <button type="button" onClick={() => handleExportNetworks("active")} disabled={activeNetworkId === null}>Export active</button>
-          <button type="button" onClick={() => handleExportNetworks("selected")} disabled={selectedExportNetworkIds.length === 0}>Export selected</button>
-          <button type="button" onClick={() => handleExportNetworks("all")} disabled={networks.length === 0}>Export all</button>
-        </div>
-        <fieldset className="inline-fieldset settings-export-fieldset">
-          <legend>Selected networks for export</legend>
-          {networks.length === 0 ? (
-            <p className="empty-copy">No network available.</p>
-          ) : (
-            <div className="settings-grid settings-export-selection-grid">
-              {networks.map((network) => (
-                <label key={network.id} className="settings-checkbox settings-export-network-option">
-                  <input
-                    type="checkbox"
-                    checked={selectedExportNetworkIds.includes(network.id)}
-                    onChange={() => toggleSelectedExportNetwork(network.id)}
-                  />
-                  <span className="settings-export-network-copy">
-                    <span className="settings-export-network-name">{network.name}</span>
-                    <span className="settings-export-network-technical-id">
-                      <span aria-hidden="true">(</span>
-                      <span className="technical-id">{network.technicalId}</span>
-                      <span aria-hidden="true">)</span>
-                    </span>
-                  </span>
-                </label>
-              ))}
+        <div className="settings-import-export-grid">
+          <div className="settings-import-export-actions-column">
+            <div className="row-actions settings-actions">
+              <button type="button" onClick={() => handleExportNetworks("active")} disabled={activeNetworkId === null}>Export active</button>
+              <button type="button" onClick={() => handleExportNetworks("selected")} disabled={selectedExportNetworkIds.length === 0}>Export selected</button>
+              <button type="button" onClick={() => handleExportNetworks("all")} disabled={networks.length === 0}>Export all</button>
             </div>
-          )}
-        </fieldset>
-        <div className="row-actions settings-actions">
-          <button type="button" onClick={handleOpenImportPicker}>Import from file</button>
-          <input
-            ref={importFileInputRef}
-            type="file"
-            accept="application/json,.json"
-            onChange={(event) => {
-              void handleImportFileChange(event);
-            }}
-            hidden
-          />
+            <div className="row-actions settings-actions">
+              <button type="button" onClick={handleOpenImportPicker}>Import from file</button>
+              <input
+                ref={importFileInputRef}
+                type="file"
+                accept="application/json,.json"
+                onChange={(event) => {
+                  void handleImportFileChange(event);
+                }}
+                hidden
+              />
+            </div>
+          </div>
+          <fieldset className="inline-fieldset settings-export-fieldset settings-import-export-selection-column">
+            <legend>Selected networks for export</legend>
+            {networks.length === 0 ? (
+              <p className="empty-copy">No network available.</p>
+            ) : (
+              <div className="settings-grid settings-export-selection-grid">
+                {networks.map((network) => (
+                  <label key={network.id} className="settings-checkbox settings-export-network-option">
+                    <input
+                      type="checkbox"
+                      checked={selectedExportNetworkIds.includes(network.id)}
+                      onChange={() => toggleSelectedExportNetwork(network.id)}
+                    />
+                    <span className="settings-export-network-copy">
+                      <span className="settings-export-network-name">{network.name}</span>
+                      <span className="settings-export-network-technical-id">
+                        <span aria-hidden="true">(</span>
+                        <span className="technical-id">{network.technicalId}</span>
+                        <span aria-hidden="true">)</span>
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </fieldset>
         </div>
         {importExportStatus !== null ? <p className={`meta-line import-status is-${importExportStatus.kind}`}>{importExportStatus.message}</p> : null}
         {lastImportSummary !== null ? (

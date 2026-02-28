@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { NetworkId } from "../../core/entities";
+import { loadRecentChangesMetadata, saveRecentChangesMetadata } from "../../adapters/persistence/recentChanges";
 import type { AppStore } from "../../store";
 import type { UndoHistoryEntry, UndoHistoryTargetKind } from "../types/app-controller";
 
@@ -253,6 +254,16 @@ function toReplaceStateHistoryEntry(sequence: number, previousState: StoreState,
   };
 }
 
+function getHighestHistorySequence(entries: UndoHistoryEntry[]): number {
+  let highest = 0;
+  for (const entry of entries) {
+    if (entry.sequence > highest) {
+      highest = entry.sequence;
+    }
+  }
+  return highest;
+}
+
 export function useStoreHistory({
   store,
   historyLimit,
@@ -261,11 +272,13 @@ export function useStoreHistory({
 }: UseStoreHistoryParams): UseStoreHistoryResult {
   const [undoStack, setUndoStack] = useState<StoreState[]>([]);
   const [redoStack, setRedoStack] = useState<StoreState[]>([]);
-  const [undoHistoryEntries, setUndoHistoryEntries] = useState<UndoHistoryEntry[]>([]);
+  const [undoHistoryEntries, setUndoHistoryEntries] = useState<UndoHistoryEntry[]>(() =>
+    loadRecentChangesMetadata(historyLimit)
+  );
   const [redoHistoryEntries, setRedoHistoryEntries] = useState<UndoHistoryEntry[]>([]);
   const [saveStatus, setSaveStatus] = useState<"saved" | "unsaved" | "error">("saved");
   const saveStatusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const historyEntrySequenceRef = useRef(0);
+  const historyEntrySequenceRef = useRef(getHighestHistorySequence(undoHistoryEntries));
 
   useEffect(() => {
     return () => {
@@ -274,6 +287,10 @@ export function useStoreHistory({
       }
     };
   }, []);
+
+  useEffect(() => {
+    saveRecentChangesMetadata(undoHistoryEntries, historyLimit);
+  }, [historyLimit, undoHistoryEntries]);
 
   const queueSavedStatus = useCallback((): void => {
     if (saveStatusTimeoutRef.current !== null) {

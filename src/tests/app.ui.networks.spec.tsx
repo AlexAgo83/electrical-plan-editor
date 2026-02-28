@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import type { ConnectorId, NetworkId } from "../core/entities";
 import { appActions, appReducer, createInitialState } from "../store";
 import { getPanelByHeading, renderAppWithState, switchScreen, switchScreenDrawerAware } from "./helpers/app-ui-test-utils";
@@ -13,6 +13,10 @@ function asNetworkId(value: string): NetworkId {
 }
 
 describe("App integration UI - networks", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it("does not show the network form panel on Network Scope until a row is explicitly selected", () => {
     renderAppWithState(createInitialState());
     switchScreen("networkScope");
@@ -69,6 +73,32 @@ describe("App integration UI - networks", () => {
     await waitFor(() => {
       expect(screen.queryByRole("heading", { name: "Recent changes" })).not.toBeInTheDocument();
     });
+  });
+
+  it("restores active-network recent changes after remount/reload", async () => {
+    const firstRender = renderAppWithState(createInitialState());
+    switchScreen("networkScope");
+
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    fireEvent.click(within(networkScopePanel).getByText("Main network sample").closest("tr") as HTMLElement);
+    const editFormPanel = getPanelByHeading("Edit network");
+    fireEvent.change(within(editFormPanel).getByLabelText("Description (optional)"), { target: { value: "Persist recent changes" } });
+    fireEvent.click(within(editFormPanel).getByRole("button", { name: "Save network" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();
+    });
+    expect(screen.getByText("Network 'NET-MAIN-SAMPLE' updated")).toBeInTheDocument();
+
+    firstRender.unmount();
+
+    renderAppWithState(createInitialState());
+    switchScreen("networkScope");
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();
+    });
+    expect(screen.getByText("Network 'NET-MAIN-SAMPLE' updated")).toBeInTheDocument();
   });
 
   it("hides the edit network panel again when returning to Network Scope", () => {

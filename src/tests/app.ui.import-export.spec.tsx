@@ -15,6 +15,25 @@ describe("App integration UI - import/export", () => {
     ).toBeInTheDocument();
   });
 
+  it("keeps import/export content in compact two-column structure with import action under export actions", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreen("settings");
+
+    const panel = getPanelByHeading("Import / Export networks");
+    const grid = panel.querySelector(".settings-import-export-grid");
+    expect(grid).not.toBeNull();
+
+    const actionsColumn = panel.querySelector(".settings-import-export-actions-column");
+    const selectionColumn = panel.querySelector(".settings-import-export-selection-column");
+    expect(actionsColumn).not.toBeNull();
+    expect(selectionColumn).not.toBeNull();
+
+    const exportAllButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export all" });
+    const importButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Import from file" });
+    expect(exportAllButton.compareDocumentPosition(importButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    expect(within(selectionColumn as HTMLElement).getByText("Selected networks for export")).toBeInTheDocument();
+  });
+
   it("keeps active context stable when import file is invalid", async () => {
     const { store } = renderAppWithState(createUiIntegrationState());
     switchScreen("settings");

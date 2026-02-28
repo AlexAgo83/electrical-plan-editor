@@ -250,6 +250,39 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(networkSummaryPanel).toHaveTextContent("W-8");
   });
 
+  it("filters callouts to selected connector/splice only when selected-callout-only preference is enabled", () => {
+    renderAppWithState(createUiIntegrationDenseWiresState());
+
+    switchScreenDrawerAware("settings");
+    const canvasSettingsPanel = getPanelByHeading("Canvas tools preferences");
+    fireEvent.click(within(canvasSettingsPanel).getByLabelText("Show connector/splice cable callouts by default"));
+    fireEvent.click(within(canvasSettingsPanel).getByLabelText("Show only selected connector/splice callout"));
+    fireEvent.click(within(canvasSettingsPanel).getByRole("button", { name: "Apply canvas defaults now" }));
+
+    switchScreenDrawerAware("modeling");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    expect(within(networkSummaryPanel).getByRole("button", { name: "Callouts" })).toHaveClass("is-active");
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(0);
+
+    const segmentHitbox = networkSummaryPanel.querySelector(".network-segment-hitbox");
+    expect(segmentHitbox).not.toBeNull();
+    fireEvent.click(segmentHitbox as Element);
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(0);
+
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    expect(connectorNode).not.toBeNull();
+    fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 220, clientY: 140 });
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(1);
+
+    switchScreenDrawerAware("settings");
+    const restoredCanvasSettingsPanel = getPanelByHeading("Canvas tools preferences");
+    fireEvent.click(within(restoredCanvasSettingsPanel).getByLabelText("Show only selected connector/splice callout"));
+    fireEvent.click(within(restoredCanvasSettingsPanel).getByRole("button", { name: "Apply canvas defaults now" }));
+
+    switchScreenDrawerAware("modeling");
+    expect(getPanelByHeading("Network summary").querySelectorAll(".network-callout-frame").length).toBeGreaterThanOrEqual(2);
+  });
+
   it("persists network summary zoom/pan and display toggles across reload-equivalent rehydrate", async () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");

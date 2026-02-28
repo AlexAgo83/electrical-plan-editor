@@ -146,4 +146,30 @@ describe("App integration UI - global undo/redo", () => {
     fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
     expect(screen.queryByRole("heading", { name: "Recent changes" })).not.toBeInTheDocument();
   });
+
+  it("restores recent changes on reload without restoring undo stack snapshots", async () => {
+    const firstRender = renderAppWithState(createStateWithCatalog());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "New" }));
+    const connectorFormPanel = getPanelByHeading("Create Connector");
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), { target: { value: "Persisted recent change" } });
+    fireEvent.change(within(connectorFormPanel).getByLabelText("Technical ID"), { target: { value: "C-PERSIST" } });
+    fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
+    firstRender.unmount();
+
+    renderAppWithState(createStateWithCatalog());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("networkScope");
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();
+    });
+    expect(screen.getByText("Connector 'C-PERSIST' created")).toBeInTheDocument();
+
+    openOpsPanel();
+    expect(screen.getByRole("button", { name: "Undo" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Redo" })).toBeDisabled();
+  });
 });

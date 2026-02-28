@@ -7,6 +7,7 @@ import {
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
+  withViewportSize,
   switchScreenDrawerAware,
   switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
@@ -245,6 +246,31 @@ describe("App integration UI - settings", () => {
 
     expect(getPanelByHeading("Appearance preferences")).toBeInTheDocument();
     expect(within(document.body).queryByRole("heading", { name: "No active network" })).not.toBeInTheDocument();
+  });
+
+  it("keeps settings and import/export controls operable on mobile baseline viewports", async () => {
+    await withViewportSize({ width: 390, height: 844 }, async () => {
+      const rendered = renderAppWithState(createUiIntegrationState());
+      switchScreenDrawerAware("settings");
+      const panel = getPanelByHeading("Import / Export networks");
+      fireEvent.click(within(panel).getByRole("button", { name: "Export all" }));
+      await waitFor(() => {
+        expect(
+          within(panel).queryByText(/Exported 1 network\(s\)/) ??
+            within(panel).getByText("Export is not available in this environment.")
+        ).toBeInTheDocument();
+      });
+      rendered.unmount();
+    });
+
+    withViewportSize({ width: 360, height: 800 }, () => {
+      const rendered = renderAppWithState(createUiIntegrationState());
+      switchScreenDrawerAware("settings");
+      expect(getPanelByHeading("Import / Export networks")).toBeInTheDocument();
+      switchScreenDrawerAware("modeling");
+      expect(getPanelByHeading("Network summary")).toBeInTheDocument();
+      rendered.unmount();
+    });
   });
 
   it("returns to the previous screen when clicking Settings again from the settings screen", () => {

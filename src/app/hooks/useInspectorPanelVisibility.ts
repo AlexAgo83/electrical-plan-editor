@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { MOBILE_BREAKPOINT_PX } from "../lib/app-utils-shared";
 
 interface UseInspectorPanelVisibilityParams {
   isModelingScreen: boolean;
@@ -27,7 +28,7 @@ export function useInspectorPanelVisibility({
   const [isInspectorCollapsedOnWideViewport, setIsInspectorCollapsedOnWideViewport] = useState(false);
 
   const isInspectorVisibilityScreen = isModelingScreen || isAnalysisScreen;
-  const isInspectorNarrowViewport = viewportWidth < 960;
+  const isInspectorNarrowViewport = viewportWidth <= MOBILE_BREAKPOINT_PX;
   const isModalDialogFocusActive = isDialogFocusActive || isNavigationDrawerOpen || isOperationsPanelOpen;
   const isInspectorHidden = !showFloatingInspectorPanel || !isInspectorVisibilityScreen || !hasActiveNetwork || isModalDialogFocusActive;
   const isInspectorOpen =

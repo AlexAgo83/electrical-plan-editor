@@ -6,6 +6,7 @@ export const HISTORY_LIMIT = 60;
 export const NETWORK_GRID_STEP = 20;
 export const NETWORK_MIN_SCALE = 0.03;
 export const NETWORK_MAX_SCALE = 2.2;
+export const MOBILE_BREAKPOINT_PX = 900;
 
 export function createEntityId(prefix: string): string {
   const randomPart = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
