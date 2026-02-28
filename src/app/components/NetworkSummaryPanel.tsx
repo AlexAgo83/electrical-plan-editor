@@ -1818,6 +1818,9 @@ export function NetworkSummaryPanel({
             </div>
           )}
         </div>
+        <p className="empty-copy network-summary-mobile-unavailable" role="status">
+          2D network summary is not available on mobile. Use a wider screen to access the canvas controls and legend.
+        </p>
         <NetworkSummaryLegend />
       </section>
       <NetworkRoutePreviewPanel
