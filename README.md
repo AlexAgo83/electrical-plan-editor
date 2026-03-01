@@ -7,7 +7,12 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 [![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.0.1-4C8BF5)
 
-<img width="1219" height="815" alt="image" src="https://github.com/user-attachments/assets/baf79474-665f-4462-ae1a-b0e172c46a95" />
+<img width="1173" height="810" alt="image" src="https://github.com/user-attachments/assets/b4d0b4a9-1fee-43a4-bfb1-ae72caf97302" />
+<img width="1159" height="280" alt="image" src="https://github.com/user-attachments/assets/7bfad15a-cc62-446a-abc6-b06c15ec1466" />
+<img width="1173" height="339" alt="image" src="https://github.com/user-attachments/assets/3480d4f6-1c74-4586-94d7-f6fbcba0c431" />
+<img width="1168" height="618" alt="image" src="https://github.com/user-attachments/assets/7da539ae-9a75-41d0-97f8-bb8cb693bd3e" />
+
+
 
 ## Table of Contents
 
