@@ -1,9 +1,9 @@
 ## item_420_req_081_validation_matrix_and_closure_traceability - Req 081 validation matrix and closure traceability
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 96%
 > Confidence: 94%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Closure governance for selected-callout-only preference rollout
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

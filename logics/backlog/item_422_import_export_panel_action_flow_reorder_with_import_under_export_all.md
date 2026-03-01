@@ -1,9 +1,9 @@
 ## item_422_import_export_panel_action_flow_reorder_with_import_under_export_all - Import/Export panel action flow reorder with import under export-all
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low
 > Theme: Action sequencing clarity in Settings portability panel
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

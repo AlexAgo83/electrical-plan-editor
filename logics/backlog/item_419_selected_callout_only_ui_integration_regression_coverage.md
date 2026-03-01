@@ -1,9 +1,9 @@
 ## item_419_selected_callout_only_ui_integration_regression_coverage - Selected-callout-only UI integration regression coverage
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Test hardening for callout preference override behavior
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

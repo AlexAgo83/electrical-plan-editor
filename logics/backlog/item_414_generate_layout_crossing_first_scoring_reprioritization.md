@@ -1,9 +1,9 @@
 ## item_414_generate_layout_crossing_first_scoring_reprioritization - Generate layout crossing-first scoring reprioritization
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Scoring strategy for topology readability
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

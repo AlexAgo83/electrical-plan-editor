@@ -1,9 +1,9 @@
 ## item_425_remove_global_min_width_lock_and_define_mobile_shell_baseline - Remove global min-width lock and define mobile shell baseline
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 97%
 > Confidence: 94%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: App-shell mobile baseline enablement
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
