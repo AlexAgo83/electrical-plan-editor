@@ -1,9 +1,9 @@
 ## item_416_req_080_validation_matrix_and_closure_traceability - Req 080 validation matrix and closure traceability
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 96%
 > Confidence: 94%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Delivery governance and AC traceability for layout crossing reduction
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

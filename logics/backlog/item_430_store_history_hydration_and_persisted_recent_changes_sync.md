@@ -1,9 +1,9 @@
 ## item_430_store_history_hydration_and_persisted_recent_changes_sync - Store history hydration and persisted recent-changes sync
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Runtime hydration of persisted recent-change metadata
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

@@ -1,9 +1,9 @@
 ## item_418_network_summary_callout_render_filter_bound_to_selection - Network summary callout render filter bound to selection
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Selection-driven callout visibility override behavior
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

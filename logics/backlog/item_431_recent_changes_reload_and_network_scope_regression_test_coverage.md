@@ -1,9 +1,9 @@
 ## item_431_recent_changes_reload_and_network_scope_regression_test_coverage - Recent changes reload and network-scope regression test coverage
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Regression safety for recent-changes persistence behavior
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

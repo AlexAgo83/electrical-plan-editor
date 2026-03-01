@@ -1,9 +1,9 @@
 ## item_432_req_084_validation_matrix_and_closure_traceability - Req 084 validation matrix and closure traceability
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 96%
 > Confidence: 94%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Closure governance for recent-changes persistence across relaunch
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

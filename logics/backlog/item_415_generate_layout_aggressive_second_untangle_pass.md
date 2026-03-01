@@ -1,9 +1,9 @@
 ## item_415_generate_layout_aggressive_second_untangle_pass - Generate layout aggressive second untangle pass
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Local-minimum escape strategy for crossing-heavy topologies
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

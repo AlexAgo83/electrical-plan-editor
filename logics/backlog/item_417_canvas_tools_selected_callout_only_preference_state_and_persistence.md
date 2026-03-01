@@ -1,9 +1,9 @@
 ## item_417_canvas_tools_selected_callout_only_preference_state_and_persistence - Canvas tools selected-callout-only preference state and persistence
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Preference contract extension for focused callout mode
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

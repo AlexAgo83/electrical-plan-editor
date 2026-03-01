@@ -1,9 +1,9 @@
 ## item_429_recent_changes_metadata_persistence_schema_and_migration_contract - Recent changes metadata persistence schema and migration contract
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Persistence schema extension for network-scoped recent changes
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
