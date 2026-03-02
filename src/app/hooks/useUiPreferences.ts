@@ -456,11 +456,11 @@ export function useUiPreferences({
       const showSegmentNamesDefault =
         typeof preferences.canvasDefaultShowSegmentNames === "boolean"
           ? preferences.canvasDefaultShowSegmentNames
-          : true;
+          : false;
       const showSegmentLengthsDefault =
         typeof preferences.canvasDefaultShowSegmentLengths === "boolean"
           ? preferences.canvasDefaultShowSegmentLengths
-          : false;
+          : true;
       const showCableCalloutsDefault =
         typeof preferences.canvasDefaultShowCableCallouts === "boolean"
           ? preferences.canvasDefaultShowCableCallouts
@@ -479,7 +479,7 @@ export function useUiPreferences({
       const autoSegmentLabelRotationDefault =
         typeof preferences.canvasDefaultAutoSegmentLabelRotation === "boolean"
           ? preferences.canvasDefaultAutoSegmentLabelRotation
-          : false;
+          : true;
       const rawResetZoomPercent =
         typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "60";
       const parsedResetZoomPercent = Number(rawResetZoomPercent);

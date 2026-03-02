@@ -12,8 +12,21 @@ describe("App integration UI - network summary layering", () => {
     localStorage.clear();
   });
 
+  function enableSegmentNamesFromSettings(): void {
+    switchScreenDrawerAware("settings");
+    const canvasToolsPanel = getPanelByHeading("Canvas tools preferences");
+    const segmentNamesToggle = within(canvasToolsPanel).getByLabelText("Show segment names");
+    if (!(segmentNamesToggle instanceof HTMLInputElement)) {
+      throw new Error("Expected Show segment names toggle to be an input element.");
+    }
+    if (!segmentNamesToggle.checked) {
+      fireEvent.click(segmentNamesToggle);
+    }
+  }
+
   it("renders labels in a dedicated SVG layer after segment and node geometry", () => {
     renderAppWithState(createUiIntegrationState());
+    enableSegmentNamesFromSettings();
     switchScreenDrawerAware("analysis");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
@@ -41,6 +54,7 @@ describe("App integration UI - network summary layering", () => {
 
   it("keeps 2D labels zoom-invariant using inverse-scale label anchors", () => {
     renderAppWithState(createUiIntegrationState());
+    enableSegmentNamesFromSettings();
     switchScreenDrawerAware("analysis");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
@@ -60,6 +74,7 @@ describe("App integration UI - network summary layering", () => {
 
   it("centers segment ID labels when segment lengths are hidden", () => {
     renderAppWithState(createUiIntegrationState());
+    enableSegmentNamesFromSettings();
     switchScreenDrawerAware("analysis");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");

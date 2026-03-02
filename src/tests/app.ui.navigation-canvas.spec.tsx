@@ -236,17 +236,8 @@ describe("App integration UI - navigation and canvas", () => {
     const networkSummaryPanel = getPanelByHeading("Network summary");
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BRANCH" }));
 
-    const segmentLabelA = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
-      (label) => label.textContent === "SEG-A"
-    );
-    const segmentLabelB = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
-      (label) => label.textContent === "SEG-B"
-    );
-    expect(segmentLabelA).not.toBeUndefined();
-    expect(segmentLabelB).not.toBeUndefined();
-
-    const segmentGroupA = segmentLabelA?.closest("g.network-entity-group");
-    const segmentGroupB = segmentLabelB?.closest("g.network-entity-group");
+    const segmentGroupA = networkSummaryPanel.querySelector('.network-graph-layer-segments [data-segment-id="SEG-A"]');
+    const segmentGroupB = networkSummaryPanel.querySelector('.network-graph-layer-segments [data-segment-id="SEG-B"]');
     expect(segmentGroupA).not.toBeNull();
     expect(segmentGroupB).not.toBeNull();
     expect(segmentGroupA).not.toHaveClass("is-deemphasized");
@@ -327,10 +318,6 @@ describe("App integration UI - navigation and canvas", () => {
 
     fireEvent.keyDown(segmentHitbox, { key: "Enter" });
 
-    const selectedSegmentLabel = Array.from(networkSummaryPanel.querySelectorAll(".network-segment-label")).find(
-      (label) => label.textContent === "SEG-A"
-    );
-    expect(selectedSegmentLabel).not.toBeUndefined();
     const selectedSegmentStroke = networkSummaryPanel.querySelector(
       '.network-graph-layer-segments [data-segment-id="SEG-A"] .network-segment'
     );

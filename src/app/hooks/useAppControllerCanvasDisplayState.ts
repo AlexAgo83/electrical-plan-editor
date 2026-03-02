@@ -10,15 +10,15 @@ export function useAppControllerCanvasDisplayState() {
   const [routePreviewStartNodeId, setRoutePreviewStartNodeId] = useState("");
   const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
   const [showNetworkInfoPanels, setShowNetworkInfoPanels] = useState(true);
-  const [showSegmentNames, setShowSegmentNames] = useState(true);
-  const [showSegmentLengths, setShowSegmentLengths] = useState(false);
+  const [showSegmentNames, setShowSegmentNames] = useState(false);
+  const [showSegmentLengths, setShowSegmentLengths] = useState(true);
   const [showCableCallouts, setShowCableCallouts] = useState(false);
   const [showSelectedCalloutOnly, setShowSelectedCalloutOnly] = useState(false);
   const [networkLabelStrokeMode, setNetworkLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
   const [networkLabelSizeMode, setNetworkLabelSizeMode] = useState<CanvasLabelSizeMode>("normal");
   const [networkCalloutTextSize, setNetworkCalloutTextSize] = useState<CanvasCalloutTextSize>("normal");
   const [networkLabelRotationDegrees, setNetworkLabelRotationDegrees] = useState<CanvasLabelRotationDegrees>(0);
-  const [networkAutoSegmentLabelRotation, setNetworkAutoSegmentLabelRotation] = useState(false);
+  const [networkAutoSegmentLabelRotation, setNetworkAutoSegmentLabelRotation] = useState(true);
   const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("60");
 
   return {
