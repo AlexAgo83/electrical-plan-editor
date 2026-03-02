@@ -124,6 +124,7 @@ interface UiPreferencesPayload {
   canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasDefaultAutoSegmentLabelRotation: boolean;
+  canvasShowCalloutWireNames: boolean;
   canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
@@ -188,6 +189,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasDefaultAutoSegmentLabelRotation: boolean;
+  canvasShowCalloutWireNames: boolean;
   canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
@@ -229,6 +231,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultCalloutTextSize: (value: CanvasCalloutTextSize) => void;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
+  setCanvasShowCalloutWireNames: (value: boolean) => void;
   setCanvasExportFormat: (value: CanvasExportFormat) => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
   setShowNetworkGrid: (value: boolean) => void;
@@ -328,6 +331,7 @@ export function useUiPreferences({
   canvasDefaultCalloutTextSize,
   canvasDefaultLabelRotationDegrees,
   canvasDefaultAutoSegmentLabelRotation,
+  canvasShowCalloutWireNames,
   canvasExportFormat,
   canvasPngExportIncludeBackground,
   canvasResetZoomPercentInput,
@@ -369,6 +373,7 @@ export function useUiPreferences({
   setCanvasDefaultCalloutTextSize,
   setCanvasDefaultLabelRotationDegrees,
   setCanvasDefaultAutoSegmentLabelRotation,
+  setCanvasShowCalloutWireNames,
   setCanvasExportFormat,
   setCanvasPngExportIncludeBackground,
   setShowNetworkGrid,
@@ -483,6 +488,9 @@ export function useUiPreferences({
       setCanvasDefaultCalloutTextSize(calloutTextSizeDefault);
       setCanvasDefaultLabelRotationDegrees(labelRotationDegreesDefault);
       setCanvasDefaultAutoSegmentLabelRotation(autoSegmentLabelRotationDefault);
+      setCanvasShowCalloutWireNames(
+        typeof preferences.canvasShowCalloutWireNames === "boolean" ? preferences.canvasShowCalloutWireNames : false
+      );
       setCanvasExportFormat(normalizeCanvasExportFormat(preferences.canvasExportFormat));
       setCanvasPngExportIncludeBackground(
         typeof preferences.canvasPngExportIncludeBackground === "boolean"
@@ -533,6 +541,7 @@ export function useUiPreferences({
     setCanvasDefaultCalloutTextSize,
     setCanvasDefaultLabelRotationDegrees,
     setCanvasDefaultAutoSegmentLabelRotation,
+    setCanvasShowCalloutWireNames,
     setCanvasExportFormat,
     setCanvasPngExportIncludeBackground,
     setCanvasResetZoomPercentInput,
@@ -609,6 +618,7 @@ export function useUiPreferences({
       canvasDefaultCalloutTextSize,
       canvasDefaultLabelRotationDegrees,
       canvasDefaultAutoSegmentLabelRotation,
+      canvasShowCalloutWireNames,
       canvasExportFormat,
       canvasPngExportIncludeBackground,
       canvasResetZoomPercentInput,
@@ -638,6 +648,7 @@ export function useUiPreferences({
     canvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees,
     canvasDefaultAutoSegmentLabelRotation,
+    canvasShowCalloutWireNames,
     canvasExportFormat,
     canvasPngExportIncludeBackground,
     canvasResetZoomPercentInput,

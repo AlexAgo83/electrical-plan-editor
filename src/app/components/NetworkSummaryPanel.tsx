@@ -113,6 +113,7 @@ export interface NetworkSummaryPanelProps {
   showSegmentLengths: boolean;
   showCableCallouts: boolean;
   showSelectedCalloutOnly: boolean;
+  showCalloutWireNames: boolean;
   labelStrokeMode: CanvasLabelStrokeMode;
   labelSizeMode: CanvasLabelSizeMode;
   calloutTextSize: CanvasCalloutTextSize;
@@ -242,10 +243,12 @@ interface CalloutLayoutMetrics {
   width: number;
   titleStartY: number;
   subtitleStartY: number | null;
+  headerY: number;
   rowsStartY: number;
   rowStep: number;
   height: number;
-  rows: string[];
+  columns: CalloutTableColumnLayout[];
+  rows: CalloutTableRow[];
 }
 
 interface DraggingCalloutState {
@@ -257,8 +260,26 @@ interface DraggingCalloutState {
 
 const CALLOUT_OFFSET_SCREEN_UNITS = 92;
 const CALLOUT_MIN_WIDTH = 44;
-const CALLOUT_MAX_WIDTH = 320;
+const CALLOUT_MAX_WIDTH = 520;
 const CALLOUT_LAYOUT_CACHE_MAX_ENTRIES = 512;
+
+type CalloutTableColumnKey = "pin" | "technicalId" | "wireName" | "length" | "section";
+
+interface CalloutTableRow {
+  pin: string;
+  technicalId: string;
+  wireName: string;
+  length: string;
+  section: string;
+}
+
+interface CalloutTableColumnLayout {
+  key: CalloutTableColumnKey;
+  header: string;
+  width: number;
+  x: number;
+  textAnchor: "start" | "end";
+}
 
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -285,10 +306,6 @@ function normalizeVector(x: number, y: number): { x: number; y: number } {
     return { x: 0, y: 0 };
   }
   return { x: x / magnitude, y: y / magnitude };
-}
-
-function buildCalloutEntryDisplayLine(entry: CalloutEntry): string {
-  return `${entry.name} (${entry.technicalId}) - ${entry.lengthMm} mm - ${entry.sectionMm2} mm²`;
 }
 
 function getCalloutRowFontSize(calloutTextSize: CanvasCalloutTextSize): number {
@@ -345,21 +362,34 @@ function buildCalloutHeaderDisplay(name: string, technicalId: string): { title: 
 let calloutMeasureCanvas: HTMLCanvasElement | null = null;
 let calloutMeasureSvgText: SVGTextElement | null = null;
 let calloutMeasureSvgRoot: SVGSVGElement | null = null;
-let calloutMeasureSvgGroup: SVGGElement | null = null;
 const calloutLayoutCache = new Map<string, CalloutLayoutMetrics>();
 
-function buildCalloutRows(groups: CalloutGroup[]): string[] {
-  return groups.flatMap((group) => group.entries.map(buildCalloutEntryDisplayLine));
+function buildCalloutRows(groups: CalloutGroup[]): CalloutTableRow[] {
+  const rows: CalloutTableRow[] = [];
+  for (const group of groups) {
+    for (const entry of group.entries) {
+      rows.push({
+        pin: group.label,
+        technicalId: entry.technicalId.trim().length > 0 ? entry.technicalId : entry.wireId,
+        wireName: entry.name,
+        length: `${entry.lengthMm} mm`,
+        section: `${entry.sectionMm2} mm²`
+      });
+    }
+  }
+  return rows;
 }
 
 function buildCalloutLayoutCacheKey(
   title: string,
   subtitle: string,
-  rows: string[],
-  calloutTextSize: CanvasCalloutTextSize
+  rows: CalloutTableRow[],
+  calloutTextSize: CanvasCalloutTextSize,
+  showCalloutWireNames: boolean
 ): string {
   return JSON.stringify({
     calloutTextSize,
+    showCalloutWireNames,
     title,
     subtitle,
     rows
@@ -383,12 +413,9 @@ function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
     svg.style.opacity = "0";
     const textNode = document.createElementNS(ns, "text");
     svg.appendChild(textNode);
-    const groupNode = document.createElementNS(ns, "g");
-    svg.appendChild(groupNode);
     document.body.appendChild(svg);
     calloutMeasureSvgRoot = svg;
     calloutMeasureSvgText = textNode;
-    calloutMeasureSvgGroup = groupNode;
   }
   if (calloutMeasureSvgText) {
     calloutMeasureSvgText.textContent = text;
@@ -450,64 +477,50 @@ function measureCalloutRowTextMetrics(fontSizePx: number): { topOffset: number; 
   return fallback;
 }
 
-function measureCalloutRowsBlockBBox(
-  rows: string[],
-  fontSizePx: number,
-  rowGap: number
-): { x: number; y: number; width: number; height: number } | null {
-  if (rows.length === 0 || typeof document === "undefined") {
-    return null;
+function getCalloutRowCellValue(row: CalloutTableRow, key: CalloutTableColumnKey): string {
+  if (key === "pin") {
+    return row.pin;
   }
-  if (!calloutMeasureSvgRoot || !calloutMeasureSvgText || !calloutMeasureSvgGroup) {
-    measureCalloutRowTextWidth("Ag", fontSizePx);
+  if (key === "technicalId") {
+    return row.technicalId;
   }
-  if (!calloutMeasureSvgGroup) {
-    return null;
+  if (key === "wireName") {
+    return row.wireName;
   }
-
-  const singleRowMetrics = measureCalloutRowTextMetrics(fontSizePx);
-  const rowStep = singleRowMetrics.height + rowGap;
-  calloutMeasureSvgGroup.replaceChildren();
-
-  for (let rowIndex = 0; rowIndex < rows.length; rowIndex += 1) {
-    const row = rows[rowIndex];
-    if (row === undefined) {
-      continue;
-    }
-    const textNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    textNode.textContent = row;
-    textNode.setAttribute("x", "0");
-    textNode.setAttribute("y", String(rowIndex * rowStep));
-    textNode.setAttribute("font-size", String(fontSizePx));
-    textNode.setAttribute("font-family", "\"IBM Plex Sans\", \"Segoe UI\", sans-serif");
-    textNode.setAttribute("font-weight", "400");
-    textNode.setAttribute("dominant-baseline", "hanging");
-    calloutMeasureSvgGroup.appendChild(textNode);
+  if (key === "length") {
+    return row.length;
   }
-
-  try {
-    const bbox = calloutMeasureSvgGroup.getBBox();
-    if (Number.isFinite(bbox.width) && Number.isFinite(bbox.height) && bbox.width >= 0 && bbox.height >= 0) {
-      return { x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height };
-    }
-  } catch {
-    return null;
-  }
-  return null;
+  return row.section;
 }
 
 function buildCalloutLayoutMetrics(
   title: string,
   subtitle: string,
   groups: CalloutGroup[],
-  calloutTextSize: CanvasCalloutTextSize
+  calloutTextSize: CanvasCalloutTextSize,
+  showCalloutWireNames: boolean
 ): CalloutLayoutMetrics {
   const rows = buildCalloutRows(groups);
-  const cacheKey = buildCalloutLayoutCacheKey(title, subtitle, rows, calloutTextSize);
+  const cacheKey = buildCalloutLayoutCacheKey(title, subtitle, rows, calloutTextSize, showCalloutWireNames);
   const cached = calloutLayoutCache.get(cacheKey);
   if (cached !== undefined) {
     return cached;
   }
+
+  const columnDefinitions: Array<{
+    key: CalloutTableColumnKey;
+    header: string;
+    textAnchor: "start" | "end";
+  }> = [
+    { key: "pin", header: "Pin", textAnchor: "start" },
+    { key: "technicalId", header: "Wire ID", textAnchor: "start" },
+    ...(showCalloutWireNames
+      ? ([{ key: "wireName", header: "Wire name", textAnchor: "start" }] as const)
+      : []),
+    { key: "length", header: "Length (mm)", textAnchor: "end" },
+    { key: "section", header: "Section (mm²)", textAnchor: "end" }
+  ];
+
   const rowFontSize = getCalloutRowFontSize(calloutTextSize);
   const titleFontSize = getCalloutTitleFontSize(calloutTextSize);
   const subtitleFontSize = getCalloutSubtitleFontSize(calloutTextSize);
@@ -515,8 +528,10 @@ function buildCalloutLayoutMetrics(
   const bottomPadding = 2.8;
   const subtitleTopGap = subtitle.length > 0 ? 0.25 : 0;
   const subtitleBottomGap = subtitle.length > 0 ? 0.55 : 0;
-  const titleBottomGap = rows.length > 0 ? 0.7 : 0;
+  const titleBottomGap = rows.length > 0 ? 0.75 : 0;
+  const tableHeaderBottomGap = rows.length > 0 ? 0.5 : 0;
   const rowGap = 0.45;
+  const columnGap = 3;
   const leftPadding = 4;
   const rightPadding = 4;
   const titleTextMetrics = measureCalloutRowTextMetrics(titleFontSize);
@@ -526,18 +541,37 @@ function buildCalloutLayoutMetrics(
   const rowTextMetrics = measureCalloutRowTextMetrics(rowFontSize);
   const rowLineHeight = rowTextMetrics.height;
   const rowStep = rowLineHeight + rowGap;
-  const blockBBox = measureCalloutRowsBlockBBox(rows, rowFontSize, rowGap);
   const measuredTitleWidth = measureCalloutRowTextWidth(title, titleFontSize);
   const measuredSubtitleWidth = subtitle.length > 0 ? measureCalloutRowTextWidth(subtitle, subtitleFontSize) : 0;
-
-  let longestMeasuredRowWidth = 0;
-  for (const row of rows) {
-    longestMeasuredRowWidth = Math.max(longestMeasuredRowWidth, measureCalloutRowTextWidth(row, rowFontSize));
+  const columns: CalloutTableColumnLayout[] = [];
+  let tableWidth = 0;
+  for (let columnIndex = 0; columnIndex < columnDefinitions.length; columnIndex += 1) {
+    const definition = columnDefinitions[columnIndex];
+    if (definition === undefined) {
+      continue;
+    }
+    let columnWidth = measureCalloutRowTextWidth(definition.header, rowFontSize);
+    for (const row of rows) {
+      columnWidth = Math.max(columnWidth, measureCalloutRowTextWidth(getCalloutRowCellValue(row, definition.key), rowFontSize));
+    }
+    columns.push({
+      key: definition.key,
+      header: definition.header,
+      width: columnWidth,
+      x: tableWidth,
+      textAnchor: definition.textAnchor
+    });
+    tableWidth += columnWidth;
+    if (columnIndex < columnDefinitions.length - 1) {
+      tableWidth += columnGap;
+    }
   }
 
-  const measuredContentWidth = Math.max(blockBBox?.width ?? longestMeasuredRowWidth, measuredTitleWidth, measuredSubtitleWidth);
-  const measuredContentHeight = blockBBox?.height ?? (rows.length > 0 ? rowLineHeight + (rows.length - 1) * rowStep : 0);
-  const measuredTopOffset = blockBBox?.y ?? rowTextMetrics.topOffset;
+  const measuredContentWidth = Math.max(tableWidth, measuredTitleWidth, measuredSubtitleWidth);
+  const measuredContentHeight =
+    rows.length > 0
+      ? rowLineHeight + tableHeaderBottomGap + rowLineHeight + (rows.length - 1) * rowStep
+      : rowLineHeight;
   const titleStartY = topPadding - titleTextMetrics.topOffset;
   const subtitleStartY =
     subtitle.length > 0 && subtitleTextMetrics !== null
@@ -547,13 +581,24 @@ function buildCalloutLayoutMetrics(
     subtitleStartY === null
       ? titleStartY + titleLineHeight
       : subtitleStartY + subtitleLineHeight + subtitleBottomGap;
-  const rowsStartY = headerBottomY + titleBottomGap - measuredTopOffset;
+  const headerY = headerBottomY + titleBottomGap - rowTextMetrics.topOffset;
+  const rowsStartY = headerY + rowLineHeight + tableHeaderBottomGap;
 
   const width = clampNumber(Math.ceil(measuredContentWidth + leftPadding + rightPadding), CALLOUT_MIN_WIDTH, CALLOUT_MAX_WIDTH);
   const headerHeight =
     titleLineHeight + (subtitleStartY === null ? 0 : subtitleTopGap + subtitleLineHeight + subtitleBottomGap);
   const height = Math.max(0, topPadding + headerHeight + titleBottomGap + measuredContentHeight + bottomPadding);
-  const layout = { width, titleStartY, subtitleStartY, rowsStartY, rowStep, height, rows } satisfies CalloutLayoutMetrics;
+  const layout = {
+    width,
+    titleStartY,
+    subtitleStartY,
+    headerY,
+    rowsStartY,
+    rowStep,
+    height,
+    columns,
+    rows
+  } satisfies CalloutLayoutMetrics;
   if (calloutLayoutCache.size >= CALLOUT_LAYOUT_CACHE_MAX_ENTRIES) {
     calloutLayoutCache.clear();
   }
@@ -594,6 +639,7 @@ export function NetworkSummaryPanel({
   showSegmentLengths,
   showCableCallouts,
   showSelectedCalloutOnly,
+  showCalloutWireNames,
   labelStrokeMode,
   labelSizeMode,
   calloutTextSize,
@@ -1327,7 +1373,7 @@ export function NetworkSummaryPanel({
   const renderedCableCallouts = useMemo(() => {
     const draggingCalloutKey = draggingCallout?.key ?? null;
     return orderedCableCallouts.map((callout) => {
-      const layout = buildCalloutLayoutMetrics(callout.title, "", callout.groups, calloutTextSize);
+      const layout = buildCalloutLayoutMetrics(callout.title, "", callout.groups, calloutTextSize, showCalloutWireNames);
       const halfWidthInModelUnits = (layout.width / 2) * inverseLabelScale;
       const halfHeightInModelUnits = (layout.height / 2) * inverseLabelScale;
       const isVisibleInViewport = !(
@@ -1360,6 +1406,7 @@ export function NetworkSummaryPanel({
   }, [
     orderedCableCallouts,
     calloutTextSize,
+    showCalloutWireNames,
     inverseLabelScale,
     hoveredCalloutKey,
     draggingCallout?.key,
@@ -1783,7 +1830,12 @@ export function NetworkSummaryPanel({
                 transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
               >
                 {renderedCableCallouts.map(({ callout, layout, calloutClassName, isVisibleInViewport }) => {
-                  let contentCursorY = layout.rowsStartY;
+                  const contentLeftX = -layout.width / 2 + 4;
+                  const headerY = -layout.height / 2 + layout.headerY;
+                  const rowsStartY = -layout.height / 2 + layout.rowsStartY;
+                  const lastColumn = layout.columns[layout.columns.length - 1];
+                  const tableRightX =
+                    lastColumn === undefined ? contentLeftX : contentLeftX + lastColumn.x + lastColumn.width;
 
                   return (
                     <g
@@ -1849,21 +1901,51 @@ export function NetworkSummaryPanel({
                               {callout.subtitle}
                             </text>
                           ) : null}
-                          {layout.rows.map((row, rowIndex) => {
-                            const rowY = -layout.height / 2 + contentCursorY;
-                            contentCursorY += layout.rowStep;
+                          {layout.columns.map((column) => {
+                            const x =
+                              column.textAnchor === "end"
+                                ? contentLeftX + column.x + column.width
+                                : contentLeftX + column.x;
                             return (
                               <text
-                                key={`${callout.key}-row-${rowIndex}`}
-                                className="network-callout-row-text"
-                                x={-layout.width / 2 + 4}
-                                y={rowY}
-                                textAnchor="start"
+                                key={`${callout.key}-header-${column.key}`}
+                                className="network-callout-table-header-cell"
+                                x={x}
+                                y={headerY}
+                                textAnchor={column.textAnchor}
                                 dominantBaseline="hanging"
                               >
-                                {row}
+                                {column.header}
                               </text>
                             );
+                          })}
+                          <line
+                            className="network-callout-table-divider"
+                            x1={contentLeftX}
+                            y1={rowsStartY - 0.35}
+                            x2={tableRightX}
+                            y2={rowsStartY - 0.35}
+                          />
+                          {layout.rows.map((row, rowIndex) => {
+                            const rowY = rowsStartY + rowIndex * layout.rowStep;
+                            return layout.columns.map((column) => {
+                              const x =
+                                column.textAnchor === "end"
+                                  ? contentLeftX + column.x + column.width
+                                  : contentLeftX + column.x;
+                              return (
+                                <text
+                                  key={`${callout.key}-row-${rowIndex}-${column.key}`}
+                                  className="network-callout-table-cell"
+                                  x={x}
+                                  y={rowY}
+                                  textAnchor={column.textAnchor}
+                                  dominantBaseline="hanging"
+                                >
+                                  {getCalloutRowCellValue(row, column.key)}
+                                </text>
+                              );
+                            });
                           })}
                         </g>
                       </g>

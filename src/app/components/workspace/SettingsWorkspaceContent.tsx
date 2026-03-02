@@ -85,6 +85,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   canvasDefaultAutoSegmentLabelRotation: boolean;
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
+  canvasShowCalloutWireNames: boolean;
+  setCanvasShowCalloutWireNames: (value: boolean) => void;
   canvasExportFormat: CanvasExportFormat;
   setCanvasExportFormat: (value: CanvasExportFormat) => void;
   canvasPngExportIncludeBackground: boolean;
@@ -175,6 +177,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultLabelRotationDegrees,
   canvasDefaultAutoSegmentLabelRotation,
   setCanvasDefaultAutoSegmentLabelRotation,
+  canvasShowCalloutWireNames,
+  setCanvasShowCalloutWireNames,
   canvasExportFormat,
   setCanvasExportFormat,
   canvasPngExportIncludeBackground,
@@ -416,6 +420,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasDefaultShowCableCallouts(event.target.checked)}
             />
             Show connector/splice cable callouts by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasShowCalloutWireNames}
+              onChange={(event) => setCanvasShowCalloutWireNames(event.target.checked)}
+            />
+            Show wire names in callout table
           </label>
           <label className="settings-checkbox">
             <input

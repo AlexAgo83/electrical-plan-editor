@@ -303,6 +303,39 @@ describe("App integration UI - settings canvas render", () => {
     expect(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Export format")).toHaveValue("png");
   });
 
+  it("toggles wire-name column visibility in callout tables from settings", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const canvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
+    const wireNamesToggle = within(canvasToolsSettingsPanel).getByLabelText("Show wire names in callout table");
+    expect(wireNamesToggle).not.toBeChecked();
+
+    switchScreenDrawerAware("analysis");
+    let networkSummaryPanel = getPanelByHeading("Network summary");
+    const firstCalloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
+    if (!firstCalloutsToggle.classList.contains("is-active")) {
+      fireEvent.click(firstCalloutsToggle);
+    }
+    expect(within(networkSummaryPanel).queryByText("Wire name")).toBeNull();
+
+    switchScreenDrawerAware("settings");
+    fireEvent.click(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Show wire names in callout table"));
+
+    switchScreenDrawerAware("analysis");
+    networkSummaryPanel = getPanelByHeading("Network summary");
+    const secondCalloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
+    if (!secondCalloutsToggle.classList.contains("is-active")) {
+      fireEvent.click(secondCalloutsToggle);
+    }
+    expect(within(networkSummaryPanel).queryAllByText("Wire name").length).toBeGreaterThan(0);
+
+    firstRender.unmount();
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    expect(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Show wire names in callout table")).toBeChecked();
+  });
+
   it("persists the 0 degree 2d label rotation preset across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 

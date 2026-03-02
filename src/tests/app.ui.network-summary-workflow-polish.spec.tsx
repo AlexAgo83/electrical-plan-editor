@@ -290,10 +290,10 @@ describe("App integration UI - network summary workflow polish", () => {
     fireEvent.click(calloutsToggle);
 
     const calloutFrames = networkSummaryPanel.querySelectorAll(".network-callout-frame");
-    const calloutRows = networkSummaryPanel.querySelectorAll(".network-callout-row-text");
+    const calloutRows = networkSummaryPanel.querySelectorAll(".network-callout-table-cell");
     expect(calloutFrames.length).toBeGreaterThanOrEqual(4);
     expect(calloutRows.length).toBeGreaterThanOrEqual(8);
-    expect(networkSummaryPanel).toHaveTextContent("Wire 8");
+    expect(networkSummaryPanel).toHaveTextContent("Length (mm)");
     expect(networkSummaryPanel).toHaveTextContent("W-8");
   });
 
