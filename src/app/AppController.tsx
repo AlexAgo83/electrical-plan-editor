@@ -1437,8 +1437,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,
     fitNetworkToContent,
-    applyListSortDefaults,
-    applyCanvasDefaultsNow,
     resetWorkspacePreferencesToDefaults
   } = useAppControllerWorkspaceHandlersAssembly({
     base: {
@@ -1473,19 +1471,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setNetworkOffset
     },
     canvasDefaults: {
-      canvasDefaultShowGrid,
-      canvasDefaultSnapToGrid,
-      canvasDefaultLockEntityMovement,
-      canvasDefaultShowInfoPanels,
-      canvasDefaultShowSegmentNames,
-      canvasDefaultShowSegmentLengths,
-      canvasDefaultShowCableCallouts,
-      canvasDefaultShowSelectedCalloutOnly,
-      canvasDefaultLabelStrokeMode,
-      canvasDefaultLabelSizeMode,
-      canvasDefaultCalloutTextSize,
-      canvasDefaultLabelRotationDegrees,
-      canvasDefaultAutoSegmentLabelRotation,
       showCableCallouts,
       networkCalloutTextSize,
       setShowNetworkGrid,
@@ -1501,11 +1486,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setNetworkCalloutTextSize,
       setNetworkLabelRotationDegrees,
       setNetworkAutoSegmentLabelRotation
-    },
-    sortDefaults: {
-      defaultSortField,
-      defaultSortDirection,
-      defaultIdSortDirection
     },
     sortSetters: {
       setConnectorSort,
@@ -2645,8 +2625,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setCanvasResetZoomPercentInput
         },
         configuredResetZoomPercent,
-        applyListSortDefaults,
-        applyCanvasDefaultsNow,
         handleZoomAction,
         resetWorkspacePreferencesToDefaults
       },

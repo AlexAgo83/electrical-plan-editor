@@ -184,7 +184,7 @@ export function cloneNetworkSummaryViewState(
   };
 }
 
-export function createEmptyWorkspaceState(themeMode: ThemeMode = "normal"): AppState {
+export function createEmptyWorkspaceState(themeMode: ThemeMode = "warmBrown"): AppState {
   return {
     schemaVersion: APP_SCHEMA_VERSION,
     networks: createEmptyEntityState<Network, NetworkId>(),
@@ -244,7 +244,7 @@ export function createInitialState(): AppState {
     ui: {
       selected: null,
       lastError: null,
-      themeMode: "normal"
+      themeMode: "warmBrown"
     },
     meta: {
       revision: 0

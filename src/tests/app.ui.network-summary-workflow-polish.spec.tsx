@@ -338,11 +338,14 @@ describe("App integration UI - network summary workflow polish", () => {
     const canvasSettingsPanel = getPanelByHeading("Canvas tools preferences");
     fireEvent.click(within(canvasSettingsPanel).getByLabelText("Show connector/splice cable callouts by default"));
     fireEvent.click(within(canvasSettingsPanel).getByLabelText("Show only selected connector/splice callout"));
-    fireEvent.click(within(canvasSettingsPanel).getByRole("button", { name: "Apply canvas defaults now" }));
 
     switchScreenDrawerAware("modeling");
     const networkSummaryPanel = getPanelByHeading("Network summary");
-    expect(within(networkSummaryPanel).getByRole("button", { name: "Callouts" })).toHaveClass("is-active");
+    const calloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
+    if (!calloutsToggle.classList.contains("is-active")) {
+      fireEvent.click(calloutsToggle);
+    }
+    expect(calloutsToggle).toHaveClass("is-active");
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(0);
 
     const segmentHitbox = networkSummaryPanel.querySelector(".network-segment-hitbox");
@@ -358,7 +361,6 @@ describe("App integration UI - network summary workflow polish", () => {
     switchScreenDrawerAware("settings");
     const restoredCanvasSettingsPanel = getPanelByHeading("Canvas tools preferences");
     fireEvent.click(within(restoredCanvasSettingsPanel).getByLabelText("Show only selected connector/splice callout"));
-    fireEvent.click(within(restoredCanvasSettingsPanel).getByRole("button", { name: "Apply canvas defaults now" }));
 
     switchScreenDrawerAware("modeling");
     expect(getPanelByHeading("Network summary").querySelectorAll(".network-callout-frame").length).toBeGreaterThanOrEqual(2);

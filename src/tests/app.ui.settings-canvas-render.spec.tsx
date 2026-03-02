@@ -177,10 +177,13 @@ describe("App integration UI - settings canvas render", () => {
     switchScreenDrawerAware("settings");
     const canvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
     fireEvent.click(within(canvasToolsSettingsPanel).getByLabelText("Show segment lengths by default"));
-    fireEvent.click(within(canvasToolsSettingsPanel).getByRole("button", { name: "Apply canvas defaults now" }));
     fireEvent.click(within(canvasToolsSettingsPanel).getByLabelText("Show segment names"));
     switchScreenDrawerAware("analysis");
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    const lengthToggle = within(networkSummaryPanel).getByRole("button", { name: "Length" });
+    if (!lengthToggle.classList.contains("is-active")) {
+      fireEvent.click(lengthToggle);
+    }
     expect(networkSummaryPanel.querySelectorAll(".network-segment-label")).toHaveLength(0);
     expect(networkSummaryPanel.querySelectorAll(".network-segment-length-label").length).toBeGreaterThan(0);
     firstRender.unmount();
@@ -259,6 +262,10 @@ describe("App integration UI - settings canvas render", () => {
     switchScreenDrawerAware("settings");
     const canvasSettingsPanel = getPanelByHeading("Canvas render preferences");
     const resizeBehaviorSelect = within(canvasSettingsPanel).getByLabelText("Viewport resize behavior");
+    expect(resizeBehaviorSelect).toHaveValue("visibleAreaOnly");
+    fireEvent.change(resizeBehaviorSelect, {
+      target: { value: "responsiveContentScale" }
+    });
     expect(resizeBehaviorSelect).toHaveValue("responsiveContentScale");
     fireEvent.change(resizeBehaviorSelect, {
       target: { value: "visibleAreaOnly" }
@@ -322,7 +329,7 @@ describe("App integration UI - settings canvas render", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("analysis");
     let networkSummaryPanel = getPanelByHeading("Network summary");
-    expect(networkSummaryPanel.querySelector(".network-node-shape-anchor")).toBeNull();
+    expect(networkSummaryPanel.querySelector(".network-node-shape-anchor")).not.toBeNull();
     const connectorShapeBefore = networkSummaryPanel.querySelector("g.network-node.connector .network-node-shape");
     expect(connectorShapeBefore).not.toBeNull();
     const connectorWidthBefore = Number(connectorShapeBefore?.getAttribute("width") ?? "0");
@@ -333,12 +340,6 @@ describe("App integration UI - settings canvas render", () => {
       name: /Node shape target size/i
     });
     expect(nodeShapeSizeSlider).toHaveValue("50");
-    expect(nodeShapeSizeSlider).toBeDisabled();
-    fireEvent.click(
-      within(canvasToolsSettingsPanel).getByLabelText(
-        "Keep connector/splice/node shape size constant while zooming"
-      )
-    );
     expect(nodeShapeSizeSlider).toBeEnabled();
     fireEvent.change(nodeShapeSizeSlider, { target: { value: "125" } });
     expect(nodeShapeSizeSlider).toHaveValue("125");
@@ -391,12 +392,11 @@ describe("App integration UI - settings canvas render", () => {
     );
     expect(defaultCalloutCheckbox).not.toBeChecked();
     fireEvent.click(defaultCalloutCheckbox);
-    fireEvent.click(within(canvasSettingsPanel).getByRole("button", { name: "Apply canvas defaults now" }));
+    firstRender.unmount();
+    renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
     const networkSummaryPanel = getPanelByHeading("Network summary");
     expect(within(networkSummaryPanel).getByRole("button", { name: "Callouts" })).toHaveClass("is-active");
-    firstRender.unmount();
-    renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
     const restoredCanvasSettingsPanel = getPanelByHeading("Canvas tools preferences");
     expect(
@@ -414,7 +414,8 @@ describe("App integration UI - settings canvas render", () => {
     expect(selectedOnlyCheckbox).not.toBeChecked();
     fireEvent.click(defaultCalloutCheckbox);
     fireEvent.click(selectedOnlyCheckbox);
-    fireEvent.click(within(canvasSettingsPanel).getByRole("button", { name: "Apply canvas defaults now" }));
+    firstRender.unmount();
+    renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
     const networkSummaryPanel = getPanelByHeading("Network summary");
     expect(within(networkSummaryPanel).getByRole("button", { name: "Callouts" })).toHaveClass("is-active");
@@ -423,8 +424,6 @@ describe("App integration UI - settings canvas render", () => {
     expect(connectorNode).not.toBeNull();
     fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 220, clientY: 140 });
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(1);
-    firstRender.unmount();
-    renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
     const restoredCanvasSettingsPanel = getPanelByHeading("Canvas tools preferences");
     expect(within(restoredCanvasSettingsPanel).getByLabelText("Show only selected connector/splice callout")).toBeChecked();

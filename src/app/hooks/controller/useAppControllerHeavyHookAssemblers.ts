@@ -36,19 +36,6 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
   >;
   canvasDefaults: Pick<
     WorkspaceHandlersParams,
-    | "canvasDefaultShowGrid"
-    | "canvasDefaultSnapToGrid"
-    | "canvasDefaultLockEntityMovement"
-    | "canvasDefaultShowInfoPanels"
-    | "canvasDefaultShowSegmentNames"
-    | "canvasDefaultShowSegmentLengths"
-    | "canvasDefaultShowCableCallouts"
-    | "canvasDefaultShowSelectedCalloutOnly"
-    | "canvasDefaultLabelStrokeMode"
-    | "canvasDefaultLabelSizeMode"
-    | "canvasDefaultCalloutTextSize"
-    | "canvasDefaultLabelRotationDegrees"
-    | "canvasDefaultAutoSegmentLabelRotation"
     | "showCableCallouts"
     | "networkCalloutTextSize"
     | "setShowNetworkGrid"
@@ -65,7 +52,6 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setNetworkLabelRotationDegrees"
     | "setNetworkAutoSegmentLabelRotation"
   >;
-  sortDefaults: Pick<WorkspaceHandlersParams, "defaultSortField" | "defaultSortDirection" | "defaultIdSortDirection">;
   sortSetters: Pick<
     WorkspaceHandlersParams,
     | "setConnectorSort"
@@ -123,7 +109,6 @@ export function useAppControllerWorkspaceHandlersAssembly({
   networkForm,
   workspace,
   canvasDefaults,
-  sortDefaults,
   sortSetters,
   preferenceSetters
 }: UseAppControllerWorkspaceHandlersAssemblyParams) {
@@ -132,7 +117,6 @@ export function useAppControllerWorkspaceHandlersAssembly({
     ...networkForm,
     ...workspace,
     ...canvasDefaults,
-    ...sortDefaults,
     ...sortSetters,
     ...preferenceSetters
   });

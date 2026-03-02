@@ -18,8 +18,8 @@ describe("App integration UI - settings", () => {
     localStorage.clear();
   });
 
-  it("applies settings defaults for list sort behavior", () => {
-    renderAppWithState(createConnectorSortingState());
+  it("applies settings defaults for list sort behavior after reload", () => {
+    const firstRender = renderAppWithState(createConnectorSortingState());
 
     switchScreenDrawerAware("settings");
     const settingsPanel = getPanelByHeading("Appearance preferences");
@@ -29,7 +29,8 @@ describe("App integration UI - settings", () => {
     fireEvent.change(within(settingsPanel).getByLabelText("Default sort direction"), {
       target: { value: "desc" }
     });
-    fireEvent.click(within(settingsPanel).getByRole("button", { name: "Apply sort defaults now" }));
+    firstRender.unmount();
+    renderAppWithState(createConnectorSortingState());
 
     switchScreenDrawerAware("modeling");
     const connectorsPanel = getPanelByHeading("Connectors");

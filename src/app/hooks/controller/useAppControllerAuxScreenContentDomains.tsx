@@ -59,8 +59,6 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     prefs: AppControllerPreferencesStateModel;
     canvasDisplay: AppControllerCanvasDisplayStateModel;
     configuredResetZoomPercent: SettingsSliceParams["configuredResetZoomPercent"];
-    applyListSortDefaults: SettingsSliceParams["applyListSortDefaults"];
-    applyCanvasDefaultsNow: SettingsSliceParams["applyCanvasDefaultsNow"];
     handleZoomAction: SettingsSliceParams["handleZoomAction"];
     resetWorkspacePreferencesToDefaults: SettingsSliceParams["resetWorkspacePreferencesToDefaults"];
   };
@@ -176,7 +174,6 @@ export function useAppControllerAuxScreenContentDomains({
     setDefaultSortDirection: settings.prefs.setDefaultSortDirection,
     defaultIdSortDirection: settings.prefs.defaultIdSortDirection,
     setDefaultIdSortDirection: settings.prefs.setDefaultIdSortDirection,
-    applyListSortDefaults: settings.applyListSortDefaults,
     canvasDefaultShowGrid: settings.prefs.canvasDefaultShowGrid,
     setCanvasDefaultShowGrid: settings.prefs.setCanvasDefaultShowGrid,
     canvasDefaultSnapToGrid: settings.prefs.canvasDefaultSnapToGrid,
@@ -219,7 +216,6 @@ export function useAppControllerAuxScreenContentDomains({
     canvasResizeBehaviorMode: settings.prefs.canvasResizeBehaviorMode,
     setCanvasResizeBehaviorMode: settings.prefs.setCanvasResizeBehaviorMode,
     configuredResetZoomPercent: settings.configuredResetZoomPercent,
-    applyCanvasDefaultsNow: settings.applyCanvasDefaultsNow,
     handleZoomAction: settings.handleZoomAction,
     showShortcutHints: settings.prefs.showShortcutHints,
     setShowShortcutHints: settings.prefs.setShowShortcutHints,

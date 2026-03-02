@@ -195,7 +195,7 @@ describe("App integration UI - theme mode", () => {
     });
     expect(appShell).toHaveClass("theme-petrol-slate");
     expect(within(settingsPanel as HTMLElement).getByLabelText("Theme mode")).toBeInTheDocument();
-    expect(within(settingsPanel as HTMLElement).getByRole("button", { name: /Apply sort defaults now/i })).toBeInTheDocument();
+    expect(within(settingsPanel as HTMLElement).getByLabelText("Default sort column")).toBeInTheDocument();
 
     switchScreen("validation");
     expect(within(document.body).getByRole("heading", { name: "Validation center" })).toBeInTheDocument();
