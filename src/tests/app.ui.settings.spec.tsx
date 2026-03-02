@@ -490,7 +490,7 @@ describe("App integration UI - settings", () => {
     ).toBe(true);
   });
 
-  it("switches to French at runtime, keeps changelog/import-export excluded, and persists locale", async () => {
+  it("switches to French at runtime, keeps changelog excluded, and persists locale", async () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
 
@@ -501,8 +501,7 @@ describe("App integration UI - settings", () => {
       expect(screen.getByRole("heading", { name: "Préférences d'apparence" })).toBeInTheDocument();
     });
 
-    // Import/Export remains intentionally out of i18n scope.
-    expect(screen.getByRole("heading", { name: "Import / Export networks" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Importer / Exporter des réseaux" })).toBeInTheDocument();
 
     const appearanceHeading = screen.getByRole("heading", { name: "Préférences d'apparence" });
     const appearancePanel = appearanceHeading.closest(".panel") as HTMLElement;
@@ -519,5 +518,24 @@ describe("App integration UI - settings", () => {
       expect(screen.getByRole("heading", { name: "Préférences d'apparence" })).toBeInTheDocument();
     });
     expect(document.documentElement.lang).toBe("fr");
+  });
+
+  it("switches back to English after French without getting stuck in translated labels", async () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+
+    const globalPreferencesPanel = getPanelByHeading("Global preferences");
+    const languageSelector = within(globalPreferencesPanel).getByLabelText("Language");
+
+    fireEvent.change(languageSelector, { target: { value: "fr" } });
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Préférences d'apparence" })).toBeInTheDocument();
+    });
+
+    fireEvent.change(within(getPanelByHeading("Préférences globales")).getByLabelText("Langue"), { target: { value: "en" } });
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Appearance preferences" })).toBeInTheDocument();
+    });
+    expect(document.documentElement.lang).toBe("en");
   });
 });

@@ -359,7 +359,7 @@ export function HomeWorkspaceContent({
           </div>
         </section>
       </div>
-      <section className="panel home-panel home-whats-new-panel" data-locale-exempt="true">
+      <section className="panel home-panel home-whats-new-panel">
         <header className="home-panel-header">
           <h2>What's new</h2>
           <span className="settings-panel-chip">Changelog</span>
@@ -373,6 +373,7 @@ export function HomeWorkspaceContent({
           aria-label="Changelog feed"
           tabIndex={0}
           data-visible-changelog-count={visibleChangelogCount}
+          data-locale-exempt="true"
         >
           {HOME_CHANGELOG_ENTRIES.length === 0 ? (
             <p className="empty-copy">No changelog available.</p>

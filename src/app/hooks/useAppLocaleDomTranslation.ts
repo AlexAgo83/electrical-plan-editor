@@ -38,15 +38,16 @@ function resolveTextNodeBaseValue(node: Text, locale: AppLocale): string {
     return currentValue;
   }
 
+  const translatedExisting = translateTextValue("fr", existing);
+
   if (locale === "en") {
-    if (currentValue !== existing) {
+    if (currentValue !== existing && currentValue !== translatedExisting) {
       textNodeBaseContent.set(node, currentValue);
       return currentValue;
     }
     return existing;
   }
 
-  const translatedExisting = translateTextValue("fr", existing);
   if (currentValue !== existing && currentValue !== translatedExisting) {
     textNodeBaseContent.set(node, currentValue);
     return currentValue;
@@ -80,15 +81,16 @@ function resolveAttributeBaseValue(element: Element, attributeName: string, loca
     return currentValue;
   }
 
+  const translatedExisting = translateTextValue("fr", existing);
+
   if (locale === "en") {
-    if (currentValue !== existing) {
+    if (currentValue !== existing && currentValue !== translatedExisting) {
       existingMap.set(attributeName, currentValue);
       return currentValue;
     }
     return existing;
   }
 
-  const translatedExisting = translateTextValue("fr", existing);
   if (currentValue !== existing && currentValue !== translatedExisting) {
     existingMap.set(attributeName, currentValue);
     return currentValue;
