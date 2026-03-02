@@ -80,7 +80,7 @@ describe("App integration UI - onboarding", () => {
     expect(lastTargetAction).toHaveFocus();
   });
 
-  it("adds a final full-flow onboarding step for settings with a single primary Open Settings CTA", () => {
+  it("adds a final full-flow onboarding step for settings with Open Settings CTA on the left and Finish on the right", () => {
     renderAppWithState(createUiIntegrationState());
 
     for (let index = 0; index < 6; index += 1) {
@@ -89,12 +89,17 @@ describe("App integration UI - onboarding", () => {
 
     const finalStepDialog = screen.getByRole("dialog", { name: "Configure your workspace defaults" });
     expect(within(finalStepDialog).getByText("Step 7 of 7")).toBeInTheDocument();
-    expect(within(finalStepDialog).getByRole("button", { name: "Open Settings" })).toBeInTheDocument();
-    expect(within(finalStepDialog).queryByRole("button", { name: "Finish" })).toBeNull();
+    const openSettingsButton = within(finalStepDialog).getByRole("button", { name: "Open Settings" });
+    const finishButton = within(finalStepDialog).getByRole("button", { name: "Finish" });
+    expect(openSettingsButton).toBeInTheDocument();
+    expect(finishButton).toBeInTheDocument();
 
-    fireEvent.click(within(finalStepDialog).getByRole("button", { name: "Open Settings" }));
+    fireEvent.click(openSettingsButton);
 
-    expect(screen.queryByRole("dialog", { name: "Configure your workspace defaults" })).toBeNull();
     expect(getPanelByHeading("Global preferences")).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Configure your workspace defaults" })).toBeInTheDocument();
+
+    fireEvent.click(finishButton);
+    expect(screen.queryByRole("dialog", { name: "Configure your workspace defaults" })).toBeNull();
   });
 });

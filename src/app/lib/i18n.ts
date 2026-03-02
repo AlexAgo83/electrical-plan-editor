@@ -15,10 +15,44 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Nodes": "Nœuds",
   "Segments": "Segments",
   "Wires": "Fils",
+  "Connector": "Connecteur",
+  "Splice": "Épissure",
+  "Node": "Nœud",
+  "Segment": "Segment",
+  "Wire": "Fil",
   "Help": "Aide",
   "Resume": "Reprendre",
+  "Quick start": "Démarrage rapide",
+  "Workspace": "Espace de travail",
+  "Workspace summary": "Résumé de l'espace de travail",
+  "Entity navigation": "Navigation entités",
+  "Home workspace": "Espace Accueil",
   "What's new": "Nouveautés",
   "Workspace hub": "Hub espace de travail",
+  "Open Network Scope": "Ouvrir Périmètre réseau",
+  "Create empty workspace": "Créer un espace vide",
+  "Import from file": "Importer depuis un fichier",
+  "Start a new workspace flow, import existing data, or open workspace management controls.": "Démarrez un nouveau flux d'espace de travail, importez des données existantes, ou ouvrez les contrôles de gestion d'espace.",
+  "Continue where you left off using the current workspace context and active network.": "Reprenez là où vous vous êtes arrêté en utilisant le contexte courant et le réseau actif.",
+  "Networks": "Réseaux",
+  "State": "État",
+  "Issues": "Issues",
+  "Errors / Warnings": "Erreurs / Avertissements",
+  "Saved": "Enregistré",
+  "Unsaved": "Non enregistré",
+  "Error": "Erreur",
+  "Active network:": "Réseau actif :",
+  "Network Scope workspace: active network context and lifecycle management.": "Espace Périmètre réseau : contexte du réseau actif et gestion du cycle de vie.",
+  "Home workspace: start, resume, shortcuts, and quick preferences.": "Espace Accueil : démarrer, reprendre, raccourcis et préférences rapides.",
+  "Modeling workspace: entity editor, operational lists, and analysis panels.": "Espace Modélisation : éditeur d'entités, listes opérationnelles et panneaux d'analyse.",
+  "Validation center: grouped model integrity issues with one-click navigation.": "Centre de validation : issues d'intégrité du modèle regroupées avec navigation en un clic.",
+  "Settings workspace: workspace preferences and project-level options.": "Espace Paramètres : préférences d'espace et options de niveau projet.",
+  "Open menu": "Ouvrir le menu",
+  "Close menu": "Fermer le menu",
+  "Install app": "Installer l'app",
+  "Update ready": "Mise à jour prête",
+  "Ops & Health": "Ops et santé",
+  "Clear": "Effacer",
   "No active network selected. Open Network Scope to choose or create one.": "Aucun réseau actif sélectionné. Ouvrez Périmètre réseau pour en choisir ou en créer un.",
   "Appearance preferences": "Préférences d'apparence",
   "Canvas render preferences": "Préférences de rendu canvas",
@@ -34,7 +68,45 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Display": "Affichage",
   "Canvas Tools": "Outils canvas",
   "Canvas Render": "Rendu canvas",
+  "Typography and rendering defaults used for labels, callouts, and view reset behavior.": "Paramètres de typographie et de rendu utilisés pour les libellés, cartouches et comportement de réinitialisation de vue.",
+  "Default tool behavior and overlay visibility for the 2D network workspace.": "Comportement par défaut des outils et visibilité des surcouches pour l'espace réseau 2D.",
+  "Global visual defaults for theme, table typography, density, and sorting across modeling and analysis views.": "Paramètres visuels globaux pour le thème, la typographie des tableaux, la densité et le tri dans les vues modélisation et analyse.",
+  "Shared UI preferences applied across workspace screens (outside of screen-specific controls).": "Préférences UI partagées appliquées aux écrans de l'espace de travail (hors contrôles spécifiques à un écran).",
+  "Enable keyboard helpers and keep a quick reference of available shortcuts.": "Activez les aides clavier et gardez un aide-mémoire des raccourcis disponibles.",
+  "Workspace pricing context for catalog and BOM flows. Catalog prices stay stored as excl. tax values.": "Contexte de tarification d'espace pour les flux catalogue et BOM. Les prix catalogue restent stockés en valeurs HT.",
+  "Tax/VAT settings only affect BOM calculations/export context. Disabling tax keeps HT-only outputs and preserves the last tax rate.": "Les réglages taxe/TVA n'affectent que les calculs BOM et le contexte d'export. Désactiver la taxe conserve des sorties HT et préserve le dernier taux.",
+  "Quickly recreate baseline and QA-oriented sample data when testing flows or resetting your sandbox.": "Recréez rapidement des données échantillon baseline et orientées QA lors des tests de flux ou de la remise à zéro du bac à sable.",
   "Theme mode": "Mode de thème",
+  "Theme": "Thème",
+  "Dark": "Sombre",
+  "Paper Blueprint (Light)": "Paper Blueprint (Clair)",
+  "Warm Brown (Light)": "Warm Brown (Clair)",
+  "Mist Gray (Light)": "Mist Gray (Clair)",
+  "Sage Paper (Light)": "Sage Paper (Clair)",
+  "Sand Slate (Light)": "Sand Slate (Clair)",
+  "Ice Blue (Light)": "Ice Blue (Clair)",
+  "Soft Teal (Light)": "Soft Teal (Clair)",
+  "Dusty Rose (Light)": "Dusty Rose (Clair)",
+  "Pale Olive (Light)": "Pale Olive (Clair)",
+  "Cloud Lavender (Light)": "Cloud Lavender (Clair)",
+  "Rose Quartz (Light)": "Rose Quartz (Clair)",
+  "Lavender Haze (Light)": "Lavender Haze (Clair)",
+  "Circle Mobility (Light)": "Circle Mobility (Clair)",
+  "Slate Neon (Dark)": "Slate Neon (Sombre)",
+  "Deep Green (Dark)": "Deep Green (Sombre)",
+  "Burgundy Noir (Dark)": "Burgundy Noir (Sombre)",
+  "Amber Night (Dark)": "Amber Night (Sombre)",
+  "Cyberpunk (Dark)": "Cyberpunk (Sombre)",
+  "Olive (Dark)": "Olive (Sombre)",
+  "Steel Blue (Dark)": "Steel Blue (Sombre)",
+  "Forest Graphite (Dark)": "Forest Graphite (Sombre)",
+  "Petrol Slate (Dark)": "Petrol Slate (Sombre)",
+  "Copper Night (Dark)": "Copper Night (Sombre)",
+  "Moss Taupe (Dark)": "Moss Taupe (Sombre)",
+  "Navy Ash (Dark)": "Navy Ash (Sombre)",
+  "Charcoal Plum (Dark)": "Charcoal Plum (Sombre)",
+  "Smoked Teal (Dark)": "Smoked Teal (Sombre)",
+  "Circle Mobility (Dark)": "Circle Mobility (Sombre)",
   "Table density": "Densité des tableaux",
   "Table font size": "Taille de police des tableaux",
   "Default sort column": "Colonne de tri par défaut",
@@ -97,9 +169,18 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Default wire section (mm²)": "Section de fil par défaut (mm²)",
   "Default auto-create linked nodes for connectors/splices": "Auto-création de nœuds liés par défaut pour connecteurs/épissures",
   "Reset all UI preferences": "Réinitialiser toutes les préférences UI",
+  "Apply language across all app screens (except changelog and import/export).": "Appliquer la langue à tous les écrans de l'app (hors changelog et import/export).",
+  "Keyboard shortcuts": "Raccourcis clavier",
+  "Connectors / Splices": "Connecteurs / Épissures",
   "Language": "Langue",
   "English": "English",
   "Français": "Français",
+  "Last import:": "Dernier import :",
+  "imported": "importé",
+  "skipped": "ignoré",
+  "warnings": "avertissements",
+  "errors": "erreurs",
+  "Sample workspace status": "État de l'espace échantillon",
   "Workspace:": "Espace :",
   "empty": "vide",
   "loaded": "chargé",
@@ -210,6 +291,53 @@ export function translateTextValue(locale: AppLocale, input: string): string {
   if (scrollToMatch !== null) {
     const scrollTarget = scrollToMatch[1] ?? "";
     return input.replace(trimmed, `Aller à ${translateTextValue(locale, scrollTarget).trim()}`);
+  }
+
+  const lastImportMatch =
+    /^Last import:\s*(\d+)\s+imported\s*\/\s*(\d+)\s+skipped(?:\s*\/\s*(\d+)\s+warnings)?(?:\s*\/\s*(\d+)\s+errors)?\.$/i.exec(
+      trimmed
+    );
+  if (lastImportMatch !== null) {
+    const importedCount = Number(lastImportMatch[1] ?? "0");
+    const skippedCount = Number(lastImportMatch[2] ?? "0");
+    const warningsCountRaw = lastImportMatch[3];
+    const errorsCountRaw = lastImportMatch[4];
+    let translated = `Dernier import : ${importedCount} importé${importedCount > 1 ? "s" : ""} / ${skippedCount} ignoré${skippedCount > 1 ? "s" : ""}`;
+    if (warningsCountRaw !== undefined) {
+      const warningsCount = Number(warningsCountRaw);
+      translated += ` / ${warningsCount} avertissement${warningsCount > 1 ? "s" : ""}`;
+    }
+    if (errorsCountRaw !== undefined) {
+      const errorsCount = Number(errorsCountRaw);
+      translated += ` / ${errorsCount} erreur${errorsCount > 1 ? "s" : ""}`;
+    }
+    translated += ".";
+    return input.replace(trimmed, translated);
+  }
+
+  const validationCounterMatch = /^(\d+)\s+validation issue(?:s)?(?:,\s+(\d+)\s+error(?:s)?)?(?:,\s+no errors)?$/i.exec(trimmed);
+  if (validationCounterMatch !== null) {
+    const issueCount = Number(validationCounterMatch[1] ?? "0");
+    const errorCountRaw = validationCounterMatch[2];
+    if (errorCountRaw !== undefined) {
+      const errorCount = Number(errorCountRaw);
+      return input.replace(
+        trimmed,
+        `${issueCount} issue${issueCount > 1 ? "s" : ""} de validation, ${errorCount} erreur${errorCount > 1 ? "s" : ""}`
+      );
+    }
+    return input.replace(trimmed, `${issueCount} issue${issueCount > 1 ? "s" : ""} de validation, aucune erreur`);
+  }
+
+  const issueCounterMatch = /^(\d+)\s+issue(?:s)?(?:,\s+(\d+)\s+error(?:s)?)?(?:,\s+no errors)?$/i.exec(trimmed);
+  if (issueCounterMatch !== null) {
+    const issueCount = Number(issueCounterMatch[1] ?? "0");
+    const errorCountRaw = issueCounterMatch[2];
+    if (errorCountRaw !== undefined) {
+      const errorCount = Number(errorCountRaw);
+      return input.replace(trimmed, `${issueCount} issue${issueCount > 1 ? "s" : ""}, ${errorCount} erreur${errorCount > 1 ? "s" : ""}`);
+    }
+    return input.replace(trimmed, `${issueCount} issue${issueCount > 1 ? "s" : ""}, aucune erreur`);
   }
 
   return input;

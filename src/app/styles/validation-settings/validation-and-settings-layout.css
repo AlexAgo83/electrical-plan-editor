@@ -237,6 +237,34 @@
   margin: 0;
 }
 
+.settings-panel .settings-grid > label.settings-locale-field {
+  gap: 0.38rem;
+  border: 1px solid rgba(153, 181, 203, 0.55);
+  border-radius: 0.6rem;
+  padding: 0.5rem 0.58rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(242, 249, 255, 0.82));
+}
+
+.settings-locale-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  font-weight: 600;
+}
+
+.settings-locale-icon {
+  width: 0.86rem;
+  height: 0.86rem;
+  flex: 0 0 0.86rem;
+}
+
+.settings-locale-hint {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: #47627a;
+}
+
 .settings-panel .settings-grid > label:not(.settings-checkbox) input,
 .settings-panel .settings-grid > label:not(.settings-checkbox) select {
   width: min(100%, 19rem);
@@ -256,6 +284,10 @@
 
 .settings-panel .settings-grid > label:not(.settings-checkbox) select {
   width: 100%;
+}
+
+.settings-locale-select {
+  font-weight: 600;
 }
 
 .settings-range-field {
