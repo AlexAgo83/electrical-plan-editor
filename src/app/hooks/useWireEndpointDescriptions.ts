@@ -41,9 +41,29 @@ export function useWireEndpointDescriptions({ connectorMap, spliceMap }: UseWire
     [connectorMap, spliceMap]
   );
 
+  const describeWireEndpointCsvParts = useCallback(
+    (endpoint: WireEndpoint): { endpointId: string; pin: string } => {
+      if (endpoint.kind === "connectorCavity") {
+        const connectorTechnicalId = connectorMap.get(endpoint.connectorId)?.technicalId ?? String(endpoint.connectorId);
+        return {
+          endpointId: connectorTechnicalId,
+          pin: `C${endpoint.cavityIndex}`
+        };
+      }
+
+      const spliceTechnicalId = spliceMap.get(endpoint.spliceId)?.technicalId ?? String(endpoint.spliceId);
+      return {
+        endpointId: spliceTechnicalId,
+        pin: `P${endpoint.portIndex}`
+      };
+    },
+    [connectorMap, spliceMap]
+  );
+
   return {
     describeWireEndpoint,
-    describeWireEndpointId
+    describeWireEndpointId,
+    describeWireEndpointCsvParts
   };
 }
 

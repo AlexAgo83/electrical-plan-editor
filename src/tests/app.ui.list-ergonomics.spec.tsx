@@ -1,5 +1,5 @@
 import { fireEvent, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createSampleNetworkState } from "../store";
 import {
   createConnectorOccupancyFilterState,
@@ -161,6 +161,60 @@ describe("App integration UI - list ergonomics", () => {
     fireEvent.change(within(wiresPanel).getByPlaceholderText("Technical ID"), { target: { value: "WIRE-B-SECONDARY" } });
 
     expect(within(wiresPanel).getByText("1 entry")).toBeInTheDocument();
+  });
+
+  it("exports wire CSV with split begin/end columns and without endpoints column", () => {
+    const originalCreateObjectUrl = Object.getOwnPropertyDescriptor(URL, "createObjectURL");
+    const originalRevokeObjectUrl = Object.getOwnPropertyDescriptor(URL, "revokeObjectURL");
+    const createObjectUrl = vi.fn((_blob: Blob) => "blob:test-wire-csv");
+    const OriginalBlob = Blob;
+    let capturedPayload: BlobPart | undefined;
+
+    try {
+      class BlobCapture extends OriginalBlob {
+        constructor(parts: BlobPart[] = [], options?: BlobPropertyBag) {
+          super(parts, options);
+          capturedPayload = parts[0];
+        }
+      }
+      (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = BlobCapture;
+      Object.defineProperty(URL, "createObjectURL", {
+        configurable: true,
+        writable: true,
+        value: createObjectUrl
+      });
+      Object.defineProperty(URL, "revokeObjectURL", {
+        configurable: true,
+        writable: true,
+        value: vi.fn()
+      });
+      vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+
+      renderAppWithState(createSampleNetworkState());
+      switchSubScreen("wire");
+      const wiresPanel = getPanelByHeading("Wires");
+      fireEvent.click(within(wiresPanel).getByRole("button", { name: "CSV" }));
+
+      const blobArg = createObjectUrl.mock.calls[0]?.[0];
+      if (!(blobArg instanceof Blob)) {
+        throw new Error("Expected captured wire CSV blob.");
+      }
+      if (typeof capturedPayload !== "string") {
+        throw new Error("Expected captured wire CSV payload.");
+      }
+      const headerLine = capturedPayload.split(/\r?\n/u, 1)[0] ?? "";
+      expect(headerLine).toContain("Begin ID,Begin pin,End ID,End pin");
+      expect(headerLine).not.toContain("Endpoints");
+    } finally {
+      (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = OriginalBlob;
+      vi.restoreAllMocks();
+      if (originalCreateObjectUrl !== undefined) {
+        Object.defineProperty(URL, "createObjectURL", originalCreateObjectUrl);
+      }
+      if (originalRevokeObjectUrl !== undefined) {
+        Object.defineProperty(URL, "revokeObjectURL", originalRevokeObjectUrl);
+      }
+    }
   });
 
   it("exposes a shared filter clear action that resets the query and restores rows and footer count", () => {

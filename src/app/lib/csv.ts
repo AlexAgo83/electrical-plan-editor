@@ -1,4 +1,7 @@
 export type CsvCellValue = string | number | boolean | null | undefined;
+export interface DownloadCsvFileOptions {
+  includeUtf8Bom?: boolean;
+}
 
 function formatCsvCell(value: CsvCellValue): string {
   if (value === null || value === undefined) {
@@ -26,13 +29,19 @@ export function buildCsvContent(headers: string[], rows: CsvCellValue[][]): stri
   return lines.join("\r\n");
 }
 
-export function downloadCsvFile(filenameBase: string, headers: string[], rows: CsvCellValue[][]): void {
+export function downloadCsvFile(
+  filenameBase: string,
+  headers: string[],
+  rows: CsvCellValue[][],
+  options?: DownloadCsvFileOptions
+): void {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return;
   }
 
   const csvContent = buildCsvContent(headers, rows);
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+  const payload = options?.includeUtf8Bom ? `\uFEFF${csvContent}` : csvContent;
+  const blob = new Blob([payload], { type: "text/csv;charset=utf-8" });
   const blobUrl = URL.createObjectURL(blob);
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const link = document.createElement("a");

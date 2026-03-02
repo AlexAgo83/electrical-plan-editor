@@ -29,7 +29,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     selectedWire,
     showEntityTables = true,
     describeWireEndpoint,
-    describeWireEndpointId,
+    describeWireEndpointCsvParts,
     getSortIndicator: _getSortIndicator,
     wireForcedRouteInput,
     setWireForcedRouteInput,
@@ -113,29 +113,39 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           className="filter-chip table-export-button"
           onClick={() => {
             const headers = showWireRouteModeColumn
-              ? ["Name", "Technical ID", "Color", "Endpoints", "Begin", "End", "Section (mm²)", "Length (mm)", "Route mode"]
-              : ["Name", "Technical ID", "Color", "Endpoints", "Begin", "End", "Section (mm²)", "Length (mm)"];
+              ? ["Name", "Technical ID", "Color", "Begin ID", "Begin pin", "End ID", "End pin", "Section (mm²)", "Length (mm)", "Route mode"]
+              : ["Name", "Technical ID", "Color", "Begin ID", "Begin pin", "End ID", "End pin", "Section (mm²)", "Length (mm)"];
             const rows = sortedVisibleWires.map((wire) => {
-              const endpoints = `${describeWireEndpoint(wire.endpointA)} -> ${describeWireEndpoint(wire.endpointB)}`;
-              const begin = describeWireEndpointId(wire.endpointA);
-              const end = describeWireEndpointId(wire.endpointB);
+              const begin = describeWireEndpointCsvParts(wire.endpointA);
+              const end = describeWireEndpointCsvParts(wire.endpointB);
               const colorCode = getWireColorCsvValue(wire);
               if (showWireRouteModeColumn) {
                 return [
                   wire.name,
                   wire.technicalId,
                   colorCode,
-                  endpoints,
-                  begin,
-                  end,
+                  begin.endpointId,
+                  begin.pin,
+                  end.endpointId,
+                  end.pin,
                   wire.sectionMm2,
                   wire.lengthMm,
                   wire.isRouteLocked ? "Locked" : "Auto"
                 ];
               }
-              return [wire.name, wire.technicalId, colorCode, endpoints, begin, end, wire.sectionMm2, wire.lengthMm];
+              return [
+                wire.name,
+                wire.technicalId,
+                colorCode,
+                begin.endpointId,
+                begin.pin,
+                end.endpointId,
+                end.pin,
+                wire.sectionMm2,
+                wire.lengthMm
+              ];
             });
-            downloadCsvFile("analysis-wires", headers, rows);
+            downloadCsvFile("analysis-wires", headers, rows, { includeUtf8Bom: true });
           }}
           disabled={sortedVisibleWires.length === 0}
         >
