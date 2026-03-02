@@ -5,7 +5,7 @@ A local-first electrical network editor focused on deterministic modeling, routi
 The project models connectors, splices, nodes, segments, and wires as a graph, computes shortest routes, and keeps wire lengths synchronized with segment changes.
 
 [![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
-[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.0.1-4C8BF5)
+[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.0.2-4C8BF5)
 
 <img width="1173" height="810" alt="image" src="https://github.com/user-attachments/assets/b4d0b4a9-1fee-43a4-bfb1-ae72caf97302" />
 <img width="1159" height="280" alt="image" src="https://github.com/user-attachments/assets/7bfad15a-cc62-446a-abc6-b06c15ec1466" />
@@ -31,7 +31,7 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 
 - Production: [https://e-plan-editor.onrender.com](https://e-plan-editor.onrender.com)
 - Hosting: Render Static Site (Blueprint via `render.yaml`)
-- Current version: `1.0.1`
+- Current version: `1.0.2`
 - CI status: see the GitHub Actions badge above
 
 ## Features
