@@ -166,7 +166,10 @@ describe("App integration UI - list ergonomics", () => {
   it("exports wire CSV with split begin/end columns and without endpoints column", () => {
     const originalCreateObjectUrl = Object.getOwnPropertyDescriptor(URL, "createObjectURL");
     const originalRevokeObjectUrl = Object.getOwnPropertyDescriptor(URL, "revokeObjectURL");
-    const createObjectUrl = vi.fn((_blob: Blob) => "blob:test-wire-csv");
+    const createObjectUrl = vi.fn((blob: Blob) => {
+      void blob;
+      return "blob:test-wire-csv";
+    });
     const OriginalBlob = Blob;
     let capturedPayload: BlobPart | undefined;
 
