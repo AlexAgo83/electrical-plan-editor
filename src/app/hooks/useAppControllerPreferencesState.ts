@@ -35,8 +35,8 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultSnapToGrid, setCanvasDefaultSnapToGrid] = useState(true);
   const [canvasDefaultLockEntityMovement, setCanvasDefaultLockEntityMovement] = useState(false);
   const [canvasDefaultShowInfoPanels, setCanvasDefaultShowInfoPanels] = useState(true);
-  const [canvasDefaultShowSegmentNames, setCanvasDefaultShowSegmentNames] = useState(true);
-  const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(false);
+  const [canvasDefaultShowSegmentNames, setCanvasDefaultShowSegmentNames] = useState(false);
+  const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(true);
   const [canvasDefaultShowCableCallouts, setCanvasDefaultShowCableCallouts] = useState(false);
   const [canvasDefaultShowSelectedCalloutOnly, setCanvasDefaultShowSelectedCalloutOnly] = useState(false);
   const [canvasDefaultLabelStrokeMode, setCanvasDefaultLabelStrokeMode] = useState<CanvasLabelStrokeMode>("normal");
@@ -44,7 +44,7 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultCalloutTextSize, setCanvasDefaultCalloutTextSize] = useState<CanvasCalloutTextSize>("normal");
   const [canvasDefaultLabelRotationDegrees, setCanvasDefaultLabelRotationDegrees] =
     useState<CanvasLabelRotationDegrees>(0);
-  const [canvasDefaultAutoSegmentLabelRotation, setCanvasDefaultAutoSegmentLabelRotation] = useState(false);
+  const [canvasDefaultAutoSegmentLabelRotation, setCanvasDefaultAutoSegmentLabelRotation] = useState(true);
   const [canvasShowCalloutWireNames, setCanvasShowCalloutWireNames] = useState(false);
   const [canvasZoomInvariantNodeShapes, setCanvasZoomInvariantNodeShapes] = useState(true);
   const [canvasNodeShapeSizePercent, setCanvasNodeShapeSizePercent] = useState(50);

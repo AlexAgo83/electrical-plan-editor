@@ -258,9 +258,20 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
+            Auto segment label rotation
+            <select
+              value={canvasDefaultAutoSegmentLabelRotation ? "yes" : "no"}
+              onChange={(event) => setCanvasDefaultAutoSegmentLabelRotation(event.target.value === "yes")}
+            >
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </label>
+          <label className="settings-field">
             2D label rotation
             <select
               value={String(canvasDefaultLabelRotationDegrees)}
+              disabled={canvasDefaultAutoSegmentLabelRotation}
               onChange={(event) => setCanvasDefaultLabelRotationDegrees(Number(event.target.value) as CanvasLabelRotationDegrees)}
             >
               <option value="-90">-90°</option>
@@ -270,16 +281,6 @@ export function SettingsWorkspaceContent({
               <option value="20">20°</option>
               <option value="45">45°</option>
               <option value="90">90°</option>
-            </select>
-          </label>
-          <label className="settings-field">
-            Auto segment label rotation
-            <select
-              value={canvasDefaultAutoSegmentLabelRotation ? "yes" : "no"}
-              onChange={(event) => setCanvasDefaultAutoSegmentLabelRotation(event.target.value === "yes")}
-            >
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
             </select>
           </label>
           <label className="settings-field">
