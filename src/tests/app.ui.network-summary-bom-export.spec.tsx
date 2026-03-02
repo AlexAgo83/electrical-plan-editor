@@ -12,7 +12,7 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - network summary BOM export", () => {
-  it("renders BOM to the right of PNG and uses the CSV export icon", () => {
+  it("renders BOM to the right of SVG and uses the CSV export icon", () => {
     const catalogItemId = asCatalogItemId("CAT-BOM");
     const withCatalog = appReducer(
       appReducer(
@@ -56,13 +56,13 @@ describe("App integration UI - network summary BOM export", () => {
       switchScreenDrawerAware("modeling");
 
       const networkSummaryPanel = getPanelByHeading("Network summary");
-      const exportPngButton = within(networkSummaryPanel).getByRole("button", { name: "PNG" });
+      const exportSvgButton = within(networkSummaryPanel).getByRole("button", { name: "SVG" });
       const exportBomButton = within(networkSummaryPanel).getByRole("button", { name: "BOM" });
       expect(within(networkSummaryPanel).queryByText(/BOM CSV pricing:/i)).toBeNull();
       expect(exportBomButton).not.toHaveAttribute("title");
 
       const actionButtons = Array.from(networkSummaryPanel.querySelectorAll("header .workspace-tab"));
-      expect(actionButtons.indexOf(exportBomButton)).toBeGreaterThan(actionButtons.indexOf(exportPngButton));
+      expect(actionButtons.indexOf(exportBomButton)).toBeGreaterThan(actionButtons.indexOf(exportSvgButton));
       expect(exportBomButton.querySelector(".table-export-icon")).not.toBeNull();
 
       fireEvent.click(exportBomButton);

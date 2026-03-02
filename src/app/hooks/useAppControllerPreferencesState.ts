@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { ThemeMode } from "../../store";
 import type {
   CanvasCalloutTextSize,
+  CanvasExportFormat,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
@@ -41,6 +42,7 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultLabelRotationDegrees, setCanvasDefaultLabelRotationDegrees] =
     useState<CanvasLabelRotationDegrees>(0);
   const [canvasDefaultAutoSegmentLabelRotation, setCanvasDefaultAutoSegmentLabelRotation] = useState(false);
+  const [canvasExportFormat, setCanvasExportFormat] = useState<CanvasExportFormat>("svg");
   const [canvasPngExportIncludeBackground, setCanvasPngExportIncludeBackground] = useState(true);
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
@@ -100,6 +102,8 @@ export function useAppControllerPreferencesState() {
     setCanvasDefaultLabelRotationDegrees,
     canvasDefaultAutoSegmentLabelRotation,
     setCanvasDefaultAutoSegmentLabelRotation,
+    canvasExportFormat,
+    setCanvasExportFormat,
     canvasPngExportIncludeBackground,
     setCanvasPngExportIncludeBackground,
     showShortcutHints,

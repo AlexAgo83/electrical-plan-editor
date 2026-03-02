@@ -276,6 +276,33 @@ describe("App integration UI - settings canvas render", () => {
     expect(within(restoredCanvasToolsSettingsPanel).getByLabelText("Include background in PNG export")).not.toBeChecked();
   });
 
+  it("uses SVG export by default and persists canvas export format changes", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const canvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
+    const exportFormatSelect = within(canvasToolsSettingsPanel).getByLabelText("Export format");
+    expect(exportFormatSelect).toHaveValue("svg");
+
+    switchScreenDrawerAware("analysis");
+    let networkSummaryPanel = getPanelByHeading("Network summary");
+    expect(within(networkSummaryPanel).getByRole("button", { name: "SVG" })).toBeInTheDocument();
+
+    switchScreenDrawerAware("settings");
+    fireEvent.change(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Export format"), {
+      target: { value: "png" }
+    });
+
+    switchScreenDrawerAware("analysis");
+    networkSummaryPanel = getPanelByHeading("Network summary");
+    expect(within(networkSummaryPanel).getByRole("button", { name: "PNG" })).toBeInTheDocument();
+
+    firstRender.unmount();
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    expect(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Export format")).toHaveValue("png");
+  });
+
   it("persists the 0 degree 2d label rotation preset across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 

@@ -24,6 +24,7 @@ import type { ShortestRouteResult } from "../../core/pathfinding";
 import type { SubNetworkSummary } from "../../store";
 import type {
   CanvasCalloutTextSize,
+  CanvasExportFormat,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
@@ -117,6 +118,7 @@ export interface NetworkSummaryPanelProps {
   calloutTextSize: CanvasCalloutTextSize;
   labelRotationDegrees: CanvasLabelRotationDegrees;
   autoSegmentLabelRotation: boolean;
+  canvasExportFormat: CanvasExportFormat;
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
   lockEntityMovement: boolean;
@@ -597,6 +599,7 @@ export function NetworkSummaryPanel({
   calloutTextSize,
   labelRotationDegrees,
   autoSegmentLabelRotation,
+  canvasExportFormat,
   showNetworkGrid,
   snapNodesToGrid,
   lockEntityMovement,
@@ -1184,6 +1187,47 @@ export function NetworkSummaryPanel({
     stopNetworkNodeDrag();
   }, [stopCalloutDrag, stopNetworkNodeDrag]);
 
+  const handleExportPlanAsSvg = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const sourceSvg = networkSvgRef.current;
+    if (sourceSvg === null) {
+      return;
+    }
+
+    const viewBoxWidth = sourceSvg.viewBox.baseVal.width;
+    const viewBoxHeight = sourceSvg.viewBox.baseVal.height;
+    const fallbackRect = sourceSvg.getBoundingClientRect();
+    const exportWidth = Math.max(1, Math.round(viewBoxWidth > 0 ? viewBoxWidth : fallbackRect.width));
+    const exportHeight = Math.max(1, Math.round(viewBoxHeight > 0 ? viewBoxHeight : fallbackRect.height));
+    const svgClone = sourceSvg.cloneNode(true) as SVGSVGElement;
+    svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    svgClone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+    svgClone.setAttribute("width", String(exportWidth));
+    svgClone.setAttribute("height", String(exportHeight));
+    if (!svgClone.getAttribute("viewBox")) {
+      svgClone.setAttribute("viewBox", `0 0 ${exportWidth} ${exportHeight}`);
+    }
+    copyComputedStylesToSvgClone(sourceSvg, svgClone);
+
+    const serializedSvg = new XMLSerializer().serializeToString(svgClone);
+    const blob = new Blob([serializedSvg], { type: "image/svg+xml;charset=utf-8" });
+    const blobUrl = URL.createObjectURL(blob);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const downloadLink = document.createElement("a");
+    downloadLink.href = blobUrl;
+    downloadLink.download = `network-plan-${timestamp}.svg`;
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+    window.setTimeout(() => {
+      URL.revokeObjectURL(blobUrl);
+    }, 0);
+  }, []);
+
   const handleExportPlanAsPng = useCallback(() => {
     if (typeof window === "undefined") {
       return;
@@ -1251,6 +1295,14 @@ export function NetworkSummaryPanel({
     };
     image.src = svgUrl;
   }, [pngExportIncludeBackground]);
+
+  const handleExportPlan = useCallback(() => {
+    if (canvasExportFormat === "png") {
+      handleExportPlanAsPng();
+      return;
+    }
+    handleExportPlanAsSvg();
+  }, [canvasExportFormat, handleExportPlanAsPng, handleExportPlanAsSvg]);
 
   function handleNetworkNodeKeyDown(event: ReactKeyboardEvent<SVGGElement>, nodeId: NodeId): void {
     if (event.key !== "Enter" && event.key !== " ") {
@@ -1486,11 +1538,11 @@ export function NetworkSummaryPanel({
             <button
               type="button"
               className="workspace-tab network-summary-export-button"
-              onClick={handleExportPlanAsPng}
+              onClick={handleExportPlan}
               disabled={nodes.length === 0}
             >
               <span className="network-summary-export-icon" aria-hidden="true" />
-              PNG
+              {canvasExportFormat.toUpperCase()}
             </button>
             <button
               type="button"
