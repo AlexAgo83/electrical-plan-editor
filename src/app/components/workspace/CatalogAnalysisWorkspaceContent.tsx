@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import type { CatalogItemId, Connector, ConnectorId, Splice, SpliceId } from "../../../core/entities";
+import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 
 interface CatalogAnalysisWorkspaceContentProps {
@@ -25,7 +26,7 @@ function CatalogUsageTableSection({
 }: {
   heading: "Connectors" | "Splices";
   rows: Array<Connector | Splice>;
-  technicalIdLabel: "Technical ID";
+  technicalIdLabel: string;
   onGoTo: (id: string) => void;
   createLabel: "Create Connector" | "Create Splice";
   createIconClass: "is-connectors" | "is-splices";
@@ -102,6 +103,8 @@ export function CatalogAnalysisWorkspaceContent({
   onOpenConnector,
   onOpenSplice
 }: CatalogAnalysisWorkspaceContentProps): ReactElement {
+  const isMobileViewport = useIsMobileViewport();
+
   if (!isCatalogSubScreen) {
     return <section className="panel-grid analysis-panel-grid" hidden />;
   }
@@ -136,7 +139,7 @@ export function CatalogAnalysisWorkspaceContent({
           <CatalogUsageTableSection
             heading="Connectors"
             rows={linkedConnectors}
-            technicalIdLabel="Technical ID"
+            technicalIdLabel={isMobileViewport ? "ID" : "Technical ID"}
             createLabel="Create Connector"
             createIconClass="is-connectors"
             onCreate={() => onCreateConnectorFromCatalog(selectedCatalogItemId)}
@@ -145,7 +148,7 @@ export function CatalogAnalysisWorkspaceContent({
           <CatalogUsageTableSection
             heading="Splices"
             rows={linkedSplices}
-            technicalIdLabel="Technical ID"
+            technicalIdLabel={isMobileViewport ? "ID" : "Technical ID"}
             createLabel="Create Splice"
             createIconClass="is-splices"
             onCreate={() => onCreateSpliceFromCatalog(selectedCatalogItemId)}

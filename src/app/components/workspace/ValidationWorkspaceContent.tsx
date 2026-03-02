@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactElement } from "react";
+import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
@@ -47,6 +48,7 @@ export function ValidationWorkspaceContent({
   validationWarningCount
 }: ValidationWorkspaceContentProps): ReactElement {
   type ValidationTableSortField = "severity" | "issue" | "actions";
+  const isMobileViewport = useIsMobileViewport();
   const [validationTableSort, setValidationTableSort] = useState<{ field: ValidationTableSortField; direction: "asc" | "desc" }>({
     field: "severity",
     direction: "asc"
@@ -196,17 +198,19 @@ export function ValidationWorkspaceContent({
                 <h3>{category}</h3>
                 <table className="data-table validation-issues-table">
                   <colgroup>
-                    <col className="validation-col-severity" />
+                    {!isMobileViewport ? <col className="validation-col-severity" /> : null}
                     <col className="validation-col-issue" />
                     <col className="validation-col-actions" />
                   </colgroup>
                   <thead>
                     <tr>
-                      <th aria-sort={getTableAriaSort(validationTableSort, "severity")}>
-                        <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("severity")}>
-                          Severity <span className="sort-indicator">{validationTableSortIndicator("severity")}</span>
-                        </button>
-                      </th>
+                      {!isMobileViewport ? (
+                        <th aria-sort={getTableAriaSort(validationTableSort, "severity")}>
+                          <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("severity")}>
+                            Severity <span className="sort-indicator">{validationTableSortIndicator("severity")}</span>
+                          </button>
+                        </th>
+                      ) : null}
                       <th aria-sort={getTableAriaSort(validationTableSort, "issue")}>
                         <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("issue")}>
                           Issue <span className="sort-indicator">{validationTableSortIndicator("issue")}</span>
@@ -240,11 +244,13 @@ export function ValidationWorkspaceContent({
                           setValidationIssueCursorFromIssue(issue);
                         }}
                       >
-                        <td>
-                          <span className={issue.severity === "error" ? "status-chip is-error" : "status-chip is-warning"}>
-                            {issue.severity.toUpperCase()}
-                          </span>
-                        </td>
+                        {!isMobileViewport ? (
+                          <td>
+                            <span className={issue.severity === "error" ? "status-chip is-error" : "status-chip is-warning"}>
+                              {issue.severity.toUpperCase()}
+                            </span>
+                          </td>
+                        ) : null}
                         <td>{issue.message}</td>
                         <td className="validation-actions-cell">
                           <button

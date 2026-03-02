@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
@@ -139,6 +140,7 @@ export function ModelingPrimaryTables({
   const lastAutoFocusedConnectorIdRef = useRef<ConnectorId | null>(null);
   const lastAutoFocusedSpliceIdRef = useRef<SpliceId | null>(null);
   const lastAutoFocusedNodeIdRef = useRef<NodeId | null>(null);
+  const isMobileViewport = useIsMobileViewport();
   const previousConnectorFormModeRef = useRef<typeof connectorFormMode>(connectorFormMode);
   const previousSpliceFormModeRef = useRef<typeof spliceFormMode>(spliceFormMode);
   const previousNodeFormModeRef = useRef<typeof nodeFormMode>(nodeFormMode);
@@ -366,19 +368,10 @@ export function ModelingPrimaryTables({
   return (
     <>
       <article className="panel" hidden={!isConnectorSubScreen} data-onboarding-panel="modeling-connectors">
-        <header className="list-panel-header">
+        <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Connectors</h2>
           <div className="list-panel-header-tools">
-            <div className="list-panel-header-tools-row">
-              <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
-                {([
-                  ["all", "All"],
-                  ["occupied", "Occupied"],
-                  ["free", "Free"]
-                ] as const).map(([filterId, label]) => (
-                  <button key={filterId} type="button" className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setConnectorOccupancyFilter(filterId)}>{label}</button>
-                ))}
-              </div>
+            <div className="list-panel-header-tools-row is-title-actions">
               <button
                 type="button"
                 className="filter-chip table-export-button"
@@ -411,7 +404,16 @@ export function ModelingPrimaryTables({
                 </button>
               ) : null}
             </div>
-            <div className="list-panel-header-tools-row">
+            <div className="list-panel-header-tools-row is-filter-row">
+              <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
+                {([
+                  ["all", "All"],
+                  ["occupied", "Occupied"],
+                  ["free", "Free"]
+                ] as const).map(([filterId, label]) => (
+                  <button key={filterId} type="button" className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setConnectorOccupancyFilter(filterId)}>{label}</button>
+                ))}
+              </div>
               <TableFilterBar
                 label="Filter"
                 fieldLabel="Connector filter field"
@@ -442,10 +444,10 @@ export function ModelingPrimaryTables({
               <thead>
               <tr>
                 <th aria-sort={getTableAriaSort(connectorTableSort, "name")}><button type="button" className="sort-header-button" onClick={() => { setConnectorTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); setConnectorSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{connectorSortIndicator("name")}</span></button></th>
-                <th aria-sort={getTableAriaSort(connectorTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setConnectorTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setConnectorSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>Technical ID <span className="sort-indicator">{connectorSortIndicator("technicalId")}</span></button></th>
+                <th aria-sort={getTableAriaSort(connectorTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setConnectorTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setConnectorSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{connectorSortIndicator("technicalId")}</span></button></th>
                 <th aria-sort={getTableAriaSort(connectorTableSort, "manufacturerReference")}><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{connectorSortIndicator("manufacturerReference")}</span></button></th>
                 <th aria-sort={getTableAriaSort(connectorTableSort, "cavityCount")}><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "cavityCount", direction: current.field === "cavityCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ways <span className="sort-indicator">{connectorSortIndicator("cavityCount")}</span></button></th>
-                <th aria-sort={getTableAriaSort(connectorTableSort, "occupiedCount")}><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "occupiedCount", direction: current.field === "occupiedCount" && current.direction === "asc" ? "desc" : "asc" }))}>Occupied <span className="sort-indicator">{connectorSortIndicator("occupiedCount")}</span></button></th>
+                <th aria-sort={getTableAriaSort(connectorTableSort, "occupiedCount")}><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "occupiedCount", direction: current.field === "occupiedCount" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Occup." : "Occupied"} <span className="sort-indicator">{connectorSortIndicator("occupiedCount")}</span></button></th>
               </tr>
               </thead>
               <tbody>
@@ -509,19 +511,10 @@ export function ModelingPrimaryTables({
       </article>
 
       <article className="panel" hidden={!isSpliceSubScreen} data-onboarding-panel="modeling-splices">
-        <header className="list-panel-header">
+        <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Splices</h2>
           <div className="list-panel-header-tools">
-            <div className="list-panel-header-tools-row">
-              <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
-                {([
-                  ["all", "All"],
-                  ["occupied", "Occupied"],
-                  ["free", "Free"]
-                ] as const).map(([filterId, label]) => (
-                  <button key={filterId} type="button" className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSpliceOccupancyFilter(filterId)}>{label}</button>
-                ))}
-              </div>
+            <div className="list-panel-header-tools-row is-title-actions">
               <button
                 type="button"
                 className="filter-chip table-export-button"
@@ -554,7 +547,16 @@ export function ModelingPrimaryTables({
                 </button>
               ) : null}
             </div>
-            <div className="list-panel-header-tools-row">
+            <div className="list-panel-header-tools-row is-filter-row">
+              <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
+                {([
+                  ["all", "All"],
+                  ["occupied", "Occupied"],
+                  ["free", "Free"]
+                ] as const).map(([filterId, label]) => (
+                  <button key={filterId} type="button" className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSpliceOccupancyFilter(filterId)}>{label}</button>
+                ))}
+              </div>
               <TableFilterBar
                 label="Filter"
                 fieldLabel="Splice filter field"
@@ -585,7 +587,7 @@ export function ModelingPrimaryTables({
               <thead>
               <tr>
                 <th aria-sort={getTableAriaSort(spliceTableSort, "name")}><button type="button" className="sort-header-button" onClick={() => { setSpliceTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); setSpliceSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{spliceSortIndicator("name")}</span></button></th>
-                <th aria-sort={getTableAriaSort(spliceTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setSpliceTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setSpliceSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>Technical ID <span className="sort-indicator">{spliceSortIndicator("technicalId")}</span></button></th>
+                <th aria-sort={getTableAriaSort(spliceTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setSpliceTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setSpliceSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{spliceSortIndicator("technicalId")}</span></button></th>
                 <th aria-sort={getTableAriaSort(spliceTableSort, "manufacturerReference")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{spliceSortIndicator("manufacturerReference")}</span></button></th>
                 <th aria-sort={getTableAriaSort(spliceTableSort, "portCount")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "portCount", direction: current.field === "portCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ports <span className="sort-indicator">{spliceSortIndicator("portCount")}</span></button></th>
                 <th aria-sort={getTableAriaSort(spliceTableSort, "branchCount")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "branchCount", direction: current.field === "branchCount" && current.direction === "asc" ? "desc" : "asc" }))}>Branches <span className="sort-indicator">{spliceSortIndicator("branchCount")}</span></button></th>
@@ -652,20 +654,10 @@ export function ModelingPrimaryTables({
       </article>
 
       <article className="panel" hidden={!isNodeSubScreen} data-onboarding-panel="modeling-nodes">
-        <header className="list-panel-header">
+        <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Nodes</h2>
           <div className="list-panel-header-tools">
-            <div className="list-panel-header-tools-row">
-              <div className="chip-group list-panel-filters" role="group" aria-label="Node kind filter">
-                {([
-                  ["all", "All"],
-                  ["connector", "Connector"],
-                  ["splice", "Splice"],
-                  ["intermediate", "Intermediate"]
-                ] as const).map(([kindId, label]) => (
-                  <button key={kindId} type="button" className={nodeKindFilter === kindId ? "filter-chip is-active" : "filter-chip"} onClick={() => setNodeKindFilter(kindId)}>{label}</button>
-                ))}
-              </div>
+            <div className="list-panel-header-tools-row is-title-actions">
               <button
                 type="button"
                 className="filter-chip table-export-button"
@@ -698,7 +690,17 @@ export function ModelingPrimaryTables({
                 </button>
               ) : null}
             </div>
-            <div className="list-panel-header-tools-row">
+            <div className="list-panel-header-tools-row is-filter-row">
+              <div className="chip-group list-panel-filters" role="group" aria-label="Node kind filter">
+                {([
+                  ["all", "All"],
+                  ["connector", "Connector"],
+                  ["splice", "Splice"],
+                  ["intermediate", "Intermediate"]
+                ] as const).map(([kindId, label]) => (
+                  <button key={kindId} type="button" className={nodeKindFilter === kindId ? "filter-chip is-active" : "filter-chip"} onClick={() => setNodeKindFilter(kindId)}>{label}</button>
+                ))}
+              </div>
               <TableFilterBar
                 label="Filter"
                 fieldLabel="Node filter field"
@@ -731,7 +733,7 @@ export function ModelingPrimaryTables({
               <tr>
                 <th aria-sort={getTableAriaSort(nodeTableSort, "id")}><button type="button" className="sort-header-button" onClick={() => { setNodeTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" })); setNodeIdSortDirection((current) => current === "asc" ? "desc" : "asc"); }}>ID <span className="sort-indicator">{nodeSortIndicator("id")}</span></button></th>
                 {showNodeKindColumn ? <th aria-sort={getTableAriaSort(nodeTableSort, "kind")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "kind", direction: current.field === "kind" && current.direction === "asc" ? "desc" : "asc" }))}>Kind <span className="sort-indicator">{nodeSortIndicator("kind")}</span></button></th> : null}
-                <th aria-sort={getTableAriaSort(nodeTableSort, "reference")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "reference", direction: current.field === "reference" && current.direction === "asc" ? "desc" : "asc" }))}>Reference <span className="sort-indicator">{nodeSortIndicator("reference")}</span></button></th>
+                <th aria-sort={getTableAriaSort(nodeTableSort, "reference")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "reference", direction: current.field === "reference" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Ref." : "Reference"} <span className="sort-indicator">{nodeSortIndicator("reference")}</span></button></th>
                 <th aria-sort={getTableAriaSort(nodeTableSort, "linkedSegments")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "linkedSegments", direction: current.field === "linkedSegments" && current.direction === "asc" ? "desc" : "asc" }))}>Linked segments <span className="sort-indicator">{nodeSortIndicator("linkedSegments")}</span></button></th>
               </tr>
               </thead>

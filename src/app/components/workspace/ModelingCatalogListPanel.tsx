@@ -1,5 +1,6 @@
 import { useMemo, useState, type ChangeEvent, type ReactElement, type RefObject } from "react";
 import type { CatalogItem, CatalogItemId } from "../../../core/entities";
+import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { compareSortableValues } from "../../lib/app-utils-shared";
 import { formatPriceWithCurrencySymbol } from "../../lib/pricing";
@@ -48,6 +49,7 @@ export function ModelingCatalogListPanel({
   catalogCsvLastImportSummaryLine = null,
   onOpenCatalogOnboardingHelp
 }: ModelingCatalogListPanelProps): ReactElement {
+  const isMobileViewport = useIsMobileViewport();
   const [filterField, setFilterField] = useState<CatalogFilterField>("any");
   const [filterQuery, setFilterQuery] = useState("");
   const [sortState, setSortState] = useState<{ field: CatalogSortField; direction: SortDirection }>({
@@ -106,10 +108,10 @@ export function ModelingCatalogListPanel({
 
   return (
     <article className="panel" hidden={!isCatalogSubScreen} data-onboarding-panel="modeling-catalog">
-      <header className="list-panel-header">
+      <header className="list-panel-header list-panel-header-mobile-inline-tools">
         <h2>Catalog</h2>
         <div className="list-panel-header-tools">
-          <div className="list-panel-header-tools-row">
+          <div className="list-panel-header-tools-row is-title-actions">
             {onExportCatalogCsv !== undefined ? (
               <button
                 type="button"
@@ -128,7 +130,7 @@ export function ModelingCatalogListPanel({
               </button>
             ) : null}
           </div>
-          <div className="list-panel-header-tools-row">
+          <div className="list-panel-header-tools-row is-filter-row">
             <TableFilterBar
               label="Filter"
               fieldLabel="Catalog filter field"
@@ -169,7 +171,8 @@ export function ModelingCatalogListPanel({
               <tr>
                 <th aria-sort={getTableAriaSort(sortState, "manufacturerReference")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("manufacturerReference")}>
-                    Manufacturer ref <span className="sort-indicator">{sortIndicator("manufacturerReference")}</span>
+                    {isMobileViewport ? "Mnf ref" : "Manufacturer ref"}{" "}
+                    <span className="sort-indicator">{sortIndicator("manufacturerReference")}</span>
                   </button>
                 </th>
                 <th aria-sort={getTableAriaSort(sortState, "name")}>
@@ -179,12 +182,13 @@ export function ModelingCatalogListPanel({
                 </th>
                 <th aria-sort={getTableAriaSort(sortState, "connectionCount")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("connectionCount")}>
-                    Connections <span className="sort-indicator">{sortIndicator("connectionCount")}</span>
+                    {isMobileViewport ? "Con." : "Connections"} <span className="sort-indicator">{sortIndicator("connectionCount")}</span>
                   </button>
                 </th>
                 <th aria-sort={getTableAriaSort(sortState, "unitPriceExclTax")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("unitPriceExclTax")}>
-                    Unit price HT ({workspaceCurrencyCode}) <span className="sort-indicator">{sortIndicator("unitPriceExclTax")}</span>
+                    {isMobileViewport ? "Price" : `Unit price HT (${workspaceCurrencyCode})`}{" "}
+                    <span className="sort-indicator">{sortIndicator("unitPriceExclTax")}</span>
                   </button>
                 </th>
               </tr>
@@ -226,7 +230,7 @@ export function ModelingCatalogListPanel({
         </button>
         {onOpenCatalogCsvImportPicker !== undefined ? (
           <button type="button" onClick={onOpenCatalogCsvImportPicker}>
-            Import CSV
+            {isMobileViewport ? "Import" : "Import CSV"}
           </button>
         ) : null}
         <button

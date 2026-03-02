@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { getWireColorSortValue } from "../../../core/cableColors";
+import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
@@ -108,6 +109,7 @@ export function ModelingSecondaryTables({
   const wireRowRefs = useRef<Partial<Record<WireId, HTMLTableRowElement | null>>>({});
   const lastAutoFocusedSegmentIdRef = useRef<SegmentId | null>(null);
   const lastAutoFocusedWireIdRef = useRef<WireId | null>(null);
+  const isMobileViewport = useIsMobileViewport();
   const previousSegmentFormModeRef = useRef<typeof segmentFormMode>(segmentFormMode);
   const previousWireFormModeRef = useRef<typeof wireFormMode>(wireFormMode);
   const focusedSegment =
@@ -115,7 +117,7 @@ export function ModelingSecondaryTables({
   const focusedWire =
     selectedWireId === null ? null : (visibleWires.find((wire) => wire.id === selectedWireId) ?? null);
   const showSegmentSubNetworkColumn = segmentSubNetworkFilter !== "default";
-  const showWireRouteModeColumn = wireRouteFilter === "all";
+  const showWireRouteModeColumn = wireRouteFilter === "all" && !isMobileViewport;
   const segmentFilterPlaceholder =
     segmentFilterField === "id"
       ? "Segment ID"
@@ -282,19 +284,10 @@ export function ModelingSecondaryTables({
   return (
     <>
       <article className="panel" hidden={!isSegmentSubScreen} data-onboarding-panel="modeling-segments">
-        <header className="list-panel-header">
+        <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Segments</h2>
           <div className="list-panel-header-tools">
-            <div className="list-panel-header-tools-row">
-              <div className="chip-group list-panel-filters" role="group" aria-label="Segment sub-network filter">
-                {([
-                  ["all", "All"],
-                  ["default", "Default"],
-                  ["tagged", "Tagged"]
-                ] as const).map(([filterId, label]) => (
-                  <button key={filterId} type="button" className={segmentSubNetworkFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSegmentSubNetworkFilter(filterId)}>{label}</button>
-                ))}
-              </div>
+            <div className="list-panel-header-tools-row is-title-actions">
               <button
                 type="button"
                 className="filter-chip table-export-button"
@@ -328,7 +321,16 @@ export function ModelingSecondaryTables({
                 </button>
               ) : null}
             </div>
-            <div className="list-panel-header-tools-row">
+            <div className="list-panel-header-tools-row is-filter-row">
+              <div className="chip-group list-panel-filters" role="group" aria-label="Segment sub-network filter">
+                {([
+                  ["all", "All"],
+                  ["default", "Default"],
+                  ["tagged", "Tagged"]
+                ] as const).map(([filterId, label]) => (
+                  <button key={filterId} type="button" className={segmentSubNetworkFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSegmentSubNetworkFilter(filterId)}>{label}</button>
+                ))}
+              </div>
               <TableFilterBar
                 label="Filter"
                 fieldLabel="Segment filter field"
@@ -363,7 +365,7 @@ export function ModelingSecondaryTables({
                   <th aria-sort={getTableAriaSort(segmentTableSort, "id")}><button type="button" className="sort-header-button" onClick={() => { setSegmentTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" })); _setSegmentIdSortDirection((current) => current === "asc" ? "desc" : "asc"); }}>ID <span className="sort-indicator">{segmentSortIndicator("id")}</span></button></th>
                   <th aria-sort={getTableAriaSort(segmentTableSort, "nodeA")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "nodeA", direction: current.field === "nodeA" && current.direction === "asc" ? "desc" : "asc" }))}>Node A <span className="sort-indicator">{segmentSortIndicator("nodeA")}</span></button></th>
                   <th aria-sort={getTableAriaSort(segmentTableSort, "nodeB")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "nodeB", direction: current.field === "nodeB" && current.direction === "asc" ? "desc" : "asc" }))}>Node B <span className="sort-indicator">{segmentSortIndicator("nodeB")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(segmentTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>Length (mm) <span className="sort-indicator">{segmentSortIndicator("lengthMm")}</span></button></th>
+                  <th aria-sort={getTableAriaSort(segmentTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{segmentSortIndicator("lengthMm")}</span></button></th>
                   {showSegmentSubNetworkColumn ? <th aria-sort={getTableAriaSort(segmentTableSort, "subNetwork")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "subNetwork", direction: current.field === "subNetwork" && current.direction === "asc" ? "desc" : "asc" }))}>Sub-network <span className="sort-indicator">{segmentSortIndicator("subNetwork")}</span></button></th> : null}
                 </tr>
               </thead>
@@ -433,19 +435,10 @@ export function ModelingSecondaryTables({
       </article>
 
       <article className="panel" hidden={!isWireSubScreen} data-onboarding-panel="modeling-wires">
-        <header className="list-panel-header">
+        <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Wires</h2>
           <div className="list-panel-header-tools">
-            <div className="list-panel-header-tools-row">
-              <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
-                {([
-                  ["all", "All"],
-                  ["auto", "Auto"],
-                  ["locked", "Locked"]
-                ] as const).map(([filterId, label]) => (
-                  <button key={filterId} type="button" className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setWireRouteFilter(filterId)}>{label}</button>
-                ))}
-              </div>
+            <div className="list-panel-header-tools-row is-title-actions">
               <button
                 type="button"
                 className="filter-chip table-export-button"
@@ -491,7 +484,16 @@ export function ModelingSecondaryTables({
                 </button>
               ) : null}
             </div>
-              <div className="list-panel-header-tools-row">
+              <div className="list-panel-header-tools-row is-filter-row">
+                <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
+                  {([
+                    ["all", "All"],
+                    ["auto", "Auto"],
+                    ["locked", "Locked"]
+                  ] as const).map(([filterId, label]) => (
+                    <button key={filterId} type="button" className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setWireRouteFilter(filterId)}>{label}</button>
+                  ))}
+                </div>
                 <TableFilterBar
                   label="Filter"
                   fieldLabel="Wire filter field"
@@ -523,12 +525,12 @@ export function ModelingSecondaryTables({
               <thead>
                 <tr>
                   <th aria-sort={getTableAriaSort(wireTableSort, "name")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{wireSortIndicator("name")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(wireTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>Technical ID <span className="sort-indicator">{wireSortIndicator("technicalId")}</span></button></th>
+                  <th aria-sort={getTableAriaSort(wireTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{wireSortIndicator("technicalId")}</span></button></th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "color")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "color", direction: current.field === "color" && current.direction === "asc" ? "desc" : "asc" }))}>Color <span className="sort-indicator">{wireSortIndicator("color")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(wireTableSort, "endpointA")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpointA", direction: current.field === "endpointA" && current.direction === "asc" ? "desc" : "asc" }))}>Endpoint A <span className="sort-indicator">{wireSortIndicator("endpointA")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(wireTableSort, "endpointB")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpointB", direction: current.field === "endpointB" && current.direction === "asc" ? "desc" : "asc" }))}>Endpoint B <span className="sort-indicator">{wireSortIndicator("endpointB")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(wireTableSort, "sectionMm2")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "sectionMm2", direction: current.field === "sectionMm2" && current.direction === "asc" ? "desc" : "asc" }))}>Section (mm²) <span className="sort-indicator">{wireSortIndicator("sectionMm2")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(wireTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" })); }}>Length (mm) <span className="sort-indicator">{wireSortIndicator("lengthMm")}</span></button></th>
+                  <th aria-sort={getTableAriaSort(wireTableSort, "endpointA")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpointA", direction: current.field === "endpointA" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "End A" : "Endpoint A"} <span className="sort-indicator">{wireSortIndicator("endpointA")}</span></button></th>
+                  <th aria-sort={getTableAriaSort(wireTableSort, "endpointB")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpointB", direction: current.field === "endpointB" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "End B" : "Endpoint B"} <span className="sort-indicator">{wireSortIndicator("endpointB")}</span></button></th>
+                  <th aria-sort={getTableAriaSort(wireTableSort, "sectionMm2")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "sectionMm2", direction: current.field === "sectionMm2" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Sec" : "Section (mm²)"} <span className="sort-indicator">{wireSortIndicator("sectionMm2")}</span></button></th>
+                  <th aria-sort={getTableAriaSort(wireTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{wireSortIndicator("lengthMm")}</span></button></th>
                   {showWireRouteModeColumn ? <th aria-sort={getTableAriaSort(wireTableSort, "routeMode")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "routeMode", direction: current.field === "routeMode" && current.direction === "asc" ? "desc" : "asc" }))}>Route mode <span className="sort-indicator">{wireSortIndicator("routeMode")}</span></button></th> : null}
                 </tr>
               </thead>
