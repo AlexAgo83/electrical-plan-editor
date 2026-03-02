@@ -451,8 +451,8 @@ export function SettingsWorkspaceContent({
               <input
                 className="settings-range-input"
                 type="range"
-                min={50}
-                max={200}
+                min={30}
+                max={150}
                 step={5}
                 value={canvasNodeShapeSizePercent}
                 disabled={!canvasZoomInvariantNodeShapes}
@@ -461,7 +461,7 @@ export function SettingsWorkspaceContent({
                   if (!Number.isFinite(parsed)) {
                     return;
                   }
-                  setCanvasNodeShapeSizePercent(Math.min(200, Math.max(50, Math.round(parsed))));
+                  setCanvasNodeShapeSizePercent(Math.min(150, Math.max(30, Math.round(parsed))));
                 }}
               />
               <span className="settings-range-value">{canvasNodeShapeSizePercent}%</span>

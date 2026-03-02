@@ -292,7 +292,7 @@ function normalizeCanvasNodeShapeSizePercent(value: unknown): number {
   if (!Number.isFinite(parsed)) {
     return 100;
   }
-  return clamp(Math.round(Number(parsed)), 50, 200);
+  return clamp(Math.round(Number(parsed)), 30, 150);
 }
 
 function normalizeWorkspacePanelsLayoutMode(value: unknown): WorkspacePanelsLayoutPreference {
