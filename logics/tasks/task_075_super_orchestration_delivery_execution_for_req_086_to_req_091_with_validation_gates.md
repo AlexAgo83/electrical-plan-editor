@@ -1,9 +1,9 @@
 ## task_075_super_orchestration_delivery_execution_for_req_086_to_req_091_with_validation_gates - Super orchestration delivery execution for req_086 to req_091 with validation gates
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 100% (scope covers six cross-cutting UI/export requests with 24 backlog items and explicit closure traceability requirements)
 > Confidence: 95% (changes are well-bounded but span settings, rendering, export contracts, and persistence, requiring strict sequencing)
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Cross-request delivery orchestration for wide-screen shell behavior, 2D readability controls, export quality/contracts, and CSV wire schema hardening
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -87,13 +87,13 @@ The queue is cross-cutting across settings/persistence, network-summary renderin
 - Minimum gate after each implementation item: `typecheck` + targeted tests + `logics_lint` when docs change.
 
 # Plan
-- [ ] Step 1. Deliver req_086 implementation bundle (`item_437`, `item_438`, `item_439`) and close with `item_440`
-- [ ] Step 2. Deliver req_087 implementation bundle (`item_441`, `item_442`, `item_443`) and close with `item_444`
-- [ ] Step 3. Deliver req_088 implementation bundle (`item_445`, `item_446`, `item_447`) and close with `item_448`
-- [ ] Step 4. Deliver req_089 implementation bundle (`item_449`, `item_450`, `item_451`) and close with `item_452`
-- [ ] Step 5. Deliver req_090 implementation bundle (`item_453`, `item_454`, `item_455`) and close with `item_456`
-- [ ] Step 6. Deliver req_091 implementation bundle (`item_457`, `item_458`, `item_459`) and close with `item_460`
-- [ ] FINAL. Synchronize request/backlog/task statuses, evidence, and closure notes for req_086..req_091
+- [x] Step 1. Deliver req_086 implementation bundle (`item_437`, `item_438`, `item_439`) and close with `item_440`
+- [x] Step 2. Deliver req_087 implementation bundle (`item_441`, `item_442`, `item_443`) and close with `item_444`
+- [x] Step 3. Deliver req_088 implementation bundle (`item_445`, `item_446`, `item_447`) and close with `item_448`
+- [x] Step 4. Deliver req_089 implementation bundle (`item_449`, `item_450`, `item_451`) and close with `item_452`
+- [x] Step 5. Deliver req_090 implementation bundle (`item_453`, `item_454`, `item_455`) and close with `item_456`
+- [x] Step 6. Deliver req_091 implementation bundle (`item_457`, `item_458`, `item_459`) and close with `item_460`
+- [x] FINAL. Synchronize request/backlog/task statuses, evidence, and closure notes for req_086..req_091
 
 # Validation gates
 ## A. Minimum wave gate (after each implementation step)
@@ -146,7 +146,7 @@ The queue is cross-cutting across settings/persistence, network-summary renderin
 
 # Report
 - Current blockers: none.
-- Current status: not started.
+- Current status: completed.
 - Risks to track:
   - class/selector spillover from shell and settings changes;
   - interaction drift in node hitboxes when shape rendering mode changes;

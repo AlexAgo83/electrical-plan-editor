@@ -1,9 +1,9 @@
 ## item_437_settings_workspace_panels_wide_screen_preference_control_and_state_contract - settings workspace panels wide screen preference control and state contract
 > From version: 0.9.18
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

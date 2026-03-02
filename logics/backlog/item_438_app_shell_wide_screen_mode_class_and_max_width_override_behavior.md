@@ -1,9 +1,9 @@
 ## item_438_app_shell_wide_screen_mode_class_and_max_width_override_behavior - app shell wide screen mode class and max width override behavior
 > From version: 0.9.18
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

@@ -1,9 +1,9 @@
 ## item_457_wire_csv_export_utf8_accent_compatibility_hardening_and_download_contract - wire csv export utf8 accent compatibility hardening and download contract
 > From version: 0.9.18
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

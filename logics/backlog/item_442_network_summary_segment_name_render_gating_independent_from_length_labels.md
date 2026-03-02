@@ -1,9 +1,9 @@
 ## item_442_network_summary_segment_name_render_gating_independent_from_length_labels - network summary segment name render gating independent from length labels
 > From version: 0.9.18
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

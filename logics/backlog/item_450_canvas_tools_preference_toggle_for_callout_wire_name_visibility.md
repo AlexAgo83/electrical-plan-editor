@@ -1,9 +1,9 @@
 ## item_450_canvas_tools_preference_toggle_for_callout_wire_name_visibility - canvas tools preference toggle for callout wire name visibility
 > From version: 0.9.18
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

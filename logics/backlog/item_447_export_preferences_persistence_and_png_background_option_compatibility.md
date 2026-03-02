@@ -1,9 +1,9 @@
 ## item_447_export_preferences_persistence_and_png_background_option_compatibility - export preferences persistence and png background option compatibility
 > From version: 0.9.18
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
