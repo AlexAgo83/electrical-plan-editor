@@ -359,7 +359,7 @@ export function HomeWorkspaceContent({
           </div>
         </section>
       </div>
-      <section className="panel home-panel home-whats-new-panel">
+      <section className="panel home-panel home-whats-new-panel" data-locale-exempt="true">
         <header className="home-panel-header">
           <h2>What's new</h2>
           <span className="settings-panel-chip">Changelog</span>

@@ -1,6 +1,6 @@
 import type { SubScreenId } from "../types/app-controller";
 
-export type OnboardingStepId = "networkScope" | "catalog" | "connectorSpliceLibrary" | "nodes" | "segments" | "wires";
+export type OnboardingStepId = "networkScope" | "catalog" | "connectorSpliceLibrary" | "nodes" | "segments" | "wires" | "settingsOverview";
 export type OnboardingModalMode = "full" | "single";
 
 export interface OnboardingStepDescriptionPart {
@@ -15,7 +15,7 @@ export interface OnboardingStepDefinition {
   badgeIconClass?: string;
   description: OnboardingStepDescriptionPart[];
   target: {
-    screen: "networkScope" | "modeling";
+    screen: "networkScope" | "modeling" | "settings";
     subScreen?: SubScreenId;
     panelSelector: string;
     panelLabel: string;
@@ -131,6 +131,32 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
       subScreen: "wire",
       panelSelector: '[data-onboarding-panel="modeling-wires"]',
       panelLabel: "Wires"
+    }
+  },
+  {
+    id: "settingsOverview",
+    title: "Configure your workspace defaults",
+    badge: "CFG",
+    badgeIconClass: "is-settings",
+    description: [
+      { text: "Before continuing, review key " },
+      { text: "Settings", strong: true },
+      { text: ": " },
+      { text: "Language", strong: true },
+      { text: ", " },
+      { text: "Theme", strong: true },
+      { text: ", " },
+      { text: "Keyboard shortcuts", strong: true },
+      { text: ", " },
+      { text: "Canvas render preferences", strong: true },
+      { text: ", and " },
+      { text: "Global preferences", strong: true },
+      { text: " for your default workflow ergonomics." }
+    ],
+    target: {
+      screen: "settings",
+      panelSelector: '[data-onboarding-panel="settings-global-preferences"]',
+      panelLabel: "Settings"
     }
   }
 ] as const;

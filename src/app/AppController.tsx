@@ -82,6 +82,8 @@ import { useValidationModel } from "./hooks/useValidationModel";
 import { useWireEndpointDescriptions } from "./hooks/useWireEndpointDescriptions";
 import { useWorkspaceShellChrome } from "./hooks/useWorkspaceShellChrome";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
+import { useAppLocaleDomTranslation } from "./hooks/useAppLocaleDomTranslation";
+import { useHoverDescriptionTitles } from "./hooks/useHoverDescriptionTitles";
 import { ModelingCatalogFormPanel } from "./components/workspace/ModelingCatalogFormPanel";
 import { ModelingCatalogListPanel } from "./components/workspace/ModelingCatalogListPanel";
 import { CatalogAnalysisWorkspaceContent } from "./components/workspace/CatalogAnalysisWorkspaceContent";
@@ -263,6 +265,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNetworkFocusRequest
   } = useNetworkScopeFormState();
   const {
+    locale,
+    setLocale,
     themeMode,
     setThemeMode,
     tableDensity,
@@ -616,6 +620,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const openOnboardingTarget = useCallback((target: OnboardingStepTarget) => {
     if (target.screen === "networkScope") {
       setActiveScreen("networkScope");
+    } else if (target.screen === "settings") {
+      setActiveScreen("settings");
     } else {
       setActiveScreen("modeling");
       if (target.subScreen !== undefined) {
@@ -631,6 +637,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       return;
     }
     openOnboardingTarget(activeOnboardingPrimaryTarget);
+  }, [activeOnboardingPrimaryTarget, openOnboardingTarget]);
+
+  const handleOnboardingOpenSettings = useCallback(() => {
+    if (activeOnboardingPrimaryTarget === undefined) {
+      return;
+    }
+    openOnboardingTarget(activeOnboardingPrimaryTarget);
+    setIsOnboardingOpen(false);
   }, [activeOnboardingPrimaryTarget, openOnboardingTarget]);
 
   const onboardingConnectorSpliceTargetActions =
@@ -693,11 +707,18 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const onboardingTargetActions = activeOnboardingStep === undefined
     ? []
+    : activeOnboardingStep.id === "settingsOverview"
+      ? []
     : activeOnboardingStep.id === "catalog"
       ? (onboardingCatalogTargetActions ?? [])
     : activeOnboardingStep.id === "connectorSpliceLibrary"
       ? (onboardingConnectorSpliceTargetActions ?? [])
       : [{ label: onboardingTargetActionLabel, onClick: handleOnboardingOpenTarget }];
+
+  const onboardingPrimaryAction =
+    activeOnboardingStep?.id === "settingsOverview" && onboardingModalMode === "full"
+      ? { label: "Open Settings", onClick: handleOnboardingOpenSettings }
+      : null;
 
   const handleOnboardingNext = useCallback(() => {
     if (onboardingModalMode !== "full") {
@@ -820,6 +841,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   useUiPreferences({
     networkMinScale: NETWORK_MIN_SCALE,
     networkMaxScale: NETWORK_MAX_SCALE,
+    locale,
     themeMode,
     tableDensity,
     tableFontSize,
@@ -857,6 +879,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspacePanelsLayoutMode,
     workspaceWideScreen,
     preferencesHydrated,
+    setLocale,
     setTableDensity,
     setTableFontSize,
     setWorkspaceCurrencyCode,
@@ -918,6 +941,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setThemeMode,
     setPreferencesHydrated
   });
+
+  useAppLocaleDomTranslation(locale);
+  useHoverDescriptionTitles(locale);
 
   useEffect(() => {
     store.dispatch(appActions.setThemeMode(themeMode));
@@ -1499,6 +1525,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     preferenceSetters: {
       setThemeMode,
+      setLocale,
       setTableDensity,
       setTableFontSize,
       setWorkspaceCurrencyCode,
@@ -2521,6 +2548,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         },
         networks,
         prefs: {
+          locale,
+          setLocale,
           themeMode,
           setThemeMode,
           tableDensity,
@@ -2749,6 +2778,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           onNext={handleOnboardingNext}
           canGoNext={onboardingModalMode !== "full" || onboardingStepIndex < ONBOARDING_STEPS.length - 1}
           targetActions={onboardingTargetActions}
+          primaryAction={onboardingPrimaryAction}
         />
       ) : null}
     </>

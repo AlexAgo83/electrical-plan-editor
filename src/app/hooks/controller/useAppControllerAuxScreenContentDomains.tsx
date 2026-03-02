@@ -152,6 +152,8 @@ export function useAppControllerAuxScreenContentDomains({
     handleImportFileChange: settings.importExport.handleImportFileChange,
     importExportStatus: settings.importExport.importExportStatus,
     lastImportSummary: settings.importExport.lastImportSummary,
+    locale: settings.prefs.locale,
+    setLocale: settings.prefs.setLocale,
     themeMode: settings.prefs.themeMode,
     setThemeMode: settings.prefs.setThemeMode,
     tableDensity: settings.prefs.tableDensity,

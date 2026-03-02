@@ -17,6 +17,10 @@ interface OnboardingModalProps {
     label: string;
     onClick: () => void;
   }>;
+  primaryAction?: {
+    label: string;
+    onClick: () => void;
+  } | null;
 }
 
 function renderDescription(step: OnboardingStepDefinition): ReactElement {
@@ -53,7 +57,8 @@ export function OnboardingModal({
   onClose,
   onNext,
   canGoNext,
-  targetActions
+  targetActions,
+  primaryAction = null
 }: OnboardingModalProps): ReactElement | null {
   const dialogRef = useRef<HTMLElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -191,7 +196,12 @@ export function OnboardingModal({
             ))}
           </div>
           <div className="onboarding-modal-actions-spacer" />
-          {isFullFlow ? (
+          {primaryAction !== null ? (
+            <button type="button" className="button-with-icon onboarding-modal-next-button" onClick={primaryAction.onClick}>
+              <span className="action-button-icon is-open" aria-hidden="true" />
+              <span>{primaryAction.label}</span>
+            </button>
+          ) : isFullFlow ? (
             <button type="button" className="button-with-icon onboarding-modal-next-button" onClick={onNext}>
               <span className="action-button-icon is-open" aria-hidden="true" />
               <span>{canGoNext ? "Next" : "Finish"}</span>

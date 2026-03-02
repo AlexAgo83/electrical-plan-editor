@@ -3,6 +3,7 @@ import type { NetworkImportSummary } from "../../../adapters/portability";
 import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
 import type {
+  AppLocale,
   CanvasCalloutTextSize,
   CanvasExportFormat,
   CanvasLabelRotationDegrees,
@@ -36,6 +37,8 @@ interface SettingsWorkspaceContentProps {
   handleImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   importExportStatus: ImportExportStatus | null;
   lastImportSummary: NetworkImportSummary | null;
+  locale: AppLocale;
+  setLocale: (value: AppLocale) => void;
   themeMode: ThemeMode;
   setThemeMode: (value: ThemeMode) => void;
   tableDensity: TableDensity;
@@ -132,6 +135,8 @@ export function SettingsWorkspaceContent({
   handleImportFileChange,
   importExportStatus,
   lastImportSummary,
+  locale,
+  setLocale,
   themeMode,
   setThemeMode,
   tableDensity,
@@ -223,8 +228,8 @@ export function SettingsWorkspaceContent({
               value={canvasDefaultLabelStrokeMode}
               onChange={(event) => setCanvasDefaultLabelStrokeMode(event.target.value as CanvasLabelStrokeMode)}
             >
-              <option value="none">Rien</option>
-              <option value="light">Léger</option>
+              <option value="none">None</option>
+              <option value="light">Light</option>
               <option value="normal">Normal</option>
             </select>
           </label>
@@ -508,6 +513,77 @@ export function SettingsWorkspaceContent({
         </div>
       </section>
 
+      <section className="panel settings-panel" data-onboarding-panel="settings-global-preferences">
+        <header className="settings-panel-header">
+          <h2>Global preferences</h2>
+          <span className="settings-panel-chip">Defaults</span>
+        </header>
+        <p className="settings-panel-intro">Shared UI preferences applied across workspace screens (outside of screen-specific controls).</p>
+        <div className="settings-grid">
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={showFloatingInspectorPanel}
+              onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
+            />
+            Show floating inspector panel on supported screens
+          </label>
+          <label className="settings-field">
+            Workspace panels layout
+            <select
+              value={workspacePanelsLayoutMode}
+              onChange={(event) => setWorkspacePanelsLayoutMode(event.target.value as WorkspacePanelsLayoutMode)}
+              disabled
+            >
+              <option value="multiColumn">Responsive multi-column</option>
+              <option value="singleColumn">Force single column</option>
+            </select>
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={workspaceWideScreen}
+              onChange={(event) => setWorkspaceWideScreen(event.target.checked)}
+            />
+            Wide screen (remove app max width cap)
+          </label>
+          <label className="settings-field">
+            Default wire section (mm²)
+            <input
+              type="number"
+              min={0.01}
+              step={0.01}
+              value={String(defaultWireSectionMm2)}
+              onChange={(event) => {
+                const nextValue = Number(event.target.value.replace(",", "."));
+                if (!Number.isFinite(nextValue) || nextValue <= 0) {
+                  return;
+                }
+                setDefaultWireSectionMm2(nextValue);
+              }}
+            />
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={defaultAutoCreateLinkedNodes}
+              onChange={(event) => setDefaultAutoCreateLinkedNodes(event.target.checked)}
+            />
+            Default auto-create linked nodes for connectors/splices
+          </label>
+        </div>
+        <div className="row-actions settings-actions">
+          <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
+        </div>
+        <label className="settings-field">
+          Language
+          <select value={locale} onChange={(event) => setLocale(event.target.value as AppLocale)}>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+          </select>
+        </label>
+      </section>
+
       <section className="panel settings-panel">
         <header className="settings-panel-header">
           <h2>Action bar and shortcuts</h2>
@@ -594,71 +670,7 @@ export function SettingsWorkspaceContent({
         </div>
       </section>
 
-      <section className="panel settings-panel">
-        <header className="settings-panel-header">
-          <h2>Global preferences</h2>
-          <span className="settings-panel-chip">Defaults</span>
-        </header>
-        <p className="settings-panel-intro">Shared UI preferences applied across workspace screens (outside of screen-specific controls).</p>
-        <div className="settings-grid">
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={showFloatingInspectorPanel}
-              onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
-            />
-            Show floating inspector panel on supported screens
-          </label>
-          <label className="settings-field">
-            Workspace panels layout
-            <select
-              value={workspacePanelsLayoutMode}
-              onChange={(event) => setWorkspacePanelsLayoutMode(event.target.value as WorkspacePanelsLayoutMode)}
-              disabled
-            >
-              <option value="multiColumn">Responsive multi-column</option>
-              <option value="singleColumn">Force single column</option>
-            </select>
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={workspaceWideScreen}
-              onChange={(event) => setWorkspaceWideScreen(event.target.checked)}
-            />
-            Wide screen (remove app max width cap)
-          </label>
-          <label className="settings-field">
-            Default wire section (mm²)
-            <input
-              type="number"
-              min={0.01}
-              step={0.01}
-              value={String(defaultWireSectionMm2)}
-              onChange={(event) => {
-                const nextValue = Number(event.target.value.replace(",", "."));
-                if (!Number.isFinite(nextValue) || nextValue <= 0) {
-                  return;
-                }
-                setDefaultWireSectionMm2(nextValue);
-              }}
-            />
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={defaultAutoCreateLinkedNodes}
-              onChange={(event) => setDefaultAutoCreateLinkedNodes(event.target.checked)}
-            />
-            Default auto-create linked nodes for connectors/splices
-          </label>
-        </div>
-        <div className="row-actions settings-actions">
-          <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
-        </div>
-      </section>
-
-      <section className="panel settings-panel settings-panel--import-export">
+      <section className="panel settings-panel settings-panel--import-export" data-locale-exempt="true">
         <header className="settings-panel-header">
           <h2>Import / Export networks</h2>
           <span className="settings-panel-chip">Portability</span>

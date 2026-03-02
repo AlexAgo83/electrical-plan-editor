@@ -737,6 +737,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     handleImportFileChange: params.handleImportFileChange,
     importExportStatus: params.importExportStatus,
     lastImportSummary: params.lastImportSummary,
+    locale: params.locale,
+    setLocale: params.setLocale,
     themeMode: params.themeMode,
     setThemeMode: params.setThemeMode,
     tableDensity: params.tableDensity,
