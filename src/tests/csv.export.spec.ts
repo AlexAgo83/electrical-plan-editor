@@ -95,7 +95,7 @@ describe("downloadCsvFile", () => {
       }
     }
     (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = BlobCapture;
-    const createObjectUrl = vi.fn((_blob: Blob) => "blob:test-csv");
+    const createObjectUrl = vi.fn(() => "blob:test-csv");
     const revokeObjectUrl = vi.fn();
     Object.defineProperty(URL, "createObjectURL", {
       configurable: true,
