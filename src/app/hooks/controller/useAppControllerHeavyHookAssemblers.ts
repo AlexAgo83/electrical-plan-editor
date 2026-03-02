@@ -101,6 +101,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setCanvasDefaultCalloutTextSize"
     | "setCanvasDefaultLabelRotationDegrees"
     | "setCanvasDefaultAutoSegmentLabelRotation"
+    | "setCanvasShowCalloutWireNames"
     | "setCanvasExportFormat"
     | "setCanvasResetZoomPercentInput"
     | "setCanvasPngExportIncludeBackground"

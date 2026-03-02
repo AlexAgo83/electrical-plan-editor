@@ -83,6 +83,31 @@
   line-height: 1.2;
 }
 
+.network-callout-table-header-cell {
+  font-size: 4.3px;
+  font-weight: 700;
+  fill: var(--network-segment-length-label-color, #547086);
+  paint-order: stroke fill;
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+  stroke-width: 0.5px;
+  stroke-linejoin: round;
+  letter-spacing: 0.01em;
+}
+
+.network-callout-table-cell {
+  font-size: 4.3px;
+  fill: var(--network-node-label-color, #183549);
+  paint-order: stroke fill;
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+  stroke-width: 0.5px;
+  stroke-linejoin: round;
+}
+
+.network-callout-table-divider {
+  stroke: color-mix(in srgb, var(--network-node-stroke-color, #55748d) 70%, transparent);
+  stroke-width: 0.45;
+}
+
 .network-canvas--label-size-small .network-callout-title {
   font-size: 6.2px;
 }
@@ -163,6 +188,11 @@
   font-size: 4.3px;
 }
 
+.network-svg.network-callout-text-size-small .network-callout-table-header-cell,
+.network-svg.network-callout-text-size-small .network-callout-table-cell {
+  font-size: 4.3px;
+}
+
 .network-svg.network-callout-text-size-normal .network-callout-title {
   font-size: 8.8px;
 }
@@ -179,6 +209,11 @@
   font-size: 5.5px;
 }
 
+.network-svg.network-callout-text-size-normal .network-callout-table-header-cell,
+.network-svg.network-callout-text-size-normal .network-callout-table-cell {
+  font-size: 5.5px;
+}
+
 .network-svg.network-callout-text-size-large .network-callout-title {
   font-size: 10px;
 }
@@ -192,5 +227,10 @@
 }
 
 .network-svg.network-callout-text-size-large .network-callout-row-text {
+  font-size: 6.3px;
+}
+
+.network-svg.network-callout-text-size-large .network-callout-table-header-cell,
+.network-svg.network-callout-text-size-large .network-callout-table-cell {
   font-size: 6.3px;
 }
