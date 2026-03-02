@@ -139,6 +139,7 @@ function isSameNetworkSummaryViewState(
     left.offset.x === right.offset.x &&
     left.offset.y === right.offset.y &&
     left.showNetworkInfoPanels === right.showNetworkInfoPanels &&
+    left.showSegmentNames === right.showSegmentNames &&
     left.showSegmentLengths === right.showSegmentLengths &&
     left.showCableCallouts === right.showCableCallouts &&
     left.showNetworkGrid === right.showNetworkGrid &&
@@ -200,6 +201,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setRoutePreviewEndNodeId,
     showNetworkInfoPanels,
     setShowNetworkInfoPanels,
+    showSegmentNames,
+    setShowSegmentNames,
     showSegmentLengths,
     setShowSegmentLengths,
     showCableCallouts,
@@ -292,6 +295,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels,
     setCanvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentNames,
+    setCanvasDefaultShowSegmentNames,
     canvasDefaultShowSegmentLengths,
     setCanvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts,
@@ -801,6 +806,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasDefaultSnapToGrid,
     canvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentNames,
     canvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts,
     canvasDefaultShowSelectedCalloutOnly,
@@ -839,6 +845,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasDefaultSnapToGrid,
     setCanvasDefaultLockEntityMovement,
     setCanvasDefaultShowInfoPanels,
+    setCanvasDefaultShowSegmentNames,
     setCanvasDefaultShowSegmentLengths,
     setCanvasDefaultShowCableCallouts,
     setCanvasDefaultShowSelectedCalloutOnly,
@@ -852,6 +859,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setSnapNodesToGrid,
     setLockEntityMovement,
     setShowNetworkInfoPanels,
+    setShowSegmentNames,
     setShowSegmentLengths,
     setShowCableCallouts,
     setShowSelectedCalloutOnly,
@@ -994,6 +1002,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     const nextScale = Math.max(NETWORK_MIN_SCALE, Math.min(NETWORK_MAX_SCALE, Number.isFinite(nextScaleRaw) ? nextScaleRaw : clampedFallbackScale));
     const nextOffset = activeNetworkSummaryViewState?.offset ?? { x: 0, y: 0 };
     const nextShowInfoPanels = activeNetworkSummaryViewState?.showNetworkInfoPanels ?? canvasDefaultShowInfoPanels;
+    const nextShowSegmentNames = activeNetworkSummaryViewState?.showSegmentNames ?? canvasDefaultShowSegmentNames;
     const nextShowSegmentLengths = activeNetworkSummaryViewState?.showSegmentLengths ?? canvasDefaultShowSegmentLengths;
     const nextShowCableCallouts = activeNetworkSummaryViewState?.showCableCallouts ?? canvasDefaultShowCableCallouts;
     const nextShowGrid = activeNetworkSummaryViewState?.showNetworkGrid ?? canvasDefaultShowGrid;
@@ -1012,6 +1021,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     if (showNetworkInfoPanels !== nextShowInfoPanels) {
       didScheduleRestore = true;
       setShowNetworkInfoPanels(nextShowInfoPanels);
+    }
+    if (showSegmentNames !== nextShowSegmentNames) {
+      didScheduleRestore = true;
+      setShowSegmentNames(nextShowSegmentNames);
     }
     if (showSegmentLengths !== nextShowSegmentLengths) {
       didScheduleRestore = true;
@@ -1044,6 +1057,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     preferencesHydrated,
     configuredResetScale,
     canvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentNames,
     canvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts,
     canvasDefaultShowGrid,
@@ -1052,6 +1066,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNetworkScale,
     setNetworkOffset,
     setShowNetworkInfoPanels,
+    setShowSegmentNames,
     setShowSegmentLengths,
     setShowCableCallouts,
     setShowNetworkGrid,
@@ -1076,6 +1091,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         y: networkOffset.y
       },
       showNetworkInfoPanels,
+      showSegmentNames,
       showSegmentLengths,
       showCableCallouts,
       showNetworkGrid,
@@ -1096,6 +1112,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     networkOffset.x,
     networkOffset.y,
     showNetworkInfoPanels,
+    showSegmentNames,
     showSegmentLengths,
     showCableCallouts,
     showNetworkGrid,
@@ -1419,6 +1436,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       canvasDefaultSnapToGrid,
       canvasDefaultLockEntityMovement,
       canvasDefaultShowInfoPanels,
+      canvasDefaultShowSegmentNames,
       canvasDefaultShowSegmentLengths,
       canvasDefaultShowCableCallouts,
       canvasDefaultShowSelectedCalloutOnly,
@@ -1433,6 +1451,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setSnapNodesToGrid,
       setLockEntityMovement,
       setShowNetworkInfoPanels,
+      setShowSegmentNames,
       setShowSegmentLengths,
       setShowCableCallouts,
       setShowSelectedCalloutOnly,
@@ -1473,6 +1492,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setCanvasDefaultSnapToGrid,
       setCanvasDefaultLockEntityMovement,
       setCanvasDefaultShowInfoPanels,
+      setCanvasDefaultShowSegmentNames,
       setCanvasDefaultShowSegmentLengths,
       setCanvasDefaultShowCableCallouts,
       setCanvasDefaultShowSelectedCalloutOnly,
@@ -2145,6 +2165,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         setLockEntityMovement,
         showNetworkInfoPanels,
         setShowNetworkInfoPanels,
+        showSegmentNames,
         showSegmentLengths,
         setShowSegmentLengths,
         showCableCallouts,
@@ -2492,6 +2513,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setCanvasDefaultLockEntityMovement,
           canvasDefaultShowInfoPanels,
           setCanvasDefaultShowInfoPanels,
+          canvasDefaultShowSegmentNames,
+          setCanvasDefaultShowSegmentNames,
           canvasDefaultShowSegmentLengths,
           setCanvasDefaultShowSegmentLengths,
           canvasDefaultShowCableCallouts,
@@ -2530,6 +2553,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setRoutePreviewEndNodeId,
           showNetworkInfoPanels,
           setShowNetworkInfoPanels,
+          showSegmentNames,
+          setShowSegmentNames,
           showSegmentLengths,
           setShowSegmentLengths,
           showCableCallouts,

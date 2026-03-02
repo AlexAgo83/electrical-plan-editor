@@ -185,6 +185,8 @@ export function useAppControllerAuxScreenContentDomains({
     setCanvasDefaultLockEntityMovement: settings.prefs.setCanvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels: settings.prefs.canvasDefaultShowInfoPanels,
     setCanvasDefaultShowInfoPanels: settings.prefs.setCanvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentNames: settings.prefs.canvasDefaultShowSegmentNames,
+    setCanvasDefaultShowSegmentNames: settings.prefs.setCanvasDefaultShowSegmentNames,
     canvasDefaultShowSegmentLengths: settings.prefs.canvasDefaultShowSegmentLengths,
     setCanvasDefaultShowSegmentLengths: settings.prefs.setCanvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts: settings.prefs.canvasDefaultShowCableCallouts,

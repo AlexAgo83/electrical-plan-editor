@@ -118,13 +118,17 @@ function normalizeNetworkSummaryViewState(candidate: unknown): NetworkSummaryVie
   }
 
   const showNetworkInfoPanels = candidate.showNetworkInfoPanels;
+  const showSegmentNames = candidate.showSegmentNames;
   const showSegmentLengths = candidate.showSegmentLengths;
   const showCableCallouts = candidate.showCableCallouts;
   const showNetworkGrid = candidate.showNetworkGrid;
   const snapNodesToGrid = candidate.snapNodesToGrid;
   const lockEntityMovement = candidate.lockEntityMovement;
+  const normalizedShowSegmentNames =
+    showSegmentNames === undefined ? true : typeof showSegmentNames === "boolean" ? showSegmentNames : null;
   if (
     typeof showNetworkInfoPanels !== "boolean" ||
+    normalizedShowSegmentNames === null ||
     typeof showSegmentLengths !== "boolean" ||
     typeof showCableCallouts !== "boolean" ||
     typeof showNetworkGrid !== "boolean" ||
@@ -138,6 +142,7 @@ function normalizeNetworkSummaryViewState(candidate: unknown): NetworkSummaryVie
     scale: candidate.scale,
     offset: { x: offsetX, y: offsetY },
     showNetworkInfoPanels,
+    showSegmentNames: normalizedShowSegmentNames,
     showSegmentLengths,
     showCableCallouts,
     showNetworkGrid,
