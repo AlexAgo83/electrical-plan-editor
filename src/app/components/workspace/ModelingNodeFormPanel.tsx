@@ -25,6 +25,10 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
     cancelNodeEdit,
     nodeFormError
   } = props;
+  const pendingPlacementCopy =
+    pendingNewNodePosition === null
+      ? null
+      : `Canvas placement captured at x=${Math.round(pendingNewNodePosition.x)}, y=${Math.round(pendingNewNodePosition.y)}.`;
 
   return (
 <article className="panel" hidden={!isNodeSubScreen}>
@@ -36,9 +40,7 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
       <input value={nodeIdInput} onChange={(event) => setNodeIdInput(event.target.value)} placeholder="N-001" required />
     </label>
     {nodeFormMode === "edit" ? <small className="inline-help">Changing Node ID renames the node and remaps connected references.</small> : null}
-    {nodeFormMode === "create" && pendingNewNodePosition !== null ? (
-      <small className="inline-help">Canvas placement captured at x={Math.round(pendingNewNodePosition.x)}, y={Math.round(pendingNewNodePosition.y)}.</small>
-    ) : null}
+    {nodeFormMode === "create" && pendingPlacementCopy !== null ? <small className="inline-help">{pendingPlacementCopy}</small> : null}
 
     <label>
       Node kind

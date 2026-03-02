@@ -72,7 +72,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       </div>
     ) : null}
     {spliceManufacturerReference.trim().length > 0 ? (
-      <small className="meta-line">Manufacturer reference: {spliceManufacturerReference}</small>
+      <small className="meta-line">{`Manufacturer reference: ${spliceManufacturerReference}`}</small>
     ) : null}
     {isCatalogLinked ? (
       <small className="inline-help">Catalog-linked splices are always bounded and derive port count from catalog connection count.</small>

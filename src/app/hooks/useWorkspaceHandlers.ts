@@ -679,14 +679,14 @@ export function useWorkspaceHandlers({
     setCanvasDefaultShowSegmentLengths(true);
     setCanvasDefaultShowCableCallouts(false);
     setCanvasDefaultShowSelectedCalloutOnly(false);
-    setCanvasDefaultLabelStrokeMode("normal");
-    setCanvasDefaultLabelSizeMode("normal");
+    setCanvasDefaultLabelStrokeMode("light");
+    setCanvasDefaultLabelSizeMode("small");
     setCanvasDefaultCalloutTextSize("normal");
     setCanvasDefaultLabelRotationDegrees(0);
     setCanvasDefaultAutoSegmentLabelRotation(true);
     setCanvasShowCalloutWireNames(false);
     setCanvasZoomInvariantNodeShapes(true);
-    setCanvasNodeShapeSizePercent(50);
+    setCanvasNodeShapeSizePercent(70);
     setCanvasExportFormat("svg");
     setCanvasPngExportIncludeBackground(true);
     setCanvasResizeBehaviorMode("visibleAreaOnly");
@@ -699,8 +699,8 @@ export function useWorkspaceHandlers({
     setShowSegmentLengths(true);
     setShowCableCallouts(false);
     setShowSelectedCalloutOnly(false);
-    setNetworkLabelStrokeMode("normal");
-    setNetworkLabelSizeMode("normal");
+    setNetworkLabelStrokeMode("light");
+    setNetworkLabelSizeMode("small");
     setNetworkCalloutTextSize("normal");
     setNetworkLabelRotationDegrees(0);
     setNetworkAutoSegmentLabelRotation(true);

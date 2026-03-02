@@ -229,15 +229,21 @@ describe("App integration UI - settings canvas render", () => {
     switchScreenDrawerAware("settings");
     const canvasSettingsPanel = getPanelByHeading("Canvas render preferences");
     const calloutTextSizeSelect = within(canvasSettingsPanel).getByLabelText("Callout text size");
+    const labelStrokeModeSelect = within(canvasSettingsPanel).getByLabelText("Label stroke mode");
+    const labelSizeSelect = within(canvasSettingsPanel).getByLabelText("2D label size");
     const labelRotationSelect = within(canvasSettingsPanel).getByLabelText("2D label rotation");
     const autoRotationSelect = within(canvasSettingsPanel).getByLabelText("Auto segment label rotation");
     expect(calloutTextSizeSelect).toHaveValue("normal");
+    expect(labelStrokeModeSelect).toHaveValue("light");
+    expect(labelSizeSelect).toHaveValue("small");
     expect(autoRotationSelect).toHaveValue("yes");
     expect(labelRotationSelect).toHaveValue("0");
     expect(labelRotationSelect).toBeDisabled();
     switchScreenDrawerAware("analysis");
     let networkSummaryPanel = getPanelByHeading("Network summary");
     let networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    expect(networkSvg).toHaveClass("network-canvas--label-stroke-light");
+    expect(networkSvg).toHaveClass("network-canvas--label-size-small");
     expect(networkSvg).toHaveClass("network-callout-text-size-normal");
     switchScreenDrawerAware("settings");
     fireEvent.change(within(getPanelByHeading("Canvas render preferences")).getByLabelText("Callout text size"), {
@@ -377,7 +383,7 @@ describe("App integration UI - settings canvas render", () => {
     const nodeShapeSizeSlider = within(canvasToolsSettingsPanel).getByRole("slider", {
       name: /Node shape target size/i
     });
-    expect(nodeShapeSizeSlider).toHaveValue("50");
+    expect(nodeShapeSizeSlider).toHaveValue("70");
     expect(nodeShapeSizeSlider).toBeEnabled();
     fireEvent.change(nodeShapeSizeSlider, { target: { value: "125" } });
     expect(nodeShapeSizeSlider).toHaveValue("125");

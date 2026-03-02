@@ -137,9 +137,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
           >
             <option value="">Select catalog item</option>
             {selectedFuseCatalogItemMissing ? (
-              <option value={wireFuseCatalogItemId}>
-                Missing catalog item ({wireFuseCatalogItemId})
-              </option>
+              <option value={wireFuseCatalogItemId}>{`Missing catalog item (${wireFuseCatalogItemId})`}</option>
             ) : null}
             {catalogItems.map((item) => (
               <option key={item.id} value={item.id}>

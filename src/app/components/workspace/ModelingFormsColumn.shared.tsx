@@ -22,11 +22,10 @@ export function renderFormHeader(title: string, mode: ModelingFormMode): ReactEl
 }
 
 export function renderIdleCopy(entityLabel: string, onCreate: () => void): ReactElement {
+  const idleCopy = `Select a ${entityLabel} row to view or edit it, or create a new one.`;
   return (
     <>
-      <p className="empty-copy">
-        Select a {entityLabel} row to view or edit it, or create a new one.
-      </p>
+      <p className="empty-copy">{idleCopy}</p>
       <div className="row-actions compact idle-panel-actions">
         <button type="button" className="button-with-icon" onClick={onCreate}>
           <span className="action-button-icon is-new" aria-hidden="true" />

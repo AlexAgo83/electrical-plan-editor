@@ -68,7 +68,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       </div>
     ) : null}
     {connectorManufacturerReference.trim().length > 0 ? (
-      <small className="meta-line">Manufacturer reference: {connectorManufacturerReference}</small>
+      <small className="meta-line">{`Manufacturer reference: ${connectorManufacturerReference}`}</small>
     ) : null}
     {connectorTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
     <label>
