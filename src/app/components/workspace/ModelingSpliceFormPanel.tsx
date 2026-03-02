@@ -16,15 +16,21 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     openCatalogSubScreen,
     spliceCatalogItemId,
     setSpliceCatalogItemId,
+    splicePortMode,
+    setSplicePortMode,
     spliceManufacturerReference,
     spliceAutoCreateLinkedNode,
     setSpliceAutoCreateLinkedNode,
     spliceTechnicalIdAlreadyUsed,
     portCount,
+    setPortCount,
+    spliceFormInfo,
     cancelSpliceEdit,
     spliceFormError
   } = props;
   const hasCatalogItems = catalogItems.length > 0;
+  const isCatalogLinked = spliceCatalogItemId.trim().length > 0;
+  const isUnbounded = splicePortMode === "unbounded";
 
   return (
 <article className="panel" hidden={!isSpliceSubScreen}>
@@ -47,10 +53,8 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       <select
         value={spliceCatalogItemId}
         onChange={(event) => setSpliceCatalogItemId(event.target.value)}
-        required
-        disabled={!hasCatalogItems}
       >
-        <option value="">Select a catalog item</option>
+        <option value="">No catalog item</option>
         {catalogItems.map((item) => (
           <option key={item.id} value={item.id}>
             {item.manufacturerReference} ({item.connectionCount})
@@ -60,7 +64,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     </label>
     {!hasCatalogItems ? (
       <div className="row-actions compact">
-        <small className="inline-error">Create a catalog item first to define manufacturer reference and connection count.</small>
+        <small className="inline-help">No catalog item is required for splices. Create one only when you need a linked product reference.</small>
         <button type="button" className="button-with-icon" onClick={openCatalogSubScreen}>
           <span className="action-button-icon is-catalog" aria-hidden="true" />
           Open Catalog
@@ -70,11 +74,40 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     {spliceManufacturerReference.trim().length > 0 ? (
       <small className="meta-line">Manufacturer reference: {spliceManufacturerReference}</small>
     ) : null}
+    {isCatalogLinked ? (
+      <small className="inline-help">Catalog-linked splices are always bounded and derive port count from catalog connection count.</small>
+    ) : null}
     {spliceTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
     <label>
-      Port count (from catalog)
-      <input type="number" min={1} step={1} value={portCount} readOnly required />
+      Capacity mode
+      <select
+        value={splicePortMode}
+        onChange={(event) => setSplicePortMode(event.target.value as "bounded" | "unbounded")}
+        disabled={isCatalogLinked}
+      >
+        <option value="bounded">Bounded</option>
+        <option value="unbounded">Unbounded (∞)</option>
+      </select>
     </label>
+    {isUnbounded ? (
+      <label>
+        Port count
+        <input value="∞" readOnly aria-readonly="true" />
+      </label>
+    ) : (
+      <label>
+        {isCatalogLinked ? "Port count (from catalog)" : "Port count"}
+        <input
+          type="number"
+          min={1}
+          step={1}
+          value={portCount}
+          onChange={(event) => setPortCount(event.target.value)}
+          readOnly={isCatalogLinked}
+          required={!isUnbounded}
+        />
+      </label>
+    )}
     <label className="settings-checkbox">
       <input
         type="checkbox"
@@ -88,7 +121,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       <button
         type="submit"
         className="button-with-icon"
-        disabled={spliceTechnicalIdAlreadyUsed || !hasCatalogItems || spliceCatalogItemId.trim().length === 0}
+        disabled={spliceTechnicalIdAlreadyUsed}
       >
         {spliceFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
         {spliceFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
@@ -99,6 +132,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
         {spliceFormMode === "edit" ? "Cancel edit" : "Cancel"}
       </button>
     </div>
+    {spliceFormInfo !== null ? <small className="inline-help">{spliceFormInfo}</small> : null}
     {spliceFormError !== null ? <small className="inline-error">{spliceFormError}</small> : null}
   </form>
   )}

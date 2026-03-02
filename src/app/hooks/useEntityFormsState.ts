@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { CatalogItemId, ConnectorId, NetworkNode, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
+import type { SplicePortMode } from "../../core/splicePortMode";
 
 export function useEntityFormsState() {
   const [catalogFormMode, setCatalogFormMode] = useState<"idle" | "create" | "edit">("idle");
@@ -28,11 +29,13 @@ export function useEntityFormsState() {
   const [spliceName, setSpliceName] = useState("");
   const [spliceTechnicalId, setSpliceTechnicalId] = useState("");
   const [spliceCatalogItemId, setSpliceCatalogItemId] = useState("");
+  const [splicePortMode, setSplicePortMode] = useState<SplicePortMode>("bounded");
   const [spliceManufacturerReference, setSpliceManufacturerReference] = useState("");
   const [spliceAutoCreateLinkedNode, setSpliceAutoCreateLinkedNode] = useState(true);
   const [portCount, setPortCount] = useState("4");
   const [portIndexInput, setPortIndexInput] = useState("1");
   const [spliceOccupantRefInput, setSpliceOccupantRefInput] = useState("manual-assignment");
+  const [spliceFormInfo, setSpliceFormInfo] = useState<string | null>(null);
   const [spliceFormError, setSpliceFormError] = useState<string | null>(null);
 
   const [nodeFormMode, setNodeFormMode] = useState<"idle" | "create" | "edit">("idle");
@@ -130,6 +133,8 @@ export function useEntityFormsState() {
     setSpliceTechnicalId,
     spliceCatalogItemId,
     setSpliceCatalogItemId,
+    splicePortMode,
+    setSplicePortMode,
     spliceManufacturerReference,
     setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode,
@@ -140,6 +145,8 @@ export function useEntityFormsState() {
     setPortIndexInput,
     spliceOccupantRefInput,
     setSpliceOccupantRefInput,
+    spliceFormInfo,
+    setSpliceFormInfo,
     spliceFormError,
     setSpliceFormError,
     nodeFormMode,

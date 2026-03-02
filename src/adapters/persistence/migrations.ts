@@ -1,6 +1,7 @@
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import { normalizeWireColorState } from "../../core/cableColors";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
+import { normalizeSplicePortMode, normalizeUnboundedPortCountFallback } from "../../core/splicePortMode";
 import type {
   CatalogItem,
   CatalogItemId,
@@ -180,10 +181,18 @@ function normalizeSpliceEntityState(candidate: EntityState<Splice, SpliceId>): E
     if (splice === undefined) {
       continue;
     }
+    const rawSplice = splice as Partial<Splice>;
+    const portMode = normalizeSplicePortMode(rawSplice.portMode);
+    const boundedPortCount =
+      typeof rawSplice.portCount === "number" && Number.isInteger(rawSplice.portCount) && rawSplice.portCount > 0
+        ? rawSplice.portCount
+        : 1;
 
     byId[spliceId] = {
       ...splice,
-      manufacturerReference: normalizeManufacturerReference((splice as Partial<Splice>).manufacturerReference)
+      portMode,
+      portCount: portMode === "bounded" ? boundedPortCount : normalizeUnboundedPortCountFallback(rawSplice.portCount),
+      manufacturerReference: normalizeManufacturerReference(rawSplice.manufacturerReference)
     };
   }
 

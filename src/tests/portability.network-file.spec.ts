@@ -284,7 +284,7 @@ describe("network file portability", () => {
     }
   });
 
-  it("bootstraps deterministic placeholder catalog refs on import when connector/splice manufacturer refs are missing", () => {
+  it("bootstraps deterministic placeholder catalog refs on import for connectors while keeping unlinked splices without placeholders", () => {
     const seeded = createSampleNetworkState();
     const payload = buildNetworkFilePayload(seeded, "active", [], "2026-02-21T10:19:00.000Z");
     const rawPayload = JSON.parse(serializeNetworkFilePayload(payload)) as Record<string, unknown>;
@@ -320,20 +320,16 @@ describe("network file portability", () => {
     expect(parsed.error).toBeNull();
     const normalizedState = parsed.payload?.networks[0]?.state;
     const expectedConnectorPlaceholder = "LEGACY-NOREF-C-CONN-LEGACY-01";
-    const expectedSplicePlaceholder = "LEGACY-NOREF-S-SPLICE-LEGACY-2";
     expect(normalizedState?.connectors.byId[asConnectorId(firstConnectorId)]?.manufacturerReference).toBe(
       expectedConnectorPlaceholder
     );
-    expect(normalizedState?.splices.byId[asSpliceId(firstSpliceId)]?.manufacturerReference).toBe(expectedSplicePlaceholder);
+    expect(normalizedState?.splices.byId[asSpliceId(firstSpliceId)]?.manufacturerReference).toBeUndefined();
     const connectorCatalogItemId = normalizedState?.connectors.byId[asConnectorId(firstConnectorId)]?.catalogItemId;
     const spliceCatalogItemId = normalizedState?.splices.byId[asSpliceId(firstSpliceId)]?.catalogItemId;
     expect(connectorCatalogItemId).toBeDefined();
-    expect(spliceCatalogItemId).toBeDefined();
+    expect(spliceCatalogItemId).toBeUndefined();
     if (connectorCatalogItemId !== undefined) {
       expect(normalizedState?.catalogItems.byId[connectorCatalogItemId]?.manufacturerReference).toBe(expectedConnectorPlaceholder);
-    }
-    if (spliceCatalogItemId !== undefined) {
-      expect(normalizedState?.catalogItems.byId[spliceCatalogItemId]?.manufacturerReference).toBe(expectedSplicePlaceholder);
     }
   });
 

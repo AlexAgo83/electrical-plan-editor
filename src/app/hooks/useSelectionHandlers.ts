@@ -1,7 +1,6 @@
 import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, SegmentId, Splice, SpliceId, Wire, WireId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
-import { NETWORK_VIEW_HEIGHT, NETWORK_VIEW_WIDTH } from "../lib/app-utils-shared";
 import { resolveEndpointNodeId } from "../lib/app-utils-networking";
 import type {
   InteractionMode,
@@ -33,6 +32,8 @@ interface UseSelectionHandlersParams {
   spliceNodeBySpliceId: Map<SpliceId, NodeId>;
   setInteractionMode: (mode: InteractionMode) => void;
   networkScale: number;
+  networkViewWidth: number;
+  networkViewHeight: number;
   setNetworkScale: (value: number) => void;
   setNetworkOffset: (value: NodePosition) => void;
   selected: SelectionRef | null;
@@ -69,6 +70,8 @@ export function useSelectionHandlers({
   spliceNodeBySpliceId,
   setInteractionMode,
   networkScale,
+  networkViewWidth,
+  networkViewHeight,
   setNetworkScale,
   setNetworkOffset,
   selected,
@@ -174,8 +177,8 @@ export function useSelectionHandlers({
     const targetScale = networkScale < 1 ? 1 : networkScale;
     setNetworkScale(targetScale);
     setNetworkOffset({
-      x: NETWORK_VIEW_WIDTH / 2 - anchor.x * targetScale,
-      y: NETWORK_VIEW_HEIGHT / 2 - anchor.y * targetScale
+      x: networkViewWidth / 2 - anchor.x * targetScale,
+      y: networkViewHeight / 2 - anchor.y * targetScale
     });
   }
 

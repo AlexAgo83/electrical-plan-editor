@@ -1,4 +1,5 @@
 import type { ConnectorId, SpliceId } from "../../core/entities";
+import { resolveSplicePortMode } from "../../core/splicePortMode";
 import type { AppState } from "../../store";
 
 interface OccupancyContext {
@@ -28,16 +29,33 @@ export function findNextAvailableConnectorWay(
 export function findNextAvailableSplicePort(
   context: OccupancyContext,
   spliceId: SpliceId,
-  portCount: number,
+  splice: {
+    portMode?: "bounded" | "unbounded";
+    portCount: number;
+  },
   excludeOccupantRefs: ReadonlySet<string>
 ): number | null {
-  for (let index = 1; index <= portCount; index += 1) {
-    const occupantRef = context.splicePortOccupancy[spliceId]?.[index];
+  const spliceOccupancy = context.splicePortOccupancy[spliceId] ?? {};
+  const isUnbounded = resolveSplicePortMode(splice) === "unbounded";
+  if (!isUnbounded) {
+    for (let index = 1; index <= splice.portCount; index += 1) {
+      const occupantRef = spliceOccupancy[index];
+      if (occupantRef === undefined || isExcludedOccupant(occupantRef, excludeOccupantRefs)) {
+        return index;
+      }
+    }
+    return null;
+  }
+
+  const maxScanBound = Object.keys(spliceOccupancy).length + excludeOccupantRefs.size + 2;
+  for (let index = 1; index <= maxScanBound; index += 1) {
+    const occupantRef = spliceOccupancy[index];
     if (occupantRef === undefined || isExcludedOccupant(occupantRef, excludeOccupantRefs)) {
       return index;
     }
   }
-  return null;
+
+  return maxScanBound + 1;
 }
 
 export function getConnectorWayOccupant(

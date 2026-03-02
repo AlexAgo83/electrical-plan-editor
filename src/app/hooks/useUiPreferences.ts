@@ -6,6 +6,7 @@ import type {
   CanvasExportFormat,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
+  CanvasResizeBehaviorMode,
   CanvasLabelStrokeMode,
   TableFontSize,
   WorkspaceCurrencyCode,
@@ -129,6 +130,7 @@ interface UiPreferencesPayload {
   canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
+  canvasResizeBehaviorMode: CanvasResizeBehaviorMode;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
@@ -196,6 +198,7 @@ interface UseUiPreferencesOptions {
   canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
+  canvasResizeBehaviorMode: CanvasResizeBehaviorMode;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
@@ -240,6 +243,7 @@ interface UseUiPreferencesOptions {
   setCanvasNodeShapeSizePercent: (value: number) => void;
   setCanvasExportFormat: (value: CanvasExportFormat) => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
+  setCanvasResizeBehaviorMode: (value: CanvasResizeBehaviorMode) => void;
   setShowNetworkGrid: (value: boolean) => void;
   setSnapNodesToGrid: (value: boolean) => void;
   setLockEntityMovement: (value: boolean) => void;
@@ -285,6 +289,10 @@ function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotatio
 
 function normalizeCanvasExportFormat(value: unknown): CanvasExportFormat {
   return value === "png" ? "png" : "svg";
+}
+
+function normalizeCanvasResizeBehaviorMode(value: unknown): CanvasResizeBehaviorMode {
+  return value === "visibleAreaOnly" ? "visibleAreaOnly" : "responsiveContentScale";
 }
 
 function normalizeCanvasNodeShapeSizePercent(value: unknown): number {
@@ -350,6 +358,7 @@ export function useUiPreferences({
   canvasNodeShapeSizePercent,
   canvasExportFormat,
   canvasPngExportIncludeBackground,
+  canvasResizeBehaviorMode,
   canvasResetZoomPercentInput,
   showShortcutHints,
   keyboardShortcutsEnabled,
@@ -394,6 +403,7 @@ export function useUiPreferences({
   setCanvasNodeShapeSizePercent,
   setCanvasExportFormat,
   setCanvasPngExportIncludeBackground,
+  setCanvasResizeBehaviorMode,
   setShowNetworkGrid,
   setSnapNodesToGrid,
   setLockEntityMovement,
@@ -519,6 +529,7 @@ export function useUiPreferences({
           ? preferences.canvasPngExportIncludeBackground
           : true
       );
+      setCanvasResizeBehaviorMode(normalizeCanvasResizeBehaviorMode(preferences.canvasResizeBehaviorMode));
       setShowNetworkGrid(showGridDefault);
       setSnapNodesToGrid(snapDefault);
       setLockEntityMovement(lockMovementDefault);
@@ -568,6 +579,7 @@ export function useUiPreferences({
     setCanvasNodeShapeSizePercent,
     setCanvasExportFormat,
     setCanvasPngExportIncludeBackground,
+    setCanvasResizeBehaviorMode,
     setCanvasResetZoomPercentInput,
     setConnectorSort,
     setDefaultIdSortDirection,
@@ -647,6 +659,7 @@ export function useUiPreferences({
       canvasNodeShapeSizePercent,
       canvasExportFormat,
       canvasPngExportIncludeBackground,
+      canvasResizeBehaviorMode,
       canvasResetZoomPercentInput,
       showShortcutHints,
       keyboardShortcutsEnabled,
@@ -679,6 +692,7 @@ export function useUiPreferences({
     canvasNodeShapeSizePercent,
     canvasExportFormat,
     canvasPngExportIncludeBackground,
+    canvasResizeBehaviorMode,
     canvasResetZoomPercentInput,
     defaultIdSortDirection,
     defaultSortDirection,

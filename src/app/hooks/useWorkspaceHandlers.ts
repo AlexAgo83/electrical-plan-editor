@@ -14,8 +14,6 @@ import {
 import {
   NETWORK_MAX_SCALE,
   NETWORK_MIN_SCALE,
-  NETWORK_VIEW_HEIGHT,
-  NETWORK_VIEW_WIDTH,
   buildUniqueNetworkTechnicalId,
   clamp,
   createEntityId
@@ -61,6 +59,8 @@ interface UseWorkspaceHandlersParams {
   connectorMap: Map<ConnectorId, Connector>;
   spliceMap: Map<SpliceId, Splice>;
   configuredResetScale: number;
+  networkViewWidth: number;
+  networkViewHeight: number;
   networkScale: number;
   networkOffset: NodePosition;
   setNetworkScale: (value: number) => void;
@@ -135,6 +135,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasNodeShapeSizePercent: (value: number) => void;
   setCanvasExportFormat: (value: "svg" | "png") => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
+  setCanvasResizeBehaviorMode: (value: "responsiveContentScale" | "visibleAreaOnly") => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
   setShowShortcutHints: (value: boolean) => void;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
@@ -163,6 +164,8 @@ export function useWorkspaceHandlers({
   connectorMap,
   spliceMap,
   configuredResetScale,
+  networkViewWidth,
+  networkViewHeight,
   networkScale,
   networkOffset,
   setNetworkScale,
@@ -235,6 +238,7 @@ export function useWorkspaceHandlers({
   setCanvasNodeShapeSizePercent,
   setCanvasExportFormat,
   setCanvasPngExportIncludeBackground,
+  setCanvasResizeBehaviorMode,
   setCanvasResetZoomPercentInput,
   setShowShortcutHints,
   setKeyboardShortcutsEnabled,
@@ -561,8 +565,8 @@ export function useWorkspaceHandlers({
       const paddedMaxY = bounds.maxY + entityVisualPadding;
       const contentWidth = Math.max(1, paddedMaxX - paddedMinX);
       const contentHeight = Math.max(1, paddedMaxY - paddedMinY);
-      const availableWidth = Math.max(1, NETWORK_VIEW_WIDTH - fitPadding * 2);
-      const availableHeight = Math.max(1, NETWORK_VIEW_HEIGHT - fitPadding * 2);
+      const availableWidth = Math.max(1, networkViewWidth - fitPadding * 2);
+      const availableHeight = Math.max(1, networkViewHeight - fitPadding * 2);
       const fittedScale = clamp(
         Math.min(availableWidth / contentWidth, availableHeight / contentHeight),
         NETWORK_MIN_SCALE,
@@ -594,8 +598,8 @@ export function useWorkspaceHandlers({
           Number.isFinite(svgRect.top);
 
         if (svgElement !== null && hasUsableSvgRect && calloutFrames !== undefined && calloutFrames.length > 0) {
-          const scaleX = NETWORK_VIEW_WIDTH / svgRect.width;
-          const scaleY = NETWORK_VIEW_HEIGHT / svgRect.height;
+          const scaleX = networkViewWidth / svgRect.width;
+          const scaleY = networkViewHeight / svgRect.height;
 
           calloutFrames.forEach((frame) => {
             const rect = frame.getBoundingClientRect();
@@ -669,8 +673,8 @@ export function useWorkspaceHandlers({
     const centerY = (paddedMinY + paddedMaxY) / 2;
     setNetworkScale(fittedScale);
     setNetworkOffset({
-      x: NETWORK_VIEW_WIDTH / 2 - centerX * fittedScale,
-      y: NETWORK_VIEW_HEIGHT / 2 - centerY * fittedScale
+      x: networkViewWidth / 2 - centerX * fittedScale,
+      y: networkViewHeight / 2 - centerY * fittedScale
     });
   }
 
@@ -741,6 +745,7 @@ export function useWorkspaceHandlers({
     setCanvasNodeShapeSizePercent(75);
     setCanvasExportFormat("svg");
     setCanvasPngExportIncludeBackground(true);
+    setCanvasResizeBehaviorMode("responsiveContentScale");
     setCanvasResetZoomPercentInput("60");
     setShowNetworkGrid(true);
     setSnapNodesToGrid(true);

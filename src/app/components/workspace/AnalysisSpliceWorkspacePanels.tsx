@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
+import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { formatOccupantRefForDisplay, parseWireOccupantRef } from "../../lib/app-utils-networking";
@@ -64,7 +65,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
           if (field === "name") return splice.name;
           if (field === "technicalId") return splice.technicalId;
           if (field === "manufacturerReference") return splice.manufacturerReference;
-          if (field === "portCount") return splice.portCount;
+          if (field === "portCount") return resolveSplicePortMode(splice) === "unbounded" ? Number.POSITIVE_INFINITY : splice.portCount;
           return spliceOccupiedCountById.get(splice.id) ?? 0;
         },
         (splice) => splice.id
@@ -95,13 +96,80 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     spliceTableSort.field === field ? (spliceTableSort.direction === "asc" ? "▲" : "▼") : "";
   const spliceSynthesisSortIndicator = (field: SpliceSynthesisTableSortField) =>
     spliceSynthesisTableSort.field === field ? (spliceSynthesisTableSort.direction === "asc" ? "▲" : "▼") : "";
-  const nextFreePortIndex = splicePortStatuses.find((slot) => !slot.isOccupied)?.portIndex ?? null;
+  const selectedSplicePortMode = selectedSplice === null ? "bounded" : resolveSplicePortMode(selectedSplice);
+  const [unboundedVisibleFreePortCount, setUnboundedVisibleFreePortCount] = useState(0);
+  const splicePortStatusByIndex = useMemo(
+    () => new Map(splicePortStatuses.map((slot) => [slot.portIndex, slot] as const)),
+    [splicePortStatuses]
+  );
+  const occupiedPortIndexSet = useMemo(() => {
+    const occupied = new Set<number>();
+    for (const slot of splicePortStatuses) {
+      if (slot.isOccupied) {
+        occupied.add(slot.portIndex);
+      }
+    }
+    return occupied;
+  }, [splicePortStatuses]);
+  const displayedSplicePortStatuses = useMemo(() => {
+    if (selectedSplice === null || selectedSplicePortMode === "bounded") {
+      return splicePortStatuses;
+    }
+
+    const visibleFreePortTarget = 2 + unboundedVisibleFreePortCount;
+    const visibleIndexes = new Set<number>(occupiedPortIndexSet);
+    let nextCandidateIndex = 1;
+    let freeSlotsAdded = 0;
+    while (freeSlotsAdded < visibleFreePortTarget) {
+      if (!occupiedPortIndexSet.has(nextCandidateIndex)) {
+        visibleIndexes.add(nextCandidateIndex);
+        freeSlotsAdded += 1;
+      }
+      nextCandidateIndex += 1;
+    }
+
+    return [...visibleIndexes]
+      .sort((left, right) => left - right)
+      .map((portIndex) => {
+        const existing = splicePortStatusByIndex.get(portIndex);
+        if (existing !== undefined) {
+          return existing;
+        }
+        return {
+          portIndex,
+          occupantRef: null,
+          isOccupied: false
+        };
+      });
+  }, [
+    selectedSplice,
+    selectedSplicePortMode,
+    splicePortStatuses,
+    unboundedVisibleFreePortCount,
+    occupiedPortIndexSet,
+    splicePortStatusByIndex
+  ]);
+  const nextFreePortIndex =
+    selectedSplice === null
+      ? null
+      : selectedSplicePortMode === "bounded"
+        ? (splicePortStatuses.find((slot) => !slot.isOccupied)?.portIndex ?? null)
+        : (() => {
+            let candidate = 1;
+            while (occupiedPortIndexSet.has(candidate)) {
+              candidate += 1;
+            }
+            return candidate;
+          })();
   const parsedPortIndex = Number.parseInt(portIndexInput, 10);
   const portIndexIsInteger = Number.isInteger(parsedPortIndex) && parsedPortIndex > 0;
-  const selectedPortSlot = portIndexIsInteger ? splicePortStatuses.find((slot) => slot.portIndex === parsedPortIndex) ?? null : null;
+  const selectedPortSlot = portIndexIsInteger ? splicePortStatusByIndex.get(parsedPortIndex) ?? null : null;
   const portIsOccupied = selectedPortSlot?.isOccupied === true;
   const portIndexOutOfRange =
-    selectedSplice !== null && portIndexIsInteger && (parsedPortIndex < 1 || parsedPortIndex > selectedSplice.portCount);
+    selectedSplice !== null &&
+    selectedSplicePortMode === "bounded" &&
+    portIndexIsInteger &&
+    (parsedPortIndex < 1 || parsedPortIndex > selectedSplice.portCount);
   const spliceReserveValidationMessage =
     selectedSplice === null || portIndexInput.trim() === ""
       ? null
@@ -117,10 +185,14 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
   const canReservePort =
     selectedSplice !== null &&
     portIndexInput.trim() !== "" &&
-    spliceOccupantRefInput.trim() !== "" &&
+      spliceOccupantRefInput.trim() !== "" &&
     portIndexIsInteger &&
     !portIndexOutOfRange &&
     !portIsOccupied;
+
+  useEffect(() => {
+    setUnboundedVisibleFreePortCount(0);
+  }, [selectedSpliceId, selectedSplicePortMode]);
 
   useEffect(() => {
     if (selectedSplice === null) {
@@ -130,17 +202,25 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
       setPortIndexInput("");
       return;
     }
-    if (nextFreePortIndex < 1 || nextFreePortIndex > selectedSplice.portCount) {
+    if (selectedSplicePortMode === "bounded" && (nextFreePortIndex < 1 || nextFreePortIndex > selectedSplice.portCount)) {
       setPortIndexInput("");
       return;
     }
-    const suggestedSlot = splicePortStatuses.find((slot) => slot.portIndex === nextFreePortIndex) ?? null;
-    if (suggestedSlot === null || suggestedSlot.isOccupied) {
+    const suggestedSlot = splicePortStatusByIndex.get(nextFreePortIndex) ?? null;
+    if (suggestedSlot?.isOccupied) {
       setPortIndexInput("");
       return;
     }
     setPortIndexInput(String(nextFreePortIndex));
-  }, [selectedSpliceId, splicePortStatuses, nextFreePortIndex, selectedSplice, setPortIndexInput]);
+  }, [
+    selectedSpliceId,
+    splicePortStatuses,
+    nextFreePortIndex,
+    selectedSplice,
+    selectedSplicePortMode,
+    setPortIndexInput,
+    splicePortStatusByIndex
+  ]);
 
   function handleReservePortSubmit(event: FormEvent<HTMLFormElement>): void {
     if (!canReservePort) {
@@ -179,12 +259,13 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
           onClick={() =>
             downloadCsvFile(
               "analysis-splices",
-              ["Name", "Technical ID", "Mfr Ref", "Ports", "Branches"],
+              ["Name", "Technical ID", "Mfr Ref", "Port mode", "Ports", "Branches"],
               sortedVisibleSplices.map((splice) => [
                 splice.name,
                 splice.technicalId,
                 splice.manufacturerReference ?? "",
-                splice.portCount,
+                resolveSplicePortMode(splice),
+                resolveSplicePortMode(splice) === "unbounded" ? "" : splice.portCount,
                 spliceOccupiedCountById.get(splice.id) ?? 0
               ])
             )
@@ -275,7 +356,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
                 <td>{splice.name}</td>
                 <td className="technical-id">{splice.technicalId}</td>
                 <td className="technical-id">{splice.manufacturerReference ?? ""}</td>
-                <td>{splice.portCount}</td>
+                <td>{resolveSplicePortMode(splice) === "unbounded" ? "∞" : splice.portCount}</td>
                 <td>{occupiedCount}</td>
               </tr>
             );
@@ -315,7 +396,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
             downloadCsvFile(
               `analysis-splice-ports-${selectedSplice?.technicalId ?? "selection"}`,
               ["Port", "Status", "Occupant reference"],
-              splicePortStatuses.map((slot) => [
+              displayedSplicePortStatuses.map((slot) => [
                 `P${slot.portIndex}`,
                 slot.isOccupied ? "Occupied" : "Free",
                 formatOccupantRef(slot.occupantRef)
@@ -337,7 +418,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
         }}
         disabled={
           selectedSplice === null ||
-          (spliceAnalysisView === "ports" ? splicePortStatuses.length === 0 : sortedSpliceSynthesisRowsByColumns.length === 0)
+          (spliceAnalysisView === "ports" ? displayedSplicePortStatuses.length === 0 : sortedSpliceSynthesisRowsByColumns.length === 0)
         }
       >
         <span className="table-export-icon" aria-hidden="true" />
@@ -352,6 +433,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
       <p className="meta-line">
         <span className="splice-badge">Junction</span> <strong>{selectedSplice.name}</strong> ({selectedSplice.technicalId})
       </p>
+      <p className="meta-line">Capacity: {selectedSplicePortMode === "unbounded" ? "∞ (unbounded)" : `${selectedSplice.portCount} ports`}</p>
       <p className="meta-line">Branch count: {splicePortStatuses.filter((slot) => slot.isOccupied).length}</p>
       <form className="row-form" onSubmit={handleReservePortSubmit}>
         <label>
@@ -359,7 +441,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
           <input
             type="number"
             min={1}
-            max={selectedSplice.portCount}
+            max={selectedSplicePortMode === "bounded" ? selectedSplice.portCount : undefined}
             step={1}
             value={portIndexInput}
             onChange={(event) => setPortIndexInput(event.target.value)}
@@ -387,12 +469,24 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
       {spliceReserveValidationMessage === null && nextFreePortIndex !== null ? (
         <small className="inline-help">Suggested next free port: P{nextFreePortIndex}</small>
       ) : null}
-      {spliceReserveValidationMessage === null && nextFreePortIndex === null ? (
+      {spliceReserveValidationMessage === null && nextFreePortIndex === null && selectedSplicePortMode === "bounded" ? (
         <small className="inline-help">No available ports on this splice.</small>
+      ) : null}
+      {selectedSplicePortMode === "unbounded" ? (
+        <div className="row-actions">
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => setUnboundedVisibleFreePortCount((current) => current + 1)}
+          >
+            <span className="action-button-icon is-add" aria-hidden="true" />
+            + Add visible port(s)
+          </button>
+        </div>
       ) : null}
 
       <div className="cavity-grid" aria-label="Splice port occupancy grid">
-        {splicePortStatuses.map((slot) => {
+        {displayedSplicePortStatuses.map((slot) => {
           const parsedOccupantRef = slot.occupantRef === null ? null : parseWireOccupantRef(slot.occupantRef);
           const canGoToWire =
             parsedOccupantRef !== null &&

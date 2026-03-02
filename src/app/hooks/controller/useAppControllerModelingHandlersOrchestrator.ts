@@ -43,12 +43,15 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setSpliceTechnicalId: Parameters<typeof useSpliceHandlers>[0]["setSpliceTechnicalId"];
   spliceCatalogItemId: Parameters<typeof useSpliceHandlers>[0]["spliceCatalogItemId"];
   setSpliceCatalogItemId: Parameters<typeof useSpliceHandlers>[0]["setSpliceCatalogItemId"];
+  splicePortMode: Parameters<typeof useSpliceHandlers>[0]["splicePortMode"];
+  setSplicePortMode: Parameters<typeof useSpliceHandlers>[0]["setSplicePortMode"];
   spliceManufacturerReference: Parameters<typeof useSpliceHandlers>[0]["spliceManufacturerReference"];
   setSpliceManufacturerReference: Parameters<typeof useSpliceHandlers>[0]["setSpliceManufacturerReference"];
   spliceAutoCreateLinkedNode: Parameters<typeof useSpliceHandlers>[0]["spliceAutoCreateLinkedNode"];
   setSpliceAutoCreateLinkedNode: Parameters<typeof useSpliceHandlers>[0]["setSpliceAutoCreateLinkedNode"];
   portCount: Parameters<typeof useSpliceHandlers>[0]["portCount"];
   setPortCount: Parameters<typeof useSpliceHandlers>[0]["setPortCount"];
+  setSpliceFormInfo: Parameters<typeof useSpliceHandlers>[0]["setSpliceFormInfo"];
   setSpliceFormError: Parameters<typeof useSpliceHandlers>[0]["setSpliceFormError"];
   portIndexInput: Parameters<typeof useSpliceHandlers>[0]["portIndexInput"];
   spliceOccupantRefInput: Parameters<typeof useSpliceHandlers>[0]["spliceOccupantRefInput"];
@@ -179,12 +182,15 @@ export function useAppControllerModelingHandlersOrchestrator({
   setSpliceTechnicalId,
   spliceCatalogItemId,
   setSpliceCatalogItemId,
+  splicePortMode,
+  setSplicePortMode,
   spliceManufacturerReference,
   setSpliceManufacturerReference,
   spliceAutoCreateLinkedNode,
   setSpliceAutoCreateLinkedNode,
   portCount,
   setPortCount,
+  setSpliceFormInfo,
   setSpliceFormError,
   portIndexInput,
   spliceOccupantRefInput,
@@ -321,6 +327,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     setSpliceTechnicalId,
     spliceCatalogItemId,
     setSpliceCatalogItemId,
+    splicePortMode,
+    setSplicePortMode,
     spliceManufacturerReference,
     setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode,
@@ -328,6 +336,7 @@ export function useAppControllerModelingHandlersOrchestrator({
     defaultAutoCreateLinkedNodes,
     portCount,
     setPortCount,
+    setSpliceFormInfo,
     setSpliceFormError,
     selectedSpliceId,
     portIndexInput,

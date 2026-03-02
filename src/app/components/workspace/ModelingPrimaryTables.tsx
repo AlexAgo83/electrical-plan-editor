@@ -3,6 +3,7 @@ import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
+import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 import type {
@@ -237,7 +238,7 @@ export function ModelingPrimaryTables({
           if (field === "name") return splice.name;
           if (field === "technicalId") return splice.technicalId;
           if (field === "manufacturerReference") return splice.manufacturerReference;
-          if (field === "portCount") return splice.portCount;
+          if (field === "portCount") return resolveSplicePortMode(splice) === "unbounded" ? Number.POSITIVE_INFINITY : splice.portCount;
           return spliceOccupiedCountById.get(splice.id) ?? 0;
         },
         (splice) => splice.id
@@ -521,12 +522,13 @@ export function ModelingPrimaryTables({
                 onClick={() =>
                   downloadCsvFile(
                     "modeling-splices",
-                    ["Name", "Technical ID", "Mfr Ref", "Ports", "Branches"],
+                    ["Name", "Technical ID", "Mfr Ref", "Port mode", "Ports", "Branches"],
                     sortedVisibleSplices.map((splice) => [
                       splice.name,
                       splice.technicalId,
                       splice.manufacturerReference ?? "",
-                      splice.portCount,
+                      resolveSplicePortMode(splice),
+                      resolveSplicePortMode(splice) === "unbounded" ? "" : splice.portCount,
                       spliceOccupiedCountById.get(splice.id) ?? 0
                     ])
                   )
@@ -617,7 +619,7 @@ export function ModelingPrimaryTables({
                     <td>{splice.name}</td>
                     <td className="technical-id">{splice.technicalId}</td>
                     <td className="technical-id">{splice.manufacturerReference ?? ""}</td>
-                    <td>{splice.portCount}</td>
+                    <td>{resolveSplicePortMode(splice) === "unbounded" ? "∞" : splice.portCount}</td>
                     <td>{occupiedCount}</td>
                   </tr>
                 );

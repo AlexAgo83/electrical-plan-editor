@@ -48,6 +48,7 @@ export type CanvasLabelSizeMode = "extraSmall" | "small" | "normal" | "large" | 
 export type CanvasCalloutTextSize = "small" | "normal" | "large";
 export type CanvasExportFormat = "svg" | "png";
 export type CanvasLabelRotationDegrees = -90 | -45 | -20 | 0 | 20 | 45 | 90;
+export type CanvasResizeBehaviorMode = "responsiveContentScale" | "visibleAreaOnly";
 export type OccupancyFilter = "all" | "occupied" | "free";
 export type SegmentSubNetworkFilter = "all" | "default" | "tagged";
 export type ValidationSeverityFilter = "all" | "error" | "warning";

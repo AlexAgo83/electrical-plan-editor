@@ -1,8 +1,8 @@
 ## req_094_node_border_stroke_scaling_parity_for_zoom_invariant_node_shapes - Node border stroke scaling parity for zoom-invariant node shapes
 > From version: 1.1.0
-> Status: Draft
-> Understanding: 100%
-> Confidence: 97%
+> Status: Done
+> Understanding: 100% (implemented with proportional stroke variables wired in network summary rendering)
+> Confidence: 98% (validated through lint, typecheck, and canvas UI regression tests)
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence and references when you edit this doc.

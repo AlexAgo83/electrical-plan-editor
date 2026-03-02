@@ -1,8 +1,8 @@
 ## req_092_optional_catalog_association_for_splices - Optional catalog association for splices
 > From version: 1.1.0
-> Status: Draft
+> Status: Done
 > Understanding: 100%
-> Confidence: 96%
+> Confidence: 97%
 > Complexity: Medium
 > Theme: Modeling contract alignment for splice real-world usage
 > Reminder: Update status/understanding/confidence and references when you edit this doc.

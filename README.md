@@ -55,7 +55,8 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - Canvas defaults for grid/snap/lock/overlays/segment lengths/callouts and PNG background export
   - Keyboard-accessible segment selection with labeled hit targets and improved interactive SVG semantics
 - Quick entity navigation in the canvas with contextual `Modeling` / `Analysis` switch (when available)
-- Network-scoped `Catalog` with catalog-first connector/splice creation (manufacturer reference + connection count driven by catalog items)
+- Network-scoped `Catalog` with catalog-first connector creation and optional splice catalog association (linked splice still derives manufacturer reference + bounded connection count from catalog items)
+- Splice capacity model supports `bounded` and `unbounded` port modes (`∞` rendering in lists, adaptive visible port slots in analysis, and mode-safe wire endpoint validation)
 - New network bootstrap seeds `3` default catalog items (`CAT-2W-STD`, `CAT-6P-STD`, `CAT-8W-STD`) with deterministic names/prices
 - Catalog analysis panel showing linked connector/splice usage for the selected catalog item with `Go to` navigation to Modeling edit flows
 - Catalog/BOM pricing workspace settings (currency + optional tax/VAT + tax rate defaults) with local persistence and reset support
@@ -67,7 +68,9 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - Occupancy/kind/route/sub-network chip filters remain available alongside table filter bars
 - Settings defaults for wire section prefill, connector/splice auto-create linked-node behavior, and Catalog/BOM pricing context
 - Validation center with grouped issues, issue navigation, and catalog integrity checks (`Catalog` records, catalog-item errors, connector/splice catalog-link audits)
-- Legacy save/import normalization for missing connector/splice manufacturer references via deterministic catalog placeholders
+- Legacy save/import normalization for missing connector manufacturer references via deterministic catalog placeholders (splices can remain unlinked without generated placeholders)
+- Zoom-invariant node shapes now scale border stroke weight proportionally (default/selected/focus states) while preserving existing hitbox behavior
+- Canvas render setting `Viewport resize behavior` with `Resize changes visible area only` mode under `Reset zoom target (%)`
 - `Network summary` header exports:
   - `Export PNG`
   - `Export BOM CSV` (catalog-aggregated BOM with pricing context metadata, HT totals, and conditional TTC columns/totals when tax is enabled)

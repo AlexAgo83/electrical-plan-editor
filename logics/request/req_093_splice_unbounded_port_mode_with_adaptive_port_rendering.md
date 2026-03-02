@@ -1,8 +1,8 @@
 ## req_093_splice_unbounded_port_mode_with_adaptive_port_rendering - Splice unbounded port mode with adaptive port rendering
 > From version: 1.1.0
-> Status: Draft
-> Understanding: 97%
-> Confidence: 93%
+> Status: Done
+> Understanding: 100%
+> Confidence: 97%
 > Complexity: High
 > Theme: Modeling and UI contract for realistic splice capacity semantics
 > Reminder: Update status/understanding/confidence and references when you edit this doc.

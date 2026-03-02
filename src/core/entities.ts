@@ -36,6 +36,7 @@ export interface Splice {
   id: SpliceId;
   name: string;
   technicalId: string;
+  portMode?: "bounded" | "unbounded";
   portCount: number;
   catalogItemId?: CatalogItemId;
   manufacturerReference?: string;

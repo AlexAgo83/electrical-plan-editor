@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import type { CatalogItem, Connector, NetworkNode, Splice, WireEndpoint } from "../../../core/entities";
+import type { SplicePortMode } from "../../../core/splicePortMode";
 import type { WireEndpointSlotHint } from "../../hooks/useWireHandlers";
 
 export interface ModelingFormsColumnProps {
@@ -34,6 +35,8 @@ export interface ModelingFormsColumnProps {
   setSpliceTechnicalId: (value: string) => void;
   spliceCatalogItemId: string;
   setSpliceCatalogItemId: (value: string) => void;
+  splicePortMode: SplicePortMode;
+  setSplicePortMode: (value: SplicePortMode) => void;
   spliceManufacturerReference: string;
   setSpliceManufacturerReference: (value: string) => void;
   spliceAutoCreateLinkedNode: boolean;
@@ -41,6 +44,7 @@ export interface ModelingFormsColumnProps {
   spliceTechnicalIdAlreadyUsed: boolean;
   portCount: string;
   setPortCount: (value: string) => void;
+  spliceFormInfo: string | null;
   cancelSpliceEdit: () => void;
   spliceFormError: string | null;
   isNodeSubScreen: boolean;

@@ -14,6 +14,7 @@ import type {
   Wire,
   WireId
 } from "../core/entities";
+import { resolveSplicePortMode } from "../core/splicePortMode";
 import { buildRoutingGraphIndex, type RoutingGraphIndex } from "../core/graph";
 import { findShortestRoute, type ShortestRouteResult } from "../core/pathfinding";
 import { normalizeManufacturerReferenceKey } from "./catalog";
@@ -248,6 +249,18 @@ export function selectSplicePortStatuses(
   }
 
   const occupancy = state.splicePortOccupancy[spliceId] ?? {};
+  const isUnbounded = resolveSplicePortMode(splice) === "unbounded";
+  if (isUnbounded) {
+    return Object.keys(occupancy)
+      .map((key) => Number(key))
+      .filter((portIndex) => Number.isInteger(portIndex) && portIndex >= 1)
+      .sort((left, right) => left - right)
+      .map((portIndex) => ({
+        portIndex,
+        occupantRef: occupancy[portIndex] ?? null,
+        isOccupied: (occupancy[portIndex] ?? null) !== null
+      }));
+  }
 
   return Array.from({ length: splice.portCount }, (_, index) => {
     const portIndex = index + 1;
