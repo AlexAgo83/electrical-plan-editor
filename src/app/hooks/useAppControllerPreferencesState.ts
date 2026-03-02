@@ -44,6 +44,7 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultAutoSegmentLabelRotation, setCanvasDefaultAutoSegmentLabelRotation] = useState(false);
   const [canvasShowCalloutWireNames, setCanvasShowCalloutWireNames] = useState(false);
   const [canvasZoomInvariantNodeShapes, setCanvasZoomInvariantNodeShapes] = useState(false);
+  const [canvasNodeShapeSizePercent, setCanvasNodeShapeSizePercent] = useState(100);
   const [canvasExportFormat, setCanvasExportFormat] = useState<CanvasExportFormat>("svg");
   const [canvasPngExportIncludeBackground, setCanvasPngExportIncludeBackground] = useState(true);
   const [showShortcutHints, setShowShortcutHints] = useState(false);
@@ -108,6 +109,8 @@ export function useAppControllerPreferencesState() {
     setCanvasShowCalloutWireNames,
     canvasZoomInvariantNodeShapes,
     setCanvasZoomInvariantNodeShapes,
+    canvasNodeShapeSizePercent,
+    setCanvasNodeShapeSizePercent,
     canvasExportFormat,
     setCanvasExportFormat,
     canvasPngExportIncludeBackground,

@@ -208,6 +208,8 @@ export function useAppControllerAuxScreenContentDomains({
     setCanvasShowCalloutWireNames: settings.prefs.setCanvasShowCalloutWireNames,
     canvasZoomInvariantNodeShapes: settings.prefs.canvasZoomInvariantNodeShapes,
     setCanvasZoomInvariantNodeShapes: settings.prefs.setCanvasZoomInvariantNodeShapes,
+    canvasNodeShapeSizePercent: settings.prefs.canvasNodeShapeSizePercent,
+    setCanvasNodeShapeSizePercent: settings.prefs.setCanvasNodeShapeSizePercent,
     canvasExportFormat: settings.prefs.canvasExportFormat,
     setCanvasExportFormat: settings.prefs.setCanvasExportFormat,
     canvasPngExportIncludeBackground: settings.prefs.canvasPngExportIncludeBackground,

@@ -126,6 +126,7 @@ interface UiPreferencesPayload {
   canvasDefaultAutoSegmentLabelRotation: boolean;
   canvasShowCalloutWireNames: boolean;
   canvasZoomInvariantNodeShapes: boolean;
+  canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
@@ -192,6 +193,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultAutoSegmentLabelRotation: boolean;
   canvasShowCalloutWireNames: boolean;
   canvasZoomInvariantNodeShapes: boolean;
+  canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
@@ -235,6 +237,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
+  setCanvasNodeShapeSizePercent: (value: number) => void;
   setCanvasExportFormat: (value: CanvasExportFormat) => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
   setShowNetworkGrid: (value: boolean) => void;
@@ -282,6 +285,14 @@ function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotatio
 
 function normalizeCanvasExportFormat(value: unknown): CanvasExportFormat {
   return value === "png" ? "png" : "svg";
+}
+
+function normalizeCanvasNodeShapeSizePercent(value: unknown): number {
+  const parsed = typeof value === "string" ? Number(value) : value;
+  if (!Number.isFinite(parsed)) {
+    return 100;
+  }
+  return clamp(Math.round(Number(parsed)), 50, 200);
 }
 
 function normalizeWorkspacePanelsLayoutMode(value: unknown): WorkspacePanelsLayoutPreference {
@@ -336,6 +347,7 @@ export function useUiPreferences({
   canvasDefaultAutoSegmentLabelRotation,
   canvasShowCalloutWireNames,
   canvasZoomInvariantNodeShapes,
+  canvasNodeShapeSizePercent,
   canvasExportFormat,
   canvasPngExportIncludeBackground,
   canvasResetZoomPercentInput,
@@ -379,6 +391,7 @@ export function useUiPreferences({
   setCanvasDefaultAutoSegmentLabelRotation,
   setCanvasShowCalloutWireNames,
   setCanvasZoomInvariantNodeShapes,
+  setCanvasNodeShapeSizePercent,
   setCanvasExportFormat,
   setCanvasPngExportIncludeBackground,
   setShowNetworkGrid,
@@ -499,6 +512,7 @@ export function useUiPreferences({
       setCanvasZoomInvariantNodeShapes(
         typeof preferences.canvasZoomInvariantNodeShapes === "boolean" ? preferences.canvasZoomInvariantNodeShapes : false
       );
+      setCanvasNodeShapeSizePercent(normalizeCanvasNodeShapeSizePercent(preferences.canvasNodeShapeSizePercent));
       setCanvasExportFormat(normalizeCanvasExportFormat(preferences.canvasExportFormat));
       setCanvasPngExportIncludeBackground(
         typeof preferences.canvasPngExportIncludeBackground === "boolean"
@@ -551,6 +565,7 @@ export function useUiPreferences({
     setCanvasDefaultAutoSegmentLabelRotation,
     setCanvasShowCalloutWireNames,
     setCanvasZoomInvariantNodeShapes,
+    setCanvasNodeShapeSizePercent,
     setCanvasExportFormat,
     setCanvasPngExportIncludeBackground,
     setCanvasResetZoomPercentInput,
@@ -629,6 +644,7 @@ export function useUiPreferences({
       canvasDefaultAutoSegmentLabelRotation,
       canvasShowCalloutWireNames,
       canvasZoomInvariantNodeShapes,
+      canvasNodeShapeSizePercent,
       canvasExportFormat,
       canvasPngExportIncludeBackground,
       canvasResetZoomPercentInput,
@@ -660,6 +676,7 @@ export function useUiPreferences({
     canvasDefaultAutoSegmentLabelRotation,
     canvasShowCalloutWireNames,
     canvasZoomInvariantNodeShapes,
+    canvasNodeShapeSizePercent,
     canvasExportFormat,
     canvasPngExportIncludeBackground,
     canvasResetZoomPercentInput,

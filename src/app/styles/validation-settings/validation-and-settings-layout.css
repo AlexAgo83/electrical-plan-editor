@@ -258,6 +258,33 @@
   width: 100%;
 }
 
+.settings-range-field {
+  gap: 0.38rem;
+}
+
+.settings-range-control {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.settings-panel .settings-grid > label:not(.settings-checkbox) .settings-range-input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.settings-range-value {
+  min-width: 3.8rem;
+  text-align: right;
+  font-size: 0.82rem;
+  color: #355975;
+  font-variant-numeric: tabular-nums;
+}
+
 .settings-panel .settings-checkbox {
   align-items: flex-start;
   gap: 0.5rem;

@@ -342,18 +342,35 @@ describe("App integration UI - settings canvas render", () => {
     switchScreenDrawerAware("analysis");
     let networkSummaryPanel = getPanelByHeading("Network summary");
     expect(networkSummaryPanel.querySelector(".network-node-shape-anchor")).toBeNull();
+    const connectorShapeBefore = networkSummaryPanel.querySelector("g.network-node.connector .network-node-shape");
+    expect(connectorShapeBefore).not.toBeNull();
+    const connectorWidthBefore = Number(connectorShapeBefore?.getAttribute("width") ?? "0");
+    expect(connectorWidthBefore).toBeGreaterThan(0);
 
     switchScreenDrawerAware("settings");
+    const canvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
+    const nodeShapeSizeSlider = within(canvasToolsSettingsPanel).getByRole("slider", {
+      name: /Node shape target size/i
+    });
+    expect(nodeShapeSizeSlider).toHaveValue("100");
+    expect(nodeShapeSizeSlider).toBeDisabled();
     fireEvent.click(
-      within(getPanelByHeading("Canvas tools preferences")).getByLabelText(
+      within(canvasToolsSettingsPanel).getByLabelText(
         "Keep connector/splice/node shape size constant while zooming"
       )
     );
+    expect(nodeShapeSizeSlider).toBeEnabled();
+    fireEvent.change(nodeShapeSizeSlider, { target: { value: "150" } });
+    expect(nodeShapeSizeSlider).toHaveValue("150");
 
     switchScreenDrawerAware("analysis");
     networkSummaryPanel = getPanelByHeading("Network summary");
     const invariantAnchor = networkSummaryPanel.querySelector(".network-node-shape-anchor");
     expect(invariantAnchor).not.toBeNull();
+    const connectorShapeAfter = networkSummaryPanel.querySelector("g.network-node.connector .network-node-shape");
+    expect(connectorShapeAfter).not.toBeNull();
+    const connectorWidthAfter = Number(connectorShapeAfter?.getAttribute("width") ?? "0");
+    expect(connectorWidthAfter).toBeGreaterThan(connectorWidthBefore);
     const transformBeforeZoom = invariantAnchor?.getAttribute("transform") ?? "";
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom +" }));
     const transformAfterZoom = networkSummaryPanel.querySelector(".network-node-shape-anchor")?.getAttribute("transform") ?? "";
@@ -362,11 +379,17 @@ describe("App integration UI - settings canvas render", () => {
     firstRender.unmount();
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
+    const restoredCanvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
     expect(
-      within(getPanelByHeading("Canvas tools preferences")).getByLabelText(
+      within(restoredCanvasToolsSettingsPanel).getByLabelText(
         "Keep connector/splice/node shape size constant while zooming"
       )
     ).toBeChecked();
+    expect(
+      within(restoredCanvasToolsSettingsPanel).getByRole("slider", {
+        name: /Node shape target size/i
+      })
+    ).toHaveValue("150");
   });
 
   it("persists the 0 degree 2d label rotation preset across remount", () => {
