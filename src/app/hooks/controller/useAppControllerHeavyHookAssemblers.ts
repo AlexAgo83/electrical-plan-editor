@@ -65,6 +65,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
   >;
   preferenceSetters: Pick<
     WorkspaceHandlersParams,
+    | "setLocale"
     | "setThemeMode"
     | "setTableDensity"
     | "setTableFontSize"

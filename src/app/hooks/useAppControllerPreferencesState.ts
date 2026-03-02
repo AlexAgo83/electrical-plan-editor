@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ThemeMode } from "../../store";
 import type {
+  AppLocale,
   CanvasCalloutTextSize,
   CanvasExportFormat,
   CanvasLabelRotationDegrees,
@@ -17,6 +18,7 @@ import type {
 } from "../types/app-controller";
 
 export function useAppControllerPreferencesState() {
+  const [locale, setLocale] = useState<AppLocale>("en");
   const [themeMode, setThemeMode] = useState<ThemeMode>("warmBrown");
   const [tableDensity, setTableDensity] = useState<TableDensity>("compact");
   const [tableFontSize, setTableFontSize] = useState<TableFontSize>("normal");
@@ -58,6 +60,8 @@ export function useAppControllerPreferencesState() {
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
 
   return {
+    locale,
+    setLocale,
     themeMode,
     setThemeMode,
     tableDensity,

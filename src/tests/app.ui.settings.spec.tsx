@@ -462,4 +462,58 @@ describe("App integration UI - settings", () => {
     expect(within(restoredGlobalPreferencesPanel).getByLabelText("Wide screen (remove app max width cap)")).toBeChecked();
     expect(document.querySelector("main.app-shell")).toHaveClass("workspace-wide-screen");
   });
+
+  it("renders Global preferences before Action bar and keeps Language selector as the last control in Global preferences", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+
+    const panelHeadings = Array.from(document.querySelectorAll(".settings-panel .settings-panel-header h2")).map((heading) =>
+      heading.textContent?.trim()
+    );
+    const globalPreferencesIndex = panelHeadings.indexOf("Global preferences");
+    const actionBarIndex = panelHeadings.indexOf("Action bar and shortcuts");
+    expect(globalPreferencesIndex).toBeGreaterThanOrEqual(0);
+    expect(actionBarIndex).toBeGreaterThanOrEqual(0);
+    expect(globalPreferencesIndex).toBeLessThan(actionBarIndex);
+
+    const globalPreferencesPanel = getPanelByHeading("Global preferences");
+    const languageSelector = within(globalPreferencesPanel).getByLabelText("Language");
+    expect(languageSelector).toHaveValue("en");
+
+    const interactiveControls = Array.from(
+      globalPreferencesPanel.querySelectorAll<HTMLElement>("button, input, select, textarea")
+    );
+    expect(interactiveControls[interactiveControls.length - 1]).toBe(languageSelector);
+  });
+
+  it("switches to French at runtime, keeps changelog/import-export excluded, and persists locale", async () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+
+    const globalPreferencesPanel = getPanelByHeading("Global preferences");
+    fireEvent.change(within(globalPreferencesPanel).getByLabelText("Language"), { target: { value: "fr" } });
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Préférences d'apparence" })).toBeInTheDocument();
+    });
+
+    // Import/Export remains intentionally out of i18n scope.
+    expect(screen.getByRole("heading", { name: "Import / Export networks" })).toBeInTheDocument();
+
+    const appearanceHeading = screen.getByRole("heading", { name: "Préférences d'apparence" });
+    const appearancePanel = appearanceHeading.closest(".panel") as HTMLElement;
+    const defaultSortSelect = within(appearancePanel).getByLabelText("Colonne de tri par défaut");
+    expect(within(defaultSortSelect).getByRole("option", { name: "ID tech." })).toBeInTheDocument();
+
+    firstRender.unmount();
+
+    renderAppWithState(createUiIntegrationState());
+    const settingsToggle = document.querySelector(".header-settings-toggle");
+    expect(settingsToggle).not.toBeNull();
+    fireEvent.click(settingsToggle as HTMLElement);
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Préférences d'apparence" })).toBeInTheDocument();
+    });
+    expect(document.documentElement.lang).toBe("fr");
+  });
 });

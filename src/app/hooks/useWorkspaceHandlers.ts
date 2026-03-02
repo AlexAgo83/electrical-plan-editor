@@ -19,6 +19,7 @@ import {
   createEntityId
 } from "../lib/app-utils-shared";
 import type {
+  AppLocale,
   CanvasCalloutTextSize,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
@@ -91,6 +92,7 @@ interface UseWorkspaceHandlersParams {
   setNodeIdSortDirection: (value: SortDirection) => void;
   setSegmentIdSortDirection: (value: SortDirection) => void;
   setThemeMode: (value: ThemeMode | ((current: ThemeMode) => ThemeMode)) => void;
+  setLocale: (value: AppLocale) => void;
   setTableDensity: (value: TableDensity) => void;
   setTableFontSize: (value: TableFontSize) => void;
   setWorkspaceCurrencyCode: (value: WorkspaceCurrencyCode) => void;
@@ -178,6 +180,7 @@ export function useWorkspaceHandlers({
   setNodeIdSortDirection,
   setSegmentIdSortDirection,
   setThemeMode,
+  setLocale,
   setTableDensity,
   setTableFontSize,
   setWorkspaceCurrencyCode,
@@ -648,6 +651,7 @@ export function useWorkspaceHandlers({
 
   function resetWorkspacePreferencesToDefaults(): void {
     const defaultSort: SortState = { field: "name", direction: "asc" };
+    setLocale("en");
     setThemeMode("warmBrown");
     setTableDensity("compact");
     setTableFontSize("normal");

@@ -79,4 +79,22 @@ describe("App integration UI - onboarding", () => {
     fireEvent.keyDown(closeButton, { key: "Tab", shiftKey: true });
     expect(lastTargetAction).toHaveFocus();
   });
+
+  it("adds a final full-flow onboarding step for settings with a single primary Open Settings CTA", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    for (let index = 0; index < 6; index += 1) {
+      fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    }
+
+    const finalStepDialog = screen.getByRole("dialog", { name: "Configure your workspace defaults" });
+    expect(within(finalStepDialog).getByText("Step 7 of 7")).toBeInTheDocument();
+    expect(within(finalStepDialog).getByRole("button", { name: "Open Settings" })).toBeInTheDocument();
+    expect(within(finalStepDialog).queryByRole("button", { name: "Finish" })).toBeNull();
+
+    fireEvent.click(within(finalStepDialog).getByRole("button", { name: "Open Settings" }));
+
+    expect(screen.queryByRole("dialog", { name: "Configure your workspace defaults" })).toBeNull();
+    expect(getPanelByHeading("Global preferences")).toBeInTheDocument();
+  });
 });

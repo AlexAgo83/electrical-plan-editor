@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { DEFAULT_WIRE_SECTION_MM2, normalizeWireSectionMm2 } from "../../core/wireSection";
 import type { ThemeMode } from "../../store";
+import { normalizeAppLocale } from "../lib/i18n";
 import type {
+  AppLocale,
   CanvasCalloutTextSize,
   CanvasExportFormat,
   CanvasLabelRotationDegrees,
@@ -101,6 +103,7 @@ interface SortState {
 
 interface UiPreferencesPayload {
   schemaVersion: number;
+  locale: AppLocale;
   themeMode: ThemeMode;
   tableDensity: TableDensity;
   tableFontSize: TableFontSizePreference;
@@ -169,6 +172,7 @@ function readUiPreferences(): Partial<UiPreferencesPayload> | null {
 interface UseUiPreferencesOptions {
   networkMinScale: number;
   networkMaxScale: number;
+  locale: AppLocale;
   themeMode: ThemeMode;
   tableDensity: TableDensity;
   tableFontSize: TableFontSizePreference;
@@ -207,6 +211,7 @@ interface UseUiPreferencesOptions {
   workspaceWideScreen: boolean;
   preferencesHydrated: boolean;
   setThemeMode: (mode: ThemeMode) => void;
+  setLocale: (value: AppLocale) => void;
   setTableDensity: (density: TableDensity) => void;
   setTableFontSize: (value: TableFontSizePreference) => void;
   setWorkspaceCurrencyCode: (value: WorkspaceCurrencyCode) => void;
@@ -329,6 +334,7 @@ function normalizeWorkspaceTaxRatePercent(value: unknown): number {
 export function useUiPreferences({
   networkMinScale,
   networkMaxScale,
+  locale,
   themeMode,
   tableDensity,
   tableFontSize,
@@ -367,6 +373,7 @@ export function useUiPreferences({
   workspaceWideScreen,
   preferencesHydrated,
   setThemeMode,
+  setLocale,
   setTableDensity,
   setTableFontSize,
   setWorkspaceCurrencyCode,
@@ -481,6 +488,7 @@ export function useUiPreferences({
         : 1;
 
       setThemeMode(normalizeThemeMode(preferences.themeMode));
+      setLocale(normalizeAppLocale(preferences.locale));
       setTableDensity(preferences.tableDensity === "comfortable" ? "comfortable" : "compact");
       setTableFontSize(
         preferences.tableFontSize === "small" || preferences.tableFontSize === "large"
@@ -617,6 +625,7 @@ export function useUiPreferences({
     setWorkspaceTaxEnabled,
     setWorkspaceTaxRatePercent,
     setThemeMode,
+    setLocale,
     setWireSort,
     setConnectorSynthesisSort,
     setWorkspacePanelsLayoutMode,
@@ -630,6 +639,7 @@ export function useUiPreferences({
 
     const payload: UiPreferencesPayload = {
       schemaVersion: UI_PREFERENCES_SCHEMA_VERSION,
+      locale,
       themeMode,
       tableDensity,
       tableFontSize,
@@ -709,6 +719,7 @@ export function useUiPreferences({
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     themeMode,
+    locale,
     workspacePanelsLayoutMode,
     workspaceWideScreen
   ]);
