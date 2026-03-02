@@ -279,7 +279,7 @@ function normalizeCanvasLabelSizeMode(value: unknown): CanvasLabelSizeMode {
     value === "large" ||
     value === "extraLarge"
     ? value
-    : "normal";
+    : "small";
 }
 
 function normalizeCanvasCalloutTextSize(value: unknown): CanvasCalloutTextSize {
@@ -303,7 +303,7 @@ function normalizeCanvasResizeBehaviorMode(value: unknown): CanvasResizeBehavior
 function normalizeCanvasNodeShapeSizePercent(value: unknown): number {
   const parsed = typeof value === "string" ? Number(value) : value;
   if (!Number.isFinite(parsed)) {
-    return 50;
+    return 70;
   }
   return clamp(Math.round(Number(parsed)), 50, 125);
 }
@@ -472,7 +472,7 @@ export function useUiPreferences({
       const labelStrokeModeDefault =
         preferences.canvasDefaultLabelStrokeMode === "none" || preferences.canvasDefaultLabelStrokeMode === "light"
           ? preferences.canvasDefaultLabelStrokeMode
-          : "normal";
+          : "light";
       const labelSizeModeDefault = normalizeCanvasLabelSizeMode(preferences.canvasDefaultLabelSizeMode);
       const calloutTextSizeDefault = normalizeCanvasCalloutTextSize(preferences.canvasDefaultCalloutTextSize);
       const labelRotationDegreesDefault = normalizeCanvasLabelRotationDegrees(preferences.canvasDefaultLabelRotationDegrees);

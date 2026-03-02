@@ -27,6 +27,8 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "New": "Nouveau",
   "Edit": "Modifier",
   "Delete": "Supprimer",
+  "Save": "Enregistrer",
+  "Cancel": "Annuler",
   "Idle": "Inactif",
   "All": "Tous",
   "Any": "Tout",
@@ -277,6 +279,11 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Start in": "Commencez dans",
   "to create the harness/wiring plan container you will model, duplicate, and export.": "pour créer le conteneur de plan faisceau/câblage que vous allez modéliser, dupliquer et exporter.",
   "Create": "Créer",
+  "Connection count": "Nombre de connexions",
+  "This manufacturer reference is already used in this network catalog.": "Cette référence fabricant est déjà utilisée dans ce catalogue réseau.",
+  "Use an absolute http/https URL.": "Utilisez une URL absolue http/https.",
+  "e.g. TE-1-967616-1": "ex. TE-1-967616-1",
+  "Optional": "Optionnel",
   "first to define reusable manufacturer references and connection counts before creating connectors or splices. Connector/splice forms then reuse the selected catalog item.": "d'abord pour définir des références fabricant réutilisables et des nombres de connexions avant de créer des connecteurs ou des épissures. Les formulaires connecteur/épissure réutilisent ensuite l'élément catalogue sélectionné.",
   "Define reusable": "Définissez des",
   "from": "à partir de",
@@ -454,8 +461,22 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Name, technical ID, endpoint...": "Nom, ID technique, extrémité...",
   "Network filter field": "Champ filtre réseau",
   "Network name": "Nom du réseau",
+  "Network summary": "Résumé réseau",
   "Network summary display options": "Options d'affichage du résumé réseau",
   "Networks list": "Liste des réseaux",
+  "Info": "Infos",
+  "Length": "Longueur",
+  "Callouts": "Cartouches",
+  "Grid": "Grille",
+  "Snap": "Align.",
+  "Lock": "Verrou",
+  "BOM": "BOM",
+  "No nodes yet. Create nodes and segments to render the 2D network.": "Aucun nœud pour l'instant. Créez des nœuds et des segments pour afficher le réseau 2D.",
+  "2D network summary is not available on mobile. Use a wider screen to access the canvas controls and legend.": "Le résumé réseau 2D n'est pas disponible sur mobile. Utilisez un écran plus large pour accéder aux contrôles canvas et à la légende.",
+  "Connector node": "Nœud connecteur",
+  "Splice node": "Nœud épissure",
+  "Intermediate node": "Nœud intermédiaire",
+  "Wire highlighted segment": "Segment surligné par le fil",
   "No color": "Aucune couleur",
   "No connection ref": "Aucune réf. connexion",
   "No seal ref": "Aucune réf. joint",
@@ -473,6 +494,46 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Port count": "Nombre de ports",
   "Port count (from catalog)": "Nombre de ports (du catalogue)",
   "Port mode": "Mode port",
+  "Functional name": "Nom fonctionnel",
+  "Catalog item (manufacturer reference)": "Élément catalogue (référence fabricant)",
+  "Select a catalog item": "Sélectionnez un élément catalogue",
+  "Select catalog item": "Sélectionnez l'élément catalogue",
+  "Open Catalog": "Ouvrir Catalogue",
+  "Manufacturer reference:": "Référence fabricant :",
+  "This technical ID is already used.": "Cet ID technique est déjà utilisé.",
+  "Way count (from catalog)": "Nombre de voies (du catalogue)",
+  "Auto-create linked node on connector creation": "Auto-créer le nœud lié à la création du connecteur",
+  "No catalog item": "Aucun élément catalogue",
+  "No catalog item is required for splices. Create one only when you need a linked product reference.": "Aucun élément catalogue n'est requis pour les épissures. Créez-en un seulement si vous avez besoin d'une référence produit liée.",
+  "Catalog-linked splices are always bounded and derive port count from catalog connection count.": "Les épissures liées au catalogue sont toujours bornées et déduisent le nombre de ports du nombre de connexions du catalogue.",
+  "Capacity mode": "Mode de capacité",
+  "Bounded": "Borné",
+  "Unbounded (∞)": "Non borné (∞)",
+  "Auto-create linked node on splice creation": "Auto-créer le nœud lié à la création de l'épissure",
+  "Changing Node ID renames the node and remaps connected references.": "Modifier l'ID du nœud renomme le nœud et remappe les références connectées.",
+  "Select connector": "Sélectionnez le connecteur",
+  "Select splice": "Sélectionnez l'épissure",
+  "Editing Segment ID performs an atomic rename.": "Modifier l'ID de segment effectue un renommage atomique.",
+  "Sub-network tag (optional)": "Tag sous-réseau (optionnel)",
+  "Swap nodes": "Inverser les nœuds",
+  "Fuse catalog item": "Élément catalogue fusible",
+  "Fuse reference is taken from the linked catalog item's manufacturer reference.": "La référence fusible est prise depuis la référence fabricant de l'élément catalogue lié.",
+  "Color mode": "Mode couleur",
+  "Catalog color": "Couleur catalogue",
+  "Free color": "Couleur libre",
+  "Free color label": "Libellé couleur libre",
+  "Leave empty to keep the cable color free (unspecified) for plan execution.": "Laissez vide pour garder la couleur du câble libre (non spécifiée) pour l'exécution du plan.",
+  "Primary color": "Couleur principale",
+  "Secondary color": "Couleur secondaire",
+  "Connector way": "Voie connecteur",
+  "Splice port": "Port épissure",
+  "Type": "Type",
+  "Side A metadata": "Métadonnées côté A",
+  "Side B metadata": "Métadonnées côté B",
+  "Connection reference": "Référence de connexion",
+  "Seal reference": "Référence de joint",
+  "Swap endpoints": "Inverser les extrémités",
+  "Open link": "Ouvrir le lien",
   "Quick entity navigation": "Navigation rapide entités",
   "Quick entity navigation strip": "Bandeau de navigation rapide entités",
   "Rear body connector": "Connecteur arrière carrosserie",
@@ -611,6 +672,46 @@ export function translateTextValue(locale: AppLocale, input: string): string {
   const direct = FR_TEXT_BY_EN_TEXT[trimmed];
   if (direct !== undefined) {
     return input.replace(trimmed, preserveCase(trimmed, direct));
+  }
+
+  const idleRowMatch = /^Select a\s+(.+)\s+row to view or edit it, or create a new one\.$/i.exec(trimmed);
+  if (idleRowMatch !== null) {
+    const entity = (idleRowMatch[1] ?? "").trim();
+    const entityByEnglish: Record<string, string> = {
+      connector: "connecteur",
+      splice: "épissure",
+      node: "nœud",
+      segment: "segment",
+      wire: "fil",
+      catalog: "catalogue"
+    };
+    const translatedEntity = entityByEnglish[entity.toLowerCase()] ?? translateTextValue(locale, entity).trim();
+    return input.replace(trimmed, `Sélectionnez une ligne ${translatedEntity} pour la consulter ou la modifier, ou créez-en une nouvelle.`);
+  }
+
+  const manufacturerReferenceLineMatch = /^Manufacturer reference:\s*(.+)$/i.exec(trimmed);
+  if (manufacturerReferenceLineMatch !== null) {
+    const value = manufacturerReferenceLineMatch[1] ?? "";
+    return input.replace(trimmed, `Référence fabricant : ${value}`);
+  }
+
+  const unitPriceLabelMatch = /^Unit price \(excl\. tax\)\s*\[(.+)\]$/i.exec(trimmed);
+  if (unitPriceLabelMatch !== null) {
+    const currencyCode = unitPriceLabelMatch[1] ?? "";
+    return input.replace(trimmed, `Prix unitaire (HT) [${currencyCode}]`);
+  }
+
+  const missingCatalogItemMatch = /^Missing catalog item\s*\((.+)\)$/i.exec(trimmed);
+  if (missingCatalogItemMatch !== null) {
+    const itemId = missingCatalogItemMatch[1] ?? "";
+    return input.replace(trimmed, `Élément catalogue manquant (${itemId})`);
+  }
+
+  const capturedPlacementMatch = /^Canvas placement captured at x=([-+]?\d+),\s*y=([-+]?\d+)\.$/i.exec(trimmed);
+  if (capturedPlacementMatch !== null) {
+    const x = capturedPlacementMatch[1] ?? "0";
+    const y = capturedPlacementMatch[2] ?? "0";
+    return input.replace(trimmed, `Position canvas capturée à x=${x}, y=${y}.`);
   }
 
   const occupiedCountMatch = /^(\d+)\s*\/\s*Occupied\s+(\d+)$/i.exec(trimmed);

@@ -85,7 +85,7 @@ export function ModelingCatalogFormPanel({
             <input value={catalogName} onChange={(event) => setCatalogName(event.target.value)} placeholder="Optional display name" />
           </label>
           <label>
-            Unit price (excl. tax) [{workspaceCurrencyCode}]
+            {`Unit price (excl. tax) [${workspaceCurrencyCode}]`}
             <input
               type="number"
               min={0}
