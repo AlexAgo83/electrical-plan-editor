@@ -1,9 +1,9 @@
 ## task_074_req_085_mobile_onboarding_and_workspace_header_compaction_orchestration_and_delivery_control - req_085 mobile onboarding and workspace header compaction orchestration and delivery control
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 100% (scope is a focused mobile compaction pass across onboarding, workspace headers/actions, and dense table labels/columns)
-> Confidence: 96% (changes are mostly presentation-level but cross-cutting; targeted regression gates are required)
-> Progress: 0%
+> Confidence: 98% (scope closed with AC traceability and validation evidence captured)
+> Progress: 100%
 > Complexity: High
 > Theme: Mobile UX compaction and readability hardening across onboarding, network scope, modeling, analysis, catalog, and validation
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -53,11 +53,11 @@ The request is cross-surface and requires a strict sequence so shared responsive
 - `Route mode` and `Severity` visibility changes are mobile-only.
 
 # Plan
-- [ ] 1. Deliver onboarding modal mobile single-line header/footer action alignment (`item_433`)
-- [ ] 2. Deliver Network Scope + Validation mobile header/action alignment and duplicate-label compaction (`item_434`)
-- [ ] 3. Deliver Catalog/Modeling/Analysis/Validation mobile table/header compaction rules (`item_435`)
-- [ ] 4. Execute req_085 AC matrix, validation evidence capture, and closure synchronization (`item_436`)
-- [ ] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
+- [x] 1. Deliver onboarding modal mobile single-line header/footer action alignment (`item_433`)
+- [x] 2. Deliver Network Scope + Validation mobile header/action alignment and duplicate-label compaction (`item_434`)
+- [x] 3. Deliver Catalog/Modeling/Analysis/Validation mobile table/header compaction rules (`item_435`)
+- [x] 4. Execute req_085 AC matrix, validation evidence capture, and closure synchronization (`item_436`)
+- [x] FINAL: Update related `logics` docs (request/backlog/task progress + delivery summary)
 
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -75,7 +75,7 @@ The request is cross-surface and requires a strict sequence so shared responsive
 
 # Report
 - Current blockers: none.
-- Current status: not started.
+- Current status: completed.
 - Risks to track:
   - selector spillover from shared responsive styles;
   - clipping risks from one-line mobile constraints;
