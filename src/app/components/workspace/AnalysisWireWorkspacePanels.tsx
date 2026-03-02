@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactElement } from "react";
 import { getWireColorLabel, getWireColorSortValue } from "../../../core/cableColors";
+import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
@@ -40,12 +41,13 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   void _setWireSort;
   void _getSortIndicator;
   type WireAnalysisTableSortField = "name" | "technicalId" | "color" | "endpointA" | "endpointB" | "sectionMm2" | "lengthMm" | "routeMode";
+  const isMobileViewport = useIsMobileViewport();
   const [wireAnalysisTableSort, setWireAnalysisTableSort] = useState<{ field: WireAnalysisTableSortField; direction: "asc" | "desc" }>({
     field: "name",
     direction: "asc"
   });
   const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
-  const showWireRouteModeColumn = wireRouteFilter === "all";
+  const showWireRouteModeColumn = wireRouteFilter === "all" && !isMobileViewport;
   const sortedVisibleWires = useMemo(
     () =>
       sortByTableColumns(
@@ -86,10 +88,10 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   return (
     <>
 <section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen || !showEntityTables}>
-  <header className="list-panel-header">
+  <header className="list-panel-header list-panel-header-mobile-inline-tools">
     <h2>Wires</h2>
     <div className="list-panel-header-tools">
-      <div className="list-panel-header-tools-row">
+      <div className="list-panel-header-tools-row is-title-actions">
         <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
           {([
             ["all", "All"],
@@ -147,7 +149,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           </button>
         ) : null}
       </div>
-      <div className="list-panel-header-tools-row">
+      <div className="list-panel-header-tools-row is-filter-row">
         <TableFilterBar
           label="Filter"
           fieldLabel="Wire filter field"
@@ -203,7 +205,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                Technical ID <span className="sort-indicator">{wireListSortIndicator("technicalId")}</span>
+                {isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{wireListSortIndicator("technicalId")}</span>
               </button>
             </th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "color")}>
@@ -231,7 +233,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                Endpoint A <span className="sort-indicator">{wireListSortIndicator("endpointA")}</span>
+                {isMobileViewport ? "End A" : "Endpoint A"} <span className="sort-indicator">{wireListSortIndicator("endpointA")}</span>
               </button>
             </th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "endpointB")}>
@@ -245,7 +247,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                Endpoint B <span className="sort-indicator">{wireListSortIndicator("endpointB")}</span>
+                {isMobileViewport ? "End B" : "Endpoint B"} <span className="sort-indicator">{wireListSortIndicator("endpointB")}</span>
               </button>
             </th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "sectionMm2")}>
@@ -259,7 +261,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                Section (mm²) <span className="sort-indicator">{wireListSortIndicator("sectionMm2")}</span>
+                {isMobileViewport ? "Sec" : "Section (mm²)"} <span className="sort-indicator">{wireListSortIndicator("sectionMm2")}</span>
               </button>
             </th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "lengthMm")}>
@@ -273,7 +275,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                Length (mm) <span className="sort-indicator">{wireListSortIndicator("lengthMm")}</span>
+                {isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{wireListSortIndicator("lengthMm")}</span>
               </button>
             </th>
             {showWireRouteModeColumn ? (

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactElement } from "react";
 import type { NetworkId } from "../../../core/entities";
+import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, nextSortState, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
@@ -91,6 +92,7 @@ export function NetworkScopeWorkspaceContent({
     field: networkSort.field === "technicalId" ? "technicalId" : "name",
     direction: networkSort.direction
   });
+  const isMobileViewport = useIsMobileViewport();
   const rowRefs = useRef<Partial<Record<NetworkId, HTMLTableRowElement | null>>>({});
   const lastHandledFocusRequestTokenRef = useRef<number>(-1);
 
@@ -234,10 +236,10 @@ export function NetworkScopeWorkspaceContent({
   return (
     <section className="panel-grid network-scope-grid">
       <section className="panel network-scope-panel" data-onboarding-panel="network-scope">
-        <header className="list-panel-header">
+        <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Network Scope</h2>
           <div className="list-panel-header-tools">
-            <div className="list-panel-header-tools-row">
+            <div className="list-panel-header-tools-row is-title-actions">
               <button
                 type="button"
                 className="filter-chip table-export-button"
@@ -268,7 +270,7 @@ export function NetworkScopeWorkspaceContent({
                 </button>
               ) : null}
             </div>
-            <div className="list-panel-header-tools-row">
+            <div className="list-panel-header-tools-row is-filter-row">
               <TableFilterBar
                 label="Filter"
                 fieldLabel="Network filter field"
@@ -329,7 +331,7 @@ export function NetworkScopeWorkspaceContent({
                         className="sort-header-button"
                         onClick={() => setNetworkTableSortField("technicalId")}
                       >
-                        Technical ID{" "}
+                        {isMobileViewport ? "ID" : "Technical ID"}{" "}
                         <span
                           className={
                             networkSortIndicator("technicalId") === null
@@ -444,7 +446,7 @@ export function NetworkScopeWorkspaceContent({
               disabled={focusedNetwork === null || isCreateMode}
             >
               <span className="action-button-icon is-duplicate" aria-hidden="true" />
-              Duplicate
+              {isMobileViewport ? "Dup." : "Duplicate"}
             </button>
             <button
               type="button"

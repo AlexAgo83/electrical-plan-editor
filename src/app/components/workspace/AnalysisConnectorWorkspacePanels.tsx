@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
+import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { formatOccupantRefForDisplay, parseWireOccupantRef } from "../../lib/app-utils-networking";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
@@ -44,6 +45,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   void _getSortIndicator;
   type ConnectorAnalysisTableSortField = "name" | "technicalId" | "manufacturerReference" | "cavityCount" | "occupiedCount";
   type ConnectorSynthesisTableSortField = "name" | "technicalId" | "localWay" | "destination" | "lengthMm";
+  const isMobileViewport = useIsMobileViewport();
   const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "synthesis">("cavities");
   const [connectorTableSort, setConnectorTableSort] = useState<{ field: ConnectorAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const [connectorSynthesisTableSort, setConnectorSynthesisTableSort] = useState<{ field: ConnectorSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
@@ -157,10 +159,10 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   return (
     <>
 <section className="panel" hidden={!isConnectorSubScreen || !showEntityTables}>
-  <header className="list-panel-header">
+  <header className="list-panel-header list-panel-header-mobile-inline-tools">
     <h2>Connectors</h2>
     <div className="list-panel-header-tools">
-      <div className="list-panel-header-tools-row">
+      <div className="list-panel-header-tools-row is-title-actions">
         <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
           {([
             ["all", "All"],
@@ -205,7 +207,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           </button>
         ) : null}
       </div>
-      <div className="list-panel-header-tools-row">
+      <div className="list-panel-header-tools-row is-filter-row">
         <TableFilterBar
           label="Filter"
           fieldLabel="Connector filter field"
@@ -260,7 +262,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
                 }))
               }
             >
-              Technical ID <span className="sort-indicator">{connectorListSortIndicator("technicalId")}</span>
+              {isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{connectorListSortIndicator("technicalId")}</span>
             </button>
           </th>
           <th aria-sort={getTableAriaSort(connectorTableSort, "manufacturerReference")}>
@@ -275,7 +277,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           </th>
           <th aria-sort={getTableAriaSort(connectorTableSort, "occupiedCount")}>
             <button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "occupiedCount", direction: current.field === "occupiedCount" && current.direction === "asc" ? "desc" : "asc" }))}>
-              Occupied <span className="sort-indicator">{connectorListSortIndicator("occupiedCount")}</span>
+              {isMobileViewport ? "Occup." : "Occupied"} <span className="sort-indicator">{connectorListSortIndicator("occupiedCount")}</span>
             </button>
           </th>
           </tr>
@@ -477,12 +479,12 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
               className="sort-header-button"
               onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" }))}
             >
-              Technical ID <span className="sort-indicator">{connectorSynthesisSortIndicator("technicalId")}</span>
+              {isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{connectorSynthesisSortIndicator("technicalId")}</span>
             </button>
           </th>
           <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "localWay")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "localWay", direction: current.field === "localWay" && current.direction === "asc" ? "desc" : "asc" }))}>Local way <span className="sort-indicator">{connectorSynthesisSortIndicator("localWay")}</span></button></th>
           <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "destination")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "destination", direction: current.field === "destination" && current.direction === "asc" ? "desc" : "asc" }))}>Destination <span className="sort-indicator">{connectorSynthesisSortIndicator("destination")}</span></button></th>
-          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>Length (mm) <span className="sort-indicator">{connectorSynthesisSortIndicator("lengthMm")}</span></button></th>
+          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{connectorSynthesisSortIndicator("lengthMm")}</span></button></th>
         </tr>
       </thead>
       <tbody>

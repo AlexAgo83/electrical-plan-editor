@@ -176,12 +176,24 @@
   }
 
   .onboarding-modal-header {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: flex-start;
   }
 
   .onboarding-modal-close {
-    align-self: flex-end;
+    align-self: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .onboarding-modal-header-main {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .onboarding-modal-actions {
+    flex-wrap: nowrap;
+    align-items: center;
   }
 
   .onboarding-modal-actions-spacer {
@@ -189,6 +201,16 @@
   }
 
   .onboarding-modal-target-actions {
-    width: 100%;
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.05rem;
+  }
+
+  .onboarding-modal-next-button {
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactElement } from "react";
 import { getWireColorSortValue } from "../../../core/cableColors";
 import type { NetworkNode, Wire } from "../../../core/entities";
+import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
@@ -62,6 +63,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
   type NodeAssociatedSegmentsSortField = "segmentId" | "peerNode" | "lengthMm" | "subNetwork" | "wireCount";
   type SegmentTableSortField = "id" | "nodeA" | "nodeB" | "subNetwork" | "lengthMm";
   type SegmentTraversingWiresSortField = "name" | "technicalId" | "color" | "endpointA" | "endpointB" | "sectionMm2" | "lengthMm" | "routeMode";
+  const isMobileViewport = useIsMobileViewport();
 
   const [nodeTableSort, setNodeTableSort] = useState<{ field: NodeTableSortField; direction: "asc" | "desc" }>({
     field: "id",
@@ -207,10 +209,10 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
   return (
     <>
       <section className="panel" hidden={!isNodeSubScreen || !showEntityTables}>
-        <header className="list-panel-header">
+        <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Nodes</h2>
           <div className="list-panel-header-tools">
-            <div className="list-panel-header-tools-row">
+            <div className="list-panel-header-tools-row is-title-actions">
               <div className="chip-group list-panel-filters" role="group" aria-label="Node kind filter">
                 {([
                   ["all", "All"],
@@ -245,7 +247,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                 </button>
               ) : null}
             </div>
-            <div className="list-panel-header-tools-row">
+            <div className="list-panel-header-tools-row is-filter-row">
               <TableFilterBar
                 label="Filter"
                 fieldLabel="Node filter field"
@@ -278,7 +280,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
               <tr>
                 <th aria-sort={getTableAriaSort(nodeTableSort, "id")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("id"))}>ID <span className="sort-indicator">{indicator(nodeTableSort, "id")}</span></button></th>
                 <th aria-sort={getTableAriaSort(nodeTableSort, "kind")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("kind"))}>Kind <span className="sort-indicator">{indicator(nodeTableSort, "kind")}</span></button></th>
-                <th aria-sort={getTableAriaSort(nodeTableSort, "reference")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("reference"))}>Reference <span className="sort-indicator">{indicator(nodeTableSort, "reference")}</span></button></th>
+                <th aria-sort={getTableAriaSort(nodeTableSort, "reference")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("reference"))}>{isMobileViewport ? "Ref." : "Reference"} <span className="sort-indicator">{indicator(nodeTableSort, "reference")}</span></button></th>
                 <th aria-sort={getTableAriaSort(nodeTableSort, "linkedSegments")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("linkedSegments"))}>Linked segments <span className="sort-indicator">{indicator(nodeTableSort, "linkedSegments")}</span></button></th>
               </tr>
               </thead>
@@ -339,7 +341,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                   <tr>
                     <th aria-sort={getTableAriaSort(nodeSegmentsSort, "segmentId")}><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("segmentId"))}>Segment ID <span className="sort-indicator">{indicator(nodeSegmentsSort, "segmentId")}</span></button></th>
                     <th aria-sort={getTableAriaSort(nodeSegmentsSort, "peerNode")}><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("peerNode"))}>Peer node <span className="sort-indicator">{indicator(nodeSegmentsSort, "peerNode")}</span></button></th>
-                    <th aria-sort={getTableAriaSort(nodeSegmentsSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("lengthMm"))}>Length (mm) <span className="sort-indicator">{indicator(nodeSegmentsSort, "lengthMm")}</span></button></th>
+                    <th aria-sort={getTableAriaSort(nodeSegmentsSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("lengthMm"))}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{indicator(nodeSegmentsSort, "lengthMm")}</span></button></th>
                     <th aria-sort={getTableAriaSort(nodeSegmentsSort, "subNetwork")}><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("subNetwork"))}>Sub-network <span className="sort-indicator">{indicator(nodeSegmentsSort, "subNetwork")}</span></button></th>
                     <th aria-sort={getTableAriaSort(nodeSegmentsSort, "wireCount")}><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("wireCount"))}>Wires <span className="sort-indicator">{indicator(nodeSegmentsSort, "wireCount")}</span></button></th>
                   </tr>
@@ -365,10 +367,10 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
       </section>
 
       <section className="panel" hidden={!isSegmentSubScreen || !showEntityTables}>
-        <header className="list-panel-header">
+        <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Segments</h2>
           <div className="list-panel-header-tools">
-            <div className="list-panel-header-tools-row">
+            <div className="list-panel-header-tools-row is-title-actions">
               <div className="chip-group list-panel-filters" role="group" aria-label="Segment sub-network filter">
                 {([
                   ["all", "All"],
@@ -408,7 +410,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                 </button>
               ) : null}
             </div>
-            <div className="list-panel-header-tools-row">
+            <div className="list-panel-header-tools-row is-filter-row">
               <TableFilterBar
                 label="Filter"
                 fieldLabel="Segment filter field"
@@ -444,7 +446,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                 <th aria-sort={getTableAriaSort(segmentTableSort, "nodeA")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("nodeA"))}>Node A <span className="sort-indicator">{indicator(segmentTableSort, "nodeA")}</span></button></th>
                 <th aria-sort={getTableAriaSort(segmentTableSort, "nodeB")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("nodeB"))}>Node B <span className="sort-indicator">{indicator(segmentTableSort, "nodeB")}</span></button></th>
                 <th aria-sort={getTableAriaSort(segmentTableSort, "subNetwork")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("subNetwork"))}>Sub-network <span className="sort-indicator">{indicator(segmentTableSort, "subNetwork")}</span></button></th>
-                <th aria-sort={getTableAriaSort(segmentTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("lengthMm"))}>Length (mm) <span className="sort-indicator">{indicator(segmentTableSort, "lengthMm")}</span></button></th>
+                <th aria-sort={getTableAriaSort(segmentTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("lengthMm"))}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{indicator(segmentTableSort, "lengthMm")}</span></button></th>
               </tr>
               </thead>
               <tbody>
@@ -506,13 +508,13 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                 <thead>
                   <tr>
                     <th aria-sort={getTableAriaSort(segmentWiresSort, "name")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("name"))}>Name <span className="sort-indicator">{indicator(segmentWiresSort, "name")}</span></button></th>
-                    <th aria-sort={getTableAriaSort(segmentWiresSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("technicalId"))}>Technical ID <span className="sort-indicator">{indicator(segmentWiresSort, "technicalId")}</span></button></th>
+                    <th aria-sort={getTableAriaSort(segmentWiresSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("technicalId"))}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{indicator(segmentWiresSort, "technicalId")}</span></button></th>
                     <th aria-sort={getTableAriaSort(segmentWiresSort, "color")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("color"))}>Color <span className="sort-indicator">{indicator(segmentWiresSort, "color")}</span></button></th>
-                    <th aria-sort={getTableAriaSort(segmentWiresSort, "endpointA")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("endpointA"))}>Endpoint A <span className="sort-indicator">{indicator(segmentWiresSort, "endpointA")}</span></button></th>
-                    <th aria-sort={getTableAriaSort(segmentWiresSort, "endpointB")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("endpointB"))}>Endpoint B <span className="sort-indicator">{indicator(segmentWiresSort, "endpointB")}</span></button></th>
-                    <th aria-sort={getTableAriaSort(segmentWiresSort, "sectionMm2")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("sectionMm2"))}>Section (mm²) <span className="sort-indicator">{indicator(segmentWiresSort, "sectionMm2")}</span></button></th>
-                    <th aria-sort={getTableAriaSort(segmentWiresSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("lengthMm"))}>Length (mm) <span className="sort-indicator">{indicator(segmentWiresSort, "lengthMm")}</span></button></th>
-                    <th aria-sort={getTableAriaSort(segmentWiresSort, "routeMode")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("routeMode"))}>Route mode <span className="sort-indicator">{indicator(segmentWiresSort, "routeMode")}</span></button></th>
+                    <th aria-sort={getTableAriaSort(segmentWiresSort, "endpointA")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("endpointA"))}>{isMobileViewport ? "End A" : "Endpoint A"} <span className="sort-indicator">{indicator(segmentWiresSort, "endpointA")}</span></button></th>
+                    <th aria-sort={getTableAriaSort(segmentWiresSort, "endpointB")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("endpointB"))}>{isMobileViewport ? "End B" : "Endpoint B"} <span className="sort-indicator">{indicator(segmentWiresSort, "endpointB")}</span></button></th>
+                    <th aria-sort={getTableAriaSort(segmentWiresSort, "sectionMm2")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("sectionMm2"))}>{isMobileViewport ? "Sec" : "Section (mm²)"} <span className="sort-indicator">{indicator(segmentWiresSort, "sectionMm2")}</span></button></th>
+                    <th aria-sort={getTableAriaSort(segmentWiresSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("lengthMm"))}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{indicator(segmentWiresSort, "lengthMm")}</span></button></th>
+                    {!isMobileViewport ? <th aria-sort={getTableAriaSort(segmentWiresSort, "routeMode")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("routeMode"))}>Route mode <span className="sort-indicator">{indicator(segmentWiresSort, "routeMode")}</span></button></th> : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -525,7 +527,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                       <td>{describeWireEndpoint(wire.endpointB)}</td>
                       <td>{wire.sectionMm2}</td>
                       <td>{wire.lengthMm}</td>
-                      <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td>
+                      {!isMobileViewport ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}
                     </tr>
                   ))}
                 </tbody>
