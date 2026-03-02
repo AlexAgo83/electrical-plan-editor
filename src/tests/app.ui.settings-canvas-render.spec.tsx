@@ -332,7 +332,7 @@ describe("App integration UI - settings canvas render", () => {
     const nodeShapeSizeSlider = within(canvasToolsSettingsPanel).getByRole("slider", {
       name: /Node shape target size/i
     });
-    expect(nodeShapeSizeSlider).toHaveValue("75");
+    expect(nodeShapeSizeSlider).toHaveValue("50");
     expect(nodeShapeSizeSlider).toBeDisabled();
     fireEvent.click(
       within(canvasToolsSettingsPanel).getByLabelText(
