@@ -1,8 +1,8 @@
 ## req_098_settings_global_preferences_reorder_and_app_wide_i18n_en_fr_with_table_label_compaction - Settings panel reorder and app-wide i18n EN/FR with table-label compaction safeguards
 > From version: 1.2.1
-> Status: Draft
-> Understanding: 100%
-> Confidence: 95%
+> Status: Done
+> Understanding: 100% (implementation and validation completed)
+> Confidence: 97%
 > Complexity: High
 > Theme: UI / Internationalization
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -135,6 +135,8 @@
 # References
 - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
 - `src/app/hooks/useUiPreferences.ts`
+- `src/app/hooks/useAppLocaleDomTranslation.ts`
+- `src/app/lib/i18n.ts`
 - `src/app/AppController.tsx`
 - `src/app/components/WorkspaceNavigation.tsx`
 - `src/app/components/workspace/AppHeaderAndStats.tsx`
@@ -145,6 +147,7 @@
 - `src/app/components/workspace/ValidationWorkspaceContent.tsx`
 - `src/app/components/onboarding/OnboardingModal.tsx`
 - `src/tests/app.ui.settings.spec.tsx`
+- `src/tests/app.ui.hover-descriptions.spec.tsx`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `src/tests/app.ui.validation.spec.tsx`
 - `logics/request/req_010_network_scope_workspace_shell_and_global_defaults.md`

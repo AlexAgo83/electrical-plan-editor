@@ -1,9 +1,9 @@
 ## item_480_onboarding_step_registry_extension_with_final_settings_overview_step - Onboarding step registry extension with final settings overview step
 > From version: 1.2.1
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Onboarding / UX guidance
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
