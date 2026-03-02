@@ -89,6 +89,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasShowCalloutWireNames: (value: boolean) => void;
   canvasZoomInvariantNodeShapes: boolean;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
+  canvasNodeShapeSizePercent: number;
+  setCanvasNodeShapeSizePercent: (value: number) => void;
   canvasExportFormat: CanvasExportFormat;
   setCanvasExportFormat: (value: CanvasExportFormat) => void;
   canvasPngExportIncludeBackground: boolean;
@@ -183,6 +185,8 @@ export function SettingsWorkspaceContent({
   setCanvasShowCalloutWireNames,
   canvasZoomInvariantNodeShapes,
   setCanvasZoomInvariantNodeShapes,
+  canvasNodeShapeSizePercent,
+  setCanvasNodeShapeSizePercent,
   canvasExportFormat,
   setCanvasExportFormat,
   canvasPngExportIncludeBackground,
@@ -440,6 +444,28 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasZoomInvariantNodeShapes(event.target.checked)}
             />
             Keep connector/splice/node shape size constant while zooming
+          </label>
+          <label className="settings-field settings-range-field">
+            Node shape target size (%)
+            <div className="settings-range-control">
+              <input
+                className="settings-range-input"
+                type="range"
+                min={50}
+                max={200}
+                step={5}
+                value={canvasNodeShapeSizePercent}
+                disabled={!canvasZoomInvariantNodeShapes}
+                onChange={(event) => {
+                  const parsed = Number(event.target.value);
+                  if (!Number.isFinite(parsed)) {
+                    return;
+                  }
+                  setCanvasNodeShapeSizePercent(Math.min(200, Math.max(50, Math.round(parsed))));
+                }}
+              />
+              <span className="settings-range-value">{canvasNodeShapeSizePercent}%</span>
+            </div>
           </label>
           <label className="settings-checkbox">
             <input

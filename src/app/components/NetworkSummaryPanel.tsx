@@ -115,6 +115,7 @@ export interface NetworkSummaryPanelProps {
   showSelectedCalloutOnly: boolean;
   showCalloutWireNames: boolean;
   zoomInvariantNodeShapes: boolean;
+  nodeShapeSizePercent: number;
   labelStrokeMode: CanvasLabelStrokeMode;
   labelSizeMode: CanvasLabelSizeMode;
   calloutTextSize: CanvasCalloutTextSize;
@@ -642,6 +643,7 @@ export function NetworkSummaryPanel({
   showSelectedCalloutOnly,
   showCalloutWireNames,
   zoomInvariantNodeShapes,
+  nodeShapeSizePercent,
   labelStrokeMode,
   labelSizeMode,
   calloutTextSize,
@@ -717,6 +719,9 @@ export function NetworkSummaryPanel({
   ];
   const effectiveScale = networkScale > 0 ? networkScale : 1;
   const inverseLabelScale = 1 / effectiveScale;
+  const normalizedNodeShapeScale = zoomInvariantNodeShapes
+    ? Math.min(2, Math.max(0.5, nodeShapeSizePercent / 100))
+    : 1;
   const visibleModelMinX = (0 - networkOffset.x) / effectiveScale;
   const visibleModelMaxX = (networkViewWidth - networkOffset.x) / effectiveScale;
   const visibleModelMinY = (0 - networkOffset.y) / effectiveScale;
@@ -1692,14 +1697,14 @@ export function NetworkSummaryPanel({
 
               <g className="network-graph-layer network-graph-layer-nodes" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
                 {renderedNodes.map(({ node, position, nodeClassName }) => {
-                  const connectorWidth = 46;
-                  const connectorHeight = 30;
-                  const spliceDiamondSize = 30;
-                  const connectorHitboxWidth = 56;
-                  const connectorHitboxHeight = 40;
-                  const spliceHitboxSize = 38;
-                  const intermediateRadius = 17;
-                  const intermediateHitboxRadius = 22;
+                  const connectorWidth = 46 * normalizedNodeShapeScale;
+                  const connectorHeight = 30 * normalizedNodeShapeScale;
+                  const spliceDiamondSize = 30 * normalizedNodeShapeScale;
+                  const connectorHitboxWidth = 56 * normalizedNodeShapeScale;
+                  const connectorHitboxHeight = 40 * normalizedNodeShapeScale;
+                  const spliceHitboxSize = 38 * normalizedNodeShapeScale;
+                  const intermediateRadius = 17 * normalizedNodeShapeScale;
+                  const intermediateHitboxRadius = 22 * normalizedNodeShapeScale;
                   const shapeAnchorTransform = `translate(${position.x} ${position.y}) scale(${inverseLabelScale}) translate(${-position.x} ${-position.y})`;
                   return (
                     <g
