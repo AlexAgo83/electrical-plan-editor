@@ -597,7 +597,7 @@ describe("localStorage persistence adapter", () => {
     expect(loadedScoped?.splices.byId[spliceId]?.manufacturerReference).toBe("AMP/SEAL-42");
   });
 
-  it("bootstraps deterministic legacy placeholders for missing connector/splice manufacturer references", () => {
+  it("bootstraps deterministic legacy placeholders for connectors while keeping unlinked splices without placeholders", () => {
     const state = createSampleNetworkState();
     const activeNetworkId = state.activeNetworkId;
     expect(activeNetworkId).not.toBeNull();
@@ -616,7 +616,6 @@ describe("localStorage persistence adapter", () => {
     const splice = state.splices.byId[spliceId]!;
     const scoped = state.networkStates[activeNetworkId]!;
     const expectedConnectorPlaceholder = "LEGACY-NOREF-C-CONN-LEGACY-01";
-    const expectedSplicePlaceholder = "LEGACY-NOREF-S-SPLICE-LEGACY-2";
     const legacyRawState: AppState = {
       ...state,
       connectors: {
@@ -690,17 +689,12 @@ describe("localStorage persistence adapter", () => {
     const loadedConnector = loaded.connectors.byId[connectorId];
     const loadedSplice = loaded.splices.byId[spliceId];
     expect(loadedConnector?.manufacturerReference).toBe(expectedConnectorPlaceholder);
-    expect(loadedSplice?.manufacturerReference).toBe(expectedSplicePlaceholder);
+    expect(loadedSplice?.manufacturerReference).toBeUndefined();
     expect(loadedConnector?.catalogItemId).toBeDefined();
-    expect(loadedSplice?.catalogItemId).toBeDefined();
+    expect(loadedSplice?.catalogItemId).toBeUndefined();
     if (loadedConnector?.catalogItemId !== undefined) {
       expect(loaded.catalogItems.byId[loadedConnector.catalogItemId]?.manufacturerReference).toBe(
         expectedConnectorPlaceholder
-      );
-    }
-    if (loadedSplice?.catalogItemId !== undefined) {
-      expect(loaded.catalogItems.byId[loadedSplice.catalogItemId]?.manufacturerReference).toBe(
-        expectedSplicePlaceholder
       );
     }
   });
