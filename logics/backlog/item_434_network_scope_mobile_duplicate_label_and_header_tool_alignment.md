@@ -1,9 +1,9 @@
 ## item_434_network_scope_mobile_duplicate_label_and_header_tool_alignment - Network Scope mobile duplicate label and header tool alignment
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Mobile action/header compaction for Network Scope and Validation center
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

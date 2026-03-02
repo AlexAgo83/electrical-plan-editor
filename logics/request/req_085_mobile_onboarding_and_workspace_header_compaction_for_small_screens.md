@@ -1,8 +1,8 @@
 ## req_085_mobile_onboarding_and_workspace_header_compaction_for_small_screens - Mobile onboarding and workspace header compaction for small screens
 > From version: 0.9.18
-> Status: Draft
-> Understanding: 100%
-> Confidence: 98%
+> Status: Done
+> Understanding: 100% (closure confirmed against backlog/task and AC matrix coverage)
+> Confidence: 99% (status synchronized with task_074 and backlog item_433..436 closure state)
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence and references when you edit this doc.

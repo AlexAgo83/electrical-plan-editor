@@ -1,9 +1,9 @@
 ## item_433_onboarding_modal_mobile_single_row_header_and_action_alignment - Onboarding modal mobile single-row header and action alignment
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Mobile onboarding layout compaction
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
