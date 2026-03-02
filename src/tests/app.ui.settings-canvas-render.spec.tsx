@@ -336,6 +336,39 @@ describe("App integration UI - settings canvas render", () => {
     expect(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Show wire names in callout table")).toBeChecked();
   });
 
+  it("supports zoom-invariant node shapes from canvas tool settings", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("analysis");
+    let networkSummaryPanel = getPanelByHeading("Network summary");
+    expect(networkSummaryPanel.querySelector(".network-node-shape-anchor")).toBeNull();
+
+    switchScreenDrawerAware("settings");
+    fireEvent.click(
+      within(getPanelByHeading("Canvas tools preferences")).getByLabelText(
+        "Keep connector/splice/node shape size constant while zooming"
+      )
+    );
+
+    switchScreenDrawerAware("analysis");
+    networkSummaryPanel = getPanelByHeading("Network summary");
+    const invariantAnchor = networkSummaryPanel.querySelector(".network-node-shape-anchor");
+    expect(invariantAnchor).not.toBeNull();
+    const transformBeforeZoom = invariantAnchor?.getAttribute("transform") ?? "";
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom +" }));
+    const transformAfterZoom = networkSummaryPanel.querySelector(".network-node-shape-anchor")?.getAttribute("transform") ?? "";
+    expect(transformAfterZoom).not.toBe(transformBeforeZoom);
+
+    firstRender.unmount();
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    expect(
+      within(getPanelByHeading("Canvas tools preferences")).getByLabelText(
+        "Keep connector/splice/node shape size constant while zooming"
+      )
+    ).toBeChecked();
+  });
+
   it("persists the 0 degree 2d label rotation preset across remount", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 

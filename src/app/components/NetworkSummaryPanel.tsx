@@ -114,6 +114,7 @@ export interface NetworkSummaryPanelProps {
   showCableCallouts: boolean;
   showSelectedCalloutOnly: boolean;
   showCalloutWireNames: boolean;
+  zoomInvariantNodeShapes: boolean;
   labelStrokeMode: CanvasLabelStrokeMode;
   labelSizeMode: CanvasLabelSizeMode;
   calloutTextSize: CanvasCalloutTextSize;
@@ -640,6 +641,7 @@ export function NetworkSummaryPanel({
   showCableCallouts,
   showSelectedCalloutOnly,
   showCalloutWireNames,
+  zoomInvariantNodeShapes,
   labelStrokeMode,
   labelSizeMode,
   calloutTextSize,
@@ -1693,6 +1695,12 @@ export function NetworkSummaryPanel({
                   const connectorWidth = 46;
                   const connectorHeight = 30;
                   const spliceDiamondSize = 30;
+                  const connectorHitboxWidth = 56;
+                  const connectorHitboxHeight = 40;
+                  const spliceHitboxSize = 38;
+                  const intermediateRadius = 17;
+                  const intermediateHitboxRadius = 22;
+                  const shapeAnchorTransform = `translate(${position.x} ${position.y}) scale(${inverseLabelScale}) translate(${-position.x} ${-position.y})`;
                   return (
                     <g
                       key={node.id}
@@ -1711,30 +1719,58 @@ export function NetworkSummaryPanel({
                       }}
                     >
                       <title>{describeNode(node)}</title>
-                      {node.kind === "connector" ? (
-                        <rect
-                          className="network-node-shape"
-                          x={position.x - connectorWidth / 2}
-                          y={position.y - connectorHeight / 2}
-                          width={connectorWidth}
-                          height={connectorHeight}
-                          rx={7}
-                          ry={7}
-                        />
-                      ) : node.kind === "splice" ? (
-                        <rect
-                          className="network-node-shape"
-                          x={position.x - spliceDiamondSize / 2}
-                          y={position.y - spliceDiamondSize / 2}
-                          width={spliceDiamondSize}
-                          height={spliceDiamondSize}
-                          rx={5}
-                          ry={5}
-                          transform={`rotate(45 ${position.x} ${position.y})`}
-                        />
-                      ) : (
-                        <circle className="network-node-shape" cx={position.x} cy={position.y} r={17} />
-                      )}
+                      <g className={zoomInvariantNodeShapes ? "network-node-shape-anchor" : undefined} transform={zoomInvariantNodeShapes ? shapeAnchorTransform : undefined}>
+                        {node.kind === "connector" ? (
+                          <>
+                            <rect
+                              className="network-node-hitbox"
+                              x={position.x - connectorHitboxWidth / 2}
+                              y={position.y - connectorHitboxHeight / 2}
+                              width={connectorHitboxWidth}
+                              height={connectorHitboxHeight}
+                              rx={9}
+                              ry={9}
+                            />
+                            <rect
+                              className="network-node-shape"
+                              x={position.x - connectorWidth / 2}
+                              y={position.y - connectorHeight / 2}
+                              width={connectorWidth}
+                              height={connectorHeight}
+                              rx={7}
+                              ry={7}
+                            />
+                          </>
+                        ) : node.kind === "splice" ? (
+                          <>
+                            <rect
+                              className="network-node-hitbox"
+                              x={position.x - spliceHitboxSize / 2}
+                              y={position.y - spliceHitboxSize / 2}
+                              width={spliceHitboxSize}
+                              height={spliceHitboxSize}
+                              rx={7}
+                              ry={7}
+                              transform={`rotate(45 ${position.x} ${position.y})`}
+                            />
+                            <rect
+                              className="network-node-shape"
+                              x={position.x - spliceDiamondSize / 2}
+                              y={position.y - spliceDiamondSize / 2}
+                              width={spliceDiamondSize}
+                              height={spliceDiamondSize}
+                              rx={5}
+                              ry={5}
+                              transform={`rotate(45 ${position.x} ${position.y})`}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <circle className="network-node-hitbox" cx={position.x} cy={position.y} r={intermediateHitboxRadius} />
+                            <circle className="network-node-shape" cx={position.x} cy={position.y} r={intermediateRadius} />
+                          </>
+                        )}
+                      </g>
                     </g>
                   );
                 })}

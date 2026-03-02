@@ -314,6 +314,13 @@
   stroke-width: 2;
 }
 
+.network-node .network-node-hitbox {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 0;
+  pointer-events: all;
+}
+
 .network-node.connector .network-node-shape {
   fill: var(--network-node-connector-fill, #dff0ff);
 }

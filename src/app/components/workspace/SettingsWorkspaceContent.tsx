@@ -87,6 +87,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   canvasShowCalloutWireNames: boolean;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
+  canvasZoomInvariantNodeShapes: boolean;
+  setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
   canvasExportFormat: CanvasExportFormat;
   setCanvasExportFormat: (value: CanvasExportFormat) => void;
   canvasPngExportIncludeBackground: boolean;
@@ -179,6 +181,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultAutoSegmentLabelRotation,
   canvasShowCalloutWireNames,
   setCanvasShowCalloutWireNames,
+  canvasZoomInvariantNodeShapes,
+  setCanvasZoomInvariantNodeShapes,
   canvasExportFormat,
   setCanvasExportFormat,
   canvasPngExportIncludeBackground,
@@ -428,6 +432,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasShowCalloutWireNames(event.target.checked)}
             />
             Show wire names in callout table
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasZoomInvariantNodeShapes}
+              onChange={(event) => setCanvasZoomInvariantNodeShapes(event.target.checked)}
+            />
+            Keep connector/splice/node shape size constant while zooming
           </label>
           <label className="settings-checkbox">
             <input
