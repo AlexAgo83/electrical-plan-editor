@@ -266,7 +266,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setWireSort: listModel.setWireSort,
     selectedWireId: selection.selectedWireId,
     describeWireEndpoint: wireDescriptions.describeWireEndpoint,
-    describeWireEndpointId: wireDescriptions.describeWireEndpointId,
+    describeWireEndpointCsvParts: wireDescriptions.describeWireEndpointCsvParts,
     startWireEdit: (wire) => {
       markSelectionPanelsFromTable?.();
       modelingHandlers.wire.startWireEdit(wire);
@@ -495,7 +495,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     onOpenWireOnboardingHelp: onboardingHelp?.openWireStep,
     selectedWire: selection.selectedWire,
     describeWireEndpoint: wireDescriptions.describeWireEndpoint,
-    describeWireEndpointId: wireDescriptions.describeWireEndpointId,
+    describeWireEndpointCsvParts: wireDescriptions.describeWireEndpointCsvParts,
     wireForcedRouteInput: formsState.wireForcedRouteInput,
     setWireForcedRouteInput: formsState.setWireForcedRouteInput,
     handleLockWireRoute: modelingHandlers.wire.handleLockWireRoute,

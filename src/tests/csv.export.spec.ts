@@ -84,4 +84,41 @@ describe("downloadCsvFile", () => {
     expect(csvContent).toContain("'@HACK");
     expect(csvContent).toContain(",-12");
   });
+
+  it("prepends a UTF-8 BOM when explicitly requested", () => {
+    const OriginalBlob = Blob;
+    let capturedPayload: BlobPart | undefined;
+    class BlobCapture extends OriginalBlob {
+      constructor(parts: BlobPart[] = [], options?: BlobPropertyBag) {
+        super(parts, options);
+        capturedPayload = parts[0];
+      }
+    }
+    (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = BlobCapture;
+    const createObjectUrl = vi.fn((_blob: Blob) => "blob:test-csv");
+    const revokeObjectUrl = vi.fn();
+    Object.defineProperty(URL, "createObjectURL", {
+      configurable: true,
+      writable: true,
+      value: createObjectUrl
+    });
+    Object.defineProperty(URL, "revokeObjectURL", {
+      configurable: true,
+      writable: true,
+      value: revokeObjectUrl
+    });
+    vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+
+    try {
+      downloadCsvFile("Wire Export", ["Libelle"], [["Epissure a e"]], { includeUtf8Bom: true });
+    } finally {
+      (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = OriginalBlob;
+    }
+    expect(typeof capturedPayload).toBe("string");
+    if (typeof capturedPayload !== "string") {
+      throw new Error("Expected string CSV payload.");
+    }
+    expect(capturedPayload.startsWith("\uFEFF")).toBe(true);
+    expect(capturedPayload).toContain("Libelle");
+  });
 });

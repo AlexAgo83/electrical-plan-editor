@@ -129,7 +129,7 @@ export interface AnalysisWorkspaceContentProps {
   onOpenWireOnboardingHelp?: () => void;
   selectedWire: Wire | null;
   describeWireEndpoint: (endpoint: Wire["endpointA"]) => string;
-  describeWireEndpointId: (endpoint: Wire["endpointA"]) => string;
+  describeWireEndpointCsvParts: (endpoint: Wire["endpointA"]) => { endpointId: string; pin: string };
   wireForcedRouteInput: string;
   setWireForcedRouteInput: (value: string) => void;
   handleLockWireRoute: () => void;

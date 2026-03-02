@@ -506,7 +506,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasResetZoomPercentInput
   });
 
-  const { describeWireEndpoint, describeWireEndpointId } = useWireEndpointDescriptions({
+  const { describeWireEndpoint, describeWireEndpointId, describeWireEndpointCsvParts } = useWireEndpointDescriptions({
     connectorMap,
     spliceMap
   });
@@ -2276,7 +2276,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       pendingNewNodePosition,
       wireDescriptions: {
         describeWireEndpoint,
-        describeWireEndpointId
+        describeWireEndpointId,
+        describeWireEndpointCsvParts
       },
       onboardingHelp: {
         openCatalogStep: () => openSingleStepOnboarding("catalog"),
