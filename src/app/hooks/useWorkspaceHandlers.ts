@@ -131,6 +131,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
+  setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
   setCanvasExportFormat: (value: "svg" | "png") => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
@@ -229,6 +230,7 @@ export function useWorkspaceHandlers({
   setCanvasDefaultLabelRotationDegrees,
   setCanvasDefaultAutoSegmentLabelRotation,
   setCanvasShowCalloutWireNames,
+  setCanvasZoomInvariantNodeShapes,
   setCanvasExportFormat,
   setCanvasPngExportIncludeBackground,
   setCanvasResetZoomPercentInput,
@@ -733,6 +735,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultLabelRotationDegrees(0);
     setCanvasDefaultAutoSegmentLabelRotation(false);
     setCanvasShowCalloutWireNames(false);
+    setCanvasZoomInvariantNodeShapes(false);
     setCanvasExportFormat("svg");
     setCanvasPngExportIncludeBackground(true);
     setCanvasResetZoomPercentInput("60");

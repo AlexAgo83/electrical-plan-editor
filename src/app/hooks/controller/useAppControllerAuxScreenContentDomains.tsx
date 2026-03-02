@@ -206,6 +206,8 @@ export function useAppControllerAuxScreenContentDomains({
     setCanvasDefaultAutoSegmentLabelRotation: settings.prefs.setCanvasDefaultAutoSegmentLabelRotation,
     canvasShowCalloutWireNames: settings.prefs.canvasShowCalloutWireNames,
     setCanvasShowCalloutWireNames: settings.prefs.setCanvasShowCalloutWireNames,
+    canvasZoomInvariantNodeShapes: settings.prefs.canvasZoomInvariantNodeShapes,
+    setCanvasZoomInvariantNodeShapes: settings.prefs.setCanvasZoomInvariantNodeShapes,
     canvasExportFormat: settings.prefs.canvasExportFormat,
     setCanvasExportFormat: settings.prefs.setCanvasExportFormat,
     canvasPngExportIncludeBackground: settings.prefs.canvasPngExportIncludeBackground,
