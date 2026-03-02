@@ -27,6 +27,8 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "connectorMap"
     | "spliceMap"
     | "configuredResetScale"
+    | "networkViewWidth"
+    | "networkViewHeight"
     | "networkScale"
     | "networkOffset"
     | "setNetworkScale"
@@ -107,6 +109,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setCanvasExportFormat"
     | "setCanvasResetZoomPercentInput"
     | "setCanvasPngExportIncludeBackground"
+    | "setCanvasResizeBehaviorMode"
     | "setShowShortcutHints"
     | "setKeyboardShortcutsEnabled"
     | "setShowFloatingInspectorPanel"
@@ -147,7 +150,7 @@ interface UseAppControllerSelectionHandlersAssemblyParams {
   >;
   canvasFocus: Pick<
     SelectionHandlersParams,
-    "setInteractionMode" | "networkScale" | "setNetworkScale" | "setNetworkOffset"
+    "setInteractionMode" | "networkScale" | "networkViewWidth" | "networkViewHeight" | "setNetworkScale" | "setNetworkOffset"
   >;
   selection: Pick<
     SelectionHandlersParams,
@@ -224,6 +227,8 @@ interface UseAppControllerCanvasInteractionHandlersAssemblyParams {
   >;
   viewport: Pick<
     CanvasInteractionHandlersParams,
+    | "networkViewWidth"
+    | "networkViewHeight"
     | "snapNodesToGrid"
     | "lockEntityMovement"
     | "networkOffset"

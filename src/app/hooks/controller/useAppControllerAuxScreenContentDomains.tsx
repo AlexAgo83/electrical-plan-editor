@@ -216,6 +216,8 @@ export function useAppControllerAuxScreenContentDomains({
     setCanvasPngExportIncludeBackground: settings.prefs.setCanvasPngExportIncludeBackground,
     canvasResetZoomPercentInput: settings.canvasDisplay.canvasResetZoomPercentInput,
     setCanvasResetZoomPercentInput: settings.canvasDisplay.setCanvasResetZoomPercentInput,
+    canvasResizeBehaviorMode: settings.prefs.canvasResizeBehaviorMode,
+    setCanvasResizeBehaviorMode: settings.prefs.setCanvasResizeBehaviorMode,
     configuredResetZoomPercent: settings.configuredResetZoomPercent,
     applyCanvasDefaultsNow: settings.applyCanvasDefaultsNow,
     handleZoomAction: settings.handleZoomAction,

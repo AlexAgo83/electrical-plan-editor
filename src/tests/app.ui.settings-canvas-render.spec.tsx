@@ -1,4 +1,4 @@
-import { fireEvent, within } from "@testing-library/react";
+import { fireEvent, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { appActions, appReducer } from "../store";
 import {
@@ -253,6 +253,43 @@ describe("App integration UI - settings canvas render", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
     expect(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Export format")).toHaveValue("png");
+  });
+  it("supports the canvas resize behavior mode and updates network summary viewport in visible-area-only mode", async () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const canvasSettingsPanel = getPanelByHeading("Canvas render preferences");
+    const resizeBehaviorSelect = within(canvasSettingsPanel).getByLabelText("Viewport resize behavior");
+    expect(resizeBehaviorSelect).toHaveValue("responsiveContentScale");
+    fireEvent.change(resizeBehaviorSelect, {
+      target: { value: "visibleAreaOnly" }
+    });
+    switchScreenDrawerAware("analysis");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    Object.defineProperty(networkSvg, "getBoundingClientRect", {
+      configurable: true,
+      value: () => ({
+        width: 1011,
+        height: 577,
+        left: 0,
+        top: 0,
+        right: 1011,
+        bottom: 577,
+        x: 0,
+        y: 0,
+        toJSON: () => ({})
+      })
+    });
+    fireEvent(window, new Event("resize"));
+    await waitFor(() => {
+      expect(networkSvg.getAttribute("viewBox")).toBe("0 0 1011 577");
+    });
+    firstRender.unmount();
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    expect(within(getPanelByHeading("Canvas render preferences")).getByLabelText("Viewport resize behavior")).toHaveValue(
+      "visibleAreaOnly"
+    );
   });
   it("toggles wire-name column visibility in callout tables from settings", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());

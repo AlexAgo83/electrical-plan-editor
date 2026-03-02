@@ -14,6 +14,7 @@ import type {
 import { normalizeWireColorState } from "../../core/cableColors";
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
+import { normalizeSplicePortMode, normalizeUnboundedPortCountFallback } from "../../core/splicePortMode";
 import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
 import { bootstrapCatalogForScopedState, normalizeCatalogItem, normalizeManufacturerReference } from "../../store/catalog";
 
@@ -147,10 +148,18 @@ function normalizeSplicesEntityState(splices: NetworkScopedState["splices"]): Ne
     if (splice === undefined) {
       continue;
     }
+    const rawSplice = splice as Partial<Splice>;
+    const portMode = normalizeSplicePortMode(rawSplice.portMode);
+    const boundedPortCount =
+      typeof rawSplice.portCount === "number" && Number.isInteger(rawSplice.portCount) && rawSplice.portCount > 0
+        ? rawSplice.portCount
+        : 1;
 
     byId[spliceId] = {
       ...splice,
-      manufacturerReference: normalizeManufacturerReference((splice as Partial<Splice>).manufacturerReference)
+      portMode,
+      portCount: portMode === "bounded" ? boundedPortCount : normalizeUnboundedPortCountFallback(rawSplice.portCount),
+      manufacturerReference: normalizeManufacturerReference(rawSplice.manufacturerReference)
     };
   }
 
@@ -390,7 +399,34 @@ export function buildNetworkFilePayload(
 }
 
 export function serializeNetworkFilePayload(payload: NetworkFilePayloadV1): string {
-  return JSON.stringify(canonicalize(payload), null, 2);
+  const payloadForSerialization: NetworkFilePayloadV1 = {
+    ...payload,
+    networks: payload.networks.map((bundle) => {
+      const nextSplicesById = { ...bundle.state.splices.byId };
+      for (const spliceId of bundle.state.splices.allIds) {
+        const splice = nextSplicesById[spliceId];
+        if (splice === undefined || splice.portMode !== "unbounded") {
+          continue;
+        }
+        const serializedSplice = { ...splice } as Partial<Splice>;
+        delete serializedSplice.portCount;
+        nextSplicesById[spliceId] = serializedSplice as Splice;
+      }
+
+      return {
+        ...bundle,
+        state: {
+          ...bundle.state,
+          splices: {
+            ...bundle.state.splices,
+            byId: nextSplicesById
+          }
+        }
+      };
+    })
+  };
+
+  return JSON.stringify(canonicalize(payloadForSerialization), null, 2);
 }
 
 export function parseNetworkFilePayload(rawJson: string): { payload: NetworkFilePayloadV1 | null; error: string | null } {

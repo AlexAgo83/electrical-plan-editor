@@ -4,6 +4,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactElement,
@@ -26,6 +27,7 @@ import type {
   CanvasCalloutTextSize,
   CanvasExportFormat,
   CanvasLabelRotationDegrees,
+  CanvasResizeBehaviorMode,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
   SubScreenId
@@ -34,6 +36,7 @@ import { NetworkCanvasFloatingInfoPanels } from "./network-summary/NetworkCanvas
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
 import { NetworkSummaryLegend } from "./network-summary/NetworkSummaryLegend";
 import { snapToGrid } from "../lib/app-utils-shared";
+import { resolveSplicePortMode } from "../../core/splicePortMode";
 
 export interface NodePosition {
   x: number;
@@ -116,6 +119,7 @@ export interface NetworkSummaryPanelProps {
   showCalloutWireNames: boolean;
   zoomInvariantNodeShapes: boolean;
   nodeShapeSizePercent: number;
+  resizeBehaviorMode: CanvasResizeBehaviorMode;
   labelStrokeMode: CanvasLabelStrokeMode;
   labelSizeMode: CanvasLabelSizeMode;
   calloutTextSize: CanvasCalloutTextSize;
@@ -175,6 +179,7 @@ export interface NetworkSummaryPanelProps {
   onSelectSpliceFromCallout: (spliceId: SpliceId) => void;
   onPersistConnectorCalloutPosition: (connectorId: ConnectorId, position: NodePosition) => void;
   onPersistSpliceCalloutPosition: (spliceId: SpliceId, position: NodePosition) => void;
+  onViewportSizeChange?: (size: { width: number; height: number }) => void;
   pngExportIncludeBackground: boolean;
   canExportBomCsv: boolean;
   onExportBomCsv: () => void;
@@ -644,6 +649,7 @@ export function NetworkSummaryPanel({
   showCalloutWireNames,
   zoomInvariantNodeShapes,
   nodeShapeSizePercent,
+  resizeBehaviorMode,
   labelStrokeMode,
   labelSizeMode,
   calloutTextSize,
@@ -703,6 +709,7 @@ export function NetworkSummaryPanel({
   onSelectSpliceFromCallout,
   onPersistConnectorCalloutPosition,
   onPersistSpliceCalloutPosition,
+  onViewportSizeChange,
   pngExportIncludeBackground,
   canExportBomCsv,
   onExportBomCsv,
@@ -722,6 +729,11 @@ export function NetworkSummaryPanel({
   const normalizedNodeShapeScale = zoomInvariantNodeShapes
     ? Math.min(1.25, Math.max(0.5, nodeShapeSizePercent / 100))
     : 1;
+  const normalizedNodeStrokeScale = zoomInvariantNodeShapes
+    ? clampNumber(normalizedNodeShapeScale, 0.65, 1.35)
+    : 1;
+  const nodeStrokeWidth = clampNumber(2 * normalizedNodeStrokeScale, 1.4, 3.4);
+  const nodeStrokeEmphasisWidth = clampNumber(3 * normalizedNodeStrokeScale, 2.1, 5.1);
   const visibleModelMinX = (0 - networkOffset.x) / effectiveScale;
   const visibleModelMaxX = (networkViewWidth - networkOffset.x) / effectiveScale;
   const visibleModelMinY = (0 - networkOffset.y) / effectiveScale;
@@ -764,6 +776,59 @@ export function NetworkSummaryPanel({
       return next;
     });
   }, [allSubNetworkTags]);
+
+  useEffect(() => {
+    if (
+      resizeBehaviorMode !== "visibleAreaOnly" ||
+      onViewportSizeChange === undefined ||
+      typeof window === "undefined"
+    ) {
+      return undefined;
+    }
+
+    let animationFrameId = 0;
+    const measureViewport = () => {
+      animationFrameId = 0;
+      const svgElement = networkSvgRef.current;
+      if (svgElement === null) {
+        return;
+      }
+      const rect = svgElement.getBoundingClientRect();
+      if (!Number.isFinite(rect.width) || !Number.isFinite(rect.height) || rect.width <= 0 || rect.height <= 0) {
+        return;
+      }
+
+      onViewportSizeChange({
+        width: Math.max(1, Math.round(rect.width)),
+        height: Math.max(1, Math.round(rect.height))
+      });
+    };
+    const scheduleMeasure = () => {
+      if (animationFrameId !== 0) {
+        return;
+      }
+      animationFrameId = window.requestAnimationFrame(measureViewport);
+    };
+
+    scheduleMeasure();
+    window.addEventListener("resize", scheduleMeasure);
+    const observedElement = networkCanvasShellRef.current ?? networkSvgRef.current;
+    const resizeObserver =
+      observedElement === null || typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(scheduleMeasure);
+    if (resizeObserver !== null && observedElement !== null) {
+      resizeObserver.observe(observedElement);
+    }
+
+    return () => {
+      if (animationFrameId !== 0) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+      window.removeEventListener("resize", scheduleMeasure);
+      resizeObserver?.disconnect();
+    };
+  }, [onViewportSizeChange, resizeBehaviorMode, nodes.length]);
 
   const activeSubNetworkTagSet = activeSubNetworkTags as ReadonlySet<string>;
   const isSubNetworkFilteringActive =
@@ -901,14 +966,7 @@ export function NetworkSummaryPanel({
 
   const spliceCalloutGroupsById = useMemo(() => {
     const map = new Map<SpliceId, CalloutGroup[]>();
-    for (const splice of spliceMap.values()) {
-      const groups = Array.from({ length: Math.max(0, splice.portCount) }, (_, index) => ({
-        key: `splice:${splice.id}:P${index + 1}`,
-        label: `P${index + 1}`,
-        entries: [] as CalloutEntry[]
-      }));
-      map.set(splice.id, groups);
-    }
+    const entriesBySpliceAndPort = new Map<SpliceId, Map<number, CalloutEntry[]>>();
 
     for (const wire of wires) {
       const endpoints = [wire.endpointA, wire.endpointB];
@@ -916,31 +974,51 @@ export function NetworkSummaryPanel({
         if (endpoint.kind !== "splicePort") {
           continue;
         }
-        const groups = map.get(endpoint.spliceId);
-        if (groups === undefined || endpoint.portIndex < 1) {
+        if (endpoint.portIndex < 1) {
           continue;
         }
-        const groupIndex = endpoint.portIndex - 1;
-        if (groupIndex >= groups.length) {
+        const splice = spliceMap.get(endpoint.spliceId);
+        if (splice === undefined) {
           continue;
         }
-        groups[groupIndex]?.entries.push({
+        if (resolveSplicePortMode(splice) === "bounded" && endpoint.portIndex > splice.portCount) {
+          continue;
+        }
+        let entriesByPort = entriesBySpliceAndPort.get(endpoint.spliceId);
+        if (entriesByPort === undefined) {
+          entriesByPort = new Map<number, CalloutEntry[]>();
+          entriesBySpliceAndPort.set(endpoint.spliceId, entriesByPort);
+        }
+        const currentEntries = entriesByPort.get(endpoint.portIndex) ?? [];
+        currentEntries.push({
           wireId: wire.id,
           name: wire.name,
           technicalId: wire.technicalId,
           lengthMm: wire.lengthMm,
           sectionMm2: wire.sectionMm2
         });
+        entriesByPort.set(endpoint.portIndex, currentEntries);
       }
     }
 
-    for (const groups of map.values()) {
+    for (const splice of spliceMap.values()) {
+      const entriesByPort = entriesBySpliceAndPort.get(splice.id) ?? new Map<number, CalloutEntry[]>();
+      const portIndexes =
+        resolveSplicePortMode(splice) === "bounded"
+          ? Array.from({ length: Math.max(0, splice.portCount) }, (_, index) => index + 1)
+          : [...entriesByPort.keys()].sort((left, right) => left - right);
+      const groups = portIndexes.map((portIndex) => ({
+        key: `splice:${splice.id}:P${portIndex}`,
+        label: `P${portIndex}`,
+        entries: entriesByPort.get(portIndex) ?? []
+      }));
       for (const group of groups) {
         group.entries.sort(
           (left, right) =>
             left.name.localeCompare(right.name) || left.technicalId.localeCompare(right.technicalId)
         );
       }
+      map.set(splice.id, groups);
     }
     return map;
   }, [spliceMap, wires]);
@@ -1695,7 +1773,16 @@ export function NetworkSummaryPanel({
                 ))}
               </g>
 
-              <g className="network-graph-layer network-graph-layer-nodes" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
+              <g
+                className="network-graph-layer network-graph-layer-nodes"
+                transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
+                style={
+                  {
+                    "--network-node-stroke-width": `${nodeStrokeWidth}`,
+                    "--network-node-stroke-emphasis-width": `${nodeStrokeEmphasisWidth}`
+                  } as CSSProperties
+                }
+              >
                 {renderedNodes.map(({ node, position, nodeClassName }) => {
                   const connectorWidth = 46 * normalizedNodeShapeScale;
                   const connectorHeight = 30 * normalizedNodeShapeScale;

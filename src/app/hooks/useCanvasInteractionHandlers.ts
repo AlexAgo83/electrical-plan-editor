@@ -2,7 +2,7 @@ import type { Dispatch, MouseEvent as ReactMouseEvent, MutableRefObject, SetStat
 import type { Connector, NetworkNode, NodeId, Segment, SegmentId, Splice } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
-import { NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE, NETWORK_VIEW_HEIGHT, NETWORK_VIEW_WIDTH, clamp, snapToGrid } from "../lib/app-utils-shared";
+import { NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE, clamp, snapToGrid } from "../lib/app-utils-shared";
 import type { InteractionMode, NodePosition, SubScreenId } from "../types/app-controller";
 
 type DispatchAction = (
@@ -29,6 +29,8 @@ interface UseCanvasInteractionHandlersParams {
   setNodeLabel: (value: string) => void;
   setNodeFormError: (value: string | null) => void;
   setPendingNewNodePosition: (value: NodePosition | null) => void;
+  networkViewWidth: number;
+  networkViewHeight: number;
   snapNodesToGrid: boolean;
   lockEntityMovement: boolean;
   networkOffset: NodePosition;
@@ -76,6 +78,8 @@ export function useCanvasInteractionHandlers({
   setNodeLabel,
   setNodeFormError,
   setPendingNewNodePosition,
+  networkViewWidth,
+  networkViewHeight,
   snapNodesToGrid,
   lockEntityMovement,
   networkOffset,
@@ -208,8 +212,8 @@ export function useCanvasInteractionHandlers({
     }
 
     return {
-      x: ((clientX - bounds.left) / bounds.width) * NETWORK_VIEW_WIDTH,
-      y: ((clientY - bounds.top) / bounds.height) * NETWORK_VIEW_HEIGHT
+      x: ((clientX - bounds.left) / bounds.width) * networkViewWidth,
+      y: ((clientY - bounds.top) / bounds.height) * networkViewHeight
     };
   }
 
@@ -286,8 +290,8 @@ export function useCanvasInteractionHandlers({
       return;
     }
 
-    const viewCenterX = NETWORK_VIEW_WIDTH / 2;
-    const viewCenterY = NETWORK_VIEW_HEIGHT / 2;
+    const viewCenterX = networkViewWidth / 2;
+    const viewCenterY = networkViewHeight / 2;
     const centerModelX = (viewCenterX - networkOffset.x) / networkScale;
     const centerModelY = (viewCenterY - networkOffset.y) / networkScale;
 
@@ -309,8 +313,8 @@ export function useCanvasInteractionHandlers({
         return;
       }
 
-      const deltaX = ((event.clientX - panStartRef.current.clientX) / bounds.width) * NETWORK_VIEW_WIDTH;
-      const deltaY = ((event.clientY - panStartRef.current.clientY) / bounds.height) * NETWORK_VIEW_HEIGHT;
+      const deltaX = ((event.clientX - panStartRef.current.clientX) / bounds.width) * networkViewWidth;
+      const deltaY = ((event.clientY - panStartRef.current.clientY) / bounds.height) * networkViewHeight;
       const nextOffsetX = panStartRef.current.offsetX + deltaX;
       const nextOffsetY = panStartRef.current.offsetY + deltaY;
       setNetworkOffset((current) => {

@@ -1,6 +1,7 @@
 import type { NodeId, SegmentId, Wire, WireEndpoint, WireId } from "../../../core/entities";
 import { buildRoutingGraphIndex } from "../../../core/graph";
 import { findShortestRoute } from "../../../core/pathfinding";
+import { isSplicePortIndexValid } from "../../../core/splicePortMode";
 import type { AppState, EntityState } from "../../types";
 import { isValidSlotIndex } from "../shared";
 
@@ -50,7 +51,7 @@ export function getEndpointValidationError(state: AppState, endpoint: WireEndpoi
     return "Wire endpoint references an unknown splice.";
   }
 
-  if (!isValidSlotIndex(endpoint.portIndex, splice.portCount)) {
+  if (!isSplicePortIndexValid(splice, endpoint.portIndex)) {
     return "Wire splice port endpoint is out of range.";
   }
 

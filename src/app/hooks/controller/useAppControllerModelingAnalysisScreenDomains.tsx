@@ -298,6 +298,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     spliceCatalogItemId: formsState.spliceCatalogItemId,
     setSpliceCatalogItemId:
       modelingHandlers.splice.syncDerivedSpliceCatalogFields ?? formsState.setSpliceCatalogItemId,
+    splicePortMode: formsState.splicePortMode,
+    setSplicePortMode: modelingHandlers.splice.setSpliceCapacityMode ?? formsState.setSplicePortMode,
     spliceManufacturerReference: formsState.spliceManufacturerReference,
     setSpliceManufacturerReference: formsState.setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode: formsState.spliceAutoCreateLinkedNode,
@@ -305,6 +307,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     spliceTechnicalIdAlreadyUsed,
     portCount: formsState.portCount,
     setPortCount: formsState.setPortCount,
+    spliceFormInfo: formsState.spliceFormInfo,
     cancelSpliceEdit: modelingHandlers.splice.cancelSpliceEdit,
     spliceFormError: formsState.spliceFormError,
     handleNodeSubmit: modelingHandlers.node.handleNodeSubmit,

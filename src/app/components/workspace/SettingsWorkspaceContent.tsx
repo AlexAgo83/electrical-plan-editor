@@ -7,6 +7,7 @@ import type {
   CanvasExportFormat,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
+  CanvasResizeBehaviorMode,
   CanvasLabelStrokeMode,
   SortDirection,
   SortField,
@@ -97,6 +98,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
   canvasResetZoomPercentInput: string;
   setCanvasResetZoomPercentInput: (value: string) => void;
+  canvasResizeBehaviorMode: CanvasResizeBehaviorMode;
+  setCanvasResizeBehaviorMode: (value: CanvasResizeBehaviorMode) => void;
   configuredResetZoomPercent: number;
   applyCanvasDefaultsNow: () => void;
   handleZoomAction: (target: "in" | "out" | "reset") => void;
@@ -193,6 +196,8 @@ export function SettingsWorkspaceContent({
   setCanvasPngExportIncludeBackground,
   canvasResetZoomPercentInput,
   setCanvasResetZoomPercentInput,
+  canvasResizeBehaviorMode,
+  setCanvasResizeBehaviorMode,
   applyCanvasDefaultsNow,
   handleZoomAction,
   showShortcutHints,
@@ -363,6 +368,16 @@ export function SettingsWorkspaceContent({
           <label className="settings-field">
             Reset zoom target (%)
             <input type="number" value={canvasResetZoomPercentInput} onChange={(event) => setCanvasResetZoomPercentInput(event.target.value)} />
+          </label>
+          <label className="settings-field">
+            Viewport resize behavior
+            <select
+              value={canvasResizeBehaviorMode}
+              onChange={(event) => setCanvasResizeBehaviorMode(event.target.value as CanvasResizeBehaviorMode)}
+            >
+              <option value="responsiveContentScale">Responsive content scaling (default)</option>
+              <option value="visibleAreaOnly">Resize changes visible area only</option>
+            </select>
           </label>
         </div>
         <div className="row-actions settings-actions">

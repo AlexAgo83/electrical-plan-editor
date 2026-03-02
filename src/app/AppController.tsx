@@ -323,6 +323,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasExportFormat,
     canvasPngExportIncludeBackground,
     setCanvasPngExportIncludeBackground,
+    canvasResizeBehaviorMode,
+    setCanvasResizeBehaviorMode,
     showShortcutHints,
     setShowShortcutHints,
     keyboardShortcutsEnabled,
@@ -348,6 +350,25 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
     downloadCsvFile("network-bom", networkSummaryBomCsvExport.headers, networkSummaryBomCsvExport.rows);
   }, [canExportBomCsv, networkSummaryBomCsvExport]);
+  const [networkViewportSize, setNetworkViewportSize] = useState({
+    width: NETWORK_VIEW_WIDTH,
+    height: NETWORK_VIEW_HEIGHT
+  });
+  const effectiveNetworkViewWidth =
+    canvasResizeBehaviorMode === "visibleAreaOnly" ? networkViewportSize.width : NETWORK_VIEW_WIDTH;
+  const effectiveNetworkViewHeight =
+    canvasResizeBehaviorMode === "visibleAreaOnly" ? networkViewportSize.height : NETWORK_VIEW_HEIGHT;
+  const handleNetworkSummaryViewportSizeChange = useCallback((viewportSize: { width: number; height: number }) => {
+    setNetworkViewportSize((current) => {
+      if (
+        Math.abs(current.width - viewportSize.width) <= 0.0001 &&
+        Math.abs(current.height - viewportSize.height) <= 0.0001
+      ) {
+        return current;
+      }
+      return viewportSize;
+    });
+  }, []);
   const [headerOffsetPx, setHeaderOffsetPx] = useState(96);
   const panStartRef = useRef<{
     clientX: number;
@@ -828,6 +849,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasNodeShapeSizePercent,
     canvasExportFormat,
     canvasPngExportIncludeBackground,
+    canvasResizeBehaviorMode,
     canvasResetZoomPercentInput,
     showShortcutHints,
     keyboardShortcutsEnabled,
@@ -871,6 +893,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCanvasNodeShapeSizePercent,
     setCanvasExportFormat,
     setCanvasPngExportIncludeBackground,
+    setCanvasResizeBehaviorMode,
     setShowNetworkGrid,
     setSnapNodesToGrid,
     setLockEntityMovement,
@@ -1442,6 +1465,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       connectorMap,
       spliceMap,
       configuredResetScale,
+      networkViewWidth: effectiveNetworkViewWidth,
+      networkViewHeight: effectiveNetworkViewHeight,
       networkScale,
       networkOffset,
       setNetworkScale,
@@ -1523,6 +1548,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setCanvasExportFormat,
       setCanvasResetZoomPercentInput,
       setCanvasPngExportIncludeBackground,
+      setCanvasResizeBehaviorMode,
       setShowShortcutHints,
       setKeyboardShortcutsEnabled,
       setShowFloatingInspectorPanel,
@@ -1611,12 +1637,15 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setSpliceTechnicalId: formsState.setSpliceTechnicalId,
     spliceCatalogItemId: formsState.spliceCatalogItemId,
     setSpliceCatalogItemId: formsState.setSpliceCatalogItemId,
+    splicePortMode: formsState.splicePortMode,
+    setSplicePortMode: formsState.setSplicePortMode,
     spliceManufacturerReference: formsState.spliceManufacturerReference,
     setSpliceManufacturerReference: formsState.setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode: formsState.spliceAutoCreateLinkedNode,
     setSpliceAutoCreateLinkedNode: formsState.setSpliceAutoCreateLinkedNode,
     portCount: formsState.portCount,
     setPortCount: formsState.setPortCount,
+    setSpliceFormInfo: formsState.setSpliceFormInfo,
     setSpliceFormError: formsState.setSpliceFormError,
     portIndexInput: formsState.portIndexInput,
     spliceOccupantRefInput: formsState.spliceOccupantRefInput,
@@ -1788,6 +1817,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasFocus: {
       setInteractionMode,
       networkScale,
+      networkViewWidth: effectiveNetworkViewWidth,
+      networkViewHeight: effectiveNetworkViewHeight,
       setNetworkScale,
       setNetworkOffset
     },
@@ -1980,6 +2011,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setPendingNewNodePosition
     },
     viewport: {
+      networkViewWidth: effectiveNetworkViewWidth,
+      networkViewHeight: effectiveNetworkViewHeight,
       snapNodesToGrid,
       lockEntityMovement,
       networkOffset,
@@ -2199,6 +2232,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         showCalloutWireNames: canvasShowCalloutWireNames,
         zoomInvariantNodeShapes: canvasZoomInvariantNodeShapes,
         nodeShapeSizePercent: canvasNodeShapeSizePercent,
+        resizeBehaviorMode: canvasResizeBehaviorMode,
         canvasExportFormat,
         networkScalePercent,
         routingGraph,
@@ -2207,8 +2241,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         segments,
         wires,
         isPanningNetwork,
-        networkViewWidth: NETWORK_VIEW_WIDTH,
-        networkViewHeight: NETWORK_VIEW_HEIGHT,
+        networkViewWidth: effectiveNetworkViewWidth,
+        networkViewHeight: effectiveNetworkViewHeight,
         networkGridStep: NETWORK_GRID_STEP,
         networkOffset,
         networkScale,
@@ -2243,6 +2277,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         onSelectSpliceFromCallout: handleSelectSpliceFromCallout,
         onPersistConnectorCalloutPosition: persistConnectorCalloutPosition,
         onPersistSpliceCalloutPosition: persistSpliceCalloutPosition,
+        onViewportSizeChange: handleNetworkSummaryViewportSizeChange,
         pngExportIncludeBackground: canvasPngExportIncludeBackground,
         canExportBomCsv,
         onExportBomCsv: handleExportBomCsv,
@@ -2566,6 +2601,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           setCanvasExportFormat,
           canvasPngExportIncludeBackground,
           setCanvasPngExportIncludeBackground,
+          canvasResizeBehaviorMode,
+          setCanvasResizeBehaviorMode,
           showShortcutHints,
           setShowShortcutHints,
           keyboardShortcutsEnabled,

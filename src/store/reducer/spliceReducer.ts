@@ -1,4 +1,9 @@
 import type { AppAction } from "../actions";
+import {
+  normalizeSplicePortMode,
+  normalizeUnboundedPortCountFallback,
+  resolveSplicePortMode
+} from "../../core/splicePortMode";
 import type { AppState } from "../types";
 import {
   bumpRevision,
@@ -51,6 +56,22 @@ function hasWireEndpointIndexOutOfRange(state: AppState, spliceId: string, portC
   });
 }
 
+function isValidSplicePortIndexForMode(
+  splice: {
+    portMode?: "bounded" | "unbounded";
+    portCount: number;
+  },
+  portIndex: number
+): boolean {
+  if (!Number.isInteger(portIndex) || portIndex < 1) {
+    return false;
+  }
+  if (resolveSplicePortMode(splice) === "unbounded") {
+    return true;
+  }
+  return isValidSlotIndex(portIndex, splice.portCount);
+}
+
 function hasSpliceNodeReference(state: AppState, spliceId: string): boolean {
   return state.nodes.allIds.some((id) => {
     const node = state.nodes.byId[id];
@@ -77,6 +98,7 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
     case "splice/upsert": {
       const normalizedName = action.payload.name.trim();
       const normalizedTechnicalId = action.payload.technicalId.trim();
+      let portMode = normalizeSplicePortMode(action.payload.portMode);
       let portCount = action.payload.portCount;
       if (action.payload.id.trim().length === 0) {
         return withError(state, "Splice ID is required.");
@@ -90,32 +112,38 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
         return withError(state, "Splice catalog item is invalid.");
       }
       if (linkedCatalogItem !== undefined) {
+        portMode = "bounded";
         portCount = linkedCatalogItem.connectionCount;
       }
 
-      if (!Number.isInteger(portCount) || portCount < 1) {
+      if (portMode === "bounded" && (!Number.isInteger(portCount) || portCount < 1)) {
         return withError(state, "Splice portCount must be an integer >= 1.");
+      }
+      if (portMode === "unbounded") {
+        portCount = normalizeUnboundedPortCountFallback(portCount);
       }
 
       if (hasDuplicateSpliceTechnicalId(state, action.payload.id, normalizedTechnicalId)) {
         return withError(state, `Splice technical ID '${normalizedTechnicalId}' is already used.`);
       }
 
-      const occupancy = state.splicePortOccupancy[action.payload.id];
-      if (occupancy !== undefined) {
-        const hasOutOfRangeOccupancy = Object.keys(occupancy)
-          .map((key) => Number(key))
-          .some((slot) => slot > portCount);
+      if (portMode === "bounded") {
+        const occupancy = state.splicePortOccupancy[action.payload.id];
+        if (occupancy !== undefined) {
+          const hasOutOfRangeOccupancy = Object.keys(occupancy)
+            .map((key) => Number(key))
+            .some((slot) => slot > portCount);
 
-        if (hasOutOfRangeOccupancy) {
-          return withError(
-            state,
-            "Splice portCount cannot be reduced below occupied port indexes."
-          );
+          if (hasOutOfRangeOccupancy) {
+            return withError(
+              state,
+              "Splice portCount cannot be reduced below occupied port indexes."
+            );
+          }
         }
-      }
-      if (hasWireEndpointIndexOutOfRange(state, action.payload.id, portCount)) {
-        return withError(state, "Splice portCount cannot be reduced below wire endpoint port indexes.");
+        if (hasWireEndpointIndexOutOfRange(state, action.payload.id, portCount)) {
+          return withError(state, "Splice portCount cannot be reduced below wire endpoint port indexes.");
+        }
       }
 
       return bumpRevision({
@@ -124,6 +152,7 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
           ...action.payload,
           name: normalizedName,
           technicalId: normalizedTechnicalId,
+          portMode,
           portCount,
           manufacturerReference:
             linkedCatalogItem !== undefined
@@ -160,7 +189,7 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
         return withError(state, "Cannot occupy port on unknown splice.");
       }
 
-      if (!isValidSlotIndex(action.payload.portIndex, splice.portCount)) {
+      if (!isValidSplicePortIndexForMode(splice, action.payload.portIndex)) {
         return withError(state, "Splice port index is out of range.");
       }
 
@@ -200,7 +229,7 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
         return withError(state, "Cannot release port on unknown splice.");
       }
 
-      if (!isValidSlotIndex(action.payload.portIndex, splice.portCount)) {
+      if (!isValidSplicePortIndexForMode(splice, action.payload.portIndex)) {
         return withError(state, "Splice port index is out of range.");
       }
 

@@ -5,6 +5,7 @@ import type {
   CanvasExportFormat,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
+  CanvasResizeBehaviorMode,
   CanvasLabelStrokeMode,
   SortDirection,
   SortField,
@@ -47,6 +48,8 @@ export function useAppControllerPreferencesState() {
   const [canvasNodeShapeSizePercent, setCanvasNodeShapeSizePercent] = useState(75);
   const [canvasExportFormat, setCanvasExportFormat] = useState<CanvasExportFormat>("svg");
   const [canvasPngExportIncludeBackground, setCanvasPngExportIncludeBackground] = useState(true);
+  const [canvasResizeBehaviorMode, setCanvasResizeBehaviorMode] =
+    useState<CanvasResizeBehaviorMode>("responsiveContentScale");
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [showFloatingInspectorPanel, setShowFloatingInspectorPanel] = useState(true);
@@ -115,6 +118,8 @@ export function useAppControllerPreferencesState() {
     setCanvasExportFormat,
     canvasPngExportIncludeBackground,
     setCanvasPngExportIncludeBackground,
+    canvasResizeBehaviorMode,
+    setCanvasResizeBehaviorMode,
     showShortcutHints,
     setShowShortcutHints,
     keyboardShortcutsEnabled,

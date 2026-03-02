@@ -262,7 +262,7 @@
 }
 .network-node .network-node-shape {
   stroke: var(--network-node-stroke-color, #55748d);
-  stroke-width: 2;
+  stroke-width: var(--network-node-stroke-width, 2);
 }
 .network-node .network-node-hitbox {
   fill: transparent;
@@ -281,14 +281,14 @@
 }
 .network-node.is-selected .network-node-shape {
   stroke: var(--network-selection-color, #0f6cb8);
-  stroke-width: 3;
+  stroke-width: var(--network-node-stroke-emphasis-width, 3);
 }
 .network-node:focus-visible {
   outline: none;
 }
 .network-node:focus-visible .network-node-shape {
   stroke: var(--network-selection-focus-color, var(--network-selection-color, #0b4f86));
-  stroke-width: 3;
+  stroke-width: var(--network-node-stroke-emphasis-width, 3);
   filter: drop-shadow(0 0 0.2rem var(--network-selection-glow, rgba(15, 108, 184, 0.45)));
 }
 .network-node-label {

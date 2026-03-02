@@ -4,6 +4,7 @@ import type {
   Connector,
   Splice,
 } from "../core/entities";
+import { normalizeSplicePortMode } from "../core/splicePortMode";
 import type { EntityState, NetworkScopedState } from "./types";
 
 const MAX_MANUFACTURER_REFERENCE_LENGTH = 120;
@@ -237,6 +238,7 @@ function syncConnectorFromCatalog(connector: Connector, catalogItem: CatalogItem
 function syncSpliceFromCatalog(splice: Splice, catalogItem: CatalogItem): Splice {
   return {
     ...splice,
+    portMode: "bounded",
     catalogItemId: catalogItem.id,
     manufacturerReference: catalogItem.manufacturerReference,
     portCount: catalogItem.connectionCount
@@ -346,22 +348,12 @@ export function bootstrapCatalogForScopedState(scoped: NetworkScopedState): Netw
       nextScoped.splices.byId[spliceId] = syncSpliceFromCatalog(splice, linkedItem);
       continue;
     }
-
-    if (!Number.isInteger(splice.portCount) || splice.portCount < 1) {
-      continue;
-    }
-    const manufacturerReference =
-      normalizeManufacturerReference(splice.manufacturerReference) ??
-      buildMissingManufacturerReferencePlaceholder(
-        "splice",
-        buildLegacyNoRefToken(
-          typeof splice.technicalId === "string" && splice.technicalId.trim().length > 0 ? splice.technicalId : spliceId
-        ),
-        splice.portCount
-      );
-
-    const item = ensureCatalogItem("splice", spliceId, manufacturerReference, splice.portCount);
-    nextScoped.splices.byId[spliceId] = syncSpliceFromCatalog(splice, item);
+    nextScoped.splices.byId[spliceId] = {
+      ...splice,
+      portMode: normalizeSplicePortMode(splice.portMode),
+      portCount: Number.isInteger(splice.portCount) && splice.portCount > 0 ? splice.portCount : 1,
+      manufacturerReference: normalizeManufacturerReference(splice.manufacturerReference)
+    };
   }
 
   return nextScoped;

@@ -1,8 +1,8 @@
 ## req_095_network_summary_resize_mode_to_lock_content_scale_on_viewport_resize - Network summary resize mode to lock content scale on viewport resize
 > From version: 1.1.0
-> Status: Draft
-> Understanding: 99%
-> Confidence: 96%
+> Status: Done
+> Understanding: 100%
+> Confidence: 97%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence and references when you edit this doc.

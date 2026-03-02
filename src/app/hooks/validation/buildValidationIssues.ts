@@ -11,6 +11,7 @@ import type {
   Wire,
   WireEndpoint
 } from "../../../core/entities";
+import { isSplicePortIndexValid, resolveSplicePortMode } from "../../../core/splicePortMode";
 import type { AppStore } from "../../../store";
 import { isValidCatalogUrlInput, normalizeManufacturerReferenceKey } from "../../../store";
 import {
@@ -284,12 +285,15 @@ export function buildValidationIssues({
   }
 
   for (const splice of splices) {
-    if (splice.name.trim().length === 0 || splice.technicalId.trim().length === 0 || splice.portCount < 1) {
+    const splicePortMode = resolveSplicePortMode(splice);
+    const hasInvalidBoundedPortCount =
+      splicePortMode === "bounded" && (!Number.isInteger(splice.portCount) || splice.portCount < 1);
+    if (splice.name.trim().length === 0 || splice.technicalId.trim().length === 0 || hasInvalidBoundedPortCount) {
       issues.push({
         id: `splice-required-fields-${splice.id}`,
         severity: "error",
         category: "Incomplete required fields",
-        message: `Splice '${splice.id}' is missing required fields or has invalid port count.`,
+        message: `Splice '${splice.id}' is missing required fields or has invalid bounded port count.`,
         subScreen: "splice",
         selectionKind: "splice",
         selectionId: splice.id
@@ -297,20 +301,7 @@ export function buildValidationIssues({
     }
 
     const spliceCatalogItemId = splice.catalogItemId;
-    if (spliceCatalogItemId === undefined) {
-      if (!shouldValidateMissingCatalogLinks) {
-        continue;
-      }
-      issues.push({
-        id: `splice-missing-catalog-link-${splice.id}`,
-        severity: "error",
-        category: catalogIntegrityCategory,
-        message: `Splice '${splice.technicalId}' is missing a catalog selection (catalogItemId).`,
-        subScreen: "splice",
-        selectionKind: "splice",
-        selectionId: splice.id
-      });
-    } else {
+    if (spliceCatalogItemId !== undefined) {
       const linkedCatalogItem = state.catalogItems.byId[spliceCatalogItemId];
       if (linkedCatalogItem === undefined) {
         issues.push({
@@ -318,6 +309,16 @@ export function buildValidationIssues({
           severity: "error",
           category: catalogIntegrityCategory,
           message: `Splice '${splice.technicalId}' references missing catalog item '${spliceCatalogItemId}'.`,
+          subScreen: "splice",
+          selectionKind: "splice",
+          selectionId: splice.id
+        });
+      } else if (splicePortMode === "unbounded") {
+        issues.push({
+          id: `splice-unbounded-catalog-link-${splice.id}`,
+          severity: "error",
+          category: catalogIntegrityCategory,
+          message: `Splice '${splice.technicalId}' cannot be unbounded while linked to catalog '${linkedCatalogItem.manufacturerReference}'.`,
           subScreen: "splice",
           selectionKind: "splice",
           selectionId: splice.id
@@ -334,6 +335,7 @@ export function buildValidationIssues({
         });
       }
     }
+
   }
 
   for (const wire of wires) {
@@ -396,6 +398,61 @@ export function buildValidationIssues({
 
     registerExpectedWireOccupancy(wire.endpointA, `wire:${wire.id}:A`);
     registerExpectedWireOccupancy(wire.endpointB, `wire:${wire.id}:B`);
+
+    if (wire.endpointA.kind === "connectorCavity") {
+      const connector = connectorMap.get(wire.endpointA.connectorId);
+      if (connector !== undefined && (wire.endpointA.cavityIndex < 1 || wire.endpointA.cavityIndex > connector.cavityCount)) {
+        issues.push({
+          id: `wire-endpoint-a-connector-out-of-range-${wire.id}`,
+          severity: "error",
+          category: "Incomplete required fields",
+          message: `Wire '${wire.technicalId}' endpoint A connector way index is out of range.`,
+          subScreen: "wire",
+          selectionKind: "wire",
+          selectionId: wire.id
+        });
+      }
+    } else {
+      const splice = spliceMap.get(wire.endpointA.spliceId);
+      if (splice !== undefined && !isSplicePortIndexValid(splice, wire.endpointA.portIndex)) {
+        issues.push({
+          id: `wire-endpoint-a-splice-out-of-range-${wire.id}`,
+          severity: "error",
+          category: "Incomplete required fields",
+          message: `Wire '${wire.technicalId}' endpoint A splice port index is out of range.`,
+          subScreen: "wire",
+          selectionKind: "wire",
+          selectionId: wire.id
+        });
+      }
+    }
+    if (wire.endpointB.kind === "connectorCavity") {
+      const connector = connectorMap.get(wire.endpointB.connectorId);
+      if (connector !== undefined && (wire.endpointB.cavityIndex < 1 || wire.endpointB.cavityIndex > connector.cavityCount)) {
+        issues.push({
+          id: `wire-endpoint-b-connector-out-of-range-${wire.id}`,
+          severity: "error",
+          category: "Incomplete required fields",
+          message: `Wire '${wire.technicalId}' endpoint B connector way index is out of range.`,
+          subScreen: "wire",
+          selectionKind: "wire",
+          selectionId: wire.id
+        });
+      }
+    } else {
+      const splice = spliceMap.get(wire.endpointB.spliceId);
+      if (splice !== undefined && !isSplicePortIndexValid(splice, wire.endpointB.portIndex)) {
+        issues.push({
+          id: `wire-endpoint-b-splice-out-of-range-${wire.id}`,
+          severity: "error",
+          category: "Incomplete required fields",
+          message: `Wire '${wire.technicalId}' endpoint B splice port index is out of range.`,
+          subScreen: "wire",
+          selectionKind: "wire",
+          selectionId: wire.id
+        });
+      }
+    }
 
     if (wire.routeSegmentIds.length === 0) {
       issues.push({

@@ -230,7 +230,7 @@ export function useWireHandlers({
       if (occupant === undefined || excluded.has(occupant)) {
         return null;
       }
-      const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice.portCount, excluded);
+      const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice, excluded);
       if (nextFree === null) {
         return { tone: "error", message: "Port is already occupied. No available ports on selected splice." };
       }
@@ -281,7 +281,7 @@ export function useWireHandlers({
     if (occupant === undefined || excluded.has(occupant)) {
       return null;
     }
-    const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice.portCount, excluded);
+    const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice, excluded);
     if (nextFree === null) {
       return { tone: "error", message: "Port is already occupied. No available ports on selected splice." };
     }
@@ -322,7 +322,7 @@ export function useWireHandlers({
         if (splice === undefined) {
           return;
         }
-        const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice.portCount, excluded);
+        const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice, excluded);
         if (nextFree !== null && String(nextFree) !== wireEndpointAPortIndex) {
           setWireEndpointAPortIndex(String(nextFree));
         }
@@ -350,7 +350,7 @@ export function useWireHandlers({
       if (splice === undefined) {
         return;
       }
-      const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice.portCount, excluded);
+      const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice, excluded);
       if (nextFree !== null && String(nextFree) !== wireEndpointBPortIndex) {
         setWireEndpointBPortIndex(String(nextFree));
       }
