@@ -1,4 +1,4 @@
-# Changelog (`1.1.0 → 1.2.0`)
+# Changelog (`1.1.0 → 1.2.1`)
 
 ## Major Highlights
 
@@ -8,7 +8,11 @@
   - new splice capacity modes (`bounded` / `unbounded`).
 - Added adaptive unbounded splice rendering across analysis and network summary surfaces.
 - Improved zoom-invariant node-shape visual quality by scaling node border strokes proportionally.
-- Added a new canvas resize behavior mode to keep content scale locked on viewport resize (`Resize changes visible area only`).
+- Added a canvas resize behavior mode to keep content scale locked on viewport resize (`Resize changes visible area only`).
+- Follow-up `1.2.1` defaults and settings UX alignment:
+  - `Warm Brown` as default theme baseline,
+  - zoom-invariant node shapes enabled by default with `50%` target size,
+  - simplified settings flows without manual “apply defaults now” actions.
 
 ## Product and UX Changes
 
@@ -45,24 +49,31 @@
 
 ### Canvas Resize Behavior Mode (req_095)
 
-- Added a new canvas render preference under `Reset zoom target (%)`:
-  - `Responsive content scaling (default)`,
+- Added a canvas render preference under `Reset zoom target (%)`:
+  - `Responsive content scaling`,
   - `Resize changes visible area only`.
 - In `Resize changes visible area only` mode:
   - resizing viewport changes visible graph extent,
   - apparent content scale remains stable.
 - Preference is persisted/restored with existing UI preference hydration.
-- `Reset current view` and `Fit network view to current graph` continue to work in both modes.
+- `Reset current view` and `Fit network view to current graph` remain operational in both modes.
 
-## Persistence, Import/Export, and Validation
+### Settings Defaults and Structure Alignment (1.2.1 follow-up)
 
-- Persistence and import normalization were updated for splice `portMode` compatibility.
-- Mixed bounded/unbounded datasets now round-trip safely through network portability paths.
-- Validation rules were aligned with new splice semantics:
-  - missing splice catalog link is no longer an error,
-  - broken splice catalog links remain validated when link exists,
-  - bounded/unbounded endpoint range checks are mode-aware.
-- Legacy portability expectations were adjusted to preserve unlinked splice behavior without forced placeholder manufacturer references.
+- Theme default is now `Warm Brown` across:
+  - initial app state,
+  - empty workspace creation/reset flows,
+  - legacy preference migration fallback.
+- `Viewport resize behavior` now defaults to `Resize changes visible area only`.
+- `Keep connector/splice/node shape size constant while zooming` is now enabled by default.
+- `Node shape target size (%)` now defaults to `50%`.
+- Segment-name visibility is now controlled as an active canvas value (`Show segment names`) instead of a “by default only” toggle.
+- `Appearance preferences` moved to the 3rd panel position in Settings.
+- `Show only selected connector/splice callout` placed directly under `Show connector/splice cable callouts by default`.
+- Added `Ctrl/Cmd + S` to the visible shortcuts reference in `Action bar and shortcuts`.
+- Removed:
+  - `Apply canvas defaults now`,
+  - `Apply sort defaults now`.
 
 ## Engineering Quality and Regression Coverage
 
@@ -71,12 +82,19 @@
   - navigation/canvas workflows,
   - analysis `Go to wire` flows,
   - portability network-file normalization.
-- Verified with:
+- Updated integration coverage around:
+  - settings defaults and persistence,
+  - theme startup behavior,
+  - network summary workflow expectations.
+- Verified with CI-equivalent gates:
   - `logics_lint`,
   - `lint`,
   - `typecheck`,
-  - targeted UI and portability test suites.
+  - segmented fast/UI tests,
+  - e2e smoke,
+  - production build and PWA artifact gate.
 
 ## Version Progression in This Window
 
-- `1.2.0`: req_092 -> req_095 implementation bundle (splice contract modernization + canvas behavior refinements + orchestration/doc closure).
+- `1.2.0`: req_092 -> req_095 implementation bundle (splice contract modernization + canvas behavior refinements).
+- `1.2.1`: defaults and settings UX alignment, plus release-note consolidation and reporting-script stability fixes.
