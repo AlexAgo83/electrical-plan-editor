@@ -1,9 +1,9 @@
 ## item_479_settings_panel_reorder_and_app_wide_i18n_en_fr_with_table_label_compaction_safeguards - Settings panel reorder and app-wide i18n EN/FR with table-label compaction safeguards
 > From version: 1.2.1
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: UI / Internationalization
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

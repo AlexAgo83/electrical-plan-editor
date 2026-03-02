@@ -1,9 +1,9 @@
 ## task_077_super_orchestration_delivery_execution_for_req_097_and_req_098_with_validation_gates - Super orchestration delivery execution for req_097, req_098, and req_099 with validation gates
 > From version: 1.2.1
-> Status: Ready
+> Status: Done
 > Understanding: 100% (scope extended to include req_099 onboarding final-step delivery)
 > Confidence: 96% (request and backlog scope now consolidated under one orchestration task)
-> Progress: 5% (planning and Logics orchestration scope updated; implementation pending)
+> Progress: 100% (req_097, req_098, and req_099 implemented, validated, and documented)
 > Complexity: High
 > Theme: UI / Internationalization / Onboarding
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -33,29 +33,29 @@
   - update `README.md` at the end with delivered behavior and scope notes.
 
 # Plan
-- [ ] 1. Finalize implementation strategy and shared contracts
+- [x] 1. Finalize implementation strategy and shared contracts
   - define global hover-description source-priority resolution and explicit title precedence;
   - define i18n key structure, EN baseline, FR catalog boundaries, and fallback rules.
-- [ ] 2. Deliver request `req_097` scope (`item_478`)
+- [x] 2. Deliver request `req_097` scope (`item_478`)
   - implement global hover-description behavior for `button`/`select`/`option` including disabled controls;
   - add regression coverage for representative static + dynamic UI surfaces.
-- [ ] 3. Deliver request `req_098` scope (`item_479`)
+- [x] 3. Deliver request `req_098` scope (`item_479`)
   - reorder Settings panels and place locale selector at required position;
   - integrate i18n EN/FR app-wide in-scope surfaces and persistence wiring;
   - apply French compact-label safeguards on constrained table/header surfaces.
-- [ ] 4. Deliver request `req_099` scope (`item_480`, `item_481`, `item_482`)
+- [x] 4. Deliver request `req_099` scope (`item_480`, `item_481`, `item_482`)
   - append final onboarding Settings overview step after `wires`;
   - implement concise EN-only final-step copy covering key settings shortlist;
   - expose single CTA (`Open Settings`) and validate onboarding progression/non-regression.
-- [ ] 5. Validate cross-request non-regression matrix
+- [x] 5. Validate cross-request non-regression matrix
   - confirm no regression on accessibility semantics and keyboard behavior;
   - confirm changelog/import-export remain out-of-scope for translation;
   - confirm onboarding final-step constraints (full-flow only, single CTA) are respected;
   - confirm save/data-format contracts remain unchanged.
-- [ ] 6. Keep delivery hygiene up to date during execution
+- [x] 6. Keep delivery hygiene up to date during execution
   - update Logics indicators (`Status`, `Progress`, and where relevant `Understanding` / `Confidence`) at each meaningful milestone;
   - produce regular, coherent commits tied to completed increments.
-- [ ] FINAL: Update related Logics docs and `README.md`
+- [x] FINAL: Update related Logics docs and `README.md`
 
 # AC Traceability
 - AC1 (`item_478`) -> Hover descriptions are deterministic and complete for in-scope controls.
@@ -72,12 +72,27 @@
 - npm run -s test:ci:ui
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] Linked request/backlog/task docs updated.
-- [ ] Progress indicators are up to date across linked request/backlog/task docs.
-- [ ] Delivery history includes regular incremental commits.
-- [ ] `README.md` updated to reflect the delivered changes and boundaries.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] Validation commands executed and results captured.
+- [x] Linked request/backlog/task docs updated.
+- [x] Progress indicators are up to date across linked request/backlog/task docs.
+- [x] Delivery history includes regular incremental commits.
+- [x] `README.md` updated to reflect the delivered changes and boundaries.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report
+- Implemented global hover-description fallback instrumentation for `button` / `select` / `option`, including disabled controls, while preserving explicit authored titles.
+- Implemented persistent locale preference (`en` default, `fr` variant), Settings panel reordering, and `Language` selector placement at the end of `Global preferences`.
+- Added app-wide EN/FR DOM translation bridge with deterministic fallback and explicit exclusions for changelog and import/export surfaces.
+- Added final onboarding step (`settingsOverview`) after `wires`, with single primary CTA `Open Settings` and full-flow-only behavior.
+- Added/updated UI tests:
+  - `src/tests/app.ui.hover-descriptions.spec.tsx`
+  - `src/tests/app.ui.settings.spec.tsx`
+  - `src/tests/app.ui.onboarding.spec.tsx`
+  - `src/tests/app.ui.home.spec.tsx`
+  - `scripts/quality/run-vitest-segmented.mjs` (UI lane contract updated for new app.ui spec).
+- Validation results:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s test:ci:ui` ✅

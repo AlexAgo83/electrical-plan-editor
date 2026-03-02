@@ -1,9 +1,9 @@
 ## item_478_hover_descriptions_for_buttons_selects_and_options - Hover descriptions for buttons, selects, and options
 > From version: 1.2.1
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Accessibility / UI clarity
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

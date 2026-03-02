@@ -1,8 +1,8 @@
 ## req_097_hover_descriptions_for_buttons_selects_and_options - Hover descriptions for buttons, selects, and options
 > From version: 1.2.1
-> Status: Draft
-> Understanding: 100%
-> Confidence: 96%
+> Status: Done
+> Understanding: 100% (implementation and validation completed)
+> Confidence: 99%
 > Complexity: Medium
 > Theme: Accessibility / UI clarity
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -116,6 +116,8 @@
 - `src/app/components/workspace/ModelingSecondaryTables.tsx`
 - `src/app/components/workspace/ValidationWorkspaceContent.tsx`
 - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
+- `src/app/hooks/useHoverDescriptionTitles.ts`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `src/tests/app.ui.validation.spec.tsx`
+- `src/tests/app.ui.hover-descriptions.spec.tsx`
 - `logics/request/req_060_accessibility_hardening_for_interactive_network_summary_modal_focus_sortable_tables_and_validation_navigation.md`

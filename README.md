@@ -62,7 +62,11 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 - Catalog/BOM pricing workspace settings (currency + optional tax/VAT + tax rate defaults) with local persistence and reset support
 - Catalog price UI displays workspace currency in list/form surfaces
 - Step-by-step onboarding modal with contextual panel help entry points and persistent auto-open opt-out
+- Final onboarding step with key Settings guidance (`Language`, `Theme`, `Keyboard shortcuts`, `Canvas render preferences`, `Global preferences`) and direct `Open Settings` CTA
+- App-wide locale switching (`English` default / `Français`) with persisted preference, including dense-label compaction safeguards for French table headers (changelog and import/export copy intentionally remain source-language)
+- Settings layout update: `Global preferences` now appears before `Action bar and shortcuts`, with language selector as the last `Global preferences` control
 - Accessibility hardening across modal/table/navigation flows (modal focus management, `aria-sort`, Validation keyboard row selection, screen-reader-visible issue counters)
+- Global hover descriptions for all `button`, `select`, and `option` controls (including disabled states) via deterministic `title` fallback generation while preserving explicit authored titles
 - Table ergonomics:
   - Reusable `Filter` bars with field selector + full-width input (`Wires`, `Network Scope`, `Connectors`, `Splices`, `Nodes`, `Segments`)
   - Occupancy/kind/route/sub-network chip filters remain available alongside table filter bars
