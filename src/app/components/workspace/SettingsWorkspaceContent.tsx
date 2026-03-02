@@ -65,6 +65,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultLockEntityMovement: (value: boolean) => void;
   canvasDefaultShowInfoPanels: boolean;
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
+  canvasDefaultShowSegmentNames: boolean;
+  setCanvasDefaultShowSegmentNames: (value: boolean) => void;
   canvasDefaultShowSegmentLengths: boolean;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   canvasDefaultShowCableCallouts: boolean;
@@ -151,6 +153,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultLockEntityMovement,
   canvasDefaultShowInfoPanels,
   setCanvasDefaultShowInfoPanels,
+  canvasDefaultShowSegmentNames,
+  setCanvasDefaultShowSegmentNames,
   canvasDefaultShowSegmentLengths,
   setCanvasDefaultShowSegmentLengths,
   canvasDefaultShowCableCallouts,
@@ -383,6 +387,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasDefaultShowInfoPanels(event.target.checked)}
             />
             Show info overlays by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultShowSegmentNames}
+              onChange={(event) => setCanvasDefaultShowSegmentNames(event.target.checked)}
+            />
+            Show segment names by default
           </label>
           <label className="settings-checkbox">
             <input

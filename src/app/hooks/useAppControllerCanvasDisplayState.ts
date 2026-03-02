@@ -10,6 +10,7 @@ export function useAppControllerCanvasDisplayState() {
   const [routePreviewStartNodeId, setRoutePreviewStartNodeId] = useState("");
   const [routePreviewEndNodeId, setRoutePreviewEndNodeId] = useState("");
   const [showNetworkInfoPanels, setShowNetworkInfoPanels] = useState(true);
+  const [showSegmentNames, setShowSegmentNames] = useState(true);
   const [showSegmentLengths, setShowSegmentLengths] = useState(false);
   const [showCableCallouts, setShowCableCallouts] = useState(false);
   const [showSelectedCalloutOnly, setShowSelectedCalloutOnly] = useState(false);
@@ -27,6 +28,8 @@ export function useAppControllerCanvasDisplayState() {
     setRoutePreviewEndNodeId,
     showNetworkInfoPanels,
     setShowNetworkInfoPanels,
+    showSegmentNames,
+    setShowSegmentNames,
     showSegmentLengths,
     setShowSegmentLengths,
     showCableCallouts,

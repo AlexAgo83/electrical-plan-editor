@@ -200,6 +200,29 @@ describe("App integration UI - settings canvas render", () => {
     expect(Math.sign(segmentIdX)).toBe(-Math.sign(segmentLengthX));
   });
 
+  it("hides segment names independently while keeping segment lengths visible", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const canvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
+    fireEvent.click(within(canvasToolsSettingsPanel).getByLabelText("Show segment names by default"));
+    fireEvent.click(within(canvasToolsSettingsPanel).getByLabelText("Show segment lengths by default"));
+    fireEvent.click(within(canvasToolsSettingsPanel).getByRole("button", { name: "Apply canvas defaults now" }));
+
+    switchScreenDrawerAware("analysis");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    expect(networkSummaryPanel.querySelectorAll(".network-segment-label")).toHaveLength(0);
+    expect(networkSummaryPanel.querySelectorAll(".network-segment-length-label").length).toBeGreaterThan(0);
+
+    firstRender.unmount();
+
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const restoredCanvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
+    expect(within(restoredCanvasToolsSettingsPanel).getByLabelText("Show segment names by default")).not.toBeChecked();
+    expect(within(restoredCanvasToolsSettingsPanel).getByLabelText("Show segment lengths by default")).toBeChecked();
+  });
+
   it("uses normal callout text size by default and updates the network callout text size class from settings", () => {
     renderAppWithState(createUiIntegrationState());
 

@@ -31,6 +31,7 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultSnapToGrid, setCanvasDefaultSnapToGrid] = useState(true);
   const [canvasDefaultLockEntityMovement, setCanvasDefaultLockEntityMovement] = useState(false);
   const [canvasDefaultShowInfoPanels, setCanvasDefaultShowInfoPanels] = useState(true);
+  const [canvasDefaultShowSegmentNames, setCanvasDefaultShowSegmentNames] = useState(true);
   const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(false);
   const [canvasDefaultShowCableCallouts, setCanvasDefaultShowCableCallouts] = useState(false);
   const [canvasDefaultShowSelectedCalloutOnly, setCanvasDefaultShowSelectedCalloutOnly] = useState(false);
@@ -81,6 +82,8 @@ export function useAppControllerPreferencesState() {
     setCanvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels,
     setCanvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentNames,
+    setCanvasDefaultShowSegmentNames,
     canvasDefaultShowSegmentLengths,
     setCanvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts,

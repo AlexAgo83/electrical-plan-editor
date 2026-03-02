@@ -108,6 +108,7 @@ export interface NetworkSummaryPanelProps {
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
   showNetworkInfoPanels: boolean;
+  showSegmentNames: boolean;
   showSegmentLengths: boolean;
   showCableCallouts: boolean;
   showSelectedCalloutOnly: boolean;
@@ -587,6 +588,7 @@ export function NetworkSummaryPanel({
   handleZoomAction,
   fitNetworkToContent,
   showNetworkInfoPanels,
+  showSegmentNames,
   showSegmentLengths,
   showCableCallouts,
   showSelectedCalloutOnly,
@@ -1341,7 +1343,7 @@ export function NetworkSummaryPanel({
         );
         const segmentLabelRotationDegrees = autoSegmentLabelRotation ? segmentAngleDegrees : labelRotationDegrees;
         const segmentLabelRotationRadians = (segmentLabelRotationDegrees * Math.PI) / 180;
-        const segmentLabelOffsetDistance = showSegmentLengths ? 6 : 0;
+        const segmentLabelOffsetDistance = showSegmentLengths && showSegmentNames ? 6 : 0;
         // Keep ID/length split along the label-normal axis, including when labels are auto-rotated.
         const segmentLengthLabelOffsetX = -Math.sin(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
         const segmentLengthLabelOffsetY = Math.cos(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
@@ -1373,6 +1375,7 @@ export function NetworkSummaryPanel({
       selectedSegmentId,
       autoSegmentLabelRotation,
       labelRotationDegrees,
+      showSegmentNames,
       showSegmentLengths
     ]
   );
@@ -1652,25 +1655,27 @@ export function NetworkSummaryPanel({
                     segmentLengthLabelY
                   }) => (
                     <g key={`${segment.id}-labels`} className={segmentGroupClassName} data-segment-id={segment.id}>
-                      <g
-                        className="network-segment-label-anchor"
-                        transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
-                      >
-                        <text
-                          className="network-segment-label"
-                          x={segmentIdLabelX}
-                          y={segmentIdLabelY}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          transform={
-                            segmentLabelRotationDegrees === 0
-                              ? undefined
-                              : `rotate(${segmentLabelRotationDegrees} ${segmentIdLabelX} ${segmentIdLabelY})`
-                          }
+                      {showSegmentNames ? (
+                        <g
+                          className="network-segment-label-anchor"
+                          transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
                         >
-                          {segment.id}
-                        </text>
-                      </g>
+                          <text
+                            className="network-segment-label"
+                            x={segmentIdLabelX}
+                            y={segmentIdLabelY}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            transform={
+                              segmentLabelRotationDegrees === 0
+                                ? undefined
+                                : `rotate(${segmentLabelRotationDegrees} ${segmentIdLabelX} ${segmentIdLabelY})`
+                            }
+                          >
+                            {segment.id}
+                          </text>
+                        </g>
+                      ) : null}
                       {showSegmentLengths ? (
                         <g
                           className="network-segment-length-label-anchor"

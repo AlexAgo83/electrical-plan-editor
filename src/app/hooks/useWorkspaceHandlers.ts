@@ -69,6 +69,7 @@ interface UseWorkspaceHandlersParams {
   canvasDefaultSnapToGrid: boolean;
   canvasDefaultLockEntityMovement: boolean;
   canvasDefaultShowInfoPanels: boolean;
+  canvasDefaultShowSegmentNames: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultShowCableCallouts: boolean;
   canvasDefaultShowSelectedCalloutOnly: boolean;
@@ -83,6 +84,7 @@ interface UseWorkspaceHandlersParams {
   setSnapNodesToGrid: (value: boolean | ((current: boolean) => boolean)) => void;
   setLockEntityMovement: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowNetworkInfoPanels: (value: boolean | ((current: boolean) => boolean)) => void;
+  setShowSegmentNames: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowSegmentLengths: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowCableCallouts: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowSelectedCalloutOnly: (value: boolean | ((current: boolean) => boolean)) => void;
@@ -119,6 +121,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasDefaultSnapToGrid: (value: boolean) => void;
   setCanvasDefaultLockEntityMovement: (value: boolean) => void;
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
+  setCanvasDefaultShowSegmentNames: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   setCanvasDefaultShowCableCallouts: (value: boolean) => void;
   setCanvasDefaultShowSelectedCalloutOnly: (value: boolean) => void;
@@ -164,6 +167,7 @@ export function useWorkspaceHandlers({
   canvasDefaultSnapToGrid,
   canvasDefaultLockEntityMovement,
   canvasDefaultShowInfoPanels,
+  canvasDefaultShowSegmentNames,
   canvasDefaultShowSegmentLengths,
   canvasDefaultShowCableCallouts,
   canvasDefaultShowSelectedCalloutOnly,
@@ -178,6 +182,7 @@ export function useWorkspaceHandlers({
   setSnapNodesToGrid,
   setLockEntityMovement,
   setShowNetworkInfoPanels,
+  setShowSegmentNames,
   setShowSegmentLengths,
   setShowCableCallouts,
   setShowSelectedCalloutOnly,
@@ -212,6 +217,7 @@ export function useWorkspaceHandlers({
   setCanvasDefaultSnapToGrid,
   setCanvasDefaultLockEntityMovement,
   setCanvasDefaultShowInfoPanels,
+  setCanvasDefaultShowSegmentNames,
   setCanvasDefaultShowSegmentLengths,
   setCanvasDefaultShowCableCallouts,
   setCanvasDefaultShowSelectedCalloutOnly,
@@ -676,6 +682,7 @@ export function useWorkspaceHandlers({
     setSnapNodesToGrid(canvasDefaultSnapToGrid);
     setLockEntityMovement(canvasDefaultLockEntityMovement);
     setShowNetworkInfoPanels(canvasDefaultShowInfoPanels);
+    setShowSegmentNames(canvasDefaultShowSegmentNames);
     setShowSegmentLengths(canvasDefaultShowSegmentLengths);
     setShowCableCallouts(canvasDefaultShowCableCallouts);
     setShowSelectedCalloutOnly(canvasDefaultShowSelectedCalloutOnly);
@@ -712,6 +719,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultSnapToGrid(true);
     setCanvasDefaultLockEntityMovement(false);
     setCanvasDefaultShowInfoPanels(true);
+    setCanvasDefaultShowSegmentNames(true);
     setCanvasDefaultShowSegmentLengths(false);
     setCanvasDefaultShowCableCallouts(false);
     setCanvasDefaultShowSelectedCalloutOnly(false);
@@ -726,6 +734,7 @@ export function useWorkspaceHandlers({
     setSnapNodesToGrid(true);
     setLockEntityMovement(false);
     setShowNetworkInfoPanels(true);
+    setShowSegmentNames(true);
     setShowSegmentLengths(false);
     setShowCableCallouts(false);
     setShowSelectedCalloutOnly(false);

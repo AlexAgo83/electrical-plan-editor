@@ -67,6 +67,7 @@ export interface NetworkSummaryViewState {
   scale: number;
   offset: LayoutNodePosition;
   showNetworkInfoPanels: boolean;
+  showSegmentNames: boolean;
   showSegmentLengths: boolean;
   showCableCallouts: boolean;
   showNetworkGrid: boolean;

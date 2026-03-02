@@ -78,6 +78,7 @@ function isSameNetworkSummaryViewState(
     left.offset.x === right.offset.x &&
     left.offset.y === right.offset.y &&
     left.showNetworkInfoPanels === right.showNetworkInfoPanels &&
+    left.showSegmentNames === right.showSegmentNames &&
     left.showSegmentLengths === right.showSegmentLengths &&
     left.showCableCallouts === right.showCableCallouts &&
     left.showNetworkGrid === right.showNetworkGrid &&

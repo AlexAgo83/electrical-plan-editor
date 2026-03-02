@@ -1048,6 +1048,7 @@ describe("localStorage persistence adapter", () => {
       scale: 1.15,
       offset: { x: 48, y: -22 },
       showNetworkInfoPanels: false,
+      showSegmentNames: true,
       showSegmentLengths: true,
       showCableCallouts: true,
       showNetworkGrid: false,

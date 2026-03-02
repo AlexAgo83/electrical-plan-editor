@@ -114,6 +114,7 @@ interface UiPreferencesPayload {
   canvasDefaultSnapToGrid: boolean;
   canvasDefaultLockEntityMovement: boolean;
   canvasDefaultShowInfoPanels: boolean;
+  canvasDefaultShowSegmentNames: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultShowCableCallouts: boolean;
   canvasDefaultShowSelectedCalloutOnly: boolean;
@@ -176,6 +177,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultSnapToGrid: boolean;
   canvasDefaultLockEntityMovement: boolean;
   canvasDefaultShowInfoPanels: boolean;
+  canvasDefaultShowSegmentNames: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultShowCableCallouts: boolean;
   canvasDefaultShowSelectedCalloutOnly: boolean;
@@ -215,6 +217,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultSnapToGrid: (value: boolean) => void;
   setCanvasDefaultLockEntityMovement: (value: boolean) => void;
   setCanvasDefaultShowInfoPanels: (value: boolean) => void;
+  setCanvasDefaultShowSegmentNames: (value: boolean) => void;
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   setCanvasDefaultShowCableCallouts: (value: boolean) => void;
   setCanvasDefaultShowSelectedCalloutOnly: (value: boolean) => void;
@@ -228,6 +231,7 @@ interface UseUiPreferencesOptions {
   setSnapNodesToGrid: (value: boolean) => void;
   setLockEntityMovement: (value: boolean) => void;
   setShowNetworkInfoPanels: (value: boolean) => void;
+  setShowSegmentNames: (value: boolean) => void;
   setShowSegmentLengths: (value: boolean) => void;
   setShowCableCallouts: (value: boolean) => void;
   setShowSelectedCalloutOnly: (value: boolean) => void;
@@ -307,6 +311,7 @@ export function useUiPreferences({
   canvasDefaultSnapToGrid,
   canvasDefaultLockEntityMovement,
   canvasDefaultShowInfoPanels,
+  canvasDefaultShowSegmentNames,
   canvasDefaultShowSegmentLengths,
   canvasDefaultShowCableCallouts,
   canvasDefaultShowSelectedCalloutOnly,
@@ -346,6 +351,7 @@ export function useUiPreferences({
   setCanvasDefaultSnapToGrid,
   setCanvasDefaultLockEntityMovement,
   setCanvasDefaultShowInfoPanels,
+  setCanvasDefaultShowSegmentNames,
   setCanvasDefaultShowSegmentLengths,
   setCanvasDefaultShowCableCallouts,
   setCanvasDefaultShowSelectedCalloutOnly,
@@ -359,6 +365,7 @@ export function useUiPreferences({
   setSnapNodesToGrid,
   setLockEntityMovement,
   setShowNetworkInfoPanels,
+  setShowSegmentNames,
   setShowSegmentLengths,
   setShowCableCallouts,
   setShowSelectedCalloutOnly,
@@ -396,6 +403,10 @@ export function useUiPreferences({
           : false;
       const showInfoPanelsDefault =
         typeof preferences.canvasDefaultShowInfoPanels === "boolean" ? preferences.canvasDefaultShowInfoPanels : true;
+      const showSegmentNamesDefault =
+        typeof preferences.canvasDefaultShowSegmentNames === "boolean"
+          ? preferences.canvasDefaultShowSegmentNames
+          : true;
       const showSegmentLengthsDefault =
         typeof preferences.canvasDefaultShowSegmentLengths === "boolean"
           ? preferences.canvasDefaultShowSegmentLengths
@@ -453,6 +464,7 @@ export function useUiPreferences({
       setCanvasDefaultSnapToGrid(snapDefault);
       setCanvasDefaultLockEntityMovement(lockMovementDefault);
       setCanvasDefaultShowInfoPanels(showInfoPanelsDefault);
+      setCanvasDefaultShowSegmentNames(showSegmentNamesDefault);
       setCanvasDefaultShowSegmentLengths(showSegmentLengthsDefault);
       setCanvasDefaultShowCableCallouts(showCableCalloutsDefault);
       setCanvasDefaultShowSelectedCalloutOnly(showSelectedCalloutOnlyDefault);
@@ -470,6 +482,7 @@ export function useUiPreferences({
       setSnapNodesToGrid(snapDefault);
       setLockEntityMovement(lockMovementDefault);
       setShowNetworkInfoPanels(showInfoPanelsDefault);
+      setShowSegmentNames(showSegmentNamesDefault);
       setShowSegmentLengths(showSegmentLengthsDefault);
       setShowCableCallouts(showCableCalloutsDefault);
       setShowSelectedCalloutOnly(showSelectedCalloutOnlyDefault);
@@ -500,6 +513,7 @@ export function useUiPreferences({
     setCanvasDefaultSnapToGrid,
     setCanvasDefaultLockEntityMovement,
     setCanvasDefaultShowInfoPanels,
+    setCanvasDefaultShowSegmentNames,
     setCanvasDefaultShowSegmentLengths,
     setCanvasDefaultShowCableCallouts,
     setCanvasDefaultShowSelectedCalloutOnly,
@@ -525,6 +539,7 @@ export function useUiPreferences({
     setSegmentIdSortDirection,
     setShowNetworkGrid,
     setShowNetworkInfoPanels,
+    setShowSegmentNames,
     setShowFloatingInspectorPanel,
     setShowShortcutHints,
     setShowSegmentLengths,
@@ -573,6 +588,7 @@ export function useUiPreferences({
       canvasDefaultSnapToGrid,
       canvasDefaultLockEntityMovement,
       canvasDefaultShowInfoPanels,
+      canvasDefaultShowSegmentNames,
       canvasDefaultShowSegmentLengths,
       canvasDefaultShowCableCallouts,
       canvasDefaultShowSelectedCalloutOnly,
@@ -600,6 +616,7 @@ export function useUiPreferences({
     canvasDefaultSnapToGrid,
     canvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels,
+    canvasDefaultShowSegmentNames,
     canvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts,
     canvasDefaultShowSelectedCalloutOnly,
