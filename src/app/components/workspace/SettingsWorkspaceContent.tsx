@@ -97,6 +97,8 @@ interface SettingsWorkspaceContentProps {
   setShowFloatingInspectorPanel: (value: boolean) => void;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutMode;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
+  workspaceWideScreen: boolean;
+  setWorkspaceWideScreen: (value: boolean) => void;
   resetWorkspacePreferencesToDefaults: () => void;
 }
 
@@ -180,6 +182,8 @@ export function SettingsWorkspaceContent({
   setShowFloatingInspectorPanel,
   workspacePanelsLayoutMode,
   setWorkspacePanelsLayoutMode,
+  workspaceWideScreen,
+  setWorkspaceWideScreen,
   resetWorkspacePreferencesToDefaults
 }: SettingsWorkspaceContentProps): ReactElement {
   return (
@@ -532,6 +536,14 @@ export function SettingsWorkspaceContent({
               <option value="multiColumn">Responsive multi-column</option>
               <option value="singleColumn">Force single column</option>
             </select>
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={workspaceWideScreen}
+              onChange={(event) => setWorkspaceWideScreen(event.target.checked)}
+            />
+            Wide screen (remove app max width cap)
           </label>
           <label className="settings-field">
             Default wire section (mm²)

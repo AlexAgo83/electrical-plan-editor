@@ -36,6 +36,10 @@ button {
   isolation: isolate;
 }
 
+.app-shell.workspace-wide-screen {
+  max-width: none;
+}
+
 .app-shell::before {
   content: "";
   position: fixed;

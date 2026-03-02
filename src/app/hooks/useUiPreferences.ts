@@ -128,6 +128,7 @@ interface UiPreferencesPayload {
   keyboardShortcutsEnabled: boolean;
   showFloatingInspectorPanel: boolean;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
+  workspaceWideScreen: boolean;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -189,6 +190,7 @@ interface UseUiPreferencesOptions {
   keyboardShortcutsEnabled: boolean;
   showFloatingInspectorPanel: boolean;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
+  workspaceWideScreen: boolean;
   preferencesHydrated: boolean;
   setThemeMode: (mode: ThemeMode) => void;
   setTableDensity: (density: TableDensity) => void;
@@ -241,6 +243,7 @@ interface UseUiPreferencesOptions {
   setKeyboardShortcutsEnabled: (value: boolean) => void;
   setShowFloatingInspectorPanel: (value: boolean) => void;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutPreference) => void;
+  setWorkspaceWideScreen: (value: boolean) => void;
   setPreferencesHydrated: (value: boolean) => void;
 }
 
@@ -318,6 +321,7 @@ export function useUiPreferences({
   keyboardShortcutsEnabled,
   showFloatingInspectorPanel,
   workspacePanelsLayoutMode,
+  workspaceWideScreen,
   preferencesHydrated,
   setThemeMode,
   setTableDensity,
@@ -370,6 +374,7 @@ export function useUiPreferences({
   setKeyboardShortcutsEnabled,
   setShowFloatingInspectorPanel,
   setWorkspacePanelsLayoutMode,
+  setWorkspaceWideScreen,
   setPreferencesHydrated
 }: UseUiPreferencesOptions): void {
   useEffect(() => {
@@ -484,6 +489,7 @@ export function useUiPreferences({
         typeof preferences.showFloatingInspectorPanel === "boolean" ? preferences.showFloatingInspectorPanel : true
       );
       setWorkspacePanelsLayoutMode(normalizeWorkspacePanelsLayoutMode(preferences.workspacePanelsLayoutMode));
+      setWorkspaceWideScreen(typeof preferences.workspaceWideScreen === "boolean" ? preferences.workspaceWideScreen : false);
     }
 
     setPreferencesHydrated(true);
@@ -541,7 +547,8 @@ export function useUiPreferences({
     setThemeMode,
     setWireSort,
     setConnectorSynthesisSort,
-    setWorkspacePanelsLayoutMode
+    setWorkspacePanelsLayoutMode,
+    setWorkspaceWideScreen
   ]);
 
   useEffect(() => {
@@ -579,7 +586,8 @@ export function useUiPreferences({
       showShortcutHints,
       keyboardShortcutsEnabled,
       showFloatingInspectorPanel,
-      workspacePanelsLayoutMode
+      workspacePanelsLayoutMode,
+      workspaceWideScreen
     };
 
     try {
@@ -617,6 +625,7 @@ export function useUiPreferences({
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     themeMode,
-    workspacePanelsLayoutMode
+    workspacePanelsLayoutMode,
+    workspaceWideScreen
   ]);
 }

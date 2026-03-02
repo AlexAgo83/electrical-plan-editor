@@ -133,6 +133,7 @@ interface UseWorkspaceHandlersParams {
   setKeyboardShortcutsEnabled: (value: boolean) => void;
   setShowFloatingInspectorPanel: (value: boolean) => void;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
+  setWorkspaceWideScreen: (value: boolean) => void;
   confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
 }
 
@@ -225,6 +226,7 @@ export function useWorkspaceHandlers({
   setKeyboardShortcutsEnabled,
   setShowFloatingInspectorPanel,
   setWorkspacePanelsLayoutMode,
+  setWorkspaceWideScreen,
   confirmAction
 }: UseWorkspaceHandlersParams) {
   function refreshBuiltInSampleNetworks(
@@ -738,6 +740,7 @@ export function useWorkspaceHandlers({
     setKeyboardShortcutsEnabled(true);
     setShowFloatingInspectorPanel(true);
     setWorkspacePanelsLayoutMode("singleColumn");
+    setWorkspaceWideScreen(false);
   }
 
   return {

@@ -104,6 +104,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setKeyboardShortcutsEnabled"
     | "setShowFloatingInspectorPanel"
     | "setWorkspacePanelsLayoutMode"
+    | "setWorkspaceWideScreen"
   >;
 }
 

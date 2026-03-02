@@ -45,6 +45,7 @@ export function useAppControllerPreferencesState() {
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [showFloatingInspectorPanel, setShowFloatingInspectorPanel] = useState(true);
   const [workspacePanelsLayoutMode, setWorkspacePanelsLayoutMode] = useState<WorkspacePanelsLayoutMode>("singleColumn");
+  const [workspaceWideScreen, setWorkspaceWideScreen] = useState(false);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
 
   return {
@@ -106,6 +107,8 @@ export function useAppControllerPreferencesState() {
     setShowFloatingInspectorPanel,
     workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode,
+    workspaceWideScreen,
+    setWorkspaceWideScreen,
     preferencesHydrated,
     setPreferencesHydrated
   };
