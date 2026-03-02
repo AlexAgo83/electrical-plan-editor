@@ -790,6 +790,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setShowFloatingInspectorPanel: params.setShowFloatingInspectorPanel,
     workspacePanelsLayoutMode: params.workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode: params.setWorkspacePanelsLayoutMode,
+    workspaceWideScreen: params.workspaceWideScreen,
+    setWorkspaceWideScreen: params.setWorkspaceWideScreen,
     resetWorkspacePreferencesToDefaults: params.resetWorkspacePreferencesToDefaults
   } satisfies SettingsWorkspaceContentProps;
 

@@ -8,6 +8,7 @@ interface UseAppControllerShellDerivedStateParams {
   tableDensity: TableDensity;
   tableFontSize: TableFontSize;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutMode;
+  workspaceWideScreen: boolean;
   headerOffsetPx: number;
   canvasResetZoomPercentInput: string;
 }
@@ -17,6 +18,7 @@ export function useAppControllerShellDerivedState({
   tableDensity,
   tableFontSize,
   workspacePanelsLayoutMode,
+  workspaceWideScreen,
   headerOffsetPx,
   canvasResetZoomPercentInput
 }: UseAppControllerShellDerivedStateParams) {
@@ -58,6 +60,7 @@ export function useAppControllerShellDerivedState({
     tableDensity === "compact" ? "table-density-compact" : "",
     `table-font-${tableFontSize}`,
     workspacePanelsLayoutMode === "singleColumn" ? "workspace-panels-layout-single-column" : "",
+    workspaceWideScreen ? "workspace-wide-screen" : "",
     ...resolvedThemeClassNames
   ]
     .filter((token) => token.length > 0)

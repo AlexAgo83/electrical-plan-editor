@@ -217,6 +217,8 @@ export function useAppControllerAuxScreenContentDomains({
     setShowFloatingInspectorPanel: settings.prefs.setShowFloatingInspectorPanel,
     workspacePanelsLayoutMode: settings.prefs.workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode: settings.prefs.setWorkspacePanelsLayoutMode,
+    workspaceWideScreen: settings.prefs.workspaceWideScreen,
+    setWorkspaceWideScreen: settings.prefs.setWorkspaceWideScreen,
     resetWorkspacePreferencesToDefaults: settings.resetWorkspacePreferencesToDefaults
       })
     : null;

@@ -427,19 +427,26 @@ describe("App integration UI - settings", () => {
     }
   });
 
-  it("persists global preferences for floating inspector visibility and shows workspace panel layout as disabled", () => {
+  it("persists global preferences for floating inspector visibility and wide screen layout override", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("settings");
     const globalPreferencesPanel = getPanelByHeading("Global preferences");
     const inspectorToggle = within(globalPreferencesPanel).getByLabelText("Show floating inspector panel on supported screens");
     const layoutSelect = within(globalPreferencesPanel).getByLabelText("Workspace panels layout");
+    const wideScreenToggle = within(globalPreferencesPanel).getByLabelText("Wide screen (remove app max width cap)");
+    const appShell = document.querySelector("main.app-shell");
 
     expect(inspectorToggle).toBeChecked();
     expect(layoutSelect).toHaveValue("singleColumn");
     expect(layoutSelect).toBeDisabled();
+    expect(wideScreenToggle).not.toBeChecked();
+    expect(appShell).not.toBeNull();
+    expect(appShell).not.toHaveClass("workspace-wide-screen");
 
     fireEvent.click(inspectorToggle);
+    fireEvent.click(wideScreenToggle);
+    expect(appShell).toHaveClass("workspace-wide-screen");
 
     firstRender.unmount();
 
@@ -451,5 +458,7 @@ describe("App integration UI - settings", () => {
     ).not.toBeChecked();
     expect(within(restoredGlobalPreferencesPanel).getByLabelText("Workspace panels layout")).toHaveValue("singleColumn");
     expect(within(restoredGlobalPreferencesPanel).getByLabelText("Workspace panels layout")).toBeDisabled();
+    expect(within(restoredGlobalPreferencesPanel).getByLabelText("Wide screen (remove app max width cap)")).toBeChecked();
+    expect(document.querySelector("main.app-shell")).toHaveClass("workspace-wide-screen");
   });
 });
