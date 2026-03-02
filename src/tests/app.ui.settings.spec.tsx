@@ -463,7 +463,7 @@ describe("App integration UI - settings", () => {
     expect(document.querySelector("main.app-shell")).toHaveClass("workspace-wide-screen");
   });
 
-  it("renders Global preferences before Action bar and keeps Language selector as the last control in Global preferences", () => {
+  it("renders Global preferences before Action bar and places Language selector before the panel action separator", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
 
@@ -479,11 +479,15 @@ describe("App integration UI - settings", () => {
     const globalPreferencesPanel = getPanelByHeading("Global preferences");
     const languageSelector = within(globalPreferencesPanel).getByLabelText("Language");
     expect(languageSelector).toHaveValue("en");
+    expect(languageSelector).toHaveClass("settings-locale-select");
 
-    const interactiveControls = Array.from(
-      globalPreferencesPanel.querySelectorAll<HTMLElement>("button, input, select, textarea")
-    );
-    expect(interactiveControls[interactiveControls.length - 1]).toBe(languageSelector);
+    const languageField = languageSelector.closest("label");
+    const settingsActions = globalPreferencesPanel.querySelector(".row-actions.settings-actions");
+    expect(languageField).not.toBeNull();
+    expect(settingsActions).not.toBeNull();
+    expect(
+      Boolean((languageField as HTMLElement).compareDocumentPosition(settingsActions as HTMLElement) & Node.DOCUMENT_POSITION_FOLLOWING)
+    ).toBe(true);
   });
 
   it("switches to French at runtime, keeps changelog/import-export excluded, and persists locale", async () => {

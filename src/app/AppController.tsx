@@ -639,14 +639,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     openOnboardingTarget(activeOnboardingPrimaryTarget);
   }, [activeOnboardingPrimaryTarget, openOnboardingTarget]);
 
-  const handleOnboardingOpenSettings = useCallback(() => {
-    if (activeOnboardingPrimaryTarget === undefined) {
-      return;
-    }
-    openOnboardingTarget(activeOnboardingPrimaryTarget);
-    setIsOnboardingOpen(false);
-  }, [activeOnboardingPrimaryTarget, openOnboardingTarget]);
-
   const onboardingConnectorSpliceTargetActions =
     activeOnboardingStep?.id === "connectorSpliceLibrary"
       ? (() => {
@@ -707,18 +699,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   const onboardingTargetActions = activeOnboardingStep === undefined
     ? []
-    : activeOnboardingStep.id === "settingsOverview"
-      ? []
     : activeOnboardingStep.id === "catalog"
       ? (onboardingCatalogTargetActions ?? [])
     : activeOnboardingStep.id === "connectorSpliceLibrary"
       ? (onboardingConnectorSpliceTargetActions ?? [])
       : [{ label: onboardingTargetActionLabel, onClick: handleOnboardingOpenTarget }];
-
-  const onboardingPrimaryAction =
-    activeOnboardingStep?.id === "settingsOverview" && onboardingModalMode === "full"
-      ? { label: "Open Settings", onClick: handleOnboardingOpenSettings }
-      : null;
 
   const handleOnboardingNext = useCallback(() => {
     if (onboardingModalMode !== "full") {
@@ -2778,7 +2763,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
           onNext={handleOnboardingNext}
           canGoNext={onboardingModalMode !== "full" || onboardingStepIndex < ONBOARDING_STEPS.length - 1}
           targetActions={onboardingTargetActions}
-          primaryAction={onboardingPrimaryAction}
         />
       ) : null}
     </>

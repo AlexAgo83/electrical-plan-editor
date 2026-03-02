@@ -571,17 +571,26 @@ export function SettingsWorkspaceContent({
             />
             Default auto-create linked nodes for connectors/splices
           </label>
+          <label className="settings-field settings-locale-field">
+            <span className="settings-locale-label">
+              <span className="action-button-icon is-settings settings-locale-icon" aria-hidden="true" />
+              <span>Language</span>
+            </span>
+            <select
+              className="settings-locale-select"
+              aria-label="Language"
+              value={locale}
+              onChange={(event) => setLocale(event.target.value as AppLocale)}
+            >
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+            </select>
+            <span className="settings-locale-hint">Apply language across all app screens (except changelog and import/export).</span>
+          </label>
         </div>
         <div className="row-actions settings-actions">
           <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
         </div>
-        <label className="settings-field">
-          Language
-          <select value={locale} onChange={(event) => setLocale(event.target.value as AppLocale)}>
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-          </select>
-        </label>
       </section>
 
       <section className="panel settings-panel">
