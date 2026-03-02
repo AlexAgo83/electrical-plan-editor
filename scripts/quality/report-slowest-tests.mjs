@@ -18,6 +18,10 @@ function parseTopArg(args) {
   };
 }
 
+function hasVitestArg(args, argName) {
+  return args.some((arg) => arg === `--${argName}` || arg.startsWith(`--${argName}=`));
+}
+
 function collectAssertions(report) {
   const assertions = [];
   for (const suiteResult of report?.testResults ?? []) {
@@ -40,6 +44,15 @@ function collectAssertions(report) {
 }
 
 const { top, rest: userArgs } = parseTopArg(process.argv.slice(2));
+const parsedTimeoutMs = Number.parseInt(process.env.SLOW_TOP_TEST_TIMEOUT_MS ?? "", 10);
+const timeoutMs = Number.isInteger(parsedTimeoutMs) && parsedTimeoutMs > 0 ? parsedTimeoutMs : 15000;
+const timeoutArgs = [];
+if (!hasVitestArg(userArgs, "testTimeout")) {
+  timeoutArgs.push(`--testTimeout=${timeoutMs}`);
+}
+if (!hasVitestArg(userArgs, "hookTimeout")) {
+  timeoutArgs.push(`--hookTimeout=${timeoutMs}`);
+}
 const vitestEntrypoint = path.resolve(process.cwd(), "node_modules/vitest/vitest.mjs");
 const reportFilePath = path.join(os.tmpdir(), `vitest-slow-tests-${Date.now()}.json`);
 const vitestArgs = [
@@ -47,6 +60,7 @@ const vitestArgs = [
   "run",
   "--reporter=json",
   `--outputFile=${reportFilePath}`,
+  ...timeoutArgs,
   ...userArgs
 ];
 
