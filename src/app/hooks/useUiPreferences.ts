@@ -298,7 +298,7 @@ function normalizeCanvasResizeBehaviorMode(value: unknown): CanvasResizeBehavior
 function normalizeCanvasNodeShapeSizePercent(value: unknown): number {
   const parsed = typeof value === "string" ? Number(value) : value;
   if (!Number.isFinite(parsed)) {
-    return 75;
+    return 50;
   }
   return clamp(Math.round(Number(parsed)), 50, 125);
 }
