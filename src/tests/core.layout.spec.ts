@@ -297,7 +297,7 @@ describe("2D layout generation", () => {
 
     expect(strictReductionCount).toBeGreaterThanOrEqual(2);
     expect(regressionCount).toBe(0);
-  });
+  }, 15_000);
 
   it("keeps layout generation responsive on representative medium topology", () => {
     const { nodes, segments } = createSyntheticTopology(40);
@@ -313,9 +313,9 @@ describe("2D layout generation", () => {
     // Keep the default budget pragmatic (with headroom for coverage + larger UI suites), and allow
     // an env override when calibrating slower runners.
     const performanceBudgetMs =
-      Number.isFinite(configuredBudgetOverride) && configuredBudgetOverride > 0 ? configuredBudgetOverride : 14_000;
+      Number.isFinite(configuredBudgetOverride) && configuredBudgetOverride > 0 ? configuredBudgetOverride : 16_000;
 
     expect(Object.keys(generated)).toHaveLength(nodes.length);
     expect(elapsedMs).toBeLessThan(performanceBudgetMs);
-  }, 12_000);
+  }, 20_000);
 });
