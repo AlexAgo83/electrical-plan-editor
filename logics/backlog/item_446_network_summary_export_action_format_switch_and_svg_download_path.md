@@ -1,9 +1,9 @@
 ## item_446_network_summary_export_action_format_switch_and_svg_download_path - network summary export action format switch and svg download path
 > From version: 0.9.18
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

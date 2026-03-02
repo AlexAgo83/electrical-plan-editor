@@ -1,9 +1,9 @@
 ## item_453_canvas_setting_for_zoom_invariant_node_shapes_preference_and_defaults - canvas setting for zoom invariant node shapes preference and defaults
 > From version: 0.9.18
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
