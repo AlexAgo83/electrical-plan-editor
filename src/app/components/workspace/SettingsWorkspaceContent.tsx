@@ -585,7 +585,7 @@ export function SettingsWorkspaceContent({
               <option value="en">English</option>
               <option value="fr">Français</option>
             </select>
-            <span className="settings-locale-hint">Apply language across all app screens (except changelog and import/export).</span>
+            <span className="settings-locale-hint">Apply language across all app screens (except changelog).</span>
           </label>
         </div>
         <div className="row-actions settings-actions">
@@ -679,7 +679,7 @@ export function SettingsWorkspaceContent({
         </div>
       </section>
 
-      <section className="panel settings-panel settings-panel--import-export" data-locale-exempt="true">
+      <section className="panel settings-panel settings-panel--import-export">
         <header className="settings-panel-header">
           <h2>Import / Export networks</h2>
           <span className="settings-panel-chip">Portability</span>

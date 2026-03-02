@@ -239,10 +239,23 @@
 
 .settings-panel .settings-grid > label.settings-locale-field {
   gap: 0.38rem;
-  border: 1px solid rgba(153, 181, 203, 0.55);
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
   border-radius: 0.6rem;
   padding: 0.5rem 0.58rem;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(242, 249, 255, 0.82));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, canvas 92%, transparent),
+    color-mix(in srgb, canvas 70%, var(--theme-primary, currentColor) 8%)
+  );
+}
+
+.settings-panel .settings-grid > label.settings-locale-field:hover {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 40%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, canvas 95%, var(--theme-primary, currentColor) 5%),
+    color-mix(in srgb, canvas 68%, var(--theme-primary, currentColor) 16%)
+  );
 }
 
 .settings-locale-label {
@@ -262,7 +275,7 @@
   margin: 0;
   font-size: 0.76rem;
   line-height: 1.35;
-  color: #47627a;
+  color: color-mix(in srgb, currentColor 78%, transparent);
 }
 
 .settings-panel .settings-grid > label:not(.settings-checkbox) input,
@@ -332,6 +345,14 @@
 
 .settings-panel .settings-checkbox input {
   margin-top: 0.12rem;
+  transition: box-shadow 140ms ease, outline-color 140ms ease, border-color 140ms ease;
+}
+
+.settings-panel .settings-checkbox:hover input:not(:disabled),
+.settings-panel .settings-checkbox:focus-within input:not(:disabled) {
+  outline: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 48%, transparent);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 0.12rem color-mix(in srgb, var(--theme-primary, currentColor) 22%, transparent);
 }
 
 .settings-actions {
