@@ -83,7 +83,7 @@ The bundle spans domain model, validation, persistence/import, canvas rendering,
 - [ ] Step 2. Deliver req_093 implementation bundle (`item_465`, `item_466`, `item_467`, `item_468`) and close with `item_469`
 - [ ] Step 3. Deliver req_094 implementation bundle (`item_470`, `item_471`, `item_472`) and close with `item_473`
 - [ ] Step 4. Deliver req_095 implementation bundle (`item_474`, `item_475`, `item_476`) and close with `item_477`
-- [ ] FINAL: Update related Logics docs
+- [ ] FINAL: Update related Logics docs and `README.md` (version/features/settings alignment)
 
 # AC Traceability
 - AC1 -> `item_461..item_464` with commits/tests and closure notes.
@@ -132,12 +132,14 @@ The bundle spans domain model, validation, persistence/import, canvas rendering,
 - [ ] Scope implemented and acceptance criteria covered.
 - [ ] Validation commands executed and results captured.
 - [ ] Linked request/backlog/task docs updated.
+- [ ] `README.md` updated to reflect delivered behavior and current version.
 - [ ] Status is `Done` and progress is `100%`.
 
 # Report
 - Current blockers: none.
 - Current status: orchestration created; execution not started.
 - Progress discipline reminder: update this task and the active backlog item at each stage transition (`0 -> 40 -> 80 -> 100`).
+- Closure reminder: before final closure, sync `README.md` with shipped scope.
 
 # References
 - `logics/request/req_092_optional_catalog_association_for_splices.md`
