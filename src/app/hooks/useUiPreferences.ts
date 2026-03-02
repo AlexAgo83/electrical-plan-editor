@@ -3,6 +3,7 @@ import { DEFAULT_WIRE_SECTION_MM2, normalizeWireSectionMm2 } from "../../core/wi
 import type { ThemeMode } from "../../store";
 import type {
   CanvasCalloutTextSize,
+  CanvasExportFormat,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
@@ -123,6 +124,7 @@ interface UiPreferencesPayload {
   canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasDefaultAutoSegmentLabelRotation: boolean;
+  canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
@@ -186,6 +188,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasDefaultAutoSegmentLabelRotation: boolean;
+  canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
@@ -226,6 +229,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultCalloutTextSize: (value: CanvasCalloutTextSize) => void;
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
+  setCanvasExportFormat: (value: CanvasExportFormat) => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
   setShowNetworkGrid: (value: boolean) => void;
   setSnapNodesToGrid: (value: boolean) => void;
@@ -268,6 +272,10 @@ function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotatio
   return value === -90 || value === -45 || value === -20 || value === 0 || value === 20 || value === 45 || value === 90
     ? value
     : 0;
+}
+
+function normalizeCanvasExportFormat(value: unknown): CanvasExportFormat {
+  return value === "png" ? "png" : "svg";
 }
 
 function normalizeWorkspacePanelsLayoutMode(value: unknown): WorkspacePanelsLayoutPreference {
@@ -320,6 +328,7 @@ export function useUiPreferences({
   canvasDefaultCalloutTextSize,
   canvasDefaultLabelRotationDegrees,
   canvasDefaultAutoSegmentLabelRotation,
+  canvasExportFormat,
   canvasPngExportIncludeBackground,
   canvasResetZoomPercentInput,
   showShortcutHints,
@@ -360,6 +369,7 @@ export function useUiPreferences({
   setCanvasDefaultCalloutTextSize,
   setCanvasDefaultLabelRotationDegrees,
   setCanvasDefaultAutoSegmentLabelRotation,
+  setCanvasExportFormat,
   setCanvasPngExportIncludeBackground,
   setShowNetworkGrid,
   setSnapNodesToGrid,
@@ -473,6 +483,7 @@ export function useUiPreferences({
       setCanvasDefaultCalloutTextSize(calloutTextSizeDefault);
       setCanvasDefaultLabelRotationDegrees(labelRotationDegreesDefault);
       setCanvasDefaultAutoSegmentLabelRotation(autoSegmentLabelRotationDefault);
+      setCanvasExportFormat(normalizeCanvasExportFormat(preferences.canvasExportFormat));
       setCanvasPngExportIncludeBackground(
         typeof preferences.canvasPngExportIncludeBackground === "boolean"
           ? preferences.canvasPngExportIncludeBackground
@@ -522,6 +533,7 @@ export function useUiPreferences({
     setCanvasDefaultCalloutTextSize,
     setCanvasDefaultLabelRotationDegrees,
     setCanvasDefaultAutoSegmentLabelRotation,
+    setCanvasExportFormat,
     setCanvasPngExportIncludeBackground,
     setCanvasResetZoomPercentInput,
     setConnectorSort,
@@ -597,6 +609,7 @@ export function useUiPreferences({
       canvasDefaultCalloutTextSize,
       canvasDefaultLabelRotationDegrees,
       canvasDefaultAutoSegmentLabelRotation,
+      canvasExportFormat,
       canvasPngExportIncludeBackground,
       canvasResetZoomPercentInput,
       showShortcutHints,
@@ -625,6 +638,7 @@ export function useUiPreferences({
     canvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees,
     canvasDefaultAutoSegmentLabelRotation,
+    canvasExportFormat,
     canvasPngExportIncludeBackground,
     canvasResetZoomPercentInput,
     defaultIdSortDirection,

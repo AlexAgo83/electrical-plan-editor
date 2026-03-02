@@ -4,6 +4,7 @@ import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
 import type {
   CanvasCalloutTextSize,
+  CanvasExportFormat,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
@@ -84,6 +85,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   canvasDefaultAutoSegmentLabelRotation: boolean;
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
+  canvasExportFormat: CanvasExportFormat;
+  setCanvasExportFormat: (value: CanvasExportFormat) => void;
   canvasPngExportIncludeBackground: boolean;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
   canvasResetZoomPercentInput: string;
@@ -172,6 +175,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultLabelRotationDegrees,
   canvasDefaultAutoSegmentLabelRotation,
   setCanvasDefaultAutoSegmentLabelRotation,
+  canvasExportFormat,
+  setCanvasExportFormat,
   canvasPngExportIncludeBackground,
   setCanvasPngExportIncludeBackground,
   canvasResetZoomPercentInput,
@@ -423,6 +428,16 @@ export function SettingsWorkspaceContent({
               }}
             />
             Show only selected connector/splice callout
+          </label>
+          <label className="settings-field">
+            Export format
+            <select
+              value={canvasExportFormat}
+              onChange={(event) => setCanvasExportFormat(event.target.value as CanvasExportFormat)}
+            >
+              <option value="svg">SVG</option>
+              <option value="png">PNG</option>
+            </select>
           </label>
           <label className="settings-checkbox">
             <input

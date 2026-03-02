@@ -46,6 +46,7 @@ export type WorkspacePanelsLayoutMode = "multiColumn" | "singleColumn";
 export type CanvasLabelStrokeMode = "none" | "light" | "normal";
 export type CanvasLabelSizeMode = "extraSmall" | "small" | "normal" | "large" | "extraLarge";
 export type CanvasCalloutTextSize = "small" | "normal" | "large";
+export type CanvasExportFormat = "svg" | "png";
 export type CanvasLabelRotationDegrees = -90 | -45 | -20 | 0 | 20 | 45 | 90;
 export type OccupancyFilter = "all" | "occupied" | "free";
 export type SegmentSubNetworkFilter = "all" | "default" | "tagged";
