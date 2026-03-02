@@ -292,7 +292,7 @@ function normalizeCanvasExportFormat(value: unknown): CanvasExportFormat {
 }
 
 function normalizeCanvasResizeBehaviorMode(value: unknown): CanvasResizeBehaviorMode {
-  return value === "visibleAreaOnly" ? "visibleAreaOnly" : "responsiveContentScale";
+  return value === "responsiveContentScale" ? "responsiveContentScale" : "visibleAreaOnly";
 }
 
 function normalizeCanvasNodeShapeSizePercent(value: unknown): number {
@@ -520,7 +520,7 @@ export function useUiPreferences({
         typeof preferences.canvasShowCalloutWireNames === "boolean" ? preferences.canvasShowCalloutWireNames : false
       );
       setCanvasZoomInvariantNodeShapes(
-        typeof preferences.canvasZoomInvariantNodeShapes === "boolean" ? preferences.canvasZoomInvariantNodeShapes : false
+        typeof preferences.canvasZoomInvariantNodeShapes === "boolean" ? preferences.canvasZoomInvariantNodeShapes : true
       );
       setCanvasNodeShapeSizePercent(normalizeCanvasNodeShapeSizePercent(preferences.canvasNodeShapeSizePercent));
       setCanvasExportFormat(normalizeCanvasExportFormat(preferences.canvasExportFormat));

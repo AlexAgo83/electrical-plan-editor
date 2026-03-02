@@ -58,7 +58,6 @@ interface SettingsWorkspaceContentProps {
   setDefaultSortDirection: (value: SortDirection) => void;
   defaultIdSortDirection: SortDirection;
   setDefaultIdSortDirection: (value: SortDirection) => void;
-  applyListSortDefaults: () => void;
   canvasDefaultShowGrid: boolean;
   setCanvasDefaultShowGrid: (value: boolean) => void;
   canvasDefaultSnapToGrid: boolean;
@@ -101,7 +100,6 @@ interface SettingsWorkspaceContentProps {
   canvasResizeBehaviorMode: CanvasResizeBehaviorMode;
   setCanvasResizeBehaviorMode: (value: CanvasResizeBehaviorMode) => void;
   configuredResetZoomPercent: number;
-  applyCanvasDefaultsNow: () => void;
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   showShortcutHints: boolean;
   setShowShortcutHints: (value: boolean) => void;
@@ -156,7 +154,6 @@ export function SettingsWorkspaceContent({
   setDefaultSortDirection,
   defaultIdSortDirection,
   setDefaultIdSortDirection,
-  applyListSortDefaults,
   canvasDefaultShowGrid,
   setCanvasDefaultShowGrid,
   canvasDefaultSnapToGrid,
@@ -198,7 +195,6 @@ export function SettingsWorkspaceContent({
   setCanvasResetZoomPercentInput,
   canvasResizeBehaviorMode,
   setCanvasResizeBehaviorMode,
-  applyCanvasDefaultsNow,
   handleZoomAction,
   showShortcutHints,
   setShowShortcutHints,
@@ -214,6 +210,223 @@ export function SettingsWorkspaceContent({
 }: SettingsWorkspaceContentProps): ReactElement {
   return (
     <section className="panel-grid settings-panel-grid">
+      <section className="panel settings-panel">
+        <header className="settings-panel-header">
+          <h2>Canvas render preferences</h2>
+          <span className="settings-panel-chip">Canvas Render</span>
+        </header>
+        <p className="settings-panel-intro">Typography and rendering defaults used for labels, callouts, and view reset behavior.</p>
+        <div className="settings-grid">
+          <label className="settings-field">
+            Label stroke mode
+            <select
+              value={canvasDefaultLabelStrokeMode}
+              onChange={(event) => setCanvasDefaultLabelStrokeMode(event.target.value as CanvasLabelStrokeMode)}
+            >
+              <option value="none">Rien</option>
+              <option value="light">Léger</option>
+              <option value="normal">Normal</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            2D label size
+            <select
+              value={canvasDefaultLabelSizeMode}
+              onChange={(event) => setCanvasDefaultLabelSizeMode(event.target.value as CanvasLabelSizeMode)}
+            >
+              <option value="extraSmall">Extra small</option>
+              <option value="small">Small</option>
+              <option value="normal">Normal</option>
+              <option value="large">Large</option>
+              <option value="extraLarge">Extra large</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            Callout text size
+            <select
+              value={canvasDefaultCalloutTextSize}
+              onChange={(event) => setCanvasDefaultCalloutTextSize(event.target.value as CanvasCalloutTextSize)}
+            >
+              <option value="small">Small</option>
+              <option value="normal">Normal</option>
+              <option value="large">Large</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            2D label rotation
+            <select
+              value={String(canvasDefaultLabelRotationDegrees)}
+              onChange={(event) => setCanvasDefaultLabelRotationDegrees(Number(event.target.value) as CanvasLabelRotationDegrees)}
+            >
+              <option value="-90">-90°</option>
+              <option value="-45">-45°</option>
+              <option value="-20">-20°</option>
+              <option value="0">0°</option>
+              <option value="20">20°</option>
+              <option value="45">45°</option>
+              <option value="90">90°</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            Auto segment label rotation
+            <select
+              value={canvasDefaultAutoSegmentLabelRotation ? "yes" : "no"}
+              onChange={(event) => setCanvasDefaultAutoSegmentLabelRotation(event.target.value === "yes")}
+            >
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            Reset zoom target (%)
+            <input type="number" value={canvasResetZoomPercentInput} onChange={(event) => setCanvasResetZoomPercentInput(event.target.value)} />
+          </label>
+          <label className="settings-field">
+            Viewport resize behavior
+            <select
+              value={canvasResizeBehaviorMode}
+              onChange={(event) => setCanvasResizeBehaviorMode(event.target.value as CanvasResizeBehaviorMode)}
+            >
+              <option value="responsiveContentScale">Responsive content scaling</option>
+              <option value="visibleAreaOnly">Resize changes visible area only (default)</option>
+            </select>
+          </label>
+        </div>
+        <div className="row-actions settings-actions">
+          <button type="button" onClick={() => handleZoomAction("reset")}>Reset current view</button>
+        </div>
+      </section>
+
+      <section className="panel settings-panel">
+        <header className="settings-panel-header">
+          <h2>Canvas tools preferences</h2>
+          <span className="settings-panel-chip">Canvas Tools</span>
+        </header>
+        <p className="settings-panel-intro">Default tool behavior and overlay visibility for the 2D network workspace.</p>
+        <div className="settings-grid">
+          <label className="settings-checkbox">
+            <input type="checkbox" checked={canvasDefaultShowGrid} onChange={(event) => setCanvasDefaultShowGrid(event.target.checked)} />
+            Show grid by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultSnapToGrid}
+              onChange={(event) => setCanvasDefaultSnapToGrid(event.target.checked)}
+            />
+            Snap node movement by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultLockEntityMovement}
+              onChange={(event) => setCanvasDefaultLockEntityMovement(event.target.checked)}
+            />
+            Lock node movement by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultShowInfoPanels}
+              onChange={(event) => setCanvasDefaultShowInfoPanels(event.target.checked)}
+            />
+            Show info overlays by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={showSegmentNames}
+              onChange={(event) => setShowSegmentNames(event.target.checked)}
+            />
+            Show segment names
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultShowSegmentLengths}
+              onChange={(event) => setCanvasDefaultShowSegmentLengths(event.target.checked)}
+            />
+            Show segment lengths by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultShowCableCallouts}
+              onChange={(event) => setCanvasDefaultShowCableCallouts(event.target.checked)}
+            />
+            Show connector/splice cable callouts by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultShowSelectedCalloutOnly}
+              onChange={(event) => {
+                const { checked } = event.target;
+                setCanvasDefaultShowSelectedCalloutOnly(checked);
+                setShowSelectedCalloutOnly(checked);
+              }}
+            />
+            Show only selected connector/splice callout
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasShowCalloutWireNames}
+              onChange={(event) => setCanvasShowCalloutWireNames(event.target.checked)}
+            />
+            Show wire names in callout table
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasZoomInvariantNodeShapes}
+              onChange={(event) => setCanvasZoomInvariantNodeShapes(event.target.checked)}
+            />
+            Keep connector/splice/node shape size constant while zooming
+          </label>
+          <label className="settings-field settings-range-field">
+            Node shape target size (%)
+            <div className="settings-range-control">
+              <input
+                className="settings-range-input"
+                type="range"
+                min={50}
+                max={125}
+                step={5}
+                value={canvasNodeShapeSizePercent}
+                disabled={!canvasZoomInvariantNodeShapes}
+                onChange={(event) => {
+                  const parsed = Number(event.target.value);
+                  if (!Number.isFinite(parsed)) {
+                    return;
+                  }
+                  setCanvasNodeShapeSizePercent(Math.min(125, Math.max(50, Math.round(parsed))));
+                }}
+              />
+              <span className="settings-range-value">{canvasNodeShapeSizePercent}%</span>
+            </div>
+          </label>
+          <label className="settings-field">
+            Export format
+            <select
+              value={canvasExportFormat}
+              onChange={(event) => setCanvasExportFormat(event.target.value as CanvasExportFormat)}
+            >
+              <option value="svg">SVG</option>
+              <option value="png">PNG</option>
+            </select>
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasPngExportIncludeBackground}
+              onChange={(event) => setCanvasPngExportIncludeBackground(event.target.checked)}
+            />
+            Include background in PNG export
+          </label>
+        </div>
+      </section>
+
       <section className="panel settings-panel">
         <header className="settings-panel-header">
           <h2>Appearance preferences</h2>
@@ -293,229 +506,6 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
         </div>
-        <div className="row-actions settings-actions">
-          <button type="button" className="settings-primary-action" onClick={applyListSortDefaults}>Apply sort defaults now</button>
-        </div>
-      </section>
-
-      <section className="panel settings-panel">
-        <header className="settings-panel-header">
-          <h2>Canvas render preferences</h2>
-          <span className="settings-panel-chip">Canvas Render</span>
-        </header>
-        <p className="settings-panel-intro">Typography and rendering defaults used for labels, callouts, and view reset behavior.</p>
-        <div className="settings-grid">
-          <label className="settings-field">
-            Label stroke mode
-            <select
-              value={canvasDefaultLabelStrokeMode}
-              onChange={(event) => setCanvasDefaultLabelStrokeMode(event.target.value as CanvasLabelStrokeMode)}
-            >
-              <option value="none">Rien</option>
-              <option value="light">Léger</option>
-              <option value="normal">Normal</option>
-            </select>
-          </label>
-          <label className="settings-field">
-            2D label size
-            <select
-              value={canvasDefaultLabelSizeMode}
-              onChange={(event) => setCanvasDefaultLabelSizeMode(event.target.value as CanvasLabelSizeMode)}
-            >
-              <option value="extraSmall">Extra small</option>
-              <option value="small">Small</option>
-              <option value="normal">Normal</option>
-              <option value="large">Large</option>
-              <option value="extraLarge">Extra large</option>
-            </select>
-          </label>
-          <label className="settings-field">
-            Callout text size
-            <select
-              value={canvasDefaultCalloutTextSize}
-              onChange={(event) => setCanvasDefaultCalloutTextSize(event.target.value as CanvasCalloutTextSize)}
-            >
-              <option value="small">Small</option>
-              <option value="normal">Normal</option>
-              <option value="large">Large</option>
-            </select>
-          </label>
-          <label className="settings-field">
-            2D label rotation
-            <select
-              value={String(canvasDefaultLabelRotationDegrees)}
-              onChange={(event) => setCanvasDefaultLabelRotationDegrees(Number(event.target.value) as CanvasLabelRotationDegrees)}
-            >
-              <option value="-90">-90°</option>
-              <option value="-45">-45°</option>
-              <option value="-20">-20°</option>
-              <option value="0">0°</option>
-              <option value="20">20°</option>
-              <option value="45">45°</option>
-              <option value="90">90°</option>
-            </select>
-          </label>
-          <label className="settings-field">
-            Auto segment label rotation
-            <select
-              value={canvasDefaultAutoSegmentLabelRotation ? "yes" : "no"}
-              onChange={(event) => setCanvasDefaultAutoSegmentLabelRotation(event.target.value === "yes")}
-            >
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </label>
-          <label className="settings-field">
-            Reset zoom target (%)
-            <input type="number" value={canvasResetZoomPercentInput} onChange={(event) => setCanvasResetZoomPercentInput(event.target.value)} />
-          </label>
-          <label className="settings-field">
-            Viewport resize behavior
-            <select
-              value={canvasResizeBehaviorMode}
-              onChange={(event) => setCanvasResizeBehaviorMode(event.target.value as CanvasResizeBehaviorMode)}
-            >
-              <option value="responsiveContentScale">Responsive content scaling (default)</option>
-              <option value="visibleAreaOnly">Resize changes visible area only</option>
-            </select>
-          </label>
-        </div>
-        <div className="row-actions settings-actions">
-          <button type="button" onClick={() => handleZoomAction("reset")}>Reset current view</button>
-        </div>
-      </section>
-
-      <section className="panel settings-panel">
-        <header className="settings-panel-header">
-          <h2>Canvas tools preferences</h2>
-          <span className="settings-panel-chip">Canvas Tools</span>
-        </header>
-        <p className="settings-panel-intro">Default tool behavior and overlay visibility for the 2D network workspace.</p>
-        <div className="settings-grid">
-          <label className="settings-checkbox">
-            <input type="checkbox" checked={canvasDefaultShowGrid} onChange={(event) => setCanvasDefaultShowGrid(event.target.checked)} />
-            Show grid by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultSnapToGrid}
-              onChange={(event) => setCanvasDefaultSnapToGrid(event.target.checked)}
-            />
-            Snap node movement by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultLockEntityMovement}
-              onChange={(event) => setCanvasDefaultLockEntityMovement(event.target.checked)}
-            />
-            Lock node movement by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultShowInfoPanels}
-              onChange={(event) => setCanvasDefaultShowInfoPanels(event.target.checked)}
-            />
-            Show info overlays by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={showSegmentNames}
-              onChange={(event) => setShowSegmentNames(event.target.checked)}
-            />
-            Show segment names
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultShowSegmentLengths}
-              onChange={(event) => setCanvasDefaultShowSegmentLengths(event.target.checked)}
-            />
-            Show segment lengths by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultShowCableCallouts}
-              onChange={(event) => setCanvasDefaultShowCableCallouts(event.target.checked)}
-            />
-            Show connector/splice cable callouts by default
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasShowCalloutWireNames}
-              onChange={(event) => setCanvasShowCalloutWireNames(event.target.checked)}
-            />
-            Show wire names in callout table
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasZoomInvariantNodeShapes}
-              onChange={(event) => setCanvasZoomInvariantNodeShapes(event.target.checked)}
-            />
-            Keep connector/splice/node shape size constant while zooming
-          </label>
-          <label className="settings-field settings-range-field">
-            Node shape target size (%)
-            <div className="settings-range-control">
-              <input
-                className="settings-range-input"
-                type="range"
-                min={50}
-                max={125}
-                step={5}
-                value={canvasNodeShapeSizePercent}
-                disabled={!canvasZoomInvariantNodeShapes}
-                onChange={(event) => {
-                  const parsed = Number(event.target.value);
-                  if (!Number.isFinite(parsed)) {
-                    return;
-                  }
-                  setCanvasNodeShapeSizePercent(Math.min(125, Math.max(50, Math.round(parsed))));
-                }}
-              />
-              <span className="settings-range-value">{canvasNodeShapeSizePercent}%</span>
-            </div>
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultShowSelectedCalloutOnly}
-              onChange={(event) => {
-                const { checked } = event.target;
-                setCanvasDefaultShowSelectedCalloutOnly(checked);
-                setShowSelectedCalloutOnly(checked);
-              }}
-            />
-            Show only selected connector/splice callout
-          </label>
-          <label className="settings-field">
-            Export format
-            <select
-              value={canvasExportFormat}
-              onChange={(event) => setCanvasExportFormat(event.target.value as CanvasExportFormat)}
-            >
-              <option value="svg">SVG</option>
-              <option value="png">PNG</option>
-            </select>
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasPngExportIncludeBackground}
-              onChange={(event) => setCanvasPngExportIncludeBackground(event.target.checked)}
-            />
-            Include background in PNG export
-          </label>
-        </div>
-        <div className="row-actions settings-actions">
-          <button type="button" className="settings-primary-action" onClick={applyCanvasDefaultsNow}>Apply canvas defaults now</button>
-        </div>
       </section>
 
       <section className="panel settings-panel">
@@ -542,6 +532,7 @@ export function SettingsWorkspaceContent({
           <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Z</span> <span>Undo last modeling action</span></li>
           <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Shift + Z</span> <span>Redo</span></li>
           <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Y</span> <span>Redo (alternative shortcut)</span></li>
+          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + S</span> <span>Save active plan (export JSON)</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + 1..6</span> <span>Switch top-level workspace</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + Shift + 1..5</span> <span>Switch entity sub-screen</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + F</span> <span>Fit network view to current graph</span></li>

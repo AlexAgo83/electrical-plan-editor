@@ -44,12 +44,12 @@ export function useAppControllerPreferencesState() {
     useState<CanvasLabelRotationDegrees>(0);
   const [canvasDefaultAutoSegmentLabelRotation, setCanvasDefaultAutoSegmentLabelRotation] = useState(false);
   const [canvasShowCalloutWireNames, setCanvasShowCalloutWireNames] = useState(false);
-  const [canvasZoomInvariantNodeShapes, setCanvasZoomInvariantNodeShapes] = useState(false);
+  const [canvasZoomInvariantNodeShapes, setCanvasZoomInvariantNodeShapes] = useState(true);
   const [canvasNodeShapeSizePercent, setCanvasNodeShapeSizePercent] = useState(50);
   const [canvasExportFormat, setCanvasExportFormat] = useState<CanvasExportFormat>("svg");
   const [canvasPngExportIncludeBackground, setCanvasPngExportIncludeBackground] = useState(true);
   const [canvasResizeBehaviorMode, setCanvasResizeBehaviorMode] =
-    useState<CanvasResizeBehaviorMode>("responsiveContentScale");
+    useState<CanvasResizeBehaviorMode>("visibleAreaOnly");
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [showFloatingInspectorPanel, setShowFloatingInspectorPanel] = useState(true);

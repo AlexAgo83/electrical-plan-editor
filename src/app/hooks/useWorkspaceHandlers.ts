@@ -65,19 +65,6 @@ interface UseWorkspaceHandlersParams {
   networkOffset: NodePosition;
   setNetworkScale: (value: number) => void;
   setNetworkOffset: (value: NodePosition) => void;
-  canvasDefaultShowGrid: boolean;
-  canvasDefaultSnapToGrid: boolean;
-  canvasDefaultLockEntityMovement: boolean;
-  canvasDefaultShowInfoPanels: boolean;
-  canvasDefaultShowSegmentNames: boolean;
-  canvasDefaultShowSegmentLengths: boolean;
-  canvasDefaultShowCableCallouts: boolean;
-  canvasDefaultShowSelectedCalloutOnly: boolean;
-  canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
-  canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
-  canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
-  canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
-  canvasDefaultAutoSegmentLabelRotation: boolean;
   showCableCallouts: boolean;
   networkCalloutTextSize: CanvasCalloutTextSize;
   setShowNetworkGrid: (value: boolean | ((current: boolean) => boolean)) => void;
@@ -95,9 +82,6 @@ interface UseWorkspaceHandlersParams {
     value: CanvasLabelRotationDegrees | ((current: CanvasLabelRotationDegrees) => CanvasLabelRotationDegrees)
   ) => void;
   setNetworkAutoSegmentLabelRotation: (value: boolean | ((current: boolean) => boolean)) => void;
-  defaultSortField: SortField;
-  defaultSortDirection: SortDirection;
-  defaultIdSortDirection: SortDirection;
   setConnectorSort: (value: SortState) => void;
   setSpliceSort: (value: SortState) => void;
   setWireSort: (value: SortState) => void;
@@ -170,19 +154,6 @@ export function useWorkspaceHandlers({
   networkOffset,
   setNetworkScale,
   setNetworkOffset,
-  canvasDefaultShowGrid,
-  canvasDefaultSnapToGrid,
-  canvasDefaultLockEntityMovement,
-  canvasDefaultShowInfoPanels,
-  canvasDefaultShowSegmentNames,
-  canvasDefaultShowSegmentLengths,
-  canvasDefaultShowCableCallouts,
-  canvasDefaultShowSelectedCalloutOnly,
-  canvasDefaultLabelStrokeMode,
-  canvasDefaultLabelSizeMode,
-  canvasDefaultCalloutTextSize,
-  canvasDefaultLabelRotationDegrees,
-  canvasDefaultAutoSegmentLabelRotation,
   showCableCallouts,
   networkCalloutTextSize,
   setShowNetworkGrid,
@@ -198,9 +169,6 @@ export function useWorkspaceHandlers({
   setNetworkCalloutTextSize,
   setNetworkLabelRotationDegrees,
   setNetworkAutoSegmentLabelRotation,
-  defaultSortField,
-  defaultSortDirection,
-  defaultIdSortDirection,
   setConnectorSort,
   setSpliceSort,
   setWireSort,
@@ -678,34 +646,6 @@ export function useWorkspaceHandlers({
     });
   }
 
-  function applyListSortDefaults(): void {
-    setNetworkSort({ field: defaultSortField, direction: defaultSortDirection });
-    setConnectorSort({ field: defaultSortField, direction: defaultSortDirection });
-    setSpliceSort({ field: defaultSortField, direction: defaultSortDirection });
-    setWireSort({ field: defaultSortField, direction: defaultSortDirection });
-    setConnectorSynthesisSort({ field: defaultSortField, direction: defaultSortDirection });
-    setSpliceSynthesisSort({ field: defaultSortField, direction: defaultSortDirection });
-    setNodeIdSortDirection(defaultIdSortDirection);
-    setSegmentIdSortDirection(defaultIdSortDirection);
-  }
-
-  function applyCanvasDefaultsNow(): void {
-    setShowNetworkGrid(canvasDefaultShowGrid);
-    setSnapNodesToGrid(canvasDefaultSnapToGrid);
-    setLockEntityMovement(canvasDefaultLockEntityMovement);
-    setShowNetworkInfoPanels(canvasDefaultShowInfoPanels);
-    setShowSegmentNames(canvasDefaultShowSegmentNames);
-    setShowSegmentLengths(canvasDefaultShowSegmentLengths);
-    setShowCableCallouts(canvasDefaultShowCableCallouts);
-    setShowSelectedCalloutOnly(canvasDefaultShowSelectedCalloutOnly);
-    setNetworkLabelStrokeMode(canvasDefaultLabelStrokeMode);
-    setNetworkLabelSizeMode(canvasDefaultLabelSizeMode);
-    setNetworkCalloutTextSize(canvasDefaultCalloutTextSize);
-    setNetworkLabelRotationDegrees(canvasDefaultLabelRotationDegrees);
-    setNetworkAutoSegmentLabelRotation(canvasDefaultAutoSegmentLabelRotation);
-    resetNetworkViewToConfiguredScale();
-  }
-
   function resetWorkspacePreferencesToDefaults(): void {
     const defaultSort: SortState = { field: "name", direction: "asc" };
     setThemeMode("warmBrown");
@@ -741,11 +681,11 @@ export function useWorkspaceHandlers({
     setCanvasDefaultLabelRotationDegrees(0);
     setCanvasDefaultAutoSegmentLabelRotation(false);
     setCanvasShowCalloutWireNames(false);
-    setCanvasZoomInvariantNodeShapes(false);
-    setCanvasNodeShapeSizePercent(75);
+    setCanvasZoomInvariantNodeShapes(true);
+    setCanvasNodeShapeSizePercent(50);
     setCanvasExportFormat("svg");
     setCanvasPngExportIncludeBackground(true);
-    setCanvasResizeBehaviorMode("responsiveContentScale");
+    setCanvasResizeBehaviorMode("visibleAreaOnly");
     setCanvasResetZoomPercentInput("60");
     setShowNetworkGrid(true);
     setSnapNodesToGrid(true);
@@ -782,8 +722,6 @@ export function useWorkspaceHandlers({
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,
     fitNetworkToContent,
-    applyListSortDefaults,
-    applyCanvasDefaultsNow,
     resetWorkspacePreferencesToDefaults
   };
 }

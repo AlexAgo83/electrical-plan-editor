@@ -566,7 +566,7 @@ function migrateLegacySingleNetworkStateToCurrent(
     ui: {
       selected: legacy.ui.selected,
       lastError: legacy.ui.lastError,
-      themeMode: "normal"
+      themeMode: "warmBrown"
     },
     meta: {
       revision: legacy.meta.revision
