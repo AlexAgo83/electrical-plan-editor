@@ -290,9 +290,9 @@ function normalizeCanvasExportFormat(value: unknown): CanvasExportFormat {
 function normalizeCanvasNodeShapeSizePercent(value: unknown): number {
   const parsed = typeof value === "string" ? Number(value) : value;
   if (!Number.isFinite(parsed)) {
-    return 100;
+    return 75;
   }
-  return clamp(Math.round(Number(parsed)), 30, 150);
+  return clamp(Math.round(Number(parsed)), 50, 125);
 }
 
 function normalizeWorkspacePanelsLayoutMode(value: unknown): WorkspacePanelsLayoutPreference {

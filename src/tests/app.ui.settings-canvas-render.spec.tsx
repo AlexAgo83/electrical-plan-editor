@@ -352,7 +352,7 @@ describe("App integration UI - settings canvas render", () => {
     const nodeShapeSizeSlider = within(canvasToolsSettingsPanel).getByRole("slider", {
       name: /Node shape target size/i
     });
-    expect(nodeShapeSizeSlider).toHaveValue("100");
+    expect(nodeShapeSizeSlider).toHaveValue("75");
     expect(nodeShapeSizeSlider).toBeDisabled();
     fireEvent.click(
       within(canvasToolsSettingsPanel).getByLabelText(
@@ -360,8 +360,8 @@ describe("App integration UI - settings canvas render", () => {
       )
     );
     expect(nodeShapeSizeSlider).toBeEnabled();
-    fireEvent.change(nodeShapeSizeSlider, { target: { value: "150" } });
-    expect(nodeShapeSizeSlider).toHaveValue("150");
+    fireEvent.change(nodeShapeSizeSlider, { target: { value: "125" } });
+    expect(nodeShapeSizeSlider).toHaveValue("125");
 
     switchScreenDrawerAware("analysis");
     networkSummaryPanel = getPanelByHeading("Network summary");
@@ -389,7 +389,7 @@ describe("App integration UI - settings canvas render", () => {
       within(restoredCanvasToolsSettingsPanel).getByRole("slider", {
         name: /Node shape target size/i
       })
-    ).toHaveValue("150");
+    ).toHaveValue("125");
   });
 
   it("persists the 0 degree 2d label rotation preset across remount", () => {

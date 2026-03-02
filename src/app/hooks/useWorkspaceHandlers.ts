@@ -738,7 +738,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultAutoSegmentLabelRotation(false);
     setCanvasShowCalloutWireNames(false);
     setCanvasZoomInvariantNodeShapes(false);
-    setCanvasNodeShapeSizePercent(100);
+    setCanvasNodeShapeSizePercent(75);
     setCanvasExportFormat("svg");
     setCanvasPngExportIncludeBackground(true);
     setCanvasResetZoomPercentInput("60");

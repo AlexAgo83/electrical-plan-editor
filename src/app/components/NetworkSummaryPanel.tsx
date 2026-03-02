@@ -720,7 +720,7 @@ export function NetworkSummaryPanel({
   const effectiveScale = networkScale > 0 ? networkScale : 1;
   const inverseLabelScale = 1 / effectiveScale;
   const normalizedNodeShapeScale = zoomInvariantNodeShapes
-    ? Math.min(1.5, Math.max(0.3, nodeShapeSizePercent / 100))
+    ? Math.min(1.25, Math.max(0.5, nodeShapeSizePercent / 100))
     : 1;
   const visibleModelMinX = (0 - networkOffset.x) / effectiveScale;
   const visibleModelMaxX = (networkViewWidth - networkOffset.x) / effectiveScale;
