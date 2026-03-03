@@ -272,10 +272,22 @@ function appendExportFrameOverlay(params: {
   width: number;
   height: number;
 }): void {
-  const segmentSource = params.sourceSvg.querySelector(".network-segment");
+  const segmentSource =
+    params.sourceSvg.querySelector(".network-segment:not(.is-wire-highlighted):not(.is-selected)") ??
+    params.sourceSvg.querySelector(".network-segment");
+  const svgStyle = window.getComputedStyle(params.sourceSvg);
   const segmentStyle = window.getComputedStyle(segmentSource ?? params.sourceSvg);
-  const strokeColor = resolveElementStyleValue(segmentStyle, "stroke", "var(--network-segment-color, #7f99af)");
-  const parsedStrokeWidth = Number.parseFloat(resolveElementStyleValue(segmentStyle, "stroke-width", "3"));
+  const segmentBaseColor = svgStyle.getPropertyValue("--network-segment-color").trim();
+  const strokeColor =
+    segmentBaseColor.length > 0
+      ? segmentBaseColor
+      : resolveElementStyleValue(segmentStyle, "stroke", "var(--network-segment-color, #7f99af)");
+  const segmentBaseStrokeWidth = svgStyle.getPropertyValue("--network-segment-stroke-width").trim();
+  const parsedStrokeWidth = Number.parseFloat(
+    segmentBaseStrokeWidth.length > 0
+      ? segmentBaseStrokeWidth
+      : resolveElementStyleValue(segmentStyle, "stroke-width", "3")
+  );
   const strokeWidth = Number.isFinite(parsedStrokeWidth) ? clampNumberValue(parsedStrokeWidth, 1.4, 3.4) : 2.2;
   const margin = Math.max(10, Math.round(Math.min(params.width, params.height) * 0.018));
   const rx = Math.max(6, Math.round(Math.min(params.width, params.height) * 0.008));
