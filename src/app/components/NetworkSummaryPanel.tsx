@@ -21,6 +21,7 @@ import type {
   SpliceId,
   Wire
 } from "../../core/entities";
+import { CABLE_COLOR_BY_ID, getWireColorCode } from "../../core/cableColors";
 import {
   formatIsoToLocalDateInput,
   isNetworkLogoUrlValid,
@@ -584,6 +585,7 @@ export interface NetworkSummaryPanelProps {
   networkNodePositions: Record<NodeId, NodePosition>;
   selectedWireRouteSegmentIds: Set<SegmentId>;
   selectedSegmentId: SegmentId | null;
+  selectedWireId: Wire["id"] | null;
   handleNetworkSegmentClick: (segmentId: SegmentId) => void;
   selectedNodeId: NodeId | null;
   selectedConnectorId: ConnectorId | null;
@@ -650,6 +652,9 @@ interface CalloutEntry {
   wireId: string;
   name: string;
   technicalId: string;
+  color: string;
+  colorPrimaryHex: string | null;
+  colorSecondaryHex: string | null;
   targetId: string;
   targetPin: string;
   lengthMm: number;
@@ -683,6 +688,7 @@ interface CalloutLayoutMetrics {
   headerY: number;
   rowsStartY: number;
   rowStep: number;
+  rowHeight: number;
   height: number;
   columns: CalloutTableColumnLayout[];
   rows: CalloutTableRow[];
@@ -699,12 +705,19 @@ const CALLOUT_OFFSET_SCREEN_UNITS = 92;
 const CALLOUT_MIN_WIDTH = 44;
 const CALLOUT_MAX_WIDTH = 520;
 const CALLOUT_LAYOUT_CACHE_MAX_ENTRIES = 512;
+const CALLOUT_COLOR_SWATCH_RADIUS = 1.35;
+const CALLOUT_COLOR_SWATCH_GAP = 0.95;
+const CALLOUT_COLOR_SWATCH_TO_TEXT_GAP = 1.5;
 
-type CalloutTableColumnKey = "pin" | "technicalId" | "targetId" | "targetPin" | "wireName" | "length" | "section";
+type CalloutTableColumnKey = "pin" | "technicalId" | "color" | "targetId" | "targetPin" | "wireName" | "length" | "section";
 
 interface CalloutTableRow {
+  wireId: string;
   pin: string;
   technicalId: string;
+  color: string;
+  colorPrimaryHex: string | null;
+  colorSecondaryHex: string | null;
   targetId: string;
   targetPin: string;
   wireName: string;
@@ -814,8 +827,12 @@ function buildCalloutRows(groups: CalloutGroup[]): CalloutTableRow[] {
   for (const group of groups) {
     for (const entry of group.entries) {
       rows.push({
+        wireId: entry.wireId,
         pin: group.label,
         technicalId: entry.technicalId.trim().length > 0 ? entry.technicalId : entry.wireId,
+        color: entry.color,
+        colorPrimaryHex: entry.colorPrimaryHex,
+        colorSecondaryHex: entry.colorSecondaryHex,
         targetId: entry.targetId,
         targetPin: entry.targetPin,
         wireName: entry.name,
@@ -931,6 +948,9 @@ function getCalloutRowCellValue(row: CalloutTableRow, key: CalloutTableColumnKey
   if (key === "technicalId") {
     return row.technicalId;
   }
+  if (key === "color") {
+    return row.color;
+  }
   if (key === "targetId") {
     return row.targetId;
   }
@@ -944,6 +964,17 @@ function getCalloutRowCellValue(row: CalloutTableRow, key: CalloutTableColumnKey
     return row.length;
   }
   return row.section;
+}
+
+function getCalloutColorSwatchesWidth(row: Pick<CalloutTableRow, "colorPrimaryHex" | "colorSecondaryHex">): number {
+  if (row.colorPrimaryHex === null) {
+    return 0;
+  }
+  const dotDiameter = CALLOUT_COLOR_SWATCH_RADIUS * 2;
+  if (row.colorSecondaryHex === null) {
+    return dotDiameter + CALLOUT_COLOR_SWATCH_TO_TEXT_GAP;
+  }
+  return dotDiameter * 2 + CALLOUT_COLOR_SWATCH_GAP + CALLOUT_COLOR_SWATCH_TO_TEXT_GAP;
 }
 
 function buildCalloutLayoutMetrics(
@@ -967,6 +998,7 @@ function buildCalloutLayoutMetrics(
   }> = [
     { key: "pin", header: "Pin", textAnchor: "start" },
     { key: "technicalId", header: "Wire ID", textAnchor: "start" },
+    { key: "color", header: "Color", textAnchor: "start" },
     { key: "targetId", header: "Node ID", textAnchor: "start" },
     { key: "targetPin", header: "PIN", textAnchor: "start" },
     ...(showCalloutWireNames
@@ -1007,7 +1039,9 @@ function buildCalloutLayoutMetrics(
     }
     let columnWidth = measureCalloutRowTextWidth(definition.header, rowFontSize);
     for (const row of rows) {
-      columnWidth = Math.max(columnWidth, measureCalloutRowTextWidth(getCalloutRowCellValue(row, definition.key), rowFontSize));
+      const cellTextWidth = measureCalloutRowTextWidth(getCalloutRowCellValue(row, definition.key), rowFontSize);
+      const cellDecorationWidth = definition.key === "color" ? getCalloutColorSwatchesWidth(row) : 0;
+      columnWidth = Math.max(columnWidth, cellTextWidth + cellDecorationWidth);
     }
     columns.push({
       key: definition.key,
@@ -1050,6 +1084,7 @@ function buildCalloutLayoutMetrics(
     headerY,
     rowsStartY,
     rowStep,
+    rowHeight: rowLineHeight,
     height,
     columns,
     rows
@@ -1142,6 +1177,7 @@ export function NetworkSummaryPanel({
   networkNodePositions,
   selectedWireRouteSegmentIds,
   selectedSegmentId,
+  selectedWireId,
   handleNetworkSegmentClick,
   selectedNodeId,
   selectedConnectorId,
@@ -1404,6 +1440,22 @@ export function NetworkSummaryPanel({
     [connectorMap, spliceMap]
   );
 
+  const resolveWireColorSwatches = useCallback((wire: Wire): { primaryHex: string | null; secondaryHex: string | null } => {
+    const primaryId = wire.primaryColorId;
+    if (primaryId === null) {
+      return { primaryHex: null, secondaryHex: null };
+    }
+    const primaryHex = CABLE_COLOR_BY_ID[primaryId]?.hex ?? null;
+    if (primaryHex === null) {
+      return { primaryHex: null, secondaryHex: null };
+    }
+    const secondaryId = wire.secondaryColorId;
+    return {
+      primaryHex,
+      secondaryHex: secondaryId === null ? null : CABLE_COLOR_BY_ID[secondaryId]?.hex ?? null
+    };
+  }, []);
+
   const connectorCalloutGroupsById = useMemo(() => {
     const map = new Map<ConnectorId, CalloutGroup[]>();
     for (const connector of connectorMap.values()) {
@@ -1433,10 +1485,14 @@ export function NetworkSummaryPanel({
           continue;
         }
         const target = describeWireEndpointForCallout(targetEndpoint);
+        const colorSwatches = resolveWireColorSwatches(wire);
         groups[groupIndex]?.entries.push({
           wireId: wire.id,
           name: wire.name,
           technicalId: wire.technicalId,
+          color: getWireColorCode(wire),
+          colorPrimaryHex: colorSwatches.primaryHex,
+          colorSecondaryHex: colorSwatches.secondaryHex,
           targetId: target.targetId,
           targetPin: target.targetPin,
           lengthMm: wire.lengthMm,
@@ -1454,7 +1510,7 @@ export function NetworkSummaryPanel({
       }
     }
     return map;
-  }, [connectorMap, wires, describeWireEndpointForCallout]);
+  }, [connectorMap, wires, describeWireEndpointForCallout, resolveWireColorSwatches]);
 
   const spliceCalloutGroupsById = useMemo(() => {
     const map = new Map<SpliceId, CalloutGroup[]>();
@@ -1486,10 +1542,14 @@ export function NetworkSummaryPanel({
         }
         const currentEntries = entriesByPort.get(localEndpoint.portIndex) ?? [];
         const target = describeWireEndpointForCallout(targetEndpoint);
+        const colorSwatches = resolveWireColorSwatches(wire);
         currentEntries.push({
           wireId: wire.id,
           name: wire.name,
           technicalId: wire.technicalId,
+          color: getWireColorCode(wire),
+          colorPrimaryHex: colorSwatches.primaryHex,
+          colorSecondaryHex: colorSwatches.secondaryHex,
           targetId: target.targetId,
           targetPin: target.targetPin,
           lengthMm: wire.lengthMm,
@@ -1519,7 +1579,7 @@ export function NetworkSummaryPanel({
       map.set(splice.id, groups);
     }
     return map;
-  }, [spliceMap, wires, describeWireEndpointForCallout]);
+  }, [spliceMap, wires, describeWireEndpointForCallout, resolveWireColorSwatches]);
 
   const getDefaultCalloutPosition = useCallback(
     (nodeId: NodeId, nodePosition: NodePosition) => {
@@ -2592,7 +2652,13 @@ export function NetworkSummaryPanel({
                                 textAnchor={column.textAnchor}
                                 dominantBaseline="hanging"
                                 data-locale-exempt={
-                                  column.key === "technicalId" || column.key === "targetId" ? "true" : undefined
+                                  column.key === "technicalId" ||
+                                  column.key === "color" ||
+                                  column.key === "targetId" ||
+                                  column.key === "length" ||
+                                  column.key === "section"
+                                    ? "true"
+                                    : undefined
                                 }
                               >
                                 {column.header}
@@ -2608,24 +2674,81 @@ export function NetworkSummaryPanel({
                           />
                           {layout.rows.map((row, rowIndex) => {
                             const rowY = rowsStartY + rowIndex * layout.rowStep;
-                            return layout.columns.map((column) => {
-                              const x =
-                                column.textAnchor === "end"
-                                  ? contentLeftX + column.x + column.width
-                                  : contentLeftX + column.x;
-                              return (
-                                <text
-                                  key={`${callout.key}-row-${rowIndex}-${column.key}`}
-                                  className="network-callout-table-cell"
-                                  x={x}
-                                  y={rowY}
-                                  textAnchor={column.textAnchor}
-                                  dominantBaseline="hanging"
-                                >
-                                  {getCalloutRowCellValue(row, column.key)}
-                                </text>
-                              );
-                            });
+                            const isSelectedWireRow = selectedWireId !== null && row.wireId === selectedWireId;
+                            const rowClassName = `network-callout-table-row${isSelectedWireRow ? " is-selected-wire" : ""}`;
+                            return (
+                              <g
+                                key={`${callout.key}-row-${rowIndex}`}
+                                className={rowClassName}
+                                data-wire-id={row.wireId}
+                              >
+                                {isSelectedWireRow ? (
+                                  <rect
+                                    className="network-callout-table-row-highlight"
+                                    x={contentLeftX - 0.8}
+                                    y={rowY - 0.25}
+                                    width={Math.max(0, tableRightX - contentLeftX + 1.6)}
+                                    height={layout.rowHeight + 0.45}
+                                    rx={0.5}
+                                    ry={0.5}
+                                  />
+                                ) : null}
+                                {layout.columns.map((column) => {
+                                  const x =
+                                    column.textAnchor === "end"
+                                      ? contentLeftX + column.x + column.width
+                                      : contentLeftX + column.x;
+                                  if (column.key === "color") {
+                                    const swatchWidth = getCalloutColorSwatchesWidth(row);
+                                    const dotDiameter = CALLOUT_COLOR_SWATCH_RADIUS * 2;
+                                    const swatchCenterY = rowY + layout.rowHeight / 2;
+                                    return (
+                                      <g key={`${callout.key}-row-${rowIndex}-${column.key}`}>
+                                        {row.colorPrimaryHex !== null ? (
+                                          <circle
+                                            className="network-callout-color-dot"
+                                            cx={x + CALLOUT_COLOR_SWATCH_RADIUS}
+                                            cy={swatchCenterY}
+                                            r={CALLOUT_COLOR_SWATCH_RADIUS}
+                                            fill={row.colorPrimaryHex}
+                                          />
+                                        ) : null}
+                                        {row.colorSecondaryHex !== null ? (
+                                          <circle
+                                            className="network-callout-color-dot"
+                                            cx={x + CALLOUT_COLOR_SWATCH_RADIUS + dotDiameter + CALLOUT_COLOR_SWATCH_GAP}
+                                            cy={swatchCenterY}
+                                            r={CALLOUT_COLOR_SWATCH_RADIUS}
+                                            fill={row.colorSecondaryHex}
+                                          />
+                                        ) : null}
+                                        <text
+                                          className={`network-callout-table-cell${isSelectedWireRow ? " is-selected-wire" : ""}`}
+                                          x={x + swatchWidth}
+                                          y={rowY}
+                                          textAnchor={column.textAnchor}
+                                          dominantBaseline="hanging"
+                                        >
+                                          {getCalloutRowCellValue(row, column.key)}
+                                        </text>
+                                      </g>
+                                    );
+                                  }
+                                  return (
+                                    <text
+                                      key={`${callout.key}-row-${rowIndex}-${column.key}`}
+                                      className={`network-callout-table-cell${isSelectedWireRow ? " is-selected-wire" : ""}`}
+                                      x={x}
+                                      y={rowY}
+                                      textAnchor={column.textAnchor}
+                                      dominantBaseline="hanging"
+                                    >
+                                      {getCalloutRowCellValue(row, column.key)}
+                                    </text>
+                                  );
+                                })}
+                              </g>
+                            );
                           })}
                         </g>
                       </g>

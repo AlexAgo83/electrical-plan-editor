@@ -295,9 +295,57 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(calloutRows.length).toBeGreaterThanOrEqual(8);
     expect(networkSummaryPanel).toHaveTextContent("Len");
     expect(networkSummaryPanel).toHaveTextContent("Sec");
+    expect(networkSummaryPanel).toHaveTextContent("Color");
     expect(networkSummaryPanel).toHaveTextContent("Node ID");
     expect(networkSummaryPanel).toHaveTextContent("PIN");
     expect(networkSummaryPanel).toHaveTextContent("W-8");
+  });
+
+  it("highlights callout rows that match the selected wire", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
+
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-table-row.is-selected-wire")).toHaveLength(0);
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-table-cell.is-selected-wire")).toHaveLength(0);
+
+    switchSubScreenDrawerAware("wire");
+    const wiresPanel = getPanelByHeading("Wires");
+    fireEvent.click(within(wiresPanel).getByText("Wire 1"));
+
+    const highlightedRows = networkSummaryPanel.querySelectorAll(".network-callout-table-row.is-selected-wire");
+    const highlightedCells = networkSummaryPanel.querySelectorAll(".network-callout-table-cell.is-selected-wire");
+    expect(highlightedRows.length).toBeGreaterThan(0);
+    expect(highlightedCells.length).toBeGreaterThan(0);
+    expect(Array.from(highlightedRows).some((row) => (row.textContent ?? "").includes("W-1"))).toBe(true);
+  });
+
+  it("renders color swatches next to color codes in callout rows", () => {
+    const baseState = createUiIntegrationState();
+    const wire = baseState.wires.byId[asWireId("W1")];
+    if (wire === undefined) {
+      throw new Error("Expected wire W1 in base integration state.");
+    }
+    const withColoredWire = appReducer(
+      baseState,
+      appActions.upsertWire({
+        ...wire,
+        colorMode: "catalog",
+        primaryColorId: "RD",
+        secondaryColorId: "BU"
+      })
+    );
+
+    renderAppWithState(withColoredWire);
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
+
+    expect(networkSummaryPanel).toHaveTextContent("RD/BU");
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-color-dot").length).toBeGreaterThanOrEqual(2);
   });
 
   it("keeps offscreen callouts non-interactive in the callout layer", () => {
