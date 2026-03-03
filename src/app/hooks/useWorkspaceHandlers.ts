@@ -692,12 +692,14 @@ export function useWorkspaceHandlers({
         const estimatedCalloutHalfWidthBySize: Record<CanvasCalloutTextSize, number> = {
           small: 110,
           normal: 130,
-          large: 155
+          large: 155,
+          extraLarge: 180
         };
         const estimatedCalloutHalfHeightBySize: Record<CanvasCalloutTextSize, number> = {
           small: 42,
           normal: 52,
-          large: 64
+          large: 64,
+          extraLarge: 74
         };
         const calloutHalfWidth = estimatedCalloutHalfWidthBySize[networkCalloutTextSize] * inverseLabelScale;
         const calloutHalfHeight = estimatedCalloutHalfHeightBySize[networkCalloutTextSize] * inverseLabelScale;

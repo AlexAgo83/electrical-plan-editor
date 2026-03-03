@@ -246,12 +246,12 @@ describe("App integration UI - settings canvas render", () => {
     expect(networkSvg).toHaveClass("network-callout-text-size-normal");
     switchScreenDrawerAware("settings");
     fireEvent.change(within(getPanelByHeading("Canvas render preferences")).getByLabelText("Callout text size"), {
-      target: { value: "small" }
+      target: { value: "extraLarge" }
     });
     switchScreenDrawerAware("analysis");
     networkSummaryPanel = getPanelByHeading("Network summary");
     networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
-    expect(networkSvg).toHaveClass("network-callout-text-size-small");
+    expect(networkSvg).toHaveClass("network-callout-text-size-extraLarge");
   });
   it("persists png export background toggle and supports negative 2d label rotation presets", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
