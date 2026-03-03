@@ -77,3 +77,44 @@
   - `npm run -s lint`
   - `npm run -s typecheck`
   - `npm run -s test:ci:ui`
+
+## Post-release 1.3.1 Maintenance Updates
+
+### Visual and Theme Fixes
+
+- Restored proper contrast/styling for the **Language** settings sub-panel across themes.
+- Locked/simplified the **Viewport resize behavior** setting presentation in Settings for clearer UX.
+
+### Export Frame/Cartouche Follow-ups
+
+- Refined export identity cartouche sizing to be content-adaptive and avoid unnecessary width.
+- Applied compact cartouche width behavior and square info-frame corners for export overlays.
+- Ensured export frame color uses the **base segment style** (never selection/highlight color).
+- Hardened export stroke parity between live 2D rendering and SVG/PNG output for segments/callout leaders.
+
+### Callout Table and Selection Improvements
+
+- Updated callout column semantics/headers (`Wire ID`, `Node ID`, `PIN`, `Len`, `Sec`) and locale-exempt handling for technical labels.
+- Added selected-wire row highlighting directly inside callout tables.
+- Added wire color support in callouts:
+  - `Color` column between `Wire ID` and `Node ID`,
+  - color code text,
+  - mono/bi-color swatches,
+  - empty cell when no color is defined.
+- Kept `Color`, `Len`, and `Sec` labels untranslated in FR locale for consistency with technical notation.
+
+### Callout Typography Scale Update
+
+- Reworked callout text-size tier mapping:
+  - `small` now maps to former `normal`,
+  - `normal` now maps to former `large`,
+  - `large` now maps to former `extraLarge`.
+- Removed `extraLarge` from the callout text-size selector.
+- Added legacy preference normalization (`extraLarge` persisted value now maps to `large`).
+
+### Additional Validation Runs
+
+- Re-ran targeted UI suites during maintenance iterations:
+  - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
+  - `src/tests/app.ui.settings-canvas-render.spec.tsx`
+  - `src/tests/app.ui.settings-locale.spec.tsx`
