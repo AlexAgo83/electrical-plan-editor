@@ -397,16 +397,12 @@ describe("App integration UI - settings canvas render", () => {
     expect(networkSummaryPanel.querySelector(".network-node-shape-anchor")).not.toBeNull();
     const networkSvgBefore = networkSummaryPanel.querySelector<SVGSVGElement>(".network-svg");
     expect(networkSvgBefore).not.toBeNull();
-    if (networkSvgBefore === null) {
-      throw new Error("Expected network SVG before settings update.");
-    }
+    if (networkSvgBefore === null) throw new Error("Expected network SVG before settings update.");
     const connectorShapeBefore = networkSummaryPanel.querySelector("g.network-node.connector .network-node-shape");
     expect(connectorShapeBefore).not.toBeNull();
     const connectorWidthBefore = Number(connectorShapeBefore?.getAttribute("width") ?? "0");
     expect(connectorWidthBefore).toBeGreaterThan(0);
-    const segmentStrokeWidthBefore = Number.parseFloat(
-      networkSvgBefore.style.getPropertyValue("--network-segment-stroke-width")
-    );
+    const segmentStrokeWidthBefore = Number.parseFloat(networkSvgBefore.style.getPropertyValue("--network-segment-stroke-width"));
     const calloutLeaderStrokeWidthBefore = Number.parseFloat(
       networkSvgBefore.style.getPropertyValue("--network-callout-leader-stroke-width")
     );
@@ -431,15 +427,9 @@ describe("App integration UI - settings canvas render", () => {
     expect(connectorWidthAfter).toBeGreaterThan(connectorWidthBefore);
     const networkSvgAfter = networkSummaryPanel.querySelector<SVGSVGElement>(".network-svg");
     expect(networkSvgAfter).not.toBeNull();
-    if (networkSvgAfter === null) {
-      throw new Error("Expected network SVG after settings update.");
-    }
-    const segmentStrokeWidthAfter = Number.parseFloat(
-      networkSvgAfter.style.getPropertyValue("--network-segment-stroke-width")
-    );
-    const calloutLeaderStrokeWidthAfter = Number.parseFloat(
-      networkSvgAfter.style.getPropertyValue("--network-callout-leader-stroke-width")
-    );
+    if (networkSvgAfter === null) throw new Error("Expected network SVG after settings update.");
+    const segmentStrokeWidthAfter = Number.parseFloat(networkSvgAfter.style.getPropertyValue("--network-segment-stroke-width"));
+    const calloutLeaderStrokeWidthAfter = Number.parseFloat(networkSvgAfter.style.getPropertyValue("--network-callout-leader-stroke-width"));
     expect(segmentStrokeWidthAfter).toBeGreaterThan(segmentStrokeWidthBefore);
     expect(calloutLeaderStrokeWidthAfter).toBeGreaterThan(calloutLeaderStrokeWidthBefore);
     const transformBeforeZoom = invariantAnchor?.getAttribute("transform") ?? "";

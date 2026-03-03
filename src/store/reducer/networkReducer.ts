@@ -22,7 +22,6 @@ import {
   persistActiveNetworkSnapshot
 } from "../networking";
 import { bumpRevision, clearLastError, removeEntity, upsertEntity, withError } from "./shared";
-
 function hasDuplicateNetworkTechnicalId(
   state: AppState,
   technicalId: string,
@@ -32,12 +31,10 @@ function hasDuplicateNetworkTechnicalId(
     if (excludedNetworkId !== undefined && networkId === excludedNetworkId) {
       return false;
     }
-
     const network = state.networks.byId[networkId];
     return network?.technicalId === technicalId;
   });
 }
-
 function cloneScopedState(scoped: NetworkScopedState): NetworkScopedState {
   return {
     catalogItems: {
@@ -70,7 +67,6 @@ function cloneScopedState(scoped: NetworkScopedState): NetworkScopedState {
     networkSummaryViewState: cloneNetworkSummaryViewState(scoped.networkSummaryViewState)
   };
 }
-
 function isSameNetworkSummaryViewState(
   left: NetworkScopedState["networkSummaryViewState"],
   right: NetworkScopedState["networkSummaryViewState"]
@@ -81,7 +77,6 @@ function isSameNetworkSummaryViewState(
   if (left === undefined || right === undefined) {
     return false;
   }
-
   return (
     left.scale === right.scale &&
     left.offset.x === right.offset.x &&
@@ -95,7 +90,6 @@ function isSameNetworkSummaryViewState(
     left.lockEntityMovement === right.lockEntityMovement
   );
 }
-
 function withUiResetSelection(state: AppState): AppState {
   return {
     ...state,
@@ -106,7 +100,6 @@ function withUiResetSelection(state: AppState): AppState {
     }
   };
 }
-
 function normalizeOptionalText(value: string | undefined): string | undefined {
   if (value === undefined) {
     return undefined;
@@ -114,12 +107,10 @@ function normalizeOptionalText(value: string | undefined): string | undefined {
   const normalized = value.trim();
   return normalized.length === 0 ? undefined : normalized;
 }
-
 interface NormalizeNetworkMetadataResult {
   metadata: Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes">;
   error: string | null;
 }
-
 function normalizeNetworkMetadata(
   source: Partial<Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes">>,
   fallback: Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes">
@@ -134,14 +125,12 @@ function normalizeNetworkMetadata(
       error: "Project code supports letters, numbers, spaces, and _ . / - characters only."
     };
   }
-
   if (normalizedLogoUrl !== undefined && !isNetworkLogoUrlValid(normalizedLogoUrl)) {
     return {
       metadata: fallback,
       error: "Logo URL must use http, https, or data:image/*."
     };
   }
-
   return {
     metadata: {
       author: normalizeNetworkAuthor(source.author === undefined ? fallback.author : source.author),
@@ -152,7 +141,6 @@ function normalizeNetworkMetadata(
     error: null
   };
 }
-
 export function handleNetworkActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "network/create": {
@@ -162,15 +150,12 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
         return withError(state, "Network name and technical ID are required.");
       }
-
       if (state.networks.byId[network.id] !== undefined) {
         return withError(state, `Network '${network.id}' already exists.`);
       }
-
       if (hasDuplicateNetworkTechnicalId(state, normalizedTechnicalId)) {
         return withError(state, `Network technical ID '${normalizedTechnicalId}' is already used.`);
       }
-
       const nowIso = new Date().toISOString();
       const normalizedCreatedAt = normalizeNetworkIsoTimestamp(network.createdAt, nowIso);
       const normalizedUpdatedAt = normalizeNetworkIsoTimestamp(network.updatedAt, normalizedCreatedAt);
@@ -183,7 +168,6 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       if (normalizedMetadata.error !== null) {
         return withError(state, normalizedMetadata.error);
       }
-
       const persisted = persistActiveNetworkSnapshot(clearLastError(state));
       const nextNetwork = {
         ...network,
@@ -202,7 +186,6 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           [network.id]: createSeededNetworkScopedState()
         }
       };
-
       if (setActive || persisted.activeNetworkId === null) {
         nextState = loadNetworkIntoActiveScope(
           withUiResetSelection({
@@ -212,19 +195,15 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           network.id
         );
       }
-
       return bumpRevision(nextState);
     }
-
     case "network/select": {
       if (state.networks.byId[action.payload.id] === undefined) {
         return withError(state, "Cannot activate unknown network.");
       }
-
       if (state.activeNetworkId === action.payload.id) {
         return clearLastError(state);
       }
-
       const persisted = persistActiveNetworkSnapshot(clearLastError(state));
       const switched = loadNetworkIntoActiveScope(
         withUiResetSelection({
@@ -233,25 +212,20 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         }),
         action.payload.id
       );
-
       return bumpRevision(switched);
     }
-
     case "network/setSummaryViewState": {
       const { id, viewState } = action.payload;
       if (state.networks.byId[id] === undefined) {
         return withError(state, "Cannot update view state for unknown network.");
       }
-
       const existingScoped = state.networkStates[id];
       if (existingScoped === undefined) {
         return withError(state, "Cannot update view state: network snapshot is missing.");
       }
-
       if (isSameNetworkSummaryViewState(existingScoped.networkSummaryViewState, viewState)) {
         return state;
       }
-
       return {
         ...clearLastError(state),
         networkStates: {
@@ -263,18 +237,15 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         }
       };
     }
-
     case "network/rename": {
       const existing = state.networks.byId[action.payload.id];
       if (existing === undefined) {
         return withError(state, "Cannot rename unknown network.");
       }
-
       const normalizedName = action.payload.name.trim();
       if (normalizedName.length === 0) {
         return withError(state, "Network name must be non-empty.");
       }
-
       const nextState: AppState = {
         ...clearLastError(state),
         networks: upsertEntity(state.networks, {
@@ -284,26 +255,21 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           updatedAt: normalizeNetworkIsoTimestamp(action.payload.updatedAt, existing.updatedAt)
         })
       };
-
       return bumpRevision(nextState);
     }
-
     case "network/update": {
       const existing = state.networks.byId[action.payload.id];
       if (existing === undefined) {
         return withError(state, "Cannot update unknown network.");
       }
-
       const normalizedName = action.payload.name.trim();
       const normalizedTechnicalId = action.payload.technicalId.trim();
       if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
         return withError(state, "Network name and technical ID are required.");
       }
-
       if (hasDuplicateNetworkTechnicalId(state, normalizedTechnicalId, action.payload.id)) {
         return withError(state, `Network technical ID '${normalizedTechnicalId}' is already used.`);
       }
-
       const normalizedMetadata = normalizeNetworkMetadata(
         {
           author: action.payload.author,
@@ -321,7 +287,6 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       if (normalizedMetadata.error !== null) {
         return withError(state, normalizedMetadata.error);
       }
-
       const nextState: AppState = {
         ...clearLastError(state),
         networks: upsertEntity(state.networks, {
@@ -334,31 +299,25 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           ...normalizedMetadata.metadata
         })
       };
-
       return bumpRevision(nextState);
     }
-
     case "network/duplicate": {
       const source = state.networks.byId[action.payload.sourceNetworkId];
       if (source === undefined) {
         return withError(state, "Cannot duplicate unknown network.");
       }
-
       const duplicated = action.payload.network;
       const normalizedName = duplicated.name.trim();
       const normalizedTechnicalId = duplicated.technicalId.trim();
       if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
         return withError(state, "Network name and technical ID are required.");
       }
-
       if (state.networks.byId[duplicated.id] !== undefined) {
         return withError(state, `Network '${duplicated.id}' already exists.`);
       }
-
       if (hasDuplicateNetworkTechnicalId(state, normalizedTechnicalId)) {
         return withError(state, `Network technical ID '${normalizedTechnicalId}' is already used.`);
       }
-
       const nowIso = new Date().toISOString();
       const normalizedCreatedAt = normalizeNetworkIsoTimestamp(duplicated.createdAt, nowIso);
       const normalizedUpdatedAt = normalizeNetworkIsoTimestamp(duplicated.updatedAt, normalizedCreatedAt);
@@ -371,13 +330,11 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       if (normalizedMetadata.error !== null) {
         return withError(state, normalizedMetadata.error);
       }
-
       const persisted = persistActiveNetworkSnapshot(clearLastError(state));
       const sourceScoped = persisted.networkStates[action.payload.sourceNetworkId];
       if (sourceScoped === undefined) {
         return withError(state, "Cannot duplicate network state: source snapshot is missing.");
       }
-
       const nextState = loadNetworkIntoActiveScope(
         withUiResetSelection({
           ...persisted,
@@ -398,21 +355,17 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         }),
         duplicated.id
       );
-
       return bumpRevision(nextState);
     }
-
     case "network/delete": {
       const existing = state.networks.byId[action.payload.id];
       if (existing === undefined) {
         return withError(state, "Cannot delete unknown network.");
       }
-
       const persisted = persistActiveNetworkSnapshot(clearLastError(state));
       const remainingNetworks = removeEntity(persisted.networks, action.payload.id);
       const nextNetworkStates = { ...persisted.networkStates };
       delete nextNetworkStates[action.payload.id];
-
       const fallbackId = buildNetworkDeletionFallback(persisted.networks, action.payload.id);
       if (fallbackId === null) {
         const cleared = clearActiveScope(
@@ -425,7 +378,6 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         );
         return bumpRevision(cleared);
       }
-
       const switched = loadNetworkIntoActiveScope(
         withUiResetSelection({
           ...persisted,
@@ -437,12 +389,10 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       );
       return bumpRevision(switched);
     }
-
     case "network/importMany": {
       if (action.payload.networks.length === 0) {
         return clearLastError(state);
       }
-
       const persisted = persistActiveNetworkSnapshot(clearLastError(state));
       let nextNetworks = persisted.networks;
       const nextNetworkStates = { ...persisted.networkStates };
@@ -453,20 +403,16 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
           return withError(state, "Cannot import network with empty name or technical ID.");
         }
-
         if (nextNetworks.byId[network.id] !== undefined) {
           return withError(state, `Cannot import network '${network.id}': ID already exists.`);
         }
-
         if (hasDuplicateNetworkTechnicalId({ ...persisted, networks: nextNetworks }, normalizedTechnicalId)) {
           return withError(state, `Cannot import network '${normalizedTechnicalId}': technical ID already exists.`);
         }
-
         const scoped = action.payload.networkStates[network.id];
         if (scoped === undefined) {
           return withError(state, `Cannot import network '${network.id}': network payload is incomplete.`);
         }
-
         const normalizedMetadata = normalizeNetworkMetadata(network, {
           author: undefined,
           projectCode: undefined,
@@ -476,10 +422,8 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         if (normalizedMetadata.error !== null) {
           return withError(state, normalizedMetadata.error);
         }
-
         const normalizedCreatedAt = normalizeNetworkIsoTimestamp(network.createdAt, nowIso);
         const normalizedUpdatedAt = normalizeNetworkIsoTimestamp(network.updatedAt, normalizedCreatedAt);
-
         nextNetworks = upsertEntity(nextNetworks, {
           ...network,
           name: normalizedName,
@@ -491,13 +435,11 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         });
         nextNetworkStates[network.id] = cloneScopedState(scoped);
       }
-
       const nextStateBase: AppState = {
         ...persisted,
         networks: nextNetworks,
         networkStates: nextNetworkStates
       };
-
       const desiredActiveId =
         action.payload.activateFirst && action.payload.networks[0] !== undefined
           ? action.payload.networks[0].id
@@ -505,10 +447,8 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       if (desiredActiveId === null) {
         return bumpRevision(nextStateBase);
       }
-
       return bumpRevision(loadNetworkIntoActiveScope({ ...nextStateBase, activeNetworkId: desiredActiveId }, desiredActiveId));
     }
-
     default:
       return null;
   }
