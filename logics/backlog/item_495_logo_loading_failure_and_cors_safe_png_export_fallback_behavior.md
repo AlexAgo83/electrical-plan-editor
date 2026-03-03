@@ -1,9 +1,9 @@
 ## item_495_logo_loading_failure_and_cors_safe_png_export_fallback_behavior - Logo loading failure and CORS-safe PNG export fallback behavior
 > From version: 1.3.0
 > Status: Draft
-> Understanding: 95%
-> Confidence: 89%
-> Progress: 0%
+> Understanding: 97% (fallback copy and allowed logo source schemes clarified)
+> Confidence: 90%
+> Progress: 5%
 > Complexity: High
 > Theme: Export robustness
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -14,16 +14,17 @@ Remote logo URLs can fail or trigger cross-origin restrictions in PNG rendering,
 # Scope
 - In:
   - implement deterministic fallback path when logo URL is invalid/unreachable/CORS-restricted;
+  - support `http`, `https`, and `data:image/*` logo sources under the same fallback rules;
   - ensure export never fails because of logo loading issues;
-  - show explicit placeholder text (`Logo unavailable`) in cartouche when configured;
+  - show explicit placeholder text (`Logo indisponible`) in cartouche fallback;
   - preserve all non-logo cartouche data in fallback cases.
 - Out:
   - hosted image proxy service;
   - local file upload flow.
 
 # Acceptance criteria
-- AC1: SVG export succeeds when logo URL fails, with placeholder/fallback behavior.
-- AC2: PNG export succeeds when logo URL fails or is CORS-blocked, with placeholder/fallback behavior.
+- AC1: SVG export succeeds when logo URL fails, with `Logo indisponible` fallback behavior.
+- AC2: PNG export succeeds when logo URL fails or is CORS-blocked, with `Logo indisponible` fallback behavior.
 - AC3: Export errors caused only by logo loading are eliminated.
 - AC4: Non-logo cartouche metadata remains present in fallback outputs.
 
@@ -40,4 +41,3 @@ Remote logo URLs can fail or trigger cross-origin restrictions in PNG rendering,
 # Notes
 - Derived from `logics/request/req_102_export_frame_and_network_identity_cartouche_for_svg_png.md`.
 - Orchestrated by `logics/tasks/task_078_req_102_export_frame_and_network_identity_cartouche_for_svg_png_orchestration_and_delivery_control.md`.
-
