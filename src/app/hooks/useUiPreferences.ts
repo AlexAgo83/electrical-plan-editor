@@ -133,6 +133,8 @@ interface UiPreferencesPayload {
   canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
+  canvasExportIncludeFrame: boolean;
+  canvasExportIncludeCartouche: boolean;
   canvasResizeBehaviorMode: CanvasResizeBehaviorMode;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
@@ -202,6 +204,8 @@ interface UseUiPreferencesOptions {
   canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
+  canvasExportIncludeFrame: boolean;
+  canvasExportIncludeCartouche: boolean;
   canvasResizeBehaviorMode: CanvasResizeBehaviorMode;
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
@@ -248,6 +252,8 @@ interface UseUiPreferencesOptions {
   setCanvasNodeShapeSizePercent: (value: number) => void;
   setCanvasExportFormat: (value: CanvasExportFormat) => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
+  setCanvasExportIncludeFrame: (value: boolean) => void;
+  setCanvasExportIncludeCartouche: (value: boolean) => void;
   setCanvasResizeBehaviorMode: (value: CanvasResizeBehaviorMode) => void;
   setShowNetworkGrid: (value: boolean) => void;
   setSnapNodesToGrid: (value: boolean) => void;
@@ -364,6 +370,8 @@ export function useUiPreferences({
   canvasNodeShapeSizePercent,
   canvasExportFormat,
   canvasPngExportIncludeBackground,
+  canvasExportIncludeFrame,
+  canvasExportIncludeCartouche,
   canvasResizeBehaviorMode,
   canvasResetZoomPercentInput,
   showShortcutHints,
@@ -410,6 +418,8 @@ export function useUiPreferences({
   setCanvasNodeShapeSizePercent,
   setCanvasExportFormat,
   setCanvasPngExportIncludeBackground,
+  setCanvasExportIncludeFrame,
+  setCanvasExportIncludeCartouche,
   setCanvasResizeBehaviorMode,
   setShowNetworkGrid,
   setSnapNodesToGrid,
@@ -537,6 +547,12 @@ export function useUiPreferences({
           ? preferences.canvasPngExportIncludeBackground
           : true
       );
+      setCanvasExportIncludeFrame(
+        typeof preferences.canvasExportIncludeFrame === "boolean" ? preferences.canvasExportIncludeFrame : false
+      );
+      setCanvasExportIncludeCartouche(
+        typeof preferences.canvasExportIncludeCartouche === "boolean" ? preferences.canvasExportIncludeCartouche : true
+      );
       setCanvasResizeBehaviorMode(normalizeCanvasResizeBehaviorMode(preferences.canvasResizeBehaviorMode));
       setShowNetworkGrid(showGridDefault);
       setSnapNodesToGrid(snapDefault);
@@ -587,6 +603,8 @@ export function useUiPreferences({
     setCanvasNodeShapeSizePercent,
     setCanvasExportFormat,
     setCanvasPngExportIncludeBackground,
+    setCanvasExportIncludeFrame,
+    setCanvasExportIncludeCartouche,
     setCanvasResizeBehaviorMode,
     setCanvasResetZoomPercentInput,
     setConnectorSort,
@@ -669,6 +687,8 @@ export function useUiPreferences({
       canvasNodeShapeSizePercent,
       canvasExportFormat,
       canvasPngExportIncludeBackground,
+      canvasExportIncludeFrame,
+      canvasExportIncludeCartouche,
       canvasResizeBehaviorMode,
       canvasResetZoomPercentInput,
       showShortcutHints,
@@ -702,6 +722,8 @@ export function useUiPreferences({
     canvasNodeShapeSizePercent,
     canvasExportFormat,
     canvasPngExportIncludeBackground,
+    canvasExportIncludeFrame,
+    canvasExportIncludeCartouche,
     canvasResizeBehaviorMode,
     canvasResetZoomPercentInput,
     defaultIdSortDirection,

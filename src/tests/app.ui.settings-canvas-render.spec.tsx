@@ -300,6 +300,27 @@ describe("App integration UI - settings canvas render", () => {
     switchScreenDrawerAware("settings");
     expect(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Export format")).toHaveValue("png");
   });
+  it("persists export frame and cartouche visibility toggles with expected defaults", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const canvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
+    const frameToggle = within(canvasToolsSettingsPanel).getByLabelText("Include frame in SVG/PNG export");
+    const cartoucheToggle = within(canvasToolsSettingsPanel).getByLabelText("Include identity cartouche in SVG/PNG export");
+    expect(frameToggle).not.toBeChecked();
+    expect(cartoucheToggle).toBeChecked();
+
+    fireEvent.click(frameToggle);
+    fireEvent.click(cartoucheToggle);
+    expect(frameToggle).toBeChecked();
+    expect(cartoucheToggle).not.toBeChecked();
+
+    firstRender.unmount();
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const restoredPanel = getPanelByHeading("Canvas tools preferences");
+    expect(within(restoredPanel).getByLabelText("Include frame in SVG/PNG export")).toBeChecked();
+    expect(within(restoredPanel).getByLabelText("Include identity cartouche in SVG/PNG export")).not.toBeChecked();
+  });
   it("supports the canvas resize behavior mode and updates network summary viewport in visible-area-only mode", async () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");

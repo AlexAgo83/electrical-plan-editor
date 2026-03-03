@@ -47,7 +47,7 @@ describe("network file portability", () => {
     const payloadB = buildNetworkFilePayload(seeded, "all", [], "2026-02-21T10:00:00.000Z");
 
     expect(payloadA.payloadKind).toBe(NETWORK_FILE_PAYLOAD_KIND);
-    expect(payloadA.schemaVersion).toBe(2);
+    expect(payloadA.schemaVersion).toBe(3);
     expect(payloadA.source.appVersion).toBe(APP_RELEASE_VERSION);
     expect(serializeNetworkFilePayload(payloadA)).toBe(serializeNetworkFilePayload(payloadB));
   });
@@ -74,7 +74,7 @@ describe("network file portability", () => {
     expect(parsed.error).toBeNull();
     expect(parsed.payload).not.toBeNull();
     expect(parsed.payload?.payloadKind).toBe(NETWORK_FILE_PAYLOAD_KIND);
-    expect(parsed.payload?.schemaVersion).toBe(2);
+    expect(parsed.payload?.schemaVersion).toBe(3);
     expect(parsed.payload?.networks).toHaveLength(1);
   });
 

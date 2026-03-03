@@ -40,8 +40,18 @@ interface NetworkScopeWorkspaceContentProps {
   setNewNetworkName: (value: string) => void;
   newNetworkTechnicalId: string;
   setNewNetworkTechnicalId: (value: string) => void;
+  newNetworkCreatedAtDate: string;
+  setNewNetworkCreatedAtDate: (value: string) => void;
   newNetworkDescription: string;
   setNewNetworkDescription: (value: string) => void;
+  newNetworkAuthor: string;
+  setNewNetworkAuthor: (value: string) => void;
+  newNetworkProjectCode: string;
+  setNewNetworkProjectCode: (value: string) => void;
+  newNetworkLogoUrl: string;
+  setNewNetworkLogoUrl: (value: string) => void;
+  newNetworkExportNotes: string;
+  setNewNetworkExportNotes: (value: string) => void;
   networkFormError: string | null;
   networkTechnicalIdAlreadyUsed: boolean;
   handleSubmitNetworkForm: (event: FormEvent<HTMLFormElement>) => void;
@@ -70,8 +80,18 @@ export function NetworkScopeWorkspaceContent({
   setNewNetworkName,
   newNetworkTechnicalId,
   setNewNetworkTechnicalId,
+  newNetworkCreatedAtDate,
+  setNewNetworkCreatedAtDate,
   newNetworkDescription,
   setNewNetworkDescription,
+  newNetworkAuthor,
+  setNewNetworkAuthor,
+  newNetworkProjectCode,
+  setNewNetworkProjectCode,
+  newNetworkLogoUrl,
+  setNewNetworkLogoUrl,
+  newNetworkExportNotes,
+  setNewNetworkExportNotes,
   networkFormError,
   networkTechnicalIdAlreadyUsed,
   handleSubmitNetworkForm,
@@ -530,6 +550,53 @@ export function NetworkScopeWorkspaceContent({
                 value={newNetworkDescription}
                 onChange={(event) => setNewNetworkDescription(event.target.value)}
                 placeholder="Optional description"
+              />
+            </label>
+            <label className="stack-label">
+              <span className="network-form-label">Creation date</span>
+              <input
+                type="date"
+                value={newNetworkCreatedAtDate}
+                onChange={(event) => setNewNetworkCreatedAtDate(event.target.value)}
+              />
+            </label>
+            <label className="stack-label">
+              <span className="network-form-label">Author (optional)</span>
+              <input
+                value={newNetworkAuthor}
+                onChange={(event) => setNewNetworkAuthor(event.target.value)}
+                placeholder="Jane Doe"
+                maxLength={80}
+              />
+            </label>
+            <label className="stack-label">
+              <span className="network-form-label">Project code (optional)</span>
+              <input
+                value={newNetworkProjectCode}
+                onChange={(event) => setNewNetworkProjectCode(event.target.value)}
+                placeholder="PRJ-A1"
+                maxLength={40}
+              />
+              <span className="form-hint">Allowed: letters, numbers, spaces, and _ . / -</span>
+            </label>
+            <label className="stack-label">
+              <span className="network-form-label">Logo URL (optional)</span>
+              <input
+                value={newNetworkLogoUrl}
+                onChange={(event) => setNewNetworkLogoUrl(event.target.value)}
+                placeholder="https://example.com/logo.png"
+                maxLength={2048}
+              />
+              <span className="form-hint">Allowed schemes: http, https, data:image/*</span>
+            </label>
+            <label className="stack-label">
+              <span className="network-form-label">Export notes (optional)</span>
+              <textarea
+                value={newNetworkExportNotes}
+                onChange={(event) => setNewNetworkExportNotes(event.target.value)}
+                placeholder="Free multiline notes shown in export cartouche."
+                rows={4}
+                maxLength={2000}
               />
             </label>
             {networkFormError !== null ? <p className="form-error">{networkFormError}</p> : null}

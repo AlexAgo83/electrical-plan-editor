@@ -1,5 +1,13 @@
 import type { FormEvent } from "react";
 import type { Connector, ConnectorId, Network, NetworkId, NetworkNode, NodeId, Splice, SpliceId } from "../../core/entities";
+import {
+  formatIsoToLocalDateInput,
+  isNetworkLogoUrlValid,
+  isNetworkProjectCodeValid,
+  normalizeNetworkLogoUrl,
+  normalizeNetworkProjectCode,
+  parseLocalDateInputToIso
+} from "../../core/networkMetadata";
 import type { AppState, AppStore, ThemeMode } from "../../store";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import {
@@ -48,8 +56,18 @@ interface UseWorkspaceHandlersParams {
   setNewNetworkName: (value: string) => void;
   newNetworkTechnicalId: string;
   setNewNetworkTechnicalId: (value: string) => void;
+  newNetworkCreatedAtDate: string;
+  setNewNetworkCreatedAtDate: (value: string) => void;
   newNetworkDescription: string;
   setNewNetworkDescription: (value: string) => void;
+  newNetworkAuthor: string;
+  setNewNetworkAuthor: (value: string) => void;
+  newNetworkProjectCode: string;
+  setNewNetworkProjectCode: (value: string) => void;
+  newNetworkLogoUrl: string;
+  setNewNetworkLogoUrl: (value: string) => void;
+  newNetworkExportNotes: string;
+  setNewNetworkExportNotes: (value: string) => void;
   setNetworkFormError: (value: string | null) => void;
   isCurrentWorkspaceEmpty: boolean;
   hasBuiltInSampleState: boolean;
@@ -121,6 +139,8 @@ interface UseWorkspaceHandlersParams {
   setCanvasNodeShapeSizePercent: (value: number) => void;
   setCanvasExportFormat: (value: "svg" | "png") => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
+  setCanvasExportIncludeFrame: (value: boolean) => void;
+  setCanvasExportIncludeCartouche: (value: boolean) => void;
   setCanvasResizeBehaviorMode: (value: "responsiveContentScale" | "visibleAreaOnly") => void;
   setCanvasResetZoomPercentInput: (value: string) => void;
   setShowShortcutHints: (value: boolean) => void;
@@ -138,8 +158,18 @@ export function useWorkspaceHandlers({
   setNewNetworkName,
   newNetworkTechnicalId,
   setNewNetworkTechnicalId,
+  newNetworkCreatedAtDate,
+  setNewNetworkCreatedAtDate,
   newNetworkDescription,
   setNewNetworkDescription,
+  newNetworkAuthor,
+  setNewNetworkAuthor,
+  newNetworkProjectCode,
+  setNewNetworkProjectCode,
+  newNetworkLogoUrl,
+  setNewNetworkLogoUrl,
+  newNetworkExportNotes,
+  setNewNetworkExportNotes,
   setNetworkFormError,
   isCurrentWorkspaceEmpty,
   hasBuiltInSampleState,
@@ -209,6 +239,8 @@ export function useWorkspaceHandlers({
   setCanvasNodeShapeSizePercent,
   setCanvasExportFormat,
   setCanvasPngExportIncludeBackground,
+  setCanvasExportIncludeFrame,
+  setCanvasExportIncludeCartouche,
   setCanvasResizeBehaviorMode,
   setCanvasResetZoomPercentInput,
   setShowShortcutHints,
@@ -264,6 +296,24 @@ export function useWorkspaceHandlers({
       return;
     }
 
+    const normalizedProjectCode = normalizeNetworkProjectCode(newNetworkProjectCode);
+    if (normalizedProjectCode !== undefined && !isNetworkProjectCodeValid(normalizedProjectCode)) {
+      setNetworkFormError("Project code supports letters, numbers, spaces, and _ . / - characters only.");
+      return;
+    }
+
+    const normalizedLogoUrl = normalizeNetworkLogoUrl(newNetworkLogoUrl);
+    if (normalizedLogoUrl !== undefined && !isNetworkLogoUrlValid(normalizedLogoUrl)) {
+      setNetworkFormError("Logo URL must use http, https, or data:image/*.");
+      return;
+    }
+
+    const createdAtIso = parseLocalDateInputToIso(newNetworkCreatedAtDate);
+    if (createdAtIso === null) {
+      setNetworkFormError("Creation date is invalid.");
+      return;
+    }
+
     const nowIso = new Date().toISOString();
     const networkId = createEntityId("net") as NetworkId;
     dispatchAction(
@@ -271,8 +321,12 @@ export function useWorkspaceHandlers({
         id: networkId,
         name: trimmedName,
         technicalId: trimmedTechnicalId,
+        createdAt: createdAtIso,
+        author: newNetworkAuthor,
+        projectCode: newNetworkProjectCode,
+        logoUrl: newNetworkLogoUrl,
+        exportNotes: newNetworkExportNotes,
         description: newNetworkDescription.trim().length === 0 ? undefined : newNetworkDescription.trim(),
-        createdAt: nowIso,
         updatedAt: nowIso
       })
     );
@@ -281,7 +335,12 @@ export function useWorkspaceHandlers({
       setNetworkFormError(null);
       setNewNetworkName("");
       setNewNetworkTechnicalId("");
+      setNewNetworkCreatedAtDate(formatIsoToLocalDateInput(nowIso));
       setNewNetworkDescription("");
+      setNewNetworkAuthor("");
+      setNewNetworkProjectCode("");
+      setNewNetworkLogoUrl("");
+      setNewNetworkExportNotes("");
       return;
     }
 
@@ -318,13 +377,38 @@ export function useWorkspaceHandlers({
       return;
     }
 
+    const normalizedProjectCode = normalizeNetworkProjectCode(newNetworkProjectCode);
+    if (normalizedProjectCode !== undefined && !isNetworkProjectCodeValid(normalizedProjectCode)) {
+      setNetworkFormError("Project code supports letters, numbers, spaces, and _ . / - characters only.");
+      return;
+    }
+
+    const normalizedLogoUrl = normalizeNetworkLogoUrl(newNetworkLogoUrl);
+    if (normalizedLogoUrl !== undefined && !isNetworkLogoUrlValid(normalizedLogoUrl)) {
+      setNetworkFormError("Logo URL must use http, https, or data:image/*.");
+      return;
+    }
+
+    const createdAtIso = parseLocalDateInputToIso(newNetworkCreatedAtDate);
+    if (createdAtIso === null) {
+      setNetworkFormError("Creation date is invalid.");
+      return;
+    }
+
     dispatchAction(
       appActions.updateNetwork(
         targetNetworkId,
         trimmedName,
         trimmedTechnicalId,
         new Date().toISOString(),
-        newNetworkDescription.trim().length === 0 ? undefined : newNetworkDescription.trim()
+        newNetworkDescription.trim().length === 0 ? undefined : newNetworkDescription.trim(),
+        {
+          createdAt: createdAtIso,
+          author: newNetworkAuthor,
+          projectCode: newNetworkProjectCode,
+          logoUrl: newNetworkLogoUrl,
+          exportNotes: newNetworkExportNotes
+        }
       )
     );
     setNetworkFormError(null);
@@ -350,6 +434,10 @@ export function useWorkspaceHandlers({
         name: `${targetNetwork.name} (Copy)`,
         technicalId,
         description: targetNetwork.description,
+        author: targetNetwork.author,
+        projectCode: targetNetwork.projectCode,
+        logoUrl: targetNetwork.logoUrl,
+        exportNotes: targetNetwork.exportNotes,
         createdAt: nowIso,
         updatedAt: nowIso
       })
@@ -689,6 +777,8 @@ export function useWorkspaceHandlers({
     setCanvasNodeShapeSizePercent(70);
     setCanvasExportFormat("svg");
     setCanvasPngExportIncludeBackground(true);
+    setCanvasExportIncludeFrame(false);
+    setCanvasExportIncludeCartouche(true);
     setCanvasResizeBehaviorMode("visibleAreaOnly");
     setCanvasResetZoomPercentInput("60");
     setShowNetworkGrid(true);

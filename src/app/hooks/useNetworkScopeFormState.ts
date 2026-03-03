@@ -11,7 +11,12 @@ export interface NetworkFocusRequest {
 export function useNetworkScopeFormState() {
   const [newNetworkName, setNewNetworkName] = useState("");
   const [newNetworkTechnicalId, setNewNetworkTechnicalId] = useState("");
+  const [newNetworkCreatedAtDate, setNewNetworkCreatedAtDate] = useState("");
   const [newNetworkDescription, setNewNetworkDescription] = useState("");
+  const [newNetworkAuthor, setNewNetworkAuthor] = useState("");
+  const [newNetworkProjectCode, setNewNetworkProjectCode] = useState("");
+  const [newNetworkLogoUrl, setNewNetworkLogoUrl] = useState("");
+  const [newNetworkExportNotes, setNewNetworkExportNotes] = useState("");
   const [networkFormError, setNetworkFormError] = useState<string | null>(null);
   const [networkFormMode, setNetworkFormMode] = useState<NetworkFormMode>(null);
   const [networkFormTargetId, setNetworkFormTargetId] = useState<NetworkId | null>(null);
@@ -25,8 +30,18 @@ export function useNetworkScopeFormState() {
     setNewNetworkName,
     newNetworkTechnicalId,
     setNewNetworkTechnicalId,
+    newNetworkCreatedAtDate,
+    setNewNetworkCreatedAtDate,
     newNetworkDescription,
     setNewNetworkDescription,
+    newNetworkAuthor,
+    setNewNetworkAuthor,
+    newNetworkProjectCode,
+    setNewNetworkProjectCode,
+    newNetworkLogoUrl,
+    setNewNetworkLogoUrl,
+    newNetworkExportNotes,
+    setNewNetworkExportNotes,
     networkFormError,
     setNetworkFormError,
     networkFormMode,
