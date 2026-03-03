@@ -57,6 +57,7 @@ const SVG_EXPORT_STYLE_PROPERTIES = [
   "stroke-linecap",
   "stroke-linejoin",
   "stroke-dasharray",
+  "vector-effect",
   "opacity",
   "font-family",
   "font-size",
@@ -1170,7 +1171,7 @@ export function NetworkSummaryPanel({
   const nodeStrokeEmphasisWidth = clampNumber(3 * normalizedNodeStrokeScale, 2.1, 5.1);
   const segmentStrokeWidth = clampNumber(3 * normalizedNodeStrokeScale, 1.95, 4.05);
   const segmentStrokeEmphasisWidth = clampNumber(5 * normalizedNodeStrokeScale, 3.25, 6.75);
-  const calloutLeaderStrokeWidth = clampNumber(1.05 * normalizedNodeStrokeScale, 0.68, 1.42);
+  const calloutLeaderStrokeWidth = clampNumber(1.25 * normalizedNodeStrokeScale, 0.82, 1.7);
   const calloutLeaderDashFirst = clampNumber(1.7 * normalizedNodeStrokeScale, 1.1, 2.3);
   const calloutLeaderDashSecond = clampNumber(2.4 * normalizedNodeStrokeScale, 1.56, 3.24);
   const networkSvgStrokeVariables = {
