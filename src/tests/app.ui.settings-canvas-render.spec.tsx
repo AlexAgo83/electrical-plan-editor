@@ -337,6 +337,7 @@ describe("App integration UI - settings canvas render", () => {
     switchScreenDrawerAware("analysis");
     const networkSummaryPanel = getPanelByHeading("Network summary");
     const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    expect(networkSvg).toHaveClass("network-svg--stroke-invariant");
     Object.defineProperty(networkSvg, "getBoundingClientRect", {
       configurable: true,
       value: () => ({
@@ -389,15 +390,28 @@ describe("App integration UI - settings canvas render", () => {
     switchScreenDrawerAware("settings");
     expect(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Show wire names in callout table")).toBeChecked();
   });
-  it("supports zoom-invariant node shapes from canvas tool settings", () => {
+  it("supports zoom-invariant node shapes and scales segment/callout strokes from canvas tool settings", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("analysis");
     let networkSummaryPanel = getPanelByHeading("Network summary");
     expect(networkSummaryPanel.querySelector(".network-node-shape-anchor")).not.toBeNull();
+    const networkSvgBefore = networkSummaryPanel.querySelector<SVGSVGElement>(".network-svg");
+    expect(networkSvgBefore).not.toBeNull();
+    if (networkSvgBefore === null) {
+      throw new Error("Expected network SVG before settings update.");
+    }
     const connectorShapeBefore = networkSummaryPanel.querySelector("g.network-node.connector .network-node-shape");
     expect(connectorShapeBefore).not.toBeNull();
     const connectorWidthBefore = Number(connectorShapeBefore?.getAttribute("width") ?? "0");
     expect(connectorWidthBefore).toBeGreaterThan(0);
+    const segmentStrokeWidthBefore = Number.parseFloat(
+      networkSvgBefore.style.getPropertyValue("--network-segment-stroke-width")
+    );
+    const calloutLeaderStrokeWidthBefore = Number.parseFloat(
+      networkSvgBefore.style.getPropertyValue("--network-callout-leader-stroke-width")
+    );
+    expect(segmentStrokeWidthBefore).toBeGreaterThan(0);
+    expect(calloutLeaderStrokeWidthBefore).toBeGreaterThan(0);
     switchScreenDrawerAware("settings");
     const canvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
     const nodeShapeSizeSlider = within(canvasToolsSettingsPanel).getByRole("slider", {
@@ -415,6 +429,19 @@ describe("App integration UI - settings canvas render", () => {
     expect(connectorShapeAfter).not.toBeNull();
     const connectorWidthAfter = Number(connectorShapeAfter?.getAttribute("width") ?? "0");
     expect(connectorWidthAfter).toBeGreaterThan(connectorWidthBefore);
+    const networkSvgAfter = networkSummaryPanel.querySelector<SVGSVGElement>(".network-svg");
+    expect(networkSvgAfter).not.toBeNull();
+    if (networkSvgAfter === null) {
+      throw new Error("Expected network SVG after settings update.");
+    }
+    const segmentStrokeWidthAfter = Number.parseFloat(
+      networkSvgAfter.style.getPropertyValue("--network-segment-stroke-width")
+    );
+    const calloutLeaderStrokeWidthAfter = Number.parseFloat(
+      networkSvgAfter.style.getPropertyValue("--network-callout-leader-stroke-width")
+    );
+    expect(segmentStrokeWidthAfter).toBeGreaterThan(segmentStrokeWidthBefore);
+    expect(calloutLeaderStrokeWidthAfter).toBeGreaterThan(calloutLeaderStrokeWidthBefore);
     const transformBeforeZoom = invariantAnchor?.getAttribute("transform") ?? "";
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom +" }));
     const transformAfterZoom = networkSummaryPanel.querySelector(".network-node-shape-anchor")?.getAttribute("transform") ?? "";
