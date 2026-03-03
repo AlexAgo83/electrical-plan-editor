@@ -239,22 +239,18 @@
 
 .settings-panel .settings-grid > label.settings-locale-field {
   gap: 0.38rem;
-  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 26%, transparent);
   border-radius: 0.6rem;
   padding: 0.5rem 0.58rem;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, canvas 92%, transparent),
-    color-mix(in srgb, canvas 70%, var(--theme-primary, currentColor) 8%)
-  );
+  background: linear-gradient(180deg, color-mix(in srgb, currentColor 8%, transparent), color-mix(in srgb, currentColor 14%, transparent));
 }
 
 .settings-panel .settings-grid > label.settings-locale-field:hover {
-  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 40%, transparent);
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 48%, transparent);
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, canvas 95%, var(--theme-primary, currentColor) 5%),
-    color-mix(in srgb, canvas 68%, var(--theme-primary, currentColor) 16%)
+    color-mix(in srgb, var(--theme-primary, currentColor) 14%, transparent),
+    color-mix(in srgb, var(--theme-primary, currentColor) 20%, transparent)
   );
 }
 
