@@ -308,11 +308,14 @@ function appendExportCartoucheOverlay(params: {
   logoAsset: ExportLogoAsset;
 }): void {
   const frameSource = params.sourceSvg.querySelector(".network-callout-frame");
-  const rowTextSource = params.sourceSvg.querySelector(".network-callout-row-text");
   const titleSource = params.sourceSvg.querySelector(".network-callout-title");
+  const rowTextSource =
+    params.sourceSvg.querySelector(".network-callout-row-text") ??
+    titleSource ??
+    params.sourceSvg.querySelector(".network-node-label");
   const frameStyle = window.getComputedStyle(frameSource ?? params.sourceSvg);
   const rowStyle = window.getComputedStyle(rowTextSource ?? params.sourceSvg);
-  const titleStyle = window.getComputedStyle(titleSource ?? params.sourceSvg);
+  const titleStyle = window.getComputedStyle(titleSource ?? rowTextSource ?? params.sourceSvg);
 
   const fillColor = resolveElementStyleValue(frameStyle, "fill", "rgba(223, 240, 255, 0.92)");
   const fillOpacity = resolveElementStyleValue(frameStyle, "fill-opacity", "0.92");
@@ -347,24 +350,14 @@ function appendExportCartoucheOverlay(params: {
     const rowFont = row.isTitle ? `700 11px ${titleFontFamily}` : `600 9.6px ${fontFamily}`;
     return Math.max(maxWidth, measureTextWidth(row.text, rowFont));
   }, 0);
-  const notesRawLines = (params.notes ?? "")
-    .replace(/\r\n/g, "\n")
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
-  const notesPreferredWidth = notesRawLines.reduce(
-    (maxWidth, line) => Math.max(maxWidth, measureTextWidth(line, notesFont)),
-    0
-  );
   const maxCartoucheWidth = Math.min(
     clampNumberValue(Math.round(params.width * 0.36), 250, 460),
     Math.max(180, params.width - margin * 2)
   );
   const minCartoucheWidth = Math.min(210, maxCartoucheWidth);
   const metadataDrivenWidth = padding * 2 + logoWidth + 10 + metadataMaxContentWidth;
-  const notesDrivenWidth = notesPreferredWidth > 0 ? notesPreferredWidth + padding * 2 : 0;
-  const preferredCartoucheWidth = Math.max(metadataDrivenWidth, notesDrivenWidth);
-  const cartoucheWidth = clampNumberValue(Math.round(preferredCartoucheWidth), minCartoucheWidth, maxCartoucheWidth);
+  // Keep width compact and let notes wrap; long note lines must not force a very wide cartouche.
+  const cartoucheWidth = clampNumberValue(Math.round(metadataDrivenWidth), minCartoucheWidth, maxCartoucheWidth);
   const metadataWidth = cartoucheWidth - padding * 2 - logoWidth - 10;
   const notesLines = wrapTextWithClamp(
     params.notes ?? "",
@@ -389,7 +382,7 @@ function appendExportCartoucheOverlay(params: {
   container.setAttribute("y", String(cartoucheY));
   container.setAttribute("width", String(cartoucheWidth));
   container.setAttribute("height", String(cartoucheHeight));
-  container.setAttribute("rx", "8");
+  container.setAttribute("rx", "0");
   container.setAttribute("fill", fillColor);
   container.setAttribute("fill-opacity", fillOpacity);
   container.setAttribute("stroke", strokeColor);
@@ -404,7 +397,7 @@ function appendExportCartoucheOverlay(params: {
   logoFrame.setAttribute("y", String(logoY));
   logoFrame.setAttribute("width", String(logoWidth));
   logoFrame.setAttribute("height", String(logoHeight));
-  logoFrame.setAttribute("rx", "4");
+  logoFrame.setAttribute("rx", "0");
   logoFrame.setAttribute("fill", "none");
   logoFrame.setAttribute("stroke", strokeColor);
   logoFrame.setAttribute("stroke-width", "0.8");
