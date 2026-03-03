@@ -321,19 +321,13 @@ describe("App integration UI - settings canvas render", () => {
     expect(within(restoredPanel).getByLabelText("Include frame in SVG/PNG export")).toBeChecked();
     expect(within(restoredPanel).getByLabelText("Include identity cartouche in SVG/PNG export")).not.toBeChecked();
   });
-  it("supports the canvas resize behavior mode and updates network summary viewport in visible-area-only mode", async () => {
+  it("keeps the canvas resize behavior locked to visible-area-only mode and updates network summary viewport on resize", async () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
     const canvasSettingsPanel = getPanelByHeading("Canvas render preferences");
     const resizeBehaviorSelect = within(canvasSettingsPanel).getByLabelText("Viewport resize behavior");
     expect(resizeBehaviorSelect).toHaveValue("visibleAreaOnly");
-    fireEvent.change(resizeBehaviorSelect, {
-      target: { value: "responsiveContentScale" }
-    });
-    expect(resizeBehaviorSelect).toHaveValue("responsiveContentScale");
-    fireEvent.change(resizeBehaviorSelect, {
-      target: { value: "visibleAreaOnly" }
-    });
+    expect(resizeBehaviorSelect).toBeDisabled();
     switchScreenDrawerAware("analysis");
     const networkSummaryPanel = getPanelByHeading("Network summary");
     const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");

@@ -299,10 +299,10 @@ export function SettingsWorkspaceContent({
             Viewport resize behavior
             <select
               value={canvasResizeBehaviorMode}
+              disabled
               onChange={(event) => setCanvasResizeBehaviorMode(event.target.value as CanvasResizeBehaviorMode)}
             >
-              <option value="responsiveContentScale">Responsive content scaling</option>
-              <option value="visibleAreaOnly">Resize changes visible area only (default)</option>
+              <option value="visibleAreaOnly">Resize changes visible area only</option>
             </select>
           </label>
         </div>
