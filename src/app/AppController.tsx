@@ -2289,6 +2289,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
         networkNodePositions,
         selectedWireRouteSegmentIds,
         selectedSegmentId,
+        selectedWireId,
         handleNetworkSegmentClick,
         selectedNodeId,
         selectedConnectorId,

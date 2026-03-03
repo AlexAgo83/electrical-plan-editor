@@ -106,6 +106,20 @@
   stroke-linejoin: round;
 }
 
+.network-callout-color-dot {
+  stroke: color-mix(in srgb, var(--network-node-stroke-color, #55748d) 78%, transparent);
+  stroke-width: 0.35;
+}
+
+.network-callout-table-row-highlight {
+  fill: color-mix(in srgb, var(--network-selection-color, #0f6cb8) 20%, transparent);
+}
+
+.network-callout-table-cell.is-selected-wire {
+  fill: var(--network-selection-color, #0f6cb8);
+  font-weight: 700;
+}
+
 .network-callout-table-divider {
   stroke: color-mix(in srgb, var(--network-node-stroke-color, #55748d) 70%, transparent);
   stroke-width: 0.45;
