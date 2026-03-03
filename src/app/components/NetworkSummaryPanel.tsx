@@ -270,7 +270,7 @@ function appendExportFrameOverlay(params: {
   width: number;
   height: number;
 }): void {
-  const segmentSource = params.sourceSvg.querySelector(".network-segment") as SVGElement | null;
+  const segmentSource = params.sourceSvg.querySelector(".network-segment");
   const segmentStyle = window.getComputedStyle(segmentSource ?? params.sourceSvg);
   const strokeColor = resolveElementStyleValue(segmentStyle, "stroke", "var(--network-segment-color, #7f99af)");
   const parsedStrokeWidth = Number.parseFloat(resolveElementStyleValue(segmentStyle, "stroke-width", "3"));
@@ -307,9 +307,9 @@ function appendExportCartoucheOverlay(params: {
   notes?: string;
   logoAsset: ExportLogoAsset;
 }): void {
-  const frameSource = params.sourceSvg.querySelector(".network-callout-frame") as SVGElement | null;
-  const rowTextSource = params.sourceSvg.querySelector(".network-callout-row-text") as SVGElement | null;
-  const titleSource = params.sourceSvg.querySelector(".network-callout-title") as SVGElement | null;
+  const frameSource = params.sourceSvg.querySelector(".network-callout-frame");
+  const rowTextSource = params.sourceSvg.querySelector(".network-callout-row-text");
+  const titleSource = params.sourceSvg.querySelector(".network-callout-title");
   const frameStyle = window.getComputedStyle(frameSource ?? params.sourceSvg);
   const rowStyle = window.getComputedStyle(rowTextSource ?? params.sourceSvg);
   const titleStyle = window.getComputedStyle(titleSource ?? params.sourceSvg);
