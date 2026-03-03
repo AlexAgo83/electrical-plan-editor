@@ -263,7 +263,6 @@ export function SettingsWorkspaceContent({
               <option value="small">Small</option>
               <option value="normal">Normal</option>
               <option value="large">Large</option>
-              <option value="extraLarge">Extra large</option>
             </select>
           </label>
           <label className="settings-field">
