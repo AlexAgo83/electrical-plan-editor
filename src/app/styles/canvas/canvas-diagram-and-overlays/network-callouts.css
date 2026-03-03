@@ -176,7 +176,7 @@
 }
 
 .network-svg.network-callout-text-size-small .network-callout-title {
-  font-size: 6.8px;
+  font-size: 6.4px;
 }
 
 .network-svg.network-callout-text-size-small .network-callout-subtitle {
@@ -197,7 +197,7 @@
 }
 
 .network-svg.network-callout-text-size-normal .network-callout-title {
-  font-size: 8.8px;
+  font-size: 8.3px;
 }
 
 .network-svg.network-callout-text-size-normal .network-callout-subtitle {
@@ -218,7 +218,7 @@
 }
 
 .network-svg.network-callout-text-size-large .network-callout-title {
-  font-size: 10px;
+  font-size: 9.5px;
 }
 
 .network-svg.network-callout-text-size-large .network-callout-subtitle {
@@ -236,4 +236,25 @@
 .network-svg.network-callout-text-size-large .network-callout-table-header-cell,
 .network-svg.network-callout-text-size-large .network-callout-table-cell {
   font-size: 6.3px;
+}
+
+.network-svg.network-callout-text-size-extraLarge .network-callout-title {
+  font-size: 10.9px;
+}
+
+.network-svg.network-callout-text-size-extraLarge .network-callout-subtitle {
+  font-size: 8.7px;
+}
+
+.network-svg.network-callout-text-size-extraLarge .network-callout-group-label {
+  font-size: 7.3px;
+}
+
+.network-svg.network-callout-text-size-extraLarge .network-callout-row-text {
+  font-size: 7.2px;
+}
+
+.network-svg.network-callout-text-size-extraLarge .network-callout-table-header-cell,
+.network-svg.network-callout-text-size-extraLarge .network-callout-table-cell {
+  font-size: 7.2px;
 }

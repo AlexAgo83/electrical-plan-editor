@@ -393,27 +393,28 @@ function appendExportCartoucheOverlay(params: {
 
   const logoX = cartoucheX + padding;
   const logoY = cartoucheY + padding;
-  const logoFrame = createSvgElement("rect");
-  logoFrame.setAttribute("x", String(logoX));
-  logoFrame.setAttribute("y", String(logoY));
-  logoFrame.setAttribute("width", String(logoWidth));
-  logoFrame.setAttribute("height", String(logoHeight));
-  logoFrame.setAttribute("rx", "0");
-  logoFrame.setAttribute("fill", "none");
-  logoFrame.setAttribute("stroke", strokeColor);
-  logoFrame.setAttribute("stroke-width", "0.8");
-  group.appendChild(logoFrame);
-
   if (params.logoAsset.kind === "image") {
     const image = createSvgElement("image");
-    image.setAttribute("x", String(logoX + 2));
-    image.setAttribute("y", String(logoY + 2));
-    image.setAttribute("width", String(logoWidth - 4));
-    image.setAttribute("height", String(logoHeight - 4));
+    image.setAttribute("x", String(logoX));
+    image.setAttribute("y", String(logoY));
+    image.setAttribute("width", String(logoWidth));
+    image.setAttribute("height", String(logoHeight));
     image.setAttribute("preserveAspectRatio", "xMidYMid meet");
     image.setAttribute("href", params.logoAsset.href);
     group.appendChild(image);
   } else {
+    const logoFrame = createSvgElement("rect");
+    logoFrame.setAttribute("class", "network-export-cartouche-logo-frame");
+    logoFrame.setAttribute("x", String(logoX));
+    logoFrame.setAttribute("y", String(logoY));
+    logoFrame.setAttribute("width", String(logoWidth));
+    logoFrame.setAttribute("height", String(logoHeight));
+    logoFrame.setAttribute("rx", "0");
+    logoFrame.setAttribute("fill", "none");
+    logoFrame.setAttribute("stroke", strokeColor);
+    logoFrame.setAttribute("stroke-width", "0.8");
+    group.appendChild(logoFrame);
+
     const fallbackText = createSvgElement("text");
     fallbackText.setAttribute("x", String(logoX + logoWidth / 2));
     fallbackText.setAttribute("y", String(logoY + logoHeight / 2 + 1));
@@ -746,6 +747,8 @@ function getCalloutRowFontSize(calloutTextSize: CanvasCalloutTextSize): number {
   switch (calloutTextSize) {
     case "small":
       return 4.3;
+    case "extraLarge":
+      return 7.2;
     case "large":
       return 6.3;
     case "normal":
@@ -757,12 +760,14 @@ function getCalloutRowFontSize(calloutTextSize: CanvasCalloutTextSize): number {
 function getCalloutTitleFontSize(calloutTextSize: CanvasCalloutTextSize): number {
   switch (calloutTextSize) {
     case "small":
-      return 6.8;
+      return 6.4;
+    case "extraLarge":
+      return 10.9;
     case "large":
-      return 10;
+      return 9.5;
     case "normal":
     default:
-      return 8.8;
+      return 8.3;
   }
 }
 
@@ -770,6 +775,8 @@ function getCalloutSubtitleFontSize(calloutTextSize: CanvasCalloutTextSize): num
   switch (calloutTextSize) {
     case "small":
       return 5.5;
+    case "extraLarge":
+      return 8.7;
     case "large":
       return 7.6;
     case "normal":
@@ -781,14 +788,14 @@ function getCalloutSubtitleFontSize(calloutTextSize: CanvasCalloutTextSize): num
 function buildCalloutHeaderDisplay(name: string, technicalId: string): { title: string; subtitle: string } {
   const trimmedName = name.trim();
   const trimmedTechnicalId = technicalId.trim();
-  if (trimmedName.length > 0) {
-    if (trimmedTechnicalId.length > 0 && trimmedTechnicalId !== trimmedName) {
-      return { title: trimmedName, subtitle: trimmedTechnicalId };
-    }
-    return { title: trimmedName, subtitle: "" };
-  }
   if (trimmedTechnicalId.length > 0) {
+    if (trimmedName.length > 0 && trimmedTechnicalId !== trimmedName) {
+      return { title: `${trimmedTechnicalId} · ${trimmedName}`, subtitle: "" };
+    }
     return { title: trimmedTechnicalId, subtitle: "" };
+  }
+  if (trimmedName.length > 0) {
+    return { title: trimmedName, subtitle: "" };
   }
   return { title: "(unnamed)", subtitle: "" };
 }
@@ -951,8 +958,8 @@ function buildCalloutLayoutMetrics(
     ...(showCalloutWireNames
       ? ([{ key: "wireName", header: "Wire name", textAnchor: "start" }] as const)
       : []),
-    { key: "length", header: "Length (mm)", textAnchor: "end" },
-    { key: "section", header: "Section (mm²)", textAnchor: "end" }
+    { key: "length", header: "Len", textAnchor: "end" },
+    { key: "section", header: "Sec", textAnchor: "end" }
   ];
 
   const rowFontSize = getCalloutRowFontSize(calloutTextSize);
@@ -2479,7 +2486,7 @@ export function NetworkSummaryPanel({
                         tabIndex={isVisibleInViewport ? 0 : -1}
                         focusable={isVisibleInViewport ? "true" : "false"}
                         aria-hidden={isVisibleInViewport ? undefined : true}
-                        aria-label={`Select ${callout.kind} ${callout.subtitle}`}
+                        aria-label={`Select ${callout.kind} ${callout.title}`}
                         style={isVisibleInViewport ? undefined : { pointerEvents: "none" }}
                         onMouseDown={(event) => handleCalloutMouseDown(event, callout)}
                         onClick={(event) => {

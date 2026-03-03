@@ -293,7 +293,8 @@ describe("App integration UI - network summary workflow polish", () => {
     const calloutRows = networkSummaryPanel.querySelectorAll(".network-callout-table-cell");
     expect(calloutFrames.length).toBeGreaterThanOrEqual(4);
     expect(calloutRows.length).toBeGreaterThanOrEqual(8);
-    expect(networkSummaryPanel).toHaveTextContent("Length (mm)");
+    expect(networkSummaryPanel).toHaveTextContent("Len");
+    expect(networkSummaryPanel).toHaveTextContent("Sec");
     expect(networkSummaryPanel).toHaveTextContent("W-8");
   });
 

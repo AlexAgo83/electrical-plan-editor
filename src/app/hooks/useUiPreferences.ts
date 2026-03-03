@@ -289,7 +289,7 @@ function normalizeCanvasLabelSizeMode(value: unknown): CanvasLabelSizeMode {
 }
 
 function normalizeCanvasCalloutTextSize(value: unknown): CanvasCalloutTextSize {
-  return value === "small" || value === "large" ? value : "normal";
+  return value === "small" || value === "large" || value === "extraLarge" ? value : "normal";
 }
 
 function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotationDegrees {
