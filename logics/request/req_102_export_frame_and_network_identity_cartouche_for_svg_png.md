@@ -1,8 +1,8 @@
 ## req_102_export_frame_and_network_identity_cartouche_for_svg_png - Export frame and network identity cartouche for SVG/PNG
 > From version: 1.3.0
-> Status: Draft
+> Status: Done
 > Understanding: 99% (scope refined with explicit product defaults and validation constraints)
-> Confidence: 96% (behavior contract now fully clarified for implementation)
+> Confidence: 97% (implemented and validated against UI/export/persistence matrix)
 > Complexity: High
 > Theme: UI / Export / Network metadata
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -177,6 +177,20 @@
 
 # Orchestration task
 - `logics/tasks/task_078_req_102_export_frame_and_network_identity_cartouche_for_svg_png_orchestration_and_delivery_control.md`
+
+# Delivery snapshot (2026-03-03)
+- Delivered:
+  - network metadata contract + migrations (`schemaVersion` local/file -> `3`);
+  - `Network Scope` controls for `Creation date`, `Author`, `Project code`, `Logo URL`, `Export notes`;
+  - settings toggles for export frame/cartouche with defaults (`frame=off`, `cartouche=on`);
+  - SVG/PNG export overlays (frame + bottom-right identity cartouche);
+  - logo failure fallback text `Logo indisponible`;
+  - notes clamp to `8` lines with ellipsis.
+- Validation:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+  - `npm run -s lint`
+  - `npm run -s typecheck`
+  - `npm run -s test:ci:ui`
 
 # References
 - `src/core/entities.ts`

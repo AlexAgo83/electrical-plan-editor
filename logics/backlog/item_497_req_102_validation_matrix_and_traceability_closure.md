@@ -1,9 +1,9 @@
 ## item_497_req_102_validation_matrix_and_traceability_closure - Req 102 validation matrix and traceability closure
 > From version: 1.3.0
-> Status: Draft
+> Status: Done
 > Understanding: 95%
-> Confidence: 90%
-> Progress: 0%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Quality / Traceability
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -43,4 +43,13 @@ Req_102 spans model, UI, rendering, export fallback behavior, and migrations; wi
 # Notes
 - Derived from `logics/request/req_102_export_frame_and_network_identity_cartouche_for_svg_png.md`.
 - Orchestrated by `logics/tasks/task_078_req_102_export_frame_and_network_identity_cartouche_for_svg_png_orchestration_and_delivery_control.md`.
-
+- Validation matrix executed:
+  - settings toggles defaults/persistence (`frame=off`, `cartouche=on`) -> `src/tests/app.ui.settings-canvas-render.spec.tsx`;
+  - network metadata authoring + clear flow -> `src/tests/app.ui.networks.spec.tsx`;
+  - SVG export overlay parity + logo fallback + notes clamp -> `src/tests/app.ui.network-summary-bom-export.spec.tsx`;
+  - persistence/network-file compatibility -> `src/tests/persistence.localStorage.spec.ts`, `src/tests/portability.network-file.spec.ts`.
+- Closure evidence:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s test:ci:ui` ✅

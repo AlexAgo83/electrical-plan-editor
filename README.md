@@ -56,6 +56,14 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - Keyboard-accessible segment selection with labeled hit targets and improved interactive SVG semantics
 - Quick entity navigation in the canvas with contextual `Modeling` / `Analysis` switch (when available)
 - Network-level export identity metadata contract (`author`, `project code`, `logo URL`, `export notes`) with persistence and import/export compatibility normalization
+- Network Scope export identity authoring:
+  - editable `Creation date`, `Author`, `Project code`, `Logo URL`, `Export notes`
+  - creation date remains backed by `network.createdAt` and exports as local `YYYY-MM-DD`
+- Export overlays in `SVG/PNG`:
+  - optional frame (`off` by default) aligned with segment visual style
+  - optional identity cartouche (`on` by default) with network name, author, project code, creation date, logo area, and notes
+  - logo fallback text `Logo indisponible` when logo URL is invalid/unreachable/CORS-blocked
+  - notes clamp to `8` visible lines with ellipsis for overflow
 - Network-scoped `Catalog` with catalog-first connector creation and optional splice catalog association (linked splice still derives manufacturer reference + bounded connection count from catalog items)
 - Splice capacity model supports `bounded` and `unbounded` port modes (`∞` rendering in lists, adaptive visible port slots in analysis, and mode-safe wire endpoint validation)
 - New network bootstrap seeds `3` default catalog items (`CAT-2W-STD`, `CAT-6P-STD`, `CAT-8W-STD`) with deterministic names/prices
@@ -77,7 +85,7 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 - Zoom-invariant node shapes now scale border stroke weight proportionally (default/selected/focus states) while preserving existing hitbox behavior
 - Canvas render setting `Viewport resize behavior` with `Resize changes visible area only` mode under `Reset zoom target (%)`
 - `Network summary` header exports:
-  - `Export PNG`
+  - `Export SVG` or `Export PNG` (controlled by Canvas tools export format setting)
   - `Export BOM CSV` (catalog-aggregated BOM with pricing context metadata, HT totals, and conditional TTC columns/totals when tax is enabled)
 - Theme presets including multiple light and dark themes
 - Local persistence with schema versioning and migrations
@@ -219,6 +227,10 @@ This repository ships a broad Logics skills kit under `logics/skills/`, but day-
 ## Persistence Versioning
 
 The app uses explicit versioned payload contracts for both local storage and network export files.
+
+- Current schema versions:
+  - local persistence: `3`
+  - network import/export file: `3`
 
 - Local workspace persistence:
   - primary key: configured `VITE_STORAGE_KEY` (default `electrical-plan-editor.state`)

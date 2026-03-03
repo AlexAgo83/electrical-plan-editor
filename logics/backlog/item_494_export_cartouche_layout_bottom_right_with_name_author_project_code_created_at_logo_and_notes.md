@@ -1,9 +1,9 @@
 ## item_494_export_cartouche_layout_bottom_right_with_name_author_project_code_created_at_logo_and_notes - Export cartouche layout bottom-right with name, author, project code, creation date, logo, and notes
 > From version: 1.3.0
-> Status: Draft
+> Status: Done
 > Understanding: 98% (cartouche toggle default and notes clamp behavior clarified)
-> Confidence: 93%
-> Progress: 5%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: High
 > Theme: UI / Export layout
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -50,3 +50,8 @@ Export artifacts currently miss a structured bottom-right identity block, making
 - Derived from `logics/request/req_102_export_frame_and_network_identity_cartouche_for_svg_png.md`.
 - Depends on `item_491_network_metadata_model_extension_author_project_code_logo_url_export_notes.md`.
 - Orchestrated by `logics/tasks/task_078_req_102_export_frame_and_network_identity_cartouche_for_svg_png_orchestration_and_delivery_control.md`.
+- Implemented:
+  - `src/app/components/workspace/SettingsWorkspaceContent.tsx` toggle `Include identity cartouche in SVG/PNG export` (default on);
+  - `src/app/components/NetworkSummaryPanel.tsx` bottom-right cartouche overlay containing network name, author, project code, local `YYYY-MM-DD` creation date, logo area, and notes block;
+  - deterministic notes wrapping/clamping (`8` lines max with ellipsis) and bounded layout sizing;
+  - regression tests in `src/tests/app.ui.network-summary-bom-export.spec.tsx` validating cartouche presence/absence and notes clamp behavior.
