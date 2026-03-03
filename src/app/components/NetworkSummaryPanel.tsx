@@ -327,24 +327,45 @@ function appendExportCartoucheOverlay(params: {
   const titleFontFamily = resolveElementStyleValue(titleStyle, "font-family", fontFamily);
 
   const margin = Math.max(12, Math.round(Math.min(params.width, params.height) * 0.02));
-  const cartoucheWidth = clampNumberValue(Math.round(params.width * 0.36), 250, 460);
   const padding = 12;
   const logoWidth = 84;
   const logoHeight = 46;
   const metadataX = padding + logoWidth + 10;
-  const metadataWidth = cartoucheWidth - padding * 2 - logoWidth - 10;
   const metadataLineHeight = 14;
   const notesLineHeight = 12;
   const notesFont = `500 ${notesLineHeight}px ${fontFamily}`;
 
   const createdAtLabel = formatIsoToLocalDateInput(params.createdAt);
   const normalizedNetworkName = params.networkName.trim().length > 0 ? params.networkName.trim() : "Unnamed network";
-  const metadataLines = [
-    `Network: ${normalizedNetworkName}`,
-    ...(params.author?.trim() ? [`Author: ${params.author.trim()}`] : []),
-    ...(params.projectCode?.trim() ? [`Code: ${params.projectCode.trim()}`] : []),
-    `Created: ${createdAtLabel.length > 0 ? createdAtLabel : "N/A"}`
+  const metadataRows = [
+    { text: `Network: ${normalizedNetworkName}`, isTitle: true },
+    ...(params.author?.trim() ? [{ text: `Author: ${params.author.trim()}`, isTitle: false }] : []),
+    ...(params.projectCode?.trim() ? [{ text: `Code: ${params.projectCode.trim()}`, isTitle: false }] : []),
+    { text: `Created: ${createdAtLabel.length > 0 ? createdAtLabel : "N/A"}`, isTitle: false }
   ];
+  const metadataMaxContentWidth = metadataRows.reduce((maxWidth, row) => {
+    const rowFont = row.isTitle ? `700 11px ${titleFontFamily}` : `600 9.6px ${fontFamily}`;
+    return Math.max(maxWidth, measureTextWidth(row.text, rowFont));
+  }, 0);
+  const notesRawLines = (params.notes ?? "")
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+  const notesPreferredWidth = notesRawLines.reduce(
+    (maxWidth, line) => Math.max(maxWidth, measureTextWidth(line, notesFont)),
+    0
+  );
+  const maxCartoucheWidth = Math.min(
+    clampNumberValue(Math.round(params.width * 0.36), 250, 460),
+    Math.max(180, params.width - margin * 2)
+  );
+  const minCartoucheWidth = Math.min(210, maxCartoucheWidth);
+  const metadataDrivenWidth = padding * 2 + logoWidth + 10 + metadataMaxContentWidth;
+  const notesDrivenWidth = notesPreferredWidth > 0 ? notesPreferredWidth + padding * 2 : 0;
+  const preferredCartoucheWidth = Math.max(metadataDrivenWidth, notesDrivenWidth);
+  const cartoucheWidth = clampNumberValue(Math.round(preferredCartoucheWidth), minCartoucheWidth, maxCartoucheWidth);
+  const metadataWidth = cartoucheWidth - padding * 2 - logoWidth - 10;
   const notesLines = wrapTextWithClamp(
     params.notes ?? "",
     cartoucheWidth - padding * 2,
@@ -352,7 +373,7 @@ function appendExportCartoucheOverlay(params: {
     8
   );
   const hasNotes = notesLines.length > 0;
-  const metadataHeight = Math.max(logoHeight, metadataLines.length * metadataLineHeight);
+  const metadataHeight = Math.max(logoHeight, metadataRows.length * metadataLineHeight);
   const notesBlockHeight = hasNotes ? 8 + 12 + notesLines.length * notesLineHeight : 0;
   const cartoucheHeight = padding * 2 + metadataHeight + notesBlockHeight;
   const cartoucheX = Math.max(margin, params.width - margin - cartoucheWidth);
@@ -412,23 +433,20 @@ function appendExportCartoucheOverlay(params: {
     group.appendChild(fallbackText);
   }
 
-  metadataLines.forEach((line, index) => {
+  metadataRows.forEach((metadataRow, index) => {
     const row = createSvgElement("text");
+    const rowFont = metadataRow.isTitle ? `700 11px ${titleFontFamily}` : `600 9.6px ${fontFamily}`;
     row.setAttribute("class", "network-export-cartouche-meta");
     row.setAttribute("x", String(cartoucheX + metadataX));
     row.setAttribute("y", String(cartoucheY + padding + 11 + index * metadataLineHeight));
-    row.setAttribute("fill", index === 0 ? textColor : subtleTextColor);
-    row.setAttribute("font-family", index === 0 ? titleFontFamily : fontFamily);
-    row.setAttribute("font-size", index === 0 ? "11px" : "9.6px");
-    row.setAttribute("font-weight", index === 0 ? "700" : "600");
-    if (measureTextWidth(line, `${index === 0 ? "700 11px" : "600 9.6px"} ${fontFamily}`) > metadataWidth) {
-      row.textContent = truncateLineWithEllipsis(
-        line,
-        metadataWidth,
-        `${index === 0 ? "700 11px" : "600 9.6px"} ${fontFamily}`
-      );
+    row.setAttribute("fill", metadataRow.isTitle ? textColor : subtleTextColor);
+    row.setAttribute("font-family", metadataRow.isTitle ? titleFontFamily : fontFamily);
+    row.setAttribute("font-size", metadataRow.isTitle ? "11px" : "9.6px");
+    row.setAttribute("font-weight", metadataRow.isTitle ? "700" : "600");
+    if (measureTextWidth(metadataRow.text, rowFont) > metadataWidth) {
+      row.textContent = truncateLineWithEllipsis(metadataRow.text, metadataWidth, rowFont);
     } else {
-      row.textContent = line;
+      row.textContent = metadataRow.text;
     }
     group.appendChild(row);
   });
