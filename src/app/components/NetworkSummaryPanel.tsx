@@ -763,42 +763,42 @@ function normalizeVector(x: number, y: number): { x: number; y: number } {
 function getCalloutRowFontSize(calloutTextSize: CanvasCalloutTextSize): number {
   switch (calloutTextSize) {
     case "small":
-      return 4.3;
+      return 5.5;
     case "extraLarge":
       return 7.2;
     case "large":
-      return 6.3;
+      return 7.2;
     case "normal":
     default:
-      return 5.5;
+      return 6.3;
   }
 }
 
 function getCalloutTitleFontSize(calloutTextSize: CanvasCalloutTextSize): number {
   switch (calloutTextSize) {
     case "small":
-      return 6.4;
+      return 8.3;
     case "extraLarge":
       return 10.9;
     case "large":
-      return 9.5;
+      return 10.9;
     case "normal":
     default:
-      return 8.3;
+      return 9.5;
   }
 }
 
 function getCalloutSubtitleFontSize(calloutTextSize: CanvasCalloutTextSize): number {
   switch (calloutTextSize) {
     case "small":
-      return 5.5;
+      return 6.9;
     case "extraLarge":
       return 8.7;
     case "large":
-      return 7.6;
+      return 8.7;
     case "normal":
     default:
-      return 6.9;
+      return 7.6;
   }
 }
 
