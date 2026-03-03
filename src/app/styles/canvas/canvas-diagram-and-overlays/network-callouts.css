@@ -1,10 +1,13 @@
 .network-callout-leader-line {
   stroke: var(--network-node-stroke-color, #55748d);
-  stroke-width: 1.05;
-  stroke-dasharray: 1.7 2.4;
+  stroke-width: var(--network-callout-leader-stroke-width, 1.05);
+  stroke-dasharray: var(--network-callout-leader-dasharray, 1.7 2.4);
   stroke-linecap: round;
   opacity: 0.92;
   pointer-events: none;
+}
+.network-svg.network-svg--stroke-invariant .network-callout-leader-line {
+  vector-effect: non-scaling-stroke;
 }
 
 .network-callout-anchor {

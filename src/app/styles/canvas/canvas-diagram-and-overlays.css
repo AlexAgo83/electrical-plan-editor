@@ -184,16 +184,16 @@
 }
 .network-segment {
   stroke: var(--network-segment-color, #7f99af);
-  stroke-width: 3;
+  stroke-width: var(--network-segment-stroke-width, 3);
   stroke-linecap: round;
 }
 .network-segment.is-wire-highlighted {
   stroke: var(--network-wire-highlight-color, #4f8d2d);
-  stroke-width: 5;
+  stroke-width: var(--network-segment-stroke-emphasis-width, 5);
 }
 .network-segment.is-selected {
   stroke: var(--network-selection-color, #0f6cb8);
-  stroke-width: 5;
+  stroke-width: var(--network-segment-stroke-emphasis-width, 5);
 }
 .network-entity-group.is-deemphasized {
   opacity: 0.5;
@@ -204,6 +204,12 @@
   stroke-linecap: round;
   cursor: pointer;
   outline: none;
+}
+.network-svg.network-svg--stroke-invariant .network-segment,
+.network-svg.network-svg--stroke-invariant .network-segment.is-wire-highlighted,
+.network-svg.network-svg--stroke-invariant .network-segment.is-selected,
+.network-svg.network-svg--stroke-invariant .network-segment-hitbox {
+  vector-effect: non-scaling-stroke;
 }
 .network-segment-hitbox:focus,
 .network-segment-hitbox:focus-visible {

@@ -1168,6 +1168,18 @@ export function NetworkSummaryPanel({
     : 1;
   const nodeStrokeWidth = clampNumber(2 * normalizedNodeStrokeScale, 1.4, 3.4);
   const nodeStrokeEmphasisWidth = clampNumber(3 * normalizedNodeStrokeScale, 2.1, 5.1);
+  const segmentStrokeWidth = clampNumber(3 * normalizedNodeStrokeScale, 1.95, 4.05);
+  const segmentStrokeEmphasisWidth = clampNumber(5 * normalizedNodeStrokeScale, 3.25, 6.75);
+  const calloutLeaderStrokeWidth = clampNumber(1.05 * normalizedNodeStrokeScale, 0.68, 1.42);
+  const calloutLeaderDashFirst = clampNumber(1.7 * normalizedNodeStrokeScale, 1.1, 2.3);
+  const calloutLeaderDashSecond = clampNumber(2.4 * normalizedNodeStrokeScale, 1.56, 3.24);
+  const networkSvgStrokeVariables = {
+    "--network-segment-stroke-width": `${segmentStrokeWidth}`,
+    "--network-segment-stroke-emphasis-width": `${segmentStrokeEmphasisWidth}`,
+    "--network-callout-leader-stroke-width": `${calloutLeaderStrokeWidth}`,
+    "--network-callout-leader-dasharray": `${calloutLeaderDashFirst} ${calloutLeaderDashSecond}`
+  } as CSSProperties;
+  const useStrokeInvariantLines = resizeBehaviorMode === "visibleAreaOnly";
   const visibleModelMinX = (0 - networkOffset.x) / effectiveScale;
   const visibleModelMaxX = (networkViewWidth - networkOffset.x) / effectiveScale;
   const visibleModelMinY = (0 - networkOffset.y) / effectiveScale;
@@ -2190,9 +2202,10 @@ export function NetworkSummaryPanel({
               />
               <svg
                 ref={networkSvgRef}
-                className={`network-svg network-canvas--label-stroke-${labelStrokeMode} network-canvas--label-size-${labelSizeMode} network-callout-text-size-${calloutTextSize}`}
+                className={`network-svg${useStrokeInvariantLines ? " network-svg--stroke-invariant" : ""} network-canvas--label-stroke-${labelStrokeMode} network-canvas--label-size-${labelSizeMode} network-callout-text-size-${calloutTextSize}`}
                 aria-label="2D network diagram"
                 viewBox={`0 0 ${networkViewWidth} ${networkViewHeight}`}
+                style={networkSvgStrokeVariables}
                 onMouseDown={handleNetworkCanvasMouseDown}
                 onClick={handleNetworkCanvasClick}
                 onWheel={handleNetworkWheel}
