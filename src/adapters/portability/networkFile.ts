@@ -13,12 +13,20 @@ import type {
 } from "../../core/entities";
 import { normalizeWireColorState } from "../../core/cableColors";
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
+import {
+  isNetworkLogoUrlValid,
+  isNetworkProjectCodeValid,
+  normalizeNetworkAuthor,
+  normalizeNetworkExportNotes,
+  normalizeNetworkLogoUrl,
+  normalizeNetworkProjectCode
+} from "../../core/networkMetadata";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeSplicePortMode, normalizeUnboundedPortCountFallback } from "../../core/splicePortMode";
 import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
 import { bootstrapCatalogForScopedState, normalizeCatalogItem, normalizeManufacturerReference } from "../../store/catalog";
 
-export const NETWORK_FILE_SCHEMA_VERSION = 2;
+export const NETWORK_FILE_SCHEMA_VERSION = 3;
 export const NETWORK_FILE_PAYLOAD_KIND = "electrical-plan-editor.network-export";
 
 export type NetworkExportScope = "active" | "selected" | "all";
@@ -224,6 +232,10 @@ function isExportedNetworkBundle(value: unknown): value is ExportedNetworkBundle
     typeof network.id === "string" &&
     typeof network.name === "string" &&
     typeof network.technicalId === "string" &&
+    (network.author === undefined || typeof network.author === "string") &&
+    (network.projectCode === undefined || typeof network.projectCode === "string") &&
+    (network.logoUrl === undefined || typeof network.logoUrl === "string") &&
+    (network.exportNotes === undefined || typeof network.exportNotes === "string") &&
     typeof network.createdAt === "string" &&
     typeof network.updatedAt === "string"
   );
@@ -343,6 +355,41 @@ function normalizeImportedNetworkTimestamps(
   };
 }
 
+function normalizeImportedNetworkMetadata(
+  network: Network,
+  warnings: string[]
+): Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes"> {
+  const normalizedAuthor = normalizeNetworkAuthor(network.author);
+  const normalizedProjectCode = normalizeNetworkProjectCode(network.projectCode);
+  const normalizedLogoUrl = normalizeNetworkLogoUrl(network.logoUrl);
+  const normalizedExportNotes = normalizeNetworkExportNotes(network.exportNotes);
+
+  const appliedFixes: string[] = [];
+  if (normalizedProjectCode !== undefined && !isNetworkProjectCodeValid(normalizedProjectCode)) {
+    appliedFixes.push("projectCode<-undefined");
+  }
+  if (normalizedLogoUrl !== undefined && !isNetworkLogoUrlValid(normalizedLogoUrl)) {
+    appliedFixes.push("logoUrl<-undefined");
+  }
+
+  if (appliedFixes.length > 0) {
+    warnings.push(`Network '${network.technicalId}' metadata was normalized (${appliedFixes.join(", ")}).`);
+  }
+
+  return {
+    author: normalizedAuthor,
+    projectCode:
+      normalizedProjectCode !== undefined && isNetworkProjectCodeValid(normalizedProjectCode)
+        ? normalizedProjectCode
+        : undefined,
+    logoUrl:
+      normalizedLogoUrl !== undefined && isNetworkLogoUrlValid(normalizedLogoUrl)
+        ? normalizedLogoUrl
+        : undefined,
+    exportNotes: normalizedExportNotes
+  };
+}
+
 function resolveNetworkIdsForScope(
   state: AppState,
   scope: NetworkExportScope,
@@ -375,10 +422,22 @@ export function buildNetworkFilePayload(
         return null;
       }
 
+      const normalizedProjectCode = normalizeNetworkProjectCode(network.projectCode);
+      const normalizedLogoUrl = normalizeNetworkLogoUrl(network.logoUrl);
+      const normalizedNetwork: Network = {
+        ...network,
+        author: normalizeNetworkAuthor(network.author),
+        projectCode:
+          normalizedProjectCode !== undefined && isNetworkProjectCodeValid(normalizedProjectCode)
+            ? normalizedProjectCode
+            : undefined,
+        logoUrl:
+          normalizedLogoUrl !== undefined && isNetworkLogoUrlValid(normalizedLogoUrl) ? normalizedLogoUrl : undefined,
+        exportNotes: normalizeNetworkExportNotes(network.exportNotes)
+      };
+
       return {
-        network: {
-          ...network
-        },
+        network: normalizedNetwork,
         state: normalizeScopedState(scoped)
       } satisfies ExportedNetworkBundle;
     })
@@ -479,7 +538,7 @@ export function parseNetworkFilePayload(rawJson: string): { payload: NetworkFile
     };
   }
 
-  if (schemaVersion !== 0 && schemaVersion !== 1 && schemaVersion !== 2) {
+  if (schemaVersion !== 0 && schemaVersion !== 1 && schemaVersion !== 2 && schemaVersion !== 3) {
     return {
       payload: null,
       error: `Unsupported file schema version '${String(schemaVersion)}'.`
@@ -562,13 +621,15 @@ export function resolveImportConflicts(
 
     const networkId = importedId as NetworkId;
     const normalizedTimestamps = normalizeImportedNetworkTimestamps(sourceNetwork, importBaseIso, summary.warnings);
+    const normalizedMetadata = normalizeImportedNetworkMetadata(sourceNetwork, summary.warnings);
     networks.push({
       ...sourceNetwork,
       id: networkId,
       name: normalizedName,
       technicalId: importedTechnicalId,
       createdAt: normalizedTimestamps.createdAt,
-      updatedAt: normalizedTimestamps.updatedAt
+      updatedAt: normalizedTimestamps.updatedAt,
+      ...normalizedMetadata
     });
     networkStates[networkId] = normalizeScopedState(bundle.state);
     summary.importedNetworkIds.push(networkId);

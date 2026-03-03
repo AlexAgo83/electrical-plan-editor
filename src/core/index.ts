@@ -4,3 +4,4 @@ export * from "./graph";
 export * from "./pathfinding";
 export * from "./schema";
 export * from "./wireSection";
+export * from "./networkMetadata";

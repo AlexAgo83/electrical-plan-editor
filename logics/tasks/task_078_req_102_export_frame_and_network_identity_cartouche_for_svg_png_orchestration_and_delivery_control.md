@@ -1,9 +1,9 @@
 ## task_078_req_102_export_frame_and_network_identity_cartouche_for_svg_png_orchestration_and_delivery_control - Req 102 export frame and network identity cartouche orchestration and delivery control
 > From version: 1.3.0
-> Status: Draft
+> Status: In Progress
 > Understanding: 99% (orchestration constraints and defaults fully clarified)
 > Confidence: 94%
-> Progress: 5%
+> Progress: 32%
 > Complexity: High
 > Theme: UI / Export / Persistence
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -36,7 +36,7 @@
   - `logoUrl` allowed schemes: `http`, `https`, `data:image/*`.
 
 # Plan
-- [ ] 1. Implement network metadata contract extension and compatibility baseline (`item_491`, `item_496`)
+- [x] 1. Implement network metadata contract extension and compatibility baseline (`item_491`, `item_496`)
   - extend domain/store/adapters contracts with deterministic defaults and normalization;
   - add migration/portability coverage for legacy payload compatibility.
 - [ ] 2. Deliver authoring surfaces in Network Scope (`item_492`)
@@ -74,4 +74,7 @@
 - [ ] Status is `Done` and progress is `100%`.
 
 # Report
-- Pending implementation.
+- 2026-03-03: Completed model/store contract extension for network identity metadata (`author`, `projectCode`, `logoUrl`, `exportNotes`) with reducer-level normalization/validation guards.
+- 2026-03-03: Upgraded compatibility baseline:
+  - persistence migration schema bumped to `v3` with incremental pipeline step (`v2 -> v3`);
+  - portability network-file schema bumped to `v3` with metadata normalization on export/import and legacy version acceptance retained (`v0..v3`).

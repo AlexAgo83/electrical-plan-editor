@@ -1,5 +1,14 @@
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import { normalizeWireColorState } from "../../core/cableColors";
+import {
+  isNetworkLogoUrlValid,
+  isNetworkProjectCodeValid,
+  normalizeNetworkAuthor,
+  normalizeNetworkExportNotes,
+  normalizeNetworkIsoTimestamp,
+  normalizeNetworkLogoUrl,
+  normalizeNetworkProjectCode
+} from "../../core/networkMetadata";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeSplicePortMode, normalizeUnboundedPortCountFallback } from "../../core/splicePortMode";
 import type {
@@ -7,6 +16,8 @@ import type {
   CatalogItemId,
   Connector,
   ConnectorId,
+  Network,
+  NetworkId,
   NetworkNode,
   NodeId,
   Segment,
@@ -25,7 +36,7 @@ import {
   createInitialState
 } from "../../store/types";
 
-export const PERSISTED_STATE_SCHEMA_VERSION = 2;
+export const PERSISTED_STATE_SCHEMA_VERSION = 3;
 export const PERSISTED_STATE_PAYLOAD_KIND = "electrical-plan-editor.workspace-state";
 
 type PlainObject = Record<string, unknown>;
@@ -218,6 +229,58 @@ function normalizeCatalogEntityState(
   return { byId, allIds };
 }
 
+function normalizeNetworkEntityState(
+  candidate: EntityState<Network, NetworkId>
+): EntityState<Network, NetworkId> | null {
+  const byId = {} as EntityState<Network, NetworkId>["byId"];
+  const allIds: NetworkId[] = [];
+
+  for (const networkId of candidate.allIds) {
+    if (typeof networkId !== "string") {
+      return null;
+    }
+
+    const network = candidate.byId[networkId];
+    if (!isRecord(network)) {
+      return null;
+    }
+
+    const normalizedName = typeof network.name === "string" ? network.name.trim() : "";
+    const normalizedTechnicalId = typeof network.technicalId === "string" ? network.technicalId.trim() : "";
+    if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
+      return null;
+    }
+
+    const normalizedCreatedAt = normalizeNetworkIsoTimestamp(network.createdAt, DEFAULT_NETWORK_CREATED_AT);
+    const normalizedUpdatedAt = normalizeNetworkIsoTimestamp(network.updatedAt, normalizedCreatedAt);
+    const normalizedProjectCode = normalizeNetworkProjectCode(network.projectCode);
+    const normalizedLogoUrl = normalizeNetworkLogoUrl(network.logoUrl);
+
+    byId[networkId] = {
+      id: networkId,
+      name: normalizedName,
+      technicalId: normalizedTechnicalId,
+      description: typeof network.description === "string" ? network.description.trim() || undefined : undefined,
+      author: normalizeNetworkAuthor(network.author),
+      projectCode:
+        normalizedProjectCode !== undefined && isNetworkProjectCodeValid(normalizedProjectCode)
+          ? normalizedProjectCode
+          : undefined,
+      logoUrl:
+        normalizedLogoUrl !== undefined && isNetworkLogoUrlValid(normalizedLogoUrl) ? normalizedLogoUrl : undefined,
+      exportNotes: normalizeNetworkExportNotes(network.exportNotes),
+      createdAt: normalizedCreatedAt,
+      updatedAt: normalizedUpdatedAt
+    };
+    allIds.push(networkId);
+  }
+
+  return {
+    byId,
+    allIds
+  };
+}
+
 function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | null {
   if (!isRecord(candidate)) {
     return null;
@@ -275,18 +338,15 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     return null;
   }
 
-  const rawNetworks = candidate.networks as AppState["networks"];
+  const rawNetworks = candidate.networks as EntityState<Network, NetworkId>;
+  const normalizedNetworks = normalizeNetworkEntityState(rawNetworks);
+  if (normalizedNetworks === null) {
+    return null;
+  }
   const rawNetworkStates = candidate.networkStates;
   const normalizedNetworkStates = {} as AppState["networkStates"];
 
-  for (const networkId of rawNetworks.allIds) {
-    if (typeof networkId !== "string") {
-      return null;
-    }
-    const network = rawNetworks.byId[networkId];
-    if (!isRecord(network)) {
-      return null;
-    }
+  for (const networkId of normalizedNetworks.allIds) {
     const scoped = normalizeNetworkScopedState(rawNetworkStates[networkId]);
     if (scoped === null) {
       return null;
@@ -297,6 +357,7 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
   const candidateState = {
     ...(candidate as unknown as AppState),
     schemaVersion: APP_SCHEMA_VERSION,
+    networks: normalizedNetworks,
     networkStates: normalizedNetworkStates,
     catalogItems:
       candidate.catalogItems !== undefined
@@ -574,8 +635,8 @@ function migrateLegacySingleNetworkStateToCurrent(
   };
 }
 
-type PipelineVersion = 1 | 2;
-const CURRENT_PIPELINE_VERSION: PipelineVersion = 2;
+type PipelineVersion = 1 | 2 | 3;
+const CURRENT_PIPELINE_VERSION: PipelineVersion = 3;
 
 interface PipelineSnapshot {
   version: PipelineVersion;
@@ -590,6 +651,10 @@ const PIPELINE_MIGRATIONS: Record<Exclude<PipelineVersion, typeof CURRENT_PIPELI
   1: (snapshot) => ({
     ...snapshot,
     version: 2
+  }),
+  2: (snapshot) => ({
+    ...snapshot,
+    version: 3
   })
 };
 

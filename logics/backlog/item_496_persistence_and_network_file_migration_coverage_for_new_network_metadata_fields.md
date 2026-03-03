@@ -1,9 +1,9 @@
 ## item_496_persistence_and_network_file_migration_coverage_for_new_network_metadata_fields - Persistence and network file migration coverage for new network metadata fields
 > From version: 1.3.0
-> Status: Draft
+> Status: In Progress
 > Understanding: 96%
 > Confidence: 90%
-> Progress: 0%
+> Progress: 65%
 > Complexity: High
 > Theme: Persistence / Portability
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -41,4 +41,9 @@ New network metadata fields introduce schema-evolution risk for local storage an
 - Derived from `logics/request/req_102_export_frame_and_network_identity_cartouche_for_svg_png.md`.
 - Depends on `item_491_network_metadata_model_extension_author_project_code_logo_url_export_notes.md`.
 - Orchestrated by `logics/tasks/task_078_req_102_export_frame_and_network_identity_cartouche_for_svg_png_orchestration_and_delivery_control.md`.
-
+- Implemented baseline:
+  - persistence schema version bumped to `v3` with migration step `v2 -> v3`;
+  - legacy/current payload hydration now normalizes network metadata fields and drops invalid metadata safely;
+  - network-file portability schema bumped to `v3` with import/export metadata normalization.
+- Remaining:
+  - dedicated regression coverage completion (tests) and closure evidence update.
