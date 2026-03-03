@@ -211,6 +211,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "No": "Non",
   "Responsive content scaling": "Mise à l'échelle responsive du contenu",
   "Resize changes visible area only (default)": "Le redimensionnement change uniquement la zone visible (défaut)",
+  "Resize changes visible area only": "Le redimensionnement change uniquement la zone visible",
   "Show grid by default": "Afficher la grille par défaut",
   "Snap node movement by default": "Aligner le déplacement des nœuds par défaut",
   "Lock node movement by default": "Verrouiller le déplacement des nœuds par défaut",
