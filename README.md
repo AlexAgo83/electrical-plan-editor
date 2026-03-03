@@ -55,6 +55,7 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - Canvas defaults for grid/snap/lock/overlays/segment lengths/callouts and PNG background export
   - Keyboard-accessible segment selection with labeled hit targets and improved interactive SVG semantics
 - Quick entity navigation in the canvas with contextual `Modeling` / `Analysis` switch (when available)
+- Network-level export identity metadata contract (`author`, `project code`, `logo URL`, `export notes`) with persistence and import/export compatibility normalization
 - Network-scoped `Catalog` with catalog-first connector creation and optional splice catalog association (linked splice still derives manufacturer reference + bounded connection count from catalog items)
 - Splice capacity model supports `bounded` and `unbounded` port modes (`∞` rendering in lists, adaptive visible port slots in analysis, and mode-safe wire endpoint validation)
 - New network bootstrap seeds `3` default catalog items (`CAT-2W-STD`, `CAT-6P-STD`, `CAT-8W-STD`) with deterministic names/prices

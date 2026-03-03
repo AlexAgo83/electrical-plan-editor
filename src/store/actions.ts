@@ -45,6 +45,11 @@ export type AppAction =
         name: string;
         technicalId: string;
         description?: string;
+        createdAt?: string;
+        author?: string;
+        projectCode?: string;
+        logoUrl?: string;
+        exportNotes?: string;
         updatedAt: string;
       };
     }
@@ -136,10 +141,28 @@ export const appActions = {
     name: string,
     technicalId: string,
     updatedAt: string,
-    description?: string
+    description?: string,
+    metadata?: {
+      createdAt?: string;
+      author?: string;
+      projectCode?: string;
+      logoUrl?: string;
+      exportNotes?: string;
+    }
   ): AppAction => ({
     type: "network/update",
-    payload: { id, name, technicalId, updatedAt, description }
+    payload: {
+      id,
+      name,
+      technicalId,
+      updatedAt,
+      description,
+      createdAt: metadata?.createdAt,
+      author: metadata?.author,
+      projectCode: metadata?.projectCode,
+      logoUrl: metadata?.logoUrl,
+      exportNotes: metadata?.exportNotes
+    }
   }),
   duplicateNetwork: (sourceNetworkId: NetworkId, network: Network): AppAction => ({
     type: "network/duplicate",

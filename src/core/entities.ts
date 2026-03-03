@@ -15,6 +15,10 @@ export interface Network {
   name: string;
   technicalId: string;
   description?: string;
+  author?: string;
+  projectCode?: string;
+  logoUrl?: string;
+  exportNotes?: string;
   createdAt: string;
   updatedAt: string;
 }
