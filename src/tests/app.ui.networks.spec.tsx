@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { ConnectorId, NetworkId } from "../core/entities";
+import { formatIsoToLocalDateInput } from "../core/networkMetadata";
 import { appActions, appReducer, createInitialState } from "../store";
 import { getPanelByHeading, renderAppWithState, switchScreen, switchScreenDrawerAware } from "./helpers/app-ui-test-utils";
 
@@ -270,6 +271,65 @@ describe("App integration UI - networks", () => {
       expect(updatedNetwork?.name).toBe("Main network updated");
       expect(updatedNetwork?.technicalId).toBe("NET-MAIN-UPD");
       expect(within(networkScopePanel).getByText("NET-MAIN-UPD")).toBeInTheDocument();
+    });
+  });
+
+  it("edits and clears export identity metadata from the network form", async () => {
+    const { store } = renderAppWithState(createInitialState());
+    switchScreen("networkScope");
+
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    fireEvent.click(within(networkScopePanel).getByText("Main network sample").closest("tr") as HTMLElement);
+    const formPanel = getPanelByHeading("Edit network");
+
+    fireEvent.change(within(formPanel).getByLabelText("Creation date"), {
+      target: { value: "2026-03-01" }
+    });
+    fireEvent.change(within(formPanel).getByLabelText("Author (optional)"), {
+      target: { value: "Alice Martin" }
+    });
+    fireEvent.change(within(formPanel).getByLabelText(/Project code \(optional\)/i), {
+      target: { value: "PRJ-42/A" }
+    });
+    fireEvent.change(within(formPanel).getByLabelText(/Logo URL \(optional\)/i), {
+      target: { value: "https://example.com/logo.png" }
+    });
+    fireEvent.change(within(formPanel).getByLabelText("Export notes (optional)"), {
+      target: { value: "First line\nSecond line" }
+    });
+    fireEvent.click(within(formPanel).getByRole("button", { name: "Save network" }));
+
+    await waitFor(() => {
+      const activeNetworkId = store.getState().activeNetworkId as NetworkId;
+      const updatedNetwork = store.getState().networks.byId[activeNetworkId];
+      expect(updatedNetwork?.author).toBe("Alice Martin");
+      expect(updatedNetwork?.projectCode).toBe("PRJ-42/A");
+      expect(updatedNetwork?.logoUrl).toBe("https://example.com/logo.png");
+      expect(updatedNetwork?.exportNotes).toBe("First line\nSecond line");
+      expect(formatIsoToLocalDateInput(updatedNetwork?.createdAt ?? "")).toBe("2026-03-01");
+    });
+
+    fireEvent.change(within(formPanel).getByLabelText("Author (optional)"), {
+      target: { value: "" }
+    });
+    fireEvent.change(within(formPanel).getByLabelText(/Project code \(optional\)/i), {
+      target: { value: "" }
+    });
+    fireEvent.change(within(formPanel).getByLabelText(/Logo URL \(optional\)/i), {
+      target: { value: "" }
+    });
+    fireEvent.change(within(formPanel).getByLabelText("Export notes (optional)"), {
+      target: { value: "" }
+    });
+    fireEvent.click(within(formPanel).getByRole("button", { name: "Save network" }));
+
+    await waitFor(() => {
+      const activeNetworkId = store.getState().activeNetworkId as NetworkId;
+      const updatedNetwork = store.getState().networks.byId[activeNetworkId];
+      expect(updatedNetwork?.author).toBeUndefined();
+      expect(updatedNetwork?.projectCode).toBeUndefined();
+      expect(updatedNetwork?.logoUrl).toBeUndefined();
+      expect(updatedNetwork?.exportNotes).toBeUndefined();
     });
   });
 

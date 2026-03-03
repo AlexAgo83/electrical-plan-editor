@@ -98,6 +98,10 @@ interface SettingsWorkspaceContentProps {
   setCanvasExportFormat: (value: CanvasExportFormat) => void;
   canvasPngExportIncludeBackground: boolean;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
+  canvasExportIncludeFrame: boolean;
+  setCanvasExportIncludeFrame: (value: boolean) => void;
+  canvasExportIncludeCartouche: boolean;
+  setCanvasExportIncludeCartouche: (value: boolean) => void;
   canvasResetZoomPercentInput: string;
   setCanvasResetZoomPercentInput: (value: string) => void;
   canvasResizeBehaviorMode: CanvasResizeBehaviorMode;
@@ -196,6 +200,10 @@ export function SettingsWorkspaceContent({
   setCanvasExportFormat,
   canvasPngExportIncludeBackground,
   setCanvasPngExportIncludeBackground,
+  canvasExportIncludeFrame,
+  setCanvasExportIncludeFrame,
+  canvasExportIncludeCartouche,
+  setCanvasExportIncludeCartouche,
   canvasResetZoomPercentInput,
   setCanvasResetZoomPercentInput,
   canvasResizeBehaviorMode,
@@ -429,6 +437,22 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasPngExportIncludeBackground(event.target.checked)}
             />
             Include background in PNG export
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasExportIncludeFrame}
+              onChange={(event) => setCanvasExportIncludeFrame(event.target.checked)}
+            />
+            Include frame in SVG/PNG export
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasExportIncludeCartouche}
+              onChange={(event) => setCanvasExportIncludeCartouche(event.target.checked)}
+            />
+            Include identity cartouche in SVG/PNG export
           </label>
         </div>
       </section>

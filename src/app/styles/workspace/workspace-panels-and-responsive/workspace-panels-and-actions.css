@@ -304,13 +304,21 @@
   font-weight: 600;
 }
 
-.network-form-grid input {
+.network-form-grid input,
+.network-form-grid textarea {
   width: 100%;
   min-width: 0;
   border-radius: 0.5rem;
   border: 1px solid #bacada;
   padding: 0.45rem 0.6rem;
   background: #fff;
+}
+
+.network-form-grid textarea {
+  resize: vertical;
+  min-height: 6rem;
+  font: inherit;
+  line-height: 1.35;
 }
 
 .network-form-submit-actions {

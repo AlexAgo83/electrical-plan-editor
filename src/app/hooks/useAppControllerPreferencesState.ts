@@ -50,6 +50,8 @@ export function useAppControllerPreferencesState() {
   const [canvasNodeShapeSizePercent, setCanvasNodeShapeSizePercent] = useState(70);
   const [canvasExportFormat, setCanvasExportFormat] = useState<CanvasExportFormat>("svg");
   const [canvasPngExportIncludeBackground, setCanvasPngExportIncludeBackground] = useState(true);
+  const [canvasExportIncludeFrame, setCanvasExportIncludeFrame] = useState(false);
+  const [canvasExportIncludeCartouche, setCanvasExportIncludeCartouche] = useState(true);
   const [canvasResizeBehaviorMode, setCanvasResizeBehaviorMode] =
     useState<CanvasResizeBehaviorMode>("visibleAreaOnly");
   const [showShortcutHints, setShowShortcutHints] = useState(false);
@@ -122,6 +124,10 @@ export function useAppControllerPreferencesState() {
     setCanvasExportFormat,
     canvasPngExportIncludeBackground,
     setCanvasPngExportIncludeBackground,
+    canvasExportIncludeFrame,
+    setCanvasExportIncludeFrame,
+    canvasExportIncludeCartouche,
+    setCanvasExportIncludeCartouche,
     canvasResizeBehaviorMode,
     setCanvasResizeBehaviorMode,
     showShortcutHints,

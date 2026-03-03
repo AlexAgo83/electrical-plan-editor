@@ -21,6 +21,11 @@ import type {
   SpliceId,
   Wire
 } from "../../core/entities";
+import {
+  formatIsoToLocalDateInput,
+  isNetworkLogoUrlValid,
+  normalizeNetworkLogoUrl
+} from "../../core/networkMetadata";
 import type { ShortestRouteResult } from "../../core/pathfinding";
 import type { SubNetworkSummary } from "../../store";
 import type {
@@ -108,6 +113,408 @@ function resolveCanvasExportBackgroundFill(shellElement: HTMLElement | null): st
   return colorMatch?.[1] ?? null;
 }
 
+type ExportLogoAsset = { kind: "image"; href: string } | { kind: "fallback" };
+
+function readBlobAsDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+      reject(new Error("Unable to read blob as data URL."));
+    };
+    reader.onerror = () => reject(reader.error ?? new Error("Unable to read blob as data URL."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function resolveExportLogoAsset(logoUrl: string | undefined): Promise<ExportLogoAsset> {
+  const normalizedLogoUrl = normalizeNetworkLogoUrl(logoUrl);
+  if (normalizedLogoUrl === undefined || !isNetworkLogoUrlValid(normalizedLogoUrl)) {
+    return { kind: "fallback" };
+  }
+
+  if (normalizedLogoUrl.toLowerCase().startsWith("data:image/")) {
+    return { kind: "image", href: normalizedLogoUrl };
+  }
+
+  try {
+    const response = await fetch(normalizedLogoUrl, {
+      method: "GET",
+      mode: "cors",
+      credentials: "omit",
+      cache: "no-store"
+    });
+    if (!response.ok) {
+      return { kind: "fallback" };
+    }
+    const blob = await response.blob();
+    if (!blob.type.startsWith("image/")) {
+      return { kind: "fallback" };
+    }
+    const dataUrl = await readBlobAsDataUrl(blob);
+    return { kind: "image", href: dataUrl };
+  } catch {
+    return { kind: "fallback" };
+  }
+}
+
+function createSvgElement<K extends keyof SVGElementTagNameMap>(tagName: K): SVGElementTagNameMap[K] {
+  return document.createElementNS("http://www.w3.org/2000/svg", tagName);
+}
+
+function clampNumberValue(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function resolveElementStyleValue(style: CSSStyleDeclaration, property: string, fallback: string): string {
+  const value = style.getPropertyValue(property).trim();
+  return value.length > 0 ? value : fallback;
+}
+
+function measureTextWidth(text: string, font: string): number {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  if (context === null) {
+    return text.length * 7;
+  }
+  context.font = font;
+  return context.measureText(text).width;
+}
+
+function truncateLineWithEllipsis(line: string, maxWidth: number, font: string): string {
+  const ellipsis = "...";
+  if (measureTextWidth(`${line}${ellipsis}`, font) <= maxWidth) {
+    return `${line}${ellipsis}`;
+  }
+
+  let candidate = line;
+  while (candidate.length > 0) {
+    candidate = candidate.slice(0, -1);
+    if (measureTextWidth(`${candidate}${ellipsis}`, font) <= maxWidth) {
+      return `${candidate}${ellipsis}`;
+    }
+  }
+  return ellipsis;
+}
+
+function wrapTextWithClamp(text: string, maxWidth: number, font: string, maxLines: number): string[] {
+  if (text.trim().length === 0 || maxLines <= 0) {
+    return [];
+  }
+
+  const lines: string[] = [];
+  const paragraphs = text.replace(/\r\n/g, "\n").split("\n");
+  for (const paragraph of paragraphs) {
+    const normalizedParagraph = paragraph.trim();
+    if (normalizedParagraph.length === 0) {
+      lines.push("");
+      continue;
+    }
+
+    const words = normalizedParagraph.split(/\s+/).filter((word) => word.length > 0);
+    let currentLine = "";
+    for (const word of words) {
+      const tentative = currentLine.length === 0 ? word : `${currentLine} ${word}`;
+      if (measureTextWidth(tentative, font) <= maxWidth) {
+        currentLine = tentative;
+        continue;
+      }
+
+      if (currentLine.length > 0) {
+        lines.push(currentLine);
+        currentLine = "";
+      }
+
+      if (measureTextWidth(word, font) <= maxWidth) {
+        currentLine = word;
+        continue;
+      }
+
+      let fragment = "";
+      for (const character of word) {
+        const nextFragment = `${fragment}${character}`;
+        if (measureTextWidth(nextFragment, font) <= maxWidth) {
+          fragment = nextFragment;
+          continue;
+        }
+
+        if (fragment.length > 0) {
+          lines.push(fragment);
+        }
+        fragment = character;
+      }
+      currentLine = fragment;
+    }
+
+    if (currentLine.length > 0) {
+      lines.push(currentLine);
+    }
+  }
+
+  if (lines.length <= maxLines) {
+    return lines;
+  }
+
+  const truncated = lines.slice(0, maxLines);
+  const lastLine = truncated[truncated.length - 1] ?? "";
+  truncated[truncated.length - 1] = truncateLineWithEllipsis(lastLine, maxWidth, font);
+  return truncated;
+}
+
+function appendExportFrameOverlay(params: {
+  sourceSvg: SVGSVGElement;
+  cloneSvg: SVGSVGElement;
+  width: number;
+  height: number;
+}): void {
+  const segmentSource = params.sourceSvg.querySelector(".network-segment") as SVGElement | null;
+  const segmentStyle = window.getComputedStyle(segmentSource ?? params.sourceSvg);
+  const strokeColor = resolveElementStyleValue(segmentStyle, "stroke", "var(--network-segment-color, #7f99af)");
+  const parsedStrokeWidth = Number.parseFloat(resolveElementStyleValue(segmentStyle, "stroke-width", "3"));
+  const strokeWidth = Number.isFinite(parsedStrokeWidth) ? clampNumberValue(parsedStrokeWidth, 1.4, 3.4) : 2.2;
+  const margin = Math.max(10, Math.round(Math.min(params.width, params.height) * 0.018));
+  const rx = Math.max(6, Math.round(Math.min(params.width, params.height) * 0.008));
+
+  const frame = createSvgElement("rect");
+  frame.setAttribute("class", "network-export-frame");
+  frame.setAttribute("x", String(margin));
+  frame.setAttribute("y", String(margin));
+  frame.setAttribute("width", String(Math.max(1, params.width - margin * 2)));
+  frame.setAttribute("height", String(Math.max(1, params.height - margin * 2)));
+  frame.setAttribute("rx", String(rx));
+  frame.setAttribute("fill", "none");
+  frame.setAttribute("stroke", strokeColor);
+  frame.setAttribute("stroke-width", String(strokeWidth));
+  frame.setAttribute("stroke-linecap", "round");
+  frame.setAttribute("stroke-linejoin", "round");
+  frame.setAttribute("vector-effect", "non-scaling-stroke");
+  frame.style.pointerEvents = "none";
+  params.cloneSvg.insertBefore(frame, params.cloneSvg.firstChild);
+}
+
+function appendExportCartoucheOverlay(params: {
+  sourceSvg: SVGSVGElement;
+  cloneSvg: SVGSVGElement;
+  width: number;
+  height: number;
+  networkName: string;
+  author?: string;
+  projectCode?: string;
+  createdAt: string;
+  notes?: string;
+  logoAsset: ExportLogoAsset;
+}): void {
+  const frameSource = params.sourceSvg.querySelector(".network-callout-frame") as SVGElement | null;
+  const rowTextSource = params.sourceSvg.querySelector(".network-callout-row-text") as SVGElement | null;
+  const titleSource = params.sourceSvg.querySelector(".network-callout-title") as SVGElement | null;
+  const frameStyle = window.getComputedStyle(frameSource ?? params.sourceSvg);
+  const rowStyle = window.getComputedStyle(rowTextSource ?? params.sourceSvg);
+  const titleStyle = window.getComputedStyle(titleSource ?? params.sourceSvg);
+
+  const fillColor = resolveElementStyleValue(frameStyle, "fill", "rgba(223, 240, 255, 0.92)");
+  const fillOpacity = resolveElementStyleValue(frameStyle, "fill-opacity", "0.92");
+  const strokeColor = resolveElementStyleValue(frameStyle, "stroke", "var(--network-node-stroke-color, #55748d)");
+  const textColor = resolveElementStyleValue(rowStyle, "fill", "var(--network-node-label-color, #183549)");
+  const subtleTextColor = resolveElementStyleValue(
+    titleStyle,
+    "fill",
+    "var(--network-segment-length-label-color, #547086)"
+  );
+  const fontFamily = resolveElementStyleValue(rowStyle, "font-family", "Inter, system-ui, sans-serif");
+  const titleFontFamily = resolveElementStyleValue(titleStyle, "font-family", fontFamily);
+
+  const margin = Math.max(12, Math.round(Math.min(params.width, params.height) * 0.02));
+  const cartoucheWidth = clampNumberValue(Math.round(params.width * 0.36), 250, 460);
+  const padding = 12;
+  const logoWidth = 84;
+  const logoHeight = 46;
+  const metadataX = padding + logoWidth + 10;
+  const metadataWidth = cartoucheWidth - padding * 2 - logoWidth - 10;
+  const metadataLineHeight = 14;
+  const notesLineHeight = 12;
+  const notesFont = `500 ${notesLineHeight}px ${fontFamily}`;
+
+  const createdAtLabel = formatIsoToLocalDateInput(params.createdAt);
+  const normalizedNetworkName = params.networkName.trim().length > 0 ? params.networkName.trim() : "Unnamed network";
+  const metadataLines = [
+    `Network: ${normalizedNetworkName}`,
+    ...(params.author?.trim() ? [`Author: ${params.author.trim()}`] : []),
+    ...(params.projectCode?.trim() ? [`Code: ${params.projectCode.trim()}`] : []),
+    `Created: ${createdAtLabel.length > 0 ? createdAtLabel : "N/A"}`
+  ];
+  const notesLines = wrapTextWithClamp(
+    params.notes ?? "",
+    cartoucheWidth - padding * 2,
+    notesFont,
+    8
+  );
+  const hasNotes = notesLines.length > 0;
+  const metadataHeight = Math.max(logoHeight, metadataLines.length * metadataLineHeight);
+  const notesBlockHeight = hasNotes ? 8 + 12 + notesLines.length * notesLineHeight : 0;
+  const cartoucheHeight = padding * 2 + metadataHeight + notesBlockHeight;
+  const cartoucheX = Math.max(margin, params.width - margin - cartoucheWidth);
+  const cartoucheY = Math.max(margin, params.height - margin - cartoucheHeight);
+
+  const group = createSvgElement("g");
+  group.setAttribute("class", "network-export-cartouche");
+  group.style.pointerEvents = "none";
+
+  const container = createSvgElement("rect");
+  container.setAttribute("class", "network-export-cartouche-frame");
+  container.setAttribute("x", String(cartoucheX));
+  container.setAttribute("y", String(cartoucheY));
+  container.setAttribute("width", String(cartoucheWidth));
+  container.setAttribute("height", String(cartoucheHeight));
+  container.setAttribute("rx", "8");
+  container.setAttribute("fill", fillColor);
+  container.setAttribute("fill-opacity", fillOpacity);
+  container.setAttribute("stroke", strokeColor);
+  container.setAttribute("stroke-width", "1");
+  container.setAttribute("vector-effect", "non-scaling-stroke");
+  group.appendChild(container);
+
+  const logoX = cartoucheX + padding;
+  const logoY = cartoucheY + padding;
+  const logoFrame = createSvgElement("rect");
+  logoFrame.setAttribute("x", String(logoX));
+  logoFrame.setAttribute("y", String(logoY));
+  logoFrame.setAttribute("width", String(logoWidth));
+  logoFrame.setAttribute("height", String(logoHeight));
+  logoFrame.setAttribute("rx", "4");
+  logoFrame.setAttribute("fill", "none");
+  logoFrame.setAttribute("stroke", strokeColor);
+  logoFrame.setAttribute("stroke-width", "0.8");
+  group.appendChild(logoFrame);
+
+  if (params.logoAsset.kind === "image") {
+    const image = createSvgElement("image");
+    image.setAttribute("x", String(logoX + 2));
+    image.setAttribute("y", String(logoY + 2));
+    image.setAttribute("width", String(logoWidth - 4));
+    image.setAttribute("height", String(logoHeight - 4));
+    image.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    image.setAttribute("href", params.logoAsset.href);
+    group.appendChild(image);
+  } else {
+    const fallbackText = createSvgElement("text");
+    fallbackText.setAttribute("x", String(logoX + logoWidth / 2));
+    fallbackText.setAttribute("y", String(logoY + logoHeight / 2 + 1));
+    fallbackText.setAttribute("text-anchor", "middle");
+    fallbackText.setAttribute("dominant-baseline", "middle");
+    fallbackText.setAttribute("fill", subtleTextColor);
+    fallbackText.setAttribute("font-family", fontFamily);
+    fallbackText.setAttribute("font-size", "8.2px");
+    fallbackText.setAttribute("font-weight", "600");
+    fallbackText.textContent = "Logo indisponible";
+    group.appendChild(fallbackText);
+  }
+
+  metadataLines.forEach((line, index) => {
+    const row = createSvgElement("text");
+    row.setAttribute("class", "network-export-cartouche-meta");
+    row.setAttribute("x", String(cartoucheX + metadataX));
+    row.setAttribute("y", String(cartoucheY + padding + 11 + index * metadataLineHeight));
+    row.setAttribute("fill", index === 0 ? textColor : subtleTextColor);
+    row.setAttribute("font-family", index === 0 ? titleFontFamily : fontFamily);
+    row.setAttribute("font-size", index === 0 ? "11px" : "9.6px");
+    row.setAttribute("font-weight", index === 0 ? "700" : "600");
+    if (measureTextWidth(line, `${index === 0 ? "700 11px" : "600 9.6px"} ${fontFamily}`) > metadataWidth) {
+      row.textContent = truncateLineWithEllipsis(
+        line,
+        metadataWidth,
+        `${index === 0 ? "700 11px" : "600 9.6px"} ${fontFamily}`
+      );
+    } else {
+      row.textContent = line;
+    }
+    group.appendChild(row);
+  });
+
+  if (hasNotes) {
+    const dividerY = cartoucheY + padding + metadataHeight + 4;
+    const divider = createSvgElement("line");
+    divider.setAttribute("x1", String(cartoucheX + padding));
+    divider.setAttribute("y1", String(dividerY));
+    divider.setAttribute("x2", String(cartoucheX + cartoucheWidth - padding));
+    divider.setAttribute("y2", String(dividerY));
+    divider.setAttribute("stroke", strokeColor);
+    divider.setAttribute("stroke-opacity", "0.5");
+    divider.setAttribute("stroke-width", "0.8");
+    group.appendChild(divider);
+
+    const notesLabel = createSvgElement("text");
+    notesLabel.setAttribute("class", "network-export-cartouche-notes-label");
+    notesLabel.setAttribute("x", String(cartoucheX + padding));
+    notesLabel.setAttribute("y", String(dividerY + 12));
+    notesLabel.setAttribute("fill", subtleTextColor);
+    notesLabel.setAttribute("font-family", fontFamily);
+    notesLabel.setAttribute("font-size", "9.2px");
+    notesLabel.setAttribute("font-weight", "700");
+    notesLabel.textContent = "Notes";
+    group.appendChild(notesLabel);
+
+    notesLines.forEach((line, index) => {
+      const note = createSvgElement("text");
+      note.setAttribute("class", "network-export-cartouche-note");
+      note.setAttribute("x", String(cartoucheX + padding));
+      note.setAttribute("y", String(dividerY + 24 + index * notesLineHeight));
+      note.setAttribute("fill", textColor);
+      note.setAttribute("font-family", fontFamily);
+      note.setAttribute("font-size", "9.2px");
+      note.setAttribute("font-weight", "500");
+      note.textContent = line;
+      group.appendChild(note);
+    });
+  }
+
+  params.cloneSvg.appendChild(group);
+}
+
+async function applyExportDecorations(params: {
+  sourceSvg: SVGSVGElement;
+  cloneSvg: SVGSVGElement;
+  width: number;
+  height: number;
+  includeFrame: boolean;
+  includeCartouche: boolean;
+  cartoucheNetworkName: string;
+  cartoucheAuthor?: string;
+  cartoucheProjectCode?: string;
+  cartoucheCreatedAt: string;
+  cartoucheLogoUrl?: string;
+  cartoucheNotes?: string;
+}): Promise<void> {
+  if (params.includeFrame) {
+    appendExportFrameOverlay({
+      sourceSvg: params.sourceSvg,
+      cloneSvg: params.cloneSvg,
+      width: params.width,
+      height: params.height
+    });
+  }
+
+  if (!params.includeCartouche) {
+    return;
+  }
+
+  const logoAsset = await resolveExportLogoAsset(params.cartoucheLogoUrl);
+  appendExportCartoucheOverlay({
+    sourceSvg: params.sourceSvg,
+    cloneSvg: params.cloneSvg,
+    width: params.width,
+    height: params.height,
+    networkName: params.cartoucheNetworkName,
+    author: params.cartoucheAuthor,
+    projectCode: params.cartoucheProjectCode,
+    createdAt: params.cartoucheCreatedAt,
+    notes: params.cartoucheNotes,
+    logoAsset
+  });
+}
+
 export interface NetworkSummaryPanelProps {
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
@@ -126,6 +533,14 @@ export interface NetworkSummaryPanelProps {
   labelRotationDegrees: CanvasLabelRotationDegrees;
   autoSegmentLabelRotation: boolean;
   canvasExportFormat: CanvasExportFormat;
+  exportIncludeFrame: boolean;
+  exportIncludeCartouche: boolean;
+  exportCartoucheNetworkName: string;
+  exportCartoucheAuthor?: string;
+  exportCartoucheProjectCode?: string;
+  exportCartoucheCreatedAt: string;
+  exportCartoucheLogoUrl?: string;
+  exportCartoucheNotes?: string;
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
   lockEntityMovement: boolean;
@@ -656,6 +1071,14 @@ export function NetworkSummaryPanel({
   labelRotationDegrees,
   autoSegmentLabelRotation,
   canvasExportFormat,
+  exportIncludeFrame,
+  exportIncludeCartouche,
+  exportCartoucheNetworkName,
+  exportCartoucheAuthor,
+  exportCartoucheProjectCode,
+  exportCartoucheCreatedAt,
+  exportCartoucheLogoUrl,
+  exportCartoucheNotes,
   showNetworkGrid,
   snapNodesToGrid,
   lockEntityMovement,
@@ -1318,7 +1741,7 @@ export function NetworkSummaryPanel({
     stopNetworkNodeDrag();
   }, [stopCalloutDrag, stopNetworkNodeDrag]);
 
-  const handleExportPlanAsSvg = useCallback(() => {
+  const handleExportPlanAsSvg = useCallback(async () => {
     if (typeof window === "undefined") {
       return;
     }
@@ -1342,6 +1765,20 @@ export function NetworkSummaryPanel({
       svgClone.setAttribute("viewBox", `0 0 ${exportWidth} ${exportHeight}`);
     }
     copyComputedStylesToSvgClone(sourceSvg, svgClone);
+    await applyExportDecorations({
+      sourceSvg,
+      cloneSvg: svgClone,
+      width: exportWidth,
+      height: exportHeight,
+      includeFrame: exportIncludeFrame,
+      includeCartouche: exportIncludeCartouche,
+      cartoucheNetworkName: exportCartoucheNetworkName,
+      cartoucheAuthor: exportCartoucheAuthor,
+      cartoucheProjectCode: exportCartoucheProjectCode,
+      cartoucheCreatedAt: exportCartoucheCreatedAt,
+      cartoucheLogoUrl: exportCartoucheLogoUrl,
+      cartoucheNotes: exportCartoucheNotes
+    });
 
     const serializedSvg = new XMLSerializer().serializeToString(svgClone);
     const blob = new Blob([serializedSvg], { type: "image/svg+xml;charset=utf-8" });
@@ -1357,9 +1794,18 @@ export function NetworkSummaryPanel({
     window.setTimeout(() => {
       URL.revokeObjectURL(blobUrl);
     }, 0);
-  }, []);
+  }, [
+    exportCartoucheAuthor,
+    exportCartoucheCreatedAt,
+    exportCartoucheLogoUrl,
+    exportCartoucheNetworkName,
+    exportCartoucheNotes,
+    exportCartoucheProjectCode,
+    exportIncludeCartouche,
+    exportIncludeFrame
+  ]);
 
-  const handleExportPlanAsPng = useCallback(() => {
+  const handleExportPlanAsPng = useCallback(async () => {
     if (typeof window === "undefined") {
       return;
     }
@@ -1384,14 +1830,33 @@ export function NetworkSummaryPanel({
       svgClone.setAttribute("viewBox", `0 0 ${exportWidth} ${exportHeight}`);
     }
     copyComputedStylesToSvgClone(sourceSvg, svgClone);
+    await applyExportDecorations({
+      sourceSvg,
+      cloneSvg: svgClone,
+      width: exportWidth,
+      height: exportHeight,
+      includeFrame: exportIncludeFrame,
+      includeCartouche: exportIncludeCartouche,
+      cartoucheNetworkName: exportCartoucheNetworkName,
+      cartoucheAuthor: exportCartoucheAuthor,
+      cartoucheProjectCode: exportCartoucheProjectCode,
+      cartoucheCreatedAt: exportCartoucheCreatedAt,
+      cartoucheLogoUrl: exportCartoucheLogoUrl,
+      cartoucheNotes: exportCartoucheNotes
+    });
 
     const serializedSvg = new XMLSerializer().serializeToString(svgClone);
     const svgBlob = new Blob([serializedSvg], { type: "image/svg+xml;charset=utf-8" });
     const svgUrl = URL.createObjectURL(svgBlob);
-    const image = new Image();
-    image.decoding = "async";
-    image.onload = () => {
-      URL.revokeObjectURL(svgUrl);
+    try {
+      const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const nextImage = new Image();
+        nextImage.decoding = "async";
+        nextImage.onload = () => resolve(nextImage);
+        nextImage.onerror = () => reject(new Error("Unable to render SVG export preview."));
+        nextImage.src = svgUrl;
+      });
+
       const exportScale = Math.max(1, Math.ceil(window.devicePixelRatio || 1));
       const canvas = document.createElement("canvas");
       canvas.width = exportWidth * exportScale;
@@ -1420,19 +1885,27 @@ export function NetworkSummaryPanel({
       document.body.appendChild(downloadLink);
       downloadLink.click();
       downloadLink.remove();
-    };
-    image.onerror = () => {
+    } finally {
       URL.revokeObjectURL(svgUrl);
-    };
-    image.src = svgUrl;
-  }, [pngExportIncludeBackground]);
+    }
+  }, [
+    exportCartoucheAuthor,
+    exportCartoucheCreatedAt,
+    exportCartoucheLogoUrl,
+    exportCartoucheNetworkName,
+    exportCartoucheNotes,
+    exportCartoucheProjectCode,
+    exportIncludeCartouche,
+    exportIncludeFrame,
+    pngExportIncludeBackground
+  ]);
 
   const handleExportPlan = useCallback(() => {
     if (canvasExportFormat === "png") {
-      handleExportPlanAsPng();
+      void handleExportPlanAsPng();
       return;
     }
-    handleExportPlanAsSvg();
+    void handleExportPlanAsSvg();
   }, [canvasExportFormat, handleExportPlanAsPng, handleExportPlanAsSvg]);
 
   function handleNetworkNodeKeyDown(event: ReactKeyboardEvent<SVGGElement>, nodeId: NodeId): void {

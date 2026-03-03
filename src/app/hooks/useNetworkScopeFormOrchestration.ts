@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, type Dispatch, type FormEvent, type SetStateAction } from "react";
+import { formatIsoToLocalDateInput } from "../../core/networkMetadata";
 import type { Network, NetworkId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import type { NetworkFocusRequest, NetworkFormMode } from "./useNetworkScopeFormState";
@@ -11,7 +12,12 @@ interface UseNetworkScopeFormOrchestrationParams {
   networksById: Record<NetworkId, Network>;
   setNewNetworkName: Dispatch<SetStateAction<string>>;
   setNewNetworkTechnicalId: Dispatch<SetStateAction<string>>;
+  setNewNetworkCreatedAtDate: Dispatch<SetStateAction<string>>;
   setNewNetworkDescription: Dispatch<SetStateAction<string>>;
+  setNewNetworkAuthor: Dispatch<SetStateAction<string>>;
+  setNewNetworkProjectCode: Dispatch<SetStateAction<string>>;
+  setNewNetworkLogoUrl: Dispatch<SetStateAction<string>>;
+  setNewNetworkExportNotes: Dispatch<SetStateAction<string>>;
   setNetworkFormError: Dispatch<SetStateAction<string | null>>;
   networkFormMode: NetworkFormMode;
   setNetworkFormMode: Dispatch<SetStateAction<NetworkFormMode>>;
@@ -30,7 +36,12 @@ export function useNetworkScopeFormOrchestration({
   networksById,
   setNewNetworkName,
   setNewNetworkTechnicalId,
+  setNewNetworkCreatedAtDate,
   setNewNetworkDescription,
+  setNewNetworkAuthor,
+  setNewNetworkProjectCode,
+  setNewNetworkLogoUrl,
+  setNewNetworkExportNotes,
   setNetworkFormError,
   networkFormMode,
   setNetworkFormMode,
@@ -42,14 +53,33 @@ export function useNetworkScopeFormOrchestration({
 }: UseNetworkScopeFormOrchestrationParams) {
   void activeNetworkId;
   const wasNetworkScopeScreenRef = useRef(false);
+  const buildDefaultCreatedAtInput = useCallback(() => formatIsoToLocalDateInput(new Date().toISOString()), []);
   const handleOpenCreateNetworkForm = useCallback(() => {
     setNetworkFormMode("create");
     setNetworkFormTargetId(null);
     setNewNetworkName("");
     setNewNetworkTechnicalId("");
+    setNewNetworkCreatedAtDate(buildDefaultCreatedAtInput());
     setNewNetworkDescription("");
+    setNewNetworkAuthor("");
+    setNewNetworkProjectCode("");
+    setNewNetworkLogoUrl("");
+    setNewNetworkExportNotes("");
     setNetworkFormError(null);
-  }, [setNetworkFormError, setNetworkFormMode, setNetworkFormTargetId, setNewNetworkDescription, setNewNetworkName, setNewNetworkTechnicalId]);
+  }, [
+    buildDefaultCreatedAtInput,
+    setNetworkFormError,
+    setNetworkFormMode,
+    setNetworkFormTargetId,
+    setNewNetworkAuthor,
+    setNewNetworkCreatedAtDate,
+    setNewNetworkDescription,
+    setNewNetworkExportNotes,
+    setNewNetworkLogoUrl,
+    setNewNetworkName,
+    setNewNetworkProjectCode,
+    setNewNetworkTechnicalId
+  ]);
 
   const handleOpenEditNetworkForm = useCallback(
     (networkId: NetworkId) => {
@@ -62,10 +92,28 @@ export function useNetworkScopeFormOrchestration({
       setNetworkFormTargetId(targetNetwork.id);
       setNewNetworkName(targetNetwork.name);
       setNewNetworkTechnicalId(targetNetwork.technicalId);
+      setNewNetworkCreatedAtDate(formatIsoToLocalDateInput(targetNetwork.createdAt));
       setNewNetworkDescription(targetNetwork.description ?? "");
+      setNewNetworkAuthor(targetNetwork.author ?? "");
+      setNewNetworkProjectCode(targetNetwork.projectCode ?? "");
+      setNewNetworkLogoUrl(targetNetwork.logoUrl ?? "");
+      setNewNetworkExportNotes(targetNetwork.exportNotes ?? "");
       setNetworkFormError(null);
     },
-    [networks, setNetworkFormError, setNetworkFormMode, setNetworkFormTargetId, setNewNetworkDescription, setNewNetworkName, setNewNetworkTechnicalId]
+    [
+      networks,
+      setNetworkFormError,
+      setNetworkFormMode,
+      setNetworkFormTargetId,
+      setNewNetworkAuthor,
+      setNewNetworkCreatedAtDate,
+      setNewNetworkDescription,
+      setNewNetworkExportNotes,
+      setNewNetworkLogoUrl,
+      setNewNetworkName,
+      setNewNetworkProjectCode,
+      setNewNetworkTechnicalId
+    ]
   );
 
   const handleCloseNetworkForm = useCallback(() => {
@@ -119,8 +167,27 @@ export function useNetworkScopeFormOrchestration({
 
     setNewNetworkName(targetNetwork.name);
     setNewNetworkTechnicalId(targetNetwork.technicalId);
+    setNewNetworkCreatedAtDate(formatIsoToLocalDateInput(targetNetwork.createdAt));
     setNewNetworkDescription(targetNetwork.description ?? "");
-  }, [networkFormMode, networkFormTargetId, networksById, setNetworkFormMode, setNetworkFormTargetId, setNewNetworkDescription, setNewNetworkName, setNewNetworkTechnicalId]);
+    setNewNetworkAuthor(targetNetwork.author ?? "");
+    setNewNetworkProjectCode(targetNetwork.projectCode ?? "");
+    setNewNetworkLogoUrl(targetNetwork.logoUrl ?? "");
+    setNewNetworkExportNotes(targetNetwork.exportNotes ?? "");
+  }, [
+    networkFormMode,
+    networkFormTargetId,
+    networksById,
+    setNetworkFormMode,
+    setNetworkFormTargetId,
+    setNewNetworkAuthor,
+    setNewNetworkCreatedAtDate,
+    setNewNetworkDescription,
+    setNewNetworkExportNotes,
+    setNewNetworkLogoUrl,
+    setNewNetworkName,
+    setNewNetworkProjectCode,
+    setNewNetworkTechnicalId
+  ]);
 
   useEffect(() => {
     const wasVisible = wasNetworkScopeScreenRef.current;
