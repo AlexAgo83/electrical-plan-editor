@@ -295,6 +295,8 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(calloutRows.length).toBeGreaterThanOrEqual(8);
     expect(networkSummaryPanel).toHaveTextContent("Len");
     expect(networkSummaryPanel).toHaveTextContent("Sec");
+    expect(networkSummaryPanel).toHaveTextContent("Node ID");
+    expect(networkSummaryPanel).toHaveTextContent("PIN");
     expect(networkSummaryPanel).toHaveTextContent("W-8");
   });
 

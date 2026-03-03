@@ -82,4 +82,5 @@ describe("App integration UI - settings locale", () => {
     });
     expect(document.documentElement.lang).toBe("en");
   });
+
 });
