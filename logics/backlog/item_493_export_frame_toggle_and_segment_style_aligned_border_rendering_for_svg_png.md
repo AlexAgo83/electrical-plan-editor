@@ -1,9 +1,9 @@
 ## item_493_export_frame_toggle_and_segment_style_aligned_border_rendering_for_svg_png - Export frame toggle and segment-style-aligned border rendering for SVG/PNG
 > From version: 1.3.0
-> Status: Draft
+> Status: Done
 > Understanding: 97% (toggle default contract clarified)
-> Confidence: 91%
-> Progress: 5%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI / Export rendering
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -41,3 +41,8 @@ Exports currently lack an optional outer frame, reducing document framing and vi
 # Notes
 - Derived from `logics/request/req_102_export_frame_and_network_identity_cartouche_for_svg_png.md`.
 - Orchestrated by `logics/tasks/task_078_req_102_export_frame_and_network_identity_cartouche_for_svg_png_orchestration_and_delivery_control.md`.
+- Implemented:
+  - `src/app/components/workspace/SettingsWorkspaceContent.tsx` toggle `Include frame in SVG/PNG export`;
+  - `src/app/hooks/useAppControllerPreferencesState.ts` + `src/app/hooks/useUiPreferences.ts` persistence with default `off`;
+  - `src/app/components/NetworkSummaryPanel.tsx` frame overlay class `network-export-frame` rendered in SVG and carried into PNG export path;
+  - `src/tests/app.ui.settings-canvas-render.spec.tsx` + `src/tests/app.ui.network-summary-bom-export.spec.tsx` toggle persistence and export-output coverage.

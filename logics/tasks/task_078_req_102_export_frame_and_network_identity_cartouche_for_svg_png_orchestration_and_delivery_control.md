@@ -1,9 +1,9 @@
 ## task_078_req_102_export_frame_and_network_identity_cartouche_for_svg_png_orchestration_and_delivery_control - Req 102 export frame and network identity cartouche orchestration and delivery control
 > From version: 1.3.0
-> Status: In Progress
+> Status: Done
 > Understanding: 99% (orchestration constraints and defaults fully clarified)
-> Confidence: 94%
-> Progress: 32%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: High
 > Theme: UI / Export / Persistence
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -39,19 +39,19 @@
 - [x] 1. Implement network metadata contract extension and compatibility baseline (`item_491`, `item_496`)
   - extend domain/store/adapters contracts with deterministic defaults and normalization;
   - add migration/portability coverage for legacy payload compatibility.
-- [ ] 2. Deliver authoring surfaces in Network Scope (`item_492`)
+- [x] 2. Deliver authoring surfaces in Network Scope (`item_492`)
   - add/edit controls for author/project code/logo URL/notes + creation date behavior;
   - enforce field limits and validation feedback.
-- [ ] 3. Deliver export rendering options and visuals (`item_493`, `item_494`)
+- [x] 3. Deliver export rendering options and visuals (`item_493`, `item_494`)
   - add settings toggles for frame/cartouche with documented defaults;
   - render frame + bottom-right cartouche in SVG/PNG with bounded layout.
-- [ ] 4. Harden logo fallback robustness (`item_495`)
+- [x] 4. Harden logo fallback robustness (`item_495`)
   - guarantee non-failing export path when logo cannot be loaded/CORS-restricted;
   - render `Logo indisponible` placeholder in cartouche fallback.
-- [ ] 5. Validate and close traceability (`item_497`)
+- [x] 5. Validate and close traceability (`item_497`)
   - execute validation matrix and capture evidence;
   - update linked request/backlog/task docs and finalize closure status.
-- [ ] FINAL: Update related Logics docs
+- [x] FINAL: Update related Logics docs
 
 # AC Traceability
 - AC1 (`item_491`, `item_492`) -> Metadata authoring and constraints are implemented.
@@ -68,13 +68,29 @@
 - `npm run -s test:ci:ui`
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] Linked request/backlog/task docs updated.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] Validation commands executed and results captured.
+- [x] Linked request/backlog/task docs updated.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report
 - 2026-03-03: Completed model/store contract extension for network identity metadata (`author`, `projectCode`, `logoUrl`, `exportNotes`) with reducer-level normalization/validation guards.
 - 2026-03-03: Upgraded compatibility baseline:
   - persistence migration schema bumped to `v3` with incremental pipeline step (`v2 -> v3`);
   - portability network-file schema bumped to `v3` with metadata normalization on export/import and legacy version acceptance retained (`v0..v3`).
+- 2026-03-03: Delivered `Network Scope` authoring controls:
+  - editable `Creation date`, `Author`, `Project code`, `Logo URL`, and multiline `Export notes`;
+  - form-level constraint hints and submit validation wiring for project-code charset and logo URL scheme.
+- 2026-03-03: Delivered export rendering contract:
+  - `Canvas tools` toggles for `Include frame in SVG/PNG export` (default off) and `Include identity cartouche in SVG/PNG export` (default on);
+  - SVG/PNG export overlays with segment-style frame + bottom-right identity cartouche.
+- 2026-03-03: Delivered robustness/fallback behavior:
+  - logo resolution pipeline (`http|https|data:image/*`) with defensive fallback;
+  - fallback text `Logo indisponible` when logo is invalid/unreachable/CORS-blocked;
+  - notes wrapping and clamp to `8` lines with ellipsis.
+- 2026-03-03: Validation evidence captured:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s test:ci:ui` ✅
+  - targeted compatibility suites (`portability.network-file`, `persistence.localStorage`, `app.ui.networks`, `app.ui.settings-canvas-render`, `app.ui.network-summary-bom-export`) ✅

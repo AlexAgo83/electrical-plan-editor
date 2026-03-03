@@ -1,9 +1,9 @@
 ## item_496_persistence_and_network_file_migration_coverage_for_new_network_metadata_fields - Persistence and network file migration coverage for new network metadata fields
 > From version: 1.3.0
-> Status: In Progress
+> Status: Done
 > Understanding: 96%
-> Confidence: 90%
-> Progress: 65%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: High
 > Theme: Persistence / Portability
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -45,5 +45,7 @@ New network metadata fields introduce schema-evolution risk for local storage an
   - persistence schema version bumped to `v3` with migration step `v2 -> v3`;
   - legacy/current payload hydration now normalizes network metadata fields and drops invalid metadata safely;
   - network-file portability schema bumped to `v3` with import/export metadata normalization.
-- Remaining:
-  - dedicated regression coverage completion (tests) and closure evidence update.
+- Validation completed:
+  - `src/tests/portability.network-file.spec.ts` updated for `schemaVersion=3` and compatibility assertions;
+  - `src/tests/persistence.localStorage.spec.ts` and `src/tests/store.reducer.networks.spec.ts` re-run in req_102 closure batch;
+  - `npm run -s test:ci:ui` passed with req_102 UI coverage included.
