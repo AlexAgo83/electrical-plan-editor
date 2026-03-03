@@ -1,9 +1,9 @@
 ## item_494_export_cartouche_layout_bottom_right_with_name_author_project_code_created_at_logo_and_notes - Export cartouche layout bottom-right with name, author, project code, creation date, logo, and notes
 > From version: 1.3.0
 > Status: Draft
-> Understanding: 96%
-> Confidence: 92%
-> Progress: 0%
+> Understanding: 98% (cartouche toggle default and notes clamp behavior clarified)
+> Confidence: 93%
+> Progress: 5%
 > Complexity: High
 > Theme: UI / Export layout
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -13,31 +13,34 @@ Export artifacts currently miss a structured bottom-right identity block, making
 
 # Scope
 - In:
+  - add dedicated Settings toggle to enable/disable export cartouche, default `on`;
   - render deterministic bottom-right export cartouche for SVG and PNG;
   - top section content:
     - network name,
     - author (if provided),
     - project code (if provided),
-    - creation date (`YYYY-MM-DD`),
+    - creation date (`YYYY-MM-DD` from local-time conversion at export),
     - logo (if available);
   - lower section content:
     - multiline notes paragraph (if provided);
-  - enforce layout bounds/wrapping/clamping to avoid overflow and protect schema readability.
+  - enforce layout bounds/wrapping/clamping to avoid overflow and protect schema readability (`8` visible lines max + ellipsis for notes).
 - Out:
   - advanced page-layout/print templates;
   - multiple cartouche positions.
 
 # Acceptance criteria
-- AC1: Cartouche appears at bottom-right in SVG and PNG exports.
-- AC2: Cartouche includes required identity fields and optional fields when present.
-- AC3: Notes render as multiline plain text with deterministic wrapping.
-- AC4: Layout bounds prevent cartouche overflow and preserve diagram readability.
+- AC1: A dedicated settings toggle controls cartouche rendering and defaults to `on`.
+- AC2: Cartouche appears at bottom-right in SVG and PNG exports when toggle is enabled.
+- AC3: Cartouche includes required identity fields and optional fields when present.
+- AC4: Notes render as multiline plain text with deterministic wrapping and `8`-line clamp + ellipsis.
+- AC5: Layout bounds prevent cartouche overflow and preserve diagram readability.
 
 # AC Traceability
-- AC1 -> Placement contract is delivered.
-- AC2 -> Content contract is delivered.
-- AC3 -> Free-text block usability is delivered.
-- AC4 -> Readability/non-overflow contract is delivered.
+- AC1 -> Visibility control contract is delivered.
+- AC2 -> Placement contract is delivered.
+- AC3 -> Content contract is delivered.
+- AC4 -> Free-text block usability is delivered.
+- AC5 -> Readability/non-overflow contract is delivered.
 
 # Priority
 - Impact: High.
@@ -47,4 +50,3 @@ Export artifacts currently miss a structured bottom-right identity block, making
 - Derived from `logics/request/req_102_export_frame_and_network_identity_cartouche_for_svg_png.md`.
 - Depends on `item_491_network_metadata_model_extension_author_project_code_logo_url_export_notes.md`.
 - Orchestrated by `logics/tasks/task_078_req_102_export_frame_and_network_identity_cartouche_for_svg_png_orchestration_and_delivery_control.md`.
-
