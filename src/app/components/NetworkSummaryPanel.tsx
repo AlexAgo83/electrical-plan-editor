@@ -650,6 +650,8 @@ interface CalloutEntry {
   wireId: string;
   name: string;
   technicalId: string;
+  targetId: string;
+  targetPin: string;
   lengthMm: number;
   sectionMm2: number;
 }
@@ -698,11 +700,13 @@ const CALLOUT_MIN_WIDTH = 44;
 const CALLOUT_MAX_WIDTH = 520;
 const CALLOUT_LAYOUT_CACHE_MAX_ENTRIES = 512;
 
-type CalloutTableColumnKey = "pin" | "technicalId" | "wireName" | "length" | "section";
+type CalloutTableColumnKey = "pin" | "technicalId" | "targetId" | "targetPin" | "wireName" | "length" | "section";
 
 interface CalloutTableRow {
   pin: string;
   technicalId: string;
+  targetId: string;
+  targetPin: string;
   wireName: string;
   length: string;
   section: string;
@@ -812,6 +816,8 @@ function buildCalloutRows(groups: CalloutGroup[]): CalloutTableRow[] {
       rows.push({
         pin: group.label,
         technicalId: entry.technicalId.trim().length > 0 ? entry.technicalId : entry.wireId,
+        targetId: entry.targetId,
+        targetPin: entry.targetPin,
         wireName: entry.name,
         length: `${entry.lengthMm} mm`,
         section: `${entry.sectionMm2} mm²`
@@ -925,6 +931,12 @@ function getCalloutRowCellValue(row: CalloutTableRow, key: CalloutTableColumnKey
   if (key === "technicalId") {
     return row.technicalId;
   }
+  if (key === "targetId") {
+    return row.targetId;
+  }
+  if (key === "targetPin") {
+    return row.targetPin;
+  }
   if (key === "wireName") {
     return row.wireName;
   }
@@ -955,6 +967,8 @@ function buildCalloutLayoutMetrics(
   }> = [
     { key: "pin", header: "Pin", textAnchor: "start" },
     { key: "technicalId", header: "Wire ID", textAnchor: "start" },
+    { key: "targetId", header: "Node ID", textAnchor: "start" },
+    { key: "targetPin", header: "PIN", textAnchor: "start" },
     ...(showCalloutWireNames
       ? ([{ key: "wireName", header: "Wire name", textAnchor: "start" }] as const)
       : []),
@@ -1372,6 +1386,24 @@ export function NetworkSummaryPanel({
     return directions;
   }, [nodes, segments, networkNodePositions]);
 
+  const describeWireEndpointForCallout = useCallback(
+    (endpoint: Wire["endpointA"]): { targetId: string; targetPin: string } => {
+      if (endpoint.kind === "connectorCavity") {
+        const connectorTechnicalId = connectorMap.get(endpoint.connectorId)?.technicalId ?? String(endpoint.connectorId);
+        return {
+          targetId: connectorTechnicalId,
+          targetPin: `C${endpoint.cavityIndex}`
+        };
+      }
+      const spliceTechnicalId = spliceMap.get(endpoint.spliceId)?.technicalId ?? String(endpoint.spliceId);
+      return {
+        targetId: spliceTechnicalId,
+        targetPin: `P${endpoint.portIndex}`
+      };
+    },
+    [connectorMap, spliceMap]
+  );
+
   const connectorCalloutGroupsById = useMemo(() => {
     const map = new Map<ConnectorId, CalloutGroup[]>();
     for (const connector of connectorMap.values()) {
@@ -1384,23 +1416,29 @@ export function NetworkSummaryPanel({
     }
 
     for (const wire of wires) {
-      const endpoints = [wire.endpointA, wire.endpointB];
-      for (const endpoint of endpoints) {
-        if (endpoint.kind !== "connectorCavity") {
+      const endpointPairs = [
+        { localEndpoint: wire.endpointA, targetEndpoint: wire.endpointB },
+        { localEndpoint: wire.endpointB, targetEndpoint: wire.endpointA }
+      ] as const;
+      for (const { localEndpoint, targetEndpoint } of endpointPairs) {
+        if (localEndpoint.kind !== "connectorCavity") {
           continue;
         }
-        const groups = map.get(endpoint.connectorId);
-        if (groups === undefined || endpoint.cavityIndex < 1) {
+        const groups = map.get(localEndpoint.connectorId);
+        if (groups === undefined || localEndpoint.cavityIndex < 1) {
           continue;
         }
-        const groupIndex = endpoint.cavityIndex - 1;
+        const groupIndex = localEndpoint.cavityIndex - 1;
         if (groupIndex >= groups.length) {
           continue;
         }
+        const target = describeWireEndpointForCallout(targetEndpoint);
         groups[groupIndex]?.entries.push({
           wireId: wire.id,
           name: wire.name,
           technicalId: wire.technicalId,
+          targetId: target.targetId,
+          targetPin: target.targetPin,
           lengthMm: wire.lengthMm,
           sectionMm2: wire.sectionMm2
         });
@@ -1416,42 +1454,48 @@ export function NetworkSummaryPanel({
       }
     }
     return map;
-  }, [connectorMap, wires]);
+  }, [connectorMap, wires, describeWireEndpointForCallout]);
 
   const spliceCalloutGroupsById = useMemo(() => {
     const map = new Map<SpliceId, CalloutGroup[]>();
     const entriesBySpliceAndPort = new Map<SpliceId, Map<number, CalloutEntry[]>>();
 
     for (const wire of wires) {
-      const endpoints = [wire.endpointA, wire.endpointB];
-      for (const endpoint of endpoints) {
-        if (endpoint.kind !== "splicePort") {
+      const endpointPairs = [
+        { localEndpoint: wire.endpointA, targetEndpoint: wire.endpointB },
+        { localEndpoint: wire.endpointB, targetEndpoint: wire.endpointA }
+      ] as const;
+      for (const { localEndpoint, targetEndpoint } of endpointPairs) {
+        if (localEndpoint.kind !== "splicePort") {
           continue;
         }
-        if (endpoint.portIndex < 1) {
+        if (localEndpoint.portIndex < 1) {
           continue;
         }
-        const splice = spliceMap.get(endpoint.spliceId);
+        const splice = spliceMap.get(localEndpoint.spliceId);
         if (splice === undefined) {
           continue;
         }
-        if (resolveSplicePortMode(splice) === "bounded" && endpoint.portIndex > splice.portCount) {
+        if (resolveSplicePortMode(splice) === "bounded" && localEndpoint.portIndex > splice.portCount) {
           continue;
         }
-        let entriesByPort = entriesBySpliceAndPort.get(endpoint.spliceId);
+        let entriesByPort = entriesBySpliceAndPort.get(localEndpoint.spliceId);
         if (entriesByPort === undefined) {
           entriesByPort = new Map<number, CalloutEntry[]>();
-          entriesBySpliceAndPort.set(endpoint.spliceId, entriesByPort);
+          entriesBySpliceAndPort.set(localEndpoint.spliceId, entriesByPort);
         }
-        const currentEntries = entriesByPort.get(endpoint.portIndex) ?? [];
+        const currentEntries = entriesByPort.get(localEndpoint.portIndex) ?? [];
+        const target = describeWireEndpointForCallout(targetEndpoint);
         currentEntries.push({
           wireId: wire.id,
           name: wire.name,
           technicalId: wire.technicalId,
+          targetId: target.targetId,
+          targetPin: target.targetPin,
           lengthMm: wire.lengthMm,
           sectionMm2: wire.sectionMm2
         });
-        entriesByPort.set(endpoint.portIndex, currentEntries);
+        entriesByPort.set(localEndpoint.portIndex, currentEntries);
       }
     }
 
@@ -1475,7 +1519,7 @@ export function NetworkSummaryPanel({
       map.set(splice.id, groups);
     }
     return map;
-  }, [spliceMap, wires]);
+  }, [spliceMap, wires, describeWireEndpointForCallout]);
 
   const getDefaultCalloutPosition = useCallback(
     (nodeId: NodeId, nodePosition: NodePosition) => {
@@ -2547,6 +2591,9 @@ export function NetworkSummaryPanel({
                                 y={headerY}
                                 textAnchor={column.textAnchor}
                                 dominantBaseline="hanging"
+                                data-locale-exempt={
+                                  column.key === "technicalId" || column.key === "targetId" ? "true" : undefined
+                                }
                               >
                                 {column.header}
                               </text>
