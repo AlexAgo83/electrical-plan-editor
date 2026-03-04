@@ -206,3 +206,5 @@ export function useCatalogHandlers({
     handleCatalogDelete
   };
 }
+
+export type CatalogHandlersModel = ReturnType<typeof useCatalogHandlers>;

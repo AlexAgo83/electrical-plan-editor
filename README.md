@@ -89,11 +89,43 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - `Export BOM CSV` (catalog-aggregated BOM with pricing context metadata, HT totals, and conditional TTC columns/totals when tax is enabled)
 - Theme presets including multiple light and dark themes
 - Local persistence with schema versioning and migrations
-- Req_104 hardening progress (in delivery):
+- Req_104 hardening (delivered and validated):
   - UI preferences schema migration path now supports legacy payload migration instead of blanket rejection on schema mismatch
   - network summary view-state sync extracted from `AppController` to dedicated hook (no `react-hooks/exhaustive-deps` suppression)
   - callout text measurement hidden SVG node now cleaned up on unmount (regression-covered)
   - export SVG/PNG pipeline helpers extracted from `NetworkSummaryPanel` into dedicated module
+  - export SVG/PNG controller callbacks extracted to `network-summary/export/useNetworkSummaryExportActions.ts`
+  - segment/node render model extracted to `network-summary/graph/networkSummaryGraphModel.ts`
+  - segment/grid/node/label SVG layers extracted to `network-summary/graph/NetworkSummaryGraphLayers.tsx`
+  - quick-entity navigation strip extracted to `network-summary/NetworkSummaryQuickEntityNavigation.tsx`
+  - callout row/group/view-model builders extracted into `network-summary/callouts/calloutModel.ts` (`NetworkSummaryPanel.tsx`: `2811` -> `975` lines)
+  - onboarding controller extracted into `hooks/controller/useOnboardingController.ts`
+  - catalog sub-screen domain composition extracted into `hooks/controller/useAppControllerCatalogScreenDomains.tsx`
+  - modeling/analysis domain assembly extracted into `hooks/controller/useAppControllerModelingAnalysisDomainAssembly.tsx`
+  - auxiliary screen-domain assembly extracted into `hooks/controller/useAppControllerAuxDomainAssembly.tsx`
+  - catalog CSV import/export orchestration extracted into `hooks/useCatalogCsvImportExport.ts`
+  - UI preference binding orchestration extracted into `hooks/controller/useAppControllerUiPreferencesBindings.ts`
+  - workspace-handlers domain assembly extracted into `hooks/controller/useAppControllerWorkspaceHandlersDomainAssembly.ts`
+  - home workspace content orchestration extracted into `hooks/controller/useAppControllerHomeWorkspaceContent.tsx`
+  - network summary panel domain assembly extracted into `hooks/controller/useAppControllerNetworkSummaryPanelDomain.tsx`
+  - selection handlers domain assembly extracted into `hooks/controller/useAppControllerSelectionHandlersDomainAssembly.ts`
+  - canvas interaction domain assembly extracted into `hooks/controller/useAppControllerCanvasInteractionDomainAssembly.ts`
+  - inspector/issue/layout state assembly extracted into `hooks/controller/useAppControllerInspectorIssueLayoutState.tsx`
+  - network summary viewport sizing assembly extracted into `hooks/controller/useAppControllerNetworkViewportState.ts`
+  - shell header offset observer extracted into `hooks/controller/useAppControllerHeaderOffsetState.ts`
+  - canvas state synchronization effects extracted into `hooks/controller/useAppControllerCanvasStateSyncEffects.ts`
+  - uniqueness checks extraction into `hooks/controller/useAppControllerUniquenessFlags.ts`
+  - regenerate-layout workflow extraction into `hooks/controller/useAppControllerRegenerateLayoutAction.ts`
+  - controller lifecycle effects extraction into `hooks/controller/useAppControllerLifecycleEffects.ts`
+  - workspace network-domain orchestration extraction into `hooks/controller/useAppControllerWorkspaceNetworkDomainAssembly.ts`
+  - workspace content-domain assembly extraction into `hooks/controller/useAppControllerWorkspaceContentAssembly.tsx` (high-level domain models + handlers)
+  - AppController overlays rendering extraction into `components/layout/AppControllerOverlays.tsx`
+  - app snapshot subscription extraction into `hooks/useAppSnapshot.ts`
+  - workspace screen-navigation callbacks extracted into `hooks/controller/useAppControllerWorkspaceScreenController.ts`
+  - `AppShellLayout` prop assembly extracted into `hooks/controller/buildAppControllerShellLayoutProps.ts`
+  - settings/network-scope domain bindings now consume typed state models directly (`prefs`, `canvasDisplay`, `networkScope.formState`) (`AppController.tsx`: `2702` -> `1100` lines)
+  - `NetworkSummaryPanel.tsx` now under phase-1 budget (`975` lines)
+  - req_104 closure matrix passed (`logics_lint`, `lint`, `typecheck`, `test:ci:ui`, `test:e2e`)
 - PWA support (install prompt + offline shell + update readiness in production)
 - Keyboard shortcuts for major workspace actions
 

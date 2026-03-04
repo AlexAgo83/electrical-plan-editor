@@ -5,7 +5,6 @@ import {
   useRef,
   useState,
   type CSSProperties,
-  type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactElement,
   type WheelEvent as ReactWheelEvent
@@ -21,7 +20,6 @@ import type {
   SpliceId,
   Wire
 } from "../../core/entities";
-import { CABLE_COLOR_BY_ID, getWireColorCode } from "../../core/cableColors";
 import type { ShortestRouteResult } from "../../core/pathfinding";
 import type { SubNetworkSummary } from "../../store";
 import type {
@@ -37,31 +35,34 @@ import type {
 import { NetworkCanvasFloatingInfoPanels } from "./network-summary/NetworkCanvasFloatingInfoPanels";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
 import { NetworkSummaryLegend } from "./network-summary/NetworkSummaryLegend";
+import { NetworkSummaryQuickEntityNavigation } from "./network-summary/NetworkSummaryQuickEntityNavigation";
+import {
+  buildCableCalloutViewModels,
+  buildConnectorCalloutGroupsById,
+  buildSpliceCalloutGroupsById
+} from "./network-summary/callouts/calloutModel";
 import {
   NetworkSummaryCalloutLeaders,
   NetworkSummaryCalloutsLayer
 } from "./network-summary/callouts/NetworkSummaryCalloutsLayer";
 import {
   CALLOUT_OFFSET_SCREEN_UNITS,
-  buildCalloutHeaderDisplay,
   computeRenderedCableCallouts,
   disposeCalloutMeasurementResources,
-  normalizeReadableSegmentLabelAngle,
   normalizeVector,
   type CableCalloutViewModel,
-  type CalloutEntry,
-  type CalloutGroup,
   type CalloutTargetKey,
   type DraggingCalloutState
 } from "./network-summary/callouts/calloutLayout";
 import {
-  applyExportDecorations,
-  copyComputedStylesToSvgClone,
-  exportCanvasToPngBlob,
-  resolveCanvasExportBackgroundFill
-} from "./network-summary/export/networkSummaryExport";
+  buildRenderedNodes,
+  buildRenderedSegments
+} from "./network-summary/graph/networkSummaryGraphModel";
+import { NetworkSummaryGraphLayers } from "./network-summary/graph/NetworkSummaryGraphLayers";
+import {
+  useNetworkSummaryExportActions
+} from "./network-summary/export/useNetworkSummaryExportActions";
 import { snapToGrid } from "../lib/app-utils-shared";
-import { resolveSplicePortMode } from "../../core/splicePortMode";
 
 
 export interface NetworkSummaryPanelProps {
@@ -150,36 +151,6 @@ export interface NetworkSummaryPanelProps {
   onExportBomCsv: () => void;
   onRegenerateLayout: () => void;
 }
-
-const QUICK_ENTITY_NAV_ITEMS: Record<
-  NetworkSummaryPanelProps["quickEntityNavigationMode"],
-  ReadonlyArray<{ subScreen: SubScreenId; label: string }>
-> = {
-  modeling: [
-    { subScreen: "catalog", label: "Catalog" },
-    { subScreen: "connector", label: "Connectors" },
-    { subScreen: "splice", label: "Splices" },
-    { subScreen: "node", label: "Nodes" },
-    { subScreen: "segment", label: "Segments" },
-    { subScreen: "wire", label: "Wires" }
-  ],
-  analysis: [
-    { subScreen: "connector", label: "Connectors" },
-    { subScreen: "splice", label: "Splices" },
-    { subScreen: "node", label: "Nodes" },
-    { subScreen: "segment", label: "Segments" },
-    { subScreen: "wire", label: "Wires" }
-  ]
-};
-
-const SUB_SCREEN_ICON_CLASS_BY_ID: Record<SubScreenId, string> = {
-  catalog: "is-catalog",
-  connector: "is-connectors",
-  splice: "is-splices",
-  node: "is-nodes",
-  segment: "is-segments",
-  wire: "is-wires"
-};
 
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -492,164 +463,25 @@ export function NetworkSummaryPanel({
     return directions;
   }, [nodes, segments, networkNodePositions]);
 
-  const describeWireEndpointForCallout = useCallback(
-    (endpoint: Wire["endpointA"]): { targetId: string; targetPin: string } => {
-      if (endpoint.kind === "connectorCavity") {
-        const connectorTechnicalId = connectorMap.get(endpoint.connectorId)?.technicalId ?? String(endpoint.connectorId);
-        return {
-          targetId: connectorTechnicalId,
-          targetPin: `C${endpoint.cavityIndex}`
-        };
-      }
-      const spliceTechnicalId = spliceMap.get(endpoint.spliceId)?.technicalId ?? String(endpoint.spliceId);
-      return {
-        targetId: spliceTechnicalId,
-        targetPin: `P${endpoint.portIndex}`
-      };
-    },
-    [connectorMap, spliceMap]
+  const connectorCalloutGroupsById = useMemo(
+    () =>
+      buildConnectorCalloutGroupsById({
+        connectorMap,
+        spliceMap,
+        wires
+      }),
+    [connectorMap, spliceMap, wires]
   );
 
-  const resolveWireColorSwatches = useCallback((wire: Wire): { primaryHex: string | null; secondaryHex: string | null } => {
-    const primaryId = wire.primaryColorId;
-    if (primaryId === null) {
-      return { primaryHex: null, secondaryHex: null };
-    }
-    const primaryHex = CABLE_COLOR_BY_ID[primaryId]?.hex ?? null;
-    if (primaryHex === null) {
-      return { primaryHex: null, secondaryHex: null };
-    }
-    const secondaryId = wire.secondaryColorId;
-    return {
-      primaryHex,
-      secondaryHex: secondaryId === null ? null : CABLE_COLOR_BY_ID[secondaryId]?.hex ?? null
-    };
-  }, []);
-
-  const connectorCalloutGroupsById = useMemo(() => {
-    const map = new Map<ConnectorId, CalloutGroup[]>();
-    for (const connector of connectorMap.values()) {
-      const groups = Array.from({ length: Math.max(0, connector.cavityCount) }, (_, index) => ({
-        key: `connector:${connector.id}:C${index + 1}`,
-        label: `C${index + 1}`,
-        entries: [] as CalloutEntry[]
-      }));
-      map.set(connector.id, groups);
-    }
-
-    for (const wire of wires) {
-      const endpointPairs = [
-        { localEndpoint: wire.endpointA, targetEndpoint: wire.endpointB },
-        { localEndpoint: wire.endpointB, targetEndpoint: wire.endpointA }
-      ] as const;
-      for (const { localEndpoint, targetEndpoint } of endpointPairs) {
-        if (localEndpoint.kind !== "connectorCavity") {
-          continue;
-        }
-        const groups = map.get(localEndpoint.connectorId);
-        if (groups === undefined || localEndpoint.cavityIndex < 1) {
-          continue;
-        }
-        const groupIndex = localEndpoint.cavityIndex - 1;
-        if (groupIndex >= groups.length) {
-          continue;
-        }
-        const target = describeWireEndpointForCallout(targetEndpoint);
-        const colorSwatches = resolveWireColorSwatches(wire);
-        groups[groupIndex]?.entries.push({
-          wireId: wire.id,
-          name: wire.name,
-          technicalId: wire.technicalId,
-          color: getWireColorCode(wire),
-          colorPrimaryHex: colorSwatches.primaryHex,
-          colorSecondaryHex: colorSwatches.secondaryHex,
-          targetId: target.targetId,
-          targetPin: target.targetPin,
-          lengthMm: wire.lengthMm,
-          sectionMm2: wire.sectionMm2
-        });
-      }
-    }
-
-    for (const groups of map.values()) {
-      for (const group of groups) {
-        group.entries.sort(
-          (left, right) =>
-            left.name.localeCompare(right.name) || left.technicalId.localeCompare(right.technicalId)
-        );
-      }
-    }
-    return map;
-  }, [connectorMap, wires, describeWireEndpointForCallout, resolveWireColorSwatches]);
-
-  const spliceCalloutGroupsById = useMemo(() => {
-    const map = new Map<SpliceId, CalloutGroup[]>();
-    const entriesBySpliceAndPort = new Map<SpliceId, Map<number, CalloutEntry[]>>();
-
-    for (const wire of wires) {
-      const endpointPairs = [
-        { localEndpoint: wire.endpointA, targetEndpoint: wire.endpointB },
-        { localEndpoint: wire.endpointB, targetEndpoint: wire.endpointA }
-      ] as const;
-      for (const { localEndpoint, targetEndpoint } of endpointPairs) {
-        if (localEndpoint.kind !== "splicePort") {
-          continue;
-        }
-        if (localEndpoint.portIndex < 1) {
-          continue;
-        }
-        const splice = spliceMap.get(localEndpoint.spliceId);
-        if (splice === undefined) {
-          continue;
-        }
-        if (resolveSplicePortMode(splice) === "bounded" && localEndpoint.portIndex > splice.portCount) {
-          continue;
-        }
-        let entriesByPort = entriesBySpliceAndPort.get(localEndpoint.spliceId);
-        if (entriesByPort === undefined) {
-          entriesByPort = new Map<number, CalloutEntry[]>();
-          entriesBySpliceAndPort.set(localEndpoint.spliceId, entriesByPort);
-        }
-        const currentEntries = entriesByPort.get(localEndpoint.portIndex) ?? [];
-        const target = describeWireEndpointForCallout(targetEndpoint);
-        const colorSwatches = resolveWireColorSwatches(wire);
-        currentEntries.push({
-          wireId: wire.id,
-          name: wire.name,
-          technicalId: wire.technicalId,
-          color: getWireColorCode(wire),
-          colorPrimaryHex: colorSwatches.primaryHex,
-          colorSecondaryHex: colorSwatches.secondaryHex,
-          targetId: target.targetId,
-          targetPin: target.targetPin,
-          lengthMm: wire.lengthMm,
-          sectionMm2: wire.sectionMm2
-        });
-        entriesByPort.set(localEndpoint.portIndex, currentEntries);
-      }
-    }
-
-    for (const splice of spliceMap.values()) {
-      const entriesByPort = entriesBySpliceAndPort.get(splice.id) ?? new Map<number, CalloutEntry[]>();
-      const portIndexes =
-        resolveSplicePortMode(splice) === "bounded"
-          ? Array.from({ length: Math.max(0, splice.portCount) }, (_, index) => index + 1)
-          : [...entriesByPort.keys()].sort((left, right) => left - right);
-      const groups = portIndexes.map((portIndex) => ({
-        key: `splice:${splice.id}:P${portIndex}`,
-        label: `P${portIndex}`,
-        entries: entriesByPort.get(portIndex) ?? []
-      }));
-      for (const group of groups) {
-        group.entries.sort(
-          (left, right) =>
-            left.name.localeCompare(right.name) || left.technicalId.localeCompare(right.technicalId)
-        );
-      }
-      map.set(splice.id, groups);
-    }
-    return map;
-  }, [spliceMap, wires, describeWireEndpointForCallout, resolveWireColorSwatches]);
+  const spliceCalloutGroupsById = useMemo(
+    () =>
+      buildSpliceCalloutGroupsById({
+        connectorMap,
+        spliceMap,
+        wires
+      }),
+    [connectorMap, spliceMap, wires]
+  );
 
   const getDefaultCalloutPosition = useCallback(
     (nodeId: NodeId, nodePosition: NodePosition) => {
@@ -682,118 +514,43 @@ export function NetworkSummaryPanel({
     [connectedSegmentDirectionByNodeId, graphCenter, inverseLabelScale]
   );
 
-  const cableCalloutViewModels = useMemo(() => {
-    if (!showCableCallouts) {
-      return [] as CableCalloutViewModel[];
-    }
-
-    const models: CableCalloutViewModel[] = [];
-    for (const node of nodes) {
-      const nodePosition = networkNodePositions[node.id];
-      if (nodePosition === undefined || (node.kind !== "connector" && node.kind !== "splice")) {
-        continue;
-      }
-
-      if (node.kind === "connector") {
-        const connector = connectorMap.get(node.connectorId);
-        if (connector === undefined) {
-          continue;
-        }
-        const key = `connector:${connector.id}` as const;
-        const draftPosition = draftCalloutPositions[key];
-        const persistedPosition = connector.cableCalloutPosition;
-        const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
-        const groups = (connectorCalloutGroupsById.get(connector.id) ?? []).filter((group) => group.entries.length > 0);
-        if (groups.length === 0) {
-          continue;
-        }
-        const header = buildCalloutHeaderDisplay(connector.name, connector.technicalId);
-        models.push({
-          key,
-          kind: "connector",
-          entityId: connector.id,
-          nodeId: node.id,
-          nodePosition,
-          position,
-          title: header.title,
-          subtitle: header.subtitle,
-          groups,
-          isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
-          isSelected: selectedConnectorId === connector.id
-        });
-        continue;
-      }
-
-      const splice = spliceMap.get(node.spliceId);
-      if (splice === undefined) {
-        continue;
-      }
-      const key = `splice:${splice.id}` as const;
-      const draftPosition = draftCalloutPositions[key];
-      const persistedPosition = splice.cableCalloutPosition;
-      const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
-      const groups = (spliceCalloutGroupsById.get(splice.id) ?? []).filter((group) => group.entries.length > 0);
-      if (groups.length === 0) {
-        continue;
-      }
-      const header = buildCalloutHeaderDisplay(splice.name, splice.technicalId);
-      models.push({
-        key,
-        kind: "splice",
-        entityId: splice.id,
-        nodeId: node.id,
-        nodePosition,
-        position,
-        title: header.title,
-        subtitle: header.subtitle,
-        groups,
-        isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
-        isSelected: selectedSpliceId === splice.id
-      });
-    }
-
-    const sortedModels = models.sort((left, right) => left.title.localeCompare(right.title) || left.subtitle.localeCompare(right.subtitle));
-    if (!showSelectedCalloutOnly) {
-      return sortedModels;
-    }
-
-    let selectedCalloutKey =
-      selectedConnectorId !== null
-        ? (`connector:${selectedConnectorId}` as const)
-        : selectedSpliceId !== null
-          ? (`splice:${selectedSpliceId}` as const)
-          : null;
-    if (selectedCalloutKey === null && selectedNodeId !== null) {
-      const selectedNode = nodes.find((entry) => entry.id === selectedNodeId);
-      if (selectedNode?.kind === "connector") {
-        selectedCalloutKey = `connector:${selectedNode.connectorId}` as const;
-      } else if (selectedNode?.kind === "splice") {
-        selectedCalloutKey = `splice:${selectedNode.spliceId}` as const;
-      }
-    }
-    if (selectedCalloutKey === null) {
-      return [] as CableCalloutViewModel[];
-    }
-
-    const selectedCallout = sortedModels.find((entry) => entry.key === selectedCalloutKey);
-    return selectedCallout === undefined ? [] as CableCalloutViewModel[] : [selectedCallout];
-  }, [
-    showCableCallouts,
-    showSelectedCalloutOnly,
-    nodes,
-    networkNodePositions,
-    connectorMap,
-    spliceMap,
-    connectorCalloutGroupsById,
-    spliceCalloutGroupsById,
-    draftCalloutPositions,
-    getDefaultCalloutPosition,
-    isSubNetworkFilteringActive,
-    nodeHasActiveSubNetworkConnection,
-    selectedConnectorId,
-    selectedSpliceId,
-    selectedNodeId
-  ]);
+  const cableCalloutViewModels = useMemo(
+    () =>
+      buildCableCalloutViewModels({
+        showCableCallouts,
+        showSelectedCalloutOnly,
+        nodes,
+        networkNodePositions,
+        connectorMap,
+        spliceMap,
+        connectorCalloutGroupsById,
+        spliceCalloutGroupsById,
+        draftCalloutPositions,
+        getDefaultCalloutPosition,
+        isSubNetworkFilteringActive,
+        nodeHasActiveSubNetworkConnection,
+        selectedConnectorId,
+        selectedSpliceId,
+        selectedNodeId
+      }),
+    [
+      showCableCallouts,
+      showSelectedCalloutOnly,
+      nodes,
+      networkNodePositions,
+      connectorMap,
+      spliceMap,
+      connectorCalloutGroupsById,
+      spliceCalloutGroupsById,
+      draftCalloutPositions,
+      getDefaultCalloutPosition,
+      isSubNetworkFilteringActive,
+      nodeHasActiveSubNetworkConnection,
+      selectedConnectorId,
+      selectedSpliceId,
+      selectedNodeId
+    ]
+  );
 
   const orderedCableCallouts = useMemo(() => {
     if (cableCalloutViewModels.length <= 1) {
@@ -946,197 +703,20 @@ export function NetworkSummaryPanel({
     stopNetworkNodeDrag();
   }, [stopCalloutDrag, stopNetworkNodeDrag]);
 
-  const handleExportPlanAsSvg = useCallback(async () => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const sourceSvg = networkSvgRef.current;
-    if (sourceSvg === null) {
-      return;
-    }
-
-    const viewBoxWidth = sourceSvg.viewBox.baseVal.width;
-    const viewBoxHeight = sourceSvg.viewBox.baseVal.height;
-    const fallbackRect = sourceSvg.getBoundingClientRect();
-    const exportWidth = Math.max(1, Math.round(viewBoxWidth > 0 ? viewBoxWidth : fallbackRect.width));
-    const exportHeight = Math.max(1, Math.round(viewBoxHeight > 0 ? viewBoxHeight : fallbackRect.height));
-    const svgClone = sourceSvg.cloneNode(true) as SVGSVGElement;
-    svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    svgClone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
-    svgClone.setAttribute("width", String(exportWidth));
-    svgClone.setAttribute("height", String(exportHeight));
-    if (!svgClone.getAttribute("viewBox")) {
-      svgClone.setAttribute("viewBox", `0 0 ${exportWidth} ${exportHeight}`);
-    }
-    copyComputedStylesToSvgClone(sourceSvg, svgClone);
-    await applyExportDecorations({
-      sourceSvg,
-      cloneSvg: svgClone,
-      width: exportWidth,
-      height: exportHeight,
-      includeFrame: exportIncludeFrame,
-      includeCartouche: exportIncludeCartouche,
-      cartoucheNetworkName: exportCartoucheNetworkName,
-      cartoucheAuthor: exportCartoucheAuthor,
-      cartoucheProjectCode: exportCartoucheProjectCode,
-      cartoucheCreatedAt: exportCartoucheCreatedAt,
-      cartoucheLogoUrl: exportCartoucheLogoUrl,
-      cartoucheNotes: exportCartoucheNotes
-    });
-
-    const serializedSvg = new XMLSerializer().serializeToString(svgClone);
-    const blob = new Blob([serializedSvg], { type: "image/svg+xml;charset=utf-8" });
-    const blobUrl = URL.createObjectURL(blob);
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const downloadLink = document.createElement("a");
-    downloadLink.href = blobUrl;
-    downloadLink.download = `network-plan-${timestamp}.svg`;
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    downloadLink.remove();
-    window.setTimeout(() => {
-      URL.revokeObjectURL(blobUrl);
-    }, 0);
-  }, [
-    exportCartoucheAuthor,
-    exportCartoucheCreatedAt,
-    exportCartoucheLogoUrl,
-    exportCartoucheNetworkName,
-    exportCartoucheNotes,
-    exportCartoucheProjectCode,
-    exportIncludeCartouche,
-    exportIncludeFrame
-  ]);
-
-  const handleExportPlanAsPng = useCallback(async () => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const sourceSvg = networkSvgRef.current;
-    if (sourceSvg === null) {
-      return;
-    }
-
-    const viewBoxWidth = sourceSvg.viewBox.baseVal.width;
-    const viewBoxHeight = sourceSvg.viewBox.baseVal.height;
-    const fallbackRect = sourceSvg.getBoundingClientRect();
-    const exportWidth = Math.max(1, Math.round(viewBoxWidth > 0 ? viewBoxWidth : fallbackRect.width));
-    const exportHeight = Math.max(1, Math.round(viewBoxHeight > 0 ? viewBoxHeight : fallbackRect.height));
-
-    const svgClone = sourceSvg.cloneNode(true) as SVGSVGElement;
-    svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    svgClone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
-    svgClone.setAttribute("width", String(exportWidth));
-    svgClone.setAttribute("height", String(exportHeight));
-    if (!svgClone.getAttribute("viewBox")) {
-      svgClone.setAttribute("viewBox", `0 0 ${exportWidth} ${exportHeight}`);
-    }
-    copyComputedStylesToSvgClone(sourceSvg, svgClone);
-    await applyExportDecorations({
-      sourceSvg,
-      cloneSvg: svgClone,
-      width: exportWidth,
-      height: exportHeight,
-      includeFrame: exportIncludeFrame,
-      includeCartouche: exportIncludeCartouche,
-      cartoucheNetworkName: exportCartoucheNetworkName,
-      cartoucheAuthor: exportCartoucheAuthor,
-      cartoucheProjectCode: exportCartoucheProjectCode,
-      cartoucheCreatedAt: exportCartoucheCreatedAt,
-      cartoucheLogoUrl: exportCartoucheLogoUrl,
-      cartoucheNotes: exportCartoucheNotes
-    });
-
-    const serializedSvg = new XMLSerializer().serializeToString(svgClone);
-    const svgBlob = new Blob([serializedSvg], { type: "image/svg+xml;charset=utf-8" });
-    const svgUrl = URL.createObjectURL(svgBlob);
-    try {
-      const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const nextImage = new Image();
-        nextImage.decoding = "async";
-        nextImage.onload = () => resolve(nextImage);
-        nextImage.onerror = () => reject(new Error("Unable to render SVG export preview."));
-        nextImage.src = svgUrl;
-      });
-
-      const exportScale = Math.max(1, Math.ceil(window.devicePixelRatio || 1));
-      const canvas = document.createElement("canvas");
-      canvas.width = exportWidth * exportScale;
-      canvas.height = exportHeight * exportScale;
-
-      const context = canvas.getContext("2d");
-      if (context === null) {
-        return;
-      }
-
-      context.setTransform(exportScale, 0, 0, exportScale, 0, 0);
-      if (pngExportIncludeBackground) {
-        const backgroundFill = resolveCanvasExportBackgroundFill(networkCanvasShellRef.current);
-        if (backgroundFill !== null) {
-          context.fillStyle = backgroundFill;
-          context.fillRect(0, 0, exportWidth, exportHeight);
-        }
-      }
-      context.drawImage(image, 0, 0, exportWidth, exportHeight);
-
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const pngBlob = await exportCanvasToPngBlob(canvas);
-      const pngBlobUrl = URL.createObjectURL(pngBlob);
-      const downloadLink = document.createElement("a");
-      downloadLink.href = pngBlobUrl;
-      downloadLink.download = `network-plan-${timestamp}.png`;
-      downloadLink.style.display = "none";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      downloadLink.remove();
-      window.setTimeout(() => {
-        URL.revokeObjectURL(pngBlobUrl);
-      }, 0);
-    } finally {
-      URL.revokeObjectURL(svgUrl);
-    }
-  }, [
-    exportCartoucheAuthor,
-    exportCartoucheCreatedAt,
-    exportCartoucheLogoUrl,
-    exportCartoucheNetworkName,
-    exportCartoucheNotes,
-    exportCartoucheProjectCode,
-    exportIncludeCartouche,
+  const { handleExportPlan } = useNetworkSummaryExportActions({
+    networkSvgRef,
+    networkCanvasShellRef,
+    canvasExportFormat,
+    pngExportIncludeBackground,
     exportIncludeFrame,
-    pngExportIncludeBackground
-  ]);
-
-  const handleExportPlan = useCallback(() => {
-    if (canvasExportFormat === "png") {
-      void handleExportPlanAsPng();
-      return;
-    }
-    void handleExportPlanAsSvg();
-  }, [canvasExportFormat, handleExportPlanAsPng, handleExportPlanAsSvg]);
-
-  function handleNetworkNodeKeyDown(event: ReactKeyboardEvent<SVGGElement>, nodeId: NodeId): void {
-    if (event.key !== "Enter" && event.key !== " ") {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    handleNetworkNodeActivate(nodeId);
-  }
-
-  function handleNetworkSegmentKeyDown(event: ReactKeyboardEvent<SVGLineElement>, segmentId: SegmentId): void {
-    if (event.key !== "Enter" && event.key !== " ") {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    handleNetworkSegmentClick(segmentId);
-  }
+    exportIncludeCartouche,
+    exportCartoucheNetworkName,
+    exportCartoucheAuthor,
+    exportCartoucheProjectCode,
+    exportCartoucheCreatedAt,
+    exportCartoucheLogoUrl,
+    exportCartoucheNotes
+  });
 
   const renderedCableCallouts = useMemo(() => {
     return computeRenderedCableCallouts({
@@ -1166,51 +746,18 @@ export function NetworkSummaryPanel({
 
   const renderedSegments = useMemo(
     () =>
-      segments.flatMap((segment) => {
-        const nodeAPosition = networkNodePositions[segment.nodeA];
-        const nodeBPosition = networkNodePositions[segment.nodeB];
-        if (nodeAPosition === undefined || nodeBPosition === undefined) {
-          return [];
-        }
-
-        const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
-        const isSubNetworkDeemphasized = isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
-        const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
-        const isSelectedSegment = selectedSegmentId === segment.id;
-        const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
-          isSelectedSegment ? " is-selected" : ""
-        }`;
-        const segmentGroupClassName = `network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`;
-        const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
-        const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
-        const segmentVectorX = nodeBPosition.x - nodeAPosition.x;
-        const segmentVectorY = nodeBPosition.y - nodeAPosition.y;
-        const segmentAngleDegrees = normalizeReadableSegmentLabelAngle(
-          (Math.atan2(segmentVectorY, segmentVectorX) * 180) / Math.PI
-        );
-        const segmentLabelRotationDegrees = autoSegmentLabelRotation ? segmentAngleDegrees : labelRotationDegrees;
-        const segmentLabelRotationRadians = (segmentLabelRotationDegrees * Math.PI) / 180;
-        const segmentLabelOffsetDistance = showSegmentLengths && showSegmentNames ? 6 : 0;
-        // Keep ID/length split along the label-normal axis, including when labels are auto-rotated.
-        const segmentLengthLabelOffsetX = -Math.sin(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
-        const segmentLengthLabelOffsetY = Math.cos(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
-
-        return [
-          {
-            segment,
-            nodeAPosition,
-            nodeBPosition,
-            segmentClassName,
-            segmentGroupClassName,
-            labelX,
-            labelY,
-            segmentLabelRotationDegrees,
-            segmentIdLabelX: -segmentLengthLabelOffsetX,
-            segmentIdLabelY: -segmentLengthLabelOffsetY,
-            segmentLengthLabelX: segmentLengthLabelOffsetX,
-            segmentLengthLabelY: segmentLengthLabelOffsetY
-          }
-        ];
+      buildRenderedSegments({
+        segments,
+        networkNodePositions,
+        segmentSubNetworkTagById,
+        isSubNetworkFilteringActive,
+        activeSubNetworkTagSet,
+        selectedWireRouteSegmentIds,
+        selectedSegmentId,
+        autoSegmentLabelRotation,
+        labelRotationDegrees,
+        showSegmentNames,
+        showSegmentLengths
       }),
     [
       segments,
@@ -1229,39 +776,16 @@ export function NetworkSummaryPanel({
 
   const renderedNodes = useMemo(
     () =>
-      nodes.flatMap((node) => {
-        const position = networkNodePositions[node.id];
-        if (position === undefined) {
-          return [];
-        }
-
-        const isSubNetworkDeemphasized =
-          isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false);
-        const nodeKindClass =
-          node.kind === "connector" ? "connector" : node.kind === "splice" ? "splice" : "intermediate";
-        const isSelectedNode =
-          selectedNodeId === node.id ||
-          (node.kind === "connector" && selectedConnectorId === node.connectorId) ||
-          (node.kind === "splice" && selectedSpliceId === node.spliceId);
-        const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}${
-          isSubNetworkDeemphasized ? " is-deemphasized" : ""
-        }`;
-        const nodeLabel =
-          node.kind === "intermediate"
-            ? node.id
-            : node.kind === "connector"
-              ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
-              : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
-
-        return [
-          {
-            node,
-            position,
-            nodeClassName,
-            nodeLabel,
-            isSubNetworkDeemphasized
-          }
-        ];
+      buildRenderedNodes({
+        nodes,
+        networkNodePositions,
+        isSubNetworkFilteringActive,
+        nodeHasActiveSubNetworkConnection,
+        selectedNodeId,
+        selectedConnectorId,
+        selectedSpliceId,
+        connectorMap,
+        spliceMap
       }),
     [
       nodes,
@@ -1385,229 +909,31 @@ export function NetworkSummaryPanel({
                 networkOffset={networkOffset}
                 networkScale={networkScale}
               />
-              {showNetworkGrid ? (
-                <g className="network-grid" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
-                  {gridXPositions.map((position) => {
-                    return (
-                      <line key={`grid-v-${position}`} x1={position} y1={visibleModelMinY} x2={position} y2={visibleModelMaxY} />
-                    );
-                  })}
-                  {gridYPositions.map((position) => {
-                    return (
-                      <line key={`grid-h-${position}`} x1={visibleModelMinX} y1={position} x2={visibleModelMaxX} y2={position} />
-                    );
-                  })}
-                </g>
-              ) : null}
-              <g className="network-graph-layer network-graph-layer-segments" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
-                {renderedSegments.map(({ segment, nodeAPosition, nodeBPosition, segmentClassName, segmentGroupClassName }) => (
-                  <g key={segment.id} className={segmentGroupClassName} data-segment-id={segment.id}>
-                    <line
-                      className={segmentClassName}
-                      x1={nodeAPosition.x}
-                      y1={nodeAPosition.y}
-                      x2={nodeBPosition.x}
-                      y2={nodeBPosition.y}
-                    />
-                    <line
-                      className="network-segment-hitbox"
-                      x1={nodeAPosition.x}
-                      y1={nodeAPosition.y}
-                      x2={nodeBPosition.x}
-                      y2={nodeBPosition.y}
-                      role="button"
-                      tabIndex={0}
-                      focusable="true"
-                      aria-label={`Select segment ${segment.id}`}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleNetworkSegmentClick(segment.id);
-                      }}
-                      onKeyDown={(event) => handleNetworkSegmentKeyDown(event, segment.id)}
-                    />
-                  </g>
-                ))}
-              </g>
-
-              <g
-                className="network-graph-layer network-graph-layer-nodes"
-                transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
-                style={
-                  {
-                    "--network-node-stroke-width": `${nodeStrokeWidth}`,
-                    "--network-node-stroke-emphasis-width": `${nodeStrokeEmphasisWidth}`
-                  } as CSSProperties
-                }
-              >
-                {renderedNodes.map(({ node, position, nodeClassName }) => {
-                  const connectorWidth = 46 * normalizedNodeShapeScale;
-                  const connectorHeight = 30 * normalizedNodeShapeScale;
-                  const spliceDiamondSize = 30 * normalizedNodeShapeScale;
-                  const connectorHitboxWidth = 56 * normalizedNodeShapeScale;
-                  const connectorHitboxHeight = 40 * normalizedNodeShapeScale;
-                  const spliceHitboxSize = 38 * normalizedNodeShapeScale;
-                  const intermediateRadius = 17 * normalizedNodeShapeScale;
-                  const intermediateHitboxRadius = 22 * normalizedNodeShapeScale;
-                  const shapeAnchorTransform = `translate(${position.x} ${position.y}) scale(${inverseLabelScale}) translate(${-position.x} ${-position.y})`;
-                  return (
-                    <g
-                      key={node.id}
-                      className={nodeClassName}
-                      data-node-id={node.id}
-                      role="button"
-                      tabIndex={0}
-                      focusable="true"
-                      aria-label={`Select ${describeNode(node)}`}
-                      onMouseDown={(event) => handleNetworkNodeMouseDown(event, node.id)}
-                      onKeyDown={(event) => handleNetworkNodeKeyDown(event, node.id)}
-                      onClick={(event) => {
-                        // Selection/editing is handled on mouse-down to support immediate drag interactions.
-                        // Keep click from bubbling to future parent click handlers.
-                        event.stopPropagation();
-                      }}
-                    >
-                      <title>{describeNode(node)}</title>
-                      <g className={zoomInvariantNodeShapes ? "network-node-shape-anchor" : undefined} transform={zoomInvariantNodeShapes ? shapeAnchorTransform : undefined}>
-                        {node.kind === "connector" ? (
-                          <>
-                            <rect
-                              className="network-node-hitbox"
-                              x={position.x - connectorHitboxWidth / 2}
-                              y={position.y - connectorHitboxHeight / 2}
-                              width={connectorHitboxWidth}
-                              height={connectorHitboxHeight}
-                              rx={9}
-                              ry={9}
-                            />
-                            <rect
-                              className="network-node-shape"
-                              x={position.x - connectorWidth / 2}
-                              y={position.y - connectorHeight / 2}
-                              width={connectorWidth}
-                              height={connectorHeight}
-                              rx={7}
-                              ry={7}
-                            />
-                          </>
-                        ) : node.kind === "splice" ? (
-                          <>
-                            <rect
-                              className="network-node-hitbox"
-                              x={position.x - spliceHitboxSize / 2}
-                              y={position.y - spliceHitboxSize / 2}
-                              width={spliceHitboxSize}
-                              height={spliceHitboxSize}
-                              rx={7}
-                              ry={7}
-                              transform={`rotate(45 ${position.x} ${position.y})`}
-                            />
-                            <rect
-                              className="network-node-shape"
-                              x={position.x - spliceDiamondSize / 2}
-                              y={position.y - spliceDiamondSize / 2}
-                              width={spliceDiamondSize}
-                              height={spliceDiamondSize}
-                              rx={5}
-                              ry={5}
-                              transform={`rotate(45 ${position.x} ${position.y})`}
-                            />
-                          </>
-                        ) : (
-                          <>
-                            <circle className="network-node-hitbox" cx={position.x} cy={position.y} r={intermediateHitboxRadius} />
-                            <circle className="network-node-shape" cx={position.x} cy={position.y} r={intermediateRadius} />
-                          </>
-                        )}
-                      </g>
-                    </g>
-                  );
-                })}
-              </g>
-
-              <g className="network-graph-layer network-graph-layer-labels" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
-                {renderedSegments.map(
-                  ({
-                    segment,
-                    segmentGroupClassName,
-                    labelX,
-                    labelY,
-                    segmentLabelRotationDegrees,
-                    segmentIdLabelX,
-                    segmentIdLabelY,
-                    segmentLengthLabelX,
-                    segmentLengthLabelY
-                  }) => (
-                    <g key={`${segment.id}-labels`} className={segmentGroupClassName} data-segment-id={segment.id}>
-                      {showSegmentNames ? (
-                        <g
-                          className="network-segment-label-anchor"
-                          transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
-                        >
-                          <text
-                            className="network-segment-label"
-                            x={segmentIdLabelX}
-                            y={segmentIdLabelY}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                            transform={
-                              segmentLabelRotationDegrees === 0
-                                ? undefined
-                                : `rotate(${segmentLabelRotationDegrees} ${segmentIdLabelX} ${segmentIdLabelY})`
-                            }
-                          >
-                            {segment.id}
-                          </text>
-                        </g>
-                      ) : null}
-                      {showSegmentLengths ? (
-                        <g
-                          className="network-segment-length-label-anchor"
-                          transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
-                        >
-                          <text
-                            className="network-segment-length-label"
-                            x={segmentLengthLabelX}
-                            y={segmentLengthLabelY}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                            transform={
-                              segmentLabelRotationDegrees === 0
-                                ? undefined
-                                : `rotate(${segmentLabelRotationDegrees} ${segmentLengthLabelX} ${segmentLengthLabelY})`
-                            }
-                          >
-                            {segment.lengthMm} mm
-                          </text>
-                        </g>
-                      ) : null}
-                    </g>
-                  )
-                )}
-
-                {renderedNodes.map(({ node, position, nodeLabel, isSubNetworkDeemphasized }) => (
-                  <g
-                    key={`${node.id}-label`}
-                    className={`network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`}
-                    data-node-id={node.id}
-                  >
-                    <g
-                      className="network-node-label-anchor"
-                      transform={`translate(${position.x} ${position.y}) scale(${inverseLabelScale})`}
-                    >
-                      <text
-                        className="network-node-label"
-                        x={0}
-                        y={0}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 0)`}
-                      >
-                        {nodeLabel}
-                      </text>
-                    </g>
-                  </g>
-                ))}
-              </g>
+              <NetworkSummaryGraphLayers
+                networkOffset={networkOffset}
+                networkScale={networkScale}
+                showNetworkGrid={showNetworkGrid}
+                gridXPositions={gridXPositions}
+                gridYPositions={gridYPositions}
+                visibleModelMinX={visibleModelMinX}
+                visibleModelMaxX={visibleModelMaxX}
+                visibleModelMinY={visibleModelMinY}
+                visibleModelMaxY={visibleModelMaxY}
+                renderedSegments={renderedSegments}
+                renderedNodes={renderedNodes}
+                showSegmentNames={showSegmentNames}
+                showSegmentLengths={showSegmentLengths}
+                inverseLabelScale={inverseLabelScale}
+                labelRotationDegrees={labelRotationDegrees}
+                zoomInvariantNodeShapes={zoomInvariantNodeShapes}
+                normalizedNodeShapeScale={normalizedNodeShapeScale}
+                nodeStrokeWidth={nodeStrokeWidth}
+                nodeStrokeEmphasisWidth={nodeStrokeEmphasisWidth}
+                describeNode={describeNode}
+                onSelectSegment={handleNetworkSegmentClick}
+                onNodeMouseDown={handleNetworkNodeMouseDown}
+                onNodeActivate={handleNetworkNodeActivate}
+              />
 
               <NetworkSummaryCalloutsLayer
                 renderedCableCallouts={renderedCableCallouts}
@@ -1638,26 +964,12 @@ export function NetworkSummaryPanel({
         setRoutePreviewEndNodeId={setRoutePreviewEndNodeId}
         routePreview={routePreview}
       />
-      <section className="panel network-summary-quick-entity-nav-panel" aria-label="Quick entity navigation">
-        <div className="network-summary-quick-entity-nav" role="group" aria-label="Quick entity navigation strip">
-          {QUICK_ENTITY_NAV_ITEMS[quickEntityNavigationMode].map((item) => (
-            <button
-              key={item.subScreen}
-              type="button"
-              className={activeSubScreen === item.subScreen ? "filter-chip is-active" : "filter-chip"}
-              onClick={() => onQuickEntityNavigation(item.subScreen)}
-              aria-pressed={activeSubScreen === item.subScreen}
-            >
-              <span
-                className={`action-button-icon network-summary-quick-entity-nav-icon ${SUB_SCREEN_ICON_CLASS_BY_ID[item.subScreen]}`}
-                aria-hidden="true"
-              />
-              <span className="network-summary-quick-entity-nav-label">{item.label}</span>
-              <span className="filter-chip-count">{entityCountBySubScreen[item.subScreen]}</span>
-            </button>
-          ))}
-        </div>
-      </section>
+      <NetworkSummaryQuickEntityNavigation
+        quickEntityNavigationMode={quickEntityNavigationMode}
+        activeSubScreen={activeSubScreen}
+        entityCountBySubScreen={entityCountBySubScreen}
+        onQuickEntityNavigation={onQuickEntityNavigation}
+      />
     </section>
   );
 }

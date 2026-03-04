@@ -237,3 +237,5 @@ export function useEntityFormsState() {
     setWireFormError
   };
 }
+
+export type EntityFormsStateModel = ReturnType<typeof useEntityFormsState>;

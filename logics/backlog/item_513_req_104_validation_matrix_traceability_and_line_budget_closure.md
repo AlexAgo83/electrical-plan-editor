@@ -1,9 +1,9 @@
 ## item_513_req_104_validation_matrix_traceability_and_line_budget_closure - Req 104 validation matrix, traceability, and line-budget closure
 > From version: 1.3.1
-> Status: Draft
-> Understanding: 96%
-> Confidence: 94%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Quality / Traceability
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -41,3 +41,21 @@ Req_104 spans persistence migration, runtime lifecycle, and major file decomposi
 # Notes
 - Derived from `logics/request/req_104_post_release_architecture_and_runtime_hardening_for_preferences_measurement_and_controller_split.md`.
 - Orchestrated by `logics/tasks/task_080_req_104_post_release_architecture_and_runtime_hardening_orchestration_and_delivery_control.md`.
+- Closure summary:
+  - validation matrix executed end-to-end for req_104 acceptance paths;
+  - traceability synchronized across request/backlog/task docs;
+  - line budgets validated:
+    - `src/app/components/NetworkSummaryPanel.tsx`: `975` lines (`<= 1000`) ✅
+    - `src/app/AppController.tsx`: `1100` lines (`<= 1100`) ✅
+- Validation evidence:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s test:ci:ui` ✅ (`33` files, `225` tests passed)
+  - `npm run -s test:e2e` ✅ (`2` tests passed)
+  - `wc -l src/app/components/NetworkSummaryPanel.tsx src/app/AppController.tsx` ✅ (`975` / `1100`)
+- AC closure:
+  - AC1 satisfied: validation matrix covered and executed.
+  - AC2 satisfied: request/backlog/task traceability links are complete and updated.
+  - AC3 satisfied: line-budget evidence recorded and within targets.
+  - AC4 satisfied: required quality commands and outcomes captured.
