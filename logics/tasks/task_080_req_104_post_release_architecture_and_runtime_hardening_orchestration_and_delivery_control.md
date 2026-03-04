@@ -1,9 +1,9 @@
 ## task_080_req_104_post_release_architecture_and_runtime_hardening_orchestration_and_delivery_control - Req 104 post-release architecture and runtime hardening orchestration and delivery control
 > From version: 1.3.1
-> Status: Draft
+> Status: In Progress
 > Understanding: 99% (scope, sequence, and size-budget constraints are explicit)
 > Confidence: 96%
-> Progress: 0%
+> Progress: 55%
 > Complexity: High
 > Theme: Reliability / Architecture / Delivery control
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -32,16 +32,16 @@
     - `AppController.tsx <= 1100` lines.
 
 # Plan
-- [ ] 1. Deliver preferences schema hardening (`item_505`, `item_506`)
+- [x] 1. Deliver preferences schema hardening (`item_505`, `item_506`)
   - add `uiPreferences` versioning and migration pipeline;
   - add key-level corruption normalization and regression tests.
-- [ ] 2. Deliver callout measurement lifecycle cleanup (`item_507`)
+- [x] 2. Deliver callout measurement lifecycle cleanup (`item_507`)
   - encapsulate measure-node init/dispose lifecycle;
   - validate no hidden-node accumulation across mount/unmount cycles.
-- [ ] 3. Deliver `NetworkSummaryPanel` size reduction phase-1 (`item_508`, `item_509`)
+- [ ] 3. Deliver `NetworkSummaryPanel` size reduction phase-1 (`item_508`, `item_509`) (In Progress)
   - extract export helpers and rendering layers;
   - extract callout model/layout/render modules with parity tests.
-- [ ] 4. Deliver `AppController` size reduction phase-1 (`item_510`, `item_511`, `item_512`)
+- [ ] 4. Deliver `AppController` size reduction phase-1 (`item_510`, `item_511`, `item_512`) (In Progress)
   - extract network summary view sync hook and remove lint suppression;
   - extract onboarding orchestration;
   - extract screen-domain + settings-binding assembly.
@@ -73,3 +73,22 @@
 - [ ] Linked request/backlog/task docs updated.
 - [ ] Line-budget targets validated and recorded.
 - [ ] Status is `Done` and progress is `100%`.
+
+# Report
+- 2026-03-04: Delivered `item_505` + `item_506`:
+  - `src/app/hooks/useUiPreferences.ts` now migrates persisted preferences (`v1 -> v2`) instead of hard-reset on schema mismatch.
+  - workspace migration fallback for `showSegmentNames` aligned to `false` (`src/adapters/persistence/migrations.ts`).
+- 2026-03-04: Delivered `item_507`:
+  - callout measurement hidden SVG root is lifecycle-cleaned on unmount;
+  - regression coverage added in `src/tests/app.ui.settings-canvas-callouts.spec.tsx`.
+- 2026-03-04: Partial `item_508`:
+  - export pipeline extracted to `src/app/components/network-summary/export/networkSummaryExport.ts`;
+  - `NetworkSummaryPanel.tsx` reduced to `2343` lines (from `2811`).
+- 2026-03-04: Delivered `item_510`:
+  - `useNetworkSummaryViewStateSync` hook extracted;
+  - `AppController.tsx` exhaustive-deps suppression removed and behavior parity validated.
+- Validation executed in this increment:
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npx vitest run src/tests/persistence.localStorage.spec.ts src/tests/app.ui.settings-pricing.spec.tsx` ✅
+  - `npx vitest run src/tests/app.ui.network-summary-bom-export.spec.tsx src/tests/app.ui.settings-canvas-callouts.spec.tsx src/tests/app.ui.network-summary-workflow-polish.spec.tsx src/tests/app.ui.settings-canvas-render.spec.tsx` ✅

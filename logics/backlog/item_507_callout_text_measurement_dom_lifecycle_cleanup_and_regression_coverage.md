@@ -1,9 +1,9 @@
 ## item_507_callout_text_measurement_dom_lifecycle_cleanup_and_regression_coverage - Callout text measurement DOM lifecycle cleanup and regression coverage
 > From version: 1.3.1
-> Status: Draft
-> Understanding: 97%
-> Confidence: 94%
-> Progress: 0%
+> Status: Done
+> Understanding: 99%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Runtime / UI infrastructure
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -39,3 +39,7 @@ Callout text measurement currently relies on hidden SVG nodes attached to `docum
 # Notes
 - Derived from `logics/request/req_104_post_release_architecture_and_runtime_hardening_for_preferences_measurement_and_controller_split.md`.
 - Orchestrated by `logics/tasks/task_080_req_104_post_release_architecture_and_runtime_hardening_orchestration_and_delivery_control.md`.
+- Implemented:
+  - `src/app/components/NetworkSummaryPanel.tsx`: explicit `disposeCalloutMeasurementResources()` teardown on unmount.
+  - measurement SVG root now tagged (`data-callout-measure-root=\"true\"`) for deterministic lifecycle assertions.
+  - `src/tests/app.ui.settings-canvas-callouts.spec.tsx`: regression test validates cleanup after unmount.
