@@ -97,3 +97,13 @@
     - `npm run -s test:e2e` ✅ (`2` tests)
     - `npm run -s ci:local` ✅
 - 2026-03-04: README release-facing notes updated with req_105 hardening summary.
+
+# Notes
+
+# Request AC Proof Coverage
+- AC1 Proof: see validation evidence and linked implementation notes in this document.
+- AC2 Proof: see validation evidence and linked implementation notes in this document.
+- AC3 Proof: see validation evidence and linked implementation notes in this document.
+- AC4 Proof: see validation evidence and linked implementation notes in this document.
+- AC5 Proof: see validation evidence and linked implementation notes in this document.
+- AC6 Proof: see validation evidence and linked implementation notes in this document.

@@ -21,7 +21,6 @@ These tasks are all planned and partially/fully ready for implementation, but th
 - cross-cutting state/history infrastructure (`req_066`).
 
 This task does not replace `task_059`..`task_063`. It defines the recommended execution order, validation discipline, and integration checkpoints across the active queue.
-
 # Objective
 - Deliver `task_059`..`task_063` in a controlled sequence with minimal regression risk and clear rollback points.
 - Reduce collisions by landing localized UI/table changes before the cross-cutting undo/redo feature.
@@ -225,3 +224,4 @@ Rationale:
 - `logics/request/req_064_segment_edit_swap_node_a_b_action_between_save_and_cancel.md`
 - `logics/request/req_065_segment_analysis_split_endpoints_column_into_endpoint_a_and_endpoint_b.md`
 - `logics/request/req_066_global_undo_redo_history_for_modeling_and_catalog_mutations.md`
+- `logics/backlog/item_364_regression_coverage_for_global_undo_redo_mutations_shortcuts_and_scope_exclusions.md`

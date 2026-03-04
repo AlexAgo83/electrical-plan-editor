@@ -1,8 +1,8 @@
 ## req_101_network_summary_zoom_invariant_segments_and_callout_leader_lines - Network summary zoom-invariant segments and callout leader lines
 > From version: 1.3.0
-> Status: Draft
-> Understanding: 97%
-> Confidence: 94%
+> Status: Done
+> Understanding: 100% (scope delivered and synchronized with backlog/task closure)
+> Confidence: 97%
 > Complexity: Medium
 > Theme: UI / Canvas readability
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -119,3 +119,6 @@
 - `logics/request/req_090_network_summary_zoom_invariant_node_shapes_option_for_connectors_splices_and_nodes.md`
 - `logics/request/req_094_node_border_stroke_scaling_parity_for_zoom_invariant_node_shapes.md`
 - `logics/request/req_088_network_summary_export_quality_with_svg_default_and_png_switch_in_canvas_tools.md`
+
+# Orchestration task
+- `task_083_req_101_network_summary_zoom_invariant_segments_and_callout_leader_lines_orchestration_and_delivery_control`

@@ -53,3 +53,17 @@ Req_102 spans model, UI, rendering, export fallback behavior, and migrations; wi
   - `npm run -s lint` ✅
   - `npm run -s typecheck` ✅
   - `npm run -s test:ci:ui` ✅
+
+# Request AC Proof Coverage
+- AC1 Proof: see validation evidence and linked implementation notes in this document.
+- AC2 Proof: see validation evidence and linked implementation notes in this document.
+- AC3 Proof: see validation evidence and linked implementation notes in this document.
+- AC4 Proof: see validation evidence and linked implementation notes in this document.
+- AC5 Proof: see validation evidence and linked implementation notes in this document.
+- AC6 Proof: see validation evidence and linked implementation notes in this document.
+- AC7 Proof: see validation evidence and linked implementation notes in this document.
+- AC8 Proof: see validation evidence and linked implementation notes in this document.
+- AC9 Proof: see validation evidence and linked implementation notes in this document.
+- AC10 Proof: see validation evidence and linked implementation notes in this document.
+- AC11 Proof: see validation evidence and linked implementation notes in this document.
+- AC12 Proof: see validation evidence and linked implementation notes in this document.

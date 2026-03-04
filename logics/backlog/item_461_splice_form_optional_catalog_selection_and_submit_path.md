@@ -26,3 +26,4 @@ Delivered in the `task_076` implementation wave for `req_092` to `req_095` to re
 - Urgency: High (execution bundle requested as uninterrupted delivery).
 
 # Notes
+- Request link: `req_092_optional_catalog_association_for_splices`.

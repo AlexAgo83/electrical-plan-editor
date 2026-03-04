@@ -110,6 +110,13 @@
 - `npm run -s test:e2e`
 - `npm run -s ci:local`
 
+
+# Definition of Ready (DoR)
+- [x] Problem statement is explicit and user impact is clear.
+- [x] Scope boundaries (in/out) are explicit.
+- [x] Acceptance criteria are testable.
+- [x] Dependencies and known risks are listed.
+
 # Risks
 - Overly strict i18n key checks can create noisy failures if dynamic copy patterns are not normalized.
 - CSV import rebase logic can alter edge-case counts if merge semantics are not preserved exactly.

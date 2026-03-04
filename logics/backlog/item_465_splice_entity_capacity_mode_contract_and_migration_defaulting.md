@@ -26,3 +26,4 @@ Delivered in the `task_076` implementation wave for `req_092` to `req_095` to re
 - Urgency: High (execution bundle requested as uninterrupted delivery).
 
 # Notes
+- Request link: `req_093_splice_unbounded_port_mode_with_adaptive_port_rendering`.

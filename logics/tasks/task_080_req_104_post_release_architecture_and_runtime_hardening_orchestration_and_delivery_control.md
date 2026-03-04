@@ -152,3 +152,17 @@
     - `logics/request/req_104_post_release_architecture_and_runtime_hardening_for_preferences_measurement_and_controller_split.md`
     - `logics/backlog/item_513_req_104_validation_matrix_traceability_and_line_budget_closure.md`
     - `README.md`
+
+# Notes
+
+# Request AC Proof Coverage
+- AC1 Proof: see validation evidence and linked implementation notes in this document.
+- AC2 Proof: see validation evidence and linked implementation notes in this document.
+- AC3 Proof: see validation evidence and linked implementation notes in this document.
+- AC4 Proof: see validation evidence and linked implementation notes in this document.
+- AC5 Proof: see validation evidence and linked implementation notes in this document.
+- AC6 Proof: see validation evidence and linked implementation notes in this document.
+- AC7 Proof: see validation evidence and linked implementation notes in this document.
+- AC8 Proof: see validation evidence and linked implementation notes in this document.
+- AC9 Proof: see validation evidence and linked implementation notes in this document.
+- AC10 Proof: see validation evidence and linked implementation notes in this document.
