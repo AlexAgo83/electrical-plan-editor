@@ -834,6 +834,16 @@ let calloutMeasureSvgText: SVGTextElement | null = null;
 let calloutMeasureSvgRoot: SVGSVGElement | null = null;
 const calloutLayoutCache = new Map<string, CalloutLayoutMetrics>();
 
+function disposeCalloutMeasurementResources(): void {
+  if (calloutMeasureSvgRoot !== null) {
+    calloutMeasureSvgRoot.remove();
+  }
+  calloutMeasureSvgText = null;
+  calloutMeasureSvgRoot = null;
+  calloutMeasureCanvas = null;
+  calloutLayoutCache.clear();
+}
+
 function buildCalloutRows(groups: CalloutGroup[]): CalloutTableRow[] {
   const rows: CalloutTableRow[] = [];
   for (const group of groups) {
@@ -882,6 +892,7 @@ function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
     svg.setAttribute("width", "0");
     svg.setAttribute("height", "0");
     svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("data-callout-measure-root", "true");
     svg.style.position = "absolute";
     svg.style.left = "-9999px";
     svg.style.top = "-9999px";
@@ -921,6 +932,21 @@ function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
   }
   context.font = `${fontSizePx}px "IBM Plex Sans", "Segoe UI", sans-serif`;
   return context.measureText(text).width;
+}
+
+async function exportCanvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  if (typeof canvas.toBlob === "function") {
+    const blobFromToBlob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob((blob) => resolve(blob), "image/png");
+    });
+    if (blobFromToBlob !== null) {
+      return blobFromToBlob;
+    }
+  }
+
+  const dataUrl = canvas.toDataURL("image/png");
+  const response = await fetch(dataUrl);
+  return response.blob();
 }
 
 function measureCalloutRowTextMetrics(fontSizePx: number): { topOffset: number; height: number } {
@@ -1266,6 +1292,12 @@ export function NetworkSummaryPanel({
     () => subNetworkSummaries.map((summary) => summary.tag),
     [subNetworkSummaries]
   );
+
+  useEffect(() => {
+    return () => {
+      disposeCalloutMeasurementResources();
+    };
+  }, []);
 
   useEffect(() => {
     if (allSubNetworkTags.length === 0) {
@@ -2025,13 +2057,18 @@ export function NetworkSummaryPanel({
       context.drawImage(image, 0, 0, exportWidth, exportHeight);
 
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const pngBlob = await exportCanvasToPngBlob(canvas);
+      const pngBlobUrl = URL.createObjectURL(pngBlob);
       const downloadLink = document.createElement("a");
-      downloadLink.href = canvas.toDataURL("image/png");
+      downloadLink.href = pngBlobUrl;
       downloadLink.download = `network-plan-${timestamp}.png`;
       downloadLink.style.display = "none";
       document.body.appendChild(downloadLink);
       downloadLink.click();
       downloadLink.remove();
+      window.setTimeout(() => {
+        URL.revokeObjectURL(pngBlobUrl);
+      }, 0);
     } finally {
       URL.revokeObjectURL(svgUrl);
     }
