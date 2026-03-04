@@ -1,9 +1,9 @@
 ## item_515_catalog_csv_import_post_confirmation_state_rebase_and_atomic_apply_hardening - Catalog CSV import post-confirmation state rebase and atomic apply hardening
 > From version: 1.3.3
-> Status: Draft
-> Understanding: 98%
-> Confidence: 94%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Data integrity / Import flow
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -40,3 +40,16 @@
 # Notes
 - Derived from `logics/request/req_105_post_req_104_review_followup_ci_budget_guard_csv_import_atomicity_i18n_runtime_completeness_onboarding_focus_cancellation_and_targeted_regression_coverage.md`.
 - Orchestrated by `logics/tasks/task_081_req_105_post_req_104_review_followup_orchestration_and_delivery_control.md`.
+- Closure summary:
+  - import apply path now rebases on a fresh post-confirmation store snapshot in `src/app/hooks/useCatalogCsvImportExport.ts`;
+  - concurrent catalog mutations done while confirmation is open are preserved after import;
+  - success/error summary semantics (`created`, `updated`, warnings/errors recap) remain unchanged.
+- Validation evidence:
+  - `npx vitest run src/tests/app.ui.catalog-csv-import-export.spec.tsx` ✅
+  - `npm run -s test:ci:ui` ✅
+  - `npm run -s ci:local` ✅
+- AC closure:
+  - AC1 satisfied: final apply no longer depends on stale pre-confirm snapshot.
+  - AC2 satisfied: concurrent updates are preserved.
+  - AC3 satisfied: import summary and status semantics are behavior-compatible.
+  - AC4 satisfied: delayed-confirmation mutation regression is covered and passing.

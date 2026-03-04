@@ -126,6 +126,14 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - settings/network-scope domain bindings now consume typed state models directly (`prefs`, `canvasDisplay`, `networkScope.formState`) (`AppController.tsx`: `2702` -> `1100` lines)
   - `NetworkSummaryPanel.tsx` now under phase-1 budget (`975` lines)
   - req_104 closure matrix passed (`logics_lint`, `lint`, `typecheck`, `test:ci:ui`, `test:e2e`)
+- Req_105 post-review hardening (delivered and validated):
+  - UI modularization quality gate now hard-enforces locked line budgets for:
+    - `src/app/AppController.tsx <= 1100`
+    - `src/app/components/NetworkSummaryPanel.tsx <= 1000`
+  - catalog CSV import apply step now rebases on fresh state after confirmation to prevent stale-snapshot clobbering
+  - onboarding target-focus retry loop now uses cancel-safe request ownership (close/unmount/superseded request cleanup)
+  - FR runtime translation coverage extended for impacted catalog CSV status flows and home confirmation runtime copy
+  - req_105 closure matrix passed (`logics_lint`, `lint`, `typecheck`, `test:ci:ui`, `test:e2e`, `ci:local`)
 - PWA support (install prompt + offline shell + update readiness in production)
 - Keyboard shortcuts for major workspace actions
 

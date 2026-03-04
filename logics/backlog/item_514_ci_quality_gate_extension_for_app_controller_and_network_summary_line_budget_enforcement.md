@@ -1,9 +1,9 @@
 ## item_514_ci_quality_gate_extension_for_app_controller_and_network_summary_line_budget_enforcement - CI quality-gate extension for AppController and NetworkSummaryPanel line-budget enforcement
 > From version: 1.3.3
-> Status: Draft
-> Understanding: 97%
-> Confidence: 94%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 99%
+> Progress: 100%
 > Complexity: Medium
 > Theme: CI / Quality gates
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -42,3 +42,17 @@ Req_104 reduced `AppController.tsx` and `NetworkSummaryPanel.tsx`, but no hard C
 # Notes
 - Derived from `logics/request/req_105_post_req_104_review_followup_ci_budget_guard_csv_import_atomicity_i18n_runtime_completeness_onboarding_focus_cancellation_and_targeted_regression_coverage.md`.
 - Orchestrated by `logics/tasks/task_081_req_105_post_req_104_review_followup_orchestration_and_delivery_control.md`.
+- Closure summary:
+  - line-budget enforcement was extracted and locked in `scripts/quality/ui-modularization-gate-core.mjs`;
+  - `scripts/quality/check-ui-modularization.mjs` now fails deterministically when:
+    - `src/app/AppController.tsx > 1100`,
+    - `src/app/components/NetworkSummaryPanel.tsx > 1000`;
+  - regression test coverage added in `src/tests/quality.ui-modularization.spec.ts`.
+- Validation evidence:
+  - `npm run -s quality:ui-modularization` ✅
+  - `npm run -s ci:local` ✅
+- AC closure:
+  - AC1 satisfied: deterministic locked-threshold enforcement in script.
+  - AC2 satisfied: `ci:local` includes and enforces the gate.
+  - AC3 satisfied: failure payload names file, observed lines, and allowed max.
+  - AC4 satisfied: targeted tests protect against threshold-regression changes.

@@ -1,8 +1,8 @@
 ## req_105_post_req_104_review_followup_ci_budget_guard_csv_import_atomicity_i18n_runtime_completeness_onboarding_focus_cancellation_and_targeted_regression_coverage - Post req_104 review follow-up for CI size-budget guardrails, catalog CSV import atomicity, runtime i18n completeness, onboarding focus cancellation, and regression coverage
 > From version: 1.3.2
-> Status: Draft
-> Understanding: 98% (review findings are concrete and reproducible)
-> Confidence: 95%
+> Status: Done
+> Understanding: 100% (delivered and validated end-to-end)
+> Confidence: 99%
 > Complexity: Medium-High
 > Theme: Reliability / Quality gates / UX consistency
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -138,3 +138,21 @@
 - `src/tests/app.ui.catalog-csv-import-export.spec.tsx`
 - `src/tests/app.ui.home.spec.tsx`
 - `src/tests/app.ui.onboarding.spec.tsx`
+
+# Closure
+- Delivered through:
+  - `logics/tasks/task_081_req_105_post_req_104_review_followup_orchestration_and_delivery_control.md`
+  - backlog `item_514` to `item_518`.
+- Final validation matrix completed on 2026-03-04:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s test:ci:ui` ✅ (`33` files, `229` tests)
+  - `npm run -s test:e2e` ✅ (`2` tests)
+  - `npm run -s ci:local` ✅
+- Final safeguards delivered:
+  - line-budget gate now hard-enforces `AppController.tsx <= 1100` and `NetworkSummaryPanel.tsx <= 1000`;
+  - catalog CSV import apply rebases on post-confirmation fresh state to avoid stale-snapshot clobber;
+  - runtime FR translation path completed for impacted catalog CSV and controller/home surfaces;
+  - onboarding target-focus retry loop is cancel-safe on close/unmount/new-target flows;
+  - targeted regression coverage added for each safeguard.

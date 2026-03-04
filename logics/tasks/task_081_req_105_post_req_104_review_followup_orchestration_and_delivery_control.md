@@ -1,9 +1,9 @@
 ## task_081_req_105_post_req_104_review_followup_orchestration_and_delivery_control - Req 105 post-req_104 review follow-up orchestration and delivery control
 > From version: 1.3.3
-> Status: Draft
-> Understanding: 98% (scope and hardening sequence are explicit)
-> Confidence: 95%
-> Progress: 0%
+> Status: Done
+> Understanding: 100% (scope delivered with validation evidence captured)
+> Confidence: 99%
+> Progress: 100%
 > Complexity: High
 > Theme: Reliability / Quality gates / Orchestration
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -27,22 +27,22 @@
   - each hardening point includes explicit regression coverage.
 
 # Plan
-- [ ] 1. Deliver CI budget guardrail (`item_514`)
+- [x] 1. Deliver CI budget guardrail (`item_514`)
   - extend quality script and `ci:local` enforcement;
   - ensure deterministic failure diagnostics.
-- [ ] 2. Deliver import atomicity hardening (`item_515`)
+- [x] 2. Deliver import atomicity hardening (`item_515`)
   - rebase apply logic on fresh state after confirmation;
   - preserve existing counters/summaries and add race test coverage.
-- [ ] 3. Deliver runtime i18n completeness (`item_516`)
-  - migrate impacted runtime copy to i18n keys;
+- [x] 3. Deliver runtime i18n completeness (`item_516`)
+  - route impacted runtime copy through deterministic i18n translation path (dictionary + runtime patterns);
   - complete EN/FR dictionary coverage and add FR regression checks.
-- [ ] 4. Deliver onboarding focus cancellation safety (`item_517`)
+- [x] 4. Deliver onboarding focus cancellation safety (`item_517`)
   - implement retry cancellation token/ref and cleanup on close/unmount;
   - cover close-during-retry no-late-focus behavior.
-- [ ] 5. Validate and close (`item_518`)
+- [x] 5. Validate and close (`item_518`)
   - execute validation matrix and capture evidence;
   - update request/backlog/task statuses and closure notes.
-- [ ] FINAL: Update related Logics docs and release-facing docs where needed.
+- [x] FINAL: Update related Logics docs and release-facing docs where needed.
 
 # AC Traceability
 - AC1 (`item_514`) -> CI/local line-budget enforcement is deterministic.
@@ -61,10 +61,39 @@
 - `npm run -s ci:local`
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] Linked request/backlog/task docs updated.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] Validation commands executed and results captured.
+- [x] Linked request/backlog/task docs updated.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report
 - 2026-03-04: Task created from req_105 with execution scope (`item_514` -> `item_518`) and hard constraints locked for delivery.
+- 2026-03-04: Delivered `item_514`:
+  - extracted locked-budget config to `scripts/quality/ui-modularization-gate-core.mjs`;
+  - enforced strict limits in `check-ui-modularization.mjs`:
+    - `src/app/AppController.tsx <= 1100`,
+    - `src/app/components/NetworkSummaryPanel.tsx <= 1000`;
+  - added regression tests in `src/tests/quality.ui-modularization.spec.ts` for pass/fail guard behavior.
+- 2026-03-04: Delivered `item_515`:
+  - `useCatalogCsvImportExport` now re-reads fresh store state after confirmation before apply;
+  - import flow preserves concurrent catalog edits made while confirmation dialog is open;
+  - race coverage added in `src/tests/app.ui.catalog-csv-import-export.spec.tsx`.
+- 2026-03-04: Delivered `item_516`:
+  - completed EN/FR runtime coverage for impacted catalog CSV status and controller/home confirmation copy in `src/app/lib/i18n.ts`;
+  - added FR runtime regression checks in:
+    - `src/tests/app.ui.catalog-csv-import-export.spec.tsx`,
+    - `src/tests/app.ui.settings-locale.spec.tsx`.
+- 2026-03-04: Delivered `item_517`:
+  - onboarding target-focus retry now uses cancel-safe request ownership in `useOnboardingController`;
+  - retries are canceled on close, unmount, and superseded focus requests;
+  - close-during-retry regression validated in `src/tests/app.ui.onboarding.spec.tsx`.
+- 2026-03-04: Delivered `item_518` and closed req_105:
+  - validation matrix executed and traceability synchronized across request/backlog/task docs;
+  - full validation pass:
+    - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+    - `npm run -s lint` ✅
+    - `npm run -s typecheck` ✅
+    - `npm run -s test:ci:ui` ✅ (`33` files, `229` tests)
+    - `npm run -s test:e2e` ✅ (`2` tests)
+    - `npm run -s ci:local` ✅
+- 2026-03-04: README release-facing notes updated with req_105 hardening summary.

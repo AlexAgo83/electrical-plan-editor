@@ -1,9 +1,9 @@
 ## item_517_onboarding_target_focus_retry_cancellation_and_lifecycle_safety - Onboarding target-focus retry cancellation and lifecycle safety
 > From version: 1.3.3
-> Status: Draft
-> Understanding: 98%
-> Confidence: 94%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UX stability / Lifecycle safety
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -39,3 +39,16 @@ RAF-based onboarding target-focus retries can continue after close/unmount and t
 # Notes
 - Derived from `logics/request/req_105_post_req_104_review_followup_ci_budget_guard_csv_import_atomicity_i18n_runtime_completeness_onboarding_focus_cancellation_and_targeted_regression_coverage.md`.
 - Orchestrated by `logics/tasks/task_081_req_105_post_req_104_review_followup_orchestration_and_delivery_control.md`.
+- Closure summary:
+  - `useOnboardingController` now owns a cancelable focus-request token for RAF retry loops;
+  - pending retries are canceled on close, unmount, and before new focus requests;
+  - no delayed refocus occurs after onboarding close in covered scenarios.
+- Validation evidence:
+  - `npx vitest run src/tests/app.ui.onboarding.spec.tsx` ✅
+  - `npm run -s test:ci:ui` ✅
+  - `npm run -s ci:local` ✅
+- AC closure:
+  - AC1 satisfied: retries are canceled when onboarding closes.
+  - AC2 satisfied: unmount cleanup leaves no pending retry side effects.
+  - AC3 satisfied: superseded focus requests are canceled before scheduling new retries.
+  - AC4 satisfied: close-during-retry regression test passes.
