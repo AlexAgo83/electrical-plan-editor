@@ -1,8 +1,35 @@
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { evaluateUiModularizationQualityGate } from "../../scripts/quality/ui-modularization-gate-core.mjs";
+
+interface EvaluateUiModularizationOptions {
+  root: string;
+  requiredUiModules: string[];
+  forbiddenLegacyFiles: string[];
+  lockedLineBudgets: Record<string, number>;
+  allowedOversize: Record<string, string>;
+}
+
+interface LockedBudgetViolation {
+  relativePath: string;
+  maxLines: number;
+  lines: number | null;
+  reason: "missing" | "exceeded";
+}
+
+interface UiModularizationGateResult {
+  lockedBudgetViolations: LockedBudgetViolation[];
+}
+
+async function evaluateUiModularizationQualityGate(options: EvaluateUiModularizationOptions): Promise<UiModularizationGateResult> {
+  const moduleUrl = pathToFileURL(path.resolve(process.cwd(), "scripts/quality/ui-modularization-gate-core.mjs")).href;
+  const module = (await import(moduleUrl)) as {
+    evaluateUiModularizationQualityGate: (value: EvaluateUiModularizationOptions) => UiModularizationGateResult;
+  };
+  return module.evaluateUiModularizationQualityGate(options);
+}
 
 function writeLines(filePath: string, lines: number): void {
   const content = Array.from({ length: lines }, (_, index) => `line ${index + 1}`).join("\n");
@@ -19,7 +46,7 @@ describe("quality gate - ui modularization locked line budgets", () => {
     tempRoots.length = 0;
   });
 
-  it("fails when a locked budget file exceeds its max lines", () => {
+  it("fails when a locked budget file exceeds its max lines", async () => {
     const root = mkdtempSync(path.join(os.tmpdir(), "ui-modularization-"));
     tempRoots.push(root);
 
@@ -33,7 +60,7 @@ describe("quality gate - ui modularization locked line budgets", () => {
     writeLines(path.join(root, "src", "app", "App.tsx"), 10);
     writeLines(path.join(root, "src", "app", "styles.css"), 10);
 
-    const result = evaluateUiModularizationQualityGate({
+    const result = await evaluateUiModularizationQualityGate({
       root,
       requiredUiModules: [],
       forbiddenLegacyFiles: [],
@@ -54,7 +81,7 @@ describe("quality gate - ui modularization locked line budgets", () => {
     ]);
   });
 
-  it("passes when locked budget files stay within limits", () => {
+  it("passes when locked budget files stay within limits", async () => {
     const root = mkdtempSync(path.join(os.tmpdir(), "ui-modularization-"));
     tempRoots.push(root);
 
@@ -68,7 +95,7 @@ describe("quality gate - ui modularization locked line budgets", () => {
     writeLines(path.join(root, "src", "app", "App.tsx"), 10);
     writeLines(path.join(root, "src", "app", "styles.css"), 10);
 
-    const result = evaluateUiModularizationQualityGate({
+    const result = await evaluateUiModularizationQualityGate({
       root,
       requiredUiModules: [],
       forbiddenLegacyFiles: [],

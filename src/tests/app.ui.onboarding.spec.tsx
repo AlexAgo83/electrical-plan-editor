@@ -1,5 +1,5 @@
 import { fireEvent, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createUiIntegrationState,
   getPanelByHeading,
@@ -101,5 +101,87 @@ describe("App integration UI - onboarding", () => {
 
     fireEvent.click(finishButton);
     expect(screen.queryByRole("dialog", { name: "Configure your workspace defaults" })).toBeNull();
+  });
+
+  it("cancels pending onboarding target-focus retries when modal closes", () => {
+    const originalRequestAnimationFrame = window.requestAnimationFrame;
+    const originalCancelAnimationFrame = window.cancelAnimationFrame;
+    const rafCallbacks = new Map<number, FrameRequestCallback>();
+    let nextRafId = 1;
+
+    Object.defineProperty(window, "requestAnimationFrame", {
+      configurable: true,
+      writable: true,
+      value: (callback: FrameRequestCallback) => {
+        const rafId = nextRafId;
+        nextRafId += 1;
+        rafCallbacks.set(rafId, callback);
+        return rafId;
+      }
+    });
+    const cancelAnimationFrameSpy = vi.fn((rafId: number) => {
+      rafCallbacks.delete(rafId);
+    });
+    Object.defineProperty(window, "cancelAnimationFrame", {
+      configurable: true,
+      writable: true,
+      value: cancelAnimationFrameSpy
+    });
+
+    try {
+      renderAppWithState(createUiIntegrationState());
+      fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+      switchScreenDrawerAware("modeling");
+
+      const connectorsPanel = getPanelByHeading("Connectors");
+      const helpButton = within(connectorsPanel).getByRole("button", { name: "Help" });
+      fireEvent.click(helpButton);
+
+      const targetSelector = '[data-onboarding-panel="modeling-connectors"]';
+      let blockTargetPanelResolution = true;
+      const originalQuerySelector = document.querySelector.bind(document);
+      vi.spyOn(document, "querySelector").mockImplementation((selector: string): Element | null => {
+        if (selector === targetSelector && blockTargetPanelResolution) {
+          return null;
+        }
+        return originalQuerySelector(selector);
+      });
+
+      const dialog = screen.getByRole("dialog", { name: "Build the connectors and splices library" });
+      fireEvent.click(within(dialog).getByRole("button", { name: "Scroll to Connectors" }));
+      fireEvent.click(within(dialog).getByRole("button", { name: "Close onboarding" }));
+
+      expect(screen.queryByRole("dialog", { name: "Build the connectors and splices library" })).toBeNull();
+      expect(cancelAnimationFrameSpy).toHaveBeenCalled();
+
+      const focusSpy = vi.spyOn(helpButton, "focus");
+      focusSpy.mockClear();
+      blockTargetPanelResolution = false;
+
+      for (let iteration = 0; iteration < 12; iteration += 1) {
+        if (rafCallbacks.size === 0) {
+          break;
+        }
+        const queued = [...rafCallbacks.values()];
+        rafCallbacks.clear();
+        for (const callback of queued) {
+          callback(performance.now());
+        }
+      }
+
+      expect(focusSpy).not.toHaveBeenCalled();
+    } finally {
+      Object.defineProperty(window, "requestAnimationFrame", {
+        configurable: true,
+        writable: true,
+        value: originalRequestAnimationFrame
+      });
+      Object.defineProperty(window, "cancelAnimationFrame", {
+        configurable: true,
+        writable: true,
+        value: originalCancelAnimationFrame
+      });
+      vi.restoreAllMocks();
+    }
   });
 });

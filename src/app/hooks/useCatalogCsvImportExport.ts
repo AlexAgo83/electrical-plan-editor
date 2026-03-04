@@ -115,9 +115,11 @@ export function useCatalogCsvImportExport({
       return;
     }
 
-    const currentState = store.getState();
-    const currentCatalogItems = Object.values(currentState.catalogItems.byId).filter((item): item is NonNullable<typeof item> => item !== undefined);
-    if (currentCatalogItems.length > 0) {
+    const stateBeforeConfirmation = store.getState();
+    const catalogItemsBeforeConfirmation = Object.values(stateBeforeConfirmation.catalogItems.byId).filter(
+      (item): item is NonNullable<typeof item> => item !== undefined
+    );
+    if (catalogItemsBeforeConfirmation.length > 0) {
       const shouldContinue = await requestConfirmation({
         title: "Import catalog CSV",
         message: `Import ${parsed.rows.length} catalog row(s) into the current catalog? Existing items are matched by manufacturer reference.`,
@@ -132,6 +134,9 @@ export function useCatalogCsvImportExport({
         return;
       }
     }
+
+    const currentState = store.getState();
+    const currentCatalogItems = Object.values(currentState.catalogItems.byId).filter((item): item is NonNullable<typeof item> => item !== undefined);
 
     const existingByManufacturerReference = new Map<string, (typeof currentCatalogItems)[number]>();
     for (const item of currentCatalogItems) {

@@ -83,4 +83,26 @@ describe("App integration UI - settings locale", () => {
     expect(document.documentElement.lang).toBe("en");
   });
 
+  it("translates create-empty-workspace confirmation runtime copy in French locale", async () => {
+    localStorage.setItem(
+      "electrical-plan-editor.ui-preferences.v1",
+      JSON.stringify({
+        schemaVersion: 2,
+        locale: "fr"
+      })
+    );
+
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Fermer l'onboarding" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Créer un espace vide" }));
+    const confirmDialog = await screen.findByRole("dialog", { name: "Créer un espace vide" });
+    expect(
+      within(confirmDialog).getByText(
+        "Remplacer l'espace de travail courant par un espace vide ? Cela supprime les changements actuels de l'espace."
+      )
+    ).toBeInTheDocument();
+    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Annuler" }));
+  });
+
 });
