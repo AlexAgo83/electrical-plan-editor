@@ -1,6 +1,6 @@
 ## req_090_network_summary_zoom_invariant_node_shapes_option_for_connectors_splices_and_nodes - Network summary zoom-invariant node shapes option for connectors, splices, and nodes
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
 > Complexity: Medium

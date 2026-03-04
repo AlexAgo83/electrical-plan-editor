@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Real-World Component Identification via Optional Manufacturer References
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Add an optional reference field on `Connector` and `Splice` to store the real-world component reference.

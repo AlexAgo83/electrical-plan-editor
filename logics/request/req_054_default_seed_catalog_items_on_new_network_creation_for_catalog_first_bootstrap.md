@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Reduce catalog-first onboarding friction by seeding realistic catalog items when creating a new network
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - The `catalog-first` workflow introduced by `req_051` is correct, but a newly created network currently starts with an empty `Catalog`.

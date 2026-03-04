@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Follow-up Hardening for 2D Canvas Accessibility and Legacy/Test Contract Clarity
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Address post-`req_024` review findings (requalified with product decision that only `select` interaction mode is supported in UI).

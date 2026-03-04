@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Follow-up hardening for shell accessibility consistency and lazy-loading scoping
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Address follow-up review findings after `req_019` / `task_018` closure, focusing on desktop shell accessibility consistency and lazy-loading scoping.

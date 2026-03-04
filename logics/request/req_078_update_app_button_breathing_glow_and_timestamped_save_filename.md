@@ -2,6 +2,7 @@
 > From version: 0.9.16
 > Understanding: 100% (animation, timestamped filenames, and lazy-loading behavior are implemented with locked V1 contracts)
 > Confidence: 99% (delivery is validated by targeted tests and full UI lane execution)
+> Status: Done
 
 # Needs
 - The `Update app` header action should use a smooth breathing glow and should not blink.

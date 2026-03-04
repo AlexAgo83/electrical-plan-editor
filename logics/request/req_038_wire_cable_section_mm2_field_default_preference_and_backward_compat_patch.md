@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Cable Section Domain Attribute, Settings Default, and Legacy Save Compatibility
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Add cable section (`mm²`) to `Wire` (instead of treating this as vague "thickness").

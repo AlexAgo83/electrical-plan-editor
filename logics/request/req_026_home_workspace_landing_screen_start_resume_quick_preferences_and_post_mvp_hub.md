@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Home / Entry Experience for Faster Start and Resume Flows
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Introduce a dedicated home screen that improves first interaction and return-to-work flows.

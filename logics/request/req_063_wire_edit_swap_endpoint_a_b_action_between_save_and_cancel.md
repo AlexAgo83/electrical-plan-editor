@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Wire editing ergonomics / endpoint form operations / modeling UX
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - In `Wires` > `Edit Wire`, users need a quick way to invert wire endpoints without manually re-entering both sides.

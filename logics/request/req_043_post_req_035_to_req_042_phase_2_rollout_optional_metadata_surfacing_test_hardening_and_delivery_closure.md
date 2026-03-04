@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Follow-up Delivery Completion and Quality Hardening After req_035-042 Baseline Implementation
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Formalize the remaining non-blocking work after the successful implementation of `req_035` through `req_042`.

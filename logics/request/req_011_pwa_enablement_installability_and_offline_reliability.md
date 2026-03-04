@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Platform Reliability and Native-like Delivery
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Make the web app installable as a Progressive Web App (desktop and mobile compatible browsers).

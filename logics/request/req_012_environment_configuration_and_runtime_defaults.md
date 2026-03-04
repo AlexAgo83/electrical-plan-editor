@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Configuration Reliability and Developer Experience
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Add environment-based configuration for project runtime settings.

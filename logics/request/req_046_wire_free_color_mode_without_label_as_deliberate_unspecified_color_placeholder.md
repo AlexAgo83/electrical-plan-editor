@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Distinguishing “No Color” from “Free Color (Unspecified)” in Wire/Cable Identification
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Allow `Free color` mode to be used **without entering a label**.

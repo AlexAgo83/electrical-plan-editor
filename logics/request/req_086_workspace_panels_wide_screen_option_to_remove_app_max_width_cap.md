@@ -1,6 +1,6 @@
 ## req_086_workspace_panels_wide_screen_option_to_remove_app_max_width_cap - Workspace panels wide screen option to remove app max-width cap
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
 > Complexity: Medium

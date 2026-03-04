@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Per-Endpoint Wire Termination Metadata for Connection and Seal References
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Add an optional **connection reference** for each side of a wire.

@@ -1,6 +1,6 @@
 ## req_081_canvas_tools_preference_selected_callout_only_visibility_override - Canvas tools preference for selected-callout-only visibility override
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Complexity: Medium

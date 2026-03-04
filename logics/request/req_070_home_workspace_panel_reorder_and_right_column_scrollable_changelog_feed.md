@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Home information architecture and release-notes discoverability
 > Reminder: Update Understanding/Confidence and references when you edit this doc.
+> Status: Done
 
 # Needs
 - Users want a clearer Home hierarchy:

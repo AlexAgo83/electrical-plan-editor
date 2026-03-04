@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Guided First-Time User Onboarding and Contextual In-App Learning
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Add a step-by-step onboarding flow to guide users through creating their first network.

@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Wire Creation Ergonomics with Endpoint Occupancy Awareness and Smart Slot Prefill
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Indicate when a selected connector `way` or splice `port` is already occupied while creating a new wire.

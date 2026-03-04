@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Reliability Hardening and Delivery Safety
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Prevent app boot/runtime crashes when browser storage access is blocked or unavailable (`localStorage` access can throw in some contexts).

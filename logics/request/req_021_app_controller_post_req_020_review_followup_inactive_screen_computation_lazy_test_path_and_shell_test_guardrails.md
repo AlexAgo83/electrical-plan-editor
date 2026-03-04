@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Follow-up hardening after req_020 review (compute scope, lazy coverage, test guardrails)
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Address follow-up review findings after `req_020` / `task_019`, focused on residual `AppController` screen-domain computation cost and test coverage/guardrail gaps.

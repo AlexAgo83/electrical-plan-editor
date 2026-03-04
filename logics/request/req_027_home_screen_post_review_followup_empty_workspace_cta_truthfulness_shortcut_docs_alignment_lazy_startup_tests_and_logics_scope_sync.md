@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Post-implementation Hardening and Scope Alignment for Home Screen Delivery
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Address post-implementation review findings introduced/clarified after the home screen (`req_026`) delivery work started.

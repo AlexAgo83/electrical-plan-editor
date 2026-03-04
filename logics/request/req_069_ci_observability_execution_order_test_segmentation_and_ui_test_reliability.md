@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: CI signal robustness and test reliability hardening
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - The project now exposes useful informational signals (`coverage:ui:report`, slow-test top-N, bundle metrics), but CI execution order still limits their diagnostic value when core tests fail first.

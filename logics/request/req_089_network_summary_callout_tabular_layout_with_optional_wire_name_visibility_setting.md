@@ -1,6 +1,6 @@
 ## req_089_network_summary_callout_tabular_layout_with_optional_wire_name_visibility_setting - Network summary callout tabular layout with optional wire-name visibility setting
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
 > Complexity: Medium

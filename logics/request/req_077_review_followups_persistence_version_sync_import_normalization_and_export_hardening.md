@@ -2,6 +2,7 @@
 > From version: 0.9.16
 > Understanding: 100% (all planned hardening points are implemented and validated with CI-equivalent coverage lanes)
 > Confidence: 99% (delivery is backed by targeted tests plus segmentation/fast/ui validation gates)
+> Status: Done
 
 # Needs
 - A global technical review identified several reliability and safety follow-ups across persistence and import/export flows.

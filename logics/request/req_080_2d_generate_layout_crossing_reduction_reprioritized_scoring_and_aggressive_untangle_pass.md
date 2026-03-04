@@ -1,6 +1,6 @@
 ## req_080_2d_generate_layout_crossing_reduction_reprioritized_scoring_and_aggressive_untangle_pass - 2D generate layout crossing reduction with reprioritized scoring and aggressive untangle pass
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Complexity: Medium

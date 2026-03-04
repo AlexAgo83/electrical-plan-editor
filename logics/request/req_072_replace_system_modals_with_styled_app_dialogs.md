@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: UX consistency, accessibility, and deterministic modal behavior
 > Reminder: Update Understanding/Confidence and references when editing this doc.
+> Status: Done
 
 # Needs
 - Current destructive/sensitive actions still rely on browser system modals (`window.confirm`), creating inconsistent UI/UX versus the product style.

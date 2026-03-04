@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Wire List Filtering UX Upgrade with Field-Scoped Search and Responsive Layout Stability
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Improve the `Wires` filter UI so the text input uses all available width **without enlarging the panel**.

@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Multi-Network Architecture
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Move from a single implicit network model to explicit multi-network management.

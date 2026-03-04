@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Composition Root Reduction and Screen-Oriented Controller Decomposition
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Further reduce `src/app/AppController.tsx` after wave-3 refactor closure (`req_016`) to improve long-term maintainability and reviewability.

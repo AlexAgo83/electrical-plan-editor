@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Improve req_051 legacy compatibility by auto-bootstrapping catalog items even when connector/splice manufacturer references are missing
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Improve the `req_051` legacy fallback behavior for old saves/imports containing `Connectors` / `Splices` without `manufacturerReference`.

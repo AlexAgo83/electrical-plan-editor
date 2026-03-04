@@ -5,6 +5,7 @@
 > Complexity: Low-Medium
 > Theme: Segment analysis table readability / endpoint column split
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - In `Segments` > `Segment analysis`, the current traversing-wires table uses a single `Endpoints` column that compresses both wire ends.

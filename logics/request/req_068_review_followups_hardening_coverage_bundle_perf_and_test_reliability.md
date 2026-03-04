@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Engineering quality follow-up after broad project review
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - The project is feature-rich and currently green on the full validation matrix, but recent review surfaced several quality follow-ups that should be tracked explicitly instead of remaining ad hoc notes.

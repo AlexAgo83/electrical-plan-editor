@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Navigation and Workspace Shell Clarity
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Replace the current ad-hoc network scope management in the left sidebar with a dedicated screen.

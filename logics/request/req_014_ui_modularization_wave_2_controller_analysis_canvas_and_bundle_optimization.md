@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Maintainability, Line-Budget Control, and Runtime Delivery Efficiency
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Reduce maintenance risk caused by very large UI/controller files (especially `AppController.tsx`).

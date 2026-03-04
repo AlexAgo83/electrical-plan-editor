@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Workspace Simplification Through Modeling/Analysis Unification
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Merge `Modeling` and `Analysis` into a unified workspace experience.

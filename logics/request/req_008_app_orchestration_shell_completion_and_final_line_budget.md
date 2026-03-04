@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: UI Modularization Completion
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Complete the final decomposition of `src/app/App.tsx` to remove monolithic ownership and enforce a sustainable line budget.

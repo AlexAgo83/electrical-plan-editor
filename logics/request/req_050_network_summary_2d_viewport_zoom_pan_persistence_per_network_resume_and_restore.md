@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: UX Continuity and State Persistence for 2D Workspace View Resume
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Persist the 2D network view viewport state (`zoom` + `pan`) so users can resume where they left off.

@@ -1,6 +1,6 @@
 ## req_084_network_scope_recent_changes_persistence_across_app_relaunch - Persist Network Scope recent changes across app relaunch
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Complexity: Medium

@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Real AppController LOC Reduction Without Opaque Abstractions
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Continue `AppController` decomposition after wave-4 (`req_017`) with a focus on measurable line-count reduction, not only structural extraction.

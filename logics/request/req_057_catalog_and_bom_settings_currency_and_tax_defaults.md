@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Settings / Catalog / BOM Pricing
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Users need a configurable `currency` and `tax rate` (e.g. VAT / `TVA`) in `Settings`.

@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Tabular UX Completion, Analysis Surface Expansion, and Wire Metadata Visibility Improvements
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Make **all columns of all tabular lists** sortable across the application (not only a subset of “core” columns).

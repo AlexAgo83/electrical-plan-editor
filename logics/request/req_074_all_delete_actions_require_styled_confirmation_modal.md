@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Destructive-action safety and UX consistency
 > Reminder: Update Understanding/Confidence and references when editing this doc.
+> Status: Done
 
 # Needs
 - Accidental deletions remain possible on several modeling/catalog actions.
