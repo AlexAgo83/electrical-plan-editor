@@ -1,9 +1,9 @@
 ## item_505_ui_preferences_schema_versioning_and_forward_migration_matrix - UI preferences schema versioning and forward migration matrix
 > From version: 1.3.1
-> Status: Draft
-> Understanding: 96%
-> Confidence: 93%
-> Progress: 0%
+> Status: Done
+> Understanding: 98%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Persistence / Reliability
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -40,3 +40,6 @@ UI preferences persistence has no explicit schema version contract, which makes 
 # Notes
 - Derived from `logics/request/req_104_post_release_architecture_and_runtime_hardening_for_preferences_measurement_and_controller_split.md`.
 - Orchestrated by `logics/tasks/task_080_req_104_post_release_architecture_and_runtime_hardening_orchestration_and_delivery_control.md`.
+- Implemented:
+  - `src/app/hooks/useUiPreferences.ts`: schema version bumped to `2` with deterministic migration function (`v1 -> v2`) instead of hard reject.
+  - Legacy payloads continue loading through migration path with explicit version rewrite.

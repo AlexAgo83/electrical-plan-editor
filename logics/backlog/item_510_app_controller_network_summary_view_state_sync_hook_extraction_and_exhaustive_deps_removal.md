@@ -1,9 +1,9 @@
 ## item_510_app_controller_network_summary_view_state_sync_hook_extraction_and_exhaustive_deps_removal - AppController network summary view-state sync extraction and exhaustive-deps removal
 > From version: 1.3.1
-> Status: Draft
+> Status: Done
 > Understanding: 99%
-> Confidence: 96%
-> Progress: 0%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: High
 > Theme: Controller / React correctness
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -39,3 +39,7 @@
 # Notes
 - Derived from `logics/request/req_104_post_release_architecture_and_runtime_hardening_for_preferences_measurement_and_controller_split.md`.
 - Orchestrated by `logics/tasks/task_080_req_104_post_release_architecture_and_runtime_hardening_orchestration_and_delivery_control.md`.
+- Implemented:
+  - `src/app/hooks/controller/useNetworkSummaryViewStateSync.ts` introduced and wired from `AppController`.
+  - `src/app/AppController.tsx` no longer contains `eslint-disable-next-line react-hooks/exhaustive-deps`.
+  - validated with network-summary workflow + canvas-render regression suites.
