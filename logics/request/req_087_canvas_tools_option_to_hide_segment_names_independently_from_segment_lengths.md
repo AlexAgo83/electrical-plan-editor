@@ -1,6 +1,6 @@
 ## req_087_canvas_tools_option_to_hide_segment_names_independently_from_segment_lengths - Canvas tools option to hide segment names independently from segment lengths
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 100%
 > Confidence: 98%
 > Complexity: Medium

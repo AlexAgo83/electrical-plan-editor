@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Onboarding and Demo Data
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Initialize the app with a realistic example network so users can explore features immediately.

@@ -5,6 +5,7 @@
 > Complexity: Low
 > Theme: PWA update visibility and action discoverability
 > Reminder: Update Understanding/Confidence and references when editing this doc.
+> Status: Done
 
 # Needs
 - The `Update ready` action can be missed in the header.

@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Interactive Subnetwork Visibility Filtering in the 2D Network Summary Panel
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Improve the usability of sub-network tags in the 2D `Network summary` floating panel by turning them into interactive visibility controls.

@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Canvas Interaction Hardening and Test Reliability Follow-up
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Address post-`req_023` review findings around duplicated canvas node click handling, missing mouse-button guards, residual empty-state regression coverage gaps, and test isolation/reliability guardrails.

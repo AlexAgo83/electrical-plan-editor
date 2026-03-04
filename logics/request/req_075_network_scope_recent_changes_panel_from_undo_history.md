@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Network-level observability and operator auditability
 > Reminder: Update Understanding/Confidence and references when editing this doc.
+> Status: Done
 
 # Needs
 - Network Scope currently shows network list and edit form but no visibility on recent modeling/catalog mutations.

@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Readability-Oriented 2D Label Rendering Controls (Zoom Invariance + User Preferences)
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Improve readability of text labels in the 2D `Network summary` rendering by making label size insensitive to zoom level.

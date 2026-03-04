@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: 2D Representation Reliability
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Persist user-adjusted positions of entities in the 2D representation.

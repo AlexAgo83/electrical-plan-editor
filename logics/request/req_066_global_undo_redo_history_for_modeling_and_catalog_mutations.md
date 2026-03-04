@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Editing safety / productivity / mutation history ergonomics
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Users need a fast and reliable way to revert mistakes while editing the workspace.
@@ -127,4 +128,3 @@ As the feature set grows (pricing settings, catalog CSV import/export, endpoint/
 - `logics/request/req_062_catalog_csv_import_export_actions_and_round_trip_support.md`
 - `logics/request/req_063_wire_edit_swap_endpoint_a_b_action_between_save_and_cancel.md`
 - `logics/request/req_064_segment_edit_swap_node_a_b_action_between_save_and_cancel.md`
-

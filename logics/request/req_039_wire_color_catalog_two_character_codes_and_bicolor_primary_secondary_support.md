@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Structured Wire Color Modeling with Canonical Palette and Bi-Color Support
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Add a wire color concept to cables/wires in the domain model.

@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: 2D Render Visual Layering / Readability
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - In the `Network summary` 2D render, text must always remain visually in front of nodes and segments.

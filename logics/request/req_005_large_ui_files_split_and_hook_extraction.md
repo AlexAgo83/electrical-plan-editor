@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Frontend Modularization
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Reduce maintenance risk by splitting oversized UI files and extracting reusable hooks/components.

@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Catalog portability / CSV import-export / list-panel action ergonomics
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Users need to export the active-network `Catalog` as CSV for external editing/review.

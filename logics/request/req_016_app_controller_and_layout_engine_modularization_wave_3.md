@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Orchestration Simplification and Layout Engine Decomposition
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Continue reducing maintenance risk in `src/app/AppController.tsx` after wave 2 modularization work.

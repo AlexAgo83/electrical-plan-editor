@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Flexible Cable Identification with Free-Form Color Labels While Preserving Canonical Color Catalog Flows
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Allow identifying a wire/cable with a **free color label** (user-entered text), not only:

@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Build a V1 electrical plan editor to model connectors, routing segments, and splices as a graph-based network.

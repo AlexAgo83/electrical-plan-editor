@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Add an Analysis panel to the Catalog screen to inspect connector/splice usage of the selected catalog item
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - The current `Catalog` screen (introduced by `req_051`) intentionally omits the analysis panel.

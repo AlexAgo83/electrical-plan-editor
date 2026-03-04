@@ -1,6 +1,6 @@
 ## req_091_wire_csv_export_encoding_hardening_and_endpoint_column_split_for_begin_end_id_pin - Wire CSV export encoding hardening and endpoint column split for begin/end ID + pin
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
 > Complexity: Medium

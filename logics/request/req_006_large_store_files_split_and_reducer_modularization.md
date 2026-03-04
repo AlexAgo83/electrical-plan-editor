@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Store Modularization
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Split oversized store/reducer files to reduce coupling and make business rules easier to maintain.

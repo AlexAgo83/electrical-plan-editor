@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Branding / Theme presets / UI visual system
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Add a new **light** theme preset and a new **dark** theme preset inspired by the Circle Mobility visual identity.

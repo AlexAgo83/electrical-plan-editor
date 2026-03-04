@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: UX/UI Consistency Across Entity Workspaces
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Reuse the `Network Scope` list/form interaction model as the baseline for every other screen combining a list and a create/edit form.

@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Validation hardening for Catalog items + sample/fixture coverage
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Users report that Validation appears not to handle errors on `Catalog` items (or not consistently enough in current flows).

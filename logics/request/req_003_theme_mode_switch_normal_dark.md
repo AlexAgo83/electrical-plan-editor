@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: UX/UI Theming
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Allow users to switch between current `Normal` mode and a new `Dark` mode.

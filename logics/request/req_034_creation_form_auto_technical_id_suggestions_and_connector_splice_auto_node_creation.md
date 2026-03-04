@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Creation Flow Ergonomics and Modeling Bootstrap Automation
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - In creation forms, pre-fill `Technical ID` fields with the next available/suggested ID so users do not need to type them manually every time.

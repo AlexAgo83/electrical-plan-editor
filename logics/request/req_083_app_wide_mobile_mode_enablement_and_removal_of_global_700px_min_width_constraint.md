@@ -1,6 +1,6 @@
 ## req_083_app_wide_mobile_mode_enablement_and_removal_of_global_700px_min_width_constraint - App-wide mobile mode enablement with removal of global 700px minimum width constraint
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Complexity: High

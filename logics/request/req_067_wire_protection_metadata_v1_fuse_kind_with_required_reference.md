@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Wire modeling extensibility / protection semantics / validation ergonomics
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Users want to represent a fuse-like bridge using the existing wire workflow (including same-connector loopback cases, e.g. one cavity to another cavity on the same connector).

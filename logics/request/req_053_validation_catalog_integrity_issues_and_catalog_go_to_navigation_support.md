@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Extend the Validation screen to detect and navigate catalog-related integrity issues introduced by req_051 catalog-first modeling
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - The Validation screen currently does not surface issues related to `Catalog` items or broken `catalogItemId` references introduced by `req_051`.

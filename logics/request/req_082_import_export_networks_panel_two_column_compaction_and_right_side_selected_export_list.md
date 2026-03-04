@@ -1,6 +1,6 @@
 ## req_082_import_export_networks_panel_two_column_compaction_and_right_side_selected_export_list - Import/Export networks panel two-column compaction with right-side selected export list
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 100%
 > Confidence: 98%
 > Complexity: Low

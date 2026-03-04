@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: UX/UI Information Architecture
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Improve the whole application UX/UI so electrical modeling and routing workflows are faster, clearer, and less error-prone.

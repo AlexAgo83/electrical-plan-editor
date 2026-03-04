@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Post-refactor behavior hardening and API contract clarification
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Address post-wave-5 review findings that can still cause UX/accessibility regressions despite green tests and successful build/CI.

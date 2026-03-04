@@ -5,6 +5,7 @@
 > Complexity: Low-Medium
 > Theme: Analysis navigation ergonomics between occupancy and wire detail
 > Reminder: Update Understanding/Confidence and references when editing this doc.
+> Status: Done
 
 # Needs
 - In `Connectors analysis` and `Splices analysis`, users want a quick action to jump directly to the linked wire from an occupied slot.

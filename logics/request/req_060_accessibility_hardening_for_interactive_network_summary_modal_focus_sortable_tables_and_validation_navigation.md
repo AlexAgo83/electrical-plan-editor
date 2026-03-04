@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Accessibility hardening (keyboard + screen reader semantics + focus management)
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Improve accessibility of the app based on a recent audit, with priority on keyboard access, screen reader semantics, and modal focus behavior.

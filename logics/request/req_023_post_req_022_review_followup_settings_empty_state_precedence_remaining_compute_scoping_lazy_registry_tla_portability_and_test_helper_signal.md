@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Follow-up hardening for settings accessibility, residual compute scope, lazy registry portability, and test signal quality
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Address post-`req_022` review findings affecting runtime behavior, performance discipline, portability risk, and test signal quality.

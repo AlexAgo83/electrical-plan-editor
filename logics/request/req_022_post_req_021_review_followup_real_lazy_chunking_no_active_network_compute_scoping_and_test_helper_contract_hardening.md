@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Follow-up hardening for production lazy-loading realism, compute scoping completeness, and test helper contract clarity
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Address follow-up review findings after `req_021` / `task_020`, focusing on residual gaps in lazy-loading production behavior, compute scoping completeness, and test helper contract safety.

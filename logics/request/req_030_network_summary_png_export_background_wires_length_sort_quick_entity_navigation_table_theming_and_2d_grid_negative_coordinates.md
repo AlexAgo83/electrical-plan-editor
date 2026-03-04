@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Workflow and Visualization Polish Across Export, Tables, Navigation, Theming, and 2D Canvas Placement
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Add a `Settings` option to include the canvas background in PNG export while preserving current transparent-default behavior.

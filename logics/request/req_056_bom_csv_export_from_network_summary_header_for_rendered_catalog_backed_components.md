@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Add a BOM CSV export action in the 2D render header using catalog-linked connector/splice data and unit pricing
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Users need to generate a BOM (Bill of Materials) directly from the 2D render workflow.

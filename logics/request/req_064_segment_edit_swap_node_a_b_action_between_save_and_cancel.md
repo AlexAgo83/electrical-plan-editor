@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Segment editing ergonomics / node-order inversion / modeling UX
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - In `Segments` > `Edit Segment`, users need a quick way to invert `Node A` and `Node B` without manually reselecting both nodes.

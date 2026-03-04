@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Tabular Readability and Workspace Action Ergonomics Polish Across Modeling/Analysis/Network Scope Surfaces
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - In `Wires` tables, split the current `Endpoints` column into **two distinct columns** for better readability:

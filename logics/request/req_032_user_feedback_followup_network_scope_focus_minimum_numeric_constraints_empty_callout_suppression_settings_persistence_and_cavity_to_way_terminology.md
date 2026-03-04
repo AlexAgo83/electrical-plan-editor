@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: UX/Data-Entry Safeguards and Terminology Cleanup from Real User Feedback
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Fix a `Network scope` table focus bug where clicking a row updates the edit panel but the row focus/visual focus state is only applied after a second click.

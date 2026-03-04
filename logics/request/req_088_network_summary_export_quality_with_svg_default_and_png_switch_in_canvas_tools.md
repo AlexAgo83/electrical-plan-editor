@@ -1,6 +1,6 @@
 ## req_088_network_summary_export_quality_with_svg_default_and_png_switch_in_canvas_tools - Network summary export quality with SVG default and PNG switch in Canvas tools
 > From version: 0.9.18
-> Status: Draft
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
 > Complexity: Medium

@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: 2D Visualization Enrichment with Draggable Callout Frames for Connector/Splice Cable Lists
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Add a new graphical element in the 2D `Network summary` rendering for each **connector** and **splice**.

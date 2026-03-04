@@ -5,6 +5,7 @@
 > Complexity: High
 > Theme: Safe Node Identifier Editability with Store-Level Referential Integrity
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Allow editing `Node ID` in the Node form while in edit mode.

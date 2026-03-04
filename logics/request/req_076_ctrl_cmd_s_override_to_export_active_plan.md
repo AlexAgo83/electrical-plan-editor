@@ -5,6 +5,7 @@
 > Complexity: Small-Medium
 > Theme: Keyboard productivity and UX consistency
 > Reminder: Update Understanding/Confidence and references when editing this doc.
+> Status: Done
 
 # Needs
 - `Ctrl/Cmd+S` currently resolves to browser page save behavior.

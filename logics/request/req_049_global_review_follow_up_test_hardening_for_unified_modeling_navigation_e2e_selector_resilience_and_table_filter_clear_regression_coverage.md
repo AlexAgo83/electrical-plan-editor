@@ -5,6 +5,7 @@
 > Complexity: Medium
 > Theme: Post-merge Test Reliability and Regression Safety Hardening
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 # Needs
 - Convert the global review findings into a focused hardening wave.

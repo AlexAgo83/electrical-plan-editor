@@ -5,6 +5,7 @@
 > Complexity: Medium-High
 > Theme: Introduce a catalog-focused modeling sub-screen with connector-like workspace composition and generic connection-count metadata
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
+> Status: Done
 
 ## Delivery status
 - Implemented (task execution complete via `task_052`).
