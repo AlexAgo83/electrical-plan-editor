@@ -1,9 +1,9 @@
 ## item_509_network_summary_panel_callout_model_layout_render_extraction_and_parity_tests - NetworkSummaryPanel callout model/layout/render extraction and parity tests
 > From version: 1.3.1
-> Status: In Progress
+> Status: Done
 > Understanding: 99%
-> Confidence: 96%
-> Progress: 82%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: High
 > Theme: Architecture / Callouts
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -45,6 +45,9 @@ Callout model, layout metrics, text measurement, and rendering are tightly coupl
   - moved callout measurement lifecycle management and layout-cache helpers out of `NetworkSummaryPanel`;
   - extracted callout render layer into `src/app/components/network-summary/callouts/NetworkSummaryCalloutsLayer.tsx`;
   - extracted callout leader-line rendering into dedicated component (`NetworkSummaryCalloutLeaders`);
-  - `NetworkSummaryPanel.tsx` reduced to `1663` lines with callout UI parity preserved in targeted UI suites.
-- Remaining for completion:
-  - extract callout row/group/view-model builders from panel to fully close AC1 scope.
+  - extracted callout row/group/view-model builders into `src/app/components/network-summary/callouts/calloutModel.ts`;
+  - `NetworkSummaryPanel.tsx` further reduced to `975` lines with callout UI parity preserved in targeted UI suites.
+- Validation evidence:
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npx vitest run src/tests/app.ui.settings-canvas-callouts.spec.tsx src/tests/app.ui.network-summary-workflow-polish.spec.tsx src/tests/app.ui.settings-canvas-render.spec.tsx` ✅

@@ -37,3 +37,5 @@ export function useCanvasState() {
     setNetworkOffset
   };
 }
+
+export type CanvasStateModel = ReturnType<typeof useCanvasState>;

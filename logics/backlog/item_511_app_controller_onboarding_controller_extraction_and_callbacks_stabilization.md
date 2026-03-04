@@ -1,9 +1,9 @@
 ## item_511_app_controller_onboarding_controller_extraction_and_callbacks_stabilization - AppController onboarding controller extraction and callbacks stabilization
 > From version: 1.3.1
-> Status: Draft
-> Understanding: 95%
-> Confidence: 92%
-> Progress: 0%
+> Status: Done
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Controller / UX orchestration
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -39,3 +39,11 @@ Onboarding orchestration (open/next/target/focus) is embedded in `AppController.
 # Notes
 - Derived from `logics/request/req_104_post_release_architecture_and_runtime_hardening_for_preferences_measurement_and_controller_split.md`.
 - Orchestrated by `logics/tasks/task_080_req_104_post_release_architecture_and_runtime_hardening_orchestration_and_delivery_control.md`.
+- Implemented:
+  - onboarding state/callback orchestration extracted into `src/app/hooks/controller/useOnboardingController.ts`;
+  - `AppController` now consumes the hook for full-flow open, single-step targeting, target actions, auto-open persistence, and modal navigation;
+  - `AppController.tsx` reduced from `2702` to `2524` lines in this increment.
+- Validation evidence:
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npx vitest run src/tests/app.ui.home.spec.tsx src/tests/app.ui.settings.spec.tsx src/tests/app.ui.settings-canvas-callouts.spec.tsx` ✅

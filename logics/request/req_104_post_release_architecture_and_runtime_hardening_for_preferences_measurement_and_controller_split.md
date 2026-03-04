@@ -1,8 +1,8 @@
 ## req_104_post_release_architecture_and_runtime_hardening_for_preferences_measurement_and_controller_split - Post-release architecture and runtime hardening for preferences, measurement lifecycle, and controller split
 > From version: 1.3.1
-> Status: Draft
-> Understanding: 98% (review points are concrete and reproducible)
-> Confidence: 95%
+> Status: Done
+> Understanding: 100% (delivered and validated end-to-end)
+> Confidence: 99%
 > Complexity: High
 > Theme: Reliability / Maintainability / Runtime safety
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -206,3 +206,17 @@
 - `src/tests/persistence.localStorage.spec.ts`
 - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
 - `src/tests/app.ui.settings-canvas-render.spec.tsx`
+
+# Closure
+- Delivered through:
+  - `logics/tasks/task_080_req_104_post_release_architecture_and_runtime_hardening_orchestration_and_delivery_control.md`
+  - backlog `item_505` to `item_513`.
+- Final validation matrix completed on 2026-03-04:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` ✅
+  - `npm run -s lint` ✅
+  - `npm run -s typecheck` ✅
+  - `npm run -s test:ci:ui` ✅
+  - `npm run -s test:e2e` ✅
+- Final size targets achieved:
+  - `src/app/components/NetworkSummaryPanel.tsx`: `975` lines (`<= 1000`) ✅
+  - `src/app/AppController.tsx`: `1100` lines (`<= 1100`) ✅
