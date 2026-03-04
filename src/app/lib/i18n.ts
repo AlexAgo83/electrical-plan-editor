@@ -94,6 +94,8 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Workspace hub": "Hub espace de travail",
   "Open Network Scope": "Ouvrir Périmètre réseau",
   "Create empty workspace": "Créer un espace vide",
+  "Replace the current workspace with an empty workspace? This removes current workspace changes.":
+    "Remplacer l'espace de travail courant par un espace vide ? Cela supprime les changements actuels de l'espace.",
   "Import from file": "Importer depuis un fichier",
   "Import / Export networks": "Importer / Exporter des réseaux",
   "Portability": "Portabilité",
@@ -500,6 +502,16 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Node kind filter": "Filtre type de nœud",
   "No available ways.": "Aucune voie disponible.",
   "No available ports.": "Aucun port disponible.",
+  "No catalog item available for export.": "Aucun élément catalogue disponible pour l'export.",
+  "Unable to read selected catalog CSV file.": "Impossible de lire le fichier CSV catalogue sélectionné.",
+  "Import catalog CSV": "Importer CSV catalogue",
+  "Catalog CSV import failed due to validation errors.": "L'import CSV catalogue a échoué à cause d'erreurs de validation.",
+  "Catalog CSV contains no importable row after warnings.": "Le CSV catalogue ne contient aucune ligne importable après avertissements.",
+  "Catalog CSV contains no data row.": "Le CSV catalogue ne contient aucune ligne de données.",
+  "Catalog CSV import canceled.": "Import CSV catalogue annulé.",
+  "Catalog import failed: invalid manufacturer reference.": "Échec de l'import catalogue : référence fabricant invalide.",
+  "Catalog CSV import aborted: resolve existing catalog duplicate references first.":
+    "Import CSV catalogue interrompu : corrigez d'abord les doublons de références fabricant existants.",
   "Occupant reference": "Référence occupant",
   "Optional (e.g. Beige/Brown mix)": "Optionnel (ex. mélange Beige/Marron)",
   "Optional description": "Description optionnelle",
@@ -811,6 +823,100 @@ export function translateTextValue(locale: AppLocale, input: string): string {
     }
     translated += ".";
     return input.replace(trimmed, translated);
+  }
+
+  const exportedCatalogItemsMatch = /^Exported\s+(\d+)\s+catalog item\(s\)\.$/i.exec(trimmed);
+  if (exportedCatalogItemsMatch !== null) {
+    const count = Number(exportedCatalogItemsMatch[1] ?? "0");
+    return input.replace(trimmed, `${count} élément${count > 1 ? "s" : ""} catalogue exporté${count > 1 ? "s" : ""}.`);
+  }
+
+  const importedCatalogRowsMatch = /^Imported\s+(\d+)\s+catalog row\(s\):\s+(\d+)\s+created\s*\/\s*(\d+)\s+updated\.$/i.exec(trimmed);
+  if (importedCatalogRowsMatch !== null) {
+    const rowCount = Number(importedCatalogRowsMatch[1] ?? "0");
+    const createdCount = Number(importedCatalogRowsMatch[2] ?? "0");
+    const updatedCount = Number(importedCatalogRowsMatch[3] ?? "0");
+    return input.replace(
+      trimmed,
+      `${rowCount} ligne${rowCount > 1 ? "s" : ""} catalogue importée${rowCount > 1 ? "s" : ""} : ${createdCount} créée${createdCount > 1 ? "s" : ""} / ${updatedCount} mise${updatedCount > 1 ? "s" : ""} à jour.`
+    );
+  }
+
+  const importCatalogRowsConfirmMatch =
+    /^Import\s+(\d+)\s+catalog row\(s\)\s+into the current catalog\?\s+Existing items are matched by manufacturer reference\.$/i.exec(
+      trimmed
+    );
+  if (importCatalogRowsConfirmMatch !== null) {
+    const rowCount = Number(importCatalogRowsConfirmMatch[1] ?? "0");
+    return input.replace(
+      trimmed,
+      `Importer ${rowCount} ligne${rowCount > 1 ? "s" : ""} catalogue dans le catalogue courant ? Les éléments existants sont appariés par référence fabricant.`
+    );
+  }
+
+  const catalogImportFailedAtRowMatch = /^Catalog CSV import failed at row\s+(\d+):\s+(.+)$/i.exec(trimmed);
+  if (catalogImportFailedAtRowMatch !== null) {
+    const rowNumber = catalogImportFailedAtRowMatch[1] ?? "0";
+    const reason = translateTextValue(locale, catalogImportFailedAtRowMatch[2] ?? "").trim();
+    return input.replace(trimmed, `Échec de l'import CSV catalogue à la ligne ${rowNumber} : ${reason}`);
+  }
+
+  const catalogImportAbortedSummaryMatch =
+    /^Catalog CSV import aborted\s+\((.+)\):\s+(\d+)\s+rows parsed,\s+(\d+)\s+warnings,\s+(\d+)\s+errors\.$/i.exec(trimmed);
+  if (catalogImportAbortedSummaryMatch !== null) {
+    const fileName = catalogImportAbortedSummaryMatch[1] ?? "";
+    const rowCount = Number(catalogImportAbortedSummaryMatch[2] ?? "0");
+    const warningCount = Number(catalogImportAbortedSummaryMatch[3] ?? "0");
+    const errorCount = Number(catalogImportAbortedSummaryMatch[4] ?? "0");
+    return input.replace(
+      trimmed,
+      `Import CSV catalogue interrompu (${fileName}) : ${rowCount} ligne${rowCount > 1 ? "s" : ""} analysée${rowCount > 1 ? "s" : ""}, ${warningCount} avertissement${warningCount > 1 ? "s" : ""}, ${errorCount} erreur${errorCount > 1 ? "s" : ""}.`
+    );
+  }
+
+  const catalogImportSkippedMatch = /^Catalog CSV import skipped\s+\((.+)\):\s+no row imported\.$/i.exec(trimmed);
+  if (catalogImportSkippedMatch !== null) {
+    const fileName = catalogImportSkippedMatch[1] ?? "";
+    return input.replace(trimmed, `Import CSV catalogue ignoré (${fileName}) : aucune ligne importée.`);
+  }
+
+  const catalogImportBlockedDuplicatesMatch =
+    /^Catalog import blocked:\s+existing catalog has duplicate manufacturer reference '(.+)'\.$/i.exec(trimmed);
+  if (catalogImportBlockedDuplicatesMatch !== null) {
+    const reference = catalogImportBlockedDuplicatesMatch[1] ?? "";
+    return input.replace(trimmed, `Import catalogue bloqué : le catalogue existant contient une référence fabricant dupliquée '${reference}'.`);
+  }
+
+  const catalogImportAbortedAfterRowsMatch = /^Catalog CSV import aborted after\s+(\d+)\s+row\(s\);\s+(\d+)\s+warnings in file\.$/i.exec(
+    trimmed
+  );
+  if (catalogImportAbortedAfterRowsMatch !== null) {
+    const importedRows = Number(catalogImportAbortedAfterRowsMatch[1] ?? "0");
+    const warningCount = Number(catalogImportAbortedAfterRowsMatch[2] ?? "0");
+    return input.replace(
+      trimmed,
+      `Import CSV catalogue interrompu après ${importedRows} ligne${importedRows > 1 ? "s" : ""} ; ${warningCount} avertissement${warningCount > 1 ? "s" : ""} dans le fichier.`
+    );
+  }
+
+  const catalogImportFailedOnReferenceMatch = /^Catalog import failed on '(.+)':\s+(.+)$/i.exec(trimmed);
+  if (catalogImportFailedOnReferenceMatch !== null) {
+    const manufacturerReference = catalogImportFailedOnReferenceMatch[1] ?? "";
+    const reason = translateTextValue(locale, catalogImportFailedOnReferenceMatch[2] ?? "").trim();
+    return input.replace(trimmed, `Échec de l'import catalogue sur '${manufacturerReference}' : ${reason}`);
+  }
+
+  const lastCatalogImportSummaryMatch =
+    /^Last catalog CSV import\s+\((.+)\):\s+(\d+)\s+rows,\s+(\d+)\s+warnings,\s+(\d+)\s+errors\.$/i.exec(trimmed);
+  if (lastCatalogImportSummaryMatch !== null) {
+    const fileName = lastCatalogImportSummaryMatch[1] ?? "";
+    const rowCount = Number(lastCatalogImportSummaryMatch[2] ?? "0");
+    const warningCount = Number(lastCatalogImportSummaryMatch[3] ?? "0");
+    const errorCount = Number(lastCatalogImportSummaryMatch[4] ?? "0");
+    return input.replace(
+      trimmed,
+      `Dernier import CSV catalogue (${fileName}) : ${rowCount} ligne${rowCount > 1 ? "s" : ""}, ${warningCount} avertissement${warningCount > 1 ? "s" : ""}, ${errorCount} erreur${errorCount > 1 ? "s" : ""}.`
+    );
   }
 
   const validationCounterMatch = /^(\d+)\s+validation issue(?:s)?(?:,\s+(\d+)\s+error(?:s)?)?(?:,\s+no errors)?$/i.exec(trimmed);

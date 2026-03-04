@@ -128,4 +128,141 @@ describe("App integration UI - catalog CSV import/export", () => {
       name: "New item"
     });
   });
+
+  it("rebases import apply on latest state after confirmation to preserve concurrent catalog updates", async () => {
+    const state = appReducer(
+      createUiIntegrationState(),
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-1"),
+        manufacturerReference: "REF-1",
+        connectionCount: 2,
+        name: "Original item"
+      })
+    );
+    const { store } = renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    const fileInput = catalogPanel.querySelector('input[type="file"][accept="text/csv,.csv"]');
+    expect(fileInput).not.toBeNull();
+
+    const csvText = [
+      CATALOG_CSV_HEADERS.join(","),
+      "ref-1,4,Updated item,1.25,https://example.com/ref-1",
+      "REF-2,5,New item,2.50,https://example.com/ref-2"
+    ].join("\r\n");
+    const file = new File([csvText], "catalog-import-rebase.csv", { type: "text/csv" });
+    Object.defineProperty(file, "text", {
+      configurable: true,
+      value: vi.fn().mockResolvedValue(csvText)
+    });
+
+    fireEvent.change(fileInput as HTMLInputElement, {
+      target: { files: [file] }
+    });
+    const confirmDialog = await screen.findByRole("dialog", { name: "Import catalog CSV" });
+
+    store.dispatch(
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-CONCURRENT"),
+        manufacturerReference: "REF-CONCURRENT",
+        connectionCount: 9,
+        name: "Concurrent item"
+      })
+    );
+
+    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Confirm" }));
+
+    await waitFor(() => {
+      expect(within(getPanelByHeading("Catalog")).getByText("Imported 2 catalog row(s): 1 created / 1 updated.")).toBeInTheDocument();
+    });
+
+    const catalogByRef = Object.values(store.getState().catalogItems.byId).reduce<
+      Record<string, { connectionCount: number; name?: string }>
+    >((accumulator, item) => {
+      if (item !== undefined) {
+        accumulator[item.manufacturerReference] = {
+          connectionCount: item.connectionCount,
+          name: item.name
+        };
+      }
+      return accumulator;
+    }, {});
+
+    expect(catalogByRef["ref-1"]).toEqual({
+      connectionCount: 4,
+      name: "Updated item"
+    });
+    expect(catalogByRef["REF-2"]).toEqual({
+      connectionCount: 5,
+      name: "New item"
+    });
+    expect(catalogByRef["REF-CONCURRENT"]).toEqual({
+      connectionCount: 9,
+      name: "Concurrent item"
+    });
+  });
+
+  it("translates catalog CSV runtime status messages in French locale", async () => {
+    localStorage.setItem(
+      "electrical-plan-editor.ui-preferences.v1",
+      JSON.stringify({
+        schemaVersion: 2,
+        locale: "fr"
+      })
+    );
+
+    const state = appReducer(
+      createUiIntegrationState(),
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-FR"),
+        manufacturerReference: "REF-FR",
+        connectionCount: 2,
+        name: "Item FR"
+      })
+    );
+
+    renderAppWithState(state);
+    const closeOnboardingButton = screen.getByRole("button", { name: /Close onboarding|Fermer l'onboarding/ });
+    fireEvent.click(closeOnboardingButton);
+    const openMenuButton = screen.queryByRole("button", { name: /Open menu|Ouvrir le menu/ });
+    if (openMenuButton !== null) {
+      fireEvent.click(openMenuButton);
+    }
+    fireEvent.click(screen.getByRole("button", { name: /^Modeling$|^Modélisation$/ }));
+    const closeMenuButton = screen.queryByRole("button", { name: /Close menu|Fermer le menu/ });
+    if (closeMenuButton !== null) {
+      fireEvent.click(closeMenuButton);
+    }
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$|^Catalogue$/, hidden: true }));
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    const exportButton = within(catalogPanel).getByRole("button", { name: /Export CSV|Exporter CSV/ });
+
+    Object.defineProperty(URL, "createObjectURL", {
+      configurable: true,
+      writable: true,
+      value: vi.fn(() => "blob:catalog-export-fr")
+    });
+    Object.defineProperty(URL, "revokeObjectURL", {
+      configurable: true,
+      writable: true,
+      value: vi.fn()
+    });
+    vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+
+    fireEvent.click(exportButton);
+
+    await waitFor(() => {
+      expect(within(catalogPanel).getByText("1 élément catalogue exporté.")).toBeInTheDocument();
+    });
+  });
 });

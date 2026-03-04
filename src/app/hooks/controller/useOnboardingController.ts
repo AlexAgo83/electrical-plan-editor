@@ -48,6 +48,7 @@ export function useOnboardingController({
   setActiveSubScreen
 }: UseOnboardingControllerOptions): UseOnboardingControllerResult {
   const onboardingAutoOpenAttemptedRef = useRef(false);
+  const pendingOnboardingFocusRequestRef = useRef<{ rafId: number | null; canceled: boolean } | null>(null);
   const [onboardingModalMode, setOnboardingModalMode] = useState<"full" | "single">("full");
   const [onboardingStepIndex, setOnboardingStepIndex] = useState(0);
   const [onboardingSingleStepId, setOnboardingSingleStepId] = useState<OnboardingStepId>("networkScope");
@@ -62,19 +63,33 @@ export function useOnboardingController({
     writeOnboardingAutoOpenEnabled(enabled);
   }, []);
 
+  const cancelPendingOnboardingTargetFocus = useCallback(() => {
+    const pendingRequest = pendingOnboardingFocusRequestRef.current;
+    if (pendingRequest === null) {
+      return;
+    }
+    pendingRequest.canceled = true;
+    if (pendingRequest.rafId !== null && typeof window !== "undefined") {
+      window.cancelAnimationFrame(pendingRequest.rafId);
+    }
+    pendingOnboardingFocusRequestRef.current = null;
+  }, []);
+
   const openFullOnboarding = useCallback(() => {
+    cancelPendingOnboardingTargetFocus();
     setOnboardingModalMode("full");
     setOnboardingStepIndex(0);
     setOnboardingSingleStepTargetOverride(null);
     setIsOnboardingOpen(true);
-  }, []);
+  }, [cancelPendingOnboardingTargetFocus]);
 
   const openSingleStepOnboarding = useCallback((stepId: OnboardingStepId, targetOverride?: OnboardingStepTarget) => {
+    cancelPendingOnboardingTargetFocus();
     setOnboardingModalMode("single");
     setOnboardingSingleStepId(stepId);
     setOnboardingSingleStepTargetOverride(targetOverride ?? null);
     setIsOnboardingOpen(true);
-  }, []);
+  }, [cancelPendingOnboardingTargetFocus]);
 
   useEffect(() => {
     if (onboardingAutoOpenAttemptedRef.current) {
@@ -92,8 +107,24 @@ export function useOnboardingController({
       return;
     }
 
+    cancelPendingOnboardingTargetFocus();
+    const focusRequest = { rafId: null as number | null, canceled: false };
+    pendingOnboardingFocusRequestRef.current = focusRequest;
     let attempts = 0;
+
+    const clearFocusRequest = () => {
+      if (pendingOnboardingFocusRequestRef.current === focusRequest) {
+        pendingOnboardingFocusRequestRef.current = null;
+      }
+      focusRequest.rafId = null;
+      focusRequest.canceled = true;
+    };
+
     const tryFocus = () => {
+      focusRequest.rafId = null;
+      if (focusRequest.canceled || pendingOnboardingFocusRequestRef.current !== focusRequest) {
+        return;
+      }
       const panel = document.querySelector(panelSelector);
       if (panel instanceof HTMLElement) {
         panel.scrollIntoView({ block: "start", behavior: "smooth" });
@@ -101,21 +132,28 @@ export function useOnboardingController({
           panel.querySelector<HTMLElement>("button, [tabindex], input, select, textarea") ??
           panel.querySelector<HTMLElement>("h2");
         focusTarget?.focus?.();
+        clearFocusRequest();
         return;
       }
 
       attempts += 1;
       if (attempts < 10 && typeof window !== "undefined") {
-        window.requestAnimationFrame(tryFocus);
+        focusRequest.rafId = window.requestAnimationFrame(tryFocus);
+        return;
       }
+      clearFocusRequest();
     };
 
     if (typeof window !== "undefined") {
-      window.requestAnimationFrame(tryFocus);
+      focusRequest.rafId = window.requestAnimationFrame(tryFocus);
     } else {
       tryFocus();
     }
-  }, []);
+  }, [cancelPendingOnboardingTargetFocus]);
+
+  useEffect(() => () => {
+    cancelPendingOnboardingTargetFocus();
+  }, [cancelPendingOnboardingTargetFocus]);
 
   const activeOnboardingStep =
     onboardingModalMode === "full" ? ONBOARDING_STEPS[onboardingStepIndex] : getOnboardingStepById(onboardingSingleStepId);
@@ -240,22 +278,25 @@ export function useOnboardingController({
 
   const handleOnboardingNext = useCallback(() => {
     if (onboardingModalMode !== "full") {
+      cancelPendingOnboardingTargetFocus();
       setIsOnboardingOpen(false);
       return;
     }
 
     setOnboardingStepIndex((current) => {
       if (current >= ONBOARDING_STEPS.length - 1) {
+        cancelPendingOnboardingTargetFocus();
         setIsOnboardingOpen(false);
         return current;
       }
       return current + 1;
     });
-  }, [onboardingModalMode]);
+  }, [cancelPendingOnboardingTargetFocus, onboardingModalMode]);
 
   const closeOnboarding = useCallback(() => {
+    cancelPendingOnboardingTargetFocus();
     setIsOnboardingOpen(false);
-  }, []);
+  }, [cancelPendingOnboardingTargetFocus]);
 
   const onboardingStepDisplayIndex =
     onboardingModalMode === "full"
