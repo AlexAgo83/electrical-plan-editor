@@ -2,8 +2,8 @@
 > From version: 1.3.1
 > Status: In Progress
 > Understanding: 99%
-> Confidence: 95%
-> Progress: 60%
+> Confidence: 96%
+> Progress: 82%
 > Complexity: High
 > Theme: Architecture / Callouts
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -40,9 +40,11 @@ Callout model, layout metrics, text measurement, and rendering are tightly coupl
 # Notes
 - Derived from `logics/request/req_104_post_release_architecture_and_runtime_hardening_for_preferences_measurement_and_controller_split.md`.
 - Orchestrated by `logics/tasks/task_080_req_104_post_release_architecture_and_runtime_hardening_orchestration_and_delivery_control.md`.
-- Delivered in this increment:
+- Delivered across current increments:
   - extracted callout model/layout infrastructure to `src/app/components/network-summary/callouts/calloutLayout.ts`;
   - moved callout measurement lifecycle management and layout-cache helpers out of `NetworkSummaryPanel`;
-  - retained behavior parity for selected-wire rows, color swatches, and callout table labels.
+  - extracted callout render layer into `src/app/components/network-summary/callouts/NetworkSummaryCalloutsLayer.tsx`;
+  - extracted callout leader-line rendering into dedicated component (`NetworkSummaryCalloutLeaders`);
+  - `NetworkSummaryPanel.tsx` reduced to `1663` lines with callout UI parity preserved in targeted UI suites.
 - Remaining for completion:
-  - isolate callout render layer/component (AC2) to finish the split.
+  - extract callout row/group/view-model builders from panel to fully close AC1 scope.
