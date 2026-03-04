@@ -32,11 +32,27 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Logics docs lint (status required)
+        run: python3 logics/skills/logics-doc-linter/scripts/logics_lint.py --require-status
+
+      - name: Sync close-eligible requests
+        run: python3 logics/skills/logics-flow-manager/scripts/logics_flow.py sync close-eligible-requests
+
+      - name: Assert request docs unchanged after sync
+        run: git diff --exit-code -- logics/request
+
+      - name: Workflow audit (blocking, grouped)
+        run: python3 logics/skills/logics-flow-manager/scripts/workflow_audit.py --legacy-cutoff-version 1.1.0 --group-by-doc
+
+      - name: Workflow audit JSON (informational, non-blocking)
+        run: python3 logics/skills/logics-flow-manager/scripts/workflow_audit.py --format json
+        continue-on-error: true
+
+      - name: Logics kit Python tests
+        run: python3 -m unittest discover -s logics/skills/tests -p "test_*.py" -v
+
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
-
-      - name: Logics docs lint
-        run: python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
 
       - name: ESLint
         run: npm run lint
