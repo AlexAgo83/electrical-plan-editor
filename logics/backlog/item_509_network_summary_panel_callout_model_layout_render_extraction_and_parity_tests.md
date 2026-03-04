@@ -1,9 +1,9 @@
 ## item_509_network_summary_panel_callout_model_layout_render_extraction_and_parity_tests - NetworkSummaryPanel callout model/layout/render extraction and parity tests
 > From version: 1.3.1
-> Status: Draft
-> Understanding: 98%
+> Status: In Progress
+> Understanding: 99%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 60%
 > Complexity: High
 > Theme: Architecture / Callouts
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -40,3 +40,9 @@ Callout model, layout metrics, text measurement, and rendering are tightly coupl
 # Notes
 - Derived from `logics/request/req_104_post_release_architecture_and_runtime_hardening_for_preferences_measurement_and_controller_split.md`.
 - Orchestrated by `logics/tasks/task_080_req_104_post_release_architecture_and_runtime_hardening_orchestration_and_delivery_control.md`.
+- Delivered in this increment:
+  - extracted callout model/layout infrastructure to `src/app/components/network-summary/callouts/calloutLayout.ts`;
+  - moved callout measurement lifecycle management and layout-cache helpers out of `NetworkSummaryPanel`;
+  - retained behavior parity for selected-wire rows, color swatches, and callout table labels.
+- Remaining for completion:
+  - isolate callout render layer/component (AC2) to finish the split.
