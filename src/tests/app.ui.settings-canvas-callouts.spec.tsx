@@ -88,4 +88,15 @@ describe("App integration UI - settings canvas callouts", () => {
     fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 220, clientY: 140 });
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(1);
   });
+
+  it("cleans up hidden callout measurement nodes on unmount", () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
+    expect(document.querySelectorAll("svg[data-callout-measure-root='true']").length).toBeGreaterThan(0);
+
+    firstRender.unmount();
+    expect(document.querySelectorAll("svg[data-callout-measure-root='true']")).toHaveLength(0);
+  });
 });
