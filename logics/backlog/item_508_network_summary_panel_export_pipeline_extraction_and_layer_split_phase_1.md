@@ -3,7 +3,7 @@
 > Status: In Progress
 > Understanding: 99%
 > Confidence: 95%
-> Progress: 65%
+> Progress: 78%
 > Complexity: High
 > Theme: Architecture / UI modularization
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -43,6 +43,6 @@
 - Delivered in this increment:
   - export pipeline helpers extracted into `src/app/components/network-summary/export/networkSummaryExport.ts`;
   - `NetworkSummaryPanel` now consumes imported export helpers (`copy styles`, `decorations`, `PNG blob`, `background fill`);
-  - `NetworkSummaryPanel.tsx` reduced from `2811` to `2343` lines.
+  - `NetworkSummaryPanel.tsx` reduced from `2811` to `1875` lines after additional callout-layout extraction.
 - Remaining for item completion:
   - dedicated segment/node render layers extraction for AC2 closure.
