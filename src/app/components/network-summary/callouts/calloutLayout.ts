@@ -43,6 +43,27 @@ export interface DraggingCalloutState {
   startPosition: NodePosition;
 }
 
+export interface RenderedCableCallout {
+  callout: CableCalloutViewModel;
+  layout: CalloutLayoutMetrics;
+  lineEnd: { x: number; y: number };
+  calloutClassName: string;
+  isVisibleInViewport: boolean;
+}
+
+export interface ComputeRenderedCableCalloutsOptions {
+  orderedCableCallouts: CableCalloutViewModel[];
+  calloutTextSize: CanvasCalloutTextSize;
+  showCalloutWireNames: boolean;
+  inverseLabelScale: number;
+  hoveredCalloutKey: CalloutTargetKey | null;
+  draggingCalloutKey: CalloutTargetKey | null;
+  visibleModelMinX: number;
+  visibleModelMaxX: number;
+  visibleModelMinY: number;
+  visibleModelMaxY: number;
+}
+
 const CALLOUT_MIN_WIDTH = 44;
 const CALLOUT_MAX_WIDTH = 520;
 const CALLOUT_LAYOUT_CACHE_MAX_ENTRIES = 512;
@@ -61,7 +82,7 @@ type CalloutTableColumnKey =
   | "length"
   | "section";
 
-interface CalloutTableRow {
+export interface CalloutTableRow {
   wireId: string;
   pin: string;
   technicalId: string;
@@ -75,7 +96,7 @@ interface CalloutTableRow {
   section: string;
 }
 
-interface CalloutTableColumnLayout {
+export interface CalloutTableColumnLayout {
   key: CalloutTableColumnKey;
   header: string;
   width: number;
@@ -83,7 +104,7 @@ interface CalloutTableColumnLayout {
   textAnchor: "start" | "end";
 }
 
-interface CalloutLayoutMetrics {
+export interface CalloutLayoutMetrics {
   width: number;
   titleStartY: number;
   subtitleStartY: number | null;
@@ -493,4 +514,38 @@ export function getCalloutFrameEdgePoint(
     x: calloutPosition.x - dx * t,
     y: calloutPosition.y - dy * t
   };
+}
+
+export function computeRenderedCableCallouts(options: ComputeRenderedCableCalloutsOptions): RenderedCableCallout[] {
+  return options.orderedCableCallouts.map((callout) => {
+    const layout = buildCalloutLayoutMetrics(callout.title, "", callout.groups, options.calloutTextSize, options.showCalloutWireNames);
+    const halfWidthInModelUnits = (layout.width / 2) * options.inverseLabelScale;
+    const halfHeightInModelUnits = (layout.height / 2) * options.inverseLabelScale;
+    const isVisibleInViewport = !(
+      callout.position.x + halfWidthInModelUnits < options.visibleModelMinX ||
+      callout.position.x - halfWidthInModelUnits > options.visibleModelMaxX ||
+      callout.position.y + halfHeightInModelUnits < options.visibleModelMinY ||
+      callout.position.y - halfHeightInModelUnits > options.visibleModelMaxY
+    );
+    const lineEnd = getCalloutFrameEdgePoint(
+      callout.nodePosition,
+      callout.position,
+      layout.width,
+      layout.height,
+      options.inverseLabelScale
+    );
+    const calloutClassName = `network-callout-group${callout.isDeemphasized ? " is-deemphasized" : ""}${
+      callout.isSelected ? " is-selected" : ""
+    }${options.hoveredCalloutKey === callout.key ? " is-hovered" : ""}${
+      options.draggingCalloutKey === callout.key ? " is-dragging" : ""
+    }`;
+
+    return {
+      callout,
+      layout,
+      lineEnd,
+      calloutClassName,
+      isVisibleInViewport
+    };
+  });
 }

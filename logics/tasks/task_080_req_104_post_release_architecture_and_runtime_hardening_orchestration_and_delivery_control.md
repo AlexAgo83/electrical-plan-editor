@@ -3,7 +3,7 @@
 > Status: In Progress
 > Understanding: 99% (scope, sequence, and size-budget constraints are explicit)
 > Confidence: 96%
-> Progress: 68%
+> Progress: 74%
 > Complexity: High
 > Theme: Reliability / Architecture / Delivery control
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -86,7 +86,8 @@
   - `NetworkSummaryPanel.tsx` reduced to `2343` lines (from `2811`).
 - 2026-03-04: Partial `item_509`:
   - callout model/layout and measurement lifecycle extracted to `src/app/components/network-summary/callouts/calloutLayout.ts`;
-  - `NetworkSummaryPanel.tsx` reduced further to `1875` lines with behavior parity maintained in callout-centric UI suites.
+  - callout render and leader-line layers extracted to `src/app/components/network-summary/callouts/NetworkSummaryCalloutsLayer.tsx`;
+  - `NetworkSummaryPanel.tsx` reduced further to `1663` lines with behavior parity maintained in callout-centric UI suites.
 - 2026-03-04: Delivered `item_510`:
   - `useNetworkSummaryViewStateSync` hook extracted;
   - `AppController.tsx` exhaustive-deps suppression removed and behavior parity validated.
