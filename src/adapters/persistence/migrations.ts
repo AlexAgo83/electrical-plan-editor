@@ -137,7 +137,7 @@ function normalizeNetworkSummaryViewState(candidate: unknown): NetworkSummaryVie
   const snapNodesToGrid = candidate.snapNodesToGrid;
   const lockEntityMovement = candidate.lockEntityMovement;
   const normalizedShowSegmentNames =
-    showSegmentNames === undefined ? true : typeof showSegmentNames === "boolean" ? showSegmentNames : null;
+    showSegmentNames === undefined ? false : typeof showSegmentNames === "boolean" ? showSegmentNames : null;
   if (
     typeof showNetworkInfoPanels !== "boolean" ||
     normalizedShowSegmentNames === null ||

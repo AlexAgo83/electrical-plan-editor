@@ -15,7 +15,7 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 1;
+const UI_PREFERENCES_SCHEMA_VERSION = 2;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 function normalizeThemeMode(value: unknown): ThemeMode {
@@ -148,6 +148,49 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function migrateUiPreferencesFromV1(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    // v2 aligns the fallback with current product defaults when this key is missing.
+    canvasDefaultShowSegmentNames:
+      typeof candidate.canvasDefaultShowSegmentNames === "boolean" ? candidate.canvasDefaultShowSegmentNames : false,
+    schemaVersion: 2
+  };
+}
+
+function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
+  if (!isRecord(parsed)) {
+    return null;
+  }
+
+  const rawSchemaVersion = parsed.schemaVersion;
+  let version =
+    typeof rawSchemaVersion === "number" && Number.isInteger(rawSchemaVersion) && rawSchemaVersion >= 1
+      ? rawSchemaVersion
+      : 1;
+
+  if (version > UI_PREFERENCES_SCHEMA_VERSION) {
+    return null;
+  }
+
+  let migrated: Record<string, unknown> = { ...parsed };
+  while (version < UI_PREFERENCES_SCHEMA_VERSION) {
+    if (version === 1) {
+      migrated = migrateUiPreferencesFromV1(migrated);
+      version = 2;
+      continue;
+    }
+    return null;
+  }
+
+  migrated.schemaVersion = UI_PREFERENCES_SCHEMA_VERSION;
+  return migrated as Partial<UiPreferencesPayload>;
+}
+
 function readUiPreferences(): Partial<UiPreferencesPayload> | null {
   try {
     const raw = localStorage.getItem(UI_PREFERENCES_STORAGE_KEY);
@@ -156,16 +199,7 @@ function readUiPreferences(): Partial<UiPreferencesPayload> | null {
     }
 
     const parsed: unknown = JSON.parse(raw);
-    if (typeof parsed !== "object" || parsed === null) {
-      return null;
-    }
-
-    const payload = parsed as Partial<UiPreferencesPayload>;
-    if (payload.schemaVersion !== UI_PREFERENCES_SCHEMA_VERSION) {
-      return null;
-    }
-
-    return payload;
+    return migrateUiPreferencesPayload(parsed);
   } catch {
     return null;
   }
