@@ -39,3 +39,4 @@ The kickoff needs objective confidence gates proving that V1 behavior matches ac
   - `tests/e2e/smoke.spec.ts`
   - `playwright.config.ts`
   - `logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md`
+- Request link: `req_000_kickoff_v1_electrical_plan_editor`.

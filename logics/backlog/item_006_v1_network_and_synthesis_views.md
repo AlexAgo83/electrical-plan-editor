@@ -37,3 +37,4 @@ The model is not usable without operator-facing views for navigation and verific
   - `src/app/App.tsx`
   - `src/app/styles.css`
   - `src/store/selectors.ts`
+- Request link: `req_000_kickoff_v1_electrical_plan_editor`.

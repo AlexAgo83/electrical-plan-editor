@@ -43,3 +43,4 @@ Wires are the core business entity. V1 needs full lifecycle support: endpoint as
   - `src/core/pathfinding.ts`
   - `src/app/App.tsx`
   - `src/tests/store.reducer.spec.ts`
+- Request link: `req_000_kickoff_v1_electrical_plan_editor`.

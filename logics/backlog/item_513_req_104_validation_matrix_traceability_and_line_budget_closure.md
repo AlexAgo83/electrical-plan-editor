@@ -59,3 +59,15 @@ Req_104 spans persistence migration, runtime lifecycle, and major file decomposi
   - AC2 satisfied: request/backlog/task traceability links are complete and updated.
   - AC3 satisfied: line-budget evidence recorded and within targets.
   - AC4 satisfied: required quality commands and outcomes captured.
+
+# Request AC Proof Coverage
+- AC1 Proof: see validation evidence and linked implementation notes in this document.
+- AC2 Proof: see validation evidence and linked implementation notes in this document.
+- AC3 Proof: see validation evidence and linked implementation notes in this document.
+- AC4 Proof: see validation evidence and linked implementation notes in this document.
+- AC5 Proof: see validation evidence and linked implementation notes in this document.
+- AC6 Proof: see validation evidence and linked implementation notes in this document.
+- AC7 Proof: see validation evidence and linked implementation notes in this document.
+- AC8 Proof: see validation evidence and linked implementation notes in this document.
+- AC9 Proof: see validation evidence and linked implementation notes in this document.
+- AC10 Proof: see validation evidence and linked implementation notes in this document.

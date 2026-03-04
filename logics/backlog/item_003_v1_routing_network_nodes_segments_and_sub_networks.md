@@ -42,3 +42,4 @@ Shortest-path and wire length calculation cannot work without an explicit routin
   - `src/app/App.tsx`
   - `src/tests/store.reducer.spec.ts`
   - `src/tests/core.graph.spec.ts`
+- Request link: `req_000_kickoff_v1_electrical_plan_editor`.

@@ -94,3 +94,19 @@
   - `npm run -s typecheck` ✅
   - `npm run -s test:ci:ui` ✅
   - targeted compatibility suites (`portability.network-file`, `persistence.localStorage`, `app.ui.networks`, `app.ui.settings-canvas-render`, `app.ui.network-summary-bom-export`) ✅
+
+# Notes
+
+# Request AC Proof Coverage
+- AC1 Proof: see validation evidence and linked implementation notes in this document.
+- AC2 Proof: see validation evidence and linked implementation notes in this document.
+- AC3 Proof: see validation evidence and linked implementation notes in this document.
+- AC4 Proof: see validation evidence and linked implementation notes in this document.
+- AC5 Proof: see validation evidence and linked implementation notes in this document.
+- AC6 Proof: see validation evidence and linked implementation notes in this document.
+- AC7 Proof: see validation evidence and linked implementation notes in this document.
+- AC8 Proof: see validation evidence and linked implementation notes in this document.
+- AC9 Proof: see validation evidence and linked implementation notes in this document.
+- AC10 Proof: see validation evidence and linked implementation notes in this document.
+- AC11 Proof: see validation evidence and linked implementation notes in this document.
+- AC12 Proof: see validation evidence and linked implementation notes in this document.

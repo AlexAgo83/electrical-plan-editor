@@ -1,8 +1,8 @@
 ## req_100_settings_language_subpanel_theme_contrast_and_token_alignment - Settings Language subpanel theme contrast and token alignment
 > From version: 1.3.0
-> Status: Draft
-> Understanding: 95% (issue reproduced and probable styling root cause identified)
-> Confidence: 90%
+> Status: Done
+> Understanding: 100% (scope delivered and synchronized with backlog/task closure)
+> Confidence: 97%
 > Complexity: Medium
 > Theme: UI / Theming / Accessibility
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -110,3 +110,6 @@
 - `src/app/styles/base/base-theme-overrides/legacy-themes-components-and-forms.css`
 - `src/tests/app.ui.settings.spec.tsx`
 - `logics/request/req_098_settings_global_preferences_reorder_and_app_wide_i18n_en_fr_with_table_label_compaction.md`
+
+# Orchestration task
+- `task_082_req_100_settings_language_subpanel_theme_contrast_and_token_alignment_orchestration_and_delivery_control`

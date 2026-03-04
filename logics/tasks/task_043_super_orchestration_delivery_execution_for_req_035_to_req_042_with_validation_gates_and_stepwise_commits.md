@@ -19,7 +19,6 @@ This super-orchestration task coordinates implementation and delivery sequencing
 - `req_042` reusable table filter-bar pattern pilot (`Wires` + `Network Scope`)
 
 This task does not replace the existing request-specific orchestration tasks (`task_035` ... `task_042`). It defines the execution order, integration risk controls, validation gates, and commit discipline across the full multi-request delivery program.
-
 # Objective
 - Deliver `task_035` through `task_042` in a controlled sequence with minimal regression risk.
 - Enforce validation gates after each implementation stage.
@@ -159,5 +158,6 @@ Rationale:
 - `logics/request/req_040_optional_manufacturer_reference_for_connectors_and_splices.md`
 - `logics/request/req_041_wire_endpoint_connection_reference_and_seal_reference_per_side.md`
 - `logics/request/req_042_wire_list_filter_bar_field_selector_and_full_width_input_without_panel_growth.md`
+- `logics/backlog/item_254_req_042_wire_filter_bar_field_selector_and_layout_closure_ci_build_and_ac_traceability.md`
 - `package.json`
 - `.github/workflows/ci.yml`

@@ -39,3 +39,4 @@ V1 is local-first. Without persistence and schema versioning, user work is volat
   - `src/adapters/persistence/migrations.ts`
   - `src/app/store.ts`
   - `src/tests/persistence.localStorage.spec.ts`
+- Request link: `req_000_kickoff_v1_electrical_plan_editor`.

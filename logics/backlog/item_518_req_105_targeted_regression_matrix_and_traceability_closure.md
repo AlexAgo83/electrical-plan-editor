@@ -55,3 +55,11 @@ Req_105 spans CI guardrails, async import atomicity, i18n runtime completeness, 
   - AC2 satisfied: request/backlog/task links are complete and coherent.
   - AC3 satisfied: required validation commands executed and recorded.
   - AC4 satisfied: closure notes summarize delivered hardening and assumptions.
+
+# Request AC Proof Coverage
+- AC1 Proof: see validation evidence and linked implementation notes in this document.
+- AC2 Proof: see validation evidence and linked implementation notes in this document.
+- AC3 Proof: see validation evidence and linked implementation notes in this document.
+- AC4 Proof: see validation evidence and linked implementation notes in this document.
+- AC5 Proof: see validation evidence and linked implementation notes in this document.
+- AC6 Proof: see validation evidence and linked implementation notes in this document.

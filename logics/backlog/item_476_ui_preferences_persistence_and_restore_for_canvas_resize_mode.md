@@ -26,3 +26,4 @@ Delivered in the `task_076` implementation wave for `req_092` to `req_095` to re
 - Urgency: High (execution bundle requested as uninterrupted delivery).
 
 # Notes
+- Request link: `req_095_network_summary_resize_mode_to_lock_content_scale_on_viewport_resize`.

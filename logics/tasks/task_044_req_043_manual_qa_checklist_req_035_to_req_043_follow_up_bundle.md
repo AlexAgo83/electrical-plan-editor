@@ -36,3 +36,4 @@ Provide an explicit manual QA checklist for the delivered `req_035` through `req
 # References
 - `logics/request/req_043_post_req_035_to_req_042_phase_2_rollout_optional_metadata_surfacing_test_hardening_and_delivery_closure.md`
 - `logics/tasks/task_044_req_043_follow_up_phase_2_rollout_onboarding_polish_metadata_surfacing_test_hardening_and_doc_sync_orchestration.md`
+- `logics/backlog/item_260_manual_qa_checklist_for_req_035_to_req_042_follow_up_bundle.md`

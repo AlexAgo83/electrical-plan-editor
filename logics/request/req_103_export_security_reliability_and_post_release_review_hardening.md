@@ -1,8 +1,8 @@
 ## req_103_export_security_reliability_and_post_release_review_hardening - Export security, reliability, and post-release hardening
 > From version: 1.3.1
-> Status: Draft
-> Understanding: 97% (post-release review points are explicit and reproducible)
-> Confidence: 93%
+> Status: Done
+> Understanding: 100% (review points delivered and synchronized with backlog/task closure)
+> Confidence: 97%
 > Complexity: High
 > Theme: Security / Export / Reliability / Maintainability
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -172,7 +172,7 @@
   - `item_504_network_summary_panel_export_module_extraction_phase_1.md`
 
 # Orchestration task
-- `logics/tasks/task_079_req_103_export_security_reliability_and_post_release_hardening_orchestration_and_delivery_control.md`
+- `logics/tasks/task_084_req_103_export_security_reliability_and_post_release_hardening_orchestration_and_delivery_control.md`
 
 # References
 - `src/app/components/NetworkSummaryPanel.tsx`

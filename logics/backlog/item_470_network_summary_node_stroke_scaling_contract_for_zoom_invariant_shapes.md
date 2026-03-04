@@ -26,3 +26,4 @@ Delivered in the `task_076` implementation wave for `req_092` to `req_095` to re
 - Urgency: High (execution bundle requested as uninterrupted delivery).
 
 # Notes
+- Request link: `req_094_node_border_stroke_scaling_parity_for_zoom_invariant_node_shapes`.
