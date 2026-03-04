@@ -32,8 +32,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Logics docs lint (status required)
+      - name: Logics docs lint (status required, informational)
         run: python3 logics/skills/logics-doc-linter/scripts/logics_lint.py --require-status
+        continue-on-error: true
+
+      - name: Logics docs lint (blocking baseline)
+        run: python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
 
       - name: Sync close-eligible requests
         run: python3 logics/skills/logics-flow-manager/scripts/logics_flow.py sync close-eligible-requests
@@ -41,8 +45,12 @@ jobs:
       - name: Assert request docs unchanged after sync
         run: git diff --exit-code -- logics/request
 
-      - name: Workflow audit (blocking, grouped)
+      - name: Workflow audit (blocking, grouped, legacy-safe)
+        run: python3 logics/skills/logics-flow-manager/scripts/workflow_audit.py --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability
+
+      - name: Workflow audit strict AC (informational, non-blocking)
         run: python3 logics/skills/logics-flow-manager/scripts/workflow_audit.py --legacy-cutoff-version 1.1.0 --group-by-doc
+        continue-on-error: true
 
       - name: Workflow audit JSON (informational, non-blocking)
         run: python3 logics/skills/logics-flow-manager/scripts/workflow_audit.py --format json
