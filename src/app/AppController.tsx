@@ -34,8 +34,7 @@ import {
   selectSplices,
   selectSubNetworkSummaries,
   selectWireTechnicalIdTaken,
-  selectWires,
-  type NetworkSummaryViewState
+  selectWires
 } from "../store";
 import { appStore } from "./store";
 import { appUiModules } from "./components/appUiModules";
@@ -60,6 +59,7 @@ import { useAppControllerAuxScreenContentDomains } from "./hooks/controller/useA
 import { useAppControllerModelingAnalysisScreenDomains } from "./hooks/controller/useAppControllerModelingAnalysisScreenDomains";
 import { useAppControllerModelingHandlersOrchestrator } from "./hooks/controller/useAppControllerModelingHandlersOrchestrator";
 import { useConfirmDialogController } from "./hooks/controller/useConfirmDialogController";
+import { useNetworkSummaryViewStateSync } from "./hooks/controller/useNetworkSummaryViewStateSync";
 import {
   buildNetworkSummaryPanelControllerSlice,
   useInspectorContextPanelControllerSlice,
@@ -127,28 +127,6 @@ function useAppSnapshot(store: AppStore) {
 }
 
 const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor";
-
-function isSameNetworkSummaryViewState(
-  left: NetworkSummaryViewState | undefined,
-  right: NetworkSummaryViewState
-): boolean {
-  if (left === undefined) {
-    return false;
-  }
-
-  return (
-    left.scale === right.scale &&
-    left.offset.x === right.offset.x &&
-    left.offset.y === right.offset.y &&
-    left.showNetworkInfoPanels === right.showNetworkInfoPanels &&
-    left.showSegmentNames === right.showSegmentNames &&
-    left.showSegmentLengths === right.showSegmentLengths &&
-    left.showCableCallouts === right.showCableCallouts &&
-    left.showNetworkGrid === right.showNetworkGrid &&
-    left.snapNodesToGrid === right.snapNodesToGrid &&
-    left.lockEntityMovement === right.lockEntityMovement
-  );
-}
 
 export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear();
@@ -407,8 +385,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
   const deferredInstallPromptRef = useRef<BeforeInstallPromptEventLike | null>(null);
   const onboardingAutoOpenAttemptedRef = useRef(false);
-  const hasAppliedPerNetworkViewRestoreRef = useRef(false);
-  const skipNextPerNetworkViewPersistRef = useRef(false);
 
   const selectionEntities = useAppControllerSelectionEntities({ state });
   const {
@@ -1052,77 +1028,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCatalogFormError: formsState.setCatalogFormError
   });
 
-  useEffect(() => {
-    hasAppliedPerNetworkViewRestoreRef.current = false;
-    skipNextPerNetworkViewPersistRef.current = false;
-
-    if (!preferencesHydrated) {
-      return;
-    }
-
-    if (activeNetworkId === null) {
-      hasAppliedPerNetworkViewRestoreRef.current = true;
-      return;
-    }
-
-    const clampedFallbackScale = Math.max(NETWORK_MIN_SCALE, Math.min(NETWORK_MAX_SCALE, configuredResetScale));
-    const nextScaleRaw = activeNetworkSummaryViewState?.scale ?? clampedFallbackScale;
-    const nextScale = Math.max(NETWORK_MIN_SCALE, Math.min(NETWORK_MAX_SCALE, Number.isFinite(nextScaleRaw) ? nextScaleRaw : clampedFallbackScale));
-    const nextOffset = activeNetworkSummaryViewState?.offset ?? { x: 0, y: 0 };
-    const nextShowInfoPanels = activeNetworkSummaryViewState?.showNetworkInfoPanels ?? canvasDefaultShowInfoPanels;
-    const nextShowSegmentNames = activeNetworkSummaryViewState?.showSegmentNames ?? canvasDefaultShowSegmentNames;
-    const nextShowSegmentLengths = activeNetworkSummaryViewState?.showSegmentLengths ?? canvasDefaultShowSegmentLengths;
-    const nextShowCableCallouts = activeNetworkSummaryViewState?.showCableCallouts ?? canvasDefaultShowCableCallouts;
-    const nextShowGrid = activeNetworkSummaryViewState?.showNetworkGrid ?? canvasDefaultShowGrid;
-    const nextSnapToGrid = activeNetworkSummaryViewState?.snapNodesToGrid ?? canvasDefaultSnapToGrid;
-    const nextLockEntityMovement = activeNetworkSummaryViewState?.lockEntityMovement ?? canvasDefaultLockEntityMovement;
-    let didScheduleRestore = false;
-
-    if (networkScale !== nextScale) {
-      didScheduleRestore = true;
-      setNetworkScale(nextScale);
-    }
-    if (networkOffset.x !== nextOffset.x || networkOffset.y !== nextOffset.y) {
-      didScheduleRestore = true;
-      setNetworkOffset({ x: nextOffset.x, y: nextOffset.y });
-    }
-    if (showNetworkInfoPanels !== nextShowInfoPanels) {
-      didScheduleRestore = true;
-      setShowNetworkInfoPanels(nextShowInfoPanels);
-    }
-    if (showSegmentNames !== nextShowSegmentNames) {
-      didScheduleRestore = true;
-      setShowSegmentNames(nextShowSegmentNames);
-    }
-    if (showSegmentLengths !== nextShowSegmentLengths) {
-      didScheduleRestore = true;
-      setShowSegmentLengths(nextShowSegmentLengths);
-    }
-    if (showCableCallouts !== nextShowCableCallouts) {
-      didScheduleRestore = true;
-      setShowCableCallouts(nextShowCableCallouts);
-    }
-    if (showNetworkGrid !== nextShowGrid) {
-      didScheduleRestore = true;
-      setShowNetworkGrid(nextShowGrid);
-    }
-    if (snapNodesToGrid !== nextSnapToGrid) {
-      didScheduleRestore = true;
-      setSnapNodesToGrid(nextSnapToGrid);
-    }
-    if (lockEntityMovement !== nextLockEntityMovement) {
-      didScheduleRestore = true;
-      setLockEntityMovement(nextLockEntityMovement);
-    }
-
-    skipNextPerNetworkViewPersistRef.current = didScheduleRestore;
-    hasAppliedPerNetworkViewRestoreRef.current = true;
-    // Intentionally reacts to network/preference changes only; current local view flags are read to decide whether restore is needed.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
+  useNetworkSummaryViewStateSync({
     activeNetworkId,
     activeNetworkSummaryViewState,
     preferencesHydrated,
+    networkMinScale: NETWORK_MIN_SCALE,
+    networkMaxScale: NETWORK_MAX_SCALE,
     configuredResetScale,
     canvasDefaultShowInfoPanels,
     canvasDefaultShowSegmentNames,
@@ -1131,54 +1042,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasDefaultShowGrid,
     canvasDefaultSnapToGrid,
     canvasDefaultLockEntityMovement,
-    setNetworkScale,
-    setNetworkOffset,
-    setShowNetworkInfoPanels,
-    setShowSegmentNames,
-    setShowSegmentLengths,
-    setShowCableCallouts,
-    setShowNetworkGrid,
-    setSnapNodesToGrid,
-    setLockEntityMovement
-  ]);
-
-  useEffect(() => {
-    if (!preferencesHydrated || activeNetworkId === null || !hasAppliedPerNetworkViewRestoreRef.current || isPanningNetwork) {
-      return;
-    }
-    if (skipNextPerNetworkViewPersistRef.current) {
-      skipNextPerNetworkViewPersistRef.current = false;
-      return;
-    }
-
-    const clampedScale = Math.max(NETWORK_MIN_SCALE, Math.min(NETWORK_MAX_SCALE, networkScale));
-    const nextViewState: NetworkSummaryViewState = {
-      scale: clampedScale,
-      offset: {
-        x: networkOffset.x,
-        y: networkOffset.y
-      },
-      showNetworkInfoPanels,
-      showSegmentNames,
-      showSegmentLengths,
-      showCableCallouts,
-      showNetworkGrid,
-      snapNodesToGrid,
-      lockEntityMovement
-    };
-
-    if (isSameNetworkSummaryViewState(activeNetworkSummaryViewState, nextViewState)) {
-      return;
-    }
-
-    dispatchAction(appActions.setNetworkSummaryViewState(activeNetworkId, nextViewState), { trackHistory: false });
-  }, [
-    activeNetworkId,
-    activeNetworkSummaryViewState,
-    preferencesHydrated,
     networkScale,
-    networkOffset.x,
-    networkOffset.y,
+    networkOffset,
     showNetworkInfoPanels,
     showSegmentNames,
     showSegmentLengths,
@@ -1187,8 +1052,17 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     snapNodesToGrid,
     lockEntityMovement,
     isPanningNetwork,
+    setNetworkScale,
+    setNetworkOffset,
+    setShowNetworkInfoPanels,
+    setShowSegmentNames,
+    setShowSegmentLengths,
+    setShowCableCallouts,
+    setShowNetworkGrid,
+    setSnapNodesToGrid,
+    setLockEntityMovement,
     dispatchAction
-  ]);
+  });
 
   const handleRegenerateLayout = useCallback(() => {
     void (async () => {
