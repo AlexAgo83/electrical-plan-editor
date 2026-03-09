@@ -7,6 +7,7 @@
   - wire CSV exports now expose explicit begin/end connection and seal reference columns in both Modeling and Analysis,
   - `Node analysis` and `Segment analysis` tables now expose iconized `Go to` actions following the existing action-column pattern,
   - network-summary cartouche sizing and segment-label offsets were adjusted to reduce truncation and improve horizontal-wire readability in both plan and exports.
+- Added a post-delivery export regression fix so cartouche background colors remain readable even when SVG export runs without visible callout frames in the source canvas.
 
 ## Version 1.4.0 - Req_106 Delivery
 
@@ -36,6 +37,8 @@
 - Kept ellipsis as a fallback for genuinely constrained export cases.
 - Increased label offset for horizontal and near-horizontal segments.
 - Shared the same label-spacing behavior between on-screen plan rendering and SVG/PNG export output.
+- Fixed cartouche export color fallback so the exported frame no longer degrades to a black fill when no `.network-callout-frame` is present in the source SVG.
+- Added a regression test covering SVG export with metadata enabled and callout frames absent from the source canvas.
 
 ## Validation and Regression Evidence
 
@@ -46,6 +49,10 @@
   - `npm run typecheck`
 - Targeted regression suites passed:
   - `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/network-summary-graph-model.spec.ts src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.network-summary-bom-export.spec.tsx src/tests/app.ui.analysis-go-to-wire.spec.tsx`
+- Post-delivery cartouche regression checks passed:
+  - `npm test -- --run src/tests/app.ui.network-summary-bom-export.spec.tsx`
+  - `npm run lint`
+  - `npm run typecheck`
 - Extended validation passed:
   - `npm run test:ci:ui`
   - `npm run build`
