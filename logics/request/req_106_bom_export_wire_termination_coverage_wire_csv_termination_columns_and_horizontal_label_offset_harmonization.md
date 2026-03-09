@@ -1,7 +1,7 @@
 ## req_106_bom_export_wire_termination_coverage_wire_csv_termination_columns_and_horizontal_label_offset_harmonization - BOM export wire-termination coverage, wire CSV termination columns, and horizontal label-offset harmonization
 > From version: 1.3.3
-> Understanding: 99% (user feedback translated into explicit export and rendering contracts)
-> Confidence: 96%
+> Understanding: 100% (scope and post-delivery regression closure are now fully reflected)
+> Confidence: 97%
 > Complexity: High
 > Theme: Export / BOM / UI
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -15,6 +15,7 @@
 - In export cartouche metadata, identity fields such as `Author` can be truncated with ellipsis, reducing readability of the exported document.
 - On-screen plan labels for horizontal and near-horizontal wires/segments sit too close to the wire stroke compared with the desired visual result.
 - The on-screen plan and SVG/export output should follow the same spacing behavior instead of diverging.
+- Export cartouche readability must also remain stable when the source SVG has no visible `.network-callout-frame`, avoiding dark/black fallback fills.
 
 # Context
 - Current BOM export aggregates only catalog-backed `connectors` and `splices`.
@@ -150,6 +151,7 @@
   - use ellipsis only as a fallback when the export viewport is genuinely too constrained.
 - Apply the same metadata readability rules to both SVG and PNG exports, since PNG is rendered from the prepared SVG content.
 - Preserve current cartouche placement safety and keep the cartouche inside export bounds.
+- Preserve a readable export cartouche palette even when the source SVG does not contain visible callout frames; fallback color sourcing must not degrade to an unreadable dark/black cartouche.
 
 # Functional behavior contract
 ## A. BOM export compatibility
@@ -193,6 +195,7 @@
 - Export cartouche identity fields such as `Network`, `Author`, `Code`, and `Created` remain readable without unnecessary truncation in normal export sizes.
 - SVG and PNG exports follow the same cartouche metadata readability behavior.
 - Ellipsis remains allowed only as a constrained fallback for genuinely overlong values or very small export sizes.
+- Export cartouche background/text contrast remains readable even if export is triggered from a plan state without visible callout frames.
 
 ## F. Node analysis navigation
 - `Node analysis` continues to show the list/table of associated segments for the selected node.
@@ -224,6 +227,7 @@
 - AC15: Missing-wire edge cases disable the `Go to` action safely instead of failing at runtime.
 - AC16: Export cartouche identity metadata is no longer unnecessarily truncated for ordinary-length values such as medium-length author names when export size allows readable layout.
 - AC17: SVG and PNG exports follow the same cartouche metadata readability behavior.
+- AC17b: Export cartouche color fallback remains readable when no `.network-callout-frame` exists in the source SVG.
 - AC18: Both new navigation tables use the existing `Actions` column + iconized `Go to` button pattern already used in `Catalog analysis`.
 - AC19: On-screen plan rendering increases label distance from the stroke for horizontal and near-horizontal segments.
 - AC20: Exported SVG follows the same horizontal/near-horizontal label-offset behavior as the on-screen plan.
@@ -241,6 +245,7 @@
   - Modeling wire CSV schema extension;
   - Analysis wire CSV schema extension;
   - export cartouche metadata readability with non-truncated identity rows where space allows;
+  - export cartouche readable fallback colors when source callout frames are absent;
   - `Node analysis` row-level `Go to` navigation to `Segment analysis`;
   - disabled `Go to` behavior when a row references a missing segment;
   - `Segment analysis` row-level `Go to` navigation to `Wire analysis`;
@@ -257,6 +262,10 @@
 - Mixing a second section into the same BOM CSV can surprise downstream tools that assume a single rectangular table.
 - Future pricing of wire terminations will require a clearer catalog contract if quantity-only V1 becomes insufficient.
 - Label-offset tuning can create visual regressions on diagonal segments if the angular transition is not smoothed carefully.
+
+# Post-delivery closure note
+- A late regression was identified after initial req_106 delivery: SVG export cartouche fill could degrade to a dark/black fallback when export was generated without visible source callout frames.
+- Closure was completed by hardening the export style fallback in `src/app/components/network-summary/export/networkSummaryExport.ts` and adding dedicated regression coverage in `src/tests/app.ui.network-summary-bom-export.spec.tsx`.
 
 # Backlog
 - To create from this request:

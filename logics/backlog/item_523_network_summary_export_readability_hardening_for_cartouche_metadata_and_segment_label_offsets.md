@@ -1,9 +1,9 @@
 ## item_523_network_summary_export_readability_hardening_for_cartouche_metadata_and_segment_label_offsets - Network summary export readability hardening for cartouche metadata and segment label offsets
 > From version: 1.3.3
-> Status: Ready
-> Understanding: 98%
-> Confidence: 95%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: High
 > Theme: Export / Render / Readability
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -46,6 +46,9 @@ Export readability remains degraded in two ways:
 - Orchestrated by `logics/tasks/task_085_req_106_export_analysis_navigation_and_render_readability_orchestration_and_delivery_control.md`.
 - Supplied SVG evidence:
   - `Author: Paul Mondou` exported as `Author: Paul Mond...`.
+- Post-delivery regression evidence:
+  - cartouche export could fall back to a black fill when no `.network-callout-frame` existed in the source SVG;
+  - fallback was hardened to reuse node-shape styling instead of the root SVG fill.
 - Risks:
   - widening/wrapping cartouche metadata can alter export footprint and must stay inside safe bounds;
   - angle-based offset tuning can create visual discontinuities if transition thresholds are too abrupt.
@@ -53,3 +56,13 @@ Export readability remains degraded in two ways:
   - `src/app/components/network-summary/export/networkSummaryExport.ts`
   - `src/app/components/network-summary/graph/networkSummaryGraphModel.ts`
   - `src/tests/app.ui.network-summary-bom-export.spec.tsx`
+
+# Delivery
+- Implemented adaptive cartouche sizing/readability and shared horizontal/near-horizontal label-offset behavior.
+- Added a post-delivery cartouche color-fallback hardening so export readability does not depend on visible callout frames being present in the source SVG.
+- Added regression coverage in `src/tests/app.ui.network-summary-bom-export.spec.tsx` for SVG export with metadata enabled and no source callout frame.
+
+# Validation
+- `npm test -- --run src/tests/app.ui.network-summary-bom-export.spec.tsx`
+- `npm run lint`
+- `npm run typecheck`

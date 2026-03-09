@@ -1,9 +1,9 @@
 ## task_085_req_106_export_analysis_navigation_and_render_readability_orchestration_and_delivery_control - Req 106 export analysis navigation and render readability orchestration and delivery control
 > From version: 1.3.3
 > Status: Done
-> Understanding: 100%
-> Confidence: 96%
-> Progress: 100%
+> Understanding: 100% (including post-delivery cartouche fallback closure)
+> Confidence: 97%
+> Progress: 100% (including regression closure)
 > Complexity: Medium
 > Theme: General
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -61,6 +61,10 @@
 - `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/network-summary-graph-model.spec.ts src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.network-summary-bom-export.spec.tsx src/tests/app.ui.analysis-go-to-wire.spec.tsx`
 - `npm run -s test:ci:ui`
 - `npm run -s build`
+- Post-delivery regression closure:
+  - `npm test -- --run src/tests/app.ui.network-summary-bom-export.spec.tsx`
+  - `npm run lint`
+  - `npm run typecheck`
 
 # Definition of Done (DoD)
 - [x] Scope implemented and acceptance criteria covered.
@@ -76,6 +80,7 @@
   - Modeling/Analysis wire CSV begin/end connection and seal reference columns.
   - `Go to` action columns in `Node analysis` and `Segment analysis`.
   - Cartouche width/readability hardening and shared horizontal/near-horizontal segment-label offset improvements.
+  - Post-delivery cartouche export fallback hardening so background readability no longer depends on visible source callout frames.
   - README and changelog updates for version `1.4.0`.
 - Validation executed:
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
@@ -84,6 +89,9 @@
   - `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/network-summary-graph-model.spec.ts src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.network-summary-bom-export.spec.tsx src/tests/app.ui.analysis-go-to-wire.spec.tsx`
   - `npm run test:ci:ui`
   - `npm run build`
+  - `npm test -- --run src/tests/app.ui.network-summary-bom-export.spec.tsx`
+  - `npm run lint`
+  - `npm run typecheck`
 
 # Notes
 - Documentation deliverables are part of the task scope:
