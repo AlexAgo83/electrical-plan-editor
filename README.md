@@ -98,6 +98,7 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
   - horizontal and near-horizontal segment labels render with extra offset both on-screen and in SVG/PNG exports
 - Theme presets including multiple light and dark themes
 - Local persistence with schema versioning and migrations
+- Visible runtime warning when local persistence writes fail, while the current session stays usable in memory until storage recovers
 - Req_104 hardening (delivered and validated):
   - UI preferences schema migration path now supports legacy payload migration instead of blanket rejection on schema mismatch
   - network summary view-state sync extracted from `AppController` to dedicated hook (no `react-hooks/exhaustive-deps` suppression)
@@ -222,7 +223,8 @@ Then open `http://127.0.0.1:5284` (unless overridden).
 - `npm run coverage:ui:report`: emit `src/app/**` coverage report (informational, non-blocking)
 - `npm run bundle:metrics:report`: report main JS chunk + total JS gzip with non-blocking warning budgets
 - `npm run build:bundle:report`: run production build then bundle metrics report
-- `npm run ci:local`: run the local CI-equivalent blocking pipeline (logics lint + lint + typecheck + segmentation check + quality gates + test:ci:fast + test:ci:ui + test:e2e + build + pwa quality)
+- `npm run ci:blocking`: run the canonical blocking CI pipeline shared with GitHub Actions
+- `npm run ci:local`: alias of `npm run ci:blocking`
 - `npm run test:e2e`: run Playwright E2E smoke tests
 - `npm run quality:ui-modularization`: enforce UI modularization line-budget gate
 - `npm run quality:ui-timeout-governance`: enforce UI test timeout-override governance (no explicit per-test timeout override unless allowlisted)
@@ -316,13 +318,17 @@ Migration authoring workflow (future schema evolution):
 Primary validation commands:
 
 ```bash
-npm run ci:local
+npm run ci:blocking
 ```
 
 Equivalent expanded command list:
 
 ```bash
 python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
+python3 logics/skills/logics-flow-manager/scripts/logics_flow.py sync close-eligible-requests
+git diff --exit-code -- logics/request
+python3 logics/skills/logics-flow-manager/scripts/workflow_audit.py --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability
+python3 -m unittest discover -s logics/skills/tests -p "test_*.py" -v
 npm run lint
 npm run typecheck
 npm run test:ci:segmentation:check
@@ -336,7 +342,9 @@ npm run build
 npm run quality:pwa
 ```
 
-CI runs the same main pipeline in `.github/workflows/ci.yml` on `push` and `pull_request`.
+`npm run ci:local` is kept as a convenience alias for the same canonical blocking pipeline.
+
+CI runs the same main blocking pipeline in `.github/workflows/ci.yml` on `push` and `pull_request`.
 
 Additional non-blocking CI observability:
 

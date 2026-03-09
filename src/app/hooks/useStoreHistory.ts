@@ -122,6 +122,7 @@ function resolveTargetId(action: HistoryTrackableAction): string | null {
     case "layout/setNodePositions":
       return `${Object.keys(action.payload.positions).length} node(s)`;
     case "ui/select":
+    case "ui/setError":
     case "ui/setThemeMode":
     case "ui/clearSelection":
     case "ui/clearError":
@@ -212,6 +213,7 @@ function actionVerb(action: HistoryTrackableAction, previousState: StoreState): 
     case "layout/setNodePositions":
       return "updated";
     case "ui/select":
+    case "ui/setError":
     case "ui/setThemeMode":
     case "ui/clearSelection":
     case "ui/clearError":

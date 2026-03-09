@@ -3,6 +3,7 @@ import {
   isNetworkLogoUrlValid,
   normalizeNetworkLogoUrl
 } from "../../../../core/networkMetadata";
+import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 
 const SVG_EXPORT_STYLE_PROPERTIES = [
   "fill",
@@ -98,7 +99,7 @@ function resolveElementStyleValue(style: CSSStyleDeclaration, property: string, 
 
 function measureTextWidth(text: string, font: string): number {
   const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d");
+  const context = getCanvasTextMeasurementContext(canvas);
   if (context === null) {
     return text.length * 7;
   }

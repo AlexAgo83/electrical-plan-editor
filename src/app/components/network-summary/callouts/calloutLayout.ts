@@ -1,5 +1,6 @@
 import type { ConnectorId, NodeId, SpliceId } from "../../../../core/entities";
 import type { CanvasCalloutTextSize, NodePosition } from "../../../types/app-controller";
+import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 
 export type CalloutTargetKey = `connector:${string}` | `splice:${string}`;
 
@@ -294,12 +295,7 @@ function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
   if (!calloutMeasureCanvas) {
     calloutMeasureCanvas = document.createElement("canvas");
   }
-  let context: CanvasRenderingContext2D | null = null;
-  try {
-    context = calloutMeasureCanvas.getContext("2d");
-  } catch {
-    return fallback;
-  }
+  const context = getCanvasTextMeasurementContext(calloutMeasureCanvas);
   if (!context) {
     return fallback;
   }

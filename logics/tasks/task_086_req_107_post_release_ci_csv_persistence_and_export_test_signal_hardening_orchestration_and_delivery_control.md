@@ -1,9 +1,9 @@
 ## task_086_req_107_post_release_ci_csv_persistence_and_export_test_signal_hardening_orchestration_and_delivery_control - Req 107 post release CI CSV persistence and export test signal hardening orchestration and delivery control
 > From version: 1.4.0
-> Status: Ready
-> Understanding: 98%
-> Confidence: 96%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: High
 > Theme: General
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -31,12 +31,14 @@ flowchart LR
 ```
 
 # Plan
-- [ ] 1. Align the canonical local blocking CI command with GitHub blocking CI gates
-- [ ] 2. Harden CSV formula neutralization for whitespace and control prefixed dangerous inputs
-- [ ] 3. Add visible persistence write failure feedback without destabilizing reducer or runtime flow
-- [ ] 4. Harden export and callout measurement fallback behavior for unsupported jsdom canvas environments
-- [ ] 5. Add targeted regression coverage and run req_107 validation matrix
-- [ ] FINAL: Update related Logics docs and synchronize statuses
+- [x] 1. Align the canonical local blocking CI command with GitHub blocking CI gates
+- [x] 2. Harden CSV formula neutralization for whitespace and control prefixed dangerous inputs
+- [x] 3. Add visible persistence write failure feedback without destabilizing reducer or runtime flow
+- [x] 4. Harden export and callout measurement fallback behavior for unsupported jsdom canvas environments
+- [x] 5. Update `README.md` for the shared blocking CI pipeline and delivered persistence behavior
+- [x] 6. Generate a changelog entry in `changelogs/` using the project version current at task completion time
+- [x] 7. Add targeted regression coverage and run req_107 validation matrix
+- [x] FINAL: Update related Logics docs and synchronize statuses
 
 # AC Traceability
 - AC1 Proof: item `525`.
@@ -61,20 +63,30 @@ flowchart LR
 # Validation
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
 - `python3 logics/skills/logics-flow-manager/scripts/workflow_audit.py --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability`
-- canonical local blocking CI command after alignment
-- targeted regression suites for CSV export, persistence failure reporting, and export/callout fallback behavior
+- `npm test -- --run src/tests/csv.export.spec.ts src/tests/store.create-store.spec.ts src/tests/app.ui.persistence-feedback.spec.tsx src/tests/app.ui.network-summary-bom-export.spec.tsx src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
+- `npm run -s test:ci:segmentation:check`
+- `npm run -s quality:ui-modularization`
+- `npm run -s ci:blocking`
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] Linked request/backlog/task docs updated.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] `README.md` reflects the canonical shared blocking CI path and runtime persistence warning behavior.
+- [x] A changelog file is generated in `changelogs/` using the project version current when the task is finished.
+- [x] Validation commands executed and results captured.
+- [x] Linked request/backlog/task docs updated.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report
-- To complete at delivery:
-  - final CI parity command/reporting outcome;
-  - CSV hardening summary and proof;
-  - persistence feedback behavior summary;
-  - export/callout test-signal hardening proof;
-  - final validation matrix and doc closure references.
-
+- Delivered:
+  - `ci:blocking` now acts as the single shared blocking CI command for local validation and GitHub Actions, with `ci:local` reduced to an alias.
+  - CSV export neutralization now treats leading whitespace/control-prefixed formula payloads as dangerous while preserving existing numeric/text behavior.
+  - Persistence writes now return explicit save outcomes and surface a visible runtime warning that clears once storage saves recover.
+  - Export/cartouche, callout, and PNG helper paths now share unsupported-canvas detection that avoids repeated jsdom `getContext` noise during successful tests.
+  - README and changelog updates were generated for version `1.4.1`.
+- Validation executed:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+  - `python3 logics/skills/logics-flow-manager/scripts/workflow_audit.py --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability`
+  - `npm test -- --run src/tests/csv.export.spec.ts src/tests/store.create-store.spec.ts src/tests/app.ui.persistence-feedback.spec.tsx src/tests/app.ui.network-summary-bom-export.spec.tsx src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
+  - `npm run -s test:ci:segmentation:check`
+  - `npm run -s quality:ui-modularization`
+  - `npm run -s ci:blocking`

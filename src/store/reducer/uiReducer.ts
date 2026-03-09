@@ -39,6 +39,20 @@ export function handleUiActions(state: AppState, action: AppAction): AppState | 
       return clearLastError(state);
     }
 
+    case "ui/setError": {
+      if (state.ui.lastError === action.payload.message) {
+        return state;
+      }
+
+      return bumpRevision({
+        ...state,
+        ui: {
+          ...state.ui,
+          lastError: action.payload.message
+        }
+      });
+    }
+
     case "ui/setThemeMode": {
       if (state.ui.themeMode === action.payload.mode) {
         return clearLastError(state);

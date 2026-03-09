@@ -1,9 +1,9 @@
 ## item_526_csv_formula_neutralization_hardening_for_whitespace_and_control_prefixed_inputs - CSV formula neutralization hardening for whitespace and control prefixed inputs
 > From version: 1.4.0
-> Status: Ready
-> Understanding: 98%
-> Confidence: 96%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Security
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -49,7 +49,7 @@ flowchart LR
 # Notes
 - Derived from request `req_107_post_release_ci_csv_persistence_and_export_test_signal_hardening`.
 - Orchestrated by `logics/tasks/task_086_req_107_post_release_ci_csv_persistence_and_export_test_signal_hardening_orchestration_and_delivery_control.md`.
+- Delivered in `src/app/lib/csv.ts` with regression coverage for leading-space, tab-prefixed, and control-prefixed dangerous spreadsheet inputs.
 - References:
   - `src/app/lib/csv.ts`
   - `src/tests/csv.export.spec.ts`
-

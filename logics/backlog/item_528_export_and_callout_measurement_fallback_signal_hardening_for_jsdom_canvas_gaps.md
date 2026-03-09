@@ -1,9 +1,9 @@
 ## item_528_export_and_callout_measurement_fallback_signal_hardening_for_jsdom_canvas_gaps - Export and callout measurement fallback signal hardening for jsdom canvas gaps
 > From version: 1.4.0
-> Status: Ready
-> Understanding: 98%
-> Confidence: 96%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Testing
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -50,8 +50,8 @@ flowchart LR
 # Notes
 - Derived from request `req_107_post_release_ci_csv_persistence_and_export_test_signal_hardening`.
 - Orchestrated by `logics/tasks/task_086_req_107_post_release_ci_csv_persistence_and_export_test_signal_hardening_orchestration_and_delivery_control.md`.
+- Delivered through shared unsupported-canvas measurement helpers and targeted regression tests proving export/cartouche and callout flows avoid jsdom `getContext` noise.
 - References:
   - `src/app/components/network-summary/export/networkSummaryExport.ts`
   - `src/app/components/network-summary/callouts/calloutLayout.ts`
   - `src/tests/app.ui.network-summary-bom-export.spec.tsx`
-

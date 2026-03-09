@@ -26,6 +26,8 @@ export const REQUIRED_UI_MODULES = [
 export const FORBIDDEN_LEGACY_FILES = ["src/tests/app.ui.spec.tsx"];
 
 export const ALLOWED_OVERSIZE = {
+  "src/tests/app.ui.network-summary-bom-export.spec.tsx":
+    "High-scope export integration regression suite spanning BOM, SVG, and cartouche scenarios; split deferred until export fixture/setup extraction is complete.",
   "src/tests/app.ui.network-summary-workflow-polish.spec.tsx":
     "High-scope integration regression suite for network-summary workflows; split planned once fixture/setup extraction is complete.",
   "src/app/styles/tables.css":
