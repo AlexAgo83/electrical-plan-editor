@@ -207,32 +207,21 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceWideScreen,
     preferencesHydrated
   } = preferencesState;
-  const networkSummaryBomCsvExport = useMemo(
-    () =>
-      buildNetworkSummaryBomCsvExport(
-        catalogItems,
-        connectors,
-        splices,
-        wires,
-        workspaceCurrencyCode,
-        workspaceTaxEnabled,
-        workspaceTaxRatePercent
-      ),
-    [catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent]
-  );
+  const networkSummaryBomCsvExport = useMemo(() => buildNetworkSummaryBomCsvExport(
+    catalogItems,
+    connectors,
+    splices,
+    wires,
+    workspaceCurrencyCode,
+    workspaceTaxEnabled,
+    workspaceTaxRatePercent
+  ), [catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent]);
   const canExportBomCsv = networkSummaryBomCsvExport.itemRowCount > 0;
   const handleExportBomCsv = useCallback(() => {
-    if (!canExportBomCsv) {
-      return;
-    }
-    downloadCsvFile("network-bom", networkSummaryBomCsvExport.headers, networkSummaryBomCsvExport.rows, {
-      includeUtf8Bom: true
-    });
+    if (!canExportBomCsv) return;
+    downloadCsvFile("network-bom", networkSummaryBomCsvExport.headers, networkSummaryBomCsvExport.rows, { includeUtf8Bom: true });
   }, [canExportBomCsv, networkSummaryBomCsvExport]);
-  const { effectiveNetworkViewWidth, effectiveNetworkViewHeight, handleNetworkSummaryViewportSizeChange } =
-    useAppControllerNetworkViewportState({
-      canvasResizeBehaviorMode
-    });
+  const { effectiveNetworkViewWidth, effectiveNetworkViewHeight, handleNetworkSummaryViewportSizeChange } = useAppControllerNetworkViewportState({ canvasResizeBehaviorMode });
   const { headerOffsetPx, headerBlockRef } = useAppControllerHeaderOffsetState();
   const panStartRef = useRef<{
     clientX: number;
