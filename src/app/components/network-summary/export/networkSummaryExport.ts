@@ -303,12 +303,14 @@ function appendExportCartoucheOverlay(params: {
   logoAsset: ExportLogoAsset;
 }): void {
   const frameSource = params.sourceSvg.querySelector(".network-callout-frame");
+  const connectorShapeSource = params.sourceSvg.querySelector(".network-node.connector .network-node-shape");
+  const genericNodeShapeSource = params.sourceSvg.querySelector(".network-node .network-node-shape");
   const titleSource = params.sourceSvg.querySelector(".network-callout-title");
   const rowTextSource =
     params.sourceSvg.querySelector(".network-callout-row-text") ??
     titleSource ??
     params.sourceSvg.querySelector(".network-node-label");
-  const frameStyle = window.getComputedStyle(frameSource ?? params.sourceSvg);
+  const frameStyle = window.getComputedStyle(frameSource ?? connectorShapeSource ?? genericNodeShapeSource ?? params.sourceSvg);
   const rowStyle = window.getComputedStyle(rowTextSource ?? params.sourceSvg);
   const titleStyle = window.getComputedStyle(titleSource ?? rowTextSource ?? params.sourceSvg);
 

@@ -267,6 +267,73 @@ describe("App integration UI - network summary BOM export", () => {
     }
   });
 
+  it("keeps a readable cartouche fill when exporting without callout frames present", async () => {
+    const baseState = createUiIntegrationState();
+    const activeNetworkId = baseState.activeNetworkId;
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network in integration state.");
+    }
+
+    const stateWithMetadata = appReducer(
+      baseState,
+      appActions.updateNetwork(
+        activeNetworkId,
+        "Main network sample",
+        "NET-MAIN-SAMPLE",
+        "2026-03-03T11:00:00.000Z",
+        undefined,
+        {
+          createdAt: "2026-02-23T10:00:00.000Z",
+          author: "Paul Mondou",
+          projectCode: "PS5",
+          exportNotes: "First design of the HVAC design in an independant harness for prototype testings."
+        }
+      )
+    );
+
+    const originalCreateObjectUrl = Object.getOwnPropertyDescriptor(URL, "createObjectURL");
+    const originalRevokeObjectUrl = Object.getOwnPropertyDescriptor(URL, "revokeObjectURL");
+    let capturedSvgBlob: Blob | null = null;
+    const createObjectUrl = vi.fn((value: Blob) => {
+      capturedSvgBlob = value;
+      return "blob:svg-export-readable-cartouche";
+    });
+    const revokeObjectUrl = vi.fn();
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, writable: true, value: createObjectUrl });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, writable: true, value: revokeObjectUrl });
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+
+    try {
+      renderAppWithState(stateWithMetadata);
+      switchScreenDrawerAware("modeling");
+      const networkSummaryPanel = getPanelByHeading("Network summary");
+      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
+
+      await waitFor(() => {
+        expect(createObjectUrl).toHaveBeenCalledTimes(1);
+      });
+      expect(capturedSvgBlob).not.toBeNull();
+      if (capturedSvgBlob === null) {
+        throw new Error("Expected exported SVG blob.");
+      }
+
+      const exportedSvg = await readBlobAsText(capturedSvgBlob);
+      expect(exportedSvg).toContain('class="network-export-cartouche-frame"');
+      expect(exportedSvg).not.toContain('fill="rgb(0, 0, 0)"');
+      expect(exportedSvg).not.toContain('fill="#000000"');
+      expect(exportedSvg).toContain("Author: Paul Mondou");
+      expect(clickSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      clickSpy.mockRestore();
+      if (originalCreateObjectUrl !== undefined) {
+        Object.defineProperty(URL, "createObjectURL", originalCreateObjectUrl);
+      }
+      if (originalRevokeObjectUrl !== undefined) {
+        Object.defineProperty(URL, "revokeObjectURL", originalRevokeObjectUrl);
+      }
+    }
+  });
+
   it("exports SVG cartouche logo without drawing a fallback logo frame when logo image is available", async () => {
     const baseState = createUiIntegrationState();
     const activeNetworkId = baseState.activeNetworkId;
