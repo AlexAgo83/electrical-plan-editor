@@ -44,6 +44,10 @@
 - Added targeted regression tests to assert that SVG export and callout rendering no longer hit the noisy jsdom canvas path during normal successful runs.
 - Documented the enlarged network-summary export regression suite as an approved temporary UI modularization oversize exception.
 
+### Documentation
+
+- Simplified the `README` feature summary so it focuses on product capabilities instead of internal refactor history and implementation-specific delivery notes.
+
 ## Validation and Regression Evidence
 
 - Documentation and workflow traceability validated:
