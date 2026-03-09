@@ -68,6 +68,7 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 - Splice capacity model supports `bounded` and `unbounded` port modes (`∞` rendering in lists, adaptive visible port slots in analysis, and mode-safe wire endpoint validation)
 - New network bootstrap seeds `3` default catalog items (`CAT-2W-STD`, `CAT-6P-STD`, `CAT-8W-STD`) with deterministic names/prices
 - Catalog analysis panel showing linked connector/splice usage for the selected catalog item with `Go to` navigation to Modeling edit flows
+- Analysis tables expose iconized `Go to` actions from `Node analysis` to `Segment analysis` and from `Segment analysis` to `Wire analysis`
 - Catalog/BOM pricing workspace settings (currency + optional tax/VAT + tax rate defaults) with local persistence and reset support
 - Catalog price UI displays workspace currency in list/form surfaces
 - Step-by-step onboarding modal with contextual panel help entry points and persistent auto-open opt-out
@@ -86,7 +87,15 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 - Canvas render setting `Viewport resize behavior` with `Resize changes visible area only` mode under `Reset zoom target (%)`
 - `Network summary` header exports:
   - `Export SVG` or `Export PNG` (controlled by Canvas tools export format setting)
-  - `Export BOM CSV` (catalog-aggregated BOM with pricing context metadata, HT totals, and conditional TTC columns/totals when tax is enabled)
+  - `Export BOM CSV` (catalog-aggregated BOM with pricing context metadata, HT totals, conditional TTC columns/totals when tax is enabled, UTF-8 BOM compatibility, and a dedicated `Wire terminations` section aggregating connection/seal references)
+- Wire CSV exports in Modeling and Analysis include explicit per-side termination columns:
+  - `Begin connection ref`
+  - `Begin seal ref`
+  - `End connection ref`
+  - `End seal ref`
+- Export/readability hardening:
+  - cartouche metadata width adapts to avoid premature truncation of fields like `Author`
+  - horizontal and near-horizontal segment labels render with extra offset both on-screen and in SVG/PNG exports
 - Theme presets including multiple light and dark themes
 - Local persistence with schema versioning and migrations
 - Req_104 hardening (delivered and validated):

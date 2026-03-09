@@ -113,8 +113,37 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           className="filter-chip table-export-button"
           onClick={() => {
             const headers = showWireRouteModeColumn
-              ? ["Name", "Technical ID", "Color", "Begin ID", "Begin pin", "End ID", "End pin", "Section (mm²)", "Length (mm)", "Route mode"]
-              : ["Name", "Technical ID", "Color", "Begin ID", "Begin pin", "End ID", "End pin", "Section (mm²)", "Length (mm)"];
+              ? [
+                  "Name",
+                  "Technical ID",
+                  "Color",
+                  "Begin ID",
+                  "Begin pin",
+                  "Begin connection ref",
+                  "Begin seal ref",
+                  "End ID",
+                  "End pin",
+                  "End connection ref",
+                  "End seal ref",
+                  "Section (mm²)",
+                  "Length (mm)",
+                  "Route mode"
+                ]
+              : [
+                  "Name",
+                  "Technical ID",
+                  "Color",
+                  "Begin ID",
+                  "Begin pin",
+                  "Begin connection ref",
+                  "Begin seal ref",
+                  "End ID",
+                  "End pin",
+                  "End connection ref",
+                  "End seal ref",
+                  "Section (mm²)",
+                  "Length (mm)"
+                ];
             const rows = sortedVisibleWires.map((wire) => {
               const begin = describeWireEndpointCsvParts(wire.endpointA);
               const end = describeWireEndpointCsvParts(wire.endpointB);
@@ -126,8 +155,12 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   colorCode,
                   begin.endpointId,
                   begin.pin,
+                  wire.endpointAConnectionReference ?? "",
+                  wire.endpointASealReference ?? "",
                   end.endpointId,
                   end.pin,
+                  wire.endpointBConnectionReference ?? "",
+                  wire.endpointBSealReference ?? "",
                   wire.sectionMm2,
                   wire.lengthMm,
                   wire.isRouteLocked ? "Locked" : "Auto"
@@ -139,8 +172,12 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 colorCode,
                 begin.endpointId,
                 begin.pin,
+                wire.endpointAConnectionReference ?? "",
+                wire.endpointASealReference ?? "",
                 end.endpointId,
                 end.pin,
+                wire.endpointBConnectionReference ?? "",
+                wire.endpointBSealReference ?? "",
                 wire.sectionMm2,
                 wire.lengthMm
               ];

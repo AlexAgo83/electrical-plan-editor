@@ -1,7 +1,8 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createSampleNetworkState } from "../store";
+import { appActions, appReducer, createSampleNetworkState } from "../store";
 import {
+  asWireId,
   createConnectorOccupancyFilterState,
   createConnectorSortingState,
   createUiIntegrationDenseWiresState,
@@ -193,7 +194,22 @@ describe("App integration UI - list ergonomics", () => {
       });
       vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
 
-      renderAppWithState(createSampleNetworkState());
+      const baseState = createSampleNetworkState();
+      const baseWire = baseState.wires.byId[asWireId("W-001")];
+      if (baseWire === undefined) {
+        throw new Error("Expected W-001 in sample network state.");
+      }
+      const stateWithTerminationRefs = appReducer(
+        baseState,
+        appActions.upsertWire({
+          ...baseWire,
+          endpointAConnectionReference: "TERM-A-CSV",
+          endpointASealReference: "SEAL-A-CSV",
+          endpointBConnectionReference: "TERM-B-CSV",
+          endpointBSealReference: "SEAL-B-CSV"
+        })
+      );
+      renderAppWithState(stateWithTerminationRefs);
       switchSubScreen("wire");
       const wiresPanel = getPanelByHeading("Wires");
       fireEvent.click(within(wiresPanel).getByRole("button", { name: "CSV" }));
@@ -206,8 +222,12 @@ describe("App integration UI - list ergonomics", () => {
         throw new Error("Expected captured wire CSV payload.");
       }
       const headerLine = capturedPayload.split(/\r?\n/u, 1)[0] ?? "";
-      expect(headerLine).toContain("Begin ID,Begin pin,End ID,End pin");
+      expect(headerLine).toContain(
+        "Begin ID,Begin pin,Begin connection ref,Begin seal ref,End ID,End pin,End connection ref,End seal ref"
+      );
       expect(headerLine).not.toContain("Endpoints");
+      expect(capturedPayload).toContain("TERM-A-CSV");
+      expect(capturedPayload).toContain("SEAL-B-CSV");
     } finally {
       (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = OriginalBlob;
       vi.restoreAllMocks();

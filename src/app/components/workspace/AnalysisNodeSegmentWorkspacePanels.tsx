@@ -53,10 +53,12 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
     selectedSegmentId,
     selectedSegment,
     onSelectSegment,
+    onGoToSegmentFromAnalysis,
     onOpenSegmentOnboardingHelp,
     wires,
     showEntityTables = true,
-    describeWireEndpoint
+    describeWireEndpoint,
+    onGoToWireFromAnalysis
   } = props;
 
   type NodeTableSortField = "id" | "kind" | "reference" | "linkedSegments";
@@ -344,6 +346,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                     <th aria-sort={getTableAriaSort(nodeSegmentsSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("lengthMm"))}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{indicator(nodeSegmentsSort, "lengthMm")}</span></button></th>
                     <th aria-sort={getTableAriaSort(nodeSegmentsSort, "subNetwork")}><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("subNetwork"))}>Sub-network <span className="sort-indicator">{indicator(nodeSegmentsSort, "subNetwork")}</span></button></th>
                     <th aria-sort={getTableAriaSort(nodeSegmentsSort, "wireCount")}><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("wireCount"))}>Wires <span className="sort-indicator">{indicator(nodeSegmentsSort, "wireCount")}</span></button></th>
+                    <th className="validation-actions-cell">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -356,6 +359,16 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                         <td>{segment.lengthMm}</td>
                         <td>{formatSubNetworkDisplay(segment.subNetworkTag)}</td>
                         <td>{wireCountBySegmentId.get(segment.id) ?? 0}</td>
+                        <td className="validation-actions-cell">
+                          <button
+                            type="button"
+                            className="validation-row-go-to-button button-with-icon"
+                            onClick={() => onGoToSegmentFromAnalysis(segment.id)}
+                          >
+                            <span className="action-button-icon is-open" aria-hidden="true" />
+                            Go to
+                          </button>
+                        </td>
                       </tr>
                     );
                   })}
@@ -515,6 +528,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                     <th aria-sort={getTableAriaSort(segmentWiresSort, "sectionMm2")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("sectionMm2"))}>{isMobileViewport ? "Sec" : "Section (mm²)"} <span className="sort-indicator">{indicator(segmentWiresSort, "sectionMm2")}</span></button></th>
                     <th aria-sort={getTableAriaSort(segmentWiresSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("lengthMm"))}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{indicator(segmentWiresSort, "lengthMm")}</span></button></th>
                     {!isMobileViewport ? <th aria-sort={getTableAriaSort(segmentWiresSort, "routeMode")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("routeMode"))}>Route mode <span className="sort-indicator">{indicator(segmentWiresSort, "routeMode")}</span></button></th> : null}
+                    <th className="validation-actions-cell">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -528,6 +542,16 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                       <td>{wire.sectionMm2}</td>
                       <td>{wire.lengthMm}</td>
                       {!isMobileViewport ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}
+                      <td className="validation-actions-cell">
+                        <button
+                          type="button"
+                          className="validation-row-go-to-button button-with-icon"
+                          onClick={() => onGoToWireFromAnalysis(wire.id)}
+                        >
+                          <span className="action-button-icon is-open" aria-hidden="true" />
+                          Go to
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
