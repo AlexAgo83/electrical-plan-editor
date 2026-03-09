@@ -36,116 +36,24 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 
 ## Features
 
-- Deterministic domain model for:
-  - Connectors with cavity occupancy
-  - Splices with port occupancy
-  - Graph nodes and weighted segments
-  - Wires with endpoint constraints, section (`mm²`), optional mono/bi-color, and per-side connection/seal references
-- Editable node IDs with atomic graph-safe rename (segments/positions/selection remap)
-- Automatic shortest-path routing (Dijkstra-based)
-- Forced route lock/reset for wires
-- Automatic wire length recomputation after segment edits
-- Wire endpoint occupancy validation with next-free way/port prefill in create flows
-- 2D network view:
-  - Node drag-and-drop
-  - Pan with `Shift + drag`
-  - Zoom with toolbar controls (`Zoom -`, `Zoom +`, `Reset view`, `Fit network`)
-  - Deterministic SVG layering for readability (segment/node labels render above geometry)
-  - Callout overlays with configurable visibility and text size (`small`, `normal`, `large`)
-  - Canvas defaults for grid/snap/lock/overlays/segment lengths/callouts and PNG background export
-  - Keyboard-accessible segment selection with labeled hit targets and improved interactive SVG semantics
-- Quick entity navigation in the canvas with contextual `Modeling` / `Analysis` switch (when available)
-- Network-level export identity metadata contract (`author`, `project code`, `logo URL`, `export notes`) with persistence and import/export compatibility normalization
-- Network Scope export identity authoring:
-  - editable `Creation date`, `Author`, `Project code`, `Logo URL`, `Export notes`
-  - creation date remains backed by `network.createdAt` and exports as local `YYYY-MM-DD`
-- Export overlays in `SVG/PNG`:
-  - optional frame (`off` by default) aligned with segment visual style
-  - optional identity cartouche (`on` by default) with network name, author, project code, creation date, logo area, and notes
-  - logo fallback text `Logo indisponible` when logo URL is invalid/unreachable/CORS-blocked
-  - notes clamp to `8` visible lines with ellipsis for overflow
-- Network-scoped `Catalog` with catalog-first connector creation and optional splice catalog association (linked splice still derives manufacturer reference + bounded connection count from catalog items)
-- Splice capacity model supports `bounded` and `unbounded` port modes (`∞` rendering in lists, adaptive visible port slots in analysis, and mode-safe wire endpoint validation)
-- New network bootstrap seeds `3` default catalog items (`CAT-2W-STD`, `CAT-6P-STD`, `CAT-8W-STD`) with deterministic names/prices
-- Catalog analysis panel showing linked connector/splice usage for the selected catalog item with `Go to` navigation to Modeling edit flows
-- Analysis tables expose iconized `Go to` actions from `Node analysis` to `Segment analysis` and from `Segment analysis` to `Wire analysis`
-- Catalog/BOM pricing workspace settings (currency + optional tax/VAT + tax rate defaults) with local persistence and reset support
-- Catalog price UI displays workspace currency in list/form surfaces
-- Step-by-step onboarding modal with contextual panel help entry points and persistent auto-open opt-out
-- Final onboarding step with key Settings guidance (`Language`, `Theme`, `Keyboard shortcuts`, `Canvas render preferences`, `Global preferences`) and direct `Open Settings` CTA
-- App-wide locale switching (`English` default / `Français`) with persisted preference, including dense-label compaction safeguards for French table headers (changelog and import/export copy intentionally remain source-language)
-- Settings layout update: `Global preferences` now appears before `Action bar and shortcuts`, with language selector as the last `Global preferences` control
-- Accessibility hardening across modal/table/navigation flows (modal focus management, `aria-sort`, Validation keyboard row selection, screen-reader-visible issue counters)
-- Global hover descriptions for all `button`, `select`, and `option` controls (including disabled states) via deterministic `title` fallback generation while preserving explicit authored titles
-- Table ergonomics:
-  - Reusable `Filter` bars with field selector + full-width input (`Wires`, `Network Scope`, `Connectors`, `Splices`, `Nodes`, `Segments`)
-  - Occupancy/kind/route/sub-network chip filters remain available alongside table filter bars
-- Settings defaults for wire section prefill, connector/splice auto-create linked-node behavior, and Catalog/BOM pricing context
-- Validation center with grouped issues, issue navigation, and catalog integrity checks (`Catalog` records, catalog-item errors, connector/splice catalog-link audits)
-- Legacy save/import normalization for missing connector manufacturer references via deterministic catalog placeholders (splices can remain unlinked without generated placeholders)
-- Zoom-invariant node shapes now scale border stroke weight proportionally (default/selected/focus states) while preserving existing hitbox behavior
-- Canvas render setting `Viewport resize behavior` with `Resize changes visible area only` mode under `Reset zoom target (%)`
-- `Network summary` header exports:
-  - `Export SVG` or `Export PNG` (controlled by Canvas tools export format setting)
-  - `Export BOM CSV` (catalog-aggregated BOM with pricing context metadata, HT totals, conditional TTC columns/totals when tax is enabled, UTF-8 BOM compatibility, and a dedicated `Wire terminations` section aggregating connection/seal references)
-- Wire CSV exports in Modeling and Analysis include explicit per-side termination columns:
-  - `Begin connection ref`
-  - `Begin seal ref`
-  - `End connection ref`
-  - `End seal ref`
-- Export/readability hardening:
-  - cartouche metadata width adapts to avoid premature truncation of fields like `Author`
-  - horizontal and near-horizontal segment labels render with extra offset both on-screen and in SVG/PNG exports
-- Theme presets including multiple light and dark themes
-- Local persistence with schema versioning and migrations
-- Visible runtime warning when local persistence writes fail, while the current session stays usable in memory until storage recovers
-- Req_104 hardening (delivered and validated):
-  - UI preferences schema migration path now supports legacy payload migration instead of blanket rejection on schema mismatch
-  - network summary view-state sync extracted from `AppController` to dedicated hook (no `react-hooks/exhaustive-deps` suppression)
-  - callout text measurement hidden SVG node now cleaned up on unmount (regression-covered)
-  - export SVG/PNG pipeline helpers extracted from `NetworkSummaryPanel` into dedicated module
-  - export SVG/PNG controller callbacks extracted to `network-summary/export/useNetworkSummaryExportActions.ts`
-  - segment/node render model extracted to `network-summary/graph/networkSummaryGraphModel.ts`
-  - segment/grid/node/label SVG layers extracted to `network-summary/graph/NetworkSummaryGraphLayers.tsx`
-  - quick-entity navigation strip extracted to `network-summary/NetworkSummaryQuickEntityNavigation.tsx`
-  - callout row/group/view-model builders extracted into `network-summary/callouts/calloutModel.ts` (`NetworkSummaryPanel.tsx`: `2811` -> `975` lines)
-  - onboarding controller extracted into `hooks/controller/useOnboardingController.ts`
-  - catalog sub-screen domain composition extracted into `hooks/controller/useAppControllerCatalogScreenDomains.tsx`
-  - modeling/analysis domain assembly extracted into `hooks/controller/useAppControllerModelingAnalysisDomainAssembly.tsx`
-  - auxiliary screen-domain assembly extracted into `hooks/controller/useAppControllerAuxDomainAssembly.tsx`
-  - catalog CSV import/export orchestration extracted into `hooks/useCatalogCsvImportExport.ts`
-  - UI preference binding orchestration extracted into `hooks/controller/useAppControllerUiPreferencesBindings.ts`
-  - workspace-handlers domain assembly extracted into `hooks/controller/useAppControllerWorkspaceHandlersDomainAssembly.ts`
-  - home workspace content orchestration extracted into `hooks/controller/useAppControllerHomeWorkspaceContent.tsx`
-  - network summary panel domain assembly extracted into `hooks/controller/useAppControllerNetworkSummaryPanelDomain.tsx`
-  - selection handlers domain assembly extracted into `hooks/controller/useAppControllerSelectionHandlersDomainAssembly.ts`
-  - canvas interaction domain assembly extracted into `hooks/controller/useAppControllerCanvasInteractionDomainAssembly.ts`
-  - inspector/issue/layout state assembly extracted into `hooks/controller/useAppControllerInspectorIssueLayoutState.tsx`
-  - network summary viewport sizing assembly extracted into `hooks/controller/useAppControllerNetworkViewportState.ts`
-  - shell header offset observer extracted into `hooks/controller/useAppControllerHeaderOffsetState.ts`
-  - canvas state synchronization effects extracted into `hooks/controller/useAppControllerCanvasStateSyncEffects.ts`
-  - uniqueness checks extraction into `hooks/controller/useAppControllerUniquenessFlags.ts`
-  - regenerate-layout workflow extraction into `hooks/controller/useAppControllerRegenerateLayoutAction.ts`
-  - controller lifecycle effects extraction into `hooks/controller/useAppControllerLifecycleEffects.ts`
-  - workspace network-domain orchestration extraction into `hooks/controller/useAppControllerWorkspaceNetworkDomainAssembly.ts`
-  - workspace content-domain assembly extraction into `hooks/controller/useAppControllerWorkspaceContentAssembly.tsx` (high-level domain models + handlers)
-  - AppController overlays rendering extraction into `components/layout/AppControllerOverlays.tsx`
-  - app snapshot subscription extraction into `hooks/useAppSnapshot.ts`
-  - workspace screen-navigation callbacks extracted into `hooks/controller/useAppControllerWorkspaceScreenController.ts`
-  - `AppShellLayout` prop assembly extracted into `hooks/controller/buildAppControllerShellLayoutProps.ts`
-  - settings/network-scope domain bindings now consume typed state models directly (`prefs`, `canvasDisplay`, `networkScope.formState`) (`AppController.tsx`: `2702` -> `1100` lines)
-  - `NetworkSummaryPanel.tsx` now under phase-1 budget (`975` lines)
-  - req_104 closure matrix passed (`logics_lint`, `lint`, `typecheck`, `test:ci:ui`, `test:e2e`)
-- Req_105 post-review hardening (delivered and validated):
-  - UI modularization quality gate now hard-enforces locked line budgets for:
-    - `src/app/AppController.tsx <= 1100`
-    - `src/app/components/NetworkSummaryPanel.tsx <= 1000`
-  - catalog CSV import apply step now rebases on fresh state after confirmation to prevent stale-snapshot clobbering
-  - onboarding target-focus retry loop now uses cancel-safe request ownership (close/unmount/superseded request cleanup)
-  - FR runtime translation coverage extended for impacted catalog CSV status flows and home confirmation runtime copy
-  - req_105 closure matrix passed (`logics_lint`, `lint`, `typecheck`, `test:ci:ui`, `test:e2e`, `ci:local`)
-- PWA support (install prompt + offline shell + update readiness in production)
-- Keyboard shortcuts for major workspace actions
+- Graph-based electrical modeling for connectors, splices, nodes, segments, and wires, with occupancy rules and wire-side connection/seal references.
+- Automatic route computation, forced-route locking, and live wire-length recomputation after segment edits.
+- Interactive 2D workspace with drag-and-drop nodes, zoom/pan controls, selectable segments, configurable callouts, and quick navigation between `Modeling` and `Analysis`.
+- Analysis workflows with targeted `Go to` actions, including navigation from `Node analysis` to `Segment analysis` and from `Segment analysis` to `Wire analysis`.
+- Network-scoped catalog management with catalog-first connector flows, optional splice linkage, seeded starter items, usage analysis, and pricing context settings.
+- Flexible export tooling:
+  - `SVG` / `PNG` network-plan export with optional frame and metadata cartouche
+  - `BOM CSV` export with pricing context and a dedicated `Wire terminations` section
+  - wire CSV export with explicit begin/end connection and seal reference columns
+- Better export readability through adaptive cartouche layout and improved horizontal / near-horizontal label placement.
+- Network metadata authoring for export identity: creation date, author, project code, logo URL, and export notes.
+- Local-first persistence with schema versioning, import/export normalization, and visible runtime warning when browser storage writes fail.
+- Settings for language, theme, canvas defaults, wire defaults, pricing defaults, and keyboard shortcuts, all persisted locally.
+- Built-in onboarding flow plus contextual help entry points to guide first-time usage.
+- Accessibility-oriented interactions across dialogs, tables, keyboard navigation, and assistive-technology semantics.
+- Reusable filterable/sortable data tables across modeling, analysis, and network scope views.
+- Validation center with grouped issues, issue navigation, and catalog integrity checks.
+- PWA support with install prompt, offline shell, and update readiness in production.
 
 ## Tech Stack
 
