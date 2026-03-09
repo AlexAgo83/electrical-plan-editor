@@ -1,9 +1,9 @@
 ## item_521_wire_csv_begin_end_connection_and_seal_reference_columns_alignment - Wire CSV begin/end connection and seal reference columns alignment
 > From version: 1.3.3
-> Status: Ready
-> Understanding: 99%
-> Confidence: 97%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Export / Wire CSV / Schema
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -54,3 +54,16 @@ Wire CSV exports currently stop at endpoint ID/pin plus section/length/route mod
   - `src/app/components/workspace/AnalysisWireWorkspacePanels.tsx`
   - `src/tests/app.ui.list-ergonomics.spec.tsx`
   - `src/tests/csv.export.spec.ts`
+
+# Delivery
+- Modeling and Analysis wire CSV exports now include:
+  - `Begin connection ref`
+  - `Begin seal ref`
+  - `End connection ref`
+  - `End seal ref`
+- Schema order is aligned across both surfaces and missing values export as blank cells.
+
+# Validation
+- `npm test -- --run src/tests/app.ui.list-ergonomics.spec.tsx src/tests/csv.export.spec.ts`
+- `npm run lint`
+- `npm run typecheck`

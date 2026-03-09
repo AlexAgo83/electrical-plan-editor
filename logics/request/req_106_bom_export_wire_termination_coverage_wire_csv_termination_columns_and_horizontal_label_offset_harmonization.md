@@ -1,7 +1,8 @@
 ## req_106_bom_export_wire_termination_coverage_wire_csv_termination_columns_and_horizontal_label_offset_harmonization - BOM export wire-termination coverage, wire CSV termination columns, and horizontal label-offset harmonization
 > From version: 1.3.3
-> Understanding: 100% (scope and post-delivery regression closure are now fully reflected)
-> Confidence: 97%
+> Status: Done
+> Understanding: 100% (request is fully delivered and formally closed with post-delivery regression coverage reflected)
+> Confidence: 98%
 > Complexity: High
 > Theme: Export / BOM / UI
 > Reminder: Update status/understanding/confidence and references when you edit this doc.

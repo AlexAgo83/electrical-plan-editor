@@ -1,9 +1,9 @@
 ## item_522_analysis_node_and_segment_go_to_action_navigation_alignment - Analysis node and segment Go to action navigation alignment
 > From version: 1.3.3
-> Status: Ready
-> Understanding: 98%
-> Confidence: 96%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Analysis / Navigation / UX consistency
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -54,3 +54,13 @@
   - `src/app/components/workspace/AnalysisNodeSegmentWorkspacePanels.tsx`
   - `src/app/components/workspace/CatalogAnalysisWorkspaceContent.tsx`
   - `src/tests/app.ui.analysis-go-to-wire.spec.tsx`
+
+# Delivery
+- `Node analysis` associated-segment rows now expose an iconized `Go to` action that opens `Segment analysis` on the targeted segment.
+- `Segment analysis` traversing-wire rows now expose the same `Go to` pattern to open `Wire analysis`.
+- Missing referenced entities disable the action safely.
+
+# Validation
+- `npm test -- --run src/tests/app.ui.analysis-go-to-wire.spec.tsx`
+- `npm run lint`
+- `npm run typecheck`

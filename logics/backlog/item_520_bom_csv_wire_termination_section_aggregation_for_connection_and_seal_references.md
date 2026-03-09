@@ -1,9 +1,9 @@
 ## item_520_bom_csv_wire_termination_section_aggregation_for_connection_and_seal_references - BOM CSV wire-termination section aggregation for connection and seal references
 > From version: 1.3.3
-> Status: Ready
-> Understanding: 99%
-> Confidence: 96%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: High
 > Theme: BOM / Export / Data aggregation
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -58,3 +58,13 @@ The current `Network summary` BOM export counts only catalog-backed connectors/s
   - `src/core/entities.ts`
   - `src/tests/network-summary-bom-csv.spec.ts`
   - `src/tests/app.ui.network-summary-bom-export.spec.tsx`
+
+# Delivery
+- The BOM CSV now appends a `Wire terminations` section in the same export file.
+- `Connection` and `Seal` references are aggregated independently by `Type + Reference`.
+- Empty endpoint-side termination values are ignored and repeated begin/end occurrences increment quantity independently.
+
+# Validation
+- `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/app.ui.network-summary-bom-export.spec.tsx`
+- `npm run lint`
+- `npm run typecheck`
