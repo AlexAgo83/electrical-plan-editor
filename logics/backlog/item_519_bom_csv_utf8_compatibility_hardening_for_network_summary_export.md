@@ -1,9 +1,9 @@
 ## item_519_bom_csv_utf8_compatibility_hardening_for_network_summary_export - BOM CSV UTF-8 compatibility hardening for Network summary export
 > From version: 1.3.3
-> Status: Ready
-> Understanding: 98%
-> Confidence: 96%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Export / BOM / Compatibility
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -45,3 +45,12 @@
   - `src/app/lib/csv.ts`
   - `src/tests/csv.export.spec.ts`
   - `src/tests/app.ui.network-summary-bom-export.spec.tsx`
+
+# Delivery
+- `Network summary` BOM export now downloads through an explicit UTF-8 BOM-compatible CSV path.
+- Accented/special-character compatibility is covered by export regression tests.
+
+# Validation
+- `npm test -- --run src/tests/app.ui.network-summary-bom-export.spec.tsx`
+- `npm run lint`
+- `npm run typecheck`
