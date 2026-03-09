@@ -1,9 +1,9 @@
 ## task_085_req_106_export_analysis_navigation_and_render_readability_orchestration_and_delivery_control - Req 106 export analysis navigation and render readability orchestration and delivery control
 > From version: 1.3.3
-> Status: Ready
-> Understanding: 96%
-> Confidence: 94%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: General
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -19,14 +19,14 @@
   - `item_524_req_106_export_analysis_navigation_and_render_regression_matrix_and_traceability_closure`
 
 # Plan
-- [ ] 1. Harden BOM CSV download compatibility and extend BOM aggregation with wire-termination section
-- [ ] 2. Extend Modeling and Analysis wire CSV exports with begin/end connection and seal reference columns
-- [ ] 3. Add `Go to` actions in `Node analysis` and `Segment analysis` tables using the existing iconized action pattern
-- [ ] 4. Improve export cartouche metadata readability and harmonize horizontal/near-horizontal segment label offsets
-- [ ] 5. Update `README.md` for the delivered export, analysis-navigation, and render-readability changes
-- [ ] 6. Generate a changelog entry in `changelogs/` using the project version current at task completion time
-- [ ] 7. Add targeted tests and complete req_106 validation/traceability closure
-- [ ] FINAL: Update related Logics docs and synchronize statuses
+- [x] 1. Harden BOM CSV download compatibility and extend BOM aggregation with wire-termination section
+- [x] 2. Extend Modeling and Analysis wire CSV exports with begin/end connection and seal reference columns
+- [x] 3. Add `Go to` actions in `Node analysis` and `Segment analysis` tables using the existing iconized action pattern
+- [x] 4. Improve export cartouche metadata readability and harmonize horizontal/near-horizontal segment label offsets
+- [x] 5. Update `README.md` for the delivered export, analysis-navigation, and render-readability changes
+- [x] 6. Generate a changelog entry in `changelogs/` using the project version current at task completion time
+- [x] 7. Add targeted tests and complete req_106 validation/traceability closure
+- [x] FINAL: Update related Logics docs and synchronize statuses
 
 # AC Traceability
 - AC1 -> Orchestration is explicit. Proof: plan and linked backlog slices are documented.
@@ -58,18 +58,32 @@
 - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
 - `npm run -s lint`
 - `npm run -s typecheck`
-- `npm run -s test:ci`
+- `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/network-summary-graph-model.spec.ts src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.network-summary-bom-export.spec.tsx src/tests/app.ui.analysis-go-to-wire.spec.tsx`
+- `npm run -s test:ci:ui`
+- `npm run -s build`
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] `README.md` reflects the delivered user-visible behavior.
-- [ ] A changelog file is generated in `changelogs/` using the project version current when the task is finished.
-- [ ] Validation commands executed and results captured.
-- [ ] Linked request/backlog/task docs updated.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] `README.md` reflects the delivered user-visible behavior.
+- [x] A changelog file is generated in `changelogs/` using the project version current when the task is finished.
+- [x] Validation commands executed and results captured.
+- [x] Linked request/backlog/task docs updated.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report
-- Pending execution.
+- Delivered:
+  - BOM CSV UTF-8 BOM compatibility and `Wire terminations` aggregation section.
+  - Modeling/Analysis wire CSV begin/end connection and seal reference columns.
+  - `Go to` action columns in `Node analysis` and `Segment analysis`.
+  - Cartouche width/readability hardening and shared horizontal/near-horizontal segment-label offset improvements.
+  - README and changelog updates for version `1.4.0`.
+- Validation executed:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+  - `npm run lint`
+  - `npm run typecheck`
+  - `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/network-summary-graph-model.spec.ts src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.network-summary-bom-export.spec.tsx src/tests/app.ui.analysis-go-to-wire.spec.tsx`
+  - `npm run test:ci:ui`
+  - `npm run build`
 
 # Notes
 - Documentation deliverables are part of the task scope:

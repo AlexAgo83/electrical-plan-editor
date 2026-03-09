@@ -72,7 +72,7 @@ describe("App integration UI - network summary layering", () => {
     expect(transformAfter).not.toContain("scale(1.666");
   });
 
-  it("centers segment ID labels when segment lengths are hidden", () => {
+  it("keeps segment ID labels offset from the stroke even when segment lengths are hidden", () => {
     renderAppWithState(createUiIntegrationState());
     enableSegmentNamesFromSettings();
     switchScreenDrawerAware("analysis");
@@ -85,7 +85,7 @@ describe("App integration UI - network summary layering", () => {
 
     const segmentIdLabel = networkSummaryPanel.querySelector(".network-segment-label");
     expect(segmentIdLabel).not.toBeNull();
-    expect(segmentIdLabel?.getAttribute("y")).toBe("0");
+    expect(segmentIdLabel?.getAttribute("y")).not.toBe("0");
     expect(networkSummaryPanel.querySelector(".network-segment-length-label")).toBeNull();
   });
 });

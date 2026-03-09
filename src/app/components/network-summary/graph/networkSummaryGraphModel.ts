@@ -87,7 +87,11 @@ export function buildRenderedSegments({
     );
     const segmentLabelRotationDegrees = autoSegmentLabelRotation ? segmentAngleDegrees : labelRotationDegrees;
     const segmentLabelRotationRadians = (segmentLabelRotationDegrees * Math.PI) / 180;
-    const segmentLabelOffsetDistance = showSegmentLengths && showSegmentNames ? 6 : 0;
+    const hasSegmentLabel = showSegmentLengths || showSegmentNames;
+    const isNearHorizontalSegment = Math.abs(segmentAngleDegrees) <= 15;
+    const segmentLabelOffsetDistance = hasSegmentLabel
+      ? (showSegmentLengths && showSegmentNames ? 6 : 4) + (isNearHorizontalSegment ? 4 : 0)
+      : 0;
 
     // Keep ID/length split along the label-normal axis, including when labels are auto-rotated.
     const segmentLengthLabelOffsetX = -Math.sin(segmentLabelRotationRadians) * segmentLabelOffsetDistance;

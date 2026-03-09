@@ -5,6 +5,7 @@ import {
   asCatalogItemId,
   asConnectorId,
   asSpliceId,
+  asWireId,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
@@ -108,6 +109,77 @@ describe("App integration UI - network summary BOM export", () => {
     expect(within(networkSummaryPanel).getByRole("button", { name: "BOM" })).toBeInTheDocument();
   });
 
+  it("exports BOM CSV with a UTF-8 BOM and a wire terminations section even without catalog-backed rows", () => {
+    const baseState = createUiIntegrationState();
+    const baseWire = baseState.wires.byId[asWireId("W1")];
+    if (baseWire === undefined) {
+      throw new Error("Expected wire W1 in integration state.");
+    }
+
+    const withWireTerminations = appReducer(
+      baseState,
+      appActions.upsertWire({
+        ...baseWire,
+        endpointAConnectionReference: "Câble-Été",
+        endpointBSealReference: "Joint-À"
+      })
+    );
+
+    const originalCreateObjectUrl = Object.getOwnPropertyDescriptor(URL, "createObjectURL");
+    const originalRevokeObjectUrl = Object.getOwnPropertyDescriptor(URL, "revokeObjectURL");
+    const createObjectUrl = vi.fn((blob: Blob) => {
+      void blob;
+      return "blob:bom-utf8";
+    });
+    const OriginalBlob = Blob;
+    let capturedPayload: BlobPart | undefined;
+
+    try {
+      class BlobCapture extends OriginalBlob {
+        constructor(parts: BlobPart[] = [], options?: BlobPropertyBag) {
+          super(parts, options);
+          capturedPayload = parts[0];
+        }
+      }
+      (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = BlobCapture;
+      Object.defineProperty(URL, "createObjectURL", {
+        configurable: true,
+        writable: true,
+        value: createObjectUrl
+      });
+      Object.defineProperty(URL, "revokeObjectURL", {
+        configurable: true,
+        writable: true,
+        value: vi.fn()
+      });
+      vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+
+      renderAppWithState(withWireTerminations);
+      switchScreenDrawerAware("modeling");
+
+      const networkSummaryPanel = getPanelByHeading("Network summary");
+      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
+
+      if (typeof capturedPayload !== "string") {
+        throw new Error("Expected captured BOM CSV payload.");
+      }
+
+      expect(capturedPayload.startsWith("\uFEFF")).toBe(true);
+      expect(capturedPayload).toContain("Wire terminations");
+      expect(capturedPayload).toContain("Connection,Câble-Été,1");
+      expect(capturedPayload).toContain("Seal,Joint-À,1");
+    } finally {
+      (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = OriginalBlob;
+      vi.restoreAllMocks();
+      if (originalCreateObjectUrl !== undefined) {
+        Object.defineProperty(URL, "createObjectURL", originalCreateObjectUrl);
+      }
+      if (originalRevokeObjectUrl !== undefined) {
+        Object.defineProperty(URL, "revokeObjectURL", originalRevokeObjectUrl);
+      }
+    }
+  });
+
   it("exports SVG with frame, cartouche metadata, fallback logo and clamped notes when enabled", async () => {
     const baseState = createUiIntegrationState();
     const activeNetworkId = baseState.activeNetworkId;
@@ -125,7 +197,7 @@ describe("App integration UI - network summary BOM export", () => {
         undefined,
         {
           createdAt: "2026-03-01T10:00:00.000Z",
-          author: "Alice Martin",
+          author: "Paul Mondou",
           projectCode: "PRJ-42/A",
           logoUrl: "https://example.invalid/logo.png",
           exportNotes: notesPayload
@@ -169,7 +241,7 @@ describe("App integration UI - network summary BOM export", () => {
       expect(exportedSvg).toContain('class="network-export-frame"');
       expect(exportedSvg).toContain('class="network-export-cartouche"');
       expect(exportedSvg).toContain("Network:");
-      expect(exportedSvg).toContain("Author: Alice Martin");
+      expect(exportedSvg).toContain("Author: Paul Mondou");
       expect(exportedSvg).toContain("Code: PRJ-42/A");
       expect(exportedSvg).toContain("Created: 2026-03-01");
       expect(exportedSvg).toContain("Logo indisponible");

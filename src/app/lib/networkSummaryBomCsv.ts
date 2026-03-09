@@ -1,4 +1,4 @@
-import type { CatalogItem, Connector, Splice } from "../../core/entities";
+import type { CatalogItem, Connector, Splice, Wire } from "../../core/entities";
 import type { WorkspaceCurrencyCode } from "../types/app-controller";
 import type { CsvCellValue } from "./csv";
 
@@ -12,6 +12,12 @@ export interface NetworkSummaryBomCsvExport {
   headers: string[];
   rows: CsvCellValue[][];
   itemRowCount: number;
+}
+
+interface WireTerminationAggregateRow {
+  kind: "Connection" | "Seal";
+  reference: string;
+  quantity: number;
 }
 
 function formatOptionalMoney(value: number | undefined): string {
@@ -32,6 +38,7 @@ export function buildNetworkSummaryBomCsvExport(
   catalogItems: CatalogItem[],
   connectors: Connector[],
   splices: Splice[],
+  wires: Wire[],
   workspaceCurrencyCode: WorkspaceCurrencyCode = "EUR",
   workspaceTaxEnabled = true,
   workspaceTaxRatePercent = 20
@@ -43,6 +50,7 @@ export function buildNetworkSummaryBomCsvExport(
   const taxMultiplier = 1 + normalizedTaxRatePercent / 100;
   const catalogById = new Map(catalogItems.map((item) => [item.id, item] as const));
   const aggregates = new Map<string, BomAggregateRow>();
+  const wireTerminationAggregates = new Map<string, WireTerminationAggregateRow>();
 
   const ensureAggregate = (catalogItem: CatalogItem): BomAggregateRow => {
     const existing = aggregates.get(catalogItem.id);
@@ -56,6 +64,29 @@ export function buildNetworkSummaryBomCsvExport(
     };
     aggregates.set(catalogItem.id, created);
     return created;
+  };
+
+  const registerWireTermination = (
+    kind: WireTerminationAggregateRow["kind"],
+    reference: string | undefined
+  ): void => {
+    const normalizedReference = reference?.trim() ?? "";
+    if (normalizedReference.length === 0) {
+      return;
+    }
+
+    const aggregateKey = `${kind}:${normalizedReference}`;
+    const existing = wireTerminationAggregates.get(aggregateKey);
+    if (existing !== undefined) {
+      existing.quantity += 1;
+      return;
+    }
+
+    wireTerminationAggregates.set(aggregateKey, {
+      kind,
+      reference: normalizedReference,
+      quantity: 1
+    });
   };
 
   for (const connector of connectors) {
@@ -80,6 +111,13 @@ export function buildNetworkSummaryBomCsvExport(
     ensureAggregate(catalogItem).spliceQuantity += 1;
   }
 
+  for (const wire of wires) {
+    registerWireTermination("Connection", wire.endpointAConnectionReference);
+    registerWireTermination("Seal", wire.endpointASealReference);
+    registerWireTermination("Connection", wire.endpointBConnectionReference);
+    registerWireTermination("Seal", wire.endpointBSealReference);
+  }
+
   const orderedRows = [...aggregates.values()].sort((left, right) => {
     const manufacturerReferenceCompare = left.catalogItem.manufacturerReference.localeCompare(
       right.catalogItem.manufacturerReference,
@@ -90,6 +128,13 @@ export function buildNetworkSummaryBomCsvExport(
       return manufacturerReferenceCompare;
     }
     return left.catalogItem.id.localeCompare(right.catalogItem.id, undefined, { sensitivity: "base" });
+  });
+  const orderedWireTerminationRows = [...wireTerminationAggregates.values()].sort((left, right) => {
+    const kindCompare = left.kind.localeCompare(right.kind, undefined, { sensitivity: "base" });
+    if (kindCompare !== 0) {
+      return kindCompare;
+    }
+    return left.reference.localeCompare(right.reference, undefined, { sensitivity: "base" });
   });
 
   const headers = [
@@ -146,5 +191,14 @@ export function buildNetworkSummaryBomCsvExport(
   rows.push(["PRICING CONTEXT", "Tax enabled", normalizedTaxEnabled ? "true" : "false"]);
   rows.push(["PRICING CONTEXT", "Tax rate (%)", normalizedTaxRatePercent.toFixed(2)]);
 
-  return { headers, rows, itemRowCount: orderedRows.length };
+  if (orderedWireTerminationRows.length > 0) {
+    rows.push(Array.from<CsvCellValue>({ length: headers.length }).fill(""));
+    rows.push(["Wire terminations"]);
+    rows.push(["Type", "Reference", "Quantity"]);
+    rows.push(
+      ...orderedWireTerminationRows.map(({ kind, reference, quantity }) => [kind, reference, quantity] satisfies CsvCellValue[])
+    );
+  }
+
+  return { headers, rows, itemRowCount: orderedRows.length + orderedWireTerminationRows.length };
 }

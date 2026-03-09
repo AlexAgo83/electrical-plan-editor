@@ -346,11 +346,11 @@ function appendExportCartoucheOverlay(params: {
     return Math.max(maxWidth, measureTextWidth(row.text, rowFont));
   }, 0);
   const maxCartoucheWidth = Math.min(
-    clampNumberValue(Math.round(params.width * 0.36), 250, 460),
+    clampNumberValue(Math.round(params.width * 0.5), 250, 620),
     Math.max(180, params.width - margin * 2)
   );
   const minCartoucheWidth = Math.min(210, maxCartoucheWidth);
-  const metadataDrivenWidth = padding * 2 + logoWidth + 10 + metadataMaxContentWidth;
+  const metadataDrivenWidth = padding * 2 + logoWidth + 10 + metadataMaxContentWidth + 8;
   const cartoucheWidth = clampNumberValue(Math.round(metadataDrivenWidth), minCartoucheWidth, maxCartoucheWidth);
   const metadataWidth = cartoucheWidth - padding * 2 - logoWidth - 10;
   const notesLines = wrapTextWithClamp(params.notes ?? "", cartoucheWidth - padding * 2, notesFont, 8);

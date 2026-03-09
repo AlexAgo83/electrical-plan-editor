@@ -22,6 +22,7 @@ interface UseAppControllerModelingAnalysisDomainAssemblyParams
     | "onSelectNode"
     | "onSelectSegment"
     | "onSelectWire"
+    | "onGoToSegmentFromAnalysis"
     | "onGoToWireFromAnalysis"
   > {
   dispatchAction: (action: ReturnType<typeof appActions.select>) => void;
@@ -112,6 +113,16 @@ export function useAppControllerModelingAnalysisDomainAssembly({
         appActions.select({
           kind: "wire",
           id: wireId
+        })
+      );
+    },
+    onGoToSegmentFromAnalysis: (segmentId) => {
+      markSelectionPanelsFromTable();
+      setActiveSubScreen("segment");
+      dispatchAction(
+        appActions.select({
+          kind: "segment",
+          id: segmentId
         })
       );
     }

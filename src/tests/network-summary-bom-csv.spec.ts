@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { CatalogItem, CatalogItemId, Connector, ConnectorId, Splice, SpliceId } from "../core/entities";
+import type { CatalogItem, CatalogItemId, Connector, ConnectorId, Splice, SpliceId, Wire, WireId } from "../core/entities";
 import { buildNetworkSummaryBomCsvExport } from "../app/lib/networkSummaryBomCsv";
 
 function asCatalogItemId(value: string): CatalogItemId {
@@ -12,6 +12,10 @@ function asConnectorId(value: string): ConnectorId {
 
 function asSpliceId(value: string): SpliceId {
   return value as SpliceId;
+}
+
+function asWireId(value: string): WireId {
+  return value as WireId;
 }
 
 describe("buildNetworkSummaryBomCsvExport", () => {
@@ -41,8 +45,25 @@ describe("buildNetworkSummaryBomCsvExport", () => {
       { id: asSpliceId("S1"), name: "S1", technicalId: "S-1", portCount: 2, catalogItemId: asCatalogItemId("CAT-A") },
       { id: asSpliceId("S2"), name: "S2", technicalId: "S-2", portCount: 6, catalogItemId: asCatalogItemId("CAT-B") }
     ];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "W-1",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        endpointAConnectionReference: "TERM-001",
+        endpointBSealReference: "SEAL-001",
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 10,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
 
-    const exported = buildNetworkSummaryBomCsvExport(catalogItems, connectors, splices, "GBP", true, 20);
+    const exported = buildNetworkSummaryBomCsvExport(catalogItems, connectors, splices, wires, "GBP", true, 20);
 
     expect(exported.headers).toEqual([
       "Manufacturer reference",
@@ -57,8 +78,8 @@ describe("buildNetworkSummaryBomCsvExport", () => {
       "URL"
     ]);
     expect(exported.headers).not.toContain("Type");
-    expect(exported.itemRowCount).toBe(2);
-    expect(exported.rows).toHaveLength(7);
+    expect(exported.itemRowCount).toBe(4);
+    expect(exported.rows).toHaveLength(12);
 
     expect(exported.rows[0]).toEqual([
       "REF-A",
@@ -78,6 +99,11 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     expect(exported.rows[4]).toEqual(["PRICING CONTEXT", "Currency", "GBP"]);
     expect(exported.rows[5]).toEqual(["PRICING CONTEXT", "Tax enabled", "true"]);
     expect(exported.rows[6]).toEqual(["PRICING CONTEXT", "Tax rate (%)", "20.00"]);
+    expect(exported.rows[7]).toEqual(["", "", "", "", "", "", "", "", "", ""]);
+    expect(exported.rows[8]).toEqual(["Wire terminations"]);
+    expect(exported.rows[9]).toEqual(["Type", "Reference", "Quantity"]);
+    expect(exported.rows[10]).toEqual(["Connection", "TERM-001", 1]);
+    expect(exported.rows[11]).toEqual(["Seal", "SEAL-001", 1]);
   });
 
   it("omits TTC column and total when tax is disabled", () => {
@@ -93,7 +119,7 @@ describe("buildNetworkSummaryBomCsvExport", () => {
       { id: asConnectorId("C1"), name: "C1", technicalId: "C-1", cavityCount: 2, catalogItemId: asCatalogItemId("CAT-A") }
     ];
 
-    const exported = buildNetworkSummaryBomCsvExport(catalogItems, connectors, [], "CAD", false, 5.5);
+    const exported = buildNetworkSummaryBomCsvExport(catalogItems, connectors, [], [], "CAD", false, 5.5);
 
     expect(exported.headers).toEqual([
       "Manufacturer reference",
@@ -114,7 +140,7 @@ describe("buildNetworkSummaryBomCsvExport", () => {
   });
 
   it("returns summary and metadata rows only when no resolvable catalog-backed components are present", () => {
-    const exported = buildNetworkSummaryBomCsvExport([], [{ id: asConnectorId("C1"), name: "C1", technicalId: "C-1", cavityCount: 2 }], []);
+    const exported = buildNetworkSummaryBomCsvExport([], [{ id: asConnectorId("C1"), name: "C1", technicalId: "C-1", cavityCount: 2 }], [], []);
 
     expect(exported.itemRowCount).toBe(0);
     expect(exported.rows).toEqual([
@@ -124,5 +150,32 @@ describe("buildNetworkSummaryBomCsvExport", () => {
       ["PRICING CONTEXT", "Tax enabled", "true"],
       ["PRICING CONTEXT", "Tax rate (%)", "20.00"]
     ]);
+  });
+
+  it("counts wire terminations even when there is no catalog-backed BOM row", () => {
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "W-1",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        endpointAConnectionReference: "TERM-A",
+        endpointBConnectionReference: "TERM-A",
+        endpointASealReference: "SEAL-B",
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 10,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const exported = buildNetworkSummaryBomCsvExport([], [], [], wires);
+
+    expect(exported.itemRowCount).toBe(2);
+    expect(exported.rows).toContainEqual(["Connection", "TERM-A", 2]);
+    expect(exported.rows).toContainEqual(["Seal", "SEAL-B", 1]);
   });
 });
