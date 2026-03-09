@@ -24,6 +24,7 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.network-summary-workflow-polish.spec.tsx",
   "src/tests/app.ui.networks.spec.tsx",
   "src/tests/app.ui.onboarding.spec.tsx",
+  "src/tests/app.ui.persistence-feedback.spec.tsx",
   "src/tests/app.ui.settings-canvas-callouts.spec.tsx",
   "src/tests/app.ui.settings-pricing.spec.tsx",
   "src/tests/app.ui.settings-canvas-render.spec.tsx",

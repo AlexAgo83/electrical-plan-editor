@@ -98,6 +98,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case "ui/select":
+    case "ui/setError":
     case "ui/setThemeMode":
     case "ui/clearSelection":
     case "ui/clearError": {

@@ -85,6 +85,22 @@ describe("downloadCsvFile", () => {
     expect(csvContent).toContain(",-12");
   });
 
+  it("neutralizes formula-like cells prefixed by whitespace or control characters", () => {
+    const csvContent = buildCsvContent(
+      ["Label", "Value"],
+      [
+        [" =SUM(A1:A2)", "\t@cmd"],
+        ["\r-10+20", "normal"],
+        [7, "text"]
+      ]
+    );
+
+    expect(csvContent).toContain("' =SUM(A1:A2)");
+    expect(csvContent).toContain("'\t@cmd");
+    expect(csvContent).toContain("'\r-10+20");
+    expect(csvContent).toContain("7,text");
+  });
+
   it("prepends a UTF-8 BOM when explicitly requested", () => {
     const OriginalBlob = Blob;
     let capturedPayload: BlobPart | undefined;

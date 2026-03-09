@@ -1,9 +1,9 @@
 ## item_525_local_and_github_blocking_ci_command_parity_and_shared_orchestration - Local and GitHub blocking CI command parity and shared orchestration
 > From version: 1.4.0
-> Status: Ready
-> Understanding: 98%
-> Confidence: 96%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 98%
+> Progress: 100%
 > Complexity: High
 > Theme: Reliability
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -49,7 +49,7 @@ flowchart LR
 # Notes
 - Derived from request `req_107_post_release_ci_csv_persistence_and_export_test_signal_hardening`.
 - Orchestrated by `logics/tasks/task_086_req_107_post_release_ci_csv_persistence_and_export_test_signal_hardening_orchestration_and_delivery_control.md`.
+- Delivered via shared `ci:blocking` orchestration in `package.json` and `.github/workflows/ci.yml`, with `ci:local` rebased onto the same blocking path.
 - References:
   - `package.json`
   - `.github/workflows/ci.yml`
-

@@ -1,8 +1,8 @@
 ## req_107_post_release_ci_csv_persistence_and_export_test_signal_hardening - Post-release CI, CSV, persistence, and export test-signal hardening
 > From version: 1.4.0
-> Status: Ready
-> Understanding: 99% (derived from post-release review findings and confirmed CI behavior)
-> Confidence: 97%
+> Status: Done
+> Understanding: 100% (implemented and validated against the shared blocking CI path)
+> Confidence: 98%
 > Complexity: High
 > Theme: Reliability / Security / CI
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -140,6 +140,21 @@
 - [x] Acceptance criteria are testable.
 - [x] Risks and tradeoffs are identified.
 
+# Delivery closure
+- Implemented through `task_086_req_107_post_release_ci_csv_persistence_and_export_test_signal_hardening_orchestration_and_delivery_control`.
+- Delivered safeguards:
+  - shared `ci:blocking` orchestration between local and GitHub blocking CI;
+  - CSV dangerous-formula neutralization with leading whitespace/control-character hardening;
+  - visible persistence write-failure feedback with automatic recovery clearing;
+  - shared unsupported-canvas text-measurement fallback used by export/cartouche/callout paths.
+- Validation executed at closure:
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+  - `python3 logics/skills/logics-flow-manager/scripts/workflow_audit.py --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability`
+  - `npm test -- --run src/tests/csv.export.spec.ts src/tests/store.create-store.spec.ts src/tests/app.ui.persistence-feedback.spec.tsx src/tests/app.ui.network-summary-bom-export.spec.tsx src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
+  - `npm run -s test:ci:segmentation:check`
+  - `npm run -s quality:ui-modularization`
+  - `npm run -s ci:blocking`
+
 # Risks
 - Over-aligning local CI with remote CI can slow the default developer loop if there is no distinction between quick-check and release-check workflows.
 - CSV hardening changes can surprise downstream consumers if text values begin gaining apostrophe prefixes in more cases.
@@ -168,4 +183,3 @@
 - `src/app/components/network-summary/callouts/calloutLayout.ts`
 - `src/tests/app.ui.network-summary-bom-export.spec.tsx`
 - `src/tests/persistence.localStorage.spec.ts`
-

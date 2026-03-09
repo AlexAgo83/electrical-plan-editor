@@ -301,6 +301,23 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(networkSummaryPanel).toHaveTextContent("W-8");
   });
 
+  it("avoids canvas text measurement fallback in jsdom when enabling callouts", () => {
+    const getContextSpy = vi.spyOn(HTMLCanvasElement.prototype, "getContext");
+
+    try {
+      renderAppWithState(createUiIntegrationDenseWiresState());
+      switchScreenDrawerAware("modeling");
+
+      const networkSummaryPanel = getPanelByHeading("Network summary");
+      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
+
+      expect(networkSummaryPanel.querySelectorAll(".network-callout-frame").length).toBeGreaterThanOrEqual(4);
+      expect(getContextSpy).not.toHaveBeenCalled();
+    } finally {
+      getContextSpy.mockRestore();
+    }
+  });
+
   it("highlights callout rows that match the selected wire", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");

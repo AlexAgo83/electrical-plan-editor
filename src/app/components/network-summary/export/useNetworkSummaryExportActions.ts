@@ -1,5 +1,6 @@
 import { useCallback, type RefObject } from "react";
 import type { CanvasExportFormat } from "../../../types/app-controller";
+import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 import {
   applyExportDecorations,
   copyComputedStylesToSvgClone,
@@ -157,7 +158,7 @@ export function useNetworkSummaryExportActions({
       canvas.width = prepared.exportWidth * exportScale;
       canvas.height = prepared.exportHeight * exportScale;
 
-      const context = canvas.getContext("2d");
+      const context = getCanvasTextMeasurementContext(canvas);
       if (context === null) {
         return;
       }

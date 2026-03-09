@@ -119,6 +119,7 @@ export type AppAction =
   | { type: "layout/setNodePositions"; payload: { positions: Record<NodeId, LayoutNodePosition> } }
   | { type: "ui/select"; payload: SelectionState }
   | { type: "ui/setThemeMode"; payload: { mode: ThemeMode } }
+  | { type: "ui/setError"; payload: { message: string } }
   | { type: "ui/clearSelection" }
   | { type: "ui/clearError" };
 
@@ -246,6 +247,7 @@ export const appActions = {
 
   select: (payload: SelectionState): AppAction => ({ type: "ui/select", payload }),
   setThemeMode: (mode: ThemeMode): AppAction => ({ type: "ui/setThemeMode", payload: { mode } }),
+  setError: (message: string): AppAction => ({ type: "ui/setError", payload: { message } }),
   clearSelection: (): AppAction => ({ type: "ui/clearSelection" }),
   clearError: (): AppAction => ({ type: "ui/clearError" })
 };

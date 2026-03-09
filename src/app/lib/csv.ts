@@ -3,15 +3,17 @@ export interface DownloadCsvFileOptions {
   includeUtf8Bom?: boolean;
 }
 
+function isDangerousCsvFormulaString(value: string): boolean {
+  const trimmedLeading = value.trimStart();
+  return /^[=+\-@]/.test(trimmedLeading);
+}
+
 function formatCsvCell(value: CsvCellValue): string {
   if (value === null || value === undefined) {
     return "";
   }
 
-  const text =
-    typeof value === "string" && /^[=+\-@]/.test(value)
-      ? `'${value}`
-      : String(value);
+  const text = typeof value === "string" && isDangerousCsvFormulaString(value) ? `'${value}` : String(value);
   if (!/[",\n\r]/.test(text)) {
     return text;
   }

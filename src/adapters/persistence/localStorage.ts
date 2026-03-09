@@ -18,6 +18,11 @@ type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 type IsoNowProvider = () => string;
 const createdAtIsoCache = new WeakMap<object, string>();
 
+export interface SaveStateResult {
+  ok: boolean;
+  reason?: "storage-unavailable" | "write-failed";
+}
+
 function getDefaultStorage(): StorageLike | null {
   if (typeof window === "undefined") {
     return null;
@@ -196,9 +201,9 @@ export function saveState(
   state: AppState,
   storage: StorageLike | null = getDefaultStorage(),
   nowProvider: IsoNowProvider = getNowIso
-): void {
+): SaveStateResult {
   if (storage === null) {
-    return;
+    return { ok: false, reason: "storage-unavailable" };
   }
 
   const updatedAtIso = nowProvider();
@@ -215,7 +220,9 @@ export function saveState(
   try {
     writeSnapshot(storage, snapshot);
     createdAtIsoCache.set(storage as object, snapshot.createdAtIso);
+    return { ok: true };
   } catch {
     // Ignore storage write failures to keep reducer flow deterministic.
+    return { ok: false, reason: "write-failed" };
   }
 }
