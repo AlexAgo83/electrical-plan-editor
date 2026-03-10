@@ -1,9 +1,9 @@
 ## item_533_req_108_validation_matrix_and_closure_traceability - Req 108 validation matrix and closure traceability
 > From version: 1.4.1
-> Status: Draft
+> Status: Done
 > Understanding: 100%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low-Medium
 > Theme: Quality / Validation / Traceability
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -45,3 +45,11 @@ Req_108 changes a previously delivered BOM export contract. Without an explicit 
   - `logics/backlog/item_532_regression_coverage_for_mixed_connection_and_seal_reference_aggregation.md`
   - `logics/request/req_106_bom_export_wire_termination_coverage_wire_csv_termination_columns_and_horizontal_label_offset_harmonization.md`
 
+# Delivery
+- Req_108 validation and traceability are now closed across items `530` to `532`.
+- The documentation chain explicitly records that req_108 supersedes the prior req_106 `Type + Reference` aggregation rule.
+
+# Validation
+- `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/app.ui.network-summary-bom-export.spec.tsx`
+- `npm run -s lint`
+- `npm run -s typecheck`

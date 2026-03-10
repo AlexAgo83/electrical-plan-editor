@@ -1,9 +1,9 @@
 ## item_531_bom_wire_termination_section_schema_alignment_without_type_column - BOM wire-termination section schema alignment without Type column
 > From version: 1.4.1
-> Status: Draft
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low-Medium
 > Theme: BOM / CSV schema / UX contract
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -41,3 +41,12 @@ Once wire-termination aggregation is merged by reference text only, the existing
   - `src/tests/network-summary-bom-csv.spec.ts`
   - `src/tests/app.ui.network-summary-bom-export.spec.tsx`
 
+# Delivery
+- The BOM `Wire terminations` section schema is now aligned with merged aggregation semantics.
+- The obsolete `Type` column was removed.
+- Section headers now export `Reference` and `Quantity`.
+
+# Validation
+- `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/app.ui.network-summary-bom-export.spec.tsx`
+- `npm run -s lint`
+- `npm run -s typecheck`

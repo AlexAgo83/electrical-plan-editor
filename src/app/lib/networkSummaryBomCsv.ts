@@ -15,7 +15,6 @@ export interface NetworkSummaryBomCsvExport {
 }
 
 interface WireTerminationAggregateRow {
-  kind: "Connection" | "Seal";
   reference: string;
   quantity: number;
 }
@@ -66,24 +65,19 @@ export function buildNetworkSummaryBomCsvExport(
     return created;
   };
 
-  const registerWireTermination = (
-    kind: WireTerminationAggregateRow["kind"],
-    reference: string | undefined
-  ): void => {
+  const registerWireTermination = (reference: string | undefined): void => {
     const normalizedReference = reference?.trim() ?? "";
     if (normalizedReference.length === 0) {
       return;
     }
 
-    const aggregateKey = `${kind}:${normalizedReference}`;
-    const existing = wireTerminationAggregates.get(aggregateKey);
+    const existing = wireTerminationAggregates.get(normalizedReference);
     if (existing !== undefined) {
       existing.quantity += 1;
       return;
     }
 
-    wireTerminationAggregates.set(aggregateKey, {
-      kind,
+    wireTerminationAggregates.set(normalizedReference, {
       reference: normalizedReference,
       quantity: 1
     });
@@ -112,10 +106,10 @@ export function buildNetworkSummaryBomCsvExport(
   }
 
   for (const wire of wires) {
-    registerWireTermination("Connection", wire.endpointAConnectionReference);
-    registerWireTermination("Seal", wire.endpointASealReference);
-    registerWireTermination("Connection", wire.endpointBConnectionReference);
-    registerWireTermination("Seal", wire.endpointBSealReference);
+    registerWireTermination(wire.endpointAConnectionReference);
+    registerWireTermination(wire.endpointASealReference);
+    registerWireTermination(wire.endpointBConnectionReference);
+    registerWireTermination(wire.endpointBSealReference);
   }
 
   const orderedRows = [...aggregates.values()].sort((left, right) => {
@@ -129,13 +123,9 @@ export function buildNetworkSummaryBomCsvExport(
     }
     return left.catalogItem.id.localeCompare(right.catalogItem.id, undefined, { sensitivity: "base" });
   });
-  const orderedWireTerminationRows = [...wireTerminationAggregates.values()].sort((left, right) => {
-    const kindCompare = left.kind.localeCompare(right.kind, undefined, { sensitivity: "base" });
-    if (kindCompare !== 0) {
-      return kindCompare;
-    }
-    return left.reference.localeCompare(right.reference, undefined, { sensitivity: "base" });
-  });
+  const orderedWireTerminationRows = [...wireTerminationAggregates.values()].sort((left, right) =>
+    left.reference.localeCompare(right.reference, undefined, { sensitivity: "base" })
+  );
 
   const headers = [
     "Manufacturer reference",
@@ -194,10 +184,8 @@ export function buildNetworkSummaryBomCsvExport(
   if (orderedWireTerminationRows.length > 0) {
     rows.push(Array.from<CsvCellValue>({ length: headers.length }).fill(""));
     rows.push(["Wire terminations"]);
-    rows.push(["Type", "Reference", "Quantity"]);
-    rows.push(
-      ...orderedWireTerminationRows.map(({ kind, reference, quantity }) => [kind, reference, quantity] satisfies CsvCellValue[])
-    );
+    rows.push(["Reference", "Quantity"]);
+    rows.push(...orderedWireTerminationRows.map(({ reference, quantity }) => [reference, quantity] satisfies CsvCellValue[]));
   }
 
   return { headers, rows, itemRowCount: orderedRows.length + orderedWireTerminationRows.length };
