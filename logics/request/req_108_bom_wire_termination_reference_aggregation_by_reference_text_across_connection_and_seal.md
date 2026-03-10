@@ -1,8 +1,8 @@
 ## req_108_bom_wire_termination_reference_aggregation_by_reference_text_across_connection_and_seal - BOM wire-termination aggregation by reference text across connection and seal
 > From version: 1.4.1
-> Status: Draft
+> Status: Done
 > Understanding: 100%
-> Confidence: 98%
+> Confidence: 99%
 > Complexity: Medium
 > Theme: Export / BOM / wire terminations
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -113,6 +113,17 @@
 - [x] Conflict with the previous `req_106` contract is called out explicitly.
 - [x] Acceptance criteria are testable.
 - [x] Scope boundaries are explicit.
+
+# Delivery closure
+- Implemented through `task_087_req_108_bom_wire_termination_reference_only_aggregation_orchestration_and_delivery_control`.
+- Delivered behavior:
+  - BOM wire-termination aggregation now groups by normalized reference text only;
+  - connection and seal occurrences with the same text collapse into one quantity;
+  - the `Wire terminations` section now exports `Reference` and `Quantity` without a `Type` column.
+- Validation executed at closure:
+  - `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/app.ui.network-summary-bom-export.spec.tsx`
+  - `npm run -s lint`
+  - `npm run -s typecheck`
 
 # Risks
 - Downstream consumers expecting the previous `Type` column will need to adapt to the new BOM section schema.

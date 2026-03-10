@@ -166,8 +166,9 @@ describe("App integration UI - network summary BOM export", () => {
 
       expect(capturedPayload.startsWith("\uFEFF")).toBe(true);
       expect(capturedPayload).toContain("Wire terminations");
-      expect(capturedPayload).toContain("Connection,Câble-Été,1");
-      expect(capturedPayload).toContain("Seal,Joint-À,1");
+      expect(capturedPayload).toContain("Reference,Quantity");
+      expect(capturedPayload).toContain("Câble-Été,1");
+      expect(capturedPayload).toContain("Joint-À,1");
     } finally {
       (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = OriginalBlob;
       vi.restoreAllMocks();

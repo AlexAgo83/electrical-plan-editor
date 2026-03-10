@@ -1,9 +1,9 @@
 ## item_530_bom_wire_termination_aggregation_key_change_from_type_plus_reference_to_reference_only - BOM wire-termination aggregation key change from type plus reference to reference only
 > From version: 1.4.1
-> Status: Draft
+> Status: Done
 > Understanding: 100%
 > Confidence: 98%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: BOM / Export / Data aggregation
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -45,3 +45,12 @@ The current BOM `Wire terminations` aggregation key is `Type + Reference`, which
   - `src/core/entities.ts`
   - `src/tests/network-summary-bom-csv.spec.ts`
 
+# Delivery
+- Wire termination aggregation now uses normalized reference text as the sole grouping key.
+- Connection and seal occurrences with identical text now contribute to the same quantity row.
+- Begin/end occurrences continue to count independently.
+
+# Validation
+- `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/app.ui.network-summary-bom-export.spec.tsx`
+- `npm run -s lint`
+- `npm run -s typecheck`

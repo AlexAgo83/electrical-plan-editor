@@ -101,9 +101,9 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     expect(exported.rows[6]).toEqual(["PRICING CONTEXT", "Tax rate (%)", "20.00"]);
     expect(exported.rows[7]).toEqual(["", "", "", "", "", "", "", "", "", ""]);
     expect(exported.rows[8]).toEqual(["Wire terminations"]);
-    expect(exported.rows[9]).toEqual(["Type", "Reference", "Quantity"]);
-    expect(exported.rows[10]).toEqual(["Connection", "TERM-001", 1]);
-    expect(exported.rows[11]).toEqual(["Seal", "SEAL-001", 1]);
+    expect(exported.rows[9]).toEqual(["Reference", "Quantity"]);
+    expect(exported.rows[10]).toEqual(["SEAL-001", 1]);
+    expect(exported.rows[11]).toEqual(["TERM-001", 1]);
   });
 
   it("omits TTC column and total when tax is disabled", () => {
@@ -175,7 +175,47 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     const exported = buildNetworkSummaryBomCsvExport([], [], [], wires);
 
     expect(exported.itemRowCount).toBe(2);
-    expect(exported.rows).toContainEqual(["Connection", "TERM-A", 2]);
-    expect(exported.rows).toContainEqual(["Seal", "SEAL-B", 1]);
+    expect(exported.rows).toContainEqual(["SEAL-B", 1]);
+    expect(exported.rows).toContainEqual(["TERM-A", 2]);
+  });
+
+  it("merges same reference text across connection and seal occurrences into one row", () => {
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "W-1",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        endpointAConnectionReference: " 1108503 ",
+        endpointBSealReference: "1108503",
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 10,
+        sectionMm2: 1,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W2"),
+        name: "Wire 2",
+        technicalId: "W-2",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C2"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S2"), portIndex: 1 },
+        endpointBConnectionReference: "1108503",
+        endpointASealReference: "   ",
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 10,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const exported = buildNetworkSummaryBomCsvExport([], [], [], wires);
+
+    expect(exported.itemRowCount).toBe(1);
+    expect(exported.rows).toContainEqual(["1108503", 3]);
   });
 });

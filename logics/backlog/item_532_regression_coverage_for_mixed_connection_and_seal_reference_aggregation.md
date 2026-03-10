@@ -1,9 +1,9 @@
 ## item_532_regression_coverage_for_mixed_connection_and_seal_reference_aggregation - Regression coverage for mixed connection and seal reference aggregation
 > From version: 1.4.1
-> Status: Draft
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Tests / BOM / Regression coverage
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -42,3 +42,12 @@ The previous regression suite validates separation by `Type + Reference`. Withou
   - `src/tests/network-summary-bom-csv.spec.ts`
   - `src/tests/app.ui.network-summary-bom-export.spec.tsx`
 
+# Delivery
+- Regression coverage now asserts one-row-per-reference BOM semantics.
+- Mixed connection/seal same-text occurrences are covered explicitly.
+- Export-facing tests now assert the `Reference,Quantity` section schema.
+
+# Validation
+- `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/app.ui.network-summary-bom-export.spec.tsx`
+- `npm run -s lint`
+- `npm run -s typecheck`
