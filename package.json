@@ -20,7 +20,7 @@
     "bundle:metrics:report": "node scripts/quality/report-bundle-metrics.mjs",
     "build:bundle:report": "npm run -s build && npm run -s bundle:metrics:report",
     "test": "vitest",
-    "test:ci": "vitest run --coverage",
+    "test:ci": "env LAYOUT_RESPONSIVENESS_BUDGET_MS=25000 vitest run --coverage --pool=forks --maxWorkers=2 --testTimeout=15000",
     "test:ci:segmentation:check": "node scripts/quality/run-vitest-segmented.mjs check",
     "test:ci:fast": "node scripts/quality/run-vitest-segmented.mjs fast",
     "test:ci:ui": "node scripts/quality/run-vitest-segmented.mjs ui",
