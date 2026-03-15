@@ -1,7 +1,7 @@
 ## req_006_large_store_files_split_and_reducer_modularization - Large Store Files Split and Reducer Modularization
 > From version: 0.1.0
 > Understanding: 99%
-> Confidence: 97%
+> Confidence: 97% (architecture reference path synchronized)
 > Complexity: High
 > Theme: Store Modularization
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -20,7 +20,7 @@ Current state-management layer includes files above 500 lines:
 The reducer currently aggregates many responsibilities (connectors, splices, nodes, segments, wires, occupancy, route lock, validation-critical invariants) in one file, making reasoning and evolution harder.
 
 Architecture reference to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 
 ## Objectives
 - Decompose reducer logic by bounded concerns with explicit handler modules.

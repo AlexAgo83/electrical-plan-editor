@@ -1,7 +1,7 @@
 ## req_009_2d_layout_persistence_and_crossing_minimization - 2D Layout Persistence and Crossing Minimization
 > From version: 0.2.0
 > Understanding: 99%
-> Confidence: 96%
+> Confidence: 96% (architecture reference path synchronized)
 > Complexity: High
 > Theme: 2D Representation Reliability
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -21,7 +21,7 @@ This request introduces a layout lifecycle with three guarantees:
 - user-controlled regeneration for recovery and optimization.
 
 Architecture references to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 - `logics/request/req_002_multi_network_management_and_navigation.md`
 - `logics/request/req_004_network_import_export_file_workflow.md`
 

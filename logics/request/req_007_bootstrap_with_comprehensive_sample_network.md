@@ -1,7 +1,7 @@
 ## req_007_bootstrap_with_comprehensive_sample_network - Bootstrap with Comprehensive Sample Network
 > From version: 0.1.0
 > Understanding: 99%
-> Confidence: 97%
+> Confidence: 97% (architecture reference path synchronized)
 > Complexity: Medium
 > Theme: Onboarding and Demo Data
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -18,7 +18,7 @@ Current startup experience may open on an empty state, which slows onboarding an
 This request introduces a built-in comprehensive sample network for first-run experience and demo/testing workflows, while preserving local-first persistence and data safety.
 
 Architecture reference to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 
 ## Objectives
 - Define a stable sample network fixture with coherent IDs and routing graph.

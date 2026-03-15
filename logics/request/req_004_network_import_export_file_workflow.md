@@ -1,7 +1,7 @@
 ## req_004_network_import_export_file_workflow - Network Import and Export File Workflow
 > From version: 0.1.0
 > Understanding: 98%
-> Confidence: 96%
+> Confidence: 96% (architecture reference path synchronized)
 > Complexity: High
 > Theme: Data Portability
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -18,7 +18,7 @@ Current multi-network behavior is local-storage only. Users cannot move their ne
 This request introduces explicit file import/export workflows at network level, while preserving deterministic domain behavior and persistence guarantees.
 
 Architecture reference to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 
 ## Objectives
 - Define a stable file payload contract for exported networks.

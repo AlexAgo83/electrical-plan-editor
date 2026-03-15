@@ -1,7 +1,7 @@
 ## req_011_pwa_enablement_installability_and_offline_reliability - PWA Enablement, Installability, and Offline Reliability
 > From version: 0.3.0
 > Understanding: 99%
-> Confidence: 97%
+> Confidence: 97% (architecture reference path synchronized)
 > Complexity: High
 > Theme: Platform Reliability and Native-like Delivery
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -20,7 +20,7 @@ The application already follows a local-first model with client-side persistence
 This request formalizes PWA support as a product capability, not just a build tweak, with explicit UX and QA expectations.
 
 Architecture references to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 - `logics/request/req_003_theme_mode_switch_normal_dark.md`
 - `logics/request/req_004_network_import_export_file_workflow.md`
 - `logics/request/req_010_network_scope_workspace_shell_and_global_defaults.md`

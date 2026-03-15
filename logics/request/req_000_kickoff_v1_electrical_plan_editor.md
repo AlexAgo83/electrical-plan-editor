@@ -1,7 +1,7 @@
 ## req_000_kickoff_v1_electrical_plan_editor - Kickoff V1 Electrical Plan Editor
 > From version: 0.1.0
 > Understanding: 99%
-> Confidence: 97%
+> Confidence: 97% (architecture reference path synchronized)
 > Complexity: High
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -18,7 +18,7 @@
 This request defines a logic-first V1 (no geometric/3D computation yet). Segment lengths are entered manually and used to compute wire lengths dynamically.
 
 Architecture reference for implementation kickoff:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 
 ## Objectives
 - Model connectors and their cavities/ways.

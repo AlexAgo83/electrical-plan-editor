@@ -1,7 +1,7 @@
 ## req_008_app_orchestration_shell_completion_and_final_line_budget - App Orchestration Shell Completion and Final Line Budget
 > From version: 0.2.0
 > Understanding: 99%
-> Confidence: 97%
+> Confidence: 97% (architecture reference path synchronized)
 > Complexity: High
 > Theme: UI Modularization Completion
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -25,7 +25,7 @@ Current `App.tsx` still contains concentrated responsibilities:
 - full multi-screen JSX rendering
 
 Architecture and modularization references to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 - `logics/request/req_005_large_ui_files_split_and_hook_extraction.md`
 
 ## Objectives

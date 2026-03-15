@@ -1,7 +1,7 @@
 ## req_001_v1_ux_ui_operator_workspace - UX/UI V1 Operator Workspace Overhaul
 > From version: 0.1.0
 > Understanding: 98%
-> Confidence: 95%
+> Confidence: 95% (architecture reference path synchronized)
 > Complexity: High
 > Theme: UX/UI Information Architecture
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -21,7 +21,7 @@ The current V1 is functionally complete but interaction cost is still high:
 This request introduces a UX/UI redesign focused on speed, readability, and deterministic operations for electrical design users.
 
 Architecture reference to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 
 ## Objectives
 - Build a persistent, task-oriented navigation model.
