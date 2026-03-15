@@ -1,7 +1,7 @@
 ## req_002_multi_network_management_and_navigation - Multi-Network Management and Navigation
 > From version: 0.1.0
 > Understanding: 98%
-> Confidence: 96%
+> Confidence: 96% (architecture reference path synchronized)
 > Complexity: High
 > Theme: Multi-Network Architecture
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -18,7 +18,7 @@ Current behavior assumes all entities belong to one shared network. This limits 
 This request introduces a first-class `Network` aggregate and active-network navigation, while preserving local-first behavior and deterministic routing.
 
 Architecture reference to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 
 ## Objectives
 - Add network lifecycle management (`create`, `rename`, `delete`, `duplicate`).

@@ -1,7 +1,7 @@
 ## req_015_runtime_robustness_persistence_empty_workspace_semantics_and_ci_release_safety - Runtime Robustness, Empty Workspace Persistence Semantics, and CI Release Safety
 > From version: 0.5.0
 > Understanding: 99%
-> Confidence: 97%
+> Confidence: 97% (architecture reference path synchronized)
 > Complexity: Medium
 > Theme: Reliability Hardening and Delivery Safety
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -25,7 +25,7 @@ The project currently has strong coverage for lint/typecheck/unit/integration/E2
 These are not feature gaps but reliability gaps. This request focuses on low-risk hardening changes with explicit behavioral contracts and regression coverage.
 
 Architecture references to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 - `logics/request/req_011_pwa_enablement_installability_and_offline_reliability.md`
 - `logics/request/req_012_environment_configuration_and_runtime_defaults.md`
 - `logics/request/req_013_list_form_workspace_harmonization_based_on_network_scope.md`

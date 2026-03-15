@@ -1,7 +1,7 @@
 ## req_005_large_ui_files_split_and_hook_extraction - Large UI Files Split and Hook Extraction
 > From version: 0.1.0
 > Understanding: 99%
-> Confidence: 97%
+> Confidence: 97% (architecture reference path synchronized)
 > Complexity: High
 > Theme: Frontend Modularization
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -21,7 +21,7 @@ Current UI layer includes several files above 500 lines:
 These files mix multiple responsibilities (state orchestration, canvas interactions, workspace rendering, preferences, validation UX, styling, integration tests), increasing coupling and regression risk.
 
 Architecture reference to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 
 ## Objectives
 - Split `App.tsx` into domain-focused React components and hooks.

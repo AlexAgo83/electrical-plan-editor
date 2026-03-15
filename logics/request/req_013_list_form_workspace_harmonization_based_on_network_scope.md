@@ -1,7 +1,7 @@
 ## req_013_list_form_workspace_harmonization_based_on_network_scope - List/Form Workspace Harmonization Based on Network Scope
 > From version: 0.4.0
 > Understanding: 99%
-> Confidence: 97%
+> Confidence: 97% (architecture reference path synchronized)
 > Complexity: High
 > Theme: UX/UI Consistency Across Entity Workspaces
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -25,7 +25,7 @@ Other entity screens still use older mixed patterns (inline row actions + separa
 This request standardizes list/form ergonomics across workspaces by extending the validated `Network Scope` pattern.
 
 Architecture references to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 - `logics/request/req_009_2d_layout_persistence_and_crossing_minimization.md`
 - `logics/request/req_010_network_scope_workspace_shell_and_global_defaults.md`
 - `logics/request/req_012_environment_configuration_and_runtime_defaults.md`

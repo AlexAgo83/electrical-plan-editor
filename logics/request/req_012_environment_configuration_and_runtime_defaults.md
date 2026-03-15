@@ -1,7 +1,7 @@
 ## req_012_environment_configuration_and_runtime_defaults - Environment Configuration and Runtime Defaults
 > From version: 0.3.0
 > Understanding: 100%
-> Confidence: 98%
+> Confidence: 98% (architecture reference path synchronized)
 > Complexity: Medium
 > Theme: Configuration Reliability and Developer Experience
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -22,7 +22,7 @@ The project currently runs with implicit runtime defaults and no explicit enviro
 This request introduces a lightweight environment configuration layer focused on local development reliability, with a clear default behavior and explicit documentation.
 
 Architecture references to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 - `logics/request/req_008_app_orchestration_shell_completion_and_final_line_budget.md`
 - `logics/request/req_010_network_scope_workspace_shell_and_global_defaults.md`
 

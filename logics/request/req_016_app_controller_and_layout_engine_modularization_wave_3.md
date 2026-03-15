@@ -1,7 +1,7 @@
 ## req_016_app_controller_and_layout_engine_modularization_wave_3 - App Controller and Layout Engine Modularization (Wave 3)
 > From version: 0.5.1
 > Understanding: 100%
-> Confidence: 99%
+> Confidence: 99% (architecture reference path synchronized)
 > Complexity: High
 > Theme: Orchestration Simplification and Layout Engine Decomposition
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -26,7 +26,7 @@ Wave-2 modularization (`req_014`) significantly improved component and CSS struc
 This request focuses on a third modularization wave centered on those two files, prioritizing structural decomposition and behavior parity before any performance tuning.
 
 Architecture references to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 - `logics/request/req_009_2d_layout_persistence_and_crossing_minimization.md`
 - `logics/request/req_014_ui_modularization_wave_2_controller_analysis_canvas_and_bundle_optimization.md`
 - `logics/request/req_015_runtime_robustness_persistence_empty_workspace_semantics_and_ci_release_safety.md`

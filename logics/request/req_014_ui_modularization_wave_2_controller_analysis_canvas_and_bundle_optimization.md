@@ -1,7 +1,7 @@
 ## req_014_ui_modularization_wave_2_controller_analysis_canvas_and_bundle_optimization - UI Modularization Wave 2 (Controller / Analysis / Canvas / Bundle Optimization)
 > From version: 0.5.0
 > Understanding: 97%
-> Confidence: 94%
+> Confidence: 94% (architecture reference path synchronized)
 > Complexity: High
 > Theme: Maintainability, Line-Budget Control, and Runtime Delivery Efficiency
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -30,7 +30,7 @@ Observed large files (current state, approximate):
 - Large CSS modules already documented as temporary oversize exceptions (`base.css`, `workspace.css`, `canvas.css`, `validation-settings.css`)
 
 Architecture references to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 - `logics/request/req_005_large_ui_files_split_and_hook_extraction.md`
 - `logics/request/req_008_app_orchestration_shell_completion_and_final_line_budget.md`
 - `logics/request/req_013_list_form_workspace_harmonization_based_on_network_scope.md`

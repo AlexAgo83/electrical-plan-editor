@@ -1,7 +1,7 @@
 ## req_003_theme_mode_switch_normal_dark - Theme Mode Switch Normal and Dark
 > From version: 0.1.0
 > Understanding: 98%
-> Confidence: 96%
+> Confidence: 96% (architecture reference path synchronized)
 > Complexity: Medium
 > Theme: UX/UI Theming
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -18,7 +18,7 @@ The current application exposes one visual mode only. As usage increases in long
 This request introduces a deterministic theme system with explicit mode selection and full UI coverage, without changing domain behavior.
 
 Architecture reference to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 
 ## Objectives
 - Introduce a global theme mode contract (`normal`, `dark`) in app state/settings.

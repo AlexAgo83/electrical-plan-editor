@@ -1,7 +1,7 @@
 ## req_010_network_scope_workspace_shell_and_global_defaults - Network Scope Workspace Shell and Global Defaults
 > From version: 0.3.0
 > Understanding: 100%
-> Confidence: 98%
+> Confidence: 98% (architecture reference path synchronized)
 > Complexity: High
 > Theme: Navigation and Workspace Shell Clarity
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
@@ -29,7 +29,7 @@ The user intent is to establish a clearer information architecture:
 - a drawer-style left navigation that can be summoned on demand.
 
 Architecture references to preserve:
-- `logics/architecture/target_reference_v1_frontend_local_first.md`
+- `logics/architecture/adr_000_v1_frontend_local_first_reference_architecture.md`
 - `logics/request/req_002_multi_network_management_and_navigation.md`
 - `logics/request/req_003_theme_mode_switch_normal_dark.md`
 - `logics/request/req_008_app_orchestration_shell_completion_and_final_line_budget.md`
