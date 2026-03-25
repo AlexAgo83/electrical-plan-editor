@@ -1,9 +1,10 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import type { ConnectorId, NetworkId } from "../core/entities";
 import { formatIsoToLocalDateInput } from "../core/networkMetadata";
 import { appActions, appReducer, createInitialState } from "../store";
 import { getPanelByHeading, renderAppWithState, switchScreen, switchScreenDrawerAware } from "./helpers/app-ui-test-utils";
+import { installScrollIntoViewSpy } from "./helpers/app-ui-form-test-utils";
 
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
@@ -14,30 +15,6 @@ function asNetworkId(value: string): NetworkId {
 }
 
 describe("App integration UI - networks", () => {
-  function installScrollIntoViewSpy() {
-    const scrollTargets: HTMLElement[] = [];
-    const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollIntoView");
-    const mock = vi.fn(function mockScrollIntoView(this: HTMLElement) {
-      scrollTargets.push(this);
-    });
-    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
-      configurable: true,
-      writable: true,
-      value: mock
-    });
-
-    return {
-      scrollTargets,
-      restore() {
-        if (originalDescriptor === undefined) {
-          Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
-          return;
-        }
-        Object.defineProperty(HTMLElement.prototype, "scrollIntoView", originalDescriptor);
-      }
-    };
-  }
-
   beforeEach(() => {
     localStorage.clear();
   });

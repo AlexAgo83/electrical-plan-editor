@@ -9,17 +9,10 @@ import {
   switchScreenDrawerAware,
   switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
+import { clickNewFromPanel, getInspectorPanelIfVisible } from "./helpers/app-ui-form-test-utils";
 import { appActions, appReducer } from "../store";
 
 describe("App integration UI - creation flow wire endpoint references", () => {
-  function clickNewFromPanel(panelHeading: "Wires"): void {
-    fireEvent.click(within(getPanelByHeading(panelHeading)).getByRole("button", { name: "New" }));
-  }
-
-  function getInspectorPanelIfVisible(): HTMLElement | null {
-    return screen.queryByRole("heading", { name: "Inspector context" }) !== null ? getPanelByHeading("Inspector context") : null;
-  }
-
   beforeEach(() => localStorage.clear());
 
   it("supports optional wire side connection and seal references with trim, non-destructive endpoint type changes, and clear on save", () => {

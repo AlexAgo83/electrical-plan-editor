@@ -1,8 +1,9 @@
 ## item_537_req_109_validation_matrix_and_closure_traceability - Req 109 validation matrix and closure traceability
 > From version: 1.4.2
+> Status: Done
 > Understanding: 100%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low-Medium
 > Theme: Quality / Validation / Traceability
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -46,3 +47,13 @@ Req_109 changes shared interaction behavior across multiple list/form screens. W
   - `logics/backlog/item_536_regression_tests_for_action_driven_scroll_to_create_and_edit_panels.md`
   - `logics/backlog/item_279_render2d_selection_sync_without_forced_table_autoscroll.md`
   - `logics/request/req_109_new_and_edit_actions_scroll_to_corresponding_form_panel.md`
+
+# Delivery
+- Captured req_109 closure against shared helper delivery, screen wiring, and regression coverage.
+- Recorded the explicit guardrail that row-click and indirect selection flows must not trigger page scroll.
+- Synchronized request, backlog, task, and release-note references for req_109 delivery.
+
+# Validation
+- `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx src/tests/app.ui.networks.spec.tsx`
+- `npm run -s lint`
+- `npm run -s typecheck`

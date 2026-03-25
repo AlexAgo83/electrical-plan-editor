@@ -1,8 +1,8 @@
 ## req_109_new_and_edit_actions_scroll_to_corresponding_form_panel - New and Edit actions scroll to the corresponding form panel
 > From version: 1.4.2
-> Status: Draft
+> Status: Done
 > Understanding: 100%
-> Confidence: 98%
+> Confidence: 99%
 > Complexity: Medium
 > Theme: UX / explicit form navigation ergonomics
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -114,9 +114,17 @@
   - `item_536_regression_tests_for_action_driven_scroll_to_create_and_edit_panels.md`
   - `item_537_req_109_validation_matrix_and_closure_traceability.md`
 
-# Delivery status
-- Status: planned.
-- Task: `logics/tasks/task_088_req_109_new_and_edit_scroll_to_corresponding_form_panel_orchestration_and_delivery_control.md`.
+# Delivery closure
+- Implemented through `task_088_req_109_new_and_edit_scroll_to_corresponding_form_panel_orchestration_and_delivery_control`.
+- Delivered behavior:
+  - explicit `New` actions now scroll to the corresponding create form panel;
+  - explicit `Edit` actions now scroll to the corresponding edit form panel;
+  - direct row selection and indirect selection-sync flows do not trigger the new page scroll behavior.
+- Validation executed at closure:
+  - `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx src/tests/app.ui.networks.spec.tsx`
+  - `npm run -s lint`
+  - `npm run -s typecheck`
+  - `npm run -s build`
 
 # References
 - `src/app/components/workspace/ModelingPrimaryTables.tsx`

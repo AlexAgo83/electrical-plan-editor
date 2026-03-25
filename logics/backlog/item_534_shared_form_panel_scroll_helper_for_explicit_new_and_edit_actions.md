@@ -1,8 +1,9 @@
 ## item_534_shared_form_panel_scroll_helper_for_explicit_new_and_edit_actions - Shared form-panel scroll helper for explicit New and Edit actions
 > From version: 1.4.2
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UX / Shared interaction helper
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -47,3 +48,13 @@
   - `src/app/lib/app-utils-shared.ts`
   - `src/app/hooks/controller/useAppControllerModelingAnalysisScreenDomains.tsx`
   - `logics/backlog/item_279_render2d_selection_sync_without_forced_table_autoscroll.md`
+
+# Delivery
+- Added a shared helper dedicated to explicit form-panel scroll behavior.
+- The helper resolves the target form panel after render and no-ops when the panel is already sufficiently visible.
+- The helper does not alter indirect selection or canvas-origin scroll behavior.
+
+# Validation
+- `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx src/tests/app.ui.networks.spec.tsx`
+- `npm run -s lint`
+- `npm run -s typecheck`
