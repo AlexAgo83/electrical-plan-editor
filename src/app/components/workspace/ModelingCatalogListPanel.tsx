@@ -3,6 +3,7 @@ import type { CatalogItem, CatalogItemId } from "../../../core/entities";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { compareSortableValues } from "../../lib/app-utils-shared";
+import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import { formatPriceWithCurrencySymbol } from "../../lib/pricing";
 import type { ImportExportStatus, WorkspaceCurrencyCode } from "../../types/app-controller";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
@@ -153,7 +154,14 @@ export function ModelingCatalogListPanel({
         <>
           <p className="empty-copy">No catalog item yet.</p>
           <div className="row-actions compact">
-            <button type="button" className="button-with-icon" onClick={onOpenCreateCatalogItem}>
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={() => {
+                onOpenCreateCatalogItem();
+                scrollToFormPanel(FORM_PANEL_IDS.catalog);
+              }}
+            >
               <span className="action-button-icon is-new" aria-hidden="true" />
               Create catalog item
             </button>
@@ -202,7 +210,9 @@ export function ModelingCatalogListPanel({
                     className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
                     aria-selected={isSelected}
                     tabIndex={0}
-                    onClick={() => onEditCatalogItem(item)}
+                    onClick={() => {
+                      onEditCatalogItem(item);
+                    }}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
@@ -224,7 +234,14 @@ export function ModelingCatalogListPanel({
       )}
 
       <div className="row-actions compact modeling-list-actions catalog-modeling-list-actions">
-        <button type="button" className="button-with-icon" onClick={onOpenCreateCatalogItem}>
+        <button
+          type="button"
+          className="button-with-icon"
+          onClick={() => {
+            onOpenCreateCatalogItem();
+            scrollToFormPanel(FORM_PANEL_IDS.catalog);
+          }}
+        >
           <span className="action-button-icon is-new" aria-hidden="true" />
           New
         </button>
@@ -236,7 +253,13 @@ export function ModelingCatalogListPanel({
         <button
           type="button"
           className="button-with-icon"
-          onClick={() => selectedCatalogItem !== null && onEditCatalogItem(selectedCatalogItem)}
+          onClick={() => {
+            if (selectedCatalogItem === null) {
+              return;
+            }
+            onEditCatalogItem(selectedCatalogItem);
+            scrollToFormPanel(FORM_PANEL_IDS.catalog);
+          }}
           disabled={selectedCatalogItem === null}
         >
           <span className="action-button-icon is-edit" aria-hidden="true" />

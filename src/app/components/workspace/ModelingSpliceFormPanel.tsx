@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -33,7 +34,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
   const isUnbounded = splicePortMode === "unbounded";
 
   return (
-<article className="panel" hidden={!isSpliceSubScreen}>
+<article className="panel" hidden={!isSpliceSubScreen} data-form-panel={FORM_PANEL_IDS.splice}>
   {renderFormHeader(
     spliceFormMode === "create" ? "Create Splice" : spliceFormMode === "edit" ? "Edit Splice" : "Splice form",
     spliceFormMode

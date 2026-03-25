@@ -1,5 +1,6 @@
 import type { FormEvent, ReactElement } from "react";
 import { isValidCatalogUrlInput } from "../../../store";
+import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import type { WorkspaceCurrencyCode } from "../../types/app-controller";
 import { renderFormHeader } from "./ModelingFormsColumn.shared";
 
@@ -49,7 +50,12 @@ export function ModelingCatalogFormPanel({
   const showPanel = isCatalogSubScreen && catalogFormMode !== "idle";
 
   return (
-    <article className="panel" hidden={!showPanel} data-onboarding-panel="modeling-catalog-edit">
+    <article
+      className="panel"
+      hidden={!showPanel}
+      data-onboarding-panel="modeling-catalog-edit"
+      data-form-panel={FORM_PANEL_IDS.catalog}
+    >
       {renderFormHeader(
         catalogFormMode === "create" ? "Create catalog item" : "Edit catalog item",
         catalogFormMode

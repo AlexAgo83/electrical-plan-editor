@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -26,7 +27,7 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
   } = props;
 
   return (
-<article className="panel" hidden={!isSegmentSubScreen}>
+<article className="panel" hidden={!isSegmentSubScreen} data-form-panel={FORM_PANEL_IDS.segment}>
   {renderFormHeader(
     segmentFormMode === "create" ? "Create Segment" : segmentFormMode === "edit" ? "Edit Segment" : "Segment form",
     segmentFormMode

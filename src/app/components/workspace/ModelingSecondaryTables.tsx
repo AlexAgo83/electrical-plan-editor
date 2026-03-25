@@ -4,6 +4,7 @@ import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
+import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
@@ -144,6 +145,28 @@ export function ModelingSecondaryTables({
     field: "name",
     direction: "asc"
   });
+  const openCreateSegmentAndScroll = () => {
+    onOpenCreateSegment();
+    scrollToFormPanel(FORM_PANEL_IDS.segment);
+  };
+  const openEditSegmentAndScroll = (segment: Segment) => {
+    onEditSegment(segment);
+    scrollToFormPanel(FORM_PANEL_IDS.segment);
+  };
+  const openEditSegment = (segment: Segment) => {
+    onEditSegment(segment);
+  };
+  const openCreateWireAndScroll = () => {
+    onOpenCreateWire();
+    scrollToFormPanel(FORM_PANEL_IDS.wire);
+  };
+  const openEditWireAndScroll = (wire: Wire) => {
+    onEditWire(wire);
+    scrollToFormPanel(FORM_PANEL_IDS.wire);
+  };
+  const openEditWire = (wire: Wire) => {
+    onEditWire(wire);
+  };
   const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   useEffect(() => {
     setSegmentTableSort((current) =>
@@ -385,11 +408,11 @@ export function ModelingSecondaryTables({
                       className={rowClassName}
                       aria-selected={isFocused}
                       tabIndex={0}
-                      onClick={() => onEditSegment(segment)}
+                      onClick={() => openEditSegment(segment)}
                       onKeyDown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
-                          onEditSegment(segment);
+                          openEditSegment(segment);
                         }
                       }}
                     >
@@ -409,14 +432,14 @@ export function ModelingSecondaryTables({
           </>
         )}
         <div className="row-actions compact modeling-list-actions">
-          <button type="button" className="button-with-icon" onClick={onOpenCreateSegment}>
+            <button type="button" className="button-with-icon" onClick={openCreateSegmentAndScroll}>
             <span className="action-button-icon is-new" aria-hidden="true" />
             New
           </button>
           <button
             type="button"
             className="button-with-icon"
-            onClick={() => focusedSegment !== null && onEditSegment(focusedSegment)}
+            onClick={() => focusedSegment !== null && openEditSegmentAndScroll(focusedSegment)}
             disabled={focusedSegment === null}
           >
             <span className="action-button-icon is-edit" aria-hidden="true" />
@@ -594,11 +617,11 @@ export function ModelingSecondaryTables({
                       className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
                       aria-selected={isFocused}
                       tabIndex={0}
-                      onClick={() => onEditWire(wire)}
+                      onClick={() => openEditWire(wire)}
                       onKeyDown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
-                          onEditWire(wire);
+                          openEditWire(wire);
                         }
                       }}
                     >
@@ -627,14 +650,14 @@ export function ModelingSecondaryTables({
           </>
         )}
         <div className="row-actions compact modeling-list-actions">
-          <button type="button" className="button-with-icon" onClick={onOpenCreateWire}>
+            <button type="button" className="button-with-icon" onClick={openCreateWireAndScroll}>
             <span className="action-button-icon is-new" aria-hidden="true" />
             New
           </button>
           <button
             type="button"
             className="button-with-icon"
-            onClick={() => focusedWire !== null && onEditWire(focusedWire)}
+            onClick={() => focusedWire !== null && openEditWireAndScroll(focusedWire)}
             disabled={focusedWire === null}
           >
             <span className="action-button-icon is-edit" aria-hidden="true" />

@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { appActions, appReducer, createInitialState } from "../store";
 import {
   asCatalogItemId,
@@ -12,6 +12,30 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - creation flow ergonomics", () => {
+  function installScrollIntoViewSpy() {
+    const scrollTargets: HTMLElement[] = [];
+    const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollIntoView");
+    const mock = vi.fn(function mockScrollIntoView(this: HTMLElement) {
+      scrollTargets.push(this);
+    });
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      writable: true,
+      value: mock
+    });
+
+    return {
+      scrollTargets,
+      restore() {
+        if (originalDescriptor === undefined) {
+          Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
+          return;
+        }
+        Object.defineProperty(HTMLElement.prototype, "scrollIntoView", originalDescriptor);
+      }
+    };
+  }
+
   function createInitialStateWithCatalog() {
     const withPrimaryCatalog = appReducer(
       createInitialState(),
@@ -32,6 +56,24 @@ describe("App integration UI - creation flow ergonomics", () => {
   }
 
   beforeEach(() => localStorage.clear());
+
+  it("scrolls to the create connector panel when clicking New", async () => {
+    const scrollSpy = installScrollIntoViewSpy();
+
+    try {
+      renderAppWithState(createInitialStateWithCatalog());
+      switchScreenDrawerAware("modeling");
+
+      clickNewFromPanel("Connectors");
+      const createConnectorPanel = getPanelByHeading("Create Connector");
+
+      await waitFor(() => {
+        expect(scrollSpy.scrollTargets).toContain(createConnectorPanel);
+      });
+    } finally {
+      scrollSpy.restore();
+    }
+  });
 
   it("prefills IDs in create mode for connectors, splices, nodes, segments, and wires without overwriting manual edits", () => {
     renderAppWithState(createInitialState());
