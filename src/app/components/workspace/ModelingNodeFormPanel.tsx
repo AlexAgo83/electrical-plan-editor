@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import type { NetworkNode } from "../../../core/entities";
+import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -31,7 +32,7 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
       : `Canvas placement captured at x=${Math.round(pendingNewNodePosition.x)}, y=${Math.round(pendingNewNodePosition.y)}.`;
 
   return (
-<article className="panel" hidden={!isNodeSubScreen}>
+<article className="panel" hidden={!isNodeSubScreen} data-form-panel={FORM_PANEL_IDS.node}>
   {renderFormHeader(nodeFormMode === "create" ? "Create Node" : nodeFormMode === "edit" ? "Edit Node" : "Node form", nodeFormMode)}
   {nodeFormMode === "idle" ? renderIdleCopy("node", openCreateNodeForm) : (
   <form className="stack-form" onSubmit={handleNodeSubmit}>

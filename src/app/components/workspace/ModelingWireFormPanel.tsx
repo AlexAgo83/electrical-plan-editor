@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG, MAX_FREE_WIRE_COLOR_LABEL_LENGTH } from "../../../core/cableColors";
 import type { WireEndpoint } from "../../../core/entities";
+import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -93,7 +94,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
   );
 
   return (
-<article className="panel" hidden={!isWireSubScreen}>
+<article className="panel" hidden={!isWireSubScreen} data-form-panel={FORM_PANEL_IDS.wire}>
   {renderFormHeader(wireFormMode === "create" ? "Create Wire" : wireFormMode === "edit" ? "Edit Wire" : "Wire form", wireFormMode)}
   {wireFormMode === "idle" ? renderIdleCopy("wire", openCreateWireForm) : (
   <form className="stack-form" onSubmit={handleWireSubmit}>

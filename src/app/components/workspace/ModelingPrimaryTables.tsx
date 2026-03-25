@@ -3,6 +3,7 @@ import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
+import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
@@ -184,6 +185,39 @@ export function ModelingPrimaryTables({
     field: "id",
     direction: "asc"
   });
+  const openCreateConnectorAndScroll = () => {
+    onOpenCreateConnector();
+    scrollToFormPanel(FORM_PANEL_IDS.connector);
+  };
+  const openEditConnectorAndScroll = (connector: Connector) => {
+    onEditConnector(connector);
+    scrollToFormPanel(FORM_PANEL_IDS.connector);
+  };
+  const openEditConnector = (connector: Connector) => {
+    onEditConnector(connector);
+  };
+  const openCreateSpliceAndScroll = () => {
+    onOpenCreateSplice();
+    scrollToFormPanel(FORM_PANEL_IDS.splice);
+  };
+  const openEditSpliceAndScroll = (splice: Splice) => {
+    onEditSplice(splice);
+    scrollToFormPanel(FORM_PANEL_IDS.splice);
+  };
+  const openEditSplice = (splice: Splice) => {
+    onEditSplice(splice);
+  };
+  const openCreateNodeAndScroll = () => {
+    onOpenCreateNode();
+    scrollToFormPanel(FORM_PANEL_IDS.node);
+  };
+  const openEditNodeAndScroll = (node: NetworkNode) => {
+    onEditNode(node);
+    scrollToFormPanel(FORM_PANEL_IDS.node);
+  };
+  const openEditNode = (node: NetworkNode) => {
+    onEditNode(node);
+  };
   useEffect(() => {
     if (connectorSort.field !== "name" && connectorSort.field !== "technicalId") {
       return;
@@ -464,11 +498,11 @@ export function ModelingPrimaryTables({
                     className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
                     aria-selected={isFocused}
                     tabIndex={0}
-                    onClick={() => onEditConnector(connector)}
+                    onClick={() => openEditConnector(connector)}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        onEditConnector(connector);
+                        openEditConnector(connector);
                       }
                     }}
                   >
@@ -486,14 +520,14 @@ export function ModelingPrimaryTables({
           </>
         )}
         <div className="row-actions compact modeling-list-actions">
-          <button type="button" className="button-with-icon" onClick={onOpenCreateConnector}>
+            <button type="button" className="button-with-icon" onClick={openCreateConnectorAndScroll}>
             <span className="action-button-icon is-new" aria-hidden="true" />
             New
           </button>
           <button
             type="button"
             className="button-with-icon"
-            onClick={() => focusedConnector !== null && onEditConnector(focusedConnector)}
+            onClick={() => focusedConnector !== null && openEditConnectorAndScroll(focusedConnector)}
             disabled={focusedConnector === null}
           >
             <span className="action-button-icon is-edit" aria-hidden="true" />
@@ -608,11 +642,11 @@ export function ModelingPrimaryTables({
                     className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
                     aria-selected={isFocused}
                     tabIndex={0}
-                    onClick={() => onEditSplice(splice)}
+                    onClick={() => openEditSplice(splice)}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        onEditSplice(splice);
+                        openEditSplice(splice);
                       }
                     }}
                   >
@@ -630,14 +664,14 @@ export function ModelingPrimaryTables({
           </>
         )}
         <div className="row-actions compact modeling-list-actions">
-          <button type="button" className="button-with-icon" onClick={onOpenCreateSplice}>
+            <button type="button" className="button-with-icon" onClick={openCreateSpliceAndScroll}>
             <span className="action-button-icon is-new" aria-hidden="true" />
             New
           </button>
           <button
             type="button"
             className="button-with-icon"
-            onClick={() => focusedSplice !== null && onEditSplice(focusedSplice)}
+            onClick={() => focusedSplice !== null && openEditSpliceAndScroll(focusedSplice)}
             disabled={focusedSplice === null}
           >
             <span className="action-button-icon is-edit" aria-hidden="true" />
@@ -752,11 +786,11 @@ export function ModelingPrimaryTables({
                     className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
                     aria-selected={isFocused}
                     tabIndex={0}
-                    onClick={() => onEditNode(node)}
+                    onClick={() => openEditNode(node)}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        onEditNode(node);
+                        openEditNode(node);
                       }
                     }}
                   >
@@ -773,14 +807,14 @@ export function ModelingPrimaryTables({
           </>
         )}
         <div className="row-actions compact modeling-list-actions">
-          <button type="button" className="button-with-icon" onClick={onOpenCreateNode}>
+            <button type="button" className="button-with-icon" onClick={openCreateNodeAndScroll}>
             <span className="action-button-icon is-new" aria-hidden="true" />
             New
           </button>
           <button
             type="button"
             className="button-with-icon"
-            onClick={() => focusedNode !== null && onEditNode(focusedNode)}
+            onClick={() => focusedNode !== null && openEditNodeAndScroll(focusedNode)}
             disabled={focusedNode === null}
           >
             <span className="action-button-icon is-edit" aria-hidden="true" />

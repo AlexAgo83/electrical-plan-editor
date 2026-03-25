@@ -4,6 +4,7 @@ import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, nextSortState, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
+import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import type { SortState, UndoHistoryEntry } from "../../types/app-controller";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
@@ -451,7 +452,14 @@ export function NetworkScopeWorkspaceContent({
               <span className="action-button-icon is-open" aria-hidden="true" />
               Open
             </button>
-            <button type="button" className="network-scope-create-button button-with-icon" onClick={handleOpenCreateNetworkForm}>
+            <button
+              type="button"
+              className="network-scope-create-button button-with-icon"
+              onClick={() => {
+                handleOpenCreateNetworkForm();
+                scrollToFormPanel(FORM_PANEL_IDS.networkScope);
+              }}
+            >
               <span className="action-button-icon is-new" aria-hidden="true" />
               New
             </button>
@@ -507,7 +515,7 @@ export function NetworkScopeWorkspaceContent({
         </section>
       ) : null}
 
-      <section className="panel network-form-panel" hidden={!showNetworkFormPanel}>
+      <section className="panel network-form-panel" hidden={!showNetworkFormPanel} data-form-panel={FORM_PANEL_IDS.networkScope}>
         <header className="network-form-header">
           <h2>{isCreateMode ? "Create network" : "Edit network"}</h2>
           <span

@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ConnectorId, NetworkId } from "../core/entities";
 import { formatIsoToLocalDateInput } from "../core/networkMetadata";
 import { appActions, appReducer, createInitialState } from "../store";
@@ -14,8 +14,67 @@ function asNetworkId(value: string): NetworkId {
 }
 
 describe("App integration UI - networks", () => {
+  function installScrollIntoViewSpy() {
+    const scrollTargets: HTMLElement[] = [];
+    const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollIntoView");
+    const mock = vi.fn(function mockScrollIntoView(this: HTMLElement) {
+      scrollTargets.push(this);
+    });
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      writable: true,
+      value: mock
+    });
+
+    return {
+      scrollTargets,
+      restore() {
+        if (originalDescriptor === undefined) {
+          Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
+          return;
+        }
+        Object.defineProperty(HTMLElement.prototype, "scrollIntoView", originalDescriptor);
+      }
+    };
+  }
+
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  it("scrolls to the network form panel for the explicit New button only", async () => {
+    const scrollSpy = installScrollIntoViewSpy();
+
+    try {
+      renderAppWithState(createInitialState());
+      switchScreen("networkScope");
+
+      fireEvent.click(screen.getByRole("button", { name: "New" }));
+      const createPanel = getPanelByHeading("Create network");
+      await waitFor(() => {
+        expect(scrollSpy.scrollTargets).toContain(createPanel);
+      });
+    } finally {
+      scrollSpy.restore();
+    }
+  });
+
+  it("does not scroll to the network form when a row is clicked directly", async () => {
+    const scrollSpy = installScrollIntoViewSpy();
+
+    try {
+      renderAppWithState(createInitialState());
+      switchScreen("networkScope");
+
+      const networkScopePanel = getPanelByHeading("Network Scope");
+      fireEvent.click(within(networkScopePanel).getByText("Main network sample").closest("tr") as HTMLElement);
+      expect(getPanelByHeading("Edit network")).toBeInTheDocument();
+
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      expect(scrollSpy.scrollTargets).toHaveLength(0);
+    } finally {
+      scrollSpy.restore();
+    }
   });
 
   it("does not show the network form panel on Network Scope until a row is explicitly selected", () => {

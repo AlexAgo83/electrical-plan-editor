@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -27,7 +28,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
   const hasCatalogItems = catalogItems.length > 0;
 
   return (
-<article className="panel" hidden={!isConnectorSubScreen}>
+<article className="panel" hidden={!isConnectorSubScreen} data-form-panel={FORM_PANEL_IDS.connector}>
   {renderFormHeader(
     connectorFormMode === "create" ? "Create Connector" : connectorFormMode === "edit" ? "Edit Connector" : "Connector form",
     connectorFormMode

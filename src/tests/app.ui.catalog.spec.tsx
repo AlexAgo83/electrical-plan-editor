@@ -1,5 +1,5 @@
-import { fireEvent, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { appActions, appReducer, createInitialState } from "../store";
 import {
   asCatalogItemId,
@@ -12,6 +12,30 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - catalog", () => {
+  function installScrollIntoViewSpy() {
+    const scrollTargets: HTMLElement[] = [];
+    const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollIntoView");
+    const mock = vi.fn(function mockScrollIntoView(this: HTMLElement) {
+      scrollTargets.push(this);
+    });
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      writable: true,
+      value: mock
+    });
+
+    return {
+      scrollTargets,
+      restore() {
+        if (originalDescriptor === undefined) {
+          Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
+          return;
+        }
+        Object.defineProperty(HTMLElement.prototype, "scrollIntoView", originalDescriptor);
+      }
+    };
+  }
+
   beforeEach(() => {
     localStorage.clear();
   });
@@ -174,6 +198,71 @@ describe("App integration UI - catalog", () => {
     expect(within(connectorsUsagePanel as HTMLElement).getByText("Connector 1")).toBeInTheDocument();
     fireEvent.click(within(connectorsUsagePanel as HTMLElement).getByRole("button", { name: "Go to" }));
     expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
+  });
+
+  it("scrolls to the edit catalog item panel when clicking Edit", async () => {
+    const scrollSpy = installScrollIntoViewSpy();
+
+    try {
+      const state = appReducer(
+        createUiIntegrationState(),
+        appActions.upsertCatalogItem({
+          id: asCatalogItemId("CAT-SCROLL"),
+          manufacturerReference: "CAT-SCROLL",
+          connectionCount: 4
+        })
+      );
+      renderAppWithState(state);
+      fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+      switchScreenDrawerAware("modeling");
+
+      const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+      expect(secondaryNavRow).not.toBeNull();
+      fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+
+      const catalogPanel = getPanelByHeading("Catalog");
+      fireEvent.click(within(catalogPanel).getByText("CAT-SCROLL"));
+      scrollSpy.scrollTargets.length = 0;
+      fireEvent.click(within(catalogPanel).getByRole("button", { name: "Edit" }));
+
+      const editCatalogPanel = getPanelByHeading("Edit catalog item");
+      await waitFor(() => {
+        expect(scrollSpy.scrollTargets).toContain(editCatalogPanel);
+      });
+    } finally {
+      scrollSpy.restore();
+    }
+  });
+
+  it("does not scroll to the catalog form when selecting a row directly", async () => {
+    const scrollSpy = installScrollIntoViewSpy();
+
+    try {
+      const state = appReducer(
+        createUiIntegrationState(),
+        appActions.upsertCatalogItem({
+          id: asCatalogItemId("CAT-ROW"),
+          manufacturerReference: "CAT-ROW",
+          connectionCount: 2
+        })
+      );
+      renderAppWithState(state);
+      fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+      switchScreenDrawerAware("modeling");
+
+      const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+      expect(secondaryNavRow).not.toBeNull();
+      fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+
+      const catalogPanel = getPanelByHeading("Catalog");
+      fireEvent.click(within(catalogPanel).getByText("CAT-ROW"));
+      expect(getPanelByHeading("Edit catalog item")).toBeInTheDocument();
+
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      expect(scrollSpy.scrollTargets).toHaveLength(0);
+    } finally {
+      scrollSpy.restore();
+    }
   });
 
   it("shows immediate validation when selecting an incompatible catalog item in connector and splice forms", () => {
