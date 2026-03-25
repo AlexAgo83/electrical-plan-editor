@@ -1,8 +1,9 @@
 ## item_536_regression_tests_for_action_driven_scroll_to_create_and_edit_panels - Regression tests for action-driven scroll to create and edit panels
 > From version: 1.4.2
+> Status: Done
 > Understanding: 100%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Quality / UI regression coverage
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -50,3 +51,13 @@ Action-driven scroll behavior is timing-sensitive and easy to regress silently. 
   - `src/tests/app.ui.catalog.spec.tsx`
   - `src/tests/app.ui.networks.spec.tsx`
   - `src/tests/app.ui.navigation-canvas.spec.tsx`
+
+# Delivery
+- Added deterministic scroll-intent assertions for representative `New` and `Edit` flows.
+- Added non-regression coverage to confirm direct row selection does not trigger the new page scroll behavior.
+- Kept the assertions based on scroll requests rather than layout-pixel assumptions in jsdom.
+
+# Validation
+- `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx src/tests/app.ui.networks.spec.tsx`
+- `npm run -s lint`
+- `npm run -s typecheck`

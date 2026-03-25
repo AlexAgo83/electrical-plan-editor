@@ -1,8 +1,9 @@
 ## item_535_modeling_catalog_and_network_scope_new_edit_scroll_wiring - Modeling, Catalog, and Network Scope New/Edit scroll wiring
 > From version: 1.4.2
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: UX / Workspace wiring
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -56,3 +57,13 @@ Even with a shared helper, the app still needs consistent integration across the
   - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`
   - `src/app/hooks/controller/useAppControllerModelingAnalysisScreenDomains.tsx`
   - `src/app/hooks/controller/useAppControllerCatalogScreenDomains.tsx`
+
+# Delivery
+- Wired explicit `New` and `Edit` actions in `Modeling`, `Catalog`, and `Network Scope` to scroll to the corresponding form panel.
+- Added explicit form-panel targets so the scroll destination matches the opened create/edit panel rather than a generic column wrapper.
+- Preserved existing create/edit mode transitions and selection state without adding row-click auto-scroll.
+
+# Validation
+- `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx src/tests/app.ui.networks.spec.tsx`
+- `npm run -s lint`
+- `npm run -s typecheck`

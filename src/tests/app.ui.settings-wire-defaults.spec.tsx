@@ -7,12 +7,9 @@ import {
   switchScreenDrawerAware,
   switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
+import { clickNewFromPanel } from "./helpers/app-ui-form-test-utils";
 
 describe("App integration UI - settings wire/create defaults", () => {
-  function clickNewFromPanel(panelHeading: "Connectors" | "Splices" | "Wires"): void {
-    fireEvent.click(within(getPanelByHeading(panelHeading)).getByRole("button", { name: "New" }));
-  }
-
   beforeEach(() => {
     localStorage.clear();
   });

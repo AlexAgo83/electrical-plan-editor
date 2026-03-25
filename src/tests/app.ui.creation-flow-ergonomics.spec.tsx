@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { appActions, appReducer, createInitialState } from "../store";
 import {
   asCatalogItemId,
@@ -10,32 +10,8 @@ import {
   switchScreenDrawerAware,
   switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
-
+import { clickNewFromPanel, getInspectorPanelIfVisible, installScrollIntoViewSpy } from "./helpers/app-ui-form-test-utils";
 describe("App integration UI - creation flow ergonomics", () => {
-  function installScrollIntoViewSpy() {
-    const scrollTargets: HTMLElement[] = [];
-    const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollIntoView");
-    const mock = vi.fn(function mockScrollIntoView(this: HTMLElement) {
-      scrollTargets.push(this);
-    });
-    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
-      configurable: true,
-      writable: true,
-      value: mock
-    });
-
-    return {
-      scrollTargets,
-      restore() {
-        if (originalDescriptor === undefined) {
-          Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
-          return;
-        }
-        Object.defineProperty(HTMLElement.prototype, "scrollIntoView", originalDescriptor);
-      }
-    };
-  }
-
   function createInitialStateWithCatalog() {
     const withPrimaryCatalog = appReducer(
       createInitialState(),
@@ -45,14 +21,6 @@ describe("App integration UI - creation flow ergonomics", () => {
       withPrimaryCatalog,
       appActions.upsertCatalogItem({ id: asCatalogItemId("CAT-2"), manufacturerReference: "CAT-REF-2", connectionCount: 2 })
     );
-  }
-
-  function clickNewFromPanel(panelHeading: "Connectors" | "Splices" | "Nodes" | "Segments" | "Wires"): void {
-    fireEvent.click(within(getPanelByHeading(panelHeading)).getByRole("button", { name: "New" }));
-  }
-
-  function getInspectorPanelIfVisible(): HTMLElement | null {
-    return screen.queryByRole("heading", { name: "Inspector context" }) !== null ? getPanelByHeading("Inspector context") : null;
   }
 
   beforeEach(() => localStorage.clear());

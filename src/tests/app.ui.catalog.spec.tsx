@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { appActions, appReducer, createInitialState } from "../store";
 import {
   asCatalogItemId,
@@ -10,32 +10,9 @@ import {
   renderAppWithState,
   switchScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
+import { installScrollIntoViewSpy } from "./helpers/app-ui-form-test-utils";
 
 describe("App integration UI - catalog", () => {
-  function installScrollIntoViewSpy() {
-    const scrollTargets: HTMLElement[] = [];
-    const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollIntoView");
-    const mock = vi.fn(function mockScrollIntoView(this: HTMLElement) {
-      scrollTargets.push(this);
-    });
-    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
-      configurable: true,
-      writable: true,
-      value: mock
-    });
-
-    return {
-      scrollTargets,
-      restore() {
-        if (originalDescriptor === undefined) {
-          Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
-          return;
-        }
-        Object.defineProperty(HTMLElement.prototype, "scrollIntoView", originalDescriptor);
-      }
-    };
-  }
-
   beforeEach(() => {
     localStorage.clear();
   });
