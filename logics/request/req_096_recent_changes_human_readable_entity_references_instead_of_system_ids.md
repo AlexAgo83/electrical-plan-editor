@@ -6,6 +6,7 @@
 > Complexity: Medium
 > Theme: UX / History readability
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
+> Schema version: 1.0
 
 # Needs
 - Stop exposing opaque system IDs (UUID-like values) as primary text in `Recent changes`.
@@ -93,10 +94,14 @@
 
 # Backlog
 - To create from this request:
-  - `item_478_history_label_displayref_resolution_for_user_facing_entity_identifiers.md`
-  - `item_479_remove_update_action_history_refinement_using_previous_next_state_context.md`
-  - `item_480_recent_changes_persistence_compatibility_and_legacy_entry_non_regression.md`
-  - `item_481_req_096_history_readability_validation_matrix_and_closure_traceability.md`
+  - `item_538_history_label_displayref_resolution_for_user_facing_entity_identifiers.md`
+  - `item_539_remove_update_action_history_refinement_using_previous_next_state_context.md`
+  - `item_540_recent_changes_persistence_compatibility_and_legacy_entry_non_regression.md`
+  - `item_541_req_096_history_readability_validation_matrix_and_closure_traceability.md`
+
+# Delivery status
+- Status: planned.
+- Task: `logics/tasks/task_089_req_096_recent_changes_human_readable_entity_references_orchestration_and_delivery_control.md`.
 
 # References
 - `src/app/hooks/useStoreHistory.ts`
@@ -105,6 +110,7 @@
 - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`
 - `src/tests/app.ui.undo-redo-global.spec.tsx`
 - `src/tests/app.ui.networks.spec.tsx`
+- `logics/specs/req_096_history_readability_traceability.md`
 - `logics/request/req_066_global_undo_redo_history_for_modeling_and_catalog_mutations.md`
 - `logics/request/req_075_network_scope_recent_changes_panel_from_undo_history.md`
 - `logics/request/req_084_network_scope_recent_changes_persistence_across_app_relaunch.md`

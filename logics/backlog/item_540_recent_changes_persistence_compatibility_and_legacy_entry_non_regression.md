@@ -1,0 +1,48 @@
+## item_540_recent_changes_persistence_compatibility_and_legacy_entry_non_regression - Recent changes persistence compatibility and legacy entry non-regression
+> From version: 1.2.0
+> Status: Ready
+> Understanding: 100%
+> Confidence: 96%
+> Progress: 0%
+> Complexity: Medium
+> Theme: Persistence / History compatibility
+> Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
+> Schema version: 1.0
+
+# Problem
+Recent-changes labels are persisted across reload. Improving readability must not break loading of existing snapshots or produce incompatible persisted data for legacy entries.
+
+# Scope
+- In:
+  - keep persisted recent-changes entries loadable after readable-label improvements;
+  - preserve compatibility for legacy stored entries that still contain older labels;
+  - ensure newly generated readable labels persist and restore correctly;
+  - validate that recent-changes rendering remains stable after remount/reload.
+- Out:
+  - destructive persistence migration;
+  - broader undo/redo storage redesign.
+
+# Acceptance criteria
+- AC1: Existing recent-changes snapshots remain loadable after the history-label readability changes.
+- AC2: Newly generated readable labels persist and restore correctly across reload/remount.
+- AC3: Legacy stored entries remain renderable without runtime errors or destructive migration.
+- AC4: Recent-changes panel visibility/order semantics remain non-regressed after persistence restore.
+
+# AC Traceability
+- AC1/AC2/AC3/AC4 -> persistence adapter and recent-changes restore behavior.
+
+# Priority
+- Impact: Medium-High.
+- Urgency: High.
+
+# Notes
+- Derived from `logics/request/req_096_recent_changes_human_readable_entity_references_instead_of_system_ids.md`.
+- Depends on: `item_538`, `item_539`.
+- Orchestrated by `logics/tasks/task_089_req_096_recent_changes_human_readable_entity_references_orchestration_and_delivery_control.md`.
+- Risks:
+  - stale legacy labels may coexist with new labels for a period, requiring explicit non-regression expectations;
+  - persistence tests may miss restore-order or visibility subtleties if coverage is too narrow.
+- References:
+  - `src/adapters/persistence/recentChanges.ts`
+  - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`
+  - `src/tests/app.ui.networks.spec.tsx`
