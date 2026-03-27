@@ -1,5 +1,15 @@
 import { useState } from "react";
-import type { CatalogItemId, ConnectorId, NetworkNode, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
+import type {
+  CatalogItemId,
+  ConnectorId,
+  NetworkNode,
+  NodeId,
+  SegmentId,
+  SpliceId,
+  WireEndpoint,
+  WireId,
+  WireMaterial
+} from "../../core/entities";
 import type { SplicePortMode } from "../../core/splicePortMode";
 
 export function useEntityFormsState() {
@@ -61,6 +71,8 @@ export function useEntityFormsState() {
   const [wireName, setWireName] = useState("");
   const [wireTechnicalId, setWireTechnicalId] = useState("");
   const [wireSectionMm2, setWireSectionMm2] = useState("0.5");
+  const [wireCurrentA, setWireCurrentA] = useState("");
+  const [wireMaterial, setWireMaterial] = useState<WireMaterial>("copper");
   const [wireColorMode, setWireColorMode] = useState<"none" | "catalog" | "free">("none");
   const [wirePrimaryColorId, setWirePrimaryColorId] = useState("");
   const [wireSecondaryColorId, setWireSecondaryColorId] = useState("");
@@ -191,6 +203,10 @@ export function useEntityFormsState() {
     setWireTechnicalId,
     wireSectionMm2,
     setWireSectionMm2,
+    wireCurrentA,
+    setWireCurrentA,
+    wireMaterial,
+    setWireMaterial,
     wireColorMode,
     setWireColorMode,
     wirePrimaryColorId,

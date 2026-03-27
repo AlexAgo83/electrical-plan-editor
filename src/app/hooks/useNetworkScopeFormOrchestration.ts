@@ -15,6 +15,7 @@ interface UseNetworkScopeFormOrchestrationParams {
   setNewNetworkCreatedAtDate: Dispatch<SetStateAction<string>>;
   setNewNetworkDescription: Dispatch<SetStateAction<string>>;
   setNewNetworkAuthor: Dispatch<SetStateAction<string>>;
+  setNewNetworkVoltageV: Dispatch<SetStateAction<string>>;
   setNewNetworkProjectCode: Dispatch<SetStateAction<string>>;
   setNewNetworkLogoUrl: Dispatch<SetStateAction<string>>;
   setNewNetworkExportNotes: Dispatch<SetStateAction<string>>;
@@ -39,6 +40,7 @@ export function useNetworkScopeFormOrchestration({
   setNewNetworkCreatedAtDate,
   setNewNetworkDescription,
   setNewNetworkAuthor,
+  setNewNetworkVoltageV,
   setNewNetworkProjectCode,
   setNewNetworkLogoUrl,
   setNewNetworkExportNotes,
@@ -62,6 +64,7 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkCreatedAtDate(buildDefaultCreatedAtInput());
     setNewNetworkDescription("");
     setNewNetworkAuthor("");
+    setNewNetworkVoltageV("");
     setNewNetworkProjectCode("");
     setNewNetworkLogoUrl("");
     setNewNetworkExportNotes("");
@@ -72,6 +75,7 @@ export function useNetworkScopeFormOrchestration({
     setNetworkFormMode,
     setNetworkFormTargetId,
     setNewNetworkAuthor,
+    setNewNetworkVoltageV,
     setNewNetworkCreatedAtDate,
     setNewNetworkDescription,
     setNewNetworkExportNotes,
@@ -95,6 +99,7 @@ export function useNetworkScopeFormOrchestration({
       setNewNetworkCreatedAtDate(formatIsoToLocalDateInput(targetNetwork.createdAt));
       setNewNetworkDescription(targetNetwork.description ?? "");
       setNewNetworkAuthor(targetNetwork.author ?? "");
+      setNewNetworkVoltageV(targetNetwork.voltageV === undefined ? "" : String(targetNetwork.voltageV));
       setNewNetworkProjectCode(targetNetwork.projectCode ?? "");
       setNewNetworkLogoUrl(targetNetwork.logoUrl ?? "");
       setNewNetworkExportNotes(targetNetwork.exportNotes ?? "");
@@ -106,6 +111,7 @@ export function useNetworkScopeFormOrchestration({
       setNetworkFormMode,
       setNetworkFormTargetId,
       setNewNetworkAuthor,
+      setNewNetworkVoltageV,
       setNewNetworkCreatedAtDate,
       setNewNetworkDescription,
       setNewNetworkExportNotes,
@@ -170,6 +176,7 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkCreatedAtDate(formatIsoToLocalDateInput(targetNetwork.createdAt));
     setNewNetworkDescription(targetNetwork.description ?? "");
     setNewNetworkAuthor(targetNetwork.author ?? "");
+    setNewNetworkVoltageV(targetNetwork.voltageV === undefined ? "" : String(targetNetwork.voltageV));
     setNewNetworkProjectCode(targetNetwork.projectCode ?? "");
     setNewNetworkLogoUrl(targetNetwork.logoUrl ?? "");
     setNewNetworkExportNotes(targetNetwork.exportNotes ?? "");
@@ -180,6 +187,7 @@ export function useNetworkScopeFormOrchestration({
     setNetworkFormMode,
     setNetworkFormTargetId,
     setNewNetworkAuthor,
+    setNewNetworkVoltageV,
     setNewNetworkCreatedAtDate,
     setNewNetworkDescription,
     setNewNetworkExportNotes,

@@ -4,7 +4,7 @@
 > Status: In Progress
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 20%
+> Progress: 55%
 > Complexity: High
 > Theme: Cross-request delivery coordination for req_110 to req_112
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -58,9 +58,9 @@ flowchart LR
 # Plan
 - [x] 1. Deliver `item_546` shared alphabetical sorting contract for modeling dynamic dropdown options.
 - [x] 2. Deliver `item_547` modeling form dropdown wiring for alphabetical ordering and missing fallback pinning.
-- [ ] 3. Deliver `item_542` wire sizing metadata and recommendation core contract.
-- [ ] 4. Deliver `item_543` wire and network forms for assisted sizing with helper text and explicit `Apply`.
-- [ ] 5. Deliver `item_544` wire sizing persistence compatibility and standard section normalization.
+- [x] 3. Deliver `item_542` wire sizing metadata and recommendation core contract.
+- [x] 4. Deliver `item_543` wire and network forms for assisted sizing with helper text and explicit `Apply`.
+- [x] 5. Deliver `item_544` wire sizing persistence compatibility and standard section normalization.
 - [ ] 6. Deliver `item_549` dedicated blocked delete feedback modal and delete guard explanation orchestration.
 - [ ] 7. Deliver `item_550` delete dependency summary contract and representative impacted reference visibility.
 - [ ] 8. Deliver `item_551` safe connector and splice cascade delete confirmation and execution contract, only if the exact impact set is provably bounded.
@@ -131,8 +131,10 @@ flowchart LR
   - `req_112` last because delete UX and cascade behavior have the highest regression and integrity risk.
 - Completed waves:
   - `req_111` shared modeling dropdown ordering is delivered, including the reusable comparator helper, form wiring across the in-scope selects, missing fallback pinning, and targeted regression coverage.
+  - `req_110` assisted wire sizing is delivered, including new network/wire sizing metadata, centralized recommendation logic, helper-text plus explicit `Apply` UX, and persistence/import-export compatibility coverage.
 - Latest validation snapshot:
-  - `npm run -s typecheck`
   - `npm run -s lint`
+  - `npm run -s typecheck`
+  - `npm test -- --run src/tests/wire-sizing.spec.ts src/tests/store.reducer.networks.spec.ts src/tests/store.reducer.wires.spec.ts src/tests/portability.network-file.spec.ts src/tests/persistence.localStorage.spec.ts src/tests/app.ui.wire-sizing-recommendation.spec.tsx`
   - `npm test -- --run src/tests/modeling-select-options.spec.ts src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx`
   - `npm run -s build`

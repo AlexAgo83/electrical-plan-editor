@@ -21,6 +21,7 @@ import {
   normalizeNetworkLogoUrl,
   normalizeNetworkProjectCode
 } from "../../core/networkMetadata";
+import { normalizeNetworkVoltageV, normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeSplicePortMode, normalizeUnboundedPortCountFallback } from "../../core/splicePortMode";
 import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
@@ -108,6 +109,8 @@ function normalizeWiresEntityState(
     byId[wireId] = {
       ...wire,
       sectionMm2: resolveWireSectionMm2((wire as Partial<Wire>).sectionMm2),
+      currentA: normalizeWireCurrentA((wire as Partial<Wire>).currentA),
+      material: normalizeWireMaterial((wire as Partial<Wire>).material),
       ...normalizeWireColorState(
         (wire as Partial<Wire>).primaryColorId,
         (wire as Partial<Wire>).secondaryColorId,
@@ -358,13 +361,17 @@ function normalizeImportedNetworkTimestamps(
 function normalizeImportedNetworkMetadata(
   network: Network,
   warnings: string[]
-): Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes"> {
+): Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "voltageV"> {
   const normalizedAuthor = normalizeNetworkAuthor(network.author);
+  const normalizedVoltageV = normalizeNetworkVoltageV(network.voltageV);
   const normalizedProjectCode = normalizeNetworkProjectCode(network.projectCode);
   const normalizedLogoUrl = normalizeNetworkLogoUrl(network.logoUrl);
   const normalizedExportNotes = normalizeNetworkExportNotes(network.exportNotes);
 
   const appliedFixes: string[] = [];
+  if (network.voltageV !== undefined && normalizedVoltageV === undefined) {
+    appliedFixes.push("voltageV<-undefined");
+  }
   if (normalizedProjectCode !== undefined && !isNetworkProjectCodeValid(normalizedProjectCode)) {
     appliedFixes.push("projectCode<-undefined");
   }
@@ -378,6 +385,7 @@ function normalizeImportedNetworkMetadata(
 
   return {
     author: normalizedAuthor,
+    voltageV: normalizedVoltageV,
     projectCode:
       normalizedProjectCode !== undefined && isNetworkProjectCodeValid(normalizedProjectCode)
         ? normalizedProjectCode
@@ -426,6 +434,7 @@ export function buildNetworkFilePayload(
       const normalizedLogoUrl = normalizeNetworkLogoUrl(network.logoUrl);
       const normalizedNetwork: Network = {
         ...network,
+        voltageV: normalizeNetworkVoltageV(network.voltageV),
         author: normalizeNetworkAuthor(network.author),
         projectCode:
           normalizedProjectCode !== undefined && isNetworkProjectCodeValid(normalizedProjectCode)

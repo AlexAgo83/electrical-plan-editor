@@ -14,6 +14,7 @@ export function useNetworkScopeFormState() {
   const [newNetworkCreatedAtDate, setNewNetworkCreatedAtDate] = useState("");
   const [newNetworkDescription, setNewNetworkDescription] = useState("");
   const [newNetworkAuthor, setNewNetworkAuthor] = useState("");
+  const [newNetworkVoltageV, setNewNetworkVoltageV] = useState("");
   const [newNetworkProjectCode, setNewNetworkProjectCode] = useState("");
   const [newNetworkLogoUrl, setNewNetworkLogoUrl] = useState("");
   const [newNetworkExportNotes, setNewNetworkExportNotes] = useState("");
@@ -36,6 +37,8 @@ export function useNetworkScopeFormState() {
     setNewNetworkDescription,
     newNetworkAuthor,
     setNewNetworkAuthor,
+    newNetworkVoltageV,
+    setNewNetworkVoltageV,
     newNetworkProjectCode,
     setNewNetworkProjectCode,
     newNetworkLogoUrl,

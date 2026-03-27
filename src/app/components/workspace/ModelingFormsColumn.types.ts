@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import type { CatalogItem, Connector, NetworkNode, Splice, WireEndpoint } from "../../../core/entities";
+import type { CatalogItem, Connector, NetworkNode, Splice, WireEndpoint, WireMaterial } from "../../../core/entities";
 import type { SplicePortMode } from "../../../core/splicePortMode";
 import type { WireEndpointSlotHint } from "../../hooks/useWireHandlers";
 
@@ -96,6 +96,12 @@ export interface ModelingFormsColumnProps {
   setWireTechnicalId: (value: string) => void;
   wireSectionMm2: string;
   setWireSectionMm2: (value: string) => void;
+  wireCurrentA: string;
+  setWireCurrentA: (value: string) => void;
+  wireMaterial: WireMaterial;
+  setWireMaterial: (value: WireMaterial) => void;
+  recommendedWireSectionMm2: number | null;
+  handleApplyRecommendedWireSection: () => void;
   wireColorMode: "none" | "catalog" | "free";
   setWireColorMode: (value: "none" | "catalog" | "free") => void;
   wirePrimaryColorId: string;

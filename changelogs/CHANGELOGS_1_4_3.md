@@ -65,6 +65,20 @@
 - Added targeted coverage for readable label generation across representative entity kinds and for wire-delete labels in the recent-changes UI.
 - Preserved existing reload and Network Scope visibility regression coverage for recent-changes persistence behavior.
 
+## Version 1.4.3 - Req_110 Delivery
+
+### Assisted Wire Sizing
+
+- Networks now support optional `Voltage (V)` metadata used by assisted wire sizing.
+- Wires now support optional `Current (A)` and `Material`, with `Copper` as the default V1 material in forms.
+- The wire form now shows `Recommended section: X mm²` directly below `Section (mm²)` with an explicit `Apply` action.
+
+### Compatibility And Determinism
+
+- Recommendation logic is centralized and normalizes to a locked standard wire-section set.
+- Local persistence and network import/export now preserve `voltageV`, `currentA`, and `material`.
+- Legacy workspaces and imports that lack the new fields remain loadable without fake default voltage write-back.
+
 ## Validation and Regression Evidence
 
 - `npm run -s lint`

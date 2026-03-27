@@ -150,6 +150,47 @@ describe("network file portability", () => {
     });
   });
 
+  it("preserves network voltage and wire sizing metadata across export/import round-trip", () => {
+    const base = createSampleNetworkState();
+    const activeNetworkId = base.activeNetworkId;
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network in sample state.");
+    }
+
+    const sample = appReducer(
+      base,
+      appActions.updateNetwork(activeNetworkId, "Main network sample", "NET-MAIN-SAMPLE", "2026-03-01T08:00:00.000Z", undefined, {
+        voltageV: 24
+      })
+    );
+    const firstWireId = sample.wires.allIds[0];
+    if (firstWireId === undefined) {
+      throw new Error("Expected first wire in sample state.");
+    }
+
+    const firstWire = sample.wires.byId[firstWireId];
+    if (firstWire === undefined) {
+      throw new Error("Expected first wire payload.");
+    }
+
+    const enriched = appReducer(
+      sample,
+      appActions.upsertWire({
+        ...firstWire,
+        currentA: 12,
+        material: "copper"
+      })
+    );
+
+    const payload = buildNetworkFilePayload(enriched, "active", [], "2026-03-01T09:00:00.000Z");
+    const parsed = parseNetworkFilePayload(serializeNetworkFilePayload(payload));
+
+    expect(parsed.error).toBeNull();
+    expect(parsed.payload?.networks[0]?.network.voltageV).toBe(24);
+    expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.currentA).toBe(12);
+    expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.material).toBe("copper");
+  });
+
   it("normalizes imported wire side connection and seal references", () => {
     const seeded = createSampleNetworkState();
     const payload = buildNetworkFilePayload(seeded, "active", [], "2026-02-21T10:16:00.000Z");
