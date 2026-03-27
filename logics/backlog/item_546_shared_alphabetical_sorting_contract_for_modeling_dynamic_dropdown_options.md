@@ -1,10 +1,10 @@
 ## item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options - Shared alphabetical sorting contract for modeling dynamic dropdown options
 > From version: 1.4.3
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Modeling select option ordering / reusable sorting policy / deterministic presentation
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -82,3 +82,7 @@ flowchart LR
   - `src/app/components/workspace/ModelingSpliceFormPanel.tsx`
   - `src/app/components/workspace/ModelingNodeFormPanel.tsx`
   - `src/app/components/workspace/ModelingSegmentFormPanel.tsx`
+
+# Delivery
+- Introduced a shared modeling-select helper that sorts dynamic options by trimmed, case-insensitive visible label and falls back to technical ID, then entity ID, for deterministic ties.
+- The helper also supports pinning a selected missing compatibility option above the normal sorted list without mutating entity order in state.

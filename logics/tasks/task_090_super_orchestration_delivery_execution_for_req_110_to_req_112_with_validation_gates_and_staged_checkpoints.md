@@ -1,10 +1,10 @@
 ## task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints - Super orchestration delivery execution for req 110 to req 112 with validation gates and staged checkpoints
 > From version: 1.4.3
 > Schema version: 1.0
-> Status: Ready
+> Status: In Progress
 > Understanding: 97%
-> Confidence: 93%
-> Progress: 0%
+> Confidence: 95%
+> Progress: 20%
 > Complexity: High
 > Theme: Cross-request delivery coordination for req_110 to req_112
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -56,8 +56,8 @@ flowchart LR
 - Leave each completed wave in a coherent, commit-ready state.
 
 # Plan
-- [ ] 1. Deliver `item_546` shared alphabetical sorting contract for modeling dynamic dropdown options.
-- [ ] 2. Deliver `item_547` modeling form dropdown wiring for alphabetical ordering and missing fallback pinning.
+- [x] 1. Deliver `item_546` shared alphabetical sorting contract for modeling dynamic dropdown options.
+- [x] 2. Deliver `item_547` modeling form dropdown wiring for alphabetical ordering and missing fallback pinning.
 - [ ] 3. Deliver `item_542` wire sizing metadata and recommendation core contract.
 - [ ] 4. Deliver `item_543` wire and network forms for assisted sizing with helper text and explicit `Apply`.
 - [ ] 5. Deliver `item_544` wire sizing persistence compatibility and standard section normalization.
@@ -129,3 +129,10 @@ flowchart LR
   - `req_111` first because it is the most localized and de-risks form option handling with minimal architectural churn.
   - `req_110` second because it adds new contracts and compatibility work but remains less risky than destructive-action workflow changes.
   - `req_112` last because delete UX and cascade behavior have the highest regression and integrity risk.
+- Completed waves:
+  - `req_111` shared modeling dropdown ordering is delivered, including the reusable comparator helper, form wiring across the in-scope selects, missing fallback pinning, and targeted regression coverage.
+- Latest validation snapshot:
+  - `npm run -s typecheck`
+  - `npm run -s lint`
+  - `npm test -- --run src/tests/modeling-select-options.spec.ts src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx`
+  - `npm run -s build`
