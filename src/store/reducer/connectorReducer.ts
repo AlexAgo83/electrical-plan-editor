@@ -1,4 +1,5 @@
 import type { AppAction } from "../actions";
+import { analyzeConnectorDeleteImpact } from "../deleteImpact";
 import type { AppState } from "../types";
 import {
   bumpRevision,
@@ -149,6 +150,38 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
         connectors: removeEntity(state.connectors, action.payload.id),
         connectorCavityOccupancy: nextConnectorCavityOccupancy,
         ui: shouldClearSelection(state.ui.selected, "connector", action.payload.id)
+          ? { ...state.ui, selected: null, lastError: null }
+          : { ...state.ui, lastError: null }
+      });
+    }
+
+    case "connector/removeCascade": {
+      const impact = analyzeConnectorDeleteImpact(state, action.payload.id);
+      if (impact.kind === "direct") {
+        return handleConnectorActions(state, { type: "connector/remove", payload: action.payload });
+      }
+      if (impact.kind !== "cascade") {
+        return withError(state, "Cannot cascade remove connector while higher-level dependencies still reference it.");
+      }
+
+      const nextNodes = impact.linkedNodeIds.reduce((current, nodeId) => removeEntity(current, nodeId), state.nodes);
+      const nextNodePositions = { ...state.nodePositions };
+      for (const nodeId of impact.linkedNodeIds) {
+        delete nextNodePositions[nodeId];
+      }
+      const nextConnectorCavityOccupancy = { ...state.connectorCavityOccupancy };
+      delete nextConnectorCavityOccupancy[action.payload.id];
+      const shouldClearCurrentSelection =
+        shouldClearSelection(state.ui.selected, "connector", action.payload.id) ||
+        impact.linkedNodeIds.some((nodeId) => shouldClearSelection(state.ui.selected, "node", nodeId));
+
+      return bumpRevision({
+        ...clearLastError(state),
+        connectors: removeEntity(state.connectors, action.payload.id),
+        nodes: nextNodes,
+        nodePositions: nextNodePositions,
+        connectorCavityOccupancy: nextConnectorCavityOccupancy,
+        ui: shouldClearCurrentSelection
           ? { ...state.ui, selected: null, lastError: null }
           : { ...state.ui, lastError: null }
       });

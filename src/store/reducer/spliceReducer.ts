@@ -1,4 +1,5 @@
 import type { AppAction } from "../actions";
+import { analyzeSpliceDeleteImpact } from "../deleteImpact";
 import {
   normalizeSplicePortMode,
   normalizeUnboundedPortCountFallback,
@@ -178,6 +179,38 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
         splices: removeEntity(state.splices, action.payload.id),
         splicePortOccupancy: nextSplicePortOccupancy,
         ui: shouldClearSelection(state.ui.selected, "splice", action.payload.id)
+          ? { ...state.ui, selected: null, lastError: null }
+          : { ...state.ui, lastError: null }
+      });
+    }
+
+    case "splice/removeCascade": {
+      const impact = analyzeSpliceDeleteImpact(state, action.payload.id);
+      if (impact.kind === "direct") {
+        return handleSpliceActions(state, { type: "splice/remove", payload: action.payload });
+      }
+      if (impact.kind !== "cascade") {
+        return withError(state, "Cannot cascade remove splice while higher-level dependencies still reference it.");
+      }
+
+      const nextNodes = impact.linkedNodeIds.reduce((current, nodeId) => removeEntity(current, nodeId), state.nodes);
+      const nextNodePositions = { ...state.nodePositions };
+      for (const nodeId of impact.linkedNodeIds) {
+        delete nextNodePositions[nodeId];
+      }
+      const nextSplicePortOccupancy = { ...state.splicePortOccupancy };
+      delete nextSplicePortOccupancy[action.payload.id];
+      const shouldClearCurrentSelection =
+        shouldClearSelection(state.ui.selected, "splice", action.payload.id) ||
+        impact.linkedNodeIds.some((nodeId) => shouldClearSelection(state.ui.selected, "node", nodeId));
+
+      return bumpRevision({
+        ...clearLastError(state),
+        splices: removeEntity(state.splices, action.payload.id),
+        nodes: nextNodes,
+        nodePositions: nextNodePositions,
+        splicePortOccupancy: nextSplicePortOccupancy,
+        ui: shouldClearCurrentSelection
           ? { ...state.ui, selected: null, lastError: null }
           : { ...state.ui, lastError: null }
       });

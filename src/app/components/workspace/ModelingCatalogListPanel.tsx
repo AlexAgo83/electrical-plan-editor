@@ -50,6 +50,7 @@ export function ModelingCatalogListPanel({
   catalogCsvLastImportSummaryLine = null,
   onOpenCatalogOnboardingHelp
 }: ModelingCatalogListPanelProps): ReactElement {
+  void isSelectedCatalogItemReferenced;
   const isMobileViewport = useIsMobileViewport();
   const [filterField, setFilterField] = useState<CatalogFilterField>("any");
   const [filterQuery, setFilterQuery] = useState("");
@@ -269,7 +270,7 @@ export function ModelingCatalogListPanel({
           type="button"
           className="modeling-list-action-delete button-with-icon"
           onClick={() => selectedCatalogItem !== null && onDeleteCatalogItem(selectedCatalogItem.id)}
-          disabled={selectedCatalogItem === null || catalogFormMode === "create" || isSelectedCatalogItemReferenced}
+          disabled={selectedCatalogItem === null || catalogFormMode === "create"}
         >
           <span className="action-button-icon is-delete" aria-hidden="true" />
           Delete

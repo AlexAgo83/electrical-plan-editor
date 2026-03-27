@@ -8,6 +8,7 @@ import {
 } from "../../core/splicePortMode";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
+import { analyzeSpliceDeleteImpact } from "../../store/deleteImpact";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestAutoSpliceNodeId, suggestNextSpliceTechnicalId } from "../lib/technical-id-suggestions";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
@@ -320,21 +321,59 @@ export function useSpliceHandlers({
     }
 
     void (async () => {
-      const shouldDelete = await confirmAction({
-        title: "Delete splice",
-        message: `Delete splice '${splice.name}' (${splice.technicalId})?`,
-        confirmLabel: "Delete",
-        cancelLabel: "Cancel",
-        intent: "danger"
-      });
-      if (!shouldDelete) {
+      const impact = analyzeSpliceDeleteImpact(store.getState(), spliceId);
+
+      if (impact.kind === "direct") {
+        const shouldDelete = await confirmAction({
+          title: "Delete splice",
+          message: `Delete splice '${splice.name}' (${splice.technicalId})?`,
+          confirmLabel: "Delete",
+          cancelLabel: "Cancel",
+          intent: "danger"
+        });
+        if (!shouldDelete) {
+          return;
+        }
+
+        dispatchAction(appActions.removeSplice(spliceId));
+        if (editingSpliceId === spliceId) {
+          clearSpliceForm();
+        }
         return;
       }
 
-      dispatchAction(appActions.removeSplice(spliceId));
-      if (editingSpliceId === spliceId) {
-        clearSpliceForm();
+      if (impact.kind === "cascade") {
+        const shouldCascadeDelete = await confirmAction({
+          title: "Cascade delete splice",
+          message: impact.message,
+          confirmLabel: "Delete all",
+          cancelLabel: "Cancel",
+          intent: "danger",
+          variant: "deleteCascade",
+          summaryCategories: impact.categories,
+          summaryNote: impact.note
+        });
+        if (!shouldCascadeDelete) {
+          return;
+        }
+
+        dispatchAction(appActions.removeSpliceCascade(spliceId));
+        if (editingSpliceId === spliceId) {
+          clearSpliceForm();
+        }
+        return;
       }
+
+      await confirmAction({
+        title: "Splice delete blocked",
+        message: impact.message,
+        confirmLabel: "Close",
+        cancelLabel: "Cancel",
+        intent: "warning",
+        variant: "deleteBlocked",
+        summaryCategories: impact.categories,
+        summaryNote: impact.note
+      });
     })();
   }
 

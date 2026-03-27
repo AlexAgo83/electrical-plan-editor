@@ -2,6 +2,7 @@ import type { FormEvent } from "react";
 import type { CatalogItem, CatalogItemId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions, isValidCatalogUrlInput } from "../../store";
+import { analyzeCatalogDeleteImpact } from "../../store/deleteImpact";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 
@@ -179,21 +180,37 @@ export function useCatalogHandlers({
         ? `'${catalogItem.manufacturerReference}'`
         : `'${catalogItem.manufacturerReference}' (${catalogItem.name.trim()})`;
     void (async () => {
-      const shouldDelete = await confirmAction({
-        title: "Delete catalog item",
-        message: `Delete catalog item ${formattedIdentity}?`,
-        confirmLabel: "Delete",
-        cancelLabel: "Cancel",
-        intent: "danger"
-      });
-      if (!shouldDelete) {
+      const impact = analyzeCatalogDeleteImpact(store.getState(), catalogItemId);
+
+      if (impact.kind === "direct") {
+        const shouldDelete = await confirmAction({
+          title: "Delete catalog item",
+          message: `Delete catalog item ${formattedIdentity}?`,
+          confirmLabel: "Delete",
+          cancelLabel: "Cancel",
+          intent: "danger"
+        });
+        if (!shouldDelete) {
+          return;
+        }
+
+        dispatchAction(appActions.removeCatalogItem(catalogItemId));
+        if (editingCatalogItemId === catalogItemId) {
+          clearCatalogForm();
+        }
         return;
       }
 
-      dispatchAction(appActions.removeCatalogItem(catalogItemId));
-      if (editingCatalogItemId === catalogItemId) {
-        clearCatalogForm();
-      }
+      await confirmAction({
+        title: "Catalog item delete blocked",
+        message: impact.message,
+        confirmLabel: "Close",
+        cancelLabel: "Cancel",
+        intent: "warning",
+        variant: "deleteBlocked",
+        summaryCategories: impact.categories,
+        summaryNote: impact.note
+      });
     })();
   }
 

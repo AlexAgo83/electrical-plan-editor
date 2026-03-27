@@ -218,6 +218,7 @@ function actionVerb(action: AppAction, previousState: AppState): string {
     case "connector/upsert":
       return previousState.connectors.byId[action.payload.id] === undefined ? "created" : "updated";
     case "connector/remove":
+    case "connector/removeCascade":
       return "deleted";
     case "connector/occupyCavity":
       return "cavity occupied";
@@ -226,6 +227,7 @@ function actionVerb(action: AppAction, previousState: AppState): string {
     case "splice/upsert":
       return previousState.splices.byId[action.payload.id] === undefined ? "created" : "updated";
     case "splice/remove":
+    case "splice/removeCascade":
       return "deleted";
     case "splice/occupyPort":
       return "port occupied";
@@ -318,6 +320,7 @@ function resolveDisplayRef(action: AppAction, previousState: AppState, nextState
         resolveConnectorDisplayRef(previousState, action.payload.id)
       );
     case "connector/remove":
+    case "connector/removeCascade":
       return resolveConnectorDisplayRef(previousState, action.payload.id);
     case "connector/occupyCavity":
     case "connector/releaseCavity": {
@@ -335,6 +338,7 @@ function resolveDisplayRef(action: AppAction, previousState: AppState, nextState
         resolveSpliceDisplayRef(previousState, action.payload.id)
       );
     case "splice/remove":
+    case "splice/removeCascade":
       return resolveSpliceDisplayRef(previousState, action.payload.id);
     case "splice/occupyPort":
     case "splice/releasePort": {
