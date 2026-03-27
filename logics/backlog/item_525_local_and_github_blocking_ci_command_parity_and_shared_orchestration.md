@@ -22,6 +22,7 @@ The canonical local validation path is not aligned with the blocking GitHub CI w
   - optimization of total CI runtime beyond what is required for parity.
 
 ```mermaid
+%% logics-signature: backlog|local-and-github-blocking-ci-command-par|req-107-post-release-ci-csv-persistence-|the-canonical-local-validation-path-is|ac1-the-canonical-local-blocking-ci
 flowchart LR
     Req[Req 107] --> Problem[Local CI misses blocking remote gates]
     Problem --> Scope[Shared blocking validation path]

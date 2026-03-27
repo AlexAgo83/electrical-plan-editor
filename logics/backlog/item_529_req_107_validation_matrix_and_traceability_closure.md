@@ -21,6 +21,7 @@ Req_107 spans CI orchestration, CSV safety, persistence runtime behavior, and ex
   - new feature work beyond req_107 closure.
 
 ```mermaid
+%% logics-signature: backlog|req-107-validation-matrix-and-traceabili|req-107-post-release-ci-csv-persistence-|req-107-spans-ci-orchestration-csv-safet|ac1-validation-matrix-covers-req-107-acc
 flowchart LR
     Req[Req 107] --> Problem[Validation and traceability can fragment]
     Problem --> Scope[Explicit closure matrix]

@@ -22,6 +22,7 @@ The app currently swallows storage write failures silently. Users can continue e
   - broad redesign of the error-notification system.
 
 ```mermaid
+%% logics-signature: backlog|persistence-write-failure-runtime-feedba|req-107-post-release-ci-csv-persistence-|the-app-currently-swallows-storage-write|ac1-storage-write-failures-surface-a
 flowchart LR
     Req[Req 107] --> Problem[Silent local save failures]
     Problem --> Scope[Visible non blocking persistence error path]

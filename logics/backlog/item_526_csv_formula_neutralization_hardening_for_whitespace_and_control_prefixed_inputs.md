@@ -21,6 +21,7 @@ CSV export neutralization currently protects formula-like cells only when the da
   - unrelated export schema changes.
 
 ```mermaid
+%% logics-signature: backlog|csv-formula-neutralization-hardening-for|req-107-post-release-ci-csv-persistence-|csv-export-neutralization-currently-prot|ac1-strings-with-leading-whitespace-or
 flowchart LR
     Req[Req 107] --> Problem[CSV formula bypass with prefixed whitespace]
     Problem --> Scope[Harden neutralization in csv helper]
