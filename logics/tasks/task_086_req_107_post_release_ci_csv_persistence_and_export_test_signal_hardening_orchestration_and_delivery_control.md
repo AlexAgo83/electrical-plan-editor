@@ -18,6 +18,7 @@
   - `item_529_req_107_validation_matrix_and_traceability_closure`
 
 ```mermaid
+%% logics-signature: task|req-107-post-release-ci-csv-persistence-|item-525-local-and-github-blocking-ci-co|1-align-the-canonical-local-blocking|python3-logics-skills-logics-doc-linter-
 flowchart LR
     Req[Req 107] --> B1[CI parity]
     Req --> B2[CSV hardening]
