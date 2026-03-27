@@ -1,10 +1,10 @@
 ## item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration - Dedicated blocked delete feedback modal and delete guard explanation orchestration
 > From version: 1.4.3
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97%
 > Confidence: 93%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Delete UX clarity / modal feedback / reducer guard surfacing
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -82,3 +82,8 @@ flowchart LR
   - `src/app/components/dialogs/ConfirmDialog.tsx`
   - `src/app/components/workspace/AppHeaderAndStats.tsx`
   - `src/app/AppController.tsx`
+
+# Delivery
+- Introduced a dedicated delete-impact dialog variant for blocked delete attempts and routed delete flows through it instead of relying on the global error banner.
+- Preserved the existing standard confirmation modal for direct successful delete paths from `req_074`.
+- Enabled previously disabled catalog delete attempts to surface the blocked-delete explanation instead of silently preventing interaction.

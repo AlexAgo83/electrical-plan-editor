@@ -1,10 +1,10 @@
 ## item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility - Delete dependency summary contract and representative impacted reference visibility
 > From version: 1.4.3
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 96%
 > Confidence: 91%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Delete dependency inspection / impact summary / explanation detail
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -83,3 +83,8 @@ flowchart LR
   - `src/store/reducer/spliceReducer.ts`
   - `src/store/reducer/nodeReducer.ts`
   - `src/store/reducer/catalogReducer.ts`
+
+# Delivery
+- Added a shared delete-impact summary module that computes dependency categories, counts, and representative labels before the user confirms or dismisses a delete path.
+- Covered representative blocked flows for connectors, splices, nodes, segments, and catalog items with structured summaries instead of reducer-string-only feedback.
+- Reused the same summary contract for both explanation-only modals and cascade confirmation candidates.

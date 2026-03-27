@@ -1,10 +1,10 @@
 ## item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract - Safe connector and splice cascade delete confirmation and execution contract
 > From version: 1.4.3
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 94%
 > Confidence: 86%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Safe cascade deletion / impact-bounded destructive operations / integrity preservation
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -85,3 +85,8 @@ flowchart LR
   - `src/store/reducer/nodeReducer.ts`
   - `src/store/reducer/segmentReducer.ts`
   - `src/store/reducer/wireReducer.ts`
+
+# Delivery
+- Added conservative cascade delete support for `connector` and `splice` only when the exact impact set is limited to linked nodes and no wire endpoints or connected segments remain.
+- Implemented dedicated cascade delete actions so the supported connector/splice cascade path is recorded as one logical undo/redo operation.
+- Kept unsupported or unsafe cases on the explanation-only path, including all `node`, `segment`, `catalog item`, and `network` delete attempts.
