@@ -1,10 +1,10 @@
 ## item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning - Modeling form dropdown wiring for alphabetical option ordering and missing fallback pinning
 > From version: 1.4.3
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Modeling forms / dynamic select wiring / user-facing option ordering
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -82,3 +82,7 @@ flowchart LR
   - `src/app/components/workspace/ModelingWireFormPanel.tsx`
   - `src/app/components/workspace/ModelingNodeFormPanel.tsx`
   - `src/app/components/workspace/ModelingSegmentFormPanel.tsx`
+
+# Delivery
+- Wired the shared alphabetical ordering helper into connector, splice, node, segment, and wire dynamic selects in `Modeling`.
+- Preserved static semantic select ordering for mode/type enums while keeping selected missing fallback options visible in compatibility-sensitive edit states.

@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
+import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -25,6 +26,22 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
     cancelSegmentEdit,
     segmentFormError
   } = props;
+  const nodeOptions = buildModelingDynamicSelectOptions({
+    options: nodes.map((node) => ({
+      value: node.id,
+      label: describeNode(node)
+    })),
+    selectedValue: segmentNodeA,
+    missingOption: segmentNodeA.trim().length === 0 ? null : { label: `Missing node (${segmentNodeA})` }
+  });
+  const nodeBOptions = buildModelingDynamicSelectOptions({
+    options: nodes.map((node) => ({
+      value: node.id,
+      label: describeNode(node)
+    })),
+    selectedValue: segmentNodeB,
+    missingOption: segmentNodeB.trim().length === 0 ? null : { label: `Missing node (${segmentNodeB})` }
+  });
 
   return (
 <article className="panel" hidden={!isSegmentSubScreen} data-form-panel={FORM_PANEL_IDS.segment}>
@@ -43,14 +60,22 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
       Node A
       <select value={segmentNodeA} onChange={(event) => setSegmentNodeA(event.target.value)} required>
         <option value="">Select node</option>
-        {nodes.map((node) => (<option key={node.id} value={node.id}>{describeNode(node)}</option>))}
+        {nodeOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
       </select>
     </label>
     <label>
       Node B
       <select value={segmentNodeB} onChange={(event) => setSegmentNodeB(event.target.value)} required>
         <option value="">Select node</option>
-        {nodes.map((node) => (<option key={node.id} value={node.id}>{describeNode(node)}</option>))}
+        {nodeBOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
       </select>
     </label>
     <label>

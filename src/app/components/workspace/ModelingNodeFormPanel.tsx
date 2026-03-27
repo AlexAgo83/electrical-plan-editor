@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import type { NetworkNode } from "../../../core/entities";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
+import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -30,6 +31,26 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
     pendingNewNodePosition === null
       ? null
       : `Canvas placement captured at x=${Math.round(pendingNewNodePosition.x)}, y=${Math.round(pendingNewNodePosition.y)}.`;
+  const connectorOptions = buildModelingDynamicSelectOptions({
+    options: connectors.map((connector) => ({
+      value: connector.id,
+      label: `${connector.name} (${connector.technicalId})`,
+      technicalId: connector.technicalId
+    })),
+    selectedValue: nodeConnectorId,
+    missingOption:
+      nodeConnectorId.trim().length === 0 ? null : { label: `Missing connector (${nodeConnectorId})`, technicalId: nodeConnectorId }
+  });
+  const spliceOptions = buildModelingDynamicSelectOptions({
+    options: splices.map((splice) => ({
+      value: splice.id,
+      label: `${splice.name} (${splice.technicalId})`,
+      technicalId: splice.technicalId
+    })),
+    selectedValue: nodeSpliceId,
+    missingOption:
+      nodeSpliceId.trim().length === 0 ? null : { label: `Missing splice (${nodeSpliceId})`, technicalId: nodeSpliceId }
+  });
 
   return (
 <article className="panel" hidden={!isNodeSubScreen} data-form-panel={FORM_PANEL_IDS.node}>
@@ -64,8 +85,10 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
         Connector
         <select value={nodeConnectorId} onChange={(event) => setNodeConnectorId(event.target.value)} required>
           <option value="">Select connector</option>
-          {connectors.map((connector) => (
-            <option key={connector.id} value={connector.id}>{connector.name} ({connector.technicalId})</option>
+          {connectorOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
           ))}
         </select>
       </label>
@@ -76,8 +99,10 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
         Splice
         <select value={nodeSpliceId} onChange={(event) => setNodeSpliceId(event.target.value)} required>
           <option value="">Select splice</option>
-          {splices.map((splice) => (
-            <option key={splice.id} value={splice.id}>{splice.name} ({splice.technicalId})</option>
+          {spliceOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
           ))}
         </select>
       </label>

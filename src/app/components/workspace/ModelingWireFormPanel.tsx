@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG, MAX_FREE_WIRE_COLOR_LABEL_LENGTH } from "../../../core/cableColors";
 import type { WireEndpoint } from "../../../core/entities";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
+import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -74,6 +75,62 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
   const selectedFuseCatalogItemMissing =
     wireFuseCatalogItemId.trim().length > 0 &&
     !catalogItems.some((item) => item.id === wireFuseCatalogItemId);
+  const fuseCatalogItemOptions = buildModelingDynamicSelectOptions({
+    options: catalogItems.map((item) => ({
+      value: item.id,
+      label: `${item.manufacturerReference}${item.name?.trim() ? ` - ${item.name.trim()}` : ""}`
+    })),
+    selectedValue: wireFuseCatalogItemId,
+    missingOption: selectedFuseCatalogItemMissing ? { label: `Missing catalog item (${wireFuseCatalogItemId})` } : null
+  });
+  const connectorOptions = buildModelingDynamicSelectOptions({
+    options: connectors.map((connector) => ({
+      value: connector.id,
+      label: `${connector.name} (${connector.technicalId})`,
+      technicalId: connector.technicalId
+    })),
+    selectedValue: wireEndpointAConnectorId,
+    missingOption:
+      wireEndpointAConnectorId.trim().length === 0
+        ? null
+        : { label: `Missing connector (${wireEndpointAConnectorId})`, technicalId: wireEndpointAConnectorId }
+  });
+  const endpointASpliceOptions = buildModelingDynamicSelectOptions({
+    options: splices.map((splice) => ({
+      value: splice.id,
+      label: `${splice.name} (${splice.technicalId})`,
+      technicalId: splice.technicalId
+    })),
+    selectedValue: wireEndpointASpliceId,
+    missingOption:
+      wireEndpointASpliceId.trim().length === 0
+        ? null
+        : { label: `Missing splice (${wireEndpointASpliceId})`, technicalId: wireEndpointASpliceId }
+  });
+  const endpointBConnectorOptions = buildModelingDynamicSelectOptions({
+    options: connectors.map((connector) => ({
+      value: connector.id,
+      label: `${connector.name} (${connector.technicalId})`,
+      technicalId: connector.technicalId
+    })),
+    selectedValue: wireEndpointBConnectorId,
+    missingOption:
+      wireEndpointBConnectorId.trim().length === 0
+        ? null
+        : { label: `Missing connector (${wireEndpointBConnectorId})`, technicalId: wireEndpointBConnectorId }
+  });
+  const endpointBSpliceOptions = buildModelingDynamicSelectOptions({
+    options: splices.map((splice) => ({
+      value: splice.id,
+      label: `${splice.name} (${splice.technicalId})`,
+      technicalId: splice.technicalId
+    })),
+    selectedValue: wireEndpointBSpliceId,
+    missingOption:
+      wireEndpointBSpliceId.trim().length === 0
+        ? null
+        : { label: `Missing splice (${wireEndpointBSpliceId})`, technicalId: wireEndpointBSpliceId }
+  });
 
   const swatch = (hex: string | undefined, label: string): ReactElement => (
     <span
@@ -137,13 +194,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             aria-required={wireFuseEnabled}
           >
             <option value="">Select catalog item</option>
-            {selectedFuseCatalogItemMissing ? (
-              <option value={wireFuseCatalogItemId}>{`Missing catalog item (${wireFuseCatalogItemId})`}</option>
-            ) : null}
-            {catalogItems.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.manufacturerReference}
-                {item.name?.trim() ? ` - ${item.name.trim()}` : ""}
+            {fuseCatalogItemOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
               </option>
             ))}
           </select>
@@ -271,7 +324,11 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               Connector
               <select value={wireEndpointAConnectorId} onChange={(event) => setWireEndpointAConnectorId(event.target.value)}>
                 <option value="">Select connector</option>
-                {connectors.map((connector) => (<option key={connector.id} value={connector.id}>{connector.name} ({connector.technicalId})</option>))}
+                {connectorOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </label>
             <label>
@@ -288,7 +345,11 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               Splice
               <select value={wireEndpointASpliceId} onChange={(event) => setWireEndpointASpliceId(event.target.value)}>
                 <option value="">Select splice</option>
-                {splices.map((splice) => (<option key={splice.id} value={splice.id}>{splice.name} ({splice.technicalId})</option>))}
+                {endpointASpliceOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </label>
             <label>
@@ -338,7 +399,11 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               Connector
               <select value={wireEndpointBConnectorId} onChange={(event) => setWireEndpointBConnectorId(event.target.value)}>
                 <option value="">Select connector</option>
-                {connectors.map((connector) => (<option key={connector.id} value={connector.id}>{connector.name} ({connector.technicalId})</option>))}
+                {endpointBConnectorOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </label>
             <label>
@@ -355,7 +420,11 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               Splice
               <select value={wireEndpointBSpliceId} onChange={(event) => setWireEndpointBSpliceId(event.target.value)}>
                 <option value="">Select splice</option>
-                {splices.map((splice) => (<option key={splice.id} value={splice.id}>{splice.name} ({splice.technicalId})</option>))}
+                {endpointBSpliceOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </label>
             <label>
