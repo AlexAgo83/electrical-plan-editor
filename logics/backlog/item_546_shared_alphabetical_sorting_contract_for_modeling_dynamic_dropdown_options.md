@@ -2,8 +2,8 @@
 > From version: 1.4.3
 > Schema version: 1.0
 > Status: Done
-> Understanding: 97%
-> Confidence: 95%
+> Understanding: 98%
+> Confidence: 96%
 > Progress: 100%
 > Complexity: Medium
 > Theme: Modeling select option ordering / reusable sorting policy / deterministic presentation
@@ -53,11 +53,11 @@ flowchart LR
 - Product follow-up: No product brief follow-up is expected based on current signals.
 - Architecture framing: Required
 - Architecture signals: contracts and integration
-- Architecture follow-up: Existing request-level framing is sufficient for now; no additional ADR is required before backlog execution.
+- Architecture follow-up: Captured in `adr_001_modeling_assisted_sizing_and_guarded_delete_contracts`.
 
 # Links
 - Product brief(s): (none yet)
-- Architecture decision(s): (none yet)
+- Architecture decision(s): `adr_001_modeling_assisted_sizing_and_guarded_delete_contracts`
 - Request: `logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`
 - Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`
 

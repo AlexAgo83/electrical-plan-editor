@@ -174,12 +174,16 @@ describe("App integration UI - modeling dropdown ordering", () => {
     localStorage.clear();
   });
 
-  it("sorts dynamic modeling dropdowns alphabetically across connector, splice, node, segment, and wire forms", () => {
+  function openModelingCreateForm(subScreen: "connector" | "splice" | "node" | "segment" | "wire", panelLabel: string): void {
     renderAppWithState(createModelingDropdownOrderingState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
     switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware(subScreen);
+    clickNewFromPanel(panelLabel);
+  }
 
-    clickNewFromPanel("Connectors");
+  it("sorts connector and splice catalog dropdowns alphabetically", () => {
+    openModelingCreateForm("connector", "Connectors");
     const connectorFormPanel = getPanelByHeading("Create Connector");
     expect(getSelectOptionLabels(within(connectorFormPanel).getByLabelText("Catalog item (manufacturer reference)"))).toEqual([
       "Select a catalog item",
@@ -195,9 +199,10 @@ describe("App integration UI - modeling dropdown ordering", () => {
       "alpha fuse (2)",
       "Zulu fuse (4)"
     ]);
+  });
 
-    switchSubScreenDrawerAware("node");
-    clickNewFromPanel("Nodes");
+  it("sorts node and segment dropdowns alphabetically", () => {
+    openModelingCreateForm("node", "Nodes");
     const nodeFormPanel = getPanelByHeading("Create Node");
     fireEvent.change(within(nodeFormPanel).getByLabelText("Node kind"), { target: { value: "connector" } });
     expect(getSelectOptionLabels(within(nodeFormPanel).getByLabelText("Connector"))).toEqual([
@@ -222,9 +227,10 @@ describe("App integration UI - modeling dropdown ordering", () => {
       "MID",
       "Zulu connector (C-Z)"
     ]);
+  });
 
-    switchSubScreenDrawerAware("wire");
-    clickNewFromPanel("Wires");
+  it("sorts wire endpoint and fuse catalog dropdowns alphabetically", () => {
+    openModelingCreateForm("wire", "Wires");
     const wireFormPanel = getPanelByHeading("Create Wire");
     const endpointAFieldset = within(wireFormPanel).getByRole("group", { name: "Endpoint A" });
     const endpointBFieldset = within(wireFormPanel).getByRole("group", { name: "Endpoint B" });

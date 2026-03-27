@@ -20,12 +20,8 @@ describe("App integration UI - wire free color mode", () => {
     fireEvent.click(within(getPanelByHeading("Wires")).getByRole("button", { name: "New" }));
   }
 
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
-  it("supports free wire color labels with explicit mode switching and clears catalog colors", () => {
-    const { store } = renderAppWithState(createUiIntegrationDenseWiresState());
+  function createFreeColorWire(functionalName: string, technicalId: string, freeColorLabel: string): ReturnType<typeof renderAppWithState> {
+    const renderResult = renderAppWithState(createUiIntegrationDenseWiresState());
     closeOnboardingIfOpen();
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("wire");
@@ -43,15 +39,24 @@ describe("App integration UI - wire free color mode", () => {
     expect(within(createWirePanel).queryByLabelText("Primary color")).not.toBeInTheDocument();
     expect(within(createWirePanel).getByText("Free")).toBeInTheDocument();
     fireEvent.change(within(createWirePanel).getByLabelText("Free color label"), {
-      target: { value: "  Beige/Brown mix  " }
+      target: { value: freeColorLabel }
     });
 
-    fireEvent.change(within(createWirePanel).getByLabelText("Functional name"), { target: { value: "Free color wire" } });
-    fireEvent.change(within(createWirePanel).getByLabelText("Technical ID"), { target: { value: "W-FREE-UI-1" } });
+    fireEvent.change(within(createWirePanel).getByLabelText("Functional name"), { target: { value: functionalName } });
+    fireEvent.change(within(createWirePanel).getByLabelText("Technical ID"), { target: { value: technicalId } });
     fireEvent.change(within(endpointAFieldset).getByLabelText("Connector"), { target: { value: "C1" } });
     fireEvent.change(within(endpointBFieldset).getByLabelText("Splice"), { target: { value: "S1" } });
     fireEvent.click(within(createWirePanel).getByRole("button", { name: "Create" }));
 
+    return renderResult;
+  }
+
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("switches to free wire color mode and clears catalog colors on save", () => {
+    const { store } = createFreeColorWire("Free color wire", "W-FREE-UI-1", "  Beige/Brown mix  ");
     const editWirePanel = getPanelByHeading("Edit Wire");
     expect(within(editWirePanel).getByLabelText("Color mode")).toHaveValue("free");
     expect(within(editWirePanel).getByLabelText("Free color label")).toHaveValue("Beige/Brown mix");
@@ -68,7 +73,10 @@ describe("App integration UI - wire free color mode", () => {
     expect(savedWire?.primaryColorId).toBeNull();
     expect(savedWire?.secondaryColorId).toBeNull();
     expect(savedWire?.freeColorLabel).toBe("Beige/Brown mix");
+  });
 
+  it("renders saved free wire color labels in list and inspector context", () => {
+    createFreeColorWire("Free color wire", "W-FREE-UI-1", "  Beige/Brown mix  ");
     const wiresPanel = getPanelByHeading("Wires");
     const wireRow = within(wiresPanel).getByText("Free color wire").closest("tr");
     expect(wireRow).not.toBeNull();

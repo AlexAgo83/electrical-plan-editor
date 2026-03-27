@@ -16,6 +16,7 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.inspector-shell.spec.tsx",
   "src/tests/app.ui.lazy-loading-regression.spec.tsx",
   "src/tests/app.ui.list-ergonomics.spec.tsx",
+  "src/tests/app.ui.modeling-dropdown-ordering.spec.tsx",
   "src/tests/app.ui.navigation-canvas-selection-gating.spec.tsx",
   "src/tests/app.ui.navigation-canvas-validation-bridge.spec.tsx",
   "src/tests/app.ui.navigation-canvas.spec.tsx",
@@ -36,6 +37,7 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.undo-redo-global.spec.tsx",
   "src/tests/app.ui.validation.spec.tsx",
   "src/tests/app.ui.wire-free-color-mode.spec.tsx",
+  "src/tests/app.ui.wire-sizing-recommendation.spec.tsx",
   "src/tests/app.ui.workspace-shell-regression.spec.tsx"
 ];
 
