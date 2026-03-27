@@ -1,8 +1,8 @@
 ## req_096_recent_changes_human_readable_entity_references_instead_of_system_ids - Recent changes human-readable entity references instead of system IDs
-> From version: 1.2.0
-> Status: Draft
+> From version: 1.4.3
+> Status: Done
 > Understanding: 100%
-> Confidence: 97%
+> Confidence: 99%
 > Complexity: Medium
 > Theme: UX / History readability
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -99,9 +99,17 @@
   - `item_540_recent_changes_persistence_compatibility_and_legacy_entry_non_regression.md`
   - `item_541_req_096_history_readability_validation_matrix_and_closure_traceability.md`
 
-# Delivery status
-- Status: planned.
-- Task: `logics/tasks/task_089_req_096_recent_changes_human_readable_entity_references_orchestration_and_delivery_control.md`.
+# Delivery closure
+- Implemented through `task_089_req_096_recent_changes_human_readable_entity_references_orchestration_and_delivery_control`.
+- Delivered behavior:
+  - recent-changes history labels now resolve readable references from entity metadata and topology context instead of surfacing opaque IDs by default;
+  - delete and update flows reuse previous/next state to preserve human-readable target identity across mutations;
+  - persisted recent-changes entries remain loadable and newly generated readable labels restore correctly after reload.
+- Validation executed at closure:
+  - `npm test -- --run src/tests/recent-change-labels.spec.ts src/tests/app.ui.undo-redo-global.spec.tsx src/tests/app.ui.networks.spec.tsx`
+  - `npm run -s lint`
+  - `npm run -s typecheck`
+  - `npm run -s build`
 
 # References
 - `src/app/hooks/useStoreHistory.ts`

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { NetworkId } from "../../core/entities";
 import { loadRecentChangesMetadata, saveRecentChangesMetadata } from "../../adapters/persistence/recentChanges";
+import { buildReplaceStateHistoryEntry, buildUndoHistoryEntry } from "../lib/recentChangeLabels";
 import type { AppStore } from "../../store";
-import type { UndoHistoryEntry, UndoHistoryTargetKind } from "../types/app-controller";
+import type { UndoHistoryEntry } from "../types/app-controller";
 
 type StoreState = ReturnType<AppStore["getState"]>;
 
@@ -22,238 +22,6 @@ interface UseStoreHistoryResult {
   handleUndo: () => void;
   handleRedo: () => void;
   replaceStateWithHistory: (nextState: StoreState) => void;
-}
-
-type HistoryTrackableAction = Parameters<AppStore["dispatch"]>[0];
-
-function toTargetKind(actionType: HistoryTrackableAction["type"] | "history/replaceState"): UndoHistoryTargetKind {
-  const prefix = actionType.split("/")[0];
-  switch (prefix) {
-    case "network":
-    case "catalog":
-    case "connector":
-    case "splice":
-    case "node":
-    case "segment":
-    case "wire":
-    case "layout":
-      return prefix;
-    default:
-      return "workspace";
-  }
-}
-
-function targetKindLabel(kind: UndoHistoryTargetKind): string {
-  switch (kind) {
-    case "network":
-      return "Network";
-    case "catalog":
-      return "Catalog item";
-    case "connector":
-      return "Connector";
-    case "splice":
-      return "Splice";
-    case "node":
-      return "Node";
-    case "segment":
-      return "Segment";
-    case "wire":
-      return "Wire";
-    case "layout":
-      return "Layout";
-    case "workspace":
-      return "Workspace";
-  }
-}
-
-function resolveTargetId(action: HistoryTrackableAction): string | null {
-  switch (action.type) {
-    case "network/create":
-      return action.payload.network.technicalId || action.payload.network.id;
-    case "network/select":
-    case "network/setSummaryViewState":
-    case "network/rename":
-    case "network/delete":
-      return action.payload.id;
-    case "network/update":
-      return action.payload.technicalId || action.payload.id;
-    case "network/duplicate":
-      return action.payload.network.technicalId || action.payload.network.id;
-    case "network/importMany":
-      return `${action.payload.networks.length} network(s)`;
-    case "catalog/upsert":
-      return action.payload.manufacturerReference || action.payload.id;
-    case "catalog/remove":
-      return action.payload.id;
-    case "connector/upsert":
-      return action.payload.technicalId || action.payload.id;
-    case "connector/remove":
-      return action.payload.id;
-    case "connector/occupyCavity":
-    case "connector/releaseCavity":
-      return `${action.payload.connectorId}:${action.payload.cavityIndex + 1}`;
-    case "splice/upsert":
-      return action.payload.technicalId || action.payload.id;
-    case "splice/remove":
-      return action.payload.id;
-    case "splice/occupyPort":
-    case "splice/releasePort":
-      return `${action.payload.spliceId}:${action.payload.portIndex + 1}`;
-    case "node/upsert":
-    case "node/remove":
-      return action.payload.id;
-    case "node/rename":
-      return `${action.payload.fromId}→${action.payload.toId}`;
-    case "segment/upsert":
-    case "segment/remove":
-      return action.payload.id;
-    case "segment/rename":
-      return `${action.payload.fromId}→${action.payload.toId}`;
-    case "wire/save":
-      return action.payload.technicalId || action.payload.id;
-    case "wire/lockRoute":
-    case "wire/resetRoute":
-    case "wire/remove":
-      return action.payload.id;
-    case "wire/upsert":
-      return action.payload.technicalId || action.payload.id;
-    case "layout/setNodePosition":
-      return action.payload.nodeId;
-    case "layout/setNodePositions":
-      return `${Object.keys(action.payload.positions).length} node(s)`;
-    case "ui/select":
-    case "ui/setError":
-    case "ui/setThemeMode":
-    case "ui/clearSelection":
-    case "ui/clearError":
-      return null;
-  }
-}
-
-function resolveEntryNetworkId(action: HistoryTrackableAction, previousState: StoreState, nextState: StoreState): NetworkId | null {
-  switch (action.type) {
-    case "network/create":
-      return action.payload.network.id;
-    case "network/select":
-    case "network/setSummaryViewState":
-    case "network/rename":
-    case "network/update":
-    case "network/delete":
-      return action.payload.id;
-    case "network/duplicate":
-      return action.payload.network.id;
-    case "network/importMany":
-      return nextState.activeNetworkId ?? previousState.activeNetworkId;
-    default:
-      return previousState.activeNetworkId;
-  }
-}
-
-function actionVerb(action: HistoryTrackableAction, previousState: StoreState): string {
-  switch (action.type) {
-    case "network/create":
-      return "created";
-    case "network/select":
-      return "activated";
-    case "network/setSummaryViewState":
-      return "view updated";
-    case "network/rename":
-      return "renamed";
-    case "network/update":
-      return "updated";
-    case "network/duplicate":
-      return "duplicated";
-    case "network/delete":
-      return "deleted";
-    case "network/importMany":
-      return "imported";
-    case "catalog/upsert":
-      return previousState.catalogItems.byId[action.payload.id] === undefined ? "created" : "updated";
-    case "catalog/remove":
-      return "deleted";
-    case "connector/upsert":
-      return previousState.connectors.byId[action.payload.id] === undefined ? "created" : "updated";
-    case "connector/remove":
-      return "deleted";
-    case "connector/occupyCavity":
-      return "cavity occupied";
-    case "connector/releaseCavity":
-      return "cavity released";
-    case "splice/upsert":
-      return previousState.splices.byId[action.payload.id] === undefined ? "created" : "updated";
-    case "splice/remove":
-      return "deleted";
-    case "splice/occupyPort":
-      return "port occupied";
-    case "splice/releasePort":
-      return "port released";
-    case "node/upsert":
-      return previousState.nodes.byId[action.payload.id] === undefined ? "created" : "updated";
-    case "node/rename":
-      return "renamed";
-    case "node/remove":
-      return "deleted";
-    case "segment/upsert":
-      return previousState.segments.byId[action.payload.id] === undefined ? "created" : "updated";
-    case "segment/rename":
-      return "renamed";
-    case "segment/remove":
-      return "deleted";
-    case "wire/save":
-      return previousState.wires.byId[action.payload.id] === undefined ? "created" : "updated";
-    case "wire/lockRoute":
-      return "route locked";
-    case "wire/resetRoute":
-      return "route reset";
-    case "wire/upsert":
-      return previousState.wires.byId[action.payload.id] === undefined ? "created" : "updated";
-    case "wire/remove":
-      return "deleted";
-    case "layout/setNodePosition":
-    case "layout/setNodePositions":
-      return "updated";
-    case "ui/select":
-    case "ui/setError":
-    case "ui/setThemeMode":
-    case "ui/clearSelection":
-    case "ui/clearError":
-      return "updated";
-  }
-}
-
-function toUndoHistoryEntry(
-  action: HistoryTrackableAction,
-  previousState: StoreState,
-  nextState: StoreState,
-  sequence: number,
-  nowIso: string
-): UndoHistoryEntry {
-  const targetKind = toTargetKind(action.type);
-  const targetId = resolveTargetId(action);
-  const labelRoot = targetId === null ? targetKindLabel(targetKind) : `${targetKindLabel(targetKind)} '${targetId}'`;
-
-  return {
-    sequence,
-    actionType: action.type,
-    targetKind,
-    targetId,
-    networkId: resolveEntryNetworkId(action, previousState, nextState),
-    label: `${labelRoot} ${actionVerb(action, previousState)}`,
-    timestampIso: nowIso
-  };
-}
-
-function toReplaceStateHistoryEntry(sequence: number, previousState: StoreState, nextState: StoreState, nowIso: string): UndoHistoryEntry {
-  const activeNetworkId = nextState.activeNetworkId ?? previousState.activeNetworkId;
-  return {
-    sequence,
-    actionType: "history/replaceState",
-    targetKind: "workspace",
-    targetId: activeNetworkId,
-    networkId: activeNetworkId,
-    label: "Workspace state replaced",
-    timestampIso: nowIso
-  };
 }
 
 function getHighestHistorySequence(entries: UndoHistoryEntry[]): number {
@@ -331,7 +99,7 @@ export function useStoreHistory({
         return;
       }
 
-      const historyEntry = toUndoHistoryEntry(
+      const historyEntry = buildUndoHistoryEntry(
         action,
         previousState,
         nextState,
@@ -445,7 +213,7 @@ export function useStoreHistory({
         return;
       }
 
-      const historyEntry = toReplaceStateHistoryEntry(
+      const historyEntry = buildReplaceStateHistoryEntry(
         ++historyEntrySequenceRef.current,
         currentState,
         nextState,

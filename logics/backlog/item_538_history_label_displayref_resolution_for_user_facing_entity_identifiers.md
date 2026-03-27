@@ -1,9 +1,9 @@
 ## item_538_history_label_displayref_resolution_for_user_facing_entity_identifiers - History label displayRef resolution for user-facing entity identifiers
 > From version: 1.2.0
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UX / History readability
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -46,3 +46,7 @@
 - References:
   - `src/app/hooks/useStoreHistory.ts`
   - `src/app/types/app-controller.ts`
+
+# Delivery
+- Centralized recent-change label composition in a shared helper so readable `displayRef` resolution is defined once for networks, catalog items, connectors, splices, nodes, segments, wires, and layout events.
+- Preferred business-facing identifiers such as `technicalId`, manufacturer reference, linked node refs, and endpoint-derived segment text before falling back to generic kind wording.

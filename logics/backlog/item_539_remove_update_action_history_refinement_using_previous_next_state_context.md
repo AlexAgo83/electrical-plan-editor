@@ -1,9 +1,9 @@
 ## item_539_remove_update_action_history_refinement_using_previous_next_state_context - Remove/update action history refinement using previous/next state context
 > From version: 1.2.0
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UX / History correctness
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -45,3 +45,7 @@ Readable reference resolution is weakest on delete/update actions because payloa
 - References:
   - `src/app/hooks/useStoreHistory.ts`
   - `src/store/actions.ts`
+
+# Delivery
+- Refined history-label generation so delete actions resolve readable identifiers from `previousState` before entity removal.
+- Update-oriented history entries now combine `previousState` and `nextState` context to keep target labels readable even when payloads only carry internal IDs.
