@@ -47,6 +47,24 @@
   - representative `Edit` flows;
   - non-regression of row-click and indirect-selection no-scroll behavior.
 
+## Version 1.4.3 - Req_096 Delivery
+
+### Recent Changes Readability
+
+- Recent-changes history labels now prefer human-readable entity references instead of opaque storage identifiers.
+- Connectors, splices, wires, catalog items, nodes, segments, and layout events resolve labels from business-facing refs such as `technicalId`, manufacturer reference, linked node names, or endpoint-derived topology text.
+- Delete and update history entries preserve readable identity by using previous and next state context during label generation.
+
+### Persistence And Restore Safety
+
+- Existing persisted recent-changes entries remain loadable without migration.
+- Newly generated readable labels restore correctly after reload while undo/redo stack semantics stay unchanged.
+
+### Regression Coverage
+
+- Added targeted coverage for readable label generation across representative entity kinds and for wire-delete labels in the recent-changes UI.
+- Preserved existing reload and Network Scope visibility regression coverage for recent-changes persistence behavior.
+
 ## Validation and Regression Evidence
 
 - `npm run -s lint`

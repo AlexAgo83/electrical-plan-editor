@@ -1,9 +1,9 @@
 ## item_540_recent_changes_persistence_compatibility_and_legacy_entry_non_regression - Recent changes persistence compatibility and legacy entry non-regression
 > From version: 1.2.0
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Persistence / History compatibility
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -46,3 +46,7 @@ Recent-changes labels are persisted across reload. Improving readability must no
   - `src/adapters/persistence/recentChanges.ts`
   - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`
   - `src/tests/app.ui.networks.spec.tsx`
+
+# Delivery
+- Preserved recent-changes persistence shape so legacy stored entries continue to load without migration.
+- Added regression coverage for readable-label restore after reload and for continued alignment between recent-changes visibility and undo-stack state.

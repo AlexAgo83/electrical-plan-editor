@@ -3,10 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CATALOG_CSV_HEADERS } from "../app/lib/catalogCsv";
 import { appActions, appReducer, createInitialState } from "../store";
 import {
+  createUiIntegrationState,
   asCatalogItemId,
   getPanelByHeading,
   renderAppWithState,
-  switchScreenDrawerAware
+  switchScreenDrawerAware,
+  switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 
 function createStateWithCatalog() {
@@ -171,5 +173,24 @@ describe("App integration UI - global undo/redo", () => {
     openOpsPanel();
     expect(screen.getByRole("button", { name: "Undo" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Redo" })).toBeDisabled();
+  });
+
+  it("shows human-readable wire delete labels in Recent changes after deletion", async () => {
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+
+    const wiresPanel = getPanelByHeading("Wires");
+    fireEvent.click(within(wiresPanel).getByText("Wire 1"));
+    fireEvent.click(within(wiresPanel).getByRole("button", { name: "Delete" }));
+
+    const confirmDialog = await screen.findByRole("dialog", { name: "Delete wire" });
+    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Delete" }));
+
+    switchScreenDrawerAware("networkScope");
+    await waitFor(() => {
+      expect(screen.getByText("Wire 'W-1' deleted")).toBeInTheDocument();
+    });
   });
 });
