@@ -55,6 +55,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
 
     case "connector/upsert":
     case "connector/remove":
+    case "connector/removeCascade":
     case "connector/occupyCavity":
     case "connector/releaseCavity": {
       return finalizeDomainAction(state, handleConnectorActions(state, action) ?? state);
@@ -67,6 +68,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
 
     case "splice/upsert":
     case "splice/remove":
+    case "splice/removeCascade":
     case "splice/occupyPort":
     case "splice/releasePort": {
       return finalizeDomainAction(state, handleSpliceActions(state, action) ?? state);

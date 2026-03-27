@@ -2,6 +2,7 @@ import type { FormEvent } from "react";
 import type { CatalogItemId, Connector, ConnectorId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
+import { analyzeConnectorDeleteImpact } from "../../store/deleteImpact";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestAutoConnectorNodeId, suggestNextConnectorTechnicalId } from "../lib/technical-id-suggestions";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
@@ -275,21 +276,59 @@ export function useConnectorHandlers({
     }
 
     void (async () => {
-      const shouldDelete = await confirmAction({
-        title: "Delete connector",
-        message: `Delete connector '${connector.name}' (${connector.technicalId})?`,
-        confirmLabel: "Delete",
-        cancelLabel: "Cancel",
-        intent: "danger"
-      });
-      if (!shouldDelete) {
+      const impact = analyzeConnectorDeleteImpact(store.getState(), connectorId);
+
+      if (impact.kind === "direct") {
+        const shouldDelete = await confirmAction({
+          title: "Delete connector",
+          message: `Delete connector '${connector.name}' (${connector.technicalId})?`,
+          confirmLabel: "Delete",
+          cancelLabel: "Cancel",
+          intent: "danger"
+        });
+        if (!shouldDelete) {
+          return;
+        }
+
+        dispatchAction(appActions.removeConnector(connectorId));
+        if (editingConnectorId === connectorId) {
+          clearConnectorForm();
+        }
         return;
       }
 
-      dispatchAction(appActions.removeConnector(connectorId));
-      if (editingConnectorId === connectorId) {
-        clearConnectorForm();
+      if (impact.kind === "cascade") {
+        const shouldCascadeDelete = await confirmAction({
+          title: "Cascade delete connector",
+          message: impact.message,
+          confirmLabel: "Delete all",
+          cancelLabel: "Cancel",
+          intent: "danger",
+          variant: "deleteCascade",
+          summaryCategories: impact.categories,
+          summaryNote: impact.note
+        });
+        if (!shouldCascadeDelete) {
+          return;
+        }
+
+        dispatchAction(appActions.removeConnectorCascade(connectorId));
+        if (editingConnectorId === connectorId) {
+          clearConnectorForm();
+        }
+        return;
       }
+
+      await confirmAction({
+        title: "Connector delete blocked",
+        message: impact.message,
+        confirmLabel: "Close",
+        cancelLabel: "Cancel",
+        intent: "warning",
+        variant: "deleteBlocked",
+        summaryCategories: impact.categories,
+        summaryNote: impact.note
+      });
     })();
   }
 

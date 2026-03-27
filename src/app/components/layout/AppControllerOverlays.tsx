@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { ConfirmDialog } from "../dialogs/ConfirmDialog";
+import { DeleteImpactDialog } from "../dialogs/DeleteImpactDialog";
 import { OnboardingModal } from "../onboarding/OnboardingModal";
 import type { ActiveConfirmDialogState } from "../../hooks/controller/useConfirmDialogController";
 import type { OnboardingControllerModel } from "../../hooks/controller/useOnboardingController";
@@ -37,19 +38,37 @@ export function AppControllerOverlays({
   return (
     <>
       {activeConfirmDialog !== null ? (
-        <ConfirmDialog
-          isOpen={activeConfirmDialog !== null}
-          themeHostClassName={appShellClassName}
-          title={activeConfirmDialog.title}
-          message={activeConfirmDialog.message}
-          details={activeConfirmDialog.details}
-          confirmLabel={activeConfirmDialog.confirmLabel}
-          cancelLabel={activeConfirmDialog.cancelLabel}
-          intent={activeConfirmDialog.intent}
-          closeOnBackdrop={activeConfirmDialog.closeOnBackdrop}
-          onConfirm={() => closeActiveConfirmDialog(true)}
-          onCancel={() => closeActiveConfirmDialog(false)}
-        />
+        activeConfirmDialog.variant === "standard" ? (
+          <ConfirmDialog
+            isOpen={activeConfirmDialog !== null}
+            themeHostClassName={appShellClassName}
+            title={activeConfirmDialog.title}
+            message={activeConfirmDialog.message}
+            details={activeConfirmDialog.details}
+            confirmLabel={activeConfirmDialog.confirmLabel}
+            cancelLabel={activeConfirmDialog.cancelLabel}
+            intent={activeConfirmDialog.intent}
+            closeOnBackdrop={activeConfirmDialog.closeOnBackdrop}
+            onConfirm={() => closeActiveConfirmDialog(true)}
+            onCancel={() => closeActiveConfirmDialog(false)}
+          />
+        ) : (
+          <DeleteImpactDialog
+            isOpen={activeConfirmDialog !== null}
+            themeHostClassName={appShellClassName}
+            variant={activeConfirmDialog.variant}
+            title={activeConfirmDialog.title}
+            message={activeConfirmDialog.message}
+            categories={activeConfirmDialog.summaryCategories}
+            note={activeConfirmDialog.summaryNote}
+            confirmLabel={activeConfirmDialog.confirmLabel}
+            cancelLabel={activeConfirmDialog.cancelLabel}
+            intent={activeConfirmDialog.intent}
+            closeOnBackdrop={activeConfirmDialog.closeOnBackdrop}
+            onConfirm={() => closeActiveConfirmDialog(true)}
+            onCancel={() => closeActiveConfirmDialog(false)}
+          />
+        )
       ) : null}
       {onboarding.activeOnboardingStep !== undefined ? (
         <OnboardingModal

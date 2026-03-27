@@ -1,3 +1,5 @@
+import type { DeleteDependencySummaryCategory, DeleteImpactDialogVariant } from "./delete-impact-dialog";
+
 export type ConfirmDialogIntent = "neutral" | "warning" | "danger";
 
 export interface ConfirmDialogRequest {
@@ -8,4 +10,7 @@ export interface ConfirmDialogRequest {
   cancelLabel?: string;
   intent?: ConfirmDialogIntent;
   closeOnBackdrop?: boolean;
+  variant?: "standard" | DeleteImpactDialogVariant;
+  summaryCategories?: DeleteDependencySummaryCategory[];
+  summaryNote?: string;
 }
