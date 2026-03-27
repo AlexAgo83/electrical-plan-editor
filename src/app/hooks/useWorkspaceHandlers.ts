@@ -8,6 +8,7 @@ import {
   normalizeNetworkProjectCode,
   parseLocalDateInputToIso
 } from "../../core/networkMetadata";
+import { normalizeNetworkVoltageV } from "../../core/wireSizing";
 import type { AppState, AppStore, ThemeMode } from "../../store";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import {
@@ -62,6 +63,8 @@ interface UseWorkspaceHandlersParams {
   setNewNetworkDescription: (value: string) => void;
   newNetworkAuthor: string;
   setNewNetworkAuthor: (value: string) => void;
+  newNetworkVoltageV: string;
+  setNewNetworkVoltageV: (value: string) => void;
   newNetworkProjectCode: string;
   setNewNetworkProjectCode: (value: string) => void;
   newNetworkLogoUrl: string;
@@ -164,6 +167,8 @@ export function useWorkspaceHandlers({
   setNewNetworkDescription,
   newNetworkAuthor,
   setNewNetworkAuthor,
+  newNetworkVoltageV,
+  setNewNetworkVoltageV,
   newNetworkProjectCode,
   setNewNetworkProjectCode,
   newNetworkLogoUrl,
@@ -314,6 +319,14 @@ export function useWorkspaceHandlers({
       return;
     }
 
+    const rawVoltage = newNetworkVoltageV.trim();
+    const parsedVoltage = rawVoltage.length === 0 ? undefined : Number(rawVoltage);
+    const normalizedVoltageV = rawVoltage.length === 0 ? undefined : normalizeNetworkVoltageV(parsedVoltage);
+    if (rawVoltage.length > 0 && normalizedVoltageV === undefined) {
+      setNetworkFormError("Network voltage must be a positive value in V.");
+      return;
+    }
+
     const nowIso = new Date().toISOString();
     const networkId = createEntityId("net") as NetworkId;
     dispatchAction(
@@ -323,6 +336,7 @@ export function useWorkspaceHandlers({
         technicalId: trimmedTechnicalId,
         createdAt: createdAtIso,
         author: newNetworkAuthor,
+        voltageV: normalizedVoltageV,
         projectCode: newNetworkProjectCode,
         logoUrl: newNetworkLogoUrl,
         exportNotes: newNetworkExportNotes,
@@ -338,6 +352,7 @@ export function useWorkspaceHandlers({
       setNewNetworkCreatedAtDate(formatIsoToLocalDateInput(nowIso));
       setNewNetworkDescription("");
       setNewNetworkAuthor("");
+      setNewNetworkVoltageV("");
       setNewNetworkProjectCode("");
       setNewNetworkLogoUrl("");
       setNewNetworkExportNotes("");
@@ -395,6 +410,14 @@ export function useWorkspaceHandlers({
       return;
     }
 
+    const rawVoltage = newNetworkVoltageV.trim();
+    const parsedVoltage = rawVoltage.length === 0 ? undefined : Number(rawVoltage);
+    const normalizedVoltageV = rawVoltage.length === 0 ? undefined : normalizeNetworkVoltageV(parsedVoltage);
+    if (rawVoltage.length > 0 && normalizedVoltageV === undefined) {
+      setNetworkFormError("Network voltage must be a positive value in V.");
+      return;
+    }
+
     dispatchAction(
       appActions.updateNetwork(
         targetNetworkId,
@@ -405,6 +428,7 @@ export function useWorkspaceHandlers({
         {
           createdAt: createdAtIso,
           author: newNetworkAuthor,
+          voltageV: normalizedVoltageV,
           projectCode: newNetworkProjectCode,
           logoUrl: newNetworkLogoUrl,
           exportNotes: newNetworkExportNotes
@@ -435,6 +459,7 @@ export function useWorkspaceHandlers({
         technicalId,
         description: targetNetwork.description,
         author: targetNetwork.author,
+        voltageV: targetNetwork.voltageV,
         projectCode: targetNetwork.projectCode,
         logoUrl: targetNetwork.logoUrl,
         exportNotes: targetNetwork.exportNotes,

@@ -1,6 +1,7 @@
 import type { CatalogItemId, SegmentId, WireProtection } from "../../core/entities";
 import { normalizeWireColorState } from "../../core/cableColors";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
+import { normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { buildRoutingGraphIndex } from "../../core/graph";
 import { findShortestRoute } from "../../core/pathfinding";
 import type { AppAction } from "../actions";
@@ -91,6 +92,8 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
       const normalizedName = action.payload.name.trim();
       const normalizedTechnicalId = action.payload.technicalId.trim();
       const normalizedSectionMm2 = resolveWireSectionMm2(action.payload.sectionMm2);
+      const normalizedCurrentA = normalizeWireCurrentA(action.payload.currentA);
+      const normalizedMaterial = normalizeWireMaterial(action.payload.material);
       const normalizedColors = normalizeWireColorState(
         action.payload.primaryColorId,
         action.payload.secondaryColorId,
@@ -223,6 +226,8 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           name: normalizedName,
           technicalId: normalizedTechnicalId,
           sectionMm2: normalizedSectionMm2,
+          currentA: normalizedCurrentA,
+          material: normalizedMaterial,
           colorMode: normalizedColors.colorMode,
           primaryColorId: normalizedColors.primaryColorId,
           secondaryColorId: normalizedColors.secondaryColorId,
@@ -315,6 +320,8 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         name: action.payload.name.trim(),
         technicalId: action.payload.technicalId.trim(),
         sectionMm2: resolveWireSectionMm2(action.payload.sectionMm2),
+        currentA: normalizeWireCurrentA(action.payload.currentA),
+        material: normalizeWireMaterial(action.payload.material),
         ...normalizeWireColorState(
           action.payload.primaryColorId,
           action.payload.secondaryColorId,

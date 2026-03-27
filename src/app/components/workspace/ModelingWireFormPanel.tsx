@@ -19,6 +19,12 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireTechnicalId,
     wireSectionMm2,
     setWireSectionMm2,
+    wireCurrentA,
+    setWireCurrentA,
+    wireMaterial,
+    setWireMaterial,
+    recommendedWireSectionMm2,
+    handleApplyRecommendedWireSection,
     wireColorMode,
     setWireColorMode,
     wirePrimaryColorId,
@@ -174,6 +180,35 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         placeholder="0.5"
         required
       />
+    </label>
+    {recommendedWireSectionMm2 !== null ? (
+      <div className="stack-form">
+        <small className="inline-help">Recommended section: {recommendedWireSectionMm2} mm²</small>
+        <div className="row-actions compact">
+          <button type="button" className="button-with-icon" onClick={handleApplyRecommendedWireSection}>
+            <span className="action-button-icon is-save" aria-hidden="true" />
+            Apply
+          </button>
+        </div>
+      </div>
+    ) : null}
+    <label>
+      Current (A)
+      <input
+        type="number"
+        min={0.01}
+        step={0.01}
+        value={wireCurrentA}
+        onChange={(event) => setWireCurrentA(event.target.value)}
+        placeholder="10"
+      />
+    </label>
+    <label>
+      Material
+      <select value={wireMaterial} onChange={(event) => setWireMaterial(event.target.value as typeof wireMaterial)}>
+        <option value="copper">Copper</option>
+        <option value="aluminum">Aluminum</option>
+      </select>
     </label>
     <label className="settings-checkbox">
       <input

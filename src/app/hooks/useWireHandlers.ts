@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, type FormEvent } from "react";
 import type {
   CatalogItemId,
   ConnectorId,
+  WireMaterial,
   SegmentId,
   SpliceId,
   Wire,
@@ -17,6 +18,9 @@ import {
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { DEFAULT_WIRE_SECTION_MM2 } from "../../core/wireSection";
+import { buildRoutingGraphIndex } from "../../core/graph";
+import { findShortestRoute } from "../../core/pathfinding";
+import { computeRecommendedWireSectionMm2, normalizeWireCurrentA, resolveWireMaterial } from "../../core/wireSizing";
 import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
 import { suggestNextWireTechnicalId } from "../lib/technical-id-suggestions";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
@@ -26,6 +30,7 @@ import {
   getConnectorWayOccupant,
   getSplicePortOccupant
 } from "../lib/wire-endpoint-slot-helpers";
+import { findNodeIdForEndpoint } from "../../store/reducer/helpers/wireTransitions";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -48,6 +53,10 @@ interface UseWireHandlersParams {
   setWireTechnicalId: (value: string) => void;
   wireSectionMm2: string;
   setWireSectionMm2: (value: string) => void;
+  wireCurrentA: string;
+  setWireCurrentA: (value: string) => void;
+  wireMaterial: WireMaterial;
+  setWireMaterial: (value: WireMaterial) => void;
   wireColorMode: "none" | "catalog" | "free";
   setWireColorMode: (value: "none" | "catalog" | "free") => void;
   wirePrimaryColorId: string;
@@ -114,6 +123,10 @@ export function useWireHandlers({
   setWireTechnicalId,
   wireSectionMm2,
   setWireSectionMm2,
+  wireCurrentA,
+  setWireCurrentA,
+  wireMaterial,
+  setWireMaterial,
   wireColorMode,
   setWireColorMode,
   wirePrimaryColorId,
@@ -400,6 +413,132 @@ export function useWireHandlers({
     prefillNextAvailableEndpointIndex("B");
   }, [endpointBContextKey, wireFormMode, wireEndpointBKind, wireEndpointBCavityIndex, wireEndpointBPortIndex, prefillNextAvailableEndpointIndex]);
 
+  const buildWireEndpointPreview = useCallback(
+    (side: "A" | "B"): WireEndpoint | null => {
+      if (side === "A") {
+        if (wireEndpointAKind === "connectorCavity") {
+          if (wireEndpointAConnectorId.length === 0) {
+            return null;
+          }
+
+          const cavityIndex = toPositiveInteger(wireEndpointACavityIndex);
+          if (cavityIndex <= 0) {
+            return null;
+          }
+
+          return {
+            kind: "connectorCavity",
+            connectorId: wireEndpointAConnectorId as ConnectorId,
+            cavityIndex
+          };
+        }
+
+        if (wireEndpointASpliceId.length === 0) {
+          return null;
+        }
+
+        const portIndex = toPositiveInteger(wireEndpointAPortIndex);
+        if (portIndex <= 0) {
+          return null;
+        }
+
+        return {
+          kind: "splicePort",
+          spliceId: wireEndpointASpliceId as SpliceId,
+          portIndex
+        };
+      }
+
+      if (wireEndpointBKind === "connectorCavity") {
+        if (wireEndpointBConnectorId.length === 0) {
+          return null;
+        }
+
+        const cavityIndex = toPositiveInteger(wireEndpointBCavityIndex);
+        if (cavityIndex <= 0) {
+          return null;
+        }
+
+        return {
+          kind: "connectorCavity",
+          connectorId: wireEndpointBConnectorId as ConnectorId,
+          cavityIndex
+        };
+      }
+
+      if (wireEndpointBSpliceId.length === 0) {
+        return null;
+      }
+
+      const portIndex = toPositiveInteger(wireEndpointBPortIndex);
+      if (portIndex <= 0) {
+        return null;
+      }
+
+      return {
+        kind: "splicePort",
+        spliceId: wireEndpointBSpliceId as SpliceId,
+        portIndex
+      };
+    },
+    [
+      wireEndpointAKind,
+      wireEndpointAConnectorId,
+      wireEndpointACavityIndex,
+      wireEndpointASpliceId,
+      wireEndpointAPortIndex,
+      wireEndpointBKind,
+      wireEndpointBConnectorId,
+      wireEndpointBCavityIndex,
+      wireEndpointBSpliceId,
+      wireEndpointBPortIndex
+    ]
+  );
+
+  const draftEndpointA = buildWireEndpointPreview("A");
+  const draftEndpointB = buildWireEndpointPreview("B");
+  const recommendedWireSectionMm2 = (() => {
+    const normalizedCurrentA = normalizeWireCurrentA(Number(wireCurrentA.replace(",", ".").trim()));
+    if (normalizedCurrentA === undefined || draftEndpointA === null || draftEndpointB === null) {
+      return null;
+    }
+
+    const snapshot = store.getState();
+    if (snapshot.activeNetworkId === null) {
+      return null;
+    }
+    const voltageV = snapshot.networks.byId[snapshot.activeNetworkId]?.voltageV;
+    if (voltageV === undefined) {
+      return null;
+    }
+
+    const startNodeId = findNodeIdForEndpoint(snapshot, draftEndpointA);
+    const endNodeId = findNodeIdForEndpoint(snapshot, draftEndpointB);
+    if (startNodeId === undefined || endNodeId === undefined) {
+      return null;
+    }
+
+    const graph = buildRoutingGraphIndex(
+      snapshot.nodes.allIds
+        .map((nodeId) => snapshot.nodes.byId[nodeId])
+        .filter((node): node is NonNullable<typeof node> => node !== undefined),
+      snapshot.segments.allIds
+        .map((segmentId) => snapshot.segments.byId[segmentId])
+        .filter((segment): segment is NonNullable<typeof segment> => segment !== undefined)
+    );
+    const route = findShortestRoute(graph, startNodeId, endNodeId);
+    if (route === null) {
+      return null;
+    }
+
+    return computeRecommendedWireSectionMm2({
+      currentA: normalizedCurrentA,
+      material: wireMaterial,
+      voltageV,
+      lengthMm: route.totalLengthMm
+    });
+  })();
+
   function resetWireForm(): void {
     const state = store.getState();
     endpointAIndexTouchedByUserRef.current = false;
@@ -411,6 +550,8 @@ export function useWireHandlers({
     setWireName("");
     setWireTechnicalId(suggestNextWireTechnicalId(Object.values(state.wires.byId).map((wire) => wire.technicalId)));
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
+    setWireCurrentA("");
+    setWireMaterial("copper");
     setWireColorMode("none");
     setWirePrimaryColorId("");
     setWireSecondaryColorId("");
@@ -445,6 +586,8 @@ export function useWireHandlers({
     setWireName("");
     setWireTechnicalId("");
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
+    setWireCurrentA("");
+    setWireMaterial("copper");
     setWireColorMode("none");
     setWirePrimaryColorId("");
     setWireSecondaryColorId("");
@@ -513,6 +656,8 @@ export function useWireHandlers({
     setWireName(wire.name);
     setWireTechnicalId(wire.technicalId);
     setWireSectionMm2(String(wire.sectionMm2));
+    setWireCurrentA(wire.currentA === undefined ? "" : String(wire.currentA));
+    setWireMaterial(resolveWireMaterial(wire.material));
     const normalizedWireColorMode = getNormalizedWireColorMode(wire);
     const normalizedFreeColorLabel = normalizeFreeWireColorLabel(wire.freeColorLabel);
     if (normalizedWireColorMode === "free") {
@@ -677,6 +822,14 @@ export function useWireHandlers({
       setWireFormError("Wire section must be a positive value in mm².");
       return;
     }
+    const normalizedCurrentInput = wireCurrentA.replace(",", ".").trim();
+    const parsedCurrentA = normalizedCurrentInput.length === 0 ? undefined : Number(normalizedCurrentInput);
+    const normalizedCurrentA =
+      normalizedCurrentInput.length === 0 ? undefined : normalizeWireCurrentA(parsedCurrentA);
+    if (normalizedCurrentInput.length > 0 && normalizedCurrentA === undefined) {
+      setWireFormError("Wire current must be a positive value in A.");
+      return;
+    }
     let normalizedColors = normalizeWireColorState(null, null, null);
     if (wireColorMode === "catalog") {
       normalizedColors = normalizeWireColorState(wirePrimaryColorId, wireSecondaryColorId, null, "catalog");
@@ -725,6 +878,8 @@ export function useWireHandlers({
         name: normalizedName,
         technicalId: normalizedTechnicalId,
         sectionMm2: parsedSectionMm2,
+        currentA: normalizedCurrentA,
+        material: resolveWireMaterial(wireMaterial),
         colorMode: normalizedColors.colorMode,
         primaryColorId: normalizedColors.primaryColorId,
         secondaryColorId: normalizedColors.secondaryColorId,
@@ -811,6 +966,15 @@ export function useWireHandlers({
     }
   }
 
+  function handleApplyRecommendedWireSection(): void {
+    if (recommendedWireSectionMm2 === null) {
+      return;
+    }
+
+    setWireSectionMm2(String(recommendedWireSectionMm2));
+    setWireFormError(null);
+  }
+
   return {
     resetWireForm,
     clearWireForm,
@@ -849,6 +1013,8 @@ export function useWireHandlers({
     },
     wireEndpointASlotHint: computeEndpointSlotHint("A"),
     wireEndpointBSlotHint: computeEndpointSlotHint("B"),
+    recommendedWireSectionMm2,
+    handleApplyRecommendedWireSection,
     handleWireSubmit,
     handleSwapWireEndpoints,
     handleWireDelete,

@@ -9,12 +9,14 @@ export type SpliceId = Brand<string, "SpliceId">;
 export type NodeId = Brand<string, "NodeId">;
 export type SegmentId = Brand<string, "SegmentId">;
 export type WireId = Brand<string, "WireId">;
+export type WireMaterial = "copper" | "aluminum";
 
 export interface Network {
   id: NetworkId;
   name: string;
   technicalId: string;
   description?: string;
+  voltageV?: number;
   author?: string;
   projectCode?: string;
   logoUrl?: string;
@@ -107,6 +109,8 @@ export interface Wire {
   name: string;
   technicalId: string;
   sectionMm2: number;
+  currentA?: number;
+  material?: WireMaterial;
   colorMode?: WireColorMode;
   primaryColorId: string | null;
   secondaryColorId: string | null;

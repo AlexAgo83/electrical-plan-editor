@@ -47,6 +47,8 @@ interface NetworkScopeWorkspaceContentProps {
   setNewNetworkDescription: (value: string) => void;
   newNetworkAuthor: string;
   setNewNetworkAuthor: (value: string) => void;
+  newNetworkVoltageV: string;
+  setNewNetworkVoltageV: (value: string) => void;
   newNetworkProjectCode: string;
   setNewNetworkProjectCode: (value: string) => void;
   newNetworkLogoUrl: string;
@@ -87,6 +89,8 @@ export function NetworkScopeWorkspaceContent({
   setNewNetworkDescription,
   newNetworkAuthor,
   setNewNetworkAuthor,
+  newNetworkVoltageV,
+  setNewNetworkVoltageV,
   newNetworkProjectCode,
   setNewNetworkProjectCode,
   newNetworkLogoUrl,
@@ -575,6 +579,17 @@ export function NetworkScopeWorkspaceContent({
                 onChange={(event) => setNewNetworkAuthor(event.target.value)}
                 placeholder="Jane Doe"
                 maxLength={80}
+              />
+            </label>
+            <label className="stack-label">
+              <span className="network-form-label">Voltage (V, optional)</span>
+              <input
+                type="number"
+                min={0.01}
+                step={0.01}
+                value={newNetworkVoltageV}
+                onChange={(event) => setNewNetworkVoltageV(event.target.value)}
+                placeholder="12"
               />
             </label>
             <label className="stack-label">

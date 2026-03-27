@@ -8,6 +8,7 @@ import {
   normalizeNetworkLogoUrl,
   normalizeNetworkProjectCode
 } from "../../core/networkMetadata";
+import { normalizeNetworkVoltageV } from "../../core/wireSizing";
 import type { AppAction } from "../actions";
 import {
   cloneNetworkSummaryViewState,
@@ -165,8 +166,12 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         logoUrl: undefined,
         exportNotes: undefined
       });
+      const normalizedVoltageV = normalizeNetworkVoltageV(network.voltageV);
       if (normalizedMetadata.error !== null) {
         return withError(state, normalizedMetadata.error);
+      }
+      if (network.voltageV !== undefined && normalizedVoltageV === undefined) {
+        return withError(state, "Network voltage must be a positive number.");
       }
       const persisted = persistActiveNetworkSnapshot(clearLastError(state));
       const nextNetwork = {
@@ -174,6 +179,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         name: normalizedName,
         technicalId: normalizedTechnicalId,
         description: normalizeOptionalText(network.description),
+        voltageV: normalizedVoltageV,
         createdAt: normalizedCreatedAt,
         updatedAt: normalizedUpdatedAt,
         ...normalizedMetadata.metadata
@@ -284,8 +290,14 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           exportNotes: existing.exportNotes
         }
       );
+      const normalizedVoltageV = normalizeNetworkVoltageV(
+        action.payload.voltageV === undefined ? existing.voltageV : action.payload.voltageV
+      );
       if (normalizedMetadata.error !== null) {
         return withError(state, normalizedMetadata.error);
+      }
+      if (action.payload.voltageV !== undefined && normalizedVoltageV === undefined) {
+        return withError(state, "Network voltage must be a positive number.");
       }
       const nextState: AppState = {
         ...clearLastError(state),
@@ -294,6 +306,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           name: normalizedName,
           technicalId: normalizedTechnicalId,
           description: normalizeOptionalText(action.payload.description),
+          voltageV: normalizedVoltageV,
           createdAt: normalizeNetworkIsoTimestamp(action.payload.createdAt, existing.createdAt),
           updatedAt: normalizeNetworkIsoTimestamp(action.payload.updatedAt, existing.updatedAt),
           ...normalizedMetadata.metadata
@@ -327,8 +340,12 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         logoUrl: source.logoUrl,
         exportNotes: source.exportNotes
       });
+      const normalizedVoltageV = normalizeNetworkVoltageV(duplicated.voltageV);
       if (normalizedMetadata.error !== null) {
         return withError(state, normalizedMetadata.error);
+      }
+      if (duplicated.voltageV !== undefined && normalizedVoltageV === undefined) {
+        return withError(state, "Network voltage must be a positive number.");
       }
       const persisted = persistActiveNetworkSnapshot(clearLastError(state));
       const sourceScoped = persisted.networkStates[action.payload.sourceNetworkId];
@@ -343,6 +360,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
             name: normalizedName,
             technicalId: normalizedTechnicalId,
             description: normalizeOptionalText(duplicated.description),
+            voltageV: normalizedVoltageV,
             createdAt: normalizedCreatedAt,
             updatedAt: normalizedUpdatedAt,
             ...normalizedMetadata.metadata

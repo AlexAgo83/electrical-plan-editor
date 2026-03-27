@@ -190,6 +190,7 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     setNewNetworkCreatedAtDate: forms.networkScopeFormState.setNewNetworkCreatedAtDate,
     setNewNetworkDescription: forms.networkScopeFormState.setNewNetworkDescription,
     setNewNetworkAuthor: forms.networkScopeFormState.setNewNetworkAuthor,
+    setNewNetworkVoltageV: forms.networkScopeFormState.setNewNetworkVoltageV,
     setNewNetworkProjectCode: forms.networkScopeFormState.setNewNetworkProjectCode,
     setNewNetworkLogoUrl: forms.networkScopeFormState.setNewNetworkLogoUrl,
     setNewNetworkExportNotes: forms.networkScopeFormState.setNewNetworkExportNotes,

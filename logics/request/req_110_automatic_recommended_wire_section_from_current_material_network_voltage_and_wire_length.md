@@ -1,9 +1,9 @@
 ## req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length - Automatic recommended wire section from current, material, network voltage, and wire length
 > From version: 1.4.3
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 97% (scope clarified with the user: the feature should suggest a cable section from wire current, default copper material, network voltage, and the wire length already computed by the app)
-> Confidence: 92% (the current data model already stores `sectionMm2` and `lengthMm`, so the request is coherent if V1 stays at recommendation level rather than full electrical-compliance enforcement)
+> Status: Done
+> Understanding: 100% (implemented as a V1 assisted-sizing flow with network voltage, wire current/material, centralized recommendation logic, helper-text placement below `Section (mm²)`, and explicit `Apply`)
+> Confidence: 100% (the shipped behavior, compatibility paths, and targeted regression coverage now confirm the scoped request end to end)
 > Complexity: Medium-High
 > Theme: Wire sizing assistance / network electrical metadata / modeling ergonomics
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -192,6 +192,20 @@ flowchart TD
   - `npm run -s typecheck`
   - `npm test -- --run <targeted recommendation and form specs>`
   - `npm run -s build`
+
+# Delivery notes
+- Delivered in `task_090` after the lower-risk `req_111` wave.
+- V1 UX is locked as:
+  - helper text directly below `Section (mm²)`
+  - explicit `Apply`
+  - no automatic overwrite of `sectionMm2`
+- Implemented surfaces:
+  - `Network.voltageV`
+  - `Wire.currentA`
+  - `Wire.material`
+  - centralized recommendation logic and standard section normalization
+  - persistence and portability compatibility
+  - targeted reducer, portability, persistence, and UI regression coverage
 
 # Acceptance criteria
 - AC1: When a wire has valid current input, valid material input or default copper behavior, valid computed length, and the active network has valid voltage, the app can produce a recommended wire section.

@@ -9,6 +9,7 @@ import {
   normalizeNetworkLogoUrl,
   normalizeNetworkProjectCode
 } from "../../core/networkMetadata";
+import { normalizeNetworkVoltageV, normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeSplicePortMode, normalizeUnboundedPortCountFallback } from "../../core/splicePortMode";
 import type {
@@ -95,6 +96,8 @@ function normalizeWireEntityState(candidate: EntityState<Wire, WireId>): EntityS
     byId[wireId] = {
       ...wire,
       sectionMm2: resolveWireSectionMm2((wire as Partial<Wire>).sectionMm2),
+      currentA: normalizeWireCurrentA((wire as Partial<Wire>).currentA),
+      material: normalizeWireMaterial((wire as Partial<Wire>).material),
       ...normalizeWireColorState(
         (wire as Partial<Wire>).primaryColorId,
         (wire as Partial<Wire>).secondaryColorId,
@@ -261,6 +264,7 @@ function normalizeNetworkEntityState(
       name: normalizedName,
       technicalId: normalizedTechnicalId,
       description: typeof network.description === "string" ? network.description.trim() || undefined : undefined,
+      voltageV: normalizeNetworkVoltageV(network.voltageV),
       author: normalizeNetworkAuthor(network.author),
       projectCode:
         normalizedProjectCode !== undefined && isNetworkProjectCodeValid(normalizedProjectCode)

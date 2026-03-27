@@ -14,7 +14,8 @@ import type {
   WireEndpoint,
   WireProtection,
   Wire,
-  WireId
+  WireId,
+  WireMaterial
 } from "../core/entities";
 import type { WireColorMode } from "../core/cableColors";
 import type { LayoutNodePosition, NetworkScopedState, NetworkSummaryViewState, SelectionState, ThemeMode } from "./types";
@@ -45,6 +46,7 @@ export type AppAction =
         name: string;
         technicalId: string;
         description?: string;
+        voltageV?: number;
         createdAt?: string;
         author?: string;
         projectCode?: string;
@@ -98,6 +100,8 @@ export type AppAction =
         name: string;
         technicalId: string;
         sectionMm2?: number;
+        currentA?: number;
+        material?: WireMaterial;
         colorMode?: WireColorMode;
         primaryColorId?: string | null;
         secondaryColorId?: string | null;
@@ -144,6 +148,7 @@ export const appActions = {
     updatedAt: string,
     description?: string,
     metadata?: {
+      voltageV?: number;
       createdAt?: string;
       author?: string;
       projectCode?: string;
@@ -158,6 +163,7 @@ export const appActions = {
       technicalId,
       updatedAt,
       description,
+      voltageV: metadata?.voltageV,
       createdAt: metadata?.createdAt,
       author: metadata?.author,
       projectCode: metadata?.projectCode,
@@ -217,6 +223,8 @@ export const appActions = {
     name: string;
     technicalId: string;
     sectionMm2?: number;
+    currentA?: number;
+    material?: WireMaterial;
     colorMode?: WireColorMode;
     primaryColorId?: string | null;
     secondaryColorId?: string | null;

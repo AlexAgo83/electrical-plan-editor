@@ -104,6 +104,8 @@ export function useAppControllerAuxScreenContentDomains({
     setNewNetworkDescription: networkScope.formState.setNewNetworkDescription,
     newNetworkAuthor: networkScope.formState.newNetworkAuthor,
     setNewNetworkAuthor: networkScope.formState.setNewNetworkAuthor,
+    newNetworkVoltageV: networkScope.formState.newNetworkVoltageV,
+    setNewNetworkVoltageV: networkScope.formState.setNewNetworkVoltageV,
     newNetworkProjectCode: networkScope.formState.newNetworkProjectCode,
     setNewNetworkProjectCode: networkScope.formState.setNewNetworkProjectCode,
     newNetworkLogoUrl: networkScope.formState.newNetworkLogoUrl,
