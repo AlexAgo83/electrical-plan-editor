@@ -1,10 +1,10 @@
 ## item_552_req_112_validation_matrix_and_blocked_delete_closure_traceability - Req 112 validation matrix and blocked delete closure traceability
 > From version: 1.4.3
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 96%
 > Confidence: 92%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low-Medium
 > Theme: Quality / Validation / Traceability
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -76,3 +76,14 @@ flowchart LR
   - `logics/backlog/item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility.md`
   - `logics/backlog/item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract.md`
   - `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`
+
+# Closure
+- V1 explanation-only entity types are locked to `node`, `segment`, `catalog item`, and `network`.
+- V1 cascade delete is limited to safe `connector` and `splice` cases where the exact impact set is bounded to linked nodes only.
+- Blocked delete proof points are covered in representative UI flows for connector, splice, node, segment, and catalog items.
+
+# Validation
+- `npm run -s lint`
+- `npm run -s typecheck`
+- `npm test -- --run src/tests/app.ui.delete-confirmations.spec.tsx`
+- `npm run -s build`

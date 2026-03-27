@@ -1,9 +1,9 @@
 ## req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation - Explicit blocked delete feedback and dependency-aware cascade delete confirmation
 > From version: 1.4.3
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 97% (user clarified the UX problem: some delete attempts appear to do nothing when blocked by dependencies, and they want clearer feedback plus an explicit option to delete the related items when that is the intended action)
-> Confidence: 89% (the feedback part is straightforward, while cascade delete requires careful scoping so the product does not silently remove more data than expected)
+> Status: Done
+> Understanding: 100% (the delivered V1 contract is explicit: blocked deletes now surface dedicated impact dialogs with structured dependency summaries, while cascade delete remains limited to safe connector/splice cases with exact local impact)
+> Confidence: 98% (UI coverage, conservative cascade guards, and undo/redo proof points confirm the scoped req_112 behavior end to end)
 > Complexity: High
 > Theme: Destructive-action clarity / dependency visibility / safe cascade deletion
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -211,3 +211,9 @@ flowchart TD
 - `src/store/reducer/catalogReducer.ts`
 - `src/store/reducer/networkReducer.ts`
 - `src/tests/app.ui.delete-confirmations.spec.tsx`
+
+# Delivery
+- Added a dedicated delete-impact modal flow for blocked delete attempts so connector, splice, node, segment, and catalog guard failures no longer depend on the passive error banner.
+- Added a shared delete-impact summary contract with category counts and representative references for connector nodes, splice nodes, connected segments, wire endpoints, routed wires, connectors, splices, and fuse wires.
+- Enabled conservative V1 cascade delete only for connector/splice cases where the exact impact set is limited to the linked node set and no wires or connected segments remain.
+- Preserved normal delete confirmations for direct deletions and kept `node`, `segment`, `catalog item`, and `network` as explanation-only in V1.

@@ -79,10 +79,27 @@
 - Local persistence and network import/export now preserve `voltageV`, `currentA`, and `material`.
 - Legacy workspaces and imports that lack the new fields remain loadable without fake default voltage write-back.
 
+## Version 1.4.3 - Req_111 Delivery
+
+### Modeling Dropdown Ordering
+
+- Dynamic dropdowns in `Modeling` are now sorted alphabetically by the visible option label.
+- The shared sort contract keeps deterministic tie-breaks and preserves selected missing fallback options at the top when needed.
+- Static semantic selects keep their deliberate order and are not forced through the alphabetical policy.
+
+## Version 1.4.3 - Req_112 Delivery
+
+### Delete Feedback And Safe Cascade
+
+- Blocked delete attempts now open a dedicated impact dialog instead of feeling like a silent no-op.
+- The dialog summarizes dependency categories with counts and representative references for connectors, splices, nodes, segments, and catalog items.
+- Safe cascade delete is now available only for bounded `connector` and `splice` cases where the exact impact set is limited to linked nodes, and the cascade remains one logical undo/redo step.
+
 ## Validation and Regression Evidence
 
 - `npm run -s lint`
 - `npm run -s typecheck`
+- `npm test -- --run src/tests/app.ui.delete-confirmations.spec.tsx`
 - `npm test -- --run src/tests/network-summary-bom-csv.spec.ts src/tests/app.ui.network-summary-bom-export.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx src/tests/app.ui.networks.spec.tsx`
 - `npm run -s build`
 - `npm run -s ci:blocking`
