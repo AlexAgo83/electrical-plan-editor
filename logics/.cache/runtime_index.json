@@ -1,6 +1,6 @@
 {
   "cache_path": "logics/.cache/runtime_index.json",
-  "generated_at": "2026-03-25T14:55:52.202199+00:00",
+  "generated_at": "2026-03-27T14:43:18.099916+00:00",
   "skill_packages": {
     "logics/skills/logics-acceptance-to-tests": {
       "data": {
@@ -1743,11 +1743,11 @@
     }
   },
   "stats": {
-    "cache_hits": 789,
-    "cache_misses": 0,
-    "removed_entries": 0,
+    "cache_hits": 753,
+    "cache_misses": 50,
+    "removed_entries": 1,
     "skill_count": 47,
-    "workflow_doc_count": 742
+    "workflow_doc_count": 756
   },
   "workflow_docs": {
     "logics/backlog/item_000_v1_foundation_domain_model_and_store.md": {
@@ -42599,6 +42599,7 @@
             "  - optimization of total CI runtime beyond what is required for parity.",
             "",
             "```mermaid",
+            "%% logics-signature: backlog|local-and-github-blocking-ci-command-par|req-107-post-release-ci-csv-persistence-|the-canonical-local-validation-path-is|ac1-the-canonical-local-blocking-ci",
             "flowchart LR",
             "    Req[Req 107] --> Problem[Local CI misses blocking remote gates]",
             "    Problem --> Scope[Shared blocking validation path]",
@@ -42611,8 +42612,8 @@
         "title": "Local and GitHub blocking CI command parity and shared orchestration"
       },
       "signature": {
-        "mtime_ns": 1773097359065159102,
-        "size": 2680
+        "mtime_ns": 1774622550650904852,
+        "size": 2866
       }
     },
     "logics/backlog/item_526_csv_formula_neutralization_hardening_for_whitespace_and_control_prefixed_inputs.md": {
@@ -42691,6 +42692,7 @@
             "  - unrelated export schema changes.",
             "",
             "```mermaid",
+            "%% logics-signature: backlog|csv-formula-neutralization-hardening-for|req-107-post-release-ci-csv-persistence-|csv-export-neutralization-currently-prot|ac1-strings-with-leading-whitespace-or",
             "flowchart LR",
             "    Req[Req 107] --> Problem[CSV formula bypass with prefixed whitespace]",
             "    Problem --> Scope[Harden neutralization in csv helper]",
@@ -42703,8 +42705,8 @@
         "title": "CSV formula neutralization hardening for whitespace and control prefixed inputs"
       },
       "signature": {
-        "mtime_ns": 1773097359065462896,
-        "size": 2526
+        "mtime_ns": 1774622550651209020,
+        "size": 2717
       }
     },
     "logics/backlog/item_527_persistence_write_failure_runtime_feedback_without_reducer_instability.md": {
@@ -42785,6 +42787,7 @@
             "  - broad redesign of the error-notification system.",
             "",
             "```mermaid",
+            "%% logics-signature: backlog|persistence-write-failure-runtime-feedba|req-107-post-release-ci-csv-persistence-|the-app-currently-swallows-storage-write|ac1-storage-write-failures-surface-a",
             "flowchart LR",
             "    Req[Req 107] --> Problem[Silent local save failures]",
             "    Problem --> Scope[Visible non blocking persistence error path]",
@@ -42797,8 +42800,8 @@
         "title": "Persistence write failure runtime feedback without reducer instability"
       },
       "signature": {
-        "mtime_ns": 1773097359065697814,
-        "size": 2587
+        "mtime_ns": 1774622550651438480,
+        "size": 2776
       }
     },
     "logics/backlog/item_528_export_and_callout_measurement_fallback_signal_hardening_for_jsdom_canvas_gaps.md": {
@@ -42879,6 +42882,7 @@
             "  - weakening export tests just to silence logs.",
             "",
             "```mermaid",
+            "%% logics-signature: backlog|export-and-callout-measurement-fallback-|req-107-post-release-ci-csv-persistence-|export-cartouche-and-callout-measurement|ac1-unsupported-canvas-environments-fall",
             "flowchart LR",
             "    Req[Req 107] --> Problem[Canvas gaps flood CI logs]",
             "    Problem --> Scope[Deterministic unsupported canvas fallback]",
@@ -42891,8 +42895,8 @@
         "title": "Export and callout measurement fallback signal hardening for jsdom canvas gaps"
       },
       "signature": {
-        "mtime_ns": 1773097359065821357,
-        "size": 2970
+        "mtime_ns": 1774622550651660065,
+        "size": 3163
       }
     },
     "logics/backlog/item_529_req_107_validation_matrix_and_traceability_closure.md": {
@@ -42979,6 +42983,7 @@
             "  - new feature work beyond req_107 closure.",
             "",
             "```mermaid",
+            "%% logics-signature: backlog|req-107-validation-matrix-and-traceabili|req-107-post-release-ci-csv-persistence-|req-107-spans-ci-orchestration-csv-safet|ac1-validation-matrix-covers-req-107-acc",
             "flowchart LR",
             "    Req[Req 107] --> Problem[Validation and traceability can fragment]",
             "    Problem --> Scope[Explicit closure matrix]",
@@ -42991,8 +42996,8 @@
         "title": "Req 107 validation matrix and traceability closure"
       },
       "signature": {
-        "mtime_ns": 1773097359065916774,
-        "size": 2881
+        "mtime_ns": 1774622550651878900,
+        "size": 3074
       }
     },
     "logics/backlog/item_530_bom_wire_termination_aggregation_key_change_from_type_plus_reference_to_reference_only.md": {
@@ -43462,7 +43467,7 @@
         "title": "Shared form-panel scroll helper for explicit New and Edit actions"
       },
       "signature": {
-        "mtime_ns": 1774449076649674285,
+        "mtime_ns": 1774457034923875731,
         "size": 3102
       }
     },
@@ -43569,7 +43574,7 @@
         "title": "Modeling, Catalog, and Network Scope New/Edit scroll wiring"
       },
       "signature": {
-        "mtime_ns": 1774449076649753036,
+        "mtime_ns": 1774457034924025357,
         "size": 3615
       }
     },
@@ -43670,7 +43675,7 @@
         "title": "Regression tests for action-driven scroll to create and edit panels"
       },
       "signature": {
-        "mtime_ns": 1774449076649821120,
+        "mtime_ns": 1774457034924156400,
         "size": 3285
       }
     },
@@ -43771,7 +43776,7 @@
         "title": "Req 109 validation matrix and closure traceability"
       },
       "signature": {
-        "mtime_ns": 1774449076649887704,
+        "mtime_ns": 1774457034924295859,
         "size": 2998
       }
     },
@@ -43855,7 +43860,7 @@
         "title": "History label displayRef resolution for user-facing entity identifiers"
       },
       "signature": {
-        "mtime_ns": 1774445117413435741,
+        "mtime_ns": 1774457034924427485,
         "size": 2423
       }
     },
@@ -43938,7 +43943,7 @@
         "title": "Remove/update action history refinement using previous/next state context"
       },
       "signature": {
-        "mtime_ns": 1774445117413554783,
+        "mtime_ns": 1774457034924566695,
         "size": 2336
       }
     },
@@ -44022,7 +44027,7 @@
         "title": "Recent changes persistence compatibility and legacy entry non-regression"
       },
       "signature": {
-        "mtime_ns": 1774445117413629367,
+        "mtime_ns": 1774457034924723113,
         "size": 2314
       }
     },
@@ -44109,8 +44114,1419 @@
         "title": "Req 096 history readability validation matrix and closure traceability"
       },
       "signature": {
-        "mtime_ns": 1774445117413704534,
+        "mtime_ns": 1774457034924909490,
         "size": 2387
+      }
+    },
+    "logics/backlog/item_542_wire_sizing_metadata_and_recommendation_core_contract.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "req110, wire sizing, voltageV, currentA, material, copper, recommendation core, standard section",
+          "skip when": "Skip when only wiring UI fields or persistence paths without changing the core recommendation contract.",
+          "summary": "Establish the core domain contract for assisted wire sizing, including sizing metadata, standard section normalization, and deterministic recommendation behavior.",
+          "use when": "Use when implementing or reviewing the domain and core logic foundations for assisted wire sizing."
+        },
+        "indicators": {
+          "Complexity": "Medium-High",
+          "Confidence": "93%",
+          "From version": "1.4.3",
+          "Progress": "0%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Ready",
+          "Theme": "Wire sizing domain model / recommendation core / deterministic contracts",
+          "Understanding": "97%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_542_wire_sizing_metadata_and_recommendation_core_contract.md",
+        "ref": "item_542_wire_sizing_metadata_and_recommendation_core_contract",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_542_wire_sizing_metadata_and_recommendation_core_contract"
+          ],
+          "prod": [],
+          "req": [
+            "req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> domain entities and action payloads are extended coherently. Proof: updated entity and store contracts compile and are consumed by downstream slices.",
+            "- AC2 -> fallback behavior stays explicit. Proof: core/reducer tests cover missing material resolving to `copper`.",
+            "- AC3 -> sizing logic is deterministic. Proof: unit tests cover valid recommendations and null-result cases.",
+            "- AC4 -> no hidden alternate length contract is introduced. Proof: recommendation inputs consume stored `lengthMm`.",
+            "- AC5 -> section normalization source is unique. Proof: shared core constant/helper is imported by consumers.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Establish the core domain contract for assisted wire sizing, including sizing metadata, standard section normalization, and deterministic recommendation behavior.",
+            "- Keywords: req110, wire sizing, voltageV, currentA, material, copper, recommendation core, standard section",
+            "- Use when: Use when implementing or reviewing the domain and core logic foundations for assisted wire sizing.",
+            "- Skip when: Skip when only wiring UI fields or persistence paths without changing the core recommendation contract.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: `Network` supports optional positive `voltageV` and `Wire` supports optional `currentA` plus `material`.",
+            "- AC2: V1 default material behavior resolves missing wire material to `copper`.",
+            "- AC3: A centralized recommendation function returns either a normalized standard section or `null` when required inputs are missing or invalid.",
+            "- AC4: The recommendation contract uses the existing wire `lengthMm` as the V1 length input.",
+            "- AC5: Supported standard section values are defined in one shared core contract rather than duplicated in UI code.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Required",
+            "- Architecture signals: contracts and integration",
+            "- Architecture follow-up: Existing request-level framing is sufficient for now; no additional ADR is required before backlog execution.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Request: `logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md`",
+            "- Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Notes": [
+            "- Dependencies: `req_110`.",
+            "- Blocks: `item_543`, `item_544`, `item_545`, `task_090`.",
+            "- Related AC: AC1, AC2, AC5, AC8.",
+            "- References:",
+            "  - `logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md`",
+            "  - `src/core/entities.ts`",
+            "  - `src/core/wireSection.ts`",
+            "  - `src/store/actions.ts`",
+            "  - `src/store/reducer/networkReducer.ts`",
+            "  - `src/store/reducer/wireReducer.ts`"
+          ],
+          "Priority": [
+            "- Impact: High.",
+            "- Urgency: High.",
+            ""
+          ],
+          "Problem": [
+            "`req_110` requires assisted wire sizing, but the current model only stores manual `sectionMm2` and computed `lengthMm`. Without a clear domain contract for sizing inputs and recommendation output, later UI and persistence work would duplicate logic and drift.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - extend the domain contract with `Network.voltageV` and wire sizing inputs (`currentA`, `material`);",
+            "  - define the V1 default material behavior (`copper`);",
+            "  - add a centralized recommendation core that consumes `currentA`, `material`, `voltageV`, and `lengthMm`;",
+            "  - lock the supported standard section list used for normalization;",
+            "  - define deterministic null-result behavior when required inputs are missing or invalid.",
+            "- Out:",
+            "  - form field wiring and `Apply` interaction (handled in `item_543`);",
+            "  - persistence/import-export compatibility work (handled in `item_544`);",
+            "  - final validation/closure traceability (handled in `item_545`).",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|wire-sizing-metadata-and-recommendation-|req-110-automatic-recommended-wire-secti|req-110-requires-assisted-wire-sizing-bu|ac1-network-supports-optional-positive-v",
+            "flowchart LR",
+            "    Request[req110 assisted wire sizing] --> Problem[Domain inputs and outputs need one contract]",
+            "    Problem --> Scope[Add voltage current material and recommendation core]",
+            "    Scope --> Acceptance[AC1 deterministic recommendation core]",
+            "    Acceptance --> Task[task090 orchestration]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Wire sizing metadata and recommendation core contract"
+      },
+      "signature": {
+        "mtime_ns": 1774622550652644989,
+        "size": 4864
+      }
+    },
+    "logics/backlog/item_543_wire_and_network_forms_for_voltage_current_material_and_section_recommendation_apply_flow.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "req110, wire form, network form, voltage, current, material, recommended section, apply",
+          "skip when": "Skip when only changing core contracts or persistence without form-level behavior.",
+          "summary": "Surface assisted wire sizing in the UI by wiring network voltage, wire current/material, and a visible recommendation with explicit apply semantics.",
+          "use when": "Use when implementing or reviewing the user-facing assisted sizing flow in forms."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "94%",
+          "From version": "1.4.3",
+          "Progress": "0%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Ready",
+          "Theme": "Modeling UX / network metadata form wiring / assisted section application",
+          "Understanding": "97%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_543_wire_and_network_forms_for_voltage_current_material_and_section_recommendation_apply_flow.md",
+        "ref": "item_543_wire_and_network_forms_for_voltage_current_material_and_section_recommendation_apply_flow",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_543_wire_and_network_forms_for_voltage_current_material_and_section_recommendation_apply_flow",
+            "item_542_wire_sizing_metadata_and_recommendation_core_contract"
+          ],
+          "prod": [],
+          "req": [
+            "req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> network scope form supports voltage input. Proof: network form tests cover create/edit and persisted draft behavior.",
+            "- AC2 -> wire form gains the required sizing inputs. Proof: UI tests cover default material and editable current/material.",
+            "- AC3 -> suggestion placement is locked. Proof: rendered helper text appears below `Section (mm\u00b2)` when inputs qualify.",
+            "- AC4 -> recommendation remains user-driven. Proof: `Apply` changes the draft only on explicit user action.",
+            "- AC5 -> assisted sizing stays non-destructive. Proof: save/cancel regression tests preserve existing semantics.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Surface assisted wire sizing in the UI by wiring network voltage, wire current/material, and a visible recommendation with explicit apply semantics.",
+            "- Keywords: req110, wire form, network form, voltage, current, material, recommended section, apply",
+            "- Use when: Use when implementing or reviewing the user-facing assisted sizing flow in forms.",
+            "- Skip when: Skip when only changing core contracts or persistence without form-level behavior.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: Network create/edit flows expose `Voltage (V)` and persist it in the form draft workflow.",
+            "- AC2: Wire create/edit flows expose `Current (A)` and `Material`, with `Copper` as the default material choice.",
+            "- AC3: When the required inputs are available, the wire form shows the recommendation directly below `Section (mm\u00b2)` as helper text.",
+            "- AC4: The wire form exposes an explicit `Apply` action that copies the recommendation into the section draft without silently overwriting it.",
+            "- AC5: Manual edits to `sectionMm2` remain possible before save, and `Cancel edit` restores persisted values as usual.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Not needed",
+            "- Architecture signals: (none detected)",
+            "- Architecture follow-up: No architecture decision follow-up is expected based on current signals.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Request: `logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md`",
+            "- Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Notes": [
+            "- Dependencies: `req_110`, `item_542`.",
+            "- Blocks: `item_545`, `task_090`.",
+            "- Related AC: AC3, AC4, AC5, AC6, AC7.",
+            "- References:",
+            "  - `logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md`",
+            "  - `logics/backlog/item_542_wire_sizing_metadata_and_recommendation_core_contract.md`",
+            "  - `src/app/components/workspace/ModelingWireFormPanel.tsx`",
+            "  - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`",
+            "  - `src/app/AppController.tsx`"
+          ],
+          "Priority": [
+            "- Impact: High.",
+            "- Urgency: High.",
+            ""
+          ],
+          "Problem": [
+            "Even with a core recommendation contract, `req_110` is not useful unless users can enter the required sizing inputs and see/apply the suggested section at the point where `sectionMm2` is decided.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - add `Voltage (V)` editing to the network create/edit workflow;",
+            "  - add wire `Current (A)` and `Material` inputs to wire create/edit;",
+            "  - show `Recommended section: X mm2` directly below `Section (mm\u00b2)` when inputs are sufficient;",
+            "  - add an explicit `Apply` interaction that copies the recommendation into the wire section draft;",
+            "  - recompute the recommendation live from current draft/context inputs;",
+            "  - preserve normal save/cancel semantics and manual override behavior.",
+            "- Out:",
+            "  - core contract definition for recommendation inputs/outputs (handled in `item_542`);",
+            "  - persistence/import-export compatibility work (handled in `item_544`);",
+            "  - final regression closure item (handled in `item_545`).",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|wire-and-network-forms-for-voltage-curre|req-110-automatic-recommended-wire-secti|even-with-a-core-recommendation-contract|ac1-network-create-edit-flows-expose",
+            "flowchart LR",
+            "    Request[req110 assisted wire sizing] --> Problem[Users need editable inputs and visible suggestion]",
+            "    Problem --> Scope[Wire and network forms expose sizing inputs]",
+            "    Scope --> Acceptance[AC1 recommendation is visible and applyable]",
+            "    Acceptance --> Task[task090 orchestration]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Wire and network forms for voltage current material and section recommendation apply flow"
+      },
+      "signature": {
+        "mtime_ns": 1774622550653380286,
+        "size": 4940
+      }
+    },
+    "logics/backlog/item_544_wire_sizing_persistence_compatibility_and_standard_section_normalization.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "req110, persistence, portability, migration, compatibility, voltageV, currentA, material, standard section",
+          "skip when": "Skip when only changing form rendering or core recommendation logic.",
+          "summary": "Make assisted sizing metadata survive persistence, portability, and compatibility paths without regressing existing saved/imported workspaces.",
+          "use when": "Use when implementing or reviewing persistence and import/export handling for assisted sizing."
+        },
+        "indicators": {
+          "Complexity": "Medium-High",
+          "Confidence": "92%",
+          "From version": "1.4.3",
+          "Progress": "0%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Ready",
+          "Theme": "Persistence / portability / compatibility for assisted sizing metadata",
+          "Understanding": "96%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_544_wire_sizing_persistence_compatibility_and_standard_section_normalization.md",
+        "ref": "item_544_wire_sizing_persistence_compatibility_and_standard_section_normalization",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_544_wire_sizing_persistence_compatibility_and_standard_section_normalization",
+            "item_542_wire_sizing_metadata_and_recommendation_core_contract"
+          ],
+          "prod": [],
+          "req": [
+            "req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> persistence and portability serializers understand the new fields. Proof: round-trip tests preserve values.",
+            "- AC2 -> compatibility remains intact. Proof: legacy fixtures/import tests load with no failure.",
+            "- AC3 -> voltage defaults stay honest. Proof: normalization tests confirm `undefined` remains `undefined` unless the user sets a value.",
+            "- AC4 -> normalization logic is shared, not drifted. Proof: portability/persistence tests import the same section contract.",
+            "- AC5 -> current import/export features do not break. Proof: existing relevant tests still pass.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Make assisted sizing metadata survive persistence, portability, and compatibility paths without regressing existing saved/imported workspaces.",
+            "- Keywords: req110, persistence, portability, migration, compatibility, voltageV, currentA, material, standard section",
+            "- Use when: Use when implementing or reviewing persistence and import/export handling for assisted sizing.",
+            "- Skip when: Skip when only changing form rendering or core recommendation logic.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: `voltageV`, `currentA`, and `material` survive local persistence and file portability round trips.",
+            "- AC2: Legacy saved/imported payloads lacking the new sizing fields remain loadable and editable.",
+            "- AC3: Missing legacy `voltageV` does not trigger a silent fake default write-back.",
+            "- AC4: Standard section normalization used by assisted sizing remains consistent across persistence/import/export code paths.",
+            "- AC5: Existing export/import flows remain non-regressed when the new sizing metadata is absent.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Required",
+            "- Architecture signals: data model and persistence",
+            "- Architecture follow-up: Existing request-level framing is sufficient for now; no additional ADR is required before backlog execution.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Request: `logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md`",
+            "- Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Notes": [
+            "- Dependencies: `req_110`, `item_542`.",
+            "- Blocks: `item_545`, `task_090`.",
+            "- Related AC: AC2, AC8, AC9, AC10.",
+            "- References:",
+            "  - `logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md`",
+            "  - `logics/backlog/item_542_wire_sizing_metadata_and_recommendation_core_contract.md`",
+            "  - `src/adapters/persistence/migrations.ts`",
+            "  - `src/adapters/portability/networkFile.ts`",
+            "  - `src/store/reducer/networkReducer.ts`",
+            "  - `src/store/reducer/wireReducer.ts`"
+          ],
+          "Priority": [
+            "- Impact: High.",
+            "- Urgency: Medium-High.",
+            ""
+          ],
+          "Problem": [
+            "`req_110` adds new network and wire sizing metadata. If those fields are not normalized consistently through persistence, migration, and import/export, the feature will behave unpredictably or break older saved workspaces.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - preserve `voltageV`, `currentA`, and `material` through persistence and portability layers;",
+            "  - ensure legacy payloads missing the new fields remain loadable and editable;",
+            "  - keep the V1 standard section normalization contract consistent across persistence/import/export paths;",
+            "  - avoid inventing a fake default voltage when older data lacks `voltageV`;",
+            "  - keep existing export flows non-regressed even if they do not yet surface the new sizing metadata.",
+            "- Out:",
+            "  - core recommendation contract (handled in `item_542`);",
+            "  - form UX and `Apply` interaction (handled in `item_543`);",
+            "  - final validation/closure traceability (handled in `item_545`).",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|wire-sizing-persistence-compatibility-an|req-110-automatic-recommended-wire-secti|req-110-adds-new-network-and-wire|ac1-voltagev-currenta-and-material-survi",
+            "flowchart LR",
+            "    Request[req110 assisted wire sizing] --> Problem[New sizing fields must survive persistence safely]",
+            "    Problem --> Scope[Persist voltage current material and keep compatibility]",
+            "    Scope --> Acceptance[AC1 sizing metadata round trips safely]",
+            "    Acceptance --> Task[task090 orchestration]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Wire sizing persistence compatibility and standard section normalization"
+      },
+      "signature": {
+        "mtime_ns": 1774622550653721330,
+        "size": 4843
+      }
+    },
+    "logics/backlog/item_545_req_110_validation_matrix_and_assisted_wire_sizing_closure_traceability.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "req110, validation, traceability, closure, recommendation, forms, persistence",
+          "skip when": "Skip when implementing a new functional slice rather than recording closure evidence.",
+          "summary": "Capture req_110 validation evidence and close the traceability chain across assisted wire sizing delivery slices.",
+          "use when": "Use when closing or reviewing req_110 delivery."
+        },
+        "indicators": {
+          "Complexity": "Low-Medium",
+          "Confidence": "94%",
+          "From version": "1.4.3",
+          "Progress": "0%",
+          "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Ready",
+          "Theme": "Quality / Validation / Traceability",
+          "Understanding": "96%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_545_req_110_validation_matrix_and_assisted_wire_sizing_closure_traceability.md",
+        "ref": "item_545_req_110_validation_matrix_and_assisted_wire_sizing_closure_traceability",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_545_req_110_validation_matrix_and_assisted_wire_sizing_closure_traceability",
+            "item_542_wire_sizing_metadata_and_recommendation_core_contract",
+            "item_543_wire_and_network_forms_for_voltage_current_material_and_section_recommendation_apply_flow",
+            "item_544_wire_sizing_persistence_compatibility_and_standard_section_normalization"
+          ],
+          "prod": [],
+          "req": [
+            "req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> acceptance criteria have reproducible validation evidence. Proof: closure notes map tests and checks to req_110 guarantees.",
+            "- AC2 -> doc chain is coherent. Proof: request, backlog, and orchestration task references align.",
+            "- AC3 -> UX contract is not lost in implementation churn. Proof: closure notes record the locked placement and apply semantics.",
+            "- AC4 -> regression confidence is durable. Proof: validation commands are listed in the closure record.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Capture req_110 validation evidence and close the traceability chain across assisted wire sizing delivery slices.",
+            "- Keywords: req110, validation, traceability, closure, recommendation, forms, persistence",
+            "- Use when: Use when closing or reviewing req_110 delivery.",
+            "- Skip when: Skip when implementing a new functional slice rather than recording closure evidence.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: Validation evidence explicitly covers req_110 acceptance criteria for domain contract, form behavior, and compatibility behavior.",
+            "- AC2: Request, backlog, and task references are synchronized across items `542` to `544`.",
+            "- AC3: Closure notes explicitly record the locked V1 UX policy: helper text below `Section (mm\u00b2)` plus explicit `Apply`.",
+            "- AC4: Validation commands and targeted proof points are recorded for future regression triage.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Not needed",
+            "- Architecture signals: (none detected)",
+            "- Architecture follow-up: No architecture decision follow-up is expected based on current signals.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Request: `logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md`",
+            "- Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from `logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md`.",
+            "- Depends on: `item_542`, `item_543`, `item_544`.",
+            "- Orchestrated by `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`.",
+            "- References:",
+            "  - `logics/backlog/item_542_wire_sizing_metadata_and_recommendation_core_contract.md`",
+            "  - `logics/backlog/item_543_wire_and_network_forms_for_voltage_current_material_and_section_recommendation_apply_flow.md`",
+            "  - `logics/backlog/item_544_wire_sizing_persistence_compatibility_and_standard_section_normalization.md`",
+            "  - `logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md`"
+          ],
+          "Priority": [
+            "- Impact: Medium-High.",
+            "- Urgency: High.",
+            ""
+          ],
+          "Problem": [
+            "`req_110` spans domain contracts, form UX, and persistence compatibility. Without an explicit closure item, acceptance-criteria evidence and non-regression proof can remain fragmented across several implementation slices.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - define the req_110 validation matrix against acceptance criteria;",
+            "  - capture closure evidence for core recommendation logic, form behavior, and persistence compatibility;",
+            "  - synchronize request/backlog/task references for req_110 delivery;",
+            "  - record the locked V1 UX contract around helper text placement and explicit `Apply`.",
+            "- Out:",
+            "  - new feature work beyond req_110 closure.",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|req-110-validation-matrix-and-assisted-w|req-110-automatic-recommended-wire-secti|req-110-spans-domain-contracts-form-ux|ac1-validation-evidence-explicitly-cover",
+            "flowchart LR",
+            "    Request[req110 assisted wire sizing] --> Problem[Validation evidence can fragment across slices]",
+            "    Problem --> Scope[Capture req110 validation and closure]",
+            "    Scope --> Acceptance[AC1 req110 validation matrix is explicit]",
+            "    Acceptance --> Task[task090 orchestration]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Req 110 validation matrix and assisted wire sizing closure traceability"
+      },
+      "signature": {
+        "mtime_ns": 1774622550654055541,
+        "size": 4492
+      }
+    },
+    "logics/backlog/item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "req111, modeling, dropdown, sorting helper, visible label, tie break, missing fallback",
+          "skip when": "Skip when only applying an already-defined contract to specific forms.",
+          "summary": "Define the reusable sorting and fallback policy for dynamic modeling dropdowns before wiring individual forms.",
+          "use when": "Use when implementing or reviewing the shared contract behind modeling dropdown ordering."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "95%",
+          "From version": "1.4.3",
+          "Progress": "0%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Ready",
+          "Theme": "Modeling select option ordering / reusable sorting policy / deterministic presentation",
+          "Understanding": "97%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options.md",
+        "ref": "item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options"
+          ],
+          "prod": [],
+          "req": [
+            "req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> implementation is reusable rather than duplicated. Proof: forms consume one helper/policy surface.",
+            "- AC2 -> ordering is stable for user-visible text. Proof: targeted tests cover trimmed and case-insensitive comparisons.",
+            "- AC3 -> equal labels remain deterministic. Proof: comparator tests cover stable secondary ordering.",
+            "- AC4 -> compatibility fallback remains safe. Proof: tests cover missing selected options remaining visible and pinned.",
+            "- AC5 -> the scope stays controlled. Proof: static semantic selects are not routed through the shared alphabetical helper.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Define the reusable sorting and fallback policy for dynamic modeling dropdowns before wiring individual forms.",
+            "- Keywords: req111, modeling, dropdown, sorting helper, visible label, tie break, missing fallback",
+            "- Use when: Use when implementing or reviewing the shared contract behind modeling dropdown ordering.",
+            "- Skip when: Skip when only applying an already-defined contract to specific forms.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: A shared contract exists for sorting dynamic modeling dropdown options by visible label.",
+            "- AC2: Sorting ignores leading/trailing whitespace and compares labels case-insensitively.",
+            "- AC3: Stable tie-break rules use technical ID and then entity ID where needed.",
+            "- AC4: A selected missing fallback option remains visible and pinned above the normal sorted options.",
+            "- AC5: Static semantic selects are explicitly excluded from the alphabetical sorting contract.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Required",
+            "- Architecture signals: contracts and integration",
+            "- Architecture follow-up: Existing request-level framing is sufficient for now; no additional ADR is required before backlog execution.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Request: `logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`",
+            "- Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Notes": [
+            "- Dependencies: `req_111`.",
+            "- Blocks: `item_547`, `item_548`, `task_090`.",
+            "- Related AC: AC1, AC2, AC3, AC5.",
+            "- References:",
+            "  - `logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`",
+            "  - `src/app/components/workspace/ModelingWireFormPanel.tsx`",
+            "  - `src/app/components/workspace/ModelingConnectorFormPanel.tsx`",
+            "  - `src/app/components/workspace/ModelingSpliceFormPanel.tsx`",
+            "  - `src/app/components/workspace/ModelingNodeFormPanel.tsx`",
+            "  - `src/app/components/workspace/ModelingSegmentFormPanel.tsx`"
+          ],
+          "Priority": [
+            "- Impact: Medium-High.",
+            "- Urgency: High.",
+            ""
+          ],
+          "Problem": [
+            "`req_111` should not be solved by copy-pasting ad hoc sorting logic into each form. Without a shared contract for how modeling dropdown options are sorted, the app will drift across screens and mishandle missing fallback options.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - define a reusable sorting contract for dynamic `Modeling` dropdown options;",
+            "  - sort by visible option label with trimmed, case-insensitive comparison;",
+            "  - define stable tie-break behavior using technical ID and then entity ID;",
+            "  - define missing selected fallback handling, including pinning a selected missing option above the normal sorted list;",
+            "  - explicitly separate dynamic entity/catalog selects from static semantic selects.",
+            "- Out:",
+            "  - applying the contract to every relevant modeling form (handled in `item_547`);",
+            "  - final validation/closure traceability (handled in `item_548`).",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|shared-alphabetical-sorting-contract-for|req-111-alphabetically-sorted-dropdown-m|req-111-should-not-be-solved-by|ac1-a-shared-contract-exists-for",
+            "flowchart LR",
+            "    Request[req111 modeling dropdown ordering] --> Problem[One policy is needed across screens]",
+            "    Problem --> Scope[Define shared sort and fallback rules]",
+            "    Scope --> Acceptance[AC1 reusable deterministic contract]",
+            "    Acceptance --> Task[task090 orchestration]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Shared alphabetical sorting contract for modeling dynamic dropdown options"
+      },
+      "signature": {
+        "mtime_ns": 1774622550654391751,
+        "size": 4656
+      }
+    },
+    "logics/backlog/item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "req111, modeling forms, dropdown wiring, connector selector, splice selector, node selector, segment selector",
+          "skip when": "Skip when only changing the shared helper or closure docs.",
+          "summary": "Apply the shared alphabetical dropdown ordering contract across the actual modeling forms.",
+          "use when": "Use when implementing or reviewing concrete screen wiring for modeling dropdown ordering."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "95%",
+          "From version": "1.4.3",
+          "Progress": "0%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Ready",
+          "Theme": "Modeling forms / dynamic select wiring / user-facing option ordering",
+          "Understanding": "97%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning.md",
+        "ref": "item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning",
+            "item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options"
+          ],
+          "prod": [],
+          "req": [
+            "req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> screen coverage is complete. Proof: targeted UI tests cover representative modeling forms.",
+            "- AC2 -> wire-specific selects are not special-cased incorrectly. Proof: wire form tests cover connector/splice/catalog option ordering.",
+            "- AC3 -> node and segment forms behave consistently. Proof: UI tests cover option ordering in both flows.",
+            "- AC4 -> scope boundaries are preserved. Proof: semantic selects retain their old order.",
+            "- AC5 -> compatibility behavior remains safe. Proof: missing selected fallback options stay visible and pinned.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Apply the shared alphabetical dropdown ordering contract across the actual modeling forms.",
+            "- Keywords: req111, modeling forms, dropdown wiring, connector selector, splice selector, node selector, segment selector",
+            "- Use when: Use when implementing or reviewing concrete screen wiring for modeling dropdown ordering.",
+            "- Skip when: Skip when only changing the shared helper or closure docs.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: All in-scope dynamic modeling selects use the shared alphabetical ordering contract.",
+            "- AC2: Wire form connector/splice selectors and fuse catalog selector follow the same ordering rules.",
+            "- AC3: Node and segment modeling selectors follow the same ordering rules.",
+            "- AC4: Static semantic selects in modeling remain in their deliberate non-alphabetical order.",
+            "- AC5: Compatibility fallback options remain visible and pinned when selected.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Not needed",
+            "- Architecture signals: (none detected)",
+            "- Architecture follow-up: No architecture decision follow-up is expected based on current signals.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Request: `logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`",
+            "- Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Notes": [
+            "- Dependencies: `req_111`, `item_546`.",
+            "- Blocks: `item_548`, `task_090`.",
+            "- Related AC: AC1, AC2, AC4, AC5, AC6.",
+            "- References:",
+            "  - `logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`",
+            "  - `logics/backlog/item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options.md`",
+            "  - `src/app/components/workspace/ModelingConnectorFormPanel.tsx`",
+            "  - `src/app/components/workspace/ModelingSpliceFormPanel.tsx`",
+            "  - `src/app/components/workspace/ModelingWireFormPanel.tsx`",
+            "  - `src/app/components/workspace/ModelingNodeFormPanel.tsx`",
+            "  - `src/app/components/workspace/ModelingSegmentFormPanel.tsx`"
+          ],
+          "Priority": [
+            "- Impact: Medium-High.",
+            "- Urgency: High.",
+            ""
+          ],
+          "Problem": [
+            "After the shared sort contract is defined, the app still needs each dynamic `Modeling` dropdown to actually use it. Otherwise users will continue to see inconsistent ordering across forms.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - apply the shared alphabetical ordering contract to all in-scope dynamic selects in `Modeling`;",
+            "  - cover at minimum catalog-backed connector/splice selectors, wire endpoint connector/splice selectors, wire fuse catalog selector, node connector/splice selectors, and segment node selectors;",
+            "  - keep selected missing fallback options visible and pinned above the sorted list where compatibility fallbacks exist;",
+            "  - preserve existing static semantic select ordering.",
+            "- Out:",
+            "  - defining the shared sort policy itself (handled in `item_546`);",
+            "  - final validation/closure traceability (handled in `item_548`).",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|modeling-form-dropdown-wiring-for-alphab|req-111-alphabetically-sorted-dropdown-m|after-the-shared-sort-contract-is|ac1-all-in-scope-dynamic-modeling-select",
+            "flowchart LR",
+            "    Request[req111 modeling dropdown ordering] --> Problem[Forms still need concrete wiring]",
+            "    Problem --> Scope[Wire shared sort policy into modeling selects]",
+            "    Scope --> Acceptance[AC1 in scope selects use sorted options]",
+            "    Acceptance --> Task[task090 orchestration]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Modeling form dropdown wiring for alphabetical option ordering and missing fallback pinning"
+      },
+      "signature": {
+        "mtime_ns": 1774622550654725379,
+        "size": 4675
+      }
+    },
+    "logics/backlog/item_548_req_111_validation_matrix_and_modeling_dropdown_ordering_closure_traceability.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "req111, validation, traceability, dropdown ordering, closure, modeling",
+          "skip when": "Skip when implementing a new functional slice.",
+          "summary": "Capture req_111 validation evidence and close the traceability chain for modeling dropdown ordering.",
+          "use when": "Use when closing or reviewing req_111 delivery."
+        },
+        "indicators": {
+          "Complexity": "Low-Medium",
+          "Confidence": "95%",
+          "From version": "1.4.3",
+          "Progress": "0%",
+          "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Ready",
+          "Theme": "Quality / Validation / Traceability",
+          "Understanding": "96%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_548_req_111_validation_matrix_and_modeling_dropdown_ordering_closure_traceability.md",
+        "ref": "item_548_req_111_validation_matrix_and_modeling_dropdown_ordering_closure_traceability",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_548_req_111_validation_matrix_and_modeling_dropdown_ordering_closure_traceability",
+            "item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options",
+            "item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning"
+          ],
+          "prod": [],
+          "req": [
+            "req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> ordering guarantees are reproducible. Proof: closure notes link targeted tests to req_111 acceptance criteria.",
+            "- AC2 -> scope boundaries remain explicit. Proof: closure notes mention preserved semantic-order selects.",
+            "- AC3 -> doc chain stays coherent. Proof: request, backlog, and task references align.",
+            "- AC4 -> regression evidence remains durable. Proof: validation commands are captured in the closure record.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Capture req_111 validation evidence and close the traceability chain for modeling dropdown ordering.",
+            "- Keywords: req111, validation, traceability, dropdown ordering, closure, modeling",
+            "- Use when: Use when closing or reviewing req_111 delivery.",
+            "- Skip when: Skip when implementing a new functional slice.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: Validation evidence explicitly covers req_111 acceptance criteria for shared sorting policy and screen wiring.",
+            "- AC2: Closure notes explicitly record that static semantic selects were preserved.",
+            "- AC3: Request, backlog, and orchestration-task references are synchronized across items `546` and `547`.",
+            "- AC4: Validation commands and representative UI proof points are recorded for future regression triage.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Not needed",
+            "- Architecture signals: (none detected)",
+            "- Architecture follow-up: No architecture decision follow-up is expected based on current signals.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Request: `logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`",
+            "- Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from `logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`.",
+            "- Depends on: `item_546`, `item_547`.",
+            "- Orchestrated by `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`.",
+            "- References:",
+            "  - `logics/backlog/item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options.md`",
+            "  - `logics/backlog/item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning.md`",
+            "  - `logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`"
+          ],
+          "Priority": [
+            "- Impact: Medium.",
+            "- Urgency: High.",
+            ""
+          ],
+          "Problem": [
+            "`req_111` looks small, but it affects many forms and has an important scope guard: dynamic selects must be alphabetized while static semantic selects must not change. Without an explicit closure item, that distinction can be lost.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - define the req_111 validation matrix against acceptance criteria;",
+            "  - capture evidence for shared helper behavior, form wiring coverage, and missing fallback pinning;",
+            "  - record the explicit non-regression contract for static semantic select ordering;",
+            "  - synchronize request/backlog/task traceability for req_111.",
+            "- Out:",
+            "  - new feature work beyond req_111 closure.",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|req-111-validation-matrix-and-modeling-d|req-111-alphabetically-sorted-dropdown-m|req-111-looks-small-but-it-affects|ac1-validation-evidence-explicitly-cover",
+            "flowchart LR",
+            "    Request[req111 modeling dropdown ordering] --> Problem[Coverage and scope guards can fragment]",
+            "    Problem --> Scope[Capture req111 validation and closure]",
+            "    Scope --> Acceptance[AC1 validation matrix covers ordering contract]",
+            "    Acceptance --> Task[task090 orchestration]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Req 111 validation matrix and modeling dropdown ordering closure traceability"
+      },
+      "signature": {
+        "mtime_ns": 1774622550655038339,
+        "size": 4169
+      }
+    },
+    "logics/backlog/item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "req112, delete, blocked delete, feedback modal, guard explanation, req074",
+          "skip when": "Skip when working on structured dependency summaries or cascade execution.",
+          "summary": "Introduce a dedicated blocked-delete feedback modal so guarded deletes stop feeling like silent no-ops.",
+          "use when": "Use when implementing or reviewing the first UX slice for req_112."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "93%",
+          "From version": "1.4.3",
+          "Progress": "0%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Ready",
+          "Theme": "Delete UX clarity / modal feedback / reducer guard surfacing",
+          "Understanding": "97%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration.md",
+        "ref": "item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration"
+          ],
+          "prod": [],
+          "req": [
+            "req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation",
+            "req_074_all_delete_actions_require_styled_confirmation_modal"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> delete failures become visible. Proof: UI tests verify blocked delete opens a dedicated modal/dialog.",
+            "- AC2 -> the user understands what was targeted. Proof: modal copy includes entity identity and blocked reason.",
+            "- AC3 -> delete feedback is local to the action. Proof: no primary reliance on the passive banner for the guarded flow.",
+            "- AC4 -> normal delete flows do not regress. Proof: existing confirmation tests still pass.",
+            "- AC5 -> business rules stay intact. Proof: reducer behavior remains guarded and non-destructive.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Introduce a dedicated blocked-delete feedback modal so guarded deletes stop feeling like silent no-ops.",
+            "- Keywords: req112, delete, blocked delete, feedback modal, guard explanation, req074",
+            "- Use when: Use when implementing or reviewing the first UX slice for req_112.",
+            "- Skip when: Skip when working on structured dependency summaries or cascade execution.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: A delete attempt blocked by existing integrity guards opens a dedicated feedback modal/dialog.",
+            "- AC2: The modal identifies the target entity and explains that the delete is blocked.",
+            "- AC3: The blocked-delete flow no longer depends on the global error banner as the primary user-facing explanation.",
+            "- AC4: Existing successful delete confirmation flows from `req_074` remain unchanged.",
+            "- AC5: No reducer guard is weakened or bypassed by this slice.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Not needed",
+            "- Architecture signals: (none detected)",
+            "- Architecture follow-up: No architecture decision follow-up is expected based on current signals.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Request: `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`",
+            "- Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Notes": [
+            "- Dependencies: `req_112`, `logics/request/req_074_all_delete_actions_require_styled_confirmation_modal.md`.",
+            "- Blocks: `item_550`, `item_551`, `item_552`, `task_090`.",
+            "- Related AC: AC1, AC2, AC3.",
+            "- References:",
+            "  - `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`",
+            "  - `logics/request/req_074_all_delete_actions_require_styled_confirmation_modal.md`",
+            "  - `src/app/components/dialogs/ConfirmDialog.tsx`",
+            "  - `src/app/components/workspace/AppHeaderAndStats.tsx`",
+            "  - `src/app/AppController.tsx`"
+          ],
+          "Priority": [
+            "- Impact: High.",
+            "- Urgency: High.",
+            ""
+          ],
+          "Problem": [
+            "`req_112` exists because guarded delete actions can currently feel silent. The first corrective slice is to make blocked deletes visible and understandable without relying on the top-level error banner alone.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - add a dedicated modal/dialog for blocked delete attempts;",
+            "  - route guarded delete failures through delete-attempt-level feedback instead of passive banner-only feedback;",
+            "  - show the target entity identity and a readable blocked-delete explanation;",
+            "  - preserve existing `req_074` delete confirmation behavior for normal successful deletes;",
+            "  - keep reducer guard semantics intact.",
+            "- Out:",
+            "  - structured dependency summaries beyond basic explanation (handled in `item_550`);",
+            "  - cascade delete execution (handled in `item_551`);",
+            "  - final validation/closure traceability (handled in `item_552`).",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|dedicated-blocked-delete-feedback-modal-|req-074-all-delete-actions-require-style|req-112-exists-because-guarded-delete-ac|ac1-a-delete-attempt-blocked-by",
+            "flowchart LR",
+            "    Request[req112 blocked delete feedback] --> Problem[Guarded delete can feel silent]",
+            "    Problem --> Scope[Add dedicated blocked delete modal]",
+            "    Scope --> Acceptance[AC1 guarded delete shows explicit feedback]",
+            "    Acceptance --> Task[task090 orchestration]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Dedicated blocked delete feedback modal and delete guard explanation orchestration"
+      },
+      "signature": {
+        "mtime_ns": 1774622550655360425,
+        "size": 4543
+      }
+    },
+    "logics/backlog/item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "req112, delete summary, dependency categories, counts, impacted references, explanation modal",
+          "skip when": "Skip when only wiring the basic blocked-delete modal or finalizing cascade execution.",
+          "summary": "Add a structured dependency-summary contract so blocked delete feedback can show categories, counts, and representative impacted references.",
+          "use when": "Use when implementing or reviewing the structured explanation layer for blocked deletes."
+        },
+        "indicators": {
+          "Complexity": "Medium-High",
+          "Confidence": "91%",
+          "From version": "1.4.3",
+          "Progress": "0%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Ready",
+          "Theme": "Delete dependency inspection / impact summary / explanation detail",
+          "Understanding": "96%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility.md",
+        "ref": "item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility",
+            "item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration"
+          ],
+          "prod": [],
+          "req": [
+            "req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> structured data replaces brittle copy-only logic. Proof: delete UX consumes a typed/shared summary surface.",
+            "- AC2 -> users see meaningful blocker categories. Proof: tests cover counts/categories for representative entity types.",
+            "- AC3 -> explanations become concrete. Proof: modal content includes sample labels or technical IDs when available.",
+            "- AC4 -> the feature fails safe. Proof: explanation modal still works without requiring full cascade eligibility.",
+            "- AC5 -> summary logic is not duplicated. Proof: both blocked explanation and cascade candidate flows use the same summary contract.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Add a structured dependency-summary contract so blocked delete feedback can show categories, counts, and representative impacted references.",
+            "- Keywords: req112, delete summary, dependency categories, counts, impacted references, explanation modal",
+            "- Use when: Use when implementing or reviewing the structured explanation layer for blocked deletes.",
+            "- Skip when: Skip when only wiring the basic blocked-delete modal or finalizing cascade execution.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: A reusable dependency-summary contract exists for blocked delete flows.",
+            "- AC2: The summary can express dependency categories and counts for representative guarded delete cases.",
+            "- AC3: When available, representative impacted references are visible in the blocked-delete explanation flow.",
+            "- AC4: The explanation flow still works safely when only a partial summary is available and cascade is not offered.",
+            "- AC5: Structured delete-summary logic is reusable by both explanation-only and future cascade-confirmation flows.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Required",
+            "- Architecture signals: contracts and integration",
+            "- Architecture follow-up: Existing request-level framing is sufficient for now; no additional ADR is required before backlog execution.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Request: `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`",
+            "- Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Notes": [
+            "- Dependencies: `req_112`, `item_549`.",
+            "- Blocks: `item_551`, `item_552`, `task_090`.",
+            "- Related AC: AC2, AC3, AC4.",
+            "- References:",
+            "  - `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`",
+            "  - `logics/backlog/item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration.md`",
+            "  - `src/store/reducer/connectorReducer.ts`",
+            "  - `src/store/reducer/spliceReducer.ts`",
+            "  - `src/store/reducer/nodeReducer.ts`",
+            "  - `src/store/reducer/catalogReducer.ts`"
+          ],
+          "Priority": [
+            "- Impact: High.",
+            "- Urgency: High.",
+            ""
+          ],
+          "Problem": [
+            "Showing only a generic blocked-delete sentence is better than silence, but it still does not tell users enough about what is preventing the delete. `req_112` needs a structured way to summarize dependency categories, counts, and representative impacted references.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - define a reusable dependency-summary contract for blocked delete attempts;",
+            "  - provide category-level details such as linked node references, wire endpoint references, connected segments, or linked catalog usages where applicable;",
+            "  - include counts and representative labels/technical IDs when the app can compute them cheaply and deterministically;",
+            "  - feed the blocked-delete modal with structured details rather than only raw reducer strings;",
+            "  - support explanation-only flows even when cascade delete is not offered.",
+            "- Out:",
+            "  - baseline modal orchestration (handled in `item_549`);",
+            "  - cascade delete execution (handled in `item_551`);",
+            "  - final validation/closure traceability (handled in `item_552`).",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|delete-dependency-summary-contract-and-r|req-112-explicit-blocked-delete-feedback|showing-only-a-generic-blocked-delete-se|ac1-a-reusable-dependency-summary-contra",
+            "flowchart LR",
+            "    Request[req112 blocked delete feedback] --> Problem[Users need more than one generic error line]",
+            "    Problem --> Scope[Add reusable dependency summary contract]",
+            "    Scope --> Acceptance[AC1 structured blocked delete summary exists]",
+            "    Acceptance --> Task[task090 orchestration]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Delete dependency summary contract and representative impacted reference visibility"
+      },
+      "signature": {
+        "mtime_ns": 1774622550655718136,
+        "size": 5002
+      }
+    },
+    "logics/backlog/item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "req112, cascade delete, connector, splice, exact impact set, safe fallback, explanation only",
+          "skip when": "Skip when working on basic blocked-delete modal feedback or generic dependency summaries.",
+          "summary": "Implement the safe V1 cascade-delete contract for connector and splice only when the exact impact set is known and explain-only fallback remains available otherwise.",
+          "use when": "Use when implementing or reviewing the bounded cascade-delete slice for req_112."
+        },
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "86%",
+          "From version": "1.4.3",
+          "Progress": "0%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Ready",
+          "Theme": "Safe cascade deletion / impact-bounded destructive operations / integrity preservation",
+          "Understanding": "94%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract.md",
+        "ref": "item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract",
+            "item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration",
+            "item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility"
+          ],
+          "prod": [],
+          "req": [
+            "req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> cascade stays conservative. Proof: only connector/splice candidate flows can reach cascade confirmation.",
+            "- AC2 -> users are not surprised. Proof: confirmation content lists counts and representative impacted entities from the exact impact set.",
+            "- AC3 -> unsafe cases fail safe. Proof: tests cover fallback from cascade candidate to explanation-only behavior.",
+            "- AC4 -> destructive state changes remain coherent. Proof: integration tests verify one logical delete operation and intact state afterward.",
+            "- AC5 -> V1 scope remains bounded. Proof: node/segment/catalog/network blocked deletes never offer cascade.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Implement the safe V1 cascade-delete contract for connector and splice only when the exact impact set is known and explain-only fallback remains available otherwise.",
+            "- Keywords: req112, cascade delete, connector, splice, exact impact set, safe fallback, explanation only",
+            "- Use when: Use when implementing or reviewing the bounded cascade-delete slice for req_112.",
+            "- Skip when: Skip when working on basic blocked-delete modal feedback or generic dependency summaries.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: V1 cascade delete is offered only for `connector` and `splice` cases whose exact impact set can be computed and summarized confidently.",
+            "- AC2: The cascade confirmation dialog shows the target plus the exact dependent entities that will also be removed.",
+            "- AC3: If the exact impact set cannot be produced confidently, the product falls back to explanation-only blocking and does not offer cascade delete.",
+            "- AC4: Successful cascade delete executes as one logical destructive operation with coherent integrity cleanup.",
+            "- AC5: Unsupported blocked-delete entity types remain explanation-only in V1.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Required",
+            "- Architecture signals: contracts and integration",
+            "- Architecture follow-up: Existing request-level framing is sufficient for now; no additional ADR is required before backlog execution.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Request: `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`",
+            "- Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Notes": [
+            "- Dependencies: `req_112`, `item_549`, `item_550`.",
+            "- Blocks: `item_552`, `task_090`.",
+            "- Related AC: AC4, AC7, AC8.",
+            "- References:",
+            "  - `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`",
+            "  - `logics/backlog/item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration.md`",
+            "  - `logics/backlog/item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility.md`",
+            "  - `src/store/reducer/connectorReducer.ts`",
+            "  - `src/store/reducer/spliceReducer.ts`",
+            "  - `src/store/reducer/nodeReducer.ts`",
+            "  - `src/store/reducer/segmentReducer.ts`",
+            "  - `src/store/reducer/wireReducer.ts`"
+          ],
+          "Priority": [
+            "- Impact: High.",
+            "- Urgency: Medium-High.",
+            ""
+          ],
+          "Problem": [
+            "Users sometimes want to remove a connector or splice together with the items that make the delete impossible. But cascade delete is dangerous if the app cannot calculate and summarize the exact impact set. `req_112` needs a conservative contract: offer cascade only when the full impact is known, otherwise fall back to explanation-only blocking.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - evaluate and implement a safe V1 cascade-delete path for `connector` and `splice` only;",
+            "  - require a precomputed exact impact summary before offering cascade confirmation;",
+            "  - show the target entity plus the exact dependent-delete set in the confirmation dialog;",
+            "  - execute supported cascade delete as one logical destructive operation when confirmed;",
+            "  - fall back to explanation-only blocking whenever the exact impact set cannot be produced confidently.",
+            "- Out:",
+            "  - cascade support for `node`, `segment`, `catalog item`, or `network` in V1;",
+            "  - unconditional recursive graph deletion without explicit and bounded impact summary;",
+            "  - final validation/closure traceability (handled in `item_552`).",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|safe-connector-and-splice-cascade-delete|req-112-explicit-blocked-delete-feedback|users-sometimes-want-to-remove-a|ac1-v1-cascade-delete-is-offered",
+            "flowchart LR",
+            "    Request[req112 blocked delete feedback] --> Problem[Cascade delete is risky without exact impact]",
+            "    Problem --> Scope[Only connector and splice are V1 candidates]",
+            "    Scope --> Acceptance[AC1 offer cascade only for safe bounded cases]",
+            "    Acceptance --> Task[task090 orchestration]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Safe connector and splice cascade delete confirmation and execution contract"
+      },
+      "signature": {
+        "mtime_ns": 1774622550656075763,
+        "size": 5337
+      }
+    },
+    "logics/backlog/item_552_req_112_validation_matrix_and_blocked_delete_closure_traceability.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "req112, validation, closure, blocked delete, cascade delete, traceability",
+          "skip when": "Skip when implementing a new functional slice.",
+          "summary": "Capture req_112 validation evidence and close the traceability chain for blocked-delete UX and any safe cascade delivery.",
+          "use when": "Use when closing or reviewing req_112 delivery."
+        },
+        "indicators": {
+          "Complexity": "Low-Medium",
+          "Confidence": "92%",
+          "From version": "1.4.3",
+          "Progress": "0%",
+          "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Ready",
+          "Theme": "Quality / Validation / Traceability",
+          "Understanding": "96%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_552_req_112_validation_matrix_and_blocked_delete_closure_traceability.md",
+        "ref": "item_552_req_112_validation_matrix_and_blocked_delete_closure_traceability",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_552_req_112_validation_matrix_and_blocked_delete_closure_traceability",
+            "item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration",
+            "item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility",
+            "item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract"
+          ],
+          "prod": [],
+          "req": [
+            "req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> acceptance criteria are reproducible. Proof: closure notes map targeted tests to req_112 guarantees.",
+            "- AC2 -> scope boundaries remain explicit. Proof: closure notes document explanation-only entity types and any delivered cascade matrix.",
+            "- AC3 -> doc chain stays coherent. Proof: request, backlog, and task references align.",
+            "- AC4 -> regression confidence is durable. Proof: validation commands and proof points are recorded at closure.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Capture req_112 validation evidence and close the traceability chain for blocked-delete UX and any safe cascade delivery.",
+            "- Keywords: req112, validation, closure, blocked delete, cascade delete, traceability",
+            "- Use when: Use when closing or reviewing req_112 delivery.",
+            "- Skip when: Skip when implementing a new functional slice.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: Validation evidence explicitly covers req_112 acceptance criteria for blocked-delete feedback, structured summaries, and any delivered cascade behavior.",
+            "- AC2: Closure notes explicitly record which entity types remain explanation-only in V1.",
+            "- AC3: Request, backlog, and orchestration-task references are synchronized across items `549` to `551`.",
+            "- AC4: Validation commands and representative destructive-action proof points are recorded for future regression triage.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Not needed",
+            "- Architecture signals: (none detected)",
+            "- Architecture follow-up: No architecture decision follow-up is expected based on current signals.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Request: `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`",
+            "- Primary task(s): `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`.",
+            "- Depends on: `item_549`, `item_550`, `item_551`.",
+            "- Orchestrated by `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`.",
+            "- References:",
+            "  - `logics/backlog/item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration.md`",
+            "  - `logics/backlog/item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility.md`",
+            "  - `logics/backlog/item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract.md`",
+            "  - `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`"
+          ],
+          "Priority": [
+            "- Impact: Medium-High.",
+            "- Urgency: High.",
+            ""
+          ],
+          "Problem": [
+            "`req_112` touches destructive-action UX, reducer guard visibility, and possibly cascade deletion. Without an explicit closure item, it becomes hard to prove which cases are explanation-only in V1 and which cases, if any, support safe cascade delete.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - define the req_112 validation matrix against acceptance criteria;",
+            "  - capture evidence for blocked-delete modal behavior, dependency summary content, and any delivered connector/splice cascade behavior;",
+            "  - record the explicit V1 scope guard that unsupported entity types remain explanation-only;",
+            "  - synchronize request/backlog/task traceability across req_112 delivery slices.",
+            "- Out:",
+            "  - new feature work beyond req_112 closure.",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|req-112-validation-matrix-and-blocked-de|req-112-explicit-blocked-delete-feedback|req-112-touches-destructive-action-ux-re|ac1-validation-evidence-explicitly-cover",
+            "flowchart LR",
+            "    Request[req112 blocked delete feedback] --> Problem[Blocked delete scope and proof can fragment]",
+            "    Problem --> Scope[Capture req112 validation and closure]",
+            "    Scope --> Acceptance[AC1 validation matrix covers blocked delete contract]",
+            "    Acceptance --> Task[task090 orchestration]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Req 112 validation matrix and blocked delete closure traceability"
+      },
+      "signature": {
+        "mtime_ns": 1774622550656410432,
+        "size": 4554
       }
     },
     "logics/request/req_000_kickoff_v1_electrical_plan_editor.md": {
@@ -44241,7 +45657,7 @@
         "title": "Kickoff V1 Electrical Plan Editor"
       },
       "signature": {
-        "mtime_ns": 1773580386198872641,
+        "mtime_ns": 1774457034925423411,
         "size": 4439
       }
     },
@@ -44395,7 +45811,7 @@
         "title": "UX/UI V1 Operator Workspace Overhaul"
       },
       "signature": {
-        "mtime_ns": 1773580386199220644,
+        "mtime_ns": 1774457034925749872,
         "size": 5396
       }
     },
@@ -44541,7 +45957,7 @@
         "title": "Multi-Network Management and Navigation"
       },
       "signature": {
-        "mtime_ns": 1773580386199409312,
+        "mtime_ns": 1774457034926338127,
         "size": 5367
       }
     },
@@ -44674,7 +46090,7 @@
         "title": "Theme Mode Switch Normal and Dark"
       },
       "signature": {
-        "mtime_ns": 1773580386199571813,
+        "mtime_ns": 1774457034926580213,
         "size": 4236
       }
     },
@@ -44814,7 +46230,7 @@
         "title": "Network Import and Export File Workflow"
       },
       "signature": {
-        "mtime_ns": 1773580386199758815,
+        "mtime_ns": 1774457034926856965,
         "size": 4659
       }
     },
@@ -44948,7 +46364,7 @@
         "title": "Large UI Files Split and Hook Extraction"
       },
       "signature": {
-        "mtime_ns": 1773580386199978525,
+        "mtime_ns": 1774457034927172968,
         "size": 4472
       }
     },
@@ -45077,7 +46493,7 @@
         "title": "Large Store Files Split and Reducer Modularization"
       },
       "signature": {
-        "mtime_ns": 1773580386200278235,
+        "mtime_ns": 1774457034927521179,
         "size": 4138
       }
     },
@@ -45206,7 +46622,7 @@
         "title": "Bootstrap with Comprehensive Sample Network"
       },
       "signature": {
-        "mtime_ns": 1773580386200520571,
+        "mtime_ns": 1774457034927820682,
         "size": 4480
       }
     },
@@ -45348,7 +46764,7 @@
         "title": "App Orchestration Shell Completion and Final Line Budget"
       },
       "signature": {
-        "mtime_ns": 1773580386200820281,
+        "mtime_ns": 1774457034928073267,
         "size": 5192
       }
     },
@@ -45482,7 +46898,7 @@
         "title": "2D Layout Persistence and Crossing Minimization"
       },
       "signature": {
-        "mtime_ns": 1773580386201037491,
+        "mtime_ns": 1774457034928386520,
         "size": 5234
       }
     },
@@ -45689,7 +47105,7 @@
         "title": "Network Scope Workspace Shell and Global Defaults"
       },
       "signature": {
-        "mtime_ns": 1773580386201250826,
+        "mtime_ns": 1774457034928662772,
         "size": 10736
       }
     },
@@ -45832,7 +47248,7 @@
         "title": "PWA Enablement, Installability, and Offline Reliability"
       },
       "signature": {
-        "mtime_ns": 1773580386201449036,
+        "mtime_ns": 1774457034928868941,
         "size": 5640
       }
     },
@@ -45982,7 +47398,7 @@
         "title": "Environment Configuration and Runtime Defaults"
       },
       "signature": {
-        "mtime_ns": 1773580386201624246,
+        "mtime_ns": 1774457034929323861,
         "size": 6007
       }
     },
@@ -46149,7 +47565,7 @@
         "title": "List/Form Workspace Harmonization Based on Network Scope"
       },
       "signature": {
-        "mtime_ns": 1773580386201838081,
+        "mtime_ns": 1774457034929577989,
         "size": 6471
       }
     },
@@ -46378,7 +47794,7 @@
         "title": "UI Modularization Wave 2 (Controller / Analysis / Canvas / Bundle Optimization)"
       },
       "signature": {
-        "mtime_ns": 1773580386202130125,
+        "mtime_ns": 1774457034929938617,
         "size": 10838
       }
     },
@@ -46538,7 +47954,7 @@
         "title": "Runtime Robustness, Empty Workspace Persistence Semantics, and CI Release Safety"
       },
       "signature": {
-        "mtime_ns": 1773580386202348960,
+        "mtime_ns": 1774457034930147744,
         "size": 6807
       }
     },
@@ -46758,7 +48174,7 @@
         "title": "App Controller and Layout Engine Modularization (Wave 3)"
       },
       "signature": {
-        "mtime_ns": 1773580386202523587,
+        "mtime_ns": 1774457034930413163,
         "size": 11482
       }
     },
@@ -62291,7 +63707,7 @@
         "title": "Recent changes human-readable entity references instead of system IDs"
       },
       "signature": {
-        "mtime_ns": 1774444921294805705,
+        "mtime_ns": 1774457034930613456,
         "size": 6812
       }
     },
@@ -65122,8 +66538,801 @@
         "title": "New and Edit actions scroll to the corresponding form panel"
       },
       "signature": {
-        "mtime_ns": 1774449126619632093,
+        "mtime_ns": 1774457034930765374,
         "size": 8922
+      }
+    },
+    "logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "wire section, section recommendation, current, copper, material, voltage, network metadata, wire length",
+          "skip when": "Skip when the work targets full electrical-compliance modeling, multi-voltage topologies, or unrelated wire metadata.",
+          "summary": "Add a V1 wire section recommendation flow based on wire current, default copper material, network voltage, and existing computed wire length while preserving manual `sectionMm2` control.",
+          "use when": "Use when framing model changes, form behavior, recommendation logic, and compatibility scope for assisted wire sizing."
+        },
+        "indicators": {
+          "Complexity": "Medium-High",
+          "Confidence": "92% (the current data model already stores `sectionMm2` and `lengthMm`, so the request is coherent if V1 stays at recommendation level rather than full electrical-compliance enforcement)",
+          "From version": "1.4.3",
+          "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Draft",
+          "Theme": "Wire sizing assistance / network electrical metadata / modeling ergonomics",
+          "Understanding": "97% (scope clarified with the user: the feature should suggest a cable section from wire current, default copper material, network voltage, and the wire length already computed by the app)"
+        },
+        "kind": "request",
+        "path": "logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md",
+        "ref": "req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_542_wire_sizing_metadata_and_recommendation_core_contract",
+            "item_543_wire_and_network_forms_for_voltage_current_material_and_section_recommendation_apply_flow",
+            "item_544_wire_sizing_persistence_compatibility_and_standard_section_normalization",
+            "item_545_req_110_validation_matrix_and_assisted_wire_sizing_closure_traceability"
+          ],
+          "prod": [],
+          "req": [
+            "req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length",
+            "req_038_wire_cable_section_mm2_field_default_preference_and_backward_compat_patch",
+            "req_067_wire_protection_metadata_v1_fuse_kind_with_required_reference"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AI Context": [
+            "- Summary: Add a V1 wire section recommendation flow based on wire current, default copper material, network voltage, and existing computed wire length while preserving manual `sectionMm2` control.",
+            "- Keywords: wire section, section recommendation, current, copper, material, voltage, network metadata, wire length",
+            "- Use when: Use when framing model changes, form behavior, recommendation logic, and compatibility scope for assisted wire sizing.",
+            "- Skip when: Skip when the work targets full electrical-compliance modeling, multi-voltage topologies, or unrelated wire metadata.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: When a wire has valid current input, valid material input or default copper behavior, valid computed length, and the active network has valid voltage, the app can produce a recommended wire section.",
+            "- AC2: The recommended result is normalized to one of the standard supported wire sections used by the product.",
+            "- AC3: In the wire create/edit form, the recommendation is shown directly below `Section (mm\u00b2)` as helper text with an explicit `Apply` action.",
+            "- AC4: `sectionMm2` remains user-editable and the recommendation does not remove manual override capability.",
+            "- AC5: The recommendation is recalculated live from the current draft/context inputs and is not applied automatically.",
+            "- AC6: Network voltage is editable and persisted at network scope without regressing existing network workflows.",
+            "- AC7: Wire current and material are editable and persisted at wire scope without regressing existing wire workflows.",
+            "- AC8: When required inputs are missing or invalid, the app does not fabricate a recommendation and existing manual section behavior still works.",
+            "- AC9: Existing persisted/imported networks and wires that lack the new voltage/current/material fields remain loadable and editable.",
+            "- AC10: Regression tests cover recommendation logic, default copper behavior, form semantics, and compatibility paths.",
+            ""
+          ],
+          "Backlog": [
+            "- `logics/backlog/item_542_wire_sizing_metadata_and_recommendation_core_contract.md`",
+            "- `logics/backlog/item_543_wire_and_network_forms_for_voltage_current_material_and_section_recommendation_apply_flow.md`",
+            "- `logics/backlog/item_544_wire_sizing_persistence_compatibility_and_standard_section_normalization.md`",
+            "- `logics/backlog/item_545_req_110_validation_matrix_and_assisted_wire_sizing_closure_traceability.md`",
+            ""
+          ],
+          "Companion docs": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            ""
+          ],
+          "Context": [
+            "The app already stores and exposes explicit wire cable section (`sectionMm2`) and computed wire length (`lengthMm`). However, section selection remains fully manual today. This creates two problems:",
+            "- operators must know or look up a suitable section outside the app",
+            "- data entry becomes slower and more error-prone when several wires must be sized",
+            "",
+            "The user clarified the intended V1 behavior:",
+            "- network voltage should be stored at the `Network` level",
+            "- wire current should be stored at the `Wire` level",
+            "- wire material should be stored at the `Wire` level",
+            "- default wire material should be `copper`",
+            "- the existing computed wire length should be reused as the length input for the recommendation",
+            "",
+            "V1 should remain a practical recommendation feature, not a full normative electrical-engineering engine. In particular, the request should avoid pretending to solve all real-world sizing variables such as installation mode, ambient temperature, bundle derating, or advanced voltage-drop rules unless they are explicitly added later.",
+            "",
+            "```mermaid",
+            "%% logics-kind: request",
+            "%% logics-signature: request|automatic-recommended-wire-section-from-|users-want-the-app-to-suggest|ac1-when-a-wire-has-valid",
+            "flowchart TD",
+            "    UserInput[User edits wire] --> Current[Wire current]",
+            "    UserInput --> Material[Wire material default copper]",
+            "    UserInput --> Length[Existing wire length]",
+            "    Network[Network voltage] --> Calc[Recommendation rule]",
+            "    Current --> Calc",
+            "    Material --> Calc",
+            "    Length --> Calc",
+            "    Calc --> Suggested[Suggested standard section]",
+            "    Suggested --> UserChoice[User keeps or overrides section]",
+            "```",
+            ""
+          ],
+          "Default decisions (V1)": [
+            "- Display location:",
+            "  - show the recommendation in the wire create/edit form directly below `Section (mm\u00b2)`",
+            "- Display format:",
+            "  - helper text pattern: `Recommended section: X mm\u00b2`",
+            "  - include an explicit `Apply` action next to the recommendation when a value is available",
+            "- Recommendation behavior:",
+            "  - recommendation is informational by default and does not silently overwrite `sectionMm2`",
+            "  - `Apply` copies the recommended value into the wire section draft",
+            "- Recompute policy:",
+            "  - recalculate the recommendation live when `currentA`, `material`, `lengthMm`, or `network.voltageV` changes",
+            "- Missing-input policy:",
+            "  - do not show a recommendation if `currentA` is missing",
+            "  - do not show a recommendation if `network.voltageV` is missing",
+            "- Length policy:",
+            "  - V1 uses the existing stored wire `lengthMm` as the calculation length input",
+            "- Standard section set:",
+            "  - V1 supported standard values should be locked in code and include at least:",
+            "    - `0.5`",
+            "    - `0.75`",
+            "    - `1`",
+            "    - `1.5`",
+            "    - `2.5`",
+            "    - `4`",
+            "    - `6`",
+            "    - `10`",
+            "    - `16`",
+            "    - `25`",
+            ""
+          ],
+          "Definition of Ready (DoR)": [
+            "- [x] Problem statement is explicit and user impact is clear.",
+            "- [x] Scope boundaries (in/out) are explicit.",
+            "- [x] Acceptance criteria are testable.",
+            "- [x] Dependencies and known risks are listed.",
+            ""
+          ],
+          "Functional scope": [
+            "## A. Network data model extension (high priority)",
+            "- Extend `Network` with a numeric voltage field, recommended naming:",
+            "  - `voltageV`",
+            "- `voltageV` is considered network-wide in V1.",
+            "- Validation rules:",
+            "  - optional for backward compatibility",
+            "  - when filled, must be a finite positive number",
+            "- Backward compatibility:",
+            "  - existing networks without voltage remain loadable and editable",
+            "  - no automatic fake default voltage should silently rewrite old data unless the implementation explicitly documents such a fallback",
+            "",
+            "## B. Wire data model extension (high priority)",
+            "- Extend `Wire` with sizing inputs used for the recommendation:",
+            "  - `currentA?: number`",
+            "  - `material?: \"copper\" | \"aluminum\"`",
+            "- V1 default material policy:",
+            "  - if no explicit wire material is selected, use `copper`",
+            "- `sectionMm2` remains the persisted wire section field already used in the model.",
+            "- Backward compatibility:",
+            "  - existing wires without `currentA` or `material` remain valid",
+            "  - legacy wires should behave as manual-section wires when recommendation inputs are absent",
+            "",
+            "## C. Recommendation engine contract (high priority)",
+            "- Add a dedicated calculation/recommendation module in the core domain for wire section recommendation.",
+            "- Inputs for the V1 recommendation:",
+            "  - `currentA`",
+            "  - `material`",
+            "  - `voltageV`",
+            "  - `lengthMm`",
+            "- Output contract:",
+            "  - a recommended section value expressed in `mm2`",
+            "  - rounded or mapped to supported standard wire sections used by the product",
+            "- The rule may be implemented as:",
+            "  - a formula",
+            "  - a lookup table",
+            "  - or a hybrid approach",
+            "- The rule must be centralized in code so UI forms do not each invent their own sizing logic.",
+            "- If required inputs are missing or invalid, the engine must return no recommendation instead of fabricating a result.",
+            "",
+            "## D. Wire form UX and behavior (high priority)",
+            "- In wire create/edit flows, add:",
+            "  - optional `Current (A)` input",
+            "  - `Material` selector with `Copper` as the default",
+            "- In network create/edit flows, add:",
+            "  - optional `Voltage (V)` input at network scope",
+            "- Wire form behavior:",
+            "  - when all required inputs are available, the UI shows a recommended section directly below `Section (mm\u00b2)`",
+            "  - the recommendation is displayed as helper text plus an explicit `Apply` action",
+            "  - the user can still type or keep a manual `sectionMm2`",
+            "- V1 recommendation policy is locked:",
+            "  - recommendation is informational until the user explicitly applies it",
+            "  - recommendation does not silently mutate persisted or draft `sectionMm2`",
+            "- Editing semantics must stay predictable:",
+            "  - recommendation is recomputed live from the current draft/context inputs",
+            "  - `Apply` updates the section draft to the recommended value",
+            "  - `Cancel edit` restores persisted values as usual",
+            "",
+            "## E. Standard section normalization and visibility (medium-high priority)",
+            "- The recommendation must resolve to standard cable section values supported by the app domain, for example:",
+            "  - `0.5`",
+            "  - `0.75`",
+            "  - `1`",
+            "  - `1.5`",
+            "  - `2.5`",
+            "  - `4`",
+            "  - `6`",
+            "  - `10`",
+            "  - `16`",
+            "  - `25`",
+            "  - and any other standard values explicitly adopted by implementation",
+            "- Existing wire-focused UI should continue showing the final stored `sectionMm2`.",
+            "- If useful and low-cost, wire-focused UI may also expose the origin of the current section:",
+            "  - manual",
+            "  - or recommended/applied",
+            "- This visibility enhancement is optional in V1 if it expands scope too much.",
+            "",
+            "## F. Persistence, import/export, and compatibility (medium priority)",
+            "- Preserve new network and wire sizing fields through:",
+            "  - local persistence",
+            "  - file import/export",
+            "  - migration/normalization paths",
+            "- Existing save data must remain compatible.",
+            "- Imported legacy data missing the new sizing inputs must not fail to load.",
+            "- Existing CSV/BOM/export flows must remain non-regressed if they do not yet surface the new metadata.",
+            "",
+            "## G. Validation and regression coverage (high priority)",
+            "- Add regression coverage for:",
+            "  - network voltage create/edit persistence and validation",
+            "  - wire current/material create/edit persistence and validation",
+            "  - copper default behavior when material is not explicitly set",
+            "  - recommendation presence when all required inputs exist",
+            "  - no recommendation when current or network voltage is missing",
+            "  - section normalization to supported standard values",
+            "  - save/cancel semantics for wire edit drafts",
+            "  - backward compatibility for legacy networks and wires lacking the new fields",
+            ""
+          ],
+          "Needs": [
+            "- Users want the app to suggest a suitable wire cable section instead of entering `sectionMm2` blindly for every wire.",
+            "- The recommendation should be based on a small, pragmatic set of inputs already available or easy to add:",
+            "  - wire current",
+            "  - wire material",
+            "  - network voltage",
+            "  - wire length already computed by the current routing model",
+            "- The result should assist wire creation and editing without removing manual control of the final wire section.",
+            ""
+          ],
+          "Non-functional requirements": [
+            "- The V1 recommendation must be deterministic for the same inputs.",
+            "- The calculation logic should live in core/domain code rather than being duplicated in UI components.",
+            "- The feature should remain understandable to operators; avoid a black-box experience where section changes without explanation.",
+            "- Existing wire workflows must remain performant and stable.",
+            ""
+          ],
+          "Objective": [
+            "- Add a V1 recommendation workflow that suggests a wire cable section from wire current, wire material, network voltage, and existing wire length.",
+            "- Keep `sectionMm2` as the persisted wire value used by the model and visible in existing UI.",
+            "- Keep the recommendation transparent and non-destructive:",
+            "  - recommendation assists the user",
+            "  - the user still decides the final stored `sectionMm2`",
+            ""
+          ],
+          "Orchestration task": [
+            "- `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Out of scope": [
+            "- Full electrical standards compliance across all installation contexts.",
+            "- Additional sizing inputs such as installation mode, ambient temperature, conductor grouping, insulation family, or advanced derating rules.",
+            "- Multi-voltage modeling inside the same network in V1.",
+            "- Automatic hard-locking of `sectionMm2` to the recommendation.",
+            "- Bulk recalculation of every existing wire in a network.",
+            ""
+          ],
+          "References": [
+            "- `src/core/entities.ts`",
+            "- `src/core/wireSection.ts`",
+            "- `src/core/networkMetadata.ts`",
+            "- `src/store/actions.ts`",
+            "- `src/store/reducer/networkReducer.ts`",
+            "- `src/store/reducer/wireReducer.ts`",
+            "- `src/adapters/persistence/migrations.ts`",
+            "- `src/adapters/portability/networkFile.ts`",
+            "- `src/app/components/workspace/ModelingWireFormPanel.tsx`",
+            "- `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`",
+            "- `src/app/components/workspace/AnalysisWireWorkspacePanels.tsx`",
+            "- `logics/request/req_038_wire_cable_section_mm2_field_default_preference_and_backward_compat_patch.md`",
+            "- `logics/request/req_067_wire_protection_metadata_v1_fuse_kind_with_required_reference.md`"
+          ],
+          "Validation and regression safety": [
+            "- Add or extend tests covering reducer/state normalization, form behavior, persistence compatibility, and recommendation logic.",
+            "- Run the relevant validation pipeline after implementation:",
+            "  - `npm run -s lint`",
+            "  - `npm run -s typecheck`",
+            "  - `npm test -- --run <targeted recommendation and form specs>`",
+            "  - `npm run -s build`",
+            ""
+          ]
+        },
+        "title": "Automatic recommended wire section from current, material, network voltage, and wire length"
+      },
+      "signature": {
+        "mtime_ns": 1774622550633653397,
+        "size": 13473
+      }
+    },
+    "logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "modeling, dropdown, select, alphabetical, sort, connector, splice, node, segment, catalog",
+          "skip when": "Skip when changing static enum ordering or non-modeling screen controls.",
+          "summary": "Sort dynamic dropdown menus in the `Modeling` workspace alphabetically by visible label while preserving semantic-order static selects.",
+          "use when": "Use when implementing or validating option ordering in modeling forms."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "94% (the scope is narrow and local to existing form dropdowns if the request is limited to user-facing selectable entity lists in modeling workflows)",
+          "From version": "1.4.3",
+          "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Draft",
+          "Theme": "Modeling form ergonomics / option ordering / data-entry efficiency",
+          "Understanding": "96% (user intent is clear: dropdown menus used in the `Modeling` screens should be easier to scan by sorting their selectable options alphabetically)"
+        },
+        "kind": "request",
+        "path": "logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md",
+        "ref": "req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options",
+            "item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning",
+            "item_548_req_111_validation_matrix_and_modeling_dropdown_ordering_closure_traceability"
+          ],
+          "prod": [],
+          "req": [
+            "req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AI Context": [
+            "- Summary: Sort dynamic dropdown menus in the `Modeling` workspace alphabetically by visible label while preserving semantic-order static selects.",
+            "- Keywords: modeling, dropdown, select, alphabetical, sort, connector, splice, node, segment, catalog",
+            "- Use when: Use when implementing or validating option ordering in modeling forms.",
+            "- Skip when: Skip when changing static enum ordering or non-modeling screen controls.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: Dynamic dropdowns in the `Modeling` screens that list current entities or catalog items are displayed in alphabetical order by user-visible label.",
+            "- AC2: Static semantic dropdowns in `Modeling` keep their deliberate non-alphabetical order.",
+            "- AC3: Alphabetical sorting is case-insensitive and based on trimmed visible option labels.",
+            "- AC4: Existing create/edit/save behavior remains unchanged apart from option ordering.",
+            "- AC5: Missing selected fallback options, when present for compatibility reasons, remain visible, usable, and pinned above the normal sorted options.",
+            "- AC6: Regression tests cover representative connector, splice, wire, node, and segment modeling dropdown ordering behavior.",
+            ""
+          ],
+          "Backlog": [
+            "- `logics/backlog/item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options.md`",
+            "- `logics/backlog/item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning.md`",
+            "- `logics/backlog/item_548_req_111_validation_matrix_and_modeling_dropdown_ordering_closure_traceability.md`",
+            ""
+          ],
+          "Companion docs": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            ""
+          ],
+          "Context": [
+            "The `Modeling` workspace exposes several form dropdowns driven by current entity lists:",
+            "- connector catalog item selector",
+            "- splice catalog item selector",
+            "- wire endpoint connector selector",
+            "- wire endpoint splice selector",
+            "- node connector selector",
+            "- node splice selector",
+            "- segment node selectors",
+            "- any other modeling-only dynamic select whose options come from current workspace entities or catalog items",
+            "",
+            "Today, these lists appear to follow current array order rather than a deterministic alphabetical user-facing order. For end users, this means:",
+            "- harder scanning when many options exist",
+            "- inconsistent ordering across sessions or test/sample data",
+            "- avoidable friction in frequent create/edit workflows",
+            "",
+            "This request should stay focused on `Modeling` dropdown ordering. It is not asking for a global redesign of every select in the app, and it should not force a sort policy onto static enum-like selects where the current semantic order is deliberate.",
+            "",
+            "```mermaid",
+            "%% logics-kind: request",
+            "%% logics-signature: request|alphabetically-sorted-dropdown-menus-in-|users-want-the-dropdown-menus-used|ac1-dynamic-dropdowns-in-the-modeling",
+            "flowchart TD",
+            "    Modeling[Modeling form opened] --> Options[Dynamic dropdown options]",
+            "    Options --> Sort[Alphabetical ordering by visible label]",
+            "    Sort --> Select[User finds target faster]",
+            "    Select --> Save[Create or edit flow remains unchanged]",
+            "```",
+            ""
+          ],
+          "Default decisions (V1)": [
+            "- In-scope controls:",
+            "  - all dynamic selects in `Modeling` backed by current entities or catalog items",
+            "- Sort algorithm:",
+            "  - sort by the exact visible option label shown to the user",
+            "  - normalize by trimming text and comparing case-insensitively",
+            "- Tie-break policy:",
+            "  - first fallback = stable technical identifier when available",
+            "  - second fallback = stable entity ID",
+            "- Missing selected option policy:",
+            "  - if the currently selected option is represented by a compatibility fallback because the entity is missing, keep that fallback visible at the top of the dropdown",
+            "- Out-of-scope controls:",
+            "  - static semantic selects keep their current order and are not alphabetized",
+            ""
+          ],
+          "Definition of Ready (DoR)": [
+            "- [x] Problem statement is explicit and user impact is clear.",
+            "- [x] Scope boundaries (in/out) are explicit.",
+            "- [x] Acceptance criteria are testable.",
+            "- [x] Dependencies and known risks are listed.",
+            ""
+          ],
+          "Functional scope": [
+            "## A. In-scope modeling dropdowns (high priority)",
+            "- Apply alphabetical sorting to dynamic, user-facing dropdowns in `Modeling`, including at minimum:",
+            "  - connector catalog item selector",
+            "  - splice catalog item selector",
+            "  - wire endpoint connector selectors",
+            "  - wire endpoint splice selectors",
+            "  - node connector selector",
+            "  - node splice selector",
+            "  - segment node selectors",
+            "- Include equivalent modeling dropdowns added by nearby features if they follow the same dynamic entity-list pattern.",
+            "",
+            "## B. Sort key policy (high priority)",
+            "- Sort by the label the user actually reads in the dropdown, not by internal object ID order.",
+            "- Recommended policy:",
+            "  - primary sort key = visible label text shown in the option",
+            "  - secondary tie-breaker = stable technical identifier or ID",
+            "- The sort should be deterministic across rerenders.",
+            "- Leading/trailing whitespace must be ignored for comparison.",
+            "- Case differences must not create unstable ordering.",
+            "- Missing optional names should fall back to the visible label contract already rendered by the select.",
+            "",
+            "## C. Semantic-order exceptions (medium-high priority)",
+            "- Do not alphabetize static or intentionally semantic selects where order conveys meaning, for example:",
+            "  - yes/no",
+            "  - ascending/descending",
+            "  - route or mode enums",
+            "  - degree/size/priority scales",
+            "- The implementation should explicitly distinguish:",
+            "  - dynamic entity/catalog selects that should be alphabetized",
+            "  - static semantic selects that should preserve their deliberate order",
+            "",
+            "## D. Missing and legacy option handling (medium priority)",
+            "- If a currently selected entity is missing but still represented as a fallback option, it must remain visible/selectable.",
+            "- Missing fallback options should not disappear just because normal options are sorted.",
+            "- Selected missing fallback options should remain pinned above the normal sorted list for clarity and safety.",
+            "- Sorting should remain safe for legacy/imported data where names or references may be absent.",
+            "",
+            "## E. Regression safety (medium priority)",
+            "- Existing selection, save/cancel behavior, and prefilled edit behavior must remain unchanged.",
+            "- Sorting should not mutate stored entity order in state; this is a presentation concern for the dropdowns.",
+            "- No regression to test flows that depend on select availability and labels.",
+            ""
+          ],
+          "Needs": [
+            "- Users want the dropdown menus used in the `Modeling` screens to be sorted alphabetically instead of reflecting insertion order or internal list order.",
+            "- The current unsorted behavior makes form completion slower, especially when the project contains many connectors, splices, nodes, or catalog items.",
+            "- The sorted order should improve scanability without changing the underlying entity model or selection semantics.",
+            ""
+          ],
+          "Non-functional requirements": [
+            "- Sorting should be implemented in a reusable and readable way rather than duplicating ad hoc comparator logic in every component.",
+            "- The ordering must be deterministic and locale-safe enough for the current EN/FR product scope.",
+            "- The feature should not add noticeable UI lag in normal modeling workflows.",
+            ""
+          ],
+          "Objective": [
+            "- Ensure dynamic dropdown menus in the `Modeling` screens are sorted alphabetically by the user-visible label.",
+            "- Keep current create/edit/save behavior unchanged except for the ordering of options.",
+            "- Preserve explicit exceptions where the current option order is semantic and should not be alphabetized.",
+            ""
+          ],
+          "Orchestration task": [
+            "- `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Out of scope": [
+            "- Reordering non-modeling dropdowns across the whole application.",
+            "- Changing table sort defaults or list sorting outside dropdown menus.",
+            "- Renaming entities or changing the displayed option label format itself.",
+            "- Large UX redesign of modeling forms.",
+            ""
+          ],
+          "References": [
+            "- `src/app/components/workspace/ModelingConnectorFormPanel.tsx`",
+            "- `src/app/components/workspace/ModelingSpliceFormPanel.tsx`",
+            "- `src/app/components/workspace/ModelingWireFormPanel.tsx`",
+            "- `src/app/components/workspace/ModelingNodeFormPanel.tsx`",
+            "- `src/app/components/workspace/ModelingSegmentFormPanel.tsx`",
+            "- `src/app/AppController.tsx`",
+            "- `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`",
+            "- `src/tests/app.ui.catalog.spec.tsx`"
+          ],
+          "Validation and regression safety": [
+            "- Add or extend tests covering sorted option ordering for representative modeling forms.",
+            "- Validate that static semantic selects preserve their existing order.",
+            "- Run targeted validation after implementation:",
+            "  - `npm run -s lint`",
+            "  - `npm run -s typecheck`",
+            "  - `npm test -- --run <targeted modeling form dropdown specs>`",
+            "  - `npm run -s build`",
+            ""
+          ]
+        },
+        "title": "Alphabetically sorted dropdown menus in modeling screens"
+      },
+      "signature": {
+        "mtime_ns": 1774622550634026400,
+        "size": 9246
+      }
+    },
+    "logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "delete, blocked delete, cascade delete, confirmation, dependency, connector, wire, feedback, modal",
+          "skip when": "Skip when only adding basic delete confirmations already covered by `req_074`.",
+          "summary": "Improve delete UX by making blocked deletions explicit and adding safe, dependency-aware cascade confirmation where supported.",
+          "use when": "Use when implementing or validating blocked-delete explanations and safe cascade deletion in modeling and catalog workflows."
+        },
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "89% (the feedback part is straightforward, while cascade delete requires careful scoping so the product does not silently remove more data than expected)",
+          "From version": "1.4.3",
+          "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Draft",
+          "Theme": "Destructive-action clarity / dependency visibility / safe cascade deletion",
+          "Understanding": "97% (user clarified the UX problem: some delete attempts appear to do nothing when blocked by dependencies, and they want clearer feedback plus an explicit option to delete the related items when that is the intended action)"
+        },
+        "kind": "request",
+        "path": "logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md",
+        "ref": "req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration",
+            "item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility",
+            "item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract",
+            "item_552_req_112_validation_matrix_and_blocked_delete_closure_traceability"
+          ],
+          "prod": [],
+          "req": [
+            "req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation",
+            "req_074_all_delete_actions_require_styled_confirmation_modal"
+          ],
+          "spec": [],
+          "task": [
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AI Context": [
+            "- Summary: Improve delete UX by making blocked deletions explicit and adding safe, dependency-aware cascade confirmation where supported.",
+            "- Keywords: delete, blocked delete, cascade delete, confirmation, dependency, connector, wire, feedback, modal",
+            "- Use when: Use when implementing or validating blocked-delete explanations and safe cascade deletion in modeling and catalog workflows.",
+            "- Skip when: Skip when only adding basic delete confirmations already covered by `req_074`.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: A delete action blocked by existing dependencies gives immediate explicit feedback and no longer feels like a silent no-op.",
+            "- AC2: The blocked-delete feedback identifies the reason category for the failure, not just that the delete did not occur.",
+            "- AC3: Blocked delete feedback is shown in a dedicated modal/dialog tied to the delete attempt and does not depend on the top-level error banner alone.",
+            "- AC4: For any entity types that support cascade deletion in V1, the user receives a dedicated impact summary and must explicitly confirm removal of the target plus its listed dependents.",
+            "- AC5: Canceling a blocked-delete explanation or cascade-delete confirmation leaves state unchanged.",
+            "- AC6: Existing delete confirmation behavior from `req_074` remains non-regressed for normal deletions.",
+            "- AC7: Integrity guards remain enforced for unsupported or unsafe cascade cases.",
+            "- AC8: By default, `node`, `segment`, `catalog item`, and `network` blocked deletions remain explanation-only in V1 unless a later explicit expansion is documented.",
+            "- AC9: Regression tests cover representative connector, splice, node, and catalog blocked-delete flows, plus any supported cascade cases.",
+            ""
+          ],
+          "Backlog": [
+            "- `logics/backlog/item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration.md`",
+            "- `logics/backlog/item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility.md`",
+            "- `logics/backlog/item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract.md`",
+            "- `logics/backlog/item_552_req_112_validation_matrix_and_blocked_delete_closure_traceability.md`",
+            ""
+          ],
+          "Companion docs": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            ""
+          ],
+          "Context": [
+            "`req_074` already ensured that delete actions go through a confirmation modal before mutation. However, that request intentionally preserved the existing reducer guard semantics. As a result, a delete flow may still feel opaque when:",
+            "- the user confirms deletion",
+            "- the reducer blocks the action because the entity is referenced",
+            "- the only feedback is a generic top-level error banner that can be missed in the current workflow",
+            "",
+            "Examples already enforced by reducers include:",
+            "- connector deletion blocked while connector nodes reference it",
+            "- connector deletion blocked while wire endpoints reference it",
+            "- splice deletion blocked while splice nodes or wire endpoints reference it",
+            "- node deletion blocked while segments are connected to it",
+            "- catalog item deletion blocked while connectors, splices, or fuse wires reference it",
+            "",
+            "The user specifically highlighted the connector case:",
+            "- deleting a connector that is still used by a wire is not allowed",
+            "- current UX does not make the reason visible enough",
+            "- ideally, the app should offer a deliberate dependency-aware delete path so the user can choose to remove the connector and all related items after a strong warning",
+            "",
+            "This request is therefore a follow-up to `req_074`:",
+            "- keep explicit confirmation before destructive actions",
+            "- improve the visibility of blocked-delete reasons",
+            "- optionally support cascade deletion where the dependency scope is deterministic and can be explained safely",
+            "",
+            "```mermaid",
+            "%% logics-kind: request",
+            "%% logics-signature: request|explicit-blocked-delete-feedback-and-dep|when-a-delete-action-is-impossible|ac1-a-delete-action-blocked-by",
+            "flowchart TD",
+            "    Delete[User requests delete] --> Check[Dependency check]",
+            "    Check -->|No blockers| Confirm[Standard delete confirmation]",
+            "    Check -->|Blocked no cascade| Explain[Immediate explicit reason]",
+            "    Check -->|Blocked cascade supported| Cascade[Impact summary and cascade confirm]",
+            "    Confirm --> Removed[Delete target]",
+            "    Explain --> Cancelled[No silent failure]",
+            "    Cascade --> RemovedAll[Delete target and listed dependents]",
+            "```",
+            ""
+          ],
+          "Default decisions (V1)": [
+            "- Feedback surface:",
+            "  - blocked delete feedback should use a dedicated modal/dialog tied to the delete attempt, not rely only on the global error banner",
+            "- Feedback content:",
+            "  - include the target entity identity",
+            "  - include the blocker category or categories",
+            "  - include dependency counts where the app can determine them cheaply",
+            "  - include representative labels when helpful and low-cost",
+            "- Delivery priority:",
+            "  - first priority is explicit blocked-delete feedback for all guarded delete actions",
+            "  - cascade delete is only enabled for entity types with a bounded, deterministic, and clearly summarized impact set",
+            "- Default cascade support matrix:",
+            "  - `connector`: candidate for V1 cascade support if the app can summarize the exact impacted dependents before confirmation",
+            "  - `splice`: candidate for V1 cascade support if the app can summarize the exact impacted dependents before confirmation",
+            "  - `node`: explanation-only by default in V1",
+            "  - `segment`: explanation-only by default in V1",
+            "  - `catalog item`: explanation-only by default in V1",
+            "  - `network`: explanation-only by default in V1",
+            "- Safety fallback:",
+            "  - if the exact impact summary cannot be produced confidently for a candidate cascade case, fall back to explanation-only blocking",
+            "- Undo/redo policy:",
+            "  - any supported cascade delete should be recorded as one logical destructive operation for undo/redo purposes",
+            ""
+          ],
+          "Definition of Ready (DoR)": [
+            "- [x] Problem statement is explicit and user impact is clear.",
+            "- [x] Scope boundaries (in/out) are explicit.",
+            "- [x] Acceptance criteria are testable.",
+            "- [x] Dependencies and known risks are listed.",
+            ""
+          ],
+          "Functional scope": [
+            "## A. Immediate blocked-delete feedback (high priority)",
+            "- When a delete action is blocked by existing references or integrity constraints, the product must provide immediate, prominent feedback.",
+            "- The feedback should be closer to the delete interaction than the current passive error-banner-only experience.",
+            "- V1 feedback direction is locked:",
+            "  - use a dedicated modal/dialog explaining why deletion cannot proceed",
+            "- The message should say:",
+            "  - what could not be deleted",
+            "  - why it is blocked",
+            "  - which dependency type is causing the block",
+            "",
+            "## B. Dependency detail visibility (high priority)",
+            "- Blocked-delete feedback should be more informative than a generic \u201ccannot remove\u201d string.",
+            "- Where feasible, the user should see the impacted dependency categories and representative references, for example:",
+            "  - connector node references",
+            "  - wire endpoint references",
+            "  - connected segments",
+            "  - linked catalog usages",
+            "- V1 does not require a full exhaustive explorer UI, but the user should understand what is preventing deletion.",
+            "",
+            "## C. Dependency-aware cascade delete flow (high priority, scoped)",
+            "- For delete cases where the dependency tree is deterministic enough to summarize safely, the app should support a cascade-delete confirmation path.",
+            "- The confirmation must explicitly state that related entities will also be removed.",
+            "- The dialog should summarize the impact before the user confirms, for example:",
+            "  - target entity",
+            "  - dependent entities to be deleted",
+            "  - counts and/or representative labels",
+            "- Cascade deletion must be opt-in and explicit.",
+            "- If the dependency scope is too broad, ambiguous, or risky, the app should prefer explanation-only blocking rather than silent or unsafe cascade behavior.",
+            "- V1 default support should start conservatively:",
+            "  - candidate support only for `connector` and `splice`",
+            "  - all other blocked-delete entity types remain explanation-only unless explicitly expanded later",
+            "",
+            "## D. Scope policy for cascade support (medium-high priority)",
+            "- V1 should define exactly which blocked-delete cases support cascade deletion and which remain explanation-only.",
+            "- Recommended V1 policy:",
+            "  - support cascade only for local, deterministic dependency chains with clear summaries",
+            "  - keep more complex or graph-wide cases blocked with explicit explanation until a safer deletion contract exists",
+            "  - treat `connector` and `splice` as the only default V1 cascade candidates",
+            "- The final supported matrix must be documented in the implementation and tests.",
+            "",
+            "## E. Relationship to existing delete confirmation (medium priority)",
+            "- Preserve the existing `req_074` confirmation rule:",
+            "  - user-triggered delete actions still require explicit confirmation",
+            "- The new behavior refines what happens when the target cannot be removed directly:",
+            "  - explanation modal if blocked",
+            "  - or cascade-impact modal if supported",
+            "- Normal successful delete flows should remain non-regressed.",
+            "",
+            "## F. Error-surfacing contract (medium priority)",
+            "- If reducers still emit `lastError` strings for integrity guards, UI must surface those errors in a way users will actually notice in delete flows.",
+            "- The implementation may keep the global error banner as a secondary channel, but delete-specific feedback should not depend on that banner alone.",
+            "- The delete UX should not feel silent even when no mutation occurs.",
+            "",
+            "## G. Regression safety (high priority)",
+            "- Existing integrity protections must not be weakened accidentally.",
+            "- Cascade deletion must not remove entities outside the explicitly summarized impact set.",
+            "- Selection, undo/redo, and persistence behavior must remain coherent after successful cascade deletion.",
+            ""
+          ],
+          "Needs": [
+            "- When a delete action is impossible because the target is still referenced, the product must explain that immediately and clearly.",
+            "- Current behavior can feel like \u201cnothing happened\u201d, which leaves users unsure whether:",
+            "  - the click was ignored",
+            "  - the app is broken",
+            "  - or the delete is blocked by existing dependencies",
+            "- In some blocked cases, users would prefer an explicit option to delete the target together with the dependent items, provided the app clearly explains the impact before confirmation.",
+            ""
+          ],
+          "Non-functional requirements": [
+            "- Cascade deletion must be conservative and predictable.",
+            "- Feedback copy should be explicit, short, and user-readable.",
+            "- The user should never be surprised by hidden extra deletions.",
+            "- The implementation should reuse existing confirmation/dialog infrastructure where possible.",
+            ""
+          ],
+          "Objective": [
+            "- Make blocked delete attempts explicit and understandable at the moment the user tries to delete.",
+            "- Avoid UX patterns where a blocked delete appears to do nothing.",
+            "- Add dependency-aware cascade delete only where the impacted entities can be identified and summarized clearly before confirmation.",
+            ""
+          ],
+          "Orchestration task": [
+            "- `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`",
+            ""
+          ],
+          "Out of scope": [
+            "- Automatic unconditional deletion of all related graph entities without explicit user confirmation.",
+            "- Full dependency-graph visualization tooling.",
+            "- Broad changes to business rules that decide whether an entity may exist without its current dependents.",
+            "- Backend permission or audit-log systems.",
+            ""
+          ],
+          "References": [
+            "- `logics/request/req_074_all_delete_actions_require_styled_confirmation_modal.md`",
+            "- `src/app/components/workspace/AppHeaderAndStats.tsx`",
+            "- `src/app/components/dialogs/ConfirmDialog.tsx`",
+            "- `src/app/AppController.tsx`",
+            "- `src/store/reducer/connectorReducer.ts`",
+            "- `src/store/reducer/spliceReducer.ts`",
+            "- `src/store/reducer/nodeReducer.ts`",
+            "- `src/store/reducer/catalogReducer.ts`",
+            "- `src/store/reducer/networkReducer.ts`",
+            "- `src/tests/app.ui.delete-confirmations.spec.tsx`"
+          ],
+          "Validation and regression safety": [
+            "- Add or extend tests covering:",
+            "  - blocked delete feedback visibility",
+            "  - explanation content for representative blocked cases",
+            "  - cascade confirmation content and confirm/cancel semantics where supported",
+            "  - non-regression of normal delete confirmation flows",
+            "  - integrity preservation when deletion remains blocked",
+            "- Run targeted validation after implementation:",
+            "  - `npm run -s lint`",
+            "  - `npm run -s typecheck`",
+            "  - `npm test -- --run <targeted delete feedback and cascade specs>`",
+            "  - `npm run -s build`",
+            ""
+          ]
+        },
+        "title": "Explicit blocked delete feedback and dependency-aware cascade delete confirmation"
+      },
+      "signature": {
+        "mtime_ns": 1774622550634425902,
+        "size": 13020
       }
     },
     "logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md": {
@@ -78389,6 +80598,7 @@
             "  - `item_529_req_107_validation_matrix_and_traceability_closure`",
             "",
             "```mermaid",
+            "%% logics-signature: task|req-107-post-release-ci-csv-persistence-|item-525-local-and-github-blocking-ci-co|1-align-the-canonical-local-blocking|python3-logics-skills-logics-doc-linter-",
             "flowchart LR",
             "    Req[Req 107] --> B1[CI parity]",
             "    Req --> B2[CSV hardening]",
@@ -78459,8 +80669,8 @@
         "title": "Req 107 post release CI CSV persistence and export test signal hardening orchestration and delivery control"
       },
       "signature": {
-        "mtime_ns": 1773097388985798503,
-        "size": 5262
+        "mtime_ns": 1774622550660274626,
+        "size": 5448
       }
     },
     "logics/tasks/task_087_req_108_bom_wire_termination_reference_only_aggregation_orchestration_and_delivery_control.md": {
@@ -78679,7 +80889,7 @@
         "title": "Req 109 New/Edit scroll to corresponding form panel orchestration and delivery control"
       },
       "signature": {
-        "mtime_ns": 1774449076649490658,
+        "mtime_ns": 1774457034931165128,
         "size": 3842
       }
     },
@@ -78781,130 +80991,190 @@
         "title": "Req 096 recent changes human-readable entity references orchestration and delivery control"
       },
       "signature": {
-        "mtime_ns": 1774444921294999707,
+        "mtime_ns": 1774457034931301712,
         "size": 3287
       }
     },
-    "logics/tasks/task_090_release_1_4_3_preparation_validation_and_publication_readiness.md": {
+    "logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md": {
       "data": {
-        "ai_context": {},
+        "ai_context": {
+          "keywords": "req110, req111, req112, orchestration, validation gates, checkpoints, modeling, delete modal",
+          "skip when": "Skip when working on an unrelated backlog slice outside items `542` to `552`.",
+          "summary": "Orchestrate delivery of req_110 to req_112 by sequencing modeling dropdown ordering first, assisted wire sizing second, and blocked-delete UX plus safe cascade last.",
+          "use when": "Use when executing or reviewing the delivery order for the current request bundle."
+        },
         "indicators": {
-          "Complexity": "Medium",
-          "Confidence": "98%",
+          "Complexity": "High",
+          "Confidence": "93%",
           "From version": "1.4.3",
-          "Progress": "100%",
+          "Progress": "0%",
           "Reminder": "Update status/understanding/confidence/progress and dependencies/references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Done",
-          "Theme": "Release / Validation / Delivery control",
-          "Understanding": "100%"
+          "Status": "Ready",
+          "Theme": "Cross-request delivery coordination for req_110 to req_112",
+          "Understanding": "97%"
         },
         "kind": "task",
-        "path": "logics/tasks/task_090_release_1_4_3_preparation_validation_and_publication_readiness.md",
-        "ref": "task_090_release_1_4_3_preparation_validation_and_publication_readiness",
+        "path": "logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md",
+        "ref": "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints",
         "refs": {
           "adr": [],
-          "item": [],
+          "item": [
+            "item_542_wire_sizing_metadata_and_recommendation_core_contract",
+            "item_552_req_112_validation_matrix_and_blocked_delete_closure_traceability"
+          ],
           "prod": [],
           "req": [
-            "req_108_bom_wire_termination_reference_aggregation_by_reference_text_across_connection_and_seal",
-            "req_109_new_and_edit_actions_scroll_to_corresponding_form_panel"
+            "req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length",
+            "req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens",
+            "req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation"
           ],
           "spec": [],
           "task": [
-            "task_090_release_1_4_3_preparation_validation_and_publication_readiness"
+            "task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints"
           ]
         },
         "schema_version": "1.0",
         "sections": {
           "AC Traceability": [
-            "- AC1 -> Version metadata is consistent across package, lockfile, and README.",
-            "- AC2 -> The `1.4.3` changelog exists and reflects shipped scope.",
-            "- AC3 -> Release-blocking validation passes on the exact release snapshot.",
-            "- AC4 -> Req_109 Logics delivery closure is synchronized before publication.",
-            "- AC5 -> Release prep does not weaken modularization or regression coverage gates.",
+            "- Req_111 AC1 to AC6 -> covered by steps 1, 2, and closure item `548`.",
+            "- Req_110 AC1 to AC10 -> covered by steps 3, 4, 5, and closure item `545`.",
+            "- Req_112 AC1 to AC9 -> covered by steps 6, 7, 8, and closure item `552`.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Orchestrate delivery of req_110 to req_112 by sequencing modeling dropdown ordering first, assisted wire sizing second, and blocked-delete UX plus safe cascade last.",
+            "- Keywords: req110, req111, req112, orchestration, validation gates, checkpoints, modeling, delete modal",
+            "- Use when: Use when executing or reviewing the delivery order for the current request bundle.",
+            "- Skip when: Skip when working on an unrelated backlog slice outside items `542` to `552`.",
+            ""
+          ],
+          "Attention points": [
+            "- Validation gate after every completed step.",
+            "- Keep `req_112` last among the major features because destructive-action changes are the riskiest.",
+            "- Do not offer cascade delete unless the exact impact summary is available and documented.",
+            "- Leave each completed wave in a coherent, commit-ready state.",
             ""
           ],
           "Context": [
-            "- Release-preparation task for the `1.4.3` line after the explicit-form-scroll delivery and associated Logics closure updates.",
-            "- Release scope consolidated in this task:",
-            "  - bump repository version metadata from `1.4.2` to `1.4.3`;",
-            "  - generate and curate `CHANGELOGS_1_4_3.md`;",
-            "  - synchronize delivered Logics docs for `req_109`;",
-            "  - validate full project release gates before publication.",
-            "- Release content included in the line:",
-            "  - `req_108_bom_wire_termination_reference_aggregation_by_reference_text_across_connection_and_seal`;",
-            "  - `req_109_new_and_edit_actions_scroll_to_corresponding_form_panel`.",
-            "- Additional release-readiness hardening was required because:",
-            "  - the UI modularization gate failed on oversize UI test files after the req_109 additions;",
-            "  - Logics request/task closure state had to be aligned before blocking CI could pass cleanly.",
+            "This orchestration task coordinates a three-request delivery bundle:",
+            "- `req_110`: assisted wire sizing from current, material, network voltage, and wire length",
+            "- `req_111`: alphabetical ordering for dynamic dropdown menus in `Modeling`",
+            "- `req_112`: explicit blocked-delete feedback and conservative dependency-aware cascade delete support",
+            "",
+            "The bundle intentionally mixes risk levels:",
+            "- `req_111` is a localized, low-risk modeling UX improvement;",
+            "- `req_110` introduces new model fields, form UX, and compatibility work;",
+            "- `req_112` changes destructive-action UX and may introduce bounded cascade deletion.",
+            "",
+            "This task does not replace the backlog items. It defines the delivery order, validation discipline, and integration checkpoints across items `542` to `552`.",
+            "",
+            "```mermaid",
+            "%% logics-kind: task",
+            "%% logics-signature: task|super-orchestration-delivery-execution-f|item-542-wire-sizing-metadata-and-recomm|1-deliver-item-546-shared-alphabetical-s|minimum-step-gate",
+            "flowchart LR",
+            "    Backlog[req110 to req112 bundle] --> Step1[1. Deliver req111 shared sort and wiring]",
+            "    Step1 --> Step2[2. Deliver req110 core forms and compatibility]",
+            "    Step2 --> Step3[3. Deliver req112 feedback summaries and safe cascade]",
+            "    Step3 --> Validation[Run final integration validation and sync docs]",
+            "    Validation --> Report[Done report]",
+            "```",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Not needed",
+            "- Architecture signals: (none detected)",
+            "- Architecture follow-up: No architecture decision follow-up is expected based on current signals.",
             ""
           ],
           "Definition of Done (DoD)": [
-            "- [x] Release version metadata updated.",
-            "- [x] Versioned changelog generated and curated.",
-            "- [x] Related Logics docs and workflow cache synchronized.",
-            "- [x] Full blocking CI passed on the release snapshot.",
-            "- [x] Status is `Done` and progress is `100%`.",
+            "- [ ] Scope implemented and acceptance criteria covered.",
+            "- [ ] Validation commands executed and results captured.",
+            "- [ ] Linked request/backlog/task docs updated during completed waves and at closure.",
+            "- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
+            "- [ ] Status is `Done` and progress is `100%`.",
+            ""
+          ],
+          "Delivery checkpoints": [
+            "- Each completed wave should leave the repository in a coherent, commit-ready state.",
+            "- Update linked Logics docs during the wave that changes the behavior, not only at final closure.",
+            "- Prefer reviewed checkpoints after each meaningful wave instead of accumulating undocumented partial states.",
             ""
           ],
           "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Backlog item: `logics/backlog/item_542_wire_sizing_metadata_and_recommendation_core_contract.md` through `logics/backlog/item_552_req_112_validation_matrix_and_blocked_delete_closure_traceability.md`",
             "- Request(s):",
-            "  - `req_108_bom_wire_termination_reference_aggregation_by_reference_text_across_connection_and_seal`",
-            "  - `req_109_new_and_edit_actions_scroll_to_corresponding_form_panel`",
-            "- Changelog:",
-            "  - `changelogs/CHANGELOGS_1_4_3.md`",
-            "- Release metadata:",
-            "  - `package.json`",
-            "  - `README.md`"
+            "  - `logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md`",
+            "  - `logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`",
+            "  - `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`",
+            ""
+          ],
+          "Objective": [
+            "- Deliver items `542` to `552` in a controlled order with clear regression gates.",
+            "- Land smaller, lower-risk form-ordering work before model and destructive-action changes.",
+            "- Keep one shared report for blockers, execution order, validation snapshots, and closure readiness.",
+            ""
           ],
           "Plan": [
-            "- [x] 1. Bump release metadata to `1.4.3`",
-            "  - update `package.json`, `package-lock.json`, and `README.md` version references.",
-            "- [x] 2. Generate and curate the release changelog",
-            "  - create `changelogs/CHANGELOGS_1_4_3.md`;",
-            "  - summarize delivered `req_108` and `req_109` behavior plus release validation evidence.",
-            "- [x] 3. Synchronize Logics delivery closure for req_109",
-            "  - mark request/backlog/task closure state as delivered;",
-            "  - refresh runtime workflow artifacts.",
-            "- [x] 4. Restore release-gate compliance",
-            "  - fix UI modularization gate failures caused by oversized test files;",
-            "  - preserve req_109 coverage while bringing files back within budget.",
-            "- [x] 5. Execute the full blocking release gate",
-            "  - run `npm run -s ci:blocking` and confirm lint, typecheck, segmented CI, UI suite, E2E, build, and PWA checks pass.",
-            "- [x] FINAL: Leave the repository in a publication-ready state with pending changes ready for commit/tag/push",
+            "- [ ] 1. Deliver `item_546` shared alphabetical sorting contract for modeling dynamic dropdown options.",
+            "- [ ] 2. Deliver `item_547` modeling form dropdown wiring for alphabetical ordering and missing fallback pinning.",
+            "- [ ] 3. Deliver `item_542` wire sizing metadata and recommendation core contract.",
+            "- [ ] 4. Deliver `item_543` wire and network forms for assisted sizing with helper text and explicit `Apply`.",
+            "- [ ] 5. Deliver `item_544` wire sizing persistence compatibility and standard section normalization.",
+            "- [ ] 6. Deliver `item_549` dedicated blocked delete feedback modal and delete guard explanation orchestration.",
+            "- [ ] 7. Deliver `item_550` delete dependency summary contract and representative impacted reference visibility.",
+            "- [ ] 8. Deliver `item_551` safe connector and splice cascade delete confirmation and execution contract, only if the exact impact set is provably bounded.",
+            "- [ ] 9. Close req-specific validation and traceability items `545`, `548`, and `552`.",
+            "- [ ] FINAL: Run final integration validation, update request/backlog/task docs, and record closure notes.",
             ""
           ],
           "Report": [
-            "- Delivered:",
-            "  - release metadata bumped to `1.4.3`;",
-            "  - `CHANGELOGS_1_4_3.md` added with curated req_108 + req_109 notes and validation evidence;",
-            "  - req_109 request/backlog/task docs synchronized to delivered state;",
-            "  - repeated UI-form test helpers extracted to `src/tests/helpers/app-ui-form-test-utils.ts` to restore modularization-gate compliance without dropping coverage.",
-            "- Validation executed:",
-            "  - `npm run -s lint` \u2705",
-            "  - targeted req_109-related UI suites \u2705",
-            "  - `npm run -s ci:blocking` \u2705",
-            "- Publication-ready outputs:",
-            "  - `package.json` / `package-lock.json` / `README.md` aligned on `1.4.3`;",
-            "  - `changelogs/CHANGELOGS_1_4_3.md` present;",
-            "  - `logics/.cache/runtime_index.json` refreshed.",
+            "- Current blockers: none.",
+            "- Execution rationale:",
+            "  - `req_111` first because it is the most localized and de-risks form option handling with minimal architectural churn.",
+            "  - `req_110` second because it adds new contracts and compatibility work but remains less risky than destructive-action workflow changes.",
+            "  - `req_112` last because delete UX and cascade behavior have the highest regression and integrity risk."
+          ],
+          "Scope": [
+            "- In:",
+            "  - define execution order and validation gates for items `542` to `552`;",
+            "  - track collisions across modeling forms, persistence, and delete-modal flows;",
+            "  - require request/backlog/task documentation updates as slices complete;",
+            "  - run and record final bundle-level validation before closure.",
+            "- Out:",
+            "  - replacing the detailed scope inside each backlog item;",
+            "  - adding new product scope beyond `req_110`, `req_111`, and `req_112`;",
+            "  - git history rewriting strategy.",
             ""
           ],
           "Validation": [
-            "- `python3 logics/skills/logics-flow-manager/scripts/logics_flow.py sync build-index`",
-            "- `python3 logics/skills/logics-flow-manager/scripts/logics_flow.py sync export-graph`",
+            "## Minimum step gate",
+            "- `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py` when Logics docs change in the step",
+            "- `npm run -s typecheck`",
+            "- targeted tests for the touched surface",
+            "- run broader checks when shared UI, persistence, or destructive-action flows are touched:",
+            "  - `npm run -s build`",
+            "  - `npm test -- --run <relevant targeted specs>`",
+            "",
+            "## Final integration gate",
+            "- `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`",
             "- `npm run -s lint`",
-            "- `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx src/tests/app.ui.networks.spec.tsx src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx src/tests/app.ui.settings-wire-defaults.spec.tsx`",
-            "- `npm run -s ci:blocking`",
+            "- `npm run -s typecheck`",
+            "- `npm run -s build`",
+            "- `npm run -s test:ci`",
             ""
           ]
         },
-        "title": "Release 1.4.3 preparation, validation, and publication readiness"
+        "title": "Super orchestration delivery execution for req 110 to req 112 with validation gates and staged checkpoints"
       },
       "signature": {
-        "mtime_ns": 1774450547204196933,
-        "size": 4420
+        "mtime_ns": 1774622550660796421,
+        "size": 7415
       }
     }
   }

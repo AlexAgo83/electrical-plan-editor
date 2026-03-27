@@ -22,6 +22,7 @@ Export cartouche and callout measurement paths rely on canvas text measurement i
   - weakening export tests just to silence logs.
 
 ```mermaid
+%% logics-signature: backlog|export-and-callout-measurement-fallback-|req-107-post-release-ci-csv-persistence-|export-cartouche-and-callout-measurement|ac1-unsupported-canvas-environments-fall
 flowchart LR
     Req[Req 107] --> Problem[Canvas gaps flood CI logs]
     Problem --> Scope[Deterministic unsupported canvas fallback]
