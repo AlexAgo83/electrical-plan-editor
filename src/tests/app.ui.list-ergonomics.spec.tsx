@@ -2,16 +2,30 @@ import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { appActions, appReducer, createSampleNetworkState } from "../store";
 import {
+  asConnectorId,
+  asSpliceId,
   asWireId,
   createConnectorOccupancyFilterState,
   createConnectorSortingState,
-  createUiIntegrationDenseWiresState,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
   switchScreen,
   switchSubScreen
 } from "./helpers/app-ui-test-utils";
+
+function createSegmentAnalysisSortingState() {
+  return appReducer(
+    createUiIntegrationState(),
+    appActions.saveWire({
+      id: asWireId("W2"),
+      name: "Wire 2",
+      technicalId: "W-2",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 2 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 2 }
+    })
+  );
+}
 
 describe("App integration UI - list ergonomics", () => {
   beforeEach(() => {
@@ -58,7 +72,7 @@ describe("App integration UI - list ergonomics", () => {
   });
 
   it("splits segment-analysis traversing wires endpoints into Endpoint A and Endpoint B columns with sortable split fields", () => {
-    renderAppWithState(createUiIntegrationDenseWiresState());
+    renderAppWithState(createSegmentAnalysisSortingState());
 
     switchSubScreen("segment");
     const modelingSegmentsPanel = getPanelByHeading("Segments");
