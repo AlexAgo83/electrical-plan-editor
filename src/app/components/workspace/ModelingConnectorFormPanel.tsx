@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
+import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -26,6 +27,17 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     connectorFormError
   } = props;
   const hasCatalogItems = catalogItems.length > 0;
+  const catalogItemOptions = buildModelingDynamicSelectOptions({
+    options: catalogItems.map((item) => ({
+      value: item.id,
+      label: `${item.manufacturerReference} (${item.connectionCount})`
+    })),
+    selectedValue: connectorCatalogItemId,
+    missingOption:
+      connectorCatalogItemId.trim().length === 0
+        ? null
+        : { label: `Missing catalog item (${connectorCatalogItemId})` }
+  });
 
   return (
 <article className="panel" hidden={!isConnectorSubScreen} data-form-panel={FORM_PANEL_IDS.connector}>
@@ -52,9 +64,9 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         disabled={!hasCatalogItems}
       >
         <option value="">Select a catalog item</option>
-        {catalogItems.map((item) => (
-          <option key={item.id} value={item.id}>
-            {item.manufacturerReference} ({item.connectionCount})
+        {catalogItemOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
           </option>
         ))}
       </select>

@@ -14,7 +14,8 @@ import type {
   WireEndpoint,
   WireProtection,
   Wire,
-  WireId
+  WireId,
+  WireMaterial
 } from "../core/entities";
 import type { WireColorMode } from "../core/cableColors";
 import type { LayoutNodePosition, NetworkScopedState, NetworkSummaryViewState, SelectionState, ThemeMode } from "./types";
@@ -45,6 +46,7 @@ export type AppAction =
         name: string;
         technicalId: string;
         description?: string;
+        voltageV?: number;
         createdAt?: string;
         author?: string;
         projectCode?: string;
@@ -73,6 +75,7 @@ export type AppAction =
   | { type: "catalog/remove"; payload: { id: CatalogItemId } }
   | { type: "connector/upsert"; payload: Connector }
   | { type: "connector/remove"; payload: { id: ConnectorId } }
+  | { type: "connector/removeCascade"; payload: { id: ConnectorId } }
   | {
       type: "connector/occupyCavity";
       payload: { connectorId: ConnectorId; cavityIndex: number; occupantRef: string };
@@ -80,6 +83,7 @@ export type AppAction =
   | { type: "connector/releaseCavity"; payload: { connectorId: ConnectorId; cavityIndex: number } }
   | { type: "splice/upsert"; payload: Splice }
   | { type: "splice/remove"; payload: { id: SpliceId } }
+  | { type: "splice/removeCascade"; payload: { id: SpliceId } }
   | {
       type: "splice/occupyPort";
       payload: { spliceId: SpliceId; portIndex: number; occupantRef: string };
@@ -98,6 +102,8 @@ export type AppAction =
         name: string;
         technicalId: string;
         sectionMm2?: number;
+        currentA?: number;
+        material?: WireMaterial;
         colorMode?: WireColorMode;
         primaryColorId?: string | null;
         secondaryColorId?: string | null;
@@ -144,6 +150,7 @@ export const appActions = {
     updatedAt: string,
     description?: string,
     metadata?: {
+      voltageV?: number;
       createdAt?: string;
       author?: string;
       projectCode?: string;
@@ -158,6 +165,7 @@ export const appActions = {
       technicalId,
       updatedAt,
       description,
+      voltageV: metadata?.voltageV,
       createdAt: metadata?.createdAt,
       author: metadata?.author,
       projectCode: metadata?.projectCode,
@@ -184,6 +192,7 @@ export const appActions = {
 
   upsertConnector: (payload: Connector): AppAction => ({ type: "connector/upsert", payload }),
   removeConnector: (id: ConnectorId): AppAction => ({ type: "connector/remove", payload: { id } }),
+  removeConnectorCascade: (id: ConnectorId): AppAction => ({ type: "connector/removeCascade", payload: { id } }),
   occupyConnectorCavity: (connectorId: ConnectorId, cavityIndex: number, occupantRef: string): AppAction => ({
     type: "connector/occupyCavity",
     payload: { connectorId, cavityIndex, occupantRef }
@@ -195,6 +204,7 @@ export const appActions = {
 
   upsertSplice: (payload: Splice): AppAction => ({ type: "splice/upsert", payload }),
   removeSplice: (id: SpliceId): AppAction => ({ type: "splice/remove", payload: { id } }),
+  removeSpliceCascade: (id: SpliceId): AppAction => ({ type: "splice/removeCascade", payload: { id } }),
   occupySplicePort: (spliceId: SpliceId, portIndex: number, occupantRef: string): AppAction => ({
     type: "splice/occupyPort",
     payload: { spliceId, portIndex, occupantRef }
@@ -217,6 +227,8 @@ export const appActions = {
     name: string;
     technicalId: string;
     sectionMm2?: number;
+    currentA?: number;
+    material?: WireMaterial;
     colorMode?: WireColorMode;
     primaryColorId?: string | null;
     secondaryColorId?: string | null;

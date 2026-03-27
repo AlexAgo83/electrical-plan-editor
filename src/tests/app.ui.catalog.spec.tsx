@@ -148,7 +148,7 @@ describe("App integration UI - catalog", () => {
 
     const catalogPanel = getPanelByHeading("Catalog");
     fireEvent.click(within(catalogPanel).getByText("CAT-ANALYSIS"));
-    expect(within(catalogPanel).getByRole("button", { name: "Delete" })).toBeDisabled();
+    expect(within(catalogPanel).getByRole("button", { name: "Delete" })).toBeEnabled();
 
     const catalogAnalysisPanel = getPanelByHeading("Catalog analysis");
     const catalogAnalysisGrid = catalogAnalysisPanel.closest(".analysis-panel-grid");

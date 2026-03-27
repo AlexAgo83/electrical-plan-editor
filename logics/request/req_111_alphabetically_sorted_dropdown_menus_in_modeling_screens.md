@@ -1,9 +1,9 @@
 ## req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens - Alphabetically sorted dropdown menus in modeling screens
 > From version: 1.4.3
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 96% (user intent is clear: dropdown menus used in the `Modeling` screens should be easier to scan by sorting their selectable options alphabetically)
-> Confidence: 94% (the scope is narrow and local to existing form dropdowns if the request is limited to user-facing selectable entity lists in modeling workflows)
+> Status: Done
+> Understanding: 100% (the delivered scope is explicit: dynamic modeling entity/catalog selects are alphabetized while semantic-order static selects remain unchanged)
+> Confidence: 98% (shared helper coverage and targeted UI regression tests make the req_111 scope and non-regression boundary clear)
 > Complexity: Medium
 > Theme: Modeling form ergonomics / option ordering / data-entry efficiency
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -154,6 +154,19 @@ flowchart TD
 
 # Orchestration task
 - `logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md`
+
+# Delivery closure
+- Implemented via the shared `modelingSelectOptions` helper plus concrete wiring across connector, splice, node, segment, and wire forms.
+- Delivered behavior:
+  - dynamic `Modeling` selects backed by catalog items or current entities now sort alphabetically by visible label;
+  - comparison ignores leading/trailing whitespace and case;
+  - selected missing compatibility options remain visible and pinned above the normal sorted list;
+  - static semantic selects such as mode/type enums keep their deliberate order.
+- Validation executed at closure:
+  - `npm run -s typecheck`
+  - `npm run -s lint`
+  - `npm test -- --run src/tests/modeling-select-options.spec.ts src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx`
+  - `npm run -s build`
 
 # References
 - `src/app/components/workspace/ModelingConnectorFormPanel.tsx`

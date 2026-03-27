@@ -98,6 +98,10 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireTechnicalId: Parameters<typeof useWireHandlers>[0]["setWireTechnicalId"];
   wireSectionMm2: Parameters<typeof useWireHandlers>[0]["wireSectionMm2"];
   setWireSectionMm2: Parameters<typeof useWireHandlers>[0]["setWireSectionMm2"];
+  wireCurrentA: Parameters<typeof useWireHandlers>[0]["wireCurrentA"];
+  setWireCurrentA: Parameters<typeof useWireHandlers>[0]["setWireCurrentA"];
+  wireMaterial: Parameters<typeof useWireHandlers>[0]["wireMaterial"];
+  setWireMaterial: Parameters<typeof useWireHandlers>[0]["setWireMaterial"];
   wireColorMode: Parameters<typeof useWireHandlers>[0]["wireColorMode"];
   setWireColorMode: Parameters<typeof useWireHandlers>[0]["setWireColorMode"];
   wirePrimaryColorId: Parameters<typeof useWireHandlers>[0]["wirePrimaryColorId"];
@@ -237,6 +241,10 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireTechnicalId,
   wireSectionMm2,
   setWireSectionMm2,
+  wireCurrentA,
+  setWireCurrentA,
+  wireMaterial,
+  setWireMaterial,
   wireColorMode,
   setWireColorMode,
   wirePrimaryColorId,
@@ -404,6 +412,10 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireTechnicalId,
     wireSectionMm2,
     setWireSectionMm2,
+    wireCurrentA,
+    setWireCurrentA,
+    wireMaterial,
+    setWireMaterial,
     wireColorMode,
     setWireColorMode,
     wirePrimaryColorId,

@@ -20,6 +20,8 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setNewNetworkDescription"
     | "newNetworkAuthor"
     | "setNewNetworkAuthor"
+    | "newNetworkVoltageV"
+    | "setNewNetworkVoltageV"
     | "newNetworkProjectCode"
     | "setNewNetworkProjectCode"
     | "newNetworkLogoUrl"

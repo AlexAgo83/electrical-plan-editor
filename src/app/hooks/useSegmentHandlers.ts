@@ -2,6 +2,7 @@ import type { FormEvent } from "react";
 import type { NodeId, Segment, SegmentId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
+import { analyzeSegmentDeleteImpact } from "../../store/deleteImpact";
 import { focusSelectedTableRowInPanel, toPositiveNumber } from "../lib/app-utils-shared";
 import { suggestNextSegmentId } from "../lib/technical-id-suggestions";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
@@ -188,21 +189,37 @@ export function useSegmentHandlers({
     }
 
     void (async () => {
-      const shouldDelete = await confirmAction({
-        title: "Delete segment",
-        message: `Delete segment '${segment.id}' (${segment.nodeA} -> ${segment.nodeB})?`,
-        confirmLabel: "Delete",
-        cancelLabel: "Cancel",
-        intent: "danger"
-      });
-      if (!shouldDelete) {
+      const impact = analyzeSegmentDeleteImpact(store.getState(), segmentId);
+
+      if (impact.kind === "direct") {
+        const shouldDelete = await confirmAction({
+          title: "Delete segment",
+          message: `Delete segment '${segment.id}' (${segment.nodeA} -> ${segment.nodeB})?`,
+          confirmLabel: "Delete",
+          cancelLabel: "Cancel",
+          intent: "danger"
+        });
+        if (!shouldDelete) {
+          return;
+        }
+
+        dispatchAction(appActions.removeSegment(segmentId));
+        if (editingSegmentId === segmentId) {
+          clearSegmentForm();
+        }
         return;
       }
 
-      dispatchAction(appActions.removeSegment(segmentId));
-      if (editingSegmentId === segmentId) {
-        clearSegmentForm();
-      }
+      await confirmAction({
+        title: "Segment delete blocked",
+        message: impact.message,
+        confirmLabel: "Close",
+        cancelLabel: "Cancel",
+        intent: "warning",
+        variant: "deleteBlocked",
+        summaryCategories: impact.categories,
+        summaryNote: impact.note
+      });
     })();
   }
 

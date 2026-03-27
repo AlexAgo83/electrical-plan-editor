@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
+import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -32,6 +33,14 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
   const hasCatalogItems = catalogItems.length > 0;
   const isCatalogLinked = spliceCatalogItemId.trim().length > 0;
   const isUnbounded = splicePortMode === "unbounded";
+  const catalogItemOptions = buildModelingDynamicSelectOptions({
+    options: catalogItems.map((item) => ({
+      value: item.id,
+      label: `${item.manufacturerReference} (${item.connectionCount})`
+    })),
+    selectedValue: spliceCatalogItemId,
+    missingOption: isCatalogLinked ? { label: `Missing catalog item (${spliceCatalogItemId})` } : null
+  });
 
   return (
 <article className="panel" hidden={!isSpliceSubScreen} data-form-panel={FORM_PANEL_IDS.splice}>
@@ -56,9 +65,9 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
         onChange={(event) => setSpliceCatalogItemId(event.target.value)}
       >
         <option value="">No catalog item</option>
-        {catalogItems.map((item) => (
-          <option key={item.id} value={item.id}>
-            {item.manufacturerReference} ({item.connectionCount})
+        {catalogItemOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
           </option>
         ))}
       </select>

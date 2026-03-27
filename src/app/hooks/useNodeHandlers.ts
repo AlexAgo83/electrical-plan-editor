@@ -2,6 +2,7 @@ import type { FormEvent } from "react";
 import type { ConnectorId, NetworkNode, NodeId, SpliceId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
+import { analyzeNodeDeleteImpact } from "../../store/deleteImpact";
 import { focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestNextNodeId } from "../lib/technical-id-suggestions";
 import type { NodePosition } from "../types/app-controller";
@@ -208,21 +209,37 @@ export function useNodeHandlers({
     const nodeIdentity =
       node.kind === "intermediate" ? `'${node.id}' (${node.label})` : `'${node.id}'`;
     void (async () => {
-      const shouldDelete = await confirmAction({
-        title: "Delete node",
-        message: `Delete node ${nodeIdentity}?`,
-        confirmLabel: "Delete",
-        cancelLabel: "Cancel",
-        intent: "danger"
-      });
-      if (!shouldDelete) {
+      const impact = analyzeNodeDeleteImpact(store.getState(), nodeId);
+
+      if (impact.kind === "direct") {
+        const shouldDelete = await confirmAction({
+          title: "Delete node",
+          message: `Delete node ${nodeIdentity}?`,
+          confirmLabel: "Delete",
+          cancelLabel: "Cancel",
+          intent: "danger"
+        });
+        if (!shouldDelete) {
+          return;
+        }
+
+        dispatchAction(appActions.removeNode(nodeId));
+        if (editingNodeId === nodeId) {
+          clearNodeForm();
+        }
         return;
       }
 
-      dispatchAction(appActions.removeNode(nodeId));
-      if (editingNodeId === nodeId) {
-        clearNodeForm();
-      }
+      await confirmAction({
+        title: "Node delete blocked",
+        message: impact.message,
+        confirmLabel: "Close",
+        cancelLabel: "Cancel",
+        intent: "warning",
+        variant: "deleteBlocked",
+        summaryCategories: impact.categories,
+        summaryNote: impact.note
+      });
     })();
   }
 

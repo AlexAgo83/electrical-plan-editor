@@ -213,6 +213,43 @@ describe("localStorage persistence adapter", () => {
     });
   });
 
+  it("preserves network voltage and wire sizing metadata across save/load", () => {
+    const base = createSampleNetworkState();
+    const activeNetworkId = base.activeNetworkId;
+    const firstWireId = base.wires.allIds[0];
+    if (activeNetworkId === null || firstWireId === undefined) {
+      throw new Error("Expected active network and first wire in sample state.");
+    }
+
+    const firstWire = base.wires.byId[firstWireId];
+    if (firstWire === undefined) {
+      throw new Error("Expected first wire payload.");
+    }
+
+    const withVoltage = appReducer(
+      base,
+      appActions.updateNetwork(activeNetworkId, "Main network sample", "NET-MAIN-SAMPLE", "2026-03-01T08:00:00.000Z", undefined, {
+        voltageV: 48
+      })
+    );
+    const enriched = appReducer(
+      withVoltage,
+      appActions.upsertWire({
+        ...firstWire,
+        currentA: 6,
+        material: "aluminum"
+      })
+    );
+    const storage = createMemoryStorage();
+
+    saveState(enriched, storage, () => "2026-03-01T09:00:00.000Z");
+    const loaded = loadState(storage, () => "2026-03-01T09:01:00.000Z");
+
+    expect(loaded.networks.byId[activeNetworkId]?.voltageV).toBe(48);
+    expect(loaded.wires.byId[firstWireId]?.currentA).toBe(6);
+    expect(loaded.wires.byId[firstWireId]?.material).toBe("aluminum");
+  });
+
   it("patches legacy persisted wires missing section/colors/side references to defaults", () => {
     const state = createSampleNetworkState();
     const nowIso = "2026-02-20T11:00:00.000Z";

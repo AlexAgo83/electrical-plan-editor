@@ -235,6 +235,30 @@ describe("appReducer network lifecycle", () => {
     expect(duplicateRejected.ui.lastError).toContain("already used");
   });
 
+  it("persists normalized network voltage and rejects invalid values", () => {
+    const initial = createInitialState();
+    const activeNetworkId = initial.activeNetworkId as NetworkId;
+
+    const updated = appReducer(
+      initial,
+      appActions.updateNetwork(activeNetworkId, "Main network", "NET-MAIN", "2026-02-21T10:00:00.000Z", undefined, {
+        voltageV: 24
+      })
+    );
+
+    expect(updated.networks.byId[activeNetworkId]?.voltageV).toBe(24);
+
+    const rejected = appReducer(
+      updated,
+      appActions.updateNetwork(activeNetworkId, "Main network", "NET-MAIN", "2026-02-21T10:01:00.000Z", undefined, {
+        voltageV: -1
+      })
+    );
+
+    expect(rejected.networks.byId[activeNetworkId]?.voltageV).toBe(24);
+    expect(rejected.ui.lastError).toBe("Network voltage must be a positive number.");
+  });
+
   it("blocks domain writes when no active network exists", () => {
     const initial = createInitialState();
     const onlyNetworkId = initial.activeNetworkId as NetworkId;

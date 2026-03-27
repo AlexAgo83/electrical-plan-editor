@@ -1,10 +1,10 @@
 ## item_542_wire_sizing_metadata_and_recommendation_core_contract - Wire sizing metadata and recommendation core contract
 > From version: 1.4.3
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97%
 > Confidence: 93%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium-High
 > Theme: Wire sizing domain model / recommendation core / deterministic contracts
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
