@@ -1,6 +1,6 @@
 {
   "cache_path": "logics/.cache/runtime_index.json",
-  "generated_at": "2026-03-27T14:43:18.099916+00:00",
+  "generated_at": "2026-03-27T16:34:10.302838+00:00",
   "skill_packages": {
     "logics/skills/logics-acceptance-to-tests": {
       "data": {
@@ -621,8 +621,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774439845211978759,
-            "size": 14205
+            "mtime_ns": 1774629191206414974,
+            "size": 14396
           },
           {
             "mtime_ns": 1772662603566243549,
@@ -1743,9 +1743,9 @@
     }
   },
   "stats": {
-    "cache_hits": 753,
-    "cache_misses": 50,
-    "removed_entries": 1,
+    "cache_hits": 803,
+    "cache_misses": 0,
+    "removed_entries": 0,
     "skill_count": 47,
     "workflow_doc_count": 756
   },
@@ -42612,7 +42612,7 @@
         "title": "Local and GitHub blocking CI command parity and shared orchestration"
       },
       "signature": {
-        "mtime_ns": 1774622550650904852,
+        "mtime_ns": 1774622691148044253,
         "size": 2866
       }
     },
@@ -42705,7 +42705,7 @@
         "title": "CSV formula neutralization hardening for whitespace and control prefixed inputs"
       },
       "signature": {
-        "mtime_ns": 1774622550651209020,
+        "mtime_ns": 1774622691149255720,
         "size": 2717
       }
     },
@@ -42800,7 +42800,7 @@
         "title": "Persistence write failure runtime feedback without reducer instability"
       },
       "signature": {
-        "mtime_ns": 1774622550651438480,
+        "mtime_ns": 1774622691151146734,
         "size": 2776
       }
     },
@@ -42895,7 +42895,7 @@
         "title": "Export and callout measurement fallback signal hardening for jsdom canvas gaps"
       },
       "signature": {
-        "mtime_ns": 1774622550651660065,
+        "mtime_ns": 1774622691153938170,
         "size": 3163
       }
     },
@@ -42996,7 +42996,7 @@
         "title": "Req 107 validation matrix and traceability closure"
       },
       "signature": {
-        "mtime_ns": 1774622550651878900,
+        "mtime_ns": 1774622691154373340,
         "size": 3074
       }
     },
@@ -43787,10 +43787,10 @@
           "Complexity": "Medium",
           "Confidence": "97%",
           "From version": "1.2.0",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "UX / History readability",
           "Understanding": "100%"
         },
@@ -43825,6 +43825,10 @@
             "- AC5: Undo/redo mechanics remain unchanged while label readability improves.",
             ""
           ],
+          "Delivery": [
+            "- Centralized recent-change label composition in a shared helper so readable `displayRef` resolution is defined once for networks, catalog items, connectors, splices, nodes, segments, wires, and layout events.",
+            "- Preferred business-facing identifiers such as `technicalId`, manufacturer reference, linked node refs, and endpoint-derived segment text before falling back to generic kind wording."
+          ],
           "Notes": [
             "- Derived from `logics/request/req_096_recent_changes_human_readable_entity_references_instead_of_system_ids.md`.",
             "- Orchestrated by `logics/tasks/task_089_req_096_recent_changes_human_readable_entity_references_orchestration_and_delivery_control.md`.",
@@ -43833,7 +43837,8 @@
             "  - entity-specific resolution rules can drift if not centralized.",
             "- References:",
             "  - `src/app/hooks/useStoreHistory.ts`",
-            "  - `src/app/types/app-controller.ts`"
+            "  - `src/app/types/app-controller.ts`",
+            ""
           ],
           "Priority": [
             "- Impact: High.",
@@ -43860,8 +43865,8 @@
         "title": "History label displayRef resolution for user-facing entity identifiers"
       },
       "signature": {
-        "mtime_ns": 1774457034924427485,
-        "size": 2423
+        "mtime_ns": 1774623276715689768,
+        "size": 2830
       }
     },
     "logics/backlog/item_539_remove_update_action_history_refinement_using_previous_next_state_context.md": {
@@ -43871,10 +43876,10 @@
           "Complexity": "Medium",
           "Confidence": "97%",
           "From version": "1.2.0",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "UX / History correctness",
           "Understanding": "100%"
         },
@@ -43908,6 +43913,10 @@
             "- AC4: Raw UUID-like identifiers are no longer the primary visible target text for supported remove/update actions.",
             ""
           ],
+          "Delivery": [
+            "- Refined history-label generation so delete actions resolve readable identifiers from `previousState` before entity removal.",
+            "- Update-oriented history entries now combine `previousState` and `nextState` context to keep target labels readable even when payloads only carry internal IDs."
+          ],
           "Notes": [
             "- Derived from `logics/request/req_096_recent_changes_human_readable_entity_references_instead_of_system_ids.md`.",
             "- Depends on: `item_538`.",
@@ -43917,7 +43926,8 @@
             "  - wording churn can make tests brittle if helper normalization is not shared.",
             "- References:",
             "  - `src/app/hooks/useStoreHistory.ts`",
-            "  - `src/store/actions.ts`"
+            "  - `src/store/actions.ts`",
+            ""
           ],
           "Priority": [
             "- Impact: High.",
@@ -43943,8 +43953,8 @@
         "title": "Remove/update action history refinement using previous/next state context"
       },
       "signature": {
-        "mtime_ns": 1774457034924566695,
-        "size": 2336
+        "mtime_ns": 1774623280581901354,
+        "size": 2636
       }
     },
     "logics/backlog/item_540_recent_changes_persistence_compatibility_and_legacy_entry_non_regression.md": {
@@ -43954,10 +43964,10 @@
           "Complexity": "Medium",
           "Confidence": "96%",
           "From version": "1.2.0",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Persistence / History compatibility",
           "Understanding": "100%"
         },
@@ -43991,6 +44001,10 @@
             "- AC4: Recent-changes panel visibility/order semantics remain non-regressed after persistence restore.",
             ""
           ],
+          "Delivery": [
+            "- Preserved recent-changes persistence shape so legacy stored entries continue to load without migration.",
+            "- Added regression coverage for readable-label restore after reload and for continued alignment between recent-changes visibility and undo-stack state."
+          ],
           "Notes": [
             "- Derived from `logics/request/req_096_recent_changes_human_readable_entity_references_instead_of_system_ids.md`.",
             "- Depends on: `item_538`, `item_539`.",
@@ -44001,7 +44015,8 @@
             "- References:",
             "  - `src/adapters/persistence/recentChanges.ts`",
             "  - `src/app/components/workspace/NetworkScopeWorkspaceContent.tsx`",
-            "  - `src/tests/app.ui.networks.spec.tsx`"
+            "  - `src/tests/app.ui.networks.spec.tsx`",
+            ""
           ],
           "Priority": [
             "- Impact: Medium-High.",
@@ -44027,8 +44042,8 @@
         "title": "Recent changes persistence compatibility and legacy entry non-regression"
       },
       "signature": {
-        "mtime_ns": 1774457034924723113,
-        "size": 2314
+        "mtime_ns": 1774623284742862396,
+        "size": 2585
       }
     },
     "logics/backlog/item_541_req_096_history_readability_validation_matrix_and_closure_traceability.md": {
@@ -44038,10 +44053,10 @@
           "Complexity": "Low-Medium",
           "Confidence": "96%",
           "From version": "1.2.0",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Quality / Validation / Traceability",
           "Understanding": "100%"
         },
@@ -44081,6 +44096,11 @@
             "- AC4: Closure notes explicitly confirm legacy recent-changes entries remain compatible.",
             ""
           ],
+          "Delivery": [
+            "- Captured req_096 closure against shared label resolution, state-aware mutation labeling, and persistence compatibility.",
+            "- Synchronized request, backlog, task, and release-note references for the delivered recent-changes readability improvement.",
+            ""
+          ],
           "Notes": [
             "- Derived from `logics/request/req_096_recent_changes_human_readable_entity_references_instead_of_system_ids.md`.",
             "- Depends on: `item_538`, `item_539`, `item_540`.",
@@ -44089,7 +44109,8 @@
             "  - `logics/backlog/item_538_history_label_displayref_resolution_for_user_facing_entity_identifiers.md`",
             "  - `logics/backlog/item_539_remove_update_action_history_refinement_using_previous_next_state_context.md`",
             "  - `logics/backlog/item_540_recent_changes_persistence_compatibility_and_legacy_entry_non_regression.md`",
-            "  - `logics/request/req_096_recent_changes_human_readable_entity_references_instead_of_system_ids.md`"
+            "  - `logics/request/req_096_recent_changes_human_readable_entity_references_instead_of_system_ids.md`",
+            ""
           ],
           "Priority": [
             "- Impact: Medium-High.",
@@ -44109,13 +44130,19 @@
             "- Out:",
             "  - new feature work beyond req_096 closure.",
             ""
+          ],
+          "Validation": [
+            "- `npm test -- --run src/tests/recent-change-labels.spec.ts src/tests/app.ui.undo-redo-global.spec.tsx src/tests/app.ui.networks.spec.tsx`",
+            "- `npm run -s lint`",
+            "- `npm run -s typecheck`",
+            "- `npm run -s build`"
           ]
         },
         "title": "Req 096 history readability validation matrix and closure traceability"
       },
       "signature": {
-        "mtime_ns": 1774457034924909490,
-        "size": 2387
+        "mtime_ns": 1774623290308463187,
+        "size": 2866
       }
     },
     "logics/backlog/item_542_wire_sizing_metadata_and_recommendation_core_contract.md": {
@@ -44130,10 +44157,10 @@
           "Complexity": "Medium-High",
           "Confidence": "93%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Wire sizing domain model / recommendation core / deterministic contracts",
           "Understanding": "97%"
         },
@@ -44243,8 +44270,8 @@
         "title": "Wire sizing metadata and recommendation core contract"
       },
       "signature": {
-        "mtime_ns": 1774622550652644989,
-        "size": 4864
+        "mtime_ns": 1774624921145423680,
+        "size": 4865
       }
     },
     "logics/backlog/item_543_wire_and_network_forms_for_voltage_current_material_and_section_recommendation_apply_flow.md": {
@@ -44259,10 +44286,10 @@
           "Complexity": "Medium",
           "Confidence": "94%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Modeling UX / network metadata form wiring / assisted section application",
           "Understanding": "97%"
         },
@@ -44373,8 +44400,8 @@
         "title": "Wire and network forms for voltage current material and section recommendation apply flow"
       },
       "signature": {
-        "mtime_ns": 1774622550653380286,
-        "size": 4940
+        "mtime_ns": 1774624921145773683,
+        "size": 4941
       }
     },
     "logics/backlog/item_544_wire_sizing_persistence_compatibility_and_standard_section_normalization.md": {
@@ -44389,10 +44416,10 @@
           "Complexity": "Medium-High",
           "Confidence": "92%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Persistence / portability / compatibility for assisted sizing metadata",
           "Understanding": "96%"
         },
@@ -44503,8 +44530,8 @@
         "title": "Wire sizing persistence compatibility and standard section normalization"
       },
       "signature": {
-        "mtime_ns": 1774622550653721330,
-        "size": 4843
+        "mtime_ns": 1774624921146125645,
+        "size": 4844
       }
     },
     "logics/backlog/item_545_req_110_validation_matrix_and_assisted_wire_sizing_closure_traceability.md": {
@@ -44519,10 +44546,10 @@
           "Complexity": "Low-Medium",
           "Confidence": "94%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Quality / Validation / Traceability",
           "Understanding": "96%"
         },
@@ -44628,8 +44655,8 @@
         "title": "Req 110 validation matrix and assisted wire sizing closure traceability"
       },
       "signature": {
-        "mtime_ns": 1774622550654055541,
-        "size": 4492
+        "mtime_ns": 1774624921146416731,
+        "size": 4493
       }
     },
     "logics/backlog/item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options.md": {
@@ -44644,10 +44671,10 @@
           "Complexity": "Medium",
           "Confidence": "95%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Modeling select option ordering / reusable sorting policy / deterministic presentation",
           "Understanding": "97%"
         },
@@ -44702,6 +44729,10 @@
             "- Architecture follow-up: Existing request-level framing is sufficient for now; no additional ADR is required before backlog execution.",
             ""
           ],
+          "Delivery": [
+            "- Introduced a shared modeling-select helper that sorts dynamic options by trimmed, case-insensitive visible label and falls back to technical ID, then entity ID, for deterministic ties.",
+            "- The helper also supports pinning a selected missing compatibility option above the normal sorted list without mutating entity order in state."
+          ],
           "Links": [
             "- Product brief(s): (none yet)",
             "- Architecture decision(s): (none yet)",
@@ -44719,7 +44750,8 @@
             "  - `src/app/components/workspace/ModelingConnectorFormPanel.tsx`",
             "  - `src/app/components/workspace/ModelingSpliceFormPanel.tsx`",
             "  - `src/app/components/workspace/ModelingNodeFormPanel.tsx`",
-            "  - `src/app/components/workspace/ModelingSegmentFormPanel.tsx`"
+            "  - `src/app/components/workspace/ModelingSegmentFormPanel.tsx`",
+            ""
           ],
           "Priority": [
             "- Impact: Medium-High.",
@@ -44756,8 +44788,8 @@
         "title": "Shared alphabetical sorting contract for modeling dynamic dropdown options"
       },
       "signature": {
-        "mtime_ns": 1774622550654391751,
-        "size": 4656
+        "mtime_ns": 1774623826419924397,
+        "size": 5000
       }
     },
     "logics/backlog/item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning.md": {
@@ -44772,10 +44804,10 @@
           "Complexity": "Medium",
           "Confidence": "95%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Modeling forms / dynamic select wiring / user-facing option ordering",
           "Understanding": "97%"
         },
@@ -44831,6 +44863,10 @@
             "- Architecture follow-up: No architecture decision follow-up is expected based on current signals.",
             ""
           ],
+          "Delivery": [
+            "- Wired the shared alphabetical ordering helper into connector, splice, node, segment, and wire dynamic selects in `Modeling`.",
+            "- Preserved static semantic select ordering for mode/type enums while keeping selected missing fallback options visible in compatibility-sensitive edit states."
+          ],
           "Links": [
             "- Product brief(s): (none yet)",
             "- Architecture decision(s): (none yet)",
@@ -44849,7 +44885,8 @@
             "  - `src/app/components/workspace/ModelingSpliceFormPanel.tsx`",
             "  - `src/app/components/workspace/ModelingWireFormPanel.tsx`",
             "  - `src/app/components/workspace/ModelingNodeFormPanel.tsx`",
-            "  - `src/app/components/workspace/ModelingSegmentFormPanel.tsx`"
+            "  - `src/app/components/workspace/ModelingSegmentFormPanel.tsx`",
+            ""
           ],
           "Priority": [
             "- Impact: Medium-High.",
@@ -44885,8 +44922,8 @@
         "title": "Modeling form dropdown wiring for alphabetical option ordering and missing fallback pinning"
       },
       "signature": {
-        "mtime_ns": 1774622550654725379,
-        "size": 4675
+        "mtime_ns": 1774623833594184835,
+        "size": 4975
       }
     },
     "logics/backlog/item_548_req_111_validation_matrix_and_modeling_dropdown_ordering_closure_traceability.md": {
@@ -44899,14 +44936,14 @@
         },
         "indicators": {
           "Complexity": "Low-Medium",
-          "Confidence": "95%",
+          "Confidence": "97%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Quality / Validation / Traceability",
-          "Understanding": "96%"
+          "Understanding": "100%"
         },
         "kind": "backlog",
         "path": "logics/backlog/item_548_req_111_validation_matrix_and_modeling_dropdown_ordering_closure_traceability.md",
@@ -44959,6 +44996,11 @@
             "- Architecture follow-up: No architecture decision follow-up is expected based on current signals.",
             ""
           ],
+          "Delivery": [
+            "- Captured req_111 closure against the shared sorting helper, the modeling form wiring, and the explicit scope guard that semantic-order static selects remain unchanged.",
+            "- Synchronized request, backlog, and orchestration-task references for the dropdown-ordering slice.",
+            ""
+          ],
           "Links": [
             "- Product brief(s): (none yet)",
             "- Architecture decision(s): (none yet)",
@@ -44973,7 +45015,8 @@
             "- References:",
             "  - `logics/backlog/item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options.md`",
             "  - `logics/backlog/item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning.md`",
-            "  - `logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`"
+            "  - `logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`",
+            ""
           ],
           "Priority": [
             "- Impact: Medium.",
@@ -45003,13 +45046,19 @@
             "    Acceptance --> Task[task090 orchestration]",
             "```",
             ""
+          ],
+          "Validation": [
+            "- `npm run -s typecheck`",
+            "- `npm run -s lint`",
+            "- `npm test -- --run src/tests/modeling-select-options.spec.ts src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx`",
+            "- `npm run -s build`"
           ]
         },
         "title": "Req 111 validation matrix and modeling dropdown ordering closure traceability"
       },
       "signature": {
-        "mtime_ns": 1774622550655038339,
-        "size": 4169
+        "mtime_ns": 1774623841432955716,
+        "size": 4760
       }
     },
     "logics/backlog/item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration.md": {
@@ -45024,10 +45073,10 @@
           "Complexity": "Medium",
           "Confidence": "93%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Delete UX clarity / modal feedback / reducer guard surfacing",
           "Understanding": "97%"
         },
@@ -45083,6 +45132,11 @@
             "- Architecture follow-up: No architecture decision follow-up is expected based on current signals.",
             ""
           ],
+          "Delivery": [
+            "- Introduced a dedicated delete-impact dialog variant for blocked delete attempts and routed delete flows through it instead of relying on the global error banner.",
+            "- Preserved the existing standard confirmation modal for direct successful delete paths from `req_074`.",
+            "- Enabled previously disabled catalog delete attempts to surface the blocked-delete explanation instead of silently preventing interaction."
+          ],
           "Links": [
             "- Product brief(s): (none yet)",
             "- Architecture decision(s): (none yet)",
@@ -45099,7 +45153,8 @@
             "  - `logics/request/req_074_all_delete_actions_require_styled_confirmation_modal.md`",
             "  - `src/app/components/dialogs/ConfirmDialog.tsx`",
             "  - `src/app/components/workspace/AppHeaderAndStats.tsx`",
-            "  - `src/app/AppController.tsx`"
+            "  - `src/app/AppController.tsx`",
+            ""
           ],
           "Priority": [
             "- Impact: High.",
@@ -45137,8 +45192,8 @@
         "title": "Dedicated blocked delete feedback modal and delete guard explanation orchestration"
       },
       "signature": {
-        "mtime_ns": 1774622550655360425,
-        "size": 4543
+        "mtime_ns": 1774626129742379013,
+        "size": 4964
       }
     },
     "logics/backlog/item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility.md": {
@@ -45153,10 +45208,10 @@
           "Complexity": "Medium-High",
           "Confidence": "91%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Delete dependency inspection / impact summary / explanation detail",
           "Understanding": "96%"
         },
@@ -45212,6 +45267,11 @@
             "- Architecture follow-up: Existing request-level framing is sufficient for now; no additional ADR is required before backlog execution.",
             ""
           ],
+          "Delivery": [
+            "- Added a shared delete-impact summary module that computes dependency categories, counts, and representative labels before the user confirms or dismisses a delete path.",
+            "- Covered representative blocked flows for connectors, splices, nodes, segments, and catalog items with structured summaries instead of reducer-string-only feedback.",
+            "- Reused the same summary contract for both explanation-only modals and cascade confirmation candidates."
+          ],
           "Links": [
             "- Product brief(s): (none yet)",
             "- Architecture decision(s): (none yet)",
@@ -45229,7 +45289,8 @@
             "  - `src/store/reducer/connectorReducer.ts`",
             "  - `src/store/reducer/spliceReducer.ts`",
             "  - `src/store/reducer/nodeReducer.ts`",
-            "  - `src/store/reducer/catalogReducer.ts`"
+            "  - `src/store/reducer/catalogReducer.ts`",
+            ""
           ],
           "Priority": [
             "- Impact: High.",
@@ -45267,8 +45328,8 @@
         "title": "Delete dependency summary contract and representative impacted reference visibility"
       },
       "signature": {
-        "mtime_ns": 1774622550655718136,
-        "size": 5002
+        "mtime_ns": 1774626136887378192,
+        "size": 5456
       }
     },
     "logics/backlog/item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract.md": {
@@ -45283,10 +45344,10 @@
           "Complexity": "High",
           "Confidence": "86%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Safe cascade deletion / impact-bounded destructive operations / integrity preservation",
           "Understanding": "94%"
         },
@@ -45343,6 +45404,11 @@
             "- Architecture follow-up: Existing request-level framing is sufficient for now; no additional ADR is required before backlog execution.",
             ""
           ],
+          "Delivery": [
+            "- Added conservative cascade delete support for `connector` and `splice` only when the exact impact set is limited to linked nodes and no wire endpoints or connected segments remain.",
+            "- Implemented dedicated cascade delete actions so the supported connector/splice cascade path is recorded as one logical undo/redo operation.",
+            "- Kept unsupported or unsafe cases on the explanation-only path, including all `node`, `segment`, `catalog item`, and `network` delete attempts."
+          ],
           "Links": [
             "- Product brief(s): (none yet)",
             "- Architecture decision(s): (none yet)",
@@ -45362,7 +45428,8 @@
             "  - `src/store/reducer/spliceReducer.ts`",
             "  - `src/store/reducer/nodeReducer.ts`",
             "  - `src/store/reducer/segmentReducer.ts`",
-            "  - `src/store/reducer/wireReducer.ts`"
+            "  - `src/store/reducer/wireReducer.ts`",
+            ""
           ],
           "Priority": [
             "- Impact: High.",
@@ -45400,8 +45467,8 @@
         "title": "Safe connector and splice cascade delete confirmation and execution contract"
       },
       "signature": {
-        "mtime_ns": 1774622550656075763,
-        "size": 5337
+        "mtime_ns": 1774626144192055878,
+        "size": 5820
       }
     },
     "logics/backlog/item_552_req_112_validation_matrix_and_blocked_delete_closure_traceability.md": {
@@ -45416,10 +45483,10 @@
           "Complexity": "Low-Medium",
           "Confidence": "92%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Quality / Validation / Traceability",
           "Understanding": "96%"
         },
@@ -45466,6 +45533,12 @@
             "- AC4: Validation commands and representative destructive-action proof points are recorded for future regression triage.",
             ""
           ],
+          "Closure": [
+            "- V1 explanation-only entity types are locked to `node`, `segment`, `catalog item`, and `network`.",
+            "- V1 cascade delete is limited to safe `connector` and `splice` cases where the exact impact set is bounded to linked nodes only.",
+            "- Blocked delete proof points are covered in representative UI flows for connector, splice, node, segment, and catalog items.",
+            ""
+          ],
           "Decision framing": [
             "- Product framing: Not needed",
             "- Product signals: (none detected)",
@@ -45490,7 +45563,8 @@
             "  - `logics/backlog/item_549_dedicated_blocked_delete_feedback_modal_and_delete_guard_explanation_orchestration.md`",
             "  - `logics/backlog/item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility.md`",
             "  - `logics/backlog/item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract.md`",
-            "  - `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`"
+            "  - `logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`",
+            ""
           ],
           "Priority": [
             "- Impact: Medium-High.",
@@ -45520,13 +45594,19 @@
             "    Acceptance --> Task[task090 orchestration]",
             "```",
             ""
+          ],
+          "Validation": [
+            "- `npm run -s lint`",
+            "- `npm run -s typecheck`",
+            "- `npm test -- --run src/tests/app.ui.delete-confirmations.spec.tsx`",
+            "- `npm run -s build`"
           ]
         },
         "title": "Req 112 validation matrix and blocked delete closure traceability"
       },
       "signature": {
-        "mtime_ns": 1774622550656410432,
-        "size": 4554
+        "mtime_ns": 1774626152973860407,
+        "size": 5070
       }
     },
     "logics/request/req_000_kickoff_v1_electrical_plan_editor.md": {
@@ -63550,11 +63630,11 @@
         "ai_context": {},
         "indicators": {
           "Complexity": "Medium",
-          "Confidence": "97%",
-          "From version": "1.2.0",
+          "Confidence": "99%",
+          "From version": "1.4.3",
           "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "UX / History readability",
           "Understanding": "100%"
         },
@@ -63616,9 +63696,17 @@
             "- [x] Dependencies and known risks are listed.",
             ""
           ],
-          "Delivery status": [
-            "- Status: planned.",
-            "- Task: `logics/tasks/task_089_req_096_recent_changes_human_readable_entity_references_orchestration_and_delivery_control.md`.",
+          "Delivery closure": [
+            "- Implemented through `task_089_req_096_recent_changes_human_readable_entity_references_orchestration_and_delivery_control`.",
+            "- Delivered behavior:",
+            "  - recent-changes history labels now resolve readable references from entity metadata and topology context instead of surfacing opaque IDs by default;",
+            "  - delete and update flows reuse previous/next state to preserve human-readable target identity across mutations;",
+            "  - persisted recent-changes entries remain loadable and newly generated readable labels restore correctly after reload.",
+            "- Validation executed at closure:",
+            "  - `npm test -- --run src/tests/recent-change-labels.spec.ts src/tests/app.ui.undo-redo-global.spec.tsx src/tests/app.ui.networks.spec.tsx`",
+            "  - `npm run -s lint`",
+            "  - `npm run -s typecheck`",
+            "  - `npm run -s build`",
             ""
           ],
           "Functional behavior contract": [
@@ -63707,8 +63795,8 @@
         "title": "Recent changes human-readable entity references instead of system IDs"
       },
       "signature": {
-        "mtime_ns": 1774457034930613456,
-        "size": 6812
+        "mtime_ns": 1774623332904243606,
+        "size": 7448
       }
     },
     "logics/request/req_097_hover_descriptions_for_buttons_selects_and_options.md": {
@@ -66552,13 +66640,13 @@
         },
         "indicators": {
           "Complexity": "Medium-High",
-          "Confidence": "92% (the current data model already stores `sectionMm2` and `lengthMm`, so the request is coherent if V1 stays at recommendation level rather than full electrical-compliance enforcement)",
+          "Confidence": "100% (the shipped behavior, compatibility paths, and targeted regression coverage now confirm the scoped request end to end)",
           "From version": "1.4.3",
           "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Wire sizing assistance / network electrical metadata / modeling ergonomics",
-          "Understanding": "97% (scope clarified with the user: the feature should suggest a cable section from wire current, default copper material, network voltage, and the wire length already computed by the app)"
+          "Understanding": "100% (implemented as a V1 assisted-sizing flow with network voltage, wire current/material, centralized recommendation logic, helper-text placement below `Section (mm\u00b2)`, and explicit `Apply`)"
         },
         "kind": "request",
         "path": "logics/request/req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md",
@@ -66681,6 +66769,21 @@
             "- [x] Scope boundaries (in/out) are explicit.",
             "- [x] Acceptance criteria are testable.",
             "- [x] Dependencies and known risks are listed.",
+            ""
+          ],
+          "Delivery notes": [
+            "- Delivered in `task_090` after the lower-risk `req_111` wave.",
+            "- V1 UX is locked as:",
+            "  - helper text directly below `Section (mm\u00b2)`",
+            "  - explicit `Apply`",
+            "  - no automatic overwrite of `sectionMm2`",
+            "- Implemented surfaces:",
+            "  - `Network.voltageV`",
+            "  - `Wire.currentA`",
+            "  - `Wire.material`",
+            "  - centralized recommendation logic and standard section normalization",
+            "  - persistence and portability compatibility",
+            "  - targeted reducer, portability, persistence, and UI regression coverage",
             ""
           ],
           "Functional scope": [
@@ -66846,8 +66949,8 @@
         "title": "Automatic recommended wire section from current, material, network voltage, and wire length"
       },
       "signature": {
-        "mtime_ns": 1774622550633653397,
-        "size": 13473
+        "mtime_ns": 1774624932342588123,
+        "size": 13910
       }
     },
     "logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md": {
@@ -66860,13 +66963,13 @@
         },
         "indicators": {
           "Complexity": "Medium",
-          "Confidence": "94% (the scope is narrow and local to existing form dropdowns if the request is limited to user-facing selectable entity lists in modeling workflows)",
+          "Confidence": "98% (shared helper coverage and targeted UI regression tests make the req_111 scope and non-regression boundary clear)",
           "From version": "1.4.3",
           "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Modeling form ergonomics / option ordering / data-entry efficiency",
-          "Understanding": "96% (user intent is clear: dropdown menus used in the `Modeling` screens should be easier to scan by sorting their selectable options alphabetically)"
+          "Understanding": "100% (the delivered scope is explicit: dynamic modeling entity/catalog selects are alphabetized while semantic-order static selects remain unchanged)"
         },
         "kind": "request",
         "path": "logics/request/req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md",
@@ -66967,6 +67070,20 @@
             "- [x] Dependencies and known risks are listed.",
             ""
           ],
+          "Delivery closure": [
+            "- Implemented via the shared `modelingSelectOptions` helper plus concrete wiring across connector, splice, node, segment, and wire forms.",
+            "- Delivered behavior:",
+            "  - dynamic `Modeling` selects backed by catalog items or current entities now sort alphabetically by visible label;",
+            "  - comparison ignores leading/trailing whitespace and case;",
+            "  - selected missing compatibility options remain visible and pinned above the normal sorted list;",
+            "  - static semantic selects such as mode/type enums keep their deliberate order.",
+            "- Validation executed at closure:",
+            "  - `npm run -s typecheck`",
+            "  - `npm run -s lint`",
+            "  - `npm test -- --run src/tests/modeling-select-options.spec.ts src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx`",
+            "  - `npm run -s build`",
+            ""
+          ],
           "Functional scope": [
             "## A. In-scope modeling dropdowns (high priority)",
             "- Apply alphabetical sorting to dynamic, user-facing dropdowns in `Modeling`, including at minimum:",
@@ -67064,8 +67181,8 @@
         "title": "Alphabetically sorted dropdown menus in modeling screens"
       },
       "signature": {
-        "mtime_ns": 1774622550634026400,
-        "size": 9246
+        "mtime_ns": 1774623854144387204,
+        "size": 10087
       }
     },
     "logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md": {
@@ -67078,13 +67195,13 @@
         },
         "indicators": {
           "Complexity": "High",
-          "Confidence": "89% (the feedback part is straightforward, while cascade delete requires careful scoping so the product does not silently remove more data than expected)",
+          "Confidence": "98% (UI coverage, conservative cascade guards, and undo/redo proof points confirm the scoped req_112 behavior end to end)",
           "From version": "1.4.3",
           "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Destructive-action clarity / dependency visibility / safe cascade deletion",
-          "Understanding": "97% (user clarified the UX problem: some delete attempts appear to do nothing when blocked by dependencies, and they want clearer feedback plus an explicit option to delete the related items when that is the intended action)"
+          "Understanding": "100% (the delivered V1 contract is explicit: blocked deletes now surface dedicated impact dialogs with structured dependency summaries, while cascade delete remains limited to safe connector/splice cases with exact local impact)"
         },
         "kind": "request",
         "path": "logics/request/req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md",
@@ -67208,6 +67325,12 @@
             "- [x] Dependencies and known risks are listed.",
             ""
           ],
+          "Delivery": [
+            "- Added a dedicated delete-impact modal flow for blocked delete attempts so connector, splice, node, segment, and catalog guard failures no longer depend on the passive error banner.",
+            "- Added a shared delete-impact summary contract with category counts and representative references for connector nodes, splice nodes, connected segments, wire endpoints, routed wires, connectors, splices, and fuse wires.",
+            "- Enabled conservative V1 cascade delete only for connector/splice cases where the exact impact set is limited to the linked node set and no wires or connected segments remain.",
+            "- Preserved normal delete confirmations for direct deletions and kept `node`, `segment`, `catalog item`, and `network` as explanation-only in V1."
+          ],
           "Functional scope": [
             "## A. Immediate blocked-delete feedback (high priority)",
             "- When a delete action is blocked by existing references or integrity constraints, the product must provide immediate, prominent feedback.",
@@ -67311,7 +67434,8 @@
             "- `src/store/reducer/nodeReducer.ts`",
             "- `src/store/reducer/catalogReducer.ts`",
             "- `src/store/reducer/networkReducer.ts`",
-            "- `src/tests/app.ui.delete-confirmations.spec.tsx`"
+            "- `src/tests/app.ui.delete-confirmations.spec.tsx`",
+            ""
           ],
           "Validation and regression safety": [
             "- Add or extend tests covering:",
@@ -67331,8 +67455,8 @@
         "title": "Explicit blocked delete feedback and dependency-aware cascade delete confirmation"
       },
       "signature": {
-        "mtime_ns": 1774622550634425902,
-        "size": 13020
+        "mtime_ns": 1774626122207271631,
+        "size": 13730
       }
     },
     "logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md": {
@@ -80669,7 +80793,7 @@
         "title": "Req 107 post release CI CSV persistence and export test signal hardening orchestration and delivery control"
       },
       "signature": {
-        "mtime_ns": 1774622550660274626,
+        "mtime_ns": 1774622691160835344,
         "size": 5448
       }
     },
@@ -80900,10 +81024,10 @@
           "Complexity": "Medium",
           "Confidence": "97%",
           "From version": "1.2.0",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and dependencies/references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "General",
           "Understanding": "100%"
         },
@@ -80949,11 +81073,11 @@
             ""
           ],
           "Definition of Done (DoD)": [
-            "- [ ] Scope implemented and acceptance criteria covered.",
-            "- [ ] A changelog file is generated in `changelogs/` using the project version current when the task is finished.",
-            "- [ ] Validation commands executed and results captured.",
-            "- [ ] Linked request/backlog/task docs updated.",
-            "- [ ] Status is `Done` and progress is `100%`.",
+            "- [x] Scope implemented and acceptance criteria covered.",
+            "- [x] A changelog file is generated in `changelogs/` using the project version current when the task is finished.",
+            "- [x] Validation commands executed and results captured.",
+            "- [x] Linked request/backlog/task docs updated.",
+            "- [x] Status is `Done` and progress is `100%`.",
             ""
           ],
           "Links": [
@@ -80967,17 +81091,29 @@
           "Notes": [
             "- This task improves readability of `Recent changes` labels only; it does not redesign the panel layout or change undo/redo semantics.",
             "- The delivery must preserve compatibility with legacy stored recent-changes entries and avoid destructive migration requirements.",
-            "- Tests should validate user-visible label quality and restore behavior rather than overfitting to internal helper implementation details."
+            "- Tests should validate user-visible label quality and restore behavior rather than overfitting to internal helper implementation details.",
+            ""
           ],
           "Plan": [
-            "- [ ] 1. Introduce shared readable `displayRef` resolution for recent-changes history labels",
-            "- [ ] 2. Refine delete/update history labeling using previous/next state context",
-            "- [ ] 3. Preserve persistence compatibility and legacy recent-changes entry rendering",
-            "- [ ] 4. Add targeted regression coverage for readable history labels and restore behavior",
-            "- [ ] 5. Generate a changelog entry in `changelogs/` using the project version current at task completion time",
-            "- [ ] 6. Complete req_096 validation and traceability closure",
-            "- [ ] FINAL: Update related Logics docs and synchronize statuses",
+            "- [x] 1. Introduce shared readable `displayRef` resolution for recent-changes history labels",
+            "- [x] 2. Refine delete/update history labeling using previous/next state context",
+            "- [x] 3. Preserve persistence compatibility and legacy recent-changes entry rendering",
+            "- [x] 4. Add targeted regression coverage for readable history labels and restore behavior",
+            "- [x] 5. Generate a changelog entry in `changelogs/` using the project version current at task completion time",
+            "- [x] 6. Complete req_096 validation and traceability closure",
+            "- [x] FINAL: Update related Logics docs and synchronize statuses",
             ""
+          ],
+          "Report": [
+            "- Delivered:",
+            "  - centralized recent-change label generation in a shared helper with readable entity-specific reference resolution;",
+            "  - preserved human-readable target identity for delete/update flows by using previous/next state context;",
+            "  - added targeted unit and UI regression coverage for label quality, recent-changes alignment, and reload persistence.",
+            "- Validation executed:",
+            "  - `npm test -- --run src/tests/recent-change-labels.spec.ts src/tests/app.ui.undo-redo-global.spec.tsx src/tests/app.ui.networks.spec.tsx`",
+            "  - `npm run -s lint`",
+            "  - `npm run -s typecheck`",
+            "  - `npm run -s build`"
           ],
           "Validation": [
             "- `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`",
@@ -80991,8 +81127,8 @@
         "title": "Req 096 recent changes human-readable entity references orchestration and delivery control"
       },
       "signature": {
-        "mtime_ns": 1774457034931301712,
-        "size": 3287
+        "mtime_ns": 1774623304593255324,
+        "size": 3892
       }
     },
     "logics/tasks/task_090_super_orchestration_delivery_execution_for_req_110_to_req_112_with_validation_gates_and_staged_checkpoints.md": {
@@ -81005,12 +81141,12 @@
         },
         "indicators": {
           "Complexity": "High",
-          "Confidence": "93%",
+          "Confidence": "95%",
           "From version": "1.4.3",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and dependencies/references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Cross-request delivery coordination for req_110 to req_112",
           "Understanding": "97%"
         },
@@ -81091,11 +81227,11 @@
             ""
           ],
           "Definition of Done (DoD)": [
-            "- [ ] Scope implemented and acceptance criteria covered.",
-            "- [ ] Validation commands executed and results captured.",
-            "- [ ] Linked request/backlog/task docs updated during completed waves and at closure.",
-            "- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
-            "- [ ] Status is `Done` and progress is `100%`.",
+            "- [x] Scope implemented and acceptance criteria covered.",
+            "- [x] Validation commands executed and results captured.",
+            "- [x] Linked request/backlog/task docs updated during completed waves and at closure.",
+            "- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
+            "- [x] Status is `Done` and progress is `100%`.",
             ""
           ],
           "Delivery checkpoints": [
@@ -81121,16 +81257,16 @@
             ""
           ],
           "Plan": [
-            "- [ ] 1. Deliver `item_546` shared alphabetical sorting contract for modeling dynamic dropdown options.",
-            "- [ ] 2. Deliver `item_547` modeling form dropdown wiring for alphabetical ordering and missing fallback pinning.",
-            "- [ ] 3. Deliver `item_542` wire sizing metadata and recommendation core contract.",
-            "- [ ] 4. Deliver `item_543` wire and network forms for assisted sizing with helper text and explicit `Apply`.",
-            "- [ ] 5. Deliver `item_544` wire sizing persistence compatibility and standard section normalization.",
-            "- [ ] 6. Deliver `item_549` dedicated blocked delete feedback modal and delete guard explanation orchestration.",
-            "- [ ] 7. Deliver `item_550` delete dependency summary contract and representative impacted reference visibility.",
-            "- [ ] 8. Deliver `item_551` safe connector and splice cascade delete confirmation and execution contract, only if the exact impact set is provably bounded.",
-            "- [ ] 9. Close req-specific validation and traceability items `545`, `548`, and `552`.",
-            "- [ ] FINAL: Run final integration validation, update request/backlog/task docs, and record closure notes.",
+            "- [x] 1. Deliver `item_546` shared alphabetical sorting contract for modeling dynamic dropdown options.",
+            "- [x] 2. Deliver `item_547` modeling form dropdown wiring for alphabetical ordering and missing fallback pinning.",
+            "- [x] 3. Deliver `item_542` wire sizing metadata and recommendation core contract.",
+            "- [x] 4. Deliver `item_543` wire and network forms for assisted sizing with helper text and explicit `Apply`.",
+            "- [x] 5. Deliver `item_544` wire sizing persistence compatibility and standard section normalization.",
+            "- [x] 6. Deliver `item_549` dedicated blocked delete feedback modal and delete guard explanation orchestration.",
+            "- [x] 7. Deliver `item_550` delete dependency summary contract and representative impacted reference visibility.",
+            "- [x] 8. Deliver `item_551` safe connector and splice cascade delete confirmation and execution contract, only if the exact impact set is provably bounded.",
+            "- [x] 9. Close req-specific validation and traceability items `545`, `548`, and `552`.",
+            "- [x] FINAL: Run final integration validation, update request/backlog/task docs, and record closure notes.",
             ""
           ],
           "Report": [
@@ -81138,7 +81274,19 @@
             "- Execution rationale:",
             "  - `req_111` first because it is the most localized and de-risks form option handling with minimal architectural churn.",
             "  - `req_110` second because it adds new contracts and compatibility work but remains less risky than destructive-action workflow changes.",
-            "  - `req_112` last because delete UX and cascade behavior have the highest regression and integrity risk."
+            "  - `req_112` last because delete UX and cascade behavior have the highest regression and integrity risk.",
+            "- Completed waves:",
+            "  - `req_111` shared modeling dropdown ordering is delivered, including the reusable comparator helper, form wiring across the in-scope selects, missing fallback pinning, and targeted regression coverage.",
+            "  - `req_110` assisted wire sizing is delivered, including new network/wire sizing metadata, centralized recommendation logic, helper-text plus explicit `Apply` UX, and persistence/import-export compatibility coverage.",
+            "  - `req_112` blocked delete UX is delivered, including a dedicated delete-impact modal, structured dependency summaries for representative guarded delete flows, conservative connector/splice cascade delete support, and undo/redo-safe cascade actions.",
+            "- Latest validation snapshot:",
+            "  - `npm run -s lint`",
+            "  - `npm run -s typecheck`",
+            "  - `npm test -- --run src/tests/app.ui.delete-confirmations.spec.tsx`",
+            "  - `npm test -- --run src/tests/wire-sizing.spec.ts src/tests/store.reducer.networks.spec.ts src/tests/store.reducer.wires.spec.ts src/tests/portability.network-file.spec.ts src/tests/persistence.localStorage.spec.ts src/tests/app.ui.wire-sizing-recommendation.spec.tsx`",
+            "  - `npm test -- --run src/tests/modeling-select-options.spec.ts src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx`",
+            "  - `npm run -s build`",
+            "  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`"
           ],
           "Scope": [
             "- In:",
@@ -81173,8 +81321,8 @@
         "title": "Super orchestration delivery execution for req 110 to req 112 with validation gates and staged checkpoints"
       },
       "signature": {
-        "mtime_ns": 1774622550660796421,
-        "size": 7415
+        "mtime_ns": 1774626170955150173,
+        "size": 8854
       }
     }
   }
