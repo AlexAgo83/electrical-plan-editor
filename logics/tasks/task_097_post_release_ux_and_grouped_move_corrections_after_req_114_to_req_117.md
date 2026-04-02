@@ -1,10 +1,10 @@
 ## task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117 - Orchestration delivery execution for req 118 post-release UX and grouped-move corrections
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 75%
+> Progress: 100%
 > Complexity: High
 > Theme: Modeling post-release corrections
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -41,10 +41,10 @@ flowchart LR
 - [x] 2. Deliver Wave 1 for `item_580`: post-create edit-state `New` correction for Modeling forms.
 - [x] 3. Deliver Wave 2 for `item_581`: `Select multiple` action-row placement and icon alignment across Modeling tables.
 - [x] 4. Deliver Wave 3 for `item_582`: grouped-drag generate isolation and localized move persistence correction on the canvas.
-- [ ] 5. Deliver Wave 4 for `item_583`: regression coverage, integrated validation, and workflow-doc closure.
-- [ ] 6. Checkpoint each completed wave in a commit-ready state, validate it, and update the linked Logics docs.
-- [ ] CHECKPOINT: leave the current wave commit-ready and update the linked Logics docs before continuing.
-- [ ] FINAL: Update related Logics docs
+- [x] 5. Deliver Wave 4 for `item_583`: regression coverage, integrated validation, and workflow-doc closure.
+- [x] 6. Checkpoint each completed wave in a commit-ready state, validate it, and update the linked Logics docs.
+- [x] CHECKPOINT: leave the current wave commit-ready and update the linked Logics docs before continuing.
+- [x] FINAL: Update related Logics docs
 
 # Delivery checkpoints
 - Each completed wave should leave the repository in a coherent, commit-ready state.
@@ -91,21 +91,24 @@ flowchart LR
 - confirm each completed wave leaves the repository in a commit-ready state
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] Linked request/backlog/task docs updated during completed waves and at closure.
-- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] Validation commands executed and results captured.
+- [x] Linked request/backlog/task docs updated during completed waves and at closure.
+- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report
 - Current wave status:
   - Wave 1 delivered the post-create edit-state `New` correction for Modeling forms.
   - Wave 2 aligned `Select multiple` on the main Modeling action row between `Edit` and `Delete` and added an explicit icon affordance.
   - Wave 3 fixed grouped-drag persistence so batch canvas moves keep unrelated persisted node positions intact instead of collapsing the wider plan state.
+  - Wave 4 closed the corrective bundle with integrated regression validation and synchronized all linked Logics docs to their delivered state.
 - Validation snapshot:
+  - `npm run -s lint`
   - `npm run -s typecheck`
   - `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
   - `npm test -- --run src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.delete-confirmations.spec.tsx`
-  - `npm run -s typecheck`
   - `npm test -- --run src/tests/app.ui.navigation-canvas.spec.tsx src/tests/store.reducer.sync-invariant.spec.ts`
+  - `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.delete-confirmations.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx src/tests/store.reducer.sync-invariant.spec.ts`
   - `npm run -s typecheck`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
