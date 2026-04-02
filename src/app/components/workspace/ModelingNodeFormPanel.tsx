@@ -9,6 +9,7 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
   const {
     isNodeSubScreen,
     nodeFormMode,
+    nodeEditAfterCreate,
     openCreateNodeForm,
     handleNodeSubmit,
     nodeIdInput,
@@ -114,7 +115,7 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
         {nodeFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {nodeFormMode === "create" ? "Create" : "Save"}
       </button>
-      {nodeFormMode === "create" ? (
+      {nodeFormMode === "edit" && nodeEditAfterCreate ? (
         <button type="button" className="button-with-icon" onClick={openCreateNodeForm}>
           <span className="action-button-icon is-new" aria-hidden="true" />
           New

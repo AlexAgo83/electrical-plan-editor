@@ -9,6 +9,7 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
   const {
     isSegmentSubScreen,
     segmentFormMode,
+    segmentEditAfterCreate,
     segmentIdInput,
     setSegmentIdInput,
     nodes,
@@ -90,7 +91,7 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
         {segmentFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {segmentFormMode === "create" ? "Create" : "Save"}
       </button>
-      {segmentFormMode === "create" ? (
+      {segmentFormMode === "edit" && segmentEditAfterCreate ? (
         <button type="button" className="button-with-icon" onClick={segmentHandlers.resetSegmentForm}>
           <span className="action-button-icon is-new" aria-hidden="true" />
           New

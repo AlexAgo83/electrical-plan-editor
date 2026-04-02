@@ -90,7 +90,32 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(within(createWirePanel).getByLabelText("Technical ID")).toHaveValue("W-001");
   });
 
-  it("shows a bottom New action across modeling create forms and resets drafts in create mode", () => {
+  it("keeps the bottom New action out of modeling create forms", () => {
+    renderAppWithState(createInitialStateWithCatalog());
+    switchScreenDrawerAware("modeling");
+
+    clickNewFromPanel("Connectors");
+    const createConnectorPanel = getPanelByHeading("Create Connector");
+    expect(within(createConnectorPanel).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
+
+    switchSubScreenDrawerAware("splice");
+    clickNewFromPanel("Splices");
+    expect(within(getPanelByHeading("Create Splice")).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
+
+    switchSubScreenDrawerAware("node");
+    clickNewFromPanel("Nodes");
+    expect(within(getPanelByHeading("Create Node")).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
+
+    switchSubScreenDrawerAware("segment");
+    clickNewFromPanel("Segments");
+    expect(within(getPanelByHeading("Create Segment")).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
+
+    switchSubScreenDrawerAware("wire");
+    clickNewFromPanel("Wires");
+    expect(within(getPanelByHeading("Create Wire")).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
+  });
+
+  it("shows the bottom New action only in the edit state reached after creation and resets to a fresh draft", () => {
     renderAppWithState(createInitialStateWithCatalog());
     switchScreenDrawerAware("modeling");
 
@@ -105,28 +130,17 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.change(within(createConnectorPanel).getByLabelText("Catalog item (manufacturer reference)"), {
       target: { value: "CAT-4" }
     });
-    fireEvent.click(within(createConnectorPanel).getByRole("button", { name: "New" }));
+    fireEvent.click(within(createConnectorPanel).getByRole("button", { name: "Create" }));
+
+    const editConnectorPanel = getPanelByHeading("Edit Connector");
+    expect(within(editConnectorPanel).getByRole("button", { name: "New" })).toBeInTheDocument();
+    fireEvent.click(within(editConnectorPanel).getByRole("button", { name: "New" }));
 
     const resetConnectorPanel = getPanelByHeading("Create Connector");
     expect(within(resetConnectorPanel).getByLabelText("Functional name")).toHaveValue("");
     expect(within(resetConnectorPanel).getByLabelText("Technical ID")).toHaveValue("C-001");
     expect(within(resetConnectorPanel).getByLabelText("Catalog item (manufacturer reference)")).toHaveValue("CAT-2");
-
-    switchSubScreenDrawerAware("splice");
-    clickNewFromPanel("Splices");
-    expect(within(getPanelByHeading("Create Splice")).getByRole("button", { name: "New" })).toBeInTheDocument();
-
-    switchSubScreenDrawerAware("node");
-    clickNewFromPanel("Nodes");
-    expect(within(getPanelByHeading("Create Node")).getByRole("button", { name: "New" })).toBeInTheDocument();
-
-    switchSubScreenDrawerAware("segment");
-    clickNewFromPanel("Segments");
-    expect(within(getPanelByHeading("Create Segment")).getByRole("button", { name: "New" })).toBeInTheDocument();
-
-    switchSubScreenDrawerAware("wire");
-    clickNewFromPanel("Wires");
-    expect(within(getPanelByHeading("Create Wire")).getByRole("button", { name: "New" })).toBeInTheDocument();
+    expect(within(resetConnectorPanel).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
   });
 
   it("focuses the created connector row and switches the form to edit mode after creation", async () => {
