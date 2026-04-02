@@ -4,7 +4,7 @@
 > Status: In progress
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 50%
+> Progress: 75%
 > Complexity: High
 > Theme: Modeling post-release corrections
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -40,7 +40,7 @@ flowchart LR
 - [x] 1. Confirm scope, acceptance-criteria mapping, and linked backlog/request dependencies across `item_580` to `item_583`.
 - [x] 2. Deliver Wave 1 for `item_580`: post-create edit-state `New` correction for Modeling forms.
 - [x] 3. Deliver Wave 2 for `item_581`: `Select multiple` action-row placement and icon alignment across Modeling tables.
-- [ ] 4. Deliver Wave 3 for `item_582`: grouped-drag generate isolation and localized move persistence correction on the canvas.
+- [x] 4. Deliver Wave 3 for `item_582`: grouped-drag generate isolation and localized move persistence correction on the canvas.
 - [ ] 5. Deliver Wave 4 for `item_583`: regression coverage, integrated validation, and workflow-doc closure.
 - [ ] 6. Checkpoint each completed wave in a commit-ready state, validate it, and update the linked Logics docs.
 - [ ] CHECKPOINT: leave the current wave commit-ready and update the linked Logics docs before continuing.
@@ -101,8 +101,11 @@ flowchart LR
 - Current wave status:
   - Wave 1 delivered the post-create edit-state `New` correction for Modeling forms.
   - Wave 2 aligned `Select multiple` on the main Modeling action row between `Edit` and `Delete` and added an explicit icon affordance.
+  - Wave 3 fixed grouped-drag persistence so batch canvas moves keep unrelated persisted node positions intact instead of collapsing the wider plan state.
 - Validation snapshot:
   - `npm run -s typecheck`
   - `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
   - `npm test -- --run src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.delete-confirmations.spec.tsx`
+  - `npm run -s typecheck`
+  - `npm test -- --run src/tests/app.ui.navigation-canvas.spec.tsx src/tests/store.reducer.sync-invariant.spec.ts`
   - `npm run -s typecheck`
