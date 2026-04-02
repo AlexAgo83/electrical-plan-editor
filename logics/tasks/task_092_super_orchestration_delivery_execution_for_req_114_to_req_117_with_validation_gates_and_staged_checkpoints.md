@@ -4,7 +4,7 @@
 > Status: In Progress
 > Understanding: 95%
 > Confidence: 98% (scope, backlog breakdown, companion docs, and orchestration links are now coherent across the full delivery bundle)
-> Progress: 50%
+> Progress: 75%
 > Complexity: High
 > Theme: Modeling productivity / destructive-action ergonomics / canvas interaction
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -49,7 +49,7 @@ flowchart LR
   - `item_568`
   - `item_569`
   - `item_570`
-- [ ] 4. Deliver Wave 3 for `req_116`:
+- [x] 4. Deliver Wave 3 for `req_116`:
   - `item_571`
   - `item_572`
   - `item_573`
@@ -129,7 +129,14 @@ flowchart LR
     - direct delete dialogs now support explicit dialog-level `Enter` confirmation without moving visible focus away from `Cancel`;
     - cascade delete dialogs now also keep `Cancel` focused while supporting `Enter` confirmation;
     - targeted delete-confirmation regression coverage now includes keyboard `Enter` and `Escape` behavior.
+  - Wave 3 (`req_116`) delivered:
+    - Modeling tables now expose an explicit `Select multiple` mode with checkbox-based selection, `select all visible`, and dedicated batch actions;
+    - the right-side edit column now switches to a batch context panel while multi-selection is active, keeping single-item editing out of scope for the mode;
+    - batch delete now runs a preflight summary, blocks mixed selections when any entry is blocked, and commits safe multi-delete operations as one undoable history step.
 - Latest validation snapshot:
   - `npm run -s typecheck`
+  - `npm run -s lint`
   - `npm test -- --run src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx`
   - `npm test -- --run src/tests/app.ui.delete-confirmations.spec.tsx`
+  - `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`

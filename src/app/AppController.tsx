@@ -951,6 +951,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       canvasInteractionDomain
     },
     handlers: {
+      store,
       requestConfirmation,
       replaceStateWithHistory,
       setActiveScreen,

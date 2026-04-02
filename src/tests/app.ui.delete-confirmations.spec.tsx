@@ -438,4 +438,71 @@ describe("App integration UI - delete confirmations", () => {
       expect(store.getState().nodes.byId[asNodeId("N-S-CASCADE")]).toBeUndefined();
     });
   });
+
+  it("replaces the modeling edit panel with a batch context panel while multi-selection is active", () => {
+    openModelingDeleteScenario(createSafeConnectorCascadeState());
+
+    switchSubScreenDrawerAware("connector");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Cascade connector"));
+    expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
+
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select multiple" }));
+
+    expect(screen.queryByRole("heading", { name: "Edit Connector" })).not.toBeInTheDocument();
+    const batchPanel = screen.getByTestId("modeling-batch-context-panel");
+    expect(within(batchPanel).getByRole("heading", { name: "Batch selection" })).toBeInTheDocument();
+    expect(batchPanel).toHaveTextContent("0 connectors selected");
+  });
+
+  it("refuses partial connector batch delete when the selection mixes cascade-safe and blocked entries", async () => {
+    const { store } = openModelingDeleteScenario(createSafeConnectorCascadeState());
+
+    switchSubScreenDrawerAware("connector");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select multiple" }));
+    fireEvent.click(within(connectorsPanel).getByText("Cascade connector"));
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+
+    const batchPanel = screen.getByTestId("modeling-batch-context-panel");
+    expect(batchPanel).toHaveTextContent("2 connectors selected");
+    expect(batchPanel).toHaveTextContent("Cascade delete");
+    expect(batchPanel).toHaveTextContent("Blocked");
+
+    fireEvent.click(within(batchPanel).getByRole("button", { name: "Delete selected (2)" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Batch delete blocked" });
+    expect(dialog).toHaveTextContent("Batch delete will not remove a partial selection");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Close" }));
+
+    expect(store.getState().connectors.byId[asConnectorId("C1")]).toBeDefined();
+    expect(store.getState().connectors.byId[asConnectorId("C-CASCADE")]).toBeDefined();
+  });
+
+  it("deletes multiple wires as one undoable batch operation", async () => {
+    const { store } = openModelingDeleteScenario();
+
+    switchSubScreenDrawerAware("wire");
+    const wiresPanel = getPanelByHeading("Wires");
+    fireEvent.click(within(wiresPanel).getByRole("button", { name: "Select multiple" }));
+    fireEvent.click(within(wiresPanel).getByText("Wire 1"));
+    fireEvent.click(within(wiresPanel).getByText("Wire deletable"));
+
+    const batchPanel = screen.getByTestId("modeling-batch-context-panel");
+    fireEvent.click(within(batchPanel).getByRole("button", { name: "Delete selected (2)" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Delete selected wires" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Delete selected" }));
+
+    await waitFor(() => {
+      expect(store.getState().wires.byId[asWireId("W1")]).toBeUndefined();
+      expect(store.getState().wires.byId[asWireId("W-DEL")]).toBeUndefined();
+    });
+
+    openOpsPanel();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+
+    expect(store.getState().wires.byId[asWireId("W1")]).toBeDefined();
+    expect(store.getState().wires.byId[asWireId("W-DEL")]).toBeDefined();
+  });
 });
