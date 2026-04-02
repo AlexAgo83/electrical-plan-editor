@@ -8,6 +8,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
   const {
     isSpliceSubScreen,
     spliceFormMode,
+    spliceEditAfterCreate,
     openCreateSpliceForm,
     handleSpliceSubmit,
     spliceName,
@@ -137,7 +138,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
         {spliceFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {spliceFormMode === "create" ? "Create" : "Save"}
       </button>
-      {spliceFormMode === "create" ? (
+      {spliceFormMode === "edit" && spliceEditAfterCreate ? (
         <button type="button" className="button-with-icon" onClick={openCreateSpliceForm}>
           <span className="action-button-icon is-new" aria-hidden="true" />
           New

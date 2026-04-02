@@ -23,6 +23,7 @@ export function useEntityFormsState() {
   const [catalogFormError, setCatalogFormError] = useState<string | null>(null);
 
   const [connectorFormMode, setConnectorFormMode] = useState<"idle" | "create" | "edit">("idle");
+  const [connectorEditAfterCreate, setConnectorEditAfterCreate] = useState(false);
   const [editingConnectorId, setEditingConnectorId] = useState<ConnectorId | null>(null);
   const [connectorName, setConnectorName] = useState("");
   const [connectorTechnicalId, setConnectorTechnicalId] = useState("");
@@ -35,6 +36,7 @@ export function useEntityFormsState() {
   const [connectorFormError, setConnectorFormError] = useState<string | null>(null);
 
   const [spliceFormMode, setSpliceFormMode] = useState<"idle" | "create" | "edit">("idle");
+  const [spliceEditAfterCreate, setSpliceEditAfterCreate] = useState(false);
   const [editingSpliceId, setEditingSpliceId] = useState<SpliceId | null>(null);
   const [spliceName, setSpliceName] = useState("");
   const [spliceTechnicalId, setSpliceTechnicalId] = useState("");
@@ -49,6 +51,7 @@ export function useEntityFormsState() {
   const [spliceFormError, setSpliceFormError] = useState<string | null>(null);
 
   const [nodeFormMode, setNodeFormMode] = useState<"idle" | "create" | "edit">("idle");
+  const [nodeEditAfterCreate, setNodeEditAfterCreate] = useState(false);
   const [editingNodeId, setEditingNodeId] = useState<NodeId | null>(null);
   const [nodeIdInput, setNodeIdInput] = useState("");
   const [nodeKind, setNodeKind] = useState<NetworkNode["kind"]>("intermediate");
@@ -58,6 +61,7 @@ export function useEntityFormsState() {
   const [nodeFormError, setNodeFormError] = useState<string | null>(null);
 
   const [segmentFormMode, setSegmentFormMode] = useState<"idle" | "create" | "edit">("idle");
+  const [segmentEditAfterCreate, setSegmentEditAfterCreate] = useState(false);
   const [editingSegmentId, setEditingSegmentId] = useState<SegmentId | null>(null);
   const [segmentIdInput, setSegmentIdInput] = useState("");
   const [segmentNodeA, setSegmentNodeA] = useState("");
@@ -67,6 +71,7 @@ export function useEntityFormsState() {
   const [segmentFormError, setSegmentFormError] = useState<string | null>(null);
 
   const [wireFormMode, setWireFormMode] = useState<"idle" | "create" | "edit">("idle");
+  const [wireEditAfterCreate, setWireEditAfterCreate] = useState(false);
   const [editingWireId, setEditingWireId] = useState<WireId | null>(null);
   const [wireName, setWireName] = useState("");
   const [wireTechnicalId, setWireTechnicalId] = useState("");
@@ -115,6 +120,8 @@ export function useEntityFormsState() {
     setCatalogFormError,
     connectorFormMode,
     setConnectorFormMode,
+    connectorEditAfterCreate,
+    setConnectorEditAfterCreate,
     editingConnectorId,
     setEditingConnectorId,
     connectorName,
@@ -137,6 +144,8 @@ export function useEntityFormsState() {
     setConnectorFormError,
     spliceFormMode,
     setSpliceFormMode,
+    spliceEditAfterCreate,
+    setSpliceEditAfterCreate,
     editingSpliceId,
     setEditingSpliceId,
     spliceName,
@@ -163,6 +172,8 @@ export function useEntityFormsState() {
     setSpliceFormError,
     nodeFormMode,
     setNodeFormMode,
+    nodeEditAfterCreate,
+    setNodeEditAfterCreate,
     editingNodeId,
     setEditingNodeId,
     nodeIdInput,
@@ -179,6 +190,8 @@ export function useEntityFormsState() {
     setNodeFormError,
     segmentFormMode,
     setSegmentFormMode,
+    segmentEditAfterCreate,
+    setSegmentEditAfterCreate,
     editingSegmentId,
     setEditingSegmentId,
     segmentIdInput,
@@ -195,6 +208,8 @@ export function useEntityFormsState() {
     setSegmentFormError,
     wireFormMode,
     setWireFormMode,
+    wireEditAfterCreate,
+    setWireEditAfterCreate,
     editingWireId,
     setEditingWireId,
     wireName,

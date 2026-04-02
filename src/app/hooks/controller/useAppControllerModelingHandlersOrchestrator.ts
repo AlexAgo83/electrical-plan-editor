@@ -16,6 +16,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   confirmAction: Parameters<typeof useConnectorHandlers>[0]["confirmAction"];
   connectorFormMode: Parameters<typeof useConnectorHandlers>[0]["connectorFormMode"];
   setConnectorFormMode: Parameters<typeof useConnectorHandlers>[0]["setConnectorFormMode"];
+  connectorEditAfterCreate: Parameters<typeof useConnectorHandlers>[0]["connectorEditAfterCreate"];
+  setConnectorEditAfterCreate: Parameters<typeof useConnectorHandlers>[0]["setConnectorEditAfterCreate"];
   editingConnectorId: Parameters<typeof useConnectorHandlers>[0]["editingConnectorId"];
   setEditingConnectorId: Parameters<typeof useConnectorHandlers>[0]["setEditingConnectorId"];
   connectorName: Parameters<typeof useConnectorHandlers>[0]["connectorName"];
@@ -35,6 +37,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   connectorOccupantRefInput: Parameters<typeof useConnectorHandlers>[0]["connectorOccupantRefInput"];
   spliceFormMode: Parameters<typeof useSpliceHandlers>[0]["spliceFormMode"];
   setSpliceFormMode: Parameters<typeof useSpliceHandlers>[0]["setSpliceFormMode"];
+  spliceEditAfterCreate: Parameters<typeof useSpliceHandlers>[0]["spliceEditAfterCreate"];
+  setSpliceEditAfterCreate: Parameters<typeof useSpliceHandlers>[0]["setSpliceEditAfterCreate"];
   editingSpliceId: Parameters<typeof useSpliceHandlers>[0]["editingSpliceId"];
   setEditingSpliceId: Parameters<typeof useSpliceHandlers>[0]["setEditingSpliceId"];
   spliceName: Parameters<typeof useSpliceHandlers>[0]["spliceName"];
@@ -57,6 +61,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   spliceOccupantRefInput: Parameters<typeof useSpliceHandlers>[0]["spliceOccupantRefInput"];
   nodeFormMode: Parameters<typeof useNodeHandlers>[0]["nodeFormMode"];
   setNodeFormMode: Parameters<typeof useNodeHandlers>[0]["setNodeFormMode"];
+  nodeEditAfterCreate: Parameters<typeof useNodeHandlers>[0]["nodeEditAfterCreate"];
+  setNodeEditAfterCreate: Parameters<typeof useNodeHandlers>[0]["setNodeEditAfterCreate"];
   editingNodeId: Parameters<typeof useNodeHandlers>[0]["editingNodeId"];
   setEditingNodeId: Parameters<typeof useNodeHandlers>[0]["setEditingNodeId"];
   nodeIdInput: Parameters<typeof useNodeHandlers>[0]["nodeIdInput"];
@@ -75,6 +81,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   onNodeIdRenamed?: Parameters<typeof useNodeHandlers>[0]["onNodeIdRenamed"];
   segmentFormMode: Parameters<typeof useSegmentHandlers>[0]["segmentFormMode"];
   setSegmentFormMode: Parameters<typeof useSegmentHandlers>[0]["setSegmentFormMode"];
+  segmentEditAfterCreate: Parameters<typeof useSegmentHandlers>[0]["segmentEditAfterCreate"];
+  setSegmentEditAfterCreate: Parameters<typeof useSegmentHandlers>[0]["setSegmentEditAfterCreate"];
   editingSegmentId: Parameters<typeof useSegmentHandlers>[0]["editingSegmentId"];
   setEditingSegmentId: Parameters<typeof useSegmentHandlers>[0]["setEditingSegmentId"];
   segmentIdInput: Parameters<typeof useSegmentHandlers>[0]["segmentIdInput"];
@@ -90,6 +98,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setSegmentFormError: Parameters<typeof useSegmentHandlers>[0]["setSegmentFormError"];
   wireFormMode: Parameters<typeof useWireHandlers>[0]["wireFormMode"];
   setWireFormMode: Parameters<typeof useWireHandlers>[0]["setWireFormMode"];
+  wireEditAfterCreate: Parameters<typeof useWireHandlers>[0]["wireEditAfterCreate"];
+  setWireEditAfterCreate: Parameters<typeof useWireHandlers>[0]["setWireEditAfterCreate"];
   editingWireId: Parameters<typeof useWireHandlers>[0]["editingWireId"];
   setEditingWireId: Parameters<typeof useWireHandlers>[0]["setEditingWireId"];
   wireName: Parameters<typeof useWireHandlers>[0]["wireName"];
@@ -159,6 +169,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   confirmAction,
   connectorFormMode,
   setConnectorFormMode,
+  connectorEditAfterCreate,
+  setConnectorEditAfterCreate,
   editingConnectorId,
   setEditingConnectorId,
   connectorName,
@@ -178,6 +190,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   connectorOccupantRefInput,
   spliceFormMode,
   setSpliceFormMode,
+  spliceEditAfterCreate,
+  setSpliceEditAfterCreate,
   editingSpliceId,
   setEditingSpliceId,
   spliceName,
@@ -200,6 +214,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   spliceOccupantRefInput,
   nodeFormMode,
   setNodeFormMode,
+  nodeEditAfterCreate,
+  setNodeEditAfterCreate,
   editingNodeId,
   setEditingNodeId,
   nodeIdInput,
@@ -218,6 +234,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   onNodeIdRenamed,
   segmentFormMode,
   setSegmentFormMode,
+  segmentEditAfterCreate,
+  setSegmentEditAfterCreate,
   editingSegmentId,
   setEditingSegmentId,
   segmentIdInput,
@@ -233,6 +251,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setSegmentFormError,
   wireFormMode,
   setWireFormMode,
+  wireEditAfterCreate,
+  setWireEditAfterCreate,
   editingWireId,
   setEditingWireId,
   wireName,
@@ -300,6 +320,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     confirmAction,
     connectorFormMode,
     setConnectorFormMode,
+    connectorEditAfterCreate,
+    setConnectorEditAfterCreate,
     editingConnectorId,
     setEditingConnectorId,
     connectorName,
@@ -327,6 +349,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     confirmAction,
     spliceFormMode,
     setSpliceFormMode,
+    spliceEditAfterCreate,
+    setSpliceEditAfterCreate,
     editingSpliceId,
     setEditingSpliceId,
     spliceName,
@@ -358,6 +382,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     confirmAction,
     nodeFormMode,
     setNodeFormMode,
+    nodeEditAfterCreate,
+    setNodeEditAfterCreate,
     editingNodeId,
     setEditingNodeId,
     nodeIdInput,
@@ -383,6 +409,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     confirmAction,
     segmentFormMode,
     setSegmentFormMode,
+    segmentEditAfterCreate,
+    setSegmentEditAfterCreate,
     editingSegmentId,
     setEditingSegmentId,
     segmentIdInput,
@@ -404,6 +432,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     confirmAction,
     wireFormMode,
     setWireFormMode,
+    wireEditAfterCreate,
+    setWireEditAfterCreate,
     editingWireId,
     setEditingWireId,
     wireName,

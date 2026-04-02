@@ -22,6 +22,8 @@ interface UseNodeHandlersParams {
   confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
   nodeFormMode: "idle" | "create" | "edit";
   setNodeFormMode: (mode: "idle" | "create" | "edit") => void;
+  nodeEditAfterCreate: boolean;
+  setNodeEditAfterCreate: (value: boolean) => void;
   editingNodeId: NodeId | null;
   setEditingNodeId: (id: NodeId | null) => void;
   nodeIdInput: string;
@@ -47,6 +49,8 @@ export function useNodeHandlers({
   confirmAction,
   nodeFormMode,
   setNodeFormMode,
+  nodeEditAfterCreate: _nodeEditAfterCreate,
+  setNodeEditAfterCreate,
   editingNodeId,
   setEditingNodeId,
   nodeIdInput,
@@ -64,9 +68,12 @@ export function useNodeHandlers({
   setPendingNewNodePosition,
   onNodeIdRenamed
 }: UseNodeHandlersParams) {
+  void _nodeEditAfterCreate;
+
   function resetNodeForm(): void {
     const nextState = store.getState();
     setNodeFormMode("create");
+    setNodeEditAfterCreate(false);
     setEditingNodeId(null);
     setNodeIdInput(suggestNextNodeId(nextState.nodes.allIds));
     setNodeKind("intermediate");
@@ -79,6 +86,7 @@ export function useNodeHandlers({
 
   function clearNodeForm(): void {
     setNodeFormMode("idle");
+    setNodeEditAfterCreate(false);
     setEditingNodeId(null);
     setNodeIdInput("");
     setNodeKind("intermediate");
@@ -94,8 +102,9 @@ export function useNodeHandlers({
     dispatchAction(appActions.clearSelection(), { trackHistory: false });
   }
 
-  function startNodeEdit(node: NetworkNode): void {
+  function startNodeEdit(node: NetworkNode, fromCreate = false): void {
     setNodeFormMode("edit");
+    setNodeEditAfterCreate(fromCreate);
     setEditingNodeId(node.id);
     setPendingNewNodePosition(null);
     setNodeIdInput(node.id);
@@ -190,7 +199,7 @@ export function useNodeHandlers({
       }
       const savedNode = nextState.nodes.byId[effectiveNodeId];
       if (savedNode !== undefined && wasCreateMode) {
-        startNodeEdit(savedNode);
+        startNodeEdit(savedNode, true);
         return;
       }
       if (savedNode !== undefined) {
