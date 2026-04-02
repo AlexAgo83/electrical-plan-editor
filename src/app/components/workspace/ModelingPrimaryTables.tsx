@@ -612,20 +612,21 @@ export function ModelingPrimaryTables({
           </button>
           <button
             type="button"
+            className="button-with-icon"
+            onClick={() => onEnterBatchMode("connector")}
+            disabled={sortedVisibleConnectors.length === 0}
+          >
+            <span className="action-button-icon is-multi-select" aria-hidden="true" />
+            Select multiple
+          </button>
+          <button
+            type="button"
             className="modeling-list-action-delete button-with-icon"
             onClick={() => focusedConnector !== null && onDeleteConnector(focusedConnector.id)}
             disabled={focusedConnector === null || connectorFormMode === "create"}
           >
             <span className="action-button-icon is-delete" aria-hidden="true" />
             Delete
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => onEnterBatchMode("connector")}
-            disabled={sortedVisibleConnectors.length === 0}
-          >
-            Select multiple
           </button>
             </>
           )}
@@ -813,20 +814,21 @@ export function ModelingPrimaryTables({
           </button>
           <button
             type="button"
+            className="button-with-icon"
+            onClick={() => onEnterBatchMode("splice")}
+            disabled={sortedVisibleSplices.length === 0}
+          >
+            <span className="action-button-icon is-multi-select" aria-hidden="true" />
+            Select multiple
+          </button>
+          <button
+            type="button"
             className="modeling-list-action-delete button-with-icon"
             onClick={() => focusedSplice !== null && onDeleteSplice(focusedSplice.id)}
             disabled={focusedSplice === null || spliceFormMode === "create"}
           >
             <span className="action-button-icon is-delete" aria-hidden="true" />
             Delete
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => onEnterBatchMode("splice")}
-            disabled={sortedVisibleSplices.length === 0}
-          >
-            Select multiple
           </button>
             </>
           )}
@@ -1009,20 +1011,21 @@ export function ModelingPrimaryTables({
           </button>
           <button
             type="button"
+            className="button-with-icon"
+            onClick={() => onEnterBatchMode("node")}
+            disabled={sortedVisibleNodes.length === 0}
+          >
+            <span className="action-button-icon is-multi-select" aria-hidden="true" />
+            Select multiple
+          </button>
+          <button
+            type="button"
             className="modeling-list-action-delete button-with-icon"
             onClick={() => focusedNode !== null && onDeleteNode(focusedNode.id)}
             disabled={focusedNode === null || nodeFormMode === "create"}
           >
             <span className="action-button-icon is-delete" aria-hidden="true" />
             Delete
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => onEnterBatchMode("node")}
-            disabled={sortedVisibleNodes.length === 0}
-          >
-            Select multiple
           </button>
             </>
           )}

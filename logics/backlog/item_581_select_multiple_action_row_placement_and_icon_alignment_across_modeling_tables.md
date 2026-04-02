@@ -1,10 +1,10 @@
 ## item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables - Select multiple action-row placement and icon alignment across Modeling tables
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -38,9 +38,9 @@ flowchart LR
 - AC3: The visual order is consistent across supported Modeling screens, with `Select multiple` logically positioned between `Edit` and `Delete` even when small layouts wrap.
 
 # AC Traceability
-- AC1 -> action-row alignment. Proof: capture in Wave 2 validation and report inside `task_097`.
-- AC2 -> explicit icon plus unchanged label. Proof: capture in Wave 2 validation and report inside `task_097`.
-- AC3 -> stable action ordering across supported screens. Proof: capture in Wave 2 validation and report inside `task_097`.
+- AC1 -> action-row alignment. Proof: `src/tests/app.ui.list-ergonomics.spec.tsx` covers the shared Modeling action row placement.
+- AC2 -> explicit icon plus unchanged label. Proof: `src/tests/app.ui.list-ergonomics.spec.tsx` checks the dedicated multi-selection icon and stable label.
+- AC3 -> stable action ordering across supported screens. Proof: `src/tests/app.ui.list-ergonomics.spec.tsx` verifies the `New -> Edit -> Select multiple -> Delete` ordering on representative Modeling tables.
 
 # Decision framing
 - Product framing: Consider
