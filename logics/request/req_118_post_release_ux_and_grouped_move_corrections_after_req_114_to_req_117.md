@@ -2,8 +2,8 @@
 > From version: 1.4.4
 > Schema version: 1.0
 > Status: Done
-> Understanding: 97%
-> Confidence: 95%
+> Understanding: 98%
+> Confidence: 97%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -72,7 +72,7 @@ flowchart TD
 
 # Companion docs
 - Product brief(s): (none yet)
-- Architecture decision(s): (none yet)
+- Architecture decision(s): `adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence`
 
 # AI Context
 - Summary: Post-release UX and grouped-move corrections after req 114 to req 117
