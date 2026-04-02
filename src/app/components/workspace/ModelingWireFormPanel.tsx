@@ -505,6 +505,12 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         {wireFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {wireFormMode === "create" ? "Create" : "Save"}
       </button>
+      {wireFormMode === "create" ? (
+        <button type="button" className="button-with-icon" onClick={openCreateWireForm}>
+          <span className="action-button-icon is-new" aria-hidden="true" />
+          New
+        </button>
+      ) : null}
       {wireFormMode === "edit" ? (
         <button type="button" className="button-with-icon" onClick={handleSwapWireEndpoints}>
           <span className="action-button-icon is-swap" aria-hidden="true" />

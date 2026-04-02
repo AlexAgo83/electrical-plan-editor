@@ -1,10 +1,10 @@
 ## task_092_super_orchestration_delivery_execution_for_req_114_to_req_117_with_validation_gates_and_staged_checkpoints - Super orchestration delivery execution for req 114 to req 117 with validation gates and staged checkpoints
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: In Progress
 > Understanding: 95%
 > Confidence: 98% (scope, backlog breakdown, companion docs, and orchestration links are now coherent across the full delivery bundle)
-> Progress: 0%
+> Progress: 25%
 > Complexity: High
 > Theme: Modeling productivity / destructive-action ergonomics / canvas interaction
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -40,8 +40,8 @@ flowchart LR
 ```
 
 # Plan
-- [ ] 1. Confirm scope, companion docs, and acceptance-criteria dependencies across `req_114` to `req_117` and items `565` to `578`.
-- [ ] 2. Deliver Wave 1 for `req_114`:
+- [x] 1. Confirm scope, companion docs, and acceptance-criteria dependencies across `req_114` to `req_117` and items `565` to `578`.
+- [x] 2. Deliver Wave 1 for `req_114`:
   - `item_565`
   - `item_566`
   - `item_567`
@@ -119,3 +119,12 @@ flowchart LR
 - [ ] Status is `Done` and progress is `100%`.
 
 # Report
+- Current blockers: none.
+- Completed waves:
+  - Wave 1 (`req_114`) delivered:
+    - connector/splice catalog labels now include catalog names with safe fallback behavior;
+    - all Modeling create forms now expose a bottom `New` action in create mode only;
+    - targeted regression coverage updated for dropdown labels and chained create resets.
+- Latest validation snapshot:
+  - `npm run -s typecheck`
+  - `npm test -- --run src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx`

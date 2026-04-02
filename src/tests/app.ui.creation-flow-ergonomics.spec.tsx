@@ -15,11 +15,21 @@ describe("App integration UI - creation flow ergonomics", () => {
   function createInitialStateWithCatalog() {
     const withPrimaryCatalog = appReducer(
       createInitialState(),
-      appActions.upsertCatalogItem({ id: asCatalogItemId("CAT-4"), manufacturerReference: "CAT-REF-4", connectionCount: 4 })
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-4"),
+        manufacturerReference: "CAT-REF-4",
+        name: "Catalog Four",
+        connectionCount: 4
+      })
     );
     return appReducer(
       withPrimaryCatalog,
-      appActions.upsertCatalogItem({ id: asCatalogItemId("CAT-2"), manufacturerReference: "CAT-REF-2", connectionCount: 2 })
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-2"),
+        manufacturerReference: "CAT-REF-2",
+        name: "Catalog Two",
+        connectionCount: 2
+      })
     );
   }
 
@@ -78,6 +88,45 @@ describe("App integration UI - creation flow ergonomics", () => {
     clickNewFromPanel("Wires");
     const createWirePanel = getPanelByHeading("Create Wire");
     expect(within(createWirePanel).getByLabelText("Technical ID")).toHaveValue("W-001");
+  });
+
+  it("shows a bottom New action across modeling create forms and resets drafts in create mode", () => {
+    renderAppWithState(createInitialStateWithCatalog());
+    switchScreenDrawerAware("modeling");
+
+    clickNewFromPanel("Connectors");
+    const createConnectorPanel = getPanelByHeading("Create Connector");
+    fireEvent.change(within(createConnectorPanel).getByLabelText("Functional name"), {
+      target: { value: "Connector draft" }
+    });
+    fireEvent.change(within(createConnectorPanel).getByLabelText("Technical ID"), {
+      target: { value: "C-DRAFT-1" }
+    });
+    fireEvent.change(within(createConnectorPanel).getByLabelText("Catalog item (manufacturer reference)"), {
+      target: { value: "CAT-4" }
+    });
+    fireEvent.click(within(createConnectorPanel).getByRole("button", { name: "New" }));
+
+    const resetConnectorPanel = getPanelByHeading("Create Connector");
+    expect(within(resetConnectorPanel).getByLabelText("Functional name")).toHaveValue("");
+    expect(within(resetConnectorPanel).getByLabelText("Technical ID")).toHaveValue("C-001");
+    expect(within(resetConnectorPanel).getByLabelText("Catalog item (manufacturer reference)")).toHaveValue("CAT-2");
+
+    switchSubScreenDrawerAware("splice");
+    clickNewFromPanel("Splices");
+    expect(within(getPanelByHeading("Create Splice")).getByRole("button", { name: "New" })).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("node");
+    clickNewFromPanel("Nodes");
+    expect(within(getPanelByHeading("Create Node")).getByRole("button", { name: "New" })).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("segment");
+    clickNewFromPanel("Segments");
+    expect(within(getPanelByHeading("Create Segment")).getByRole("button", { name: "New" })).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("wire");
+    clickNewFromPanel("Wires");
+    expect(within(getPanelByHeading("Create Wire")).getByRole("button", { name: "New" })).toBeInTheDocument();
   });
 
   it("focuses the created connector row and switches the form to edit mode after creation", async () => {
@@ -181,6 +230,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.change(within(createConnectorPanel).getByLabelText("Catalog item (manufacturer reference)"), {
       target: { value: "CAT-2" }
     });
+    expect(within(createConnectorPanel).getByDisplayValue("CAT-REF-2 - Catalog Two (2)")).toBeInTheDocument();
     expect(within(createConnectorPanel).getByLabelText("Way count (from catalog)")).toHaveValue(2);
     expect(within(createConnectorPanel).getByText("Manufacturer reference: CAT-REF-2")).toBeInTheDocument();
     fireEvent.click(within(createConnectorPanel).getByRole("button", { name: "Create" }));
@@ -228,6 +278,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.change(within(createSplicePanel).getByLabelText("Catalog item (manufacturer reference)"), {
       target: { value: "CAT-2" }
     });
+    expect(within(createSplicePanel).getByDisplayValue("CAT-REF-2 - Catalog Two (2)")).toBeInTheDocument();
     expect(within(createSplicePanel).getByLabelText("Port count (from catalog)")).toHaveValue(2);
     expect(within(createSplicePanel).getByText("Manufacturer reference: CAT-REF-2")).toBeInTheDocument();
     fireEvent.click(within(createSplicePanel).getByRole("button", { name: "Create" }));
