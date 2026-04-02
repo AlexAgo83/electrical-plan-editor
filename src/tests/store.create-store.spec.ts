@@ -35,7 +35,7 @@ describe("createAppStore", () => {
         appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 })
       );
       await waitFor(() => {
-        expect(store.getState().ui.lastError).toBe(PERSISTENCE_WRITE_FAILURE_MESSAGE);
+        expect(store.getState().ui.lastError?.message).toBe(PERSISTENCE_WRITE_FAILURE_MESSAGE);
       });
       expect(save).toHaveBeenCalledTimes(1);
 

@@ -34,7 +34,9 @@ import {
   DEFAULT_NETWORK_CREATED_AT,
   DEFAULT_NETWORK_ID,
   DEFAULT_NETWORK_TECHNICAL_ID,
-  createInitialState
+  createInitialState,
+  normalizeAppError,
+  type AppError
 } from "../../store/types";
 
 export const PERSISTED_STATE_SCHEMA_VERSION = 3;
@@ -320,6 +322,31 @@ function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | n
   });
 }
 
+function normalizePersistedAppError(candidate: unknown): AppError | null {
+  if (candidate === null || candidate === undefined) {
+    return null;
+  }
+
+  if (typeof candidate === "string") {
+    return normalizeAppError(candidate);
+  }
+
+  if (typeof candidate === "object" && candidate !== null) {
+    const message = "message" in candidate ? (candidate as { message?: unknown }).message : undefined;
+    const code = "code" in candidate ? (candidate as { code?: unknown }).code : undefined;
+    const context = "context" in candidate ? (candidate as { context?: unknown }).context : undefined;
+    if (typeof message === "string" && typeof code === "string") {
+      return normalizeAppError({
+        code,
+        message,
+        context: typeof context === "object" && context !== null ? (context as Record<string, unknown>) : undefined
+      });
+    }
+  }
+
+  return null;
+}
+
 function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | null {
   if (!isRecord(candidate)) {
     return null;
@@ -370,7 +397,11 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     connectors: normalizeConnectorEntityState(candidate.connectors as EntityState<Connector, ConnectorId>),
     splices: normalizeSpliceEntityState(candidate.splices as EntityState<Splice, SpliceId>),
     wires: normalizeWireEntityState(candidate.wires as EntityState<Wire, WireId>),
-    nodePositions: normalizeNodePositions(candidate.nodePositions)
+    nodePositions: normalizeNodePositions(candidate.nodePositions),
+    ui: {
+      ...(candidate.ui as AppState["ui"]),
+      lastError: normalizePersistedAppError((candidate.ui as { lastError?: unknown }).lastError)
+    }
   } satisfies AppState;
 
   const knownNetworkIds = new Set(candidateState.networks.allIds);
@@ -418,7 +449,7 @@ interface LegacySingleNetworkState {
   splicePortOccupancy: Record<SpliceId, Record<number, string>>;
   ui: {
     selected: AppState["ui"]["selected"];
-    lastError: string | null;
+    lastError: string | AppError | null;
   };
   meta: {
     revision: number;
@@ -630,7 +661,7 @@ function migrateLegacySingleNetworkStateToCurrent(
     splicePortOccupancy: catalogBootstrappedScoped.splicePortOccupancy,
     ui: {
       selected: legacy.ui.selected,
-      lastError: legacy.ui.lastError,
+      lastError: normalizePersistedAppError(legacy.ui.lastError),
       themeMode: "warmBrown"
     },
     meta: {
