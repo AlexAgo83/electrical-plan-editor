@@ -1,10 +1,10 @@
 ## item_561_dedicated_migration_spec_with_version_fixtures_and_corrupt_input_coverage - Dedicated migration spec with version fixtures and corrupt input coverage
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 95%
-> Confidence: 92%
-> Progress: 0%
+> Status: Done
+> Understanding: 97%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Test quality / migration coverage
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -72,6 +72,10 @@ flowchart LR
   - `src/adapters/persistence/migrations.ts`
   - `src/tests/persistence.migrations.spec.ts` (to be created)
   - `src/tests/persistence.localStorage.spec.ts`
+- Delivery notes:
+  - added `src/tests/persistence.migrations.spec.ts` with static fixtures for pre-timestamp (`v1`), timestamped (`v2`), and current versioned (`v3`) persisted payload shapes;
+  - covered happy-path preservation of network metadata, entity collections, and per-network summary view state;
+  - covered both migration-step failure surfaces plus successful backup create/remove lifecycle during `loadState()`.
 
 # Validation
 - `npm run -s lint`

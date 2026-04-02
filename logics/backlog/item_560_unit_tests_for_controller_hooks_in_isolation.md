@@ -1,10 +1,10 @@
 ## item_560_unit_tests_for_controller_hooks_in_isolation - Unit tests for controller hooks in isolation
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 93%
-> Confidence: 90%
-> Progress: 0%
+> Status: Done
+> Understanding: 96%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Test quality / hook coverage
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -71,6 +71,9 @@ flowchart LR
 - References:
   - `src/app/hooks/controller/`
   - `src/tests/` (new spec files to be created)
+- Delivery notes:
+  - added isolated `renderHook()` specs for `useAppControllerSelectionHandlersDomainAssembly`, `useAppControllerWorkspaceHandlersDomainAssembly`, `useAppControllerModelingHandlersAssembly`, `useEntityFormsState`, and `useCanvasState`;
+  - each hook now has a default-contract assertion plus one representative state-change assertion without mounting `AppController` or any screen component.
 
 # Validation
 - `npm run -s lint`
