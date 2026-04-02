@@ -4,7 +4,7 @@
 > Status: In Progress
 > Understanding: 96%
 > Confidence: 93%
-> Progress: 75%
+> Progress: 83%
 > Complexity: High
 > Theme: Technical hardening / orchestration across persistence, performance, architecture, and robustness
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -79,8 +79,8 @@ flowchart LR
 - [x] C-GATE: Run `npm run -s lint && npm run -s typecheck && npm test -- --run src/tests/app.ui src/tests/store.reducer && npm run -s build`. All green before proceeding.
 
 ## Wave D — Robustness and testing
-- [ ] 8. Deliver `item_560`: unit tests for the five controller hooks in isolation.
-- [ ] 9. Deliver `item_561`: dedicated migration spec with version fixtures and corrupt-input coverage.
+- [x] 8. Deliver `item_560`: unit tests for the five controller hooks in isolation.
+- [x] 9. Deliver `item_561`: dedicated migration spec with version fixtures and corrupt-input coverage.
 - [ ] 10. Deliver `item_562`: universal occupancy index validation before all occupancy map writes.
 - [ ] 11. Deliver `item_564`: structured `AppError` type replacing raw `lastError` string.
 - [ ] 12. Deliver `item_563`: canvas viewport state in store and undo/redo history integration. (Deliver last — highest architectural impact within Wave D.)
@@ -182,7 +182,12 @@ flowchart LR
     - modeling surfaces now run under explicit contexts for dispatch plus connector, segment, and wire handlers; deeply nested modeling form panels consume those handler namespaces directly instead of relying only on prop drilling;
     - `forms`, `canvas`, and `selectionEntities` now expose memoized derived objects, and persistence health handling moved into a dedicated hook so `AppController.tsx` dropped from 1120 lines to 1110 lines;
     - scoped domain mutations now all flow through an explicit `runScopedDomainReducer()` wrapper with an invariant comment block in `reducer.ts`, and a dedicated reducer test asserts root/scoped-state alignment after representative mutations.
+  - Wave D (partial) (`item_560` `item_561`) delivered:
+    - added isolated `renderHook()` coverage for the five highest-risk controller/state hooks without mounting `AppController`, with one contract test and one representative mutation test per hook;
+    - added `persistence.migrations.spec.ts` covering pre-timestamp, timestamped, and current versioned payload fixtures, migration-step failure recovery, and pre-migration backup lifecycle cleanup.
 - Latest validation snapshot:
+  - `npm run -s typecheck`
+  - `npm test -- --run src/tests/entity-forms-state.hook.spec.ts src/tests/canvas-state.hook.spec.ts src/tests/app-controller-selection-handlers-domain.hook.spec.ts src/tests/app-controller-workspace-handlers-domain.hook.spec.ts src/tests/app-controller-modeling-handlers-assembly.hook.spec.ts src/tests/persistence.migrations.spec.ts`
   - `npm run -s lint`
   - `npm run -s typecheck`
   - `npm test -- --run $(rg --files src/tests | rg '(^src/tests/app\\.ui.*\\.spec\\.tsx$)|(^src/tests/store\\.reducer.*\\.spec\\.ts$)|(^src/tests/store\\.reducer.*\\.spec\\.tsx$)' | tr '\n' ' ')`
