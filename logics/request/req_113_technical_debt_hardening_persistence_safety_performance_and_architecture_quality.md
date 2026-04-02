@@ -30,7 +30,7 @@ The 50+ controller hooks are tested only via UI integration tests and have no de
 
 ```mermaid
 %% logics-kind: request
-%% logics-signature: request|technical-debt-hardening-persistence-perf-arch|12-audit-issues-v1.4.4|ac1-json-parse-failures
+%% logics-signature: request|technical-debt-hardening-persistence-saf|the-application-exposes-a-set-of|ac1-a-corrupted-or-unparseable-localstor
 flowchart TD
     Audit[v1.4.4 codebase audit] --> P1[Persistence safety]
     Audit --> P2[Performance]

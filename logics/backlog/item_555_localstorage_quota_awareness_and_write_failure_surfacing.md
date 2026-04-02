@@ -24,7 +24,7 @@ The persistence adapter writes to localStorage without checking available quota.
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|localstorage-quota-awareness-and-write-f|persistence-adapter-writes-to-localstor|ac1-a-write-that-triggers-quotaexceeded|minimum-step-gate
+%% logics-signature: backlog|localstorage-quota-awareness-and-write-f|req-113-technical-debt-hardening-persist|the-persistence-adapter-writes-to-locals|ac1-a-write-that-triggers-quotaexceedede
 flowchart LR
     Write[localStorage write attempt] --> Estimate[navigator.storage.estimate]
     Estimate -->|80% threshold reached| Warn[Non-blocking warning toast]
