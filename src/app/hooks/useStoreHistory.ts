@@ -11,6 +11,7 @@ interface UseStoreHistoryParams {
   historyLimit: number;
   onUndoRedoApplied?: () => void;
   onReplaceStateApplied?: () => void;
+  transformUndoRedoTargetState?: (targetState: StoreState, currentState: StoreState) => StoreState;
 }
 
 interface UseStoreHistoryResult {
@@ -38,7 +39,8 @@ export function useStoreHistory({
   store,
   historyLimit,
   onUndoRedoApplied,
-  onReplaceStateApplied
+  onReplaceStateApplied,
+  transformUndoRedoTargetState
 }: UseStoreHistoryParams): UseStoreHistoryResult {
   const [undoStack, setUndoStack] = useState<StoreState[]>([]);
   const [redoStack, setRedoStack] = useState<StoreState[]>([]);
@@ -139,8 +141,9 @@ export function useStoreHistory({
     }
 
     const currentState = store.getState();
+    const nextUndoState = transformUndoRedoTargetState?.(previousState, currentState) ?? previousState;
     try {
-      store.replaceState(previousState);
+      store.replaceState(nextUndoState);
     } catch {
       setSaveStatus("error");
       return;
@@ -159,7 +162,7 @@ export function useStoreHistory({
     onUndoRedoApplied?.();
     setSaveStatus("unsaved");
     queueSavedStatus();
-  }, [historyLimit, onUndoRedoApplied, queueSavedStatus, store, undoHistoryEntries, undoStack]);
+  }, [historyLimit, onUndoRedoApplied, queueSavedStatus, store, transformUndoRedoTargetState, undoHistoryEntries, undoStack]);
 
   const handleRedo = useCallback((): void => {
     if (redoStack.length === 0) {
@@ -177,8 +180,9 @@ export function useStoreHistory({
     }
 
     const currentState = store.getState();
+    const nextRedoState = transformUndoRedoTargetState?.(redoState, currentState) ?? redoState;
     try {
-      store.replaceState(redoState);
+      store.replaceState(nextRedoState);
     } catch {
       setSaveStatus("error");
       return;
@@ -197,7 +201,7 @@ export function useStoreHistory({
     onUndoRedoApplied?.();
     setSaveStatus("unsaved");
     queueSavedStatus();
-  }, [historyLimit, onUndoRedoApplied, queueSavedStatus, redoHistoryEntries, redoStack, store]);
+  }, [historyLimit, onUndoRedoApplied, queueSavedStatus, redoHistoryEntries, redoStack, store, transformUndoRedoTargetState]);
 
   const replaceStateWithHistory = useCallback(
     (nextState: StoreState): void => {

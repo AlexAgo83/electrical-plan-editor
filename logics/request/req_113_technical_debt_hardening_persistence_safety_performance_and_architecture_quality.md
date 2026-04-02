@@ -1,9 +1,9 @@
 ## req_113_technical_debt_hardening_persistence_safety_performance_and_architecture_quality - Technical debt hardening: persistence safety, performance, and architecture quality
-> From version: 1.4.4
+> From version: 1.4.4 (completed through `task_091`)
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 97% (all 12 issues sourced from a systematic audit of the live codebase at v1.4.4 — root causes are confirmed, fixes are scoped conservatively)
-> Confidence: 92% (persistence and pathfinding fixes are well-bounded; architecture refactors carry higher delivery risk and are explicitly scoped to safe increments)
+> Status: Done
+> Understanding: 99% (delivery complete; each audit item is now mapped to implemented code paths and regression evidence)
+> Confidence: 98% (final lint/typecheck/test:ci/build/Playwright gates passed on the completed bundle)
 > Complexity: High
 > Theme: Technical hardening / persistence safety / runtime performance / architecture quality
 > Reminder: Update status/understanding/confidence and references when you edit this doc.
@@ -145,8 +145,8 @@ flowchart TD
 - Affected files: all reducers in `src/store/reducer/` that write to occupancy maps; `src/store/reducer/shared.ts`.
 
 ### D4 — Canvas viewport in undo/redo history
-- The canvas viewport state (scale, offset, snap settings) must be persisted to the Redux store rather than living exclusively in local hook state.
-- The `useStoreHistory` hook must include canvas viewport snapshots in its history entries so that undo/redo restores both entity state and canvas position together.
+- The canvas viewport state (scale, offset, snap settings) must be available from Redux-backed per-network view state rather than being invisible to undo/redo.
+- The `useStoreHistory` hook must restore both entity state and canvas position together, while allowing an explicit opt-out that preserves the current viewport during undo/redo.
 - A settings toggle may be provided to disable viewport restoration on undo if the user prefers entity-only undo.
 - Affected files: `src/store/types.ts`, `src/app/hooks/useStoreHistory.ts`, relevant canvas hooks.
 
@@ -187,7 +187,7 @@ flowchart TD
 - AC8: Unit tests exist for the five listed controller hooks and run in isolation without full UI setup.
 - AC9: `persistence.migrations.spec.ts` exists and covers happy-path migration from each persisted schema version and corrupt-input handling at each step.
 - AC10: All writes to `connectorCavityOccupancy` and `splicePortOccupancy` are guarded by `isValidSlotIndex()`; out-of-bounds writes are rejected without corrupting the map.
-- AC11: Canvas viewport state is stored in Redux and restored by undo/redo alongside entity state.
+- AC11: Canvas viewport state is Redux-backed and undo/redo restores it alongside entity state unless the explicit opt-out preference is disabled.
 - AC12: `ui.lastError` is typed as `AppError | null`; all existing raw-string error assignments are updated; the error display component renders the structured fields.
 
 # Out of scope

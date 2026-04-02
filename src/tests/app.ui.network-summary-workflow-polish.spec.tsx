@@ -31,6 +31,44 @@ function getDisplayToggleButton(panel: HTMLElement, label: "Info" | "Length" | "
   return within(panel).getByRole("button", { name: label });
 }
 
+function mockNetworkSvgRect(networkSvg: SVGSVGElement) {
+  return vi.spyOn(networkSvg, "getBoundingClientRect").mockImplementation(
+    () =>
+      ({
+        x: 0,
+        y: 0,
+        top: 0,
+        left: 0,
+        width: 800,
+        height: 520,
+        right: 800,
+        bottom: 520,
+        toJSON: () => ({})
+      }) as DOMRect
+  );
+}
+
+function panNetworkSummaryViewport(
+  panel: HTMLElement,
+  interaction: { startX: number; startY: number; endX: number; endY: number }
+): string {
+  const networkSvg = within(panel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
+  const rectSpy = mockNetworkSvgRect(networkSvg);
+
+  fireEvent.mouseDown(networkSvg, {
+    button: 0,
+    shiftKey: true,
+    clientX: interaction.startX,
+    clientY: interaction.startY
+  });
+  fireEvent.mouseMove(networkSvg, { clientX: interaction.endX, clientY: interaction.endY });
+  fireEvent.mouseUp(networkSvg, { clientX: interaction.endX, clientY: interaction.endY });
+
+  const transform = getNetworkSummaryViewportTransform(panel);
+  rectSpy.mockRestore();
+  return transform;
+}
+
 function expectDisplayToggles(
   panel: HTMLElement,
   expected: Record<"Info" | "Length" | "Callouts" | "Grid" | "Snap" | "Lock", boolean>
@@ -623,6 +661,111 @@ describe("App integration UI - network summary workflow polish", () => {
         Snap: false,
         Lock: true
       });
+    });
+  });
+
+  it("restores the captured network viewport on undo/redo when the preference is enabled", async () => {
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+
+    const wiresPanel = getPanelByHeading("Wires");
+    let networkSummaryPanel = getPanelByHeading("Network summary");
+    const viewportAtEditTime = panNetworkSummaryViewport(networkSummaryPanel, {
+      startX: 220,
+      startY: 160,
+      endX: 360,
+      endY: 250
+    });
+
+    fireEvent.click(within(wiresPanel).getByText("Wire 1"));
+    fireEvent.click(within(wiresPanel).getByRole("button", { name: "Delete" }));
+    const deleteDialog = await screen.findByRole("dialog", { name: "Delete wire" });
+    fireEvent.click(within(deleteDialog).getByRole("button", { name: "Delete" }));
+
+    await waitFor(() => {
+      expect(within(wiresPanel).queryByText("Wire 1")).not.toBeInTheDocument();
+    });
+
+    networkSummaryPanel = getPanelByHeading("Network summary");
+    const viewportBeforeUndo = panNetworkSummaryViewport(networkSummaryPanel, {
+      startX: 320,
+      startY: 240,
+      endX: 180,
+      endY: 120
+    });
+    expect(viewportBeforeUndo).not.toBe(viewportAtEditTime);
+
+    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+
+    await waitFor(() => {
+      expect(within(wiresPanel).getByText("Wire 1")).toBeInTheDocument();
+      expect(getNetworkSummaryViewportTransform(getPanelByHeading("Network summary"))).toBe(viewportAtEditTime);
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Redo" }));
+
+    await waitFor(() => {
+      expect(within(wiresPanel).queryByText("Wire 1")).not.toBeInTheDocument();
+      expect(getNetworkSummaryViewportTransform(getPanelByHeading("Network summary"))).toBe(viewportBeforeUndo);
+    });
+  });
+
+  it("keeps the current viewport during undo/redo when viewport restoration is disabled in settings", async () => {
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+
+    switchScreenDrawerAware("settings");
+    const shortcutsPanel = getPanelByHeading("Action bar and shortcuts");
+    const restoreViewportCheckbox = within(shortcutsPanel).getByLabelText("Restore network viewport on undo/redo");
+    expect(restoreViewportCheckbox).toBeChecked();
+    fireEvent.click(restoreViewportCheckbox);
+    expect(restoreViewportCheckbox).not.toBeChecked();
+
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+    const wiresPanel = getPanelByHeading("Wires");
+    let networkSummaryPanel = getPanelByHeading("Network summary");
+    const viewportAtEditTime = panNetworkSummaryViewport(networkSummaryPanel, {
+      startX: 220,
+      startY: 160,
+      endX: 360,
+      endY: 250
+    });
+
+    fireEvent.click(within(wiresPanel).getByText("Wire 1"));
+    fireEvent.click(within(wiresPanel).getByRole("button", { name: "Delete" }));
+    const deleteDialog = await screen.findByRole("dialog", { name: "Delete wire" });
+    fireEvent.click(within(deleteDialog).getByRole("button", { name: "Delete" }));
+
+    await waitFor(() => {
+      expect(within(wiresPanel).queryByText("Wire 1")).not.toBeInTheDocument();
+    });
+
+    networkSummaryPanel = getPanelByHeading("Network summary");
+    const viewportBeforeUndo = panNetworkSummaryViewport(networkSummaryPanel, {
+      startX: 320,
+      startY: 240,
+      endX: 180,
+      endY: 120
+    });
+    expect(viewportBeforeUndo).not.toBe(viewportAtEditTime);
+
+    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+
+    await waitFor(() => {
+      expect(within(wiresPanel).getByText("Wire 1")).toBeInTheDocument();
+      expect(getNetworkSummaryViewportTransform(getPanelByHeading("Network summary"))).toBe(viewportBeforeUndo);
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Redo" }));
+
+    await waitFor(() => {
+      expect(within(wiresPanel).queryByText("Wire 1")).not.toBeInTheDocument();
+      expect(getNetworkSummaryViewportTransform(getPanelByHeading("Network summary"))).toBe(viewportBeforeUndo);
     });
   });
 });

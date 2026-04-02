@@ -148,6 +148,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasResetZoomPercentInput: (value: string) => void;
   setShowShortcutHints: (value: boolean) => void;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
+  setRestoreViewportOnUndo: (value: boolean) => void;
   setShowFloatingInspectorPanel: (value: boolean) => void;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
   setWorkspaceWideScreen: (value: boolean) => void;
@@ -250,6 +251,7 @@ export function useWorkspaceHandlers({
   setCanvasResetZoomPercentInput,
   setShowShortcutHints,
   setKeyboardShortcutsEnabled,
+  setRestoreViewportOnUndo,
   setShowFloatingInspectorPanel,
   setWorkspacePanelsLayoutMode,
   setWorkspaceWideScreen,
@@ -826,6 +828,7 @@ export function useWorkspaceHandlers({
     setNetworkOffset({ x: 0, y: 0 });
     setShowShortcutHints(false);
     setKeyboardShortcutsEnabled(true);
+    setRestoreViewportOnUndo(true);
     setShowFloatingInspectorPanel(true);
     setWorkspacePanelsLayoutMode("singleColumn");
     setWorkspaceWideScreen(false);

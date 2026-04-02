@@ -885,6 +885,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setShowShortcutHints: params.setShowShortcutHints,
     keyboardShortcutsEnabled: params.keyboardShortcutsEnabled,
     setKeyboardShortcutsEnabled: params.setKeyboardShortcutsEnabled,
+    restoreViewportOnUndo: params.restoreViewportOnUndo,
+    setRestoreViewportOnUndo: params.setRestoreViewportOnUndo,
     showFloatingInspectorPanel: params.showFloatingInspectorPanel,
     setShowFloatingInspectorPanel: params.setShowFloatingInspectorPanel,
     workspacePanelsLayoutMode: params.workspacePanelsLayoutMode,
