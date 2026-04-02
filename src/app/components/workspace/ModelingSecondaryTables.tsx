@@ -16,9 +16,17 @@ import type {
   Wire,
   WireId
 } from "../../../core/entities";
+import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
 import type { SegmentSubNetworkFilter, SortDirection, SortState } from "../../types/app-controller";
 
 interface ModelingSecondaryTablesProps {
+  activeBatchScope: ModelingBatchSelectionScope | null;
+  batchSelectionIds: ReadonlySet<string>;
+  onEnterBatchMode: (scope: ModelingBatchSelectionScope) => void;
+  onExitBatchMode: () => void;
+  onToggleBatchSelection: (scope: ModelingBatchSelectionScope, id: string) => void;
+  onSetBatchSelectionForVisible: (scope: ModelingBatchSelectionScope, ids: readonly string[]) => void;
+  onDeleteSelectedInBatchMode: () => void;
   isSegmentSubScreen: boolean;
   segmentFormMode: "idle" | "create" | "edit";
   onOpenCreateSegment: () => void;
@@ -62,6 +70,13 @@ interface ModelingSecondaryTablesProps {
 }
 
 export function ModelingSecondaryTables({
+  activeBatchScope,
+  batchSelectionIds,
+  onEnterBatchMode,
+  onExitBatchMode,
+  onToggleBatchSelection,
+  onSetBatchSelectionForVisible,
+  onDeleteSelectedInBatchMode,
   isSegmentSubScreen,
   segmentFormMode,
   onOpenCreateSegment,
@@ -113,6 +128,8 @@ export function ModelingSecondaryTables({
   const isMobileViewport = useIsMobileViewport();
   const previousSegmentFormModeRef = useRef<typeof segmentFormMode>(segmentFormMode);
   const previousWireFormModeRef = useRef<typeof wireFormMode>(wireFormMode);
+  const isSegmentBatchMode = activeBatchScope === "segment";
+  const isWireBatchMode = activeBatchScope === "wire";
   const focusedSegment =
     selectedSegmentId === null ? null : (visibleSegments.find((segment) => segment.id === selectedSegmentId) ?? null);
   const focusedWire =
@@ -227,6 +244,14 @@ export function ModelingSecondaryTables({
       ),
     [describeWireEndpoint, visibleWires, wireTableSort]
   );
+  const visibleSegmentIds = useMemo(() => sortedVisibleSegments.map((segment) => segment.id), [sortedVisibleSegments]);
+  const visibleWireIds = useMemo(() => sortedVisibleWires.map((wire) => wire.id), [sortedVisibleWires]);
+  const allVisibleSegmentsSelected =
+    visibleSegmentIds.length > 0 && visibleSegmentIds.every((segmentId) => batchSelectionIds.has(segmentId));
+  const allVisibleWiresSelected =
+    visibleWireIds.length > 0 && visibleWireIds.every((wireId) => batchSelectionIds.has(wireId));
+  const selectedSegmentBatchCount = batchSelectionIds.size;
+  const selectedWireBatchCount = batchSelectionIds.size;
   const segmentSortIndicator = (field: SegmentTableSortField) =>
     segmentTableSort.field === field ? (segmentTableSort.direction === "asc" ? "▲" : "▼") : "";
   const wireSortIndicator = (field: WireTableSortField) =>
@@ -385,6 +410,16 @@ export function ModelingSecondaryTables({
             <table className="data-table">
               <thead>
                 <tr>
+                  {isSegmentBatchMode ? (
+                    <th>
+                      <input
+                        type="checkbox"
+                        aria-label="Select all visible segments"
+                        checked={allVisibleSegmentsSelected}
+                        onChange={() => onSetBatchSelectionForVisible("segment", visibleSegmentIds)}
+                      />
+                    </th>
+                  ) : null}
                   <th aria-sort={getTableAriaSort(segmentTableSort, "id")}><button type="button" className="sort-header-button" onClick={() => { setSegmentTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" })); _setSegmentIdSortDirection((current) => current === "asc" ? "desc" : "asc"); }}>ID <span className="sort-indicator">{segmentSortIndicator("id")}</span></button></th>
                   <th aria-sort={getTableAriaSort(segmentTableSort, "nodeA")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "nodeA", direction: current.field === "nodeA" && current.direction === "asc" ? "desc" : "asc" }))}>Node A <span className="sort-indicator">{segmentSortIndicator("nodeA")}</span></button></th>
                   <th aria-sort={getTableAriaSort(segmentTableSort, "nodeB")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "nodeB", direction: current.field === "nodeB" && current.direction === "asc" ? "desc" : "asc" }))}>Node B <span className="sort-indicator">{segmentSortIndicator("nodeB")}</span></button></th>
@@ -398,7 +433,8 @@ export function ModelingSecondaryTables({
                   const nodeB = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
                   const isFocused = focusedSegment?.id === segment.id;
                   const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
-                  const rowClassName = `${isFocused ? "is-selected " : ""}${isWireHighlighted ? "is-wire-highlighted " : ""}is-focusable-row`;
+                  const isBatchSelected = batchSelectionIds.has(segment.id);
+                  const rowClassName = `${isSegmentBatchMode ? (isBatchSelected ? "is-selected " : "") : isFocused ? "is-selected " : ""}${isWireHighlighted ? "is-wire-highlighted " : ""}is-focusable-row`;
                   return (
                     <tr
                       key={segment.id}
@@ -406,16 +442,35 @@ export function ModelingSecondaryTables({
                         segmentRowRefs.current[segment.id] = element;
                       }}
                       className={rowClassName}
-                      aria-selected={isFocused}
+                      aria-selected={isSegmentBatchMode ? isBatchSelected : isFocused}
                       tabIndex={0}
-                      onClick={() => openEditSegment(segment)}
+                      onClick={() =>
+                        isSegmentBatchMode
+                          ? onToggleBatchSelection("segment", segment.id)
+                          : openEditSegment(segment)
+                      }
                       onKeyDown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
+                          if (isSegmentBatchMode) {
+                            onToggleBatchSelection("segment", segment.id);
+                            return;
+                          }
                           openEditSegment(segment);
                         }
                       }}
                     >
+                      {isSegmentBatchMode ? (
+                        <td>
+                          <input
+                            type="checkbox"
+                            aria-label={`Select segment ${segment.id}`}
+                            checked={isBatchSelected}
+                            onChange={() => onToggleBatchSelection("segment", segment.id)}
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                        </td>
+                      ) : null}
                       <td className="technical-id">{segment.id}</td>
                       <td>{nodeA}</td>
                       <td>{nodeB}</td>
@@ -432,6 +487,23 @@ export function ModelingSecondaryTables({
           </>
         )}
         <div className="row-actions compact modeling-list-actions">
+          {isSegmentBatchMode ? (
+            <>
+              <button
+                type="button"
+                className="modeling-list-action-delete button-with-icon"
+                onClick={onDeleteSelectedInBatchMode}
+                disabled={selectedSegmentBatchCount === 0}
+              >
+                <span className="action-button-icon is-delete" aria-hidden="true" />
+                Delete selected{selectedSegmentBatchCount > 0 ? ` (${selectedSegmentBatchCount})` : ""}
+              </button>
+              <button type="button" className="button-with-icon" onClick={onExitBatchMode}>
+                Cancel selection
+              </button>
+            </>
+          ) : (
+            <>
             <button type="button" className="button-with-icon" onClick={openCreateSegmentAndScroll}>
             <span className="action-button-icon is-new" aria-hidden="true" />
             New
@@ -454,6 +526,16 @@ export function ModelingSecondaryTables({
             <span className="action-button-icon is-delete" aria-hidden="true" />
             Delete
           </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => onEnterBatchMode("segment")}
+            disabled={sortedVisibleSegments.length === 0}
+          >
+            Select multiple
+          </button>
+            </>
+          )}
         </div>
       </article>
 
@@ -594,6 +676,16 @@ export function ModelingSecondaryTables({
             <table className="data-table">
               <thead>
                 <tr>
+                  {isWireBatchMode ? (
+                    <th>
+                      <input
+                        type="checkbox"
+                        aria-label="Select all visible wires"
+                        checked={allVisibleWiresSelected}
+                        onChange={() => onSetBatchSelectionForVisible("wire", visibleWireIds)}
+                      />
+                    </th>
+                  ) : null}
                   <th aria-sort={getTableAriaSort(wireTableSort, "name")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{wireSortIndicator("name")}</span></button></th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{wireSortIndicator("technicalId")}</span></button></th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "color")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "color", direction: current.field === "color" && current.direction === "asc" ? "desc" : "asc" }))}>Color <span className="sort-indicator">{wireSortIndicator("color")}</span></button></th>
@@ -608,23 +700,39 @@ export function ModelingSecondaryTables({
                 {sortedVisibleWires.map((wire) => {
                   const isFocused = focusedWire?.id === wire.id;
                   const fuseManufacturerReference = getWireFuseManufacturerReference(wire);
+                  const isBatchSelected = batchSelectionIds.has(wire.id);
                   return (
                     <tr
                       key={wire.id}
                       ref={(element) => {
                         wireRowRefs.current[wire.id] = element;
                       }}
-                      className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
-                      aria-selected={isFocused}
+                      className={isWireBatchMode ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row` : isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
+                      aria-selected={isWireBatchMode ? isBatchSelected : isFocused}
                       tabIndex={0}
-                      onClick={() => openEditWire(wire)}
+                      onClick={() => (isWireBatchMode ? onToggleBatchSelection("wire", wire.id) : openEditWire(wire))}
                       onKeyDown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
+                          if (isWireBatchMode) {
+                            onToggleBatchSelection("wire", wire.id);
+                            return;
+                          }
                           openEditWire(wire);
                         }
                       }}
                     >
+                      {isWireBatchMode ? (
+                        <td>
+                          <input
+                            type="checkbox"
+                            aria-label={`Select wire ${wire.technicalId}`}
+                            checked={isBatchSelected}
+                            onChange={() => onToggleBatchSelection("wire", wire.id)}
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                        </td>
+                      ) : null}
                       <td>
                         <div>{wire.name}</div>
                         {fuseManufacturerReference !== null ? (
@@ -650,6 +758,23 @@ export function ModelingSecondaryTables({
           </>
         )}
         <div className="row-actions compact modeling-list-actions">
+          {isWireBatchMode ? (
+            <>
+              <button
+                type="button"
+                className="modeling-list-action-delete button-with-icon"
+                onClick={onDeleteSelectedInBatchMode}
+                disabled={selectedWireBatchCount === 0}
+              >
+                <span className="action-button-icon is-delete" aria-hidden="true" />
+                Delete selected{selectedWireBatchCount > 0 ? ` (${selectedWireBatchCount})` : ""}
+              </button>
+              <button type="button" className="button-with-icon" onClick={onExitBatchMode}>
+                Cancel selection
+              </button>
+            </>
+          ) : (
+            <>
             <button type="button" className="button-with-icon" onClick={openCreateWireAndScroll}>
             <span className="action-button-icon is-new" aria-hidden="true" />
             New
@@ -672,6 +797,16 @@ export function ModelingSecondaryTables({
             <span className="action-button-icon is-delete" aria-hidden="true" />
             Delete
           </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => onEnterBatchMode("wire")}
+            disabled={sortedVisibleWires.length === 0}
+          >
+            Select multiple
+          </button>
+            </>
+          )}
         </div>
       </article>
     </>

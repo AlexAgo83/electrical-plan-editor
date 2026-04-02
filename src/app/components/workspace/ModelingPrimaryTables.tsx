@@ -15,9 +15,17 @@ import type {
   Splice,
   SpliceId
 } from "../../../core/entities";
+import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
 import type { OccupancyFilter, SortDirection, SortState } from "../../types/app-controller";
 
 interface ModelingPrimaryTablesProps {
+  activeBatchScope: ModelingBatchSelectionScope | null;
+  batchSelectionIds: ReadonlySet<string>;
+  onEnterBatchMode: (scope: ModelingBatchSelectionScope) => void;
+  onExitBatchMode: () => void;
+  onToggleBatchSelection: (scope: ModelingBatchSelectionScope, id: string) => void;
+  onSetBatchSelectionForVisible: (scope: ModelingBatchSelectionScope, ids: readonly string[]) => void;
+  onDeleteSelectedInBatchMode: () => void;
   isConnectorSubScreen: boolean;
   connectorFormMode: "idle" | "create" | "edit";
   onOpenCreateConnector: () => void;
@@ -77,6 +85,13 @@ interface ModelingPrimaryTablesProps {
 }
 
 export function ModelingPrimaryTables({
+  activeBatchScope,
+  batchSelectionIds,
+  onEnterBatchMode,
+  onExitBatchMode,
+  onToggleBatchSelection,
+  onSetBatchSelectionForVisible,
+  onDeleteSelectedInBatchMode,
   isConnectorSubScreen,
   connectorFormMode,
   onOpenCreateConnector,
@@ -146,6 +161,9 @@ export function ModelingPrimaryTables({
   const previousConnectorFormModeRef = useRef<typeof connectorFormMode>(connectorFormMode);
   const previousSpliceFormModeRef = useRef<typeof spliceFormMode>(spliceFormMode);
   const previousNodeFormModeRef = useRef<typeof nodeFormMode>(nodeFormMode);
+  const isConnectorBatchMode = activeBatchScope === "connector";
+  const isSpliceBatchMode = activeBatchScope === "splice";
+  const isNodeBatchMode = activeBatchScope === "node";
   const focusedConnector =
     selectedConnectorId === null ? null : (visibleConnectors.find((connector) => connector.id === selectedConnectorId) ?? null);
   const focusedSplice =
@@ -294,6 +312,18 @@ export function ModelingPrimaryTables({
       ),
     [describeNode, nodeTableSort, segmentsCountByNodeId, visibleNodes]
   );
+  const visibleConnectorIds = useMemo(() => sortedVisibleConnectors.map((connector) => connector.id), [sortedVisibleConnectors]);
+  const visibleSpliceIds = useMemo(() => sortedVisibleSplices.map((splice) => splice.id), [sortedVisibleSplices]);
+  const visibleNodeIds = useMemo(() => sortedVisibleNodes.map((node) => node.id), [sortedVisibleNodes]);
+  const allVisibleConnectorsSelected =
+    visibleConnectorIds.length > 0 && visibleConnectorIds.every((connectorId) => batchSelectionIds.has(connectorId));
+  const allVisibleSplicesSelected =
+    visibleSpliceIds.length > 0 && visibleSpliceIds.every((spliceId) => batchSelectionIds.has(spliceId));
+  const allVisibleNodesSelected =
+    visibleNodeIds.length > 0 && visibleNodeIds.every((nodeId) => batchSelectionIds.has(nodeId));
+  const selectedConnectorBatchCount = batchSelectionIds.size;
+  const selectedSpliceBatchCount = batchSelectionIds.size;
+  const selectedNodeBatchCount = batchSelectionIds.size;
   const connectorSortIndicator = (field: ConnectorTableSortField) =>
     connectorTableSort.field === field ? (connectorTableSort.direction === "asc" ? "▲" : "▼") : "";
   const spliceSortIndicator = (field: SpliceTableSortField) =>
@@ -478,6 +508,16 @@ export function ModelingPrimaryTables({
             <table className="data-table">
               <thead>
               <tr>
+                {isConnectorBatchMode ? (
+                  <th>
+                    <input
+                      type="checkbox"
+                      aria-label="Select all visible connectors"
+                      checked={allVisibleConnectorsSelected}
+                      onChange={() => onSetBatchSelectionForVisible("connector", visibleConnectorIds)}
+                    />
+                  </th>
+                ) : null}
                 <th aria-sort={getTableAriaSort(connectorTableSort, "name")}><button type="button" className="sort-header-button" onClick={() => { setConnectorTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); setConnectorSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{connectorSortIndicator("name")}</span></button></th>
                 <th aria-sort={getTableAriaSort(connectorTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setConnectorTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setConnectorSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{connectorSortIndicator("technicalId")}</span></button></th>
                 <th aria-sort={getTableAriaSort(connectorTableSort, "manufacturerReference")}><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{connectorSortIndicator("manufacturerReference")}</span></button></th>
@@ -489,23 +529,43 @@ export function ModelingPrimaryTables({
               {sortedVisibleConnectors.map((connector) => {
                 const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
                 const isFocused = focusedConnector?.id === connector.id;
+                const isBatchSelected = batchSelectionIds.has(connector.id);
                 return (
                   <tr
                     key={connector.id}
                     ref={(element) => {
                       connectorRowRefs.current[connector.id] = element;
                     }}
-                    className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
-                    aria-selected={isFocused}
+                    className={isConnectorBatchMode ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row` : isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
+                    aria-selected={isConnectorBatchMode ? isBatchSelected : isFocused}
                     tabIndex={0}
-                    onClick={() => openEditConnector(connector)}
+                    onClick={() =>
+                      isConnectorBatchMode
+                        ? onToggleBatchSelection("connector", connector.id)
+                        : openEditConnector(connector)
+                    }
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
+                        if (isConnectorBatchMode) {
+                          onToggleBatchSelection("connector", connector.id);
+                          return;
+                        }
                         openEditConnector(connector);
                       }
                     }}
                   >
+                    {isConnectorBatchMode ? (
+                      <td>
+                        <input
+                          type="checkbox"
+                          aria-label={`Select connector ${connector.technicalId}`}
+                          checked={isBatchSelected}
+                          onChange={() => onToggleBatchSelection("connector", connector.id)}
+                          onClick={(event) => event.stopPropagation()}
+                        />
+                      </td>
+                    ) : null}
                     <td>{connector.name}</td>
                     <td className="technical-id">{connector.technicalId}</td>
                     <td className="technical-id">{connector.manufacturerReference ?? ""}</td>
@@ -520,6 +580,23 @@ export function ModelingPrimaryTables({
           </>
         )}
         <div className="row-actions compact modeling-list-actions">
+          {isConnectorBatchMode ? (
+            <>
+              <button
+                type="button"
+                className="modeling-list-action-delete button-with-icon"
+                onClick={onDeleteSelectedInBatchMode}
+                disabled={selectedConnectorBatchCount === 0}
+              >
+                <span className="action-button-icon is-delete" aria-hidden="true" />
+                Delete selected{selectedConnectorBatchCount > 0 ? ` (${selectedConnectorBatchCount})` : ""}
+              </button>
+              <button type="button" className="button-with-icon" onClick={onExitBatchMode}>
+                Cancel selection
+              </button>
+            </>
+          ) : (
+            <>
             <button type="button" className="button-with-icon" onClick={openCreateConnectorAndScroll}>
             <span className="action-button-icon is-new" aria-hidden="true" />
             New
@@ -542,6 +619,16 @@ export function ModelingPrimaryTables({
             <span className="action-button-icon is-delete" aria-hidden="true" />
             Delete
           </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => onEnterBatchMode("connector")}
+            disabled={sortedVisibleConnectors.length === 0}
+          >
+            Select multiple
+          </button>
+            </>
+          )}
         </div>
       </article>
 
@@ -622,6 +709,16 @@ export function ModelingPrimaryTables({
             <table className="data-table">
               <thead>
               <tr>
+                {isSpliceBatchMode ? (
+                  <th>
+                    <input
+                      type="checkbox"
+                      aria-label="Select all visible splices"
+                      checked={allVisibleSplicesSelected}
+                      onChange={() => onSetBatchSelectionForVisible("splice", visibleSpliceIds)}
+                    />
+                  </th>
+                ) : null}
                 <th aria-sort={getTableAriaSort(spliceTableSort, "name")}><button type="button" className="sort-header-button" onClick={() => { setSpliceTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); setSpliceSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{spliceSortIndicator("name")}</span></button></th>
                 <th aria-sort={getTableAriaSort(spliceTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setSpliceTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setSpliceSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{spliceSortIndicator("technicalId")}</span></button></th>
                 <th aria-sort={getTableAriaSort(spliceTableSort, "manufacturerReference")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{spliceSortIndicator("manufacturerReference")}</span></button></th>
@@ -633,23 +730,43 @@ export function ModelingPrimaryTables({
               {sortedVisibleSplices.map((splice) => {
                 const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
                 const isFocused = focusedSplice?.id === splice.id;
+                const isBatchSelected = batchSelectionIds.has(splice.id);
                 return (
                   <tr
                     key={splice.id}
                     ref={(element) => {
                       spliceRowRefs.current[splice.id] = element;
                     }}
-                    className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
-                    aria-selected={isFocused}
+                    className={isSpliceBatchMode ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row` : isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
+                    aria-selected={isSpliceBatchMode ? isBatchSelected : isFocused}
                     tabIndex={0}
-                    onClick={() => openEditSplice(splice)}
+                    onClick={() =>
+                      isSpliceBatchMode
+                        ? onToggleBatchSelection("splice", splice.id)
+                        : openEditSplice(splice)
+                    }
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
+                        if (isSpliceBatchMode) {
+                          onToggleBatchSelection("splice", splice.id);
+                          return;
+                        }
                         openEditSplice(splice);
                       }
                     }}
                   >
+                    {isSpliceBatchMode ? (
+                      <td>
+                        <input
+                          type="checkbox"
+                          aria-label={`Select splice ${splice.technicalId}`}
+                          checked={isBatchSelected}
+                          onChange={() => onToggleBatchSelection("splice", splice.id)}
+                          onClick={(event) => event.stopPropagation()}
+                        />
+                      </td>
+                    ) : null}
                     <td>{splice.name}</td>
                     <td className="technical-id">{splice.technicalId}</td>
                     <td className="technical-id">{splice.manufacturerReference ?? ""}</td>
@@ -664,6 +781,23 @@ export function ModelingPrimaryTables({
           </>
         )}
         <div className="row-actions compact modeling-list-actions">
+          {isSpliceBatchMode ? (
+            <>
+              <button
+                type="button"
+                className="modeling-list-action-delete button-with-icon"
+                onClick={onDeleteSelectedInBatchMode}
+                disabled={selectedSpliceBatchCount === 0}
+              >
+                <span className="action-button-icon is-delete" aria-hidden="true" />
+                Delete selected{selectedSpliceBatchCount > 0 ? ` (${selectedSpliceBatchCount})` : ""}
+              </button>
+              <button type="button" className="button-with-icon" onClick={onExitBatchMode}>
+                Cancel selection
+              </button>
+            </>
+          ) : (
+            <>
             <button type="button" className="button-with-icon" onClick={openCreateSpliceAndScroll}>
             <span className="action-button-icon is-new" aria-hidden="true" />
             New
@@ -686,6 +820,16 @@ export function ModelingPrimaryTables({
             <span className="action-button-icon is-delete" aria-hidden="true" />
             Delete
           </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => onEnterBatchMode("splice")}
+            disabled={sortedVisibleSplices.length === 0}
+          >
+            Select multiple
+          </button>
+            </>
+          )}
         </div>
       </article>
 
@@ -767,6 +911,16 @@ export function ModelingPrimaryTables({
             <table className="data-table">
               <thead>
               <tr>
+                {isNodeBatchMode ? (
+                  <th>
+                    <input
+                      type="checkbox"
+                      aria-label="Select all visible nodes"
+                      checked={allVisibleNodesSelected}
+                      onChange={() => onSetBatchSelectionForVisible("node", visibleNodeIds)}
+                    />
+                  </th>
+                ) : null}
                 <th aria-sort={getTableAriaSort(nodeTableSort, "id")}><button type="button" className="sort-header-button" onClick={() => { setNodeTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" })); setNodeIdSortDirection((current) => current === "asc" ? "desc" : "asc"); }}>ID <span className="sort-indicator">{nodeSortIndicator("id")}</span></button></th>
                 {showNodeKindColumn ? <th aria-sort={getTableAriaSort(nodeTableSort, "kind")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "kind", direction: current.field === "kind" && current.direction === "asc" ? "desc" : "asc" }))}>Kind <span className="sort-indicator">{nodeSortIndicator("kind")}</span></button></th> : null}
                 <th aria-sort={getTableAriaSort(nodeTableSort, "reference")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "reference", direction: current.field === "reference" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Ref." : "Reference"} <span className="sort-indicator">{nodeSortIndicator("reference")}</span></button></th>
@@ -777,23 +931,39 @@ export function ModelingPrimaryTables({
               {sortedVisibleNodes.map((node) => {
                 const linkedSegments = segmentsCountByNodeId.get(node.id) ?? 0;
                 const isFocused = focusedNode?.id === node.id;
+                const isBatchSelected = batchSelectionIds.has(node.id);
                 return (
                   <tr
                     key={node.id}
                     ref={(element) => {
                       nodeRowRefs.current[node.id] = element;
                     }}
-                    className={isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
-                    aria-selected={isFocused}
+                    className={isNodeBatchMode ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row` : isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
+                    aria-selected={isNodeBatchMode ? isBatchSelected : isFocused}
                     tabIndex={0}
-                    onClick={() => openEditNode(node)}
+                    onClick={() => (isNodeBatchMode ? onToggleBatchSelection("node", node.id) : openEditNode(node))}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
+                        if (isNodeBatchMode) {
+                          onToggleBatchSelection("node", node.id);
+                          return;
+                        }
                         openEditNode(node);
                       }
                     }}
                   >
+                    {isNodeBatchMode ? (
+                      <td>
+                        <input
+                          type="checkbox"
+                          aria-label={`Select node ${node.id}`}
+                          checked={isBatchSelected}
+                          onChange={() => onToggleBatchSelection("node", node.id)}
+                          onClick={(event) => event.stopPropagation()}
+                        />
+                      </td>
+                    ) : null}
                     <td className="technical-id">{node.id}</td>
                     {showNodeKindColumn ? <td>{node.kind}</td> : null}
                     <td>{describeNode(node)}</td>
@@ -807,6 +977,23 @@ export function ModelingPrimaryTables({
           </>
         )}
         <div className="row-actions compact modeling-list-actions">
+          {isNodeBatchMode ? (
+            <>
+              <button
+                type="button"
+                className="modeling-list-action-delete button-with-icon"
+                onClick={onDeleteSelectedInBatchMode}
+                disabled={selectedNodeBatchCount === 0}
+              >
+                <span className="action-button-icon is-delete" aria-hidden="true" />
+                Delete selected{selectedNodeBatchCount > 0 ? ` (${selectedNodeBatchCount})` : ""}
+              </button>
+              <button type="button" className="button-with-icon" onClick={onExitBatchMode}>
+                Cancel selection
+              </button>
+            </>
+          ) : (
+            <>
             <button type="button" className="button-with-icon" onClick={openCreateNodeAndScroll}>
             <span className="action-button-icon is-new" aria-hidden="true" />
             New
@@ -829,6 +1016,16 @@ export function ModelingPrimaryTables({
             <span className="action-button-icon is-delete" aria-hidden="true" />
             Delete
           </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => onEnterBatchMode("node")}
+            disabled={sortedVisibleNodes.length === 0}
+          >
+            Select multiple
+          </button>
+            </>
+          )}
         </div>
       </article>
     </>

@@ -25,7 +25,6 @@ interface UseAppControllerModelingAnalysisDomainAssemblyParams
     | "onGoToSegmentFromAnalysis"
     | "onGoToWireFromAnalysis"
   > {
-  dispatchAction: (action: ReturnType<typeof appActions.select>) => void;
   setActiveSubScreen: (subScreen: SubScreenId) => void;
   handleWorkspaceScreenChange: (targetScreen: ScreenChangeTarget) => void;
   openSingleStepOnboarding: (stepId: OnboardingStepId, targetOverride?: OnboardingTargetOverride) => void;
@@ -42,6 +41,7 @@ export function useAppControllerModelingAnalysisDomainAssembly({
 }: UseAppControllerModelingAnalysisDomainAssemblyParams) {
   return useAppControllerModelingAnalysisScreenDomains({
     ...domains,
+    dispatchAction,
     onboardingHelp: {
       openCatalogStep: () => openSingleStepOnboarding("catalog"),
       openConnectorStep: () => openSingleStepOnboarding("connectorSpliceLibrary"),

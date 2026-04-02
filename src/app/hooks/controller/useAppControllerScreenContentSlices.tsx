@@ -341,6 +341,13 @@ export function buildNetworkScopeScreenContentSlice(params: NetworkScopeScreenCo
 
 export function buildModelingScreenContentSlice(params: ModelingScreenContentSliceParams) {
   const modelingPrimaryTablesProps = {
+    activeBatchScope: params.activeBatchScope,
+    batchSelectionIds: params.batchSelectionIds,
+    onEnterBatchMode: params.onEnterBatchMode,
+    onExitBatchMode: params.onExitBatchMode,
+    onToggleBatchSelection: params.onToggleBatchSelection,
+    onSetBatchSelectionForVisible: params.onSetBatchSelectionForVisible,
+    onDeleteSelectedInBatchMode: params.onDeleteSelectedInBatchMode,
     isConnectorSubScreen: params.isConnectorSubScreen,
     connectorFormMode: params.connectorFormMode,
     onOpenCreateConnector: params.resetConnectorForm,
@@ -399,6 +406,13 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     onOpenNodeOnboardingHelp: params.onOpenNodeOnboardingHelp
   } satisfies ModelingPrimaryTablesProps;
   const modelingSecondaryTablesProps = {
+    activeBatchScope: params.activeBatchScope,
+    batchSelectionIds: params.batchSelectionIds,
+    onEnterBatchMode: params.onEnterBatchMode,
+    onExitBatchMode: params.onExitBatchMode,
+    onToggleBatchSelection: params.onToggleBatchSelection,
+    onSetBatchSelectionForVisible: params.onSetBatchSelectionForVisible,
+    onDeleteSelectedInBatchMode: params.onDeleteSelectedInBatchMode,
     isSegmentSubScreen: params.isSegmentSubScreen,
     segmentFormMode: params.segmentFormMode,
     onOpenCreateSegment: params.resetSegmentForm,
@@ -583,7 +597,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setWireEndpointBPortIndex: params.setWireEndpointBPortIndex,
     wireEndpointBSlotHint: params.wireEndpointBSlotHint,
     cancelWireEdit: params.cancelWireEdit,
-    wireFormError: params.wireFormError
+    wireFormError: params.wireFormError,
+    modelingBatchSelection: params.modelingBatchSelection
   } satisfies ModelingFormsColumnProps;
 
   return {
