@@ -2,8 +2,8 @@
 > From version: 1.4.4
 > Schema version: 1.0
 > Status: Done
-> Understanding: 97%
-> Confidence: 95%
+> Understanding: 98%
+> Confidence: 97%
 > Progress: 100%
 > Complexity: Medium
 > Theme: UI
@@ -55,7 +55,7 @@ flowchart LR
 
 # Links
 - Product brief(s): (none yet)
-- Architecture decision(s): (none yet)
+- Architecture decision(s): `adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence`
 - Request: `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`
 - Parent backlog item: `item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`
 - Primary task(s): `task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`
