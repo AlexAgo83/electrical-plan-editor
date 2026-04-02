@@ -197,7 +197,8 @@ export function useSegmentHandlers({
           message: `Delete segment '${segment.id}' (${segment.nodeA} -> ${segment.nodeB})?`,
           confirmLabel: "Delete",
           cancelLabel: "Cancel",
-          intent: "danger"
+          intent: "danger",
+          confirmOnEnter: true
         });
         if (!shouldDelete) {
           return;

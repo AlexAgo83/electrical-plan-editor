@@ -487,7 +487,8 @@ export function useWorkspaceHandlers({
         message: `Delete network '${targetNetwork.name}' (${targetNetwork.technicalId})?`,
         confirmLabel: "Delete",
         cancelLabel: "Cancel",
-        intent: "danger"
+        intent: "danger",
+        confirmOnEnter: true
       });
       if (!shouldDelete) {
         return;

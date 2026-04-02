@@ -4,7 +4,7 @@
 > Status: In Progress
 > Understanding: 95%
 > Confidence: 98% (scope, backlog breakdown, companion docs, and orchestration links are now coherent across the full delivery bundle)
-> Progress: 25%
+> Progress: 50%
 > Complexity: High
 > Theme: Modeling productivity / destructive-action ergonomics / canvas interaction
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -45,7 +45,7 @@ flowchart LR
   - `item_565`
   - `item_566`
   - `item_567`
-- [ ] 3. Deliver Wave 2 for `req_115`:
+- [x] 3. Deliver Wave 2 for `req_115`:
   - `item_568`
   - `item_569`
   - `item_570`
@@ -125,6 +125,11 @@ flowchart LR
     - connector/splice catalog labels now include catalog names with safe fallback behavior;
     - all Modeling create forms now expose a bottom `New` action in create mode only;
     - targeted regression coverage updated for dropdown labels and chained create resets.
+  - Wave 2 (`req_115`) delivered:
+    - direct delete dialogs now support explicit dialog-level `Enter` confirmation without moving visible focus away from `Cancel`;
+    - cascade delete dialogs now also keep `Cancel` focused while supporting `Enter` confirmation;
+    - targeted delete-confirmation regression coverage now includes keyboard `Enter` and `Escape` behavior.
 - Latest validation snapshot:
   - `npm run -s typecheck`
   - `npm test -- --run src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx`
+  - `npm test -- --run src/tests/app.ui.delete-confirmations.spec.tsx`

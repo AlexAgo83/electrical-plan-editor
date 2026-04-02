@@ -188,7 +188,8 @@ export function useCatalogHandlers({
           message: `Delete catalog item ${formattedIdentity}?`,
           confirmLabel: "Delete",
           cancelLabel: "Cancel",
-          intent: "danger"
+          intent: "danger",
+          confirmOnEnter: true
         });
         if (!shouldDelete) {
           return;

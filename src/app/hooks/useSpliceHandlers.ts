@@ -329,7 +329,8 @@ export function useSpliceHandlers({
           message: `Delete splice '${splice.name}' (${splice.technicalId})?`,
           confirmLabel: "Delete",
           cancelLabel: "Cancel",
-          intent: "danger"
+          intent: "danger",
+          confirmOnEnter: true
         });
         if (!shouldDelete) {
           return;
@@ -349,6 +350,7 @@ export function useSpliceHandlers({
           confirmLabel: "Delete all",
           cancelLabel: "Cancel",
           intent: "danger",
+          confirmOnEnter: true,
           variant: "deleteCascade",
           summaryCategories: impact.categories,
           summaryNote: impact.note

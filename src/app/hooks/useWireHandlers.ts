@@ -920,7 +920,8 @@ export function useWireHandlers({
         message: `Delete wire ${wireIdentity}?`,
         confirmLabel: "Delete",
         cancelLabel: "Cancel",
-        intent: "danger"
+        intent: "danger",
+        confirmOnEnter: true
       });
       if (!shouldDelete) {
         return;
