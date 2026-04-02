@@ -49,6 +49,7 @@ export function AppControllerOverlays({
             cancelLabel={activeConfirmDialog.cancelLabel}
             intent={activeConfirmDialog.intent}
             closeOnBackdrop={activeConfirmDialog.closeOnBackdrop}
+            confirmOnEnter={activeConfirmDialog.confirmOnEnter}
             onConfirm={() => closeActiveConfirmDialog(true)}
             onCancel={() => closeActiveConfirmDialog(false)}
           />
@@ -65,6 +66,7 @@ export function AppControllerOverlays({
             cancelLabel={activeConfirmDialog.cancelLabel}
             intent={activeConfirmDialog.intent}
             closeOnBackdrop={activeConfirmDialog.closeOnBackdrop}
+            confirmOnEnter={activeConfirmDialog.confirmOnEnter}
             onConfirm={() => closeActiveConfirmDialog(true)}
             onCancel={() => closeActiveConfirmDialog(false)}
           />

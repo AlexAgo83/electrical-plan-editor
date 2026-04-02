@@ -14,6 +14,7 @@ interface DeleteImpactDialogProps {
   cancelLabel?: string;
   intent?: ConfirmDialogIntent;
   closeOnBackdrop?: boolean;
+  confirmOnEnter?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -38,12 +39,15 @@ export function DeleteImpactDialog({
   cancelLabel = "Cancel",
   intent = "warning",
   closeOnBackdrop = true,
+  confirmOnEnter = false,
   onConfirm,
   onCancel
 }: DeleteImpactDialogProps): ReactElement | null {
   const dialogRef = useRef<HTMLElement | null>(null);
   const primaryButtonRef = useRef<HTMLButtonElement | null>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
   const previousFocusedElementRef = useRef<HTMLElement | null>(null);
+  const enterConfirmationArmedRef = useRef(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -52,7 +56,11 @@ export function DeleteImpactDialog({
 
     previousFocusedElementRef.current =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    primaryButtonRef.current?.focus();
+    if (variant === "deleteCascade") {
+      cancelButtonRef.current?.focus();
+    } else {
+      primaryButtonRef.current?.focus();
+    }
 
     return () => {
       const previousFocusedElement = previousFocusedElementRef.current;
@@ -66,7 +74,34 @@ export function DeleteImpactDialog({
       }
       previousFocusedElementRef.current = null;
     };
-  }, [isOpen, title]);
+  }, [isOpen, title, variant]);
+
+  useEffect(() => {
+    if (!isOpen || !confirmOnEnter) {
+      enterConfirmationArmedRef.current = false;
+      return;
+    }
+
+    enterConfirmationArmedRef.current = false;
+
+    const armEnterConfirmation = () => {
+      enterConfirmationArmedRef.current = true;
+      window.removeEventListener("keyup", armEnterConfirmation, true);
+    };
+
+    const fallbackTimer = window.setTimeout(() => {
+      enterConfirmationArmedRef.current = true;
+      window.removeEventListener("keyup", armEnterConfirmation, true);
+    }, 0);
+
+    window.addEventListener("keyup", armEnterConfirmation, true);
+
+    return () => {
+      window.clearTimeout(fallbackTimer);
+      window.removeEventListener("keyup", armEnterConfirmation, true);
+      enterConfirmationArmedRef.current = false;
+    };
+  }, [isOpen, confirmOnEnter, title]);
 
   if (!isOpen) {
     return null;
@@ -86,6 +121,16 @@ export function DeleteImpactDialog({
       event.preventDefault();
       event.stopPropagation();
       onCancel();
+      return;
+    }
+
+    if (event.key === "Enter" && confirmOnEnter) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!enterConfirmationArmedRef.current) {
+        return;
+      }
+      onConfirm();
       return;
     }
 
@@ -170,7 +215,7 @@ export function DeleteImpactDialog({
         ) : null}
         <footer className="confirm-dialog-actions">
           {variant === "deleteCascade" ? (
-            <button type="button" className="confirm-dialog-cancel" onClick={onCancel}>
+            <button ref={cancelButtonRef} type="button" className="confirm-dialog-cancel" onClick={onCancel}>
               {cancelLabel}
             </button>
           ) : null}

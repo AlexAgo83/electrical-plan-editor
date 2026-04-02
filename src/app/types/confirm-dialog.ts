@@ -10,6 +10,7 @@ export interface ConfirmDialogRequest {
   cancelLabel?: string;
   intent?: ConfirmDialogIntent;
   closeOnBackdrop?: boolean;
+  confirmOnEnter?: boolean;
   variant?: "standard" | DeleteImpactDialogVariant;
   summaryCategories?: DeleteDependencySummaryCategory[];
   summaryNote?: string;

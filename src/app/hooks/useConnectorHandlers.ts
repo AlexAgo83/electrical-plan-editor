@@ -284,7 +284,8 @@ export function useConnectorHandlers({
           message: `Delete connector '${connector.name}' (${connector.technicalId})?`,
           confirmLabel: "Delete",
           cancelLabel: "Cancel",
-          intent: "danger"
+          intent: "danger",
+          confirmOnEnter: true
         });
         if (!shouldDelete) {
           return;
@@ -304,6 +305,7 @@ export function useConnectorHandlers({
           confirmLabel: "Delete all",
           cancelLabel: "Cancel",
           intent: "danger",
+          confirmOnEnter: true,
           variant: "deleteCascade",
           summaryCategories: impact.categories,
           summaryNote: impact.note
