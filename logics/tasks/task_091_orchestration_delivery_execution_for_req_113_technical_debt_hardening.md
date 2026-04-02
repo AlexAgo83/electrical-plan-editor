@@ -4,7 +4,7 @@
 > Status: In Progress
 > Understanding: 96%
 > Confidence: 93%
-> Progress: 50%
+> Progress: 75%
 > Complexity: High
 > Theme: Technical hardening / orchestration across persistence, performance, architecture, and robustness
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -74,9 +74,9 @@ flowchart LR
 - [x] B-GATE: Run `npm run -s typecheck && npm test -- --run src/tests/core.pathfinding.spec.ts src/tests/core.graph.spec.ts && npm run -s build`. All green before proceeding.
 
 ## Wave C — Architecture quality
-- [ ] 6. Deliver `item_558`: AppController Context providers, `useMemo` on derived state objects, and `ModelingController` extraction. Validate after each increment.
-- [ ] 7. Deliver `item_559`: audit all domain reducers for missing sync calls, add missing calls, and introduce enforcement wrapper.
-- [ ] C-GATE: Run `npm run -s lint && npm run -s typecheck && npm test -- --run src/tests/app.ui src/tests/store.reducer && npm run -s build`. All green before proceeding.
+- [x] 6. Deliver `item_558`: AppController Context providers, `useMemo` on derived state objects, and `ModelingController` extraction. Validate after each increment.
+- [x] 7. Deliver `item_559`: audit all domain reducers for missing sync calls, add missing calls, and introduce enforcement wrapper.
+- [x] C-GATE: Run `npm run -s lint && npm run -s typecheck && npm test -- --run src/tests/app.ui src/tests/store.reducer && npm run -s build`. All green before proceeding.
 
 ## Wave D — Robustness and testing
 - [ ] 8. Deliver `item_560`: unit tests for the five controller hooks in isolation.
@@ -178,8 +178,12 @@ flowchart LR
   - Wave B (`item_556` `item_557`) delivered:
     - Dijkstra route selection now uses a generic `MinHeap` priority queue instead of sorting the whole candidate list on every iteration, while preserving the existing deterministic tie-break comparator;
     - `selectRoutingGraphIndex()` now memoizes its derived `nodes` and `segments` collections by entity-slice identity and returns the cached graph on unrelated UI-only state changes.
+  - Wave C (`item_558` `item_559`) delivered:
+    - modeling surfaces now run under explicit contexts for dispatch plus connector, segment, and wire handlers; deeply nested modeling form panels consume those handler namespaces directly instead of relying only on prop drilling;
+    - `forms`, `canvas`, and `selectionEntities` now expose memoized derived objects, and persistence health handling moved into a dedicated hook so `AppController.tsx` dropped from 1120 lines to 1110 lines;
+    - scoped domain mutations now all flow through an explicit `runScopedDomainReducer()` wrapper with an invariant comment block in `reducer.ts`, and a dedicated reducer test asserts root/scoped-state alignment after representative mutations.
 - Latest validation snapshot:
-  - `npm run -s typecheck`
-  - `npm test -- --run src/tests/core.pathfinding.spec.ts src/tests/core.graph.spec.ts src/tests/core.min-heap.spec.ts src/tests/store.selectors.spec.ts`
   - `npm run -s lint`
+  - `npm run -s typecheck`
+  - `npm test -- --run $(rg --files src/tests | rg '(^src/tests/app\\.ui.*\\.spec\\.tsx$)|(^src/tests/store\\.reducer.*\\.spec\\.ts$)|(^src/tests/store\\.reducer.*\\.spec\\.tsx$)' | tr '\n' ' ')`
   - `npm run -s build`

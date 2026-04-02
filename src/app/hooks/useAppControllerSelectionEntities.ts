@@ -55,25 +55,46 @@ export function useAppControllerSelectionEntities({ state }: UseAppControllerSel
   const selectedSpliceOccupiedCount =
     selectedSplice === null ? 0 : splicePortStatuses.filter((slot) => slot.isOccupied).length;
 
-  return {
-    selected,
-    selectedConnectorId,
-    selectedSpliceId,
-    selectedNodeId,
-    selectedSegmentId,
-    selectedWireId,
-    selectedConnector,
-    selectedSplice,
-    selectedNode,
-    selectedSegment,
-    selectedWire,
-    selectedWireRouteInputValue,
-    selectedSubScreen,
-    connectorCavityStatuses,
-    splicePortStatuses,
-    selectedConnectorOccupiedCount,
-    selectedSpliceOccupiedCount
-  };
+  return useMemo(
+    () => ({
+      selected,
+      selectedConnectorId,
+      selectedSpliceId,
+      selectedNodeId,
+      selectedSegmentId,
+      selectedWireId,
+      selectedConnector,
+      selectedSplice,
+      selectedNode,
+      selectedSegment,
+      selectedWire,
+      selectedWireRouteInputValue,
+      selectedSubScreen,
+      connectorCavityStatuses,
+      splicePortStatuses,
+      selectedConnectorOccupiedCount,
+      selectedSpliceOccupiedCount
+    }),
+    [
+      connectorCavityStatuses,
+      selected,
+      selectedConnector,
+      selectedConnectorId,
+      selectedConnectorOccupiedCount,
+      selectedNode,
+      selectedNodeId,
+      selectedSegment,
+      selectedSegmentId,
+      selectedSplice,
+      selectedSpliceId,
+      selectedSpliceOccupiedCount,
+      selectedSubScreen,
+      selectedWire,
+      selectedWireId,
+      selectedWireRouteInputValue,
+      splicePortStatuses
+    ]
+  );
 }
 
 export type AppControllerSelectionEntitiesModel = ReturnType<typeof useAppControllerSelectionEntities>;

@@ -1,10 +1,10 @@
 ## item_559_audit_and_enforce_sync_invariant_between_global_and_network_scoped_state - Audit and enforce sync invariant between global and network-scoped state
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 92%
-> Confidence: 88%
-> Progress: 0%
+> Status: Done
+> Understanding: 96%
+> Confidence: 94%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Architecture quality / state consistency
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -69,6 +69,7 @@ flowchart LR
   - `src/store/reducer.ts`
   - `src/store/reducer/` (all domain reducers)
   - `src/store/types.ts`
+  - `src/tests/store.reducer.sync-invariant.spec.ts`
 
 # Validation
 - `npm run -s lint`

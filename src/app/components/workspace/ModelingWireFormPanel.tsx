@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG, MAX_FREE_WIRE_COLOR_LABEL_LENGTH } from "../../../core/cableColors";
 import type { WireEndpoint } from "../../../core/entities";
+import { useWireHandlersContext } from "../controller/ModelingController.context";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
@@ -10,9 +11,6 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
   const {
     isWireSubScreen,
     wireFormMode,
-    openCreateWireForm,
-    handleWireSubmit,
-    handleSwapWireEndpoints,
     wireName,
     setWireName,
     wireTechnicalId,
@@ -71,9 +69,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     catalogItems,
     connectors,
     splices,
-    cancelWireEdit,
     wireFormError
   } = props;
+  const wireHandlers = useWireHandlersContext();
   const primaryColor = wirePrimaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wirePrimaryColorId] : undefined;
   const secondaryColor = wireSecondaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wireSecondaryColorId] : undefined;
   const isCatalogColorMode = wireColorMode === "catalog";
@@ -159,8 +157,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
   return (
 <article className="panel" hidden={!isWireSubScreen} data-form-panel={FORM_PANEL_IDS.wire}>
   {renderFormHeader(wireFormMode === "create" ? "Create Wire" : wireFormMode === "edit" ? "Edit Wire" : "Wire form", wireFormMode)}
-  {wireFormMode === "idle" ? renderIdleCopy("wire", openCreateWireForm) : (
-  <form className="stack-form" onSubmit={handleWireSubmit}>
+  {wireFormMode === "idle" ? renderIdleCopy("wire", wireHandlers.resetWireForm) : (
+  <form className="stack-form" onSubmit={wireHandlers.handleWireSubmit}>
     <label>
       Functional name
       <input value={wireName} onChange={(event) => setWireName(event.target.value)} placeholder="Feed wire" required />
@@ -506,18 +504,22 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         {wireFormMode === "create" ? "Create" : "Save"}
       </button>
       {wireFormMode === "create" ? (
-        <button type="button" className="button-with-icon" onClick={openCreateWireForm}>
+        <button type="button" className="button-with-icon" onClick={wireHandlers.resetWireForm}>
           <span className="action-button-icon is-new" aria-hidden="true" />
           New
         </button>
       ) : null}
       {wireFormMode === "edit" ? (
-        <button type="button" className="button-with-icon" onClick={handleSwapWireEndpoints}>
+        <button type="button" className="button-with-icon" onClick={wireHandlers.handleSwapWireEndpoints}>
           <span className="action-button-icon is-swap" aria-hidden="true" />
           Swap endpoints
         </button>
       ) : null}
-      <button type="button" className={wireFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelWireEdit}>
+      <button
+        type="button"
+        className={wireFormMode === "edit" ? "button-with-icon" : undefined}
+        onClick={wireHandlers.cancelWireEdit}
+      >
         {wireFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {wireFormMode === "edit" ? "Cancel edit" : "Cancel"}
       </button>

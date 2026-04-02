@@ -8,11 +8,6 @@ import {
 import appPackageMetadata from "../../package.json";
 import type { CatalogItemId } from "../core/entities";
 import {
-  clearPendingPersistenceRecovery,
-  commitPendingPersistenceRecovery,
-  getPendingPersistenceRecovery
-} from "../adapters/persistence";
-import {
   appActions,
   hasSampleNetworkSignature,
   isWorkspaceEmpty,
@@ -20,7 +15,6 @@ import {
   selectActiveNetworkId,
   selectConnectors,
   selectCatalogItems,
-  selectLastError,
   selectNetworks,
   selectNodes,
   selectRoutingGraphIndex,
@@ -55,6 +49,7 @@ import { useAppControllerCanvasStateSyncEffects } from "./hooks/controller/useAp
 import { useConfirmDialogController } from "./hooks/controller/useConfirmDialogController";
 import { useNetworkSummaryViewStateSync } from "./hooks/controller/useNetworkSummaryViewStateSync";
 import { useOnboardingController } from "./hooks/controller/useOnboardingController";
+import { useAppControllerPersistenceHealth } from "./hooks/controller/useAppControllerPersistenceHealth";
 import { useAppControllerWorkspaceContentAssembly } from "./hooks/controller/useAppControllerWorkspaceContentAssembly";
 import { useAppControllerUniquenessFlags } from "./hooks/controller/useAppControllerUniquenessFlags";
 import {
@@ -132,7 +127,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     spliceNodeBySpliceId
   } = useEntityRelationshipMaps(connectors, splices, nodes, segments);
   const formsState = useEntityFormsState();
-  const forms = buildAppControllerNamespacedFormsState(formsState);
+  const forms = useMemo(() => buildAppControllerNamespacedFormsState(formsState), [formsState]);
   const { setWireForcedRouteInput } = formsState;
   const canvasDisplayState = useAppControllerCanvasDisplayState();
   const {
@@ -155,7 +150,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasResetZoomPercentInput
   } = canvasDisplayState;
   const canvasState = useCanvasState();
-  const canvas = buildAppControllerNamespacedCanvasState(canvasState);
+  const canvas = useMemo(() => buildAppControllerNamespacedCanvasState(canvasState), [canvasState]);
   const {
     interactionMode,
     setInteractionMode,
@@ -485,11 +480,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const hasActiveNetwork = activeNetwork !== null;
   const isCurrentWorkspaceEmpty = isWorkspaceEmpty(state);
   const hasBuiltInSampleState = hasSampleNetworkSignature(state);
-
-  const lastError = selectLastError(state);
-  const [bootRecoveryMessage, setBootRecoveryMessage] = useState<string | null>(
-    () => getPendingPersistenceRecovery()?.message ?? null
-  );
   const {
     saveStatus,
     isUndoAvailable,
@@ -511,6 +501,15 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setActiveSubScreen("connector");
       setInteractionMode("select");
     }
+  });
+  const {
+    lastError,
+    bootRecoveryMessage,
+    clearPersistenceHealth,
+    commitBootRecovery
+  } = useAppControllerPersistenceHealth({
+    state,
+    dispatchAction
   });
 
   const catalogHandlers = useCatalogHandlers({
@@ -1028,18 +1027,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       validationErrorCount,
       validationWarningCount,
       lastError,
-      onClearError: () => {
-        clearPendingPersistenceRecovery();
-        setBootRecoveryMessage(null);
-        dispatchAction(appActions.clearError());
-      },
+      onClearError: clearPersistenceHealth,
       bootRecoveryMessage,
-      onCommitBootRecovery: () => {
-        commitPendingPersistenceRecovery();
-        clearPendingPersistenceRecovery();
-        setBootRecoveryMessage(null);
-        dispatchAction(appActions.clearError());
-      }
+      onCommitBootRecovery: commitBootRecovery
     },
     navigation: {
       activeScreen,
