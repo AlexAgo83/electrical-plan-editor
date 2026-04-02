@@ -25,7 +25,7 @@
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|appcontroller-decomposition-context-pro|appcontroller-tsx-1099-lines-is-a-god-c|ac1-react-context-providers-exist-for-d|minimum-step-gate
+%% logics-signature: backlog|appcontroller-decomposition-context-prov|req-113-technical-debt-hardening-persist|appcontroller-tsx-1-099-lines-is-a|ac1-react-context-providers-exist-for
 flowchart LR
     Before[AppController 1099 lines, no context, no memo] --> Contexts[Context providers for dispatch and handlers]
     Before --> Memo[useMemo on selectionEntities, forms, canvas]

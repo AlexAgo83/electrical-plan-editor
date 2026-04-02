@@ -24,7 +24,7 @@ The migration system applies schema upgrades linearly without any rollback capab
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|migration-backup-and-rollback-on-failure|migration-applies-schema-upgrades-linea|ac1-a-migration-step-that-throws-or-retu|minimum-step-gate
+%% logics-signature: backlog|migration-backup-and-rollback-on-failure|req-113-technical-debt-hardening-persist|the-migration-system-applies-schema-upgr|ac1-a-migration-step-that-throws
 flowchart LR
     Pre[Write backup before migration] --> Migrate[Apply migration steps]
     Migrate -->|Success| Cleanup[Delete backup key]

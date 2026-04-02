@@ -24,7 +24,7 @@ All `JSON.parse()` calls in the persistence layer are unguarded. A corrupted or 
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|safe-json-parse-wrapper-and-boot-recovery|all-json-parse-calls-in-the-persistenc|ac1-a-deliberately-corrupted-localstorag|minimum-step-gate
+%% logics-signature: backlog|safe-json-parse-wrapper-and-boot-recover|req-113-technical-debt-hardening-persist|all-json-parse-calls-in-the-persistence|ac1-a-deliberately-corrupted-localstorag
 flowchart LR
     Problem[Unguarded JSON.parse on boot] --> Fix[parseJsonSafe wrapper]
     Fix --> Recovery[Explicit recovery UI on parse failure]

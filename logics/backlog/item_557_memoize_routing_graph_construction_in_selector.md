@@ -23,7 +23,7 @@
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|memoize-routing-graph-construction-in-s|buildroutinggraphindex-called-on-every|ac1-buildroutinggraphindex-is-not-called|minimum-step-gate
+%% logics-signature: backlog|memoize-routing-graph-construction-in-se|req-113-technical-debt-hardening-persist|buildroutinggraphindex-in-src-core-graph|ac1-buildroutinggraphindex-is-not-called
 flowchart LR
     Before[buildRoutingGraphIndex on every render] --> Selector[createSelector with segments + nodePositions]
     Selector -->|Same inputs| Skip[Return cached result]

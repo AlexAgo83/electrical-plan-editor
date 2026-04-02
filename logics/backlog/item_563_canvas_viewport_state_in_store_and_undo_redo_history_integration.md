@@ -24,7 +24,7 @@ Canvas viewport state (scale, offset, snap settings) lives in local React hook s
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|canvas-viewport-state-in-store-and-undo|canvas-viewport-state-scale-offset-snap|ac1-canvas-viewport-scale-and-offset-ar|minimum-step-gate
+%% logics-signature: backlog|canvas-viewport-state-in-store-and-undo-|req-113-technical-debt-hardening-persist|canvas-viewport-state-scale-offset-snap|ac1-canvas-viewport-scale-and-offset
 flowchart LR
     Before[Canvas viewport in local hook state] --> Store[canvas slice in Redux store]
     Store --> History[useStoreHistory includes viewport snapshot]

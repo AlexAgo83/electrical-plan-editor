@@ -28,7 +28,7 @@ The 50+ controller hooks in `src/app/hooks/controller/` are tested only through 
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|unit-tests-for-controller-hooks-in-iso|50-controller-hooks-are-tested-only-thr|ac1-dedicated-unit-test-files-exist-for|minimum-step-gate
+%% logics-signature: backlog|unit-tests-for-controller-hooks-in-isola|req-113-technical-debt-hardening-persist|the-50-controller-hooks-in-src|ac1-dedicated-unit-test-files-exist
 flowchart LR
     Gap[No hook unit tests] --> Spec[renderHook with minimal store provider]
     Spec --> Coverage[5 hooks: selection, workspace, modeling, forms, canvas]
