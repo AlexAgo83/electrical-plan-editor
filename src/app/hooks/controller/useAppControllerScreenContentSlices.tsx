@@ -1,5 +1,8 @@
 import type { ComponentProps, ComponentType, Dispatch, SetStateAction } from "react";
+import type { AppStore } from "../../../store";
 import { InspectorContextPanel } from "../../components/InspectorContextPanel";
+import { ModelingController } from "../../components/controller/ModelingController";
+import type { AppControllerModelingHandlersOrchestrator } from "./useAppControllerModelingHandlersOrchestrator";
 
 type NetworkSummaryPanelProps = ComponentProps<typeof import("../../components/NetworkSummaryPanel").NetworkSummaryPanel>;
 type NetworkScopeWorkspaceContentProps = ComponentProps<
@@ -140,6 +143,15 @@ type ModelingScreenContentSliceParams = Omit<
     resetWireForm: ModelingSecondaryTablesProps["onOpenCreateWire"];
     startWireEdit: ModelingSecondaryTablesProps["onEditWire"];
     handleWireDelete: ModelingSecondaryTablesProps["onDeleteWire"];
+    dispatchAction: (
+      action: Parameters<AppStore["dispatch"]>[0],
+      options?: {
+        trackHistory?: boolean;
+      }
+    ) => void;
+    connectorHandlers: AppControllerModelingHandlersOrchestrator["connector"];
+    segmentHandlers: AppControllerModelingHandlersOrchestrator["segment"];
+    wireHandlers: AppControllerModelingHandlersOrchestrator["wire"];
   };
 
 type AnalysisScreenContentSliceParams = Omit<
@@ -608,12 +620,28 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     modelingSecondaryTablesProps,
     modelingFormsColumnProps,
     modelingLeftColumnContent: (
-      <>
+      <ModelingController
+        dispatchAction={params.dispatchAction}
+        connectorHandlers={params.connectorHandlers}
+        segmentHandlers={params.segmentHandlers}
+        wireHandlers={params.wireHandlers}
+      >
+        <>
         <params.ModelingPrimaryTablesComponent {...modelingPrimaryTablesProps} />
         <params.ModelingSecondaryTablesComponent {...modelingSecondaryTablesProps} />
-      </>
+        </>
+      </ModelingController>
     ),
-    modelingFormsColumnContent: <params.ModelingFormsColumnComponent {...modelingFormsColumnProps} />
+    modelingFormsColumnContent: (
+      <ModelingController
+        dispatchAction={params.dispatchAction}
+        connectorHandlers={params.connectorHandlers}
+        segmentHandlers={params.segmentHandlers}
+        wireHandlers={params.wireHandlers}
+      >
+        <params.ModelingFormsColumnComponent {...modelingFormsColumnProps} />
+      </ModelingController>
+    )
   };
 }
 
