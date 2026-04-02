@@ -1,7 +1,7 @@
 import { useRef, useState, type ChangeEvent, type RefObject } from "react";
 import type { CatalogItem, CatalogItemId } from "../../core/entities";
 import type { AppState, AppStore } from "../../store";
-import { appActions, appReducer, normalizeManufacturerReferenceKey } from "../../store";
+import { appActions, appReducer, getAppErrorMessage, normalizeManufacturerReferenceKey } from "../../store";
 import { createEntityId } from "../lib/app-utils-shared";
 import { buildCatalogCsvExport, parseCatalogCsvImportText } from "../lib/catalogCsv";
 import { downloadCsvFile } from "../lib/csv";
@@ -201,7 +201,7 @@ export function useCatalogCsvImportExport({
       if (candidateState.ui.lastError !== null) {
         setCatalogCsvImportExportStatus({
           kind: "failed",
-          message: `Catalog import failed on '${row.manufacturerReference}': ${candidateState.ui.lastError}`
+          message: `Catalog import failed on '${row.manufacturerReference}': ${getAppErrorMessage(candidateState.ui.lastError)}`
         });
         setCatalogCsvLastImportSummaryLine(
           `Catalog CSV import aborted after ${createdCount + updatedCount} row(s); ${warningCount} warnings in file.`

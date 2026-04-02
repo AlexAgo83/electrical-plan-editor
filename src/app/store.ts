@@ -1,5 +1,5 @@
 import { loadState, saveState, type SaveStateResult } from "../adapters/persistence";
-import { appActions, createAppStore, type AppStore } from "../store";
+import { appActions, createAppStore, getAppErrorMessage, type AppStore } from "../store";
 
 export const PERSISTENCE_WRITE_FAILURE_MESSAGE =
   "Local persistence is currently unavailable. Changes remain in this tab only until storage works again.";
@@ -57,7 +57,7 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
         }
 
         const nextState = store.getState();
-        const currentMessage = nextState.ui.lastError;
+        const currentMessage = getAppErrorMessage(nextState.ui.lastError);
         const nextMessage = mapPersistenceResultToMessage(saveResult);
         const isPersistenceMessageVisible = isPersistenceFeedbackMessage(currentMessage);
 
@@ -86,7 +86,7 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
         }
 
         const nextState = store.getState();
-        if (nextState.ui.lastError === PERSISTENCE_WRITE_FAILURE_MESSAGE) {
+        if (getAppErrorMessage(nextState.ui.lastError) === PERSISTENCE_WRITE_FAILURE_MESSAGE) {
           return;
         }
 

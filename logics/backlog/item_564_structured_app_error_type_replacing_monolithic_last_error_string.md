@@ -1,10 +1,10 @@
 ## item_564_structured_app_error_type_replacing_monolithic_last_error_string - Structured AppError type replacing monolithic lastError string
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 94%
-> Confidence: 91%
-> Progress: 0%
+> Status: Done
+> Understanding: 97%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Low-Medium
 > Theme: Robustness / error handling
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -72,6 +72,11 @@ flowchart LR
   - `src/store/types.ts`
   - `src/store/reducer/` (all domain reducers)
   - `src/app/` (error display component)
+- Delivery notes:
+  - introduced `AppError` plus shared normalization/comparison helpers in `src/store/types.ts`;
+  - `withError()` and `ui/setError` now always store typed `AppError` objects while preserving existing user-facing messages;
+  - persistence feedback, CSV import flows, rename flows, migration recovery, and the header error banner now consume `lastError.message`, while the UI also exposes `lastError.code`;
+  - reducer coverage now explicitly asserts `WIRE_ENDPOINT_A_IS_ALREADY_OCCUPIED` as a representative structured error code.
 
 # Validation
 - `npm run -s lint`

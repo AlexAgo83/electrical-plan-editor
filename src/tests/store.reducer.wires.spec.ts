@@ -115,7 +115,8 @@ describe("appReducer wire lifecycle and routing", () => {
     ]);
 
     expect(state.wires.byId[asWireId("W2")]).toBeUndefined();
-    expect(state.ui.lastError).toBe("Wire endpoint A is already occupied.");
+    expect(state.ui.lastError?.code).toBe("WIRE_ENDPOINT_A_IS_ALREADY_OCCUPIED");
+    expect(state.ui.lastError?.message).toBe("Wire endpoint A is already occupied.");
   });
 
   it("validates fuse catalog association and persists fuse protection on save", () => {
@@ -149,7 +150,7 @@ describe("appReducer wire lifecycle and routing", () => {
       })
     );
     expect(invalidMissingCatalog.wires.byId[asWireId("WFUSE-BAD")]).toBeUndefined();
-    expect(invalidMissingCatalog.ui.lastError).toBe("Fuse wire references a missing catalog item.");
+    expect(invalidMissingCatalog.ui.lastError?.message).toBe("Fuse wire references a missing catalog item.");
 
     const validFuseWire = appReducer(
       baseState,

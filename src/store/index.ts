@@ -13,9 +13,15 @@ export * from "./selectors";
 export * from "./catalog";
 export {
   createEmptyWorkspaceState,
+  createAppError,
   createInitialState,
   createEmptyNetworkScopedState,
   cloneNetworkSummaryViewState,
+  getAppErrorMessage,
+  inferAppErrorCode,
+  isSameAppError,
+  normalizeAppError,
+  type AppError,
   type AppState,
   type EntityState,
   type LayoutNodePosition,
