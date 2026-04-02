@@ -1,10 +1,10 @@
 ## item_568_delete_and_cascade_delete_dialog_enter_shortcut_contract_with_cancel_focused_safety - Delete and cascade delete dialog Enter shortcut contract with cancel-focused safety
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97% (the user intent is specific: when a delete confirmation opens, pressing Enter should confirm faster without broadening the rule to unrelated confirmation dialogs)
 > Confidence: 97% (the main product tradeoff is explicit and localized, and the remaining keyboard-scope details are now locked to the current delete-dialog shape with focus preserved on cancel)
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Destructive-action ergonomics / keyboard flow / confirmation safety
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

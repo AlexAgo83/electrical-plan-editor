@@ -1,10 +1,10 @@
 ## item_565_connector_and_splice_catalog_selector_labels_include_catalog_names_and_safe_fallback_formatting - Connector and splice catalog selector labels include catalog names and safe fallback formatting
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 96% (the requested scope is clear: improve connector/splice catalog option readability and reduce repetitive scrolling during chained create flows)
 > Confidence: 98% (current UI patterns and nearby requests define the interaction boundaries clearly, and the remaining bottom-action behavior is now locked to silent reset semantics within Modeling forms only)
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Modeling form ergonomics / catalog readability / repetitive-entry speed
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -94,3 +94,4 @@ flowchart LR
 - Derived from request `req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action`.
 - Source file: `logics/request/req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action.md`.
 - Request context seeded into this backlog item from `logics/request/req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action.md`.
+- Task `task_092_super_orchestration_delivery_execution_for_req_114_to_req_117_with_validation_gates_and_staged_checkpoints` was finished via `logics_flow.py finish task` on 2026-04-02.

@@ -1,7 +1,7 @@
 ## req_115_keyboard_confirmation_shortcut_for_delete_modals_with_explicit_safety_policy - Keyboard confirmation shortcut for delete modals with explicit safety policy
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 97% (the user intent is specific: when a delete confirmation opens, pressing Enter should confirm faster without broadening the rule to unrelated confirmation dialogs)
 > Confidence: 97% (the main product tradeoff is explicit and localized, and the remaining keyboard-scope details are now locked to the current delete-dialog shape with focus preserved on cancel)
 > Complexity: Medium

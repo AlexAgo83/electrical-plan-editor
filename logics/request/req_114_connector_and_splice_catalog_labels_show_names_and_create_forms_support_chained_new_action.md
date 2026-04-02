@@ -1,7 +1,7 @@
 ## req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action - Connector and splice catalog labels show names and create forms support chained New action
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 96% (the requested scope is clear: improve connector/splice catalog option readability and reduce repetitive scrolling during chained create flows)
 > Confidence: 98% (current UI patterns and nearby requests define the interaction boundaries clearly, and the remaining bottom-action behavior is now locked to silent reset semantics within Modeling forms only)
 > Complexity: Medium
