@@ -1,7 +1,7 @@
 ## req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas - Shift click multi selection and grouped move on the 2D modeling canvas
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 97% (the feature goal is clear: support canvas-side multi-selection with `Shift+click`, then move the selected set together on the 2D modeling canvas)
 > Confidence: 97% (the current canvas already supports single-node selection and single-node drag, and the remaining grouped-selection semantics are now locked to a node-only V1 with explicit group-drag and summary behavior)
 > Complexity: High

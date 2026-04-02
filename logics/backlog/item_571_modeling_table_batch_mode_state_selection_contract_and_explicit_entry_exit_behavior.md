@@ -1,10 +1,10 @@
 ## item_571_modeling_table_batch_mode_state_selection_contract_and_explicit_entry_exit_behavior - Modeling table batch mode state, selection contract, and explicit entry exit behavior
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97% (the requested user value is clear: delete several modeling items in one operation, but only through an explicit multi-selection mode that does not break existing row-to-edit behavior)
 > Confidence: 98% (the main delete-impact policy is explicit, the batch-mode UX now clearly separates multi-selection context from single-item editing, and the remaining list-state behaviors are now locked)
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Modeling list ergonomics / batch destructive actions / dependency-aware deletion
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
