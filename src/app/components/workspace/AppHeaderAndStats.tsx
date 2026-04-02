@@ -17,6 +17,8 @@ interface AppHeaderAndStatsProps {
   validationErrorCount: number;
   lastError: string | null;
   onClearError: () => void;
+  bootRecoveryMessage: string | null;
+  onCommitBootRecovery: () => void;
 }
 
 export function AppHeaderAndStats({
@@ -36,7 +38,9 @@ export function AppHeaderAndStats({
   validationIssuesCount,
   validationErrorCount,
   lastError,
-  onClearError
+  onClearError,
+  bootRecoveryMessage,
+  onCommitBootRecovery
 }: AppHeaderAndStatsProps): ReactElement {
   const opsStatusDescription = `${validationIssuesCount} validation issue${validationIssuesCount === 1 ? "" : "s"}${
     validationErrorCount > 0
@@ -106,7 +110,21 @@ export function AppHeaderAndStats({
         </div>
       </section>
 
-      {lastError !== null ? (
+      {bootRecoveryMessage !== null ? (
+        <section className="error-banner" role="alert">
+          <p>{bootRecoveryMessage}</p>
+          <div className="inline-actions">
+            <button type="button" onClick={onCommitBootRecovery}>
+              Reset stored workspace
+            </button>
+            <button type="button" onClick={onClearError}>
+              Dismiss
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {lastError !== null && lastError !== bootRecoveryMessage ? (
         <section className="error-banner" role="alert">
           <p>{lastError}</p>
           <button type="button" onClick={onClearError}>
