@@ -1,10 +1,4 @@
-import {
-  type ReactElement,
-  useCallback,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+import { type ReactElement, useCallback, useMemo, useRef, useState } from "react";
 import appPackageMetadata from "../../package.json";
 import type { CatalogItemId } from "../core/entities";
 import {
@@ -87,10 +81,7 @@ import {
 } from "./lib/app-utils-shared";
 import { downloadCsvFile } from "./lib/csv";
 import { buildNetworkSummaryBomCsvExport } from "./lib/networkSummaryBomCsv";
-import type {
-  AppProps,
-  SubScreenId
-} from "./types/app-controller";
+import type { AppProps, SubScreenId } from "./types/app-controller";
 import "./styles.css";
 
 export type { AppProps } from "./types/app-controller";
@@ -99,10 +90,8 @@ const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor"
 export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear();
   const state = useAppSnapshot(store);
-  const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, ValidationScreen } =
-    appUiModules;
-  const { AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables } =
-    appUiModules;
+  const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, ValidationScreen } = appUiModules;
+  const { AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables } = appUiModules;
   const { NetworkScopeWorkspaceContent, SettingsWorkspaceContent, ValidationWorkspaceContent } = appUiModules;
 
   const networks = selectNetworks(state);
@@ -209,15 +198,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceWideScreen,
     preferencesHydrated
   } = preferencesState;
-  const networkSummaryBomCsvExport = useMemo(() => buildNetworkSummaryBomCsvExport(
-    catalogItems,
-    connectors,
-    splices,
-    wires,
-    workspaceCurrencyCode,
-    workspaceTaxEnabled,
-    workspaceTaxRatePercent
-  ), [catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent]);
+  const networkSummaryBomCsvExport = useMemo(
+    () => buildNetworkSummaryBomCsvExport(catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent),
+    [catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent]
+  );
   const canExportBomCsv = networkSummaryBomCsvExport.itemRowCount > 0;
   const handleExportBomCsv = useCallback(() => {
     if (!canExportBomCsv) return;
@@ -378,10 +362,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasResetZoomPercentInput
   });
 
-  const { describeWireEndpoint, describeWireEndpointId, describeWireEndpointCsvParts } = useWireEndpointDescriptions({
-    connectorMap,
-    spliceMap
-  });
+  const { describeWireEndpoint, describeWireEndpointId, describeWireEndpointCsvParts } = useWireEndpointDescriptions({ connectorMap, spliceMap });
 
   useAppControllerCanvasStateSyncEffects({
     activeNetworkId,
@@ -993,10 +974,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       networkGridStep: NETWORK_GRID_STEP
     }
   });
-  useAppControllerInspectorSelectionSourceEffect({
-    hasInspectableSelection,
-    setDetailPanelsSelectionSource
-  });
+  useAppControllerInspectorSelectionSourceEffect({ hasInspectableSelection, setDetailPanelsSelectionSource });
   const appShellLayoutProps = buildAppControllerShellLayoutProps({
     meta: {
       appShellClassName,
@@ -1088,27 +1066,25 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
   });
 
-  return (
-    <>
-      <AppShellLayout {...appShellLayoutProps} />
-      <AppControllerOverlays
-        appShellClassName={appShellClassName}
-        activeConfirmDialog={activeConfirmDialog}
-        closeActiveConfirmDialog={closeActiveConfirmDialog}
-        onboarding={{
-          activeOnboardingStep,
-          isOnboardingOpen,
-          onboardingModalMode,
-          onboardingStepDisplayIndex,
-          onboardingTotalSteps,
-          onboardingAutoOpenEnabled,
-          setOnboardingAutoOpenEnabledPersisted,
-          closeOnboarding,
-          handleOnboardingNext,
-          canGoNext: canOnboardingGoNext,
-          onboardingTargetActions
-        }}
-      />
-    </>
-  );
+  return <>
+    <AppShellLayout {...appShellLayoutProps} />
+    <AppControllerOverlays
+      appShellClassName={appShellClassName}
+      activeConfirmDialog={activeConfirmDialog}
+      closeActiveConfirmDialog={closeActiveConfirmDialog}
+      onboarding={{
+        activeOnboardingStep,
+        isOnboardingOpen,
+        onboardingModalMode,
+        onboardingStepDisplayIndex,
+        onboardingTotalSteps,
+        onboardingAutoOpenEnabled,
+        setOnboardingAutoOpenEnabledPersisted,
+        closeOnboarding,
+        handleOnboardingNext,
+        canGoNext: canOnboardingGoNext,
+        onboardingTargetActions
+      }}
+    />
+  </>;
 }
