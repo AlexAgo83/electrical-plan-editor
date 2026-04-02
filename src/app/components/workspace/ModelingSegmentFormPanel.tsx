@@ -92,6 +92,12 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
         {segmentFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {segmentFormMode === "create" ? "Create" : "Save"}
       </button>
+      {segmentFormMode === "create" ? (
+        <button type="button" className="button-with-icon" onClick={openCreateSegmentForm}>
+          <span className="action-button-icon is-new" aria-hidden="true" />
+          New
+        </button>
+      ) : null}
       {segmentFormMode === "edit" ? (
         <button type="button" className="button-with-icon" onClick={handleSwapSegmentNodes}>
           <span className="action-button-icon is-swap" aria-hidden="true" />
