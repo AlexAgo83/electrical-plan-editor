@@ -387,7 +387,15 @@ describe("App integration UI - navigation and canvas", () => {
   });
 
   it("moves every selected canvas node by the same persisted delta during grouped drag", () => {
-    const { store } = renderAppWithState(createUiIntegrationState());
+    const positionedState = appReducer(
+      createUiIntegrationState(),
+      appActions.setNodePositions({
+        [asNodeId("N-C1")]: { x: 60, y: 80 },
+        [asNodeId("N-MID")]: { x: 220, y: 180 },
+        [asNodeId("N-S1")]: { x: 420, y: 220 }
+      })
+    );
+    const { store } = renderAppWithState(positionedState);
     switchScreenDrawerAware("modeling");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
@@ -431,8 +439,10 @@ describe("App integration UI - navigation and canvas", () => {
     const nextState = store.getState();
     const connectorAfter = nextState.nodePositions[asNodeId("N-C1")];
     const intermediateAfter = nextState.nodePositions[asNodeId("N-MID")];
+    const spliceAfter = nextState.nodePositions[asNodeId("N-S1")];
     expect(connectorAfter).toBeDefined();
     expect(intermediateAfter).toBeDefined();
+    expect(spliceAfter).toEqual({ x: 420, y: 220 });
     if (connectorAfter === undefined || intermediateAfter === undefined) {
       throw new Error("Expected moved node positions.");
     }
@@ -449,6 +459,7 @@ describe("App integration UI - navigation and canvas", () => {
     expect(connectorDelta.x).not.toBe(0);
     expect(connectorDelta.y).not.toBe(0);
     expect(intermediateDelta).toEqual(connectorDelta);
+    expect(Object.keys(nextState.nodePositions)).toHaveLength(3);
   });
 
   it("ignores non-primary mouse buttons for 2D node drag selection and shift-pan starts", () => {
