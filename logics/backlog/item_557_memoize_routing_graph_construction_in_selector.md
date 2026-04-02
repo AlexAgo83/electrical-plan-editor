@@ -1,20 +1,20 @@
 ## item_557_memoize_routing_graph_construction_in_selector - Memoize routing graph construction in selector
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 96%
 > Confidence: 93%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low-Medium
 > Theme: Performance / selector memoization
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
 
 # Problem
-`buildRoutingGraphIndex()` in `src/core/graph.ts` is called on every render via `selectRoutingGraphIndex` in `src/store/selectors.ts`, even when neither `segments` nor `nodePositions` has changed. For mid-size networks this is a measurable wasted computation on every state change, including unrelated UI interactions.
+`buildRoutingGraphIndex()` in `src/core/graph.ts` is called on every render via `selectRoutingGraphIndex` in `src/store/selectors.ts`, even when neither `nodes` nor `segments` has changed. For mid-size networks this is a measurable wasted computation on every state change, including unrelated UI interactions.
 
 # Scope
 - In:
-  - refactor `selectRoutingGraphIndex` to use structural memoization (`createSelector` or equivalent) with `segments` and `nodePositions` as the only inputs;
+  - refactor `selectRoutingGraphIndex` to use structural memoization (`createSelector` or equivalent) with `nodes` and `segments` as the only inputs;
   - confirm that `buildRoutingGraphIndex()` is not called more than once per render cycle when the relevant state slices are unchanged;
   - add a test or proof point that the selector does not recompute on unrelated state changes.
 - Out:
@@ -25,13 +25,13 @@
 %% logics-kind: backlog
 %% logics-signature: backlog|memoize-routing-graph-construction-in-se|req-113-technical-debt-hardening-persist|buildroutinggraphindex-in-src-core-graph|ac1-buildroutinggraphindex-is-not-called
 flowchart LR
-    Before[buildRoutingGraphIndex on every render] --> Selector[createSelector with segments + nodePositions]
+    Before[buildRoutingGraphIndex on every render] --> Selector[Memoized selector with nodes + segments]
     Selector -->|Same inputs| Skip[Return cached result]
     Selector -->|Changed inputs| Rebuild[Recompute graph]
 ```
 
 # Acceptance criteria
-- AC1: `buildRoutingGraphIndex()` is not called more than once per render cycle when `segments` and `nodePositions` have not changed.
+- AC1: `buildRoutingGraphIndex()` is not called more than once per render cycle when `nodes` and `segments` have not changed.
 - AC2: `selectRoutingGraphIndex` is implemented with a memoized selector pattern; the raw function call no longer sits directly inside the selector body without caching.
 - AC3: Existing `core.graph.spec.ts` and all routing-related tests continue to pass without modification.
 - AC4: A test or inline proof point demonstrates that the selector returns a cached reference when inputs are unchanged.
@@ -67,6 +67,7 @@ flowchart LR
   - `src/store/selectors.ts`
   - `src/core/graph.ts`
   - `src/tests/core.graph.spec.ts`
+  - `src/tests/store.selectors.spec.ts`
 
 # Validation
 - `npm run -s lint`

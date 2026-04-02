@@ -4,7 +4,7 @@
 > Status: In Progress
 > Understanding: 96%
 > Confidence: 93%
-> Progress: 25%
+> Progress: 50%
 > Complexity: High
 > Theme: Technical hardening / orchestration across persistence, performance, architecture, and robustness
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -69,9 +69,9 @@ flowchart LR
 - [x] A-GATE: Run `npm run -s lint && npm run -s typecheck && npm test -- --run src/tests/persistence && npm run -s build`. All green before proceeding.
 
 ## Wave B — Performance
-- [ ] 4. Deliver `item_556`: replace `queue.sort()` with `MinHeap` in pathfinding.
-- [ ] 5. Deliver `item_557`: memoize `selectRoutingGraphIndex` with structural `createSelector`.
-- [ ] B-GATE: Run `npm run -s typecheck && npm test -- --run src/tests/core.pathfinding.spec.ts src/tests/core.graph.spec.ts && npm run -s build`. All green before proceeding.
+- [x] 4. Deliver `item_556`: replace `queue.sort()` with `MinHeap` in pathfinding.
+- [x] 5. Deliver `item_557`: memoize `selectRoutingGraphIndex` with structural `createSelector`.
+- [x] B-GATE: Run `npm run -s typecheck && npm test -- --run src/tests/core.pathfinding.spec.ts src/tests/core.graph.spec.ts && npm run -s build`. All green before proceeding.
 
 ## Wave C — Architecture quality
 - [ ] 6. Deliver `item_558`: AppController Context providers, `useMemo` on derived state objects, and `ModelingController` extraction. Validate after each increment.
@@ -175,8 +175,11 @@ flowchart LR
     - persistence deserialization now goes through `parseJsonSafe()` and corrupted boot payloads surface an explicit recovery UI instead of silently overwriting storage;
     - migration attempts now create dated pre-migration backup keys, preserve the original payload on failure, and expose rollback feedback through the recovery surface;
     - local persistence writes now estimate storage pressure, surface near-quota warnings, and distinguish `QuotaExceededError` failures from generic write failures.
+  - Wave B (`item_556` `item_557`) delivered:
+    - Dijkstra route selection now uses a generic `MinHeap` priority queue instead of sorting the whole candidate list on every iteration, while preserving the existing deterministic tie-break comparator;
+    - `selectRoutingGraphIndex()` now memoizes its derived `nodes` and `segments` collections by entity-slice identity and returns the cached graph on unrelated UI-only state changes.
 - Latest validation snapshot:
-  - `npm run -s lint`
   - `npm run -s typecheck`
-  - `npm test -- --run src/tests/persistence.localStorage.spec.ts src/tests/store.create-store.spec.ts src/tests/app.ui.persistence-feedback.spec.tsx src/tests/persistence.storage-key.spec.ts src/tests/sample-network.compat.spec.ts`
+  - `npm test -- --run src/tests/core.pathfinding.spec.ts src/tests/core.graph.spec.ts src/tests/core.min-heap.spec.ts src/tests/store.selectors.spec.ts`
+  - `npm run -s lint`
   - `npm run -s build`
