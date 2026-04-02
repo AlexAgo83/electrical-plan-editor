@@ -112,6 +112,35 @@ export function syncCurrentScopeToNetworkMap(state: AppState): AppState {
   };
 }
 
+export function withPreservedNetworkSummaryViewStates(targetState: AppState, sourceState: AppState): AppState {
+  let didChange = false;
+  const nextNetworkStates: AppState["networkStates"] = { ...targetState.networkStates };
+
+  for (const networkId of Object.keys(targetState.networkStates) as NetworkId[]) {
+    const targetScoped = targetState.networkStates[networkId];
+    const sourceScoped = sourceState.networkStates[networkId];
+    if (targetScoped === undefined || sourceScoped === undefined) {
+      continue;
+    }
+
+    const sourceViewState = cloneNetworkSummaryViewState(sourceScoped.networkSummaryViewState);
+    nextNetworkStates[networkId] = {
+      ...targetScoped,
+      networkSummaryViewState: sourceViewState
+    };
+    didChange = true;
+  }
+
+  if (!didChange) {
+    return targetState;
+  }
+
+  return {
+    ...targetState,
+    networkStates: nextNetworkStates
+  };
+}
+
 export function buildNetworkDeletionFallback(
   networks: AppState["networks"],
   excludedNetworkId: NetworkId

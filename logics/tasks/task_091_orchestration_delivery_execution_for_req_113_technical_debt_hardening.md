@@ -1,10 +1,10 @@
 ## task_091_orchestration_delivery_execution_for_req_113_technical_debt_hardening - Orchestration delivery execution for req_113 technical debt hardening
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: In Progress
+> Status: Done
 > Understanding: 96%
 > Confidence: 93%
-> Progress: 92%
+> Progress: 100%
 > Complexity: High
 > Theme: Technical hardening / orchestration across persistence, performance, architecture, and robustness
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -83,11 +83,11 @@ flowchart LR
 - [x] 9. Deliver `item_561`: dedicated migration spec with version fixtures and corrupt-input coverage.
 - [x] 10. Deliver `item_562`: universal occupancy index validation before all occupancy map writes.
 - [x] 11. Deliver `item_564`: structured `AppError` type replacing raw `lastError` string.
-- [ ] 12. Deliver `item_563`: canvas viewport state in store and undo/redo history integration. (Deliver last — highest architectural impact within Wave D.)
-- [ ] D-GATE: Run `npm run -s typecheck && npm run -s test:ci && npm run -s build`. All green before final gate.
+- [x] 12. Deliver `item_563`: canvas viewport state in store and undo/redo history integration. (Delivered by reusing existing per-network view state plus undo/redo opt-out.)
+- [x] D-GATE: Run `npm run -s typecheck && npm run -s test:ci && npm run -s build`. All green before final gate.
 
 ## Final integration
-- [ ] FINAL: Run full integration gate (see Validation section below). Update all linked request/backlog/task docs. Record closure notes.
+- [x] FINAL: Run full integration gate (see Validation section below). Update all linked request/backlog/task docs. Record closure notes.
 
 # Delivery checkpoints
 - Each completed wave must leave the repository in a coherent, commit-ready state.
@@ -110,11 +110,11 @@ flowchart LR
 
 # Decision framing
 - Product framing: Not needed (this is a purely technical hardening wave).
-- Architecture framing: `item_559` (C2 long-term consolidation) and `item_563` (canvas state in store) may each warrant a follow-up ADR; record the need in the task report if confirmed during delivery.
+- Architecture framing: `item_559` (C2 long-term consolidation) may still warrant a follow-up ADR; `item_563` closed by reusing the existing per-network view-state contract without adding a new store slice.
 
 # Links
 - Product brief(s): (none)
-- Architecture decision(s): (none yet — follow-up ADRs may be triggered by `item_559` and `item_563`)
+- Architecture decision(s): (none — `item_563` did not require a new ADR after the implementation reused the existing network-scoped viewport state)
 - Request: `logics/request/req_113_technical_debt_hardening_persistence_safety_performance_and_architecture_quality.md`
 - Backlog items:
   - `logics/backlog/item_553_safe_json_parse_wrapper_and_boot_recovery_ui_for_corrupted_localstorage.md`
@@ -157,11 +157,11 @@ flowchart LR
 - `npx playwright test`
 
 # Definition of Done (DoD)
-- [ ] All 12 backlog items implemented and acceptance criteria covered.
-- [ ] Final integration gate executed and results captured.
-- [ ] Linked request and backlog docs updated at each wave closure.
-- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] All 12 backlog items implemented and acceptance criteria covered.
+- [x] Final integration gate executed and results captured.
+- [x] Linked request and backlog docs updated at each wave closure.
+- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report
 - Current blockers: none.
@@ -185,10 +185,19 @@ flowchart LR
   - Wave D (partial) (`item_560` `item_561`) delivered:
     - added isolated `renderHook()` coverage for the five highest-risk controller/state hooks without mounting `AppController`, with one contract test and one representative mutation test per hook;
     - added `persistence.migrations.spec.ts` covering pre-timestamp, timestamped, and current versioned payload fixtures, migration-step failure recovery, and pre-migration backup lifecycle cleanup.
-  - Wave D (partial) (`item_562` `item_564`) delivered:
+  - Wave D (`item_562` `item_563` `item_564`) delivered:
     - all direct connector/splice occupancy writes now guard out-of-range indices with `console.warn()` plus no-op semantics, and wire occupancy helper paths re-validate endpoint bounds before any release/write mutation;
+    - undo/redo now supports a persisted `Restore network viewport on undo/redo` preference, preserving the current viewport when disabled and restoring the captured per-network viewport when enabled;
     - `ui.lastError` is now a typed `AppError`, with normalized error codes, message-preserving migrations/recovery, updated persistence feedback wiring, and error banner rendering of both `message` and `code`.
 - Latest validation snapshot:
+  - `npm run -s typecheck`
+  - `npm test -- --run src/tests/app.ui.network-summary-workflow-polish.spec.tsx src/tests/app.ui.settings.spec.tsx`
+  - `npm run -s lint`
+  - `npm run -s typecheck`
+  - `npm run -s test:ci`
+  - `npm run -s build`
+  - `npx playwright test`
+  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
   - `npm run -s typecheck`
   - `npm test -- --run src/tests/store.reducer.entities.spec.ts src/tests/store.reducer.networks.spec.ts src/tests/store.reducer.wires.spec.ts src/tests/store.reducer.catalog.spec.ts src/tests/store.reducer.occupancy.spec.ts src/tests/store.create-store.spec.ts src/tests/persistence.localStorage.spec.ts src/tests/app.ui.persistence-feedback.spec.tsx src/tests/sample-network.compat.spec.ts src/tests/sample-network.fixture.spec.ts`
   - `npm run -s typecheck`

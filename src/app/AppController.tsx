@@ -21,7 +21,8 @@ import {
   selectSegments,
   selectSplices,
   selectSubNetworkSummaries,
-  selectWires
+  selectWires,
+  withPreservedNetworkSummaryViewStates
 } from "../store";
 import { appStore } from "./store";
 import { appUiModules } from "./components/appUiModules";
@@ -202,6 +203,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasResizeBehaviorMode,
     showShortcutHints,
     keyboardShortcutsEnabled,
+    restoreViewportOnUndo,
     showFloatingInspectorPanel,
     workspacePanelsLayoutMode,
     workspaceWideScreen,
@@ -492,6 +494,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   } = useStoreHistory({
     store,
     historyLimit: HISTORY_LIMIT,
+    transformUndoRedoTargetState: (targetState, currentState) =>
+      restoreViewportOnUndo ? targetState : withPreservedNetworkSummaryViewStates(targetState, currentState),
     onUndoRedoApplied: () => {
       setPendingNewNodePosition(null);
     },

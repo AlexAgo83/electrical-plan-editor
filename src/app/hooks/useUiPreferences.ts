@@ -15,7 +15,7 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 2;
+const UI_PREFERENCES_SCHEMA_VERSION = 3;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 function normalizeThemeMode(value: unknown): ThemeMode {
@@ -139,6 +139,7 @@ interface UiPreferencesPayload {
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
+  restoreViewportOnUndo: boolean;
   showFloatingInspectorPanel: boolean;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
   workspaceWideScreen: boolean;
@@ -162,6 +163,13 @@ function migrateUiPreferencesFromV1(candidate: Record<string, unknown>): Record<
   };
 }
 
+function migrateUiPreferencesFromV2(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    schemaVersion: 3
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -182,6 +190,11 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
     if (version === 1) {
       migrated = migrateUiPreferencesFromV1(migrated);
       version = 2;
+      continue;
+    }
+    if (version === 2) {
+      migrated = migrateUiPreferencesFromV2(migrated);
+      version = 3;
       continue;
     }
     return null;
@@ -244,6 +257,7 @@ interface UseUiPreferencesOptions {
   canvasResetZoomPercentInput: string;
   showShortcutHints: boolean;
   keyboardShortcutsEnabled: boolean;
+  restoreViewportOnUndo: boolean;
   showFloatingInspectorPanel: boolean;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
   workspaceWideScreen: boolean;
@@ -307,6 +321,7 @@ interface UseUiPreferencesOptions {
   setNetworkOffset: (value: { x: number; y: number }) => void;
   setShowShortcutHints: (value: boolean) => void;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
+  setRestoreViewportOnUndo: (value: boolean) => void;
   setShowFloatingInspectorPanel: (value: boolean) => void;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutPreference) => void;
   setWorkspaceWideScreen: (value: boolean) => void;
@@ -417,6 +432,7 @@ export function useUiPreferences({
   canvasResetZoomPercentInput,
   showShortcutHints,
   keyboardShortcutsEnabled,
+  restoreViewportOnUndo,
   showFloatingInspectorPanel,
   workspacePanelsLayoutMode,
   workspaceWideScreen,
@@ -480,6 +496,7 @@ export function useUiPreferences({
   setNetworkOffset,
   setShowShortcutHints,
   setKeyboardShortcutsEnabled,
+  setRestoreViewportOnUndo,
   setShowFloatingInspectorPanel,
   setWorkspacePanelsLayoutMode,
   setWorkspaceWideScreen,
@@ -615,6 +632,9 @@ export function useUiPreferences({
       setKeyboardShortcutsEnabled(
         typeof preferences.keyboardShortcutsEnabled === "boolean" ? preferences.keyboardShortcutsEnabled : true
       );
+      setRestoreViewportOnUndo(
+        typeof preferences.restoreViewportOnUndo === "boolean" ? preferences.restoreViewportOnUndo : true
+      );
       setShowFloatingInspectorPanel(
         typeof preferences.showFloatingInspectorPanel === "boolean" ? preferences.showFloatingInspectorPanel : true
       );
@@ -660,6 +680,7 @@ export function useUiPreferences({
     setNetworkScale,
     setNodeIdSortDirection,
     setPreferencesHydrated,
+    setRestoreViewportOnUndo,
     setSegmentIdSortDirection,
     setShowNetworkGrid,
     setShowNetworkInfoPanels,
@@ -734,6 +755,7 @@ export function useUiPreferences({
       canvasResetZoomPercentInput,
       showShortcutHints,
       keyboardShortcutsEnabled,
+      restoreViewportOnUndo,
       showFloatingInspectorPanel,
       workspacePanelsLayoutMode,
       workspaceWideScreen
@@ -772,6 +794,7 @@ export function useUiPreferences({
     defaultSortField,
     keyboardShortcutsEnabled,
     preferencesHydrated,
+    restoreViewportOnUndo,
     showFloatingInspectorPanel,
     showShortcutHints,
     tableDensity,
