@@ -11,6 +11,8 @@ interface NetworkCanvasFloatingInfoPanelsProps {
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
   onRegenerateLayout: () => void;
+  selectedCanvasNodeCount: number;
+  clearSelectedCanvasNodes: () => void;
   networkScalePercent: number;
   subNetworkSummaries: SubNetworkSummary[];
   activeSubNetworkTags: ReadonlySet<string>;
@@ -32,6 +34,8 @@ export function NetworkCanvasFloatingInfoPanels({
   handleZoomAction,
   fitNetworkToContent,
   onRegenerateLayout,
+  selectedCanvasNodeCount,
+  clearSelectedCanvasNodes,
   networkScalePercent,
   subNetworkSummaries,
   activeSubNetworkTags,
@@ -68,6 +72,17 @@ export function NetworkCanvasFloatingInfoPanels({
         <p className="meta-line network-canvas-floating-copy">
           View: {networkScalePercent}% zoom. Hold <strong>Shift</strong> and drag empty canvas to pan.
         </p>
+        {selectedCanvasNodeCount > 0 ? (
+          <div className="network-canvas-selection-summary" aria-live="polite">
+            <p className="meta-line network-canvas-floating-copy">
+              {selectedCanvasNodeCount} node{selectedCanvasNodeCount > 1 ? "s" : ""} selected. Drag one selected node to
+              move the full group.
+            </p>
+            <button type="button" className="workspace-tab" onClick={clearSelectedCanvasNodes}>
+              Clear selection
+            </button>
+          </div>
+        ) : null}
       </div>
 
       <div className="network-canvas-floating-stack">

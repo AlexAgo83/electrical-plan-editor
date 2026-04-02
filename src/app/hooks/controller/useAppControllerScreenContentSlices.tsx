@@ -255,6 +255,8 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     selectedSegmentId: params.selectedSegmentId,
     selectedWireId: params.selectedWireId,
     handleNetworkSegmentClick: params.handleNetworkSegmentClick,
+    selectedCanvasNodeIds: params.selectedCanvasNodeIds,
+    clearSelectedCanvasNodes: params.clearSelectedCanvasNodes,
     selectedNodeId: params.selectedNodeId,
     selectedConnectorId: params.selectedConnectorId,
     selectedSpliceId: params.selectedSpliceId,

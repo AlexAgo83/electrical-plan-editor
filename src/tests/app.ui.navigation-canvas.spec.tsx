@@ -21,6 +21,22 @@ describe("App integration UI - navigation and canvas", () => {
     }));
   }
   const openOperationsHealthPanel = () => fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+  function mockSvgRect(networkSvg: SVGSVGElement) {
+    return vi.spyOn(networkSvg, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({
+          x: 0,
+          y: 0,
+          top: 0,
+          left: 0,
+          width: 800,
+          height: 520,
+          right: 800,
+          bottom: 520,
+          toJSON: () => ({})
+        }) as DOMRect
+    );
+  }
   beforeEach(() => {
     localStorage.clear();
   });
@@ -340,6 +356,99 @@ describe("App integration UI - navigation and canvas", () => {
 
     fireEvent.click(networkSvg);
     expect(connectorNode).not.toHaveClass("is-selected");
+  });
+
+  it("supports shift-click multi-selection on canvas nodes and clears it from the empty canvas", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    const intermediateNode = networkSummaryPanel.querySelector(".network-node.intermediate");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+
+    expect(connectorNode).not.toBeNull();
+    expect(intermediateNode).not.toBeNull();
+
+    fireEvent.mouseDown(connectorNode as Element, { button: 0, shiftKey: true });
+    fireEvent.mouseUp(connectorNode as Element, { button: 0, shiftKey: true });
+    fireEvent.mouseDown(intermediateNode as Element, { button: 0, shiftKey: true });
+    fireEvent.mouseUp(intermediateNode as Element, { button: 0, shiftKey: true });
+
+    expect(connectorNode).toHaveClass("is-selected");
+    expect(intermediateNode).toHaveClass("is-selected");
+    expect(within(networkSummaryPanel).getByText("2 nodes selected. Drag one selected node to move the full group.")).toBeInTheDocument();
+    expect(within(networkSummaryPanel).getByRole("button", { name: "Clear selection" })).toBeInTheDocument();
+
+    fireEvent.click(networkSvg);
+    expect(connectorNode).not.toHaveClass("is-selected");
+    expect(intermediateNode).not.toHaveClass("is-selected");
+    expect(within(networkSummaryPanel).queryByText(/nodes selected\./)).toBeNull();
+  });
+
+  it("moves every selected canvas node by the same persisted delta during grouped drag", () => {
+    const { store } = renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    const intermediateNode = networkSummaryPanel.querySelector(".network-node.intermediate");
+    const connectorShape = connectorNode?.querySelector(".network-node-shape");
+    const intermediateShape = intermediateNode?.querySelector(".network-node-shape");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
+    expect(connectorNode).not.toBeNull();
+    expect(intermediateNode).not.toBeNull();
+    expect(connectorShape).not.toBeNull();
+    expect(intermediateShape).not.toBeNull();
+    if (connectorShape === null || intermediateShape === null) {
+      throw new Error("Expected rendered node shapes.");
+    }
+
+    const connectorBefore = {
+      x:
+        Number((connectorShape as SVGRectElement).getAttribute("x")) +
+        Number((connectorShape as SVGRectElement).getAttribute("width")) / 2,
+      y:
+        Number((connectorShape as SVGRectElement).getAttribute("y")) +
+        Number((connectorShape as SVGRectElement).getAttribute("height")) / 2
+    };
+    const intermediateBefore = {
+      x: Number((intermediateShape as SVGCircleElement).getAttribute("cx")),
+      y: Number((intermediateShape as SVGCircleElement).getAttribute("cy"))
+    };
+
+    fireEvent.mouseDown(connectorNode as Element, { button: 0, shiftKey: true });
+    fireEvent.mouseUp(connectorNode as Element, { button: 0, shiftKey: true });
+    fireEvent.mouseDown(intermediateNode as Element, { button: 0, shiftKey: true });
+    fireEvent.mouseUp(intermediateNode as Element, { button: 0, shiftKey: true });
+
+    const rectSpy = mockSvgRect(networkSvg);
+    fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 180, clientY: 120 });
+    fireEvent.mouseMove(networkSvg, { clientX: 420, clientY: 250 });
+    fireEvent.mouseUp(networkSvg, { clientX: 420, clientY: 250 });
+    rectSpy.mockRestore();
+
+    const nextState = store.getState();
+    const connectorAfter = nextState.nodePositions[asNodeId("N-C1")];
+    const intermediateAfter = nextState.nodePositions[asNodeId("N-MID")];
+    expect(connectorAfter).toBeDefined();
+    expect(intermediateAfter).toBeDefined();
+    if (connectorAfter === undefined || intermediateAfter === undefined) {
+      throw new Error("Expected moved node positions.");
+    }
+
+    const connectorDelta = {
+      x: connectorAfter.x - connectorBefore.x,
+      y: connectorAfter.y - connectorBefore.y
+    };
+    const intermediateDelta = {
+      x: intermediateAfter.x - intermediateBefore.x,
+      y: intermediateAfter.y - intermediateBefore.y
+    };
+
+    expect(connectorDelta.x).not.toBe(0);
+    expect(connectorDelta.y).not.toBe(0);
+    expect(intermediateDelta).toEqual(connectorDelta);
   });
 
   it("ignores non-primary mouse buttons for 2D node drag selection and shift-pan starts", () => {

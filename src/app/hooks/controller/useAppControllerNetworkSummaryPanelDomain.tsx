@@ -113,6 +113,8 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   handleNetworkSegmentClick: NetworkSummaryPanelSliceParams["handleNetworkSegmentClick"];
   handleNetworkNodeMouseDown: NetworkSummaryPanelSliceParams["handleNetworkNodeMouseDown"];
   handleNetworkNodeActivate: NetworkSummaryPanelSliceParams["handleNetworkNodeActivate"];
+  selectedCanvasNodeIds: NetworkSummaryPanelSliceParams["selectedCanvasNodeIds"];
+  clearSelectedCanvasNodes: NetworkSummaryPanelSliceParams["clearSelectedCanvasNodes"];
   onViewportSizeChange: (size: { width: number; height: number }) => void;
   canExportBomCsv: boolean;
   onExportBomCsv: () => void;
@@ -161,6 +163,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
   handleNetworkSegmentClick,
   handleNetworkNodeMouseDown,
   handleNetworkNodeActivate,
+  selectedCanvasNodeIds,
+  clearSelectedCanvasNodes,
   onViewportSizeChange,
   canExportBomCsv,
   onExportBomCsv,
@@ -279,6 +283,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
         selectedSegmentId: selection.selectedSegmentId,
         selectedWireId: selection.selectedWireId,
         handleNetworkSegmentClick,
+        selectedCanvasNodeIds,
+        clearSelectedCanvasNodes,
         selectedNodeId: selection.selectedNodeId,
         selectedConnectorId: selection.selectedConnectorId,
         selectedSpliceId: selection.selectedSpliceId,
