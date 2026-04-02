@@ -28,12 +28,33 @@ function hasActiveNetworkForDomainActions(state: AppState, action: AppAction): b
   return true;
 }
 
+/**
+ * Dual-state invariant:
+ * - root-level domain slices (`catalogItems`, `connectors`, `splices`, `nodes`, `segments`, `wires`, layout/occupancy maps)
+ *   are the active-network working set;
+ * - `networkStates[activeNetworkId]` must remain a synchronized snapshot of that same working set after every scoped mutation.
+ *
+ * Audit status for the scoped reducers:
+ * - `handleConnectorActions` -> synchronized through this wrapper
+ * - `handleCatalogActions` -> synchronized through this wrapper
+ * - `handleSpliceActions` -> synchronized through this wrapper
+ * - `handleNodeActions` -> synchronized through this wrapper
+ * - `handleSegmentActions` -> synchronized through this wrapper
+ * - `handleWireActions` -> synchronized through this wrapper
+ * - `handleLayoutActions` -> synchronized through this wrapper
+ */
 function finalizeDomainAction(previous: AppState, next: AppState): AppState {
   if (next === previous) {
     return previous;
   }
 
   return syncCurrentScopeToNetworkMap(next);
+}
+
+type DomainReducerHandler = (state: AppState, action: AppAction) => AppState | null;
+
+function runScopedDomainReducer(previous: AppState, action: AppAction, handler: DomainReducerHandler): AppState {
+  return finalizeDomainAction(previous, handler(previous, action) ?? previous);
 }
 
 export function appReducer(state: AppState, action: AppAction): AppState {
@@ -58,12 +79,12 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "connector/removeCascade":
     case "connector/occupyCavity":
     case "connector/releaseCavity": {
-      return finalizeDomainAction(state, handleConnectorActions(state, action) ?? state);
+      return runScopedDomainReducer(state, action, handleConnectorActions);
     }
 
     case "catalog/upsert":
     case "catalog/remove": {
-      return finalizeDomainAction(state, handleCatalogActions(state, action) ?? state);
+      return runScopedDomainReducer(state, action, handleCatalogActions);
     }
 
     case "splice/upsert":
@@ -71,19 +92,19 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "splice/removeCascade":
     case "splice/occupyPort":
     case "splice/releasePort": {
-      return finalizeDomainAction(state, handleSpliceActions(state, action) ?? state);
+      return runScopedDomainReducer(state, action, handleSpliceActions);
     }
 
     case "node/upsert":
     case "node/rename":
     case "node/remove": {
-      return finalizeDomainAction(state, handleNodeActions(state, action) ?? state);
+      return runScopedDomainReducer(state, action, handleNodeActions);
     }
 
     case "segment/upsert":
     case "segment/rename":
     case "segment/remove": {
-      return finalizeDomainAction(state, handleSegmentActions(state, action) ?? state);
+      return runScopedDomainReducer(state, action, handleSegmentActions);
     }
 
     case "wire/save":
@@ -91,12 +112,12 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "wire/resetRoute":
     case "wire/upsert":
     case "wire/remove": {
-      return finalizeDomainAction(state, handleWireActions(state, action) ?? state);
+      return runScopedDomainReducer(state, action, handleWireActions);
     }
 
     case "layout/setNodePosition":
     case "layout/setNodePositions": {
-      return finalizeDomainAction(state, handleLayoutActions(state, action) ?? state);
+      return runScopedDomainReducer(state, action, handleLayoutActions);
     }
 
     case "ui/select":

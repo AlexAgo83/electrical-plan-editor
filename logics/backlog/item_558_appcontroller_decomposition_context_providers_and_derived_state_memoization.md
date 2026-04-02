@@ -1,10 +1,10 @@
 ## item_558_appcontroller_decomposition_context_providers_and_derived_state_memoization - AppController decomposition: Context providers and derived state memoization
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Status: Done
+> Understanding: 96%
+> Confidence: 92%
+> Progress: 100%
 > Complexity: High
 > Theme: Architecture quality / component structure
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -72,6 +72,8 @@ flowchart LR
 - Blocks: nothing currently, but unblocks future controller extractions.
 - References:
   - `src/app/AppController.tsx`
+  - `src/app/components/controller/ModelingController.tsx`
+  - `src/app/components/controller/ModelingController.context.ts`
   - `src/app/hooks/` (controller hooks)
   - `src/tests/app.ui.*.spec.tsx`
 
