@@ -1,4 +1,12 @@
-import type { Dispatch, MouseEvent as ReactMouseEvent, MutableRefObject, SetStateAction, WheelEvent as ReactWheelEvent } from "react";
+import {
+  useRef,
+  useState,
+  type Dispatch,
+  type MouseEvent as ReactMouseEvent,
+  type MutableRefObject,
+  type SetStateAction,
+  type WheelEvent as ReactWheelEvent
+} from "react";
 import type { Connector, NetworkNode, NodeId, Segment, SegmentId, Splice } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
@@ -31,6 +39,7 @@ interface UseCanvasInteractionHandlersParams {
   setPendingNewNodePosition: (value: NodePosition | null) => void;
   networkViewWidth: number;
   networkViewHeight: number;
+  networkNodePositions: Record<NodeId, NodePosition>;
   snapNodesToGrid: boolean;
   lockEntityMovement: boolean;
   networkOffset: NodePosition;
@@ -53,6 +62,7 @@ interface UseCanvasInteractionHandlersParams {
   >;
   dispatchAction: DispatchAction;
   persistNodePosition: (nodeId: NodeId, position: NodePosition) => void;
+  persistNodePositions: (positions: Record<NodeId, NodePosition>) => void;
   resetNetworkViewToConfiguredScale: () => void;
   startConnectorEdit: (connector: Connector) => void;
   startSpliceEdit: (splice: Splice) => void;
@@ -80,6 +90,7 @@ export function useCanvasInteractionHandlers({
   setPendingNewNodePosition,
   networkViewWidth,
   networkViewHeight,
+  networkNodePositions,
   snapNodesToGrid,
   lockEntityMovement,
   networkOffset,
@@ -94,6 +105,7 @@ export function useCanvasInteractionHandlers({
   panStartRef,
   dispatchAction,
   persistNodePosition,
+  persistNodePositions,
   resetNetworkViewToConfiguredScale,
   startConnectorEdit,
   startSpliceEdit,
@@ -101,6 +113,43 @@ export function useCanvasInteractionHandlers({
   startSegmentEdit,
   onExternalSelectionInteraction
 }: UseCanvasInteractionHandlersParams) {
+  const [selectedCanvasNodeIds, setSelectedCanvasNodeIds] = useState<Set<NodeId>>(new Set());
+  const draggingNodeGroupRef = useRef<{
+    anchorNodeId: NodeId;
+    anchorStartPosition: NodePosition;
+    nodeIds: NodeId[];
+    originPositions: Record<NodeId, NodePosition>;
+  } | null>(null);
+
+  function clearSelectedCanvasNodes(): void {
+    setSelectedCanvasNodeIds((previous) => (previous.size === 0 ? previous : new Set<NodeId>()));
+  }
+
+  function getStoredNodePosition(nodeId: NodeId): NodePosition | null {
+    const position = manualNodePositions[nodeId] ?? networkNodePositions[nodeId] ?? state.nodePositions[nodeId];
+    if (position === undefined) {
+      return null;
+    }
+
+    return {
+      x: position.x,
+      y: position.y
+    };
+  }
+
+  function applyGroupDragDelta(originPositions: Record<NodeId, NodePosition>, deltaX: number, deltaY: number) {
+    const nextPositions = {} as Record<NodeId, NodePosition>;
+    for (const [nodeId, origin] of Object.entries(originPositions) as Array<[NodeId, NodePosition]>) {
+      const nextX = origin.x + deltaX;
+      const nextY = origin.y + deltaY;
+      nextPositions[nodeId] = {
+        x: snapNodesToGrid ? snapToGrid(nextX, NETWORK_GRID_STEP) : nextX,
+        y: snapNodesToGrid ? snapToGrid(nextY, NETWORK_GRID_STEP) : nextY
+      };
+    }
+    return nextPositions;
+  }
+
   function handleNetworkSegmentClick(segmentId: SegmentId): void {
     if (interactionMode !== "select") {
       return;
@@ -109,6 +158,8 @@ export function useCanvasInteractionHandlers({
     if (segment === undefined) {
       return;
     }
+
+    clearSelectedCanvasNodes();
 
     if (isModelingScreen && activeSubScreen === "segment") {
       onExternalSelectionInteraction?.();
@@ -129,6 +180,8 @@ export function useCanvasInteractionHandlers({
     if (node === undefined) {
       return;
     }
+
+    clearSelectedCanvasNodes();
 
     if (isModelingScreen) {
       if (activeSubScreen === "connector" && node.kind === "connector") {
@@ -178,6 +231,7 @@ export function useCanvasInteractionHandlers({
     }
 
     if (interactionMode === "select") {
+      clearSelectedCanvasNodes();
       onExternalSelectionInteraction?.();
       dispatchAction(appActions.clearSelection(), { trackHistory: false });
       return;
@@ -244,10 +298,50 @@ export function useCanvasInteractionHandlers({
       return;
     }
     event.preventDefault();
-    handleNetworkNodeActivate(nodeId);
+
+    if (event.shiftKey) {
+      onExternalSelectionInteraction?.();
+      dispatchAction(appActions.clearSelection(), { trackHistory: false });
+      setSelectedCanvasNodeIds((previous) => {
+        const next = new Set(previous);
+        if (next.has(nodeId)) {
+          next.delete(nodeId);
+        } else {
+          next.add(nodeId);
+        }
+        return next;
+      });
+      return;
+    }
+
+    const shouldPreserveCanvasSelection = selectedCanvasNodeIds.has(nodeId);
+    if (!shouldPreserveCanvasSelection) {
+      handleNetworkNodeActivate(nodeId);
+    }
     if (lockEntityMovement) {
       return;
     }
+
+    const selectedNodeIds = shouldPreserveCanvasSelection ? Array.from(selectedCanvasNodeIds) : [nodeId];
+    const originPositions = {} as Record<NodeId, NodePosition>;
+    for (const selectedNodeId of selectedNodeIds) {
+      const position = getStoredNodePosition(selectedNodeId);
+      if (position !== null) {
+        originPositions[selectedNodeId] = position;
+      }
+    }
+
+    const anchorStartPosition = originPositions[nodeId];
+    if (anchorStartPosition === undefined) {
+      return;
+    }
+
+    draggingNodeGroupRef.current = {
+      anchorNodeId: nodeId,
+      anchorStartPosition,
+      nodeIds: selectedNodeIds,
+      originPositions
+    };
     setDraggingNodeId(nodeId);
   }
 
@@ -334,6 +428,37 @@ export function useCanvasInteractionHandlers({
       return;
     }
 
+    const draggingNodeGroup = draggingNodeGroupRef.current;
+    if (draggingNodeGroup !== null) {
+      const deltaX = coordinates.x - draggingNodeGroup.anchorStartPosition.x;
+      const deltaY = coordinates.y - draggingNodeGroup.anchorStartPosition.y;
+      const nextPositions = applyGroupDragDelta(draggingNodeGroup.originPositions, deltaX, deltaY);
+      setManualNodePositions((previous) => {
+        let changed = false;
+        for (const [nodeId, nextPosition] of Object.entries(nextPositions) as Array<[NodeId, NodePosition]>) {
+          const previousPosition = previous[nodeId];
+          if (
+            previousPosition === undefined ||
+            Math.abs(previousPosition.x - nextPosition.x) > 0.0001 ||
+            Math.abs(previousPosition.y - nextPosition.y) > 0.0001
+          ) {
+            changed = true;
+            break;
+          }
+        }
+
+        if (!changed) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          ...nextPositions
+        };
+      });
+      return;
+    }
+
     setManualNodePositions((previous) => {
       const previousPosition = previous[draggingNodeId];
       if (
@@ -352,20 +477,47 @@ export function useCanvasInteractionHandlers({
 
   function stopNetworkNodeDrag(): void {
     if (draggingNodeId !== null) {
-      const draggedPosition = manualNodePositions[draggingNodeId];
-      if (draggedPosition !== undefined) {
-        persistNodePosition(draggingNodeId, draggedPosition);
-        setManualNodePositions((previous) => {
-          if (previous[draggingNodeId] === undefined) {
-            return previous;
+      const draggingNodeGroup = draggingNodeGroupRef.current;
+      if (draggingNodeGroup !== null && draggingNodeGroup.nodeIds.length > 1) {
+        const nextPersistedPositions = {} as Record<NodeId, NodePosition>;
+        for (const nodeId of draggingNodeGroup.nodeIds) {
+          const draggedPosition = manualNodePositions[nodeId];
+          if (draggedPosition !== undefined) {
+            nextPersistedPositions[nodeId] = draggedPosition;
           }
+        }
 
-          const next = { ...previous };
-          delete next[draggingNodeId];
-          return next;
-        });
+        if (Object.keys(nextPersistedPositions).length > 0) {
+          persistNodePositions(nextPersistedPositions);
+          setManualNodePositions((previous) => {
+            let changed = false;
+            const next = { ...previous };
+            for (const nodeId of Object.keys(nextPersistedPositions) as NodeId[]) {
+              if (next[nodeId] !== undefined) {
+                delete next[nodeId];
+                changed = true;
+              }
+            }
+            return changed ? next : previous;
+          });
+        }
+      } else {
+        const draggedPosition = manualNodePositions[draggingNodeId];
+        if (draggedPosition !== undefined) {
+          persistNodePosition(draggingNodeId, draggedPosition);
+          setManualNodePositions((previous) => {
+            if (previous[draggingNodeId] === undefined) {
+              return previous;
+            }
+
+            const next = { ...previous };
+            delete next[draggingNodeId];
+            return next;
+          });
+        }
       }
 
+      draggingNodeGroupRef.current = null;
       setDraggingNodeId(null);
     }
 
@@ -384,6 +536,8 @@ export function useCanvasInteractionHandlers({
     handleNetworkWheel,
     handleZoomAction,
     handleNetworkMouseMove,
-    stopNetworkNodeDrag
+    stopNetworkNodeDrag,
+    selectedCanvasNodeIds,
+    clearSelectedCanvasNodes
   };
 }

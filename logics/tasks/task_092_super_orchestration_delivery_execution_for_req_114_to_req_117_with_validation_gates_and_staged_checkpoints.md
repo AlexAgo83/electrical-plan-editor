@@ -1,10 +1,10 @@
 ## task_092_super_orchestration_delivery_execution_for_req_114_to_req_117_with_validation_gates_and_staged_checkpoints - Super orchestration delivery execution for req 114 to req 117 with validation gates and staged checkpoints
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: In Progress
+> Status: Done
 > Understanding: 95%
 > Confidence: 98% (scope, backlog breakdown, companion docs, and orchestration links are now coherent across the full delivery bundle)
-> Progress: 75%
+> Progress: 100%
 > Complexity: High
 > Theme: Modeling productivity / destructive-action ergonomics / canvas interaction
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -54,14 +54,14 @@ flowchart LR
   - `item_572`
   - `item_573`
   - `item_574`
-- [ ] 5. Deliver Wave 4 for `req_117`:
+- [x] 5. Deliver Wave 4 for `req_117`:
   - `item_575`
   - `item_576`
   - `item_577`
   - `item_578`
-- [ ] 6. Checkpoint each completed wave in a commit-ready state, validate it, and update the linked Logics docs.
-- [ ] CHECKPOINT: leave the current wave commit-ready and update the linked Logics docs before continuing.
-- [ ] FINAL: Update related Logics docs
+- [x] 6. Checkpoint each completed wave in a commit-ready state, validate it, and update the linked Logics docs.
+- [x] CHECKPOINT: leave the current wave commit-ready and update the linked Logics docs before continuing.
+- [x] FINAL: Update related Logics docs
 
 # Delivery checkpoints
 - Each completed wave should leave the repository in a coherent, commit-ready state.
@@ -111,12 +111,12 @@ flowchart LR
 - confirm each completed wave leaves the repository in a commit-ready state
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] Linked request/backlog/task docs updated during completed waves and at closure.
-- [ ] Product brief and ADR links remain synchronized with the delivered scope.
-- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] Validation commands executed and results captured.
+- [x] Linked request/backlog/task docs updated during completed waves and at closure.
+- [x] Product brief and ADR links remain synchronized with the delivered scope.
+- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report
 - Current blockers: none.
@@ -133,10 +133,15 @@ flowchart LR
     - Modeling tables now expose an explicit `Select multiple` mode with checkbox-based selection, `select all visible`, and dedicated batch actions;
     - the right-side edit column now switches to a batch context panel while multi-selection is active, keeping single-item editing out of scope for the mode;
     - batch delete now runs a preflight summary, blocks mixed selections when any entry is blocked, and commits safe multi-delete operations as one undoable history step.
+  - Wave 4 (`req_117`) delivered:
+    - the 2D Modeling canvas now supports node-only `Shift+click` multi-selection with explicit floating feedback and a clear-selection action;
+    - dragging any selected node now moves the full selected group while preserving relative offsets and keeping `Shift+drag` on empty canvas reserved for pan;
+    - grouped canvas movement now persists as a multi-node layout update, while single-node drag and existing callout interactions remain intact.
 - Latest validation snapshot:
   - `npm run -s typecheck`
   - `npm run -s lint`
   - `npm test -- --run src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx`
-  - `npm test -- --run src/tests/app.ui.delete-confirmations.spec.tsx`
-  - `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
+  - `npm test -- --run src/tests/app.ui.delete-confirmations.spec.tsx src/tests/app.ui.list-ergonomics.spec.tsx`
+  - `npm test -- --run src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.navigation-canvas-selection-gating.spec.tsx`
+  - `npm test -- --run src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`

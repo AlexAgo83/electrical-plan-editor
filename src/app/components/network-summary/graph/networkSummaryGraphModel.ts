@@ -121,6 +121,7 @@ interface BuildRenderedNodesParams {
   networkNodePositions: Record<NodeId, NodePosition>;
   isSubNetworkFilteringActive: boolean;
   nodeHasActiveSubNetworkConnection: ReadonlyMap<NodeId, boolean>;
+  selectedCanvasNodeIds: ReadonlySet<NodeId>;
   selectedNodeId: NodeId | null;
   selectedConnectorId: ConnectorId | null;
   selectedSpliceId: SpliceId | null;
@@ -143,6 +144,7 @@ export function buildRenderedNodes({
   networkNodePositions,
   isSubNetworkFilteringActive,
   nodeHasActiveSubNetworkConnection,
+  selectedCanvasNodeIds,
   selectedNodeId,
   selectedConnectorId,
   selectedSpliceId,
@@ -161,6 +163,7 @@ export function buildRenderedNodes({
       isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false);
     const nodeKindClass = resolveNodeKindClass(node.kind);
     const isSelectedNode =
+      selectedCanvasNodeIds.has(node.id) ||
       selectedNodeId === node.id ||
       (node.kind === "connector" && selectedConnectorId === node.connectorId) ||
       (node.kind === "splice" && selectedSpliceId === node.spliceId);

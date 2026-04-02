@@ -25,6 +25,7 @@ interface UseAppControllerCanvasInteractionDomainAssemblyParams {
   viewport: {
     effectiveNetworkViewWidth: number;
     effectiveNetworkViewHeight: number;
+    networkNodePositions: Record<NodeId, NodePosition>;
     snapNodesToGrid: boolean;
     lockEntityMovement: boolean;
     networkOffset: NodePosition;
@@ -79,6 +80,7 @@ export function useAppControllerCanvasInteractionDomainAssembly({
     viewport: {
       networkViewWidth: viewport.effectiveNetworkViewWidth,
       networkViewHeight: viewport.effectiveNetworkViewHeight,
+      networkNodePositions: viewport.networkNodePositions,
       snapNodesToGrid: viewport.snapNodesToGrid,
       lockEntityMovement: viewport.lockEntityMovement,
       networkOffset: viewport.networkOffset,
@@ -96,6 +98,8 @@ export function useAppControllerCanvasInteractionDomainAssembly({
       dispatchAction: actions.dispatchAction,
       persistNodePosition: (nodeId, position) =>
         actions.dispatchAction(appActions.setNodePosition(nodeId, position), { trackHistory: false }),
+      persistNodePositions: (positions) =>
+        actions.dispatchAction(appActions.setNodePositions(positions), { trackHistory: false }),
       resetNetworkViewToConfiguredScale: actions.resetNetworkViewToConfiguredScale,
       startConnectorEdit: modelingHandlers.connector.startConnectorEdit,
       startSpliceEdit: modelingHandlers.splice.startSpliceEdit,
