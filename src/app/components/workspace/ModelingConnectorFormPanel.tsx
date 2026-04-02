@@ -30,7 +30,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
   const catalogItemOptions = buildModelingDynamicSelectOptions({
     options: catalogItems.map((item) => ({
       value: item.id,
-      label: `${item.manufacturerReference} (${item.connectionCount})`
+      label: `${item.manufacturerReference}${item.name?.trim() ? ` - ${item.name.trim()}` : ""} (${item.connectionCount})`
     })),
     selectedValue: connectorCatalogItemId,
     missingOption:
@@ -107,6 +107,12 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         {connectorFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {connectorFormMode === "create" ? "Create" : "Save"}
       </button>
+      {connectorFormMode === "create" ? (
+        <button type="button" className="button-with-icon" onClick={openCreateConnectorForm}>
+          <span className="action-button-icon is-new" aria-hidden="true" />
+          New
+        </button>
+      ) : null}
       <button type="button" className={connectorFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelConnectorEdit}>
         {connectorFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {connectorFormMode === "edit" ? "Cancel edit" : "Cancel"}

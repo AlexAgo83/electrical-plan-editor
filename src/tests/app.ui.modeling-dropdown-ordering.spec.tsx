@@ -26,6 +26,7 @@ function createModelingDropdownOrderingState(): AppState {
     appActions.upsertCatalogItem({
       id: asCatalogItemId("CAT-Z"),
       manufacturerReference: "Zulu fuse",
+      name: "Zulu protection",
       connectionCount: 4
     })
   );
@@ -34,6 +35,7 @@ function createModelingDropdownOrderingState(): AppState {
     appActions.upsertCatalogItem({
       id: asCatalogItemId("CAT-A"),
       manufacturerReference: "alpha fuse",
+      name: "Alpha protection",
       connectionCount: 2
     })
   );
@@ -187,8 +189,8 @@ describe("App integration UI - modeling dropdown ordering", () => {
     const connectorFormPanel = getPanelByHeading("Create Connector");
     expect(getSelectOptionLabels(within(connectorFormPanel).getByLabelText("Catalog item (manufacturer reference)"))).toEqual([
       "Select a catalog item",
-      "alpha fuse (2)",
-      "Zulu fuse (4)"
+      "alpha fuse - Alpha protection (2)",
+      "Zulu fuse - Zulu protection (4)"
     ]);
 
     switchSubScreenDrawerAware("splice");
@@ -196,8 +198,8 @@ describe("App integration UI - modeling dropdown ordering", () => {
     const spliceFormPanel = getPanelByHeading("Create Splice");
     expect(getSelectOptionLabels(within(spliceFormPanel).getByLabelText("Catalog item (manufacturer reference)"))).toEqual([
       "No catalog item",
-      "alpha fuse (2)",
-      "Zulu fuse (4)"
+      "alpha fuse - Alpha protection (2)",
+      "Zulu fuse - Zulu protection (4)"
     ]);
   });
 
@@ -248,8 +250,8 @@ describe("App integration UI - modeling dropdown ordering", () => {
     fireEvent.click(within(wireFormPanel).getByLabelText("Fuse"));
     expect(getSelectOptionLabels(within(wireFormPanel).getByLabelText("Fuse catalog item"))).toEqual([
       "Select catalog item",
-      "alpha fuse",
-      "Zulu fuse"
+      "alpha fuse - Alpha protection",
+      "Zulu fuse - Zulu protection"
     ]);
   });
 
@@ -267,8 +269,8 @@ describe("App integration UI - modeling dropdown ordering", () => {
     expect(getSelectOptionLabels(fuseCatalogSelect)).toEqual([
       "Select catalog item",
       "Missing catalog item (CAT-MISSING)",
-      "alpha fuse",
-      "Zulu fuse"
+      "alpha fuse - Alpha protection",
+      "Zulu fuse - Zulu protection"
     ]);
   });
 });

@@ -36,7 +36,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
   const catalogItemOptions = buildModelingDynamicSelectOptions({
     options: catalogItems.map((item) => ({
       value: item.id,
-      label: `${item.manufacturerReference} (${item.connectionCount})`
+      label: `${item.manufacturerReference}${item.name?.trim() ? ` - ${item.name.trim()}` : ""} (${item.connectionCount})`
     })),
     selectedValue: spliceCatalogItemId,
     missingOption: isCatalogLinked ? { label: `Missing catalog item (${spliceCatalogItemId})` } : null
@@ -137,6 +137,12 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
         {spliceFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {spliceFormMode === "create" ? "Create" : "Save"}
       </button>
+      {spliceFormMode === "create" ? (
+        <button type="button" className="button-with-icon" onClick={openCreateSpliceForm}>
+          <span className="action-button-icon is-new" aria-hidden="true" />
+          New
+        </button>
+      ) : null}
       <button type="button" className={spliceFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelSpliceEdit}>
         {spliceFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {spliceFormMode === "edit" ? "Cancel edit" : "Cancel"}
