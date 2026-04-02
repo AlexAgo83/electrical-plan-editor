@@ -116,6 +116,30 @@
   margin-top: 0.6rem;
 }
 
+.helper-text {
+  margin: 0;
+  color: #4b6477;
+  font-size: 0.82rem;
+}
+
+.compact-definition-list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.compact-definition-list div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.compact-definition-list dt,
+.compact-definition-list dd {
+  margin: 0;
+}
+
 .row-form {
   display: grid;
   gap: 0.75rem;

@@ -1,4 +1,5 @@
 import type { AppAction } from "../../../store/actions";
+import type { AppStore } from "../../../store";
 import type { SubScreenId } from "../../types/app-controller";
 import type { AppControllerCanvasDisplayStateModel } from "../useAppControllerCanvasDisplayState";
 import type { AppControllerPreferencesStateModel } from "../useAppControllerPreferencesState";
@@ -126,6 +127,7 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     canvasInteractionDomain: AppControllerCanvasInteractionDomainAssemblyModel;
   };
   handlers: {
+    store: AppStore;
     requestConfirmation: HomeWorkspaceParams["requestConfirmation"];
     replaceStateWithHistory: HomeWorkspaceParams["replaceStateWithHistory"];
     setActiveScreen: (screen: ScreenId) => void;
@@ -281,7 +283,7 @@ export function useAppControllerWorkspaceContentAssembly({
     dispatchAction: handlers.dispatchAction
   });
 
-  const { modelingLeftColumnContent, modelingFormsColumnContent, analysisWorkspaceContent } =
+  const { modelingLeftColumnContent, modelingFormsColumnContent, analysisWorkspaceContent, isModelingBatchModeActive } =
     useAppControllerModelingAnalysisDomainAssembly({
       components: {
         ModelingPrimaryTablesComponent: components.ModelingPrimaryTablesComponent,
@@ -324,7 +326,10 @@ export function useAppControllerWorkspaceContentAssembly({
       wireTechnicalIdAlreadyUsed: handlers.wireTechnicalIdAlreadyUsed,
       includeModelingContent: state.hasActiveNetwork && state.isModelingScreen,
       includeAnalysisContent: state.hasActiveNetwork && (state.isAnalysisScreen || state.isModelingScreen),
+      store: handlers.store,
       dispatchAction: handlers.dispatchAction,
+      requestConfirmation: handlers.requestConfirmation,
+      replaceStateWithHistory: handlers.replaceStateWithHistory,
       setActiveSubScreen: handlers.setActiveSubScreen,
       handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange,
       openSingleStepOnboarding: handlers.openSingleStepOnboarding,
@@ -420,7 +425,7 @@ export function useAppControllerWorkspaceContentAssembly({
     });
 
   const modelingFormsColumnContentForLayout =
-    state.hasTableSelectionForActiveSubScreen || state.hasActiveEntityForm || state.isCatalogSubScreen
+    isModelingBatchModeActive || state.hasTableSelectionForActiveSubScreen || state.hasActiveEntityForm || state.isCatalogSubScreen
       ? modelingFormsColumnContentForSubScreen
       : null;
 
