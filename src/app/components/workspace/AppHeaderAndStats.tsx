@@ -1,4 +1,5 @@
 import type { ReactElement, RefObject } from "react";
+import type { AppError } from "../../../store/types";
 interface AppHeaderAndStatsProps {
   headerBlockRef: RefObject<HTMLElement | null>;
   isNavigationDrawerOpen: boolean;
@@ -15,7 +16,7 @@ interface AppHeaderAndStatsProps {
   operationsButtonRef: RefObject<HTMLButtonElement | null>;
   validationIssuesCount: number;
   validationErrorCount: number;
-  lastError: string | null;
+  lastError: AppError | null;
   onClearError: () => void;
   bootRecoveryMessage: string | null;
   onCommitBootRecovery: () => void;
@@ -124,9 +125,12 @@ export function AppHeaderAndStats({
         </section>
       ) : null}
 
-      {lastError !== null && lastError !== bootRecoveryMessage ? (
+      {lastError !== null && lastError.message !== bootRecoveryMessage ? (
         <section className="error-banner" role="alert">
-          <p>{lastError}</p>
+          <p>{lastError.message}</p>
+          <p>
+            <small>{lastError.code}</small>
+          </p>
           <button type="button" onClick={onClearError}>
             Clear
           </button>

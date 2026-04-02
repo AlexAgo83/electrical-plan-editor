@@ -1,4 +1,11 @@
-import type { AppState, EntityState, SelectionState } from "../types";
+import {
+  isSameAppError,
+  normalizeAppError,
+  type AppError,
+  type AppState,
+  type EntityState,
+  type SelectionState
+} from "../types";
 
 function sortIds<Id extends string>(ids: Id[]): Id[] {
   return [...ids].sort((left, right) => left.localeCompare(right));
@@ -68,8 +75,9 @@ export function bumpRevision(state: AppState): AppState {
   };
 }
 
-export function withError(state: AppState, message: string): AppState {
-  if (state.ui.lastError === message) {
+export function withError(state: AppState, error: string | AppError): AppState {
+  const normalizedError = normalizeAppError(error);
+  if (isSameAppError(state.ui.lastError, normalizedError)) {
     return state;
   }
 
@@ -77,7 +85,7 @@ export function withError(state: AppState, message: string): AppState {
     ...state,
     ui: {
       ...state.ui,
-      lastError: message
+      lastError: normalizedError
     }
   });
 }

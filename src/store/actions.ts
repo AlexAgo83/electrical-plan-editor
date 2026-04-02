@@ -18,7 +18,15 @@ import type {
   WireMaterial
 } from "../core/entities";
 import type { WireColorMode } from "../core/cableColors";
-import type { LayoutNodePosition, NetworkScopedState, NetworkSummaryViewState, SelectionState, ThemeMode } from "./types";
+import {
+  normalizeAppError,
+  type AppError,
+  type LayoutNodePosition,
+  type NetworkScopedState,
+  type NetworkSummaryViewState,
+  type SelectionState,
+  type ThemeMode
+} from "./types";
 
 export type AppAction =
   | {
@@ -125,7 +133,7 @@ export type AppAction =
   | { type: "layout/setNodePositions"; payload: { positions: Record<NodeId, LayoutNodePosition> } }
   | { type: "ui/select"; payload: SelectionState }
   | { type: "ui/setThemeMode"; payload: { mode: ThemeMode } }
-  | { type: "ui/setError"; payload: { message: string } }
+  | { type: "ui/setError"; payload: { error: AppError } }
   | { type: "ui/clearSelection" }
   | { type: "ui/clearError" };
 
@@ -259,7 +267,10 @@ export const appActions = {
 
   select: (payload: SelectionState): AppAction => ({ type: "ui/select", payload }),
   setThemeMode: (mode: ThemeMode): AppAction => ({ type: "ui/setThemeMode", payload: { mode } }),
-  setError: (message: string): AppAction => ({ type: "ui/setError", payload: { message } }),
+  setError: (error: string | AppError): AppAction => ({
+    type: "ui/setError",
+    payload: { error: normalizeAppError(error) }
+  }),
   clearSelection: (): AppAction => ({ type: "ui/clearSelection" }),
   clearError: (): AppAction => ({ type: "ui/clearError" })
 };

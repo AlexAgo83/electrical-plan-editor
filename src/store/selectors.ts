@@ -18,7 +18,7 @@ import { resolveSplicePortMode } from "../core/splicePortMode";
 import { buildRoutingGraphIndex, type RoutingGraphIndex } from "../core/graph";
 import { findShortestRoute, type ShortestRouteResult } from "../core/pathfinding";
 import { normalizeManufacturerReferenceKey } from "./catalog";
-import type { AppState, SelectionState, ThemeMode } from "./types";
+import type { AppError, AppState, SelectionState, ThemeMode } from "./types";
 
 function selectCollection<T, Id extends string>(
   byId: Record<Id, T>,
@@ -142,7 +142,7 @@ export function selectSelection(state: AppState): SelectionState | null {
   return state.ui.selected;
 }
 
-export function selectLastError(state: AppState): string | null {
+export function selectLastError(state: AppState): AppError | null {
   return state.ui.lastError;
 }
 

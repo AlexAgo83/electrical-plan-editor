@@ -1,7 +1,7 @@
 import type { FormEvent } from "react";
 import type { NodeId, Segment, SegmentId } from "../../core/entities";
 import type { AppStore } from "../../store";
-import { appActions } from "../../store";
+import { appActions, getAppErrorMessage } from "../../store";
 import { analyzeSegmentDeleteImpact } from "../../store/deleteImpact";
 import { focusSelectedTableRowInPanel, toPositiveNumber } from "../lib/app-utils-shared";
 import { suggestNextSegmentId } from "../lib/technical-id-suggestions";
@@ -153,7 +153,7 @@ export function useSegmentHandlers({
       dispatchAction(appActions.renameSegment(editingSegmentId, normalizedSegmentId as SegmentId));
       const stateAfterRename = store.getState();
       if (stateAfterRename.ui.lastError !== null) {
-        setSegmentFormError(stateAfterRename.ui.lastError);
+        setSegmentFormError(getAppErrorMessage(stateAfterRename.ui.lastError));
         return;
       }
       segmentId = normalizedSegmentId as SegmentId;

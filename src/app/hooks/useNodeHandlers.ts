@@ -1,7 +1,7 @@
 import type { FormEvent } from "react";
 import type { ConnectorId, NetworkNode, NodeId, SpliceId } from "../../core/entities";
 import type { AppStore } from "../../store";
-import { appActions } from "../../store";
+import { appActions, getAppErrorMessage } from "../../store";
 import { analyzeNodeDeleteImpact } from "../../store/deleteImpact";
 import { focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestNextNodeId } from "../lib/technical-id-suggestions";
@@ -168,7 +168,7 @@ export function useNodeHandlers({
       dispatchAction(appActions.renameNode(originalNodeId, requestedNodeId));
       const postRenameState = store.getState();
       if (postRenameState.nodes.byId[requestedNodeId] === undefined) {
-        setNodeFormError(postRenameState.ui.lastError ?? "Unable to rename node.");
+        setNodeFormError(getAppErrorMessage(postRenameState.ui.lastError) ?? "Unable to rename node.");
         return;
       }
       effectiveNodeId = requestedNodeId;

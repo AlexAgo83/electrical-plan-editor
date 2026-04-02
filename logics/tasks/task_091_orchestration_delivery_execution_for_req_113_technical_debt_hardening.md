@@ -4,7 +4,7 @@
 > Status: In Progress
 > Understanding: 96%
 > Confidence: 93%
-> Progress: 83%
+> Progress: 92%
 > Complexity: High
 > Theme: Technical hardening / orchestration across persistence, performance, architecture, and robustness
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -81,8 +81,8 @@ flowchart LR
 ## Wave D — Robustness and testing
 - [x] 8. Deliver `item_560`: unit tests for the five controller hooks in isolation.
 - [x] 9. Deliver `item_561`: dedicated migration spec with version fixtures and corrupt-input coverage.
-- [ ] 10. Deliver `item_562`: universal occupancy index validation before all occupancy map writes.
-- [ ] 11. Deliver `item_564`: structured `AppError` type replacing raw `lastError` string.
+- [x] 10. Deliver `item_562`: universal occupancy index validation before all occupancy map writes.
+- [x] 11. Deliver `item_564`: structured `AppError` type replacing raw `lastError` string.
 - [ ] 12. Deliver `item_563`: canvas viewport state in store and undo/redo history integration. (Deliver last — highest architectural impact within Wave D.)
 - [ ] D-GATE: Run `npm run -s typecheck && npm run -s test:ci && npm run -s build`. All green before final gate.
 
@@ -185,7 +185,12 @@ flowchart LR
   - Wave D (partial) (`item_560` `item_561`) delivered:
     - added isolated `renderHook()` coverage for the five highest-risk controller/state hooks without mounting `AppController`, with one contract test and one representative mutation test per hook;
     - added `persistence.migrations.spec.ts` covering pre-timestamp, timestamped, and current versioned payload fixtures, migration-step failure recovery, and pre-migration backup lifecycle cleanup.
+  - Wave D (partial) (`item_562` `item_564`) delivered:
+    - all direct connector/splice occupancy writes now guard out-of-range indices with `console.warn()` plus no-op semantics, and wire occupancy helper paths re-validate endpoint bounds before any release/write mutation;
+    - `ui.lastError` is now a typed `AppError`, with normalized error codes, message-preserving migrations/recovery, updated persistence feedback wiring, and error banner rendering of both `message` and `code`.
 - Latest validation snapshot:
+  - `npm run -s typecheck`
+  - `npm test -- --run src/tests/store.reducer.entities.spec.ts src/tests/store.reducer.networks.spec.ts src/tests/store.reducer.wires.spec.ts src/tests/store.reducer.catalog.spec.ts src/tests/store.reducer.occupancy.spec.ts src/tests/store.create-store.spec.ts src/tests/persistence.localStorage.spec.ts src/tests/app.ui.persistence-feedback.spec.tsx src/tests/sample-network.compat.spec.ts src/tests/sample-network.fixture.spec.ts`
   - `npm run -s typecheck`
   - `npm test -- --run src/tests/entity-forms-state.hook.spec.ts src/tests/canvas-state.hook.spec.ts src/tests/app-controller-selection-handlers-domain.hook.spec.ts src/tests/app-controller-workspace-handlers-domain.hook.spec.ts src/tests/app-controller-modeling-handlers-assembly.hook.spec.ts src/tests/persistence.migrations.spec.ts`
   - `npm run -s lint`

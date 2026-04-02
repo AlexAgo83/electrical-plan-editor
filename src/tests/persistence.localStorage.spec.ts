@@ -927,7 +927,7 @@ describe("localStorage persistence adapter", () => {
     expect(migrationBackupKey).toBeDefined();
     expect(storage.read(migrationBackupKey ?? "")).toContain("pre-migration-backup");
     expect(getPendingPersistenceRecovery()?.backupKey).toBe(migrationBackupKey);
-    expect(loaded.ui.lastError).toMatch(/migration failed/i);
+    expect(loaded.ui.lastError?.message).toMatch(/migration failed/i);
   });
 
   it("restores a valid persisted empty workspace without bootstrapping the sample", () => {
@@ -1240,7 +1240,7 @@ describe("localStorage persistence adapter", () => {
     const loaded = loadState(storage, () => "2026-02-20T15:00:00.000Z");
 
     expect(hasSampleNetworkSignature(loaded)).toBe(true);
-    expect(loaded.ui.lastError).toMatch(/newer app version/i);
+    expect(loaded.ui.lastError?.message).toMatch(/newer app version/i);
 
     const backupRaw = storage.read(STORAGE_BACKUP_KEY);
     expect(backupRaw).not.toBeNull();

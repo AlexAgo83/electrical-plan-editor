@@ -115,7 +115,7 @@ describe("appReducer entity lifecycle", () => {
     );
 
     expect(second.connectors.byId[asConnectorId("C2")]).toBeUndefined();
-    expect(second.ui.lastError).toBe("Connector technical ID 'C-1' is already used.");
+    expect(second.ui.lastError?.message).toBe("Connector technical ID 'C-1' is already used.");
   });
 
   it("rejects connector upsert when required fields are empty after trim", () => {
@@ -130,7 +130,7 @@ describe("appReducer entity lifecycle", () => {
     );
 
     expect(state.connectors.byId[asConnectorId("C1")]).toBeUndefined();
-    expect(state.ui.lastError).toBe("Connector name and technical ID are required.");
+    expect(state.ui.lastError?.message).toBe("Connector name and technical ID are required.");
   });
 
   it("normalizes optional connector manufacturer references", () => {
@@ -176,7 +176,7 @@ describe("appReducer entity lifecycle", () => {
     expect(secondConnectorOccupancy).toBeDefined();
     expect(firstConnectorOccupancy?.[2]).toBe("wire-draft-1:A");
     expect(secondConnectorOccupancy?.[2]).toBe("wire-draft-1:A");
-    expect(second.ui.lastError).toBe("Way 2 is already occupied by 'wire-draft-1:A'.");
+    expect(second.ui.lastError?.message).toBe("Way 2 is already occupied by 'wire-draft-1:A'.");
   });
 
   it("clears connector occupancy on connector removal", () => {
@@ -200,7 +200,7 @@ describe("appReducer entity lifecycle", () => {
     );
 
     expect(second.splices.byId[asSpliceId("S2")]).toBeUndefined();
-    expect(second.ui.lastError).toBe("Splice technical ID 'S-1' is already used.");
+    expect(second.ui.lastError?.message).toBe("Splice technical ID 'S-1' is already used.");
   });
 
   it("rejects splice upsert when required fields are empty after trim", () => {
@@ -215,7 +215,7 @@ describe("appReducer entity lifecycle", () => {
     );
 
     expect(state.splices.byId[asSpliceId("S1")]).toBeUndefined();
-    expect(state.ui.lastError).toBe("Splice name and technical ID are required.");
+    expect(state.ui.lastError?.message).toBe("Splice name and technical ID are required.");
   });
 
   it("normalizes optional splice manufacturer references and allows duplicates across connector/splice", () => {
@@ -261,7 +261,7 @@ describe("appReducer entity lifecycle", () => {
     expect(secondSpliceOccupancy).toBeDefined();
     expect(firstSpliceOccupancy?.[2]).toBe("wire-draft-1:B");
     expect(secondSpliceOccupancy?.[2]).toBe("wire-draft-1:B");
-    expect(second.ui.lastError).toBe("Port 2 is already occupied by 'wire-draft-1:B'.");
+    expect(second.ui.lastError?.message).toBe("Port 2 is already occupied by 'wire-draft-1:B'.");
   });
 
   it("clears splice occupancy on splice removal", () => {
@@ -284,7 +284,7 @@ describe("appReducer entity lifecycle", () => {
       })
     );
     expect(missingConnectorNode.nodes.byId[asNodeId("N-CONNECTOR")]).toBeUndefined();
-    expect(missingConnectorNode.ui.lastError).toBe("Cannot create connector node for unknown connector.");
+    expect(missingConnectorNode.ui.lastError?.message).toBe("Cannot create connector node for unknown connector.");
 
     const missingSpliceNode = appReducer(
       createInitialState(),
@@ -295,7 +295,7 @@ describe("appReducer entity lifecycle", () => {
       })
     );
     expect(missingSpliceNode.nodes.byId[asNodeId("N-SPLICE")]).toBeUndefined();
-    expect(missingSpliceNode.ui.lastError).toBe("Cannot create splice node for unknown splice.");
+    expect(missingSpliceNode.ui.lastError?.message).toBe("Cannot create splice node for unknown splice.");
   });
 
   it("rejects node upsert when node ID is empty after trim", () => {
@@ -309,7 +309,7 @@ describe("appReducer entity lifecycle", () => {
     );
 
     expect(state.nodes.allIds).toHaveLength(0);
-    expect(state.ui.lastError).toBe("Node ID is required.");
+    expect(state.ui.lastError?.message).toBe("Node ID is required.");
   });
 
   it("allows only one specialized node per connector or splice", () => {
@@ -325,14 +325,14 @@ describe("appReducer entity lifecycle", () => {
       appActions.upsertNode({ id: asNodeId("N-C2"), kind: "connector", connectorId: asConnectorId("C1") })
     );
     expect(second.nodes.byId[asNodeId("N-C2")]).toBeUndefined();
-    expect(second.ui.lastError).toBe("Only one connector node is allowed per connector.");
+    expect(second.ui.lastError?.message).toBe("Only one connector node is allowed per connector.");
 
     const third = appReducer(
       first,
       appActions.upsertNode({ id: asNodeId("N-S2"), kind: "splice", spliceId: asSpliceId("S1") })
     );
     expect(third.nodes.byId[asNodeId("N-S2")]).toBeUndefined();
-    expect(third.ui.lastError).toBe("Only one splice node is allowed per splice.");
+    expect(third.ui.lastError?.message).toBe("Only one splice node is allowed per splice.");
   });
 
   it("normalizes optional wire side connection and seal references on save/upsert", () => {
@@ -480,7 +480,7 @@ describe("appReducer entity lifecycle", () => {
 
     expect(renamed.nodes.byId[asNodeId("N1")]).toBeDefined();
     expect(renamed.nodes.byId[asNodeId("N2")]).toBeDefined();
-    expect(renamed.ui.lastError).toBe("Node ID 'N2' already exists.");
+    expect(renamed.ui.lastError?.message).toBe("Node ID 'N2' already exists.");
   });
 
   it("treats node rename to the same ID as a safe no-op", () => {
@@ -534,7 +534,7 @@ describe("appReducer entity lifecycle", () => {
     const renamed = appReducer(state, appActions.renameSegment(asSegmentId("SEG1"), asSegmentId("SEG2")));
 
     expect(renamed.segments.byId[asSegmentId("SEG1")]).toBeDefined();
-    expect(renamed.ui.lastError).toBe("Segment ID 'SEG2' already exists.");
+    expect(renamed.ui.lastError?.message).toBe("Segment ID 'SEG2' already exists.");
   });
 
   it("rejects invalid segment endpoints and length", () => {
@@ -553,7 +553,7 @@ describe("appReducer entity lifecycle", () => {
       })
     );
     expect(sameNode.segments.byId[asSegmentId("SEG-INVALID-A")]).toBeUndefined();
-    expect(sameNode.ui.lastError).toBe("Segment endpoints must reference two different nodes.");
+    expect(sameNode.ui.lastError?.message).toBe("Segment endpoints must reference two different nodes.");
 
     const missingNode = appReducer(
       withNodes,
@@ -565,7 +565,7 @@ describe("appReducer entity lifecycle", () => {
       })
     );
     expect(missingNode.segments.byId[asSegmentId("SEG-INVALID-B")]).toBeUndefined();
-    expect(missingNode.ui.lastError).toBe("Segment endpoints must reference existing nodes.");
+    expect(missingNode.ui.lastError?.message).toBe("Segment endpoints must reference existing nodes.");
 
     const invalidLength = appReducer(
       withNodes,
@@ -577,7 +577,7 @@ describe("appReducer entity lifecycle", () => {
       })
     );
     expect(invalidLength.segments.byId[asSegmentId("SEG-INVALID-C")]).toBeUndefined();
-    expect(invalidLength.ui.lastError).toBe("Segment lengthMm must be >= 1.");
+    expect(invalidLength.ui.lastError?.message).toBe("Segment lengthMm must be >= 1.");
 
     const emptyId = appReducer(
       withNodes,
@@ -589,7 +589,7 @@ describe("appReducer entity lifecycle", () => {
       })
     );
     expect(emptyId.segments.allIds).toHaveLength(0);
-    expect(emptyId.ui.lastError).toBe("Segment ID is required.");
+    expect(emptyId.ui.lastError?.message).toBe("Segment ID is required.");
   });
 
   it("blocks node and connector removal when graph references exist", () => {
@@ -607,10 +607,10 @@ describe("appReducer entity lifecycle", () => {
 
     const removeNode = appReducer(state, appActions.removeNode(asNodeId("N-C1")));
     expect(removeNode.nodes.byId[asNodeId("N-C1")]).toBeDefined();
-    expect(removeNode.ui.lastError).toBe("Cannot remove node while segments are connected to it.");
+    expect(removeNode.ui.lastError?.message).toBe("Cannot remove node while segments are connected to it.");
 
     const removeConnector = appReducer(state, appActions.removeConnector(asConnectorId("C1")));
     expect(removeConnector.connectors.byId[asConnectorId("C1")]).toBeDefined();
-    expect(removeConnector.ui.lastError).toBe("Cannot remove connector while a connector node references it.");
+    expect(removeConnector.ui.lastError?.message).toBe("Cannot remove connector while a connector node references it.");
   });
 });

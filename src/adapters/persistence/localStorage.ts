@@ -1,6 +1,6 @@
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import { resolveStorageKey } from "../../config/environment";
-import { createSampleNetworkState, type AppState } from "../../store";
+import { createSampleNetworkState, normalizeAppError, type AppState } from "../../store";
 import { parseJsonSafe } from "./json";
 import {
   PERSISTED_STATE_PAYLOAD_KIND,
@@ -96,7 +96,7 @@ function createRecoveryState(errorMessage: string): AppState {
     ...sampleState,
     ui: {
       ...sampleState.ui,
-      lastError: errorMessage
+      lastError: normalizeAppError(errorMessage)
     }
   };
 }

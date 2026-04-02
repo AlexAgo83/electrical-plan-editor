@@ -1,10 +1,10 @@
 ## item_562_universal_occupancy_index_validation_before_map_writes - Universal occupancy index validation before occupancy map writes
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 95%
-> Confidence: 93%
-> Progress: 0%
+> Status: Done
+> Understanding: 97%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Low-Medium
 > Theme: Robustness / state integrity
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -72,6 +72,10 @@ flowchart LR
   - `src/store/reducer/wireReducer.ts`
   - `src/tests/store.reducer.connectors.spec.ts`
   - `src/tests/store.reducer.splices.spec.ts`
+- Delivery notes:
+  - direct connector/splice occupancy writes now `console.warn()` and return the untouched state when the requested index is out of range;
+  - wire occupancy helper paths now re-check endpoint bounds before release/write so corrupted endpoints cannot mutate occupancy maps silently;
+  - added `src/tests/store.reducer.occupancy.spec.ts` covering bounded connector and splice rejection paths.
 
 # Validation
 - `npm run -s lint`
