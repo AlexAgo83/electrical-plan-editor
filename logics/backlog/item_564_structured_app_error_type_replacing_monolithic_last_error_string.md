@@ -25,7 +25,7 @@
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|structured-app-error-type-replacing-mo|ui-last-error-is-typed-as-string-or-nul|ac1-apperror-code-string-message-string|minimum-step-gate
+%% logics-signature: backlog|structured-apperror-type-replacing-monol|req-113-technical-debt-hardening-persist|ui-lasterror-is-typed-as-string-null|ac1-apperror-code-string-message-string
 flowchart LR
     Before[lastError: string or null] --> Type[AppError with code and message]
     Type --> Reducers[All reducers produce typed AppError]

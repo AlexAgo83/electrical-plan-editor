@@ -24,7 +24,7 @@
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|universal-occupancy-index-validation-b|connectorCavityOccupancy-and-splicePortO|ac1-all-occupancy-map-writes-in-the-redu|minimum-step-gate
+%% logics-signature: backlog|universal-occupancy-index-validation-bef|req-113-technical-debt-hardening-persist|connectorcavityoccupancy-and-spliceporto|ac1-all-occupancy-map-writes-in
 flowchart LR
     Write[Occupancy map write] --> Guard[isValidSlotIndex check]
     Guard -->|Valid| Commit[Write to map]

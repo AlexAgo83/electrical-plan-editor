@@ -25,7 +25,7 @@
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|dedicated-migration-spec-with-version-f|migrations-ts-is-a-26-kb-critical-file|ac1-persistence-migrations-spec-ts-exist|minimum-step-gate
+%% logics-signature: backlog|dedicated-migration-spec-with-version-fi|req-113-technical-debt-hardening-persist|src-adapters-persistence-migrations-ts-i|ac1-src-tests-persistence-migrations-spe
 flowchart LR
     Gap[No migration spec] --> Fixtures[Static fixtures per schema version]
     Fixtures --> HappyPath[Happy-path migration v1 to v3]

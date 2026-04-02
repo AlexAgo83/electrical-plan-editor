@@ -24,7 +24,7 @@ The Dijkstra implementation in `src/core/pathfinding.ts` calls `queue.sort(compa
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|replace-pathfinding-queue-sort-with-min|dijkstra-implementation-calls-queue-sor|ac1-core-pathfinding-spec-ts-passes-with|minimum-step-gate
+%% logics-signature: backlog|replace-pathfinding-queue-sort-with-a-mi|req-113-technical-debt-hardening-persist|the-dijkstra-implementation-in-src-core|ac1-core-pathfinding-spec-ts-passes-with
 flowchart LR
     Before[queue.sort each iteration O(E² log E)] --> Heap[MinHeap push/pop O(E log E)]
     Heap --> Determinism[Preserve tie-breaking comparators]

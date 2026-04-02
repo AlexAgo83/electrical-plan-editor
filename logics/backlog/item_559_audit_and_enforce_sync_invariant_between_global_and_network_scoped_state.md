@@ -24,7 +24,7 @@
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|audit-and-enforce-sync-invariant-betwee|appstate-maintains-entity-collections-b|ac1-all-domain-reducers-that-perform-a-d|minimum-step-gate
+%% logics-signature: backlog|audit-and-enforce-sync-invariant-between|req-113-technical-debt-hardening-persist|appstate-maintains-entity-collections-bo|ac1-all-domain-reducers-that-perform
 flowchart LR
     Audit[Audit all domain reducers] --> Missing[Identify missing sync calls]
     Missing --> Fix[Add missing sync calls]

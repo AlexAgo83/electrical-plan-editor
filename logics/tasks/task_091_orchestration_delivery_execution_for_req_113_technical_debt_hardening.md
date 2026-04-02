@@ -27,7 +27,7 @@ This task does not replace the detailed scope inside each backlog item. It defin
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|orchestration-delivery-execution-for-re|req-113-wave-a-persistence-553-554-555|1-deliver-item-553-safe-json-parse-wrapp|minimum-step-gate
+%% logics-signature: task|orchestration-delivery-execution-for-req|item-553-safe-json-parse-wrapper-and-boo|wave-a-persistence-safety-critical|minimum-step-gate-after-each-individual
 flowchart LR
     WaveA[Wave A: Persistence 553-555] --> WaveB[Wave B: Performance 556-557]
     WaveA --> WaveC[Wave C: Architecture 558-559]
