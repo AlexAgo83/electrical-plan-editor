@@ -19,7 +19,7 @@ export function handleLayoutActions(state: AppState, action: AppAction): AppStat
     }
 
     case "layout/setNodePositions": {
-      const nextPositions = {} as AppState["nodePositions"];
+      const nextPositions = { ...state.nodePositions } as AppState["nodePositions"];
       for (const nodeId of state.nodes.allIds) {
         const position = action.payload.positions[nodeId];
         if (position !== undefined) {

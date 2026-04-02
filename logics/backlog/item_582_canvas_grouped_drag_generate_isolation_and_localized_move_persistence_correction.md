@@ -1,10 +1,10 @@
 ## item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction - Canvas grouped-drag generate isolation and localized move persistence correction
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -38,9 +38,9 @@ flowchart LR
 - AC3: If a grouped move cannot remain localized, the interaction is blocked or constrained instead of mutating unrelated elements.
 
 # AC Traceability
-- AC1 -> no automatic generate during grouped drag. Proof: capture in Wave 3 validation and report inside `task_097`.
-- AC2 -> localized persisted move only. Proof: capture in Wave 3 validation and report inside `task_097`.
-- AC3 -> block or constrain if localization is impossible. Proof: capture in Wave 3 validation and report inside `task_097`.
+- AC1 -> no automatic generate during grouped drag. Proof: `src/tests/app.ui.navigation-canvas.spec.tsx` covers grouped drag as a localized persistence flow without unrelated layout mutation.
+- AC2 -> localized persisted move only. Proof: `src/tests/app.ui.navigation-canvas.spec.tsx` verifies unrelated persisted node positions remain unchanged after grouped drag.
+- AC3 -> block or constrain if localization is impossible. Proof: `src/tests/store.reducer.sync-invariant.spec.ts` locks the partial-batch merge contract so localized grouped persistence cannot drop unrelated node positions.
 
 # Decision framing
 - Product framing: Consider
