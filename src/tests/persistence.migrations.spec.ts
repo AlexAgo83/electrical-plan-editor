@@ -242,7 +242,7 @@ describe("persistence migrations", () => {
 
     const loaded = loadState(storage, () => "2026-04-02T10:00:00.000Z");
 
-    expect(loaded.ui.lastError).toMatch(/migration failed/i);
+    expect(loaded.ui.lastError?.message).toMatch(/migration failed/i);
     expect(getPendingPersistenceRecovery()?.message).toMatch(/reset the stored workspace/i);
   });
 
@@ -261,7 +261,7 @@ describe("persistence migrations", () => {
 
     const loaded = loadState(storage, () => "2026-04-02T10:00:00.000Z");
 
-    expect(loaded.ui.lastError).toMatch(/migration failed/i);
+    expect(loaded.ui.lastError?.message).toMatch(/migration failed/i);
     expect(getPendingPersistenceRecovery()?.message).toMatch(/reset the stored workspace/i);
   });
 

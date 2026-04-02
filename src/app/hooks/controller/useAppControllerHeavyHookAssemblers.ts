@@ -113,6 +113,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setCanvasResizeBehaviorMode"
     | "setShowShortcutHints"
     | "setKeyboardShortcutsEnabled"
+    | "setRestoreViewportOnUndo"
     | "setShowFloatingInspectorPanel"
     | "setWorkspacePanelsLayoutMode"
     | "setWorkspaceWideScreen"

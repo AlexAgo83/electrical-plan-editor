@@ -239,6 +239,8 @@ export function useAppControllerAuxScreenContentDomains({
     setShowShortcutHints: settings.prefs.setShowShortcutHints,
     keyboardShortcutsEnabled: settings.prefs.keyboardShortcutsEnabled,
     setKeyboardShortcutsEnabled: settings.prefs.setKeyboardShortcutsEnabled,
+    restoreViewportOnUndo: settings.prefs.restoreViewportOnUndo,
+    setRestoreViewportOnUndo: settings.prefs.setRestoreViewportOnUndo,
     showFloatingInspectorPanel: settings.prefs.showFloatingInspectorPanel,
     setShowFloatingInspectorPanel: settings.prefs.setShowFloatingInspectorPanel,
     workspacePanelsLayoutMode: settings.prefs.workspacePanelsLayoutMode,
