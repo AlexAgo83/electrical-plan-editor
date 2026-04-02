@@ -11,6 +11,7 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   intent?: ConfirmDialogIntent;
   closeOnBackdrop?: boolean;
+  confirmOnEnter?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -33,12 +34,14 @@ export function ConfirmDialog({
   cancelLabel = "Cancel",
   intent = "neutral",
   closeOnBackdrop = true,
+  confirmOnEnter = false,
   onConfirm,
   onCancel
 }: ConfirmDialogProps): ReactElement | null {
   const dialogRef = useRef<HTMLElement | null>(null);
   const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
   const previousFocusedElementRef = useRef<HTMLElement | null>(null);
+  const enterConfirmationArmedRef = useRef(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -63,6 +66,33 @@ export function ConfirmDialog({
     };
   }, [isOpen, title]);
 
+  useEffect(() => {
+    if (!isOpen || !confirmOnEnter) {
+      enterConfirmationArmedRef.current = false;
+      return;
+    }
+
+    enterConfirmationArmedRef.current = false;
+
+    const armEnterConfirmation = () => {
+      enterConfirmationArmedRef.current = true;
+      window.removeEventListener("keyup", armEnterConfirmation, true);
+    };
+
+    const fallbackTimer = window.setTimeout(() => {
+      enterConfirmationArmedRef.current = true;
+      window.removeEventListener("keyup", armEnterConfirmation, true);
+    }, 0);
+
+    window.addEventListener("keyup", armEnterConfirmation, true);
+
+    return () => {
+      window.clearTimeout(fallbackTimer);
+      window.removeEventListener("keyup", armEnterConfirmation, true);
+      enterConfirmationArmedRef.current = false;
+    };
+  }, [isOpen, confirmOnEnter, title]);
+
   if (!isOpen) {
     return null;
   }
@@ -82,6 +112,16 @@ export function ConfirmDialog({
       event.preventDefault();
       event.stopPropagation();
       onCancel();
+      return;
+    }
+
+    if (event.key === "Enter" && confirmOnEnter) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!enterConfirmationArmedRef.current) {
+        return;
+      }
+      onConfirm();
       return;
     }
 

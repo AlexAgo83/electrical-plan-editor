@@ -229,6 +229,37 @@ describe("App integration UI - delete confirmations", () => {
     expect(within(getPanelByHeading(caseData.panelHeading)).getByText(caseData.rowText)).toBeInTheDocument();
   });
 
+  it("keeps Cancel focused in direct delete dialogs, supports Escape cancel, and confirms on Enter", async () => {
+    const { store } = renderAppWithState(createDeleteConfirmationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("networkScope");
+
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    fireEvent.click(within(networkScopePanel).getByText("Network deletable").closest("tr") as HTMLElement);
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Edit network" })).toBeInTheDocument();
+    });
+
+    fireEvent.click(within(getPanelByHeading("Edit network")).getByRole("button", { name: "Delete" }));
+    const escapeDialog = await screen.findByRole("dialog", { name: "Delete network" });
+    const escapeCancelButton = within(escapeDialog).getByRole("button", { name: "Cancel" });
+    expect(escapeCancelButton).toHaveFocus();
+    fireEvent.keyDown(escapeDialog, { key: "Escape" });
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog", { name: "Delete network" })).not.toBeInTheDocument();
+    });
+    expect(store.getState().networks.byId["net-del" as NetworkId]).toBeDefined();
+
+    fireEvent.click(within(getPanelByHeading("Edit network")).getByRole("button", { name: "Delete" }));
+    const enterDialog = await screen.findByRole("dialog", { name: "Delete network" });
+    const enterCancelButton = within(enterDialog).getByRole("button", { name: "Cancel" });
+    expect(enterCancelButton).toHaveFocus();
+    fireEvent.keyDown(enterDialog, { key: "Enter" });
+    await waitFor(() => {
+      expect(store.getState().networks.byId["net-del" as NetworkId]).toBeUndefined();
+    });
+  });
+
   it.each(cancelDeleteCases)("deletes deletable $entity only after explicit confirmation", async (caseData) => {
     const { store } = openModelingDeleteScenario();
     triggerEntityDelete(caseData);
@@ -369,6 +400,25 @@ describe("App integration UI - delete confirmations", () => {
     fireEvent.click(screen.getByRole("button", { name: "Redo" }));
     expect(store.getState().connectors.byId[asConnectorId("C-CASCADE")]).toBeUndefined();
     expect(store.getState().nodes.byId[asNodeId("N-C-CASCADE")]).toBeUndefined();
+  });
+
+  it("keeps Cancel focused in cascade delete dialogs and confirms on Enter", async () => {
+    const { store } = openModelingDeleteScenario(createSafeConnectorCascadeState());
+
+    switchSubScreenDrawerAware("connector");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Cascade connector"));
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Delete" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Cascade delete connector" });
+    const cancelButton = within(dialog).getByRole("button", { name: "Cancel" });
+    expect(cancelButton).toHaveFocus();
+    fireEvent.keyDown(dialog, { key: "Enter" });
+
+    await waitFor(() => {
+      expect(store.getState().connectors.byId[asConnectorId("C-CASCADE")]).toBeUndefined();
+      expect(store.getState().nodes.byId[asNodeId("N-C-CASCADE")]).toBeUndefined();
+    });
   });
 
   it("offers safe splice cascade delete when only the linked splice node is impacted", async () => {
