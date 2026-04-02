@@ -244,6 +244,18 @@
   line-height: 1.25;
 }
 
+.network-canvas-selection-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.network-canvas-selection-summary .workspace-tab {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.74rem;
+}
+
 .network-canvas-floating-stack {
   position: absolute;
   left: 0.8rem;

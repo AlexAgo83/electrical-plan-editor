@@ -275,6 +275,8 @@ export function useAppControllerWorkspaceContentAssembly({
     handleNetworkSegmentClick: domains.canvasInteractionDomain.handleNetworkSegmentClick,
     handleNetworkNodeMouseDown: domains.canvasInteractionDomain.handleNetworkNodeMouseDown,
     handleNetworkNodeActivate: domains.canvasInteractionDomain.handleNetworkNodeActivate,
+    selectedCanvasNodeIds: domains.canvasInteractionDomain.selectedCanvasNodeIds,
+    clearSelectedCanvasNodes: domains.canvasInteractionDomain.clearSelectedCanvasNodes,
     onViewportSizeChange: handlers.handleNetworkSummaryViewportSizeChange,
     canExportBomCsv: handlers.canExportBomCsv,
     onExportBomCsv: handlers.handleExportBomCsv,

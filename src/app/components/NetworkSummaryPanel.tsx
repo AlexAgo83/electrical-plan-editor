@@ -123,6 +123,8 @@ export interface NetworkSummaryPanelProps {
   selectedSegmentId: SegmentId | null;
   selectedWireId: Wire["id"] | null;
   handleNetworkSegmentClick: (segmentId: SegmentId) => void;
+  selectedCanvasNodeIds: ReadonlySet<NodeId>;
+  clearSelectedCanvasNodes: () => void;
   selectedNodeId: NodeId | null;
   selectedConnectorId: ConnectorId | null;
   selectedSpliceId: SpliceId | null;
@@ -214,6 +216,8 @@ export function NetworkSummaryPanel({
   selectedSegmentId,
   selectedWireId,
   handleNetworkSegmentClick,
+  selectedCanvasNodeIds,
+  clearSelectedCanvasNodes,
   selectedNodeId,
   selectedConnectorId,
   selectedSpliceId,
@@ -609,6 +613,7 @@ export function NetworkSummaryPanel({
 
       event.preventDefault();
       event.stopPropagation();
+      clearSelectedCanvasNodes();
       if (callout.kind === "connector") {
         onSelectConnectorFromCallout(callout.entityId as ConnectorId);
       } else {
@@ -630,7 +635,7 @@ export function NetworkSummaryPanel({
         [callout.key]: callout.position
       }));
     },
-    [lockEntityMovement, onSelectConnectorFromCallout, onSelectSpliceFromCallout]
+    [clearSelectedCanvasNodes, lockEntityMovement, onSelectConnectorFromCallout, onSelectSpliceFromCallout]
   );
 
   const handleCanvasMouseMoveWithCallouts = useCallback(
@@ -781,6 +786,7 @@ export function NetworkSummaryPanel({
         networkNodePositions,
         isSubNetworkFilteringActive,
         nodeHasActiveSubNetworkConnection,
+        selectedCanvasNodeIds,
         selectedNodeId,
         selectedConnectorId,
         selectedSpliceId,
@@ -792,6 +798,7 @@ export function NetworkSummaryPanel({
       networkNodePositions,
       isSubNetworkFilteringActive,
       nodeHasActiveSubNetworkConnection,
+      selectedCanvasNodeIds,
       selectedNodeId,
       selectedConnectorId,
       selectedSpliceId,
@@ -884,6 +891,8 @@ export function NetworkSummaryPanel({
                 handleZoomAction={handleZoomAction}
                 fitNetworkToContent={fitNetworkToContent}
                 onRegenerateLayout={onRegenerateLayout}
+                selectedCanvasNodeCount={selectedCanvasNodeIds.size}
+                clearSelectedCanvasNodes={clearSelectedCanvasNodes}
                 networkScalePercent={networkScalePercent}
                 subNetworkSummaries={subNetworkSummaries}
                 activeSubNetworkTags={activeSubNetworkTagSet}

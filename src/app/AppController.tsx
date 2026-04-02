@@ -784,6 +784,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     viewport: {
       effectiveNetworkViewWidth,
       effectiveNetworkViewHeight,
+      networkNodePositions,
       snapNodesToGrid,
       lockEntityMovement,
       networkOffset,
