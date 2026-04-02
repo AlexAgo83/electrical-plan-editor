@@ -1,6 +1,6 @@
 {
   "cache_path": "logics/.cache/runtime_index.json",
-  "generated_at": "2026-04-02T10:13:47.718767+00:00",
+  "generated_at": "2026-04-02T12:20:21.839552+00:00",
   "skill_packages": {
     "logics/skills/logics-acceptance-to-tests": {
       "data": {
@@ -45631,10 +45631,10 @@
           "Complexity": "Low-Medium",
           "Confidence": "94%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Persistence safety / boot resilience",
           "Understanding": "97%"
         },
@@ -45738,8 +45738,8 @@
         "title": "Safe JSON.parse wrapper and boot recovery UI for corrupted localStorage"
       },
       "signature": {
-        "mtime_ns": 1775124699142690037,
-        "size": 3990
+        "mtime_ns": 1775128115700506437,
+        "size": 3991
       }
     },
     "logics/backlog/item_554_migration_backup_and_rollback_on_failure_with_explicit_user_feedback.md": {
@@ -45754,10 +45754,10 @@
           "Complexity": "Medium",
           "Confidence": "92%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Persistence safety / migration resilience",
           "Understanding": "96%"
         },
@@ -45863,8 +45863,8 @@
         "title": "Migration backup and rollback on failure with explicit user feedback"
       },
       "signature": {
-        "mtime_ns": 1775124699144524512,
-        "size": 4312
+        "mtime_ns": 1775128118798066220,
+        "size": 4313
       }
     },
     "logics/backlog/item_555_localstorage_quota_awareness_and_write_failure_surfacing.md": {
@@ -45879,10 +45879,10 @@
           "Complexity": "Low-Medium",
           "Confidence": "90%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Persistence safety / storage resilience",
           "Understanding": "95%"
         },
@@ -45984,8 +45984,8 @@
         "title": "localStorage quota awareness and write failure surfacing"
       },
       "signature": {
-        "mtime_ns": 1775124699145484604,
-        "size": 4035
+        "mtime_ns": 1775128122675047731,
+        "size": 4036
       }
     },
     "logics/backlog/item_556_replace_pathfinding_queue_sort_with_min_heap_priority_queue.md": {
@@ -46000,10 +46000,10 @@
           "Complexity": "Medium",
           "Confidence": "96%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Performance / algorithmic complexity",
           "Understanding": "98%"
         },
@@ -46062,7 +46062,9 @@
             "- Depends on: none.",
             "- References:",
             "  - `src/core/pathfinding.ts`",
+            "  - `src/core/minHeap.ts`",
             "  - `src/tests/core.pathfinding.spec.ts`",
+            "  - `src/tests/core.min-heap.spec.ts`",
             ""
           ],
           "Priority": [
@@ -46104,8 +46106,8 @@
         "title": "Replace pathfinding queue.sort with a min-heap priority queue"
       },
       "signature": {
-        "mtime_ns": 1775124699146446654,
-        "size": 3826
+        "mtime_ns": 1775128402662082832,
+        "size": 3891
       }
     },
     "logics/backlog/item_557_memoize_routing_graph_construction_in_selector.md": {
@@ -46120,10 +46122,10 @@
           "Complexity": "Low-Medium",
           "Confidence": "93%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Performance / selector memoization",
           "Understanding": "96%"
         },
@@ -46161,7 +46163,7 @@
             ""
           ],
           "Acceptance criteria": [
-            "- AC1: `buildRoutingGraphIndex()` is not called more than once per render cycle when `segments` and `nodePositions` have not changed.",
+            "- AC1: `buildRoutingGraphIndex()` is not called more than once per render cycle when `nodes` and `segments` have not changed.",
             "- AC2: `selectRoutingGraphIndex` is implemented with a memoized selector pattern; the raw function call no longer sits directly inside the selector body without caching.",
             "- AC3: Existing `core.graph.spec.ts` and all routing-related tests continue to pass without modification.",
             "- AC4: A test or inline proof point demonstrates that the selector returns a cached reference when inputs are unchanged.",
@@ -46184,6 +46186,7 @@
             "  - `src/store/selectors.ts`",
             "  - `src/core/graph.ts`",
             "  - `src/tests/core.graph.spec.ts`",
+            "  - `src/tests/store.selectors.spec.ts`",
             ""
           ],
           "Priority": [
@@ -46192,12 +46195,12 @@
             ""
           ],
           "Problem": [
-            "`buildRoutingGraphIndex()` in `src/core/graph.ts` is called on every render via `selectRoutingGraphIndex` in `src/store/selectors.ts`, even when neither `segments` nor `nodePositions` has changed. For mid-size networks this is a measurable wasted computation on every state change, including unrelated UI interactions.",
+            "`buildRoutingGraphIndex()` in `src/core/graph.ts` is called on every render via `selectRoutingGraphIndex` in `src/store/selectors.ts`, even when neither `nodes` nor `segments` has changed. For mid-size networks this is a measurable wasted computation on every state change, including unrelated UI interactions.",
             ""
           ],
           "Scope": [
             "- In:",
-            "  - refactor `selectRoutingGraphIndex` to use structural memoization (`createSelector` or equivalent) with `segments` and `nodePositions` as the only inputs;",
+            "  - refactor `selectRoutingGraphIndex` to use structural memoization (`createSelector` or equivalent) with `nodes` and `segments` as the only inputs;",
             "  - confirm that `buildRoutingGraphIndex()` is not called more than once per render cycle when the relevant state slices are unchanged;",
             "  - add a test or proof point that the selector does not recompute on unrelated state changes.",
             "- Out:",
@@ -46208,7 +46211,7 @@
             "%% logics-kind: backlog",
             "%% logics-signature: backlog|memoize-routing-graph-construction-in-se|req-113-technical-debt-hardening-persist|buildroutinggraphindex-in-src-core-graph|ac1-buildroutinggraphindex-is-not-called",
             "flowchart LR",
-            "    Before[buildRoutingGraphIndex on every render] --> Selector[createSelector with segments + nodePositions]",
+            "    Before[buildRoutingGraphIndex on every render] --> Selector[Memoized selector with nodes + segments]",
             "    Selector -->|Same inputs| Skip[Return cached result]",
             "    Selector -->|Changed inputs| Rebuild[Recompute graph]",
             "```",
@@ -46224,8 +46227,8 @@
         "title": "Memoize routing graph construction in selector"
       },
       "signature": {
-        "mtime_ns": 1775124699147014826,
-        "size": 3911
+        "mtime_ns": 1775128402662199458,
+        "size": 3923
       }
     },
     "logics/backlog/item_558_appcontroller_decomposition_context_providers_and_derived_state_memoization.md": {
@@ -46238,14 +46241,14 @@
         },
         "indicators": {
           "Complexity": "High",
-          "Confidence": "85%",
+          "Confidence": "92%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Architecture quality / component structure",
-          "Understanding": "90%"
+          "Understanding": "96%"
         },
         "kind": "backlog",
         "path": "logics/backlog/item_558_appcontroller_decomposition_context_providers_and_derived_state_memoization.md",
@@ -46305,6 +46308,8 @@
             "- Blocks: nothing currently, but unblocks future controller extractions.",
             "- References:",
             "  - `src/app/AppController.tsx`",
+            "  - `src/app/components/controller/ModelingController.tsx`",
+            "  - `src/app/components/controller/ModelingController.context.ts`",
             "  - `src/app/hooks/` (controller hooks)",
             "  - `src/tests/app.ui.*.spec.tsx`",
             ""
@@ -46351,8 +46356,8 @@
         "title": "AppController decomposition: Context providers and derived state memoization"
       },
       "signature": {
-        "mtime_ns": 1775124699148749799,
-        "size": 4762
+        "mtime_ns": 1775129074879210977,
+        "size": 4888
       }
     },
     "logics/backlog/item_559_audit_and_enforce_sync_invariant_between_global_and_network_scoped_state.md": {
@@ -46365,14 +46370,14 @@
         },
         "indicators": {
           "Complexity": "Medium",
-          "Confidence": "88%",
+          "Confidence": "94%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Architecture quality / state consistency",
-          "Understanding": "92%"
+          "Understanding": "96%"
         },
         "kind": "backlog",
         "path": "logics/backlog/item_559_audit_and_enforce_sync_invariant_between_global_and_network_scoped_state.md",
@@ -46431,6 +46436,7 @@
             "  - `src/store/reducer.ts`",
             "  - `src/store/reducer/` (all domain reducers)",
             "  - `src/store/types.ts`",
+            "  - `src/tests/store.reducer.sync-invariant.spec.ts`",
             ""
           ],
           "Priority": [
@@ -46473,8 +46479,8 @@
         "title": "Audit and enforce sync invariant between global and network-scoped state"
       },
       "signature": {
-        "mtime_ns": 1775124699150464731,
-        "size": 4278
+        "mtime_ns": 1775129074879594980,
+        "size": 4332
       }
     },
     "logics/backlog/item_560_unit_tests_for_controller_hooks_in_isolation.md": {
@@ -46487,14 +46493,14 @@
         },
         "indicators": {
           "Complexity": "Medium",
-          "Confidence": "90%",
+          "Confidence": "95%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Test quality / hook coverage",
-          "Understanding": "93%"
+          "Understanding": "96%"
         },
         "kind": "backlog",
         "path": "logics/backlog/item_560_unit_tests_for_controller_hooks_in_isolation.md",
@@ -46552,6 +46558,9 @@
             "- References:",
             "  - `src/app/hooks/controller/`",
             "  - `src/tests/` (new spec files to be created)",
+            "- Delivery notes:",
+            "  - added isolated `renderHook()` specs for `useAppControllerSelectionHandlersDomainAssembly`, `useAppControllerWorkspaceHandlersDomainAssembly`, `useAppControllerModelingHandlersAssembly`, `useEntityFormsState`, and `useCanvasState`;",
+            "  - each hook now has a default-contract assertion plus one representative state-change assertion without mounting `AppController` or any screen component.",
             ""
           ],
           "Priority": [
@@ -46597,8 +46606,8 @@
         "title": "Unit tests for controller hooks in isolation"
       },
       "signature": {
-        "mtime_ns": 1775124699152091329,
-        "size": 3883
+        "mtime_ns": 1775129850804929716,
+        "size": 4293
       }
     },
     "logics/backlog/item_561_dedicated_migration_spec_with_version_fixtures_and_corrupt_input_coverage.md": {
@@ -46611,14 +46620,14 @@
         },
         "indicators": {
           "Complexity": "Medium",
-          "Confidence": "92%",
+          "Confidence": "95%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Test quality / migration coverage",
-          "Understanding": "95%"
+          "Understanding": "97%"
         },
         "kind": "backlog",
         "path": "logics/backlog/item_561_dedicated_migration_spec_with_version_fixtures_and_corrupt_input_coverage.md",
@@ -46679,6 +46688,10 @@
             "  - `src/adapters/persistence/migrations.ts`",
             "  - `src/tests/persistence.migrations.spec.ts` (to be created)",
             "  - `src/tests/persistence.localStorage.spec.ts`",
+            "- Delivery notes:",
+            "  - added `src/tests/persistence.migrations.spec.ts` with static fixtures for pre-timestamp (`v1`), timestamped (`v2`), and current versioned (`v3`) persisted payload shapes;",
+            "  - covered happy-path preservation of network metadata, entity collections, and per-network summary view state;",
+            "  - covered both migration-step failure surfaces plus successful backup create/remove lifecycle during `loadState()`.",
             ""
           ],
           "Priority": [
@@ -46722,8 +46735,8 @@
         "title": "Dedicated migration spec with version fixtures and corrupt input coverage"
       },
       "signature": {
-        "mtime_ns": 1775124699152542124,
-        "size": 4539
+        "mtime_ns": 1775129850805773350,
+        "size": 4964
       }
     },
     "logics/backlog/item_562_universal_occupancy_index_validation_before_map_writes.md": {
@@ -46736,14 +46749,14 @@
         },
         "indicators": {
           "Complexity": "Low-Medium",
-          "Confidence": "93%",
+          "Confidence": "96%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Robustness / state integrity",
-          "Understanding": "95%"
+          "Understanding": "97%"
         },
         "kind": "backlog",
         "path": "logics/backlog/item_562_universal_occupancy_index_validation_before_map_writes.md",
@@ -46806,6 +46819,10 @@
             "  - `src/store/reducer/wireReducer.ts`",
             "  - `src/tests/store.reducer.connectors.spec.ts`",
             "  - `src/tests/store.reducer.splices.spec.ts`",
+            "- Delivery notes:",
+            "  - direct connector/splice occupancy writes now `console.warn()` and return the untouched state when the requested index is out of range;",
+            "  - wire occupancy helper paths now re-check endpoint bounds before release/write so corrupted endpoints cannot mutate occupancy maps silently;",
+            "  - added `src/tests/store.reducer.occupancy.spec.ts` covering bounded connector and splice rejection paths.",
             ""
           ],
           "Priority": [
@@ -46847,8 +46864,8 @@
         "title": "Universal occupancy index validation before occupancy map writes"
       },
       "signature": {
-        "mtime_ns": 1775124699153407215,
-        "size": 4125
+        "mtime_ns": 1775130502524803030,
+        "size": 4536
       }
     },
     "logics/backlog/item_563_canvas_viewport_state_in_store_and_undo_redo_history_integration.md": {
@@ -46856,19 +46873,19 @@
         "ai_context": {
           "keywords": "canvas viewport, undo/redo, useStoreHistory, Redux store, scale, offset, snap, history",
           "skip when": "Working on persistence, pathfinding, or features unrelated to the canvas or undo mechanism.",
-          "summary": "Move canvas viewport state into the Redux store and include it in useStoreHistory so undo/redo restores both entity state and canvas position coherently.",
+          "summary": "Reuse the existing per-network Redux viewport state for undo/redo, and add a user-controlled opt-out that preserves the current viewport during undo/redo.",
           "use when": "Implementing or reviewing canvas state management or the undo/redo history contract."
         },
         "indicators": {
           "Complexity": "Medium-High",
-          "Confidence": "82%",
+          "Confidence": "96%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Robustness / undo-redo coherence",
-          "Understanding": "88%"
+          "Understanding": "98%"
         },
         "kind": "backlog",
         "path": "logics/backlog/item_563_canvas_viewport_state_in_store_and_undo_redo_history_integration.md",
@@ -46890,31 +46907,31 @@
         "schema_version": "1.0",
         "sections": {
           "AC Traceability": [
-            "- AC1 \u2192 state location. Proof: `canvas` slice visible in `AppState` type definition.",
-            "- AC2 \u2192 history entry shape. Proof: `useStoreHistory` snapshot type includes viewport fields.",
-            "- AC3 \u2192 coherent undo. Proof: new test performs entity edit with viewport pan, undoes, and asserts both are restored.",
-            "- AC4 \u2192 user control. Proof: settings toggle renders and controls viewport restoration behavior.",
+            "- AC1 \u2192 state location. Proof: `networkStates[networkId].networkSummaryViewState` remains populated and reused by restore flows.",
+            "- AC2 \u2192 history contract. Proof: undo/redo now optionally transforms the target state instead of relying on a separate viewport-only history stack.",
+            "- AC3 \u2192 coherent undo. Proof: new UI regression deletes a visible wire after panning, pans again, then undo/redo restores the captured viewport.",
+            "- AC4 \u2192 user control. Proof: settings toggle renders, persists, and keeps the current viewport stable during undo/redo when disabled.",
             "- AC5 \u2192 non-regression. Proof: existing undo/redo specs pass green.",
             ""
           ],
           "AI Context": [
-            "- Summary: Move canvas viewport state into the Redux store and include it in useStoreHistory so undo/redo restores both entity state and canvas position coherently.",
+            "- Summary: Reuse the existing per-network Redux viewport state for undo/redo, and add a user-controlled opt-out that preserves the current viewport during undo/redo.",
             "- Keywords: canvas viewport, undo/redo, useStoreHistory, Redux store, scale, offset, snap, history",
             "- Use when: Implementing or reviewing canvas state management or the undo/redo history contract.",
             "- Skip when: Working on persistence, pathfinding, or features unrelated to the canvas or undo mechanism.",
             ""
           ],
           "Acceptance criteria": [
-            "- AC1: Canvas viewport scale and offset are stored in the Redux store and not in local hook state alone.",
-            "- AC2: `useStoreHistory` history entries include a canvas viewport snapshot.",
+            "- AC1: Per-network canvas viewport scale and offset remain stored in Redux and act as the source of truth for history-aware restores.",
+            "- AC2: Undo/redo operates on snapshots that already include the persisted per-network viewport state.",
             "- AC3: Performing undo after a canvas-visible entity edit restores both the entity state and the canvas viewport to their pre-edit values.",
             "- AC4: A settings toggle exists that allows the user to opt out of viewport restoration on undo.",
             "- AC5: Existing undo/redo tests pass without modification; new tests cover the viewport restoration behavior.",
             ""
           ],
           "Decision framing": [
-            "- Product framing: The settings toggle (AC4) may be considered a product decision; expose it only in the advanced settings section to avoid cluttering the main settings.",
-            "- Architecture framing: Moving canvas state to the store changes the data flow for all canvas hooks; impacts need to be traced.",
+            "- Product framing: The settings toggle (AC4) belongs in the shortcuts/undo section because it changes undo semantics rather than rendering defaults.",
+            "- Architecture framing: No new `canvas` slice was introduced; the implementation intentionally reuses the existing per-network summary view state instead of splitting sources of truth further.",
             ""
           ],
           "Links": [
@@ -46926,9 +46943,9 @@
             "- Derived from `logics/request/req_113_...` audit item D4.",
             "- Depends on: none, but should be delivered after persistence and performance items to reduce risk.",
             "- References:",
-            "  - `src/store/types.ts`",
+            "  - `src/store/networking.ts`",
             "  - `src/app/hooks/useStoreHistory.ts`",
-            "  - `src/app/hooks/` (canvas-related hooks)",
+            "  - `src/app/components/workspace/SettingsWorkspaceContent.tsx`",
             "  - `src/app/AppController.tsx`",
             ""
           ],
@@ -46938,42 +46955,41 @@
             ""
           ],
           "Problem": [
-            "Canvas viewport state (scale, offset, snap settings) lives in local React hook state, not in the Redux store. The `useStoreHistory` undo/redo mechanism only covers store mutations, so undoing an entity edit does not restore the canvas position the user was at when they made the edit. This creates a disorienting UX where the canvas stays zoomed into a location that no longer matches the restored entity state.",
+            "The product already persists per-network summary viewport state in Redux, but the undo/redo contract was implicit and had no user control. Users who prefer entity-only undo needed a way to preserve the current viewport while undoing an entity mutation, and the existing behavior needed regression proof for both modes.",
             ""
           ],
           "Scope": [
             "- In:",
-            "  - move canvas viewport state (scale, offset, and snap-to-grid toggle at minimum) from local hook state into the Redux store under a `canvas` slice;",
-            "  - extend `useStoreHistory` to include canvas viewport snapshots in its history entries, so undo/redo restores both entity state and viewport together;",
+            "  - keep using per-network `networkSummaryViewState` in Redux as the canonical persisted viewport source for undo/redo snapshots;",
+            "  - extend `useStoreHistory` with an undo/redo target-state transform so viewport restoration can be preserved or bypassed without breaking entity history;",
             "  - add an optional settings toggle to disable viewport restoration on undo (for users who prefer entity-only undo);",
-            "  - add a test asserting that undo restores the canvas viewport alongside the entity state.",
+            "  - add tests asserting both restore-enabled and restore-disabled viewport behavior around undo/redo.",
             "- Out:",
             "  - canvas animation or transition effects during undo/redo;",
             "  - persisting canvas state across sessions (can be added later; this item focuses on undo/redo coherence).",
             "",
             "```mermaid",
             "%% logics-kind: backlog",
-            "%% logics-signature: backlog|canvas-viewport-state-in-store-and-undo-|req-113-technical-debt-hardening-persist|canvas-viewport-state-scale-offset-snap|ac1-canvas-viewport-scale-and-offset",
+            "%% logics-signature: backlog|canvas-viewport-state-in-store-and-undo-|req-113-technical-debt-hardening-persist|the-product-already-persists-per-network|ac1-per-network-canvas-viewport-scale-an",
             "flowchart LR",
-            "    Before[Canvas viewport in local hook state] --> Store[canvas slice in Redux store]",
-            "    Store --> History[useStoreHistory includes viewport snapshot]",
+            "    Store[Per-network viewport state already in Redux] --> History[Entity history snapshots include viewport state]",
             "    History --> Undo[Undo restores entity state and viewport]",
-            "    History --> Toggle[Optional settings toggle: entity-only undo]",
+            "    History --> Toggle[Optional settings toggle: preserve current viewport during undo/redo]",
             "```",
             ""
           ],
           "Validation": [
             "- `npm run -s lint`",
             "- `npm run -s typecheck`",
-            "- `npm test -- --run src/tests/store.reducer src/tests/app.ui`",
+            "- `npm test -- --run src/tests/app.ui.network-summary-workflow-polish.spec.tsx src/tests/app.ui.settings.spec.tsx src/tests/app.ui.undo-redo-global.spec.tsx`",
             "- `npm run -s build`"
           ]
         },
         "title": "Canvas viewport state in store and undo/redo history integration"
       },
       "signature": {
-        "mtime_ns": 1775124699153945262,
-        "size": 4722
+        "mtime_ns": 1775131440544619573,
+        "size": 4998
       }
     },
     "logics/backlog/item_564_structured_app_error_type_replacing_monolithic_last_error_string.md": {
@@ -46986,14 +47002,14 @@
         },
         "indicators": {
           "Complexity": "Low-Medium",
-          "Confidence": "91%",
+          "Confidence": "95%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Robustness / error handling",
-          "Understanding": "94%"
+          "Understanding": "97%"
         },
         "kind": "backlog",
         "path": "logics/backlog/item_564_structured_app_error_type_replacing_monolithic_last_error_string.md",
@@ -47054,6 +47070,11 @@
             "  - `src/store/types.ts`",
             "  - `src/store/reducer/` (all domain reducers)",
             "  - `src/app/` (error display component)",
+            "- Delivery notes:",
+            "  - introduced `AppError` plus shared normalization/comparison helpers in `src/store/types.ts`;",
+            "  - `withError()` and `ui/setError` now always store typed `AppError` objects while preserving existing user-facing messages;",
+            "  - persistence feedback, CSV import flows, rename flows, migration recovery, and the header error banner now consume `lastError.message`, while the UI also exposes `lastError.code`;",
+            "  - reducer coverage now explicitly asserts `WIRE_ENDPOINT_A_IS_ALREADY_OCCUPIED` as a representative structured error code.",
             ""
           ],
           "Priority": [
@@ -47097,8 +47118,8 @@
         "title": "Structured AppError type replacing monolithic lastError string"
       },
       "signature": {
-        "mtime_ns": 1775124699154349557,
-        "size": 4397
+        "mtime_ns": 1775130502525667080,
+        "size": 4946
       }
     },
     "logics/backlog/item_565_connector_and_splice_catalog_selector_labels_include_catalog_names_and_safe_fallback_formatting.md": {
@@ -47113,10 +47134,10 @@
           "Complexity": "Medium",
           "Confidence": "98% (current UI patterns and nearby requests define the interaction boundaries clearly, and the remaining bottom-action behavior is now locked to silent reset semantics within Modeling forms only)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Modeling form ergonomics / catalog readability / repetitive-entry speed",
           "Understanding": "96% (the requested scope is clear: improve connector/splice catalog option readability and reduce repetitive scrolling during chained create flows)"
         },
@@ -47194,7 +47215,8 @@
           "Notes": [
             "- Derived from request `req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action`.",
             "- Source file: `logics/request/req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action.md`.",
-            "- Request context seeded into this backlog item from `logics/request/req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action.md`."
+            "- Request context seeded into this backlog item from `logics/request/req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action.md`.",
+            "- Task `task_092_super_orchestration_delivery_execution_for_req_114_to_req_117_with_validation_gates_and_staged_checkpoints` was finished via `logics_flow.py finish task` on 2026-04-02."
           ],
           "Priority": [
             "- Impact:",
@@ -47245,8 +47267,8 @@
         "title": "Connector and splice catalog selector labels include catalog names and safe fallback formatting"
       },
       "signature": {
-        "mtime_ns": 1775124699156246115,
-        "size": 9136
+        "mtime_ns": 1775132301979806365,
+        "size": 9323
       }
     },
     "logics/backlog/item_566_bottom_new_action_across_modeling_create_forms_with_silent_draft_reset.md": {
@@ -47261,10 +47283,10 @@
           "Complexity": "Medium",
           "Confidence": "98% (current UI patterns and nearby requests define the interaction boundaries clearly, and the remaining bottom-action behavior is now locked to silent reset semantics within Modeling forms only)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Modeling form ergonomics / catalog readability / repetitive-entry speed",
           "Understanding": "96% (the requested scope is clear: improve connector/splice catalog option readability and reduce repetitive scrolling during chained create flows)"
         },
@@ -47393,8 +47415,8 @@
         "title": "Bottom New action across Modeling create forms with silent draft reset"
       },
       "signature": {
-        "mtime_ns": 1775124699156693869,
-        "size": 9084
+        "mtime_ns": 1775132321431364574,
+        "size": 9085
       }
     },
     "logics/backlog/item_567_regression_coverage_and_closure_for_modeling_create_form_chained_new_and_catalog_label_ergonomics.md": {
@@ -47409,10 +47431,10 @@
           "Complexity": "Medium",
           "Confidence": "98% (current UI patterns and nearby requests define the interaction boundaries clearly, and the remaining bottom-action behavior is now locked to silent reset semantics within Modeling forms only)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Modeling form ergonomics / catalog readability / repetitive-entry speed",
           "Understanding": "96% (the requested scope is clear: improve connector/splice catalog option readability and reduce repetitive scrolling during chained create flows)"
         },
@@ -47541,8 +47563,8 @@
         "title": "Regression coverage and closure for modeling create-form chained New and catalog label ergonomics"
       },
       "signature": {
-        "mtime_ns": 1775124699157076373,
-        "size": 9140
+        "mtime_ns": 1775132321652282779,
+        "size": 9141
       }
     },
     "logics/backlog/item_568_delete_and_cascade_delete_dialog_enter_shortcut_contract_with_cancel_focused_safety.md": {
@@ -47557,10 +47579,10 @@
           "Complexity": "Medium",
           "Confidence": "97% (the main product tradeoff is explicit and localized, and the remaining keyboard-scope details are now locked to the current delete-dialog shape with focus preserved on cancel)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Destructive-action ergonomics / keyboard flow / confirmation safety",
           "Understanding": "97% (the user intent is specific: when a delete confirmation opens, pressing Enter should confirm faster without broadening the rule to unrelated confirmation dialogs)"
         },
@@ -47680,8 +47702,8 @@
         "title": "Delete and cascade delete dialog Enter shortcut contract with cancel-focused safety"
       },
       "signature": {
-        "mtime_ns": 1775124699157447834,
-        "size": 6880
+        "mtime_ns": 1775132321862087749,
+        "size": 6881
       }
     },
     "logics/backlog/item_569_keyboard_enter_confirmation_wiring_scoped_to_destructive_delete_dialogs_only.md": {
@@ -47696,10 +47718,10 @@
           "Complexity": "Medium",
           "Confidence": "97% (the main product tradeoff is explicit and localized, and the remaining keyboard-scope details are now locked to the current delete-dialog shape with focus preserved on cancel)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Destructive-action ergonomics / keyboard flow / confirmation safety",
           "Understanding": "97% (the user intent is specific: when a delete confirmation opens, pressing Enter should confirm faster without broadening the rule to unrelated confirmation dialogs)"
         },
@@ -47819,8 +47841,8 @@
         "title": "Keyboard Enter confirmation wiring scoped to destructive delete dialogs only"
       },
       "signature": {
-        "mtime_ns": 1775124699158216091,
-        "size": 6869
+        "mtime_ns": 1775132322120062191,
+        "size": 6870
       }
     },
     "logics/backlog/item_570_regression_coverage_and_closure_for_destructive_dialog_enter_confirmation_behavior.md": {
@@ -47835,10 +47857,10 @@
           "Complexity": "Medium",
           "Confidence": "97% (the main product tradeoff is explicit and localized, and the remaining keyboard-scope details are now locked to the current delete-dialog shape with focus preserved on cancel)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Destructive-action ergonomics / keyboard flow / confirmation safety",
           "Understanding": "97% (the user intent is specific: when a delete confirmation opens, pressing Enter should confirm faster without broadening the rule to unrelated confirmation dialogs)"
         },
@@ -47958,8 +47980,8 @@
         "title": "Regression coverage and closure for destructive dialog Enter confirmation behavior"
       },
       "signature": {
-        "mtime_ns": 1775124699158658845,
-        "size": 6882
+        "mtime_ns": 1775132322330380750,
+        "size": 6883
       }
     },
     "logics/backlog/item_571_modeling_table_batch_mode_state_selection_contract_and_explicit_entry_exit_behavior.md": {
@@ -47974,10 +47996,10 @@
           "Complexity": "High",
           "Confidence": "98% (the main delete-impact policy is explicit, the batch-mode UX now clearly separates multi-selection context from single-item editing, and the remaining list-state behaviors are now locked)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Modeling list ergonomics / batch destructive actions / dependency-aware deletion",
           "Understanding": "97% (the requested user value is clear: delete several modeling items in one operation, but only through an explicit multi-selection mode that does not break existing row-to-edit behavior)"
         },
@@ -48110,8 +48132,8 @@
         "title": "Modeling table batch mode state, selection contract, and explicit entry exit behavior"
       },
       "signature": {
-        "mtime_ns": 1775124699159631104,
-        "size": 8872
+        "mtime_ns": 1775132322556298378,
+        "size": 8873
       }
     },
     "logics/backlog/item_572_modeling_table_checkbox_ui_and_batch_context_panel_wiring.md": {
@@ -48126,10 +48148,10 @@
           "Complexity": "High",
           "Confidence": "98% (the main delete-impact policy is explicit, the batch-mode UX now clearly separates multi-selection context from single-item editing, and the remaining list-state behaviors are now locked)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Modeling list ergonomics / batch destructive actions / dependency-aware deletion",
           "Understanding": "97% (the requested user value is clear: delete several modeling items in one operation, but only through an explicit multi-selection mode that does not break existing row-to-edit behavior)"
         },
@@ -48262,8 +48284,8 @@
         "title": "Modeling table checkbox UI and batch context panel wiring"
       },
       "signature": {
-        "mtime_ns": 1775124699160998282,
-        "size": 8813
+        "mtime_ns": 1775132322759757787,
+        "size": 8814
       }
     },
     "logics/backlog/item_573_batch_delete_preflight_confirmation_and_one_operation_execution_for_modeling_tables.md": {
@@ -48278,10 +48300,10 @@
           "Complexity": "High",
           "Confidence": "98% (the main delete-impact policy is explicit, the batch-mode UX now clearly separates multi-selection context from single-item editing, and the remaining list-state behaviors are now locked)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Modeling list ergonomics / batch destructive actions / dependency-aware deletion",
           "Understanding": "97% (the requested user value is clear: delete several modeling items in one operation, but only through an explicit multi-selection mode that does not break existing row-to-edit behavior)"
         },
@@ -48414,8 +48436,8 @@
         "title": "Batch delete preflight confirmation and one operation execution for modeling tables"
       },
       "signature": {
-        "mtime_ns": 1775124699162732756,
-        "size": 8871
+        "mtime_ns": 1775132322949692730,
+        "size": 8872
       }
     },
     "logics/backlog/item_574_regression_coverage_and_closure_for_modeling_table_batch_delete_flows.md": {
@@ -48430,10 +48452,10 @@
           "Complexity": "High",
           "Confidence": "98% (the main delete-impact policy is explicit, the batch-mode UX now clearly separates multi-selection context from single-item editing, and the remaining list-state behaviors are now locked)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Modeling list ergonomics / batch destructive actions / dependency-aware deletion",
           "Understanding": "97% (the requested user value is clear: delete several modeling items in one operation, but only through an explicit multi-selection mode that does not break existing row-to-edit behavior)"
         },
@@ -48566,8 +48588,8 @@
         "title": "Regression coverage and closure for modeling table batch delete flows"
       },
       "signature": {
-        "mtime_ns": 1775124699164137394,
-        "size": 8843
+        "mtime_ns": 1775132323147331623,
+        "size": 8844
       }
     },
     "logics/backlog/item_575_canvas_shift_click_multi_selection_state_and_node_only_selection_contract.md": {
@@ -48582,10 +48604,10 @@
           "Complexity": "High",
           "Confidence": "97% (the current canvas already supports single-node selection and single-node drag, and the remaining grouped-selection semantics are now locked to a node-only V1 with explicit group-drag and summary behavior)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Canvas ergonomics / multi selection / grouped movement",
           "Understanding": "97% (the feature goal is clear: support canvas-side multi-selection with `Shift+click`, then move the selected set together on the 2D modeling canvas)"
         },
@@ -48716,8 +48738,8 @@
         "title": "Canvas Shift click multi selection state and node only selection contract"
       },
       "signature": {
-        "mtime_ns": 1775124699165670115,
-        "size": 7708
+        "mtime_ns": 1775132323338834372,
+        "size": 7709
       }
     },
     "logics/backlog/item_576_grouped_node_drag_and_persisted_multi_move_behavior_on_the_2d_modeling_canvas.md": {
@@ -48732,10 +48754,10 @@
           "Complexity": "High",
           "Confidence": "97% (the current canvas already supports single-node selection and single-node drag, and the remaining grouped-selection semantics are now locked to a node-only V1 with explicit group-drag and summary behavior)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Canvas ergonomics / multi selection / grouped movement",
           "Understanding": "97% (the feature goal is clear: support canvas-side multi-selection with `Shift+click`, then move the selected set together on the 2D modeling canvas)"
         },
@@ -48866,8 +48888,8 @@
         "title": "Grouped node drag and persisted multi move behavior on the 2D modeling canvas"
       },
       "signature": {
-        "mtime_ns": 1775124699167187795,
-        "size": 7713
+        "mtime_ns": 1775132323538749246,
+        "size": 7714
       }
     },
     "logics/backlog/item_577_canvas_multi_selection_inspector_summary_and_single_selection_compatibility_wiring.md": {
@@ -48882,10 +48904,10 @@
           "Complexity": "High",
           "Confidence": "97% (the current canvas already supports single-node selection and single-node drag, and the remaining grouped-selection semantics are now locked to a node-only V1 with explicit group-drag and summary behavior)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Canvas ergonomics / multi selection / grouped movement",
           "Understanding": "97% (the feature goal is clear: support canvas-side multi-selection with `Shift+click`, then move the selected set together on the 2D modeling canvas)"
         },
@@ -49016,8 +49038,8 @@
         "title": "Canvas multi selection inspector summary and single selection compatibility wiring"
       },
       "signature": {
-        "mtime_ns": 1775124699168743059,
-        "size": 7728
+        "mtime_ns": 1775132323728857107,
+        "size": 7729
       }
     },
     "logics/backlog/item_578_regression_coverage_and_closure_for_canvas_multi_selection_and_grouped_move_behavior.md": {
@@ -49032,10 +49054,10 @@
           "Complexity": "High",
           "Confidence": "97% (the current canvas already supports single-node selection and single-node drag, and the remaining grouped-selection semantics are now locked to a node-only V1 with explicit group-drag and summary behavior)",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Canvas ergonomics / multi selection / grouped movement",
           "Understanding": "97% (the feature goal is clear: support canvas-side multi-selection with `Shift+click`, then move the selected set together on the 2D modeling canvas)"
         },
@@ -49116,7 +49138,8 @@
           "Notes": [
             "- Derived from request `req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas`.",
             "- Source file: `logics/request/req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas.md`.",
-            "- Request context seeded into this backlog item from `logics/request/req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas.md`."
+            "- Request context seeded into this backlog item from `logics/request/req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas.md`.",
+            "- Task `task_092_super_orchestration_delivery_execution_for_req_114_to_req_117_with_validation_gates_and_staged_checkpoints` was finished via `logics_flow.py finish task` on 2026-04-02."
           ],
           "Priority": [
             "- Impact:",
@@ -49166,8 +49189,8 @@
         "title": "Regression coverage and closure for canvas multi selection and grouped move behavior"
       },
       "signature": {
-        "mtime_ns": 1775124699170344074,
-        "size": 7732
+        "mtime_ns": 1775132301980135493,
+        "size": 7919
       }
     },
     "logics/request/req_000_kickoff_v1_electrical_plan_editor.md": {
@@ -71030,13 +71053,13 @@
         },
         "indicators": {
           "Complexity": "High",
-          "Confidence": "92% (persistence and pathfinding fixes are well-bounded; architecture refactors carry higher delivery risk and are explicitly scoped to safe increments)",
-          "From version": "1.4.4",
+          "Confidence": "98% (final lint/typecheck/test:ci/build/Playwright gates passed on the completed bundle)",
+          "From version": "1.4.4 (completed through `task_091`)",
           "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Technical hardening / persistence safety / runtime performance / architecture quality",
-          "Understanding": "97% (all 12 issues sourced from a systematic audit of the live codebase at v1.4.4 \u2014 root causes are confirmed, fixes are scoped conservatively)"
+          "Understanding": "99% (delivery complete; each audit item is now mapped to implemented code paths and regression evidence)"
         },
         "kind": "request",
         "path": "logics/request/req_113_technical_debt_hardening_persistence_safety_performance_and_architecture_quality.md",
@@ -71087,7 +71110,7 @@
             "- AC8: Unit tests exist for the five listed controller hooks and run in isolation without full UI setup.",
             "- AC9: `persistence.migrations.spec.ts` exists and covers happy-path migration from each persisted schema version and corrupt-input handling at each step.",
             "- AC10: All writes to `connectorCavityOccupancy` and `splicePortOccupancy` are guarded by `isValidSlotIndex()`; out-of-bounds writes are rejected without corrupting the map.",
-            "- AC11: Canvas viewport state is stored in Redux and restored by undo/redo alongside entity state.",
+            "- AC11: Canvas viewport state is Redux-backed and undo/redo restores it alongside entity state unless the explicit opt-out preference is disabled.",
             "- AC12: `ui.lastError` is typed as `AppError | null`; all existing raw-string error assignments are updated; the error display component renders the structured fields.",
             ""
           ],
@@ -71244,8 +71267,8 @@
             "- Affected files: all reducers in `src/store/reducer/` that write to occupancy maps; `src/store/reducer/shared.ts`.",
             "",
             "### D4 \u2014 Canvas viewport in undo/redo history",
-            "- The canvas viewport state (scale, offset, snap settings) must be persisted to the Redux store rather than living exclusively in local hook state.",
-            "- The `useStoreHistory` hook must include canvas viewport snapshots in its history entries so that undo/redo restores both entity state and canvas position together.",
+            "- The canvas viewport state (scale, offset, snap settings) must be available from Redux-backed per-network view state rather than being invisible to undo/redo.",
+            "- The `useStoreHistory` hook must restore both entity state and canvas position together, while allowing an explicit opt-out that preserves the current viewport during undo/redo.",
             "- A settings toggle may be provided to disable viewport restoration on undo if the user prefers entity-only undo.",
             "- Affected files: `src/store/types.ts`, `src/app/hooks/useStoreHistory.ts`, relevant canvas hooks.",
             "",
@@ -71327,8 +71350,8 @@
         "title": "Technical debt hardening: persistence safety, performance, and architecture quality"
       },
       "signature": {
-        "mtime_ns": 1775124698522725891,
-        "size": 18699
+        "mtime_ns": 1775131358136069839,
+        "size": 18697
       }
     },
     "logics/request/req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action.md": {
@@ -71345,7 +71368,7 @@
           "From version": "1.4.4",
           "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Modeling form ergonomics / catalog readability / repetitive-entry speed",
           "Understanding": "96% (the requested scope is clear: improve connector/splice catalog option readability and reduce repetitive scrolling during chained create flows)"
         },
@@ -71559,8 +71582,8 @@
         "title": "Connector and splice catalog labels show names and create forms support chained New action"
       },
       "signature": {
-        "mtime_ns": 1775121148946121829,
-        "size": 13251
+        "mtime_ns": 1775132323922105499,
+        "size": 13250
       }
     },
     "logics/request/req_115_keyboard_confirmation_shortcut_for_delete_modals_with_explicit_safety_policy.md": {
@@ -71577,7 +71600,7 @@
           "From version": "1.4.4",
           "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Destructive-action ergonomics / keyboard flow / confirmation safety",
           "Understanding": "97% (the user intent is specific: when a delete confirmation opens, pressing Enter should confirm faster without broadening the rule to unrelated confirmation dialogs)"
         },
@@ -71774,8 +71797,8 @@
         "title": "Keyboard confirmation shortcut for delete modals with explicit safety policy"
       },
       "signature": {
-        "mtime_ns": 1775124698527865895,
-        "size": 10278
+        "mtime_ns": 1775132324075116288,
+        "size": 10277
       }
     },
     "logics/request/req_116_batch_delete_mode_for_modeling_tables_with_explicit_multi_selection_and_mixed_impact_handling.md": {
@@ -71792,7 +71815,7 @@
           "From version": "1.4.4",
           "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Modeling list ergonomics / batch destructive actions / dependency-aware deletion",
           "Understanding": "97% (the requested user value is clear: delete several modeling items in one operation, but only through an explicit multi-selection mode that does not break existing row-to-edit behavior)"
         },
@@ -72057,8 +72080,8 @@
         "title": "Batch delete mode for modeling tables with explicit multi-selection and mixed-impact handling"
       },
       "signature": {
-        "mtime_ns": 1775124698529773620,
-        "size": 14262
+        "mtime_ns": 1775132324221216385,
+        "size": 14261
       }
     },
     "logics/request/req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas.md": {
@@ -72075,7 +72098,7 @@
           "From version": "1.4.4",
           "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Canvas ergonomics / multi selection / grouped movement",
           "Understanding": "97% (the feature goal is clear: support canvas-side multi-selection with `Shift+click`, then move the selected set together on the 2D modeling canvas)"
         },
@@ -72304,8 +72327,8 @@
         "title": "Shift click multi selection and grouped move on the 2D modeling canvas"
       },
       "signature": {
-        "mtime_ns": 1775124698531129882,
-        "size": 12532
+        "mtime_ns": 1775132324364675581,
+        "size": 12531
       }
     },
     "logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md": {
@@ -86186,10 +86209,10 @@
           "Complexity": "High",
           "Confidence": "93%",
           "From version": "1.4.4",
-          "Progress": "0%",
+          "Progress": "100%",
           "Reminder": "Update status/understanding/confidence/progress and dependencies/references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Draft",
+          "Status": "Done",
           "Theme": "Technical hardening / orchestration across persistence, performance, architecture, and robustness",
           "Understanding": "96%"
         },
@@ -86283,15 +86306,15 @@
           ],
           "Decision framing": [
             "- Product framing: Not needed (this is a purely technical hardening wave).",
-            "- Architecture framing: `item_559` (C2 long-term consolidation) and `item_563` (canvas state in store) may each warrant a follow-up ADR; record the need in the task report if confirmed during delivery.",
+            "- Architecture framing: `item_559` (C2 long-term consolidation) may still warrant a follow-up ADR; `item_563` closed by reusing the existing per-network view-state contract without adding a new store slice.",
             ""
           ],
           "Definition of Done (DoD)": [
-            "- [ ] All 12 backlog items implemented and acceptance criteria covered.",
-            "- [ ] Final integration gate executed and results captured.",
-            "- [ ] Linked request and backlog docs updated at each wave closure.",
-            "- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
-            "- [ ] Status is `Done` and progress is `100%`.",
+            "- [x] All 12 backlog items implemented and acceptance criteria covered.",
+            "- [x] Final integration gate executed and results captured.",
+            "- [x] Linked request and backlog docs updated at each wave closure.",
+            "- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
+            "- [x] Status is `Done` and progress is `100%`.",
             ""
           ],
           "Delivery checkpoints": [
@@ -86302,7 +86325,7 @@
           ],
           "Links": [
             "- Product brief(s): (none)",
-            "- Architecture decision(s): (none yet \u2014 follow-up ADRs may be triggered by `item_559` and `item_563`)",
+            "- Architecture decision(s): (none \u2014 `item_563` did not require a new ADR after the implementation reused the existing network-scoped viewport state)",
             "- Request: `logics/request/req_113_technical_debt_hardening_persistence_safety_performance_and_architecture_quality.md`",
             "- Backlog items:",
             "  - `logics/backlog/item_553_safe_json_parse_wrapper_and_boot_recovery_ui_for_corrupted_localstorage.md`",
@@ -86329,31 +86352,31 @@
           "Plan": [
             "",
             "## Wave A \u2014 Persistence safety (critical)",
-            "- [ ] 1. Deliver `item_553`: safe `parseJsonSafe<T>()` wrapper and boot recovery UI.",
-            "- [ ] 2. Deliver `item_554`: migration backup, rollback on failure, and explicit user feedback.",
-            "- [ ] 3. Deliver `item_555`: localStorage quota awareness and `QuotaExceededError` surfacing.",
-            "- [ ] A-GATE: Run `npm run -s lint && npm run -s typecheck && npm test -- --run src/tests/persistence && npm run -s build`. All green before proceeding.",
+            "- [x] 1. Deliver `item_553`: safe `parseJsonSafe<T>()` wrapper and boot recovery UI.",
+            "- [x] 2. Deliver `item_554`: migration backup, rollback on failure, and explicit user feedback.",
+            "- [x] 3. Deliver `item_555`: localStorage quota awareness and `QuotaExceededError` surfacing.",
+            "- [x] A-GATE: Run `npm run -s lint && npm run -s typecheck && npm test -- --run src/tests/persistence && npm run -s build`. All green before proceeding.",
             "",
             "## Wave B \u2014 Performance",
-            "- [ ] 4. Deliver `item_556`: replace `queue.sort()` with `MinHeap` in pathfinding.",
-            "- [ ] 5. Deliver `item_557`: memoize `selectRoutingGraphIndex` with structural `createSelector`.",
-            "- [ ] B-GATE: Run `npm run -s typecheck && npm test -- --run src/tests/core.pathfinding.spec.ts src/tests/core.graph.spec.ts && npm run -s build`. All green before proceeding.",
+            "- [x] 4. Deliver `item_556`: replace `queue.sort()` with `MinHeap` in pathfinding.",
+            "- [x] 5. Deliver `item_557`: memoize `selectRoutingGraphIndex` with structural `createSelector`.",
+            "- [x] B-GATE: Run `npm run -s typecheck && npm test -- --run src/tests/core.pathfinding.spec.ts src/tests/core.graph.spec.ts && npm run -s build`. All green before proceeding.",
             "",
             "## Wave C \u2014 Architecture quality",
-            "- [ ] 6. Deliver `item_558`: AppController Context providers, `useMemo` on derived state objects, and `ModelingController` extraction. Validate after each increment.",
-            "- [ ] 7. Deliver `item_559`: audit all domain reducers for missing sync calls, add missing calls, and introduce enforcement wrapper.",
-            "- [ ] C-GATE: Run `npm run -s lint && npm run -s typecheck && npm test -- --run src/tests/app.ui src/tests/store.reducer && npm run -s build`. All green before proceeding.",
+            "- [x] 6. Deliver `item_558`: AppController Context providers, `useMemo` on derived state objects, and `ModelingController` extraction. Validate after each increment.",
+            "- [x] 7. Deliver `item_559`: audit all domain reducers for missing sync calls, add missing calls, and introduce enforcement wrapper.",
+            "- [x] C-GATE: Run `npm run -s lint && npm run -s typecheck && npm test -- --run src/tests/app.ui src/tests/store.reducer && npm run -s build`. All green before proceeding.",
             "",
             "## Wave D \u2014 Robustness and testing",
-            "- [ ] 8. Deliver `item_560`: unit tests for the five controller hooks in isolation.",
-            "- [ ] 9. Deliver `item_561`: dedicated migration spec with version fixtures and corrupt-input coverage.",
-            "- [ ] 10. Deliver `item_562`: universal occupancy index validation before all occupancy map writes.",
-            "- [ ] 11. Deliver `item_564`: structured `AppError` type replacing raw `lastError` string.",
-            "- [ ] 12. Deliver `item_563`: canvas viewport state in store and undo/redo history integration. (Deliver last \u2014 highest architectural impact within Wave D.)",
-            "- [ ] D-GATE: Run `npm run -s typecheck && npm run -s test:ci && npm run -s build`. All green before final gate.",
+            "- [x] 8. Deliver `item_560`: unit tests for the five controller hooks in isolation.",
+            "- [x] 9. Deliver `item_561`: dedicated migration spec with version fixtures and corrupt-input coverage.",
+            "- [x] 10. Deliver `item_562`: universal occupancy index validation before all occupancy map writes.",
+            "- [x] 11. Deliver `item_564`: structured `AppError` type replacing raw `lastError` string.",
+            "- [x] 12. Deliver `item_563`: canvas viewport state in store and undo/redo history integration. (Delivered by reusing existing per-network view state plus undo/redo opt-out.)",
+            "- [x] D-GATE: Run `npm run -s typecheck && npm run -s test:ci && npm run -s build`. All green before final gate.",
             "",
             "## Final integration",
-            "- [ ] FINAL: Run full integration gate (see Validation section below). Update all linked request/backlog/task docs. Record closure notes.",
+            "- [x] FINAL: Run full integration gate (see Validation section below). Update all linked request/backlog/task docs. Record closure notes.",
             ""
           ],
           "Report": [
@@ -86363,8 +86386,42 @@
             "  - Wave B second because performance regressions are measurable and test-provable; pathfinding and graph fixes are independent of each other.",
             "  - Wave C third because architecture changes carry the highest regression surface; each increment is validated before the next.",
             "  - Wave D last because these items raise the robustness floor without blocking other waves, except `item_561` which depends on Wave A.",
-            "- Completed waves: (none yet)",
-            "- Latest validation snapshot: (none yet)"
+            "- Completed waves:",
+            "  - Wave A (`item_553` `item_554` `item_555`) delivered:",
+            "    - persistence deserialization now goes through `parseJsonSafe()` and corrupted boot payloads surface an explicit recovery UI instead of silently overwriting storage;",
+            "    - migration attempts now create dated pre-migration backup keys, preserve the original payload on failure, and expose rollback feedback through the recovery surface;",
+            "    - local persistence writes now estimate storage pressure, surface near-quota warnings, and distinguish `QuotaExceededError` failures from generic write failures.",
+            "  - Wave B (`item_556` `item_557`) delivered:",
+            "    - Dijkstra route selection now uses a generic `MinHeap` priority queue instead of sorting the whole candidate list on every iteration, while preserving the existing deterministic tie-break comparator;",
+            "    - `selectRoutingGraphIndex()` now memoizes its derived `nodes` and `segments` collections by entity-slice identity and returns the cached graph on unrelated UI-only state changes.",
+            "  - Wave C (`item_558` `item_559`) delivered:",
+            "    - modeling surfaces now run under explicit contexts for dispatch plus connector, segment, and wire handlers; deeply nested modeling form panels consume those handler namespaces directly instead of relying only on prop drilling;",
+            "    - `forms`, `canvas`, and `selectionEntities` now expose memoized derived objects, and persistence health handling moved into a dedicated hook so `AppController.tsx` dropped from 1120 lines to 1110 lines;",
+            "    - scoped domain mutations now all flow through an explicit `runScopedDomainReducer()` wrapper with an invariant comment block in `reducer.ts`, and a dedicated reducer test asserts root/scoped-state alignment after representative mutations.",
+            "  - Wave D (partial) (`item_560` `item_561`) delivered:",
+            "    - added isolated `renderHook()` coverage for the five highest-risk controller/state hooks without mounting `AppController`, with one contract test and one representative mutation test per hook;",
+            "    - added `persistence.migrations.spec.ts` covering pre-timestamp, timestamped, and current versioned payload fixtures, migration-step failure recovery, and pre-migration backup lifecycle cleanup.",
+            "  - Wave D (`item_562` `item_563` `item_564`) delivered:",
+            "    - all direct connector/splice occupancy writes now guard out-of-range indices with `console.warn()` plus no-op semantics, and wire occupancy helper paths re-validate endpoint bounds before any release/write mutation;",
+            "    - undo/redo now supports a persisted `Restore network viewport on undo/redo` preference, preserving the current viewport when disabled and restoring the captured per-network viewport when enabled;",
+            "    - `ui.lastError` is now a typed `AppError`, with normalized error codes, message-preserving migrations/recovery, updated persistence feedback wiring, and error banner rendering of both `message` and `code`.",
+            "- Latest validation snapshot:",
+            "  - `npm run -s typecheck`",
+            "  - `npm test -- --run src/tests/app.ui.network-summary-workflow-polish.spec.tsx src/tests/app.ui.settings.spec.tsx`",
+            "  - `npm run -s lint`",
+            "  - `npm run -s typecheck`",
+            "  - `npm run -s test:ci`",
+            "  - `npm run -s build`",
+            "  - `npx playwright test`",
+            "  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`",
+            "  - `npm run -s typecheck`",
+            "  - `npm test -- --run src/tests/store.reducer.entities.spec.ts src/tests/store.reducer.networks.spec.ts src/tests/store.reducer.wires.spec.ts src/tests/store.reducer.catalog.spec.ts src/tests/store.reducer.occupancy.spec.ts src/tests/store.create-store.spec.ts src/tests/persistence.localStorage.spec.ts src/tests/app.ui.persistence-feedback.spec.tsx src/tests/sample-network.compat.spec.ts src/tests/sample-network.fixture.spec.ts`",
+            "  - `npm run -s typecheck`",
+            "  - `npm test -- --run src/tests/entity-forms-state.hook.spec.ts src/tests/canvas-state.hook.spec.ts src/tests/app-controller-selection-handlers-domain.hook.spec.ts src/tests/app-controller-workspace-handlers-domain.hook.spec.ts src/tests/app-controller-modeling-handlers-assembly.hook.spec.ts src/tests/persistence.migrations.spec.ts`",
+            "  - `npm run -s lint`",
+            "  - `npm run -s typecheck`",
+            "  - `npm test -- --run $(rg --files src/tests | rg '(^src/tests/app\\\\.ui.*\\\\.spec\\\\.tsx$)|(^src/tests/store\\\\.reducer.*\\\\.spec\\\\.ts$)|(^src/tests/store\\\\.reducer.*\\\\.spec\\\\.tsx$)' | tr '\\n' ' ')`",
+            "  - `npm run -s build`"
           ],
           "Scope": [
             "- In:",
@@ -86403,8 +86460,8 @@
         "title": "Orchestration delivery execution for req_113 technical debt hardening"
       },
       "signature": {
-        "mtime_ns": 1775124699336180622,
-        "size": 10921
+        "mtime_ns": 1775131308798320141,
+        "size": 15267
       }
     },
     "logics/tasks/task_092_super_orchestration_delivery_execution_for_req_114_to_req_117_with_validation_gates_and_staged_checkpoints.md": {
@@ -86417,14 +86474,14 @@
         },
         "indicators": {
           "Complexity": "High",
-          "Confidence": "98% (scope, backlog breakdown, companion docs, and orchestration links are now coherent across the full delivery bundle)",
-          "From version": "1.4.4",
-          "Progress": "0%",
+          "Confidence": "99% (validation passed and the closure chain is now coherent across all linked workflow docs)",
+          "From version": "1.4.4 (delivery closed and propagated on 2026-04-02)",
+          "Progress": "100% (implementation complete, validation captured, linked backlog items and requests closed)",
           "Reminder": "Update status/understanding/confidence/progress and dependencies/references when you edit this doc.",
           "Schema version": "1.0",
-          "Status": "Ready",
+          "Status": "Done",
           "Theme": "Modeling productivity / destructive-action ergonomics / canvas interaction",
-          "Understanding": "95%"
+          "Understanding": "99% (the full req_114 to req_117 bundle is implemented, validated, and now synchronized across task, backlog, and request docs)"
         },
         "kind": "task",
         "path": "logics/tasks/task_092_super_orchestration_delivery_execution_for_req_114_to_req_117_with_validation_gates_and_staged_checkpoints.md",
@@ -86445,7 +86502,10 @@
             "req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action",
             "req_115_keyboard_confirmation_shortcut_for_delete_modals_with_explicit_safety_policy",
             "req_116_batch_delete_mode_for_modeling_tables_with_explicit_multi_selection_and_mixed_impact_handling",
-            "req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas"
+            "req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas",
+            "req_051_catalog_screen_with_catalog_item_crud_navigation_integration_and_required_manufacturer_reference_connection_count",
+            "req_109_new_and_edit_actions_scroll_to_corresponding_form_panel",
+            "req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens"
           ],
           "spec": [],
           "task": [
@@ -86511,12 +86571,12 @@
             ""
           ],
           "Definition of Done (DoD)": [
-            "- [ ] Scope implemented and acceptance criteria covered.",
-            "- [ ] Validation commands executed and results captured.",
-            "- [ ] Linked request/backlog/task docs updated during completed waves and at closure.",
-            "- [ ] Product brief and ADR links remain synchronized with the delivered scope.",
-            "- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
-            "- [ ] Status is `Done` and progress is `100%`.",
+            "- [x] Scope implemented and acceptance criteria covered.",
+            "- [x] Validation commands executed and results captured.",
+            "- [x] Linked request/backlog/task docs updated during completed waves and at closure.",
+            "- [x] Product brief and ADR links remain synchronized with the delivered scope.",
+            "- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
+            "- [x] Status is `Done` and progress is `100%`.",
             ""
           ],
           "Delivery checkpoints": [
@@ -86538,31 +86598,61 @@
             ""
           ],
           "Plan": [
-            "- [ ] 1. Confirm scope, companion docs, and acceptance-criteria dependencies across `req_114` to `req_117` and items `565` to `578`.",
-            "- [ ] 2. Deliver Wave 1 for `req_114`:",
+            "- [x] 1. Confirm scope, companion docs, and acceptance-criteria dependencies across `req_114` to `req_117` and items `565` to `578`.",
+            "- [x] 2. Deliver Wave 1 for `req_114`:",
             "  - `item_565`",
             "  - `item_566`",
             "  - `item_567`",
-            "- [ ] 3. Deliver Wave 2 for `req_115`:",
+            "- [x] 3. Deliver Wave 2 for `req_115`:",
             "  - `item_568`",
             "  - `item_569`",
             "  - `item_570`",
-            "- [ ] 4. Deliver Wave 3 for `req_116`:",
+            "- [x] 4. Deliver Wave 3 for `req_116`:",
             "  - `item_571`",
             "  - `item_572`",
             "  - `item_573`",
             "  - `item_574`",
-            "- [ ] 5. Deliver Wave 4 for `req_117`:",
+            "- [x] 5. Deliver Wave 4 for `req_117`:",
             "  - `item_575`",
             "  - `item_576`",
             "  - `item_577`",
             "  - `item_578`",
-            "- [ ] 6. Checkpoint each completed wave in a commit-ready state, validate it, and update the linked Logics docs.",
-            "- [ ] CHECKPOINT: leave the current wave commit-ready and update the linked Logics docs before continuing.",
-            "- [ ] FINAL: Update related Logics docs",
+            "- [x] 6. Checkpoint each completed wave in a commit-ready state, validate it, and update the linked Logics docs.",
+            "- [x] CHECKPOINT: leave the current wave commit-ready and update the linked Logics docs before continuing.",
+            "- [x] FINAL: Update related Logics docs",
             ""
           ],
-          "Report": [],
+          "Report": [
+            "- Current blockers: none.",
+            "- Completed waves:",
+            "  - Wave 1 (`req_114`) delivered:",
+            "    - connector/splice catalog labels now include catalog names with safe fallback behavior;",
+            "    - all Modeling create forms now expose a bottom `New` action in create mode only;",
+            "    - targeted regression coverage updated for dropdown labels and chained create resets.",
+            "  - Wave 2 (`req_115`) delivered:",
+            "    - direct delete dialogs now support explicit dialog-level `Enter` confirmation without moving visible focus away from `Cancel`;",
+            "    - cascade delete dialogs now also keep `Cancel` focused while supporting `Enter` confirmation;",
+            "    - targeted delete-confirmation regression coverage now includes keyboard `Enter` and `Escape` behavior.",
+            "  - Wave 3 (`req_116`) delivered:",
+            "    - Modeling tables now expose an explicit `Select multiple` mode with checkbox-based selection, `select all visible`, and dedicated batch actions;",
+            "    - the right-side edit column now switches to a batch context panel while multi-selection is active, keeping single-item editing out of scope for the mode;",
+            "    - batch delete now runs a preflight summary, blocks mixed selections when any entry is blocked, and commits safe multi-delete operations as one undoable history step.",
+            "  - Wave 4 (`req_117`) delivered:",
+            "    - the 2D Modeling canvas now supports node-only `Shift+click` multi-selection with explicit floating feedback and a clear-selection action;",
+            "    - dragging any selected node now moves the full selected group while preserving relative offsets and keeping `Shift+drag` on empty canvas reserved for pan;",
+            "    - grouped canvas movement now persists as a multi-node layout update, while single-node drag and existing callout interactions remain intact.",
+            "- Latest validation snapshot:",
+            "  - `npm run -s typecheck`",
+            "  - `npm run -s lint`",
+            "  - `npm test -- --run src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.catalog.spec.tsx`",
+            "  - `npm test -- --run src/tests/app.ui.delete-confirmations.spec.tsx src/tests/app.ui.list-ergonomics.spec.tsx`",
+            "  - `npm test -- --run src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.navigation-canvas-selection-gating.spec.tsx`",
+            "  - `npm test -- --run src/tests/app.ui.network-summary-workflow-polish.spec.tsx`",
+            "  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`",
+            "- Finished on 2026-04-02.",
+            "- Linked backlog item(s): `item_565_connector_and_splice_catalog_selector_labels_include_catalog_names_and_safe_fallback_formatting`, `item_578_regression_coverage_and_closure_for_canvas_multi_selection_and_grouped_move_behavior`",
+            "- Related request(s): `req_051_catalog_screen_with_catalog_item_crud_navigation_integration_and_required_manufacturer_reference_connection_count`, `req_109_new_and_edit_actions_scroll_to_corresponding_form_panel`, `req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens`, `req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action`, `req_116_batch_delete_mode_for_modeling_tables_with_explicit_multi_selection_and_mixed_impact_handling`, `req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas`"
+          ],
           "Validation": [
             "- `npm run -s lint`",
             "- `npm run -s typecheck`",
@@ -86571,14 +86661,16 @@
             "- `npm test -- --run src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.navigation-canvas-selection-gating.spec.tsx`",
             "- run narrower targeted subsets during each wave before re-running the broader integrated matrix",
             "- confirm each completed wave leaves the repository in a commit-ready state",
+            "- Finish workflow executed on 2026-04-02.",
+            "- Linked backlog/request close verification passed.",
             ""
           ]
         },
         "title": "Super orchestration delivery execution for req 114 to req 117 with validation gates and staged checkpoints"
       },
       "signature": {
-        "mtime_ns": 1775124699336750669,
-        "size": 8012
+        "mtime_ns": 1775132350938568972,
+        "size": 11519
       }
     }
   }

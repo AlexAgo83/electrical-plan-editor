@@ -1,10 +1,10 @@
 ## item_576_grouped_node_drag_and_persisted_multi_move_behavior_on_the_2d_modeling_canvas - Grouped node drag and persisted multi move behavior on the 2D modeling canvas
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97% (the feature goal is clear: support canvas-side multi-selection with `Shift+click`, then move the selected set together on the 2D modeling canvas)
 > Confidence: 97% (the current canvas already supports single-node selection and single-node drag, and the remaining grouped-selection semantics are now locked to a node-only V1 with explicit group-drag and summary behavior)
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Canvas ergonomics / multi selection / grouped movement
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.

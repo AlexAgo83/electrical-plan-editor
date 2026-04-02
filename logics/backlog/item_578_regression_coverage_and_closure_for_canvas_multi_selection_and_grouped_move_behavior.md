@@ -1,10 +1,10 @@
 ## item_578_regression_coverage_and_closure_for_canvas_multi_selection_and_grouped_move_behavior - Regression coverage and closure for canvas multi selection and grouped move behavior
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97% (the feature goal is clear: support canvas-side multi-selection with `Shift+click`, then move the selected set together on the 2D modeling canvas)
 > Confidence: 97% (the current canvas already supports single-node selection and single-node drag, and the remaining grouped-selection semantics are now locked to a node-only V1 with explicit group-drag and summary behavior)
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Canvas ergonomics / multi selection / grouped movement
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -97,3 +97,4 @@ flowchart LR
 - Derived from request `req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas`.
 - Source file: `logics/request/req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas.md`.
 - Request context seeded into this backlog item from `logics/request/req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas.md`.
+- Task `task_092_super_orchestration_delivery_execution_for_req_114_to_req_117_with_validation_gates_and_staged_checkpoints` was finished via `logics_flow.py finish task` on 2026-04-02.
