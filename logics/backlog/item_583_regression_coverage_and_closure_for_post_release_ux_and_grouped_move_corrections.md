@@ -1,10 +1,10 @@
 ## item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections - Regression coverage and closure for post-release UX and grouped-move corrections
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -40,10 +40,10 @@ flowchart LR
 - AC4: The linked request, umbrella backlog item, child backlog items, and orchestration task are updated coherently as the corrective bundle is delivered and closed.
 
 # AC Traceability
-- AC1 -> create-flow regression coverage. Proof: capture in Wave 4 validation and report inside `task_097`.
-- AC2 -> Modeling action-row regression coverage. Proof: capture in Wave 4 validation and report inside `task_097`.
-- AC3 -> canvas grouped-drag regression coverage. Proof: capture in Wave 4 validation and report inside `task_097`.
-- AC4 -> workflow-doc closure evidence. Proof: capture in Wave 4 validation and report inside `task_097`.
+- AC1 -> create-flow regression coverage. Proof: `src/tests/app.ui.creation-flow-ergonomics.spec.tsx` covers the post-create-only bottom `New` contract.
+- AC2 -> Modeling action-row regression coverage. Proof: `src/tests/app.ui.list-ergonomics.spec.tsx` covers the shared action-row placement and icon affordance for `Select multiple`.
+- AC3 -> canvas grouped-drag regression coverage. Proof: `src/tests/app.ui.navigation-canvas.spec.tsx` and `src/tests/store.reducer.sync-invariant.spec.ts` cover localized grouped drag persistence without unrelated plan mutation.
+- AC4 -> workflow-doc closure evidence. Proof: `req_118`, `item_579`, `item_580`, `item_581`, `item_582`, `item_583`, and `task_097` are all synchronized to `Done` after integrated validation and `Logics lint: OK`.
 
 # Decision framing
 - Product framing: Consider

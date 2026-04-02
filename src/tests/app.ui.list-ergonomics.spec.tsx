@@ -183,9 +183,9 @@ describe("App integration UI - list ergonomics", () => {
     switchScreen("modeling");
 
     const connectorsPanel = getPanelByHeading("Connectors");
-    const connectorActions = connectorsPanel.querySelector(".modeling-list-actions") as HTMLElement | null;
+    const connectorActions = connectorsPanel.querySelector(".modeling-list-actions");
     expect(connectorActions).not.toBeNull();
-    if (connectorActions === null) {
+    if (!(connectorActions instanceof HTMLElement)) {
       throw new Error("Expected connector action row.");
     }
 
@@ -202,9 +202,9 @@ describe("App integration UI - list ergonomics", () => {
 
     switchSubScreen("wire");
     const wiresPanel = getPanelByHeading("Wires");
-    const wireActions = wiresPanel.querySelector(".modeling-list-actions") as HTMLElement | null;
+    const wireActions = wiresPanel.querySelector(".modeling-list-actions");
     expect(wireActions).not.toBeNull();
-    if (wireActions === null) {
+    if (!(wireActions instanceof HTMLElement)) {
       throw new Error("Expected wire action row.");
     }
 
