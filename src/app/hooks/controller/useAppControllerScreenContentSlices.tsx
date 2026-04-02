@@ -1,5 +1,8 @@
 import type { ComponentProps, ComponentType, Dispatch, SetStateAction } from "react";
+import type { AppStore } from "../../../store";
 import { InspectorContextPanel } from "../../components/InspectorContextPanel";
+import { ModelingController } from "../../components/controller/ModelingController";
+import type { AppControllerModelingHandlersOrchestrator } from "./useAppControllerModelingHandlersOrchestrator";
 
 type NetworkSummaryPanelProps = ComponentProps<typeof import("../../components/NetworkSummaryPanel").NetworkSummaryPanel>;
 type NetworkScopeWorkspaceContentProps = ComponentProps<
@@ -140,6 +143,15 @@ type ModelingScreenContentSliceParams = Omit<
     resetWireForm: ModelingSecondaryTablesProps["onOpenCreateWire"];
     startWireEdit: ModelingSecondaryTablesProps["onEditWire"];
     handleWireDelete: ModelingSecondaryTablesProps["onDeleteWire"];
+    dispatchAction: (
+      action: Parameters<AppStore["dispatch"]>[0],
+      options?: {
+        trackHistory?: boolean;
+      }
+    ) => void;
+    connectorHandlers: AppControllerModelingHandlersOrchestrator["connector"];
+    segmentHandlers: AppControllerModelingHandlersOrchestrator["segment"];
+    wireHandlers: AppControllerModelingHandlersOrchestrator["wire"];
   };
 
 type AnalysisScreenContentSliceParams = Omit<
@@ -255,6 +267,8 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     selectedSegmentId: params.selectedSegmentId,
     selectedWireId: params.selectedWireId,
     handleNetworkSegmentClick: params.handleNetworkSegmentClick,
+    selectedCanvasNodeIds: params.selectedCanvasNodeIds,
+    clearSelectedCanvasNodes: params.clearSelectedCanvasNodes,
     selectedNodeId: params.selectedNodeId,
     selectedConnectorId: params.selectedConnectorId,
     selectedSpliceId: params.selectedSpliceId,
@@ -341,6 +355,13 @@ export function buildNetworkScopeScreenContentSlice(params: NetworkScopeScreenCo
 
 export function buildModelingScreenContentSlice(params: ModelingScreenContentSliceParams) {
   const modelingPrimaryTablesProps = {
+    activeBatchScope: params.activeBatchScope,
+    batchSelectionIds: params.batchSelectionIds,
+    onEnterBatchMode: params.onEnterBatchMode,
+    onExitBatchMode: params.onExitBatchMode,
+    onToggleBatchSelection: params.onToggleBatchSelection,
+    onSetBatchSelectionForVisible: params.onSetBatchSelectionForVisible,
+    onDeleteSelectedInBatchMode: params.onDeleteSelectedInBatchMode,
     isConnectorSubScreen: params.isConnectorSubScreen,
     connectorFormMode: params.connectorFormMode,
     onOpenCreateConnector: params.resetConnectorForm,
@@ -399,6 +420,13 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     onOpenNodeOnboardingHelp: params.onOpenNodeOnboardingHelp
   } satisfies ModelingPrimaryTablesProps;
   const modelingSecondaryTablesProps = {
+    activeBatchScope: params.activeBatchScope,
+    batchSelectionIds: params.batchSelectionIds,
+    onEnterBatchMode: params.onEnterBatchMode,
+    onExitBatchMode: params.onExitBatchMode,
+    onToggleBatchSelection: params.onToggleBatchSelection,
+    onSetBatchSelectionForVisible: params.onSetBatchSelectionForVisible,
+    onDeleteSelectedInBatchMode: params.onDeleteSelectedInBatchMode,
     isSegmentSubScreen: params.isSegmentSubScreen,
     segmentFormMode: params.segmentFormMode,
     onOpenCreateSegment: params.resetSegmentForm,
@@ -445,6 +473,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     openCatalogSubScreen: params.openCatalogSubScreen,
     isConnectorSubScreen: params.isConnectorSubScreen,
     connectorFormMode: params.connectorFormMode,
+    connectorEditAfterCreate: params.connectorEditAfterCreate,
     openCreateConnectorForm: params.resetConnectorForm,
     handleConnectorSubmit: params.handleConnectorSubmit,
     connectorName: params.connectorName,
@@ -464,6 +493,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     connectorFormError: params.connectorFormError,
     isSpliceSubScreen: params.isSpliceSubScreen,
     spliceFormMode: params.spliceFormMode,
+    spliceEditAfterCreate: params.spliceEditAfterCreate,
     openCreateSpliceForm: params.resetSpliceForm,
     handleSpliceSubmit: params.handleSpliceSubmit,
     spliceName: params.spliceName,
@@ -486,6 +516,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     spliceFormError: params.spliceFormError,
     isNodeSubScreen: params.isNodeSubScreen,
     nodeFormMode: params.nodeFormMode,
+    nodeEditAfterCreate: params.nodeEditAfterCreate,
     openCreateNodeForm: params.resetNodeForm,
     handleNodeSubmit: params.handleNodeSubmit,
     nodeIdInput: params.nodeIdInput,
@@ -505,6 +536,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     nodeFormError: params.nodeFormError,
     isSegmentSubScreen: params.isSegmentSubScreen,
     segmentFormMode: params.segmentFormMode,
+    segmentEditAfterCreate: params.segmentEditAfterCreate,
     openCreateSegmentForm: params.resetSegmentForm,
     handleSegmentSubmit: params.handleSegmentSubmit,
     handleSwapSegmentNodes: params.handleSwapSegmentNodes,
@@ -524,6 +556,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     segmentFormError: params.segmentFormError,
     isWireSubScreen: params.isWireSubScreen,
     wireFormMode: params.wireFormMode,
+    wireEditAfterCreate: params.wireEditAfterCreate,
     openCreateWireForm: params.resetWireForm,
     handleWireSubmit: params.handleWireSubmit,
     handleSwapWireEndpoints: params.handleSwapWireEndpoints,
@@ -583,7 +616,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setWireEndpointBPortIndex: params.setWireEndpointBPortIndex,
     wireEndpointBSlotHint: params.wireEndpointBSlotHint,
     cancelWireEdit: params.cancelWireEdit,
-    wireFormError: params.wireFormError
+    wireFormError: params.wireFormError,
+    modelingBatchSelection: params.modelingBatchSelection
   } satisfies ModelingFormsColumnProps;
 
   return {
@@ -591,12 +625,28 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     modelingSecondaryTablesProps,
     modelingFormsColumnProps,
     modelingLeftColumnContent: (
-      <>
+      <ModelingController
+        dispatchAction={params.dispatchAction}
+        connectorHandlers={params.connectorHandlers}
+        segmentHandlers={params.segmentHandlers}
+        wireHandlers={params.wireHandlers}
+      >
+        <>
         <params.ModelingPrimaryTablesComponent {...modelingPrimaryTablesProps} />
         <params.ModelingSecondaryTablesComponent {...modelingSecondaryTablesProps} />
-      </>
+        </>
+      </ModelingController>
     ),
-    modelingFormsColumnContent: <params.ModelingFormsColumnComponent {...modelingFormsColumnProps} />
+    modelingFormsColumnContent: (
+      <ModelingController
+        dispatchAction={params.dispatchAction}
+        connectorHandlers={params.connectorHandlers}
+        segmentHandlers={params.segmentHandlers}
+        wireHandlers={params.wireHandlers}
+      >
+        <params.ModelingFormsColumnComponent {...modelingFormsColumnProps} />
+      </ModelingController>
+    )
   };
 }
 
@@ -840,6 +890,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setShowShortcutHints: params.setShowShortcutHints,
     keyboardShortcutsEnabled: params.keyboardShortcutsEnabled,
     setKeyboardShortcutsEnabled: params.setKeyboardShortcutsEnabled,
+    restoreViewportOnUndo: params.restoreViewportOnUndo,
+    setRestoreViewportOnUndo: params.setRestoreViewportOnUndo,
     showFloatingInspectorPanel: params.showFloatingInspectorPanel,
     setShowFloatingInspectorPanel: params.setShowFloatingInspectorPanel,
     workspacePanelsLayoutMode: params.workspacePanelsLayoutMode,

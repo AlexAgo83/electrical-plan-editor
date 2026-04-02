@@ -112,6 +112,8 @@ interface SettingsWorkspaceContentProps {
   setShowShortcutHints: (value: boolean) => void;
   keyboardShortcutsEnabled: boolean;
   setKeyboardShortcutsEnabled: (value: boolean) => void;
+  restoreViewportOnUndo: boolean;
+  setRestoreViewportOnUndo: (value: boolean) => void;
   showFloatingInspectorPanel: boolean;
   setShowFloatingInspectorPanel: (value: boolean) => void;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutMode;
@@ -213,6 +215,8 @@ export function SettingsWorkspaceContent({
   setShowShortcutHints,
   keyboardShortcutsEnabled,
   setKeyboardShortcutsEnabled,
+  restoreViewportOnUndo,
+  setRestoreViewportOnUndo,
   showFloatingInspectorPanel,
   setShowFloatingInspectorPanel,
   workspacePanelsLayoutMode,
@@ -636,6 +640,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
             />
             Enable keyboard shortcuts (undo/redo/navigation/issues/view)
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={restoreViewportOnUndo}
+              onChange={(event) => setRestoreViewportOnUndo(event.target.checked)}
+            />
+            Restore network viewport on undo/redo
           </label>
         </div>
         <ul className="settings-shortcut-list">

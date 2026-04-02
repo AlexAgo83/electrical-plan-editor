@@ -26,6 +26,8 @@ interface UseSpliceHandlersParams {
   confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
   spliceFormMode: "idle" | "create" | "edit";
   setSpliceFormMode: (mode: "idle" | "create" | "edit") => void;
+  spliceEditAfterCreate: boolean;
+  setSpliceEditAfterCreate: (value: boolean) => void;
   editingSpliceId: SpliceId | null;
   setEditingSpliceId: (id: SpliceId | null) => void;
   spliceName: string;
@@ -84,6 +86,8 @@ export function useSpliceHandlers({
   confirmAction,
   spliceFormMode,
   setSpliceFormMode,
+  spliceEditAfterCreate: _spliceEditAfterCreate,
+  setSpliceEditAfterCreate,
   editingSpliceId,
   setEditingSpliceId,
   spliceName,
@@ -109,6 +113,7 @@ export function useSpliceHandlers({
 }: UseSpliceHandlersParams) {
   const spliceManufacturerReference = _spliceManufacturerReference;
   const portCount = _portCount;
+  void _spliceEditAfterCreate;
 
   function setSpliceCapacityMode(nextMode: SplicePortMode): void {
     if (nextMode === "unbounded" && spliceCatalogItemId.trim().length > 0) {
@@ -169,6 +174,7 @@ export function useSpliceHandlers({
   function resetSpliceForm(): void {
     const state = store.getState();
     setSpliceFormMode("create");
+    setSpliceEditAfterCreate(false);
     setEditingSpliceId(null);
     setSpliceName("");
     setSpliceTechnicalId(suggestNextSpliceTechnicalId(Object.values(state.splices.byId).map((splice) => splice.technicalId)));
@@ -183,6 +189,7 @@ export function useSpliceHandlers({
 
   function clearSpliceForm(): void {
     setSpliceFormMode("idle");
+    setSpliceEditAfterCreate(false);
     setEditingSpliceId(null);
     setSpliceName("");
     setSpliceTechnicalId("");
@@ -200,8 +207,9 @@ export function useSpliceHandlers({
     dispatchAction(appActions.clearSelection(), { trackHistory: false });
   }
 
-  function startSpliceEdit(splice: Splice): void {
+  function startSpliceEdit(splice: Splice, fromCreate = false): void {
     setSpliceFormMode("edit");
+    setSpliceEditAfterCreate(fromCreate);
     setEditingSpliceId(splice.id);
     setSpliceName(splice.name);
     setSpliceTechnicalId(splice.technicalId);
@@ -306,7 +314,7 @@ export function useSpliceHandlers({
           }
         }
 
-        startSpliceEdit(savedSplice);
+        startSpliceEdit(savedSplice, true);
         return;
       }
       startSpliceEdit(savedSplice);
@@ -329,7 +337,8 @@ export function useSpliceHandlers({
           message: `Delete splice '${splice.name}' (${splice.technicalId})?`,
           confirmLabel: "Delete",
           cancelLabel: "Cancel",
-          intent: "danger"
+          intent: "danger",
+          confirmOnEnter: true
         });
         if (!shouldDelete) {
           return;
@@ -349,6 +358,7 @@ export function useSpliceHandlers({
           confirmLabel: "Delete all",
           cancelLabel: "Cancel",
           intent: "danger",
+          confirmOnEnter: true,
           variant: "deleteCascade",
           summaryCategories: impact.categories,
           summaryNote: impact.note

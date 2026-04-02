@@ -45,6 +45,8 @@ interface UseWireHandlersParams {
   confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
   wireFormMode: "idle" | "create" | "edit";
   setWireFormMode: (mode: "idle" | "create" | "edit") => void;
+  wireEditAfterCreate: boolean;
+  setWireEditAfterCreate: (value: boolean) => void;
   editingWireId: WireId | null;
   setEditingWireId: (id: WireId | null) => void;
   wireName: string;
@@ -115,6 +117,8 @@ export function useWireHandlers({
   confirmAction,
   wireFormMode,
   setWireFormMode,
+  wireEditAfterCreate: _wireEditAfterCreate,
+  setWireEditAfterCreate,
   editingWireId,
   setEditingWireId,
   wireName,
@@ -173,6 +177,7 @@ export function useWireHandlers({
   selectedWire,
   defaultWireSectionMm2
 }: UseWireHandlersParams) {
+  void _wireEditAfterCreate;
   const effectiveDefaultWireSectionMm2 =
     Number.isFinite(defaultWireSectionMm2) && defaultWireSectionMm2 > 0 ? defaultWireSectionMm2 : DEFAULT_WIRE_SECTION_MM2;
   const endpointAIndexTouchedByUserRef = useRef(false);
@@ -546,6 +551,7 @@ export function useWireHandlers({
     lastEndpointAContextRef.current = "";
     lastEndpointBContextRef.current = "";
     setWireFormMode("create");
+    setWireEditAfterCreate(false);
     setEditingWireId(null);
     setWireName("");
     setWireTechnicalId(suggestNextWireTechnicalId(Object.values(state.wires.byId).map((wire) => wire.technicalId)));
@@ -582,6 +588,7 @@ export function useWireHandlers({
     lastEndpointAContextRef.current = "";
     lastEndpointBContextRef.current = "";
     setWireFormMode("idle");
+    setWireEditAfterCreate(false);
     setEditingWireId(null);
     setWireName("");
     setWireTechnicalId("");
@@ -648,10 +655,11 @@ export function useWireHandlers({
     setWireFormError(null);
   }
 
-  function startWireEdit(wire: Wire): void {
+  function startWireEdit(wire: Wire, fromCreate = false): void {
     endpointAIndexTouchedByUserRef.current = false;
     endpointBIndexTouchedByUserRef.current = false;
     setWireFormMode("edit");
+    setWireEditAfterCreate(fromCreate);
     setEditingWireId(wire.id);
     setWireName(wire.name);
     setWireTechnicalId(wire.technicalId);
@@ -898,7 +906,7 @@ export function useWireHandlers({
     const savedWire = nextState.wires.byId[wireId];
     if (savedWire !== undefined) {
       if (wasCreateMode) {
-        startWireEdit(savedWire);
+        startWireEdit(savedWire, true);
         return;
       }
       startWireEdit(savedWire);
@@ -920,7 +928,8 @@ export function useWireHandlers({
         message: `Delete wire ${wireIdentity}?`,
         confirmLabel: "Delete",
         cancelLabel: "Cancel",
-        intent: "danger"
+        intent: "danger",
+        confirmOnEnter: true
       });
       if (!shouldDelete) {
         return;

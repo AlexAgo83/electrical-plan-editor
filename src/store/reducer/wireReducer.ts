@@ -4,6 +4,7 @@ import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { buildRoutingGraphIndex } from "../../core/graph";
 import { findShortestRoute } from "../../core/pathfinding";
+import { resolveSplicePortMode } from "../../core/splicePortMode";
 import type { AppAction } from "../actions";
 import type { AppState } from "../types";
 import {
@@ -19,7 +20,7 @@ import {
   getEndpointKey,
   getEndpointValidationError
 } from "./helpers/wireTransitions";
-import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
+import { bumpRevision, clearLastError, isValidSlotIndex, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
 
 function hasDuplicateWireTechnicalId(state: AppState, wireId: string, technicalId: string): boolean {
   return state.wires.allIds.some((id) => {
@@ -84,6 +85,55 @@ function normalizeWireProtection(
     },
     error: null
   };
+}
+
+function canWriteEndpointOccupancy(state: AppState, endpoint: Parameters<typeof getEndpointOccupant>[1]): boolean {
+  if (endpoint.kind === "connectorCavity") {
+    const connector = state.connectors.byId[endpoint.connectorId];
+    if (connector === undefined) {
+      console.warn("Rejected wire occupancy write for missing connector endpoint.", {
+        connectorId: endpoint.connectorId,
+        cavityIndex: endpoint.cavityIndex
+      });
+      return false;
+    }
+
+    if (!isValidSlotIndex(endpoint.cavityIndex, connector.cavityCount)) {
+      console.warn("Rejected wire occupancy write with out-of-range connector cavity index.", {
+        connectorId: endpoint.connectorId,
+        cavityIndex: endpoint.cavityIndex,
+        cavityCount: connector.cavityCount
+      });
+      return false;
+    }
+
+    return true;
+  }
+
+  const splice = state.splices.byId[endpoint.spliceId];
+  if (splice === undefined) {
+    console.warn("Rejected wire occupancy write for missing splice endpoint.", {
+      spliceId: endpoint.spliceId,
+      portIndex: endpoint.portIndex
+    });
+    return false;
+  }
+
+  const isValidPortIndex =
+    resolveSplicePortMode(splice) === "unbounded"
+      ? Number.isInteger(endpoint.portIndex) && endpoint.portIndex >= 1
+      : isValidSlotIndex(endpoint.portIndex, splice.portCount);
+  if (!isValidPortIndex) {
+    console.warn("Rejected wire occupancy write with out-of-range splice port index.", {
+      spliceId: endpoint.spliceId,
+      portIndex: endpoint.portIndex,
+      portMode: resolveSplicePortMode(splice),
+      portCount: splice.portCount
+    });
+    return false;
+  }
+
+  return true;
 }
 
 export function handleWireActions(state: AppState, action: AppAction): AppState | null {
@@ -181,6 +231,9 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
       };
 
       if (existingWire !== undefined) {
+        if (!canWriteEndpointOccupancy(state, existingWire.endpointA) || !canWriteEndpointOccupancy(state, existingWire.endpointB)) {
+          return state;
+        }
         occupancyState = releaseEndpointOccupant(
           occupancyState,
           existingWire.endpointA,
@@ -191,6 +244,10 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           existingWire.endpointB,
           getWireEndpointOccupantRef(existingWire.id, "B")
         );
+      }
+
+      if (!canWriteEndpointOccupancy(state, action.payload.endpointA) || !canWriteEndpointOccupancy(state, action.payload.endpointB)) {
+        return state;
       }
 
       const endpointAOccupant = getEndpointOccupant(occupancyState, action.payload.endpointA);

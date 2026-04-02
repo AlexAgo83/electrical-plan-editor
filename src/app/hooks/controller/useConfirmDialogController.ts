@@ -10,6 +10,7 @@ export interface ActiveConfirmDialogState {
   cancelLabel: string;
   intent: ConfirmDialogIntent;
   closeOnBackdrop: boolean;
+  confirmOnEnter: boolean;
   variant: "standard" | DeleteImpactDialogVariant;
   summaryCategories: DeleteDependencySummaryCategory[];
   summaryNote?: string;
@@ -42,6 +43,7 @@ export function useConfirmDialogController() {
         cancelLabel: request.cancelLabel ?? "Cancel",
         intent: request.intent ?? "neutral",
         closeOnBackdrop: request.closeOnBackdrop ?? true,
+        confirmOnEnter: request.confirmOnEnter ?? false,
         variant: request.variant ?? "standard",
         summaryCategories: request.summaryCategories ?? [],
         summaryNote: request.summaryNote

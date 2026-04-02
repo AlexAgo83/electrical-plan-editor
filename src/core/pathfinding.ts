@@ -1,5 +1,6 @@
 import type { NodeId, SegmentId } from "./entities";
 import type { RoutingGraphEdge, RoutingGraphIndex } from "./graph";
+import { MinHeap } from "./minHeap";
 
 interface NodeRouteCandidate {
   nodeId: NodeId;
@@ -92,11 +93,11 @@ export function findShortestRoute(
     }
   };
 
-  const queue: NodeRouteCandidate[] = [bestByNodeId[fromNodeId] as NodeRouteCandidate];
+  const queue = new MinHeap<NodeRouteCandidate>(compareCandidates);
+  queue.push(bestByNodeId[fromNodeId] as NodeRouteCandidate);
 
-  while (queue.length > 0) {
-    queue.sort(compareCandidates);
-    const candidate = queue.shift();
+  while (queue.size() > 0) {
+    const candidate = queue.pop();
     if (candidate === undefined) {
       break;
     }

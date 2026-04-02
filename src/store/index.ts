@@ -11,11 +11,18 @@ export { createCatalogValidationIssuesSampleNetworkState } from "./sampleNetwork
 export { createPricingBomQaSampleNetworkState } from "./sampleNetworkPricingQaSample";
 export * from "./selectors";
 export * from "./catalog";
+export { withPreservedNetworkSummaryViewStates } from "./networking";
 export {
   createEmptyWorkspaceState,
+  createAppError,
   createInitialState,
   createEmptyNetworkScopedState,
   cloneNetworkSummaryViewState,
+  getAppErrorMessage,
+  inferAppErrorCode,
+  isSameAppError,
+  normalizeAppError,
+  type AppError,
   type AppState,
   type EntityState,
   type LayoutNodePosition,

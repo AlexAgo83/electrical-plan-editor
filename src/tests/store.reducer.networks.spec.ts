@@ -232,7 +232,7 @@ describe("appReducer network lifecycle", () => {
     );
 
     expect(duplicateRejected.networks.byId[activeNetworkId]?.technicalId).toBe("NET-MAIN-UPD");
-    expect(duplicateRejected.ui.lastError).toContain("already used");
+    expect(duplicateRejected.ui.lastError?.message).toContain("already used");
   });
 
   it("persists normalized network voltage and rejects invalid values", () => {
@@ -256,7 +256,7 @@ describe("appReducer network lifecycle", () => {
     );
 
     expect(rejected.networks.byId[activeNetworkId]?.voltageV).toBe(24);
-    expect(rejected.ui.lastError).toBe("Network voltage must be a positive number.");
+    expect(rejected.ui.lastError?.message).toBe("Network voltage must be a positive number.");
   });
 
   it("blocks domain writes when no active network exists", () => {
@@ -277,7 +277,7 @@ describe("appReducer network lifecycle", () => {
     );
 
     expect(attemptedWrite.connectors.byId[asConnectorId("C-NONE")]).toBeUndefined();
-    expect(attemptedWrite.ui.lastError).toBe("No active network selected. Create or select a network first.");
+    expect(attemptedWrite.ui.lastError?.message).toBe("No active network selected. Create or select a network first.");
   });
 
   it("seeds exactly three default catalog items when creating a new network", () => {

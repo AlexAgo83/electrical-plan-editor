@@ -56,6 +56,7 @@ export function useAppControllerPreferencesState() {
     useState<CanvasResizeBehaviorMode>("visibleAreaOnly");
   const [showShortcutHints, setShowShortcutHints] = useState(false);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
+  const [restoreViewportOnUndo, setRestoreViewportOnUndo] = useState(true);
   const [showFloatingInspectorPanel, setShowFloatingInspectorPanel] = useState(true);
   const [workspacePanelsLayoutMode, setWorkspacePanelsLayoutMode] = useState<WorkspacePanelsLayoutMode>("singleColumn");
   const [workspaceWideScreen, setWorkspaceWideScreen] = useState(false);
@@ -134,6 +135,8 @@ export function useAppControllerPreferencesState() {
     setShowShortcutHints,
     keyboardShortcutsEnabled,
     setKeyboardShortcutsEnabled,
+    restoreViewportOnUndo,
+    setRestoreViewportOnUndo,
     showFloatingInspectorPanel,
     setShowFloatingInspectorPanel,
     workspacePanelsLayoutMode,

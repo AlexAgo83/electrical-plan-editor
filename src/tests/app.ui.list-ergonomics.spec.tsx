@@ -178,6 +178,46 @@ describe("App integration UI - list ergonomics", () => {
     expect(within(wiresPanel).getByText("1 entry")).toBeInTheDocument();
   });
 
+  it("keeps Select multiple on the main modeling action row between Edit and Delete with an icon", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreen("modeling");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    const connectorActions = connectorsPanel.querySelector(".modeling-list-actions");
+    expect(connectorActions).not.toBeNull();
+    if (!(connectorActions instanceof HTMLElement)) {
+      throw new Error("Expected connector action row.");
+    }
+
+    const connectorButtons = within(connectorActions).getAllByRole("button");
+    expect(connectorButtons.map((button) => button.textContent?.trim() ?? "")).toEqual([
+      "New",
+      "Edit",
+      "Select multiple",
+      "Delete"
+    ]);
+    expect(
+      within(connectorActions).getByRole("button", { name: "Select multiple" }).querySelector(".action-button-icon.is-multi-select")
+    ).not.toBeNull();
+
+    switchSubScreen("wire");
+    const wiresPanel = getPanelByHeading("Wires");
+    const wireActions = wiresPanel.querySelector(".modeling-list-actions");
+    expect(wireActions).not.toBeNull();
+    if (!(wireActions instanceof HTMLElement)) {
+      throw new Error("Expected wire action row.");
+    }
+
+    const wireButtons = within(wireActions).getAllByRole("button");
+    expect(wireButtons.map((button) => button.textContent?.trim() ?? "")).toEqual([
+      "New",
+      "Edit",
+      "Select multiple",
+      "Delete"
+    ]);
+    expect(within(wireActions).getByRole("button", { name: "Select multiple" }).querySelector(".action-button-icon.is-multi-select")).not.toBeNull();
+  });
+
   it("exports wire CSV with split begin/end columns and without endpoints column", () => {
     const originalCreateObjectUrl = Object.getOwnPropertyDescriptor(URL, "createObjectURL");
     const originalRevokeObjectUrl = Object.getOwnPropertyDescriptor(URL, "revokeObjectURL");

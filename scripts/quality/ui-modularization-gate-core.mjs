@@ -26,6 +26,14 @@ export const REQUIRED_UI_MODULES = [
 export const FORBIDDEN_LEGACY_FILES = ["src/tests/app.ui.spec.tsx"];
 
 export const ALLOWED_OVERSIZE = {
+  "src/tests/app.ui.navigation-canvas.spec.tsx":
+    "Canvas integration coverage remains intentionally centralized because selection, pan, zoom, and grouped-drag scenarios share the same fixtures and helper wiring.",
+  "src/tests/app.ui.creation-flow-ergonomics.spec.tsx":
+    "Create-flow integration coverage stays consolidated so repeated-create, endpoint-prefill, and edit-transition scenarios keep one shared modeling fixture surface.",
+  "src/tests/app.ui.delete-confirmations.spec.tsx":
+    "Delete confirmation coverage spans direct, blocked, cascade, and batch-delete contracts on the same shared setup; split deferred until delete-flow fixtures are extracted.",
+  "src/app/styles/canvas/canvas-toolbar-and-shell.css":
+    "Canvas toolbar and shell rules stay centralized while responsive canvas controls and shell tokens still share tightly coupled selectors.",
   "src/tests/app.ui.network-summary-bom-export.spec.tsx":
     "High-scope export integration regression suite spanning BOM, SVG, and cartouche scenarios; split deferred until export fixture/setup extraction is complete.",
   "src/tests/app.ui.network-summary-workflow-polish.spec.tsx":

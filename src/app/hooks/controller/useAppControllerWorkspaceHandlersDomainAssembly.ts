@@ -146,6 +146,7 @@ export function useAppControllerWorkspaceHandlersDomainAssembly({
       setCanvasResizeBehaviorMode: preferencesState.setCanvasResizeBehaviorMode,
       setShowShortcutHints: preferencesState.setShowShortcutHints,
       setKeyboardShortcutsEnabled: preferencesState.setKeyboardShortcutsEnabled,
+      setRestoreViewportOnUndo: preferencesState.setRestoreViewportOnUndo,
       setShowFloatingInspectorPanel: preferencesState.setShowFloatingInspectorPanel,
       setWorkspacePanelsLayoutMode: preferencesState.setWorkspacePanelsLayoutMode,
       setWorkspaceWideScreen: preferencesState.setWorkspaceWideScreen

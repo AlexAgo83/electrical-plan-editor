@@ -37,6 +37,8 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "validationWarningCount"
     | "lastError"
     | "onClearError"
+    | "bootRecoveryMessage"
+    | "onCommitBootRecovery"
   >;
   navigation: Pick<
     AppShellLayoutProps,

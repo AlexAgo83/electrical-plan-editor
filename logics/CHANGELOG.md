@@ -1,0 +1,93 @@
+# Changelog
+
+## 2026-04-02
+
+- V1 Backlog Orchestration and Delivery Control
+- V1 UX/UI Workspace Orchestration and Delivery Control
+- Multi-Network Orchestration and Delivery Control
+- Theme Mode Orchestration and Delivery Control
+- Network Import Export Orchestration and Delivery Control
+- UI and Store Large File Modularization Orchestration and Delivery Control
+- Sample Network Bootstrap Orchestration and Delivery Control
+- App Shell Completion Orchestration and Delivery Control
+- 2D Layout Persistence and Crossing Minimization Orchestration and Delivery Control
+- Network Scope Workspace Shell and Global Defaults Orchestration and Delivery Control
+- PWA Enablement, Installability, and Offline Reliability Orchestration and Delivery Control
+- Environment Configuration and Runtime Defaults Orchestration and Delivery Control
+- List/Form Workspace Harmonization Orchestration and Delivery Control
+- UI Modularization Wave 2 Orchestration and Delivery Control
+- Runtime Robustness and CI Release Safety Orchestration and Delivery Control
+- App Controller and Layout Engine Modularization Wave 3 Orchestration and Delivery Control
+- AppController Decomposition Wave 4 (Screen Containers and Controller Slices) Orchestration and Delivery Control
+- AppController Decomposition Wave 5 (Real LOC Reduction and Composition Root Slimming) Orchestration and Delivery Control
+- AppController Post-Wave-5 Hardening (Accessibility, Loading, and Contract Clarity) Orchestration and Delivery Control
+- App Shell Desktop Overlay Hardening Alignment and Workspace Suspense Scoping Orchestration and Delivery Control
+- AppController Post-req_020 Review Follow-up Orchestration and Delivery Control (Inactive Screen Computation, Lazy Test Path, Shell Test Guardrails)
+- Post-req_021 Review Follow-up Orchestration and Delivery Control (Real Lazy Chunking, No-Active-Network Compute Scoping, Test Helper Contract Hardening)
+- Post-req_022 Review Follow-up Orchestration and Delivery Control (Settings Empty-State Precedence, Remaining Compute Scoping, Lazy Registry TLA Portability, Test Helper Signal)
+- Post-req_023 Review Follow-up Orchestration and Delivery Control (Canvas Event Dedup, Mouse Button Guards, Empty-State Coverage, Test Isolation Guardrails)
+- Post-req_024 Review Follow-up Orchestration and Delivery Control (2D Accessibility, Legacy InteractionMode Cleanup, Test Reset Contract Clarity, Perf Guardrail Strategy)
+- Home Workspace Landing Screen Orchestration and Delivery Control (Start/Resume MVP, Post-MVP Hub Hooks)
+- Home Screen Post-Review Follow-up Orchestration and Delivery Control (CTA Truthfulness, Shortcut Docs, Startup Tests, Logics Sync)
+- Network Summary 2D Subnetwork Visibility Filter Toggles and Default Tag Labeling Orchestration and Delivery Control
+- Network Summary 2D Zoom-Invariant Labels with Size and Rotation Preferences Orchestration and Delivery Control
+- Network Summary PNG Export Background, Wires Length Sorting, Quick Entity Navigation, Table Theming/Highlight Refinement, and 2D Grid Negative Coordinates Orchestration and Delivery Control
+- Network Summary 2D Connector/Splice Cable Info Frames with Draggable Callouts Orchestration and Delivery Control
+- User Feedback Follow-up Orchestration and Delivery Control (Network Scope Focus, Numeric Guards, Empty Callout Suppression, Settings Persistence, and Cavity→Way Terminology)
+- Save/Data Versioning and Backward-Compatible Migrations (Local + File Persistence) Orchestration and Delivery Control
+- Creation Form Auto Technical ID Suggestions and Connector/Splice Auto-Node Creation Orchestration and Delivery Control
+- Step-by-Step Onboarding Modal Flow for First Network Creation and Contextual Help Orchestration and Delivery Control
+- Node ID Editability via Atomic Node Rename and Reference Remap Orchestration and Delivery Control
+- Wire Creation Endpoint Occupancy Validation and Next-Free Way/Port Prefill Orchestration and Delivery Control
+- Wire Cable Section (mm²) Field, Default Preference, and Backward-Compat Patch Orchestration and Delivery Control
+- Wire Color Catalog (2-Character Codes) and Bi-Color Primary/Secondary Support Orchestration and Delivery Control
+- Optional Manufacturer Reference for Connectors and Splices Orchestration and Delivery Control
+- Wire Endpoint Connection Reference and Seal Reference (Per Side) Orchestration and Delivery Control
+- Wire List Filter Bar: Field Selector and Full-Width Input Without Panel Growth Orchestration and Delivery Control
+- C. Commit gate (apply after each Step 1-9)
+- C. Commit gate (apply after each Wave 0-8 and FINAL docs sync if separate)
+- Manual QA Checklist for req_035 to req_043 Follow-up Bundle
+- C. Commit gate (apply after each Wave 0-9 and FINAL docs sync if separate)
+- D. Commit gate (apply after each Wave 0-4 and FINAL docs sync if separate)
+- D. Commit gate (apply after each Wave 0-4 and FINAL docs sync if separate)
+- D. Commit gate (apply after each Wave 0-4 and FINAL docs sync if separate)
+- D. Commit gate (apply after each Wave 0-4 and FINAL docs sync if separate)
+- D. Commit gate (apply after each Wave 0-3 and FINAL docs sync if separate)
+- D. Commit gate (apply after each Wave 0-4 and FINAL docs sync if separate)
+- D. Commit gate (apply after each Wave 0-7 and FINAL docs sync if separate)
+- D. Commit gate (apply after each Wave 0-6 and FINAL docs sync if separate)
+- req_057 catalog and BOM pricing settings orchestration and delivery control
+- req_058 network summary 2d text layering orchestration and delivery control
+- req_059 catalog item validation hardening and sample coverage orchestration and delivery control
+- req_060 accessibility hardening for network summary, modal, and semantics orchestration and delivery control
+- req_061 Circle Mobility brand theme presets (light and dark) orchestration and delivery control
+- req_062 Catalog CSV import/export orchestration and delivery control
+- req_063 Wire edit endpoint swap action orchestration and delivery control
+- req_064 Segment edit node swap action orchestration and delivery control
+- req_065 Segment analysis endpoint column split orchestration and delivery control
+- req_066 Global undo/redo history orchestration and delivery control
+- req_067 Wire protection metadata V1 (`fuse`) with required catalog manufacturer reference orchestration and delivery control
+- Full gate (before task closure)
+- Full gate (before task closure)
+- req_074 all delete actions require styled confirmation modal orchestration and delivery control
+- B. Final integration gate (Step 5 mandatory)
+- Super orchestration closure and validation for req_070 to req_073
+- C. Req_078 closure gate (Step 8 mandatory)
+- B. Req_079 closure gate (Step 4 mandatory)
+- E. Req_084 closure gate
+- req_085 mobile onboarding and workspace header compaction orchestration and delivery control
+- H. Final gate
+- Final gate
+- Req 102 export frame and network identity cartouche orchestration and delivery control
+- Req 104 post-release architecture and runtime hardening orchestration and delivery control
+- Req 105 post-req_104 review follow-up orchestration and delivery control
+- Req 100 settings language subpanel theme contrast and token alignment orchestration and delivery control
+- Req 101 network summary zoom invariant segments and callout leader lines orchestration and delivery control
+- Req 103 export security reliability and post release hardening orchestration and delivery control
+- Req 107 post release CI CSV persistence and export test signal hardening orchestration and delivery control
+- Req 108 BOM wire-termination reference-only aggregation orchestration and delivery control
+- Req 109 New/Edit scroll to corresponding form panel orchestration and delivery control
+- Req 096 recent changes human-readable entity references orchestration and delivery control
+- Final integration gate
+- Final integration gate
+- Orchestration delivery execution for req 118 post-release UX and grouped-move corrections

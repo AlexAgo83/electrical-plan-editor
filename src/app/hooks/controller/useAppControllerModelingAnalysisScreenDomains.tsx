@@ -1,3 +1,11 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { appActions, type AppStore } from "../../../store";
+import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
+import {
+  analyzeModelingBatchDelete,
+  type ModelingBatchSelectionId,
+  type ModelingBatchSelectionScope
+} from "../../lib/modelingBatchDelete";
 import type { EntityListModel } from "../useEntityListModel";
 import type { AppControllerFormsStateFlat } from "../useAppControllerNamespacedFormsState";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
@@ -118,6 +126,10 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   onGoToWireFromAnalysis: AnalysisSliceParams["onGoToWireFromAnalysis"];
   includeModelingContent: boolean;
   includeAnalysisContent: boolean;
+  store: AppStore;
+  dispatchAction: (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean }) => void;
+  requestConfirmation: (request: ConfirmDialogRequest) => Promise<boolean>;
+  replaceStateWithHistory: (nextState: ReturnType<AppStore["getState"]>) => void;
   openCatalogSubScreen: () => void;
   markSelectionPanelsFromTable?: () => void;
   onboardingHelp?: {
@@ -155,19 +167,197 @@ export function useAppControllerModelingAnalysisScreenDomains({
   onGoToWireFromAnalysis,
   includeModelingContent,
   includeAnalysisContent,
+  store,
+  dispatchAction,
+  requestConfirmation,
+  replaceStateWithHistory,
   openCatalogSubScreen,
   markSelectionPanelsFromTable,
   onboardingHelp
 }: UseAppControllerModelingAnalysisScreenDomainsParams) {
+  const [activeBatchScope, setActiveBatchScope] = useState<ModelingBatchSelectionScope | null>(null);
+  const [batchSelectionIds, setBatchSelectionIds] = useState<ReadonlySet<string>>(new Set());
+  const activeSubScreenBatchScope = screenFlags.isConnectorSubScreen
+    ? "connector"
+    : screenFlags.isSpliceSubScreen
+      ? "splice"
+      : screenFlags.isNodeSubScreen
+        ? "node"
+        : screenFlags.isSegmentSubScreen
+          ? "segment"
+          : "wire";
+
+  const clearAllModelingForms = useCallback(() => {
+    modelingHandlers.connector.clearConnectorForm();
+    modelingHandlers.splice.clearSpliceForm();
+    modelingHandlers.node.clearNodeForm();
+    modelingHandlers.segment.clearSegmentForm();
+    modelingHandlers.wire.clearWireForm();
+  }, [modelingHandlers]);
+
+  const exitBatchMode = useCallback(() => {
+    setActiveBatchScope(null);
+    setBatchSelectionIds(new Set());
+  }, []);
+
+  const enterBatchMode = useCallback(
+    (scope: ModelingBatchSelectionScope) => {
+      clearAllModelingForms();
+      dispatchAction(appActions.clearSelection(), { trackHistory: false });
+      setActiveBatchScope(scope);
+      setBatchSelectionIds(new Set());
+    },
+    [clearAllModelingForms, dispatchAction]
+  );
+
+  useEffect(() => {
+    if (activeBatchScope !== null && activeBatchScope !== activeSubScreenBatchScope) {
+      exitBatchMode();
+    }
+  }, [activeBatchScope, activeSubScreenBatchScope, exitBatchMode]);
+
+  useEffect(() => {
+    if (activeBatchScope === null) {
+      return;
+    }
+    const availableIds = new Set<string>(
+      activeBatchScope === "connector"
+        ? entities.connectors.map((connector) => connector.id)
+        : activeBatchScope === "splice"
+          ? entities.splices.map((splice) => splice.id)
+          : activeBatchScope === "node"
+            ? entities.nodes.map((node) => node.id)
+            : activeBatchScope === "segment"
+              ? entities.segments.map((segment) => segment.id)
+              : entities.wires.map((wire) => wire.id)
+    );
+    setBatchSelectionIds((current) => {
+      const next = [...current].filter((id) => availableIds.has(id));
+      return next.length === current.size ? current : new Set(next);
+    });
+  }, [activeBatchScope, entities.connectors, entities.nodes, entities.segments, entities.splices, entities.wires]);
+
+  const toggleBatchSelection = useCallback((scope: ModelingBatchSelectionScope, id: string) => {
+    setBatchSelectionIds((current) => {
+      if (activeBatchScope !== scope) {
+        return current;
+      }
+      const next = new Set(current);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, [activeBatchScope]);
+
+  const setBatchSelectionForVisible = useCallback((scope: ModelingBatchSelectionScope, ids: readonly string[]) => {
+    setBatchSelectionIds((current) => {
+      if (activeBatchScope !== scope) {
+        return current;
+      }
+      const next = new Set(current);
+      const allVisibleSelected = ids.length > 0 && ids.every((id) => next.has(id));
+      for (const id of ids) {
+        if (allVisibleSelected) {
+          next.delete(id);
+        } else {
+          next.add(id);
+        }
+      }
+      return next;
+    });
+  }, [activeBatchScope]);
+
+  const batchDeleteAnalysisState = useMemo(
+    () => {
+      const entitySnapshotSizes = [
+        entities.connectors.length,
+        entities.splices.length,
+        entities.nodes.length,
+        entities.segments.length,
+        entities.wires.length
+      ];
+      void entitySnapshotSizes;
+      return store.getState();
+    },
+    [entities.connectors, entities.nodes, entities.segments, entities.splices, entities.wires, store]
+  );
+
+  const batchDeletePreflight = useMemo(() => {
+    if (activeBatchScope === null) {
+      return null;
+    }
+    return analyzeModelingBatchDelete(
+      batchDeleteAnalysisState,
+      activeBatchScope,
+      [...batchSelectionIds] as ModelingBatchSelectionId[]
+    );
+  }, [activeBatchScope, batchDeleteAnalysisState, batchSelectionIds]);
+
+  const handleDeleteSelectedInBatchMode = useCallback(() => {
+    if (batchDeletePreflight === null || activeBatchScope === null) {
+      return;
+    }
+
+    void (async () => {
+      if (batchDeletePreflight.blockedCount > 0) {
+        await requestConfirmation({
+          title: batchDeletePreflight.blockedTitle,
+          message: batchDeletePreflight.blockedMessage,
+          confirmLabel: "Close",
+          cancelLabel: "Cancel",
+          intent: "warning",
+          variant: "deleteBlocked",
+          summaryCategories: batchDeletePreflight.summaryCategories,
+          summaryNote: batchDeletePreflight.summaryNote
+        });
+        return;
+      }
+
+      if (batchDeletePreflight.nextState === null) {
+        return;
+      }
+
+      const shouldDelete = await requestConfirmation({
+        title: batchDeletePreflight.confirmationTitle,
+        message: batchDeletePreflight.confirmationMessage,
+        confirmLabel: batchDeletePreflight.confirmLabel,
+        cancelLabel: "Cancel",
+        intent: "danger",
+        confirmOnEnter: true,
+        variant: batchDeletePreflight.confirmationVariant,
+        summaryCategories: batchDeletePreflight.summaryCategories,
+        summaryNote: batchDeletePreflight.summaryNote
+      });
+      if (!shouldDelete) {
+        return;
+      }
+
+      replaceStateWithHistory(batchDeletePreflight.nextState);
+      clearAllModelingForms();
+      exitBatchMode();
+    })();
+  }, [activeBatchScope, batchDeletePreflight, clearAllModelingForms, exitBatchMode, replaceStateWithHistory, requestConfirmation]);
+
   const modelingSlice = includeModelingContent
     ? buildModelingScreenContentSlice({
     ModelingPrimaryTablesComponent: components.ModelingPrimaryTablesComponent,
     ModelingSecondaryTablesComponent: components.ModelingSecondaryTablesComponent,
     ModelingFormsColumnComponent: components.ModelingFormsColumnComponent,
+    activeBatchScope,
+    batchSelectionIds,
+    onEnterBatchMode: enterBatchMode,
+    onExitBatchMode: exitBatchMode,
+    onToggleBatchSelection: toggleBatchSelection,
+    onSetBatchSelectionForVisible: setBatchSelectionForVisible,
+    onDeleteSelectedInBatchMode: handleDeleteSelectedInBatchMode,
     catalogItems: entities.catalogItems,
     openCatalogSubScreen,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     connectorFormMode: formsState.connectorFormMode,
+    connectorEditAfterCreate: formsState.connectorEditAfterCreate,
     resetConnectorForm: modelingHandlers.connector.resetConnectorForm,
     connectorOccupancyFilter: listModel.connectorOccupancyFilter,
     setConnectorOccupancyFilter: listModel.setConnectorOccupancyFilter,
@@ -190,6 +380,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorStep,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
     spliceFormMode: formsState.spliceFormMode,
+    spliceEditAfterCreate: formsState.spliceEditAfterCreate,
     resetSpliceForm: modelingHandlers.splice.resetSpliceForm,
     spliceOccupancyFilter: listModel.spliceOccupancyFilter,
     setSpliceOccupancyFilter: listModel.setSpliceOccupancyFilter,
@@ -211,6 +402,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     onOpenSpliceOnboardingHelp: onboardingHelp?.openSpliceStep,
     isNodeSubScreen: screenFlags.isNodeSubScreen,
     nodeFormMode: formsState.nodeFormMode,
+    nodeEditAfterCreate: formsState.nodeEditAfterCreate,
     resetNodeForm: modelingHandlers.node.resetNodeForm,
     nodeKindFilter: listModel.nodeKindFilter,
     setNodeKindFilter: listModel.setNodeKindFilter,
@@ -233,6 +425,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     onOpenNodeOnboardingHelp: onboardingHelp?.openNodeStep,
     isSegmentSubScreen: screenFlags.isSegmentSubScreen,
     segmentFormMode: formsState.segmentFormMode,
+    segmentEditAfterCreate: formsState.segmentEditAfterCreate,
     resetSegmentForm: modelingHandlers.segment.resetSegmentForm,
     segmentSubNetworkFilter: listModel.segmentSubNetworkFilter,
     setSegmentSubNetworkFilter: listModel.setSegmentSubNetworkFilter,
@@ -255,6 +448,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     onOpenSegmentOnboardingHelp: onboardingHelp?.openSegmentStep,
     isWireSubScreen: screenFlags.isWireSubScreen,
     wireFormMode: formsState.wireFormMode,
+    wireEditAfterCreate: formsState.wireEditAfterCreate,
     resetWireForm: modelingHandlers.wire.resetWireForm,
     wireRouteFilter: listModel.wireRouteFilter,
     setWireRouteFilter: listModel.setWireRouteFilter,
@@ -266,6 +460,10 @@ export function useAppControllerModelingAnalysisScreenDomains({
     visibleWires: listModel.visibleWires,
     wireSort: listModel.wireSort,
     setWireSort: listModel.setWireSort,
+    dispatchAction,
+    connectorHandlers: modelingHandlers.connector,
+    segmentHandlers: modelingHandlers.segment,
+    wireHandlers: modelingHandlers.wire,
     selectedWireId: selection.selectedWireId,
     describeWireEndpoint: wireDescriptions.describeWireEndpoint,
     describeWireEndpointCsvParts: wireDescriptions.describeWireEndpointCsvParts,
@@ -398,7 +596,21 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setWireEndpointBPortIndex: modelingHandlers.wire.setWireEndpointBPortIndex,
     wireEndpointBSlotHint: modelingHandlers.wire.wireEndpointBSlotHint,
     cancelWireEdit: modelingHandlers.wire.cancelWireEdit,
-    wireFormError: formsState.wireFormError
+    wireFormError: formsState.wireFormError,
+    modelingBatchSelection:
+      activeBatchScope === null || batchDeletePreflight === null
+        ? null
+        : {
+            scope: activeBatchScope,
+            selectedCount: batchDeletePreflight.selectedCount,
+            directCount: batchDeletePreflight.directCount,
+            cascadeCount: batchDeletePreflight.cascadeCount,
+            blockedCount: batchDeletePreflight.blockedCount,
+            summaryCategories: batchDeletePreflight.summaryCategories,
+            summaryNote: batchDeletePreflight.summaryNote,
+            onDeleteSelected: handleDeleteSelectedInBatchMode,
+            onCancelBatchMode: exitBatchMode
+          }
       })
     : null;
 
@@ -520,6 +732,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   return {
     modelingLeftColumnContent: modelingSlice?.modelingLeftColumnContent ?? null,
     modelingFormsColumnContent: modelingSlice?.modelingFormsColumnContent ?? null,
-    analysisWorkspaceContent: analysisSlice?.analysisWorkspaceContent ?? null
+    analysisWorkspaceContent: analysisSlice?.analysisWorkspaceContent ?? null,
+    isModelingBatchModeActive: activeBatchScope !== null
   };
 }

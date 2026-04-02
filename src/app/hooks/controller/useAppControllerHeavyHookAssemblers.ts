@@ -113,6 +113,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setCanvasResizeBehaviorMode"
     | "setShowShortcutHints"
     | "setKeyboardShortcutsEnabled"
+    | "setRestoreViewportOnUndo"
     | "setShowFloatingInspectorPanel"
     | "setWorkspacePanelsLayoutMode"
     | "setWorkspaceWideScreen"
@@ -228,6 +229,7 @@ interface UseAppControllerCanvasInteractionHandlersAssemblyParams {
     CanvasInteractionHandlersParams,
     | "networkViewWidth"
     | "networkViewHeight"
+    | "networkNodePositions"
     | "snapNodesToGrid"
     | "lockEntityMovement"
     | "networkOffset"
@@ -245,6 +247,7 @@ interface UseAppControllerCanvasInteractionHandlersAssemblyParams {
     CanvasInteractionHandlersParams,
     | "dispatchAction"
     | "persistNodePosition"
+    | "persistNodePositions"
     | "resetNetworkViewToConfiguredScale"
     | "startConnectorEdit"
     | "startSpliceEdit"

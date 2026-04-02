@@ -1,4 +1,5 @@
 import type { ReactElement, RefObject } from "react";
+import type { AppError } from "../../../store/types";
 interface AppHeaderAndStatsProps {
   headerBlockRef: RefObject<HTMLElement | null>;
   isNavigationDrawerOpen: boolean;
@@ -15,8 +16,10 @@ interface AppHeaderAndStatsProps {
   operationsButtonRef: RefObject<HTMLButtonElement | null>;
   validationIssuesCount: number;
   validationErrorCount: number;
-  lastError: string | null;
+  lastError: AppError | null;
   onClearError: () => void;
+  bootRecoveryMessage: string | null;
+  onCommitBootRecovery: () => void;
 }
 
 export function AppHeaderAndStats({
@@ -36,7 +39,9 @@ export function AppHeaderAndStats({
   validationIssuesCount,
   validationErrorCount,
   lastError,
-  onClearError
+  onClearError,
+  bootRecoveryMessage,
+  onCommitBootRecovery
 }: AppHeaderAndStatsProps): ReactElement {
   const opsStatusDescription = `${validationIssuesCount} validation issue${validationIssuesCount === 1 ? "" : "s"}${
     validationErrorCount > 0
@@ -106,9 +111,26 @@ export function AppHeaderAndStats({
         </div>
       </section>
 
-      {lastError !== null ? (
+      {bootRecoveryMessage !== null ? (
         <section className="error-banner" role="alert">
-          <p>{lastError}</p>
+          <p>{bootRecoveryMessage}</p>
+          <div className="inline-actions">
+            <button type="button" onClick={onCommitBootRecovery}>
+              Reset stored workspace
+            </button>
+            <button type="button" onClick={onClearError}>
+              Dismiss
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {lastError !== null && lastError.message !== bootRecoveryMessage ? (
+        <section className="error-banner" role="alert">
+          <p>{lastError.message}</p>
+          <p>
+            <small>{lastError.code}</small>
+          </p>
           <button type="button" onClick={onClearError}>
             Clear
           </button>

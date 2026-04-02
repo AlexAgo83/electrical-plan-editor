@@ -229,6 +229,37 @@ describe("App integration UI - delete confirmations", () => {
     expect(within(getPanelByHeading(caseData.panelHeading)).getByText(caseData.rowText)).toBeInTheDocument();
   });
 
+  it("keeps Cancel focused in direct delete dialogs, supports Escape cancel, and confirms on Enter", async () => {
+    const { store } = renderAppWithState(createDeleteConfirmationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("networkScope");
+
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    fireEvent.click(within(networkScopePanel).getByText("Network deletable").closest("tr") as HTMLElement);
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Edit network" })).toBeInTheDocument();
+    });
+
+    fireEvent.click(within(getPanelByHeading("Edit network")).getByRole("button", { name: "Delete" }));
+    const escapeDialog = await screen.findByRole("dialog", { name: "Delete network" });
+    const escapeCancelButton = within(escapeDialog).getByRole("button", { name: "Cancel" });
+    expect(escapeCancelButton).toHaveFocus();
+    fireEvent.keyDown(escapeDialog, { key: "Escape" });
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog", { name: "Delete network" })).not.toBeInTheDocument();
+    });
+    expect(store.getState().networks.byId["net-del" as NetworkId]).toBeDefined();
+
+    fireEvent.click(within(getPanelByHeading("Edit network")).getByRole("button", { name: "Delete" }));
+    const enterDialog = await screen.findByRole("dialog", { name: "Delete network" });
+    const enterCancelButton = within(enterDialog).getByRole("button", { name: "Cancel" });
+    expect(enterCancelButton).toHaveFocus();
+    fireEvent.keyDown(enterDialog, { key: "Enter" });
+    await waitFor(() => {
+      expect(store.getState().networks.byId["net-del" as NetworkId]).toBeUndefined();
+    });
+  });
+
   it.each(cancelDeleteCases)("deletes deletable $entity only after explicit confirmation", async (caseData) => {
     const { store } = openModelingDeleteScenario();
     triggerEntityDelete(caseData);
@@ -371,6 +402,25 @@ describe("App integration UI - delete confirmations", () => {
     expect(store.getState().nodes.byId[asNodeId("N-C-CASCADE")]).toBeUndefined();
   });
 
+  it("keeps Cancel focused in cascade delete dialogs and confirms on Enter", async () => {
+    const { store } = openModelingDeleteScenario(createSafeConnectorCascadeState());
+
+    switchSubScreenDrawerAware("connector");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Cascade connector"));
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Delete" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Cascade delete connector" });
+    const cancelButton = within(dialog).getByRole("button", { name: "Cancel" });
+    expect(cancelButton).toHaveFocus();
+    fireEvent.keyDown(dialog, { key: "Enter" });
+
+    await waitFor(() => {
+      expect(store.getState().connectors.byId[asConnectorId("C-CASCADE")]).toBeUndefined();
+      expect(store.getState().nodes.byId[asNodeId("N-C-CASCADE")]).toBeUndefined();
+    });
+  });
+
   it("offers safe splice cascade delete when only the linked splice node is impacted", async () => {
     const { store } = openModelingDeleteScenario(createSafeSpliceCascadeState());
 
@@ -387,5 +437,72 @@ describe("App integration UI - delete confirmations", () => {
       expect(store.getState().splices.byId[asSpliceId("S-CASCADE")]).toBeUndefined();
       expect(store.getState().nodes.byId[asNodeId("N-S-CASCADE")]).toBeUndefined();
     });
+  });
+
+  it("replaces the modeling edit panel with a batch context panel while multi-selection is active", () => {
+    openModelingDeleteScenario(createSafeConnectorCascadeState());
+
+    switchSubScreenDrawerAware("connector");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Cascade connector"));
+    expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
+
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select multiple" }));
+
+    expect(screen.queryByRole("heading", { name: "Edit Connector" })).not.toBeInTheDocument();
+    const batchPanel = screen.getByTestId("modeling-batch-context-panel");
+    expect(within(batchPanel).getByRole("heading", { name: "Batch selection" })).toBeInTheDocument();
+    expect(batchPanel).toHaveTextContent("0 connectors selected");
+  });
+
+  it("refuses partial connector batch delete when the selection mixes cascade-safe and blocked entries", async () => {
+    const { store } = openModelingDeleteScenario(createSafeConnectorCascadeState());
+
+    switchSubScreenDrawerAware("connector");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "Select multiple" }));
+    fireEvent.click(within(connectorsPanel).getByText("Cascade connector"));
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+
+    const batchPanel = screen.getByTestId("modeling-batch-context-panel");
+    expect(batchPanel).toHaveTextContent("2 connectors selected");
+    expect(batchPanel).toHaveTextContent("Cascade delete");
+    expect(batchPanel).toHaveTextContent("Blocked");
+
+    fireEvent.click(within(batchPanel).getByRole("button", { name: "Delete selected (2)" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Batch delete blocked" });
+    expect(dialog).toHaveTextContent("Batch delete will not remove a partial selection");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Close" }));
+
+    expect(store.getState().connectors.byId[asConnectorId("C1")]).toBeDefined();
+    expect(store.getState().connectors.byId[asConnectorId("C-CASCADE")]).toBeDefined();
+  });
+
+  it("deletes multiple wires as one undoable batch operation", async () => {
+    const { store } = openModelingDeleteScenario();
+
+    switchSubScreenDrawerAware("wire");
+    const wiresPanel = getPanelByHeading("Wires");
+    fireEvent.click(within(wiresPanel).getByRole("button", { name: "Select multiple" }));
+    fireEvent.click(within(wiresPanel).getByText("Wire 1"));
+    fireEvent.click(within(wiresPanel).getByText("Wire deletable"));
+
+    const batchPanel = screen.getByTestId("modeling-batch-context-panel");
+    fireEvent.click(within(batchPanel).getByRole("button", { name: "Delete selected (2)" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Delete selected wires" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Delete selected" }));
+
+    await waitFor(() => {
+      expect(store.getState().wires.byId[asWireId("W1")]).toBeUndefined();
+      expect(store.getState().wires.byId[asWireId("W-DEL")]).toBeUndefined();
+    });
+
+    openOpsPanel();
+    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+
+    expect(store.getState().wires.byId[asWireId("W1")]).toBeDefined();
+    expect(store.getState().wires.byId[asWireId("W-DEL")]).toBeDefined();
   });
 });

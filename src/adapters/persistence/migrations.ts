@@ -34,7 +34,9 @@ import {
   DEFAULT_NETWORK_CREATED_AT,
   DEFAULT_NETWORK_ID,
   DEFAULT_NETWORK_TECHNICAL_ID,
-  createInitialState
+  createInitialState,
+  normalizeAppError,
+  type AppError
 } from "../../store/types";
 
 export const PERSISTED_STATE_SCHEMA_VERSION = 3;
@@ -320,6 +322,31 @@ function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | n
   });
 }
 
+function normalizePersistedAppError(candidate: unknown): AppError | null {
+  if (candidate === null || candidate === undefined) {
+    return null;
+  }
+
+  if (typeof candidate === "string") {
+    return normalizeAppError(candidate);
+  }
+
+  if (typeof candidate === "object" && candidate !== null) {
+    const message = "message" in candidate ? (candidate as { message?: unknown }).message : undefined;
+    const code = "code" in candidate ? (candidate as { code?: unknown }).code : undefined;
+    const context = "context" in candidate ? (candidate as { context?: unknown }).context : undefined;
+    if (typeof message === "string" && typeof code === "string") {
+      return normalizeAppError({
+        code,
+        message,
+        context: typeof context === "object" && context !== null ? (context as Record<string, unknown>) : undefined
+      });
+    }
+  }
+
+  return null;
+}
+
 function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | null {
   if (!isRecord(candidate)) {
     return null;
@@ -370,7 +397,11 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     connectors: normalizeConnectorEntityState(candidate.connectors as EntityState<Connector, ConnectorId>),
     splices: normalizeSpliceEntityState(candidate.splices as EntityState<Splice, SpliceId>),
     wires: normalizeWireEntityState(candidate.wires as EntityState<Wire, WireId>),
-    nodePositions: normalizeNodePositions(candidate.nodePositions)
+    nodePositions: normalizeNodePositions(candidate.nodePositions),
+    ui: {
+      ...(candidate.ui as AppState["ui"]),
+      lastError: normalizePersistedAppError((candidate.ui as { lastError?: unknown }).lastError)
+    }
   } satisfies AppState;
 
   const knownNetworkIds = new Set(candidateState.networks.allIds);
@@ -418,7 +449,7 @@ interface LegacySingleNetworkState {
   splicePortOccupancy: Record<SpliceId, Record<number, string>>;
   ui: {
     selected: AppState["ui"]["selected"];
-    lastError: string | null;
+    lastError: string | AppError | null;
   };
   meta: {
     revision: number;
@@ -630,7 +661,7 @@ function migrateLegacySingleNetworkStateToCurrent(
     splicePortOccupancy: catalogBootstrappedScoped.splicePortOccupancy,
     ui: {
       selected: legacy.ui.selected,
-      lastError: legacy.ui.lastError,
+      lastError: normalizePersistedAppError(legacy.ui.lastError),
       themeMode: "warmBrown"
     },
     meta: {
@@ -650,6 +681,7 @@ interface PipelineSnapshot {
 }
 
 type MigrationStep = (snapshot: PipelineSnapshot) => PipelineSnapshot;
+const migrationStepOverrides = new Map<1 | 2, MigrationStep>();
 
 const PIPELINE_MIGRATIONS: Record<Exclude<PipelineVersion, typeof CURRENT_PIPELINE_VERSION>, MigrationStep> = {
   1: (snapshot) => ({
@@ -666,11 +698,24 @@ function runPipeline(initial: PipelineSnapshot): { snapshot: PipelineSnapshot; d
   const diagnostics: string[] = [];
   let current = initial;
   while (current.version < CURRENT_PIPELINE_VERSION) {
-    const step = PIPELINE_MIGRATIONS[current.version as keyof typeof PIPELINE_MIGRATIONS];
+    const currentVersion = current.version as keyof typeof PIPELINE_MIGRATIONS;
+    const step = migrationStepOverrides.get(currentVersion) ?? PIPELINE_MIGRATIONS[currentVersion];
     diagnostics.push(`Applied persistence migration v${current.version} -> v${current.version + 1}.`);
     current = step(current);
   }
   return { snapshot: current, diagnostics };
+}
+
+export function setPersistenceMigrationStepOverrideForTests(
+  version: 1 | 2,
+  step: MigrationStep | null
+): void {
+  if (step === null) {
+    migrationStepOverrides.delete(version);
+    return;
+  }
+
+  migrationStepOverrides.set(version, step);
 }
 
 function detectUnsupportedFutureVersion(payload: unknown): PersistenceMigrationFailure | null {
@@ -733,44 +778,68 @@ export function migratePersistedPayloadDetailed(payload: unknown, nowIso: string
 
   const legacyTimestamped = asLegacyTimestampedSnapshotV1(payload);
   if (legacyTimestamped !== null) {
-    const pipeline = runPipeline({
-      version: legacyTimestamped.schemaVersion as PipelineVersion,
-      createdAtIso: legacyTimestamped.createdAtIso,
-      updatedAtIso: legacyTimestamped.updatedAtIso,
-      state: legacyTimestamped.state
-    });
+    try {
+      const pipeline = runPipeline({
+        version: legacyTimestamped.schemaVersion as PipelineVersion,
+        createdAtIso: legacyTimestamped.createdAtIso,
+        updatedAtIso: legacyTimestamped.updatedAtIso,
+        state: legacyTimestamped.state
+      });
 
-    return {
-      ok: true,
-      snapshot: buildCurrentSnapshotEnvelope(
-        pipeline.snapshot.state,
-        pipeline.snapshot.createdAtIso,
-        pipeline.snapshot.updatedAtIso
-      ),
-      wasMigrated: true,
-      diagnostics: [...pipeline.diagnostics, ...validatePostMigrationState(pipeline.snapshot.state)]
-    };
+      return {
+        ok: true,
+        snapshot: buildCurrentSnapshotEnvelope(
+          pipeline.snapshot.state,
+          pipeline.snapshot.createdAtIso,
+          pipeline.snapshot.updatedAtIso
+        ),
+        wasMigrated: true,
+        diagnostics: [...pipeline.diagnostics, ...validatePostMigrationState(pipeline.snapshot.state)]
+      };
+    } catch {
+      return {
+        ok: false,
+        error: {
+          code: "invalidPayload",
+          message: "Persisted workspace migration failed before the data could be upgraded safely."
+        }
+      };
+    }
   }
 
   const currentStateWithoutTimestamp = asPreTimestampSnapshot(payload);
   if (currentStateWithoutTimestamp !== null) {
-    const pipeline = runPipeline({
-      version: 1,
-      createdAtIso: nowIso,
-      updatedAtIso: nowIso,
-      state: currentStateWithoutTimestamp
-    });
+    try {
+      const pipeline = runPipeline({
+        version: 1,
+        createdAtIso: nowIso,
+        updatedAtIso: nowIso,
+        state: currentStateWithoutTimestamp
+      });
 
-    return {
-      ok: true,
-      snapshot: buildCurrentSnapshotEnvelope(
-        pipeline.snapshot.state,
-        pipeline.snapshot.createdAtIso,
-        pipeline.snapshot.updatedAtIso
-      ),
-      wasMigrated: true,
-      diagnostics: ["Normalized legacy untimestamped persisted payload.", ...pipeline.diagnostics, ...validatePostMigrationState(pipeline.snapshot.state)]
-    };
+      return {
+        ok: true,
+        snapshot: buildCurrentSnapshotEnvelope(
+          pipeline.snapshot.state,
+          pipeline.snapshot.createdAtIso,
+          pipeline.snapshot.updatedAtIso
+        ),
+        wasMigrated: true,
+        diagnostics: [
+          "Normalized legacy untimestamped persisted payload.",
+          ...pipeline.diagnostics,
+          ...validatePostMigrationState(pipeline.snapshot.state)
+        ]
+      };
+    } catch {
+      return {
+        ok: false,
+        error: {
+          code: "invalidPayload",
+          message: "Persisted workspace migration failed before the data could be upgraded safely."
+        }
+      };
+    }
   }
 
   const legacyState = isLegacySingleNetworkState(payload)
@@ -780,28 +849,38 @@ export function migratePersistedPayloadDetailed(payload: unknown, nowIso: string
       : null;
 
   if (legacyState !== null) {
-    const migratedState = migrateLegacySingleNetworkStateToCurrent(legacyState, nowIso);
-    const pipeline = runPipeline({
-      version: 1,
-      createdAtIso: nowIso,
-      updatedAtIso: nowIso,
-      state: migratedState
-    });
+    try {
+      const migratedState = migrateLegacySingleNetworkStateToCurrent(legacyState, nowIso);
+      const pipeline = runPipeline({
+        version: 1,
+        createdAtIso: nowIso,
+        updatedAtIso: nowIso,
+        state: migratedState
+      });
 
-    return {
-      ok: true,
-      snapshot: buildCurrentSnapshotEnvelope(
-        pipeline.snapshot.state,
-        pipeline.snapshot.createdAtIso,
-        pipeline.snapshot.updatedAtIso
-      ),
-      wasMigrated: true,
-      diagnostics: [
-        "Normalized legacy single-network payload into multi-network workspace format.",
-        ...pipeline.diagnostics,
-        ...validatePostMigrationState(pipeline.snapshot.state)
-      ]
-    };
+      return {
+        ok: true,
+        snapshot: buildCurrentSnapshotEnvelope(
+          pipeline.snapshot.state,
+          pipeline.snapshot.createdAtIso,
+          pipeline.snapshot.updatedAtIso
+        ),
+        wasMigrated: true,
+        diagnostics: [
+          "Normalized legacy single-network payload into multi-network workspace format.",
+          ...pipeline.diagnostics,
+          ...validatePostMigrationState(pipeline.snapshot.state)
+        ]
+      };
+    } catch {
+      return {
+        ok: false,
+        error: {
+          code: "invalidPayload",
+          message: "Persisted workspace migration failed before the data could be upgraded safely."
+        }
+      };
+    }
   }
 
   return {

@@ -194,7 +194,12 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
       }
 
       if (!isValidSlotIndex(action.payload.cavityIndex, connector.cavityCount)) {
-        return withError(state, "Connector way index is out of range.");
+        console.warn("Rejected connector occupancy write with out-of-range cavity index.", {
+          connectorId: action.payload.connectorId,
+          cavityIndex: action.payload.cavityIndex,
+          cavityCount: connector.cavityCount
+        });
+        return state;
       }
 
       const occupantRef = action.payload.occupantRef.trim();
@@ -234,7 +239,12 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
       }
 
       if (!isValidSlotIndex(action.payload.cavityIndex, connector.cavityCount)) {
-        return withError(state, "Connector way index is out of range.");
+        console.warn("Rejected connector occupancy release with out-of-range cavity index.", {
+          connectorId: action.payload.connectorId,
+          cavityIndex: action.payload.cavityIndex,
+          cavityCount: connector.cavityCount
+        });
+        return state;
       }
 
       const connectorOccupancy = state.connectorCavityOccupancy[action.payload.connectorId];

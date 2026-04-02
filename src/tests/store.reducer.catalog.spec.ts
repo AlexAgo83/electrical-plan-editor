@@ -33,7 +33,7 @@ describe("store reducer - catalog", () => {
 
     expect(rejected.catalogItems.byId[firstCatalogId]).toBeDefined();
     expect(rejected.catalogItems.byId[secondCatalogId]).toBeUndefined();
-    expect(rejected.ui.lastError).toContain("already used");
+    expect(rejected.ui.lastError?.message).toContain("already used");
   });
 
   it("propagates manufacturer reference and connection count changes to linked connectors and splices", () => {
@@ -101,7 +101,7 @@ describe("store reducer - catalog", () => {
 
     const afterDeleteAttempt = appReducer(seeded, appActions.removeCatalogItem(catalogId));
     expect(afterDeleteAttempt.catalogItems.byId[catalogId]).toBeDefined();
-    expect(afterDeleteAttempt.ui.lastError).toBe("Cannot remove catalog item while connectors reference it.");
+    expect(afterDeleteAttempt.ui.lastError?.message).toBe("Cannot remove catalog item while connectors reference it.");
 
     const afterReductionAttempt = appReducer(
       seeded,
@@ -113,7 +113,7 @@ describe("store reducer - catalog", () => {
     );
     expect(afterReductionAttempt.catalogItems.byId[catalogId]?.connectionCount).toBe(4);
     expect(afterReductionAttempt.connectors.byId[connectorId]?.cavityCount).toBe(4);
-    expect(afterReductionAttempt.ui.lastError).toContain("Catalog connection count cannot be reduced");
+    expect(afterReductionAttempt.ui.lastError?.message).toContain("Catalog connection count cannot be reduced");
   });
 
   it("blocks removing a catalog item referenced by a fuse-mode wire", () => {
@@ -159,6 +159,6 @@ describe("store reducer - catalog", () => {
 
     const afterDeleteAttempt = appReducer(seeded, appActions.removeCatalogItem(catalogId));
     expect(afterDeleteAttempt.catalogItems.byId[catalogId]).toBeDefined();
-    expect(afterDeleteAttempt.ui.lastError).toBe("Cannot remove catalog item while fuse wires reference it.");
+    expect(afterDeleteAttempt.ui.lastError?.message).toBe("Cannot remove catalog item while fuse wires reference it.");
   });
 });

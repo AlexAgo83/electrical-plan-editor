@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { useSegmentHandlersContext } from "../controller/ModelingController.context";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
@@ -8,9 +9,7 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
   const {
     isSegmentSubScreen,
     segmentFormMode,
-    openCreateSegmentForm,
-    handleSegmentSubmit,
-    handleSwapSegmentNodes,
+    segmentEditAfterCreate,
     segmentIdInput,
     setSegmentIdInput,
     nodes,
@@ -23,9 +22,9 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
     setSegmentLengthMm,
     segmentSubNetworkTag,
     setSegmentSubNetworkTag,
-    cancelSegmentEdit,
     segmentFormError
   } = props;
+  const segmentHandlers = useSegmentHandlersContext();
   const nodeOptions = buildModelingDynamicSelectOptions({
     options: nodes.map((node) => ({
       value: node.id,
@@ -49,8 +48,8 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
     segmentFormMode === "create" ? "Create Segment" : segmentFormMode === "edit" ? "Edit Segment" : "Segment form",
     segmentFormMode
   )}
-  {segmentFormMode === "idle" ? renderIdleCopy("segment", openCreateSegmentForm) : (
-  <form className="stack-form" onSubmit={handleSegmentSubmit}>
+  {segmentFormMode === "idle" ? renderIdleCopy("segment", segmentHandlers.resetSegmentForm) : (
+  <form className="stack-form" onSubmit={segmentHandlers.handleSegmentSubmit}>
     <label>
       Segment ID
       <input value={segmentIdInput} onChange={(event) => setSegmentIdInput(event.target.value)} placeholder="SEG-001" required />
@@ -92,13 +91,23 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
         {segmentFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {segmentFormMode === "create" ? "Create" : "Save"}
       </button>
+      {segmentFormMode === "edit" && segmentEditAfterCreate ? (
+        <button type="button" className="button-with-icon" onClick={segmentHandlers.resetSegmentForm}>
+          <span className="action-button-icon is-new" aria-hidden="true" />
+          New
+        </button>
+      ) : null}
       {segmentFormMode === "edit" ? (
-        <button type="button" className="button-with-icon" onClick={handleSwapSegmentNodes}>
+        <button type="button" className="button-with-icon" onClick={segmentHandlers.handleSwapSegmentNodes}>
           <span className="action-button-icon is-swap" aria-hidden="true" />
           Swap nodes
         </button>
       ) : null}
-      <button type="button" className={segmentFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelSegmentEdit}>
+      <button
+        type="button"
+        className={segmentFormMode === "edit" ? "button-with-icon" : undefined}
+        onClick={segmentHandlers.cancelSegmentEdit}
+      >
         {segmentFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {segmentFormMode === "edit" ? "Cancel edit" : "Cancel"}
       </button>

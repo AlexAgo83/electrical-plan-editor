@@ -223,7 +223,13 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
       }
 
       if (!isValidSplicePortIndexForMode(splice, action.payload.portIndex)) {
-        return withError(state, "Splice port index is out of range.");
+        console.warn("Rejected splice occupancy write with out-of-range port index.", {
+          spliceId: action.payload.spliceId,
+          portIndex: action.payload.portIndex,
+          portMode: splice.portMode ?? "bounded",
+          portCount: splice.portCount
+        });
+        return state;
       }
 
       const occupantRef = action.payload.occupantRef.trim();
@@ -263,7 +269,13 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
       }
 
       if (!isValidSplicePortIndexForMode(splice, action.payload.portIndex)) {
-        return withError(state, "Splice port index is out of range.");
+        console.warn("Rejected splice occupancy release with out-of-range port index.", {
+          spliceId: action.payload.spliceId,
+          portIndex: action.payload.portIndex,
+          portMode: splice.portMode ?? "bounded",
+          portCount: splice.portCount
+        });
+        return state;
       }
 
       const spliceOccupancy = state.splicePortOccupancy[action.payload.spliceId];

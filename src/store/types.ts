@@ -26,6 +26,56 @@ export interface SelectionState {
   id: string;
 }
 
+export interface AppError {
+  code: string;
+  message: string;
+  context?: Record<string, unknown>;
+}
+
+function sanitizeAppErrorCodeSegment(value: string): string {
+  const normalized = value
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  return normalized.length > 0 ? normalized : "UNKNOWN_ERROR";
+}
+
+export function inferAppErrorCode(message: string): string {
+  return sanitizeAppErrorCodeSegment(message);
+}
+
+export function createAppError(code: string, message: string, context?: Record<string, unknown>): AppError {
+  return {
+    code: sanitizeAppErrorCodeSegment(code),
+    message,
+    ...(context === undefined ? {} : { context })
+  };
+}
+
+export function normalizeAppError(error: string | AppError): AppError {
+  if (typeof error === "string") {
+    return createAppError(inferAppErrorCode(error), error);
+  }
+
+  return createAppError(error.code, error.message, error.context);
+}
+
+export function getAppErrorMessage(error: AppError | null | undefined): string | null {
+  return error?.message ?? null;
+}
+
+export function isSameAppError(left: AppError | null, right: AppError | null): boolean {
+  if (left === right) {
+    return true;
+  }
+  if (left === null || right === null) {
+    return false;
+  }
+
+  return left.code === right.code && left.message === right.message;
+}
+
 export type ThemeMode =
   | "normal"
   | "dark"
@@ -104,7 +154,7 @@ export interface AppState {
   splicePortOccupancy: Record<SpliceId, Record<number, string>>;
   ui: {
     selected: SelectionState | null;
-    lastError: string | null;
+    lastError: AppError | null;
     themeMode: ThemeMode;
   };
   meta: {

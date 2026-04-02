@@ -20,6 +20,8 @@ interface UseConnectorHandlersParams {
   confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
   connectorFormMode: "idle" | "create" | "edit";
   setConnectorFormMode: (mode: "idle" | "create" | "edit") => void;
+  connectorEditAfterCreate: boolean;
+  setConnectorEditAfterCreate: (value: boolean) => void;
   editingConnectorId: ConnectorId | null;
   setEditingConnectorId: (id: ConnectorId | null) => void;
   connectorName: string;
@@ -75,6 +77,8 @@ export function useConnectorHandlers({
   confirmAction,
   connectorFormMode,
   setConnectorFormMode,
+  connectorEditAfterCreate: _connectorEditAfterCreate,
+  setConnectorEditAfterCreate,
   editingConnectorId,
   setEditingConnectorId,
   connectorName,
@@ -97,6 +101,7 @@ export function useConnectorHandlers({
 }: UseConnectorHandlersParams) {
   void _connectorManufacturerReference;
   void _cavityCount;
+  void _connectorEditAfterCreate;
 
   function syncDerivedConnectorCatalogFields(nextCatalogItemId: string): void {
     const catalogItem = store.getState().catalogItems.byId[nextCatalogItemId as CatalogItemId];
@@ -130,6 +135,7 @@ export function useConnectorHandlers({
       .find((item): item is NonNullable<typeof item> => item !== undefined);
     if (firstCatalogItem === undefined) {
       setConnectorFormMode("create");
+      setConnectorEditAfterCreate(false);
       setEditingConnectorId(null);
       setConnectorName("");
       setConnectorTechnicalId(
@@ -144,6 +150,7 @@ export function useConnectorHandlers({
     }
 
     setConnectorFormMode("create");
+    setConnectorEditAfterCreate(false);
     setEditingConnectorId(null);
     setConnectorName("");
     setConnectorTechnicalId(
@@ -156,6 +163,7 @@ export function useConnectorHandlers({
 
   function clearConnectorForm(): void {
     setConnectorFormMode("idle");
+    setConnectorEditAfterCreate(false);
     setEditingConnectorId(null);
     setConnectorName("");
     setConnectorTechnicalId("");
@@ -171,8 +179,9 @@ export function useConnectorHandlers({
     dispatchAction(appActions.clearSelection(), { trackHistory: false });
   }
 
-  function startConnectorEdit(connector: Connector): void {
+  function startConnectorEdit(connector: Connector, fromCreate = false): void {
     setConnectorFormMode("edit");
+    setConnectorEditAfterCreate(fromCreate);
     setEditingConnectorId(connector.id);
     setConnectorName(connector.name);
     setConnectorTechnicalId(connector.technicalId);
@@ -261,7 +270,7 @@ export function useConnectorHandlers({
           }
         }
 
-        startConnectorEdit(savedConnector);
+        startConnectorEdit(savedConnector, true);
         return;
       }
       startConnectorEdit(savedConnector);
@@ -284,7 +293,8 @@ export function useConnectorHandlers({
           message: `Delete connector '${connector.name}' (${connector.technicalId})?`,
           confirmLabel: "Delete",
           cancelLabel: "Cancel",
-          intent: "danger"
+          intent: "danger",
+          confirmOnEnter: true
         });
         if (!shouldDelete) {
           return;
@@ -304,6 +314,7 @@ export function useConnectorHandlers({
           confirmLabel: "Delete all",
           cancelLabel: "Cancel",
           intent: "danger",
+          confirmOnEnter: true,
           variant: "deleteCascade",
           summaryCategories: impact.categories,
           summaryNote: impact.note

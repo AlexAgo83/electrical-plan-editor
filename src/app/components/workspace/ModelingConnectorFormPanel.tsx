@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { useConnectorHandlersContext } from "../controller/ModelingController.context";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
@@ -8,8 +9,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
   const {
     isConnectorSubScreen,
     connectorFormMode,
-    openCreateConnectorForm,
-    handleConnectorSubmit,
+    connectorEditAfterCreate,
     connectorName,
     setConnectorName,
     connectorTechnicalId,
@@ -23,14 +23,14 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,
     cavityCount,
-    cancelConnectorEdit,
     connectorFormError
   } = props;
+  const connectorHandlers = useConnectorHandlersContext();
   const hasCatalogItems = catalogItems.length > 0;
   const catalogItemOptions = buildModelingDynamicSelectOptions({
     options: catalogItems.map((item) => ({
       value: item.id,
-      label: `${item.manufacturerReference} (${item.connectionCount})`
+      label: `${item.manufacturerReference}${item.name?.trim() ? ` - ${item.name.trim()}` : ""} (${item.connectionCount})`
     })),
     selectedValue: connectorCatalogItemId,
     missingOption:
@@ -45,8 +45,8 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     connectorFormMode === "create" ? "Create Connector" : connectorFormMode === "edit" ? "Edit Connector" : "Connector form",
     connectorFormMode
   )}
-  {connectorFormMode === "idle" ? renderIdleCopy("connector", openCreateConnectorForm) : (
-  <form className="stack-form" onSubmit={handleConnectorSubmit}>
+  {connectorFormMode === "idle" ? renderIdleCopy("connector", connectorHandlers.resetConnectorForm) : (
+  <form className="stack-form" onSubmit={connectorHandlers.handleConnectorSubmit}>
     <label>
       Functional name
       <input value={connectorName} onChange={(event) => setConnectorName(event.target.value)} placeholder="Rear body connector" required />
@@ -107,7 +107,17 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         {connectorFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {connectorFormMode === "create" ? "Create" : "Save"}
       </button>
-      <button type="button" className={connectorFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelConnectorEdit}>
+      {connectorFormMode === "edit" && connectorEditAfterCreate ? (
+        <button type="button" className="button-with-icon" onClick={connectorHandlers.resetConnectorForm}>
+          <span className="action-button-icon is-new" aria-hidden="true" />
+          New
+        </button>
+      ) : null}
+      <button
+        type="button"
+        className={connectorFormMode === "edit" ? "button-with-icon" : undefined}
+        onClick={connectorHandlers.cancelConnectorEdit}
+      >
         {connectorFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {connectorFormMode === "edit" ? "Cancel edit" : "Cancel"}
       </button>

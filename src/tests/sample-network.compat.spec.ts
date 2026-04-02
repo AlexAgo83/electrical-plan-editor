@@ -52,11 +52,11 @@ function toLegacySingleNetworkState(state: AppState): unknown {
 }
 
 describe("sample network compatibility", () => {
-  it("round-trips sample state through persistence snapshot save/load with deterministic catalog normalization", () => {
+  it("round-trips sample state through persistence snapshot save/load with deterministic catalog normalization", async () => {
     const sample = createSampleNetworkState();
     const storage = createMemoryStorage();
 
-    saveState(sample, storage, () => "2026-02-21T10:00:00.000Z");
+    await saveState(sample, storage, () => "2026-02-21T10:00:00.000Z");
     const loaded = loadState(storage, () => "2026-02-21T10:01:00.000Z");
 
     expect(loaded.schemaVersion).toBe(sample.schemaVersion);
@@ -82,10 +82,10 @@ describe("sample network compatibility", () => {
     expect(hasSampleNetworkSignature(migration?.snapshot.state ?? sample)).toBe(true);
   });
 
-  it("keeps sample signature after JSON serialization/deserialization of persisted snapshot", () => {
+  it("keeps sample signature after JSON serialization/deserialization of persisted snapshot", async () => {
     const sample = createSampleNetworkState();
     const storage = createMemoryStorage();
-    saveState(sample, storage, () => "2026-02-21T10:30:00.000Z");
+    await saveState(sample, storage, () => "2026-02-21T10:30:00.000Z");
 
     const raw = storage.read(STORAGE_KEY);
     expect(raw).not.toBeNull();

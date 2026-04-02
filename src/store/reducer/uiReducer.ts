@@ -1,5 +1,6 @@
 import type { AppAction } from "../actions";
 import type { AppState } from "../types";
+import { isSameAppError } from "../types";
 import { bumpRevision, clearLastError } from "./shared";
 
 export function handleUiActions(state: AppState, action: AppAction): AppState | null {
@@ -40,7 +41,7 @@ export function handleUiActions(state: AppState, action: AppAction): AppState | 
     }
 
     case "ui/setError": {
-      if (state.ui.lastError === action.payload.message) {
+      if (isSameAppError(state.ui.lastError, action.payload.error)) {
         return state;
       }
 
@@ -48,7 +49,7 @@ export function handleUiActions(state: AppState, action: AppAction): AppState | 
         ...state,
         ui: {
           ...state.ui,
-          lastError: action.payload.message
+          lastError: action.payload.error
         }
       });
     }

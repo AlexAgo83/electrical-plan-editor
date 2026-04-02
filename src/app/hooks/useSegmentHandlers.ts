@@ -1,7 +1,7 @@
 import type { FormEvent } from "react";
 import type { NodeId, Segment, SegmentId } from "../../core/entities";
 import type { AppStore } from "../../store";
-import { appActions } from "../../store";
+import { appActions, getAppErrorMessage } from "../../store";
 import { analyzeSegmentDeleteImpact } from "../../store/deleteImpact";
 import { focusSelectedTableRowInPanel, toPositiveNumber } from "../lib/app-utils-shared";
 import { suggestNextSegmentId } from "../lib/technical-id-suggestions";
@@ -21,6 +21,8 @@ interface UseSegmentHandlersParams {
   confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
   segmentFormMode: "idle" | "create" | "edit";
   setSegmentFormMode: (mode: "idle" | "create" | "edit") => void;
+  segmentEditAfterCreate: boolean;
+  setSegmentEditAfterCreate: (value: boolean) => void;
   editingSegmentId: SegmentId | null;
   setEditingSegmentId: (id: SegmentId | null) => void;
   segmentIdInput: string;
@@ -43,6 +45,8 @@ export function useSegmentHandlers({
   confirmAction,
   segmentFormMode,
   setSegmentFormMode,
+  segmentEditAfterCreate: _segmentEditAfterCreate,
+  setSegmentEditAfterCreate,
   editingSegmentId,
   setEditingSegmentId,
   segmentIdInput,
@@ -57,9 +61,12 @@ export function useSegmentHandlers({
   setSegmentSubNetworkTag,
   setSegmentFormError
 }: UseSegmentHandlersParams) {
+  void _segmentEditAfterCreate;
+
   function resetSegmentForm(): void {
     const nextState = store.getState();
     setSegmentFormMode("create");
+    setSegmentEditAfterCreate(false);
     setEditingSegmentId(null);
     setSegmentIdInput(suggestNextSegmentId(nextState.segments.allIds));
     setSegmentNodeA("");
@@ -71,6 +78,7 @@ export function useSegmentHandlers({
 
   function clearSegmentForm(): void {
     setSegmentFormMode("idle");
+    setSegmentEditAfterCreate(false);
     setEditingSegmentId(null);
     setSegmentIdInput("");
     setSegmentNodeA("");
@@ -97,8 +105,9 @@ export function useSegmentHandlers({
     setSegmentFormError(null);
   }
 
-  function startSegmentEdit(segment: Segment): void {
+  function startSegmentEdit(segment: Segment, fromCreate = false): void {
     setSegmentFormMode("edit");
+    setSegmentEditAfterCreate(fromCreate);
     setEditingSegmentId(segment.id);
     setSegmentIdInput(segment.id);
     setSegmentNodeA(segment.nodeA);
@@ -153,7 +162,7 @@ export function useSegmentHandlers({
       dispatchAction(appActions.renameSegment(editingSegmentId, normalizedSegmentId as SegmentId));
       const stateAfterRename = store.getState();
       if (stateAfterRename.ui.lastError !== null) {
-        setSegmentFormError(stateAfterRename.ui.lastError);
+        setSegmentFormError(getAppErrorMessage(stateAfterRename.ui.lastError));
         return;
       }
       segmentId = normalizedSegmentId as SegmentId;
@@ -174,7 +183,7 @@ export function useSegmentHandlers({
     const savedSegment = nextState.segments.byId[segmentId];
     if (savedSegment !== undefined) {
       if (wasCreateMode) {
-        startSegmentEdit(savedSegment);
+        startSegmentEdit(savedSegment, true);
         return;
       }
       startSegmentEdit(savedSegment);
@@ -197,7 +206,8 @@ export function useSegmentHandlers({
           message: `Delete segment '${segment.id}' (${segment.nodeA} -> ${segment.nodeB})?`,
           confirmLabel: "Delete",
           cancelLabel: "Cancel",
-          intent: "danger"
+          intent: "danger",
+          confirmOnEnter: true
         });
         if (!shouldDelete) {
           return;

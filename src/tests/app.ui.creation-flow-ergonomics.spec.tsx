@@ -15,11 +15,21 @@ describe("App integration UI - creation flow ergonomics", () => {
   function createInitialStateWithCatalog() {
     const withPrimaryCatalog = appReducer(
       createInitialState(),
-      appActions.upsertCatalogItem({ id: asCatalogItemId("CAT-4"), manufacturerReference: "CAT-REF-4", connectionCount: 4 })
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-4"),
+        manufacturerReference: "CAT-REF-4",
+        name: "Catalog Four",
+        connectionCount: 4
+      })
     );
     return appReducer(
       withPrimaryCatalog,
-      appActions.upsertCatalogItem({ id: asCatalogItemId("CAT-2"), manufacturerReference: "CAT-REF-2", connectionCount: 2 })
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-2"),
+        manufacturerReference: "CAT-REF-2",
+        name: "Catalog Two",
+        connectionCount: 2
+      })
     );
   }
 
@@ -78,6 +88,59 @@ describe("App integration UI - creation flow ergonomics", () => {
     clickNewFromPanel("Wires");
     const createWirePanel = getPanelByHeading("Create Wire");
     expect(within(createWirePanel).getByLabelText("Technical ID")).toHaveValue("W-001");
+  });
+
+  it("keeps the bottom New action out of modeling create forms", () => {
+    renderAppWithState(createInitialStateWithCatalog());
+    switchScreenDrawerAware("modeling");
+
+    clickNewFromPanel("Connectors");
+    const createConnectorPanel = getPanelByHeading("Create Connector");
+    expect(within(createConnectorPanel).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
+
+    switchSubScreenDrawerAware("splice");
+    clickNewFromPanel("Splices");
+    expect(within(getPanelByHeading("Create Splice")).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
+
+    switchSubScreenDrawerAware("node");
+    clickNewFromPanel("Nodes");
+    expect(within(getPanelByHeading("Create Node")).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
+
+    switchSubScreenDrawerAware("segment");
+    clickNewFromPanel("Segments");
+    expect(within(getPanelByHeading("Create Segment")).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
+
+    switchSubScreenDrawerAware("wire");
+    clickNewFromPanel("Wires");
+    expect(within(getPanelByHeading("Create Wire")).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
+  });
+
+  it("shows the bottom New action only in the edit state reached after creation and resets to a fresh draft", () => {
+    renderAppWithState(createInitialStateWithCatalog());
+    switchScreenDrawerAware("modeling");
+
+    clickNewFromPanel("Connectors");
+    const createConnectorPanel = getPanelByHeading("Create Connector");
+    fireEvent.change(within(createConnectorPanel).getByLabelText("Functional name"), {
+      target: { value: "Connector draft" }
+    });
+    fireEvent.change(within(createConnectorPanel).getByLabelText("Technical ID"), {
+      target: { value: "C-DRAFT-1" }
+    });
+    fireEvent.change(within(createConnectorPanel).getByLabelText("Catalog item (manufacturer reference)"), {
+      target: { value: "CAT-4" }
+    });
+    fireEvent.click(within(createConnectorPanel).getByRole("button", { name: "Create" }));
+
+    const editConnectorPanel = getPanelByHeading("Edit Connector");
+    expect(within(editConnectorPanel).getByRole("button", { name: "New" })).toBeInTheDocument();
+    fireEvent.click(within(editConnectorPanel).getByRole("button", { name: "New" }));
+
+    const resetConnectorPanel = getPanelByHeading("Create Connector");
+    expect(within(resetConnectorPanel).getByLabelText("Functional name")).toHaveValue("");
+    expect(within(resetConnectorPanel).getByLabelText("Technical ID")).toHaveValue("C-001");
+    expect(within(resetConnectorPanel).getByLabelText("Catalog item (manufacturer reference)")).toHaveValue("CAT-2");
+    expect(within(resetConnectorPanel).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
   });
 
   it("focuses the created connector row and switches the form to edit mode after creation", async () => {
@@ -181,6 +244,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.change(within(createConnectorPanel).getByLabelText("Catalog item (manufacturer reference)"), {
       target: { value: "CAT-2" }
     });
+    expect(within(createConnectorPanel).getByDisplayValue("CAT-REF-2 - Catalog Two (2)")).toBeInTheDocument();
     expect(within(createConnectorPanel).getByLabelText("Way count (from catalog)")).toHaveValue(2);
     expect(within(createConnectorPanel).getByText("Manufacturer reference: CAT-REF-2")).toBeInTheDocument();
     fireEvent.click(within(createConnectorPanel).getByRole("button", { name: "Create" }));
@@ -228,6 +292,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.change(within(createSplicePanel).getByLabelText("Catalog item (manufacturer reference)"), {
       target: { value: "CAT-2" }
     });
+    expect(within(createSplicePanel).getByDisplayValue("CAT-REF-2 - Catalog Two (2)")).toBeInTheDocument();
     expect(within(createSplicePanel).getByLabelText("Port count (from catalog)")).toHaveValue(2);
     expect(within(createSplicePanel).getByText("Manufacturer reference: CAT-REF-2")).toBeInTheDocument();
     fireEvent.click(within(createSplicePanel).getByRole("button", { name: "Create" }));

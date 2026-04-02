@@ -1,10 +1,4 @@
-import {
-  type ReactElement,
-  useCallback,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+import { type ReactElement, useCallback, useMemo, useRef, useState } from "react";
 import appPackageMetadata from "../../package.json";
 import type { CatalogItemId } from "../core/entities";
 import {
@@ -15,14 +9,14 @@ import {
   selectActiveNetworkId,
   selectConnectors,
   selectCatalogItems,
-  selectLastError,
   selectNetworks,
   selectNodes,
   selectRoutingGraphIndex,
   selectSegments,
   selectSplices,
   selectSubNetworkSummaries,
-  selectWires
+  selectWires,
+  withPreservedNetworkSummaryViewStates
 } from "../store";
 import { appStore } from "./store";
 import { appUiModules } from "./components/appUiModules";
@@ -50,6 +44,7 @@ import { useAppControllerCanvasStateSyncEffects } from "./hooks/controller/useAp
 import { useConfirmDialogController } from "./hooks/controller/useConfirmDialogController";
 import { useNetworkSummaryViewStateSync } from "./hooks/controller/useNetworkSummaryViewStateSync";
 import { useOnboardingController } from "./hooks/controller/useOnboardingController";
+import { useAppControllerPersistenceHealth } from "./hooks/controller/useAppControllerPersistenceHealth";
 import { useAppControllerWorkspaceContentAssembly } from "./hooks/controller/useAppControllerWorkspaceContentAssembly";
 import { useAppControllerUniquenessFlags } from "./hooks/controller/useAppControllerUniquenessFlags";
 import {
@@ -86,10 +81,7 @@ import {
 } from "./lib/app-utils-shared";
 import { downloadCsvFile } from "./lib/csv";
 import { buildNetworkSummaryBomCsvExport } from "./lib/networkSummaryBomCsv";
-import type {
-  AppProps,
-  SubScreenId
-} from "./types/app-controller";
+import type { AppProps, SubScreenId } from "./types/app-controller";
 import "./styles.css";
 
 export type { AppProps } from "./types/app-controller";
@@ -98,10 +90,8 @@ const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor"
 export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear();
   const state = useAppSnapshot(store);
-  const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, ValidationScreen } =
-    appUiModules;
-  const { AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables } =
-    appUiModules;
+  const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, ValidationScreen } = appUiModules;
+  const { AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables } = appUiModules;
   const { NetworkScopeWorkspaceContent, SettingsWorkspaceContent, ValidationWorkspaceContent } = appUiModules;
 
   const networks = selectNetworks(state);
@@ -127,7 +117,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     spliceNodeBySpliceId
   } = useEntityRelationshipMaps(connectors, splices, nodes, segments);
   const formsState = useEntityFormsState();
-  const forms = buildAppControllerNamespacedFormsState(formsState);
+  const forms = useMemo(() => buildAppControllerNamespacedFormsState(formsState), [formsState]);
   const { setWireForcedRouteInput } = formsState;
   const canvasDisplayState = useAppControllerCanvasDisplayState();
   const {
@@ -150,7 +140,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasResetZoomPercentInput
   } = canvasDisplayState;
   const canvasState = useCanvasState();
-  const canvas = buildAppControllerNamespacedCanvasState(canvasState);
+  const canvas = useMemo(() => buildAppControllerNamespacedCanvasState(canvasState), [canvasState]);
   const {
     interactionMode,
     setInteractionMode,
@@ -202,20 +192,16 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasResizeBehaviorMode,
     showShortcutHints,
     keyboardShortcutsEnabled,
+    restoreViewportOnUndo,
     showFloatingInspectorPanel,
     workspacePanelsLayoutMode,
     workspaceWideScreen,
     preferencesHydrated
   } = preferencesState;
-  const networkSummaryBomCsvExport = useMemo(() => buildNetworkSummaryBomCsvExport(
-    catalogItems,
-    connectors,
-    splices,
-    wires,
-    workspaceCurrencyCode,
-    workspaceTaxEnabled,
-    workspaceTaxRatePercent
-  ), [catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent]);
+  const networkSummaryBomCsvExport = useMemo(
+    () => buildNetworkSummaryBomCsvExport(catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent),
+    [catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent]
+  );
   const canExportBomCsv = networkSummaryBomCsvExport.itemRowCount > 0;
   const handleExportBomCsv = useCallback(() => {
     if (!canExportBomCsv) return;
@@ -376,10 +362,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canvasResetZoomPercentInput
   });
 
-  const { describeWireEndpoint, describeWireEndpointId, describeWireEndpointCsvParts } = useWireEndpointDescriptions({
-    connectorMap,
-    spliceMap
-  });
+  const { describeWireEndpoint, describeWireEndpointId, describeWireEndpointCsvParts } = useWireEndpointDescriptions({ connectorMap, spliceMap });
 
   useAppControllerCanvasStateSyncEffects({
     activeNetworkId,
@@ -480,8 +463,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const hasActiveNetwork = activeNetwork !== null;
   const isCurrentWorkspaceEmpty = isWorkspaceEmpty(state);
   const hasBuiltInSampleState = hasSampleNetworkSignature(state);
-
-  const lastError = selectLastError(state);
   const {
     saveStatus,
     isUndoAvailable,
@@ -494,6 +475,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   } = useStoreHistory({
     store,
     historyLimit: HISTORY_LIMIT,
+    transformUndoRedoTargetState: (targetState, currentState) =>
+      restoreViewportOnUndo ? targetState : withPreservedNetworkSummaryViewStates(targetState, currentState),
     onUndoRedoApplied: () => {
       setPendingNewNodePosition(null);
     },
@@ -503,6 +486,15 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setActiveSubScreen("connector");
       setInteractionMode("select");
     }
+  });
+  const {
+    lastError,
+    bootRecoveryMessage,
+    clearPersistenceHealth,
+    commitBootRecovery
+  } = useAppControllerPersistenceHealth({
+    state,
+    dispatchAction
   });
 
   const catalogHandlers = useCatalogHandlers({
@@ -784,6 +776,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     viewport: {
       effectiveNetworkViewWidth,
       effectiveNetworkViewHeight,
+      networkNodePositions,
       snapNodesToGrid,
       lockEntityMovement,
       networkOffset,
@@ -951,6 +944,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       canvasInteractionDomain
     },
     handlers: {
+      store,
       requestConfirmation,
       replaceStateWithHistory,
       setActiveScreen,
@@ -980,10 +974,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       networkGridStep: NETWORK_GRID_STEP
     }
   });
-  useAppControllerInspectorSelectionSourceEffect({
-    hasInspectableSelection,
-    setDetailPanelsSelectionSource
-  });
+  useAppControllerInspectorSelectionSourceEffect({ hasInspectableSelection, setDetailPanelsSelectionSource });
   const appShellLayoutProps = buildAppControllerShellLayoutProps({
     meta: {
       appShellClassName,
@@ -1018,7 +1009,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       validationErrorCount,
       validationWarningCount,
       lastError,
-      onClearError: () => dispatchAction(appActions.clearError())
+      onClearError: clearPersistenceHealth,
+      bootRecoveryMessage,
+      onCommitBootRecovery: commitBootRecovery
     },
     navigation: {
       activeScreen,
@@ -1073,27 +1066,25 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
   });
 
-  return (
-    <>
-      <AppShellLayout {...appShellLayoutProps} />
-      <AppControllerOverlays
-        appShellClassName={appShellClassName}
-        activeConfirmDialog={activeConfirmDialog}
-        closeActiveConfirmDialog={closeActiveConfirmDialog}
-        onboarding={{
-          activeOnboardingStep,
-          isOnboardingOpen,
-          onboardingModalMode,
-          onboardingStepDisplayIndex,
-          onboardingTotalSteps,
-          onboardingAutoOpenEnabled,
-          setOnboardingAutoOpenEnabledPersisted,
-          closeOnboarding,
-          handleOnboardingNext,
-          canGoNext: canOnboardingGoNext,
-          onboardingTargetActions
-        }}
-      />
-    </>
-  );
+  return <>
+    <AppShellLayout {...appShellLayoutProps} />
+    <AppControllerOverlays
+      appShellClassName={appShellClassName}
+      activeConfirmDialog={activeConfirmDialog}
+      closeActiveConfirmDialog={closeActiveConfirmDialog}
+      onboarding={{
+        activeOnboardingStep,
+        isOnboardingOpen,
+        onboardingModalMode,
+        onboardingStepDisplayIndex,
+        onboardingTotalSteps,
+        onboardingAutoOpenEnabled,
+        setOnboardingAutoOpenEnabledPersisted,
+        closeOnboarding,
+        handleOnboardingNext,
+        canGoNext: canOnboardingGoNext,
+        onboardingTargetActions
+      }}
+    />
+  </>;
 }
