@@ -519,20 +519,21 @@ export function ModelingSecondaryTables({
           </button>
           <button
             type="button"
+            className="button-with-icon"
+            onClick={() => onEnterBatchMode("segment")}
+            disabled={sortedVisibleSegments.length === 0}
+          >
+            <span className="action-button-icon is-multi-select" aria-hidden="true" />
+            Select multiple
+          </button>
+          <button
+            type="button"
             className="modeling-list-action-delete button-with-icon"
             onClick={() => focusedSegment !== null && onDeleteSegment(focusedSegment.id)}
             disabled={focusedSegment === null || segmentFormMode === "create"}
           >
             <span className="action-button-icon is-delete" aria-hidden="true" />
             Delete
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => onEnterBatchMode("segment")}
-            disabled={sortedVisibleSegments.length === 0}
-          >
-            Select multiple
           </button>
             </>
           )}
@@ -790,20 +791,21 @@ export function ModelingSecondaryTables({
           </button>
           <button
             type="button"
+            className="button-with-icon"
+            onClick={() => onEnterBatchMode("wire")}
+            disabled={sortedVisibleWires.length === 0}
+          >
+            <span className="action-button-icon is-multi-select" aria-hidden="true" />
+            Select multiple
+          </button>
+          <button
+            type="button"
             className="modeling-list-action-delete button-with-icon"
             onClick={() => focusedWire !== null && onDeleteWire(focusedWire.id)}
             disabled={focusedWire === null || wireFormMode === "create"}
           >
             <span className="action-button-icon is-delete" aria-hidden="true" />
             Delete
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => onEnterBatchMode("wire")}
-            disabled={sortedVisibleWires.length === 0}
-          >
-            Select multiple
           </button>
             </>
           )}
