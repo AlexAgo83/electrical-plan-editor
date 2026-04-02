@@ -27,6 +27,45 @@ function selectCollection<T, Id extends string>(
   return allIds.map((id) => byId[id]);
 }
 
+function createCollectionSelector<T, Id extends string>() {
+  let previousById: Record<Id, T> | null = null;
+  let previousAllIds: Id[] | null = null;
+  let previousResult: T[] | null = null;
+
+  return (byId: Record<Id, T>, allIds: Id[]): T[] => {
+    if (previousById === byId && previousAllIds === allIds && previousResult !== null) {
+      return previousResult;
+    }
+
+    previousById = byId;
+    previousAllIds = allIds;
+    previousResult = selectCollection(byId, allIds);
+    return previousResult;
+  };
+}
+
+const selectRoutingNodes = createCollectionSelector<NetworkNode, NodeId>();
+const selectRoutingSegments = createCollectionSelector<Segment, SegmentId>();
+const selectMemoizedRoutingGraphIndex = (() => {
+  let previousNodes: NetworkNode[] | null = null;
+  let previousSegments: Segment[] | null = null;
+  let previousGraph: RoutingGraphIndex | null = null;
+
+  return (state: AppState): RoutingGraphIndex => {
+    const nodes = selectRoutingNodes(state.nodes.byId, state.nodes.allIds);
+    const segments = selectRoutingSegments(state.segments.byId, state.segments.allIds);
+
+    if (previousNodes === nodes && previousSegments === segments && previousGraph !== null) {
+      return previousGraph;
+    }
+
+    previousNodes = nodes;
+    previousSegments = segments;
+    previousGraph = buildRoutingGraphIndex(nodes, segments);
+    return previousGraph;
+  };
+})();
+
 export function selectConnectors(state: AppState): Connector[] {
   return selectCollection(state.connectors.byId, state.connectors.allIds);
 }
@@ -311,7 +350,7 @@ export function selectSubNetworkSummaries(state: AppState): SubNetworkSummary[] 
 }
 
 export function selectRoutingGraphIndex(state: AppState): RoutingGraphIndex {
-  return buildRoutingGraphIndex(selectNodes(state), selectSegments(state));
+  return selectMemoizedRoutingGraphIndex(state);
 }
 
 export function selectShortestRouteBetweenNodes(

@@ -1,10 +1,10 @@
 ## item_556_replace_pathfinding_queue_sort_with_min_heap_priority_queue - Replace pathfinding queue.sort with a min-heap priority queue
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Performance / algorithmic complexity
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
@@ -66,7 +66,9 @@ flowchart LR
 - Depends on: none.
 - References:
   - `src/core/pathfinding.ts`
+  - `src/core/minHeap.ts`
   - `src/tests/core.pathfinding.spec.ts`
+  - `src/tests/core.min-heap.spec.ts`
 
 # Validation
 - `npm run -s lint`
