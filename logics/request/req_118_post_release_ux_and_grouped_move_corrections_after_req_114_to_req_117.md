@@ -1,7 +1,7 @@
 ## req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117 - Post-release UX and grouped-move corrections after req 114 to req 117
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
 > Complexity: Medium

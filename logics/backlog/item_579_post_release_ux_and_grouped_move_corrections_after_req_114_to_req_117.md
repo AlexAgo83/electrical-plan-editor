@@ -1,10 +1,10 @@
 ## item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117 - Post-release UX and grouped-move corrections after req 114 to req 117
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -40,9 +40,9 @@ flowchart LR
 - AC4: The post-release corrections preserve the intended behaviors introduced by the original bundle: chained creation remains fast, batch delete still requires explicit entry into selection mode, and `Shift+click` remains the gesture for canvas multi-selection.
 
 # AC Traceability
-- AC1 -> `item_580`. Proof: post-create edit-state `New` correction lands without create-mode duplication.
-- AC2 -> `item_581`. Proof: `Select multiple` is aligned on the shared action row and gains an explicit icon.
-- AC3 -> `item_582`. Proof: grouped drag no longer triggers unrelated generate/recompute side effects.
+- AC1 -> `item_580`. Proof: post-create edit-state `New` correction lands without create-mode duplication and is covered by `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`.
+- AC2 -> `item_581`. Proof: `Select multiple` is aligned on the shared action row, gains an explicit icon, and is covered by `src/tests/app.ui.list-ergonomics.spec.tsx`.
+- AC3 -> `item_582`. Proof: grouped drag no longer drops unrelated persisted node positions and is covered by `src/tests/app.ui.navigation-canvas.spec.tsx` plus `src/tests/store.reducer.sync-invariant.spec.ts`.
 - AC4 -> `item_583` plus integrated validation in `task_097`. Proof: targeted regression coverage and closure keep the original shipped interaction contracts intact.
 
 # Decision framing
