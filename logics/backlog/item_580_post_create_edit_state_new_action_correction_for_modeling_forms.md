@@ -1,10 +1,10 @@
 ## item_580_post_create_edit_state_new_action_correction_for_modeling_forms - Post-create edit state New action correction for Modeling forms
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
@@ -38,9 +38,9 @@ flowchart LR
 - AC3: Clicking `New` from the post-create edit state resets toward a fresh empty creation form without duplicating or pre-filling the previously created item.
 
 # AC Traceability
-- AC1 -> post-create edit-state action placement. Proof: capture in Wave 1 validation and report inside `task_097`.
-- AC2 -> create-mode footer removal. Proof: capture in Wave 1 validation and report inside `task_097`.
-- AC3 -> silent reset to fresh create form. Proof: capture in Wave 1 validation and report inside `task_097`.
+- AC1 -> post-create edit-state action placement. Proof: delivered in Wave 1 and validated in `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`.
+- AC2 -> create-mode footer removal. Proof: delivered in Wave 1 and validated in `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`.
+- AC3 -> silent reset to fresh create form. Proof: delivered in Wave 1 and validated in `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`.
 
 # Decision framing
 - Product framing: Consider

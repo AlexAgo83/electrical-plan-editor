@@ -9,6 +9,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
   const {
     isConnectorSubScreen,
     connectorFormMode,
+    connectorEditAfterCreate,
     connectorName,
     setConnectorName,
     connectorTechnicalId,
@@ -106,7 +107,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         {connectorFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {connectorFormMode === "create" ? "Create" : "Save"}
       </button>
-      {connectorFormMode === "create" ? (
+      {connectorFormMode === "edit" && connectorEditAfterCreate ? (
         <button type="button" className="button-with-icon" onClick={connectorHandlers.resetConnectorForm}>
           <span className="action-button-icon is-new" aria-hidden="true" />
           New

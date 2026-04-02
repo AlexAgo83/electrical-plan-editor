@@ -11,6 +11,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
   const {
     isWireSubScreen,
     wireFormMode,
+    wireEditAfterCreate,
     wireName,
     setWireName,
     wireTechnicalId,
@@ -503,7 +504,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         {wireFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
         {wireFormMode === "create" ? "Create" : "Save"}
       </button>
-      {wireFormMode === "create" ? (
+      {wireFormMode === "edit" && wireEditAfterCreate ? (
         <button type="button" className="button-with-icon" onClick={wireHandlers.resetWireForm}>
           <span className="action-button-icon is-new" aria-hidden="true" />
           New

@@ -10,6 +10,7 @@ export interface ModelingFormsColumnProps {
   openCatalogSubScreen: () => void;
   isConnectorSubScreen: boolean;
   connectorFormMode: "idle" | "create" | "edit";
+  connectorEditAfterCreate: boolean;
   openCreateConnectorForm: () => void;
   handleConnectorSubmit: (event: FormEvent<HTMLFormElement>) => void;
   connectorName: string;
@@ -29,6 +30,7 @@ export interface ModelingFormsColumnProps {
   connectorFormError: string | null;
   isSpliceSubScreen: boolean;
   spliceFormMode: "idle" | "create" | "edit";
+  spliceEditAfterCreate: boolean;
   openCreateSpliceForm: () => void;
   handleSpliceSubmit: (event: FormEvent<HTMLFormElement>) => void;
   spliceName: string;
@@ -51,6 +53,7 @@ export interface ModelingFormsColumnProps {
   spliceFormError: string | null;
   isNodeSubScreen: boolean;
   nodeFormMode: "idle" | "create" | "edit";
+  nodeEditAfterCreate: boolean;
   openCreateNodeForm: () => void;
   handleNodeSubmit: (event: FormEvent<HTMLFormElement>) => void;
   nodeIdInput: string;
@@ -70,6 +73,7 @@ export interface ModelingFormsColumnProps {
   nodeFormError: string | null;
   isSegmentSubScreen: boolean;
   segmentFormMode: "idle" | "create" | "edit";
+  segmentEditAfterCreate: boolean;
   openCreateSegmentForm: () => void;
   handleSegmentSubmit: (event: FormEvent<HTMLFormElement>) => void;
   handleSwapSegmentNodes: () => void;
@@ -89,6 +93,7 @@ export interface ModelingFormsColumnProps {
   segmentFormError: string | null;
   isWireSubScreen: boolean;
   wireFormMode: "idle" | "create" | "edit";
+  wireEditAfterCreate: boolean;
   openCreateWireForm: () => void;
   handleWireSubmit: (event: FormEvent<HTMLFormElement>) => void;
   handleSwapWireEndpoints: () => void;
