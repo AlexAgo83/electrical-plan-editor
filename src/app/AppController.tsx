@@ -8,6 +8,11 @@ import {
 import appPackageMetadata from "../../package.json";
 import type { CatalogItemId } from "../core/entities";
 import {
+  clearPendingPersistenceRecovery,
+  commitPendingPersistenceRecovery,
+  getPendingPersistenceRecovery
+} from "../adapters/persistence";
+import {
   appActions,
   hasSampleNetworkSignature,
   isWorkspaceEmpty,
@@ -482,6 +487,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const hasBuiltInSampleState = hasSampleNetworkSignature(state);
 
   const lastError = selectLastError(state);
+  const [bootRecoveryMessage, setBootRecoveryMessage] = useState<string | null>(
+    () => getPendingPersistenceRecovery()?.message ?? null
+  );
   const {
     saveStatus,
     isUndoAvailable,
@@ -1020,7 +1028,18 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       validationErrorCount,
       validationWarningCount,
       lastError,
-      onClearError: () => dispatchAction(appActions.clearError())
+      onClearError: () => {
+        clearPendingPersistenceRecovery();
+        setBootRecoveryMessage(null);
+        dispatchAction(appActions.clearError());
+      },
+      bootRecoveryMessage,
+      onCommitBootRecovery: () => {
+        commitPendingPersistenceRecovery();
+        clearPendingPersistenceRecovery();
+        setBootRecoveryMessage(null);
+        dispatchAction(appActions.clearError());
+      }
     },
     navigation: {
       activeScreen,

@@ -1,5 +1,6 @@
 import type { UndoHistoryEntry, UndoHistoryTargetKind } from "../../app/types/app-controller";
 import type { NetworkId } from "../../core/entities";
+import { parseJsonSafe } from "./json";
 import { STORAGE_KEY } from "./localStorage";
 
 const RECENT_CHANGES_SCHEMA_VERSION = 1;
@@ -120,7 +121,12 @@ export function loadRecentChangesMetadata(
       return [];
     }
 
-    const parsed = JSON.parse(raw) as unknown;
+    const parsedResult = parseJsonSafe<unknown>(raw);
+    if (!parsedResult.ok) {
+      return [];
+    }
+
+    const parsed = parsedResult.value;
     if (!isRecord(parsed) || parsed.schemaVersion !== RECENT_CHANGES_SCHEMA_VERSION) {
       return [];
     }

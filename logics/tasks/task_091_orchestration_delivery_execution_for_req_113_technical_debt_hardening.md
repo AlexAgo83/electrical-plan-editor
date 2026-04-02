@@ -1,10 +1,10 @@
 ## task_091_orchestration_delivery_execution_for_req_113_technical_debt_hardening - Orchestration delivery execution for req_113 technical debt hardening
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
+> Status: In Progress
 > Understanding: 96%
 > Confidence: 93%
-> Progress: 0%
+> Progress: 25%
 > Complexity: High
 > Theme: Technical hardening / orchestration across persistence, performance, architecture, and robustness
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
@@ -63,10 +63,10 @@ flowchart LR
 # Plan
 
 ## Wave A — Persistence safety (critical)
-- [ ] 1. Deliver `item_553`: safe `parseJsonSafe<T>()` wrapper and boot recovery UI.
-- [ ] 2. Deliver `item_554`: migration backup, rollback on failure, and explicit user feedback.
-- [ ] 3. Deliver `item_555`: localStorage quota awareness and `QuotaExceededError` surfacing.
-- [ ] A-GATE: Run `npm run -s lint && npm run -s typecheck && npm test -- --run src/tests/persistence && npm run -s build`. All green before proceeding.
+- [x] 1. Deliver `item_553`: safe `parseJsonSafe<T>()` wrapper and boot recovery UI.
+- [x] 2. Deliver `item_554`: migration backup, rollback on failure, and explicit user feedback.
+- [x] 3. Deliver `item_555`: localStorage quota awareness and `QuotaExceededError` surfacing.
+- [x] A-GATE: Run `npm run -s lint && npm run -s typecheck && npm test -- --run src/tests/persistence && npm run -s build`. All green before proceeding.
 
 ## Wave B — Performance
 - [ ] 4. Deliver `item_556`: replace `queue.sort()` with `MinHeap` in pathfinding.
@@ -170,5 +170,13 @@ flowchart LR
   - Wave B second because performance regressions are measurable and test-provable; pathfinding and graph fixes are independent of each other.
   - Wave C third because architecture changes carry the highest regression surface; each increment is validated before the next.
   - Wave D last because these items raise the robustness floor without blocking other waves, except `item_561` which depends on Wave A.
-- Completed waves: (none yet)
-- Latest validation snapshot: (none yet)
+- Completed waves:
+  - Wave A (`item_553` `item_554` `item_555`) delivered:
+    - persistence deserialization now goes through `parseJsonSafe()` and corrupted boot payloads surface an explicit recovery UI instead of silently overwriting storage;
+    - migration attempts now create dated pre-migration backup keys, preserve the original payload on failure, and expose rollback feedback through the recovery surface;
+    - local persistence writes now estimate storage pressure, surface near-quota warnings, and distinguish `QuotaExceededError` failures from generic write failures.
+- Latest validation snapshot:
+  - `npm run -s lint`
+  - `npm run -s typecheck`
+  - `npm test -- --run src/tests/persistence.localStorage.spec.ts src/tests/store.create-store.spec.ts src/tests/app.ui.persistence-feedback.spec.tsx src/tests/persistence.storage-key.spec.ts src/tests/sample-network.compat.spec.ts`
+  - `npm run -s build`

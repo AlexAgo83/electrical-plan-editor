@@ -41,6 +41,8 @@ interface AppShellLayoutProps {
   validationWarningCount: number;
   lastError: AppHeaderAndStatsProps["lastError"];
   onClearError: AppHeaderAndStatsProps["onClearError"];
+  bootRecoveryMessage: AppHeaderAndStatsProps["bootRecoveryMessage"];
+  onCommitBootRecovery: AppHeaderAndStatsProps["onCommitBootRecovery"];
   activeScreen: WorkspaceSidebarPanelProps["activeScreen"];
   activeSubScreen: WorkspaceSidebarPanelProps["activeSubScreen"];
   isModelingScreen: WorkspaceSidebarPanelProps["isModelingScreen"];
@@ -121,6 +123,8 @@ export function AppShellLayout({
   validationWarningCount,
   lastError,
   onClearError,
+  bootRecoveryMessage,
+  onCommitBootRecovery,
   activeScreen,
   activeSubScreen,
   isModelingScreen,
@@ -253,6 +257,8 @@ export function AppShellLayout({
         validationErrorCount={validationErrorCount}
         lastError={lastError}
         onClearError={onClearError}
+        bootRecoveryMessage={bootRecoveryMessage}
+        onCommitBootRecovery={onCommitBootRecovery}
       />
 
       <section className="workspace-shell" style={workspaceShellStyle}>

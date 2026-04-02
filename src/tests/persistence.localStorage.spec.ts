@@ -2,6 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CatalogItemId, ConnectorId, NodeId } from "../core/entities";
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../core/schema";
 import {
+  clearPendingPersistenceRecovery,
+  commitPendingPersistenceRecovery,
+  getPendingPersistenceRecovery,
+  MIGRATION_BACKUP_KEY_PREFIX,
   PERSISTED_STATE_PAYLOAD_KIND,
   PERSISTED_STATE_SCHEMA_VERSION,
   RECENT_CHANGES_STORAGE_KEY,
@@ -12,6 +16,7 @@ import {
   migratePersistedPayload,
   saveRecentChangesMetadata,
   saveState,
+  setPersistenceMigrationStepOverrideForTests,
   type PersistedStateSnapshotV1
 } from "../adapters/persistence";
 import {
@@ -26,6 +31,7 @@ import {
 
 interface MemoryStorage extends Pick<Storage, "getItem" | "setItem" | "removeItem"> {
   read: (key: string) => string | null;
+  keys: () => string[];
 }
 
 function createMemoryStorage(seed: Record<string, string> = {}): MemoryStorage {
@@ -43,6 +49,9 @@ function createMemoryStorage(seed: Record<string, string> = {}): MemoryStorage {
     },
     read(key: string) {
       return entries.get(key) ?? null;
+    },
+    keys() {
+      return [...entries.keys()];
     }
   };
 }
@@ -142,6 +151,9 @@ describe("migratePersistedPayload", () => {
 describe("localStorage persistence adapter", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    clearPendingPersistenceRecovery();
+    setPersistenceMigrationStepOverrideForTests(1, null);
+    setPersistenceMigrationStepOverrideForTests(2, null);
   });
 
   it("bootstraps sample state on first run when storage is empty", () => {
@@ -181,7 +193,7 @@ describe("localStorage persistence adapter", () => {
     expect(loaded).toEqual(state);
   });
 
-  it("preserves wire fuse catalog linkage across save/load", () => {
+  it("preserves wire fuse catalog linkage across save/load", async () => {
     const sample = createSampleNetworkState();
     const firstWireId = sample.wires.allIds[0];
     const firstCatalogItemId = sample.catalogItems.allIds[0];
@@ -204,7 +216,7 @@ describe("localStorage persistence adapter", () => {
     );
     const storage = createMemoryStorage();
 
-    saveState(withFuseWire, storage, () => "2026-02-26T12:30:00.000Z");
+    await saveState(withFuseWire, storage, () => "2026-02-26T12:30:00.000Z");
     const loaded = loadState(storage, () => "2026-02-26T12:31:00.000Z");
 
     expect(loaded.wires.byId[firstWireId]?.protection).toEqual({
@@ -213,7 +225,7 @@ describe("localStorage persistence adapter", () => {
     });
   });
 
-  it("preserves network voltage and wire sizing metadata across save/load", () => {
+  it("preserves network voltage and wire sizing metadata across save/load", async () => {
     const base = createSampleNetworkState();
     const activeNetworkId = base.activeNetworkId;
     const firstWireId = base.wires.allIds[0];
@@ -242,7 +254,7 @@ describe("localStorage persistence adapter", () => {
     );
     const storage = createMemoryStorage();
 
-    saveState(enriched, storage, () => "2026-03-01T09:00:00.000Z");
+    await saveState(enriched, storage, () => "2026-03-01T09:00:00.000Z");
     const loaded = loadState(storage, () => "2026-03-01T09:01:00.000Z");
 
     expect(loaded.networks.byId[activeNetworkId]?.voltageV).toBe(48);
@@ -838,7 +850,7 @@ describe("localStorage persistence adapter", () => {
     expect(loaded.networkStates[activeNetworkId]?.nodePositions).toEqual({});
   });
 
-  it("falls back safely and clears corrupted payload", () => {
+  it("keeps corrupted payload untouched until explicit recovery reset", () => {
     const storage = createMemoryStorage({
       [STORAGE_KEY]: "{not-valid-json"
     });
@@ -846,7 +858,13 @@ describe("localStorage persistence adapter", () => {
     const loaded = loadState(storage, () => "2026-02-20T11:30:00.000Z");
 
     expect(hasSampleNetworkSignature(loaded)).toBe(true);
-    expect(storage.read(STORAGE_KEY)).not.toBeNull();
+    expect(storage.read(STORAGE_KEY)).toBe("{not-valid-json");
+    expect(getPendingPersistenceRecovery()?.message).toMatch(/could not be loaded safely/i);
+
+    const committed = commitPendingPersistenceRecovery(storage, () => "2026-02-20T11:31:00.000Z");
+    expect(hasSampleNetworkSignature(committed)).toBe(true);
+    expect(storage.read(STORAGE_KEY)).not.toBe("{not-valid-json");
+    expect(getPendingPersistenceRecovery()).toBeNull();
   });
 
   it("falls back safely when storage getItem throws at load time", () => {
@@ -891,6 +909,27 @@ describe("localStorage persistence adapter", () => {
     expect(rewrittenSnapshot.state).toEqual(loaded);
   });
 
+  it("preserves a pre-migration backup when a migration step fails", () => {
+    const legacyState = createSampleState();
+    const rawLegacyPayload = JSON.stringify(toLegacySingleNetworkState(legacyState));
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: rawLegacyPayload
+    });
+    setPersistenceMigrationStepOverrideForTests(1, () => {
+      throw new Error("forced migration failure");
+    });
+
+    const loaded = loadState(storage, () => "2026-02-20T12:05:00.000Z");
+
+    expect(hasSampleNetworkSignature(loaded)).toBe(true);
+    expect(storage.read(STORAGE_KEY)).toBe(rawLegacyPayload);
+    const migrationBackupKey = storage.keys().find((key) => key.startsWith(MIGRATION_BACKUP_KEY_PREFIX));
+    expect(migrationBackupKey).toBeDefined();
+    expect(storage.read(migrationBackupKey ?? "")).toContain("pre-migration-backup");
+    expect(getPendingPersistenceRecovery()?.backupKey).toBe(migrationBackupKey);
+    expect(loaded.ui.lastError).toMatch(/migration failed/i);
+  });
+
   it("restores a valid persisted empty workspace without bootstrapping the sample", () => {
     const emptyState = createInitialState();
     const nowIso = "2026-02-20T12:30:00.000Z";
@@ -914,7 +953,7 @@ describe("localStorage persistence adapter", () => {
     expect(rewrittenSnapshot.state).toEqual(emptyState);
   });
 
-  it("falls back safely when the default localStorage accessor throws", () => {
+  it("falls back safely when the default localStorage accessor throws", async () => {
     vi.spyOn(window, "localStorage", "get").mockImplementation(() => {
       throw new Error("Storage access blocked");
     });
@@ -922,9 +961,10 @@ describe("localStorage persistence adapter", () => {
     const loaded = loadState(undefined, () => "2026-02-20T12:35:00.000Z");
     expect(hasSampleNetworkSignature(loaded)).toBe(true);
 
-    expect(() => {
-      saveState(createInitialState(), undefined, () => "2026-02-20T12:36:00.000Z");
-    }).not.toThrow();
+    await expect(saveState(createInitialState(), undefined, () => "2026-02-20T12:36:00.000Z")).resolves.toEqual({
+      ok: false,
+      reason: "storage-unavailable"
+    });
   });
 
   it("does not overwrite existing non-empty user state", () => {
@@ -949,7 +989,7 @@ describe("localStorage persistence adapter", () => {
     expect(hasSampleNetworkSignature(sample)).toBe(true);
   });
 
-  it("saves with schema version and preserves createdAt timestamp across updates", () => {
+  it("saves with schema version and preserves createdAt timestamp across updates", async () => {
     const firstState = createSampleState();
     const secondState = appReducer(
       firstState,
@@ -969,7 +1009,7 @@ describe("localStorage persistence adapter", () => {
       } satisfies PersistedStateSnapshotV1)
     });
 
-    saveState(secondState, storage, () => "2026-02-20T13:00:00.000Z");
+    await saveState(secondState, storage, () => "2026-02-20T13:00:00.000Z");
 
     const raw = storage.read(STORAGE_KEY);
     expect(raw).not.toBeNull();
@@ -982,7 +1022,7 @@ describe("localStorage persistence adapter", () => {
     expect(savedSnapshot.state).toEqual(secondState);
   });
 
-  it("falls back to current save timestamp when persisted createdAtIso is malformed", () => {
+  it("falls back to current save timestamp when persisted createdAtIso is malformed", async () => {
     const initialState = createSampleState();
     const updatedState = appReducer(
       initialState,
@@ -1002,7 +1042,7 @@ describe("localStorage persistence adapter", () => {
       } satisfies PersistedStateSnapshotV1)
     });
 
-    saveState(updatedState, storage, () => "2026-02-20T13:20:00.000Z");
+    await saveState(updatedState, storage, () => "2026-02-20T13:20:00.000Z");
 
     const raw = storage.read(STORAGE_KEY);
     expect(raw).not.toBeNull();
@@ -1011,7 +1051,7 @@ describe("localStorage persistence adapter", () => {
     expect(savedSnapshot.updatedAtIso).toBe("2026-02-20T13:20:00.000Z");
   });
 
-  it("preserves createdAt across saves even when storage reads throw", () => {
+  it("preserves createdAt across saves even when storage reads throw", async () => {
     const state = createSampleState();
     const nextState = appReducer(
       state,
@@ -1033,8 +1073,8 @@ describe("localStorage persistence adapter", () => {
       removeItem: vi.fn()
     };
 
-    saveState(state, throwingReadStorage, () => "2026-02-20T13:10:00.000Z");
-    saveState(nextState, throwingReadStorage, () => "2026-02-20T13:11:00.000Z");
+    await saveState(state, throwingReadStorage, () => "2026-02-20T13:10:00.000Z");
+    await saveState(nextState, throwingReadStorage, () => "2026-02-20T13:11:00.000Z");
 
     const raw = storedValues.get(STORAGE_KEY);
     expect(raw).toBeDefined();
@@ -1043,7 +1083,7 @@ describe("localStorage persistence adapter", () => {
     expect(snapshot.updatedAtIso).toBe("2026-02-20T13:11:00.000Z");
   });
 
-  it("persists and restores node layout positions across save/load", () => {
+  it("persists and restores node layout positions across save/load", async () => {
     const withNode = appReducer(
       createInitialState(),
       appActions.upsertNode({
@@ -1055,7 +1095,7 @@ describe("localStorage persistence adapter", () => {
     const positioned = appReducer(withNode, appActions.setNodePosition(asNodeId("N-LAYOUT"), { x: 280, y: 160 }));
     const storage = createMemoryStorage();
 
-    saveState(positioned, storage, () => "2026-02-20T14:00:00.000Z");
+    await saveState(positioned, storage, () => "2026-02-20T14:00:00.000Z");
     const loaded = loadState(storage, () => "2026-02-20T14:01:00.000Z");
 
     expect(loaded.nodePositions[asNodeId("N-LAYOUT")]).toEqual({ x: 280, y: 160 });
@@ -1067,7 +1107,7 @@ describe("localStorage persistence adapter", () => {
     expect(loaded.networkStates[activeNetworkId]?.nodePositions[asNodeId("N-LAYOUT")]).toEqual({ x: 280, y: 160 });
   });
 
-  it("persists valid network summary view-state and drops malformed persisted view-state payloads", () => {
+  it("persists valid network summary view-state and drops malformed persisted view-state payloads", async () => {
     const state = createSampleState();
     const activeNetworkId = state.activeNetworkId;
     expect(activeNetworkId).not.toBeNull();
@@ -1099,7 +1139,7 @@ describe("localStorage persistence adapter", () => {
     };
 
     const storage = createMemoryStorage();
-    saveState(withViewState, storage, () => "2026-02-20T14:10:00.000Z");
+    await saveState(withViewState, storage, () => "2026-02-20T14:10:00.000Z");
     const loaded = loadState(storage, () => "2026-02-20T14:11:00.000Z");
     expect(loaded.networkStates[activeNetworkId]?.networkSummaryViewState).toEqual(persistedViewState);
 
@@ -1207,5 +1247,37 @@ describe("localStorage persistence adapter", () => {
     const backup = JSON.parse(backupRaw ?? "{}") as { raw?: string; reason?: string };
     expect(backup.raw).toBe(rawFuture);
     expect(backup.reason).toContain("unsupportedFutureVersion");
+  });
+
+  it("returns a storage-near-quota warning when navigator storage estimate shows low remaining capacity", async () => {
+    const storage = createMemoryStorage();
+    Object.defineProperty(navigator, "storage", {
+      configurable: true,
+      value: {
+        estimate: vi.fn().mockResolvedValue({ quota: 1_000, usage: 850 })
+      }
+    });
+    const estimateSpy = vi
+      .spyOn(navigator.storage, "estimate")
+      .mockResolvedValue({ quota: 1_000, usage: 850 });
+
+    const result = await saveState(createSampleState(), storage, () => "2026-02-20T15:05:00.000Z");
+
+    expect(result).toEqual({ ok: true, warning: "storage-near-quota" });
+    expect(estimateSpy).toHaveBeenCalled();
+  });
+
+  it("returns a quota-exceeded result when storage writes exceed browser quota", async () => {
+    const storage = {
+      getItem: vi.fn(() => null),
+      setItem: vi.fn(() => {
+        throw new DOMException("Quota exceeded", "QuotaExceededError");
+      }),
+      removeItem: vi.fn()
+    };
+
+    const result = await saveState(createSampleState(), storage, () => "2026-02-20T15:10:00.000Z");
+
+    expect(result).toEqual({ ok: false, reason: "quota-exceeded" });
   });
 });

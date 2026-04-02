@@ -35,7 +35,7 @@ describe("persistence storage key configuration", () => {
     const persistenceModule = await import("../adapters/persistence/localStorage");
     const storage = createMemoryStorage();
 
-    persistenceModule.saveState(createInitialState(), storage, () => "2026-02-21T00:00:00.000Z");
+    await persistenceModule.saveState(createInitialState(), storage, () => "2026-02-21T00:00:00.000Z");
 
     expect(persistenceModule.STORAGE_KEY).toBe("electrical-plan-editor.test");
     expect(storage.read("electrical-plan-editor.test")).not.toBeNull();
@@ -46,7 +46,7 @@ describe("persistence storage key configuration", () => {
     const persistenceModule = await import("../adapters/persistence/localStorage");
     const storage = createMemoryStorage();
 
-    persistenceModule.saveState(createInitialState(), storage, () => "2026-02-21T00:05:00.000Z");
+    await persistenceModule.saveState(createInitialState(), storage, () => "2026-02-21T00:05:00.000Z");
 
     expect(persistenceModule.STORAGE_KEY).toBe("electrical-plan-editor.state");
     expect(storage.read("electrical-plan-editor.state")).not.toBeNull();
