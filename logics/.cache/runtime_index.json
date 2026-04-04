@@ -1,6 +1,6 @@
 {
   "cache_path": "logics/.cache/runtime_index.json",
-  "generated_at": "2026-04-02T12:20:21.839552+00:00",
+  "generated_at": "2026-04-04T21:09:44.773093+00:00",
   "skill_packages": {
     "logics/skills/logics-acceptance-to-tests": {
       "data": {
@@ -66,8 +66,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883149900512,
-            "size": 1199
+            "mtime_ns": 1775289571320772776,
+            "size": 1198
           },
           {
             "mtime_ns": 1772662548924020332,
@@ -103,8 +103,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774312264604298851,
-            "size": 1106
+            "mtime_ns": 1775289571321191488,
+            "size": 1050
           },
           {
             "mtime_ns": 1772662548933204614,
@@ -140,8 +140,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883150401101,
-            "size": 1092
+            "mtime_ns": 1775289571321392199,
+            "size": 1088
           },
           {
             "mtime_ns": 1772662777931164611,
@@ -177,8 +177,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883150984816,
-            "size": 825
+            "mtime_ns": 1775321299577379675,
+            "size": 1056
           },
           {
             "mtime_ns": 1772662548950176624,
@@ -214,8 +214,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1771580506788544928,
-            "size": 941
+            "mtime_ns": 1775289571322891838,
+            "size": 939
           },
           {
             "mtime_ns": 1772662580549977546,
@@ -251,8 +251,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883151177026,
-            "size": 1754
+            "mtime_ns": 1775289571323148924,
+            "size": 1751
           },
           {
             "mtime_ns": 1772662588943393116,
@@ -288,8 +288,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774439769664601708,
-            "size": 918
+            "mtime_ns": 1775289571323309092,
+            "size": 916
           },
           {
             "mtime_ns": 1772662783500354211,
@@ -325,8 +325,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774439769665141296,
-            "size": 1007
+            "mtime_ns": 1775289571323443468,
+            "size": 1004
           },
           {
             "mtime_ns": 1772662791626280440,
@@ -362,8 +362,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774439769665553966,
-            "size": 852
+            "mtime_ns": 1775289571323562761,
+            "size": 850
           },
           {
             "mtime_ns": 1772662797848840332,
@@ -399,8 +399,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774439769665821177,
-            "size": 994
+            "mtime_ns": 1775289571323675095,
+            "size": 992
           },
           {
             "mtime_ns": 1772662803985414454,
@@ -436,8 +436,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774439769666066054,
-            "size": 2238
+            "mtime_ns": 1775289571323796388,
+            "size": 2231
           },
           {
             "mtime_ns": 1772662595703295541,
@@ -473,8 +473,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883153387259,
-            "size": 2368
+            "mtime_ns": 1775289571323917389,
+            "size": 2365
           },
           {
             "mtime_ns": 1772661140511646406,
@@ -510,8 +510,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774312264606562245,
-            "size": 1511
+            "mtime_ns": 1775289571324050891,
+            "size": 1509
           },
           {
             "mtime_ns": 1772662549024726052,
@@ -547,8 +547,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883154844566,
-            "size": 826
+            "mtime_ns": 1775289571324175892,
+            "size": 825
           },
           {
             "mtime_ns": 1772662549032851117,
@@ -584,8 +584,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1771580506792283725,
-            "size": 965
+            "mtime_ns": 1775289571324304101,
+            "size": 963
           },
           {
             "mtime_ns": 1772662549041409685,
@@ -621,8 +621,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774629191206414974,
-            "size": 14396
+            "mtime_ns": 1775321299577875512,
+            "size": 15993
           },
           {
             "mtime_ns": 1772662603566243549,
@@ -658,8 +658,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883157290593,
-            "size": 1420
+            "mtime_ns": 1775289571327128337,
+            "size": 1415
           },
           {
             "mtime_ns": 1772662549056925892,
@@ -695,8 +695,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774439769668941827,
-            "size": 2318
+            "mtime_ns": 1775321299582105128,
+            "size": 2685
           },
           {
             "mtime_ns": 1774439769669075744,
@@ -732,8 +732,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1771580506794193104,
-            "size": 348
+            "mtime_ns": 1775289571327248754,
+            "size": 347
           },
           {
             "mtime_ns": 1772662549064606661,
@@ -954,8 +954,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1771580506795707598,
-            "size": 724
+            "mtime_ns": 1775289571327360256,
+            "size": 722
           },
           {
             "mtime_ns": 1772662549111092990,
@@ -991,8 +991,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1772659157731637310,
-            "size": 919
+            "mtime_ns": 1775289571327704509,
+            "size": 917
           },
           {
             "mtime_ns": 1772659178136950973,
@@ -1028,8 +1028,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1771580506795939354,
-            "size": 2665
+            "mtime_ns": 1775289571327841177,
+            "size": 2659
           },
           {
             "mtime_ns": 1772662549126760115,
@@ -1102,8 +1102,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1771580506796781999,
-            "size": 425
+            "mtime_ns": 1775289571328040595,
+            "size": 424
           },
           {
             "mtime_ns": 1772662549141541983,
@@ -1139,8 +1139,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883157948725,
-            "size": 1363
+            "mtime_ns": 1775289571328155805,
+            "size": 1362
           },
           {
             "mtime_ns": 1773578883158101810,
@@ -1176,8 +1176,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883158700817,
-            "size": 1371
+            "mtime_ns": 1775289571328273764,
+            "size": 1368
           },
           {
             "mtime_ns": 1772662549149261461,
@@ -1213,8 +1213,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1772297429750716307,
-            "size": 2706
+            "mtime_ns": 1775289571328621184,
+            "size": 2703
           },
           {
             "mtime_ns": 1772662284969474874,
@@ -1250,8 +1250,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883167245201,
-            "size": 781
+            "mtime_ns": 1775289571328749644,
+            "size": 780
           },
           {
             "mtime_ns": 1772662549164546208,
@@ -1287,8 +1287,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883167824958,
-            "size": 1265
+            "mtime_ns": 1775289571328870437,
+            "size": 1263
           },
           {
             "mtime_ns": 1772659181898189756,
@@ -1324,8 +1324,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883168063960,
-            "size": 651
+            "mtime_ns": 1775289571328995105,
+            "size": 650
           },
           {
             "mtime_ns": 1772662549179563661,
@@ -1361,8 +1361,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1771580506797988777,
-            "size": 780
+            "mtime_ns": 1775289571329099439,
+            "size": 778
           },
           {
             "mtime_ns": 1772662549186937595,
@@ -1398,8 +1398,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1771580506798226408,
-            "size": 621
+            "mtime_ns": 1775289571329231648,
+            "size": 620
           },
           {
             "mtime_ns": 1772662549194373612,
@@ -1435,8 +1435,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774312264610551194,
-            "size": 1366
+            "mtime_ns": 1775289571329373733,
+            "size": 1310
           },
           {
             "mtime_ns": 1772662549202070215,
@@ -1472,8 +1472,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1772659152149837103,
-            "size": 930
+            "mtime_ns": 1775289571329625902,
+            "size": 928
           },
           {
             "mtime_ns": 1772659174657326773,
@@ -1509,8 +1509,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1772659145869862035,
-            "size": 1261
+            "mtime_ns": 1775289571329807029,
+            "size": 1258
           },
           {
             "mtime_ns": 1772662290834176621,
@@ -1546,8 +1546,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1774312264610674446,
-            "size": 1105
+            "mtime_ns": 1775289571329958864,
+            "size": 1077
           },
           {
             "mtime_ns": 1772662549225101857,
@@ -1620,8 +1620,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1771580506799068262,
-            "size": 2048
+            "mtime_ns": 1775289571330112865,
+            "size": 2047
           },
           {
             "mtime_ns": 1772662549232655543,
@@ -1657,8 +1657,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883168261087,
-            "size": 1054
+            "mtime_ns": 1775321299582313129,
+            "size": 1540
           },
           {
             "mtime_ns": 1773578883168437923,
@@ -1694,8 +1694,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1773578883169430600,
-            "size": 966
+            "mtime_ns": 1775321299582582715,
+            "size": 2340
           },
           {
             "mtime_ns": 1773578883169638769,
@@ -1731,8 +1731,8 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1771580506799577399,
-            "size": 382
+            "mtime_ns": 1775289571331528337,
+            "size": 381
           },
           {
             "mtime_ns": 1772662549240489813,
@@ -1743,11 +1743,11 @@
     }
   },
   "stats": {
-    "cache_hits": 836,
+    "cache_hits": 843,
     "cache_misses": 0,
     "removed_entries": 0,
     "skill_count": 47,
-    "workflow_doc_count": 789
+    "workflow_doc_count": 796
   },
   "workflow_docs": {
     "logics/backlog/item_000_v1_foundation_domain_model_and_store.md": {
@@ -45738,7 +45738,7 @@
         "title": "Safe JSON.parse wrapper and boot recovery UI for corrupted localStorage"
       },
       "signature": {
-        "mtime_ns": 1775128115700506437,
+        "mtime_ns": 1775142102013900175,
         "size": 3991
       }
     },
@@ -45863,7 +45863,7 @@
         "title": "Migration backup and rollback on failure with explicit user feedback"
       },
       "signature": {
-        "mtime_ns": 1775128118798066220,
+        "mtime_ns": 1775142102014182178,
         "size": 4313
       }
     },
@@ -45984,7 +45984,7 @@
         "title": "localStorage quota awareness and write failure surfacing"
       },
       "signature": {
-        "mtime_ns": 1775128122675047731,
+        "mtime_ns": 1775142102014754891,
         "size": 4036
       }
     },
@@ -46106,7 +46106,7 @@
         "title": "Replace pathfinding queue.sort with a min-heap priority queue"
       },
       "signature": {
-        "mtime_ns": 1775128402662082832,
+        "mtime_ns": 1775142102015674066,
         "size": 3891
       }
     },
@@ -46227,7 +46227,7 @@
         "title": "Memoize routing graph construction in selector"
       },
       "signature": {
-        "mtime_ns": 1775128402662199458,
+        "mtime_ns": 1775142102016344988,
         "size": 3923
       }
     },
@@ -46356,7 +46356,7 @@
         "title": "AppController decomposition: Context providers and derived state memoization"
       },
       "signature": {
-        "mtime_ns": 1775129074879210977,
+        "mtime_ns": 1775142102016861284,
         "size": 4888
       }
     },
@@ -46479,7 +46479,7 @@
         "title": "Audit and enforce sync invariant between global and network-scoped state"
       },
       "signature": {
-        "mtime_ns": 1775129074879594980,
+        "mtime_ns": 1775142102017035619,
         "size": 4332
       }
     },
@@ -46606,7 +46606,7 @@
         "title": "Unit tests for controller hooks in isolation"
       },
       "signature": {
-        "mtime_ns": 1775129850804929716,
+        "mtime_ns": 1775142102017541748,
         "size": 4293
       }
     },
@@ -46735,7 +46735,7 @@
         "title": "Dedicated migration spec with version fixtures and corrupt input coverage"
       },
       "signature": {
-        "mtime_ns": 1775129850805773350,
+        "mtime_ns": 1775142102017915835,
         "size": 4964
       }
     },
@@ -46864,7 +46864,7 @@
         "title": "Universal occupancy index validation before occupancy map writes"
       },
       "signature": {
-        "mtime_ns": 1775130502524803030,
+        "mtime_ns": 1775142102018182212,
         "size": 4536
       }
     },
@@ -46988,7 +46988,7 @@
         "title": "Canvas viewport state in store and undo/redo history integration"
       },
       "signature": {
-        "mtime_ns": 1775131440544619573,
+        "mtime_ns": 1775142102018520632,
         "size": 4998
       }
     },
@@ -47118,7 +47118,7 @@
         "title": "Structured AppError type replacing monolithic lastError string"
       },
       "signature": {
-        "mtime_ns": 1775130502525667080,
+        "mtime_ns": 1775142102018768759,
         "size": 4946
       }
     },
@@ -47267,7 +47267,7 @@
         "title": "Connector and splice catalog selector labels include catalog names and safe fallback formatting"
       },
       "signature": {
-        "mtime_ns": 1775132301979806365,
+        "mtime_ns": 1775142102019582141,
         "size": 9323
       }
     },
@@ -47415,7 +47415,7 @@
         "title": "Bottom New action across Modeling create forms with silent draft reset"
       },
       "signature": {
-        "mtime_ns": 1775132321431364574,
+        "mtime_ns": 1775142102019961727,
         "size": 9085
       }
     },
@@ -47563,7 +47563,7 @@
         "title": "Regression coverage and closure for modeling create-form chained New and catalog label ergonomics"
       },
       "signature": {
-        "mtime_ns": 1775132321652282779,
+        "mtime_ns": 1775142102020289522,
         "size": 9141
       }
     },
@@ -47702,7 +47702,7 @@
         "title": "Delete and cascade delete dialog Enter shortcut contract with cancel-focused safety"
       },
       "signature": {
-        "mtime_ns": 1775132321862087749,
+        "mtime_ns": 1775142102020713900,
         "size": 6881
       }
     },
@@ -47841,7 +47841,7 @@
         "title": "Keyboard Enter confirmation wiring scoped to destructive delete dialogs only"
       },
       "signature": {
-        "mtime_ns": 1775132322120062191,
+        "mtime_ns": 1775142102021035778,
         "size": 6870
       }
     },
@@ -47980,7 +47980,7 @@
         "title": "Regression coverage and closure for destructive dialog Enter confirmation behavior"
       },
       "signature": {
-        "mtime_ns": 1775132322330380750,
+        "mtime_ns": 1775142102021398031,
         "size": 6883
       }
     },
@@ -48132,7 +48132,7 @@
         "title": "Modeling table batch mode state, selection contract, and explicit entry exit behavior"
       },
       "signature": {
-        "mtime_ns": 1775132322556298378,
+        "mtime_ns": 1775142102021747868,
         "size": 8873
       }
     },
@@ -48284,7 +48284,7 @@
         "title": "Modeling table checkbox UI and batch context panel wiring"
       },
       "signature": {
-        "mtime_ns": 1775132322759757787,
+        "mtime_ns": 1775142102022011703,
         "size": 8814
       }
     },
@@ -48436,7 +48436,7 @@
         "title": "Batch delete preflight confirmation and one operation execution for modeling tables"
       },
       "signature": {
-        "mtime_ns": 1775132322949692730,
+        "mtime_ns": 1775142102022692584,
         "size": 8872
       }
     },
@@ -48588,7 +48588,7 @@
         "title": "Regression coverage and closure for modeling table batch delete flows"
       },
       "signature": {
-        "mtime_ns": 1775132323147331623,
+        "mtime_ns": 1775142102023075087,
         "size": 8844
       }
     },
@@ -48738,7 +48738,7 @@
         "title": "Canvas Shift click multi selection state and node only selection contract"
       },
       "signature": {
-        "mtime_ns": 1775132323338834372,
+        "mtime_ns": 1775142102023281172,
         "size": 7709
       }
     },
@@ -48888,7 +48888,7 @@
         "title": "Grouped node drag and persisted multi move behavior on the 2D modeling canvas"
       },
       "signature": {
-        "mtime_ns": 1775132323538749246,
+        "mtime_ns": 1775142102023616050,
         "size": 7714
       }
     },
@@ -49038,7 +49038,7 @@
         "title": "Canvas multi selection inspector summary and single selection compatibility wiring"
       },
       "signature": {
-        "mtime_ns": 1775132323728857107,
+        "mtime_ns": 1775142102023978928,
         "size": 7729
       }
     },
@@ -49189,8 +49189,642 @@
         "title": "Regression coverage and closure for canvas multi selection and grouped move behavior"
       },
       "signature": {
-        "mtime_ns": 1775132301980135493,
+        "mtime_ns": 1775142102024193597,
         "size": 7919
+      }
+    },
+    "logics/backlog/item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "post-release, and, grouped-move, corrections, req",
+          "skip when": "Skip when the work targets another feature, repository, or workflow stage.",
+          "summary": "Post-release UX and grouped-move corrections after req 114 to req 117",
+          "use when": "Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "97%",
+          "From version": "1.4.4",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "UI",
+          "Understanding": "98%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md",
+        "ref": "item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117",
+        "refs": {
+          "adr": [
+            "adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence"
+          ],
+          "item": [
+            "item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117",
+            "item_580_post_create_edit_state_new_action_correction_for_modeling_forms",
+            "item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables",
+            "item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction",
+            "item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections"
+          ],
+          "prod": [],
+          "req": [
+            "req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ],
+          "spec": [],
+          "task": [
+            "task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> `item_580`. Proof: post-create edit-state `New` correction lands without create-mode duplication and is covered by `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`.",
+            "- AC2 -> `item_581`. Proof: `Select multiple` is aligned on the shared action row, gains an explicit icon, and is covered by `src/tests/app.ui.list-ergonomics.spec.tsx`.",
+            "- AC3 -> `item_582`. Proof: grouped drag no longer drops unrelated persisted node positions and is covered by `src/tests/app.ui.navigation-canvas.spec.tsx` plus `src/tests/store.reducer.sync-invariant.spec.ts`.",
+            "- AC4 -> `item_583` plus integrated validation in `task_097`. Proof: targeted regression coverage and closure keep the original shipped interaction contracts intact.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Post-release UX and grouped-move corrections after req 114 to req 117",
+            "- Keywords: post-release, and, grouped-move, corrections, req",
+            "- Use when: Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117.",
+            "- Skip when: Skip when the work targets another feature, repository, or workflow stage.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: After a successful creation in Modeling, the bottom `New` action is available from the resulting edit state so the operator can immediately start a fresh creation without scrolling back to the top. The button is not duplicated as a create-mode-only footer action.",
+            "- AC2: On the Modeling table screens, `Select multiple` is rendered on the same horizontal action row as the other primary actions, with a dedicated icon and a stable placement consistent across the supported tables. A suggested placement is between `Edit` and `Delete`.",
+            "- AC3: Entering multi-selection on the 2D canvas and dragging a selected node only applies the grouped move to the selected nodes. It must not trigger an automatic generate/recompute as part of the drag flow, and it must not materially change unrelated parts of the plan.",
+            "- AC4: The post-release corrections preserve the intended behaviors introduced by the original bundle: chained creation remains fast, batch delete still requires explicit entry into selection mode, and `Shift+click` remains the gesture for canvas multi-selection.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Consider",
+            "- Product signals: pricing and packaging",
+            "- Product follow-up: Review whether a product brief is needed before scope becomes harder to change.",
+            "- Architecture framing: Required",
+            "- Architecture signals: data model and persistence, contracts and integration",
+            "- Architecture follow-up: Create or link an architecture decision before irreversible implementation work starts.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence`",
+            "- Request: `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            "- Child backlog item(s): `item_580_post_create_edit_state_new_action_correction_for_modeling_forms`, `item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables`, `item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction`, `item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections`",
+            "- Primary task(s): `task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from request `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`.",
+            "- Source file: `logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md`.",
+            "- Request context seeded into this backlog item from `logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md`.",
+            "- This backlog item is the umbrella slice for child items `580` to `583`."
+          ],
+          "Priority": [
+            "- Impact:",
+            "- Urgency:",
+            ""
+          ],
+          "Problem": [
+            "- Coordinate a coherent post-release correction bundle for the features delivered by `req_114` to `req_117`.",
+            "- Keep the corrective work split into focused slices so create-flow UX, Modeling table action-bar UX, canvas grouped drag behavior, and regression closure can move independently while still landing under one delivery wrapper.",
+            "- Preserve the original interaction contracts from the shipped bundle while correcting the operator-reported issues.",
+            ""
+          ],
+          "References": [
+            "- `logics/skills/logics-ui-steering/SKILL.md`",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - corrective delivery planning for child backlog items `580` to `583`",
+            "  - one orchestration task that sequences the waves and validation",
+            "  - linked workflow-doc updates across request, backlog, and task levels",
+            "- Out:",
+            "  - introducing new features beyond the reported corrections",
+            "  - redesigning unrelated Modeling or canvas workflows",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|post-release-ux-and-grouped-move-correct|req-118-post-release-ux-and-grouped-move|coordinate-a-coherent-post-release-corre|ac1-after-a-successful-creation-in",
+            "flowchart LR",
+            "    Request[req_118_post_release_ux_and_grouped_move_c] --> Problem[Correct the placement of the bottom]",
+            "    Problem --> Scope[Post-release UX and grouped-move correctio]",
+            "    Scope --> Acceptance[AC1: After a successful creation in]",
+            "    Acceptance --> Tasks[Execution task]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Post-release UX and grouped-move corrections after req 114 to req 117"
+      },
+      "signature": {
+        "mtime_ns": 1775142102024494558,
+        "size": 5660
+      }
+    },
+    "logics/backlog/item_580_post_create_edit_state_new_action_correction_for_modeling_forms.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "post-release, and, grouped-move, corrections, req",
+          "skip when": "Skip when the work targets another feature, repository, or workflow stage.",
+          "summary": "Post-release UX and grouped-move corrections after req 114 to req 117",
+          "use when": "Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "97%",
+          "From version": "1.4.4",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "UI",
+          "Understanding": "98%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_580_post_create_edit_state_new_action_correction_for_modeling_forms.md",
+        "ref": "item_580_post_create_edit_state_new_action_correction_for_modeling_forms",
+        "refs": {
+          "adr": [
+            "adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence"
+          ],
+          "item": [
+            "item_580_post_create_edit_state_new_action_correction_for_modeling_forms",
+            "item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ],
+          "prod": [],
+          "req": [
+            "req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ],
+          "spec": [],
+          "task": [
+            "task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> post-create edit-state action placement. Proof: delivered in Wave 1 and validated in `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`.",
+            "- AC2 -> create-mode footer removal. Proof: delivered in Wave 1 and validated in `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`.",
+            "- AC3 -> silent reset to fresh create form. Proof: delivered in Wave 1 and validated in `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Post-release UX and grouped-move corrections after req 114 to req 117",
+            "- Keywords: post-release, and, grouped-move, corrections, req",
+            "- Use when: Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117.",
+            "- Skip when: Skip when the work targets another feature, repository, or workflow stage.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: After a successful creation in a supported Modeling form, the resulting edit state exposes the bottom `New` action so the operator can immediately start another creation without scrolling back to the top.",
+            "- AC2: The bottom `New` action is no longer presented as a create-mode-only footer control.",
+            "- AC3: Clicking `New` from the post-create edit state resets toward a fresh empty creation form without duplicating or pre-filling the previously created item.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Consider",
+            "- Product signals: pricing and packaging",
+            "- Product follow-up: Review whether a product brief is needed before scope becomes harder to change.",
+            "- Architecture framing: Required",
+            "- Architecture signals: data model and persistence, contracts and integration",
+            "- Architecture follow-up: Create or link an architecture decision before irreversible implementation work starts.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence`",
+            "- Request: `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            "- Parent backlog item: `item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            "- Primary task(s): `task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from request `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`.",
+            "- Source file: `logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md`.",
+            "- Request context seeded into this backlog item from `logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md`.",
+            "- This item maps the create-flow correction slice from the post-release bundle."
+          ],
+          "Priority": [
+            "- Impact:",
+            "- Urgency:",
+            ""
+          ],
+          "Problem": [
+            "- The repeated-creation accelerator was placed in create mode instead of the post-create edit state where the operator actually needs it.",
+            "- The correction must restore the intended chained-creation flow without turning `New` into a generic action across every edit scenario.",
+            ""
+          ],
+          "References": [
+            "- `logics/skills/logics-ui-steering/SKILL.md`",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - move the bottom `New` action to the post-create edit state across supported Modeling forms",
+            "  - keep `New` as a silent reset toward a fresh empty creation form",
+            "  - remove the create-mode-only footer placement introduced by the previous delivery",
+            "- Out:",
+            "  - adding duplication or prefilled-create behavior",
+            "  - expanding the action to all pre-existing edit states",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|post-create-edit-state-new-action-correc|req-118-post-release-ux-and-grouped-move|the-repeated-creation-accelerator-was-pl|ac1-after-a-successful-creation-in",
+            "flowchart LR",
+            "    Request[req_118_post_release_ux_and_grouped_move_c] --> Problem[Correct the placement of the bottom]",
+            "    Problem --> Scope[Post-create edit state New action correcti]",
+            "    Scope --> Acceptance[AC1: After a successful creation in]",
+            "    Acceptance --> Tasks[Execution task]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Post-create edit state New action correction for Modeling forms"
+      },
+      "signature": {
+        "mtime_ns": 1775142102024810727,
+        "size": 4319
+      }
+    },
+    "logics/backlog/item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "post-release, and, grouped-move, corrections, req",
+          "skip when": "Skip when the work targets another feature, repository, or workflow stage.",
+          "summary": "Post-release UX and grouped-move corrections after req 114 to req 117",
+          "use when": "Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "97%",
+          "From version": "1.4.4",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "UI",
+          "Understanding": "98%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables.md",
+        "ref": "item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables",
+        "refs": {
+          "adr": [
+            "adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence"
+          ],
+          "item": [
+            "item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables",
+            "item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ],
+          "prod": [],
+          "req": [
+            "req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ],
+          "spec": [],
+          "task": [
+            "task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> action-row alignment. Proof: `src/tests/app.ui.list-ergonomics.spec.tsx` covers the shared Modeling action row placement.",
+            "- AC2 -> explicit icon plus unchanged label. Proof: `src/tests/app.ui.list-ergonomics.spec.tsx` checks the dedicated multi-selection icon and stable label.",
+            "- AC3 -> stable action ordering across supported screens. Proof: `src/tests/app.ui.list-ergonomics.spec.tsx` verifies the `New -> Edit -> Select multiple -> Delete` ordering on representative Modeling tables.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Post-release UX and grouped-move corrections after req 114 to req 117",
+            "- Keywords: post-release, and, grouped-move, corrections, req",
+            "- Use when: Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117.",
+            "- Skip when: Skip when the work targets another feature, repository, or workflow stage.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: On supported Modeling table screens, `Select multiple` is rendered on the same horizontal action row as the other primary actions rather than as a detached control.",
+            "- AC2: The control uses a dedicated multi-selection icon and remains labeled `Select multiple`.",
+            "- AC3: The visual order is consistent across supported Modeling screens, with `Select multiple` logically positioned between `Edit` and `Delete` even when small layouts wrap.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Consider",
+            "- Product signals: pricing and packaging",
+            "- Product follow-up: Review whether a product brief is needed before scope becomes harder to change.",
+            "- Architecture framing: Required",
+            "- Architecture signals: data model and persistence, contracts and integration",
+            "- Architecture follow-up: Create or link an architecture decision before irreversible implementation work starts.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence`",
+            "- Request: `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            "- Parent backlog item: `item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            "- Primary task(s): `task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from request `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`.",
+            "- Source file: `logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md`.",
+            "- Request context seeded into this backlog item from `logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md`.",
+            "- This item maps the Modeling action-bar correction slice from the post-release bundle."
+          ],
+          "Priority": [
+            "- Impact:",
+            "- Urgency:",
+            ""
+          ],
+          "Problem": [
+            "- The `Select multiple` action is visually detached from the other Modeling table actions and currently lacks the discoverability expected for a mode-switching control.",
+            "- The correction must align the control with the existing action bar contract without changing the underlying batch-delete behavior.",
+            ""
+          ],
+          "References": [
+            "- `logics/skills/logics-ui-steering/SKILL.md`",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - place `Select multiple` on the same horizontal action row as `New`, `Edit`, and `Delete`",
+            "  - keep a stable logical ordering, with target placement between `Edit` and `Delete`",
+            "  - add an explicit multi-selection icon to the action",
+            "- Out:",
+            "  - renaming the action",
+            "  - changing batch-delete rules or the explicit-entry requirement",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|select-multiple-action-row-placement-and|req-118-post-release-ux-and-grouped-move|the-select-multiple-action-is-visually|ac1-on-supported-modeling-table-screens",
+            "flowchart LR",
+            "    Request[req_118_post_release_ux_and_grouped_move_c] --> Problem[Correct the placement of the bottom]",
+            "    Problem --> Scope[Select multiple action-row placement and i]",
+            "    Scope --> Acceptance[AC1: After a successful creation in]",
+            "    Acceptance --> Tasks[Execution task]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Select multiple action-row placement and icon alignment across Modeling tables"
+      },
+      "signature": {
+        "mtime_ns": 1775142102025139730,
+        "size": 4404
+      }
+    },
+    "logics/backlog/item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "post-release, and, grouped-move, corrections, req",
+          "skip when": "Skip when the work targets another feature, repository, or workflow stage.",
+          "summary": "Post-release UX and grouped-move corrections after req 114 to req 117",
+          "use when": "Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "97%",
+          "From version": "1.4.4",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "UI",
+          "Understanding": "98%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction.md",
+        "ref": "item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction",
+        "refs": {
+          "adr": [
+            "adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence"
+          ],
+          "item": [
+            "item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction",
+            "item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ],
+          "prod": [],
+          "req": [
+            "req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ],
+          "spec": [],
+          "task": [
+            "task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> no automatic generate during grouped drag. Proof: `src/tests/app.ui.navigation-canvas.spec.tsx` covers grouped drag as a localized persistence flow without unrelated layout mutation.",
+            "- AC2 -> localized persisted move only. Proof: `src/tests/app.ui.navigation-canvas.spec.tsx` verifies unrelated persisted node positions remain unchanged after grouped drag.",
+            "- AC3 -> block or constrain if localization is impossible. Proof: `src/tests/store.reducer.sync-invariant.spec.ts` locks the partial-batch merge contract so localized grouped persistence cannot drop unrelated node positions.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Post-release UX and grouped-move corrections after req 114 to req 117",
+            "- Keywords: post-release, and, grouped-move, corrections, req",
+            "- Use when: Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117.",
+            "- Skip when: Skip when the work targets another feature, repository, or workflow stage.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: Dragging a selected node while canvas multi-selection is active does not trigger an automatic generate or broad recompute as part of the drag flow.",
+            "- AC2: The resulting persisted mutation only updates the selected nodes and does not materially change unrelated parts of the plan.",
+            "- AC3: If a grouped move cannot remain localized, the interaction is blocked or constrained instead of mutating unrelated elements.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Consider",
+            "- Product signals: pricing and packaging",
+            "- Product follow-up: Review whether a product brief is needed before scope becomes harder to change.",
+            "- Architecture framing: Required",
+            "- Architecture signals: data model and persistence, contracts and integration",
+            "- Architecture follow-up: Create or link an architecture decision before irreversible implementation work starts.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence`",
+            "- Request: `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            "- Parent backlog item: `item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            "- Primary task(s): `task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from request `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`.",
+            "- Source file: `logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md`.",
+            "- Request context seeded into this backlog item from `logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md`.",
+            "- This item maps the canvas grouped-drag correction slice from the post-release bundle."
+          ],
+          "Priority": [
+            "- Impact:",
+            "- Urgency:",
+            ""
+          ],
+          "Problem": [
+            "- Grouped drag on the 2D Modeling canvas appears to trigger a generate or broader recompute after movement, which alters unrelated parts of the plan.",
+            "- The correction must restore a strict grouped-move contract where only the selected nodes are updated, or the move is explicitly blocked if a localized update is impossible.",
+            ""
+          ],
+          "References": [
+            "- `logics/skills/logics-ui-steering/SKILL.md`",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - isolate grouped drag from automatic generate or broad recompute side effects",
+            "  - persist only the intended localized move for the selected nodes",
+            "  - preserve the existing `Shift+click` multi-selection gesture and localized move semantics",
+            "- Out:",
+            "  - adding new selection gestures",
+            "  - reworking unrelated generation flows outside this bug fix",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|canvas-grouped-drag-generate-isolation-a|req-118-post-release-ux-and-grouped-move|grouped-drag-on-the-2d-modeling|ac1-dragging-a-selected-node-while",
+            "flowchart LR",
+            "    Request[req_118_post_release_ux_and_grouped_move_c] --> Problem[Correct the placement of the bottom]",
+            "    Problem --> Scope[Canvas grouped-drag generate isolation and]",
+            "    Scope --> Acceptance[AC1: After a successful creation in]",
+            "    Acceptance --> Tasks[Execution task]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Canvas grouped-drag generate isolation and localized move persistence correction"
+      },
+      "signature": {
+        "mtime_ns": 1775142102025642234,
+        "size": 4504
+      }
+    },
+    "logics/backlog/item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "post-release, and, grouped-move, corrections, req",
+          "skip when": "Skip when the work targets another feature, repository, or workflow stage.",
+          "summary": "Post-release UX and grouped-move corrections after req 114 to req 117",
+          "use when": "Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "97%",
+          "From version": "1.4.4",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "UI",
+          "Understanding": "98%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections.md",
+        "ref": "item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections",
+        "refs": {
+          "adr": [
+            "adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence"
+          ],
+          "item": [
+            "item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections",
+            "item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ],
+          "prod": [],
+          "req": [
+            "req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ],
+          "spec": [],
+          "task": [
+            "task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> create-flow regression coverage. Proof: `src/tests/app.ui.creation-flow-ergonomics.spec.tsx` covers the post-create-only bottom `New` contract.",
+            "- AC2 -> Modeling action-row regression coverage. Proof: `src/tests/app.ui.list-ergonomics.spec.tsx` covers the shared action-row placement and icon affordance for `Select multiple`.",
+            "- AC3 -> canvas grouped-drag regression coverage. Proof: `src/tests/app.ui.navigation-canvas.spec.tsx` and `src/tests/store.reducer.sync-invariant.spec.ts` cover localized grouped drag persistence without unrelated plan mutation.",
+            "- AC4 -> workflow-doc closure evidence. Proof: `req_118`, `item_579`, `item_580`, `item_581`, `item_582`, `item_583`, and `task_097` are all synchronized to `Done` after integrated validation and `Logics lint: OK`.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Post-release UX and grouped-move corrections after req 114 to req 117",
+            "- Keywords: post-release, and, grouped-move, corrections, req",
+            "- Use when: Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117.",
+            "- Skip when: Skip when the work targets another feature, repository, or workflow stage.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: Automated regression coverage demonstrates that the repaired post-create `New` placement behaves as intended and no longer appears as a create-mode-only footer action.",
+            "- AC2: Automated regression coverage demonstrates that `Select multiple` is rendered on the intended action row with the intended icon affordance.",
+            "- AC3: Automated regression coverage demonstrates that grouped drag does not trigger automatic generate side effects and does not mutate unrelated plan elements.",
+            "- AC4: The linked request, umbrella backlog item, child backlog items, and orchestration task are updated coherently as the corrective bundle is delivered and closed.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Consider",
+            "- Product signals: pricing and packaging",
+            "- Product follow-up: Review whether a product brief is needed before scope becomes harder to change.",
+            "- Architecture framing: Required",
+            "- Architecture signals: data model and persistence, contracts and integration",
+            "- Architecture follow-up: Create or link an architecture decision before irreversible implementation work starts.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence`",
+            "- Request: `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            "- Parent backlog item: `item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            "- Primary task(s): `task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from request `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`.",
+            "- Source file: `logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md`.",
+            "- Request context seeded into this backlog item from `logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md`.",
+            "- This item maps the regression-and-closure slice from the post-release bundle."
+          ],
+          "Priority": [
+            "- Impact:",
+            "- Urgency:",
+            ""
+          ],
+          "Problem": [
+            "- The post-release correction bundle needs explicit regression coverage and closure evidence so the repaired interaction contracts stay stable.",
+            "- The regression slice must cover the create-flow correction, the Modeling action-bar correction, the grouped-drag canvas fix, and linked workflow-doc synchronization.",
+            ""
+          ],
+          "References": [
+            "- `logics/skills/logics-ui-steering/SKILL.md`",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - targeted regression coverage for the corrected `New` placement",
+            "  - targeted regression coverage for `Select multiple` row placement and icon affordance",
+            "  - targeted regression coverage for grouped-drag no-generate behavior and localized movement",
+            "  - linked request/backlog/task closure updates after delivery",
+            "- Out:",
+            "  - broad new test suites unrelated to the corrected surfaces",
+            "  - unrelated workflow-document refactors outside the delivery chain",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|regression-coverage-and-closure-for-post|req-118-post-release-ux-and-grouped-move|the-post-release-correction-bundle-needs|ac1-automated-regression-coverage-demons",
+            "flowchart LR",
+            "    Request[req_118_post_release_ux_and_grouped_move_c] --> Problem[Correct the placement of the bottom]",
+            "    Problem --> Scope[Regression coverage and closure for post-r]",
+            "    Scope --> Acceptance[AC1: After a successful creation in]",
+            "    Acceptance --> Tasks[Execution task]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Regression coverage and closure for post-release UX and grouped-move corrections"
+      },
+      "signature": {
+        "mtime_ns": 1775142102025972362,
+        "size": 5026
       }
     },
     "logics/request/req_000_kickoff_v1_electrical_plan_editor.md": {
@@ -71350,7 +71984,7 @@
         "title": "Technical debt hardening: persistence safety, performance, and architecture quality"
       },
       "signature": {
-        "mtime_ns": 1775131358136069839,
+        "mtime_ns": 1775142102028279382,
         "size": 18697
       }
     },
@@ -71582,7 +72216,7 @@
         "title": "Connector and splice catalog labels show names and create forms support chained New action"
       },
       "signature": {
-        "mtime_ns": 1775132323922105499,
+        "mtime_ns": 1775142102028609343,
         "size": 13250
       }
     },
@@ -71797,7 +72431,7 @@
         "title": "Keyboard confirmation shortcut for delete modals with explicit safety policy"
       },
       "signature": {
-        "mtime_ns": 1775132324075116288,
+        "mtime_ns": 1775142102028918762,
         "size": 10277
       }
     },
@@ -72080,7 +72714,7 @@
         "title": "Batch delete mode for modeling tables with explicit multi-selection and mixed-impact handling"
       },
       "signature": {
-        "mtime_ns": 1775132324221216385,
+        "mtime_ns": 1775142102029237765,
         "size": 14261
       }
     },
@@ -72327,8 +72961,150 @@
         "title": "Shift click multi selection and grouped move on the 2D modeling canvas"
       },
       "signature": {
-        "mtime_ns": 1775132324364675581,
+        "mtime_ns": 1775142102029599768,
         "size": 12531
+      }
+    },
+    "logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "post-release, and, grouped-move, corrections, req",
+          "skip when": "Skip when the work targets another feature, repository, or workflow stage.",
+          "summary": "Post-release UX and grouped-move corrections after req 114 to req 117",
+          "use when": "Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "97%",
+          "From version": "1.4.4",
+          "Reminder": "Update status/understanding/confidence and references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "UI",
+          "Understanding": "98%"
+        },
+        "kind": "request",
+        "path": "logics/request/req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md",
+        "ref": "req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117",
+        "refs": {
+          "adr": [
+            "adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence"
+          ],
+          "item": [
+            "item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117",
+            "item_580_post_create_edit_state_new_action_correction_for_modeling_forms",
+            "item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables",
+            "item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction",
+            "item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections"
+          ],
+          "prod": [],
+          "req": [
+            "req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117",
+            "req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action",
+            "req_116_batch_delete_mode_for_modeling_tables_with_explicit_multi_selection_and_mixed_impact_handling",
+            "req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas"
+          ],
+          "spec": [],
+          "task": [
+            "task_092_super_orchestration_delivery_execution_for_req_114_to_req_117_with_validation_gates_and_staged_checkpoints"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AI Context": [
+            "- Summary: Post-release UX and grouped-move corrections after req 114 to req 117",
+            "- Keywords: post-release, and, grouped-move, corrections, req",
+            "- Use when: Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117.",
+            "- Skip when: Skip when the work targets another feature, repository, or workflow stage.",
+            "",
+            "",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: After a successful creation in Modeling, the bottom `New` action is available from the resulting edit state so the operator can immediately start a fresh creation without scrolling back to the top. The button is not duplicated as a create-mode-only footer action.",
+            "- AC2: On the Modeling table screens, `Select multiple` is rendered on the same horizontal action row as the other primary actions, with a dedicated icon and a stable placement consistent across the supported tables. A suggested placement is between `Edit` and `Delete`.",
+            "- AC3: Entering multi-selection on the 2D canvas and dragging a selected node only applies the grouped move to the selected nodes. It must not trigger an automatic generate/recompute as part of the drag flow, and it must not materially change unrelated parts of the plan.",
+            "- AC4: The post-release corrections preserve the intended behaviors introduced by the original bundle: chained creation remains fast, batch delete still requires explicit entry into selection mode, and `Shift+click` remains the gesture for canvas multi-selection.",
+            ""
+          ],
+          "Backlog": [
+            "- `item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            "- `item_580_post_create_edit_state_new_action_correction_for_modeling_forms`",
+            "- `item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables`",
+            "- `item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction`",
+            "- `item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections`"
+          ],
+          "Clarifications": [
+            "- The bottom `New` action is intended for the post-create edit state reached immediately after a successful creation. It is not a generic action added to every pre-existing edit state.",
+            "- Clicking `New` from that post-create edit state resets toward a fresh empty creation form in V1. No duplication or field prefill is expected.",
+            "- The button label stays `Select multiple`. This correction changes placement and affordance, not vocabulary.",
+            "- The `Select multiple` action should use an explicit multi-selection icon, preferably a checked-boxes style icon rather than a generic batch-action metaphor.",
+            "- The target order is consistent across Modeling screens, with `Select multiple` placed on the same action row as the other controls and logically between `Edit` and `Delete`. On smaller layouts the visual wrapping may change, but the action order should remain the same.",
+            "- For grouped move on the canvas, the intended V1 contract is strict: no automatic generate/recompute should run as part of the grouped drag flow.",
+            "- If a grouped drag would require a broader recomposition than the selected nodes, the operation should be blocked or constrained rather than mutating unrelated parts of the plan.",
+            "",
+            "```mermaid",
+            "%% logics-kind: request",
+            "%% logics-signature: request|post-release-ux-and-grouped-move-correct|correct-the-placement-of-the-bottom|ac1-after-a-successful-creation-in",
+            "flowchart TD",
+            "    Trigger[Post release corrections after req 114 to req 117] --> NewFix[Move bottom New action to edit state]",
+            "    Trigger --> BatchFix[Align Select multiple in action row with icon]",
+            "    Trigger --> CanvasFix[Keep grouped move isolated from generate side effects]",
+            "    NewFix --> Outcome1[AC1 repeated creation starts from edit state]",
+            "    BatchFix --> Outcome2[AC2 batch action is aligned and recognizable]",
+            "    CanvasFix --> Outcome3[AC3 grouped drag only moves selected nodes]",
+            "    Outcome1 --> Backlog[Backlog slice]",
+            "    Outcome2 --> Backlog",
+            "    Outcome3 --> Backlog",
+            "```",
+            ""
+          ],
+          "Companion docs": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence`",
+            ""
+          ],
+          "Context": [
+            "The bundle shipped through `req_114` to `req_117` improved repeated creation, destructive workflows, table batch delete, and canvas multi-selection. The operator has now identified four post-release issues in the delivered UX and behavior:",
+            "",
+            "- The bottom `New` button was added in create mode, but the intended acceleration point is the edit mode reached immediately after a successful creation. In its current placement, it duplicates an action already available from the top-level create flow instead of helping chained creation.",
+            "- The `Select multiple` button is visually detached from the rest of the table actions. It should live on the same horizontal action row as `New`, `Edit`, and `Delete`, for example between `Edit` and `Delete`.",
+            "- The `Select multiple` button currently lacks an icon, which makes the action less scannable than adjacent controls.",
+            "- `Shift+click` grouped move on the canvas appears to trigger a generate/recompute after drag, and that recomputation changes the overall plan instead of only persisting the moved selected nodes.",
+            "",
+            "This request is intentionally a post-release correction bundle for the features delivered by:",
+            "",
+            "- [req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action.md](/Users/alexandreagostini/Documents/electrical-plan-editor/logics/request/req_114_connector_and_splice_catalog_labels_show_names_and_create_forms_support_chained_new_action.md)",
+            "- [req_116_batch_delete_mode_for_modeling_tables_with_explicit_multi_selection_and_mixed_impact_handling.md](/Users/alexandreagostini/Documents/electrical-plan-editor/logics/request/req_116_batch_delete_mode_for_modeling_tables_with_explicit_multi_selection_and_mixed_impact_handling.md)",
+            "- [req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas.md](/Users/alexandreagostini/Documents/electrical-plan-editor/logics/request/req_117_shift_click_multi_selection_and_grouped_move_on_the_2d_modeling_canvas.md)",
+            "- [task_092_super_orchestration_delivery_execution_for_req_114_to_req_117_with_validation_gates_and_staged_checkpoints.md](/Users/alexandreagostini/Documents/electrical-plan-editor/logics/tasks/task_092_super_orchestration_delivery_execution_for_req_114_to_req_117_with_validation_gates_and_staged_checkpoints.md)",
+            "",
+            "Scope boundaries:",
+            "",
+            "- In scope: placement and affordance corrections for already-shipped actions, and bug fixing for grouped move persistence/generation interaction.",
+            "- Out of scope: redesigning the full Modeling action bar, adding new canvas selection gestures beyond the current `Shift+click` contract, or changing the batch delete rules introduced by `req_116`.",
+            ""
+          ],
+          "Definition of Ready (DoR)": [
+            "- [x] Problem statement is explicit and user impact is clear.",
+            "- [x] Scope boundaries (in/out) are explicit.",
+            "- [x] Acceptance criteria are testable.",
+            "- [x] Dependencies and known risks are listed.",
+            ""
+          ],
+          "Needs": [
+            "- Correct the placement of the bottom `New` action so it supports repeated creation from the post-create edit state instead of duplicating the create-mode footer.",
+            "- Align the `Select multiple` action with the existing table action bar layout and make the affordance more discoverable with an icon.",
+            "- Preserve a clean separation between grouped movement and generation logic on the 2D modeling canvas so `Shift+click` multi-selection only moves the selected nodes.",
+            "- Capture these fixes as post-release corrections to the delivered bundle from `req_114` to `req_117`, without expanding scope to new unrelated features.",
+            ""
+          ]
+        },
+        "title": "Post-release UX and grouped-move corrections after req 114 to req 117"
+      },
+      "signature": {
+        "mtime_ns": 1775142102030063147,
+        "size": 7963
       }
     },
     "logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md": {
@@ -86460,7 +87236,7 @@
         "title": "Orchestration delivery execution for req_113 technical debt hardening"
       },
       "signature": {
-        "mtime_ns": 1775131308798320141,
+        "mtime_ns": 1775142102030480150,
         "size": 15267
       }
     },
@@ -86669,8 +87445,174 @@
         "title": "Super orchestration delivery execution for req 114 to req 117 with validation gates and staged checkpoints"
       },
       "signature": {
-        "mtime_ns": 1775132350938568972,
+        "mtime_ns": 1775142102030749153,
         "size": 11519
+      }
+    },
+    "logics/tasks/task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "post-release, and, grouped-move, corrections, req",
+          "skip when": "Skip when the work targets another feature, repository, or workflow stage.",
+          "summary": "Post-release UX and grouped-move corrections after req 114 to req 117",
+          "use when": "Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117."
+        },
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "97%",
+          "From version": "1.4.4",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and dependencies/references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "Modeling post-release corrections",
+          "Understanding": "98%"
+        },
+        "kind": "task",
+        "path": "logics/tasks/task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117.md",
+        "ref": "task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117",
+        "refs": {
+          "adr": [
+            "adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence"
+          ],
+          "item": [
+            "item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117",
+            "item_580_post_create_edit_state_new_action_correction_for_modeling_forms",
+            "item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables",
+            "item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction",
+            "item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections"
+          ],
+          "prod": [],
+          "req": [
+            "req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ],
+          "spec": [],
+          "task": [
+            "task_097_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- `req_118` AC1 -> `item_580`. Proof: post-create edit-state `New` correction plus targeted create-flow coverage.",
+            "- `req_118` AC2 -> `item_581`. Proof: Modeling action-row alignment and icon affordance updates plus table UX coverage.",
+            "- `req_118` AC3 -> `item_582`. Proof: grouped-drag no-generate correction and localized-move persistence coverage.",
+            "- `req_118` AC4 -> `item_583`. Proof: integrated regression coverage and coherent closure across request, backlog, and task docs.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Post-release UX and grouped-move corrections after req 114 to req 117",
+            "- Keywords: post-release, and, grouped-move, corrections, req",
+            "- Use when: Use when framing scope, context, and acceptance checks for Post-release UX and grouped-move corrections after req 114 to req 117.",
+            "- Skip when: Skip when the work targets another feature, repository, or workflow stage.",
+            ""
+          ],
+          "Context": [
+            "This orchestration task executes the full corrective bundle opened by `req_118` after the delivery of `req_114` to `req_117`.",
+            "",
+            "The work is intentionally split into four coherent backlog slices:",
+            "- `item_580` for the post-create edit-state `New` correction",
+            "- `item_581` for the `Select multiple` action-row placement and icon alignment",
+            "- `item_582` for canvas grouped-drag generate isolation and localized move persistence",
+            "- `item_583` for regression coverage and workflow-doc closure",
+            "",
+            "The main execution constraint is correction without scope drift:",
+            "- the create-flow repair must restore the intended chained-creation point without making `New` global to all edit states;",
+            "- the Modeling action-bar repair must improve discoverability without changing the batch-delete contract;",
+            "- the canvas repair must stop unrelated plan mutations during grouped drag without redefining the broader generation model;",
+            "- regression and closure work must prove the repaired contracts and keep the Logics chain synchronized.",
+            "",
+            "```mermaid",
+            "%% logics-kind: task",
+            "%% logics-signature: task|orchestration-delivery-execution-for-req|item-579-post-release-ux-and-grouped-mov|1-confirm-scope-acceptance-criteria-mapp|npm-run-s-lint",
+            "flowchart LR",
+            "    Backlog[Items 580 to 583] --> Wave1[Wave 1 post create New correction]",
+            "    Wave1 --> Wave2[Wave 2 Select multiple action row correction]",
+            "    Wave2 --> Wave3[Wave 3 grouped drag canvas correction]",
+            "    Wave3 --> Wave4[Wave 4 regression coverage and closure]",
+            "    Wave4 --> Validation[Integrated validation and doc closure]",
+            "    Validation --> Report[Done report]",
+            "```",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Consider",
+            "- Product signals: pricing and packaging",
+            "- Product follow-up: Review whether a product brief is needed before scope becomes harder to change.",
+            "- Architecture framing: Required",
+            "- Architecture signals: data model and persistence, contracts and integration",
+            "- Architecture follow-up: Create or link an architecture decision before irreversible implementation work starts.",
+            ""
+          ],
+          "Definition of Done (DoD)": [
+            "- [x] Scope implemented and acceptance criteria covered.",
+            "- [x] Validation commands executed and results captured.",
+            "- [x] Linked request/backlog/task docs updated during completed waves and at closure.",
+            "- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
+            "- [x] Status is `Done` and progress is `100%`.",
+            ""
+          ],
+          "Delivery checkpoints": [
+            "- Each completed wave should leave the repository in a coherent, commit-ready state.",
+            "- Update the linked Logics docs during the wave that changes the behavior, not only at final closure.",
+            "- Prefer a reviewed commit checkpoint at the end of each meaningful wave instead of accumulating several undocumented partial states.",
+            "- Use this task as the single orchestration wrapper for items `580` to `583`.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence`",
+            "- Backlog item(s): `item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`, `item_580_post_create_edit_state_new_action_correction_for_modeling_forms`, `item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables`, `item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction`, `item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections`",
+            "- Request(s): `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`",
+            ""
+          ],
+          "Plan": [
+            "- [x] 1. Confirm scope, acceptance-criteria mapping, and linked backlog/request dependencies across `item_580` to `item_583`.",
+            "- [x] 2. Deliver Wave 1 for `item_580`: post-create edit-state `New` correction for Modeling forms.",
+            "- [x] 3. Deliver Wave 2 for `item_581`: `Select multiple` action-row placement and icon alignment across Modeling tables.",
+            "- [x] 4. Deliver Wave 3 for `item_582`: grouped-drag generate isolation and localized move persistence correction on the canvas.",
+            "- [x] 5. Deliver Wave 4 for `item_583`: regression coverage, integrated validation, and workflow-doc closure.",
+            "- [x] 6. Checkpoint each completed wave in a commit-ready state, validate it, and update the linked Logics docs.",
+            "- [x] CHECKPOINT: leave the current wave commit-ready and update the linked Logics docs before continuing.",
+            "- [x] FINAL: Update related Logics docs",
+            ""
+          ],
+          "References": [
+            "- `logics/skills/logics-ui-steering/SKILL.md`",
+            ""
+          ],
+          "Report": [
+            "- Current wave status:",
+            "  - Wave 1 delivered the post-create edit-state `New` correction for Modeling forms.",
+            "  - Wave 2 aligned `Select multiple` on the main Modeling action row between `Edit` and `Delete` and added an explicit icon affordance.",
+            "  - Wave 3 fixed grouped-drag persistence so batch canvas moves keep unrelated persisted node positions intact instead of collapsing the wider plan state.",
+            "  - Wave 4 closed the corrective bundle with integrated regression validation and synchronized all linked Logics docs to their delivered state.",
+            "- Validation snapshot:",
+            "  - `npm run -s lint`",
+            "  - `npm run -s typecheck`",
+            "  - `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx`",
+            "  - `npm test -- --run src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.delete-confirmations.spec.tsx`",
+            "  - `npm test -- --run src/tests/app.ui.navigation-canvas.spec.tsx src/tests/store.reducer.sync-invariant.spec.ts`",
+            "  - `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.list-ergonomics.spec.tsx src/tests/app.ui.delete-confirmations.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx src/tests/store.reducer.sync-invariant.spec.ts`",
+            "  - `npm run -s typecheck`",
+            "  - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`"
+          ],
+          "Validation": [
+            "- `npm run -s lint`",
+            "- `npm run -s typecheck`",
+            "- `npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.list-ergonomics.spec.tsx`",
+            "- `npm test -- --run src/tests/app.ui.navigation-canvas.spec.tsx src/tests/app.ui.navigation-canvas-selection-gating.spec.tsx`",
+            "- run narrower targeted subsets during each wave before re-running the broader integrated matrix",
+            "- `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`",
+            "- confirm each completed wave leaves the repository in a commit-ready state",
+            ""
+          ]
+        },
+        "title": "Orchestration delivery execution for req 118 post-release UX and grouped-move corrections"
+      },
+      "signature": {
+        "mtime_ns": 1775142102031299032,
+        "size": 7592
       }
     }
   }

@@ -1,0 +1,26 @@
+version: 1
+workflow:
+  split:
+    policy: minimal-coherent
+    max_children_without_override: 2
+mutations:
+  mode: transactional
+  audit_log: logics/mutation_audit.jsonl
+index:
+  enabled: true
+  path: logics/.cache/runtime_index.json
+hybrid_assist:
+  audit_log: logics/.cache/hybrid_assist_audit.jsonl
+  measurement_log: logics/.cache/hybrid_assist_measurements.jsonl
+  env_file: .env.local
+  provider_health_path: logics/.cache/provider_health.json
+  providers:
+    readiness_cooldown_seconds: 300
+    openai:
+      enabled: true
+      base_url: https://api.openai.com/v1
+      model: gpt-4.1-mini
+    gemini:
+      enabled: true
+      base_url: https://generativelanguage.googleapis.com/v1beta
+      model: gemini-2.0-flash

@@ -16,3 +16,6 @@ logics/hybrid_assist_measurements.jsonl
 logics/mutation_audit.jsonl
 logics/.cache/hybrid_assist_audit.jsonl
 logics/.cache/hybrid_assist_measurements.jsonl
+
+# Generated Logics runtime artifacts
+logics/.cache/
