@@ -126,8 +126,12 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireFuseCatalogItemId: Parameters<typeof useWireHandlers>[0]["setWireFuseCatalogItemId"];
   wireEndpointAConnectionReference: Parameters<typeof useWireHandlers>[0]["wireEndpointAConnectionReference"];
   setWireEndpointAConnectionReference: Parameters<typeof useWireHandlers>[0]["setWireEndpointAConnectionReference"];
+  wireEndpointAConnectionName: Parameters<typeof useWireHandlers>[0]["wireEndpointAConnectionName"];
+  setWireEndpointAConnectionName: Parameters<typeof useWireHandlers>[0]["setWireEndpointAConnectionName"];
   wireEndpointASealReference: Parameters<typeof useWireHandlers>[0]["wireEndpointASealReference"];
   setWireEndpointASealReference: Parameters<typeof useWireHandlers>[0]["setWireEndpointASealReference"];
+  wireEndpointASealName: Parameters<typeof useWireHandlers>[0]["wireEndpointASealName"];
+  setWireEndpointASealName: Parameters<typeof useWireHandlers>[0]["setWireEndpointASealName"];
   wireEndpointAKind: Parameters<typeof useWireHandlers>[0]["wireEndpointAKind"];
   setWireEndpointAKind: Parameters<typeof useWireHandlers>[0]["setWireEndpointAKind"];
   wireEndpointAConnectorId: Parameters<typeof useWireHandlers>[0]["wireEndpointAConnectorId"];
@@ -140,8 +144,12 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireEndpointAPortIndex: Parameters<typeof useWireHandlers>[0]["setWireEndpointAPortIndex"];
   wireEndpointBConnectionReference: Parameters<typeof useWireHandlers>[0]["wireEndpointBConnectionReference"];
   setWireEndpointBConnectionReference: Parameters<typeof useWireHandlers>[0]["setWireEndpointBConnectionReference"];
+  wireEndpointBConnectionName: Parameters<typeof useWireHandlers>[0]["wireEndpointBConnectionName"];
+  setWireEndpointBConnectionName: Parameters<typeof useWireHandlers>[0]["setWireEndpointBConnectionName"];
   wireEndpointBSealReference: Parameters<typeof useWireHandlers>[0]["wireEndpointBSealReference"];
   setWireEndpointBSealReference: Parameters<typeof useWireHandlers>[0]["setWireEndpointBSealReference"];
+  wireEndpointBSealName: Parameters<typeof useWireHandlers>[0]["wireEndpointBSealName"];
+  setWireEndpointBSealName: Parameters<typeof useWireHandlers>[0]["setWireEndpointBSealName"];
   wireEndpointBKind: Parameters<typeof useWireHandlers>[0]["wireEndpointBKind"];
   setWireEndpointBKind: Parameters<typeof useWireHandlers>[0]["setWireEndpointBKind"];
   wireEndpointBConnectorId: Parameters<typeof useWireHandlers>[0]["wireEndpointBConnectorId"];
@@ -279,8 +287,12 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireFuseCatalogItemId,
   wireEndpointAConnectionReference,
   setWireEndpointAConnectionReference,
+  wireEndpointAConnectionName,
+  setWireEndpointAConnectionName,
   wireEndpointASealReference,
   setWireEndpointASealReference,
+  wireEndpointASealName,
+  setWireEndpointASealName,
   wireEndpointAKind,
   setWireEndpointAKind,
   wireEndpointAConnectorId,
@@ -293,8 +305,12 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireEndpointAPortIndex,
   wireEndpointBConnectionReference,
   setWireEndpointBConnectionReference,
+  wireEndpointBConnectionName,
+  setWireEndpointBConnectionName,
   wireEndpointBSealReference,
   setWireEndpointBSealReference,
+  wireEndpointBSealName,
+  setWireEndpointBSealName,
   wireEndpointBKind,
   setWireEndpointBKind,
   wireEndpointBConnectorId,
@@ -460,8 +476,12 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireFuseCatalogItemId,
     wireEndpointAConnectionReference,
     setWireEndpointAConnectionReference,
+    wireEndpointAConnectionName,
+    setWireEndpointAConnectionName,
     wireEndpointASealReference,
     setWireEndpointASealReference,
+    wireEndpointASealName,
+    setWireEndpointASealName,
     wireEndpointAKind,
     setWireEndpointAKind,
     wireEndpointAConnectorId,
@@ -474,8 +494,12 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireEndpointAPortIndex,
     wireEndpointBConnectionReference,
     setWireEndpointBConnectionReference,
+    wireEndpointBConnectionName,
+    setWireEndpointBConnectionName,
     wireEndpointBSealReference,
     setWireEndpointBSealReference,
+    wireEndpointBSealName,
+    setWireEndpointBSealName,
     wireEndpointBKind,
     setWireEndpointBKind,
     wireEndpointBConnectorId,

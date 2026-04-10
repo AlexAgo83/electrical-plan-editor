@@ -12,7 +12,13 @@ import type {
   Wire,
   WireId
 } from "../../../core/entities";
-import type { ConnectorSynthesisRow, SegmentSubNetworkFilter, SortState, SpliceSynthesisRow } from "../../types/app-controller";
+import type {
+  ConnectorSynthesisRow,
+  SegmentSubNetworkFilter,
+  SortState,
+  SpliceSynthesisRow,
+  TabularExportFormat
+} from "../../types/app-controller";
 
 interface OccupancyStatus {
   isOccupied: boolean;
@@ -118,6 +124,7 @@ export interface AnalysisWorkspaceContentProps {
   setWireFilterField: (value: "endpoints" | "name" | "technicalId" | "any") => void;
   wireEndpointFilterQuery: string;
   setWireEndpointFilterQuery: (value: string) => void;
+  tabularExportFormat: TabularExportFormat;
   catalogItems: CatalogItem[];
   wires: Wire[];
   visibleWires: Wire[];

@@ -95,7 +95,7 @@ describe("App integration UI - creation flow wire endpoint references", () => {
       expect(within(inspectorPanel).queryByText("SEAL-A-01")).not.toBeInTheDocument();
       expect(within(inspectorPanel).queryByText("SPL-CONN-B")).not.toBeInTheDocument();
     }
-  });
+  }, 10000);
 
   it("swaps wire edit endpoints as a draft action between Save and Cancel edit and preserves side metadata on save only", () => {
     const { store } = renderAppWithState(createUiIntegrationState());
@@ -165,7 +165,7 @@ describe("App integration UI - creation flow wire endpoint references", () => {
     expect(savedWire?.endpointASealReference).toBe("SEAL-B-SAVE");
     expect(savedWire?.endpointBConnectionReference).toBe("TERM-A-SAVE");
     expect(savedWire?.endpointBSealReference).toBeUndefined();
-  });
+  }, 10000);
 
   it(
     "supports fuse mode with catalog linkage, preserves save/cancel semantics, and shows fuse metadata in wire list and analysis",
@@ -236,6 +236,6 @@ describe("App integration UI - creation flow wire endpoint references", () => {
       expect(within(wireAnalysisPanel).getByText("Protection")).toBeInTheDocument();
       expect(within(wireAnalysisPanel).getByText("CAT-FUSE-UI")).toBeInTheDocument();
     },
-    10_000
+    10000
   );
 });

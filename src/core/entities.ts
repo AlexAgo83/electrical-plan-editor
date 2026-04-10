@@ -116,9 +116,13 @@ export interface Wire {
   secondaryColorId: string | null;
   freeColorLabel?: string | null;
   endpointAConnectionReference?: string;
+  endpointAConnectionName?: string;
   endpointASealReference?: string;
+  endpointASealName?: string;
   endpointBConnectionReference?: string;
+  endpointBConnectionName?: string;
   endpointBSealReference?: string;
+  endpointBSealName?: string;
   endpointA: WireEndpoint;
   endpointB: WireEndpoint;
   protection?: WireProtection;
