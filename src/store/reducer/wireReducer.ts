@@ -1,5 +1,6 @@
 import type { CatalogItemId, SegmentId, WireProtection } from "../../core/entities";
 import { normalizeWireColorState } from "../../core/cableColors";
+import { normalizeWireEndpointReferenceName } from "../../core/wireReferences";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { buildRoutingGraphIndex } from "../../core/graph";
@@ -48,6 +49,10 @@ function normalizeWireEndpointReference(value: string | undefined): string | und
   }
 
   return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
+}
+
+function normalizeWireEndpointReferenceNameValue(value: string | undefined): string | undefined {
+  return normalizeWireEndpointReferenceName(value);
 }
 
 function normalizeWireProtection(
@@ -151,9 +156,13 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         action.payload.colorMode
       );
       const endpointAConnectionReference = normalizeWireEndpointReference(action.payload.endpointAConnectionReference);
+      const endpointAConnectionName = normalizeWireEndpointReferenceNameValue(action.payload.endpointAConnectionName);
       const endpointASealReference = normalizeWireEndpointReference(action.payload.endpointASealReference);
+      const endpointASealName = normalizeWireEndpointReferenceNameValue(action.payload.endpointASealName);
       const endpointBConnectionReference = normalizeWireEndpointReference(action.payload.endpointBConnectionReference);
+      const endpointBConnectionName = normalizeWireEndpointReferenceNameValue(action.payload.endpointBConnectionName);
       const endpointBSealReference = normalizeWireEndpointReference(action.payload.endpointBSealReference);
+      const endpointBSealName = normalizeWireEndpointReferenceNameValue(action.payload.endpointBSealName);
       const normalizedProtectionResult = normalizeWireProtection(state, action.payload.protection);
       if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
         return withError(state, "Wire name and technical ID are required.");
@@ -290,9 +299,13 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           secondaryColorId: normalizedColors.secondaryColorId,
           freeColorLabel: normalizedColors.freeColorLabel,
           endpointAConnectionReference,
+          endpointAConnectionName,
           endpointASealReference,
+          endpointASealName,
           endpointBConnectionReference,
+          endpointBConnectionName,
           endpointBSealReference,
+          endpointBSealName,
           protection: normalizedProtectionResult.protection,
           endpointA: action.payload.endpointA,
           endpointB: action.payload.endpointB,
@@ -386,9 +399,13 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           action.payload.colorMode
         ),
         endpointAConnectionReference: normalizeWireEndpointReference(action.payload.endpointAConnectionReference),
+        endpointAConnectionName: normalizeWireEndpointReferenceNameValue(action.payload.endpointAConnectionName),
         endpointASealReference: normalizeWireEndpointReference(action.payload.endpointASealReference),
+        endpointASealName: normalizeWireEndpointReferenceNameValue(action.payload.endpointASealName),
         endpointBConnectionReference: normalizeWireEndpointReference(action.payload.endpointBConnectionReference),
+        endpointBConnectionName: normalizeWireEndpointReferenceNameValue(action.payload.endpointBConnectionName),
         endpointBSealReference: normalizeWireEndpointReference(action.payload.endpointBSealReference),
+        endpointBSealName: normalizeWireEndpointReferenceNameValue(action.payload.endpointBSealName),
         protection: normalizedProtectionResult.protection
       };
       return bumpRevision({

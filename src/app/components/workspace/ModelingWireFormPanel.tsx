@@ -39,8 +39,12 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     wireTechnicalIdAlreadyUsed,
     wireEndpointAConnectionReference,
     setWireEndpointAConnectionReference,
+    wireEndpointAConnectionName,
+    setWireEndpointAConnectionName,
     wireEndpointASealReference,
     setWireEndpointASealReference,
+    wireEndpointASealName,
+    setWireEndpointASealName,
     wireEndpointAKind,
     setWireEndpointAKind,
     wireEndpointAConnectorId,
@@ -54,8 +58,12 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     wireEndpointASlotHint,
     wireEndpointBConnectionReference,
     setWireEndpointBConnectionReference,
+    wireEndpointBConnectionName,
+    setWireEndpointBConnectionName,
     wireEndpointBSealReference,
     setWireEndpointBSealReference,
+    wireEndpointBSealName,
+    setWireEndpointBSealName,
     wireEndpointBKind,
     setWireEndpointBKind,
     wireEndpointBConnectorId,
@@ -407,10 +415,28 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             />
           </label>
           <label>
+            Connection name
+            <input
+              value={wireEndpointAConnectionName}
+              onChange={(event) => setWireEndpointAConnectionName(event.target.value)}
+              maxLength={120}
+              placeholder="Optional"
+            />
+          </label>
+          <label>
             Seal reference
             <input
               value={wireEndpointASealReference}
               onChange={(event) => setWireEndpointASealReference(event.target.value)}
+              maxLength={120}
+              placeholder="Optional"
+            />
+          </label>
+          <label>
+            Seal name
+            <input
+              value={wireEndpointASealName}
+              onChange={(event) => setWireEndpointASealName(event.target.value)}
               maxLength={120}
               placeholder="Optional"
             />
@@ -482,10 +508,28 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             />
           </label>
           <label>
+            Connection name
+            <input
+              value={wireEndpointBConnectionName}
+              onChange={(event) => setWireEndpointBConnectionName(event.target.value)}
+              maxLength={120}
+              placeholder="Optional"
+            />
+          </label>
+          <label>
             Seal reference
             <input
               value={wireEndpointBSealReference}
               onChange={(event) => setWireEndpointBSealReference(event.target.value)}
+              maxLength={120}
+              placeholder="Optional"
+            />
+          </label>
+          <label>
+            Seal name
+            <input
+              value={wireEndpointBSealName}
+              onChange={(event) => setWireEndpointBSealName(event.target.value)}
               maxLength={120}
               placeholder="Optional"
             />

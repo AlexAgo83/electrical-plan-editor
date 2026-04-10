@@ -44,6 +44,7 @@ export type TableFontSize = "small" | "normal" | "large";
 export type AppLocale = "en" | "fr";
 export type WorkspaceCurrencyCode = "EUR" | "USD" | "GBP" | "CAD" | "CHF";
 export type WorkspacePanelsLayoutMode = "multiColumn" | "singleColumn";
+export type TabularExportFormat = "csv" | "xlsx";
 export type CanvasLabelStrokeMode = "none" | "light" | "normal";
 export type CanvasLabelSizeMode = "extraSmall" | "small" | "normal" | "large" | "extraLarge";
 export type CanvasCalloutTextSize = "small" | "normal" | "large" | "extraLarge";

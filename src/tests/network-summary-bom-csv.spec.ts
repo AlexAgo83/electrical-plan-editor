@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogItem, CatalogItemId, Connector, ConnectorId, Splice, SpliceId, Wire, WireId } from "../core/entities";
-import { buildNetworkSummaryBomCsvExport } from "../app/lib/networkSummaryBomCsv";
+import { buildNetworkSummaryBomCsvExport, buildNetworkSummaryBomWorkbookSheets } from "../app/lib/networkSummaryBomCsv";
 
 function asCatalogItemId(value: string): CatalogItemId {
   return value as CatalogItemId;
@@ -66,6 +66,7 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     const exported = buildNetworkSummaryBomCsvExport(catalogItems, connectors, splices, wires, "GBP", true, 20);
 
     expect(exported.headers).toEqual([
+      "Type",
       "Manufacturer reference",
       "Name",
       "Connection count",
@@ -77,11 +78,11 @@ describe("buildNetworkSummaryBomCsvExport", () => {
       "Line total (incl. tax, GBP)",
       "URL"
     ]);
-    expect(exported.headers).not.toContain("Type");
     expect(exported.itemRowCount).toBe(4);
-    expect(exported.rows).toHaveLength(12);
+    expect(exported.rows).toHaveLength(9);
 
     expect(exported.rows[0]).toEqual([
+      "Catalog item",
       "REF-A",
       "Quoted, \"A\"",
       2,
@@ -93,17 +94,14 @@ describe("buildNetworkSummaryBomCsvExport", () => {
       "18.00",
       "https://example.test/a"
     ]);
-    expect(exported.rows[1]).toEqual(["REF-B", "No price", 6, 0, 1, 1, "", "", "", ""]);
-    expect(exported.rows[2]).toEqual(["TOTAL (priced rows only)", "", "", "", "", "", "", "15.00", "", ""]);
-    expect(exported.rows[3]).toEqual(["TOTAL TTC (priced rows only)", "", "", "", "", "", "", "", "18.00", ""]);
-    expect(exported.rows[4]).toEqual(["PRICING CONTEXT", "Currency", "GBP"]);
-    expect(exported.rows[5]).toEqual(["PRICING CONTEXT", "Tax enabled", "true"]);
-    expect(exported.rows[6]).toEqual(["PRICING CONTEXT", "Tax rate (%)", "20.00"]);
-    expect(exported.rows[7]).toEqual(["", "", "", "", "", "", "", "", "", ""]);
-    expect(exported.rows[8]).toEqual(["Wire terminations"]);
-    expect(exported.rows[9]).toEqual(["Reference", "Quantity"]);
-    expect(exported.rows[10]).toEqual(["SEAL-001", 1]);
-    expect(exported.rows[11]).toEqual(["TERM-001", 1]);
+    expect(exported.rows[1]).toEqual(["Catalog item", "REF-B", "No price", 6, 0, 1, 1, "", "", "", ""]);
+    expect(exported.rows[2]).toEqual(["Summary", "TOTAL (priced rows only)", "", "", "", "", "", "", "15.00", "", ""]);
+    expect(exported.rows[3]).toEqual(["Summary", "TOTAL TTC (priced rows only)", "", "", "", "", "", "", "", "18.00", ""]);
+    expect(exported.rows[4]).toEqual(["Summary", "PRICING CONTEXT", "Currency", "GBP", "", "", "", "", "", "", ""]);
+    expect(exported.rows[5]).toEqual(["Summary", "PRICING CONTEXT", "Tax enabled", "true", "", "", "", "", "", "", ""]);
+    expect(exported.rows[6]).toEqual(["Summary", "PRICING CONTEXT", "Tax rate (%)", "20.00", "", "", "", "", "", "", ""]);
+    expect(exported.rows[7]).toEqual(["Wire termination", "SEAL-001", "", "", 1, "", 1, "", "", "", ""]);
+    expect(exported.rows[8]).toEqual(["Wire termination", "TERM-001", "", "", 1, "", 1, "", "", "", ""]);
   });
 
   it("omits TTC column and total when tax is disabled", () => {
@@ -122,6 +120,7 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     const exported = buildNetworkSummaryBomCsvExport(catalogItems, connectors, [], [], "CAD", false, 5.5);
 
     expect(exported.headers).toEqual([
+      "Type",
       "Manufacturer reference",
       "Name",
       "Connection count",
@@ -133,10 +132,82 @@ describe("buildNetworkSummaryBomCsvExport", () => {
       "URL"
     ]);
     expect(exported.headers).not.toContain("Line total (incl. tax, CAD)");
-    expect(exported.rows).toContainEqual(["TOTAL (priced rows only)", "", "", "", "", "", "", "5.00", ""]);
-    expect(exported.rows.find((row) => row[0] === "TOTAL TTC (priced rows only)")).toBeUndefined();
-    expect(exported.rows).toContainEqual(["PRICING CONTEXT", "Tax enabled", "false"]);
-    expect(exported.rows).toContainEqual(["PRICING CONTEXT", "Tax rate (%)", "5.50"]);
+    expect(exported.rows[0]).toEqual(["Catalog item", "REF-A", "", 2, 1, 0, 1, "5.00", "5.00", ""]);
+    expect(exported.rows.find((row) => row[1] === "TOTAL TTC (priced rows only)")).toBeUndefined();
+    expect(
+      exported.rows.some(
+        (row) => row[0] === "Summary" && row[1] === "PRICING CONTEXT" && row[2] === "Tax enabled" && row[3] === "false"
+      )
+    ).toBe(true);
+    expect(
+      exported.rows.some(
+        (row) => row[0] === "Summary" && row[1] === "PRICING CONTEXT" && row[2] === "Tax rate (%)" && row[3] === "5.50"
+      )
+    ).toBe(true);
+  });
+
+  it("supports compact BOM export columns for the masked export view", () => {
+    const catalogItems: CatalogItem[] = [
+      {
+        id: asCatalogItemId("CAT-A"),
+        manufacturerReference: "REF-A",
+        name: "Compact item",
+        connectionCount: 2,
+        unitPriceExclTax: 5,
+        url: "https://example.test/a"
+      }
+    ];
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-001",
+        cavityCount: 2,
+        catalogItemId: asCatalogItemId("CAT-A")
+      }
+    ];
+
+    const exported = buildNetworkSummaryBomCsvExport(catalogItems, connectors, [], [], "EUR", true, 20, true);
+
+    expect(exported.headers).toEqual(["Type", "Manufacturer reference", "Name", "Connection count", "Connector quantity"]);
+    expect(exported.rows).toEqual([["Catalog item", "REF-A", "Compact item", 2, 1]]);
+  });
+
+  it("builds a two-sheet workbook structure for xlsx export", () => {
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-001",
+        cavityCount: 2
+      }
+    ];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "W-1",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        endpointAConnectionReference: "TERM-A",
+        endpointAConnectionName: "Conn A",
+        endpointASealReference: "SEAL-A",
+        endpointASealName: "Seal A",
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 10,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const sheets = buildNetworkSummaryBomWorkbookSheets([], connectors, [], wires);
+
+    expect(sheets).toHaveLength(2);
+    expect(sheets[0]?.name).toBe("Network BOM");
+    expect(sheets[1]?.name).toBe("By connector");
+    expect(sheets[1]?.rows).toEqual([["C-001", "Connector 1", "Connector", "", "", 1], ["C-001", "Connector 1", "Connection", "TERM-A", "Conn A", 1], ["C-001", "Connector 1", "Seal", "SEAL-A", "Seal A", 1]]);
   });
 
   it("returns summary and metadata rows only when no resolvable catalog-backed components are present", () => {
@@ -144,11 +215,11 @@ describe("buildNetworkSummaryBomCsvExport", () => {
 
     expect(exported.itemRowCount).toBe(0);
     expect(exported.rows).toEqual([
-      ["TOTAL (priced rows only)", "", "", "", "", "", "", "0.00", "", ""],
-      ["TOTAL TTC (priced rows only)", "", "", "", "", "", "", "", "0.00", ""],
-      ["PRICING CONTEXT", "Currency", "EUR"],
-      ["PRICING CONTEXT", "Tax enabled", "true"],
-      ["PRICING CONTEXT", "Tax rate (%)", "20.00"]
+      ["Summary", "TOTAL (priced rows only)", "", "", "", "", "", "", "0.00", "", ""],
+      ["Summary", "TOTAL TTC (priced rows only)", "", "", "", "", "", "", "", "0.00", ""],
+      ["Summary", "PRICING CONTEXT", "Currency", "EUR", "", "", "", "", "", "", ""],
+      ["Summary", "PRICING CONTEXT", "Tax enabled", "true", "", "", "", "", "", "", ""],
+      ["Summary", "PRICING CONTEXT", "Tax rate (%)", "20.00", "", "", "", "", "", "", ""]
     ]);
   });
 
@@ -175,8 +246,8 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     const exported = buildNetworkSummaryBomCsvExport([], [], [], wires);
 
     expect(exported.itemRowCount).toBe(2);
-    expect(exported.rows).toContainEqual(["SEAL-B", 1]);
-    expect(exported.rows).toContainEqual(["TERM-A", 2]);
+    expect(exported.rows).toContainEqual(["Wire termination", "SEAL-B", "", "", 1, "", 1, "", "", "", ""]);
+    expect(exported.rows).toContainEqual(["Wire termination", "TERM-A", "", "", 2, "", 2, "", "", "", ""]);
   });
 
   it("merges same reference text across connection and seal occurrences into one row", () => {
@@ -216,6 +287,6 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     const exported = buildNetworkSummaryBomCsvExport([], [], [], wires);
 
     expect(exported.itemRowCount).toBe(1);
-    expect(exported.rows).toContainEqual(["1108503", 3]);
+    expect(exported.rows).toContainEqual(["Wire termination", "1108503", "", "", 3, "", 3, "", "", "", ""]);
   });
 });

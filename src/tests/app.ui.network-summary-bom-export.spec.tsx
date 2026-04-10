@@ -71,9 +71,11 @@ describe("App integration UI - network summary BOM export", () => {
 
       const networkSummaryPanel = getPanelByHeading("Network summary");
       const exportSvgButton = within(networkSummaryPanel).getByRole("button", { name: "SVG" });
+      const compactBomButton = within(networkSummaryPanel).getByRole("button", { name: "Compact" });
       const exportBomButton = within(networkSummaryPanel).getByRole("button", { name: "BOM" });
       expect(within(networkSummaryPanel).queryByText(/BOM CSV pricing:/i)).toBeNull();
       expect(exportBomButton).not.toHaveAttribute("title");
+      expect(compactBomButton).toBeInTheDocument();
 
       const actionButtons = Array.from(networkSummaryPanel.querySelectorAll("header .workspace-tab"));
       expect(actionButtons.indexOf(exportBomButton)).toBeGreaterThan(actionButtons.indexOf(exportSvgButton));
@@ -109,7 +111,7 @@ describe("App integration UI - network summary BOM export", () => {
     expect(within(networkSummaryPanel).getByRole("button", { name: "BOM" })).toBeInTheDocument();
   });
 
-  it("exports BOM CSV with a UTF-8 BOM and a wire terminations section even without catalog-backed rows", () => {
+  it("exports BOM CSV with a UTF-8 BOM and inline wire termination rows even without catalog-backed rows", () => {
     const baseState = createUiIntegrationState();
     const baseWire = baseState.wires.byId[asWireId("W1")];
     if (baseWire === undefined) {
@@ -165,10 +167,9 @@ describe("App integration UI - network summary BOM export", () => {
       }
 
       expect(capturedPayload.startsWith("\uFEFF")).toBe(true);
-      expect(capturedPayload).toContain("Wire terminations");
-      expect(capturedPayload).toContain("Reference,Quantity");
-      expect(capturedPayload).toContain("Câble-Été,1");
-      expect(capturedPayload).toContain("Joint-À,1");
+      expect(capturedPayload).toContain("Type,Manufacturer reference,Name,Connection count,Connector quantity");
+      expect(capturedPayload).toContain("Wire termination,Câble-Été");
+      expect(capturedPayload).toContain("Wire termination,Joint-À");
     } finally {
       (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = OriginalBlob;
       vi.restoreAllMocks();

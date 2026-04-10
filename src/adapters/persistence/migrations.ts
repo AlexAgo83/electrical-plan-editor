@@ -11,6 +11,7 @@ import {
 } from "../../core/networkMetadata";
 import { normalizeNetworkVoltageV, normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
+import { normalizeWireEndpointReferenceName } from "../../core/wireReferences";
 import { normalizeSplicePortMode, normalizeUnboundedPortCountFallback } from "../../core/splicePortMode";
 import type {
   CatalogItem,
@@ -107,9 +108,13 @@ function normalizeWireEntityState(candidate: EntityState<Wire, WireId>): EntityS
         (wire as Partial<Wire>).colorMode
       ),
       endpointAConnectionReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointAConnectionReference),
+      endpointAConnectionName: normalizeWireEndpointReferenceName((wire as Partial<Wire>).endpointAConnectionName),
       endpointASealReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointASealReference),
+      endpointASealName: normalizeWireEndpointReferenceName((wire as Partial<Wire>).endpointASealName),
       endpointBConnectionReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointBConnectionReference),
-      endpointBSealReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointBSealReference)
+      endpointBConnectionName: normalizeWireEndpointReferenceName((wire as Partial<Wire>).endpointBConnectionName),
+      endpointBSealReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointBSealReference),
+      endpointBSealName: normalizeWireEndpointReferenceName((wire as Partial<Wire>).endpointBSealName)
     };
   }
 

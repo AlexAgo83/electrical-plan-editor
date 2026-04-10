@@ -34,6 +34,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
     ModelingSliceParams,
     "catalogItems" | "connectors" | "splices" | "nodes" | "segments" | "wires"
   >;
+  tabularExportFormat: ModelingSliceParams["tabularExportFormat"];
   formsState: AppControllerFormsStateFlat;
   modelingHandlers: AppControllerModelingHandlersOrchestrator;
   listModel: Pick<
@@ -158,6 +159,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   connectorTechnicalIdAlreadyUsed,
   spliceTechnicalIdAlreadyUsed,
   wireTechnicalIdAlreadyUsed,
+  tabularExportFormat,
   onSelectConnector,
   onSelectSplice,
   onSelectNode,
@@ -456,6 +458,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setWireFilterField: listModel.setWireFilterField,
     wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
     setWireEndpointFilterQuery: listModel.setWireEndpointFilterQuery,
+    tabularExportFormat,
     wires: entities.wires,
     visibleWires: listModel.visibleWires,
     wireSort: listModel.wireSort,
@@ -567,8 +570,12 @@ export function useAppControllerModelingAnalysisScreenDomains({
     wireTechnicalIdAlreadyUsed,
     wireEndpointAConnectionReference: formsState.wireEndpointAConnectionReference,
     setWireEndpointAConnectionReference: formsState.setWireEndpointAConnectionReference,
+    wireEndpointAConnectionName: formsState.wireEndpointAConnectionName,
+    setWireEndpointAConnectionName: formsState.setWireEndpointAConnectionName,
     wireEndpointASealReference: formsState.wireEndpointASealReference,
     setWireEndpointASealReference: formsState.setWireEndpointASealReference,
+    wireEndpointASealName: formsState.wireEndpointASealName,
+    setWireEndpointASealName: formsState.setWireEndpointASealName,
     wireEndpointAKind: formsState.wireEndpointAKind,
     setWireEndpointAKind: formsState.setWireEndpointAKind,
     wireEndpointAConnectorId: formsState.wireEndpointAConnectorId,
@@ -582,8 +589,12 @@ export function useAppControllerModelingAnalysisScreenDomains({
     wireEndpointASlotHint: modelingHandlers.wire.wireEndpointASlotHint,
     wireEndpointBConnectionReference: formsState.wireEndpointBConnectionReference,
     setWireEndpointBConnectionReference: formsState.setWireEndpointBConnectionReference,
+    wireEndpointBConnectionName: formsState.wireEndpointBConnectionName,
+    setWireEndpointBConnectionName: formsState.setWireEndpointBConnectionName,
     wireEndpointBSealReference: formsState.wireEndpointBSealReference,
     setWireEndpointBSealReference: formsState.setWireEndpointBSealReference,
+    wireEndpointBSealName: formsState.wireEndpointBSealName,
+    setWireEndpointBSealName: formsState.setWireEndpointBSealName,
     wireEndpointBKind: formsState.wireEndpointBKind,
     setWireEndpointBKind: formsState.setWireEndpointBKind,
     wireEndpointBConnectorId: formsState.wireEndpointBConnectorId,
@@ -707,6 +718,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setWireFilterField: listModel.setWireFilterField,
     wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
     setWireEndpointFilterQuery: listModel.setWireEndpointFilterQuery,
+    tabularExportFormat,
     catalogItems: entities.catalogItems,
     wires: entities.wires,
     visibleWires: listModel.visibleWires,

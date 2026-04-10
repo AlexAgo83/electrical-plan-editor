@@ -79,8 +79,8 @@ import {
   NETWORK_MAX_SCALE,
   NETWORK_MIN_SCALE,
 } from "./lib/app-utils-shared";
-import { downloadCsvFile } from "./lib/csv";
-import { buildNetworkSummaryBomCsvExport } from "./lib/networkSummaryBomCsv";
+import { buildNetworkSummaryBomCsvExport, buildNetworkSummaryBomWorkbookSheets } from "./lib/networkSummaryBomCsv";
+import { downloadTabularCsvOrXlsxFile, downloadTabularWorkbookFile } from "./lib/tabularExport";
 import type { AppProps, SubScreenId } from "./types/app-controller";
 import "./styles.css";
 
@@ -174,6 +174,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceCurrencyCode,
     workspaceTaxEnabled,
     workspaceTaxRatePercent,
+    tabularExportFormat,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     networkSort,
@@ -198,15 +199,70 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceWideScreen,
     preferencesHydrated
   } = preferencesState;
+  const [bomExportCompactColumns, setBomExportCompactColumns] = useState(false);
   const networkSummaryBomCsvExport = useMemo(
-    () => buildNetworkSummaryBomCsvExport(catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent),
-    [catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent]
+    () =>
+      buildNetworkSummaryBomCsvExport(
+        catalogItems,
+        connectors,
+        splices,
+        wires,
+        workspaceCurrencyCode,
+        workspaceTaxEnabled,
+        workspaceTaxRatePercent,
+        bomExportCompactColumns
+      ),
+    [catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent, bomExportCompactColumns]
   );
   const canExportBomCsv = networkSummaryBomCsvExport.itemRowCount > 0;
   const handleExportBomCsv = useCallback(() => {
-    if (!canExportBomCsv) return;
-    downloadCsvFile("network-bom", networkSummaryBomCsvExport.headers, networkSummaryBomCsvExport.rows, { includeUtf8Bom: true });
-  }, [canExportBomCsv, networkSummaryBomCsvExport]);
+    if (!canExportBomCsv) {
+      return;
+    }
+
+    if (tabularExportFormat === "xlsx") {
+      void downloadTabularWorkbookFile(
+        "network-bom",
+        buildNetworkSummaryBomWorkbookSheets(
+          catalogItems,
+          connectors,
+          splices,
+          wires,
+          workspaceCurrencyCode,
+          workspaceTaxEnabled,
+          workspaceTaxRatePercent,
+          bomExportCompactColumns
+        )
+      );
+      return;
+    }
+
+    void downloadTabularCsvOrXlsxFile(
+      "network-bom",
+      tabularExportFormat,
+      {
+        name: "Network BOM",
+        headers: networkSummaryBomCsvExport.headers,
+        rows: networkSummaryBomCsvExport.rows,
+        freezeHeaderRow: true,
+        autoFilter: true
+      },
+      { includeUtf8Bom: true }
+    );
+  }, [
+    bomExportCompactColumns,
+    canExportBomCsv,
+    catalogItems,
+    connectors,
+    networkSummaryBomCsvExport.headers,
+    networkSummaryBomCsvExport.rows,
+    splices,
+    tabularExportFormat,
+    wires,
+    workspaceCurrencyCode,
+    workspaceTaxEnabled,
+    workspaceTaxRatePercent
+  ]);
   const { effectiveNetworkViewWidth, effectiveNetworkViewHeight, handleNetworkSummaryViewportSizeChange } = useAppControllerNetworkViewportState({ canvasResizeBehaviorMode });
   const { headerOffsetPx, headerBlockRef } = useAppControllerHeaderOffsetState();
   const panStartRef = useRef<{
@@ -958,6 +1014,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       dispatchAction,
       handleNetworkSummaryViewportSizeChange,
       canExportBomCsv,
+      bomExportCompactColumns,
+      toggleBomExportCompactColumns: () => setBomExportCompactColumns((current) => !current),
       handleExportBomCsv,
       describeNode,
       nodeLabelById,
