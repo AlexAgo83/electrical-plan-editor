@@ -26,6 +26,17 @@ export interface WireEndpointReferenceNameLookup {
   seal: Map<string, string>;
 }
 
+export interface WireEndpointReferenceEntry {
+  reference: string;
+  name?: string;
+  quantity: number;
+}
+
+export interface WireEndpointReferenceEntries {
+  connection: WireEndpointReferenceEntry[];
+  seal: WireEndpointReferenceEntry[];
+}
+
 function setLookupEntryIfAbsent(map: Map<string, string>, key: string, value: string): void {
   if (!map.has(key)) {
     map.set(key, value);
@@ -64,4 +75,49 @@ export function buildWireEndpointReferenceNameLookup(wires: Iterable<Wire>): Wir
   }
 
   return lookup;
+}
+
+export function buildWireEndpointReferenceEntries(wires: Iterable<Wire>): WireEndpointReferenceEntries {
+  const connectionEntries = new Map<string, WireEndpointReferenceEntry>();
+  const sealEntries = new Map<string, WireEndpointReferenceEntry>();
+
+  const register = (
+    map: Map<string, WireEndpointReferenceEntry>,
+    reference: string | undefined,
+    name: string | undefined
+  ): void => {
+    const normalizedReference = reference?.trim();
+    if (normalizedReference === undefined || normalizedReference.length === 0) {
+      return;
+    }
+    const normalizedName = normalizeWireEndpointReferenceName(name);
+    const existing = map.get(normalizedReference);
+    if (existing !== undefined) {
+      existing.quantity += 1;
+      if (existing.name === undefined && normalizedName !== undefined) {
+        existing.name = normalizedName;
+      }
+      return;
+    }
+    map.set(normalizedReference, {
+      reference: normalizedReference,
+      name: normalizedName,
+      quantity: 1
+    });
+  };
+
+  for (const wire of wires) {
+    register(connectionEntries, wire.endpointAConnectionReference, wire.endpointAConnectionName);
+    register(connectionEntries, wire.endpointBConnectionReference, wire.endpointBConnectionName);
+    register(sealEntries, wire.endpointASealReference, wire.endpointASealName);
+    register(sealEntries, wire.endpointBSealReference, wire.endpointBSealName);
+  }
+
+  const sortEntries = (entries: Map<string, WireEndpointReferenceEntry>): WireEndpointReferenceEntry[] =>
+    [...entries.values()].sort((left, right) => left.reference.localeCompare(right.reference, undefined, { sensitivity: "base" }));
+
+  return {
+    connection: sortEntries(connectionEntries),
+    seal: sortEntries(sealEntries)
+  };
 }

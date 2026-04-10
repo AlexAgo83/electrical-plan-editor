@@ -9,6 +9,7 @@ interface UseAppControllerModelingHandlersAssemblyParams {
   state: ModelingHandlersParams["state"];
   dispatchAction: ModelingHandlersParams["dispatchAction"];
   confirmAction: ModelingHandlersParams["confirmAction"];
+  choiceAction: ModelingHandlersParams["choiceAction"];
   formsState: EntityFormsStateModel;
   pendingNewNodePosition: ModelingHandlersParams["pendingNewNodePosition"];
   setPendingNewNodePosition: ModelingHandlersParams["setPendingNewNodePosition"];
@@ -26,6 +27,7 @@ export function useAppControllerModelingHandlersAssembly({
   state,
   dispatchAction,
   confirmAction,
+  choiceAction,
   formsState,
   pendingNewNodePosition,
   setPendingNewNodePosition,
@@ -42,6 +44,7 @@ export function useAppControllerModelingHandlersAssembly({
     state,
     dispatchAction,
     confirmAction,
+    choiceAction,
     connectorFormMode: formsState.connectorFormMode,
     setConnectorFormMode: formsState.setConnectorFormMode,
     connectorEditAfterCreate: formsState.connectorEditAfterCreate,

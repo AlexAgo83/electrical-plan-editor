@@ -352,6 +352,7 @@ export function useAppControllerWorkspaceContentAssembly({
     catalogItems: entities.catalogItems,
     connectors: entities.connectors,
     splices: entities.splices,
+    wires: entities.wires,
     selectedCatalogItemId: state.selectedCatalogItemId,
     workspaceCurrencyCode: state.workspaceCurrencyCode,
     catalogHandlers: models.catalogHandlers,
@@ -368,6 +369,7 @@ export function useAppControllerWorkspaceContentAssembly({
     onCreateSpliceFromCatalog: domains.catalogAnalysisDomain.handleCreateSpliceFromCatalog,
     onOpenConnectorFromCatalogAnalysis: domains.catalogAnalysisDomain.handleOpenConnectorFromCatalogAnalysis,
     onOpenSpliceFromCatalogAnalysis: domains.catalogAnalysisDomain.handleOpenSpliceFromCatalogAnalysis,
+    onUpdateWireEndpointReferenceName: models.modelingHandlers.wire.syncWireEndpointReferenceName,
     modelingLeftColumnContent,
     modelingFormsColumnContent,
     analysisWorkspaceContent
@@ -437,7 +439,7 @@ export function useAppControllerWorkspaceContentAssembly({
       : null;
 
   const analysisWorkspaceContentForLayout = state.isCatalogSubScreen
-    ? (state.hasCatalogSelectionForActiveSubScreen ? analysisWorkspaceContentForSubScreen : null)
+    ? analysisWorkspaceContentForSubScreen
     : state.hasInspectableSelectionForActiveSubScreen
       ? analysisWorkspaceContentForSubScreen
       : null;

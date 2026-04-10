@@ -42,6 +42,7 @@ import { useAppControllerNetworkViewportState } from "./hooks/controller/useAppC
 import { useAppControllerHeaderOffsetState } from "./hooks/controller/useAppControllerHeaderOffsetState";
 import { useAppControllerCanvasStateSyncEffects } from "./hooks/controller/useAppControllerCanvasStateSyncEffects";
 import { useConfirmDialogController } from "./hooks/controller/useConfirmDialogController";
+import { useChoiceDialogController } from "./hooks/controller/useChoiceDialogController";
 import { useNetworkSummaryViewStateSync } from "./hooks/controller/useNetworkSummaryViewStateSync";
 import { useOnboardingController } from "./hooks/controller/useOnboardingController";
 import { useAppControllerPersistenceHealth } from "./hooks/controller/useAppControllerPersistenceHealth";
@@ -337,6 +338,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setActiveSubScreen
   });
   const { activeConfirmDialog, requestConfirmation, closeActiveConfirmDialog } = useConfirmDialogController();
+  const { activeChoiceDialog, requestChoiceSelection, closeActiveChoiceDialog } = useChoiceDialogController();
   const {
     isInstallPromptAvailable,
     isPwaUpdateReady,
@@ -677,6 +679,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     state,
     dispatchAction,
     confirmAction: requestConfirmation,
+    choiceAction: requestChoiceSelection,
     formsState,
     pendingNewNodePosition,
     setPendingNewNodePosition,
@@ -1130,6 +1133,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       appShellClassName={appShellClassName}
       activeConfirmDialog={activeConfirmDialog}
       closeActiveConfirmDialog={closeActiveConfirmDialog}
+      activeChoiceDialog={activeChoiceDialog}
+      closeActiveChoiceDialog={closeActiveChoiceDialog}
       onboarding={{
         activeOnboardingStep,
         isOnboardingOpen,

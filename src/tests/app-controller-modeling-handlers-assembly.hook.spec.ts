@@ -33,6 +33,7 @@ describe("useAppControllerModelingHandlersAssembly", () => {
           store.dispatch(action);
         },
         confirmAction: vi.fn(() => Promise.resolve(true)),
+        choiceAction: vi.fn(() => Promise.resolve(null)),
         formsState,
         pendingNewNodePosition: null,
         setPendingNewNodePosition: vi.fn(),
@@ -66,6 +67,7 @@ describe("useAppControllerModelingHandlersAssembly", () => {
           store.dispatch(action);
         },
         confirmAction: vi.fn(() => Promise.resolve(true)),
+        choiceAction: vi.fn(() => Promise.resolve(null)),
         formsState,
         pendingNewNodePosition: null,
         setPendingNewNodePosition: vi.fn(),

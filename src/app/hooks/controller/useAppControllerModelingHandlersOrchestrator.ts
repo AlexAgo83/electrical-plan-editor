@@ -14,6 +14,7 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   state: StateSnapshot;
   dispatchAction: DispatchAction;
   confirmAction: Parameters<typeof useConnectorHandlers>[0]["confirmAction"];
+  choiceAction: Parameters<typeof useWireHandlers>[0]["choiceAction"];
   connectorFormMode: Parameters<typeof useConnectorHandlers>[0]["connectorFormMode"];
   setConnectorFormMode: Parameters<typeof useConnectorHandlers>[0]["setConnectorFormMode"];
   connectorEditAfterCreate: Parameters<typeof useConnectorHandlers>[0]["connectorEditAfterCreate"];
@@ -175,6 +176,7 @@ export function useAppControllerModelingHandlersOrchestrator({
   state,
   dispatchAction,
   confirmAction,
+  choiceAction,
   connectorFormMode,
   setConnectorFormMode,
   connectorEditAfterCreate,
@@ -446,6 +448,7 @@ export function useAppControllerModelingHandlersOrchestrator({
     store,
     dispatchAction,
     confirmAction,
+    choiceAction,
     wireFormMode,
     setWireFormMode,
     wireEditAfterCreate,
