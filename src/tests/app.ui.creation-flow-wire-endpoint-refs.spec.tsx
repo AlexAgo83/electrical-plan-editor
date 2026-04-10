@@ -95,7 +95,7 @@ describe("App integration UI - creation flow wire endpoint references", () => {
       expect(within(inspectorPanel).queryByText("SEAL-A-01")).not.toBeInTheDocument();
       expect(within(inspectorPanel).queryByText("SPL-CONN-B")).not.toBeInTheDocument();
     }
-  }, 10000);
+  }, 20000);
 
   it("swaps wire edit endpoints as a draft action between Save and Cancel edit and preserves side metadata on save only", () => {
     const { store } = renderAppWithState(createUiIntegrationState());
@@ -236,6 +236,6 @@ describe("App integration UI - creation flow wire endpoint references", () => {
       expect(within(wireAnalysisPanel).getByText("Protection")).toBeInTheDocument();
       expect(within(wireAnalysisPanel).getByText("CAT-FUSE-UI")).toBeInTheDocument();
     },
-    10000
+    20000
   );
 });

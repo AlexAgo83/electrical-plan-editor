@@ -1,14 +1,18 @@
 import type { ReactElement } from "react";
 import { ConfirmDialog } from "../dialogs/ConfirmDialog";
+import { ChoiceDialog } from "../dialogs/ChoiceDialog";
 import { DeleteImpactDialog } from "../dialogs/DeleteImpactDialog";
 import { OnboardingModal } from "../onboarding/OnboardingModal";
 import type { ActiveConfirmDialogState } from "../../hooks/controller/useConfirmDialogController";
+import type { ActiveChoiceDialogState } from "../../hooks/controller/useChoiceDialogController";
 import type { OnboardingControllerModel } from "../../hooks/controller/useOnboardingController";
 
 interface AppControllerOverlaysProps {
   appShellClassName: string;
   activeConfirmDialog: ActiveConfirmDialogState | null;
   closeActiveConfirmDialog: (confirmed: boolean) => void;
+  activeChoiceDialog: ActiveChoiceDialogState | null;
+  closeActiveChoiceDialog: (choiceId: string | null) => void;
   onboarding: Pick<
     OnboardingControllerModel,
     | "activeOnboardingStep"
@@ -29,14 +33,29 @@ export function AppControllerOverlays({
   appShellClassName,
   activeConfirmDialog,
   closeActiveConfirmDialog,
+  activeChoiceDialog,
+  closeActiveChoiceDialog,
   onboarding
 }: AppControllerOverlaysProps): ReactElement | null {
-  if (activeConfirmDialog === null && onboarding.activeOnboardingStep === undefined) {
+  if (activeConfirmDialog === null && activeChoiceDialog === null && onboarding.activeOnboardingStep === undefined) {
     return null;
   }
 
   return (
     <>
+      {activeChoiceDialog !== null ? (
+        <ChoiceDialog
+          isOpen={activeChoiceDialog !== null}
+          themeHostClassName={appShellClassName}
+          title={activeChoiceDialog.title}
+          message={activeChoiceDialog.message}
+          details={activeChoiceDialog.details}
+          discardLabel={activeChoiceDialog.discardLabel}
+          options={activeChoiceDialog.options}
+          closeOnBackdrop={activeChoiceDialog.closeOnBackdrop}
+          onChoose={closeActiveChoiceDialog}
+        />
+      ) : null}
       {activeConfirmDialog !== null ? (
         activeConfirmDialog.variant === "standard" ? (
           <ConfirmDialog

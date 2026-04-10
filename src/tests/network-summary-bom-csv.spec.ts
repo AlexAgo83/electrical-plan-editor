@@ -180,6 +180,12 @@ describe("buildNetworkSummaryBomCsvExport", () => {
         name: "Connector 1",
         technicalId: "C-001",
         cavityCount: 2
+      },
+      {
+        id: asConnectorId("C2"),
+        name: "Connector 2",
+        technicalId: "C-002",
+        cavityCount: 4
       }
     ];
     const wires: Wire[] = [
@@ -207,7 +213,28 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     expect(sheets).toHaveLength(2);
     expect(sheets[0]?.name).toBe("Network BOM");
     expect(sheets[1]?.name).toBe("By connector");
-    expect(sheets[1]?.rows).toEqual([["C-001", "Connector 1", "Connector", "", "", 1], ["C-001", "Connector 1", "Connection", "TERM-A", "Conn A", 1], ["C-001", "Connector 1", "Seal", "SEAL-A", "Seal A", 1]]);
+    expect(sheets[1]?.headers).toEqual(["Connector ID", "Connector name", "Connection count", "Type", "Reference", "Name", "Quantity"]);
+    expect(sheets[1]?.rows).toEqual([
+      ["C-001", "Connector 1", 2, "Connector", "", "", 1],
+      ["C-001", "Connector 1", "", "Connection", "TERM-A", "Conn A", 1],
+      ["C-001", "Connector 1", "", "Seal", "SEAL-A", "Seal A", 1],
+      ["C-002", "Connector 2", 4, "Connector", "", "", 1]
+    ]);
+  });
+
+  it("includes connectors without wire terminations in the grouped workbook sheet", () => {
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-001",
+        cavityCount: 2
+      }
+    ];
+
+    const sheets = buildNetworkSummaryBomWorkbookSheets([], connectors, [], []);
+
+    expect(sheets[1]?.rows).toEqual([["C-001", "Connector 1", 2, "Connector", "", "", 1]]);
   });
 
   it("returns summary and metadata rows only when no resolvable catalog-backed components are present", () => {

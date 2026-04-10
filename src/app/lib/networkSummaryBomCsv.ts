@@ -28,6 +28,7 @@ interface ConnectorGroupedTerminationRow {
 interface ConnectorGroupedTerminationAggregate {
   connectorTechnicalId: string;
   connectorName: string;
+  connectionCount: number;
   rows: Map<string, ConnectorGroupedTerminationRow>;
 }
 
@@ -165,6 +166,7 @@ function registerGroupedWireTermination(
   groups: Map<string, ConnectorGroupedTerminationAggregate>,
   connectorTechnicalId: string,
   connectorName: string,
+  connectionCount: number,
   kind: WireTerminationKind,
   reference: string | undefined,
   explicitName: string | undefined,
@@ -184,6 +186,7 @@ function registerGroupedWireTermination(
       const created: ConnectorGroupedTerminationAggregate = {
         connectorTechnicalId,
         connectorName,
+        connectionCount,
         rows: new Map<string, ConnectorGroupedTerminationRow>()
       };
       groups.set(groupKey, created);
@@ -266,6 +269,15 @@ function buildNetworkSummaryBomExportData(
     ensureAggregate(catalogItem).spliceQuantity += 1;
   }
 
+  for (const connector of connectors) {
+    groupedConnectorAggregates.set(connector.technicalId, {
+      connectorTechnicalId: connector.technicalId,
+      connectorName: connector.name,
+      connectionCount: connector.cavityCount,
+      rows: new Map<string, ConnectorGroupedTerminationRow>()
+    });
+  }
+
   const registerEndpointGroupedTerminology = (
     endpoint: WireEndpoint,
     connectionReference: string | undefined,
@@ -284,6 +296,7 @@ function buildNetworkSummaryBomExportData(
       groupedConnectorAggregates,
       connector.technicalId,
       connector.name,
+      connector.cavityCount,
       "connection",
       connectionReference,
       connectionName,
@@ -293,6 +306,7 @@ function buildNetworkSummaryBomExportData(
       groupedConnectorAggregates,
       connector.technicalId,
       connector.name,
+      connector.cavityCount,
       "seal",
       sealReference,
       sealName,
@@ -488,11 +502,12 @@ function buildNetworkSummaryBomExportData(
       return left.reference.localeCompare(right.reference, undefined, { sensitivity: "base" });
     });
     const startRow = groupedSheetRows.length + 2;
-    groupedSheetRows.push([group.connectorTechnicalId, group.connectorName, "Connector", "", "", 1]);
+    groupedSheetRows.push([group.connectorTechnicalId, group.connectorName, group.connectionCount, "Connector", "", "", 1]);
     for (const row of orderedGroupRows) {
       groupedSheetRows.push([
         group.connectorTechnicalId,
         group.connectorName,
+        "",
         row.kind === "connection" ? "Connection" : "Seal",
         row.reference,
         row.name ?? "",
@@ -515,7 +530,7 @@ function buildNetworkSummaryBomExportData(
     },
     {
       name: "By connector",
-      headers: ["Connector ID", "Connector name", "Type", "Reference", "Name", "Quantity"],
+      headers: ["Connector ID", "Connector name", "Connection count", "Type", "Reference", "Name", "Quantity"],
       rows: groupedSheetRows,
       freezeHeaderRow: true,
       autoFilter: true,
