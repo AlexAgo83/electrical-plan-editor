@@ -19,7 +19,7 @@ interface CatalogAnalysisWorkspaceContentProps {
     kind: "connection" | "seal",
     reference: string,
     nextName: string
-  ) => Promise<boolean> | boolean;
+  ) => Promise<boolean | { apply: () => void } | false> | boolean | { apply: () => void };
 }
 
 function CatalogUsageTableSection({
@@ -112,7 +112,7 @@ function WireEndpointReferenceNamesSection({
     kind: "connection" | "seal",
     reference: string,
     nextName: string
-  ) => Promise<boolean> | boolean;
+  ) => Promise<boolean | { apply: () => void } | false> | boolean | { apply: () => void };
 }): ReactElement {
   const [draftsByReference, setDraftsByReference] = useState<Record<string, string>>({});
 
@@ -175,7 +175,12 @@ function WireEndpointReferenceNamesSection({
                     type="button"
                     className="validation-row-go-to-button button-with-icon"
                     onClick={() => {
-                      void onUpdateWireEndpointReferenceName(kind, entry.reference, draftValue);
+                      void (async () => {
+                        const result = await Promise.resolve(onUpdateWireEndpointReferenceName(kind, entry.reference, draftValue));
+                        if (result !== false && result !== true) {
+                          result.apply();
+                        }
+                      })();
                     }}
                   >
                     <span className="action-button-icon is-save" aria-hidden="true" />
