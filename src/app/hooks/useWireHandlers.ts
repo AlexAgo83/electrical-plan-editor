@@ -121,6 +121,10 @@ export interface WireEndpointSlotHint {
   message: string;
 }
 
+interface WireEndpointReferenceSyncPlan {
+  apply: () => void;
+}
+
 export function useWireHandlers({
   store,
   dispatchAction,
@@ -261,7 +265,7 @@ export function useWireHandlers({
       excludeWireId?: WireId;
       onResolvedName?: (resolvedName: string | undefined) => void;
     }
-  ): boolean | Promise<boolean> => {
+  ): boolean | WireEndpointReferenceSyncPlan | Promise<WireEndpointReferenceSyncPlan | false> => {
     const normalizedReference = normalizeWireEndpointReferenceInput(reference ?? "");
     if (normalizedReference === undefined) {
       return true;
@@ -294,33 +298,34 @@ export function useWireHandlers({
       }
     }
 
-    const applyResolvedName = (resolvedName: string | undefined): void => {
-      options?.onResolvedName?.(resolvedName);
+    const createPlan = (resolvedName: string | undefined): WireEndpointReferenceSyncPlan => ({
+      apply: () => {
+        options?.onResolvedName?.(resolvedName);
 
-      if (matchingWires.length === 0) {
-        return;
-      }
+        if (matchingWires.length === 0) {
+          return;
+        }
 
-      for (const wire of matchingWires) {
-        const nextWire = {
-          ...wire,
-          ...(kind === "connection"
-            ? {
-                endpointAConnectionName: resolvedName,
-                endpointBConnectionName: resolvedName
-              }
-            : {
-                endpointASealName: resolvedName,
-                endpointBSealName: resolvedName
-              })
-        };
-        dispatchAction(appActions.saveWire(nextWire), { trackHistory: false });
+        for (const wire of matchingWires) {
+          const nextWire = {
+            ...wire,
+            ...(kind === "connection"
+              ? {
+                  endpointAConnectionName: resolvedName,
+                  endpointBConnectionName: resolvedName
+                }
+              : {
+                  endpointASealName: resolvedName,
+                  endpointBSealName: resolvedName
+                })
+          };
+          dispatchAction(appActions.saveWire(nextWire), { trackHistory: false });
+        }
       }
-    };
+    });
 
     if (normalizedNextNames.length === 0) {
-      applyResolvedName(undefined);
-      return true;
+      return createPlan(undefined);
     }
 
     const candidateNames = [...normalizedNextNames];
@@ -331,8 +336,7 @@ export function useWireHandlers({
     }
 
     if (candidateNames.length === 1) {
-      applyResolvedName(candidateNames[0]);
-      return true;
+      return createPlan(candidateNames[0]);
     }
 
     const visibleChoiceNames = candidateNames.slice(0, 3);
@@ -361,8 +365,7 @@ export function useWireHandlers({
         return false;
       }
 
-      applyResolvedName(selectedName);
-      return true;
+      return createPlan(selectedName);
     });
   };
 
@@ -1140,6 +1143,11 @@ export function useWireHandlers({
         }
       })
     );
+    const isPromiseLikeSyncResult = (
+      value: boolean | WireEndpointReferenceSyncPlan | Promise<WireEndpointReferenceSyncPlan | false>
+    ): value is Promise<WireEndpointReferenceSyncPlan | false> => {
+      return typeof value === "object" && value !== null && "then" in value;
+    };
 
     const saveCurrentWire = (): void => {
       dispatchAction(
@@ -1180,19 +1188,34 @@ export function useWireHandlers({
       }
     };
 
-    if (syncResults.every((result) => typeof result === "boolean")) {
+    if (syncResults.every((result) => !isPromiseLikeSyncResult(result))) {
       if (syncResults.some((result) => result === false)) {
         return;
+      }
+
+      for (const result of syncResults) {
+        if (!isPromiseLikeSyncResult(result) && result !== false && result !== true) {
+          result.apply();
+        }
       }
       saveCurrentWire();
       return;
     }
 
     void (async () => {
-      const resolvedResults = await Promise.all(syncResults.map((result) => Promise.resolve(result)));
+      const resolvedResults: Array<boolean | WireEndpointReferenceSyncPlan | false> = await Promise.all(
+        syncResults.map(async (result): Promise<boolean | WireEndpointReferenceSyncPlan | false> => await result)
+      );
       if (resolvedResults.some((result) => result === false)) {
         return;
       }
+
+      for (const result of resolvedResults) {
+        if (!isPromiseLikeSyncResult(result) && result !== false && result !== true) {
+          result.apply();
+        }
+      }
+
       saveCurrentWire();
     })();
   }

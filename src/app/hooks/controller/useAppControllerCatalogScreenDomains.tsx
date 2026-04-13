@@ -41,7 +41,7 @@ interface UseAppControllerCatalogScreenDomainsParams {
     kind: "connection" | "seal",
     reference: string,
     nextName: string
-  ) => Promise<boolean> | boolean;
+  ) => Promise<boolean | { apply: () => void } | false> | boolean | { apply: () => void };
   modelingLeftColumnContent: ReactElement | null;
   modelingFormsColumnContent: ReactElement | null;
   analysisWorkspaceContent: ReactElement | null;

@@ -1,8 +1,10 @@
-import { fireEvent, screen, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   asCatalogItemId,
+  asWireId,
   createUiIntegrationState,
+  createUiIntegrationDenseWiresState,
   createUiIntegrationWideEndpointsState,
   getPanelByHeading,
   renderAppWithState,
@@ -166,6 +168,66 @@ describe("App integration UI - creation flow wire endpoint references", () => {
     expect(savedWire?.endpointBConnectionReference).toBe("TERM-A-SAVE");
     expect(savedWire?.endpointBSealReference).toBeUndefined();
   }, 10000);
+
+  it("does not partially apply wire endpoint reference renames when a conflicting choice is discarded", async () => {
+    const baseState = createUiIntegrationDenseWiresState();
+    const firstWire = baseState.wires.byId[asWireId("W1")];
+    const secondWire = baseState.wires.byId[asWireId("W2")];
+    const thirdWire = baseState.wires.byId[asWireId("W3")];
+    if (firstWire === undefined || secondWire === undefined || thirdWire === undefined) {
+      throw new Error("Expected dense wire integration state.");
+    }
+
+    const state = appReducer(
+      appReducer(
+        appReducer(
+          baseState,
+          appActions.saveWire({
+            ...firstWire,
+            endpointAConnectionReference: "TERM-A-1",
+            endpointAConnectionName: "Current Alpha",
+            endpointBConnectionReference: "TERM-B-1",
+            endpointBConnectionName: "Current Beta"
+          })
+        ),
+        appActions.saveWire({
+          ...secondWire,
+          endpointAConnectionReference: "TERM-A-1",
+          endpointAConnectionName: "Existing Alpha"
+        })
+      ),
+      appActions.saveWire({
+        ...thirdWire,
+        endpointAConnectionReference: "TERM-B-1",
+        endpointAConnectionName: "Existing Beta"
+      })
+    );
+
+    const { store } = renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+
+    fireEvent.click(within(getPanelByHeading("Wires")).getByText("Wire 1"));
+
+    const editWirePanel = getPanelByHeading("Edit Wire");
+    const endpointAFieldset = within(editWirePanel).getByRole("group", { name: "Endpoint A" });
+    const endpointBFieldset = within(editWirePanel).getByRole("group", { name: "Endpoint B" });
+    fireEvent.change(within(endpointAFieldset).getByLabelText("Connection name"), { target: { value: "Alpha Updated" } });
+    fireEvent.change(within(endpointBFieldset).getByLabelText("Connection name"), { target: { value: "Beta Updated" } });
+    fireEvent.click(within(editWirePanel).getByRole("button", { name: "Save" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Choose connection name" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Discard" }));
+
+    await waitFor(() => {
+      const nextState = store.getState();
+      expect(nextState.wires.byId[asWireId("W1")]?.endpointAConnectionName).toBe("Current Alpha");
+      expect(nextState.wires.byId[asWireId("W1")]?.endpointBConnectionName).toBe("Current Beta");
+      expect(nextState.wires.byId[asWireId("W2")]?.endpointAConnectionName).toBe("Existing Alpha");
+      expect(nextState.wires.byId[asWireId("W3")]?.endpointAConnectionName).toBe("Existing Beta");
+    });
+  }, 20000);
 
   it(
     "supports fuse mode with catalog linkage, preserves save/cancel semantics, and shows fuse metadata in wire list and analysis",
