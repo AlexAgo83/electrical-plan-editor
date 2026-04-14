@@ -1,6 +1,7 @@
 node_modules
 dist
 coverage
+.claude/
 playwright-report
 test-results
 .vite
