@@ -508,6 +508,8 @@
 
 .settings-import-export-selection-column {
   margin: 0;
+  overflow-y: auto;
+  max-height: 14rem;
 }
 
 @container settings-import-export-panel (min-width: 656px) {
