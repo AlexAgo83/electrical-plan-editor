@@ -36,12 +36,12 @@ stateDiagram-v2
 ```
 
 # Plan
-- [ ] 1. Build the workbook model for the two-sheet BOM export.
-- [ ] 2. Keep the current summary sheet intact and add a connector-grouped sheet.
-- [ ] 3. Merge the connector ID and name cells across each grouped block.
-- [ ] 4. Verify the grouped rows stay under the right connector and totals remain correct.
-- [ ] 5. Update export tests and workbook checks for both sheets.
-- [ ] 6. Validate the workbook output and update linked Logics docs before closing the wave.
+- [x] 1. Build the workbook model for the two-sheet BOM export.
+- [x] 2. Keep the current summary sheet intact and add a connector-grouped sheet.
+- [x] 3. Merge the connector ID and name cells across each grouped block.
+- [x] 4. Verify the grouped rows stay under the right connector and totals remain correct.
+- [x] 5. Update export tests and workbook checks for both sheets.
+- [x] 6. Validate the workbook output and update linked Logics docs before closing the wave.
 
 # Delivery checkpoints
 - Each completed wave should leave the repository in a coherent, commit-ready state.
@@ -86,11 +86,11 @@ stateDiagram-v2
 - Confirm the generated workbook contains both sheets, merged connector identity cells, and stable grouped rows.
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] No wave or step was closed before the relevant automated tests and quality checks passed.
-- [ ] Linked request/backlog/task docs updated during completed waves and at closure.
-- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] Validation commands executed and results captured.
+- [x] No wave or step was closed before the relevant automated tests and quality checks passed.
+- [x] Linked request/backlog/task docs updated during completed waves and at closure.
+- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report

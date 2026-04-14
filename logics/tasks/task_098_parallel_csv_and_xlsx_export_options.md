@@ -36,11 +36,11 @@ stateDiagram-v2
 ```
 
 # Plan
-- [ ] 1. Add or select the XLSX export dependency and wire the workbook writer into the export layer.
-- [ ] 2. Add a user-facing format choice so BOM and wire-by-wire exports can be emitted as CSV or XLSX.
-- [ ] 3. Keep the existing CSV path unchanged and make XLSX an opt-in parallel path.
-- [ ] 4. Update tests for both export formats and for the format selection behavior.
-- [ ] 5. Validate the build and update linked Logics docs before closing the wave.
+- [x] 1. Add or select the XLSX export dependency and wire the workbook writer into the export layer.
+- [x] 2. Add a user-facing format choice so BOM and wire-by-wire exports can be emitted as CSV or XLSX.
+- [x] 3. Keep the existing CSV path unchanged and make XLSX an opt-in parallel path.
+- [x] 4. Update tests for both export formats and for the format selection behavior.
+- [x] 5. Validate the build and update linked Logics docs before closing the wave.
 
 # Delivery checkpoints
 - Each completed wave should leave the repository in a coherent, commit-ready state.
@@ -81,11 +81,11 @@ stateDiagram-v2
 - Confirm CSV remains available and XLSX exports open as valid workbook files.
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] No wave or step was closed before the relevant automated tests and quality checks passed.
-- [ ] Linked request/backlog/task docs updated during completed waves and at closure.
-- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] Validation commands executed and results captured.
+- [x] No wave or step was closed before the relevant automated tests and quality checks passed.
+- [x] Linked request/backlog/task docs updated during completed waves and at closure.
+- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report

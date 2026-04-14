@@ -7,6 +7,7 @@
 > Progress: 100%
 > Complexity: High
 > Theme: Data Model
+> Non-semantic edit: closed DoD checklist after delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Context
@@ -35,12 +36,12 @@ stateDiagram-v2
 ```
 
 # Plan
-- [ ] 1. Identify where wire termination references are stored, edited, and serialized.
-- [ ] 2. Add optional display-name support for seal and connection references in the data model and forms.
-- [ ] 3. Implement fallback lookup so re-entering a known reference suggests or reuses its last known name.
-- [ ] 4. Preserve blank names when no label is known or entered.
-- [ ] 5. Update tests around persistence, form behavior, and the fallback lookup path.
-- [ ] 6. Validate the change set and update linked Logics docs before closing the wave.
+- [x] 1. Identify where wire termination references are stored, edited, and serialized.
+- [x] 2. Add optional display-name support for seal and connection references in the data model and forms.
+- [x] 3. Implement fallback lookup so re-entering a known reference suggests or reuses its last known name.
+- [x] 4. Preserve blank names when no label is known or entered.
+- [x] 5. Update tests around persistence, form behavior, and the fallback lookup path.
+- [x] 6. Validate the change set and update linked Logics docs before closing the wave.
 
 # Delivery checkpoints
 - Each completed wave should leave the repository in a coherent, commit-ready state.
@@ -84,11 +85,11 @@ stateDiagram-v2
 - Confirm wire termination forms save blank names, reuse known names, and keep existing references intact.
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] No wave or step was closed before the relevant automated tests and quality checks passed.
-- [ ] Linked request/backlog/task docs updated during completed waves and at closure.
-- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] Validation commands executed and results captured.
+- [x] No wave or step was closed before the relevant automated tests and quality checks passed.
+- [x] Linked request/backlog/task docs updated during completed waves and at closure.
+- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report

@@ -36,11 +36,11 @@ stateDiagram-v2
 ```
 
 # Plan
-- [ ] 1. Inspect the current BOM row builder and isolate the wire termination block logic.
-- [ ] 2. Replace the split structure with a single normalized BOM row model.
-- [ ] 3. Keep ordering deterministic so the unified export is readable and stable.
-- [ ] 4. Update any callers or tests that still expect the old separate termination section.
-- [ ] 5. Validate the export output and update linked Logics docs before closing the wave.
+- [x] 1. Inspect the current BOM row builder and isolate the wire termination block logic.
+- [x] 2. Replace the split structure with a single normalized BOM row model.
+- [x] 3. Keep ordering deterministic so the unified export is readable and stable.
+- [x] 4. Update any callers or tests that still expect the old separate termination section.
+- [x] 5. Validate the export output and update linked Logics docs before closing the wave.
 
 # Delivery checkpoints
 - Each completed wave should leave the repository in a coherent, commit-ready state.
@@ -84,11 +84,11 @@ stateDiagram-v2
 - Confirm the exported BOM now contains one unified structure and no longer emits a separate wire termination section.
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] No wave or step was closed before the relevant automated tests and quality checks passed.
-- [ ] Linked request/backlog/task docs updated during completed waves and at closure.
-- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] Validation commands executed and results captured.
+- [x] No wave or step was closed before the relevant automated tests and quality checks passed.
+- [x] Linked request/backlog/task docs updated during completed waves and at closure.
+- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report

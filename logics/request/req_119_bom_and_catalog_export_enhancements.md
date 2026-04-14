@@ -6,6 +6,7 @@
 > Confidence: 100%
 > Complexity: High
 > Theme: UI
+> Non-semantic edit: closed DoR checklist after delivery
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
 
 # Needs
@@ -54,10 +55,10 @@ flowchart TD
 - AC5: The BOM XLSX export contains two sheets, one global summary sheet and one connector-grouped sheet with merged connector ID and name cells, correct quantities, and connector-order grouping.
 
 # Definition of Ready (DoR)
-- [ ] Problem statement is explicit and user impact is clear.
-- [ ] Scope boundaries are explicit, including what stays CSV-only and what becomes optional XLSX.
-- [ ] Acceptance criteria are testable and can later be split into bounded backlog items.
-- [ ] Dependencies, especially the XLSX library choice and workbook formatting rules, are listed.
+- [x] Problem statement is explicit and user impact is clear.
+- [x] Scope boundaries are explicit, including what stays CSV-only and what becomes optional XLSX.
+- [x] Acceptance criteria are testable and can later be split into bounded backlog items.
+- [x] Dependencies, especially the XLSX library choice and workbook formatting rules, are listed.
 
 # Companion docs
 - Product brief(s): (none yet)

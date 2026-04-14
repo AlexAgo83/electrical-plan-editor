@@ -7,6 +7,7 @@
 > Progress: 100%
 > Complexity: Medium
 > Theme: UI
+> Non-semantic edit: closed DoD checklist after delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Context
@@ -35,11 +36,11 @@ stateDiagram-v2
 ```
 
 # Plan
-- [ ] 1. Locate the catalog export path and the state source that controls export column selection.
-- [ ] 2. Add export-only column toggles and thread the selected columns into the catalog export builder.
-- [ ] 3. Keep the on-screen catalog table unchanged and preserve the default export output when no toggle is enabled.
-- [ ] 4. Add or update tests for export column inclusion and exclusion.
-- [ ] 5. Validate the change set and update linked Logics docs before closing the wave.
+- [x] 1. Locate the catalog export path and the state source that controls export column selection.
+- [x] 2. Add export-only column toggles and thread the selected columns into the catalog export builder.
+- [x] 3. Keep the on-screen catalog table unchanged and preserve the default export output when no toggle is enabled.
+- [x] 4. Add or update tests for export column inclusion and exclusion.
+- [x] 5. Validate the change set and update linked Logics docs before closing the wave.
 
 # Delivery checkpoints
 - Each completed wave should leave the repository in a coherent, commit-ready state.
@@ -82,11 +83,11 @@ stateDiagram-v2
 - Confirm the exported catalog still renders unchanged in the app and the hidden columns are absent only from the export output.
 
 # Definition of Done (DoD)
-- [ ] Scope implemented and acceptance criteria covered.
-- [ ] Validation commands executed and results captured.
-- [ ] No wave or step was closed before the relevant automated tests and quality checks passed.
-- [ ] Linked request/backlog/task docs updated during completed waves and at closure.
-- [ ] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
-- [ ] Status is `Done` and progress is `100%`.
+- [x] Scope implemented and acceptance criteria covered.
+- [x] Validation commands executed and results captured.
+- [x] No wave or step was closed before the relevant automated tests and quality checks passed.
+- [x] Linked request/backlog/task docs updated during completed waves and at closure.
+- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.
+- [x] Status is `Done` and progress is `100%`.
 
 # Report
