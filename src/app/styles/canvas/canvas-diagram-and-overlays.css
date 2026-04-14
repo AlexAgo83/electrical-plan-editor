@@ -146,6 +146,11 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
+.network-summary-view-menu--right {
+  left: auto;
+  right: 0;
+}
+
 .network-summary-view-menu-item {
   display: flex;
   align-items: center;
