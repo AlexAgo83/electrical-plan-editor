@@ -201,7 +201,7 @@ function NetworkSummaryViewMenu({
         View
       </button>
       {open && (
-        <div className="network-summary-view-menu" role="menu">
+        <div className="network-summary-view-menu network-summary-view-menu--right" role="menu">
           <button
             type="button"
             role="menuitemcheckbox"
