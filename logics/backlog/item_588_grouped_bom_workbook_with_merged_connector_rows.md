@@ -54,7 +54,7 @@ flowchart TD
 
 # Links
 - Product brief(s): (none yet)
-- Architecture decision(s): (none yet)
+- Architecture decision(s): `adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming`
 - Request: `req_119_bom_and_catalog_export_enhancements`
 - Primary task(s): `task_102_grouped_bom_workbook_with_merged_connector_rows`
 
