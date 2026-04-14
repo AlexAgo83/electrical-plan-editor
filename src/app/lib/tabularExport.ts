@@ -82,7 +82,7 @@ function addWorksheet(workbook: ExcelJS.Workbook, sheet: TabularWorksheetExport)
   });
 }
 
-async function downloadBlob(blob: Blob, filenameBase: string, extension: "csv" | "xlsx"): Promise<void> {
+function downloadBlob(blob: Blob, filenameBase: string, extension: "csv" | "xlsx"): void {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return;
   }
@@ -117,7 +117,7 @@ export async function downloadTabularWorkbookFile(
   const blob = new Blob([buffer], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   });
-  await downloadBlob(blob, filenameBase, "xlsx");
+  downloadBlob(blob, filenameBase, "xlsx");
 }
 
 export async function downloadTabularCsvOrXlsxFile(
@@ -134,5 +134,5 @@ export async function downloadTabularCsvOrXlsxFile(
   const csvContent = buildCsvContent(sheet.headers, sheet.rows);
   const payload = options?.includeUtf8Bom ? `\uFEFF${csvContent}` : csvContent;
   const blob = new Blob([payload], { type: "text/csv;charset=utf-8" });
-  await downloadBlob(blob, filenameBase, "csv");
+  downloadBlob(blob, filenameBase, "csv");
 }

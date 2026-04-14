@@ -19,7 +19,7 @@ interface CatalogAnalysisWorkspaceContentProps {
     kind: "connection" | "seal",
     reference: string,
     nextName: string
-  ) => Promise<boolean | { apply: () => void } | false> | boolean | { apply: () => void };
+  ) => Promise<boolean | { apply: () => void }> | boolean | { apply: () => void };
 }
 
 function CatalogUsageTableSection({
@@ -112,7 +112,7 @@ function WireEndpointReferenceNamesSection({
     kind: "connection" | "seal",
     reference: string,
     nextName: string
-  ) => Promise<boolean | { apply: () => void } | false> | boolean | { apply: () => void };
+  ) => Promise<boolean | { apply: () => void }> | boolean | { apply: () => void };
 }): ReactElement {
   const [draftsByReference, setDraftsByReference] = useState<Record<string, string>>({});
 

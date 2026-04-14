@@ -28,6 +28,42 @@ const ALLOWED_TIMEOUT_OVERRIDES = [
       "src/tests/app.ui.settings-wire-defaults.spec.tsx::persists global defaults for wire section and auto-create linked nodes and reuses them in create forms",
     rationale:
       "Cross-screen defaults propagation scenario touches multiple forms and validation passes; temporary override retained until helper extraction."
+  },
+  {
+    key:
+      "src/tests/app.ui.catalog.spec.tsx::adds Catalog before connectors in modeling navigation and quick entity navigation",
+    rationale:
+      "Catalog navigation test covers multiple screen transitions and quick-nav interactions; temporary override retained until fixture cost is reduced."
+  },
+  {
+    key:
+      "src/tests/app.ui.catalog.spec.tsx::scrolls to the edit catalog item panel when clicking Edit",
+    rationale:
+      "Catalog scroll behavior test involves async DOM mutations and scroll spy coordination; temporary override retained pending test decomposition."
+  },
+  {
+    key:
+      "src/tests/app.ui.catalog.spec.tsx::does not scroll to the catalog form when selecting a row directly",
+    rationale:
+      "Catalog scroll guard test involves async DOM mutations and scroll spy coordination; temporary override retained pending test decomposition."
+  },
+  {
+    key:
+      "src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx::supports optional wire side connection and seal references with trim, non-destructive endpoint type changes, and clear on save",
+    rationale:
+      "Wide integration path covering wire endpoint ref creation, trim, type changes, and save/cancel semantics; temporary override retained until fixture cost is reduced."
+  },
+  {
+    key:
+      "src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx::swaps wire edit endpoints as a draft action between Save and Cancel edit and preserves side metadata on save only",
+    rationale:
+      "Wire endpoint swap test covers multiple draft/save/cancel cycles with side metadata; temporary override retained until helper extraction."
+  },
+  {
+    key:
+      "src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx::does not partially apply wire endpoint reference renames when a conflicting choice is discarded",
+    rationale:
+      "Wire reference rename atomicity test involves choice dialog and conflict resolution flows; temporary override retained until fixture cost is reduced."
   }
 ];
 

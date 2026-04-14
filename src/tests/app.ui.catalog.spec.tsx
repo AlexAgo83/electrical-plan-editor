@@ -221,7 +221,7 @@ describe("App integration UI - catalog", () => {
     fireEvent.click(within(catalogPanel).getByText("CAT-WIRES"));
 
     const connectionHeading = await screen.findByRole("heading", { name: "Wire endpoint references" });
-    const connectionPanel = connectionHeading.closest(".panel") as HTMLElement | null;
+    const connectionPanel = connectionHeading.closest<HTMLElement>(".panel");
     expect(connectionPanel).not.toBeNull();
     if (connectionPanel === null) {
       throw new Error("Expected wire endpoint references panel.");

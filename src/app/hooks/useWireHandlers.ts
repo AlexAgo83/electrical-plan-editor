@@ -1203,8 +1203,8 @@ export function useWireHandlers({
     }
 
     void (async () => {
-      const resolvedResults: Array<boolean | WireEndpointReferenceSyncPlan | false> = await Promise.all(
-        syncResults.map(async (result): Promise<boolean | WireEndpointReferenceSyncPlan | false> => await result)
+      const resolvedResults: Array<boolean | WireEndpointReferenceSyncPlan> = await Promise.all(
+        syncResults.map(async (result): Promise<boolean | WireEndpointReferenceSyncPlan> => await result)
       );
       if (resolvedResults.some((result) => result === false)) {
         return;

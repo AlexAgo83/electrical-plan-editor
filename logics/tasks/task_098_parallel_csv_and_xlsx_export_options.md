@@ -7,6 +7,7 @@
 > Progress: 0%
 > Complexity: High
 > Theme: Export
+> Non-semantic edit: linked adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Context
