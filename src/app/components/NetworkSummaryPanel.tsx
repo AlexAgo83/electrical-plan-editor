@@ -177,8 +177,6 @@ function NetworkSummaryViewMenu({
 }: NetworkSummaryViewMenuProps): ReactElement {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const anyActive = showNetworkInfoPanels || showSegmentLengths || showCableCallouts;
-
   useEffect(() => {
     if (!open) return;
     function handleClickOutside(event: MouseEvent) {
@@ -194,7 +192,7 @@ function NetworkSummaryViewMenu({
     <div ref={wrapperRef} className="network-summary-view-menu-wrapper">
       <button
         type="button"
-        className={anyActive ? "workspace-tab network-summary-export-button is-active" : "workspace-tab network-summary-export-button"}
+        className="workspace-tab network-summary-export-button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
