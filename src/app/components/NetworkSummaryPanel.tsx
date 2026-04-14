@@ -194,7 +194,7 @@ function NetworkSummaryViewMenu({
     <div ref={wrapperRef} className="network-summary-view-menu-wrapper">
       <button
         type="button"
-        className={anyActive ? "workspace-tab is-active" : "workspace-tab"}
+        className={anyActive ? "workspace-tab network-summary-export-button is-active" : "workspace-tab network-summary-export-button"}
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
