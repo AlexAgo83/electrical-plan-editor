@@ -63,7 +63,7 @@ stateDiagram-v2
 
 # Links
 - Product brief(s): (none yet)
-- Architecture decision(s): (none yet)
+- Architecture decision(s): `adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming`
 - Backlog item: `item_587_parallel_csv_and_xlsx_export_options`
 - Request(s): `req_119_bom_and_catalog_export_enhancements`
 
