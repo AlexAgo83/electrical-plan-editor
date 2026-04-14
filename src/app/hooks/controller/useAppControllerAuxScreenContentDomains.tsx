@@ -180,6 +180,8 @@ export function useAppControllerAuxScreenContentDomains({
     setWorkspaceTaxRatePercent: settings.prefs.setWorkspaceTaxRatePercent,
     tabularExportFormat: settings.prefs.tabularExportFormat,
     setTabularExportFormat: settings.prefs.setTabularExportFormat,
+    bomExportCompactColumns: settings.prefs.bomExportCompactColumns,
+    setBomExportCompactColumns: settings.prefs.setBomExportCompactColumns,
     defaultWireSectionMm2: settings.prefs.defaultWireSectionMm2,
     setDefaultWireSectionMm2: settings.prefs.setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes: settings.prefs.defaultAutoCreateLinkedNodes,

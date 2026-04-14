@@ -175,6 +175,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceTaxEnabled,
     workspaceTaxRatePercent,
     tabularExportFormat,
+    bomExportCompactColumns,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     networkSort,
@@ -199,7 +200,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceWideScreen,
     preferencesHydrated
   } = preferencesState;
-  const { bomExportCompactColumns, toggleBomExportCompactColumns, canExportBomCsv, handleExportBomCsv } = useAppControllerBomExportHandlers({
+  const { canExportBomCsv, handleExportBomCsv } = useAppControllerBomExportHandlers({
     catalogItems,
     connectors,
     splices,
@@ -207,7 +208,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceCurrencyCode,
     workspaceTaxEnabled,
     workspaceTaxRatePercent,
-    tabularExportFormat
+    tabularExportFormat,
+    bomExportCompactColumns
   });
   const { effectiveNetworkViewWidth, effectiveNetworkViewHeight, handleNetworkSummaryViewportSizeChange } = useAppControllerNetworkViewportState({ canvasResizeBehaviorMode });
   const { headerOffsetPx, headerBlockRef } = useAppControllerHeaderOffsetState();
@@ -962,8 +964,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       dispatchAction,
       handleNetworkSummaryViewportSizeChange,
       canExportBomCsv,
-      bomExportCompactColumns,
-      toggleBomExportCompactColumns,
       handleExportBomCsv,
       describeNode,
       nodeLabelById,

@@ -54,6 +54,8 @@ interface SettingsWorkspaceContentProps {
   setWorkspaceTaxRatePercent: (value: number) => void;
   tabularExportFormat: TabularExportFormat;
   setTabularExportFormat: (value: TabularExportFormat) => void;
+  bomExportCompactColumns: boolean;
+  setBomExportCompactColumns: (value: boolean) => void;
   defaultWireSectionMm2: number;
   setDefaultWireSectionMm2: (value: number) => void;
   defaultAutoCreateLinkedNodes: boolean;
@@ -160,6 +162,8 @@ export function SettingsWorkspaceContent({
   setWorkspaceTaxRatePercent,
   tabularExportFormat,
   setTabularExportFormat,
+  bomExportCompactColumns,
+  setBomExportCompactColumns,
   defaultWireSectionMm2,
   setDefaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
@@ -706,6 +710,14 @@ export function SettingsWorkspaceContent({
               <option value="csv">CSV</option>
               <option value="xlsx">XLSX</option>
             </select>
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={bomExportCompactColumns}
+              onChange={(event) => setBomExportCompactColumns(event.target.checked)}
+            />
+            Compact BOM export columns
           </label>
           <label className="settings-field">
             Tax rate (%)

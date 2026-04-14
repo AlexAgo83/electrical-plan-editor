@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import type { CatalogItem, Connector, Splice, Wire } from "../../../core/entities";
 import { buildNetworkSummaryBomCsvExport, buildNetworkSummaryBomWorkbookSheets } from "../../lib/networkSummaryBomCsv";
 import { downloadTabularCsvOrXlsxFile, downloadTabularWorkbookFile, type TabularExportFormat } from "../../lib/tabularExport";
@@ -13,6 +13,7 @@ interface UseAppControllerBomExportHandlersParams {
   workspaceTaxEnabled: boolean;
   workspaceTaxRatePercent: number;
   tabularExportFormat: TabularExportFormat;
+  bomExportCompactColumns: boolean;
 }
 
 export function useAppControllerBomExportHandlers({
@@ -23,10 +24,9 @@ export function useAppControllerBomExportHandlers({
   workspaceCurrencyCode,
   workspaceTaxEnabled,
   workspaceTaxRatePercent,
-  tabularExportFormat
+  tabularExportFormat,
+  bomExportCompactColumns
 }: UseAppControllerBomExportHandlersParams) {
-  const [bomExportCompactColumns, setBomExportCompactColumns] = useState(false);
-
   const networkSummaryBomCsvExport = useMemo(
     () =>
       buildNetworkSummaryBomCsvExport(
@@ -95,7 +95,6 @@ export function useAppControllerBomExportHandlers({
 
   return {
     bomExportCompactColumns,
-    toggleBomExportCompactColumns: () => setBomExportCompactColumns((current) => !current),
     canExportBomCsv,
     handleExportBomCsv
   };

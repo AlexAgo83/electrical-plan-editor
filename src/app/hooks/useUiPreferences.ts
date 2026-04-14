@@ -16,7 +16,7 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 4;
+const UI_PREFERENCES_SCHEMA_VERSION = 5;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 function normalizeThemeMode(value: unknown): ThemeMode {
@@ -112,6 +112,7 @@ interface UiPreferencesPayload {
   workspaceTaxEnabled: boolean;
   workspaceTaxRatePercent: number;
   tabularExportFormat: TabularExportFormat;
+  bomExportCompactColumns: boolean;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
   defaultSortField: SortField;
@@ -181,6 +182,14 @@ function migrateUiPreferencesFromV3(candidate: Record<string, unknown>): Record<
   };
 }
 
+function migrateUiPreferencesFromV4(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    bomExportCompactColumns: typeof candidate.bomExportCompactColumns === "boolean" ? candidate.bomExportCompactColumns : false,
+    schemaVersion: 5
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -211,6 +220,11 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
     if (version === 3) {
       migrated = migrateUiPreferencesFromV3(migrated);
       version = 4;
+      continue;
+    }
+    if (version === 4) {
+      migrated = migrateUiPreferencesFromV4(migrated);
+      version = 5;
       continue;
     }
     return null;
@@ -245,6 +259,7 @@ interface UseUiPreferencesOptions {
   workspaceTaxEnabled: boolean;
   workspaceTaxRatePercent: number;
   tabularExportFormat: TabularExportFormat;
+  bomExportCompactColumns: boolean;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
   defaultSortField: SortField;
@@ -287,6 +302,7 @@ interface UseUiPreferencesOptions {
   setWorkspaceTaxEnabled: (value: boolean) => void;
   setWorkspaceTaxRatePercent: (value: number) => void;
   setTabularExportFormat: (value: TabularExportFormat) => void;
+  setBomExportCompactColumns: (value: boolean) => void;
   setDefaultWireSectionMm2: (value: number) => void;
   setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
   setDefaultSortField: (field: SortField) => void;
@@ -422,6 +438,7 @@ export function useUiPreferences({
   workspaceTaxEnabled,
   workspaceTaxRatePercent,
   tabularExportFormat,
+  bomExportCompactColumns,
   defaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
   defaultSortField,
@@ -464,6 +481,7 @@ export function useUiPreferences({
   setWorkspaceTaxEnabled,
   setWorkspaceTaxRatePercent,
   setTabularExportFormat,
+  setBomExportCompactColumns,
   setDefaultWireSectionMm2,
   setDefaultAutoCreateLinkedNodes,
   setDefaultSortField,
@@ -587,6 +605,7 @@ export function useUiPreferences({
       setWorkspaceTaxEnabled(normalizeWorkspaceTaxEnabled(preferences.workspaceTaxEnabled));
       setWorkspaceTaxRatePercent(normalizeWorkspaceTaxRatePercent(preferences.workspaceTaxRatePercent));
       setTabularExportFormat(preferences.tabularExportFormat === "xlsx" ? "xlsx" : "csv");
+      setBomExportCompactColumns(preferences.bomExportCompactColumns === true);
       setDefaultWireSectionMm2(defaultWireSectionMm2Value);
       setDefaultAutoCreateLinkedNodes(defaultAutoCreateLinkedNodesValue);
       setDefaultSortField(sortField);
@@ -748,6 +767,7 @@ export function useUiPreferences({
       workspaceTaxEnabled,
       workspaceTaxRatePercent,
       tabularExportFormat,
+      bomExportCompactColumns,
       defaultWireSectionMm2,
       defaultAutoCreateLinkedNodes,
       defaultSortField,
@@ -825,6 +845,7 @@ export function useUiPreferences({
     workspaceTaxEnabled,
     workspaceTaxRatePercent,
     tabularExportFormat,
+    bomExportCompactColumns,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     themeMode,

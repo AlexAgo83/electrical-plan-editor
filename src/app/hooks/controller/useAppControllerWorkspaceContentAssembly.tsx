@@ -141,8 +141,6 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     dispatchAction: (action: AppAction, options?: { trackHistory?: boolean }) => void;
     handleNetworkSummaryViewportSizeChange: NetworkSummaryParams["onViewportSizeChange"];
     canExportBomCsv: boolean;
-    bomExportCompactColumns: boolean;
-    toggleBomExportCompactColumns: () => void;
     handleExportBomCsv: () => void;
     describeNode: NetworkSummaryParams["describeNode"];
     nodeLabelById: ModelingAnalysisParams["nodeLabelById"];
@@ -281,8 +279,6 @@ export function useAppControllerWorkspaceContentAssembly({
     clearSelectedCanvasNodes: domains.canvasInteractionDomain.clearSelectedCanvasNodes,
     onViewportSizeChange: handlers.handleNetworkSummaryViewportSizeChange,
     canExportBomCsv: handlers.canExportBomCsv,
-    bomExportCompactColumns: handlers.bomExportCompactColumns,
-    toggleBomExportCompactColumns: handlers.toggleBomExportCompactColumns,
     onExportBomCsv: handlers.handleExportBomCsv,
     handleRegenerateLayout: domains.workspaceNetworkDomain.handleRegenerateLayout,
     markDetailPanelsSelectionSourceAsExternal: handlers.markDetailPanelsSelectionSourceAsExternal,

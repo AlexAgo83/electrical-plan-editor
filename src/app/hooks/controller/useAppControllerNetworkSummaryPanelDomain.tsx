@@ -117,8 +117,6 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   clearSelectedCanvasNodes: NetworkSummaryPanelSliceParams["clearSelectedCanvasNodes"];
   onViewportSizeChange: (size: { width: number; height: number }) => void;
   canExportBomCsv: boolean;
-  bomExportCompactColumns: boolean;
-  toggleBomExportCompactColumns: () => void;
   onExportBomCsv: () => void;
   handleRegenerateLayout: () => void;
   markDetailPanelsSelectionSourceAsExternal: () => void;
@@ -169,8 +167,6 @@ export function useAppControllerNetworkSummaryPanelDomain({
   clearSelectedCanvasNodes,
   onViewportSizeChange,
   canExportBomCsv,
-  bomExportCompactColumns,
-  toggleBomExportCompactColumns,
   onExportBomCsv,
   handleRegenerateLayout,
   markDetailPanelsSelectionSourceAsExternal,
@@ -314,8 +310,6 @@ export function useAppControllerNetworkSummaryPanelDomain({
         onViewportSizeChange,
         pngExportIncludeBackground: preferencesState.canvasPngExportIncludeBackground,
         canExportBomCsv,
-        bomExportCompactColumns,
-        toggleBomExportCompactColumns,
         onExportBomCsv,
         handleRegenerateLayout
       }).networkSummaryPanel

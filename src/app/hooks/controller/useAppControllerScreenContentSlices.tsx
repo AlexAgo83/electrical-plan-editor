@@ -294,8 +294,6 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     onViewportSizeChange: params.onViewportSizeChange,
     pngExportIncludeBackground: params.pngExportIncludeBackground,
     canExportBomCsv: params.canExportBomCsv,
-    bomExportCompactColumns: params.bomExportCompactColumns,
-    toggleBomExportCompactColumns: params.toggleBomExportCompactColumns,
     onExportBomCsv: params.onExportBomCsv,
     onRegenerateLayout: params.handleRegenerateLayout
   } satisfies NetworkSummaryPanelProps;
@@ -843,6 +841,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setWorkspaceTaxRatePercent: params.setWorkspaceTaxRatePercent,
     tabularExportFormat: params.tabularExportFormat,
     setTabularExportFormat: params.setTabularExportFormat,
+    bomExportCompactColumns: params.bomExportCompactColumns,
+    setBomExportCompactColumns: params.setBomExportCompactColumns,
     defaultWireSectionMm2: params.defaultWireSectionMm2,
     setDefaultWireSectionMm2: params.setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes: params.defaultAutoCreateLinkedNodes,
