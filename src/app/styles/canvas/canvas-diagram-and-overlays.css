@@ -126,6 +126,8 @@
 
 .network-summary-view-menu-wrapper {
   position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
 .network-summary-view-menu {
