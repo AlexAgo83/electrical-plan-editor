@@ -2,6 +2,7 @@ node_modules
 dist
 coverage
 .claude/
+logics/.cache/
 playwright-report
 test-results
 .vite

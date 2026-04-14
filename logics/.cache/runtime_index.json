@@ -1,6 +1,6 @@
 {
   "cache_path": "logics/.cache/runtime_index.json",
-  "generated_at": "2026-04-04T21:09:44.773093+00:00",
+  "generated_at": "2026-04-14T10:41:39.583430+00:00",
   "skill_packages": {
     "logics/skills/logics-acceptance-to-tests": {
       "data": {
@@ -33,8 +33,8 @@
             "size": 691
           },
           {
-            "mtime_ns": 1772662548914052336,
-            "size": 258
+            "mtime_ns": 1775831074041991921,
+            "size": 269
           }
         ]
       }
@@ -70,8 +70,8 @@
             "size": 1198
           },
           {
-            "mtime_ns": 1772662548924020332,
-            "size": 264
+            "mtime_ns": 1775831074042145672,
+            "size": 275
           }
         ]
       }
@@ -107,8 +107,8 @@
             "size": 1050
           },
           {
-            "mtime_ns": 1772662548933204614,
-            "size": 230
+            "mtime_ns": 1775831074042270340,
+            "size": 241
           }
         ]
       }
@@ -140,12 +140,12 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1775289571321392199,
-            "size": 1088
+            "mtime_ns": 1776157466592994313,
+            "size": 1154
           },
           {
-            "mtime_ns": 1772662777931164611,
-            "size": 243
+            "mtime_ns": 1775831074042505426,
+            "size": 254
           }
         ]
       }
@@ -181,8 +181,8 @@
             "size": 1056
           },
           {
-            "mtime_ns": 1772662548950176624,
-            "size": 269
+            "mtime_ns": 1775831074043054681,
+            "size": 280
           }
         ]
       }
@@ -218,8 +218,8 @@
             "size": 939
           },
           {
-            "mtime_ns": 1772662580549977546,
-            "size": 310
+            "mtime_ns": 1775831074043201891,
+            "size": 321
           }
         ]
       }
@@ -255,8 +255,8 @@
             "size": 1751
           },
           {
-            "mtime_ns": 1772662588943393116,
-            "size": 337
+            "mtime_ns": 1775831074043333642,
+            "size": 348
           }
         ]
       }
@@ -292,8 +292,8 @@
             "size": 916
           },
           {
-            "mtime_ns": 1772662783500354211,
-            "size": 263
+            "mtime_ns": 1775831074043448143,
+            "size": 278
           }
         ]
       }
@@ -329,8 +329,8 @@
             "size": 1004
           },
           {
-            "mtime_ns": 1772662791626280440,
-            "size": 267
+            "mtime_ns": 1775831074043586519,
+            "size": 282
           }
         ]
       }
@@ -366,8 +366,8 @@
             "size": 850
           },
           {
-            "mtime_ns": 1772662797848840332,
-            "size": 233
+            "mtime_ns": 1775831074043826396,
+            "size": 248
           }
         ]
       }
@@ -403,8 +403,8 @@
             "size": 992
           },
           {
-            "mtime_ns": 1772662803985414454,
-            "size": 239
+            "mtime_ns": 1775831074043938814,
+            "size": 254
           }
         ]
       }
@@ -440,8 +440,8 @@
             "size": 2231
           },
           {
-            "mtime_ns": 1772662595703295541,
-            "size": 322
+            "mtime_ns": 1775831074044052856,
+            "size": 337
           }
         ]
       }
@@ -477,8 +477,8 @@
             "size": 2365
           },
           {
-            "mtime_ns": 1772661140511646406,
-            "size": 246
+            "mtime_ns": 1775831074044398318,
+            "size": 257
           }
         ]
       }
@@ -510,12 +510,12 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1775289571324050891,
-            "size": 1509
+            "mtime_ns": 1776157466593639775,
+            "size": 1700
           },
           {
-            "mtime_ns": 1772662549024726052,
-            "size": 210
+            "mtime_ns": 1775831074044536611,
+            "size": 221
           }
         ]
       }
@@ -551,8 +551,8 @@
             "size": 825
           },
           {
-            "mtime_ns": 1772662549032851117,
-            "size": 230
+            "mtime_ns": 1775831074044765738,
+            "size": 241
           }
         ]
       }
@@ -588,8 +588,8 @@
             "size": 963
           },
           {
-            "mtime_ns": 1772662549041409685,
-            "size": 246
+            "mtime_ns": 1775831074044906406,
+            "size": 257
           }
         ]
       }
@@ -621,12 +621,12 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1775321299577875512,
-            "size": 15993
+            "mtime_ns": 1776157466594310945,
+            "size": 16693
           },
           {
-            "mtime_ns": 1772662603566243549,
-            "size": 346
+            "mtime_ns": 1775831074045159200,
+            "size": 357
           }
         ]
       }
@@ -662,8 +662,8 @@
             "size": 1415
           },
           {
-            "mtime_ns": 1772662549056925892,
-            "size": 310
+            "mtime_ns": 1775831074051051170,
+            "size": 321
           }
         ]
       }
@@ -699,8 +699,8 @@
             "size": 2685
           },
           {
-            "mtime_ns": 1774439769669075744,
-            "size": 291
+            "mtime_ns": 1775831074051289589,
+            "size": 302
           }
         ]
       }
@@ -736,8 +736,8 @@
             "size": 347
           },
           {
-            "mtime_ns": 1772662549064606661,
-            "size": 204
+            "mtime_ns": 1775831074051417840,
+            "size": 215
           }
         ]
       }
@@ -773,8 +773,8 @@
             "size": 2350
           },
           {
-            "mtime_ns": 1772662549072254306,
-            "size": 291
+            "mtime_ns": 1775831074051727843,
+            "size": 306
           }
         ]
       }
@@ -810,8 +810,8 @@
             "size": 1188
           },
           {
-            "mtime_ns": 1772662549080589706,
-            "size": 234
+            "mtime_ns": 1775831074051904095,
+            "size": 249
           }
         ]
       }
@@ -847,8 +847,8 @@
             "size": 1315
           },
           {
-            "mtime_ns": 1772662549088598644,
-            "size": 239
+            "mtime_ns": 1775831074052055221,
+            "size": 254
           }
         ]
       }
@@ -884,8 +884,8 @@
             "size": 1999
           },
           {
-            "mtime_ns": 1772662549096168913,
-            "size": 243
+            "mtime_ns": 1775831074052208306,
+            "size": 258
           }
         ]
       }
@@ -921,8 +921,45 @@
             "size": 1196
           },
           {
-            "mtime_ns": 1772662549103664223,
-            "size": 259
+            "mtime_ns": 1775831074052330807,
+            "size": 274
+          }
+        ]
+      }
+    },
+    "logics/skills/logics-mermaid-generator": {
+      "data": {
+        "capability_flags": {
+          "agents": true,
+          "assets": false,
+          "machine_readable": true,
+          "scripts": true,
+          "tests": false,
+          "validated": false
+        },
+        "description": "Generate Logics workflow Mermaid blocks with a deterministic fallback that stays compatible with the flow manager.",
+        "frontmatter": {
+          "description": "Generate Logics workflow Mermaid blocks with a deterministic fallback that stays compatible with the flow manager.",
+          "name": "logics-mermaid-generator"
+        },
+        "interface": {
+          "default_prompt": "Use $logics-mermaid-generator to generate bounded Mermaid blocks for Logics request, backlog, or task docs.",
+          "display_name": "Mermaid Generator",
+          "short_description": "Generate Logics workflow Mermaid blocks with deterministic fallback"
+        },
+        "issues": [],
+        "name": "logics-mermaid-generator",
+        "path": "logics/skills/logics-mermaid-generator"
+      },
+      "signature": {
+        "files": [
+          {
+            "mtime_ns": 1775831074052461266,
+            "size": 711
+          },
+          {
+            "mtime_ns": 1775831074052597351,
+            "size": 277
           }
         ]
       }
@@ -958,8 +995,8 @@
             "size": 722
           },
           {
-            "mtime_ns": 1772662549111092990,
-            "size": 240
+            "mtime_ns": 1775831074052937854,
+            "size": 251
           }
         ]
       }
@@ -995,8 +1032,8 @@
             "size": 917
           },
           {
-            "mtime_ns": 1772659178136950973,
-            "size": 263
+            "mtime_ns": 1775831074053283857,
+            "size": 274
           }
         ]
       }
@@ -1032,8 +1069,8 @@
             "size": 2659
           },
           {
-            "mtime_ns": 1772662549126760115,
-            "size": 240
+            "mtime_ns": 1775831074053404942,
+            "size": 255
           }
         ]
       }
@@ -1069,8 +1106,8 @@
             "size": 7998
           },
           {
-            "mtime_ns": 1774439769670242629,
-            "size": 316
+            "mtime_ns": 1775831074053523901,
+            "size": 327
           }
         ]
       }
@@ -1106,8 +1143,8 @@
             "size": 424
           },
           {
-            "mtime_ns": 1772662549141541983,
-            "size": 236
+            "mtime_ns": 1775831074053648277,
+            "size": 247
           }
         ]
       }
@@ -1143,8 +1180,8 @@
             "size": 1362
           },
           {
-            "mtime_ns": 1773578883158101810,
-            "size": 208
+            "mtime_ns": 1775831074053786737,
+            "size": 219
           }
         ]
       }
@@ -1176,12 +1213,12 @@
       "signature": {
         "files": [
           {
-            "mtime_ns": 1775289571328273764,
-            "size": 1368
+            "mtime_ns": 1776157466608933821,
+            "size": 1551
           },
           {
-            "mtime_ns": 1772662549149261461,
-            "size": 198
+            "mtime_ns": 1775831074053914572,
+            "size": 209
           }
         ]
       }
@@ -1217,8 +1254,8 @@
             "size": 2703
           },
           {
-            "mtime_ns": 1772662284969474874,
-            "size": 286
+            "mtime_ns": 1775831074054165824,
+            "size": 297
           }
         ]
       }
@@ -1254,8 +1291,8 @@
             "size": 780
           },
           {
-            "mtime_ns": 1772662549164546208,
-            "size": 242
+            "mtime_ns": 1775831074054318533,
+            "size": 253
           }
         ]
       }
@@ -1291,8 +1328,8 @@
             "size": 1263
           },
           {
-            "mtime_ns": 1772659181898189756,
-            "size": 251
+            "mtime_ns": 1775831074054731621,
+            "size": 262
           }
         ]
       }
@@ -1328,8 +1365,8 @@
             "size": 650
           },
           {
-            "mtime_ns": 1772662549179563661,
-            "size": 218
+            "mtime_ns": 1775831074054853538,
+            "size": 229
           }
         ]
       }
@@ -1365,8 +1402,8 @@
             "size": 778
           },
           {
-            "mtime_ns": 1772662549186937595,
-            "size": 200
+            "mtime_ns": 1775831074054991748,
+            "size": 211
           }
         ]
       }
@@ -1402,8 +1439,8 @@
             "size": 620
           },
           {
-            "mtime_ns": 1772662549194373612,
-            "size": 218
+            "mtime_ns": 1775831074055111624,
+            "size": 229
           }
         ]
       }
@@ -1439,8 +1476,8 @@
             "size": 1310
           },
           {
-            "mtime_ns": 1772662549202070215,
-            "size": 228
+            "mtime_ns": 1775831074055265376,
+            "size": 239
           }
         ]
       }
@@ -1476,8 +1513,8 @@
             "size": 928
           },
           {
-            "mtime_ns": 1772659174657326773,
-            "size": 248
+            "mtime_ns": 1775831074055587670,
+            "size": 259
           }
         ]
       }
@@ -1513,8 +1550,8 @@
             "size": 1258
           },
           {
-            "mtime_ns": 1772662290834176621,
-            "size": 277
+            "mtime_ns": 1775831074055701504,
+            "size": 288
           }
         ]
       }
@@ -1550,8 +1587,8 @@
             "size": 1077
           },
           {
-            "mtime_ns": 1772662549225101857,
-            "size": 198
+            "mtime_ns": 1775831074055816547,
+            "size": 209
           }
         ]
       }
@@ -1587,8 +1624,8 @@
             "size": 2399
           },
           {
-            "mtime_ns": 1774312264610970031,
-            "size": 426
+            "mtime_ns": 1775831074055930465,
+            "size": 437
           }
         ]
       }
@@ -1624,8 +1661,8 @@
             "size": 2047
           },
           {
-            "mtime_ns": 1772662549232655543,
-            "size": 207
+            "mtime_ns": 1775831074056040924,
+            "size": 222
           }
         ]
       }
@@ -1661,8 +1698,8 @@
             "size": 1540
           },
           {
-            "mtime_ns": 1773578883168437923,
-            "size": 263
+            "mtime_ns": 1775831074056177425,
+            "size": 274
           }
         ]
       }
@@ -1698,8 +1735,8 @@
             "size": 2340
           },
           {
-            "mtime_ns": 1773578883169638769,
-            "size": 260
+            "mtime_ns": 1775831074056656930,
+            "size": 271
           }
         ]
       }
@@ -1735,19 +1772,19 @@
             "size": 381
           },
           {
-            "mtime_ns": 1772662549240489813,
-            "size": 236
+            "mtime_ns": 1775831074057190060,
+            "size": 247
           }
         ]
       }
     }
   },
   "stats": {
-    "cache_hits": 843,
+    "cache_hits": 855,
     "cache_misses": 0,
     "removed_entries": 0,
-    "skill_count": 47,
-    "workflow_doc_count": 796
+    "skill_count": 48,
+    "workflow_doc_count": 807
   },
   "workflow_docs": {
     "logics/backlog/item_000_v1_foundation_domain_model_and_store.md": {
@@ -49827,6 +49864,534 @@
         "size": 5026
       }
     },
+    "logics/backlog/item_584_catalog_export_column_toggles.md": {
+      "data": {
+        "ai_context": {},
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "100%",
+          "From version": "1.4.4",
+          "Non-semantic edit": "linked adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked request/task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "UI",
+          "Understanding": "100%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_584_catalog_export_column_toggles.md",
+        "ref": "item_584_catalog_export_column_toggles",
+        "refs": {
+          "adr": [
+            "adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming"
+          ],
+          "item": [
+            "item_584_catalog_export_column_toggles"
+          ],
+          "prod": [],
+          "req": [
+            "req_119_bom_and_catalog_export_enhancements"
+          ],
+          "spec": [],
+          "task": [
+            "task_101_catalog_export_column_toggles"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> Export only hiding of catalog columns.",
+            "- AC2 -> Preserve default export compatibility.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: The export flow can omit selected catalog columns, but the catalog screen still shows the full catalog table.",
+            "- AC2: The default catalog export remains compatible with the existing column order and content unless a column toggle is enabled.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Architecture framing: Required",
+            "- Architecture signals: export contracts and file schema",
+            "- Architecture follow-up: Create or link an architecture decision before implementation if the toggle state needs persistence.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming`",
+            "- Request: `req_119_bom_and_catalog_export_enhancements`",
+            "- Primary task(s): `task_101_catalog_export_column_toggles`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from request `req_119_bom_and_catalog_export_enhancements`.",
+            "- Source file: `logics/request/req_119_bom_and_catalog_export_enhancements.md`.",
+            "- Keep this as the export-only catalog slice."
+          ],
+          "Priority": [
+            "- Impact: Medium",
+            "- Urgency: Medium",
+            ""
+          ],
+          "Problem": [
+            "Users want to hide some catalog columns only in exported files, without changing the catalog table visible in the app.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - Add an export-time option to omit selected catalog columns.",
+            "  - Keep the catalog table and form unchanged on screen.",
+            "  - Preserve the current catalog export behavior for columns that are not hidden.",
+            "- Out:",
+            "  - Adding new catalog fields.",
+            "  - Changing the catalog table layout in the UI.",
+            "  - BOM or wire export changes.",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|catalog-export-column-toggles|req-119-bom-and-catalog-export-enhancement|export-time-catalog-column-omission|ac1-export-only-hidden-columns",
+            "flowchart TD",
+            "    Request[req 119 bom and catalog export enhancements] --> Problem[Catalog export column toggles]",
+            "    Problem --> Scope[Export only hiding]",
+            "    Scope --> Acceptance[AC1 export only hidden columns]",
+            "    Acceptance --> Tasks[Implementation task]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Catalog Export Column Toggles"
+      },
+      "signature": {
+        "mtime_ns": 1776162721670830365,
+        "size": 2531
+      }
+    },
+    "logics/backlog/item_585_reference_naming_fallback_for_wire_terminations.md": {
+      "data": {
+        "ai_context": {},
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "100%",
+          "From version": "1.4.4",
+          "Non-semantic edit": "linked adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked request/task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "Data Model",
+          "Understanding": "100%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_585_reference_naming_fallback_for_wire_terminations.md",
+        "ref": "item_585_reference_naming_fallback_for_wire_terminations",
+        "refs": {
+          "adr": [
+            "adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming"
+          ],
+          "item": [
+            "item_585_reference_naming_fallback_for_wire_terminations"
+          ],
+          "prod": [],
+          "req": [
+            "req_119_bom_and_catalog_export_enhancements"
+          ],
+          "spec": [],
+          "task": [
+            "task_099_reference_naming_fallback_for_wire_terminations"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> Optional name fields for wire terminations.",
+            "- AC2 -> Reuse last known name for the same reference.",
+            "- AC3 -> Blank name stays blank.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: Seal and connection references can each store an optional name.",
+            "- AC2: When the same reference is entered again, the previous name is suggested or reused as a fallback.",
+            "- AC3: If the name is still empty, the saved value remains blank.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Architecture framing: Required",
+            "- Architecture signals: data model, persistence, and form contracts",
+            "- Architecture follow-up: Create or link an architecture decision before implementation because this changes the stored shape of wire termination metadata.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming`",
+            "- Request: `req_119_bom_and_catalog_export_enhancements`",
+            "- Primary task(s): `task_099_reference_naming_fallback_for_wire_terminations`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from request `req_119_bom_and_catalog_export_enhancements`.",
+            "- Source file: `logics/request/req_119_bom_and_catalog_export_enhancements.md`.",
+            "- Keep this slice focused on naming behavior only."
+          ],
+          "Priority": [
+            "- Impact: High",
+            "- Urgency: High",
+            ""
+          ],
+          "Problem": [
+            "Seal and connection references need an optional friendly name, and the app should remember a previously entered name for a reference when that reference is used again.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - Add an optional name field for seal references and connection references.",
+            "  - Allow the name to be edited later from both the form entry flow and the catalog-linked flow.",
+            "  - Reuse the last known name as a fallback when the same reference is entered again.",
+            "  - Keep the name field optional and leave it blank when no name is known.",
+            "- Out:",
+            "  - Automatic renaming of existing references.",
+            "  - Changing connector or splice model fields.",
+            "  - BOM layout changes.",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|reference-naming-fallback-for-wire-terminations|req-119-bom-and-catalog-export-enhancement|optional-names-and-reference-fallback|ac1-optional-name-fields",
+            "flowchart TD",
+            "    Request[req 119 bom and catalog export enhancements] --> Problem[Reference naming fallback]",
+            "    Problem --> Scope[Optional wire termination names]",
+            "    Scope --> Acceptance[AC1 optional names and reuse]",
+            "    Acceptance --> Tasks[Implementation task]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Reference Naming Fallback for Wire Terminations"
+      },
+      "signature": {
+        "mtime_ns": 1776162721678584543,
+        "size": 2880
+      }
+    },
+    "logics/backlog/item_586_flatten_bom_export_into_a_single_plane.md": {
+      "data": {
+        "ai_context": {},
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "100%",
+          "From version": "1.4.4",
+          "Non-semantic edit": "linked adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked request/task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "Export",
+          "Understanding": "100%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_586_flatten_bom_export_into_a_single_plane.md",
+        "ref": "item_586_flatten_bom_export_into_a_single_plane",
+        "refs": {
+          "adr": [
+            "adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming"
+          ],
+          "item": [
+            "item_586_flatten_bom_export_into_a_single_plane"
+          ],
+          "prod": [],
+          "req": [
+            "req_119_bom_and_catalog_export_enhancements"
+          ],
+          "spec": [],
+          "task": [
+            "task_100_flatten_bom_export_into_a_single_plane"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> Unified BOM rows.",
+            "- AC2 -> Remove separate wire termination section.",
+            "- AC3 -> Stable export ordering.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: BOM export uses one common row structure for connector, seal, and connection reference data.",
+            "- AC2: The old separate wire termination section no longer appears in the exported BOM.",
+            "- AC3: The unified export keeps a stable and readable row order.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Architecture framing: Required",
+            "- Architecture signals: export schema and serialization contract",
+            "- Architecture follow-up: Create or link an architecture decision if the unified BOM row model changes the shared export contract.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming`",
+            "- Request: `req_119_bom_and_catalog_export_enhancements`",
+            "- Primary task(s): `task_100_flatten_bom_export_into_a_single_plane`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from request `req_119_bom_and_catalog_export_enhancements`.",
+            "- Source file: `logics/request/req_119_bom_and_catalog_export_enhancements.md`.",
+            "- This slice is the BOM row-model normalization."
+          ],
+          "Priority": [
+            "- Impact: High",
+            "- Urgency: High",
+            ""
+          ],
+          "Problem": [
+            "The current BOM output uses a separate wire termination block. The export needs one flat BOM structure so connectors, seals, and connection references are represented with the same column layout.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - Replace the separate wire termination block with a single BOM row structure.",
+            "  - Keep connector, seal, and connection reference data on the same plane.",
+            "  - Preserve deterministic ordering for the unified BOM rows.",
+            "- Out:",
+            "  - XLSX workbook formatting.",
+            "  - Optional CSV/XLSX format selection.",
+            "  - Catalog export column toggles.",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|flatten-bom-export-into-a-single-plane|req-119-bom-and-catalog-export-enhancement|single-bom-row-plane|ac1-unified-bom-rows",
+            "flowchart TD",
+            "    Request[req 119 bom and catalog export enhancements] --> Problem[Flat BOM structure]",
+            "    Problem --> Scope[Single plane BOM rows]",
+            "    Scope --> Acceptance[AC1 unified BOM rows]",
+            "    Acceptance --> Tasks[Implementation task]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Flatten BOM Export Into a Single Plane"
+      },
+      "signature": {
+        "mtime_ns": 1776162721685308048,
+        "size": 2642
+      }
+    },
+    "logics/backlog/item_587_parallel_csv_and_xlsx_export_options.md": {
+      "data": {
+        "ai_context": {},
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "100%",
+          "From version": "1.4.4",
+          "Non-semantic edit": "linked adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked request/task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "Export",
+          "Understanding": "100%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_587_parallel_csv_and_xlsx_export_options.md",
+        "ref": "item_587_parallel_csv_and_xlsx_export_options",
+        "refs": {
+          "adr": [
+            "adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming"
+          ],
+          "item": [
+            "item_587_parallel_csv_and_xlsx_export_options"
+          ],
+          "prod": [],
+          "req": [
+            "req_119_bom_and_catalog_export_enhancements"
+          ],
+          "spec": [],
+          "task": [
+            "task_098_parallel_csv_and_xlsx_export_options"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> Explicit CSV or XLSX choice.",
+            "- AC2 -> Preserve CSV behavior.",
+            "- AC3 -> Add XLSX without removing CSV.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: The user can explicitly choose CSV or XLSX for BOM export and wire-by-wire export.",
+            "- AC2: CSV export remains available and behaves the same when selected.",
+            "- AC3: XLSX export is available without forcing a CSV workflow change.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Architecture framing: Required",
+            "- Architecture signals: file export contracts, dependency selection, and integration",
+            "- Architecture follow-up: Create or link an architecture decision before implementation because XLSX support introduces a new dependency surface.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming`",
+            "- Request: `req_119_bom_and_catalog_export_enhancements`",
+            "- Primary task(s): `task_098_parallel_csv_and_xlsx_export_options`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from request `req_119_bom_and_catalog_export_enhancements`.",
+            "- Source file: `logics/request/req_119_bom_and_catalog_export_enhancements.md`.",
+            "- This slice covers format selection only."
+          ],
+          "Priority": [
+            "- Impact: High",
+            "- Urgency: High",
+            ""
+          ],
+          "Problem": [
+            "Users want BOM and wire-by-wire exports in Excel format, but the app currently only exposes CSV export paths.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - Add an explicit export option to choose CSV or XLSX.",
+            "  - Apply the format choice to BOM export and wire-by-wire export.",
+            "  - Keep CSV behavior unchanged when CSV is selected.",
+            "- Out:",
+            "  - BOM row-model changes.",
+            "  - XLSX workbook formatting details.",
+            "  - Catalog export column toggles.",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|parallel-csv-and-xlsx-export-options|req-119-bom-and-catalog-export-enhancement|csv-or-xlsx-choice|ac1-format-choice-for-bom-and-wire",
+            "flowchart TD",
+            "    Request[req 119 bom and catalog export enhancements] --> Problem[CSV or XLSX choice]",
+            "    Problem --> Scope[Parallel export formats]",
+            "    Scope --> Acceptance[AC1 format choice]",
+            "    Acceptance --> Tasks[Implementation task]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Parallel CSV and XLSX Export Options"
+      },
+      "signature": {
+        "mtime_ns": 1776162721692676224,
+        "size": 2522
+      }
+    },
+    "logics/backlog/item_588_grouped_bom_workbook_with_merged_connector_rows.md": {
+      "data": {
+        "ai_context": {},
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "100%",
+          "From version": "1.4.4",
+          "Non-semantic edit": "linked adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked request/task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "Export",
+          "Understanding": "100%"
+        },
+        "kind": "backlog",
+        "path": "logics/backlog/item_588_grouped_bom_workbook_with_merged_connector_rows.md",
+        "ref": "item_588_grouped_bom_workbook_with_merged_connector_rows",
+        "refs": {
+          "adr": [
+            "adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming"
+          ],
+          "item": [
+            "item_588_grouped_bom_workbook_with_merged_connector_rows"
+          ],
+          "prod": [],
+          "req": [
+            "req_119_bom_and_catalog_export_enhancements"
+          ],
+          "spec": [],
+          "task": [
+            "task_102_grouped_bom_workbook_with_merged_connector_rows"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> Two sheet workbook.",
+            "- AC2 -> Merged connector identity cells.",
+            "- AC3 -> Group rows by connector in a stable order.",
+            "- AC4 -> Correct quantities in both views.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: The BOM XLSX export contains a global summary sheet and a connector-grouped sheet.",
+            "- AC2: The grouped sheet merges the connector ID and connector name cells across the rows in each connector group.",
+            "- AC3: The grouped sheet keeps connector-related rows under the right connector and preserves a stable order.",
+            "- AC4: Quantity totals are correct in both sheets.",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Architecture framing: Required",
+            "- Architecture signals: workbook layout, merged-cell rules, and export integration",
+            "- Architecture follow-up: Create or link an architecture decision before implementation because the workbook structure is a new export contract.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming`",
+            "- Request: `req_119_bom_and_catalog_export_enhancements`",
+            "- Primary task(s): `task_102_grouped_bom_workbook_with_merged_connector_rows`",
+            ""
+          ],
+          "Notes": [
+            "- Derived from request `req_119_bom_and_catalog_export_enhancements`.",
+            "- Source file: `logics/request/req_119_bom_and_catalog_export_enhancements.md`.",
+            "- This slice covers the workbook layout and formatting layer."
+          ],
+          "Priority": [
+            "- Impact: High",
+            "- Urgency: High",
+            ""
+          ],
+          "Problem": [
+            "The BOM XLSX export needs a second sheet grouped by connector, with merged connector identity cells and correct connector-level quantities.",
+            ""
+          ],
+          "Scope": [
+            "- In:",
+            "  - Build a two-sheet BOM workbook.",
+            "  - Keep the first sheet as the global summary view.",
+            "  - Add a second sheet grouped by connector.",
+            "  - Merge the connector ID and name cells across each connector group.",
+            "  - Order grouped rows so each connector is followed by its related rows in a stable sequence.",
+            "- Out:",
+            "  - CSV export behavior.",
+            "  - Catalog export controls.",
+            "  - Wire-by-wire XLSX formatting.",
+            "",
+            "```mermaid",
+            "%% logics-kind: backlog",
+            "%% logics-signature: backlog|grouped-bom-workbook-with-merged-connector-rows|req-119-bom-and-catalog-export-enhancement|two-sheet-bom-workbook|ac1-two-bom-sheets-and-merged-cells",
+            "flowchart TD",
+            "    Request[req 119 bom and catalog export enhancements] --> Problem[Grouped BOM workbook]",
+            "    Problem --> Scope[Two sheet BOM XLSX]",
+            "    Scope --> Acceptance[AC1 two sheets and merged cells]",
+            "    Acceptance --> Tasks[Implementation task]",
+            "```",
+            ""
+          ]
+        },
+        "title": "Grouped BOM Workbook With Merged Connector Rows"
+      },
+      "signature": {
+        "mtime_ns": 1776162721700318652,
+        "size": 2927
+      }
+    },
     "logics/request/req_000_kickoff_v1_electrical_plan_editor.md": {
       "data": {
         "ai_context": {},
@@ -73107,6 +73672,128 @@
         "size": 7963
       }
     },
+    "logics/request/req_119_bom_and_catalog_export_enhancements.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "catalog, bom, csv, xlsx, seal, connection, connector, export, workbook, merged cells",
+          "skip when": "Skip when the work targets unrelated modeling, routing, or canvas behavior.",
+          "summary": "Add export-time catalog column controls, reference naming fallback, and CSV/XLSX BOM improvements.",
+          "use when": "Use when grooming the export and BOM enhancement request into smaller backlog slices."
+        },
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "100%",
+          "From version": "1.4.4",
+          "Non-semantic edit": "closed DoR checklist after delivery",
+          "Reminder": "Update status/understanding/confidence and linked backlog/task references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "UI",
+          "Understanding": "100%"
+        },
+        "kind": "request",
+        "path": "logics/request/req_119_bom_and_catalog_export_enhancements.md",
+        "ref": "req_119_bom_and_catalog_export_enhancements",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_584_catalog_export_column_toggles",
+            "item_585_reference_naming_fallback_for_wire_terminations",
+            "item_586_flatten_bom_export_into_a_single_plane",
+            "item_587_parallel_csv_and_xlsx_export_options",
+            "item_588_grouped_bom_workbook_with_merged_connector_rows"
+          ],
+          "prod": [],
+          "req": [
+            "req_119_bom_and_catalog_export_enhancements"
+          ],
+          "spec": [],
+          "task": []
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AI Context": [
+            "- Summary: Add export-time catalog column controls, reference naming fallback, and CSV/XLSX BOM improvements.",
+            "- Keywords: catalog, bom, csv, xlsx, seal, connection, connector, export, workbook, merged cells",
+            "- Use when: Use when grooming the export and BOM enhancement request into smaller backlog slices.",
+            "- Skip when: Skip when the work targets unrelated modeling, routing, or canvas behavior.",
+            ""
+          ],
+          "Acceptance criteria": [
+            "- AC1: Users can hide selected catalog columns only when exporting, without affecting the catalog table shown in the UI.",
+            "- AC2: Seal and connection references can each store an optional name, and a previously entered name is reused as a fallback when the same reference is typed again.",
+            "- AC3: BOM export no longer splits connector, seal, and connection reference data into separate sections; they appear on one common structure with consistent columns.",
+            "- AC4: BOM export and wire-by-wire export can be produced as CSV or XLSX in parallel, with XLSX chosen through an explicit option.",
+            "- AC5: The BOM XLSX export contains two sheets, one global summary sheet and one connector-grouped sheet with merged connector ID and name cells, correct quantities, and connector-order grouping.",
+            ""
+          ],
+          "Backlog": [
+            "- `item_584_catalog_export_column_toggles`",
+            "- `item_585_reference_naming_fallback_for_wire_terminations`",
+            "- `item_586_flatten_bom_export_into_a_single_plane`",
+            "- `item_587_parallel_csv_and_xlsx_export_options`",
+            "- `item_588_grouped_bom_workbook_with_merged_connector_rows`"
+          ],
+          "Companion docs": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            ""
+          ],
+          "Context": [
+            "- The catalog already stores manufacturer reference, connection count, name, unit price, and URL, and the current catalog list shows those fields in the UI.",
+            "- The current BOM export is built as a CSV-oriented structure in `src/app/lib/networkSummaryBomCsv.ts` and is triggered from `src/app/AppController.tsx`.",
+            "- Wire termination references are already tracked on wires through connection and seal reference fields, but they are currently exported as a separate wire terminations block.",
+            "- The project currently depends on CSV export helpers, but does not yet declare an XLSX library in `package.json`, so the XLSX path will require a new dependency and a defined formatting contract.",
+            "- The new export behavior should stay additive: CSV remains available, and XLSX becomes an opt-in parallel format controlled by a user action.",
+            "- The BOM connector-grouped sheet needs to group seals under the connector they belong to, count quantities correctly, and avoid including splices in that grouped view.",
+            "- The connector-grouped sheet should merge the connector ID and name cells across the rows belonging to that connector group, while keeping the grouped rows ordered consistently.",
+            "- This request is intentionally broad and should be split into several backlog items after grooming, but it should remain one request record for now.",
+            "",
+            "```mermaid",
+            "%% logics-kind: request",
+            "%% logics-signature: request|bom-and-catalog-export-enhancements|catalog-export-toggle-and-bom-xlsx-views|ac1-export-time-catalog-column-toggles|ac2-reference-naming-fallback|ac3-single-plane-bom-export|ac4-xlsx-parallel-export|ac5-dual-sheet-bom-structure",
+            "flowchart TD",
+            "    Trigger[Export and BOM enhancement request] --> CatalogToggle[Export-time catalog column toggles]",
+            "    Trigger --> RefNaming[Optional names for seal and connection references]",
+            "    Trigger --> BomFlat[BOM single plane layout]",
+            "    Trigger --> Xlsx[XLSX export option]",
+            "    Trigger --> DualSheet[Two sheet BOM workbook]",
+            "    CatalogToggle --> Ac1[AC1 export only]",
+            "    RefNaming --> Ac2[AC2 fallback naming]",
+            "    BomFlat --> Ac3[AC3 single BOM plane]",
+            "    Xlsx --> Ac4[AC4 CSV and XLSX parallel]",
+            "    DualSheet --> Ac5[AC5 summary and grouped sheets]",
+            "    Ac1 --> Backlog[Backlog split]",
+            "    Ac2 --> Backlog",
+            "    Ac3 --> Backlog",
+            "    Ac4 --> Backlog",
+            "    Ac5 --> Backlog",
+            "```",
+            ""
+          ],
+          "Definition of Ready (DoR)": [
+            "- [x] Problem statement is explicit and user impact is clear.",
+            "- [x] Scope boundaries are explicit, including what stays CSV-only and what becomes optional XLSX.",
+            "- [x] Acceptance criteria are testable and can later be split into bounded backlog items.",
+            "- [x] Dependencies, especially the XLSX library choice and workbook formatting rules, are listed.",
+            ""
+          ],
+          "Needs": [
+            "- Add export-time catalog column toggles so selected catalog columns can be omitted from exports only, without changing the on-screen catalog view.",
+            "- Let seal and connection references carry an optional human name, with fallback reuse of an already-known name when the same reference is entered again.",
+            "- Rework BOM output so connector, seal, and connection references are represented on a single flat plane instead of split into separate sections.",
+            "- Provide optional XLSX exports for BOM and wire-by-wire outputs in parallel with the existing CSV flow.",
+            "- Add a two-sheet BOM XLSX export with a global summary sheet and a connector-grouped sheet using merged cells for connector identity.",
+            ""
+          ]
+        },
+        "title": "BOM and catalog export enhancements"
+      },
+      "signature": {
+        "mtime_ns": 1776162828912634287,
+        "size": 5341
+      }
+    },
     "logics/tasks/task_000_v1_backlog_orchestration_and_delivery_control.md": {
       "data": {
         "ai_context": {},
@@ -87613,6 +88300,705 @@
       "signature": {
         "mtime_ns": 1775142102031299032,
         "size": 7592
+      }
+    },
+    "logics/tasks/task_098_parallel_csv_and_xlsx_export_options.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "parallel, csv, and, xlsx, export, options, users, want",
+          "skip when": "Skip when the work belongs to another backlog item or a different execution wave.",
+          "summary": "Users want BOM and wire-by-wire exports in Excel format, but the app currently only exposes CSV export paths.",
+          "use when": "Use when executing the current implementation wave for Parallel CSV and XLSX Export Options."
+        },
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "100%",
+          "From version": "1.4.4",
+          "Non-semantic edit": "linked adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "Export",
+          "Understanding": "100%"
+        },
+        "kind": "task",
+        "path": "logics/tasks/task_098_parallel_csv_and_xlsx_export_options.md",
+        "ref": "task_098_parallel_csv_and_xlsx_export_options",
+        "refs": {
+          "adr": [
+            "adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming"
+          ],
+          "item": [
+            "item_587_parallel_csv_and_xlsx_export_options"
+          ],
+          "prod": [],
+          "req": [
+            "req_119_bom_and_catalog_export_enhancements"
+          ],
+          "spec": [],
+          "task": [
+            "task_098_parallel_csv_and_xlsx_export_options"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> Scope: The user can explicitly choose CSV or XLSX for BOM export and wire-by-wire export.. Proof: capture validation evidence in this doc.",
+            "- AC2 -> Scope: CSV export remains available and behaves the same when selected.. Proof: capture validation evidence in this doc.",
+            "- AC3 -> Scope: XLSX export is available without forcing a CSV workflow change.. Proof: capture validation evidence in this doc.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Users want BOM and wire-by-wire exports in Excel format, but the app currently only exposes CSV export paths.",
+            "- Keywords: parallel, csv, and, xlsx, export, options, users, want",
+            "- Use when: Use when executing the current implementation wave for Parallel CSV and XLSX Export Options.",
+            "- Skip when: Skip when the work belongs to another backlog item or a different execution wave."
+          ],
+          "Context": [
+            "- Derived from backlog item `item_587_parallel_csv_and_xlsx_export_options`.",
+            "- Source file: `logics\\backlog\\item_587_parallel_csv_and_xlsx_export_options.md`.",
+            "- Related request(s): `req_119_bom_and_catalog_export_enhancements`.",
+            "Users want BOM and wire-by-wire exports in Excel format, but the app currently only exposes CSV export paths.",
+            "",
+            "```mermaid",
+            "%% logics-kind: task",
+            "%% logics-signature: task|parallel-csv-and-xlsx-export-options|item-587-parallel-csv-and-xlsx-export-op|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for",
+            "stateDiagram-v2",
+            "    state \"item_587_parallel_csv_and_xlsx_export_opti\" as Backlog",
+            "    state \"1. Confirm scope dependencies and linked\" as Scope",
+            "    state \"2. Implement the next coherent delivery\" as Build",
+            "    state \"3. Checkpoint the wave in a\" as Verify",
+            "    state \"Run the relevant automated tests for\" as Validation",
+            "    state \"Done report\" as Report",
+            "    [*] --> Backlog",
+            "    Backlog --> Scope",
+            "    Scope --> Build",
+            "    Build --> Verify",
+            "    Verify --> Validation",
+            "    Validation --> Report",
+            "    Report --> [*]",
+            "```",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Required",
+            "- Architecture signals: data model and persistence, contracts and integration",
+            "- Architecture follow-up: Create or link an architecture decision before irreversible implementation work starts.",
+            ""
+          ],
+          "Definition of Done (DoD)": [
+            "- [x] Scope implemented and acceptance criteria covered.",
+            "- [x] Validation commands executed and results captured.",
+            "- [x] No wave or step was closed before the relevant automated tests and quality checks passed.",
+            "- [x] Linked request/backlog/task docs updated during completed waves and at closure.",
+            "- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
+            "- [x] Status is `Done` and progress is `100%`.",
+            ""
+          ],
+          "Delivery checkpoints": [
+            "- Each completed wave should leave the repository in a coherent, commit-ready state.",
+            "- Update the linked Logics docs during the wave that changes the behavior, not only at final closure.",
+            "- Prefer a reviewed commit checkpoint at the end of each meaningful wave instead of accumulating several undocumented partial states.",
+            "- If the shared AI runtime is active and healthy, use `python logics/skills/logics.py flow assist commit-all` to prepare the commit checkpoint for each meaningful step, item, or wave.",
+            "- Do not mark a wave or step complete until the relevant automated tests and quality checks have been run successfully.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming`",
+            "- Backlog item: `item_587_parallel_csv_and_xlsx_export_options`",
+            "- Request(s): `req_119_bom_and_catalog_export_enhancements`",
+            ""
+          ],
+          "Plan": [
+            "- [x] 1. Add or select the XLSX export dependency and wire the workbook writer into the export layer.",
+            "- [x] 2. Add a user-facing format choice so BOM and wire-by-wire exports can be emitted as CSV or XLSX.",
+            "- [x] 3. Keep the existing CSV path unchanged and make XLSX an opt-in parallel path.",
+            "- [x] 4. Update tests for both export formats and for the format selection behavior.",
+            "- [x] 5. Validate the build and update linked Logics docs before closing the wave.",
+            ""
+          ],
+          "Report": [],
+          "Validation": [
+            "- `npm run lint`",
+            "- `npm run typecheck`",
+            "- `npm run test:ci:fast`",
+            "- `npm run build`",
+            "- Confirm CSV remains available and XLSX exports open as valid workbook files.",
+            ""
+          ]
+        },
+        "title": "Parallel CSV and XLSX Export Options"
+      },
+      "signature": {
+        "mtime_ns": 1776162791504389350,
+        "size": 4783
+      }
+    },
+    "logics/tasks/task_099_reference_naming_fallback_for_wire_terminations.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "reference, naming, fallback, for, wire, terminations, seal, and",
+          "skip when": "Skip when the work belongs to another backlog item or a different execution wave.",
+          "summary": "Seal and connection references need an optional friendly name, and the app should remember a previously entered name...",
+          "use when": "Use when executing the current implementation wave for Reference Naming Fallback for Wire Terminations."
+        },
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "100%",
+          "From version": "1.4.4",
+          "Non-semantic edit": "closed DoD checklist after delivery",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "Data Model",
+          "Understanding": "100%"
+        },
+        "kind": "task",
+        "path": "logics/tasks/task_099_reference_naming_fallback_for_wire_terminations.md",
+        "ref": "task_099_reference_naming_fallback_for_wire_terminations",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_585_reference_naming_fallback_for_wire_terminations"
+          ],
+          "prod": [],
+          "req": [
+            "req_119_bom_and_catalog_export_enhancements"
+          ],
+          "spec": [],
+          "task": [
+            "task_099_reference_naming_fallback_for_wire_terminations"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> Scope: Seal and connection references can each store an optional name.. Proof: capture validation evidence in this doc.",
+            "- AC2 -> Scope: When the same reference is entered again, the previous name is suggested or reused as a fallback.. Proof: capture validation evidence in this doc.",
+            "- AC3 -> Scope: If the name is still empty, the saved value remains blank.. Proof: capture validation evidence in this doc.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Seal and connection references need an optional friendly name, and the app should remember a previously entered name...",
+            "- Keywords: reference, naming, fallback, for, wire, terminations, seal, and",
+            "- Use when: Use when executing the current implementation wave for Reference Naming Fallback for Wire Terminations.",
+            "- Skip when: Skip when the work belongs to another backlog item or a different execution wave."
+          ],
+          "Context": [
+            "- Derived from backlog item `item_585_reference_naming_fallback_for_wire_terminations`.",
+            "- Source file: `logics\\backlog\\item_585_reference_naming_fallback_for_wire_terminations.md`.",
+            "- Related request(s): `req_119_bom_and_catalog_export_enhancements`.",
+            "Seal and connection references need an optional friendly name, and the app should remember a previously entered name for a reference when that reference is used again.",
+            "",
+            "```mermaid",
+            "%% logics-kind: task",
+            "%% logics-signature: task|reference-naming-fallback-for-wire-termi|item-585-reference-naming-fallback-for-w|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for",
+            "stateDiagram-v2",
+            "    state \"item_585_reference_naming_fallback_for_wir\" as Backlog",
+            "    state \"1. Confirm scope dependencies and linked\" as Scope",
+            "    state \"2. Implement the next coherent delivery\" as Build",
+            "    state \"3. Checkpoint the wave in a\" as Verify",
+            "    state \"Run the relevant automated tests for\" as Validation",
+            "    state \"Done report\" as Report",
+            "    [*] --> Backlog",
+            "    Backlog --> Scope",
+            "    Scope --> Build",
+            "    Build --> Verify",
+            "    Verify --> Validation",
+            "    Validation --> Report",
+            "    Report --> [*]",
+            "```",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Consider",
+            "- Architecture signals: data model and persistence",
+            "- Architecture follow-up: Review whether an architecture decision is needed before implementation becomes harder to reverse.",
+            ""
+          ],
+          "Definition of Done (DoD)": [
+            "- [x] Scope implemented and acceptance criteria covered.",
+            "- [x] Validation commands executed and results captured.",
+            "- [x] No wave or step was closed before the relevant automated tests and quality checks passed.",
+            "- [x] Linked request/backlog/task docs updated during completed waves and at closure.",
+            "- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
+            "- [x] Status is `Done` and progress is `100%`.",
+            ""
+          ],
+          "Delivery checkpoints": [
+            "- Each completed wave should leave the repository in a coherent, commit-ready state.",
+            "- Update the linked Logics docs during the wave that changes the behavior, not only at final closure.",
+            "- Prefer a reviewed commit checkpoint at the end of each meaningful wave instead of accumulating several undocumented partial states.",
+            "- If the shared AI runtime is active and healthy, use `python logics/skills/logics.py flow assist commit-all` to prepare the commit checkpoint for each meaningful step, item, or wave.",
+            "- Do not mark a wave or step complete until the relevant automated tests and quality checks have been run successfully.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Backlog item: `item_585_reference_naming_fallback_for_wire_terminations`",
+            "- Request(s): `req_119_bom_and_catalog_export_enhancements`",
+            ""
+          ],
+          "Plan": [
+            "- [x] 1. Identify where wire termination references are stored, edited, and serialized.",
+            "- [x] 2. Add optional display-name support for seal and connection references in the data model and forms.",
+            "- [x] 3. Implement fallback lookup so re-entering a known reference suggests or reuses its last known name.",
+            "- [x] 4. Preserve blank names when no label is known or entered.",
+            "- [x] 5. Update tests around persistence, form behavior, and the fallback lookup path.",
+            "- [x] 6. Validate the change set and update linked Logics docs before closing the wave.",
+            ""
+          ],
+          "References": [
+            "- `logics/skills/logics-ui-steering/SKILL.md`",
+            ""
+          ],
+          "Report": [],
+          "Validation": [
+            "- `npm run lint`",
+            "- `npm run typecheck`",
+            "- `npm run test:ci:fast`",
+            "- `npm run build`",
+            "- Confirm wire termination forms save blank names, reuse known names, and keep existing references intact.",
+            ""
+          ]
+        },
+        "title": "Reference Naming Fallback for Wire Terminations"
+      },
+      "signature": {
+        "mtime_ns": 1776162842744267923,
+        "size": 5003
+      }
+    },
+    "logics/tasks/task_100_flatten_bom_export_into_a_single_plane.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "flatten, bom, export, single, plane, the, current, output",
+          "skip when": "Skip when the work belongs to another backlog item or a different execution wave.",
+          "summary": "The current BOM output uses a separate wire termination block. The export needs one flat BOM structure so...",
+          "use when": "Use when executing the current implementation wave for Flatten BOM Export Into a Single Plane."
+        },
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "100%",
+          "From version": "1.4.4",
+          "Non-semantic edit": "linked adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "Export",
+          "Understanding": "100%"
+        },
+        "kind": "task",
+        "path": "logics/tasks/task_100_flatten_bom_export_into_a_single_plane.md",
+        "ref": "task_100_flatten_bom_export_into_a_single_plane",
+        "refs": {
+          "adr": [
+            "adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming"
+          ],
+          "item": [
+            "item_586_flatten_bom_export_into_a_single_plane"
+          ],
+          "prod": [],
+          "req": [
+            "req_119_bom_and_catalog_export_enhancements"
+          ],
+          "spec": [],
+          "task": [
+            "task_100_flatten_bom_export_into_a_single_plane"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> Scope: BOM export uses one common row structure for connector, seal, and connection reference data.. Proof: capture validation evidence in this doc.",
+            "- AC2 -> Scope: The old separate wire termination section no longer appears in the exported BOM.. Proof: capture validation evidence in this doc.",
+            "- AC3 -> Scope: The unified export keeps a stable and readable row order.. Proof: capture validation evidence in this doc.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: The current BOM output uses a separate wire termination block. The export needs one flat BOM structure so...",
+            "- Keywords: flatten, bom, export, single, plane, the, current, output",
+            "- Use when: Use when executing the current implementation wave for Flatten BOM Export Into a Single Plane.",
+            "- Skip when: Skip when the work belongs to another backlog item or a different execution wave."
+          ],
+          "Context": [
+            "- Derived from backlog item `item_586_flatten_bom_export_into_a_single_plane`.",
+            "- Source file: `logics\\backlog\\item_586_flatten_bom_export_into_a_single_plane.md`.",
+            "- Related request(s): `req_119_bom_and_catalog_export_enhancements`.",
+            "The current BOM output uses a separate wire termination block. The export needs one flat BOM structure so connectors, seals, and connection references are represented with the same column layout.",
+            "",
+            "```mermaid",
+            "%% logics-kind: task",
+            "%% logics-signature: task|flatten-bom-export-into-a-single-plane|item-586-flatten-bom-export-into-a-singl|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for",
+            "stateDiagram-v2",
+            "    state \"item_586_flatten_bom_export_into_a_single_\" as Backlog",
+            "    state \"1. Confirm scope dependencies and linked\" as Scope",
+            "    state \"2. Implement the next coherent delivery\" as Build",
+            "    state \"3. Checkpoint the wave in a\" as Verify",
+            "    state \"Run the relevant automated tests for\" as Validation",
+            "    state \"Done report\" as Report",
+            "    [*] --> Backlog",
+            "    Backlog --> Scope",
+            "    Scope --> Build",
+            "    Build --> Verify",
+            "    Verify --> Validation",
+            "    Validation --> Report",
+            "    Report --> [*]",
+            "```",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Required",
+            "- Architecture signals: data model and persistence, contracts and integration",
+            "- Architecture follow-up: Create or link an architecture decision before irreversible implementation work starts.",
+            ""
+          ],
+          "Definition of Done (DoD)": [
+            "- [x] Scope implemented and acceptance criteria covered.",
+            "- [x] Validation commands executed and results captured.",
+            "- [x] No wave or step was closed before the relevant automated tests and quality checks passed.",
+            "- [x] Linked request/backlog/task docs updated during completed waves and at closure.",
+            "- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
+            "- [x] Status is `Done` and progress is `100%`.",
+            ""
+          ],
+          "Delivery checkpoints": [
+            "- Each completed wave should leave the repository in a coherent, commit-ready state.",
+            "- Update the linked Logics docs during the wave that changes the behavior, not only at final closure.",
+            "- Prefer a reviewed commit checkpoint at the end of each meaningful wave instead of accumulating several undocumented partial states.",
+            "- If the shared AI runtime is active and healthy, use `python logics/skills/logics.py flow assist commit-all` to prepare the commit checkpoint for each meaningful step, item, or wave.",
+            "- Do not mark a wave or step complete until the relevant automated tests and quality checks have been run successfully.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming`",
+            "- Backlog item: `item_586_flatten_bom_export_into_a_single_plane`",
+            "- Request(s): `req_119_bom_and_catalog_export_enhancements`",
+            ""
+          ],
+          "Plan": [
+            "- [x] 1. Inspect the current BOM row builder and isolate the wire termination block logic.",
+            "- [x] 2. Replace the split structure with a single normalized BOM row model.",
+            "- [x] 3. Keep ordering deterministic so the unified export is readable and stable.",
+            "- [x] 4. Update any callers or tests that still expect the old separate termination section.",
+            "- [x] 5. Validate the export output and update linked Logics docs before closing the wave.",
+            ""
+          ],
+          "References": [
+            "- `logics/skills/logics-ui-steering/SKILL.md`",
+            ""
+          ],
+          "Report": [],
+          "Validation": [
+            "- `npm run lint`",
+            "- `npm run typecheck`",
+            "- `npm run test:ci:fast`",
+            "- `npm run build`",
+            "- Confirm the exported BOM now contains one unified structure and no longer emits a separate wire termination section.",
+            ""
+          ]
+        },
+        "title": "Flatten BOM Export Into a Single Plane"
+      },
+      "signature": {
+        "mtime_ns": 1776162791510726019,
+        "size": 4981
+      }
+    },
+    "logics/tasks/task_101_catalog_export_column_toggles.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "catalog, export, column, toggles, users, want, hide, some",
+          "skip when": "Skip when the work belongs to another backlog item or a different execution wave.",
+          "summary": "Users want to hide some catalog columns only in exported files, without changing the catalog table visible in...",
+          "use when": "Use when executing the current implementation wave for Catalog Export Column Toggles."
+        },
+        "indicators": {
+          "Complexity": "Medium",
+          "Confidence": "100%",
+          "From version": "1.4.4",
+          "Non-semantic edit": "closed DoD checklist after delivery",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "UI",
+          "Understanding": "100%"
+        },
+        "kind": "task",
+        "path": "logics/tasks/task_101_catalog_export_column_toggles.md",
+        "ref": "task_101_catalog_export_column_toggles",
+        "refs": {
+          "adr": [],
+          "item": [
+            "item_584_catalog_export_column_toggles"
+          ],
+          "prod": [],
+          "req": [
+            "req_119_bom_and_catalog_export_enhancements"
+          ],
+          "spec": [],
+          "task": [
+            "task_101_catalog_export_column_toggles"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> Scope: The export flow can omit selected catalog columns, but the catalog screen still shows the full catalog table.. Proof: capture validation evidence in this doc.",
+            "- AC2 -> Scope: The default catalog export remains compatible with the existing column order and content unless a column toggle is enabled.. Proof: capture validation evidence in this doc.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: Users want to hide some catalog columns only in exported files, without changing the catalog table visible in...",
+            "- Keywords: catalog, export, column, toggles, users, want, hide, some",
+            "- Use when: Use when executing the current implementation wave for Catalog Export Column Toggles.",
+            "- Skip when: Skip when the work belongs to another backlog item or a different execution wave."
+          ],
+          "Context": [
+            "- Derived from backlog item `item_584_catalog_export_column_toggles`.",
+            "- Source file: `logics\\backlog\\item_584_catalog_export_column_toggles.md`.",
+            "- Related request(s): `req_119_bom_and_catalog_export_enhancements`.",
+            "Users want to hide some catalog columns only in exported files, without changing the catalog table visible in the app.",
+            "",
+            "```mermaid",
+            "%% logics-kind: task",
+            "%% logics-signature: task|catalog-export-column-toggles|item-584-catalog-export-column-toggles|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for",
+            "stateDiagram-v2",
+            "    state \"item_584_catalog_export_column_toggles\" as Backlog",
+            "    state \"1. Confirm scope dependencies and linked\" as Scope",
+            "    state \"2. Implement the next coherent delivery\" as Build",
+            "    state \"3. Checkpoint the wave in a\" as Verify",
+            "    state \"Run the relevant automated tests for\" as Validation",
+            "    state \"Done report\" as Report",
+            "    [*] --> Backlog",
+            "    Backlog --> Scope",
+            "    Scope --> Build",
+            "    Build --> Verify",
+            "    Verify --> Validation",
+            "    Validation --> Report",
+            "    Report --> [*]",
+            "```",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Consider",
+            "- Architecture signals: data model and persistence",
+            "- Architecture follow-up: Review whether an architecture decision is needed before implementation becomes harder to reverse.",
+            ""
+          ],
+          "Definition of Done (DoD)": [
+            "- [x] Scope implemented and acceptance criteria covered.",
+            "- [x] Validation commands executed and results captured.",
+            "- [x] No wave or step was closed before the relevant automated tests and quality checks passed.",
+            "- [x] Linked request/backlog/task docs updated during completed waves and at closure.",
+            "- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
+            "- [x] Status is `Done` and progress is `100%`.",
+            ""
+          ],
+          "Delivery checkpoints": [
+            "- Each completed wave should leave the repository in a coherent, commit-ready state.",
+            "- Update the linked Logics docs during the wave that changes the behavior, not only at final closure.",
+            "- Prefer a reviewed commit checkpoint at the end of each meaningful wave instead of accumulating several undocumented partial states.",
+            "- If the shared AI runtime is active and healthy, use `python logics/skills/logics.py flow assist commit-all` to prepare the commit checkpoint for each meaningful step, item, or wave.",
+            "- Do not mark a wave or step complete until the relevant automated tests and quality checks have been run successfully.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): (none yet)",
+            "- Backlog item: `item_584_catalog_export_column_toggles`",
+            "- Request(s): `req_119_bom_and_catalog_export_enhancements`",
+            ""
+          ],
+          "Plan": [
+            "- [x] 1. Locate the catalog export path and the state source that controls export column selection.",
+            "- [x] 2. Add export-only column toggles and thread the selected columns into the catalog export builder.",
+            "- [x] 3. Keep the on-screen catalog table unchanged and preserve the default export output when no toggle is enabled.",
+            "- [x] 4. Add or update tests for export column inclusion and exclusion.",
+            "- [x] 5. Validate the change set and update linked Logics docs before closing the wave.",
+            ""
+          ],
+          "References": [
+            "- `logics/skills/logics-ui-steering/SKILL.md`",
+            ""
+          ],
+          "Report": [],
+          "Validation": [
+            "- `npm run lint`",
+            "- `npm run typecheck`",
+            "- `npm run test:ci:fast`",
+            "- `npm run build`",
+            "- Confirm the exported catalog still renders unchanged in the app and the hidden columns are absent only from the export output.",
+            ""
+          ]
+        },
+        "title": "Catalog Export Column Toggles"
+      },
+      "signature": {
+        "mtime_ns": 1776162846703167261,
+        "size": 4720
+      }
+    },
+    "logics/tasks/task_102_grouped_bom_workbook_with_merged_connector_rows.md": {
+      "data": {
+        "ai_context": {
+          "keywords": "grouped, bom, workbook, merged, connector, rows, the, xlsx",
+          "skip when": "Skip when the work belongs to another backlog item or a different execution wave.",
+          "summary": "The BOM XLSX export needs a second sheet grouped by connector, with merged connector identity cells and correct...",
+          "use when": "Use when executing the current implementation wave for Grouped BOM Workbook With Merged Connector Rows."
+        },
+        "indicators": {
+          "Complexity": "High",
+          "Confidence": "100%",
+          "From version": "1.4.4",
+          "Non-semantic edit": "linked adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming",
+          "Progress": "100%",
+          "Reminder": "Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.",
+          "Schema version": "1.0",
+          "Status": "Done",
+          "Theme": "Export",
+          "Understanding": "100%"
+        },
+        "kind": "task",
+        "path": "logics/tasks/task_102_grouped_bom_workbook_with_merged_connector_rows.md",
+        "ref": "task_102_grouped_bom_workbook_with_merged_connector_rows",
+        "refs": {
+          "adr": [
+            "adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming"
+          ],
+          "item": [
+            "item_588_grouped_bom_workbook_with_merged_connector_rows"
+          ],
+          "prod": [],
+          "req": [
+            "req_119_bom_and_catalog_export_enhancements"
+          ],
+          "spec": [],
+          "task": [
+            "task_102_grouped_bom_workbook_with_merged_connector_rows"
+          ]
+        },
+        "schema_version": "1.0",
+        "sections": {
+          "AC Traceability": [
+            "- AC1 -> Scope: The BOM XLSX export contains a global summary sheet and a connector-grouped sheet.. Proof: capture validation evidence in this doc.",
+            "- AC2 -> Scope: The grouped sheet merges the connector ID and connector name cells across the rows in each connector group.. Proof: capture validation evidence in this doc.",
+            "- AC3 -> Scope: The grouped sheet keeps connector-related rows under the right connector and preserves a stable order.. Proof: capture validation evidence in this doc.",
+            "- AC4 -> Scope: Quantity totals are correct in both sheets.. Proof: capture validation evidence in this doc.",
+            ""
+          ],
+          "AI Context": [
+            "- Summary: The BOM XLSX export needs a second sheet grouped by connector, with merged connector identity cells and correct...",
+            "- Keywords: grouped, bom, workbook, merged, connector, rows, the, xlsx",
+            "- Use when: Use when executing the current implementation wave for Grouped BOM Workbook With Merged Connector Rows.",
+            "- Skip when: Skip when the work belongs to another backlog item or a different execution wave."
+          ],
+          "Context": [
+            "- Derived from backlog item `item_588_grouped_bom_workbook_with_merged_connector_rows`.",
+            "- Source file: `logics\\backlog\\item_588_grouped_bom_workbook_with_merged_connector_rows.md`.",
+            "- Related request(s): `req_119_bom_and_catalog_export_enhancements`.",
+            "The BOM XLSX export needs a second sheet grouped by connector, with merged connector identity cells and correct connector-level quantities.",
+            "",
+            "```mermaid",
+            "%% logics-kind: task",
+            "%% logics-signature: task|grouped-bom-workbook-with-merged-connect|item-588-grouped-bom-workbook-with-merge|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for",
+            "stateDiagram-v2",
+            "    state \"item_588_grouped_bom_workbook_with_merged_\" as Backlog",
+            "    state \"1. Confirm scope dependencies and linked\" as Scope",
+            "    state \"2. Implement the next coherent delivery\" as Build",
+            "    state \"3. Checkpoint the wave in a\" as Verify",
+            "    state \"Run the relevant automated tests for\" as Validation",
+            "    state \"Done report\" as Report",
+            "    [*] --> Backlog",
+            "    Backlog --> Scope",
+            "    Scope --> Build",
+            "    Build --> Verify",
+            "    Verify --> Validation",
+            "    Validation --> Report",
+            "    Report --> [*]",
+            "```",
+            ""
+          ],
+          "Decision framing": [
+            "- Product framing: Not needed",
+            "- Product signals: (none detected)",
+            "- Product follow-up: No product brief follow-up is expected based on current signals.",
+            "- Architecture framing: Required",
+            "- Architecture signals: data model and persistence, contracts and integration",
+            "- Architecture follow-up: Create or link an architecture decision before irreversible implementation work starts.",
+            ""
+          ],
+          "Definition of Done (DoD)": [
+            "- [x] Scope implemented and acceptance criteria covered.",
+            "- [x] Validation commands executed and results captured.",
+            "- [x] No wave or step was closed before the relevant automated tests and quality checks passed.",
+            "- [x] Linked request/backlog/task docs updated during completed waves and at closure.",
+            "- [x] Each completed wave left a commit-ready checkpoint or an explicit exception is documented.",
+            "- [x] Status is `Done` and progress is `100%`.",
+            ""
+          ],
+          "Delivery checkpoints": [
+            "- Each completed wave should leave the repository in a coherent, commit-ready state.",
+            "- Update the linked Logics docs during the wave that changes the behavior, not only at final closure.",
+            "- Prefer a reviewed commit checkpoint at the end of each meaningful wave instead of accumulating several undocumented partial states.",
+            "- If the shared AI runtime is active and healthy, use `python logics/skills/logics.py flow assist commit-all` to prepare the commit checkpoint for each meaningful step, item, or wave.",
+            "- Do not mark a wave or step complete until the relevant automated tests and quality checks have been run successfully.",
+            ""
+          ],
+          "Links": [
+            "- Product brief(s): (none yet)",
+            "- Architecture decision(s): `adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming`",
+            "- Backlog item: `item_588_grouped_bom_workbook_with_merged_connector_rows`",
+            "- Request(s): `req_119_bom_and_catalog_export_enhancements`",
+            ""
+          ],
+          "Plan": [
+            "- [x] 1. Build the workbook model for the two-sheet BOM export.",
+            "- [x] 2. Keep the current summary sheet intact and add a connector-grouped sheet.",
+            "- [x] 3. Merge the connector ID and name cells across each grouped block.",
+            "- [x] 4. Verify the grouped rows stay under the right connector and totals remain correct.",
+            "- [x] 5. Update export tests and workbook checks for both sheets.",
+            "- [x] 6. Validate the workbook output and update linked Logics docs before closing the wave.",
+            ""
+          ],
+          "References": [
+            "- `logics/skills/logics-ui-steering/SKILL.md`",
+            ""
+          ],
+          "Report": [],
+          "Validation": [
+            "- `npm run lint`",
+            "- `npm run typecheck`",
+            "- `npm run test:ci:fast`",
+            "- `npm run build`",
+            "- Confirm the generated workbook contains both sheets, merged connector identity cells, and stable grouped rows.",
+            ""
+          ]
+        },
+        "title": "Grouped BOM Workbook With Merged Connector Rows"
+      },
+      "signature": {
+        "mtime_ns": 1776162791516431683,
+        "size": 5188
       }
     }
   }
