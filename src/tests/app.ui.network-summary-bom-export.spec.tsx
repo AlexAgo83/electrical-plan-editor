@@ -12,6 +12,13 @@ import {
   switchScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 
+function openExportMenu(panel: HTMLElement): void {
+  const exportButton = within(panel).getByRole("button", { name: "Export" });
+  if (exportButton.getAttribute("aria-expanded") !== "true") {
+    fireEvent.click(exportButton);
+  }
+}
+
 function readBlobAsText(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -70,15 +77,19 @@ describe("App integration UI - network summary BOM export", () => {
       switchScreenDrawerAware("modeling");
 
       const networkSummaryPanel = getPanelByHeading("Network summary");
-      const exportSvgButton = within(networkSummaryPanel).getByRole("button", { name: "SVG" });
-      const compactBomButton = within(networkSummaryPanel).getByRole("button", { name: "Compact" });
-      const exportBomButton = within(networkSummaryPanel).getByRole("button", { name: "BOM" });
       expect(within(networkSummaryPanel).queryByText(/BOM CSV pricing:/i)).toBeNull();
-      expect(exportBomButton).not.toHaveAttribute("title");
-      expect(compactBomButton).toBeInTheDocument();
 
-      const actionButtons = Array.from(networkSummaryPanel.querySelectorAll("header .workspace-tab"));
-      expect(actionButtons.indexOf(exportBomButton)).toBeGreaterThan(actionButtons.indexOf(exportSvgButton));
+      // Compact BOM export columns is now a setting, not a header button
+      switchScreenDrawerAware("settings");
+      const bomSettingsPanel = getPanelByHeading("Catalog & BOM setup");
+      expect(within(bomSettingsPanel).getByLabelText("Compact BOM export columns")).toBeInTheDocument();
+      switchScreenDrawerAware("modeling");
+
+      const refreshedNetworkSummaryPanel = getPanelByHeading("Network summary");
+      openExportMenu(refreshedNetworkSummaryPanel);
+      const exportSvgButton = within(refreshedNetworkSummaryPanel).getByRole("button", { name: "SVG" });
+      const exportBomButton = within(refreshedNetworkSummaryPanel).getByRole("button", { name: "BOM" });
+      expect(exportSvgButton).toHaveTextContent("SVG");
       expect(exportBomButton.querySelector(".table-export-icon")).not.toBeNull();
 
       fireEvent.click(exportBomButton);
@@ -108,6 +119,7 @@ describe("App integration UI - network summary BOM export", () => {
     switchScreenDrawerAware("modeling");
     const networkSummaryPanel = getPanelByHeading("Network summary");
     expect(within(networkSummaryPanel).queryByText(/BOM CSV pricing:/i)).toBeNull();
+    openExportMenu(networkSummaryPanel);
     expect(within(networkSummaryPanel).getByRole("button", { name: "BOM" })).toBeInTheDocument();
   });
 
@@ -160,6 +172,7 @@ describe("App integration UI - network summary BOM export", () => {
       switchScreenDrawerAware("modeling");
 
       const networkSummaryPanel = getPanelByHeading("Network summary");
+      openExportMenu(networkSummaryPanel);
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
 
       if (typeof capturedPayload !== "string") {
@@ -228,8 +241,11 @@ describe("App integration UI - network summary BOM export", () => {
 
       switchScreenDrawerAware("modeling");
       const networkSummaryPanel = getPanelByHeading("Network summary");
+      const viewButton = within(networkSummaryPanel).getByRole("button", { name: "View" });
+      fireEvent.click(viewButton);
       const calloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
       fireEvent.click(calloutsToggle);
+      openExportMenu(networkSummaryPanel);
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
 
       await waitFor(() => {
@@ -309,6 +325,7 @@ describe("App integration UI - network summary BOM export", () => {
       renderAppWithState(stateWithMetadata);
       switchScreenDrawerAware("modeling");
       const networkSummaryPanel = getPanelByHeading("Network summary");
+      openExportMenu(networkSummaryPanel);
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
 
       await waitFor(() => {
@@ -379,6 +396,7 @@ describe("App integration UI - network summary BOM export", () => {
       renderAppWithState(stateWithMetadata);
       switchScreenDrawerAware("modeling");
       const networkSummaryPanel = getPanelByHeading("Network summary");
+      openExportMenu(networkSummaryPanel);
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
 
       await waitFor(() => {
@@ -437,6 +455,7 @@ describe("App integration UI - network summary BOM export", () => {
       renderAppWithState(stateWithLogo);
       switchScreenDrawerAware("modeling");
       const networkSummaryPanel = getPanelByHeading("Network summary");
+      openExportMenu(networkSummaryPanel);
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
 
       await waitFor(() => {
@@ -484,6 +503,7 @@ describe("App integration UI - network summary BOM export", () => {
 
       switchScreenDrawerAware("modeling");
       const networkSummaryPanel = getPanelByHeading("Network summary");
+      openExportMenu(networkSummaryPanel);
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
 
       await waitFor(() => {

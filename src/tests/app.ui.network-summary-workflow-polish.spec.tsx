@@ -27,7 +27,17 @@ function getNetworkSummaryViewportTransform(panel: HTMLElement): string {
   return transformGroup.getAttribute("transform") ?? "";
 }
 
+function openViewMenu(panel: HTMLElement): void {
+  const viewButton = within(panel).getByRole("button", { name: "View" });
+  if (viewButton.getAttribute("aria-expanded") !== "true") {
+    fireEvent.click(viewButton);
+  }
+}
+
 function getDisplayToggleButton(panel: HTMLElement, label: "Info" | "Length" | "Callouts" | "Grid" | "Snap" | "Lock"): HTMLButtonElement {
+  if (label === "Info" || label === "Length" || label === "Callouts") {
+    openViewMenu(panel);
+  }
   return within(panel).getByRole("button", { name: label });
 }
 
@@ -222,6 +232,7 @@ describe("App integration UI - network summary workflow polish", () => {
     switchScreenDrawerAware("modeling");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
     const calloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
 
@@ -277,6 +288,7 @@ describe("App integration UI - network summary workflow polish", () => {
     switchScreenDrawerAware("modeling");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
 
@@ -324,6 +336,7 @@ describe("App integration UI - network summary workflow polish", () => {
     switchScreenDrawerAware("modeling");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     const calloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
     fireEvent.click(calloutsToggle);
 
@@ -347,6 +360,7 @@ describe("App integration UI - network summary workflow polish", () => {
       switchScreenDrawerAware("modeling");
 
       const networkSummaryPanel = getPanelByHeading("Network summary");
+      openViewMenu(networkSummaryPanel);
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
 
       expect(networkSummaryPanel.querySelectorAll(".network-callout-frame").length).toBeGreaterThanOrEqual(4);
@@ -361,6 +375,7 @@ describe("App integration UI - network summary workflow polish", () => {
     switchScreenDrawerAware("modeling");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
 
     expect(networkSummaryPanel.querySelectorAll(".network-callout-table-row.is-selected-wire")).toHaveLength(0);
@@ -397,6 +412,7 @@ describe("App integration UI - network summary workflow polish", () => {
     switchScreenDrawerAware("modeling");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
 
     expect(networkSummaryPanel).toHaveTextContent("RD/BU");
@@ -421,6 +437,7 @@ describe("App integration UI - network summary workflow polish", () => {
     switchScreenDrawerAware("modeling");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
 
     const calloutAnchors = Array.from(networkSummaryPanel.querySelectorAll(".network-callout-anchor"));
@@ -447,6 +464,7 @@ describe("App integration UI - network summary workflow polish", () => {
 
     switchScreenDrawerAware("modeling");
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     const calloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
     if (!calloutsToggle.classList.contains("is-active")) {
       fireEvent.click(calloutsToggle);
