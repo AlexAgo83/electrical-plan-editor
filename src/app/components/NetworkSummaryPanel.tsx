@@ -972,14 +972,6 @@ export function NetworkSummaryPanel({
         <header className="network-summary-header">
           <h2>Network summary</h2>
           <div className="network-summary-header-actions" role="group" aria-label="Network summary display options">
-            <NetworkSummaryViewMenu
-              showNetworkInfoPanels={showNetworkInfoPanels}
-              showSegmentLengths={showSegmentLengths}
-              showCableCallouts={showCableCallouts}
-              toggleShowNetworkInfoPanels={toggleShowNetworkInfoPanels}
-              toggleShowSegmentLengths={toggleShowSegmentLengths}
-              toggleShowCableCallouts={toggleShowCableCallouts}
-            />
             <button
               type="button"
               className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}
@@ -1004,6 +996,14 @@ export function NetworkSummaryPanel({
               <span className="network-summary-lock-move-icon" aria-hidden="true" />
               Lock
             </button>
+            <NetworkSummaryViewMenu
+              showNetworkInfoPanels={showNetworkInfoPanels}
+              showSegmentLengths={showSegmentLengths}
+              showCableCallouts={showCableCallouts}
+              toggleShowNetworkInfoPanels={toggleShowNetworkInfoPanels}
+              toggleShowSegmentLengths={toggleShowSegmentLengths}
+              toggleShowCableCallouts={toggleShowCableCallouts}
+            />
             <NetworkSummaryExportMenu
               canvasExportFormat={canvasExportFormat}
               canExportCanvas={nodes.length > 0}
