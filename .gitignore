@@ -2,7 +2,7 @@ node_modules
 dist
 coverage
 .claude/
-logics/.cache/
+
 playwright-report
 test-results
 .vite
@@ -18,6 +18,8 @@ logics/hybrid_assist_measurements.jsonl
 logics/mutation_audit.jsonl
 logics/.cache/hybrid_assist_audit.jsonl
 logics/.cache/hybrid_assist_measurements.jsonl
+logics/.cache/runtime_index.json
+logics/.cache/workflow_graph.json
 
 # Generated Logics runtime artifacts
 logics/.cache/
