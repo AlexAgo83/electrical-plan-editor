@@ -19,3 +19,6 @@ logics/.cache/hybrid_assist_measurements.jsonl
 
 # Generated Logics runtime artifacts
 logics/.cache/
+
+AGENTS.md
+LOGICS.md
