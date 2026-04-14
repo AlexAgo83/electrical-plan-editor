@@ -18,7 +18,7 @@ The current BOM output uses a separate wire termination block. The export needs 
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|flatten-bom-export-into-a-single-plane|item-586-flatten-bom-export-into-a-singl|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for
+%% logics-signature: task|flatten-bom-export-into-a-single-plane|item-586-flatten-bom-export-into-a-singl|1-inspect-the-current-bom-row|npm-run-lint
 stateDiagram-v2
     state "item_586_flatten_bom_export_into_a_single_" as Backlog
     state "1. Confirm scope dependencies and linked" as Scope

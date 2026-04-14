@@ -28,7 +28,7 @@
 
 ```mermaid
 %% logics-kind: request
-%% logics-signature: request|bom-and-catalog-export-enhancements|catalog-export-toggle-and-bom-xlsx-views|ac1-export-time-catalog-column-toggles|ac2-reference-naming-fallback|ac3-single-plane-bom-export|ac4-xlsx-parallel-export|ac5-dual-sheet-bom-structure
+%% logics-signature: request|bom-and-catalog-export-enhancements|add-export-time-catalog-column-toggles-s|ac1-users-can-hide-selected-catalog
 flowchart TD
     Trigger[Export and BOM enhancement request] --> CatalogToggle[Export-time catalog column toggles]
     Trigger --> RefNaming[Optional names for seal and connection references]

@@ -18,7 +18,7 @@ The BOM XLSX export needs a second sheet grouped by connector, with merged conne
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|grouped-bom-workbook-with-merged-connect|item-588-grouped-bom-workbook-with-merge|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for
+%% logics-signature: task|grouped-bom-workbook-with-merged-connect|item-588-grouped-bom-workbook-with-merge|1-build-the-workbook-model-for|npm-run-lint
 stateDiagram-v2
     state "item_588_grouped_bom_workbook_with_merged_" as Backlog
     state "1. Confirm scope dependencies and linked" as Scope

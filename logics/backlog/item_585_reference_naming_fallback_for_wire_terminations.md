@@ -26,7 +26,7 @@ Seal and connection references need an optional friendly name, and the app shoul
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|reference-naming-fallback-for-wire-terminations|req-119-bom-and-catalog-export-enhancement|optional-names-and-reference-fallback|ac1-optional-name-fields
+%% logics-signature: backlog|reference-naming-fallback-for-wire-termi|req-119-bom-and-catalog-export-enhanceme|seal-and-connection-references-need-an|ac1-seal-and-connection-references-can
 flowchart TD
     Request[req 119 bom and catalog export enhancements] --> Problem[Reference naming fallback]
     Problem --> Scope[Optional wire termination names]

@@ -25,7 +25,7 @@ Users want to hide some catalog columns only in exported files, without changing
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|catalog-export-column-toggles|req-119-bom-and-catalog-export-enhancement|export-time-catalog-column-omission|ac1-export-only-hidden-columns
+%% logics-signature: backlog|catalog-export-column-toggles|req-119-bom-and-catalog-export-enhanceme|users-want-to-hide-some-catalog|ac1-the-export-flow-can-omit
 flowchart TD
     Request[req 119 bom and catalog export enhancements] --> Problem[Catalog export column toggles]
     Problem --> Scope[Export only hiding]

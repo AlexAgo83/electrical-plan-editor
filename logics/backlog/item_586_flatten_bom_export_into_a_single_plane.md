@@ -25,7 +25,7 @@ The current BOM output uses a separate wire termination block. The export needs 
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|flatten-bom-export-into-a-single-plane|req-119-bom-and-catalog-export-enhancement|single-bom-row-plane|ac1-unified-bom-rows
+%% logics-signature: backlog|flatten-bom-export-into-a-single-plane|req-119-bom-and-catalog-export-enhanceme|the-current-bom-output-uses-a|ac1-bom-export-uses-one-common
 flowchart TD
     Request[req 119 bom and catalog export enhancements] --> Problem[Flat BOM structure]
     Problem --> Scope[Single plane BOM rows]

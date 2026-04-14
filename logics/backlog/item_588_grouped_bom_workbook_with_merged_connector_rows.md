@@ -27,7 +27,7 @@ The BOM XLSX export needs a second sheet grouped by connector, with merged conne
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|grouped-bom-workbook-with-merged-connector-rows|req-119-bom-and-catalog-export-enhancement|two-sheet-bom-workbook|ac1-two-bom-sheets-and-merged-cells
+%% logics-signature: backlog|grouped-bom-workbook-with-merged-connect|req-119-bom-and-catalog-export-enhanceme|the-bom-xlsx-export-needs-a|ac1-the-bom-xlsx-export-contains
 flowchart TD
     Request[req 119 bom and catalog export enhancements] --> Problem[Grouped BOM workbook]
     Problem --> Scope[Two sheet BOM XLSX]

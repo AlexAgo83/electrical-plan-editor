@@ -18,7 +18,7 @@ Seal and connection references need an optional friendly name, and the app shoul
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|reference-naming-fallback-for-wire-termi|item-585-reference-naming-fallback-for-w|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for
+%% logics-signature: task|reference-naming-fallback-for-wire-termi|item-585-reference-naming-fallback-for-w|1-identify-where-wire-termination-refere|npm-run-lint
 stateDiagram-v2
     state "item_585_reference_naming_fallback_for_wir" as Backlog
     state "1. Confirm scope dependencies and linked" as Scope

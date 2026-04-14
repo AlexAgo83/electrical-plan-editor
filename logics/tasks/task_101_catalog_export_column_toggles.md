@@ -18,7 +18,7 @@ Users want to hide some catalog columns only in exported files, without changing
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|catalog-export-column-toggles|item-584-catalog-export-column-toggles|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for
+%% logics-signature: task|catalog-export-column-toggles|item-584-catalog-export-column-toggles|1-locate-the-catalog-export-path|npm-run-lint
 stateDiagram-v2
     state "item_584_catalog_export_column_toggles" as Backlog
     state "1. Confirm scope dependencies and linked" as Scope

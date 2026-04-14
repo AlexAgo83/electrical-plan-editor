@@ -25,7 +25,7 @@ Users want BOM and wire-by-wire exports in Excel format, but the app currently o
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|parallel-csv-and-xlsx-export-options|req-119-bom-and-catalog-export-enhancement|csv-or-xlsx-choice|ac1-format-choice-for-bom-and-wire
+%% logics-signature: backlog|parallel-csv-and-xlsx-export-options|req-119-bom-and-catalog-export-enhanceme|users-want-bom-and-wire-by-wire-exports|ac1-the-user-can-explicitly-choose
 flowchart TD
     Request[req 119 bom and catalog export enhancements] --> Problem[CSV or XLSX choice]
     Problem --> Scope[Parallel export formats]

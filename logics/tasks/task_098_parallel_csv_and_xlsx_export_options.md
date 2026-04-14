@@ -18,7 +18,7 @@ Users want BOM and wire-by-wire exports in Excel format, but the app currently o
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|parallel-csv-and-xlsx-export-options|item-587-parallel-csv-and-xlsx-export-op|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for
+%% logics-signature: task|parallel-csv-and-xlsx-export-options|item-587-parallel-csv-and-xlsx-export-op|1-add-or-select-the-xlsx|npm-run-lint
 stateDiagram-v2
     state "item_587_parallel_csv_and_xlsx_export_opti" as Backlog
     state "1. Confirm scope dependencies and linked" as Scope
