@@ -140,9 +140,7 @@
   gap: 0.15rem;
   min-width: 11rem;
   padding: 0.35rem;
-  border: 1px solid #9eb7cc;
   border-radius: 0.6rem;
-  background: #f3f8fc;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
@@ -159,7 +157,7 @@
   border: 1px solid transparent;
   border-radius: 0.45rem;
   background: transparent;
-  color: #17374e;
+  color: inherit;
   font-size: 0.85rem;
   line-height: 1.2;
   text-align: left;
@@ -168,14 +166,19 @@
 }
 
 .network-summary-view-menu-item:hover {
-  background: #e4eef6;
-  border-color: #b8cfdf;
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 .network-summary-view-menu-item.is-active {
-  background: #d0e8f5;
-  border-color: #7aadcc;
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.18);
   font-weight: 500;
+}
+
+.network-summary-view-menu-item:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 @media (max-width: 900px) {
   .network-summary-header {

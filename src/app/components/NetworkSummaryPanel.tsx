@@ -201,7 +201,7 @@ function NetworkSummaryViewMenu({
         View
       </button>
       {open && (
-        <div className="network-summary-view-menu network-summary-view-menu--right" role="menu">
+        <div className="panel network-summary-view-menu network-summary-view-menu--right" role="menu">
           <button
             type="button"
             role="menuitemcheckbox"
@@ -290,7 +290,7 @@ function NetworkSummaryExportMenu({
         Export
       </button>
       {open && (
-        <div className="network-summary-view-menu network-summary-view-menu--right" role="menu">
+        <div className="panel network-summary-view-menu network-summary-view-menu--right" role="menu">
           <button
             type="button"
             role="menuitem"
