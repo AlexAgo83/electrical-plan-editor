@@ -117,9 +117,13 @@ export type AppAction =
         secondaryColorId?: string | null;
         freeColorLabel?: string | null;
         endpointAConnectionReference?: string;
+        endpointAConnectionName?: string;
         endpointASealReference?: string;
+        endpointASealName?: string;
         endpointBConnectionReference?: string;
+        endpointBConnectionName?: string;
         endpointBSealReference?: string;
+        endpointBSealName?: string;
         protection?: WireProtection;
         endpointA: WireEndpoint;
         endpointB: WireEndpoint;
@@ -242,9 +246,13 @@ export const appActions = {
     secondaryColorId?: string | null;
     freeColorLabel?: string | null;
     endpointAConnectionReference?: string;
+    endpointAConnectionName?: string;
     endpointASealReference?: string;
+    endpointASealName?: string;
     endpointBConnectionReference?: string;
+    endpointBConnectionName?: string;
     endpointBSealReference?: string;
+    endpointBSealName?: string;
     protection?: WireProtection;
     endpointA: WireEndpoint;
     endpointB: WireEndpoint;

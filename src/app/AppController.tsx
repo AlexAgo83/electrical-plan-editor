@@ -42,6 +42,7 @@ import { useAppControllerNetworkViewportState } from "./hooks/controller/useAppC
 import { useAppControllerHeaderOffsetState } from "./hooks/controller/useAppControllerHeaderOffsetState";
 import { useAppControllerCanvasStateSyncEffects } from "./hooks/controller/useAppControllerCanvasStateSyncEffects";
 import { useConfirmDialogController } from "./hooks/controller/useConfirmDialogController";
+import { useChoiceDialogController } from "./hooks/controller/useChoiceDialogController";
 import { useNetworkSummaryViewStateSync } from "./hooks/controller/useNetworkSummaryViewStateSync";
 import { useOnboardingController } from "./hooks/controller/useOnboardingController";
 import { useAppControllerPersistenceHealth } from "./hooks/controller/useAppControllerPersistenceHealth";
@@ -79,8 +80,7 @@ import {
   NETWORK_MAX_SCALE,
   NETWORK_MIN_SCALE,
 } from "./lib/app-utils-shared";
-import { downloadCsvFile } from "./lib/csv";
-import { buildNetworkSummaryBomCsvExport } from "./lib/networkSummaryBomCsv";
+import { useAppControllerBomExportHandlers } from "./hooks/controller/useAppControllerBomExportHandlers";
 import type { AppProps, SubScreenId } from "./types/app-controller";
 import "./styles.css";
 
@@ -174,6 +174,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceCurrencyCode,
     workspaceTaxEnabled,
     workspaceTaxRatePercent,
+    tabularExportFormat,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     networkSort,
@@ -198,15 +199,16 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceWideScreen,
     preferencesHydrated
   } = preferencesState;
-  const networkSummaryBomCsvExport = useMemo(
-    () => buildNetworkSummaryBomCsvExport(catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent),
-    [catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent]
-  );
-  const canExportBomCsv = networkSummaryBomCsvExport.itemRowCount > 0;
-  const handleExportBomCsv = useCallback(() => {
-    if (!canExportBomCsv) return;
-    downloadCsvFile("network-bom", networkSummaryBomCsvExport.headers, networkSummaryBomCsvExport.rows, { includeUtf8Bom: true });
-  }, [canExportBomCsv, networkSummaryBomCsvExport]);
+  const { bomExportCompactColumns, toggleBomExportCompactColumns, canExportBomCsv, handleExportBomCsv } = useAppControllerBomExportHandlers({
+    catalogItems,
+    connectors,
+    splices,
+    wires,
+    workspaceCurrencyCode,
+    workspaceTaxEnabled,
+    workspaceTaxRatePercent,
+    tabularExportFormat
+  });
   const { effectiveNetworkViewWidth, effectiveNetworkViewHeight, handleNetworkSummaryViewportSizeChange } = useAppControllerNetworkViewportState({ canvasResizeBehaviorMode });
   const { headerOffsetPx, headerBlockRef } = useAppControllerHeaderOffsetState();
   const panStartRef = useRef<{
@@ -281,6 +283,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setActiveSubScreen
   });
   const { activeConfirmDialog, requestConfirmation, closeActiveConfirmDialog } = useConfirmDialogController();
+  const { activeChoiceDialog, requestChoiceSelection, closeActiveChoiceDialog } = useChoiceDialogController();
   const {
     isInstallPromptAvailable,
     isPwaUpdateReady,
@@ -621,6 +624,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     state,
     dispatchAction,
     confirmAction: requestConfirmation,
+    choiceAction: requestChoiceSelection,
     formsState,
     pendingNewNodePosition,
     setPendingNewNodePosition,
@@ -958,6 +962,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       dispatchAction,
       handleNetworkSummaryViewportSizeChange,
       canExportBomCsv,
+      bomExportCompactColumns,
+      toggleBomExportCompactColumns,
       handleExportBomCsv,
       describeNode,
       nodeLabelById,
@@ -1072,6 +1078,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       appShellClassName={appShellClassName}
       activeConfirmDialog={activeConfirmDialog}
       closeActiveConfirmDialog={closeActiveConfirmDialog}
+      activeChoiceDialog={activeChoiceDialog}
+      closeActiveChoiceDialog={closeActiveChoiceDialog}
       onboarding={{
         activeOnboardingStep,
         isOnboardingOpen,

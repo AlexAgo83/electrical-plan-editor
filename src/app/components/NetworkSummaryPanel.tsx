@@ -150,6 +150,8 @@ export interface NetworkSummaryPanelProps {
   onViewportSizeChange?: (size: { width: number; height: number }) => void;
   pngExportIncludeBackground: boolean;
   canExportBomCsv: boolean;
+  bomExportCompactColumns: boolean;
+  toggleBomExportCompactColumns: () => void;
   onExportBomCsv: () => void;
   onRegenerateLayout: () => void;
 }
@@ -243,6 +245,8 @@ export function NetworkSummaryPanel({
   onViewportSizeChange,
   pngExportIncludeBackground,
   canExportBomCsv,
+  bomExportCompactColumns,
+  toggleBomExportCompactColumns,
   onExportBomCsv,
   onRegenerateLayout
 }: NetworkSummaryPanelProps): ReactElement {
@@ -869,6 +873,14 @@ export function NetworkSummaryPanel({
             >
               <span className="network-summary-export-icon" aria-hidden="true" />
               {canvasExportFormat.toUpperCase()}
+            </button>
+            <button
+              type="button"
+              className={bomExportCompactColumns ? "workspace-tab network-summary-export-button is-active" : "workspace-tab network-summary-export-button"}
+              onClick={toggleBomExportCompactColumns}
+              title="Toggle compact BOM export columns"
+            >
+              Compact
             </button>
             <button
               type="button"

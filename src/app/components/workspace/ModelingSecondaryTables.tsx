@@ -4,6 +4,7 @@ import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
+import { downloadTabularCsvOrXlsxFile } from "../../lib/tabularExport";
 import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
@@ -17,7 +18,7 @@ import type {
   WireId
 } from "../../../core/entities";
 import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
-import type { SegmentSubNetworkFilter, SortDirection, SortState } from "../../types/app-controller";
+import type { SegmentSubNetworkFilter, SortDirection, SortState, TabularExportFormat } from "../../types/app-controller";
 
 interface ModelingSecondaryTablesProps {
   activeBatchScope: ModelingBatchSelectionScope | null;
@@ -55,6 +56,7 @@ interface ModelingSecondaryTablesProps {
   setWireFilterField: (value: "endpoints" | "name" | "technicalId" | "any") => void;
   wireEndpointFilterQuery: string;
   setWireEndpointFilterQuery: (value: string) => void;
+  tabularExportFormat: TabularExportFormat;
   catalogItems: CatalogItem[];
   wires: Wire[];
   visibleWires: Wire[];
@@ -105,6 +107,7 @@ export function ModelingSecondaryTables({
   setWireFilterField,
   wireEndpointFilterQuery,
   setWireEndpointFilterQuery,
+  tabularExportFormat,
   catalogItems,
   wires,
   visibleWires,
@@ -580,7 +583,7 @@ export function ModelingSecondaryTables({
                         "End seal ref",
                         "Section (mm²)",
                         "Length (mm)"
-                      ];
+                    ];
                   const rows = sortedVisibleWires.map((wire) => {
                     const begin = describeWireEndpointCsvParts(wire.endpointA);
                     const end = describeWireEndpointCsvParts(wire.endpointB);
@@ -619,12 +622,17 @@ export function ModelingSecondaryTables({
                       wire.lengthMm
                     ];
                   });
-                  downloadCsvFile("modeling-wires", headers, rows, { includeUtf8Bom: true });
+                  void downloadTabularCsvOrXlsxFile(
+                    "modeling-wires",
+                    tabularExportFormat,
+                    { name: "Modeling Wires", headers, rows, freezeHeaderRow: true, autoFilter: true },
+                    { includeUtf8Bom: true }
+                  );
                 }}
                 disabled={sortedVisibleWires.length === 0}
               >
                 <span className="table-export-icon" aria-hidden="true" />
-                CSV
+                {tabularExportFormat.toUpperCase()}
               </button>
               {onOpenWireOnboardingHelp !== undefined ? (
                 <button

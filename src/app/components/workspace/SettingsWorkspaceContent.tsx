@@ -14,6 +14,7 @@ import type {
   SortField,
   TableDensity,
   TableFontSize,
+  TabularExportFormat,
   WorkspaceCurrencyCode,
   WorkspacePanelsLayoutMode
 } from "../../types/app-controller";
@@ -51,6 +52,8 @@ interface SettingsWorkspaceContentProps {
   setWorkspaceTaxEnabled: (value: boolean) => void;
   workspaceTaxRatePercent: number;
   setWorkspaceTaxRatePercent: (value: number) => void;
+  tabularExportFormat: TabularExportFormat;
+  setTabularExportFormat: (value: TabularExportFormat) => void;
   defaultWireSectionMm2: number;
   setDefaultWireSectionMm2: (value: number) => void;
   defaultAutoCreateLinkedNodes: boolean;
@@ -155,6 +158,8 @@ export function SettingsWorkspaceContent({
   setWorkspaceTaxEnabled,
   workspaceTaxRatePercent,
   setWorkspaceTaxRatePercent,
+  tabularExportFormat,
+  setTabularExportFormat,
   defaultWireSectionMm2,
   setDefaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
@@ -694,6 +699,13 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setWorkspaceTaxEnabled(event.target.checked)}
             />
             Enable tax / VAT (TVA)
+          </label>
+          <label className="settings-field">
+            Tabular export format
+            <select value={tabularExportFormat} onChange={(event) => setTabularExportFormat(event.target.value as TabularExportFormat)}>
+              <option value="csv">CSV</option>
+              <option value="xlsx">XLSX</option>
+            </select>
           </label>
           <label className="settings-field">
             Tax rate (%)

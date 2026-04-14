@@ -85,14 +85,18 @@ export function useEntityFormsState() {
   const [wireFuseEnabled, setWireFuseEnabled] = useState(false);
   const [wireFuseCatalogItemId, setWireFuseCatalogItemId] = useState("");
   const [wireEndpointAConnectionReference, setWireEndpointAConnectionReference] = useState("");
+  const [wireEndpointAConnectionName, setWireEndpointAConnectionName] = useState("");
   const [wireEndpointASealReference, setWireEndpointASealReference] = useState("");
+  const [wireEndpointASealName, setWireEndpointASealName] = useState("");
   const [wireEndpointAKind, setWireEndpointAKind] = useState<WireEndpoint["kind"]>("connectorCavity");
   const [wireEndpointAConnectorId, setWireEndpointAConnectorId] = useState("");
   const [wireEndpointACavityIndex, setWireEndpointACavityIndex] = useState("1");
   const [wireEndpointASpliceId, setWireEndpointASpliceId] = useState("");
   const [wireEndpointAPortIndex, setWireEndpointAPortIndex] = useState("1");
   const [wireEndpointBConnectionReference, setWireEndpointBConnectionReference] = useState("");
+  const [wireEndpointBConnectionName, setWireEndpointBConnectionName] = useState("");
   const [wireEndpointBSealReference, setWireEndpointBSealReference] = useState("");
+  const [wireEndpointBSealName, setWireEndpointBSealName] = useState("");
   const [wireEndpointBKind, setWireEndpointBKind] = useState<WireEndpoint["kind"]>("splicePort");
   const [wireEndpointBConnectorId, setWireEndpointBConnectorId] = useState("");
   const [wireEndpointBCavityIndex, setWireEndpointBCavityIndex] = useState("1");
@@ -236,8 +240,12 @@ export function useEntityFormsState() {
     setWireFuseCatalogItemId,
     wireEndpointAConnectionReference,
     setWireEndpointAConnectionReference,
+    wireEndpointAConnectionName,
+    setWireEndpointAConnectionName,
     wireEndpointASealReference,
     setWireEndpointASealReference,
+    wireEndpointASealName,
+    setWireEndpointASealName,
     wireEndpointAKind,
     setWireEndpointAKind,
     wireEndpointAConnectorId,
@@ -250,8 +258,12 @@ export function useEntityFormsState() {
     setWireEndpointAPortIndex,
     wireEndpointBConnectionReference,
     setWireEndpointBConnectionReference,
+    wireEndpointBConnectionName,
+    setWireEndpointBConnectionName,
     wireEndpointBSealReference,
     setWireEndpointBSealReference,
+    wireEndpointBSealName,
+    setWireEndpointBSealName,
     wireEndpointBKind,
     setWireEndpointBKind,
     wireEndpointBConnectorId,

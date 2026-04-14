@@ -9,6 +9,7 @@ interface UseAppControllerModelingHandlersAssemblyParams {
   state: ModelingHandlersParams["state"];
   dispatchAction: ModelingHandlersParams["dispatchAction"];
   confirmAction: ModelingHandlersParams["confirmAction"];
+  choiceAction: ModelingHandlersParams["choiceAction"];
   formsState: EntityFormsStateModel;
   pendingNewNodePosition: ModelingHandlersParams["pendingNewNodePosition"];
   setPendingNewNodePosition: ModelingHandlersParams["setPendingNewNodePosition"];
@@ -26,6 +27,7 @@ export function useAppControllerModelingHandlersAssembly({
   state,
   dispatchAction,
   confirmAction,
+  choiceAction,
   formsState,
   pendingNewNodePosition,
   setPendingNewNodePosition,
@@ -42,6 +44,7 @@ export function useAppControllerModelingHandlersAssembly({
     state,
     dispatchAction,
     confirmAction,
+    choiceAction,
     connectorFormMode: formsState.connectorFormMode,
     setConnectorFormMode: formsState.setConnectorFormMode,
     connectorEditAfterCreate: formsState.connectorEditAfterCreate,
@@ -157,8 +160,12 @@ export function useAppControllerModelingHandlersAssembly({
     setWireFuseCatalogItemId: formsState.setWireFuseCatalogItemId,
     wireEndpointAConnectionReference: formsState.wireEndpointAConnectionReference,
     setWireEndpointAConnectionReference: formsState.setWireEndpointAConnectionReference,
+    wireEndpointAConnectionName: formsState.wireEndpointAConnectionName,
+    setWireEndpointAConnectionName: formsState.setWireEndpointAConnectionName,
     wireEndpointASealReference: formsState.wireEndpointASealReference,
     setWireEndpointASealReference: formsState.setWireEndpointASealReference,
+    wireEndpointASealName: formsState.wireEndpointASealName,
+    setWireEndpointASealName: formsState.setWireEndpointASealName,
     wireEndpointAKind: formsState.wireEndpointAKind,
     setWireEndpointAKind: formsState.setWireEndpointAKind,
     wireEndpointAConnectorId: formsState.wireEndpointAConnectorId,
@@ -171,8 +178,12 @@ export function useAppControllerModelingHandlersAssembly({
     setWireEndpointAPortIndex: formsState.setWireEndpointAPortIndex,
     wireEndpointBConnectionReference: formsState.wireEndpointBConnectionReference,
     setWireEndpointBConnectionReference: formsState.setWireEndpointBConnectionReference,
+    wireEndpointBConnectionName: formsState.wireEndpointBConnectionName,
+    setWireEndpointBConnectionName: formsState.setWireEndpointBConnectionName,
     wireEndpointBSealReference: formsState.wireEndpointBSealReference,
     setWireEndpointBSealReference: formsState.setWireEndpointBSealReference,
+    wireEndpointBSealName: formsState.wireEndpointBSealName,
+    setWireEndpointBSealName: formsState.setWireEndpointBSealName,
     wireEndpointBKind: formsState.wireEndpointBKind,
     setWireEndpointBKind: formsState.setWireEndpointBKind,
     wireEndpointBConnectorId: formsState.wireEndpointBConnectorId,
