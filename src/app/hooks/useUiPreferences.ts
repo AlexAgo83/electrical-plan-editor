@@ -741,6 +741,8 @@ export function useUiPreferences({
     setSpliceSynthesisSort,
     setTableDensity,
     setTableFontSize,
+    setTabularExportFormat,
+    setBomExportCompactColumns,
     setWorkspaceCurrencyCode,
     setWorkspaceTaxEnabled,
     setWorkspaceTaxRatePercent,
