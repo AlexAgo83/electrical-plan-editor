@@ -158,6 +158,88 @@ function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
+interface NetworkSummaryViewMenuProps {
+  showNetworkInfoPanels: boolean;
+  showSegmentLengths: boolean;
+  showCableCallouts: boolean;
+  toggleShowNetworkInfoPanels: () => void;
+  toggleShowSegmentLengths: () => void;
+  toggleShowCableCallouts: () => void;
+}
+
+function NetworkSummaryViewMenu({
+  showNetworkInfoPanels,
+  showSegmentLengths,
+  showCableCallouts,
+  toggleShowNetworkInfoPanels,
+  toggleShowSegmentLengths,
+  toggleShowCableCallouts
+}: NetworkSummaryViewMenuProps): ReactElement {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const anyActive = showNetworkInfoPanels || showSegmentLengths || showCableCallouts;
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current !== null && !wrapperRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div ref={wrapperRef} className="network-summary-view-menu-wrapper">
+      <button
+        type="button"
+        className={anyActive ? "workspace-tab is-active" : "workspace-tab"}
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-haspopup="menu"
+      >
+        <span className="network-summary-view-icon" aria-hidden="true" />
+        View
+      </button>
+      {open && (
+        <div className="network-summary-view-menu" role="menu">
+          <button
+            type="button"
+            role="menuitemcheckbox"
+            aria-checked={showNetworkInfoPanels}
+            className={showNetworkInfoPanels ? "network-summary-view-menu-item is-active" : "network-summary-view-menu-item"}
+            onClick={toggleShowNetworkInfoPanels}
+          >
+            <span className="network-summary-info-icon" aria-hidden="true" />
+            Info panels
+          </button>
+          <button
+            type="button"
+            role="menuitemcheckbox"
+            aria-checked={showSegmentLengths}
+            className={showSegmentLengths ? "network-summary-view-menu-item is-active" : "network-summary-view-menu-item"}
+            onClick={toggleShowSegmentLengths}
+          >
+            <span className="network-summary-length-icon" aria-hidden="true" />
+            Segment lengths
+          </button>
+          <button
+            type="button"
+            role="menuitemcheckbox"
+            aria-checked={showCableCallouts}
+            className={showCableCallouts ? "network-summary-view-menu-item is-active" : "network-summary-view-menu-item"}
+            onClick={toggleShowCableCallouts}
+          >
+            <span className="network-summary-callouts-icon" aria-hidden="true" />
+            Callouts
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function NetworkSummaryPanel({
   handleZoomAction,
   fitNetworkToContent,
@@ -813,30 +895,14 @@ export function NetworkSummaryPanel({
         <header className="network-summary-header">
           <h2>Network summary</h2>
           <div className="network-summary-header-actions" role="group" aria-label="Network summary display options">
-            <button
-              type="button"
-              className={showNetworkInfoPanels ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={toggleShowNetworkInfoPanels}
-            >
-              <span className="network-summary-info-icon" aria-hidden="true" />
-              Info
-            </button>
-            <button
-              type="button"
-              className={showSegmentLengths ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={toggleShowSegmentLengths}
-            >
-              <span className="network-summary-length-icon" aria-hidden="true" />
-              Length
-            </button>
-            <button
-              type="button"
-              className={showCableCallouts ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={toggleShowCableCallouts}
-            >
-              <span className="network-summary-callouts-icon" aria-hidden="true" />
-              Callouts
-            </button>
+            <NetworkSummaryViewMenu
+              showNetworkInfoPanels={showNetworkInfoPanels}
+              showSegmentLengths={showSegmentLengths}
+              showCableCallouts={showCableCallouts}
+              toggleShowNetworkInfoPanels={toggleShowNetworkInfoPanels}
+              toggleShowSegmentLengths={toggleShowSegmentLengths}
+              toggleShowCableCallouts={toggleShowCableCallouts}
+            />
             <button
               type="button"
               className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}

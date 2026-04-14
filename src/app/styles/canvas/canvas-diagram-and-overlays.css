@@ -123,6 +123,53 @@
 .network-summary-mobile-unavailable {
   display: none;
 }
+
+.network-summary-view-menu-wrapper {
+  position: relative;
+}
+
+.network-summary-view-menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 11rem;
+  padding: 0.35rem;
+  border: 1px solid #9eb7cc;
+  border-radius: 0.6rem;
+  background: #f3f8fc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.network-summary-view-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: #17374e;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+.network-summary-view-menu-item:hover {
+  background: #e4eef6;
+  border-color: #b8cfdf;
+}
+
+.network-summary-view-menu-item.is-active {
+  background: #d0e8f5;
+  border-color: #7aadcc;
+  font-weight: 500;
+}
 @media (max-width: 900px) {
   .network-summary-header {
     flex-direction: column;
