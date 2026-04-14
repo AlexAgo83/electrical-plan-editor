@@ -35,6 +35,8 @@ import type {
 import { NetworkCanvasFloatingInfoPanels } from "./network-summary/NetworkCanvasFloatingInfoPanels";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
 import { NetworkSummaryLegend } from "./network-summary/NetworkSummaryLegend";
+import { NetworkSummaryViewMenu } from "./network-summary/NetworkSummaryViewMenu";
+import { NetworkSummaryExportMenu } from "./network-summary/NetworkSummaryExportMenu";
 import { NetworkSummaryQuickEntityNavigation } from "./network-summary/NetworkSummaryQuickEntityNavigation";
 import {
   buildCableCalloutViewModels,
@@ -815,30 +817,6 @@ export function NetworkSummaryPanel({
           <div className="network-summary-header-actions" role="group" aria-label="Network summary display options">
             <button
               type="button"
-              className={showNetworkInfoPanels ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={toggleShowNetworkInfoPanels}
-            >
-              <span className="network-summary-info-icon" aria-hidden="true" />
-              Info
-            </button>
-            <button
-              type="button"
-              className={showSegmentLengths ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={toggleShowSegmentLengths}
-            >
-              <span className="network-summary-length-icon" aria-hidden="true" />
-              Length
-            </button>
-            <button
-              type="button"
-              className={showCableCallouts ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={toggleShowCableCallouts}
-            >
-              <span className="network-summary-callouts-icon" aria-hidden="true" />
-              Callouts
-            </button>
-            <button
-              type="button"
               className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}
               onClick={toggleShowNetworkGrid}
             >
@@ -861,24 +839,21 @@ export function NetworkSummaryPanel({
               <span className="network-summary-lock-move-icon" aria-hidden="true" />
               Lock
             </button>
-            <button
-              type="button"
-              className="workspace-tab network-summary-export-button"
-              onClick={handleExportPlan}
-              disabled={nodes.length === 0}
-            >
-              <span className="network-summary-export-icon" aria-hidden="true" />
-              {canvasExportFormat.toUpperCase()}
-            </button>
-            <button
-              type="button"
-              className="workspace-tab network-summary-export-button"
-              onClick={onExportBomCsv}
-              disabled={!canExportBomCsv}
-            >
-              <span className="table-export-icon" aria-hidden="true" />
-              BOM
-            </button>
+            <NetworkSummaryViewMenu
+              showNetworkInfoPanels={showNetworkInfoPanels}
+              showSegmentLengths={showSegmentLengths}
+              showCableCallouts={showCableCallouts}
+              toggleShowNetworkInfoPanels={toggleShowNetworkInfoPanels}
+              toggleShowSegmentLengths={toggleShowSegmentLengths}
+              toggleShowCableCallouts={toggleShowCableCallouts}
+            />
+            <NetworkSummaryExportMenu
+              canvasExportFormat={canvasExportFormat}
+              canExportCanvas={nodes.length > 0}
+              canExportBomCsv={canExportBomCsv}
+              onExportCanvas={handleExportPlan}
+              onExportBomCsv={onExportBomCsv}
+            />
           </div>
         </header>
         <div className="network-summary-canvas-region">

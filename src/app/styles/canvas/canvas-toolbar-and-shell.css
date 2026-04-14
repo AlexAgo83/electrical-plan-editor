@@ -108,6 +108,15 @@
   mask: url("/icons/export_plan.svg") center / contain no-repeat;
 }
 
+.network-summary-view-icon {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex: 0 0 0.85rem;
+  background: currentColor;
+  -webkit-mask: url("/icons/view.svg") center / contain no-repeat;
+  mask: url("/icons/view.svg") center / contain no-repeat;
+}
+
 .canvas-toolbar > span {
   font-size: 0.85rem;
   color: #3d596d;

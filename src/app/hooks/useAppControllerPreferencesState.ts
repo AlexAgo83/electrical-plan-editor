@@ -13,6 +13,7 @@ import type {
   SortState,
   TableDensity,
   TableFontSize,
+  TabularExportFormat,
   WorkspaceCurrencyCode,
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
@@ -25,6 +26,8 @@ export function useAppControllerPreferencesState() {
   const [workspaceCurrencyCode, setWorkspaceCurrencyCode] = useState<WorkspaceCurrencyCode>("EUR");
   const [workspaceTaxEnabled, setWorkspaceTaxEnabled] = useState(true);
   const [workspaceTaxRatePercent, setWorkspaceTaxRatePercent] = useState(20);
+  const [tabularExportFormat, setTabularExportFormat] = useState<TabularExportFormat>("csv");
+  const [bomExportCompactColumns, setBomExportCompactColumns] = useState(false);
   const [defaultWireSectionMm2, setDefaultWireSectionMm2] = useState(0.5);
   const [defaultAutoCreateLinkedNodes, setDefaultAutoCreateLinkedNodes] = useState(true);
   const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
@@ -77,6 +80,10 @@ export function useAppControllerPreferencesState() {
     setWorkspaceTaxEnabled,
     workspaceTaxRatePercent,
     setWorkspaceTaxRatePercent,
+    tabularExportFormat,
+    setTabularExportFormat,
+    bomExportCompactColumns,
+    setBomExportCompactColumns,
     defaultWireSectionMm2,
     setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,

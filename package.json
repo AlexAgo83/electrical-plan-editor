@@ -1,6 +1,6 @@
 {
   "name": "electrical-plan-editor",
-  "version": "1.4.4",
+  "version": "1.6.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -31,6 +31,7 @@
     "ci:local": "npm run -s ci:blocking"
   },
   "dependencies": {
+    "exceljs": "^4.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",

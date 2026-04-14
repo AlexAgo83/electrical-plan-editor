@@ -7,6 +7,13 @@ import {
   switchScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 
+function openViewMenu(panel: HTMLElement): void {
+  const viewButton = within(panel).getByRole("button", { name: "View" });
+  if (viewButton.getAttribute("aria-expanded") !== "true") {
+    fireEvent.click(viewButton);
+  }
+}
+
 describe("App integration UI - network summary layering", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -78,6 +85,7 @@ describe("App integration UI - network summary layering", () => {
     switchScreenDrawerAware("analysis");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     const lengthToggleButton = within(networkSummaryPanel).getByRole("button", { name: "Length" });
     if (lengthToggleButton.classList.contains("is-active")) {
       fireEvent.click(lengthToggleButton);

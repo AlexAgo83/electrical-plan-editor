@@ -23,7 +23,7 @@ import { findShortestRoute } from "../../core/pathfinding";
 import { computeRecommendedWireSectionMm2, normalizeWireCurrentA, resolveWireMaterial } from "../../core/wireSizing";
 import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
 import { suggestNextWireTechnicalId } from "../lib/technical-id-suggestions";
-import type { ConfirmDialogRequest } from "../types/confirm-dialog";
+import type { ChoiceDialogRequest, ConfirmDialogRequest } from "../types/confirm-dialog";
 import {
   findNextAvailableConnectorWay,
   findNextAvailableSplicePort,
@@ -31,6 +31,7 @@ import {
   getSplicePortOccupant
 } from "../lib/wire-endpoint-slot-helpers";
 import { findNodeIdForEndpoint } from "../../store/reducer/helpers/wireTransitions";
+import { buildWireEndpointReferenceNameLookup, normalizeWireEndpointReferenceName } from "../../core/wireReferences";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -43,6 +44,7 @@ interface UseWireHandlersParams {
   store: AppStore;
   dispatchAction: DispatchAction;
   confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
+  choiceAction: (request: ChoiceDialogRequest) => Promise<string | null>;
   wireFormMode: "idle" | "create" | "edit";
   setWireFormMode: (mode: "idle" | "create" | "edit") => void;
   wireEditAfterCreate: boolean;
@@ -73,8 +75,12 @@ interface UseWireHandlersParams {
   setWireFuseCatalogItemId: (value: string) => void;
   wireEndpointAConnectionReference: string;
   setWireEndpointAConnectionReference: (value: string) => void;
+  wireEndpointAConnectionName: string;
+  setWireEndpointAConnectionName: (value: string) => void;
   wireEndpointASealReference: string;
   setWireEndpointASealReference: (value: string) => void;
+  wireEndpointASealName: string;
+  setWireEndpointASealName: (value: string) => void;
   wireEndpointAKind: WireEndpoint["kind"];
   setWireEndpointAKind: (value: WireEndpoint["kind"]) => void;
   wireEndpointAConnectorId: string;
@@ -87,8 +93,12 @@ interface UseWireHandlersParams {
   setWireEndpointAPortIndex: (value: string) => void;
   wireEndpointBConnectionReference: string;
   setWireEndpointBConnectionReference: (value: string) => void;
+  wireEndpointBConnectionName: string;
+  setWireEndpointBConnectionName: (value: string) => void;
   wireEndpointBSealReference: string;
   setWireEndpointBSealReference: (value: string) => void;
+  wireEndpointBSealName: string;
+  setWireEndpointBSealName: (value: string) => void;
   wireEndpointBKind: WireEndpoint["kind"];
   setWireEndpointBKind: (value: WireEndpoint["kind"]) => void;
   wireEndpointBConnectorId: string;
@@ -111,10 +121,15 @@ export interface WireEndpointSlotHint {
   message: string;
 }
 
+interface WireEndpointReferenceSyncPlan {
+  apply: () => void;
+}
+
 export function useWireHandlers({
   store,
   dispatchAction,
   confirmAction,
+  choiceAction,
   wireFormMode,
   setWireFormMode,
   wireEditAfterCreate: _wireEditAfterCreate,
@@ -145,8 +160,12 @@ export function useWireHandlers({
   setWireFuseCatalogItemId,
   wireEndpointAConnectionReference,
   setWireEndpointAConnectionReference,
+  wireEndpointAConnectionName,
+  setWireEndpointAConnectionName,
   wireEndpointASealReference,
   setWireEndpointASealReference,
+  wireEndpointASealName,
+  setWireEndpointASealName,
   wireEndpointAKind,
   setWireEndpointAKind,
   wireEndpointAConnectorId,
@@ -159,8 +178,12 @@ export function useWireHandlers({
   setWireEndpointAPortIndex,
   wireEndpointBConnectionReference,
   setWireEndpointBConnectionReference,
+  wireEndpointBConnectionName,
+  setWireEndpointBConnectionName,
   wireEndpointBSealReference,
   setWireEndpointBSealReference,
+  wireEndpointBSealName,
+  setWireEndpointBSealName,
   wireEndpointBKind,
   setWireEndpointBKind,
   wireEndpointBConnectorId,
@@ -200,6 +223,150 @@ export function useWireHandlers({
     }
 
     return normalized;
+  };
+
+  const resolveWireEndpointReferenceName = (
+    reference: string | undefined,
+    inputName: string,
+    kind: "connection" | "seal",
+    lookup: ReturnType<typeof buildWireEndpointReferenceNameLookup>
+  ): string | undefined => {
+    const normalizedInputName = normalizeWireEndpointReferenceName(inputName);
+    if (normalizedInputName !== undefined) {
+      return normalizedInputName;
+    }
+
+    const normalizedReference = normalizeWireEndpointReferenceInput(reference ?? "");
+    if (normalizedReference === undefined) {
+      return undefined;
+    }
+
+    return kind === "connection" ? lookup.connection.get(normalizedReference) : lookup.seal.get(normalizedReference);
+  };
+
+  const normalizeWireEndpointReferenceNames = (nextName: string | readonly string[] | undefined): string[] => {
+    const values = Array.isArray(nextName) ? nextName : [nextName];
+    const normalizedNames: string[] = [];
+    for (const value of values) {
+      const normalized = normalizeWireEndpointReferenceName(value);
+      if (normalized === undefined || normalizedNames.includes(normalized)) {
+        continue;
+      }
+      normalizedNames.push(normalized);
+    }
+    return normalizedNames;
+  };
+
+  const syncWireEndpointReferenceName = (
+    kind: "connection" | "seal",
+    reference: string | undefined,
+    nextName: string | readonly string[] | undefined,
+    options?: {
+      excludeWireId?: WireId;
+      onResolvedName?: (resolvedName: string | undefined) => void;
+    }
+  ): boolean | WireEndpointReferenceSyncPlan | Promise<WireEndpointReferenceSyncPlan | false> => {
+    const normalizedReference = normalizeWireEndpointReferenceInput(reference ?? "");
+    if (normalizedReference === undefined) {
+      return true;
+    }
+
+    const normalizedNextNames = normalizeWireEndpointReferenceNames(nextName);
+    const wiresSnapshot = store.getState().wires;
+    const matchingWires = wiresSnapshot.allIds
+      .map((wireId) => wiresSnapshot.byId[wireId])
+      .filter((wire): wire is Wire => wire !== undefined)
+      .filter((wire) => options?.excludeWireId !== wire.id)
+      .filter((wire) => {
+        const endpoints =
+          kind === "connection"
+            ? [wire.endpointAConnectionReference, wire.endpointBConnectionReference]
+            : [wire.endpointASealReference, wire.endpointBSealReference];
+        return endpoints.some((endpointReference) => normalizeWireEndpointReferenceInput(endpointReference ?? "") === normalizedReference);
+      });
+
+    const existingNames = new Set<string>();
+    for (const wire of matchingWires) {
+      const wireNames =
+        kind === "connection"
+          ? [normalizeWireEndpointReferenceName(wire.endpointAConnectionName), normalizeWireEndpointReferenceName(wire.endpointBConnectionName)]
+          : [normalizeWireEndpointReferenceName(wire.endpointASealName), normalizeWireEndpointReferenceName(wire.endpointBSealName)];
+      for (const wireName of wireNames) {
+        if (wireName !== undefined) {
+          existingNames.add(wireName);
+        }
+      }
+    }
+
+    const createPlan = (resolvedName: string | undefined): WireEndpointReferenceSyncPlan => ({
+      apply: () => {
+        options?.onResolvedName?.(resolvedName);
+
+        if (matchingWires.length === 0) {
+          return;
+        }
+
+        for (const wire of matchingWires) {
+          const nextWire = {
+            ...wire,
+            ...(kind === "connection"
+              ? {
+                  endpointAConnectionName: resolvedName,
+                  endpointBConnectionName: resolvedName
+                }
+              : {
+                  endpointASealName: resolvedName,
+                  endpointBSealName: resolvedName
+                })
+          };
+          dispatchAction(appActions.saveWire(nextWire), { trackHistory: false });
+        }
+      }
+    });
+
+    if (normalizedNextNames.length === 0) {
+      return createPlan(undefined);
+    }
+
+    const candidateNames = [...normalizedNextNames];
+    for (const wireName of existingNames) {
+      if (!candidateNames.includes(wireName)) {
+        candidateNames.push(wireName);
+      }
+    }
+
+    if (candidateNames.length === 1) {
+      return createPlan(candidateNames[0]);
+    }
+
+    const visibleChoiceNames = candidateNames.slice(0, 3);
+    const details =
+      candidateNames.length > visibleChoiceNames.length
+        ? `Showing ${visibleChoiceNames.length} overwrite proposals out of ${candidateNames.length} detected names.`
+        : `Detected names: ${candidateNames.join(", ")}.`;
+
+    return choiceAction({
+      title: `Choose ${kind} name`,
+      message: `Reference '${normalizedReference}' has ${candidateNames.length} conflicting name${candidateNames.length > 1 ? "s" : ""}. Choose the one to keep.`,
+      details,
+      discardLabel: "Discard",
+      options: visibleChoiceNames.map((name) => ({
+        id: name,
+        label: name
+      })),
+      closeOnBackdrop: true
+    }).then((choiceId) => {
+      if (choiceId === null) {
+        return false;
+      }
+
+      const selectedName = visibleChoiceNames.find((name) => name === choiceId);
+      if (selectedName === undefined) {
+        return false;
+      }
+
+      return createPlan(selectedName);
+    });
   };
 
   const computeEndpointSlotHint = (side: "A" | "B"): WireEndpointSlotHint | null => {
@@ -565,14 +732,18 @@ export function useWireHandlers({
     setWireFuseEnabled(false);
     setWireFuseCatalogItemId("");
     setWireEndpointAConnectionReference("");
+    setWireEndpointAConnectionName("");
     setWireEndpointASealReference("");
+    setWireEndpointASealName("");
     setWireEndpointAKind("connectorCavity");
     setWireEndpointAConnectorId("");
     setWireEndpointACavityIndex("1");
     setWireEndpointASpliceId("");
     setWireEndpointAPortIndex("1");
     setWireEndpointBConnectionReference("");
+    setWireEndpointBConnectionName("");
     setWireEndpointBSealReference("");
+    setWireEndpointBSealName("");
     setWireEndpointBKind("splicePort");
     setWireEndpointBConnectorId("");
     setWireEndpointBCavityIndex("1");
@@ -638,7 +809,9 @@ export function useWireHandlers({
     const nextEndpointAPortIndex = wireEndpointBPortIndex;
 
     setWireEndpointAConnectionReference(nextEndpointAConnectionReference);
+    setWireEndpointAConnectionName(wireEndpointBConnectionName);
     setWireEndpointASealReference(nextEndpointASealReference);
+    setWireEndpointASealName(wireEndpointBSealName);
     setWireEndpointAKind(nextEndpointAKind);
     setWireEndpointAConnectorId(nextEndpointAConnectorId);
     setWireEndpointACavityIndex(nextEndpointACavityIndex);
@@ -646,7 +819,9 @@ export function useWireHandlers({
     setWireEndpointAPortIndex(nextEndpointAPortIndex);
 
     setWireEndpointBConnectionReference(wireEndpointAConnectionReference);
+    setWireEndpointBConnectionName(wireEndpointAConnectionName);
     setWireEndpointBSealReference(wireEndpointASealReference);
+    setWireEndpointBSealName(wireEndpointASealName);
     setWireEndpointBKind(wireEndpointAKind);
     setWireEndpointBConnectorId(wireEndpointAConnectorId);
     setWireEndpointBCavityIndex(wireEndpointACavityIndex);
@@ -685,9 +860,13 @@ export function useWireHandlers({
       setWireFreeColorLabel("");
     }
     setWireEndpointAConnectionReference(wire.endpointAConnectionReference ?? "");
+    setWireEndpointAConnectionName(wire.endpointAConnectionName ?? "");
     setWireEndpointASealReference(wire.endpointASealReference ?? "");
+    setWireEndpointASealName(wire.endpointASealName ?? "");
     setWireEndpointBConnectionReference(wire.endpointBConnectionReference ?? "");
+    setWireEndpointBConnectionName(wire.endpointBConnectionName ?? "");
     setWireEndpointBSealReference(wire.endpointBSealReference ?? "");
+    setWireEndpointBSealName(wire.endpointBSealName ?? "");
     if (wire.protection?.kind === "fuse") {
       setWireFuseEnabled(true);
       setWireFuseCatalogItemId(wire.protection.catalogItemId);
@@ -855,6 +1034,25 @@ export function useWireHandlers({
     const endpointASealReference = normalizeWireEndpointReferenceInput(wireEndpointASealReference);
     const endpointBConnectionReference = normalizeWireEndpointReferenceInput(wireEndpointBConnectionReference);
     const endpointBSealReference = normalizeWireEndpointReferenceInput(wireEndpointBSealReference);
+    const referenceNameLookup = buildWireEndpointReferenceNameLookup(
+      store.getState().wires.allIds
+        .map((wireId) => store.getState().wires.byId[wireId])
+        .filter((wire): wire is Wire => wire !== undefined)
+    );
+    let endpointAConnectionName = resolveWireEndpointReferenceName(
+      endpointAConnectionReference,
+      wireEndpointAConnectionName,
+      "connection",
+      referenceNameLookup
+    );
+    let endpointASealName = resolveWireEndpointReferenceName(endpointASealReference, wireEndpointASealName, "seal", referenceNameLookup);
+    let endpointBConnectionName = resolveWireEndpointReferenceName(
+      endpointBConnectionReference,
+      wireEndpointBConnectionName,
+      "connection",
+      referenceNameLookup
+    );
+    let endpointBSealName = resolveWireEndpointReferenceName(endpointBSealReference, wireEndpointBSealName, "seal", referenceNameLookup);
     if (
       (endpointAConnectionReference?.length ?? 0) > 120 ||
       (endpointASealReference?.length ?? 0) > 120 ||
@@ -878,40 +1076,148 @@ export function useWireHandlers({
 
     setWireFormError(null);
 
-    const wasCreateMode = wireFormMode === "create";
-    const wireId = wireFormMode === "edit" && editingWireId !== null ? editingWireId : (createEntityId("wire") as WireId);
-    dispatchAction(
-      appActions.saveWire({
-        id: wireId,
-        name: normalizedName,
-        technicalId: normalizedTechnicalId,
-        sectionMm2: parsedSectionMm2,
-        currentA: normalizedCurrentA,
-        material: resolveWireMaterial(wireMaterial),
-        colorMode: normalizedColors.colorMode,
-        primaryColorId: normalizedColors.primaryColorId,
-        secondaryColorId: normalizedColors.secondaryColorId,
-        freeColorLabel: normalizedColors.freeColorLabel,
-        endpointAConnectionReference,
-        endpointASealReference,
-        endpointBConnectionReference,
-        endpointBSealReference,
-        protection,
-        endpointA,
-        endpointB
-      })
-    );
-
-    const nextState = store.getState();
-    const savedWire = nextState.wires.byId[wireId];
-    if (savedWire !== undefined) {
-      if (wasCreateMode) {
-        startWireEdit(savedWire, true);
+    const endpointReferenceGroups = new Map<
+      string,
+      {
+        kind: "connection" | "seal";
+        reference: string;
+        nextNames: string[];
+        resolvedNameCallbacks: Array<(resolvedName: string | undefined) => void>;
+      }
+    >();
+    const registerReferenceGroup = (
+      kind: "connection" | "seal",
+      reference: string | undefined,
+      nextName: string | undefined,
+      onResolvedName: (resolvedName: string | undefined) => void
+    ): void => {
+      const normalizedReference = normalizeWireEndpointReferenceInput(reference ?? "");
+      if (normalizedReference === undefined) {
         return;
       }
-      startWireEdit(savedWire);
-      focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-wires"]');
+
+      const groupKey = `${kind}:${normalizedReference}`;
+      const existingGroup = endpointReferenceGroups.get(groupKey);
+      const group =
+        existingGroup ??
+        (() => {
+          const created = {
+            kind,
+            reference: normalizedReference,
+            nextNames: [] as string[],
+            resolvedNameCallbacks: [] as Array<(resolvedName: string | undefined) => void>
+          };
+          endpointReferenceGroups.set(groupKey, created);
+          return created;
+        })();
+      const normalizedNextName = normalizeWireEndpointReferenceName(nextName);
+      if (normalizedNextName !== undefined && !group.nextNames.includes(normalizedNextName)) {
+        group.nextNames.push(normalizedNextName);
+      }
+      group.resolvedNameCallbacks.push(onResolvedName);
+    };
+
+    registerReferenceGroup("connection", endpointAConnectionReference, endpointAConnectionName, (resolvedName) => {
+      endpointAConnectionName = resolvedName;
+    });
+    registerReferenceGroup("seal", endpointASealReference, endpointASealName, (resolvedName) => {
+      endpointASealName = resolvedName;
+    });
+    registerReferenceGroup("connection", endpointBConnectionReference, endpointBConnectionName, (resolvedName) => {
+      endpointBConnectionName = resolvedName;
+    });
+    registerReferenceGroup("seal", endpointBSealReference, endpointBSealName, (resolvedName) => {
+      endpointBSealName = resolvedName;
+    });
+
+    const wasCreateMode = wireFormMode === "create";
+    const wireId = wireFormMode === "edit" && editingWireId !== null ? editingWireId : (createEntityId("wire") as WireId);
+    const excludeWireId = wireFormMode === "edit" ? wireId : undefined;
+    const syncResults = [...endpointReferenceGroups.values()].map((group) =>
+      syncWireEndpointReferenceName(group.kind, group.reference, group.nextNames, {
+        excludeWireId,
+        onResolvedName: (resolvedName) => {
+          for (const callback of group.resolvedNameCallbacks) {
+            callback(resolvedName);
+          }
+        }
+      })
+    );
+    const isPromiseLikeSyncResult = (
+      value: boolean | WireEndpointReferenceSyncPlan | Promise<WireEndpointReferenceSyncPlan | false>
+    ): value is Promise<WireEndpointReferenceSyncPlan | false> => {
+      return typeof value === "object" && value !== null && "then" in value;
+    };
+
+    const saveCurrentWire = (): void => {
+      dispatchAction(
+        appActions.saveWire({
+          id: wireId,
+          name: normalizedName,
+          technicalId: normalizedTechnicalId,
+          sectionMm2: parsedSectionMm2,
+          currentA: normalizedCurrentA,
+          material: resolveWireMaterial(wireMaterial),
+          colorMode: normalizedColors.colorMode,
+          primaryColorId: normalizedColors.primaryColorId,
+          secondaryColorId: normalizedColors.secondaryColorId,
+          freeColorLabel: normalizedColors.freeColorLabel,
+          endpointAConnectionReference,
+          endpointAConnectionName,
+          endpointASealReference,
+          endpointASealName,
+          endpointBConnectionReference,
+          endpointBConnectionName,
+          endpointBSealReference,
+          endpointBSealName,
+          protection,
+          endpointA,
+          endpointB
+        })
+      );
+
+      const nextState = store.getState();
+      const savedWire = nextState.wires.byId[wireId];
+      if (savedWire !== undefined) {
+        if (wasCreateMode) {
+          startWireEdit(savedWire, true);
+          return;
+        }
+        startWireEdit(savedWire);
+        focusSelectedTableRowInPanel('[data-onboarding-panel="modeling-wires"]');
+      }
+    };
+
+    if (syncResults.every((result) => !isPromiseLikeSyncResult(result))) {
+      if (syncResults.some((result) => result === false)) {
+        return;
+      }
+
+      for (const result of syncResults) {
+        if (!isPromiseLikeSyncResult(result) && result !== false && result !== true) {
+          result.apply();
+        }
+      }
+      saveCurrentWire();
+      return;
     }
+
+    void (async () => {
+      const resolvedResults: Array<boolean | WireEndpointReferenceSyncPlan> = await Promise.all(
+        syncResults.map(async (result): Promise<boolean | WireEndpointReferenceSyncPlan> => await result)
+      );
+      if (resolvedResults.some((result) => result === false)) {
+        return;
+      }
+
+      for (const result of resolvedResults) {
+        if (!isPromiseLikeSyncResult(result) && result !== false && result !== true) {
+          result.apply();
+        }
+      }
+
+      saveCurrentWire();
+    })();
   }
 
   function handleWireDelete(wireId: WireId): void {
@@ -1024,6 +1330,7 @@ export function useWireHandlers({
     wireEndpointBSlotHint: computeEndpointSlotHint("B"),
     recommendedWireSectionMm2,
     handleApplyRecommendedWireSection,
+    syncWireEndpointReferenceName,
     handleWireSubmit,
     handleSwapWireEndpoints,
     handleWireDelete,

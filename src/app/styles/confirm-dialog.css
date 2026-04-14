@@ -90,6 +90,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .confirm-dialog-cancel {
@@ -106,6 +107,14 @@
   color: inherit;
   border-radius: 0.5rem;
   padding: 0.35rem 0.7rem;
+}
+
+.confirm-dialog-choice-actions {
+  align-items: stretch;
+}
+
+.confirm-dialog-choice-button {
+  min-width: 7rem;
 }
 
 .confirm-dialog.is-warning .confirm-dialog-confirm {

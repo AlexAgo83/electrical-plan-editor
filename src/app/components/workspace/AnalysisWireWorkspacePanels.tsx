@@ -3,7 +3,7 @@ import { getWireColorLabel, getWireColorSortValue } from "../../../core/cableCol
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
-import { downloadCsvFile } from "../../lib/csv";
+import { downloadTabularCsvOrXlsxFile } from "../../lib/tabularExport";
 import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
@@ -18,6 +18,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     setWireFilterField,
     wireEndpointFilterQuery,
     setWireEndpointFilterQuery,
+    tabularExportFormat,
     catalogItems,
     wires,
     visibleWires,
@@ -182,12 +183,17 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 wire.lengthMm
               ];
             });
-            downloadCsvFile("analysis-wires", headers, rows, { includeUtf8Bom: true });
+            void downloadTabularCsvOrXlsxFile(
+              "analysis-wires",
+              tabularExportFormat,
+              { name: "Analysis Wires", headers, rows, freezeHeaderRow: true, autoFilter: true },
+              { includeUtf8Bom: true }
+            );
           }}
           disabled={sortedVisibleWires.length === 0}
         >
           <span className="table-export-icon" aria-hidden="true" />
-          CSV
+          {tabularExportFormat.toUpperCase()}
         </button>
         {onOpenWireOnboardingHelp !== undefined ? (
           <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenWireOnboardingHelp}>

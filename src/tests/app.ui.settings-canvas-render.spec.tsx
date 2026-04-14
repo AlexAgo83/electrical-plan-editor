@@ -13,6 +13,13 @@ describe("App integration UI - settings canvas render", () => {
     localStorage.clear();
   });
 
+  function openViewMenu(panel: HTMLElement): void {
+    const viewButton = within(panel).getByRole("button", { name: "View" });
+    if (!viewButton.classList.contains("is-active")) {
+      fireEvent.click(viewButton);
+    }
+  }
+
   function ensureSegmentNamesEnabledFromSettings(): void {
     const canvasToolsPanel = getPanelByHeading("Canvas tools preferences");
     const segmentNamesToggle = within(canvasToolsPanel).getByLabelText("Show segment names");
@@ -185,6 +192,7 @@ describe("App integration UI - settings canvas render", () => {
     });
     switchScreenDrawerAware("analysis");
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     const lengthToggle = within(networkSummaryPanel).getByRole("button", { name: "Length" });
     if (!lengthToggle.classList.contains("is-active")) {
       fireEvent.click(lengthToggle);
@@ -210,6 +218,7 @@ describe("App integration UI - settings canvas render", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("analysis");
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     const lengthToggle = within(networkSummaryPanel).getByRole("button", { name: "Length" });
     if (!lengthToggle.classList.contains("is-active")) {
       fireEvent.click(lengthToggle);
@@ -280,27 +289,6 @@ describe("App integration UI - settings canvas render", () => {
     expect(within(restoredCanvasRenderSettingsPanel).getByLabelText("2D label rotation")).toHaveValue("-45");
     expect(within(restoredCanvasToolsSettingsPanel).getByLabelText("Include background in PNG export")).not.toBeChecked();
   });
-  it("uses SVG export by default and persists canvas export format changes", () => {
-    const firstRender = renderAppWithState(createUiIntegrationState());
-    switchScreenDrawerAware("settings");
-    const canvasToolsSettingsPanel = getPanelByHeading("Canvas tools preferences");
-    const exportFormatSelect = within(canvasToolsSettingsPanel).getByLabelText("Export format");
-    expect(exportFormatSelect).toHaveValue("svg");
-    switchScreenDrawerAware("analysis");
-    let networkSummaryPanel = getPanelByHeading("Network summary");
-    expect(within(networkSummaryPanel).getByRole("button", { name: "SVG" })).toBeInTheDocument();
-    switchScreenDrawerAware("settings");
-    fireEvent.change(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Export format"), {
-      target: { value: "png" }
-    });
-    switchScreenDrawerAware("analysis");
-    networkSummaryPanel = getPanelByHeading("Network summary");
-    expect(within(networkSummaryPanel).getByRole("button", { name: "PNG" })).toBeInTheDocument();
-    firstRender.unmount();
-    renderAppWithState(createUiIntegrationState());
-    switchScreenDrawerAware("settings");
-    expect(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Export format")).toHaveValue("png");
-  });
   it("persists export frame and cartouche visibility toggles with expected defaults", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
@@ -366,6 +354,7 @@ describe("App integration UI - settings canvas render", () => {
     expect(wireNamesToggle).not.toBeChecked();
     switchScreenDrawerAware("analysis");
     let networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     const firstCalloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
     if (!firstCalloutsToggle.classList.contains("is-active")) {
       fireEvent.click(firstCalloutsToggle);
@@ -375,6 +364,7 @@ describe("App integration UI - settings canvas render", () => {
     fireEvent.click(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Show wire names in callout table"));
     switchScreenDrawerAware("analysis");
     networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     const secondCalloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
     if (!secondCalloutsToggle.classList.contains("is-active")) {
       fireEvent.click(secondCalloutsToggle);
@@ -475,6 +465,7 @@ describe("App integration UI - settings canvas render", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     expect(within(networkSummaryPanel).getByRole("button", { name: "Callouts" })).toHaveClass("is-active");
     switchScreenDrawerAware("settings");
     const restoredCanvasSettingsPanel = getPanelByHeading("Canvas tools preferences");

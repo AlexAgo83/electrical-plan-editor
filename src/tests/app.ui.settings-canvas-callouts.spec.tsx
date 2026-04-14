@@ -8,6 +8,13 @@ import {
   switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 
+function openViewMenu(panel: HTMLElement): void {
+  const viewButton = within(panel).getByRole("button", { name: "View" });
+  if (viewButton.getAttribute("aria-expanded") !== "true") {
+    fireEvent.click(viewButton);
+  }
+}
+
 describe("App integration UI - settings canvas callouts", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -30,6 +37,7 @@ describe("App integration UI - settings canvas callouts", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     expect(within(networkSummaryPanel).getByRole("button", { name: "Callouts" })).toHaveClass("is-active");
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(0);
     const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
@@ -46,6 +54,7 @@ describe("App integration UI - settings canvas callouts", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
     let networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     const calloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
     fireEvent.click(calloutsToggle);
     expect(calloutsToggle).toHaveClass("is-active");
@@ -70,6 +79,7 @@ describe("App integration UI - settings canvas callouts", () => {
     switchSubScreenDrawerAware("node");
 
     let networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     const calloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
     fireEvent.click(calloutsToggle);
     expect(calloutsToggle).toHaveClass("is-active");
@@ -93,6 +103,7 @@ describe("App integration UI - settings canvas callouts", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
     expect(document.querySelectorAll("svg[data-callout-measure-root='true']").length).toBeGreaterThan(0);
 

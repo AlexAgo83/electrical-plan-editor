@@ -123,6 +123,63 @@
 .network-summary-mobile-unavailable {
   display: none;
 }
+
+.network-summary-view-menu-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.network-summary-view-menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 11rem;
+  padding: 0.35rem;
+  border-radius: 0.6rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.network-summary-view-menu--right {
+  left: auto;
+  right: 0;
+}
+
+.network-summary-view-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: inherit;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+.network-summary-view-menu-item:hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.network-summary-view-menu-item.is-active {
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.18);
+  font-weight: 500;
+}
+
+.network-summary-view-menu-item:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
 @media (max-width: 900px) {
   .network-summary-header {
     flex-direction: column;

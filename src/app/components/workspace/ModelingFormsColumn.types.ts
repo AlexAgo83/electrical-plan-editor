@@ -124,8 +124,12 @@ export interface ModelingFormsColumnProps {
   wireTechnicalIdAlreadyUsed: boolean;
   wireEndpointAConnectionReference: string;
   setWireEndpointAConnectionReference: (value: string) => void;
+  wireEndpointAConnectionName: string;
+  setWireEndpointAConnectionName: (value: string) => void;
   wireEndpointASealReference: string;
   setWireEndpointASealReference: (value: string) => void;
+  wireEndpointASealName: string;
+  setWireEndpointASealName: (value: string) => void;
   wireEndpointAKind: WireEndpoint["kind"];
   setWireEndpointAKind: (value: WireEndpoint["kind"]) => void;
   wireEndpointAConnectorId: string;
@@ -139,8 +143,12 @@ export interface ModelingFormsColumnProps {
   wireEndpointASlotHint: WireEndpointSlotHint | null;
   wireEndpointBConnectionReference: string;
   setWireEndpointBConnectionReference: (value: string) => void;
+  wireEndpointBConnectionName: string;
+  setWireEndpointBConnectionName: (value: string) => void;
   wireEndpointBSealReference: string;
   setWireEndpointBSealReference: (value: string) => void;
+  wireEndpointBSealName: string;
+  setWireEndpointBSealName: (value: string) => void;
   wireEndpointBKind: WireEndpoint["kind"];
   setWireEndpointBKind: (value: WireEndpoint["kind"]) => void;
   wireEndpointBConnectorId: string;

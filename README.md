@@ -1,11 +1,11 @@
 # e-Plan Editor
 
-A local-first electrical network editor focused on deterministic modeling, routing, and validation.
+A local-first electrical network editor for modeling, validating, and documenting electrical networks.
 
-The project models connectors, splices, nodes, segments, and wires as a graph, computes shortest routes, and keeps wire lengths synchronized with segment changes.
+The app treats connectors, splices, nodes, segments, and wires as a graph, computes routes deterministically, and keeps canvas preferences and export outputs aligned with the current workspace state.
 
 [![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
-[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.4.4-4C8BF5)
+[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.6.1-4C8BF5)
 
 <img width="1173" height="810" alt="image" src="https://github.com/user-attachments/assets/b4d0b4a9-1fee-43a4-bfb1-ae72caf97302" />
 <img width="1159" height="280" alt="image" src="https://github.com/user-attachments/assets/7bfad15a-cc62-446a-abc6-b06c15ec1466" />
@@ -17,8 +17,8 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 ## Table of Contents
 
 - [Live Demo & Status](#live-demo--status)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
+- [Product](#product)
+- [Technical Overview](#technical-overview)
 - [Getting Started](#getting-started)
 - [Available Scripts](#available-scripts)
 - [Deployment](#deployment)
@@ -31,39 +31,47 @@ The project models connectors, splices, nodes, segments, and wires as a graph, c
 
 - Production: [https://e-plan-editor.onrender.com](https://e-plan-editor.onrender.com)
 - Hosting: Render Static Site (Blueprint via `render.yaml`)
-- Current version: `1.4.4`
+- Current version: `1.6.1`
 - CI status: see the GitHub Actions badge above
 
-## Features
+## Product
 
-- Graph-based electrical modeling for connectors, splices, nodes, segments, and wires, with occupancy rules and wire-side connection/seal references.
+- Electrical modeling for connectors, splices, nodes, segments, and wires, with occupancy rules and wire-side connection / seal references.
 - Automatic route computation, forced-route locking, and live wire-length recomputation after segment edits.
-- Interactive 2D workspace with drag-and-drop nodes, zoom/pan controls, selectable segments, configurable callouts, and quick navigation between `Modeling` and `Analysis`.
+- Interactive 2D workspace with drag-and-drop nodes, zoom/pan controls, selectable segments, configurable callouts, and quick navigation between `Modeling`, `Analysis`, and `Settings`.
 - Analysis workflows with targeted `Go to` actions, including navigation from `Node analysis` to `Segment analysis` and from `Segment analysis` to `Wire analysis`.
 - Network-scoped catalog management with catalog-first connector flows, optional splice linkage, seeded starter items, usage analysis, and pricing context settings.
-- Flexible export tooling:
+- Export tooling for operational handoff:
   - `SVG` / `PNG` network-plan export with optional frame and metadata cartouche
   - `BOM CSV` export with pricing context and a dedicated `Wire terminations` section
   - wire CSV export with explicit begin/end connection and seal reference columns
-- Better export readability through adaptive cartouche layout and improved horizontal / near-horizontal label placement.
 - Network metadata authoring for export identity: creation date, author, project code, logo URL, and export notes.
-- Local-first persistence with schema versioning, import/export normalization, and visible runtime warning when browser storage writes fail.
-- Settings for language, theme, canvas defaults, wire defaults, pricing defaults, and keyboard shortcuts, all persisted locally.
+- Local-first persistence so workspace state, settings, and export preferences survive reloads.
+- Validation center with grouped issues, issue navigation, and catalog integrity checks.
 - Built-in onboarding flow plus contextual help entry points to guide first-time usage.
 - Accessibility-oriented interactions across dialogs, tables, keyboard navigation, and assistive-technology semantics.
-- Reusable filterable/sortable data tables across modeling, analysis, and network scope views.
-- Validation center with grouped issues, issue navigation, and catalog integrity checks.
 - PWA support with install prompt, offline shell, and update readiness in production.
 
-## Tech Stack
+## Technical Overview
 
-- React 19
-- TypeScript (strict)
-- Vite
-- Vitest + Testing Library
-- Playwright (E2E smoke)
-- ESLint
-- Logics documentation workflow (`logics/`)
+- React 19 + TypeScript in strict mode.
+- Vite for dev, preview, and production builds.
+- Domain/state split:
+  - `src/core` holds graph, routing, layout, and domain primitives.
+  - `src/store` holds reducers, selectors, and action orchestration.
+  - `src/app` holds screen composition, controller wiring, and UI modules.
+- Persistence and portability:
+  - local storage uses versioned schema migrations
+  - import/export payloads are normalized and guarded against unsupported future versions
+  - storage failures surface visible runtime warnings instead of silently corrupting state
+- Test and quality stack:
+  - Vitest + Testing Library for unit and integration coverage
+  - Playwright for E2E smoke coverage
+  - ESLint for linting
+  - explicit quality gates for UI modularization, timeout governance, store modularization, and PWA artifacts
+- Delivery workflow:
+  - Logics-backed request/backlog/task tracking under `logics/`
+  - CI runs the same blocking validation pipeline locally and in GitHub Actions
 
 ## Getting Started
 
@@ -249,8 +257,6 @@ npm run test:e2e
 npm run build
 npm run quality:pwa
 ```
-
-`npm run ci:local` is kept as a convenience alias for the same canonical blocking pipeline.
 
 CI runs the same main blocking pipeline in `.github/workflows/ci.yml` on `push` and `pull_request`.
 

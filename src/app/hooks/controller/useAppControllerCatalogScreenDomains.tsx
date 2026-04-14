@@ -5,7 +5,8 @@ import type {
   Connector,
   ConnectorId,
   Splice,
-  SpliceId
+  SpliceId,
+  Wire
 } from "../../../core/entities";
 import { CatalogAnalysisWorkspaceContent } from "../../components/workspace/CatalogAnalysisWorkspaceContent";
 import { ModelingCatalogFormPanel } from "../../components/workspace/ModelingCatalogFormPanel";
@@ -19,6 +20,7 @@ interface UseAppControllerCatalogScreenDomainsParams {
   catalogItems: CatalogItem[];
   connectors: Connector[];
   splices: Splice[];
+  wires: Wire[];
   selectedCatalogItemId: CatalogItemId | null;
   workspaceCurrencyCode: WorkspaceCurrencyCode;
   catalogHandlers: CatalogHandlersModel;
@@ -35,6 +37,11 @@ interface UseAppControllerCatalogScreenDomainsParams {
   onCreateSpliceFromCatalog: (catalogItemId: CatalogItemId) => void;
   onOpenConnectorFromCatalogAnalysis: (connectorId: ConnectorId) => void;
   onOpenSpliceFromCatalogAnalysis: (spliceId: SpliceId) => void;
+  onUpdateWireEndpointReferenceName: (
+    kind: "connection" | "seal",
+    reference: string,
+    nextName: string
+  ) => Promise<boolean | { apply: () => void }> | boolean | { apply: () => void };
   modelingLeftColumnContent: ReactElement | null;
   modelingFormsColumnContent: ReactElement | null;
   analysisWorkspaceContent: ReactElement | null;
@@ -51,6 +58,7 @@ export function useAppControllerCatalogScreenDomains({
   catalogItems,
   connectors,
   splices,
+  wires,
   selectedCatalogItemId,
   workspaceCurrencyCode,
   catalogHandlers,
@@ -67,6 +75,7 @@ export function useAppControllerCatalogScreenDomains({
   onCreateSpliceFromCatalog,
   onOpenConnectorFromCatalogAnalysis,
   onOpenSpliceFromCatalogAnalysis,
+  onUpdateWireEndpointReferenceName,
   modelingLeftColumnContent,
   modelingFormsColumnContent,
   analysisWorkspaceContent
@@ -131,10 +140,12 @@ export function useAppControllerCatalogScreenDomains({
       selectedCatalogItemManufacturerReference={selectedCatalogItem?.manufacturerReference ?? null}
       linkedConnectors={selectedCatalogItemId === null ? [] : connectors.filter((connector) => connector.catalogItemId === selectedCatalogItemId)}
       linkedSplices={selectedCatalogItemId === null ? [] : splices.filter((splice) => splice.catalogItemId === selectedCatalogItemId)}
+      wires={wires}
       onCreateConnectorFromCatalog={onCreateConnectorFromCatalog}
       onCreateSpliceFromCatalog={onCreateSpliceFromCatalog}
       onOpenConnector={onOpenConnectorFromCatalogAnalysis}
       onOpenSplice={onOpenSpliceFromCatalogAnalysis}
+      onUpdateWireEndpointReferenceName={onUpdateWireEndpointReferenceName}
     />
   );
 

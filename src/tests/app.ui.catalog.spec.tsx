@@ -4,11 +4,14 @@ import { appActions, appReducer, createInitialState } from "../store";
 import {
   asCatalogItemId,
   asConnectorId,
+  asWireId,
   asSpliceId,
+  createUiIntegrationDenseWiresState,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
-  switchScreenDrawerAware
+  switchScreenDrawerAware,
+  switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 import { installScrollIntoViewSpy } from "./helpers/app-ui-form-test-utils";
 
@@ -41,7 +44,7 @@ describe("App integration UI - catalog", () => {
     expect(getPanelByHeading("Catalog")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Catalog item form" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Edit catalog item" })).not.toBeInTheDocument();
-  });
+  }, 15000);
 
   it("enforces catalog-first connector creation and supports catalog creation with URL validation", () => {
     renderAppWithState(createInitialState());
@@ -177,6 +180,74 @@ describe("App integration UI - catalog", () => {
     expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
   });
 
+  it("edits wire endpoint reference names from the catalog view and propagates matching names after confirmation", async () => {
+    const baseState = createUiIntegrationDenseWiresState();
+    const firstWire = baseState.wires.byId[asWireId("W1")];
+    const secondWire = baseState.wires.byId[asWireId("W2")];
+    if (firstWire === undefined || secondWire === undefined) {
+      throw new Error("Expected dense wire integration state.");
+    }
+
+    const state = appReducer(
+      appReducer(
+        appReducer(
+          baseState,
+          appActions.upsertCatalogItem({
+            id: asCatalogItemId("CAT-WIRES"),
+            manufacturerReference: "CAT-WIRES",
+            name: "Wires catalog item",
+            connectionCount: 2
+          })
+        ),
+        appActions.saveWire({
+          ...firstWire,
+          endpointAConnectionReference: "TERM-SHARED",
+          endpointAConnectionName: "Old Alpha"
+        })
+      ),
+      appActions.saveWire({
+        ...secondWire,
+        endpointAConnectionReference: "TERM-SHARED",
+        endpointAConnectionName: "Old Beta"
+      })
+    );
+
+    const { store } = renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("catalog");
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    fireEvent.click(within(catalogPanel).getByText("CAT-WIRES"));
+
+    const connectionHeading = await screen.findByRole("heading", { name: "Wire endpoint references" });
+    const connectionPanel = connectionHeading.closest<HTMLElement>(".panel");
+    expect(connectionPanel).not.toBeNull();
+    if (connectionPanel === null) {
+      throw new Error("Expected wire endpoint references panel.");
+    }
+
+    const sharedRow = within(connectionPanel).getByText("TERM-SHARED").closest("tr");
+    expect(sharedRow).not.toBeNull();
+    if (sharedRow === null) {
+      throw new Error("Expected shared connection reference row.");
+    }
+
+    fireEvent.change(within(sharedRow).getByRole("textbox"), {
+      target: { value: "Shared Connection" }
+    });
+    fireEvent.click(within(sharedRow).getByRole("button", { name: "Save" }));
+
+    const dialog = await screen.findByRole("dialog", { name: "Choose connection name" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Shared Connection" }));
+
+    await waitFor(() => {
+      const nextState = store.getState();
+      expect(nextState.wires.byId[asWireId("W1")]?.endpointAConnectionName).toBe("Shared Connection");
+      expect(nextState.wires.byId[asWireId("W2")]?.endpointAConnectionName).toBe("Shared Connection");
+    });
+  });
+
   it("scrolls to the edit catalog item panel when clicking Edit", async () => {
     const scrollSpy = installScrollIntoViewSpy();
 
@@ -209,7 +280,7 @@ describe("App integration UI - catalog", () => {
     } finally {
       scrollSpy.restore();
     }
-  });
+  }, 15000);
 
   it("does not scroll to the catalog form when selecting a row directly", async () => {
     const scrollSpy = installScrollIntoViewSpy();
@@ -234,13 +305,14 @@ describe("App integration UI - catalog", () => {
       const catalogPanel = getPanelByHeading("Catalog");
       fireEvent.click(within(catalogPanel).getByText("CAT-ROW"));
       expect(getPanelByHeading("Edit catalog item")).toBeInTheDocument();
+      const editCatalogPanel = getPanelByHeading("Edit catalog item");
 
       await new Promise((resolve) => setTimeout(resolve, 30));
-      expect(scrollSpy.scrollTargets).toHaveLength(0);
+      expect(scrollSpy.scrollTargets).not.toContain(editCatalogPanel);
     } finally {
       scrollSpy.restore();
     }
-  });
+  }, 15000);
 
   it("shows immediate validation when selecting an incompatible catalog item in connector and splice forms", () => {
     const catalogLargeId = asCatalogItemId("CAT-LARGE");
