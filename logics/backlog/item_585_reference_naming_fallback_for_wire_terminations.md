@@ -1,10 +1,10 @@
 ## item_585_reference_naming_fallback_for_wire_terminations - Reference Naming Fallback for Wire Terminations
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 95%
-> Confidence: 86%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 100%
+> Progress: 100%
 > Complexity: High
 > Theme: Data Model
 > Non-semantic edit: linked adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming

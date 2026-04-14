@@ -1,9 +1,9 @@
 ## req_119_bom_and_catalog_export_enhancements - BOM and catalog export enhancements
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 95%
-> Confidence: 86%
+> Status: Done
+> Understanding: 100%
+> Confidence: 100%
 > Complexity: High
 > Theme: UI
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.

@@ -1,10 +1,10 @@
 ## task_101_catalog_export_column_toggles - Catalog Export Column Toggles
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 95%
-> Confidence: 86%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 100%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.

@@ -1,10 +1,10 @@
 ## item_587_parallel_csv_and_xlsx_export_options - Parallel CSV and XLSX Export Options
 > From version: 1.4.4
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 95%
-> Confidence: 86%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 100%
+> Progress: 100%
 > Complexity: High
 > Theme: Export
 > Non-semantic edit: linked adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming
