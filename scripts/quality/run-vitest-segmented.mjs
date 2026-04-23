@@ -5,8 +5,10 @@ import path from "node:path";
 const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.analysis-go-to-wire.spec.tsx",
   "src/tests/app.ui.catalog-csv-import-export.spec.tsx",
+  "src/tests/app.ui.catalog-wire-endpoint-reference-renames.spec.tsx",
   "src/tests/app.ui.catalog.spec.tsx",
   "src/tests/app.ui.creation-flow-ergonomics.spec.tsx",
+  "src/tests/app.ui.creation-flow-wire-endpoint-renames.spec.tsx",
   "src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx",
   "src/tests/app.ui.delete-confirmations.spec.tsx",
   "src/tests/app.ui.form-validation-doctrine.spec.tsx",
