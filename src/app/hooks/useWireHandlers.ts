@@ -125,6 +125,12 @@ interface WireEndpointReferenceSyncPlan {
   apply: () => void;
 }
 
+interface MatchingWireEndpointReferenceTarget {
+  wireId: WireId;
+  side: "A" | "B";
+  currentName: string | undefined;
+}
+
 export function useWireHandlers({
   store,
   dispatchAction,
@@ -273,28 +279,45 @@ export function useWireHandlers({
 
     const normalizedNextNames = normalizeWireEndpointReferenceNames(nextName);
     const wiresSnapshot = store.getState().wires;
-    const matchingWires = wiresSnapshot.allIds
+    const matchingTargets = wiresSnapshot.allIds
       .map((wireId) => wiresSnapshot.byId[wireId])
       .filter((wire): wire is Wire => wire !== undefined)
       .filter((wire) => options?.excludeWireId !== wire.id)
-      .filter((wire) => {
-        const endpoints =
-          kind === "connection"
-            ? [wire.endpointAConnectionReference, wire.endpointBConnectionReference]
-            : [wire.endpointASealReference, wire.endpointBSealReference];
-        return endpoints.some((endpointReference) => normalizeWireEndpointReferenceInput(endpointReference ?? "") === normalizedReference);
+      .flatMap((wire): MatchingWireEndpointReferenceTarget[] => {
+        const endpointATargetReference = normalizeWireEndpointReferenceInput(
+          kind === "connection" ? wire.endpointAConnectionReference ?? "" : wire.endpointASealReference ?? ""
+        );
+        const endpointBTargetReference = normalizeWireEndpointReferenceInput(
+          kind === "connection" ? wire.endpointBConnectionReference ?? "" : wire.endpointBSealReference ?? ""
+        );
+        const targets: MatchingWireEndpointReferenceTarget[] = [];
+
+        if (endpointATargetReference === normalizedReference) {
+          targets.push({
+            wireId: wire.id,
+            side: "A",
+            currentName: normalizeWireEndpointReferenceName(
+              kind === "connection" ? wire.endpointAConnectionName : wire.endpointASealName
+            )
+          });
+        }
+        if (endpointBTargetReference === normalizedReference) {
+          targets.push({
+            wireId: wire.id,
+            side: "B",
+            currentName: normalizeWireEndpointReferenceName(
+              kind === "connection" ? wire.endpointBConnectionName : wire.endpointBSealName
+            )
+          });
+        }
+
+        return targets;
       });
 
     const existingNames = new Set<string>();
-    for (const wire of matchingWires) {
-      const wireNames =
-        kind === "connection"
-          ? [normalizeWireEndpointReferenceName(wire.endpointAConnectionName), normalizeWireEndpointReferenceName(wire.endpointBConnectionName)]
-          : [normalizeWireEndpointReferenceName(wire.endpointASealName), normalizeWireEndpointReferenceName(wire.endpointBSealName)];
-      for (const wireName of wireNames) {
-        if (wireName !== undefined) {
-          existingNames.add(wireName);
-        }
+    for (const target of matchingTargets) {
+      if (target.currentName !== undefined) {
+        existingNames.add(target.currentName);
       }
     }
 
@@ -302,23 +325,53 @@ export function useWireHandlers({
       apply: () => {
         options?.onResolvedName?.(resolvedName);
 
-        if (matchingWires.length === 0) {
+        if (matchingTargets.length === 0) {
           return;
         }
 
-        for (const wire of matchingWires) {
-          const nextWire = {
-            ...wire,
-            ...(kind === "connection"
+        const updatesByWireId = new Map<
+          WireId,
+          {
+            endpointA: boolean;
+            endpointB: boolean;
+          }
+        >();
+
+        for (const target of matchingTargets) {
+          const existingUpdate = updatesByWireId.get(target.wireId);
+          if (existingUpdate !== undefined) {
+            if (target.side === "A") {
+              existingUpdate.endpointA = true;
+            } else {
+              existingUpdate.endpointB = true;
+            }
+            continue;
+          }
+
+          updatesByWireId.set(target.wireId, {
+            endpointA: target.side === "A",
+            endpointB: target.side === "B"
+          });
+        }
+
+        const latestWiresSnapshot = store.getState().wires;
+        for (const [wireId, { endpointA, endpointB }] of updatesByWireId.entries()) {
+          const wire = latestWiresSnapshot.byId[wireId];
+          if (wire === undefined) {
+            continue;
+          }
+          const nextWire =
+            kind === "connection"
               ? {
-                  endpointAConnectionName: resolvedName,
-                  endpointBConnectionName: resolvedName
+                  ...wire,
+                  ...(endpointA ? { endpointAConnectionName: resolvedName } : {}),
+                  ...(endpointB ? { endpointBConnectionName: resolvedName } : {})
                 }
               : {
-                  endpointASealName: resolvedName,
-                  endpointBSealName: resolvedName
-                })
-          };
+                  ...wire,
+                  ...(endpointA ? { endpointASealName: resolvedName } : {}),
+                  ...(endpointB ? { endpointBSealName: resolvedName } : {})
+                };
           dispatchAction(appActions.saveWire(nextWire), { trackHistory: false });
         }
       }
