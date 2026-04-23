@@ -7,6 +7,7 @@
 > Progress: 100%
 > Complexity: Medium
 > Theme: UI
+> Non-semantic edit: linked adr_006_global_reference_name_propagation_for_wire_endpoint_renames
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Context
@@ -73,7 +74,7 @@ stateDiagram-v2
 
 # Links
 - Product brief(s): (none yet)
-- Architecture decision(s): (none yet)
+- Architecture decision(s): `adr_006_global_reference_name_propagation_for_wire_endpoint_renames`
 - Derived from `item_590_global_reference_name_propagation_for_wire_endpoint_renames`
 - Request(s): `req_121_global_reference_name_propagation_for_wire_endpoint_renames`
 

@@ -6,6 +6,7 @@
 > Confidence: 96%
 > Complexity: Medium
 > Theme: UI
+> Non-semantic edit: linked adr_006_global_reference_name_propagation_for_wire_endpoint_renames
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
 
 # Needs
@@ -78,7 +79,7 @@ flowchart TD
 
 # Companion docs
 - Product brief(s): (none yet)
-- Architecture decision(s): (none yet)
+- Architecture decision(s): `adr_006_global_reference_name_propagation_for_wire_endpoint_renames`
 
 # AI Context
 - Summary: Restore dataset-wide shared-name propagation for identical wire endpoint references after a confirmed overwrite choice.

@@ -7,6 +7,7 @@
 > Progress: 100%
 > Complexity: Medium
 > Theme: UI
+> Non-semantic edit: linked adr_006_global_reference_name_propagation_for_wire_endpoint_renames
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
 
 # Problem
@@ -55,7 +56,7 @@ flowchart TD
 
 # Links
 - Product brief(s): (none yet)
-- Architecture decision(s): (none yet)
+- Architecture decision(s): `adr_006_global_reference_name_propagation_for_wire_endpoint_renames`
 - Request: `req_121_global_reference_name_propagation_for_wire_endpoint_renames`
 - Primary task(s): `task_104_global_reference_name_propagation_for_wire_endpoint_renames`
 <!-- When creating a task from this item, add: Derived from `this file path` in the task # Links section -->
