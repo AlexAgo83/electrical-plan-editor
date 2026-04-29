@@ -1,5 +1,12 @@
 import { type ChangeEvent, type MutableRefObject, useEffect, useRef, useState } from "react";
-import { type Network, type NetworkId } from "../../core/entities";
+import {
+  type Network,
+  type NetworkId,
+  type SpliceId,
+  type WireEndpoint
+} from "../../core/entities";
+import { spliceSideToPortIndex } from "../../core/directionalSplice";
+import { DIRECTIONAL_SPLICE_PORT_COUNT, resolveSplicePortMode } from "../../core/splicePortMode";
 import type { NetworkExportScope } from "../../adapters/portability";
 import type { AppStore } from "../../store";
 import {
@@ -10,6 +17,7 @@ import {
   type NetworkImportSummary
 } from "../../adapters/portability";
 import { appActions } from "../../store";
+import type { NetworkScopedState } from "../../store";
 import type { ImportExportStatus } from "../types/app-controller";
 
 interface UseNetworkImportExportParams {
@@ -50,6 +58,92 @@ function toFilesystemSafeTimestamp(exportedAtIso: string): string {
   return `${year}-${month}-${day}_${hour}-${minute}-${second}`;
 }
 
+function hasLegacyNumericSplices(networkStates: Record<NetworkId, NetworkScopedState>): boolean {
+  return Object.values(networkStates).some((networkState) =>
+    networkState.splices.allIds.some((spliceId) => {
+      const splice = networkState.splices.byId[spliceId];
+      return splice !== undefined && resolveSplicePortMode(splice) !== "directional";
+    })
+  );
+}
+
+function convertLegacyNumericSplicesToDirectional(
+  networkStates: Record<NetworkId, NetworkScopedState>
+): Record<NetworkId, NetworkScopedState> {
+  const nextStates = { ...networkStates };
+  for (const [networkId, networkState] of Object.entries(networkStates) as Array<[NetworkId, NetworkScopedState]>) {
+    const convertedSpliceIds = new Set<SpliceId>();
+    const nextSplicesById = { ...networkState.splices.byId };
+    const originalPortCountBySpliceId = new Map<SpliceId, number>();
+
+    for (const spliceId of networkState.splices.allIds) {
+      const splice = networkState.splices.byId[spliceId];
+      if (splice === undefined || resolveSplicePortMode(splice) === "directional") {
+        continue;
+      }
+      convertedSpliceIds.add(spliceId);
+      originalPortCountBySpliceId.set(spliceId, splice.portCount);
+      nextSplicesById[spliceId] = {
+        ...splice,
+        portMode: "directional",
+        portCount: DIRECTIONAL_SPLICE_PORT_COUNT,
+        sideInverted: false
+      };
+    }
+
+    if (convertedSpliceIds.size === 0) {
+      continue;
+    }
+
+    const convertEndpoint = (endpoint: WireEndpoint): WireEndpoint => {
+      if (endpoint.kind !== "splicePort" || !convertedSpliceIds.has(endpoint.spliceId)) {
+        return endpoint;
+      }
+      const originalPortCount = originalPortCountBySpliceId.get(endpoint.spliceId) ?? DIRECTIONAL_SPLICE_PORT_COUNT;
+      const side = endpoint.portIndex > Math.ceil(originalPortCount / 2) ? "R" : "L";
+      return {
+        ...endpoint,
+        portIndex: spliceSideToPortIndex(side),
+        spliceSideOverride: side,
+        spliceSideLocked: false
+      };
+    };
+
+    const nextWiresById = { ...networkState.wires.byId };
+    for (const wireId of networkState.wires.allIds) {
+      const wire = networkState.wires.byId[wireId];
+      if (wire === undefined) {
+        continue;
+      }
+      nextWiresById[wireId] = {
+        ...wire,
+        endpointA: convertEndpoint(wire.endpointA),
+        endpointB: convertEndpoint(wire.endpointB)
+      };
+    }
+
+    const nextSplicePortOccupancy = { ...networkState.splicePortOccupancy };
+    for (const spliceId of convertedSpliceIds) {
+      delete nextSplicePortOccupancy[spliceId];
+    }
+
+    nextStates[networkId] = {
+      ...networkState,
+      splices: {
+        ...networkState.splices,
+        byId: nextSplicesById
+      },
+      wires: {
+        ...networkState.wires,
+        byId: nextWiresById
+      },
+      splicePortOccupancy: nextSplicePortOccupancy
+    };
+  }
+
+  return nextStates;
+}
+
 export function buildNetworkExportFilename(scope: NetworkExportScope, exportedAtIso: string): string {
   return `electrical-network-${scope}-${toFilesystemSafeTimestamp(exportedAtIso)}.json`;
 }
@@ -76,6 +170,66 @@ export function downloadJsonFile(fileName: string, content: string): boolean {
     urlFactory.revokeObjectURL(href);
   }, 0);
   return true;
+}
+
+type SaveFilePickerOptions = {
+  suggestedName: string;
+  types: Array<{
+    description: string;
+    accept: Record<string, string[]>;
+  }>;
+};
+
+type SaveFilePickerHandle = {
+  createWritable: () => Promise<{
+    write: (content: Blob) => Promise<void>;
+    close: () => Promise<void>;
+  }>;
+};
+
+export async function saveJsonFileWithPicker(
+  fileName: string,
+  content: string
+): Promise<"saved" | "cancelled" | "unavailable" | "failed"> {
+  if (typeof window === "undefined") {
+    return "unavailable";
+  }
+
+  const saveFilePicker = (window as Window & { showSaveFilePicker?: (options: SaveFilePickerOptions) => Promise<SaveFilePickerHandle> }).showSaveFilePicker;
+  if (typeof saveFilePicker !== "function") {
+    return "unavailable";
+  }
+
+  try {
+    const fileHandle = await saveFilePicker({
+      suggestedName: fileName,
+      types: [
+        {
+          description: "JSON file",
+          accept: { "application/json": [".json"] }
+        }
+      ]
+    });
+    const writable = await fileHandle.createWritable();
+    await writable.write(new Blob([content], { type: "application/json" }));
+    await writable.close();
+    return "saved";
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      return "cancelled";
+    }
+
+    return "failed";
+  }
+}
+
+export async function exportJsonFile(fileName: string, content: string): Promise<"saved" | "cancelled" | "failed"> {
+  const pickerResult = await saveJsonFileWithPicker(fileName, content);
+  if (pickerResult === "saved" || pickerResult === "cancelled") {
+    return pickerResult;
+  }
+
+  return downloadJsonFile(fileName, content) ? "saved" : "failed";
 }
 
 export function useNetworkImportExport({
@@ -115,30 +269,35 @@ export function useNetworkImportExport({
   }
 
   function handleExportNetworks(scope: "active" | "selected" | "all", exportedAtIsoOverride?: string): void {
-    const exportedAtIso = exportedAtIsoOverride ?? new Date().toISOString();
-    const payload = buildNetworkFilePayload(store.getState(), scope, selectedExportNetworkIds, exportedAtIso);
-    if (payload.networks.length === 0) {
-      setImportExportStatus({
-        kind: "failed",
-        message: "No network available for the selected export scope."
-      });
-      return;
-    }
+    void (async () => {
+      const exportedAtIso = exportedAtIsoOverride ?? new Date().toISOString();
+      const payload = buildNetworkFilePayload(store.getState(), scope, selectedExportNetworkIds, exportedAtIso);
+      if (payload.networks.length === 0) {
+        setImportExportStatus({
+          kind: "failed",
+          message: "No network available for the selected export scope."
+        });
+        return;
+      }
 
-    const serialized = serializeNetworkFilePayload(payload);
-    const downloadOk = downloadJsonFile(buildNetworkExportFilename(scope, exportedAtIso), serialized);
-    if (!downloadOk) {
-      setImportExportStatus({
-        kind: "failed",
-        message: "Export is not available in this environment."
-      });
-      return;
-    }
+      const serialized = serializeNetworkFilePayload(payload);
+      const exportResult = await exportJsonFile(buildNetworkExportFilename(scope, exportedAtIso), serialized);
+      if (exportResult === "cancelled") {
+        return;
+      }
+      if (exportResult === "failed") {
+        setImportExportStatus({
+          kind: "failed",
+          message: "Export is not available in this environment."
+        });
+        return;
+      }
 
-    setImportExportStatus({
-      kind: "success",
-      message: `Exported ${payload.networks.length} network(s) (${scope}).`
-    });
+      setImportExportStatus({
+        kind: "success",
+        message: `Exported ${payload.networks.length} network(s) (${scope}).`
+      });
+    })();
   }
 
   function handleOpenImportPicker(): void {
@@ -189,7 +348,17 @@ export function useNetworkImportExport({
       return;
     }
 
-    dispatchAction(appActions.importNetworks(resolved.networks, resolved.networkStates, true));
+    let networkStatesToImport = resolved.networkStates;
+    if (hasLegacyNumericSplices(resolved.networkStates) && typeof window !== "undefined") {
+      const shouldConvertLegacySplices = window.confirm(
+        "Legacy numeric splice ports were detected. Convert them to directional L/R splices now? Choose Cancel to keep the old numeric design."
+      );
+      if (shouldConvertLegacySplices) {
+        networkStatesToImport = convertLegacyNumericSplicesToDirectional(resolved.networkStates);
+      }
+    }
+
+    dispatchAction(appActions.importNetworks(resolved.networks, networkStatesToImport, true));
 
     setImportExportStatus({
       kind: resolved.summary.errors.length > 0 || resolved.summary.warnings.length > 0 ? "partial" : "success",

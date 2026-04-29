@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { buildNetworkExportFilename, downloadJsonFile } from "../app/hooks/useNetworkImportExport";
+import { buildNetworkExportFilename, downloadJsonFile, exportJsonFile } from "../app/hooks/useNetworkImportExport";
 
 describe("network import/export helpers", () => {
   const originalCreateObjectUrl = Object.getOwnPropertyDescriptor(URL, "createObjectURL");
@@ -61,5 +61,33 @@ describe("network import/export helpers", () => {
 
     vi.runAllTimers();
     expect(revokeObjectUrl).toHaveBeenCalledWith("blob:test-json");
+  });
+
+  it("uses the native save file picker when available", async () => {
+    const createWritable = vi.fn(() =>
+      Promise.resolve({
+        write: vi.fn(),
+        close: vi.fn()
+      })
+    );
+    const saveFilePicker = vi.fn(() =>
+      Promise.resolve({
+        createWritable
+      })
+    );
+    Object.defineProperty(window, "showSaveFilePicker", {
+      configurable: true,
+      writable: true,
+      value: saveFilePicker
+    });
+
+    const result = await exportJsonFile("workspace.json", "{\"hello\":\"world\"}");
+    expect(result).toBe("saved");
+    expect(saveFilePicker).toHaveBeenCalledWith(
+      expect.objectContaining({
+        suggestedName: "workspace.json"
+      })
+    );
+    expect(createWritable).toHaveBeenCalledTimes(1);
   });
 });
