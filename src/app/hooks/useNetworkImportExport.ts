@@ -187,16 +187,30 @@ type SaveFilePickerHandle = {
   }>;
 };
 
+function resolveSaveFilePicker():
+  | ((options: SaveFilePickerOptions) => Promise<SaveFilePickerHandle>)
+  | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const candidate: unknown = (
+    window as Window & {
+      showSaveFilePicker?: unknown;
+    }
+  ).showSaveFilePicker;
+
+  return typeof candidate === "function"
+    ? (candidate as (options: SaveFilePickerOptions) => Promise<SaveFilePickerHandle>)
+    : null;
+}
+
 export async function saveJsonFileWithPicker(
   fileName: string,
   content: string
 ): Promise<"saved" | "cancelled" | "unavailable" | "failed"> {
-  if (typeof window === "undefined") {
-    return "unavailable";
-  }
-
-  const saveFilePicker = (window as Window & { showSaveFilePicker?: (options: SaveFilePickerOptions) => Promise<SaveFilePickerHandle> }).showSaveFilePicker;
-  if (typeof saveFilePicker !== "function") {
+  const saveFilePicker = resolveSaveFilePicker();
+  if (saveFilePicker === null) {
     return "unavailable";
   }
 
