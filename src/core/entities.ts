@@ -42,8 +42,9 @@ export interface Splice {
   id: SpliceId;
   name: string;
   technicalId: string;
-  portMode?: "bounded" | "unbounded";
+  portMode?: "bounded" | "unbounded" | "directional";
   portCount: number;
+  sideInverted?: boolean;
   catalogItemId?: CatalogItemId;
   manufacturerReference?: string;
   cableCalloutPosition?: {
@@ -96,6 +97,8 @@ export type WireEndpoint =
       kind: "splicePort";
       spliceId: SpliceId;
       portIndex: number;
+      spliceSideOverride?: "L" | "R";
+      spliceSideLocked?: boolean;
     };
 
 export type WireProtection =
@@ -108,6 +111,7 @@ export interface Wire {
   id: WireId;
   name: string;
   technicalId: string;
+  twistGroupLabel?: string;
   sectionMm2: number;
   currentA?: number;
   material?: WireMaterial;

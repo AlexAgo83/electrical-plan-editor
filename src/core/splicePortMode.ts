@@ -1,12 +1,17 @@
 import type { Splice } from "./entities";
 
-export type SplicePortMode = "bounded" | "unbounded";
+export type SplicePortMode = "bounded" | "unbounded" | "directional";
 
 export const DEFAULT_SPLICE_PORT_MODE: SplicePortMode = "bounded";
+export const DEFAULT_NEW_SPLICE_PORT_MODE: SplicePortMode = "directional";
 export const DEFAULT_UNBOUNDED_FREE_PORT_BUFFER = 2;
+export const DIRECTIONAL_SPLICE_PORT_COUNT = 2;
 
 export function normalizeSplicePortMode(value: unknown): SplicePortMode {
-  return value === "unbounded" ? "unbounded" : "bounded";
+  if (value === "unbounded" || value === "directional") {
+    return value;
+  }
+  return "bounded";
 }
 
 export function resolveSplicePortMode(splice: Pick<Splice, "portMode">): SplicePortMode {
@@ -21,8 +26,12 @@ export function isSplicePortIndexValid(
     return false;
   }
 
-  if (resolveSplicePortMode(splice) === "unbounded") {
+  const portMode = resolveSplicePortMode(splice);
+  if (portMode === "unbounded") {
     return true;
+  }
+  if (portMode === "directional") {
+    return portIndex === 1 || portIndex === 2;
   }
 
   return portIndex <= splice.portCount;
