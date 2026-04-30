@@ -10,9 +10,11 @@ describe("App integration UI - import/export", () => {
     const panel = getPanelByHeading("Import / Export networks");
     fireEvent.click(within(panel).getByRole("button", { name: "Export all" }));
 
-    expect(
-      within(panel).queryByText(/Exported 1 network\(s\)/) ?? within(panel).getByText("Export is not available in this environment.")
-    ).toBeInTheDocument();
+    return waitFor(() => {
+      expect(
+        within(panel).queryByText(/Exported 1 network\(s\)/) ?? within(panel).getByText("Export is not available in this environment.")
+      ).toBeInTheDocument();
+    });
   });
 
   it("keeps import/export content in compact two-column structure with import action under export actions", () => {

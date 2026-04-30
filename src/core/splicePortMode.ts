@@ -3,7 +3,7 @@ import type { Splice } from "./entities";
 export type SplicePortMode = "bounded" | "unbounded" | "directional";
 
 export const DEFAULT_SPLICE_PORT_MODE: SplicePortMode = "bounded";
-export const DEFAULT_NEW_SPLICE_PORT_MODE: SplicePortMode = "directional";
+export const DEFAULT_NEW_SPLICE_PORT_MODE: SplicePortMode = "bounded";
 export const DEFAULT_UNBOUNDED_FREE_PORT_BUFFER = 2;
 export const DIRECTIONAL_SPLICE_PORT_COUNT = 2;
 

@@ -163,12 +163,16 @@ describe("App integration UI - network summary workflow polish", () => {
     const wiresPanel = getPanelByHeading("Wires");
     fireEvent.click(within(wiresPanel).getByRole("button", { name: /Length \(mm\)/i }));
 
+    const headerCells = Array.from(wiresPanel.querySelectorAll("thead th"));
+    const lengthColumnIndex = headerCells.findIndex((header) => header.textContent?.includes("Length (mm)") === true);
+    expect(lengthColumnIndex).toBeGreaterThanOrEqual(0);
+
     const rows = Array.from(wiresPanel.querySelectorAll("tbody tr"));
     expect(rows).toHaveLength(2);
     expect(rows[0]?.querySelector("td")?.textContent).toContain("Wire 2");
-    expect(rows[0]?.children[6]?.textContent?.trim()).toBe("25");
+    expect(rows[0]?.children[lengthColumnIndex]?.textContent?.trim()).toBe("25");
     expect(rows[1]?.querySelector("td")?.textContent).toContain("Wire 1");
-    expect(rows[1]?.children[6]?.textContent?.trim()).toBe("120");
+    expect(rows[1]?.children[lengthColumnIndex]?.textContent?.trim()).toBe("120");
   });
 
   it("supports deeper zoom-out floor and allows dragging nodes to negative coordinates", () => {
