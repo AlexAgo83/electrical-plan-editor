@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG, MAX_FREE_WIRE_COLOR_LABEL_LENGTH } from "../../../core/cableColors";
 import type { WireEndpoint } from "../../../core/entities";
+import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import { useWireHandlersContext } from "../controller/ModelingController.context";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
@@ -16,6 +17,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireName,
     wireTechnicalId,
     setWireTechnicalId,
+    wireTwistGroupLabel,
+    setWireTwistGroupLabel,
     wireSectionMm2,
     setWireSectionMm2,
     wireCurrentA,
@@ -55,6 +58,10 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireEndpointASpliceId,
     wireEndpointAPortIndex,
     setWireEndpointAPortIndex,
+    wireEndpointASpliceSideOverride,
+    setWireEndpointASpliceSideOverride,
+    wireEndpointASpliceSideLocked,
+    setWireEndpointASpliceSideLocked,
     wireEndpointASlotHint,
     wireEndpointBConnectionReference,
     setWireEndpointBConnectionReference,
@@ -74,6 +81,10 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireEndpointBSpliceId,
     wireEndpointBPortIndex,
     setWireEndpointBPortIndex,
+    wireEndpointBSpliceSideOverride,
+    setWireEndpointBSpliceSideOverride,
+    wireEndpointBSpliceSideLocked,
+    setWireEndpointBSpliceSideLocked,
     wireEndpointBSlotHint,
     catalogItems,
     connectors,
@@ -83,6 +94,12 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
   const wireHandlers = useWireHandlersContext();
   const primaryColor = wirePrimaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wirePrimaryColorId] : undefined;
   const secondaryColor = wireSecondaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wireSecondaryColorId] : undefined;
+  const selectedEndpointASplice = splices.find((splice) => splice.id === wireEndpointASpliceId);
+  const selectedEndpointBSplice = splices.find((splice) => splice.id === wireEndpointBSpliceId);
+  const endpointAIsDirectionalSplice =
+    selectedEndpointASplice !== undefined && resolveSplicePortMode(selectedEndpointASplice) === "directional";
+  const endpointBIsDirectionalSplice =
+    selectedEndpointBSplice !== undefined && resolveSplicePortMode(selectedEndpointBSplice) === "directional";
   const isCatalogColorMode = wireColorMode === "catalog";
   const isFreeColorMode = wireColorMode === "free";
   const selectedFuseCatalogItemMissing =
@@ -175,6 +192,15 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     <label>
       Technical ID
       <input value={wireTechnicalId} onChange={(event) => setWireTechnicalId(event.target.value)} placeholder="W-001" required />
+    </label>
+    <label>
+      Twist group
+      <input
+        value={wireTwistGroupLabel}
+        onChange={(event) => setWireTwistGroupLabel(event.target.value)}
+        maxLength={80}
+        placeholder="Optional (e.g. CAN 1)"
+      />
     </label>
     <label>
       Section (mm²)
@@ -394,10 +420,35 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
                 ))}
               </select>
             </label>
-            <label>
-              Port index
-              <input type="number" min={1} step={1} value={wireEndpointAPortIndex} onChange={(event) => setWireEndpointAPortIndex(event.target.value)} />
-            </label>
+            {endpointAIsDirectionalSplice ? (
+              <>
+                <label>
+                  Side
+                  <select
+                    value={wireEndpointASpliceSideOverride}
+                    onChange={(event) => setWireEndpointASpliceSideOverride(event.target.value as typeof wireEndpointASpliceSideOverride)}
+                  >
+                    <option value="auto">Auto by routing</option>
+                    <option value="L">Force L</option>
+                    <option value="R">Force R</option>
+                  </select>
+                </label>
+                <label className="settings-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={wireEndpointASpliceSideLocked}
+                    onChange={(event) => setWireEndpointASpliceSideLocked(event.target.checked)}
+                    disabled={wireEndpointASpliceSideOverride === "auto"}
+                  />{" "}
+                  Lock forced side
+                </label>
+              </>
+            ) : (
+              <label>
+                Port index
+                <input type="number" min={1} step={1} value={wireEndpointAPortIndex} onChange={(event) => setWireEndpointAPortIndex(event.target.value)} />
+              </label>
+            )}
             {wireEndpointASlotHint !== null ? (
               <small className={wireEndpointASlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointASlotHint.message}</small>
             ) : null}
@@ -487,10 +538,35 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
                 ))}
               </select>
             </label>
-            <label>
-              Port index
-              <input type="number" min={1} step={1} value={wireEndpointBPortIndex} onChange={(event) => setWireEndpointBPortIndex(event.target.value)} />
-            </label>
+            {endpointBIsDirectionalSplice ? (
+              <>
+                <label>
+                  Side
+                  <select
+                    value={wireEndpointBSpliceSideOverride}
+                    onChange={(event) => setWireEndpointBSpliceSideOverride(event.target.value as typeof wireEndpointBSpliceSideOverride)}
+                  >
+                    <option value="auto">Auto by routing</option>
+                    <option value="L">Force L</option>
+                    <option value="R">Force R</option>
+                  </select>
+                </label>
+                <label className="settings-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={wireEndpointBSpliceSideLocked}
+                    onChange={(event) => setWireEndpointBSpliceSideLocked(event.target.checked)}
+                    disabled={wireEndpointBSpliceSideOverride === "auto"}
+                  />{" "}
+                  Lock forced side
+                </label>
+              </>
+            ) : (
+              <label>
+                Port index
+                <input type="number" min={1} step={1} value={wireEndpointBPortIndex} onChange={(event) => setWireEndpointBPortIndex(event.target.value)} />
+              </label>
+            )}
             {wireEndpointBSlotHint !== null ? (
               <small className={wireEndpointBSlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointBSlotHint.message}</small>
             ) : null}

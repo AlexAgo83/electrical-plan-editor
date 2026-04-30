@@ -117,6 +117,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
               ? [
                   "Name",
                   "Technical ID",
+                  "Twist group",
                   "Color",
                   "Begin ID",
                   "Begin pin",
@@ -153,6 +154,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 return [
                   wire.name,
                   wire.technicalId,
+                  wire.twistGroupLabel ?? "",
                   colorCode,
                   begin.endpointId,
                   begin.pin,
@@ -170,6 +172,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
               return [
                 wire.name,
                 wire.technicalId,
+                wire.twistGroupLabel ?? "",
                 colorCode,
                 begin.endpointId,
                 begin.pin,
@@ -261,6 +264,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 {isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{wireListSortIndicator("technicalId")}</span>
               </button>
             </th>
+            <th>{isMobileViewport ? "Twist" : "Twist group"}</th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "color")}>
               <button
                 type="button"
@@ -377,6 +381,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   ) : null}
                 </td>
                 <td className="technical-id">{wire.technicalId}</td>
+                <td>{wire.twistGroupLabel ?? ""}</td>
                 <td>{renderWireColorCellValue(wire)}</td>
                 <td>{describeWireEndpoint(wire.endpointA)}</td>
                 <td>{describeWireEndpoint(wire.endpointB)}</td>

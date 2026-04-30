@@ -186,6 +186,8 @@ export function useAppControllerAuxScreenContentDomains({
     setDefaultWireSectionMm2: settings.prefs.setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes: settings.prefs.defaultAutoCreateLinkedNodes,
     setDefaultAutoCreateLinkedNodes: settings.prefs.setDefaultAutoCreateLinkedNodes,
+    spliceSectionImbalanceRatioPercent: settings.prefs.spliceSectionImbalanceRatioPercent,
+    setSpliceSectionImbalanceRatioPercent: settings.prefs.setSpliceSectionImbalanceRatioPercent,
     defaultSortField: settings.prefs.defaultSortField,
     setDefaultSortField: settings.prefs.setDefaultSortField,
     defaultSortDirection: settings.prefs.defaultSortDirection,

@@ -1,5 +1,7 @@
 import { useCallback } from "react";
+import { portIndexToSpliceSide } from "../../core/directionalSplice";
 import type { Connector, ConnectorId, Splice, SpliceId, WireEndpoint } from "../../core/entities";
+import { resolveSplicePortMode } from "../../core/splicePortMode";
 
 interface UseWireEndpointDescriptionsParams {
   connectorMap: Map<ConnectorId, Connector>;
@@ -23,6 +25,10 @@ export function useWireEndpointDescriptions({ connectorMap, spliceMap }: UseWire
         return `Splice ${endpoint.spliceId} / P${endpoint.portIndex}`;
       }
 
+      if (resolveSplicePortMode(splice) === "directional") {
+        return `${splice.name} (${splice.technicalId}) / ${endpoint.spliceSideOverride ?? portIndexToSpliceSide(endpoint.portIndex)}`;
+      }
+
       return `${splice.name} (${splice.technicalId}) / P${endpoint.portIndex}`;
     },
     [connectorMap, spliceMap]
@@ -36,6 +42,10 @@ export function useWireEndpointDescriptions({ connectorMap, spliceMap }: UseWire
       }
 
       const spliceTechnicalId = spliceMap.get(endpoint.spliceId)?.technicalId ?? String(endpoint.spliceId);
+      const splice = spliceMap.get(endpoint.spliceId);
+      if (splice !== undefined && resolveSplicePortMode(splice) === "directional") {
+        return `${spliceTechnicalId} / ${endpoint.spliceSideOverride ?? portIndexToSpliceSide(endpoint.portIndex)}`;
+      }
       return `${spliceTechnicalId} / P${endpoint.portIndex}`;
     },
     [connectorMap, spliceMap]
@@ -52,9 +62,13 @@ export function useWireEndpointDescriptions({ connectorMap, spliceMap }: UseWire
       }
 
       const spliceTechnicalId = spliceMap.get(endpoint.spliceId)?.technicalId ?? String(endpoint.spliceId);
+      const splice = spliceMap.get(endpoint.spliceId);
       return {
         endpointId: spliceTechnicalId,
-        pin: `P${endpoint.portIndex}`
+        pin:
+          splice !== undefined && resolveSplicePortMode(splice) === "directional"
+            ? endpoint.spliceSideOverride ?? portIndexToSpliceSide(endpoint.portIndex)
+            : `P${endpoint.portIndex}`
       };
     },
     [connectorMap, spliceMap]

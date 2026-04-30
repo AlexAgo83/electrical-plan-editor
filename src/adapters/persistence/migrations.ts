@@ -12,7 +12,11 @@ import {
 import { normalizeNetworkVoltageV, normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeWireEndpointReferenceName } from "../../core/wireReferences";
-import { normalizeSplicePortMode, normalizeUnboundedPortCountFallback } from "../../core/splicePortMode";
+import {
+  DIRECTIONAL_SPLICE_PORT_COUNT,
+  normalizeSplicePortMode,
+  normalizeUnboundedPortCountFallback
+} from "../../core/splicePortMode";
 import type {
   CatalogItem,
   CatalogItemId,
@@ -98,6 +102,11 @@ function normalizeWireEntityState(candidate: EntityState<Wire, WireId>): EntityS
 
     byId[wireId] = {
       ...wire,
+      twistGroupLabel:
+        typeof (wire as Partial<Wire>).twistGroupLabel === "string" &&
+        ((wire as Partial<Wire>).twistGroupLabel ?? "").trim().length > 0
+          ? ((wire as Partial<Wire>).twistGroupLabel ?? "").trim().slice(0, 80)
+          : undefined,
       sectionMm2: resolveWireSectionMm2((wire as Partial<Wire>).sectionMm2),
       currentA: normalizeWireCurrentA((wire as Partial<Wire>).currentA),
       material: normalizeWireMaterial((wire as Partial<Wire>).material),
@@ -212,7 +221,13 @@ function normalizeSpliceEntityState(candidate: EntityState<Splice, SpliceId>): E
     byId[spliceId] = {
       ...splice,
       portMode,
-      portCount: portMode === "bounded" ? boundedPortCount : normalizeUnboundedPortCountFallback(rawSplice.portCount),
+      portCount:
+        portMode === "bounded"
+          ? boundedPortCount
+          : portMode === "directional"
+            ? DIRECTIONAL_SPLICE_PORT_COUNT
+            : normalizeUnboundedPortCountFallback(rawSplice.portCount),
+      sideInverted: rawSplice.sideInverted === true,
       manufacturerReference: normalizeManufacturerReference(rawSplice.manufacturerReference)
     };
   }

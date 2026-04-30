@@ -11,6 +11,8 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     spliceEditAfterCreate,
     openCreateSpliceForm,
     handleSpliceSubmit,
+    handleConvertSpliceToDirectional,
+    handleRerouteSpliceConnectedWires,
     spliceName,
     setSpliceName,
     spliceTechnicalId,
@@ -21,6 +23,8 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     setSpliceCatalogItemId,
     splicePortMode,
     setSplicePortMode,
+    spliceSideInverted,
+    setSpliceSideInverted,
     spliceManufacturerReference,
     spliceAutoCreateLinkedNode,
     setSpliceAutoCreateLinkedNode,
@@ -34,6 +38,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
   const hasCatalogItems = catalogItems.length > 0;
   const isCatalogLinked = spliceCatalogItemId.trim().length > 0;
   const isUnbounded = splicePortMode === "unbounded";
+  const isDirectional = splicePortMode === "directional";
   const catalogItemOptions = buildModelingDynamicSelectOptions({
     options: catalogItems.map((item) => ({
       value: item.id,
@@ -86,24 +91,59 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       <small className="meta-line">{`Manufacturer reference: ${spliceManufacturerReference}`}</small>
     ) : null}
     {isCatalogLinked ? (
-      <small className="inline-help">Catalog-linked splices are always bounded and derive port count from catalog connection count.</small>
+      <small className="inline-help">Catalog-linked directional splices keep L/R sides; legacy bounded splices derive port count from catalog connection count.</small>
     ) : null}
     {spliceTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
-    <label>
-      Capacity mode
-      <select
-        value={splicePortMode}
-        onChange={(event) => setSplicePortMode(event.target.value as "bounded" | "unbounded")}
-        disabled={isCatalogLinked}
-      >
-        <option value="bounded">Bounded</option>
-        <option value="unbounded">Unbounded (∞)</option>
-      </select>
-    </label>
-    {isUnbounded ? (
+    {spliceFormMode === "edit" && !isDirectional ? (
+      <>
+        <label>
+          Legacy capacity mode
+          <select
+            value={splicePortMode}
+            onChange={(event) => setSplicePortMode(event.target.value as "bounded" | "unbounded")}
+            disabled={isCatalogLinked}
+          >
+            <option value="bounded">Bounded</option>
+            <option value="unbounded">Unbounded (infinity)</option>
+          </select>
+        </label>
+        <div className="row-actions compact">
+          <button type="button" className="button-with-icon" onClick={handleConvertSpliceToDirectional}>
+            <span className="action-button-icon is-swap" aria-hidden="true" />
+            Convert to automatic L/R
+          </button>
+        </div>
+      </>
+    ) : (
+      <small className="inline-help">Directional splice: wire endpoints are assigned automatically to L or R from routing.</small>
+    )}
+    {isDirectional ? (
+      <>
+        <label>
+          Directional ports
+          <input value="L / R" readOnly aria-readonly="true" />
+        </label>
+        <label className="settings-checkbox">
+          <input
+            type="checkbox"
+            checked={spliceSideInverted}
+            onChange={(event) => setSpliceSideInverted(event.target.checked)}
+          />{" "}
+          Invert all L/R assignments
+        </label>
+        {spliceFormMode === "edit" ? (
+          <div className="row-actions compact">
+            <button type="button" className="button-with-icon" onClick={handleRerouteSpliceConnectedWires}>
+              <span className="action-button-icon is-refresh" aria-hidden="true" />
+              Reroute connected wires
+            </button>
+          </div>
+        ) : null}
+      </>
+    ) : isUnbounded ? (
       <label>
         Port count
-        <input value="∞" readOnly aria-readonly="true" />
+        <input value="infinity" readOnly aria-readonly="true" />
       </label>
     ) : (
       <label>

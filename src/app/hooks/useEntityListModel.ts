@@ -301,6 +301,7 @@ export function useEntityListModel({
         `${describeWireEndpoint(wire.endpointA)} ${describeWireEndpoint(wire.endpointB)}`.toLocaleLowerCase();
       const nameSearchText = wire.name.toLocaleLowerCase();
       const technicalIdSearchText = wire.technicalId.toLocaleLowerCase();
+      const twistGroupSearchText = (wire.twistGroupLabel ?? "").toLocaleLowerCase();
       const colorSearchText = getWireColorSearchText(wire);
       const matchesSelectedField =
         wireFilterField === "endpoints"
@@ -309,7 +310,7 @@ export function useEntityListModel({
             ? nameSearchText.includes(normalizedWireFilterQuery)
             : wireFilterField === "technicalId"
               ? technicalIdSearchText.includes(normalizedWireFilterQuery)
-              : `${nameSearchText} ${technicalIdSearchText} ${endpointSearchText} ${colorSearchText}`.includes(normalizedWireFilterQuery);
+              : `${nameSearchText} ${technicalIdSearchText} ${twistGroupSearchText} ${endpointSearchText} ${colorSearchText}`.includes(normalizedWireFilterQuery);
       if (!matchesSelectedField) {
         return false;
       }
@@ -317,7 +318,7 @@ export function useEntityListModel({
     if (normalizedWireSearch.length === 0) {
       return true;
     }
-    return `${wire.name} ${wire.technicalId} ${getWireColorSearchText(wire)}`.toLocaleLowerCase().includes(normalizedWireSearch);
+    return `${wire.name} ${wire.technicalId} ${wire.twistGroupLabel ?? ""} ${getWireColorSearchText(wire)}`.toLocaleLowerCase().includes(normalizedWireSearch);
   }), [describeWireEndpoint, normalizedWireFilterQuery, normalizedWireSearch, sortedWires, wireFilterField, wireRouteFilter]);
 
   const segmentsCountByNodeId = useMemo(() => {

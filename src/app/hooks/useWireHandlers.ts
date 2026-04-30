@@ -9,6 +9,7 @@ import type {
   WireEndpoint,
   WireId
 } from "../../core/entities";
+import { portIndexToSpliceSide, type DirectionalSpliceSide } from "../../core/directionalSplice";
 import {
   getNormalizedWireColorMode,
   MAX_FREE_WIRE_COLOR_LABEL_LENGTH,
@@ -21,6 +22,7 @@ import { DEFAULT_WIRE_SECTION_MM2 } from "../../core/wireSection";
 import { buildRoutingGraphIndex } from "../../core/graph";
 import { findShortestRoute } from "../../core/pathfinding";
 import { computeRecommendedWireSectionMm2, normalizeWireCurrentA, resolveWireMaterial } from "../../core/wireSizing";
+import { resolveSplicePortMode } from "../../core/splicePortMode";
 import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
 import { suggestNextWireTechnicalId } from "../lib/technical-id-suggestions";
 import type { ChoiceDialogRequest, ConfirmDialogRequest } from "../types/confirm-dialog";
@@ -55,6 +57,8 @@ interface UseWireHandlersParams {
   setWireName: (value: string) => void;
   wireTechnicalId: string;
   setWireTechnicalId: (value: string) => void;
+  wireTwistGroupLabel: string;
+  setWireTwistGroupLabel: (value: string) => void;
   wireSectionMm2: string;
   setWireSectionMm2: (value: string) => void;
   wireCurrentA: string;
@@ -91,6 +95,10 @@ interface UseWireHandlersParams {
   setWireEndpointASpliceId: (value: string) => void;
   wireEndpointAPortIndex: string;
   setWireEndpointAPortIndex: (value: string) => void;
+  wireEndpointASpliceSideOverride: DirectionalSpliceSide | "auto";
+  setWireEndpointASpliceSideOverride: (value: DirectionalSpliceSide | "auto") => void;
+  wireEndpointASpliceSideLocked: boolean;
+  setWireEndpointASpliceSideLocked: (value: boolean) => void;
   wireEndpointBConnectionReference: string;
   setWireEndpointBConnectionReference: (value: string) => void;
   wireEndpointBConnectionName: string;
@@ -109,6 +117,10 @@ interface UseWireHandlersParams {
   setWireEndpointBSpliceId: (value: string) => void;
   wireEndpointBPortIndex: string;
   setWireEndpointBPortIndex: (value: string) => void;
+  wireEndpointBSpliceSideOverride: DirectionalSpliceSide | "auto";
+  setWireEndpointBSpliceSideOverride: (value: DirectionalSpliceSide | "auto") => void;
+  wireEndpointBSpliceSideLocked: boolean;
+  setWireEndpointBSpliceSideLocked: (value: boolean) => void;
   wireForcedRouteInput: string;
   setWireForcedRouteInput: (value: string) => void;
   setWireFormError: (value: string | null) => void;
@@ -146,6 +158,8 @@ export function useWireHandlers({
   setWireName,
   wireTechnicalId,
   setWireTechnicalId,
+  wireTwistGroupLabel,
+  setWireTwistGroupLabel,
   wireSectionMm2,
   setWireSectionMm2,
   wireCurrentA,
@@ -182,6 +196,10 @@ export function useWireHandlers({
   setWireEndpointASpliceId,
   wireEndpointAPortIndex,
   setWireEndpointAPortIndex,
+  wireEndpointASpliceSideOverride,
+  setWireEndpointASpliceSideOverride,
+  wireEndpointASpliceSideLocked,
+  setWireEndpointASpliceSideLocked,
   wireEndpointBConnectionReference,
   setWireEndpointBConnectionReference,
   wireEndpointBConnectionName,
@@ -200,6 +218,10 @@ export function useWireHandlers({
   setWireEndpointBSpliceId,
   wireEndpointBPortIndex,
   setWireEndpointBPortIndex,
+  wireEndpointBSpliceSideOverride,
+  setWireEndpointBSpliceSideOverride,
+  wireEndpointBSpliceSideLocked,
+  setWireEndpointBSpliceSideLocked,
   wireForcedRouteInput,
   setWireForcedRouteInput,
   setWireFormError,
@@ -460,6 +482,9 @@ export function useWireHandlers({
       if (splice === undefined) {
         return null;
       }
+      if (resolveSplicePortMode(splice) === "directional") {
+        return null;
+      }
       const portIndex = toPositiveInteger(wireEndpointAPortIndex);
       if (portIndex <= 0) {
         return null;
@@ -509,6 +534,9 @@ export function useWireHandlers({
     }
     const splice = snapshot.splices.byId[wireEndpointBSpliceId as SpliceId];
     if (splice === undefined) {
+      return null;
+    }
+    if (resolveSplicePortMode(splice) === "directional") {
       return null;
     }
     const portIndex = toPositiveInteger(wireEndpointBPortIndex);
@@ -775,6 +803,7 @@ export function useWireHandlers({
     setEditingWireId(null);
     setWireName("");
     setWireTechnicalId(suggestNextWireTechnicalId(Object.values(state.wires.byId).map((wire) => wire.technicalId)));
+    setWireTwistGroupLabel("");
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
     setWireCurrentA("");
     setWireMaterial("copper");
@@ -793,6 +822,8 @@ export function useWireHandlers({
     setWireEndpointACavityIndex("1");
     setWireEndpointASpliceId("");
     setWireEndpointAPortIndex("1");
+    setWireEndpointASpliceSideOverride("auto");
+    setWireEndpointASpliceSideLocked(false);
     setWireEndpointBConnectionReference("");
     setWireEndpointBConnectionName("");
     setWireEndpointBSealReference("");
@@ -802,6 +833,8 @@ export function useWireHandlers({
     setWireEndpointBCavityIndex("1");
     setWireEndpointBSpliceId("");
     setWireEndpointBPortIndex("1");
+    setWireEndpointBSpliceSideOverride("auto");
+    setWireEndpointBSpliceSideLocked(false);
     setWireForcedRouteInput("");
     setWireFormError(null);
   }
@@ -816,6 +849,7 @@ export function useWireHandlers({
     setEditingWireId(null);
     setWireName("");
     setWireTechnicalId("");
+    setWireTwistGroupLabel("");
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
     setWireCurrentA("");
     setWireMaterial("copper");
@@ -832,6 +866,8 @@ export function useWireHandlers({
     setWireEndpointACavityIndex("1");
     setWireEndpointASpliceId("");
     setWireEndpointAPortIndex("1");
+    setWireEndpointASpliceSideOverride("auto");
+    setWireEndpointASpliceSideLocked(false);
     setWireEndpointBConnectionReference("");
     setWireEndpointBSealReference("");
     setWireEndpointBKind("splicePort");
@@ -839,6 +875,8 @@ export function useWireHandlers({
     setWireEndpointBCavityIndex("1");
     setWireEndpointBSpliceId("");
     setWireEndpointBPortIndex("1");
+    setWireEndpointBSpliceSideOverride("auto");
+    setWireEndpointBSpliceSideLocked(false);
     setWireForcedRouteInput("");
     setWireFormError(null);
   }
@@ -860,6 +898,8 @@ export function useWireHandlers({
     const nextEndpointACavityIndex = wireEndpointBCavityIndex;
     const nextEndpointASpliceId = wireEndpointBSpliceId;
     const nextEndpointAPortIndex = wireEndpointBPortIndex;
+    const nextEndpointASpliceSideOverride = wireEndpointBSpliceSideOverride;
+    const nextEndpointASpliceSideLocked = wireEndpointBSpliceSideLocked;
 
     setWireEndpointAConnectionReference(nextEndpointAConnectionReference);
     setWireEndpointAConnectionName(wireEndpointBConnectionName);
@@ -870,6 +910,8 @@ export function useWireHandlers({
     setWireEndpointACavityIndex(nextEndpointACavityIndex);
     setWireEndpointASpliceId(nextEndpointASpliceId);
     setWireEndpointAPortIndex(nextEndpointAPortIndex);
+    setWireEndpointASpliceSideOverride(nextEndpointASpliceSideOverride);
+    setWireEndpointASpliceSideLocked(nextEndpointASpliceSideLocked);
 
     setWireEndpointBConnectionReference(wireEndpointAConnectionReference);
     setWireEndpointBConnectionName(wireEndpointAConnectionName);
@@ -880,6 +922,8 @@ export function useWireHandlers({
     setWireEndpointBCavityIndex(wireEndpointACavityIndex);
     setWireEndpointBSpliceId(wireEndpointASpliceId);
     setWireEndpointBPortIndex(wireEndpointAPortIndex);
+    setWireEndpointBSpliceSideOverride(wireEndpointASpliceSideOverride);
+    setWireEndpointBSpliceSideLocked(wireEndpointASpliceSideLocked);
     setWireFormError(null);
   }
 
@@ -891,6 +935,7 @@ export function useWireHandlers({
     setEditingWireId(wire.id);
     setWireName(wire.name);
     setWireTechnicalId(wire.technicalId);
+    setWireTwistGroupLabel(wire.twistGroupLabel ?? "");
     setWireSectionMm2(String(wire.sectionMm2));
     setWireCurrentA(wire.currentA === undefined ? "" : String(wire.currentA));
     setWireMaterial(resolveWireMaterial(wire.material));
@@ -933,9 +978,13 @@ export function useWireHandlers({
       setWireEndpointACavityIndex(String(wire.endpointA.cavityIndex));
       setWireEndpointASpliceId("");
       setWireEndpointAPortIndex("1");
+      setWireEndpointASpliceSideOverride("auto");
+      setWireEndpointASpliceSideLocked(false);
     } else {
       setWireEndpointASpliceId(wire.endpointA.spliceId);
       setWireEndpointAPortIndex(String(wire.endpointA.portIndex));
+      setWireEndpointASpliceSideOverride(wire.endpointA.spliceSideOverride ?? portIndexToSpliceSide(wire.endpointA.portIndex));
+      setWireEndpointASpliceSideLocked(wire.endpointA.spliceSideLocked === true);
       setWireEndpointAConnectorId("");
       setWireEndpointACavityIndex("1");
     }
@@ -946,9 +995,13 @@ export function useWireHandlers({
       setWireEndpointBCavityIndex(String(wire.endpointB.cavityIndex));
       setWireEndpointBSpliceId("");
       setWireEndpointBPortIndex("1");
+      setWireEndpointBSpliceSideOverride("auto");
+      setWireEndpointBSpliceSideLocked(false);
     } else {
       setWireEndpointBSpliceId(wire.endpointB.spliceId);
       setWireEndpointBPortIndex(String(wire.endpointB.portIndex));
+      setWireEndpointBSpliceSideOverride(wire.endpointB.spliceSideOverride ?? portIndexToSpliceSide(wire.endpointB.portIndex));
+      setWireEndpointBSpliceSideLocked(wire.endpointB.spliceSideLocked === true);
       setWireEndpointBConnectorId("");
       setWireEndpointBCavityIndex("1");
     }
@@ -980,7 +1033,10 @@ export function useWireHandlers({
       return {
         kind: "splicePort",
         spliceId: wireEndpointASpliceId as SpliceId,
-        portIndex: toPositiveInteger(wireEndpointAPortIndex)
+        portIndex: toPositiveInteger(wireEndpointAPortIndex),
+        spliceSideOverride:
+          wireEndpointASpliceSideOverride === "auto" ? undefined : wireEndpointASpliceSideOverride,
+        spliceSideLocked: wireEndpointASpliceSideLocked
       };
     }
 
@@ -1005,7 +1061,10 @@ export function useWireHandlers({
     return {
       kind: "splicePort",
       spliceId: wireEndpointBSpliceId as SpliceId,
-      portIndex: toPositiveInteger(wireEndpointBPortIndex)
+      portIndex: toPositiveInteger(wireEndpointBPortIndex),
+      spliceSideOverride:
+        wireEndpointBSpliceSideOverride === "auto" ? undefined : wireEndpointBSpliceSideOverride,
+      spliceSideLocked: wireEndpointBSpliceSideLocked
     };
   }
 
@@ -1208,6 +1267,7 @@ export function useWireHandlers({
           id: wireId,
           name: normalizedName,
           technicalId: normalizedTechnicalId,
+          twistGroupLabel: wireTwistGroupLabel,
           sectionMm2: parsedSectionMm2,
           currentA: normalizedCurrentA,
           material: resolveWireMaterial(wireMaterial),

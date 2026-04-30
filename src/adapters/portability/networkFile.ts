@@ -24,7 +24,11 @@ import {
 import { normalizeNetworkVoltageV, normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeWireEndpointReferenceName } from "../../core/wireReferences";
-import { normalizeSplicePortMode, normalizeUnboundedPortCountFallback } from "../../core/splicePortMode";
+import {
+  DIRECTIONAL_SPLICE_PORT_COUNT,
+  normalizeSplicePortMode,
+  normalizeUnboundedPortCountFallback
+} from "../../core/splicePortMode";
 import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
 import { bootstrapCatalogForScopedState, normalizeCatalogItem, normalizeManufacturerReference } from "../../store/catalog";
 
@@ -109,6 +113,11 @@ function normalizeWiresEntityState(
 
     byId[wireId] = {
       ...wire,
+      twistGroupLabel:
+        typeof (wire as Partial<Wire>).twistGroupLabel === "string" &&
+        ((wire as Partial<Wire>).twistGroupLabel ?? "").trim().length > 0
+          ? ((wire as Partial<Wire>).twistGroupLabel ?? "").trim().slice(0, 80)
+          : undefined,
       sectionMm2: resolveWireSectionMm2((wire as Partial<Wire>).sectionMm2),
       currentA: normalizeWireCurrentA((wire as Partial<Wire>).currentA),
       material: normalizeWireMaterial((wire as Partial<Wire>).material),
@@ -174,7 +183,13 @@ function normalizeSplicesEntityState(splices: NetworkScopedState["splices"]): Ne
     byId[spliceId] = {
       ...splice,
       portMode,
-      portCount: portMode === "bounded" ? boundedPortCount : normalizeUnboundedPortCountFallback(rawSplice.portCount),
+      portCount:
+        portMode === "bounded"
+          ? boundedPortCount
+          : portMode === "directional"
+            ? DIRECTIONAL_SPLICE_PORT_COUNT
+            : normalizeUnboundedPortCountFallback(rawSplice.portCount),
+      sideInverted: rawSplice.sideInverted === true,
       manufacturerReference: normalizeManufacturerReference(rawSplice.manufacturerReference)
     };
   }

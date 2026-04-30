@@ -556,6 +556,7 @@ export function ModelingSecondaryTables({
                     ? [
                         "Name",
                         "Technical ID",
+                        "Twist group",
                         "Color",
                         "Begin ID",
                         "Begin pin",
@@ -592,6 +593,7 @@ export function ModelingSecondaryTables({
                       return [
                         wire.name,
                         wire.technicalId,
+                        wire.twistGroupLabel ?? "",
                         colorCode,
                         begin.endpointId,
                         begin.pin,
@@ -609,6 +611,7 @@ export function ModelingSecondaryTables({
                     return [
                       wire.name,
                       wire.technicalId,
+                      wire.twistGroupLabel ?? "",
                       colorCode,
                       begin.endpointId,
                       begin.pin,
@@ -697,6 +700,7 @@ export function ModelingSecondaryTables({
                   ) : null}
                   <th aria-sort={getTableAriaSort(wireTableSort, "name")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{wireSortIndicator("name")}</span></button></th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{wireSortIndicator("technicalId")}</span></button></th>
+                  <th>{isMobileViewport ? "Twist" : "Twist group"}</th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "color")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "color", direction: current.field === "color" && current.direction === "asc" ? "desc" : "asc" }))}>Color <span className="sort-indicator">{wireSortIndicator("color")}</span></button></th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "endpointA")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpointA", direction: current.field === "endpointA" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "End A" : "Endpoint A"} <span className="sort-indicator">{wireSortIndicator("endpointA")}</span></button></th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "endpointB")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpointB", direction: current.field === "endpointB" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "End B" : "Endpoint B"} <span className="sort-indicator">{wireSortIndicator("endpointB")}</span></button></th>
@@ -752,6 +756,7 @@ export function ModelingSecondaryTables({
                         ) : null}
                       </td>
                       <td className="technical-id">{wire.technicalId}</td>
+                      <td>{wire.twistGroupLabel ?? ""}</td>
                       <td>{renderWireColorCellValue(wire)}</td>
                       <td>{describeWireEndpoint(wire.endpointA)}</td>
                       <td>{describeWireEndpoint(wire.endpointB)}</td>

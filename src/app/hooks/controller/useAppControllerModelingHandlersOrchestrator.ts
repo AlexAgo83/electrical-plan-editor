@@ -50,6 +50,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setSpliceCatalogItemId: Parameters<typeof useSpliceHandlers>[0]["setSpliceCatalogItemId"];
   splicePortMode: Parameters<typeof useSpliceHandlers>[0]["splicePortMode"];
   setSplicePortMode: Parameters<typeof useSpliceHandlers>[0]["setSplicePortMode"];
+  spliceSideInverted: Parameters<typeof useSpliceHandlers>[0]["spliceSideInverted"];
+  setSpliceSideInverted: Parameters<typeof useSpliceHandlers>[0]["setSpliceSideInverted"];
   spliceManufacturerReference: Parameters<typeof useSpliceHandlers>[0]["spliceManufacturerReference"];
   setSpliceManufacturerReference: Parameters<typeof useSpliceHandlers>[0]["setSpliceManufacturerReference"];
   spliceAutoCreateLinkedNode: Parameters<typeof useSpliceHandlers>[0]["spliceAutoCreateLinkedNode"];
@@ -107,6 +109,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireName: Parameters<typeof useWireHandlers>[0]["setWireName"];
   wireTechnicalId: Parameters<typeof useWireHandlers>[0]["wireTechnicalId"];
   setWireTechnicalId: Parameters<typeof useWireHandlers>[0]["setWireTechnicalId"];
+  wireTwistGroupLabel: Parameters<typeof useWireHandlers>[0]["wireTwistGroupLabel"];
+  setWireTwistGroupLabel: Parameters<typeof useWireHandlers>[0]["setWireTwistGroupLabel"];
   wireSectionMm2: Parameters<typeof useWireHandlers>[0]["wireSectionMm2"];
   setWireSectionMm2: Parameters<typeof useWireHandlers>[0]["setWireSectionMm2"];
   wireCurrentA: Parameters<typeof useWireHandlers>[0]["wireCurrentA"];
@@ -143,6 +147,10 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireEndpointASpliceId: Parameters<typeof useWireHandlers>[0]["setWireEndpointASpliceId"];
   wireEndpointAPortIndex: Parameters<typeof useWireHandlers>[0]["wireEndpointAPortIndex"];
   setWireEndpointAPortIndex: Parameters<typeof useWireHandlers>[0]["setWireEndpointAPortIndex"];
+  wireEndpointASpliceSideOverride: Parameters<typeof useWireHandlers>[0]["wireEndpointASpliceSideOverride"];
+  setWireEndpointASpliceSideOverride: Parameters<typeof useWireHandlers>[0]["setWireEndpointASpliceSideOverride"];
+  wireEndpointASpliceSideLocked: Parameters<typeof useWireHandlers>[0]["wireEndpointASpliceSideLocked"];
+  setWireEndpointASpliceSideLocked: Parameters<typeof useWireHandlers>[0]["setWireEndpointASpliceSideLocked"];
   wireEndpointBConnectionReference: Parameters<typeof useWireHandlers>[0]["wireEndpointBConnectionReference"];
   setWireEndpointBConnectionReference: Parameters<typeof useWireHandlers>[0]["setWireEndpointBConnectionReference"];
   wireEndpointBConnectionName: Parameters<typeof useWireHandlers>[0]["wireEndpointBConnectionName"];
@@ -161,6 +169,10 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireEndpointBSpliceId: Parameters<typeof useWireHandlers>[0]["setWireEndpointBSpliceId"];
   wireEndpointBPortIndex: Parameters<typeof useWireHandlers>[0]["wireEndpointBPortIndex"];
   setWireEndpointBPortIndex: Parameters<typeof useWireHandlers>[0]["setWireEndpointBPortIndex"];
+  wireEndpointBSpliceSideOverride: Parameters<typeof useWireHandlers>[0]["wireEndpointBSpliceSideOverride"];
+  setWireEndpointBSpliceSideOverride: Parameters<typeof useWireHandlers>[0]["setWireEndpointBSpliceSideOverride"];
+  wireEndpointBSpliceSideLocked: Parameters<typeof useWireHandlers>[0]["wireEndpointBSpliceSideLocked"];
+  setWireEndpointBSpliceSideLocked: Parameters<typeof useWireHandlers>[0]["setWireEndpointBSpliceSideLocked"];
   wireForcedRouteInput: Parameters<typeof useWireHandlers>[0]["wireForcedRouteInput"];
   setWireForcedRouteInput: Parameters<typeof useWireHandlers>[0]["setWireForcedRouteInput"];
   setWireFormError: Parameters<typeof useWireHandlers>[0]["setWireFormError"];
@@ -212,6 +224,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setSpliceCatalogItemId,
   splicePortMode,
   setSplicePortMode,
+  spliceSideInverted,
+  setSpliceSideInverted,
   spliceManufacturerReference,
   setSpliceManufacturerReference,
   spliceAutoCreateLinkedNode,
@@ -269,6 +283,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireName,
   wireTechnicalId,
   setWireTechnicalId,
+  wireTwistGroupLabel,
+  setWireTwistGroupLabel,
   wireSectionMm2,
   setWireSectionMm2,
   wireCurrentA,
@@ -305,6 +321,10 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireEndpointASpliceId,
   wireEndpointAPortIndex,
   setWireEndpointAPortIndex,
+  wireEndpointASpliceSideOverride,
+  setWireEndpointASpliceSideOverride,
+  wireEndpointASpliceSideLocked,
+  setWireEndpointASpliceSideLocked,
   wireEndpointBConnectionReference,
   setWireEndpointBConnectionReference,
   wireEndpointBConnectionName,
@@ -323,6 +343,10 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireEndpointBSpliceId,
   wireEndpointBPortIndex,
   setWireEndpointBPortIndex,
+  wireEndpointBSpliceSideOverride,
+  setWireEndpointBSpliceSideOverride,
+  wireEndpointBSpliceSideLocked,
+  setWireEndpointBSpliceSideLocked,
   wireForcedRouteInput,
   setWireForcedRouteInput,
   setWireFormError,
@@ -379,6 +403,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     setSpliceCatalogItemId,
     splicePortMode,
     setSplicePortMode,
+    spliceSideInverted,
+    setSpliceSideInverted,
     spliceManufacturerReference,
     setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode,
@@ -459,6 +485,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireName,
     wireTechnicalId,
     setWireTechnicalId,
+    wireTwistGroupLabel,
+    setWireTwistGroupLabel,
     wireSectionMm2,
     setWireSectionMm2,
     wireCurrentA,
@@ -495,6 +523,10 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireEndpointASpliceId,
     wireEndpointAPortIndex,
     setWireEndpointAPortIndex,
+    wireEndpointASpliceSideOverride,
+    setWireEndpointASpliceSideOverride,
+    wireEndpointASpliceSideLocked,
+    setWireEndpointASpliceSideLocked,
     wireEndpointBConnectionReference,
     setWireEndpointBConnectionReference,
     wireEndpointBConnectionName,
@@ -513,6 +545,10 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireEndpointBSpliceId,
     wireEndpointBPortIndex,
     setWireEndpointBPortIndex,
+    wireEndpointBSpliceSideOverride,
+    setWireEndpointBSpliceSideOverride,
+    wireEndpointBSpliceSideLocked,
+    setWireEndpointBSpliceSideLocked,
     wireForcedRouteInput,
     setWireForcedRouteInput,
     setWireFormError,

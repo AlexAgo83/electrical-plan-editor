@@ -1,5 +1,6 @@
 import type { CatalogItemId, SegmentId, WireProtection } from "../../core/entities";
 import { normalizeWireColorState } from "../../core/cableColors";
+import { normalizeDirectionalSpliceEndpoint } from "../../core/directionalSplice";
 import { normalizeWireEndpointReferenceName } from "../../core/wireReferences";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
@@ -19,7 +20,9 @@ import {
   computeForcedRouteLength,
   findNodeIdForEndpoint,
   getEndpointKey,
-  getEndpointValidationError
+  getEndpointValidationError,
+  recomputeWireRouteAndDirectionalEndpoints,
+  resolveDirectionalSpliceEndpointSide
 } from "./helpers/wireTransitions";
 import { bumpRevision, clearLastError, isValidSlotIndex, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
 
@@ -53,6 +56,32 @@ function normalizeWireEndpointReference(value: string | undefined): string | und
 
 function normalizeWireEndpointReferenceNameValue(value: string | undefined): string | undefined {
   return normalizeWireEndpointReferenceName(value);
+}
+
+function normalizeWireTwistGroupLabel(value: string | undefined): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return undefined;
+  }
+
+  return normalized.length > 80 ? normalized.slice(0, 80) : normalized;
+}
+
+function isDirectionalSpliceEndpoint(state: AppState, endpoint: Parameters<typeof getEndpointOccupant>[1]): boolean {
+  if (endpoint.kind !== "splicePort") {
+    return false;
+  }
+
+  const splice = state.splices.byId[endpoint.spliceId];
+  return splice !== undefined && resolveSplicePortMode(splice) === "directional";
+}
+
+function isEndpointOccupancyExclusive(state: AppState, endpoint: Parameters<typeof getEndpointOccupant>[1]): boolean {
+  return !isDirectionalSpliceEndpoint(state, endpoint);
 }
 
 function normalizeWireProtection(
@@ -124,15 +153,18 @@ function canWriteEndpointOccupancy(state: AppState, endpoint: Parameters<typeof 
     return false;
   }
 
+  const portMode = resolveSplicePortMode(splice);
   const isValidPortIndex =
-    resolveSplicePortMode(splice) === "unbounded"
+    portMode === "unbounded"
       ? Number.isInteger(endpoint.portIndex) && endpoint.portIndex >= 1
-      : isValidSlotIndex(endpoint.portIndex, splice.portCount);
+      : portMode === "directional"
+        ? endpoint.portIndex === 1 || endpoint.portIndex === 2
+        : isValidSlotIndex(endpoint.portIndex, splice.portCount);
   if (!isValidPortIndex) {
     console.warn("Rejected wire occupancy write with out-of-range splice port index.", {
       spliceId: endpoint.spliceId,
       portIndex: endpoint.portIndex,
-      portMode: resolveSplicePortMode(splice),
+      portMode,
       portCount: splice.portCount
     });
     return false;
@@ -146,6 +178,7 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
     case "wire/save": {
       const normalizedName = action.payload.name.trim();
       const normalizedTechnicalId = action.payload.technicalId.trim();
+      const normalizedTwistGroupLabel = normalizeWireTwistGroupLabel(action.payload.twistGroupLabel);
       const normalizedSectionMm2 = resolveWireSectionMm2(action.payload.sectionMm2);
       const normalizedCurrentA = normalizeWireCurrentA(action.payload.currentA);
       const normalizedMaterial = normalizeWireMaterial(action.payload.material);
@@ -175,22 +208,25 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         return withError(state, `Wire technical ID '${normalizedTechnicalId}' is already used.`);
       }
 
-      const endpointAError = getEndpointValidationError(state, action.payload.endpointA);
+      let endpointA = action.payload.endpointA;
+      let endpointB = action.payload.endpointB;
+
+      const endpointAError = getEndpointValidationError(state, endpointA);
       if (endpointAError !== null) {
         return withError(state, endpointAError);
       }
 
-      const endpointBError = getEndpointValidationError(state, action.payload.endpointB);
+      const endpointBError = getEndpointValidationError(state, endpointB);
       if (endpointBError !== null) {
         return withError(state, endpointBError);
       }
 
-      if (getEndpointKey(action.payload.endpointA) === getEndpointKey(action.payload.endpointB)) {
+      if (getEndpointKey(endpointA) === getEndpointKey(endpointB)) {
         return withError(state, "Wire endpoints must be different.");
       }
 
-      const startNodeId = findNodeIdForEndpoint(state, action.payload.endpointA);
-      const endNodeId = findNodeIdForEndpoint(state, action.payload.endpointB);
+      const startNodeId = findNodeIdForEndpoint(state, endpointA);
+      const endNodeId = findNodeIdForEndpoint(state, endpointB);
       if (startNodeId === undefined || endNodeId === undefined) {
         return withError(state, "Wire endpoints must be mapped to routing graph nodes.");
       }
@@ -211,8 +247,8 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
 
       const sameEndpointsAsExisting =
         existingWire !== undefined &&
-        getEndpointKey(existingWire.endpointA) === getEndpointKey(action.payload.endpointA) &&
-        getEndpointKey(existingWire.endpointB) === getEndpointKey(action.payload.endpointB);
+        getEndpointKey(existingWire.endpointA) === getEndpointKey(endpointA) &&
+        getEndpointKey(existingWire.endpointB) === getEndpointKey(endpointB);
 
       if (existingWire !== undefined && existingWire.isRouteLocked && sameEndpointsAsExisting) {
         const forcedLength = computeForcedRouteLength(state, startNodeId, endNodeId, existingWire.routeSegmentIds);
@@ -234,6 +270,15 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         isRouteLocked = false;
       }
 
+      const endpointASide = resolveDirectionalSpliceEndpointSide(state, endpointA, routeSegmentIds, "A");
+      if (endpointASide !== null) {
+        endpointA = normalizeDirectionalSpliceEndpoint(endpointA, endpointASide);
+      }
+      const endpointBSide = resolveDirectionalSpliceEndpointSide(state, endpointB, routeSegmentIds, "B");
+      if (endpointBSide !== null) {
+        endpointB = normalizeDirectionalSpliceEndpoint(endpointB, endpointBSide);
+      }
+
       let occupancyState: EndpointOccupancyState = {
         connectorCavityOccupancy: state.connectorCavityOccupancy,
         splicePortOccupancy: state.splicePortOccupancy
@@ -243,24 +288,32 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         if (!canWriteEndpointOccupancy(state, existingWire.endpointA) || !canWriteEndpointOccupancy(state, existingWire.endpointB)) {
           return state;
         }
-        occupancyState = releaseEndpointOccupant(
-          occupancyState,
-          existingWire.endpointA,
-          getWireEndpointOccupantRef(existingWire.id, "A")
-        );
-        occupancyState = releaseEndpointOccupant(
-          occupancyState,
-          existingWire.endpointB,
-          getWireEndpointOccupantRef(existingWire.id, "B")
-        );
+        if (isEndpointOccupancyExclusive(state, existingWire.endpointA)) {
+          occupancyState = releaseEndpointOccupant(
+            occupancyState,
+            existingWire.endpointA,
+            getWireEndpointOccupantRef(existingWire.id, "A")
+          );
+        }
+        if (isEndpointOccupancyExclusive(state, existingWire.endpointB)) {
+          occupancyState = releaseEndpointOccupant(
+            occupancyState,
+            existingWire.endpointB,
+            getWireEndpointOccupantRef(existingWire.id, "B")
+          );
+        }
       }
 
-      if (!canWriteEndpointOccupancy(state, action.payload.endpointA) || !canWriteEndpointOccupancy(state, action.payload.endpointB)) {
+      if (!canWriteEndpointOccupancy(state, endpointA) || !canWriteEndpointOccupancy(state, endpointB)) {
         return state;
       }
 
-      const endpointAOccupant = getEndpointOccupant(occupancyState, action.payload.endpointA);
-      const endpointBOccupant = getEndpointOccupant(occupancyState, action.payload.endpointB);
+      const endpointAOccupant = isEndpointOccupancyExclusive(state, endpointA)
+        ? getEndpointOccupant(occupancyState, endpointA)
+        : undefined;
+      const endpointBOccupant = isEndpointOccupancyExclusive(state, endpointB)
+        ? getEndpointOccupant(occupancyState, endpointB)
+        : undefined;
       const endpointAOccupantRef = getWireEndpointOccupantRef(action.payload.id, "A");
       const endpointBOccupantRef = getWireEndpointOccupantRef(action.payload.id, "B");
 
@@ -280,8 +333,12 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         return withError(state, "Wire endpoint B is already occupied.");
       }
 
-      occupancyState = setEndpointOccupant(occupancyState, action.payload.endpointA, endpointAOccupantRef);
-      occupancyState = setEndpointOccupant(occupancyState, action.payload.endpointB, endpointBOccupantRef);
+      if (isEndpointOccupancyExclusive(state, endpointA)) {
+        occupancyState = setEndpointOccupant(occupancyState, endpointA, endpointAOccupantRef);
+      }
+      if (isEndpointOccupancyExclusive(state, endpointB)) {
+        occupancyState = setEndpointOccupant(occupancyState, endpointB, endpointBOccupantRef);
+      }
 
       return bumpRevision({
         ...clearLastError(state),
@@ -291,6 +348,7 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           id: action.payload.id,
           name: normalizedName,
           technicalId: normalizedTechnicalId,
+          twistGroupLabel: normalizedTwistGroupLabel,
           sectionMm2: normalizedSectionMm2,
           currentA: normalizedCurrentA,
           material: normalizedMaterial,
@@ -307,8 +365,8 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           endpointBSealReference,
           endpointBSealName,
           protection: normalizedProtectionResult.protection,
-          endpointA: action.payload.endpointA,
-          endpointB: action.payload.endpointB,
+          endpointA,
+          endpointB,
           routeSegmentIds,
           lengthMm,
           isRouteLocked
@@ -349,34 +407,17 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
       if (wire === undefined) {
         return withError(state, "Cannot reset route for unknown wire.");
       }
-
-      const startNodeId = findNodeIdForEndpoint(state, wire.endpointA);
-      const endNodeId = findNodeIdForEndpoint(state, wire.endpointB);
-      if (startNodeId === undefined || endNodeId === undefined) {
-        return withError(state, "Cannot reset route: wire endpoints are not mapped to graph nodes.");
-      }
-
-      const graph = buildRoutingGraphIndex(
-        state.nodes.allIds
-          .map((nodeId) => state.nodes.byId[nodeId])
-          .filter((node): node is NonNullable<typeof node> => node !== undefined),
-        state.segments.allIds
-          .map((segmentId) => state.segments.byId[segmentId])
-          .filter((segment): segment is NonNullable<typeof segment> => segment !== undefined)
-      );
-      const shortestRoute = findShortestRoute(graph, startNodeId, endNodeId);
-      if (shortestRoute === null) {
-        return withError(state, "No valid shortest route was found for this wire.");
+      const recomputed = recomputeWireRouteAndDirectionalEndpoints(state, {
+        ...wire,
+        isRouteLocked: false
+      });
+      if (!("wire" in recomputed)) {
+        return withError(state, recomputed.error);
       }
 
       return bumpRevision({
         ...clearLastError(state),
-        wires: upsertEntity(state.wires, {
-          ...wire,
-          routeSegmentIds: shortestRoute.segmentIds,
-          lengthMm: shortestRoute.totalLengthMm,
-          isRouteLocked: false
-        })
+        wires: upsertEntity(state.wires, recomputed.wire)
       });
     }
 
@@ -389,6 +430,7 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         ...action.payload,
         name: action.payload.name.trim(),
         technicalId: action.payload.technicalId.trim(),
+        twistGroupLabel: normalizeWireTwistGroupLabel(action.payload.twistGroupLabel),
         sectionMm2: resolveWireSectionMm2(action.payload.sectionMm2),
         currentA: normalizeWireCurrentA(action.payload.currentA),
         material: normalizeWireMaterial(action.payload.material),
@@ -424,8 +466,12 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         connectorCavityOccupancy: state.connectorCavityOccupancy,
         splicePortOccupancy: state.splicePortOccupancy
       };
-      occupancyState = releaseEndpointOccupant(occupancyState, wire.endpointA, getWireEndpointOccupantRef(wire.id, "A"));
-      occupancyState = releaseEndpointOccupant(occupancyState, wire.endpointB, getWireEndpointOccupantRef(wire.id, "B"));
+      if (isEndpointOccupancyExclusive(state, wire.endpointA)) {
+        occupancyState = releaseEndpointOccupant(occupancyState, wire.endpointA, getWireEndpointOccupantRef(wire.id, "A"));
+      }
+      if (isEndpointOccupancyExclusive(state, wire.endpointB)) {
+        occupancyState = releaseEndpointOccupant(occupancyState, wire.endpointB, getWireEndpointOccupantRef(wire.id, "B"));
+      }
 
       return bumpRevision({
         ...clearLastError(state),

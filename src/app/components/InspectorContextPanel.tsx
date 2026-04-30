@@ -147,6 +147,9 @@ export function InspectorContextPanel({
   if (selectedWire !== null) {
     detailRows.push({ label: "Name", value: selectedWire.name });
     detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedWire.technicalId}</span> });
+    if ((selectedWire.twistGroupLabel ?? "").trim().length > 0) {
+      detailRows.push({ label: "Twist group", value: selectedWire.twistGroupLabel as string });
+    }
     detailRows.push({ label: "Section", value: `${selectedWire.sectionMm2} mm²` });
     detailRows.push({
       label: "Cable colors",

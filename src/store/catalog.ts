@@ -4,7 +4,7 @@ import type {
   Connector,
   Splice,
 } from "../core/entities";
-import { normalizeSplicePortMode } from "../core/splicePortMode";
+import { DIRECTIONAL_SPLICE_PORT_COUNT, normalizeSplicePortMode, resolveSplicePortMode } from "../core/splicePortMode";
 import type { EntityState, NetworkScopedState } from "./types";
 
 const MAX_MANUFACTURER_REFERENCE_LENGTH = 120;
@@ -236,12 +236,13 @@ function syncConnectorFromCatalog(connector: Connector, catalogItem: CatalogItem
 }
 
 function syncSpliceFromCatalog(splice: Splice, catalogItem: CatalogItem): Splice {
+  const portMode = resolveSplicePortMode(splice);
   return {
     ...splice,
-    portMode: "bounded",
+    portMode,
     catalogItemId: catalogItem.id,
     manufacturerReference: catalogItem.manufacturerReference,
-    portCount: catalogItem.connectionCount
+    portCount: portMode === "directional" ? DIRECTIONAL_SPLICE_PORT_COUNT : catalogItem.connectionCount
   };
 }
 

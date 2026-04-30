@@ -178,6 +178,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     bomExportCompactColumns,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
+    spliceSectionImbalanceRatioPercent,
     networkSort,
     setNetworkSort,
     canvasDefaultShowGrid,
@@ -445,7 +446,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     segmentMap,
     connectorNodeByConnectorId,
     spliceNodeBySpliceId,
-    isValidationScreen
+    isValidationScreen,
+    spliceSectionImbalanceRatioPercent
   });
   const {
     validationIssues,

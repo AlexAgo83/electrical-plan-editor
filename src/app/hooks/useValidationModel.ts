@@ -30,6 +30,7 @@ interface UseValidationModelParams {
   connectorNodeByConnectorId: Map<ConnectorId, NodeId>;
   spliceNodeBySpliceId: Map<SpliceId, NodeId>;
   isValidationScreen: boolean;
+  spliceSectionImbalanceRatioPercent?: number;
 }
 
 interface UseValidationModelResult {
@@ -70,7 +71,8 @@ export function useValidationModel({
   segmentMap,
   connectorNodeByConnectorId,
   spliceNodeBySpliceId,
-  isValidationScreen
+  isValidationScreen,
+  spliceSectionImbalanceRatioPercent
 }: UseValidationModelParams): UseValidationModelResult {
   const [validationCategoryFilter, setValidationCategoryFilter] = useState<string>("all");
   const [validationSeverityFilter, setValidationSeverityFilter] = useState<ValidationSeverityFilter>("all");
@@ -91,7 +93,8 @@ export function useValidationModel({
         spliceMap,
         segmentMap,
         connectorNodeByConnectorId,
-        spliceNodeBySpliceId
+        spliceNodeBySpliceId,
+        spliceSectionImbalanceRatioPercent: spliceSectionImbalanceRatioPercent ?? 300
       }),
     [
       state,
@@ -104,7 +107,8 @@ export function useValidationModel({
       spliceMap,
       segmentMap,
       connectorNodeByConnectorId,
-      spliceNodeBySpliceId
+      spliceNodeBySpliceId,
+      spliceSectionImbalanceRatioPercent
     ]
   );
 

@@ -16,7 +16,7 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 5;
+const UI_PREFERENCES_SCHEMA_VERSION = 6;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 function normalizeThemeMode(value: unknown): ThemeMode {
@@ -115,6 +115,7 @@ interface UiPreferencesPayload {
   bomExportCompactColumns: boolean;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
+  spliceSectionImbalanceRatioPercent: number;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
   defaultIdSortDirection: SortDirection;
@@ -190,6 +191,17 @@ function migrateUiPreferencesFromV4(candidate: Record<string, unknown>): Record<
   };
 }
 
+function migrateUiPreferencesFromV5(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    spliceSectionImbalanceRatioPercent:
+      typeof candidate.spliceSectionImbalanceRatioPercent === "number"
+        ? candidate.spliceSectionImbalanceRatioPercent
+        : 300,
+    schemaVersion: 6
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -227,6 +239,11 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
       version = 5;
       continue;
     }
+    if (version === 5) {
+      migrated = migrateUiPreferencesFromV5(migrated);
+      version = 6;
+      continue;
+    }
     return null;
   }
 
@@ -262,6 +279,7 @@ interface UseUiPreferencesOptions {
   bomExportCompactColumns: boolean;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
+  spliceSectionImbalanceRatioPercent: number;
   defaultSortField: SortField;
   defaultSortDirection: SortDirection;
   defaultIdSortDirection: SortDirection;
@@ -305,6 +323,7 @@ interface UseUiPreferencesOptions {
   setBomExportCompactColumns: (value: boolean) => void;
   setDefaultWireSectionMm2: (value: number) => void;
   setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
+  setSpliceSectionImbalanceRatioPercent: (value: number) => void;
   setDefaultSortField: (field: SortField) => void;
   setDefaultSortDirection: (direction: SortDirection) => void;
   setDefaultIdSortDirection: (direction: SortDirection) => void;
@@ -427,6 +446,14 @@ function normalizeWorkspaceTaxRatePercent(value: unknown): number {
   return Number(parsed);
 }
 
+function normalizeSpliceSectionImbalanceRatioPercent(value: unknown): number {
+  const parsed = typeof value === "string" ? Number(value) : value;
+  if (!Number.isFinite(parsed)) {
+    return 300;
+  }
+  return clamp(Math.round(Number(parsed)), 100, 10000);
+}
+
 export function useUiPreferences({
   networkMinScale,
   networkMaxScale,
@@ -441,6 +468,7 @@ export function useUiPreferences({
   bomExportCompactColumns,
   defaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
+  spliceSectionImbalanceRatioPercent,
   defaultSortField,
   defaultSortDirection,
   defaultIdSortDirection,
@@ -484,6 +512,7 @@ export function useUiPreferences({
   setBomExportCompactColumns,
   setDefaultWireSectionMm2,
   setDefaultAutoCreateLinkedNodes,
+  setSpliceSectionImbalanceRatioPercent,
   setDefaultSortField,
   setDefaultSortDirection,
   setDefaultIdSortDirection,
@@ -547,6 +576,9 @@ export function useUiPreferences({
       const defaultWireSectionMm2Value = normalizeWireSectionMm2(preferences.defaultWireSectionMm2) ?? DEFAULT_WIRE_SECTION_MM2;
       const defaultAutoCreateLinkedNodesValue =
         typeof preferences.defaultAutoCreateLinkedNodes === "boolean" ? preferences.defaultAutoCreateLinkedNodes : true;
+      const spliceSectionImbalanceRatioPercentValue = normalizeSpliceSectionImbalanceRatioPercent(
+        preferences.spliceSectionImbalanceRatioPercent
+      );
       const sortDirection = preferences.defaultSortDirection === "desc" ? "desc" : "asc";
       const idSortDirection = preferences.defaultIdSortDirection === "desc" ? "desc" : "asc";
       const showGridDefault =
@@ -608,6 +640,7 @@ export function useUiPreferences({
       setBomExportCompactColumns(preferences.bomExportCompactColumns === true);
       setDefaultWireSectionMm2(defaultWireSectionMm2Value);
       setDefaultAutoCreateLinkedNodes(defaultAutoCreateLinkedNodesValue);
+      setSpliceSectionImbalanceRatioPercent(spliceSectionImbalanceRatioPercentValue);
       setDefaultSortField(sortField);
       setDefaultSortDirection(sortDirection);
       setDefaultIdSortDirection(idSortDirection);
@@ -712,6 +745,7 @@ export function useUiPreferences({
     setDefaultIdSortDirection,
     setDefaultWireSectionMm2,
     setDefaultAutoCreateLinkedNodes,
+    setSpliceSectionImbalanceRatioPercent,
     setDefaultSortDirection,
     setDefaultSortField,
     setNetworkSort,
@@ -772,6 +806,7 @@ export function useUiPreferences({
       bomExportCompactColumns,
       defaultWireSectionMm2,
       defaultAutoCreateLinkedNodes,
+      spliceSectionImbalanceRatioPercent,
       defaultSortField,
       defaultSortDirection,
       defaultIdSortDirection,
@@ -850,6 +885,7 @@ export function useUiPreferences({
     bomExportCompactColumns,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
+    spliceSectionImbalanceRatioPercent,
     themeMode,
     locale,
     workspacePanelsLayoutMode,

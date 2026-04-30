@@ -226,6 +226,10 @@ function actionVerb(action: AppAction, previousState: AppState): string {
       return "cavity released";
     case "splice/upsert":
       return previousState.splices.byId[action.payload.id] === undefined ? "created" : "updated";
+    case "splice/convertToDirectional":
+      return "converted";
+    case "splice/rerouteConnectedWires":
+      return "rerouted";
     case "splice/remove":
     case "splice/removeCascade":
       return "deleted";
@@ -335,6 +339,12 @@ function resolveDisplayRef(action: AppAction, previousState: AppState, nextState
         resolveSpliceDisplayRef(nextState, action.payload.id),
         action.payload.technicalId,
         action.payload.name,
+        resolveSpliceDisplayRef(previousState, action.payload.id)
+      );
+    case "splice/convertToDirectional":
+    case "splice/rerouteConnectedWires":
+      return preferDisplayText(
+        resolveSpliceDisplayRef(nextState, action.payload.id),
         resolveSpliceDisplayRef(previousState, action.payload.id)
       );
     case "splice/remove":

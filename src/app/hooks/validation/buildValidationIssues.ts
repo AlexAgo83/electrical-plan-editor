@@ -11,6 +11,7 @@ import type {
   Wire,
   WireEndpoint
 } from "../../../core/entities";
+import { portIndexToSpliceSide } from "../../../core/directionalSplice";
 import { isSplicePortIndexValid, resolveSplicePortMode } from "../../../core/splicePortMode";
 import type { AppStore } from "../../../store";
 import { isValidCatalogUrlInput, normalizeManufacturerReferenceKey } from "../../../store";
@@ -37,6 +38,7 @@ interface BuildValidationIssuesParams {
   segmentMap: Map<SegmentId, Segment>;
   connectorNodeByConnectorId: Map<ConnectorId, NodeId>;
   spliceNodeBySpliceId: Map<SpliceId, NodeId>;
+  spliceSectionImbalanceRatioPercent: number;
 }
 
 export function buildValidationIssues({
@@ -50,7 +52,8 @@ export function buildValidationIssues({
   spliceMap,
   segmentMap,
   connectorNodeByConnectorId,
-  spliceNodeBySpliceId
+  spliceNodeBySpliceId,
+  spliceSectionImbalanceRatioPercent
 }: BuildValidationIssuesParams): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const catalogIntegrityCategory = "Catalog integrity";
@@ -151,6 +154,11 @@ export function buildValidationIssues({
       return;
     }
 
+    const splice = spliceMap.get(endpoint.spliceId);
+    if (splice !== undefined && resolveSplicePortMode(splice) === "directional") {
+      return;
+    }
+
     const key = toSpliceOccupancyKey(endpoint.spliceId, endpoint.portIndex);
     const existing = expectedSpliceOccupancy.get(key);
     if (existing !== undefined && existing !== occupantRef) {
@@ -166,6 +174,8 @@ export function buildValidationIssues({
     }
     expectedSpliceOccupancy.set(key, occupantRef);
   }
+
+  const directionalSpliceSections = new Map<SpliceId, { L: number; R: number }>();
 
   for (const node of nodes) {
     if (node.kind === "connector" && connectorMap.get(node.connectorId) === undefined) {
@@ -323,7 +333,7 @@ export function buildValidationIssues({
           selectionKind: "splice",
           selectionId: splice.id
         });
-      } else if (linkedCatalogItem.connectionCount !== splice.portCount) {
+      } else if (splicePortMode !== "directional" && linkedCatalogItem.connectionCount !== splice.portCount) {
         issues.push({
           id: `splice-catalog-capacity-mismatch-${splice.id}`,
           severity: "error",
@@ -504,6 +514,47 @@ export function buildValidationIssues({
         });
       }
     }
+
+    const registerDirectionalSection = (endpoint: WireEndpoint): void => {
+      if (endpoint.kind !== "splicePort") {
+        return;
+      }
+      const splice = spliceMap.get(endpoint.spliceId);
+      if (splice === undefined || resolveSplicePortMode(splice) !== "directional") {
+        return;
+      }
+      const side = endpoint.spliceSideOverride ?? portIndexToSpliceSide(endpoint.portIndex);
+      const current = directionalSpliceSections.get(endpoint.spliceId) ?? { L: 0, R: 0 };
+      current[side] += wire.sectionMm2;
+      directionalSpliceSections.set(endpoint.spliceId, current);
+    };
+
+    registerDirectionalSection(wire.endpointA);
+    registerDirectionalSection(wire.endpointB);
+  }
+
+  const imbalanceThreshold =
+    Number.isFinite(spliceSectionImbalanceRatioPercent) && spliceSectionImbalanceRatioPercent >= 100
+      ? spliceSectionImbalanceRatioPercent
+      : 300;
+  for (const [spliceId, sections] of directionalSpliceSections) {
+    if (sections.L <= 0 || sections.R <= 0) {
+      continue;
+    }
+    const ratioPercent = (Math.max(sections.L, sections.R) / Math.min(sections.L, sections.R)) * 100;
+    if (ratioPercent <= imbalanceThreshold) {
+      continue;
+    }
+    const splice = spliceMap.get(spliceId);
+    issues.push({
+      id: `splice-directional-section-imbalance-${spliceId}`,
+      severity: "warning",
+      category: "Directional splice balance",
+      message: `Directional splice '${splice?.technicalId ?? spliceId}' has unbalanced total sections: L=${sections.L.toFixed(2)} mm2, R=${sections.R.toFixed(2)} mm2 (${Math.round(ratioPercent)}% > ${imbalanceThreshold}%).`,
+      subScreen: "splice",
+      selectionKind: "splice",
+      selectionId: spliceId
+    });
   }
 
   for (const [connectorId, occupancyByCavity] of Object.entries(state.connectorCavityOccupancy)) {

@@ -1,6 +1,7 @@
 import type { FormEvent } from "react";
 import type { CatalogItemId, Splice, SpliceId } from "../../core/entities";
 import {
+  DEFAULT_NEW_SPLICE_PORT_MODE,
   normalizeSplicePortMode,
   normalizeUnboundedPortCountFallback,
   resolveSplicePortMode,
@@ -38,6 +39,8 @@ interface UseSpliceHandlersParams {
   setSpliceCatalogItemId: (value: string) => void;
   splicePortMode: SplicePortMode;
   setSplicePortMode: (value: SplicePortMode) => void;
+  spliceSideInverted: boolean;
+  setSpliceSideInverted: (value: boolean) => void;
   spliceManufacturerReference: string;
   setSpliceManufacturerReference: (value: string) => void;
   spliceAutoCreateLinkedNode: boolean;
@@ -98,6 +101,8 @@ export function useSpliceHandlers({
   setSpliceCatalogItemId,
   splicePortMode,
   setSplicePortMode,
+  spliceSideInverted,
+  setSpliceSideInverted,
   spliceManufacturerReference: _spliceManufacturerReference,
   setSpliceManufacturerReference,
   spliceAutoCreateLinkedNode,
@@ -163,10 +168,11 @@ export function useSpliceHandlers({
     }
 
     const switchedFromUnbounded = splicePortMode === "unbounded";
+    const nextPortMode = splicePortMode === "directional" ? "directional" : "bounded";
     setSpliceCatalogItemId(nextCatalogItemId);
     setSpliceManufacturerReference(catalogItem.manufacturerReference);
-    setPortCount(String(catalogItem.connectionCount));
-    setSplicePortMode("bounded");
+    setPortCount(nextPortMode === "directional" ? "2" : String(catalogItem.connectionCount));
+    setSplicePortMode(nextPortMode);
     setSpliceFormError(null);
     setSpliceFormInfo(switchedFromUnbounded ? "Catalog selection switched capacity mode to bounded." : null);
   }
@@ -179,7 +185,8 @@ export function useSpliceHandlers({
     setSpliceName("");
     setSpliceTechnicalId(suggestNextSpliceTechnicalId(Object.values(state.splices.byId).map((splice) => splice.technicalId)));
     setSpliceCatalogItemId("");
-    setSplicePortMode("bounded");
+    setSplicePortMode(DEFAULT_NEW_SPLICE_PORT_MODE);
+    setSpliceSideInverted(false);
     setSpliceManufacturerReference("");
     setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setPortCount("4");
@@ -214,7 +221,7 @@ export function useSpliceHandlers({
     setSpliceName(splice.name);
     setSpliceTechnicalId(splice.technicalId);
     if (splice.catalogItemId !== undefined && store.getState().catalogItems.byId[splice.catalogItemId] !== undefined) {
-      setSplicePortMode("bounded");
+      setSplicePortMode(resolveSplicePortMode(splice));
       syncDerivedSpliceCatalogFields(splice.catalogItemId);
     } else {
       setSpliceCatalogItemId("");
@@ -222,6 +229,7 @@ export function useSpliceHandlers({
       setSpliceManufacturerReference(splice.manufacturerReference ?? "");
       setPortCount(String(splice.portCount));
     }
+    setSpliceSideInverted(splice.sideInverted === true);
     setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setSpliceFormError(null);
     setSpliceFormInfo(null);
@@ -240,9 +248,14 @@ export function useSpliceHandlers({
       return;
     }
 
-    const normalizedPortMode = selectedCatalogItem === undefined ? normalizeSplicePortMode(splicePortMode) : "bounded";
+    const normalizedPortMode =
+      selectedCatalogItem === undefined || splicePortMode === "directional"
+        ? normalizeSplicePortMode(splicePortMode)
+        : "bounded";
     const normalizedPortCountRaw =
-      selectedCatalogItem !== undefined
+      normalizedPortMode === "directional"
+        ? 2
+        : selectedCatalogItem !== undefined
         ? selectedCatalogItem.connectionCount
         : Math.max(0, Math.trunc(Number(portCount)));
     if (trimmedName.length === 0 || trimmedTechnicalId.length === 0) {
@@ -275,6 +288,7 @@ export function useSpliceHandlers({
         technicalId: trimmedTechnicalId,
         catalogItemId: selectedCatalogItem?.id,
         portMode: normalizedPortMode,
+        sideInverted: spliceSideInverted,
         manufacturerReference:
           selectedCatalogItem?.manufacturerReference ??
           (spliceManufacturerReference.trim().length === 0 ? undefined : spliceManufacturerReference.trim()),
@@ -387,6 +401,61 @@ export function useSpliceHandlers({
     })();
   }
 
+  function handleConvertSpliceToDirectional(): void {
+    if (spliceFormMode !== "edit" || editingSpliceId === null) {
+      return;
+    }
+
+    const splice = store.getState().splices.byId[editingSpliceId];
+    if (splice === undefined) {
+      setSpliceFormError("Cannot convert an unknown splice.");
+      return;
+    }
+    if (resolveSplicePortMode(splice) === "directional") {
+      setSpliceFormError(null);
+      setSpliceFormInfo("Splice is already directional.");
+      return;
+    }
+
+    void (async () => {
+      const shouldConvert = await confirmAction({
+        title: "Convert splice to directional",
+        message: `Convert splice '${splice.name}' (${splice.technicalId}) from numeric ports to automatic L/R sides? Existing wire endpoints will be reassigned from routing where possible and old manual port occupancy will be cleared.`,
+        confirmLabel: "Convert",
+        cancelLabel: "Cancel",
+        intent: "warning",
+        confirmOnEnter: true
+      });
+      if (!shouldConvert) {
+        return;
+      }
+
+      dispatchAction(appActions.convertSpliceToDirectional(splice.id));
+      const convertedSplice = store.getState().splices.byId[splice.id];
+      if (convertedSplice !== undefined) {
+        startSpliceEdit(convertedSplice);
+        setSpliceFormInfo("Splice converted to directional L/R mode.");
+      }
+    })();
+  }
+
+  function handleRerouteSpliceConnectedWires(): void {
+    if (spliceFormMode !== "edit" || editingSpliceId === null) {
+      return;
+    }
+
+    const splice = store.getState().splices.byId[editingSpliceId];
+    if (splice === undefined) {
+      setSpliceFormError("Cannot reroute an unknown splice.");
+      return;
+    }
+
+    dispatchAction(appActions.rerouteSpliceConnectedWires(splice.id));
+    const nextError = store.getState().ui.lastError?.message ?? null;
+    setSpliceFormError(nextError);
+    setSpliceFormInfo(nextError === null ? "Connected wires rerouted and L/R sides reassigned." : null);
+  }
+
   function handleReservePort(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
 
@@ -413,6 +482,8 @@ export function useSpliceHandlers({
     startSpliceEdit,
     handleSpliceSubmit,
     handleSpliceDelete,
+    handleConvertSpliceToDirectional,
+    handleRerouteSpliceConnectedWires,
     handleReservePort,
     handleReleasePort,
     syncDerivedSpliceCatalogFields,

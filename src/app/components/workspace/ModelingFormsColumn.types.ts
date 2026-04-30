@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import type { CatalogItem, Connector, NetworkNode, Splice, WireEndpoint, WireMaterial } from "../../../core/entities";
+import type { DirectionalSpliceSide } from "../../../core/directionalSplice";
 import type { DeleteDependencySummaryCategory } from "../../../store/deleteImpact";
 import type { SplicePortMode } from "../../../core/splicePortMode";
 import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
@@ -33,6 +34,8 @@ export interface ModelingFormsColumnProps {
   spliceEditAfterCreate: boolean;
   openCreateSpliceForm: () => void;
   handleSpliceSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  handleConvertSpliceToDirectional: () => void;
+  handleRerouteSpliceConnectedWires: () => void;
   spliceName: string;
   setSpliceName: (value: string) => void;
   spliceTechnicalId: string;
@@ -41,6 +44,8 @@ export interface ModelingFormsColumnProps {
   setSpliceCatalogItemId: (value: string) => void;
   splicePortMode: SplicePortMode;
   setSplicePortMode: (value: SplicePortMode) => void;
+  spliceSideInverted: boolean;
+  setSpliceSideInverted: (value: boolean) => void;
   spliceManufacturerReference: string;
   setSpliceManufacturerReference: (value: string) => void;
   spliceAutoCreateLinkedNode: boolean;
@@ -101,6 +106,8 @@ export interface ModelingFormsColumnProps {
   setWireName: (value: string) => void;
   wireTechnicalId: string;
   setWireTechnicalId: (value: string) => void;
+  wireTwistGroupLabel: string;
+  setWireTwistGroupLabel: (value: string) => void;
   wireSectionMm2: string;
   setWireSectionMm2: (value: string) => void;
   wireCurrentA: string;
@@ -140,6 +147,10 @@ export interface ModelingFormsColumnProps {
   setWireEndpointASpliceId: (value: string) => void;
   wireEndpointAPortIndex: string;
   setWireEndpointAPortIndex: (value: string) => void;
+  wireEndpointASpliceSideOverride: DirectionalSpliceSide | "auto";
+  setWireEndpointASpliceSideOverride: (value: DirectionalSpliceSide | "auto") => void;
+  wireEndpointASpliceSideLocked: boolean;
+  setWireEndpointASpliceSideLocked: (value: boolean) => void;
   wireEndpointASlotHint: WireEndpointSlotHint | null;
   wireEndpointBConnectionReference: string;
   setWireEndpointBConnectionReference: (value: string) => void;
@@ -159,6 +170,10 @@ export interface ModelingFormsColumnProps {
   setWireEndpointBSpliceId: (value: string) => void;
   wireEndpointBPortIndex: string;
   setWireEndpointBPortIndex: (value: string) => void;
+  wireEndpointBSpliceSideOverride: DirectionalSpliceSide | "auto";
+  setWireEndpointBSpliceSideOverride: (value: DirectionalSpliceSide | "auto") => void;
+  wireEndpointBSpliceSideLocked: boolean;
+  setWireEndpointBSpliceSideLocked: (value: boolean) => void;
   wireEndpointBSlotHint: WireEndpointSlotHint | null;
   cancelWireEdit: () => void;
   wireFormError: string | null;

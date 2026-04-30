@@ -1,4 +1,5 @@
 import type { CatalogItem, Connector, Splice } from "../../core/entities";
+import { DIRECTIONAL_SPLICE_PORT_COUNT, resolveSplicePortMode } from "../../core/splicePortMode";
 import type { AppAction } from "../actions";
 import {
   isValidCatalogUrlInput,
@@ -54,6 +55,11 @@ function connectorUsesCapacityAbove(state: AppState, connectorId: string, maxCou
 }
 
 function spliceUsesCapacityAbove(state: AppState, spliceId: string, maxCount: number): boolean {
+  const splice = state.splices.byId[spliceId as keyof typeof state.splices.byId];
+  if (splice !== undefined && resolveSplicePortMode(splice) === "directional") {
+    return false;
+  }
+
   const occupancy = state.splicePortOccupancy[spliceId as keyof typeof state.splicePortOccupancy];
   if (occupancy !== undefined) {
     const hasOutOfRangeOccupancy = Object.keys(occupancy)
@@ -86,11 +92,12 @@ function propagateCatalogToConnector(connector: Connector, catalogItem: CatalogI
 }
 
 function propagateCatalogToSplice(splice: Splice, catalogItem: CatalogItem): Splice {
+  const portMode = resolveSplicePortMode(splice);
   return {
     ...splice,
     catalogItemId: catalogItem.id,
     manufacturerReference: catalogItem.manufacturerReference,
-    portCount: catalogItem.connectionCount
+    portCount: portMode === "directional" ? DIRECTIONAL_SPLICE_PORT_COUNT : catalogItem.connectionCount
   };
 }
 

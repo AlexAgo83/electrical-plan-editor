@@ -90,6 +90,8 @@ export type AppAction =
     }
   | { type: "connector/releaseCavity"; payload: { connectorId: ConnectorId; cavityIndex: number } }
   | { type: "splice/upsert"; payload: Splice }
+  | { type: "splice/convertToDirectional"; payload: { id: SpliceId } }
+  | { type: "splice/rerouteConnectedWires"; payload: { id: SpliceId } }
   | { type: "splice/remove"; payload: { id: SpliceId } }
   | { type: "splice/removeCascade"; payload: { id: SpliceId } }
   | {
@@ -109,6 +111,7 @@ export type AppAction =
         id: WireId;
         name: string;
         technicalId: string;
+        twistGroupLabel?: string;
         sectionMm2?: number;
         currentA?: number;
         material?: WireMaterial;
@@ -215,6 +218,14 @@ export const appActions = {
   }),
 
   upsertSplice: (payload: Splice): AppAction => ({ type: "splice/upsert", payload }),
+  convertSpliceToDirectional: (id: SpliceId): AppAction => ({
+    type: "splice/convertToDirectional",
+    payload: { id }
+  }),
+  rerouteSpliceConnectedWires: (id: SpliceId): AppAction => ({
+    type: "splice/rerouteConnectedWires",
+    payload: { id }
+  }),
   removeSplice: (id: SpliceId): AppAction => ({ type: "splice/remove", payload: { id } }),
   removeSpliceCascade: (id: SpliceId): AppAction => ({ type: "splice/removeCascade", payload: { id } }),
   occupySplicePort: (spliceId: SpliceId, portIndex: number, occupantRef: string): AppAction => ({
@@ -238,6 +249,7 @@ export const appActions = {
     id: WireId;
     name: string;
     technicalId: string;
+    twistGroupLabel?: string;
     sectionMm2?: number;
     currentA?: number;
     material?: WireMaterial;

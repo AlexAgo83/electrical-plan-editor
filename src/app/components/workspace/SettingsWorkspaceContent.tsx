@@ -60,6 +60,8 @@ interface SettingsWorkspaceContentProps {
   setDefaultWireSectionMm2: (value: number) => void;
   defaultAutoCreateLinkedNodes: boolean;
   setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
+  spliceSectionImbalanceRatioPercent: number;
+  setSpliceSectionImbalanceRatioPercent: (value: number) => void;
   defaultSortField: SortField;
   setDefaultSortField: (value: SortField) => void;
   defaultSortDirection: SortDirection;
@@ -168,6 +170,8 @@ export function SettingsWorkspaceContent({
   setDefaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
   setDefaultAutoCreateLinkedNodes,
+  spliceSectionImbalanceRatioPercent,
+  setSpliceSectionImbalanceRatioPercent,
   defaultSortField,
   setDefaultSortField,
   defaultSortDirection,
@@ -608,6 +612,22 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setDefaultAutoCreateLinkedNodes(event.target.checked)}
             />
             Default auto-create linked nodes for connectors/splices
+          </label>
+          <label className="settings-field">
+            Directional splice imbalance limit (%)
+            <input
+              type="number"
+              min={100}
+              step={10}
+              value={String(spliceSectionImbalanceRatioPercent)}
+              onChange={(event) => {
+                const nextValue = Number(event.target.value.replace(",", "."));
+                if (!Number.isFinite(nextValue) || nextValue < 100) {
+                  return;
+                }
+                setSpliceSectionImbalanceRatioPercent(Math.round(nextValue));
+              }}
+            />
           </label>
           <label className="settings-field settings-locale-field">
             <span className="settings-locale-label">

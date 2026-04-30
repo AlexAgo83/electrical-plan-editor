@@ -11,7 +11,8 @@ import {
   computeForcedRouteLength,
   findNodeIdForEndpoint,
   getEndpointValidationError,
-  recomputeAllWiresForNetwork
+  recomputeAllWiresForNetwork,
+  resolveDirectionalSpliceEndpointSide
 } from "../store/reducer/helpers/wireTransitions";
 import {
   asConnectorId,
@@ -188,5 +189,154 @@ describe("store reducer helpers - wire transitions", () => {
 
     expect(recomputed.wires.byId[asWireId("W1")]?.routeSegmentIds).toEqual([asSegmentId("SEG-A"), asSegmentId("SEG-B")]);
     expect(recomputed.wires.byId[asWireId("W1")]?.lengthMm).toBe(70);
+  });
+
+  it("recomputes unlocked directional splice sides from the adjacent branch instead of trusting stale overrides", () => {
+    const directionalState = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C-R"), name: "Right leaf", technicalId: "C-R", cavityCount: 1 }),
+      appActions.upsertConnector({ id: asConnectorId("C-L1"), name: "Left 1", technicalId: "C-L1", cavityCount: 1 }),
+      appActions.upsertConnector({ id: asConnectorId("C-L2"), name: "Left 2", technicalId: "C-L2", cavityCount: 1 }),
+      appActions.upsertSplice({
+        id: asSpliceId("S-DIR"),
+        name: "Directional splice",
+        technicalId: "S-DIR",
+        portCount: 2,
+        portMode: "directional"
+      }),
+      appActions.upsertNode({ id: asNodeId("N-R"), kind: "connector", connectorId: asConnectorId("C-R") }),
+      appActions.upsertNode({ id: asNodeId("N-L1"), kind: "connector", connectorId: asConnectorId("C-L1") }),
+      appActions.upsertNode({ id: asNodeId("N-L2"), kind: "connector", connectorId: asConnectorId("C-L2") }),
+      appActions.upsertNode({ id: asNodeId("N-S"), kind: "splice", spliceId: asSpliceId("S-DIR") }),
+      appActions.upsertNode({ id: asNodeId("N-LMID"), kind: "intermediate", label: "LMID" }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-R"),
+        nodeA: asNodeId("N-R"),
+        nodeB: asNodeId("N-S"),
+        lengthMm: 10
+      }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-L1"),
+        nodeA: asNodeId("N-S"),
+        nodeB: asNodeId("N-LMID"),
+        lengthMm: 10
+      }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-L2"),
+        nodeA: asNodeId("N-LMID"),
+        nodeB: asNodeId("N-L2"),
+        lengthMm: 10
+      }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-L3"),
+        nodeA: asNodeId("N-LMID"),
+        nodeB: asNodeId("N-L1"),
+        lengthMm: 10
+      }),
+      appActions.setNodePositions({
+        [asNodeId("N-S")]: { x: 100, y: 100 },
+        [asNodeId("N-R")]: { x: 100, y: 0 },
+        [asNodeId("N-LMID")]: { x: 100, y: 200 },
+        [asNodeId("N-L1")]: { x: 60, y: 260 },
+        [asNodeId("N-L2")]: { x: 140, y: 260 }
+      }),
+      appActions.saveWire({
+        id: asWireId("W-LEFT"),
+        name: "Left branch wire",
+        technicalId: "W-LEFT",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-L1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-DIR"), portIndex: 1 }
+      }),
+      appActions.saveWire({
+        id: asWireId("W-DIR"),
+        name: "Directional wire",
+        technicalId: "W-DIR",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-R"), cavityIndex: 1 },
+        endpointB: {
+          kind: "splicePort",
+          spliceId: asSpliceId("S-DIR"),
+          portIndex: 1,
+          spliceSideOverride: "L",
+          spliceSideLocked: false
+        }
+      })
+    ]);
+
+    const wire = directionalState.wires.byId[asWireId("W-DIR")];
+    expect(wire?.endpointB.kind).toBe("splicePort");
+    if (wire?.endpointB.kind !== "splicePort") {
+      throw new Error("Expected a splice endpoint.");
+    }
+
+    expect(wire.endpointB.spliceSideOverride).toBe("R");
+    expect(wire.endpointB.portIndex).toBe(2);
+
+    expect(
+      resolveDirectionalSpliceEndpointSide(
+        directionalState,
+        {
+          ...wire.endpointB,
+          spliceSideOverride: "L",
+          spliceSideLocked: false
+        },
+        wire.routeSegmentIds,
+        "B"
+      )
+    ).toBe("R");
+  });
+
+  it("assigns R to the less populated branch when a directional splice has two outgoing branches", () => {
+    const initialState = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C-SOLO"), name: "Solo", technicalId: "C-SOLO", cavityCount: 1 }),
+      appActions.upsertConnector({ id: asConnectorId("C-BUS"), name: "Bus", technicalId: "C-BUS", cavityCount: 3 }),
+      appActions.upsertSplice({
+        id: asSpliceId("S-BRANCH"),
+        name: "Branch splice",
+        technicalId: "S-BRANCH",
+        portCount: 2,
+        portMode: "directional"
+      }),
+      appActions.upsertNode({ id: asNodeId("N-S"), kind: "splice", spliceId: asSpliceId("S-BRANCH") }),
+      appActions.upsertNode({ id: asNodeId("N-SOLO"), kind: "connector", connectorId: asConnectorId("C-SOLO") }),
+      appActions.upsertNode({ id: asNodeId("N-BUS"), kind: "connector", connectorId: asConnectorId("C-BUS") }),
+      appActions.upsertSegment({ id: asSegmentId("SEG-SOLO"), nodeA: asNodeId("N-S"), nodeB: asNodeId("N-SOLO"), lengthMm: 20 }),
+      appActions.upsertSegment({ id: asSegmentId("SEG-BUS"), nodeA: asNodeId("N-S"), nodeB: asNodeId("N-BUS"), lengthMm: 20 }),
+      appActions.setNodePositions({
+        [asNodeId("N-S")]: { x: 0, y: 0 },
+        [asNodeId("N-SOLO")]: { x: 120, y: -120 },
+        [asNodeId("N-BUS")]: { x: 120, y: 120 }
+      }),
+      appActions.saveWire({
+        id: asWireId("W-SOLO"),
+        name: "Solo",
+        technicalId: "W-SOLO",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SOLO"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-BRANCH"), portIndex: 1 }
+      }),
+      appActions.saveWire({
+        id: asWireId("W-BUS-1"),
+        name: "Bus 1",
+        technicalId: "W-BUS-1",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-BUS"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-BRANCH"), portIndex: 1 }
+      }),
+      appActions.saveWire({
+        id: asWireId("W-BUS-2"),
+        name: "Bus 2",
+        technicalId: "W-BUS-2",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-BUS"), cavityIndex: 2 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-BRANCH"), portIndex: 1 }
+      })
+    ]);
+
+    const recomputed = recomputeAllWiresForNetwork(initialState);
+    expect("wires" in recomputed).toBe(true);
+    if (!("wires" in recomputed)) {
+      throw new Error("Expected recompute result to contain wires.");
+    }
+    const branchState = recomputed.wires;
+
+    expect(branchState.byId[asWireId("W-SOLO")]?.endpointB).toMatchObject({ spliceSideOverride: "R", portIndex: 2 });
+    expect(branchState.byId[asWireId("W-BUS-1")]?.endpointB).toMatchObject({ spliceSideOverride: "L", portIndex: 1 });
+    expect(branchState.byId[asWireId("W-BUS-2")]?.endpointB).toMatchObject({ spliceSideOverride: "L", portIndex: 1 });
   });
 });

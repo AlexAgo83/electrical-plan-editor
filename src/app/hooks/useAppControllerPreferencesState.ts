@@ -30,6 +30,7 @@ export function useAppControllerPreferencesState() {
   const [bomExportCompactColumns, setBomExportCompactColumns] = useState(false);
   const [defaultWireSectionMm2, setDefaultWireSectionMm2] = useState(0.5);
   const [defaultAutoCreateLinkedNodes, setDefaultAutoCreateLinkedNodes] = useState(true);
+  const [spliceSectionImbalanceRatioPercent, setSpliceSectionImbalanceRatioPercent] = useState(300);
   const [defaultSortField, setDefaultSortField] = useState<SortField>("name");
   const [defaultSortDirection, setDefaultSortDirection] = useState<SortDirection>("asc");
   const [defaultIdSortDirection, setDefaultIdSortDirection] = useState<SortDirection>("asc");
@@ -88,6 +89,8 @@ export function useAppControllerPreferencesState() {
     setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     setDefaultAutoCreateLinkedNodes,
+    spliceSectionImbalanceRatioPercent,
+    setSpliceSectionImbalanceRatioPercent,
     defaultSortField,
     setDefaultSortField,
     defaultSortDirection,

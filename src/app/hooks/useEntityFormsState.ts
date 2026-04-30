@@ -10,7 +10,8 @@ import type {
   WireId,
   WireMaterial
 } from "../../core/entities";
-import type { SplicePortMode } from "../../core/splicePortMode";
+import { DEFAULT_NEW_SPLICE_PORT_MODE, type SplicePortMode } from "../../core/splicePortMode";
+import type { DirectionalSpliceSide } from "../../core/directionalSplice";
 
 export function useEntityFormsState() {
   const [catalogFormMode, setCatalogFormMode] = useState<"idle" | "create" | "edit">("idle");
@@ -41,7 +42,8 @@ export function useEntityFormsState() {
   const [spliceName, setSpliceName] = useState("");
   const [spliceTechnicalId, setSpliceTechnicalId] = useState("");
   const [spliceCatalogItemId, setSpliceCatalogItemId] = useState("");
-  const [splicePortMode, setSplicePortMode] = useState<SplicePortMode>("bounded");
+  const [splicePortMode, setSplicePortMode] = useState<SplicePortMode>(DEFAULT_NEW_SPLICE_PORT_MODE);
+  const [spliceSideInverted, setSpliceSideInverted] = useState(false);
   const [spliceManufacturerReference, setSpliceManufacturerReference] = useState("");
   const [spliceAutoCreateLinkedNode, setSpliceAutoCreateLinkedNode] = useState(true);
   const [portCount, setPortCount] = useState("4");
@@ -75,6 +77,7 @@ export function useEntityFormsState() {
   const [editingWireId, setEditingWireId] = useState<WireId | null>(null);
   const [wireName, setWireName] = useState("");
   const [wireTechnicalId, setWireTechnicalId] = useState("");
+  const [wireTwistGroupLabel, setWireTwistGroupLabel] = useState("");
   const [wireSectionMm2, setWireSectionMm2] = useState("0.5");
   const [wireCurrentA, setWireCurrentA] = useState("");
   const [wireMaterial, setWireMaterial] = useState<WireMaterial>("copper");
@@ -93,6 +96,8 @@ export function useEntityFormsState() {
   const [wireEndpointACavityIndex, setWireEndpointACavityIndex] = useState("1");
   const [wireEndpointASpliceId, setWireEndpointASpliceId] = useState("");
   const [wireEndpointAPortIndex, setWireEndpointAPortIndex] = useState("1");
+  const [wireEndpointASpliceSideOverride, setWireEndpointASpliceSideOverride] = useState<DirectionalSpliceSide | "auto">("auto");
+  const [wireEndpointASpliceSideLocked, setWireEndpointASpliceSideLocked] = useState(false);
   const [wireEndpointBConnectionReference, setWireEndpointBConnectionReference] = useState("");
   const [wireEndpointBConnectionName, setWireEndpointBConnectionName] = useState("");
   const [wireEndpointBSealReference, setWireEndpointBSealReference] = useState("");
@@ -102,6 +107,8 @@ export function useEntityFormsState() {
   const [wireEndpointBCavityIndex, setWireEndpointBCavityIndex] = useState("1");
   const [wireEndpointBSpliceId, setWireEndpointBSpliceId] = useState("");
   const [wireEndpointBPortIndex, setWireEndpointBPortIndex] = useState("1");
+  const [wireEndpointBSpliceSideOverride, setWireEndpointBSpliceSideOverride] = useState<DirectionalSpliceSide | "auto">("auto");
+  const [wireEndpointBSpliceSideLocked, setWireEndpointBSpliceSideLocked] = useState(false);
   const [wireForcedRouteInput, setWireForcedRouteInput] = useState("");
   const [wireFormError, setWireFormError] = useState<string | null>(null);
 
@@ -160,6 +167,8 @@ export function useEntityFormsState() {
     setSpliceCatalogItemId,
     splicePortMode,
     setSplicePortMode,
+    spliceSideInverted,
+    setSpliceSideInverted,
     spliceManufacturerReference,
     setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode,
@@ -220,6 +229,8 @@ export function useEntityFormsState() {
     setWireName,
     wireTechnicalId,
     setWireTechnicalId,
+    wireTwistGroupLabel,
+    setWireTwistGroupLabel,
     wireSectionMm2,
     setWireSectionMm2,
     wireCurrentA,
@@ -256,6 +267,10 @@ export function useEntityFormsState() {
     setWireEndpointASpliceId,
     wireEndpointAPortIndex,
     setWireEndpointAPortIndex,
+    wireEndpointASpliceSideOverride,
+    setWireEndpointASpliceSideOverride,
+    wireEndpointASpliceSideLocked,
+    setWireEndpointASpliceSideLocked,
     wireEndpointBConnectionReference,
     setWireEndpointBConnectionReference,
     wireEndpointBConnectionName,
@@ -274,6 +289,10 @@ export function useEntityFormsState() {
     setWireEndpointBSpliceId,
     wireEndpointBPortIndex,
     setWireEndpointBPortIndex,
+    wireEndpointBSpliceSideOverride,
+    setWireEndpointBSpliceSideOverride,
+    wireEndpointBSpliceSideLocked,
+    setWireEndpointBSpliceSideLocked,
     wireForcedRouteInput,
     setWireForcedRouteInput,
     wireFormError,
