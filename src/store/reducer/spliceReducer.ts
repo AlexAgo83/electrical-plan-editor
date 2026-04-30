@@ -1,11 +1,18 @@
 import type { AppAction } from "../actions";
 import { analyzeSpliceDeleteImpact } from "../deleteImpact";
 import {
+  normalizeDirectionalSpliceEndpoint,
+  type DirectionalSpliceSide
+} from "../../core/directionalSplice";
+import type { SegmentId, Wire, WireEndpoint, WireId } from "../../core/entities";
+import { recomputeWireRouteAndDirectionalEndpoints, resolveDirectionalSpliceEndpointSide } from "./helpers/wireTransitions";
+import type { AppState, EntityState } from "../types";
+import {
+  DIRECTIONAL_SPLICE_PORT_COUNT,
   normalizeSplicePortMode,
   normalizeUnboundedPortCountFallback,
   resolveSplicePortMode
 } from "../../core/splicePortMode";
-import type { AppState } from "../types";
 import {
   bumpRevision,
   clearLastError,
@@ -59,7 +66,7 @@ function hasWireEndpointIndexOutOfRange(state: AppState, spliceId: string, portC
 
 function isValidSplicePortIndexForMode(
   splice: {
-    portMode?: "bounded" | "unbounded";
+    portMode?: "bounded" | "unbounded" | "directional";
     portCount: number;
   },
   portIndex: number
@@ -67,8 +74,12 @@ function isValidSplicePortIndexForMode(
   if (!Number.isInteger(portIndex) || portIndex < 1) {
     return false;
   }
-  if (resolveSplicePortMode(splice) === "unbounded") {
+  const portMode = resolveSplicePortMode(splice);
+  if (portMode === "unbounded") {
     return true;
+  }
+  if (portMode === "directional") {
+    return portIndex === 1 || portIndex === 2;
   }
   return isValidSlotIndex(portIndex, splice.portCount);
 }
@@ -94,6 +105,63 @@ function hasWireEndpointReferenceOnSplice(state: AppState, spliceId: string): bo
   });
 }
 
+function resolveConvertedEndpointSide(
+  state: AppState,
+  endpoint: Extract<WireEndpoint, { kind: "splicePort" }>,
+  routeSegmentIds: SegmentId[],
+  wireSide: "A" | "B",
+  originalPortCount: number
+): DirectionalSpliceSide {
+  const inferredSide = resolveDirectionalSpliceEndpointSide(state, endpoint, routeSegmentIds, wireSide);
+  if (inferredSide !== null) {
+    return inferredSide;
+  }
+
+  return endpoint.portIndex > Math.ceil(originalPortCount / 2) ? "R" : "L";
+}
+
+function convertWireEndpointsForDirectionalSplice(
+  state: AppState,
+  spliceId: string,
+  originalPortCount: number
+): EntityState<Wire, WireId> {
+  const nextWiresById = { ...state.wires.byId };
+  for (const wireId of state.wires.allIds) {
+    const wire = state.wires.byId[wireId];
+    if (wire === undefined) {
+      continue;
+    }
+
+    let endpointA = wire.endpointA;
+    let endpointB = wire.endpointB;
+    if (endpointA.kind === "splicePort" && endpointA.spliceId === spliceId) {
+      endpointA = normalizeDirectionalSpliceEndpoint(
+        endpointA,
+        resolveConvertedEndpointSide(state, endpointA, wire.routeSegmentIds, "A", originalPortCount)
+      );
+    }
+    if (endpointB.kind === "splicePort" && endpointB.spliceId === spliceId) {
+      endpointB = normalizeDirectionalSpliceEndpoint(
+        endpointB,
+        resolveConvertedEndpointSide(state, endpointB, wire.routeSegmentIds, "B", originalPortCount)
+      );
+    }
+
+    if (endpointA !== wire.endpointA || endpointB !== wire.endpointB) {
+      nextWiresById[wireId] = {
+        ...wire,
+        endpointA,
+        endpointB
+      };
+    }
+  }
+
+  return {
+    ...state.wires,
+    byId: nextWiresById
+  };
+}
+
 export function handleSpliceActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "splice/upsert": {
@@ -112,7 +180,9 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
       if (action.payload.catalogItemId !== undefined && linkedCatalogItem === undefined) {
         return withError(state, "Splice catalog item is invalid.");
       }
-      if (linkedCatalogItem !== undefined) {
+      if (portMode === "directional") {
+        portCount = DIRECTIONAL_SPLICE_PORT_COUNT;
+      } else if (linkedCatalogItem !== undefined) {
         portMode = "bounded";
         portCount = linkedCatalogItem.connectionCount;
       }
@@ -146,6 +216,26 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
           return withError(state, "Splice portCount cannot be reduced below wire endpoint port indexes.");
         }
       }
+      if (portMode === "directional") {
+        const nextSplicePortOccupancy = { ...state.splicePortOccupancy };
+        delete nextSplicePortOccupancy[action.payload.id];
+        return bumpRevision({
+          ...clearLastError(state),
+          splicePortOccupancy: nextSplicePortOccupancy,
+          splices: upsertEntity(state.splices, {
+            ...action.payload,
+            name: normalizedName,
+            technicalId: normalizedTechnicalId,
+            portMode,
+            portCount,
+            sideInverted: action.payload.sideInverted === true,
+            manufacturerReference:
+              linkedCatalogItem !== undefined
+                ? linkedCatalogItem.manufacturerReference
+                : normalizeManufacturerReference(action.payload.manufacturerReference)
+          })
+        });
+      }
 
       return bumpRevision({
         ...clearLastError(state),
@@ -155,11 +245,87 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
           technicalId: normalizedTechnicalId,
           portMode,
           portCount,
+          sideInverted: action.payload.sideInverted === true,
           manufacturerReference:
             linkedCatalogItem !== undefined
               ? linkedCatalogItem.manufacturerReference
               : normalizeManufacturerReference(action.payload.manufacturerReference)
         })
+      });
+    }
+
+    case "splice/convertToDirectional": {
+      const splice = state.splices.byId[action.payload.id];
+      if (splice === undefined) {
+        return withError(state, "Cannot convert unknown splice.");
+      }
+      if (resolveSplicePortMode(splice) === "directional") {
+        return clearLastError(state);
+      }
+
+      const convertedSplice = {
+        ...splice,
+        portMode: "directional" as const,
+        portCount: DIRECTIONAL_SPLICE_PORT_COUNT,
+        sideInverted: false
+      };
+      const transientState: AppState = {
+        ...state,
+        splices: upsertEntity(state.splices, convertedSplice)
+      };
+      const nextSplicePortOccupancy = { ...state.splicePortOccupancy };
+      delete nextSplicePortOccupancy[action.payload.id];
+
+      return bumpRevision({
+        ...clearLastError(state),
+        splices: upsertEntity(state.splices, convertedSplice),
+        wires: convertWireEndpointsForDirectionalSplice(transientState, action.payload.id, splice.portCount),
+        splicePortOccupancy: nextSplicePortOccupancy
+      });
+    }
+
+    case "splice/rerouteConnectedWires": {
+      const splice = state.splices.byId[action.payload.id];
+      if (splice === undefined) {
+        return withError(state, "Cannot reroute wires for unknown splice.");
+      }
+
+      const nextWiresById = { ...state.wires.byId };
+      let touchedWireCount = 0;
+      for (const wireId of state.wires.allIds) {
+        const wire = state.wires.byId[wireId];
+        if (
+          wire === undefined ||
+          !(
+            (wire.endpointA.kind === "splicePort" && wire.endpointA.spliceId === splice.id) ||
+            (wire.endpointB.kind === "splicePort" && wire.endpointB.spliceId === splice.id)
+          )
+        ) {
+          continue;
+        }
+
+        const recomputed = recomputeWireRouteAndDirectionalEndpoints(state, {
+          ...wire,
+          isRouteLocked: false
+        });
+        if (!("wire" in recomputed)) {
+          return withError(state, recomputed.error);
+        }
+
+        nextWiresById[wireId] = recomputed.wire;
+        touchedWireCount += 1;
+      }
+
+      if (touchedWireCount === 0) {
+        return clearLastError(state);
+      }
+
+      return bumpRevision({
+        ...clearLastError(state),
+        wires: {
+          ...state.wires,
+          byId: nextWiresById
+        }
       });
     }
 

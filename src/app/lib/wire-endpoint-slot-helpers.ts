@@ -30,13 +30,17 @@ export function findNextAvailableSplicePort(
   context: OccupancyContext,
   spliceId: SpliceId,
   splice: {
-    portMode?: "bounded" | "unbounded";
+    portMode?: "bounded" | "unbounded" | "directional";
     portCount: number;
   },
   excludeOccupantRefs: ReadonlySet<string>
 ): number | null {
   const spliceOccupancy = context.splicePortOccupancy[spliceId] ?? {};
-  const isUnbounded = resolveSplicePortMode(splice) === "unbounded";
+  const portMode = resolveSplicePortMode(splice);
+  if (portMode === "directional") {
+    return 1;
+  }
+  const isUnbounded = portMode === "unbounded";
   if (!isUnbounded) {
     for (let index = 1; index <= splice.portCount; index += 1) {
       const occupantRef = spliceOccupancy[index];
