@@ -180,6 +180,181 @@
   opacity: 0.45;
   cursor: default;
 }
+
+.functional-schematic-panel {
+  overflow: hidden;
+}
+
+.functional-schematic-subtitle {
+  margin: 0.15rem 0 0;
+  color: #486579;
+  font-size: 0.82rem;
+}
+
+.functional-schematic-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.65rem 0;
+}
+
+.functional-schematic-canvas-shell {
+  min-height: 14rem;
+  border: 1px solid #bfd3e2;
+  border-radius: 0.7rem;
+  background:
+    linear-gradient(90deg, rgba(213, 225, 235, 0.48) 1px, transparent 1px),
+    linear-gradient(rgba(213, 225, 235, 0.48) 1px, transparent 1px),
+    rgba(247, 251, 255, 0.86);
+  background-size: 24px 24px;
+  overflow: auto;
+}
+
+.functional-schematic-canvas-shell .empty-copy {
+  margin: 0;
+  padding: 1rem;
+}
+
+.functional-schematic-svg {
+  display: block;
+  min-width: 100%;
+  height: 16rem;
+}
+
+.functional-edge path {
+  fill: none;
+  stroke: var(--network-wire-highlight-color, #4f8d2d);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.functional-edge text,
+.functional-edge-label text {
+  fill: #315168;
+  font-size: 10px;
+  font-weight: 700;
+  paint-order: stroke fill;
+  stroke: rgba(247, 251, 255, 0.94);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+}
+
+.functional-edge-label-layer {
+  pointer-events: all;
+}
+
+.functional-edge-label {
+  cursor: default;
+  outline: none;
+}
+
+.functional-edge-label-hitbox {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 1.4;
+}
+
+.functional-edge-label:hover .functional-edge-label-hitbox,
+.functional-edge-label.is-hovered .functional-edge-label-hitbox,
+.functional-edge-label:focus-visible .functional-edge-label-hitbox {
+  fill: rgba(247, 251, 255, 0.82);
+  stroke: rgba(79, 141, 45, 0.42);
+}
+
+.functional-edge-name {
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.functional-edge-tech-label {
+  font-size: 8px;
+  font-weight: 700;
+  fill: #4f6b7e;
+}
+
+.functional-edge-color-swatch {
+  opacity: 0;
+  stroke-width: 4;
+  stroke-linecap: round;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.functional-edge:hover path,
+.functional-edge:focus-within path,
+.functional-edge.is-hovered path {
+  stroke-width: 4;
+}
+
+.functional-edge:hover .functional-edge-color-swatch,
+.functional-edge:focus-within .functional-edge-color-swatch,
+.functional-edge.is-hovered .functional-edge-color-swatch {
+  opacity: 1;
+}
+
+.functional-node-shape {
+  stroke: var(--network-node-stroke-color, #55748d);
+  stroke-width: 2;
+  fill: #eef6fc;
+}
+
+.functional-node--connector .functional-node-shape {
+  fill: var(--network-node-connector-fill, #dff0ff);
+}
+
+.functional-node--splice .functional-node-shape {
+  fill: var(--network-node-splice-fill, #fdeecf);
+}
+
+.functional-node--fuse .functional-node-shape {
+  fill: #fff1d5;
+  stroke: #9d741f;
+}
+
+.functional-node--power .functional-node-shape {
+  stroke: #a45b20;
+}
+
+.functional-node--ground .functional-node-shape {
+  stroke: #3e6f52;
+}
+
+.functional-node-label {
+  fill: #17364c;
+  font-size: 10px;
+  font-weight: 800;
+  paint-order: stroke fill;
+  stroke: rgba(247, 251, 255, 0.94);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+}
+
+.functional-node-detail {
+  fill: #4f6b7e;
+  font-size: 8px;
+  paint-order: stroke fill;
+  stroke: rgba(247, 251, 255, 0.94);
+  stroke-width: 1.8px;
+  stroke-linejoin: round;
+}
+
+.functional-schematic-warnings {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 0.6rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid #d5b75e;
+  border-radius: 0.6rem;
+  background: rgba(255, 244, 204, 0.78);
+}
+
+.functional-schematic-warnings p {
+  margin: 0;
+  color: #644d10;
+  font-size: 0.82rem;
+}
+
 @media (max-width: 900px) {
   .network-summary-header {
     flex-direction: column;

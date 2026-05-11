@@ -19,6 +19,8 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     connectorCatalogItemId,
     setConnectorCatalogItemId,
     connectorManufacturerReference,
+    connectorIsMainHarnessConnector,
+    setConnectorIsMainHarnessConnector,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,
@@ -87,6 +89,14 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     <label>
       Way count (from catalog)
       <input type="number" min={1} step={1} value={cavityCount} readOnly required />
+    </label>
+    <label className="settings-checkbox">
+      <input
+        type="checkbox"
+        checked={connectorIsMainHarnessConnector}
+        onChange={(event) => setConnectorIsMainHarnessConnector(event.target.checked)}
+      />
+      Main harness connector for functional view
     </label>
     <label className="settings-checkbox">
       <input

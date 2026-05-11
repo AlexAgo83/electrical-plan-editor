@@ -192,7 +192,7 @@ export function useAppControllerWorkspaceContentAssembly({
     handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange
   });
 
-  const { networkSummaryPanel } = useAppControllerNetworkSummaryPanelDomain({
+  const { networkSummaryPanel, networkFunctionalSchematicPanel } = useAppControllerNetworkSummaryPanelDomain({
     NetworkSummaryPanelComponent: components.NetworkSummaryPanelComponent,
     hasActiveNetwork: state.hasActiveNetwork,
     isModelingScreen: state.isModelingScreen,
@@ -205,6 +205,7 @@ export function useAppControllerWorkspaceContentAssembly({
     nodes: entities.nodes,
     segments: entities.segments,
     wires: entities.wires,
+    catalogItems: entities.catalogItems,
     subNetworkSummaries: entities.subNetworkSummaries,
     routingGraph: entities.routingGraph,
     totalEdgeEntries: entities.totalEdgeEntries,
@@ -396,7 +397,8 @@ export function useAppControllerWorkspaceContentAssembly({
         networkTechnicalIdAlreadyUsed: state.networkTechnicalIdAlreadyUsed,
         handleSubmitNetworkForm: domains.workspaceNetworkDomain.handleSubmitNetworkForm,
         openNetworkScopeOnboardingHelp: () => handlers.openSingleStepOnboarding("networkScope"),
-        networkScopeFormState: models.networkScopeFormState
+        networkScopeFormState: models.networkScopeFormState,
+        functionalSchematicPanel: networkFunctionalSchematicPanel
       },
       validation: {
         validationModel: models.validationModel,

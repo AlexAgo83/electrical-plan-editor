@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactElement } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactElement, type ReactNode } from "react";
 import type { NetworkId } from "../../../core/entities";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
@@ -61,6 +61,7 @@ interface NetworkScopeWorkspaceContentProps {
   focusRequestedNetworkId: NetworkId | null;
   focusRequestedNetworkToken: number;
   onOpenOnboardingHelp?: () => void;
+  functionalSchematicPanel?: ReactNode;
 }
 
 export function NetworkScopeWorkspaceContent({
@@ -102,7 +103,8 @@ export function NetworkScopeWorkspaceContent({
   handleSubmitNetworkForm,
   focusRequestedNetworkId,
   focusRequestedNetworkToken,
-  onOpenOnboardingHelp
+  onOpenOnboardingHelp,
+  functionalSchematicPanel
 }: NetworkScopeWorkspaceContentProps): ReactElement {
   type NetworkScopeFilterField = "name" | "technicalId" | "any";
   type NetworkScopeTableSortField = "name" | "technicalId" | "status";
@@ -492,6 +494,8 @@ export function NetworkScopeWorkspaceContent({
           </div>
         </div>
       </section>
+
+      {functionalSchematicPanel}
 
       {showRecentChangesPanel ? (
         <section className="panel network-recent-changes-panel" aria-label="Recent changes for active network">

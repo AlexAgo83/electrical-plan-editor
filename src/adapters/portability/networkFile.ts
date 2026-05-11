@@ -156,6 +156,7 @@ function normalizeConnectorsEntityState(
 
     byId[connectorId] = {
       ...connector,
+      isMainHarnessConnector: connector.isMainHarnessConnector === true ? true : undefined,
       manufacturerReference: normalizeManufacturerReference((connector as Partial<Connector>).manufacturerReference)
     };
   }

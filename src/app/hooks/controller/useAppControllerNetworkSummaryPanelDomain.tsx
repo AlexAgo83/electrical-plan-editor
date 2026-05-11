@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import type { AppAction } from "../../../store/actions";
 import type {
   Connector,
+  CatalogItem,
   ConnectorId,
   Network,
   NodeId,
@@ -19,6 +20,7 @@ import type { ShortestRouteResult } from "../../../core/pathfinding";
 import type { NodePosition, SubScreenId } from "../../types/app-controller";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
 import { appActions } from "../../../store";
+import { FunctionalSchematicPanel } from "../../components/network-summary/FunctionalSchematicPanel";
 import { buildNetworkSummaryPanelControllerSlice } from "./useAppControllerScreenContentSlices";
 
 type NetworkSummaryPanelSliceParams = Parameters<typeof buildNetworkSummaryPanelControllerSlice>[0];
@@ -36,6 +38,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   nodes: NetworkSummaryPanelSliceParams["nodes"];
   segments: Segment[];
   wires: Wire[];
+  catalogItems: CatalogItem[];
   subNetworkSummaries: SubNetworkSummary[];
   routingGraph: {
     nodeIds: string[];
@@ -136,6 +139,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   nodes,
   segments,
   wires,
+  catalogItems,
   subNetworkSummaries,
   routingGraph,
   totalEdgeEntries,
@@ -267,6 +271,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
         nodes,
         segments,
         wires,
+        catalogItems,
+        activeNetwork,
         isPanningNetwork: canvasState.isPanningNetwork,
         networkViewWidth: effectiveNetworkViewWidth,
         networkViewHeight: effectiveNetworkViewHeight,
@@ -311,11 +317,34 @@ export function useAppControllerNetworkSummaryPanelDomain({
         pngExportIncludeBackground: preferencesState.canvasPngExportIncludeBackground,
         canExportBomCsv,
         onExportBomCsv,
-        handleRegenerateLayout
+        handleRegenerateLayout,
+        showFunctionalSchematic: false
       }).networkSummaryPanel
     : null;
+  const mainHarnessConnectorIds = [...connectorMap.values()]
+    .filter((connector) => connector.isMainHarnessConnector === true)
+    .map((connector) => connector.id);
+  const networkFunctionalSchematicPanel = hasActiveNetwork ? (
+    <FunctionalSchematicPanel
+      network={activeNetwork}
+      wires={wires}
+      segments={segments}
+      catalogItems={catalogItems}
+      connectorMap={connectorMap}
+      spliceMap={spliceMap}
+      rootConnectorIds={mainHarnessConnectorIds}
+      selectedWireId={null}
+      selectedConnectorId={mainHarnessConnectorIds[0] ?? null}
+      selectedSpliceId={null}
+      canvasExportFormat={preferencesState.canvasExportFormat}
+      pngExportIncludeBackground={preferencesState.canvasPngExportIncludeBackground}
+      exportIncludeFrame={preferencesState.canvasExportIncludeFrame}
+      exportIncludeCartouche={preferencesState.canvasExportIncludeCartouche}
+    />
+  ) : null;
 
   return {
-    networkSummaryPanel
+    networkSummaryPanel,
+    networkFunctionalSchematicPanel
   };
 }

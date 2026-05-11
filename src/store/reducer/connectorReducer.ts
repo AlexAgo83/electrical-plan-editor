@@ -126,6 +126,7 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
           name: normalizedName,
           technicalId: normalizedTechnicalId,
           cavityCount,
+          isMainHarnessConnector: action.payload.isMainHarnessConnector === true ? true : undefined,
           manufacturerReference:
             linkedCatalogItem !== undefined
               ? linkedCatalogItem.manufacturerReference

@@ -30,6 +30,7 @@ export interface Connector {
   name: string;
   technicalId: string;
   cavityCount: number;
+  isMainHarnessConnector?: boolean;
   catalogItemId?: CatalogItemId;
   manufacturerReference?: string;
   cableCalloutPosition?: {

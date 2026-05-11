@@ -32,6 +32,8 @@ interface UseConnectorHandlersParams {
   setConnectorCatalogItemId: (value: string) => void;
   connectorManufacturerReference: string;
   setConnectorManufacturerReference: (value: string) => void;
+  connectorIsMainHarnessConnector: boolean;
+  setConnectorIsMainHarnessConnector: (value: boolean) => void;
   connectorAutoCreateLinkedNode: boolean;
   setConnectorAutoCreateLinkedNode: (value: boolean) => void;
   defaultAutoCreateLinkedNodes: boolean;
@@ -89,6 +91,8 @@ export function useConnectorHandlers({
   setConnectorCatalogItemId,
   connectorManufacturerReference: _connectorManufacturerReference,
   setConnectorManufacturerReference,
+  connectorIsMainHarnessConnector,
+  setConnectorIsMainHarnessConnector,
   connectorAutoCreateLinkedNode,
   setConnectorAutoCreateLinkedNode,
   defaultAutoCreateLinkedNodes,
@@ -143,6 +147,7 @@ export function useConnectorHandlers({
       );
       setConnectorCatalogItemId("");
       setConnectorManufacturerReference("");
+      setConnectorIsMainHarnessConnector(false);
       setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
       setCavityCount("4");
       setConnectorFormError("Create a catalog item first to define manufacturer reference and connection count.");
@@ -157,6 +162,7 @@ export function useConnectorHandlers({
       suggestNextConnectorTechnicalId(Object.values(state.connectors.byId).map((connector) => connector.technicalId))
     );
     syncDerivedConnectorCatalogFields(firstCatalogItem.id);
+    setConnectorIsMainHarnessConnector(false);
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setConnectorFormError(null);
   }
@@ -169,6 +175,7 @@ export function useConnectorHandlers({
     setConnectorTechnicalId("");
     setConnectorCatalogItemId("");
     setConnectorManufacturerReference("");
+    setConnectorIsMainHarnessConnector(false);
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setCavityCount("4");
     setConnectorFormError(null);
@@ -192,6 +199,7 @@ export function useConnectorHandlers({
       setConnectorManufacturerReference(connector.manufacturerReference ?? "");
       setCavityCount(String(connector.cavityCount));
     }
+    setConnectorIsMainHarnessConnector(connector.isMainHarnessConnector === true);
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setConnectorFormError(null);
     dispatchAction(appActions.select({ kind: "connector", id: connector.id }));
@@ -234,6 +242,7 @@ export function useConnectorHandlers({
         technicalId: trimmedTechnicalId,
         catalogItemId: selectedCatalogItem.id,
         manufacturerReference: selectedCatalogItem.manufacturerReference,
+        isMainHarnessConnector: connectorIsMainHarnessConnector === true ? true : undefined,
         cavityCount: normalizedCavityCount
       })
     );

@@ -251,6 +251,9 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     nodes: params.nodes,
     segments: params.segments,
     wires: params.wires,
+    catalogItems: params.catalogItems,
+    activeNetwork: params.activeNetwork,
+    showFunctionalSchematic: params.showFunctionalSchematic,
     isPanningNetwork: params.isPanningNetwork,
     networkViewWidth: params.networkViewWidth,
     networkViewHeight: params.networkViewHeight,
@@ -344,7 +347,8 @@ export function buildNetworkScopeScreenContentSlice(params: NetworkScopeScreenCo
     handleSubmitNetworkForm: params.handleSubmitNetworkForm,
     focusRequestedNetworkId: params.networkFocusRequest.id,
     focusRequestedNetworkToken: params.networkFocusRequest.token,
-    onOpenOnboardingHelp: params.onOpenOnboardingHelp
+    onOpenOnboardingHelp: params.onOpenOnboardingHelp,
+    functionalSchematicPanel: params.functionalSchematicPanel
   } satisfies NetworkScopeWorkspaceContentProps;
 
   return {
@@ -485,6 +489,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setConnectorCatalogItemId: params.setConnectorCatalogItemId,
     connectorManufacturerReference: params.connectorManufacturerReference,
     setConnectorManufacturerReference: params.setConnectorManufacturerReference,
+    connectorIsMainHarnessConnector: params.connectorIsMainHarnessConnector,
+    setConnectorIsMainHarnessConnector: params.setConnectorIsMainHarnessConnector,
     connectorAutoCreateLinkedNode: params.connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode: params.setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed: params.connectorTechnicalIdAlreadyUsed,

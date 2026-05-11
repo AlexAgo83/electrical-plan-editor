@@ -104,6 +104,20 @@ describe("appReducer entity lifecycle", () => {
     expect(updatedConnector?.name).toBe("Connector 1 Updated");
   });
 
+  it("persists main harness connector markers on connector upsert", () => {
+    const state = reduceAll([
+      appActions.upsertConnector({
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 2,
+        isMainHarnessConnector: true
+      })
+    ]);
+
+    expect(state.connectors.byId[asConnectorId("C1")]?.isMainHarnessConnector).toBe(true);
+  });
+
   it("rejects duplicate connector technical IDs", () => {
     const first = reduceAll([
       appActions.upsertConnector({ id: asConnectorId("C1"), name: "Connector 1", technicalId: "C-1", cavityCount: 2 })

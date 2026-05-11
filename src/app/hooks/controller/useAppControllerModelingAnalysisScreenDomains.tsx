@@ -486,6 +486,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
       modelingHandlers.connector.syncDerivedConnectorCatalogFields ?? formsState.setConnectorCatalogItemId,
     connectorManufacturerReference: formsState.connectorManufacturerReference,
     setConnectorManufacturerReference: formsState.setConnectorManufacturerReference,
+    connectorIsMainHarnessConnector: formsState.connectorIsMainHarnessConnector,
+    setConnectorIsMainHarnessConnector: formsState.setConnectorIsMainHarnessConnector,
     connectorAutoCreateLinkedNode: formsState.connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode: formsState.setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,

@@ -22,6 +22,8 @@ export interface ModelingFormsColumnProps {
   setConnectorCatalogItemId: (value: string) => void;
   connectorManufacturerReference: string;
   setConnectorManufacturerReference: (value: string) => void;
+  connectorIsMainHarnessConnector: boolean;
+  setConnectorIsMainHarnessConnector: (value: boolean) => void;
   connectorAutoCreateLinkedNode: boolean;
   setConnectorAutoCreateLinkedNode: (value: boolean) => void;
   connectorTechnicalIdAlreadyUsed: boolean;

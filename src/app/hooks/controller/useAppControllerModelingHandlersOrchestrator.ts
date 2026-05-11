@@ -29,6 +29,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setConnectorCatalogItemId: Parameters<typeof useConnectorHandlers>[0]["setConnectorCatalogItemId"];
   connectorManufacturerReference: Parameters<typeof useConnectorHandlers>[0]["connectorManufacturerReference"];
   setConnectorManufacturerReference: Parameters<typeof useConnectorHandlers>[0]["setConnectorManufacturerReference"];
+  connectorIsMainHarnessConnector: Parameters<typeof useConnectorHandlers>[0]["connectorIsMainHarnessConnector"];
+  setConnectorIsMainHarnessConnector: Parameters<typeof useConnectorHandlers>[0]["setConnectorIsMainHarnessConnector"];
   connectorAutoCreateLinkedNode: Parameters<typeof useConnectorHandlers>[0]["connectorAutoCreateLinkedNode"];
   setConnectorAutoCreateLinkedNode: Parameters<typeof useConnectorHandlers>[0]["setConnectorAutoCreateLinkedNode"];
   cavityCount: Parameters<typeof useConnectorHandlers>[0]["cavityCount"];
@@ -203,6 +205,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setConnectorCatalogItemId,
   connectorManufacturerReference,
   setConnectorManufacturerReference,
+  connectorIsMainHarnessConnector,
+  setConnectorIsMainHarnessConnector,
   connectorAutoCreateLinkedNode,
   setConnectorAutoCreateLinkedNode,
   cavityCount,
@@ -374,6 +378,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     setConnectorCatalogItemId,
     connectorManufacturerReference,
     setConnectorManufacturerReference,
+    connectorIsMainHarnessConnector,
+    setConnectorIsMainHarnessConnector,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     defaultAutoCreateLinkedNodes,

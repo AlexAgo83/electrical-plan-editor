@@ -59,6 +59,8 @@ export function useAppControllerModelingHandlersAssembly({
     setConnectorCatalogItemId: formsState.setConnectorCatalogItemId,
     connectorManufacturerReference: formsState.connectorManufacturerReference,
     setConnectorManufacturerReference: formsState.setConnectorManufacturerReference,
+    connectorIsMainHarnessConnector: formsState.connectorIsMainHarnessConnector,
+    setConnectorIsMainHarnessConnector: formsState.setConnectorIsMainHarnessConnector,
     connectorAutoCreateLinkedNode: formsState.connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode: formsState.setConnectorAutoCreateLinkedNode,
     cavityCount: formsState.cavityCount,

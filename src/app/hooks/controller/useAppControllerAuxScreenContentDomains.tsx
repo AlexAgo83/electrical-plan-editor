@@ -39,6 +39,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     | "networkTechnicalIdAlreadyUsed"
     | "handleSubmitNetworkForm"
     | "onOpenOnboardingHelp"
+    | "functionalSchematicPanel"
   > & {
     formState: NetworkScopeFormStateModel;
   };
@@ -116,6 +117,7 @@ export function useAppControllerAuxScreenContentDomains({
     networkTechnicalIdAlreadyUsed: networkScope.networkTechnicalIdAlreadyUsed,
     handleSubmitNetworkForm: networkScope.handleSubmitNetworkForm,
     onOpenOnboardingHelp: networkScope.onOpenOnboardingHelp,
+    functionalSchematicPanel: networkScope.functionalSchematicPanel,
     networkFocusRequest: networkScope.formState.networkFocusRequest
       })
     : null;

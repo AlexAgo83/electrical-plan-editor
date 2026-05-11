@@ -12,6 +12,8 @@ import {
 import type {
   Connector,
   ConnectorId,
+  CatalogItem,
+  Network,
   NetworkNode,
   NodeId,
   Segment,
@@ -64,6 +66,7 @@ import { NetworkSummaryGraphLayers } from "./network-summary/graph/NetworkSummar
 import {
   useNetworkSummaryExportActions
 } from "./network-summary/export/useNetworkSummaryExportActions";
+import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
 import { snapToGrid } from "../lib/app-utils-shared";
 
 
@@ -154,6 +157,9 @@ export interface NetworkSummaryPanelProps {
   canExportBomCsv: boolean;
   onExportBomCsv: () => void;
   onRegenerateLayout: () => void;
+  activeNetwork: Network | null;
+  catalogItems: CatalogItem[];
+  showFunctionalSchematic?: boolean;
 }
 
 function clampNumber(value: number, min: number, max: number): number {
@@ -246,7 +252,10 @@ export function NetworkSummaryPanel({
   pngExportIncludeBackground,
   canExportBomCsv,
   onExportBomCsv,
-  onRegenerateLayout
+  onRegenerateLayout,
+  activeNetwork,
+  catalogItems,
+  showFunctionalSchematic = true
 }: NetworkSummaryPanelProps): ReactElement {
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
   const networkCanvasShellRef = useRef<HTMLDivElement | null>(null);
@@ -954,6 +963,23 @@ export function NetworkSummaryPanel({
         entityCountBySubScreen={entityCountBySubScreen}
         onQuickEntityNavigation={onQuickEntityNavigation}
       />
+      {showFunctionalSchematic ? (
+        <FunctionalSchematicPanel
+          network={activeNetwork}
+          wires={wires}
+          segments={segments}
+          catalogItems={catalogItems}
+          connectorMap={connectorMap}
+          spliceMap={spliceMap}
+          selectedWireId={selectedWireId}
+          selectedConnectorId={selectedConnectorId}
+          selectedSpliceId={selectedSpliceId}
+          canvasExportFormat={canvasExportFormat}
+          pngExportIncludeBackground={pngExportIncludeBackground}
+          exportIncludeFrame={exportIncludeFrame}
+          exportIncludeCartouche={exportIncludeCartouche}
+        />
+      ) : null}
     </section>
   );
 }

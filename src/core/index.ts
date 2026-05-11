@@ -1,6 +1,7 @@
 export * from "./entities";
 export * from "./cableColors";
 export * from "./graph";
+export * from "./functionalSchematic";
 export * from "./pathfinding";
 export * from "./schema";
 export * from "./wireSection";

@@ -30,6 +30,7 @@ export function useEntityFormsState() {
   const [connectorTechnicalId, setConnectorTechnicalId] = useState("");
   const [connectorCatalogItemId, setConnectorCatalogItemId] = useState("");
   const [connectorManufacturerReference, setConnectorManufacturerReference] = useState("");
+  const [connectorIsMainHarnessConnector, setConnectorIsMainHarnessConnector] = useState(false);
   const [connectorAutoCreateLinkedNode, setConnectorAutoCreateLinkedNode] = useState(true);
   const [cavityCount, setCavityCount] = useState("4");
   const [cavityIndexInput, setCavityIndexInput] = useState("1");
@@ -143,6 +144,8 @@ export function useEntityFormsState() {
     setConnectorCatalogItemId,
     connectorManufacturerReference,
     setConnectorManufacturerReference,
+    connectorIsMainHarnessConnector,
+    setConnectorIsMainHarnessConnector,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     cavityCount,

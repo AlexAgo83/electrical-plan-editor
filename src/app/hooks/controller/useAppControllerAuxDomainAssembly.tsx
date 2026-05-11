@@ -32,6 +32,7 @@ interface UseAppControllerAuxDomainAssemblyParams {
     handleSubmitNetworkForm: (event: FormEvent<HTMLFormElement>) => void;
     openNetworkScopeOnboardingHelp: () => void;
     networkScopeFormState: NetworkScopeFormStateModel;
+    functionalSchematicPanel: AuxDomainsParams["networkScope"]["functionalSchematicPanel"];
   };
   validation: {
     validationModel: ValidationModel;
@@ -92,6 +93,7 @@ export function useAppControllerAuxDomainAssembly({
       networkTechnicalIdAlreadyUsed: networkScope.networkTechnicalIdAlreadyUsed,
       handleSubmitNetworkForm: networkScope.handleSubmitNetworkForm,
       onOpenOnboardingHelp: networkScope.openNetworkScopeOnboardingHelp,
+      functionalSchematicPanel: networkScope.functionalSchematicPanel,
       formState: networkScope.networkScopeFormState
     },
     validation: {

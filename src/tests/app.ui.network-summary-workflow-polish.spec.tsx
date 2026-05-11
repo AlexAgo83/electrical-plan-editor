@@ -4,6 +4,9 @@ import type { NetworkId } from "../core/entities";
 import { appActions, appReducer } from "../store";
 import {
   asConnectorId,
+  asCatalogItemId,
+  asNodeId,
+  asSegmentId,
   asSpliceId,
   asWireId,
   createUiIntegrationDenseWiresState,
@@ -126,6 +129,87 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(within(analysisQuickNavPanel).getByRole("button", { name: /Nodes/i })).toBeInTheDocument();
     expect(within(analysisQuickNavPanel).getByRole("button", { name: /Segments/i })).toBeInTheDocument();
     expect(within(analysisQuickNavPanel).getByRole("button", { name: /Wires/i })).toBeInTheDocument();
+  });
+
+  it("renders a read-only functional schematic trace with filters and export action", () => {
+    const baseState = createUiIntegrationState();
+    const withFuseCatalog = appReducer(
+      baseState,
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("F12-CAT"),
+        manufacturerReference: "F12",
+        connectionCount: 2,
+        name: "Fuse F12"
+      })
+    );
+    const withTaggedSegmentA = appReducer(
+      withFuseCatalog,
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-A"),
+        nodeA: asNodeId("N-C1"),
+        nodeB: asNodeId("N-MID"),
+        lengthMm: 40,
+        subNetworkTag: "CAN"
+      })
+    );
+    const withTaggedSegmentB = appReducer(
+      withTaggedSegmentA,
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-B"),
+        nodeA: asNodeId("N-MID"),
+        nodeB: asNodeId("N-S1"),
+        lengthMm: 60,
+        subNetworkTag: "CAN"
+      })
+    );
+    const withWire = appReducer(
+      withTaggedSegmentB,
+      appActions.saveWire({
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "W-1",
+        colorMode: "catalog",
+        primaryColorId: "RD",
+        protection: { kind: "fuse", catalogItemId: asCatalogItemId("F12-CAT") },
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 }
+      })
+    );
+    const connector = withWire.connectors.byId[asConnectorId("C1")];
+    expect(connector).toBeDefined();
+    const state =
+      connector === undefined
+        ? withWire
+        : appReducer(withWire, appActions.upsertConnector({ ...connector, isMainHarnessConnector: true }));
+
+    renderAppWithState(state);
+    switchScreenDrawerAware("modeling");
+    expect(screen.queryByRole("heading", { name: "Functional schematic" })).not.toBeInTheDocument();
+    switchScreenDrawerAware("networkScope");
+
+    const functionalPanel = getPanelByHeading("Functional schematic");
+    const functionalSvg = within(functionalPanel).getByLabelText("Read-only functional schematic");
+    expect(functionalSvg).toBeInTheDocument();
+    expect(functionalPanel).toHaveTextContent("C-1 pin 1");
+    expect(functionalPanel).toHaveTextContent("S-1");
+    expect(functionalPanel).toHaveTextContent("F12");
+    expect(functionalPanel).toHaveTextContent("Wire 1");
+    expect(functionalPanel).toHaveTextContent("W-1");
+    expect(functionalPanel).not.toHaveTextContent("SEG-A");
+    expect(functionalSvg.querySelector(".functional-edge-color-swatch")).not.toBeNull();
+    const functionalEdgePath = functionalSvg.querySelector(".functional-edge path");
+    const functionalEdgePathData = functionalEdgePath?.getAttribute("d") ?? "";
+    const verticalFlowMatch = functionalEdgePathData.match(/^M\s+\S+\s+(\S+)\s+C\s+\S+\s+(\S+)/);
+    expect(verticalFlowMatch).not.toBeNull();
+    expect(Number(verticalFlowMatch?.[2])).toBeGreaterThan(Number(verticalFlowMatch?.[1]));
+    expect(within(functionalPanel).getByRole("button", { name: "Export SVG" })).toBeEnabled();
+    expect(within(functionalPanel).getByRole("button", { name: "signal" })).toBeInTheDocument();
+    expect(within(functionalPanel).getByRole("button", { name: "12V power" })).toBeInTheDocument();
+    expect(within(functionalPanel).getByRole("button", { name: "-12V power(GND)" })).toBeInTheDocument();
+    expect(within(functionalPanel).getByRole("button", { name: "48V" })).toBeInTheDocument();
+
+    fireEvent.click(within(functionalPanel).getByRole("button", { name: "CAN" }));
+    expect(functionalPanel).toHaveTextContent("W-1");
   });
 
   it("sorts wires by numeric length in modeling wire table", () => {
