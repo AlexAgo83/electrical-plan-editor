@@ -34,6 +34,8 @@ export const ALLOWED_OVERSIZE = {
     "Delete confirmation coverage spans direct, blocked, cascade, and batch-delete contracts on the same shared setup; split deferred until delete-flow fixtures are extracted.",
   "src/app/styles/canvas/canvas-toolbar-and-shell.css":
     "Canvas toolbar and shell rules stay centralized while responsive canvas controls and shell tokens still share tightly coupled selectors.",
+  "src/app/styles/canvas/canvas-diagram-and-overlays.css":
+    "Network summary and functional schematic diagram overlays share SVG layering and hover semantics; split deferred until canvas diagram style tokens are extracted.",
   "src/tests/app.ui.network-summary-bom-export.spec.tsx":
     "High-scope export integration regression suite spanning BOM, SVG, and cartouche scenarios; split deferred until export fixture/setup extraction is complete.",
   "src/tests/app.ui.network-summary-workflow-polish.spec.tsx":
@@ -43,6 +45,10 @@ export const ALLOWED_OVERSIZE = {
   "src/app/styles/validation-settings/validation-and-settings-layout.css":
     "Validation/settings layout shares tightly coupled responsive rules; split deferred to avoid regressions during mobile pass."
 };
+
+function normalizeRelativePath(relativePath) {
+  return relativePath.split(path.sep).join("/");
+}
 
 export const LOCKED_LINE_BUDGETS = {
   "src/app/AppController.tsx": 1100,
@@ -92,10 +98,10 @@ export function evaluateUiModularizationQualityGate({
     "src/app/App.tsx",
     "src/app/styles.css",
     ...walk(path.join(root, "src", "app", "styles"), (filePath) => filePath.endsWith(".css")).map((filePath) =>
-      path.relative(root, filePath)
+      normalizeRelativePath(path.relative(root, filePath))
     ),
     ...walk(path.join(root, "src", "tests"), (filePath) => /app\.ui\..+\.spec\.tsx$/.test(filePath)).map((filePath) =>
-      path.relative(root, filePath)
+      normalizeRelativePath(path.relative(root, filePath))
     )
   ];
 
