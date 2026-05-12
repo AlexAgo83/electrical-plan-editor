@@ -250,6 +250,11 @@
   grid-template-columns: minmax(8rem, 0.8fr) minmax(12rem, 1fr) auto;
 }
 
+.harness-assembly-row .technical-id,
+.harness-assembly-links .technical-id {
+  font-family: inherit;
+}
+
 .functional-schematic-subtitle {
   margin: 0.15rem 0 0;
   color: #486579;
@@ -419,6 +424,26 @@
   paint-order: stroke fill;
   stroke: rgba(247, 251, 255, 0.94);
   stroke-width: 1.8px;
+  stroke-linejoin: round;
+}
+
+.functional-node-label--interconnector {
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.functional-node-detail--top,
+.functional-node-detail--bottom {
+  font-size: 7.5px;
+}
+
+.functional-node-network-label {
+  fill: #4f6b7e;
+  font-size: 7px;
+  font-weight: 700;
+  paint-order: stroke fill;
+  stroke: rgba(247, 251, 255, 0.94);
+  stroke-width: 1.6px;
   stroke-linejoin: round;
 }
 

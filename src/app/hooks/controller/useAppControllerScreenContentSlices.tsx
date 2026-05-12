@@ -577,6 +577,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setWireTechnicalId: params.setWireTechnicalId,
     wireTwistGroupLabel: params.wireTwistGroupLabel,
     setWireTwistGroupLabel: params.setWireTwistGroupLabel,
+    wireFunctionalDomainTag: params.wireFunctionalDomainTag,
+    setWireFunctionalDomainTag: params.setWireFunctionalDomainTag,
     wireSectionMm2: params.wireSectionMm2,
     setWireSectionMm2: params.setWireSectionMm2,
     wireCurrentA: params.wireCurrentA,

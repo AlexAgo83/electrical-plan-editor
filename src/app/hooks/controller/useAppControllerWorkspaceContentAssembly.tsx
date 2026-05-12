@@ -1,6 +1,6 @@
 import type { AppAction } from "../../../store/actions";
 import type { AppStore } from "../../../store";
-import type { SubScreenId } from "../../types/app-controller";
+import type { ScreenId, SubScreenId } from "../../types/app-controller";
 import type { AppControllerCanvasDisplayStateModel } from "../useAppControllerCanvasDisplayState";
 import type { AppControllerPreferencesStateModel } from "../useAppControllerPreferencesState";
 import type { CanvasStateModel } from "../useCanvasState";
@@ -20,8 +20,6 @@ import { useAppControllerNetworkSummaryPanelDomain } from "./useAppControllerNet
 import { useAppControllerModelingAnalysisDomainAssembly } from "./useAppControllerModelingAnalysisDomainAssembly";
 import { useAppControllerCatalogScreenDomains } from "./useAppControllerCatalogScreenDomains";
 import { useAppControllerAuxDomainAssembly } from "./useAppControllerAuxDomainAssembly";
-
-type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
 
 type HomeWorkspaceParams = Parameters<typeof useAppControllerHomeWorkspaceContent>[0];
 type NetworkSummaryParams = Parameters<typeof useAppControllerNetworkSummaryPanelDomain>[0];
@@ -54,6 +52,7 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     isAnalysisScreen: boolean;
     isModelingAnalysisFocused: boolean;
     isNetworkScopeScreen: boolean;
+    isHarnessAssemblyScreen: boolean;
     isValidationScreen: boolean;
     isSettingsScreen: boolean;
     isCatalogSubScreen: boolean;
@@ -399,7 +398,7 @@ export function useAppControllerWorkspaceContentAssembly({
         handleSubmitNetworkForm: domains.workspaceNetworkDomain.handleSubmitNetworkForm,
         openNetworkScopeOnboardingHelp: () => handlers.openSingleStepOnboarding("networkScope"),
         networkScopeFormState: models.networkScopeFormState,
-        functionalSchematicPanel: networkFunctionalSchematicPanel
+        functionalSchematicPanel: null
       },
       validation: {
         validationModel: models.validationModel,
@@ -450,6 +449,7 @@ export function useAppControllerWorkspaceContentAssembly({
     modelingFormsColumnContentForLayout,
     analysisWorkspaceContentForLayout,
     networkScopeWorkspaceContent,
+    harnessAssemblyWorkspaceContent: networkFunctionalSchematicPanel,
     validationWorkspaceContent,
     settingsWorkspaceContent
   };

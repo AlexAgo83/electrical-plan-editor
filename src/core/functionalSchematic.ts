@@ -23,9 +23,9 @@ export type FunctionalTraceSeed =
 export type FunctionalDomainFilter = string;
 
 export const FUNCTIONAL_FILTER_ALL = "all";
-export const FUNCTIONAL_FILTER_SIGNAL = "signal";
+export const FUNCTIONAL_FILTER_SIGNAL = "Signal";
 export const FUNCTIONAL_FILTER_12V_POWER = "12V power";
-export const FUNCTIONAL_FILTER_GROUND_POWER = "-12V power(GND)";
+export const FUNCTIONAL_FILTER_GROUND_POWER = "-12V power (GND)";
 export const FUNCTIONAL_FILTER_48V = "48V";
 export const FUNCTIONAL_FILTER_CAN = "CAN";
 export const FUNCTIONAL_FILTERS = [
@@ -49,6 +49,8 @@ export interface FunctionalSchematicNode {
   kind: FunctionalNodeKind;
   label: string;
   detail: string;
+  detailTop?: string;
+  detailBottom?: string;
   sourceIds: string[];
   role: "power" | "ground" | "signal" | "component";
   networkId?: NetworkId;
@@ -60,6 +62,12 @@ export interface FunctionalSchematicEdge {
   fromNodeId: string;
   toNodeId: string;
   label: string;
+  wireName?: string;
+  wireTechnicalId?: string;
+  wireColorMode?: Wire["colorMode"];
+  wirePrimaryColorId?: Wire["primaryColorId"];
+  wireSecondaryColorId?: Wire["secondaryColorId"];
+  wireFreeColorLabel?: Wire["freeColorLabel"];
   sourceWireIds: WireId[];
   domainTags: string[];
   harnessColor?: string;
@@ -246,6 +254,7 @@ function collectWireDomainTags(
   segmentById: ReadonlyMap<SegmentId, Segment>
 ): string[] {
   const routeTags: string[] = [];
+  const explicitDomainTag = normalizeText(wire.functionalDomainTag);
   for (const segmentId of wire.routeSegmentIds) {
     const tag = normalizeText(segmentById.get(segmentId)?.subNetworkTag);
     if (tag.length > 0) {
@@ -260,6 +269,10 @@ function collectWireDomainTags(
     ...routeTags
   ].join(" ");
   const tags = new Set<string>();
+  if (explicitDomainTag.length > 0) {
+    tags.add(explicitDomainTag);
+    return [...tags].sort((left, right) => left.localeCompare(right));
+  }
   const isCan = hasNeedle(combinedText, "can");
   const isGround =
     hasNeedle(combinedText, "gnd") ||
@@ -429,6 +442,20 @@ function addEdge(
   });
 }
 
+function getWireEdgeDisplayFields(wire: Wire): Pick<
+  FunctionalSchematicEdge,
+  "wireName" | "wireTechnicalId" | "wireColorMode" | "wirePrimaryColorId" | "wireSecondaryColorId" | "wireFreeColorLabel"
+> {
+  return {
+    wireName: wire.name,
+    wireTechnicalId: wire.technicalId,
+    wireColorMode: wire.colorMode,
+    wirePrimaryColorId: wire.primaryColorId,
+    wireSecondaryColorId: wire.secondaryColorId,
+    wireFreeColorLabel: wire.freeColorLabel
+  };
+}
+
 function orientEdgesFromRoots(
   nodes: ReadonlyMap<string, FunctionalSchematicNode>,
   edges: FunctionalSchematicEdge[],
@@ -578,6 +605,7 @@ export function buildFunctionalSchematicGraph({
         fromNodeId: endpointANode.id,
         toNodeId: fuseNode.id,
         label: wire.technicalId,
+        ...getWireEdgeDisplayFields(wire),
         sourceWireIds: [wire.id],
         domainTags
       });
@@ -586,6 +614,7 @@ export function buildFunctionalSchematicGraph({
         fromNodeId: fuseNode.id,
         toNodeId: endpointBNode.id,
         label: wire.technicalId,
+        ...getWireEdgeDisplayFields(wire),
         sourceWireIds: [wire.id],
         domainTags
       });
@@ -597,6 +626,7 @@ export function buildFunctionalSchematicGraph({
       fromNodeId: endpointANode.id,
       toNodeId: endpointBNode.id,
       label: wire.technicalId,
+      ...getWireEdgeDisplayFields(wire),
       sourceWireIds: [wire.id],
       domainTags
     });
@@ -634,6 +664,17 @@ interface QualifiedWire {
   wire: Wire;
 }
 
+interface AssemblyInterconnectorEndpoint {
+  linkId: string;
+  cavityIndex: number;
+  nodeId: string;
+  otherKey: string;
+  label: string;
+  sourceLabel: string;
+  targetLabel: string;
+  sourceIds: string[];
+}
+
 function collectAssemblyWireDomainTags(
   networksById: ReadonlyMap<NetworkId, HarnessFunctionalNetworkBundle>
 ): Map<string, string[]> {
@@ -652,11 +693,27 @@ function getAssemblyEndpointNode(
   endpoint: WireEndpoint,
   bundle: HarnessFunctionalNetworkBundle,
   assembly: HarnessAssembly,
+  interconnectorByEndpointKey: ReadonlyMap<string, readonly AssemblyInterconnectorEndpoint[]>,
   warnings: FunctionalSchematicWarning[],
   sourceWireId: WireId
 ): FunctionalSchematicNode | null {
   const harnessColor = getHarnessColor(assembly, networkId);
   if (endpoint.kind === "connectorCavity") {
+    const interconnector = interconnectorByEndpointKey.get(endpointKey(networkId, endpoint))?.[0];
+    if (interconnector !== undefined) {
+      return {
+        id: interconnector.nodeId,
+        kind: "interconnector",
+        label: interconnector.label,
+        detail: `${interconnector.sourceLabel} to ${interconnector.targetLabel}`,
+        detailTop: interconnector.sourceLabel,
+        detailBottom: interconnector.targetLabel,
+        sourceIds: interconnector.sourceIds,
+        role: "component",
+        harnessColor
+      };
+    }
+
     const connector = bundle.connectorMap.get(endpoint.connectorId);
     if (connector === undefined) {
       warnings.push({
@@ -666,12 +723,13 @@ function getAssemblyEndpointNode(
       });
       return null;
     }
-    const label = `${connector.technicalId} pin ${endpoint.cavityIndex}`;
+    const label = `${connector.technicalId} / pin ${endpoint.cavityIndex}`;
     return {
       id: makeAssemblyConnectorNodeId(networkId, endpoint.connectorId, endpoint.cavityIndex),
       kind: "connector",
       label,
-      detail: `${bundle.network.name} - ${connector.name}`,
+      detail: connector.name,
+      detailTop: bundle.network.name,
       sourceIds: [String(networkId), String(endpoint.connectorId), String(endpoint.cavityIndex)],
       role: inferRole(`${label} ${connector.name}`),
       networkId,
@@ -699,6 +757,10 @@ function getAssemblyEndpointNode(
     networkId,
     harnessColor
   };
+}
+
+function getAssemblyConnectorPinLabel(network: Network, connector: Connector, cavityIndex: number): string {
+  return `${network.technicalId} / ${connector.technicalId} pin ${cavityIndex} - ${connector.name}`;
 }
 
 export function buildHarnessAssemblyFunctionalSchematicGraph({
@@ -731,13 +793,13 @@ export function buildHarnessAssemblyFunctionalSchematicGraph({
     }
   }
 
-  const interconnectorByEndpointKey = new Map<string, Array<{ linkId: string; cavityIndex: number; otherKey: string }>>();
+  const interconnectorByEndpointKey = new Map<string, AssemblyInterconnectorEndpoint[]>();
   for (const link of assembly.connectorLinks) {
     const sourceBundle = networksById.get(link.sourceNetworkId);
     const targetBundle = networksById.get(link.targetNetworkId);
     const sourceConnector = sourceBundle?.connectorMap.get(link.sourceConnectorId);
     const targetConnector = targetBundle?.connectorMap.get(link.targetConnectorId);
-    if (sourceConnector === undefined || targetConnector === undefined) {
+    if (sourceBundle === undefined || targetBundle === undefined || sourceConnector === undefined || targetConnector === undefined) {
       warnings.push({
         kind: "missing-endpoint",
         message: `Interconnector link '${link.id}' references a missing connector.`,
@@ -749,11 +811,33 @@ export function buildHarnessAssemblyFunctionalSchematicGraph({
     for (let cavityIndex = 1; cavityIndex <= sharedPinCount; cavityIndex += 1) {
       const sourceKey = `${link.sourceNetworkId}:connector:${link.sourceConnectorId}:pin:${cavityIndex}`;
       const targetKey = `${link.targetNetworkId}:connector:${link.targetConnectorId}:pin:${cavityIndex}`;
+      const nodeId = makeInterconnectorNodeId(String(link.id), cavityIndex);
+      const sourceLabel = getAssemblyConnectorPinLabel(sourceBundle.network, sourceConnector, cavityIndex);
+      const targetLabel = getAssemblyConnectorPinLabel(targetBundle.network, targetConnector, cavityIndex);
+      const sourceIds = [String(link.id), String(cavityIndex), String(link.sourceConnectorId), String(link.targetConnectorId)];
       const sourceEntries = interconnectorByEndpointKey.get(sourceKey) ?? [];
-      sourceEntries.push({ linkId: String(link.id), cavityIndex, otherKey: targetKey });
+      sourceEntries.push({
+        linkId: String(link.id),
+        cavityIndex,
+        nodeId,
+        otherKey: targetKey,
+        label: link.name ?? "Interconnector",
+        sourceLabel,
+        targetLabel,
+        sourceIds
+      });
       interconnectorByEndpointKey.set(sourceKey, sourceEntries);
       const targetEntries = interconnectorByEndpointKey.get(targetKey) ?? [];
-      targetEntries.push({ linkId: String(link.id), cavityIndex, otherKey: sourceKey });
+      targetEntries.push({
+        linkId: String(link.id),
+        cavityIndex,
+        nodeId,
+        otherKey: sourceKey,
+        label: link.name ?? "Interconnector",
+        sourceLabel,
+        targetLabel,
+        sourceIds
+      });
       interconnectorByEndpointKey.set(targetKey, targetEntries);
     }
   }
@@ -831,8 +915,24 @@ export function buildHarnessAssemblyFunctionalSchematicGraph({
     if (bundle === undefined) {
       continue;
     }
-    const endpointANode = getAssemblyEndpointNode(networkId, wire.endpointA, bundle, assembly, warnings, wire.id);
-    const endpointBNode = getAssemblyEndpointNode(networkId, wire.endpointB, bundle, assembly, warnings, wire.id);
+    const endpointANode = getAssemblyEndpointNode(
+      networkId,
+      wire.endpointA,
+      bundle,
+      assembly,
+      interconnectorByEndpointKey,
+      warnings,
+      wire.id
+    );
+    const endpointBNode = getAssemblyEndpointNode(
+      networkId,
+      wire.endpointB,
+      bundle,
+      assembly,
+      interconnectorByEndpointKey,
+      warnings,
+      wire.id
+    );
     if (endpointANode === null || endpointBNode === null) {
       continue;
     }
@@ -844,57 +944,11 @@ export function buildHarnessAssemblyFunctionalSchematicGraph({
       fromNodeId: endpointANode.id,
       toNodeId: endpointBNode.id,
       label: wire.technicalId,
+      ...getWireEdgeDisplayFields(wire),
       sourceWireIds: [wire.id],
       domainTags: wireTagsByQualifiedId.get(qualifiedWireId) ?? [],
       harnessColor: getHarnessColor(assembly, networkId)
     });
-  }
-
-  for (const link of assembly.connectorLinks) {
-    const sourceBundle = networksById.get(link.sourceNetworkId);
-    const targetBundle = networksById.get(link.targetNetworkId);
-    const sourceConnector = sourceBundle?.connectorMap.get(link.sourceConnectorId);
-    const targetConnector = targetBundle?.connectorMap.get(link.targetConnectorId);
-    if (sourceConnector === undefined || targetConnector === undefined) {
-      continue;
-    }
-    const sharedPinCount = getSymmetricSharedPinCount(sourceConnector, targetConnector);
-    for (let cavityIndex = 1; cavityIndex <= sharedPinCount; cavityIndex += 1) {
-      const sourceNodeId = makeAssemblyConnectorNodeId(link.sourceNetworkId, link.sourceConnectorId, cavityIndex);
-      const targetNodeId = makeAssemblyConnectorNodeId(link.targetNetworkId, link.targetConnectorId, cavityIndex);
-      if (!nodes.has(sourceNodeId) || !nodes.has(targetNodeId)) {
-        continue;
-      }
-      const interconnectorNodeId = makeInterconnectorNodeId(String(link.id), cavityIndex);
-      mergeNode(nodes, {
-        id: interconnectorNodeId,
-        kind: "interconnector",
-        label: link.name ?? "Interconnector",
-        detail: `${sourceConnector.technicalId} pin ${cavityIndex} to ${targetConnector.technicalId} pin ${cavityIndex}`,
-        sourceIds: [String(link.id), String(cavityIndex), String(link.sourceConnectorId), String(link.targetConnectorId)],
-        role: "component"
-      });
-      addEdge(edges, {
-        id: `${link.id}:${cavityIndex}:source`,
-        fromNodeId: sourceNodeId,
-        toNodeId: interconnectorNodeId,
-        label: `${sourceConnector.technicalId} pin ${cavityIndex}`,
-        sourceWireIds: [],
-        domainTags: [],
-        interconnectorLinkId: String(link.id),
-        harnessColor: getHarnessColor(assembly, link.sourceNetworkId)
-      });
-      addEdge(edges, {
-        id: `${link.id}:${cavityIndex}:target`,
-        fromNodeId: interconnectorNodeId,
-        toNodeId: targetNodeId,
-        label: `${targetConnector.technicalId} pin ${cavityIndex}`,
-        sourceWireIds: [],
-        domainTags: [],
-        interconnectorLinkId: String(link.id),
-        harnessColor: getHarnessColor(assembly, link.targetNetworkId)
-      });
-    }
   }
 
   const rootNodeIds = rootConnectorRefs.flatMap((root) => {
@@ -904,7 +958,8 @@ export function buildHarnessAssemblyFunctionalSchematicGraph({
     }
     const ids: string[] = [];
     for (let cavityIndex = 1; cavityIndex <= connector.cavityCount; cavityIndex += 1) {
-      const nodeId = makeAssemblyConnectorNodeId(root.networkId, root.connectorId, cavityIndex);
+      const interconnector = interconnectorByEndpointKey.get(`${root.networkId}:connector:${root.connectorId}:pin:${cavityIndex}`)?.[0];
+      const nodeId = interconnector?.nodeId ?? makeAssemblyConnectorNodeId(root.networkId, root.connectorId, cavityIndex);
       if (nodes.has(nodeId)) {
         ids.push(nodeId);
       }

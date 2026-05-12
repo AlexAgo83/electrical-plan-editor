@@ -144,6 +144,7 @@ export interface Wire {
   name: string;
   technicalId: string;
   twistGroupLabel?: string;
+  functionalDomainTag?: string;
   sectionMm2: number;
   currentA?: number;
   material?: WireMaterial;

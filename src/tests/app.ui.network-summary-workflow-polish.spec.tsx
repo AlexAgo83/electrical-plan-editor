@@ -185,7 +185,7 @@ describe("App integration UI - network summary workflow polish", () => {
     renderAppWithState(state);
     switchScreenDrawerAware("modeling");
     expect(screen.queryByRole("heading", { name: "Functional schematic" })).not.toBeInTheDocument();
-    switchScreenDrawerAware("networkScope");
+    switchScreenDrawerAware("harnessAssembly");
 
     const functionalPanel = getPanelByHeading("Functional schematic");
     const functionalSvg = within(functionalPanel).getByLabelText("Read-only functional schematic");
@@ -203,9 +203,9 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(verticalFlowMatch).not.toBeNull();
     expect(Number(verticalFlowMatch?.[2])).toBeGreaterThan(Number(verticalFlowMatch?.[1]));
     expect(within(functionalPanel).getByRole("button", { name: "Export SVG" })).toBeEnabled();
-    expect(within(functionalPanel).getByRole("button", { name: "signal" })).toBeInTheDocument();
+    expect(within(functionalPanel).getByRole("button", { name: "Signal" })).toBeInTheDocument();
     expect(within(functionalPanel).getByRole("button", { name: "12V power" })).toBeInTheDocument();
-    expect(within(functionalPanel).getByRole("button", { name: "-12V power(GND)" })).toBeInTheDocument();
+    expect(within(functionalPanel).getByRole("button", { name: "-12V power (GND)" })).toBeInTheDocument();
     expect(within(functionalPanel).getByRole("button", { name: "48V" })).toBeInTheDocument();
 
     fireEvent.click(within(functionalPanel).getByRole("button", { name: "CAN" }));

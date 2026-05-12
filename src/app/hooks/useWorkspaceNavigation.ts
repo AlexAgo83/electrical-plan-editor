@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
-
-type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
-type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
+import type { ScreenId, SubScreenId } from "../types/app-controller";
 
 interface UseWorkspaceNavigationResult {
   activeScreen: ScreenId;
@@ -9,6 +7,7 @@ interface UseWorkspaceNavigationResult {
   activeSubScreen: SubScreenId;
   setActiveSubScreen: (subScreen: SubScreenId) => void;
   isNetworkScopeScreen: boolean;
+  isHarnessAssemblyScreen: boolean;
   isHomeScreen: boolean;
   isModelingScreen: boolean;
   isAnalysisScreen: boolean;
@@ -24,6 +23,7 @@ export function useWorkspaceNavigation(): UseWorkspaceNavigationResult {
 
   const isHomeScreen = activeScreen === "home";
   const isNetworkScopeScreen = activeScreen === "networkScope";
+  const isHarnessAssemblyScreen = activeScreen === "harnessAssembly";
   const isModelingScreen = activeScreen === "modeling";
   const isAnalysisScreen = activeScreen === "analysis";
   const isValidationScreen = activeScreen === "validation";
@@ -40,6 +40,7 @@ export function useWorkspaceNavigation(): UseWorkspaceNavigationResult {
     setActiveSubScreen,
     isHomeScreen,
     isNetworkScopeScreen,
+    isHarnessAssemblyScreen,
     isModelingScreen,
     isAnalysisScreen,
     isValidationScreen,

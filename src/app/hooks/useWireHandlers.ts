@@ -59,6 +59,8 @@ interface UseWireHandlersParams {
   setWireTechnicalId: (value: string) => void;
   wireTwistGroupLabel: string;
   setWireTwistGroupLabel: (value: string) => void;
+  wireFunctionalDomainTag: string;
+  setWireFunctionalDomainTag: (value: string) => void;
   wireSectionMm2: string;
   setWireSectionMm2: (value: string) => void;
   wireCurrentA: string;
@@ -160,6 +162,8 @@ export function useWireHandlers({
   setWireTechnicalId,
   wireTwistGroupLabel,
   setWireTwistGroupLabel,
+  wireFunctionalDomainTag,
+  setWireFunctionalDomainTag,
   wireSectionMm2,
   setWireSectionMm2,
   wireCurrentA,
@@ -804,6 +808,7 @@ export function useWireHandlers({
     setWireName("");
     setWireTechnicalId(suggestNextWireTechnicalId(Object.values(state.wires.byId).map((wire) => wire.technicalId)));
     setWireTwistGroupLabel("");
+    setWireFunctionalDomainTag("");
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
     setWireCurrentA("");
     setWireMaterial("copper");
@@ -850,6 +855,7 @@ export function useWireHandlers({
     setWireName("");
     setWireTechnicalId("");
     setWireTwistGroupLabel("");
+    setWireFunctionalDomainTag("");
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));
     setWireCurrentA("");
     setWireMaterial("copper");
@@ -936,6 +942,7 @@ export function useWireHandlers({
     setWireName(wire.name);
     setWireTechnicalId(wire.technicalId);
     setWireTwistGroupLabel(wire.twistGroupLabel ?? "");
+    setWireFunctionalDomainTag(wire.functionalDomainTag ?? "");
     setWireSectionMm2(String(wire.sectionMm2));
     setWireCurrentA(wire.currentA === undefined ? "" : String(wire.currentA));
     setWireMaterial(resolveWireMaterial(wire.material));
@@ -1268,6 +1275,7 @@ export function useWireHandlers({
           name: normalizedName,
           technicalId: normalizedTechnicalId,
           twistGroupLabel: wireTwistGroupLabel,
+          functionalDomainTag: wireFunctionalDomainTag,
           sectionMm2: parsedSectionMm2,
           currentA: normalizedCurrentA,
           material: resolveWireMaterial(wireMaterial),

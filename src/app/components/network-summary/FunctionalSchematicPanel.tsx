@@ -58,6 +58,8 @@ interface FunctionalLabelCollisionBox {
   height: number;
 }
 
+type WireColorPresentationInput = Parameters<typeof getWireColorCode>[0];
+
 interface FunctionalEdgeRenderModel {
   id: string;
   path: string;
@@ -73,7 +75,8 @@ interface FunctionalEdgeRenderModel {
   wireName: string;
   wireTechnicalId: string;
   title: string;
-  colorStyle: {
+  traceColor: string | null;
+  wireColorStyle: {
     primary: string | null;
     secondary: string | null;
   };
@@ -85,6 +88,7 @@ const FUNCTIONAL_LAYOUT_COLUMN_GAP = 165;
 const FUNCTIONAL_LAYOUT_ROW_GAP = 124;
 const FUNCTIONAL_LAYOUT_SPLICE_FANOUT_ROW_GAP = 172;
 const FUNCTIONAL_LAYOUT_LEAF_COLUMN_WIDTH = 0.62;
+const FUNCTIONAL_LAYOUT_INTERCONNECTOR_COLUMN_WIDTH = 1.12;
 const FUNCTIONAL_LAYOUT_MIN_SIBLING_COLUMN_GAP = 0.06;
 const FUNCTIONAL_LAYOUT_MAX_PARENT_GROUP_COLUMN_GAP = 0.42;
 const FUNCTIONAL_NODE_HALF_HEIGHT = 26;
@@ -155,6 +159,10 @@ function getFunctionalLayoutGapBetweenWidths(leftWidth: number, rightWidth: numb
     FUNCTIONAL_LAYOUT_MAX_PARENT_GROUP_COLUMN_GAP,
     FUNCTIONAL_LAYOUT_MIN_SIBLING_COLUMN_GAP + subtreeExtraWidth * 0.04
   );
+}
+
+function getFunctionalNodeLayoutWidth(node: FunctionalSchematicNode): number {
+  return node.kind === "interconnector" ? FUNCTIONAL_LAYOUT_INTERCONNECTOR_COLUMN_WIDTH : FUNCTIONAL_LAYOUT_LEAF_COLUMN_WIDTH;
 }
 
 function sumFunctionalLayoutWidths(widths: number[]): number {
@@ -282,8 +290,8 @@ function buildFunctionalSchematicLayout(graph: FunctionalSchematicGraph): Functi
     const row = rows.get(rank) ?? [];
     for (const node of row) {
       const children = layoutChildrenByNodeId.get(node.id) ?? [];
-      const childWidths = children.map((child) => layoutWidthByNodeId.get(child.id) ?? FUNCTIONAL_LAYOUT_LEAF_COLUMN_WIDTH);
-      layoutWidthByNodeId.set(node.id, Math.max(FUNCTIONAL_LAYOUT_LEAF_COLUMN_WIDTH, sumFunctionalLayoutWidths(childWidths)));
+      const childWidths = children.map((child) => layoutWidthByNodeId.get(child.id) ?? getFunctionalNodeLayoutWidth(child));
+      layoutWidthByNodeId.set(node.id, Math.max(getFunctionalNodeLayoutWidth(node), sumFunctionalLayoutWidths(childWidths)));
     }
   }
 
@@ -293,7 +301,7 @@ function buildFunctionalSchematicLayout(graph: FunctionalSchematicGraph): Functi
       return;
     }
     const children = layoutChildrenByNodeId.get(parentNodeId) ?? [];
-    const childWidths = children.map((child) => layoutWidthByNodeId.get(child.id) ?? FUNCTIONAL_LAYOUT_LEAF_COLUMN_WIDTH);
+    const childWidths = children.map((child) => layoutWidthByNodeId.get(child.id) ?? getFunctionalNodeLayoutWidth(child));
     const totalChildWidth = sumFunctionalLayoutWidths(childWidths);
     let nextColumn = parentColumn - totalChildWidth / 2;
     children.forEach((child, index) => {
@@ -308,7 +316,7 @@ function buildFunctionalSchematicLayout(graph: FunctionalSchematicGraph): Functi
 
   const rootIds = new Set(roots.map((root) => root.id));
   const assignRootColumns = (rootNodes: FunctionalSchematicNode[], startColumn: number): number => {
-    const rootWidths = rootNodes.map((root) => layoutWidthByNodeId.get(root.id) ?? FUNCTIONAL_LAYOUT_LEAF_COLUMN_WIDTH);
+    const rootWidths = rootNodes.map((root) => layoutWidthByNodeId.get(root.id) ?? getFunctionalNodeLayoutWidth(root));
     let nextColumn = startColumn;
     rootNodes.forEach((root, index) => {
       const rootWidth = rootWidths[index] ?? FUNCTIONAL_LAYOUT_LEAF_COLUMN_WIDTH;
@@ -330,9 +338,10 @@ function buildFunctionalSchematicLayout(graph: FunctionalSchematicGraph): Functi
     }
     const disconnectedNodes = row.filter((node) => !rootIds.has(node.id) && (incomingEdgesByNodeId.get(node.id) ?? []).length === 0);
     if (disconnectedNodes.length > 0) {
+      const lastDisconnectedNode = disconnectedNodes.at(-1)!;
       const lastDisconnectedWidth =
-        layoutWidthByNodeId.get(disconnectedNodes.at(-1)?.id ?? "") ?? FUNCTIONAL_LAYOUT_LEAF_COLUMN_WIDTH;
-      nextDisconnectedColumn += getFunctionalLayoutGapBetweenWidths(lastDisconnectedWidth, FUNCTIONAL_LAYOUT_LEAF_COLUMN_WIDTH);
+        layoutWidthByNodeId.get(lastDisconnectedNode.id) ?? getFunctionalNodeLayoutWidth(lastDisconnectedNode);
+      nextDisconnectedColumn += getFunctionalLayoutGapBetweenWidths(lastDisconnectedWidth, getFunctionalNodeLayoutWidth(lastDisconnectedNode));
     }
   }
 
@@ -447,13 +456,30 @@ function getFunctionalEdgeWire(edge: FunctionalSchematicEdge, wireMap: ReadonlyM
   return null;
 }
 
-function getFunctionalEdgeColorStyle(wire: Wire | null): { primary: string | null; secondary: string | null } {
-  if (wire === null || wire.colorMode === "free" || wire.primaryColorId === null) {
+function getFunctionalEdgeColorStyle(wireColor: WireColorPresentationInput | null): { primary: string | null; secondary: string | null } {
+  const primaryColorId = wireColor?.primaryColorId ?? null;
+  const secondaryColorId = wireColor?.secondaryColorId ?? null;
+  if (wireColor === null || wireColor.colorMode === "free" || primaryColorId === null) {
     return { primary: null, secondary: null };
   }
-  const primary = CABLE_COLOR_BY_ID[wire.primaryColorId]?.hex ?? null;
-  const secondary = wire.secondaryColorId === null ? null : CABLE_COLOR_BY_ID[wire.secondaryColorId]?.hex ?? null;
+  const primary = CABLE_COLOR_BY_ID[primaryColorId]?.hex ?? null;
+  const secondary = secondaryColorId === null ? null : CABLE_COLOR_BY_ID[secondaryColorId]?.hex ?? null;
   return { primary, secondary };
+}
+
+function getFunctionalEdgeWireColorInput(edge: FunctionalSchematicEdge, wire: Wire | null): WireColorPresentationInput | null {
+  if (wire !== null) {
+    return wire;
+  }
+  if (edge.wirePrimaryColorId === undefined && edge.wireSecondaryColorId === undefined && edge.wireFreeColorLabel === undefined) {
+    return null;
+  }
+  return {
+    colorMode: edge.wireColorMode,
+    primaryColorId: edge.wirePrimaryColorId ?? null,
+    secondaryColorId: edge.wireSecondaryColorId ?? null,
+    freeColorLabel: edge.wireFreeColorLabel
+  };
 }
 
 interface FunctionalInterconnectorDetail {
@@ -468,16 +494,6 @@ interface FunctionalInterconnectorDetail {
   targetConnectorLabel: string;
   onOpenSource: () => void;
   onOpenTarget: () => void;
-}
-
-function getFunctionalEdgeRenderColorStyle(
-  edge: FunctionalSchematicEdge,
-  wire: Wire | null
-): { primary: string | null; secondary: string | null } {
-  if (edge.harnessColor !== undefined) {
-    return { primary: edge.harnessColor, secondary: null };
-  }
-  return getFunctionalEdgeColorStyle(wire);
 }
 
 function estimateFunctionalEdgeLabelBoxWidth(wireName: string, wireTechnicalId: string): number {
@@ -514,7 +530,10 @@ function getFunctionalNodeCollisionBox(node: FunctionalSchematicNode, position: 
     return { x: position.x, y: position.y, width: 76, height: 46 };
   }
   if (node.kind === "interconnector") {
-    return { x: position.x, y: position.y, width: 112, height: 54 };
+    return { x: position.x, y: position.y, width: 168, height: 78 };
+  }
+  if (node.kind === "connector" && node.detailTop !== undefined) {
+    return { x: position.x, y: position.y, width: 124, height: 62 };
   }
   return { x: position.x, y: position.y, width: 100, height: 48 };
 }
@@ -620,9 +639,57 @@ function renderNodeShape(node: FunctionalSchematicNode, position: FunctionalNode
     return <rect className="functional-node-shape" x={position.x - 32} y={position.y - 18} width={64} height={36} rx={6} />;
   }
   if (node.kind === "interconnector") {
-    return <rect className="functional-node-shape" x={position.x - 54} y={position.y - 22} width={108} height={44} rx={5} />;
+    return <rect className="functional-node-shape" x={position.x - 78} y={position.y - 33} width={156} height={66} rx={6} />;
+  }
+  if (node.kind === "connector" && node.detailTop !== undefined) {
+    return <rect className="functional-node-shape" x={position.x - 55} y={position.y - 27} width={110} height={54} rx={7} />;
   }
   return <rect className="functional-node-shape" x={position.x - 46} y={position.y - 20} width={92} height={40} rx={7} />;
+}
+
+function renderNodeText(node: FunctionalSchematicNode, position: FunctionalNodePosition): ReactElement {
+  if (node.kind === "interconnector") {
+    return (
+      <>
+        <text className="functional-node-detail functional-node-detail--top" x={position.x} y={position.y - 16} textAnchor="middle">
+          {node.detailTop ?? node.detail}
+        </text>
+        <text className="functional-node-label functional-node-label--interconnector" x={position.x} y={position.y + 3} textAnchor="middle">
+          {node.label}
+        </text>
+        <text className="functional-node-detail functional-node-detail--bottom" x={position.x} y={position.y + 20} textAnchor="middle">
+          {node.detailBottom ?? node.detail}
+        </text>
+      </>
+    );
+  }
+
+  if (node.kind === "connector" && node.detailTop !== undefined) {
+    return (
+      <>
+        <text className="functional-node-network-label" x={position.x - 48} y={position.y - 14} textAnchor="start">
+          {node.detailTop}
+        </text>
+        <text className="functional-node-label" x={position.x} y={position.y + 2} textAnchor="middle">
+          {node.label}
+        </text>
+        <text className="functional-node-detail" x={position.x} y={position.y + 17} textAnchor="middle">
+          {node.detail}
+        </text>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <text className="functional-node-label" x={position.x} y={position.y - 2} textAnchor="middle">
+        {node.label}
+      </text>
+      <text className="functional-node-detail" x={position.x} y={position.y + 13} textAnchor="middle">
+        {node.detail}
+      </text>
+    </>
+  );
 }
 
 export function FunctionalSchematicPanel({
@@ -706,10 +773,11 @@ export function FunctionalSchematicPanel({
       const midX = (from.x + to.x) / 2;
       const midY = (from.y + to.y) / 2;
       const wire = getFunctionalEdgeWire(edge, wireMap);
-      const wireName = wire?.name.trim() || edge.label;
-      const wireTechnicalId = wire?.technicalId.trim() || edge.label;
-      const wireColorCode = wire === null ? "" : getWireColorCode(wire);
-      const wireColorLabel = wire === null ? "No color" : getWireColorLabel(wire);
+      const wireName = wire?.name.trim() || edge.wireName?.trim() || edge.label;
+      const wireTechnicalId = wire?.technicalId.trim() || edge.wireTechnicalId?.trim() || edge.label;
+      const wireColorInput = getFunctionalEdgeWireColorInput(edge, wire);
+      const wireColorCode = wireColorInput === null ? "" : getWireColorCode(wireColorInput);
+      const wireColorLabel = wireColorInput === null ? "No color" : getWireColorLabel(wireColorInput);
       return [
         {
           id: edge.id,
@@ -726,7 +794,8 @@ export function FunctionalSchematicPanel({
           wireName,
           wireTechnicalId,
           title: `${wireName} ${wireTechnicalId}${wireColorCode.length > 0 ? ` ${wireColorCode}` : ""} - ${wireColorLabel}`,
-          colorStyle: getFunctionalEdgeRenderColorStyle(edge, wire)
+          traceColor: edge.harnessColor ?? null,
+          wireColorStyle: getFunctionalEdgeColorStyle(wireColorInput)
         }
       ];
     });
@@ -805,25 +874,25 @@ export function FunctionalSchematicPanel({
                 return (
                   <g key={edge.id} className={hoveredEdgeId === edge.id ? "functional-edge is-hovered" : "functional-edge"}>
                     <title>{edge.title}</title>
-                    <path d={edge.path} />
-                    {edge.colorStyle.primary !== null ? (
+                    <path d={edge.path} style={edge.traceColor === null ? undefined : { stroke: edge.traceColor }} />
+                    {edge.wireColorStyle.primary !== null ? (
                       <line
                         className="functional-edge-color-swatch"
                         x1={edge.labelX - 35}
                         y1={edge.labelY + FUNCTIONAL_EDGE_LABEL_GAP + 7}
-                        x2={edge.colorStyle.secondary === null ? edge.labelX + 35 : edge.labelX}
+                        x2={edge.wireColorStyle.secondary === null ? edge.labelX + 35 : edge.labelX}
                         y2={edge.labelY + FUNCTIONAL_EDGE_LABEL_GAP + 7}
-                        style={{ stroke: edge.colorStyle.primary }}
+                        style={{ stroke: edge.wireColorStyle.primary }}
                       />
                     ) : null}
-                    {edge.colorStyle.secondary !== null ? (
+                    {edge.wireColorStyle.secondary !== null ? (
                       <line
                         className="functional-edge-color-swatch"
                         x1={edge.labelX}
                         y1={edge.labelY + FUNCTIONAL_EDGE_LABEL_GAP + 7}
                         x2={edge.labelX + 35}
                         y2={edge.labelY + FUNCTIONAL_EDGE_LABEL_GAP + 7}
-                        style={{ stroke: edge.colorStyle.secondary }}
+                        style={{ stroke: edge.wireColorStyle.secondary }}
                       />
                     ) : null}
                   </g>
@@ -864,12 +933,7 @@ export function FunctionalSchematicPanel({
                   >
                     <title>{`${node.label} ${node.detail}`}</title>
                     {renderNodeShape(node, position)}
-                    <text className="functional-node-label" x={position.x} y={position.y - 2} textAnchor="middle">
-                      {node.label}
-                    </text>
-                    <text className="functional-node-detail" x={position.x} y={position.y + 13} textAnchor="middle">
-                      {node.detail}
-                    </text>
+                    {renderNodeText(node, position)}
                   </g>
                 );
               })}

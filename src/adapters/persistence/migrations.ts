@@ -1,5 +1,6 @@
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../../core/schema";
 import { normalizeWireColorState } from "../../core/cableColors";
+import { FUNCTIONAL_FILTERS } from "../../core/functionalSchematic";
 import {
   isNetworkLogoUrlValid,
   isNetworkProjectCodeValid,
@@ -103,6 +104,12 @@ function normalizeWireEntityState(candidate: EntityState<Wire, WireId>): EntityS
       continue;
     }
 
+    const functionalDomainTag =
+      typeof (wire as Partial<Wire>).functionalDomainTag === "string" &&
+      (FUNCTIONAL_FILTERS as readonly string[]).includes(((wire as Partial<Wire>).functionalDomainTag ?? "").trim()) &&
+      ((wire as Partial<Wire>).functionalDomainTag ?? "").trim() !== "all"
+        ? ((wire as Partial<Wire>).functionalDomainTag ?? "").trim()
+        : undefined;
     byId[wireId] = {
       ...wire,
       twistGroupLabel:
@@ -110,6 +117,7 @@ function normalizeWireEntityState(candidate: EntityState<Wire, WireId>): EntityS
         ((wire as Partial<Wire>).twistGroupLabel ?? "").trim().length > 0
           ? ((wire as Partial<Wire>).twistGroupLabel ?? "").trim().slice(0, 80)
           : undefined,
+      functionalDomainTag,
       sectionMm2: resolveWireSectionMm2((wire as Partial<Wire>).sectionMm2),
       currentA: normalizeWireCurrentA((wire as Partial<Wire>).currentA),
       material: normalizeWireMaterial((wire as Partial<Wire>).material),

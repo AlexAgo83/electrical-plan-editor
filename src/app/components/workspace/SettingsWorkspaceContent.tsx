@@ -684,7 +684,7 @@ export function SettingsWorkspaceContent({
           <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Shift + Z</span> <span>Redo</span></li>
           <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Y</span> <span>Redo (alternative shortcut)</span></li>
           <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + S</span> <span>Save active plan (export JSON)</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + 1..6</span> <span>Switch top-level workspace</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + 1..7</span> <span>Switch top-level workspace</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + Shift + 1..5</span> <span>Switch entity sub-screen</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + F</span> <span>Fit network view to current graph</span></li>
           <li><span className="technical-id settings-shortcut-key">Alt + J / Alt + K</span> <span>Previous / next validation issue</span></li>

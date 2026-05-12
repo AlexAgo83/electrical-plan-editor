@@ -1,5 +1,12 @@
 import type { ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG, MAX_FREE_WIRE_COLOR_LABEL_LENGTH } from "../../../core/cableColors";
+import {
+  FUNCTIONAL_FILTER_12V_POWER,
+  FUNCTIONAL_FILTER_48V,
+  FUNCTIONAL_FILTER_CAN,
+  FUNCTIONAL_FILTER_GROUND_POWER,
+  FUNCTIONAL_FILTER_SIGNAL
+} from "../../../core/functionalSchematic";
 import type { WireEndpoint } from "../../../core/entities";
 import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import { useWireHandlersContext } from "../controller/ModelingController.context";
@@ -19,6 +26,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireTechnicalId,
     wireTwistGroupLabel,
     setWireTwistGroupLabel,
+    wireFunctionalDomainTag,
+    setWireFunctionalDomainTag,
     wireSectionMm2,
     setWireSectionMm2,
     wireCurrentA,
@@ -100,6 +109,13 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     selectedEndpointASplice !== undefined && resolveSplicePortMode(selectedEndpointASplice) === "directional";
   const endpointBIsDirectionalSplice =
     selectedEndpointBSplice !== undefined && resolveSplicePortMode(selectedEndpointBSplice) === "directional";
+  const functionalDomainTagOptions = [
+    FUNCTIONAL_FILTER_SIGNAL,
+    FUNCTIONAL_FILTER_12V_POWER,
+    FUNCTIONAL_FILTER_GROUND_POWER,
+    FUNCTIONAL_FILTER_48V,
+    FUNCTIONAL_FILTER_CAN
+  ];
   const isCatalogColorMode = wireColorMode === "catalog";
   const isFreeColorMode = wireColorMode === "free";
   const selectedFuseCatalogItemMissing =
@@ -201,6 +217,17 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         maxLength={80}
         placeholder="Optional (e.g. CAN 1)"
       />
+    </label>
+    <label>
+      Functional tag
+      <select value={wireFunctionalDomainTag} onChange={(event) => setWireFunctionalDomainTag(event.target.value)}>
+        <option value="">Auto</option>
+        {functionalDomainTagOptions.map((tag) => (
+          <option key={tag} value={tag}>
+            {tag}
+          </option>
+        ))}
+      </select>
     </label>
     <label>
       Section (mm²)

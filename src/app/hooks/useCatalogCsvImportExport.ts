@@ -8,7 +8,7 @@ import { downloadCsvFile } from "../lib/csv";
 import type { ImportExportStatus, SubScreenId } from "../types/app-controller";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 
-type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
 
 interface UseCatalogCsvImportExportOptions {
   store: AppStore;

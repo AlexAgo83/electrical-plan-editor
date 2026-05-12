@@ -79,9 +79,11 @@ interface BuildAppControllerShellLayoutPropsParams {
     AppShellLayoutProps,
     | "isHomeScreen"
     | "isNetworkScopeScreen"
+    | "isHarnessAssemblyScreen"
     | "homeWorkspaceContent"
     | "hasActiveNetwork"
     | "networkScopeWorkspaceContent"
+    | "harnessAssemblyWorkspaceContent"
     | "modelingLeftColumnContent"
     | "modelingFormsColumnContent"
     | "networkSummaryPanel"

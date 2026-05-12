@@ -2,7 +2,7 @@ import { useEffect, type MutableRefObject } from "react";
 import { appActions, type AppStore, type ThemeMode } from "../../../store";
 import type { SubScreenId } from "../../types/app-controller";
 
-type WorkspaceScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type WorkspaceScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
 type AnalysisSubScreenId = "connector" | "splice" | "node" | "segment" | "wire";
 
 type DetailPanelsSelectionSource = "table" | "external";

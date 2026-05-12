@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import type { CatalogItemId, Connector, ConnectorId, Splice, SpliceId } from "../../../core/entities";
 import type { AppControllerModelingHandlersOrchestrator } from "./useAppControllerModelingHandlersOrchestrator";
 
-type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
 
 interface UseAppControllerCatalogAnalysisActionsParams {

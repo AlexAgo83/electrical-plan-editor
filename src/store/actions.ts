@@ -117,6 +117,7 @@ export type AppAction =
         name: string;
         technicalId: string;
         twistGroupLabel?: string;
+        functionalDomainTag?: string;
         sectionMm2?: number;
         currentA?: number;
         material?: WireMaterial;
@@ -264,6 +265,7 @@ export const appActions = {
     name: string;
     technicalId: string;
     twistGroupLabel?: string;
+    functionalDomainTag?: string;
     sectionMm2?: number;
     currentA?: number;
     material?: WireMaterial;

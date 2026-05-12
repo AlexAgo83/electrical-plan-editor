@@ -94,6 +94,8 @@ export function buildAppControllerNamespacedFormsState(forms: AppControllerForms
       setTechnicalId: forms.setWireTechnicalId,
       twistGroupLabel: forms.wireTwistGroupLabel,
       setTwistGroupLabel: forms.setWireTwistGroupLabel,
+      functionalDomainTag: forms.wireFunctionalDomainTag,
+      setFunctionalDomainTag: forms.setWireFunctionalDomainTag,
       currentA: forms.wireCurrentA,
       setCurrentA: forms.setWireCurrentA,
       material: forms.wireMaterial,

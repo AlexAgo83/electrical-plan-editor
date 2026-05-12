@@ -156,6 +156,25 @@ export function HarnessAssemblyManagerPanel({
     });
   };
 
+  const handleUpdateLinkName = (linkId: InterHarnessConnectorLinkId, nextName: string) => {
+    if (selectedAssembly === null) {
+      return;
+    }
+    const trimmedName = nextName.trim();
+    onUpsertAssembly({
+      ...buildDraftAssembly(),
+      connectorLinks: selectedAssembly.connectorLinks.map((link) =>
+        link.id === linkId
+          ? {
+              ...link,
+              name: trimmedName.length === 0 ? undefined : trimmedName
+            }
+          : link
+      ),
+      updatedAt: new Date().toISOString()
+    });
+  };
+
   const describeConnector = (networkId: NetworkId, connectorId: ConnectorId): string => {
     const connector = connectorsByNetworkId.get(networkId)?.find((candidate) => candidate.id === connectorId);
     return connector === undefined ? String(connectorId) : `${connector.technicalId} - ${connector.name}`;
@@ -313,7 +332,17 @@ export function HarnessAssemblyManagerPanel({
               <ul className="harness-assembly-links">
                 {selectedAssembly.connectorLinks.map((link) => (
                   <li key={link.id}>
-                    <span>{link.name ?? "Interconnector"}</span>
+                    <input
+                      defaultValue={link.name ?? ""}
+                      onBlur={(event) => handleUpdateLinkName(link.id, event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.currentTarget.blur();
+                        }
+                      }}
+                      placeholder="Interconnector"
+                      aria-label="Interconnector link name"
+                    />
                     <span className="technical-id">
                       {describeConnector(link.sourceNetworkId, link.sourceConnectorId)} {"->"} {describeConnector(link.targetNetworkId, link.targetConnectorId)}
                     </span>

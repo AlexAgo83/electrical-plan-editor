@@ -79,6 +79,7 @@ export function useEntityFormsState() {
   const [wireName, setWireName] = useState("");
   const [wireTechnicalId, setWireTechnicalId] = useState("");
   const [wireTwistGroupLabel, setWireTwistGroupLabel] = useState("");
+  const [wireFunctionalDomainTag, setWireFunctionalDomainTag] = useState("");
   const [wireSectionMm2, setWireSectionMm2] = useState("0.5");
   const [wireCurrentA, setWireCurrentA] = useState("");
   const [wireMaterial, setWireMaterial] = useState<WireMaterial>("copper");
@@ -234,6 +235,8 @@ export function useEntityFormsState() {
     setWireTechnicalId,
     wireTwistGroupLabel,
     setWireTwistGroupLabel,
+    wireFunctionalDomainTag,
+    setWireFunctionalDomainTag,
     wireSectionMm2,
     setWireSectionMm2,
     wireCurrentA,

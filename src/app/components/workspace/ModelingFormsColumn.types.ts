@@ -110,6 +110,8 @@ export interface ModelingFormsColumnProps {
   setWireTechnicalId: (value: string) => void;
   wireTwistGroupLabel: string;
   setWireTwistGroupLabel: (value: string) => void;
+  wireFunctionalDomainTag: string;
+  setWireFunctionalDomainTag: (value: string) => void;
   wireSectionMm2: string;
   setWireSectionMm2: (value: string) => void;
   wireCurrentA: string;

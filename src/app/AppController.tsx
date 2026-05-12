@@ -256,6 +256,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setActiveSubScreen,
     isHomeScreen,
     isNetworkScopeScreen,
+    isHarnessAssemblyScreen,
     isModelingScreen,
     isAnalysisScreen,
     isValidationScreen,
@@ -855,6 +856,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     modelingFormsColumnContentForLayout,
     analysisWorkspaceContentForLayout,
     networkScopeWorkspaceContent,
+    harnessAssemblyWorkspaceContent,
     validationWorkspaceContent,
     settingsWorkspaceContent
   } = useAppControllerWorkspaceContentAssembly({
@@ -879,6 +881,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isAnalysisScreen,
       isModelingAnalysisFocused,
       isNetworkScopeScreen,
+      isHarnessAssemblyScreen,
       isValidationScreen,
       isSettingsScreen,
       isCatalogSubScreen,
@@ -1056,9 +1059,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspace: {
       isHomeScreen,
       isNetworkScopeScreen,
+      isHarnessAssemblyScreen,
       homeWorkspaceContent,
       hasActiveNetwork,
       networkScopeWorkspaceContent,
+      harnessAssemblyWorkspaceContent,
       modelingLeftColumnContent: modelingLeftColumnContentForSubScreen,
       modelingFormsColumnContent: modelingFormsColumnContentForLayout,
       networkSummaryPanel,

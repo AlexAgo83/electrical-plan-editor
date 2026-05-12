@@ -3,7 +3,7 @@ import type { SubScreenId } from "../../types/app-controller";
 import type { OnboardingStepId } from "../../lib/onboarding";
 import { useAppControllerModelingAnalysisScreenDomains } from "./useAppControllerModelingAnalysisScreenDomains";
 
-type ScreenChangeTarget = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenChangeTarget = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
 type OnboardingTargetOverride = {
   screen: "modeling" | "networkScope" | "settings";
   subScreen?: SubScreenId;

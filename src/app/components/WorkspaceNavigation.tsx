@@ -1,7 +1,5 @@
 import type { ReactElement } from "react";
-
-type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
-type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
+import type { ScreenId, SubScreenId } from "../types/app-controller";
 
 interface WorkspaceNavigationProps {
   activeScreen: ScreenId;
@@ -36,6 +34,7 @@ export function WorkspaceNavigation({
   const screenIconClassById: Partial<Record<ScreenId, string>> = {
     home: "is-home",
     networkScope: "is-network-scope",
+    harnessAssembly: "is-network-scope",
     modeling: "is-edit",
     analysis: "is-analysis",
     validation: "is-validation"
@@ -72,6 +71,7 @@ export function WorkspaceNavigation({
         {([
           ["home", "Home"],
           ["networkScope", "Network Scope"],
+          ["harnessAssembly", "Harness Assembly"],
           ["modeling", "Modeling"],
           ["validation", "Validation"]
         ] as const).map(([screenId, label]) => (
@@ -131,6 +131,8 @@ export function WorkspaceNavigation({
       <p className="meta-line screen-description">
         {activeScreen === "networkScope"
           ? "Network Scope workspace: active network context and lifecycle management."
+          : activeScreen === "harnessAssembly"
+          ? "Harness Assembly workspace: cross-harness grouping and functional trace."
           : activeScreen === "home"
           ? "Home workspace: start, resume, shortcuts, and quick preferences."
           : isModelingScreen || isAnalysisScreen

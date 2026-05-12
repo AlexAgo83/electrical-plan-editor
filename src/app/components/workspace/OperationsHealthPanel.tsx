@@ -52,7 +52,7 @@ export function OperationsHealthPanel({
       {showShortcutHints ? (
         <>
           <p className="shortcut-hints">Shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo.</p>
-          <p className="shortcut-hints">Nav: Alt+1..5 screens, Alt+Shift+1..5 entity tabs, Alt+V/N/G/C/R modes, Alt+F fit canvas, Alt+J/K issue nav.</p>
+          <p className="shortcut-hints">Nav: Alt+1..7 screens, Alt+Shift+1..5 entity tabs, Alt+V/N/G/C/R modes, Alt+F fit canvas, Alt+J/K issue nav.</p>
         </>
       ) : null}
       <p className={`save-status is-${saveStatus}`}>

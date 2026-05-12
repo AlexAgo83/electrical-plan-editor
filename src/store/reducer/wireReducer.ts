@@ -4,6 +4,7 @@ import { normalizeDirectionalSpliceEndpoint } from "../../core/directionalSplice
 import { normalizeWireEndpointReferenceName } from "../../core/wireReferences";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
+import { FUNCTIONAL_FILTERS } from "../../core/functionalSchematic";
 import { buildRoutingGraphIndex } from "../../core/graph";
 import { findShortestRoute } from "../../core/pathfinding";
 import { resolveSplicePortMode } from "../../core/splicePortMode";
@@ -69,6 +70,14 @@ function normalizeWireTwistGroupLabel(value: string | undefined): string | undef
   }
 
   return normalized.length > 80 ? normalized.slice(0, 80) : normalized;
+}
+
+function normalizeWireFunctionalDomainTag(value: string | undefined): string | undefined {
+  const normalized = value?.trim() ?? "";
+  if (normalized.length === 0) {
+    return undefined;
+  }
+  return (FUNCTIONAL_FILTERS as readonly string[]).includes(normalized) && normalized !== "all" ? normalized : undefined;
 }
 
 function isDirectionalSpliceEndpoint(state: AppState, endpoint: Parameters<typeof getEndpointOccupant>[1]): boolean {
@@ -179,6 +188,7 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
       const normalizedName = action.payload.name.trim();
       const normalizedTechnicalId = action.payload.technicalId.trim();
       const normalizedTwistGroupLabel = normalizeWireTwistGroupLabel(action.payload.twistGroupLabel);
+      const normalizedFunctionalDomainTag = normalizeWireFunctionalDomainTag(action.payload.functionalDomainTag);
       const normalizedSectionMm2 = resolveWireSectionMm2(action.payload.sectionMm2);
       const normalizedCurrentA = normalizeWireCurrentA(action.payload.currentA);
       const normalizedMaterial = normalizeWireMaterial(action.payload.material);
@@ -349,6 +359,7 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           name: normalizedName,
           technicalId: normalizedTechnicalId,
           twistGroupLabel: normalizedTwistGroupLabel,
+          functionalDomainTag: normalizedFunctionalDomainTag,
           sectionMm2: normalizedSectionMm2,
           currentA: normalizedCurrentA,
           material: normalizedMaterial,
@@ -431,6 +442,7 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         name: action.payload.name.trim(),
         technicalId: action.payload.technicalId.trim(),
         twistGroupLabel: normalizeWireTwistGroupLabel(action.payload.twistGroupLabel),
+        functionalDomainTag: normalizeWireFunctionalDomainTag(action.payload.functionalDomainTag),
         sectionMm2: resolveWireSectionMm2(action.payload.sectionMm2),
         currentA: normalizeWireCurrentA(action.payload.currentA),
         material: normalizeWireMaterial(action.payload.material),

@@ -9,7 +9,7 @@ import type { useAppControllerModelingHandlersAssembly } from "./useAppControlle
 type SelectionHandlersAssemblyParams = Parameters<typeof useAppControllerSelectionHandlersAssembly>[0];
 type ModelingHandlersModel = ReturnType<typeof useAppControllerModelingHandlersAssembly>;
 
-type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
 
 interface UseAppControllerSelectionHandlersDomainAssemblyParams {
   core: Pick<

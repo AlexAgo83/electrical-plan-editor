@@ -71,9 +71,11 @@ interface AppShellLayoutProps {
   SettingsScreenComponent: ScreenContainerComponent;
   isHomeScreen: boolean;
   isNetworkScopeScreen: boolean;
+  isHarnessAssemblyScreen: boolean;
   homeWorkspaceContent: ReactNode;
   hasActiveNetwork: boolean;
   networkScopeWorkspaceContent: ReactNode;
+  harnessAssemblyWorkspaceContent: ReactNode;
   modelingLeftColumnContent: ReactNode;
   modelingFormsColumnContent: ReactNode;
   networkSummaryPanel: ReactNode;
@@ -153,9 +155,11 @@ export function AppShellLayout({
   SettingsScreenComponent,
   isHomeScreen,
   isNetworkScopeScreen,
+  isHarnessAssemblyScreen,
   homeWorkspaceContent,
   hasActiveNetwork,
   networkScopeWorkspaceContent,
+  harnessAssemblyWorkspaceContent,
   modelingLeftColumnContent,
   modelingFormsColumnContent,
   networkSummaryPanel,
@@ -202,6 +206,14 @@ export function AppShellLayout({
           Create a network from the network scope controls to start modeling connectors, splices, nodes, segments, and wires.
         </p>
       </section>
+    );
+  } else if (isHarnessAssemblyScreen) {
+    activeWorkspaceContent = (
+      <NetworkScopeWorkspaceContainer
+        ScreenComponent={NetworkScopeScreenComponent}
+        isActive={isHarnessAssemblyScreen}
+        workspaceContent={harnessAssemblyWorkspaceContent}
+      />
     );
   } else if (isModelingScreen) {
     activeWorkspaceContent = (

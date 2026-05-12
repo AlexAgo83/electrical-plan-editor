@@ -4,7 +4,7 @@ import { createEmptyWorkspaceState, type AppState } from "../../../store";
 import type { InteractionMode } from "../../types/app-controller";
 import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
 
-type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
 
 type HomeWorkspaceContentProps = Parameters<

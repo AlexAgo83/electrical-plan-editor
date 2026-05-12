@@ -1,9 +1,9 @@
 import type { ReactElement } from "react";
 import { WorkspaceNavigation } from "../WorkspaceNavigation";
-import type { SubScreenId } from "../../types/app-controller";
+import type { ScreenId, SubScreenId } from "../../types/app-controller";
 
 interface WorkspaceSidebarPanelProps {
-  activeScreen: "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+  activeScreen: ScreenId;
   activeSubScreen: SubScreenId;
   isModelingScreen: boolean;
   isAnalysisScreen: boolean;
@@ -11,7 +11,7 @@ interface WorkspaceSidebarPanelProps {
   validationIssuesCount: number;
   validationErrorCount: number;
   entityCountBySubScreen: Record<SubScreenId, number>;
-  onScreenChange: (screen: "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings") => void;
+  onScreenChange: (screen: ScreenId) => void;
   onSubScreenChange: (subScreen: SubScreenId) => void;
 }
 

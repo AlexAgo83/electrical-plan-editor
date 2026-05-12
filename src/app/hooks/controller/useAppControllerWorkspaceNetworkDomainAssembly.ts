@@ -18,7 +18,7 @@ import { useAppControllerRegenerateLayoutAction } from "./useAppControllerRegene
 type WorkspaceHandlersAssemblyParams = Parameters<typeof useAppControllerWorkspaceHandlersDomainAssembly>[0];
 type NetworkScopeOrchestrationParams = Parameters<typeof useNetworkScopeFormOrchestration>[0];
 
-type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
 type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
 
 interface UseAppControllerWorkspaceNetworkDomainAssemblyParams {

@@ -3,7 +3,7 @@ import type { SelectionState } from "../../../store";
 import type { SubScreenId } from "../../types/app-controller";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
 
-type ScreenId = "home" | "networkScope" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
 type DetailPanelsSelectionSource = "table" | "external";
 type AnalysisSubScreen = Exclude<SubScreenId, "catalog">;
 

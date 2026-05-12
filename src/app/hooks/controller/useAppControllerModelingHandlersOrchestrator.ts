@@ -113,6 +113,8 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setWireTechnicalId: Parameters<typeof useWireHandlers>[0]["setWireTechnicalId"];
   wireTwistGroupLabel: Parameters<typeof useWireHandlers>[0]["wireTwistGroupLabel"];
   setWireTwistGroupLabel: Parameters<typeof useWireHandlers>[0]["setWireTwistGroupLabel"];
+  wireFunctionalDomainTag: Parameters<typeof useWireHandlers>[0]["wireFunctionalDomainTag"];
+  setWireFunctionalDomainTag: Parameters<typeof useWireHandlers>[0]["setWireFunctionalDomainTag"];
   wireSectionMm2: Parameters<typeof useWireHandlers>[0]["wireSectionMm2"];
   setWireSectionMm2: Parameters<typeof useWireHandlers>[0]["setWireSectionMm2"];
   wireCurrentA: Parameters<typeof useWireHandlers>[0]["wireCurrentA"];
@@ -289,6 +291,8 @@ export function useAppControllerModelingHandlersOrchestrator({
   setWireTechnicalId,
   wireTwistGroupLabel,
   setWireTwistGroupLabel,
+  wireFunctionalDomainTag,
+  setWireFunctionalDomainTag,
   wireSectionMm2,
   setWireSectionMm2,
   wireCurrentA,
@@ -493,6 +497,8 @@ export function useAppControllerModelingHandlersOrchestrator({
     setWireTechnicalId,
     wireTwistGroupLabel,
     setWireTwistGroupLabel,
+    wireFunctionalDomainTag,
+    setWireFunctionalDomainTag,
     wireSectionMm2,
     setWireSectionMm2,
     wireCurrentA,

@@ -555,6 +555,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setWireTechnicalId: formsState.setWireTechnicalId,
     wireTwistGroupLabel: formsState.wireTwistGroupLabel,
     setWireTwistGroupLabel: formsState.setWireTwistGroupLabel,
+    wireFunctionalDomainTag: formsState.wireFunctionalDomainTag,
+    setWireFunctionalDomainTag: formsState.setWireFunctionalDomainTag,
     wireSectionMm2: formsState.wireSectionMm2,
     setWireSectionMm2: formsState.setWireSectionMm2,
     wireCurrentA: formsState.wireCurrentA,

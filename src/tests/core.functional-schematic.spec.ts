@@ -128,6 +128,32 @@ describe("buildFunctionalSchematicGraph", () => {
     expect(graph.nodes.some((node) => node.sourceIds.includes("C-BCM"))).toBe(true);
   });
 
+  it("uses explicit wire functional tags before text and route heuristics", () => {
+    const taggedWire: Wire = {
+      ...wires[1]!,
+      id: asWireId("W-SIGNAL"),
+      name: "Door command",
+      technicalId: "W-SIGNAL",
+      functionalDomainTag: "Signal",
+      routeSegmentIds: []
+    };
+    const graph = buildFunctionalSchematicGraph({
+      network: null,
+      seed: { kind: "wire", wireId: taggedWire.id },
+      activeFilter: "Signal",
+      wires: [taggedWire],
+      segments: [],
+      connectorMap: new Map(connectors.map((connector) => [connector.id, connector])),
+      spliceMap: new Map(splices.map((splice) => [splice.id, splice])),
+      catalogItemMap: new Map()
+    });
+
+    expect(graph.includedWireIds).toEqual([taggedWire.id]);
+    expect(graph.availableFilters).toContain("Signal");
+    expect(graph.edges.every((edge) => edge.domainTags.includes("Signal"))).toBe(true);
+    expect(graph.warnings.map((warning) => warning.kind)).not.toContain("ambiguous-domain");
+  });
+
   it("can seed the trace from configured main harness connectors", () => {
     const graph = buildFunctionalSchematicGraph({
       network: { voltageV: 12 },
@@ -223,7 +249,8 @@ describe("buildFunctionalSchematicGraph", () => {
         name: "Wake A",
         technicalId: "W-A",
         sectionMm2: 0.35,
-        primaryColorId: null,
+        colorMode: "catalog",
+        primaryColorId: "RD",
         secondaryColorId: null,
         endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-A-MASTER"), cavityIndex: 1 },
         endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-A-OUT"), cavityIndex: 1 },
@@ -238,7 +265,8 @@ describe("buildFunctionalSchematicGraph", () => {
         name: "Wake B",
         technicalId: "W-B",
         sectionMm2: 0.35,
-        primaryColorId: null,
+        colorMode: "catalog",
+        primaryColorId: "BU",
         secondaryColorId: null,
         endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-B-IN"), cavityIndex: 1 },
         endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-B-END"), cavityIndex: 1 },
@@ -278,14 +306,40 @@ describe("buildFunctionalSchematicGraph", () => {
     });
 
     expect(graph.includedWireIds).toEqual([asWireId("W-A"), asWireId("W-B")]);
-    expect(graph.nodes).toEqual(expect.arrayContaining([expect.objectContaining({ kind: "interconnector", label: "Inline interface" })]));
-    expect(graph.edges).toEqual(
+    expect(graph.nodes).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ label: "W-A", harnessColor: "#2563eb" }),
-        expect.objectContaining({ label: "W-B", harnessColor: "#16a34a" }),
-        expect.objectContaining({ interconnectorLinkId: "link-ab" })
+        expect.objectContaining({
+          kind: "interconnector",
+          label: "Inline interface",
+          detailTop: "H-A / A-OUT pin 1 - Output",
+          detailBottom: "H-B / B-IN pin 1 - Input"
+        })
       ])
     );
+    expect(graph.nodes).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "network:net-a:connector:C-A-OUT:pin:1" }),
+        expect.objectContaining({ id: "network:net-b:connector:C-B-IN:pin:1" })
+      ])
+    );
+    expect(graph.edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "W-A",
+          toNodeId: "interconnector:link-ab:pin:1",
+          harnessColor: "#2563eb"
+        }),
+        expect.objectContaining({
+          label: "W-B",
+          fromNodeId: "interconnector:link-ab:pin:1",
+          wireName: "Wake B",
+          wireTechnicalId: "W-B",
+          wirePrimaryColorId: "BU",
+          harnessColor: "#16a34a"
+        })
+      ])
+    );
+    expect(graph.edges).toHaveLength(2);
     expect(graph.rootNodeIds).toContain("network:net-a:connector:C-A-MASTER:pin:1");
   });
 });

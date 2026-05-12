@@ -56,7 +56,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Current issue:": "Issue courante :",
   "Previous": "Précédent",
   "Shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo.": "Raccourcis : Ctrl/Cmd+Z annuler, Ctrl/Cmd+Shift+Z ou Ctrl/Cmd+Y rétablir.",
-  "Nav: Alt+1..5 screens, Alt+Shift+1..5 entity tabs, Alt+V/N/G/C/R modes, Alt+F fit canvas, Alt+J/K issue nav.": "Navigation : Alt+1..5 écrans, Alt+Shift+1..5 onglets entité, Alt+V/N/G/C/R modes, Alt+F adapter canvas, Alt+J/K navigation issues.",
+  "Nav: Alt+1..7 screens, Alt+Shift+1..5 entity tabs, Alt+V/N/G/C/R modes, Alt+F fit canvas, Alt+J/K issue nav.": "Navigation : Alt+1..7 écrans, Alt+Shift+1..5 onglets entité, Alt+V/N/G/C/R modes, Alt+F adapter canvas, Alt+J/K navigation issues.",
   "Validation summary": "Résumé de validation",
   "Total issues": "Total issues",
   "Visible": "Visibles",
