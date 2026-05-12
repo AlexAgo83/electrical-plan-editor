@@ -3,6 +3,8 @@ import type { WireColorMode } from "./cableColors";
 export type Brand<T, B extends string> = T & { readonly __brand: B };
 
 export type NetworkId = Brand<string, "NetworkId">;
+export type HarnessAssemblyId = Brand<string, "HarnessAssemblyId">;
+export type InterHarnessConnectorLinkId = Brand<string, "InterHarnessConnectorLinkId">;
 export type CatalogItemId = Brand<string, "CatalogItemId">;
 export type ConnectorId = Brand<string, "ConnectorId">;
 export type SpliceId = Brand<string, "SpliceId">;
@@ -31,12 +33,41 @@ export interface Connector {
   technicalId: string;
   cavityCount: number;
   isMainHarnessConnector?: boolean;
+  isTerminalConnector?: boolean;
   catalogItemId?: CatalogItemId;
   manufacturerReference?: string;
   cableCalloutPosition?: {
     x: number;
     y: number;
   };
+}
+
+export interface HarnessAssemblyMember {
+  networkId: NetworkId;
+  color: string;
+}
+
+export interface InterHarnessConnectorLink {
+  id: InterHarnessConnectorLinkId;
+  name?: string;
+  sourceNetworkId: NetworkId;
+  sourceConnectorId: ConnectorId;
+  targetNetworkId: NetworkId;
+  targetConnectorId: ConnectorId;
+}
+
+export interface HarnessAssembly {
+  id: HarnessAssemblyId;
+  name: string;
+  technicalId: string;
+  members: HarnessAssemblyMember[];
+  masterConnectorRefs: Array<{
+    networkId: NetworkId;
+    connectorId: ConnectorId;
+  }>;
+  connectorLinks: InterHarnessConnectorLink[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Splice {

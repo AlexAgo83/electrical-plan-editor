@@ -1,5 +1,7 @@
 import type {
   Network,
+  HarnessAssembly,
+  HarnessAssemblyId,
   NetworkId,
   CatalogItem,
   CatalogItemId,
@@ -76,9 +78,12 @@ export type AppAction =
       payload: {
         networks: Network[];
         networkStates: Record<NetworkId, NetworkScopedState>;
+        harnessAssemblies?: HarnessAssembly[];
         activateFirst?: boolean;
       };
     }
+  | { type: "harnessAssembly/upsert"; payload: HarnessAssembly }
+  | { type: "harnessAssembly/remove"; payload: { id: HarnessAssemblyId } }
   | { type: "catalog/upsert"; payload: CatalogItem }
   | { type: "catalog/remove"; payload: { id: CatalogItemId } }
   | { type: "connector/upsert"; payload: Connector }
@@ -196,11 +201,20 @@ export const appActions = {
   importNetworks: (
     networks: Network[],
     networkStates: Record<NetworkId, NetworkScopedState>,
+    harnessAssembliesOrActivateFirst: HarnessAssembly[] | boolean = [],
     activateFirst = false
-  ): AppAction => ({
-    type: "network/importMany",
-    payload: { networks, networkStates, activateFirst }
-  }),
+  ): AppAction => {
+    const harnessAssemblies = Array.isArray(harnessAssembliesOrActivateFirst) ? harnessAssembliesOrActivateFirst : [];
+    const resolvedActivateFirst =
+      typeof harnessAssembliesOrActivateFirst === "boolean" ? harnessAssembliesOrActivateFirst : activateFirst;
+    return {
+      type: "network/importMany",
+      payload: { networks, networkStates, harnessAssemblies, activateFirst: resolvedActivateFirst }
+    };
+  },
+
+  upsertHarnessAssembly: (payload: HarnessAssembly): AppAction => ({ type: "harnessAssembly/upsert", payload }),
+  removeHarnessAssembly: (id: HarnessAssemblyId): AppAction => ({ type: "harnessAssembly/remove", payload: { id } }),
 
   upsertCatalogItem: (payload: CatalogItem): AppAction => ({ type: "catalog/upsert", payload }),
   removeCatalogItem: (id: CatalogItemId): AppAction => ({ type: "catalog/remove", payload: { id } }),

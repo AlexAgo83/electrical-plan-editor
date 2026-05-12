@@ -283,7 +283,8 @@ export function useAppControllerWorkspaceContentAssembly({
     onExportBomCsv: handlers.handleExportBomCsv,
     handleRegenerateLayout: domains.workspaceNetworkDomain.handleRegenerateLayout,
     markDetailPanelsSelectionSourceAsExternal: handlers.markDetailPanelsSelectionSourceAsExternal,
-    dispatchAction: handlers.dispatchAction
+    dispatchAction: handlers.dispatchAction,
+    store: handlers.store
   });
 
   const { modelingLeftColumnContent, modelingFormsColumnContent, analysisWorkspaceContent, isModelingBatchModeActive } =

@@ -1,6 +1,7 @@
 import type {
   CatalogItemId,
   ConnectorId,
+  HarnessAssemblyId,
   NetworkId,
   NetworkNode,
   NodeId,
@@ -92,6 +93,15 @@ function resolveNetworkDisplayRef(state: AppState, networkId: NetworkId | null):
 
   const network = state.networks.byId[networkId];
   return preferDisplayText(network?.technicalId, network?.name);
+}
+
+function resolveHarnessAssemblyDisplayRef(state: AppState, assemblyId: string | null): string | null {
+  if (assemblyId === null) {
+    return null;
+  }
+
+  const assembly = state.harnessAssemblies.byId[assemblyId as HarnessAssemblyId];
+  return preferDisplayText(assembly?.technicalId, assembly?.name);
 }
 
 function resolveCatalogDisplayRef(state: AppState, catalogItemId: CatalogItemId | null): string | null {
@@ -211,6 +221,10 @@ function actionVerb(action: AppAction, previousState: AppState): string {
       return "deleted";
     case "network/importMany":
       return "imported";
+    case "harnessAssembly/upsert":
+      return previousState.harnessAssemblies.byId[action.payload.id] === undefined ? "created" : "updated";
+    case "harnessAssembly/remove":
+      return "deleted";
     case "catalog/upsert":
       return previousState.catalogItems.byId[action.payload.id] === undefined ? "created" : "updated";
     case "catalog/remove":
@@ -285,6 +299,9 @@ function resolveEntryNetworkId(action: AppAction, previousState: AppState, nextS
       return action.payload.network.id;
     case "network/importMany":
       return nextState.activeNetworkId ?? previousState.activeNetworkId;
+    case "harnessAssembly/upsert":
+    case "harnessAssembly/remove":
+      return previousState.activeNetworkId;
     default:
       return previousState.activeNetworkId;
   }
@@ -307,6 +324,15 @@ function resolveDisplayRef(action: AppAction, previousState: AppState, nextState
       return preferDisplayText(action.payload.network.technicalId, action.payload.network.name);
     case "network/importMany":
       return `${action.payload.networks.length} network(s)`;
+    case "harnessAssembly/upsert":
+      return preferDisplayText(
+        resolveHarnessAssemblyDisplayRef(nextState, action.payload.id),
+        action.payload.technicalId,
+        action.payload.name,
+        resolveHarnessAssemblyDisplayRef(previousState, action.payload.id)
+      );
+    case "harnessAssembly/remove":
+      return resolveHarnessAssemblyDisplayRef(previousState, action.payload.id);
     case "catalog/upsert":
       return preferDisplayText(
         resolveCatalogDisplayRef(nextState, action.payload.id),

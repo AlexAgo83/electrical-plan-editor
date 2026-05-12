@@ -23,6 +23,7 @@ import {
   persistActiveNetworkSnapshot
 } from "../networking";
 import { bumpRevision, clearLastError, removeEntity, upsertEntity, withError } from "./shared";
+import { cleanupHarnessAssembliesForDeletedNetwork } from "./harnessAssemblyReducer";
 function hasDuplicateNetworkTechnicalId(
   state: AppState,
   technicalId: string,
@@ -385,12 +386,18 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       const nextNetworkStates = { ...persisted.networkStates };
       delete nextNetworkStates[action.payload.id];
       const fallbackId = buildNetworkDeletionFallback(persisted.networks, action.payload.id);
+      const withCleanedAssemblies = cleanupHarnessAssembliesForDeletedNetwork(
+        {
+          ...persisted,
+          networks: remainingNetworks,
+          networkStates: nextNetworkStates
+        },
+        action.payload.id
+      );
       if (fallbackId === null) {
         const cleared = clearActiveScope(
           withUiResetSelection({
-            ...persisted,
-            networks: remainingNetworks,
-            networkStates: nextNetworkStates,
+            ...withCleanedAssemblies,
             activeNetworkId: null
           })
         );
@@ -398,9 +405,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       }
       const switched = loadNetworkIntoActiveScope(
         withUiResetSelection({
-          ...persisted,
-          networks: remainingNetworks,
-          networkStates: nextNetworkStates,
+          ...withCleanedAssemblies,
           activeNetworkId: fallbackId
         }),
         fallbackId
@@ -413,6 +418,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       }
       const persisted = persistActiveNetworkSnapshot(clearLastError(state));
       let nextNetworks = persisted.networks;
+      let nextHarnessAssemblies = persisted.harnessAssemblies;
       const nextNetworkStates = { ...persisted.networkStates };
       const nowIso = new Date().toISOString();
       for (const network of action.payload.networks) {
@@ -453,9 +459,16 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         });
         nextNetworkStates[network.id] = cloneScopedState(scoped);
       }
+      for (const assembly of action.payload.harnessAssemblies ?? []) {
+        if (nextHarnessAssemblies.byId[assembly.id] !== undefined) {
+          return withError(state, `Cannot import harness assembly '${assembly.id}': ID already exists.`);
+        }
+        nextHarnessAssemblies = upsertEntity(nextHarnessAssemblies, assembly);
+      }
       const nextStateBase: AppState = {
         ...persisted,
         networks: nextNetworks,
+        harnessAssemblies: nextHarnessAssemblies,
         networkStates: nextNetworkStates
       };
       const desiredActiveId =

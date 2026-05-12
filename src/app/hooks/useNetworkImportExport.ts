@@ -372,7 +372,7 @@ export function useNetworkImportExport({
       }
     }
 
-    dispatchAction(appActions.importNetworks(resolved.networks, networkStatesToImport, true));
+    dispatchAction(appActions.importNetworks(resolved.networks, networkStatesToImport, resolved.harnessAssemblies, true));
 
     setImportExportStatus({
       kind: resolved.summary.errors.length > 0 || resolved.summary.warnings.length > 0 ? "partial" : "success",

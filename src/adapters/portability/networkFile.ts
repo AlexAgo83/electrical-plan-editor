@@ -3,6 +3,9 @@ import type {
   CatalogItemId,
   Connector,
   ConnectorId,
+  HarnessAssembly,
+  HarnessAssemblyId,
+  InterHarnessConnectorLinkId,
   Network,
   NetworkId,
   NodeId,
@@ -52,6 +55,7 @@ export interface NetworkFilePayloadV1 {
     appSchemaVersion: number;
   };
   networks: ExportedNetworkBundle[];
+  harnessAssemblies?: HarnessAssembly[];
 }
 
 export interface NetworkImportSummary {
@@ -64,6 +68,7 @@ export interface NetworkImportSummary {
 export interface NetworkImportResult {
   networks: Network[];
   networkStates: Record<NetworkId, NetworkScopedState>;
+  harnessAssemblies: HarnessAssembly[];
   summary: NetworkImportSummary;
 }
 
@@ -157,6 +162,7 @@ function normalizeConnectorsEntityState(
     byId[connectorId] = {
       ...connector,
       isMainHarnessConnector: connector.isMainHarnessConnector === true ? true : undefined,
+      isTerminalConnector: connector.isTerminalConnector === true ? true : undefined,
       manufacturerReference: normalizeManufacturerReference((connector as Partial<Connector>).manufacturerReference)
     };
   }
@@ -165,6 +171,92 @@ function normalizeConnectorsEntityState(
     allIds: [...connectors.allIds],
     byId
   };
+}
+
+function normalizeHarnessAssemblyColor(value: unknown, fallback: string): string {
+  return typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value) ? value : fallback;
+}
+
+function normalizeHarnessAssemblies(
+  value: unknown,
+  allowedNetworkIds: ReadonlySet<string>
+): HarnessAssembly[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const colors = ["#2563eb", "#16a34a", "#dc2626", "#9333ea", "#ca8a04", "#0891b2"];
+  const assemblies: HarnessAssembly[] = [];
+  for (const entry of value) {
+    if (!isRecord(entry) || typeof entry.id !== "string") {
+      continue;
+    }
+    const name = typeof entry.name === "string" ? entry.name.trim() : "";
+    const technicalId = typeof entry.technicalId === "string" ? entry.technicalId.trim() : "";
+    if (name.length === 0 || technicalId.length === 0) {
+      continue;
+    }
+    const members = (Array.isArray(entry.members) ? entry.members : []).flatMap((member, index) => {
+      if (!isRecord(member) || typeof member.networkId !== "string" || !allowedNetworkIds.has(member.networkId)) {
+        return [];
+      }
+      return [
+        {
+          networkId: member.networkId as NetworkId,
+          color: normalizeHarnessAssemblyColor(member.color, colors[index % colors.length] ?? "#2563eb")
+        }
+      ];
+    });
+    const memberIds = new Set(members.map((member) => member.networkId as string));
+    const masterConnectorRefs = (Array.isArray(entry.masterConnectorRefs) ? entry.masterConnectorRefs : []).flatMap((ref) => {
+      if (
+        !isRecord(ref) ||
+        typeof ref.networkId !== "string" ||
+        typeof ref.connectorId !== "string" ||
+        !memberIds.has(ref.networkId)
+      ) {
+        return [];
+      }
+      return [{ networkId: ref.networkId as NetworkId, connectorId: ref.connectorId as ConnectorId }];
+    });
+    const connectorLinks = (Array.isArray(entry.connectorLinks) ? entry.connectorLinks : []).flatMap((link) => {
+      if (
+        !isRecord(link) ||
+        typeof link.id !== "string" ||
+        typeof link.sourceNetworkId !== "string" ||
+        typeof link.sourceConnectorId !== "string" ||
+        typeof link.targetNetworkId !== "string" ||
+        typeof link.targetConnectorId !== "string" ||
+        !memberIds.has(link.sourceNetworkId) ||
+        !memberIds.has(link.targetNetworkId)
+      ) {
+        return [];
+      }
+      return [
+        {
+          id: link.id as InterHarnessConnectorLinkId,
+          name: typeof link.name === "string" && link.name.trim().length > 0 ? link.name.trim() : undefined,
+          sourceNetworkId: link.sourceNetworkId as NetworkId,
+          sourceConnectorId: link.sourceConnectorId as ConnectorId,
+          targetNetworkId: link.targetNetworkId as NetworkId,
+          targetConnectorId: link.targetConnectorId as ConnectorId
+        }
+      ];
+    });
+
+    assemblies.push({
+      id: entry.id as HarnessAssemblyId,
+      name,
+      technicalId,
+      members,
+      masterConnectorRefs,
+      connectorLinks,
+      createdAt: typeof entry.createdAt === "string" ? entry.createdAt : "2026-01-01T00:00:00.000Z",
+      updatedAt: typeof entry.updatedAt === "string" ? entry.updatedAt : "2026-01-01T00:00:00.000Z"
+    });
+  }
+
+  return assemblies.sort((left, right) => left.technicalId.localeCompare(right.technicalId));
 }
 
 function normalizeSplicesEntityState(splices: NetworkScopedState["splices"]): NetworkScopedState["splices"] {
@@ -443,6 +535,7 @@ export function buildNetworkFilePayload(
   exportedAt: string
 ): NetworkFilePayloadV1 {
   const networkIds = resolveNetworkIdsForScope(state, scope, selectedNetworkIds);
+  const networkIdSet = new Set(networkIds.map((networkId) => networkId as string));
   const bundles = networkIds
     .map((networkId) => {
       const network = state.networks.byId[networkId];
@@ -474,6 +567,29 @@ export function buildNetworkFilePayload(
     .filter((bundle): bundle is ExportedNetworkBundle => bundle !== null)
     .sort((left, right) => left.network.technicalId.localeCompare(right.network.technicalId));
 
+  const harnessAssemblies = state.harnessAssemblies.allIds
+    .map((assemblyId) => state.harnessAssemblies.byId[assemblyId])
+    .filter((assembly): assembly is HarnessAssembly => {
+      if (assembly === undefined) {
+        return false;
+      }
+      return assembly.members.some((member) => networkIdSet.has(member.networkId));
+    })
+    .map((assembly) => {
+      const members = assembly.members.filter((member) => networkIdSet.has(member.networkId));
+      const memberIds = new Set(members.map((member) => member.networkId as string));
+      return {
+        ...assembly,
+        members,
+        masterConnectorRefs: assembly.masterConnectorRefs.filter((root) => memberIds.has(root.networkId)),
+        connectorLinks: assembly.connectorLinks.filter(
+          (link) => memberIds.has(link.sourceNetworkId) && memberIds.has(link.targetNetworkId)
+        )
+      };
+    })
+    .filter((assembly) => assembly.members.length > 0)
+    .sort((left, right) => left.technicalId.localeCompare(right.technicalId));
+
   return {
     payloadKind: NETWORK_FILE_PAYLOAD_KIND,
     schemaVersion: NETWORK_FILE_SCHEMA_VERSION,
@@ -483,7 +599,8 @@ export function buildNetworkFilePayload(
       appVersion: APP_RELEASE_VERSION,
       appSchemaVersion: APP_SCHEMA_VERSION
     },
-    networks: bundles
+    networks: bundles,
+    harnessAssemblies
   };
 }
 
@@ -582,6 +699,9 @@ export function parseNetworkFilePayload(rawJson: string): { payload: NetworkFile
       ? sourceRecord.appVersion
       : "unknown";
 
+  const parsedNetworkIds = new Set(parsedBundles.map((bundle) => bundle.network.id as string));
+  const harnessAssemblies = normalizeHarnessAssemblies(parsed.harnessAssemblies, parsedNetworkIds);
+
   return {
     payload: {
       payloadKind: NETWORK_FILE_PAYLOAD_KIND,
@@ -597,7 +717,8 @@ export function parseNetworkFilePayload(rawJson: string): { payload: NetworkFile
           ...bundle.network
         },
         state: normalizeScopedState(bundle.state)
-      }))
+      })),
+      harnessAssemblies
     },
     error: null
   };
@@ -619,6 +740,7 @@ export function resolveImportConflicts(
   };
   const networks: Network[] = [];
   const networkStates = {} as Record<NetworkId, NetworkScopedState>;
+  const importedNetworkIdBySourceId = new Map<string, NetworkId>();
 
   for (const bundle of payload.networks) {
     const sourceNetwork = bundle.network;
@@ -650,6 +772,7 @@ export function resolveImportConflicts(
     existingTechnicalIds.add(importedTechnicalId);
 
     const networkId = importedId as NetworkId;
+    importedNetworkIdBySourceId.set(sourceNetwork.id as string, networkId);
     const normalizedTimestamps = normalizeImportedNetworkTimestamps(sourceNetwork, importBaseIso, summary.warnings);
     const normalizedMetadata = normalizeImportedNetworkMetadata(sourceNetwork, summary.warnings);
     networks.push({
@@ -665,9 +788,42 @@ export function resolveImportConflicts(
     summary.importedNetworkIds.push(networkId);
   }
 
+  const harnessAssemblies = (payload.harnessAssemblies ?? []).flatMap((assembly) => {
+    const members = assembly.members.flatMap((member) => {
+      const networkId = importedNetworkIdBySourceId.get(member.networkId as string);
+      return networkId === undefined ? [] : [{ ...member, networkId }];
+    });
+    if (members.length === 0) {
+      summary.warnings.push(`Harness assembly '${assembly.technicalId}' was skipped because none of its networks were imported.`);
+      return [];
+    }
+    const memberIds = new Set(members.map((member) => member.networkId as string));
+    const remapNetworkId = (networkId: NetworkId): NetworkId | null =>
+      importedNetworkIdBySourceId.get(networkId as string) ?? null;
+    return [
+      {
+        ...assembly,
+        members,
+        masterConnectorRefs: assembly.masterConnectorRefs.flatMap((root) => {
+          const networkId = remapNetworkId(root.networkId);
+          return networkId !== null && memberIds.has(networkId) ? [{ ...root, networkId }] : [];
+        }),
+        connectorLinks: assembly.connectorLinks.flatMap((link) => {
+          const sourceNetworkId = remapNetworkId(link.sourceNetworkId);
+          const targetNetworkId = remapNetworkId(link.targetNetworkId);
+          if (sourceNetworkId === null || targetNetworkId === null) {
+            return [];
+          }
+          return [{ ...link, sourceNetworkId, targetNetworkId }];
+        })
+      }
+    ];
+  });
+
   return {
     networks,
     networkStates,
+    harnessAssemblies,
     summary
   };
 }

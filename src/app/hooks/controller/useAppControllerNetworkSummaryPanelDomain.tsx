@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import type { AppAction } from "../../../store/actions";
 import type {
   Connector,
@@ -13,6 +13,7 @@ import type {
   Wire
 } from "../../../core/entities";
 import type { SubNetworkSummary } from "../../../store";
+import type { AppStore } from "../../../store";
 import type { AppControllerCanvasDisplayStateModel } from "../useAppControllerCanvasDisplayState";
 import type { CanvasStateModel } from "../useCanvasState";
 import type { AppControllerPreferencesStateModel } from "../useAppControllerPreferencesState";
@@ -21,6 +22,8 @@ import type { NodePosition, SubScreenId } from "../../types/app-controller";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
 import { appActions } from "../../../store";
 import { FunctionalSchematicPanel } from "../../components/network-summary/FunctionalSchematicPanel";
+import { HarnessAssemblyManagerPanel } from "../../components/network-summary/HarnessAssemblyManagerPanel";
+import { buildHarnessAssemblyFunctionalSchematicGraph, type FunctionalDomainFilter } from "../../../core/functionalSchematic";
 import { buildNetworkSummaryPanelControllerSlice } from "./useAppControllerScreenContentSlices";
 
 type NetworkSummaryPanelSliceParams = Parameters<typeof buildNetworkSummaryPanelControllerSlice>[0];
@@ -124,6 +127,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   handleRegenerateLayout: () => void;
   markDetailPanelsSelectionSourceAsExternal: () => void;
   dispatchAction: (action: AppAction, options?: { trackHistory?: boolean }) => void;
+  store: AppStore;
 }
 
 export function useAppControllerNetworkSummaryPanelDomain({
@@ -174,7 +178,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
   onExportBomCsv,
   handleRegenerateLayout,
   markDetailPanelsSelectionSourceAsExternal,
-  dispatchAction
+  dispatchAction,
+  store
 }: UseAppControllerNetworkSummaryPanelDomainParams) {
   const handleSelectConnectorFromCallout = useCallback(
     (connectorId: ConnectorId) => {
@@ -321,26 +326,164 @@ export function useAppControllerNetworkSummaryPanelDomain({
         showFunctionalSchematic: false
       }).networkSummaryPanel
     : null;
+  const globalState = store.getState();
   const mainHarnessConnectorIds = [...connectorMap.values()]
     .filter((connector) => connector.isMainHarnessConnector === true)
     .map((connector) => connector.id);
+  const harnessAssemblies = globalState.harnessAssemblies.allIds.flatMap((assemblyId) => {
+    const assembly = globalState.harnessAssemblies.byId[assemblyId];
+    return assembly === undefined ? [] : [assembly];
+  });
+  const allNetworks = globalState.networks.allIds.flatMap((networkId) => {
+    const network = globalState.networks.byId[networkId];
+    return network === undefined ? [] : [network];
+  });
+  const connectorsByNetworkId = new Map(
+    globalState.networks.allIds.map((networkId) => [
+      networkId,
+      globalState.networkStates[networkId]?.connectors.allIds.flatMap((connectorId) => {
+        const connector = globalState.networkStates[networkId]?.connectors.byId[connectorId];
+        return connector === undefined ? [] : [connector];
+      }) ?? []
+    ])
+  );
+  const activeHarnessAssembly =
+    globalState.activeNetworkId === null
+      ? null
+      : harnessAssemblies.find((assembly) => assembly.members.some((member) => member.networkId === globalState.activeNetworkId)) ?? null;
+  const networksById = new Map(allNetworks.map((network) => [network.id, network]));
+  const assemblyGraphFactory = useMemo(() => {
+    if (activeHarnessAssembly === null) {
+      return null;
+    }
+    return (activeFilter: FunctionalDomainFilter) => {
+      const state = store.getState();
+      const networksById = new Map(
+        activeHarnessAssembly.members.flatMap((member) => {
+          const network = state.networks.byId[member.networkId];
+          const scoped = state.networkStates[member.networkId];
+          if (network === undefined || scoped === undefined) {
+            return [];
+          }
+          return [
+            [
+              member.networkId,
+              {
+                network,
+                wires: scoped.wires.allIds.flatMap((wireId) => {
+                  const wire = scoped.wires.byId[wireId];
+                  return wire === undefined ? [] : [wire];
+                }),
+                segments: scoped.segments.allIds.flatMap((segmentId) => {
+                  const segment = scoped.segments.byId[segmentId];
+                  return segment === undefined ? [] : [segment];
+                }),
+                connectorMap: new Map(scoped.connectors.allIds.flatMap((connectorId) => {
+                  const connector = scoped.connectors.byId[connectorId];
+                  return connector === undefined ? [] : [[connector.id, connector] as const];
+                })),
+                spliceMap: new Map(scoped.splices.allIds.flatMap((spliceId) => {
+                  const splice = scoped.splices.byId[spliceId];
+                  return splice === undefined ? [] : [[splice.id, splice] as const];
+                })),
+                catalogItemMap: new Map(scoped.catalogItems.allIds.flatMap((catalogItemId) => {
+                  const catalogItem = scoped.catalogItems.byId[catalogItemId];
+                  return catalogItem === undefined ? [] : [[catalogItem.id, catalogItem] as const];
+                }))
+              }
+            ] as const
+          ];
+        })
+      );
+      const rootConnectorRefs =
+        activeHarnessAssembly.masterConnectorRefs.length > 0
+          ? activeHarnessAssembly.masterConnectorRefs
+          : [...networksById].flatMap(([networkId, bundle]) =>
+              [...bundle.connectorMap.values()]
+                .filter((connector) => connector.isMainHarnessConnector === true)
+                .map((connector) => ({ networkId, connectorId: connector.id }))
+            );
+      return buildHarnessAssemblyFunctionalSchematicGraph({
+        assembly: activeHarnessAssembly,
+        networksById,
+        activeFilter,
+        rootConnectorRefs
+      });
+    };
+  }, [activeHarnessAssembly, store]);
+  const interconnectorDetails =
+    activeHarnessAssembly === null
+      ? undefined
+      : new Map(
+          activeHarnessAssembly.connectorLinks.flatMap((link) => {
+            const sourceNetwork = networksById.get(link.sourceNetworkId);
+            const targetNetwork = networksById.get(link.targetNetworkId);
+            const sourceConnector = connectorsByNetworkId.get(link.sourceNetworkId)?.find((connector) => connector.id === link.sourceConnectorId);
+            const targetConnector = connectorsByNetworkId.get(link.targetNetworkId)?.find((connector) => connector.id === link.targetConnectorId);
+            if (sourceNetwork === undefined || targetNetwork === undefined || sourceConnector === undefined || targetConnector === undefined) {
+              return [];
+            }
+            return [
+              [
+                String(link.id),
+                {
+                  name: link.name ?? "Interconnector",
+                  sourceNetworkId: link.sourceNetworkId,
+                  sourceNetworkLabel: `${sourceNetwork.technicalId} - ${sourceNetwork.name}`,
+                  sourceConnectorId: link.sourceConnectorId,
+                  sourceConnectorLabel: `${sourceConnector.technicalId} - ${sourceConnector.name}`,
+                  targetNetworkId: link.targetNetworkId,
+                  targetNetworkLabel: `${targetNetwork.technicalId} - ${targetNetwork.name}`,
+                  targetConnectorId: link.targetConnectorId,
+                  targetConnectorLabel: `${targetConnector.technicalId} - ${targetConnector.name}`,
+                  onOpenSource: () => {
+                    dispatchAction(appActions.selectNetwork(link.sourceNetworkId), { trackHistory: false });
+                    dispatchAction(appActions.select({ kind: "connector", id: link.sourceConnectorId }), { trackHistory: false });
+                  },
+                  onOpenTarget: () => {
+                    dispatchAction(appActions.selectNetwork(link.targetNetworkId), { trackHistory: false });
+                    dispatchAction(appActions.select({ kind: "connector", id: link.targetConnectorId }), { trackHistory: false });
+                  }
+                }
+              ] as const
+            ];
+          })
+        );
   const networkFunctionalSchematicPanel = hasActiveNetwork ? (
-    <FunctionalSchematicPanel
-      network={activeNetwork}
-      wires={wires}
-      segments={segments}
-      catalogItems={catalogItems}
-      connectorMap={connectorMap}
-      spliceMap={spliceMap}
-      rootConnectorIds={mainHarnessConnectorIds}
-      selectedWireId={null}
-      selectedConnectorId={mainHarnessConnectorIds[0] ?? null}
-      selectedSpliceId={null}
-      canvasExportFormat={preferencesState.canvasExportFormat}
-      pngExportIncludeBackground={preferencesState.canvasPngExportIncludeBackground}
-      exportIncludeFrame={preferencesState.canvasExportIncludeFrame}
-      exportIncludeCartouche={preferencesState.canvasExportIncludeCartouche}
-    />
+    <>
+      <HarnessAssemblyManagerPanel
+        assemblies={harnessAssemblies}
+        networks={allNetworks}
+        connectorsByNetworkId={connectorsByNetworkId}
+        activeNetworkId={globalState.activeNetworkId}
+        onUpsertAssembly={(assembly) => dispatchAction(appActions.upsertHarnessAssembly(assembly))}
+        onRemoveAssembly={(assemblyId) => dispatchAction(appActions.removeHarnessAssembly(assemblyId))}
+      />
+      <FunctionalSchematicPanel
+        network={activeNetwork}
+        wires={wires}
+        segments={segments}
+        catalogItems={catalogItems}
+        connectorMap={connectorMap}
+        spliceMap={spliceMap}
+        rootConnectorIds={mainHarnessConnectorIds}
+        assemblyGraphFactory={assemblyGraphFactory ?? undefined}
+        interconnectorDetails={interconnectorDetails}
+        title={activeHarnessAssembly === null ? "Functional schematic" : "Harness assembly functional schematic"}
+        subtitle={
+          activeHarnessAssembly === null
+            ? undefined
+            : `Filtered trace across ${activeHarnessAssembly.name} from configured master connectors.`
+        }
+        selectedWireId={null}
+        selectedConnectorId={mainHarnessConnectorIds[0] ?? null}
+        selectedSpliceId={null}
+        canvasExportFormat={preferencesState.canvasExportFormat}
+        pngExportIncludeBackground={preferencesState.canvasPngExportIncludeBackground}
+        exportIncludeFrame={preferencesState.canvasExportIncludeFrame}
+        exportIncludeCartouche={preferencesState.canvasExportIncludeCartouche}
+      />
+    </>
   ) : null;
 
   return {

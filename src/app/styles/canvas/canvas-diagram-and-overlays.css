@@ -185,6 +185,71 @@
   overflow: hidden;
 }
 
+.harness-assembly-manager-panel {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.harness-assembly-grid,
+.harness-assembly-link-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.harness-assembly-list {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 0.35rem;
+}
+
+.harness-assembly-row,
+.harness-assembly-links li {
+  display: grid;
+  grid-template-columns: auto minmax(8rem, 1fr) minmax(8rem, 0.9fr) auto;
+  gap: 0.55rem;
+  align-items: center;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #d5e2ec;
+  border-radius: 0.5rem;
+  background: rgba(248, 252, 255, 0.8);
+}
+
+.harness-assembly-row input[type="color"] {
+  width: 2rem;
+  height: 1.6rem;
+  padding: 0;
+}
+
+.harness-assembly-subpanel {
+  display: grid;
+  gap: 0.55rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid #d5e2ec;
+}
+
+.harness-assembly-subpanel h3,
+.functional-interconnector-detail h3 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.harness-assembly-link-form {
+  grid-template-columns: minmax(8rem, 1fr) repeat(4, minmax(8rem, 1fr)) auto;
+}
+
+.harness-assembly-links {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.harness-assembly-links li {
+  grid-template-columns: minmax(8rem, 0.8fr) minmax(12rem, 1fr) auto;
+}
+
 .functional-schematic-subtitle {
   margin: 0.15rem 0 0;
   color: #486579;
@@ -312,6 +377,24 @@
   stroke: #9d741f;
 }
 
+.functional-node--interconnector .functional-node-shape {
+  fill: #e8eefc;
+  stroke: #4f62a8;
+  stroke-dasharray: 6 4;
+}
+
+.functional-node--interconnector {
+  cursor: pointer;
+  outline: none;
+}
+
+.functional-node--interconnector:hover .functional-node-shape,
+.functional-node--interconnector:focus-visible .functional-node-shape,
+.functional-node--interconnector.is-selected .functional-node-shape {
+  stroke-width: 3;
+  fill: #dce6ff;
+}
+
 .functional-node--power .functional-node-shape {
   stroke: #a45b20;
 }
@@ -355,6 +438,24 @@
   font-size: 0.82rem;
 }
 
+.functional-interconnector-detail {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #b9cde0;
+  border-radius: 0.6rem;
+  background: rgba(240, 246, 252, 0.9);
+}
+
+.functional-interconnector-detail p {
+  margin: 0.2rem 0 0;
+  color: #486579;
+  font-size: 0.82rem;
+}
+
 @media (max-width: 900px) {
   .network-summary-header {
     flex-direction: column;
@@ -373,6 +474,18 @@
     min-width: 0;
     justify-content: center;
     padding: 0.24rem 0.5rem;
+  }
+  .harness-assembly-grid,
+  .harness-assembly-link-form {
+    grid-template-columns: 1fr;
+  }
+  .harness-assembly-row,
+  .harness-assembly-links li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .functional-interconnector-detail {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 @media (max-width: 520px) {

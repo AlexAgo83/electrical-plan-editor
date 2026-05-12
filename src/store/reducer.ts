@@ -5,6 +5,7 @@ import { handleConnectorActions } from "./reducer/connectorReducer";
 import { handleCatalogActions } from "./reducer/catalogReducer";
 import { handleLayoutActions } from "./reducer/layoutReducer";
 import { handleNetworkActions } from "./reducer/networkReducer";
+import { handleHarnessAssemblyActions } from "./reducer/harnessAssemblyReducer";
 import { handleNodeActions } from "./reducer/nodeReducer";
 import { handleSegmentActions } from "./reducer/segmentReducer";
 import { handleSpliceActions } from "./reducer/spliceReducer";
@@ -72,6 +73,11 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "network/delete":
     case "network/importMany": {
       return handleNetworkActions(state, action) ?? state;
+    }
+
+    case "harnessAssembly/upsert":
+    case "harnessAssembly/remove": {
+      return handleHarnessAssemblyActions(state, action) ?? state;
     }
 
     case "connector/upsert":

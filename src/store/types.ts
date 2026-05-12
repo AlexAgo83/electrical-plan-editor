@@ -1,5 +1,7 @@
 import type {
   Network,
+  HarnessAssembly,
+  HarnessAssemblyId,
   NetworkId,
   CatalogItem,
   CatalogItemId,
@@ -141,6 +143,7 @@ export interface NetworkScopedState {
 export interface AppState {
   schemaVersion: AppSchemaVersion;
   networks: EntityState<Network, NetworkId>;
+  harnessAssemblies: EntityState<HarnessAssembly, HarnessAssemblyId>;
   activeNetworkId: NetworkId | null;
   networkStates: Record<NetworkId, NetworkScopedState>;
   catalogItems: EntityState<CatalogItem, CatalogItemId>;
@@ -238,6 +241,7 @@ export function createEmptyWorkspaceState(themeMode: ThemeMode = "warmBrown"): A
   return {
     schemaVersion: APP_SCHEMA_VERSION,
     networks: createEmptyEntityState<Network, NetworkId>(),
+    harnessAssemblies: createEmptyEntityState<HarnessAssembly, HarnessAssemblyId>(),
     activeNetworkId: null,
     networkStates: {} as Record<NetworkId, NetworkScopedState>,
     catalogItems: createEmptyEntityState<CatalogItem, CatalogItemId>(),
@@ -278,6 +282,7 @@ export function createInitialState(): AppState {
       } as Record<NetworkId, Network>,
       allIds: [defaultNetwork.id]
     },
+    harnessAssemblies: createEmptyEntityState<HarnessAssembly, HarnessAssemblyId>(),
     activeNetworkId: defaultNetwork.id,
     networkStates: {
       [defaultNetwork.id]: defaultScopedState
