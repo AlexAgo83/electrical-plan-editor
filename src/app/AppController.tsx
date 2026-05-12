@@ -74,12 +74,7 @@ import { useAppControllerUiPreferencesBindings } from "./hooks/controller/useApp
 import { buildAppControllerNamespacedCanvasState } from "./hooks/useAppControllerNamespacedCanvasState";
 import { buildAppControllerNamespacedFormsState } from "./hooks/useAppControllerNamespacedFormsState";
 import { useAppSnapshot } from "./hooks/useAppSnapshot";
-import {
-  HISTORY_LIMIT,
-  NETWORK_GRID_STEP,
-  NETWORK_MAX_SCALE,
-  NETWORK_MIN_SCALE,
-} from "./lib/app-utils-shared";
+import { HISTORY_LIMIT, NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE } from "./lib/app-utils-shared";
 import { useAppControllerBomExportHandlers } from "./hooks/controller/useAppControllerBomExportHandlers";
 import type { AppProps, SubScreenId } from "./types/app-controller";
 import "./styles.css";

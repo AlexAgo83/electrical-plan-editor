@@ -171,7 +171,7 @@ flowchart TD
 ```
 
 # Companion Docs
-- Product brief(s): (none yet)
+- Product brief(s): `logics/product/prod_001_multi_harness_assembly_traceability.md`
 - Architecture decision(s): `logics/architecture/adr_007_harness_assembly_and_physical_interconnector_contract.md`
 
 # AI Context

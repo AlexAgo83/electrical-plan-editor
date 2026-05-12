@@ -163,12 +163,12 @@ if (lane === "check") {
 }
 
 if (lane === "ui") {
-  process.exit(runVitest([...UI_LANE_TEST_FILES, ...userArgs]));
+  process.exit(runVitest([...userArgs, ...UI_LANE_TEST_FILES]));
 }
 
 if (lane === "fast") {
   const excludeArgs = UI_LANE_TEST_FILES.map((filePath) => `--exclude=${filePath}`);
-  process.exit(runVitest([...excludeArgs, ...userArgs]));
+  process.exit(runVitest([...userArgs, ...excludeArgs]));
 }
 
 if (lane === "ui-slow-top") {

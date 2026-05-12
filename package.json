@@ -1,6 +1,6 @@
 {
   "name": "electrical-plan-editor",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "private": true,
   "type": "module",
   "engines": {
@@ -22,8 +22,8 @@
     "test": "vitest",
     "test:ci": "env LAYOUT_RESPONSIVENESS_BUDGET_MS=25000 vitest run --coverage --pool=forks --maxWorkers=2 --testTimeout=15000",
     "test:ci:segmentation:check": "node scripts/quality/run-vitest-segmented.mjs check",
-    "test:ci:fast": "node scripts/quality/run-vitest-segmented.mjs fast",
-    "test:ci:ui": "node scripts/quality/run-vitest-segmented.mjs ui",
+    "test:ci:fast": "node scripts/quality/run-vitest-segmented.mjs fast --pool=forks --maxWorkers=2 --testTimeout=15000",
+    "test:ci:ui": "node scripts/quality/run-vitest-segmented.mjs ui --pool=forks --maxWorkers=2 --testTimeout=15000",
     "test:ci:slow-top": "node scripts/quality/report-slowest-tests.mjs --top=10",
     "test:ci:ui:slow-top": "node scripts/quality/run-vitest-segmented.mjs ui-slow-top --top=10",
     "test:e2e": "env -u NO_COLOR playwright test --reporter=line",

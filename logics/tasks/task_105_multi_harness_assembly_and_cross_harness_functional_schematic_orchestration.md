@@ -102,7 +102,7 @@ flowchart LR
 - Architecture follow-up: Create or link at least one ADR before implementing irreversible schema or traversal contracts.
 
 # Links
-- Product brief(s): (none yet)
+- Product brief(s): `logics/product/prod_001_multi_harness_assembly_traceability.md`
 - Architecture decision(s): `logics/architecture/adr_007_harness_assembly_and_physical_interconnector_contract.md`
 - Derived from `logics/backlog/item_591_harness_assembly_data_model_persistence_and_migration.md`
 - Derived from `logics/backlog/item_592_inter_harness_connector_links_and_symmetric_pin_continuity.md`

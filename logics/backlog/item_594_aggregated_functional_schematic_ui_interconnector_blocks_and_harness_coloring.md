@@ -62,7 +62,7 @@ flowchart TD
 - Architecture follow-up: Link the sibling ADRs if created.
 
 # Links
-- Product brief(s): (none yet)
+- Product brief(s): `logics/product/prod_001_multi_harness_assembly_traceability.md`
 - Architecture decision(s): `logics/architecture/adr_007_harness_assembly_and_physical_interconnector_contract.md`
 - Request: `req_122_multi_harness_super_category_and_cross_harness_functional_schematic`
 - Primary task(s): `task_105_multi_harness_assembly_and_cross_harness_functional_schematic_orchestration`

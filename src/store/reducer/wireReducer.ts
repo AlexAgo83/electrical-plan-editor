@@ -43,15 +43,10 @@ function hasDuplicateWireTechnicalId(state: AppState, wireId: string, technicalI
 }
 
 function normalizeWireEndpointReference(value: string | undefined): string | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-
-  const normalized = value.trim();
+  const normalized = value?.trim() ?? "";
   if (normalized.length === 0) {
     return undefined;
   }
-
   return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
 }
 
@@ -60,15 +55,10 @@ function normalizeWireEndpointReferenceNameValue(value: string | undefined): str
 }
 
 function normalizeWireTwistGroupLabel(value: string | undefined): string | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-
-  const normalized = value.trim();
+  const normalized = value?.trim() ?? "";
   if (normalized.length === 0) {
     return undefined;
   }
-
   return normalized.length > 80 ? normalized.slice(0, 80) : normalized;
 }
 
