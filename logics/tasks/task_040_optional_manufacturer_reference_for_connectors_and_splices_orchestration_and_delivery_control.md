@@ -1,5 +1,6 @@
 ## task_040_optional_manufacturer_reference_for_connectors_and_splices_orchestration_and_delivery_control - Optional Manufacturer Reference for Connectors and Splices Orchestration and Delivery Control
 > From version: 0.7.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

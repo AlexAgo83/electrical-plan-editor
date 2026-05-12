@@ -1,5 +1,6 @@
 ## item_379_test_ci_segmentation_contract_explicit_globs_and_pwa_fast_lane_assignment - Test CI segmentation contract with explicit globs and `pwa.*` fast-lane assignment
 > From version: 0.9.11
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_156_home_create_empty_workspace_cta_new_workspace_behavior_and_preference_preservation - Home `Create empty workspace` CTA New-Workspace Behavior and Preference Preservation
 > From version: 0.6.1
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_299_workspace_navigation_and_analysis_screen_alias_redirect_for_modeling_analysis_merge - Workspace Navigation and `Analysis` Screen Alias/Redirect for Modeling+Analysis Merge
 > From version: 0.9.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_139_canvas_2d_node_click_event_dedup_and_single_dispatch_behavior - Canvas 2D Node Click Event Dedup and Single-Dispatch Behavior
 > From version: 0.5.9
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

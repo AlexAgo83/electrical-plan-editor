@@ -1,5 +1,6 @@
 ## item_222_local_ui_node_id_state_sync_or_safe_reset_after_node_rename - Local UI Node-ID State Sync (or Explicit Safe Reset) After Node Rename
 > From version: 0.7.3
+> Status: Done
 > Understanding: 96%
 > Confidence: 94%
 > Progress: 100%

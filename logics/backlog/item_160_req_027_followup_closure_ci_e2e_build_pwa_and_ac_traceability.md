@@ -1,5 +1,6 @@
 ## item_160_req_027_followup_closure_ci_e2e_build_pwa_and_ac_traceability - req_027 Follow-up Closure (CI / E2E / Build / PWA / AC Traceability)
 > From version: 0.6.1
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

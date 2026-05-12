@@ -1,5 +1,6 @@
 ## item_346_circle_mobility_theme_css_overrides_and_surface_coverage_for_light_and_dark_presets - Circle Mobility theme CSS overrides and surface coverage for light and dark presets
 > From version: 0.9.7
+> Status: Done
 > Understanding: 100%
 > Confidence: 95%
 > Progress: 100%

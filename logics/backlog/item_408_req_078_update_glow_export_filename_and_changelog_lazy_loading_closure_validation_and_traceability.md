@@ -1,5 +1,6 @@
 ## item_408_req_078_update_glow_export_filename_and_changelog_lazy_loading_closure_validation_and_traceability - req_078 closure: update glow, export filename, and changelog lazy-loading validation with AC traceability
 > From version: 0.9.16
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

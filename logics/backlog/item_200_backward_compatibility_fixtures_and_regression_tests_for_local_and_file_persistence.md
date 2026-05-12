@@ -1,5 +1,6 @@
 ## item_200_backward_compatibility_fixtures_and_regression_tests_for_local_and_file_persistence - Backward-Compatibility Fixtures and Regression Tests for Local and File Persistence
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 97%
 > Progress: 100%

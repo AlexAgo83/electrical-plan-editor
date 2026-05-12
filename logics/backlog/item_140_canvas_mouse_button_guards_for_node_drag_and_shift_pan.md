@@ -1,5 +1,6 @@
 ## item_140_canvas_mouse_button_guards_for_node_drag_and_shift_pan - Canvas Mouse Button Guards for Node Drag and Shift-Pan
 > From version: 0.5.9
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

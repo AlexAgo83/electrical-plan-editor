@@ -1,5 +1,6 @@
 ## item_283_wire_form_explicit_color_mode_selector_and_free_color_label_input - Wire Form Explicit Color Mode Selector and Free Color Label Input
 > From version: 0.8.1
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

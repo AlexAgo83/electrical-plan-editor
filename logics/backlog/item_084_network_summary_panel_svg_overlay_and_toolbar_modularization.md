@@ -1,5 +1,6 @@
 ## item_084_network_summary_panel_svg_overlay_and_toolbar_modularization - Network Summary Panel SVG, Overlay, and Toolbar Modularization
 > From version: 0.5.0
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

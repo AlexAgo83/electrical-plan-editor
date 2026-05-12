@@ -1,5 +1,6 @@
 ## item_065_service_worker_registration_and_update_strategy - Service Worker Registration and Update Strategy
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

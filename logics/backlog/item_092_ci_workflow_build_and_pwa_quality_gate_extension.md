@@ -1,5 +1,6 @@
 ## item_092_ci_workflow_build_and_pwa_quality_gate_extension - CI Workflow Build and PWA Quality-Gate Extension
 > From version: 0.5.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

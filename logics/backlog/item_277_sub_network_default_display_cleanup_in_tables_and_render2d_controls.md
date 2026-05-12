@@ -1,5 +1,6 @@
 ## item_277_sub_network_default_display_cleanup_in_tables_and_render2d_controls - Sub-network Default Display Cleanup in Tables and Render2D Controls
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

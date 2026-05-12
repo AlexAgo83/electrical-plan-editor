@@ -1,5 +1,6 @@
 ## item_247_wire_endpoint_reference_legacy_persistence_import_compatibility_patch - Wire Endpoint Reference Legacy Persistence/Import Compatibility Patch
 > From version: 0.7.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_297_modeling_workspace_composition_adds_access_to_analysis_panels - Modeling Workspace Composition Adds Access to Analysis Panels
 > From version: 0.9.1
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
 > Progress: 100%

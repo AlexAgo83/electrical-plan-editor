@@ -1,5 +1,6 @@
 ## item_096_app_controller_screen_render_composition_and_prop_builder_split - AppController Screen Render Composition and Prop Builder Split
 > From version: 0.5.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

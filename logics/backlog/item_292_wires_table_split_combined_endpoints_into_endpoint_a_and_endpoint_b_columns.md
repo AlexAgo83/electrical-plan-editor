@@ -1,5 +1,6 @@
 ## item_292_wires_table_split_combined_endpoints_into_endpoint_a_and_endpoint_b_columns - Wires Table Split Combined Endpoints into `Endpoint A` and `Endpoint B` Columns
 > From version: 0.9.1
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

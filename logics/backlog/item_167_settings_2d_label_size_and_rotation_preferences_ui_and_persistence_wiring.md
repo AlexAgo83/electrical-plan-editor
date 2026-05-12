@@ -1,5 +1,6 @@
 ## item_167_settings_2d_label_size_and_rotation_preferences_ui_and_persistence_wiring - Settings 2D Label Size and Rotation Preferences UI and Persistence Wiring
 > From version: 0.6.2
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

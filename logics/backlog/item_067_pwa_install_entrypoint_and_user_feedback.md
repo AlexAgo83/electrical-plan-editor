@@ -1,5 +1,6 @@
 ## item_067_pwa_install_entrypoint_and_user_feedback - PWA Install Entrypoint and User Feedback
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_036_occupancy_and_wire_transition_helper_extraction - Occupancy and Wire Transition Helper Extraction
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

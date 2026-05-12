@@ -1,5 +1,6 @@
 ## item_134_settings_screen_empty_state_precedence_and_no_active_network_access_fix - Settings Screen Empty-State Precedence and No-Active-Network Access Fix
 > From version: 0.5.8
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_068_pwa_regression_matrix_and_browser_compatibility_checks - PWA Regression Matrix and Browser Compatibility Checks
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_315_connector_splice_catalog_first_selector_derived_counts_and_integrity_guards - Connector/Splice Catalog-First Selector Integration, Derived Counts, and Integrity Guards
 > From version: 0.9.4
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

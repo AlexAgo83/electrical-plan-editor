@@ -1,5 +1,6 @@
 ## task_060_req_063_wire_edit_endpoint_swap_action_orchestration_and_delivery_control - req_063 Wire edit endpoint swap action orchestration and delivery control
 > From version: 0.9.8
+> Status: Done
 > Understanding: 100% (feature scope is locked, including icon asset, exact label `Swap endpoints`, and no-confirm draft-only swap semantics)
 > Confidence: 99% (implementation delivered and validated with targeted suites plus full matrix)
 > Progress: 100%

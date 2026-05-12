@@ -1,5 +1,6 @@
 ## item_371_catalog_reference_conflict_detection_surfacing_for_load_and_legacy_bootstrap_paths - Catalog reference conflict detection surfacing for load and legacy bootstrap paths
 > From version: 0.9.10
+> Status: Done
 > Understanding: 94%
 > Confidence: 88%
 > Progress: 100%

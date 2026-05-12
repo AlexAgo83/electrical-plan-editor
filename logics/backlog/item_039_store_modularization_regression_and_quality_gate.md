@@ -1,5 +1,6 @@
 ## item_039_store_modularization_regression_and_quality_gate - Store Modularization Regression and Quality Gate
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

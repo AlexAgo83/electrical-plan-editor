@@ -1,5 +1,6 @@
 ## item_237_wire_form_primary_secondary_color_selectors_with_swatch_indicators_and_optional_secondary - Wire Form Primary/Secondary Color Selectors with Swatch Indicators and Optional Secondary
 > From version: 0.7.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

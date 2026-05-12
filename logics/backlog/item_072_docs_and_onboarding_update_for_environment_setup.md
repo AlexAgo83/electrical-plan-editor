@@ -1,5 +1,6 @@
 ## item_072_docs_and_onboarding_update_for_environment_setup - Docs and Onboarding Update for Environment Setup
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

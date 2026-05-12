@@ -1,5 +1,6 @@
 ## item_349_catalog_csv_import_parser_mapping_conflict_policy_and_row_level_error_reporting - Catalog CSV import parser, mapping, conflict policy, and row-level error reporting
 > From version: 0.9.8
+> Status: Done
 > Understanding: 97%
 > Confidence: 93%
 > Progress: 100%

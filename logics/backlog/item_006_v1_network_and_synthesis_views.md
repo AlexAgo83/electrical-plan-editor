@@ -1,5 +1,6 @@
 ## item_006_v1_network_and_synthesis_views - V1 Network and Synthesis Views
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_372_ui_coverage_reporting_visibility_for_src_app_non_blocking_ci_signal - UI coverage reporting visibility for `src/app/**` as non-blocking CI signal
 > From version: 0.9.10
+> Status: Done
 > Understanding: 95%
 > Confidence: 92%
 > Progress: 100%

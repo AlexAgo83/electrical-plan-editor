@@ -1,5 +1,6 @@
 ## item_367_wire_fuse_metadata_visibility_and_persistence_compatibility_across_wire_workflows - Wire fuse metadata visibility and persistence compatibility across wire workflows
 > From version: 0.9.8
+> Status: Done
 > Understanding: 94%
 > Confidence: 90%
 > Progress: 100%

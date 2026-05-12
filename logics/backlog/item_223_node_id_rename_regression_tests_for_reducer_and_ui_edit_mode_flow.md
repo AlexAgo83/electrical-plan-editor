@@ -1,5 +1,6 @@
 ## item_223_node_id_rename_regression_tests_for_reducer_and_ui_edit_mode_flow - Node ID Rename Regression Tests for Reducer and UI Edit-Mode Flow
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

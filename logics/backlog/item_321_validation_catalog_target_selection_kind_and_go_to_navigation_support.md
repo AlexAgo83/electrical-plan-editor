@@ -1,5 +1,6 @@
 ## item_321_validation_catalog_target_selection_kind_and_go_to_navigation_support - Validation Catalog Target Selection Kind and Go-to Navigation Support
 > From version: 0.9.5
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_368_regression_coverage_for_wire_fuse_mode_required_reference_and_legacy_compatibility - Regression coverage for wire fuse mode, required catalog association validation, and legacy compatibility
 > From version: 0.9.8
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

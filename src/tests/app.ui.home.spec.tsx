@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { HOME_CHANGELOG_ENTRIES } from "../app/lib/changelogFeed";
+import { HOME_CHANGELOG_ENTRY_SUMMARIES } from "../app/lib/changelogFeed";
 import {
   createUiIntegrationState,
   createValidationIssueState,
@@ -89,7 +89,7 @@ describe("home workspace screen", () => {
 
       const whatsNewPanel = getPanelByHeading("What's new");
       const initialVisible = whatsNewPanel.querySelectorAll("[data-changelog-version]").length;
-      expect(initialVisible).toBe(Math.min(4, HOME_CHANGELOG_ENTRIES.length));
+      expect(initialVisible).toBe(Math.min(4, HOME_CHANGELOG_ENTRY_SUMMARIES.length));
       expect(observerCallbacks.length).toBeGreaterThan(0);
       expect(observedTargets.length).toBeGreaterThan(0);
 
@@ -98,19 +98,22 @@ describe("home workspace screen", () => {
 
       await waitFor(() => {
         const nextVisible = whatsNewPanel.querySelectorAll("[data-changelog-version]").length;
-        expect(nextVisible).toBe(Math.min(HOME_CHANGELOG_ENTRIES.length, initialVisible + 4));
+        expect(nextVisible).toBe(Math.min(HOME_CHANGELOG_ENTRY_SUMMARIES.length, initialVisible + 4));
       });
     } finally {
       globalThis.IntersectionObserver = originalIntersectionObserver;
     }
   });
 
-  it("keeps Major Highlights visible and collapses following sections by default, then toggles on click", () => {
+  it("keeps Major Highlights visible and collapses following sections by default, then toggles on click", async () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("home");
 
     const whatsNewPanel = getPanelByHeading("What's new");
+    await waitFor(() => {
+      expect(within(whatsNewPanel).getAllByRole("button", { name: "Product and UX Changes" }).length).toBeGreaterThan(0);
+    });
     const productUxToggles = within(whatsNewPanel).getAllByRole("button", { name: "Product and UX Changes" });
     expect(productUxToggles.length).toBeGreaterThan(0);
     const productUxToggle = productUxToggles[0];

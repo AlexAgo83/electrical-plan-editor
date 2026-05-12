@@ -1,5 +1,6 @@
 ## item_213_onboarding_auto_open_on_app_load_with_persisted_opt_out_preference - Onboarding Auto-Open on App Load with Persisted Opt-Out Preference
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

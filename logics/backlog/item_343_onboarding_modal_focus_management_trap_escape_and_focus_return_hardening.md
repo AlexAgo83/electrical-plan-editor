@@ -1,5 +1,6 @@
 ## item_343_onboarding_modal_focus_management_trap_escape_and_focus_return_hardening - Onboarding modal focus management trap, Escape, and focus-return hardening
 > From version: 0.9.6
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

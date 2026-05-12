@@ -1,5 +1,6 @@
 ## item_308_persistence_migration_and_defaulting_for_network_summary_2d_view_state - Persistence Migration and Defaulting for Network Summary 2D View-State
 > From version: 0.9.2
+> Status: Done
 > Understanding: 96%
 > Confidence: 95%
 > Progress: 100%

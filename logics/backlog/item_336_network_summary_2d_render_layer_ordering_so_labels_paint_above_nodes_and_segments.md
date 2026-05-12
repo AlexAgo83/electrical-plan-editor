@@ -1,5 +1,6 @@
 ## item_336_network_summary_2d_render_layer_ordering_so_labels_paint_above_nodes_and_segments - Network summary 2D render layer ordering so labels paint above nodes and segments
 > From version: 0.9.6
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

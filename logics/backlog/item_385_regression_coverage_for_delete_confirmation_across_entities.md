@@ -1,5 +1,6 @@
 ## item_385_regression_coverage_for_delete_confirmation_across_entities - Regression coverage for delete-confirmation behavior across entities
 > From version: 0.9.14
+> Status: Done
 > Understanding: 96%
 > Confidence: 93%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_185_connector_splice_callout_theme_readability_and_navigation_canvas_regression_coverage - Connector/Splice Callout Theme Readability and Navigation-Canvas Regression Coverage
 > From version: 0.6.4
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

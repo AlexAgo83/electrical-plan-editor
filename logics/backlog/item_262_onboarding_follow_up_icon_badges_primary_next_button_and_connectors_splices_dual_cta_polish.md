@@ -1,5 +1,6 @@
 ## item_262_onboarding_follow_up_icon_badges_primary_next_button_and_connectors_splices_dual_cta_polish - Onboarding Follow-up: Icon Badges, Primary Next Button, and Connectors/Splices Dual-CTA Polish
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

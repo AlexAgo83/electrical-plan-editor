@@ -1,5 +1,6 @@
 ## item_359_segment_analysis_traversing_wires_sort_contract_update_for_endpoint_a_and_endpoint_b_columns - Segment analysis traversing-wires sort contract update for Endpoint A and Endpoint B columns
 > From version: 0.9.8
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

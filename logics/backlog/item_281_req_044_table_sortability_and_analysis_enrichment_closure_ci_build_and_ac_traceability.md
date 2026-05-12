@@ -1,5 +1,6 @@
 ## item_281_req_044_table_sortability_and_analysis_enrichment_closure_ci_build_and_ac_traceability - req_044 Table Sortability and Analysis Enrichment Closure, CI/Build, and AC Traceability
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

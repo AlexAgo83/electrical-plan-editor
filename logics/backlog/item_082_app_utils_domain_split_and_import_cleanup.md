@@ -1,5 +1,6 @@
 ## item_082_app_utils_domain_split_and_import_cleanup - App Utils Domain Split and Import Cleanup
 > From version: 0.5.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

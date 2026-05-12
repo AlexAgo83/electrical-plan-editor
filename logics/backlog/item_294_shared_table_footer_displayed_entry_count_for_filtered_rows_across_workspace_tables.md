@@ -1,5 +1,6 @@
 ## item_294_shared_table_footer_displayed_entry_count_for_filtered_rows_across_workspace_tables - Shared Table Footer Displayed Entry Count for Filtered Rows Across Workspace Filterable Tables
 > From version: 0.9.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

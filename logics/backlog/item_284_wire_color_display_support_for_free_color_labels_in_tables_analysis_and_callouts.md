@@ -1,5 +1,6 @@
 ## item_284_wire_color_display_support_for_free_color_labels_in_tables_analysis_and_callouts - Wire Color Display Support for Free Color Labels in Tables, Analysis, and Callouts
 > From version: 0.8.1
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
 > Progress: 100%

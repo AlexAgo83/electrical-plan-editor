@@ -1,5 +1,6 @@
 ## item_135_network_summary_panel_remaining_compute_scoping_and_active_screen_assembly_alignment - NetworkSummaryPanel Remaining Compute Scoping and Active-Screen Assembly Alignment
 > From version: 0.5.8
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

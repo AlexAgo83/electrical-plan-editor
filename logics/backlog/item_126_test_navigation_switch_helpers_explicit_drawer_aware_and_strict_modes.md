@@ -1,5 +1,6 @@
 ## item_126_test_navigation_switch_helpers_explicit_drawer_aware_and_strict_modes - Test Navigation Switch Helpers: Explicit Drawer-Aware and Strict Modes
 > From version: 0.5.6
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_328_regression_coverage_for_catalog_analysis_panel_usage_listing_and_navigation - Regression Coverage for Catalog Analysis Panel Usage Listing and Navigation
 > From version: 0.9.5
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

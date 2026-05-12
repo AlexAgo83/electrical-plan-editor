@@ -1,5 +1,6 @@
 ## item_159_req_026_home_mvp_scope_docs_sync_after_quick_panels_removal - req_026 Home MVP Scope Docs Sync After Quick Panels Removal
 > From version: 0.6.1
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

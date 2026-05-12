@@ -1,5 +1,6 @@
 ## item_304_shared_table_filter_bar_clear_action_regression_coverage_for_query_reset_and_row_restore - Shared TableFilterBar Clear Action Regression Coverage for Query Reset and Row Restore
 > From version: 0.9.2
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

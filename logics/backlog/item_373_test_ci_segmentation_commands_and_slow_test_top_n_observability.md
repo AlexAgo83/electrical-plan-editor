@@ -1,5 +1,6 @@
 ## item_373_test_ci_segmentation_commands_and_slow_test_top_n_observability - Test CI segmentation commands and slow-test top-N observability
 > From version: 0.9.10
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

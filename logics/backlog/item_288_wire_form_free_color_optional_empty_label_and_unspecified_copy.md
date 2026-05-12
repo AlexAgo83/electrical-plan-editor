@@ -1,5 +1,6 @@
 ## item_288_wire_form_free_color_optional_empty_label_and_unspecified_copy - Wire Form Free Color Optional Empty Label and Unspecified Copy
 > From version: 0.8.1
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

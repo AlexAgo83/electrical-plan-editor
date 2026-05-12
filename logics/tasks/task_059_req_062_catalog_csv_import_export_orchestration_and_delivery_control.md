@@ -1,5 +1,6 @@
 ## task_059_req_062_catalog_csv_import_export_orchestration_and_delivery_control - req_062 Catalog CSV import/export orchestration and delivery control
 > From version: 0.9.8
+> Status: Done
 > Understanding: 100% (UI placements plus V1 policy decisions are locked: match key, duplicate handling, strict import validation + strict headers, schema without internal ID, non-empty-catalog confirmation, local Catalog summary)
 > Confidence: 95% (contract is implementation-ready; remaining risk is execution/regression only)
 > Progress: 100%

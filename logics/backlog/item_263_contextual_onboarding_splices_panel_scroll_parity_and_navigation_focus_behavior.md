@@ -1,5 +1,6 @@
 ## item_263_contextual_onboarding_splices_panel_scroll_parity_and_navigation_focus_behavior - Contextual Onboarding: Splices Panel Scroll Parity and Navigation Focus Behavior
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

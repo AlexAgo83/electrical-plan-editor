@@ -1,5 +1,6 @@
 ## item_003_v1_routing_network_nodes_segments_and_sub_networks - V1 Routing Network Nodes Segments and Sub Networks
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

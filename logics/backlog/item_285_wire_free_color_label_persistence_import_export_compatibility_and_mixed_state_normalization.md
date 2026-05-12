@@ -1,5 +1,6 @@
 ## item_285_wire_free_color_label_persistence_import_export_compatibility_and_mixed_state_normalization - Wire Free Color Label Persistence/Import/Export Compatibility and Mixed-State Normalization
 > From version: 0.8.1
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

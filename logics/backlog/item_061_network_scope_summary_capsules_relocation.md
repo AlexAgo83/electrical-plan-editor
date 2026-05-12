@@ -1,5 +1,6 @@
 ## item_061_network_scope_summary_capsules_relocation - Network Scope Summary Capsules Relocation
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 98%
 > Progress: 100%

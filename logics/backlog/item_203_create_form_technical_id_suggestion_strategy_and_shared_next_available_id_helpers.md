@@ -1,5 +1,6 @@
 ## item_203_create_form_technical_id_suggestion_strategy_and_shared_next_available_id_helpers - Create-Form Technical ID Suggestion Strategy and Shared Next-Available ID Helpers
 > From version: 0.7.3
+> Status: Done
 > Understanding: 97%
 > Confidence: 96%
 > Progress: 100%

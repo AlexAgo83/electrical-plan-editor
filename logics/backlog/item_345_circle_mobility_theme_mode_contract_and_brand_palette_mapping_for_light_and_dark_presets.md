@@ -1,5 +1,6 @@
 ## item_345_circle_mobility_theme_mode_contract_and_brand_palette_mapping_for_light_and_dark_presets - Circle Mobility theme mode contract and brand palette mapping for light and dark presets
 > From version: 0.9.7
+> Status: Done
 > Understanding: 100%
 > Confidence: 96%
 > Progress: 100%

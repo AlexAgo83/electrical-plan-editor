@@ -1,5 +1,6 @@
 ## item_352_wire_edit_form_endpoint_swap_state_transform_and_draft_preservation - Wire edit form endpoint swap state transform and draft preservation
 > From version: 0.9.8
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

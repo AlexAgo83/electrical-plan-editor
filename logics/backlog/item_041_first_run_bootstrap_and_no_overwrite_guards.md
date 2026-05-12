@@ -1,5 +1,6 @@
 ## item_041_first_run_bootstrap_and_no_overwrite_guards - First Run Bootstrap and No Overwrite Guards
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

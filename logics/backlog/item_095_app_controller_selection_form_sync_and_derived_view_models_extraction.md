@@ -1,5 +1,6 @@
 ## item_095_app_controller_selection_form_sync_and_derived_view_models_extraction - AppController Selection/Form Sync and Derived View Models Extraction
 > From version: 0.5.1
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

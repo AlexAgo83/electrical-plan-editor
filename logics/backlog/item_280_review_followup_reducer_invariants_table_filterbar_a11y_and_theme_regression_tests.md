@@ -1,5 +1,6 @@
 ## item_280_review_followup_reducer_invariants_table_filterbar_a11y_and_theme_regression_tests - Review Follow-up: Reducer Invariants, TableFilterBar A11y, and Theme Regression Tests
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

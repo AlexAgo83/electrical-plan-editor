@@ -1,5 +1,6 @@
 ## item_251_wire_filter_field_selector_state_and_field_specific_filtering_logic - Wire Filter Field Selector State and Field-Specific Filtering Logic
 > From version: 0.7.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

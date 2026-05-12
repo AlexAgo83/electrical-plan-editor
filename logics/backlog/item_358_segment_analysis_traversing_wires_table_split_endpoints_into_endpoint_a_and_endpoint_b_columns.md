@@ -1,5 +1,6 @@
 ## item_358_segment_analysis_traversing_wires_table_split_endpoints_into_endpoint_a_and_endpoint_b_columns - Segment analysis traversing-wires table split Endpoints into Endpoint A and Endpoint B columns
 > From version: 0.9.8
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

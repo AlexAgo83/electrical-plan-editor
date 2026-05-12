@@ -1,5 +1,6 @@
 ## item_224_req_036_node_id_editability_closure_ci_build_and_ac_traceability - req_036 Node ID Editability Closure (CI, Build, and AC Traceability)
 > From version: 0.7.3
+> Status: Done
 > Understanding: 97%
 > Confidence: 96%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_257_connector_splice_and_wire_optional_reference_metadata_follow_up_surfacing_in_views_and_optional_exports - Connector/Splice and Wire Optional Reference Metadata Follow-up Surfacing in Views (and Optional Exports)
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

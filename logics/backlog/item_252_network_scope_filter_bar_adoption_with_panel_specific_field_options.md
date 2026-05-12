@@ -1,5 +1,6 @@
 ## item_252_network_scope_filter_bar_adoption_with_panel_specific_field_options - Network Scope Filter Bar Adoption with Panel-Specific Field Options
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

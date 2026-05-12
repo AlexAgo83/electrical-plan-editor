@@ -1,5 +1,6 @@
 ## item_020_theme_mode_state_and_persistence - Theme Mode State and Persistence
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_273_wires_table_column_order_section_before_length_and_analysis_info_enrichment - Wires Table Column Order (Section Before Length) and Analysis Info Enrichment
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

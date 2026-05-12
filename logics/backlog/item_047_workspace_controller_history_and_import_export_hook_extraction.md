@@ -1,5 +1,6 @@
 ## item_047_workspace_controller_history_and_import_export_hook_extraction - Workspace Controller, History and Import/Export Hook Extraction
 > From version: 0.2.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

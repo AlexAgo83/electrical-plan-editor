@@ -1,5 +1,6 @@
 ## item_187_network_scope_table_single_click_focus_sync_with_edit_panel_selection_state - Network Scope Table Single-Click Focus Sync with Edit Panel Selection State
 > From version: 0.7.2
+> Status: Done
 > Understanding: 97%
 > Confidence: 96%
 > Progress: 100%

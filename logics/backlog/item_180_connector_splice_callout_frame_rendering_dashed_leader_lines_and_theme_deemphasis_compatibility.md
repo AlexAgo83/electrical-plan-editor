@@ -1,5 +1,6 @@
 ## item_180_connector_splice_callout_frame_rendering_dashed_leader_lines_and_theme_deemphasis_compatibility - Connector/Splice Callout Frame Rendering, Dashed Leader Lines, and Theme/Deemphasis Compatibility
 > From version: 0.6.4
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_172_wires_table_length_mm_sorting_support_and_numeric_ordering - Wires Table Length (mm) Sorting Support and Numeric Ordering
 > From version: 0.6.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

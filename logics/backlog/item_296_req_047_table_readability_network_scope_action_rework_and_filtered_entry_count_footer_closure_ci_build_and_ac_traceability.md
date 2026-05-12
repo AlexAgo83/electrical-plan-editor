@@ -1,5 +1,6 @@
 ## item_296_req_047_table_readability_network_scope_action_rework_and_filtered_entry_count_footer_closure_ci_build_and_ac_traceability - req_047 Table Readability + Network Scope Action Rework Closure (CI, Build, and AC Traceability)
 > From version: 0.9.1
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## task_065_req_067_wire_protection_metadata_v1_fuse_kind_with_required_reference_orchestration_and_delivery_control - req_067 Wire protection metadata V1 (`fuse`) with required catalog manufacturer reference orchestration and delivery control
 > From version: 0.9.8
+> Status: Done
 > Understanding: 100% (implemented V1 `wire.protection` fuse contract with linked catalog item identity, delete guard, UI controls/visibility, and compatibility coverage across persistence/import-export)
 > Confidence: 98% (full validation matrix passed after implementation and regression coverage additions; residual risk is limited to future UI copy/layout changes around wire tables/forms)
 > Progress: 100%

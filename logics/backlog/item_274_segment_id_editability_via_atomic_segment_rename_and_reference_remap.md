@@ -1,5 +1,6 @@
 ## item_274_segment_id_editability_via_atomic_segment_rename_and_reference_remap - Segment ID Editability via Atomic Segment Rename and Reference Remap
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

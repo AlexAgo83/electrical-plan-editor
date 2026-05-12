@@ -1,5 +1,6 @@
 ## task_009_network_scope_workspace_shell_and_global_defaults_orchestration_and_delivery_control - Network Scope Workspace Shell and Global Defaults Orchestration and Delivery Control
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

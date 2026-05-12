@@ -1,5 +1,6 @@
 ## item_381_coverage_ui_report_v1_separate_execution_and_cost_baseline_tracking - `coverage:ui:report` V1 separate execution and CI cost baseline tracking
 > From version: 0.9.11
+> Status: Done
 > Understanding: 97%
 > Confidence: 93%
 > Progress: 100%

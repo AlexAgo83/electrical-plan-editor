@@ -1,5 +1,6 @@
 ## item_209_creation_flow_regression_tests_for_id_suggestions_and_connector_splice_auto_node_bootstrap - Creation Flow Regression Tests for ID Suggestions and Connector/Splice Auto-Node Bootstrap
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 97%
 > Progress: 100%

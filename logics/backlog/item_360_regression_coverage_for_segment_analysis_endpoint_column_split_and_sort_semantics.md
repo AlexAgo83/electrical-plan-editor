@@ -1,5 +1,6 @@
 ## item_360_regression_coverage_for_segment_analysis_endpoint_column_split_and_sort_semantics - Regression coverage for segment analysis endpoint column split and sort semantics
 > From version: 0.9.8
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

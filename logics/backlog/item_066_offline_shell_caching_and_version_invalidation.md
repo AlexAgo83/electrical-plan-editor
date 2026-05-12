@@ -1,5 +1,6 @@
 ## item_066_offline_shell_caching_and_version_invalidation - Offline Shell Caching and Version Invalidation
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 98%
 > Progress: 100%

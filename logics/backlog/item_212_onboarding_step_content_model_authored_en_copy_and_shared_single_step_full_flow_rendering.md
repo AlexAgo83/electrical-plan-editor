@@ -1,5 +1,6 @@
 ## item_212_onboarding_step_content_model_authored_en_copy_and_shared_single_step_full_flow_rendering - Onboarding Step Content Model, Authored EN Copy, and Shared Single-Step/Full-Flow Rendering
 > From version: 0.7.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

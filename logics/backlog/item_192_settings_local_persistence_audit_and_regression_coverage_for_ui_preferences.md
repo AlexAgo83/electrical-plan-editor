@@ -1,5 +1,6 @@
 ## item_192_settings_local_persistence_audit_and_regression_coverage_for_ui_preferences - Settings Local Persistence Audit and Regression Coverage for UI Preferences
 > From version: 0.7.2
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

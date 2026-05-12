@@ -1,5 +1,6 @@
 ## item_108_app_controller_namespaced_state_contracts_and_destructuring_reduction - AppController Namespaced State Contracts and Destructuring Reduction
 > From version: 0.5.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_334_bom_csv_ttc_column_and_total_with_tax_enabled_conditional_export_behavior - BOM CSV TTC column and total with tax-enabled conditional export behavior
 > From version: 0.9.6
+> Status: Done
 > Understanding: 95%
 > Confidence: 89%
 > Progress: 100%

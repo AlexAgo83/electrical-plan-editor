@@ -1,5 +1,6 @@
 ## item_351_regression_coverage_for_catalog_csv_import_export_round_trip_and_action_placement - Regression coverage for catalog CSV import/export round-trip and action placement
 > From version: 0.9.8
+> Status: Done
 > Understanding: 97%
 > Confidence: 94%
 > Progress: 100%

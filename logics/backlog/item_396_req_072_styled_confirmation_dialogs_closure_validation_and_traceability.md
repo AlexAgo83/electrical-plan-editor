@@ -1,5 +1,6 @@
 ## item_396_req_072_styled_confirmation_dialogs_closure_validation_and_traceability - req_072 closure: styled confirmation-dialog migration validation and AC traceability
 > From version: 0.9.13
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

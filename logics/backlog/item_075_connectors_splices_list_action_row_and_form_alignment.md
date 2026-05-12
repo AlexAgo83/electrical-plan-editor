@@ -1,5 +1,6 @@
 ## item_075_connectors_splices_list_action_row_and_form_alignment - Connectors/Splices List Action Row and Form Alignment
 > From version: 0.4.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_162_network_summary_2d_subnetwork_deemphasis_rendering_for_inactive_filters - Network Summary 2D Subnetwork Deemphasis Rendering for Inactive Filters
 > From version: 0.6.2
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

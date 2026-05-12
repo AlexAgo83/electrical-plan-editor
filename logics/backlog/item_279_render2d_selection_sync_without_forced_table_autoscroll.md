@@ -1,5 +1,6 @@
 ## item_279_render2d_selection_sync_without_forced_table_autoscroll - Render2D Selection Sync Without Forced Table Auto-scroll
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

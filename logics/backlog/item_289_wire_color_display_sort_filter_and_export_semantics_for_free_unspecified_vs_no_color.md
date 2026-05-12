@@ -1,5 +1,6 @@
 ## item_289_wire_color_display_sort_filter_and_export_semantics_for_free_unspecified_vs_no_color - Wire Color Display/Sort/Filter/Export Semantics for Free-Unspecified vs No-Color
 > From version: 0.8.1
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
 > Progress: 100%

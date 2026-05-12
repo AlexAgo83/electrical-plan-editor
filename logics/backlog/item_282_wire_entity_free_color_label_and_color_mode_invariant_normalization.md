@@ -1,5 +1,6 @@
 ## item_282_wire_entity_free_color_label_and_color_mode_invariant_normalization - Wire Entity Free Color Label and Color-Mode Invariant Normalization
 > From version: 0.8.1
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_340_dedicated_sample_fixture_for_catalog_item_validation_error_reproduction_and_regression_coverage - Dedicated sample fixture for catalog item validation error reproduction and regression coverage
 > From version: 0.9.6
+> Status: Done
 > Understanding: 99%
 > Confidence: 95%
 > Progress: 100%

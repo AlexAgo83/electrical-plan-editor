@@ -1,5 +1,6 @@
 ## item_270_connectors_splices_tables_manufacturer_reference_column_and_sortability - Connectors/Splices Tables Manufacturer Reference Column and Sortability
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

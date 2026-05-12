@@ -1,5 +1,6 @@
 ## item_178_network_summary_callout_visibility_toggle_and_settings_default_preference_for_connector_splice_cable_frames - Network Summary Callout Visibility Toggle and Settings Default Preference for Connector/Splice Cable Frames
 > From version: 0.6.4
+> Status: Done
 > Understanding: 98%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_267_onboarding_copy_refresh_for_req_036_to_req_042_feature_additions - Onboarding Copy Refresh for req_036 to req_042 Feature Additions
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_074_list_form_pattern_baseline_and_shared_interaction_contract - List/Form Pattern Baseline and Shared Interaction Contract
 > From version: 0.4.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

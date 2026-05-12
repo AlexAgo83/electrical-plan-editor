@@ -1,5 +1,6 @@
 ## task_063_req_066_global_undo_redo_history_orchestration_and_delivery_control - req_066 Global undo/redo history orchestration and delivery control
 > From version: 0.9.8
+> Status: Done
 > Understanding: 97% (V1 scope is a global undo/redo feature for workspace-domain mutations with UI actions, shortcuts, history boundaries, and explicit UI-state exclusions)
 > Confidence: 92% (cross-cutting state/history work is tractable but requires careful sequencing and regression coverage)
 > Progress: 100%

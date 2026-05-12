@@ -1,5 +1,6 @@
 ## item_004_v1_shortest_path_engine_and_deterministic_tie_break - V1 Shortest Path Engine and Deterministic Tie Break
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

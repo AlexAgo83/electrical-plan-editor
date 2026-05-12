@@ -1,5 +1,6 @@
 ## item_195_persistence_schema_version_envelope_and_current_version_contract_for_saved_data - Persistence Schema Version Envelope and Current Version Contract for Saved Data
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 97%
 > Progress: 100%

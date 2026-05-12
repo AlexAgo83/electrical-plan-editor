@@ -1,5 +1,6 @@
 ## item_255_table_filter_bar_phase_2_rollout_to_connectors_splices_nodes_and_segments_panels - Table Filter Bar Phase-2 Rollout to Connectors/Splices/Nodes/Segments Panels
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_271_nodes_analysis_panel_with_associated_segments_and_length_listing - Nodes Analysis Panel With Associated Segments and Length Listing
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

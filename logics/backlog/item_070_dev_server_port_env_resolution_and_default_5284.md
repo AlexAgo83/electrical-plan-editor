@@ -1,5 +1,6 @@
 ## item_070_dev_server_port_env_resolution_and_default_5284 - Dev Server Port Env Resolution and Default 5284
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

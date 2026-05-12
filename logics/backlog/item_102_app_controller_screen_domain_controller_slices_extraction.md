@@ -1,5 +1,6 @@
 ## item_102_app_controller_screen_domain_controller_slices_extraction - AppController Screen/Domain Controller Slices Extraction
 > From version: 0.5.2
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

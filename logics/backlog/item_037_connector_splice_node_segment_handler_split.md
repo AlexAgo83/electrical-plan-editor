@@ -1,5 +1,6 @@
 ## item_037_connector_splice_node_segment_handler_split - Connector Splice Node Segment Handler Split
 > From version: 0.1.0
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

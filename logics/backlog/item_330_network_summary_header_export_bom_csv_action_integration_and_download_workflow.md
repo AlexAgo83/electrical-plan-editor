@@ -1,5 +1,6 @@
 ## item_330_network_summary_header_export_bom_csv_action_integration_and_download_workflow - Network Summary Header Export BOM CSV Action Integration and Download Workflow
 > From version: 0.9.5
+> Status: Done
 > Understanding: 99% (CSV icon asset contract added)
 > Confidence: 96% (UI integration contract narrowed)
 > Progress: 100%

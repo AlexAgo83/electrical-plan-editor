@@ -1,5 +1,6 @@
 ## item_259_req_035_to_req_042_logics_closure_traceability_status_updates_and_defer_mapping - req_035 to req_042 Logics Closure, Traceability Status Updates, and Defer Mapping
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

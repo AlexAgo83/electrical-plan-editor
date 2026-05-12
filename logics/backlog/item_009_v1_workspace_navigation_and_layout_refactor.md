@@ -1,5 +1,6 @@
 ## item_009_v1_workspace_navigation_and_layout_refactor - V1 Workspace Navigation and Layout Refactor
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

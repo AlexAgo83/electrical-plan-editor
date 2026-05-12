@@ -1,5 +1,6 @@
 ## item_392_ctrl_cmd_s_export_wiring_to_network_scope_export_path - Ctrl/Cmd+S export wiring to Network Scope active-export path
 > From version: 0.9.14
+> Status: Done
 > Understanding: 97%
 > Confidence: 94%
 > Progress: 100%

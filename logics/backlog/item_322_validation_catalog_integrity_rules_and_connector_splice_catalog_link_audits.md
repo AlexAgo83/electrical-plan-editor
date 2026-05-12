@@ -1,5 +1,6 @@
 ## item_322_validation_catalog_integrity_rules_and_connector_splice_catalog_link_audits - Validation Catalog Integrity Rules and Connector/Splice Catalog-Link Audits
 > From version: 0.9.5
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

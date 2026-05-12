@@ -1,5 +1,6 @@
 ## item_253_filter_bar_regression_tests_for_wire_and_network_scope_panels - Filter Bar Regression Tests for Wire and Network Scope Panels
 > From version: 0.7.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

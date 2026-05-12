@@ -1,5 +1,6 @@
 ## item_375_bundle_code_splitting_quick_wins_and_lazy_loading_regression_safety - Bundle code-splitting quick wins and lazy-loading regression safety
 > From version: 0.9.10
+> Status: Done
 > Understanding: 94%
 > Confidence: 88%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_206_splice_creation_auto_generates_linked_splice_node_with_valid_unique_node_id - Splice Creation Auto-Generates Linked Splice Node with Valid Unique Node ID
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

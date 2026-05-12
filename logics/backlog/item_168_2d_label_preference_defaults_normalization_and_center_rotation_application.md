@@ -1,5 +1,6 @@
 ## item_168_2d_label_preference_defaults_normalization_and_center_rotation_application - 2D Label Preference Defaults, Normalization, and Center-Rotation Application
 > From version: 0.6.2
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

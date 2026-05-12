@@ -1,5 +1,6 @@
 ## task_006_sample_network_bootstrap_orchestration_and_delivery_control - Sample Network Bootstrap Orchestration and Delivery Control
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

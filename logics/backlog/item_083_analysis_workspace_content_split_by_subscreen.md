@@ -1,5 +1,6 @@
 ## item_083_analysis_workspace_content_split_by_subscreen - Analysis Workspace Content Split by Sub-screen
 > From version: 0.5.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

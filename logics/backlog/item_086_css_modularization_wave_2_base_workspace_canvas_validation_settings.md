@@ -1,5 +1,6 @@
 ## item_086_css_modularization_wave_2_base_workspace_canvas_validation_settings - CSS Modularization Wave 2 (Base / Workspace / Canvas / Validation-Settings)
 > From version: 0.5.0
+> Status: Done
 > Understanding: 97%
 > Confidence: 94%
 > Progress: 100%

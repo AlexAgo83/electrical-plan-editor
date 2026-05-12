@@ -1,5 +1,6 @@
 ## item_060_operations_health_floating_panel_and_header_badge - Operations/Health Floating Panel and Header Badge
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 98%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_356_segment_edit_form_swap_action_ui_placement_between_save_and_cancel_and_edit_mode_visibility - Segment edit form swap action UI placement between Save and Cancel and edit-mode visibility
 > From version: 0.9.8
+> Status: Done
 > Understanding: 99% (user-specified placement is explicit: between `Save` and `Cancel edit` in `Edit Segment`)
 > Confidence: 96%
 > Progress: 100%

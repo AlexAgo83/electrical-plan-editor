@@ -1,5 +1,6 @@
 ## item_033_app_ui_test_suite_split_and_shared_helpers - App UI Test Suite Split and Shared Helpers
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

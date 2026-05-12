@@ -1,5 +1,6 @@
 ## item_397_req_073_pwa_update_ready_glow_closure_validation_and_traceability - req_073 closure: `Update ready` glow emphasis validation and AC traceability
 > From version: 0.9.13
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

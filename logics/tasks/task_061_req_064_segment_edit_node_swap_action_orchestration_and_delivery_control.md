@@ -1,5 +1,6 @@
 ## task_061_req_064_segment_edit_node_swap_action_orchestration_and_delivery_control - req_064 Segment edit node swap action orchestration and delivery control
 > From version: 0.9.8
+> Status: Done
 > Understanding: 99% (focused segment-edit ergonomics feature with exact UI placement and draft-only swap semantics)
 > Confidence: 99% (implementation delivered and validated with targeted suites plus full matrix)
 > Progress: 100%

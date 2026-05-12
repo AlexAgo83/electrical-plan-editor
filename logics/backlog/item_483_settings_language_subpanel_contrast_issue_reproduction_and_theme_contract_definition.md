@@ -7,16 +7,17 @@
 > Complexity: Medium
 > Theme: General
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
+> Maintenance edit: 2026-05-12 audit placeholder cleanup.
 
 # Problem
-Describe the problem and user impact.
+Audit cleanup: this retained backlog item needs a concrete problem statement reconstructed from its title and linked request before any new implementation starts.
 
 # Scope
 - In:
 - Out:
 
 # Acceptance criteria
-- AC1: Define an objective acceptance check.
+- AC1: Reconstruct concrete acceptance criteria from the title, linked request, and current code behavior before implementation resumes.
 
 # AC Traceability
 - AC1 -> Initial scope definition. Proof: backlog bootstrap.

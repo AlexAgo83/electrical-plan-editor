@@ -1,5 +1,6 @@
 ## item_350_catalog_panel_csv_export_import_action_placement_and_browser_file_workflow_integration - Catalog panel CSV export/import action placement and browser file workflow integration
 > From version: 0.9.8
+> Status: Done
 > Understanding: 99% (user specified exact button placements for both export and import actions)
 > Confidence: 95%
 > Progress: 100%

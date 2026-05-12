@@ -1,5 +1,6 @@
 ## item_193_user_facing_cavity_to_way_terminology_replacement_with_copy_and_test_updates - User-Facing Cavity→Way Terminology Replacement with Copy and Test Updates
 > From version: 0.7.2
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

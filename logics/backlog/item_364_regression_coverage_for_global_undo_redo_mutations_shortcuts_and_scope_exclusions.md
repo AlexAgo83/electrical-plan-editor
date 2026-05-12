@@ -1,5 +1,6 @@
 ## item_364_regression_coverage_for_global_undo_redo_mutations_shortcuts_and_scope_exclusions - Regression coverage for global undo/redo mutations, shortcuts, and scope exclusions
 > From version: 0.9.8
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

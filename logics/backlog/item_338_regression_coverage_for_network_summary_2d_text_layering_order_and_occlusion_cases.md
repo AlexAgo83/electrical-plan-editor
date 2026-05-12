@@ -1,5 +1,6 @@
 ## item_338_regression_coverage_for_network_summary_2d_text_layering_order_and_occlusion_cases - Regression coverage for network summary 2D text layering order and occlusion cases
 > From version: 0.9.6
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

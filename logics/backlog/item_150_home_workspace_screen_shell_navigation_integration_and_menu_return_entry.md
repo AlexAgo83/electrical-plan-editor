@@ -1,5 +1,6 @@
 ## item_150_home_workspace_screen_shell_navigation_integration_and_menu_return_entry - Home Workspace Screen Shell Navigation Integration and Menu Return Entry
 > From version: 0.5.11
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

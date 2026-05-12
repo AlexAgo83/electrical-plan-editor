@@ -1,5 +1,6 @@
 ## item_174_settings_2d_label_rotation_negative_angle_option_extension_and_normalization - Settings 2D Label Rotation Negative-Angle Option Extension and Normalization
 > From version: 0.6.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

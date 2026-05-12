@@ -1,5 +1,6 @@
 ## item_218_onboarding_flow_regression_tests_for_auto_open_opt_out_contextual_steps_and_navigation_cta - Onboarding Flow Regression Tests for Auto-Open, Opt-Out, Contextual Steps, and Navigation CTA
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

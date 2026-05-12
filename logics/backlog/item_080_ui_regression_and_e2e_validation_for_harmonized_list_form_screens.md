@@ -1,5 +1,6 @@
 ## item_080_ui_regression_and_e2e_validation_for_harmonized_list_form_screens - UI Regression and E2E Validation for Harmonized List/Form Screens
 > From version: 0.4.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

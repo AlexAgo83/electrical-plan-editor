@@ -1,5 +1,6 @@
 ## item_333_settings_catalog_and_bom_pricing_setup_with_workspace_currency_and_optional_tax_persistence - Settings catalog and BOM pricing setup with workspace currency and optional tax persistence
 > From version: 0.9.6
+> Status: Done
 > Understanding: 96%
 > Confidence: 91%
 > Progress: 100%

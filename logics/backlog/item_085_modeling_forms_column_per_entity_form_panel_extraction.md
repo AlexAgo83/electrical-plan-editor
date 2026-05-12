@@ -1,5 +1,6 @@
 ## item_085_modeling_forms_column_per_entity_form_panel_extraction - Modeling Forms Column Per-Entity Form Panel Extraction
 > From version: 0.5.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## task_062_req_065_segment_analysis_endpoint_column_split_orchestration_and_delivery_control - req_065 Segment analysis endpoint column split orchestration and delivery control
 > From version: 0.9.8
+> Status: Done
 > Understanding: 100% (scope is locked: split `Endpoints` into ordered `Endpoint A` then `Endpoint B` columns in `Segments > Segment analysis`, with individually sortable split fields and no legacy `Endpoints` header fallback)
 > Confidence: 99% (localized table/sort change delivered and validated with targeted suites plus full matrix)
 > Progress: 100%

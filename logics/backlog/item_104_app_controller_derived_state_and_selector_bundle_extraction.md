@@ -1,5 +1,6 @@
 ## item_104_app_controller_derived_state_and_selector_bundle_extraction - AppController Derived State and Selector Bundle Extraction
 > From version: 0.5.2
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

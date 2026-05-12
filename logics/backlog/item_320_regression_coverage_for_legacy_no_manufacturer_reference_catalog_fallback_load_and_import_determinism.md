@@ -1,5 +1,6 @@
 ## item_320_regression_coverage_for_legacy_no_manufacturer_reference_catalog_fallback_load_and_import_determinism - Regression Coverage for Legacy No-Manufacturer-Reference Catalog Fallback Load and Import Determinism
 > From version: 0.9.5
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_063_inspector_context_floating_bottom_right_panel - Inspector Context Floating Bottom-Right Panel
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100% (floating panel + visibility matrix delivered)

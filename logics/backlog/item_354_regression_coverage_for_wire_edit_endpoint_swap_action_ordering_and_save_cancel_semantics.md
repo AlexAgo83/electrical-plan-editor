@@ -1,5 +1,6 @@
 ## item_354_regression_coverage_for_wire_edit_endpoint_swap_action_ordering_and_save_cancel_semantics - Regression coverage for wire edit endpoint swap action ordering and save/cancel semantics
 > From version: 0.9.8
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

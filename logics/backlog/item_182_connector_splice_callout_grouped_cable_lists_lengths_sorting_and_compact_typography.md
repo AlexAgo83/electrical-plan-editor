@@ -1,5 +1,6 @@
 ## item_182_connector_splice_callout_grouped_cable_lists_lengths_sorting_and_compact_typography - Connector/Splice Callout Grouped Cable Lists, Lengths, Sorting, and Compact Typography
 > From version: 0.6.4
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

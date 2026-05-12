@@ -1,5 +1,6 @@
 ## item_361_workspace_history_snapshot_contract_and_domain_mutation_tracking_for_undo_redo - Workspace history snapshot contract and domain mutation tracking for undo/redo
 > From version: 0.9.8
+> Status: Done
 > Understanding: 97%
 > Confidence: 93%
 > Progress: 100%

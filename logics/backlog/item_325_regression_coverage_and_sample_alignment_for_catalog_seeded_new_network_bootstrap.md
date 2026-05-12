@@ -1,5 +1,6 @@
 ## item_325_regression_coverage_and_sample_alignment_for_catalog_seeded_new_network_bootstrap - Regression Coverage and Sample Alignment for Catalog-Seeded New-Network Bootstrap
 > From version: 0.9.5
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

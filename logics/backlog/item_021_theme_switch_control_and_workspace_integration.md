@@ -1,5 +1,6 @@
 ## item_021_theme_switch_control_and_workspace_integration - Theme Switch Control and Workspace Integration
 > From version: 0.1.0
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_064_pwa_baseline_manifest_icons_and_build_integration - PWA Baseline Manifest, Icons, and Build Integration
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

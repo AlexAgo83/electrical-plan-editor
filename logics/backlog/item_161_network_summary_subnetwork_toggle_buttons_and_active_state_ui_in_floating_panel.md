@@ -1,5 +1,6 @@
 ## item_161_network_summary_subnetwork_toggle_buttons_and_active_state_ui_in_floating_panel - Network Summary Subnetwork Toggle Buttons and Active-State UI in Floating Panel
 > From version: 0.6.2
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_306_network_scoped_network_summary_2d_view_state_persistence_schema_extension_scale_offset_and_canvas_toggles - Network-Scoped Network Summary 2D View-State Persistence Schema Extension (Scale, Offset, and Canvas Toggles)
 > From version: 0.9.2
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
 > Progress: 100%

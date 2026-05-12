@@ -149,6 +149,20 @@ function runVitest(argumentsList) {
   return runNode([vitestEntrypoint, "run", ...argumentsList]);
 }
 
+function runVitestInChunks(argumentsList, testFiles, chunkSize) {
+  for (let index = 0; index < testFiles.length; index += chunkSize) {
+    const chunk = testFiles.slice(index, index + chunkSize);
+    const chunkNumber = Math.floor(index / chunkSize) + 1;
+    const chunkCount = Math.ceil(testFiles.length / chunkSize);
+    console.log(`[test:ci:segmentation] running UI chunk ${chunkNumber}/${chunkCount} (${chunk.length} files)`);
+    const status = runVitest([...argumentsList, ...chunk]);
+    if (status !== 0) {
+      return status;
+    }
+  }
+  return 0;
+}
+
 function runUiSlowTop(argumentsList) {
   const reportSlowTestsScript = path.resolve(process.cwd(), "scripts/quality/report-slowest-tests.mjs");
   return runNode([reportSlowTestsScript, ...argumentsList, ...UI_LANE_TEST_FILES]);
@@ -163,7 +177,7 @@ if (lane === "check") {
 }
 
 if (lane === "ui") {
-  process.exit(runVitest([...userArgs, ...UI_LANE_TEST_FILES]));
+  process.exit(runVitestInChunks(userArgs, UI_LANE_TEST_FILES, 6));
 }
 
 if (lane === "fast") {

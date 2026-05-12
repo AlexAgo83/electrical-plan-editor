@@ -1,5 +1,6 @@
 ## item_158_home_first_startup_lazy_loading_regression_test_expectation_alignment - Home-First Startup Lazy-Loading Regression Test Expectation Alignment
 > From version: 0.6.1
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

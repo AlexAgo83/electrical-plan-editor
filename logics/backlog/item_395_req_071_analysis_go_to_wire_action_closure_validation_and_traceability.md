@@ -1,5 +1,6 @@
 ## item_395_req_071_analysis_go_to_wire_action_closure_validation_and_traceability - req_071 closure: analysis occupancy `Go to` wire action validation and AC traceability
 > From version: 0.9.12
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

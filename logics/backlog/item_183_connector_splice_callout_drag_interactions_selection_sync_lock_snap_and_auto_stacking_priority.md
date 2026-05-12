@@ -1,5 +1,6 @@
 ## item_183_connector_splice_callout_drag_interactions_selection_sync_lock_snap_and_auto_stacking_priority - Connector/Splice Callout Drag Interactions, Selection Sync, Lock/Snap, and Auto Stacking Priority
 > From version: 0.6.4
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

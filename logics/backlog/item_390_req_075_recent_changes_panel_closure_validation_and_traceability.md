@@ -1,5 +1,6 @@
 ## item_390_req_075_recent_changes_panel_closure_validation_and_traceability - req_075 closure: recent-changes panel validation matrix and AC traceability
 > From version: 0.9.14
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

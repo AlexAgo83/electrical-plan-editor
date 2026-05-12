@@ -1,5 +1,6 @@
 ## item_059_workspace_shell_regression_accessibility_and_scroll_behavior - Workspace Shell Regression Accessibility and Scroll Behavior
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100% (regression/accessibility matrix and quality gates closed)

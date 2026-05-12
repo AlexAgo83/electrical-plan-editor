@@ -1,5 +1,6 @@
 ## item_208_post_create_selection_focus_and_form_mode_coherence_with_auto_generated_nodes - Post-Create Selection, Focus, and Form-Mode Coherence with Auto-Generated Nodes
 > From version: 0.7.3
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
 > Progress: 100%

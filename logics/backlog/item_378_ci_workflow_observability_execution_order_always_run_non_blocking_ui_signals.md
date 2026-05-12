@@ -1,5 +1,6 @@
 ## item_378_ci_workflow_observability_execution_order_always_run_non_blocking_ui_signals - CI workflow observability execution order with always-run non-blocking UI signals
 > From version: 0.9.11
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

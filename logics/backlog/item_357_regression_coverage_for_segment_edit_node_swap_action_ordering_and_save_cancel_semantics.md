@@ -1,5 +1,6 @@
 ## item_357_regression_coverage_for_segment_edit_node_swap_action_ordering_and_save_cancel_semantics - Regression coverage for segment edit node swap action ordering and save/cancel semantics
 > From version: 0.9.8
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

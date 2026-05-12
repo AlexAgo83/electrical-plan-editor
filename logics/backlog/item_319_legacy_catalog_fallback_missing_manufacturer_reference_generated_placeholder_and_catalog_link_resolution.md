@@ -1,5 +1,6 @@
 ## item_319_legacy_catalog_fallback_missing_manufacturer_reference_generated_placeholder_and_catalog_link_resolution - Legacy Catalog Fallback Missing Manufacturer Reference Generated Placeholder and Catalog Link Resolution
 > From version: 0.9.5
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

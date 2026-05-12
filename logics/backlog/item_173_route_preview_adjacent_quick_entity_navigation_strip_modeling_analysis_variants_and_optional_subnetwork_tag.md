@@ -1,5 +1,6 @@
 ## item_173_route_preview_adjacent_quick_entity_navigation_strip_modeling_analysis_variants_and_optional_subnetwork_tag - Route-Preview-Adjacent Quick Entity Navigation Strip (Modeling/Analysis Variants and Optional Subnetwork Tag)
 > From version: 0.6.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

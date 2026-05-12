@@ -1,5 +1,6 @@
 ## item_031_canvas_preferences_and_navigation_hook_extraction - Canvas Preferences and Navigation Hook Extraction
 > From version: 0.1.0
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

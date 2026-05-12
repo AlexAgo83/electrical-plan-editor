@@ -1,5 +1,6 @@
 ## item_248_wire_endpoint_connection_seal_reference_regression_tests - Wire Endpoint Connection/Seal Reference Regression Tests
 > From version: 0.7.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

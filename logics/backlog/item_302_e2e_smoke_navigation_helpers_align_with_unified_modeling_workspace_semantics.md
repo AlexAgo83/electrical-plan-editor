@@ -1,5 +1,6 @@
 ## item_302_e2e_smoke_navigation_helpers_align_with_unified_modeling_workspace_semantics - E2E Smoke Navigation Helpers Align with Unified Modeling Workspace Semantics
 > From version: 0.9.2
+> Status: Done
 > Understanding: 96%
 > Confidence: 95%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_254_req_042_wire_filter_bar_field_selector_and_layout_closure_ci_build_and_ac_traceability - req_042 Filter Bar (Wires + Network Scope) Closure (CI, Build, and AC Traceability)
 > From version: 0.7.3
+> Status: Done
 > Understanding: 97%
 > Confidence: 96%
 > Progress: 100%

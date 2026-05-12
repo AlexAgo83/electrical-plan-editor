@@ -1,5 +1,6 @@
 ## item_056_workspace_header_sticky_and_navigation_drawer_overlay - Workspace Header Sticky and Navigation Drawer Overlay
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 98%
 > Progress: 100%

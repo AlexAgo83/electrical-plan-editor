@@ -1,5 +1,6 @@
 ## item_217_onboarding_modal_visual_design_assets_bold_emphasis_responsive_and_accessibility_polish - Onboarding Modal Visual Design, Assets, Bold Emphasis, Responsive, and Accessibility Polish
 > From version: 0.7.3
+> Status: Done
 > Understanding: 97%
 > Confidence: 94%
 > Progress: 100%

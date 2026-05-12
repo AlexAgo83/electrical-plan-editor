@@ -1,5 +1,6 @@
 ## item_256_wire_metadata_follow_up_surfacing_for_section_mm2_and_color_in_tables_inspector_and_optional_exports - Wire Metadata Follow-up Surfacing for Section mm2 and Color in Tables/Inspector (and Optional Exports)
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

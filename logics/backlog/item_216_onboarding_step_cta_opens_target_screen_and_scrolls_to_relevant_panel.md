@@ -1,5 +1,6 @@
 ## item_216_onboarding_step_cta_opens_target_screen_and_scrolls_to_relevant_panel - Onboarding Step CTA Opens Target Screen and Scrolls to Relevant Panel
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

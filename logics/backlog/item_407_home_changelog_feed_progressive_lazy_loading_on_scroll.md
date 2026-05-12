@@ -1,5 +1,6 @@
 ## item_407_home_changelog_feed_progressive_lazy_loading_on_scroll - Home changelog feed progressive lazy loading on scroll
 > From version: 0.9.16
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

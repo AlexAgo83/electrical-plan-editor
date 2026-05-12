@@ -1,5 +1,6 @@
 ## item_184_callout_visibility_png_export_and_canvas_default_apply_interoperability - Callout Visibility, PNG Export, and Canvas Default Apply Interoperability
 > From version: 0.6.4
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_316_onboarding_catalog_step_insertion_catalog_first_guidance_and_contextual_actions - Onboarding Catalog Step Insertion, Catalog-First Guidance, and Contextual Actions
 > From version: 0.9.4
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
 > Progress: 100%

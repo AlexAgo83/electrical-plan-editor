@@ -1,5 +1,6 @@
 ## task_058_req_061_circle_mobility_brand_theme_presets_light_and_dark_orchestration_and_delivery_control - req_061 Circle Mobility brand theme presets (light and dark) orchestration and delivery control
 > From version: 0.9.7
+> Status: Done
 > Understanding: 100% (delivered: theme mode contract, Circle Mobility palette mapping, CSS surface overrides, regression coverage)
 > Confidence: 96% (implementation validated on targeted theme/settings suites; remaining visual tuning can iterate without contract changes)
 > Progress: 100%

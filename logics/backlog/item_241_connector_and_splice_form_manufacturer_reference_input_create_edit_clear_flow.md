@@ -1,5 +1,6 @@
 ## item_241_connector_and_splice_form_manufacturer_reference_input_create_edit_clear_flow - Connector and Splice Form `Manufacturer reference` Input (Create/Edit/Clear Flow)
 > From version: 0.7.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

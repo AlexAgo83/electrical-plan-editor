@@ -1,5 +1,6 @@
 ## item_121_workspace_shell_regression_desktop_breakpoint_overlay_accessibility_coverage - Workspace Shell Regression Desktop/Breakpoint Overlay Accessibility Coverage
 > From version: 0.5.5
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

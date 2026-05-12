@@ -1,5 +1,6 @@
 ## item_266_table_panel_action_row_help_button_alignment_and_network_scope_export_action - Table Panel Action-Row Help Alignment and Network Scope Export Action
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

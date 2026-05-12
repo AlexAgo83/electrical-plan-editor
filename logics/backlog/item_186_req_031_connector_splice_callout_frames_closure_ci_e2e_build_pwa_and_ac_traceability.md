@@ -1,5 +1,6 @@
 ## item_186_req_031_connector_splice_callout_frames_closure_ci_e2e_build_pwa_and_ac_traceability - req_031 Connector/Splice Callout Frames Closure (CI / E2E / Build / PWA / AC Traceability)
 > From version: 0.6.4
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

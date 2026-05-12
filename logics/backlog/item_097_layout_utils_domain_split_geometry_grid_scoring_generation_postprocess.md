@@ -1,5 +1,6 @@
 ## item_097_layout_utils_domain_split_geometry_grid_scoring_generation_postprocess - Layout Utils Domain Split (Geometry / Grid / Scoring / Generation / Postprocess)
 > From version: 0.5.1
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

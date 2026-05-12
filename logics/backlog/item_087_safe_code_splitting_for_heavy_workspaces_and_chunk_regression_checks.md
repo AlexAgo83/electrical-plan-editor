@@ -1,5 +1,6 @@
 ## item_087_safe_code_splitting_for_heavy_workspaces_and_chunk_regression_checks - Safe Code Splitting for Heavy Workspaces and Chunk Regression Checks
 > From version: 0.5.0
+> Status: Done
 > Understanding: 96%
 > Confidence: 92%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_117_workspace_shell_regression_tests_hidden_overlay_tab_focus_coverage - Workspace Shell Regression Tests for Hidden Overlay Tab/Focus Coverage
 > From version: 0.5.4
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

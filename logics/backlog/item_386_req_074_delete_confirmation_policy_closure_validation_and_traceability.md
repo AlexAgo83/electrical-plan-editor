@@ -1,5 +1,6 @@
 ## item_386_req_074_delete_confirmation_policy_closure_validation_and_traceability - req_074 closure: delete-confirmation policy validation matrix and AC traceability
 > From version: 0.9.14
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

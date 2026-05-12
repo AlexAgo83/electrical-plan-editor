@@ -1,5 +1,6 @@
 ## item_265_connector_splice_auto_node_creation_checkbox_and_settings_default_preset - Connector/Splice Auto-Node Creation Checkbox and Settings Default Preset
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

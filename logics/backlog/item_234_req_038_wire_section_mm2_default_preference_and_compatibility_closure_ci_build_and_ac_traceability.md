@@ -1,5 +1,6 @@
 ## item_234_req_038_wire_section_mm2_default_preference_and_compatibility_closure_ci_build_and_ac_traceability - req_038 Wire `sectionMm2` Default Preference and Compatibility Closure (CI, Build, and AC Traceability)
 > From version: 0.7.3
+> Status: Done
 > Understanding: 97%
 > Confidence: 96%
 > Progress: 100%

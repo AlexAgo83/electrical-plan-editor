@@ -1,5 +1,6 @@
 ## item_090_empty_workspace_persistence_contract_and_sample_bootstrap_rule_fix - Empty Workspace Persistence Contract and Sample Bootstrap Rule Fix
 > From version: 0.5.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

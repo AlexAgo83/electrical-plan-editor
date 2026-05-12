@@ -1,5 +1,6 @@
 ## item_394_req_070_home_workspace_changelog_feed_closure_validation_and_traceability - req_070 closure: Home panel reorder and changelog feed validation with AC traceability
 > From version: 0.9.12
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_191_network_summary_2d_suppress_empty_connector_splice_callouts_and_leader_lines - Network Summary 2D Suppress Empty Connector/Splice Callouts and Leader Lines
 > From version: 0.7.2
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

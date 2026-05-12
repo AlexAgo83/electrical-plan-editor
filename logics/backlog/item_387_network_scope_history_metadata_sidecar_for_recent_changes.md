@@ -1,5 +1,6 @@
 ## item_387_network_scope_history_metadata_sidecar_for_recent_changes - Network Scope history metadata sidecar for recent-changes rendering
 > From version: 0.9.14
+> Status: Done
 > Understanding: 96%
 > Confidence: 93%
 > Progress: 100%

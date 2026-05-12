@@ -1,5 +1,6 @@
 ## item_046_app_helpers_types_and_validation_hook_extraction - App Helpers, Types and Validation Hook Extraction
 > From version: 0.2.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

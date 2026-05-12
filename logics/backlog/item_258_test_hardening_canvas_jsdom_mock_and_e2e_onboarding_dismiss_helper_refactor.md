@@ -1,5 +1,6 @@
 ## item_258_test_hardening_canvas_jsdom_mock_and_e2e_onboarding_dismiss_helper_refactor - Test Hardening: Canvas JSDOM Mock and E2E Onboarding Dismiss Helper Refactor
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

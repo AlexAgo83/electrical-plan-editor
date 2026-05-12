@@ -1,5 +1,6 @@
 ## item_014_network_aggregate_and_store_partitioning - Network Aggregate and Store Partitioning
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

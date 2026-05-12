@@ -1,5 +1,6 @@
 ## item_114_app_shell_overlay_accessibility_and_focus_isolation_hardening - App Shell Overlay Accessibility and Focus Isolation Hardening
 > From version: 0.5.4
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

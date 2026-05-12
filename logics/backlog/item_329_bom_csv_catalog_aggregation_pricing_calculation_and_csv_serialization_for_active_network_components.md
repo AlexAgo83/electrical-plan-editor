@@ -1,5 +1,6 @@
 ## item_329_bom_csv_catalog_aggregation_pricing_calculation_and_csv_serialization_for_active_network_components - BOM CSV Catalog Aggregation, Pricing Calculation, and CSV Serialization for Active-Network Components
 > From version: 0.9.5
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

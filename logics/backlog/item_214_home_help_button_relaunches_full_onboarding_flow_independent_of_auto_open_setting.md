@@ -1,5 +1,6 @@
 ## item_214_home_help_button_relaunches_full_onboarding_flow_independent_of_auto_open_setting - Home Help Button Relaunches Full Onboarding Flow Independent of Auto-Open Setting
 > From version: 0.7.3
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_287_wire_color_mode_persisted_semantic_state_for_none_catalog_and_free - Wire Color Mode Persisted Semantic State for None/Catalog/Free
 > From version: 0.8.1
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

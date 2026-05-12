@@ -1,5 +1,6 @@
 ## task_057_req_060_accessibility_hardening_for_network_summary_modal_and_semantics_orchestration_and_delivery_control - req_060 accessibility hardening for network summary, modal, and semantics orchestration and delivery control
 > From version: 0.9.6
+> Status: Done
 > Understanding: 99% (all six req_060 accessibility fixes are covered across SVG semantics, modal focus, tables, Validation rows, and issue counters)
 > Confidence: 96% (changes are stable and validated by focused UI tests plus the full CI/e2e matrix)
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_051_crossing_minimized_initial_layout_heuristics - Crossing-Minimized Initial Layout Heuristics
 > From version: 0.2.0
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_105_app_controller_hook_dependency_config_builder_simplification - AppController Hook Dependency Config Builder Simplification
 > From version: 0.5.2
+> Status: Done
 > Understanding: 97%
 > Confidence: 94%
 > Progress: 100%

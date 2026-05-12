@@ -1,5 +1,6 @@
 ## item_058_global_settings_relocation_and_default_preference_update - Global Settings Relocation and Default Preference Update
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 98%
 > Progress: 100%

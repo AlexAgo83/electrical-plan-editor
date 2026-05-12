@@ -1,5 +1,6 @@
 ## item_362_undo_redo_ui_actions_shortcuts_and_input_focus_guard_integration - Undo/redo UI actions, shortcuts, and input-focus guard integration
 > From version: 0.9.8
+> Status: Done
 > Understanding: 96%
 > Confidence: 92%
 > Progress: 100%

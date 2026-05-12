@@ -1,5 +1,6 @@
 ## item_303_e2e_table_assertions_use_resilient_column_targeting_instead_of_brittle_cell_indexes - E2E Table Assertions Use Resilient Column Targeting Instead of Brittle Cell Indexes
 > From version: 0.9.2
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
 > Progress: 100%

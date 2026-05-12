@@ -1,5 +1,6 @@
 ## item_317_regression_coverage_for_catalog_screen_catalog_first_connector_splice_integration_and_legacy_fallback - Regression Coverage for Catalog Screen, Catalog-First Connector/Splice Integration, and Legacy Fallback
 > From version: 0.9.4
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

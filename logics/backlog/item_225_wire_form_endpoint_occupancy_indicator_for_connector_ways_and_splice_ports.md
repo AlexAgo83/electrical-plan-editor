@@ -1,5 +1,6 @@
 ## item_225_wire_form_endpoint_occupancy_indicator_for_connector_ways_and_splice_ports - Wire Form Endpoint Occupancy Indicator for Connector Ways and Splice Ports
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

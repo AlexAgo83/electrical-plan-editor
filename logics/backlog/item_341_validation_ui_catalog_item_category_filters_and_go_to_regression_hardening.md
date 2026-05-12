@@ -1,5 +1,6 @@
 ## item_341_validation_ui_catalog_item_category_filters_and_go_to_regression_hardening - Validation UI catalog item category filters and go-to regression hardening
 > From version: 0.9.6
+> Status: Done
 > Understanding: 98%
 > Confidence: 94%
 > Progress: 100%

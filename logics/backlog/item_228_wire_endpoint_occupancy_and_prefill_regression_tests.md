@@ -1,5 +1,6 @@
 ## item_228_wire_endpoint_occupancy_and_prefill_regression_tests - Wire Endpoint Occupancy and Prefill Regression Tests
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

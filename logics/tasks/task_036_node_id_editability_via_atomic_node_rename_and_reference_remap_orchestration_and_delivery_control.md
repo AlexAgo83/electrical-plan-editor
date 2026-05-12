@@ -1,5 +1,6 @@
 ## task_036_node_id_editability_via_atomic_node_rename_and_reference_remap_orchestration_and_delivery_control - Node ID Editability via Atomic Node Rename and Reference Remap Orchestration and Delivery Control
 > From version: 0.7.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_112_app_controller_wave_5_loc_reduction_measurement_and_regression_tracking - AppController Wave 5 LOC Reduction Measurement and Regression Tracking
 > From version: 0.5.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

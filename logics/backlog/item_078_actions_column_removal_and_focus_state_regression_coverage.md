@@ -1,5 +1,6 @@
 ## item_078_actions_column_removal_and_focus_state_regression_coverage - Actions Column Removal and Focus-State Regression Coverage
 > From version: 0.4.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

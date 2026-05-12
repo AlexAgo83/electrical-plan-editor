@@ -1,5 +1,6 @@
 ## item_366_wire_form_fuse_mode_controls_conditional_reference_inputs_and_save_cancel_semantics - Wire form fuse-mode controls, conditional reference inputs, and save/cancel semantics
 > From version: 0.9.8
+> Status: Done
 > Understanding: 96%
 > Confidence: 92%
 > Progress: 100%

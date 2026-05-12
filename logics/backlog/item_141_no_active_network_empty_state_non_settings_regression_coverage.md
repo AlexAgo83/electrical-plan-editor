@@ -1,5 +1,6 @@
 ## item_141_no_active_network_empty_state_non_settings_regression_coverage - No-Active-Network Empty-State Non-Settings Regression Coverage
 > From version: 0.5.9
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

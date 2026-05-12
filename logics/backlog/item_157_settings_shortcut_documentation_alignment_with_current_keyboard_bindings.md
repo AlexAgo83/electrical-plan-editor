@@ -1,5 +1,6 @@
 ## item_157_settings_shortcut_documentation_alignment_with_current_keyboard_bindings - Settings Shortcut Documentation Alignment with Current Keyboard Bindings
 > From version: 0.6.1
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

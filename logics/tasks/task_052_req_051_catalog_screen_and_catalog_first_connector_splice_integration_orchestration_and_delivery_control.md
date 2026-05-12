@@ -1,5 +1,6 @@
 ## task_052_req_051_catalog_screen_and_catalog_first_connector_splice_integration_orchestration_and_delivery_control - req_051 Orchestration: Catalog Screen and Catalog-First Connector/Splice Integration Delivery Control
 > From version: 0.9.4
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_404_req_077_hardening_bundle_closure_validation_and_traceability - req_077 closure: hardening bundle validation matrix and AC traceability
 > From version: 0.9.16
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

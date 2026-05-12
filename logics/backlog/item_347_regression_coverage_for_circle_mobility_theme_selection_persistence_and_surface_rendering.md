@@ -1,5 +1,6 @@
 ## item_347_regression_coverage_for_circle_mobility_theme_selection_persistence_and_surface_rendering - Regression coverage for Circle Mobility theme selection, persistence, and surface rendering
 > From version: 0.9.7
+> Status: Done
 > Understanding: 100%
 > Confidence: 97%
 > Progress: 100%

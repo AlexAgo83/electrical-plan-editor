@@ -1,5 +1,6 @@
 ## item_269_shared_table_sortability_completion_audit_and_column_comparator_rollout - Shared Table Sortability Completion Audit and Column Comparator Rollout
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

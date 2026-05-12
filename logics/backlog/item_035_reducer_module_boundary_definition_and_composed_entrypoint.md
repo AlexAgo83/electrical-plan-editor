@@ -1,5 +1,6 @@
 ## item_035_reducer_module_boundary_definition_and_composed_entrypoint - Reducer Module Boundary Definition and Composed Entrypoint
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

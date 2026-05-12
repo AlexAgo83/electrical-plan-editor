@@ -1,5 +1,6 @@
 ## item_311_network_scoped_catalog_domain_model_store_schema_and_catalog_item_id_link_contract - Network-Scoped Catalog Domain Model, Store Schema, and catalogItemId Link Contract
 > From version: 0.9.4
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

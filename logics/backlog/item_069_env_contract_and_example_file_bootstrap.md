@@ -1,5 +1,6 @@
 ## item_069_env_contract_and_example_file_bootstrap - Env Contract and Example File Bootstrap
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 99%
 > Progress: 100%

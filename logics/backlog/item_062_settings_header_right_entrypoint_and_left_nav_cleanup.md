@@ -1,5 +1,6 @@
 ## item_062_settings_header_right_entrypoint_and_left_nav_cleanup - Settings Header Right Entrypoint and Left Nav Cleanup
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 98%
 > Progress: 100%

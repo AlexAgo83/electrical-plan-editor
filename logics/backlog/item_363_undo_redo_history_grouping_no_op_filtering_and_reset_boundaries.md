@@ -1,5 +1,6 @@
 ## item_363_undo_redo_history_grouping_no_op_filtering_and_reset_boundaries - Undo/redo history grouping, no-op filtering, and reset boundaries
 > From version: 0.9.8
+> Status: Done
 > Understanding: 96%
 > Confidence: 91%
 > Progress: 100%

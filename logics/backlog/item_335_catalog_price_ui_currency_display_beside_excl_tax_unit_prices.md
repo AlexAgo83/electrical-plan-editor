@@ -1,5 +1,6 @@
 ## item_335_catalog_price_ui_currency_display_beside_excl_tax_unit_prices - Catalog price UI currency display beside excl-tax unit prices
 > From version: 0.9.6
+> Status: Done
 > Understanding: 94%
 > Confidence: 92%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_380_ui_test_reliability_stabilization_wave_1_for_top_slow_specs - UI test reliability stabilization wave 1 for top slow/unstable specs
 > From version: 0.9.11
+> Status: Done
 > Understanding: 97%
 > Confidence: 93%
 > Progress: 100%

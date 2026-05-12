@@ -1,5 +1,6 @@
 ## item_050_layout_state_schema_and_persistence_migration - Layout State Schema and Persistence Migration
 > From version: 0.2.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

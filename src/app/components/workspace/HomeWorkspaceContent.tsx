@@ -1,8 +1,6 @@
-import { useEffect, useId, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { lazy, Suspense, useEffect, useId, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
-import { HOME_CHANGELOG_ENTRIES } from "../../lib/changelogFeed";
+import { HOME_CHANGELOG_ENTRY_SUMMARIES, loadHomeChangelogEntryContent } from "../../lib/changelogFeed";
 
 const CHANGELOG_INITIAL_BATCH_SIZE = 4;
 const CHANGELOG_INCREMENT_BATCH_SIZE = 4;
@@ -57,6 +55,24 @@ interface ChangelogSectionsSplit {
 
 const MAJOR_HIGHLIGHTS_SECTION_TITLE = "Major Highlights";
 const LEVEL_TWO_HEADING_MATCHER = /^ {0,3}##\s+(.+?)\s*#*\s*$/;
+
+const MarkdownBlock = lazy(async () => {
+  const [{ default: ReactMarkdown }, { default: remarkGfm }] = await Promise.all([import("react-markdown"), import("remark-gfm")]);
+
+  return {
+    default: function LoadedMarkdownBlock({ content }: { content: string }): ReactElement {
+      return <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>;
+    }
+  };
+});
+
+function ChangelogMarkdownBlock({ content }: { content: string }): ReactElement {
+  return (
+    <Suspense fallback={<p className="meta-line">Loading changelog...</p>}>
+      <MarkdownBlock content={content} />
+    </Suspense>
+  );
+}
 
 function normalizeHeadingTitle(value: string): string {
   return value.trim().toLowerCase();
@@ -131,13 +147,13 @@ function ChangelogEntryMarkdown({ content }: { content: string }): ReactElement 
   const collapsibleSectionsIdPrefix = useId();
 
   if (collapsibleSections === null) {
-    return <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>;
+    return <ChangelogMarkdownBlock content={content} />;
   }
 
   return (
     <>
       {collapsibleSections.beforeCollapsibleSections.length > 0 ? (
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{collapsibleSections.beforeCollapsibleSections}</ReactMarkdown>
+        <ChangelogMarkdownBlock content={collapsibleSections.beforeCollapsibleSections} />
       ) : null}
       {collapsibleSections.collapsibleSections.map((section, index) => {
         const panelId = `${collapsibleSectionsIdPrefix}-${index}`;
@@ -162,7 +178,7 @@ function ChangelogEntryMarkdown({ content }: { content: string }): ReactElement 
             {isExpanded ? (
               <div id={panelId} className="home-changelog-collapsible-content">
                 {section.body.length > 0 ? (
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.body}</ReactMarkdown>
+                  <ChangelogMarkdownBlock content={section.body} />
                 ) : (
                   <p className="meta-line">No listed changes in this section.</p>
                 )}
@@ -204,16 +220,46 @@ export function HomeWorkspaceContent({
 
   const hasPostMvpModules = homeExtensionEntries.some(([, , content]) => content !== undefined && content !== null);
   const [visibleChangelogCount, setVisibleChangelogCount] = useState(() =>
-    Math.min(CHANGELOG_INITIAL_BATCH_SIZE, HOME_CHANGELOG_ENTRIES.length)
+    Math.min(CHANGELOG_INITIAL_BATCH_SIZE, HOME_CHANGELOG_ENTRY_SUMMARIES.length)
   );
+  const [changelogContentBySourcePath, setChangelogContentBySourcePath] = useState<Record<string, string>>({});
   const changelogScrollContainerRef = useRef<HTMLDivElement | null>(null);
   const changelogSentinelRef = useRef<HTMLDivElement | null>(null);
-  const canLoadMoreChangelogs = visibleChangelogCount < HOME_CHANGELOG_ENTRIES.length;
-  const visibleChangelogEntries = HOME_CHANGELOG_ENTRIES.slice(0, visibleChangelogCount);
+  const canLoadMoreChangelogs = visibleChangelogCount < HOME_CHANGELOG_ENTRY_SUMMARIES.length;
+  const visibleChangelogEntries = HOME_CHANGELOG_ENTRY_SUMMARIES.slice(0, visibleChangelogCount);
 
   useEffect(() => {
-    setVisibleChangelogCount(Math.min(CHANGELOG_INITIAL_BATCH_SIZE, HOME_CHANGELOG_ENTRIES.length));
+    setVisibleChangelogCount(Math.min(CHANGELOG_INITIAL_BATCH_SIZE, HOME_CHANGELOG_ENTRY_SUMMARIES.length));
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const missingEntries = visibleChangelogEntries.filter((entry) => changelogContentBySourcePath[entry.sourcePath] === undefined);
+    if (missingEntries.length === 0) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    void Promise.all(
+      missingEntries.map(async (entry) => [entry.sourcePath, await loadHomeChangelogEntryContent(entry.sourcePath)] as const)
+    ).then((loadedEntries) => {
+      if (cancelled) {
+        return;
+      }
+      setChangelogContentBySourcePath((current) => {
+        const next = { ...current };
+        for (const [sourcePath, content] of loadedEntries) {
+          next[sourcePath] = content;
+        }
+        return next;
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [changelogContentBySourcePath, visibleChangelogEntries]);
 
   useEffect(() => {
     if (!canLoadMoreChangelogs) {
@@ -221,7 +267,7 @@ export function HomeWorkspaceContent({
     }
 
     if (typeof IntersectionObserver !== "function") {
-      setVisibleChangelogCount(HOME_CHANGELOG_ENTRIES.length);
+      setVisibleChangelogCount(HOME_CHANGELOG_ENTRY_SUMMARIES.length);
       return;
     }
 
@@ -238,7 +284,7 @@ export function HomeWorkspaceContent({
           return;
         }
         setVisibleChangelogCount((current) =>
-          Math.min(current + CHANGELOG_INCREMENT_BATCH_SIZE, HOME_CHANGELOG_ENTRIES.length)
+          Math.min(current + CHANGELOG_INCREMENT_BATCH_SIZE, HOME_CHANGELOG_ENTRY_SUMMARIES.length)
         );
       },
       {
@@ -375,19 +421,22 @@ export function HomeWorkspaceContent({
           data-visible-changelog-count={visibleChangelogCount}
           data-locale-exempt="true"
         >
-          {HOME_CHANGELOG_ENTRIES.length === 0 ? (
+          {HOME_CHANGELOG_ENTRY_SUMMARIES.length === 0 ? (
             <p className="empty-copy">No changelog available.</p>
           ) : (
-            visibleChangelogEntries.map((entry) => (
-              <article key={entry.sourcePath} className="home-changelog-entry" aria-label={`Changelog v${entry.version}`}>
-                <h3 className="home-changelog-version-heading" data-changelog-version={entry.version}>
-                  v{entry.version}
-                </h3>
-                <div className="home-changelog-markdown">
-                  <ChangelogEntryMarkdown content={entry.content} />
-                </div>
-              </article>
-            ))
+            visibleChangelogEntries.map((entry) => {
+              const content = changelogContentBySourcePath[entry.sourcePath];
+              return (
+                <article key={entry.sourcePath} className="home-changelog-entry" aria-label={`Changelog v${entry.version}`}>
+                  <h3 className="home-changelog-version-heading" data-changelog-version={entry.version}>
+                    v{entry.version}
+                  </h3>
+                  <div className="home-changelog-markdown">
+                    {content === undefined ? <p className="meta-line">Loading changelog...</p> : <ChangelogEntryMarkdown content={content} />}
+                  </div>
+                </article>
+              );
+            })
           )}
           {canLoadMoreChangelogs ? <div ref={changelogSentinelRef} className="home-changelog-sentinel" aria-hidden="true" /> : null}
         </div>

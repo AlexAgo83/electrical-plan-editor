@@ -1,5 +1,6 @@
 ## item_215_contextual_info_buttons_open_independent_single_step_onboarding_modals_in_relevant_panels - Contextual Info Buttons Open Independent Single-Step Onboarding Modals in Relevant Panels
 > From version: 0.7.3
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

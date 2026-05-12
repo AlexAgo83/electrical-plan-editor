@@ -1,5 +1,6 @@
 ## item_374_bundle_size_measurement_reporting_and_non_blocking_budget_baseline - Bundle size measurement, reporting, and non-blocking budget baseline
 > From version: 0.9.10
+> Status: Done
 > Understanding: 94%
 > Confidence: 90%
 > Progress: 100%

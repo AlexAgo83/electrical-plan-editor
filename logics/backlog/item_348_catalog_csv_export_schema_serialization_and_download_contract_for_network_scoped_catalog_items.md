@@ -1,5 +1,6 @@
 ## item_348_catalog_csv_export_schema_serialization_and_download_contract_for_network_scoped_catalog_items - Catalog CSV export schema, serialization, and download contract for network-scoped catalog items
 > From version: 0.9.8
+> Status: Done
 > Understanding: 97%
 > Confidence: 94%
 > Progress: 100%

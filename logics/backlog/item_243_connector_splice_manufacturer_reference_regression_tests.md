@@ -1,5 +1,6 @@
 ## item_243_connector_splice_manufacturer_reference_regression_tests - Connector/Splice Manufacturer Reference Regression Tests
 > From version: 0.7.3
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_055_network_scope_screen_and_primary_navigation_restructure - Network Scope Screen and Primary Navigation Restructure
 > From version: 0.3.0
+> Status: Done
 > Understanding: 100%
 > Confidence: 98%
 > Progress: 100%

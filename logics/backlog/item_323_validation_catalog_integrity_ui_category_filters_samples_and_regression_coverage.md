@@ -1,5 +1,6 @@
 ## item_323_validation_catalog_integrity_ui_category_filters_samples_and_regression_coverage - Validation Catalog Integrity UI Category Filters, Samples, and Regression Coverage
 > From version: 0.9.5
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

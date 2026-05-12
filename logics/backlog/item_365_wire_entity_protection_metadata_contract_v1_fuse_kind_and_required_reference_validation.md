@@ -1,5 +1,6 @@
 ## item_365_wire_entity_protection_metadata_contract_v1_fuse_kind_and_required_reference_validation - Wire entity protection metadata contract V1 (`fuse`) and required catalog association validation
 > From version: 0.9.8
+> Status: Done
 > Understanding: 95%
 > Confidence: 92%
 > Progress: 100%

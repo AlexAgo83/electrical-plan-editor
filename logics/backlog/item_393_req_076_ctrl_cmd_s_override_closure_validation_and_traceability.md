@@ -1,5 +1,6 @@
 ## item_393_req_076_ctrl_cmd_s_override_closure_validation_and_traceability - req_076 closure: Ctrl/Cmd+S override validation and AC traceability
 > From version: 0.9.14
+> Status: Done
 > Understanding: 95%
 > Confidence: 91%
 > Progress: 100%

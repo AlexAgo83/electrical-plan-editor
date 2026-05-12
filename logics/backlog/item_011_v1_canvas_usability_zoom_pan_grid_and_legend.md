@@ -1,5 +1,6 @@
 ## item_011_v1_canvas_usability_zoom_pan_grid_and_legend - V1 Canvas Usability (Zoom, Pan, Grid, Legend)
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

@@ -1,5 +1,6 @@
 ## item_120_workspace_suspense_active_screen_scoping_and_inactive_lazy_isolation - Workspace Suspense Active-Screen Scoping and Inactive Lazy Isolation
 > From version: 0.5.5
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

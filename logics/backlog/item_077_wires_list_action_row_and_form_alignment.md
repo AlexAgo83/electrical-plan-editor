@@ -1,5 +1,6 @@
 ## item_077_wires_list_action_row_and_form_alignment - Wires List Action Row and Form Alignment
 > From version: 0.4.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

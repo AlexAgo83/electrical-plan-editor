@@ -1,5 +1,6 @@
 ## item_261_req_043_follow_up_rollout_hardening_and_closure_ci_build_pwa_e2e_traceability - req_043 Follow-up Rollout, Hardening, and Closure CI/Build/PWA/E2E Traceability
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

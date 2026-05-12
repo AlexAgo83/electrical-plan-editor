@@ -1,5 +1,6 @@
 ## item_353_wire_edit_form_swap_action_ui_placement_between_save_and_cancel_and_edit_mode_visibility - Wire edit form swap action UI placement between Save and Cancel and edit-mode visibility
 > From version: 0.9.8
+> Status: Done
 > Understanding: 100% (placement, icon usage, and exact V1 label `Swap endpoints` are explicit for `Edit Wire`)
 > Confidence: 97%
 > Progress: 100%

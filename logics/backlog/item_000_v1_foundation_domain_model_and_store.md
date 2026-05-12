@@ -1,5 +1,6 @@
 ## item_000_v1_foundation_domain_model_and_store - V1 Foundation Domain Model and Store
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

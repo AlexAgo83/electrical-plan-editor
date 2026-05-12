@@ -1,5 +1,6 @@
 ## item_331_regression_coverage_fixtures_and_png_non_regression_for_bom_csv_export - Regression Coverage, Fixtures, and PNG Non-Regression for BOM CSV Export
 > From version: 0.9.5
+> Status: Done
 > Understanding: 99% (CSV icon regression expectation added)
 > Confidence: 96% (BOM header regression scope clarified)
 > Progress: 100%

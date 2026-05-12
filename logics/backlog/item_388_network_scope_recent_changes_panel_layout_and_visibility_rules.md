@@ -1,5 +1,6 @@
 ## item_388_network_scope_recent_changes_panel_layout_and_visibility_rules - Network Scope recent-changes panel layout and visibility rules
 > From version: 0.9.14
+> Status: Done
 > Understanding: 97%
 > Confidence: 94%
 > Progress: 100%

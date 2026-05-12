@@ -1,5 +1,6 @@
 ## item_244_req_040_manufacturer_reference_for_connectors_and_splices_closure_ci_build_and_ac_traceability - req_040 Manufacturer Reference for Connectors and Splices Closure (CI, Build, and AC Traceability)
 > From version: 0.7.3
+> Status: Done
 > Understanding: 97%
 > Confidence: 96%
 > Progress: 100%

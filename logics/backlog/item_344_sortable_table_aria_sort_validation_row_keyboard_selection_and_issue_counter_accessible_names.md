@@ -1,5 +1,6 @@
 ## item_344_sortable_table_aria_sort_validation_row_keyboard_selection_and_issue_counter_accessible_names - Sortable table aria-sort, Validation row keyboard selection, and issue counter accessible names
 > From version: 0.9.6
+> Status: Done
 > Understanding: 99%
 > Confidence: 95%
 > Progress: 100%

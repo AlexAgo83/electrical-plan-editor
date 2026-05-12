@@ -1,5 +1,6 @@
 ## item_152_home_workspace_quick_shortcuts_and_quick_preferences_modules - Home Workspace Quick Shortcuts and Quick Preferences Modules
 > From version: 0.5.11
+> Status: Done
 > Understanding: 99%
 > Confidence: 96%
 > Progress: 100%

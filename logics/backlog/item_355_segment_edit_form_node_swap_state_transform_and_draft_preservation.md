@@ -1,5 +1,6 @@
 ## item_355_segment_edit_form_node_swap_state_transform_and_draft_preservation - Segment edit form node swap state transform and draft preservation
 > From version: 0.9.8
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

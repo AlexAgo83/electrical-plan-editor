@@ -1,5 +1,5 @@
-import * as ExcelJS from "exceljs";
 import { buildCsvContent, type CsvCellValue } from "./csv";
+import type { Workbook, Worksheet } from "exceljs";
 
 export type TabularExportFormat = "csv" | "xlsx";
 
@@ -9,7 +9,7 @@ export interface TabularWorksheetExport {
   rows: CsvCellValue[][];
   freezeHeaderRow?: boolean;
   autoFilter?: boolean;
-  configureWorksheet?: (worksheet: ExcelJS.Worksheet) => void;
+  configureWorksheet?: (worksheet: Worksheet) => void;
 }
 
 function normalizeFileName(value: string): string {
@@ -24,7 +24,7 @@ function measureCellWidth(value: CsvCellValue): number {
   return String(value).length;
 }
 
-function addWorksheet(workbook: ExcelJS.Workbook, sheet: TabularWorksheetExport): void {
+function addWorksheet(workbook: Workbook, sheet: TabularWorksheetExport): void {
   const worksheet = workbook.addWorksheet(sheet.name);
   worksheet.addRow(sheet.headers);
   for (const row of sheet.rows) {
@@ -105,6 +105,7 @@ export async function downloadTabularWorkbookFile(
   filenameBase: string,
   sheets: TabularWorksheetExport[]
 ): Promise<void> {
+  const ExcelJS = await import("exceljs");
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "electrical-plan-editor";
   workbook.created = new Date();

@@ -1,5 +1,6 @@
 ## item_295_network_scope_action_area_open_button_and_two_row_grouping_rework - Network Scope Action Area `Open` Button and Two-Row Grouping Rework
 > From version: 0.9.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

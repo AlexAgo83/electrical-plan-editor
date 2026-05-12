@@ -1,5 +1,6 @@
 ## task_054_req_057_catalog_and_bom_pricing_settings_orchestration_and_delivery_control - req_057 catalog and BOM pricing settings orchestration and delivery control
 > From version: 0.9.6
+> Status: Done
 > Understanding: 97% (scope decisions locked: EUR default, 20% TVA default, workspace scope, optional tax with greyed rate field)
 > Confidence: 91% (delivery can be sequenced cleanly on top of req_051/req_056 surfaces)
 > Progress: 100%

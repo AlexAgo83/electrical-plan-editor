@@ -1,5 +1,6 @@
 ## item_293_connectors_splices_analysis_wire_entries_show_name_subrow_beneath_technical_id - Connectors/Splices Analysis Wire Entries Show Name Subrow Beneath Technical ID
 > From version: 0.9.1
+> Status: Done
 > Understanding: 98%
 > Confidence: 95%
 > Progress: 100%

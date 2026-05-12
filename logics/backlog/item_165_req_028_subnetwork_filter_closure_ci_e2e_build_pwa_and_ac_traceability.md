@@ -1,5 +1,6 @@
 ## item_165_req_028_subnetwork_filter_closure_ci_e2e_build_pwa_and_ac_traceability - req_028 Subnetwork Filter Closure (CI / E2E / Build / PWA / AC Traceability)
 > From version: 0.6.2
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

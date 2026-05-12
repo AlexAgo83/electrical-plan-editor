@@ -1,5 +1,6 @@
 ## item_179_connector_splice_callout_position_persistence_in_network_model_and_schema_normalization - Connector/Splice Callout Position Persistence in Network Model and Schema Normalization
 > From version: 0.6.4
+> Status: Done
 > Understanding: 97%
 > Confidence: 95%
 > Progress: 100%

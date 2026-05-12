@@ -1,5 +1,6 @@
 ## item_399_app_release_version_single_source_of_truth_from_package_json - App release version single source of truth from package.json
 > From version: 0.9.16
+> Status: Done
 > Understanding: 95%
 > Confidence: 92%
 > Progress: 100%

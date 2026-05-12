@@ -1,5 +1,6 @@
 ## item_015_network_selector_and_active_scope_navigation - Network Selector and Active Scope Navigation
 > From version: 0.1.0
+> Status: Done
 > Understanding: 98%
 > Confidence: 96%
 > Progress: 100%

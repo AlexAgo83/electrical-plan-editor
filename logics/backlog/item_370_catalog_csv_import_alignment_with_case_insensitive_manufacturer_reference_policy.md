@@ -1,5 +1,6 @@
 ## item_370_catalog_csv_import_alignment_with_case_insensitive_manufacturer_reference_policy - Catalog CSV import alignment with case-insensitive manufacturer-reference policy
 > From version: 0.9.10
+> Status: Done
 > Understanding: 94%
 > Confidence: 90%
 > Progress: 100%

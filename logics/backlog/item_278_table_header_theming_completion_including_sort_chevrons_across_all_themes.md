@@ -1,5 +1,6 @@
 ## item_278_table_header_theming_completion_including_sort_chevrons_across_all_themes - Table Header Theming Completion Including Sort Chevrons Across All Themes
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

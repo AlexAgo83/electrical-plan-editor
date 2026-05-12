@@ -1,5 +1,6 @@
 ## item_007_v1_local_persistence_and_save_schema_versioning - V1 Local Persistence and Save Schema Versioning
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%

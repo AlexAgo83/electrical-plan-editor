@@ -1,5 +1,6 @@
 ## task_044_req_043_manual_qa_checklist_req_035_to_req_043_follow_up_bundle - Manual QA Checklist for req_035 to req_043 Follow-up Bundle
 > From version: 0.8.1
+> Status: Done
 > Understanding: 99%
 > Confidence: 95%
 > Progress: 100%

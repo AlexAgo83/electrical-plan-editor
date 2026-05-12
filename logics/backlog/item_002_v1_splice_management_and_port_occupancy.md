@@ -1,5 +1,6 @@
 ## item_002_v1_splice_management_and_port_occupancy - V1 Splice Management and Port Occupancy
 > From version: 0.1.0
+> Status: Done
 > Understanding: 99%
 > Confidence: 97%
 > Progress: 100%
