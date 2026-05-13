@@ -20,6 +20,18 @@ interface ModelingCatalogFormPanelProps {
   setCatalogUnitPriceExclTax: (value: string) => void;
   catalogUrl: string;
   setCatalogUrl: (value: string) => void;
+  catalogAllSameTerminals: boolean;
+  setCatalogAllSameTerminals: (value: boolean) => void;
+  catalogDefaultTerminalReference: string;
+  setCatalogDefaultTerminalReference: (value: string) => void;
+  catalogDefaultTerminalName: string;
+  setCatalogDefaultTerminalName: (value: string) => void;
+  catalogDefaultSealReference: string;
+  setCatalogDefaultSealReference: (value: string) => void;
+  catalogDefaultSealName: string;
+  setCatalogDefaultSealName: (value: string) => void;
+  catalogPlugDefinitionsText: string;
+  setCatalogPlugDefinitionsText: (value: string) => void;
   catalogManufacturerReferenceAlreadyUsed: boolean;
   cancelCatalogEdit: () => void;
   catalogFormError: string | null;
@@ -41,6 +53,18 @@ export function ModelingCatalogFormPanel({
   setCatalogUnitPriceExclTax,
   catalogUrl,
   setCatalogUrl,
+  catalogAllSameTerminals,
+  setCatalogAllSameTerminals,
+  catalogDefaultTerminalReference,
+  setCatalogDefaultTerminalReference,
+  catalogDefaultTerminalName,
+  setCatalogDefaultTerminalName,
+  catalogDefaultSealReference,
+  setCatalogDefaultSealReference,
+  catalogDefaultSealName,
+  setCatalogDefaultSealName,
+  catalogPlugDefinitionsText,
+  setCatalogPlugDefinitionsText,
   catalogManufacturerReferenceAlreadyUsed,
   cancelCatalogEdit,
   catalogFormError
@@ -125,6 +149,58 @@ export function ModelingCatalogFormPanel({
               </a>
             </div>
           ) : null}
+          <fieldset className="inline-fieldset">
+            <legend>Connector material defaults</legend>
+            <label className="settings-checkbox">
+              <input
+                type="checkbox"
+                checked={catalogAllSameTerminals}
+                onChange={(event) => setCatalogAllSameTerminals(event.target.checked)}
+              />
+              All same terminals
+            </label>
+            <label>
+              Default terminal reference
+              <input
+                value={catalogDefaultTerminalReference}
+                onChange={(event) => setCatalogDefaultTerminalReference(event.target.value)}
+                placeholder="Optional terminal ref"
+              />
+            </label>
+            <label>
+              Default terminal name
+              <input
+                value={catalogDefaultTerminalName}
+                onChange={(event) => setCatalogDefaultTerminalName(event.target.value)}
+                placeholder="Optional terminal name"
+              />
+            </label>
+            <label>
+              Default seal reference
+              <input
+                value={catalogDefaultSealReference}
+                onChange={(event) => setCatalogDefaultSealReference(event.target.value)}
+                placeholder="Optional seal ref"
+              />
+            </label>
+            <label>
+              Default seal name
+              <input
+                value={catalogDefaultSealName}
+                onChange={(event) => setCatalogDefaultSealName(event.target.value)}
+                placeholder="Optional seal name"
+              />
+            </label>
+            <label>
+              Plug definitions
+              <textarea
+                value={catalogPlugDefinitionsText}
+                onChange={(event) => setCatalogPlugDefinitionsText(event.target.value)}
+                placeholder={"PLUG-REF,2,Plug name\nPLUG-ALT,1"}
+                rows={3}
+              />
+            </label>
+          </fieldset>
           <div className="row-actions">
             <button type="submit" className="button-with-icon" disabled={catalogManufacturerReferenceAlreadyUsed || hasUrlValidationError}>
               {catalogFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}

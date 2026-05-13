@@ -171,6 +171,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceTaxRatePercent,
     tabularExportFormat,
     bomExportCompactColumns,
+    bomTraceabilityLabelsHidden,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     spliceSectionImbalanceRatioPercent,
@@ -205,7 +206,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceTaxEnabled,
     workspaceTaxRatePercent,
     tabularExportFormat,
-    bomExportCompactColumns
+    bomExportCompactColumns,
+    bomTraceabilityLabelsHidden,
+    connectorCavityOccupancy: state.connectorCavityOccupancy
   });
   const { effectiveNetworkViewWidth, effectiveNetworkViewHeight, handleNetworkSummaryViewportSizeChange } = useAppControllerNetworkViewportState({ canvasResizeBehaviorMode });
   const { headerOffsetPx, headerBlockRef } = useAppControllerHeaderOffsetState();
@@ -518,6 +521,18 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCatalogUnitPriceExclTax: formsState.setCatalogUnitPriceExclTax,
     catalogUrl: formsState.catalogUrl,
     setCatalogUrl: formsState.setCatalogUrl,
+    catalogAllSameTerminals: formsState.catalogAllSameTerminals,
+    setCatalogAllSameTerminals: formsState.setCatalogAllSameTerminals,
+    catalogDefaultTerminalReference: formsState.catalogDefaultTerminalReference,
+    setCatalogDefaultTerminalReference: formsState.setCatalogDefaultTerminalReference,
+    catalogDefaultTerminalName: formsState.catalogDefaultTerminalName,
+    setCatalogDefaultTerminalName: formsState.setCatalogDefaultTerminalName,
+    catalogDefaultSealReference: formsState.catalogDefaultSealReference,
+    setCatalogDefaultSealReference: formsState.setCatalogDefaultSealReference,
+    catalogDefaultSealName: formsState.catalogDefaultSealName,
+    setCatalogDefaultSealName: formsState.setCatalogDefaultSealName,
+    catalogPlugDefinitionsText: formsState.catalogPlugDefinitionsText,
+    setCatalogPlugDefinitionsText: formsState.setCatalogPlugDefinitionsText,
     setCatalogFormError: formsState.setCatalogFormError
   });
 

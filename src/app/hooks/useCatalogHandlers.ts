@@ -31,6 +31,18 @@ interface UseCatalogHandlersParams {
   setCatalogUnitPriceExclTax: (value: string) => void;
   catalogUrl: string;
   setCatalogUrl: (value: string) => void;
+  catalogAllSameTerminals?: boolean;
+  setCatalogAllSameTerminals?: (value: boolean) => void;
+  catalogDefaultTerminalReference?: string;
+  setCatalogDefaultTerminalReference?: (value: string) => void;
+  catalogDefaultTerminalName?: string;
+  setCatalogDefaultTerminalName?: (value: string) => void;
+  catalogDefaultSealReference?: string;
+  setCatalogDefaultSealReference?: (value: string) => void;
+  catalogDefaultSealName?: string;
+  setCatalogDefaultSealName?: (value: string) => void;
+  catalogPlugDefinitionsText?: string;
+  setCatalogPlugDefinitionsText?: (value: string) => void;
   setCatalogFormError: (value: string | null) => void;
 }
 
@@ -64,8 +76,29 @@ export function useCatalogHandlers({
   setCatalogUnitPriceExclTax,
   catalogUrl,
   setCatalogUrl,
+  catalogAllSameTerminals = false,
+  setCatalogAllSameTerminals = () => {},
+  catalogDefaultTerminalReference = "",
+  setCatalogDefaultTerminalReference = () => {},
+  catalogDefaultTerminalName = "",
+  setCatalogDefaultTerminalName = () => {},
+  catalogDefaultSealReference = "",
+  setCatalogDefaultSealReference = () => {},
+  catalogDefaultSealName = "",
+  setCatalogDefaultSealName = () => {},
+  catalogPlugDefinitionsText = "",
+  setCatalogPlugDefinitionsText = () => {},
   setCatalogFormError
 }: UseCatalogHandlersParams) {
+  function clearCatalogMaterialDefaults(): void {
+    setCatalogAllSameTerminals(false);
+    setCatalogDefaultTerminalReference("");
+    setCatalogDefaultTerminalName("");
+    setCatalogDefaultSealReference("");
+    setCatalogDefaultSealName("");
+    setCatalogPlugDefinitionsText("");
+  }
+
   function clearCatalogForm(): void {
     setCatalogFormMode("idle");
     setEditingCatalogItemId(null);
@@ -74,6 +107,7 @@ export function useCatalogHandlers({
     setCatalogName("");
     setCatalogUnitPriceExclTax("");
     setCatalogUrl("");
+    clearCatalogMaterialDefaults();
     setCatalogFormError(null);
   }
 
@@ -85,6 +119,7 @@ export function useCatalogHandlers({
     setCatalogName("");
     setCatalogUnitPriceExclTax("");
     setCatalogUrl("");
+    clearCatalogMaterialDefaults();
     setCatalogFormError(null);
   }
 
@@ -101,6 +136,16 @@ export function useCatalogHandlers({
     setCatalogName(item.name ?? "");
     setCatalogUnitPriceExclTax(item.unitPriceExclTax === undefined ? "" : String(item.unitPriceExclTax));
     setCatalogUrl(item.url ?? "");
+    setCatalogAllSameTerminals(item.connectorDefaults?.allSameTerminals === true);
+    setCatalogDefaultTerminalReference(item.connectorDefaults?.defaultTerminal?.terminalReference ?? "");
+    setCatalogDefaultTerminalName(item.connectorDefaults?.defaultTerminal?.terminalName ?? "");
+    setCatalogDefaultSealReference(item.connectorDefaults?.defaultTerminal?.sealReference ?? "");
+    setCatalogDefaultSealName(item.connectorDefaults?.defaultTerminal?.sealName ?? "");
+    setCatalogPlugDefinitionsText(
+      item.connectorDefaults?.plugs
+        ?.map((plug) => [plug.plugReference, plug.quantity, plug.plugName ?? ""].join(","))
+        .join("\n") ?? ""
+    );
     setCatalogFormError(null);
     dispatchAction(appActions.select({ kind: "catalog", id: item.id }), { trackHistory: false });
   }
@@ -117,6 +162,19 @@ export function useCatalogHandlers({
     const connectionCount = Number.isInteger(parsedConnectionCount) && parsedConnectionCount > 0 ? parsedConnectionCount : 0;
     const unitPriceExclTax = normalizeOptionalNumber(catalogUnitPriceExclTax);
     const url = catalogUrl.trim();
+    const plugDefinitions = catalogPlugDefinitionsText
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .map((line) => {
+        const [reference = "", quantityText = "", name = ""] = line.split(",").map((part) => part.trim());
+        const quantity = Number(quantityText);
+        return {
+          plugReference: reference,
+          quantity: Number.isInteger(quantity) && quantity > 0 ? quantity : Number.NaN,
+          plugName: name.length === 0 ? undefined : name
+        };
+      });
 
     if (manufacturerReference.length === 0) {
       setCatalogFormError("Manufacturer reference is required.");
@@ -138,6 +196,10 @@ export function useCatalogHandlers({
       setCatalogFormError("URL must be empty or a valid absolute http/https URL.");
       return;
     }
+    if (plugDefinitions.some((plug) => plug.plugReference.length === 0 || Number.isNaN(plug.quantity))) {
+      setCatalogFormError("Plug definitions must use one line per plug: reference,quantity,name.");
+      return;
+    }
     setCatalogFormError(null);
 
     const existing =
@@ -156,7 +218,17 @@ export function useCatalogHandlers({
         connectionCount,
         name: catalogName.trim().length === 0 ? undefined : catalogName.trim(),
         unitPriceExclTax,
-        url: url.length === 0 ? undefined : url
+        url: url.length === 0 ? undefined : url,
+        connectorDefaults: {
+          allSameTerminals: catalogAllSameTerminals ? true : undefined,
+          defaultTerminal: {
+            terminalReference: catalogDefaultTerminalReference.trim() || undefined,
+            terminalName: catalogDefaultTerminalName.trim() || undefined,
+            sealReference: catalogDefaultSealReference.trim() || undefined,
+            sealName: catalogDefaultSealName.trim() || undefined
+          },
+          plugs: plugDefinitions.length > 0 ? plugDefinitions : undefined
+        }
       })
     );
 

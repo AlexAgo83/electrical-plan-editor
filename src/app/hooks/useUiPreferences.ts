@@ -16,7 +16,7 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 6;
+const UI_PREFERENCES_SCHEMA_VERSION = 7;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 function normalizeThemeMode(value: unknown): ThemeMode {
@@ -113,6 +113,7 @@ interface UiPreferencesPayload {
   workspaceTaxRatePercent: number;
   tabularExportFormat: TabularExportFormat;
   bomExportCompactColumns: boolean;
+  bomTraceabilityLabelsHidden: boolean;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
   spliceSectionImbalanceRatioPercent: number;
@@ -202,6 +203,15 @@ function migrateUiPreferencesFromV5(candidate: Record<string, unknown>): Record<
   };
 }
 
+function migrateUiPreferencesFromV6(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    bomTraceabilityLabelsHidden:
+      typeof candidate.bomTraceabilityLabelsHidden === "boolean" ? candidate.bomTraceabilityLabelsHidden : false,
+    schemaVersion: 7
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -244,6 +254,11 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
       version = 6;
       continue;
     }
+    if (version === 6) {
+      migrated = migrateUiPreferencesFromV6(migrated);
+      version = 7;
+      continue;
+    }
     return null;
   }
 
@@ -277,6 +292,7 @@ interface UseUiPreferencesOptions {
   workspaceTaxRatePercent: number;
   tabularExportFormat: TabularExportFormat;
   bomExportCompactColumns: boolean;
+  bomTraceabilityLabelsHidden: boolean;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
   spliceSectionImbalanceRatioPercent: number;
@@ -321,6 +337,7 @@ interface UseUiPreferencesOptions {
   setWorkspaceTaxRatePercent: (value: number) => void;
   setTabularExportFormat: (value: TabularExportFormat) => void;
   setBomExportCompactColumns: (value: boolean) => void;
+  setBomTraceabilityLabelsHidden: (value: boolean) => void;
   setDefaultWireSectionMm2: (value: number) => void;
   setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
   setSpliceSectionImbalanceRatioPercent: (value: number) => void;
@@ -466,6 +483,7 @@ export function useUiPreferences({
   workspaceTaxRatePercent,
   tabularExportFormat,
   bomExportCompactColumns,
+  bomTraceabilityLabelsHidden,
   defaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
   spliceSectionImbalanceRatioPercent,
@@ -510,6 +528,7 @@ export function useUiPreferences({
   setWorkspaceTaxRatePercent,
   setTabularExportFormat,
   setBomExportCompactColumns,
+  setBomTraceabilityLabelsHidden,
   setDefaultWireSectionMm2,
   setDefaultAutoCreateLinkedNodes,
   setSpliceSectionImbalanceRatioPercent,
@@ -638,6 +657,7 @@ export function useUiPreferences({
       setWorkspaceTaxRatePercent(normalizeWorkspaceTaxRatePercent(preferences.workspaceTaxRatePercent));
       setTabularExportFormat(preferences.tabularExportFormat === "xlsx" ? "xlsx" : "csv");
       setBomExportCompactColumns(preferences.bomExportCompactColumns === true);
+      setBomTraceabilityLabelsHidden(preferences.bomTraceabilityLabelsHidden === true);
       setDefaultWireSectionMm2(defaultWireSectionMm2Value);
       setDefaultAutoCreateLinkedNodes(defaultAutoCreateLinkedNodesValue);
       setSpliceSectionImbalanceRatioPercent(spliceSectionImbalanceRatioPercentValue);
@@ -777,6 +797,7 @@ export function useUiPreferences({
     setTableFontSize,
     setTabularExportFormat,
     setBomExportCompactColumns,
+    setBomTraceabilityLabelsHidden,
     setWorkspaceCurrencyCode,
     setWorkspaceTaxEnabled,
     setWorkspaceTaxRatePercent,
@@ -804,6 +825,7 @@ export function useUiPreferences({
       workspaceTaxRatePercent,
       tabularExportFormat,
       bomExportCompactColumns,
+      bomTraceabilityLabelsHidden,
       defaultWireSectionMm2,
       defaultAutoCreateLinkedNodes,
       spliceSectionImbalanceRatioPercent,
@@ -883,6 +905,7 @@ export function useUiPreferences({
     workspaceTaxRatePercent,
     tabularExportFormat,
     bomExportCompactColumns,
+    bomTraceabilityLabelsHidden,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     spliceSectionImbalanceRatioPercent,

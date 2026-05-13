@@ -56,6 +56,8 @@ interface SettingsWorkspaceContentProps {
   setTabularExportFormat: (value: TabularExportFormat) => void;
   bomExportCompactColumns: boolean;
   setBomExportCompactColumns: (value: boolean) => void;
+  bomTraceabilityLabelsHidden: boolean;
+  setBomTraceabilityLabelsHidden: (value: boolean) => void;
   defaultWireSectionMm2: number;
   setDefaultWireSectionMm2: (value: number) => void;
   defaultAutoCreateLinkedNodes: boolean;
@@ -166,6 +168,8 @@ export function SettingsWorkspaceContent({
   setTabularExportFormat,
   bomExportCompactColumns,
   setBomExportCompactColumns,
+  bomTraceabilityLabelsHidden,
+  setBomTraceabilityLabelsHidden,
   defaultWireSectionMm2,
   setDefaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
@@ -738,6 +742,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setBomExportCompactColumns(event.target.checked)}
             />
             Compact BOM export columns
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={bomTraceabilityLabelsHidden}
+              onChange={(event) => setBomTraceabilityLabelsHidden(event.target.checked)}
+            />
+            Hide BOM traceability labels
           </label>
           <label className="settings-field">
             Tax rate (%)

@@ -4,6 +4,7 @@ import type {
   Connector,
   Splice,
 } from "../core/entities";
+import { normalizeConnectorCatalogDefaults, normalizeConnectorTerminalMaterial } from "../core/connectorCatalogMaterials";
 import { DIRECTIONAL_SPLICE_PORT_COUNT, normalizeSplicePortMode, resolveSplicePortMode } from "../core/splicePortMode";
 import type { EntityState, NetworkScopedState } from "./types";
 
@@ -95,7 +96,8 @@ export function normalizeCatalogItem(candidate: Partial<CatalogItem>): CatalogIt
     connectionCount,
     name: normalizeCatalogName(candidate.name),
     unitPriceExclTax: normalizeCatalogUnitPriceExclTax(candidate.unitPriceExclTax),
-    url: normalizeCatalogUrl(candidate.url)
+    url: normalizeCatalogUrl(candidate.url),
+    connectorDefaults: normalizeConnectorCatalogDefaults(candidate.connectorDefaults, connectionCount)
   };
 }
 
@@ -231,8 +233,32 @@ function syncConnectorFromCatalog(connector: Connector, catalogItem: CatalogItem
     ...connector,
     catalogItemId: catalogItem.id,
     manufacturerReference: catalogItem.manufacturerReference,
-    cavityCount: catalogItem.connectionCount
+    cavityCount: catalogItem.connectionCount,
+    applyCatalogPlugs: connector.applyCatalogPlugs === false ? false : undefined,
+    applyCatalogSeals: connector.applyCatalogSeals === false ? false : undefined,
+    terminalOverrides: normalizeConnectorTerminalOverrides(connector.terminalOverrides, catalogItem.connectionCount)
   };
+}
+
+function normalizeConnectorTerminalOverrides(
+  overrides: Connector["terminalOverrides"],
+  cavityCount: number
+): Connector["terminalOverrides"] {
+  if (overrides === undefined) {
+    return undefined;
+  }
+  const normalized: NonNullable<Connector["terminalOverrides"]> = {};
+  for (const [key, value] of Object.entries(overrides)) {
+    const cavityIndex = Number(key);
+    if (!Number.isInteger(cavityIndex) || cavityIndex < 1 || cavityIndex > cavityCount) {
+      continue;
+    }
+    const material = normalizeConnectorTerminalMaterial(value);
+    if (material !== undefined) {
+      normalized[cavityIndex] = material;
+    }
+  }
+  return Object.keys(normalized).length === 0 ? undefined : normalized;
 }
 
 function syncSpliceFromCatalog(splice: Splice, catalogItem: CatalogItem): Splice {

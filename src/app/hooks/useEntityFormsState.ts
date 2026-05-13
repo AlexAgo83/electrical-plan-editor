@@ -21,6 +21,12 @@ export function useEntityFormsState() {
   const [catalogName, setCatalogName] = useState("");
   const [catalogUnitPriceExclTax, setCatalogUnitPriceExclTax] = useState("");
   const [catalogUrl, setCatalogUrl] = useState("");
+  const [catalogAllSameTerminals, setCatalogAllSameTerminals] = useState(false);
+  const [catalogDefaultTerminalReference, setCatalogDefaultTerminalReference] = useState("");
+  const [catalogDefaultTerminalName, setCatalogDefaultTerminalName] = useState("");
+  const [catalogDefaultSealReference, setCatalogDefaultSealReference] = useState("");
+  const [catalogDefaultSealName, setCatalogDefaultSealName] = useState("");
+  const [catalogPlugDefinitionsText, setCatalogPlugDefinitionsText] = useState("");
   const [catalogFormError, setCatalogFormError] = useState<string | null>(null);
 
   const [connectorFormMode, setConnectorFormMode] = useState<"idle" | "create" | "edit">("idle");
@@ -31,6 +37,9 @@ export function useEntityFormsState() {
   const [connectorCatalogItemId, setConnectorCatalogItemId] = useState("");
   const [connectorManufacturerReference, setConnectorManufacturerReference] = useState("");
   const [connectorIsMainHarnessConnector, setConnectorIsMainHarnessConnector] = useState(false);
+  const [connectorApplyCatalogPlugs, setConnectorApplyCatalogPlugs] = useState(true);
+  const [connectorApplyCatalogSeals, setConnectorApplyCatalogSeals] = useState(true);
+  const [connectorTerminalOverridesText, setConnectorTerminalOverridesText] = useState("");
   const [connectorAutoCreateLinkedNode, setConnectorAutoCreateLinkedNode] = useState(true);
   const [cavityCount, setCavityCount] = useState("4");
   const [cavityIndexInput, setCavityIndexInput] = useState("1");
@@ -129,6 +138,18 @@ export function useEntityFormsState() {
     setCatalogUnitPriceExclTax,
     catalogUrl,
     setCatalogUrl,
+    catalogAllSameTerminals,
+    setCatalogAllSameTerminals,
+    catalogDefaultTerminalReference,
+    setCatalogDefaultTerminalReference,
+    catalogDefaultTerminalName,
+    setCatalogDefaultTerminalName,
+    catalogDefaultSealReference,
+    setCatalogDefaultSealReference,
+    catalogDefaultSealName,
+    setCatalogDefaultSealName,
+    catalogPlugDefinitionsText,
+    setCatalogPlugDefinitionsText,
     catalogFormError,
     setCatalogFormError,
     connectorFormMode,
@@ -147,6 +168,12 @@ export function useEntityFormsState() {
     setConnectorManufacturerReference,
     connectorIsMainHarnessConnector,
     setConnectorIsMainHarnessConnector,
+    connectorApplyCatalogPlugs,
+    setConnectorApplyCatalogPlugs,
+    connectorApplyCatalogSeals,
+    setConnectorApplyCatalogSeals,
+    connectorTerminalOverridesText,
+    setConnectorTerminalOverridesText,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     cavityCount,

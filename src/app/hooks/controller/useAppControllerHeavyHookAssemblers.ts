@@ -84,6 +84,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setWorkspaceCurrencyCode"
     | "setWorkspaceTaxEnabled"
     | "setWorkspaceTaxRatePercent"
+    | "setBomTraceabilityLabelsHidden"
     | "setDefaultWireSectionMm2"
     | "setDefaultAutoCreateLinkedNodes"
     | "setDefaultSortField"

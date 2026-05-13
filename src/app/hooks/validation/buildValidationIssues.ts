@@ -11,6 +11,7 @@ import type {
   Wire,
   WireEndpoint
 } from "../../../core/entities";
+import { resolveConnectorPlugMaterials } from "../../../core/connectorCatalogMaterials";
 import { portIndexToSpliceSide } from "../../../core/directionalSplice";
 import { isSplicePortIndexValid, resolveSplicePortMode } from "../../../core/splicePortMode";
 import type { AppStore } from "../../../store";
@@ -286,6 +287,23 @@ export function buildValidationIssues({
           severity: "error",
           category: catalogIntegrityCategory,
           message: `Connector '${connector.technicalId}' way count (${connector.cavityCount}) does not match catalog '${linkedCatalogItem.manufacturerReference}' connection count (${linkedCatalogItem.connectionCount}).`,
+          subScreen: "connector",
+          selectionKind: "connector",
+          selectionId: connector.id
+        });
+      }
+      const plugResolution = resolveConnectorPlugMaterials(
+        connector,
+        linkedCatalogItem,
+        wires,
+        state.connectorCavityOccupancy
+      );
+      for (const warning of plugResolution.warnings) {
+        issues.push({
+          id: `connector-catalog-material-${warning.code.toLowerCase()}-${connector.id}`,
+          severity: "warning",
+          category: catalogIntegrityCategory,
+          message: warning.message,
           subScreen: "connector",
           selectionKind: "connector",
           selectionId: connector.id

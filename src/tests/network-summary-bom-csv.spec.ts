@@ -316,4 +316,106 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     expect(exported.itemRowCount).toBe(1);
     expect(exported.rows).toContainEqual(["Wire termination", "1108503", "", "", 3, "", 3, "", "", "", ""]);
   });
+
+  it("applies catalog terminal, seal, and unused-cavity plug defaults with traceability labels", () => {
+    const catalogItems: CatalogItem[] = [
+      {
+        id: asCatalogItemId("CAT-CONN"),
+        manufacturerReference: "CONN-4",
+        connectionCount: 4,
+        connectorDefaults: {
+          allSameTerminals: true,
+          defaultTerminal: {
+            terminalReference: "TERM-DEFAULT",
+            sealReference: "SEAL-DEFAULT"
+          },
+          plugs: [{ plugReference: "PLUG-A", quantity: 2 }]
+        }
+      }
+    ];
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-001",
+        cavityCount: 4,
+        catalogItemId: asCatalogItemId("CAT-CONN")
+      }
+    ];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "W-1",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 2 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 10,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const exported = buildNetworkSummaryBomCsvExport(catalogItems, connectors, [], wires, "EUR", true, 20, false, {
+      showTraceabilityLabels: true
+    });
+
+    expect(exported.headers).toContain("Origin");
+    expect(exported.warnings).toEqual([]);
+    expect(exported.rows).toContainEqual(["Wire termination", "PLUG-A", "", "", 2, "", 2, "catalog default", "", "", "", ""]);
+    expect(exported.rows).toContainEqual(["Wire termination", "SEAL-DEFAULT", "", "", 2, "", 2, "catalog default", "", "", "", ""]);
+    expect(exported.rows).toContainEqual(["Wire termination", "TERM-DEFAULT", "", "", 2, "", 2, "catalog default", "", "", "", ""]);
+  });
+
+  it("keeps plug and seal opt-outs independent and reports plug quantity warnings without blocking BOM output", () => {
+    const catalogItems: CatalogItem[] = [
+      {
+        id: asCatalogItemId("CAT-CONN"),
+        manufacturerReference: "CONN-3",
+        connectionCount: 3,
+        connectorDefaults: {
+          allSameTerminals: true,
+          defaultTerminal: {
+            terminalReference: "TERM-DEFAULT",
+            sealReference: "SEAL-DEFAULT"
+          },
+          plugs: [{ plugReference: "PLUG-A", quantity: 3 }]
+        }
+      }
+    ];
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-001",
+        cavityCount: 3,
+        catalogItemId: asCatalogItemId("CAT-CONN"),
+        applyCatalogSeals: false
+      }
+    ];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "W-1",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 10,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const exported = buildNetworkSummaryBomCsvExport(catalogItems, connectors, [], wires);
+
+    expect(exported.warnings).toEqual(["Connector 'C-001' has 2 unused cavities but 3 catalog plug quantities."]);
+    expect(exported.rows).toContainEqual(["Wire termination", "PLUG-A", "", "", 3, "", 3, "", "", "", ""]);
+    expect(exported.rows).toContainEqual(["Wire termination", "TERM-DEFAULT", "", "", 1, "", 1, "", "", "", ""]);
+    expect(exported.rows.some((row) => row[1] === "SEAL-DEFAULT")).toBe(false);
+  });
 });

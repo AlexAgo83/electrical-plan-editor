@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 import type { CatalogItem, Connector, Splice, Wire } from "../../../core/entities";
+import type { ConnectorCavityOccupancyMap } from "../../../core/connectorCatalogMaterials";
 import { buildNetworkSummaryBomCsvExport, buildNetworkSummaryBomWorkbookSheets } from "../../lib/networkSummaryBomCsv";
 import { downloadTabularCsvOrXlsxFile, downloadTabularWorkbookFile, type TabularExportFormat } from "../../lib/tabularExport";
 import type { WorkspaceCurrencyCode } from "../../types/app-controller";
@@ -14,6 +15,8 @@ interface UseAppControllerBomExportHandlersParams {
   workspaceTaxRatePercent: number;
   tabularExportFormat: TabularExportFormat;
   bomExportCompactColumns: boolean;
+  bomTraceabilityLabelsHidden: boolean;
+  connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
 }
 
 export function useAppControllerBomExportHandlers({
@@ -25,7 +28,9 @@ export function useAppControllerBomExportHandlers({
   workspaceTaxEnabled,
   workspaceTaxRatePercent,
   tabularExportFormat,
-  bomExportCompactColumns
+  bomExportCompactColumns,
+  bomTraceabilityLabelsHidden,
+  connectorCavityOccupancy
 }: UseAppControllerBomExportHandlersParams) {
   const networkSummaryBomCsvExport = useMemo(
     () =>
@@ -37,9 +42,24 @@ export function useAppControllerBomExportHandlers({
         workspaceCurrencyCode,
         workspaceTaxEnabled,
         workspaceTaxRatePercent,
-        bomExportCompactColumns
+        bomExportCompactColumns,
+        {
+          connectorCavityOccupancy,
+          showTraceabilityLabels: !bomTraceabilityLabelsHidden
+        }
       ),
-    [catalogItems, connectors, splices, wires, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent, bomExportCompactColumns]
+    [
+      bomExportCompactColumns,
+      bomTraceabilityLabelsHidden,
+      catalogItems,
+      connectorCavityOccupancy,
+      connectors,
+      splices,
+      wires,
+      workspaceCurrencyCode,
+      workspaceTaxEnabled,
+      workspaceTaxRatePercent
+    ]
   );
 
   const canExportBomCsv = networkSummaryBomCsvExport.itemRowCount > 0;
@@ -60,7 +80,11 @@ export function useAppControllerBomExportHandlers({
           workspaceCurrencyCode,
           workspaceTaxEnabled,
           workspaceTaxRatePercent,
-          bomExportCompactColumns
+          bomExportCompactColumns,
+          {
+            connectorCavityOccupancy,
+            showTraceabilityLabels: !bomTraceabilityLabelsHidden
+          }
         )
       );
       return;
@@ -80,8 +104,10 @@ export function useAppControllerBomExportHandlers({
     );
   }, [
     bomExportCompactColumns,
+    bomTraceabilityLabelsHidden,
     canExportBomCsv,
     catalogItems,
+    connectorCavityOccupancy,
     connectors,
     networkSummaryBomCsvExport.headers,
     networkSummaryBomCsvExport.rows,

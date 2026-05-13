@@ -13,6 +13,7 @@ import {
 import { normalizeNetworkVoltageV, normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeWireEndpointReferenceName } from "../../core/wireReferences";
+import { normalizeConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
 import {
   DIRECTIONAL_SPLICE_PORT_COUNT,
   normalizeSplicePortMode,
@@ -207,6 +208,9 @@ function normalizeConnectorEntityState(
       ...connector,
       isMainHarnessConnector: connector.isMainHarnessConnector === true ? true : undefined,
       isTerminalConnector: connector.isTerminalConnector === true ? true : undefined,
+      applyCatalogPlugs: connector.applyCatalogPlugs === false ? false : undefined,
+      applyCatalogSeals: connector.applyCatalogSeals === false ? false : undefined,
+      terminalOverrides: normalizeConnectorTerminalOverrides(connector.terminalOverrides, connector.cavityCount),
       manufacturerReference: normalizeManufacturerReference((connector as Partial<Connector>).manufacturerReference)
     };
   }
@@ -215,6 +219,27 @@ function normalizeConnectorEntityState(
     allIds: [...candidate.allIds],
     byId
   };
+}
+
+function normalizeConnectorTerminalOverrides(
+  overrides: Connector["terminalOverrides"],
+  cavityCount: number
+): Connector["terminalOverrides"] {
+  if (overrides === undefined || typeof overrides !== "object") {
+    return undefined;
+  }
+  const normalized: NonNullable<Connector["terminalOverrides"]> = {};
+  for (const [key, value] of Object.entries(overrides)) {
+    const cavityIndex = Number(key);
+    if (!Number.isInteger(cavityIndex) || cavityIndex < 1 || cavityIndex > cavityCount) {
+      continue;
+    }
+    const material = normalizeConnectorTerminalMaterial(value);
+    if (material !== undefined) {
+      normalized[cavityIndex] = material;
+    }
+  }
+  return Object.keys(normalized).length === 0 ? undefined : normalized;
 }
 
 function normalizeHarnessColor(value: unknown, fallback: string): string {

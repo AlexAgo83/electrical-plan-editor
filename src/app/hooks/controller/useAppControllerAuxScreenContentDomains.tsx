@@ -184,6 +184,8 @@ export function useAppControllerAuxScreenContentDomains({
     setTabularExportFormat: settings.prefs.setTabularExportFormat,
     bomExportCompactColumns: settings.prefs.bomExportCompactColumns,
     setBomExportCompactColumns: settings.prefs.setBomExportCompactColumns,
+    bomTraceabilityLabelsHidden: settings.prefs.bomTraceabilityLabelsHidden,
+    setBomTraceabilityLabelsHidden: settings.prefs.setBomTraceabilityLabelsHidden,
     defaultWireSectionMm2: settings.prefs.defaultWireSectionMm2,
     setDefaultWireSectionMm2: settings.prefs.setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes: settings.prefs.defaultAutoCreateLinkedNodes,

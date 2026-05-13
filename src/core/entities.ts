@@ -36,6 +36,9 @@ export interface Connector {
   isTerminalConnector?: boolean;
   catalogItemId?: CatalogItemId;
   manufacturerReference?: string;
+  applyCatalogPlugs?: boolean;
+  applyCatalogSeals?: boolean;
+  terminalOverrides?: Record<number, ConnectorTerminalMaterial>;
   cableCalloutPosition?: {
     x: number;
     y: number;
@@ -92,6 +95,27 @@ export interface CatalogItem {
   name?: string;
   unitPriceExclTax?: number;
   url?: string;
+  connectorDefaults?: ConnectorCatalogDefaults;
+}
+
+export interface ConnectorTerminalMaterial {
+  terminalReference?: string;
+  terminalName?: string;
+  sealReference?: string;
+  sealName?: string;
+}
+
+export interface ConnectorPlugDefinition {
+  plugReference: string;
+  plugName?: string;
+  quantity: number;
+}
+
+export interface ConnectorCatalogDefaults {
+  allSameTerminals?: boolean;
+  defaultTerminal?: ConnectorTerminalMaterial;
+  terminalOverrides?: Record<number, ConnectorTerminalMaterial>;
+  plugs?: ConnectorPlugDefinition[];
 }
 
 export type NetworkNode =

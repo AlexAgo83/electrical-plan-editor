@@ -31,6 +31,12 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   setConnectorManufacturerReference: Parameters<typeof useConnectorHandlers>[0]["setConnectorManufacturerReference"];
   connectorIsMainHarnessConnector: Parameters<typeof useConnectorHandlers>[0]["connectorIsMainHarnessConnector"];
   setConnectorIsMainHarnessConnector: Parameters<typeof useConnectorHandlers>[0]["setConnectorIsMainHarnessConnector"];
+  connectorApplyCatalogPlugs: Parameters<typeof useConnectorHandlers>[0]["connectorApplyCatalogPlugs"];
+  setConnectorApplyCatalogPlugs: Parameters<typeof useConnectorHandlers>[0]["setConnectorApplyCatalogPlugs"];
+  connectorApplyCatalogSeals: Parameters<typeof useConnectorHandlers>[0]["connectorApplyCatalogSeals"];
+  setConnectorApplyCatalogSeals: Parameters<typeof useConnectorHandlers>[0]["setConnectorApplyCatalogSeals"];
+  connectorTerminalOverridesText: Parameters<typeof useConnectorHandlers>[0]["connectorTerminalOverridesText"];
+  setConnectorTerminalOverridesText: Parameters<typeof useConnectorHandlers>[0]["setConnectorTerminalOverridesText"];
   connectorAutoCreateLinkedNode: Parameters<typeof useConnectorHandlers>[0]["connectorAutoCreateLinkedNode"];
   setConnectorAutoCreateLinkedNode: Parameters<typeof useConnectorHandlers>[0]["setConnectorAutoCreateLinkedNode"];
   cavityCount: Parameters<typeof useConnectorHandlers>[0]["cavityCount"];
@@ -209,6 +215,12 @@ export function useAppControllerModelingHandlersOrchestrator({
   setConnectorManufacturerReference,
   connectorIsMainHarnessConnector,
   setConnectorIsMainHarnessConnector,
+  connectorApplyCatalogPlugs,
+  setConnectorApplyCatalogPlugs,
+  connectorApplyCatalogSeals,
+  setConnectorApplyCatalogSeals,
+  connectorTerminalOverridesText,
+  setConnectorTerminalOverridesText,
   connectorAutoCreateLinkedNode,
   setConnectorAutoCreateLinkedNode,
   cavityCount,
@@ -384,6 +396,12 @@ export function useAppControllerModelingHandlersOrchestrator({
     setConnectorManufacturerReference,
     connectorIsMainHarnessConnector,
     setConnectorIsMainHarnessConnector,
+    connectorApplyCatalogPlugs,
+    setConnectorApplyCatalogPlugs,
+    connectorApplyCatalogSeals,
+    setConnectorApplyCatalogSeals,
+    connectorTerminalOverridesText,
+    setConnectorTerminalOverridesText,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     defaultAutoCreateLinkedNodes,

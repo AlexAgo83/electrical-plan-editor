@@ -1,4 +1,6 @@
 import type { AppAction } from "../actions";
+import { normalizeConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
+import type { ConnectorTerminalMaterial } from "../../core/entities";
 import { analyzeConnectorDeleteImpact } from "../deleteImpact";
 import type { AppState } from "../types";
 import {
@@ -37,6 +39,31 @@ function normalizeManufacturerReference(value: string | undefined): string | und
   }
 
   return normalized.length > 120 ? normalized.slice(0, 120) : normalized;
+}
+
+function normalizeApplyCatalogFlag(value: boolean | undefined): boolean | undefined {
+  return value === false ? false : undefined;
+}
+
+function normalizeConnectorTerminalOverrides(
+  overrides: Record<number, ConnectorTerminalMaterial> | undefined,
+  cavityCount: number
+): Record<number, ConnectorTerminalMaterial> | undefined {
+  if (overrides === undefined || typeof overrides !== "object") {
+    return undefined;
+  }
+  const normalized: Record<number, ConnectorTerminalMaterial> = {};
+  for (const [key, value] of Object.entries(overrides)) {
+    const cavityIndex = Number(key);
+    if (!Number.isInteger(cavityIndex) || cavityIndex < 1 || cavityIndex > cavityCount) {
+      continue;
+    }
+    const material = normalizeConnectorTerminalMaterial(value as Parameters<typeof normalizeConnectorTerminalMaterial>[0]);
+    if (material !== undefined) {
+      normalized[cavityIndex] = material;
+    }
+  }
+  return Object.keys(normalized).length === 0 ? undefined : normalized;
 }
 
 function hasWireEndpointIndexOutOfRange(state: AppState, connectorId: string, cavityCount: number): boolean {
@@ -127,6 +154,9 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
           technicalId: normalizedTechnicalId,
           cavityCount,
           isMainHarnessConnector: action.payload.isMainHarnessConnector === true ? true : undefined,
+          applyCatalogPlugs: normalizeApplyCatalogFlag(action.payload.applyCatalogPlugs),
+          applyCatalogSeals: normalizeApplyCatalogFlag(action.payload.applyCatalogSeals),
+          terminalOverrides: normalizeConnectorTerminalOverrides(action.payload.terminalOverrides, cavityCount),
           manufacturerReference:
             linkedCatalogItem !== undefined
               ? linkedCatalogItem.manufacturerReference

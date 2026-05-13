@@ -21,6 +21,12 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     connectorManufacturerReference,
     connectorIsMainHarnessConnector,
     setConnectorIsMainHarnessConnector,
+    connectorApplyCatalogPlugs,
+    setConnectorApplyCatalogPlugs,
+    connectorApplyCatalogSeals,
+    setConnectorApplyCatalogSeals,
+    connectorTerminalOverridesText,
+    setConnectorTerminalOverridesText,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,
@@ -98,6 +104,34 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       />
       Main harness connector for functional view
     </label>
+    <fieldset className="inline-fieldset">
+      <legend>Catalog material application</legend>
+      <label className="settings-checkbox">
+        <input
+          type="checkbox"
+          checked={connectorApplyCatalogSeals}
+          onChange={(event) => setConnectorApplyCatalogSeals(event.target.checked)}
+        />
+        Apply catalog seals
+      </label>
+      <label className="settings-checkbox">
+        <input
+          type="checkbox"
+          checked={connectorApplyCatalogPlugs}
+          onChange={(event) => setConnectorApplyCatalogPlugs(event.target.checked)}
+        />
+        Apply catalog plugs
+      </label>
+      <label>
+        Terminal overrides
+        <textarea
+          value={connectorTerminalOverridesText}
+          onChange={(event) => setConnectorTerminalOverridesText(event.target.value)}
+          placeholder={"1,TERM-A,SEAL-A,Terminal name,Seal name\n2,TERM-B,SEAL-B"}
+          rows={3}
+        />
+      </label>
+    </fieldset>
     <label className="settings-checkbox">
       <input
         type="checkbox"

@@ -1,4 +1,10 @@
 import type { CatalogItem, Connector, Splice, Wire, WireEndpoint } from "../../core/entities";
+import {
+  type BomMaterialOrigin,
+  type ConnectorCavityOccupancyMap,
+  resolveConnectorPlugMaterials,
+  resolveConnectorTerminalMaterial
+} from "../../core/connectorCatalogMaterials";
 import { buildWireEndpointReferenceNameLookup, normalizeWireEndpointReferenceName } from "../../core/wireReferences";
 import type { WorkspaceCurrencyCode } from "../types/app-controller";
 import type { CsvCellValue } from "./csv";
@@ -14,15 +20,17 @@ interface WireTerminationAggregateRow {
   reference: string;
   name?: string;
   quantity: number;
+  origin: BomMaterialOrigin;
 }
 
-type WireTerminationKind = "connection" | "seal";
+type WireTerminationKind = "connection" | "seal" | "plug";
 
 interface ConnectorGroupedTerminationRow {
   kind: WireTerminationKind;
   reference: string;
   name?: string;
   quantity: number;
+  origin: BomMaterialOrigin;
 }
 
 interface ConnectorGroupedTerminationAggregate {
@@ -36,6 +44,7 @@ export interface NetworkSummaryBomCsvExport {
   headers: string[];
   rows: CsvCellValue[][];
   itemRowCount: number;
+  warnings: string[];
 }
 
 interface NetworkSummaryBomExportData {
@@ -43,6 +52,7 @@ interface NetworkSummaryBomExportData {
   headers: string[];
   rows: CsvCellValue[][];
   itemRowCount: number;
+  warnings: string[];
   groupedSheets: TabularWorksheetExport[];
 }
 
@@ -73,9 +83,14 @@ function padRow(values: CsvCellValue[], length: number): CsvCellValue[] {
   return padded.slice(0, length);
 }
 
-function buildBomHeaders(workspaceCurrencyCode: WorkspaceCurrencyCode, normalizedTaxEnabled: boolean, compactColumns: boolean): string[] {
+function buildBomHeaders(
+  workspaceCurrencyCode: WorkspaceCurrencyCode,
+  normalizedTaxEnabled: boolean,
+  compactColumns: boolean,
+  includeTraceability: boolean
+): string[] {
   const headers = compactColumns
-    ? ["Type", "Manufacturer reference", "Name", "Connection count", "Connector quantity"]
+    ? ["Type", "Manufacturer reference", "Name", "Connection count", "Connector quantity", ...(includeTraceability ? ["Origin"] : [])]
     : [
         "Type",
         "Manufacturer reference",
@@ -84,6 +99,7 @@ function buildBomHeaders(workspaceCurrencyCode: WorkspaceCurrencyCode, normalize
         "Connector quantity",
         "Splice quantity",
         "Component quantity",
+        ...(includeTraceability ? ["Origin"] : []),
         `Unit price (excl. tax, ${workspaceCurrencyCode})`,
         `Line total (excl. tax, ${workspaceCurrencyCode})`,
         ...(normalizedTaxEnabled ? [`Line total (incl. tax, ${workspaceCurrencyCode})`] : []),
@@ -102,6 +118,7 @@ function createBomRow(
     connectorQuantity: CsvCellValue;
     spliceQuantity?: CsvCellValue;
     componentQuantity?: CsvCellValue;
+    origin?: CsvCellValue;
     unitPriceExclTax?: CsvCellValue;
     lineTotalExclTax?: CsvCellValue;
     lineTotalInclTax?: CsvCellValue;
@@ -109,13 +126,17 @@ function createBomRow(
   }
 ): CsvCellValue[] {
   if (compactColumns) {
-    return [
+    const row = [
       values.type,
       values.manufacturerReference,
       values.name,
       values.connectionCount,
       values.connectorQuantity
     ];
+    if (values.origin !== undefined) {
+      row.push(values.origin);
+    }
+    return row;
   }
 
   return [
@@ -126,6 +147,7 @@ function createBomRow(
     values.connectorQuantity,
     values.spliceQuantity ?? "",
     values.componentQuantity ?? "",
+    ...(values.origin !== undefined ? [values.origin] : []),
     values.unitPriceExclTax ?? "",
     values.lineTotalExclTax ?? "",
     values.lineTotalInclTax ?? "",
@@ -138,6 +160,7 @@ function registerWireTermination(
   reference: string | undefined,
   kind: WireTerminationKind,
   explicitName: string | undefined,
+  origin: BomMaterialOrigin,
   lookup: ReturnType<typeof buildWireEndpointReferenceNameLookup>
 ): void {
   const normalizedReference = normalizeWireTerminationReference(reference);
@@ -146,7 +169,8 @@ function registerWireTermination(
   }
 
   const resolvedName = normalizeWireEndpointReferenceName(explicitName) ?? (kind === "connection" ? lookup.connection.get(normalizedReference) : lookup.seal.get(normalizedReference));
-  const existing = aggregates.get(normalizedReference);
+  const aggregateKey = `${origin}:${normalizedReference}`;
+  const existing = aggregates.get(aggregateKey);
   if (existing !== undefined) {
     existing.quantity += 1;
     if (existing.name === undefined && resolvedName !== undefined) {
@@ -155,10 +179,11 @@ function registerWireTermination(
     return;
   }
 
-  aggregates.set(normalizedReference, {
+  aggregates.set(aggregateKey, {
     reference: normalizedReference,
     name: resolvedName,
-    quantity: 1
+    quantity: 1,
+    origin
   });
 }
 
@@ -170,6 +195,7 @@ function registerGroupedWireTermination(
   kind: WireTerminationKind,
   reference: string | undefined,
   explicitName: string | undefined,
+  origin: BomMaterialOrigin,
   lookup: ReturnType<typeof buildWireEndpointReferenceNameLookup>
 ): void {
   const normalizedReference = normalizeWireTerminationReference(reference);
@@ -193,7 +219,7 @@ function registerGroupedWireTermination(
       return created;
     })();
 
-  const rowKey = `${kind}:${normalizedReference}`;
+  const rowKey = `${kind}:${origin}:${normalizedReference}`;
   const existingRow = group.rows.get(rowKey);
   if (existingRow !== undefined) {
     existingRow.quantity += 1;
@@ -207,8 +233,60 @@ function registerGroupedWireTermination(
     kind,
     reference: normalizedReference,
     name: resolvedName,
-    quantity: 1
+    quantity: 1,
+    origin
   });
+}
+
+function resolveWireEndpointTerminal(
+  endpoint: WireEndpoint,
+  connectorById: ReadonlyMap<Connector["id"], Connector>,
+  catalogById: ReadonlyMap<CatalogItem["id"], CatalogItem>,
+  reference: string | undefined,
+  name: string | undefined
+): { reference: string | undefined; name: string | undefined; origin: BomMaterialOrigin } {
+  const manualReference = normalizeWireTerminationReference(reference);
+  if (manualReference !== undefined) {
+    return { reference: manualReference, name, origin: "manual" };
+  }
+  if (endpoint.kind !== "connectorCavity") {
+    return { reference, name, origin: "manual" };
+  }
+  const connector = connectorById.get(endpoint.connectorId);
+  const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogById.get(connector.catalogItemId);
+  const resolved = connector === undefined ? undefined : resolveConnectorTerminalMaterial(connector, catalogItem, endpoint.cavityIndex);
+  return {
+    reference: resolved?.terminalReference,
+    name: resolved?.terminalName,
+    origin: resolved?.origin ?? "manual"
+  };
+}
+
+function resolveWireEndpointSeal(
+  endpoint: WireEndpoint,
+  connectorById: ReadonlyMap<Connector["id"], Connector>,
+  catalogById: ReadonlyMap<CatalogItem["id"], CatalogItem>,
+  reference: string | undefined,
+  name: string | undefined
+): { reference: string | undefined; name: string | undefined; origin: BomMaterialOrigin } {
+  const manualReference = normalizeWireTerminationReference(reference);
+  if (manualReference !== undefined) {
+    return { reference: manualReference, name, origin: "manual" };
+  }
+  if (endpoint.kind !== "connectorCavity") {
+    return { reference, name, origin: "manual" };
+  }
+  const connector = connectorById.get(endpoint.connectorId);
+  if (connector === undefined || connector.applyCatalogSeals === false) {
+    return { reference, name, origin: "manual" };
+  }
+  const catalogItem = connector.catalogItemId === undefined ? undefined : catalogById.get(connector.catalogItemId);
+  const resolved = resolveConnectorTerminalMaterial(connector, catalogItem, endpoint.cavityIndex);
+  return {
+    reference: resolved?.sealReference,
+    name: resolved?.sealName,
+    origin: resolved?.origin ?? "manual"
+  };
 }
 
 function buildNetworkSummaryBomExportData(
@@ -219,7 +297,11 @@ function buildNetworkSummaryBomExportData(
   workspaceCurrencyCode: WorkspaceCurrencyCode = "EUR",
   workspaceTaxEnabled = true,
   workspaceTaxRatePercent = 20,
-  compactColumns = false
+  compactColumns = false,
+  options: {
+    connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
+    showTraceabilityLabels?: boolean;
+  } = {}
 ): NetworkSummaryBomExportData {
   const normalizedTaxEnabled = workspaceTaxEnabled === true;
   const normalizedTaxRatePercent = Number.isFinite(workspaceTaxRatePercent)
@@ -232,6 +314,8 @@ function buildNetworkSummaryBomExportData(
   const wireTerminationAggregates = new Map<string, WireTerminationAggregateRow>();
   const groupedConnectorAggregates = new Map<string, ConnectorGroupedTerminationAggregate>();
   const wireReferenceNameLookup = buildWireEndpointReferenceNameLookup(wires);
+  const warnings: string[] = [];
+  const includeTraceability = options.showTraceabilityLabels === true;
 
   const ensureAggregate = (catalogItem: CatalogItem): BomAggregateRow => {
     const existing = aggregates.get(catalogItem.id);
@@ -282,8 +366,10 @@ function buildNetworkSummaryBomExportData(
     endpoint: WireEndpoint,
     connectionReference: string | undefined,
     connectionName: string | undefined,
+    connectionOrigin: BomMaterialOrigin,
     sealReference: string | undefined,
-    sealName: string | undefined
+    sealName: string | undefined,
+    sealOrigin: BomMaterialOrigin
   ): void => {
     if (endpoint.kind !== "connectorCavity") {
       return;
@@ -300,6 +386,7 @@ function buildNetworkSummaryBomExportData(
       "connection",
       connectionReference,
       connectionName,
+      connectionOrigin,
       wireReferenceNameLookup
     );
     registerGroupedWireTermination(
@@ -310,42 +397,120 @@ function buildNetworkSummaryBomExportData(
       "seal",
       sealReference,
       sealName,
+      sealOrigin,
       wireReferenceNameLookup
     );
   };
 
   for (const wire of wires) {
-    registerWireTermination(
-      wireTerminationAggregates,
-      wire.endpointAConnectionReference,
-      "connection",
-      wire.endpointAConnectionName,
-      wireReferenceNameLookup
-    );
-    registerWireTermination(wireTerminationAggregates, wire.endpointASealReference, "seal", wire.endpointASealName, wireReferenceNameLookup);
-    registerWireTermination(
-      wireTerminationAggregates,
-      wire.endpointBConnectionReference,
-      "connection",
-      wire.endpointBConnectionName,
-      wireReferenceNameLookup
-    );
-    registerWireTermination(wireTerminationAggregates, wire.endpointBSealReference, "seal", wire.endpointBSealName, wireReferenceNameLookup);
-
-    registerEndpointGroupedTerminology(
+    const endpointATerminal = resolveWireEndpointTerminal(
       wire.endpointA,
+      connectorById,
+      catalogById,
       wire.endpointAConnectionReference,
-      wire.endpointAConnectionName,
+      wire.endpointAConnectionName
+    );
+    const endpointASeal = resolveWireEndpointSeal(
+      wire.endpointA,
+      connectorById,
+      catalogById,
       wire.endpointASealReference,
       wire.endpointASealName
     );
-    registerEndpointGroupedTerminology(
+    const endpointBTerminal = resolveWireEndpointTerminal(
       wire.endpointB,
+      connectorById,
+      catalogById,
       wire.endpointBConnectionReference,
-      wire.endpointBConnectionName,
+      wire.endpointBConnectionName
+    );
+    const endpointBSeal = resolveWireEndpointSeal(
+      wire.endpointB,
+      connectorById,
+      catalogById,
       wire.endpointBSealReference,
       wire.endpointBSealName
     );
+
+    registerWireTermination(
+      wireTerminationAggregates,
+      endpointATerminal.reference,
+      "connection",
+      endpointATerminal.name,
+      endpointATerminal.origin,
+      wireReferenceNameLookup
+    );
+    registerWireTermination(wireTerminationAggregates, endpointASeal.reference, "seal", endpointASeal.name, endpointASeal.origin, wireReferenceNameLookup);
+    registerWireTermination(
+      wireTerminationAggregates,
+      endpointBTerminal.reference,
+      "connection",
+      endpointBTerminal.name,
+      endpointBTerminal.origin,
+      wireReferenceNameLookup
+    );
+    registerWireTermination(wireTerminationAggregates, endpointBSeal.reference, "seal", endpointBSeal.name, endpointBSeal.origin, wireReferenceNameLookup);
+
+    registerEndpointGroupedTerminology(
+      wire.endpointA,
+      endpointATerminal.reference,
+      endpointATerminal.name,
+      endpointATerminal.origin,
+      endpointASeal.reference,
+      endpointASeal.name,
+      endpointASeal.origin
+    );
+    registerEndpointGroupedTerminology(
+      wire.endpointB,
+      endpointBTerminal.reference,
+      endpointBTerminal.name,
+      endpointBTerminal.origin,
+      endpointBSeal.reference,
+      endpointBSeal.name,
+      endpointBSeal.origin
+    );
+  }
+
+  for (const connector of connectors) {
+    const catalogItem = connector.catalogItemId === undefined ? undefined : catalogById.get(connector.catalogItemId);
+    const { plugs, warnings: plugWarnings } = resolveConnectorPlugMaterials(
+      connector,
+      catalogItem,
+      wires,
+      options.connectorCavityOccupancy
+    );
+    warnings.push(...plugWarnings.map((warning) => warning.message));
+    for (const plug of plugs) {
+      registerWireTermination(
+        wireTerminationAggregates,
+        plug.plugReference,
+        "plug",
+        plug.plugName,
+        plug.origin,
+        wireReferenceNameLookup
+      );
+      const existing = wireTerminationAggregates.get(`${plug.origin}:${plug.plugReference}`);
+      if (existing !== undefined) {
+        existing.quantity += plug.quantity - 1;
+      }
+
+      registerGroupedWireTermination(
+        groupedConnectorAggregates,
+        connector.technicalId,
+        connector.name,
+        connector.cavityCount,
+        "plug",
+        plug.plugReference,
+        plug.plugName,
+        plug.origin,
+        wireReferenceNameLookup
+      );
+      const group = groupedConnectorAggregates.get(connector.technicalId);
+      const row = group?.rows.get(`plug:${plug.origin}:${plug.plugReference}`);
+      if (row !== undefined) {
+        row.quantity += plug.quantity - 1;
+      }
+    }
   }
 
   const orderedRows = [...aggregates.values()].sort((left, right) => {
@@ -368,7 +533,7 @@ function buildNetworkSummaryBomExportData(
     left.connectorTechnicalId.localeCompare(right.connectorTechnicalId, undefined, { sensitivity: "base" })
   );
 
-  const headers = buildBomHeaders(workspaceCurrencyCode, normalizedTaxEnabled, compactColumns);
+  const headers = buildBomHeaders(workspaceCurrencyCode, normalizedTaxEnabled, compactColumns, includeTraceability);
   const rows: CsvCellValue[][] = [];
   const groupedSheetRows: CsvCellValue[][] = [];
   const groupedSheetMergeRanges: Array<{ startRow: number; endRow: number }> = [];
@@ -398,6 +563,7 @@ function buildNetworkSummaryBomExportData(
           connectorQuantity,
           spliceQuantity,
           componentQuantity,
+          origin: includeTraceability ? "catalog default" : undefined,
           unitPriceExclTax: formatOptionalMoney(unitPrice),
           lineTotalExclTax: formatRowMoney(componentQuantity, unitPrice),
           lineTotalInclTax:
@@ -418,6 +584,7 @@ function buildNetworkSummaryBomExportData(
           name: "",
           connectionCount: "",
           connectorQuantity: "",
+          origin: includeTraceability ? "" : undefined,
           lineTotalExclTax: pricedRowsTotal.toFixed(2)
         }),
         headers.length
@@ -432,6 +599,7 @@ function buildNetworkSummaryBomExportData(
           name: "",
           connectionCount: "",
           connectorQuantity: "",
+          origin: includeTraceability ? "" : undefined,
           lineTotalInclTax: pricedRowsTotalInclTax.toFixed(2)
         }),
           headers.length
@@ -445,7 +613,8 @@ function buildNetworkSummaryBomExportData(
           manufacturerReference: "PRICING CONTEXT",
           name: "Currency",
           connectionCount: workspaceCurrencyCode,
-          connectorQuantity: ""
+          connectorQuantity: "",
+          origin: includeTraceability ? "" : undefined
         }),
         headers.length
       )
@@ -457,7 +626,8 @@ function buildNetworkSummaryBomExportData(
           manufacturerReference: "PRICING CONTEXT",
           name: "Tax enabled",
           connectionCount: normalizedTaxEnabled ? "true" : "false",
-          connectorQuantity: ""
+          connectorQuantity: "",
+          origin: includeTraceability ? "" : undefined
         }),
         headers.length
       )
@@ -469,14 +639,15 @@ function buildNetworkSummaryBomExportData(
           manufacturerReference: "PRICING CONTEXT",
           name: "Tax rate (%)",
           connectionCount: normalizedTaxRatePercent.toFixed(2),
-          connectorQuantity: ""
+          connectorQuantity: "",
+          origin: includeTraceability ? "" : undefined
         }),
         headers.length
       )
     );
   }
 
-  for (const { reference, name, quantity } of orderedWireTerminationRows) {
+  for (const { reference, name, quantity, origin } of orderedWireTerminationRows) {
     rows.push(
       padRow(
         createBomRow(compactColumns, {
@@ -485,7 +656,8 @@ function buildNetworkSummaryBomExportData(
           name: name ?? "",
           connectionCount: "",
           connectorQuantity: quantity,
-          componentQuantity: quantity
+          componentQuantity: quantity,
+          origin: includeTraceability ? origin : undefined
         }),
         headers.length
       )
@@ -502,16 +674,26 @@ function buildNetworkSummaryBomExportData(
       return left.reference.localeCompare(right.reference, undefined, { sensitivity: "base" });
     });
     const startRow = groupedSheetRows.length + 2;
-    groupedSheetRows.push([group.connectorTechnicalId, group.connectorName, group.connectionCount, "Connector", "", "", 1]);
+    groupedSheetRows.push([
+      group.connectorTechnicalId,
+      group.connectorName,
+      group.connectionCount,
+      "Connector",
+      "",
+      "",
+      1,
+      ...(includeTraceability ? ["catalog default"] : [])
+    ]);
     for (const row of orderedGroupRows) {
       groupedSheetRows.push([
         group.connectorTechnicalId,
         group.connectorName,
         "",
-        row.kind === "connection" ? "Connection" : "Seal",
+        row.kind === "connection" ? "Connection" : row.kind === "seal" ? "Seal" : "Plug",
         row.reference,
         row.name ?? "",
-        row.quantity
+        row.quantity,
+        ...(includeTraceability ? [row.origin] : [])
       ]);
     }
     const endRow = groupedSheetRows.length + 1;
@@ -530,7 +712,16 @@ function buildNetworkSummaryBomExportData(
     },
     {
       name: "By connector",
-      headers: ["Connector ID", "Connector name", "Connection count", "Type", "Reference", "Name", "Quantity"],
+      headers: [
+        "Connector ID",
+        "Connector name",
+        "Connection count",
+        "Type",
+        "Reference",
+        "Name",
+        "Quantity",
+        ...(includeTraceability ? ["Origin"] : [])
+      ],
       rows: groupedSheetRows,
       freezeHeaderRow: true,
       autoFilter: true,
@@ -555,6 +746,7 @@ function buildNetworkSummaryBomExportData(
     headers,
     rows,
     itemRowCount,
+    warnings,
     groupedSheets
   };
 }
@@ -567,7 +759,11 @@ export function buildNetworkSummaryBomCsvExport(
   workspaceCurrencyCode: WorkspaceCurrencyCode = "EUR",
   workspaceTaxEnabled = true,
   workspaceTaxRatePercent = 20,
-  compactColumns = false
+  compactColumns = false,
+  options?: {
+    connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
+    showTraceabilityLabels?: boolean;
+  }
 ): NetworkSummaryBomCsvExport {
   const exportData = buildNetworkSummaryBomExportData(
     catalogItems,
@@ -577,13 +773,15 @@ export function buildNetworkSummaryBomCsvExport(
     workspaceCurrencyCode,
     workspaceTaxEnabled,
     workspaceTaxRatePercent,
-    compactColumns
+    compactColumns,
+    options
   );
 
   return {
     headers: exportData.headers,
     rows: exportData.rows,
-    itemRowCount: exportData.itemRowCount
+    itemRowCount: exportData.itemRowCount,
+    warnings: exportData.warnings
   };
 }
 
@@ -595,7 +793,11 @@ export function buildNetworkSummaryBomWorkbookSheets(
   workspaceCurrencyCode: WorkspaceCurrencyCode = "EUR",
   workspaceTaxEnabled = true,
   workspaceTaxRatePercent = 20,
-  compactColumns = false
+  compactColumns = false,
+  options?: {
+    connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
+    showTraceabilityLabels?: boolean;
+  }
 ): TabularWorksheetExport[] {
   const exportData = buildNetworkSummaryBomExportData(
     catalogItems,
@@ -605,7 +807,8 @@ export function buildNetworkSummaryBomWorkbookSheets(
     workspaceCurrencyCode,
     workspaceTaxEnabled,
     workspaceTaxRatePercent,
-    compactColumns
+    compactColumns,
+    options
   );
 
   return exportData.groupedSheets;

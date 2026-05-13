@@ -119,6 +119,7 @@ interface UseWorkspaceHandlersParams {
   setWorkspaceCurrencyCode: (value: WorkspaceCurrencyCode) => void;
   setWorkspaceTaxEnabled: (value: boolean) => void;
   setWorkspaceTaxRatePercent: (value: number) => void;
+  setBomTraceabilityLabelsHidden: (value: boolean) => void;
   setDefaultWireSectionMm2: (value: number) => void;
   setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
   setDefaultSortField: (value: SortField) => void;
@@ -222,6 +223,7 @@ export function useWorkspaceHandlers({
   setWorkspaceCurrencyCode,
   setWorkspaceTaxEnabled,
   setWorkspaceTaxRatePercent,
+  setBomTraceabilityLabelsHidden,
   setDefaultWireSectionMm2,
   setDefaultAutoCreateLinkedNodes,
   setDefaultSortField,
@@ -776,6 +778,7 @@ export function useWorkspaceHandlers({
     setWorkspaceCurrencyCode("EUR");
     setWorkspaceTaxEnabled(true);
     setWorkspaceTaxRatePercent(20);
+    setBomTraceabilityLabelsHidden(false);
     setDefaultWireSectionMm2(0.5);
     setDefaultAutoCreateLinkedNodes(true);
     setDefaultSortField("name");

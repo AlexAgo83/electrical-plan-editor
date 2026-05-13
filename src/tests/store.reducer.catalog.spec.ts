@@ -78,6 +78,46 @@ describe("store reducer - catalog", () => {
     expect(state.splices.byId[spliceId]?.portCount).toBe(6);
   });
 
+  it("preserves connector material opt-outs and overrides when refreshing linked catalog defaults", () => {
+    const catalogId = asCatalogItemId("CAT-MATERIAL");
+    const connectorId = asConnectorId("C-MATERIAL");
+
+    const state = [
+      appActions.upsertCatalogItem({
+        id: catalogId,
+        manufacturerReference: "MAT-REF-A",
+        connectionCount: 4
+      }),
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "Material connector",
+        technicalId: "C-MAT-1",
+        catalogItemId: catalogId,
+        manufacturerReference: "MAT-REF-A",
+        cavityCount: 4,
+        applyCatalogPlugs: false,
+        terminalOverrides: {
+          2: { terminalReference: "TERM-OVERRIDE", sealReference: "SEAL-OVERRIDE" }
+        }
+      }),
+      appActions.upsertCatalogItem({
+        id: catalogId,
+        manufacturerReference: "MAT-REF-B",
+        connectionCount: 4,
+        connectorDefaults: {
+          allSameTerminals: true,
+          defaultTerminal: { terminalReference: "TERM-DEFAULT", sealReference: "SEAL-DEFAULT" },
+          plugs: [{ plugReference: "PLUG-A", quantity: 2 }]
+        }
+      })
+    ].reduce(appReducer, createInitialState());
+
+    expect(state.catalogItems.byId[catalogId]?.connectorDefaults?.defaultTerminal?.terminalReference).toBe("TERM-DEFAULT");
+    expect(state.connectors.byId[connectorId]?.manufacturerReference).toBe("MAT-REF-B");
+    expect(state.connectors.byId[connectorId]?.applyCatalogPlugs).toBe(false);
+    expect(state.connectors.byId[connectorId]?.terminalOverrides?.[2]?.terminalReference).toBe("TERM-OVERRIDE");
+  });
+
   it("blocks removing a referenced catalog item and blocks unsafe connection count reduction", () => {
     const catalogId = asCatalogItemId("CAT-LOCKED");
     const connectorId = asConnectorId("C-LOCKED");

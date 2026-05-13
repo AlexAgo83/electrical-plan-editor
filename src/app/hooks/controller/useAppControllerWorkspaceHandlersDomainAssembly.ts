@@ -117,6 +117,7 @@ export function useAppControllerWorkspaceHandlersDomainAssembly({
       setWorkspaceCurrencyCode: preferencesState.setWorkspaceCurrencyCode,
       setWorkspaceTaxEnabled: preferencesState.setWorkspaceTaxEnabled,
       setWorkspaceTaxRatePercent: preferencesState.setWorkspaceTaxRatePercent,
+      setBomTraceabilityLabelsHidden: preferencesState.setBomTraceabilityLabelsHidden,
       setDefaultWireSectionMm2: preferencesState.setDefaultWireSectionMm2,
       setDefaultAutoCreateLinkedNodes: preferencesState.setDefaultAutoCreateLinkedNodes,
       setDefaultSortField: preferencesState.setDefaultSortField,
