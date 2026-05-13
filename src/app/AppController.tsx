@@ -997,20 +997,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   });
   useAppControllerInspectorSelectionSourceEffect({ hasInspectableSelection, setDetailPanelsSelectionSource });
   const appShellLayoutProps = buildAppControllerShellLayoutProps({
-    meta: {
-      appShellClassName,
-      workspaceShellStyle,
-      appRepositoryUrl: APP_REPOSITORY_URL,
-      currentYear,
-      appVersion: appPackageMetadata.version
-    },
-    refs: {
-      headerBlockRef,
-      navigationToggleButtonRef,
-      operationsButtonRef,
-      navigationDrawerRef,
-      operationsPanelRef
-    },
+    meta: { appShellClassName, workspaceShellStyle, appRepositoryUrl: APP_REPOSITORY_URL, currentYear, appVersion: appPackageMetadata.version },
+    refs: { headerBlockRef, navigationToggleButtonRef, operationsButtonRef, navigationDrawerRef, operationsPanelRef },
     shellChrome: {
       isNavigationDrawerOpen,
       isOperationsPanelOpen,
@@ -1058,14 +1046,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       handleOpenValidationScreen: selectionHandlersDomain.handleOpenValidationScreen,
       moveValidationIssueCursor: selectionHandlersDomain.moveValidationIssueCursor
     },
-    screenComponents: {
-      HomeScreenComponent: HomeScreen,
-      NetworkScopeScreenComponent: NetworkScopeScreen,
-      ModelingScreenComponent: ModelingScreen,
-      AnalysisScreenComponent: AnalysisScreen,
-      ValidationScreenComponent: ValidationScreen,
-      SettingsScreenComponent: SettingsScreen
-    },
+    screenComponents: { HomeScreenComponent: HomeScreen, NetworkScopeScreenComponent: NetworkScopeScreen, ModelingScreenComponent: ModelingScreen, AnalysisScreenComponent: AnalysisScreen, ValidationScreenComponent: ValidationScreen, SettingsScreenComponent: SettingsScreen },
     workspace: {
       isHomeScreen,
       isNetworkScopeScreen,
@@ -1082,11 +1063,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       settingsWorkspaceContent,
       isSettingsScreen
     },
-    inspector: {
-      isInspectorHidden,
-      isInspectorOpen,
-      inspectorContextPanel
-    }
+    inspector: { isInspectorHidden, isInspectorOpen, inspectorContextPanel }
   });
 
   return <>
