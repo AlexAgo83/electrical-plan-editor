@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { NetworkId } from "../core/entities";
+import type { HarnessAssemblyId, NetworkId } from "../core/entities";
 import { appActions, appReducer } from "../store";
 import {
   asConnectorId,
@@ -19,6 +19,10 @@ import {
 
 function asNetworkId(value: string): NetworkId {
   return value as NetworkId;
+}
+
+function asAssemblyId(value: string): HarnessAssemblyId {
+  return value as HarnessAssemblyId;
 }
 
 function getNetworkSummaryViewportTransform(panel: HTMLElement): string {
@@ -58,6 +62,43 @@ function mockNetworkSvgRect(networkSvg: SVGSVGElement) {
         bottom: 520,
         toJSON: () => ({})
       }) as DOMRect
+  );
+}
+
+function createHarnessAssemblyFunctionalSelectionState() {
+  const base = createUiIntegrationState();
+  const mainNetworkId = base.activeNetworkId;
+  if (mainNetworkId === null) {
+    throw new Error("Expected active network.");
+  }
+  const mainConnector = base.connectors.byId[asConnectorId("C1")];
+  if (mainConnector === undefined) {
+    throw new Error("Expected connector C1.");
+  }
+  const withMainConnector = appReducer(base, appActions.upsertConnector({ ...mainConnector, isMainHarnessConnector: true }));
+  const withSecondNetwork = appReducer(
+    withMainConnector,
+    appActions.createNetwork({
+      id: asNetworkId("net-b"),
+      name: "Harness B",
+      technicalId: "H-B",
+      createdAt: "2026-05-15T08:00:00.000Z",
+      updatedAt: "2026-05-15T08:00:00.000Z"
+    })
+  );
+  const withMainActive = appReducer(withSecondNetwork, appActions.selectNetwork(mainNetworkId));
+  return appReducer(
+    withMainActive,
+    appActions.upsertHarnessAssembly({
+      id: asAssemblyId("asm-main"),
+      name: "Main assembly",
+      technicalId: "ASM-MAIN",
+      members: [{ networkId: mainNetworkId, color: "#2563eb" }],
+      masterConnectorRefs: [{ networkId: mainNetworkId, connectorId: asConnectorId("C1") }],
+      connectorLinks: [],
+      createdAt: "2026-05-15T08:05:00.000Z",
+      updatedAt: "2026-05-15T08:05:00.000Z"
+    })
   );
 }
 
@@ -187,7 +228,11 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(screen.queryByRole("heading", { name: "Functional schematic" })).not.toBeInTheDocument();
     switchScreenDrawerAware("harnessAssembly");
 
-    const functionalPanel = getPanelByHeading("Functional schematic");
+    const assemblyPanel = getPanelByHeading("Harness assembly functional schematic");
+    expect(assemblyPanel).toHaveTextContent("No harness assembly selected.");
+    fireEvent.click(screen.getByRole("tab", { name: "Current network functional" }));
+
+    const functionalPanel = getPanelByHeading("Current network functional");
     const functionalSvg = within(functionalPanel).getByLabelText("Read-only functional schematic");
     expect(functionalSvg).toBeInTheDocument();
     expect(functionalPanel).toHaveTextContent("C-1 pin 1");
@@ -210,6 +255,55 @@ describe("App integration UI - network summary workflow polish", () => {
 
     fireEvent.click(within(functionalPanel).getByRole("button", { name: "CAN" }));
     expect(functionalPanel).toHaveTextContent("W-1");
+  });
+
+  it("uses a persisted explicit harness assembly selector and decouples the assembly graph from active network changes", async () => {
+    const state = createHarnessAssemblyFunctionalSelectionState();
+    const mainNetworkId = state.networks.allIds[0];
+    const secondNetworkId = asNetworkId("net-b");
+    if (mainNetworkId === undefined) {
+      throw new Error("Expected main network.");
+    }
+
+    const firstRender = renderAppWithState(state);
+    switchScreenDrawerAware("harnessAssembly");
+
+    const manager = screen.getByRole("region", { name: "Harness assembly manager" });
+    const assemblySelector = within(manager).getByLabelText("Selected harness assembly");
+    expect(assemblySelector).toHaveValue("");
+    expect(getPanelByHeading("Harness assembly functional schematic")).toHaveTextContent("No harness assembly selected.");
+
+    fireEvent.change(assemblySelector, { target: { value: "asm-main" } });
+    expect(assemblySelector).toHaveValue("asm-main");
+    expect(localStorage.getItem("electrical-plan-editor.displayed-harness-assembly-id")).toBe("asm-main");
+
+    const assemblyPanel = getPanelByHeading("Harness assembly functional schematic");
+    expect(assemblyPanel).toHaveTextContent("Filtered trace across Main assembly");
+    expect(assemblyPanel).toHaveTextContent("W-1");
+
+    const harnessBCheckbox = within(manager).getByRole("checkbox", { name: /Harness B H-B/i });
+    fireEvent.click(harnessBCheckbox);
+    expect(manager).toHaveTextContent("Unsaved assembly edits are not reflected in the visualization yet.");
+    expect(assemblyPanel).toHaveTextContent("Filtered trace across Main assembly");
+
+    firstRender.store.dispatch(appActions.selectNetwork(secondNetworkId));
+    await waitFor(() => {
+      expect(getPanelByHeading("Harness assembly functional schematic")).toHaveTextContent("Filtered trace across Main assembly");
+      expect(getPanelByHeading("Harness assembly functional schematic")).toHaveTextContent("W-1");
+    });
+
+    fireEvent.click(screen.getByRole("tab", { name: "Current network functional" }));
+    const currentNetworkPanel = getPanelByHeading("Current network functional");
+    expect(currentNetworkPanel).not.toHaveTextContent("W-1");
+    expect(currentNetworkPanel).toHaveTextContent("Select a wire, connector, or splice to generate a functional trace.");
+
+    firstRender.unmount();
+    renderAppWithState(appReducer(state, appActions.selectNetwork(mainNetworkId)));
+    switchScreenDrawerAware("harnessAssembly");
+
+    const restoredManager = screen.getByRole("region", { name: "Harness assembly manager" });
+    expect(within(restoredManager).getByLabelText("Selected harness assembly")).toHaveValue("asm-main");
+    expect(getPanelByHeading("Harness assembly functional schematic")).toHaveTextContent("Filtered trace across Main assembly");
   });
 
   it("sorts wires by numeric length in modeling wire table", () => {

@@ -32,6 +32,12 @@ interface FunctionalSchematicPanelProps {
   pngExportIncludeBackground: boolean;
   exportIncludeFrame: boolean;
   exportIncludeCartouche: boolean;
+  exportCartoucheName?: string;
+  exportCartoucheAuthor?: string;
+  exportCartoucheProjectCode?: string;
+  exportCartoucheCreatedAt?: string;
+  exportCartoucheLogoUrl?: string;
+  exportCartoucheNotes?: string;
 }
 
 interface FunctionalNodePosition {
@@ -711,7 +717,13 @@ export function FunctionalSchematicPanel({
   canvasExportFormat,
   pngExportIncludeBackground,
   exportIncludeFrame,
-  exportIncludeCartouche
+  exportIncludeCartouche,
+  exportCartoucheName,
+  exportCartoucheAuthor,
+  exportCartoucheProjectCode,
+  exportCartoucheCreatedAt,
+  exportCartoucheLogoUrl,
+  exportCartoucheNotes
 }: FunctionalSchematicPanelProps): ReactElement {
   const [activeFilter, setActiveFilter] = useState<FunctionalDomainFilter>("all");
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null);
@@ -812,12 +824,12 @@ export function FunctionalSchematicPanel({
     pngExportIncludeBackground,
     exportIncludeFrame,
     exportIncludeCartouche,
-    exportCartoucheNetworkName: `${network?.name ?? "Network"} functional schematic`,
-    exportCartoucheAuthor: network?.author,
-    exportCartoucheProjectCode: network?.projectCode,
-    exportCartoucheCreatedAt: network?.createdAt ?? new Date().toISOString(),
-    exportCartoucheLogoUrl: network?.logoUrl,
-    exportCartoucheNotes: network?.exportNotes
+    exportCartoucheNetworkName: exportCartoucheName ?? `${network?.name ?? "Network"} functional schematic`,
+    exportCartoucheAuthor: exportCartoucheAuthor ?? network?.author,
+    exportCartoucheProjectCode: exportCartoucheProjectCode ?? network?.projectCode,
+    exportCartoucheCreatedAt: exportCartoucheCreatedAt ?? network?.createdAt ?? new Date().toISOString(),
+    exportCartoucheLogoUrl: exportCartoucheLogoUrl ?? network?.logoUrl,
+    exportCartoucheNotes: exportCartoucheNotes ?? network?.exportNotes
   });
   const canExport = graph.nodes.length > 0;
   const selectedInterconnectorDetail =
