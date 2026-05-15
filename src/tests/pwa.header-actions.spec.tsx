@@ -10,9 +10,19 @@ interface BeforeInstallPromptEventLike extends Event {
   }>;
 }
 
+const originalUserAgent = window.navigator.userAgent;
+
+function setUserAgent(userAgent: string): void {
+  Object.defineProperty(window.navigator, "userAgent", {
+    value: userAgent,
+    configurable: true
+  });
+}
+
 describe("PWA header actions", () => {
   beforeEach(() => {
     localStorage.clear();
+    setUserAgent(originalUserAgent);
   });
 
   it("shows install action only when beforeinstallprompt is available", async () => {
@@ -38,6 +48,19 @@ describe("PWA header actions", () => {
     await waitFor(() => {
       expect(screen.queryByRole("button", { name: "Install app" })).not.toBeInTheDocument();
     });
+  });
+
+  it("shows install action in Firefox even without beforeinstallprompt support", async () => {
+    setUserAgent("Mozilla/5.0 Firefox/126.0");
+    const manualInstallSpy = vi.fn();
+    window.addEventListener("app:pwa-manual-install-requested", manualInstallSpy);
+
+    renderAppWithState(createUiIntegrationState());
+    const installButton = await screen.findByRole("button", { name: "Install app" });
+    fireEvent.click(installButton);
+
+    expect(manualInstallSpy).toHaveBeenCalledTimes(1);
+    window.removeEventListener("app:pwa-manual-install-requested", manualInstallSpy);
   });
 
   it("shows and clears update action from service worker update events", async () => {

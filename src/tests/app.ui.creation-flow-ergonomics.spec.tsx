@@ -115,6 +115,33 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(within(getPanelByHeading("Create Wire")).queryByRole("button", { name: "New" })).not.toBeInTheDocument();
   });
 
+  it("can create an automatic L/R directional splice directly from the create form", () => {
+    const { store } = renderAppWithState(createInitialState());
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("splice");
+
+    clickNewFromPanel("Splices");
+    const createSplicePanel = getPanelByHeading("Create Splice");
+    fireEvent.change(within(createSplicePanel).getByLabelText("Functional name"), {
+      target: { value: "Directional splice draft" }
+    });
+    fireEvent.change(within(createSplicePanel).getByLabelText("Splice type"), {
+      target: { value: "directional" }
+    });
+    expect(within(createSplicePanel).getByLabelText("Directional ports")).toHaveValue("L / R");
+
+    fireEvent.click(within(createSplicePanel).getByRole("button", { name: "Create" }));
+
+    const createdSplice = Object.values(store.getState().splices.byId).find(
+      (splice) => splice?.technicalId === "S-001"
+    );
+    expect(createdSplice).toMatchObject({
+      name: "Directional splice draft",
+      portMode: "directional",
+      portCount: 2
+    });
+  });
+
   it("shows the bottom New action only in the edit state reached after creation and resets to a fresh draft", () => {
     renderAppWithState(createInitialStateWithCatalog());
     switchScreenDrawerAware("modeling");
