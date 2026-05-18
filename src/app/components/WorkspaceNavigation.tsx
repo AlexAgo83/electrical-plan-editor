@@ -34,7 +34,7 @@ export function WorkspaceNavigation({
   const screenIconClassById: Partial<Record<ScreenId, string>> = {
     home: "is-home",
     networkScope: "is-network-scope",
-    harnessAssembly: "is-network-scope",
+    harnessAssembly: "is-harness-assembly",
     modeling: "is-edit",
     analysis: "is-analysis",
     validation: "is-validation"
