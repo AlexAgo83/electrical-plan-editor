@@ -16,6 +16,7 @@ interface HarnessAssemblyManagerPanelProps {
   networks: Network[];
   connectorsByNetworkId: ReadonlyMap<NetworkId, readonly Connector[]>;
   selectedAssemblyId: HarnessAssemblyId | "new" | "";
+  onSelectedAssemblyIdChange: (assemblyId: HarnessAssemblyId | "new" | "") => void;
   onUpsertAssembly: (assembly: HarnessAssembly) => void;
   onRemoveAssembly: (assemblyId: HarnessAssemblyId) => void;
 }
@@ -37,6 +38,7 @@ export function HarnessAssemblyManagerPanel({
   networks,
   connectorsByNetworkId,
   selectedAssemblyId,
+  onSelectedAssemblyIdChange,
   onUpsertAssembly,
   onRemoveAssembly
 }: HarnessAssemblyManagerPanelProps): ReactElement {
@@ -263,6 +265,10 @@ export function HarnessAssemblyManagerPanel({
           </div>
 
           <div className="row-actions compact">
+            <button type="button" className="button-with-icon" onClick={() => onSelectedAssemblyIdChange("new")}>
+              <span className="action-button-icon is-new" aria-hidden="true" />
+              New assembly
+            </button>
             <button type="submit" className="button-with-icon">
               <span className="action-button-icon is-save" aria-hidden="true" />
               Save assembly

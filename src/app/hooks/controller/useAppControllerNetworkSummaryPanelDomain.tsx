@@ -565,6 +565,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         networks={allNetworks}
         connectorsByNetworkId={connectorsByNetworkId}
         selectedAssemblyId={displayedAssemblyId}
+        onSelectedAssemblyIdChange={handleDisplayedAssemblyIdChange}
         onUpsertAssembly={(assembly) => {
           dispatchAction(appActions.upsertHarnessAssembly(assembly));
           handleDisplayedAssemblyIdChange(assembly.id);

@@ -276,10 +276,10 @@
 .harness-assembly-row input[type="color"] {
   width: 1.75rem;
   height: 1.75rem;
-  padding: 2px;
-  border: 1px solid color-mix(in srgb, currentColor 24%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, currentColor 6%, transparent);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
   box-sizing: border-box;
   overflow: hidden;
   cursor: pointer;
@@ -289,16 +289,16 @@
 
 .harness-assembly-row input[type="color"]::-webkit-color-swatch-wrapper {
   padding: 0;
-  border-radius: 999px;
+  border-radius: 50%;
   overflow: hidden;
 }
 
 .harness-assembly-row input[type="color"]::-webkit-color-swatch,
 .harness-assembly-row input[type="color"]::-moz-color-swatch {
   border: 0;
-  border-radius: 999px;
-  min-width: 100%;
-  min-height: 100%;
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
 }
 
 .harness-assembly-row input[type="color"]:disabled {
@@ -541,7 +541,11 @@
     align-items: stretch;
   }
   .harness-assembly-functional-tabs {
+    flex-direction: column;
     align-items: stretch;
+  }
+  .harness-assembly-functional-tabs .network-summary-header-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .harness-assembly-functional-select {
     width: 100%;
@@ -606,6 +610,15 @@
   .network-summary-canvas-region,
   .network-summary-legend {
     display: none !important;
+  }
+  .harness-assembly-functional-tabs .network-summary-header-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .harness-assembly-functional-tabs .workspace-tab {
+    white-space: normal;
+    min-height: 2.25rem;
+    line-height: 1.15;
   }
   .network-summary-mobile-unavailable {
     display: block;
