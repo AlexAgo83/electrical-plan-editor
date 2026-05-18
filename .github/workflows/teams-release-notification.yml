@@ -1,0 +1,74 @@
+name: Notify Teams on release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify-teams:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Teams notification
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          REPOSITORY: ${{ github.repository }}
+          AUTHOR: ${{ github.event.release.author.login }}
+        run: |
+          if [ -z "$TEAMS_WEBHOOK_URL" ]; then
+            echo "TEAMS_WEBHOOK_URL secret is not configured."
+            exit 1
+          fi
+
+          jq -n \
+            --arg repository "$REPOSITORY" \
+            --arg release_name "$RELEASE_NAME" \
+            --arg release_tag "$RELEASE_TAG" \
+            --arg release_url "$RELEASE_URL" \
+            --arg author "$AUTHOR" \
+            '{
+              type: "message",
+              attachments: [
+                {
+                  contentType: "application/vnd.microsoft.card.adaptive",
+                  content: {
+                    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                    type: "AdaptiveCard",
+                    version: "1.4",
+                    body: [
+                      {
+                        type: "TextBlock",
+                        size: "Large",
+                        weight: "Bolder",
+                        text: "Nouvelle release publiée"
+                      },
+                      {
+                        type: "FactSet",
+                        facts: [
+                          { title: "Repo", value: $repository },
+                          { title: "Release", value: $release_name },
+                          { title: "Tag", value: $release_tag },
+                          { title: "Auteur", value: $author }
+                        ]
+                      }
+                    ],
+                    actions: [
+                      {
+                        type: "Action.OpenUrl",
+                        title: "Voir la release",
+                        url: $release_url
+                      }
+                    ]
+                  }
+                }
+              ]
+            }' > teams-payload.json
+
+          curl --fail-with-body \
+            --request POST \
+            --header "Content-Type: application/json" \
+            --data @teams-payload.json \
+            "$TEAMS_WEBHOOK_URL"
