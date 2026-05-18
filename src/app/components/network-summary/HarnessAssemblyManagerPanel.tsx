@@ -321,7 +321,7 @@ export function HarnessAssemblyManagerPanel({
                 <option value="">Target connector</option>
                 {targetConnectors.map((connector) => <option key={connector.id} value={connector.id}>{connector.technicalId}</option>)}
               </select>
-              <button type="button" className="button-with-icon" onClick={handleAddLink} disabled={!canAddLink}>
+              <button type="button" className="network-scope-create-button button-with-icon" onClick={handleAddLink} disabled={!canAddLink}>
                 <span className="action-button-icon is-new" aria-hidden="true" />
                 Add link
               </button>
