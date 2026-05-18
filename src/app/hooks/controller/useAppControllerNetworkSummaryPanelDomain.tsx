@@ -391,7 +391,6 @@ export function useAppControllerNetworkSummaryPanelDomain({
     displayedAssemblyId === "" || displayedAssemblyId === "new"
       ? null
       : harnessAssemblies.find((assembly) => assembly.id === displayedAssemblyId) ?? null;
-  const networksById = new Map(allNetworks.map((network) => [network.id, network]));
   const assemblyGraphFactory = useMemo(() => {
     if (displayedHarnessAssembly === null) {
       return null;
@@ -451,44 +450,6 @@ export function useAppControllerNetworkSummaryPanelDomain({
       });
     };
   }, [displayedHarnessAssembly, store]);
-  const interconnectorDetails =
-    displayedHarnessAssembly === null
-      ? undefined
-      : new Map(
-          displayedHarnessAssembly.connectorLinks.flatMap((link) => {
-            const sourceNetwork = networksById.get(link.sourceNetworkId);
-            const targetNetwork = networksById.get(link.targetNetworkId);
-            const sourceConnector = connectorsByNetworkId.get(link.sourceNetworkId)?.find((connector) => connector.id === link.sourceConnectorId);
-            const targetConnector = connectorsByNetworkId.get(link.targetNetworkId)?.find((connector) => connector.id === link.targetConnectorId);
-            if (sourceNetwork === undefined || targetNetwork === undefined || sourceConnector === undefined || targetConnector === undefined) {
-              return [];
-            }
-            return [
-              [
-                String(link.id),
-                {
-                  name: link.name ?? "Interconnector",
-                  sourceNetworkId: link.sourceNetworkId,
-                  sourceNetworkLabel: `${sourceNetwork.technicalId} - ${sourceNetwork.name}`,
-                  sourceConnectorId: link.sourceConnectorId,
-                  sourceConnectorLabel: `${sourceConnector.technicalId} - ${sourceConnector.name}`,
-                  targetNetworkId: link.targetNetworkId,
-                  targetNetworkLabel: `${targetNetwork.technicalId} - ${targetNetwork.name}`,
-                  targetConnectorId: link.targetConnectorId,
-                  targetConnectorLabel: `${targetConnector.technicalId} - ${targetConnector.name}`,
-                  onOpenSource: () => {
-                    dispatchAction(appActions.selectNetwork(link.sourceNetworkId), { trackHistory: false });
-                    dispatchAction(appActions.select({ kind: "connector", id: link.sourceConnectorId }), { trackHistory: false });
-                  },
-                  onOpenTarget: () => {
-                    dispatchAction(appActions.selectNetwork(link.targetNetworkId), { trackHistory: false });
-                    dispatchAction(appActions.select({ kind: "connector", id: link.targetConnectorId }), { trackHistory: false });
-                  }
-                }
-              ] as const
-            ];
-          })
-        );
   const assemblyFunctionalGraphPanel =
     displayedHarnessAssembly === null ? (
       <section className="panel functional-schematic-panel" aria-labelledby="harness-assembly-empty-title">
@@ -512,8 +473,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
         spliceMap={new Map()}
         rootConnectorIds={[]}
         assemblyGraphFactory={assemblyGraphFactory ?? undefined}
-        interconnectorDetails={interconnectorDetails}
         title="Harness assembly functional schematic"
+        titleSuffix={displayedHarnessAssembly.name}
         subtitle={`Filtered trace across ${displayedHarnessAssembly.name} from configured master connectors.`}
         selectedWireId={null}
         selectedConnectorId={null}
@@ -537,6 +498,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
       spliceMap={spliceMap}
       rootConnectorIds={mainHarnessConnectorIds}
       title="Current network functional"
+      titleSuffix={activeNetwork?.name ?? "No active network"}
       selectedWireId={selection.selectedWireId}
       selectedConnectorId={selection.selectedConnectorId ?? mainHarnessConnectorIds[0] ?? null}
       selectedSpliceId={selection.selectedSpliceId}
@@ -560,23 +522,6 @@ export function useAppControllerNetworkSummaryPanelDomain({
   );
   const networkFunctionalSchematicPanel = (
     <>
-      <HarnessAssemblyManagerPanel
-        assemblies={harnessAssemblies}
-        networks={allNetworks}
-        connectorsByNetworkId={connectorsByNetworkId}
-        selectedAssemblyId={displayedAssemblyId}
-        onSelectedAssemblyIdChange={handleDisplayedAssemblyIdChange}
-        onUpsertAssembly={(assembly) => {
-          dispatchAction(appActions.upsertHarnessAssembly(assembly));
-          handleDisplayedAssemblyIdChange(assembly.id);
-        }}
-        onRemoveAssembly={(assemblyId) => {
-          dispatchAction(appActions.removeHarnessAssembly(assemblyId));
-          if (displayedAssemblyId === assemblyId) {
-            handleDisplayedAssemblyIdChange("");
-          }
-        }}
-      />
       <section className="panel harness-assembly-functional-tabs" aria-label="Functional graph scope">
         <div className="network-summary-header-actions" role="tablist" aria-label="Functional graph scope tabs">
           <button
@@ -598,8 +543,39 @@ export function useAppControllerNetworkSummaryPanelDomain({
             Current network functional
           </button>
         </div>
+        <select
+          className="harness-assembly-functional-select"
+          value={displayedAssemblyId}
+          onChange={(event) => handleDisplayedAssemblyIdChange(event.target.value as HarnessAssemblyId | "new" | "")}
+          aria-label="Selected harness assembly"
+          disabled={harnessAssemblyGraphTab === "current"}
+        >
+          <option value="">Select assembly</option>
+          <option value="new">New assembly</option>
+          {harnessAssemblies.map((assembly) => (
+            <option key={assembly.id} value={assembly.id}>
+              {assembly.name}
+            </option>
+          ))}
+        </select>
       </section>
       {harnessAssemblyGraphTab === "assembly" ? assemblyFunctionalGraphPanel : currentNetworkFunctionalGraphPanel}
+      <HarnessAssemblyManagerPanel
+        assemblies={harnessAssemblies}
+        networks={allNetworks}
+        connectorsByNetworkId={connectorsByNetworkId}
+        selectedAssemblyId={displayedAssemblyId}
+        onUpsertAssembly={(assembly) => {
+          dispatchAction(appActions.upsertHarnessAssembly(assembly));
+          handleDisplayedAssemblyIdChange(assembly.id);
+        }}
+        onRemoveAssembly={(assemblyId) => {
+          dispatchAction(appActions.removeHarnessAssembly(assemblyId));
+          if (displayedAssemblyId === assemblyId) {
+            handleDisplayedAssemblyIdChange("");
+          }
+        }}
+      />
     </>
   );
 

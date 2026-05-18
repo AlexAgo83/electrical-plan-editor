@@ -190,6 +190,13 @@
   gap: 0.85rem;
 }
 
+.harness-assembly-functional-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
 .harness-assembly-grid,
 .harness-assembly-link-form {
   display: grid;
@@ -198,6 +205,7 @@
 }
 
 .harness-assembly-manager-panel select,
+.harness-assembly-functional-select,
 .harness-assembly-link-form input,
 .harness-assembly-links input {
   width: 100%;
@@ -211,13 +219,14 @@
 }
 
 .harness-assembly-manager-panel select:focus-visible,
+.harness-assembly-functional-select:focus-visible,
 .harness-assembly-link-form input:focus-visible,
 .harness-assembly-links input:focus-visible {
   outline: 2px solid color-mix(in srgb, currentColor 36%, transparent);
   outline-offset: 2px;
 }
 
-.harness-assembly-manager-panel > .network-summary-header select {
+.harness-assembly-functional-select {
   width: min(18rem, 42vw);
   flex: 0 1 18rem;
 }
@@ -309,8 +318,7 @@
   border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
 }
 
-.harness-assembly-subpanel h3,
-.functional-interconnector-detail h3 {
+.harness-assembly-subpanel h3 {
   margin: 0;
   font-size: 0.9rem;
 }
@@ -472,26 +480,6 @@
   stroke-dasharray: 6 4;
 }
 
-.functional-node--interconnector {
-  cursor: pointer;
-  outline: none;
-}
-
-.functional-node--interconnector:hover .functional-node-shape,
-.functional-node--interconnector:focus-visible .functional-node-shape,
-.functional-node--interconnector.is-selected .functional-node-shape {
-  stroke-width: 3;
-  fill: color-mix(in srgb, var(--network-selection-color, #0f6cb8) 16%, var(--network-node-connector-fill, #dff0ff));
-}
-
-.functional-node--power .functional-node-shape {
-  stroke: var(--network-wire-highlight-color, #4f8d2d);
-}
-
-.functional-node--ground .functional-node-shape {
-  stroke: var(--network-wire-highlight-color, #4f8d2d);
-}
-
 .functional-node-label {
   fill: var(--network-node-label-color, #183549);
   font-size: 10px;
@@ -547,30 +535,15 @@
   font-size: 0.82rem;
 }
 
-.functional-interconnector-detail {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: 0.65rem;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid #b9cde0;
-  border-radius: 0.6rem;
-  background: rgba(240, 246, 252, 0.9);
-}
-
-.functional-interconnector-detail p {
-  margin: 0.2rem 0 0;
-  color: #486579;
-  font-size: 0.82rem;
-}
-
 @media (max-width: 900px) {
   .network-summary-header {
     flex-direction: column;
     align-items: stretch;
   }
-  .harness-assembly-manager-panel > .network-summary-header select {
+  .harness-assembly-functional-tabs {
+    align-items: stretch;
+  }
+  .harness-assembly-functional-select {
     width: 100%;
     flex-basis: auto;
   }
@@ -595,10 +568,6 @@
   .harness-assembly-row,
   .harness-assembly-links li {
     grid-template-columns: auto minmax(0, 1fr);
-  }
-  .functional-interconnector-detail {
-    flex-direction: column;
-    align-items: stretch;
   }
 }
 @media (max-width: 520px) {

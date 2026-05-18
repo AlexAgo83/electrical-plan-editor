@@ -16,7 +16,6 @@ interface HarnessAssemblyManagerPanelProps {
   networks: Network[];
   connectorsByNetworkId: ReadonlyMap<NetworkId, readonly Connector[]>;
   selectedAssemblyId: HarnessAssemblyId | "new" | "";
-  onSelectedAssemblyIdChange: (assemblyId: HarnessAssemblyId | "new" | "") => void;
   onUpsertAssembly: (assembly: HarnessAssembly) => void;
   onRemoveAssembly: (assemblyId: HarnessAssemblyId) => void;
 }
@@ -38,7 +37,6 @@ export function HarnessAssemblyManagerPanel({
   networks,
   connectorsByNetworkId,
   selectedAssemblyId,
-  onSelectedAssemblyIdChange,
   onUpsertAssembly,
   onRemoveAssembly
 }: HarnessAssemblyManagerPanelProps): ReactElement {
@@ -151,7 +149,6 @@ export function HarnessAssemblyManagerPanel({
     event.preventDefault();
     const draftAssembly = buildDraftAssembly();
     onUpsertAssembly(draftAssembly);
-    onSelectedAssemblyIdChange(draftAssembly.id);
   };
 
   const handleAddLink = () => {
@@ -216,19 +213,6 @@ export function HarnessAssemblyManagerPanel({
           <h2>Harness assembly</h2>
           <p className="functional-schematic-subtitle">Group networks, choose trace roots, and define physical interconnector links.</p>
         </div>
-        <select
-          value={selectedAssemblyId}
-          onChange={(event) => onSelectedAssemblyIdChange(event.target.value as HarnessAssemblyId | "new" | "")}
-          aria-label="Selected harness assembly"
-        >
-          <option value="">Select assembly</option>
-          <option value="new">New assembly</option>
-          {assemblies.map((assembly) => (
-            <option key={assembly.id} value={assembly.id}>
-              {assembly.name}
-            </option>
-          ))}
-        </select>
       </header>
 
       {hasEmptyAssemblySelection ? (

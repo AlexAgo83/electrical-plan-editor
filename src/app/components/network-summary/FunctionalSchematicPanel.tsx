@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, type ReactElement } from "react";
-import type { CatalogItem, Connector, ConnectorId, Network, NetworkId, Segment, Splice, SpliceId, Wire } from "../../../core/entities";
+import type { CatalogItem, Connector, ConnectorId, Network, Segment, Splice, SpliceId, Wire } from "../../../core/entities";
 import {
   buildFunctionalSchematicGraph,
   type FunctionalSchematicEdge,
@@ -22,8 +22,8 @@ interface FunctionalSchematicPanelProps {
   rootConnectorIds?: readonly ConnectorId[];
   assemblyGraph?: FunctionalSchematicGraph;
   assemblyGraphFactory?: (activeFilter: FunctionalDomainFilter) => FunctionalSchematicGraph;
-  interconnectorDetails?: ReadonlyMap<string, FunctionalInterconnectorDetail>;
   title?: string;
+  titleSuffix?: string;
   subtitle?: string;
   selectedWireId: Wire["id"] | null;
   selectedConnectorId: ConnectorId | null;
@@ -488,20 +488,6 @@ function getFunctionalEdgeWireColorInput(edge: FunctionalSchematicEdge, wire: Wi
   };
 }
 
-interface FunctionalInterconnectorDetail {
-  name: string;
-  sourceNetworkId: NetworkId;
-  sourceNetworkLabel: string;
-  sourceConnectorId: ConnectorId;
-  sourceConnectorLabel: string;
-  targetNetworkId: NetworkId;
-  targetNetworkLabel: string;
-  targetConnectorId: ConnectorId;
-  targetConnectorLabel: string;
-  onOpenSource: () => void;
-  onOpenTarget: () => void;
-}
-
 function estimateFunctionalEdgeLabelBoxWidth(wireName: string, wireTechnicalId: string): number {
   const longestLabelLength = Math.max(wireName.length, wireTechnicalId.length);
   return Math.max(FUNCTIONAL_EDGE_LABEL_BOX_MIN_WIDTH, longestLabelLength * 5.4 + 18);
@@ -708,8 +694,8 @@ export function FunctionalSchematicPanel({
   rootConnectorIds = [],
   assemblyGraph,
   assemblyGraphFactory,
-  interconnectorDetails,
   title = "Functional schematic",
+  titleSuffix,
   subtitle,
   selectedWireId,
   selectedConnectorId,
@@ -727,7 +713,6 @@ export function FunctionalSchematicPanel({
 }: FunctionalSchematicPanelProps): ReactElement {
   const [activeFilter, setActiveFilter] = useState<FunctionalDomainFilter>("all");
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null);
-  const [selectedInterconnectorLinkId, setSelectedInterconnectorLinkId] = useState<string | null>(null);
   const [showGrid, setShowGrid] = useState(true);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
@@ -833,14 +818,18 @@ export function FunctionalSchematicPanel({
     exportCartoucheNotes: exportCartoucheNotes ?? network?.exportNotes
   });
   const canExport = graph.nodes.length > 0;
-  const selectedInterconnectorDetail =
-    selectedInterconnectorLinkId === null ? undefined : interconnectorDetails?.get(selectedInterconnectorLinkId);
-
   return (
     <section className="panel functional-schematic-panel" aria-labelledby="functional-schematic-title">
       <header className="network-summary-header">
         <div>
-          <h2 id="functional-schematic-title">{title}</h2>
+          <div className="network-summary-title">
+            <h2 id="functional-schematic-title">{title}</h2>
+            {titleSuffix !== undefined && titleSuffix.length > 0 ? (
+              <span className="network-summary-active-network" aria-hidden="true">
+                {titleSuffix}
+              </span>
+            ) : null}
+          </div>
           <p className="functional-schematic-subtitle">
             {subtitle ?? `Read-only trace from ${getSeedLabel(seed, rootConnectors)}.`} {graph.includedWireIds.length} wire
             {graph.includedWireIds.length === 1 ? "" : "s"} included.
@@ -855,7 +844,13 @@ export function FunctionalSchematicPanel({
             <span className="network-summary-grid-icon" aria-hidden="true" />
             Grid
           </button>
-          <button type="button" className="workspace-tab" onClick={handleExportPlan} disabled={!canExport}>
+          <button
+            type="button"
+            className="workspace-tab network-summary-export-button"
+            onClick={handleExportPlan}
+            disabled={!canExport}
+          >
+            <span className="network-summary-export-icon" aria-hidden="true" />
             Export {canvasExportFormat.toUpperCase()}
           </button>
         </div>
@@ -929,28 +924,7 @@ export function FunctionalSchematicPanel({
                 return (
                   <g
                     key={node.id}
-                    className={
-                      node.kind === "interconnector" && node.sourceIds[0] === selectedInterconnectorLinkId
-                        ? `${getNodeClassName(node)} is-selected`
-                        : getNodeClassName(node)
-                    }
-                    tabIndex={node.kind === "interconnector" ? 0 : undefined}
-                    role={node.kind === "interconnector" ? "button" : undefined}
-                    aria-label={node.kind === "interconnector" ? `Open ${node.label} details` : undefined}
-                    onClick={() => {
-                      if (node.kind === "interconnector") {
-                        setSelectedInterconnectorLinkId(node.sourceIds[0] ?? null);
-                      }
-                    }}
-                    onKeyDown={(event) => {
-                      if (node.kind !== "interconnector") {
-                        return;
-                      }
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        setSelectedInterconnectorLinkId(node.sourceIds[0] ?? null);
-                      }
-                    }}
+                    className={getNodeClassName(node)}
                   >
                     <title>{`${node.label} ${node.detail}`}</title>
                     {renderNodeShape(node, position)}
@@ -992,29 +966,6 @@ export function FunctionalSchematicPanel({
           </svg>
         )}
       </div>
-
-      {selectedInterconnectorDetail !== undefined ? (
-        <section className="functional-interconnector-detail" aria-label="Interconnector detail">
-          <div>
-            <h3>{selectedInterconnectorDetail.name}</h3>
-            <p>
-              {selectedInterconnectorDetail.sourceNetworkLabel} / {selectedInterconnectorDetail.sourceConnectorLabel}
-              {" -> "}
-              {selectedInterconnectorDetail.targetNetworkLabel} / {selectedInterconnectorDetail.targetConnectorLabel}
-            </p>
-          </div>
-          <div className="row-actions compact">
-            <button type="button" className="button-with-icon" onClick={selectedInterconnectorDetail.onOpenSource}>
-              <span className="action-button-icon is-open" aria-hidden="true" />
-              Open source
-            </button>
-            <button type="button" className="button-with-icon" onClick={selectedInterconnectorDetail.onOpenTarget}>
-              <span className="action-button-icon is-open" aria-hidden="true" />
-              Open target
-            </button>
-          </div>
-        </section>
-      ) : null}
 
       {graph.warnings.length > 0 ? (
         <div className="functional-schematic-warnings" role="status" aria-label="Functional schematic warnings">

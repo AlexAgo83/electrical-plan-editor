@@ -34,10 +34,13 @@
 }
 
 .network-summary-active-network {
-  color: #486579;
+  color: color-mix(in srgb, currentColor 78%, transparent);
   font-size: 1rem;
   font-weight: 600;
   overflow-wrap: anywhere;
+  background: color-mix(in srgb, currentColor 7%, transparent);
+  border-radius: 0.35rem;
+  padding: 0.05rem 0.3rem;
 }
 
 .network-summary-header-actions {
