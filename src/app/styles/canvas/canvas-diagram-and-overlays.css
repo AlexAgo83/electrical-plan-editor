@@ -265,9 +265,30 @@
 }
 
 .harness-assembly-row input[type="color"] {
-  width: 2rem;
-  height: 1.6rem;
+  width: 1.75rem;
+  height: 1.75rem;
   padding: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.harness-assembly-row input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.harness-assembly-row input[type="color"]::-webkit-color-swatch,
+.harness-assembly-row input[type="color"]::-moz-color-swatch {
+  border: 0;
+  border-radius: 999px;
+}
+
+.harness-assembly-row input[type="color"]:disabled {
+  opacity: 0.32;
+  cursor: not-allowed;
+  filter: saturate(0.45);
 }
 
 .harness-assembly-row input[type="checkbox"] {
