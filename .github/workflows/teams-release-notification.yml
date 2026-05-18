@@ -3,20 +3,45 @@ name: Notify Teams on release
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag to notify. Leave empty to use the latest release."
+        required: false
+        type: string
 
 jobs:
   notify-teams:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
+      - name: Resolve release details
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_EVENT: ${{ toJson(github.event.release) }}
+          RELEASE_TAG_INPUT: ${{ inputs.release_tag }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
+            echo "$RELEASE_EVENT" > release.json
+          elif [ -n "$RELEASE_TAG_INPUT" ]; then
+            gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG_INPUT" > release.json
+          else
+            gh api "repos/$GITHUB_REPOSITORY/releases/latest" > release.json
+          fi
+
+          {
+            echo "RELEASE_NAME=$(jq -r '.name // .tag_name' release.json)"
+            echo "RELEASE_TAG=$(jq -r '.tag_name' release.json)"
+            echo "RELEASE_URL=$(jq -r '.html_url' release.json)"
+            echo "AUTHOR=$(jq -r '.author.login // \"unknown\"' release.json)"
+          } >> "$GITHUB_ENV"
+
       - name: Send Teams notification
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
-          RELEASE_NAME: ${{ github.event.release.name }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-          RELEASE_URL: ${{ github.event.release.html_url }}
           REPOSITORY: ${{ github.repository }}
-          AUTHOR: ${{ github.event.release.author.login }}
         run: |
           if [ -z "$TEAMS_WEBHOOK_URL" ]; then
             echo "TEAMS_WEBHOOK_URL secret is not configured."
