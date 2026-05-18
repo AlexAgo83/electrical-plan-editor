@@ -357,11 +357,11 @@
 
 .functional-edge text,
 .functional-edge-label text {
-  fill: #315168;
+  fill: var(--network-segment-label-color, #38566a);
   font-size: 10px;
   font-weight: 700;
   paint-order: stroke fill;
-  stroke: rgba(247, 251, 255, 0.94);
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
   stroke-width: 2px;
   stroke-linejoin: round;
 }
@@ -384,8 +384,8 @@
 .functional-edge-label:hover .functional-edge-label-hitbox,
 .functional-edge-label.is-hovered .functional-edge-label-hitbox,
 .functional-edge-label:focus-visible .functional-edge-label-hitbox {
-  fill: rgba(247, 251, 255, 0.82);
-  stroke: rgba(79, 141, 45, 0.42);
+  fill: color-mix(in srgb, var(--network-label-stroke-color, rgba(246, 251, 255, 0.96)) 72%, transparent);
+  stroke: color-mix(in srgb, var(--network-wire-highlight-color, #4f8d2d) 46%, transparent);
 }
 
 .functional-edge-name {
@@ -396,7 +396,7 @@
 .functional-edge-tech-label {
   font-size: 8px;
   font-weight: 700;
-  fill: #4f6b7e;
+  fill: var(--network-segment-length-label-color, var(--network-segment-label-color, #547086));
 }
 
 .functional-edge-color-swatch {
@@ -422,7 +422,7 @@
 .functional-node-shape {
   stroke: var(--network-node-stroke-color, #55748d);
   stroke-width: 2;
-  fill: #eef6fc;
+  fill: var(--network-node-intermediate-fill, #ecf2f7);
 }
 
 .functional-node--connector .functional-node-shape {
@@ -434,13 +434,13 @@
 }
 
 .functional-node--fuse .functional-node-shape {
-  fill: #fff1d5;
-  stroke: #9d741f;
+  fill: var(--network-node-splice-fill, #fdeecf);
+  stroke: var(--network-node-stroke-color, #55748d);
 }
 
 .functional-node--interconnector .functional-node-shape {
-  fill: #e8eefc;
-  stroke: #4f62a8;
+  fill: color-mix(in srgb, var(--network-node-connector-fill, #dff0ff) 76%, var(--network-node-intermediate-fill, #ecf2f7));
+  stroke: var(--network-selection-color, var(--network-node-stroke-color, #55748d));
   stroke-dasharray: 6 4;
 }
 
@@ -453,32 +453,32 @@
 .functional-node--interconnector:focus-visible .functional-node-shape,
 .functional-node--interconnector.is-selected .functional-node-shape {
   stroke-width: 3;
-  fill: #dce6ff;
+  fill: color-mix(in srgb, var(--network-selection-color, #0f6cb8) 16%, var(--network-node-connector-fill, #dff0ff));
 }
 
 .functional-node--power .functional-node-shape {
-  stroke: #a45b20;
+  stroke: var(--network-wire-highlight-color, #4f8d2d);
 }
 
 .functional-node--ground .functional-node-shape {
-  stroke: #3e6f52;
+  stroke: var(--network-wire-highlight-color, #4f8d2d);
 }
 
 .functional-node-label {
-  fill: #17364c;
+  fill: var(--network-node-label-color, #183549);
   font-size: 10px;
   font-weight: 800;
   paint-order: stroke fill;
-  stroke: rgba(247, 251, 255, 0.94);
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
   stroke-width: 2px;
   stroke-linejoin: round;
 }
 
 .functional-node-detail {
-  fill: #4f6b7e;
+  fill: var(--network-segment-length-label-color, var(--network-segment-label-color, #547086));
   font-size: 8px;
   paint-order: stroke fill;
-  stroke: rgba(247, 251, 255, 0.94);
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
   stroke-width: 1.8px;
   stroke-linejoin: round;
 }
@@ -494,11 +494,11 @@
 }
 
 .functional-node-network-label {
-  fill: #4f6b7e;
+  fill: var(--network-segment-length-label-color, var(--network-segment-label-color, #547086));
   font-size: 7px;
   font-weight: 700;
   paint-order: stroke fill;
-  stroke: rgba(247, 251, 255, 0.94);
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
   stroke-width: 1.6px;
   stroke-linejoin: round;
 }
