@@ -451,14 +451,6 @@ export function useAppControllerNetworkSummaryPanelDomain({
         );
   const networkFunctionalSchematicPanel = hasActiveNetwork ? (
     <>
-      <HarnessAssemblyManagerPanel
-        assemblies={harnessAssemblies}
-        networks={allNetworks}
-        connectorsByNetworkId={connectorsByNetworkId}
-        activeNetworkId={globalState.activeNetworkId}
-        onUpsertAssembly={(assembly) => dispatchAction(appActions.upsertHarnessAssembly(assembly))}
-        onRemoveAssembly={(assemblyId) => dispatchAction(appActions.removeHarnessAssembly(assemblyId))}
-      />
       <FunctionalSchematicPanel
         network={activeNetwork}
         wires={wires}
@@ -482,6 +474,14 @@ export function useAppControllerNetworkSummaryPanelDomain({
         pngExportIncludeBackground={preferencesState.canvasPngExportIncludeBackground}
         exportIncludeFrame={preferencesState.canvasExportIncludeFrame}
         exportIncludeCartouche={preferencesState.canvasExportIncludeCartouche}
+      />
+      <HarnessAssemblyManagerPanel
+        assemblies={harnessAssemblies}
+        networks={allNetworks}
+        connectorsByNetworkId={connectorsByNetworkId}
+        activeNetworkId={globalState.activeNetworkId}
+        onUpsertAssembly={(assembly) => dispatchAction(appActions.upsertHarnessAssembly(assembly))}
+        onRemoveAssembly={(assemblyId) => dispatchAction(appActions.removeHarnessAssembly(assemblyId))}
       />
     </>
   ) : null;
