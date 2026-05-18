@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ConnectorId, SegmentId, WireId } from "../core/entities";
+import type { ConnectorId, HarnessAssemblyId, NetworkId, SegmentId, WireId } from "../core/entities";
 import {
   createInitialState,
   createSampleNetworkState,
@@ -13,6 +13,14 @@ function asWireId(value: string): WireId {
 
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
+}
+
+function asHarnessAssemblyId(value: string): HarnessAssemblyId {
+  return value as HarnessAssemblyId;
+}
+
+function asNetworkId(value: string): NetworkId {
+  return value as NetworkId;
 }
 
 function asSegmentId(value: string): SegmentId {
@@ -71,6 +79,27 @@ describe("sample network fixture", () => {
         expect(scoped.splices.byId[spliceId]?.catalogItemId).toBeDefined();
       }
     }
+  });
+
+  it("includes a harness assembly across the built-in demo networks", () => {
+    const state = createSampleNetworkState();
+    const assembly = state.harnessAssemblies.byId[asHarnessAssemblyId("assembly-sample-vehicle-platform")];
+
+    expect(assembly).toBeDefined();
+    expect(assembly?.members.map((member) => member.networkId)).toEqual([
+      asNetworkId("network-main"),
+      asNetworkId("network-lighting-demo"),
+      asNetworkId("network-sensor-backbone-demo")
+    ]);
+    expect(assembly?.masterConnectorRefs).toEqual([
+      { networkId: asNetworkId("network-main"), connectorId: asConnectorId("C-SRC") },
+      { networkId: asNetworkId("network-lighting-demo"), connectorId: asConnectorId("L-C-SRC") },
+      { networkId: asNetworkId("network-sensor-backbone-demo"), connectorId: asConnectorId("S-C-ECU") }
+    ]);
+    expect(assembly?.connectorLinks).toHaveLength(2);
+    expect(state.networkStates[asNetworkId("network-main")]?.connectors.byId[asConnectorId("C-SRC")]?.isMainHarnessConnector).toBe(true);
+    expect(state.networkStates[asNetworkId("network-lighting-demo")]?.connectors.byId[asConnectorId("L-C-SRC")]?.isMainHarnessConnector).toBe(true);
+    expect(state.networkStates[asNetworkId("network-sensor-backbone-demo")]?.connectors.byId[asConnectorId("S-C-ECU")]?.isMainHarnessConnector).toBe(true);
   });
 
   it("keeps source connector occupancy coherent for seeded wires", () => {

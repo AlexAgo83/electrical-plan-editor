@@ -1,5 +1,6 @@
 import type {
   ConnectorId,
+  HarnessAssemblyId,
   NetworkId,
   NodeId,
   SegmentId,
@@ -19,6 +20,9 @@ import { createInitialState, type AppState } from "./types";
 
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
+}
+function asHarnessAssemblyId(value: string): HarnessAssemblyId {
+  return value as HarnessAssemblyId;
 }
 function asSpliceId(value: string): SpliceId {
   return value as SpliceId;
@@ -76,6 +80,7 @@ const SAMPLE_WIRE_IDS = [
 ] as const;
 
 export const SAMPLE_NETWORK_SIGNATURE = {
+  harnessAssemblies: [asHarnessAssemblyId("assembly-sample-vehicle-platform")],
   connectors: SAMPLE_CONNECTOR_IDS,
   splices: SAMPLE_SPLICE_IDS,
   nodes: SAMPLE_NODE_IDS,
@@ -112,7 +117,8 @@ export function hasSampleNetworkSignature(state: AppState): boolean {
       SAMPLE_SPLICE_IDS.every((id) => scoped.splices.byId[id] !== undefined) &&
       SAMPLE_NODE_IDS.every((id) => scoped.nodes.byId[id] !== undefined) &&
       SAMPLE_SEGMENT_IDS.every((id) => scoped.segments.byId[id] !== undefined) &&
-      SAMPLE_WIRE_IDS.every((id) => scoped.wires.byId[id] !== undefined)
+      SAMPLE_WIRE_IDS.every((id) => scoped.wires.byId[id] !== undefined) &&
+      SAMPLE_NETWORK_SIGNATURE.harnessAssemblies.every((id) => state.harnessAssemblies.byId[id] !== undefined)
     );
   });
 }
@@ -125,6 +131,7 @@ export function createSampleNetworkState(): AppState {
       name: "Power Source Connector",
       technicalId: "CONN-SRC-01",
       cavityCount: 12,
+      isMainHarnessConnector: true,
       catalogItemId: mainSampleCatalogIds.powerSource12Way
     }),
     appActions.upsertConnector({

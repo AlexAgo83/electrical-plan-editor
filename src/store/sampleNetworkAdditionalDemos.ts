@@ -1,5 +1,7 @@
 import type {
   ConnectorId,
+  HarnessAssemblyId,
+  InterHarnessConnectorLinkId,
   NetworkId,
   NodeId,
   SegmentId,
@@ -38,6 +40,14 @@ function asNetworkId(value: string): NetworkId {
   return value as NetworkId;
 }
 
+function asHarnessAssemblyId(value: string): HarnessAssemblyId {
+  return value as HarnessAssemblyId;
+}
+
+function asInterHarnessConnectorLinkId(value: string): InterHarnessConnectorLinkId {
+  return value as InterHarnessConnectorLinkId;
+}
+
 export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
   return [
     appActions.createNetwork(
@@ -58,6 +68,7 @@ export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
       name: "Lighting Source Connector",
       technicalId: "L-CONN-SRC",
       cavityCount: 6,
+      isMainHarnessConnector: true,
       catalogItemId: lightingDemoCatalogIds.source6Way
     }),
     appActions.upsertConnector({
@@ -154,6 +165,7 @@ export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
       name: "ECU Connector",
       technicalId: "S-CONN-ECU",
       cavityCount: 12,
+      isMainHarnessConnector: true,
       catalogItemId: sensorDemoCatalogIds.ecu12Way
     }),
     appActions.upsertConnector({
@@ -266,6 +278,41 @@ export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
       technicalId: "S-WIRE-C-GND",
       endpointA: { kind: "connectorCavity", connectorId: asConnectorId("S-C-C"), cavityIndex: 2 },
       endpointB: { kind: "splicePort", spliceId: asSpliceId("S-S-GND"), portIndex: 3 }
+    }),
+    appActions.upsertHarnessAssembly({
+      id: asHarnessAssemblyId("assembly-sample-vehicle-platform"),
+      name: "Sample vehicle platform assembly",
+      technicalId: "ASM-SAMPLE-VEHICLE",
+      members: [
+        { networkId: asNetworkId("network-main"), color: "#2563eb" },
+        { networkId: asNetworkId("network-lighting-demo"), color: "#f59e0b" },
+        { networkId: asNetworkId("network-sensor-backbone-demo"), color: "#16a34a" }
+      ],
+      masterConnectorRefs: [
+        { networkId: asNetworkId("network-main"), connectorId: asConnectorId("C-SRC") },
+        { networkId: asNetworkId("network-lighting-demo"), connectorId: asConnectorId("L-C-SRC") },
+        { networkId: asNetworkId("network-sensor-backbone-demo"), connectorId: asConnectorId("S-C-ECU") }
+      ],
+      connectorLinks: [
+        {
+          id: asInterHarnessConnectorLinkId("sample-link-main-lighting"),
+          name: "Main to lighting feed",
+          sourceNetworkId: asNetworkId("network-main"),
+          sourceConnectorId: asConnectorId("C-DST-2"),
+          targetNetworkId: asNetworkId("network-lighting-demo"),
+          targetConnectorId: asConnectorId("L-C-SRC")
+        },
+        {
+          id: asInterHarnessConnectorLinkId("sample-link-lighting-sensor"),
+          name: "Lighting to sensor handoff",
+          sourceNetworkId: asNetworkId("network-lighting-demo"),
+          sourceConnectorId: asConnectorId("L-C-REAR"),
+          targetNetworkId: asNetworkId("network-sensor-backbone-demo"),
+          targetConnectorId: asConnectorId("S-C-ECU")
+        }
+      ],
+      createdAt: "2026-02-24T09:10:00.000Z",
+      updatedAt: "2026-02-24T09:10:00.000Z"
     }),
     appActions.selectNetwork(asNetworkId("network-main"))
   ];
