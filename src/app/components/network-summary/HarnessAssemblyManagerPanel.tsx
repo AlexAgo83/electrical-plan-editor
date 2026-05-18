@@ -346,7 +346,10 @@ export function HarnessAssemblyManagerPanel({
                     <span className="technical-id">
                       {describeConnector(link.sourceNetworkId, link.sourceConnectorId)} {"->"} {describeConnector(link.targetNetworkId, link.targetConnectorId)}
                     </span>
-                    <button type="button" className="network-delete-button" onClick={() => handleRemoveLink(link.id)}>Remove</button>
+                    <button type="button" className="network-delete-button button-with-icon" onClick={() => handleRemoveLink(link.id)}>
+                      <span className="action-button-icon is-delete" aria-hidden="true" />
+                      Remove
+                    </button>
                   </li>
                 ))}
               </ul>

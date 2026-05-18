@@ -222,6 +222,29 @@
   flex: 0 1 18rem;
 }
 
+.harness-assembly-link-form button,
+.harness-assembly-links button {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+}
+
+.harness-assembly-link-form button:disabled,
+.harness-assembly-links button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.harness-assembly-link-form button.button-with-icon,
+.harness-assembly-links button.button-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
 .harness-assembly-list {
   display: grid;
   grid-column: 1 / -1;
