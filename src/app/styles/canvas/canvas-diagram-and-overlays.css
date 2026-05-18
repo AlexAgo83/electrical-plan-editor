@@ -197,6 +197,31 @@
   gap: 0.7rem;
 }
 
+.harness-assembly-manager-panel select,
+.harness-assembly-link-form input,
+.harness-assembly-links input {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  padding: 0.45rem 0.6rem;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  color: inherit;
+}
+
+.harness-assembly-manager-panel select:focus-visible,
+.harness-assembly-link-form input:focus-visible,
+.harness-assembly-links input:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 36%, transparent);
+  outline-offset: 2px;
+}
+
+.harness-assembly-manager-panel > .network-summary-header select {
+  width: min(18rem, 42vw);
+  flex: 0 1 18rem;
+}
+
 .harness-assembly-list {
   display: grid;
   grid-column: 1 / -1;
@@ -485,6 +510,10 @@
   .network-summary-header {
     flex-direction: column;
     align-items: stretch;
+  }
+  .harness-assembly-manager-panel > .network-summary-header select {
+    width: 100%;
+    flex-basis: auto;
   }
   .network-summary-header-actions {
     display: grid;
