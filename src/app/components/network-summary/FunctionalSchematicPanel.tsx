@@ -716,6 +716,7 @@ export function FunctionalSchematicPanel({
   const [activeFilter, setActiveFilter] = useState<FunctionalDomainFilter>("all");
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null);
   const [selectedInterconnectorLinkId, setSelectedInterconnectorLinkId] = useState<string | null>(null);
+  const [showGrid, setShowGrid] = useState(true);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const seed = useMemo(
@@ -834,6 +835,14 @@ export function FunctionalSchematicPanel({
           </p>
         </div>
         <div className="network-summary-header-actions" role="group" aria-label="Functional schematic actions">
+          <button
+            type="button"
+            className={showGrid ? "workspace-tab is-active" : "workspace-tab"}
+            onClick={() => setShowGrid((current) => !current)}
+          >
+            <span className="network-summary-grid-icon" aria-hidden="true" />
+            Grid
+          </button>
           <button type="button" className="workspace-tab" onClick={handleExportPlan} disabled={!canExport}>
             Export {canvasExportFormat.toUpperCase()}
           </button>
@@ -854,7 +863,7 @@ export function FunctionalSchematicPanel({
         ))}
       </div>
 
-      <div ref={shellRef} className="functional-schematic-canvas-shell">
+      <div ref={shellRef} className="network-canvas-shell functional-schematic-canvas-shell">
         {graph.nodes.length === 0 ? (
           <p className="empty-copy">
             {rootConnectors.length > 0
@@ -864,7 +873,7 @@ export function FunctionalSchematicPanel({
         ) : (
           <svg
             ref={svgRef}
-            className="functional-schematic-svg"
+            className={showGrid ? "functional-schematic-svg" : "functional-schematic-svg is-grid-hidden"}
             aria-label="Read-only functional schematic"
             viewBox={`0 0 ${svgWidth} ${svgHeight}`}
             style={{ height: `${svgHeight}px` }}
