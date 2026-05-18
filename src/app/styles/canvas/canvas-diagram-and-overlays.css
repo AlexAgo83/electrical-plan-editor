@@ -569,6 +569,30 @@
   .harness-assembly-links li {
     grid-template-columns: auto minmax(0, 1fr);
   }
+  .harness-assembly-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+  .harness-assembly-row > input[type="checkbox"] {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+  .harness-assembly-row > span:not(.technical-id) {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .harness-assembly-row > .technical-id {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .harness-assembly-row > input[type="color"] {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
 }
 @media (max-width: 520px) {
   .network-summary-header-actions .workspace-tab {
