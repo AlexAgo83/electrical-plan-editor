@@ -25,6 +25,21 @@
   margin: 0;
 }
 
+.network-summary-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.network-summary-active-network {
+  color: #486579;
+  font-size: 1rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
 .network-summary-header-actions {
   display: inline-flex;
   align-items: center;

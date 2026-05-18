@@ -19,6 +19,25 @@ interface UseWorkspaceShellChromeArgs {
   deferredInstallPromptRef: MutableRefObject<BeforeInstallPromptEventLike | null>;
 }
 
+function isStandaloneDisplayMode(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const navigatorWithStandalone = navigator as Navigator & { standalone?: boolean };
+  return window.matchMedia?.("(display-mode: standalone)").matches === true || navigatorWithStandalone.standalone === true;
+}
+
+function isFirefoxInstallFallbackAvailable(): boolean {
+  if (typeof navigator === "undefined") {
+    return false;
+  }
+
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isFirefox = userAgent.includes("firefox/") || userAgent.includes("fxios/");
+  return isFirefox && !isStandaloneDisplayMode();
+}
+
 export function useWorkspaceShellChrome({
   activeScreen,
   setActiveScreen,
@@ -28,7 +47,8 @@ export function useWorkspaceShellChrome({
   operationsButtonRef,
   deferredInstallPromptRef
 }: UseWorkspaceShellChromeArgs) {
-  const [isInstallPromptAvailable, setIsInstallPromptAvailable] = useState(false);
+  const [isBrowserInstallPromptAvailable, setIsBrowserInstallPromptAvailable] = useState(false);
+  const [isManualInstallAvailable, setIsManualInstallAvailable] = useState(isFirefoxInstallFallbackAvailable);
   const [isPwaUpdateReady, setIsPwaUpdateReady] = useState(false);
   const [isNavigationDrawerOpen, setIsNavigationDrawerOpen] = useState(false);
   const [isOperationsPanelOpen, setIsOperationsPanelOpen] = useState(false);
@@ -85,6 +105,11 @@ export function useWorkspaceShellChrome({
   const handleInstallApp = useCallback(() => {
     const promptEvent = deferredInstallPromptRef.current;
     if (promptEvent === null) {
+      if (isManualInstallAvailable && typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("app:pwa-manual-install-requested", {
+          detail: { browser: "firefox" }
+        }));
+      }
       return;
     }
 
@@ -93,10 +118,10 @@ export function useWorkspaceShellChrome({
       const choice = await promptEvent.userChoice;
       if (choice.outcome === "accepted") {
         deferredInstallPromptRef.current = null;
-        setIsInstallPromptAvailable(false);
+        setIsBrowserInstallPromptAvailable(false);
       }
     })();
-  }, [deferredInstallPromptRef]);
+  }, [deferredInstallPromptRef, isManualInstallAvailable]);
 
   const handleApplyPwaUpdate = useCallback(() => {
     void (async () => {
@@ -114,12 +139,13 @@ export function useWorkspaceShellChrome({
 
       promptEvent.preventDefault();
       deferredInstallPromptRef.current = promptEvent;
-      setIsInstallPromptAvailable(true);
+      setIsBrowserInstallPromptAvailable(true);
     };
 
     const handleAppInstalled = (): void => {
       deferredInstallPromptRef.current = null;
-      setIsInstallPromptAvailable(false);
+      setIsBrowserInstallPromptAvailable(false);
+      setIsManualInstallAvailable(false);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
@@ -129,6 +155,10 @@ export function useWorkspaceShellChrome({
       window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, [deferredInstallPromptRef]);
+
+  useEffect(() => {
+    setIsManualInstallAvailable(isFirefoxInstallFallbackAvailable());
+  }, []);
 
   useEffect(() => {
     const handlePwaUpdateAvailable = (): void => {
@@ -323,7 +353,7 @@ export function useWorkspaceShellChrome({
   }, []);
 
   return {
-    isInstallPromptAvailable,
+    isInstallPromptAvailable: isBrowserInstallPromptAvailable || isManualInstallAvailable,
     isPwaUpdateReady,
     isNavigationDrawerOpen,
     isOperationsPanelOpen,

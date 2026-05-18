@@ -53,6 +53,14 @@ describe("App integration UI - navigation and canvas", () => {
     expect(getPanelByHeading("Network Scope")).toBeInTheDocument();
   });
 
+  it("shows the active network name beside the modeling network summary title", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    expect(within(networkSummaryPanel).getByText(": Main network sample")).toBeInTheDocument();
+  });
+
   it("toggles the navigation drawer from the header and closes on backdrop click", () => {
     renderAppWithState(createUiIntegrationState());
     const toggleButton = screen.getByRole("button", { name: "Open menu" });

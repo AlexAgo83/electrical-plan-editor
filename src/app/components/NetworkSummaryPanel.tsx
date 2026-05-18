@@ -266,6 +266,7 @@ export function NetworkSummaryPanel({
     { label: "Graph segments", value: routingGraphSegmentCount },
     { label: "Adjacency entries", value: totalEdgeEntries }
   ];
+  const activeNetworkName = activeNetwork?.name.trim() ?? "";
   const effectiveScale = networkScale > 0 ? networkScale : 1;
   const inverseLabelScale = 1 / effectiveScale;
   const normalizedNodeShapeScale = zoomInvariantNodeShapes
@@ -822,7 +823,14 @@ export function NetworkSummaryPanel({
     <section className="network-summary-stack">
       <section className="panel">
         <header className="network-summary-header">
-          <h2>Network summary</h2>
+          <div className="network-summary-title">
+            <h2>Network summary</h2>
+            {activeNetworkName.length > 0 ? (
+              <span className="network-summary-active-network" aria-hidden="true">
+                : {activeNetworkName}
+              </span>
+            ) : null}
+          </div>
           <div className="network-summary-header-actions" role="group" aria-label="Network summary display options">
             <button
               type="button"

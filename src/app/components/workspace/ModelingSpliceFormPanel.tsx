@@ -94,6 +94,19 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       <small className="inline-help">Catalog-linked directional splices keep L/R sides; legacy bounded splices derive port count from catalog connection count.</small>
     ) : null}
     {spliceTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
+    {spliceFormMode === "create" ? (
+      <label>
+        Splice type
+        <select
+          value={splicePortMode}
+          onChange={(event) => setSplicePortMode(event.target.value as "bounded" | "unbounded" | "directional")}
+        >
+          <option value="bounded">Legacy bounded ports</option>
+          <option value="unbounded" disabled={isCatalogLinked}>Legacy unbounded ports</option>
+          <option value="directional">Automatic L/R directional</option>
+        </select>
+      </label>
+    ) : null}
     {spliceFormMode === "edit" && !isDirectional ? (
       <>
         <label>
@@ -114,9 +127,10 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
           </button>
         </div>
       </>
-    ) : (
+    ) : null}
+    {isDirectional ? (
       <small className="inline-help">Directional splice: wire endpoints are assigned automatically to L or R from routing.</small>
-    )}
+    ) : null}
     {isDirectional ? (
       <>
         <label>

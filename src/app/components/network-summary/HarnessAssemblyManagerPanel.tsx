@@ -15,7 +15,8 @@ interface HarnessAssemblyManagerPanelProps {
   assemblies: HarnessAssembly[];
   networks: Network[];
   connectorsByNetworkId: ReadonlyMap<NetworkId, readonly Connector[]>;
-  activeNetworkId: NetworkId | null;
+  selectedAssemblyId: HarnessAssemblyId | "new" | "";
+  onSelectedAssemblyIdChange: (assemblyId: HarnessAssemblyId | "new" | "") => void;
   onUpsertAssembly: (assembly: HarnessAssembly) => void;
   onRemoveAssembly: (assemblyId: HarnessAssemblyId) => void;
 }
@@ -36,22 +37,15 @@ export function HarnessAssemblyManagerPanel({
   assemblies,
   networks,
   connectorsByNetworkId,
-  activeNetworkId,
+  selectedAssemblyId,
+  onSelectedAssemblyIdChange,
   onUpsertAssembly,
   onRemoveAssembly
 }: HarnessAssemblyManagerPanelProps): ReactElement {
-  const activeNetwork = activeNetworkId === null ? undefined : networks.find((network) => network.id === activeNetworkId);
-  const defaultAssembly = useMemo(
-    () => assemblies.find((assembly) => assembly.members.some((member) => member.networkId === activeNetworkId)) ?? assemblies[0] ?? null,
-    [activeNetworkId, assemblies]
-  );
-  const [selectedAssemblyId, setSelectedAssemblyId] = useState<HarnessAssemblyId | "new">(defaultAssembly?.id ?? "new");
   const selectedAssembly = selectedAssemblyId === "new" ? null : assemblies.find((assembly) => assembly.id === selectedAssemblyId) ?? null;
-  const [name, setName] = useState(getInitialAssemblyName(activeNetwork));
-  const [technicalId, setTechnicalId] = useState(getInitialAssemblyTechnicalId(activeNetwork));
-  const [memberNetworkIds, setMemberNetworkIds] = useState<Set<NetworkId>>(
-    () => new Set(activeNetworkId === null ? [] : [activeNetworkId])
-  );
+  const [name, setName] = useState(getInitialAssemblyName(undefined));
+  const [technicalId, setTechnicalId] = useState(getInitialAssemblyTechnicalId(undefined));
+  const [memberNetworkIds, setMemberNetworkIds] = useState<Set<NetworkId>>(() => new Set());
   const [memberColors, setMemberColors] = useState<Partial<Record<NetworkId, string>>>({});
   const [rootKeys, setRootKeys] = useState<Set<string>>(() => new Set());
   const [linkName, setLinkName] = useState("");
@@ -59,16 +53,13 @@ export function HarnessAssemblyManagerPanel({
   const [sourceConnectorId, setSourceConnectorId] = useState<ConnectorId | "">("");
   const [targetNetworkId, setTargetNetworkId] = useState<NetworkId | "">("");
   const [targetConnectorId, setTargetConnectorId] = useState<ConnectorId | "">("");
-
-  useEffect(() => {
-    setSelectedAssemblyId(defaultAssembly?.id ?? "new");
-  }, [defaultAssembly?.id]);
+  const hasEmptyAssemblySelection = selectedAssemblyId === "";
 
   useEffect(() => {
     if (selectedAssembly === null) {
-      setName(getInitialAssemblyName(activeNetwork));
-      setTechnicalId(getInitialAssemblyTechnicalId(activeNetwork));
-      setMemberNetworkIds(new Set(activeNetworkId === null ? [] : [activeNetworkId]));
+      setName(getInitialAssemblyName(undefined));
+      setTechnicalId(getInitialAssemblyTechnicalId(undefined));
+      setMemberNetworkIds(new Set());
       setMemberColors({});
       setRootKeys(new Set());
       return;
@@ -79,7 +70,7 @@ export function HarnessAssemblyManagerPanel({
     setMemberNetworkIds(new Set(selectedAssembly.members.map((member) => member.networkId)));
     setMemberColors(Object.fromEntries(selectedAssembly.members.map((member) => [member.networkId, member.color])));
     setRootKeys(new Set(selectedAssembly.masterConnectorRefs.map((root) => makeRootKey(root.networkId, root.connectorId))));
-  }, [activeNetwork, activeNetworkId, selectedAssembly]);
+  }, [selectedAssembly]);
 
   const selectedMemberNetworks = networks.filter((network) => memberNetworkIds.has(network.id));
   const sourceConnectors = sourceNetworkId === "" ? [] : connectorsByNetworkId.get(sourceNetworkId) ?? [];
@@ -91,6 +82,42 @@ export function HarnessAssemblyManagerPanel({
     targetNetworkId !== "" &&
     targetConnectorId !== "" &&
     sourceNetworkId !== targetNetworkId;
+
+  const persistedDraftSignature = useMemo(() => {
+    if (selectedAssembly === null) {
+      return "";
+    }
+    return JSON.stringify({
+      name: selectedAssembly.name,
+      technicalId: selectedAssembly.technicalId,
+      members: selectedAssembly.members
+        .map((member) => ({ networkId: member.networkId, color: member.color }))
+        .sort((left, right) => String(left.networkId).localeCompare(String(right.networkId))),
+      roots: selectedAssembly.masterConnectorRefs
+        .map((root) => makeRootKey(root.networkId, root.connectorId))
+        .sort()
+    });
+  }, [selectedAssembly]);
+
+  const currentDraftSignature = useMemo(() => {
+    if (selectedAssembly === null) {
+      return "";
+    }
+    return JSON.stringify({
+      name,
+      technicalId,
+      members: networks
+        .filter((network) => memberNetworkIds.has(network.id))
+        .map((network, index) => ({
+          networkId: network.id,
+          color: memberColors[network.id] ?? resolveDefaultHarnessColor(index)
+        }))
+        .sort((left, right) => String(left.networkId).localeCompare(String(right.networkId))),
+      roots: [...rootKeys].sort()
+    });
+  }, [memberColors, memberNetworkIds, name, networks, rootKeys, selectedAssembly, technicalId]);
+
+  const hasUnsavedVisualizationChanges = selectedAssembly !== null && persistedDraftSignature !== currentDraftSignature;
 
   const buildDraftAssembly = (): HarnessAssembly => {
     const now = new Date().toISOString();
@@ -122,7 +149,9 @@ export function HarnessAssemblyManagerPanel({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onUpsertAssembly(buildDraftAssembly());
+    const draftAssembly = buildDraftAssembly();
+    onUpsertAssembly(draftAssembly);
+    onSelectedAssemblyIdChange(draftAssembly.id);
   };
 
   const handleAddLink = () => {
@@ -189,9 +218,10 @@ export function HarnessAssemblyManagerPanel({
         </div>
         <select
           value={selectedAssemblyId}
-          onChange={(event) => setSelectedAssemblyId(event.target.value as HarnessAssemblyId | "new")}
+          onChange={(event) => onSelectedAssemblyIdChange(event.target.value as HarnessAssemblyId | "new" | "")}
           aria-label="Selected harness assembly"
         >
+          <option value="">Select assembly</option>
           <option value="new">New assembly</option>
           {assemblies.map((assembly) => (
             <option key={assembly.id} value={assembly.id}>
@@ -201,63 +231,72 @@ export function HarnessAssemblyManagerPanel({
         </select>
       </header>
 
-      <form className="harness-assembly-grid" onSubmit={handleSubmit}>
-        <label className="stack-label">
-          <span className="network-form-label">Name</span>
-          <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Front cabin assembly" />
-        </label>
-        <label className="stack-label">
-          <span className="network-form-label">Technical ID</span>
-          <input value={technicalId} onChange={(event) => setTechnicalId(event.target.value)} placeholder="ASM-FRONT-CABIN" />
-        </label>
+      {hasEmptyAssemblySelection ? (
+        <p className="empty-copy">Select an existing harness assembly or choose New assembly to start editing.</p>
+      ) : (
+        <form className="harness-assembly-grid" onSubmit={handleSubmit}>
+          <label className="stack-label">
+            <span className="network-form-label">Name</span>
+            <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Front cabin assembly" />
+          </label>
+          <label className="stack-label">
+            <span className="network-form-label">Technical ID</span>
+            <input value={technicalId} onChange={(event) => setTechnicalId(event.target.value)} placeholder="ASM-FRONT-CABIN" />
+          </label>
 
-        <div className="harness-assembly-list" aria-label="Harness members">
-          {networks.map((network, index) => {
-            const checked = memberNetworkIds.has(network.id);
-            return (
-              <label key={network.id} className="harness-assembly-row">
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={(event) => {
-                    setMemberNetworkIds((current) => {
-                      const next = new Set(current);
-                      if (event.target.checked) {
-                        next.add(network.id);
-                      } else {
-                        next.delete(network.id);
-                      }
-                      return next;
-                    });
-                  }}
-                />
-                <span>{network.name}</span>
-                <span className="technical-id">{network.technicalId}</span>
-                <input
-                  type="color"
-                  value={memberColors[network.id] ?? resolveDefaultHarnessColor(index)}
-                  onChange={(event) => setMemberColors((current) => ({ ...current, [network.id]: event.target.value }))}
-                  aria-label={`${network.name} harness color`}
-                  disabled={!checked}
-                />
-              </label>
-            );
-          })}
-        </div>
+          <div className="harness-assembly-list" aria-label="Harness members">
+            {networks.map((network, index) => {
+              const checked = memberNetworkIds.has(network.id);
+              return (
+                <label key={network.id} className="harness-assembly-row">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(event) => {
+                      setMemberNetworkIds((current) => {
+                        const next = new Set(current);
+                        if (event.target.checked) {
+                          next.add(network.id);
+                        } else {
+                          next.delete(network.id);
+                        }
+                        return next;
+                      });
+                    }}
+                  />
+                  <span>{network.name}</span>
+                  <span className="technical-id">{network.technicalId}</span>
+                  <input
+                    type="color"
+                    value={memberColors[network.id] ?? resolveDefaultHarnessColor(index)}
+                    onChange={(event) => setMemberColors((current) => ({ ...current, [network.id]: event.target.value }))}
+                    aria-label={`${network.name} harness color`}
+                    disabled={!checked}
+                  />
+                </label>
+              );
+            })}
+          </div>
 
-        <div className="row-actions compact">
-          <button type="submit" className="button-with-icon">
-            <span className="action-button-icon is-save" aria-hidden="true" />
-            Save assembly
-          </button>
-          {selectedAssembly !== null ? (
-            <button type="button" className="network-delete-button button-with-icon" onClick={() => onRemoveAssembly(selectedAssembly.id)}>
-              <span className="action-button-icon is-delete" aria-hidden="true" />
-              Delete
+          <div className="row-actions compact">
+            <button type="submit" className="button-with-icon">
+              <span className="action-button-icon is-save" aria-hidden="true" />
+              Save assembly
             </button>
+            {selectedAssembly !== null ? (
+              <button type="button" className="network-delete-button button-with-icon" onClick={() => onRemoveAssembly(selectedAssembly.id)}>
+                <span className="action-button-icon is-delete" aria-hidden="true" />
+                Delete
+              </button>
+            ) : null}
+          </div>
+          {hasUnsavedVisualizationChanges ? (
+            <p className="form-hint warning" role="status">
+              Unsaved assembly edits are not reflected in the visualization yet. Save assembly to update the graph.
+            </p>
           ) : null}
-        </div>
-      </form>
+        </form>
+      )}
 
       {selectedAssembly !== null ? (
         <>
