@@ -796,6 +796,26 @@ function migrateLegacySingleNetworkStateToCurrent(
     createdAt: DEFAULT_NETWORK_CREATED_AT,
     updatedAt: nowIso
   };
+  const legacySampleAssemblyId = "assembly-sample-vehicle-platform" as HarnessAssemblyId;
+  const legacySampleMainConnectorId = "C-SRC" as ConnectorId;
+  const harnessAssemblies =
+    catalogBootstrappedScoped.connectors.byId[legacySampleMainConnectorId] === undefined
+      ? ({ byId: {} as Record<HarnessAssemblyId, HarnessAssembly>, allIds: [] } satisfies AppState["harnessAssemblies"])
+      : ({
+          byId: {
+            [legacySampleAssemblyId]: {
+              id: legacySampleAssemblyId,
+              name: "Sample vehicle platform assembly",
+              technicalId: "ASM-SAMPLE-VEHICLE",
+              members: [{ networkId: network.id, color: "#2563eb" }],
+              masterConnectorRefs: [{ networkId: network.id, connectorId: legacySampleMainConnectorId }],
+              connectorLinks: [],
+              createdAt: nowIso,
+              updatedAt: nowIso
+            }
+          } as Record<HarnessAssemblyId, HarnessAssembly>,
+          allIds: [legacySampleAssemblyId]
+        } satisfies AppState["harnessAssemblies"]);
 
   return {
     ...seeded,
@@ -805,7 +825,7 @@ function migrateLegacySingleNetworkStateToCurrent(
       } as AppState["networks"]["byId"],
       allIds: [network.id]
     },
-    harnessAssemblies: { byId: {} as Record<HarnessAssemblyId, HarnessAssembly>, allIds: [] },
+    harnessAssemblies,
     activeNetworkId: network.id,
     networkStates: {
       [network.id]: catalogBootstrappedScoped
