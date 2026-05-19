@@ -124,7 +124,7 @@ flowchart TD
 - `npm run -s lint`
 - Run broader test/build gates if implementation touches shared export, BOM, catalog, or harness assembly behavior.
 
-# Definition of Done
+# Definition of Done (DoD)
 - [x] Selected-harness-only agent JSON export is implemented.
 - [x] The export never falls back to `activeNetworkId`.
 - [x] Missing selected harness behavior is explicit and non-exporting.
