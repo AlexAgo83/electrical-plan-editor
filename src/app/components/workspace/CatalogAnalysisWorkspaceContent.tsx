@@ -7,7 +7,6 @@ import { TableEntryCountFooter } from "./TableEntryCountFooter";
 interface CatalogAnalysisWorkspaceContentProps {
   isCatalogSubScreen: boolean;
   selectedCatalogItemId: CatalogItemId | null;
-  selectedCatalogItemManufacturerReference: string | null;
   linkedConnectors: Connector[];
   linkedSplices: Splice[];
   wires: Wire[];
@@ -202,7 +201,6 @@ function WireEndpointReferenceNamesSection({
 export function CatalogAnalysisWorkspaceContent({
   isCatalogSubScreen,
   selectedCatalogItemId,
-  selectedCatalogItemManufacturerReference,
   linkedConnectors,
   linkedSplices,
   wires,
@@ -220,29 +218,17 @@ export function CatalogAnalysisWorkspaceContent({
   }
 
   const hasSelection = selectedCatalogItemId !== null;
-  const summaryLabel = `${linkedConnectors.length} connectors / ${linkedSplices.length} splices`;
 
   return (
     <section className="panel-grid analysis-panel-grid">
-      <article className="panel">
-        <header className="analysis-wire-route-header">
-          <h2>Catalog analysis</h2>
-        </header>
-        {!hasSelection ? (
+      {!hasSelection ? (
+        <article className="panel">
+          <header className="analysis-wire-route-header">
+            <h2>Catalog analysis</h2>
+          </header>
           <p className="empty-copy">Select a catalog item to inspect usage.</p>
-        ) : (
-          <div className="analysis-wire-route-content">
-            <article className="analysis-wire-identity">
-              <span className="analysis-wire-identity-label">Selected catalog item</span>
-              <p className="analysis-wire-identity-value">{selectedCatalogItemManufacturerReference ?? selectedCatalogItemId}</p>
-            </article>
-            <article className="analysis-wire-route-current">
-              <h3>Usage summary</h3>
-              <p>{summaryLabel}</p>
-            </article>
-          </div>
-        )}
-      </article>
+        </article>
+      ) : null}
 
       {hasSelection ? (
         <>

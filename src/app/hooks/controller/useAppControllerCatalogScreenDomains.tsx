@@ -144,14 +144,10 @@ export function useAppControllerCatalogScreenDomains({
     </section>
   );
 
-  const selectedCatalogItem =
-    selectedCatalogItemId === null ? null : (catalogItems.find((item) => item.id === selectedCatalogItemId) ?? null);
-
   const catalogAnalysisWorkspaceContent = (
     <CatalogAnalysisWorkspaceContent
       isCatalogSubScreen={isCatalogSubScreen}
       selectedCatalogItemId={selectedCatalogItemId}
-      selectedCatalogItemManufacturerReference={selectedCatalogItem?.manufacturerReference ?? null}
       linkedConnectors={selectedCatalogItemId === null ? [] : connectors.filter((connector) => connector.catalogItemId === selectedCatalogItemId)}
       linkedSplices={selectedCatalogItemId === null ? [] : splices.filter((splice) => splice.catalogItemId === selectedCatalogItemId)}
       wires={wires}

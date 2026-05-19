@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { appActions, appReducer, createInitialState } from "../store";
 import {
@@ -128,7 +128,7 @@ describe("App integration UI - catalog", () => {
       .find((item) => item?.manufacturerReference === "TE-1-967616-1");
     expect(createdCatalogItem?.connectorLayout?.ways).toHaveLength(6);
     fireEvent.click(within(catalogPanel).getByText("TE-1-967616-1"));
-    const catalogAnalysisGrid = getPanelByHeading("Catalog analysis").closest(".analysis-panel-grid");
+    const catalogAnalysisGrid = screen.getByRole("heading", { name: "Connectors" }).closest(".analysis-panel-grid");
     expect(catalogAnalysisGrid).not.toBeNull();
     const connectorsUsageHeading = within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Connectors" });
     const connectorsUsagePanel = connectorsUsageHeading.closest(".panel");
@@ -208,11 +208,9 @@ describe("App integration UI - catalog", () => {
     fireEvent.click(within(catalogPanel).getByText("CAT-ANALYSIS"));
     expect(within(catalogPanel).getByRole("button", { name: "Delete" })).toBeEnabled();
 
-    const catalogAnalysisPanel = getPanelByHeading("Catalog analysis");
-    const catalogAnalysisGrid = catalogAnalysisPanel.closest(".analysis-panel-grid");
+    expect(screen.queryByRole("heading", { name: "Catalog analysis" })).not.toBeInTheDocument();
+    const catalogAnalysisGrid = screen.getByRole("heading", { name: "Connectors" }).closest(".analysis-panel-grid");
     expect(catalogAnalysisGrid).not.toBeNull();
-    expect(within(catalogAnalysisPanel).getByText("CAT-ANALYSIS")).toBeInTheDocument();
-    expect(within(catalogAnalysisPanel).getByText("1 connectors / 1 splices")).toBeInTheDocument();
     expect(within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Connectors" })).toBeInTheDocument();
     expect(within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Splices" })).toBeInTheDocument();
     expect(
@@ -233,7 +231,7 @@ describe("App integration UI - catalog", () => {
 
     fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
     fireEvent.click(within(getPanelByHeading("Catalog")).getByText("CAT-ANALYSIS"));
-    const refreshedAnalysisGrid = getPanelByHeading("Catalog analysis").closest(".analysis-panel-grid");
+    const refreshedAnalysisGrid = screen.getByRole("heading", { name: "Connectors" }).closest(".analysis-panel-grid");
     expect(refreshedAnalysisGrid).not.toBeNull();
     const connectorsUsageHeading = within(refreshedAnalysisGrid as HTMLElement).getByRole("heading", { name: "Connectors" });
     const connectorsUsagePanel = connectorsUsageHeading.closest(".panel");
@@ -241,6 +239,38 @@ describe("App integration UI - catalog", () => {
     expect(within(connectorsUsagePanel as HTMLElement).getByText("Connector 1")).toBeInTheDocument();
     fireEvent.click(within(connectorsUsagePanel as HTMLElement).getByRole("button", { name: "Go to" }));
     expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
+  });
+
+  it("closes catalog edit panel when clearing the catalog selection", () => {
+    const catalogItemId = asCatalogItemId("CAT-CLEAR");
+    const state = appReducer(
+      createUiIntegrationState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "CAT-CLEAR",
+        name: "Clear selection sample",
+        connectionCount: 2
+      })
+    );
+
+    const { store } = renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    fireEvent.click(within(catalogPanel).getByText("CAT-CLEAR"));
+    expect(getPanelByHeading("Edit catalog item")).toBeInTheDocument();
+
+    act(() => {
+      store.dispatch(appActions.clearSelection());
+    });
+
+    expect(screen.queryByRole("heading", { name: "Edit catalog item" })).not.toBeInTheDocument();
+    expect(catalogPanel.querySelector("tr.is-selected")).toBeNull();
   });
 
   it("scrolls to the edit catalog item panel when clicking Edit", async () => {

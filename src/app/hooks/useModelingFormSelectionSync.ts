@@ -1,21 +1,24 @@
 import { useCallback, useEffect } from "react";
-import type { ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../core/entities";
+import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../core/entities";
 import type { SubScreenId } from "../types/app-controller";
 
 type EntityFormMode = "idle" | "create" | "edit";
 
 interface UseModelingFormSelectionSyncParams {
   activeSubScreen: SubScreenId;
+  catalogFormMode: EntityFormMode;
   connectorFormMode: EntityFormMode;
   spliceFormMode: EntityFormMode;
   nodeFormMode: EntityFormMode;
   segmentFormMode: EntityFormMode;
   wireFormMode: EntityFormMode;
+  selectedCatalogItemId: CatalogItemId | null;
   selectedConnectorId: ConnectorId | null;
   selectedSpliceId: SpliceId | null;
   selectedNodeId: NodeId | null;
   selectedSegmentId: SegmentId | null;
   selectedWireId: WireId | null;
+  clearCatalogForm: () => void;
   clearConnectorForm: () => void;
   clearSpliceForm: () => void;
   clearNodeForm: () => void;
@@ -25,16 +28,19 @@ interface UseModelingFormSelectionSyncParams {
 
 export function useModelingFormSelectionSync({
   activeSubScreen,
+  catalogFormMode,
   connectorFormMode,
   spliceFormMode,
   nodeFormMode,
   segmentFormMode,
   wireFormMode,
+  selectedCatalogItemId,
   selectedConnectorId,
   selectedSpliceId,
   selectedNodeId,
   selectedSegmentId,
   selectedWireId,
+  clearCatalogForm,
   clearConnectorForm,
   clearSpliceForm,
   clearNodeForm,
@@ -42,14 +48,21 @@ export function useModelingFormSelectionSync({
   clearWireForm
 }: UseModelingFormSelectionSyncParams) {
   const clearAllModelingForms = useCallback(() => {
+    clearCatalogForm();
     clearConnectorForm();
     clearSpliceForm();
     clearNodeForm();
     clearSegmentForm();
     clearWireForm();
-  }, [clearConnectorForm, clearNodeForm, clearSegmentForm, clearSpliceForm, clearWireForm]);
+  }, [clearCatalogForm, clearConnectorForm, clearNodeForm, clearSegmentForm, clearSpliceForm, clearWireForm]);
 
   useEffect(() => {
+    if (activeSubScreen !== "catalog" && catalogFormMode !== "idle") {
+      clearCatalogForm();
+    } else if (catalogFormMode === "edit" && selectedCatalogItemId === null) {
+      clearCatalogForm();
+    }
+
     if (activeSubScreen !== "connector" && connectorFormMode !== "idle") {
       clearConnectorForm();
     } else if (connectorFormMode === "edit" && selectedConnectorId === null) {
@@ -81,6 +94,8 @@ export function useModelingFormSelectionSync({
     }
   }, [
     activeSubScreen,
+    catalogFormMode,
+    clearCatalogForm,
     clearConnectorForm,
     clearNodeForm,
     clearSegmentForm,
@@ -89,6 +104,7 @@ export function useModelingFormSelectionSync({
     connectorFormMode,
     nodeFormMode,
     segmentFormMode,
+    selectedCatalogItemId,
     selectedConnectorId,
     selectedNodeId,
     selectedSegmentId,
