@@ -9,7 +9,8 @@ import {
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
-  switchScreenDrawerAware
+  switchScreenDrawerAware,
+  switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 import {
   getConnectorLayoutKeyingControls,
@@ -246,6 +247,44 @@ describe("App integration UI - catalog", () => {
     expect(within(connectorsUsagePanel as HTMLElement).getByText("Connector 1")).toBeInTheDocument();
     fireEvent.click(within(connectorsUsagePanel as HTMLElement).getByRole("button", { name: "Go to" }));
     expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
+  });
+
+  it("returns to catalog items when opening a connector manufacturer reference after reference views", () => {
+    const catalogItemId = asCatalogItemId("CAT-MFR-LINK");
+    let state = appReducer(
+      createUiIntegrationState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "CAT-MFR-LINK",
+        name: "Manufacturer link sample",
+        connectionCount: 2
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        ...state.connectors.byId[asConnectorId("C1")]!,
+        catalogItemId
+      })
+    );
+
+    renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("catalog");
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Seal refs" }));
+    expect(within(catalogPanel).getByRole("button", { name: "Seal refs" })).toHaveAttribute("aria-pressed", "true");
+
+    switchSubScreenDrawerAware("connector");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "CAT-MFR-LINK" }));
+
+    const refreshedCatalogPanel = getPanelByHeading("Catalog");
+    expect(within(refreshedCatalogPanel).getByRole("button", { name: "Items" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(refreshedCatalogPanel).getByText("CAT-MFR-LINK")).toBeInTheDocument();
+    expect(within(refreshedCatalogPanel).queryByText("No seal references yet.")).not.toBeInTheDocument();
   });
 
   it("closes catalog edit panel when clearing the catalog selection", () => {
