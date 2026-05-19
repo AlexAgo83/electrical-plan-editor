@@ -55,6 +55,7 @@ describe("App integration UI - catalog wire endpoint reference renames", () => {
 
     const catalogPanel = getPanelByHeading("Catalog");
     fireEvent.click(within(catalogPanel).getByText("CAT-WIRES"));
+    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Endpoint refs" }));
 
     const connectionHeading = await screen.findByRole("heading", { name: "Wire endpoint references" });
     const connectionPanel = connectionHeading.closest<HTMLElement>(".panel");
@@ -131,6 +132,7 @@ describe("App integration UI - catalog wire endpoint reference renames", () => {
 
     const catalogPanel = getPanelByHeading("Catalog");
     fireEvent.click(within(catalogPanel).getByText("CAT-GLOBAL"));
+    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Endpoint refs" }));
 
     const connectionHeading = await screen.findByRole("heading", { name: "Wire endpoint references" });
     const connectionPanel = connectionHeading.closest<HTMLElement>(".panel");

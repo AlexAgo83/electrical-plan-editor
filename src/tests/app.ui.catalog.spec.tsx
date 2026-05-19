@@ -213,16 +213,23 @@ describe("App integration UI - catalog", () => {
     expect(catalogAnalysisGrid).not.toBeNull();
     expect(within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Connectors" })).toBeInTheDocument();
     expect(within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Splices" })).toBeInTheDocument();
+    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Seal refs" }));
     expect(
-      within(catalogAnalysisGrid as HTMLElement).getByRole("textbox", { name: "Wire seal references name for SEAL-1" })
+      within(catalogPanel).getByRole("textbox", { name: "Wire seal references name for SEAL-1" })
     ).toHaveClass("data-table-text-input");
     expect(
-      within(catalogAnalysisGrid as HTMLElement)
+      within(catalogPanel)
         .getByRole("textbox", { name: "Wire seal references name for SEAL-1" })
         .closest("tr")
     ).toHaveClass("data-table-editable-row");
+    expect(screen.queryByRole("heading", { name: "Edit catalog item" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Connectors" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Splices" })).not.toBeInTheDocument();
+    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Items" }));
 
-    const splicesUsageHeading = within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Splices" });
+    const refreshedCatalogAnalysisGrid = screen.getByRole("heading", { name: "Connectors" }).closest(".analysis-panel-grid");
+    expect(refreshedCatalogAnalysisGrid).not.toBeNull();
+    const splicesUsageHeading = within(refreshedCatalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Splices" });
     const splicesUsagePanel = splicesUsageHeading.closest(".panel");
     expect(splicesUsagePanel).not.toBeNull();
     expect(within(splicesUsagePanel as HTMLElement).getByText("Splice 1")).toBeInTheDocument();

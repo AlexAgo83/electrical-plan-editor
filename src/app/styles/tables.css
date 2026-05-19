@@ -109,6 +109,12 @@
   margin: 0;
 }
 
+.list-subheading {
+  margin: 0 0 0.55rem;
+  font-size: 0.92rem;
+  line-height: 1.2;
+}
+
 .list-panel-filters {
   justify-content: flex-end;
 }

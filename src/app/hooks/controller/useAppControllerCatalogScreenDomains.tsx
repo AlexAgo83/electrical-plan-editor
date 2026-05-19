@@ -1,4 +1,4 @@
-import type { ChangeEvent, ReactElement, RefObject } from "react";
+import { useState, type ChangeEvent, type ReactElement, type RefObject } from "react";
 import type {
   CatalogItem,
   CatalogItemId,
@@ -10,7 +10,7 @@ import type {
 } from "../../../core/entities";
 import { CatalogAnalysisWorkspaceContent } from "../../components/workspace/CatalogAnalysisWorkspaceContent";
 import { ModelingCatalogFormPanel } from "../../components/workspace/ModelingCatalogFormPanel";
-import { ModelingCatalogListPanel } from "../../components/workspace/ModelingCatalogListPanel";
+import { ModelingCatalogListPanel, type CatalogTableView } from "../../components/workspace/ModelingCatalogListPanel";
 import type { CatalogHandlersModel } from "../useCatalogHandlers";
 import type { EntityFormsStateModel } from "../useEntityFormsState";
 import type { ImportExportStatus, WorkspaceCurrencyCode } from "../../types/app-controller";
@@ -80,6 +80,9 @@ export function useAppControllerCatalogScreenDomains({
   modelingFormsColumnContent,
   analysisWorkspaceContent
 }: UseAppControllerCatalogScreenDomainsParams): UseAppControllerCatalogScreenDomainsResult {
+  const [activeCatalogTableView, setActiveCatalogTableView] = useState<CatalogTableView>("items");
+  const isCatalogItemsView = activeCatalogTableView === "items";
+
   const catalogModelingLeftColumnContent = (
     <ModelingCatalogListPanel
       isCatalogSubScreen={isCatalogSubScreen}
@@ -92,9 +95,13 @@ export function useAppControllerCatalogScreenDomains({
         (connectors.some((connector) => connector.catalogItemId === selectedCatalogItemId) ||
           splices.some((splice) => splice.catalogItemId === selectedCatalogItemId))
       }
+      activeView={activeCatalogTableView}
+      setActiveView={setActiveCatalogTableView}
+      wires={wires}
       onOpenCreateCatalogItem={catalogHandlers.resetCatalogForm}
       onEditCatalogItem={catalogHandlers.startCatalogEdit}
       onDeleteCatalogItem={catalogHandlers.handleCatalogDelete}
+      onUpdateWireEndpointReferenceName={onUpdateWireEndpointReferenceName}
       onExportCatalogCsv={handleExportCatalogCsv}
       onOpenCatalogCsvImportPicker={handleOpenCatalogCsvImportPicker}
       catalogCsvImportFileInputRef={catalogCsvImportFileInputRef}
@@ -150,12 +157,10 @@ export function useAppControllerCatalogScreenDomains({
       selectedCatalogItemId={selectedCatalogItemId}
       linkedConnectors={selectedCatalogItemId === null ? [] : connectors.filter((connector) => connector.catalogItemId === selectedCatalogItemId)}
       linkedSplices={selectedCatalogItemId === null ? [] : splices.filter((splice) => splice.catalogItemId === selectedCatalogItemId)}
-      wires={wires}
       onCreateConnectorFromCatalog={onCreateConnectorFromCatalog}
       onCreateSpliceFromCatalog={onCreateSpliceFromCatalog}
       onOpenConnector={onOpenConnectorFromCatalogAnalysis}
       onOpenSplice={onOpenSpliceFromCatalogAnalysis}
-      onUpdateWireEndpointReferenceName={onUpdateWireEndpointReferenceName}
     />
   );
 
@@ -164,10 +169,14 @@ export function useAppControllerCatalogScreenDomains({
       ? catalogModelingLeftColumnContent
       : modelingLeftColumnContent,
     modelingFormsColumnContentForSubScreen: isCatalogSubScreen
-      ? catalogModelingFormsColumnContent
+      ? isCatalogItemsView
+        ? catalogModelingFormsColumnContent
+        : null
       : modelingFormsColumnContent,
     analysisWorkspaceContentForSubScreen: isCatalogSubScreen
-      ? catalogAnalysisWorkspaceContent
+      ? isCatalogItemsView
+        ? catalogAnalysisWorkspaceContent
+        : null
       : analysisWorkspaceContent
   };
 }

@@ -1,5 +1,6 @@
-import { useMemo, useState, type ChangeEvent, type ReactElement, type RefObject } from "react";
-import type { CatalogItem, CatalogItemId } from "../../../core/entities";
+import { useEffect, useMemo, useState, type ChangeEvent, type Dispatch, type ReactElement, type RefObject, type SetStateAction } from "react";
+import type { CatalogItem, CatalogItemId, Wire } from "../../../core/entities";
+import { buildWireEndpointReferenceEntries, type WireEndpointReferenceEntry } from "../../../core/wireReferences";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { compareSortableValues } from "../../lib/app-utils-shared";
@@ -11,7 +12,13 @@ import { TableFilterBar } from "./TableFilterBar";
 
 type CatalogFilterField = "manufacturerReference" | "name" | "any";
 type CatalogSortField = "manufacturerReference" | "name" | "connectionCount" | "unitPriceExclTax";
+type CatalogTableView = "items" | "endpointRefs" | "sealRefs";
 type SortDirection = "asc" | "desc";
+type WireEndpointReferenceNameHandler = (
+  kind: "connection" | "seal",
+  reference: string,
+  nextName: string
+) => Promise<boolean | { apply: () => void }> | boolean | { apply: () => void };
 
 interface ModelingCatalogListPanelProps {
   isCatalogSubScreen: boolean;
@@ -20,9 +27,13 @@ interface ModelingCatalogListPanelProps {
   catalogFormMode: "idle" | "create" | "edit";
   workspaceCurrencyCode: WorkspaceCurrencyCode;
   isSelectedCatalogItemReferenced: boolean;
+  activeView: CatalogTableView;
+  setActiveView: Dispatch<SetStateAction<CatalogTableView>>;
+  wires: Wire[];
   onOpenCreateCatalogItem: () => void;
   onEditCatalogItem: (item: CatalogItem) => void;
   onDeleteCatalogItem: (catalogItemId: CatalogItemId) => void;
+  onUpdateWireEndpointReferenceName: WireEndpointReferenceNameHandler;
   onExportCatalogCsv?: () => void;
   onOpenCatalogCsvImportPicker?: () => void;
   catalogCsvImportFileInputRef?: RefObject<HTMLInputElement | null>;
@@ -39,9 +50,13 @@ export function ModelingCatalogListPanel({
   catalogFormMode,
   workspaceCurrencyCode,
   isSelectedCatalogItemReferenced,
+  activeView,
+  setActiveView,
+  wires,
   onOpenCreateCatalogItem,
   onEditCatalogItem,
   onDeleteCatalogItem,
+  onUpdateWireEndpointReferenceName,
   onExportCatalogCsv,
   onOpenCatalogCsvImportPicker,
   catalogCsvImportFileInputRef,
@@ -107,6 +122,8 @@ export function ModelingCatalogListPanel({
       field,
       direction: current.field === field && current.direction === "asc" ? "desc" : "asc"
     }));
+  const wireReferenceEntries = useMemo(() => buildWireEndpointReferenceEntries(wires), [wires]);
+  const isItemsView = activeView === "items";
 
   return (
     <article className="panel" hidden={!isCatalogSubScreen} data-onboarding-panel="modeling-catalog">
@@ -114,7 +131,33 @@ export function ModelingCatalogListPanel({
         <h2>Catalog</h2>
         <div className="list-panel-header-tools">
           <div className="list-panel-header-tools-row is-title-actions">
-            {onExportCatalogCsv !== undefined ? (
+            <div className="chip-group" aria-label="Catalog tables">
+              <button
+                type="button"
+                aria-pressed={activeView === "items"}
+                className={`filter-chip${activeView === "items" ? " is-active" : ""}`}
+                onClick={() => setActiveView("items")}
+              >
+                Items
+              </button>
+              <button
+                type="button"
+                aria-pressed={activeView === "endpointRefs"}
+                className={`filter-chip${activeView === "endpointRefs" ? " is-active" : ""}`}
+                onClick={() => setActiveView("endpointRefs")}
+              >
+                Endpoint refs
+              </button>
+              <button
+                type="button"
+                aria-pressed={activeView === "sealRefs"}
+                className={`filter-chip${activeView === "sealRefs" ? " is-active" : ""}`}
+                onClick={() => setActiveView("sealRefs")}
+              >
+                Seal refs
+              </button>
+            </div>
+            {isItemsView && onExportCatalogCsv !== undefined ? (
               <button
                 type="button"
                 className="filter-chip onboarding-help-button"
@@ -132,26 +175,42 @@ export function ModelingCatalogListPanel({
               </button>
             ) : null}
           </div>
-          <div className="list-panel-header-tools-row is-filter-row">
-            <TableFilterBar
-              label="Filter"
-              fieldLabel="Catalog filter field"
-              fieldValue={filterField}
-              onFieldChange={(value) => setFilterField(value as CatalogFilterField)}
-              fieldOptions={[
-                { value: "manufacturerReference", label: "Manufacturer ref" },
-                { value: "name", label: "Name" },
-                { value: "any", label: "Any" }
-              ]}
-              queryValue={filterQuery}
-              onQueryChange={setFilterQuery}
-              placeholder={filterPlaceholder}
-            />
-          </div>
+          {isItemsView ? (
+            <div className="list-panel-header-tools-row is-filter-row">
+              <TableFilterBar
+                label="Filter"
+                fieldLabel="Catalog filter field"
+                fieldValue={filterField}
+                onFieldChange={(value) => setFilterField(value as CatalogFilterField)}
+                fieldOptions={[
+                  { value: "manufacturerReference", label: "Manufacturer ref" },
+                  { value: "name", label: "Name" },
+                  { value: "any", label: "Any" }
+                ]}
+                queryValue={filterQuery}
+                onQueryChange={setFilterQuery}
+                placeholder={filterPlaceholder}
+              />
+            </div>
+          ) : null}
         </div>
       </header>
 
-      {catalogItems.length === 0 ? (
+      {activeView === "endpointRefs" ? (
+        <WireEndpointReferenceNamesTable
+          heading="Wire endpoint references"
+          kind="connection"
+          entries={wireReferenceEntries.connection}
+          onUpdateWireEndpointReferenceName={onUpdateWireEndpointReferenceName}
+        />
+      ) : activeView === "sealRefs" ? (
+        <WireEndpointReferenceNamesTable
+          heading="Wire seal references"
+          kind="seal"
+          entries={wireReferenceEntries.seal}
+          onUpdateWireEndpointReferenceName={onUpdateWireEndpointReferenceName}
+        />
+      ) : catalogItems.length === 0 ? (
         <>
           <p className="empty-copy">No catalog item yet.</p>
           <div className="row-actions compact">
@@ -234,49 +293,51 @@ export function ModelingCatalogListPanel({
         </>
       )}
 
-      <div className="row-actions compact modeling-list-actions catalog-modeling-list-actions">
-        <button
-          type="button"
-          className="button-with-icon"
-          onClick={() => {
-            onOpenCreateCatalogItem();
-            scrollToFormPanel(FORM_PANEL_IDS.catalog);
-          }}
-        >
-          <span className="action-button-icon is-new" aria-hidden="true" />
-          New
-        </button>
-        {onOpenCatalogCsvImportPicker !== undefined ? (
-          <button type="button" onClick={onOpenCatalogCsvImportPicker}>
-            {isMobileViewport ? "Import" : "Import CSV"}
+      {isItemsView ? (
+        <div className="row-actions compact modeling-list-actions catalog-modeling-list-actions">
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => {
+              onOpenCreateCatalogItem();
+              scrollToFormPanel(FORM_PANEL_IDS.catalog);
+            }}
+          >
+            <span className="action-button-icon is-new" aria-hidden="true" />
+            New
           </button>
-        ) : null}
-        <button
-          type="button"
-          className="button-with-icon"
-          onClick={() => {
-            if (selectedCatalogItem === null) {
-              return;
-            }
-            onEditCatalogItem(selectedCatalogItem);
-            scrollToFormPanel(FORM_PANEL_IDS.catalog);
-          }}
-          disabled={selectedCatalogItem === null}
-        >
-          <span className="action-button-icon is-edit" aria-hidden="true" />
-          Edit
-        </button>
-        <button
-          type="button"
-          className="modeling-list-action-delete button-with-icon"
-          onClick={() => selectedCatalogItem !== null && onDeleteCatalogItem(selectedCatalogItem.id)}
-          disabled={selectedCatalogItem === null || catalogFormMode === "create"}
-        >
-          <span className="action-button-icon is-delete" aria-hidden="true" />
-          Delete
-        </button>
-      </div>
-      {catalogCsvImportFileInputRef !== undefined && onCatalogCsvImportFileChange !== undefined ? (
+          {onOpenCatalogCsvImportPicker !== undefined ? (
+            <button type="button" onClick={onOpenCatalogCsvImportPicker}>
+              {isMobileViewport ? "Import" : "Import CSV"}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => {
+              if (selectedCatalogItem === null) {
+                return;
+              }
+              onEditCatalogItem(selectedCatalogItem);
+              scrollToFormPanel(FORM_PANEL_IDS.catalog);
+            }}
+            disabled={selectedCatalogItem === null}
+          >
+            <span className="action-button-icon is-edit" aria-hidden="true" />
+            Edit
+          </button>
+          <button
+            type="button"
+            className="modeling-list-action-delete button-with-icon"
+            onClick={() => selectedCatalogItem !== null && onDeleteCatalogItem(selectedCatalogItem.id)}
+            disabled={selectedCatalogItem === null || catalogFormMode === "create"}
+          >
+            <span className="action-button-icon is-delete" aria-hidden="true" />
+            Delete
+          </button>
+        </div>
+      ) : null}
+      {isItemsView && catalogCsvImportFileInputRef !== undefined && onCatalogCsvImportFileChange !== undefined ? (
         <input
           ref={catalogCsvImportFileInputRef}
           type="file"
@@ -287,12 +348,95 @@ export function ModelingCatalogListPanel({
           }}
         />
       ) : null}
-      {catalogCsvImportExportStatus !== null ? (
+      {isItemsView && catalogCsvImportExportStatus !== null ? (
         <p className={`meta-line import-status is-${catalogCsvImportExportStatus.kind}`}>{catalogCsvImportExportStatus.message}</p>
       ) : null}
-      {catalogCsvLastImportSummaryLine !== null ? <p className="meta-line">{catalogCsvLastImportSummaryLine}</p> : null}
+      {isItemsView && catalogCsvLastImportSummaryLine !== null ? <p className="meta-line">{catalogCsvLastImportSummaryLine}</p> : null}
     </article>
   );
 }
 
-export type { ModelingCatalogListPanelProps };
+function WireEndpointReferenceNamesTable({
+  heading,
+  kind,
+  entries,
+  onUpdateWireEndpointReferenceName
+}: {
+  heading: string;
+  kind: "connection" | "seal";
+  entries: WireEndpointReferenceEntry[];
+  onUpdateWireEndpointReferenceName: WireEndpointReferenceNameHandler;
+}): ReactElement {
+  const [draftsByReference, setDraftsByReference] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setDraftsByReference(Object.fromEntries(entries.map((entry) => [entry.reference, entry.name ?? ""])));
+  }, [entries]);
+
+  if (entries.length === 0) {
+    return <p className="empty-copy">No {kind} references yet.</p>;
+  }
+
+  return (
+    <>
+      <h3 className="list-subheading">{heading}</h3>
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Name</th>
+            <th>Count</th>
+            <th className="validation-actions-cell">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map((entry) => {
+            const draftValue = draftsByReference[entry.reference] ?? "";
+            return (
+              <tr key={entry.reference} className="data-table-editable-row">
+                <td className="technical-id">{entry.reference}</td>
+                <td>
+                  <input
+                    className="data-table-text-input"
+                    aria-label={`${heading} name for ${entry.reference}`}
+                    value={draftValue}
+                    maxLength={120}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      const nextValue = event.target.value;
+                      setDraftsByReference((current) => ({
+                        ...current,
+                        [entry.reference]: nextValue
+                      }));
+                    }}
+                    placeholder="Optional"
+                  />
+                </td>
+                <td>{entry.quantity}</td>
+                <td className="validation-actions-cell">
+                  <button
+                    type="button"
+                    className="validation-row-go-to-button button-with-icon"
+                    onClick={() => {
+                      void (async () => {
+                        const result = await Promise.resolve(onUpdateWireEndpointReferenceName(kind, entry.reference, draftValue));
+                        if (result !== false && result !== true) {
+                          result.apply();
+                        }
+                      })();
+                    }}
+                  >
+                    <span className="action-button-icon is-save" aria-hidden="true" />
+                    Save
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <TableEntryCountFooter count={entries.length} />
+    </>
+  );
+}
+
+export type { CatalogTableView, ModelingCatalogListPanelProps };
