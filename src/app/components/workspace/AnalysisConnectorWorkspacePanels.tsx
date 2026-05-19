@@ -7,6 +7,7 @@ import { downloadCsvFile } from "../../lib/csv";
 import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 import { ConnectorPhysicalView } from "./ConnectorPhysicalView";
+import { EntityReferenceButton } from "./EntityReferenceButton";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
@@ -27,6 +28,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     wires,
     connectorOccupiedCountById,
     onSelectConnector,
+    onSelectCatalogItem,
     onOpenConnectorOnboardingHelp,
     cavityIndexInput,
     setCavityIndexInput,
@@ -51,6 +53,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "physical" | "synthesis">("cavities");
   const [connectorTableSort, setConnectorTableSort] = useState<{ field: ConnectorAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const [connectorSynthesisTableSort, setConnectorSynthesisTableSort] = useState<{ field: ConnectorSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
+  const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   const connectorFilterPlaceholder =
     connectorFilterField === "name" ? "Connector name" : connectorFilterField === "technicalId" ? "Technical ID" : "Name or technical ID...";
   const sortedVisibleConnectors = useMemo(
@@ -71,7 +74,6 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   );
   const wireTechnicalIdById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire.technicalId] as const)), [wires]);
   const wireById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire] as const)), [wires]);
-  const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   const formatOccupantRef = (occupantRef: string | null): string =>
     occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
   const renderConnectorOccupantRef = (occupantRef: string | null): ReactElement => {
@@ -308,6 +310,8 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           {sortedVisibleConnectors.map((connector) => {
             const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
             const isSelected = selectedConnectorId === connector.id;
+            const linkedCatalogItemId = connector.catalogItemId;
+            const linkedCatalogItem = linkedCatalogItemId === undefined ? undefined : catalogItemById.get(linkedCatalogItemId);
             return (
               <tr
                 key={connector.id}
@@ -324,7 +328,19 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
               >
                 <td>{connector.name}</td>
                 <td className="technical-id">{connector.technicalId}</td>
-                <td className="technical-id">{connector.manufacturerReference ?? ""}</td>
+                <td className="technical-id">
+                  {linkedCatalogItemId !== undefined && linkedCatalogItem !== undefined ? (
+                    <EntityReferenceButton
+                      className="technical-id"
+                      title={`Open catalog item ${connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
+                      onClick={() => onSelectCatalogItem(linkedCatalogItemId)}
+                    >
+                      {connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference}
+                    </EntityReferenceButton>
+                  ) : (
+                    connector.manufacturerReference ?? ""
+                  )}
+                </td>
                 <td>{connector.cavityCount}</td>
                 <td>{occupiedCount}</td>
               </tr>

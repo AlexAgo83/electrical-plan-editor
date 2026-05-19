@@ -328,6 +328,30 @@
   letter-spacing: 0.01em;
 }
 
+.entity-reference-button {
+  appearance: none;
+  border: 0;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.entity-reference-button:hover,
+.entity-reference-button:focus-visible {
+  color: var(--theme-accent, Highlight);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.entity-reference-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--theme-accent, Highlight) 62%, transparent);
+  outline-offset: 2px;
+}
+
 .table-entry-count-footer {
   margin: 0.45rem 0 0;
   text-align: right;

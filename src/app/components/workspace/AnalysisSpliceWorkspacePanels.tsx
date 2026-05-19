@@ -7,6 +7,7 @@ import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { EntityReferenceButton } from "./EntityReferenceButton";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
@@ -22,12 +23,14 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     spliceFilterQuery,
     setSpliceFilterQuery,
     splices,
+    catalogItems,
     visibleSplices,
     wires,
     spliceSort: _spliceSort,
     setSpliceSort: _setSpliceSort,
     spliceOccupiedCountById,
     onSelectSplice,
+    onSelectCatalogItem,
     onOpenSpliceOnboardingHelp,
     splicePortStatuses,
     portIndexInput,
@@ -54,6 +57,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
   const [spliceAnalysisView, setSpliceAnalysisView] = useState<"ports" | "synthesis">("ports");
   const [spliceTableSort, setSpliceTableSort] = useState<{ field: SpliceAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const [spliceSynthesisTableSort, setSpliceSynthesisTableSort] = useState<{ field: SpliceSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
+  const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   const spliceFilterPlaceholder =
     spliceFilterField === "name" ? "Splice name" : spliceFilterField === "technicalId" ? "Technical ID" : "Name or technical ID...";
   const sortedVisibleSplices = useMemo(
@@ -339,6 +343,8 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
           {sortedVisibleSplices.map((splice) => {
             const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
             const isSelected = selectedSpliceId === splice.id;
+            const linkedCatalogItemId = splice.catalogItemId;
+            const linkedCatalogItem = linkedCatalogItemId === undefined ? undefined : catalogItemById.get(linkedCatalogItemId);
             return (
               <tr
                 key={splice.id}
@@ -355,7 +361,19 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
               >
                 <td>{splice.name}</td>
                 <td className="technical-id">{splice.technicalId}</td>
-                <td className="technical-id">{splice.manufacturerReference ?? ""}</td>
+                <td className="technical-id">
+                  {linkedCatalogItemId !== undefined && linkedCatalogItem !== undefined ? (
+                    <EntityReferenceButton
+                      className="technical-id"
+                      title={`Open catalog item ${splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
+                      onClick={() => onSelectCatalogItem(linkedCatalogItemId)}
+                    >
+                      {splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}
+                    </EntityReferenceButton>
+                  ) : (
+                    splice.manufacturerReference ?? ""
+                  )}
+                </td>
                 <td>{resolveSplicePortMode(splice) === "unbounded" ? "∞" : splice.portCount}</td>
                 <td>{occupiedCount}</td>
               </tr>

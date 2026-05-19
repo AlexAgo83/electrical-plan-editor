@@ -128,6 +128,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   includeModelingContent: boolean;
   includeAnalysisContent: boolean;
   store: AppStore;
+  setActiveSubScreen: (subScreen: "catalog" | "connector" | "splice" | "node" | "segment" | "wire") => void;
   dispatchAction: (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean }) => void;
   requestConfirmation: (request: ConfirmDialogRequest) => Promise<boolean>;
   replaceStateWithHistory: (nextState: ReturnType<AppStore["getState"]>) => void;
@@ -170,6 +171,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   includeModelingContent,
   includeAnalysisContent,
   store,
+  setActiveSubScreen,
   dispatchAction,
   requestConfirmation,
   replaceStateWithHistory,
@@ -343,6 +345,46 @@ export function useAppControllerModelingAnalysisScreenDomains({
     })();
   }, [activeBatchScope, batchDeletePreflight, clearAllModelingForms, exitBatchMode, replaceStateWithHistory, requestConfirmation]);
 
+  const handleSelectCatalogItemReference: ModelingSliceParams["onSelectCatalogItem"] = useCallback(
+    (catalogItemId) => {
+      markSelectionPanelsFromTable?.();
+      openCatalogSubScreen();
+      dispatchAction(
+        appActions.select({
+          kind: "catalog",
+          id: catalogItemId
+        })
+      );
+    },
+    [dispatchAction, markSelectionPanelsFromTable, openCatalogSubScreen]
+  );
+  const handleSelectConnectorReference: ModelingSliceParams["onSelectConnectorReference"] = useCallback(
+    (connectorId) => {
+      markSelectionPanelsFromTable?.();
+      setActiveSubScreen("connector");
+      dispatchAction(
+        appActions.select({
+          kind: "connector",
+          id: connectorId
+        })
+      );
+    },
+    [dispatchAction, markSelectionPanelsFromTable, setActiveSubScreen]
+  );
+  const handleSelectSpliceReference: ModelingSliceParams["onSelectSpliceReference"] = useCallback(
+    (spliceId) => {
+      markSelectionPanelsFromTable?.();
+      setActiveSubScreen("splice");
+      dispatchAction(
+        appActions.select({
+          kind: "splice",
+          id: spliceId
+        })
+      );
+    },
+    [dispatchAction, markSelectionPanelsFromTable, setActiveSubScreen]
+  );
+
   const modelingSlice = includeModelingContent
     ? buildModelingScreenContentSlice({
     ModelingPrimaryTablesComponent: components.ModelingPrimaryTablesComponent,
@@ -357,6 +399,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
     onDeleteSelectedInBatchMode: handleDeleteSelectedInBatchMode,
     catalogItems: entities.catalogItems,
     openCatalogSubScreen,
+    onSelectCatalogItem: handleSelectCatalogItemReference,
+    onSelectConnectorReference: handleSelectConnectorReference,
+    onSelectSpliceReference: handleSelectSpliceReference,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     connectorFormMode: formsState.connectorFormMode,
     connectorEditAfterCreate: formsState.connectorEditAfterCreate,
@@ -672,6 +717,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setConnectorSort: listModel.setConnectorSort,
     connectorOccupiedCountById: listModel.connectorOccupiedCountById,
     onSelectConnector,
+    onSelectCatalogItem: handleSelectCatalogItemReference,
     onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorStep,
     cavityIndexInput: formsState.cavityIndexInput,
     setCavityIndexInput: formsState.setCavityIndexInput,

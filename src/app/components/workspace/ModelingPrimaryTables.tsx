@@ -8,6 +8,8 @@ import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 import type {
+  CatalogItem,
+  CatalogItemId,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -17,6 +19,7 @@ import type {
 } from "../../../core/entities";
 import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
 import type { OccupancyFilter, SortDirection, SortState } from "../../types/app-controller";
+import { EntityReferenceButton } from "./EntityReferenceButton";
 
 interface ModelingPrimaryTablesProps {
   activeBatchScope: ModelingBatchSelectionScope | null;
@@ -35,6 +38,7 @@ interface ModelingPrimaryTablesProps {
   setConnectorFilterField: (value: "name" | "technicalId" | "any") => void;
   connectorFilterQuery: string;
   setConnectorFilterQuery: (value: string) => void;
+  catalogItems: CatalogItem[];
   connectors: Connector[];
   visibleConnectors: Connector[];
   connectorSort: SortState;
@@ -43,6 +47,7 @@ interface ModelingPrimaryTablesProps {
   connectorOccupiedCountById: Map<ConnectorId, number>;
   selectedConnectorId: ConnectorId | null;
   onEditConnector: (connector: Connector) => void;
+  onSelectCatalogItem: (catalogItemId: CatalogItemId) => void;
   onDeleteConnector: (connectorId: ConnectorId) => void;
   onOpenConnectorOnboardingHelp?: () => void;
   isSpliceSubScreen: boolean;
@@ -101,6 +106,7 @@ export function ModelingPrimaryTables({
   setConnectorFilterField,
   connectorFilterQuery,
   setConnectorFilterQuery,
+  catalogItems,
   connectors,
   visibleConnectors,
   connectorSort,
@@ -108,6 +114,7 @@ export function ModelingPrimaryTables({
   connectorOccupiedCountById,
   selectedConnectorId,
   onEditConnector,
+  onSelectCatalogItem,
   onDeleteConnector,
   onOpenConnectorOnboardingHelp,
   isSpliceSubScreen,
@@ -171,6 +178,7 @@ export function ModelingPrimaryTables({
   const focusedNode =
     selectedNodeId === null ? null : (visibleNodes.find((node) => node.id === selectedNodeId) ?? null);
   const showNodeKindColumn = nodeKindFilter === "all";
+  const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   const connectorFilterPlaceholder =
     connectorFilterField === "name"
       ? "Connector name"
@@ -530,6 +538,8 @@ export function ModelingPrimaryTables({
                 const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
                 const isFocused = focusedConnector?.id === connector.id;
                 const isBatchSelected = batchSelectionIds.has(connector.id);
+                const linkedCatalogItemId = connector.catalogItemId;
+                const linkedCatalogItem = linkedCatalogItemId === undefined ? undefined : catalogItemById.get(linkedCatalogItemId);
                 return (
                   <tr
                     key={connector.id}
@@ -568,7 +578,19 @@ export function ModelingPrimaryTables({
                     ) : null}
                     <td>{connector.name}</td>
                     <td className="technical-id">{connector.technicalId}</td>
-                    <td className="technical-id">{connector.manufacturerReference ?? ""}</td>
+                    <td className="technical-id">
+                      {linkedCatalogItemId !== undefined && linkedCatalogItem !== undefined ? (
+                        <EntityReferenceButton
+                          className="technical-id"
+                          title={`Open catalog item ${connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
+                          onClick={() => onSelectCatalogItem(linkedCatalogItemId)}
+                        >
+                          {connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference}
+                        </EntityReferenceButton>
+                      ) : (
+                        connector.manufacturerReference ?? ""
+                      )}
+                    </td>
                     <td>{connector.cavityCount}</td>
                     <td>{occupiedCount}</td>
                   </tr>
@@ -732,6 +754,8 @@ export function ModelingPrimaryTables({
                 const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
                 const isFocused = focusedSplice?.id === splice.id;
                 const isBatchSelected = batchSelectionIds.has(splice.id);
+                const linkedCatalogItemId = splice.catalogItemId;
+                const linkedCatalogItem = linkedCatalogItemId === undefined ? undefined : catalogItemById.get(linkedCatalogItemId);
                 return (
                   <tr
                     key={splice.id}
@@ -770,7 +794,19 @@ export function ModelingPrimaryTables({
                     ) : null}
                     <td>{splice.name}</td>
                     <td className="technical-id">{splice.technicalId}</td>
-                    <td className="technical-id">{splice.manufacturerReference ?? ""}</td>
+                    <td className="technical-id">
+                      {linkedCatalogItemId !== undefined && linkedCatalogItem !== undefined ? (
+                        <EntityReferenceButton
+                          className="technical-id"
+                          title={`Open catalog item ${splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
+                          onClick={() => onSelectCatalogItem(linkedCatalogItemId)}
+                        >
+                          {splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}
+                        </EntityReferenceButton>
+                      ) : (
+                        splice.manufacturerReference ?? ""
+                      )}
+                    </td>
                     <td>{resolveSplicePortMode(splice) === "unbounded" ? "∞" : splice.portCount}</td>
                     <td>{occupiedCount}</td>
                   </tr>

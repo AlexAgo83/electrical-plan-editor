@@ -130,6 +130,9 @@ type ModelingScreenContentSliceParams = Omit<
     ModelingFormsColumnComponent: ComponentType<ModelingFormsColumnProps>;
     resetConnectorForm: ModelingPrimaryTablesProps["onOpenCreateConnector"];
     startConnectorEdit: ModelingPrimaryTablesProps["onEditConnector"];
+    onSelectCatalogItem: ModelingPrimaryTablesProps["onSelectCatalogItem"];
+    onSelectConnectorReference: ModelingSecondaryTablesProps["onSelectConnectorReference"];
+    onSelectSpliceReference: ModelingSecondaryTablesProps["onSelectSpliceReference"];
     handleConnectorDelete: ModelingPrimaryTablesProps["onDeleteConnector"];
     resetSpliceForm: ModelingPrimaryTablesProps["onOpenCreateSplice"];
     startSpliceEdit: ModelingPrimaryTablesProps["onEditSplice"];
@@ -156,10 +159,11 @@ type ModelingScreenContentSliceParams = Omit<
 
 type AnalysisScreenContentSliceParams = Omit<
   AnalysisWorkspaceContentProps,
-  "onSelectConnector" | "onSelectSplice" | "onSelectNode" | "onSelectSegment" | "onSelectWire"
+  "onSelectConnector" | "onSelectCatalogItem" | "onSelectSplice" | "onSelectNode" | "onSelectSegment" | "onSelectWire"
 > & {
   AnalysisWorkspaceContentComponent: ComponentType<AnalysisWorkspaceContentProps>;
   onSelectConnector: AnalysisWorkspaceContentProps["onSelectConnector"];
+  onSelectCatalogItem: AnalysisWorkspaceContentProps["onSelectCatalogItem"];
   onSelectSplice: AnalysisWorkspaceContentProps["onSelectSplice"];
   onSelectNode: AnalysisWorkspaceContentProps["onSelectNode"];
   onSelectSegment: AnalysisWorkspaceContentProps["onSelectSegment"];
@@ -377,6 +381,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setConnectorFilterField: params.setConnectorFilterField,
     connectorFilterQuery: params.connectorFilterQuery,
     setConnectorFilterQuery: params.setConnectorFilterQuery,
+    catalogItems: params.catalogItems,
     connectors: params.connectors,
     visibleConnectors: params.visibleConnectors,
     connectorSort: params.connectorSort,
@@ -385,6 +390,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     connectorOccupiedCountById: params.connectorOccupiedCountById,
     selectedConnectorId: params.selectedConnectorId,
     onEditConnector: params.startConnectorEdit,
+    onSelectCatalogItem: params.onSelectCatalogItem,
     onDeleteConnector: params.handleConnectorDelete,
     onOpenConnectorOnboardingHelp: params.onOpenConnectorOnboardingHelp,
     isSpliceSubScreen: params.isSpliceSubScreen,
@@ -462,12 +468,17 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setWireEndpointFilterQuery: params.setWireEndpointFilterQuery,
     tabularExportFormat: params.tabularExportFormat,
     catalogItems: params.catalogItems,
+    connectors: params.connectors,
+    splices: params.splices,
     wires: params.wires,
     visibleWires: params.visibleWires,
     wireSort: params.wireSort,
     setWireSort: params.setWireSort,
     getSortIndicator: params.getSortIndicator,
     selectedWireId: params.selectedWireId,
+    onSelectCatalogItem: params.onSelectCatalogItem,
+    onSelectConnectorReference: params.onSelectConnectorReference,
+    onSelectSpliceReference: params.onSelectSpliceReference,
     describeWireEndpoint: params.describeWireEndpoint,
     describeWireEndpointCsvParts: params.describeWireEndpointCsvParts,
     onEditWire: params.startWireEdit,
@@ -711,6 +722,7 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
     setConnectorSort: params.setConnectorSort,
     connectorOccupiedCountById: params.connectorOccupiedCountById,
     onSelectConnector: params.onSelectConnector,
+    onSelectCatalogItem: params.onSelectCatalogItem,
     onOpenConnectorOnboardingHelp: params.onOpenConnectorOnboardingHelp,
     cavityIndexInput: params.cavityIndexInput,
     setCavityIndexInput: params.setCavityIndexInput,

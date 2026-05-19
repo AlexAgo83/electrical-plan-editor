@@ -1,6 +1,7 @@
 import type { FormEvent } from "react";
 import type {
   CatalogItem,
+  CatalogItemId,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -54,6 +55,7 @@ export interface AnalysisWorkspaceContentProps {
   setConnectorSort: (value: SortState | ((current: SortState) => SortState)) => void;
   connectorOccupiedCountById: Map<ConnectorId, number>;
   onSelectConnector: (connectorId: ConnectorId) => void;
+  onSelectCatalogItem: (catalogItemId: CatalogItemId) => void;
   onOpenConnectorOnboardingHelp?: () => void;
   cavityIndexInput: string;
   setCavityIndexInput: (value: string) => void;

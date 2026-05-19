@@ -11,14 +11,21 @@ import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 import type {
   CatalogItem,
+  CatalogItemId,
+  Connector,
+  ConnectorId,
   NodeId,
   Segment,
   SegmentId,
+  Splice,
+  SpliceId,
+  WireEndpoint,
   Wire,
   WireId
 } from "../../../core/entities";
 import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
 import type { SegmentSubNetworkFilter, SortDirection, SortState, TabularExportFormat } from "../../types/app-controller";
+import { EntityReferenceButton } from "./EntityReferenceButton";
 
 interface ModelingSecondaryTablesProps {
   activeBatchScope: ModelingBatchSelectionScope | null;
@@ -58,12 +65,17 @@ interface ModelingSecondaryTablesProps {
   setWireEndpointFilterQuery: (value: string) => void;
   tabularExportFormat: TabularExportFormat;
   catalogItems: CatalogItem[];
+  connectors: Connector[];
+  splices: Splice[];
   wires: Wire[];
   visibleWires: Wire[];
   wireSort: SortState;
   setWireSort: (value: SortState | ((current: SortState) => SortState)) => void;
   getSortIndicator: (sortState: SortState, field: SortState["field"]) => string;
   selectedWireId: WireId | null;
+  onSelectCatalogItem: (catalogItemId: CatalogItemId) => void;
+  onSelectConnectorReference: (connectorId: ConnectorId) => void;
+  onSelectSpliceReference: (spliceId: SpliceId) => void;
   describeWireEndpoint: (endpoint: Wire["endpointA"]) => string;
   describeWireEndpointCsvParts: (endpoint: Wire["endpointA"]) => { endpointId: string; pin: string };
   onEditWire: (wire: Wire) => void;
@@ -109,12 +121,17 @@ export function ModelingSecondaryTables({
   setWireEndpointFilterQuery,
   tabularExportFormat,
   catalogItems,
+  connectors,
+  splices,
   wires,
   visibleWires,
   wireSort: _wireSort,
   setWireSort: _setWireSort,
   getSortIndicator: _getSortIndicator,
   selectedWireId,
+  onSelectCatalogItem,
+  onSelectConnectorReference,
+  onSelectSpliceReference,
   describeWireEndpoint,
   describeWireEndpointCsvParts,
   onEditWire,
@@ -188,6 +205,8 @@ export function ModelingSecondaryTables({
     onEditWire(wire);
   };
   const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
+  const connectorById = useMemo(() => new Map(connectors.map((connector) => [connector.id, connector] as const)), [connectors]);
+  const spliceById = useMemo(() => new Map(splices.map((splice) => [splice.id, splice] as const)), [splices]);
   useEffect(() => {
     setSegmentTableSort((current) =>
       current.field === "id" && current.direction === _segmentIdSortDirection
@@ -264,6 +283,30 @@ export function ModelingSecondaryTables({
       return null;
     }
     return catalogItemById.get(wire.protection.catalogItemId)?.manufacturerReference ?? "(missing catalog item)";
+  };
+  const renderWireEndpointReference = (endpoint: WireEndpoint): ReactElement => {
+    const label = describeWireEndpoint(endpoint);
+    if (endpoint.kind === "connectorCavity") {
+      const connector = connectorById.get(endpoint.connectorId);
+      if (connector === undefined) {
+        return <>{label}</>;
+      }
+      return (
+        <EntityReferenceButton title={`Open connector ${connector.technicalId}`} onClick={() => onSelectConnectorReference(endpoint.connectorId)}>
+          {label}
+        </EntityReferenceButton>
+      );
+    }
+
+    const splice = spliceById.get(endpoint.spliceId);
+    if (splice === undefined) {
+      return <>{label}</>;
+    }
+    return (
+      <EntityReferenceButton title={`Open splice ${splice.technicalId}`} onClick={() => onSelectSpliceReference(endpoint.spliceId)}>
+        {label}
+      </EntityReferenceButton>
+    );
   };
 
   useEffect(() => {
@@ -713,6 +756,8 @@ export function ModelingSecondaryTables({
                 {sortedVisibleWires.map((wire) => {
                   const isFocused = focusedWire?.id === wire.id;
                   const fuseManufacturerReference = getWireFuseManufacturerReference(wire);
+                  const fuseCatalogItemId = wire.protection?.catalogItemId;
+                  const fuseCatalogItem = fuseCatalogItemId === undefined ? undefined : catalogItemById.get(fuseCatalogItemId);
                   const isBatchSelected = batchSelectionIds.has(wire.id);
                   return (
                     <tr
@@ -751,15 +796,25 @@ export function ModelingSecondaryTables({
                         {fuseManufacturerReference !== null ? (
                           <div className="wire-fuse-inline">
                             <span className="status-chip wire-fuse-chip">Fuse</span>
-                            <span className="technical-id">{fuseManufacturerReference}</span>
+                            {fuseCatalogItemId !== undefined && fuseCatalogItem !== undefined ? (
+                              <EntityReferenceButton
+                                className="technical-id"
+                                title={`Open catalog item ${fuseManufacturerReference}`}
+                                onClick={() => onSelectCatalogItem(fuseCatalogItemId)}
+                              >
+                                {fuseManufacturerReference}
+                              </EntityReferenceButton>
+                            ) : (
+                              <span className="technical-id">{fuseManufacturerReference}</span>
+                            )}
                           </div>
                         ) : null}
                       </td>
                       <td className="technical-id">{wire.technicalId}</td>
                       <td>{wire.twistGroupLabel ?? ""}</td>
                       <td>{renderWireColorCellValue(wire)}</td>
-                      <td>{describeWireEndpoint(wire.endpointA)}</td>
-                      <td>{describeWireEndpoint(wire.endpointB)}</td>
+                      <td>{renderWireEndpointReference(wire.endpointA)}</td>
+                      <td>{renderWireEndpointReference(wire.endpointB)}</td>
                       <td>{wire.sectionMm2}</td>
                       <td>{wire.lengthMm}</td>
                       {showWireRouteModeColumn ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}

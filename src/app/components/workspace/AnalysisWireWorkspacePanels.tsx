@@ -1,11 +1,13 @@
 import { useMemo, useState, type ReactElement } from "react";
 import { getWireColorLabel, getWireColorSortValue } from "../../../core/cableColors";
+import type { WireEndpoint } from "../../../core/entities";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadTabularCsvOrXlsxFile } from "../../lib/tabularExport";
 import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { EntityReferenceButton } from "./EntityReferenceButton";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
@@ -20,12 +22,17 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     setWireEndpointFilterQuery,
     tabularExportFormat,
     catalogItems,
+    connectors,
+    splices,
     wires,
     visibleWires,
     wireSort: _wireSort,
     setWireSort: _setWireSort,
     selectedWireId,
     onSelectWire,
+    onSelectConnector,
+    onSelectSplice,
+    onSelectCatalogItem,
     onOpenWireOnboardingHelp,
     selectedWire,
     showEntityTables = true,
@@ -43,6 +50,8 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   void _getSortIndicator;
   type WireAnalysisTableSortField = "name" | "technicalId" | "color" | "endpointA" | "endpointB" | "sectionMm2" | "lengthMm" | "routeMode";
   const isMobileViewport = useIsMobileViewport();
+  const connectorById = useMemo(() => new Map(connectors.map((connector) => [connector.id, connector] as const)), [connectors]);
+  const spliceById = useMemo(() => new Map(splices.map((splice) => [splice.id, splice] as const)), [splices]);
   const [wireAnalysisTableSort, setWireAnalysisTableSort] = useState<{ field: WireAnalysisTableSortField; direction: "asc" | "desc" }>({
     field: "name",
     direction: "asc"
@@ -85,6 +94,30 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
       return null;
     }
     return catalogItemById.get(wire.protection.catalogItemId)?.manufacturerReference ?? "(missing catalog item)";
+  };
+  const renderWireEndpointReference = (endpoint: WireEndpoint): ReactElement => {
+    const label = describeWireEndpoint(endpoint);
+    if (endpoint.kind === "connectorCavity") {
+      const connector = connectorById.get(endpoint.connectorId);
+      if (connector === undefined) {
+        return <>{label}</>;
+      }
+      return (
+        <EntityReferenceButton title={`Open connector ${connector.technicalId}`} onClick={() => onSelectConnector(endpoint.connectorId)}>
+          {label}
+        </EntityReferenceButton>
+      );
+    }
+
+    const splice = spliceById.get(endpoint.spliceId);
+    if (splice === undefined) {
+      return <>{label}</>;
+    }
+    return (
+      <EntityReferenceButton title={`Open splice ${splice.technicalId}`} onClick={() => onSelectSplice(endpoint.spliceId)}>
+        {label}
+      </EntityReferenceButton>
+    );
   };
   return (
     <>
@@ -357,6 +390,8 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           {sortedVisibleWires.map((wire) => {
             const isSelected = selectedWireId === wire.id;
             const fuseManufacturerReference = getWireFuseManufacturerReference(wire);
+            const fuseCatalogItemId = wire.protection?.catalogItemId;
+            const fuseCatalogItem = fuseCatalogItemId === undefined ? undefined : catalogItemById.get(fuseCatalogItemId);
             return (
               <tr
                 key={wire.id}
@@ -376,15 +411,25 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   {fuseManufacturerReference !== null ? (
                     <div className="wire-fuse-inline">
                       <span className="status-chip wire-fuse-chip">Fuse</span>
-                      <span className="technical-id">{fuseManufacturerReference}</span>
+                      {fuseCatalogItemId !== undefined && fuseCatalogItem !== undefined ? (
+                        <EntityReferenceButton
+                          className="technical-id"
+                          title={`Open catalog item ${fuseManufacturerReference}`}
+                          onClick={() => onSelectCatalogItem(fuseCatalogItemId)}
+                        >
+                          {fuseManufacturerReference}
+                        </EntityReferenceButton>
+                      ) : (
+                        <span className="technical-id">{fuseManufacturerReference}</span>
+                      )}
                     </div>
                   ) : null}
                 </td>
                 <td className="technical-id">{wire.technicalId}</td>
                 <td>{wire.twistGroupLabel ?? ""}</td>
                 <td>{renderWireColorCellValue(wire)}</td>
-                <td>{describeWireEndpoint(wire.endpointA)}</td>
-                <td>{describeWireEndpoint(wire.endpointB)}</td>
+                <td>{renderWireEndpointReference(wire.endpointA)}</td>
+                <td>{renderWireEndpointReference(wire.endpointB)}</td>
                 <td>{wire.sectionMm2}</td>
                 <td>{wire.lengthMm}</td>
                 {showWireRouteModeColumn ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}

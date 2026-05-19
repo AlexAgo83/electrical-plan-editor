@@ -57,12 +57,14 @@ export function useAppControllerModelingAnalysisDomainAssembly({
       openWireStep: () => openSingleStepOnboarding("wires")
     },
     markSelectionPanelsFromTable,
+    setActiveSubScreen,
     openCatalogSubScreen: () => {
       handleWorkspaceScreenChange("modeling");
       setActiveSubScreen("catalog");
     },
     onSelectConnector: (connectorId) => {
       markSelectionPanelsFromTable();
+      setActiveSubScreen("connector");
       dispatchAction(
         appActions.select({
           kind: "connector",
@@ -72,6 +74,7 @@ export function useAppControllerModelingAnalysisDomainAssembly({
     },
     onSelectSplice: (spliceId) => {
       markSelectionPanelsFromTable();
+      setActiveSubScreen("splice");
       dispatchAction(
         appActions.select({
           kind: "splice",
@@ -81,6 +84,7 @@ export function useAppControllerModelingAnalysisDomainAssembly({
     },
     onSelectNode: (nodeId) => {
       markSelectionPanelsFromTable();
+      setActiveSubScreen("node");
       dispatchAction(
         appActions.select({
           kind: "node",
@@ -90,6 +94,7 @@ export function useAppControllerModelingAnalysisDomainAssembly({
     },
     onSelectSegment: (segmentId) => {
       markSelectionPanelsFromTable();
+      setActiveSubScreen("segment");
       dispatchAction(
         appActions.select({
           kind: "segment",
@@ -99,6 +104,7 @@ export function useAppControllerModelingAnalysisDomainAssembly({
     },
     onSelectWire: (wireId) => {
       markSelectionPanelsFromTable();
+      setActiveSubScreen("wire");
       dispatchAction(
         appActions.select({
           kind: "wire",

@@ -178,6 +178,24 @@ describe("App integration UI - list ergonomics", () => {
     expect(within(wiresPanel).getByText("1 entry")).toBeInTheDocument();
   });
 
+  it("opens endpoint entities from the wire Endpoint A and Endpoint B cells", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreen("modeling");
+    switchSubScreen("wire");
+    const wiresPanel = getPanelByHeading("Wires");
+
+    fireEvent.click(within(wiresPanel).getByRole("button", { name: /Connector 1 \(C-1\) \/ C1/i }));
+    const connectorsPanel = getPanelByHeading("Connectors");
+    expect(within(connectorsPanel).getByText("Connector 1")).toBeInTheDocument();
+
+    switchSubScreen("wire");
+    const reopenedWiresPanel = getPanelByHeading("Wires");
+    fireEvent.click(within(reopenedWiresPanel).getByRole("button", { name: /Splice 1 \(S-1\) \/ P1/i }));
+    const splicesPanel = getPanelByHeading("Splices");
+    expect(within(splicesPanel).getByText("Splice 1")).toBeInTheDocument();
+  });
+
   it("keeps Select multiple on the main modeling action row between Edit and Delete with an icon", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreen("modeling");

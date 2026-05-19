@@ -4,6 +4,7 @@ import type { NetworkId } from "../core/entities";
 import { appActions, appReducer, createInitialState } from "../store";
 import {
   asCatalogItemId,
+  asConnectorId,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
@@ -117,6 +118,44 @@ describe("App integration UI - inspector floating shell", () => {
     const inspectorPanel = getPanelByHeading("Inspector context");
     expect(within(inspectorPanel).getByText("CAT-MFR-1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
     expect(within(inspectorPanel).queryByText("CAT-INTERNAL-1", { selector: ".inspector-entity-id" })).not.toBeInTheDocument();
+  });
+
+  it("opens referenced catalog items from connector manufacturer reference cells", () => {
+    const baseState = createUiIntegrationState();
+    const connector = baseState.connectors.byId[asConnectorId("C1")];
+    if (connector === undefined) {
+      throw new Error("Expected connector C1 in integration state.");
+    }
+    const stateWithCatalog = appReducer(
+      appReducer(
+        baseState,
+        appActions.upsertCatalogItem({
+          id: asCatalogItemId("CAT-INTERNAL-1"),
+          manufacturerReference: "CAT-MFR-1",
+          name: "Catalog inspector sample",
+          connectionCount: connector.cavityCount
+        })
+      ),
+      appActions.upsertConnector({
+        ...connector,
+        catalogItemId: asCatalogItemId("CAT-INTERNAL-1"),
+        manufacturerReference: "CAT-MFR-1"
+      })
+    );
+
+    renderAppWithState(stateWithCatalog);
+    closeOnboardingIfOpen();
+    switchScreenDrawerAware("modeling");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByRole("button", { name: "CAT-MFR-1" }));
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    expect(within(catalogPanel).getByText("CAT-MFR-1")).toBeInTheDocument();
+    const inspectorShell = getInspectorShell();
+    if (inspectorShell !== null) {
+      expect(within(getPanelByHeading("Inspector context")).getByText("CAT-MFR-1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
+    }
   });
 
   it("hides inspector on Validation, Network Scope and Settings", () => {
