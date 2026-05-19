@@ -119,6 +119,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
     | "canvasExportIncludeFrame"
     | "canvasExportIncludeCartouche"
     | "canvasPngExportIncludeBackground"
+    | "showRoutePreviewPanel"
   >;
   selection: Pick<
     AppControllerSelectionEntitiesModel,
@@ -339,6 +340,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         routePreviewEndNodeId: canvasDisplayState.routePreviewEndNodeId,
         setRoutePreviewEndNodeId: canvasDisplayState.setRoutePreviewEndNodeId,
         routePreview,
+        showRoutePreviewPanel: preferencesState.showRoutePreviewPanel,
         quickEntityNavigationMode: isModelingScreen && !isModelingAnalysisFocused ? "modeling" : "analysis",
         activeSubScreen,
         entityCountBySubScreen,

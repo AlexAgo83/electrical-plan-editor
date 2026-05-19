@@ -253,6 +253,8 @@ export function useAppControllerAuxScreenContentDomains({
     setRestoreViewportOnUndo: settings.prefs.setRestoreViewportOnUndo,
     showFloatingInspectorPanel: settings.prefs.showFloatingInspectorPanel,
     setShowFloatingInspectorPanel: settings.prefs.setShowFloatingInspectorPanel,
+    showRoutePreviewPanel: settings.prefs.showRoutePreviewPanel,
+    setShowRoutePreviewPanel: settings.prefs.setShowRoutePreviewPanel,
     workspacePanelsLayoutMode: settings.prefs.workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode: settings.prefs.setWorkspacePanelsLayoutMode,
     workspaceWideScreen: settings.prefs.workspaceWideScreen,

@@ -144,6 +144,7 @@ export interface NetworkSummaryPanelProps {
   routePreviewEndNodeId: string;
   setRoutePreviewEndNodeId: (value: string) => void;
   routePreview: ShortestRouteResult | null;
+  showRoutePreviewPanel: boolean;
   quickEntityNavigationMode: "modeling" | "analysis";
   activeSubScreen: SubScreenId;
   entityCountBySubScreen: Record<SubScreenId, number>;
@@ -240,6 +241,7 @@ export function NetworkSummaryPanel({
   routePreviewEndNodeId,
   setRoutePreviewEndNodeId,
   routePreview,
+  showRoutePreviewPanel,
   quickEntityNavigationMode,
   activeSubScreen,
   entityCountBySubScreen,
@@ -961,15 +963,17 @@ export function NetworkSummaryPanel({
         </p>
         <NetworkSummaryLegend />
       </section>
-      <NetworkRoutePreviewPanel
-        nodes={nodes}
-        describeNode={describeNode}
-        routePreviewStartNodeId={routePreviewStartNodeId}
-        setRoutePreviewStartNodeId={setRoutePreviewStartNodeId}
-        routePreviewEndNodeId={routePreviewEndNodeId}
-        setRoutePreviewEndNodeId={setRoutePreviewEndNodeId}
-        routePreview={routePreview}
-      />
+      {showRoutePreviewPanel ? (
+        <NetworkRoutePreviewPanel
+          nodes={nodes}
+          describeNode={describeNode}
+          routePreviewStartNodeId={routePreviewStartNodeId}
+          setRoutePreviewStartNodeId={setRoutePreviewStartNodeId}
+          routePreviewEndNodeId={routePreviewEndNodeId}
+          setRoutePreviewEndNodeId={setRoutePreviewEndNodeId}
+          routePreview={routePreview}
+        />
+      ) : null}
       <NetworkSummaryQuickEntityNavigation
         quickEntityNavigationMode={quickEntityNavigationMode}
         activeSubScreen={activeSubScreen}

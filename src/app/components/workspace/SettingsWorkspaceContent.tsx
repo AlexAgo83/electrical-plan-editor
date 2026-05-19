@@ -125,6 +125,8 @@ interface SettingsWorkspaceContentProps {
   setRestoreViewportOnUndo: (value: boolean) => void;
   showFloatingInspectorPanel: boolean;
   setShowFloatingInspectorPanel: (value: boolean) => void;
+  showRoutePreviewPanel: boolean;
+  setShowRoutePreviewPanel: (value: boolean) => void;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutMode;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
   workspaceWideScreen: boolean;
@@ -236,6 +238,8 @@ export function SettingsWorkspaceContent({
   setRestoreViewportOnUndo,
   showFloatingInspectorPanel,
   setShowFloatingInspectorPanel,
+  showRoutePreviewPanel,
+  setShowRoutePreviewPanel,
   workspacePanelsLayoutMode,
   setWorkspacePanelsLayoutMode,
   workspaceWideScreen,
@@ -573,6 +577,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
             />
             Show floating inspector panel on supported screens
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={showRoutePreviewPanel}
+              onChange={(event) => setShowRoutePreviewPanel(event.target.checked)}
+            />
+            Show route preview panel
           </label>
           <label className="settings-field">
             Workspace panels layout

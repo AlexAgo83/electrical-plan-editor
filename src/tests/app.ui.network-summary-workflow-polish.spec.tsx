@@ -150,6 +150,10 @@ describe("App integration UI - network summary workflow polish", () => {
 
   it("renders a compact quick entity navigation strip after route preview and switches sub-screens", () => {
     renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const globalSettingsPanel = getPanelByHeading("Global preferences");
+    fireEvent.click(within(globalSettingsPanel).getByLabelText("Show route preview panel"));
+
     switchScreenDrawerAware("modeling");
 
     const routePreviewPanel = getPanelByHeading("Route preview");

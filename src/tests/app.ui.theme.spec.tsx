@@ -215,7 +215,7 @@ describe("App integration UI - theme mode", () => {
 
     switchScreen("analysis");
     expect(within(document.body).queryByRole("heading", { name: "Connector analysis" })).toBeNull();
-    expect(within(document.body).getByRole("heading", { name: "Route preview" })).toBeInTheDocument();
+    expect(within(document.body).queryByRole("heading", { name: "Route preview" })).toBeNull();
     const connectorsPanel = within(document.body).getByRole("heading", { name: "Connectors" }).closest(".panel");
     expect(connectorsPanel).not.toBeNull();
     fireEvent.click(within(connectorsPanel as HTMLElement).getByText("Connector 1"));

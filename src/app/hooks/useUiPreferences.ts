@@ -16,7 +16,7 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 7;
+const UI_PREFERENCES_SCHEMA_VERSION = 8;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 function normalizeThemeMode(value: unknown): ThemeMode {
@@ -146,6 +146,7 @@ interface UiPreferencesPayload {
   keyboardShortcutsEnabled: boolean;
   restoreViewportOnUndo: boolean;
   showFloatingInspectorPanel: boolean;
+  showRoutePreviewPanel: boolean;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
   workspaceWideScreen: boolean;
 }
@@ -212,6 +213,14 @@ function migrateUiPreferencesFromV6(candidate: Record<string, unknown>): Record<
   };
 }
 
+function migrateUiPreferencesFromV7(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    showRoutePreviewPanel: typeof candidate.showRoutePreviewPanel === "boolean" ? candidate.showRoutePreviewPanel : false,
+    schemaVersion: 8
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -257,6 +266,11 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
     if (version === 6) {
       migrated = migrateUiPreferencesFromV6(migrated);
       version = 7;
+      continue;
+    }
+    if (version === 7) {
+      migrated = migrateUiPreferencesFromV7(migrated);
+      version = 8;
       continue;
     }
     return null;
@@ -325,6 +339,7 @@ interface UseUiPreferencesOptions {
   keyboardShortcutsEnabled: boolean;
   restoreViewportOnUndo: boolean;
   showFloatingInspectorPanel: boolean;
+  showRoutePreviewPanel: boolean;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
   workspaceWideScreen: boolean;
   preferencesHydrated: boolean;
@@ -393,6 +408,7 @@ interface UseUiPreferencesOptions {
   setKeyboardShortcutsEnabled: (value: boolean) => void;
   setRestoreViewportOnUndo: (value: boolean) => void;
   setShowFloatingInspectorPanel: (value: boolean) => void;
+  setShowRoutePreviewPanel: (value: boolean) => void;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutPreference) => void;
   setWorkspaceWideScreen: (value: boolean) => void;
   setPreferencesHydrated: (value: boolean) => void;
@@ -516,6 +532,7 @@ export function useUiPreferences({
   keyboardShortcutsEnabled,
   restoreViewportOnUndo,
   showFloatingInspectorPanel,
+  showRoutePreviewPanel,
   workspacePanelsLayoutMode,
   workspaceWideScreen,
   preferencesHydrated,
@@ -584,6 +601,7 @@ export function useUiPreferences({
   setKeyboardShortcutsEnabled,
   setRestoreViewportOnUndo,
   setShowFloatingInspectorPanel,
+  setShowRoutePreviewPanel,
   setWorkspacePanelsLayoutMode,
   setWorkspaceWideScreen,
   setPreferencesHydrated
@@ -731,6 +749,9 @@ export function useUiPreferences({
       setShowFloatingInspectorPanel(
         typeof preferences.showFloatingInspectorPanel === "boolean" ? preferences.showFloatingInspectorPanel : true
       );
+      setShowRoutePreviewPanel(
+        typeof preferences.showRoutePreviewPanel === "boolean" ? preferences.showRoutePreviewPanel : false
+      );
       setWorkspacePanelsLayoutMode(normalizeWorkspacePanelsLayoutMode(preferences.workspacePanelsLayoutMode));
       setWorkspaceWideScreen(typeof preferences.workspaceWideScreen === "boolean" ? preferences.workspaceWideScreen : false);
     }
@@ -780,6 +801,7 @@ export function useUiPreferences({
     setShowNetworkInfoPanels,
     setShowSegmentNames,
     setShowFloatingInspectorPanel,
+    setShowRoutePreviewPanel,
     setShowShortcutHints,
     setShowSegmentLengths,
     setShowCableCallouts,
@@ -858,6 +880,7 @@ export function useUiPreferences({
       keyboardShortcutsEnabled,
       restoreViewportOnUndo,
       showFloatingInspectorPanel,
+      showRoutePreviewPanel,
       workspacePanelsLayoutMode,
       workspaceWideScreen
     };
@@ -897,6 +920,7 @@ export function useUiPreferences({
     preferencesHydrated,
     restoreViewportOnUndo,
     showFloatingInspectorPanel,
+    showRoutePreviewPanel,
     showShortcutHints,
     tableDensity,
     tableFontSize,

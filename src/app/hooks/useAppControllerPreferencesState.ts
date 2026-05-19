@@ -63,6 +63,7 @@ export function useAppControllerPreferencesState() {
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
   const [restoreViewportOnUndo, setRestoreViewportOnUndo] = useState(true);
   const [showFloatingInspectorPanel, setShowFloatingInspectorPanel] = useState(true);
+  const [showRoutePreviewPanel, setShowRoutePreviewPanel] = useState(false);
   const [workspacePanelsLayoutMode, setWorkspacePanelsLayoutMode] = useState<WorkspacePanelsLayoutMode>("singleColumn");
   const [workspaceWideScreen, setWorkspaceWideScreen] = useState(false);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
@@ -152,6 +153,8 @@ export function useAppControllerPreferencesState() {
     setRestoreViewportOnUndo,
     showFloatingInspectorPanel,
     setShowFloatingInspectorPanel,
+    showRoutePreviewPanel,
+    setShowRoutePreviewPanel,
     workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode,
     workspaceWideScreen,

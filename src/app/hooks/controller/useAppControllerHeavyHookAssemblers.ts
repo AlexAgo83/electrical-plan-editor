@@ -116,6 +116,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setKeyboardShortcutsEnabled"
     | "setRestoreViewportOnUndo"
     | "setShowFloatingInspectorPanel"
+    | "setShowRoutePreviewPanel"
     | "setWorkspacePanelsLayoutMode"
     | "setWorkspaceWideScreen"
   >;

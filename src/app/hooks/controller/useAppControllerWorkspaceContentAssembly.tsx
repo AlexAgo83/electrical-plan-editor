@@ -248,7 +248,8 @@ export function useAppControllerWorkspaceContentAssembly({
       canvasExportFormat: models.preferencesState.canvasExportFormat,
       canvasExportIncludeFrame: models.preferencesState.canvasExportIncludeFrame,
       canvasExportIncludeCartouche: models.preferencesState.canvasExportIncludeCartouche,
-      canvasPngExportIncludeBackground: models.preferencesState.canvasPngExportIncludeBackground
+      canvasPngExportIncludeBackground: models.preferencesState.canvasPngExportIncludeBackground,
+      showRoutePreviewPanel: models.preferencesState.showRoutePreviewPanel
     },
     selection: {
       selectedSegmentId: entities.selectedSegmentId,
