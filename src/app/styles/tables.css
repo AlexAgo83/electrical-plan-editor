@@ -342,13 +342,13 @@
 
 .entity-reference-button:hover,
 .entity-reference-button:focus-visible {
-  color: var(--theme-accent, Highlight);
+  color: var(--theme-primary, Highlight);
   text-decoration: underline;
   text-underline-offset: 0.18em;
 }
 
 .entity-reference-button:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--theme-accent, Highlight) 62%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--theme-primary, Highlight) 62%, transparent);
   outline-offset: 2px;
 }
 
