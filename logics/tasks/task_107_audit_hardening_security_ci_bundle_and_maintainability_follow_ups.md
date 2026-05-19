@@ -8,12 +8,13 @@
 > Complexity: High
 > Theme: Quality
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Non-semantic edit: Removed references to a deleted root-level audit report file.
 
 # Context
 - Derived from `logics/backlog/item_596_audit_hardening_security_ci_bundle_and_maintainability_follow_ups.md`.
 - Related request: `req_124_audit_hardening_security_ci_bundle_and_maintainability_follow_ups`.
 - Related ADR: `adr_008_audit_hardening_delivery_strategy_for_security_ci_bundle_and_maintainability`.
-- Source audit: `AUDIT_PROJECT_2026-05-12.md`.
+- Source audit: historical May 12 project audit summary, removed from the repository.
 - This task is the first execution task for the audit-hardening backlog item. It should patch the high-signal audit findings through bounded waves rather than mixing them into unrelated feature work.
 - The current known blockers are dependency security advisories, PowerShell-incompatible E2E script behavior, UI Vitest lane reliability, oversized bundle loading boundaries, Logics hygiene gaps, and the need for at least one focused maintainability extraction plan or first slice.
 
@@ -148,7 +149,7 @@ stateDiagram-v2
 - Bundle loading boundary: changelog markdown files are no longer eagerly imported, `react-markdown`/`remark-gfm` are loaded through a lazy markdown block, and `exceljs` is dynamically imported only for workbook export.
 - Bundle metrics after the change: main JS chunk `index-Cir4ML6p.js` is 619.10 KiB raw / 153.76 KiB gzip, down from the audit baseline of roughly 1537.94 KiB raw / 419.15 KiB gzip. Total JS gzip is 619.81 KiB across lazy chunks, so the remaining budget warning is tracked as a residual cost rather than a blocker for AC4 because the main chunk reduction is material.
 - Maintainability slice: the implemented slice extracts runtime loading boundaries for changelog content, markdown rendering, and XLSX export without changing the source model or user-visible workflow; targeted home/changelog/export tests cover the behavior.
-- Logics hygiene: renamed the audited `task_105` DoD heading to `# Definition of Done (DoD)`, cleaned the 15 placeholder backlog docs with explicit maintenance notes, and generated `logics/GLOBAL_REVIEW_2026-05-12.md` showing `Template placeholders remaining: 0`.
+- Logics hygiene: renamed the audited `task_105` DoD heading to `# Definition of Done (DoD)`, cleaned the 15 placeholder backlog docs with explicit maintenance notes, and generated a historical May 12 global review showing `Template placeholders remaining: 0`.
 - Validation passed:
   - `npm audit --audit-level=moderate`
   - `npm run -s typecheck`

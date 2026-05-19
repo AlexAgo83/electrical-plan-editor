@@ -7,6 +7,7 @@
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
+> Non-semantic edit: Removed references to a deleted root-level harness assembly report file.
 
 # Needs
 - Let the operator explicitly choose which `Harness assembly` functional schematic is displayed.
@@ -149,7 +150,7 @@ flowchart TD
 - Preserve the current single-network graph path, but move or expose it through the new current-network functional tab.
 
 # References
-- `HARNESS_ASSEMBLY_USAGE_REPORT_2026-05-13.md`
+- Historical harness assembly usage report from 2026-05-13, removed from the repository.
 - `logics/request/req_122_multi_harness_super_category_and_cross_harness_functional_schematic.md`
 - `src/app/components/network-summary/HarnessAssemblyManagerPanel.tsx`
 - `src/app/hooks/controller/useAppControllerNetworkSummaryPanelDomain.tsx`

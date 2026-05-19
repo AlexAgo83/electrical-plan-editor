@@ -6,6 +6,7 @@
 > Related backlog: `item_596_audit_hardening_security_ci_bundle_and_maintainability_follow_ups`
 > Related task: `task_107_audit_hardening_security_ci_bundle_and_maintainability_follow_ups`
 > Reminder: Update status, linked refs, decision rationale, consequences, migration plan, and follow-up work when you edit this doc.
+> Non-semantic edit: Removed references to a deleted root-level audit report file.
 
 # Overview
 Patch audit findings through bounded hardening waves.
@@ -27,7 +28,7 @@ flowchart LR
 ```
 
 # Context
-- The project audit in `AUDIT_PROJECT_2026-05-12.md` found that the application is functionally healthy, but release safety is weakened by dependency advisories, non-portable scripts, a flaky UI test lane exit, an oversized bundle, and large high-risk modules.
+- The May 12 project audit found that the application is functionally healthy, but release safety is weakened by dependency advisories, non-portable scripts, a flaky UI test lane exit, an oversized bundle, and large high-risk modules.
 - The project is local-first and already has strict TypeScript, Vite, PWA, segmented Vitest lanes, Playwright E2E, and Logics traceability.
 - The hardening work touches build tooling, test execution, dependency versions, runtime loading boundaries, and maintainability seams. Treating all of it as one broad rewrite would increase regression risk.
 - The audit also identified Logics hygiene gaps, including a missing DoD checklist in `task_105` and placeholder cleanup follow-ups.
@@ -74,7 +75,7 @@ Use an incremental audit-hardening delivery strategy:
 - Each wave should run the relevant subset first, then the broader gate: lint, typecheck, build, PWA quality, fast tests, UI tests or segmented replacement, E2E, `npm audit --audit-level=moderate`, and Logics lint/audit where touched.
 
 # References
-- `AUDIT_PROJECT_2026-05-12.md`
+- Historical May 12 project audit summary, removed from the repository.
 - `logics/request/req_124_audit_hardening_security_ci_bundle_and_maintainability_follow_ups.md`
 - `logics/backlog/item_596_audit_hardening_security_ci_bundle_and_maintainability_follow_ups.md`
 - `package.json`

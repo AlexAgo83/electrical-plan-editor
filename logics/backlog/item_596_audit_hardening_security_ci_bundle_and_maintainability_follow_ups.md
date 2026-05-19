@@ -8,15 +8,16 @@
 > Complexity: High
 > Theme: Quality
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+> Non-semantic edit: Removed references to a deleted root-level audit report file.
 
 # Problem
-- Turn the project audit findings from `AUDIT_PROJECT_2026-05-12.md` into a coordinated hardening effort instead of leaving them as disconnected maintenance notes.
+- Turn the May 12 project audit findings into a coordinated hardening effort instead of leaving them as disconnected maintenance notes.
 - Restore a trustworthy local and CI validation path by fixing the PowerShell-incompatible E2E script and the UI Vitest lane that exits with an unhandled worker timeout after assertions pass.
 - Reduce release risk by resolving audited dependency vulnerabilities and refreshing vulnerable or outdated build/test dependencies without regressing the production build, PWA artifacts, or test lanes.
 - Reduce user-facing load cost and deploy risk by shrinking the oversized main bundle and keeping bundle metrics visible.
 - Reduce future change risk by planning focused decomposition of the largest high-risk modules called out by the audit.
 - Bring Logics hygiene back to a coherent state by fixing the workflow audit failure and cleaning the audit-identified placeholder/documentation noise.
-- The local project audit in `AUDIT_PROJECT_2026-05-12.md` found that the application code is broadly healthy: lint, typecheck, build, PWA quality checks, fast Vitest lane, and direct Playwright E2E all pass. The risks are concentrated around release safety, dependency security, CI reliability, bundle size, maintainability, and Logics workflow hygiene.
+- The May 12 local project audit found that the application code is broadly healthy: lint, typecheck, build, PWA quality checks, fast Vitest lane, and direct Playwright E2E all pass. The risks are concentrated around release safety, dependency security, CI reliability, bundle size, maintainability, and Logics workflow hygiene.
 
 # Scope
 - In: dependency security remediation for the audited `npm audit` findings, with validated lockfile updates.
@@ -85,7 +86,7 @@ flowchart TD
 # AI Context
 - Summary: Patch all high-signal findings from the May 12 project audit across security dependencies, CI reliability, bundle size, maintainability...
 - Keywords: audit, hardening, npm audit, security, PowerShell, E2E, Vitest, onTaskUpdate, bundle, lazy loading, changelog, exceljs, Logics, DoD, placeholders, maintainability
-- Use when: Use when grooming, splitting, or implementing the audit follow-up work from `AUDIT_PROJECT_2026-05-12.md`.
+- Use when: Use when grooming, splitting, or implementing the May 12 audit follow-up work.
 - Skip when: Skip when the work targets unrelated product features, visual redesign, or broad rewrites not required by the audit findings.
 # Priority
 - Impact: High
