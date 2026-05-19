@@ -1,11 +1,14 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { NetworkId } from "../core/entities";
+import { appActions, appReducer, createInitialState } from "../store";
 import {
+  asCatalogItemId,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
   switchScreenDrawerAware,
+  switchSubScreenDrawerAware,
   withViewportWidth
 } from "./helpers/app-ui-test-utils";
 
@@ -85,6 +88,35 @@ describe("App integration UI - inspector floating shell", () => {
 
     const analysisPanel = getPanelByHeading("Connector analysis");
     expect(analysisPanel).toHaveTextContent(/\(C-1\)/);
+  });
+
+  it("uses the manufacturer reference as the catalog inspector display id", () => {
+    const stateWithCatalog = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-INTERNAL-1"),
+        manufacturerReference: "CAT-MFR-1",
+        name: "Catalog inspector sample",
+        connectionCount: 2
+      })
+    );
+    renderAppWithState(stateWithCatalog);
+    closeOnboardingIfOpen();
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("catalog");
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    fireEvent.click(within(catalogPanel).getByText("CAT-MFR-1"));
+
+    const inspectorShell = getInspectorShell();
+    if (inspectorShell === null) {
+      return;
+    }
+
+    expect(inspectorShell).toHaveClass("is-open");
+    const inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).getByText("CAT-MFR-1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
+    expect(within(inspectorPanel).queryByText("CAT-INTERNAL-1", { selector: ".inspector-entity-id" })).not.toBeInTheDocument();
   });
 
   it("hides inspector on Validation, Network Scope and Settings", () => {

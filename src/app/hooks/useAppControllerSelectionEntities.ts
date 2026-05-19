@@ -1,6 +1,7 @@
 import { useMemo } from "react";
-import type { ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../core/entities";
+import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../core/entities";
 import {
+  selectCatalogItemById,
   selectConnectorById,
   selectConnectorCavityStatuses,
   selectNodeById,
@@ -19,12 +20,15 @@ interface UseAppControllerSelectionEntitiesParams {
 
 export function useAppControllerSelectionEntities({ state }: UseAppControllerSelectionEntitiesParams) {
   const selected = selectSelection(state);
+  const selectedCatalogItemId = selected?.kind === "catalog" ? (selected.id as CatalogItemId) : null;
   const selectedConnectorId = selected?.kind === "connector" ? (selected.id as ConnectorId) : null;
   const selectedSpliceId = selected?.kind === "splice" ? (selected.id as SpliceId) : null;
   const selectedNodeId = selected?.kind === "node" ? (selected.id as NodeId) : null;
   const selectedSegmentId = selected?.kind === "segment" ? (selected.id as SegmentId) : null;
   const selectedWireId = selected?.kind === "wire" ? (selected.id as WireId) : null;
 
+  const selectedCatalogItem =
+    selectedCatalogItemId === null ? null : (selectCatalogItemById(state, selectedCatalogItemId) ?? null);
   const selectedConnector =
     selectedConnectorId === null ? null : (selectConnectorById(state, selectedConnectorId) ?? null);
   const selectedSplice = selectedSpliceId === null ? null : (selectSpliceById(state, selectedSpliceId) ?? null);
@@ -58,6 +62,8 @@ export function useAppControllerSelectionEntities({ state }: UseAppControllerSel
   return useMemo(
     () => ({
       selected,
+      selectedCatalogItemId,
+      selectedCatalogItem,
       selectedConnectorId,
       selectedSpliceId,
       selectedNodeId,
@@ -77,6 +83,8 @@ export function useAppControllerSelectionEntities({ state }: UseAppControllerSel
     }),
     [
       connectorCavityStatuses,
+      selectedCatalogItem,
+      selectedCatalogItemId,
       selected,
       selectedConnector,
       selectedConnectorId,

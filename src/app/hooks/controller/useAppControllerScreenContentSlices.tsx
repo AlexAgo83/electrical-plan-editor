@@ -183,6 +183,7 @@ export function useInspectorContextPanelControllerSlice(params: InspectorContext
     onCollapseToCollapsed: params.collapseInspectorToCollapsed,
     selected: params.selected,
     selectedSubScreen: params.selectedSubScreen,
+    selectedCatalogItem: params.selectedCatalogItem,
     selectedConnector: params.selectedConnector,
     selectedSplice: params.selectedSplice,
     selectedNode: params.selectedNode,

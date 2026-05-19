@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, getWireColorLabel, isWireFreeColorMode, type WireColorMode } from "../../core/cableColors";
-import type { Connector, NetworkNode, Segment, Splice, Wire } from "../../core/entities";
+import type { CatalogItem, Connector, NetworkNode, Segment, Splice, Wire } from "../../core/entities";
 import type { SelectionState } from "../../store/types";
 
 interface InspectorContextPanelProps {
@@ -11,6 +11,7 @@ interface InspectorContextPanelProps {
   onCollapseToCollapsed: () => void;
   selected: SelectionState | null;
   selectedSubScreen: "connector" | "splice" | "node" | "segment" | "wire" | null;
+  selectedCatalogItem: CatalogItem | null;
   selectedConnector: Connector | null;
   selectedSplice: Splice | null;
   selectedNode: NetworkNode | null;
@@ -31,6 +32,7 @@ export function InspectorContextPanel({
   onCollapseToCollapsed,
   selected,
   selectedSubScreen,
+  selectedCatalogItem,
   selectedConnector,
   selectedSplice,
   selectedNode,
@@ -115,6 +117,15 @@ export function InspectorContextPanel({
   const isCollapsed = mode === "collapsed";
   const detailRows: Array<{ label: string; value: ReactElement | string }> = [];
 
+  if (selectedCatalogItem !== null) {
+    detailRows.push({
+      label: "Manufacturer reference",
+      value: <span className="technical-id">{selectedCatalogItem.manufacturerReference}</span>
+    });
+    detailRows.push({ label: "Name", value: selectedCatalogItem.name ?? "" });
+    detailRows.push({ label: "Connections", value: String(selectedCatalogItem.connectionCount) });
+  }
+
   if (selectedConnector !== null) {
     detailRows.push({ label: "Name", value: selectedConnector.name });
     detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedConnector.technicalId}</span> });
@@ -181,6 +192,7 @@ export function InspectorContextPanel({
   }
 
   const focusedEntityDisplayId =
+    selectedCatalogItem?.manufacturerReference ??
     selectedConnector?.technicalId ??
     selectedSplice?.technicalId ??
     selectedWire?.technicalId ??

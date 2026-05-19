@@ -22,6 +22,7 @@ interface UseAppControllerInspectorIssueLayoutStateParams {
     AppControllerSelectionEntitiesModel,
     | "selected"
     | "selectedSubScreen"
+    | "selectedCatalogItem"
     | "selectedConnector"
     | "selectedSplice"
     | "selectedNode"
@@ -90,8 +91,7 @@ export function useAppControllerInspectorIssueLayoutState({
 
   const hasInspectableSelection =
     selectionEntities.selected !== null &&
-    selectionEntities.selectedSubScreen !== null &&
-    selectionEntities.selectedSubScreen !== "catalog";
+    selectionEntities.selectedSubScreen !== null;
   const hasTableInspectableSelection = hasInspectableSelection && detailPanelsSelectionSource === "table";
   const hasTableSelectionForActiveSubScreen =
     hasTableInspectableSelection && selectionEntities.selectedSubScreen === activeSubScreen;
@@ -137,6 +137,7 @@ export function useAppControllerInspectorIssueLayoutState({
     collapseInspectorToCollapsed,
     selected: selectionEntities.selected,
     selectedSubScreen: inspectableSelectedSubScreen,
+    selectedCatalogItem: selectionEntities.selectedCatalogItem,
     selectedConnector: selectionEntities.selectedConnector,
     selectedSplice: selectionEntities.selectedSplice,
     selectedNode: selectionEntities.selectedNode,
