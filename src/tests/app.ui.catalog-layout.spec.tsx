@@ -74,7 +74,9 @@ describe("App integration UI - catalog layout", () => {
     expect(connectorAnalysisPanel.querySelector("ellipse.connector-physical-shell")).not.toBeNull();
     expect(connectorAnalysisPanel.querySelector("ellipse.connector-physical-shell")?.getAttribute("rx")).toBe("3.75");
     expect(connectorAnalysisPanel.querySelectorAll(".connector-physical-keying")).toHaveLength(2);
-    expect(connectorAnalysisPanel.querySelector(".connector-physical-keying")?.getAttribute("style")).toContain("fill: #ff8800");
+    const squareKeying = connectorAnalysisPanel.querySelector(".connector-physical-keying");
+    expect(squareKeying?.getAttribute("style")).toContain("fill: #ff8800");
+    expect(Number(squareKeying?.getAttribute("y"))).toBeGreaterThan(0);
     expect(connectorAnalysisPanel.querySelector('.connector-physical-way-shape[width="0.66"]')).not.toBeNull();
   });
 
@@ -112,6 +114,7 @@ describe("App integration UI - catalog layout", () => {
     });
     expect(within(catalogFormPanel).getByLabelText("X")).toHaveValue(2);
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Add keying" }));
+    expect(catalogFormPanel.querySelector(".connector-layout-keying")?.getAttribute("style")).toBeNull();
     const { sideSelect, shapeSelect, positionInput } = getConnectorLayoutKeyingControls(
       getConnectorLayoutKeyingRow(catalogFormPanel)
     );

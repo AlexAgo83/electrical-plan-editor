@@ -59,7 +59,7 @@ const KEYING_MARKER_SIZE = 0.28;
 const KEYING_MARKER_RADIUS = 0.15;
 const KEYING_ARROW_WIDTH = 0.32;
 const KEYING_ARROW_DEPTH = 0.19;
-const DEFAULT_KEYING_COLOR_PICKER_VALUE = "#2563eb";
+const DEFAULT_KEYING_COLOR_PICKER_VALUE = "#7a7a7a";
 
 type RenderableKeying = {
   side: Exclude<ConnectorLayoutKeyingSide, "none">;
@@ -91,6 +91,21 @@ function getKeyingStyle(keying: RenderableKeying): CSSProperties | undefined {
 function normalizeHexColor(value: string): string | null {
   const normalized = value.trim();
   return /^#[\da-f]{6}$/i.test(normalized) ? normalized.toLowerCase() : null;
+}
+
+function normalizeCssColorToHex(value: string): string | null {
+  const hex = normalizeHexColor(value);
+  if (hex !== null) {
+    return hex;
+  }
+  const rgbMatch = value.trim().match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (rgbMatch === null) {
+    return null;
+  }
+  const [, red, green, blue] = rgbMatch;
+  return `#${[red, green, blue]
+    .map((component) => Math.min(255, Math.max(0, Number(component))).toString(16).padStart(2, "0"))
+    .join("")}`;
 }
 
 function renderWayShape(way: ConnectorLayoutWay, isSelected: boolean): ReactElement {
@@ -158,9 +173,10 @@ function renderKeying(
   shellPadding: number
 ): ReactElement {
   const anchor = getKeyingAnchor(keying, layout, shellShape, shellPadding);
-  const markerCenterX = anchor.x + anchor.normalX * (KEYING_MARKER_SIZE / 2);
-  const markerCenterY = anchor.y + anchor.normalY * (KEYING_MARKER_SIZE / 2);
   const shape = keying.shape ?? "arrow";
+  const markerDirection = shape === "square" ? -1 : shape === "round" || shape === "diamond" ? 0 : 1;
+  const markerCenterX = anchor.x + anchor.normalX * (KEYING_MARKER_SIZE / 2) * markerDirection;
+  const markerCenterY = anchor.y + anchor.normalY * (KEYING_MARKER_SIZE / 2) * markerDirection;
   const style = getKeyingStyle(keying);
   const markerAngle = (Math.atan2(anchor.normalY, anchor.normalX) * 180) / Math.PI;
   if (shape === "square") {
@@ -304,14 +320,12 @@ export function ConnectorLayoutEditor({
   }
 
   function getDefaultKeyingColor(): string {
-    const themePrimary = svgRef.current === null ? "" : getComputedStyle(svgRef.current).getPropertyValue("--theme-primary");
-    return normalizeHexColor(themePrimary) ?? DEFAULT_KEYING_COLOR_PICKER_VALUE;
+    const currentColor = svgRef.current === null ? "" : getComputedStyle(svgRef.current).color;
+    return normalizeCssColorToHex(currentColor) ?? DEFAULT_KEYING_COLOR_PICKER_VALUE;
   }
 
   function addKeyingWithDefaultColor(): void {
-    const nextLayout = addConnectorLayoutKeying(layout);
-    const nextKeyingIndex = getConnectorLayoutKeyings(nextLayout).length - 1;
-    commitLayout(updateConnectorLayoutKeyingAt(nextLayout, nextKeyingIndex, { color: getDefaultKeyingColor() }));
+    commitLayout(addConnectorLayoutKeying(layout));
   }
 
   function updateKeyingPosition(index: number, value: string): void {
@@ -582,7 +596,7 @@ export function ConnectorLayoutEditor({
                         <input
                           id={colorInputId}
                           type="color"
-                          value={keying.color ?? DEFAULT_KEYING_COLOR_PICKER_VALUE}
+                          value={keying.color ?? getDefaultKeyingColor()}
                           onChange={(event) =>
                             commitLayout(
                               updateConnectorLayoutKeyingAt(layout, index, {

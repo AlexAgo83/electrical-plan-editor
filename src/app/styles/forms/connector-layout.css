@@ -57,7 +57,7 @@
 
 .connector-layout-keying,
 .connector-physical-keying {
-  fill: var(--theme-primary, currentColor);
+  fill: color-mix(in srgb, currentColor 34%, transparent);
   stroke: none;
 }
 

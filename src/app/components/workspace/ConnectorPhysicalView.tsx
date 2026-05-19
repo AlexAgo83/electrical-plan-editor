@@ -118,9 +118,10 @@ function renderPhysicalKeying(
   shellPadding: number
 ): ReactElement {
   const anchor = getPhysicalKeyingAnchor(keying, layout, shellShape, shellPadding);
-  const markerCenterX = anchor.x + anchor.normalX * (KEYING_MARKER_SIZE / 2);
-  const markerCenterY = anchor.y + anchor.normalY * (KEYING_MARKER_SIZE / 2);
   const shape = keying.shape ?? "arrow";
+  const markerDirection = shape === "square" ? -1 : shape === "round" || shape === "diamond" ? 0 : 1;
+  const markerCenterX = anchor.x + anchor.normalX * (KEYING_MARKER_SIZE / 2) * markerDirection;
+  const markerCenterY = anchor.y + anchor.normalY * (KEYING_MARKER_SIZE / 2) * markerDirection;
   const style = getPhysicalKeyingStyle(keying);
   const markerAngle = (Math.atan2(anchor.normalY, anchor.normalX) * 180) / Math.PI;
   if (shape === "square") {
