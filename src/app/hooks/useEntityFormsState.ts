@@ -7,6 +7,7 @@ import type {
   SegmentId,
   SpliceId,
   WireEndpoint,
+  ConnectorLayout,
   WireId,
   WireMaterial
 } from "../../core/entities";
@@ -27,6 +28,7 @@ export function useEntityFormsState() {
   const [catalogDefaultSealReference, setCatalogDefaultSealReference] = useState("");
   const [catalogDefaultSealName, setCatalogDefaultSealName] = useState("");
   const [catalogPlugDefinitionsText, setCatalogPlugDefinitionsText] = useState("");
+  const [catalogConnectorLayout, setCatalogConnectorLayout] = useState<ConnectorLayout | undefined>(undefined);
   const [catalogFormError, setCatalogFormError] = useState<string | null>(null);
 
   const [connectorFormMode, setConnectorFormMode] = useState<"idle" | "create" | "edit">("idle");
@@ -150,6 +152,8 @@ export function useEntityFormsState() {
     setCatalogDefaultSealName,
     catalogPlugDefinitionsText,
     setCatalogPlugDefinitionsText,
+    catalogConnectorLayout,
+    setCatalogConnectorLayout,
     catalogFormError,
     setCatalogFormError,
     connectorFormMode,

@@ -533,6 +533,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCatalogDefaultSealName: formsState.setCatalogDefaultSealName,
     catalogPlugDefinitionsText: formsState.catalogPlugDefinitionsText,
     setCatalogPlugDefinitionsText: formsState.setCatalogPlugDefinitionsText,
+    catalogConnectorLayout: formsState.catalogConnectorLayout,
+    setCatalogConnectorLayout: formsState.setCatalogConnectorLayout,
     setCatalogFormError: formsState.setCatalogFormError
   });
 

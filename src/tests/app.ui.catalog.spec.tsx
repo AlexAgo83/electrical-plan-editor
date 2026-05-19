@@ -45,7 +45,7 @@ describe("App integration UI - catalog", () => {
   }, 15000);
 
   it("enforces catalog-first connector creation and supports catalog creation with URL validation", () => {
-    renderAppWithState(createInitialState());
+    const { store } = renderAppWithState(createInitialState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
     switchScreenDrawerAware("modeling");
 
@@ -79,9 +79,15 @@ describe("App integration UI - catalog", () => {
     fireEvent.change(within(catalogFormPanel).getByLabelText("URL"), {
       target: { value: "https://example.com/te-1-967616-1" }
     });
+    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Auto layout" }));
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Create" }));
 
     expect(within(catalogPanel).getByText("TE-1-967616-1")).toBeInTheDocument();
+    const createdCatalogItem = store
+      .getState()
+      .catalogItems.allIds.map((id) => store.getState().catalogItems.byId[id])
+      .find((item) => item?.manufacturerReference === "TE-1-967616-1");
+    expect(createdCatalogItem?.connectorLayout?.ways).toHaveLength(6);
     fireEvent.click(within(catalogPanel).getByText("TE-1-967616-1"));
     const catalogAnalysisGrid = getPanelByHeading("Catalog analysis").closest(".analysis-panel-grid");
     expect(catalogAnalysisGrid).not.toBeNull();
@@ -109,6 +115,54 @@ describe("App integration UI - catalog", () => {
     const refreshedConnectorsPanel = getPanelByHeading("Connectors");
     expect(within(refreshedConnectorsPanel).getByText("Catalog-first connector")).toBeInTheDocument();
     expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
+  });
+
+  it("renders catalog connector layouts in the connector physical analysis view", () => {
+    const catalogItemId = asCatalogItemId("CAT-PHYSICAL");
+    const connectorId = asConnectorId("C1");
+    const state = [
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "CAT-PHYSICAL",
+        connectionCount: 2,
+        connectorLayout: {
+          version: 1,
+          units: "grid",
+          width: 6,
+          height: 5,
+          ways: [
+            { cavityIndex: 1, x: 2, y: 2, shape: "square", label: "A1" },
+            { cavityIndex: 2, x: 4, y: 2, shape: "slot", label: "A2" }
+          ]
+        }
+      }),
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "Connector 1",
+        technicalId: "C-1",
+        catalogItemId,
+        manufacturerReference: "CAT-PHYSICAL",
+        cavityCount: 2
+      })
+    ].reduce(appReducer, createUiIntegrationState());
+
+    renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true }));
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+
+    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
+
+    expect(within(connectorAnalysisPanel).getByLabelText("Connector physical view")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("Using catalog physical layout.")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("A1")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("A2")).toBeInTheDocument();
   });
 
   it("shows catalog analysis usage sections and navigates to linked connector/splice editing", () => {

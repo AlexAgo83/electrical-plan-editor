@@ -118,6 +118,37 @@ describe("store reducer - catalog", () => {
     expect(state.connectors.byId[connectorId]?.terminalOverrides?.[2]?.terminalReference).toBe("TERM-OVERRIDE");
   });
 
+  it("normalizes connector physical layout on catalog upsert", () => {
+    const catalogId = asCatalogItemId("CAT-LAYOUT");
+
+    const state = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: catalogId,
+        manufacturerReference: "LAYOUT-REF",
+        connectionCount: 3,
+        connectorLayout: {
+          version: 1,
+          units: "grid",
+          width: 8,
+          height: 6,
+          ways: [
+            { cavityIndex: 2, x: 5, y: 3, shape: "slot", label: "B" }
+          ]
+        }
+      })
+    );
+
+    expect(state.catalogItems.byId[catalogId]?.connectorLayout?.ways).toHaveLength(3);
+    expect(state.catalogItems.byId[catalogId]?.connectorLayout?.ways[1]).toEqual({
+      cavityIndex: 2,
+      x: 5,
+      y: 3,
+      shape: "slot",
+      label: "B"
+    });
+  });
+
   it("blocks removing a referenced catalog item and blocks unsafe connection count reduction", () => {
     const catalogId = asCatalogItemId("CAT-LOCKED");
     const connectorId = asConnectorId("C-LOCKED");

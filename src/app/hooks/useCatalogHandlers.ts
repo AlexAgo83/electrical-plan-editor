@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
-import type { CatalogItem, CatalogItemId } from "../../core/entities";
+import type { CatalogItem, CatalogItemId, ConnectorLayout } from "../../core/entities";
+import { normalizeConnectorLayout } from "../../core/connectorLayout";
 import type { AppStore } from "../../store";
 import { appActions, isValidCatalogUrlInput } from "../../store";
 import { analyzeCatalogDeleteImpact } from "../../store/deleteImpact";
@@ -43,6 +44,8 @@ interface UseCatalogHandlersParams {
   setCatalogDefaultSealName?: (value: string) => void;
   catalogPlugDefinitionsText?: string;
   setCatalogPlugDefinitionsText?: (value: string) => void;
+  catalogConnectorLayout?: ConnectorLayout | undefined;
+  setCatalogConnectorLayout?: (value: ConnectorLayout | undefined) => void;
   setCatalogFormError: (value: string | null) => void;
 }
 
@@ -88,6 +91,8 @@ export function useCatalogHandlers({
   setCatalogDefaultSealName = () => {},
   catalogPlugDefinitionsText = "",
   setCatalogPlugDefinitionsText = () => {},
+  catalogConnectorLayout,
+  setCatalogConnectorLayout = () => {},
   setCatalogFormError
 }: UseCatalogHandlersParams) {
   function clearCatalogMaterialDefaults(): void {
@@ -97,6 +102,7 @@ export function useCatalogHandlers({
     setCatalogDefaultSealReference("");
     setCatalogDefaultSealName("");
     setCatalogPlugDefinitionsText("");
+    setCatalogConnectorLayout(undefined);
   }
 
   function clearCatalogForm(): void {
@@ -146,6 +152,7 @@ export function useCatalogHandlers({
         ?.map((plug) => [plug.plugReference, plug.quantity, plug.plugName ?? ""].join(","))
         .join("\n") ?? ""
     );
+    setCatalogConnectorLayout(item.connectorLayout);
     setCatalogFormError(null);
     dispatchAction(appActions.select({ kind: "catalog", id: item.id }), { trackHistory: false });
   }
@@ -200,6 +207,7 @@ export function useCatalogHandlers({
       setCatalogFormError("Plug definitions must use one line per plug: reference,quantity,name.");
       return;
     }
+    const normalizedConnectorLayout = normalizeConnectorLayout(catalogConnectorLayout, connectionCount);
     setCatalogFormError(null);
 
     const existing =
@@ -228,7 +236,8 @@ export function useCatalogHandlers({
             sealName: catalogDefaultSealName.trim() || undefined
           },
           plugs: plugDefinitions.length > 0 ? plugDefinitions : undefined
-        }
+        },
+        connectorLayout: normalizedConnectorLayout
       })
     );
 

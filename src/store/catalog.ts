@@ -5,6 +5,7 @@ import type {
   Splice,
 } from "../core/entities";
 import { normalizeConnectorCatalogDefaults, normalizeConnectorTerminalMaterial } from "../core/connectorCatalogMaterials";
+import { normalizeConnectorLayout } from "../core/connectorLayout";
 import { DIRECTIONAL_SPLICE_PORT_COUNT, normalizeSplicePortMode, resolveSplicePortMode } from "../core/splicePortMode";
 import type { EntityState, NetworkScopedState } from "./types";
 
@@ -97,7 +98,8 @@ export function normalizeCatalogItem(candidate: Partial<CatalogItem>): CatalogIt
     name: normalizeCatalogName(candidate.name),
     unitPriceExclTax: normalizeCatalogUnitPriceExclTax(candidate.unitPriceExclTax),
     url: normalizeCatalogUrl(candidate.url),
-    connectorDefaults: normalizeConnectorCatalogDefaults(candidate.connectorDefaults, connectionCount)
+    connectorDefaults: normalizeConnectorCatalogDefaults(candidate.connectorDefaults, connectionCount),
+    connectorLayout: normalizeConnectorLayout(candidate.connectorLayout, connectionCount)
   };
 }
 

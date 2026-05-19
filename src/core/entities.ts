@@ -96,6 +96,25 @@ export interface CatalogItem {
   unitPriceExclTax?: number;
   url?: string;
   connectorDefaults?: ConnectorCatalogDefaults;
+  connectorLayout?: ConnectorLayout;
+}
+
+export type ConnectorLayoutWayShape = "round" | "square" | "slot";
+
+export interface ConnectorLayoutWay {
+  cavityIndex: number;
+  x: number;
+  y: number;
+  shape: ConnectorLayoutWayShape;
+  label?: string;
+}
+
+export interface ConnectorLayout {
+  version: 1;
+  units: "grid";
+  width: number;
+  height: number;
+  ways: ConnectorLayoutWay[];
 }
 
 export interface ConnectorTerminalMaterial {

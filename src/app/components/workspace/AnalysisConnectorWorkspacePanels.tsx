@@ -6,6 +6,7 @@ import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { ConnectorPhysicalView } from "./ConnectorPhysicalView";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
@@ -21,6 +22,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     connectorFilterQuery,
     setConnectorFilterQuery,
     connectors,
+    catalogItems,
     visibleConnectors,
     wires,
     connectorOccupiedCountById,
@@ -46,7 +48,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   type ConnectorAnalysisTableSortField = "name" | "technicalId" | "manufacturerReference" | "cavityCount" | "occupiedCount";
   type ConnectorSynthesisTableSortField = "name" | "technicalId" | "localWay" | "destination" | "lengthMm";
   const isMobileViewport = useIsMobileViewport();
-  const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "synthesis">("cavities");
+  const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "physical" | "synthesis">("cavities");
   const [connectorTableSort, setConnectorTableSort] = useState<{ field: ConnectorAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const [connectorSynthesisTableSort, setConnectorSynthesisTableSort] = useState<{ field: ConnectorSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const connectorFilterPlaceholder =
@@ -69,8 +71,13 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   );
   const wireTechnicalIdById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire.technicalId] as const)), [wires]);
   const wireById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire] as const)), [wires]);
+  const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   const formatOccupantRef = (occupantRef: string | null): string =>
     occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
+  const parseOccupantWireId = (occupantRef: string | null) => {
+    const parsed = occupantRef === null ? null : parseWireOccupantRef(occupantRef);
+    return parsed !== null && wireById.has(parsed.wireId) ? parsed.wireId : null;
+  };
   const sortedConnectorSynthesisRowsByColumns = useMemo(
     () =>
       sortByTableColumns(
@@ -329,6 +336,13 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         </button>
         <button
           type="button"
+          className={connectorAnalysisView === "physical" ? "filter-chip is-active" : "filter-chip"}
+          onClick={() => setConnectorAnalysisView("physical")}
+        >
+          Physical
+        </button>
+        <button
+          type="button"
           className={connectorAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
           onClick={() => setConnectorAnalysisView("synthesis")}
         >
@@ -339,7 +353,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         type="button"
         className="filter-chip table-export-button"
         onClick={() => {
-          if (connectorAnalysisView === "cavities") {
+          if (connectorAnalysisView === "cavities" || connectorAnalysisView === "physical") {
             downloadCsvFile(
               `analysis-connector-ways-${selectedConnector?.technicalId ?? "selection"}`,
               ["Way", "Status", "Occupant reference"],
@@ -366,6 +380,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         disabled={
           selectedConnector === null ||
           (connectorAnalysisView === "cavities"
+            || connectorAnalysisView === "physical"
             ? connectorCavityStatuses.length === 0
             : sortedConnectorSynthesisRowsByColumns.length === 0)
         }
@@ -457,6 +472,20 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           );
         })}
       </div>
+    </>
+  ) : connectorAnalysisView === "physical" ? (
+    <>
+      <p className="meta-line">
+        <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
+      </p>
+      <ConnectorPhysicalView
+        connector={selectedConnector}
+        catalogItem={selectedConnector.catalogItemId === undefined ? undefined : catalogItemById.get(selectedConnector.catalogItemId)}
+        connectorCavityStatuses={connectorCavityStatuses}
+        formatOccupantRef={formatOccupantRef}
+        parseOccupantWireId={parseOccupantWireId}
+        onGoToWire={onGoToWireFromAnalysis}
+      />
     </>
   ) : sortedConnectorSynthesisRowsByColumns.length === 0 ? (
     <p className="empty-copy">No wire currently connected to this connector.</p>

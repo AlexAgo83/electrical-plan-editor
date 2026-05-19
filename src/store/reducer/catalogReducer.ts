@@ -1,5 +1,6 @@
 import type { CatalogItem, Connector, Splice } from "../../core/entities";
 import { normalizeConnectorCatalogDefaults } from "../../core/connectorCatalogMaterials";
+import { normalizeConnectorLayout } from "../../core/connectorLayout";
 import { DIRECTIONAL_SPLICE_PORT_COUNT, resolveSplicePortMode } from "../../core/splicePortMode";
 import type { AppAction } from "../actions";
 import {
@@ -160,7 +161,8 @@ export function handleCatalogActions(state: AppState, action: AppAction): AppSta
         name: normalizeCatalogName(action.payload.name),
         unitPriceExclTax: normalizeCatalogUnitPriceExclTax(action.payload.unitPriceExclTax),
         url: normalizeCatalogUrl(action.payload.url),
-        connectorDefaults: normalizeConnectorCatalogDefaults(action.payload.connectorDefaults, normalizedConnectionCount)
+        connectorDefaults: normalizeConnectorCatalogDefaults(action.payload.connectorDefaults, normalizedConnectionCount),
+        connectorLayout: normalizeConnectorLayout(action.payload.connectorLayout, normalizedConnectionCount)
       };
 
       let nextConnectors = state.connectors;

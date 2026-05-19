@@ -1,7 +1,9 @@
 import type { FormEvent, ReactElement } from "react";
+import type { ConnectorLayout } from "../../../core/entities";
 import { isValidCatalogUrlInput } from "../../../store";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import type { WorkspaceCurrencyCode } from "../../types/app-controller";
+import { ConnectorLayoutEditor } from "./ConnectorLayoutEditor";
 import { renderFormHeader } from "./ModelingFormsColumn.shared";
 
 interface ModelingCatalogFormPanelProps {
@@ -32,6 +34,8 @@ interface ModelingCatalogFormPanelProps {
   setCatalogDefaultSealName: (value: string) => void;
   catalogPlugDefinitionsText: string;
   setCatalogPlugDefinitionsText: (value: string) => void;
+  catalogConnectorLayout: ConnectorLayout | undefined;
+  setCatalogConnectorLayout: (value: ConnectorLayout | undefined) => void;
   catalogManufacturerReferenceAlreadyUsed: boolean;
   cancelCatalogEdit: () => void;
   catalogFormError: string | null;
@@ -65,6 +69,8 @@ export function ModelingCatalogFormPanel({
   setCatalogDefaultSealName,
   catalogPlugDefinitionsText,
   setCatalogPlugDefinitionsText,
+  catalogConnectorLayout,
+  setCatalogConnectorLayout,
   catalogManufacturerReferenceAlreadyUsed,
   cancelCatalogEdit,
   catalogFormError
@@ -201,6 +207,11 @@ export function ModelingCatalogFormPanel({
               />
             </label>
           </fieldset>
+          <ConnectorLayoutEditor
+            connectionCount={catalogConnectionCount}
+            connectorLayout={catalogConnectorLayout}
+            setConnectorLayout={setCatalogConnectorLayout}
+          />
           <div className="row-actions">
             <button type="submit" className="button-with-icon" disabled={catalogManufacturerReferenceAlreadyUsed || hasUrlValidationError}>
               {catalogFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
