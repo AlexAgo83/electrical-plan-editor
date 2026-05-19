@@ -367,6 +367,11 @@ export function useAppControllerWorkspaceContentAssembly({
     onCreateSpliceFromCatalog: domains.catalogAnalysisDomain.handleCreateSpliceFromCatalog,
     onOpenConnectorFromCatalogAnalysis: domains.catalogAnalysisDomain.handleOpenConnectorFromCatalogAnalysis,
     onOpenSpliceFromCatalogAnalysis: domains.catalogAnalysisDomain.handleOpenSpliceFromCatalogAnalysis,
+    onOpenWireReference: (wire) => {
+      handlers.markDetailPanelsSelectionSourceAsTable();
+      handlers.setActiveSubScreen("wire");
+      models.modelingHandlers.wire.startWireEdit(wire);
+    },
     onUpdateWireEndpointReferenceName: models.modelingHandlers.wire.syncWireEndpointReferenceName,
     modelingLeftColumnContent,
     modelingFormsColumnContent,

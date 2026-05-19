@@ -16,6 +16,61 @@ describe("App integration UI - catalog wire endpoint reference renames", () => {
     localStorage.clear();
   });
 
+  it("opens matching wires from endpoint and seal reference table refs", async () => {
+    const baseState = createUiIntegrationDenseWiresState();
+    const firstWire = baseState.wires.byId[asWireId("W1")];
+    const secondWire = baseState.wires.byId[asWireId("W2")];
+    if (firstWire === undefined || secondWire === undefined) {
+      throw new Error("Expected dense wire integration state.");
+    }
+
+    const state = appReducer(
+      appReducer(
+        appReducer(
+          appReducer(
+            baseState,
+            appActions.upsertCatalogItem({
+              id: asCatalogItemId("CAT-LINK"),
+              manufacturerReference: "CAT-LINK",
+              name: "Linked catalog item",
+              connectionCount: 1
+            })
+          ),
+          appActions.upsertCatalogItem({
+            id: asCatalogItemId("CAT-LINK-2"),
+            manufacturerReference: "CAT-LINK-2",
+            name: "Second linked catalog item",
+            connectionCount: 1
+          })
+        ),
+        appActions.saveWire({
+          ...firstWire,
+          endpointAConnectionReference: "TERM-LINK"
+        })
+      ),
+      appActions.saveWire({
+        ...secondWire,
+        endpointBSealReference: "SEAL-LINK"
+      })
+    );
+
+    renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("catalog");
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Endpoint refs" }));
+    fireEvent.click(await within(catalogPanel).findByRole("button", { name: "TERM-LINK" }));
+    expect(within(getPanelByHeading("Edit Wire")).getByDisplayValue("W-1")).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("catalog");
+    const refreshedCatalogPanel = getPanelByHeading("Catalog");
+    fireEvent.click(within(refreshedCatalogPanel).getByRole("button", { name: "Seal refs" }));
+    fireEvent.click(await within(refreshedCatalogPanel).findByRole("button", { name: "SEAL-LINK" }));
+    expect(within(getPanelByHeading("Edit Wire")).getByDisplayValue("W-2")).toBeInTheDocument();
+  });
+
   it("edits wire endpoint reference names from the catalog view and propagates matching names after confirmation", async () => {
     const baseState = createUiIntegrationDenseWiresState();
     const firstWire = baseState.wires.byId[asWireId("W1")];

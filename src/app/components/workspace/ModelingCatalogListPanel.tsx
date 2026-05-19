@@ -7,6 +7,7 @@ import { compareSortableValues } from "../../lib/app-utils-shared";
 import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import { formatPriceWithCurrencySymbol } from "../../lib/pricing";
 import type { ImportExportStatus, WorkspaceCurrencyCode } from "../../types/app-controller";
+import { EntityReferenceButton } from "./EntityReferenceButton";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
@@ -32,6 +33,7 @@ interface ModelingCatalogListPanelProps {
   wires: Wire[];
   onOpenCreateCatalogItem: () => void;
   onEditCatalogItem: (item: CatalogItem) => void;
+  onOpenWireReference: (wire: Wire) => void;
   onDeleteCatalogItem: (catalogItemId: CatalogItemId) => void;
   onUpdateWireEndpointReferenceName: WireEndpointReferenceNameHandler;
   onExportCatalogCsv?: () => void;
@@ -55,6 +57,7 @@ export function ModelingCatalogListPanel({
   wires,
   onOpenCreateCatalogItem,
   onEditCatalogItem,
+  onOpenWireReference,
   onDeleteCatalogItem,
   onUpdateWireEndpointReferenceName,
   onExportCatalogCsv,
@@ -201,6 +204,8 @@ export function ModelingCatalogListPanel({
           heading="Wire endpoint references"
           kind="connection"
           entries={wireReferenceEntries.connection}
+          wires={wires}
+          onOpenWireReference={onOpenWireReference}
           onUpdateWireEndpointReferenceName={onUpdateWireEndpointReferenceName}
         />
       ) : activeView === "sealRefs" ? (
@@ -208,6 +213,8 @@ export function ModelingCatalogListPanel({
           heading="Wire seal references"
           kind="seal"
           entries={wireReferenceEntries.seal}
+          wires={wires}
+          onOpenWireReference={onOpenWireReference}
           onUpdateWireEndpointReferenceName={onUpdateWireEndpointReferenceName}
         />
       ) : catalogItems.length === 0 ? (
@@ -360,14 +367,38 @@ function WireEndpointReferenceNamesTable({
   heading,
   kind,
   entries,
+  wires,
+  onOpenWireReference,
   onUpdateWireEndpointReferenceName
 }: {
   heading: string;
   kind: "connection" | "seal";
   entries: WireEndpointReferenceEntry[];
+  wires: Wire[];
+  onOpenWireReference: (wire: Wire) => void;
   onUpdateWireEndpointReferenceName: WireEndpointReferenceNameHandler;
 }): ReactElement {
   const [draftsByReference, setDraftsByReference] = useState<Record<string, string>>({});
+  const firstWireByReference = useMemo(() => {
+    const wiresByReference = new Map<string, Wire>();
+    for (const wire of wires) {
+      const references =
+        kind === "connection"
+          ? [wire.endpointAConnectionReference, wire.endpointBConnectionReference]
+          : [wire.endpointASealReference, wire.endpointBSealReference];
+      for (const reference of references) {
+        const normalizedReference = reference?.trim();
+        if (normalizedReference === undefined || normalizedReference.length === 0) {
+          continue;
+        }
+        const key = normalizedReference.toLocaleLowerCase();
+        if (!wiresByReference.has(key)) {
+          wiresByReference.set(key, wire);
+        }
+      }
+    }
+    return wiresByReference;
+  }, [kind, wires]);
 
   useEffect(() => {
     setDraftsByReference(Object.fromEntries(entries.map((entry) => [entry.reference, entry.name ?? ""])));
@@ -392,9 +423,22 @@ function WireEndpointReferenceNamesTable({
         <tbody>
           {entries.map((entry) => {
             const draftValue = draftsByReference[entry.reference] ?? "";
+            const linkedWire = firstWireByReference.get(entry.reference.trim().toLocaleLowerCase());
             return (
               <tr key={entry.reference} className="data-table-editable-row">
-                <td className="technical-id">{entry.reference}</td>
+                <td className="technical-id">
+                  {linkedWire !== undefined ? (
+                    <EntityReferenceButton
+                      className="technical-id"
+                      title={`Open wire ${linkedWire.technicalId}`}
+                      onClick={() => onOpenWireReference(linkedWire)}
+                    >
+                      {entry.reference}
+                    </EntityReferenceButton>
+                  ) : (
+                    entry.reference
+                  )}
+                </td>
                 <td>
                   <input
                     className="data-table-text-input"

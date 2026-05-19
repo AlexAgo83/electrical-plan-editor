@@ -37,6 +37,7 @@ interface UseAppControllerCatalogScreenDomainsParams {
   onCreateSpliceFromCatalog: (catalogItemId: CatalogItemId) => void;
   onOpenConnectorFromCatalogAnalysis: (connectorId: ConnectorId) => void;
   onOpenSpliceFromCatalogAnalysis: (spliceId: SpliceId) => void;
+  onOpenWireReference: (wire: Wire) => void;
   onUpdateWireEndpointReferenceName: (
     kind: "connection" | "seal",
     reference: string,
@@ -75,6 +76,7 @@ export function useAppControllerCatalogScreenDomains({
   onCreateSpliceFromCatalog,
   onOpenConnectorFromCatalogAnalysis,
   onOpenSpliceFromCatalogAnalysis,
+  onOpenWireReference,
   onUpdateWireEndpointReferenceName,
   modelingLeftColumnContent,
   modelingFormsColumnContent,
@@ -100,6 +102,7 @@ export function useAppControllerCatalogScreenDomains({
       wires={wires}
       onOpenCreateCatalogItem={catalogHandlers.resetCatalogForm}
       onEditCatalogItem={catalogHandlers.startCatalogEdit}
+      onOpenWireReference={onOpenWireReference}
       onDeleteCatalogItem={catalogHandlers.handleCatalogDelete}
       onUpdateWireEndpointReferenceName={onUpdateWireEndpointReferenceName}
       onExportCatalogCsv={handleExportCatalogCsv}
