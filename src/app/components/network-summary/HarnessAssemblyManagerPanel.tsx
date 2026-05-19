@@ -16,6 +16,8 @@ interface HarnessAssemblyManagerPanelProps {
   networks: Network[];
   connectorsByNetworkId: ReadonlyMap<NetworkId, readonly Connector[]>;
   selectedAssemblyId: HarnessAssemblyId | "new" | "";
+  canExportAgentJson?: boolean;
+  onExportAgentJson?: () => void;
   onSelectedAssemblyIdChange: (assemblyId: HarnessAssemblyId | "new" | "") => void;
   onUpsertAssembly: (assembly: HarnessAssembly) => void;
   onRemoveAssembly: (assemblyId: HarnessAssemblyId) => void;
@@ -38,6 +40,8 @@ export function HarnessAssemblyManagerPanel({
   networks,
   connectorsByNetworkId,
   selectedAssemblyId,
+  canExportAgentJson = false,
+  onExportAgentJson,
   onSelectedAssemblyIdChange,
   onUpsertAssembly,
   onRemoveAssembly
@@ -272,6 +276,16 @@ export function HarnessAssemblyManagerPanel({
             <button type="submit" className="button-with-icon">
               <span className="action-button-icon is-save" aria-hidden="true" />
               Save assembly
+            </button>
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={onExportAgentJson}
+              disabled={!canExportAgentJson}
+              title={canExportAgentJson ? "Export selected harness agent JSON" : "Select a saved harness assembly to export agent JSON"}
+            >
+              <span className="action-button-icon is-open" aria-hidden="true" />
+              Agent JSON
             </button>
             {selectedAssembly !== null ? (
               <button type="button" className="network-delete-button button-with-icon" onClick={() => onRemoveAssembly(selectedAssembly.id)}>

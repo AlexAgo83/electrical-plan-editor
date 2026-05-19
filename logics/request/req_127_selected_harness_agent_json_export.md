@@ -1,9 +1,9 @@
 ## req_127_selected_harness_agent_json_export - Selected Harness Agent JSON Export
-> From version: 1.6.7
+> From version: 1.7.0
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 94%
-> Confidence: 91%
+> Status: Done
+> Understanding: 99%
+> Confidence: 97%
 > Complexity: Medium
 > Theme: Export
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -34,7 +34,7 @@ Some fields should be computed at export time rather than added to the stored da
 
 ```mermaid
 %% logics-kind: request
-%% logics-signature: request|selected-harness-agent-json-export|selected-harness-to-agent-json|relationships-and-warnings
+%% logics-signature: request|selected-harness-agent-json-export|export-the-currently-selected-harness-as|ac1-a-selected-harness-assembly-can
 flowchart TD
     SelectedHarness[Selected harness assembly] --> MemberNetworks[Member networks]
     MemberNetworks --> RawEntities[Wires connectors splices catalog]
@@ -177,3 +177,9 @@ flowchart TD
 
 # Backlog
 - `logics/backlog/item_599_selected_harness_agent_json_export.md`
+
+# Delivery outcome
+- Status: Delivered by `logics/tasks/task_110_selected_harness_agent_json_export.md`.
+- The selected-harness-only agent JSON export is implemented with a versioned envelope, selected harness scope, member-network entity data, material resolution, catalog usage, BOM-like quantities, explicit relationships, and structured warnings.
+- The Harness Assembly manager exposes a disabled/enabled `Agent JSON` export action based on saved selected assembly state.
+- Validation passed: targeted tests, typecheck, lint, and production build.

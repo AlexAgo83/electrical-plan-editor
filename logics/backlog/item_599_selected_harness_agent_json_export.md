@@ -1,10 +1,10 @@
 ## item_599_selected_harness_agent_json_export - Selected Harness Agent JSON Export
-> From version: 1.6.7
+> From version: 1.7.0
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 94%
-> Confidence: 91%
-> Progress: 0%
+> Status: Done
+> Understanding: 99%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Export
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -33,7 +33,7 @@ The delivery slice is intentionally narrow: one selected harness assembly, one J
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|selected-harness-agent-json-export|req-127-selected-harness|json-envelope|relationships-warnings
+%% logics-signature: backlog|selected-harness-agent-json-export|req-127-selected-harness-agent-json-expo|ai-agents-need-a-complete-stable|ac1-a-selected-harness-assembly-can
 flowchart TD
     Request[req 127 selected harness agent JSON] --> Selection[Selected harness assembly]
     Selection --> Resolver[Export resolver]
@@ -124,6 +124,12 @@ flowchart TD
 - `usedBy`, relationship records, BOM quantities, and validation warnings should be computed at export time rather than stored as source-of-truth fields.
 - A likely implementation shape is a pure builder such as `src/app/lib/selectedHarnessAgentJson.ts` or `src/core/harnessAgentExport.ts`.
 
+# Delivery outcome
+- Status: Delivered.
+- Implemented as `src/app/lib/selectedHarnessAgentJson.ts` plus the selected Harness Assembly manager `Agent JSON` action.
+- Automated coverage added in `src/tests/selected-harness-agent-json.spec.ts` and `src/tests/harness-assembly-agent-json-ui.spec.tsx`.
+- Validation passed: targeted tests, typecheck, lint, and production build.
+
 # Validation plan
 - Add unit tests for the pure export builder.
 - Add targeted tests for selected-harness-only scoping and active-network decoupling.
@@ -142,4 +148,7 @@ flowchart TD
 - Skip when: Work targets human-readable export formats, all-harness export, import support, or active-network-only export.
 
 # Tasks
-- (not created yet)
+- `logics/tasks/task_110_selected_harness_agent_json_export.md`
+
+# Links
+- Primary task(s): `task_110_selected_harness_agent_json_export`

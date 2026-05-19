@@ -26,6 +26,12 @@ import { FunctionalSchematicPanel } from "../../components/network-summary/Funct
 import { HarnessAssemblyManagerPanel } from "../../components/network-summary/HarnessAssemblyManagerPanel";
 import { buildHarnessAssemblyFunctionalSchematicGraph, type FunctionalDomainFilter } from "../../../core/functionalSchematic";
 import { buildNetworkSummaryPanelControllerSlice } from "./useAppControllerScreenContentSlices";
+import { exportJsonFile } from "../useNetworkImportExport";
+import {
+  buildSelectedHarnessAgentJsonFilename,
+  buildSelectedHarnessAgentJsonPayload,
+  serializeSelectedHarnessAgentJsonPayload
+} from "../../lib/selectedHarnessAgentJson";
 
 type NetworkSummaryPanelSliceParams = Parameters<typeof buildNetworkSummaryPanelControllerSlice>[0];
 
@@ -391,6 +397,26 @@ export function useAppControllerNetworkSummaryPanelDomain({
     displayedAssemblyId === "" || displayedAssemblyId === "new"
       ? null
       : harnessAssemblies.find((assembly) => assembly.id === displayedAssemblyId) ?? null;
+  const handleExportSelectedHarnessAgentJson = useCallback(() => {
+    if (displayedHarnessAssembly === null) {
+      return;
+    }
+    void (async () => {
+      const exportedAt = new Date().toISOString();
+      const result = buildSelectedHarnessAgentJsonPayload({
+        state: store.getState(),
+        selectedHarnessAssemblyId: displayedHarnessAssembly.id,
+        exportedAt
+      });
+      if (!result.ok) {
+        return;
+      }
+      await exportJsonFile(
+        buildSelectedHarnessAgentJsonFilename(displayedHarnessAssembly, exportedAt),
+        serializeSelectedHarnessAgentJsonPayload(result.payload)
+      );
+    })();
+  }, [displayedHarnessAssembly, store]);
   const assemblyGraphFactory = useMemo(() => {
     if (displayedHarnessAssembly === null) {
       return null;
@@ -565,6 +591,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
         networks={allNetworks}
         connectorsByNetworkId={connectorsByNetworkId}
         selectedAssemblyId={displayedAssemblyId}
+        canExportAgentJson={displayedHarnessAssembly !== null}
+        onExportAgentJson={handleExportSelectedHarnessAgentJson}
         onSelectedAssemblyIdChange={handleDisplayedAssemblyIdChange}
         onUpsertAssembly={(assembly) => {
           dispatchAction(appActions.upsertHarnessAssembly(assembly));
