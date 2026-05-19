@@ -101,11 +101,14 @@ export interface CatalogItem {
 
 export type ConnectorLayoutWayShape = "round" | "square" | "slot";
 export type ConnectorLayoutKeyingSide = "none" | "top" | "right" | "bottom" | "left";
+export type ConnectorLayoutKeyingShape = "arrow" | "square" | "round" | "diamond";
 export type ConnectorLayoutShellShape = "square" | "circle";
 
 export interface ConnectorLayoutKeying {
   side: ConnectorLayoutKeyingSide;
   position?: number;
+  shape?: ConnectorLayoutKeyingShape;
+  color?: string;
 }
 
 export interface ConnectorLayoutWay {
@@ -122,6 +125,8 @@ export interface ConnectorLayout {
   width: number;
   height: number;
   shellShape?: ConnectorLayoutShellShape;
+  keyings?: ConnectorLayoutKeying[];
+  /** @deprecated Use keyings for zero-to-many connector keying features. */
   keying?: ConnectorLayoutKeying;
   ways: ConnectorLayoutWay[];
 }

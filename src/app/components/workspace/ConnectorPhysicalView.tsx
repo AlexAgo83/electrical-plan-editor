@@ -1,15 +1,15 @@
-import type { ReactElement } from "react";
+import type { CSSProperties, ReactElement } from "react";
 import type {
   CatalogItem,
   Connector,
   ConnectorLayout,
+  ConnectorLayoutKeyingShape,
   ConnectorLayoutKeyingSide,
   ConnectorLayoutShellShape,
   WireId
 } from "../../../core/entities";
 import {
-  getConnectorLayoutKeyingPosition,
-  getConnectorLayoutKeyingSide,
+  getConnectorLayoutKeyings,
   getConnectorLayoutShellShape,
   resolveConnectorLayout
 } from "../../../core/connectorLayout";
@@ -24,6 +24,33 @@ interface ConnectorPhysicalViewProps {
   onGoToWire: (wireId: WireId) => void;
 }
 
+type RenderableKeying = {
+  side: Exclude<ConnectorLayoutKeyingSide, "none">;
+  position?: number;
+  shape?: ConnectorLayoutKeyingShape;
+  color?: string;
+};
+
+type KeyingAnchor = {
+  x: number;
+  y: number;
+  normalX: number;
+  normalY: number;
+};
+
+const KEYING_MARKER_SIZE = 0.28;
+const KEYING_MARKER_RADIUS = 0.15;
+const KEYING_ARROW_WIDTH = 0.32;
+const KEYING_ARROW_DEPTH = 0.19;
+
+function clampUnit(value: number): number {
+  return Math.min(1, Math.max(-1, value));
+}
+
+function getPhysicalKeyingStyle(keying: RenderableKeying): CSSProperties | undefined {
+  return keying.color === undefined ? undefined : { fill: keying.color };
+}
+
 function renderPhysicalWayShape(shape: string, isOccupied: boolean): ReactElement {
   const className = isOccupied ? "connector-physical-way-shape is-occupied" : "connector-physical-way-shape";
   if (shape === "square") {
@@ -35,23 +62,103 @@ function renderPhysicalWayShape(shape: string, isOccupied: boolean): ReactElemen
   return <circle className={className} r={0.33} />;
 }
 
-function renderPhysicalKeying(side: ConnectorLayoutKeyingSide, position: number | undefined, layout: ConnectorLayout): ReactElement | null {
-  if (side === "none") {
-    return null;
-  }
+function getPhysicalKeyingAnchor(
+  keying: RenderableKeying,
+  layout: ConnectorLayout,
+  shellShape: ConnectorLayoutShellShape
+): KeyingAnchor {
   const centerX = layout.width / 2 + 0.5;
   const centerY = layout.height / 2 + 0.5;
-  const keyingX = position ?? centerX;
-  const keyingY = position ?? centerY;
   const right = layout.width + 0.5;
   const bottom = layout.height + 0.5;
-  const pathBySide: Record<Exclude<ConnectorLayoutKeyingSide, "none">, string> = {
-    top: `M ${keyingX} 0.5 l 0.32 -0.38 h -0.64 z`,
-    right: `M ${right} ${keyingY} l 0.38 -0.32 v 0.64 z`,
-    bottom: `M ${keyingX} ${bottom} l 0.32 0.38 h -0.64 z`,
-    left: `M 0.5 ${keyingY} l -0.38 -0.32 v 0.64 z`
+  if (shellShape === "circle") {
+    const radiusX = layout.width / 2;
+    const radiusY = layout.height / 2;
+    if (keying.side === "top" || keying.side === "bottom") {
+      const x = keying.position ?? centerX;
+      const relativeX = clampUnit((x - centerX) / radiusX);
+      const signedY = (keying.side === "top" ? -1 : 1) * radiusY * Math.sqrt(1 - relativeX * relativeX);
+      const y = centerY + signedY;
+      const normalX = relativeX / radiusX;
+      const normalY = signedY / (radiusY * radiusY);
+      const normalLength = Math.hypot(normalX, normalY) || 1;
+      return { x, y, normalX: normalX / normalLength, normalY: normalY / normalLength };
+    }
+    const y = keying.position ?? centerY;
+    const relativeY = clampUnit((y - centerY) / radiusY);
+    const signedX = (keying.side === "left" ? -1 : 1) * radiusX * Math.sqrt(1 - relativeY * relativeY);
+    const x = centerX + signedX;
+    const normalX = signedX / (radiusX * radiusX);
+    const normalY = relativeY / radiusY;
+    const normalLength = Math.hypot(normalX, normalY) || 1;
+    return { x, y, normalX: normalX / normalLength, normalY: normalY / normalLength };
+  }
+  const keyingX = keying.position ?? centerX;
+  const keyingY = keying.position ?? centerY;
+  const anchorBySide: Record<Exclude<ConnectorLayoutKeyingSide, "none">, KeyingAnchor> = {
+    top: { x: keyingX, y: 0.5, normalX: 0, normalY: -1 },
+    right: { x: right, y: keyingY, normalX: 1, normalY: 0 },
+    bottom: { x: keyingX, y: bottom, normalX: 0, normalY: 1 },
+    left: { x: 0.5, y: keyingY, normalX: -1, normalY: 0 }
   };
-  return <path className="connector-physical-keying" d={pathBySide[side]} aria-hidden="true" />;
+  return anchorBySide[keying.side];
+}
+
+function renderPhysicalKeying(
+  keying: RenderableKeying,
+  layout: ConnectorLayout,
+  shellShape: ConnectorLayoutShellShape
+): ReactElement {
+  const anchor = getPhysicalKeyingAnchor(keying, layout, shellShape);
+  const markerCenterX = anchor.x + anchor.normalX * (KEYING_MARKER_SIZE / 2);
+  const markerCenterY = anchor.y + anchor.normalY * (KEYING_MARKER_SIZE / 2);
+  const shape = keying.shape ?? "arrow";
+  const style = getPhysicalKeyingStyle(keying);
+  const markerAngle = (Math.atan2(anchor.normalY, anchor.normalX) * 180) / Math.PI;
+  if (shape === "square") {
+    return (
+      <rect
+        className="connector-physical-keying"
+        style={style}
+        x={markerCenterX - KEYING_MARKER_SIZE / 2}
+        y={markerCenterY - KEYING_MARKER_SIZE / 2}
+        width={KEYING_MARKER_SIZE}
+        height={KEYING_MARKER_SIZE}
+        rx={0.035}
+        transform={`rotate(${markerAngle} ${markerCenterX} ${markerCenterY})`}
+        aria-hidden="true"
+      />
+    );
+  }
+  if (shape === "round") {
+    return <circle className="connector-physical-keying" style={style} cx={markerCenterX} cy={markerCenterY} r={KEYING_MARKER_RADIUS} aria-hidden="true" />;
+  }
+  if (shape === "diamond") {
+    return (
+      <rect
+        className="connector-physical-keying"
+        style={style}
+        x={markerCenterX - KEYING_MARKER_SIZE / 2}
+        y={markerCenterY - KEYING_MARKER_SIZE / 2}
+        width={KEYING_MARKER_SIZE}
+        height={KEYING_MARKER_SIZE}
+        transform={`rotate(${markerAngle + 45} ${markerCenterX} ${markerCenterY})`}
+        aria-hidden="true"
+      />
+    );
+  }
+  const tangentX = -anchor.normalY;
+  const tangentY = anchor.normalX;
+  const baseX = anchor.x + anchor.normalX * KEYING_ARROW_DEPTH;
+  const baseY = anchor.y + anchor.normalY * KEYING_ARROW_DEPTH;
+  const halfWidth = KEYING_ARROW_WIDTH / 2;
+  const path = [
+    `M ${anchor.x} ${anchor.y}`,
+    `L ${baseX + tangentX * halfWidth} ${baseY + tangentY * halfWidth}`,
+    `L ${baseX - tangentX * halfWidth} ${baseY - tangentY * halfWidth}`,
+    "z"
+  ].join(" ");
+  return <path className="connector-physical-keying" style={style} d={path} aria-hidden="true" />;
 }
 
 function renderPhysicalShell(layout: ConnectorLayout, shellShape: ConnectorLayoutShellShape): ReactElement {
@@ -80,8 +187,7 @@ export function ConnectorPhysicalView({
   const layout = resolveConnectorLayout(catalogItem?.connectorLayout, connector.cavityCount);
   const statusByCavity = new Map(connectorCavityStatuses.map((status) => [status.cavityIndex, status] as const));
   const hasCustomLayout = catalogItem?.connectorLayout !== undefined;
-  const keyingSide = getConnectorLayoutKeyingSide(layout);
-  const keyingPosition = getConnectorLayoutKeyingPosition(layout);
+  const keyings = getConnectorLayoutKeyings(layout);
   const shellShape = getConnectorLayoutShellShape(layout);
 
   return (
@@ -94,7 +200,11 @@ export function ConnectorPhysicalView({
           aria-label={`${connector.technicalId} physical connector layout`}
         >
           {renderPhysicalShell(layout, shellShape)}
-          {renderPhysicalKeying(keyingSide, keyingPosition, layout)}
+          {keyings.map((keying, index) => (
+            <g key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${index}`}>
+              {renderPhysicalKeying(keying as RenderableKeying, layout, shellShape)}
+            </g>
+          ))}
           {layout.ways.map((way) => {
             const status = statusByCavity.get(way.cavityIndex);
             const isOccupied = status?.isOccupied === true;

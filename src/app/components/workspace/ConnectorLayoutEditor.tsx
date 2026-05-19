@@ -1,22 +1,23 @@
-import { useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactElement } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactElement } from "react";
 import type {
   ConnectorLayout,
+  ConnectorLayoutKeyingShape,
   ConnectorLayoutKeyingSide,
   ConnectorLayoutShellShape,
   ConnectorLayoutWay,
   ConnectorLayoutWayShape
 } from "../../../core/entities";
 import {
+  addConnectorLayoutKeying,
   createDefaultConnectorLayout,
   getConnectorLayoutDuplicatePositions,
-  getConnectorLayoutKeyingPosition,
-  getConnectorLayoutKeyingSide,
+  getConnectorLayoutKeyings,
   getConnectorLayoutShellShape,
   moveConnectorLayoutWayIfFree,
+  removeConnectorLayoutKeying,
   resolveConnectorLayout,
+  updateConnectorLayoutKeyingAt,
   updateConnectorLayoutShellShape,
-  updateConnectorLayoutKeyingPosition,
-  updateConnectorLayoutKeyingSide
 } from "../../../core/connectorLayout";
 
 interface ConnectorLayoutEditorProps {
@@ -32,11 +33,17 @@ const WAY_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutWayShape; label: string }
 ];
 
 const KEYING_SIDE_OPTIONS: Array<{ value: ConnectorLayoutKeyingSide; label: string }> = [
-  { value: "none", label: "None" },
   { value: "top", label: "Top" },
   { value: "right", label: "Right" },
   { value: "bottom", label: "Bottom" },
   { value: "left", label: "Left" }
+];
+
+const KEYING_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutKeyingShape; label: string }> = [
+  { value: "arrow", label: "Arrow" },
+  { value: "square", label: "Square" },
+  { value: "round", label: "Round" },
+  { value: "diamond", label: "Diamond" }
 ];
 
 const SHELL_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutShellShape; label: string }> = [
@@ -44,9 +51,42 @@ const SHELL_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutShellShape; label: stri
   { value: "circle", label: "Circle" }
 ];
 
+const KEYING_MARKER_SIZE = 0.28;
+const KEYING_MARKER_RADIUS = 0.15;
+const KEYING_ARROW_WIDTH = 0.32;
+const KEYING_ARROW_DEPTH = 0.19;
+const DEFAULT_KEYING_COLOR_PICKER_VALUE = "#2563eb";
+
+type RenderableKeying = {
+  side: Exclude<ConnectorLayoutKeyingSide, "none">;
+  position?: number;
+  shape?: ConnectorLayoutKeyingShape;
+  color?: string;
+};
+
+type KeyingAnchor = {
+  x: number;
+  y: number;
+  normalX: number;
+  normalY: number;
+};
+
 function parseConnectionCount(value: string): number {
   const parsed = Number(value);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
+}
+
+function clampUnit(value: number): number {
+  return Math.min(1, Math.max(-1, value));
+}
+
+function getKeyingStyle(keying: RenderableKeying): CSSProperties | undefined {
+  return keying.color === undefined ? undefined : { fill: keying.color };
+}
+
+function normalizeHexColor(value: string): string | null {
+  const normalized = value.trim();
+  return /^#[\da-f]{6}$/i.test(normalized) ? normalized.toLowerCase() : null;
 }
 
 function renderWayShape(way: ConnectorLayoutWay, isSelected: boolean): ReactElement {
@@ -62,23 +102,103 @@ function renderWayShape(way: ConnectorLayoutWay, isSelected: boolean): ReactElem
   return <circle {...commonProps} r={0.32} />;
 }
 
-function renderKeying(side: ConnectorLayoutKeyingSide, position: number | undefined, layout: ConnectorLayout): ReactElement | null {
-  if (side === "none") {
-    return null;
-  }
+function getKeyingAnchor(
+  keying: RenderableKeying,
+  layout: ConnectorLayout,
+  shellShape: ConnectorLayoutShellShape
+): KeyingAnchor {
   const centerX = layout.width / 2 + 0.5;
   const centerY = layout.height / 2 + 0.5;
-  const keyingX = position ?? centerX;
-  const keyingY = position ?? centerY;
   const right = layout.width + 0.5;
   const bottom = layout.height + 0.5;
-  const pathBySide: Record<Exclude<ConnectorLayoutKeyingSide, "none">, string> = {
-    top: `M ${keyingX} 0.5 l 0.32 -0.38 h -0.64 z`,
-    right: `M ${right} ${keyingY} l 0.38 -0.32 v 0.64 z`,
-    bottom: `M ${keyingX} ${bottom} l 0.32 0.38 h -0.64 z`,
-    left: `M 0.5 ${keyingY} l -0.38 -0.32 v 0.64 z`
+  if (shellShape === "circle") {
+    const radiusX = layout.width / 2;
+    const radiusY = layout.height / 2;
+    if (keying.side === "top" || keying.side === "bottom") {
+      const x = keying.position ?? centerX;
+      const relativeX = clampUnit((x - centerX) / radiusX);
+      const signedY = (keying.side === "top" ? -1 : 1) * radiusY * Math.sqrt(1 - relativeX * relativeX);
+      const y = centerY + signedY;
+      const normalX = relativeX / radiusX;
+      const normalY = signedY / (radiusY * radiusY);
+      const normalLength = Math.hypot(normalX, normalY) || 1;
+      return { x, y, normalX: normalX / normalLength, normalY: normalY / normalLength };
+    }
+    const y = keying.position ?? centerY;
+    const relativeY = clampUnit((y - centerY) / radiusY);
+    const signedX = (keying.side === "left" ? -1 : 1) * radiusX * Math.sqrt(1 - relativeY * relativeY);
+    const x = centerX + signedX;
+    const normalX = signedX / (radiusX * radiusX);
+    const normalY = relativeY / radiusY;
+    const normalLength = Math.hypot(normalX, normalY) || 1;
+    return { x, y, normalX: normalX / normalLength, normalY: normalY / normalLength };
+  }
+  const keyingX = keying.position ?? centerX;
+  const keyingY = keying.position ?? centerY;
+  const anchorBySide: Record<Exclude<ConnectorLayoutKeyingSide, "none">, KeyingAnchor> = {
+    top: { x: keyingX, y: 0.5, normalX: 0, normalY: -1 },
+    right: { x: right, y: keyingY, normalX: 1, normalY: 0 },
+    bottom: { x: keyingX, y: bottom, normalX: 0, normalY: 1 },
+    left: { x: 0.5, y: keyingY, normalX: -1, normalY: 0 }
   };
-  return <path className="connector-layout-keying" d={pathBySide[side]} aria-hidden="true" />;
+  return anchorBySide[keying.side];
+}
+
+function renderKeying(
+  keying: RenderableKeying,
+  layout: ConnectorLayout,
+  shellShape: ConnectorLayoutShellShape
+): ReactElement {
+  const anchor = getKeyingAnchor(keying, layout, shellShape);
+  const markerCenterX = anchor.x + anchor.normalX * (KEYING_MARKER_SIZE / 2);
+  const markerCenterY = anchor.y + anchor.normalY * (KEYING_MARKER_SIZE / 2);
+  const shape = keying.shape ?? "arrow";
+  const style = getKeyingStyle(keying);
+  const markerAngle = (Math.atan2(anchor.normalY, anchor.normalX) * 180) / Math.PI;
+  if (shape === "square") {
+    return (
+      <rect
+        className="connector-layout-keying"
+        style={style}
+        x={markerCenterX - KEYING_MARKER_SIZE / 2}
+        y={markerCenterY - KEYING_MARKER_SIZE / 2}
+        width={KEYING_MARKER_SIZE}
+        height={KEYING_MARKER_SIZE}
+        rx={0.035}
+        transform={`rotate(${markerAngle} ${markerCenterX} ${markerCenterY})`}
+        aria-hidden="true"
+      />
+    );
+  }
+  if (shape === "round") {
+    return <circle className="connector-layout-keying" style={style} cx={markerCenterX} cy={markerCenterY} r={KEYING_MARKER_RADIUS} aria-hidden="true" />;
+  }
+  if (shape === "diamond") {
+    return (
+      <rect
+        className="connector-layout-keying"
+        style={style}
+        x={markerCenterX - KEYING_MARKER_SIZE / 2}
+        y={markerCenterY - KEYING_MARKER_SIZE / 2}
+        width={KEYING_MARKER_SIZE}
+        height={KEYING_MARKER_SIZE}
+        transform={`rotate(${markerAngle + 45} ${markerCenterX} ${markerCenterY})`}
+        aria-hidden="true"
+      />
+    );
+  }
+  const tangentX = -anchor.normalY;
+  const tangentY = anchor.normalX;
+  const baseX = anchor.x + anchor.normalX * KEYING_ARROW_DEPTH;
+  const baseY = anchor.y + anchor.normalY * KEYING_ARROW_DEPTH;
+  const halfWidth = KEYING_ARROW_WIDTH / 2;
+  const path = [
+    `M ${anchor.x} ${anchor.y}`,
+    `L ${baseX + tangentX * halfWidth} ${baseY + tangentY * halfWidth}`,
+    `L ${baseX - tangentX * halfWidth} ${baseY - tangentY * halfWidth}`,
+    "z"
+  ].join(" ");
+  return <path className="connector-layout-keying" style={style} d={path} aria-hidden="true" />;
 }
 
 function renderLayoutShell(layout: ConnectorLayout, shellShape: ConnectorLayoutShellShape): ReactElement {
@@ -113,10 +233,8 @@ export function ConnectorLayoutEditor({
   const selectedWay =
     layout.ways.find((way) => way.cavityIndex === selectedCavityIndex) ?? layout.ways[0] ?? null;
   const duplicatePositionGroups = useMemo(() => getConnectorLayoutDuplicatePositions(layout), [layout]);
-  const keyingSide = getConnectorLayoutKeyingSide(layout);
-  const keyingPosition = getConnectorLayoutKeyingPosition(layout);
+  const keyings = getConnectorLayoutKeyings(layout);
   const shellShape = getConnectorLayoutShellShape(layout);
-  const keyingPositionMax = keyingSide === "top" || keyingSide === "bottom" ? layout.width : layout.height;
 
   function commitLayout(nextLayout: ConnectorLayout): void {
     setConnectorLayout(resolveConnectorLayout(nextLayout, parsedConnectionCount));
@@ -152,20 +270,27 @@ export function ConnectorLayoutEditor({
     commitLayout({ ...layout, [axis]: parsed });
   }
 
-  function updateKeyingSide(side: ConnectorLayoutKeyingSide): void {
-    commitLayout(updateConnectorLayoutKeyingSide(layout, side));
-  }
-
   function updateShellShape(nextShellShape: ConnectorLayoutShellShape): void {
     commitLayout(updateConnectorLayoutShellShape(layout, nextShellShape));
   }
 
-  function updateKeyingPosition(value: string): void {
+  function getDefaultKeyingColor(): string {
+    const themePrimary = svgRef.current === null ? "" : getComputedStyle(svgRef.current).getPropertyValue("--theme-primary");
+    return normalizeHexColor(themePrimary) ?? DEFAULT_KEYING_COLOR_PICKER_VALUE;
+  }
+
+  function addKeyingWithDefaultColor(): void {
+    const nextLayout = addConnectorLayoutKeying(layout);
+    const nextKeyingIndex = getConnectorLayoutKeyings(nextLayout).length - 1;
+    commitLayout(updateConnectorLayoutKeyingAt(nextLayout, nextKeyingIndex, { color: getDefaultKeyingColor() }));
+  }
+
+  function updateKeyingPosition(index: number, value: string): void {
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) {
       return;
     }
-    commitLayout(updateConnectorLayoutKeyingPosition(layout, parsed));
+    commitLayout(updateConnectorLayoutKeyingAt(layout, index, { position: parsed }));
   }
 
   function getPointerGridPosition(event: PointerEvent<SVGElement>): { x: number; y: number } | null {
@@ -273,7 +398,11 @@ export function ConnectorLayoutEditor({
             onPointerCancel={handleLayoutPointerEnd}
           >
             {renderLayoutShell(layout, shellShape)}
-            {renderKeying(keyingSide, keyingPosition, layout)}
+            {keyings.map((keying, index) => (
+              <g key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${index}`}>
+                {renderKeying(keying as RenderableKeying, layout, shellShape)}
+              </g>
+            ))}
             {layout.ways.map((way) => {
               const isSelected = selectedWay?.cavityIndex === way.cavityIndex;
               return (
@@ -351,33 +480,99 @@ export function ConnectorLayoutEditor({
               </select>
             </label>
 
-            <label>
-              Keying
-              <select
-                value={keyingSide}
-                onChange={(event) => updateKeyingSide(event.target.value as ConnectorLayoutKeyingSide)}
-              >
-                {KEYING_SIDE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            {keyingSide !== "none" ? (
-              <label>
-                Keying position
-                <input
-                  type="number"
-                  min={1}
-                  max={keyingPositionMax}
-                  step={0.5}
-                  value={keyingPosition ?? 1}
-                  onChange={(event) => updateKeyingPosition(event.target.value)}
-                />
-              </label>
-            ) : null}
+            <div className="connector-layout-keying-list" aria-label="Keying features">
+              <div className="connector-layout-keying-list-header">
+                <h4>Keying features</h4>
+                <button type="button" className="button-with-icon" onClick={addKeyingWithDefaultColor}>
+                  <span className="action-button-icon is-new" aria-hidden="true" />
+                  Add keying
+                </button>
+              </div>
+              {keyings.length === 0 ? <p className="meta-line">No keying features.</p> : null}
+              {keyings.map((keying, index) => {
+                const keyingPositionMax = keying.side === "top" || keying.side === "bottom" ? layout.width : layout.height;
+                const colorInputId = `connector-layout-keying-color-${index}`;
+                return (
+                  <div key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${index}`} className="connector-layout-keying-row">
+                    <label>
+                      Side
+                      <select
+                        value={keying.side}
+                        onChange={(event) =>
+                          commitLayout(
+                            updateConnectorLayoutKeyingAt(layout, index, {
+                              side: event.target.value as ConnectorLayoutKeyingSide,
+                              position: undefined
+                            })
+                          )
+                        }
+                      >
+                        {KEYING_SIDE_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      Shape
+                      <select
+                        value={keying.shape ?? "arrow"}
+                        onChange={(event) =>
+                          commitLayout(
+                            updateConnectorLayoutKeyingAt(layout, index, {
+                              shape: event.target.value as ConnectorLayoutKeyingShape
+                            })
+                          )
+                        }
+                      >
+                        {KEYING_SHAPE_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <div className="connector-layout-keying-color-control">
+                      <label htmlFor={colorInputId}>Color</label>
+                      <div>
+                        <input
+                          id={colorInputId}
+                          type="color"
+                          value={keying.color ?? DEFAULT_KEYING_COLOR_PICKER_VALUE}
+                          onChange={(event) =>
+                            commitLayout(
+                              updateConnectorLayoutKeyingAt(layout, index, {
+                                color: event.target.value
+                              })
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+                    <label>
+                      Position
+                      <input
+                        type="number"
+                        min={1}
+                        max={keyingPositionMax}
+                        step={0.5}
+                        value={keying.position ?? 1}
+                        onChange={(event) => updateKeyingPosition(index, event.target.value)}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="button-with-icon"
+                      onClick={() => commitLayout(removeConnectorLayoutKeying(layout, index))}
+                    >
+                      <span className="action-button-icon is-delete" aria-hidden="true" />
+                      Remove
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
           </section>
 
           {selectedWay !== null ? (

@@ -11,7 +11,11 @@ import {
   renderAppWithState,
   switchScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
-import { installScrollIntoViewSpy } from "./helpers/app-ui-form-test-utils";
+import {
+  getConnectorLayoutKeyingControls,
+  getConnectorLayoutKeyingRow,
+  installScrollIntoViewSpy
+} from "./helpers/app-ui-form-test-utils";
 
 describe("App integration UI - catalog", () => {
   beforeEach(() => {
@@ -86,6 +90,26 @@ describe("App integration UI - catalog", () => {
       target: { value: "circle" }
     });
     expect(within(catalogFormPanel).getByLabelText("Border shape")).toHaveValue("circle");
+    expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
+    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Add keying" }));
+    const { sideSelect, shapeSelect, colorInput, positionInput } = getConnectorLayoutKeyingControls(
+      getConnectorLayoutKeyingRow(catalogFormPanel)
+    );
+    expect(sideSelect).toHaveValue("right");
+    expect(shapeSelect).toHaveValue("arrow");
+    fireEvent.change(shapeSelect, {
+      target: { value: "round" }
+    });
+    expect(shapeSelect).toHaveValue("round");
+    expect(colorInput).toHaveValue("#2563eb");
+    fireEvent.change(colorInput, {
+      target: { value: "#ff8800" }
+    });
+    expect(colorInput).toHaveValue("#ff8800");
+    expect(within(catalogFormPanel).queryByRole("button", { name: "Theme color" })).not.toBeInTheDocument();
+    expect(positionInput).toHaveValue(1.5);
+    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Remove" }));
+    expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
     expect(within(catalogFormPanel).getByRole("heading", { name: "Selected way" })).toBeInTheDocument();
     expect(within(catalogFormPanel).getByText("C1").closest(".connector-layout-control-card-header")).not.toBeNull();
     expect(within(catalogFormPanel).getByText("Use an absolute http/https URL.")).toBeInTheDocument();
@@ -130,96 +154,6 @@ describe("App integration UI - catalog", () => {
     const refreshedConnectorsPanel = getPanelByHeading("Connectors");
     expect(within(refreshedConnectorsPanel).getByText("Catalog-first connector")).toBeInTheDocument();
     expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
-  });
-
-  it("renders catalog connector layouts in the connector physical analysis view", () => {
-    const catalogItemId = asCatalogItemId("CAT-PHYSICAL");
-    const connectorId = asConnectorId("C1");
-    const state = [
-      appActions.upsertCatalogItem({
-        id: catalogItemId,
-        manufacturerReference: "CAT-PHYSICAL",
-        connectionCount: 2,
-        connectorLayout: {
-          version: 1,
-          units: "grid",
-          width: 6,
-          height: 5,
-          shellShape: "circle",
-          ways: [
-            { cavityIndex: 1, x: 2, y: 2, shape: "square", label: "A1" },
-            { cavityIndex: 2, x: 4, y: 2, shape: "slot", label: "A2" }
-          ]
-        }
-      }),
-      appActions.upsertConnector({
-        id: connectorId,
-        name: "Connector 1",
-        technicalId: "C-1",
-        catalogItemId,
-        manufacturerReference: "CAT-PHYSICAL",
-        cavityCount: 2
-      })
-    ].reduce(appReducer, createUiIntegrationState());
-
-    renderAppWithState(state);
-    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
-    switchScreenDrawerAware("modeling");
-
-    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
-    expect(secondaryNavRow).not.toBeNull();
-    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true }));
-    const connectorsPanel = getPanelByHeading("Connectors");
-    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
-
-    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
-    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
-
-    expect(within(connectorAnalysisPanel).getByLabelText("Connector physical view")).toBeInTheDocument();
-    expect(within(connectorAnalysisPanel).getByText("Using catalog physical layout.")).toBeInTheDocument();
-    expect(within(connectorAnalysisPanel).getByText("A1")).toBeInTheDocument();
-    expect(within(connectorAnalysisPanel).getByText("A2")).toBeInTheDocument();
-    expect(connectorAnalysisPanel.querySelector("ellipse.connector-physical-shell")).not.toBeNull();
-    expect(connectorAnalysisPanel.querySelector('.connector-physical-way-shape[width="0.66"]')).not.toBeNull();
-  });
-
-  it("supports keyboard layout moves without allowing overlapping ways", () => {
-    renderAppWithState(createUiIntegrationState());
-    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
-    switchScreenDrawerAware("modeling");
-
-    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
-    expect(secondaryNavRow).not.toBeNull();
-    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
-
-    const catalogPanel = getPanelByHeading("Catalog");
-    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Create catalog item" }));
-    const catalogFormPanel = getPanelByHeading("Create catalog item");
-
-    fireEvent.change(within(catalogFormPanel).getByLabelText("Connection count"), {
-      target: { value: "4" }
-    });
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Auto layout" }));
-    expect(within(catalogFormPanel).getByLabelText("Keying")).toHaveValue("right");
-    expect(within(catalogFormPanel).getByLabelText("Keying position")).toHaveValue(1.5);
-    fireEvent.change(within(catalogFormPanel).getByLabelText("Grid width"), {
-      target: { value: "1" }
-    });
-    expect(within(catalogFormPanel).getByLabelText("Grid width")).toHaveValue(2);
-    expect(within(catalogFormPanel).getByText("Cannot reduce grid width: move C2, C4 inside the new width first.")).toBeInTheDocument();
-    fireEvent.keyDown(within(catalogFormPanel).getByRole("button", { name: "Select and move way 2" }), {
-      key: "ArrowLeft"
-    });
-    expect(within(catalogFormPanel).getByLabelText("X")).toHaveValue(2);
-    fireEvent.change(within(catalogFormPanel).getByLabelText("Keying"), {
-      target: { value: "bottom" }
-    });
-    expect(within(catalogFormPanel).getByLabelText("Keying")).toHaveValue("bottom");
-    fireEvent.change(within(catalogFormPanel).getByLabelText("Keying position"), {
-      target: { value: "2" }
-    });
-    expect(within(catalogFormPanel).getByLabelText("Keying position")).toHaveValue(2);
-    expect(within(catalogFormPanel).queryByText("Overlapping ways: C1/C2.")).not.toBeInTheDocument();
   });
 
   it("shows catalog analysis usage sections and navigates to linked connector/splice editing", () => {

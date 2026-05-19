@@ -1,6 +1,7 @@
 import type {
   ConnectorLayout,
   ConnectorLayoutKeying,
+  ConnectorLayoutKeyingShape,
   ConnectorLayoutKeyingSide,
   ConnectorLayoutShellShape,
   ConnectorLayoutWay,
@@ -11,6 +12,7 @@ const MIN_LAYOUT_SIZE = 1;
 const MAX_LAYOUT_SIZE = 48;
 const DEFAULT_WAY_SHAPE: ConnectorLayoutWayShape = "round";
 const DEFAULT_KEYING_SIDE: ConnectorLayoutKeyingSide = "right";
+const DEFAULT_KEYING_SHAPE: ConnectorLayoutKeyingShape = "arrow";
 const DEFAULT_SHELL_SHAPE: ConnectorLayoutShellShape = "square";
 
 function clampInteger(value: unknown, min: number, max: number): number | null {
@@ -62,6 +64,20 @@ function normalizeKeyingSide(value: unknown): ConnectorLayoutKeyingSide {
     : DEFAULT_KEYING_SIDE;
 }
 
+function normalizeKeyingShape(value: unknown): ConnectorLayoutKeyingShape {
+  return value === "square" || value === "round" || value === "diamond" || value === "arrow"
+    ? value
+    : DEFAULT_KEYING_SHAPE;
+}
+
+function normalizeKeyingColor(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  const normalized = value.trim();
+  return /^#[\da-f]{6}$/i.test(normalized) ? normalized.toLowerCase() : undefined;
+}
+
 function getDefaultKeyingPosition(side: ConnectorLayoutKeyingSide, width: number, height: number): number | undefined {
   if (side === "none") {
     return undefined;
@@ -80,20 +96,33 @@ function getKeyingPositionBounds(side: ConnectorLayoutKeyingSide, width: number,
   };
 }
 
-function normalizeKeying(value: unknown, width: number, height: number): ConnectorLayoutKeying {
+function normalizeKeying(value: unknown, width: number, height: number): ConnectorLayoutKeying | null {
   if (value === undefined || typeof value !== "object") {
-    return { side: DEFAULT_KEYING_SIDE, position: getDefaultKeyingPosition(DEFAULT_KEYING_SIDE, width, height) };
+    return null;
   }
   const keying = value as Partial<ConnectorLayoutKeying>;
   const side = normalizeKeyingSide(keying.side);
+  if (side === "none") {
+    return null;
+  }
   const bounds = getKeyingPositionBounds(side, width, height);
   if (bounds === null) {
-    return { side };
+    return null;
   }
+  const color = normalizeKeyingColor(keying.color);
   return {
     side,
+    shape: normalizeKeyingShape(keying.shape),
+    ...(color !== undefined ? { color } : {}),
     position: clampNumber(keying.position, bounds.min, bounds.max) ?? getDefaultKeyingPosition(side, width, height)
   };
+}
+
+function normalizeKeyings(value: unknown, legacyKeying: unknown, width: number, height: number): ConnectorLayoutKeying[] {
+  const rawKeyings = Array.isArray(value) ? value : legacyKeying === undefined ? [] : [legacyKeying];
+  return rawKeyings
+    .map((rawKeying) => normalizeKeying(rawKeying, width, height))
+    .filter((keying): keying is ConnectorLayoutKeying => keying !== null);
 }
 
 function buildFallbackWay(cavityIndex: number, connectionCount: number): ConnectorLayoutWay {
@@ -126,7 +155,7 @@ export function createDefaultConnectorLayout(connectionCount: number): Connector
     width: columns,
     height: rows,
     shellShape: DEFAULT_SHELL_SHAPE,
-    keying: { side: DEFAULT_KEYING_SIDE, position: getDefaultKeyingPosition(DEFAULT_KEYING_SIDE, columns, rows) },
+    keyings: [],
     ways
   };
 }
@@ -182,7 +211,7 @@ export function normalizeConnectorLayout(
     width,
     height,
     shellShape: normalizeShellShape(value.shellShape),
-    keying: normalizeKeying(value.keying, width, height),
+    keyings: normalizeKeyings(value.keyings, value.keying, width, height),
     ways: [...normalizedByIndex.values()].sort((left, right) => left.cavityIndex - right.cavityIndex)
   };
 }
@@ -249,11 +278,15 @@ export function getConnectorLayoutDuplicatePositions(layout: ConnectorLayout): C
 }
 
 export function getConnectorLayoutKeyingSide(layout: ConnectorLayout): ConnectorLayoutKeyingSide {
-  return normalizeKeying(layout.keying, layout.width, layout.height).side;
+  return getConnectorLayoutKeyings(layout)[0]?.side ?? "none";
 }
 
 export function getConnectorLayoutKeyingPosition(layout: ConnectorLayout): number | undefined {
-  return normalizeKeying(layout.keying, layout.width, layout.height).position;
+  return getConnectorLayoutKeyings(layout)[0]?.position;
+}
+
+export function getConnectorLayoutKeyings(layout: ConnectorLayout): ConnectorLayoutKeying[] {
+  return normalizeKeyings(layout.keyings, layout.keying, layout.width, layout.height);
 }
 
 export function getConnectorLayoutShellShape(layout: ConnectorLayout): ConnectorLayoutShellShape {
@@ -275,16 +308,22 @@ export function updateConnectorLayoutKeyingSide(
   side: ConnectorLayoutKeyingSide
 ): ConnectorLayout {
   const normalizedSide = normalizeKeyingSide(side);
+  if (normalizedSide === "none") {
+    return { ...layout, keying: undefined, keyings: [] };
+  }
   return {
     ...layout,
-    keying: normalizeKeying(
-      {
-        side: normalizedSide,
-        position: layout.keying?.side === normalizedSide ? layout.keying.position : undefined
-      },
-      layout.width,
-      layout.height
-    )
+    keying: undefined,
+    keyings: [
+      normalizeKeying(
+        {
+          side: normalizedSide,
+          position: getConnectorLayoutKeyingSide(layout) === normalizedSide ? getConnectorLayoutKeyingPosition(layout) : undefined
+        },
+        layout.width,
+        layout.height
+      )
+    ].filter((keying): keying is ConnectorLayoutKeying => keying !== null)
   };
 }
 
@@ -292,6 +331,49 @@ export function updateConnectorLayoutKeyingPosition(layout: ConnectorLayout, pos
   const side = getConnectorLayoutKeyingSide(layout);
   return {
     ...layout,
-    keying: normalizeKeying({ side, position }, layout.width, layout.height)
+    keying: undefined,
+    keyings: [normalizeKeying({ side, position }, layout.width, layout.height)].filter(
+      (keying): keying is ConnectorLayoutKeying => keying !== null
+    )
+  };
+}
+
+export function addConnectorLayoutKeying(layout: ConnectorLayout): ConnectorLayout {
+  return {
+    ...layout,
+    keying: undefined,
+    keyings: [
+      ...getConnectorLayoutKeyings(layout),
+      {
+        side: DEFAULT_KEYING_SIDE,
+        shape: DEFAULT_KEYING_SHAPE,
+        position: getDefaultKeyingPosition(DEFAULT_KEYING_SIDE, layout.width, layout.height)
+      }
+    ]
+  };
+}
+
+export function removeConnectorLayoutKeying(layout: ConnectorLayout, index: number): ConnectorLayout {
+  return {
+    ...layout,
+    keying: undefined,
+    keyings: getConnectorLayoutKeyings(layout).filter((_, keyingIndex) => keyingIndex !== index)
+  };
+}
+
+export function updateConnectorLayoutKeyingAt(
+  layout: ConnectorLayout,
+  index: number,
+  patch: Partial<ConnectorLayoutKeying>
+): ConnectorLayout {
+  return {
+    ...layout,
+    keying: undefined,
+    keyings: getConnectorLayoutKeyings(layout).map((keying, keyingIndex) => {
+      if (keyingIndex !== index) {
+        return keying;
+      }
+      return normalizeKeying({ ...keying, ...patch }, layout.width, layout.height) ?? keying;
+    })
   };
 }

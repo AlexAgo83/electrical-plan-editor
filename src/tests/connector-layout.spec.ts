@@ -3,12 +3,16 @@ import {
   createDefaultConnectorLayout,
   getConnectorLayoutDuplicatePositions,
   getConnectorLayoutKeyingPosition,
+  getConnectorLayoutKeyings,
   getConnectorLayoutKeyingSide,
   getConnectorLayoutShellShape,
+  addConnectorLayoutKeying,
   moveConnectorLayoutWay,
   moveConnectorLayoutWayIfFree,
   normalizeConnectorLayout,
+  removeConnectorLayoutKeying,
   resolveConnectorLayout,
+  updateConnectorLayoutKeyingAt,
   updateConnectorLayoutShellShape
 } from "../core/connectorLayout";
 
@@ -21,8 +25,9 @@ describe("connector layout", () => {
     expect(layout.width).toBe(3);
     expect(layout.height).toBe(2);
     expect(getConnectorLayoutShellShape(layout)).toBe("square");
-    expect(getConnectorLayoutKeyingSide(layout)).toBe("right");
-    expect(getConnectorLayoutKeyingPosition(layout)).toBe(1.5);
+    expect(getConnectorLayoutKeyings(layout)).toEqual([]);
+    expect(getConnectorLayoutKeyingSide(layout)).toBe("none");
+    expect(getConnectorLayoutKeyingPosition(layout)).toBeUndefined();
     expect(layout.ways.map((way) => way.cavityIndex)).toEqual([1, 2, 3, 4, 5, 6]);
     expect(layout.ways[0]).toMatchObject({ cavityIndex: 1, x: 1, y: 1, shape: "round" });
     expect(layout.ways[5]).toMatchObject({ cavityIndex: 6, x: 3, y: 2, shape: "round" });
@@ -48,6 +53,7 @@ describe("connector layout", () => {
 
     expect(layout?.ways).toHaveLength(3);
     expect(layout !== undefined ? getConnectorLayoutShellShape(layout) : null).toBe("circle");
+    expect(layout !== undefined ? getConnectorLayoutKeyings(layout) : []).toEqual([{ side: "bottom", shape: "arrow", position: 8 }]);
     expect(layout !== undefined ? getConnectorLayoutKeyingSide(layout) : null).toBe("bottom");
     expect(layout !== undefined ? getConnectorLayoutKeyingPosition(layout) : null).toBe(8);
     expect(layout?.ways[1]).toEqual({ cavityIndex: 2, x: 4, y: 3, shape: "slot", label: "B" });
@@ -84,5 +90,21 @@ describe("connector layout", () => {
 
     expect(getConnectorLayoutShellShape(circle)).toBe("circle");
     expect(square !== undefined ? getConnectorLayoutShellShape(square) : null).toBe("square");
+  });
+
+  it("supports zero to many connector keying features", () => {
+    const layout = createDefaultConnectorLayout(4);
+    const first = addConnectorLayoutKeying(layout);
+    const second = addConnectorLayoutKeying(first);
+    const updated = updateConnectorLayoutKeyingAt(second, 1, { side: "bottom", shape: "diamond", color: "#ff8800", position: 2 });
+    const removed = removeConnectorLayoutKeying(updated, 0);
+
+    expect(getConnectorLayoutKeyings(layout)).toEqual([]);
+    expect(getConnectorLayoutKeyings(second)).toEqual([
+      { side: "right", shape: "arrow", position: 1.5 },
+      { side: "right", shape: "arrow", position: 1.5 }
+    ]);
+    expect(getConnectorLayoutKeyings(updated)[1]).toEqual({ side: "bottom", shape: "diamond", color: "#ff8800", position: 2 });
+    expect(getConnectorLayoutKeyings(removed)).toEqual([{ side: "bottom", shape: "diamond", color: "#ff8800", position: 2 }]);
   });
 });
