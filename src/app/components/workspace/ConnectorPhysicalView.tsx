@@ -15,6 +15,7 @@ import {
   getConnectorLayoutShellShape,
   resolveConnectorLayout
 } from "../../../core/connectorLayout";
+import { CABLE_COLOR_BY_ID } from "../../../core/cableColors";
 import { parseWireOccupantRef } from "../../lib/app-utils-networking";
 import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
 import type { ConnectorCavityStatus } from "./AnalysisWorkspaceContent.types";
@@ -51,6 +52,9 @@ const WIRE_TECHNICAL_ID_BACKGROUND_HEIGHT = 0.14;
 const WIRE_TECHNICAL_ID_BACKGROUND_MIN_WIDTH = 0.3;
 const WIRE_TECHNICAL_ID_BACKGROUND_CHAR_WIDTH = 0.045;
 const WIRE_TECHNICAL_ID_BACKGROUND_HORIZONTAL_PADDING = 0.08;
+const WIRE_TECHNICAL_ID_COLOR_DOT_RADIUS = 0.035;
+const WIRE_TECHNICAL_ID_COLOR_DOT_GAP = 0.025;
+const WIRE_TECHNICAL_ID_COLOR_DOT_TEXT_GAP = 0.045;
 
 function clampUnit(value: number): number {
   return Math.min(1, Math.max(-1, value));
@@ -194,10 +198,63 @@ function renderPhysicalShell(layout: ConnectorLayout, shellShape: ConnectorLayou
   return <rect className="connector-physical-shell" x={x} y={y} width={width} height={height} rx={Math.min(0.6, shellPadding)} />;
 }
 
-function getWireTechnicalIdBackgroundWidth(value: string): number {
+function getWireTechnicalIdColorDotCount(wire: Wire | null): number {
+  if (wire === null || wire.primaryColorId === null) {
+    return 0;
+  }
+  return wire.secondaryColorId === null ? 1 : 2;
+}
+
+function getWireTechnicalIdColorDotWidth(wire: Wire | null): number {
+  const dotCount = getWireTechnicalIdColorDotCount(wire);
+  if (dotCount === 0) {
+    return 0;
+  }
+  return dotCount * WIRE_TECHNICAL_ID_COLOR_DOT_RADIUS * 2 + (dotCount - 1) * WIRE_TECHNICAL_ID_COLOR_DOT_GAP;
+}
+
+function getWireTechnicalIdTextWidth(value: string): number {
+  return value.length * WIRE_TECHNICAL_ID_BACKGROUND_CHAR_WIDTH;
+}
+
+function getWireTechnicalIdContentWidth(value: string, wire: Wire | null): number {
+  const colorDotWidth = getWireTechnicalIdColorDotWidth(wire);
+  return getWireTechnicalIdTextWidth(value) + (colorDotWidth > 0 ? colorDotWidth + WIRE_TECHNICAL_ID_COLOR_DOT_TEXT_GAP : 0);
+}
+
+function getWireTechnicalIdBackgroundWidth(value: string, wire: Wire | null): number {
   return Math.max(
     WIRE_TECHNICAL_ID_BACKGROUND_MIN_WIDTH,
-    value.length * WIRE_TECHNICAL_ID_BACKGROUND_CHAR_WIDTH + WIRE_TECHNICAL_ID_BACKGROUND_HORIZONTAL_PADDING * 2
+    getWireTechnicalIdContentWidth(value, wire) + WIRE_TECHNICAL_ID_BACKGROUND_HORIZONTAL_PADDING * 2
+  );
+}
+
+function renderPhysicalWireColorDots(wire: Wire | null, startX: number): ReactElement | null {
+  if (wire === null || wire.primaryColorId === null) {
+    return null;
+  }
+  const primary = CABLE_COLOR_BY_ID[wire.primaryColorId];
+  const secondary = wire.secondaryColorId === null ? null : CABLE_COLOR_BY_ID[wire.secondaryColorId];
+  const secondDotOffset = WIRE_TECHNICAL_ID_COLOR_DOT_RADIUS * 2 + WIRE_TECHNICAL_ID_COLOR_DOT_GAP;
+  return (
+    <g className="connector-physical-wire-color-dots" aria-hidden="true">
+      <circle
+        className="connector-physical-wire-color-dot"
+        cx={startX + WIRE_TECHNICAL_ID_COLOR_DOT_RADIUS}
+        cy={0}
+        r={WIRE_TECHNICAL_ID_COLOR_DOT_RADIUS}
+        style={{ fill: primary?.hex ?? "#7a7a7a" }}
+      />
+      {secondary !== null ? (
+        <circle
+          className="connector-physical-wire-color-dot"
+          cx={startX + WIRE_TECHNICAL_ID_COLOR_DOT_RADIUS + secondDotOffset}
+          cy={0}
+          r={WIRE_TECHNICAL_ID_COLOR_DOT_RADIUS}
+          style={{ fill: secondary?.hex ?? "#7a7a7a" }}
+        />
+      ) : null}
+    </g>
   );
 }
 
@@ -259,7 +316,20 @@ export function ConnectorPhysicalView({
             const status = statusByCavity.get(way.cavityIndex);
             const isOccupied = status?.isOccupied === true;
             const wireId = parseOccupantWireId(status?.occupantRef ?? null);
-            const wireTechnicalId = wireId === null ? null : wireById.get(wireId)?.technicalId ?? null;
+            const wire = wireId === null ? null : wireById.get(wireId) ?? null;
+            const wireTechnicalId = wire?.technicalId ?? null;
+            const wireTechnicalIdBackgroundWidth =
+              wireTechnicalId === null ? 0 : getWireTechnicalIdBackgroundWidth(wireTechnicalId, wire);
+            const wireTechnicalIdContentWidth =
+              wireTechnicalId === null ? 0 : getWireTechnicalIdContentWidth(wireTechnicalId, wire);
+            const wireTechnicalIdColorDotWidth = getWireTechnicalIdColorDotWidth(wire);
+            const wireTechnicalIdContentStartX = -wireTechnicalIdContentWidth / 2;
+            const wireTechnicalIdTextWidth = wireTechnicalId === null ? 0 : getWireTechnicalIdTextWidth(wireTechnicalId);
+            const wireTechnicalIdTextX =
+              wireTechnicalIdContentStartX +
+              wireTechnicalIdColorDotWidth +
+              (wireTechnicalIdColorDotWidth > 0 ? WIRE_TECHNICAL_ID_COLOR_DOT_TEXT_GAP : 0) +
+              wireTechnicalIdTextWidth / 2;
             return (
               <g key={way.cavityIndex} className="connector-physical-way" transform={`translate(${way.x} ${way.y})`}>
                 {renderPhysicalWayShape(way.shape, isOccupied)}
@@ -270,14 +340,15 @@ export function ConnectorPhysicalView({
                   <g className="connector-physical-wire-technical-id-badge" transform="translate(0 0.32)">
                     <rect
                       className="connector-physical-wire-technical-id-bg"
-                      x={-getWireTechnicalIdBackgroundWidth(wireTechnicalId) / 2}
+                      x={-wireTechnicalIdBackgroundWidth / 2}
                       y={-WIRE_TECHNICAL_ID_BACKGROUND_HEIGHT / 2}
-                      width={getWireTechnicalIdBackgroundWidth(wireTechnicalId)}
+                      width={wireTechnicalIdBackgroundWidth}
                       height={WIRE_TECHNICAL_ID_BACKGROUND_HEIGHT}
                       rx={0.035}
                       aria-hidden="true"
                     />
-                    <text className="connector-physical-wire-technical-id" y={0} style={{ fontSize: WIRE_TECHNICAL_ID_FONT_SIZE }}>
+                    {renderPhysicalWireColorDots(wire, wireTechnicalIdContentStartX)}
+                    <text className="connector-physical-wire-technical-id" x={wireTechnicalIdTextX} y={0} style={{ fontSize: WIRE_TECHNICAL_ID_FONT_SIZE }}>
                       {wireTechnicalId}
                     </text>
                   </g>

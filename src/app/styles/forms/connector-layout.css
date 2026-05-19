@@ -114,6 +114,11 @@
   stroke-width: 0.025;
 }
 
+.connector-physical-wire-color-dot {
+  stroke: color-mix(in srgb, var(--theme-surface, Canvas) 76%, currentColor 24%);
+  stroke-width: 0.012;
+}
+
 .connector-layout-fields,
 .connector-physical-details {
   min-width: 0;
