@@ -14,6 +14,9 @@ const DEFAULT_WAY_SHAPE: ConnectorLayoutWayShape = "round";
 const DEFAULT_KEYING_SIDE: ConnectorLayoutKeyingSide = "right";
 const DEFAULT_KEYING_SHAPE: ConnectorLayoutKeyingShape = "arrow";
 const DEFAULT_SHELL_SHAPE: ConnectorLayoutShellShape = "square";
+export const DEFAULT_CONNECTOR_LAYOUT_SHELL_PADDING = 0.5;
+export const MIN_CONNECTOR_LAYOUT_SHELL_PADDING = 0.35;
+export const MAX_CONNECTOR_LAYOUT_SHELL_PADDING = 1.5;
 
 function clampInteger(value: unknown, min: number, max: number): number | null {
   if (typeof value !== "number" || !Number.isFinite(value)) {
@@ -48,6 +51,15 @@ function normalizeWayShape(value: unknown): ConnectorLayoutWayShape {
 
 function normalizeShellShape(value: unknown): ConnectorLayoutShellShape {
   return value === "circle" || value === "square" ? value : DEFAULT_SHELL_SHAPE;
+}
+
+function normalizeShellPadding(value: unknown): number {
+  const parsed = typeof value === "string" ? Number(value) : value;
+  if (typeof parsed !== "number" || !Number.isFinite(parsed)) {
+    return DEFAULT_CONNECTOR_LAYOUT_SHELL_PADDING;
+  }
+  const clamped = Math.min(MAX_CONNECTOR_LAYOUT_SHELL_PADDING, Math.max(MIN_CONNECTOR_LAYOUT_SHELL_PADDING, parsed));
+  return Math.round(clamped * 100) / 100;
 }
 
 function normalizeWayLabel(value: unknown): string | undefined {
@@ -155,6 +167,7 @@ export function createDefaultConnectorLayout(connectionCount: number): Connector
     width: columns,
     height: rows,
     shellShape: DEFAULT_SHELL_SHAPE,
+    shellPadding: DEFAULT_CONNECTOR_LAYOUT_SHELL_PADDING,
     keyings: [],
     ways
   };
@@ -211,6 +224,7 @@ export function normalizeConnectorLayout(
     width,
     height,
     shellShape: normalizeShellShape(value.shellShape),
+    shellPadding: normalizeShellPadding(value.shellPadding),
     keyings: normalizeKeyings(value.keyings, value.keying, width, height),
     ways: [...normalizedByIndex.values()].sort((left, right) => left.cavityIndex - right.cavityIndex)
   };
@@ -293,6 +307,10 @@ export function getConnectorLayoutShellShape(layout: ConnectorLayout): Connector
   return normalizeShellShape(layout.shellShape);
 }
 
+export function getConnectorLayoutShellPadding(layout: ConnectorLayout): number {
+  return normalizeShellPadding(layout.shellPadding);
+}
+
 export function updateConnectorLayoutShellShape(
   layout: ConnectorLayout,
   shellShape: ConnectorLayoutShellShape
@@ -300,6 +318,13 @@ export function updateConnectorLayoutShellShape(
   return {
     ...layout,
     shellShape: normalizeShellShape(shellShape)
+  };
+}
+
+export function updateConnectorLayoutShellPadding(layout: ConnectorLayout, shellPadding: number): ConnectorLayout {
+  return {
+    ...layout,
+    shellPadding: normalizeShellPadding(shellPadding)
   };
 }
 

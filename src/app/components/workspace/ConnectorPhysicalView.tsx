@@ -10,6 +10,7 @@ import type {
 } from "../../../core/entities";
 import {
   getConnectorLayoutKeyings,
+  getConnectorLayoutShellPadding,
   getConnectorLayoutShellShape,
   resolveConnectorLayout
 } from "../../../core/connectorLayout";
@@ -65,15 +66,18 @@ function renderPhysicalWayShape(shape: string, isOccupied: boolean): ReactElemen
 function getPhysicalKeyingAnchor(
   keying: RenderableKeying,
   layout: ConnectorLayout,
-  shellShape: ConnectorLayoutShellShape
+  shellShape: ConnectorLayoutShellShape,
+  shellPadding: number
 ): KeyingAnchor {
   const centerX = layout.width / 2 + 0.5;
   const centerY = layout.height / 2 + 0.5;
-  const right = layout.width + 0.5;
-  const bottom = layout.height + 0.5;
+  const left = 1 - shellPadding;
+  const top = 1 - shellPadding;
+  const right = layout.width + shellPadding;
+  const bottom = layout.height + shellPadding;
   if (shellShape === "circle") {
-    const radiusX = layout.width / 2;
-    const radiusY = layout.height / 2;
+    const radiusX = (layout.width - 1) / 2 + shellPadding;
+    const radiusY = (layout.height - 1) / 2 + shellPadding;
     if (keying.side === "top" || keying.side === "bottom") {
       const x = keying.position ?? centerX;
       const relativeX = clampUnit((x - centerX) / radiusX);
@@ -96,10 +100,10 @@ function getPhysicalKeyingAnchor(
   const keyingX = keying.position ?? centerX;
   const keyingY = keying.position ?? centerY;
   const anchorBySide: Record<Exclude<ConnectorLayoutKeyingSide, "none">, KeyingAnchor> = {
-    top: { x: keyingX, y: 0.5, normalX: 0, normalY: -1 },
+    top: { x: keyingX, y: top, normalX: 0, normalY: -1 },
     right: { x: right, y: keyingY, normalX: 1, normalY: 0 },
     bottom: { x: keyingX, y: bottom, normalX: 0, normalY: 1 },
-    left: { x: 0.5, y: keyingY, normalX: -1, normalY: 0 }
+    left: { x: left, y: keyingY, normalX: -1, normalY: 0 }
   };
   return anchorBySide[keying.side];
 }
@@ -107,9 +111,10 @@ function getPhysicalKeyingAnchor(
 function renderPhysicalKeying(
   keying: RenderableKeying,
   layout: ConnectorLayout,
-  shellShape: ConnectorLayoutShellShape
+  shellShape: ConnectorLayoutShellShape,
+  shellPadding: number
 ): ReactElement {
-  const anchor = getPhysicalKeyingAnchor(keying, layout, shellShape);
+  const anchor = getPhysicalKeyingAnchor(keying, layout, shellShape, shellPadding);
   const markerCenterX = anchor.x + anchor.normalX * (KEYING_MARKER_SIZE / 2);
   const markerCenterY = anchor.y + anchor.normalY * (KEYING_MARKER_SIZE / 2);
   const shape = keying.shape ?? "arrow";
@@ -161,19 +166,31 @@ function renderPhysicalKeying(
   return <path className="connector-physical-keying" style={style} d={path} aria-hidden="true" />;
 }
 
-function renderPhysicalShell(layout: ConnectorLayout, shellShape: ConnectorLayoutShellShape): ReactElement {
+function renderPhysicalShell(layout: ConnectorLayout, shellShape: ConnectorLayoutShellShape, shellPadding: number): ReactElement {
+  const x = 1 - shellPadding;
+  const y = 1 - shellPadding;
+  const width = layout.width - 1 + shellPadding * 2;
+  const height = layout.height - 1 + shellPadding * 2;
   if (shellShape === "circle") {
     return (
       <ellipse
         className="connector-physical-shell"
         cx={layout.width / 2 + 0.5}
         cy={layout.height / 2 + 0.5}
-        rx={layout.width / 2}
-        ry={layout.height / 2}
+        rx={width / 2}
+        ry={height / 2}
       />
     );
   }
-  return <rect className="connector-physical-shell" x={0.5} y={0.5} width={layout.width} height={layout.height} rx={0.6} />;
+  return <rect className="connector-physical-shell" x={x} y={y} width={width} height={height} rx={Math.min(0.6, shellPadding)} />;
+}
+
+function getPhysicalViewBox(layout: ConnectorLayout, shellPadding: number): string {
+  const minX = 1 - shellPadding - 0.5;
+  const minY = 1 - shellPadding - 0.5;
+  const width = layout.width - 1 + shellPadding * 2 + 1;
+  const height = layout.height - 1 + shellPadding * 2 + 1;
+  return `${minX} ${minY} ${width} ${height}`;
 }
 
 export function ConnectorPhysicalView({
@@ -189,20 +206,21 @@ export function ConnectorPhysicalView({
   const hasCustomLayout = catalogItem?.connectorLayout !== undefined;
   const keyings = getConnectorLayoutKeyings(layout);
   const shellShape = getConnectorLayoutShellShape(layout);
+  const shellPadding = getConnectorLayoutShellPadding(layout);
 
   return (
     <div className="connector-physical-view">
       <div className="connector-physical-canvas" aria-label="Connector physical view">
         <svg
           className="connector-physical-svg"
-          viewBox={`0 0 ${layout.width + 1} ${layout.height + 1}`}
+          viewBox={getPhysicalViewBox(layout, shellPadding)}
           role="img"
           aria-label={`${connector.technicalId} physical connector layout`}
         >
-          {renderPhysicalShell(layout, shellShape)}
+          {renderPhysicalShell(layout, shellShape, shellPadding)}
           {keyings.map((keying, index) => (
             <g key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${index}`}>
-              {renderPhysicalKeying(keying as RenderableKeying, layout, shellShape)}
+              {renderPhysicalKeying(keying as RenderableKeying, layout, shellShape, shellPadding)}
             </g>
           ))}
           {layout.ways.map((way) => {

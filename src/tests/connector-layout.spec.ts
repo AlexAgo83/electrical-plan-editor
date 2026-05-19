@@ -5,6 +5,7 @@ import {
   getConnectorLayoutKeyingPosition,
   getConnectorLayoutKeyings,
   getConnectorLayoutKeyingSide,
+  getConnectorLayoutShellPadding,
   getConnectorLayoutShellShape,
   addConnectorLayoutKeying,
   moveConnectorLayoutWay,
@@ -13,6 +14,7 @@ import {
   removeConnectorLayoutKeying,
   resolveConnectorLayout,
   updateConnectorLayoutKeyingAt,
+  updateConnectorLayoutShellPadding,
   updateConnectorLayoutShellShape
 } from "../core/connectorLayout";
 
@@ -25,6 +27,7 @@ describe("connector layout", () => {
     expect(layout.width).toBe(3);
     expect(layout.height).toBe(2);
     expect(getConnectorLayoutShellShape(layout)).toBe("square");
+    expect(getConnectorLayoutShellPadding(layout)).toBe(0.5);
     expect(getConnectorLayoutKeyings(layout)).toEqual([]);
     expect(getConnectorLayoutKeyingSide(layout)).toBe("none");
     expect(getConnectorLayoutKeyingPosition(layout)).toBeUndefined();
@@ -41,6 +44,7 @@ describe("connector layout", () => {
         width: 8,
         height: 7,
         shellShape: "circle",
+        shellPadding: 1.25,
         keying: { side: "bottom", position: 99 },
         ways: [
           { cavityIndex: 2, x: 4, y: 3, shape: "slot", label: "B" },
@@ -53,6 +57,7 @@ describe("connector layout", () => {
 
     expect(layout?.ways).toHaveLength(3);
     expect(layout !== undefined ? getConnectorLayoutShellShape(layout) : null).toBe("circle");
+    expect(layout !== undefined ? getConnectorLayoutShellPadding(layout) : null).toBe(1.25);
     expect(layout !== undefined ? getConnectorLayoutKeyings(layout) : []).toEqual([{ side: "bottom", shape: "arrow", position: 8 }]);
     expect(layout !== undefined ? getConnectorLayoutKeyingSide(layout) : null).toBe("bottom");
     expect(layout !== undefined ? getConnectorLayoutKeyingPosition(layout) : null).toBe(8);
@@ -90,6 +95,17 @@ describe("connector layout", () => {
 
     expect(getConnectorLayoutShellShape(circle)).toBe("circle");
     expect(square !== undefined ? getConnectorLayoutShellShape(square) : null).toBe("square");
+  });
+
+  it("updates connector shell padding within supported bounds", () => {
+    const layout = createDefaultConnectorLayout(2);
+    const expanded = updateConnectorLayoutShellPadding(layout, 1.2);
+    const normalizedLow = normalizeConnectorLayout({ ...layout, shellPadding: -1 }, 2);
+    const normalizedHigh = normalizeConnectorLayout({ ...layout, shellPadding: 99 }, 2);
+
+    expect(getConnectorLayoutShellPadding(expanded)).toBe(1.2);
+    expect(normalizedLow !== undefined ? getConnectorLayoutShellPadding(normalizedLow) : null).toBe(0.35);
+    expect(normalizedHigh !== undefined ? getConnectorLayoutShellPadding(normalizedHigh) : null).toBe(1.5);
   });
 
   it("supports zero to many connector keying features", () => {

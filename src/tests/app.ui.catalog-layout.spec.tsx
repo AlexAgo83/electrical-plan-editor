@@ -33,6 +33,7 @@ describe("App integration UI - catalog layout", () => {
           width: 6,
           height: 5,
           shellShape: "circle",
+          shellPadding: 1.25,
           keyings: [
             { side: "top", shape: "square", color: "#ff8800", position: 2 },
             { side: "bottom", shape: "diamond", position: 4 }
@@ -71,6 +72,7 @@ describe("App integration UI - catalog layout", () => {
     expect(within(connectorAnalysisPanel).getByText("A1")).toBeInTheDocument();
     expect(within(connectorAnalysisPanel).getByText("A2")).toBeInTheDocument();
     expect(connectorAnalysisPanel.querySelector("ellipse.connector-physical-shell")).not.toBeNull();
+    expect(connectorAnalysisPanel.querySelector("ellipse.connector-physical-shell")?.getAttribute("rx")).toBe("3.75");
     expect(connectorAnalysisPanel.querySelectorAll(".connector-physical-keying")).toHaveLength(2);
     expect(connectorAnalysisPanel.querySelector(".connector-physical-keying")?.getAttribute("style")).toContain("fill: #ff8800");
     expect(connectorAnalysisPanel.querySelector('.connector-physical-way-shape[width="0.66"]')).not.toBeNull();
@@ -94,6 +96,12 @@ describe("App integration UI - catalog layout", () => {
     });
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Auto layout" }));
     expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
+    const shellPaddingSlider = within(catalogFormPanel).getByLabelText(/Shell padding/i);
+    expect(shellPaddingSlider).toHaveValue("0.5");
+    fireEvent.change(shellPaddingSlider, {
+      target: { value: "1.1" }
+    });
+    expect(shellPaddingSlider).toHaveValue("1.1");
     fireEvent.change(within(catalogFormPanel).getByLabelText("Grid width"), {
       target: { value: "1" }
     });

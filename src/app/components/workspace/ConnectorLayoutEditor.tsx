@@ -10,13 +10,17 @@ import type {
 import {
   addConnectorLayoutKeying,
   createDefaultConnectorLayout,
+  getConnectorLayoutShellPadding,
   getConnectorLayoutDuplicatePositions,
   getConnectorLayoutKeyings,
   getConnectorLayoutShellShape,
+  MIN_CONNECTOR_LAYOUT_SHELL_PADDING,
+  MAX_CONNECTOR_LAYOUT_SHELL_PADDING,
   moveConnectorLayoutWayIfFree,
   removeConnectorLayoutKeying,
   resolveConnectorLayout,
   updateConnectorLayoutKeyingAt,
+  updateConnectorLayoutShellPadding,
   updateConnectorLayoutShellShape,
 } from "../../../core/connectorLayout";
 
@@ -105,15 +109,18 @@ function renderWayShape(way: ConnectorLayoutWay, isSelected: boolean): ReactElem
 function getKeyingAnchor(
   keying: RenderableKeying,
   layout: ConnectorLayout,
-  shellShape: ConnectorLayoutShellShape
+  shellShape: ConnectorLayoutShellShape,
+  shellPadding: number
 ): KeyingAnchor {
   const centerX = layout.width / 2 + 0.5;
   const centerY = layout.height / 2 + 0.5;
-  const right = layout.width + 0.5;
-  const bottom = layout.height + 0.5;
+  const left = 1 - shellPadding;
+  const top = 1 - shellPadding;
+  const right = layout.width + shellPadding;
+  const bottom = layout.height + shellPadding;
   if (shellShape === "circle") {
-    const radiusX = layout.width / 2;
-    const radiusY = layout.height / 2;
+    const radiusX = (layout.width - 1) / 2 + shellPadding;
+    const radiusY = (layout.height - 1) / 2 + shellPadding;
     if (keying.side === "top" || keying.side === "bottom") {
       const x = keying.position ?? centerX;
       const relativeX = clampUnit((x - centerX) / radiusX);
@@ -136,10 +143,10 @@ function getKeyingAnchor(
   const keyingX = keying.position ?? centerX;
   const keyingY = keying.position ?? centerY;
   const anchorBySide: Record<Exclude<ConnectorLayoutKeyingSide, "none">, KeyingAnchor> = {
-    top: { x: keyingX, y: 0.5, normalX: 0, normalY: -1 },
+    top: { x: keyingX, y: top, normalX: 0, normalY: -1 },
     right: { x: right, y: keyingY, normalX: 1, normalY: 0 },
     bottom: { x: keyingX, y: bottom, normalX: 0, normalY: 1 },
-    left: { x: 0.5, y: keyingY, normalX: -1, normalY: 0 }
+    left: { x: left, y: keyingY, normalX: -1, normalY: 0 }
   };
   return anchorBySide[keying.side];
 }
@@ -147,9 +154,10 @@ function getKeyingAnchor(
 function renderKeying(
   keying: RenderableKeying,
   layout: ConnectorLayout,
-  shellShape: ConnectorLayoutShellShape
+  shellShape: ConnectorLayoutShellShape,
+  shellPadding: number
 ): ReactElement {
-  const anchor = getKeyingAnchor(keying, layout, shellShape);
+  const anchor = getKeyingAnchor(keying, layout, shellShape, shellPadding);
   const markerCenterX = anchor.x + anchor.normalX * (KEYING_MARKER_SIZE / 2);
   const markerCenterY = anchor.y + anchor.normalY * (KEYING_MARKER_SIZE / 2);
   const shape = keying.shape ?? "arrow";
@@ -201,19 +209,31 @@ function renderKeying(
   return <path className="connector-layout-keying" style={style} d={path} aria-hidden="true" />;
 }
 
-function renderLayoutShell(layout: ConnectorLayout, shellShape: ConnectorLayoutShellShape): ReactElement {
+function renderLayoutShell(layout: ConnectorLayout, shellShape: ConnectorLayoutShellShape, shellPadding: number): ReactElement {
+  const x = 1 - shellPadding;
+  const y = 1 - shellPadding;
+  const width = layout.width - 1 + shellPadding * 2;
+  const height = layout.height - 1 + shellPadding * 2;
   if (shellShape === "circle") {
     return (
       <ellipse
         className="connector-layout-shell"
         cx={layout.width / 2 + 0.5}
         cy={layout.height / 2 + 0.5}
-        rx={layout.width / 2}
-        ry={layout.height / 2}
+        rx={width / 2}
+        ry={height / 2}
       />
     );
   }
-  return <rect className="connector-layout-shell" x={0.5} y={0.5} width={layout.width} height={layout.height} rx={0.55} />;
+  return <rect className="connector-layout-shell" x={x} y={y} width={width} height={height} rx={Math.min(0.55, shellPadding)} />;
+}
+
+function getLayoutViewBox(layout: ConnectorLayout, shellPadding: number): string {
+  const minX = 1 - shellPadding - 0.5;
+  const minY = 1 - shellPadding - 0.5;
+  const width = layout.width - 1 + shellPadding * 2 + 1;
+  const height = layout.height - 1 + shellPadding * 2 + 1;
+  return `${minX} ${minY} ${width} ${height}`;
 }
 
 export function ConnectorLayoutEditor({
@@ -235,6 +255,7 @@ export function ConnectorLayoutEditor({
   const duplicatePositionGroups = useMemo(() => getConnectorLayoutDuplicatePositions(layout), [layout]);
   const keyings = getConnectorLayoutKeyings(layout);
   const shellShape = getConnectorLayoutShellShape(layout);
+  const shellPadding = getConnectorLayoutShellPadding(layout);
 
   function commitLayout(nextLayout: ConnectorLayout): void {
     setConnectorLayout(resolveConnectorLayout(nextLayout, parsedConnectionCount));
@@ -272,6 +293,14 @@ export function ConnectorLayoutEditor({
 
   function updateShellShape(nextShellShape: ConnectorLayoutShellShape): void {
     commitLayout(updateConnectorLayoutShellShape(layout, nextShellShape));
+  }
+
+  function updateShellPadding(value: string): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+    commitLayout(updateConnectorLayoutShellPadding(layout, parsed));
   }
 
   function getDefaultKeyingColor(): string {
@@ -390,17 +419,17 @@ export function ConnectorLayoutEditor({
           <svg
             ref={svgRef}
             className="connector-layout-svg"
-            viewBox={`0 0 ${layout.width + 1} ${layout.height + 1}`}
+            viewBox={getLayoutViewBox(layout, shellPadding)}
             role="img"
             aria-label="Editable connector physical layout"
             onPointerMove={handleLayoutPointerMove}
             onPointerUp={handleLayoutPointerEnd}
             onPointerCancel={handleLayoutPointerEnd}
           >
-            {renderLayoutShell(layout, shellShape)}
+            {renderLayoutShell(layout, shellShape, shellPadding)}
             {keyings.map((keying, index) => (
               <g key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${index}`}>
-                {renderKeying(keying as RenderableKeying, layout, shellShape)}
+                {renderKeying(keying as RenderableKeying, layout, shellShape, shellPadding)}
               </g>
             ))}
             {layout.ways.map((way) => {
@@ -478,6 +507,20 @@ export function ConnectorLayoutEditor({
                   </option>
                 ))}
               </select>
+            </label>
+            <label className="connector-layout-slider-field">
+              <span>
+                Shell padding
+                <strong>{shellPadding.toFixed(2)} grid</strong>
+              </span>
+              <input
+                type="range"
+                min={MIN_CONNECTOR_LAYOUT_SHELL_PADDING}
+                max={MAX_CONNECTOR_LAYOUT_SHELL_PADDING}
+                step={0.05}
+                value={shellPadding}
+                onChange={(event) => updateShellPadding(event.target.value)}
+              />
             </label>
 
             <div className="connector-layout-keying-list" aria-label="Keying features">
