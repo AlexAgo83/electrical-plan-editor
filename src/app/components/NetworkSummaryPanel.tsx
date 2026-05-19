@@ -912,11 +912,6 @@ export function NetworkSummaryPanel({
                 onMouseUp={stopNetworkInteractions}
                 onMouseLeave={stopNetworkInteractions}
               >
-              <NetworkSummaryCalloutLeaders
-                renderedCableCallouts={renderedCableCallouts}
-                networkOffset={networkOffset}
-                networkScale={networkScale}
-              />
               <NetworkSummaryGraphLayers
                 networkOffset={networkOffset}
                 networkScale={networkScale}
@@ -927,6 +922,13 @@ export function NetworkSummaryPanel({
                 visibleModelMaxX={visibleModelMaxX}
                 visibleModelMinY={visibleModelMinY}
                 visibleModelMaxY={visibleModelMaxY}
+                afterGridLayer={
+                  <NetworkSummaryCalloutLeaders
+                    renderedCableCallouts={renderedCableCallouts}
+                    networkOffset={networkOffset}
+                    networkScale={networkScale}
+                  />
+                }
                 renderedSegments={renderedSegments}
                 renderedNodes={renderedNodes}
                 showSegmentNames={showSegmentNames}

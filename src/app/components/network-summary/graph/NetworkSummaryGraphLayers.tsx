@@ -2,7 +2,8 @@ import {
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
-  type ReactElement
+  type ReactElement,
+  type ReactNode
 } from "react";
 import type { NetworkNode, NodeId, SegmentId } from "../../../../core/entities";
 import type { NodePosition } from "../../../types/app-controller";
@@ -18,6 +19,7 @@ interface NetworkSummaryGraphLayersProps {
   visibleModelMaxX: number;
   visibleModelMinY: number;
   visibleModelMaxY: number;
+  afterGridLayer?: ReactNode;
   renderedSegments: RenderedSegmentModel[];
   renderedNodes: RenderedNodeModel[];
   showSegmentNames: boolean;
@@ -72,6 +74,7 @@ export function NetworkSummaryGraphLayers({
   visibleModelMaxX,
   visibleModelMinY,
   visibleModelMaxY,
+  afterGridLayer,
   renderedSegments,
   renderedNodes,
   showSegmentNames,
@@ -99,6 +102,7 @@ export function NetworkSummaryGraphLayers({
           })}
         </g>
       ) : null}
+      {afterGridLayer}
 
       <g className="network-graph-layer network-graph-layer-segments" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
         {renderedSegments.map(({ segment, nodeAPosition, nodeBPosition, segmentClassName, segmentGroupClassName }) => (

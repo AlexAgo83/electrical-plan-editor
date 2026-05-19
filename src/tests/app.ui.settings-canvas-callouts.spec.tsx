@@ -73,6 +73,27 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(1);
   });
 
+  it("renders callout leader lines above the network grid and below callout cards", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
+
+    const networkGrid = networkSummaryPanel.querySelector(".network-grid");
+    const calloutLeader = networkSummaryPanel.querySelector(".network-callout-leader-line");
+    const calloutLayer = networkSummaryPanel.querySelector(".network-graph-layer-callouts");
+    expect(networkGrid).not.toBeNull();
+    expect(calloutLeader).not.toBeNull();
+    expect(calloutLayer).not.toBeNull();
+    if (networkGrid === null || calloutLeader === null || calloutLayer === null) {
+      throw new Error("Expected network grid, callout leader, and callout card layer.");
+    }
+
+    expect(Boolean(networkGrid.compareDocumentPosition(calloutLeader) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+    expect(Boolean(calloutLeader.compareDocumentPosition(calloutLayer) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+  });
+
   it("filters callouts from connector/splice nodes selected while modeling sub-screen is Node", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
