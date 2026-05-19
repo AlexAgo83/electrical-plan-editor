@@ -826,9 +826,14 @@ export function NetworkSummaryPanel({
           <div className="network-summary-title">
             <h2>Network summary</h2>
             {activeNetworkName.length > 0 ? (
-              <span className="network-summary-active-network" aria-hidden="true">
-                : {activeNetworkName}
-              </span>
+              <>
+                <span className="network-summary-title-separator" aria-hidden="true">
+                  :
+                </span>
+                <span className="network-summary-active-network" aria-hidden="true">
+                  {activeNetworkName}
+                </span>
+              </>
             ) : null}
           </div>
           <div className="network-summary-header-actions" role="group" aria-label="Network summary display options">

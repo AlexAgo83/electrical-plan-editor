@@ -5,6 +5,7 @@ import {
   asCatalogItemId,
   asConnectorId,
   asSpliceId,
+  asWireId,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
@@ -112,32 +113,41 @@ describe("App integration UI - catalog", () => {
 
   it("shows catalog analysis usage sections and navigates to linked connector/splice editing", () => {
     const catalogItemId = asCatalogItemId("CAT-ANALYSIS");
-    const state = appReducer(
-      appReducer(
-        appReducer(
-          createUiIntegrationState(),
-          appActions.upsertCatalogItem({
-            id: catalogItemId,
-            manufacturerReference: "CAT-ANALYSIS",
-            name: "Analysis sample item",
-            connectionCount: 2,
-            unitPriceExclTax: 3.5
-          })
-        ),
-        appActions.upsertConnector({
-          id: asConnectorId("C1"),
-          name: "Connector 1",
-          technicalId: "C-1",
-          cavityCount: 2,
-          catalogItemId
-        })
-      ),
+    let state = appReducer(
+      createUiIntegrationState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "CAT-ANALYSIS",
+        name: "Analysis sample item",
+        connectionCount: 2,
+        unitPriceExclTax: 3.5
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 2,
+        catalogItemId
+      })
+    );
+    state = appReducer(
+      state,
       appActions.upsertSplice({
         id: asSpliceId("S1"),
         name: "Splice 1",
         technicalId: "S-1",
         portCount: 2,
         catalogItemId
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertWire({
+        ...state.wires.byId[asWireId("W1")]!,
+        endpointBSealReference: "SEAL-1"
       })
     );
 
@@ -160,6 +170,14 @@ describe("App integration UI - catalog", () => {
     expect(within(catalogAnalysisPanel).getByText("1 connectors / 1 splices")).toBeInTheDocument();
     expect(within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Connectors" })).toBeInTheDocument();
     expect(within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Splices" })).toBeInTheDocument();
+    expect(
+      within(catalogAnalysisGrid as HTMLElement).getByRole("textbox", { name: "Wire seal references name for SEAL-1" })
+    ).toHaveClass("data-table-text-input");
+    expect(
+      within(catalogAnalysisGrid as HTMLElement)
+        .getByRole("textbox", { name: "Wire seal references name for SEAL-1" })
+        .closest("tr")
+    ).toHaveClass("data-table-editable-row");
 
     const splicesUsageHeading = within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Splices" });
     const splicesUsagePanel = splicesUsageHeading.closest(".panel");

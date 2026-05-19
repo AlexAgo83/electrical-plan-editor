@@ -29,8 +29,14 @@
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: 0.25rem;
+  gap: 0.2rem;
   min-width: 0;
+}
+
+.network-summary-title-separator {
+  color: color-mix(in srgb, currentColor 64%, transparent);
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .network-summary-active-network {

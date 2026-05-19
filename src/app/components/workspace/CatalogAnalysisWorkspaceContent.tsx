@@ -153,10 +153,12 @@ function WireEndpointReferenceNamesSection({
           {visibleEntries.map((entry) => {
             const draftValue = draftsByReference[entry.reference] ?? "";
             return (
-              <tr key={entry.reference}>
+              <tr key={entry.reference} className="data-table-editable-row">
                 <td className="technical-id">{entry.reference}</td>
                 <td>
                   <input
+                    className="data-table-text-input"
+                    aria-label={`${heading} name for ${entry.reference}`}
                     value={draftValue}
                     maxLength={120}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {

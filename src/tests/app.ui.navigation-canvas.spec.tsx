@@ -58,7 +58,8 @@ describe("App integration UI - navigation and canvas", () => {
     switchScreenDrawerAware("modeling");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
-    expect(within(networkSummaryPanel).getByText(": Main network sample")).toBeInTheDocument();
+    expect(within(networkSummaryPanel).getByText(":")).toHaveClass("network-summary-title-separator");
+    expect(within(networkSummaryPanel).getByText("Main network sample")).toHaveClass("network-summary-active-network");
   });
 
   it("toggles the navigation drawer from the header and closes on backdrop click", () => {

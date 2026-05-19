@@ -23,6 +23,39 @@
   font-weight: 600;
 }
 
+.data-table tr.data-table-editable-row > td {
+  vertical-align: middle;
+}
+
+.data-table .data-table-text-input {
+  width: 100%;
+  min-width: 10rem;
+  max-width: 100%;
+  border-radius: 0.45rem;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: var(--table-cell-font-size, var(--table-font-size, 0.84rem));
+  line-height: 1.2;
+  padding: 0.32rem 0.5rem;
+}
+
+.data-table .data-table-text-input::placeholder {
+  opacity: 0.62;
+}
+
+.data-table .data-table-text-input:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--theme-primary, currentColor) 45%, transparent);
+  outline-offset: 1px;
+}
+
+.table-density-compact .data-table .data-table-text-input {
+  font-size: var(--table-cell-font-size-compact, var(--table-font-size-compact, 0.76rem));
+  min-height: 1.7rem;
+  padding: 0.24rem 0.42rem;
+}
+
 .sort-header-button {
   border: 0;
   background: transparent;
