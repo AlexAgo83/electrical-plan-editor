@@ -93,6 +93,9 @@ describe("App integration UI - catalog", () => {
     expect(within(connectorFormPanel).getByDisplayValue(/TE-1-967616-1 \(6\)/)).toBeInTheDocument();
     expect(within(connectorFormPanel).getByText("Manufacturer reference: TE-1-967616-1")).toBeInTheDocument();
     expect(within(connectorFormPanel).getByLabelText("Way count (from catalog)")).toHaveValue(6);
+    expect(within(connectorFormPanel).getByText("Catalog material application").closest("fieldset")).toHaveClass(
+      "catalog-material-application-fieldset"
+    );
 
     fireEvent.change(within(connectorFormPanel).getByLabelText("Functional name"), {
       target: { value: "Catalog-first connector" }

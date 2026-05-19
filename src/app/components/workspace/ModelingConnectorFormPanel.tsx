@@ -104,7 +104,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       />
       Main harness connector for functional view
     </label>
-    <fieldset className="inline-fieldset">
+    <fieldset className="inline-fieldset catalog-material-application-fieldset">
       <legend>Catalog material application</legend>
       <label className="settings-checkbox">
         <input

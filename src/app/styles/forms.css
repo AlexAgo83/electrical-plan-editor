@@ -29,6 +29,25 @@
   color: #345167;
 }
 
+.app-shell .inline-fieldset.catalog-material-application-fieldset {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 28%, #cfdde8);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--theme-primary, currentColor) 8%, transparent),
+    color-mix(in srgb, var(--theme-primary, currentColor) 3%, transparent)
+  );
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 54%, transparent);
+}
+
+.app-shell .inline-fieldset.catalog-material-application-fieldset legend {
+  color: color-mix(in srgb, var(--theme-primary, currentColor) 68%, currentColor);
+  font-weight: 700;
+}
+
+.app-shell .catalog-material-application-fieldset .settings-checkbox {
+  color: inherit;
+}
+
 .stack-form label,
 .row-form label {
   display: grid;
@@ -44,6 +63,7 @@
 
 .stack-form input:not([type="checkbox"]):not([type="radio"]),
 .stack-form select,
+.stack-form textarea,
 .row-form input:not([type="checkbox"]):not([type="radio"]),
 .row-form select,
 .stack-label input,
@@ -56,6 +76,12 @@
   width: 100%;
   min-width: 0;
   max-width: 100%;
+}
+
+.stack-form textarea {
+  resize: vertical;
+  font: inherit;
+  line-height: 1.35;
 }
 
 .stack-form label.settings-checkbox,
