@@ -15,6 +15,7 @@ import {
   getConnectorLayoutShellShape,
   resolveConnectorLayout
 } from "../../../core/connectorLayout";
+import { parseWireOccupantRef } from "../../lib/app-utils-networking";
 import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
 import type { ConnectorCavityStatus } from "./AnalysisWorkspaceContent.types";
 
@@ -23,7 +24,6 @@ interface ConnectorPhysicalViewProps {
   catalogItem: CatalogItem | undefined;
   connectorCavityStatuses: ConnectorCavityStatus[];
   wireById: Map<WireId, Wire>;
-  formatOccupantRef: (occupantRef: string | null) => string;
   parseOccupantWireId: (occupantRef: string | null) => WireId | null;
   onGoToWire: (wireId: WireId) => void;
 }
@@ -201,6 +201,22 @@ function getWireTechnicalIdBackgroundWidth(value: string): number {
   );
 }
 
+function renderPhysicalOccupantRef(occupantRef: string | null, wireById: Map<WireId, Wire>): ReactElement {
+  if (occupantRef === null) {
+    return <span>Free</span>;
+  }
+  const parsed = parseWireOccupantRef(occupantRef);
+  if (parsed === null) {
+    return <span>{occupantRef}</span>;
+  }
+  const technicalId = wireById.get(parsed.wireId)?.technicalId ?? parsed.wireId;
+  return (
+    <span className="cavity-occupant-ref" aria-label={`Wire ${technicalId} / ${parsed.side}`}>
+      <span>{technicalId} / {parsed.side}</span>
+    </span>
+  );
+}
+
 function getPhysicalViewBox(layout: ConnectorLayout, shellPadding: number): string {
   const minX = 1 - shellPadding - 0.5;
   const minY = 1 - shellPadding - 0.5;
@@ -214,7 +230,6 @@ export function ConnectorPhysicalView({
   catalogItem,
   connectorCavityStatuses,
   wireById,
-  formatOccupantRef,
   parseOccupantWireId,
   onGoToWire
 }: ConnectorPhysicalViewProps): ReactElement {
@@ -287,8 +302,9 @@ export function ConnectorPhysicalView({
               <article key={way.cavityIndex} className={status?.isOccupied === true ? "cavity is-occupied" : "cavity"}>
                 <h3>C{way.cavityIndex}</h3>
                 <p className="cavity-occupant-line">
+                  {status?.isOccupied === true ? <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" /> : null}
                   {status?.isOccupied === true ? renderWireColorPrefixMarker(wire) : null}
-                  <span>{status?.isOccupied === true ? formatOccupantRef(occupantRef) : "Free"}</span>
+                  {status?.isOccupied === true ? renderPhysicalOccupantRef(occupantRef, wireById) : <span>Free</span>}
                 </p>
                 {wireId !== null ? (
                   <div className="cavity-actions">

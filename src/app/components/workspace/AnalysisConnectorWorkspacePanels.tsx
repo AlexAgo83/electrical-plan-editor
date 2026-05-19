@@ -74,6 +74,21 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   const formatOccupantRef = (occupantRef: string | null): string =>
     occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
+  const renderConnectorOccupantRef = (occupantRef: string | null): ReactElement => {
+    if (occupantRef === null) {
+      return <span>Free</span>;
+    }
+    const parsed = parseWireOccupantRef(occupantRef);
+    if (parsed === null) {
+      return <span>{occupantRef}</span>;
+    }
+    const technicalId = wireTechnicalIdById.get(parsed.wireId) ?? parsed.wireId;
+    return (
+      <span className="cavity-occupant-ref" aria-label={`Wire ${technicalId} / ${parsed.side}`}>
+        <span>{technicalId} / {parsed.side}</span>
+      </span>
+    );
+  };
   const parseOccupantWireId = (occupantRef: string | null) => {
     const parsed = occupantRef === null ? null : parseWireOccupantRef(occupantRef);
     return parsed !== null && wireById.has(parsed.wireId) ? parsed.wireId : null;
@@ -446,8 +461,9 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             <article key={slot.cavityIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
               <h3>C{slot.cavityIndex}</h3>
               <p className="cavity-occupant-line">
+                {slot.isOccupied ? <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" /> : null}
                 {slot.isOccupied ? renderWireColorPrefixMarker(parsedOccupantRef === null ? null : wireById.get(parsedOccupantRef.wireId)) : null}
-                <span>{slot.isOccupied ? formatOccupantRef(slot.occupantRef) : "Free"}</span>
+                {slot.isOccupied ? renderConnectorOccupantRef(slot.occupantRef) : <span>Free</span>}
               </p>
               {slot.isOccupied ? (
                 <div className="cavity-actions">
@@ -486,7 +502,6 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         catalogItem={selectedConnector.catalogItemId === undefined ? undefined : catalogItemById.get(selectedConnector.catalogItemId)}
         connectorCavityStatuses={connectorCavityStatuses}
         wireById={wireById}
-        formatOccupantRef={formatOccupantRef}
         parseOccupantWireId={parseOccupantWireId}
         onGoToWire={onGoToWireFromAnalysis}
       />

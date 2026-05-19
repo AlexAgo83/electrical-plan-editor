@@ -115,7 +115,7 @@ describe("App integration UI - navigation and canvas", () => {
     switchSubScreenDrawerAware("connector");
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
-    expect(within(connectorAnalysisPanel).getByText("Wire W-1 / A")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("W-1 / A")).toBeInTheDocument();
     const wayIndexInput = within(connectorAnalysisPanel).getByLabelText("Way index");
     expect(wayIndexInput).toHaveValue(2);
     fireEvent.change(wayIndexInput, { target: { value: "1" } });

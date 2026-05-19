@@ -27,8 +27,9 @@ describe("App integration UI - analysis go-to wire actions", () => {
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
-    const occupiedCard = within(connectorAnalysisPanel).getByText("Wire W-1 / A").closest("article");
+    const occupiedCard = within(connectorAnalysisPanel).getByText("W-1 / A").closest("article");
     expect(occupiedCard).not.toBeNull();
+    expect((occupiedCard as HTMLElement).querySelector(".cavity-occupant-ref-icon")).not.toBeNull();
 
     const cardButtons = within(occupiedCard as HTMLElement).getAllByRole("button");
     const cardButtonLabels = cardButtons.map((button) => button.textContent?.trim());
@@ -68,12 +69,12 @@ describe("App integration UI - analysis go-to wire actions", () => {
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
-    const waysCard = within(connectorAnalysisPanel).getByText("Wire W-1 / A").closest("article");
+    const waysCard = within(connectorAnalysisPanel).getByText("W-1 / A").closest("article");
     expect(waysCard).not.toBeNull();
     expect((waysCard as HTMLElement).querySelectorAll('[title="Red / Blue"]')).toHaveLength(2);
 
     fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
-    const physicalCard = within(connectorAnalysisPanel).getByText("Wire W-1 / A").closest("article");
+    const physicalCard = within(connectorAnalysisPanel).getByText("W-1 / A").closest("article");
     expect(physicalCard).not.toBeNull();
     expect((physicalCard as HTMLElement).querySelectorAll('[title="Red / Blue"]')).toHaveLength(2);
   });
@@ -126,7 +127,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
-    const occupiedCard = within(connectorAnalysisPanel).getByText("Wire W-GHOST / A").closest("article");
+    const occupiedCard = within(connectorAnalysisPanel).getByText("W-GHOST / A").closest("article");
     expect(occupiedCard).not.toBeNull();
     expect(within(occupiedCard as HTMLElement).getByRole("button", { name: "Go to" })).toBeDisabled();
     expect(within(occupiedCard as HTMLElement).getByRole("button", { name: "Release" })).toBeEnabled();

@@ -176,6 +176,18 @@
   flex-wrap: wrap;
 }
 
+.cavity-occupant-ref {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+}
+
+.cavity-occupant-ref-icon {
+  width: 0.74rem;
+  height: 0.74rem;
+  flex-basis: 0.74rem;
+}
+
 .connector-layout-control-card-header h3 {
   margin: 0;
   font-size: 0.82rem;
