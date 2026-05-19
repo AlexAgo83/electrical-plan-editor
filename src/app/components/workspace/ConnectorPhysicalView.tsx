@@ -46,6 +46,11 @@ const KEYING_MARKER_SIZE = 0.28;
 const KEYING_MARKER_RADIUS = 0.15;
 const KEYING_ARROW_WIDTH = 0.32;
 const KEYING_ARROW_DEPTH = 0.19;
+const WIRE_TECHNICAL_ID_FONT_SIZE = 0.08;
+const WIRE_TECHNICAL_ID_BACKGROUND_HEIGHT = 0.14;
+const WIRE_TECHNICAL_ID_BACKGROUND_MIN_WIDTH = 0.3;
+const WIRE_TECHNICAL_ID_BACKGROUND_CHAR_WIDTH = 0.045;
+const WIRE_TECHNICAL_ID_BACKGROUND_HORIZONTAL_PADDING = 0.08;
 
 function clampUnit(value: number): number {
   return Math.min(1, Math.max(-1, value));
@@ -189,6 +194,13 @@ function renderPhysicalShell(layout: ConnectorLayout, shellShape: ConnectorLayou
   return <rect className="connector-physical-shell" x={x} y={y} width={width} height={height} rx={Math.min(0.6, shellPadding)} />;
 }
 
+function getWireTechnicalIdBackgroundWidth(value: string): number {
+  return Math.max(
+    WIRE_TECHNICAL_ID_BACKGROUND_MIN_WIDTH,
+    value.length * WIRE_TECHNICAL_ID_BACKGROUND_CHAR_WIDTH + WIRE_TECHNICAL_ID_BACKGROUND_HORIZONTAL_PADDING * 2
+  );
+}
+
 function getPhysicalViewBox(layout: ConnectorLayout, shellPadding: number): string {
   const minX = 1 - shellPadding - 0.5;
   const minY = 1 - shellPadding - 0.5;
@@ -231,12 +243,30 @@ export function ConnectorPhysicalView({
           {layout.ways.map((way) => {
             const status = statusByCavity.get(way.cavityIndex);
             const isOccupied = status?.isOccupied === true;
+            const wireId = parseOccupantWireId(status?.occupantRef ?? null);
+            const wireTechnicalId = wireId === null ? null : wireById.get(wireId)?.technicalId ?? null;
             return (
               <g key={way.cavityIndex} className="connector-physical-way" transform={`translate(${way.x} ${way.y})`}>
                 {renderPhysicalWayShape(way.shape, isOccupied)}
                 <text className="connector-physical-way-label" y={0}>
                   {way.label ?? way.cavityIndex}
                 </text>
+                {wireTechnicalId !== null ? (
+                  <g className="connector-physical-wire-technical-id-badge" transform="translate(0 0.32)">
+                    <rect
+                      className="connector-physical-wire-technical-id-bg"
+                      x={-getWireTechnicalIdBackgroundWidth(wireTechnicalId) / 2}
+                      y={-WIRE_TECHNICAL_ID_BACKGROUND_HEIGHT / 2}
+                      width={getWireTechnicalIdBackgroundWidth(wireTechnicalId)}
+                      height={WIRE_TECHNICAL_ID_BACKGROUND_HEIGHT}
+                      rx={0.035}
+                      aria-hidden="true"
+                    />
+                    <text className="connector-physical-wire-technical-id" y={0} style={{ fontSize: WIRE_TECHNICAL_ID_FONT_SIZE }}>
+                      {wireTechnicalId}
+                    </text>
+                  </g>
+                ) : null}
               </g>
             );
           })}

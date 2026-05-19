@@ -71,6 +71,8 @@ describe("App integration UI - catalog layout", () => {
     expect(within(connectorAnalysisPanel).getByText("Using catalog physical layout.")).toBeInTheDocument();
     expect(within(connectorAnalysisPanel).getByText("A1")).toBeInTheDocument();
     expect(within(connectorAnalysisPanel).getByText("A2")).toBeInTheDocument();
+    expect(connectorAnalysisPanel.querySelector(".connector-physical-wire-technical-id")?.textContent).toBe("W-1");
+    expect(connectorAnalysisPanel.querySelector(".connector-physical-wire-technical-id-bg")).not.toBeNull();
     expect(connectorAnalysisPanel.querySelector("ellipse.connector-physical-shell")).not.toBeNull();
     expect(connectorAnalysisPanel.querySelector("ellipse.connector-physical-shell")?.getAttribute("rx")).toBe("3.75");
     expect(connectorAnalysisPanel.querySelectorAll(".connector-physical-keying")).toHaveLength(2);
