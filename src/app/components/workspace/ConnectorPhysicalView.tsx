@@ -6,6 +6,7 @@ import type {
   ConnectorLayoutKeyingShape,
   ConnectorLayoutKeyingSide,
   ConnectorLayoutShellShape,
+  Wire,
   WireId
 } from "../../../core/entities";
 import {
@@ -14,12 +15,14 @@ import {
   getConnectorLayoutShellShape,
   resolveConnectorLayout
 } from "../../../core/connectorLayout";
+import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
 import type { ConnectorCavityStatus } from "./AnalysisWorkspaceContent.types";
 
 interface ConnectorPhysicalViewProps {
   connector: Connector;
   catalogItem: CatalogItem | undefined;
   connectorCavityStatuses: ConnectorCavityStatus[];
+  wireById: Map<WireId, Wire>;
   formatOccupantRef: (occupantRef: string | null) => string;
   parseOccupantWireId: (occupantRef: string | null) => WireId | null;
   onGoToWire: (wireId: WireId) => void;
@@ -197,6 +200,7 @@ export function ConnectorPhysicalView({
   connector,
   catalogItem,
   connectorCavityStatuses,
+  wireById,
   formatOccupantRef,
   parseOccupantWireId,
   onGoToWire
@@ -247,10 +251,14 @@ export function ConnectorPhysicalView({
             const status = statusByCavity.get(way.cavityIndex);
             const occupantRef = status?.occupantRef ?? null;
             const wireId = parseOccupantWireId(occupantRef);
+            const wire = wireId === null ? null : wireById.get(wireId);
             return (
               <article key={way.cavityIndex} className={status?.isOccupied === true ? "cavity is-occupied" : "cavity"}>
                 <h3>C{way.cavityIndex}</h3>
-                <p>{status?.isOccupied === true ? formatOccupantRef(occupantRef) : "Free"}</p>
+                <p className="cavity-occupant-line">
+                  {status?.isOccupied === true ? renderWireColorPrefixMarker(wire) : null}
+                  <span>{status?.isOccupied === true ? formatOccupantRef(occupantRef) : "Free"}</span>
+                </p>
                 {wireId !== null ? (
                   <div className="cavity-actions">
                     <button type="button" className="validation-row-go-to-button button-with-icon" onClick={() => onGoToWire(wireId)}>

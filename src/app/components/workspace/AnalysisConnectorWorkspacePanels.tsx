@@ -445,7 +445,10 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           return (
             <article key={slot.cavityIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
               <h3>C{slot.cavityIndex}</h3>
-              <p>{slot.isOccupied ? formatOccupantRef(slot.occupantRef) : "Free"}</p>
+              <p className="cavity-occupant-line">
+                {slot.isOccupied ? renderWireColorPrefixMarker(parsedOccupantRef === null ? null : wireById.get(parsedOccupantRef.wireId)) : null}
+                <span>{slot.isOccupied ? formatOccupantRef(slot.occupantRef) : "Free"}</span>
+              </p>
               {slot.isOccupied ? (
                 <div className="cavity-actions">
                   <button
@@ -482,6 +485,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         connector={selectedConnector}
         catalogItem={selectedConnector.catalogItemId === undefined ? undefined : catalogItemById.get(selectedConnector.catalogItemId)}
         connectorCavityStatuses={connectorCavityStatuses}
+        wireById={wireById}
         formatOccupantRef={formatOccupantRef}
         parseOccupantWireId={parseOccupantWireId}
         onGoToWire={onGoToWireFromAnalysis}

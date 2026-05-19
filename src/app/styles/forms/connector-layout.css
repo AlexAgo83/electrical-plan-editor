@@ -150,6 +150,13 @@
   width: 100%;
 }
 
+.cavity-occupant-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
 .connector-layout-control-card-header h3 {
   margin: 0;
   font-size: 0.82rem;

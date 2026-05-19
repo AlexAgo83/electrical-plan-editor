@@ -1,7 +1,9 @@
 import { fireEvent, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
+import { appActions, appReducer } from "../store";
 import {
   asConnectorId,
+  asWireId,
   createUiIntegrationDenseWiresState,
   createUiIntegrationState,
   getPanelByHeading,
@@ -39,6 +41,41 @@ describe("App integration UI - analysis go-to wire actions", () => {
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/, hidden: true })).toHaveClass("is-active");
+  });
+
+  it("shows wire color markers in connector ways and physical views", () => {
+    const baseState = createUiIntegrationState();
+    const wire = baseState.wires.byId[asWireId("W1")];
+    if (wire === undefined) {
+      throw new Error("Expected wire W1 in base integration state.");
+    }
+    const withColoredWire = appReducer(
+      baseState,
+      appActions.upsertWire({
+        ...wire,
+        colorMode: "catalog",
+        primaryColorId: "RD",
+        secondaryColorId: "BU"
+      })
+    );
+
+    renderAppWithState(withColoredWire);
+
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("connector");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+
+    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    const waysCard = within(connectorAnalysisPanel).getByText("Wire W-1 / A").closest("article");
+    expect(waysCard).not.toBeNull();
+    expect((waysCard as HTMLElement).querySelectorAll('[title="Red / Blue"]')).toHaveLength(2);
+
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
+    const physicalCard = within(connectorAnalysisPanel).getByText("Wire W-1 / A").closest("article");
+    expect(physicalCard).not.toBeNull();
+    expect((physicalCard as HTMLElement).querySelectorAll('[title="Red / Blue"]')).toHaveLength(2);
   });
 
   it("opens wire analysis from splice occupancy card and keeps Go to before Release", () => {
