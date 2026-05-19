@@ -1,6 +1,18 @@
 import type { ReactElement } from "react";
-import type { CatalogItem, Connector, WireId } from "../../../core/entities";
-import { resolveConnectorLayout } from "../../../core/connectorLayout";
+import type {
+  CatalogItem,
+  Connector,
+  ConnectorLayout,
+  ConnectorLayoutKeyingSide,
+  ConnectorLayoutShellShape,
+  WireId
+} from "../../../core/entities";
+import {
+  getConnectorLayoutKeyingPosition,
+  getConnectorLayoutKeyingSide,
+  getConnectorLayoutShellShape,
+  resolveConnectorLayout
+} from "../../../core/connectorLayout";
 import type { ConnectorCavityStatus } from "./AnalysisWorkspaceContent.types";
 
 interface ConnectorPhysicalViewProps {
@@ -18,9 +30,43 @@ function renderPhysicalWayShape(shape: string, isOccupied: boolean): ReactElemen
     return <rect className={className} x={-0.3} y={-0.3} width={0.6} height={0.6} rx={0.08} />;
   }
   if (shape === "slot") {
-    return <rect className={className} x={-0.45} y={-0.22} width={0.9} height={0.44} rx={0.22} />;
+    return <rect className={className} x={-0.33} y={-0.22} width={0.66} height={0.44} rx={0.22} />;
   }
   return <circle className={className} r={0.33} />;
+}
+
+function renderPhysicalKeying(side: ConnectorLayoutKeyingSide, position: number | undefined, layout: ConnectorLayout): ReactElement | null {
+  if (side === "none") {
+    return null;
+  }
+  const centerX = layout.width / 2 + 0.5;
+  const centerY = layout.height / 2 + 0.5;
+  const keyingX = position ?? centerX;
+  const keyingY = position ?? centerY;
+  const right = layout.width + 0.5;
+  const bottom = layout.height + 0.5;
+  const pathBySide: Record<Exclude<ConnectorLayoutKeyingSide, "none">, string> = {
+    top: `M ${keyingX} 0.5 l 0.32 -0.38 h -0.64 z`,
+    right: `M ${right} ${keyingY} l 0.38 -0.32 v 0.64 z`,
+    bottom: `M ${keyingX} ${bottom} l 0.32 0.38 h -0.64 z`,
+    left: `M 0.5 ${keyingY} l -0.38 -0.32 v 0.64 z`
+  };
+  return <path className="connector-physical-keying" d={pathBySide[side]} aria-hidden="true" />;
+}
+
+function renderPhysicalShell(layout: ConnectorLayout, shellShape: ConnectorLayoutShellShape): ReactElement {
+  if (shellShape === "circle") {
+    return (
+      <ellipse
+        className="connector-physical-shell"
+        cx={layout.width / 2 + 0.5}
+        cy={layout.height / 2 + 0.5}
+        rx={layout.width / 2}
+        ry={layout.height / 2}
+      />
+    );
+  }
+  return <rect className="connector-physical-shell" x={0.5} y={0.5} width={layout.width} height={layout.height} rx={0.6} />;
 }
 
 export function ConnectorPhysicalView({
@@ -34,8 +80,9 @@ export function ConnectorPhysicalView({
   const layout = resolveConnectorLayout(catalogItem?.connectorLayout, connector.cavityCount);
   const statusByCavity = new Map(connectorCavityStatuses.map((status) => [status.cavityIndex, status] as const));
   const hasCustomLayout = catalogItem?.connectorLayout !== undefined;
-  const shellRightEdge = layout.width + 0.5;
-  const shellVerticalCenter = layout.height / 2 + 0.5;
+  const keyingSide = getConnectorLayoutKeyingSide(layout);
+  const keyingPosition = getConnectorLayoutKeyingPosition(layout);
+  const shellShape = getConnectorLayoutShellShape(layout);
 
   return (
     <div className="connector-physical-view">
@@ -46,19 +93,15 @@ export function ConnectorPhysicalView({
           role="img"
           aria-label={`${connector.technicalId} physical connector layout`}
         >
-          <rect className="connector-physical-shell" x={0.5} y={0.5} width={layout.width} height={layout.height} rx={0.6} />
-          <path
-            className="connector-physical-keying"
-            d={`M ${shellRightEdge} ${shellVerticalCenter} l 0.38 -0.32 v 0.64 z`}
-            aria-hidden="true"
-          />
+          {renderPhysicalShell(layout, shellShape)}
+          {renderPhysicalKeying(keyingSide, keyingPosition, layout)}
           {layout.ways.map((way) => {
             const status = statusByCavity.get(way.cavityIndex);
             const isOccupied = status?.isOccupied === true;
             return (
               <g key={way.cavityIndex} className="connector-physical-way" transform={`translate(${way.x} ${way.y})`}>
                 {renderPhysicalWayShape(way.shape, isOccupied)}
-                <text className="connector-physical-way-label" y={0.1}>
+                <text className="connector-physical-way-label" y={0}>
                   {way.label ?? way.cavityIndex}
                 </text>
               </g>

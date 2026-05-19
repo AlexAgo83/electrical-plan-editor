@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { createDefaultConnectorLayout, normalizeConnectorLayout, resolveConnectorLayout } from "../core/connectorLayout";
+import {
+  createDefaultConnectorLayout,
+  getConnectorLayoutDuplicatePositions,
+  getConnectorLayoutKeyingPosition,
+  getConnectorLayoutKeyingSide,
+  getConnectorLayoutShellShape,
+  moveConnectorLayoutWay,
+  moveConnectorLayoutWayIfFree,
+  normalizeConnectorLayout,
+  resolveConnectorLayout,
+  updateConnectorLayoutShellShape
+} from "../core/connectorLayout";
 
 describe("connector layout", () => {
   it("creates deterministic default layouts from connection count", () => {
@@ -9,6 +20,9 @@ describe("connector layout", () => {
     expect(layout.units).toBe("grid");
     expect(layout.width).toBe(3);
     expect(layout.height).toBe(2);
+    expect(getConnectorLayoutShellShape(layout)).toBe("square");
+    expect(getConnectorLayoutKeyingSide(layout)).toBe("right");
+    expect(getConnectorLayoutKeyingPosition(layout)).toBe(1.5);
     expect(layout.ways.map((way) => way.cavityIndex)).toEqual([1, 2, 3, 4, 5, 6]);
     expect(layout.ways[0]).toMatchObject({ cavityIndex: 1, x: 1, y: 1, shape: "round" });
     expect(layout.ways[5]).toMatchObject({ cavityIndex: 6, x: 3, y: 2, shape: "round" });
@@ -21,6 +35,8 @@ describe("connector layout", () => {
         units: "grid",
         width: 8,
         height: 7,
+        shellShape: "circle",
+        keying: { side: "bottom", position: 99 },
         ways: [
           { cavityIndex: 2, x: 4, y: 3, shape: "slot", label: "B" },
           { cavityIndex: 99, x: 50, y: 50, shape: "square" },
@@ -31,6 +47,9 @@ describe("connector layout", () => {
     );
 
     expect(layout?.ways).toHaveLength(3);
+    expect(layout !== undefined ? getConnectorLayoutShellShape(layout) : null).toBe("circle");
+    expect(layout !== undefined ? getConnectorLayoutKeyingSide(layout) : null).toBe("bottom");
+    expect(layout !== undefined ? getConnectorLayoutKeyingPosition(layout) : null).toBe(8);
     expect(layout?.ways[1]).toEqual({ cavityIndex: 2, x: 4, y: 3, shape: "slot", label: "B" });
     expect(layout?.ways[2]?.cavityIndex).toBe(3);
   });
@@ -39,5 +58,31 @@ describe("connector layout", () => {
     const layout = resolveConnectorLayout(undefined, 4);
 
     expect(layout.ways).toHaveLength(4);
+  });
+
+  it("moves ways within layout bounds and reports duplicate positions", () => {
+    const layout = createDefaultConnectorLayout(4);
+    const moved = moveConnectorLayoutWay(layout, 4, 20, -5);
+
+    expect(moved.ways[3]).toMatchObject({ cavityIndex: 4, x: 2, y: 1 });
+    expect(getConnectorLayoutDuplicatePositions(moved).map((ways) => ways.map((way) => way.cavityIndex))).toEqual([[2, 4]]);
+  });
+
+  it("keeps interactive moves from overlapping occupied positions", () => {
+    const layout = createDefaultConnectorLayout(3);
+    const blocked = moveConnectorLayoutWayIfFree(layout, 2, 1, 1);
+    const moved = moveConnectorLayoutWayIfFree(layout, 3, 2, 2);
+
+    expect(blocked.ways[1]).toMatchObject({ cavityIndex: 2, x: 2, y: 1 });
+    expect(moved.ways[2]).toMatchObject({ cavityIndex: 3, x: 2, y: 2 });
+  });
+
+  it("updates connector shell shape with malformed values falling back to square", () => {
+    const layout = createDefaultConnectorLayout(2);
+    const circle = updateConnectorLayoutShellShape(layout, "circle");
+    const square = normalizeConnectorLayout({ ...circle, shellShape: "triangle" as never }, 2);
+
+    expect(getConnectorLayoutShellShape(circle)).toBe("circle");
+    expect(square !== undefined ? getConnectorLayoutShellShape(square) : null).toBe("square");
   });
 });

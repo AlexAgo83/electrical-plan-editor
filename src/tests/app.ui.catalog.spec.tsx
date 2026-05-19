@@ -73,6 +73,21 @@ describe("App integration UI - catalog", () => {
     fireEvent.change(within(catalogFormPanel).getByLabelText("URL"), {
       target: { value: "not-a-url" }
     });
+    expect(within(catalogFormPanel).getByText("Connector material defaults").closest("fieldset")).toHaveClass(
+      "catalog-material-defaults-fieldset"
+    );
+    expect(within(catalogFormPanel).getByText("Connector physical layout").closest("fieldset")).toHaveClass(
+      "connector-layout-editor"
+    );
+    expect(within(catalogFormPanel).getByRole("heading", { name: "Global layout" })).toBeInTheDocument();
+    expect(within(catalogFormPanel).getByText("6 ways").closest(".connector-layout-control-card-header")).not.toBeNull();
+    expect(within(catalogFormPanel).getByLabelText("Border shape")).toHaveValue("square");
+    fireEvent.change(within(catalogFormPanel).getByLabelText("Border shape"), {
+      target: { value: "circle" }
+    });
+    expect(within(catalogFormPanel).getByLabelText("Border shape")).toHaveValue("circle");
+    expect(within(catalogFormPanel).getByRole("heading", { name: "Selected way" })).toBeInTheDocument();
+    expect(within(catalogFormPanel).getByText("C1").closest(".connector-layout-control-card-header")).not.toBeNull();
     expect(within(catalogFormPanel).getByText("Use an absolute http/https URL.")).toBeInTheDocument();
     expect(within(catalogFormPanel).getByRole("button", { name: "Create" })).toBeDisabled();
 
@@ -130,6 +145,7 @@ describe("App integration UI - catalog", () => {
           units: "grid",
           width: 6,
           height: 5,
+          shellShape: "circle",
           ways: [
             { cavityIndex: 1, x: 2, y: 2, shape: "square", label: "A1" },
             { cavityIndex: 2, x: 4, y: 2, shape: "slot", label: "A2" }
@@ -163,6 +179,47 @@ describe("App integration UI - catalog", () => {
     expect(within(connectorAnalysisPanel).getByText("Using catalog physical layout.")).toBeInTheDocument();
     expect(within(connectorAnalysisPanel).getByText("A1")).toBeInTheDocument();
     expect(within(connectorAnalysisPanel).getByText("A2")).toBeInTheDocument();
+    expect(connectorAnalysisPanel.querySelector("ellipse.connector-physical-shell")).not.toBeNull();
+    expect(connectorAnalysisPanel.querySelector('.connector-physical-way-shape[width="0.66"]')).not.toBeNull();
+  });
+
+  it("supports keyboard layout moves without allowing overlapping ways", () => {
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Create catalog item" }));
+    const catalogFormPanel = getPanelByHeading("Create catalog item");
+
+    fireEvent.change(within(catalogFormPanel).getByLabelText("Connection count"), {
+      target: { value: "4" }
+    });
+    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Auto layout" }));
+    expect(within(catalogFormPanel).getByLabelText("Keying")).toHaveValue("right");
+    expect(within(catalogFormPanel).getByLabelText("Keying position")).toHaveValue(1.5);
+    fireEvent.change(within(catalogFormPanel).getByLabelText("Grid width"), {
+      target: { value: "1" }
+    });
+    expect(within(catalogFormPanel).getByLabelText("Grid width")).toHaveValue(2);
+    expect(within(catalogFormPanel).getByText("Cannot reduce grid width: move C2, C4 inside the new width first.")).toBeInTheDocument();
+    fireEvent.keyDown(within(catalogFormPanel).getByRole("button", { name: "Select and move way 2" }), {
+      key: "ArrowLeft"
+    });
+    expect(within(catalogFormPanel).getByLabelText("X")).toHaveValue(2);
+    fireEvent.change(within(catalogFormPanel).getByLabelText("Keying"), {
+      target: { value: "bottom" }
+    });
+    expect(within(catalogFormPanel).getByLabelText("Keying")).toHaveValue("bottom");
+    fireEvent.change(within(catalogFormPanel).getByLabelText("Keying position"), {
+      target: { value: "2" }
+    });
+    expect(within(catalogFormPanel).getByLabelText("Keying position")).toHaveValue(2);
+    expect(within(catalogFormPanel).queryByText("Overlapping ways: C1/C2.")).not.toBeInTheDocument();
   });
 
   it("shows catalog analysis usage sections and navigates to linked connector/splice editing", () => {

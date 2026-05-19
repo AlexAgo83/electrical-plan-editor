@@ -1,8 +1,17 @@
-import type { ConnectorLayout, ConnectorLayoutWay, ConnectorLayoutWayShape } from "./entities";
+import type {
+  ConnectorLayout,
+  ConnectorLayoutKeying,
+  ConnectorLayoutKeyingSide,
+  ConnectorLayoutShellShape,
+  ConnectorLayoutWay,
+  ConnectorLayoutWayShape
+} from "./entities";
 
 const MIN_LAYOUT_SIZE = 1;
 const MAX_LAYOUT_SIZE = 48;
 const DEFAULT_WAY_SHAPE: ConnectorLayoutWayShape = "round";
+const DEFAULT_KEYING_SIDE: ConnectorLayoutKeyingSide = "right";
+const DEFAULT_SHELL_SHAPE: ConnectorLayoutShellShape = "square";
 
 function clampInteger(value: unknown, min: number, max: number): number | null {
   if (typeof value !== "number" || !Number.isFinite(value)) {
@@ -18,8 +27,25 @@ function clampInteger(value: unknown, min: number, max: number): number | null {
   return normalized;
 }
 
+function clampNumber(value: unknown, min: number, max: number): number | null {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return null;
+  }
+  if (value < min) {
+    return min;
+  }
+  if (value > max) {
+    return max;
+  }
+  return value;
+}
+
 function normalizeWayShape(value: unknown): ConnectorLayoutWayShape {
   return value === "square" || value === "slot" || value === "round" ? value : DEFAULT_WAY_SHAPE;
+}
+
+function normalizeShellShape(value: unknown): ConnectorLayoutShellShape {
+  return value === "circle" || value === "square" ? value : DEFAULT_SHELL_SHAPE;
 }
 
 function normalizeWayLabel(value: unknown): string | undefined {
@@ -28,6 +54,46 @@ function normalizeWayLabel(value: unknown): string | undefined {
   }
   const normalized = value.trim();
   return normalized.length === 0 ? undefined : normalized.slice(0, 24);
+}
+
+function normalizeKeyingSide(value: unknown): ConnectorLayoutKeyingSide {
+  return value === "none" || value === "top" || value === "right" || value === "bottom" || value === "left"
+    ? value
+    : DEFAULT_KEYING_SIDE;
+}
+
+function getDefaultKeyingPosition(side: ConnectorLayoutKeyingSide, width: number, height: number): number | undefined {
+  if (side === "none") {
+    return undefined;
+  }
+  const span = side === "top" || side === "bottom" ? width : height;
+  return (span + 1) / 2;
+}
+
+function getKeyingPositionBounds(side: ConnectorLayoutKeyingSide, width: number, height: number): { min: number; max: number } | null {
+  if (side === "none") {
+    return null;
+  }
+  return {
+    min: 1,
+    max: side === "top" || side === "bottom" ? width : height
+  };
+}
+
+function normalizeKeying(value: unknown, width: number, height: number): ConnectorLayoutKeying {
+  if (value === undefined || typeof value !== "object") {
+    return { side: DEFAULT_KEYING_SIDE, position: getDefaultKeyingPosition(DEFAULT_KEYING_SIDE, width, height) };
+  }
+  const keying = value as Partial<ConnectorLayoutKeying>;
+  const side = normalizeKeyingSide(keying.side);
+  const bounds = getKeyingPositionBounds(side, width, height);
+  if (bounds === null) {
+    return { side };
+  }
+  return {
+    side,
+    position: clampNumber(keying.position, bounds.min, bounds.max) ?? getDefaultKeyingPosition(side, width, height)
+  };
 }
 
 function buildFallbackWay(cavityIndex: number, connectionCount: number): ConnectorLayoutWay {
@@ -59,6 +125,8 @@ export function createDefaultConnectorLayout(connectionCount: number): Connector
     units: "grid",
     width: columns,
     height: rows,
+    shellShape: DEFAULT_SHELL_SHAPE,
+    keying: { side: DEFAULT_KEYING_SIDE, position: getDefaultKeyingPosition(DEFAULT_KEYING_SIDE, columns, rows) },
     ways
   };
 }
@@ -113,6 +181,8 @@ export function normalizeConnectorLayout(
     units: "grid",
     width,
     height,
+    shellShape: normalizeShellShape(value.shellShape),
+    keying: normalizeKeying(value.keying, width, height),
     ways: [...normalizedByIndex.values()].sort((left, right) => left.cavityIndex - right.cavityIndex)
   };
 }
@@ -122,4 +192,106 @@ export function resolveConnectorLayout(
   connectionCount: number
 ): ConnectorLayout {
   return normalizeConnectorLayout(value, connectionCount) ?? createDefaultConnectorLayout(connectionCount);
+}
+
+export function moveConnectorLayoutWay(
+  layout: ConnectorLayout,
+  cavityIndex: number,
+  x: number,
+  y: number
+): ConnectorLayout {
+  const nextX = clampInteger(x, 1, layout.width) ?? 1;
+  const nextY = clampInteger(y, 1, layout.height) ?? 1;
+
+  return {
+    ...layout,
+    ways: layout.ways.map((way) =>
+      way.cavityIndex === cavityIndex
+        ? { ...way, x: nextX, y: nextY }
+        : way
+    )
+  };
+}
+
+export function canMoveConnectorLayoutWay(
+  layout: ConnectorLayout,
+  cavityIndex: number,
+  x: number,
+  y: number
+): boolean {
+  const nextX = clampInteger(x, 1, layout.width) ?? 1;
+  const nextY = clampInteger(y, 1, layout.height) ?? 1;
+  return !layout.ways.some((way) => way.cavityIndex !== cavityIndex && way.x === nextX && way.y === nextY);
+}
+
+export function moveConnectorLayoutWayIfFree(
+  layout: ConnectorLayout,
+  cavityIndex: number,
+  x: number,
+  y: number
+): ConnectorLayout {
+  return canMoveConnectorLayoutWay(layout, cavityIndex, x, y)
+    ? moveConnectorLayoutWay(layout, cavityIndex, x, y)
+    : layout;
+}
+
+export function getConnectorLayoutDuplicatePositions(layout: ConnectorLayout): ConnectorLayoutWay[][] {
+  const waysByPosition = new Map<string, ConnectorLayoutWay[]>();
+
+  for (const way of layout.ways) {
+    const key = `${way.x}:${way.y}`;
+    const ways = waysByPosition.get(key) ?? [];
+    ways.push(way);
+    waysByPosition.set(key, ways);
+  }
+
+  return [...waysByPosition.values()].filter((ways) => ways.length > 1);
+}
+
+export function getConnectorLayoutKeyingSide(layout: ConnectorLayout): ConnectorLayoutKeyingSide {
+  return normalizeKeying(layout.keying, layout.width, layout.height).side;
+}
+
+export function getConnectorLayoutKeyingPosition(layout: ConnectorLayout): number | undefined {
+  return normalizeKeying(layout.keying, layout.width, layout.height).position;
+}
+
+export function getConnectorLayoutShellShape(layout: ConnectorLayout): ConnectorLayoutShellShape {
+  return normalizeShellShape(layout.shellShape);
+}
+
+export function updateConnectorLayoutShellShape(
+  layout: ConnectorLayout,
+  shellShape: ConnectorLayoutShellShape
+): ConnectorLayout {
+  return {
+    ...layout,
+    shellShape: normalizeShellShape(shellShape)
+  };
+}
+
+export function updateConnectorLayoutKeyingSide(
+  layout: ConnectorLayout,
+  side: ConnectorLayoutKeyingSide
+): ConnectorLayout {
+  const normalizedSide = normalizeKeyingSide(side);
+  return {
+    ...layout,
+    keying: normalizeKeying(
+      {
+        side: normalizedSide,
+        position: layout.keying?.side === normalizedSide ? layout.keying.position : undefined
+      },
+      layout.width,
+      layout.height
+    )
+  };
+}
+
+export function updateConnectorLayoutKeyingPosition(layout: ConnectorLayout, position: number): ConnectorLayout {
+  const side = getConnectorLayoutKeyingSide(layout);
+  return {
+    ...layout,
+    keying: normalizeKeying({ side, position }, layout.width, layout.height)
+  };
 }

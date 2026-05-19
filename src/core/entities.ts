@@ -100,6 +100,13 @@ export interface CatalogItem {
 }
 
 export type ConnectorLayoutWayShape = "round" | "square" | "slot";
+export type ConnectorLayoutKeyingSide = "none" | "top" | "right" | "bottom" | "left";
+export type ConnectorLayoutShellShape = "square" | "circle";
+
+export interface ConnectorLayoutKeying {
+  side: ConnectorLayoutKeyingSide;
+  position?: number;
+}
 
 export interface ConnectorLayoutWay {
   cavityIndex: number;
@@ -114,6 +121,8 @@ export interface ConnectorLayout {
   units: "grid";
   width: number;
   height: number;
+  shellShape?: ConnectorLayoutShellShape;
+  keying?: ConnectorLayoutKeying;
   ways: ConnectorLayoutWay[];
 }
 

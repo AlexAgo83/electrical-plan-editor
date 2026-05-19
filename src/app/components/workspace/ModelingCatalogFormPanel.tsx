@@ -155,7 +155,7 @@ export function ModelingCatalogFormPanel({
               </a>
             </div>
           ) : null}
-          <fieldset className="inline-fieldset">
+          <fieldset className="inline-fieldset catalog-material-defaults-fieldset">
             <legend>Connector material defaults</legend>
             <label className="settings-checkbox">
               <input
