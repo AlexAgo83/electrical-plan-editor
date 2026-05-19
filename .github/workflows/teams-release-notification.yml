@@ -1,8 +1,10 @@
 name: Notify Teams on release
 
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       release_tag:
@@ -13,23 +15,52 @@ on:
 jobs:
   notify-teams:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     permissions:
       contents: read
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Resolve release details
+        id: release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_EVENT: ${{ toJson(github.event.release) }}
           RELEASE_TAG_INPUT: ${{ inputs.release_tag }}
+          WORKFLOW_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
-            echo "$RELEASE_EVENT" > release.json
-          elif [ -n "$RELEASE_TAG_INPUT" ]; then
-            gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG_INPUT" > release.json
-          else
+          if [ -n "$RELEASE_TAG_INPUT" ]; then
+            release_tag="$RELEASE_TAG_INPUT"
+          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
             gh api "repos/$GITHUB_REPOSITORY/releases/latest" > release.json
+          else
+            git fetch --tags --force
+            release_tag="$(
+              git tag --points-at "$WORKFLOW_HEAD_SHA" |
+                grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' |
+                sort -V |
+                tail -n 1
+            )"
           fi
+
+          if [ -n "${release_tag:-}" ]; then
+            if ! gh api "repos/$GITHUB_REPOSITORY/releases/tags/$release_tag" > release.json; then
+              echo "No GitHub Release found for tag $release_tag; skipping Teams notification."
+              echo "should_notify=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          if [ ! -s release.json ]; then
+            echo "No semver release tag found on CI head SHA $WORKFLOW_HEAD_SHA; skipping Teams notification."
+            echo "should_notify=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "should_notify=true" >> "$GITHUB_OUTPUT"
 
           {
             echo "RELEASE_NAME=$(jq -r '.name // .tag_name' release.json)"
@@ -39,6 +70,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Send Teams notification
+        if: ${{ steps.release.outputs.should_notify == 'true' }}
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
           REPOSITORY: ${{ github.repository }}
@@ -68,7 +100,7 @@ jobs:
                         type: "TextBlock",
                         size: "Large",
                         weight: "Bolder",
-                        text: "Nouvelle release publiée"
+                        text: "Nouvelle release validée par la CI"
                       },
                       {
                         type: "FactSet",
