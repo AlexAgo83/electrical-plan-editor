@@ -1,5 +1,6 @@
 import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactElement } from "react";
-import type { ConnectorId, SpliceId, Wire } from "../../../../core/entities";
+import type { ConnectorId, ConnectorLayout, SpliceId, Wire } from "../../../../core/entities";
+import { getConnectorLayoutKeyings, getConnectorLayoutShellPadding, getConnectorLayoutShellShape } from "../../../../core/connectorLayout";
 import {
   CALLOUT_COLOR_SWATCH_GAP,
   CALLOUT_COLOR_SWATCH_RADIUS,
@@ -9,6 +10,76 @@ import {
   type CalloutTargetKey,
   type RenderedCableCallout
 } from "./calloutLayout";
+
+function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, height: number): ReactElement {
+  const shellPadding = getConnectorLayoutShellPadding(layout);
+  const shellShape = getConnectorLayoutShellShape(layout);
+  const minX = 1 - shellPadding - 0.5;
+  const minY = 1 - shellPadding - 0.5;
+  const viewWidth = layout.width - 1 + shellPadding * 2 + 1;
+  const viewHeight = layout.height - 1 + shellPadding * 2 + 1;
+  const scale = Math.min(width / viewWidth, height / viewHeight);
+  const originX = -width / 2 + (width - viewWidth * scale) / 2 - minX * scale;
+  const originY = (height - viewHeight * scale) / 2 - minY * scale;
+  const shellX = 1 - shellPadding;
+  const shellY = 1 - shellPadding;
+  const shellWidth = layout.width - 1 + shellPadding * 2;
+  const shellHeight = layout.height - 1 + shellPadding * 2;
+
+  return (
+    <g className="network-callout-connector-drawing" transform={`translate(${originX} ${originY}) scale(${scale})`}>
+      {shellShape === "circle" ? (
+        <ellipse
+          className="network-callout-connector-shell"
+          cx={layout.width / 2 + 0.5}
+          cy={layout.height / 2 + 0.5}
+          rx={shellWidth / 2}
+          ry={shellHeight / 2}
+        />
+      ) : (
+        <rect
+          className="network-callout-connector-shell"
+          x={shellX}
+          y={shellY}
+          width={shellWidth}
+          height={shellHeight}
+          rx={Math.min(0.55, shellPadding)}
+        />
+      )}
+      {getConnectorLayoutKeyings(layout).map((keying, index) => {
+        const x = keying.side === "left" ? shellX : keying.side === "right" ? shellX + shellWidth : keying.position ?? layout.width / 2 + 0.5;
+        const y = keying.side === "top" ? shellY : keying.side === "bottom" ? shellY + shellHeight : keying.position ?? layout.height / 2 + 0.5;
+        return (
+          <circle
+            key={`${keying.side}-${keying.position ?? "auto"}-${index}`}
+            className="network-callout-connector-keying"
+            cx={x}
+            cy={y}
+            r={0.13}
+            fill={keying.color}
+          />
+        );
+      })}
+      {layout.ways.map((way) => {
+        const label = way.label ?? String(way.cavityIndex);
+        return (
+          <g key={way.cavityIndex} transform={`translate(${way.x} ${way.y})`}>
+            {way.shape === "square" ? (
+              <rect className="network-callout-connector-way" x={-0.28} y={-0.28} width={0.56} height={0.56} rx={0.08} />
+            ) : way.shape === "slot" ? (
+              <rect className="network-callout-connector-way" x={-0.32} y={-0.22} width={0.64} height={0.44} rx={0.22} />
+            ) : (
+              <circle className="network-callout-connector-way" r={0.32} />
+            )}
+            <text className="network-callout-connector-way-label" y={0}>
+              {label}
+            </text>
+          </g>
+        );
+      })}
+    </g>
+  );
+}
 
 interface NetworkSummaryCalloutLeadersProps {
   renderedCableCallouts: RenderedCableCallout[];
@@ -119,6 +190,15 @@ export function NetworkSummaryCalloutsLayer({
                 height={layout.height}
               />
               <g className="network-callout-content">
+                {callout.connectorLayout !== undefined && layout.drawingTopY !== null ? (
+                  <g transform={`translate(0 ${-layout.height / 2 + layout.drawingTopY})`}>
+                    {renderConnectorLayoutDrawing(
+                      callout.connectorLayout,
+                      Math.max(0, layout.width - 8),
+                      layout.drawingHeight
+                    )}
+                  </g>
+                ) : null}
                 <text
                   className="network-callout-title"
                   x={-layout.width / 2 + 4}
@@ -139,118 +219,122 @@ export function NetworkSummaryCalloutsLayer({
                     {callout.subtitle}
                   </text>
                 ) : null}
-                {layout.columns.map((column) => {
-                  const x =
-                    column.textAnchor === "end"
-                      ? contentLeftX + column.x + column.width
-                      : contentLeftX + column.x;
-                  return (
-                    <text
-                      key={`${callout.key}-header-${column.key}`}
-                      className="network-callout-table-header-cell"
-                      x={x}
-                      y={headerY}
-                      textAnchor={column.textAnchor}
-                      dominantBaseline="hanging"
-                      data-locale-exempt={
-                        column.key === "technicalId" ||
-                        column.key === "color" ||
-                        column.key === "targetId" ||
-                        column.key === "length" ||
-                        column.key === "section"
-                          ? "true"
-                          : undefined
-                      }
-                    >
-                      {column.header}
-                    </text>
-                  );
-                })}
-                <line
-                  className="network-callout-table-divider"
-                  x1={contentLeftX}
-                  y1={rowsStartY - 0.35}
-                  x2={tableRightX}
-                  y2={rowsStartY - 0.35}
-                />
-                {layout.rows.map((row, rowIndex) => {
-                  const rowY = rowsStartY + rowIndex * layout.rowStep;
-                  const isSelectedWireRow = selectedWireId !== null && row.wireId === selectedWireId;
-                  const rowClassName = `network-callout-table-row${isSelectedWireRow ? " is-selected-wire" : ""}`;
-                  return (
-                    <g
-                      key={`${callout.key}-row-${rowIndex}`}
-                      className={rowClassName}
-                      data-wire-id={row.wireId}
-                    >
-                      {isSelectedWireRow ? (
-                        <rect
-                          className="network-callout-table-row-highlight"
-                          x={contentLeftX - 0.8}
-                          y={rowY - 0.25}
-                          width={Math.max(0, tableRightX - contentLeftX + 1.6)}
-                          height={layout.rowHeight + 0.45}
-                          rx={0.5}
-                          ry={0.5}
-                        />
-                      ) : null}
-                      {layout.columns.map((column) => {
-                        const x =
-                          column.textAnchor === "end"
-                            ? contentLeftX + column.x + column.width
-                            : contentLeftX + column.x;
-                        if (column.key === "color") {
-                          const swatchWidth = getCalloutColorSwatchesWidth(row);
-                          const dotDiameter = CALLOUT_COLOR_SWATCH_RADIUS * 2;
-                          const swatchCenterY = rowY + layout.rowHeight / 2;
-                          return (
-                            <g key={`${callout.key}-row-${rowIndex}-${column.key}`}>
-                              {row.colorPrimaryHex !== null ? (
-                                <circle
-                                  className="network-callout-color-dot"
-                                  cx={x + CALLOUT_COLOR_SWATCH_RADIUS}
-                                  cy={swatchCenterY}
-                                  r={CALLOUT_COLOR_SWATCH_RADIUS}
-                                  fill={row.colorPrimaryHex}
-                                />
-                              ) : null}
-                              {row.colorSecondaryHex !== null ? (
-                                <circle
-                                  className="network-callout-color-dot"
-                                  cx={x + CALLOUT_COLOR_SWATCH_RADIUS + dotDiameter + CALLOUT_COLOR_SWATCH_GAP}
-                                  cy={swatchCenterY}
-                                  r={CALLOUT_COLOR_SWATCH_RADIUS}
-                                  fill={row.colorSecondaryHex}
-                                />
-                              ) : null}
+                {layout.rows.length > 0 ? (
+                  <>
+                    {layout.columns.map((column) => {
+                      const x =
+                        column.textAnchor === "end"
+                          ? contentLeftX + column.x + column.width
+                          : contentLeftX + column.x;
+                      return (
+                        <text
+                          key={`${callout.key}-header-${column.key}`}
+                          className="network-callout-table-header-cell"
+                          x={x}
+                          y={headerY}
+                          textAnchor={column.textAnchor}
+                          dominantBaseline="hanging"
+                          data-locale-exempt={
+                            column.key === "technicalId" ||
+                            column.key === "color" ||
+                            column.key === "targetId" ||
+                            column.key === "length" ||
+                            column.key === "section"
+                              ? "true"
+                              : undefined
+                          }
+                        >
+                          {column.header}
+                        </text>
+                      );
+                    })}
+                    <line
+                      className="network-callout-table-divider"
+                      x1={contentLeftX}
+                      y1={rowsStartY - 0.35}
+                      x2={tableRightX}
+                      y2={rowsStartY - 0.35}
+                    />
+                    {layout.rows.map((row, rowIndex) => {
+                      const rowY = rowsStartY + rowIndex * layout.rowStep;
+                      const isSelectedWireRow = selectedWireId !== null && row.wireId === selectedWireId;
+                      const rowClassName = `network-callout-table-row${isSelectedWireRow ? " is-selected-wire" : ""}`;
+                      return (
+                        <g
+                          key={`${callout.key}-row-${rowIndex}`}
+                          className={rowClassName}
+                          data-wire-id={row.wireId}
+                        >
+                          {isSelectedWireRow ? (
+                            <rect
+                              className="network-callout-table-row-highlight"
+                              x={contentLeftX - 0.8}
+                              y={rowY - 0.25}
+                              width={Math.max(0, tableRightX - contentLeftX + 1.6)}
+                              height={layout.rowHeight + 0.45}
+                              rx={0.5}
+                              ry={0.5}
+                            />
+                          ) : null}
+                          {layout.columns.map((column) => {
+                            const x =
+                              column.textAnchor === "end"
+                                ? contentLeftX + column.x + column.width
+                                : contentLeftX + column.x;
+                            if (column.key === "color") {
+                              const swatchWidth = getCalloutColorSwatchesWidth(row);
+                              const dotDiameter = CALLOUT_COLOR_SWATCH_RADIUS * 2;
+                              const swatchCenterY = rowY + layout.rowHeight / 2;
+                              return (
+                                <g key={`${callout.key}-row-${rowIndex}-${column.key}`}>
+                                  {row.colorPrimaryHex !== null ? (
+                                    <circle
+                                      className="network-callout-color-dot"
+                                      cx={x + CALLOUT_COLOR_SWATCH_RADIUS}
+                                      cy={swatchCenterY}
+                                      r={CALLOUT_COLOR_SWATCH_RADIUS}
+                                      fill={row.colorPrimaryHex}
+                                    />
+                                  ) : null}
+                                  {row.colorSecondaryHex !== null ? (
+                                    <circle
+                                      className="network-callout-color-dot"
+                                      cx={x + CALLOUT_COLOR_SWATCH_RADIUS + dotDiameter + CALLOUT_COLOR_SWATCH_GAP}
+                                      cy={swatchCenterY}
+                                      r={CALLOUT_COLOR_SWATCH_RADIUS}
+                                      fill={row.colorSecondaryHex}
+                                    />
+                                  ) : null}
+                                  <text
+                                    className={`network-callout-table-cell${isSelectedWireRow ? " is-selected-wire" : ""}`}
+                                    x={x + swatchWidth}
+                                    y={rowY}
+                                    textAnchor={column.textAnchor}
+                                    dominantBaseline="hanging"
+                                  >
+                                    {getCalloutRowCellValue(row, column.key)}
+                                  </text>
+                                </g>
+                              );
+                            }
+                            return (
                               <text
+                                key={`${callout.key}-row-${rowIndex}-${column.key}`}
                                 className={`network-callout-table-cell${isSelectedWireRow ? " is-selected-wire" : ""}`}
-                                x={x + swatchWidth}
+                                x={x}
                                 y={rowY}
                                 textAnchor={column.textAnchor}
                                 dominantBaseline="hanging"
                               >
                                 {getCalloutRowCellValue(row, column.key)}
                               </text>
-                            </g>
-                          );
-                        }
-                        return (
-                          <text
-                            key={`${callout.key}-row-${rowIndex}-${column.key}`}
-                            className={`network-callout-table-cell${isSelectedWireRow ? " is-selected-wire" : ""}`}
-                            x={x}
-                            y={rowY}
-                            textAnchor={column.textAnchor}
-                            dominantBaseline="hanging"
-                          >
-                            {getCalloutRowCellValue(row, column.key)}
-                          </text>
-                        );
-                      })}
-                    </g>
-                  );
-                })}
+                            );
+                          })}
+                        </g>
+                      );
+                    })}
+                  </>
+                ) : null}
               </g>
             </g>
           </g>

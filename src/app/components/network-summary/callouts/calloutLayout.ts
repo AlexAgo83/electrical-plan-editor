@@ -1,5 +1,5 @@
-import type { ConnectorId, NodeId, SpliceId } from "../../../../core/entities";
-import type { CanvasCalloutTextSize, NodePosition } from "../../../types/app-controller";
+import type { ConnectorId, ConnectorLayout, NodeId, SpliceId } from "../../../../core/entities";
+import type { CanvasCalloutTextSize, NetworkCalloutContentMode, NodePosition } from "../../../types/app-controller";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 
 export type CalloutTargetKey = `connector:${string}` | `splice:${string}`;
@@ -32,6 +32,7 @@ export interface CableCalloutViewModel {
   position: NodePosition;
   title: string;
   subtitle: string;
+  connectorLayout?: ConnectorLayout;
   groups: CalloutGroup[];
   isDeemphasized: boolean;
   isSelected: boolean;
@@ -55,6 +56,7 @@ export interface RenderedCableCallout {
 export interface ComputeRenderedCableCalloutsOptions {
   orderedCableCallouts: CableCalloutViewModel[];
   calloutTextSize: CanvasCalloutTextSize;
+  calloutContentMode: NetworkCalloutContentMode;
   showCalloutWireNames: boolean;
   inverseLabelScale: number;
   hoveredCalloutKey: CalloutTargetKey | null;
@@ -68,6 +70,8 @@ export interface ComputeRenderedCableCalloutsOptions {
 const CALLOUT_MIN_WIDTH = 44;
 const CALLOUT_MAX_WIDTH = 520;
 const CALLOUT_LAYOUT_CACHE_MAX_ENTRIES = 512;
+const CALLOUT_CONNECTOR_DRAWING_WIDTH = 152;
+const CALLOUT_CONNECTOR_DRAWING_HEIGHT = 56;
 export const CALLOUT_OFFSET_SCREEN_UNITS = 92;
 export const CALLOUT_COLOR_SWATCH_RADIUS = 1.35;
 export const CALLOUT_COLOR_SWATCH_GAP = 0.95;
@@ -107,6 +111,8 @@ export interface CalloutTableColumnLayout {
 
 export interface CalloutLayoutMetrics {
   width: number;
+  drawingTopY: number | null;
+  drawingHeight: number;
   titleStartY: number;
   subtitleStartY: number | null;
   headerY: number;
@@ -244,11 +250,13 @@ function buildCalloutLayoutCacheKey(
   subtitle: string,
   rows: CalloutTableRow[],
   calloutTextSize: CanvasCalloutTextSize,
-  showCalloutWireNames: boolean
+  showCalloutWireNames: boolean,
+  hasConnectorDrawing: boolean
 ): string {
   return JSON.stringify({
     calloutTextSize,
     showCalloutWireNames,
+    hasConnectorDrawing,
     title,
     subtitle,
     rows
@@ -373,10 +381,11 @@ export function buildCalloutLayoutMetrics(
   subtitle: string,
   groups: CalloutGroup[],
   calloutTextSize: CanvasCalloutTextSize,
-  showCalloutWireNames: boolean
+  showCalloutWireNames: boolean,
+  hasConnectorDrawing = false
 ): CalloutLayoutMetrics {
   const rows = buildCalloutRows(groups);
-  const cacheKey = buildCalloutLayoutCacheKey(title, subtitle, rows, calloutTextSize, showCalloutWireNames);
+  const cacheKey = buildCalloutLayoutCacheKey(title, subtitle, rows, calloutTextSize, showCalloutWireNames, hasConnectorDrawing);
   const cached = calloutLayoutCache.get(cacheKey);
   if (cached !== undefined) {
     return cached;
@@ -447,12 +456,16 @@ export function buildCalloutLayoutMetrics(
     }
   }
 
-  const measuredContentWidth = Math.max(tableWidth, measuredTitleWidth, measuredSubtitleWidth);
+  const drawingHeight = hasConnectorDrawing ? CALLOUT_CONNECTOR_DRAWING_HEIGHT : 0;
+  const drawingWidth = hasConnectorDrawing ? CALLOUT_CONNECTOR_DRAWING_WIDTH : 0;
+  const drawingBottomGap = hasConnectorDrawing ? 2.5 : 0;
+  const measuredContentWidth = Math.max(tableWidth, measuredTitleWidth, measuredSubtitleWidth, drawingWidth);
   const measuredContentHeight =
     rows.length > 0
       ? rowLineHeight + tableHeaderBottomGap + rowLineHeight + (rows.length - 1) * rowStep
       : rowLineHeight;
-  const titleStartY = topPadding - titleTextMetrics.topOffset;
+  const drawingTopY = hasConnectorDrawing ? topPadding : null;
+  const titleStartY = topPadding + drawingHeight + drawingBottomGap - titleTextMetrics.topOffset;
   const subtitleStartY =
     subtitle.length > 0 && subtitleTextMetrics !== null
       ? titleStartY + titleLineHeight + subtitleTopGap - subtitleTextMetrics.topOffset
@@ -467,9 +480,11 @@ export function buildCalloutLayoutMetrics(
   const width = clampNumber(Math.ceil(measuredContentWidth + leftPadding + rightPadding), CALLOUT_MIN_WIDTH, CALLOUT_MAX_WIDTH);
   const headerHeight =
     titleLineHeight + (subtitleStartY === null ? 0 : subtitleTopGap + subtitleLineHeight + subtitleBottomGap);
-  const height = Math.max(0, topPadding + headerHeight + titleBottomGap + measuredContentHeight + bottomPadding);
+  const height = Math.max(0, topPadding + drawingHeight + drawingBottomGap + headerHeight + titleBottomGap + measuredContentHeight + bottomPadding);
   const layout = {
     width,
+    drawingTopY,
+    drawingHeight,
     titleStartY,
     subtitleStartY,
     headerY,
@@ -514,7 +529,14 @@ export function getCalloutFrameEdgePoint(
 
 export function computeRenderedCableCallouts(options: ComputeRenderedCableCalloutsOptions): RenderedCableCallout[] {
   return options.orderedCableCallouts.map((callout) => {
-    const layout = buildCalloutLayoutMetrics(callout.title, "", callout.groups, options.calloutTextSize, options.showCalloutWireNames);
+    const layout = buildCalloutLayoutMetrics(
+      callout.title,
+      "",
+      callout.groups,
+      options.calloutTextSize,
+      options.showCalloutWireNames,
+      callout.connectorLayout !== undefined
+    );
     const halfWidthInModelUnits = (layout.width / 2) * options.inverseLabelScale;
     const halfHeightInModelUnits = (layout.height / 2) * options.inverseLabelScale;
     const isVisibleInViewport = !(

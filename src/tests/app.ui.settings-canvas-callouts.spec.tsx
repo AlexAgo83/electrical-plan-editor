@@ -1,5 +1,6 @@
 import { fireEvent, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
+import { buildCalloutLayoutMetrics } from "../app/components/network-summary/callouts/calloutLayout";
 import {
   createUiIntegrationState,
   getPanelByHeading,
@@ -92,6 +93,35 @@ describe("App integration UI - settings canvas callouts", () => {
 
     expect(Boolean(networkGrid.compareDocumentPosition(calloutLeader) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
     expect(Boolean(calloutLeader.compareDocumentPosition(calloutLayer) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+  });
+
+  it("keeps callout drawing setup in settings while View only toggles callout visibility", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+    let networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
+
+    expect(within(networkSummaryPanel).queryByRole("button", { name: "Wires" })).toBeNull();
+    expect(within(networkSummaryPanel).queryByRole("button", { name: "Drawing" })).toBeNull();
+    expect(within(networkSummaryPanel).queryByRole("button", { name: "Both" })).toBeNull();
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-table-cell").length).toBeGreaterThan(0);
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing")).toHaveLength(0);
+
+    switchScreenDrawerAware("settings");
+    fireEvent.click(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Show connector drawing in callouts"));
+
+    switchScreenDrawerAware("modeling");
+    networkSummaryPanel = getPanelByHeading("Network summary");
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing").length).toBeGreaterThan(0);
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-table-cell").length).toBeGreaterThan(0);
+  });
+
+  it("allocates doubled space for connector drawings inside callouts", () => {
+    const drawingLayout = buildCalloutLayoutMetrics("J1", "", [], "normal", false, true);
+
+    expect(drawingLayout.drawingHeight).toBe(56);
+    expect(drawingLayout.width).toBeGreaterThanOrEqual(160);
   });
 
   it("filters callouts from connector/splice nodes selected while modeling sub-screen is Node", () => {

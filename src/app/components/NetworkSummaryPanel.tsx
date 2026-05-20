@@ -31,6 +31,7 @@ import type {
   CanvasResizeBehaviorMode,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
+  NetworkCalloutContentMode,
   NodePosition,
   SubScreenId
 } from "../types/app-controller";
@@ -77,6 +78,7 @@ export interface NetworkSummaryPanelProps {
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
   showCableCallouts: boolean;
+  calloutContentMode: NetworkCalloutContentMode;
   showSelectedCalloutOnly: boolean;
   showCalloutWireNames: boolean;
   zoomInvariantNodeShapes: boolean;
@@ -174,6 +176,7 @@ export function NetworkSummaryPanel({
   showSegmentNames,
   showSegmentLengths,
   showCableCallouts,
+  calloutContentMode,
   showSelectedCalloutOnly,
   showCalloutWireNames,
   zoomInvariantNodeShapes,
@@ -536,10 +539,12 @@ export function NetworkSummaryPanel({
     () =>
       buildCableCalloutViewModels({
         showCableCallouts,
+        calloutContentMode,
         showSelectedCalloutOnly,
         nodes,
         networkNodePositions,
         connectorMap,
+        catalogItems,
         spliceMap,
         connectorCalloutGroupsById,
         spliceCalloutGroupsById,
@@ -553,10 +558,12 @@ export function NetworkSummaryPanel({
       }),
     [
       showCableCallouts,
+      calloutContentMode,
       showSelectedCalloutOnly,
       nodes,
       networkNodePositions,
       connectorMap,
+      catalogItems,
       spliceMap,
       connectorCalloutGroupsById,
       spliceCalloutGroupsById,
@@ -741,6 +748,7 @@ export function NetworkSummaryPanel({
     return computeRenderedCableCallouts({
       orderedCableCallouts,
       calloutTextSize,
+      calloutContentMode,
       showCalloutWireNames,
       inverseLabelScale,
       hoveredCalloutKey,
@@ -753,6 +761,7 @@ export function NetworkSummaryPanel({
   }, [
     orderedCableCallouts,
     calloutTextSize,
+    calloutContentMode,
     showCalloutWireNames,
     inverseLabelScale,
     hoveredCalloutKey,

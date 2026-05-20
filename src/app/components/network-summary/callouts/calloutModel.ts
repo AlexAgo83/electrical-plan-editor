@@ -2,14 +2,16 @@ import { CABLE_COLOR_BY_ID, getWireColorCode } from "../../../../core/cableColor
 import type {
   Connector,
   ConnectorId,
+  CatalogItem,
   NetworkNode,
   NodeId,
   Splice,
   SpliceId,
   Wire
 } from "../../../../core/entities";
+import { resolveConnectorLayout } from "../../../../core/connectorLayout";
 import { resolveSplicePortMode } from "../../../../core/splicePortMode";
-import type { NodePosition } from "../../../types/app-controller";
+import type { NetworkCalloutContentMode, NodePosition } from "../../../types/app-controller";
 import {
   buildCalloutHeaderDisplay,
   type CableCalloutViewModel,
@@ -202,10 +204,12 @@ export function buildSpliceCalloutGroupsById({
 
 interface BuildCableCalloutViewModelsOptions {
   showCableCallouts: boolean;
+  calloutContentMode: NetworkCalloutContentMode;
   showSelectedCalloutOnly: boolean;
   nodes: NetworkNode[];
   networkNodePositions: Record<NodeId, NodePosition>;
   connectorMap: Map<ConnectorId, Connector>;
+  catalogItems: CatalogItem[];
   spliceMap: Map<SpliceId, Splice>;
   connectorCalloutGroupsById: Map<ConnectorId, CalloutGroup[]>;
   spliceCalloutGroupsById: Map<SpliceId, CalloutGroup[]>;
@@ -246,10 +250,12 @@ function resolveSelectedCalloutKey({
 
 export function buildCableCalloutViewModels({
   showCableCallouts,
+  calloutContentMode,
   showSelectedCalloutOnly,
   nodes,
   networkNodePositions,
   connectorMap,
+  catalogItems,
   spliceMap,
   connectorCalloutGroupsById,
   spliceCalloutGroupsById,
@@ -265,6 +271,8 @@ export function buildCableCalloutViewModels({
     return [];
   }
 
+  const shouldShowConnectorDrawing = calloutContentMode === "connectorDrawing" || calloutContentMode === "both";
+  const catalogItemById = new Map(catalogItems.map((item) => [item.id, item] as const));
   const models: CableCalloutViewModel[] = [];
   for (const node of nodes) {
     const nodePosition = networkNodePositions[node.id];
@@ -282,9 +290,10 @@ export function buildCableCalloutViewModels({
       const persistedPosition = connector.cableCalloutPosition;
       const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
       const groups = (connectorCalloutGroupsById.get(connector.id) ?? []).filter((group) => group.entries.length > 0);
-      if (groups.length === 0) {
+      if (groups.length === 0 && !shouldShowConnectorDrawing) {
         continue;
       }
+      const catalogItem = connector.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId);
       const header = buildCalloutHeaderDisplay(connector.name, connector.technicalId);
       models.push({
         key,
@@ -295,6 +304,9 @@ export function buildCableCalloutViewModels({
         position,
         title: header.title,
         subtitle: header.subtitle,
+        connectorLayout: shouldShowConnectorDrawing
+          ? resolveConnectorLayout(catalogItem?.connectorLayout, connector.cavityCount)
+          : undefined,
         groups,
         isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
         isSelected: selectedConnectorId === connector.id

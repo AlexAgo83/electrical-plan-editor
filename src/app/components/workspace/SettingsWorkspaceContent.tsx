@@ -10,6 +10,7 @@ import type {
   CanvasLabelSizeMode,
   CanvasResizeBehaviorMode,
   CanvasLabelStrokeMode,
+  NetworkCalloutContentMode,
   SortDirection,
   SortField,
   TableDensity,
@@ -84,6 +85,9 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
   canvasDefaultShowCableCallouts: boolean;
   setCanvasDefaultShowCableCallouts: (value: boolean) => void;
+  canvasDefaultCalloutContentMode: NetworkCalloutContentMode;
+  setCanvasDefaultCalloutContentMode: (value: NetworkCalloutContentMode) => void;
+  setNetworkCalloutContentMode: (value: NetworkCalloutContentMode) => void;
   canvasDefaultShowSelectedCalloutOnly: boolean;
   setCanvasDefaultShowSelectedCalloutOnly: (value: boolean) => void;
   setShowSelectedCalloutOnly: (value: boolean) => void;
@@ -198,6 +202,9 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultShowSegmentLengths,
   canvasDefaultShowCableCallouts,
   setCanvasDefaultShowCableCallouts,
+  canvasDefaultCalloutContentMode,
+  setCanvasDefaultCalloutContentMode,
+  setNetworkCalloutContentMode,
   canvasDefaultShowSelectedCalloutOnly,
   setCanvasDefaultShowSelectedCalloutOnly,
   setShowSelectedCalloutOnly,
@@ -394,6 +401,18 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasDefaultShowCableCallouts(event.target.checked)}
             />
             Show connector/splice cable callouts by default
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasDefaultCalloutContentMode === "connectorDrawing" || canvasDefaultCalloutContentMode === "both"}
+              onChange={(event) => {
+                const mode: NetworkCalloutContentMode = event.target.checked ? "both" : "wireDetails";
+                setCanvasDefaultCalloutContentMode(mode);
+                setNetworkCalloutContentMode(mode);
+              }}
+            />
+            Show connector drawing in callouts
           </label>
           <label className="settings-checkbox">
             <input

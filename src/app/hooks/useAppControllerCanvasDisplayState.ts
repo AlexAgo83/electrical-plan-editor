@@ -3,7 +3,8 @@ import type {
   CanvasCalloutTextSize,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
-  CanvasLabelStrokeMode
+  CanvasLabelStrokeMode,
+  NetworkCalloutContentMode
 } from "../types/app-controller";
 
 export function useAppControllerCanvasDisplayState() {
@@ -13,6 +14,7 @@ export function useAppControllerCanvasDisplayState() {
   const [showSegmentNames, setShowSegmentNames] = useState(false);
   const [showSegmentLengths, setShowSegmentLengths] = useState(true);
   const [showCableCallouts, setShowCableCallouts] = useState(false);
+  const [networkCalloutContentMode, setNetworkCalloutContentMode] = useState<NetworkCalloutContentMode>("wireDetails");
   const [showSelectedCalloutOnly, setShowSelectedCalloutOnly] = useState(false);
   const [networkLabelStrokeMode, setNetworkLabelStrokeMode] = useState<CanvasLabelStrokeMode>("light");
   const [networkLabelSizeMode, setNetworkLabelSizeMode] = useState<CanvasLabelSizeMode>("small");
@@ -34,6 +36,8 @@ export function useAppControllerCanvasDisplayState() {
     setShowSegmentLengths,
     showCableCallouts,
     setShowCableCallouts,
+    networkCalloutContentMode,
+    setNetworkCalloutContentMode,
     showSelectedCalloutOnly,
     setShowSelectedCalloutOnly,
     networkLabelStrokeMode,

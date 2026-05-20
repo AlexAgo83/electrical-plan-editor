@@ -8,6 +8,7 @@ import type {
   CanvasLabelSizeMode,
   CanvasResizeBehaviorMode,
   CanvasLabelStrokeMode,
+  NetworkCalloutContentMode,
   SortDirection,
   SortField,
   SortState,
@@ -43,6 +44,8 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultShowSegmentNames, setCanvasDefaultShowSegmentNames] = useState(false);
   const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(true);
   const [canvasDefaultShowCableCallouts, setCanvasDefaultShowCableCallouts] = useState(false);
+  const [canvasDefaultCalloutContentMode, setCanvasDefaultCalloutContentMode] =
+    useState<NetworkCalloutContentMode>("wireDetails");
   const [canvasDefaultShowSelectedCalloutOnly, setCanvasDefaultShowSelectedCalloutOnly] = useState(false);
   const [canvasDefaultLabelStrokeMode, setCanvasDefaultLabelStrokeMode] = useState<CanvasLabelStrokeMode>("light");
   const [canvasDefaultLabelSizeMode, setCanvasDefaultLabelSizeMode] = useState<CanvasLabelSizeMode>("small");
@@ -117,6 +120,8 @@ export function useAppControllerPreferencesState() {
     setCanvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts,
     setCanvasDefaultShowCableCallouts,
+    canvasDefaultCalloutContentMode,
+    setCanvasDefaultCalloutContentMode,
     canvasDefaultShowSelectedCalloutOnly,
     setCanvasDefaultShowSelectedCalloutOnly,
     canvasDefaultLabelStrokeMode,

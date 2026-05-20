@@ -221,6 +221,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Show segment names": "Afficher les noms de segments",
   "Show segment lengths by default": "Afficher les longueurs de segments par défaut",
   "Show connector/splice cable callouts by default": "Afficher les cartouches câble connecteur/épissure par défaut",
+  "Show connector drawing in callouts": "Afficher le dessin connecteur dans les cartouches",
   "Show only selected connector/splice callout": "Afficher uniquement le cartouche connecteur/épissure sélectionné",
   "Show wire names in callout table": "Afficher les noms de fils dans le tableau des cartouches",
   "Keep connector/splice/node shape size constant while zooming": "Conserver la taille des formes connecteur/épissure/nœud pendant le zoom",

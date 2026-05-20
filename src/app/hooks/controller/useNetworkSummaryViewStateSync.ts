@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { appActions, type NetworkSummaryViewState } from "../../../store";
 import type { NetworkId } from "../../../core/entities";
+import type { NetworkCalloutContentMode } from "../../types/app-controller";
 
 type SetNetworkSummaryViewStateAction = ReturnType<typeof appActions.setNetworkSummaryViewState>;
 
@@ -37,6 +38,7 @@ export interface UseNetworkSummaryViewStateSyncOptions {
   canvasDefaultShowSegmentNames: boolean;
   canvasDefaultShowSegmentLengths: boolean;
   canvasDefaultShowCableCallouts: boolean;
+  canvasDefaultCalloutContentMode: NetworkCalloutContentMode;
   canvasDefaultShowGrid: boolean;
   canvasDefaultSnapToGrid: boolean;
   canvasDefaultLockEntityMovement: boolean;
@@ -46,6 +48,7 @@ export interface UseNetworkSummaryViewStateSyncOptions {
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
   showCableCallouts: boolean;
+  networkCalloutContentMode: NetworkCalloutContentMode;
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
   lockEntityMovement: boolean;
@@ -56,6 +59,7 @@ export interface UseNetworkSummaryViewStateSyncOptions {
   setShowSegmentNames: (value: boolean) => void;
   setShowSegmentLengths: (value: boolean) => void;
   setShowCableCallouts: (value: boolean) => void;
+  setNetworkCalloutContentMode: (value: NetworkCalloutContentMode) => void;
   setShowNetworkGrid: (value: boolean) => void;
   setSnapNodesToGrid: (value: boolean) => void;
   setLockEntityMovement: (value: boolean) => void;
@@ -76,6 +80,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     canvasDefaultShowSegmentNames,
     canvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts,
+    canvasDefaultCalloutContentMode,
     canvasDefaultShowGrid,
     canvasDefaultSnapToGrid,
     canvasDefaultLockEntityMovement,
@@ -85,6 +90,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     showSegmentNames,
     showSegmentLengths,
     showCableCallouts,
+    networkCalloutContentMode,
     showNetworkGrid,
     snapNodesToGrid,
     lockEntityMovement,
@@ -95,6 +101,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     setShowSegmentNames,
     setShowSegmentLengths,
     setShowCableCallouts,
+    setNetworkCalloutContentMode,
     setShowNetworkGrid,
     setSnapNodesToGrid,
     setLockEntityMovement,
@@ -107,6 +114,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     showSegmentNames,
     showSegmentLengths,
     showCableCallouts,
+    networkCalloutContentMode,
     showNetworkGrid,
     snapNodesToGrid,
     lockEntityMovement
@@ -120,6 +128,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
       showSegmentNames,
       showSegmentLengths,
       showCableCallouts,
+      networkCalloutContentMode,
       showNetworkGrid,
       snapNodesToGrid,
       lockEntityMovement
@@ -131,6 +140,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     showSegmentNames,
     showSegmentLengths,
     showCableCallouts,
+    networkCalloutContentMode,
     showNetworkGrid,
     snapNodesToGrid,
     lockEntityMovement
@@ -162,6 +172,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
       activeNetworkSummaryViewState?.showSegmentLengths ?? canvasDefaultShowSegmentLengths;
     const nextShowCableCallouts =
       activeNetworkSummaryViewState?.showCableCallouts ?? canvasDefaultShowCableCallouts;
+    const nextCalloutContentMode = canvasDefaultCalloutContentMode;
     const nextShowGrid = activeNetworkSummaryViewState?.showNetworkGrid ?? canvasDefaultShowGrid;
     const nextSnapToGrid = activeNetworkSummaryViewState?.snapNodesToGrid ?? canvasDefaultSnapToGrid;
     const nextLockEntityMovement =
@@ -194,6 +205,10 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
       didScheduleRestore = true;
       setShowCableCallouts(nextShowCableCallouts);
     }
+    if (localView.networkCalloutContentMode !== nextCalloutContentMode) {
+      didScheduleRestore = true;
+      setNetworkCalloutContentMode(nextCalloutContentMode);
+    }
     if (localView.showNetworkGrid !== nextShowGrid) {
       didScheduleRestore = true;
       setShowNetworkGrid(nextShowGrid);
@@ -220,6 +235,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     canvasDefaultShowSegmentNames,
     canvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts,
+    canvasDefaultCalloutContentMode,
     canvasDefaultShowGrid,
     canvasDefaultSnapToGrid,
     canvasDefaultLockEntityMovement,
@@ -229,6 +245,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     setShowSegmentNames,
     setShowSegmentLengths,
     setShowCableCallouts,
+    setNetworkCalloutContentMode,
     setShowNetworkGrid,
     setSnapNodesToGrid,
     setLockEntityMovement

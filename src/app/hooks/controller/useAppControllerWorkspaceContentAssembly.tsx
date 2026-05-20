@@ -229,6 +229,7 @@ export function useAppControllerWorkspaceContentAssembly({
       setShowSegmentLengths: models.canvasDisplayState.setShowSegmentLengths,
       showCableCallouts: models.canvasDisplayState.showCableCallouts,
       setShowCableCallouts: models.canvasDisplayState.setShowCableCallouts,
+      networkCalloutContentMode: models.canvasDisplayState.networkCalloutContentMode,
       showSelectedCalloutOnly: models.canvasDisplayState.showSelectedCalloutOnly,
       networkLabelStrokeMode: models.canvasDisplayState.networkLabelStrokeMode,
       networkLabelSizeMode: models.canvasDisplayState.networkLabelSizeMode,

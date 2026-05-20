@@ -87,6 +87,7 @@ function isSameNetworkSummaryViewState(
     left.showSegmentNames === right.showSegmentNames &&
     left.showSegmentLengths === right.showSegmentLengths &&
     left.showCableCallouts === right.showCableCallouts &&
+    left.calloutContentMode === right.calloutContentMode &&
     left.showNetworkGrid === right.showNetworkGrid &&
     left.snapNodesToGrid === right.snapNodesToGrid &&
     left.lockEntityMovement === right.lockEntityMovement

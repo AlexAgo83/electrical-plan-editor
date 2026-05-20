@@ -57,6 +57,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   | "labelStrokeMode"
   | "labelSizeMode"
   | "calloutTextSize"
+  | "calloutContentMode"
   | "labelRotationDegrees"
   | "autoSegmentLabelRotation"
   | "toggleShowNetworkInfoPanels"
@@ -74,6 +75,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   setShowNetworkInfoPanels: BooleanStateSetter;
   setShowSegmentLengths: BooleanStateSetter;
   setShowCableCallouts: BooleanStateSetter;
+  networkCalloutContentMode: NetworkSummaryPanelProps["calloutContentMode"];
   setShowNetworkGrid: BooleanStateSetter;
   setSnapNodesToGrid: BooleanStateSetter;
   setLockEntityMovement: BooleanStateSetter;
@@ -224,6 +226,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     showSegmentNames: params.showSegmentNames,
     showSegmentLengths: params.showSegmentLengths,
     showCableCallouts: params.showCableCallouts,
+    calloutContentMode: params.networkCalloutContentMode,
     showSelectedCalloutOnly: params.showSelectedCalloutOnly,
     labelStrokeMode: params.networkLabelStrokeMode,
     labelSizeMode: params.networkLabelSizeMode,
@@ -913,6 +916,9 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setCanvasDefaultShowSegmentLengths: params.setCanvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts: params.canvasDefaultShowCableCallouts,
     setCanvasDefaultShowCableCallouts: params.setCanvasDefaultShowCableCallouts,
+    canvasDefaultCalloutContentMode: params.canvasDefaultCalloutContentMode,
+    setCanvasDefaultCalloutContentMode: params.setCanvasDefaultCalloutContentMode,
+    setNetworkCalloutContentMode: params.setNetworkCalloutContentMode,
     canvasDefaultShowSelectedCalloutOnly: params.canvasDefaultShowSelectedCalloutOnly,
     setCanvasDefaultShowSelectedCalloutOnly: params.setCanvasDefaultShowSelectedCalloutOnly,
     setShowSelectedCalloutOnly: params.setShowSelectedCalloutOnly,

@@ -65,6 +65,33 @@
   stroke-linejoin: round;
 }
 
+.network-callout-connector-shell {
+  fill: color-mix(in srgb, var(--network-node-connector-fill, #dff0ff) 88%, white);
+  stroke: var(--network-node-stroke-color, #55748d);
+  stroke-width: 0.08;
+}
+
+.network-callout-connector-keying {
+  stroke: color-mix(in srgb, var(--network-node-stroke-color, #55748d) 75%, transparent);
+  stroke-width: 0.04;
+}
+
+.network-callout-connector-way {
+  fill: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+  stroke: var(--network-node-stroke-color, #55748d);
+  stroke-width: 0.07;
+}
+
+.network-callout-connector-way-label {
+  font-size: 0.36px;
+  font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+  font-weight: 700;
+  fill: var(--network-node-label-color, #183549);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
 .network-callout-group-label {
   font-size: 4.8px;
   font-weight: 700;

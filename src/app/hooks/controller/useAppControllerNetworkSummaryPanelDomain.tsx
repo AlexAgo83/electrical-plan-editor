@@ -98,6 +98,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
     | "setShowSegmentLengths"
     | "showCableCallouts"
     | "setShowCableCallouts"
+    | "networkCalloutContentMode"
     | "showSelectedCalloutOnly"
     | "networkLabelStrokeMode"
     | "networkLabelSizeMode"
@@ -281,6 +282,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         setShowSegmentLengths: canvasDisplayState.setShowSegmentLengths,
         showCableCallouts: canvasDisplayState.showCableCallouts,
         setShowCableCallouts: canvasDisplayState.setShowCableCallouts,
+        networkCalloutContentMode: canvasDisplayState.networkCalloutContentMode,
         showSelectedCalloutOnly: canvasDisplayState.showSelectedCalloutOnly,
         networkLabelStrokeMode: canvasDisplayState.networkLabelStrokeMode,
         networkLabelSizeMode: canvasDisplayState.networkLabelSizeMode,

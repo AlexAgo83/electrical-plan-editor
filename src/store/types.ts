@@ -122,6 +122,7 @@ export interface NetworkSummaryViewState {
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
   showCableCallouts: boolean;
+  calloutContentMode?: "wireDetails" | "connectorDrawing" | "both";
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
   lockEntityMovement: boolean;
