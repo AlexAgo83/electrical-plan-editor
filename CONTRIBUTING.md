@@ -6,13 +6,13 @@ Thanks for contributing to Electrical Plan Editor.
 
 - Node.js 20+
 - npm
-- Python 3
+- Python 3 with `logics-manager` available as `python3 -m logics_manager`
 
 ## Setup
 
 ```bash
 npm ci
-git submodule update --init --recursive
+python3 -m pip install logics-manager
 cp .env.example .env
 ```
 

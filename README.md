@@ -38,8 +38,11 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 
 - Electrical modeling for connectors, splices, nodes, segments, and wires, with occupancy rules and wire-side connection / seal references.
 - Automatic route computation, forced-route locking, and live wire-length recomputation after segment edits.
-- Interactive 2D workspace with drag-and-drop nodes, zoom/pan controls, selectable segments, configurable callouts, and quick navigation between `Modeling`, `Analysis`, and `Settings`.
-- Analysis workflows with targeted `Go to` actions, including navigation from `Node analysis` to `Segment analysis` and from `Segment analysis` to `Wire analysis`.
+- Interactive 2D workspace with drag-and-drop nodes, zoom/pan controls, selectable segments, sub-network filtering, configurable callouts, and quick navigation between `Modeling`, `Analysis`, `Harness`, and `Settings`.
+- Connector and splice callouts with tabular wire details, optional wire-name columns, draggable positions, and catalog connector drawings when a physical layout was edited.
+- Catalog-backed connector physical layout editor with reusable way geometry, keying features, shell shape controls, and physical connector analysis views.
+- Harness assembly workflows for multi-network grouping, master connector references, inter-harness connector links, and functional schematic inspection.
+- Analysis workflows with targeted `Go to` actions, including navigation from `Node analysis` to `Segment analysis`, from `Segment analysis` to `Wire analysis`, and from connector analysis into physical views.
 - Network-scoped catalog management with catalog-first connector flows, optional splice linkage, seeded starter items, usage analysis, and pricing context settings.
 - Export tooling for operational handoff:
   - `SVG` / `PNG` network-plan export with optional frame and metadata cartouche
@@ -50,6 +53,7 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 - Validation center with grouped issues, issue navigation, and catalog integrity checks.
 - Built-in onboarding flow plus contextual help entry points to guide first-time usage.
 - Accessibility-oriented interactions across dialogs, tables, keyboard navigation, and assistive-technology semantics.
+- Theme, language, canvas, export, and onboarding preferences persisted per workspace.
 - PWA support with install prompt, offline shell, and update readiness in production.
 
 ## Technical Overview
@@ -79,18 +83,13 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 
 - Node.js 20+
 - npm
-- Python 3 (for Logics lint/tooling)
+- Python 3 with `logics-manager` available as `python3 -m logics_manager`
 
 ### Install
 
 ```bash
 npm ci
-```
-
-If you cloned without submodules and need Logics tooling:
-
-```bash
-git submodule update --init --recursive
+python3 -m pip install logics-manager
 ```
 
 ### Run locally
@@ -108,6 +107,7 @@ Supported variables and defaults:
 - `PREVIEW_PORT=5285`
 - `E2E_BASE_URL=http://127.0.0.1:5284`
 - `VITE_STORAGE_KEY=electrical-plan-editor.state`
+- optional local maintenance credentials: `RENDER_API_KEY`, `RENDER_SERVICE_ID`, `OPENAI_API_KEY`, `GEMINI_API_KEY`
 
 Env fallback behavior:
 
@@ -115,6 +115,7 @@ Env fallback behavior:
 - Invalid/empty `E2E_BASE_URL` falls back to `http://{APP_HOST}:{APP_PORT}`.
 - Invalid/empty `VITE_STORAGE_KEY` falls back to `electrical-plan-editor.state`.
 - Keep secrets out of `VITE_*` variables (they are client-visible at build/runtime).
+- Non-`VITE_*` variables are for local tooling only and are not bundled into the client app.
 
 ```bash
 npm run dev
