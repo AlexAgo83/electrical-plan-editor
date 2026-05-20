@@ -136,14 +136,18 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(within(networkSummaryPanel).queryByRole("button", { name: "Both" })).toBeNull();
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
     expect(networkSummaryPanel.querySelectorAll(".network-callout-table-cell").length).toBeGreaterThan(0);
-    expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing")).toHaveLength(0);
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing").length).toBeGreaterThan(0);
 
     switchScreenDrawerAware("settings");
-    fireEvent.click(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Show connector drawing in callouts"));
+    const connectorDrawingCheckbox = within(getPanelByHeading("Canvas tools preferences")).getByLabelText(
+      "Show connector drawing in callouts"
+    );
+    expect(connectorDrawingCheckbox).toBeChecked();
+    fireEvent.click(connectorDrawingCheckbox);
 
     switchScreenDrawerAware("modeling");
     networkSummaryPanel = getPanelByHeading("Network summary");
-    expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing").length).toBeGreaterThan(0);
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing")).toHaveLength(0);
     expect(networkSummaryPanel.querySelectorAll(".network-callout-table-cell").length).toBeGreaterThan(0);
   });
 
@@ -166,9 +170,6 @@ describe("App integration UI - settings canvas callouts", () => {
     ].reduce(appReducer, createUiIntegrationState());
 
     renderAppWithState(state);
-    switchScreenDrawerAware("settings");
-    fireEvent.click(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Show connector drawing in callouts"));
-
     switchScreenDrawerAware("modeling");
     const networkSummaryPanel = getPanelByHeading("Network summary");
     openViewMenu(networkSummaryPanel);

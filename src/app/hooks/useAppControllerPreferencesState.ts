@@ -45,7 +45,7 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultShowSegmentLengths, setCanvasDefaultShowSegmentLengths] = useState(true);
   const [canvasDefaultShowCableCallouts, setCanvasDefaultShowCableCallouts] = useState(false);
   const [canvasDefaultCalloutContentMode, setCanvasDefaultCalloutContentMode] =
-    useState<NetworkCalloutContentMode>("wireDetails");
+    useState<NetworkCalloutContentMode>("both");
   const [canvasDefaultShowSelectedCalloutOnly, setCanvasDefaultShowSelectedCalloutOnly] = useState(false);
   const [canvasDefaultLabelStrokeMode, setCanvasDefaultLabelStrokeMode] = useState<CanvasLabelStrokeMode>("light");
   const [canvasDefaultLabelSizeMode, setCanvasDefaultLabelSizeMode] = useState<CanvasLabelSizeMode>("small");

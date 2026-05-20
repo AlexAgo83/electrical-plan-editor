@@ -443,7 +443,7 @@ function normalizeNetworkCalloutContentMode(value: unknown): NetworkCalloutConte
   if (value === "connectorDrawing" || value === "both") {
     return "both";
   }
-  return value === "wireDetails" ? value : "wireDetails";
+  return value === "wireDetails" ? value : "both";
 }
 
 function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotationDegrees {
