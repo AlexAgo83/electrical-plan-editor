@@ -1,5 +1,11 @@
 # Changelog (`1.8.0 -> 1.8.1`)
 
+## Major Highlights
+
+- Added connector callout drawing size control with a `125%` default and `100%` minimum.
+- Improved connector drawing readability for way labels longer than two characters.
+- Kept the update scoped to persisted UI preferences, callout layout measurement, and connector layout rendering.
+
 ## Version 1.8.1 - Callout Connector Drawing Controls
 
 ### Network Summary Callouts
