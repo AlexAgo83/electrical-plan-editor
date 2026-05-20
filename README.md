@@ -180,21 +180,16 @@ src/
   tests/                  # Unit + integration tests
 
 tests/e2e/                # Playwright end-to-end smoke
-logics/                   # Product requests, backlog, tasks, architecture, skills
+logics/                   # Product requests, backlog, tasks, architecture
 ```
 
-## Logics Skills Usage Profile
+## Logics Workflow
 
-This repository ships a broad Logics skills kit under `logics/skills/`, but day-to-day usage is intentionally focused.
+This repository uses the standalone `logics-manager` CLI for Logics workflow operations.
 
-- Core (actively used in this project):
-  - `logics-doc-linter` (mandatory in local/CI validation)
-  - `logics-flow-manager` (request/backlog/task lifecycle management)
-- Secondary (used on demand):
-  - `logics-bootstrapper` (initial structure checks/bootstrapping)
-  - MCP skill references (`logics-mcp-*`) when external connector setup is required
-- Optional toolbox:
-  - all other skills remain available, but are not part of the default delivery workflow for this repo
+- `python3 -m logics_manager flow ...` creates, promotes, and finishes workflow docs.
+- `python3 -m logics_manager lint --require-status` validates Logics document structure.
+- `python3 -m logics_manager audit ...` checks workflow consistency.
 
 ## Persistence Versioning
 
@@ -240,11 +235,10 @@ npm run ci:blocking
 Equivalent expanded command list:
 
 ```bash
-python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
-python3 logics/skills/logics-flow-manager/scripts/logics_flow.py sync close-eligible-requests
+python3 -m logics_manager lint --require-status
+python3 -m logics_manager sync close-eligible-requests
 git diff --exit-code -- logics/request
-python3 logics/skills/logics-flow-manager/scripts/workflow_audit.py --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability
-python3 -m unittest discover -s logics/skills/tests -p "test_*.py" -v
+python3 -m logics_manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability
 npm run lint
 npm run typecheck
 npm run test:ci:segmentation:check

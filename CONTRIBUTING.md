@@ -40,7 +40,7 @@ Do not put secrets in `VITE_*` variables (client-visible).
 Run these commands before submitting:
 
 ```bash
-python3 logics/skills/logics-doc-linter/scripts/logics_lint.py
+python3 -m logics_manager lint --require-status
 npm run lint
 npm run typecheck
 npm run test:ci

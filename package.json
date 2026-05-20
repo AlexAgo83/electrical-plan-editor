@@ -27,7 +27,7 @@
     "test:ci:slow-top": "node scripts/quality/report-slowest-tests.mjs --top=10",
     "test:ci:ui:slow-top": "node scripts/quality/run-vitest-segmented.mjs ui-slow-top --top=10",
     "test:e2e": "node scripts/quality/run-playwright-e2e.mjs",
-    "ci:blocking": "python3 logics/skills/logics-doc-linter/scripts/logics_lint.py && python3 logics/skills/logics-flow-manager/scripts/logics_flow.py sync close-eligible-requests && git diff --exit-code -- logics/request && python3 logics/skills/logics-flow-manager/scripts/workflow_audit.py --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability && python3 -m unittest discover -s logics/skills/tests -p \"test_*.py\" -v && npm run -s lint && npm run -s typecheck && npm run -s test:ci:segmentation:check && npm run -s quality:ui-modularization && npm run -s quality:ui-timeout-governance && npm run -s quality:store-modularization && npm run -s test:ci:fast -- --coverage && npm run -s test:ci:ui && npm run -s test:e2e && npm run -s build && npm run -s quality:pwa",
+    "ci:blocking": "python3 -m logics_manager lint --require-status && python3 -m logics_manager sync close-eligible-requests && git diff --exit-code -- logics/request && python3 -m logics_manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability && npm run -s lint && npm run -s typecheck && npm run -s test:ci:segmentation:check && npm run -s quality:ui-modularization && npm run -s quality:ui-timeout-governance && npm run -s quality:store-modularization && npm run -s test:ci:fast -- --coverage && npm run -s test:ci:ui && npm run -s test:e2e && npm run -s build && npm run -s quality:pwa",
     "ci:local": "npm run -s ci:blocking"
   },
   "dependencies": {
