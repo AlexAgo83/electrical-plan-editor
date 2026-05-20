@@ -1,7 +1,11 @@
 import { fireEvent, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { buildCalloutLayoutMetrics } from "../app/components/network-summary/callouts/calloutLayout";
+import { createDefaultConnectorLayout } from "../core/connectorLayout";
+import { appActions, appReducer } from "../store";
 import {
+  asCatalogItemId,
+  asConnectorId,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
@@ -96,7 +100,33 @@ describe("App integration UI - settings canvas callouts", () => {
   });
 
   it("keeps callout drawing setup in settings while View only toggles callout visibility", () => {
-    renderAppWithState(createUiIntegrationState());
+    const catalogItemId = asCatalogItemId("CAT-CALLOUT-DRAWING");
+    const state = [
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "CAT-CALLOUT-DRAWING",
+        connectionCount: 2,
+        connectorLayout: {
+          version: 1,
+          units: "grid",
+          width: 4,
+          height: 1,
+          ways: [
+            { cavityIndex: 1, x: 1, y: 1, shape: "round" },
+            { cavityIndex: 2, x: 4, y: 1, shape: "round" }
+          ]
+        }
+      }),
+      appActions.upsertConnector({
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 2,
+        catalogItemId
+      })
+    ].reduce(appReducer, createUiIntegrationState());
+
+    renderAppWithState(state);
     switchScreenDrawerAware("modeling");
     let networkSummaryPanel = getPanelByHeading("Network summary");
     openViewMenu(networkSummaryPanel);
@@ -115,6 +145,37 @@ describe("App integration UI - settings canvas callouts", () => {
     networkSummaryPanel = getPanelByHeading("Network summary");
     expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing").length).toBeGreaterThan(0);
     expect(networkSummaryPanel.querySelectorAll(".network-callout-table-cell").length).toBeGreaterThan(0);
+  });
+
+  it("does not draw generated connector layouts inside callouts", () => {
+    const catalogItemId = asCatalogItemId("CAT-GENERATED-CALLOUT-DRAWING");
+    const state = [
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "CAT-GENERATED-CALLOUT-DRAWING",
+        connectionCount: 2,
+        connectorLayout: createDefaultConnectorLayout(2)
+      }),
+      appActions.upsertConnector({
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 2,
+        catalogItemId
+      })
+    ].reduce(appReducer, createUiIntegrationState());
+
+    renderAppWithState(state);
+    switchScreenDrawerAware("settings");
+    fireEvent.click(within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Show connector drawing in callouts"));
+
+    switchScreenDrawerAware("modeling");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
+
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-table-cell").length).toBeGreaterThan(0);
+    expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing")).toHaveLength(0);
   });
 
   it("allocates doubled space for connector drawings inside callouts", () => {

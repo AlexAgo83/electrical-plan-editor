@@ -7,11 +7,13 @@ import {
   getConnectorLayoutKeyingSide,
   getConnectorLayoutShellPadding,
   getConnectorLayoutShellShape,
+  getConnectorLayoutWayDisplayLabel,
   addConnectorLayoutKeying,
   moveConnectorLayoutWay,
   moveConnectorLayoutWayIfFree,
   normalizeConnectorLayout,
   removeConnectorLayoutKeying,
+  resolveEditedConnectorLayout,
   resolveConnectorLayout,
   updateConnectorLayoutKeyingAt,
   updateConnectorLayoutShellPadding,
@@ -34,6 +36,7 @@ describe("connector layout", () => {
     expect(layout.ways.map((way) => way.cavityIndex)).toEqual([1, 2, 3, 4, 5, 6]);
     expect(layout.ways[0]).toMatchObject({ cavityIndex: 1, x: 1, y: 1, shape: "round" });
     expect(layout.ways[5]).toMatchObject({ cavityIndex: 6, x: 3, y: 2, shape: "round" });
+    expect(getConnectorLayoutWayDisplayLabel(layout.ways[0]!)).toBe("C1");
   });
 
   it("normalizes custom layouts and fills missing ways", () => {
@@ -69,6 +72,18 @@ describe("connector layout", () => {
     const layout = resolveConnectorLayout(undefined, 4);
 
     expect(layout.ways).toHaveLength(4);
+  });
+
+  it("only resolves edited layouts for connector callout drawings", () => {
+    const generated = createDefaultConnectorLayout(4);
+    const edited = {
+      ...generated,
+      ways: generated.ways.map((way) => (way.cavityIndex === 2 ? { ...way, x: 1, y: 2 } : way))
+    };
+
+    expect(resolveEditedConnectorLayout(undefined, 4)).toBeUndefined();
+    expect(resolveEditedConnectorLayout(generated, 4)).toBeUndefined();
+    expect(resolveEditedConnectorLayout(edited, 4)?.ways[1]).toMatchObject({ cavityIndex: 2, x: 1, y: 2 });
   });
 
   it("moves ways within layout bounds and reports duplicate positions", () => {

@@ -9,7 +9,7 @@ import type {
   SpliceId,
   Wire
 } from "../../../../core/entities";
-import { resolveConnectorLayout } from "../../../../core/connectorLayout";
+import { resolveEditedConnectorLayout } from "../../../../core/connectorLayout";
 import { resolveSplicePortMode } from "../../../../core/splicePortMode";
 import type { NetworkCalloutContentMode, NodePosition } from "../../../types/app-controller";
 import {
@@ -305,7 +305,7 @@ export function buildCableCalloutViewModels({
         title: header.title,
         subtitle: header.subtitle,
         connectorLayout: shouldShowConnectorDrawing
-          ? resolveConnectorLayout(catalogItem?.connectorLayout, connector.cavityCount)
+          ? resolveEditedConnectorLayout(catalogItem?.connectorLayout, connector.cavityCount)
           : undefined,
         groups,
         isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),

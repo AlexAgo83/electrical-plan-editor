@@ -14,6 +14,7 @@ import {
   getConnectorLayoutDuplicatePositions,
   getConnectorLayoutKeyings,
   getConnectorLayoutShellShape,
+  getConnectorLayoutWayDisplayLabel,
   MIN_CONNECTOR_LAYOUT_SHELL_PADDING,
   MAX_CONNECTOR_LAYOUT_SHELL_PADDING,
   moveConnectorLayoutWayIfFree,
@@ -462,7 +463,7 @@ export function ConnectorLayoutEditor({
                 >
                   {renderWayShape(way, isSelected)}
                   <text className="connector-layout-way-label" y={0}>
-                    {way.label ?? way.cavityIndex}
+                    {getConnectorLayoutWayDisplayLabel(way)}
                   </text>
                 </g>
               );

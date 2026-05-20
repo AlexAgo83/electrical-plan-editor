@@ -13,6 +13,7 @@ import {
   getConnectorLayoutKeyings,
   getConnectorLayoutShellPadding,
   getConnectorLayoutShellShape,
+  getConnectorLayoutWayDisplayLabel,
   resolveConnectorLayout
 } from "../../../core/connectorLayout";
 import { CABLE_COLOR_BY_ID } from "../../../core/cableColors";
@@ -334,7 +335,7 @@ export function ConnectorPhysicalView({
               <g key={way.cavityIndex} className="connector-physical-way" transform={`translate(${way.x} ${way.y})`}>
                 {renderPhysicalWayShape(way.shape, isOccupied)}
                 <text className="connector-physical-way-label" y={0}>
-                  {way.label ?? way.cavityIndex}
+                  {getConnectorLayoutWayDisplayLabel(way)}
                 </text>
                 {wireTechnicalId !== null ? (
                   <g className="connector-physical-wire-technical-id-badge" transform="translate(0 0.32)">

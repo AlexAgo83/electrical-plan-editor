@@ -1,6 +1,11 @@
 import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactElement } from "react";
 import type { ConnectorId, ConnectorLayout, SpliceId, Wire } from "../../../../core/entities";
-import { getConnectorLayoutKeyings, getConnectorLayoutShellPadding, getConnectorLayoutShellShape } from "../../../../core/connectorLayout";
+import {
+  getConnectorLayoutKeyings,
+  getConnectorLayoutShellPadding,
+  getConnectorLayoutShellShape,
+  getConnectorLayoutWayDisplayLabel
+} from "../../../../core/connectorLayout";
 import {
   CALLOUT_COLOR_SWATCH_GAP,
   CALLOUT_COLOR_SWATCH_RADIUS,
@@ -61,7 +66,7 @@ function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, he
         );
       })}
       {layout.ways.map((way) => {
-        const label = way.label ?? String(way.cavityIndex);
+        const label = getConnectorLayoutWayDisplayLabel(way);
         return (
           <g key={way.cavityIndex} transform={`translate(${way.x} ${way.y})`}>
             {way.shape === "square" ? (

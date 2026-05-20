@@ -237,6 +237,73 @@ export function resolveConnectorLayout(
   return normalizeConnectorLayout(value, connectionCount) ?? createDefaultConnectorLayout(connectionCount);
 }
 
+function connectorLayoutKeyingsMatch(left: ConnectorLayoutKeying[] | undefined, right: ConnectorLayoutKeying[] | undefined): boolean {
+  const leftKeyings = left ?? [];
+  const rightKeyings = right ?? [];
+  return (
+    leftKeyings.length === rightKeyings.length &&
+    leftKeyings.every((leftKeying, index) => {
+      const rightKeying = rightKeyings[index];
+      return (
+        rightKeying !== undefined &&
+        leftKeying.side === rightKeying.side &&
+        leftKeying.shape === rightKeying.shape &&
+        leftKeying.position === rightKeying.position &&
+        leftKeying.color === rightKeying.color
+      );
+    })
+  );
+}
+
+function connectorLayoutWaysMatch(left: ConnectorLayoutWay[], right: ConnectorLayoutWay[]): boolean {
+  return (
+    left.length === right.length &&
+    left.every((leftWay, index) => {
+      const rightWay = right[index];
+      return (
+        rightWay !== undefined &&
+        leftWay.cavityIndex === rightWay.cavityIndex &&
+        leftWay.x === rightWay.x &&
+        leftWay.y === rightWay.y &&
+        leftWay.shape === rightWay.shape &&
+        leftWay.label === rightWay.label
+      );
+    })
+  );
+}
+
+export function isEditedConnectorLayout(
+  value: Partial<ConnectorLayout> | undefined,
+  connectionCount: number
+): boolean {
+  const layout = normalizeConnectorLayout(value, connectionCount);
+  if (layout === undefined) {
+    return false;
+  }
+  const generatedLayout = createDefaultConnectorLayout(connectionCount);
+  return !(
+    layout.version === generatedLayout.version &&
+    layout.units === generatedLayout.units &&
+    layout.width === generatedLayout.width &&
+    layout.height === generatedLayout.height &&
+    getConnectorLayoutShellShape(layout) === getConnectorLayoutShellShape(generatedLayout) &&
+    getConnectorLayoutShellPadding(layout) === getConnectorLayoutShellPadding(generatedLayout) &&
+    connectorLayoutKeyingsMatch(getConnectorLayoutKeyings(layout), getConnectorLayoutKeyings(generatedLayout)) &&
+    connectorLayoutWaysMatch(layout.ways, generatedLayout.ways)
+  );
+}
+
+export function resolveEditedConnectorLayout(
+  value: Partial<ConnectorLayout> | undefined,
+  connectionCount: number
+): ConnectorLayout | undefined {
+  return isEditedConnectorLayout(value, connectionCount) ? normalizeConnectorLayout(value, connectionCount) : undefined;
+}
+
+export function getConnectorLayoutWayDisplayLabel(way: Pick<ConnectorLayoutWay, "cavityIndex" | "label">): string {
+  return way.label ?? `C${way.cavityIndex}`;
+}
+
 export function moveConnectorLayoutWay(
   layout: ConnectorLayout,
   cavityIndex: number,
