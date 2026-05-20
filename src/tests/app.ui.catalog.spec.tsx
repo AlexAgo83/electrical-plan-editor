@@ -112,7 +112,10 @@ describe("App integration UI - catalog", () => {
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Remove" }));
     expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
     expect(within(catalogFormPanel).getByRole("heading", { name: "Selected way" })).toBeInTheDocument();
-    expect(within(catalogFormPanel).getByText("C1").closest(".connector-layout-control-card-header")).not.toBeNull();
+    expect(
+      catalogFormPanel.querySelector(".connector-layout-control-card-selected .connector-layout-control-card-header span")
+        ?.textContent
+    ).toBe("C1");
     expect(within(catalogFormPanel).getByText("Use an absolute http/https URL.")).toBeInTheDocument();
     expect(within(catalogFormPanel).getByRole("button", { name: "Create" })).toBeDisabled();
 
