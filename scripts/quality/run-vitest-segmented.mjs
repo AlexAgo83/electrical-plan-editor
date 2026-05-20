@@ -34,6 +34,7 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.settings-canvas-render.spec.tsx",
   "src/tests/app.ui.settings-canvas-export.spec.tsx",
   "src/tests/app.ui.settings-locale.spec.tsx",
+  "src/tests/app.ui.settings-route-preview.spec.tsx",
   "src/tests/app.ui.settings-samples.spec.tsx",
   "src/tests/app.ui.settings-wire-defaults.spec.tsx",
   "src/tests/app.ui.settings.spec.tsx",

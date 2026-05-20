@@ -52,7 +52,13 @@ describe("App integration UI - catalog CSV import/export", () => {
     const headerToolsRows = catalogPanel.querySelectorAll(".list-panel-header-tools-row");
     expect(headerToolsRows.length).toBeGreaterThan(0);
     const headerButtons = within(headerToolsRows[0] as HTMLElement).getAllByRole("button");
-    expect(headerButtons.map((button) => button.textContent?.trim() ?? "")).toEqual(["Export CSV", "Help"]);
+    expect(headerButtons.map((button) => button.textContent?.trim() ?? "")).toEqual([
+      "Items",
+      "Endpoint refs",
+      "Seal refs",
+      "Export CSV",
+      "Help"
+    ]);
     const exportButton = within(headerToolsRows[0] as HTMLElement).getByRole("button", { name: "Export CSV" });
     expect(exportButton).toHaveClass("onboarding-help-button");
     expect(exportButton.querySelector(".table-export-icon")).not.toBeNull();

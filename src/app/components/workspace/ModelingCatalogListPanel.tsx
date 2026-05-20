@@ -379,6 +379,7 @@ function WireEndpointReferenceNamesTable({
   onUpdateWireEndpointReferenceName: WireEndpointReferenceNameHandler;
 }): ReactElement {
   const [draftsByReference, setDraftsByReference] = useState<Record<string, string>>({});
+  const draftResetPayload = JSON.stringify(entries.map((entry) => [entry.reference, entry.name ?? ""]));
   const firstWireByReference = useMemo(() => {
     const wiresByReference = new Map<string, Wire>();
     for (const wire of wires) {
@@ -401,8 +402,8 @@ function WireEndpointReferenceNamesTable({
   }, [kind, wires]);
 
   useEffect(() => {
-    setDraftsByReference(Object.fromEntries(entries.map((entry) => [entry.reference, entry.name ?? ""])));
-  }, [entries]);
+    setDraftsByReference(Object.fromEntries(JSON.parse(draftResetPayload) as Array<[string, string]>));
+  }, [draftResetPayload]);
 
   if (entries.length === 0) {
     return <p className="empty-copy">No {kind} references yet.</p>;

@@ -125,9 +125,11 @@ describe("App integration UI - catalog wire endpoint reference renames", () => {
       throw new Error("Expected shared connection reference row.");
     }
 
-    fireEvent.change(within(sharedRow).getByRole("textbox"), {
+    const sharedNameInput = within(sharedRow).getByRole("textbox");
+    fireEvent.change(sharedNameInput, {
       target: { value: "Shared Connection" }
     });
+    await waitFor(() => expect(sharedNameInput).toHaveValue("Shared Connection"));
     fireEvent.click(within(sharedRow).getByRole("button", { name: "Save" }));
 
     const dialog = await screen.findByRole("dialog", { name: "Choose connection name" });

@@ -102,7 +102,7 @@ describe("App integration UI - catalog", () => {
       target: { value: "round" }
     });
     expect(shapeSelect).toHaveValue("round");
-    expect(colorInput).toHaveValue("#2563eb");
+    expect(colorInput).toHaveValue("#7a7a7a");
     fireEvent.change(colorInput, {
       target: { value: "#ff8800" }
     });

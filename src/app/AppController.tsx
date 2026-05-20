@@ -78,10 +78,8 @@ import { HISTORY_LIMIT, NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE 
 import { useAppControllerBomExportHandlers } from "./hooks/controller/useAppControllerBomExportHandlers";
 import type { AppProps, SubScreenId } from "./types/app-controller";
 import "./styles.css";
-
 export type { AppProps } from "./types/app-controller";
 const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor";
-
 export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear();
   const state = useAppSnapshot(store);
@@ -103,7 +101,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const routingGraph = selectRoutingGraphIndex(state);
   const subNetworkSummaries = selectSubNetworkSummaries(state);
   const networkEntityCountsById = useNetworkEntityCountsById(networks, state.networkStates);
-
   const {
     connectorMap,
     spliceMap,
@@ -369,9 +366,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     headerOffsetPx,
     canvasResetZoomPercentInput
   });
-
   const { describeWireEndpoint, describeWireEndpointId, describeWireEndpointCsvParts } = useWireEndpointDescriptions({ connectorMap, spliceMap });
-
   useAppControllerCanvasStateSyncEffects({
     activeNetworkId,
     nodes,
@@ -639,9 +634,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     requestConfirmation
   });
-
   const { describeNode, nodeLabelById } = useNodeDescriptions(nodes, connectorMap, spliceMap);
-
   const modelingHandlers = useAppControllerModelingHandlersAssembly({
     store,
     state,

@@ -69,8 +69,6 @@ import {
 } from "./network-summary/export/useNetworkSummaryExportActions";
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
 import { snapToGrid } from "../lib/app-utils-shared";
-
-
 export interface NetworkSummaryPanelProps {
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
@@ -164,7 +162,6 @@ export interface NetworkSummaryPanelProps {
   catalogItems: CatalogItem[];
   showFunctionalSchematic?: boolean;
 }
-
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -310,20 +307,17 @@ export function NetworkSummaryPanel({
     () => subNetworkSummaries.map((summary) => summary.tag),
     [subNetworkSummaries]
   );
-
   useEffect(() => {
     return () => {
       disposeCalloutMeasurementResources();
     };
   }, []);
-
   useEffect(() => {
     if (allSubNetworkTags.length === 0) {
       subNetworkFilterInitializedRef.current = false;
       setActiveSubNetworkTags((current) => (current.size === 0 ? current : new Set()));
       return;
     }
-
     setActiveSubNetworkTags((current) => {
       const next = new Set<string>();
       const isUninitialized = !subNetworkFilterInitializedRef.current;
@@ -351,7 +345,6 @@ export function NetworkSummaryPanel({
     ) {
       return undefined;
     }
-
     let animationFrameId = 0;
     const measureViewport = () => {
       animationFrameId = 0;
@@ -363,7 +356,6 @@ export function NetworkSummaryPanel({
       if (!Number.isFinite(rect.width) || !Number.isFinite(rect.height) || rect.width <= 0 || rect.height <= 0) {
         return;
       }
-
       onViewportSizeChange({
         width: Math.max(1, Math.round(rect.width)),
         height: Math.max(1, Math.round(rect.height))
@@ -386,7 +378,6 @@ export function NetworkSummaryPanel({
     if (resizeObserver !== null && observedElement !== null) {
       resizeObserver.observe(observedElement);
     }
-
     return () => {
       if (animationFrameId !== 0) {
         window.cancelAnimationFrame(animationFrameId);
@@ -399,7 +390,6 @@ export function NetworkSummaryPanel({
   const activeSubNetworkTagSet = activeSubNetworkTags as ReadonlySet<string>;
   const isSubNetworkFilteringActive =
     allSubNetworkTags.length > 0 && activeSubNetworkTagSet.size < allSubNetworkTags.length;
-
   const segmentSubNetworkTagById = useMemo(() => {
     const byId = new Map<SegmentId, string>();
     for (const segment of segments) {
@@ -408,7 +398,6 @@ export function NetworkSummaryPanel({
     }
     return byId;
   }, [segments]);
-
   const nodeHasActiveSubNetworkConnection = useMemo(() => {
     const byNodeId = new Map<NodeId, boolean>();
     for (const node of nodes) {
@@ -424,7 +413,6 @@ export function NetworkSummaryPanel({
     }
     return byNodeId;
   }, [nodes, segments, segmentSubNetworkTagById, activeSubNetworkTagSet]);
-
   const toggleSubNetworkTag = useCallback((tag: string) => {
     setActiveSubNetworkTags((current) => {
       const next = new Set(current);
@@ -440,7 +428,6 @@ export function NetworkSummaryPanel({
   const enableAllSubNetworkTags = useCallback(() => {
     setActiveSubNetworkTags(new Set(allSubNetworkTags));
   }, [allSubNetworkTags]);
-
   const [hoveredCalloutKey, setHoveredCalloutKey] = useState<CalloutTargetKey | null>(null);
   const [draggingCallout, setDraggingCallout] = useState<DraggingCalloutState | null>(null);
   const [draftCalloutPositions, setDraftCalloutPositions] = useState<Record<string, NodePosition>>({});
@@ -631,7 +618,6 @@ export function NetworkSummaryPanel({
       if (event.button !== 0) {
         return;
       }
-
       event.preventDefault();
       event.stopPropagation();
       clearSelectedCanvasNodes();
@@ -640,11 +626,9 @@ export function NetworkSummaryPanel({
       } else {
         onSelectSpliceFromCallout(callout.entityId as SpliceId);
       }
-
       if (lockEntityMovement) {
         return;
       }
-
       setDraggingCallout({
         key: callout.key,
         kind: callout.kind,
@@ -658,19 +642,16 @@ export function NetworkSummaryPanel({
     },
     [clearSelectedCanvasNodes, lockEntityMovement, onSelectConnectorFromCallout, onSelectSpliceFromCallout]
   );
-
   const handleCanvasMouseMoveWithCallouts = useCallback(
     (event: ReactMouseEvent<SVGSVGElement>) => {
       if (draggingCallout === null) {
         handleNetworkMouseMove(event);
         return;
       }
-
       const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
       if (coordinates === null) {
         return;
       }
-
       setDraftCalloutPositions((current) => {
         const previousPosition = current[draggingCallout.key];
         if (
