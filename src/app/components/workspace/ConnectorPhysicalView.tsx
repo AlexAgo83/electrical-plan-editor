@@ -331,11 +331,13 @@ export function ConnectorPhysicalView({
               wireTechnicalIdColorDotWidth +
               (wireTechnicalIdColorDotWidth > 0 ? WIRE_TECHNICAL_ID_COLOR_DOT_TEXT_GAP : 0) +
               wireTechnicalIdTextWidth / 2;
+            const label = getConnectorLayoutWayDisplayLabel(way);
+            const labelClassName = `connector-physical-way-label${label.length > 2 ? " is-long-label" : ""}`;
             return (
               <g key={way.cavityIndex} className="connector-physical-way" transform={`translate(${way.x} ${way.y})`}>
                 {renderPhysicalWayShape(way.shape, isOccupied)}
-                <text className="connector-physical-way-label" y={0}>
-                  {getConnectorLayoutWayDisplayLabel(way)}
+                <text className={labelClassName} y={0}>
+                  {label}
                 </text>
                 {wireTechnicalId !== null ? (
                   <g className="connector-physical-wire-technical-id-badge" transform="translate(0 0.32)">

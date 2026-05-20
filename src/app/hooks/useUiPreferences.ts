@@ -17,7 +17,7 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 8;
+const UI_PREFERENCES_SCHEMA_VERSION = 9;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 function normalizeThemeMode(value: unknown): ThemeMode {
@@ -136,6 +136,7 @@ interface UiPreferencesPayload {
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasDefaultAutoSegmentLabelRotation: boolean;
   canvasShowCalloutWireNames: boolean;
+  canvasCalloutConnectorDrawingScalePercent: number;
   canvasZoomInvariantNodeShapes: boolean;
   canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
@@ -223,6 +224,17 @@ function migrateUiPreferencesFromV7(candidate: Record<string, unknown>): Record<
   };
 }
 
+function migrateUiPreferencesFromV8(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    canvasCalloutConnectorDrawingScalePercent:
+      typeof candidate.canvasCalloutConnectorDrawingScalePercent === "number"
+        ? candidate.canvasCalloutConnectorDrawingScalePercent
+        : 125,
+    schemaVersion: 9
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -273,6 +285,11 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
     if (version === 7) {
       migrated = migrateUiPreferencesFromV7(migrated);
       version = 8;
+      continue;
+    }
+    if (version === 8) {
+      migrated = migrateUiPreferencesFromV8(migrated);
+      version = 9;
       continue;
     }
     return null;
@@ -330,6 +347,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasDefaultAutoSegmentLabelRotation: boolean;
   canvasShowCalloutWireNames: boolean;
+  canvasCalloutConnectorDrawingScalePercent: number;
   canvasZoomInvariantNodeShapes: boolean;
   canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
@@ -385,6 +403,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
+  setCanvasCalloutConnectorDrawingScalePercent: (value: number) => void;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
   setCanvasNodeShapeSizePercent: (value: number) => void;
   setCanvasExportFormat: (value: CanvasExportFormat) => void;
@@ -468,6 +487,14 @@ function normalizeCanvasNodeShapeSizePercent(value: unknown): number {
   return clamp(Math.round(Number(parsed)), 50, 125);
 }
 
+function normalizeCanvasCalloutConnectorDrawingScalePercent(value: unknown): number {
+  const parsed = typeof value === "string" ? Number(value) : value;
+  if (!Number.isFinite(parsed)) {
+    return 125;
+  }
+  return clamp(Math.round(Number(parsed)), 100, 200);
+}
+
 function normalizeWorkspacePanelsLayoutMode(value: unknown): WorkspacePanelsLayoutPreference {
   return value === "multiColumn" ? "multiColumn" : "singleColumn";
 }
@@ -533,6 +560,7 @@ export function useUiPreferences({
   canvasDefaultLabelRotationDegrees,
   canvasDefaultAutoSegmentLabelRotation,
   canvasShowCalloutWireNames,
+  canvasCalloutConnectorDrawingScalePercent,
   canvasZoomInvariantNodeShapes,
   canvasNodeShapeSizePercent,
   canvasExportFormat,
@@ -588,6 +616,7 @@ export function useUiPreferences({
   setCanvasDefaultLabelRotationDegrees,
   setCanvasDefaultAutoSegmentLabelRotation,
   setCanvasShowCalloutWireNames,
+  setCanvasCalloutConnectorDrawingScalePercent,
   setCanvasZoomInvariantNodeShapes,
   setCanvasNodeShapeSizePercent,
   setCanvasExportFormat,
@@ -723,6 +752,9 @@ export function useUiPreferences({
       setCanvasShowCalloutWireNames(
         typeof preferences.canvasShowCalloutWireNames === "boolean" ? preferences.canvasShowCalloutWireNames : false
       );
+      setCanvasCalloutConnectorDrawingScalePercent(
+        normalizeCanvasCalloutConnectorDrawingScalePercent(preferences.canvasCalloutConnectorDrawingScalePercent)
+      );
       setCanvasZoomInvariantNodeShapes(
         typeof preferences.canvasZoomInvariantNodeShapes === "boolean" ? preferences.canvasZoomInvariantNodeShapes : true
       );
@@ -793,6 +825,7 @@ export function useUiPreferences({
     setCanvasDefaultLabelRotationDegrees,
     setCanvasDefaultAutoSegmentLabelRotation,
     setCanvasShowCalloutWireNames,
+    setCanvasCalloutConnectorDrawingScalePercent,
     setCanvasZoomInvariantNodeShapes,
     setCanvasNodeShapeSizePercent,
     setCanvasExportFormat,
@@ -889,6 +922,7 @@ export function useUiPreferences({
       canvasDefaultLabelRotationDegrees,
       canvasDefaultAutoSegmentLabelRotation,
       canvasShowCalloutWireNames,
+      canvasCalloutConnectorDrawingScalePercent,
       canvasZoomInvariantNodeShapes,
       canvasNodeShapeSizePercent,
       canvasExportFormat,
@@ -927,6 +961,7 @@ export function useUiPreferences({
     canvasDefaultLabelRotationDegrees,
     canvasDefaultAutoSegmentLabelRotation,
     canvasShowCalloutWireNames,
+    canvasCalloutConnectorDrawingScalePercent,
     canvasZoomInvariantNodeShapes,
     canvasNodeShapeSizePercent,
     canvasExportFormat,

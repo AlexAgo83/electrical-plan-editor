@@ -143,6 +143,7 @@ describe("App integration UI - settings canvas callouts", () => {
       "Show connector drawing in callouts"
     );
     expect(connectorDrawingCheckbox).toBeChecked();
+    expect(within(getPanelByHeading("Canvas tools preferences")).getByRole("slider", { name: /Connector drawing size/ })).toHaveValue("125");
     fireEvent.click(connectorDrawingCheckbox);
 
     switchScreenDrawerAware("modeling");
@@ -181,9 +182,12 @@ describe("App integration UI - settings canvas callouts", () => {
 
   it("allocates doubled space for connector drawings inside callouts", () => {
     const drawingLayout = buildCalloutLayoutMetrics("J1", "", [], "normal", false, true);
+    const doubledDrawingLayout = buildCalloutLayoutMetrics("J1", "", [], "normal", false, true, 2);
 
     expect(drawingLayout.drawingHeight).toBe(56);
     expect(drawingLayout.width).toBeGreaterThanOrEqual(160);
+    expect(doubledDrawingLayout.drawingHeight).toBe(112);
+    expect(doubledDrawingLayout.width).toBeGreaterThanOrEqual(312);
   });
 
   it("filters callouts from connector/splice nodes selected while modeling sub-screen is Node", () => {

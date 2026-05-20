@@ -39,7 +39,7 @@ describe("App integration UI - catalog layout", () => {
             { side: "bottom", shape: "diamond", position: 4 }
           ],
           ways: [
-            { cavityIndex: 1, x: 2, y: 2, shape: "square", label: "A1" },
+            { cavityIndex: 1, x: 2, y: 2, shape: "square", label: "A10" },
             { cavityIndex: 2, x: 4, y: 2, shape: "slot", label: "A2" }
           ]
         }
@@ -69,8 +69,10 @@ describe("App integration UI - catalog layout", () => {
 
     expect(within(connectorAnalysisPanel).getByLabelText("Connector physical view")).toBeInTheDocument();
     expect(within(connectorAnalysisPanel).getByText("Using catalog physical layout.")).toBeInTheDocument();
-    expect(within(connectorAnalysisPanel).getByText("A1")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("A10")).toBeInTheDocument();
     expect(within(connectorAnalysisPanel).getByText("A2")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("A10")).toHaveClass("is-long-label");
+    expect(within(connectorAnalysisPanel).getByText("A2")).not.toHaveClass("is-long-label");
     expect(connectorAnalysisPanel.querySelector(".connector-physical-wire-technical-id")?.textContent).toBe("W-1");
     expect(connectorAnalysisPanel.querySelector(".connector-physical-wire-technical-id-bg")).not.toBeNull();
     expect(connectorAnalysisPanel.querySelector("ellipse.connector-physical-shell")).not.toBeNull();

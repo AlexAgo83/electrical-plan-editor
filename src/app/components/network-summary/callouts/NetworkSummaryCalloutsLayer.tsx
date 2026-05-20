@@ -67,6 +67,7 @@ function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, he
       })}
       {layout.ways.map((way) => {
         const label = getConnectorLayoutWayDisplayLabel(way);
+        const labelClassName = `network-callout-connector-way-label${label.length > 2 ? " is-long-label" : ""}`;
         return (
           <g key={way.cavityIndex} transform={`translate(${way.x} ${way.y})`}>
             {way.shape === "square" ? (
@@ -76,7 +77,7 @@ function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, he
             ) : (
               <circle className="network-callout-connector-way" r={0.32} />
             )}
-            <text className="network-callout-connector-way-label" y={0}>
+            <text className={labelClassName} y={0}>
               {label}
             </text>
           </g>

@@ -95,6 +95,11 @@
   alignment-baseline: central;
 }
 
+.connector-layout-way-label.is-long-label,
+.connector-physical-way-label.is-long-label {
+  font-size: 0.23px;
+}
+
 .connector-physical-wire-technical-id {
   fill: currentColor;
   font-weight: 700;

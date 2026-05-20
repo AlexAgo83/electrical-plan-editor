@@ -92,6 +92,10 @@
   pointer-events: none;
 }
 
+.network-callout-connector-way-label.is-long-label {
+  font-size: 0.26px;
+}
+
 .network-callout-group-label {
   font-size: 4.8px;
   font-weight: 700;

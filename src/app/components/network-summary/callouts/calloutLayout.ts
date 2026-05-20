@@ -56,6 +56,7 @@ export interface RenderedCableCallout {
 export interface ComputeRenderedCableCalloutsOptions {
   orderedCableCallouts: CableCalloutViewModel[];
   calloutTextSize: CanvasCalloutTextSize;
+  connectorDrawingScale: number;
   calloutContentMode: NetworkCalloutContentMode;
   showCalloutWireNames: boolean;
   inverseLabelScale: number;
@@ -251,12 +252,14 @@ function buildCalloutLayoutCacheKey(
   rows: CalloutTableRow[],
   calloutTextSize: CanvasCalloutTextSize,
   showCalloutWireNames: boolean,
-  hasConnectorDrawing: boolean
+  hasConnectorDrawing: boolean,
+  connectorDrawingScale: number
 ): string {
   return JSON.stringify({
     calloutTextSize,
     showCalloutWireNames,
     hasConnectorDrawing,
+    connectorDrawingScale,
     title,
     subtitle,
     rows
@@ -382,10 +385,20 @@ export function buildCalloutLayoutMetrics(
   groups: CalloutGroup[],
   calloutTextSize: CanvasCalloutTextSize,
   showCalloutWireNames: boolean,
-  hasConnectorDrawing = false
+  hasConnectorDrawing = false,
+  connectorDrawingScale = 1
 ): CalloutLayoutMetrics {
   const rows = buildCalloutRows(groups);
-  const cacheKey = buildCalloutLayoutCacheKey(title, subtitle, rows, calloutTextSize, showCalloutWireNames, hasConnectorDrawing);
+  const normalizedConnectorDrawingScale = clampNumber(connectorDrawingScale, 1, 2);
+  const cacheKey = buildCalloutLayoutCacheKey(
+    title,
+    subtitle,
+    rows,
+    calloutTextSize,
+    showCalloutWireNames,
+    hasConnectorDrawing,
+    normalizedConnectorDrawingScale
+  );
   const cached = calloutLayoutCache.get(cacheKey);
   if (cached !== undefined) {
     return cached;
@@ -456,8 +469,8 @@ export function buildCalloutLayoutMetrics(
     }
   }
 
-  const drawingHeight = hasConnectorDrawing ? CALLOUT_CONNECTOR_DRAWING_HEIGHT : 0;
-  const drawingWidth = hasConnectorDrawing ? CALLOUT_CONNECTOR_DRAWING_WIDTH : 0;
+  const drawingHeight = hasConnectorDrawing ? CALLOUT_CONNECTOR_DRAWING_HEIGHT * normalizedConnectorDrawingScale : 0;
+  const drawingWidth = hasConnectorDrawing ? CALLOUT_CONNECTOR_DRAWING_WIDTH * normalizedConnectorDrawingScale : 0;
   const drawingBottomGap = hasConnectorDrawing ? 2.5 : 0;
   const measuredContentWidth = Math.max(tableWidth, measuredTitleWidth, measuredSubtitleWidth, drawingWidth);
   const measuredContentHeight =
@@ -535,7 +548,8 @@ export function computeRenderedCableCallouts(options: ComputeRenderedCableCallou
       callout.groups,
       options.calloutTextSize,
       options.showCalloutWireNames,
-      callout.connectorLayout !== undefined
+      callout.connectorLayout !== undefined,
+      options.connectorDrawingScale
     );
     const halfWidthInModelUnits = (layout.width / 2) * options.inverseLabelScale;
     const halfHeightInModelUnits = (layout.height / 2) * options.inverseLabelScale;

@@ -79,6 +79,7 @@ export interface NetworkSummaryPanelProps {
   calloutContentMode: NetworkCalloutContentMode;
   showSelectedCalloutOnly: boolean;
   showCalloutWireNames: boolean;
+  connectorDrawingScalePercent: number;
   zoomInvariantNodeShapes: boolean;
   nodeShapeSizePercent: number;
   resizeBehaviorMode: CanvasResizeBehaviorMode;
@@ -176,6 +177,7 @@ export function NetworkSummaryPanel({
   calloutContentMode,
   showSelectedCalloutOnly,
   showCalloutWireNames,
+  connectorDrawingScalePercent,
   zoomInvariantNodeShapes,
   nodeShapeSizePercent,
   resizeBehaviorMode,
@@ -729,6 +731,7 @@ export function NetworkSummaryPanel({
     return computeRenderedCableCallouts({
       orderedCableCallouts,
       calloutTextSize,
+      connectorDrawingScale: clampNumber(connectorDrawingScalePercent / 100, 1, 2),
       calloutContentMode,
       showCalloutWireNames,
       inverseLabelScale,
@@ -742,6 +745,7 @@ export function NetworkSummaryPanel({
   }, [
     orderedCableCallouts,
     calloutTextSize,
+    connectorDrawingScalePercent,
     calloutContentMode,
     showCalloutWireNames,
     inverseLabelScale,

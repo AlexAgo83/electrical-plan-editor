@@ -103,6 +103,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   canvasShowCalloutWireNames: boolean;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
+  canvasCalloutConnectorDrawingScalePercent: number;
+  setCanvasCalloutConnectorDrawingScalePercent: (value: number) => void;
   canvasZoomInvariantNodeShapes: boolean;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
   canvasNodeShapeSizePercent: number;
@@ -220,6 +222,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultAutoSegmentLabelRotation,
   canvasShowCalloutWireNames,
   setCanvasShowCalloutWireNames,
+  canvasCalloutConnectorDrawingScalePercent,
+  setCanvasCalloutConnectorDrawingScalePercent,
   canvasZoomInvariantNodeShapes,
   setCanvasZoomInvariantNodeShapes,
   canvasNodeShapeSizePercent,
@@ -413,6 +417,28 @@ export function SettingsWorkspaceContent({
               }}
             />
             Show connector drawing in callouts
+          </label>
+          <label className="settings-field settings-range-field">
+            Connector drawing size (%)
+            <div className="settings-range-control">
+              <input
+                className="settings-range-input"
+                type="range"
+                min={100}
+                max={200}
+                step={5}
+                value={canvasCalloutConnectorDrawingScalePercent}
+                disabled={canvasDefaultCalloutContentMode !== "connectorDrawing" && canvasDefaultCalloutContentMode !== "both"}
+                onChange={(event) => {
+                  const parsed = Number(event.target.value);
+                  if (!Number.isFinite(parsed)) {
+                    return;
+                  }
+                  setCanvasCalloutConnectorDrawingScalePercent(Math.min(200, Math.max(100, Math.round(parsed))));
+                }}
+              />
+              <span className="settings-range-value">{canvasCalloutConnectorDrawingScalePercent}%</span>
+            </div>
           </label>
           <label className="settings-checkbox">
             <input

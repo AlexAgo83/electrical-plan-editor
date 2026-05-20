@@ -449,6 +449,8 @@ export function ConnectorLayoutEditor({
             ))}
             {layout.ways.map((way) => {
               const isSelected = selectedWay?.cavityIndex === way.cavityIndex;
+              const label = getConnectorLayoutWayDisplayLabel(way);
+              const labelClassName = `connector-layout-way-label${label.length > 2 ? " is-long-label" : ""}`;
               return (
                 <g
                   key={way.cavityIndex}
@@ -462,8 +464,8 @@ export function ConnectorLayoutEditor({
                   onKeyDown={(event) => handleWayKeyDown(event, way)}
                 >
                   {renderWayShape(way, isSelected)}
-                  <text className="connector-layout-way-label" y={0}>
-                    {getConnectorLayoutWayDisplayLabel(way)}
+                  <text className={labelClassName} y={0}>
+                    {label}
                   </text>
                 </g>
               );
