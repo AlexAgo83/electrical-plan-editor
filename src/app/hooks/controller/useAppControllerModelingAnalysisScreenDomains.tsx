@@ -371,6 +371,12 @@ export function useAppControllerModelingAnalysisScreenDomains({
     (connectorId) => {
       markSelectionPanelsFromTable?.();
       setActiveSubScreen("connector");
+      const connector = store.getState().connectors.byId[connectorId];
+      if (connector !== undefined) {
+        modelingHandlers.connector.startConnectorEdit(connector);
+        return;
+      }
+
       dispatchAction(
         appActions.select({
           kind: "connector",
@@ -378,12 +384,18 @@ export function useAppControllerModelingAnalysisScreenDomains({
         })
       );
     },
-    [dispatchAction, markSelectionPanelsFromTable, setActiveSubScreen]
+    [dispatchAction, markSelectionPanelsFromTable, modelingHandlers.connector, setActiveSubScreen, store]
   );
   const handleSelectSpliceReference: ModelingSliceParams["onSelectSpliceReference"] = useCallback(
     (spliceId) => {
       markSelectionPanelsFromTable?.();
       setActiveSubScreen("splice");
+      const splice = store.getState().splices.byId[spliceId];
+      if (splice !== undefined) {
+        modelingHandlers.splice.startSpliceEdit(splice);
+        return;
+      }
+
       dispatchAction(
         appActions.select({
           kind: "splice",
@@ -391,7 +403,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
         })
       );
     },
-    [dispatchAction, markSelectionPanelsFromTable, setActiveSubScreen]
+    [dispatchAction, markSelectionPanelsFromTable, modelingHandlers.splice, setActiveSubScreen, store]
   );
 
   const modelingSlice = includeModelingContent
