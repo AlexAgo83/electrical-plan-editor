@@ -9,7 +9,7 @@ type StoreState = ReturnType<AppStore["getState"]>;
 interface UseStoreHistoryParams {
   store: AppStore;
   historyLimit: number;
-  onUndoRedoApplied?: () => void;
+  onUndoRedoApplied?: (event: { direction: "undo" | "redo"; entry: UndoHistoryEntry }) => void;
   onReplaceStateApplied?: () => void;
   transformUndoRedoTargetState?: (targetState: StoreState, currentState: StoreState) => StoreState;
 }
@@ -159,7 +159,7 @@ export function useStoreHistory({
       const next = [...previous, previousHistoryEntry];
       return next.length > historyLimit ? next.slice(next.length - historyLimit) : next;
     });
-    onUndoRedoApplied?.();
+    onUndoRedoApplied?.({ direction: "undo", entry: previousHistoryEntry });
     setSaveStatus("unsaved");
     queueSavedStatus();
   }, [historyLimit, onUndoRedoApplied, queueSavedStatus, store, transformUndoRedoTargetState, undoHistoryEntries, undoStack]);
@@ -198,7 +198,7 @@ export function useStoreHistory({
       const next = [...previous, redoHistoryEntry];
       return next.length > historyLimit ? next.slice(next.length - historyLimit) : next;
     });
-    onUndoRedoApplied?.();
+    onUndoRedoApplied?.({ direction: "redo", entry: redoHistoryEntry });
     setSaveStatus("unsaved");
     queueSavedStatus();
   }, [historyLimit, onUndoRedoApplied, queueSavedStatus, redoHistoryEntries, redoStack, store, transformUndoRedoTargetState]);

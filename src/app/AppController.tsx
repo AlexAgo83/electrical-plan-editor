@@ -490,8 +490,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     historyLimit: HISTORY_LIMIT,
     transformUndoRedoTargetState: (targetState, currentState) =>
       restoreViewportOnUndo ? targetState : withPreservedNetworkSummaryViewStates(targetState, currentState),
-    onUndoRedoApplied: () => {
+    onUndoRedoApplied: ({ direction, entry }) => {
       setPendingNewNodePosition(null);
+      notifyToast(direction === "undo" ? "Undo applied" : "Redo applied", {
+        message: entry.label,
+        variant: "info"
+      });
     },
     onReplaceStateApplied: () => {
       setPendingNewNodePosition(null);

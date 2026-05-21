@@ -46,9 +46,12 @@ describe("App integration UI - global undo/redo", () => {
 
     fireEvent.keyDown(window, { key: "z", ctrlKey: true });
     expect(within(connectorsPanel).queryByText("Undo keyboard A")).not.toBeInTheDocument();
+    expect(screen.getByText("Undo applied")).toBeInTheDocument();
+    expect(screen.getByText("Connector 'C-UNDO-A' created")).toBeInTheDocument();
 
     fireEvent.keyDown(window, { key: "y", ctrlKey: true });
     expect(within(connectorsPanel).getByText("Undo keyboard A")).toBeInTheDocument();
+    expect(screen.getByText("Redo applied")).toBeInTheDocument();
 
     const filterInput = within(connectorsPanel).getByLabelText("Connector filter field query");
     fireEvent.focus(filterInput);
