@@ -24,6 +24,7 @@ type WorkspaceSidebarPanelProps = Parameters<typeof WorkspaceSidebarPanel>[0];
 type OperationsHealthPanelProps = Parameters<typeof OperationsHealthPanel>[0];
 
 const QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX = 18;
+const QUICK_ENTITY_NAV_DOCK_DELAY_PX = 16;
 
 interface AppShellLayoutProps {
   appShellClassName: string;
@@ -222,7 +223,10 @@ export function AppShellLayout({
       const headerRect = headerElement.getBoundingClientRect();
       const headerHeight = Math.max(0, headerRect.height);
       if (quickEntityNavigationDockThresholdRef.current === null || !isQuickEntityNavigationDockedRef.current) {
-        quickEntityNavigationDockThresholdRef.current = Math.max(0, navigationRect.top + window.scrollY - headerHeight);
+        quickEntityNavigationDockThresholdRef.current = Math.max(
+          0,
+          navigationRect.top + window.scrollY - headerHeight + QUICK_ENTITY_NAV_DOCK_DELAY_PX
+        );
       }
       const dockThreshold = quickEntityNavigationDockThresholdRef.current;
       const nextIsDocked = isQuickEntityNavigationDockedRef.current
