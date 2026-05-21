@@ -198,6 +198,7 @@ export function useAppControllerWorkspaceContentAssembly({
     isAnalysisScreen: state.isAnalysisScreen,
     isModelingAnalysisFocused: state.isModelingAnalysisFocused,
     activeSubScreen: state.activeSubScreen,
+    setActiveSubScreen: handlers.setActiveSubScreen,
     entityCountBySubScreen: entities.entityCountBySubScreen,
     onQuickEntityNavigation: handlers.setActiveSubScreen,
     activeNetwork: state.activeNetwork,

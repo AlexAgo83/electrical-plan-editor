@@ -62,6 +62,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   isAnalysisScreen: boolean;
   isModelingAnalysisFocused: boolean;
   activeSubScreen: SubScreenId;
+  setActiveSubScreen: (subScreen: SubScreenId) => void;
   entityCountBySubScreen: Record<SubScreenId, number>;
   onQuickEntityNavigation: (subScreen: SubScreenId) => void;
   activeNetwork: Network | null;
@@ -169,6 +170,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   isAnalysisScreen,
   isModelingAnalysisFocused,
   activeSubScreen,
+  setActiveSubScreen,
   entityCountBySubScreen,
   onQuickEntityNavigation,
   activeNetwork,
@@ -217,18 +219,20 @@ export function useAppControllerNetworkSummaryPanelDomain({
   const [harnessAssemblyGraphTab, setHarnessAssemblyGraphTab] = useState<"assembly" | "current">("assembly");
   const handleSelectConnectorFromCallout = useCallback(
     (connectorId: ConnectorId) => {
+      setActiveSubScreen("connector");
       markDetailPanelsSelectionSourceAsExternal();
       dispatchAction(appActions.select({ kind: "connector", id: connectorId }), { trackHistory: false });
     },
-    [dispatchAction, markDetailPanelsSelectionSourceAsExternal]
+    [dispatchAction, markDetailPanelsSelectionSourceAsExternal, setActiveSubScreen]
   );
 
   const handleSelectSpliceFromCallout = useCallback(
     (spliceId: SpliceId) => {
+      setActiveSubScreen("splice");
       markDetailPanelsSelectionSourceAsExternal();
       dispatchAction(appActions.select({ kind: "splice", id: spliceId }), { trackHistory: false });
     },
-    [dispatchAction, markDetailPanelsSelectionSourceAsExternal]
+    [dispatchAction, markDetailPanelsSelectionSourceAsExternal, setActiveSubScreen]
   );
 
   const persistConnectorCalloutPosition = useCallback(

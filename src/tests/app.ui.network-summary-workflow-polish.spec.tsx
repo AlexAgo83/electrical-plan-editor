@@ -549,6 +549,31 @@ describe("App integration UI - network summary workflow polish", () => {
     expect((restoredCalloutAnchor as SVGGElement).getAttribute("transform") ?? "").toBe(transformAfterDrag);
   });
 
+  it("switches analysis sub-view when selecting connector and splice callouts", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("wire");
+
+    let networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
+
+    const connectorCallout = networkSummaryPanel.querySelector('[aria-label^="Select connector"]');
+    expect(connectorCallout).not.toBeNull();
+    fireEvent.mouseDown(connectorCallout as Element, { button: 0, clientX: 220, clientY: 140 });
+    fireEvent.mouseUp(networkSvg);
+    expect(getPanelByHeading("Connector analysis")).toBeInTheDocument();
+
+    networkSummaryPanel = getPanelByHeading("Network summary");
+    const refreshedNetworkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    const spliceCallout = networkSummaryPanel.querySelector('[aria-label^="Select splice"]');
+    expect(spliceCallout).not.toBeNull();
+    fireEvent.mouseDown(spliceCallout as Element, { button: 0, clientX: 220, clientY: 140 });
+    fireEvent.mouseUp(refreshedNetworkSvg);
+    expect(getPanelByHeading("Splice analysis")).toBeInTheDocument();
+  });
+
   it("resets persisted callout positions when generating a new 2D layout", async () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
