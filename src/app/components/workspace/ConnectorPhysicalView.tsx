@@ -296,8 +296,10 @@ export function ConnectorPhysicalView({
               wireTechnicalIdTextWidth / 2;
             const label = getConnectorLayoutWayDisplayLabel(way);
             const labelClassName = `connector-physical-way-label${label.length > 2 ? " is-long-label" : ""}`;
+            const wireName = wire?.name.trim() ?? "";
             return (
               <g key={way.cavityIndex} className="connector-physical-way" transform={`translate(${way.x} ${way.y})`}>
+                {wireName.length > 0 ? <title>{wireName}</title> : null}
                 {renderPhysicalWayShape(way.shape, isOccupied, cellPadding)}
                 <text className={labelClassName} y={0}>
                   {label}
