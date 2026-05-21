@@ -3,14 +3,15 @@ import type {
   CatalogItem,
   Connector,
   ConnectorLayout,
+  ConnectorLayoutKeying,
   ConnectorLayoutKeyingShape,
-  ConnectorLayoutKeyingSide,
   ConnectorLayoutShellShape,
   Wire,
   WireId
 } from "../../../core/entities";
 import {
   DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE,
+  getConnectorLayoutKeyingAnchor,
   getConnectorLayoutKeyings,
   getConnectorLayoutShellPadding,
   getConnectorLayoutShellShape,
@@ -32,18 +33,9 @@ interface ConnectorPhysicalViewProps {
 }
 
 type RenderableKeying = {
-  side: Exclude<ConnectorLayoutKeyingSide, "none">;
-  position?: number;
   shape?: ConnectorLayoutKeyingShape;
   color?: string;
   scale?: number;
-};
-
-type KeyingAnchor = {
-  x: number;
-  y: number;
-  normalX: number;
-  normalY: number;
 };
 
 const KEYING_MARKER_SIZE = 0.28;
@@ -58,10 +50,6 @@ const WIRE_TECHNICAL_ID_BACKGROUND_HORIZONTAL_PADDING = 0.08;
 const WIRE_TECHNICAL_ID_COLOR_DOT_RADIUS = 0.035;
 const WIRE_TECHNICAL_ID_COLOR_DOT_GAP = 0.025;
 const WIRE_TECHNICAL_ID_COLOR_DOT_TEXT_GAP = 0.045;
-
-function clampUnit(value: number): number {
-  return Math.min(1, Math.max(-1, value));
-}
 
 function getPhysicalKeyingStyle(keying: RenderableKeying): CSSProperties | undefined {
   return keying.color === undefined ? undefined : { fill: keying.color };
@@ -78,65 +66,21 @@ function renderPhysicalWayShape(shape: string, isOccupied: boolean): ReactElemen
   return <circle className={className} r={0.33} />;
 }
 
-function getPhysicalKeyingAnchor(
-  keying: RenderableKeying,
-  layout: ConnectorLayout,
-  shellShape: ConnectorLayoutShellShape,
-  shellPadding: number
-): KeyingAnchor {
-  const centerX = layout.width / 2 + 0.5;
-  const centerY = layout.height / 2 + 0.5;
-  const left = 1 - shellPadding;
-  const top = 1 - shellPadding;
-  const right = layout.width + shellPadding;
-  const bottom = layout.height + shellPadding;
-  if (shellShape === "circle") {
-    const radiusX = (layout.width - 1) / 2 + shellPadding;
-    const radiusY = (layout.height - 1) / 2 + shellPadding;
-    if (keying.side === "top" || keying.side === "bottom") {
-      const x = keying.position ?? centerX;
-      const relativeX = clampUnit((x - centerX) / radiusX);
-      const signedY = (keying.side === "top" ? -1 : 1) * radiusY * Math.sqrt(1 - relativeX * relativeX);
-      const y = centerY + signedY;
-      const normalX = relativeX / radiusX;
-      const normalY = signedY / (radiusY * radiusY);
-      const normalLength = Math.hypot(normalX, normalY) || 1;
-      return { x, y, normalX: normalX / normalLength, normalY: normalY / normalLength };
-    }
-    const y = keying.position ?? centerY;
-    const relativeY = clampUnit((y - centerY) / radiusY);
-    const signedX = (keying.side === "left" ? -1 : 1) * radiusX * Math.sqrt(1 - relativeY * relativeY);
-    const x = centerX + signedX;
-    const normalX = signedX / (radiusX * radiusX);
-    const normalY = relativeY / radiusY;
-    const normalLength = Math.hypot(normalX, normalY) || 1;
-    return { x, y, normalX: normalX / normalLength, normalY: normalY / normalLength };
-  }
-  const keyingX = keying.position ?? centerX;
-  const keyingY = keying.position ?? centerY;
-  const anchorBySide: Record<Exclude<ConnectorLayoutKeyingSide, "none">, KeyingAnchor> = {
-    top: { x: keyingX, y: top, normalX: 0, normalY: -1 },
-    right: { x: right, y: keyingY, normalX: 1, normalY: 0 },
-    bottom: { x: keyingX, y: bottom, normalX: 0, normalY: 1 },
-    left: { x: left, y: keyingY, normalX: -1, normalY: 0 }
-  };
-  return anchorBySide[keying.side];
-}
-
 function renderPhysicalKeying(
-  keying: RenderableKeying,
+  keying: ConnectorLayoutKeying,
   layout: ConnectorLayout,
   shellShape: ConnectorLayoutShellShape,
   shellPadding: number
 ): ReactElement {
-  const anchor = getPhysicalKeyingAnchor(keying, layout, shellShape, shellPadding);
+  const anchor = getConnectorLayoutKeyingAnchor(keying, layout, shellShape, shellPadding);
   const shape = keying.shape ?? "arrow";
   const keyingScale = keying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE;
   const markerSize = KEYING_MARKER_SIZE * keyingScale;
   const markerRadius = KEYING_MARKER_RADIUS * keyingScale;
   const arrowWidth = KEYING_ARROW_WIDTH * keyingScale;
   const arrowDepth = KEYING_ARROW_DEPTH * keyingScale;
-  const markerDirection = shape === "square" ? -1 : shape === "round" || shape === "diamond" ? 0 : 1;
+  const isFreePlacement = keying.placement?.mode === "free";
+  const markerDirection = isFreePlacement ? 0 : shape === "square" ? -1 : shape === "round" || shape === "diamond" ? 0 : 1;
   const markerCenterX = anchor.x + anchor.normalX * (markerSize / 2) * markerDirection;
   const markerCenterY = anchor.y + anchor.normalY * (markerSize / 2) * markerDirection;
   const style = getPhysicalKeyingStyle(keying);
@@ -151,7 +95,7 @@ function renderPhysicalKeying(
         width={markerSize}
         height={markerSize}
         rx={0.035}
-        transform={`rotate(${markerAngle} ${markerCenterX} ${markerCenterY})`}
+        transform={isFreePlacement ? undefined : `rotate(${markerAngle} ${markerCenterX} ${markerCenterY})`}
         aria-hidden="true"
       />
     );
@@ -168,7 +112,7 @@ function renderPhysicalKeying(
         y={markerCenterY - markerSize / 2}
         width={markerSize}
         height={markerSize}
-        transform={`rotate(${markerAngle + 45} ${markerCenterX} ${markerCenterY})`}
+        transform={`rotate(${isFreePlacement ? 45 : markerAngle + 45} ${markerCenterX} ${markerCenterY})`}
         aria-hidden="true"
       />
     );
@@ -317,7 +261,7 @@ export function ConnectorPhysicalView({
           {renderPhysicalShell(layout, shellShape, shellPadding)}
           {keyings.map((keying, index) => (
             <g key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${keying.scale ?? "default"}-${index}`}>
-              {renderPhysicalKeying(keying as RenderableKeying, layout, shellShape, shellPadding)}
+              {renderPhysicalKeying(keying, layout, shellShape, shellPadding)}
             </g>
           ))}
           {layout.ways.map((way) => {

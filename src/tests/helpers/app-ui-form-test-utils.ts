@@ -41,19 +41,18 @@ export function getConnectorLayoutKeyingRow(formPanel: HTMLElement): HTMLElement
 }
 
 export function getConnectorLayoutKeyingControls(keyingRow: HTMLElement): {
-  sideSelect: HTMLElement;
+  placementSelect: HTMLElement;
   shapeSelect: HTMLElement;
   colorInput: HTMLElement;
-  positionInput: HTMLElement;
+  positionSlider: HTMLElement | null;
   scaleInput: HTMLElement;
 } {
   const keyingSelects = within(keyingRow).getAllByRole("combobox");
-  const keyingSpinButtons = within(keyingRow).getAllByRole("spinbutton");
   return {
-    sideSelect: keyingSelects[0] as HTMLElement,
+    placementSelect: keyingSelects[0] as HTMLElement,
     shapeSelect: keyingSelects[1] as HTMLElement,
     colorInput: within(keyingRow).getByLabelText("Color"),
-    positionInput: keyingSpinButtons[0] as HTMLElement,
+    positionSlider: within(keyingRow).queryByRole("slider", { name: /Position/ }),
     scaleInput: within(keyingRow).getByRole("slider", { name: /Scale/ })
   };
 }

@@ -119,25 +119,28 @@ describe("App integration UI - catalog layout", () => {
     expect(within(catalogFormPanel).getByLabelText("X")).toHaveValue(2);
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Add keying" }));
     expect(catalogFormPanel.querySelector(".connector-layout-keying")?.getAttribute("style")).toBeNull();
-    const { sideSelect, shapeSelect, positionInput, scaleInput } = getConnectorLayoutKeyingControls(
+    const { placementSelect, shapeSelect, positionSlider, scaleInput } = getConnectorLayoutKeyingControls(
       getConnectorLayoutKeyingRow(catalogFormPanel)
     );
-    expect(sideSelect).toHaveValue("right");
+    expect(placementSelect).toHaveValue("guided");
     expect(shapeSelect).toHaveValue("arrow");
-    expect(positionInput).toHaveValue(1.5);
+    expect(positionSlider).toHaveValue("0.375");
     expect(scaleInput).toHaveValue("1");
-    fireEvent.change(sideSelect, {
-      target: { value: "bottom" }
-    });
-    expect(sideSelect).toHaveValue("bottom");
     fireEvent.change(shapeSelect, {
       target: { value: "square" }
     });
     expect(shapeSelect).toHaveValue("square");
-    fireEvent.change(positionInput, {
-      target: { value: "2" }
+    fireEvent.change(positionSlider as HTMLElement, {
+      target: { value: "0.55" }
     });
-    expect(positionInput).toHaveValue(2);
+    expect(positionSlider).toHaveValue("0.55");
+    fireEvent.change(placementSelect, {
+      target: { value: "free" }
+    });
+    expect(placementSelect).toHaveValue("free");
+    const freeControls = getConnectorLayoutKeyingControls(getConnectorLayoutKeyingRow(catalogFormPanel));
+    expect(freeControls.positionSlider).toBeNull();
+    expect(within(getConnectorLayoutKeyingRow(catalogFormPanel)).queryByText("Drag in preview")).not.toBeInTheDocument();
     fireEvent.change(scaleInput, {
       target: { value: "1.6" }
     });

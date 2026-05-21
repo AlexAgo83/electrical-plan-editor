@@ -103,10 +103,16 @@ export type ConnectorLayoutWayShape = "round" | "square" | "slot";
 export type ConnectorLayoutKeyingSide = "none" | "top" | "right" | "bottom" | "left";
 export type ConnectorLayoutKeyingShape = "arrow" | "square" | "round" | "diamond";
 export type ConnectorLayoutShellShape = "square" | "circle";
+export type ConnectorLayoutKeyingPlacement =
+  | { mode: "guided"; pathPosition: number }
+  | { mode: "free"; x: number; y: number };
 
 export interface ConnectorLayoutKeying {
+  /** @deprecated Use placement for keying positioning. */
   side: ConnectorLayoutKeyingSide;
+  /** @deprecated Use placement for keying positioning. */
   position?: number;
+  placement?: ConnectorLayoutKeyingPlacement;
   shape?: ConnectorLayoutKeyingShape;
   color?: string;
   scale?: number;

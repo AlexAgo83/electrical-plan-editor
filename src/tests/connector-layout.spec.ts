@@ -3,6 +3,7 @@ import {
   createDefaultConnectorLayout,
   getConnectorLayoutDuplicatePositions,
   getConnectorLayoutKeyingPosition,
+  getConnectorLayoutKeyingAnchor,
   getConnectorLayoutKeyings,
   getConnectorLayoutKeyingSide,
   getConnectorLayoutShellPadding,
@@ -61,7 +62,9 @@ describe("connector layout", () => {
     expect(layout?.ways).toHaveLength(3);
     expect(layout !== undefined ? getConnectorLayoutShellShape(layout) : null).toBe("circle");
     expect(layout !== undefined ? getConnectorLayoutShellPadding(layout) : null).toBe(1.25);
-    expect(layout !== undefined ? getConnectorLayoutKeyings(layout) : []).toEqual([{ side: "bottom", shape: "arrow", position: 8 }]);
+    expect(layout !== undefined ? getConnectorLayoutKeyings(layout) : []).toEqual([
+      { side: "bottom", shape: "arrow", placement: { mode: "guided", pathPosition: 0.5347 }, position: 8 }
+    ]);
     expect(layout !== undefined ? getConnectorLayoutKeyingSide(layout) : null).toBe("bottom");
     expect(layout !== undefined ? getConnectorLayoutKeyingPosition(layout) : null).toBe(8);
     expect(layout?.ways[1]).toEqual({ cavityIndex: 2, x: 4, y: 3, shape: "slot", label: "B" });
@@ -134,12 +137,38 @@ describe("connector layout", () => {
 
     expect(getConnectorLayoutKeyings(layout)).toEqual([]);
     expect(getConnectorLayoutKeyings(second)).toEqual([
-      { side: "right", shape: "arrow", position: 1.5 },
-      { side: "right", shape: "arrow", position: 1.5 }
+      { side: "right", shape: "arrow", placement: { mode: "guided", pathPosition: 0.375 }, position: 1.5 },
+      { side: "right", shape: "arrow", placement: { mode: "guided", pathPosition: 0.375 }, position: 1.5 }
     ]);
-    expect(getConnectorLayoutKeyings(updated)[1]).toEqual({ side: "bottom", shape: "diamond", color: "#ff8800", scale: 1.45, position: 2 });
-    expect(getConnectorLayoutKeyings(removed)).toEqual([{ side: "bottom", shape: "diamond", color: "#ff8800", scale: 1.45, position: 2 }]);
+    expect(getConnectorLayoutKeyings(updated)[1]).toEqual({
+      side: "bottom",
+      shape: "diamond",
+      color: "#ff8800",
+      scale: 1.45,
+      placement: { mode: "guided", pathPosition: 0.5625 },
+      position: 2
+    });
+    expect(getConnectorLayoutKeyings(removed)).toEqual([
+      { side: "bottom", shape: "diamond", color: "#ff8800", scale: 1.45, placement: { mode: "guided", pathPosition: 0.5625 }, position: 2 }
+    ]);
     expect(normalizedLowScale !== undefined ? getConnectorLayoutKeyings(normalizedLowScale)[0]?.scale : null).toBe(0.5);
     expect(normalizedHighScale !== undefined ? getConnectorLayoutKeyings(normalizedHighScale)[0]?.scale : null).toBe(2);
+  });
+
+  it("snaps free keying arrow orientation to square shell axes", () => {
+    const layout = {
+      ...createDefaultConnectorLayout(4),
+      width: 4,
+      height: 3,
+      shellShape: "square" as const,
+      keyings: [
+        { side: "right" as const, shape: "arrow" as const, placement: { mode: "free" as const, x: 2.2, y: 0.62 } },
+        { side: "right" as const, shape: "arrow" as const, placement: { mode: "free" as const, x: 4.42, y: 2 } }
+      ]
+    };
+    const keyings = getConnectorLayoutKeyings(layout);
+
+    expect(getConnectorLayoutKeyingAnchor(keyings[0]!, layout)).toMatchObject({ normalX: 0, normalY: -1 });
+    expect(getConnectorLayoutKeyingAnchor(keyings[1]!, layout)).toMatchObject({ normalX: 1, normalY: 0 });
   });
 });

@@ -1,8 +1,9 @@
 import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactElement } from "react";
 import type {
   ConnectorLayout,
+  ConnectorLayoutKeying,
+  ConnectorLayoutKeyingPlacement,
   ConnectorLayoutKeyingShape,
-  ConnectorLayoutKeyingSide,
   ConnectorLayoutShellShape,
   ConnectorLayoutWay,
   ConnectorLayoutWayShape
@@ -16,6 +17,8 @@ import {
   getConnectorLayoutShellShape,
   getConnectorLayoutWayDisplayLabel,
   DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE,
+  DEFAULT_CONNECTOR_LAYOUT_KEYING_PATH_POSITION,
+  getConnectorLayoutKeyingAnchor,
   MIN_CONNECTOR_LAYOUT_SHELL_PADDING,
   MAX_CONNECTOR_LAYOUT_SHELL_PADDING,
   MIN_CONNECTOR_LAYOUT_KEYING_SCALE,
@@ -40,13 +43,6 @@ const WAY_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutWayShape; label: string }
   { value: "slot", label: "Slot" }
 ];
 
-const KEYING_SIDE_OPTIONS: Array<{ value: ConnectorLayoutKeyingSide; label: string }> = [
-  { value: "top", label: "Top" },
-  { value: "right", label: "Right" },
-  { value: "bottom", label: "Bottom" },
-  { value: "left", label: "Left" }
-];
-
 const KEYING_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutKeyingShape; label: string }> = [
   { value: "arrow", label: "Arrow" },
   { value: "square", label: "Square" },
@@ -66,27 +62,15 @@ const KEYING_ARROW_DEPTH = 0.19;
 const DEFAULT_KEYING_COLOR_PICKER_VALUE = "#7a7a7a";
 
 type RenderableKeying = {
-  side: Exclude<ConnectorLayoutKeyingSide, "none">;
-  position?: number;
+  placement?: ConnectorLayoutKeyingPlacement;
   shape?: ConnectorLayoutKeyingShape;
   color?: string;
   scale?: number;
 };
 
-type KeyingAnchor = {
-  x: number;
-  y: number;
-  normalX: number;
-  normalY: number;
-};
-
 function parseConnectionCount(value: string): number {
   const parsed = Number(value);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
-}
-
-function clampUnit(value: number): number {
-  return Math.min(1, Math.max(-1, value));
 }
 
 function getKeyingStyle(keying: RenderableKeying): CSSProperties | undefined {
@@ -126,65 +110,21 @@ function renderWayShape(way: ConnectorLayoutWay, isSelected: boolean): ReactElem
   return <circle {...commonProps} r={0.32} />;
 }
 
-function getKeyingAnchor(
-  keying: RenderableKeying,
-  layout: ConnectorLayout,
-  shellShape: ConnectorLayoutShellShape,
-  shellPadding: number
-): KeyingAnchor {
-  const centerX = layout.width / 2 + 0.5;
-  const centerY = layout.height / 2 + 0.5;
-  const left = 1 - shellPadding;
-  const top = 1 - shellPadding;
-  const right = layout.width + shellPadding;
-  const bottom = layout.height + shellPadding;
-  if (shellShape === "circle") {
-    const radiusX = (layout.width - 1) / 2 + shellPadding;
-    const radiusY = (layout.height - 1) / 2 + shellPadding;
-    if (keying.side === "top" || keying.side === "bottom") {
-      const x = keying.position ?? centerX;
-      const relativeX = clampUnit((x - centerX) / radiusX);
-      const signedY = (keying.side === "top" ? -1 : 1) * radiusY * Math.sqrt(1 - relativeX * relativeX);
-      const y = centerY + signedY;
-      const normalX = relativeX / radiusX;
-      const normalY = signedY / (radiusY * radiusY);
-      const normalLength = Math.hypot(normalX, normalY) || 1;
-      return { x, y, normalX: normalX / normalLength, normalY: normalY / normalLength };
-    }
-    const y = keying.position ?? centerY;
-    const relativeY = clampUnit((y - centerY) / radiusY);
-    const signedX = (keying.side === "left" ? -1 : 1) * radiusX * Math.sqrt(1 - relativeY * relativeY);
-    const x = centerX + signedX;
-    const normalX = signedX / (radiusX * radiusX);
-    const normalY = relativeY / radiusY;
-    const normalLength = Math.hypot(normalX, normalY) || 1;
-    return { x, y, normalX: normalX / normalLength, normalY: normalY / normalLength };
-  }
-  const keyingX = keying.position ?? centerX;
-  const keyingY = keying.position ?? centerY;
-  const anchorBySide: Record<Exclude<ConnectorLayoutKeyingSide, "none">, KeyingAnchor> = {
-    top: { x: keyingX, y: top, normalX: 0, normalY: -1 },
-    right: { x: right, y: keyingY, normalX: 1, normalY: 0 },
-    bottom: { x: keyingX, y: bottom, normalX: 0, normalY: 1 },
-    left: { x: left, y: keyingY, normalX: -1, normalY: 0 }
-  };
-  return anchorBySide[keying.side];
-}
-
 function renderKeying(
-  keying: RenderableKeying,
+  keying: ConnectorLayoutKeying,
   layout: ConnectorLayout,
   shellShape: ConnectorLayoutShellShape,
   shellPadding: number
 ): ReactElement {
-  const anchor = getKeyingAnchor(keying, layout, shellShape, shellPadding);
+  const anchor = getConnectorLayoutKeyingAnchor(keying, layout, shellShape, shellPadding);
   const shape = keying.shape ?? "arrow";
   const keyingScale = keying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE;
   const markerSize = KEYING_MARKER_SIZE * keyingScale;
   const markerRadius = KEYING_MARKER_RADIUS * keyingScale;
   const arrowWidth = KEYING_ARROW_WIDTH * keyingScale;
   const arrowDepth = KEYING_ARROW_DEPTH * keyingScale;
-  const markerDirection = shape === "square" ? -1 : shape === "round" || shape === "diamond" ? 0 : 1;
+  const isFreePlacement = keying.placement?.mode === "free";
+  const markerDirection = isFreePlacement ? 0 : shape === "square" ? -1 : shape === "round" || shape === "diamond" ? 0 : 1;
   const markerCenterX = anchor.x + anchor.normalX * (markerSize / 2) * markerDirection;
   const markerCenterY = anchor.y + anchor.normalY * (markerSize / 2) * markerDirection;
   const style = getKeyingStyle(keying);
@@ -199,7 +139,7 @@ function renderKeying(
         width={markerSize}
         height={markerSize}
         rx={0.035}
-        transform={`rotate(${markerAngle} ${markerCenterX} ${markerCenterY})`}
+        transform={isFreePlacement ? undefined : `rotate(${markerAngle} ${markerCenterX} ${markerCenterY})`}
         aria-hidden="true"
       />
     );
@@ -216,7 +156,7 @@ function renderKeying(
         y={markerCenterY - markerSize / 2}
         width={markerSize}
         height={markerSize}
-        transform={`rotate(${markerAngle + 45} ${markerCenterX} ${markerCenterY})`}
+        transform={`rotate(${isFreePlacement ? 45 : markerAngle + 45} ${markerCenterX} ${markerCenterY})`}
         aria-hidden="true"
       />
     );
@@ -275,6 +215,7 @@ export function ConnectorLayoutEditor({
   );
   const [selectedCavityIndex, setSelectedCavityIndex] = useState(1);
   const [draggingCavityIndex, setDraggingCavityIndex] = useState<number | null>(null);
+  const [draggingKeyingIndex, setDraggingKeyingIndex] = useState<number | null>(null);
   const [layoutSizeError, setLayoutSizeError] = useState<string | null>(null);
   const selectedWay =
     layout.ways.find((way) => way.cavityIndex === selectedCavityIndex) ?? layout.ways[0] ?? null;
@@ -338,12 +279,53 @@ export function ConnectorLayoutEditor({
     commitLayout(addConnectorLayoutKeying(layout));
   }
 
-  function updateKeyingPosition(index: number, value: string): void {
+  function updateKeyingPlacementMode(index: number, mode: ConnectorLayoutKeyingPlacement["mode"]): void {
+    const current = keyings[index];
+    if (current === undefined) {
+      return;
+    }
+    if (mode === "guided") {
+      commitLayout(
+        updateConnectorLayoutKeyingAt(layout, index, {
+          placement: {
+            mode: "guided",
+            pathPosition: current.placement?.mode === "guided" ? current.placement.pathPosition : DEFAULT_CONNECTOR_LAYOUT_KEYING_PATH_POSITION
+          }
+        })
+      );
+      return;
+    }
+    const anchor = getConnectorLayoutKeyingAnchor(current, layout, shellShape, shellPadding);
+    commitLayout(
+      updateConnectorLayoutKeyingAt(layout, index, {
+        placement: { mode: "free", x: anchor.x, y: anchor.y }
+      })
+    );
+  }
+
+  function updateKeyingGuidedPosition(index: number, value: string): void {
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) {
       return;
     }
-    commitLayout(updateConnectorLayoutKeyingAt(layout, index, { position: parsed }));
+    commitLayout(updateConnectorLayoutKeyingAt(layout, index, { placement: { mode: "guided", pathPosition: parsed } }));
+  }
+
+  function updateKeyingFreePosition(index: number, patch: Partial<Extract<ConnectorLayoutKeyingPlacement, { mode: "free" }>>): void {
+    const current = keyings[index];
+    if (current === undefined) {
+      return;
+    }
+    const anchor = getConnectorLayoutKeyingAnchor(current, layout, shellShape, shellPadding);
+    commitLayout(
+      updateConnectorLayoutKeyingAt(layout, index, {
+        placement: {
+          mode: "free",
+          x: patch.x ?? (current.placement?.mode === "free" ? current.placement.x : anchor.x),
+          y: patch.y ?? (current.placement?.mode === "free" ? current.placement.y : anchor.y)
+        }
+      })
+    );
   }
 
   function updateKeyingScale(index: number, value: string): void {
@@ -355,6 +337,17 @@ export function ConnectorLayoutEditor({
   }
 
   function getPointerGridPosition(event: PointerEvent<SVGElement>): { x: number; y: number } | null {
+    const position = getPointerLayoutPosition(event);
+    if (position === null) {
+      return null;
+    }
+    return {
+      x: Math.min(layout.width, Math.max(1, Math.round(position.x))),
+      y: Math.min(layout.height, Math.max(1, Math.round(position.y)))
+    };
+  }
+
+  function getPointerLayoutPosition(event: PointerEvent<SVGElement>): { x: number; y: number } | null {
     const svg = svgRef.current;
     if (svg === null) {
       return null;
@@ -367,8 +360,8 @@ export function ConnectorLayoutEditor({
       point.y = event.clientY;
       const svgPoint = point.matrixTransform(screenCtm.inverse());
       return {
-        x: Math.min(layout.width, Math.max(1, Math.round(svgPoint.x))),
-        y: Math.min(layout.height, Math.max(1, Math.round(svgPoint.y)))
+        x: svgPoint.x,
+        y: svgPoint.y
       };
     }
 
@@ -377,8 +370,8 @@ export function ConnectorLayoutEditor({
       return null;
     }
     return {
-      x: Math.min(layout.width, Math.max(1, Math.round(((event.clientX - rect.left) / rect.width) * (layout.width + 1)))),
-      y: Math.min(layout.height, Math.max(1, Math.round(((event.clientY - rect.top) / rect.height) * (layout.height + 1))))
+      x: ((event.clientX - rect.left) / rect.width) * (layout.width + 1),
+      y: ((event.clientY - rect.top) / rect.height) * (layout.height + 1)
     };
   }
 
@@ -393,7 +386,26 @@ export function ConnectorLayoutEditor({
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
+  function handleKeyingPointerDown(event: PointerEvent<SVGGElement>, index: number): void {
+    const keying = keyings[index];
+    if (keying?.placement?.mode !== "free") {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    setDraggingKeyingIndex(index);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
   function handleLayoutPointerMove(event: PointerEvent<SVGSVGElement>): void {
+    if (draggingKeyingIndex !== null) {
+      const position = getPointerLayoutPosition(event);
+      if (position === null) {
+        return;
+      }
+      updateKeyingFreePosition(draggingKeyingIndex, position);
+      return;
+    }
     if (draggingCavityIndex === null) {
       return;
     }
@@ -406,6 +418,7 @@ export function ConnectorLayoutEditor({
 
   function handleLayoutPointerEnd(): void {
     setDraggingCavityIndex(null);
+    setDraggingKeyingIndex(null);
   }
 
   function handleWayKeyDown(event: KeyboardEvent<SVGGElement>, way: ConnectorLayoutWay): void {
@@ -460,8 +473,15 @@ export function ConnectorLayoutEditor({
           >
             {renderLayoutShell(layout, shellShape, shellPadding)}
             {keyings.map((keying, index) => (
-              <g key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${keying.scale ?? "default"}-${index}`}>
-                {renderKeying(keying as RenderableKeying, layout, shellShape, shellPadding)}
+              <g
+                key={`keying-preview-${index}`}
+                className={keying.placement?.mode === "free" ? "connector-layout-keying-handle is-free" : "connector-layout-keying-handle"}
+                role={keying.placement?.mode === "free" ? "button" : undefined}
+                tabIndex={keying.placement?.mode === "free" ? 0 : undefined}
+                aria-label={keying.placement?.mode === "free" ? `Drag keying ${index + 1}` : undefined}
+                onPointerDown={(event) => handleKeyingPointerDown(event, index)}
+              >
+                {renderKeying(keying, layout, shellShape, shellPadding)}
               </g>
             ))}
             {layout.ways.map((way) => {
@@ -567,28 +587,18 @@ export function ConnectorLayoutEditor({
               </div>
               {keyings.length === 0 ? <p className="meta-line">No keying features.</p> : null}
               {keyings.map((keying, index) => {
-                const keyingPositionMax = keying.side === "top" || keying.side === "bottom" ? layout.width : layout.height;
                 const colorInputId = `connector-layout-keying-color-${index}`;
+                const placement = keying.placement ?? { mode: "guided", pathPosition: DEFAULT_CONNECTOR_LAYOUT_KEYING_PATH_POSITION };
                 return (
                   <div key={`keying-${index}`} className="connector-layout-keying-row">
                     <label>
-                      Side
+                      Placement
                       <select
-                        value={keying.side}
-                        onChange={(event) =>
-                          commitLayout(
-                            updateConnectorLayoutKeyingAt(layout, index, {
-                              side: event.target.value as ConnectorLayoutKeyingSide,
-                              position: undefined
-                            })
-                          )
-                        }
+                        value={placement.mode}
+                        onChange={(event) => updateKeyingPlacementMode(index, event.target.value as ConnectorLayoutKeyingPlacement["mode"])}
                       >
-                        {KEYING_SIDE_OPTIONS.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
+                        <option value="guided">Guided</option>
+                        <option value="free">Free</option>
                       </select>
                     </label>
                     <label>
@@ -627,17 +637,22 @@ export function ConnectorLayoutEditor({
                         />
                       </div>
                     </div>
-                    <label>
-                      Position
-                      <input
-                        type="number"
-                        min={1}
-                        max={keyingPositionMax}
-                        step={0.5}
-                        value={keying.position ?? 1}
-                        onChange={(event) => updateKeyingPosition(index, event.target.value)}
-                      />
-                    </label>
+                    {placement.mode === "guided" ? (
+                      <label className="connector-layout-slider-field">
+                        <span>
+                          Position
+                          <strong>{Math.round(placement.pathPosition * 100)}%</strong>
+                        </span>
+                        <input
+                          type="range"
+                          min={0}
+                          max={1}
+                          step={0.01}
+                          value={placement.pathPosition}
+                          onChange={(event) => updateKeyingGuidedPosition(index, event.target.value)}
+                        />
+                      </label>
+                    ) : null}
                     <label className="connector-layout-slider-field">
                       <span>
                         Scale

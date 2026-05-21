@@ -93,10 +93,10 @@ describe("App integration UI - catalog", () => {
     expect(within(catalogFormPanel).getByLabelText("Border shape")).toHaveValue("circle");
     expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Add keying" }));
-    const { sideSelect, shapeSelect, colorInput, positionInput, scaleInput } = getConnectorLayoutKeyingControls(
+    const { placementSelect, shapeSelect, colorInput, positionSlider, scaleInput } = getConnectorLayoutKeyingControls(
       getConnectorLayoutKeyingRow(catalogFormPanel)
     );
-    expect(sideSelect).toHaveValue("right");
+    expect(placementSelect).toHaveValue("guided");
     expect(shapeSelect).toHaveValue("arrow");
     fireEvent.change(shapeSelect, {
       target: { value: "round" }
@@ -108,7 +108,7 @@ describe("App integration UI - catalog", () => {
     });
     expect(colorInput).toHaveValue("#ff8800");
     expect(within(catalogFormPanel).queryByRole("button", { name: "Theme color" })).not.toBeInTheDocument();
-    expect(positionInput).toHaveValue(1.5);
+    expect(positionSlider).toHaveValue("0.4");
     expect(scaleInput).toHaveValue("1");
     fireEvent.change(scaleInput, {
       target: { value: "1.45" }

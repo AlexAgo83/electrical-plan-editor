@@ -61,6 +61,14 @@
   stroke: none;
 }
 
+.connector-layout-keying-handle.is-free {
+  cursor: grab;
+}
+
+.connector-layout-keying-handle.is-free:active {
+  cursor: grabbing;
+}
+
 .connector-layout-way,
 .connector-physical-way {
   cursor: pointer;
