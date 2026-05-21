@@ -14,6 +14,14 @@ function openViewMenu(panel: HTMLElement): void {
   }
 }
 
+function getTransformScale(transform: string): number {
+  const match = /scale\(([^)]+)\)/.exec(transform);
+  if (match === null) {
+    throw new Error(`Expected transform to include a scale(): ${transform}`);
+  }
+  return Number(match[1]);
+}
+
 describe("App integration UI - network summary layering", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -65,18 +73,24 @@ describe("App integration UI - network summary layering", () => {
     switchScreenDrawerAware("analysis");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    const labelLayer = networkSummaryPanel.querySelector(".network-graph-layer-labels");
     const anchorBefore = networkSummaryPanel.querySelector(".network-segment-label-anchor");
+    expect(labelLayer).not.toBeNull();
     expect(anchorBefore).not.toBeNull();
+    const layerScaleBefore = getTransformScale(labelLayer?.getAttribute("transform") ?? "");
     const transformBefore = anchorBefore?.getAttribute("transform") ?? "";
-    expect(transformBefore).toContain("scale(1.666");
+    expect(layerScaleBefore * getTransformScale(transformBefore)).toBeCloseTo(1, 5);
 
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom +" }));
 
+    const labelLayerAfter = networkSummaryPanel.querySelector(".network-graph-layer-labels");
     const anchorAfter = networkSummaryPanel.querySelector(".network-segment-label-anchor");
+    expect(labelLayerAfter).not.toBeNull();
     expect(anchorAfter).not.toBeNull();
+    const layerScaleAfter = getTransformScale(labelLayerAfter?.getAttribute("transform") ?? "");
     const transformAfter = anchorAfter?.getAttribute("transform") ?? "";
     expect(transformAfter).not.toBe(transformBefore);
-    expect(transformAfter).not.toContain("scale(1.666");
+    expect(layerScaleAfter * getTransformScale(transformAfter)).toBeCloseTo(1, 5);
   });
 
   it("keeps segment ID labels offset from the stroke even when segment lengths are hidden", () => {

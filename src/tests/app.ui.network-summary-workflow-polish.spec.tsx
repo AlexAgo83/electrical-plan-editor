@@ -148,6 +148,27 @@ describe("App integration UI - network summary workflow polish", () => {
     localStorage.clear();
   });
 
+  it("uses the fitted network viewport as the default before any zoom change", async () => {
+    const rendered = renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const panel = getPanelByHeading("Network summary");
+    await waitFor(() => {
+      expect(getNetworkSummaryViewportTransform(panel)).not.toBe("translate(0 0) scale(1)");
+    });
+    const defaultViewportTransform = getNetworkSummaryViewportTransform(panel);
+
+    fireEvent.click(within(panel).getByRole("button", { name: "Fit network" }));
+    expect(getNetworkSummaryViewportTransform(panel)).toBe(defaultViewportTransform);
+
+    const activeNetworkId = rendered.store.getState().activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network.");
+    }
+    expect(rendered.store.getState().networkStates[activeNetworkId]?.networkSummaryViewState).toBeUndefined();
+  });
+
   it("renders a compact quick entity navigation strip after route preview and switches sub-screens", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
@@ -728,19 +749,6 @@ describe("App integration UI - network summary workflow polish", () => {
     if (activeNetworkId === null) {
       throw new Error("Expected active network.");
     }
-
-    await waitFor(() => {
-      const persisted = firstRender.store.getState().networkStates[activeNetworkId]?.networkSummaryViewState;
-      expect(persisted).toBeDefined();
-      expect(persisted?.offset.x ?? 0).not.toBe(0);
-      expect(persisted?.offset.y ?? 0).not.toBe(0);
-    });
-
-    const persistedViewState = firstRender.store.getState().networkStates[activeNetworkId]?.networkSummaryViewState;
-    expect(persistedViewState).toBeDefined();
-    if (persistedViewState === undefined) {
-      throw new Error("Expected persisted network summary view state.");
-    }
     const expectedToggleState = {
       Info: !initialToggleState.Info,
       Length: !initialToggleState.Length,
@@ -749,6 +757,25 @@ describe("App integration UI - network summary workflow polish", () => {
       Snap: !initialToggleState.Snap,
       Lock: !initialToggleState.Lock
     } as const;
+
+    await waitFor(() => {
+      const persisted = firstRender.store.getState().networkStates[activeNetworkId]?.networkSummaryViewState;
+      expect(persisted).toBeDefined();
+      expect(persisted?.offset.x ?? 0).not.toBe(0);
+      expect(persisted?.offset.y ?? 0).not.toBe(0);
+      expect(persisted?.showNetworkInfoPanels).toBe(expectedToggleState.Info);
+      expect(persisted?.showSegmentLengths).toBe(expectedToggleState.Length);
+      expect(persisted?.showCableCallouts).toBe(expectedToggleState.Callouts);
+      expect(persisted?.showNetworkGrid).toBe(expectedToggleState.Grid);
+      expect(persisted?.snapNodesToGrid).toBe(expectedToggleState.Snap);
+      expect(persisted?.lockEntityMovement).toBe(expectedToggleState.Lock);
+    });
+
+    const persistedViewState = firstRender.store.getState().networkStates[activeNetworkId]?.networkSummaryViewState;
+    expect(persistedViewState).toBeDefined();
+    if (persistedViewState === undefined) {
+      throw new Error("Expected persisted network summary view state.");
+    }
 
     rectSpy.mockRestore();
     firstRender.unmount();

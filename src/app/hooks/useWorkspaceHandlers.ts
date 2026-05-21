@@ -24,9 +24,9 @@ import {
   NETWORK_MAX_SCALE,
   NETWORK_MIN_SCALE,
   buildUniqueNetworkTechnicalId,
-  clamp,
   createEntityId
 } from "../lib/app-utils-shared";
+import { computeNetworkFitViewportForBounds } from "../lib/networkSummaryViewport";
 import type {
   AppLocale,
   CanvasCalloutTextSize,
@@ -652,35 +652,6 @@ export function useWorkspaceHandlers({
       }
     }
 
-    const computeFitScaleForBounds = (bounds: { minX: number; maxX: number; minY: number; maxY: number }) => {
-      // Nodes are positioned by their center coordinates; expand the fit bounds so shapes
-      // (rect/circle) and labels do not visually stick to the viewport edges after fitting.
-      const entityVisualPadding = 28;
-      const fitPadding = 40;
-      const paddedMinX = bounds.minX - entityVisualPadding;
-      const paddedMaxX = bounds.maxX + entityVisualPadding;
-      const paddedMinY = bounds.minY - entityVisualPadding;
-      const paddedMaxY = bounds.maxY + entityVisualPadding;
-      const contentWidth = Math.max(1, paddedMaxX - paddedMinX);
-      const contentHeight = Math.max(1, paddedMaxY - paddedMinY);
-      const availableWidth = Math.max(1, networkViewWidth - fitPadding * 2);
-      const availableHeight = Math.max(1, networkViewHeight - fitPadding * 2);
-      const fittedScale = clamp(
-        Math.min(availableWidth / contentWidth, availableHeight / contentHeight),
-        NETWORK_MIN_SCALE,
-        NETWORK_MAX_SCALE
-      );
-
-      return {
-        fitPadding,
-        paddedMinX,
-        paddedMaxX,
-        paddedMinY,
-        paddedMaxY,
-        fittedScale
-      };
-    };
-
     if (showCableCallouts) {
       let measuredCalloutBoundsFromDom = false;
 
@@ -725,8 +696,14 @@ export function useWorkspaceHandlers({
       }
 
       if (!measuredCalloutBoundsFromDom) {
-        const initialFit = computeFitScaleForBounds({ minX, maxX, minY, maxY });
-        const safeScale = Math.max(0.05, initialFit.fittedScale);
+        const initialFit = computeNetworkFitViewportForBounds({
+          bounds: { minX, maxX, minY, maxY },
+          networkViewWidth,
+          networkViewHeight,
+          networkMinScale: NETWORK_MIN_SCALE,
+          networkMaxScale: NETWORK_MAX_SCALE
+        });
+        const safeScale = Math.max(0.05, initialFit.scale);
         const inverseLabelScale = 1 / safeScale;
         const estimatedCalloutHalfWidthBySize: Record<CanvasCalloutTextSize, number> = {
           small: 130,
@@ -762,20 +739,16 @@ export function useWorkspaceHandlers({
         }
       }
     }
-    const { paddedMinX, paddedMaxX, paddedMinY, paddedMaxY, fittedScale } = computeFitScaleForBounds({
-      minX,
-      maxX,
-      minY,
-      maxY
+    const fittedViewport = computeNetworkFitViewportForBounds({
+      bounds: { minX, maxX, minY, maxY },
+      networkViewWidth,
+      networkViewHeight,
+      networkMinScale: NETWORK_MIN_SCALE,
+      networkMaxScale: NETWORK_MAX_SCALE
     });
 
-    const centerX = (paddedMinX + paddedMaxX) / 2;
-    const centerY = (paddedMinY + paddedMaxY) / 2;
-    setNetworkScale(fittedScale);
-    setNetworkOffset({
-      x: networkViewWidth / 2 - centerX * fittedScale,
-      y: networkViewHeight / 2 - centerY * fittedScale
-    });
+    setNetworkScale(fittedViewport.scale);
+    setNetworkOffset(fittedViewport.offset);
   }
 
   function resetWorkspacePreferencesToDefaults(): void {
