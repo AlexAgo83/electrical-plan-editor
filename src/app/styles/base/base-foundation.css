@@ -191,41 +191,84 @@ button {
   margin-right: 0.45rem;
 }
 
+.header-install-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 0.9rem;
+  background: currentColor;
+  -webkit-mask: url("/icons/ico_home_import.svg") center / contain no-repeat;
+  mask: url("/icons/ico_home_import.svg") center / contain no-repeat;
+}
+
 .header-update-toggle {
+  --header-update-glow-color: color-mix(in srgb, var(--theme-primary, currentColor) 24%, #fff);
+
   border-color: #2f8f4e;
   background: #e5f6eb;
   color: #19542d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  isolation: isolate;
+  position: relative;
+}
+
+.header-update-toggle .action-button-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-basis: 0.9rem;
+}
+
+.header-update-toggle.is-icon-only {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+}
+
+.header-update-toggle.is-icon-only .header-update-label {
+  display: none;
 }
 
 .header-update-toggle.is-ready-glow {
   box-shadow:
-    0 0 0.18rem color-mix(in srgb, currentColor 22%, transparent),
-    0 0 0.62rem color-mix(in srgb, currentColor 30%, transparent),
-    0 0 1.08rem color-mix(in srgb, currentColor 34%, transparent);
-  animation: header-update-glow-breathe 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    0 0 0.12rem color-mix(in srgb, var(--header-update-glow-color) 16%, transparent),
+    0 0 0.38rem color-mix(in srgb, var(--header-update-glow-color) 22%, transparent),
+    0 0 0.72rem color-mix(in srgb, var(--header-update-glow-color) 24%, transparent);
+}
+
+.header-update-toggle.is-ready-glow::after {
+  content: "";
+  position: absolute;
+  inset: -0.32rem;
+  z-index: -1;
+  border-radius: 0.72rem;
+  background: color-mix(in srgb, var(--header-update-glow-color) 18%, transparent);
+  box-shadow:
+    0 0 0.78rem color-mix(in srgb, var(--header-update-glow-color) 30%, transparent),
+    0 0 1.36rem color-mix(in srgb, var(--header-update-glow-color) 34%, transparent);
+  opacity: 0.36;
+  pointer-events: none;
+  transform: scale(0.94);
+  animation: header-update-glow-breathe 4.8s ease-in-out infinite;
+  will-change: opacity, transform;
 }
 
 @keyframes header-update-glow-breathe {
   0%,
   100% {
-    box-shadow:
-      0 0 0.18rem color-mix(in srgb, currentColor 18%, transparent),
-      0 0 0.56rem color-mix(in srgb, currentColor 26%, transparent),
-      0 0 0.95rem color-mix(in srgb, currentColor 30%, transparent);
-    filter: saturate(98%);
+    opacity: 0.24;
+    transform: scale(0.94);
   }
 
-  48% {
-    box-shadow:
-      0 0 0.28rem color-mix(in srgb, currentColor 30%, transparent),
-      0 0 0.8rem color-mix(in srgb, currentColor 40%, transparent),
-      0 0 1.26rem color-mix(in srgb, currentColor 46%, transparent);
-    filter: saturate(110%);
+  50% {
+    opacity: 0.7;
+    transform: scale(1);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .header-update-toggle.is-ready-glow {
+  .header-update-toggle.is-ready-glow::after {
     animation: none;
   }
 }

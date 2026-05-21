@@ -49,7 +49,7 @@ export function useWorkspaceShellChrome({
 }: UseWorkspaceShellChromeArgs) {
   const [isBrowserInstallPromptAvailable, setIsBrowserInstallPromptAvailable] = useState(false);
   const [isManualInstallAvailable, setIsManualInstallAvailable] = useState(isFirefoxInstallFallbackAvailable);
-  const [isPwaUpdateReady, setIsPwaUpdateReady] = useState(false);
+  const [isPwaUpdateReady, setIsPwaUpdateReady] = useState(() => import.meta.env.DEV && import.meta.env.MODE !== "test");
   const [isNavigationDrawerOpen, setIsNavigationDrawerOpen] = useState(false);
   const [isOperationsPanelOpen, setIsOperationsPanelOpen] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(() =>
@@ -352,8 +352,10 @@ export function useWorkspaceShellChrome({
     };
   }, []);
 
+  const forcePwaHeaderActionsInDev = import.meta.env.DEV && import.meta.env.MODE !== "test";
+
   return {
-    isInstallPromptAvailable: isBrowserInstallPromptAvailable || isManualInstallAvailable,
+    isInstallPromptAvailable: forcePwaHeaderActionsInDev || isBrowserInstallPromptAvailable || isManualInstallAvailable,
     isPwaUpdateReady,
     isNavigationDrawerOpen,
     isOperationsPanelOpen,

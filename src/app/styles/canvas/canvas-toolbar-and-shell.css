@@ -546,6 +546,8 @@
 }
 
 .header-block.has-center-content .header-settings-label,
+.header-block.has-center-content .header-install-label,
+.header-block.has-center-content .header-update-label,
 .header-block.has-center-content .header-ops-label {
   display: none;
 }
@@ -589,6 +591,8 @@
 
 @media (max-width: 1040px) {
   .header-settings-label,
+  .header-install-label,
+  .header-update-label,
   .header-ops-label,
   .header-center-content .network-summary-quick-entity-nav-label {
     display: none;

@@ -8,6 +8,7 @@ interface AppHeaderAndStatsProps {
   isSettingsActive: boolean;
   onOpenSettings: () => void;
   isInstallPromptAvailable: boolean;
+  isDockedNavigationVisible: boolean;
   onInstallApp: () => void;
   isPwaUpdateReady: boolean;
   onApplyPwaUpdate: () => void;
@@ -31,6 +32,7 @@ export function AppHeaderAndStats({
   isSettingsActive,
   onOpenSettings,
   isInstallPromptAvailable,
+  isDockedNavigationVisible,
   onInstallApp,
   isPwaUpdateReady,
   onApplyPwaUpdate,
@@ -81,14 +83,26 @@ export function AppHeaderAndStats({
         </div>
         {centerContent !== null ? <div className="header-center-content">{centerContent}</div> : null}
         <div className="header-actions">
-          {isInstallPromptAvailable ? (
+          {isInstallPromptAvailable && !isDockedNavigationVisible ? (
             <button type="button" className="header-install-toggle" onClick={onInstallApp}>
-              Install app
+              <span className="header-install-icon" aria-hidden="true" />
+              <span className="header-install-label">Install app</span>
             </button>
           ) : null}
           {isPwaUpdateReady ? (
-            <button type="button" className="header-update-toggle is-ready-glow" onClick={onApplyPwaUpdate}>
-              Update ready
+            <button
+              type="button"
+              className={
+                isDockedNavigationVisible
+                  ? "header-update-toggle is-ready-glow is-icon-only"
+                  : "header-update-toggle is-ready-glow"
+              }
+              onClick={onApplyPwaUpdate}
+              aria-label="Update ready"
+              title="Update ready"
+            >
+              <span className="action-button-icon is-redo" aria-hidden="true" />
+              <span className="header-update-label">Update ready</span>
             </button>
           ) : null}
           <button
