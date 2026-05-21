@@ -133,6 +133,7 @@ export interface ConnectorLayout {
   height: number;
   shellShape?: ConnectorLayoutShellShape;
   shellPadding?: number;
+  cellPadding?: number;
   keyings?: ConnectorLayoutKeying[];
   /** @deprecated Use keyings for zero-to-many connector keying features. */
   keying?: ConnectorLayoutKeying;

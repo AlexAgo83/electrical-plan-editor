@@ -504,10 +504,13 @@ describe("App integration UI - network summary workflow polish", () => {
     const firstCalloutAnchor = networkSummaryPanel.querySelector(".network-callout-anchor");
     expect(firstCalloutAnchor).not.toBeNull();
 
-    fireEvent.mouseDown(firstCalloutAnchor as Element, { button: 0, clientX: 220, clientY: 140 });
-    expect(networkSummaryPanel.querySelector(".network-node.connector.is-selected")).not.toBeNull();
-
     const transformBeforeDrag = (firstCalloutAnchor as SVGGElement).getAttribute("transform") ?? "";
+
+    fireEvent.mouseDown(firstCalloutAnchor as Element, { button: 0, clientX: 220, clientY: 140 });
+    fireEvent.mouseMove(networkSvg, { clientX: 222, clientY: 141 });
+    fireEvent.mouseUp(networkSvg, { clientX: 222, clientY: 141 });
+    expect(networkSummaryPanel.querySelector(".network-node.connector.is-selected")).not.toBeNull();
+    expect((firstCalloutAnchor as SVGGElement).getAttribute("transform") ?? "").toBe(transformBeforeDrag);
 
     const rectSpy = vi.spyOn(networkSvg, "getBoundingClientRect").mockImplementation(
       () =>
@@ -524,6 +527,7 @@ describe("App integration UI - network summary workflow polish", () => {
         }) as DOMRect
     );
 
+    fireEvent.mouseDown(firstCalloutAnchor as Element, { button: 0, clientX: 220, clientY: 140 });
     fireEvent.mouseMove(networkSvg, { clientX: 620, clientY: 320 });
     fireEvent.mouseUp(networkSvg);
     rectSpy.mockRestore();

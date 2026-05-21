@@ -9,7 +9,9 @@ import type {
   Wire
 } from "../../../../core/entities";
 import {
+  DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING,
   DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE,
+  getConnectorLayoutCellPadding,
   getConnectorLayoutKeyingAnchor,
   getConnectorLayoutKeyings,
   getConnectorLayoutShellPadding,
@@ -30,6 +32,7 @@ const KEYING_MARKER_SIZE = 0.28;
 const KEYING_MARKER_RADIUS = 0.15;
 const KEYING_ARROW_WIDTH = 0.32;
 const KEYING_ARROW_DEPTH = 0.19;
+const DEFAULT_WAY_RENDER_CELL_SIZE = 1 - DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING;
 
 type RenderableKeying = {
   shape?: ConnectorLayoutKeyingShape;
@@ -39,6 +42,10 @@ type RenderableKeying = {
 
 function getKeyingStyle(keying: RenderableKeying): CSSProperties | undefined {
   return keying.color === undefined ? undefined : { fill: keying.color };
+}
+
+function getWayRenderScale(cellPadding: number): number {
+  return (1 - cellPadding) / DEFAULT_WAY_RENDER_CELL_SIZE;
 }
 
 function renderConnectorKeying(
@@ -108,6 +115,8 @@ function renderConnectorKeying(
 
 function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, height: number): ReactElement {
   const shellPadding = getConnectorLayoutShellPadding(layout);
+  const cellPadding = getConnectorLayoutCellPadding(layout);
+  const wayScale = getWayRenderScale(cellPadding);
   const shellShape = getConnectorLayoutShellShape(layout);
   const minX = 1 - shellPadding - 0.5;
   const minY = 1 - shellPadding - 0.5;
@@ -154,11 +163,25 @@ function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, he
         return (
           <g key={way.cavityIndex} transform={`translate(${way.x} ${way.y})`}>
             {way.shape === "square" ? (
-              <rect className="network-callout-connector-way" x={-0.28} y={-0.28} width={0.56} height={0.56} rx={0.08} />
+              <rect
+                className="network-callout-connector-way"
+                x={-(0.56 * wayScale) / 2}
+                y={-(0.56 * wayScale) / 2}
+                width={0.56 * wayScale}
+                height={0.56 * wayScale}
+                rx={0.08 * wayScale}
+              />
             ) : way.shape === "slot" ? (
-              <rect className="network-callout-connector-way" x={-0.32} y={-0.22} width={0.64} height={0.44} rx={0.22} />
+              <rect
+                className="network-callout-connector-way"
+                x={-(0.64 * wayScale) / 2}
+                y={-(0.44 * wayScale) / 2}
+                width={0.64 * wayScale}
+                height={0.44 * wayScale}
+                rx={(0.44 * wayScale) / 2}
+              />
             ) : (
-              <circle className="network-callout-connector-way" r={0.32} />
+              <circle className="network-callout-connector-way" r={0.32 * wayScale} />
             )}
             <text
               className={labelClassName}

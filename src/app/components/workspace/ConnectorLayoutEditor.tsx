@@ -11,7 +11,9 @@ import type {
 import {
   addConnectorLayoutKeying,
   createDefaultConnectorLayout,
+  DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING,
   getConnectorLayoutShellPadding,
+  getConnectorLayoutCellPadding,
   getConnectorLayoutDuplicatePositions,
   getConnectorLayoutKeyings,
   getConnectorLayoutShellShape,
@@ -21,14 +23,17 @@ import {
   getConnectorLayoutKeyingAnchor,
   MIN_CONNECTOR_LAYOUT_SHELL_PADDING,
   MAX_CONNECTOR_LAYOUT_SHELL_PADDING,
+  MIN_CONNECTOR_LAYOUT_CELL_PADDING,
+  MAX_CONNECTOR_LAYOUT_CELL_PADDING,
   MIN_CONNECTOR_LAYOUT_KEYING_SCALE,
   MAX_CONNECTOR_LAYOUT_KEYING_SCALE,
   moveConnectorLayoutWayIfFree,
   removeConnectorLayoutKeying,
   resolveConnectorLayout,
+  updateConnectorLayoutCellPadding,
   updateConnectorLayoutKeyingAt,
   updateConnectorLayoutShellPadding,
-  updateConnectorLayoutShellShape,
+  updateConnectorLayoutShellShape
 } from "../../../core/connectorLayout";
 
 interface ConnectorLayoutEditorProps {
@@ -60,6 +65,7 @@ const KEYING_MARKER_RADIUS = 0.15;
 const KEYING_ARROW_WIDTH = 0.32;
 const KEYING_ARROW_DEPTH = 0.19;
 const DEFAULT_KEYING_COLOR_PICKER_VALUE = "#7a7a7a";
+const DEFAULT_WAY_RENDER_CELL_SIZE = 1 - DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING;
 
 type RenderableKeying = {
   placement?: ConnectorLayoutKeyingPlacement;
@@ -97,17 +103,25 @@ function normalizeCssColorToHex(value: string): string | null {
     .join("")}`;
 }
 
-function renderWayShape(way: ConnectorLayoutWay, isSelected: boolean): ReactElement {
+function getWayRenderScale(cellPadding: number): number {
+  return (1 - cellPadding) / DEFAULT_WAY_RENDER_CELL_SIZE;
+}
+
+function renderWayShape(way: ConnectorLayoutWay, isSelected: boolean, cellPadding: number): ReactElement {
   const commonProps = {
     className: isSelected ? "connector-layout-way-shape is-selected" : "connector-layout-way-shape"
   };
+  const scale = getWayRenderScale(cellPadding);
   if (way.shape === "square") {
-    return <rect {...commonProps} x={-0.28} y={-0.28} width={0.56} height={0.56} rx={0.08} />;
+    const size = 0.56 * scale;
+    return <rect {...commonProps} x={-size / 2} y={-size / 2} width={size} height={size} rx={0.08 * scale} />;
   }
   if (way.shape === "slot") {
-    return <rect {...commonProps} x={-0.32} y={-0.22} width={0.64} height={0.44} rx={0.22} />;
+    const width = 0.64 * scale;
+    const height = 0.44 * scale;
+    return <rect {...commonProps} x={-width / 2} y={-height / 2} width={width} height={height} rx={height / 2} />;
   }
-  return <circle {...commonProps} r={0.32} />;
+  return <circle {...commonProps} r={0.32 * scale} />;
 }
 
 function renderKeying(
@@ -223,6 +237,7 @@ export function ConnectorLayoutEditor({
   const keyings = getConnectorLayoutKeyings(layout);
   const shellShape = getConnectorLayoutShellShape(layout);
   const shellPadding = getConnectorLayoutShellPadding(layout);
+  const cellPadding = getConnectorLayoutCellPadding(layout);
 
   function commitLayout(nextLayout: ConnectorLayout): void {
     setConnectorLayout(resolveConnectorLayout(nextLayout, parsedConnectionCount));
@@ -268,6 +283,14 @@ export function ConnectorLayoutEditor({
       return;
     }
     commitLayout(updateConnectorLayoutShellPadding(layout, parsed));
+  }
+
+  function updateCellPadding(value: string): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+    commitLayout(updateConnectorLayoutCellPadding(layout, parsed));
   }
 
   function getDefaultKeyingColor(): string {
@@ -500,7 +523,7 @@ export function ConnectorLayoutEditor({
                   onPointerDown={(event) => handleWayPointerDown(event, way.cavityIndex)}
                   onKeyDown={(event) => handleWayKeyDown(event, way)}
                 >
-                  {renderWayShape(way, isSelected)}
+                  {renderWayShape(way, isSelected, cellPadding)}
                   <text className={labelClassName} y={0}>
                     {label}
                   </text>
@@ -574,6 +597,20 @@ export function ConnectorLayoutEditor({
                 step={0.05}
                 value={shellPadding}
                 onChange={(event) => updateShellPadding(event.target.value)}
+              />
+            </label>
+            <label className="connector-layout-slider-field">
+              <span>
+                Cell padding
+                <strong>{cellPadding.toFixed(2)} grid</strong>
+              </span>
+              <input
+                type="range"
+                min={MIN_CONNECTOR_LAYOUT_CELL_PADDING}
+                max={MAX_CONNECTOR_LAYOUT_CELL_PADDING}
+                step={0.02}
+                value={cellPadding}
+                onChange={(event) => updateCellPadding(event.target.value)}
               />
             </label>
 

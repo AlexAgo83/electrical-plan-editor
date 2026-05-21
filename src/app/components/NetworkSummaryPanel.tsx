@@ -578,6 +578,18 @@ export function NetworkSummaryPanel({
     [networkGridStep, networkOffset.x, networkOffset.y, networkScale, networkViewHeight, networkViewWidth, snapNodesToGrid]
   );
 
+  const selectCalloutTarget = useCallback(
+    (callout: Pick<CableCalloutViewModel, "kind" | "entityId">) => {
+      clearSelectedCanvasNodes();
+      if (callout.kind === "connector") {
+        onSelectConnectorFromCallout(callout.entityId as ConnectorId);
+      } else {
+        onSelectSpliceFromCallout(callout.entityId as SpliceId);
+      }
+    },
+    [clearSelectedCanvasNodes, onSelectConnectorFromCallout, onSelectSpliceFromCallout]
+  );
+
   const handleCalloutMouseDown = useCallback(
     (
       event: ReactMouseEvent<SVGGElement>,
@@ -588,15 +600,6 @@ export function NetworkSummaryPanel({
       }
       event.preventDefault();
       event.stopPropagation();
-      clearSelectedCanvasNodes();
-      if (callout.kind === "connector") {
-        onSelectConnectorFromCallout(callout.entityId as ConnectorId);
-      } else {
-        onSelectSpliceFromCallout(callout.entityId as SpliceId);
-      }
-      if (lockEntityMovement) {
-        return;
-      }
       setDraggingCallout({
         key: callout.key,
         kind: callout.kind,
@@ -607,7 +610,7 @@ export function NetworkSummaryPanel({
         hasStartedDrag: false
       });
     },
-    [clearSelectedCanvasNodes, lockEntityMovement, onSelectConnectorFromCallout, onSelectSpliceFromCallout]
+    []
   );
   const handleCanvasMouseMoveWithCallouts = useCallback(
     (event: ReactMouseEvent<SVGSVGElement>) => {
@@ -617,12 +620,16 @@ export function NetworkSummaryPanel({
       }
       let hasStartedDrag = draggingCallout.hasStartedDrag;
       if (!hasStartedDrag) {
+        if (lockEntityMovement) {
+          return;
+        }
         const deltaClientX = event.clientX - draggingCallout.startClientX;
         const deltaClientY = event.clientY - draggingCallout.startClientY;
         if (Math.hypot(deltaClientX, deltaClientY) < CALLOUT_DRAG_START_THRESHOLD_PX) {
           return;
         }
         hasStartedDrag = true;
+        selectCalloutTarget(draggingCallout);
         setDraggingCallout((current) =>
           current !== null && current.key === draggingCallout.key
             ? { ...current, hasStartedDrag: true }
@@ -648,7 +655,7 @@ export function NetworkSummaryPanel({
         };
       });
     },
-    [draggingCallout, getSvgCoordinates, handleNetworkMouseMove]
+    [draggingCallout, getSvgCoordinates, handleNetworkMouseMove, lockEntityMovement, selectCalloutTarget]
   );
 
   const stopCalloutDrag = useCallback(() => {
@@ -657,7 +664,9 @@ export function NetworkSummaryPanel({
     }
 
     const draftPosition = draftCalloutPositions[draggingCallout.key];
-    if (draggingCallout.hasStartedDrag && draftPosition !== undefined) {
+    if (!draggingCallout.hasStartedDrag) {
+      selectCalloutTarget(draggingCallout);
+    } else if (draftPosition !== undefined) {
       const changed =
         Math.abs(draftPosition.x - draggingCallout.startPosition.x) > 0.0001 ||
         Math.abs(draftPosition.y - draggingCallout.startPosition.y) > 0.0001;
@@ -683,7 +692,8 @@ export function NetworkSummaryPanel({
     draggingCallout,
     draftCalloutPositions,
     onPersistConnectorCalloutPosition,
-    onPersistSpliceCalloutPosition
+    onPersistSpliceCalloutPosition,
+    selectCalloutTarget
   ]);
 
   const stopNetworkInteractions = useCallback(() => {

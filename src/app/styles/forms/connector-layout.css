@@ -254,12 +254,16 @@
 }
 
 .connector-layout-keying-row {
-  grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+  grid-template-columns: repeat(auto-fit, minmax(7.8rem, 1fr));
   align-items: end;
   border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
   border-radius: 0.55rem;
   background: color-mix(in srgb, currentColor 3%, transparent);
   padding: 0.55rem;
+}
+
+.connector-layout-keying-row > .connector-layout-slider-field {
+  grid-column: span 2;
 }
 
 .connector-layout-keying-row > label,
@@ -303,6 +307,7 @@
   color: inherit;
   padding: 0.32rem 0.65rem;
   min-height: 2.05rem;
+  min-width: 0;
 }
 
 .connector-layout-keying-list-header button.button-with-icon,
@@ -321,8 +326,17 @@
 @media (max-width: 980px) {
   .connector-layout-editor-grid,
   .connector-physical-view,
-  .connector-layout-keying-list-header,
+  .connector-layout-keying-list-header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
   .connector-layout-keying-row {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .connector-layout-keying-row > .connector-layout-slider-field {
+    grid-column: auto;
   }
 }

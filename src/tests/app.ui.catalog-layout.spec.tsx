@@ -108,6 +108,12 @@ describe("App integration UI - catalog layout", () => {
       target: { value: "1.1" }
     });
     expect(shellPaddingSlider).toHaveValue("1.1");
+    const cellPaddingSlider = within(catalogFormPanel).getByLabelText(/Cell padding/i);
+    expect(cellPaddingSlider).toHaveValue("0.36");
+    fireEvent.change(cellPaddingSlider, {
+      target: { value: "0.52" }
+    });
+    expect(cellPaddingSlider).toHaveValue("0.52");
     fireEvent.change(within(catalogFormPanel).getByLabelText("Grid width"), {
       target: { value: "1" }
     });

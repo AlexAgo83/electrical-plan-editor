@@ -10,7 +10,9 @@ import type {
   WireId
 } from "../../../core/entities";
 import {
+  DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING,
   DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE,
+  getConnectorLayoutCellPadding,
   getConnectorLayoutKeyingAnchor,
   getConnectorLayoutKeyings,
   getConnectorLayoutShellPadding,
@@ -50,20 +52,29 @@ const WIRE_TECHNICAL_ID_BACKGROUND_HORIZONTAL_PADDING = 0.08;
 const WIRE_TECHNICAL_ID_COLOR_DOT_RADIUS = 0.035;
 const WIRE_TECHNICAL_ID_COLOR_DOT_GAP = 0.025;
 const WIRE_TECHNICAL_ID_COLOR_DOT_TEXT_GAP = 0.045;
+const DEFAULT_WAY_RENDER_CELL_SIZE = 1 - DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING;
 
 function getPhysicalKeyingStyle(keying: RenderableKeying): CSSProperties | undefined {
   return keying.color === undefined ? undefined : { fill: keying.color };
 }
 
-function renderPhysicalWayShape(shape: string, isOccupied: boolean): ReactElement {
+function getPhysicalWayRenderScale(cellPadding: number): number {
+  return (1 - cellPadding) / DEFAULT_WAY_RENDER_CELL_SIZE;
+}
+
+function renderPhysicalWayShape(shape: string, isOccupied: boolean, cellPadding: number): ReactElement {
   const className = isOccupied ? "connector-physical-way-shape is-occupied" : "connector-physical-way-shape";
+  const scale = getPhysicalWayRenderScale(cellPadding);
   if (shape === "square") {
-    return <rect className={className} x={-0.3} y={-0.3} width={0.6} height={0.6} rx={0.08} />;
+    const size = 0.6 * scale;
+    return <rect className={className} x={-size / 2} y={-size / 2} width={size} height={size} rx={0.08 * scale} />;
   }
   if (shape === "slot") {
-    return <rect className={className} x={-0.33} y={-0.22} width={0.66} height={0.44} rx={0.22} />;
+    const width = 0.66 * scale;
+    const height = 0.44 * scale;
+    return <rect className={className} x={-width / 2} y={-height / 2} width={width} height={height} rx={height / 2} />;
   }
-  return <circle className={className} r={0.33} />;
+  return <circle className={className} r={0.33 * scale} />;
 }
 
 function renderPhysicalKeying(
@@ -248,6 +259,7 @@ export function ConnectorPhysicalView({
   const keyings = getConnectorLayoutKeyings(layout);
   const shellShape = getConnectorLayoutShellShape(layout);
   const shellPadding = getConnectorLayoutShellPadding(layout);
+  const cellPadding = getConnectorLayoutCellPadding(layout);
 
   return (
     <div className="connector-physical-view">
@@ -286,7 +298,7 @@ export function ConnectorPhysicalView({
             const labelClassName = `connector-physical-way-label${label.length > 2 ? " is-long-label" : ""}`;
             return (
               <g key={way.cavityIndex} className="connector-physical-way" transform={`translate(${way.x} ${way.y})`}>
-                {renderPhysicalWayShape(way.shape, isOccupied)}
+                {renderPhysicalWayShape(way.shape, isOccupied, cellPadding)}
                 <text className={labelClassName} y={0}>
                   {label}
                 </text>

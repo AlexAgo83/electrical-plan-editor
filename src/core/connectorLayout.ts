@@ -22,6 +22,9 @@ export const DEFAULT_CONNECTOR_LAYOUT_KEYING_PATH_POSITION = 0.25;
 export const DEFAULT_CONNECTOR_LAYOUT_SHELL_PADDING = 0.5;
 export const MIN_CONNECTOR_LAYOUT_SHELL_PADDING = 0.35;
 export const MAX_CONNECTOR_LAYOUT_SHELL_PADDING = 1.5;
+export const DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING = 0.36;
+export const MIN_CONNECTOR_LAYOUT_CELL_PADDING = 0.12;
+export const MAX_CONNECTOR_LAYOUT_CELL_PADDING = 0.72;
 
 function clampInteger(value: unknown, min: number, max: number): number | null {
   if (typeof value !== "number" || !Number.isFinite(value)) {
@@ -69,6 +72,15 @@ function normalizeShellPadding(value: unknown): number {
     return DEFAULT_CONNECTOR_LAYOUT_SHELL_PADDING;
   }
   const clamped = Math.min(MAX_CONNECTOR_LAYOUT_SHELL_PADDING, Math.max(MIN_CONNECTOR_LAYOUT_SHELL_PADDING, parsed));
+  return Math.round(clamped * 100) / 100;
+}
+
+function normalizeCellPadding(value: unknown): number {
+  const parsed = typeof value === "string" ? Number(value) : value;
+  if (typeof parsed !== "number" || !Number.isFinite(parsed)) {
+    return DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING;
+  }
+  const clamped = Math.min(MAX_CONNECTOR_LAYOUT_CELL_PADDING, Math.max(MIN_CONNECTOR_LAYOUT_CELL_PADDING, parsed));
   return Math.round(clamped * 100) / 100;
 }
 
@@ -374,6 +386,7 @@ export function createDefaultConnectorLayout(connectionCount: number): Connector
     height: rows,
     shellShape: DEFAULT_SHELL_SHAPE,
     shellPadding: DEFAULT_CONNECTOR_LAYOUT_SHELL_PADDING,
+    cellPadding: DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING,
     keyings: [],
     ways
   };
@@ -432,6 +445,7 @@ export function normalizeConnectorLayout(
     height,
     shellShape: normalizeShellShape(value.shellShape),
     shellPadding,
+    cellPadding: normalizeCellPadding(value.cellPadding),
     keyings: normalizeKeyings(value.keyings, value.keying, width, height, shellPadding),
     ways: [...normalizedByIndex.values()].sort((left, right) => left.cavityIndex - right.cavityIndex)
   };
@@ -497,6 +511,7 @@ export function isEditedConnectorLayout(
     layout.height === generatedLayout.height &&
     getConnectorLayoutShellShape(layout) === getConnectorLayoutShellShape(generatedLayout) &&
     getConnectorLayoutShellPadding(layout) === getConnectorLayoutShellPadding(generatedLayout) &&
+    getConnectorLayoutCellPadding(layout) === getConnectorLayoutCellPadding(generatedLayout) &&
     connectorLayoutKeyingsMatch(getConnectorLayoutKeyings(layout), getConnectorLayoutKeyings(generatedLayout)) &&
     connectorLayoutWaysMatch(layout.ways, generatedLayout.ways)
   );
@@ -587,6 +602,10 @@ export function getConnectorLayoutShellPadding(layout: ConnectorLayout): number 
   return normalizeShellPadding(layout.shellPadding);
 }
 
+export function getConnectorLayoutCellPadding(layout: ConnectorLayout): number {
+  return normalizeCellPadding(layout.cellPadding);
+}
+
 export function updateConnectorLayoutShellShape(
   layout: ConnectorLayout,
   shellShape: ConnectorLayoutShellShape
@@ -601,6 +620,13 @@ export function updateConnectorLayoutShellPadding(layout: ConnectorLayout, shell
   return {
     ...layout,
     shellPadding: normalizeShellPadding(shellPadding)
+  };
+}
+
+export function updateConnectorLayoutCellPadding(layout: ConnectorLayout, cellPadding: number): ConnectorLayout {
+  return {
+    ...layout,
+    cellPadding: normalizeCellPadding(cellPadding)
   };
 }
 
