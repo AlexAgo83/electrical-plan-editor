@@ -6,6 +6,13 @@ import { computeNetworkFitViewportForPositions } from "../../lib/networkSummaryV
 
 type SetNetworkSummaryViewStateAction = ReturnType<typeof appActions.setNetworkSummaryViewState>;
 
+const LEGACY_RESET_SCALE = 0.6;
+const VIEWPORT_EPSILON = 0.0001;
+
+function isApproximatelyEqual(left: number, right: number): boolean {
+  return Math.abs(left - right) <= VIEWPORT_EPSILON;
+}
+
 function isSameNetworkSummaryViewState(
   left: NetworkSummaryViewState | undefined,
   right: NetworkSummaryViewState
@@ -32,7 +39,41 @@ function isSameNetworkViewport(
   left: Pick<NetworkSummaryViewState, "scale" | "offset">,
   right: Pick<NetworkSummaryViewState, "scale" | "offset">
 ): boolean {
-  return left.scale === right.scale && left.offset.x === right.offset.x && left.offset.y === right.offset.y;
+  return (
+    isApproximatelyEqual(left.scale, right.scale) &&
+    isApproximatelyEqual(left.offset.x, right.offset.x) &&
+    isApproximatelyEqual(left.offset.y, right.offset.y)
+  );
+}
+
+function isLegacyDefaultNetworkSummaryViewState(
+  viewState: NetworkSummaryViewState,
+  options: {
+    configuredResetScale: number;
+    canvasDefaultShowInfoPanels: boolean;
+    canvasDefaultShowSegmentNames: boolean;
+    canvasDefaultShowSegmentLengths: boolean;
+    canvasDefaultShowCableCallouts: boolean;
+    canvasDefaultShowGrid: boolean;
+    canvasDefaultSnapToGrid: boolean;
+    canvasDefaultLockEntityMovement: boolean;
+  }
+): boolean {
+  const isResetScale =
+    isApproximatelyEqual(viewState.scale, options.configuredResetScale) ||
+    isApproximatelyEqual(viewState.scale, LEGACY_RESET_SCALE);
+  return (
+    isResetScale &&
+    isApproximatelyEqual(viewState.offset.x, 0) &&
+    isApproximatelyEqual(viewState.offset.y, 0) &&
+    viewState.showNetworkInfoPanels === options.canvasDefaultShowInfoPanels &&
+    viewState.showSegmentNames === options.canvasDefaultShowSegmentNames &&
+    viewState.showSegmentLengths === options.canvasDefaultShowSegmentLengths &&
+    viewState.showCableCallouts === options.canvasDefaultShowCableCallouts &&
+    viewState.showNetworkGrid === options.canvasDefaultShowGrid &&
+    viewState.snapNodesToGrid === options.canvasDefaultSnapToGrid &&
+    viewState.lockEntityMovement === options.canvasDefaultLockEntityMovement
+  );
 }
 
 export interface UseNetworkSummaryViewStateSyncOptions {
@@ -124,6 +165,21 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     setLockEntityMovement,
     dispatchAction
   } = options;
+  const activeNetworkSummaryViewStateIsLegacyDefault =
+    activeNetworkSummaryViewState !== undefined &&
+    isLegacyDefaultNetworkSummaryViewState(activeNetworkSummaryViewState, {
+      configuredResetScale,
+      canvasDefaultShowInfoPanels,
+      canvasDefaultShowSegmentNames,
+      canvasDefaultShowSegmentLengths,
+      canvasDefaultShowCableCallouts,
+      canvasDefaultShowGrid,
+      canvasDefaultSnapToGrid,
+      canvasDefaultLockEntityMovement
+    });
+  const effectiveActiveNetworkSummaryViewState = activeNetworkSummaryViewStateIsLegacyDefault
+    ? undefined
+    : activeNetworkSummaryViewState;
   const localViewSnapshotRef = useRef({
     networkScale,
     networkOffset,
@@ -137,19 +193,19 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     lockEntityMovement
   });
   const activeNetworkSummaryViewStateSignature =
-    activeNetworkSummaryViewState === undefined
+    effectiveActiveNetworkSummaryViewState === undefined
       ? "default"
       : [
-          activeNetworkSummaryViewState.scale,
-          activeNetworkSummaryViewState.offset.x,
-          activeNetworkSummaryViewState.offset.y,
-          activeNetworkSummaryViewState.showNetworkInfoPanels,
-          activeNetworkSummaryViewState.showSegmentNames,
-          activeNetworkSummaryViewState.showSegmentLengths,
-          activeNetworkSummaryViewState.showCableCallouts,
-          activeNetworkSummaryViewState.showNetworkGrid,
-          activeNetworkSummaryViewState.snapNodesToGrid,
-          activeNetworkSummaryViewState.lockEntityMovement
+          effectiveActiveNetworkSummaryViewState.scale,
+          effectiveActiveNetworkSummaryViewState.offset.x,
+          effectiveActiveNetworkSummaryViewState.offset.y,
+          effectiveActiveNetworkSummaryViewState.showNetworkInfoPanels,
+          effectiveActiveNetworkSummaryViewState.showSegmentNames,
+          effectiveActiveNetworkSummaryViewState.showSegmentLengths,
+          effectiveActiveNetworkSummaryViewState.showCableCallouts,
+          effectiveActiveNetworkSummaryViewState.showNetworkGrid,
+          effectiveActiveNetworkSummaryViewState.snapNodesToGrid,
+          effectiveActiveNetworkSummaryViewState.lockEntityMovement
         ].join(":");
 
   const computedDefaultFitViewport = useMemo(() => {
@@ -223,28 +279,28 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
       return;
     }
 
-    const defaultFitViewport = activeNetworkSummaryViewState === undefined ? computedDefaultFitViewport : null;
-    if (activeNetworkSummaryViewState === undefined && networkNodeCount >= 2 && defaultFitViewport === null) {
+    const defaultFitViewport = effectiveActiveNetworkSummaryViewState === undefined ? computedDefaultFitViewport : null;
+    if (effectiveActiveNetworkSummaryViewState === undefined && networkNodeCount >= 2 && defaultFitViewport === null) {
       return;
     }
 
     const clampedFallbackScale = Math.max(networkMinScale, Math.min(networkMaxScale, configuredResetScale));
-    const nextScaleRaw = activeNetworkSummaryViewState?.scale ?? clampedFallbackScale;
+    const nextScaleRaw = effectiveActiveNetworkSummaryViewState?.scale ?? clampedFallbackScale;
     const nextScale =
       defaultFitViewport?.scale ??
       Math.max(networkMinScale, Math.min(networkMaxScale, Number.isFinite(nextScaleRaw) ? nextScaleRaw : clampedFallbackScale));
-    const nextOffset = defaultFitViewport?.offset ?? activeNetworkSummaryViewState?.offset ?? { x: 0, y: 0 };
-    const nextShowInfoPanels = activeNetworkSummaryViewState?.showNetworkInfoPanels ?? canvasDefaultShowInfoPanels;
-    const nextShowSegmentNames = activeNetworkSummaryViewState?.showSegmentNames ?? canvasDefaultShowSegmentNames;
+    const nextOffset = defaultFitViewport?.offset ?? effectiveActiveNetworkSummaryViewState?.offset ?? { x: 0, y: 0 };
+    const nextShowInfoPanels = effectiveActiveNetworkSummaryViewState?.showNetworkInfoPanels ?? canvasDefaultShowInfoPanels;
+    const nextShowSegmentNames = effectiveActiveNetworkSummaryViewState?.showSegmentNames ?? canvasDefaultShowSegmentNames;
     const nextShowSegmentLengths =
-      activeNetworkSummaryViewState?.showSegmentLengths ?? canvasDefaultShowSegmentLengths;
+      effectiveActiveNetworkSummaryViewState?.showSegmentLengths ?? canvasDefaultShowSegmentLengths;
     const nextShowCableCallouts =
-      activeNetworkSummaryViewState?.showCableCallouts ?? canvasDefaultShowCableCallouts;
+      effectiveActiveNetworkSummaryViewState?.showCableCallouts ?? canvasDefaultShowCableCallouts;
     const nextCalloutContentMode = canvasDefaultCalloutContentMode;
-    const nextShowGrid = activeNetworkSummaryViewState?.showNetworkGrid ?? canvasDefaultShowGrid;
-    const nextSnapToGrid = activeNetworkSummaryViewState?.snapNodesToGrid ?? canvasDefaultSnapToGrid;
+    const nextShowGrid = effectiveActiveNetworkSummaryViewState?.showNetworkGrid ?? canvasDefaultShowGrid;
+    const nextSnapToGrid = effectiveActiveNetworkSummaryViewState?.snapNodesToGrid ?? canvasDefaultSnapToGrid;
     const nextLockEntityMovement =
-      activeNetworkSummaryViewState?.lockEntityMovement ?? canvasDefaultLockEntityMovement;
+      effectiveActiveNetworkSummaryViewState?.lockEntityMovement ?? canvasDefaultLockEntityMovement;
     const localView = localViewSnapshotRef.current;
 
     let didScheduleRestore = false;
@@ -297,6 +353,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     activeNetworkId,
     activeNetworkSummaryViewState,
     activeNetworkSummaryViewStateSignature,
+    effectiveActiveNetworkSummaryViewState,
     preferencesHydrated,
     networkMinScale,
     networkMaxScale,
@@ -338,8 +395,8 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
       return;
     }
 
-    const defaultFitViewport = activeNetworkSummaryViewState === undefined ? computedDefaultFitViewport : null;
-    if (activeNetworkSummaryViewState === undefined && networkNodeCount >= 2 && defaultFitViewport === null) {
+    const defaultFitViewport = effectiveActiveNetworkSummaryViewState === undefined ? computedDefaultFitViewport : null;
+    if (effectiveActiveNetworkSummaryViewState === undefined && networkNodeCount >= 2 && defaultFitViewport === null) {
       return;
     }
 
@@ -373,7 +430,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
       return;
     }
 
-    if (isSameNetworkSummaryViewState(activeNetworkSummaryViewState, nextViewState)) {
+    if (isSameNetworkSummaryViewState(effectiveActiveNetworkSummaryViewState, nextViewState)) {
       return;
     }
 
@@ -383,6 +440,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
   }, [
     activeNetworkId,
     activeNetworkSummaryViewState,
+    effectiveActiveNetworkSummaryViewState,
     preferencesHydrated,
     networkMinScale,
     networkMaxScale,

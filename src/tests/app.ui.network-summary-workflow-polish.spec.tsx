@@ -169,6 +169,51 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(rendered.store.getState().networkStates[activeNetworkId]?.networkSummaryViewState).toBeUndefined();
   });
 
+  it("treats a legacy reset viewport as no prior zoom change", async () => {
+    const base = createUiIntegrationState();
+    const activeNetworkId = base.activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network.");
+    }
+    const scoped = base.networkStates[activeNetworkId];
+    expect(scoped).toBeDefined();
+    if (scoped === undefined) {
+      throw new Error("Expected active scoped network.");
+    }
+
+    renderAppWithState({
+      ...base,
+      networkStates: {
+        ...base.networkStates,
+        [activeNetworkId]: {
+          ...scoped,
+          networkSummaryViewState: {
+            scale: 0.6,
+            offset: { x: 0, y: 0 },
+            showNetworkInfoPanels: true,
+            showSegmentNames: false,
+            showSegmentLengths: true,
+            showCableCallouts: false,
+            showNetworkGrid: true,
+            snapNodesToGrid: true,
+            lockEntityMovement: false
+          }
+        }
+      }
+    });
+    switchScreenDrawerAware("modeling");
+
+    const panel = getPanelByHeading("Network summary");
+    await waitFor(() => {
+      expect(getNetworkSummaryViewportTransform(panel)).not.toBe("translate(0 0) scale(0.6)");
+    });
+    const defaultViewportTransform = getNetworkSummaryViewportTransform(panel);
+
+    fireEvent.click(within(panel).getByRole("button", { name: "Fit network" }));
+    expect(getNetworkSummaryViewportTransform(panel)).toBe(defaultViewportTransform);
+  });
+
   it("renders a compact quick entity navigation strip after route preview and switches sub-screens", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
