@@ -806,6 +806,12 @@ export function NetworkSummaryPanel({
 
   return (
     <section className="network-summary-stack">
+      <NetworkSummaryQuickEntityNavigation
+        quickEntityNavigationMode={quickEntityNavigationMode}
+        activeSubScreen={activeSubScreen}
+        entityCountBySubScreen={entityCountBySubScreen}
+        onQuickEntityNavigation={onQuickEntityNavigation}
+      />
       <section className="panel">
         <header className="network-summary-header">
           <div className="network-summary-title">
@@ -959,12 +965,6 @@ export function NetworkSummaryPanel({
           routePreview={routePreview}
         />
       ) : null}
-      <NetworkSummaryQuickEntityNavigation
-        quickEntityNavigationMode={quickEntityNavigationMode}
-        activeSubScreen={activeSubScreen}
-        entityCountBySubScreen={entityCountBySubScreen}
-        onQuickEntityNavigation={onQuickEntityNavigation}
-      />
       {showFunctionalSchematic ? (
         <FunctionalSchematicPanel
           network={activeNetwork}

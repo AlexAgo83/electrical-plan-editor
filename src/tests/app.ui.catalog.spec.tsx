@@ -38,6 +38,11 @@ describe("App integration UI - catalog", () => {
 
     const quickNavGroup = document.querySelector(".network-summary-quick-entity-nav");
     expect(quickNavGroup).not.toBeNull();
+    const quickNavPanel = quickNavGroup?.closest(".network-summary-quick-entity-nav-panel");
+    const networkSummaryPanel = screen.getByRole("heading", { name: "Network summary" }).closest(".panel");
+    expect(quickNavPanel).not.toBeNull();
+    expect(networkSummaryPanel).not.toBeNull();
+    expect((quickNavPanel as HTMLElement).compareDocumentPosition(networkSummaryPanel as HTMLElement) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     const quickNavButtons = within(quickNavGroup as HTMLElement).getAllByRole("button");
     const quickNavLabels = quickNavButtons.map((button) => button.textContent?.trim() ?? "");
     expect(quickNavLabels[0]).toMatch(/^Catalog\d+$/);
