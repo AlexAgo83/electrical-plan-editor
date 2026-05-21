@@ -4,6 +4,7 @@ import {
   asCatalogItemId,
   asNodeId,
   asSegmentId,
+  asSpliceId,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
@@ -138,6 +139,37 @@ describe("App integration UI - navigation and canvas", () => {
     expect(portIndexInput).toHaveValue(2);
     fireEvent.change(portIndexInput, { target: { value: "1" } });
     expect(within(spliceAnalysisPanel).getByText(/Port P1 is already used/)).toBeInTheDocument();
+    expect(within(spliceAnalysisPanel).getByRole("button", { name: "Reserve port" })).toBeDisabled();
+  });
+
+  it("keeps directional splice ports capped in analysis", () => {
+    const spliceId = asSpliceId("S-DIR");
+    const state = [
+      appActions.upsertSplice({
+        id: spliceId,
+        name: "Directional test splice",
+        technicalId: "S-DIR",
+        portCount: 2,
+        portMode: "directional"
+      }),
+      appActions.occupySplicePort(spliceId, 1, "left-branch"),
+      appActions.occupySplicePort(spliceId, 2, "right-branch")
+    ].reduce(appReducer, createInitialState());
+
+    renderAppWithState(state);
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("splice");
+    fireEvent.click(within(getPanelByHeading("Splices")).getByText("Directional test splice"));
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("splice");
+
+    const spliceAnalysisPanel = getPanelByHeading("Splice analysis");
+    expect(within(spliceAnalysisPanel).getByText("Capacity: 2 ports")).toBeInTheDocument();
+    expect(within(spliceAnalysisPanel).getByText("No available ports on this splice.")).toBeInTheDocument();
+    expect(within(spliceAnalysisPanel).getByText("P1")).toBeInTheDocument();
+    expect(within(spliceAnalysisPanel).getByText("P2")).toBeInTheDocument();
+    expect(within(spliceAnalysisPanel).queryByText("P3")).not.toBeInTheDocument();
+    expect(within(spliceAnalysisPanel).queryByText("P4")).not.toBeInTheDocument();
     expect(within(spliceAnalysisPanel).getByRole("button", { name: "Reserve port" })).toBeDisabled();
   });
 
