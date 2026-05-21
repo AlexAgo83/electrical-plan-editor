@@ -127,15 +127,19 @@ describe("connector layout", () => {
     const layout = createDefaultConnectorLayout(4);
     const first = addConnectorLayoutKeying(layout);
     const second = addConnectorLayoutKeying(first);
-    const updated = updateConnectorLayoutKeyingAt(second, 1, { side: "bottom", shape: "diamond", color: "#ff8800", position: 2 });
+    const updated = updateConnectorLayoutKeyingAt(second, 1, { side: "bottom", shape: "diamond", color: "#ff8800", position: 2, scale: 1.45 });
     const removed = removeConnectorLayoutKeying(updated, 0);
+    const normalizedLowScale = normalizeConnectorLayout({ ...layout, keyings: [{ side: "right", scale: -1 }] }, 4);
+    const normalizedHighScale = normalizeConnectorLayout({ ...layout, keyings: [{ side: "right", scale: 99 }] }, 4);
 
     expect(getConnectorLayoutKeyings(layout)).toEqual([]);
     expect(getConnectorLayoutKeyings(second)).toEqual([
       { side: "right", shape: "arrow", position: 1.5 },
       { side: "right", shape: "arrow", position: 1.5 }
     ]);
-    expect(getConnectorLayoutKeyings(updated)[1]).toEqual({ side: "bottom", shape: "diamond", color: "#ff8800", position: 2 });
-    expect(getConnectorLayoutKeyings(removed)).toEqual([{ side: "bottom", shape: "diamond", color: "#ff8800", position: 2 }]);
+    expect(getConnectorLayoutKeyings(updated)[1]).toEqual({ side: "bottom", shape: "diamond", color: "#ff8800", scale: 1.45, position: 2 });
+    expect(getConnectorLayoutKeyings(removed)).toEqual([{ side: "bottom", shape: "diamond", color: "#ff8800", scale: 1.45, position: 2 }]);
+    expect(normalizedLowScale !== undefined ? getConnectorLayoutKeyings(normalizedLowScale)[0]?.scale : null).toBe(0.5);
+    expect(normalizedHighScale !== undefined ? getConnectorLayoutKeyings(normalizedHighScale)[0]?.scale : null).toBe(2);
   });
 });

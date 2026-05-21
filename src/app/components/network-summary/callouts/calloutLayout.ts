@@ -44,6 +44,9 @@ export interface DraggingCalloutState {
   kind: "connector" | "splice";
   entityId: ConnectorId | SpliceId;
   startPosition: NodePosition;
+  startClientX: number;
+  startClientY: number;
+  hasStartedDrag: boolean;
 }
 
 export interface RenderedCableCallout {

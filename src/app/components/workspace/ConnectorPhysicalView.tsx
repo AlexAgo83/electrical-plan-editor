@@ -10,6 +10,7 @@ import type {
   WireId
 } from "../../../core/entities";
 import {
+  DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE,
   getConnectorLayoutKeyings,
   getConnectorLayoutShellPadding,
   getConnectorLayoutShellShape,
@@ -35,6 +36,7 @@ type RenderableKeying = {
   position?: number;
   shape?: ConnectorLayoutKeyingShape;
   color?: string;
+  scale?: number;
 };
 
 type KeyingAnchor = {
@@ -129,9 +131,14 @@ function renderPhysicalKeying(
 ): ReactElement {
   const anchor = getPhysicalKeyingAnchor(keying, layout, shellShape, shellPadding);
   const shape = keying.shape ?? "arrow";
+  const keyingScale = keying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE;
+  const markerSize = KEYING_MARKER_SIZE * keyingScale;
+  const markerRadius = KEYING_MARKER_RADIUS * keyingScale;
+  const arrowWidth = KEYING_ARROW_WIDTH * keyingScale;
+  const arrowDepth = KEYING_ARROW_DEPTH * keyingScale;
   const markerDirection = shape === "square" ? -1 : shape === "round" || shape === "diamond" ? 0 : 1;
-  const markerCenterX = anchor.x + anchor.normalX * (KEYING_MARKER_SIZE / 2) * markerDirection;
-  const markerCenterY = anchor.y + anchor.normalY * (KEYING_MARKER_SIZE / 2) * markerDirection;
+  const markerCenterX = anchor.x + anchor.normalX * (markerSize / 2) * markerDirection;
+  const markerCenterY = anchor.y + anchor.normalY * (markerSize / 2) * markerDirection;
   const style = getPhysicalKeyingStyle(keying);
   const markerAngle = (Math.atan2(anchor.normalY, anchor.normalX) * 180) / Math.PI;
   if (shape === "square") {
@@ -139,10 +146,10 @@ function renderPhysicalKeying(
       <rect
         className="connector-physical-keying"
         style={style}
-        x={markerCenterX - KEYING_MARKER_SIZE / 2}
-        y={markerCenterY - KEYING_MARKER_SIZE / 2}
-        width={KEYING_MARKER_SIZE}
-        height={KEYING_MARKER_SIZE}
+        x={markerCenterX - markerSize / 2}
+        y={markerCenterY - markerSize / 2}
+        width={markerSize}
+        height={markerSize}
         rx={0.035}
         transform={`rotate(${markerAngle} ${markerCenterX} ${markerCenterY})`}
         aria-hidden="true"
@@ -150,17 +157,17 @@ function renderPhysicalKeying(
     );
   }
   if (shape === "round") {
-    return <circle className="connector-physical-keying" style={style} cx={markerCenterX} cy={markerCenterY} r={KEYING_MARKER_RADIUS} aria-hidden="true" />;
+    return <circle className="connector-physical-keying" style={style} cx={markerCenterX} cy={markerCenterY} r={markerRadius} aria-hidden="true" />;
   }
   if (shape === "diamond") {
     return (
       <rect
         className="connector-physical-keying"
         style={style}
-        x={markerCenterX - KEYING_MARKER_SIZE / 2}
-        y={markerCenterY - KEYING_MARKER_SIZE / 2}
-        width={KEYING_MARKER_SIZE}
-        height={KEYING_MARKER_SIZE}
+        x={markerCenterX - markerSize / 2}
+        y={markerCenterY - markerSize / 2}
+        width={markerSize}
+        height={markerSize}
         transform={`rotate(${markerAngle + 45} ${markerCenterX} ${markerCenterY})`}
         aria-hidden="true"
       />
@@ -168,9 +175,9 @@ function renderPhysicalKeying(
   }
   const tangentX = -anchor.normalY;
   const tangentY = anchor.normalX;
-  const baseX = anchor.x + anchor.normalX * KEYING_ARROW_DEPTH;
-  const baseY = anchor.y + anchor.normalY * KEYING_ARROW_DEPTH;
-  const halfWidth = KEYING_ARROW_WIDTH / 2;
+  const baseX = anchor.x + anchor.normalX * arrowDepth;
+  const baseY = anchor.y + anchor.normalY * arrowDepth;
+  const halfWidth = arrowWidth / 2;
   const path = [
     `M ${anchor.x} ${anchor.y}`,
     `L ${baseX + tangentX * halfWidth} ${baseY + tangentY * halfWidth}`,
@@ -309,7 +316,7 @@ export function ConnectorPhysicalView({
         >
           {renderPhysicalShell(layout, shellShape, shellPadding)}
           {keyings.map((keying, index) => (
-            <g key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${index}`}>
+            <g key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${keying.scale ?? "default"}-${index}`}>
               {renderPhysicalKeying(keying as RenderableKeying, layout, shellShape, shellPadding)}
             </g>
           ))}

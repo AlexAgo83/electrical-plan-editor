@@ -69,6 +69,9 @@ import {
 } from "./network-summary/export/useNetworkSummaryExportActions";
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
 import { snapToGrid } from "../lib/app-utils-shared";
+
+const CALLOUT_DRAG_START_THRESHOLD_PX = 4;
+
 export interface NetworkSummaryPanelProps {
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
@@ -635,12 +638,11 @@ export function NetworkSummaryPanel({
         key: callout.key,
         kind: callout.kind,
         entityId: callout.entityId,
-        startPosition: callout.position
+        startPosition: callout.position,
+        startClientX: event.clientX,
+        startClientY: event.clientY,
+        hasStartedDrag: false
       });
-      setDraftCalloutPositions((current) => ({
-        ...current,
-        [callout.key]: callout.position
-      }));
     },
     [clearSelectedCanvasNodes, lockEntityMovement, onSelectConnectorFromCallout, onSelectSpliceFromCallout]
   );
@@ -649,6 +651,20 @@ export function NetworkSummaryPanel({
       if (draggingCallout === null) {
         handleNetworkMouseMove(event);
         return;
+      }
+      let hasStartedDrag = draggingCallout.hasStartedDrag;
+      if (!hasStartedDrag) {
+        const deltaClientX = event.clientX - draggingCallout.startClientX;
+        const deltaClientY = event.clientY - draggingCallout.startClientY;
+        if (Math.hypot(deltaClientX, deltaClientY) < CALLOUT_DRAG_START_THRESHOLD_PX) {
+          return;
+        }
+        hasStartedDrag = true;
+        setDraggingCallout((current) =>
+          current !== null && current.key === draggingCallout.key
+            ? { ...current, hasStartedDrag: true }
+            : current
+        );
       }
       const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
       if (coordinates === null) {
@@ -678,7 +694,7 @@ export function NetworkSummaryPanel({
     }
 
     const draftPosition = draftCalloutPositions[draggingCallout.key];
-    if (draftPosition !== undefined) {
+    if (draggingCallout.hasStartedDrag && draftPosition !== undefined) {
       const changed =
         Math.abs(draftPosition.x - draggingCallout.startPosition.x) > 0.0001 ||
         Math.abs(draftPosition.y - draggingCallout.startPosition.y) > 0.0001;

@@ -109,6 +109,7 @@ export interface ConnectorLayoutKeying {
   position?: number;
   shape?: ConnectorLayoutKeyingShape;
   color?: string;
+  scale?: number;
 }
 
 export interface ConnectorLayoutWay {

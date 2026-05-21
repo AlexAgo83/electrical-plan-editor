@@ -93,7 +93,7 @@ describe("App integration UI - catalog", () => {
     expect(within(catalogFormPanel).getByLabelText("Border shape")).toHaveValue("circle");
     expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Add keying" }));
-    const { sideSelect, shapeSelect, colorInput, positionInput } = getConnectorLayoutKeyingControls(
+    const { sideSelect, shapeSelect, colorInput, positionInput, scaleInput } = getConnectorLayoutKeyingControls(
       getConnectorLayoutKeyingRow(catalogFormPanel)
     );
     expect(sideSelect).toHaveValue("right");
@@ -109,6 +109,11 @@ describe("App integration UI - catalog", () => {
     expect(colorInput).toHaveValue("#ff8800");
     expect(within(catalogFormPanel).queryByRole("button", { name: "Theme color" })).not.toBeInTheDocument();
     expect(positionInput).toHaveValue(1.5);
+    expect(scaleInput).toHaveValue("1");
+    fireEvent.change(scaleInput, {
+      target: { value: "1.45" }
+    });
+    expect(scaleInput).toHaveValue("1.45");
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Remove" }));
     expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
     expect(within(catalogFormPanel).getByRole("heading", { name: "Selected way" })).toBeInTheDocument();
@@ -141,7 +146,7 @@ describe("App integration UI - catalog", () => {
 
     connectorFormPanel = getPanelByHeading("Create Connector");
     expect(within(connectorFormPanel).getByDisplayValue(/TE-1-967616-1 \(6\)/)).toBeInTheDocument();
-    expect(within(connectorFormPanel).getByText("Manufacturer reference: TE-1-967616-1")).toBeInTheDocument();
+    expect(within(connectorFormPanel).getByRole("button", { name: "Manufacturer reference: TE-1-967616-1" })).toBeInTheDocument();
     expect(within(connectorFormPanel).getByLabelText("Way count (from catalog)")).toHaveValue(6);
     expect(within(connectorFormPanel).getByText("Catalog material application").closest("fieldset")).toHaveClass(
       "catalog-material-application-fieldset"

@@ -119,12 +119,13 @@ describe("App integration UI - catalog layout", () => {
     expect(within(catalogFormPanel).getByLabelText("X")).toHaveValue(2);
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Add keying" }));
     expect(catalogFormPanel.querySelector(".connector-layout-keying")?.getAttribute("style")).toBeNull();
-    const { sideSelect, shapeSelect, positionInput } = getConnectorLayoutKeyingControls(
+    const { sideSelect, shapeSelect, positionInput, scaleInput } = getConnectorLayoutKeyingControls(
       getConnectorLayoutKeyingRow(catalogFormPanel)
     );
     expect(sideSelect).toHaveValue("right");
     expect(shapeSelect).toHaveValue("arrow");
     expect(positionInput).toHaveValue(1.5);
+    expect(scaleInput).toHaveValue("1");
     fireEvent.change(sideSelect, {
       target: { value: "bottom" }
     });
@@ -137,6 +138,10 @@ describe("App integration UI - catalog layout", () => {
       target: { value: "2" }
     });
     expect(positionInput).toHaveValue(2);
+    fireEvent.change(scaleInput, {
+      target: { value: "1.6" }
+    });
+    expect(scaleInput).toHaveValue("1.6");
     expect(within(catalogFormPanel).queryByText("Overlapping ways: C1/C2.")).not.toBeInTheDocument();
   });
 });

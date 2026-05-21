@@ -14,6 +14,9 @@ const DEFAULT_WAY_SHAPE: ConnectorLayoutWayShape = "round";
 const DEFAULT_KEYING_SIDE: ConnectorLayoutKeyingSide = "right";
 const DEFAULT_KEYING_SHAPE: ConnectorLayoutKeyingShape = "arrow";
 const DEFAULT_SHELL_SHAPE: ConnectorLayoutShellShape = "square";
+export const DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE = 1;
+export const MIN_CONNECTOR_LAYOUT_KEYING_SCALE = 0.5;
+export const MAX_CONNECTOR_LAYOUT_KEYING_SCALE = 2;
 export const DEFAULT_CONNECTOR_LAYOUT_SHELL_PADDING = 0.5;
 export const MIN_CONNECTOR_LAYOUT_SHELL_PADDING = 0.35;
 export const MAX_CONNECTOR_LAYOUT_SHELL_PADDING = 1.5;
@@ -90,6 +93,19 @@ function normalizeKeyingColor(value: unknown): string | undefined {
   return /^#[\da-f]{6}$/i.test(normalized) ? normalized.toLowerCase() : undefined;
 }
 
+function normalizeKeyingScale(value: unknown): number | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  const parsed = typeof value === "string" ? Number(value) : value;
+  if (typeof parsed !== "number" || !Number.isFinite(parsed)) {
+    return undefined;
+  }
+  const clamped = Math.min(MAX_CONNECTOR_LAYOUT_KEYING_SCALE, Math.max(MIN_CONNECTOR_LAYOUT_KEYING_SCALE, parsed));
+  const rounded = Math.round(clamped * 100) / 100;
+  return rounded === DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE ? undefined : rounded;
+}
+
 function getDefaultKeyingPosition(side: ConnectorLayoutKeyingSide, width: number, height: number): number | undefined {
   if (side === "none") {
     return undefined;
@@ -122,10 +138,12 @@ function normalizeKeying(value: unknown, width: number, height: number): Connect
     return null;
   }
   const color = normalizeKeyingColor(keying.color);
+  const scale = normalizeKeyingScale(keying.scale);
   return {
     side,
     shape: normalizeKeyingShape(keying.shape),
     ...(color !== undefined ? { color } : {}),
+    ...(scale !== undefined ? { scale } : {}),
     position: clampNumber(keying.position, bounds.min, bounds.max) ?? getDefaultKeyingPosition(side, width, height)
   };
 }
@@ -249,7 +267,8 @@ function connectorLayoutKeyingsMatch(left: ConnectorLayoutKeying[] | undefined, 
         leftKeying.side === rightKeying.side &&
         leftKeying.shape === rightKeying.shape &&
         leftKeying.position === rightKeying.position &&
-        leftKeying.color === rightKeying.color
+        leftKeying.color === rightKeying.color &&
+        leftKeying.scale === rightKeying.scale
       );
     })
   );
