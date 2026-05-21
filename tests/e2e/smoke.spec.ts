@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 
 async function dismissOnboardingIfVisible(page: Page): Promise<void> {
   const closeOnboardingButton = page.getByRole("button", { name: "Close onboarding", exact: true });
-  if ((await closeOnboardingButton.count()) === 0) {
+  if (!(await closeOnboardingButton.isVisible({ timeout: 3_000 }).catch(() => false))) {
     return;
   }
   await closeOnboardingButton.click();
@@ -39,7 +39,12 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
   };
   const ensureNavigationDrawerOpen = async () => {
     const navigationToggle = page.locator(".header-nav-toggle");
+    await page.locator(".header-nav-toggle, .workspace-nav-row").first().waitFor({ state: "attached" });
     if ((await findVisibleSidebarButtonByText(".workspace-nav-row", "Modeling")) !== null) {
+      return;
+    }
+    if ((await navigationToggle.count()) === 0) {
+      await expect(page.locator(".workspace-nav-row").first()).toBeVisible();
       return;
     }
     if ((await navigationToggle.getAttribute("aria-expanded")) !== "true") {
@@ -49,6 +54,9 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
   };
   const ensureNavigationDrawerClosed = async () => {
     const navigationToggle = page.locator(".header-nav-toggle");
+    if ((await navigationToggle.count()) === 0) {
+      return;
+    }
     const backdrop = page.locator(".workspace-drawer-backdrop.is-open");
     if ((await navigationToggle.getAttribute("aria-expanded")) === "true" && (await backdrop.count()) > 0) {
       await backdrop.click({ position: { x: 8, y: 8 } });
@@ -107,7 +115,12 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   };
   const ensureNavigationDrawerOpen = async () => {
     const navigationToggle = page.locator(".header-nav-toggle");
+    await page.locator(".header-nav-toggle, .workspace-nav-row").first().waitFor({ state: "attached" });
     if ((await findVisibleSidebarButtonByText(".workspace-nav-row", "Modeling")) !== null) {
+      return;
+    }
+    if ((await navigationToggle.count()) === 0) {
+      await expect(page.locator(".workspace-nav-row").first()).toBeVisible();
       return;
     }
     if ((await navigationToggle.getAttribute("aria-expanded")) !== "true") {
@@ -117,6 +130,9 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   };
   const ensureNavigationDrawerClosed = async () => {
     const navigationToggle = page.locator(".header-nav-toggle");
+    if ((await navigationToggle.count()) === 0) {
+      return;
+    }
     const backdrop = page.locator(".workspace-drawer-backdrop.is-open");
     if ((await navigationToggle.getAttribute("aria-expanded")) === "true" && (await backdrop.count()) > 0) {
       await backdrop.click({ position: { x: 8, y: 8 } });

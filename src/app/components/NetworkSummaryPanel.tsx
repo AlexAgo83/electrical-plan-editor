@@ -41,6 +41,7 @@ import { NetworkSummaryLegend } from "./network-summary/NetworkSummaryLegend";
 import { NetworkSummaryViewMenu } from "./network-summary/NetworkSummaryViewMenu";
 import { NetworkSummaryExportMenu } from "./network-summary/NetworkSummaryExportMenu";
 import { NetworkSummaryQuickEntityNavigation } from "./network-summary/NetworkSummaryQuickEntityNavigation";
+import { useActiveSubNetworkTags } from "./network-summary/useActiveSubNetworkTags";
 import {
   buildCableCalloutViewModels,
   buildConnectorCalloutGroupsById,
@@ -266,8 +267,6 @@ export function NetworkSummaryPanel({
 }: NetworkSummaryPanelProps): ReactElement {
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
   const networkCanvasShellRef = useRef<HTMLDivElement | null>(null);
-  const subNetworkFilterInitializedRef = useRef(false);
-  const [activeSubNetworkTags, setActiveSubNetworkTags] = useState<Set<string>>(new Set());
   const graphStats = [
     { label: "Graph nodes", value: routingGraphNodeCount },
     { label: "Graph segments", value: routingGraphSegmentCount },
@@ -312,35 +311,17 @@ export function NetworkSummaryPanel({
     () => subNetworkSummaries.map((summary) => summary.tag),
     [subNetworkSummaries]
   );
+  const {
+    activeSubNetworkTags,
+    isSubNetworkFilteringActive,
+    toggleSubNetworkTag,
+    enableAllSubNetworkTags
+  } = useActiveSubNetworkTags(allSubNetworkTags);
   useEffect(() => {
     return () => {
       disposeCalloutMeasurementResources();
     };
   }, []);
-  useEffect(() => {
-    if (allSubNetworkTags.length === 0) {
-      subNetworkFilterInitializedRef.current = false;
-      setActiveSubNetworkTags((current) => (current.size === 0 ? current : new Set()));
-      return;
-    }
-    setActiveSubNetworkTags((current) => {
-      const next = new Set<string>();
-      const isUninitialized = !subNetworkFilterInitializedRef.current;
-      for (const tag of allSubNetworkTags) {
-        if (isUninitialized || current.has(tag)) {
-          next.add(tag);
-        }
-      }
-      if (isUninitialized) {
-        subNetworkFilterInitializedRef.current = true;
-      }
-      const hasSameSize = next.size === current.size;
-      if (hasSameSize && [...next].every((tag) => current.has(tag))) {
-        return current;
-      }
-      return next;
-    });
-  }, [allSubNetworkTags]);
 
   useEffect(() => {
     if (
@@ -392,9 +373,6 @@ export function NetworkSummaryPanel({
     };
   }, [onViewportSizeChange, resizeBehaviorMode, nodes.length]);
 
-  const activeSubNetworkTagSet = activeSubNetworkTags as ReadonlySet<string>;
-  const isSubNetworkFilteringActive =
-    allSubNetworkTags.length > 0 && activeSubNetworkTagSet.size < allSubNetworkTags.length;
   const segmentSubNetworkTagById = useMemo(() => {
     const byId = new Map<SegmentId, string>();
     for (const segment of segments) {
@@ -410,29 +388,14 @@ export function NetworkSummaryPanel({
     }
     for (const segment of segments) {
       const tag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
-      if (!activeSubNetworkTagSet.has(tag)) {
+      if (!activeSubNetworkTags.has(tag)) {
         continue;
       }
       byNodeId.set(segment.nodeA, true);
       byNodeId.set(segment.nodeB, true);
     }
     return byNodeId;
-  }, [nodes, segments, segmentSubNetworkTagById, activeSubNetworkTagSet]);
-  const toggleSubNetworkTag = useCallback((tag: string) => {
-    setActiveSubNetworkTags((current) => {
-      const next = new Set(current);
-      if (next.has(tag)) {
-        next.delete(tag);
-      } else {
-        next.add(tag);
-      }
-      return next;
-    });
-  }, []);
-
-  const enableAllSubNetworkTags = useCallback(() => {
-    setActiveSubNetworkTags(new Set(allSubNetworkTags));
-  }, [allSubNetworkTags]);
+  }, [nodes, segments, segmentSubNetworkTagById, activeSubNetworkTags]);
   const [hoveredCalloutKey, setHoveredCalloutKey] = useState<CalloutTargetKey | null>(null);
   const [draggingCallout, setDraggingCallout] = useState<DraggingCalloutState | null>(null);
   const [draftCalloutPositions, setDraftCalloutPositions] = useState<Record<string, NodePosition>>({});
@@ -780,7 +743,7 @@ export function NetworkSummaryPanel({
         networkNodePositions,
         segmentSubNetworkTagById,
         isSubNetworkFilteringActive,
-        activeSubNetworkTagSet,
+        activeSubNetworkTagSet: activeSubNetworkTags,
         selectedWireRouteSegmentIds,
         selectedSegmentId,
         autoSegmentLabelRotation,
@@ -793,7 +756,7 @@ export function NetworkSummaryPanel({
       networkNodePositions,
       segmentSubNetworkTagById,
       isSubNetworkFilteringActive,
-      activeSubNetworkTagSet,
+      activeSubNetworkTags,
       selectedWireRouteSegmentIds,
       selectedSegmentId,
       autoSegmentLabelRotation,
@@ -904,7 +867,7 @@ export function NetworkSummaryPanel({
                 clearSelectedCanvasNodes={clearSelectedCanvasNodes}
                 networkScalePercent={networkScalePercent}
                 subNetworkSummaries={subNetworkSummaries}
-                activeSubNetworkTags={activeSubNetworkTagSet}
+                activeSubNetworkTags={activeSubNetworkTags}
                 toggleSubNetworkTag={toggleSubNetworkTag}
                 enableAllSubNetworkTags={enableAllSubNetworkTags}
                 graphStats={graphStats}
