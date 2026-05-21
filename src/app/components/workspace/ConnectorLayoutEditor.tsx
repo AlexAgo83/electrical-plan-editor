@@ -74,6 +74,8 @@ type RenderableKeying = {
   scale?: number;
 };
 
+type ConnectorLayoutDetailPanel = "global" | "selectedWay" | "keying";
+
 function parseConnectionCount(value: string): number {
   const parsed = Number(value);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
@@ -228,6 +230,7 @@ export function ConnectorLayoutEditor({
     [connectorLayout, parsedConnectionCount]
   );
   const [selectedCavityIndex, setSelectedCavityIndex] = useState(1);
+  const [detailPanel, setDetailPanel] = useState<ConnectorLayoutDetailPanel>("global");
   const [draggingCavityIndex, setDraggingCavityIndex] = useState<number | null>(null);
   const [draggingKeyingIndex, setDraggingKeyingIndex] = useState<number | null>(null);
   const [layoutSizeError, setLayoutSizeError] = useState<string | null>(null);
@@ -255,6 +258,11 @@ export function ConnectorLayoutEditor({
           : way
       )
     });
+  }
+
+  function selectWay(cavityIndex: number): void {
+    setSelectedCavityIndex(cavityIndex);
+    setDetailPanel("selectedWay");
   }
 
   function updateLayoutSize(axis: "width" | "height", value: string): void {
@@ -404,7 +412,7 @@ export function ConnectorLayoutEditor({
 
   function handleWayPointerDown(event: PointerEvent<SVGGElement>, cavityIndex: number): void {
     event.preventDefault();
-    setSelectedCavityIndex(cavityIndex);
+    selectWay(cavityIndex);
     setDraggingCavityIndex(cavityIndex);
     event.currentTarget.setPointerCapture(event.pointerId);
   }
@@ -454,34 +462,19 @@ export function ConnectorLayoutEditor({
     const delta = deltaByKey[event.key];
     if (delta !== undefined) {
       event.preventDefault();
-      setSelectedCavityIndex(way.cavityIndex);
+      selectWay(way.cavityIndex);
       moveWayToGridPosition(way.cavityIndex, way.x + delta.dx, way.y + delta.dy);
       return;
     }
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      setSelectedCavityIndex(way.cavityIndex);
+      selectWay(way.cavityIndex);
     }
   }
 
   return (
     <fieldset className="inline-fieldset connector-layout-editor">
       <legend>Connector physical layout</legend>
-      <div className="connector-layout-editor-actions">
-        <button
-          type="button"
-          className="button-with-icon"
-          onClick={() => setConnectorLayout(createDefaultConnectorLayout(parsedConnectionCount))}
-        >
-          <span className="action-button-icon is-catalog" aria-hidden="true" />
-          Auto layout
-        </button>
-        <button type="button" className="button-with-icon" onClick={() => setConnectorLayout(undefined)}>
-          <span className="action-button-icon is-cancel" aria-hidden="true" />
-          Clear custom layout
-        </button>
-      </div>
-
       <div className="connector-layout-editor-grid">
         <div className="connector-layout-preview" aria-label="Connector layout editor preview">
           <svg
@@ -519,7 +512,7 @@ export function ConnectorLayoutEditor({
                   role="button"
                   tabIndex={0}
                   aria-label={`Select and move way ${way.cavityIndex}`}
-                  onClick={() => setSelectedCavityIndex(way.cavityIndex)}
+                  onClick={() => selectWay(way.cavityIndex)}
                   onPointerDown={(event) => handleWayPointerDown(event, way.cavityIndex)}
                   onKeyDown={(event) => handleWayKeyDown(event, way)}
                 >
@@ -544,181 +537,122 @@ export function ConnectorLayoutEditor({
             </small>
           ) : null}
           {layoutSizeError !== null ? <small className="inline-error">{layoutSizeError}</small> : null}
-          <section className="connector-layout-control-card connector-layout-control-card-global">
-            <header className="connector-layout-control-card-header">
-              <h3>Global layout</h3>
-              <span>{layout.ways.length} ways</span>
-            </header>
-            <div className="form-split">
+
+          <div className="chip-group connector-layout-detail-switch" role="group" aria-label="Connector layout detail panel">
+            <button
+              type="button"
+              className={detailPanel === "global" ? "filter-chip is-active" : "filter-chip"}
+              aria-pressed={detailPanel === "global"}
+              onClick={() => setDetailPanel("global")}
+            >
+              Global layout
+            </button>
+            <button
+              type="button"
+              className={detailPanel === "selectedWay" ? "filter-chip is-active" : "filter-chip"}
+              aria-pressed={detailPanel === "selectedWay"}
+              onClick={() => setDetailPanel("selectedWay")}
+            >
+              Selected way
+            </button>
+            <button
+              type="button"
+              className={detailPanel === "keying" ? "filter-chip is-active" : "filter-chip"}
+              aria-pressed={detailPanel === "keying"}
+              onClick={() => setDetailPanel("keying")}
+            >
+              Keying features
+            </button>
+          </div>
+
+          {detailPanel === "global" ? (
+            <section className="connector-layout-control-card connector-layout-control-card-global">
+              <header className="connector-layout-control-card-header">
+                <h3>Global layout</h3>
+                <span>{layout.ways.length} ways</span>
+              </header>
+              <div className="form-split">
+                <label>
+                  Grid width
+                  <input
+                    type="number"
+                    min={1}
+                    step={1}
+                    value={layout.width}
+                    onChange={(event) => updateLayoutSize("width", event.target.value)}
+                  />
+                </label>
+                <label>
+                  Grid height
+                  <input
+                    type="number"
+                    min={1}
+                    step={1}
+                    value={layout.height}
+                    onChange={(event) => updateLayoutSize("height", event.target.value)}
+                  />
+                </label>
+              </div>
+
               <label>
-                Grid width
+                Border shape
+                <select
+                  value={shellShape}
+                  onChange={(event) => updateShellShape(event.target.value as ConnectorLayoutShellShape)}
+                >
+                  {SHELL_SHAPE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="connector-layout-slider-field">
+                <span>
+                  Shell padding
+                  <strong>{shellPadding.toFixed(2)} grid</strong>
+                </span>
                 <input
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={layout.width}
-                  onChange={(event) => updateLayoutSize("width", event.target.value)}
+                  type="range"
+                  min={MIN_CONNECTOR_LAYOUT_SHELL_PADDING}
+                  max={MAX_CONNECTOR_LAYOUT_SHELL_PADDING}
+                  step={0.05}
+                  value={shellPadding}
+                  onChange={(event) => updateShellPadding(event.target.value)}
                 />
               </label>
-              <label>
-                Grid height
+              <label className="connector-layout-slider-field">
+                <span>
+                  Cell padding
+                  <strong>{cellPadding.toFixed(2)} grid</strong>
+                </span>
                 <input
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={layout.height}
-                  onChange={(event) => updateLayoutSize("height", event.target.value)}
+                  type="range"
+                  min={MIN_CONNECTOR_LAYOUT_CELL_PADDING}
+                  max={MAX_CONNECTOR_LAYOUT_CELL_PADDING}
+                  step={0.02}
+                  value={cellPadding}
+                  onChange={(event) => updateCellPadding(event.target.value)}
                 />
               </label>
-            </div>
-
-            <label>
-              Border shape
-              <select
-                value={shellShape}
-                onChange={(event) => updateShellShape(event.target.value as ConnectorLayoutShellShape)}
-              >
-                {SHELL_SHAPE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="connector-layout-slider-field">
-              <span>
-                Shell padding
-                <strong>{shellPadding.toFixed(2)} grid</strong>
-              </span>
-              <input
-                type="range"
-                min={MIN_CONNECTOR_LAYOUT_SHELL_PADDING}
-                max={MAX_CONNECTOR_LAYOUT_SHELL_PADDING}
-                step={0.05}
-                value={shellPadding}
-                onChange={(event) => updateShellPadding(event.target.value)}
-              />
-            </label>
-            <label className="connector-layout-slider-field">
-              <span>
-                Cell padding
-                <strong>{cellPadding.toFixed(2)} grid</strong>
-              </span>
-              <input
-                type="range"
-                min={MIN_CONNECTOR_LAYOUT_CELL_PADDING}
-                max={MAX_CONNECTOR_LAYOUT_CELL_PADDING}
-                step={0.02}
-                value={cellPadding}
-                onChange={(event) => updateCellPadding(event.target.value)}
-              />
-            </label>
-
-            <div className="connector-layout-keying-list" aria-label="Keying features">
-              <div className="connector-layout-keying-list-header">
-                <h4>Keying features</h4>
-                <button type="button" className="button-with-icon" onClick={addKeyingWithDefaultColor}>
-                  <span className="action-button-icon is-new" aria-hidden="true" />
-                  Add keying
+              <div className="connector-layout-editor-actions">
+                <button
+                  type="button"
+                  className="button-with-icon"
+                  onClick={() => setConnectorLayout(createDefaultConnectorLayout(parsedConnectionCount))}
+                >
+                  <span className="action-button-icon is-catalog" aria-hidden="true" />
+                  Auto layout
+                </button>
+                <button type="button" className="button-with-icon" onClick={() => setConnectorLayout(undefined)}>
+                  <span className="action-button-icon is-cancel" aria-hidden="true" />
+                  Clear custom layout
                 </button>
               </div>
-              {keyings.length === 0 ? <p className="meta-line">No keying features.</p> : null}
-              {keyings.map((keying, index) => {
-                const colorInputId = `connector-layout-keying-color-${index}`;
-                const placement = keying.placement ?? { mode: "guided", pathPosition: DEFAULT_CONNECTOR_LAYOUT_KEYING_PATH_POSITION };
-                return (
-                  <div key={`keying-${index}`} className="connector-layout-keying-row">
-                    <label>
-                      Placement
-                      <select
-                        value={placement.mode}
-                        onChange={(event) => updateKeyingPlacementMode(index, event.target.value as ConnectorLayoutKeyingPlacement["mode"])}
-                      >
-                        <option value="guided">Guided</option>
-                        <option value="free">Free</option>
-                      </select>
-                    </label>
-                    <label>
-                      Shape
-                      <select
-                        value={keying.shape ?? "arrow"}
-                        onChange={(event) =>
-                          commitLayout(
-                            updateConnectorLayoutKeyingAt(layout, index, {
-                              shape: event.target.value as ConnectorLayoutKeyingShape
-                            })
-                          )
-                        }
-                      >
-                        {KEYING_SHAPE_OPTIONS.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <div className="connector-layout-keying-color-control">
-                      <label htmlFor={colorInputId}>Color</label>
-                      <div>
-                        <input
-                          id={colorInputId}
-                          type="color"
-                          value={keying.color ?? getDefaultKeyingColor()}
-                          onChange={(event) =>
-                            commitLayout(
-                              updateConnectorLayoutKeyingAt(layout, index, {
-                                color: event.target.value
-                              })
-                            )
-                          }
-                        />
-                      </div>
-                    </div>
-                    {placement.mode === "guided" ? (
-                      <label className="connector-layout-slider-field">
-                        <span>
-                          Position
-                          <strong>{Math.round(placement.pathPosition * 100)}%</strong>
-                        </span>
-                        <input
-                          type="range"
-                          min={0}
-                          max={1}
-                          step={0.01}
-                          value={placement.pathPosition}
-                          onChange={(event) => updateKeyingGuidedPosition(index, event.target.value)}
-                        />
-                      </label>
-                    ) : null}
-                    <label className="connector-layout-slider-field">
-                      <span>
-                        Scale
-                        <strong>{(keying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE).toFixed(2)}x</strong>
-                      </span>
-                      <input
-                        type="range"
-                        min={MIN_CONNECTOR_LAYOUT_KEYING_SCALE}
-                        max={MAX_CONNECTOR_LAYOUT_KEYING_SCALE}
-                        step={0.05}
-                        value={keying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE}
-                        onChange={(event) => updateKeyingScale(index, event.target.value)}
-                      />
-                    </label>
-                    <button
-                      type="button"
-                      className="button-with-icon"
-                      onClick={() => commitLayout(removeConnectorLayoutKeying(layout, index))}
-                    >
-                      <span className="action-button-icon is-delete" aria-hidden="true" />
-                      Remove
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+            </section>
+          ) : null}
 
-          {selectedWay !== null ? (
+          {detailPanel === "selectedWay" && selectedWay !== null ? (
             <section className="connector-layout-control-card connector-layout-control-card-selected">
               <header className="connector-layout-control-card-header">
                 <h3>Selected way</h3>
@@ -770,6 +704,117 @@ export function ConnectorLayoutEditor({
                   placeholder={`C${selectedWay.cavityIndex}`}
                 />
               </label>
+            </section>
+          ) : null}
+
+          {detailPanel === "keying" ? (
+            <section className="connector-layout-control-card connector-layout-control-card-keying">
+              <header className="connector-layout-control-card-header">
+                <h3>Keying features</h3>
+                <span>{keyings.length} features</span>
+              </header>
+              <div className="connector-layout-keying-list" aria-label="Keying features">
+                <div className="connector-layout-keying-list-header">
+                  <p className="meta-line">Configure guided or free keying markers for the connector shell.</p>
+                  <button type="button" className="button-with-icon" onClick={addKeyingWithDefaultColor}>
+                    <span className="action-button-icon is-new" aria-hidden="true" />
+                    Add keying
+                  </button>
+                </div>
+                {keyings.length === 0 ? <p className="meta-line">No keying features.</p> : null}
+                {keyings.map((keying, index) => {
+                  const colorInputId = `connector-layout-keying-color-${index}`;
+                  const placement = keying.placement ?? { mode: "guided", pathPosition: DEFAULT_CONNECTOR_LAYOUT_KEYING_PATH_POSITION };
+                  return (
+                    <div key={`keying-${index}`} className="connector-layout-keying-row">
+                      <label>
+                        Placement
+                        <select
+                          value={placement.mode}
+                          onChange={(event) => updateKeyingPlacementMode(index, event.target.value as ConnectorLayoutKeyingPlacement["mode"])}
+                        >
+                          <option value="guided">Guided</option>
+                          <option value="free">Free</option>
+                        </select>
+                      </label>
+                      <label>
+                        Shape
+                        <select
+                          value={keying.shape ?? "arrow"}
+                          onChange={(event) =>
+                            commitLayout(
+                              updateConnectorLayoutKeyingAt(layout, index, {
+                                shape: event.target.value as ConnectorLayoutKeyingShape
+                              })
+                            )
+                          }
+                        >
+                          {KEYING_SHAPE_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <div className="connector-layout-keying-color-control">
+                        <label htmlFor={colorInputId}>Color</label>
+                        <div>
+                          <input
+                            id={colorInputId}
+                            type="color"
+                            value={keying.color ?? getDefaultKeyingColor()}
+                            onChange={(event) =>
+                              commitLayout(
+                                updateConnectorLayoutKeyingAt(layout, index, {
+                                  color: event.target.value
+                                })
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+                      {placement.mode === "guided" ? (
+                        <label className="connector-layout-slider-field">
+                          <span>
+                            Position
+                            <strong>{Math.round(placement.pathPosition * 100)}%</strong>
+                          </span>
+                          <input
+                            type="range"
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            value={placement.pathPosition}
+                            onChange={(event) => updateKeyingGuidedPosition(index, event.target.value)}
+                          />
+                        </label>
+                      ) : null}
+                      <label className="connector-layout-slider-field">
+                        <span>
+                          Scale
+                          <strong>{(keying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE).toFixed(2)}x</strong>
+                        </span>
+                        <input
+                          type="range"
+                          min={MIN_CONNECTOR_LAYOUT_KEYING_SCALE}
+                          max={MAX_CONNECTOR_LAYOUT_KEYING_SCALE}
+                          step={0.05}
+                          value={keying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE}
+                          onChange={(event) => updateKeyingScale(index, event.target.value)}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="button-with-icon"
+                        onClick={() => commitLayout(removeConnectorLayoutKeying(layout, index))}
+                      >
+                        <span className="action-button-icon is-delete" aria-hidden="true" />
+                        Remove
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             </section>
           ) : null}
         </div>

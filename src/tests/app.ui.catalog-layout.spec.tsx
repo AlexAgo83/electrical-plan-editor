@@ -104,7 +104,7 @@ describe("App integration UI - catalog layout", () => {
       target: { value: "4" }
     });
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Auto layout" }));
-    expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
+    expect(within(catalogFormPanel).queryByText("No keying features.")).not.toBeInTheDocument();
     const shellPaddingSlider = within(catalogFormPanel).getByLabelText(/Shell padding/i);
     expect(shellPaddingSlider).toHaveValue("0.5");
     fireEvent.change(shellPaddingSlider, {
@@ -126,6 +126,7 @@ describe("App integration UI - catalog layout", () => {
       key: "ArrowLeft"
     });
     expect(within(catalogFormPanel).getByLabelText("X")).toHaveValue(2);
+    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Keying features" }));
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Add keying" }));
     expect(catalogFormPanel.querySelector(".connector-layout-keying")?.getAttribute("style")).toBeNull();
     const { placementSelect, shapeSelect, positionSlider, scaleInput } = getConnectorLayoutKeyingControls(
@@ -155,5 +156,11 @@ describe("App integration UI - catalog layout", () => {
     });
     expect(scaleInput).toHaveValue("1.6");
     expect(within(catalogFormPanel).queryByText("Overlapping ways: C1/C2.")).not.toBeInTheDocument();
+    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Select and move way 3" }));
+    expect(within(catalogFormPanel).getByRole("button", { name: "Selected way" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(catalogFormPanel).queryByRole("heading", { name: "Keying features" })).not.toBeInTheDocument();
+    expect(catalogFormPanel.querySelector(".connector-layout-control-card-selected .connector-layout-control-card-header span")?.textContent).toBe(
+      "C3"
+    );
   });
 });

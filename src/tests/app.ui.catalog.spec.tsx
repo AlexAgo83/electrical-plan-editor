@@ -166,6 +166,10 @@ describe("App integration UI - catalog", () => {
       target: { value: "circle" }
     });
     expect(within(catalogFormPanel).getByLabelText("Border shape")).toHaveValue("circle");
+    expect(within(catalogFormPanel).getByRole("button", { name: "Global layout" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(catalogFormPanel).getByRole("button", { name: "Selected way" })).toHaveAttribute("aria-pressed", "false");
+    expect(within(catalogFormPanel).queryByText("No keying features.")).not.toBeInTheDocument();
+    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Keying features" }));
     expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Add keying" }));
     const { placementSelect, shapeSelect, colorInput, positionSlider, scaleInput } = getConnectorLayoutKeyingControls(
@@ -191,6 +195,7 @@ describe("App integration UI - catalog", () => {
     expect(scaleInput).toHaveValue("1.45");
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Remove" }));
     expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
+    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Selected way" }));
     expect(within(catalogFormPanel).getByRole("heading", { name: "Selected way" })).toBeInTheDocument();
     expect(
       catalogFormPanel.querySelector(".connector-layout-control-card-selected .connector-layout-control-card-header span")
@@ -202,6 +207,7 @@ describe("App integration UI - catalog", () => {
     fireEvent.change(within(catalogFormPanel).getByLabelText("URL"), {
       target: { value: "https://example.com/te-1-967616-1" }
     });
+    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Global layout" }));
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Auto layout" }));
     fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Create" }));
 
