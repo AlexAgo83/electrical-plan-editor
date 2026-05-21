@@ -124,6 +124,28 @@ describe("App integration UI - navigation and canvas", () => {
     expect(within(connectorAnalysisPanel).getByRole("button", { name: "Reserve way" })).toBeDisabled();
   });
 
+  it("notifies when connector ways are reserved and released", async () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("connector");
+
+    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Reserve way" }));
+
+    expect(await screen.findByText("Connector way reserved")).toBeInTheDocument();
+    expect(screen.getAllByText("Connector 1 (C-1) · C2 · manual-assignment")).toHaveLength(1);
+
+    const reservedCavity = within(connectorAnalysisPanel).getByText("C2").closest("article");
+    expect(reservedCavity).not.toBeNull();
+    fireEvent.click(within(reservedCavity as HTMLElement).getByRole("button", { name: "Release" }));
+
+    expect(await screen.findByText("Connector way released")).toBeInTheDocument();
+    expect(screen.getAllByText("Connector 1 (C-1) · C2 · manual-assignment")).toHaveLength(2);
+  });
+
   it("reflects splice port occupancy in real time", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
@@ -140,6 +162,29 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.change(portIndexInput, { target: { value: "1" } });
     expect(within(spliceAnalysisPanel).getByText(/Port P1 is already used/)).toBeInTheDocument();
     expect(within(spliceAnalysisPanel).getByRole("button", { name: "Reserve port" })).toBeDisabled();
+  });
+
+  it("notifies when splice ports are reserved and released", async () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("splice");
+    const splicesPanel = getPanelByHeading("Splices");
+    fireEvent.click(within(splicesPanel).getByText("Splice 1"));
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("splice");
+
+    const spliceAnalysisPanel = getPanelByHeading("Splice analysis");
+    fireEvent.click(within(spliceAnalysisPanel).getByRole("button", { name: "Reserve port" }));
+
+    expect(await screen.findByText("Splice port reserved")).toBeInTheDocument();
+    expect(screen.getAllByText("Splice 1 (S-1) · P2 · manual-assignment")).toHaveLength(1);
+
+    const reservedPort = within(spliceAnalysisPanel).getByText("P2").closest("article");
+    expect(reservedPort).not.toBeNull();
+    fireEvent.click(within(reservedPort as HTMLElement).getByRole("button", { name: "Release" }));
+
+    expect(await screen.findByText("Splice port released")).toBeInTheDocument();
+    expect(screen.getAllByText("Splice 1 (S-1) · P2 · manual-assignment")).toHaveLength(2);
   });
 
   it("keeps directional splice ports capped in analysis", () => {

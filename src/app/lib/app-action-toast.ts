@@ -72,6 +72,34 @@ function buildRemoveToast(params: {
   };
 }
 
+function buildConnectorCavityOccupancyToast(params: {
+  actionName: "reserved" | "released";
+  connectorId: string;
+  cavityIndex: number;
+  occupantRef: string;
+  state: AppState;
+}): AppActionToast {
+  return {
+    title: `Connector way ${params.actionName}`,
+    message: `${getConnectorLabel(params.state, params.connectorId)} · C${params.cavityIndex} · ${params.occupantRef}`,
+    variant: params.actionName === "reserved" ? "success" : "info"
+  };
+}
+
+function buildSplicePortOccupancyToast(params: {
+  actionName: "reserved" | "released";
+  spliceId: string;
+  portIndex: number;
+  occupantRef: string;
+  state: AppState;
+}): AppActionToast {
+  return {
+    title: `Splice port ${params.actionName}`,
+    message: `${getSpliceLabel(params.state, params.spliceId)} · P${params.portIndex} · ${params.occupantRef}`,
+    variant: params.actionName === "reserved" ? "success" : "info"
+  };
+}
+
 export function buildAppActionToast(action: AppAction, previousState: AppState, nextState: AppState): AppActionToast | null {
   switch (action.type) {
     case "network/create":
@@ -149,6 +177,34 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
         previousState,
         cascade: action.type === "connector/removeCascade"
       });
+    case "connector/occupyCavity": {
+      const previousOccupant = previousState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex];
+      const nextOccupant = nextState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex];
+      if (nextOccupant === undefined || previousOccupant === nextOccupant) {
+        return null;
+      }
+      return buildConnectorCavityOccupancyToast({
+        actionName: "reserved",
+        connectorId: action.payload.connectorId,
+        cavityIndex: action.payload.cavityIndex,
+        occupantRef: nextOccupant,
+        state: nextState
+      });
+    }
+    case "connector/releaseCavity": {
+      const previousOccupant = previousState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex];
+      const nextOccupant = nextState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex];
+      if (previousOccupant === undefined || nextOccupant !== undefined) {
+        return null;
+      }
+      return buildConnectorCavityOccupancyToast({
+        actionName: "released",
+        connectorId: action.payload.connectorId,
+        cavityIndex: action.payload.cavityIndex,
+        occupantRef: previousOccupant,
+        state: previousState
+      });
+    }
     case "splice/upsert":
       return buildUpsertToast({
         entityName: "Splice",
@@ -166,6 +222,34 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
         previousState,
         cascade: action.type === "splice/removeCascade"
       });
+    case "splice/occupyPort": {
+      const previousOccupant = previousState.splicePortOccupancy[action.payload.spliceId]?.[action.payload.portIndex];
+      const nextOccupant = nextState.splicePortOccupancy[action.payload.spliceId]?.[action.payload.portIndex];
+      if (nextOccupant === undefined || previousOccupant === nextOccupant) {
+        return null;
+      }
+      return buildSplicePortOccupancyToast({
+        actionName: "reserved",
+        spliceId: action.payload.spliceId,
+        portIndex: action.payload.portIndex,
+        occupantRef: nextOccupant,
+        state: nextState
+      });
+    }
+    case "splice/releasePort": {
+      const previousOccupant = previousState.splicePortOccupancy[action.payload.spliceId]?.[action.payload.portIndex];
+      const nextOccupant = nextState.splicePortOccupancy[action.payload.spliceId]?.[action.payload.portIndex];
+      if (previousOccupant === undefined || nextOccupant !== undefined) {
+        return null;
+      }
+      return buildSplicePortOccupancyToast({
+        actionName: "released",
+        spliceId: action.payload.spliceId,
+        portIndex: action.payload.portIndex,
+        occupantRef: previousOccupant,
+        state: previousState
+      });
+    }
     case "node/upsert":
       return buildUpsertToast({
         entityName: "Node",
