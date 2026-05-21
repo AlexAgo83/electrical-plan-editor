@@ -432,84 +432,88 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
       <p className="meta-line">
         <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
       </p>
-      <form className="row-form" onSubmit={handleReserveCavitySubmit}>
-        <label>
-          Way index
-          <input
-            type="number"
-            min={1}
-            max={selectedConnector.cavityCount}
-            step={1}
-            value={cavityIndexInput}
-            onChange={(event) => setCavityIndexInput(event.target.value)}
-            aria-invalid={connectorReserveValidationMessage !== null ? true : undefined}
-            required
-          />
-        </label>
+      <div className="connector-ways-view">
+        <section className="connector-ways-assignment-panel" aria-label="Manual way assignment">
+          <form className="row-form connector-ways-assignment-form" onSubmit={handleReserveCavitySubmit}>
+            <label>
+              Way index
+              <input
+                type="number"
+                min={1}
+                max={selectedConnector.cavityCount}
+                step={1}
+                value={cavityIndexInput}
+                onChange={(event) => setCavityIndexInput(event.target.value)}
+                aria-invalid={connectorReserveValidationMessage !== null ? true : undefined}
+                required
+              />
+            </label>
 
-        <label>
-          Occupant reference
-          <input
-            value={connectorOccupantRefInput}
-            onChange={(event) => setConnectorOccupantRefInput(event.target.value)}
-            placeholder="wire-draft-001:A"
-            required
-          />
-        </label>
+            <label>
+              Occupant reference
+              <input
+                value={connectorOccupantRefInput}
+                onChange={(event) => setConnectorOccupantRefInput(event.target.value)}
+                placeholder="wire-draft-001:A"
+                required
+              />
+            </label>
 
-        <button type="submit" className="button-with-icon" disabled={!canReserveCavity}>
-          <span className="action-button-icon is-lock-move" aria-hidden="true" />
-          Reserve way
-        </button>
-      </form>
-      {connectorReserveValidationMessage !== null ? <small className="inline-error">{connectorReserveValidationMessage}</small> : null}
-      {connectorReserveValidationMessage === null && nextFreeCavityIndex !== null ? (
-        <small className="inline-help">Suggested next free way: C{nextFreeCavityIndex}</small>
-      ) : null}
-      {connectorReserveValidationMessage === null && nextFreeCavityIndex === null ? (
-        <small className="inline-help">No available ways on this connector.</small>
-      ) : null}
+            <button type="submit" className="button-with-icon" disabled={!canReserveCavity}>
+              <span className="action-button-icon is-lock-move" aria-hidden="true" />
+              Reserve way
+            </button>
+          </form>
+          {connectorReserveValidationMessage !== null ? <small className="inline-error">{connectorReserveValidationMessage}</small> : null}
+          {connectorReserveValidationMessage === null && nextFreeCavityIndex !== null ? (
+            <small className="inline-help">Suggested next free way: C{nextFreeCavityIndex}</small>
+          ) : null}
+          {connectorReserveValidationMessage === null && nextFreeCavityIndex === null ? (
+            <small className="inline-help">No available ways on this connector.</small>
+          ) : null}
+        </section>
 
-      <div className="cavity-grid" aria-label="Way occupancy grid">
-        {connectorCavityStatuses.map((slot) => {
-          const parsedOccupantRef = slot.occupantRef === null ? null : parseWireOccupantRef(slot.occupantRef);
-          const canGoToWire =
-            parsedOccupantRef !== null &&
-            wireById.has(parsedOccupantRef.wireId);
+        <div className="cavity-grid connector-ways-cavity-grid" aria-label="Way occupancy grid">
+          {connectorCavityStatuses.map((slot) => {
+            const parsedOccupantRef = slot.occupantRef === null ? null : parseWireOccupantRef(slot.occupantRef);
+            const canGoToWire =
+              parsedOccupantRef !== null &&
+              wireById.has(parsedOccupantRef.wireId);
 
-          return (
-            <article key={slot.cavityIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
-              <h3>C{slot.cavityIndex}</h3>
-              <p className="cavity-occupant-line">
-                {slot.isOccupied ? <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" /> : null}
-                {slot.isOccupied ? renderWireColorPrefixMarker(parsedOccupantRef === null ? null : wireById.get(parsedOccupantRef.wireId)) : null}
-                {slot.isOccupied ? renderConnectorOccupantRef(slot.occupantRef) : <span>Free</span>}
-              </p>
-              {slot.isOccupied ? (
-                <div className="cavity-actions">
-                  <button
-                    type="button"
-                    className="validation-row-go-to-button button-with-icon"
-                    disabled={!canGoToWire}
-                    onClick={() => {
-                      if (!canGoToWire || parsedOccupantRef === null) {
-                        return;
-                      }
-                      onGoToWireFromAnalysis(parsedOccupantRef.wireId);
-                    }}
-                  >
-                    <span className="action-button-icon is-open" aria-hidden="true" />
-                    Go to
-                  </button>
-                  <button type="button" className="button-with-icon" onClick={() => handleReleaseCavity(slot.cavityIndex)}>
-                    <span className="action-button-icon is-cancel" aria-hidden="true" />
-                    Release
-                  </button>
-                </div>
-              ) : null}
-            </article>
-          );
-        })}
+            return (
+              <article key={slot.cavityIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
+                <h3>C{slot.cavityIndex}</h3>
+                <p className="cavity-occupant-line">
+                  {slot.isOccupied ? <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" /> : null}
+                  {slot.isOccupied ? renderWireColorPrefixMarker(parsedOccupantRef === null ? null : wireById.get(parsedOccupantRef.wireId)) : null}
+                  {slot.isOccupied ? renderConnectorOccupantRef(slot.occupantRef) : <span>Free</span>}
+                </p>
+                {slot.isOccupied ? (
+                  <div className="cavity-actions">
+                    <button
+                      type="button"
+                      className="validation-row-go-to-button button-with-icon"
+                      disabled={!canGoToWire}
+                      onClick={() => {
+                        if (!canGoToWire || parsedOccupantRef === null) {
+                          return;
+                        }
+                        onGoToWireFromAnalysis(parsedOccupantRef.wireId);
+                      }}
+                    >
+                      <span className="action-button-icon is-open" aria-hidden="true" />
+                      Go to
+                    </button>
+                    <button type="button" className="button-with-icon" onClick={() => handleReleaseCavity(slot.cavityIndex)}>
+                      <span className="action-button-icon is-cancel" aria-hidden="true" />
+                      Release
+                    </button>
+                  </div>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
       </div>
     </>
   ) : connectorAnalysisView === "physical" ? (

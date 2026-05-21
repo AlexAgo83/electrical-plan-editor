@@ -456,92 +456,96 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
       </p>
       <p className="meta-line">Capacity: {selectedSplicePortMode === "unbounded" ? "∞ (unbounded)" : `${selectedSplice.portCount} ports`}</p>
       <p className="meta-line">Branch count: {splicePortStatuses.filter((slot) => slot.isOccupied).length}</p>
-      <form className="row-form" onSubmit={handleReservePortSubmit}>
-        <label>
-          Port index
-          <input
-            type="number"
-            min={1}
-            max={selectedSplicePortMode === "bounded" ? selectedSplice.portCount : undefined}
-            step={1}
-            value={portIndexInput}
-            onChange={(event) => setPortIndexInput(event.target.value)}
-            aria-invalid={spliceReserveValidationMessage !== null ? true : undefined}
-            required
-          />
-        </label>
+      <div className="connector-ways-view splice-ports-view">
+        <section className="connector-ways-assignment-panel splice-ports-assignment-panel" aria-label="Manual port assignment">
+          <form className="row-form connector-ways-assignment-form splice-ports-assignment-form" onSubmit={handleReservePortSubmit}>
+            <label>
+              Port index
+              <input
+                type="number"
+                min={1}
+                max={selectedSplicePortMode === "bounded" ? selectedSplice.portCount : undefined}
+                step={1}
+                value={portIndexInput}
+                onChange={(event) => setPortIndexInput(event.target.value)}
+                aria-invalid={spliceReserveValidationMessage !== null ? true : undefined}
+                required
+              />
+            </label>
 
-        <label>
-          Occupant reference
-          <input
-            value={spliceOccupantRefInput}
-            onChange={(event) => setSpliceOccupantRefInput(event.target.value)}
-            placeholder="wire-draft-001:B"
-            required
-          />
-        </label>
+            <label>
+              Occupant reference
+              <input
+                value={spliceOccupantRefInput}
+                onChange={(event) => setSpliceOccupantRefInput(event.target.value)}
+                placeholder="wire-draft-001:B"
+                required
+              />
+            </label>
 
-        <button type="submit" className="button-with-icon" disabled={!canReservePort}>
-          <span className="action-button-icon is-lock-move" aria-hidden="true" />
-          Reserve port
-        </button>
-      </form>
-      {spliceReserveValidationMessage !== null ? <small className="inline-error">{spliceReserveValidationMessage}</small> : null}
-      {spliceReserveValidationMessage === null && nextFreePortIndex !== null ? (
-        <small className="inline-help">Suggested next free port: P{nextFreePortIndex}</small>
-      ) : null}
-      {spliceReserveValidationMessage === null && nextFreePortIndex === null && selectedSplicePortMode === "bounded" ? (
-        <small className="inline-help">No available ports on this splice.</small>
-      ) : null}
-      {selectedSplicePortMode === "unbounded" ? (
-        <div className="row-actions">
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => setUnboundedVisibleFreePortCount((current) => current + 1)}
-          >
-            <span className="action-button-icon is-add" aria-hidden="true" />
-            + Add visible port(s)
-          </button>
+            <button type="submit" className="button-with-icon" disabled={!canReservePort}>
+              <span className="action-button-icon is-lock-move" aria-hidden="true" />
+              Reserve port
+            </button>
+          </form>
+          {spliceReserveValidationMessage !== null ? <small className="inline-error">{spliceReserveValidationMessage}</small> : null}
+          {spliceReserveValidationMessage === null && nextFreePortIndex !== null ? (
+            <small className="inline-help">Suggested next free port: P{nextFreePortIndex}</small>
+          ) : null}
+          {spliceReserveValidationMessage === null && nextFreePortIndex === null && selectedSplicePortMode === "bounded" ? (
+            <small className="inline-help">No available ports on this splice.</small>
+          ) : null}
+          {selectedSplicePortMode === "unbounded" ? (
+            <div className="row-actions splice-ports-assignment-actions">
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() => setUnboundedVisibleFreePortCount((current) => current + 1)}
+              >
+                <span className="action-button-icon is-add" aria-hidden="true" />
+                + Add visible port(s)
+              </button>
+            </div>
+          ) : null}
+        </section>
+
+        <div className="cavity-grid connector-ways-cavity-grid splice-ports-cavity-grid" aria-label="Splice port occupancy grid">
+          {displayedSplicePortStatuses.map((slot) => {
+            const parsedOccupantRef = slot.occupantRef === null ? null : parseWireOccupantRef(slot.occupantRef);
+            const canGoToWire =
+              parsedOccupantRef !== null &&
+              wireById.has(parsedOccupantRef.wireId);
+
+            return (
+              <article key={slot.portIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
+                <h3>P{slot.portIndex}</h3>
+                <p>{slot.isOccupied ? formatOccupantRef(slot.occupantRef) : "Free"}</p>
+                {slot.isOccupied ? (
+                  <div className="cavity-actions">
+                    <button
+                      type="button"
+                      className="validation-row-go-to-button button-with-icon"
+                      disabled={!canGoToWire}
+                      onClick={() => {
+                        if (!canGoToWire || parsedOccupantRef === null) {
+                          return;
+                        }
+                        onGoToWireFromAnalysis(parsedOccupantRef.wireId);
+                      }}
+                    >
+                      <span className="action-button-icon is-open" aria-hidden="true" />
+                      Go to
+                    </button>
+                    <button type="button" className="button-with-icon" onClick={() => handleReleasePort(slot.portIndex)}>
+                      <span className="action-button-icon is-cancel" aria-hidden="true" />
+                      Release
+                    </button>
+                  </div>
+                ) : null}
+              </article>
+            );
+          })}
         </div>
-      ) : null}
-
-      <div className="cavity-grid" aria-label="Splice port occupancy grid">
-        {displayedSplicePortStatuses.map((slot) => {
-          const parsedOccupantRef = slot.occupantRef === null ? null : parseWireOccupantRef(slot.occupantRef);
-          const canGoToWire =
-            parsedOccupantRef !== null &&
-            wireById.has(parsedOccupantRef.wireId);
-
-          return (
-            <article key={slot.portIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
-              <h3>P{slot.portIndex}</h3>
-              <p>{slot.isOccupied ? formatOccupantRef(slot.occupantRef) : "Free"}</p>
-              {slot.isOccupied ? (
-                <div className="cavity-actions">
-                  <button
-                    type="button"
-                    className="validation-row-go-to-button button-with-icon"
-                    disabled={!canGoToWire}
-                    onClick={() => {
-                      if (!canGoToWire || parsedOccupantRef === null) {
-                        return;
-                      }
-                      onGoToWireFromAnalysis(parsedOccupantRef.wireId);
-                    }}
-                  >
-                    <span className="action-button-icon is-open" aria-hidden="true" />
-                    Go to
-                  </button>
-                  <button type="button" className="button-with-icon" onClick={() => handleReleasePort(slot.portIndex)}>
-                    <span className="action-button-icon is-cancel" aria-hidden="true" />
-                    Release
-                  </button>
-                </div>
-              ) : null}
-            </article>
-          );
-        })}
       </div>
     </>
   ) : sortedSpliceSynthesisRowsByColumns.length === 0 ? (

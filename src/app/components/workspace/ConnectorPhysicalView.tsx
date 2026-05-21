@@ -255,7 +255,6 @@ export function ConnectorPhysicalView({
 }: ConnectorPhysicalViewProps): ReactElement {
   const layout = resolveConnectorLayout(catalogItem?.connectorLayout, connector.cavityCount);
   const statusByCavity = new Map(connectorCavityStatuses.map((status) => [status.cavityIndex, status] as const));
-  const hasCustomLayout = catalogItem?.connectorLayout !== undefined;
   const keyings = getConnectorLayoutKeyings(layout);
   const shellShape = getConnectorLayoutShellShape(layout);
   const shellPadding = getConnectorLayoutShellPadding(layout);
@@ -328,9 +327,6 @@ export function ConnectorPhysicalView({
       </div>
 
       <div className="connector-physical-details">
-        <p className="meta-line">
-          {hasCustomLayout ? "Using catalog physical layout." : "Using generated layout. Edit the catalog item to define the physical face."}
-        </p>
         <div className="cavity-grid connector-physical-way-list" aria-label="Physical way details">
           {layout.ways.map((way) => {
             const status = statusByCavity.get(way.cavityIndex);

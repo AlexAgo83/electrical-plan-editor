@@ -68,7 +68,10 @@ describe("App integration UI - catalog layout", () => {
     fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
 
     expect(within(connectorAnalysisPanel).getByLabelText("Connector physical view")).toBeInTheDocument();
-    expect(within(connectorAnalysisPanel).getByText("Using catalog physical layout.")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).queryByText("Using catalog physical layout.")).not.toBeInTheDocument();
+    expect(
+      within(connectorAnalysisPanel).queryByText("Using generated layout. Edit the catalog item to define the physical face.")
+    ).not.toBeInTheDocument();
     expect(within(connectorAnalysisPanel).getByText("A10")).toBeInTheDocument();
     expect(within(connectorAnalysisPanel).getByText("A2")).toBeInTheDocument();
     expect(within(connectorAnalysisPanel).getByText("A10")).toHaveClass("is-long-label");
