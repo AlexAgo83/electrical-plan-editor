@@ -63,6 +63,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   | "toggleShowNetworkInfoPanels"
   | "toggleShowSegmentLengths"
   | "toggleShowCableCallouts"
+  | "toggleShowFloatingInspectorPanel"
   | "toggleShowNetworkGrid"
   | "toggleSnapNodesToGrid"
   | "toggleLockEntityMovement"
@@ -75,6 +76,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   setShowNetworkInfoPanels: BooleanStateSetter;
   setShowSegmentLengths: BooleanStateSetter;
   setShowCableCallouts: BooleanStateSetter;
+  setShowFloatingInspectorPanel: BooleanStateSetter;
   networkCalloutContentMode: NetworkSummaryPanelProps["calloutContentMode"];
   setShowNetworkGrid: BooleanStateSetter;
   setSnapNodesToGrid: BooleanStateSetter;
@@ -247,9 +249,11 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     exportCartoucheCreatedAt: params.exportCartoucheCreatedAt,
     exportCartoucheLogoUrl: params.exportCartoucheLogoUrl,
     exportCartoucheNotes: params.exportCartoucheNotes,
+    showFloatingInspectorPanel: params.showFloatingInspectorPanel,
     toggleShowNetworkInfoPanels: () => params.setShowNetworkInfoPanels((current: boolean) => !current),
     toggleShowSegmentLengths: () => params.setShowSegmentLengths((current: boolean) => !current),
     toggleShowCableCallouts: () => params.setShowCableCallouts((current: boolean) => !current),
+    toggleShowFloatingInspectorPanel: () => params.setShowFloatingInspectorPanel((current: boolean) => !current),
     toggleShowNetworkGrid: () => params.setShowNetworkGrid((current: boolean) => !current),
     toggleSnapNodesToGrid: () => params.setSnapNodesToGrid((current: boolean) => !current),
     toggleLockEntityMovement: () => params.setLockEntityMovement((current: boolean) => !current),

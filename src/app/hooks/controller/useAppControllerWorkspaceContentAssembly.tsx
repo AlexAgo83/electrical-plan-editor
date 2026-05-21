@@ -251,6 +251,8 @@ export function useAppControllerWorkspaceContentAssembly({
       canvasExportIncludeFrame: models.preferencesState.canvasExportIncludeFrame,
       canvasExportIncludeCartouche: models.preferencesState.canvasExportIncludeCartouche,
       canvasPngExportIncludeBackground: models.preferencesState.canvasPngExportIncludeBackground,
+      showFloatingInspectorPanel: models.preferencesState.showFloatingInspectorPanel,
+      setShowFloatingInspectorPanel: models.preferencesState.setShowFloatingInspectorPanel,
       showRoutePreviewPanel: models.preferencesState.showRoutePreviewPanel
     },
     selection: {

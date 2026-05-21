@@ -121,6 +121,8 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
     | "canvasExportIncludeFrame"
     | "canvasExportIncludeCartouche"
     | "canvasPngExportIncludeBackground"
+    | "showFloatingInspectorPanel"
+    | "setShowFloatingInspectorPanel"
     | "showRoutePreviewPanel"
   >;
   selection: Pick<
@@ -304,6 +306,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
         exportCartoucheCreatedAt: activeNetwork?.createdAt ?? new Date().toISOString(),
         exportCartoucheLogoUrl: activeNetwork?.logoUrl,
         exportCartoucheNotes: activeNetwork?.exportNotes,
+        showFloatingInspectorPanel: preferencesState.showFloatingInspectorPanel,
+        setShowFloatingInspectorPanel: preferencesState.setShowFloatingInspectorPanel,
         networkScalePercent,
         routingGraph,
         totalEdgeEntries,

@@ -65,6 +65,7 @@
 }
 
 .network-summary-grid-icon,
+.network-summary-inspector-icon,
 .network-summary-snap-icon,
 .network-summary-lock-move-icon,
 .network-summary-info-icon,
@@ -76,6 +77,7 @@
 }
 
 .network-summary-grid-icon,
+.network-summary-inspector-icon,
 .network-summary-snap-icon,
 .network-summary-lock-move-icon,
 .network-summary-info-icon,
@@ -90,6 +92,11 @@
 .network-summary-grid-icon {
   -webkit-mask: url("/icons/grid_show.svg") center / contain no-repeat;
   mask: url("/icons/grid_show.svg") center / contain no-repeat;
+}
+
+.network-summary-inspector-icon {
+  -webkit-mask: url("/icons/info.svg") center / contain no-repeat;
+  mask: url("/icons/info.svg") center / contain no-repeat;
 }
 
 .network-summary-snap-icon {

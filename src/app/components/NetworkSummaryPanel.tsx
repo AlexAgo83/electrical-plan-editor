@@ -101,12 +101,14 @@ export interface NetworkSummaryPanelProps {
   exportCartoucheCreatedAt: string;
   exportCartoucheLogoUrl?: string;
   exportCartoucheNotes?: string;
+  showFloatingInspectorPanel: boolean;
   showNetworkGrid: boolean;
   snapNodesToGrid: boolean;
   lockEntityMovement: boolean;
   toggleShowNetworkInfoPanels: () => void;
   toggleShowSegmentLengths: () => void;
   toggleShowCableCallouts: () => void;
+  toggleShowFloatingInspectorPanel: () => void;
   toggleShowNetworkGrid: () => void;
   toggleSnapNodesToGrid: () => void;
   toggleLockEntityMovement: () => void;
@@ -199,12 +201,14 @@ export function NetworkSummaryPanel({
   exportCartoucheCreatedAt,
   exportCartoucheLogoUrl,
   exportCartoucheNotes,
+  showFloatingInspectorPanel,
   showNetworkGrid,
   snapNodesToGrid,
   lockEntityMovement,
   toggleShowNetworkInfoPanels,
   toggleShowSegmentLengths,
   toggleShowCableCallouts,
+  toggleShowFloatingInspectorPanel,
   toggleShowNetworkGrid,
   toggleSnapNodesToGrid,
   toggleLockEntityMovement,
@@ -828,6 +832,16 @@ export function NetworkSummaryPanel({
             ) : null}
           </div>
           <div className="network-summary-header-actions" role="group" aria-label="Network summary display options">
+            <button
+              type="button"
+              className={showFloatingInspectorPanel ? "workspace-tab is-active" : "workspace-tab"}
+              onClick={toggleShowFloatingInspectorPanel}
+              aria-pressed={showFloatingInspectorPanel}
+              aria-label={showFloatingInspectorPanel ? "Hide inspector" : "Show inspector"}
+            >
+              <span className="network-summary-inspector-icon" aria-hidden="true" />
+              Inspect
+            </button>
             <button
               type="button"
               className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}

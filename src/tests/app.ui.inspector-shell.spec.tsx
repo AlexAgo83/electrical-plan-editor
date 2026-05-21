@@ -63,6 +63,25 @@ describe("App integration UI - inspector floating shell", () => {
     expect(screen.queryByRole("heading", { name: "Edit Connector" })).not.toBeInTheDocument();
   });
 
+  it("toggles the floating inspector from network summary display options", () => {
+    renderAppWithState(createUiIntegrationState());
+    closeOnboardingIfOpen();
+    switchScreenDrawerAware("modeling");
+
+    const displayOptions = screen.getByRole("group", { name: "Network summary display options" });
+    const hideInspectorButton = within(displayOptions).getByRole("button", { name: "Hide inspector" });
+    expect(hideInspectorButton).toHaveTextContent("Inspect");
+    expect(hideInspectorButton).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.click(hideInspectorButton);
+    const showInspectorButton = within(displayOptions).getByRole("button", { name: "Show inspector" });
+    expect(showInspectorButton).toHaveAttribute("aria-pressed", "false");
+    expect(getInspectorShell()).not.toBeInTheDocument();
+
+    fireEvent.click(showInspectorButton);
+    expect(within(displayOptions).getByRole("button", { name: "Hide inspector" })).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("opens inspector on modeling and analysis when a selection exists", () => {
     renderAppWithState(createUiIntegrationState());
     closeOnboardingIfOpen();
