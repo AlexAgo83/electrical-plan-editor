@@ -277,7 +277,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
           </>
         ) : (
           <>
-            <table className="data-table">
+            <table className="data-table analysis-nodes-table">
               <thead>
               <tr>
                 <th aria-sort={getTableAriaSort(nodeTableSort, "id")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort(buildToggleSortUpdater<NodeTableSortField>("id"))}>ID <span className="sort-indicator">{indicator(nodeTableSort, "id")}</span></button></th>
@@ -338,7 +338,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
             {sortedNodeAssociatedSegments.length === 0 ? (
               <p className="empty-copy">No segment is connected to this node.</p>
             ) : (
-              <table className="data-table">
+              <table className="data-table analysis-node-segments-table">
                 <thead>
                   <tr>
                     <th aria-sort={getTableAriaSort(nodeSegmentsSort, "segmentId")}><button type="button" className="sort-header-button" onClick={() => setNodeSegmentsSort(buildToggleSortUpdater<NodeAssociatedSegmentsSortField>("segmentId"))}>Segment ID <span className="sort-indicator">{indicator(nodeSegmentsSort, "segmentId")}</span></button></th>
@@ -362,11 +362,12 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                         <td className="validation-actions-cell">
                           <button
                             type="button"
+                            aria-label="Go to"
                             className="validation-row-go-to-button button-with-icon"
                             onClick={() => onGoToSegmentFromAnalysis(segment.id)}
                           >
                             <span className="action-button-icon is-open" aria-hidden="true" />
-                            Go to
+                            <span className="analysis-table-go-to-label">Go to</span>
                           </button>
                         </td>
                       </tr>
@@ -452,7 +453,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
           </>
         ) : (
           <>
-            <table className="data-table">
+            <table className="data-table analysis-segments-table">
               <thead>
               <tr>
                 <th aria-sort={getTableAriaSort(segmentTableSort, "id")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort(buildToggleSortUpdater<SegmentTableSortField>("id"))}>ID <span className="sort-indicator">{indicator(segmentTableSort, "id")}</span></button></th>
@@ -517,7 +518,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
             {sortedSegmentTraversingWires.length === 0 ? (
               <p className="empty-copy">No wire traverses this segment.</p>
             ) : (
-              <table className="data-table">
+              <table className="data-table analysis-segment-wires-table">
                 <thead>
                   <tr>
                     <th aria-sort={getTableAriaSort(segmentWiresSort, "name")}><button type="button" className="sort-header-button" onClick={() => setSegmentWiresSort(buildToggleSortUpdater<SegmentTraversingWiresSortField>("name"))}>Name <span className="sort-indicator">{indicator(segmentWiresSort, "name")}</span></button></th>
@@ -545,11 +546,12 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                       <td className="validation-actions-cell">
                         <button
                           type="button"
+                          aria-label="Go to"
                           className="validation-row-go-to-button button-with-icon"
                           onClick={() => onGoToWireFromAnalysis(wire.id)}
                         >
                           <span className="action-button-icon is-open" aria-hidden="true" />
-                          Go to
+                          <span className="analysis-table-go-to-label">Go to</span>
                         </button>
                       </td>
                     </tr>

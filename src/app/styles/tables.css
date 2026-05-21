@@ -366,6 +366,43 @@
   min-width: 0;
 }
 
+.analysis-nodes-table,
+.analysis-node-segments-table,
+.analysis-segments-table,
+.analysis-segment-wires-table {
+  table-layout: fixed;
+}
+
+.analysis-nodes-table th:nth-child(4),
+.analysis-nodes-table td:nth-child(4) {
+  width: 6.4rem;
+  text-align: center;
+}
+
+.analysis-node-segments-table .validation-actions-cell,
+.analysis-segment-wires-table .validation-actions-cell {
+  width: 5.1rem;
+  text-align: right;
+}
+
+.analysis-node-segments-table th:nth-child(3),
+.analysis-node-segments-table td:nth-child(3),
+.analysis-node-segments-table th:nth-child(5),
+.analysis-node-segments-table td:nth-child(5),
+.analysis-segments-table th:nth-child(5),
+.analysis-segments-table td:nth-child(5),
+.analysis-segment-wires-table th:nth-child(6),
+.analysis-segment-wires-table td:nth-child(6),
+.analysis-segment-wires-table th:nth-child(7),
+.analysis-segment-wires-table td:nth-child(7) {
+  width: 4.2rem;
+}
+
+.analysis-segment-wires-table th:nth-child(3),
+.analysis-segment-wires-table td:nth-child(3) {
+  width: 4.6rem;
+}
+
 .entity-reference-button {
   appearance: none;
   border: 0;
@@ -683,6 +720,55 @@
 
   .catalog-reference-save-label {
     display: none;
+  }
+
+  .analysis-node-segments-table .validation-actions-cell,
+  .analysis-segment-wires-table .validation-actions-cell {
+    width: 2.65rem;
+  }
+
+  .analysis-node-segments-table .validation-row-go-to-button,
+  .analysis-segment-wires-table .validation-row-go-to-button {
+    min-width: 0;
+    width: 2.15rem;
+    padding-inline: 0.32rem;
+  }
+
+  .analysis-node-segments-table .validation-row-go-to-button .action-button-icon,
+  .analysis-segment-wires-table .validation-row-go-to-button .action-button-icon {
+    flex: 0 0 0.85rem;
+  }
+
+  .analysis-table-go-to-label {
+    display: none;
+  }
+
+  .analysis-nodes-table th:nth-child(2),
+  .analysis-nodes-table td:nth-child(2) {
+    width: 5rem;
+  }
+
+  .analysis-nodes-table th:nth-child(4),
+  .analysis-nodes-table td:nth-child(4) {
+    width: 3.1rem;
+  }
+
+  .analysis-node-segments-table th:nth-child(3),
+  .analysis-node-segments-table td:nth-child(3),
+  .analysis-node-segments-table th:nth-child(5),
+  .analysis-node-segments-table td:nth-child(5),
+  .analysis-segments-table th:nth-child(5),
+  .analysis-segments-table td:nth-child(5),
+  .analysis-segment-wires-table th:nth-child(6),
+  .analysis-segment-wires-table td:nth-child(6),
+  .analysis-segment-wires-table th:nth-child(7),
+  .analysis-segment-wires-table td:nth-child(7) {
+    width: 2.8rem;
+  }
+
+  .analysis-segment-wires-table th:nth-child(3),
+  .analysis-segment-wires-table td:nth-child(3) {
+    width: 3.1rem;
   }
 }
 
