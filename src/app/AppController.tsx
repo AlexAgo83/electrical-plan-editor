@@ -1,4 +1,4 @@
-import { type ReactElement, useCallback, useMemo, useRef, useState } from "react";
+import { type ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import appPackageMetadata from "../../package.json";
 import type { CatalogItemId } from "../core/entities";
 import {
@@ -19,7 +19,7 @@ import {
   withPreservedNetworkSummaryViewStates
 } from "../store";
 import { appStore } from "./store";
-import { appUiModules } from "./components/appUiModules";
+import { appUiModules, preloadNetworkSummaryWorkspaceUiModules } from "./components/appUiModules";
 import { AppShellLayout } from "./components/layout/AppShellLayout";
 import { AppControllerOverlays } from "./components/layout/AppControllerOverlays";
 import { ToastViewport } from "./components/ToastViewport";
@@ -468,6 +468,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     wire: wires.length
   };
   const hasActiveNetwork = activeNetwork !== null;
+  useEffect(() => {
+    if (hasActiveNetwork && (isModelingScreen || isAnalysisScreen)) {
+      preloadNetworkSummaryWorkspaceUiModules();
+    }
+  }, [hasActiveNetwork, isAnalysisScreen, isModelingScreen]);
   const isCurrentWorkspaceEmpty = isWorkspaceEmpty(state);
   const hasBuiltInSampleState = hasSampleNetworkSignature(state);
   const { toasts, notifyToast, dismissToast } = useToastNotifications();

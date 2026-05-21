@@ -27,56 +27,87 @@ async function maybeDelayLazyImportForTests(): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, appUiModulesLazyImportDelayMsForTests));
 }
 
+const lazyUiModulePromiseCache = new Map<string, Promise<{ default: unknown }>>();
+
 function loadLazyUiModule<TModule, TExport>(
+  cacheKey: string,
   loader: () => Promise<TModule>,
   pickDefault: (module: TModule) => TExport
 ): Promise<{ default: TExport }> {
-  return (async () => {
+  const cachedPromise = lazyUiModulePromiseCache.get(cacheKey);
+  if (cachedPromise !== undefined) {
+    return cachedPromise as Promise<{ default: TExport }>;
+  }
+
+  const lazyModulePromise = (async () => {
     await maybeDelayLazyImportForTests();
     const module = await loader();
     return { default: pickDefault(module) };
   })();
+  lazyUiModulePromiseCache.set(cacheKey, lazyModulePromise as Promise<{ default: unknown }>);
+  void lazyModulePromise.catch(() => {
+    if (lazyUiModulePromiseCache.get(cacheKey) === lazyModulePromise) {
+      lazyUiModulePromiseCache.delete(cacheKey);
+    }
+  });
+  return lazyModulePromise;
 }
 
 const appUiModulesLazy = {
   NetworkSummaryPanel: lazy(() =>
-    loadLazyUiModule(() => import("./NetworkSummaryPanel"), (module) => module.NetworkSummaryPanel)
+    loadLazyUiModule("NetworkSummaryPanel", () => import("./NetworkSummaryPanel"), (module) => module.NetworkSummaryPanel)
   ),
-  AnalysisScreen: lazy(() => loadLazyUiModule(() => import("./screens/AnalysisScreen"), (module) => module.AnalysisScreen)),
-  HomeScreen: lazy(() => loadLazyUiModule(() => import("./screens/HomeScreen"), (module) => module.HomeScreen)),
-  ModelingScreen: lazy(() => loadLazyUiModule(() => import("./screens/ModelingScreen"), (module) => module.ModelingScreen)),
+  AnalysisScreen: lazy(() => loadLazyUiModule("AnalysisScreen", () => import("./screens/AnalysisScreen"), (module) => module.AnalysisScreen)),
+  HomeScreen: lazy(() => loadLazyUiModule("HomeScreen", () => import("./screens/HomeScreen"), (module) => module.HomeScreen)),
+  ModelingScreen: lazy(() => loadLazyUiModule("ModelingScreen", () => import("./screens/ModelingScreen"), (module) => module.ModelingScreen)),
   NetworkScopeScreen: lazy(() =>
-    loadLazyUiModule(() => import("./screens/NetworkScopeScreen"), (module) => module.NetworkScopeScreen)
+    loadLazyUiModule("NetworkScopeScreen", () => import("./screens/NetworkScopeScreen"), (module) => module.NetworkScopeScreen)
   ),
-  SettingsScreen: lazy(() => loadLazyUiModule(() => import("./screens/SettingsScreen"), (module) => module.SettingsScreen)),
+  SettingsScreen: lazy(() => loadLazyUiModule("SettingsScreen", () => import("./screens/SettingsScreen"), (module) => module.SettingsScreen)),
   ValidationScreen: lazy(() =>
-    loadLazyUiModule(() => import("./screens/ValidationScreen"), (module) => module.ValidationScreen)
+    loadLazyUiModule("ValidationScreen", () => import("./screens/ValidationScreen"), (module) => module.ValidationScreen)
   ),
   AnalysisWorkspaceContent: lazy(() =>
-    loadLazyUiModule(() => import("./workspace/AnalysisWorkspaceContent"), (module) => module.AnalysisWorkspaceContent)
+    loadLazyUiModule("AnalysisWorkspaceContent", () => import("./workspace/AnalysisWorkspaceContent"), (module) => module.AnalysisWorkspaceContent)
   ),
   HomeWorkspaceContent: lazy(() =>
-    loadLazyUiModule(() => import("./workspace/HomeWorkspaceContent"), (module) => module.HomeWorkspaceContent)
+    loadLazyUiModule("HomeWorkspaceContent", () => import("./workspace/HomeWorkspaceContent"), (module) => module.HomeWorkspaceContent)
   ),
   ModelingFormsColumn: lazy(() =>
-    loadLazyUiModule(() => import("./workspace/ModelingFormsColumn"), (module) => module.ModelingFormsColumn)
+    loadLazyUiModule("ModelingFormsColumn", () => import("./workspace/ModelingFormsColumn"), (module) => module.ModelingFormsColumn)
   ),
   ModelingPrimaryTables: lazy(() =>
-    loadLazyUiModule(() => import("./workspace/ModelingPrimaryTables"), (module) => module.ModelingPrimaryTables)
+    loadLazyUiModule("ModelingPrimaryTables", () => import("./workspace/ModelingPrimaryTables"), (module) => module.ModelingPrimaryTables)
   ),
   ModelingSecondaryTables: lazy(() =>
-    loadLazyUiModule(() => import("./workspace/ModelingSecondaryTables"), (module) => module.ModelingSecondaryTables)
+    loadLazyUiModule("ModelingSecondaryTables", () => import("./workspace/ModelingSecondaryTables"), (module) => module.ModelingSecondaryTables)
   ),
   NetworkScopeWorkspaceContent: lazy(() =>
-    loadLazyUiModule(() => import("./workspace/NetworkScopeWorkspaceContent"), (module) => module.NetworkScopeWorkspaceContent)
+    loadLazyUiModule("NetworkScopeWorkspaceContent", () => import("./workspace/NetworkScopeWorkspaceContent"), (module) => module.NetworkScopeWorkspaceContent)
   ),
   SettingsWorkspaceContent: lazy(() =>
-    loadLazyUiModule(() => import("./workspace/SettingsWorkspaceContent"), (module) => module.SettingsWorkspaceContent)
+    loadLazyUiModule("SettingsWorkspaceContent", () => import("./workspace/SettingsWorkspaceContent"), (module) => module.SettingsWorkspaceContent)
   ),
   ValidationWorkspaceContent: lazy(() =>
-    loadLazyUiModule(() => import("./workspace/ValidationWorkspaceContent"), (module) => module.ValidationWorkspaceContent)
+    loadLazyUiModule("ValidationWorkspaceContent", () => import("./workspace/ValidationWorkspaceContent"), (module) => module.ValidationWorkspaceContent)
   )
 } as const;
+
+export function preloadNetworkSummaryWorkspaceUiModules(): void {
+  if (!shouldLazyLoadUiModules()) {
+    return;
+  }
+
+  void Promise.all([
+    loadLazyUiModule("NetworkSummaryPanel", () => import("./NetworkSummaryPanel"), (module) => module.NetworkSummaryPanel),
+    loadLazyUiModule("AnalysisScreen", () => import("./screens/AnalysisScreen"), (module) => module.AnalysisScreen),
+    loadLazyUiModule("ModelingScreen", () => import("./screens/ModelingScreen"), (module) => module.ModelingScreen),
+    loadLazyUiModule("AnalysisWorkspaceContent", () => import("./workspace/AnalysisWorkspaceContent"), (module) => module.AnalysisWorkspaceContent),
+    loadLazyUiModule("ModelingFormsColumn", () => import("./workspace/ModelingFormsColumn"), (module) => module.ModelingFormsColumn),
+    loadLazyUiModule("ModelingPrimaryTables", () => import("./workspace/ModelingPrimaryTables"), (module) => module.ModelingPrimaryTables),
+    loadLazyUiModule("ModelingSecondaryTables", () => import("./workspace/ModelingSecondaryTables"), (module) => module.ModelingSecondaryTables)
+  ]).catch(() => undefined);
+}
 
 function getEagerRegistryForCurrentEnvironment(): AppUiModulesRegistry {
   if (eagerRegistryForTests === null) {
@@ -153,6 +184,7 @@ export function setAppUiModulesEagerRegistryForTests(registry: AppUiModulesRegis
 export function resetAppUiModulesNonRegistryTestControls(): void {
   appUiModulesLoadingModeForTests = "auto";
   appUiModulesLazyImportDelayMsForTests = 0;
+  lazyUiModulePromiseCache.clear();
 }
 
 // Backward-compatible alias: only resets mode/delay knobs. The eager registry is managed separately in test setup.
