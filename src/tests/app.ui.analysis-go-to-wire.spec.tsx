@@ -79,6 +79,27 @@ describe("App integration UI - analysis go-to wire actions", () => {
     expect((physicalCard as HTMLElement).querySelectorAll('[title="Red / Blue"]')).toHaveLength(2);
   });
 
+  it("preserves the connector analysis view when returning to connector analysis", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("connector");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+
+    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
+    expect(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" })).toHaveAttribute("aria-pressed", "true");
+
+    switchSubScreenDrawerAware("wire");
+    switchSubScreenDrawerAware("connector");
+
+    const refreshedConnectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    expect(within(refreshedConnectorAnalysisPanel).getByRole("button", { name: "Physical" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(refreshedConnectorAnalysisPanel).getByRole("button", { name: "Ways" })).toHaveAttribute("aria-pressed", "false");
+  });
+
   it("opens wire analysis from splice occupancy card and keeps Go to before Release", () => {
     renderAppWithState(createUiIntegrationState());
 
@@ -103,6 +124,27 @@ describe("App integration UI - analysis go-to wire actions", () => {
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/, hidden: true })).toHaveClass("is-active");
+  });
+
+  it("preserves the splice analysis view when returning to splice analysis", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("splice");
+
+    const splicesPanel = getPanelByHeading("Splices");
+    fireEvent.click(within(splicesPanel).getByText("Splice 1"));
+
+    const spliceAnalysisPanel = getPanelByHeading("Splice analysis");
+    fireEvent.click(within(spliceAnalysisPanel).getByRole("button", { name: "Synthesis" }));
+    expect(within(spliceAnalysisPanel).getByRole("button", { name: "Synthesis" })).toHaveAttribute("aria-pressed", "true");
+
+    switchSubScreenDrawerAware("wire");
+    switchSubScreenDrawerAware("splice");
+
+    const refreshedSpliceAnalysisPanel = getPanelByHeading("Splice analysis");
+    expect(within(refreshedSpliceAnalysisPanel).getByRole("button", { name: "Synthesis" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(refreshedSpliceAnalysisPanel).getByRole("button", { name: "Ports" })).toHaveAttribute("aria-pressed", "false");
   });
 
   it("disables Go to when occupancy references a missing wire and keeps Release enabled", () => {

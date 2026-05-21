@@ -16,6 +16,10 @@ import {
   buildAnalysisScreenContentSlice,
   buildModelingScreenContentSlice
 } from "./useAppControllerScreenContentSlices";
+import type {
+  ConnectorAnalysisView,
+  SpliceAnalysisView
+} from "../../components/workspace/AnalysisWorkspaceContent.types";
 
 type ModelingSliceParams = Parameters<typeof buildModelingScreenContentSlice>[0];
 type AnalysisSliceParams = Parameters<typeof buildAnalysisScreenContentSlice>[0];
@@ -182,6 +186,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
   markSelectionPanelsFromTable,
   onboardingHelp
 }: UseAppControllerModelingAnalysisScreenDomainsParams) {
+  const [connectorAnalysisView, setConnectorAnalysisView] = useState<ConnectorAnalysisView>("cavities");
+  const [spliceAnalysisView, setSpliceAnalysisView] = useState<SpliceAnalysisView>("ports");
   const [activeBatchScope, setActiveBatchScope] = useState<ModelingBatchSelectionScope | null>(null);
   const [batchSelectionIds, setBatchSelectionIds] = useState<ReadonlySet<string>>(new Set());
   const activeSubScreenBatchScope = screenFlags.isConnectorSubScreen
@@ -751,6 +757,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     connectorSynthesisSort: listModel.connectorSynthesisSort,
     setConnectorSynthesisSort: listModel.setConnectorSynthesisSort,
     getSortIndicator: listModel.getSortIndicator,
+    connectorAnalysisView,
+    setConnectorAnalysisView,
     selectedSplice: selection.selectedSplice,
     selectedSpliceId: selection.selectedSpliceId,
     spliceOccupancyFilter: listModel.spliceOccupancyFilter,
@@ -776,6 +784,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     sortedSpliceSynthesisRows: listModel.sortedSpliceSynthesisRows,
     spliceSynthesisSort: listModel.spliceSynthesisSort,
     setSpliceSynthesisSort: listModel.setSpliceSynthesisSort,
+    spliceAnalysisView,
+    setSpliceAnalysisView,
     nodeKindFilter: listModel.nodeKindFilter,
     setNodeKindFilter: listModel.setNodeKindFilter,
     nodeFilterField: listModel.nodeFilterField,

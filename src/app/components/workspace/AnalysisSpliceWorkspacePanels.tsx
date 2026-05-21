@@ -44,6 +44,8 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
     sortedSpliceSynthesisRows,
     spliceSynthesisSort: _spliceSynthesisSort,
     setSpliceSynthesisSort: _setSpliceSynthesisSort,
+    spliceAnalysisView,
+    setSpliceAnalysisView,
     getSortIndicator: _getSortIndicator
   } = props;
   void _spliceSort;
@@ -54,7 +56,6 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
   type SpliceAnalysisTableSortField = "name" | "technicalId" | "manufacturerReference" | "portCount" | "branchCount";
   type SpliceSynthesisTableSortField = "name" | "technicalId" | "localPort" | "destination" | "lengthMm";
   const isMobileViewport = useIsMobileViewport();
-  const [spliceAnalysisView, setSpliceAnalysisView] = useState<"ports" | "synthesis">("ports");
   const [spliceTableSort, setSpliceTableSort] = useState<{ field: SpliceAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const [spliceSynthesisTableSort, setSpliceSynthesisTableSort] = useState<{ field: SpliceSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
@@ -394,6 +395,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
         <button
           type="button"
           className={spliceAnalysisView === "ports" ? "filter-chip is-active" : "filter-chip"}
+          aria-pressed={spliceAnalysisView === "ports"}
           onClick={() => setSpliceAnalysisView("ports")}
         >
           Ports
@@ -401,6 +403,7 @@ export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentPro
         <button
           type="button"
           className={spliceAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
+          aria-pressed={spliceAnalysisView === "synthesis"}
           onClick={() => setSpliceAnalysisView("synthesis")}
         >
           Synthesis

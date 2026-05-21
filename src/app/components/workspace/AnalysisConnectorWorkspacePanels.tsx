@@ -42,6 +42,8 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     sortedConnectorSynthesisRows,
     connectorSynthesisSort: _connectorSynthesisSort,
     setConnectorSynthesisSort: _setConnectorSynthesisSort,
+    connectorAnalysisView,
+    setConnectorAnalysisView,
     getSortIndicator: _getSortIndicator
   } = props;
   void _connectorSynthesisSort;
@@ -50,7 +52,6 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   type ConnectorAnalysisTableSortField = "name" | "technicalId" | "manufacturerReference" | "cavityCount" | "occupiedCount";
   type ConnectorSynthesisTableSortField = "name" | "technicalId" | "localWay" | "destination" | "lengthMm";
   const isMobileViewport = useIsMobileViewport();
-  const [connectorAnalysisView, setConnectorAnalysisView] = useState<"cavities" | "physical" | "synthesis">("cavities");
   const [connectorTableSort, setConnectorTableSort] = useState<{ field: ConnectorAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const [connectorSynthesisTableSort, setConnectorSynthesisTableSort] = useState<{ field: ConnectorSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
@@ -361,6 +362,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         <button
           type="button"
           className={connectorAnalysisView === "cavities" ? "filter-chip is-active" : "filter-chip"}
+          aria-pressed={connectorAnalysisView === "cavities"}
           onClick={() => setConnectorAnalysisView("cavities")}
         >
           Ways
@@ -368,6 +370,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         <button
           type="button"
           className={connectorAnalysisView === "physical" ? "filter-chip is-active" : "filter-chip"}
+          aria-pressed={connectorAnalysisView === "physical"}
           onClick={() => setConnectorAnalysisView("physical")}
         >
           Physical
@@ -375,6 +378,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         <button
           type="button"
           className={connectorAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
+          aria-pressed={connectorAnalysisView === "synthesis"}
           onClick={() => setConnectorAnalysisView("synthesis")}
         >
           Synthesis

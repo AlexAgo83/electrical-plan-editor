@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type ReactElement, type RefObject } from "react";
+import { useState, type ChangeEvent, type ReactElement, type RefObject } from "react";
 import type {
   CatalogItem,
   CatalogItemId,
@@ -84,12 +84,6 @@ export function useAppControllerCatalogScreenDomains({
 }: UseAppControllerCatalogScreenDomainsParams): UseAppControllerCatalogScreenDomainsResult {
   const [activeCatalogTableView, setActiveCatalogTableView] = useState<CatalogTableView>("items");
   const isCatalogItemsView = activeCatalogTableView === "items";
-
-  useEffect(() => {
-    if (isCatalogSubScreen && selectedCatalogItemId !== null) {
-      setActiveCatalogTableView("items");
-    }
-  }, [isCatalogSubScreen, selectedCatalogItemId]);
 
   const catalogModelingLeftColumnContent = (
     <ModelingCatalogListPanel

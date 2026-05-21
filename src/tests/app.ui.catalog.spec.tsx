@@ -293,7 +293,7 @@ describe("App integration UI - catalog", () => {
     expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
   });
 
-  it("returns to catalog items when opening a connector manufacturer reference after reference views", () => {
+  it("preserves the selected catalog table view when returning to catalog", () => {
     const catalogItemId = asCatalogItemId("CAT-MFR-LINK");
     let state = appReducer(
       createUiIntegrationState(),
@@ -326,9 +326,8 @@ describe("App integration UI - catalog", () => {
     fireEvent.click(within(connectorsPanel).getByRole("button", { name: "CAT-MFR-LINK" }));
 
     const refreshedCatalogPanel = getPanelByHeading("Catalog");
-    expect(within(refreshedCatalogPanel).getByRole("button", { name: "Items" })).toHaveAttribute("aria-pressed", "true");
-    expect(within(refreshedCatalogPanel).getByText("CAT-MFR-LINK")).toBeInTheDocument();
-    expect(within(refreshedCatalogPanel).queryByText("No seal references yet.")).not.toBeInTheDocument();
+    expect(within(refreshedCatalogPanel).getByRole("button", { name: "Seal refs" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(refreshedCatalogPanel).getByRole("button", { name: "Items" })).toHaveAttribute("aria-pressed", "false");
   });
 
   it("closes catalog edit panel when clearing the catalog selection", () => {

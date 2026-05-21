@@ -34,6 +34,9 @@ export interface SplicePortStatus extends OccupancyStatus {
   portIndex: number;
 }
 
+export type ConnectorAnalysisView = "cavities" | "physical" | "synthesis";
+export type SpliceAnalysisView = "ports" | "synthesis";
+
 export interface AnalysisWorkspaceContentProps {
   showEntityTables?: boolean;
   isConnectorSubScreen: boolean;
@@ -68,6 +71,8 @@ export interface AnalysisWorkspaceContentProps {
   connectorSynthesisSort: SortState;
   setConnectorSynthesisSort: (value: SortState | ((current: SortState) => SortState)) => void;
   getSortIndicator: (sortState: SortState, field: SortState["field"]) => string;
+  connectorAnalysisView: ConnectorAnalysisView;
+  setConnectorAnalysisView: (value: ConnectorAnalysisView) => void;
   selectedSplice: Splice | null;
   selectedSpliceId: SpliceId | null;
   spliceOccupancyFilter: "all" | "occupied" | "free";
@@ -93,6 +98,8 @@ export interface AnalysisWorkspaceContentProps {
   sortedSpliceSynthesisRows: SpliceSynthesisRow[];
   spliceSynthesisSort: SortState;
   setSpliceSynthesisSort: (value: SortState | ((current: SortState) => SortState)) => void;
+  spliceAnalysisView: SpliceAnalysisView;
+  setSpliceAnalysisView: (value: SpliceAnalysisView) => void;
   nodeKindFilter: "all" | NetworkNode["kind"];
   setNodeKindFilter: (value: "all" | NetworkNode["kind"]) => void;
   nodeFilterField: "id" | "reference" | "kind" | "any";
