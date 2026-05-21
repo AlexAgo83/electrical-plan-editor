@@ -24,6 +24,7 @@ function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, he
   const viewWidth = layout.width - 1 + shellPadding * 2 + 1;
   const viewHeight = layout.height - 1 + shellPadding * 2 + 1;
   const scale = Math.min(width / viewWidth, height / viewHeight);
+  const inverseDrawingScale = scale > 0 ? 1 / scale : 1;
   const originX = -width / 2 + (width - viewWidth * scale) / 2 - minX * scale;
   const originY = (height - viewHeight * scale) / 2 - minY * scale;
   const shellX = 1 - shellPadding;
@@ -68,6 +69,7 @@ function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, he
       {layout.ways.map((way) => {
         const label = getConnectorLayoutWayDisplayLabel(way);
         const labelClassName = `network-callout-connector-way-label${label.length > 2 ? " is-long-label" : ""}`;
+        const labelFontSize = label.length > 2 ? 4.7 : 5.8;
         return (
           <g key={way.cavityIndex} transform={`translate(${way.x} ${way.y})`}>
             {way.shape === "square" ? (
@@ -77,7 +79,12 @@ function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, he
             ) : (
               <circle className="network-callout-connector-way" r={0.32} />
             )}
-            <text className={labelClassName} y={0}>
+            <text
+              className={labelClassName}
+              y={0}
+              style={{ fontSize: labelFontSize }}
+              transform={`scale(${inverseDrawingScale})`}
+            >
               {label}
             </text>
           </g>
@@ -200,7 +207,7 @@ export function NetworkSummaryCalloutsLayer({
                   <g transform={`translate(0 ${-layout.height / 2 + layout.drawingTopY})`}>
                     {renderConnectorLayoutDrawing(
                       callout.connectorLayout,
-                      Math.max(0, layout.width - 8),
+                      layout.drawingWidth,
                       layout.drawingHeight
                     )}
                   </g>

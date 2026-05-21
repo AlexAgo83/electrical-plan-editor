@@ -180,14 +180,14 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing")).toHaveLength(0);
   });
 
-  it("allocates doubled space for connector drawings inside callouts", () => {
+  it("scales connector drawings vertically without forcing wide callouts", () => {
     const drawingLayout = buildCalloutLayoutMetrics("J1", "", [], "normal", false, true);
     const doubledDrawingLayout = buildCalloutLayoutMetrics("J1", "", [], "normal", false, true, 2);
 
-    expect(drawingLayout.drawingHeight).toBe(56);
-    expect(drawingLayout.width).toBeGreaterThanOrEqual(160);
-    expect(doubledDrawingLayout.drawingHeight).toBe(112);
-    expect(doubledDrawingLayout.width).toBeGreaterThanOrEqual(312);
+    expect(drawingLayout.drawingHeight).toBe(72);
+    expect(drawingLayout.width).toBeLessThan(160);
+    expect(doubledDrawingLayout.drawingHeight).toBe(144);
+    expect(doubledDrawingLayout.width).toBeLessThan(220);
   });
 
   it("filters callouts from connector/splice nodes selected while modeling sub-screen is Node", () => {

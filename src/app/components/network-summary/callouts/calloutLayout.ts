@@ -1,6 +1,7 @@
 import type { ConnectorId, ConnectorLayout, NodeId, SpliceId } from "../../../../core/entities";
 import type { CanvasCalloutTextSize, NetworkCalloutContentMode, NodePosition } from "../../../types/app-controller";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
+import { getConnectorLayoutShellPadding } from "../../../../core/connectorLayout";
 
 export type CalloutTargetKey = `connector:${string}` | `splice:${string}`;
 
@@ -71,8 +72,8 @@ export interface ComputeRenderedCableCalloutsOptions {
 const CALLOUT_MIN_WIDTH = 44;
 const CALLOUT_MAX_WIDTH = 520;
 const CALLOUT_LAYOUT_CACHE_MAX_ENTRIES = 512;
-const CALLOUT_CONNECTOR_DRAWING_WIDTH = 152;
-const CALLOUT_CONNECTOR_DRAWING_HEIGHT = 56;
+const CALLOUT_CONNECTOR_DRAWING_FALLBACK_ASPECT_RATIO = 1.35;
+const CALLOUT_CONNECTOR_DRAWING_HEIGHT = 72;
 export const CALLOUT_OFFSET_SCREEN_UNITS = 92;
 export const CALLOUT_COLOR_SWATCH_RADIUS = 1.35;
 export const CALLOUT_COLOR_SWATCH_GAP = 0.95;
@@ -113,6 +114,7 @@ export interface CalloutTableColumnLayout {
 export interface CalloutLayoutMetrics {
   width: number;
   drawingTopY: number | null;
+  drawingWidth: number;
   drawingHeight: number;
   titleStartY: number;
   subtitleStartY: number | null;
@@ -253,17 +255,26 @@ function buildCalloutLayoutCacheKey(
   calloutTextSize: CanvasCalloutTextSize,
   showCalloutWireNames: boolean,
   hasConnectorDrawing: boolean,
-  connectorDrawingScale: number
+  connectorDrawingScale: number,
+  connectorDrawingAspectRatio: number
 ): string {
   return JSON.stringify({
     calloutTextSize,
     showCalloutWireNames,
     hasConnectorDrawing,
     connectorDrawingScale,
+    connectorDrawingAspectRatio,
     title,
     subtitle,
     rows
   });
+}
+
+export function getConnectorLayoutDrawingAspectRatio(layout: ConnectorLayout): number {
+  const shellPadding = getConnectorLayoutShellPadding(layout);
+  const viewWidth = Math.max(1, layout.width + shellPadding * 2);
+  const viewHeight = Math.max(1, layout.height + shellPadding * 2);
+  return viewWidth / viewHeight;
 }
 
 function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
@@ -386,10 +397,16 @@ export function buildCalloutLayoutMetrics(
   calloutTextSize: CanvasCalloutTextSize,
   showCalloutWireNames: boolean,
   hasConnectorDrawing = false,
-  connectorDrawingScale = 1
+  connectorDrawingScale = 1,
+  connectorDrawingAspectRatio = CALLOUT_CONNECTOR_DRAWING_FALLBACK_ASPECT_RATIO
 ): CalloutLayoutMetrics {
   const rows = buildCalloutRows(groups);
   const normalizedConnectorDrawingScale = clampNumber(connectorDrawingScale, 1, 2);
+  const normalizedConnectorDrawingAspectRatio = clampNumber(
+    connectorDrawingAspectRatio,
+    0.45,
+    2.25
+  );
   const cacheKey = buildCalloutLayoutCacheKey(
     title,
     subtitle,
@@ -397,7 +414,8 @@ export function buildCalloutLayoutMetrics(
     calloutTextSize,
     showCalloutWireNames,
     hasConnectorDrawing,
-    normalizedConnectorDrawingScale
+    normalizedConnectorDrawingScale,
+    normalizedConnectorDrawingAspectRatio
   );
   const cached = calloutLayoutCache.get(cacheKey);
   if (cached !== undefined) {
@@ -470,7 +488,7 @@ export function buildCalloutLayoutMetrics(
   }
 
   const drawingHeight = hasConnectorDrawing ? CALLOUT_CONNECTOR_DRAWING_HEIGHT * normalizedConnectorDrawingScale : 0;
-  const drawingWidth = hasConnectorDrawing ? CALLOUT_CONNECTOR_DRAWING_WIDTH * normalizedConnectorDrawingScale : 0;
+  const drawingWidth = hasConnectorDrawing ? drawingHeight * normalizedConnectorDrawingAspectRatio : 0;
   const drawingBottomGap = hasConnectorDrawing ? 2.5 : 0;
   const measuredContentWidth = Math.max(tableWidth, measuredTitleWidth, measuredSubtitleWidth, drawingWidth);
   const measuredContentHeight =
@@ -497,6 +515,7 @@ export function buildCalloutLayoutMetrics(
   const layout = {
     width,
     drawingTopY,
+    drawingWidth,
     drawingHeight,
     titleStartY,
     subtitleStartY,
@@ -549,7 +568,10 @@ export function computeRenderedCableCallouts(options: ComputeRenderedCableCallou
       options.calloutTextSize,
       options.showCalloutWireNames,
       callout.connectorLayout !== undefined,
-      options.connectorDrawingScale
+      options.connectorDrawingScale,
+      callout.connectorLayout === undefined
+        ? CALLOUT_CONNECTOR_DRAWING_FALLBACK_ASPECT_RATIO
+        : getConnectorLayoutDrawingAspectRatio(callout.connectorLayout)
     );
     const halfWidthInModelUnits = (layout.width / 2) * options.inverseLabelScale;
     const halfHeightInModelUnits = (layout.height / 2) * options.inverseLabelScale;
