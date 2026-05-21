@@ -93,7 +93,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "What's new": "Nouveautés",
   "Workspace hub": "Hub espace de travail",
   "Open Network Scope": "Ouvrir Périmètre réseau",
-  "Load workspace": "Charger le workspace",
+  "Load network": "Charger un réseau",
   "Create empty workspace": "Créer un espace vide",
   "Save workspace": "Enregistrer le workspace",
   "Replace the current workspace with an empty workspace? This removes current workspace changes.":
@@ -135,7 +135,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Ops & Health": "Ops et santé",
   "Clear": "Effacer",
   "No active network selected. Open Network Scope to choose or create one.": "Aucun réseau actif sélectionné. Ouvrez Périmètre réseau pour en choisir ou en créer un.",
-  "No active network selected. Load workspace to choose or create one.": "Aucun réseau actif sélectionné. Chargez le workspace pour en choisir ou en créer un.",
+  "No active network selected. Load network to choose or create one.": "Aucun réseau actif sélectionné. Chargez un réseau pour en choisir ou en créer un.",
   "Appearance preferences": "Préférences d'apparence",
   "Canvas render preferences": "Préférences de rendu canvas",
   "Canvas tools preferences": "Préférences des outils canvas",

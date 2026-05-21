@@ -69,4 +69,33 @@ describe("network file harness assemblies", () => {
     ]);
     expect(resolved.harnessAssemblies[0]?.connectorLinks[0]?.sourceNetworkId).toBe(`${defaultNetworkId}-import`);
   });
+
+  it("renames imported harness assemblies when their ID already exists", () => {
+    const initial = createInitialState();
+    const defaultNetworkId = initial.activeNetworkId as NetworkId;
+    const withAssembly = appReducer(
+      initial,
+      appActions.upsertHarnessAssembly({
+        id: asAssemblyId("asm-main"),
+        name: "Main assembly",
+        technicalId: "ASM-MAIN",
+        members: [{ networkId: defaultNetworkId, color: "#2563eb" }],
+        masterConnectorRefs: [],
+        connectorLinks: [],
+        createdAt: "2026-05-11T00:00:00.000Z",
+        updatedAt: "2026-05-11T00:00:00.000Z"
+      })
+    );
+
+    const payload = buildNetworkFilePayload(withAssembly, "all", [], "2026-05-11T12:00:00.000Z");
+    const parsed = parseNetworkFilePayload(JSON.stringify(payload));
+    const resolved = resolveImportConflicts(parsed.payload!, withAssembly);
+
+    expect(resolved.harnessAssemblies[0]?.id).toBe("asm-main-import");
+    expect(resolved.harnessAssemblies[0]?.technicalId).toBe("ASM-MAIN-IMP");
+    expect(resolved.summary.warnings).toContain("Harness assembly ID 'asm-main' was renamed to 'asm-main-import' during import.");
+    expect(resolved.summary.warnings).toContain(
+      "Harness assembly technical ID 'ASM-MAIN' was renamed to 'ASM-MAIN-IMP' during import."
+    );
+  });
 });

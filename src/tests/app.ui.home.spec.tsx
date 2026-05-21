@@ -36,7 +36,7 @@ describe("home workspace screen", () => {
     expect(getPanelByHeading("Quick start")).toBeInTheDocument();
     expect(getPanelByHeading("Workspace")).toBeInTheDocument();
     expect(getPanelByHeading("What's new")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Load workspace" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Load network" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Save workspace" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Import workspace" })).toBeInTheDocument();
   });

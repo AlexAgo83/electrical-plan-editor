@@ -317,7 +317,7 @@ export function HomeWorkspaceContent({
           <div className="row-actions home-primary-actions">
             <button type="button" className="button-with-icon" onClick={onOpenNetworkScope}>
               <span className="action-button-icon is-home-start" aria-hidden="true" />
-              <span>Load workspace</span>
+              <span>Load network</span>
             </button>
             <button type="button" className="button-with-icon" onClick={onCreateEmptyWorkspace}>
               <span className="action-button-icon is-home-create" aria-hidden="true" />
@@ -381,7 +381,7 @@ export function HomeWorkspaceContent({
                 <span className="home-resume-copy-id">({activeNetworkTechnicalId})</span>
               </>
             ) : (
-              "No active network selected. Load workspace to choose or create one."
+              "No active network selected. Load network to choose or create one."
             )}
           </p>
           <NetworkRecentChangesList entries={recentChangesForActiveNetwork} />

@@ -764,6 +764,10 @@ export function resolveImportConflicts(
   const importBaseIso = new Date().toISOString();
   const existingTechnicalIds = new Set(existingState.networks.allIds.map((id) => existingState.networks.byId[id]?.technicalId ?? ""));
   const existingIds = new Set(existingState.networks.allIds.map((id) => id as string));
+  const existingHarnessAssemblyIds = new Set(existingState.harnessAssemblies.allIds.map((id) => id as string));
+  const existingHarnessAssemblyTechnicalIds = new Set(
+    existingState.harnessAssemblies.allIds.map((id) => existingState.harnessAssemblies.byId[id]?.technicalId ?? "")
+  );
 
   const summary: NetworkImportSummary = {
     importedNetworkIds: [],
@@ -833,9 +837,29 @@ export function resolveImportConflicts(
     const memberIds = new Set(members.map((member) => member.networkId as string));
     const remapNetworkId = (networkId: NetworkId): NetworkId | null =>
       importedNetworkIdBySourceId.get(networkId as string) ?? null;
+    let importedAssemblyId = assembly.id as string;
+    if (existingHarnessAssemblyIds.has(importedAssemblyId)) {
+      const dedupedAssemblyId = dedupeWithSuffix(importedAssemblyId, existingHarnessAssemblyIds, "-import");
+      summary.warnings.push(`Harness assembly ID '${assembly.id}' was renamed to '${dedupedAssemblyId}' during import.`);
+      importedAssemblyId = dedupedAssemblyId;
+    }
+    existingHarnessAssemblyIds.add(importedAssemblyId);
+
+    let importedAssemblyTechnicalId = assembly.technicalId.trim();
+    if (existingHarnessAssemblyTechnicalIds.has(importedAssemblyTechnicalId)) {
+      const dedupedTechnicalId = dedupeWithSuffix(importedAssemblyTechnicalId, existingHarnessAssemblyTechnicalIds, "-IMP");
+      summary.warnings.push(
+        `Harness assembly technical ID '${assembly.technicalId}' was renamed to '${dedupedTechnicalId}' during import.`
+      );
+      importedAssemblyTechnicalId = dedupedTechnicalId;
+    }
+    existingHarnessAssemblyTechnicalIds.add(importedAssemblyTechnicalId);
+
     return [
       {
         ...assembly,
+        id: importedAssemblyId as HarnessAssemblyId,
+        technicalId: importedAssemblyTechnicalId,
         members,
         masterConnectorRefs: assembly.masterConnectorRefs.flatMap((root) => {
           const networkId = remapNetworkId(root.networkId);
