@@ -218,6 +218,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
 }: UseAppControllerNetworkSummaryPanelDomainParams) {
   const [displayedAssemblyId, setDisplayedAssemblyId] = useState<HarnessAssemblyId | "new" | "">(readPersistedDisplayedAssemblyId);
   const [harnessAssemblyGraphTab, setHarnessAssemblyGraphTab] = useState<"assembly" | "current">("assembly");
+  const [isHarnessAssemblyPickerOpen, setIsHarnessAssemblyPickerOpen] = useState(false);
   const handleSelectConnectorFromCallout = useCallback(
     (connectorId: ConnectorId) => {
       unstable_batchedUpdates(() => {
@@ -412,6 +413,15 @@ export function useAppControllerNetworkSummaryPanelDomain({
     persistDisplayedAssemblyId(assemblyId === "new" ? "" : assemblyId);
   }, []);
 
+  const handlePickDisplayedAssembly = useCallback(
+    (assemblyId: HarnessAssemblyId | "new") => {
+      handleDisplayedAssemblyIdChange(assemblyId);
+      setHarnessAssemblyGraphTab("assembly");
+      setIsHarnessAssemblyPickerOpen(false);
+    },
+    [handleDisplayedAssemblyIdChange]
+  );
+
   const displayedHarnessAssembly =
     displayedAssemblyId === "" || displayedAssemblyId === "new"
       ? null
@@ -574,7 +584,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
             role="tab"
             className={harnessAssemblyGraphTab === "assembly" ? "workspace-tab is-active" : "workspace-tab"}
             aria-selected={harnessAssemblyGraphTab === "assembly"}
-            onClick={() => setHarnessAssemblyGraphTab("assembly")}
+            onClick={() => setIsHarnessAssemblyPickerOpen(true)}
+            title={displayedHarnessAssembly === null ? "Select a harness assembly" : `Selected: ${displayedHarnessAssembly.name}`}
           >
             Harness assembly
           </button>
@@ -583,27 +594,62 @@ export function useAppControllerNetworkSummaryPanelDomain({
             role="tab"
             className={harnessAssemblyGraphTab === "current" ? "workspace-tab is-active" : "workspace-tab"}
             aria-selected={harnessAssemblyGraphTab === "current"}
-            onClick={() => setHarnessAssemblyGraphTab("current")}
+            onClick={() => {
+              setIsHarnessAssemblyPickerOpen(false);
+              setHarnessAssemblyGraphTab("current");
+            }}
           >
             Current network functional
           </button>
         </div>
-        <select
-          className="harness-assembly-functional-select"
-          value={displayedAssemblyId}
-          onChange={(event) => handleDisplayedAssemblyIdChange(event.target.value as HarnessAssemblyId | "new" | "")}
-          aria-label="Selected harness assembly"
-          disabled={harnessAssemblyGraphTab === "current"}
-        >
-          <option value="">Select assembly</option>
-          <option value="new">New assembly</option>
-          {harnessAssemblies.map((assembly) => (
-            <option key={assembly.id} value={assembly.id}>
-              {assembly.name}
-            </option>
-          ))}
-        </select>
       </section>
+      {isHarnessAssemblyPickerOpen ? (
+        <div className="confirm-dialog-layer harness-assembly-picker-layer" role="presentation">
+          <button
+            type="button"
+            className="confirm-dialog-backdrop"
+            aria-label="Close harness assembly selector"
+            onClick={() => setIsHarnessAssemblyPickerOpen(false)}
+          />
+          <section
+            className="confirm-dialog panel harness-assembly-picker-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="harness-assembly-picker-title"
+          >
+            <header className="confirm-dialog-header">
+              <h2 id="harness-assembly-picker-title">Select harness assembly</h2>
+            </header>
+            <div className="harness-assembly-picker-list" role="list">
+              <button
+                type="button"
+                className={displayedAssemblyId === "new" ? "harness-assembly-picker-option is-selected" : "harness-assembly-picker-option"}
+                onClick={() => handlePickDisplayedAssembly("new")}
+              >
+                <span>New assembly</span>
+                <span className="technical-id">Create draft</span>
+              </button>
+              {harnessAssemblies.map((assembly) => (
+                <button
+                  key={assembly.id}
+                  type="button"
+                  className={displayedAssemblyId === assembly.id ? "harness-assembly-picker-option is-selected" : "harness-assembly-picker-option"}
+                  onClick={() => handlePickDisplayedAssembly(assembly.id)}
+                >
+                  <span>{assembly.name}</span>
+                  <span className="technical-id">{assembly.technicalId}</span>
+                </button>
+              ))}
+            </div>
+            {harnessAssemblies.length === 0 ? <p className="empty-copy">No saved harness assembly yet.</p> : null}
+            <footer className="confirm-dialog-actions">
+              <button type="button" className="confirm-dialog-cancel" onClick={() => setIsHarnessAssemblyPickerOpen(false)}>
+                Cancel
+              </button>
+            </footer>
+          </section>
+        </div>
+      ) : null}
       {harnessAssemblyGraphTab === "assembly" ? assemblyFunctionalGraphPanel : currentNetworkFunctionalGraphPanel}
       <HarnessAssemblyManagerPanel
         assemblies={harnessAssemblies}

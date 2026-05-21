@@ -205,7 +205,6 @@
 }
 
 .harness-assembly-manager-panel select,
-.harness-assembly-functional-select,
 .harness-assembly-link-form input,
 .harness-assembly-links input {
   width: 100%;
@@ -219,16 +218,43 @@
 }
 
 .harness-assembly-manager-panel select:focus-visible,
-.harness-assembly-functional-select:focus-visible,
 .harness-assembly-link-form input:focus-visible,
 .harness-assembly-links input:focus-visible {
   outline: 2px solid color-mix(in srgb, currentColor 36%, transparent);
   outline-offset: 2px;
 }
 
-.harness-assembly-functional-select {
-  width: min(18rem, 42vw);
-  flex: 0 1 18rem;
+.harness-assembly-picker-dialog {
+  display: grid;
+  gap: 0.75rem;
+  width: min(34rem, calc(100vw - 2rem));
+}
+
+.harness-assembly-picker-list {
+  display: grid;
+  gap: 0.45rem;
+  max-height: min(52vh, 24rem);
+  overflow: auto;
+}
+
+.harness-assembly-picker-option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, currentColor 5%, transparent);
+  color: inherit;
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+}
+
+.harness-assembly-picker-option.is-selected {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 48%, currentColor 12%);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 13%, transparent);
 }
 
 .harness-assembly-link-form button,
@@ -546,10 +572,6 @@
   }
   .harness-assembly-functional-tabs .network-summary-header-actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .harness-assembly-functional-select {
-    width: 100%;
-    flex-basis: auto;
   }
   .network-summary-header-actions {
     display: grid;

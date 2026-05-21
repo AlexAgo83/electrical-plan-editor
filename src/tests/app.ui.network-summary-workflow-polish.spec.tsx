@@ -336,7 +336,7 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(functionalPanel).toHaveTextContent("W-1");
   });
 
-  it("uses a persisted explicit harness assembly selector and decouples the assembly graph from active network changes", async () => {
+  it("uses a persisted explicit harness assembly picker and decouples the assembly graph from active network changes", async () => {
     const state = createHarnessAssemblyFunctionalSelectionState();
     const mainNetworkId = state.networks.allIds[0];
     const secondNetworkId = asNetworkId("net-b");
@@ -347,14 +347,16 @@ describe("App integration UI - network summary workflow polish", () => {
     const firstRender = renderAppWithState(state);
     switchScreenDrawerAware("harnessAssembly");
 
-    const assemblySelector = screen.getByLabelText("Selected harness assembly");
+    const graphScope = screen.getByRole("region", { name: "Functional graph scope" });
     const manager = screen.getByRole("region", { name: "Harness assembly manager" });
-    expect(assemblySelector).toHaveValue("");
+    expect(screen.queryByLabelText("Selected harness assembly")).not.toBeInTheDocument();
     expect(getPanelByHeading("Harness assembly functional schematic")).toHaveTextContent("No harness assembly selected.");
 
-    fireEvent.change(assemblySelector, { target: { value: "asm-main" } });
-    expect(assemblySelector).toHaveValue("asm-main");
+    fireEvent.click(within(graphScope).getByRole("tab", { name: "Harness assembly" }));
+    const assemblyPicker = screen.getByRole("dialog", { name: "Select harness assembly" });
+    fireEvent.click(within(assemblyPicker).getByRole("button", { name: /Main assembly/i }));
     expect(localStorage.getItem("electrical-plan-editor.displayed-harness-assembly-id")).toBe("asm-main");
+    expect(screen.queryByRole("dialog", { name: "Select harness assembly" })).not.toBeInTheDocument();
 
     const assemblyPanel = getPanelByHeading("Harness assembly functional schematic");
     expect(assemblyPanel).toHaveTextContent("Harness assembly functional schematicMain assembly");
@@ -376,13 +378,13 @@ describe("App integration UI - network summary workflow polish", () => {
     const currentNetworkPanel = getCurrentNetworkFunctionalPanel("Harness B");
     expect(currentNetworkPanel).not.toHaveTextContent("W-1");
     expect(currentNetworkPanel).toHaveTextContent("Select a wire, connector, or splice to generate a functional trace.");
-    expect(assemblySelector).toBeDisabled();
+    expect(screen.queryByLabelText("Selected harness assembly")).not.toBeInTheDocument();
 
     firstRender.unmount();
     renderAppWithState(appReducer(state, appActions.selectNetwork(mainNetworkId)));
     switchScreenDrawerAware("harnessAssembly");
 
-    expect(screen.getByLabelText("Selected harness assembly")).toHaveValue("asm-main");
+    expect(screen.queryByLabelText("Selected harness assembly")).not.toBeInTheDocument();
     expect(getPanelByHeading("Harness assembly functional schematic")).toHaveTextContent("Filtered trace across Main assembly");
   });
 
