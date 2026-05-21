@@ -53,7 +53,7 @@ function CatalogUsageTableSection({
       <header className="analysis-wire-route-header">
         <h2>{heading}</h2>
       </header>
-      <table className="data-table">
+      <table className="data-table catalog-usage-table">
         <thead>
           <tr>
             <th>Name</th>
@@ -69,11 +69,12 @@ function CatalogUsageTableSection({
               <td className="validation-actions-cell">
                 <button
                   type="button"
+                  aria-label="Go to"
                   className="validation-row-go-to-button button-with-icon"
                   onClick={() => onGoTo(row.id)}
                 >
                   <span className="action-button-icon is-open" aria-hidden="true" />
-                  Go to
+                  <span className="catalog-usage-go-to-label">Go to</span>
                 </button>
               </td>
             </tr>

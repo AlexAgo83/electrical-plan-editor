@@ -334,6 +334,38 @@
   letter-spacing: 0.01em;
 }
 
+.catalog-usage-table {
+  table-layout: fixed;
+}
+
+.catalog-usage-table .validation-actions-cell {
+  width: 5.1rem;
+  text-align: right;
+}
+
+.catalog-usage-table .validation-row-go-to-button {
+  max-width: 100%;
+}
+
+.catalog-reference-table {
+  table-layout: fixed;
+}
+
+.catalog-reference-table th:nth-child(3),
+.catalog-reference-table td:nth-child(3) {
+  width: 4rem;
+  text-align: center;
+}
+
+.catalog-reference-table .validation-actions-cell {
+  width: 5.1rem;
+  text-align: right;
+}
+
+.catalog-reference-table .data-table-text-input {
+  min-width: 0;
+}
+
 .entity-reference-button {
   appearance: none;
   border: 0;
@@ -610,6 +642,47 @@
   .data-table td {
     overflow-wrap: anywhere;
     word-break: break-word;
+  }
+
+  .catalog-usage-table .validation-actions-cell {
+    width: 2.65rem;
+  }
+
+  .catalog-usage-table .validation-row-go-to-button {
+    min-width: 0;
+    width: 2.15rem;
+    padding-inline: 0.32rem;
+  }
+
+  .catalog-usage-table .validation-row-go-to-button .action-button-icon {
+    flex: 0 0 0.85rem;
+  }
+
+  .catalog-usage-go-to-label {
+    display: none;
+  }
+
+  .catalog-reference-table th:nth-child(3),
+  .catalog-reference-table td:nth-child(3) {
+    width: 2.6rem;
+  }
+
+  .catalog-reference-table .validation-actions-cell {
+    width: 2.65rem;
+  }
+
+  .catalog-reference-table .validation-row-go-to-button {
+    min-width: 0;
+    width: 2.15rem;
+    padding-inline: 0.32rem;
+  }
+
+  .catalog-reference-table .validation-row-go-to-button .action-button-icon {
+    flex: 0 0 0.85rem;
+  }
+
+  .catalog-reference-save-label {
+    display: none;
   }
 }
 

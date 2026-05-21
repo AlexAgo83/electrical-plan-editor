@@ -412,7 +412,7 @@ function WireEndpointReferenceNamesTable({
   return (
     <>
       <h3 className="list-subheading">{heading}</h3>
-      <table className="data-table">
+      <table className="data-table catalog-reference-table">
         <thead>
           <tr>
             <th>Reference</th>
@@ -460,6 +460,7 @@ function WireEndpointReferenceNamesTable({
                 <td className="validation-actions-cell">
                   <button
                     type="button"
+                    aria-label="Save"
                     className="validation-row-go-to-button button-with-icon"
                     onClick={() => {
                       void (async () => {
@@ -471,7 +472,7 @@ function WireEndpointReferenceNamesTable({
                     }}
                   >
                     <span className="action-button-icon is-save" aria-hidden="true" />
-                    Save
+                    <span className="catalog-reference-save-label">Save</span>
                   </button>
                 </td>
               </tr>
