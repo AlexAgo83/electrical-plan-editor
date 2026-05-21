@@ -41,11 +41,20 @@
   padding: 0.6rem;
 }
 
+.connector-physical-canvas {
+  max-height: min(54vh, 28rem);
+  overflow: auto;
+}
+
 .connector-layout-svg,
 .connector-physical-svg {
   display: block;
   width: 100%;
   min-height: 13rem;
+}
+
+.connector-physical-svg {
+  max-height: calc(min(54vh, 28rem) - 1.2rem);
 }
 
 .connector-layout-shell,
@@ -332,6 +341,14 @@
 }
 
 @media (max-width: 560px) {
+  .connector-physical-canvas {
+    max-height: min(46vh, 20rem);
+  }
+
+  .connector-physical-svg {
+    max-height: calc(min(46vh, 20rem) - 1.2rem);
+  }
+
   .connector-layout-keying-row {
     grid-template-columns: minmax(0, 1fr);
   }
