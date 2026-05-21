@@ -117,6 +117,8 @@ describe("home workspace screen", () => {
     await waitFor(() => {
       expect(within(whatsNewPanel).getAllByRole("button", { name: "Product and UX Changes" }).length).toBeGreaterThan(0);
     });
+    expect(within(whatsNewPanel).queryByRole("heading", { name: /Changelog \(/ })).not.toBeInTheDocument();
+    expect(within(whatsNewPanel).queryByRole("button", { name: "Validation and Regression Evidence" })).not.toBeInTheDocument();
     const productUxToggles = within(whatsNewPanel).getAllByRole("button", { name: "Product and UX Changes" });
     expect(productUxToggles.length).toBeGreaterThan(0);
     const productUxToggle = productUxToggles[0];

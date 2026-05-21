@@ -55,7 +55,9 @@ interface ChangelogSectionsSplit {
 }
 
 const MAJOR_HIGHLIGHTS_SECTION_TITLE = "Major Highlights";
+const HIDDEN_CHANGELOG_SECTION_TITLES = new Set(["Validation and Regression Evidence"]);
 const LEVEL_TWO_HEADING_MATCHER = /^ {0,3}##\s+(.+?)\s*#*\s*$/;
+const CHANGELOG_TITLE_MATCHER = /^ {0,3}#\s+Changelog\s+\(`[^`]+`\)\s*#*\s*$/i;
 
 const MarkdownBlock = lazy(async () => {
   const [{ default: ReactMarkdown }, { default: remarkGfm }] = await Promise.all([import("react-markdown"), import("remark-gfm")]);
@@ -79,6 +81,14 @@ function normalizeHeadingTitle(value: string): string {
   return value.trim().toLowerCase();
 }
 
+function removeChangelogTitleLine(markdown: string): string {
+  return markdown
+    .split(/\r?\n/)
+    .filter((line) => !CHANGELOG_TITLE_MATCHER.test(line))
+    .join("\n")
+    .trim();
+}
+
 function readLevelTwoHeadingTitle(line: string): string | null {
   const match = line.match(LEVEL_TWO_HEADING_MATCHER);
   if (match === null) {
@@ -92,7 +102,7 @@ function readLevelTwoHeadingTitle(line: string): string | null {
 }
 
 function splitCollapsibleSections(markdown: string): ChangelogSectionsSplit | null {
-  const lines = markdown.split(/\r?\n/);
+  const lines = removeChangelogTitleLine(markdown).split(/\r?\n/);
   const levelTwoHeadings: Array<{ index: number; title: string }> = [];
 
   for (let index = 0; index < lines.length; index += 1) {
@@ -127,14 +137,17 @@ function splitCollapsibleSections(markdown: string): ChangelogSectionsSplit | nu
     return null;
   }
 
-  const collapsibleSections = levelTwoHeadings.slice(startHeadingIndex).map((heading, index, headings) => {
-    const nextHeading = headings[index + 1];
-    const sectionEndIndex = nextHeading?.index ?? lines.length;
-    return {
-      title: heading.title,
-      body: lines.slice(heading.index + 1, sectionEndIndex).join("\n").trim()
-    };
-  });
+  const collapsibleSections = levelTwoHeadings
+    .slice(startHeadingIndex)
+    .map((heading, index, headings) => {
+      const nextHeading = headings[index + 1];
+      const sectionEndIndex = nextHeading?.index ?? lines.length;
+      return {
+        title: heading.title,
+        body: lines.slice(heading.index + 1, sectionEndIndex).join("\n").trim()
+      };
+    })
+    .filter((section) => !HIDDEN_CHANGELOG_SECTION_TITLES.has(section.title));
 
   return {
     beforeCollapsibleSections: lines.slice(0, firstCollapsibleHeading.index).join("\n").trim(),
@@ -148,7 +161,7 @@ function ChangelogEntryMarkdown({ content }: { content: string }): ReactElement 
   const collapsibleSectionsIdPrefix = useId();
 
   if (collapsibleSections === null) {
-    return <ChangelogMarkdownBlock content={content} />;
+    return <ChangelogMarkdownBlock content={removeChangelogTitleLine(content)} />;
   }
 
   return (
