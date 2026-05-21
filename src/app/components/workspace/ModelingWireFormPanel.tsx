@@ -7,13 +7,78 @@ import {
   FUNCTIONAL_FILTER_GROUND_POWER,
   FUNCTIONAL_FILTER_SIGNAL
 } from "../../../core/functionalSchematic";
-import type { WireEndpoint } from "../../../core/entities";
+import { normalizeConnectorTerminalMaterial } from "../../../core/connectorCatalogMaterials";
+import type { CatalogItem, Connector, ConnectorTerminalMaterial, WireEndpoint } from "../../../core/entities";
 import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import { useWireHandlersContext } from "../controller/ModelingController.context";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
+
+interface WireEndpointCatalogDefaults {
+  connectionReference?: string;
+  connectionName?: string;
+  sealReference?: string;
+  sealName?: string;
+}
+
+function buildDefaultLabel(label: string, defaultValue: string | undefined): string {
+  return defaultValue === undefined ? label : `${label} (${defaultValue})`;
+}
+
+function resolveCatalogDefaultTerminalMaterial(
+  connector: Connector | undefined,
+  catalogItems: readonly CatalogItem[],
+  cavityIndexText: string
+): ConnectorTerminalMaterial | undefined {
+  if (connector?.catalogItemId === undefined) {
+    return undefined;
+  }
+
+  const cavityIndex = Number(cavityIndexText);
+  if (!Number.isInteger(cavityIndex) || cavityIndex < 1) {
+    return undefined;
+  }
+
+  const catalogItem = catalogItems.find((item) => item.id === connector.catalogItemId);
+  const catalogDefaults = catalogItem?.connectorDefaults;
+  if (catalogDefaults === undefined) {
+    return undefined;
+  }
+
+  const cavityOverride = normalizeConnectorTerminalMaterial(catalogDefaults.terminalOverrides?.[cavityIndex]);
+  if (cavityOverride !== undefined) {
+    return cavityOverride;
+  }
+
+  if (catalogDefaults.allSameTerminals === true) {
+    return normalizeConnectorTerminalMaterial(catalogDefaults.defaultTerminal);
+  }
+
+  return undefined;
+}
+
+function resolveWireEndpointCatalogDefaults(params: {
+  kind: WireEndpoint["kind"];
+  connectorId: string;
+  cavityIndex: string;
+  connectors: readonly Connector[];
+  catalogItems: readonly CatalogItem[];
+}): WireEndpointCatalogDefaults {
+  if (params.kind !== "connectorCavity") {
+    return {};
+  }
+
+  const connector = params.connectors.find((candidate) => candidate.id === params.connectorId);
+  const material = resolveCatalogDefaultTerminalMaterial(connector, params.catalogItems, params.cavityIndex);
+  return {
+    connectionReference: material?.terminalReference,
+    connectionName: material?.terminalName,
+    sealReference: connector?.applyCatalogSeals === false ? undefined : material?.sealReference,
+    sealName: connector?.applyCatalogSeals === false ? undefined : material?.sealName
+  };
+}
 
 export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactElement {
   const {
@@ -176,6 +241,20 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       wireEndpointBSpliceId.trim().length === 0
         ? null
         : { label: `Missing splice (${wireEndpointBSpliceId})`, technicalId: wireEndpointBSpliceId }
+  });
+  const endpointACatalogDefaults = resolveWireEndpointCatalogDefaults({
+    kind: wireEndpointAKind,
+    connectorId: wireEndpointAConnectorId,
+    cavityIndex: wireEndpointACavityIndex,
+    connectors,
+    catalogItems
+  });
+  const endpointBCatalogDefaults = resolveWireEndpointCatalogDefaults({
+    kind: wireEndpointBKind,
+    connectorId: wireEndpointBConnectorId,
+    cavityIndex: wireEndpointBCavityIndex,
+    connectors,
+    catalogItems
   });
 
   const swatch = (hex: string | undefined, label: string): ReactElement => (
@@ -484,7 +563,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         <div className="stack-form">
           <small className="inline-help">Side A metadata</small>
           <label>
-            Connection reference
+            {buildDefaultLabel("Connection reference", endpointACatalogDefaults.connectionReference)}
             <input
               value={wireEndpointAConnectionReference}
               onChange={(event) => setWireEndpointAConnectionReference(event.target.value)}
@@ -493,7 +572,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             />
           </label>
           <label>
-            Connection name
+            {buildDefaultLabel("Connection name", endpointACatalogDefaults.connectionName)}
             <input
               value={wireEndpointAConnectionName}
               onChange={(event) => setWireEndpointAConnectionName(event.target.value)}
@@ -502,7 +581,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             />
           </label>
           <label>
-            Seal reference
+            {buildDefaultLabel("Seal reference", endpointACatalogDefaults.sealReference)}
             <input
               value={wireEndpointASealReference}
               onChange={(event) => setWireEndpointASealReference(event.target.value)}
@@ -511,7 +590,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             />
           </label>
           <label>
-            Seal name
+            {buildDefaultLabel("Seal name", endpointACatalogDefaults.sealName)}
             <input
               value={wireEndpointASealName}
               onChange={(event) => setWireEndpointASealName(event.target.value)}
@@ -602,7 +681,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         <div className="stack-form">
           <small className="inline-help">Side B metadata</small>
           <label>
-            Connection reference
+            {buildDefaultLabel("Connection reference", endpointBCatalogDefaults.connectionReference)}
             <input
               value={wireEndpointBConnectionReference}
               onChange={(event) => setWireEndpointBConnectionReference(event.target.value)}
@@ -611,7 +690,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             />
           </label>
           <label>
-            Connection name
+            {buildDefaultLabel("Connection name", endpointBCatalogDefaults.connectionName)}
             <input
               value={wireEndpointBConnectionName}
               onChange={(event) => setWireEndpointBConnectionName(event.target.value)}
@@ -620,7 +699,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             />
           </label>
           <label>
-            Seal reference
+            {buildDefaultLabel("Seal reference", endpointBCatalogDefaults.sealReference)}
             <input
               value={wireEndpointBSealReference}
               onChange={(event) => setWireEndpointBSealReference(event.target.value)}
@@ -629,7 +708,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             />
           </label>
           <label>
-            Seal name
+            {buildDefaultLabel("Seal name", endpointBCatalogDefaults.sealName)}
             <input
               value={wireEndpointBSealName}
               onChange={(event) => setWireEndpointBSealName(event.target.value)}
