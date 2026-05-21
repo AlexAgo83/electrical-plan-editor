@@ -6,6 +6,7 @@ interface NetworkSummaryQuickEntityNavigationProps {
   activeSubScreen: SubScreenId;
   entityCountBySubScreen: Record<SubScreenId, number>;
   onQuickEntityNavigation: (subScreen: SubScreenId) => void;
+  variant?: "panel" | "header";
 }
 
 const QUICK_ENTITY_NAV_ITEMS: Record<
@@ -42,11 +43,25 @@ export function NetworkSummaryQuickEntityNavigation({
   quickEntityNavigationMode,
   activeSubScreen,
   entityCountBySubScreen,
-  onQuickEntityNavigation
+  onQuickEntityNavigation,
+  variant = "panel"
 }: NetworkSummaryQuickEntityNavigationProps): ReactElement {
+  const sectionClassName =
+    variant === "header"
+      ? "header-quick-entity-nav-panel"
+      : "panel network-summary-quick-entity-nav-panel";
+  const groupClassName =
+    variant === "header"
+      ? "network-summary-quick-entity-nav header-quick-entity-nav"
+      : "network-summary-quick-entity-nav";
+
   return (
-    <section className="panel network-summary-quick-entity-nav-panel" aria-label="Quick entity navigation">
-      <div className="network-summary-quick-entity-nav" role="group" aria-label="Quick entity navigation strip">
+    <section
+      className={sectionClassName}
+      aria-label="Quick entity navigation"
+      data-quick-entity-nav-source={variant === "panel" ? "true" : undefined}
+    >
+      <div className={groupClassName} role="group" aria-label="Quick entity navigation strip">
         {QUICK_ENTITY_NAV_ITEMS[quickEntityNavigationMode].map((item) => (
           <button
             key={item.subScreen}

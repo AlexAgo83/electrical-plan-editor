@@ -1,4 +1,4 @@
-import type { ReactElement, RefObject } from "react";
+import type { ReactElement, ReactNode, RefObject } from "react";
 import type { AppError } from "../../../store/types";
 interface AppHeaderAndStatsProps {
   headerBlockRef: RefObject<HTMLElement | null>;
@@ -20,6 +20,7 @@ interface AppHeaderAndStatsProps {
   onClearError: () => void;
   bootRecoveryMessage: string | null;
   onCommitBootRecovery: () => void;
+  centerContent?: ReactNode;
 }
 
 export function AppHeaderAndStats({
@@ -41,8 +42,16 @@ export function AppHeaderAndStats({
   lastError,
   onClearError,
   bootRecoveryMessage,
-  onCommitBootRecovery
+  onCommitBootRecovery,
+  centerContent = null
 }: AppHeaderAndStatsProps): ReactElement {
+  const headerClassName = [
+    "header-block",
+    isNavigationDrawerOpen ? "is-drawer-open" : "",
+    centerContent !== null ? "has-center-content" : ""
+  ]
+    .filter((token) => token.length > 0)
+    .join(" ");
   const opsStatusDescription = `${validationIssuesCount} validation issue${validationIssuesCount === 1 ? "" : "s"}${
     validationErrorCount > 0
       ? `, ${validationErrorCount} error${validationErrorCount === 1 ? "" : "s"}`
@@ -52,22 +61,25 @@ export function AppHeaderAndStats({
     <>
       <section
         ref={headerBlockRef}
-        className={isNavigationDrawerOpen ? "header-block is-drawer-open" : "header-block"}
+        className={headerClassName}
       >
-        <button
-          ref={navigationToggleButtonRef}
-          type="button"
-          className="header-nav-toggle"
-          onClick={onToggleNavigationDrawer}
-          aria-label={isNavigationDrawerOpen ? "Close menu" : "Open menu"}
-          aria-expanded={isNavigationDrawerOpen}
-          aria-controls="workspace-navigation-drawer"
-        >
-          <span className="header-nav-icon" aria-hidden="true" />
-        </button>
-        <h1 className="header-title">
-          <span className="header-title-accent">e</span>-Plan Editor
-        </h1>
+        <div className="header-brand">
+          <button
+            ref={navigationToggleButtonRef}
+            type="button"
+            className="header-nav-toggle"
+            onClick={onToggleNavigationDrawer}
+            aria-label={isNavigationDrawerOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isNavigationDrawerOpen}
+            aria-controls="workspace-navigation-drawer"
+          >
+            <span className="header-nav-icon" aria-hidden="true" />
+          </button>
+          <h1 className="header-title">
+            <span className="header-title-accent">e</span>-Plan Editor
+          </h1>
+        </div>
+        {centerContent !== null ? <div className="header-center-content">{centerContent}</div> : null}
         <div className="header-actions">
           {isInstallPromptAvailable ? (
             <button type="button" className="header-install-toggle" onClick={onInstallApp}>

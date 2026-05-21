@@ -1,10 +1,20 @@
-import { Suspense, type CSSProperties, type ReactElement, type ReactNode, type RefObject } from "react";
+import {
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactElement,
+  type ReactNode,
+  type RefObject
+} from "react";
 import { HomeWorkspaceContainer } from "../containers/HomeWorkspaceContainer";
 import { ModelingWorkspaceContainer } from "../containers/ModelingWorkspaceContainer";
 import { NetworkScopeWorkspaceContainer } from "../containers/NetworkScopeWorkspaceContainer";
 import { SettingsWorkspaceContainer } from "../containers/SettingsWorkspaceContainer";
 import { ValidationWorkspaceContainer } from "../containers/ValidationWorkspaceContainer";
 import type { ScreenContainerComponent } from "../containers/screenContainer.shared";
+import { NetworkSummaryQuickEntityNavigation } from "../network-summary/NetworkSummaryQuickEntityNavigation";
 import { AppHeaderAndStats } from "../workspace/AppHeaderAndStats";
 import { OperationsHealthPanel } from "../workspace/OperationsHealthPanel";
 import { WorkspaceSidebarPanel } from "../workspace/WorkspaceSidebarPanel";
@@ -12,6 +22,8 @@ import { WorkspaceSidebarPanel } from "../workspace/WorkspaceSidebarPanel";
 type AppHeaderAndStatsProps = Parameters<typeof AppHeaderAndStats>[0];
 type WorkspaceSidebarPanelProps = Parameters<typeof WorkspaceSidebarPanel>[0];
 type OperationsHealthPanelProps = Parameters<typeof OperationsHealthPanel>[0];
+
+const QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX = 18;
 
 interface AppShellLayoutProps {
   appShellClassName: string;
@@ -172,6 +184,94 @@ export function AppShellLayout({
   inspectorContextPanel
 }: AppShellLayoutProps): ReactElement {
   const isNavigationDrawerInteractionHidden = !isNavigationDrawerOpen;
+  const [isQuickEntityNavigationDocked, setIsQuickEntityNavigationDocked] = useState(false);
+  const isQuickEntityNavigationDockedRef = useRef(false);
+  const quickEntityNavigationDockThresholdRef = useRef<number | null>(null);
+  const shouldOfferDockedEntityNavigation = hasActiveNetwork && (isModelingScreen || isAnalysisScreen);
+
+  useEffect(() => {
+    isQuickEntityNavigationDockedRef.current = isQuickEntityNavigationDocked;
+  }, [isQuickEntityNavigationDocked]);
+
+  useEffect(() => {
+    if (!shouldOfferDockedEntityNavigation) {
+      quickEntityNavigationDockThresholdRef.current = null;
+      setIsQuickEntityNavigationDocked(false);
+      return undefined;
+    }
+
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    let animationFrameId = 0;
+    const updateDockedNavigationState = () => {
+      animationFrameId = 0;
+      const sourceNavigation = document.querySelector<HTMLElement>("[data-quick-entity-nav-source='true']");
+      const headerElement = headerBlockRef.current;
+
+      if (sourceNavigation === null || headerElement === null) {
+        const fallbackThreshold = quickEntityNavigationDockThresholdRef.current;
+        setIsQuickEntityNavigationDocked((current) =>
+          fallbackThreshold === null ? current : window.scrollY >= fallbackThreshold
+        );
+        return;
+      }
+
+      const navigationRect = sourceNavigation.getBoundingClientRect();
+      const headerRect = headerElement.getBoundingClientRect();
+      const headerHeight = Math.max(0, headerRect.height);
+      if (quickEntityNavigationDockThresholdRef.current === null || !isQuickEntityNavigationDockedRef.current) {
+        quickEntityNavigationDockThresholdRef.current = Math.max(0, navigationRect.top + window.scrollY - headerHeight);
+      }
+      const dockThreshold = quickEntityNavigationDockThresholdRef.current;
+      const nextIsDocked = isQuickEntityNavigationDockedRef.current
+        ? window.scrollY >= Math.max(0, dockThreshold - QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX)
+        : window.scrollY >= dockThreshold;
+      setIsQuickEntityNavigationDocked((current) => (current === nextIsDocked ? current : nextIsDocked));
+    };
+
+    const scheduleDockedNavigationStateUpdate = () => {
+      if (animationFrameId !== 0) {
+        return;
+      }
+
+      animationFrameId = window.requestAnimationFrame(updateDockedNavigationState);
+    };
+
+    scheduleDockedNavigationStateUpdate();
+    window.addEventListener("scroll", scheduleDockedNavigationStateUpdate, { passive: true });
+    window.addEventListener("resize", scheduleDockedNavigationStateUpdate);
+    document.addEventListener("scroll", scheduleDockedNavigationStateUpdate, { passive: true, capture: true });
+    return () => {
+      if (animationFrameId !== 0) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+
+      window.removeEventListener("scroll", scheduleDockedNavigationStateUpdate);
+      window.removeEventListener("resize", scheduleDockedNavigationStateUpdate);
+      document.removeEventListener("scroll", scheduleDockedNavigationStateUpdate, { capture: true });
+    };
+  }, [headerBlockRef, shouldOfferDockedEntityNavigation]);
+
+  const headerCenterContent = shouldOfferDockedEntityNavigation ? (
+    <div
+      className={
+        isQuickEntityNavigationDocked
+          ? "header-docked-nav-shell is-visible"
+          : "header-docked-nav-shell is-hidden"
+      }
+      aria-hidden={!isQuickEntityNavigationDocked}
+    >
+      <NetworkSummaryQuickEntityNavigation
+        variant="header"
+        quickEntityNavigationMode={isAnalysisScreen ? "analysis" : "modeling"}
+        activeSubScreen={activeSubScreen}
+        entityCountBySubScreen={entityCountBySubScreen}
+        onQuickEntityNavigation={onSubScreenChange}
+      />
+    </div>
+    ) : null;
 
   let activeWorkspaceContent: ReactNode;
   if (isHomeScreen) {
@@ -271,6 +371,7 @@ export function AppShellLayout({
         onClearError={onClearError}
         bootRecoveryMessage={bootRecoveryMessage}
         onCommitBootRecovery={onCommitBootRecovery}
+        centerContent={headerCenterContent}
       />
 
       <section className="workspace-shell" style={workspaceShellStyle}>
