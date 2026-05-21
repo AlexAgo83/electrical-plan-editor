@@ -76,7 +76,7 @@ export function AppHeaderAndStats({
             <span className="header-nav-icon" aria-hidden="true" />
           </button>
           <h1 className="header-title">
-            <span className="header-title-accent">e</span>-Plan Editor
+            <span className="header-title-accent">e</span>-Plan<span className="header-title-full"> Editor</span>
           </h1>
         </div>
         {centerContent !== null ? <div className="header-center-content">{centerContent}</div> : null}

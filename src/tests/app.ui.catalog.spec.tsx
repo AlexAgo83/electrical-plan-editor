@@ -62,11 +62,9 @@ describe("App integration UI - catalog", () => {
 
     const headerBlock = document.querySelector(".header-block");
     const quickNavPanel = document.querySelector("[data-quick-entity-nav-source='true']");
-    const dockedNavShell = document.querySelector(".header-docked-nav-shell");
     expect(headerBlock).not.toBeNull();
     expect(quickNavPanel).not.toBeNull();
-    expect(dockedNavShell).not.toBeNull();
-    expect(dockedNavShell).toHaveClass("is-hidden");
+    expect(document.querySelector(".header-docked-nav-shell")).toBeNull();
 
     Object.defineProperty(headerBlock, "getBoundingClientRect", {
       configurable: true,

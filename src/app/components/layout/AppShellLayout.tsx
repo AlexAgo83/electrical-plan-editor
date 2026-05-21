@@ -25,6 +25,11 @@ type OperationsHealthPanelProps = Parameters<typeof OperationsHealthPanel>[0];
 
 const QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX = 18;
 const QUICK_ENTITY_NAV_DOCK_DELAY_PX = 16;
+const QUICK_ENTITY_NAV_DOCK_BLEND_RANGE_PX = 44;
+
+function clampDockedNavigationProgress(value: number): number {
+  return Math.min(1, Math.max(0, value));
+}
 
 interface AppShellLayoutProps {
   appShellClassName: string;
@@ -186,6 +191,7 @@ export function AppShellLayout({
 }: AppShellLayoutProps): ReactElement {
   const isNavigationDrawerInteractionHidden = !isNavigationDrawerOpen;
   const [isQuickEntityNavigationDocked, setIsQuickEntityNavigationDocked] = useState(false);
+  const [quickEntityNavigationDockProgress, setQuickEntityNavigationDockProgress] = useState(0);
   const isQuickEntityNavigationDockedRef = useRef(false);
   const quickEntityNavigationDockThresholdRef = useRef<number | null>(null);
   const shouldOfferDockedEntityNavigation = hasActiveNetwork && (isModelingScreen || isAnalysisScreen);
@@ -198,6 +204,7 @@ export function AppShellLayout({
     if (!shouldOfferDockedEntityNavigation) {
       quickEntityNavigationDockThresholdRef.current = null;
       setIsQuickEntityNavigationDocked(false);
+      setQuickEntityNavigationDockProgress(0);
       return undefined;
     }
 
@@ -216,6 +223,9 @@ export function AppShellLayout({
         setIsQuickEntityNavigationDocked((current) =>
           fallbackThreshold === null ? current : window.scrollY >= fallbackThreshold
         );
+        setQuickEntityNavigationDockProgress((current) =>
+          fallbackThreshold === null ? current : window.scrollY >= fallbackThreshold ? 1 : 0
+        );
         return;
       }
 
@@ -232,7 +242,17 @@ export function AppShellLayout({
       const nextIsDocked = isQuickEntityNavigationDockedRef.current
         ? window.scrollY >= Math.max(0, dockThreshold - QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX)
         : window.scrollY >= dockThreshold;
+      const nextDockProgress =
+        dockThreshold <= QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX
+          ? 1
+          : clampDockedNavigationProgress(
+              (window.scrollY - (dockThreshold - QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX)) /
+                QUICK_ENTITY_NAV_DOCK_BLEND_RANGE_PX
+            );
       setIsQuickEntityNavigationDocked((current) => (current === nextIsDocked ? current : nextIsDocked));
+      setQuickEntityNavigationDockProgress((current) =>
+        Math.abs(current - nextDockProgress) < 0.01 ? current : nextDockProgress
+      );
     };
 
     const scheduleDockedNavigationStateUpdate = () => {
@@ -258,13 +278,16 @@ export function AppShellLayout({
     };
   }, [headerBlockRef, shouldOfferDockedEntityNavigation]);
 
-  const headerCenterContent = shouldOfferDockedEntityNavigation ? (
+  const shouldMountDockedEntityNavigation =
+    shouldOfferDockedEntityNavigation && (isQuickEntityNavigationDocked || quickEntityNavigationDockProgress > 0);
+  const headerCenterContent = shouldMountDockedEntityNavigation ? (
     <div
       className={
-        isQuickEntityNavigationDocked
+        isQuickEntityNavigationDocked || quickEntityNavigationDockProgress > 0
           ? "header-docked-nav-shell is-visible"
           : "header-docked-nav-shell is-hidden"
       }
+      style={{ "--header-docked-nav-progress": quickEntityNavigationDockProgress } as CSSProperties}
       aria-hidden={!isQuickEntityNavigationDocked}
     >
       <NetworkSummaryQuickEntityNavigation
