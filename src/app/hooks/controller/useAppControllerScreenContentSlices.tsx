@@ -493,6 +493,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
   const modelingFormsColumnProps = {
     catalogItems: params.catalogItems,
     openCatalogSubScreen: params.openCatalogSubScreen,
+    onSelectCatalogItem: params.onSelectCatalogItem,
     isConnectorSubScreen: params.isConnectorSubScreen,
     connectorFormMode: params.connectorFormMode,
     connectorEditAfterCreate: params.connectorEditAfterCreate,

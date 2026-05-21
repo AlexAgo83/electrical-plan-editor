@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { appActions, appReducer, createInitialState } from "../store";
 import {
   asCatalogItemId,
+  asConnectorId,
+  asSpliceId,
   createUiIntegrationDenseWiresState,
   createUiIntegrationState,
   getPanelByHeading,
@@ -273,7 +275,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     });
     expect(within(createConnectorPanel).getByDisplayValue("CAT-REF-2 - Catalog Two (2)")).toBeInTheDocument();
     expect(within(createConnectorPanel).getByLabelText("Way count (from catalog)")).toHaveValue(2);
-    expect(within(createConnectorPanel).getByText("Manufacturer reference: CAT-REF-2")).toBeInTheDocument();
+    expect(within(createConnectorPanel).getByRole("button", { name: "Manufacturer reference: CAT-REF-2" })).toBeInTheDocument();
     fireEvent.click(within(createConnectorPanel).getByRole("button", { name: "Create" }));
 
     let state = store.getState();
@@ -321,7 +323,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     });
     expect(within(createSplicePanel).getByDisplayValue("CAT-REF-2 - Catalog Two (2)")).toBeInTheDocument();
     expect(within(createSplicePanel).getByLabelText("Port count (from catalog)")).toHaveValue(2);
-    expect(within(createSplicePanel).getByText("Manufacturer reference: CAT-REF-2")).toBeInTheDocument();
+    expect(within(createSplicePanel).getByRole("button", { name: "Manufacturer reference: CAT-REF-2" })).toBeInTheDocument();
     fireEvent.click(within(createSplicePanel).getByRole("button", { name: "Create" }));
 
     state = store.getState();
@@ -352,6 +354,55 @@ describe("App integration UI - creation flow ergonomics", () => {
     if (inspectorPanel !== null) {
       expect(within(inspectorPanel).getByText("CAT-REF-4")).toBeInTheDocument();
     }
+  });
+
+  it("opens linked catalog items from connector and splice edit form manufacturer references", () => {
+    const catalogItemId = asCatalogItemId("CAT-2");
+    const stateWithLinkedEntities = appReducer(
+      appReducer(
+        appReducer(
+          createInitialState(),
+          appActions.upsertCatalogItem({
+            id: catalogItemId,
+            manufacturerReference: "CAT-REF-2",
+            name: "Catalog Two",
+            connectionCount: 2
+          })
+        ),
+        appActions.upsertConnector({
+          id: asConnectorId("C-LINK"),
+          name: "Linked connector",
+          technicalId: "C-LINK",
+          catalogItemId,
+          manufacturerReference: "CAT-REF-2",
+          cavityCount: 2
+        })
+      ),
+      appActions.upsertSplice({
+        id: asSpliceId("S-LINK"),
+        name: "Linked splice",
+        technicalId: "S-LINK",
+        catalogItemId,
+        manufacturerReference: "CAT-REF-2",
+        portCount: 2
+      })
+    );
+
+    renderAppWithState(stateWithLinkedEntities);
+    switchScreenDrawerAware("modeling");
+
+    fireEvent.click(within(getPanelByHeading("Connectors")).getByText("Linked connector"));
+    fireEvent.click(
+      within(getPanelByHeading("Edit Connector")).getByRole("button", { name: "Manufacturer reference: CAT-REF-2" })
+    );
+    expect(within(getPanelByHeading("Catalog")).getByText("CAT-REF-2")).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("splice");
+    fireEvent.click(within(getPanelByHeading("Splices")).getByText("Linked splice"));
+    fireEvent.click(
+      within(getPanelByHeading("Edit Splice")).getByRole("button", { name: "Manufacturer reference: CAT-REF-2" })
+    );
+    expect(within(getPanelByHeading("Catalog")).getByText("CAT-REF-2")).toBeInTheDocument();
   });
 
   it("allows editing a node ID in edit mode and saves the renamed node", () => {

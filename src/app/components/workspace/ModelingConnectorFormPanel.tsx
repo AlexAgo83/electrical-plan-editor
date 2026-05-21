@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { useConnectorHandlersContext } from "../controller/ModelingController.context";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
+import { EntityReferenceButton } from "./EntityReferenceButton";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -16,6 +17,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     setConnectorTechnicalId,
     catalogItems,
     openCatalogSubScreen,
+    onSelectCatalogItem,
     connectorCatalogItemId,
     setConnectorCatalogItemId,
     connectorManufacturerReference,
@@ -35,6 +37,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
   } = props;
   const connectorHandlers = useConnectorHandlersContext();
   const hasCatalogItems = catalogItems.length > 0;
+  const selectedCatalogItem = catalogItems.find((item) => item.id === connectorCatalogItemId);
   const catalogItemOptions = buildModelingDynamicSelectOptions({
     options: catalogItems.map((item) => ({
       value: item.id,
@@ -89,7 +92,18 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       </div>
     ) : null}
     {connectorManufacturerReference.trim().length > 0 ? (
-      <small className="meta-line">{`Manufacturer reference: ${connectorManufacturerReference}`}</small>
+      <small className="meta-line">
+        {selectedCatalogItem === undefined ? (
+          `Manufacturer reference: ${connectorManufacturerReference}`
+        ) : (
+          <EntityReferenceButton
+            title={`Open catalog item ${connectorManufacturerReference}`}
+            onClick={() => onSelectCatalogItem(selectedCatalogItem.id)}
+          >
+            Manufacturer reference: <span className="technical-id">{connectorManufacturerReference}</span>
+          </EntityReferenceButton>
+        )}
+      </small>
     ) : null}
     {connectorTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
     <label>

@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
+import { EntityReferenceButton } from "./EntityReferenceButton";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 
@@ -19,6 +20,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     setSpliceTechnicalId,
     catalogItems,
     openCatalogSubScreen,
+    onSelectCatalogItem,
     spliceCatalogItemId,
     setSpliceCatalogItemId,
     splicePortMode,
@@ -39,6 +41,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
   const isCatalogLinked = spliceCatalogItemId.trim().length > 0;
   const isUnbounded = splicePortMode === "unbounded";
   const isDirectional = splicePortMode === "directional";
+  const selectedCatalogItem = catalogItems.find((item) => item.id === spliceCatalogItemId);
   const catalogItemOptions = buildModelingDynamicSelectOptions({
     options: catalogItems.map((item) => ({
       value: item.id,
@@ -88,7 +91,18 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       </div>
     ) : null}
     {spliceManufacturerReference.trim().length > 0 ? (
-      <small className="meta-line">{`Manufacturer reference: ${spliceManufacturerReference}`}</small>
+      <small className="meta-line">
+        {selectedCatalogItem === undefined ? (
+          `Manufacturer reference: ${spliceManufacturerReference}`
+        ) : (
+          <EntityReferenceButton
+            title={`Open catalog item ${spliceManufacturerReference}`}
+            onClick={() => onSelectCatalogItem(selectedCatalogItem.id)}
+          >
+            Manufacturer reference: <span className="technical-id">{spliceManufacturerReference}</span>
+          </EntityReferenceButton>
+        )}
+      </small>
     ) : null}
     {isCatalogLinked ? (
       <small className="inline-help">Catalog-linked directional splices keep L/R sides; legacy bounded splices derive port count from catalog connection count.</small>

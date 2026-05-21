@@ -9,6 +9,7 @@ import type { WireEndpointSlotHint } from "../../hooks/useWireHandlers";
 export interface ModelingFormsColumnProps {
   catalogItems: CatalogItem[];
   openCatalogSubScreen: () => void;
+  onSelectCatalogItem: (catalogItemId: CatalogItem["id"]) => void;
   isConnectorSubScreen: boolean;
   connectorFormMode: "idle" | "create" | "edit";
   connectorEditAfterCreate: boolean;
