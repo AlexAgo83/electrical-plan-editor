@@ -191,7 +191,14 @@ button {
   margin-right: 0.45rem;
 }
 
+.header-install-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .header-install-icon {
+  display: inline-block;
   width: 0.9rem;
   height: 0.9rem;
   flex: 0 0 0.9rem;
@@ -218,12 +225,6 @@ button {
   width: 0.9rem;
   height: 0.9rem;
   flex-basis: 0.9rem;
-}
-
-.header-update-toggle.is-icon-only {
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
 }
 
 .header-update-toggle.is-icon-only .header-update-label {
