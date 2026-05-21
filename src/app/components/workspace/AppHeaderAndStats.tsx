@@ -50,7 +50,7 @@ export function AppHeaderAndStats({
   const headerClassName = [
     "header-block",
     isNavigationDrawerOpen ? "is-drawer-open" : "",
-    centerContent !== null ? "has-center-content" : ""
+    isDockedNavigationVisible ? "has-center-content" : ""
   ]
     .filter((token) => token.length > 0)
     .join(" ");

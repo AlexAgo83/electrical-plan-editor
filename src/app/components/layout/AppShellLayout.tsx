@@ -386,7 +386,7 @@ export function AppShellLayout({
         isSettingsActive={isSettingsActive}
         onOpenSettings={onOpenSettings}
         isInstallPromptAvailable={isInstallPromptAvailable}
-        isDockedNavigationVisible={shouldMountDockedEntityNavigation}
+        isDockedNavigationVisible={isQuickEntityNavigationDocked}
         onInstallApp={onInstallApp}
         isPwaUpdateReady={isPwaUpdateReady}
         onApplyPwaUpdate={onApplyPwaUpdate}

@@ -85,6 +85,45 @@ describe("App integration UI - catalog", () => {
     expect(getPanelByHeading("Catalog")).toBeInTheDocument();
   });
 
+  it("keeps header action compaction stable while docked quick navigation blends in", async () => {
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+
+    switchScreenDrawerAware("modeling");
+
+    const headerBlock = document.querySelector(".header-block");
+    const quickNavPanel = document.querySelector("[data-quick-entity-nav-source='true']");
+    expect(headerBlock).not.toBeNull();
+    expect(quickNavPanel).not.toBeNull();
+
+    Object.defineProperty(headerBlock, "getBoundingClientRect", {
+      configurable: true,
+      value: () => ({ top: 0, right: 1200, bottom: 72, left: 0, width: 1200, height: 72, x: 0, y: 0 })
+    });
+    Object.defineProperty(quickNavPanel, "getBoundingClientRect", {
+      configurable: true,
+      value: () => {
+        const top = 132 - window.scrollY;
+        return { top, right: 800, bottom: top + 48, left: 240, width: 560, height: 48, x: 240, y: top };
+      }
+    });
+    Object.defineProperty(window, "scrollY", { configurable: true, writable: true, value: 60 });
+
+    act(() => {
+      window.dispatchEvent(new Event("scroll"));
+    });
+
+    await waitFor(() => expect(document.querySelector(".header-docked-nav-shell")).toHaveClass("is-visible"));
+    expect(headerBlock).not.toHaveClass("has-center-content");
+
+    Object.defineProperty(window, "scrollY", { configurable: true, writable: true, value: 80 });
+    act(() => {
+      window.dispatchEvent(new Event("scroll"));
+    });
+
+    await waitFor(() => expect(headerBlock).toHaveClass("has-center-content"));
+  });
+
   it("enforces catalog-first connector creation and supports catalog creation with URL validation", () => {
     const { store } = renderAppWithState(createInitialState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
