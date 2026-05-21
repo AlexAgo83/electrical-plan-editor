@@ -99,38 +99,39 @@ describe("App integration UI - catalog layout", () => {
     const catalogPanel = getPanelByHeading("Catalog");
     fireEvent.click(within(catalogPanel).getByRole("button", { name: "Create catalog item" }));
     const catalogFormPanel = getPanelByHeading("Create catalog item");
+    const catalogLayoutPanel = getPanelByHeading("Connector physical layout");
 
     fireEvent.change(within(catalogFormPanel).getByLabelText("Connection count"), {
       target: { value: "4" }
     });
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Auto layout" }));
-    expect(within(catalogFormPanel).queryByText("No keying features.")).not.toBeInTheDocument();
-    const shellPaddingSlider = within(catalogFormPanel).getByLabelText(/Shell padding/i);
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Auto layout" }));
+    expect(within(catalogLayoutPanel).queryByText("No keying features.")).not.toBeInTheDocument();
+    const shellPaddingSlider = within(catalogLayoutPanel).getByLabelText(/Shell padding/i);
     expect(shellPaddingSlider).toHaveValue("0.5");
     fireEvent.change(shellPaddingSlider, {
       target: { value: "1.1" }
     });
     expect(shellPaddingSlider).toHaveValue("1.1");
-    const cellPaddingSlider = within(catalogFormPanel).getByLabelText(/Cell padding/i);
+    const cellPaddingSlider = within(catalogLayoutPanel).getByLabelText(/Cell padding/i);
     expect(cellPaddingSlider).toHaveValue("0.36");
     fireEvent.change(cellPaddingSlider, {
       target: { value: "0.52" }
     });
     expect(cellPaddingSlider).toHaveValue("0.52");
-    fireEvent.change(within(catalogFormPanel).getByLabelText("Grid width"), {
+    fireEvent.change(within(catalogLayoutPanel).getByLabelText("Grid width"), {
       target: { value: "1" }
     });
-    expect(within(catalogFormPanel).getByLabelText("Grid width")).toHaveValue(2);
-    expect(within(catalogFormPanel).getByText("Cannot reduce grid width: move C2, C4 inside the new width first.")).toBeInTheDocument();
-    fireEvent.keyDown(within(catalogFormPanel).getByRole("button", { name: "Select and move way 2" }), {
+    expect(within(catalogLayoutPanel).getByLabelText("Grid width")).toHaveValue(2);
+    expect(within(catalogLayoutPanel).getByText("Cannot reduce grid width: move C2, C4 inside the new width first.")).toBeInTheDocument();
+    fireEvent.keyDown(within(catalogLayoutPanel).getByRole("button", { name: "Select and move way 2" }), {
       key: "ArrowLeft"
     });
-    expect(within(catalogFormPanel).getByLabelText("X")).toHaveValue(2);
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Keying features" }));
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Add keying" }));
-    expect(catalogFormPanel.querySelector(".connector-layout-keying")?.getAttribute("style")).toBeNull();
+    expect(within(catalogLayoutPanel).getByLabelText("X")).toHaveValue(2);
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Keying features" }));
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Add keying" }));
+    expect(catalogLayoutPanel.querySelector(".connector-layout-keying")?.getAttribute("style")).toBeNull();
     const { placementSelect, shapeSelect, positionSlider, scaleInput } = getConnectorLayoutKeyingControls(
-      getConnectorLayoutKeyingRow(catalogFormPanel)
+      getConnectorLayoutKeyingRow(catalogLayoutPanel)
     );
     expect(placementSelect).toHaveValue("guided");
     expect(shapeSelect).toHaveValue("arrow");
@@ -148,18 +149,18 @@ describe("App integration UI - catalog layout", () => {
       target: { value: "free" }
     });
     expect(placementSelect).toHaveValue("free");
-    const freeControls = getConnectorLayoutKeyingControls(getConnectorLayoutKeyingRow(catalogFormPanel));
+    const freeControls = getConnectorLayoutKeyingControls(getConnectorLayoutKeyingRow(catalogLayoutPanel));
     expect(freeControls.positionSlider).toBeNull();
-    expect(within(getConnectorLayoutKeyingRow(catalogFormPanel)).queryByText("Drag in preview")).not.toBeInTheDocument();
+    expect(within(getConnectorLayoutKeyingRow(catalogLayoutPanel)).queryByText("Drag in preview")).not.toBeInTheDocument();
     fireEvent.change(scaleInput, {
       target: { value: "1.6" }
     });
     expect(scaleInput).toHaveValue("1.6");
-    expect(within(catalogFormPanel).queryByText("Overlapping ways: C1/C2.")).not.toBeInTheDocument();
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Select and move way 3" }));
-    expect(within(catalogFormPanel).getByRole("button", { name: "Selected way" })).toHaveAttribute("aria-pressed", "true");
-    expect(within(catalogFormPanel).queryByRole("heading", { name: "Keying features" })).not.toBeInTheDocument();
-    expect(catalogFormPanel.querySelector(".connector-layout-control-card-selected .connector-layout-control-card-header span")?.textContent).toBe(
+    expect(within(catalogLayoutPanel).queryByText("Overlapping ways: C1/C2.")).not.toBeInTheDocument();
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Select and move way 3" }));
+    expect(within(catalogLayoutPanel).getByRole("button", { name: "Selected way" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(catalogLayoutPanel).queryByRole("heading", { name: "Keying features" })).not.toBeInTheDocument();
+    expect(catalogLayoutPanel.querySelector(".connector-layout-control-card-selected .connector-layout-control-card-header span")?.textContent).toBe(
       "C3"
     );
   });

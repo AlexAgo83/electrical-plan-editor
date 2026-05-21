@@ -153,27 +153,27 @@ describe("App integration UI - catalog", () => {
     fireEvent.change(within(catalogFormPanel).getByLabelText("URL"), {
       target: { value: "not-a-url" }
     });
-    expect(within(catalogFormPanel).getByText("Connector material defaults").closest("fieldset")).toHaveClass(
-      "catalog-material-defaults-fieldset"
-    );
-    expect(within(catalogFormPanel).getByText("Connector physical layout").closest("fieldset")).toHaveClass(
-      "connector-layout-editor"
-    );
-    expect(within(catalogFormPanel).getByRole("heading", { name: "Global layout" })).toBeInTheDocument();
-    expect(within(catalogFormPanel).getByText("6 ways").closest(".connector-layout-control-card-header")).not.toBeNull();
-    expect(within(catalogFormPanel).getByLabelText("Border shape")).toHaveValue("square");
-    fireEvent.change(within(catalogFormPanel).getByLabelText("Border shape"), {
+    const catalogMaterialPanel = getPanelByHeading("Connector material defaults");
+    const catalogLayoutPanel = getPanelByHeading("Connector physical layout");
+    expect(catalogMaterialPanel).toHaveClass("catalog-material-defaults-panel");
+    expect(catalogLayoutPanel).toHaveClass("catalog-connector-layout-panel");
+    expect(within(catalogMaterialPanel).getByRole("button", { name: "Create" })).toBeDisabled();
+    expect(within(catalogLayoutPanel).getByRole("button", { name: "Create" })).toBeDisabled();
+    expect(within(catalogLayoutPanel).getByRole("heading", { name: "Global layout" })).toBeInTheDocument();
+    expect(within(catalogLayoutPanel).getByText("6 ways").closest(".connector-layout-control-card-header")).not.toBeNull();
+    expect(within(catalogLayoutPanel).getByLabelText("Border shape")).toHaveValue("square");
+    fireEvent.change(within(catalogLayoutPanel).getByLabelText("Border shape"), {
       target: { value: "circle" }
     });
-    expect(within(catalogFormPanel).getByLabelText("Border shape")).toHaveValue("circle");
-    expect(within(catalogFormPanel).getByRole("button", { name: "Global layout" })).toHaveAttribute("aria-pressed", "true");
-    expect(within(catalogFormPanel).getByRole("button", { name: "Selected way" })).toHaveAttribute("aria-pressed", "false");
-    expect(within(catalogFormPanel).queryByText("No keying features.")).not.toBeInTheDocument();
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Keying features" }));
-    expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Add keying" }));
+    expect(within(catalogLayoutPanel).getByLabelText("Border shape")).toHaveValue("circle");
+    expect(within(catalogLayoutPanel).getByRole("button", { name: "Global layout" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(catalogLayoutPanel).getByRole("button", { name: "Selected way" })).toHaveAttribute("aria-pressed", "false");
+    expect(within(catalogLayoutPanel).queryByText("No keying features.")).not.toBeInTheDocument();
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Keying features" }));
+    expect(within(catalogLayoutPanel).getByText("No keying features.")).toBeInTheDocument();
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Add keying" }));
     const { placementSelect, shapeSelect, colorInput, positionSlider, scaleInput } = getConnectorLayoutKeyingControls(
-      getConnectorLayoutKeyingRow(catalogFormPanel)
+      getConnectorLayoutKeyingRow(catalogLayoutPanel)
     );
     expect(placementSelect).toHaveValue("guided");
     expect(shapeSelect).toHaveValue("arrow");
@@ -186,19 +186,19 @@ describe("App integration UI - catalog", () => {
       target: { value: "#ff8800" }
     });
     expect(colorInput).toHaveValue("#ff8800");
-    expect(within(catalogFormPanel).queryByRole("button", { name: "Theme color" })).not.toBeInTheDocument();
+    expect(within(catalogLayoutPanel).queryByRole("button", { name: "Theme color" })).not.toBeInTheDocument();
     expect(positionSlider).toHaveValue("0.4");
     expect(scaleInput).toHaveValue("1");
     fireEvent.change(scaleInput, {
       target: { value: "1.45" }
     });
     expect(scaleInput).toHaveValue("1.45");
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Remove" }));
-    expect(within(catalogFormPanel).getByText("No keying features.")).toBeInTheDocument();
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Selected way" }));
-    expect(within(catalogFormPanel).getByRole("heading", { name: "Selected way" })).toBeInTheDocument();
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Remove" }));
+    expect(within(catalogLayoutPanel).getByText("No keying features.")).toBeInTheDocument();
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Selected way" }));
+    expect(within(catalogLayoutPanel).getByRole("heading", { name: "Selected way" })).toBeInTheDocument();
     expect(
-      catalogFormPanel.querySelector(".connector-layout-control-card-selected .connector-layout-control-card-header span")
+      catalogLayoutPanel.querySelector(".connector-layout-control-card-selected .connector-layout-control-card-header span")
         ?.textContent
     ).toBe("C1");
     expect(within(catalogFormPanel).getByText("Use an absolute http/https URL.")).toBeInTheDocument();
@@ -207,9 +207,9 @@ describe("App integration UI - catalog", () => {
     fireEvent.change(within(catalogFormPanel).getByLabelText("URL"), {
       target: { value: "https://example.com/te-1-967616-1" }
     });
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Global layout" }));
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Auto layout" }));
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Create" }));
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Global layout" }));
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Auto layout" }));
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Create" }));
 
     expect(within(catalogPanel).getByText("TE-1-967616-1")).toBeInTheDocument();
     const createdCatalogItem = store

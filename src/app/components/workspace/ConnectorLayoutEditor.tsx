@@ -10,7 +10,6 @@ import type {
 } from "../../../core/entities";
 import {
   addConnectorLayoutKeying,
-  createDefaultConnectorLayout,
   DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING,
   getConnectorLayoutShellPadding,
   getConnectorLayoutCellPadding,
@@ -40,6 +39,7 @@ interface ConnectorLayoutEditorProps {
   connectionCount: string;
   connectorLayout: ConnectorLayout | undefined;
   setConnectorLayout: (value: ConnectorLayout | undefined) => void;
+  showLegend?: boolean;
 }
 
 const WAY_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutWayShape; label: string }> = [
@@ -221,7 +221,8 @@ function getLayoutViewBox(layout: ConnectorLayout, shellPadding: number): string
 export function ConnectorLayoutEditor({
   connectionCount,
   connectorLayout,
-  setConnectorLayout
+  setConnectorLayout,
+  showLegend = true
 }: ConnectorLayoutEditorProps): ReactElement {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const parsedConnectionCount = parseConnectionCount(connectionCount);
@@ -472,9 +473,11 @@ export function ConnectorLayoutEditor({
     }
   }
 
+  const fieldsetClassName = showLegend ? "inline-fieldset connector-layout-editor" : "inline-fieldset connector-layout-editor is-embedded";
+
   return (
-    <fieldset className="inline-fieldset connector-layout-editor">
-      <legend>Connector physical layout</legend>
+    <fieldset className={fieldsetClassName}>
+      {showLegend ? <legend>Connector physical layout</legend> : null}
       <div className="connector-layout-editor-grid">
         <div className="connector-layout-preview" aria-label="Connector layout editor preview">
           <svg
@@ -635,20 +638,6 @@ export function ConnectorLayoutEditor({
                   onChange={(event) => updateCellPadding(event.target.value)}
                 />
               </label>
-              <div className="connector-layout-editor-actions">
-                <button
-                  type="button"
-                  className="button-with-icon"
-                  onClick={() => setConnectorLayout(createDefaultConnectorLayout(parsedConnectionCount))}
-                >
-                  <span className="action-button-icon is-catalog" aria-hidden="true" />
-                  Auto layout
-                </button>
-                <button type="button" className="button-with-icon" onClick={() => setConnectorLayout(undefined)}>
-                  <span className="action-button-icon is-cancel" aria-hidden="true" />
-                  Clear custom layout
-                </button>
-              </div>
             </section>
           ) : null}
 
