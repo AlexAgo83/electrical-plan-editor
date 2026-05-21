@@ -152,6 +152,7 @@ describe("App integration UI - inspector floating shell", () => {
 
     const catalogPanel = getPanelByHeading("Catalog");
     expect(within(catalogPanel).getByText("CAT-MFR-1")).toBeInTheDocument();
+    expect(within(getPanelByHeading("Edit catalog item")).getByLabelText("Manufacturer reference")).toHaveValue("CAT-MFR-1");
     const inspectorShell = getInspectorShell();
     if (inspectorShell !== null) {
       expect(within(getPanelByHeading("Inspector context")).getByText("CAT-MFR-1", { selector: ".inspector-entity-id" })).toBeInTheDocument();

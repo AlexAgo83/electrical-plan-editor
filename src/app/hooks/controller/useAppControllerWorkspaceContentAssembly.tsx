@@ -315,6 +315,7 @@ export function useAppControllerWorkspaceContentAssembly({
       tabularExportFormat: models.preferencesState.tabularExportFormat,
       formsState: models.formsState,
       modelingHandlers: models.modelingHandlers,
+      catalogHandlers: models.catalogHandlers,
       listModel: models.entityListModel,
       selection: models.selectionEntities,
       layoutDerived: {

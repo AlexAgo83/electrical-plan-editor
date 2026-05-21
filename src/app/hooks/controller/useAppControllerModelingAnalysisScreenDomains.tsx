@@ -9,6 +9,7 @@ import {
 import type { EntityListModel } from "../useEntityListModel";
 import type { AppControllerFormsStateFlat } from "../useAppControllerNamespacedFormsState";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
+import type { CatalogHandlersModel } from "../useCatalogHandlers";
 import type { WireEndpointDescriptions } from "../useWireEndpointDescriptions";
 import type { AppControllerModelingHandlersOrchestrator } from "./useAppControllerModelingHandlersOrchestrator";
 import {
@@ -37,6 +38,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   tabularExportFormat: ModelingSliceParams["tabularExportFormat"];
   formsState: AppControllerFormsStateFlat;
   modelingHandlers: AppControllerModelingHandlersOrchestrator;
+  catalogHandlers: Pick<CatalogHandlersModel, "startCatalogEdit">;
   listModel: Pick<
     EntityListModel,
     | "connectorOccupancyFilter"
@@ -150,6 +152,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   entities,
   formsState,
   modelingHandlers,
+  catalogHandlers,
   listModel,
   selection,
   layoutDerived,
@@ -349,6 +352,12 @@ export function useAppControllerModelingAnalysisScreenDomains({
     (catalogItemId) => {
       markSelectionPanelsFromTable?.();
       openCatalogSubScreen();
+      const catalogItem = store.getState().catalogItems.byId[catalogItemId];
+      if (catalogItem !== undefined) {
+        catalogHandlers.startCatalogEdit(catalogItem);
+        return;
+      }
+
       dispatchAction(
         appActions.select({
           kind: "catalog",
@@ -356,7 +365,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
         })
       );
     },
-    [dispatchAction, markSelectionPanelsFromTable, openCatalogSubScreen]
+    [catalogHandlers, dispatchAction, markSelectionPanelsFromTable, openCatalogSubScreen, store]
   );
   const handleSelectConnectorReference: ModelingSliceParams["onSelectConnectorReference"] = useCallback(
     (connectorId) => {

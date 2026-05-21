@@ -396,6 +396,7 @@ describe("App integration UI - creation flow ergonomics", () => {
       within(getPanelByHeading("Edit Connector")).getByRole("button", { name: "Manufacturer reference: CAT-REF-2" })
     );
     expect(within(getPanelByHeading("Catalog")).getByText("CAT-REF-2")).toBeInTheDocument();
+    expect(within(getPanelByHeading("Edit catalog item")).getByLabelText("Manufacturer reference")).toHaveValue("CAT-REF-2");
 
     switchSubScreenDrawerAware("splice");
     fireEvent.click(within(getPanelByHeading("Splices")).getByText("Linked splice"));
@@ -403,6 +404,7 @@ describe("App integration UI - creation flow ergonomics", () => {
       within(getPanelByHeading("Edit Splice")).getByRole("button", { name: "Manufacturer reference: CAT-REF-2" })
     );
     expect(within(getPanelByHeading("Catalog")).getByText("CAT-REF-2")).toBeInTheDocument();
+    expect(within(getPanelByHeading("Edit catalog item")).getByLabelText("Manufacturer reference")).toHaveValue("CAT-REF-2");
   });
 
   it("allows editing a node ID in edit mode and saves the renamed node", () => {
