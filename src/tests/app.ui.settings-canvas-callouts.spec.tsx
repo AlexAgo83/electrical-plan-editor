@@ -111,6 +111,10 @@ describe("App integration UI - settings canvas callouts", () => {
           units: "grid",
           width: 4,
           height: 1,
+          keyings: [
+            { side: "top", shape: "arrow", position: 2 },
+            { side: "right", shape: "square", position: 1 }
+          ],
           ways: [
             { cavityIndex: 1, x: 1, y: 1, shape: "round" },
             { cavityIndex: 2, x: 4, y: 1, shape: "round" }
@@ -137,6 +141,8 @@ describe("App integration UI - settings canvas callouts", () => {
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
     expect(networkSummaryPanel.querySelectorAll(".network-callout-table-cell").length).toBeGreaterThan(0);
     expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing").length).toBeGreaterThan(0);
+    expect(networkSummaryPanel.querySelector(".network-callout-connector-keying[d]")).not.toBeNull();
+    expect(networkSummaryPanel.querySelector(".network-callout-connector-keying[width]")).not.toBeNull();
 
     switchScreenDrawerAware("settings");
     const connectorDrawingCheckbox = within(getPanelByHeading("Canvas tools preferences")).getByLabelText(

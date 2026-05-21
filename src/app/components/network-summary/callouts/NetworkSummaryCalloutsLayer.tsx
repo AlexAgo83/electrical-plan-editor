@@ -1,5 +1,13 @@
-import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactElement } from "react";
-import type { ConnectorId, ConnectorLayout, SpliceId, Wire } from "../../../../core/entities";
+import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactElement } from "react";
+import type {
+  ConnectorId,
+  ConnectorLayout,
+  ConnectorLayoutKeyingShape,
+  ConnectorLayoutKeyingSide,
+  ConnectorLayoutShellShape,
+  SpliceId,
+  Wire
+} from "../../../../core/entities";
 import {
   getConnectorLayoutKeyings,
   getConnectorLayoutShellPadding,
@@ -15,6 +23,137 @@ import {
   type CalloutTargetKey,
   type RenderedCableCallout
 } from "./calloutLayout";
+
+const KEYING_MARKER_SIZE = 0.28;
+const KEYING_MARKER_RADIUS = 0.15;
+const KEYING_ARROW_WIDTH = 0.32;
+const KEYING_ARROW_DEPTH = 0.19;
+
+type RenderableKeying = {
+  side: Exclude<ConnectorLayoutKeyingSide, "none">;
+  position?: number;
+  shape?: ConnectorLayoutKeyingShape;
+  color?: string;
+};
+
+type KeyingAnchor = {
+  x: number;
+  y: number;
+  normalX: number;
+  normalY: number;
+};
+
+function clampUnit(value: number): number {
+  return Math.min(1, Math.max(-1, value));
+}
+
+function getKeyingStyle(keying: RenderableKeying): CSSProperties | undefined {
+  return keying.color === undefined ? undefined : { fill: keying.color };
+}
+
+function getKeyingAnchor(
+  keying: RenderableKeying,
+  layout: ConnectorLayout,
+  shellShape: ConnectorLayoutShellShape,
+  shellPadding: number
+): KeyingAnchor {
+  const centerX = layout.width / 2 + 0.5;
+  const centerY = layout.height / 2 + 0.5;
+  const left = 1 - shellPadding;
+  const top = 1 - shellPadding;
+  const right = layout.width + shellPadding;
+  const bottom = layout.height + shellPadding;
+  if (shellShape === "circle") {
+    const radiusX = (layout.width - 1) / 2 + shellPadding;
+    const radiusY = (layout.height - 1) / 2 + shellPadding;
+    if (keying.side === "top" || keying.side === "bottom") {
+      const x = keying.position ?? centerX;
+      const relativeX = clampUnit((x - centerX) / radiusX);
+      const signedY = (keying.side === "top" ? -1 : 1) * radiusY * Math.sqrt(1 - relativeX * relativeX);
+      const y = centerY + signedY;
+      const normalX = relativeX / radiusX;
+      const normalY = signedY / (radiusY * radiusY);
+      const normalLength = Math.hypot(normalX, normalY) || 1;
+      return { x, y, normalX: normalX / normalLength, normalY: normalY / normalLength };
+    }
+    const y = keying.position ?? centerY;
+    const relativeY = clampUnit((y - centerY) / radiusY);
+    const signedX = (keying.side === "left" ? -1 : 1) * radiusX * Math.sqrt(1 - relativeY * relativeY);
+    const x = centerX + signedX;
+    const normalX = signedX / (radiusX * radiusX);
+    const normalY = relativeY / radiusY;
+    const normalLength = Math.hypot(normalX, normalY) || 1;
+    return { x, y, normalX: normalX / normalLength, normalY: normalY / normalLength };
+  }
+  const keyingX = keying.position ?? centerX;
+  const keyingY = keying.position ?? centerY;
+  const anchorBySide: Record<Exclude<ConnectorLayoutKeyingSide, "none">, KeyingAnchor> = {
+    top: { x: keyingX, y: top, normalX: 0, normalY: -1 },
+    right: { x: right, y: keyingY, normalX: 1, normalY: 0 },
+    bottom: { x: keyingX, y: bottom, normalX: 0, normalY: 1 },
+    left: { x: left, y: keyingY, normalX: -1, normalY: 0 }
+  };
+  return anchorBySide[keying.side];
+}
+
+function renderConnectorKeying(
+  keying: RenderableKeying,
+  layout: ConnectorLayout,
+  shellShape: ConnectorLayoutShellShape,
+  shellPadding: number
+): ReactElement {
+  const anchor = getKeyingAnchor(keying, layout, shellShape, shellPadding);
+  const shape = keying.shape ?? "arrow";
+  const markerDirection = shape === "square" ? -1 : shape === "round" || shape === "diamond" ? 0 : 1;
+  const markerCenterX = anchor.x + anchor.normalX * (KEYING_MARKER_SIZE / 2) * markerDirection;
+  const markerCenterY = anchor.y + anchor.normalY * (KEYING_MARKER_SIZE / 2) * markerDirection;
+  const style = getKeyingStyle(keying);
+  const markerAngle = (Math.atan2(anchor.normalY, anchor.normalX) * 180) / Math.PI;
+  if (shape === "square") {
+    return (
+      <rect
+        className="network-callout-connector-keying"
+        style={style}
+        x={markerCenterX - KEYING_MARKER_SIZE / 2}
+        y={markerCenterY - KEYING_MARKER_SIZE / 2}
+        width={KEYING_MARKER_SIZE}
+        height={KEYING_MARKER_SIZE}
+        rx={0.035}
+        transform={`rotate(${markerAngle} ${markerCenterX} ${markerCenterY})`}
+        aria-hidden="true"
+      />
+    );
+  }
+  if (shape === "round") {
+    return <circle className="network-callout-connector-keying" style={style} cx={markerCenterX} cy={markerCenterY} r={KEYING_MARKER_RADIUS} aria-hidden="true" />;
+  }
+  if (shape === "diamond") {
+    return (
+      <rect
+        className="network-callout-connector-keying"
+        style={style}
+        x={markerCenterX - KEYING_MARKER_SIZE / 2}
+        y={markerCenterY - KEYING_MARKER_SIZE / 2}
+        width={KEYING_MARKER_SIZE}
+        height={KEYING_MARKER_SIZE}
+        transform={`rotate(${markerAngle + 45} ${markerCenterX} ${markerCenterY})`}
+        aria-hidden="true"
+      />
+    );
+  }
+  const tangentX = -anchor.normalY;
+  const tangentY = anchor.normalX;
+  const baseX = anchor.x + anchor.normalX * KEYING_ARROW_DEPTH;
+  const baseY = anchor.y + anchor.normalY * KEYING_ARROW_DEPTH;
+  const halfWidth = KEYING_ARROW_WIDTH / 2;
+  const path = [
+    `M ${anchor.x} ${anchor.y}`,
+    `L ${baseX + tangentX * halfWidth} ${baseY + tangentY * halfWidth}`,
+    `L ${baseX - tangentX * halfWidth} ${baseY - tangentY * halfWidth}`,
+    "z"
+  ].join(" ");
+  return <path className="network-callout-connector-keying" style={style} d={path} aria-hidden="true" />;
+}
 
 function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, height: number): ReactElement {
   const shellPadding = getConnectorLayoutShellPadding(layout);
@@ -52,20 +191,11 @@ function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, he
           rx={Math.min(0.55, shellPadding)}
         />
       )}
-      {getConnectorLayoutKeyings(layout).map((keying, index) => {
-        const x = keying.side === "left" ? shellX : keying.side === "right" ? shellX + shellWidth : keying.position ?? layout.width / 2 + 0.5;
-        const y = keying.side === "top" ? shellY : keying.side === "bottom" ? shellY + shellHeight : keying.position ?? layout.height / 2 + 0.5;
-        return (
-          <circle
-            key={`${keying.side}-${keying.position ?? "auto"}-${index}`}
-            className="network-callout-connector-keying"
-            cx={x}
-            cy={y}
-            r={0.13}
-            fill={keying.color}
-          />
-        );
-      })}
+      {getConnectorLayoutKeyings(layout).map((keying, index) => (
+        <g key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${index}`}>
+          {renderConnectorKeying(keying as RenderableKeying, layout, shellShape, shellPadding)}
+        </g>
+      ))}
       {layout.ways.map((way) => {
         const label = getConnectorLayoutWayDisplayLabel(way);
         const labelClassName = `network-callout-connector-way-label${label.length > 2 ? " is-long-label" : ""}`;
