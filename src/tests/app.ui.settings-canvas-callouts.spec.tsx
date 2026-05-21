@@ -184,9 +184,9 @@ describe("App integration UI - settings canvas callouts", () => {
     const drawingLayout = buildCalloutLayoutMetrics("J1", "", [], "normal", false, true);
     const doubledDrawingLayout = buildCalloutLayoutMetrics("J1", "", [], "normal", false, true, 2);
 
-    expect(drawingLayout.drawingHeight).toBe(72);
+    expect(drawingLayout.drawingHeight).toBe(64);
     expect(drawingLayout.width).toBeLessThan(160);
-    expect(doubledDrawingLayout.drawingHeight).toBe(144);
+    expect(doubledDrawingLayout.drawingHeight).toBe(128);
     expect(doubledDrawingLayout.width).toBeLessThan(220);
   });
 

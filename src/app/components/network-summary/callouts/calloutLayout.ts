@@ -73,7 +73,7 @@ const CALLOUT_MIN_WIDTH = 44;
 const CALLOUT_MAX_WIDTH = 520;
 const CALLOUT_LAYOUT_CACHE_MAX_ENTRIES = 512;
 const CALLOUT_CONNECTOR_DRAWING_FALLBACK_ASPECT_RATIO = 1.35;
-const CALLOUT_CONNECTOR_DRAWING_HEIGHT = 72;
+const CALLOUT_CONNECTOR_DRAWING_HEIGHT = 64;
 export const CALLOUT_OFFSET_SCREEN_UNITS = 92;
 export const CALLOUT_COLOR_SWATCH_RADIUS = 1.35;
 export const CALLOUT_COLOR_SWATCH_GAP = 0.95;
@@ -489,7 +489,7 @@ export function buildCalloutLayoutMetrics(
 
   const drawingHeight = hasConnectorDrawing ? CALLOUT_CONNECTOR_DRAWING_HEIGHT * normalizedConnectorDrawingScale : 0;
   const drawingWidth = hasConnectorDrawing ? drawingHeight * normalizedConnectorDrawingAspectRatio : 0;
-  const drawingBottomGap = hasConnectorDrawing ? 2.5 : 0;
+  const drawingBottomGap = hasConnectorDrawing ? 1 : 0;
   const measuredContentWidth = Math.max(tableWidth, measuredTitleWidth, measuredSubtitleWidth, drawingWidth);
   const measuredContentHeight =
     rows.length > 0
