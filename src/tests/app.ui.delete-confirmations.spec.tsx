@@ -229,6 +229,24 @@ describe("App integration UI - delete confirmations", () => {
     expect(within(getPanelByHeading(caseData.panelHeading)).getByText(caseData.rowText)).toBeInTheDocument();
   });
 
+  it("shows an in-app notification after deleting an entity", async () => {
+    openModelingDeleteScenario();
+    triggerEntityDelete({
+      entity: "connector",
+      subScreen: "connector",
+      panelHeading: "Connectors",
+      rowText: "Connector deletable",
+      dialogTitle: "Delete connector"
+    });
+    await confirmDeleteDialog("Delete connector");
+
+    const toastTitle = await screen.findByText("Connector deleted");
+    const toast = toastTitle.closest(".toast-notification");
+    expect(toast).not.toBeNull();
+    expect(toast).toHaveTextContent("Connector deleted");
+    expect(toast).toHaveTextContent("Connector deletable (C-DEL)");
+  });
+
   it("keeps Cancel focused in direct delete dialogs, supports Escape cancel, and confirms on Enter", async () => {
     const { store } = renderAppWithState(createDeleteConfirmationState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));

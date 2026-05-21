@@ -1,0 +1,112 @@
+.toast-viewport {
+  position: fixed;
+  left: max(1rem, env(safe-area-inset-left));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 95;
+  display: grid;
+  gap: 0.55rem;
+  width: min(24rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.toast-notification {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.65rem;
+  padding: 0.68rem 0.72rem;
+  border: 1px solid color-mix(in srgb, var(--toast-accent, #17374e) 48%, #d6e1eb);
+  border-left-width: 0.28rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, #fff 92%, var(--toast-accent, #17374e));
+  color: #17374e;
+  box-shadow: 0 0.55rem 1.3rem rgba(16, 41, 59, 0.18);
+  pointer-events: auto;
+  animation: toast-slide-in 140ms ease-out;
+}
+
+.toast-notification.is-success {
+  --toast-accent: var(--theme-primary, #17374e);
+}
+
+.toast-notification.is-info {
+  --toast-accent: #316c98;
+}
+
+.toast-notification.is-warning {
+  --toast-accent: #a46a13;
+}
+
+.toast-notification.is-error {
+  --toast-accent: #a83c3c;
+}
+
+.toast-notification-content {
+  min-width: 0;
+}
+
+.toast-notification-title,
+.toast-notification-message {
+  margin: 0;
+}
+
+.toast-notification-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.toast-notification-message {
+  margin-top: 0.16rem;
+  color: color-mix(in srgb, currentColor 76%, transparent);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.toast-notification-dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  color: inherit;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.toast-notification-dismiss:hover,
+.toast-notification-dismiss:focus-visible {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.app-shell.theme-dark .toast-notification {
+  background: color-mix(in srgb, #18283a 88%, var(--toast-accent, #6ea8d4));
+  color: #eff7ff;
+  border-color: color-mix(in srgb, var(--toast-accent, #6ea8d4) 55%, #334b63);
+  box-shadow: 0 0.55rem 1.4rem rgba(0, 0, 0, 0.34);
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.45rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 560px) {
+  .toast-viewport {
+    right: max(0.75rem, env(safe-area-inset-right));
+    left: max(0.75rem, env(safe-area-inset-left));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    width: auto;
+  }
+}

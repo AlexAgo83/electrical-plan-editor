@@ -22,6 +22,7 @@ import { appStore } from "./store";
 import { appUiModules } from "./components/appUiModules";
 import { AppShellLayout } from "./components/layout/AppShellLayout";
 import { AppControllerOverlays } from "./components/layout/AppControllerOverlays";
+import { ToastViewport } from "./components/ToastViewport";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useCanvasState } from "./hooks/useCanvasState";
 import { useCatalogHandlers } from "./hooks/useCatalogHandlers";
@@ -70,12 +71,14 @@ import { useWorkspaceShellChrome } from "./hooks/useWorkspaceShellChrome";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
 import { useAppLocaleDomTranslation } from "./hooks/useAppLocaleDomTranslation";
 import { useHoverDescriptionTitles } from "./hooks/useHoverDescriptionTitles";
+import { useToastNotifications } from "./hooks/useToastNotifications";
 import { useAppControllerUiPreferencesBindings } from "./hooks/controller/useAppControllerUiPreferencesBindings";
 import { buildAppControllerNamespacedCanvasState } from "./hooks/useAppControllerNamespacedCanvasState";
 import { buildAppControllerNamespacedFormsState } from "./hooks/useAppControllerNamespacedFormsState";
 import { useAppSnapshot } from "./hooks/useAppSnapshot";
 import { HISTORY_LIMIT, NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE } from "./lib/app-utils-shared";
 import { useAppControllerBomExportHandlers } from "./hooks/controller/useAppControllerBomExportHandlers";
+import { buildAppActionToast } from "./lib/app-action-toast";
 import type { AppProps, SubScreenId } from "./types/app-controller";
 import "./styles.css";
 export type { AppProps } from "./types/app-controller";
@@ -467,12 +470,13 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const hasActiveNetwork = activeNetwork !== null;
   const isCurrentWorkspaceEmpty = isWorkspaceEmpty(state);
   const hasBuiltInSampleState = hasSampleNetworkSignature(state);
+  const { toasts, notifyToast, dismissToast } = useToastNotifications();
   const {
     saveStatus,
     isUndoAvailable,
     isRedoAvailable,
     undoHistoryEntries,
-    dispatchAction,
+    dispatchAction: dispatchActionWithHistory,
     handleUndo,
     handleRedo,
     replaceStateWithHistory
@@ -491,6 +495,28 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       setInteractionMode("select");
     }
   });
+  const dispatchAction = useCallback(
+    (
+      action: Parameters<typeof dispatchActionWithHistory>[0],
+      options?: Parameters<typeof dispatchActionWithHistory>[1]
+    ): void => {
+      const previousState = store.getState();
+      dispatchActionWithHistory(action, options);
+      const nextState = store.getState();
+      if (nextState === previousState || options?.trackHistory === false) {
+        return;
+      }
+
+      const toast = buildAppActionToast(action, previousState, nextState);
+      if (toast !== null) {
+        notifyToast(toast.title, {
+          message: toast.message,
+          variant: toast.variant
+        });
+      }
+    },
+    [dispatchActionWithHistory, notifyToast, store]
+  );
   const {
     lastError,
     bootRecoveryMessage,
@@ -1076,6 +1102,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
 
   return <>
     <AppShellLayout {...appShellLayoutProps} />
+    <ToastViewport toasts={toasts} onDismissToast={dismissToast} />
     <AppControllerOverlays
       appShellClassName={appShellClassName}
       activeConfirmDialog={activeConfirmDialog}
