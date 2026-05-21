@@ -1,6 +1,8 @@
 import { lazy, Suspense, useEffect, useId, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import { HOME_CHANGELOG_ENTRY_SUMMARIES, loadHomeChangelogEntryContent } from "../../lib/changelogFeed";
+import type { UndoHistoryEntry } from "../../types/app-controller";
+import { NetworkRecentChangesPanel } from "./NetworkRecentChangesPanel";
 
 const CHANGELOG_INITIAL_BATCH_SIZE = 4;
 const CHANGELOG_INCREMENT_BATCH_SIZE = 4;
@@ -15,6 +17,7 @@ interface HomeWorkspaceContentProps {
   hasActiveNetwork: boolean;
   activeNetworkName: string | null;
   activeNetworkTechnicalId: string | null;
+  recentChangesForActiveNetwork: UndoHistoryEntry[];
   networkCount: number;
   saveStatus: "saved" | "unsaved" | "error";
   validationIssuesCount: number;
@@ -195,6 +198,7 @@ export function HomeWorkspaceContent({
   hasActiveNetwork,
   activeNetworkName,
   activeNetworkTechnicalId,
+  recentChangesForActiveNetwork,
   networkCount,
   saveStatus,
   validationIssuesCount,
@@ -404,6 +408,7 @@ export function HomeWorkspaceContent({
             ) : null}
           </div>
         </section>
+        <NetworkRecentChangesPanel entries={recentChangesForActiveNetwork} />
       </div>
       <section className="panel home-panel home-whats-new-panel">
         <header className="home-panel-header">

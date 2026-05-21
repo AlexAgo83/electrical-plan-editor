@@ -64,7 +64,7 @@ describe("App integration UI - networks", () => {
     expect(screen.queryByRole("heading", { name: "Create network" })).not.toBeInTheDocument();
   });
 
-  it("renders active-network recent changes between Network Scope and Edit network, then hides for another active network without history", async () => {
+  it("renders active-network recent changes under the Home workspace panel, then hides for another active network without history", async () => {
     const base = createInitialState();
     const defaultNetworkId = base.activeNetworkId as NetworkId;
     const withSecondNetwork = appReducer(
@@ -88,15 +88,18 @@ describe("App integration UI - networks", () => {
     fireEvent.change(within(editFormPanel).getByLabelText("Description (optional)"), { target: { value: "Recent change update" } });
     fireEvent.click(within(editFormPanel).getByRole("button", { name: "Save network" }));
 
+    expect(screen.queryByRole("heading", { name: "Recent changes" })).not.toBeInTheDocument();
+    switchScreen("home");
+
     await waitFor(() => {
       expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();
     });
 
     const recentChangesHeading = screen.getByRole("heading", { name: "Recent changes" });
-    const editHeading = screen.getByRole("heading", { name: "Edit network" });
-    const networkScopeHeading = screen.getByRole("heading", { name: "Network Scope" });
-    expect(networkScopeHeading.compareDocumentPosition(recentChangesHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
-    expect(recentChangesHeading.compareDocumentPosition(editHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    const workspaceHeading = screen.getByRole("heading", { name: "Workspace" });
+    const whatsNewHeading = screen.getByRole("heading", { name: "What's new" });
+    expect(workspaceHeading.compareDocumentPosition(recentChangesHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    expect(recentChangesHeading.compareDocumentPosition(whatsNewHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
 
     const recentChangesPanel = recentChangesHeading.closest(".panel");
     expect(recentChangesPanel).not.toBeNull();
@@ -104,8 +107,11 @@ describe("App integration UI - networks", () => {
     const firstTime = (recentChangesPanel as HTMLElement).querySelector("time")?.textContent ?? "";
     expect(firstTime).toMatch(/^\d{2}:\d{2}:\d{2}$/);
 
-    fireEvent.click(within(networkScopePanel).getByText("Network B").closest("tr") as HTMLElement);
+    switchScreen("networkScope");
+    const nextNetworkScopePanel = getPanelByHeading("Network Scope");
+    fireEvent.click(within(nextNetworkScopePanel).getByText("Network B").closest("tr") as HTMLElement);
     fireEvent.click(within(getPanelByHeading("Edit network")).getByRole("button", { name: "Set active" }));
+    switchScreen("home");
 
     await waitFor(() => {
       expect(screen.queryByRole("heading", { name: "Recent changes" })).not.toBeInTheDocument();
@@ -122,6 +128,7 @@ describe("App integration UI - networks", () => {
     fireEvent.change(within(editFormPanel).getByLabelText("Description (optional)"), { target: { value: "Persist recent changes" } });
     fireEvent.click(within(editFormPanel).getByRole("button", { name: "Save network" }));
 
+    switchScreen("home");
     await waitFor(() => {
       expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();
     });
@@ -130,7 +137,7 @@ describe("App integration UI - networks", () => {
     firstRender.unmount();
 
     renderAppWithState(createInitialState());
-    switchScreen("networkScope");
+    switchScreen("home");
 
     await waitFor(() => {
       expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();

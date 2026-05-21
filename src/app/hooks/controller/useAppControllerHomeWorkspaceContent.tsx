@@ -1,7 +1,8 @@
-import { useCallback, type ChangeEvent, type ComponentType, type RefObject } from "react";
+import { useCallback, useMemo, type ChangeEvent, type ComponentType, type RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import { createEmptyWorkspaceState, type AppState } from "../../../store";
-import type { InteractionMode } from "../../types/app-controller";
+import type { InteractionMode, UndoHistoryEntry } from "../../types/app-controller";
+import type { NetworkId } from "../../../core/entities";
 import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
 
 type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
@@ -16,6 +17,8 @@ interface UseAppControllerHomeWorkspaceContentParams {
   hasActiveNetwork: boolean;
   activeNetworkName: string | null;
   activeNetworkTechnicalId: string | null;
+  activeNetworkId: NetworkId | null;
+  undoHistoryEntries: UndoHistoryEntry[];
   networkCount: number;
   saveStatus: HomeWorkspaceContentProps["saveStatus"];
   validationIssuesCount: number;
@@ -42,6 +45,8 @@ export function useAppControllerHomeWorkspaceContent({
   hasActiveNetwork,
   activeNetworkName,
   activeNetworkTechnicalId,
+  activeNetworkId,
+  undoHistoryEntries,
   networkCount,
   saveStatus,
   validationIssuesCount,
@@ -90,11 +95,21 @@ export function useAppControllerHomeWorkspaceContent({
     themeMode
   ]);
 
+  const recentChangesForActiveNetwork = useMemo(
+    () =>
+      undoHistoryEntries
+        .filter((entry) => entry.networkId === activeNetworkId)
+        .slice(-10)
+        .reverse(),
+    [activeNetworkId, undoHistoryEntries]
+  );
+
   const homeWorkspaceContent = (
     <HomeWorkspaceContentComponent
       hasActiveNetwork={hasActiveNetwork}
       activeNetworkName={activeNetworkName}
       activeNetworkTechnicalId={activeNetworkTechnicalId}
+      recentChangesForActiveNetwork={recentChangesForActiveNetwork}
       networkCount={networkCount}
       saveStatus={saveStatus}
       validationIssuesCount={validationIssuesCount}

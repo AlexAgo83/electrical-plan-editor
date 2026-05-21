@@ -1,6 +1,6 @@
 import type { AppAction } from "../../../store/actions";
 import type { AppStore } from "../../../store";
-import type { ScreenId, SubScreenId } from "../../types/app-controller";
+import type { ScreenId, SubScreenId, UndoHistoryEntry } from "../../types/app-controller";
 import type { AppControllerCanvasDisplayStateModel } from "../useAppControllerCanvasDisplayState";
 import type { AppControllerPreferencesStateModel } from "../useAppControllerPreferencesState";
 import type { CanvasStateModel } from "../useCanvasState";
@@ -105,7 +105,7 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     selectedNodeId: NetworkSummaryParams["selection"]["selectedNodeId"];
     selectedConnectorId: NetworkSummaryParams["selection"]["selectedConnectorId"];
     selectedSpliceId: NetworkSummaryParams["selection"]["selectedSpliceId"];
-    undoHistoryEntries: AuxDomainsParams["networkScope"]["undoHistoryEntries"];
+    undoHistoryEntries: UndoHistoryEntry[];
   };
   models: {
     formsState: EntityFormsStateModel;
@@ -170,6 +170,8 @@ export function useAppControllerWorkspaceContentAssembly({
     hasActiveNetwork: state.hasActiveNetwork,
     activeNetworkName: state.activeNetworkName,
     activeNetworkTechnicalId: state.activeNetworkTechnicalId,
+    activeNetworkId: entities.activeNetworkId,
+    undoHistoryEntries: entities.undoHistoryEntries,
     networkCount: state.networkCount,
     saveStatus: state.saveStatus,
     validationIssuesCount: state.validationIssuesCount,
@@ -402,7 +404,6 @@ export function useAppControllerWorkspaceContentAssembly({
         handleDuplicateNetwork: domains.workspaceNetworkDomain.handleDuplicateNetwork,
         handleSaveActiveNetworkWithConfirmation: domains.workspaceNetworkDomain.handleSaveActiveNetworkWithConfirmation,
         handleDeleteNetwork: domains.workspaceNetworkDomain.handleDeleteNetwork,
-        undoHistoryEntries: entities.undoHistoryEntries,
         handleOpenCreateNetworkForm: domains.workspaceNetworkDomain.handleOpenCreateNetworkForm,
         handleOpenEditNetworkForm: domains.workspaceNetworkDomain.handleOpenEditNetworkForm,
         handleCloseNetworkForm: domains.workspaceNetworkDomain.handleCloseNetworkForm,

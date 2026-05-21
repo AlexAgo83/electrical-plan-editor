@@ -24,7 +24,6 @@ interface UseAppControllerAuxDomainAssemblyParams {
     handleDuplicateNetwork: AuxDomainsParams["networkScope"]["handleDuplicateNetwork"];
     handleSaveActiveNetworkWithConfirmation: AuxDomainsParams["networkScope"]["handleExportActiveNetwork"];
     handleDeleteNetwork: AuxDomainsParams["networkScope"]["handleDeleteNetwork"];
-    undoHistoryEntries: AuxDomainsParams["networkScope"]["undoHistoryEntries"];
     handleOpenCreateNetworkForm: () => void;
     handleOpenEditNetworkForm: AuxDomainsParams["networkScope"]["handleOpenEditNetworkForm"];
     handleCloseNetworkForm: () => void;
@@ -86,7 +85,6 @@ export function useAppControllerAuxDomainAssembly({
       handleDuplicateNetwork: networkScope.handleDuplicateNetwork,
       handleExportActiveNetwork: networkScope.handleSaveActiveNetworkWithConfirmation,
       handleDeleteNetwork: networkScope.handleDeleteNetwork,
-      undoHistoryEntries: networkScope.undoHistoryEntries,
       handleOpenCreateNetworkForm: networkScope.handleOpenCreateNetworkForm,
       handleOpenEditNetworkForm: networkScope.handleOpenEditNetworkForm,
       handleCloseNetworkForm: networkScope.handleCloseNetworkForm,

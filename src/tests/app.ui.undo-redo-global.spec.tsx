@@ -127,7 +127,7 @@ describe("App integration UI - global undo/redo", () => {
     expect(store.getState().catalogItems.byId[asCatalogItemId("CAT-UNDO")]?.connectionCount).toBe(6);
   });
 
-  it("keeps Network Scope recent changes aligned with undo stack", () => {
+  it("keeps Home recent changes aligned with undo stack", () => {
     renderAppWithState(createStateWithCatalog());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
     switchScreenDrawerAware("modeling");
@@ -139,7 +139,7 @@ describe("App integration UI - global undo/redo", () => {
     fireEvent.change(within(connectorFormPanel).getByLabelText("Technical ID"), { target: { value: "C-UNDO-SYNC" } });
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
 
-    switchScreenDrawerAware("networkScope");
+    switchScreenDrawerAware("home");
     expect(getPanelByHeading("Recent changes")).toBeInTheDocument();
     expect(screen.getByText("Connector 'C-UNDO-SYNC' created")).toBeInTheDocument();
 
@@ -164,7 +164,7 @@ describe("App integration UI - global undo/redo", () => {
 
     renderAppWithState(createStateWithCatalog());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
-    switchScreenDrawerAware("networkScope");
+    switchScreenDrawerAware("home");
     await waitFor(() => {
       expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();
     });
@@ -188,7 +188,7 @@ describe("App integration UI - global undo/redo", () => {
     const confirmDialog = await screen.findByRole("dialog", { name: "Delete wire" });
     fireEvent.click(within(confirmDialog).getByRole("button", { name: "Delete" }));
 
-    switchScreenDrawerAware("networkScope");
+    switchScreenDrawerAware("home");
     await waitFor(() => {
       expect(screen.getByText("Wire 'W-1' deleted")).toBeInTheDocument();
     });
