@@ -376,6 +376,62 @@ describe("App integration UI - navigation and canvas", () => {
     expect(selectedSegmentStroke).toHaveClass("is-selected");
   });
 
+  it("switches analysis sub-view to the clicked 2D entity type", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("wire");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    const spliceNode = networkSummaryPanel.querySelector(".network-node.splice");
+    const intermediateNode = networkSummaryPanel.querySelector(".network-node.intermediate");
+    const segmentHitbox = within(networkSummaryPanel).getByRole("button", { name: "Select segment SEG-A" });
+    expect(connectorNode).not.toBeNull();
+    expect(spliceNode).not.toBeNull();
+    expect(intermediateNode).not.toBeNull();
+
+    fireEvent.mouseDown(connectorNode as Element, { button: 0 });
+    fireEvent.mouseUp(connectorNode as Element, { button: 0 });
+    fireEvent.click(connectorNode as Element);
+    expect(getPanelByHeading("Connector analysis")).toBeInTheDocument();
+
+    fireEvent.mouseDown(spliceNode as Element, { button: 0 });
+    fireEvent.mouseUp(spliceNode as Element, { button: 0 });
+    fireEvent.click(spliceNode as Element);
+    expect(getPanelByHeading("Splice analysis")).toBeInTheDocument();
+
+    fireEvent.click(segmentHitbox);
+    expect(getPanelByHeading("Segment analysis")).toBeInTheDocument();
+
+    fireEvent.mouseDown(intermediateNode as Element, { button: 0 });
+    fireEvent.mouseUp(intermediateNode as Element, { button: 0 });
+    fireEvent.click(intermediateNode as Element);
+    expect(getPanelByHeading("Node analysis")).toBeInTheDocument();
+  });
+
+  it("keeps connector and splice node clicks more specific than the node sub-view", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("node");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    const spliceNode = networkSummaryPanel.querySelector(".network-node.splice");
+    expect(connectorNode).not.toBeNull();
+    expect(spliceNode).not.toBeNull();
+
+    fireEvent.mouseDown(connectorNode as Element, { button: 0 });
+    fireEvent.mouseUp(connectorNode as Element, { button: 0 });
+    fireEvent.click(connectorNode as Element);
+    expect(getPanelByHeading("Connector analysis")).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("node");
+    fireEvent.mouseDown(spliceNode as Element, { button: 0 });
+    fireEvent.mouseUp(spliceNode as Element, { button: 0 });
+    fireEvent.click(spliceNode as Element);
+    expect(getPanelByHeading("Splice analysis")).toBeInTheDocument();
+  });
+
   it("clears selection when clicking empty 2D canvas in select mode", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");

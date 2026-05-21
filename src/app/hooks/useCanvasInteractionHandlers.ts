@@ -165,6 +165,7 @@ export function useCanvasInteractionHandlers({
     }
 
     clearSelectedCanvasNodes();
+    setActiveSubScreen("segment");
 
     if (isModelingScreen && activeSubScreen === "segment") {
       onExternalSelectionInteraction?.();
@@ -207,25 +208,28 @@ export function useCanvasInteractionHandlers({
         }
       }
 
-      if (activeSubScreen === "node") {
+      if (activeSubScreen === "node" && node.kind === "intermediate") {
         onExternalSelectionInteraction?.();
         startNodeEdit(node);
         return;
       }
     }
 
-    if (activeSubScreen === "connector" && node.kind === "connector") {
+    if (node.kind === "connector") {
       onExternalSelectionInteraction?.();
+      setActiveSubScreen("connector");
       dispatchAction(appActions.select({ kind: "connector", id: node.connectorId }));
       return;
     }
 
-    if (activeSubScreen === "splice" && node.kind === "splice") {
+    if (node.kind === "splice") {
       onExternalSelectionInteraction?.();
+      setActiveSubScreen("splice");
       dispatchAction(appActions.select({ kind: "splice", id: node.spliceId }));
       return;
     }
 
+    setActiveSubScreen("node");
     onExternalSelectionInteraction?.();
     dispatchAction(appActions.select({ kind: "node", id: nodeId }));
   }
