@@ -179,7 +179,7 @@ body:has(.app-shell.theme-circle-mobility-dark) {
 
 .app-shell.theme-circle-mobility-light .header-block,
 .app-shell.theme-circle-mobility-dark .header-block {
-  position: relative;
+  position: sticky;
   overflow: hidden;
 }
 
