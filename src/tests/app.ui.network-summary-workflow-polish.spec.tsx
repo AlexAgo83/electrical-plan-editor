@@ -47,9 +47,18 @@ function openViewMenu(panel: HTMLElement): void {
   }
 }
 
+function openEditMenu(panel: HTMLElement): void {
+  const editButton = within(panel).getByRole("button", { name: "Edit" });
+  if (editButton.getAttribute("aria-expanded") !== "true") {
+    fireEvent.click(editButton);
+  }
+}
+
 function getDisplayToggleButton(panel: HTMLElement, label: "Info" | "Length" | "Callouts" | "Grid" | "Snap" | "Lock"): HTMLButtonElement {
   if (label === "Info" || label === "Length" || label === "Callouts") {
     openViewMenu(panel);
+  } else {
+    openEditMenu(panel);
   }
   return within(panel).getByRole("button", { name: label });
 }

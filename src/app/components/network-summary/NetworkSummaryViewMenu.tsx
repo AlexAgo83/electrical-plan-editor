@@ -1,18 +1,22 @@
 import { useEffect, useRef, useState, type ReactElement } from "react";
 
 interface NetworkSummaryViewMenuProps {
+  showFloatingInspectorPanel: boolean;
   showNetworkInfoPanels: boolean;
   showSegmentLengths: boolean;
   showCableCallouts: boolean;
+  toggleShowFloatingInspectorPanel: () => void;
   toggleShowNetworkInfoPanels: () => void;
   toggleShowSegmentLengths: () => void;
   toggleShowCableCallouts: () => void;
 }
 
 export function NetworkSummaryViewMenu({
+  showFloatingInspectorPanel,
   showNetworkInfoPanels,
   showSegmentLengths,
   showCableCallouts,
+  toggleShowFloatingInspectorPanel,
   toggleShowNetworkInfoPanels,
   toggleShowSegmentLengths,
   toggleShowCableCallouts
@@ -45,6 +49,16 @@ export function NetworkSummaryViewMenu({
       </button>
       {open && (
         <div className="panel network-summary-view-menu network-summary-view-menu--right">
+          <button
+            type="button"
+            className={showFloatingInspectorPanel ? "network-summary-view-menu-item is-active" : "network-summary-view-menu-item"}
+            onClick={toggleShowFloatingInspectorPanel}
+            aria-pressed={showFloatingInspectorPanel}
+            aria-label={showFloatingInspectorPanel ? "Hide inspector" : "Show inspector"}
+          >
+            <span className="network-summary-inspector-icon" aria-hidden="true" />
+            Inspect
+          </button>
           <button
             type="button"
             className={showNetworkInfoPanels ? "network-summary-view-menu-item is-active" : "network-summary-view-menu-item"}

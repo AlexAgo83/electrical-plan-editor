@@ -69,6 +69,7 @@ describe("App integration UI - inspector floating shell", () => {
     switchScreenDrawerAware("modeling");
 
     const displayOptions = screen.getByRole("group", { name: "Network summary display options" });
+    fireEvent.click(within(displayOptions).getByRole("button", { name: "View" }));
     const hideInspectorButton = within(displayOptions).getByRole("button", { name: "Hide inspector" });
     expect(hideInspectorButton).toHaveTextContent("Inspect");
     expect(hideInspectorButton).toHaveAttribute("aria-pressed", "true");

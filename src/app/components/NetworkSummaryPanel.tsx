@@ -38,6 +38,7 @@ import type {
 import { NetworkCanvasFloatingInfoPanels } from "./network-summary/NetworkCanvasFloatingInfoPanels";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
 import { NetworkSummaryLegend } from "./network-summary/NetworkSummaryLegend";
+import { NetworkSummaryEditMenu } from "./network-summary/NetworkSummaryEditMenu";
 import { NetworkSummaryViewMenu } from "./network-summary/NetworkSummaryViewMenu";
 import { NetworkSummaryExportMenu } from "./network-summary/NetworkSummaryExportMenu";
 import { NetworkSummaryQuickEntityNavigation } from "./network-summary/NetworkSummaryQuickEntityNavigation";
@@ -832,44 +833,20 @@ export function NetworkSummaryPanel({
             ) : null}
           </div>
           <div className="network-summary-header-actions" role="group" aria-label="Network summary display options">
-            <button
-              type="button"
-              className={showFloatingInspectorPanel ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={toggleShowFloatingInspectorPanel}
-              aria-pressed={showFloatingInspectorPanel}
-              aria-label={showFloatingInspectorPanel ? "Hide inspector" : "Show inspector"}
-            >
-              <span className="network-summary-inspector-icon" aria-hidden="true" />
-              Inspect
-            </button>
-            <button
-              type="button"
-              className={showNetworkGrid ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={toggleShowNetworkGrid}
-            >
-              <span className="network-summary-grid-icon" aria-hidden="true" />
-              Grid
-            </button>
-            <button
-              type="button"
-              className={snapNodesToGrid ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={toggleSnapNodesToGrid}
-            >
-              <span className="network-summary-snap-icon" aria-hidden="true" />
-              Snap
-            </button>
-            <button
-              type="button"
-              className={lockEntityMovement ? "workspace-tab is-active" : "workspace-tab"}
-              onClick={toggleLockEntityMovement}
-            >
-              <span className="network-summary-lock-move-icon" aria-hidden="true" />
-              Lock
-            </button>
+            <NetworkSummaryEditMenu
+              showNetworkGrid={showNetworkGrid}
+              snapNodesToGrid={snapNodesToGrid}
+              lockEntityMovement={lockEntityMovement}
+              toggleShowNetworkGrid={toggleShowNetworkGrid}
+              toggleSnapNodesToGrid={toggleSnapNodesToGrid}
+              toggleLockEntityMovement={toggleLockEntityMovement}
+            />
             <NetworkSummaryViewMenu
+              showFloatingInspectorPanel={showFloatingInspectorPanel}
               showNetworkInfoPanels={showNetworkInfoPanels}
               showSegmentLengths={showSegmentLengths}
               showCableCallouts={showCableCallouts}
+              toggleShowFloatingInspectorPanel={toggleShowFloatingInspectorPanel}
               toggleShowNetworkInfoPanels={toggleShowNetworkInfoPanels}
               toggleShowSegmentLengths={toggleShowSegmentLengths}
               toggleShowCableCallouts={toggleShowCableCallouts}
