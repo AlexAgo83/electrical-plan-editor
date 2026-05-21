@@ -20,6 +20,8 @@ type DispatchAction = (
   }
 ) => void;
 
+const NODE_DRAG_START_THRESHOLD_PX = 4;
+
 interface UseCanvasInteractionHandlersParams {
   state: ReturnType<AppStore["getState"]>;
   nodesCount: number;
@@ -119,6 +121,9 @@ export function useCanvasInteractionHandlers({
     anchorStartPosition: NodePosition;
     nodeIds: NodeId[];
     originPositions: Record<NodeId, NodePosition>;
+    startClientX: number;
+    startClientY: number;
+    hasStartedDrag: boolean;
   } | null>(null);
 
   function clearSelectedCanvasNodes(): void {
@@ -340,9 +345,11 @@ export function useCanvasInteractionHandlers({
       anchorNodeId: nodeId,
       anchorStartPosition,
       nodeIds: selectedNodeIds,
-      originPositions
+      originPositions,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      hasStartedDrag: false
     };
-    setDraggingNodeId(nodeId);
   }
 
   function handleNetworkCanvasMouseDown(event: ReactMouseEvent<SVGSVGElement>): void {
@@ -397,6 +404,53 @@ export function useCanvasInteractionHandlers({
   }
 
   function handleNetworkMouseMove(event: ReactMouseEvent<SVGSVGElement>): void {
+    const draggingNodeGroup = draggingNodeGroupRef.current;
+    if (draggingNodeGroup !== null) {
+      if (!draggingNodeGroup.hasStartedDrag) {
+        const deltaClientX = event.clientX - draggingNodeGroup.startClientX;
+        const deltaClientY = event.clientY - draggingNodeGroup.startClientY;
+        if (Math.hypot(deltaClientX, deltaClientY) < NODE_DRAG_START_THRESHOLD_PX) {
+          return;
+        }
+
+        draggingNodeGroup.hasStartedDrag = true;
+        setDraggingNodeId(draggingNodeGroup.anchorNodeId);
+      }
+
+      const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
+      if (coordinates === null) {
+        return;
+      }
+
+      const deltaX = coordinates.x - draggingNodeGroup.anchorStartPosition.x;
+      const deltaY = coordinates.y - draggingNodeGroup.anchorStartPosition.y;
+      const nextPositions = applyGroupDragDelta(draggingNodeGroup.originPositions, deltaX, deltaY);
+      setManualNodePositions((previous) => {
+        let changed = false;
+        for (const [nodeId, nextPosition] of Object.entries(nextPositions) as Array<[NodeId, NodePosition]>) {
+          const previousPosition = previous[nodeId];
+          if (
+            previousPosition === undefined ||
+            Math.abs(previousPosition.x - nextPosition.x) > 0.0001 ||
+            Math.abs(previousPosition.y - nextPosition.y) > 0.0001
+          ) {
+            changed = true;
+            break;
+          }
+        }
+
+        if (!changed) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          ...nextPositions
+        };
+      });
+      return;
+    }
+
     if (draggingNodeId === null) {
       if (panStartRef.current === null) {
         return;
@@ -427,38 +481,6 @@ export function useCanvasInteractionHandlers({
     if (coordinates === null) {
       return;
     }
-
-    const draggingNodeGroup = draggingNodeGroupRef.current;
-    if (draggingNodeGroup !== null) {
-      const deltaX = coordinates.x - draggingNodeGroup.anchorStartPosition.x;
-      const deltaY = coordinates.y - draggingNodeGroup.anchorStartPosition.y;
-      const nextPositions = applyGroupDragDelta(draggingNodeGroup.originPositions, deltaX, deltaY);
-      setManualNodePositions((previous) => {
-        let changed = false;
-        for (const [nodeId, nextPosition] of Object.entries(nextPositions) as Array<[NodeId, NodePosition]>) {
-          const previousPosition = previous[nodeId];
-          if (
-            previousPosition === undefined ||
-            Math.abs(previousPosition.x - nextPosition.x) > 0.0001 ||
-            Math.abs(previousPosition.y - nextPosition.y) > 0.0001
-          ) {
-            changed = true;
-            break;
-          }
-        }
-
-        if (!changed) {
-          return previous;
-        }
-
-        return {
-          ...previous,
-          ...nextPositions
-        };
-      });
-      return;
-    }
-
     setManualNodePositions((previous) => {
       const previousPosition = previous[draggingNodeId];
       if (
@@ -476,9 +498,9 @@ export function useCanvasInteractionHandlers({
   }
 
   function stopNetworkNodeDrag(): void {
-    if (draggingNodeId !== null) {
-      const draggingNodeGroup = draggingNodeGroupRef.current;
-      if (draggingNodeGroup !== null && draggingNodeGroup.nodeIds.length > 1) {
+    const draggingNodeGroup = draggingNodeGroupRef.current;
+    if (draggingNodeGroup !== null) {
+      if (draggingNodeGroup.hasStartedDrag && draggingNodeGroup.nodeIds.length > 1) {
         const nextPersistedPositions = {} as Record<NodeId, NodePosition>;
         for (const nodeId of draggingNodeGroup.nodeIds) {
           const draggedPosition = manualNodePositions[nodeId];
@@ -501,23 +523,25 @@ export function useCanvasInteractionHandlers({
             return changed ? next : previous;
           });
         }
-      } else {
-        const draggedPosition = manualNodePositions[draggingNodeId];
+      } else if (draggingNodeGroup.hasStartedDrag) {
+        const draggedPosition = manualNodePositions[draggingNodeGroup.anchorNodeId];
         if (draggedPosition !== undefined) {
-          persistNodePosition(draggingNodeId, draggedPosition);
+          persistNodePosition(draggingNodeGroup.anchorNodeId, draggedPosition);
           setManualNodePositions((previous) => {
-            if (previous[draggingNodeId] === undefined) {
+            if (previous[draggingNodeGroup.anchorNodeId] === undefined) {
               return previous;
             }
 
             const next = { ...previous };
-            delete next[draggingNodeId];
+            delete next[draggingNodeGroup.anchorNodeId];
             return next;
           });
         }
       }
 
       draggingNodeGroupRef.current = null;
+      setDraggingNodeId(null);
+    } else if (draggingNodeId !== null) {
       setDraggingNodeId(null);
     }
 

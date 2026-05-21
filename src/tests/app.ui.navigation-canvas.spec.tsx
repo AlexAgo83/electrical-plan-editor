@@ -318,6 +318,33 @@ describe("App integration UI - navigation and canvas", () => {
     dispatchSpy.mockRestore();
   });
 
+  it("does not move a canvas node on a click with only pointer jitter", () => {
+    const positionedState = appReducer(
+      createUiIntegrationState(),
+      appActions.setNodePositions({
+        [asNodeId("N-C1")]: { x: 60, y: 80 },
+        [asNodeId("N-MID")]: { x: 220, y: 180 },
+        [asNodeId("N-S1")]: { x: 420, y: 220 }
+      })
+    );
+    const { store } = renderAppWithState(positionedState);
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
+    expect(connectorNode).not.toBeNull();
+
+    const rectSpy = mockSvgRect(networkSvg);
+    fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 180, clientY: 120 });
+    fireEvent.mouseMove(networkSvg, { clientX: 182, clientY: 121 });
+    fireEvent.mouseUp(networkSvg, { clientX: 182, clientY: 121 });
+    rectSpy.mockRestore();
+
+    expect(store.getState().nodePositions[asNodeId("N-C1")]).toEqual({ x: 60, y: 80 });
+    expect(connectorNode).toHaveClass("is-selected");
+  });
+
   it("supports keyboard activation for 2D connector node selection in modeling", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
