@@ -28,6 +28,13 @@
   flex-direction: column;
 }
 
+.home-workspace-resume-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+}
+
 .home-whats-new-panel {
   display: flex;
   flex-direction: column;
@@ -47,9 +54,12 @@
 }
 
 .home-panel .settings-panel-intro.home-start-intro,
-.home-panel .settings-panel-intro.home-resume-intro,
 .home-panel .settings-panel-intro.home-whats-new-intro {
   margin: 0 0 1rem;
+}
+
+.home-panel .settings-panel-intro.home-resume-intro {
+  margin: 0;
 }
 
 .home-primary-actions,
@@ -66,6 +76,7 @@
 
 .home-resume-actions {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 0;
 }
 
 .home-shortcut-actions {
@@ -77,12 +88,8 @@
   display: none;
 }
 
-.home-inline-status {
-  margin-top: 0.55rem;
-}
-
 .home-summary-grid {
-  margin-top: 0.05rem;
+  margin-top: 0;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.55rem;
 }
@@ -118,7 +125,7 @@
 }
 
 .home-resume-copy {
-  margin-top: 0.65rem;
+  margin-top: 0;
   padding: 0.5rem 0.65rem;
   border-radius: 0.65rem;
   border: 1px solid rgba(120, 145, 166, 0.28);
@@ -316,10 +323,20 @@
 @media (min-width: 980px) {
   .home-workspace-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
+    align-items: stretch;
+  }
+
+  .home-left-column {
+    align-self: stretch;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .home-workspace-resume-panel {
+    align-self: stretch;
   }
 
   .home-whats-new-panel {
+    align-self: end;
     grid-column: 2;
     grid-row: 1;
     max-height: calc(100vh - 11.5rem);

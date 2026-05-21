@@ -59,7 +59,7 @@ describe("App integration UI - networks", () => {
     switchScreen("networkScope");
 
     expect(getPanelByHeading("Network Scope")).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Recent changes" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Recent changes list")).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Edit network" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Create network" })).not.toBeInTheDocument();
   });
@@ -88,23 +88,25 @@ describe("App integration UI - networks", () => {
     fireEvent.change(within(editFormPanel).getByLabelText("Description (optional)"), { target: { value: "Recent change update" } });
     fireEvent.click(within(editFormPanel).getByRole("button", { name: "Save network" }));
 
-    expect(screen.queryByRole("heading", { name: "Recent changes" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Recent changes list")).not.toBeInTheDocument();
     switchScreen("home");
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();
+      expect(screen.getByLabelText("Recent changes list")).toBeInTheDocument();
     });
 
-    const recentChangesHeading = screen.getByRole("heading", { name: "Recent changes" });
+    const recentChangesList = screen.getByLabelText("Recent changes list");
+    const activeNetworkCopy = screen.getByText(/Active network:/i, { selector: ".home-resume-copy-label" }).closest(".home-resume-copy");
     const workspaceHeading = screen.getByRole("heading", { name: "Workspace" });
     const whatsNewHeading = screen.getByRole("heading", { name: "What's new" });
-    expect(workspaceHeading.compareDocumentPosition(recentChangesHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
-    expect(recentChangesHeading.compareDocumentPosition(whatsNewHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    expect(activeNetworkCopy).not.toBeNull();
+    expect(workspaceHeading.compareDocumentPosition(recentChangesList) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    expect((activeNetworkCopy as HTMLElement).compareDocumentPosition(recentChangesList) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    expect(recentChangesList.compareDocumentPosition(whatsNewHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
 
-    const recentChangesPanel = recentChangesHeading.closest(".panel");
-    expect(recentChangesPanel).not.toBeNull();
-    expect(within(recentChangesPanel as HTMLElement).getByText("Network 'NET-MAIN-SAMPLE' updated")).toBeInTheDocument();
-    const firstTime = (recentChangesPanel as HTMLElement).querySelector("time")?.textContent ?? "";
+    const workspacePanel = getPanelByHeading("Workspace");
+    expect(within(workspacePanel).getByText("Network 'NET-MAIN-SAMPLE' updated")).toBeInTheDocument();
+    const firstTime = recentChangesList.querySelector("time")?.textContent ?? "";
     expect(firstTime).toMatch(/^\d{2}:\d{2}:\d{2}$/);
 
     switchScreen("networkScope");
@@ -114,7 +116,7 @@ describe("App integration UI - networks", () => {
     switchScreen("home");
 
     await waitFor(() => {
-      expect(screen.queryByRole("heading", { name: "Recent changes" })).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("Recent changes list")).not.toBeInTheDocument();
     });
   });
 
@@ -130,7 +132,7 @@ describe("App integration UI - networks", () => {
 
     switchScreen("home");
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();
+      expect(screen.getByLabelText("Recent changes list")).toBeInTheDocument();
     });
     expect(screen.getByText("Network 'NET-MAIN-SAMPLE' updated")).toBeInTheDocument();
 
@@ -140,7 +142,7 @@ describe("App integration UI - networks", () => {
     switchScreen("home");
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();
+      expect(screen.getByLabelText("Recent changes list")).toBeInTheDocument();
     });
     expect(screen.getByText("Network 'NET-MAIN-SAMPLE' updated")).toBeInTheDocument();
   });

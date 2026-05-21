@@ -8,6 +8,7 @@ import type { NetworkScopeFormStateModel } from "../useNetworkScopeFormState";
 import type { AppControllerPreferencesStateModel } from "../useAppControllerPreferencesState";
 import type { AppControllerLayoutDerivedStateModel } from "../useAppControllerLayoutDerivedState";
 import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
+import type { ToastNotificationVariant } from "../useToastNotifications";
 import { useNetworkImportExport } from "../useNetworkImportExport";
 import { useAppControllerSaveExportActions } from "./useAppControllerSaveExportActions";
 import { useCatalogCsvImportExport } from "../useCatalogCsvImportExport";
@@ -32,6 +33,7 @@ interface UseAppControllerWorkspaceNetworkDomainAssemblyParams {
     catalogItems: CatalogItem[];
     isNetworkScopeScreen: boolean;
     dispatchAction: (action: AppAction, options?: { trackHistory?: boolean }) => void;
+    notifyToast: (title: string, options?: { message?: string; variant?: ToastNotificationVariant }) => void;
     replaceStateWithHistory: (nextState: AppState) => void;
   };
   forms: {
@@ -102,7 +104,8 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     store: core.store,
     networks: core.networks,
     activeNetworkId: core.activeNetworkId,
-    dispatchAction: core.dispatchAction
+    dispatchAction: core.dispatchAction,
+    notifyToast: core.notifyToast
   });
 
   const {

@@ -621,6 +621,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       catalogItems,
       isNetworkScopeScreen,
       dispatchAction,
+      notifyToast,
       replaceStateWithHistory
     },
     forms: {

@@ -140,13 +140,13 @@ describe("App integration UI - global undo/redo", () => {
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
 
     switchScreenDrawerAware("home");
-    expect(getPanelByHeading("Recent changes")).toBeInTheDocument();
+    expect(within(getPanelByHeading("Workspace")).getByLabelText("Recent changes list")).toBeInTheDocument();
     expect(screen.getByText("Connector 'C-UNDO-SYNC' created")).toBeInTheDocument();
 
     openOpsPanel();
     fireEvent.click(screen.getByRole("button", { name: "Undo" }));
     fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
-    expect(screen.queryByRole("heading", { name: "Recent changes" })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Recent changes list")).not.toBeInTheDocument();
   });
 
   it("restores recent changes on reload without restoring undo stack snapshots", async () => {
@@ -166,7 +166,7 @@ describe("App integration UI - global undo/redo", () => {
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
     switchScreenDrawerAware("home");
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Recent changes" })).toBeInTheDocument();
+      expect(screen.getByLabelText("Recent changes list")).toBeInTheDocument();
     });
     expect(screen.getByText("Connector 'C-PERSIST' created")).toBeInTheDocument();
 

@@ -1,5 +1,4 @@
 import { useCallback, useMemo, type ChangeEvent, type ComponentType, type RefObject } from "react";
-import type { NetworkImportSummary } from "../../../adapters/portability";
 import { createEmptyWorkspaceState, type AppState } from "../../../store";
 import type { InteractionMode, UndoHistoryEntry } from "../../types/app-controller";
 import type { NetworkId } from "../../../core/entities";
@@ -25,10 +24,9 @@ interface UseAppControllerHomeWorkspaceContentParams {
   validationErrorCount: number;
   validationWarningCount: number;
   onOpenImportPicker: () => void;
+  onSaveWorkspace: () => void;
   importFileInputRef: RefObject<HTMLInputElement | null>;
   onImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
-  importExportStatusMessage: string | null;
-  lastImportSummary: NetworkImportSummary | null;
   onOpenOnboardingHelp: () => void;
   isCurrentWorkspaceEmpty: boolean;
   requestConfirmation: (input: ConfirmDialogRequest) => Promise<boolean>;
@@ -53,10 +51,9 @@ export function useAppControllerHomeWorkspaceContent({
   validationErrorCount,
   validationWarningCount,
   onOpenImportPicker,
+  onSaveWorkspace,
   importFileInputRef,
   onImportFileChange,
-  importExportStatusMessage,
-  lastImportSummary,
   onOpenOnboardingHelp,
   isCurrentWorkspaceEmpty,
   requestConfirmation,
@@ -116,11 +113,10 @@ export function useAppControllerHomeWorkspaceContent({
       validationErrorCount={validationErrorCount}
       validationWarningCount={validationWarningCount}
       onCreateEmptyWorkspace={handleCreateEmptyWorkspace}
+      onSaveWorkspace={onSaveWorkspace}
       onOpenImportPicker={onOpenImportPicker}
       importFileInputRef={importFileInputRef}
       onImportFileChange={onImportFileChange}
-      importExportStatusMessage={importExportStatusMessage}
-      lastImportSummary={lastImportSummary}
       onOpenNetworkScope={() => handleWorkspaceScreenChange("networkScope")}
       onOpenModeling={() => {
         handleWorkspaceScreenChange("modeling");

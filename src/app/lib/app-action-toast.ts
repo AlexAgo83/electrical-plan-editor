@@ -101,11 +101,7 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
         previousState
       });
     case "network/importMany":
-      return {
-        title: "Networks imported",
-        message: `${action.payload.networks.length} network${action.payload.networks.length === 1 ? "" : "s"}`,
-        variant: "success"
-      };
+      return null;
     case "harnessAssembly/upsert":
       return buildUpsertToast({
         entityName: "Harness assembly",

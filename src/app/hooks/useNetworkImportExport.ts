@@ -19,12 +19,16 @@ import {
 import { appActions } from "../../store";
 import type { NetworkScopedState } from "../../store";
 import type { ImportExportStatus } from "../types/app-controller";
+import type { ToastNotificationVariant } from "./useToastNotifications";
+
+type NotifyToast = (title: string, options?: { message?: string; variant?: ToastNotificationVariant }) => void;
 
 interface UseNetworkImportExportParams {
   store: AppStore;
   networks: Network[];
   activeNetworkId: NetworkId | null;
   dispatchAction: (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean }) => void;
+  notifyToast?: NotifyToast;
 }
 
 interface UseNetworkImportExportResult {
@@ -144,6 +148,20 @@ function convertLegacyNumericSplicesToDirectional(
   return nextStates;
 }
 
+function formatImportSummaryMessage(summary: NetworkImportSummary): string {
+  const parts = [
+    `${summary.importedNetworkIds.length} imported`,
+    `${summary.skippedNetworkIds.length} skipped`
+  ];
+  if (summary.warnings.length > 0) {
+    parts.push(`${summary.warnings.length} warning${summary.warnings.length === 1 ? "" : "s"}`);
+  }
+  if (summary.errors.length > 0) {
+    parts.push(`${summary.errors.length} error${summary.errors.length === 1 ? "" : "s"}`);
+  }
+  return `${parts.join(" / ")}.`;
+}
+
 export function buildNetworkExportFilename(scope: NetworkExportScope, exportedAtIso: string): string {
   return `electrical-network-${scope}-${toFilesystemSafeTimestamp(exportedAtIso)}.json`;
 }
@@ -250,7 +268,8 @@ export function useNetworkImportExport({
   store,
   networks,
   activeNetworkId,
-  dispatchAction
+  dispatchAction,
+  notifyToast
 }: UseNetworkImportExportParams): UseNetworkImportExportResult {
   const importFileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedExportNetworkIds, setSelectedExportNetworkIds] = useState<NetworkId[]>([]);
@@ -332,9 +351,14 @@ export function useNetworkImportExport({
     try {
       rawJson = await file.text();
     } catch {
+      const message = "Unable to read selected file.";
       setImportExportStatus({
         kind: "failed",
-        message: "Unable to read selected file."
+        message
+      });
+      notifyToast?.("Import failed", {
+        message,
+        variant: "error"
       });
       resetInput();
       return;
@@ -342,9 +366,14 @@ export function useNetworkImportExport({
 
     const parsed = parseNetworkFilePayload(rawJson);
     if (parsed.payload === null) {
+      const message = parsed.error ?? "Invalid import file.";
       setImportExportStatus({
         kind: "failed",
-        message: parsed.error ?? "Invalid import file."
+        message
+      });
+      notifyToast?.("Import failed", {
+        message,
+        variant: "error"
       });
       resetInput();
       return;
@@ -354,9 +383,14 @@ export function useNetworkImportExport({
     setLastImportSummary(resolved.summary);
 
     if (resolved.networks.length === 0) {
+      const message = "No network was imported. Check file errors.";
       setImportExportStatus({
         kind: "failed",
-        message: "No network was imported. Check file errors."
+        message
+      });
+      notifyToast?.("Import failed", {
+        message: formatImportSummaryMessage(resolved.summary),
+        variant: "error"
       });
       resetInput();
       return;
@@ -374,9 +408,15 @@ export function useNetworkImportExport({
 
     dispatchAction(appActions.importNetworks(resolved.networks, networkStatesToImport, resolved.harnessAssemblies, true));
 
+    const importStatusKind: ImportExportStatus["kind"] =
+      resolved.summary.errors.length > 0 || resolved.summary.warnings.length > 0 ? "partial" : "success";
     setImportExportStatus({
-      kind: resolved.summary.errors.length > 0 || resolved.summary.warnings.length > 0 ? "partial" : "success",
+      kind: importStatusKind,
       message: `Imported ${resolved.networks.length} network(s).`
+    });
+    notifyToast?.("Networks imported", {
+      message: formatImportSummaryMessage(resolved.summary),
+      variant: importStatusKind === "success" ? "success" : "warning"
     });
     resetInput();
   }
