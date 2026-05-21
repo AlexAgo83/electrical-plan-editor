@@ -214,7 +214,7 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(getNetworkSummaryViewportTransform(panel)).toBe(defaultViewportTransform);
   });
 
-  it("renders a compact quick entity navigation strip after route preview and switches sub-screens", () => {
+  it("renders a compact quick entity navigation strip above network summary and switches sub-screens", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");
     const globalSettingsPanel = getPanelByHeading("Global preferences");
@@ -222,14 +222,17 @@ describe("App integration UI - network summary workflow polish", () => {
 
     switchScreenDrawerAware("modeling");
 
-    const routePreviewPanel = getPanelByHeading("Route preview");
-    const quickNavPanel = screen.getByRole("region", { name: "Quick entity navigation" });
-    const connectorsButton = within(quickNavPanel).getByRole("button", { name: /Connectors/i });
-    const segmentsButton = within(quickNavPanel).getByRole("button", { name: /Segments/i });
-    const wiresButton = within(quickNavPanel).getByRole("button", { name: /Wires/i });
+    expect(getPanelByHeading("Route preview")).toBeInTheDocument();
+    const quickNavPanel = document.querySelector("[data-quick-entity-nav-source='true']");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    expect(quickNavPanel).not.toBeNull();
+    const sourceQuickNavPanel = quickNavPanel as HTMLElement;
+    const connectorsButton = within(sourceQuickNavPanel).getByRole("button", { name: /Connectors/i });
+    const segmentsButton = within(sourceQuickNavPanel).getByRole("button", { name: /Segments/i });
+    const wiresButton = within(sourceQuickNavPanel).getByRole("button", { name: /Wires/i });
 
-    expect(routePreviewPanel.nextElementSibling).toBe(quickNavPanel);
-    expect(within(quickNavPanel).getByRole("button", { name: /Nodes/i })).toBeInTheDocument();
+    expect(sourceQuickNavPanel.compareDocumentPosition(networkSummaryPanel) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    expect(within(sourceQuickNavPanel).getByRole("button", { name: /Nodes/i })).toBeInTheDocument();
     expect(connectorsButton).toHaveAttribute("aria-pressed", "true");
     expect(segmentsButton).toHaveAttribute("aria-pressed", "false");
     expect(wiresButton).toHaveAttribute("aria-pressed", "false");

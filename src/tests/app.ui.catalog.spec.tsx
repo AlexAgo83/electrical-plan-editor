@@ -52,7 +52,7 @@ describe("App integration UI - catalog", () => {
     expect(getPanelByHeading("Catalog")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Catalog item form" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Edit catalog item" })).not.toBeInTheDocument();
-  }, 15000);
+  });
 
   it("docks quick entity navigation into the header after the source strip scrolls under it", async () => {
     renderAppWithState(createUiIntegrationState());
@@ -77,7 +77,7 @@ describe("App integration UI - catalog", () => {
       value: () => ({ top: 48, right: 800, bottom: 96, left: 240, width: 560, height: 48, x: 240, y: 48 })
     });
 
-    await act(async () => {
+    act(() => {
       window.dispatchEvent(new Event("scroll"));
     });
 
@@ -85,7 +85,7 @@ describe("App integration UI - catalog", () => {
     const dockedNav = document.querySelector(".header-quick-entity-nav") as HTMLElement;
     fireEvent.click(within(dockedNav).getByRole("button", { name: /^Catalog\b/i }));
     expect(getPanelByHeading("Catalog")).toBeInTheDocument();
-  }, 15000);
+  });
 
   it("enforces catalog-first connector creation and supports catalog creation with URL validation", () => {
     const { store } = renderAppWithState(createInitialState());
