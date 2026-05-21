@@ -7,8 +7,12 @@ export const CATALOG_CSV_HEADERS = [
   "Connection count",
   "Name",
   "Unit price (excl. tax)",
-  "URL"
+  "URL",
+  "Connector defaults (JSON)",
+  "Connector layout (JSON)"
 ] as const;
+
+export const LEGACY_CATALOG_CSV_HEADERS = CATALOG_CSV_HEADERS.slice(0, 5);
 
 export interface CatalogCsvImportRow {
   manufacturerReference: string;
@@ -16,6 +20,8 @@ export interface CatalogCsvImportRow {
   name?: string;
   unitPriceExclTax?: number;
   url?: string;
+  connectorDefaults?: CatalogItem["connectorDefaults"];
+  connectorLayout?: CatalogItem["connectorLayout"];
 }
 
 export interface CatalogCsvImportIssue {
@@ -27,6 +33,7 @@ export interface CatalogCsvImportIssue {
 export interface CatalogCsvImportParseResult {
   rows: CatalogCsvImportRow[];
   issues: CatalogCsvImportIssue[];
+  schema: "current" | "legacy";
 }
 
 type ParsedCsvRow = string[];
@@ -120,6 +127,41 @@ function parseStrictNonNegativeNumber(raw: string): number | undefined {
   return parsed;
 }
 
+function stableStringifyJson(value: unknown): string {
+  if (value === undefined) {
+    return "";
+  }
+  return JSON.stringify(value, (_key, candidate: unknown) => {
+    if (candidate === null || typeof candidate !== "object" || Array.isArray(candidate)) {
+      return candidate;
+    }
+    return Object.fromEntries(Object.entries(candidate).sort(([left], [right]) => left.localeCompare(right)));
+  });
+}
+
+function parseOptionalJsonObject(
+  raw: string,
+  label: string
+): { ok: true; value: Record<string, unknown> | undefined } | { ok: false; message: string } {
+  const normalized = raw.trim();
+  if (normalized.length === 0) {
+    return { ok: true, value: undefined };
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(normalized);
+  } catch {
+    return { ok: false, message: `${label} must be valid JSON when provided.` };
+  }
+
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return { ok: false, message: `${label} must be a JSON object when provided.` };
+  }
+
+  return { ok: true, value: parsed as Record<string, unknown> };
+}
+
 export function buildCatalogCsvExport(catalogItems: CatalogItem[]): { headers: string[]; rows: CsvCellValue[][] } {
   const rows = [...catalogItems]
     .sort((left, right) => left.manufacturerReference.localeCompare(right.manufacturerReference, undefined, { sensitivity: "base" }))
@@ -128,7 +170,9 @@ export function buildCatalogCsvExport(catalogItems: CatalogItem[]): { headers: s
       item.connectionCount,
       item.name ?? "",
       item.unitPriceExclTax ?? "",
-      item.url ?? ""
+      item.url ?? "",
+      stableStringifyJson(item.connectorDefaults),
+      stableStringifyJson(item.connectorLayout)
     ]);
 
   return {
@@ -142,18 +186,23 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
   if (rows.length === 0) {
     return {
       rows: [],
-      issues: [{ kind: "error", rowNumber: 1, message: "CSV is empty." }]
+      issues: [{ kind: "error", rowNumber: 1, message: "CSV is empty." }],
+      schema: "current"
     };
   }
 
   const headerRow = rows[0]?.map((value) => value.replace(/^\uFEFF/, "")) ?? [];
   const expectedHeaders = [...CATALOG_CSV_HEADERS];
+  const legacyHeaders = [...LEGACY_CATALOG_CSV_HEADERS];
   const issues: CatalogCsvImportIssue[] = [];
+  const hasCurrentHeaders =
+    headerRow.length === expectedHeaders.length &&
+    headerRow.every((value, index) => value === expectedHeaders[index]);
+  const hasLegacyHeaders =
+    headerRow.length === legacyHeaders.length &&
+    headerRow.every((value, index) => value === legacyHeaders[index]);
 
-  if (
-    headerRow.length !== expectedHeaders.length ||
-    headerRow.some((value, index) => value !== expectedHeaders[index])
-  ) {
+  if (!hasCurrentHeaders && !hasLegacyHeaders) {
     return {
       rows: [],
       issues: [
@@ -162,10 +211,13 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
           rowNumber: 1,
           message: `Invalid CSV headers. Expected: ${expectedHeaders.join(", ")}.`
         }
-      ]
+      ],
+      schema: "current"
     };
   }
 
+  const schema = hasCurrentHeaders ? "current" : "legacy";
+  const activeHeaders = hasCurrentHeaders ? expectedHeaders : legacyHeaders;
   const dataRows = rows.slice(1);
   const rawRowsByManufacturerRef = new Map<string, { rowNumber: number; values: string[]; manufacturerReference: string }>();
 
@@ -177,11 +229,11 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
       continue;
     }
 
-    if (values.length !== expectedHeaders.length) {
+    if (values.length !== activeHeaders.length) {
       issues.push({
         kind: "error",
         rowNumber,
-        message: `Expected ${expectedHeaders.length} columns but found ${values.length}.`
+        message: `Expected ${activeHeaders.length} columns but found ${values.length}.`
       });
       continue;
     }
@@ -251,17 +303,46 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
       continue;
     }
 
+    const connectorDefaults =
+      schema === "current"
+        ? parseOptionalJsonObject(values[5] ?? "", "Connector defaults (JSON)")
+        : { ok: true as const, value: undefined };
+    if (!connectorDefaults.ok) {
+      issues.push({
+        kind: "error",
+        rowNumber,
+        message: connectorDefaults.message
+      });
+      continue;
+    }
+
+    const connectorLayout =
+      schema === "current"
+        ? parseOptionalJsonObject(values[6] ?? "", "Connector layout (JSON)")
+        : { ok: true as const, value: undefined };
+    if (!connectorLayout.ok) {
+      issues.push({
+        kind: "error",
+        rowNumber,
+        message: connectorLayout.message
+      });
+      continue;
+    }
+
     parsedRows.push({
       manufacturerReference,
       connectionCount,
       name: normalizeOptionalText(values[2] ?? ""),
       unitPriceExclTax,
-      url
+      url,
+      connectorDefaults: connectorDefaults.value as CatalogItem["connectorDefaults"],
+      connectorLayout: connectorLayout.value as CatalogItem["connectorLayout"]
     });
   }
 
   return {
     rows: parsedRows,
-    issues: issues.sort((left, right) => left.rowNumber - right.rowNumber || left.kind.localeCompare(right.kind))
+    issues: issues.sort((left, right) => left.rowNumber - right.rowNumber || left.kind.localeCompare(right.kind)),
+    schema
   };
 }

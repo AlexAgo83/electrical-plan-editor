@@ -24,6 +24,9 @@ interface UseAppControllerModelingAnalysisDomainAssemblyParams
     | "onSelectWire"
     | "onGoToSegmentFromAnalysis"
     | "onGoToWireFromAnalysis"
+    | "onOpenWireFromAnalysisTable"
+    | "onOpenConnectorFromAnalysisTable"
+    | "onOpenSpliceFromAnalysisTable"
   > {
   setActiveSubScreen: (subScreen: SubScreenId) => void;
   handleWorkspaceScreenChange: (targetScreen: ScreenChangeTarget) => void;
@@ -121,6 +124,36 @@ export function useAppControllerModelingAnalysisDomainAssembly({
           id: wireId
         })
       );
+    },
+    onOpenWireFromAnalysisTable: (wireId) => {
+      const wire = domains.store.getState().wires.byId[wireId];
+      if (wire === undefined) {
+        return;
+      }
+      markSelectionPanelsFromTable();
+      handleWorkspaceScreenChange("modeling");
+      setActiveSubScreen("wire");
+      domains.modelingHandlers.wire.startWireEdit(wire);
+    },
+    onOpenConnectorFromAnalysisTable: (connectorId) => {
+      const connector = domains.store.getState().connectors.byId[connectorId];
+      if (connector === undefined) {
+        return;
+      }
+      markSelectionPanelsFromTable();
+      handleWorkspaceScreenChange("modeling");
+      setActiveSubScreen("connector");
+      domains.modelingHandlers.connector.startConnectorEdit(connector);
+    },
+    onOpenSpliceFromAnalysisTable: (spliceId) => {
+      const splice = domains.store.getState().splices.byId[spliceId];
+      if (splice === undefined) {
+        return;
+      }
+      markSelectionPanelsFromTable();
+      handleWorkspaceScreenChange("modeling");
+      setActiveSubScreen("splice");
+      domains.modelingHandlers.splice.startSpliceEdit(splice);
     },
     onGoToSegmentFromAnalysis: (segmentId) => {
       markSelectionPanelsFromTable();

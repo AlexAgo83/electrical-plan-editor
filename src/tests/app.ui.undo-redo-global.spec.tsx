@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { CATALOG_CSV_HEADERS } from "../app/lib/catalogCsv";
+import { LEGACY_CATALOG_CSV_HEADERS } from "../app/lib/catalogCsv";
 import { appActions, appReducer, createInitialState } from "../store";
 import {
   createUiIntegrationState,
@@ -92,7 +92,7 @@ describe("App integration UI - global undo/redo", () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
 
     const csvText = [
-      CATALOG_CSV_HEADERS.join(","),
+      LEGACY_CATALOG_CSV_HEADERS.join(","),
       "UNDO-CAT-REF,6,Updated undo item,1.00,https://example.com/undo-cat-ref",
       "UNDO-CAT-NEW,2,Imported new item,2.00,https://example.com/undo-cat-new"
     ].join("\r\n");

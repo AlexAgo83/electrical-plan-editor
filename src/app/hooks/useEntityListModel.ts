@@ -83,6 +83,7 @@ export function useEntityListModel({
           wireTechnicalId: wire.technicalId,
           localEndpointLabel: `C${wire.endpointA.cavityIndex}`,
           remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
+          remoteEndpoint: wire.endpointB,
           lengthMm: wire.lengthMm
         });
       }
@@ -93,6 +94,7 @@ export function useEntityListModel({
           wireTechnicalId: wire.technicalId,
           localEndpointLabel: `C${wire.endpointB.cavityIndex}`,
           remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
+          remoteEndpoint: wire.endpointA,
           lengthMm: wire.lengthMm
         });
       }
@@ -113,6 +115,7 @@ export function useEntityListModel({
           wireTechnicalId: wire.technicalId,
           localEndpointLabel: `P${wire.endpointA.portIndex}`,
           remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
+          remoteEndpoint: wire.endpointB,
           lengthMm: wire.lengthMm
         });
       }
@@ -123,6 +126,7 @@ export function useEntityListModel({
           wireTechnicalId: wire.technicalId,
           localEndpointLabel: `P${wire.endpointB.portIndex}`,
           remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
+          remoteEndpoint: wire.endpointA,
           lengthMm: wire.lengthMm
         });
       }

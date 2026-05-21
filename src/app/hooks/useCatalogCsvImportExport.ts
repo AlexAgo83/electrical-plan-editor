@@ -194,7 +194,13 @@ export function useCatalogCsvImportExport({
           connectionCount: row.connectionCount,
           name: row.name,
           unitPriceExclTax: row.unitPriceExclTax,
-          url: row.url
+          url: row.url,
+          ...(parsed.schema === "current"
+            ? {
+                connectorDefaults: row.connectorDefaults,
+                connectorLayout: row.connectorLayout
+              }
+            : {})
         })
       );
 

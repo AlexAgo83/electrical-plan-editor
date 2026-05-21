@@ -1,4 +1,4 @@
-import type { ConnectorId, NetworkId, NodeId, SpliceId, WireId } from "../../core/entities";
+import type { ConnectorId, NetworkId, NodeId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
 import type { AppStore } from "../../store";
 
 export interface AppProps {
@@ -24,6 +24,7 @@ export interface ConnectorSynthesisRow {
   wireTechnicalId: string;
   localEndpointLabel: string;
   remoteEndpointLabel: string;
+  remoteEndpoint: WireEndpoint;
   lengthMm: number;
 }
 
@@ -33,6 +34,7 @@ export interface SpliceSynthesisRow {
   wireTechnicalId: string;
   localEndpointLabel: string;
   remoteEndpointLabel: string;
+  remoteEndpoint: WireEndpoint;
   lengthMm: number;
 }
 

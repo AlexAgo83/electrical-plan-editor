@@ -38,6 +38,9 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     connectorCavityStatuses,
     handleReleaseCavity,
     onGoToWireFromAnalysis,
+    onOpenWireFromAnalysisTable,
+    onOpenConnectorFromAnalysisTable,
+    onOpenSpliceFromAnalysisTable,
     showEntityTables = true,
     sortedConnectorSynthesisRows,
     connectorSynthesisSort: _connectorSynthesisSort,
@@ -116,6 +119,29 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     connectorTableSort.field === field ? (connectorTableSort.direction === "asc" ? "▲" : "▼") : "";
   const connectorSynthesisSortIndicator = (field: ConnectorSynthesisTableSortField) =>
     connectorSynthesisTableSort.field === field ? (connectorSynthesisTableSort.direction === "asc" ? "▲" : "▼") : "";
+  const renderDestinationReference = (row: (typeof sortedConnectorSynthesisRowsByColumns)[number]): ReactElement => {
+    if (row.remoteEndpoint.kind === "connectorCavity") {
+      const connectorId = row.remoteEndpoint.connectorId;
+      return (
+        <EntityReferenceButton
+          title={`Open connector ${row.remoteEndpointLabel}`}
+          onClick={() => onOpenConnectorFromAnalysisTable(connectorId)}
+        >
+          {row.remoteEndpointLabel}
+        </EntityReferenceButton>
+      );
+    }
+
+    const spliceId = row.remoteEndpoint.spliceId;
+    return (
+      <EntityReferenceButton
+        title={`Open splice ${row.remoteEndpointLabel}`}
+        onClick={() => onOpenSpliceFromAnalysisTable(spliceId)}
+      >
+        {row.remoteEndpointLabel}
+      </EntityReferenceButton>
+    );
+  };
   const nextFreeCavityIndex = connectorCavityStatuses.find((slot) => !slot.isOccupied)?.cavityIndex ?? null;
   const parsedCavityIndex = Number.parseInt(cavityIndexInput, 10);
   const cavityIndexIsInteger = Number.isInteger(parsedCavityIndex) && parsedCavityIndex > 0;
@@ -567,14 +593,19 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             <td>
               <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
                 {renderWireColorPrefixMarker(wire)}
-                <span>{row.wireName}</span>
+                <EntityReferenceButton
+                  title={`Open wire ${row.wireTechnicalId}`}
+                  onClick={() => onOpenWireFromAnalysisTable(row.wireId)}
+                >
+                  {row.wireName}
+                </EntityReferenceButton>
               </span>
             </td>
             <td className="technical-id">
               {row.wireTechnicalId}
             </td>
             <td>{row.localEndpointLabel}</td>
-            <td>{row.remoteEndpointLabel}</td>
+            <td>{renderDestinationReference(row)}</td>
             <td>{row.lengthMm}</td>
           </tr>
           );

@@ -100,6 +100,46 @@ describe("App integration UI - analysis go-to wire actions", () => {
     expect(within(refreshedConnectorAnalysisPanel).getByRole("button", { name: "Ways" })).toHaveAttribute("aria-pressed", "false");
   });
 
+  it("opens wire editing from connector synthesis Wire references", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("connector");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+
+    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Synthesis" }));
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Wire 1" }));
+
+    const wireEditPanel = getPanelByHeading("Edit Wire");
+    expect(within(wireEditPanel).getByDisplayValue("W-1")).toBeInTheDocument();
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/, hidden: true })).toHaveClass("is-active");
+  });
+
+  it("opens destination editing from connector synthesis Destination references", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("connector");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+
+    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Synthesis" }));
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Splice 1 (S-1) / P1" }));
+
+    const spliceEditPanel = getPanelByHeading("Edit Splice");
+    expect(within(spliceEditPanel).getByDisplayValue("S-1")).toBeInTheDocument();
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Splice$/, hidden: true })).toHaveClass("is-active");
+  });
+
   it("opens wire analysis from splice occupancy card and keeps Go to before Release", () => {
     renderAppWithState(createUiIntegrationState());
 
@@ -145,6 +185,48 @@ describe("App integration UI - analysis go-to wire actions", () => {
     const refreshedSpliceAnalysisPanel = getPanelByHeading("Splice analysis");
     expect(within(refreshedSpliceAnalysisPanel).getByRole("button", { name: "Synthesis" })).toHaveAttribute("aria-pressed", "true");
     expect(within(refreshedSpliceAnalysisPanel).getByRole("button", { name: "Ports" })).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("opens wire editing from splice synthesis Wire references", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("splice");
+
+    const splicesPanel = getPanelByHeading("Splices");
+    fireEvent.click(within(splicesPanel).getByText("Splice 1"));
+
+    const spliceAnalysisPanel = getPanelByHeading("Splice analysis");
+    fireEvent.click(within(spliceAnalysisPanel).getByRole("button", { name: "Synthesis" }));
+    fireEvent.click(within(spliceAnalysisPanel).getByRole("button", { name: "Wire 1" }));
+
+    const wireEditPanel = getPanelByHeading("Edit Wire");
+    expect(within(wireEditPanel).getByDisplayValue("W-1")).toBeInTheDocument();
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/, hidden: true })).toHaveClass("is-active");
+  });
+
+  it("opens destination editing from splice synthesis Destination references", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("splice");
+
+    const splicesPanel = getPanelByHeading("Splices");
+    fireEvent.click(within(splicesPanel).getByText("Splice 1"));
+
+    const spliceAnalysisPanel = getPanelByHeading("Splice analysis");
+    fireEvent.click(within(spliceAnalysisPanel).getByRole("button", { name: "Synthesis" }));
+    fireEvent.click(within(spliceAnalysisPanel).getByRole("button", { name: "Connector 1 (C-1) / C1" }));
+
+    const connectorEditPanel = getPanelByHeading("Edit Connector");
+    expect(within(connectorEditPanel).getByDisplayValue("C-1")).toBeInTheDocument();
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
   });
 
   it("disables Go to when occupancy references a missing wire and keeps Release enabled", () => {

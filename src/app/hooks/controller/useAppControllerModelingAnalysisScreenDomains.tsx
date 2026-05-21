@@ -131,6 +131,9 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   onSelectWire: AnalysisSliceParams["onSelectWire"];
   onGoToSegmentFromAnalysis: AnalysisSliceParams["onGoToSegmentFromAnalysis"];
   onGoToWireFromAnalysis: AnalysisSliceParams["onGoToWireFromAnalysis"];
+  onOpenWireFromAnalysisTable: AnalysisSliceParams["onOpenWireFromAnalysisTable"];
+  onOpenConnectorFromAnalysisTable: AnalysisSliceParams["onOpenConnectorFromAnalysisTable"];
+  onOpenSpliceFromAnalysisTable: AnalysisSliceParams["onOpenSpliceFromAnalysisTable"];
   includeModelingContent: boolean;
   includeAnalysisContent: boolean;
   store: AppStore;
@@ -175,6 +178,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
   onSelectWire,
   onGoToSegmentFromAnalysis,
   onGoToWireFromAnalysis,
+  onOpenWireFromAnalysisTable,
+  onOpenConnectorFromAnalysisTable,
+  onOpenSpliceFromAnalysisTable,
   includeModelingContent,
   includeAnalysisContent,
   store,
@@ -829,6 +835,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
     onSelectWire,
     onGoToSegmentFromAnalysis,
     onGoToWireFromAnalysis,
+    onOpenWireFromAnalysisTable,
+    onOpenConnectorFromAnalysisTable,
+    onOpenSpliceFromAnalysisTable,
     onOpenWireOnboardingHelp: onboardingHelp?.openWireStep,
     selectedWire: selection.selectedWire,
     describeWireEndpoint: wireDescriptions.describeWireEndpoint,

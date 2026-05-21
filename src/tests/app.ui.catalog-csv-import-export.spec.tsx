@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { CATALOG_CSV_HEADERS } from "../app/lib/catalogCsv";
+import { LEGACY_CATALOG_CSV_HEADERS } from "../app/lib/catalogCsv";
 import { appActions, appReducer } from "../store";
 import {
   asCatalogItemId,
@@ -86,7 +86,7 @@ describe("App integration UI - catalog CSV import/export", () => {
     expect(fileInput).not.toBeNull();
 
     const csvText = [
-      CATALOG_CSV_HEADERS.join(","),
+      LEGACY_CATALOG_CSV_HEADERS.join(","),
       "ref-1,4,Updated item,1.25,https://example.com/ref-1",
       "REF-2,5,New item,2.50,https://example.com/ref-2"
     ].join("\r\n");
@@ -158,7 +158,7 @@ describe("App integration UI - catalog CSV import/export", () => {
     expect(fileInput).not.toBeNull();
 
     const csvText = [
-      CATALOG_CSV_HEADERS.join(","),
+      LEGACY_CATALOG_CSV_HEADERS.join(","),
       "ref-1,4,Updated item,1.25,https://example.com/ref-1",
       "REF-2,5,New item,2.50,https://example.com/ref-2"
     ].join("\r\n");
