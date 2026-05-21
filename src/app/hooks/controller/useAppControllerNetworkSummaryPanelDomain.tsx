@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { unstable_batchedUpdates } from "react-dom";
 import type { AppAction } from "../../../store/actions";
 import type {
   Connector,
@@ -219,18 +220,22 @@ export function useAppControllerNetworkSummaryPanelDomain({
   const [harnessAssemblyGraphTab, setHarnessAssemblyGraphTab] = useState<"assembly" | "current">("assembly");
   const handleSelectConnectorFromCallout = useCallback(
     (connectorId: ConnectorId) => {
-      setActiveSubScreen("connector");
-      markDetailPanelsSelectionSourceAsExternal();
-      dispatchAction(appActions.select({ kind: "connector", id: connectorId }), { trackHistory: false });
+      unstable_batchedUpdates(() => {
+        setActiveSubScreen("connector");
+        markDetailPanelsSelectionSourceAsExternal();
+        dispatchAction(appActions.select({ kind: "connector", id: connectorId }), { trackHistory: false });
+      });
     },
     [dispatchAction, markDetailPanelsSelectionSourceAsExternal, setActiveSubScreen]
   );
 
   const handleSelectSpliceFromCallout = useCallback(
     (spliceId: SpliceId) => {
-      setActiveSubScreen("splice");
-      markDetailPanelsSelectionSourceAsExternal();
-      dispatchAction(appActions.select({ kind: "splice", id: spliceId }), { trackHistory: false });
+      unstable_batchedUpdates(() => {
+        setActiveSubScreen("splice");
+        markDetailPanelsSelectionSourceAsExternal();
+        dispatchAction(appActions.select({ kind: "splice", id: spliceId }), { trackHistory: false });
+      });
     },
     [dispatchAction, markDetailPanelsSelectionSourceAsExternal, setActiveSubScreen]
   );

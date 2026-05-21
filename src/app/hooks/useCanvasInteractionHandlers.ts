@@ -7,6 +7,7 @@ import {
   type SetStateAction,
   type WheelEvent as ReactWheelEvent
 } from "react";
+import { unstable_batchedUpdates } from "react-dom";
 import type { Connector, NetworkNode, NodeId, Segment, SegmentId, Splice } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
@@ -164,17 +165,19 @@ export function useCanvasInteractionHandlers({
       return;
     }
 
-    clearSelectedCanvasNodes();
-    setActiveSubScreen("segment");
+    unstable_batchedUpdates(() => {
+      clearSelectedCanvasNodes();
+      setActiveSubScreen("segment");
 
-    if (isModelingScreen && activeSubScreen === "segment") {
+      if (isModelingScreen && activeSubScreen === "segment") {
+        onExternalSelectionInteraction?.();
+        startSegmentEdit(segment);
+        return;
+      }
+
       onExternalSelectionInteraction?.();
-      startSegmentEdit(segment);
-      return;
-    }
-
-    onExternalSelectionInteraction?.();
-    dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
+      dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
+    });
   }
 
   function handleNetworkNodeActivate(nodeId: NodeId): void {
@@ -187,51 +190,53 @@ export function useCanvasInteractionHandlers({
       return;
     }
 
-    clearSelectedCanvasNodes();
+    unstable_batchedUpdates(() => {
+      clearSelectedCanvasNodes();
 
-    if (isModelingScreen) {
-      if (activeSubScreen === "connector" && node.kind === "connector") {
-        const connector = state.connectors.byId[node.connectorId];
-        if (connector !== undefined) {
+      if (isModelingScreen) {
+        if (activeSubScreen === "connector" && node.kind === "connector") {
+          const connector = state.connectors.byId[node.connectorId];
+          if (connector !== undefined) {
+            onExternalSelectionInteraction?.();
+            startConnectorEdit(connector);
+            return;
+          }
+        }
+
+        if (activeSubScreen === "splice" && node.kind === "splice") {
+          const splice = state.splices.byId[node.spliceId];
+          if (splice !== undefined) {
+            onExternalSelectionInteraction?.();
+            startSpliceEdit(splice);
+            return;
+          }
+        }
+
+        if (activeSubScreen === "node" && node.kind === "intermediate") {
           onExternalSelectionInteraction?.();
-          startConnectorEdit(connector);
+          startNodeEdit(node);
           return;
         }
       }
 
-      if (activeSubScreen === "splice" && node.kind === "splice") {
-        const splice = state.splices.byId[node.spliceId];
-        if (splice !== undefined) {
-          onExternalSelectionInteraction?.();
-          startSpliceEdit(splice);
-          return;
-        }
-      }
-
-      if (activeSubScreen === "node" && node.kind === "intermediate") {
+      if (node.kind === "connector") {
         onExternalSelectionInteraction?.();
-        startNodeEdit(node);
+        setActiveSubScreen("connector");
+        dispatchAction(appActions.select({ kind: "connector", id: node.connectorId }));
         return;
       }
-    }
 
-    if (node.kind === "connector") {
+      if (node.kind === "splice") {
+        onExternalSelectionInteraction?.();
+        setActiveSubScreen("splice");
+        dispatchAction(appActions.select({ kind: "splice", id: node.spliceId }));
+        return;
+      }
+
+      setActiveSubScreen("node");
       onExternalSelectionInteraction?.();
-      setActiveSubScreen("connector");
-      dispatchAction(appActions.select({ kind: "connector", id: node.connectorId }));
-      return;
-    }
-
-    if (node.kind === "splice") {
-      onExternalSelectionInteraction?.();
-      setActiveSubScreen("splice");
-      dispatchAction(appActions.select({ kind: "splice", id: node.spliceId }));
-      return;
-    }
-
-    setActiveSubScreen("node");
-    onExternalSelectionInteraction?.();
-    dispatchAction(appActions.select({ kind: "node", id: nodeId }));
+      dispatchAction(appActions.select({ kind: "node", id: nodeId }));
+    });
   }
 
   function handleNetworkCanvasClick(event: ReactMouseEvent<SVGSVGElement>): void {
