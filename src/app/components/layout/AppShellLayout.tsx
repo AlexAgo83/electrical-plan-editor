@@ -26,6 +26,7 @@ type OperationsHealthPanelProps = Parameters<typeof OperationsHealthPanel>[0];
 const QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX = 18;
 const QUICK_ENTITY_NAV_DOCK_DELAY_PX = 16;
 const QUICK_ENTITY_NAV_DOCK_BLEND_RANGE_PX = 44;
+const QUICK_ENTITY_NAV_PRESENTATION_RELEASE_PX = 18;
 
 function clampDockedNavigationProgress(value: number): number {
   return Math.min(1, Math.max(0, value));
@@ -193,8 +194,10 @@ export function AppShellLayout({
 }: AppShellLayoutProps): ReactElement {
   const isNavigationDrawerInteractionHidden = !isNavigationDrawerOpen;
   const [isQuickEntityNavigationDocked, setIsQuickEntityNavigationDocked] = useState(false);
+  const [isQuickEntityNavigationPresentationActive, setIsQuickEntityNavigationPresentationActive] = useState(false);
   const [quickEntityNavigationDockProgress, setQuickEntityNavigationDockProgress] = useState(0);
   const isQuickEntityNavigationDockedRef = useRef(false);
+  const isQuickEntityNavigationPresentationActiveRef = useRef(false);
   const quickEntityNavigationDockThresholdRef = useRef<number | null>(null);
   const shouldOfferDockedEntityNavigation =
     hasActiveNetwork &&
@@ -205,9 +208,14 @@ export function AppShellLayout({
   }, [isQuickEntityNavigationDocked]);
 
   useEffect(() => {
+    isQuickEntityNavigationPresentationActiveRef.current = isQuickEntityNavigationPresentationActive;
+  }, [isQuickEntityNavigationPresentationActive]);
+
+  useEffect(() => {
     if (!shouldOfferDockedEntityNavigation) {
       quickEntityNavigationDockThresholdRef.current = null;
       setIsQuickEntityNavigationDocked(false);
+      setIsQuickEntityNavigationPresentationActive(false);
       setQuickEntityNavigationDockProgress(0);
       return undefined;
     }
@@ -227,6 +235,9 @@ export function AppShellLayout({
         setIsQuickEntityNavigationDocked((current) =>
           fallbackThreshold === null ? current : window.scrollY >= fallbackThreshold
         );
+        setIsQuickEntityNavigationPresentationActive((current) =>
+          fallbackThreshold === null ? current : window.scrollY >= fallbackThreshold
+        );
         setQuickEntityNavigationDockProgress((current) =>
           fallbackThreshold === null ? current : window.scrollY >= fallbackThreshold ? 1 : 0
         );
@@ -236,7 +247,7 @@ export function AppShellLayout({
       const navigationRect = sourceNavigation.getBoundingClientRect();
       const headerRect = headerElement.getBoundingClientRect();
       const headerHeight = Math.max(0, headerRect.height);
-      if (quickEntityNavigationDockThresholdRef.current === null || !isQuickEntityNavigationDockedRef.current) {
+      if (quickEntityNavigationDockThresholdRef.current === null) {
         quickEntityNavigationDockThresholdRef.current = Math.max(
           0,
           navigationRect.top + window.scrollY - headerHeight + QUICK_ENTITY_NAV_DOCK_DELAY_PX
@@ -246,6 +257,10 @@ export function AppShellLayout({
       const nextIsDocked = isQuickEntityNavigationDockedRef.current
         ? window.scrollY >= Math.max(0, dockThreshold - QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX)
         : window.scrollY >= dockThreshold;
+      const presentationStart = Math.max(0, dockThreshold - QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX);
+      const nextPresentationActive = isQuickEntityNavigationPresentationActiveRef.current
+        ? window.scrollY >= Math.max(0, presentationStart - QUICK_ENTITY_NAV_PRESENTATION_RELEASE_PX)
+        : window.scrollY >= presentationStart;
       const nextDockProgress =
         dockThreshold <= QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX
           ? 1
@@ -254,6 +269,9 @@ export function AppShellLayout({
                 QUICK_ENTITY_NAV_DOCK_BLEND_RANGE_PX
             );
       setIsQuickEntityNavigationDocked((current) => (current === nextIsDocked ? current : nextIsDocked));
+      setIsQuickEntityNavigationPresentationActive((current) =>
+        current === nextPresentationActive ? current : nextPresentationActive
+      );
       setQuickEntityNavigationDockProgress((current) =>
         Math.abs(current - nextDockProgress) < 0.01 ? current : nextDockProgress
       );
@@ -283,7 +301,7 @@ export function AppShellLayout({
   }, [headerBlockRef, shouldOfferDockedEntityNavigation]);
 
   const shouldMountDockedEntityNavigation =
-    shouldOfferDockedEntityNavigation && (isQuickEntityNavigationDocked || quickEntityNavigationDockProgress > 0);
+    shouldOfferDockedEntityNavigation && isQuickEntityNavigationPresentationActive;
   const headerCenterNavigation = isHarnessAssemblyScreen ? (
     headerHarnessAssemblyFunctionalScopeNavigation
   ) : (
