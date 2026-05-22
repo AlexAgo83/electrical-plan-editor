@@ -75,12 +75,16 @@ export function ModelingCatalogFormPanel({
   catalogManufacturerReferenceAlreadyUsed,
   cancelCatalogEdit,
   catalogFormError
-}: ModelingCatalogFormPanelProps): ReactElement {
+}: ModelingCatalogFormPanelProps): ReactElement | null {
   void _openCreateCatalogForm;
   const hasUrlValidationError = catalogUrl.trim().length > 0 && !isValidCatalogUrlInput(catalogUrl);
   const showPanel = isCatalogSubScreen && catalogFormMode !== "idle";
   const catalogSubmitDisabled = catalogManufacturerReferenceAlreadyUsed || hasUrlValidationError;
   const catalogSubmitLabel = catalogFormMode === "create" ? "Create" : "Save";
+
+  if (!showPanel) {
+    return null;
+  }
 
   function renderCatalogSubmitButton(): ReactElement {
     return (
@@ -102,7 +106,7 @@ export function ModelingCatalogFormPanel({
   }
 
   return (
-    <form className="stack-form catalog-item-edit-form" hidden={!showPanel} onSubmit={handleCatalogSubmit}>
+    <form className="stack-form catalog-item-edit-form" onSubmit={handleCatalogSubmit}>
       <article
         className="panel"
         data-onboarding-panel="modeling-catalog-edit"
@@ -112,172 +116,160 @@ export function ModelingCatalogFormPanel({
           catalogFormMode === "create" ? "Create catalog item" : "Edit catalog item",
           catalogFormMode
         )}
-        {catalogFormMode !== "idle" ? (
-          <>
-            <label>
-              Manufacturer reference
-              <input
-                value={catalogManufacturerReference}
-                onChange={(event) => setCatalogManufacturerReference(event.target.value)}
-                placeholder="e.g. TE-1-967616-1"
-                maxLength={120}
-                required
-              />
-            </label>
-            {catalogManufacturerReferenceAlreadyUsed ? (
-              <small className="inline-error">This manufacturer reference is already used in this network catalog.</small>
-            ) : null}
-            <label>
-              Connection count
-              <input
-                type="number"
-                min={1}
-                step={1}
-                value={catalogConnectionCount}
-                onChange={(event) => setCatalogConnectionCount(event.target.value)}
-                required
-              />
-            </label>
-            <label>
-              Name
-              <input value={catalogName} onChange={(event) => setCatalogName(event.target.value)} placeholder="Optional display name" />
-            </label>
-            <label>
-              {`Unit price (excl. tax) [${workspaceCurrencyCode}]`}
-              <input
-                type="number"
-                min={0}
-                step={0.01}
-                value={catalogUnitPriceExclTax}
-                onChange={(event) => setCatalogUnitPriceExclTax(event.target.value)}
-                placeholder="Optional"
-                inputMode="decimal"
-              />
-            </label>
-            <label>
-              URL
-              <input
-                type="url"
-                value={catalogUrl}
-                onChange={(event) => setCatalogUrl(event.target.value)}
-                placeholder="https://example.com/product"
-              />
-            </label>
-            {hasUrlValidationError ? <small className="inline-error">Use an absolute http/https URL.</small> : null}
-            {catalogUrl.trim().length > 0 && !hasUrlValidationError ? (
-              <div className="row-actions compact">
-                <a
-                  className="button-with-icon"
-                  href={catalogUrl.trim()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <span className="action-button-icon is-open" aria-hidden="true" />
-                  Open link
-                </a>
-              </div>
-            ) : null}
-            <div className="row-actions catalog-item-submit-actions">
-              {renderCatalogSubmitButton()}
-              <button type="button" className={catalogFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelCatalogEdit}>
-                {catalogFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
-                {catalogFormMode === "edit" ? "Cancel edit" : "Cancel"}
-              </button>
-            </div>
-            {renderCatalogFormError()}
-          </>
+        <label>
+          Manufacturer reference
+          <input
+            value={catalogManufacturerReference}
+            onChange={(event) => setCatalogManufacturerReference(event.target.value)}
+            placeholder="e.g. TE-1-967616-1"
+            maxLength={120}
+            required
+          />
+        </label>
+        {catalogManufacturerReferenceAlreadyUsed ? (
+          <small className="inline-error">This manufacturer reference is already used in this network catalog.</small>
         ) : null}
+        <label>
+          Connection count
+          <input
+            type="number"
+            min={1}
+            step={1}
+            value={catalogConnectionCount}
+            onChange={(event) => setCatalogConnectionCount(event.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Name
+          <input value={catalogName} onChange={(event) => setCatalogName(event.target.value)} placeholder="Optional display name" />
+        </label>
+        <label>
+          {`Unit price (excl. tax) [${workspaceCurrencyCode}]`}
+          <input
+            type="number"
+            min={0}
+            step={0.01}
+            value={catalogUnitPriceExclTax}
+            onChange={(event) => setCatalogUnitPriceExclTax(event.target.value)}
+            placeholder="Optional"
+            inputMode="decimal"
+          />
+        </label>
+        <label>
+          URL
+          <input
+            type="url"
+            value={catalogUrl}
+            onChange={(event) => setCatalogUrl(event.target.value)}
+            placeholder="https://example.com/product"
+          />
+        </label>
+        {hasUrlValidationError ? <small className="inline-error">Use an absolute http/https URL.</small> : null}
+        {catalogUrl.trim().length > 0 && !hasUrlValidationError ? (
+          <div className="row-actions compact">
+            <a
+              className="button-with-icon"
+              href={catalogUrl.trim()}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="action-button-icon is-open" aria-hidden="true" />
+              Open link
+            </a>
+          </div>
+        ) : null}
+        <div className="row-actions catalog-item-submit-actions">
+          {renderCatalogSubmitButton()}
+          <button type="button" className={catalogFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelCatalogEdit}>
+            {catalogFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
+            {catalogFormMode === "edit" ? "Cancel edit" : "Cancel"}
+          </button>
+        </div>
+        {renderCatalogFormError()}
       </article>
 
       <article className="panel catalog-material-defaults-panel">
         {renderFormHeader("Connector material defaults", catalogFormMode)}
-        {catalogFormMode !== "idle" ? (
-          <>
-            <label className="settings-checkbox">
-              <input
-                type="checkbox"
-                checked={catalogAllSameTerminals}
-                onChange={(event) => setCatalogAllSameTerminals(event.target.checked)}
-              />
-              All same terminals
-            </label>
-            <label>
-              Default terminal reference
-              <input
-                value={catalogDefaultTerminalReference}
-                onChange={(event) => setCatalogDefaultTerminalReference(event.target.value)}
-                placeholder="Optional terminal ref"
-              />
-            </label>
-            <label>
-              Default terminal name
-              <input
-                value={catalogDefaultTerminalName}
-                onChange={(event) => setCatalogDefaultTerminalName(event.target.value)}
-                placeholder="Optional terminal name"
-              />
-            </label>
-            <label>
-              Default seal reference
-              <input
-                value={catalogDefaultSealReference}
-                onChange={(event) => setCatalogDefaultSealReference(event.target.value)}
-                placeholder="Optional seal ref"
-              />
-            </label>
-            <label>
-              Default seal name
-              <input
-                value={catalogDefaultSealName}
-                onChange={(event) => setCatalogDefaultSealName(event.target.value)}
-                placeholder="Optional seal name"
-              />
-            </label>
-            <label>
-              Plug definitions
-              <textarea
-                value={catalogPlugDefinitionsText}
-                onChange={(event) => setCatalogPlugDefinitionsText(event.target.value)}
-                placeholder={"PLUG-REF,2,Plug name\nPLUG-ALT,1"}
-                rows={3}
-              />
-            </label>
-            <div className="row-actions catalog-item-submit-actions">
-              {renderCatalogSubmitButton()}
-            </div>
-            {renderCatalogFormError()}
-          </>
-        ) : null}
+        <label className="settings-checkbox">
+          <input
+            type="checkbox"
+            checked={catalogAllSameTerminals}
+            onChange={(event) => setCatalogAllSameTerminals(event.target.checked)}
+          />
+          All same terminals
+        </label>
+        <label>
+          Default terminal reference
+          <input
+            value={catalogDefaultTerminalReference}
+            onChange={(event) => setCatalogDefaultTerminalReference(event.target.value)}
+            placeholder="Optional terminal ref"
+          />
+        </label>
+        <label>
+          Default terminal name
+          <input
+            value={catalogDefaultTerminalName}
+            onChange={(event) => setCatalogDefaultTerminalName(event.target.value)}
+            placeholder="Optional terminal name"
+          />
+        </label>
+        <label>
+          Default seal reference
+          <input
+            value={catalogDefaultSealReference}
+            onChange={(event) => setCatalogDefaultSealReference(event.target.value)}
+            placeholder="Optional seal ref"
+          />
+        </label>
+        <label>
+          Default seal name
+          <input
+            value={catalogDefaultSealName}
+            onChange={(event) => setCatalogDefaultSealName(event.target.value)}
+            placeholder="Optional seal name"
+          />
+        </label>
+        <label>
+          Plug definitions
+          <textarea
+            value={catalogPlugDefinitionsText}
+            onChange={(event) => setCatalogPlugDefinitionsText(event.target.value)}
+            placeholder={"PLUG-REF,2,Plug name\nPLUG-ALT,1"}
+            rows={3}
+          />
+        </label>
+        <div className="row-actions catalog-item-submit-actions">
+          {renderCatalogSubmitButton()}
+        </div>
+        {renderCatalogFormError()}
       </article>
 
       <article className="panel catalog-connector-layout-panel">
         {renderFormHeader("Connector physical layout", catalogFormMode)}
-        {catalogFormMode !== "idle" ? (
-          <>
-            <ConnectorLayoutEditor
-              connectionCount={catalogConnectionCount}
-              connectorLayout={catalogConnectorLayout}
-              setConnectorLayout={setCatalogConnectorLayout}
-              showLegend={false}
-            />
-            <div className="row-actions catalog-item-submit-actions">
-              {renderCatalogSubmitButton()}
-              <button
-                type="button"
-                className="button-with-icon"
-                onClick={() => setCatalogConnectorLayout(createDefaultConnectorLayout(resolveCatalogLayoutConnectionCount()))}
-              >
-                <span className="action-button-icon is-catalog" aria-hidden="true" />
-                Auto layout
-              </button>
-              <button type="button" className="button-with-icon" onClick={() => setCatalogConnectorLayout(undefined)}>
-                <span className="action-button-icon is-cancel" aria-hidden="true" />
-                Clear custom layout
-              </button>
-            </div>
-            {renderCatalogFormError()}
-          </>
-        ) : null}
+        <ConnectorLayoutEditor
+          connectionCount={catalogConnectionCount}
+          connectorLayout={catalogConnectorLayout}
+          setConnectorLayout={setCatalogConnectorLayout}
+          showLegend={false}
+        />
+        <div className="row-actions catalog-item-submit-actions">
+          {renderCatalogSubmitButton()}
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={() => setCatalogConnectorLayout(createDefaultConnectorLayout(resolveCatalogLayoutConnectionCount()))}
+          >
+            <span className="action-button-icon is-catalog" aria-hidden="true" />
+            Auto layout
+          </button>
+          <button type="button" className="button-with-icon" onClick={() => setCatalogConnectorLayout(undefined)}>
+            <span className="action-button-icon is-cancel" aria-hidden="true" />
+            Clear custom layout
+          </button>
+        </div>
+        {renderCatalogFormError()}
       </article>
     </form>
   );
