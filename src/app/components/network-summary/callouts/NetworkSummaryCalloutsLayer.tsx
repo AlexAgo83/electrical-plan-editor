@@ -113,7 +113,12 @@ function renderConnectorKeying(
   return <path className="network-callout-connector-keying" style={style} d={path} aria-hidden="true" />;
 }
 
-function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, height: number): ReactElement {
+function renderConnectorLayoutDrawing(
+  layout: ConnectorLayout,
+  width: number,
+  height: number,
+  highlightedCavityIndexes: ReadonlySet<number>
+): ReactElement {
   const shellPadding = getConnectorLayoutShellPadding(layout);
   const cellPadding = getConnectorLayoutCellPadding(layout);
   const wayScale = getWayRenderScale(cellPadding);
@@ -160,11 +165,17 @@ function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, he
         const label = getConnectorLayoutWayDisplayLabel(way);
         const labelClassName = `network-callout-connector-way-label${label.length > 2 ? " is-long-label" : ""}`;
         const labelFontSize = label.length > 2 ? 4.7 : 5.8;
+        const isWireHighlighted = highlightedCavityIndexes.has(way.cavityIndex);
+        const wayClassName = `network-callout-connector-way${isWireHighlighted ? " is-wire-highlighted" : ""}`;
         return (
-          <g key={way.cavityIndex} transform={`translate(${way.x} ${way.y})`}>
+          <g
+            key={way.cavityIndex}
+            className={isWireHighlighted ? "network-callout-connector-way-group is-wire-highlighted" : "network-callout-connector-way-group"}
+            transform={`translate(${way.x} ${way.y})`}
+          >
             {way.shape === "square" ? (
               <rect
-                className="network-callout-connector-way"
+                className={wayClassName}
                 x={-(0.56 * wayScale) / 2}
                 y={-(0.56 * wayScale) / 2}
                 width={0.56 * wayScale}
@@ -173,7 +184,7 @@ function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, he
               />
             ) : way.shape === "slot" ? (
               <rect
-                className="network-callout-connector-way"
+                className={wayClassName}
                 x={-(0.64 * wayScale) / 2}
                 y={-(0.44 * wayScale) / 2}
                 width={0.64 * wayScale}
@@ -181,7 +192,7 @@ function renderConnectorLayoutDrawing(layout: ConnectorLayout, width: number, he
                 rx={(0.44 * wayScale) / 2}
               />
             ) : (
-              <circle className="network-callout-connector-way" r={0.32 * wayScale} />
+              <circle className={wayClassName} r={0.32 * wayScale} />
             )}
             <text
               className={labelClassName}
@@ -264,6 +275,18 @@ export function NetworkSummaryCalloutsLayer({
         const lastColumn = layout.columns[layout.columns.length - 1];
         const tableRightX =
           lastColumn === undefined ? contentLeftX : contentLeftX + lastColumn.x + lastColumn.width;
+        const highlightedCavityIndexes = new Set<number>();
+        if (selectedWireId !== null) {
+          for (const group of callout.groups) {
+            if (!group.entries.some((entry) => entry.wireId === selectedWireId)) {
+              continue;
+            }
+            const cavityIndex = Number(/^C(\d+)$/.exec(group.label)?.[1] ?? Number.NaN);
+            if (Number.isInteger(cavityIndex) && cavityIndex > 0) {
+              highlightedCavityIndexes.add(cavityIndex);
+            }
+          }
+        }
 
         return (
           <g
@@ -312,7 +335,8 @@ export function NetworkSummaryCalloutsLayer({
                     {renderConnectorLayoutDrawing(
                       callout.connectorLayout,
                       layout.drawingWidth,
-                      layout.drawingHeight
+                      layout.drawingHeight,
+                      highlightedCavityIndexes
                     )}
                   </g>
                 ) : null}

@@ -30,6 +30,7 @@ interface ConnectorPhysicalViewProps {
   catalogItem: CatalogItem | undefined;
   connectorCavityStatuses: ConnectorCavityStatus[];
   wireById: Map<WireId, Wire>;
+  selectedWireId: WireId | null;
   parseOccupantWireId: (occupantRef: string | null) => WireId | null;
   onGoToWire: (wireId: WireId) => void;
 }
@@ -62,8 +63,10 @@ function getPhysicalWayRenderScale(cellPadding: number): number {
   return (1 - cellPadding) / DEFAULT_WAY_RENDER_CELL_SIZE;
 }
 
-function renderPhysicalWayShape(shape: string, isOccupied: boolean, cellPadding: number): ReactElement {
-  const className = isOccupied ? "connector-physical-way-shape is-occupied" : "connector-physical-way-shape";
+function renderPhysicalWayShape(shape: string, isOccupied: boolean, isWireHighlighted: boolean, cellPadding: number): ReactElement {
+  const className = `connector-physical-way-shape${isOccupied ? " is-occupied" : ""}${
+    isWireHighlighted ? " is-wire-highlighted" : ""
+  }`;
   const scale = getPhysicalWayRenderScale(cellPadding);
   if (shape === "square") {
     const size = 0.6 * scale;
@@ -250,6 +253,7 @@ export function ConnectorPhysicalView({
   catalogItem,
   connectorCavityStatuses,
   wireById,
+  selectedWireId,
   parseOccupantWireId,
   onGoToWire
 }: ConnectorPhysicalViewProps): ReactElement {
@@ -279,6 +283,7 @@ export function ConnectorPhysicalView({
             const status = statusByCavity.get(way.cavityIndex);
             const isOccupied = status?.isOccupied === true;
             const wireId = parseOccupantWireId(status?.occupantRef ?? null);
+            const isWireHighlighted = selectedWireId !== null && wireId === selectedWireId;
             const wire = wireId === null ? null : wireById.get(wireId) ?? null;
             const wireTechnicalId = wire?.technicalId ?? null;
             const wireTechnicalIdBackgroundWidth =
@@ -297,9 +302,13 @@ export function ConnectorPhysicalView({
             const labelClassName = `connector-physical-way-label${label.length > 2 ? " is-long-label" : ""}`;
             const wireName = wire?.name.trim() ?? "";
             return (
-              <g key={way.cavityIndex} className="connector-physical-way" transform={`translate(${way.x} ${way.y})`}>
+              <g
+                key={way.cavityIndex}
+                className={`connector-physical-way${isWireHighlighted ? " is-wire-highlighted" : ""}`}
+                transform={`translate(${way.x} ${way.y})`}
+              >
                 {wireName.length > 0 ? <title>{wireName}</title> : null}
-                {renderPhysicalWayShape(way.shape, isOccupied, cellPadding)}
+                {renderPhysicalWayShape(way.shape, isOccupied, isWireHighlighted, cellPadding)}
                 <text className={labelClassName} y={0}>
                   {label}
                 </text>
@@ -333,8 +342,14 @@ export function ConnectorPhysicalView({
             const occupantRef = status?.occupantRef ?? null;
             const wireId = parseOccupantWireId(occupantRef);
             const wire = wireId === null ? null : wireById.get(wireId);
+            const isWireHighlighted = selectedWireId !== null && wireId === selectedWireId;
             return (
-              <article key={way.cavityIndex} className={status?.isOccupied === true ? "cavity is-occupied" : "cavity"}>
+              <article
+                key={way.cavityIndex}
+                className={`cavity${status?.isOccupied === true ? " is-occupied" : ""}${
+                  isWireHighlighted ? " is-wire-highlighted" : ""
+                }`}
+              >
                 <h3>C{way.cavityIndex}</h3>
                 <p className="cavity-occupant-line">
                   {status?.isOccupied === true ? <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" /> : null}

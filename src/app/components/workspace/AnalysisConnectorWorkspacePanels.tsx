@@ -26,6 +26,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     catalogItems,
     visibleConnectors,
     wires,
+    selectedWireId,
     connectorOccupiedCountById,
     onSelectConnector,
     onSelectCatalogItem,
@@ -552,6 +553,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         catalogItem={selectedConnector.catalogItemId === undefined ? undefined : catalogItemById.get(selectedConnector.catalogItemId)}
         connectorCavityStatuses={connectorCavityStatuses}
         wireById={wireById}
+        selectedWireId={selectedWireId}
         parseOccupantWireId={parseOccupantWireId}
         onGoToWire={onGoToWireFromAnalysis}
       />

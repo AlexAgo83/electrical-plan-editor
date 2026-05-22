@@ -103,6 +103,12 @@
   stroke: var(--theme-primary, currentColor);
 }
 
+.connector-physical-way-shape.is-wire-highlighted {
+  fill: color-mix(in srgb, var(--network-wire-highlight-color, var(--theme-primary, currentColor)) 34%, transparent);
+  stroke: var(--network-wire-highlight-color, var(--theme-primary, currentColor));
+  stroke-width: 0.14;
+}
+
 .connector-layout-way-label,
 .connector-physical-way-label {
   fill: currentColor;
@@ -325,6 +331,11 @@
 .connector-physical-way-list {
   margin-top: 0;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
+.connector-physical-way-list .cavity.is-wire-highlighted {
+  border-color: color-mix(in srgb, var(--network-wire-highlight-color, var(--theme-primary, currentColor)) 55%, var(--panel-border));
+  background: color-mix(in srgb, var(--network-wire-highlight-color, var(--theme-primary, currentColor)) 14%, var(--panel-bg));
 }
 
 @media (max-width: 980px) {

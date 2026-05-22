@@ -82,6 +82,12 @@
   stroke-width: 0.07;
 }
 
+.network-callout-connector-way.is-wire-highlighted {
+  fill: color-mix(in srgb, var(--network-wire-highlight-color, #4f8d2d) 34%, var(--network-label-stroke-color, rgba(246, 251, 255, 0.96)));
+  stroke: var(--network-wire-highlight-color, #4f8d2d);
+  stroke-width: 0.12;
+}
+
 .network-callout-connector-way-label {
   font-size: 0.36px;
   font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
