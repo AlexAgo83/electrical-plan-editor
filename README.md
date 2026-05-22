@@ -38,12 +38,14 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 
 - Electrical modeling for connectors, splices, nodes, segments, and wires, with occupancy rules and wire-side connection / seal references.
 - Automatic route computation, forced-route locking, and live wire-length recomputation after segment edits.
-- Interactive 2D workspace with drag-and-drop nodes, zoom/pan controls, selectable segments, sub-network filtering, configurable callouts, and quick navigation between `Modeling`, `Analysis`, `Harness`, and `Settings`.
+- Interactive 2D workspace with drag-and-drop nodes, zoom/pan controls, selectable segments, sub-network filtering, configurable callouts, wire-linked pin highlighting, and quick navigation between `Modeling`, `Analysis`, `Harness`, and `Settings`.
 - Connector and splice callouts with tabular wire details, optional wire-name columns, draggable positions, and catalog connector drawings when a physical layout was edited.
 - Catalog-backed connector physical layout editor with reusable way geometry, keying features, shell shape controls, and physical connector analysis views.
-- Harness assembly workflows for multi-network grouping, master connector references, inter-harness connector links, and functional schematic inspection.
+- Harness assembly workflows for multi-network grouping, master connector references, inter-harness connector links, saved assembly graphs, current-network functional graphs, and contextual assembly help.
 - Analysis workflows with targeted `Go to` actions, including navigation from `Node analysis` to `Segment analysis`, from `Segment analysis` to `Wire analysis`, and from connector analysis into physical views.
 - Network-scoped catalog management with catalog-first connector flows, optional splice linkage, seeded starter items, usage analysis, and pricing context settings.
+- Home workspace hub with Quick start actions, active-network context, changelog feed, and rich recent-change rows that can navigate back to changed objects when possible.
+- Themed toast notifications for important workspace actions, including undo/redo and connector/splice occupancy changes.
 - Export tooling for operational handoff:
   - `SVG` / `PNG` network-plan export with optional frame and metadata cartouche
   - `BOM CSV` export with pricing context and a dedicated `Wire terminations` section
@@ -72,7 +74,7 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
   - Vitest + Testing Library for unit and integration coverage
   - Playwright for E2E smoke coverage
   - ESLint for linting
-  - explicit quality gates for UI modularization, timeout governance, store modularization, and PWA artifacts
+  - explicit quality gates for UI modularization, timeout governance, store modularization, segmented test ownership, and PWA artifacts
 - Delivery workflow:
   - Logics-backed request/backlog/task tracking under `logics/`
   - CI runs the same blocking validation pipeline locally and in GitHub Actions

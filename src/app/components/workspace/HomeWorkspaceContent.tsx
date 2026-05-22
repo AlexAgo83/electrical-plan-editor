@@ -194,7 +194,6 @@ function ChangelogEntryMarkdown({ content }: { content: string }): ReactElement 
 export function HomeWorkspaceContent({
   hasActiveNetwork,
   activeNetworkName,
-  activeNetworkTechnicalId: _activeNetworkTechnicalId,
   recentChangesForActiveNetwork,
   networkCount,
   onCreateEmptyWorkspace,
