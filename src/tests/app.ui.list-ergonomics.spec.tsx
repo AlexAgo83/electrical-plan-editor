@@ -160,6 +160,37 @@ describe("App integration UI - list ergonomics", () => {
     expect(within(wiresPanel).queryByText("Feed Main Junction")).not.toBeInTheDocument();
   });
 
+  it("filters wires by twist group tag before the text filter", () => {
+    const baseState = createSampleNetworkState();
+    const feedWire = baseState.wires.byId[asWireId("W-001")];
+    const secondaryWire = baseState.wires.byId[asWireId("W-004")];
+    if (feedWire === undefined || secondaryWire === undefined) {
+      throw new Error("Expected sample wires to exist.");
+    }
+    const taggedState = appReducer(
+      appReducer(baseState, appActions.saveWire({ ...feedWire, twistGroupLabel: "CAN" })),
+      appActions.saveWire({ ...secondaryWire, twistGroupLabel: "LIN" })
+    );
+
+    renderAppWithState(taggedState);
+
+    switchSubScreen("wire");
+    const wiresPanel = getPanelByHeading("Wires");
+    const tagFilterSelect = within(wiresPanel).getByLabelText("Wire tag filter");
+    const tagFilterOptions = Array.from((tagFilterSelect as HTMLSelectElement).options).map((option) => option.textContent);
+
+    expect(tagFilterSelect).toHaveValue("all");
+    expect(tagFilterOptions).toEqual(["Any", "CAN", "LIN"]);
+
+    fireEvent.change(tagFilterSelect, { target: { value: "CAN" } });
+    expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
+    expect(within(wiresPanel).queryByText("Secondary Feed B")).not.toBeInTheDocument();
+
+    fireEvent.change(tagFilterSelect, { target: { value: "all" } });
+    expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
+    expect(within(wiresPanel).getByText("Secondary Feed B")).toBeInTheDocument();
+  });
+
   it("splits wire endpoints into Endpoint A and Endpoint B columns and updates the displayed entry count footer when filtering", () => {
     renderAppWithState(createSampleNetworkState());
 

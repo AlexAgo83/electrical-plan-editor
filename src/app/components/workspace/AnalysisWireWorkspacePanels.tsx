@@ -15,7 +15,9 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   const {
     isWireSubScreen,
     wireRouteFilter,
-    setWireRouteFilter,
+    wireTwistGroupFilter,
+    setWireTwistGroupFilter,
+    wireTwistGroupOptions,
     wireFilterField,
     setWireFilterField,
     wireEndpointFilterQuery,
@@ -126,22 +128,6 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     <h2>Wires</h2>
     <div className="list-panel-header-tools">
       <div className="list-panel-header-tools-row is-title-actions">
-        <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
-          {([
-            ["all", "All"],
-            ["auto", "Auto"],
-            ["locked", "Locked"]
-          ] as const).map(([filterId, label]) => (
-            <button
-              key={filterId}
-              type="button"
-              className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"}
-              onClick={() => setWireRouteFilter(filterId)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
         <button
           type="button"
           className="filter-chip table-export-button"
@@ -238,7 +224,23 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           </button>
         ) : null}
       </div>
-      <div className="list-panel-header-tools-row is-filter-row">
+      <div className="list-panel-header-tools-row is-filter-row is-wire-filter-row">
+        <label className="list-inline-number-filter wire-tag-filter">
+          <span>Tag</span>
+          <select
+            className="list-inline-table-filter-select"
+            aria-label="Wire tag filter"
+            value={wireTwistGroupFilter}
+            onChange={(event) => setWireTwistGroupFilter(event.target.value)}
+          >
+            <option value="all">Any</option>
+            {wireTwistGroupOptions.map((label) => (
+              <option key={label} value={label}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
         <TableFilterBar
           label="Filter"
           fieldLabel="Wire filter field"

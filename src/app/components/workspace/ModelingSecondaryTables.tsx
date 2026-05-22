@@ -58,7 +58,9 @@ interface ModelingSecondaryTablesProps {
   wireFormMode: "idle" | "create" | "edit";
   onOpenCreateWire: () => void;
   wireRouteFilter: "all" | "auto" | "locked";
-  setWireRouteFilter: (value: "all" | "auto" | "locked") => void;
+  wireTwistGroupFilter: string;
+  setWireTwistGroupFilter: (value: string) => void;
+  wireTwistGroupOptions: string[];
   wireFilterField: "endpoints" | "name" | "technicalId" | "any";
   setWireFilterField: (value: "endpoints" | "name" | "technicalId" | "any") => void;
   wireEndpointFilterQuery: string;
@@ -114,7 +116,9 @@ export function ModelingSecondaryTables({
   wireFormMode,
   onOpenCreateWire,
   wireRouteFilter,
-  setWireRouteFilter,
+  wireTwistGroupFilter,
+  setWireTwistGroupFilter,
+  wireTwistGroupOptions,
   wireFilterField,
   setWireFilterField,
   wireEndpointFilterQuery,
@@ -691,16 +695,23 @@ export function ModelingSecondaryTables({
                 </button>
               ) : null}
             </div>
-              <div className="list-panel-header-tools-row is-filter-row">
-                <div className="chip-group list-panel-filters" role="group" aria-label="Wire route mode filter">
-                  {([
-                    ["all", "All"],
-                    ["auto", "Auto"],
-                    ["locked", "Locked"]
-                  ] as const).map(([filterId, label]) => (
-                    <button key={filterId} type="button" className={wireRouteFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setWireRouteFilter(filterId)}>{label}</button>
-                  ))}
-                </div>
+              <div className="list-panel-header-tools-row is-filter-row is-wire-filter-row">
+                <label className="list-inline-number-filter wire-tag-filter">
+                  <span>Tag</span>
+                  <select
+                    className="list-inline-table-filter-select"
+                    aria-label="Wire tag filter"
+                    value={wireTwistGroupFilter}
+                    onChange={(event) => setWireTwistGroupFilter(event.target.value)}
+                  >
+                    <option value="all">Any</option>
+                    {wireTwistGroupOptions.map((label) => (
+                      <option key={label} value={label}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <TableFilterBar
                   label="Filter"
                   fieldLabel="Wire filter field"

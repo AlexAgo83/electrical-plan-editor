@@ -86,6 +86,9 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
     | "setSegmentIdSortDirection"
     | "wireRouteFilter"
     | "setWireRouteFilter"
+    | "wireTwistGroupFilter"
+    | "setWireTwistGroupFilter"
+    | "wireTwistGroupOptions"
     | "wireFilterField"
     | "setWireFilterField"
     | "wireEndpointFilterQuery"
@@ -531,7 +534,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
     wireEditAfterCreate: formsState.wireEditAfterCreate,
     resetWireForm: modelingHandlers.wire.resetWireForm,
     wireRouteFilter: listModel.wireRouteFilter,
-    setWireRouteFilter: listModel.setWireRouteFilter,
+    wireTwistGroupFilter: listModel.wireTwistGroupFilter,
+    setWireTwistGroupFilter: listModel.setWireTwistGroupFilter,
+    wireTwistGroupOptions: listModel.wireTwistGroupOptions,
     wireFilterField: listModel.wireFilterField,
     setWireFilterField: listModel.setWireFilterField,
     wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
@@ -821,6 +826,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
     onOpenSegmentOnboardingHelp: onboardingHelp?.openSegmentStep,
     wireRouteFilter: listModel.wireRouteFilter,
     setWireRouteFilter: listModel.setWireRouteFilter,
+    wireTwistGroupFilter: listModel.wireTwistGroupFilter,
+    setWireTwistGroupFilter: listModel.setWireTwistGroupFilter,
+    wireTwistGroupOptions: listModel.wireTwistGroupOptions,
     wireFilterField: listModel.wireFilterField,
     setWireFilterField: listModel.setWireFilterField,
     wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,

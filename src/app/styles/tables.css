@@ -179,6 +179,15 @@
   width: 100%;
 }
 
+.list-panel-header-tools-row.is-wire-filter-row {
+  align-items: center;
+}
+
+.list-panel-header-tools-row.is-wire-filter-row .list-inline-table-filter {
+  flex: 1 1 24rem;
+  width: auto;
+}
+
 .list-inline-table-filter-select {
   flex: 0 0 auto;
   border-radius: 999px;
@@ -195,6 +204,10 @@
 .list-inline-table-filter-select:focus-visible {
   outline: 2px solid color-mix(in srgb, currentColor 35%, transparent);
   outline-offset: 1px;
+}
+
+.wire-tag-filter .list-inline-table-filter-select {
+  min-width: 8rem;
 }
 
 .list-inline-table-filter-input {

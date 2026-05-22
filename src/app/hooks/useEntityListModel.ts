@@ -28,6 +28,7 @@ interface UseEntityListModelParams {
 }
 
 export type WireFilterField = "endpoints" | "name" | "technicalId" | "any";
+export type WireTwistGroupFilter = "all" | string;
 export type ConnectorFilterField = "name" | "technicalId" | "any";
 export type SpliceFilterField = "name" | "technicalId" | "any";
 export type NodeFilterField = "id" | "kind" | "reference" | "any";
@@ -60,6 +61,7 @@ export function useEntityListModel({
   const [nodeKindFilter, setNodeKindFilter] = useState<"all" | NetworkNode["kind"]>("all");
   const [segmentSubNetworkFilter, setSegmentSubNetworkFilter] = useState<SegmentSubNetworkFilter>("all");
   const [wireRouteFilter, setWireRouteFilter] = useState<"all" | "auto" | "locked">("all");
+  const [wireTwistGroupFilter, setWireTwistGroupFilter] = useState<WireTwistGroupFilter>("all");
   const [wireFilterField, setWireFilterField] = useState<WireFilterField>("any");
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
@@ -152,6 +154,17 @@ export function useEntityListModel({
       return left.technicalId.localeCompare(right.technicalId) * factor;
     });
   }, [wires, wireSort]);
+  const wireTwistGroupOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          wires
+            .map((wire) => wire.twistGroupLabel?.trim() ?? "")
+            .filter((label) => label.length > 0)
+        )
+      ).sort((left, right) => left.localeCompare(right, undefined, { numeric: true, sensitivity: "base" })),
+    [wires]
+  );
   const sortedConnectorSynthesisRows = useMemo(() => sortByNameAndTechnicalId(connectorSynthesisRows, connectorSynthesisSort, (row) => row.wireName, (row) => row.wireTechnicalId), [connectorSynthesisRows, connectorSynthesisSort]);
   const sortedSpliceSynthesisRows = useMemo(() => sortByNameAndTechnicalId(spliceSynthesisRows, spliceSynthesisSort, (row) => row.wireName, (row) => row.wireTechnicalId), [spliceSynthesisRows, spliceSynthesisSort]);
 
@@ -300,6 +313,9 @@ export function useEntityListModel({
     if (wireRouteFilter === "auto" && wire.isRouteLocked) {
       return false;
     }
+    if (wireTwistGroupFilter !== "all" && (wire.twistGroupLabel?.trim() ?? "") !== wireTwistGroupFilter) {
+      return false;
+    }
     if (normalizedWireFilterQuery.length > 0) {
       const endpointSearchText =
         `${describeWireEndpoint(wire.endpointA)} ${describeWireEndpoint(wire.endpointB)}`.toLocaleLowerCase();
@@ -323,7 +339,15 @@ export function useEntityListModel({
       return true;
     }
     return `${wire.name} ${wire.technicalId} ${wire.twistGroupLabel ?? ""} ${getWireColorSearchText(wire)}`.toLocaleLowerCase().includes(normalizedWireSearch);
-  }), [describeWireEndpoint, normalizedWireFilterQuery, normalizedWireSearch, sortedWires, wireFilterField, wireRouteFilter]);
+  }), [
+    describeWireEndpoint,
+    normalizedWireFilterQuery,
+    normalizedWireSearch,
+    sortedWires,
+    wireFilterField,
+    wireRouteFilter,
+    wireTwistGroupFilter
+  ]);
 
   const segmentsCountByNodeId = useMemo(() => {
     const result = new Map<NodeId, number>();
@@ -373,6 +397,9 @@ export function useEntityListModel({
     setSegmentSubNetworkFilter,
     wireRouteFilter,
     setWireRouteFilter,
+    wireTwistGroupFilter,
+    setWireTwistGroupFilter,
+    wireTwistGroupOptions,
     wireFilterField,
     setWireFilterField,
     wireEndpointFilterQuery,
