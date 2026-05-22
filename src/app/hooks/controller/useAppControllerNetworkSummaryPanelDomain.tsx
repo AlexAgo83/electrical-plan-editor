@@ -666,25 +666,27 @@ export function useAppControllerNetworkSummaryPanelDomain({
         </div>
       ) : null}
       {harnessAssemblyGraphTab === "assembly" ? assemblyFunctionalGraphPanel : currentNetworkFunctionalGraphPanel}
-      <HarnessAssemblyManagerPanel
-        assemblies={harnessAssemblies}
-        networks={allNetworks}
-        connectorsByNetworkId={connectorsByNetworkId}
-        selectedAssemblyId={displayedAssemblyId}
-        canExportAgentJson={displayedHarnessAssembly !== null}
-        onExportAgentJson={handleExportSelectedHarnessAgentJson}
-        onSelectedAssemblyIdChange={handleDisplayedAssemblyIdChange}
-        onUpsertAssembly={(assembly) => {
-          dispatchAction(appActions.upsertHarnessAssembly(assembly));
-          handleDisplayedAssemblyIdChange(assembly.id);
-        }}
-        onRemoveAssembly={(assemblyId) => {
-          dispatchAction(appActions.removeHarnessAssembly(assemblyId));
-          if (displayedAssemblyId === assemblyId) {
-            handleDisplayedAssemblyIdChange("");
-          }
-        }}
-      />
+      {harnessAssemblyGraphTab === "assembly" ? (
+        <HarnessAssemblyManagerPanel
+          assemblies={harnessAssemblies}
+          networks={allNetworks}
+          connectorsByNetworkId={connectorsByNetworkId}
+          selectedAssemblyId={displayedAssemblyId}
+          canExportAgentJson={displayedHarnessAssembly !== null}
+          onExportAgentJson={handleExportSelectedHarnessAgentJson}
+          onSelectedAssemblyIdChange={handleDisplayedAssemblyIdChange}
+          onUpsertAssembly={(assembly) => {
+            dispatchAction(appActions.upsertHarnessAssembly(assembly));
+            handleDisplayedAssemblyIdChange(assembly.id);
+          }}
+          onRemoveAssembly={(assemblyId) => {
+            dispatchAction(appActions.removeHarnessAssembly(assemblyId));
+            if (displayedAssemblyId === assemblyId) {
+              handleDisplayedAssemblyIdChange("");
+            }
+          }}
+        />
+      ) : null}
     </>
   );
 
