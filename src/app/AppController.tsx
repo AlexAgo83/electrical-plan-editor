@@ -953,6 +953,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       totalEdgeEntries,
       networkNodePositions,
       selectedWireRouteSegmentIds,
+      splicePlacementPreview: spliceHandlers.optimizedLengthSuggestion,
       routePreview,
       connectorMap,
       spliceMap,

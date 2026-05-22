@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import type { CatalogItemId, NodeId, SegmentId, Splice, SpliceId } from "../../core/entities";
+import type { CatalogItemId, NodeId, Segment, SegmentId, Splice, SpliceId } from "../../core/entities";
 import {
   DEFAULT_NEW_SPLICE_PORT_MODE,
   normalizeSplicePortMode,
@@ -30,6 +30,9 @@ export type PendingSpliceLengthSuggestion = SpliceLengthSuggestionPanelModel & {
   spliceId: SpliceId;
   spliceNodeId: NodeId;
   segmentLengths: Record<SegmentId, number>;
+  segments: Record<SegmentId, Segment>;
+  removedSegmentIds: SegmentId[];
+  spliceNodePosition: { x: number; y: number } | null;
 };
 
 interface UseSpliceHandlersParams {
@@ -93,6 +96,14 @@ function hasSpliceWireEndpointIndexAboveLimit(store: AppStore, spliceId: SpliceI
       (wire.endpointB.kind === "splicePort" && wire.endpointB.spliceId === spliceId && wire.endpointB.portIndex > maxPortCount)
     );
   });
+}
+
+function scrollNetworkPlanIntoView(): void {
+  if (typeof document === "undefined") {
+    return;
+  }
+  const planElement = document.querySelector(".network-summary-canvas-region");
+  planElement?.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 export function useSpliceHandlers({
@@ -529,11 +540,17 @@ export function useSpliceHandlers({
       spliceId: suggestion.spliceId,
       spliceNodeId: suggestion.spliceNodeId,
       segmentLengths: suggestion.segmentLengths,
+      segments: suggestion.segments,
+      removedSegmentIds: suggestion.removedSegmentIds,
+      spliceNodePosition: suggestion.spliceNodePosition,
       spliceSummary,
-      message: suggestion.warning ?? "Review the optimized segment lengths before applying them.",
+      message:
+        suggestion.warning ??
+        `Review the optimized splice placement on segment ${suggestion.targetSegmentId} before applying it.`,
       comparisonDetails,
       hasWarning: suggestion.warning !== null
     });
+    scrollNetworkPlanIntoView();
   }
 
   function applyOptimizedSpliceLengthSuggestion(): void {
@@ -545,7 +562,10 @@ export function useSpliceHandlers({
       appActions.applyOptimizedSplicePlacement(
         optimizedLengthSuggestion.spliceId,
         optimizedLengthSuggestion.spliceNodeId,
-        optimizedLengthSuggestion.segmentLengths
+        optimizedLengthSuggestion.segmentLengths,
+        optimizedLengthSuggestion.segments,
+        optimizedLengthSuggestion.removedSegmentIds,
+        optimizedLengthSuggestion.spliceNodePosition
       )
     );
     const nextError = store.getState().ui.lastError?.message ?? null;

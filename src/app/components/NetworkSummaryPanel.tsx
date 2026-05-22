@@ -119,6 +119,12 @@ export interface NetworkSummaryPanelProps {
   totalEdgeEntries: number;
   nodes: NetworkNode[];
   segments: Segment[];
+  splicePlacementPreview?: {
+    spliceNodeId: NodeId;
+    segments: Record<SegmentId, Segment>;
+    removedSegmentIds: SegmentId[];
+    spliceNodePosition: NodePosition | null;
+  } | null;
   wires: Wire[];
   isPanningNetwork: boolean;
   networkViewWidth: number;
@@ -220,6 +226,7 @@ export function NetworkSummaryPanel({
   totalEdgeEntries,
   nodes,
   segments,
+  splicePlacementPreview,
   wires,
   isPanningNetwork,
   networkViewWidth,
@@ -783,6 +790,68 @@ export function NetworkSummaryPanel({
     ]
   );
 
+  const splicePlacementPreviewSegments = useMemo(() => {
+    if (splicePlacementPreview === undefined || splicePlacementPreview === null) {
+      return [];
+    }
+
+    const changedSegmentIds = new Set<SegmentId>([
+      ...Object.keys(splicePlacementPreview.segments).map((segmentId) => segmentId as SegmentId),
+      ...splicePlacementPreview.removedSegmentIds
+    ]);
+    const previewNodePositions =
+      splicePlacementPreview.spliceNodePosition === null
+        ? networkNodePositions
+        : {
+            ...networkNodePositions,
+            [splicePlacementPreview.spliceNodeId]: splicePlacementPreview.spliceNodePosition
+          };
+
+    const buildPreviewLine = (
+      segment: Segment,
+      kind: "current" | "suggested",
+      nodePositions: Record<NodeId, NodePosition>
+    ) => {
+      const nodeAPosition = nodePositions[segment.nodeA];
+      const nodeBPosition = nodePositions[segment.nodeB];
+      if (nodeAPosition === undefined || nodeBPosition === undefined) {
+        return null;
+      }
+      return {
+        key: `${kind}:${segment.id}`,
+        segmentId: segment.id,
+        kind,
+        nodeAPosition,
+        nodeBPosition
+      };
+    };
+
+    const currentLines = segments
+      .filter((segment) => changedSegmentIds.has(segment.id))
+      .map((segment) => buildPreviewLine(segment, "current", networkNodePositions))
+      .filter((line): line is NonNullable<typeof line> => line !== null);
+    const suggestedLines = Object.values(splicePlacementPreview.segments)
+      .map((segment) => buildPreviewLine(segment, "suggested", previewNodePositions))
+      .filter((line): line is NonNullable<typeof line> => line !== null);
+
+    return [...currentLines, ...suggestedLines];
+  }, [networkNodePositions, segments, splicePlacementPreview]);
+
+  const splicePlacementPreviewNode = useMemo(() => {
+    if (
+      splicePlacementPreview === undefined ||
+      splicePlacementPreview === null ||
+      splicePlacementPreview.spliceNodePosition === null
+    ) {
+      return null;
+    }
+
+    return {
+      nodeId: splicePlacementPreview.spliceNodeId,
+      position: splicePlacementPreview.spliceNodePosition
+    };
+  }, [splicePlacementPreview]);
+
   const renderedNodes = useMemo(
     () =>
       buildRenderedNodes({
@@ -922,6 +991,8 @@ export function NetworkSummaryPanel({
                   />
                 }
                 renderedSegments={renderedSegments}
+                splicePlacementPreviewSegments={splicePlacementPreviewSegments}
+                splicePlacementPreviewNode={splicePlacementPreviewNode}
                 renderedNodes={renderedNodes}
                 showSegmentNames={showSegmentNames}
                 showSegmentLengths={showSegmentLengths}

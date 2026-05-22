@@ -93,6 +93,7 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     totalEdgeEntries: NetworkSummaryParams["totalEdgeEntries"];
     networkNodePositions: NetworkSummaryParams["networkNodePositions"];
     selectedWireRouteSegmentIds: NetworkSummaryParams["selectedWireRouteSegmentIds"];
+    splicePlacementPreview: NetworkSummaryParams["splicePlacementPreview"];
     routePreview: NetworkSummaryParams["routePreview"];
     connectorMap: NetworkSummaryParams["connectorMap"];
     spliceMap: NetworkSummaryParams["spliceMap"];
@@ -207,6 +208,7 @@ export function useAppControllerWorkspaceContentAssembly({
     totalEdgeEntries: entities.totalEdgeEntries,
     networkNodePositions: entities.networkNodePositions,
     selectedWireRouteSegmentIds: entities.selectedWireRouteSegmentIds,
+    splicePlacementPreview: entities.splicePlacementPreview,
     canvasState: {
       isPanningNetwork: models.canvasState.isPanningNetwork,
       showNetworkGrid: models.canvasState.showNetworkGrid,

@@ -14,6 +14,10 @@ export interface SplicePlacementSuggestion {
   spliceId: SpliceId;
   spliceNodeId: NodeId;
   segmentLengths: Record<SegmentId, number>;
+  segments: Record<SegmentId, Segment>;
+  removedSegmentIds: SegmentId[];
+  targetSegmentId: SegmentId;
+  spliceNodePosition: { x: number; y: number } | null;
   current: SplicePlacementMetrics;
   suggested: SplicePlacementMetrics;
   copperVolumeDeltaMm3: number;
@@ -113,26 +117,205 @@ function toSegment(segment: ConnectedSegment): Segment {
   };
 }
 
+function getMergedSubNetworkTag(leftSegment: ConnectedSegment, rightSegment: ConnectedSegment): string | undefined {
+  return leftSegment.subNetworkTag === rightSegment.subNetworkTag ? leftSegment.subNetworkTag : undefined;
+}
+
+function buildCandidateTopology(
+  state: AppState,
+  leftSegment: ConnectedSegment,
+  rightSegment: ConnectedSegment,
+  spliceNodeId: NodeId,
+  targetSegment: Segment,
+  leftLengthMm: number,
+  rightLengthMm: number
+): {
+  state: AppState;
+  segments: Record<SegmentId, Segment>;
+  removedSegmentIds: SegmentId[];
+} {
+  const mergedSegment: Segment = {
+    id: leftSegment.id,
+    nodeA: leftSegment.otherNodeId,
+    nodeB: rightSegment.otherNodeId,
+    lengthMm: leftSegment.lengthMm + rightSegment.lengthMm,
+    ...(getMergedSubNetworkTag(leftSegment, rightSegment) === undefined
+      ? {}
+      : { subNetworkTag: getMergedSubNetworkTag(leftSegment, rightSegment) })
+  };
+  const firstSplitSegment: Segment = {
+    id: targetSegment.id,
+    nodeA: targetSegment.nodeA,
+    nodeB: spliceNodeId,
+    lengthMm: leftLengthMm,
+    ...(targetSegment.subNetworkTag === undefined ? {} : { subNetworkTag: targetSegment.subNetworkTag })
+  };
+  const secondSplitSegment: Segment = {
+    id: rightSegment.id,
+    nodeA: spliceNodeId,
+    nodeB: targetSegment.nodeB,
+    lengthMm: rightLengthMm,
+    ...(targetSegment.subNetworkTag === undefined ? {} : { subNetworkTag: targetSegment.subNetworkTag })
+  };
+  const nextSegmentsById = { ...state.segments.byId };
+  delete nextSegmentsById[rightSegment.id];
+  nextSegmentsById[leftSegment.id] = mergedSegment;
+  nextSegmentsById[targetSegment.id] = firstSplitSegment;
+  nextSegmentsById[rightSegment.id] = secondSplitSegment;
+
+  return {
+    state: {
+      ...state,
+      segments: {
+        ...state.segments,
+        allIds: state.segments.allIds.includes(rightSegment.id)
+          ? state.segments.allIds
+          : [...state.segments.allIds, rightSegment.id].sort((left, right) => left.localeCompare(right)),
+        byId: nextSegmentsById
+      }
+    },
+    segments: {
+      [leftSegment.id]: nextSegmentsById[leftSegment.id] as Segment,
+      [targetSegment.id]: nextSegmentsById[targetSegment.id] as Segment,
+      [rightSegment.id]: nextSegmentsById[rightSegment.id] as Segment
+    },
+    removedSegmentIds: []
+  };
+}
+
+function buildRemovedSpliceSegments(
+  state: AppState,
+  leftSegment: ConnectedSegment,
+  rightSegment: ConnectedSegment
+): Segment[] {
+  const mergedSegment: Segment = {
+    id: leftSegment.id,
+    nodeA: leftSegment.otherNodeId,
+    nodeB: rightSegment.otherNodeId,
+    lengthMm: leftSegment.lengthMm + rightSegment.lengthMm,
+    ...(getMergedSubNetworkTag(leftSegment, rightSegment) === undefined
+      ? {}
+      : { subNetworkTag: getMergedSubNetworkTag(leftSegment, rightSegment) })
+  };
+
+  return state.segments.allIds
+    .map((segmentId) => state.segments.byId[segmentId])
+    .filter((segment): segment is Segment => segment !== undefined)
+    .filter((segment) => segment.id !== leftSegment.id && segment.id !== rightSegment.id)
+    .concat(mergedSegment)
+    .sort((left, right) => left.id.localeCompare(right.id));
+}
+
+function isOriginalMergedSegment(targetSegment: Segment, leftSegment: ConnectedSegment): boolean {
+  return targetSegment.id === leftSegment.id;
+}
+
 function buildCandidateState(
   state: AppState,
   leftSegment: ConnectedSegment,
   rightSegment: ConnectedSegment,
+  spliceNodeId: NodeId,
+  targetSegment: Segment,
   leftLengthMm: number,
   rightLengthMm: number
-): AppState {
-  const leftSegmentValue = toSegment(leftSegment);
-  const rightSegmentValue = toSegment(rightSegment);
+): {
+  state: AppState;
+  segments: Record<SegmentId, Segment>;
+  removedSegmentIds: SegmentId[];
+} {
+  if (isOriginalMergedSegment(targetSegment, leftSegment)) {
+    const leftSegmentValue: Segment = {
+      ...toSegment(leftSegment),
+      nodeA: targetSegment.nodeA,
+      nodeB: spliceNodeId,
+      lengthMm: leftLengthMm
+    };
+    const rightSegmentValue: Segment = {
+      ...toSegment(rightSegment),
+      nodeA: spliceNodeId,
+      nodeB: targetSegment.nodeB,
+      lengthMm: rightLengthMm
+    };
+    const nextSegmentsById = {
+      ...state.segments.byId,
+      [leftSegment.id]: leftSegmentValue,
+      [rightSegment.id]: rightSegmentValue
+    };
+
+    return {
+      state: {
+        ...state,
+        segments: {
+          ...state.segments,
+          byId: nextSegmentsById
+        }
+      },
+      segments: {
+        [leftSegment.id]: leftSegmentValue,
+        [rightSegment.id]: rightSegmentValue
+      } as Record<SegmentId, Segment>,
+      removedSegmentIds: []
+    };
+  }
+
+  return buildCandidateTopology(state, leftSegment, rightSegment, spliceNodeId, targetSegment, leftLengthMm, rightLengthMm);
+}
+
+function computeSpliceNodePosition(
+  state: AppState,
+  spliceNodeId: NodeId,
+  targetSegment: Segment,
+  leftLengthMm: number,
+  rightLengthMm: number
+): { x: number; y: number } | null {
+  const positionA = state.nodePositions[targetSegment.nodeA];
+  const positionB = state.nodePositions[targetSegment.nodeB];
+  if (positionA === undefined || positionB === undefined) {
+    return state.nodePositions[spliceNodeId] ?? null;
+  }
+
+  const totalLengthMm = leftLengthMm + rightLengthMm;
+  if (!Number.isFinite(totalLengthMm) || totalLengthMm <= 0) {
+    return null;
+  }
+
+  const ratioFromA = leftLengthMm / totalLengthMm;
   return {
-    ...state,
-    segments: {
-      ...state.segments,
-      byId: {
-        ...state.segments.byId,
-        [leftSegment.id]: { ...leftSegmentValue, lengthMm: leftLengthMm },
-        [rightSegment.id]: { ...rightSegmentValue, lengthMm: rightLengthMm }
-      }
-    }
+    x: positionA.x + (positionB.x - positionA.x) * ratioFromA,
+    y: positionA.y + (positionB.y - positionA.y) * ratioFromA
   };
+}
+
+function getSegmentLengths(segments: Record<SegmentId, Segment>): Record<SegmentId, number> {
+  const lengths: Record<SegmentId, number> = {} as Record<SegmentId, number>;
+  for (const [segmentId, segment] of Object.entries(segments)) {
+    lengths[segmentId as SegmentId] = segment.lengthMm;
+  }
+
+  return lengths;
+}
+
+function calculatePositionSteps(totalLengthMm: number): number[] {
+  const steps = new Set<number>();
+  const lastPositionMm = Math.max(1, Math.round(totalLengthMm) - 1);
+  const sampleCount = Math.min(lastPositionMm, 500);
+  for (let step = 1; step <= sampleCount; step += 1) {
+    steps.add(Math.max(1, Math.round((lastPositionMm * step) / sampleCount)));
+  }
+  return [...steps].sort((left, right) => left - right);
+}
+
+function getCandidateTargetSegments(
+  state: AppState,
+  leftSegment: ConnectedSegment,
+  rightSegment: ConnectedSegment
+): Segment[] {
+  return buildRemovedSpliceSegments(state, leftSegment, rightSegment).filter((segment) => {
+    if (segment.nodeA === segment.nodeB) {
+      return false;
+    }
+    return Number.isFinite(segment.lengthMm) && segment.lengthMm >= 2;
+  });
 }
 
 function recomputeConnectedWiresForCandidate(
@@ -230,48 +413,58 @@ export function findSplicePlacementSuggestion(
   const current = computeMetrics(currentRecomputed, spliceId);
 
   const totalAdjacentLengthMm = leftSegment.lengthMm + rightSegment.lengthMm;
-  if (!Number.isFinite(totalAdjacentLengthMm) || totalAdjacentLengthMm < 20) {
-    return { reason: "Adjacent splice segment lengths are too short to optimize safely." };
+  if (!Number.isFinite(totalAdjacentLengthMm) || totalAdjacentLengthMm < 2) {
+    return { reason: "Adjacent splice segment lengths are too short to remove and reinsert safely." };
   }
 
   let best:
     | {
-        leftLengthMm: number;
-        rightLengthMm: number;
+        targetSegmentId: SegmentId;
+        segments: Record<SegmentId, Segment>;
+        removedSegmentIds: SegmentId[];
+        spliceNodePosition: { x: number; y: number } | null;
         metrics: SplicePlacementMetrics;
         score: number;
       }
     | null = null;
 
-  for (let step = 1; step <= 9; step += 1) {
-    const ratioFromLeft = step / 10;
-    const leftLengthMm = Math.max(1, Math.round(totalAdjacentLengthMm * ratioFromLeft));
-    const rightLengthMm = Math.max(1, totalAdjacentLengthMm - leftLengthMm);
-    if (leftLengthMm === leftSegment.lengthMm && rightLengthMm === rightSegment.lengthMm) {
-      continue;
-    }
+  for (const targetSegment of getCandidateTargetSegments(state, leftSegment, rightSegment)) {
+    for (const leftLengthMm of calculatePositionSteps(targetSegment.lengthMm)) {
+      const rightLengthMm = Math.max(1, targetSegment.lengthMm - leftLengthMm);
+      if (
+        isOriginalMergedSegment(targetSegment, leftSegment) &&
+        leftLengthMm === leftSegment.lengthMm &&
+        rightLengthMm === rightSegment.lengthMm
+      ) {
+        continue;
+      }
 
-    const candidateState = buildCandidateState(
-      state,
-      leftSegment,
-      rightSegment,
-      leftLengthMm,
-      rightLengthMm
-    );
-    const candidateWires = recomputeConnectedWiresForCandidate(candidateState, spliceId, connectedWires);
-    if (candidateWires === null) {
-      continue;
-    }
-
-    const metrics = computeMetrics(candidateWires, spliceId);
-    const score = scoreCandidate(metrics, balanceLimitPercent);
-    if (best === null || score < best.score) {
-      best = {
+      const candidate = buildCandidateState(
+        state,
+        leftSegment,
+        rightSegment,
+        spliceNodeId,
+        targetSegment,
         leftLengthMm,
-        rightLengthMm,
-        metrics,
-        score
-      };
+        rightLengthMm
+      );
+      const candidateWires = recomputeConnectedWiresForCandidate(candidate.state, spliceId, connectedWires);
+      if (candidateWires === null) {
+        continue;
+      }
+
+      const metrics = computeMetrics(candidateWires, spliceId);
+      const score = scoreCandidate(metrics, balanceLimitPercent);
+      if (best === null || score < best.score) {
+        best = {
+          targetSegmentId: targetSegment.id,
+          segments: candidate.segments,
+          removedSegmentIds: candidate.removedSegmentIds,
+          spliceNodePosition: computeSpliceNodePosition(state, spliceNodeId, targetSegment, leftLengthMm, rightLengthMm),
+          metrics,
+          score
+        };
+      }
     }
   }
 
@@ -295,10 +488,11 @@ export function findSplicePlacementSuggestion(
     suggestion: {
       spliceId,
       spliceNodeId,
-      segmentLengths: {
-        [leftSegment.id]: best.leftLengthMm,
-        [rightSegment.id]: best.rightLengthMm
-      } as Record<SegmentId, number>,
+      segmentLengths: getSegmentLengths(best.segments),
+      segments: best.segments,
+      removedSegmentIds: best.removedSegmentIds,
+      targetSegmentId: best.targetSegmentId,
+      spliceNodePosition: best.spliceNodePosition,
       current,
       suggested: best.metrics,
       copperVolumeDeltaMm3,

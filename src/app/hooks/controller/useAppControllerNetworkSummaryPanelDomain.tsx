@@ -81,6 +81,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   totalEdgeEntries: number;
   networkNodePositions: Record<NodeId, NodePosition>;
   selectedWireRouteSegmentIds: Set<SegmentId>;
+  splicePlacementPreview: NetworkSummaryPanelSliceParams["splicePlacementPreview"];
   canvasState: Pick<
     CanvasStateModel,
     | "isPanningNetwork"
@@ -188,6 +189,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   totalEdgeEntries,
   networkNodePositions,
   selectedWireRouteSegmentIds,
+  splicePlacementPreview,
   canvasState,
   canvasDisplayState,
   preferencesState,
@@ -352,6 +354,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         stopNetworkNodeDrag,
         networkNodePositions,
         selectedWireRouteSegmentIds,
+        splicePlacementPreview,
         selectedSegmentId: selection.selectedSegmentId,
         selectedWireId: selection.selectedWireId,
         handleNetworkSegmentClick,

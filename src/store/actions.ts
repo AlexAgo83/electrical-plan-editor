@@ -103,6 +103,9 @@ export type AppAction =
         id: SpliceId;
         nodeId: NodeId;
         segmentLengths: Record<SegmentId, number>;
+        segments?: Record<SegmentId, Segment>;
+        removedSegmentIds?: SegmentId[];
+        nodePosition?: { x: number; y: number } | null;
       };
     }
   | { type: "splice/remove"; payload: { id: SpliceId } }
@@ -252,10 +255,13 @@ export const appActions = {
   applyOptimizedSplicePlacement: (
     id: SpliceId,
     nodeId: NodeId,
-    segmentLengths: Record<SegmentId, number>
+    segmentLengths: Record<SegmentId, number>,
+    segments?: Record<SegmentId, Segment>,
+    removedSegmentIds?: SegmentId[],
+    nodePosition?: { x: number; y: number } | null
   ): AppAction => ({
     type: "splice/applyOptimizedPlacement",
-    payload: { id, nodeId, segmentLengths }
+    payload: { id, nodeId, segmentLengths, segments, removedSegmentIds, nodePosition }
   }),
   removeSplice: (id: SpliceId): AppAction => ({ type: "splice/remove", payload: { id } }),
   removeSpliceCascade: (id: SpliceId): AppAction => ({ type: "splice/removeCascade", payload: { id } }),

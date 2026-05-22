@@ -9,6 +9,19 @@ import type { NetworkNode, NodeId, SegmentId } from "../../../../core/entities";
 import type { NodePosition } from "../../../types/app-controller";
 import type { RenderedNodeModel, RenderedSegmentModel } from "./networkSummaryGraphModel";
 
+export interface SplicePlacementPreviewSegmentModel {
+  key: string;
+  segmentId: SegmentId;
+  kind: "current" | "suggested";
+  nodeAPosition: NodePosition;
+  nodeBPosition: NodePosition;
+}
+
+export interface SplicePlacementPreviewNodeModel {
+  nodeId: NodeId;
+  position: NodePosition;
+}
+
 interface NetworkSummaryGraphLayersProps {
   networkOffset: NodePosition;
   networkScale: number;
@@ -21,6 +34,8 @@ interface NetworkSummaryGraphLayersProps {
   visibleModelMaxY: number;
   afterGridLayer?: ReactNode;
   renderedSegments: RenderedSegmentModel[];
+  splicePlacementPreviewSegments?: SplicePlacementPreviewSegmentModel[];
+  splicePlacementPreviewNode?: SplicePlacementPreviewNodeModel | null;
   renderedNodes: RenderedNodeModel[];
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
@@ -76,6 +91,8 @@ export function NetworkSummaryGraphLayers({
   visibleModelMaxY,
   afterGridLayer,
   renderedSegments,
+  splicePlacementPreviewSegments = [],
+  splicePlacementPreviewNode = null,
   renderedNodes,
   showSegmentNames,
   showSegmentLengths,
@@ -103,6 +120,41 @@ export function NetworkSummaryGraphLayers({
         </g>
       ) : null}
       {afterGridLayer}
+
+      {splicePlacementPreviewSegments.length > 0 || splicePlacementPreviewNode !== null ? (
+        <g
+          className="network-graph-layer network-splice-placement-preview-layer"
+          transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
+          aria-hidden="true"
+        >
+          {splicePlacementPreviewSegments.map((segment) => (
+            <line
+              key={segment.key}
+              className={
+                segment.kind === "current"
+                  ? "network-splice-placement-preview-segment is-current"
+                  : "network-splice-placement-preview-segment is-suggested"
+              }
+              x1={segment.nodeAPosition.x}
+              y1={segment.nodeAPosition.y}
+              x2={segment.nodeBPosition.x}
+              y2={segment.nodeBPosition.y}
+            />
+          ))}
+          {splicePlacementPreviewNode === null ? null : (
+            <rect
+              className="network-splice-placement-preview-node"
+              x={splicePlacementPreviewNode.position.x - 15}
+              y={splicePlacementPreviewNode.position.y - 15}
+              width={30}
+              height={30}
+              rx={5}
+              ry={5}
+              transform={`rotate(45 ${splicePlacementPreviewNode.position.x} ${splicePlacementPreviewNode.position.y})`}
+            />
+          )}
+        </g>
+      ) : null}
 
       <g className="network-graph-layer network-graph-layer-segments" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
         {renderedSegments.map(({ segment, nodeAPosition, nodeBPosition, segmentClassName, segmentGroupClassName }) => (

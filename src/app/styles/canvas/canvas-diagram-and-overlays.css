@@ -678,6 +678,29 @@
   stroke-width: var(--network-segment-stroke-width, 3);
   stroke-linecap: round;
 }
+.network-splice-placement-preview-layer {
+  pointer-events: none;
+}
+.network-splice-placement-preview-segment {
+  fill: none;
+  stroke-width: var(--network-segment-stroke-emphasis-width, 5);
+  stroke-linecap: round;
+  stroke-dasharray: 8 6;
+}
+.network-splice-placement-preview-segment.is-current {
+  stroke: #d97706;
+  opacity: 0.32;
+}
+.network-splice-placement-preview-segment.is-suggested {
+  stroke: #0891b2;
+  opacity: 0.72;
+}
+.network-splice-placement-preview-node {
+  fill: rgba(8, 145, 178, 0.22);
+  stroke: #0891b2;
+  stroke-width: var(--network-node-stroke-emphasis-width, 3);
+  stroke-dasharray: 5 4;
+}
 .network-segment.is-wire-highlighted {
   stroke: var(--network-wire-highlight-color, #4f8d2d);
   stroke-width: var(--network-segment-stroke-emphasis-width, 5);
@@ -699,6 +722,8 @@
 .network-svg.network-svg--stroke-invariant .network-segment,
 .network-svg.network-svg--stroke-invariant .network-segment.is-wire-highlighted,
 .network-svg.network-svg--stroke-invariant .network-segment.is-selected,
+.network-svg.network-svg--stroke-invariant .network-splice-placement-preview-segment,
+.network-svg.network-svg--stroke-invariant .network-splice-placement-preview-node,
 .network-svg.network-svg--stroke-invariant .network-segment-hitbox {
   vector-effect: non-scaling-stroke;
 }
