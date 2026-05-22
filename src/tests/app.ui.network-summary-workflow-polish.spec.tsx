@@ -1,6 +1,6 @@
 import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { HarnessAssemblyId, NetworkId } from "../core/entities";
+import type { HarnessAssemblyId, InterHarnessConnectorLinkId, NetworkId } from "../core/entities";
 import { appActions, appReducer } from "../store";
 import {
   asConnectorId,
@@ -23,6 +23,10 @@ function asNetworkId(value: string): NetworkId {
 
 function asAssemblyId(value: string): HarnessAssemblyId {
   return value as HarnessAssemblyId;
+}
+
+function asInterHarnessConnectorLinkId(value: string): InterHarnessConnectorLinkId {
+  return value as InterHarnessConnectorLinkId;
 }
 
 function getCurrentNetworkFunctionalPanel(networkName: string): HTMLElement {
@@ -101,16 +105,37 @@ function createHarnessAssemblyFunctionalSelectionState() {
       updatedAt: "2026-05-15T08:00:00.000Z"
     })
   );
-  const withMainActive = appReducer(withSecondNetwork, appActions.selectNetwork(mainNetworkId));
+  const withSecondConnector = appReducer(
+    withSecondNetwork,
+    appActions.upsertConnector({
+      id: asConnectorId("C-B1"),
+      name: "Harness B connector",
+      technicalId: "B-C-1",
+      cavityCount: 2
+    })
+  );
+  const withMainActive = appReducer(withSecondConnector, appActions.selectNetwork(mainNetworkId));
   return appReducer(
     withMainActive,
     appActions.upsertHarnessAssembly({
       id: asAssemblyId("asm-main"),
       name: "Main assembly",
       technicalId: "ASM-MAIN",
-      members: [{ networkId: mainNetworkId, color: "#2563eb" }],
+      members: [
+        { networkId: mainNetworkId, color: "#2563eb" },
+        { networkId: asNetworkId("net-b"), color: "#16a34a" }
+      ],
       masterConnectorRefs: [{ networkId: mainNetworkId, connectorId: asConnectorId("C1") }],
-      connectorLinks: [],
+      connectorLinks: [
+        {
+          id: asInterHarnessConnectorLinkId("link-main-b"),
+          name: "Main to B",
+          sourceNetworkId: mainNetworkId,
+          sourceConnectorId: asConnectorId("C1"),
+          targetNetworkId: asNetworkId("net-b"),
+          targetConnectorId: asConnectorId("C-B1")
+        }
+      ],
       createdAt: "2026-05-15T08:05:00.000Z",
       updatedAt: "2026-05-15T08:05:00.000Z"
     })
@@ -409,6 +434,19 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(screen.queryByRole("dialog", { name: "Select harness assembly" })).not.toBeInTheDocument();
     const manager = screen.getByRole("region", { name: "Harness assembly manager" });
     expect(manager).toBeInTheDocument();
+    const masterConnectorsPanel = screen.getByRole("region", { name: "Master connector roots" });
+    const interconnectorLinksPanel = screen.getByRole("region", { name: "Inter-harness connector links" });
+    expect(within(manager).getByRole("button", { name: "Save assembly" })).toBeInTheDocument();
+    expect(within(masterConnectorsPanel).getByRole("button", { name: "Save assembly" })).toBeInTheDocument();
+    expect(within(interconnectorLinksPanel).getByRole("button", { name: "Save assembly" })).toBeInTheDocument();
+    const interconnectorNameInput = within(interconnectorLinksPanel).getByRole("textbox", { name: "Interconnector link name" });
+    fireEvent.change(interconnectorNameInput, { target: { value: "Draft link rename" } });
+    expect(firstRender.store.getState().harnessAssemblies.byId[asAssemblyId("asm-main")]?.connectorLinks[0]?.name).toBe("Main to B");
+    expect(interconnectorLinksPanel).toHaveTextContent("Unsaved assembly edits are not reflected in the visualization yet.");
+    fireEvent.click(within(interconnectorLinksPanel).getByRole("button", { name: "Save assembly" }));
+    expect(firstRender.store.getState().harnessAssemblies.byId[asAssemblyId("asm-main")]?.connectorLinks[0]?.name).toBe(
+      "Draft link rename"
+    );
 
     const assemblyPanel = getPanelByHeading("Harness assembly functional schematic");
     expect(assemblyPanel).toHaveTextContent("Harness assembly functional schematicMain assembly");
