@@ -116,6 +116,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.28rem;
+  min-height: 1.85rem;
   border: 1px solid #7a99b3;
   background: #e8f1f8;
   color: #153048;
