@@ -2,10 +2,12 @@ import type { ReactElement } from "react";
 import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 import { ChoiceDialog } from "../dialogs/ChoiceDialog";
 import { DeleteImpactDialog } from "../dialogs/DeleteImpactDialog";
+import { BomExportPreviewDialog } from "../dialogs/BomExportPreviewDialog";
 import { OnboardingModal } from "../onboarding/OnboardingModal";
 import type { ActiveConfirmDialogState } from "../../hooks/controller/useConfirmDialogController";
 import type { ActiveChoiceDialogState } from "../../hooks/controller/useChoiceDialogController";
 import type { OnboardingControllerModel } from "../../hooks/controller/useOnboardingController";
+import type { ActiveBomPreviewState } from "../../hooks/controller/useAppControllerBomExportHandlers";
 
 interface AppControllerOverlaysProps {
   appShellClassName: string;
@@ -13,6 +15,9 @@ interface AppControllerOverlaysProps {
   closeActiveConfirmDialog: (confirmed: boolean) => void;
   activeChoiceDialog: ActiveChoiceDialogState | null;
   closeActiveChoiceDialog: (choiceId: string | null) => void;
+  activeBomPreview: ActiveBomPreviewState | null;
+  closeActiveBomPreview: () => void;
+  confirmActiveBomPreviewDownload: () => void;
   onboarding: Pick<
     OnboardingControllerModel,
     | "activeOnboardingStep"
@@ -35,9 +40,17 @@ export function AppControllerOverlays({
   closeActiveConfirmDialog,
   activeChoiceDialog,
   closeActiveChoiceDialog,
+  activeBomPreview,
+  closeActiveBomPreview,
+  confirmActiveBomPreviewDownload,
   onboarding
 }: AppControllerOverlaysProps): ReactElement | null {
-  if (activeConfirmDialog === null && activeChoiceDialog === null && onboarding.activeOnboardingStep === undefined) {
+  if (
+    activeConfirmDialog === null &&
+    activeChoiceDialog === null &&
+    activeBomPreview === null &&
+    onboarding.activeOnboardingStep === undefined
+  ) {
     return null;
   }
 
@@ -90,6 +103,15 @@ export function AppControllerOverlays({
             onCancel={() => closeActiveConfirmDialog(false)}
           />
         )
+      ) : null}
+      {activeBomPreview !== null ? (
+        <BomExportPreviewDialog
+          isOpen={activeBomPreview !== null}
+          themeHostClassName={appShellClassName}
+          preview={activeBomPreview}
+          onConfirm={confirmActiveBomPreviewDownload}
+          onCancel={closeActiveBomPreview}
+        />
       ) : null}
       {onboarding.activeOnboardingStep !== undefined ? (
         <OnboardingModal

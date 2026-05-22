@@ -1,4 +1,4 @@
-import { fireEvent, waitFor, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { appActions, appReducer } from "../store";
 import {
@@ -93,6 +93,14 @@ describe("App integration UI - network summary BOM export", () => {
       expect(exportBomButton.querySelector(".table-export-icon")).not.toBeNull();
 
       fireEvent.click(exportBomButton);
+      expect(createObjectUrl).not.toHaveBeenCalled();
+      expect(clickSpy).not.toHaveBeenCalled();
+
+      const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+      expect(within(previewDialog).getByText("1 BOM item rows")).toBeInTheDocument();
+      expect(within(previewDialog).getByText("CSV")).toBeInTheDocument();
+      expect(within(previewDialog).getByText("CAT-BOM")).toBeInTheDocument();
+      fireEvent.click(within(previewDialog).getByRole("button", { name: "Download CSV" }));
       expect(createObjectUrl).toHaveBeenCalledTimes(1);
       expect(clickSpy).toHaveBeenCalledTimes(1);
     } finally {
@@ -121,6 +129,106 @@ describe("App integration UI - network summary BOM export", () => {
     expect(within(networkSummaryPanel).queryByText(/BOM CSV pricing:/i)).toBeNull();
     openExportMenu(networkSummaryPanel);
     expect(within(networkSummaryPanel).getByRole("button", { name: "BOM" })).toBeInTheDocument();
+  });
+
+  it("cancels BOM preview without downloading", () => {
+    const catalogItemId = asCatalogItemId("CAT-BOM-CANCEL");
+    const withCatalog = appReducer(
+      appReducer(
+        createUiIntegrationState(),
+        appActions.upsertCatalogItem({
+          id: catalogItemId,
+          manufacturerReference: "CAT-BOM-CANCEL",
+          name: "Catalog BOM cancel item",
+          connectionCount: 2,
+          unitPriceExclTax: 5
+        })
+      ),
+      appActions.upsertConnector({
+        id: asConnectorId("C-BOM-CANCEL"),
+        name: "Connector cancel",
+        technicalId: "C-BOM-CANCEL",
+        cavityCount: 2,
+        catalogItemId
+      })
+    );
+    const originalCreateObjectUrl = Object.getOwnPropertyDescriptor(URL, "createObjectURL");
+    const originalRevokeObjectUrl = Object.getOwnPropertyDescriptor(URL, "revokeObjectURL");
+    const createObjectUrl = vi.fn(() => "blob:bom-cancel");
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, writable: true, value: createObjectUrl });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, writable: true, value: vi.fn() });
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+
+    try {
+      renderAppWithState(withCatalog);
+      switchScreenDrawerAware("modeling");
+
+      const networkSummaryPanel = getPanelByHeading("Network summary");
+      openExportMenu(networkSummaryPanel);
+      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
+
+      const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+      fireEvent.click(within(previewDialog).getByRole("button", { name: "Cancel" }));
+
+      expect(screen.queryByRole("dialog", { name: "BOM preview" })).toBeNull();
+      expect(createObjectUrl).not.toHaveBeenCalled();
+      expect(clickSpy).not.toHaveBeenCalled();
+    } finally {
+      clickSpy.mockRestore();
+      if (originalCreateObjectUrl !== undefined) {
+        Object.defineProperty(URL, "createObjectURL", originalCreateObjectUrl);
+      }
+      if (originalRevokeObjectUrl !== undefined) {
+        Object.defineProperty(URL, "revokeObjectURL", originalRevokeObjectUrl);
+      }
+    }
+  });
+
+  it("shows XLSX workbook sheets as BOM preview tabs", () => {
+    const catalogItemId = asCatalogItemId("CAT-BOM-XLSX");
+    const withCatalog = appReducer(
+      appReducer(
+        createUiIntegrationState(),
+        appActions.upsertCatalogItem({
+          id: catalogItemId,
+          manufacturerReference: "CAT-BOM-XLSX",
+          name: "Catalog BOM XLSX item",
+          connectionCount: 2,
+          unitPriceExclTax: 5
+        })
+      ),
+      appActions.upsertConnector({
+        id: asConnectorId("C-BOM-XLSX"),
+        name: "Connector XLSX",
+        technicalId: "C-BOM-XLSX",
+        cavityCount: 2,
+        catalogItemId
+      })
+    );
+
+    renderAppWithState(withCatalog);
+
+    switchScreenDrawerAware("settings");
+    const pricingSettingsPanel = getPanelByHeading("Catalog & BOM setup");
+    fireEvent.change(within(pricingSettingsPanel).getByLabelText("Tabular export format"), {
+      target: { value: "xlsx" }
+    });
+
+    switchScreenDrawerAware("modeling");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    openExportMenu(networkSummaryPanel);
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
+
+    const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+    expect(within(previewDialog).getByText("XLSX")).toBeInTheDocument();
+    expect(within(previewDialog).getByText("2 sheets")).toBeInTheDocument();
+    expect(within(previewDialog).getByRole("tab", { name: /Network BOM/ })).toHaveAttribute("aria-selected", "true");
+    const byConnectorTab = within(previewDialog).getByRole("tab", { name: /By connector/ });
+    fireEvent.click(byConnectorTab);
+
+    expect(byConnectorTab).toHaveAttribute("aria-selected", "true");
+    expect(within(previewDialog).getByText("Connector ID")).toBeInTheDocument();
+    expect(within(previewDialog).getByText("C-BOM-XLSX")).toBeInTheDocument();
   });
 
   it("exports BOM CSV with a UTF-8 BOM and inline wire termination rows even without catalog-backed rows", () => {
@@ -174,6 +282,9 @@ describe("App integration UI - network summary BOM export", () => {
       const networkSummaryPanel = getPanelByHeading("Network summary");
       openExportMenu(networkSummaryPanel);
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
+      const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+      expect(within(previewDialog).getAllByText("Wire termination").length).toBeGreaterThan(0);
+      fireEvent.click(within(previewDialog).getByRole("button", { name: "Download CSV" }));
 
       if (typeof capturedPayload !== "string") {
         throw new Error("Expected captured BOM CSV payload.");

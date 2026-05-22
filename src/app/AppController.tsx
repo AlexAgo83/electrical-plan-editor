@@ -139,7 +139,13 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const { canvasDefaultLabelRotationDegrees, canvasDefaultAutoSegmentLabelRotation, canvasResizeBehaviorMode } = preferencesState;
   const { showShortcutHints, keyboardShortcutsEnabled, restoreViewportOnUndo, showFloatingInspectorPanel } = preferencesState;
   const { workspacePanelsLayoutMode, workspaceWideScreen, preferencesHydrated } = preferencesState;
-  const { canExportBomCsv, handleExportBomCsv } = useAppControllerBomExportHandlers({
+  const {
+    activeBomPreview,
+    canExportBomCsv,
+    closeActiveBomPreview,
+    confirmActiveBomPreviewDownload,
+    handleExportBomCsv
+  } = useAppControllerBomExportHandlers({
     catalogItems,
     connectors,
     splices,
@@ -1044,6 +1050,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       closeActiveConfirmDialog={closeActiveConfirmDialog}
       activeChoiceDialog={activeChoiceDialog}
       closeActiveChoiceDialog={closeActiveChoiceDialog}
+      activeBomPreview={activeBomPreview}
+      closeActiveBomPreview={closeActiveBomPreview}
+      confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload}
       onboarding={{
         activeOnboardingStep,
         isOnboardingOpen,
