@@ -104,7 +104,7 @@ describe("App integration UI - onboarding", () => {
     expect(screen.queryByRole("dialog", { name: "Configure your workspace defaults" })).toBeNull();
   });
 
-  it("opens harness assembly contextual onboarding help from the functional export actions", () => {
+  it("opens harness assembly contextual onboarding help from the harness assembly panel", () => {
     localStorage.setItem("electrical-plan-editor.displayed-harness-assembly-id", "assembly-sample-vehicle-platform");
     renderAppWithState(createSampleNetworkState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
@@ -114,11 +114,11 @@ describe("App integration UI - onboarding", () => {
     const actions = within(harnessFunctionalPanel).getByRole("group", { name: "Functional schematic actions" });
     expect(within(actions).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
       "Grid",
-      "Export SVG",
-      "Help"
+      "Export SVG"
     ]);
 
-    fireEvent.click(within(actions).getByRole("button", { name: "Help" }));
+    const harnessAssemblyPanel = screen.getByRole("region", { name: "Harness assembly manager" });
+    fireEvent.click(within(harnessAssemblyPanel).getByRole("button", { name: "Help" }));
 
     const dialog = screen.getByRole("dialog", { name: "Build harness assemblies" });
     expect(within(dialog).getByText("Context help")).toBeInTheDocument();

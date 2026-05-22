@@ -213,6 +213,7 @@ interface UseAppControllerCanvasInteractionHandlersAssemblyParams {
     | "nodesCount"
     | "interactionMode"
     | "isModelingScreen"
+    | "isModelingAnalysisFocused"
     | "activeSubScreen"
     | "setActiveScreen"
     | "setActiveSubScreen"

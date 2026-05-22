@@ -161,7 +161,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   canExportBomCsv: boolean;
   onExportBomCsv: () => void;
   handleRegenerateLayout: () => void;
-  markDetailPanelsSelectionSourceAsExternal: () => void;
+  markDetailPanelsSelectionSourceAsTable: () => void;
   onOpenHarnessAssemblyOnboardingHelp: () => void;
   dispatchAction: (action: AppAction, options?: { trackHistory?: boolean }) => void;
   store: AppStore;
@@ -216,7 +216,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   canExportBomCsv,
   onExportBomCsv,
   handleRegenerateLayout,
-  markDetailPanelsSelectionSourceAsExternal,
+  markDetailPanelsSelectionSourceAsTable,
   onOpenHarnessAssemblyOnboardingHelp,
   dispatchAction,
   store
@@ -236,22 +236,22 @@ export function useAppControllerNetworkSummaryPanelDomain({
     (connectorId: ConnectorId) => {
       unstable_batchedUpdates(() => {
         setActiveSubScreen("connector");
-        markDetailPanelsSelectionSourceAsExternal();
+        markDetailPanelsSelectionSourceAsTable();
         dispatchAction(appActions.select({ kind: "connector", id: connectorId }), { trackHistory: false });
       });
     },
-    [dispatchAction, markDetailPanelsSelectionSourceAsExternal, setActiveSubScreen]
+    [dispatchAction, markDetailPanelsSelectionSourceAsTable, setActiveSubScreen]
   );
 
   const handleSelectSpliceFromCallout = useCallback(
     (spliceId: SpliceId) => {
       unstable_batchedUpdates(() => {
         setActiveSubScreen("splice");
-        markDetailPanelsSelectionSourceAsExternal();
+        markDetailPanelsSelectionSourceAsTable();
         dispatchAction(appActions.select({ kind: "splice", id: spliceId }), { trackHistory: false });
       });
     },
-    [dispatchAction, markDetailPanelsSelectionSourceAsExternal, setActiveSubScreen]
+    [dispatchAction, markDetailPanelsSelectionSourceAsTable, setActiveSubScreen]
   );
 
   const persistConnectorCalloutPosition = useCallback(
@@ -555,7 +555,6 @@ export function useAppControllerNetworkSummaryPanelDomain({
         exportCartoucheName={`${displayedHarnessAssembly.name} functional schematic`}
         exportCartoucheProjectCode={displayedHarnessAssembly.technicalId}
         exportCartoucheCreatedAt={displayedHarnessAssembly.createdAt}
-        onOpenOnboardingHelp={onOpenHarnessAssemblyOnboardingHelp}
         onboardingPanelKey="harness-assembly-functional"
       />
     );
@@ -578,7 +577,6 @@ export function useAppControllerNetworkSummaryPanelDomain({
       exportIncludeFrame={preferencesState.canvasExportIncludeFrame}
       exportIncludeCartouche={preferencesState.canvasExportIncludeCartouche}
       onOpenActiveNetworkInModeling={handleOpenActiveNetworkInModeling}
-      onOpenOnboardingHelp={onOpenHarnessAssemblyOnboardingHelp}
       onboardingPanelKey="harness-assembly-current-network-functional"
     />
   ) : (
@@ -680,6 +678,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
           selectedAssemblyId={displayedAssemblyId}
           canExportAgentJson={displayedHarnessAssembly !== null}
           onExportAgentJson={handleExportSelectedHarnessAgentJson}
+          onOpenOnboardingHelp={onOpenHarnessAssemblyOnboardingHelp}
           onSelectedAssemblyIdChange={handleDisplayedAssemblyIdChange}
           onUpsertAssembly={(assembly) => {
             dispatchAction(appActions.upsertHarnessAssembly(assembly));

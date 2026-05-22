@@ -87,7 +87,6 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "No wire matches the current filters.": "Aucun fil ne correspond aux filtres courants.",
   "Quick start": "Démarrage rapide",
   "Workspace": "Espace de travail",
-  "Workspace summary": "Résumé de l'espace de travail",
   "Entity navigation": "Navigation entités",
   "Home workspace": "Espace Accueil",
   "What's new": "Nouveautés",

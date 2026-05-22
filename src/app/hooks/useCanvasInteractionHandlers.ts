@@ -28,6 +28,7 @@ interface UseCanvasInteractionHandlersParams {
   nodesCount: number;
   interactionMode: InteractionMode;
   isModelingScreen: boolean;
+  isModelingAnalysisFocused: boolean;
   activeSubScreen: SubScreenId;
   setActiveScreen: (screen: "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings") => void;
   setActiveSubScreen: (screen: SubScreenId) => void;
@@ -79,6 +80,7 @@ export function useCanvasInteractionHandlers({
   nodesCount,
   interactionMode,
   isModelingScreen,
+  isModelingAnalysisFocused,
   activeSubScreen,
   setActiveScreen,
   setActiveSubScreen,
@@ -167,15 +169,15 @@ export function useCanvasInteractionHandlers({
 
     unstable_batchedUpdates(() => {
       clearSelectedCanvasNodes();
-      setActiveSubScreen("segment");
 
-      if (isModelingScreen && activeSubScreen === "segment") {
+      if (isModelingScreen && !isModelingAnalysisFocused && activeSubScreen === "segment") {
         onExternalSelectionInteraction?.();
         startSegmentEdit(segment);
         return;
       }
 
       onExternalSelectionInteraction?.();
+      setActiveSubScreen("segment");
       dispatchAction(appActions.select({ kind: "segment", id: segmentId }));
     });
   }
@@ -193,7 +195,7 @@ export function useCanvasInteractionHandlers({
     unstable_batchedUpdates(() => {
       clearSelectedCanvasNodes();
 
-      if (isModelingScreen) {
+      if (isModelingScreen && !isModelingAnalysisFocused) {
         if (activeSubScreen === "connector" && node.kind === "connector") {
           const connector = state.connectors.byId[node.connectorId];
           if (connector !== undefined) {
@@ -217,6 +219,17 @@ export function useCanvasInteractionHandlers({
           startNodeEdit(node);
           return;
         }
+
+        onExternalSelectionInteraction?.();
+        if (node.kind === "connector") {
+          setActiveSubScreen("connector");
+        } else if (node.kind === "splice") {
+          setActiveSubScreen("splice");
+        } else {
+          setActiveSubScreen("node");
+        }
+        dispatchAction(appActions.select({ kind: "node", id: nodeId }));
+        return;
       }
 
       if (node.kind === "connector") {

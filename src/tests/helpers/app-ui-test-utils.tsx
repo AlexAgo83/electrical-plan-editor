@@ -397,7 +397,7 @@ function switchScreenWithMode(target: ScreenSwitchTarget, mode: "strict" | "draw
   }
 
   if (target === "analysis") {
-    switchScreenWithMode("modeling", mode);
+    fireEvent.keyDown(window, { key: "5", altKey: true });
     return;
   }
 

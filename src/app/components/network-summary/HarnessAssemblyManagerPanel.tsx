@@ -19,6 +19,7 @@ interface HarnessAssemblyManagerPanelProps {
   selectedAssemblyId: HarnessAssemblyId | "new" | "";
   canExportAgentJson?: boolean;
   onExportAgentJson?: () => void;
+  onOpenOnboardingHelp?: () => void;
   onSelectedAssemblyIdChange: (assemblyId: HarnessAssemblyId | "new" | "") => void;
   onUpsertAssembly: (assembly: HarnessAssembly) => void;
   onRemoveAssembly: (assemblyId: HarnessAssemblyId) => void;
@@ -43,6 +44,7 @@ export function HarnessAssemblyManagerPanel({
   selectedAssemblyId,
   canExportAgentJson = false,
   onExportAgentJson,
+  onOpenOnboardingHelp,
   onSelectedAssemblyIdChange,
   onUpsertAssembly,
   onRemoveAssembly
@@ -242,6 +244,12 @@ export function HarnessAssemblyManagerPanel({
             <h2>Harness assembly</h2>
             <p className="functional-schematic-subtitle">Group networks, choose trace roots, and define physical interconnector links.</p>
           </div>
+          {onOpenOnboardingHelp === undefined ? null : (
+            <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenOnboardingHelp}>
+              <span className="action-button-icon is-help" aria-hidden="true" />
+              <span>Help</span>
+            </button>
+          )}
         </header>
 
         {hasEmptyAssemblySelection ? (

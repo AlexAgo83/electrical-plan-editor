@@ -67,10 +67,6 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     hasCatalogSelectionForActiveSubScreen: boolean;
     hasInspectableSelectionForActiveSubScreen: boolean;
     networkScalePercent: number;
-    saveStatus: HomeWorkspaceParams["saveStatus"];
-    validationIssuesCount: number;
-    validationErrorCount: number;
-    validationWarningCount: number;
     isCurrentWorkspaceEmpty: boolean;
     hasBuiltInSampleState: boolean;
     themeMode: HomeWorkspaceParams["themeMode"];
@@ -173,10 +169,6 @@ export function useAppControllerWorkspaceContentAssembly({
     activeNetworkId: entities.activeNetworkId,
     undoHistoryEntries: entities.undoHistoryEntries,
     networkCount: state.networkCount,
-    saveStatus: state.saveStatus,
-    validationIssuesCount: state.validationIssuesCount,
-    validationErrorCount: state.validationErrorCount,
-    validationWarningCount: state.validationWarningCount,
     onOpenImportPicker: domains.workspaceNetworkDomain.handleOpenImportPicker,
     onSaveWorkspace: () => domains.workspaceNetworkDomain.handleExportNetworksWithActiveSaveConfirmation("all"),
     importFileInputRef: domains.workspaceNetworkDomain.importFileInputRef,
@@ -290,7 +282,7 @@ export function useAppControllerWorkspaceContentAssembly({
     canExportBomCsv: handlers.canExportBomCsv,
     onExportBomCsv: handlers.handleExportBomCsv,
     handleRegenerateLayout: domains.workspaceNetworkDomain.handleRegenerateLayout,
-    markDetailPanelsSelectionSourceAsExternal: handlers.markDetailPanelsSelectionSourceAsExternal,
+    markDetailPanelsSelectionSourceAsTable: handlers.markDetailPanelsSelectionSourceAsTable,
     onOpenHarnessAssemblyOnboardingHelp: () => handlers.openSingleStepOnboarding("harnessAssembly"),
     dispatchAction: handlers.dispatchAction,
     store: handlers.store
@@ -453,7 +445,8 @@ export function useAppControllerWorkspaceContentAssembly({
 
   const analysisWorkspaceContentForLayout = state.isCatalogSubScreen
     ? analysisWorkspaceContentForSubScreen
-    : state.hasInspectableSelectionForActiveSubScreen
+    : state.hasTableSelectionForActiveSubScreen ||
+        (state.isModelingScreen && state.hasInspectableSelectionForActiveSubScreen)
       ? analysisWorkspaceContentForSubScreen
       : null;
 

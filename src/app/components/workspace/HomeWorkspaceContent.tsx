@@ -18,10 +18,6 @@ interface HomeWorkspaceContentProps {
   activeNetworkTechnicalId: string | null;
   recentChangesForActiveNetwork: UndoHistoryEntry[];
   networkCount: number;
-  saveStatus: "saved" | "unsaved" | "error";
-  validationIssuesCount: number;
-  validationErrorCount: number;
-  validationWarningCount: number;
   onCreateEmptyWorkspace: () => void;
   onSaveWorkspace: () => void;
   onOpenImportPicker: () => void;
@@ -29,19 +25,8 @@ interface HomeWorkspaceContentProps {
   onImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   onOpenNetworkScope: () => void;
   onOpenModeling: () => void;
-  onOpenValidation: () => void;
   onOpenOnboardingHelp?: () => void;
   postMvpModules?: HomeWorkspacePostMvpModules;
-}
-
-function formatSaveStatus(saveStatus: HomeWorkspaceContentProps["saveStatus"]): string {
-  if (saveStatus === "saved") {
-    return "Saved";
-  }
-  if (saveStatus === "unsaved") {
-    return "Unsaved";
-  }
-  return "Error";
 }
 
 interface ChangelogCollapsibleSection {
@@ -211,10 +196,6 @@ export function HomeWorkspaceContent({
   activeNetworkTechnicalId,
   recentChangesForActiveNetwork,
   networkCount,
-  saveStatus,
-  validationIssuesCount,
-  validationErrorCount,
-  validationWarningCount,
   onCreateEmptyWorkspace,
   onSaveWorkspace,
   onOpenImportPicker,
@@ -222,7 +203,6 @@ export function HomeWorkspaceContent({
   onImportFileChange,
   onOpenNetworkScope,
   onOpenModeling,
-  onOpenValidation,
   onOpenOnboardingHelp,
   postMvpModules
 }: HomeWorkspaceContentProps): ReactElement {
@@ -328,6 +308,10 @@ export function HomeWorkspaceContent({
             Start a new workspace flow, import existing data, or open workspace management controls.
           </p>
           <div className="row-actions home-primary-actions">
+            <button type="button" className="button-with-icon" onClick={onOpenModeling} disabled={!hasActiveNetwork}>
+              <span className="action-button-icon is-edit" aria-hidden="true" />
+              <span>Resume</span>
+            </button>
             <button type="button" className="button-with-icon" onClick={onOpenNetworkScope}>
               <span className="action-button-icon is-home-start" aria-hidden="true" />
               <span>Load network</span>
@@ -344,6 +328,12 @@ export function HomeWorkspaceContent({
               <span className="action-button-icon is-home-import" aria-hidden="true" />
               <span>Import workspace</span>
             </button>
+            {onOpenOnboardingHelp !== undefined ? (
+              <button type="button" className="button-with-icon" onClick={onOpenOnboardingHelp}>
+                <span className="action-button-icon is-help" aria-hidden="true" />
+                <span>Help</span>
+              </button>
+            ) : null}
           </div>
           <input
             ref={importFileInputRef}
@@ -364,26 +354,6 @@ export function HomeWorkspaceContent({
           <p className="settings-panel-intro home-resume-intro">
             Continue where you left off using the current workspace context and active network.
           </p>
-          <div className="summary-grid home-summary-grid" aria-label="Workspace summary">
-            <article>
-              <h3>Networks</h3>
-              <p>{networkCount}</p>
-            </article>
-            <article>
-              <h3>State</h3>
-              <p>{formatSaveStatus(saveStatus)}</p>
-            </article>
-            <article>
-              <h3>Issues</h3>
-              <p>{validationIssuesCount}</p>
-            </article>
-            <article>
-              <h3>Errors / Warnings</h3>
-              <p>
-                {validationErrorCount} / {validationWarningCount}
-              </p>
-            </article>
-          </div>
           <p className="meta-line home-resume-copy">
             {hasActiveNetwork && activeNetworkName !== null && activeNetworkTechnicalId !== null ? (
               <>
@@ -398,22 +368,6 @@ export function HomeWorkspaceContent({
             )}
           </p>
           <NetworkRecentChangesList entries={recentChangesForActiveNetwork} />
-          <div className="row-actions home-resume-actions">
-            <button type="button" className="button-with-icon" onClick={onOpenModeling} disabled={!hasActiveNetwork}>
-              <span className="action-button-icon is-edit" aria-hidden="true" />
-              <span>Resume</span>
-            </button>
-            <button type="button" className="button-with-icon" onClick={onOpenValidation} disabled={!hasActiveNetwork}>
-              <span className="action-button-icon is-open" aria-hidden="true" />
-              <span>Validation</span>
-            </button>
-            {onOpenOnboardingHelp !== undefined ? (
-              <button type="button" className="button-with-icon" onClick={onOpenOnboardingHelp}>
-                <span className="action-button-icon is-help" aria-hidden="true" />
-                <span>Help</span>
-              </button>
-            ) : null}
-          </div>
         </section>
       </div>
       <section className="panel home-panel home-whats-new-panel">

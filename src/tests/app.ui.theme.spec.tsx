@@ -1,6 +1,11 @@
 import { fireEvent, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { createUiIntegrationState, renderAppWithState, switchScreen } from "./helpers/app-ui-test-utils";
+import {
+  createUiIntegrationState,
+  renderAppWithState,
+  switchScreen,
+  switchSubScreenDrawerAware
+} from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - theme mode", () => {
   beforeEach(() => {
@@ -214,6 +219,7 @@ describe("App integration UI - theme mode", () => {
     expect(appShell).toHaveClass("theme-circle-mobility-light");
 
     switchScreen("analysis");
+    switchSubScreenDrawerAware("connector");
     expect(within(document.body).queryByRole("heading", { name: "Connector analysis" })).toBeNull();
     expect(within(document.body).queryByRole("heading", { name: "Route preview" })).toBeNull();
     const connectorsPanel = within(document.body).getByRole("heading", { name: "Connectors" }).closest(".panel");

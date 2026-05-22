@@ -101,6 +101,7 @@ describe("App integration UI - inspector floating shell", () => {
     }
 
     switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("connector");
     const analysisInspectorShell = getInspectorShell();
     if (analysisInspectorShell !== null) {
       expect(analysisInspectorShell).toHaveClass("is-open");

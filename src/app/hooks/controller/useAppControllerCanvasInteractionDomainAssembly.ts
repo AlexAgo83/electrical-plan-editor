@@ -17,6 +17,7 @@ interface UseAppControllerCanvasInteractionDomainAssemblyParams {
     nodesCount: number;
     interactionMode: CanvasInteractionAssemblyParams["core"]["interactionMode"];
     isModelingScreen: boolean;
+    isModelingAnalysisFocused: boolean;
     activeSubScreen: CanvasInteractionAssemblyParams["core"]["activeSubScreen"];
     setActiveScreen: (screen: ScreenId) => void;
     setActiveSubScreen: CanvasInteractionAssemblyParams["core"]["setActiveSubScreen"];
@@ -62,6 +63,7 @@ export function useAppControllerCanvasInteractionDomainAssembly({
       nodesCount: core.nodesCount,
       interactionMode: core.interactionMode,
       isModelingScreen: core.isModelingScreen,
+      isModelingAnalysisFocused: core.isModelingAnalysisFocused,
       activeSubScreen: core.activeSubScreen,
       setActiveScreen: core.setActiveScreen,
       setActiveSubScreen: core.setActiveSubScreen

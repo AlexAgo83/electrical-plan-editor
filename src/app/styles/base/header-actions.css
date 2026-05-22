@@ -1,0 +1,180 @@
+.header-nav-toggle {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+}
+
+.header-nav-icon,
+.header-settings-icon,
+.header-ops-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 0.9rem;
+  background: currentColor;
+}
+
+.header-nav-icon {
+  -webkit-mask: url("/icons/menu.svg") center / contain no-repeat;
+  mask: url("/icons/menu.svg") center / contain no-repeat;
+}
+
+.header-settings-icon {
+  -webkit-mask: url("/icons/settings.svg") center / contain no-repeat;
+  mask: url("/icons/settings.svg") center / contain no-repeat;
+}
+
+.header-ops-icon {
+  -webkit-mask: url("/icons/health.svg") center / contain no-repeat;
+  mask: url("/icons/health.svg") center / contain no-repeat;
+}
+
+.header-actions {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
+.header-ops-toggle {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.header-settings-toggle {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  margin-right: 0.45rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.header-install-toggle,
+.header-update-toggle {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  margin-right: 0.45rem;
+}
+
+.header-install-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.header-install-icon {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 0.9rem;
+  background: currentColor;
+  -webkit-mask: url("/icons/ico_home_import.svg") center / contain no-repeat;
+  mask: url("/icons/ico_home_import.svg") center / contain no-repeat;
+}
+
+.header-update-toggle {
+  --header-update-glow-color: color-mix(in srgb, var(--theme-primary, currentColor) 24%, #fff);
+
+  border-color: #2f8f4e;
+  background: #e5f6eb;
+  color: #19542d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  isolation: isolate;
+  position: relative;
+}
+
+.header-update-toggle .action-button-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-basis: 0.9rem;
+}
+
+.header-update-toggle.is-icon-only .header-update-label {
+  display: none;
+}
+
+.header-update-toggle.is-ready-glow {
+  box-shadow:
+    0 0 0.12rem color-mix(in srgb, var(--header-update-glow-color) 16%, transparent),
+    0 0 0.38rem color-mix(in srgb, var(--header-update-glow-color) 22%, transparent),
+    0 0 0.72rem color-mix(in srgb, var(--header-update-glow-color) 24%, transparent);
+}
+
+.header-update-toggle.is-ready-glow::after {
+  content: "";
+  position: absolute;
+  inset: -0.32rem;
+  z-index: -1;
+  border-radius: 0.72rem;
+  background: color-mix(in srgb, var(--header-update-glow-color) 18%, transparent);
+  box-shadow:
+    0 0 0.78rem color-mix(in srgb, var(--header-update-glow-color) 30%, transparent),
+    0 0 1.36rem color-mix(in srgb, var(--header-update-glow-color) 34%, transparent);
+  opacity: 0.36;
+  pointer-events: none;
+  transform: scale(0.94);
+  animation: header-update-glow-breathe 4.8s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes header-update-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.24;
+    transform: scale(0.94);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-update-toggle.is-ready-glow::after {
+    animation: none;
+  }
+}
+
+.header-settings-toggle.is-active {
+  background: #17374e;
+  color: #fff;
+  border-color: #17374e;
+}
+
+.header-ops-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.3rem;
+  border-radius: 999px;
+  padding: 0.08rem 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #dceaf5;
+  color: #1b3b53;
+}
+
+.header-ops-badge.is-error {
+  background: #fde0e0;
+  color: #902020;
+}

@@ -365,11 +365,10 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(within(functionalActions).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
       "Grid",
       "Active network",
-      "Export SVG",
-      "Help"
+      "Export SVG"
     ]);
     expect(within(functionalPanel).getByRole("button", { name: "Export SVG" })).toBeEnabled();
-    expect(within(functionalPanel).getByRole("button", { name: "Help" })).toBeInTheDocument();
+    expect(within(functionalPanel).queryByRole("button", { name: "Help" })).not.toBeInTheDocument();
     expect(within(functionalPanel).getByRole("button", { name: "Signal" })).toBeInTheDocument();
     expect(within(functionalPanel).getByRole("button", { name: "12V power" })).toBeInTheDocument();
     expect(within(functionalPanel).getByRole("button", { name: "-12V power (GND)" })).toBeInTheDocument();

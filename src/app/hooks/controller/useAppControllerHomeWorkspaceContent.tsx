@@ -19,10 +19,6 @@ interface UseAppControllerHomeWorkspaceContentParams {
   activeNetworkId: NetworkId | null;
   undoHistoryEntries: UndoHistoryEntry[];
   networkCount: number;
-  saveStatus: HomeWorkspaceContentProps["saveStatus"];
-  validationIssuesCount: number;
-  validationErrorCount: number;
-  validationWarningCount: number;
   onOpenImportPicker: () => void;
   onSaveWorkspace: () => void;
   importFileInputRef: RefObject<HTMLInputElement | null>;
@@ -46,10 +42,6 @@ export function useAppControllerHomeWorkspaceContent({
   activeNetworkId,
   undoHistoryEntries,
   networkCount,
-  saveStatus,
-  validationIssuesCount,
-  validationErrorCount,
-  validationWarningCount,
   onOpenImportPicker,
   onSaveWorkspace,
   importFileInputRef,
@@ -108,10 +100,6 @@ export function useAppControllerHomeWorkspaceContent({
       activeNetworkTechnicalId={activeNetworkTechnicalId}
       recentChangesForActiveNetwork={recentChangesForActiveNetwork}
       networkCount={networkCount}
-      saveStatus={saveStatus}
-      validationIssuesCount={validationIssuesCount}
-      validationErrorCount={validationErrorCount}
-      validationWarningCount={validationWarningCount}
       onCreateEmptyWorkspace={handleCreateEmptyWorkspace}
       onSaveWorkspace={onSaveWorkspace}
       onOpenImportPicker={onOpenImportPicker}
@@ -122,7 +110,6 @@ export function useAppControllerHomeWorkspaceContent({
         handleWorkspaceScreenChange("modeling");
         setActiveSubScreen("connector");
       }}
-      onOpenValidation={() => handleWorkspaceScreenChange("validation")}
       onOpenOnboardingHelp={onOpenOnboardingHelp}
     />
   );

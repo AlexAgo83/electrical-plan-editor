@@ -31,6 +31,11 @@ describe("App integration UI - navigation and canvas selection gating", () => {
     fireEvent.mouseUp(connectorNode, { button: 0 });
     fireEvent.click(connectorNode);
 
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
     const inspectorHeading = screen.queryByRole("heading", { name: "Inspector context" });
     if (inspectorHeading !== null) {
       const inspectorPanel = getPanelByHeading("Inspector context");

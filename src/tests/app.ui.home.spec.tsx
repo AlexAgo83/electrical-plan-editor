@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { HOME_CHANGELOG_ENTRY_SUMMARIES } from "../app/lib/changelogFeed";
 import {
   createUiIntegrationState,
-  createValidationIssueState,
   getPanelByHeading,
   renderAppWithState,
   switchScreenDrawerAware
@@ -36,9 +35,19 @@ describe("home workspace screen", () => {
     expect(getPanelByHeading("Quick start")).toBeInTheDocument();
     expect(getPanelByHeading("Workspace")).toBeInTheDocument();
     expect(getPanelByHeading("What's new")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Load network" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Save workspace" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Import workspace" })).toBeInTheDocument();
+    const quickStartPanel = getPanelByHeading("Quick start");
+    const quickStartActions = within(quickStartPanel)
+      .getAllByRole("button")
+      .map((button) => button.textContent);
+    expect(quickStartActions).toEqual([
+      "Resume",
+      "Load network",
+      "Create empty workspace",
+      "Save workspace",
+      "Import workspace",
+      "Help"
+    ]);
+    expect(screen.queryByRole("button", { name: "Validation" })).not.toBeInTheDocument();
   });
 
   it("renders an auto-detected changelog feed in descending version order", () => {
@@ -182,18 +191,17 @@ describe("home workspace screen", () => {
     const resumePanel = getPanelByHeading("Workspace");
     expect(within(resumePanel).getByText(/Active network:/i, { selector: ".home-resume-copy-label" })).toBeInTheDocument();
     expect(within(resumePanel).getByText("Main network sample", { selector: ".home-resume-copy-value" })).toBeInTheDocument();
-    expect(within(resumePanel).getByText("Networks")).toBeInTheDocument();
-    expect(within(resumePanel).getByText("State")).toBeInTheDocument();
+    expect(within(resumePanel).queryByLabelText("Workspace summary")).not.toBeInTheDocument();
   });
 
-  it("routes home resume CTA to validation", () => {
-    renderAppWithState(createValidationIssueState());
+  it("routes home resume CTA to modeling", () => {
+    renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("home");
-    const resumePanel = getPanelByHeading("Workspace");
-    fireEvent.click(within(resumePanel).getByRole("button", { name: "Validation" }));
+    const quickStartPanel = getPanelByHeading("Quick start");
+    fireEvent.click(within(quickStartPanel).getByRole("button", { name: "Resume" }));
 
-    expect(getPanelByHeading("Validation center")).toBeInTheDocument();
+    expect(getPanelByHeading("Connectors")).toBeInTheDocument();
   });
 
   it("creates a genuinely empty workspace from Home without resetting theme mode", async () => {
@@ -236,7 +244,7 @@ describe("home workspace screen", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 
     expect(screen.getByRole("dialog", { name: "Create your first network" })).toBeInTheDocument();
-    expect(screen.getByText("Step 1 of 7")).toBeInTheDocument();
+    expect(screen.getByText("Step 1 of 8")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
     const optOutCheckbox = screen.getByLabelText("Do not open automatically on app load");
     expect(optOutCheckbox).toBeInTheDocument();
@@ -249,8 +257,8 @@ describe("home workspace screen", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
     switchScreenDrawerAware("home");
-    const resumePanel = getPanelByHeading("Workspace");
-    fireEvent.click(within(resumePanel).getByRole("button", { name: "Help" }));
+    const quickStartPanel = getPanelByHeading("Quick start");
+    fireEvent.click(within(quickStartPanel).getByRole("button", { name: "Help" }));
     expect(screen.getByRole("dialog", { name: "Create your first network" })).toBeInTheDocument();
   });
 

@@ -1,4 +1,4 @@
-import { type ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import appPackageMetadata from "../../package.json";
 import type { CatalogItemId } from "../core/entities";
 import {
@@ -49,6 +49,7 @@ import { useOnboardingController } from "./hooks/controller/useOnboardingControl
 import { useAppControllerPersistenceHealth } from "./hooks/controller/useAppControllerPersistenceHealth";
 import { useAppControllerWorkspaceContentAssembly } from "./hooks/controller/useAppControllerWorkspaceContentAssembly";
 import { useAppControllerUniquenessFlags } from "./hooks/controller/useAppControllerUniquenessFlags";
+import { useAppControllerRefs } from "./hooks/controller/useAppControllerRefs";
 import {
   useAppControllerActionRefsSyncEffect,
   useAppControllerAnalysisSubScreenTrackingEffect,
@@ -63,7 +64,6 @@ import { useNetworkEntityCountsById } from "./hooks/useNetworkEntityCountsById";
 import { useNetworkScopeFormState } from "./hooks/useNetworkScopeFormState";
 import { useModelingFormSelectionSync } from "./hooks/useModelingFormSelectionSync";
 import { useNodeDescriptions } from "./hooks/useNodeDescriptions";
-import type { BeforeInstallPromptEventLike } from "./hooks/useWorkspaceShellChrome";
 import { useStoreHistory } from "./hooks/useStoreHistory";
 import { useValidationModel } from "./hooks/useValidationModel";
 import { useWireEndpointDescriptions } from "./hooks/useWireEndpointDescriptions";
@@ -104,102 +104,41 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const routingGraph = selectRoutingGraphIndex(state);
   const subNetworkSummaries = selectSubNetworkSummaries(state);
   const networkEntityCountsById = useNetworkEntityCountsById(networks, state.networkStates);
-  const {
-    connectorMap,
-    spliceMap,
-    segmentMap,
-    connectorNodeByConnectorId,
-    spliceNodeBySpliceId
-  } = useEntityRelationshipMaps(connectors, splices, nodes, segments);
+  const { connectorMap, spliceMap, segmentMap, connectorNodeByConnectorId, spliceNodeBySpliceId } =
+    useEntityRelationshipMaps(connectors, splices, nodes, segments);
   const formsState = useEntityFormsState();
   const forms = useMemo(() => buildAppControllerNamespacedFormsState(formsState), [formsState]);
   const { setWireForcedRouteInput } = formsState;
   const canvasDisplayState = useAppControllerCanvasDisplayState();
-  const {
-    routePreviewStartNodeId,
-    setRoutePreviewStartNodeId,
-    routePreviewEndNodeId,
-    setRoutePreviewEndNodeId,
-    showNetworkInfoPanels,
-    setShowNetworkInfoPanels,
-    showSegmentNames,
-    setShowSegmentNames,
-    showSegmentLengths,
-    setShowSegmentLengths,
-    showCableCallouts,
-    setShowCableCallouts,
-    networkCalloutContentMode,
-    setNetworkCalloutContentMode,
-    setNetworkLabelSizeMode,
-    setNetworkCalloutTextSize,
-    setNetworkLabelRotationDegrees,
-    setNetworkAutoSegmentLabelRotation,
-    canvasResetZoomPercentInput
-  } = canvasDisplayState;
+  const { routePreviewStartNodeId, setRoutePreviewStartNodeId, routePreviewEndNodeId, setRoutePreviewEndNodeId } =
+    canvasDisplayState;
+  const { showNetworkInfoPanels, setShowNetworkInfoPanels, showSegmentNames, setShowSegmentNames } = canvasDisplayState;
+  const { showSegmentLengths, setShowSegmentLengths, showCableCallouts, setShowCableCallouts } = canvasDisplayState;
+  const { networkCalloutContentMode, setNetworkCalloutContentMode, canvasResetZoomPercentInput } = canvasDisplayState;
+  const { setNetworkLabelSizeMode, setNetworkCalloutTextSize, setNetworkLabelRotationDegrees, setNetworkAutoSegmentLabelRotation } =
+    canvasDisplayState;
   const canvasState = useCanvasState();
   const canvas = useMemo(() => buildAppControllerNamespacedCanvasState(canvasState), [canvasState]);
-  const {
-    interactionMode,
-    setInteractionMode,
-    pendingNewNodePosition,
-    setPendingNewNodePosition,
-    manualNodePositions,
-    setManualNodePositions,
-    draggingNodeId,
-    setDraggingNodeId,
-    isPanningNetwork,
-    setIsPanningNetwork,
-    showNetworkGrid,
-    setShowNetworkGrid,
-    snapNodesToGrid,
-    setSnapNodesToGrid,
-    lockEntityMovement,
-    setLockEntityMovement,
-    networkScale,
-    setNetworkScale,
-    networkOffset,
-    setNetworkOffset
-  } = canvasState;
+  const { interactionMode, setInteractionMode, pendingNewNodePosition, setPendingNewNodePosition, draggingNodeId, setDraggingNodeId } =
+    canvasState;
+  const { manualNodePositions, setManualNodePositions, isPanningNetwork, setIsPanningNetwork } = canvasState;
+  const { showNetworkGrid, setShowNetworkGrid, snapNodesToGrid, setSnapNodesToGrid, lockEntityMovement, setLockEntityMovement } =
+    canvasState;
+  const { networkScale, setNetworkScale, networkOffset, setNetworkOffset } = canvasState;
   const networkScopeFormState = useNetworkScopeFormState();
   const { newNetworkTechnicalId, networkFormMode, networkFormTargetId } = networkScopeFormState;
   const preferencesState = useAppControllerPreferencesState();
-  const {
-    locale,
-    themeMode,
-    tableDensity,
-    tableFontSize,
-    workspaceCurrencyCode,
-    workspaceTaxEnabled,
-    workspaceTaxRatePercent,
-    tabularExportFormat,
-    bomExportCompactColumns,
-    bomTraceabilityLabelsHidden,
-    defaultWireSectionMm2,
-    defaultAutoCreateLinkedNodes,
-    spliceSectionImbalanceRatioPercent,
-    networkSort,
-    setNetworkSort,
-    canvasDefaultShowGrid,
-    canvasDefaultSnapToGrid,
-    canvasDefaultLockEntityMovement,
-    canvasDefaultShowInfoPanels,
-    canvasDefaultShowSegmentNames,
-    canvasDefaultShowSegmentLengths,
-    canvasDefaultShowCableCallouts,
-    canvasDefaultCalloutContentMode,
-    canvasDefaultLabelSizeMode,
-    canvasDefaultCalloutTextSize,
-    canvasDefaultLabelRotationDegrees,
-    canvasDefaultAutoSegmentLabelRotation,
-    canvasResizeBehaviorMode,
-    showShortcutHints,
-    keyboardShortcutsEnabled,
-    restoreViewportOnUndo,
-    showFloatingInspectorPanel,
-    workspacePanelsLayoutMode,
-    workspaceWideScreen,
-    preferencesHydrated
-  } = preferencesState;
+  const { locale, themeMode, tableDensity, tableFontSize, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent } =
+    preferencesState;
+  const { tabularExportFormat, bomExportCompactColumns, bomTraceabilityLabelsHidden, defaultWireSectionMm2 } = preferencesState;
+  const { defaultAutoCreateLinkedNodes, spliceSectionImbalanceRatioPercent, networkSort, setNetworkSort } = preferencesState;
+  const { canvasDefaultShowGrid, canvasDefaultSnapToGrid, canvasDefaultLockEntityMovement, canvasDefaultShowInfoPanels } =
+    preferencesState;
+  const { canvasDefaultShowSegmentNames, canvasDefaultShowSegmentLengths, canvasDefaultShowCableCallouts } = preferencesState;
+  const { canvasDefaultCalloutContentMode, canvasDefaultLabelSizeMode, canvasDefaultCalloutTextSize } = preferencesState;
+  const { canvasDefaultLabelRotationDegrees, canvasDefaultAutoSegmentLabelRotation, canvasResizeBehaviorMode } = preferencesState;
+  const { showShortcutHints, keyboardShortcutsEnabled, restoreViewportOnUndo, showFloatingInspectorPanel } = preferencesState;
+  const { workspacePanelsLayoutMode, workspaceWideScreen, preferencesHydrated } = preferencesState;
   const { canExportBomCsv, handleExportBomCsv } = useAppControllerBomExportHandlers({
     catalogItems,
     connectors,
@@ -215,23 +154,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   });
   const { effectiveNetworkViewWidth, effectiveNetworkViewHeight, handleNetworkSummaryViewportSizeChange } = useAppControllerNetworkViewportState({ canvasResizeBehaviorMode });
   const { headerOffsetPx, headerBlockRef } = useAppControllerHeaderOffsetState();
-  const panStartRef = useRef<{
-    clientX: number;
-    clientY: number;
-    offsetX: number;
-    offsetY: number;
-  } | null>(null);
-  const undoActionRef = useRef<() => void>(() => {});
-  const redoActionRef = useRef<() => void>(() => {});
-  const exportActiveNetworkRef = useRef<() => void>(() => {});
-  const fitNetworkToContentRef = useRef<() => void>(() => {});
-  const previousValidationIssueRef = useRef<() => void>(() => {});
-  const nextValidationIssueRef = useRef<() => void>(() => {});
-  const navigationDrawerRef = useRef<HTMLDivElement | null>(null);
-  const navigationToggleButtonRef = useRef<HTMLButtonElement | null>(null);
-  const operationsPanelRef = useRef<HTMLDivElement | null>(null);
-  const operationsButtonRef = useRef<HTMLButtonElement | null>(null);
-  const deferredInstallPromptRef = useRef<BeforeInstallPromptEventLike | null>(null);
+  const refs = useAppControllerRefs();
+  const { panStartRef, undoActionRef, redoActionRef, exportActiveNetworkRef, fitNetworkToContentRef } = refs;
+  const { previousValidationIssueRef, nextValidationIssueRef, navigationDrawerRef, navigationToggleButtonRef } = refs;
+  const { operationsPanelRef, operationsButtonRef, deferredInstallPromptRef } = refs;
 
   const selectionEntities = useAppControllerSelectionEntities({ state });
   const {
@@ -830,6 +756,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       nodesCount: nodes.length,
       interactionMode,
       isModelingScreen,
+      isModelingAnalysisFocused,
       activeSubScreen,
       setActiveScreen,
       setActiveSubScreen
@@ -951,10 +878,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       hasCatalogSelectionForActiveSubScreen,
       hasInspectableSelectionForActiveSubScreen,
       networkScalePercent,
-      saveStatus,
-      validationIssuesCount: validationIssues.length,
-      validationErrorCount,
-      validationWarningCount,
       isCurrentWorkspaceEmpty,
       hasBuiltInSampleState,
       themeMode: state.ui.themeMode,
