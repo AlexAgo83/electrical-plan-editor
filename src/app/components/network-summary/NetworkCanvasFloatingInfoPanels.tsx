@@ -10,7 +10,6 @@ interface NetworkCanvasFloatingInfoPanelsProps {
   showNetworkInfoPanels: boolean;
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
-  onRegenerateLayout: () => void;
   selectedCanvasNodeCount: number;
   clearSelectedCanvasNodes: () => void;
   networkScalePercent: number;
@@ -33,7 +32,6 @@ export function NetworkCanvasFloatingInfoPanels({
   showNetworkInfoPanels,
   handleZoomAction,
   fitNetworkToContent,
-  onRegenerateLayout,
   selectedCanvasNodeCount,
   clearSelectedCanvasNodes,
   networkScalePercent,
@@ -53,11 +51,25 @@ export function NetworkCanvasFloatingInfoPanels({
     <>
       <div className="network-canvas-floating-controls" aria-label="Canvas controls">
         <div className="network-canvas-toolbar">
-          <button type="button" className="workspace-tab" onClick={() => handleZoomAction("out")}>
-            Zoom -
+          <button
+            type="button"
+            className="workspace-tab network-canvas-zoom-button"
+            aria-label="Zoom out"
+            title="Zoom out"
+            onClick={() => handleZoomAction("out")}
+          >
+            <span className="action-button-icon is-zoom" aria-hidden="true" />
+            <span aria-hidden="true">-</span>
           </button>
-          <button type="button" className="workspace-tab" onClick={() => handleZoomAction("in")}>
-            Zoom +
+          <button
+            type="button"
+            className="workspace-tab network-canvas-zoom-button"
+            aria-label="Zoom in"
+            title="Zoom in"
+            onClick={() => handleZoomAction("in")}
+          >
+            <span className="action-button-icon is-zoom" aria-hidden="true" />
+            <span aria-hidden="true">+</span>
           </button>
           <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
             Reset view
@@ -65,18 +77,22 @@ export function NetworkCanvasFloatingInfoPanels({
           <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
             Fit network
           </button>
-          <button type="button" className="workspace-tab" onClick={onRegenerateLayout}>
-            Generate
-          </button>
         </div>
-        <p className="meta-line network-canvas-floating-copy">
-          View: {networkScalePercent}% zoom. Hold <strong>Shift</strong> and drag empty canvas to pan.
-        </p>
+        <div className="network-canvas-floating-guidance">
+          <p className="meta-line network-canvas-floating-copy">
+            Hold <strong>Shift</strong> and drag empty canvas to pan.
+          </p>
+          <p className="meta-line network-canvas-floating-copy">
+            {selectedCanvasNodeCount > 1
+              ? "Drag one selected node to move the full group."
+              : "Shift-click nodes to select a group."}
+          </p>
+          <p className="meta-line network-canvas-floating-copy">View: {networkScalePercent}% zoom.</p>
+        </div>
         {selectedCanvasNodeCount > 0 ? (
           <div className="network-canvas-selection-summary" aria-live="polite">
             <p className="meta-line network-canvas-floating-copy">
-              {selectedCanvasNodeCount} node{selectedCanvasNodeCount > 1 ? "s" : ""} selected. Drag one selected node to
-              move the full group.
+              {selectedCanvasNodeCount} node{selectedCanvasNodeCount > 1 ? "s" : ""} selected.
             </p>
             <button type="button" className="workspace-tab" onClick={clearSelectedCanvasNodes}>
               Clear selection

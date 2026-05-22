@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import type { CatalogItem, Connector, Splice, Wire } from "../../../core/entities";
+import type { CatalogItem, CatalogItemId, Connector, Splice, Wire } from "../../../core/entities";
 import type { ConnectorCavityOccupancyMap } from "../../../core/connectorCatalogMaterials";
 import { buildNetworkSummaryBomCsvExport, buildNetworkSummaryBomWorkbookSheets } from "../../lib/networkSummaryBomCsv";
 import type { CsvCellValue } from "../../lib/csv";
@@ -26,6 +26,8 @@ export interface ActiveBomPreviewState {
   rows: CsvCellValue[][];
   itemRowCount: number;
   warnings: string[];
+  catalogItemReferenceLinks: Record<string, CatalogItemId>;
+  connectorTechnicalIdLinks: Record<string, Connector["id"]>;
   workspaceCurrencyCode: WorkspaceCurrencyCode;
   workspaceTaxEnabled: boolean;
   workspaceTaxRatePercent: number;
@@ -85,6 +87,12 @@ export function useAppControllerBomExportHandlers({
     }
 
     const normalizedWorkspaceCurrencyCode = workspaceCurrencyCode ?? "EUR";
+    const catalogItemReferenceLinks = Object.fromEntries(
+      catalogItems.map((item) => [item.manufacturerReference, item.id] as const)
+    );
+    const connectorTechnicalIdLinks = Object.fromEntries(
+      connectors.map((connector) => [connector.technicalId, connector.id] as const)
+    );
     const workbookSheets = buildNetworkSummaryBomWorkbookSheets(
       catalogItems,
       connectors,
@@ -106,6 +114,8 @@ export function useAppControllerBomExportHandlers({
       rows: networkSummaryBomCsvExport.rows,
       itemRowCount: networkSummaryBomCsvExport.itemRowCount,
       warnings: networkSummaryBomCsvExport.warnings,
+      catalogItemReferenceLinks,
+      connectorTechnicalIdLinks,
       workspaceCurrencyCode: normalizedWorkspaceCurrencyCode,
       workspaceTaxEnabled,
       workspaceTaxRatePercent,

@@ -102,6 +102,10 @@
 }
 
 .confirm-dialog-confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
   border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 42%, transparent);
   background: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
   color: inherit;
@@ -131,16 +135,47 @@
 .bom-preview-dialog-summary {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  font-size: 0.82rem;
+  align-items: center;
+  gap: 0.5rem 0.85rem;
+  border-left: 3px solid color-mix(in srgb, var(--theme-primary, currentColor) 48%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  padding: 0.55rem 0.7rem;
+  font-size: 0.8rem;
   line-height: 1.25;
 }
 
-.bom-preview-dialog-summary span {
-  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
-  border-radius: 0.45rem;
-  background: color-mix(in srgb, currentColor 5%, transparent);
-  padding: 0.22rem 0.45rem;
+.bom-preview-summary-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  min-width: max-content;
+}
+
+.bom-preview-summary-item + .bom-preview-summary-item {
+  position: relative;
+}
+
+.bom-preview-summary-item + .bom-preview-summary-item::before {
+  content: "";
+  width: 1px;
+  height: 0.95rem;
+  margin-right: 0.35rem;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.bom-preview-summary-label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+  opacity: 0.64;
+}
+
+.bom-preview-summary-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
 }
 
 .bom-preview-warnings ul {

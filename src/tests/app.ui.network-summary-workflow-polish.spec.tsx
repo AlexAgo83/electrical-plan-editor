@@ -533,14 +533,14 @@ describe("App integration UI - network summary workflow polish", () => {
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
     const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
-    const zoomOutButton = within(networkSummaryPanel).getByRole("button", { name: "Zoom -" });
+    const zoomOutButton = within(networkSummaryPanel).getByRole("button", { name: "Zoom out" });
 
     let previousZoomStatusText = "";
     let zoomStatusText = "";
     for (let index = 0; index < 48; index += 1) {
       fireEvent.click(zoomOutButton);
       zoomStatusText =
-        networkSummaryPanel.querySelector(".network-canvas-floating-copy")?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+        within(networkSummaryPanel).getByText(/View: \d+% zoom\./).textContent?.replace(/\s+/g, " ").trim() ?? "";
       if (zoomStatusText === previousZoomStatusText) {
         break;
       }
@@ -705,6 +705,7 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(selectedCalloutAnchorBeforeGenerate).not.toBeNull();
     const draggedTransform = (selectedCalloutAnchorBeforeGenerate as SVGGElement).getAttribute("transform") ?? "";
 
+    openEditMenu(networkSummaryPanel);
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Generate" }));
 
     await waitFor(() => {
@@ -905,8 +906,8 @@ describe("App integration UI - network summary workflow polish", () => {
       Lock: getDisplayToggleButton(networkSummaryPanel, "Lock").classList.contains("is-active")
     } as const;
 
-    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom +" }));
-    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom +" }));
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom in" }));
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom in" }));
     fireEvent.mouseDown(networkSvg, { button: 0, shiftKey: true, clientX: 240, clientY: 180 });
     fireEvent.mouseMove(networkSvg, { clientX: 360, clientY: 250 });
     fireEvent.mouseUp(networkSvg, { clientX: 360, clientY: 250 });

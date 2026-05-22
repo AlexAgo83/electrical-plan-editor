@@ -8,6 +8,7 @@ import type { ActiveConfirmDialogState } from "../../hooks/controller/useConfirm
 import type { ActiveChoiceDialogState } from "../../hooks/controller/useChoiceDialogController";
 import type { OnboardingControllerModel } from "../../hooks/controller/useOnboardingController";
 import type { ActiveBomPreviewState } from "../../hooks/controller/useAppControllerBomExportHandlers";
+import type { CatalogItemId, ConnectorId } from "../../../core/entities";
 
 interface AppControllerOverlaysProps {
   appShellClassName: string;
@@ -18,6 +19,8 @@ interface AppControllerOverlaysProps {
   activeBomPreview: ActiveBomPreviewState | null;
   closeActiveBomPreview: () => void;
   confirmActiveBomPreviewDownload: () => void;
+  openBomPreviewCatalogItem: (catalogItemId: CatalogItemId) => void;
+  openBomPreviewConnector: (connectorId: ConnectorId) => void;
   onboarding: Pick<
     OnboardingControllerModel,
     | "activeOnboardingStep"
@@ -43,6 +46,8 @@ export function AppControllerOverlays({
   activeBomPreview,
   closeActiveBomPreview,
   confirmActiveBomPreviewDownload,
+  openBomPreviewCatalogItem,
+  openBomPreviewConnector,
   onboarding
 }: AppControllerOverlaysProps): ReactElement | null {
   if (
@@ -109,6 +114,8 @@ export function AppControllerOverlays({
           isOpen={activeBomPreview !== null}
           themeHostClassName={appShellClassName}
           preview={activeBomPreview}
+          onOpenCatalogItem={openBomPreviewCatalogItem}
+          onOpenConnector={openBomPreviewConnector}
           onConfirm={confirmActiveBomPreviewDownload}
           onCancel={closeActiveBomPreview}
         />

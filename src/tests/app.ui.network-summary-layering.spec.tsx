@@ -81,7 +81,7 @@ describe("App integration UI - network summary layering", () => {
     const transformBefore = anchorBefore?.getAttribute("transform") ?? "";
     expect(layerScaleBefore * getTransformScale(transformBefore)).toBeCloseTo(1, 5);
 
-    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom +" }));
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom in" }));
 
     const labelLayerAfter = networkSummaryPanel.querySelector(".network-graph-layer-labels");
     const anchorAfter = networkSummaryPanel.querySelector(".network-segment-label-anchor");

@@ -22,6 +22,13 @@ describe("App integration UI - navigation and canvas", () => {
     }));
   }
   const openOperationsHealthPanel = () => fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+  function openNetworkSummaryEditMenu(panel: HTMLElement): void {
+    const editButton = within(panel).getByRole("button", { name: "Edit" });
+    if (editButton.getAttribute("aria-expanded") !== "true") {
+      fireEvent.click(editButton);
+    }
+  }
+
   function mockSvgRect(networkSvg: SVGSVGElement) {
     return vi.spyOn(networkSvg, "getBoundingClientRect").mockImplementation(
       () =>
@@ -538,6 +545,7 @@ describe("App integration UI - navigation and canvas", () => {
 
     expect(connectorNode).not.toBeNull();
     expect(intermediateNode).not.toBeNull();
+    expect(within(networkSummaryPanel).getByText("Shift-click nodes to select a group.")).toBeInTheDocument();
 
     fireEvent.mouseDown(connectorNode as Element, { button: 0, shiftKey: true });
     fireEvent.mouseUp(connectorNode as Element, { button: 0, shiftKey: true });
@@ -546,7 +554,8 @@ describe("App integration UI - navigation and canvas", () => {
 
     expect(connectorNode).toHaveClass("is-selected");
     expect(intermediateNode).toHaveClass("is-selected");
-    expect(within(networkSummaryPanel).getByText("2 nodes selected. Drag one selected node to move the full group.")).toBeInTheDocument();
+    expect(within(networkSummaryPanel).getByText("Drag one selected node to move the full group.")).toBeInTheDocument();
+    expect(within(networkSummaryPanel).getByText("2 nodes selected.")).toBeInTheDocument();
     expect(within(networkSummaryPanel).getByRole("button", { name: "Clear selection" })).toBeInTheDocument();
 
     fireEvent.click(networkSvg);
@@ -722,7 +731,7 @@ describe("App integration UI - navigation and canvas", () => {
     const networkPanel = getPanelByHeading("Network summary");
     const currentZoomLine = () => within(networkPanel).getByText(/View: \d+% zoom\./).textContent ?? "";
     const fittedZoomLine = currentZoomLine();
-    fireEvent.click(within(networkPanel).getByRole("button", { name: "Zoom -" }));
+    fireEvent.click(within(networkPanel).getByRole("button", { name: "Zoom out" }));
     expect(currentZoomLine()).not.toBe(fittedZoomLine);
     fireEvent.keyDown(window, { key: "f", altKey: true });
     expect(currentZoomLine()).toBe(fittedZoomLine);
@@ -754,6 +763,7 @@ describe("App integration UI - navigation and canvas", () => {
     renderAppWithState(state);
     switchScreenDrawerAware("analysis");
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    openNetworkSummaryEditMenu(networkSummaryPanel);
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Generate" }));
     const confirmDialog = screen.getByRole("dialog", { name: "Regenerate 2D layout" });
     fireEvent.click(within(confirmDialog).getByRole("button", { name: "Cancel" }));

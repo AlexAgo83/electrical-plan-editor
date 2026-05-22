@@ -7,6 +7,7 @@ interface NetworkSummaryEditMenuProps {
   toggleShowNetworkGrid: () => void;
   toggleSnapNodesToGrid: () => void;
   toggleLockEntityMovement: () => void;
+  onRegenerateLayout: () => void;
 }
 
 export function NetworkSummaryEditMenu({
@@ -15,7 +16,8 @@ export function NetworkSummaryEditMenu({
   lockEntityMovement,
   toggleShowNetworkGrid,
   toggleSnapNodesToGrid,
-  toggleLockEntityMovement
+  toggleLockEntityMovement,
+  onRegenerateLayout
 }: NetworkSummaryEditMenuProps): ReactElement {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -30,6 +32,11 @@ export function NetworkSummaryEditMenu({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
+
+  function handleRegenerateLayout(): void {
+    setOpen(false);
+    onRegenerateLayout();
+  }
 
   return (
     <div ref={wrapperRef} className="network-summary-view-menu-wrapper">
@@ -68,6 +75,14 @@ export function NetworkSummaryEditMenu({
           >
             <span className="network-summary-lock-move-icon" aria-hidden="true" />
             Lock
+          </button>
+          <button
+            type="button"
+            className="network-summary-view-menu-item"
+            onClick={handleRegenerateLayout}
+          >
+            <span className="action-button-icon is-prevnext" aria-hidden="true" />
+            Generate
           </button>
         </div>
       ) : null}

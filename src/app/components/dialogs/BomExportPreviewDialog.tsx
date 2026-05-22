@@ -2,11 +2,15 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboa
 import type { ActiveBomPreviewState } from "../../hooks/controller/useAppControllerBomExportHandlers";
 import type { CsvCellValue } from "../../lib/csv";
 import type { TabularWorksheetExport } from "../../lib/tabularExport";
+import type { CatalogItemId, ConnectorId } from "../../../core/entities";
+import { EntityReferenceButton } from "../workspace/EntityReferenceButton";
 
 interface BomExportPreviewDialogProps {
   isOpen: boolean;
   themeHostClassName?: string;
   preview: ActiveBomPreviewState;
+  onOpenCatalogItem: (catalogItemId: CatalogItemId) => void;
+  onOpenConnector: (connectorId: ConnectorId) => void;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -44,6 +48,8 @@ export function BomExportPreviewDialog({
   isOpen,
   themeHostClassName,
   preview,
+  onOpenCatalogItem,
+  onOpenConnector,
   onConfirm,
   onCancel
 }: BomExportPreviewDialogProps): ReactElement | null {
@@ -56,6 +62,10 @@ export function BomExportPreviewDialog({
   const previewSheets = useMemo(() => buildPreviewSheets(preview), [preview]);
   const fallbackSheet = previewSheets[0] ?? { name: "Network BOM", headers: preview.headers, rows: preview.rows };
   const activeSheet = previewSheets[Math.min(activeSheetIndex, previewSheets.length - 1)] ?? fallbackSheet;
+  const typeColumnIndex = activeSheet.headers.indexOf("Type");
+  const manufacturerReferenceColumnIndex = activeSheet.headers.indexOf("Manufacturer reference");
+  const connectorIdColumnIndex = activeSheet.headers.indexOf("Connector ID");
+  const connectorNameColumnIndex = activeSheet.headers.indexOf("Connector name");
   const formatLabel = preview.format.toUpperCase();
 
   useEffect(() => {
@@ -145,13 +155,40 @@ export function BomExportPreviewDialog({
         <header className="confirm-dialog-header bom-preview-dialog-header">
           <h2 id={titleId}>BOM preview</h2>
           <div className="bom-preview-dialog-summary" id={descriptionId}>
-            <span>{preview.itemRowCount} BOM item rows</span>
-            <span>{preview.rows.length} export rows</span>
-            <span>{formatLabel}</span>
-            {previewSheets.length > 1 ? <span>{previewSheets.length} sheets</span> : null}
-            <span>{preview.workspaceCurrencyCode}</span>
-            <span>{preview.workspaceTaxEnabled ? `Tax ${preview.workspaceTaxRatePercent.toFixed(2)}%` : "Tax disabled"}</span>
-            {preview.compactColumns ? <span>Compact columns</span> : null}
+            <span className="bom-preview-summary-item">
+              <span className="bom-preview-summary-label">Items</span>
+              <span className="bom-preview-summary-value">{preview.itemRowCount}</span>
+            </span>
+            <span className="bom-preview-summary-item">
+              <span className="bom-preview-summary-label">Rows</span>
+              <span className="bom-preview-summary-value">{preview.rows.length}</span>
+            </span>
+            <span className="bom-preview-summary-item">
+              <span className="bom-preview-summary-label">Format</span>
+              <span className="bom-preview-summary-value">{formatLabel}</span>
+            </span>
+            {previewSheets.length > 1 ? (
+              <span className="bom-preview-summary-item">
+                <span className="bom-preview-summary-label">Sheets</span>
+                <span className="bom-preview-summary-value">{previewSheets.length}</span>
+              </span>
+            ) : null}
+            <span className="bom-preview-summary-item">
+              <span className="bom-preview-summary-label">Currency</span>
+              <span className="bom-preview-summary-value">{preview.workspaceCurrencyCode}</span>
+            </span>
+            <span className="bom-preview-summary-item">
+              <span className="bom-preview-summary-label">Tax</span>
+              <span className="bom-preview-summary-value">
+                {preview.workspaceTaxEnabled ? `${preview.workspaceTaxRatePercent.toFixed(2)}%` : "Disabled"}
+              </span>
+            </span>
+            {preview.compactColumns ? (
+              <span className="bom-preview-summary-item">
+                <span className="bom-preview-summary-label">Columns</span>
+                <span className="bom-preview-summary-value">Compact</span>
+              </span>
+            ) : null}
           </div>
         </header>
         {preview.warnings.length > 0 ? (
@@ -199,9 +236,43 @@ export function BomExportPreviewDialog({
             <tbody>
               {activeSheet.rows.map((row, rowIndex) => (
                 <tr key={`${rowIndex}-${row.join("|")}`}>
-                  {activeSheet.headers.map((header, columnIndex) => (
-                    <td key={`${header}-${columnIndex}`}>{formatPreviewCell(row[columnIndex])}</td>
-                  ))}
+                  {activeSheet.headers.map((header, columnIndex) => {
+                    const cellValue = formatPreviewCell(row[columnIndex]);
+                    const rowType = typeColumnIndex >= 0 ? formatPreviewCell(row[typeColumnIndex]) : "";
+                    const linkedCatalogItemId =
+                      rowType === "Catalog item" && columnIndex === manufacturerReferenceColumnIndex
+                        ? preview.catalogItemReferenceLinks[cellValue]
+                        : undefined;
+                    const connectorTechnicalId = connectorIdColumnIndex >= 0 ? formatPreviewCell(row[connectorIdColumnIndex]) : "";
+                    const linkedConnectorId =
+                      activeSheet.name === "By connector" &&
+                      (columnIndex === connectorIdColumnIndex || columnIndex === connectorNameColumnIndex)
+                        ? preview.connectorTechnicalIdLinks[connectorTechnicalId]
+                        : undefined;
+                    return (
+                      <td key={`${header}-${columnIndex}`}>
+                        {linkedCatalogItemId !== undefined ? (
+                          <EntityReferenceButton
+                            className="technical-id"
+                            title={`Open catalog item ${cellValue}`}
+                            onClick={() => onOpenCatalogItem(linkedCatalogItemId)}
+                          >
+                            {cellValue}
+                          </EntityReferenceButton>
+                        ) : linkedConnectorId !== undefined ? (
+                          <EntityReferenceButton
+                            className={columnIndex === connectorIdColumnIndex ? "technical-id" : ""}
+                            title={`Open connector ${connectorTechnicalId}`}
+                            onClick={() => onOpenConnector(linkedConnectorId)}
+                          >
+                            {cellValue}
+                          </EntityReferenceButton>
+                        ) : (
+                          cellValue
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>

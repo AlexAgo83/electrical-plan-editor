@@ -1,6 +1,6 @@
 import { type ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import appPackageMetadata from "../../package.json";
-import type { CatalogItemId } from "../core/entities";
+import type { CatalogItemId, ConnectorId } from "../core/entities";
 import {
   appActions,
   hasSampleNetworkSignature,
@@ -502,7 +502,27 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCatalogConnectorLayout: formsState.setCatalogConnectorLayout,
     setCatalogFormError: formsState.setCatalogFormError
   });
+  const openBomPreviewCatalogItem = useCallback(
+    (catalogItemId: CatalogItemId) => {
+      closeActiveBomPreview();
+      setDetailPanelsSelectionSource("table");
+      setActiveScreen("modeling");
+      setActiveSubScreen("catalog");
+      const catalogItem = store.getState().catalogItems.byId[catalogItemId];
+      if (catalogItem !== undefined) {
+        catalogHandlers.startCatalogEdit(catalogItem);
+        return;
+      }
 
+      dispatchAction(
+        appActions.select({
+          kind: "catalog",
+          id: catalogItemId
+        })
+      );
+    },
+    [catalogHandlers, closeActiveBomPreview, dispatchAction, setActiveScreen, setActiveSubScreen, store]
+  );
   useNetworkSummaryViewStateSync({
     activeNetworkId,
     activeNetworkSummaryViewState,
@@ -626,6 +646,27 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   });
   const { connector: connectorHandlers, splice: spliceHandlers, node: nodeHandlers, segment: segmentHandlers, wire: wireHandlers } =
     modelingHandlers;
+  const openBomPreviewConnector = useCallback(
+    (connectorId: ConnectorId) => {
+      closeActiveBomPreview();
+      setDetailPanelsSelectionSource("table");
+      setActiveScreen("modeling");
+      setActiveSubScreen("connector");
+      const connector = store.getState().connectors.byId[connectorId];
+      if (connector !== undefined) {
+        modelingHandlers.connector.startConnectorEdit(connector);
+        return;
+      }
+
+      dispatchAction(
+        appActions.select({
+          kind: "connector",
+          id: connectorId
+        })
+      );
+    },
+    [closeActiveBomPreview, dispatchAction, modelingHandlers.connector, setActiveScreen, setActiveSubScreen, store]
+  );
 
   const catalogAnalysisDomain = useAppControllerCatalogAnalysisActions({
     connectorMap,
@@ -1053,6 +1094,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       activeBomPreview={activeBomPreview}
       closeActiveBomPreview={closeActiveBomPreview}
       confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload}
+      openBomPreviewCatalogItem={openBomPreviewCatalogItem}
+      openBomPreviewConnector={openBomPreviewConnector}
       onboarding={{
         activeOnboardingStep,
         isOnboardingOpen,

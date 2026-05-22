@@ -842,6 +842,7 @@ export function NetworkSummaryPanel({
               toggleShowNetworkGrid={toggleShowNetworkGrid}
               toggleSnapNodesToGrid={toggleSnapNodesToGrid}
               toggleLockEntityMovement={toggleLockEntityMovement}
+              onRegenerateLayout={onRegenerateLayout}
             />
             <NetworkSummaryViewMenu
               showFloatingInspectorPanel={showFloatingInspectorPanel}
@@ -881,7 +882,6 @@ export function NetworkSummaryPanel({
                 showNetworkInfoPanels={showNetworkInfoPanels}
                 handleZoomAction={handleZoomAction}
                 fitNetworkToContent={fitNetworkToContent}
-                onRegenerateLayout={onRegenerateLayout}
                 selectedCanvasNodeCount={selectedCanvasNodeIds.size}
                 clearSelectedCanvasNodes={clearSelectedCanvasNodes}
                 networkScalePercent={networkScalePercent}

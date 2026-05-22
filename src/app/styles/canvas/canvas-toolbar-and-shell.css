@@ -285,17 +285,39 @@
   font-size: 0.76rem;
 }
 
+.network-canvas-toolbar .network-canvas-zoom-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.24rem;
+  min-width: 2.35rem;
+}
+
+.network-canvas-zoom-button .action-button-icon {
+  width: 0.78rem;
+  height: 0.78rem;
+  flex-basis: 0.78rem;
+}
+
 .network-canvas-floating-copy {
   margin: 0;
   font-size: 0.76rem;
   line-height: 1.25;
 }
 
+.network-canvas-floating-guidance {
+  display: grid;
+  gap: 0.12rem;
+}
+
 .network-canvas-selection-summary {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem;
+  justify-content: space-between;
+  gap: 0.45rem;
+  padding-top: 0.32rem;
+  border-top: 1px solid rgba(95, 124, 148, 0.28);
 }
 
 .network-canvas-selection-summary .workspace-tab {

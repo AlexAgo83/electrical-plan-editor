@@ -97,7 +97,8 @@ describe("App integration UI - network summary BOM export", () => {
       expect(clickSpy).not.toHaveBeenCalled();
 
       const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
-      expect(within(previewDialog).getByText("1 BOM item rows")).toBeInTheDocument();
+      expect(within(previewDialog).getByText("Items")).toBeInTheDocument();
+      expect(within(previewDialog).getAllByText("1").length).toBeGreaterThan(0);
       expect(within(previewDialog).getByText("CSV")).toBeInTheDocument();
       expect(within(previewDialog).getByText("CAT-BOM")).toBeInTheDocument();
       fireEvent.click(within(previewDialog).getByRole("button", { name: "Download CSV" }));
@@ -221,7 +222,8 @@ describe("App integration UI - network summary BOM export", () => {
 
     const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
     expect(within(previewDialog).getByText("XLSX")).toBeInTheDocument();
-    expect(within(previewDialog).getByText("2 sheets")).toBeInTheDocument();
+    expect(within(previewDialog).getByText("Sheets")).toBeInTheDocument();
+    expect(within(previewDialog).getAllByText("2").length).toBeGreaterThan(0);
     expect(within(previewDialog).getByRole("tab", { name: /Network BOM/ })).toHaveAttribute("aria-selected", "true");
     const byConnectorTab = within(previewDialog).getByRole("tab", { name: /By connector/ });
     fireEvent.click(byConnectorTab);
@@ -229,6 +231,122 @@ describe("App integration UI - network summary BOM export", () => {
     expect(byConnectorTab).toHaveAttribute("aria-selected", "true");
     expect(within(previewDialog).getByText("Connector ID")).toBeInTheDocument();
     expect(within(previewDialog).getByText("C-BOM-XLSX")).toBeInTheDocument();
+  });
+
+  it("opens connectors from the BOM preview By connector sheet", () => {
+    const catalogItemId = asCatalogItemId("CAT-BOM-CONNECTOR-LINK");
+    const withCatalog = appReducer(
+      appReducer(
+        createUiIntegrationState(),
+        appActions.upsertCatalogItem({
+          id: catalogItemId,
+          manufacturerReference: "CAT-BOM-CONNECTOR-LINK",
+          name: "Catalog BOM connector link item",
+          connectionCount: 2
+        })
+      ),
+      appActions.upsertConnector({
+        id: asConnectorId("C-BOM-CONNECTOR-LINK"),
+        name: "Connector BOM Link",
+        technicalId: "CONN-BOM-LINK",
+        cavityCount: 2,
+        catalogItemId
+      })
+    );
+
+    renderAppWithState(withCatalog);
+
+    switchScreenDrawerAware("settings");
+    const pricingSettingsPanel = getPanelByHeading("Catalog & BOM setup");
+    fireEvent.change(within(pricingSettingsPanel).getByLabelText("Tabular export format"), {
+      target: { value: "xlsx" }
+    });
+
+    switchScreenDrawerAware("modeling");
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    openExportMenu(networkSummaryPanel);
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
+
+    const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+    fireEvent.click(within(previewDialog).getByRole("tab", { name: /By connector/ }));
+    fireEvent.click(within(previewDialog).getByRole("button", { name: "CONN-BOM-LINK" }));
+
+    expect(screen.queryByRole("dialog", { name: "BOM preview" })).toBeNull();
+    const editConnectorPanel = getPanelByHeading("Edit Connector");
+    expect(within(editConnectorPanel).getByLabelText("Technical ID")).toHaveValue("CONN-BOM-LINK");
+  });
+
+  it("opens catalog entries from BOM preview manufacturer references", () => {
+    const catalogItemId = asCatalogItemId("CAT-BOM-LINK");
+    const withCatalog = appReducer(
+      appReducer(
+        createUiIntegrationState(),
+        appActions.upsertCatalogItem({
+          id: catalogItemId,
+          manufacturerReference: "CAT-BOM-LINK",
+          name: "Catalog BOM linked item",
+          connectionCount: 2,
+          unitPriceExclTax: 5
+        })
+      ),
+      appActions.upsertConnector({
+        id: asConnectorId("C-BOM-LINK"),
+        name: "Connector link",
+        technicalId: "C-BOM-LINK",
+        cavityCount: 2,
+        catalogItemId
+      })
+    );
+
+    renderAppWithState(withCatalog);
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    openExportMenu(networkSummaryPanel);
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
+
+    const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+    fireEvent.click(within(previewDialog).getByRole("button", { name: "CAT-BOM-LINK" }));
+
+    expect(screen.queryByRole("dialog", { name: "BOM preview" })).toBeNull();
+    const editCatalogPanel = getPanelByHeading("Edit catalog item");
+    expect(within(editCatalogPanel).getByLabelText("Manufacturer reference")).toHaveValue("CAT-BOM-LINK");
+  });
+
+  it("keeps wire termination references in the BOM preview as non-navigation text", () => {
+    const baseState = createUiIntegrationState();
+    const baseWire = baseState.wires.byId[asWireId("W1")];
+    if (baseWire === undefined) {
+      throw new Error("Expected wire W1 in integration state.");
+    }
+
+    const catalogItemId = asCatalogItemId("CAT-TERM-REF");
+    const withMatchingTerminationReference = appReducer(
+      appReducer(
+        baseState,
+        appActions.upsertCatalogItem({
+          id: catalogItemId,
+          manufacturerReference: "TERM-NOT-CATALOG-LINK",
+          name: "Catalog with matching termination text",
+          connectionCount: 2
+        })
+      ),
+      appActions.upsertWire({
+        ...baseWire,
+        endpointAConnectionReference: "TERM-NOT-CATALOG-LINK"
+      })
+    );
+
+    renderAppWithState(withMatchingTerminationReference);
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    openExportMenu(networkSummaryPanel);
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
+
+    const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+    expect(within(previewDialog).getAllByText("TERM-NOT-CATALOG-LINK").length).toBeGreaterThan(0);
+    expect(within(previewDialog).queryByRole("button", { name: "TERM-NOT-CATALOG-LINK" })).toBeNull();
   });
 
   it("exports BOM CSV with a UTF-8 BOM and inline wire termination rows even without catalog-backed rows", () => {
