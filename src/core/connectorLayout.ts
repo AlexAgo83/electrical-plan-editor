@@ -26,6 +26,9 @@ export const MAX_CONNECTOR_LAYOUT_SHELL_PADDING = 1.5;
 export const DEFAULT_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS = 1;
 export const MIN_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS = 0;
 export const MAX_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS = 1;
+export const DEFAULT_CONNECTOR_LAYOUT_SHELL_STROKE_WIDTH = 0.08;
+export const MIN_CONNECTOR_LAYOUT_SHELL_STROKE_WIDTH = 0.02;
+export const MAX_CONNECTOR_LAYOUT_SHELL_STROKE_WIDTH = 0.2;
 export const DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING = 0.36;
 export const MIN_CONNECTOR_LAYOUT_CELL_PADDING = 0.12;
 export const MAX_CONNECTOR_LAYOUT_CELL_PADDING = 0.72;
@@ -86,6 +89,15 @@ function normalizeShellCornerRadius(value: unknown): number {
   }
   const clamped = Math.min(MAX_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS, Math.max(MIN_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS, parsed));
   return Math.round(clamped * 100) / 100;
+}
+
+function normalizeShellStrokeWidth(value: unknown): number {
+  const parsed = typeof value === "string" ? Number(value) : value;
+  if (typeof parsed !== "number" || !Number.isFinite(parsed)) {
+    return DEFAULT_CONNECTOR_LAYOUT_SHELL_STROKE_WIDTH;
+  }
+  const clamped = Math.min(MAX_CONNECTOR_LAYOUT_SHELL_STROKE_WIDTH, Math.max(MIN_CONNECTOR_LAYOUT_SHELL_STROKE_WIDTH, parsed));
+  return Math.round(clamped * 1000) / 1000;
 }
 
 function normalizeCellPadding(value: unknown): number {
@@ -402,6 +414,7 @@ export function createDefaultConnectorLayout(connectionCount: number): Connector
     shellShape: DEFAULT_SHELL_SHAPE,
     shellPadding: DEFAULT_CONNECTOR_LAYOUT_SHELL_PADDING,
     shellCornerRadius: DEFAULT_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS,
+    shellStrokeWidth: DEFAULT_CONNECTOR_LAYOUT_SHELL_STROKE_WIDTH,
     cellPadding: DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING,
     keyings: [],
     ways
@@ -462,6 +475,7 @@ export function normalizeConnectorLayout(
     shellShape: normalizeShellShape(value.shellShape),
     shellPadding,
     shellCornerRadius: normalizeShellCornerRadius(value.shellCornerRadius),
+    shellStrokeWidth: normalizeShellStrokeWidth(value.shellStrokeWidth),
     cellPadding: normalizeCellPadding(value.cellPadding),
     keyings: normalizeKeyings(value.keyings, value.keying, width, height, shellPadding),
     ways: [...normalizedByIndex.values()].sort((left, right) => left.cavityIndex - right.cavityIndex)
@@ -529,6 +543,7 @@ export function isEditedConnectorLayout(
     getConnectorLayoutShellShape(layout) === getConnectorLayoutShellShape(generatedLayout) &&
     getConnectorLayoutShellPadding(layout) === getConnectorLayoutShellPadding(generatedLayout) &&
     getConnectorLayoutShellCornerRadius(layout) === getConnectorLayoutShellCornerRadius(generatedLayout) &&
+    getConnectorLayoutShellStrokeWidth(layout) === getConnectorLayoutShellStrokeWidth(generatedLayout) &&
     getConnectorLayoutCellPadding(layout) === getConnectorLayoutCellPadding(generatedLayout) &&
     connectorLayoutKeyingsMatch(getConnectorLayoutKeyings(layout), getConnectorLayoutKeyings(generatedLayout)) &&
     connectorLayoutWaysMatch(layout.ways, generatedLayout.ways)
@@ -624,6 +639,10 @@ export function getConnectorLayoutShellCornerRadius(layout: ConnectorLayout): nu
   return normalizeShellCornerRadius(layout.shellCornerRadius);
 }
 
+export function getConnectorLayoutShellStrokeWidth(layout: ConnectorLayout): number {
+  return normalizeShellStrokeWidth(layout.shellStrokeWidth);
+}
+
 export function getConnectorLayoutCellPadding(layout: ConnectorLayout): number {
   return normalizeCellPadding(layout.cellPadding);
 }
@@ -649,6 +668,13 @@ export function updateConnectorLayoutShellCornerRadius(layout: ConnectorLayout, 
   return {
     ...layout,
     shellCornerRadius: normalizeShellCornerRadius(shellCornerRadius)
+  };
+}
+
+export function updateConnectorLayoutShellStrokeWidth(layout: ConnectorLayout, shellStrokeWidth: number): ConnectorLayout {
+  return {
+    ...layout,
+    shellStrokeWidth: normalizeShellStrokeWidth(shellStrokeWidth)
   };
 }
 

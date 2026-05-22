@@ -134,6 +134,7 @@ export interface ConnectorLayout {
   shellShape?: ConnectorLayoutShellShape;
   shellPadding?: number;
   shellCornerRadius?: number;
+  shellStrokeWidth?: number;
   cellPadding?: number;
   keyings?: ConnectorLayoutKeying[];
   /** @deprecated Use keyings for zero-to-many connector keying features. */

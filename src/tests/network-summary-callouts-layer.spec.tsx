@@ -21,6 +21,8 @@ describe("NetworkSummaryCalloutsLayer", () => {
           units: "grid",
           width: 3,
           height: 2,
+          shellCornerRadius: 0,
+          shellStrokeWidth: 0.16,
           ways: [
             { cavityIndex: 1, x: 1, y: 1, shape: "round" },
             { cavityIndex: 2, x: 2, y: 1, shape: "round" }
@@ -88,5 +90,7 @@ describe("NetworkSummaryCalloutsLayer", () => {
 
     expect(container.querySelectorAll(".network-callout-connector-way.is-wire-highlighted")).toHaveLength(1);
     expect(container.querySelector(".network-callout-connector-way-group.is-wire-highlighted text")?.textContent).toBe("C1");
+    expect(container.querySelector(".network-callout-connector-shell")?.getAttribute("rx")).toBe("0");
+    expect(container.querySelector(".network-callout-connector-shell")?.getAttribute("style")).toContain("stroke-width: 0.16");
   });
 });

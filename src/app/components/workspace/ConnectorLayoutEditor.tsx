@@ -13,6 +13,7 @@ import {
   DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING,
   getConnectorLayoutShellPadding,
   getConnectorLayoutShellCornerRadius,
+  getConnectorLayoutShellStrokeWidth,
   getConnectorLayoutCellPadding,
   getConnectorLayoutDuplicatePositions,
   getConnectorLayoutKeyings,
@@ -25,6 +26,8 @@ import {
   MAX_CONNECTOR_LAYOUT_SHELL_PADDING,
   MIN_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS,
   MAX_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS,
+  MIN_CONNECTOR_LAYOUT_SHELL_STROKE_WIDTH,
+  MAX_CONNECTOR_LAYOUT_SHELL_STROKE_WIDTH,
   MIN_CONNECTOR_LAYOUT_CELL_PADDING,
   MAX_CONNECTOR_LAYOUT_CELL_PADDING,
   MIN_CONNECTOR_LAYOUT_KEYING_SCALE,
@@ -37,6 +40,7 @@ import {
   updateConnectorLayoutKeyingAt,
   updateConnectorLayoutShellCornerRadius,
   updateConnectorLayoutShellPadding,
+  updateConnectorLayoutShellStrokeWidth,
   updateConnectorLayoutShellShape
 } from "../../../core/connectorLayout";
 
@@ -211,6 +215,7 @@ function renderLayoutShell(layout: ConnectorLayout, shellShape: ConnectorLayoutS
   const width = layout.width - 1 + shellPadding * 2;
   const height = layout.height - 1 + shellPadding * 2;
   const cornerRadius = Math.min(0.55, shellPadding) * getConnectorLayoutShellCornerRadius(layout);
+  const strokeWidth = getConnectorLayoutShellStrokeWidth(layout);
   if (shellShape === "circle") {
     return (
       <ellipse
@@ -219,10 +224,11 @@ function renderLayoutShell(layout: ConnectorLayout, shellShape: ConnectorLayoutS
         cy={layout.height / 2 + 0.5}
         rx={width / 2}
         ry={height / 2}
+        style={{ strokeWidth }}
       />
     );
   }
-  return <rect className="connector-layout-shell" x={x} y={y} width={width} height={height} rx={cornerRadius} />;
+  return <rect className="connector-layout-shell" x={x} y={y} width={width} height={height} rx={cornerRadius} style={{ strokeWidth }} />;
 }
 
 function renderLayoutGrid(layout: ConnectorLayout): ReactElement {
@@ -384,6 +390,7 @@ export function ConnectorLayoutEditor({
   const shellShape = getConnectorLayoutShellShape(layout);
   const shellPadding = getConnectorLayoutShellPadding(layout);
   const shellCornerRadius = getConnectorLayoutShellCornerRadius(layout);
+  const shellStrokeWidth = getConnectorLayoutShellStrokeWidth(layout);
   const cellPadding = getConnectorLayoutCellPadding(layout);
 
   function commitLayout(nextLayout: ConnectorLayout): void {
@@ -448,6 +455,14 @@ export function ConnectorLayoutEditor({
       return;
     }
     commitLayout(updateConnectorLayoutShellCornerRadius(layout, parsed));
+  }
+
+  function updateShellStrokeWidth(value: string): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+    commitLayout(updateConnectorLayoutShellStrokeWidth(layout, parsed));
   }
 
   function updateCellPadding(value: string): void {
@@ -958,6 +973,20 @@ export function ConnectorLayoutEditor({
                   />
                 </label>
               ) : null}
+              <label className="connector-layout-slider-field">
+                <span>
+                  Shape thickness
+                  <strong>{shellStrokeWidth.toFixed(2)} grid</strong>
+                </span>
+                <input
+                  type="range"
+                  min={MIN_CONNECTOR_LAYOUT_SHELL_STROKE_WIDTH}
+                  max={MAX_CONNECTOR_LAYOUT_SHELL_STROKE_WIDTH}
+                  step={0.01}
+                  value={shellStrokeWidth}
+                  onChange={(event) => updateShellStrokeWidth(event.target.value)}
+                />
+              </label>
               <label className="connector-layout-slider-field">
                 <span>
                   Cell padding

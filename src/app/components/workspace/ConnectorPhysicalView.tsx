@@ -17,6 +17,7 @@ import {
   getConnectorLayoutKeyings,
   getConnectorLayoutShellCornerRadius,
   getConnectorLayoutShellPadding,
+  getConnectorLayoutShellStrokeWidth,
   getConnectorLayoutShellShape,
   getConnectorLayoutWayDisplayLabel,
   resolveConnectorLayout
@@ -152,6 +153,7 @@ function renderPhysicalShell(layout: ConnectorLayout, shellShape: ConnectorLayou
   const width = layout.width - 1 + shellPadding * 2;
   const height = layout.height - 1 + shellPadding * 2;
   const cornerRadius = Math.min(0.6, shellPadding) * getConnectorLayoutShellCornerRadius(layout);
+  const strokeWidth = getConnectorLayoutShellStrokeWidth(layout);
   if (shellShape === "circle") {
     return (
       <ellipse
@@ -160,10 +162,11 @@ function renderPhysicalShell(layout: ConnectorLayout, shellShape: ConnectorLayou
         cy={layout.height / 2 + 0.5}
         rx={width / 2}
         ry={height / 2}
+        style={{ strokeWidth }}
       />
     );
   }
-  return <rect className="connector-physical-shell" x={x} y={y} width={width} height={height} rx={cornerRadius} />;
+  return <rect className="connector-physical-shell" x={x} y={y} width={width} height={height} rx={cornerRadius} style={{ strokeWidth }} />;
 }
 
 function getWireTechnicalIdColorDotCount(wire: Wire | null): number {

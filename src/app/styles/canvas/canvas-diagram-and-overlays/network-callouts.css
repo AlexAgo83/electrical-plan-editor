@@ -72,8 +72,8 @@
 }
 
 .network-callout-connector-keying {
-  stroke: color-mix(in srgb, var(--network-node-stroke-color, #55748d) 75%, transparent);
-  stroke-width: 0.04;
+  fill: color-mix(in srgb, var(--theme-primary, currentColor) 68%, currentColor 32%);
+  stroke: none;
 }
 
 .network-callout-connector-way {

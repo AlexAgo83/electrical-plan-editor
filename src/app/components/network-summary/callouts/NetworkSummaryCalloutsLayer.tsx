@@ -14,7 +14,9 @@ import {
   getConnectorLayoutCellPadding,
   getConnectorLayoutKeyingAnchor,
   getConnectorLayoutKeyings,
+  getConnectorLayoutShellCornerRadius,
   getConnectorLayoutShellPadding,
+  getConnectorLayoutShellStrokeWidth,
   getConnectorLayoutShellShape,
   getConnectorLayoutWayDisplayLabel
 } from "../../../../core/connectorLayout";
@@ -135,6 +137,8 @@ function renderConnectorLayoutDrawing(
   const shellY = 1 - shellPadding;
   const shellWidth = layout.width - 1 + shellPadding * 2;
   const shellHeight = layout.height - 1 + shellPadding * 2;
+  const shellCornerRadius = Math.min(0.55, shellPadding) * getConnectorLayoutShellCornerRadius(layout);
+  const shellStrokeWidth = getConnectorLayoutShellStrokeWidth(layout);
 
   return (
     <g className="network-callout-connector-drawing" transform={`translate(${originX} ${originY}) scale(${scale})`}>
@@ -145,6 +149,7 @@ function renderConnectorLayoutDrawing(
           cy={layout.height / 2 + 0.5}
           rx={shellWidth / 2}
           ry={shellHeight / 2}
+          style={{ strokeWidth: shellStrokeWidth }}
         />
       ) : (
         <rect
@@ -153,7 +158,8 @@ function renderConnectorLayoutDrawing(
           y={shellY}
           width={shellWidth}
           height={shellHeight}
-          rx={Math.min(0.55, shellPadding)}
+          rx={shellCornerRadius}
+          style={{ strokeWidth: shellStrokeWidth }}
         />
       )}
       {getConnectorLayoutKeyings(layout).map((keying, index) => (

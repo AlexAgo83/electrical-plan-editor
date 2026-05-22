@@ -134,6 +134,13 @@ describe("App integration UI - catalog layout", () => {
     });
     expect(roundedSlider).toHaveValue("0");
     expect(catalogLayoutPanel.querySelector(".connector-layout-shell")?.getAttribute("rx")).toBe("0");
+    const shapeThicknessSlider = within(catalogLayoutPanel).getByLabelText(/Shape thickness/i);
+    expect(shapeThicknessSlider).toHaveValue("0.08");
+    fireEvent.change(shapeThicknessSlider, {
+      target: { value: "0.16" }
+    });
+    expect(shapeThicknessSlider).toHaveValue("0.16");
+    expect(catalogLayoutPanel.querySelector(".connector-layout-shell")?.getAttribute("style")).toContain("stroke-width: 0.16");
     const cellPaddingSlider = within(catalogLayoutPanel).getByLabelText(/Cell padding/i);
     expect(cellPaddingSlider).toHaveValue("0.36");
     fireEvent.change(cellPaddingSlider, {
