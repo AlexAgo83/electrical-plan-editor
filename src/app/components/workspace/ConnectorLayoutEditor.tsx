@@ -98,12 +98,20 @@ function normalizeCssColorToHex(value: string): string | null {
     return hex;
   }
   const rgbMatch = value.trim().match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
-  if (rgbMatch === null) {
+  if (rgbMatch !== null) {
+    const [, red, green, blue] = rgbMatch;
+    return `#${[red, green, blue]
+      .map((component) => Math.min(255, Math.max(0, Number(component))).toString(16).padStart(2, "0"))
+      .join("")}`;
+  }
+
+  const srgbMatch = value.trim().match(/^color\(\s*srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)/i);
+  if (srgbMatch === null) {
     return null;
   }
-  const [, red, green, blue] = rgbMatch;
+  const [, red, green, blue] = srgbMatch;
   return `#${[red, green, blue]
-    .map((component) => Math.min(255, Math.max(0, Number(component))).toString(16).padStart(2, "0"))
+    .map((component) => Math.round(Math.min(1, Math.max(0, Number(component))) * 255).toString(16).padStart(2, "0"))
     .join("")}`;
 }
 
@@ -212,6 +220,25 @@ function renderLayoutShell(layout: ConnectorLayout, shellShape: ConnectorLayoutS
   return <rect className="connector-layout-shell" x={x} y={y} width={width} height={height} rx={Math.min(0.55, shellPadding)} />;
 }
 
+function renderLayoutGrid(layout: ConnectorLayout): ReactElement {
+  const minX = 0.5;
+  const minY = 0.5;
+  const maxX = layout.width + 0.5;
+  const maxY = layout.height + 0.5;
+  return (
+    <g className="connector-layout-grid" aria-hidden="true">
+      {Array.from({ length: layout.width + 1 }, (_, index) => {
+        const x = index + 0.5;
+        return <line key={`grid-x-${x}`} className="connector-layout-grid-line" x1={x} y1={minY} x2={x} y2={maxY} />;
+      })}
+      {Array.from({ length: layout.height + 1 }, (_, index) => {
+        const y = index + 0.5;
+        return <line key={`grid-y-${y}`} className="connector-layout-grid-line" x1={minX} y1={y} x2={maxX} y2={y} />;
+      })}
+    </g>
+  );
+}
+
 function getLayoutViewBox(layout: ConnectorLayout, shellPadding: number): string {
   const minX = 1 - shellPadding - 0.5;
   const minY = 1 - shellPadding - 0.5;
@@ -305,8 +332,12 @@ export function ConnectorLayoutEditor({
   }
 
   function getDefaultKeyingColor(): string {
+    const shellColor =
+      svgRef.current === null
+        ? ""
+        : getComputedStyle(svgRef.current.querySelector(".connector-layout-shell") ?? svgRef.current).fill;
     const currentColor = svgRef.current === null ? "" : getComputedStyle(svgRef.current).color;
-    return normalizeCssColorToHex(currentColor) ?? DEFAULT_KEYING_COLOR_PICKER_VALUE;
+    return normalizeCssColorToHex(shellColor) ?? normalizeCssColorToHex(currentColor) ?? DEFAULT_KEYING_COLOR_PICKER_VALUE;
   }
 
   function addKeyingWithDefaultColor(): void {
@@ -584,6 +615,7 @@ export function ConnectorLayoutEditor({
             onPointerCancel={handleLayoutPointerEnd}
           >
             {renderLayoutShell(layout, shellShape, shellPadding)}
+            {renderLayoutGrid(layout)}
             {keyings.map((keying, index) => (
               <g
                 key={`keying-preview-${index}`}

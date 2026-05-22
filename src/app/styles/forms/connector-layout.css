@@ -136,14 +136,31 @@
 
 .connector-layout-shell,
 .connector-physical-shell {
-  fill: color-mix(in srgb, currentColor 8%, transparent);
-  stroke: color-mix(in srgb, currentColor 34%, transparent);
+  fill: color-mix(in srgb, var(--theme-surface, Canvas) 82%, var(--theme-primary, currentColor) 18%);
+  stroke: color-mix(in srgb, var(--theme-primary, currentColor) 46%, currentColor 54%);
   stroke-width: 0.08;
+}
+
+.connector-layout-grid {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.connector-layout-preview:hover .connector-layout-grid,
+.connector-layout-preview:focus-within .connector-layout-grid {
+  opacity: 0.25;
+}
+
+.connector-layout-grid-line {
+  stroke: color-mix(in srgb, var(--theme-primary, currentColor) 72%, currentColor 28%);
+  stroke-width: 0.0275;
+  stroke-dasharray: 0.07 0.11;
 }
 
 .connector-layout-keying,
 .connector-physical-keying {
-  fill: color-mix(in srgb, currentColor 34%, transparent);
+  fill: color-mix(in srgb, var(--theme-primary, currentColor) 68%, currentColor 32%);
   stroke: none;
 }
 

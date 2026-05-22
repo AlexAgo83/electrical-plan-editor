@@ -105,9 +105,11 @@ describe("App integration UI - catalog layout", () => {
       target: { value: "4" }
     });
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Auto layout" }));
+    expect(catalogLayoutPanel.querySelectorAll(".connector-layout-grid-line")).toHaveLength(6);
     expect(within(catalogLayoutPanel).getByRole("button", { name: "Remove column on right" })).toBeDisabled();
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Add column on left" }));
     expect(within(catalogLayoutPanel).getByLabelText("Grid width")).toHaveValue(3);
+    expect(catalogLayoutPanel.querySelectorAll(".connector-layout-grid-line")).toHaveLength(7);
     expect(within(catalogLayoutPanel).getByRole("button", { name: "Remove column on left" })).toBeEnabled();
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Remove column on left" }));
     expect(within(catalogLayoutPanel).getByLabelText("Grid width")).toHaveValue(2);
