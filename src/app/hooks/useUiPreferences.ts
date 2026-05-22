@@ -232,7 +232,7 @@ function migrateUiPreferencesFromV8(candidate: Record<string, unknown>): Record<
     canvasCalloutConnectorDrawingScalePercent:
       typeof candidate.canvasCalloutConnectorDrawingScalePercent === "number"
         ? candidate.canvasCalloutConnectorDrawingScalePercent
-        : 125,
+        : 150,
     schemaVersion: 9
   };
 }
@@ -242,7 +242,7 @@ function migrateUiPreferencesFromV9(candidate: Record<string, unknown>): Record<
   return {
     ...candidate,
     canvasConnectorDrawingDisplayMode:
-      legacyMode === "connectorDrawing" || legacyMode === "both" ? "callouts" : "disabled",
+      legacyMode === "connectorDrawing" || legacyMode === "both" ? "nodes" : "disabled",
     schemaVersion: 10
   };
 }
@@ -488,7 +488,7 @@ function normalizeConnectorDrawingDisplayMode(value: unknown): ConnectorDrawingD
   if (value === "disabled" || value === "nodes") {
     return value;
   }
-  return "callouts";
+  return "nodes";
 }
 
 function normalizeCanvasLabelRotationDegrees(value: unknown): CanvasLabelRotationDegrees {
@@ -516,7 +516,7 @@ function normalizeCanvasNodeShapeSizePercent(value: unknown): number {
 function normalizeCanvasCalloutConnectorDrawingScalePercent(value: unknown): number {
   const parsed = typeof value === "string" ? Number(value) : value;
   if (!Number.isFinite(parsed)) {
-    return 125;
+    return 150;
   }
   return clamp(Math.round(Number(parsed)), 100, 200);
 }

@@ -148,8 +148,8 @@ describe("App integration UI - settings canvas callouts", () => {
     const connectorDrawingSelector = within(getPanelByHeading("Canvas tools preferences")).getByLabelText(
       "Connector drawing display"
     );
-    expect(connectorDrawingSelector).toHaveValue("callouts");
-    expect(within(getPanelByHeading("Canvas tools preferences")).getByRole("slider", { name: /Connector drawing size/ })).toHaveValue("125");
+    expect(connectorDrawingSelector).toHaveValue("nodes");
+    expect(within(getPanelByHeading("Canvas tools preferences")).getByRole("slider", { name: /Connector drawing size/ })).toHaveValue("150");
     fireEvent.change(connectorDrawingSelector, { target: { value: "disabled" } });
 
     switchScreenDrawerAware("modeling");

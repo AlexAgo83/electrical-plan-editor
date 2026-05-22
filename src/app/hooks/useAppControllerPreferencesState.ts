@@ -56,8 +56,8 @@ export function useAppControllerPreferencesState() {
   const [canvasDefaultAutoSegmentLabelRotation, setCanvasDefaultAutoSegmentLabelRotation] = useState(true);
   const [canvasShowCalloutWireNames, setCanvasShowCalloutWireNames] = useState(false);
   const [canvasConnectorDrawingDisplayMode, setCanvasConnectorDrawingDisplayMode] =
-    useState<ConnectorDrawingDisplayMode>("callouts");
-  const [canvasCalloutConnectorDrawingScalePercent, setCanvasCalloutConnectorDrawingScalePercent] = useState(125);
+    useState<ConnectorDrawingDisplayMode>("nodes");
+  const [canvasCalloutConnectorDrawingScalePercent, setCanvasCalloutConnectorDrawingScalePercent] = useState(150);
   const [canvasZoomInvariantNodeShapes, setCanvasZoomInvariantNodeShapes] = useState(true);
   const [canvasNodeShapeSizePercent, setCanvasNodeShapeSizePercent] = useState(70);
   const [canvasExportFormat, setCanvasExportFormat] = useState<CanvasExportFormat>("svg");
