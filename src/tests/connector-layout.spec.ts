@@ -7,6 +7,7 @@ import {
   getConnectorLayoutKeyingAnchor,
   getConnectorLayoutKeyings,
   getConnectorLayoutKeyingSide,
+  getConnectorLayoutShellCornerRadius,
   getConnectorLayoutShellPadding,
   getConnectorLayoutShellShape,
   getConnectorLayoutWayDisplayLabel,
@@ -19,6 +20,7 @@ import {
   resolveConnectorLayout,
   updateConnectorLayoutKeyingAt,
   updateConnectorLayoutCellPadding,
+  updateConnectorLayoutShellCornerRadius,
   updateConnectorLayoutShellPadding,
   updateConnectorLayoutShellShape
 } from "../core/connectorLayout";
@@ -33,6 +35,7 @@ describe("connector layout", () => {
     expect(layout.height).toBe(2);
     expect(getConnectorLayoutShellShape(layout)).toBe("square");
     expect(getConnectorLayoutShellPadding(layout)).toBe(0.5);
+    expect(getConnectorLayoutShellCornerRadius(layout)).toBe(1);
     expect(getConnectorLayoutCellPadding(layout)).toBe(0.36);
     expect(getConnectorLayoutKeyings(layout)).toEqual([]);
     expect(getConnectorLayoutKeyingSide(layout)).toBe("none");
@@ -129,6 +132,18 @@ describe("connector layout", () => {
     expect(getConnectorLayoutShellPadding(expanded)).toBe(1.2);
     expect(normalizedLow !== undefined ? getConnectorLayoutShellPadding(normalizedLow) : null).toBe(0.35);
     expect(normalizedHigh !== undefined ? getConnectorLayoutShellPadding(normalizedHigh) : null).toBe(1.5);
+  });
+
+  it("updates connector shell corner radius within supported bounds", () => {
+    const layout = createDefaultConnectorLayout(2);
+    const squared = updateConnectorLayoutShellCornerRadius(layout, 0);
+    const normalizedLow = normalizeConnectorLayout({ ...layout, shellCornerRadius: -1 }, 2);
+    const normalizedHigh = normalizeConnectorLayout({ ...layout, shellCornerRadius: 99 }, 2);
+
+    expect(getConnectorLayoutShellCornerRadius(squared)).toBe(0);
+    expect(normalizedLow !== undefined ? getConnectorLayoutShellCornerRadius(normalizedLow) : null).toBe(0);
+    expect(normalizedHigh !== undefined ? getConnectorLayoutShellCornerRadius(normalizedHigh) : null).toBe(1);
+    expect(resolveEditedConnectorLayout(squared, 2)).toBeDefined();
   });
 
   it("updates connector cell padding within supported bounds", () => {

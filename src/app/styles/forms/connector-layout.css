@@ -175,8 +175,8 @@
 }
 
 .connector-layout-keying-handle.is-selected .connector-layout-keying {
-  stroke: color-mix(in srgb, var(--theme-primary, currentColor) 30%, currentColor 70%);
-  stroke-width: 0.06;
+  stroke: color-mix(in srgb, var(--theme-primary, currentColor) 18%, currentColor 82%);
+  stroke-width: 0.035;
 }
 
 .connector-layout-keying-handle.is-free {
@@ -371,22 +371,30 @@
 }
 
 .connector-layout-keying-row {
-  grid-template-columns: repeat(auto-fit, minmax(7.8rem, 1fr));
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-  border-radius: 0.55rem;
-  background: color-mix(in srgb, currentColor 3%, transparent);
-  padding: 0.55rem;
 }
 
 .connector-layout-keying-row > .connector-layout-slider-field {
-  grid-column: span 2;
+  grid-column: 1 / -1;
+}
+
+.connector-layout-keying-row > label:not(.connector-layout-checkbox-field),
+.connector-layout-keying-color-control {
+  grid-column: 1 / -1;
+}
+
+.connector-layout-keying-row > .connector-layout-keying-remove-button {
+  grid-column: 1;
+  justify-self: start;
 }
 
 .connector-layout-keying-row > .connector-layout-checkbox-field {
+  grid-column: 2;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  justify-self: start;
   min-height: 2.05rem;
 }
 
@@ -482,7 +490,9 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .connector-layout-keying-row > .connector-layout-slider-field {
+  .connector-layout-keying-row > .connector-layout-slider-field,
+  .connector-layout-keying-row > .connector-layout-keying-remove-button,
+  .connector-layout-keying-row > .connector-layout-checkbox-field {
     grid-column: auto;
   }
 }

@@ -12,6 +12,7 @@ import {
   addConnectorLayoutKeying,
   DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING,
   getConnectorLayoutShellPadding,
+  getConnectorLayoutShellCornerRadius,
   getConnectorLayoutCellPadding,
   getConnectorLayoutDuplicatePositions,
   getConnectorLayoutKeyings,
@@ -22,6 +23,8 @@ import {
   getConnectorLayoutKeyingAnchor,
   MIN_CONNECTOR_LAYOUT_SHELL_PADDING,
   MAX_CONNECTOR_LAYOUT_SHELL_PADDING,
+  MIN_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS,
+  MAX_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS,
   MIN_CONNECTOR_LAYOUT_CELL_PADDING,
   MAX_CONNECTOR_LAYOUT_CELL_PADDING,
   MIN_CONNECTOR_LAYOUT_KEYING_SCALE,
@@ -32,6 +35,7 @@ import {
   resolveConnectorLayout,
   updateConnectorLayoutCellPadding,
   updateConnectorLayoutKeyingAt,
+  updateConnectorLayoutShellCornerRadius,
   updateConnectorLayoutShellPadding,
   updateConnectorLayoutShellShape
 } from "../../../core/connectorLayout";
@@ -206,6 +210,7 @@ function renderLayoutShell(layout: ConnectorLayout, shellShape: ConnectorLayoutS
   const y = 1 - shellPadding;
   const width = layout.width - 1 + shellPadding * 2;
   const height = layout.height - 1 + shellPadding * 2;
+  const cornerRadius = Math.min(0.55, shellPadding) * getConnectorLayoutShellCornerRadius(layout);
   if (shellShape === "circle") {
     return (
       <ellipse
@@ -217,7 +222,7 @@ function renderLayoutShell(layout: ConnectorLayout, shellShape: ConnectorLayoutS
       />
     );
   }
-  return <rect className="connector-layout-shell" x={x} y={y} width={width} height={height} rx={Math.min(0.55, shellPadding)} />;
+  return <rect className="connector-layout-shell" x={x} y={y} width={width} height={height} rx={cornerRadius} />;
 }
 
 function renderLayoutGrid(layout: ConnectorLayout): ReactElement {
@@ -378,6 +383,7 @@ export function ConnectorLayoutEditor({
   const selectedKeying = selectedKeyingIndex === null ? null : keyings[selectedKeyingIndex] ?? null;
   const shellShape = getConnectorLayoutShellShape(layout);
   const shellPadding = getConnectorLayoutShellPadding(layout);
+  const shellCornerRadius = getConnectorLayoutShellCornerRadius(layout);
   const cellPadding = getConnectorLayoutCellPadding(layout);
 
   function commitLayout(nextLayout: ConnectorLayout): void {
@@ -434,6 +440,14 @@ export function ConnectorLayoutEditor({
       return;
     }
     commitLayout(updateConnectorLayoutShellPadding(layout, parsed));
+  }
+
+  function updateShellCornerRadius(value: string): void {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return;
+    }
+    commitLayout(updateConnectorLayoutShellCornerRadius(layout, parsed));
   }
 
   function updateCellPadding(value: string): void {
@@ -928,6 +942,22 @@ export function ConnectorLayoutEditor({
                   onChange={(event) => updateShellPadding(event.target.value)}
                 />
               </label>
+              {shellShape === "square" ? (
+                <label className="connector-layout-slider-field">
+                  <span>
+                    Rounded
+                    <strong>{Math.round(shellCornerRadius * 100)}%</strong>
+                  </span>
+                  <input
+                    type="range"
+                    min={MIN_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS}
+                    max={MAX_CONNECTOR_LAYOUT_SHELL_CORNER_RADIUS}
+                    step={0.05}
+                    value={shellCornerRadius}
+                    onChange={(event) => updateShellCornerRadius(event.target.value)}
+                  />
+                </label>
+              ) : null}
               <label className="connector-layout-slider-field">
                 <span>
                   Cell padding
@@ -1084,14 +1114,6 @@ export function ConnectorLayoutEditor({
                           />
                         </label>
                       ) : null}
-                      <label className="connector-layout-checkbox-field">
-                        <input
-                          type="checkbox"
-                          checked={isKeyingSnapEnabled(selectedKeyingPlacement)}
-                          onChange={(event) => updateKeyingSnap(selectedKeyingControlIndex, event.target.checked)}
-                        />
-                        Snap
-                      </label>
                       <label className="connector-layout-slider-field">
                         <span>
                           Scale
@@ -1108,7 +1130,7 @@ export function ConnectorLayoutEditor({
                       </label>
                       <button
                         type="button"
-                        className="button-with-icon"
+                        className="button-with-icon connector-layout-keying-remove-button"
                         onClick={() => {
                           setSelectedKeyingIndex(keyings.length <= 1 ? null : Math.min(selectedKeyingControlIndex, keyings.length - 2));
                           commitLayout(removeConnectorLayoutKeying(layout, selectedKeyingControlIndex));
@@ -1117,6 +1139,14 @@ export function ConnectorLayoutEditor({
                         <span className="action-button-icon is-delete" aria-hidden="true" />
                         Remove
                       </button>
+                      <label className="connector-layout-checkbox-field">
+                        <input
+                          type="checkbox"
+                          checked={isKeyingSnapEnabled(selectedKeyingPlacement)}
+                          onChange={(event) => updateKeyingSnap(selectedKeyingControlIndex, event.target.checked)}
+                        />
+                        Snap
+                      </label>
                     </div>
                 ) : null}
               </div>
