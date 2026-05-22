@@ -127,6 +127,14 @@ describe("App integration UI - catalog layout", () => {
       key: "ArrowLeft"
     });
     expect(within(catalogLayoutPanel).getByLabelText("X")).toHaveValue(2);
+    fireEvent.change(within(catalogLayoutPanel).getByLabelText("X"), {
+      target: { value: "1" }
+    });
+    expect(within(catalogLayoutPanel).getByLabelText("X")).toHaveValue(2);
+    fireEvent.change(within(catalogLayoutPanel).getByLabelText("Y"), {
+      target: { value: "2" }
+    });
+    expect(within(catalogLayoutPanel).getByLabelText("Y")).toHaveValue(1);
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Keying features" }));
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Add keying" }));
     expect(catalogLayoutPanel.querySelector(".connector-layout-keying")?.getAttribute("style")).toBeNull();

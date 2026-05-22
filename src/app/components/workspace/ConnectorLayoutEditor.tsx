@@ -656,7 +656,7 @@ export function ConnectorLayoutEditor({
                     max={layout.width}
                     step={1}
                     value={selectedWay.x}
-                    onChange={(event) => updateSelectedWay({ x: Number(event.target.value) })}
+                    onChange={(event) => moveWayToGridPosition(selectedWay.cavityIndex, Number(event.target.value), selectedWay.y)}
                   />
                 </label>
                 <label>
@@ -667,7 +667,7 @@ export function ConnectorLayoutEditor({
                     max={layout.height}
                     step={1}
                     value={selectedWay.y}
-                    onChange={(event) => updateSelectedWay({ y: Number(event.target.value) })}
+                    onChange={(event) => moveWayToGridPosition(selectedWay.cavityIndex, selectedWay.x, Number(event.target.value))}
                   />
                 </label>
               </div>
