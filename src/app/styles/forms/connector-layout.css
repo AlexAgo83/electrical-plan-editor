@@ -41,10 +41,85 @@
   padding: 0.6rem;
 }
 
+.connector-layout-preview {
+  position: relative;
+}
+
 .connector-layout-preview,
 .connector-physical-canvas {
   max-height: min(54vh, 28rem);
   overflow: auto;
+}
+
+.connector-layout-resize-button {
+  position: absolute;
+  z-index: 2;
+  display: inline-grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 44%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--theme-surface, Canvas) 88%, var(--theme-primary, currentColor) 12%);
+  color: color-mix(in srgb, currentColor 86%, var(--theme-primary, currentColor) 14%);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease, background-color 120ms ease;
+}
+
+.connector-layout-preview:hover .connector-layout-resize-button,
+.connector-layout-preview:focus-within .connector-layout-resize-button {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.connector-layout-resize-button.is-left {
+  left: 0.35rem;
+  top: 50%;
+}
+
+.connector-layout-resize-button.is-right {
+  right: 0.35rem;
+  top: 50%;
+}
+
+.connector-layout-resize-button.is-top {
+  left: 50%;
+  top: 0.35rem;
+}
+
+.connector-layout-resize-button.is-bottom {
+  left: 50%;
+  bottom: 0.35rem;
+}
+
+.connector-layout-resize-button.is-left.is-add,
+.connector-layout-resize-button.is-right.is-add {
+  transform: translateY(-112%);
+}
+
+.connector-layout-resize-button.is-left.is-remove,
+.connector-layout-resize-button.is-right.is-remove {
+  transform: translateY(12%);
+}
+
+.connector-layout-resize-button.is-top.is-add,
+.connector-layout-resize-button.is-bottom.is-add {
+  transform: translateX(-112%);
+}
+
+.connector-layout-resize-button.is-top.is-remove,
+.connector-layout-resize-button.is-bottom.is-remove {
+  transform: translateX(12%);
+}
+
+.connector-layout-preview:hover .connector-layout-resize-button:disabled,
+.connector-layout-preview:focus-within .connector-layout-resize-button:disabled {
+  opacity: 0.32;
+  cursor: not-allowed;
 }
 
 .connector-layout-svg,

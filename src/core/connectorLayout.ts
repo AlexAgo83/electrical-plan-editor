@@ -10,7 +10,8 @@ import type {
 } from "./entities";
 
 const MIN_LAYOUT_SIZE = 1;
-const MAX_LAYOUT_SIZE = 48;
+export const MAX_CONNECTOR_LAYOUT_SIZE = 48;
+const MAX_LAYOUT_SIZE = MAX_CONNECTOR_LAYOUT_SIZE;
 const DEFAULT_WAY_SHAPE: ConnectorLayoutWayShape = "round";
 const DEFAULT_KEYING_SIDE: ConnectorLayoutKeyingSide = "right";
 const DEFAULT_KEYING_SHAPE: ConnectorLayoutKeyingShape = "arrow";

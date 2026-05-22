@@ -105,6 +105,17 @@ describe("App integration UI - catalog layout", () => {
       target: { value: "4" }
     });
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Auto layout" }));
+    expect(within(catalogLayoutPanel).getByRole("button", { name: "Remove column on right" })).toBeDisabled();
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Add column on left" }));
+    expect(within(catalogLayoutPanel).getByLabelText("Grid width")).toHaveValue(3);
+    expect(within(catalogLayoutPanel).getByRole("button", { name: "Remove column on left" })).toBeEnabled();
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Remove column on left" }));
+    expect(within(catalogLayoutPanel).getByLabelText("Grid width")).toHaveValue(2);
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Add row on top" }));
+    expect(within(catalogLayoutPanel).getByLabelText("Grid height")).toHaveValue(3);
+    expect(within(catalogLayoutPanel).getByRole("button", { name: "Remove row on top" })).toBeEnabled();
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Remove row on top" }));
+    expect(within(catalogLayoutPanel).getByLabelText("Grid height")).toHaveValue(2);
     expect(within(catalogLayoutPanel).queryByText("No keying features.")).not.toBeInTheDocument();
     const shellPaddingSlider = within(catalogLayoutPanel).getByLabelText(/Shell padding/i);
     expect(shellPaddingSlider).toHaveValue("0.5");

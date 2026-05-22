@@ -26,6 +26,7 @@ import {
   MAX_CONNECTOR_LAYOUT_CELL_PADDING,
   MIN_CONNECTOR_LAYOUT_KEYING_SCALE,
   MAX_CONNECTOR_LAYOUT_KEYING_SCALE,
+  MAX_CONNECTOR_LAYOUT_SIZE,
   moveConnectorLayoutWayIfFree,
   removeConnectorLayoutKeying,
   resolveConnectorLayout,
@@ -75,6 +76,7 @@ type RenderableKeying = {
 };
 
 type ConnectorLayoutDetailPanel = "global" | "selectedWay" | "keying";
+type ConnectorLayoutResizeSide = "left" | "right" | "top" | "bottom";
 
 function parseConnectionCount(value: string): number {
   const parsed = Number(value);
@@ -411,6 +413,91 @@ export function ConnectorLayoutEditor({
     commitLayout(moveConnectorLayoutWayIfFree(layout, cavityIndex, x, y));
   }
 
+  function canResizeLayout(side: ConnectorLayoutResizeSide, delta: 1 | -1): boolean {
+    const isHorizontal = side === "left" || side === "right";
+    const currentSize = isHorizontal ? layout.width : layout.height;
+    if (delta > 0) {
+      return currentSize < MAX_CONNECTOR_LAYOUT_SIZE;
+    }
+    if (currentSize <= 1) {
+      return false;
+    }
+    if (side === "left") {
+      return !layout.ways.some((way) => way.x <= 1);
+    }
+    if (side === "right") {
+      return !layout.ways.some((way) => way.x >= layout.width);
+    }
+    if (side === "top") {
+      return !layout.ways.some((way) => way.y <= 1);
+    }
+    return !layout.ways.some((way) => way.y >= layout.height);
+  }
+
+  function resizeLayout(side: ConnectorLayoutResizeSide, delta: 1 | -1): void {
+    if (!canResizeLayout(side, delta)) {
+      return;
+    }
+
+    const shiftX = side === "left" ? delta : 0;
+    const shiftY = side === "top" ? delta : 0;
+    commitLayout({
+      ...layout,
+      width: side === "left" || side === "right" ? layout.width + delta : layout.width,
+      height: side === "top" || side === "bottom" ? layout.height + delta : layout.height,
+      ways: layout.ways.map((way) => ({
+        ...way,
+        x: way.x + shiftX,
+        y: way.y + shiftY
+      })),
+      keyings: keyings.map((keying) =>
+        keying.placement?.mode === "free"
+          ? {
+              ...keying,
+              placement: {
+                ...keying.placement,
+                x: keying.placement.x + shiftX,
+                y: keying.placement.y + shiftY
+              }
+            }
+          : keying
+      )
+    });
+  }
+
+  function renderResizeButton(side: ConnectorLayoutResizeSide, delta: 1 | -1): ReactElement {
+    const isHorizontal = side === "left" || side === "right";
+    const sideLabel =
+      side === "left"
+        ? "left"
+        : side === "right"
+          ? "right"
+          : side === "top"
+            ? "top"
+            : "bottom";
+    const actionLabel =
+      delta > 0
+        ? isHorizontal
+          ? "Add column"
+          : "Add row"
+        : isHorizontal
+          ? "Remove column"
+          : "Remove row";
+    const actionClassName = delta > 0 ? "is-add" : "is-remove";
+    return (
+      <button
+        key={`${actionClassName}-${side}`}
+        type="button"
+        className={`connector-layout-resize-button ${actionClassName} is-${side}`}
+        aria-label={`${actionLabel} on ${sideLabel}`}
+        disabled={!canResizeLayout(side, delta)}
+        onClick={() => resizeLayout(side, delta)}
+      >
+        {delta > 0 ? "+" : "-"}
+      </button>
+    );
+  }
+
   function handleWayPointerDown(event: PointerEvent<SVGGElement>, cavityIndex: number): void {
     event.preventDefault();
     selectWay(cavityIndex);
@@ -480,6 +567,12 @@ export function ConnectorLayoutEditor({
       {showLegend ? <legend>Connector physical layout</legend> : null}
       <div className="connector-layout-editor-grid">
         <div className="connector-layout-preview" aria-label="Connector layout editor preview">
+          <div className="connector-layout-resize-controls" aria-label="Layout size controls">
+            {(["left", "right", "top", "bottom"] as const).flatMap((side) => [
+              renderResizeButton(side, 1),
+              renderResizeButton(side, -1)
+            ])}
+          </div>
           <svg
             ref={svgRef}
             className="connector-layout-svg"
