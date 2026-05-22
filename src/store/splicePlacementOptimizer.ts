@@ -27,7 +27,7 @@ export interface SplicePlacementSuggestion {
 }
 
 type ConnectedSegment = Segment & { otherNodeId: NodeId };
-
+const MIN_INSERTED_SPLICE_BRANCH_LENGTH_MM = 10;
 function findSpliceNodeId(state: AppState, spliceId: SpliceId): NodeId | null {
   for (const nodeId of state.nodes.allIds) {
     const node = state.nodes.byId[nodeId];
@@ -99,12 +99,7 @@ function computeMetrics(wires: Wire[], spliceId: SpliceId): SplicePlacementMetri
       ? (Math.max(leftSectionMm2, rightSectionMm2) / Math.min(leftSectionMm2, rightSectionMm2)) * 100
       : null;
 
-  return {
-    copperVolumeMm3,
-    leftSectionMm2,
-    rightSectionMm2,
-    balanceRatioPercent
-  };
+  return { copperVolumeMm3, leftSectionMm2, rightSectionMm2, balanceRatioPercent };
 }
 
 function toSegment(segment: ConnectedSegment): Segment {
@@ -297,10 +292,13 @@ function getSegmentLengths(segments: Record<SegmentId, Segment>): Record<Segment
 
 function calculatePositionSteps(totalLengthMm: number): number[] {
   const steps = new Set<number>();
-  const lastPositionMm = Math.max(1, Math.round(totalLengthMm) - 1);
-  const sampleCount = Math.min(lastPositionMm, 500);
+  const firstPositionMm = MIN_INSERTED_SPLICE_BRANCH_LENGTH_MM;
+  const lastPositionMm = Math.round(totalLengthMm) - MIN_INSERTED_SPLICE_BRANCH_LENGTH_MM;
+  if (lastPositionMm < firstPositionMm) return [];
+  const sampleCount = Math.min(lastPositionMm - firstPositionMm + 1, 500);
+  const divisor = Math.max(1, sampleCount - 1);
   for (let step = 1; step <= sampleCount; step += 1) {
-    steps.add(Math.max(1, Math.round((lastPositionMm * step) / sampleCount)));
+    steps.add(firstPositionMm + Math.round(((lastPositionMm - firstPositionMm) * (step - 1)) / divisor));
   }
   return [...steps].sort((left, right) => left - right);
 }
@@ -310,12 +308,9 @@ function getCandidateTargetSegments(
   leftSegment: ConnectedSegment,
   rightSegment: ConnectedSegment
 ): Segment[] {
-  return buildRemovedSpliceSegments(state, leftSegment, rightSegment).filter((segment) => {
-    if (segment.nodeA === segment.nodeB) {
-      return false;
-    }
-    return Number.isFinite(segment.lengthMm) && segment.lengthMm >= 2;
-  });
+  return buildRemovedSpliceSegments(state, leftSegment, rightSegment).filter(
+    (segment) => segment.nodeA !== segment.nodeB && Number.isFinite(segment.lengthMm) && segment.lengthMm >= MIN_INSERTED_SPLICE_BRANCH_LENGTH_MM * 2
+  );
 }
 
 function recomputeConnectedWiresForCandidate(

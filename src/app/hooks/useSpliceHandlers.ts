@@ -103,7 +103,9 @@ function scrollNetworkPlanIntoView(): void {
     return;
   }
   const planElement = document.querySelector(".network-summary-canvas-region");
-  planElement?.scrollIntoView({ behavior: "smooth", block: "center" });
+  if (planElement instanceof HTMLElement && typeof planElement.scrollIntoView === "function") {
+    planElement.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 }
 
 export function useSpliceHandlers({

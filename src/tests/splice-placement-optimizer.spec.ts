@@ -76,7 +76,7 @@ function buildMovableSpliceState() {
     appActions.upsertNode({ id: asNodeId("N-S"), kind: "splice", spliceId: asSpliceId("S-MOVE") }),
     appActions.setNodePosition(asNodeId("N-L"), { x: 0, y: 0 }),
     appActions.setNodePosition(asNodeId("N-R"), { x: 100, y: 0 }),
-    appActions.setNodePosition(asNodeId("N-F"), { x: 10, y: 0 }),
+    appActions.setNodePosition(asNodeId("N-F"), { x: 40, y: 0 }),
     appActions.setNodePosition(asNodeId("N-S"), { x: 80, y: 0 }),
     appActions.upsertSegment({
       id: asSegmentId("SEG-L"),
@@ -94,7 +94,7 @@ function buildMovableSpliceState() {
       id: asSegmentId("SEG-F"),
       nodeA: asNodeId("N-L"),
       nodeB: asNodeId("N-F"),
-      lengthMm: 10
+      lengthMm: 40
     }),
     appActions.saveWire({
       id: asWireId("W-L"),
@@ -218,7 +218,9 @@ describe("splice placement optimizer", () => {
     });
     expect(result.suggestion.segments[asSegmentId("SEG-F")]?.nodeB).toBe(asNodeId("N-S"));
     expect(result.suggestion.segments[asSegmentId("SEG-R")]?.nodeA).toBe(asNodeId("N-S"));
-    expect(result.suggestion.spliceNodePosition).toEqual({ x: 9, y: 0 });
+    expect(result.suggestion.spliceNodePosition?.x).toBeGreaterThanOrEqual(10);
+    expect(result.suggestion.spliceNodePosition?.x).toBeLessThanOrEqual(30);
+    expect(result.suggestion.spliceNodePosition?.y).toBe(0);
 
     const next = appReducer(
       state,

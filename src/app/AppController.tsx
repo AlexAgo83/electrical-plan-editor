@@ -87,7 +87,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear();
   const state = useAppSnapshot(store);
   const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, ValidationScreen, AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables, NetworkScopeWorkspaceContent, SettingsWorkspaceContent, ValidationWorkspaceContent } = appUiModules;
-
   const networks = selectNetworks(state);
   const activeNetworkId = selectActiveNetworkId(state);
   const activeNetworkSummaryViewState =
@@ -162,7 +161,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const { panStartRef, undoActionRef, redoActionRef, exportActiveNetworkRef, fitNetworkToContentRef } = refs;
   const { previousValidationIssueRef, nextValidationIssueRef, navigationDrawerRef, navigationToggleButtonRef } = refs;
   const { operationsPanelRef, operationsButtonRef, deferredInstallPromptRef } = refs;
-
   const selectionEntities = useAppControllerSelectionEntities({ state });
   const {
     selected,
@@ -833,7 +831,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     modelingHandlers
   });
-
   const networkScalePercent = Math.round(networkScale * 100);
   const {
     currentValidationIssue,
@@ -1086,9 +1083,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     inspector: { isInspectorHidden, isInspectorOpen, inspectorContextPanel }
   });
-
-  return <><AppShellLayout {...appShellLayoutProps} />
-    <ToastViewport toasts={toasts} onDismissToast={dismissToast} />
+  return <><AppShellLayout {...appShellLayoutProps} /><ToastViewport toasts={toasts} onDismissToast={dismissToast} />
     <AppControllerOverlays
       appShellClassName={appShellClassName}
       activeConfirmDialog={activeConfirmDialog}
@@ -1101,6 +1096,5 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       openBomPreviewCatalogItem={openBomPreviewCatalogItem}
       openBomPreviewConnector={openBomPreviewConnector}
       onboarding={{ activeOnboardingStep, isOnboardingOpen, onboardingModalMode, onboardingStepDisplayIndex, onboardingTotalSteps, onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabledPersisted, closeOnboarding, handleOnboardingNext, canGoNext: canOnboardingGoNext, onboardingTargetActions }}
-    />
-  </>;
+    /></>;
 }

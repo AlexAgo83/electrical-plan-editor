@@ -6,53 +6,30 @@ import {
   useState,
   type CSSProperties,
   type MouseEvent as ReactMouseEvent,
-  type ReactElement,
-  type WheelEvent as ReactWheelEvent
+  type ReactElement
 } from "react";
 import type {
-  Connector,
   ConnectorId,
-  CatalogItem,
-  Network,
-  NetworkNode,
   NodeId,
   Segment,
   SegmentId,
-  Splice,
-  SpliceId,
-  Wire
+  SpliceId
 } from "../../core/entities";
-import type { ShortestRouteResult } from "../../core/pathfinding";
-import type { SubNetworkSummary } from "../../store";
 import type {
-  CanvasCalloutTextSize,
-  CanvasExportFormat,
-  CanvasLabelRotationDegrees,
-  CanvasResizeBehaviorMode,
-  CanvasLabelSizeMode,
-  CanvasLabelStrokeMode,
-  ConnectorDrawingDisplayMode,
-  NetworkCalloutContentMode,
-  NodePosition,
-  SubScreenId
+  NodePosition
 } from "../types/app-controller";
-import { NetworkCanvasFloatingInfoPanels } from "./network-summary/NetworkCanvasFloatingInfoPanels";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
-import { NetworkSummaryLegend } from "./network-summary/NetworkSummaryLegend";
 import { NetworkSummaryEditMenu } from "./network-summary/NetworkSummaryEditMenu";
 import { NetworkSummaryViewMenu } from "./network-summary/NetworkSummaryViewMenu";
 import { NetworkSummaryExportMenu } from "./network-summary/NetworkSummaryExportMenu";
 import { NetworkSummaryQuickEntityNavigation } from "./network-summary/NetworkSummaryQuickEntityNavigation";
+import { NetworkSummaryCanvasPanel } from "./network-summary/NetworkSummaryCanvasPanel";
 import { useActiveSubNetworkTags } from "./network-summary/useActiveSubNetworkTags";
 import {
   buildCableCalloutViewModels,
   buildConnectorCalloutGroupsById,
   buildSpliceCalloutGroupsById
 } from "./network-summary/callouts/calloutModel";
-import {
-  NetworkSummaryCalloutLeaders,
-  NetworkSummaryCalloutsLayer
-} from "./network-summary/callouts/NetworkSummaryCalloutsLayer";
 import {
   CALLOUT_OFFSET_SCREEN_UNITS,
   computeRenderedCableCallouts,
@@ -66,119 +43,15 @@ import {
   buildRenderedNodes,
   buildRenderedSegments
 } from "./network-summary/graph/networkSummaryGraphModel";
-import { NetworkSummaryGraphLayers } from "./network-summary/graph/NetworkSummaryGraphLayers";
 import {
   useNetworkSummaryExportActions
 } from "./network-summary/export/useNetworkSummaryExportActions";
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
 import { snapToGrid } from "../lib/app-utils-shared";
+import type { NetworkSummaryPanelProps } from "./network-summary/NetworkSummaryPanel.types";
 
 const CALLOUT_DRAG_START_THRESHOLD_PX = 4;
 
-export interface NetworkSummaryPanelProps {
-  handleZoomAction: (target: "in" | "out" | "reset") => void;
-  fitNetworkToContent: () => void;
-  showNetworkInfoPanels: boolean;
-  showSegmentNames: boolean;
-  showSegmentLengths: boolean;
-  showCableCallouts: boolean;
-  calloutContentMode: NetworkCalloutContentMode;
-  showSelectedCalloutOnly: boolean;
-  showCalloutWireNames: boolean;
-  connectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
-  connectorDrawingScalePercent: number;
-  zoomInvariantNodeShapes: boolean;
-  nodeShapeSizePercent: number;
-  resizeBehaviorMode: CanvasResizeBehaviorMode;
-  labelStrokeMode: CanvasLabelStrokeMode;
-  labelSizeMode: CanvasLabelSizeMode;
-  calloutTextSize: CanvasCalloutTextSize;
-  labelRotationDegrees: CanvasLabelRotationDegrees;
-  autoSegmentLabelRotation: boolean;
-  canvasExportFormat: CanvasExportFormat;
-  exportIncludeFrame: boolean;
-  exportIncludeCartouche: boolean;
-  exportCartoucheNetworkName: string;
-  exportCartoucheAuthor?: string;
-  exportCartoucheProjectCode?: string;
-  exportCartoucheCreatedAt: string;
-  exportCartoucheLogoUrl?: string;
-  exportCartoucheNotes?: string;
-  showFloatingInspectorPanel: boolean;
-  showNetworkGrid: boolean;
-  snapNodesToGrid: boolean;
-  lockEntityMovement: boolean;
-  toggleShowNetworkInfoPanels: () => void;
-  toggleShowSegmentLengths: () => void;
-  toggleShowCableCallouts: () => void;
-  toggleShowFloatingInspectorPanel: () => void;
-  toggleShowNetworkGrid: () => void;
-  toggleSnapNodesToGrid: () => void;
-  toggleLockEntityMovement: () => void;
-  networkScalePercent: number;
-  routingGraphNodeCount: number;
-  routingGraphSegmentCount: number;
-  totalEdgeEntries: number;
-  nodes: NetworkNode[];
-  segments: Segment[];
-  splicePlacementPreview?: {
-    spliceNodeId: NodeId;
-    segments: Record<SegmentId, Segment>;
-    removedSegmentIds: SegmentId[];
-    spliceNodePosition: NodePosition | null;
-  } | null;
-  wires: Wire[];
-  isPanningNetwork: boolean;
-  networkViewWidth: number;
-  networkViewHeight: number;
-  networkGridStep: number;
-  networkOffset: NodePosition;
-  networkScale: number;
-  handleNetworkCanvasMouseDown: (event: ReactMouseEvent<SVGSVGElement>) => void;
-  handleNetworkCanvasClick: (event: ReactMouseEvent<SVGSVGElement>) => void;
-  handleNetworkWheel: (event: ReactWheelEvent<SVGSVGElement>) => void;
-  handleNetworkMouseMove: (event: ReactMouseEvent<SVGSVGElement>) => void;
-  stopNetworkNodeDrag: () => void;
-  networkNodePositions: Record<NodeId, NodePosition>;
-  selectedWireRouteSegmentIds: Set<SegmentId>;
-  selectedSegmentId: SegmentId | null;
-  selectedWireId: Wire["id"] | null;
-  handleNetworkSegmentClick: (segmentId: SegmentId) => void;
-  selectedCanvasNodeIds: ReadonlySet<NodeId>;
-  clearSelectedCanvasNodes: () => void;
-  selectedNodeId: NodeId | null;
-  selectedConnectorId: ConnectorId | null;
-  selectedSpliceId: SpliceId | null;
-  handleNetworkNodeMouseDown: (event: ReactMouseEvent<SVGGElement>, nodeId: NodeId) => void;
-  handleNetworkNodeActivate: (nodeId: NodeId) => void;
-  connectorMap: Map<ConnectorId, Connector>;
-  spliceMap: Map<SpliceId, Splice>;
-  describeNode: (node: NetworkNode) => string;
-  subNetworkSummaries: SubNetworkSummary[];
-  routePreviewStartNodeId: string;
-  setRoutePreviewStartNodeId: (value: string) => void;
-  routePreviewEndNodeId: string;
-  setRoutePreviewEndNodeId: (value: string) => void;
-  routePreview: ShortestRouteResult | null;
-  showRoutePreviewPanel: boolean;
-  quickEntityNavigationMode: "modeling" | "analysis";
-  activeSubScreen: SubScreenId;
-  entityCountBySubScreen: Record<SubScreenId, number>;
-  onQuickEntityNavigation: (subScreen: SubScreenId) => void;
-  onSelectConnectorFromCallout: (connectorId: ConnectorId) => void;
-  onSelectSpliceFromCallout: (spliceId: SpliceId) => void;
-  onPersistConnectorCalloutPosition: (connectorId: ConnectorId, position: NodePosition) => void;
-  onPersistSpliceCalloutPosition: (spliceId: SpliceId, position: NodePosition) => void;
-  onViewportSizeChange?: (size: { width: number; height: number }) => void;
-  pngExportIncludeBackground: boolean;
-  canExportBomCsv: boolean;
-  onExportBomCsv: () => void;
-  onRegenerateLayout: () => void;
-  onOpenCurrentNetworkFunctional?: () => void;
-  activeNetwork: Network | null;
-  catalogItems: CatalogItem[];
-  showFunctionalSchematic?: boolean;
-}
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -958,92 +831,67 @@ export function NetworkSummaryPanel({
             />
           </div>
         </header>
-        <div className="network-summary-canvas-region">
-          {nodes.length === 0 ? (
-            <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
-          ) : (
-            <div ref={networkCanvasShellRef} className={`network-canvas-shell${isPanningNetwork ? " is-panning" : ""}`}>
-              <NetworkCanvasFloatingInfoPanels
-                showNetworkInfoPanels={showNetworkInfoPanels}
-                handleZoomAction={handleZoomAction}
-                fitNetworkToContent={fitNetworkToContent}
-                selectedCanvasNodeCount={selectedCanvasNodeIds.size}
-                clearSelectedCanvasNodes={clearSelectedCanvasNodes}
-                networkScalePercent={networkScalePercent}
-                subNetworkSummaries={subNetworkSummaries}
-                activeSubNetworkTags={activeSubNetworkTags}
-                toggleSubNetworkTag={toggleSubNetworkTag}
-                enableAllSubNetworkTags={enableAllSubNetworkTags}
-                graphStats={graphStats}
-              />
-              <svg
-                ref={networkSvgRef}
-                className={`network-svg${useStrokeInvariantLines ? " network-svg--stroke-invariant" : ""} network-canvas--label-stroke-${labelStrokeMode} network-canvas--label-size-${labelSizeMode} network-callout-text-size-${calloutTextSize}`}
-                aria-label="2D network diagram"
-                viewBox={`0 0 ${networkViewWidth} ${networkViewHeight}`}
-                style={networkSvgStrokeVariables}
-                onMouseDown={handleNetworkCanvasMouseDown}
-                onClick={handleNetworkCanvasClick}
-                onWheel={handleNetworkWheel}
-                onMouseMove={handleCanvasMouseMoveWithCallouts}
-                onMouseUp={stopNetworkInteractions}
-                onMouseLeave={stopNetworkInteractions}
-              >
-              <NetworkSummaryGraphLayers
-                networkOffset={networkOffset}
-                networkScale={networkScale}
-                showNetworkGrid={showNetworkGrid}
-                gridXPositions={gridXPositions}
-                gridYPositions={gridYPositions}
-                visibleModelMinX={visibleModelMinX}
-                visibleModelMaxX={visibleModelMaxX}
-                visibleModelMinY={visibleModelMinY}
-                visibleModelMaxY={visibleModelMaxY}
-                afterGridLayer={
-                  <NetworkSummaryCalloutLeaders
-                    renderedCableCallouts={renderedCableCallouts}
-                    networkOffset={networkOffset}
-                    networkScale={networkScale}
-                  />
-                }
-                renderedSegments={renderedSegments}
-                splicePlacementPreviewSegments={splicePlacementPreviewSegments}
-                splicePlacementPreviewNode={splicePlacementPreviewNode}
-                renderedNodes={renderedNodes}
-                showSegmentNames={showSegmentNames}
-                showSegmentLengths={showSegmentLengths}
-                inverseLabelScale={inverseLabelScale}
-                labelRotationDegrees={labelRotationDegrees}
-                zoomInvariantNodeShapes={zoomInvariantNodeShapes}
-                normalizedNodeShapeScale={normalizedNodeShapeScale}
-                connectorDrawingScale={normalizedConnectorNodeDrawingScale}
-                nodeStrokeWidth={nodeStrokeWidth}
-                nodeStrokeEmphasisWidth={nodeStrokeEmphasisWidth}
-                describeNode={describeNode}
-                onSelectSegment={handleNetworkSegmentClick}
-                onNodeMouseDown={handleNetworkNodeMouseDown}
-                onNodeActivate={handleNetworkNodeActivate}
-              />
-
-              <NetworkSummaryCalloutsLayer
-                renderedCableCallouts={renderedCableCallouts}
-                inverseLabelScale={inverseLabelScale}
-                selectedWireId={selectedWireId}
-                onHoverCallout={setHoveredCalloutKey}
-                onCalloutMouseDown={handleCalloutMouseDown}
-                onSelectConnectorFromCallout={onSelectConnectorFromCallout}
-                onSelectSpliceFromCallout={onSelectSpliceFromCallout}
-                networkOffset={networkOffset}
-                networkScale={networkScale}
-              />
-              </svg>
-            </div>
-          )}
-        </div>
-        <p className="empty-copy network-summary-mobile-unavailable" role="status">
-          2D network summary is not available on mobile. Use a wider screen to access the canvas controls and legend.
-        </p>
-        <NetworkSummaryLegend />
+        <NetworkSummaryCanvasPanel
+          nodes={nodes}
+          networkCanvasShellRef={networkCanvasShellRef}
+          networkSvgRef={networkSvgRef}
+          isPanningNetwork={isPanningNetwork}
+          showNetworkInfoPanels={showNetworkInfoPanels}
+          handleZoomAction={handleZoomAction}
+          fitNetworkToContent={fitNetworkToContent}
+          selectedCanvasNodeCount={selectedCanvasNodeIds.size}
+          clearSelectedCanvasNodes={clearSelectedCanvasNodes}
+          networkScalePercent={networkScalePercent}
+          subNetworkSummaries={subNetworkSummaries}
+          activeSubNetworkTags={activeSubNetworkTags}
+          toggleSubNetworkTag={toggleSubNetworkTag}
+          enableAllSubNetworkTags={enableAllSubNetworkTags}
+          graphStats={graphStats}
+          useStrokeInvariantLines={useStrokeInvariantLines}
+          labelStrokeMode={labelStrokeMode}
+          labelSizeMode={labelSizeMode}
+          calloutTextSize={calloutTextSize}
+          networkViewWidth={networkViewWidth}
+          networkViewHeight={networkViewHeight}
+          networkSvgStrokeVariables={networkSvgStrokeVariables}
+          handleNetworkCanvasMouseDown={handleNetworkCanvasMouseDown}
+          handleNetworkCanvasClick={handleNetworkCanvasClick}
+          handleNetworkWheel={handleNetworkWheel}
+          handleCanvasMouseMoveWithCallouts={handleCanvasMouseMoveWithCallouts}
+          stopNetworkInteractions={stopNetworkInteractions}
+          networkOffset={networkOffset}
+          networkScale={networkScale}
+          showNetworkGrid={showNetworkGrid}
+          gridXPositions={gridXPositions}
+          gridYPositions={gridYPositions}
+          visibleModelMinX={visibleModelMinX}
+          visibleModelMaxX={visibleModelMaxX}
+          visibleModelMinY={visibleModelMinY}
+          visibleModelMaxY={visibleModelMaxY}
+          renderedCableCallouts={renderedCableCallouts}
+          renderedSegments={renderedSegments}
+          splicePlacementPreviewSegments={splicePlacementPreviewSegments}
+          splicePlacementPreviewNode={splicePlacementPreviewNode}
+          renderedNodes={renderedNodes}
+          showSegmentNames={showSegmentNames}
+          showSegmentLengths={showSegmentLengths}
+          inverseLabelScale={inverseLabelScale}
+          labelRotationDegrees={labelRotationDegrees}
+          zoomInvariantNodeShapes={zoomInvariantNodeShapes}
+          normalizedNodeShapeScale={normalizedNodeShapeScale}
+          normalizedConnectorNodeDrawingScale={normalizedConnectorNodeDrawingScale}
+          nodeStrokeWidth={nodeStrokeWidth}
+          nodeStrokeEmphasisWidth={nodeStrokeEmphasisWidth}
+          describeNode={describeNode}
+          handleNetworkSegmentClick={handleNetworkSegmentClick}
+          handleNetworkNodeMouseDown={handleNetworkNodeMouseDown}
+          handleNetworkNodeActivate={handleNetworkNodeActivate}
+          selectedWireId={selectedWireId}
+          setHoveredCalloutKey={setHoveredCalloutKey}
+          handleCalloutMouseDown={handleCalloutMouseDown}
+          onSelectConnectorFromCallout={onSelectConnectorFromCallout}
+          onSelectSpliceFromCallout={onSelectSpliceFromCallout}
+        />
       </section>
       {showRoutePreviewPanel ? (
         <NetworkRoutePreviewPanel
