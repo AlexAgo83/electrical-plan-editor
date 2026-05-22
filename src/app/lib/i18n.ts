@@ -648,6 +648,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Select a catalog item first.": "Sélectionnez d'abord un élément catalogue.",
   "Select a connector to create a connector node.": "Sélectionnez un connecteur pour créer un nœud connecteur.",
   "Select a splice to create a splice node.": "Sélectionnez une épissure pour créer un nœud épissure.",
+  "Close inspector": "Fermer l'inspecteur",
   "Selected catalog item is incompatible: occupied port indexes exceed the catalog connection count.": "L'élément catalogue sélectionné est incompatible : les index de ports occupés dépassent le nombre de connexions catalogue.",
   "Selected catalog item is incompatible: occupied way indexes exceed the catalog connection count.": "L'élément catalogue sélectionné est incompatible : les index de voies occupées dépassent le nombre de connexions catalogue.",
   "Selected catalog item is incompatible: wire endpoint port indexes exceed the catalog connection count.": "L'élément catalogue sélectionné est incompatible : les index de ports d'extrémités fil dépassent le nombre de connexions catalogue.",

@@ -864,6 +864,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isAnalysisScreen,
     hasActiveNetwork,
     showFloatingInspectorPanel,
+    onCloseInspector: () => preferencesState.setShowFloatingInspectorPanel(false),
     viewportWidth,
     isDialogFocusActive,
     isNavigationDrawerOpen,
@@ -877,7 +878,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     formsState,
     spliceLengthSuggestion: spliceHandlers.optimizedLengthSuggestion,
     onApplySpliceLengthSuggestion: spliceHandlers.applyOptimizedSpliceLengthSuggestion,
-    onCancelSpliceLengthSuggestion: spliceHandlers.cancelOptimizedSpliceLengthSuggestion
+    onCancelSpliceLengthSuggestion: spliceHandlers.cancelOptimizedSpliceLengthSuggestion,
+    onSuggestOptimizedSplicePlacement: spliceHandlers.handleSuggestOptimizedSplicePlacementForSplice
   });
   const {
     homeWorkspaceContent,

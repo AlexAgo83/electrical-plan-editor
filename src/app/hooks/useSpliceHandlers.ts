@@ -492,12 +492,8 @@ export function useSpliceHandlers({
     setOptimizedLengthSuggestion(null);
   }
 
-  function handleSuggestOptimizedSplicePlacement(): void {
-    if (spliceFormMode !== "edit" || editingSpliceId === null) {
-      return;
-    }
-
-    const result = findSplicePlacementSuggestion(store.getState(), editingSpliceId);
+  function suggestOptimizedSplicePlacement(spliceId: SpliceId): void {
+    const result = findSplicePlacementSuggestion(store.getState(), spliceId);
     if (!("suggestion" in result)) {
       setSpliceFormError(null);
       setSpliceFormInfo(null);
@@ -551,6 +547,18 @@ export function useSpliceHandlers({
       hasWarning: suggestion.warning !== null
     });
     scrollNetworkPlanIntoView();
+  }
+
+  function handleSuggestOptimizedSplicePlacement(): void {
+    if (spliceFormMode !== "edit" || editingSpliceId === null) {
+      return;
+    }
+
+    suggestOptimizedSplicePlacement(editingSpliceId);
+  }
+
+  function handleSuggestOptimizedSplicePlacementForSplice(spliceId: SpliceId): void {
+    suggestOptimizedSplicePlacement(spliceId);
   }
 
   function applyOptimizedSpliceLengthSuggestion(): void {
@@ -611,6 +619,7 @@ export function useSpliceHandlers({
     handleConvertSpliceToDirectional,
     handleRerouteSpliceConnectedWires,
     handleSuggestOptimizedSplicePlacement,
+    handleSuggestOptimizedSplicePlacementForSplice,
     optimizedLengthSuggestion,
     applyOptimizedSpliceLengthSuggestion,
     cancelOptimizedSpliceLengthSuggestion,

@@ -1,7 +1,7 @@
 import { useIssueNavigatorModel } from "../useIssueNavigatorModel";
 import { useInspectorPanelVisibility } from "../useInspectorPanelVisibility";
 import { useInspectorContextPanelControllerSlice } from "./useAppControllerScreenContentSlices";
-import type { NetworkNode } from "../../../core/entities";
+import type { NetworkNode, SpliceId } from "../../../core/entities";
 import { SpliceLengthSuggestionPanel } from "../../components/SpliceLengthSuggestionPanel";
 import type { PendingSpliceLengthSuggestion } from "../useSpliceHandlers";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
@@ -41,6 +41,7 @@ interface UseAppControllerInspectorIssueLayoutStateParams {
   isAnalysisScreen: boolean;
   hasActiveNetwork: boolean;
   showFloatingInspectorPanel: boolean;
+  onCloseInspector: () => void;
   viewportWidth: number;
   isDialogFocusActive: boolean;
   isNavigationDrawerOpen: boolean;
@@ -60,6 +61,7 @@ interface UseAppControllerInspectorIssueLayoutStateParams {
   spliceLengthSuggestion: PendingSpliceLengthSuggestion | null;
   onApplySpliceLengthSuggestion: () => void;
   onCancelSpliceLengthSuggestion: () => void;
+  onSuggestOptimizedSplicePlacement: (spliceId: SpliceId) => void;
 }
 
 export function useAppControllerInspectorIssueLayoutState({
@@ -74,6 +76,7 @@ export function useAppControllerInspectorIssueLayoutState({
   isAnalysisScreen,
   hasActiveNetwork,
   showFloatingInspectorPanel,
+  onCloseInspector,
   viewportWidth,
   isDialogFocusActive,
   isNavigationDrawerOpen,
@@ -84,7 +87,8 @@ export function useAppControllerInspectorIssueLayoutState({
   formsState,
   spliceLengthSuggestion,
   onApplySpliceLengthSuggestion,
-  onCancelSpliceLengthSuggestion
+  onCancelSpliceLengthSuggestion,
+  onSuggestOptimizedSplicePlacement
 }: UseAppControllerInspectorIssueLayoutStateParams) {
   const currentValidationIssue = isValidationScreen
     ? (validationModel.getFocusedValidationIssueByCursor() ?? validationModel.visibleValidationIssues[0] ?? null)
@@ -156,7 +160,9 @@ export function useAppControllerInspectorIssueLayoutState({
     selectedSpliceOccupiedCount: selectionEntities.selectedSpliceOccupiedCount,
     describeNode,
     handleStartSelectedEdit,
-    onClearSelection
+    onClearSelection,
+    onCloseInspector,
+    onSuggestOptimizedSplicePlacement
   });
   const activeInspectorPanel =
     spliceLengthSuggestion === null ? (

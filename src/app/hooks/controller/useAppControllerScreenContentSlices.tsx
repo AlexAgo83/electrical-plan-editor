@@ -36,10 +36,12 @@ type InspectorContextPanelControllerSliceParams = Omit<
   | "canCollapseToCollapsed"
   | "onExpandFromCollapsed"
   | "onCollapseToCollapsed"
+  | "onCloseInspector"
   | "connectorOccupiedCount"
   | "spliceOccupiedCount"
   | "onEditSelected"
   | "onClearSelection"
+  | "onSuggestOptimizedSplicePlacement"
 > & {
   isInspectorOpen: boolean;
   canExpandInspectorFromCollapsed: boolean;
@@ -50,6 +52,8 @@ type InspectorContextPanelControllerSliceParams = Omit<
   selectedSpliceOccupiedCount: number;
   handleStartSelectedEdit: ComponentProps<typeof InspectorContextPanel>["onEditSelected"];
   onClearSelection: ComponentProps<typeof InspectorContextPanel>["onClearSelection"];
+  onCloseInspector: ComponentProps<typeof InspectorContextPanel>["onCloseInspector"];
+  onSuggestOptimizedSplicePlacement: ComponentProps<typeof InspectorContextPanel>["onSuggestOptimizedSplicePlacement"];
 };
 
 type NetworkSummaryPanelControllerSliceParams = Omit<
@@ -191,6 +195,7 @@ export function useInspectorContextPanelControllerSlice(params: InspectorContext
     canCollapseToCollapsed: params.canCollapseInspectorToCollapsed,
     onExpandFromCollapsed: params.expandInspectorFromCollapsed,
     onCollapseToCollapsed: params.collapseInspectorToCollapsed,
+    onCloseInspector: params.onCloseInspector,
     selected: params.selected,
     selectedSubScreen: params.selectedSubScreen,
     selectedCatalogItem: params.selectedCatalogItem,
@@ -203,7 +208,8 @@ export function useInspectorContextPanelControllerSlice(params: InspectorContext
     spliceOccupiedCount: params.selectedSpliceOccupiedCount,
     describeNode: params.describeNode,
     onEditSelected: params.handleStartSelectedEdit,
-    onClearSelection: params.onClearSelection
+    onClearSelection: params.onClearSelection,
+    onSuggestOptimizedSplicePlacement: params.onSuggestOptimizedSplicePlacement
   } satisfies ComponentProps<typeof InspectorContextPanel>;
 
   return {

@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, getWireColorLabel, isWireFreeColorMode, type WireColorMode } from "../../core/cableColors";
-import type { CatalogItem, Connector, NetworkNode, Segment, Splice, Wire } from "../../core/entities";
+import type { CatalogItem, Connector, NetworkNode, Segment, Splice, SpliceId, Wire } from "../../core/entities";
 import type { SelectionState } from "../../store/types";
 
 interface InspectorContextPanelProps {
@@ -9,6 +9,7 @@ interface InspectorContextPanelProps {
   canCollapseToCollapsed: boolean;
   onExpandFromCollapsed: () => void;
   onCollapseToCollapsed: () => void;
+  onCloseInspector: () => void;
   selected: SelectionState | null;
   selectedSubScreen: "connector" | "splice" | "node" | "segment" | "wire" | null;
   selectedCatalogItem: CatalogItem | null;
@@ -22,6 +23,7 @@ interface InspectorContextPanelProps {
   describeNode: (node: NetworkNode) => string;
   onEditSelected: () => void;
   onClearSelection: () => void;
+  onSuggestOptimizedSplicePlacement: (spliceId: SpliceId) => void;
 }
 
 export function InspectorContextPanel({
@@ -30,6 +32,7 @@ export function InspectorContextPanel({
   canCollapseToCollapsed,
   onExpandFromCollapsed,
   onCollapseToCollapsed,
+  onCloseInspector,
   selected,
   selectedSubScreen,
   selectedCatalogItem,
@@ -42,7 +45,8 @@ export function InspectorContextPanel({
   spliceOccupiedCount,
   describeNode,
   onEditSelected,
-  onClearSelection
+  onClearSelection,
+  onSuggestOptimizedSplicePlacement
 }: InspectorContextPanelProps): ReactElement {
   function renderCableColorSwatches(
     colorMode: WireColorMode | null | undefined,
@@ -203,18 +207,28 @@ export function InspectorContextPanel({
     <article className={isCollapsed ? "panel inspector-context-panel is-collapsed" : "panel inspector-context-panel"}>
       <div className="inspector-context-header">
         <h2>Inspector context</h2>
-        {isCollapsed && canExpandFromCollapsed ? (
-          <button type="button" className="inspector-context-toggle" onClick={onExpandFromCollapsed}>
-            <span className="inspector-context-toggle-icon" aria-hidden="true" />
-            Expand
+        <div className="inspector-context-header-actions">
+          {isCollapsed && canExpandFromCollapsed ? (
+            <button type="button" className="inspector-context-toggle" onClick={onExpandFromCollapsed}>
+              <span className="inspector-context-toggle-icon" aria-hidden="true" />
+              Expand
+            </button>
+          ) : null}
+          {!isCollapsed && canCollapseToCollapsed ? (
+            <button type="button" className="inspector-context-toggle" onClick={onCollapseToCollapsed}>
+              <span className="inspector-context-toggle-icon is-collapse" aria-hidden="true" />
+              Collapse
+            </button>
+          ) : null}
+          <button
+            type="button"
+            className="inspector-context-toggle inspector-context-close-button"
+            onClick={onCloseInspector}
+            aria-label="Close inspector"
+          >
+            <span className="action-button-icon is-cancel" aria-hidden="true" />
           </button>
-        ) : null}
-        {!isCollapsed && canCollapseToCollapsed ? (
-          <button type="button" className="inspector-context-toggle" onClick={onCollapseToCollapsed}>
-            <span className="inspector-context-toggle-icon is-collapse" aria-hidden="true" />
-            Collapse
-          </button>
-        ) : null}
+        </div>
       </div>
       {isCollapsed ? (
         selected === null ? (
@@ -242,10 +256,22 @@ export function InspectorContextPanel({
             ))}
           </dl>
           <div className="row-actions compact inspector-actions">
-            <button type="button" className="button-with-icon" onClick={onEditSelected} disabled={selectedSubScreen === null}>
-              <span className="action-button-icon is-edit" aria-hidden="true" />
-              Select
-            </button>
+            {selectedSplice !== null ? (
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() => onSuggestOptimizedSplicePlacement(selectedSplice.id)}
+              >
+                <span className="action-button-icon is-analysis" aria-hidden="true" />
+                Suggest optimized lengths
+              </button>
+            ) : null}
+            {selectedSplice === null ? (
+              <button type="button" className="button-with-icon" onClick={onEditSelected} disabled={selectedSubScreen === null}>
+                <span className="action-button-icon is-edit" aria-hidden="true" />
+                Select
+              </button>
+            ) : null}
             <button type="button" className="button-with-icon" onClick={onClearSelection}>
               <span className="action-button-icon is-unselect" aria-hidden="true" />
               Clear

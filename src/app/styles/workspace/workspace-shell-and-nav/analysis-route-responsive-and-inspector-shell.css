@@ -106,6 +106,12 @@
   color: #4f6a7f;
 }
 
+.inspector-context-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .inspector-context-toggle {
   display: inline-flex;
   align-items: center;
@@ -116,6 +122,17 @@
   border-radius: 0.5rem;
   padding: 0.25rem 0.5rem;
   font-size: 0.78rem;
+}
+
+.inspector-context-close-button {
+  justify-content: center;
+  padding-inline: 0.42rem;
+}
+
+.inspector-context-close-button .action-button-icon {
+  width: 0.78rem;
+  height: 0.78rem;
+  flex-basis: 0.78rem;
 }
 
 .inspector-context-toggle-icon {

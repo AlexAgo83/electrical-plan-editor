@@ -1,12 +1,17 @@
-import { fireEvent, screen, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { NetworkId } from "../core/entities";
 import { appActions, appReducer, createInitialState } from "../store";
 import {
   asCatalogItemId,
   asConnectorId,
+  asNodeId,
+  asSegmentId,
+  asSpliceId,
+  asWireId,
   createUiIntegrationState,
   getPanelByHeading,
+  reduceAll,
   renderAppWithState,
   switchScreenDrawerAware,
   switchSubScreenDrawerAware,
@@ -81,6 +86,88 @@ describe("App integration UI - inspector floating shell", () => {
 
     fireEvent.click(showInspectorButton);
     expect(within(displayOptions).getByRole("button", { name: "Hide inspector" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("closes the floating inspector from its header icon button", () => {
+    renderAppWithState(createUiIntegrationState());
+    closeOnboardingIfOpen();
+    switchScreenDrawerAware("modeling");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+    const inspectorShell = getInspectorShell();
+    if (inspectorShell === null) {
+      expectInlineConnectorSelectionPanels();
+      return;
+    }
+
+    fireEvent.click(within(getPanelByHeading("Inspector context")).getByRole("button", { name: "Close inspector" }));
+    expect(getInspectorShell()).not.toBeInTheDocument();
+  });
+
+  it("offers optimized splice length suggestions from the inspector splice actions", async () => {
+    const state = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C-L"), name: "Left", technicalId: "C-L", cavityCount: 1 }),
+      appActions.upsertConnector({ id: asConnectorId("C-R"), name: "Right", technicalId: "C-R", cavityCount: 1 }),
+      appActions.upsertSplice({
+        id: asSpliceId("S-OPT"),
+        name: "Optimized splice",
+        technicalId: "S-OPT",
+        portMode: "directional",
+        portCount: 2
+      }),
+      appActions.upsertNode({ id: asNodeId("N-L"), kind: "connector", connectorId: asConnectorId("C-L") }),
+      appActions.upsertNode({ id: asNodeId("N-R"), kind: "connector", connectorId: asConnectorId("C-R") }),
+      appActions.upsertNode({ id: asNodeId("N-S"), kind: "splice", spliceId: asSpliceId("S-OPT") }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-L"),
+        nodeA: asNodeId("N-L"),
+        nodeB: asNodeId("N-S"),
+        lengthMm: 80
+      }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-R"),
+        nodeA: asNodeId("N-S"),
+        nodeB: asNodeId("N-R"),
+        lengthMm: 20
+      }),
+      appActions.saveWire({
+        id: asWireId("W-L"),
+        name: "Left heavy wire",
+        technicalId: "W-L",
+        sectionMm2: 4,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-L"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-OPT"), portIndex: 1 }
+      }),
+      appActions.saveWire({
+        id: asWireId("W-R"),
+        name: "Right light wire",
+        technicalId: "W-R",
+        sectionMm2: 1,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-R"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-OPT"), portIndex: 2 }
+      })
+    ]);
+    renderAppWithState(state);
+    closeOnboardingIfOpen();
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("splice");
+
+    fireEvent.click(within(getPanelByHeading("Splices")).getByText("Optimized splice"));
+    const inspectorShell = getInspectorShell();
+    if (inspectorShell === null) {
+      expect(within(getPanelByHeading("Edit Splice")).getByRole("button", { name: "Suggest optimized lengths" })).toBeInTheDocument();
+      return;
+    }
+
+    const inspectorPanel = getPanelByHeading("Inspector context");
+    expect(within(inspectorPanel).queryByRole("button", { name: "Select" })).not.toBeInTheDocument();
+    fireEvent.click(within(inspectorPanel).getByRole("button", { name: "Suggest optimized lengths" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Suggested splice lengths" })).toBeInTheDocument();
+    });
+    expect(within(getPanelByHeading("Suggested splice lengths")).getByText("S-OPT - Optimized splice")).toBeInTheDocument();
   });
 
   it("opens inspector on modeling and analysis when a selection exists", () => {
