@@ -49,6 +49,26 @@ function isUndoHistoryTargetKind(value: unknown): value is UndoHistoryTargetKind
   );
 }
 
+function isUndoHistoryNavigationScreen(value: unknown): value is NonNullable<UndoHistoryEntry["navigationScreen"]> {
+  return (
+    value === "home" ||
+    value === "networkScope" ||
+    value === "harnessAssembly" ||
+    value === "modeling" ||
+    value === "analysis" ||
+    value === "validation" ||
+    value === "settings"
+  );
+}
+
+function isUndoHistoryNavigationSubScreen(value: unknown): value is NonNullable<UndoHistoryEntry["navigationSubScreen"]> {
+  return value === "catalog" || value === "connector" || value === "splice" || value === "node" || value === "segment" || value === "wire";
+}
+
+function isUndoHistoryNavigationSelectionKind(value: unknown): value is NonNullable<UndoHistoryEntry["navigationSelectionKind"]> {
+  return value === "catalog" || value === "connector" || value === "splice" || value === "node" || value === "segment" || value === "wire";
+}
+
 function normalizeRecentChangesEntries(rawEntries: unknown, historyLimit: number): UndoHistoryEntry[] {
   if (!Array.isArray(rawEntries)) {
     return [];
@@ -66,6 +86,10 @@ function normalizeRecentChangesEntries(rawEntries: unknown, historyLimit: number
       targetKind,
       targetId,
       networkId: rawNetworkId,
+      navigationScreen,
+      navigationSubScreen,
+      navigationSelectionKind,
+      navigationSelectionId,
       label,
       timestampIso
     } = rawEntry;
@@ -92,7 +116,7 @@ function normalizeRecentChangesEntries(rawEntries: unknown, historyLimit: number
       continue;
     }
 
-    normalized.push({
+    const normalizedEntry: UndoHistoryEntry = {
       sequence: Number(sequence),
       actionType,
       targetKind,
@@ -100,7 +124,22 @@ function normalizeRecentChangesEntries(rawEntries: unknown, historyLimit: number
       networkId: rawNetworkId as NetworkId | null,
       label,
       timestampIso
-    });
+    };
+
+    if (isUndoHistoryNavigationScreen(navigationScreen)) {
+      normalizedEntry.navigationScreen = navigationScreen;
+    }
+    if (isUndoHistoryNavigationSubScreen(navigationSubScreen)) {
+      normalizedEntry.navigationSubScreen = navigationSubScreen;
+    }
+    if (isUndoHistoryNavigationSelectionKind(navigationSelectionKind)) {
+      normalizedEntry.navigationSelectionKind = navigationSelectionKind;
+    }
+    if (typeof navigationSelectionId === "string" && navigationSelectionId.length > 0) {
+      normalizedEntry.navigationSelectionId = navigationSelectionId;
+    }
+
+    normalized.push(normalizedEntry);
   }
 
   const boundedLimit = Math.max(1, Math.trunc(historyLimit));

@@ -25,6 +25,7 @@ interface HomeWorkspaceContentProps {
   onImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   onOpenNetworkScope: () => void;
   onOpenModeling: () => void;
+  onOpenRecentChangeTarget?: (entry: UndoHistoryEntry) => void;
   onOpenOnboardingHelp?: () => void;
   postMvpModules?: HomeWorkspacePostMvpModules;
 }
@@ -193,7 +194,7 @@ function ChangelogEntryMarkdown({ content }: { content: string }): ReactElement 
 export function HomeWorkspaceContent({
   hasActiveNetwork,
   activeNetworkName,
-  activeNetworkTechnicalId,
+  activeNetworkTechnicalId: _activeNetworkTechnicalId,
   recentChangesForActiveNetwork,
   networkCount,
   onCreateEmptyWorkspace,
@@ -203,6 +204,7 @@ export function HomeWorkspaceContent({
   onImportFileChange,
   onOpenNetworkScope,
   onOpenModeling,
+  onOpenRecentChangeTarget,
   onOpenOnboardingHelp,
   postMvpModules
 }: HomeWorkspaceContentProps): ReactElement {
@@ -316,6 +318,12 @@ export function HomeWorkspaceContent({
               <span className="action-button-icon is-home-start" aria-hidden="true" />
               <span>Load network</span>
             </button>
+            {onOpenOnboardingHelp !== undefined ? (
+              <button type="button" className="button-with-icon" onClick={onOpenOnboardingHelp}>
+                <span className="action-button-icon is-help" aria-hidden="true" />
+                <span>Help</span>
+              </button>
+            ) : null}
             <button type="button" className="button-with-icon" onClick={onCreateEmptyWorkspace}>
               <span className="action-button-icon is-home-create" aria-hidden="true" />
               <span>Create empty workspace</span>
@@ -328,12 +336,6 @@ export function HomeWorkspaceContent({
               <span className="action-button-icon is-home-import" aria-hidden="true" />
               <span>Import workspace</span>
             </button>
-            {onOpenOnboardingHelp !== undefined ? (
-              <button type="button" className="button-with-icon" onClick={onOpenOnboardingHelp}>
-                <span className="action-button-icon is-help" aria-hidden="true" />
-                <span>Help</span>
-              </button>
-            ) : null}
           </div>
           <input
             ref={importFileInputRef}
@@ -349,25 +351,14 @@ export function HomeWorkspaceContent({
         <section className="panel home-panel home-workspace-resume-panel">
           <header className="home-panel-header">
             <h2>Workspace</h2>
-            <span className="settings-panel-chip">Active</span>
+            <span className="settings-panel-chip">
+              {hasActiveNetwork && activeNetworkName !== null ? activeNetworkName : "No active network"}
+            </span>
           </header>
           <p className="settings-panel-intro home-resume-intro">
             Continue where you left off using the current workspace context and active network.
           </p>
-          <p className="meta-line home-resume-copy">
-            {hasActiveNetwork && activeNetworkName !== null && activeNetworkTechnicalId !== null ? (
-              <>
-                <span className="home-resume-copy-label">Active network:</span>
-                {" "}
-                <span className="home-resume-copy-value">{activeNetworkName}</span>
-                {" "}
-                <span className="home-resume-copy-id">({activeNetworkTechnicalId})</span>
-              </>
-            ) : (
-              "No active network selected. Load network to choose or create one."
-            )}
-          </p>
-          <NetworkRecentChangesList entries={recentChangesForActiveNetwork} />
+          <NetworkRecentChangesList entries={recentChangesForActiveNetwork} onOpenEntryTarget={onOpenRecentChangeTarget} />
         </section>
       </div>
       <section className="panel home-panel home-whats-new-panel">

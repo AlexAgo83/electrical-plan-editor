@@ -67,6 +67,10 @@ export interface UndoHistoryEntry {
   targetKind: UndoHistoryTargetKind;
   targetId: string | null;
   networkId: NetworkId | null;
+  navigationScreen?: ScreenId;
+  navigationSubScreen?: SubScreenId;
+  navigationSelectionKind?: "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
+  navigationSelectionId?: string;
   label: string;
   timestampIso: string;
 }

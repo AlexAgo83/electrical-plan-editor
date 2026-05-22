@@ -1,11 +1,126 @@
 import type { ReactElement } from "react";
-import type { UndoHistoryEntry } from "../../types/app-controller";
+import type { UndoHistoryEntry, UndoHistoryTargetKind } from "../../types/app-controller";
 
 interface NetworkRecentChangesListProps {
   entries: UndoHistoryEntry[];
+  onOpenEntryTarget?: (entry: UndoHistoryEntry) => void;
 }
 
-export function NetworkRecentChangesList({ entries }: NetworkRecentChangesListProps): ReactElement | null {
+type RecentChangeTone = "create" | "update" | "delete" | "route" | "occupancy" | "workspace";
+
+function getTargetKindLabel(kind: UndoHistoryTargetKind): string {
+  switch (kind) {
+    case "network":
+      return "Network";
+    case "catalog":
+      return "Catalog";
+    case "connector":
+      return "Connector";
+    case "splice":
+      return "Splice";
+    case "node":
+      return "Node";
+    case "segment":
+      return "Segment";
+    case "wire":
+      return "Wire";
+    case "layout":
+      return "Layout";
+    case "workspace":
+      return "Workspace";
+  }
+}
+
+function getRecentChangeActionLabel(actionType: string): string {
+  if (actionType === "history/replaceState") {
+    return "Replace";
+  }
+
+  const action = actionType.split("/")[1] ?? actionType;
+  switch (action) {
+    case "create":
+      return "Create";
+    case "select":
+      return "Activate";
+    case "setSummaryViewState":
+      return "View";
+    case "rename":
+      return "Rename";
+    case "update":
+    case "upsert":
+    case "save":
+      return "Save";
+    case "duplicate":
+      return "Duplicate";
+    case "delete":
+    case "remove":
+    case "removeCascade":
+      return "Delete";
+    case "importMany":
+      return "Import";
+    case "occupyCavity":
+      return "Occupy cavity";
+    case "releaseCavity":
+      return "Release cavity";
+    case "occupyPort":
+      return "Occupy port";
+    case "releasePort":
+      return "Release port";
+    case "convertToDirectional":
+      return "Convert";
+    case "rerouteConnectedWires":
+      return "Reroute";
+    case "lockRoute":
+      return "Lock route";
+    case "resetRoute":
+      return "Reset route";
+    case "setNodePosition":
+    case "setNodePositions":
+      return "Move";
+    default:
+      return action.replace(/([a-z])([A-Z])/g, "$1 $2");
+  }
+}
+
+function getRecentChangeTone(actionType: string): RecentChangeTone {
+  if (actionType.includes("/remove") || actionType.includes("/delete")) {
+    return "delete";
+  }
+  if (actionType.includes("/create") || actionType.includes("/duplicate") || actionType.includes("/import")) {
+    return "create";
+  }
+  if (actionType.includes("Route") || actionType.includes("reroute")) {
+    return "route";
+  }
+  if (actionType.includes("Cavity") || actionType.includes("Port")) {
+    return "occupancy";
+  }
+  if (actionType.startsWith("history/") || actionType.startsWith("network/setSummaryViewState") || actionType.startsWith("layout/")) {
+    return "workspace";
+  }
+  return "update";
+}
+
+function getRecentChangeTimeLabel(timestampIso: string): string {
+  return new Date(timestampIso).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
+  });
+}
+
+function canOpenRecentChangeTarget(entry: UndoHistoryEntry): boolean {
+  if (entry.navigationScreen === undefined) {
+    return false;
+  }
+  if (entry.navigationScreen === "networkScope" || entry.navigationScreen === "harnessAssembly") {
+    return true;
+  }
+  return entry.navigationSubScreen !== undefined && entry.navigationSelectionKind !== undefined && entry.navigationSelectionId !== undefined;
+}
+
+export function NetworkRecentChangesList({ entries, onOpenEntryTarget }: NetworkRecentChangesListProps): ReactElement | null {
   if (entries.length === 0) {
     return null;
   }
@@ -13,19 +128,42 @@ export function NetworkRecentChangesList({ entries }: NetworkRecentChangesListPr
   return (
     <div className="network-recent-changes-list-shell home-network-recent-changes" aria-label="Recent changes for active network">
       <ul className="network-recent-changes-list" aria-label="Recent changes list">
-        {entries.map((entry) => (
-          <li key={entry.sequence} className="network-recent-changes-item">
-            <time dateTime={entry.timestampIso} className="network-recent-changes-time">
-              {new Date(entry.timestampIso).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: false
-              })}
-            </time>
-            <span className="network-recent-changes-label">{entry.label}</span>
-          </li>
-        ))}
+        {entries.map((entry) => {
+          const tone = getRecentChangeTone(entry.actionType);
+          const actionLabel = getRecentChangeActionLabel(entry.actionType);
+          const targetKindLabel = getTargetKindLabel(entry.targetKind);
+          const targetReference = entry.targetId ?? targetKindLabel;
+          const canOpenTarget = onOpenEntryTarget !== undefined && canOpenRecentChangeTarget(entry);
+          return (
+            <li key={entry.sequence} className={`network-recent-changes-item is-${tone}`}>
+              <span className={`network-recent-changes-icon is-${entry.targetKind}`} aria-hidden="true" />
+              <div className="network-recent-changes-main">
+                <span className="network-recent-changes-label">{entry.label}</span>
+                <span className="network-recent-changes-meta">
+                  <span className="network-recent-changes-kind">{targetKindLabel}</span>
+                  <span className={`network-recent-changes-action is-${tone}`}>{actionLabel}</span>
+                  <span className="network-recent-changes-target" title={targetReference}>
+                    {targetReference}
+                  </span>
+                </span>
+              </div>
+              <time dateTime={entry.timestampIso} className="network-recent-changes-time">
+                {getRecentChangeTimeLabel(entry.timestampIso)}
+              </time>
+              {canOpenTarget ? (
+                <button
+                  type="button"
+                  className="network-recent-changes-open-button"
+                  aria-label={`Open changed object: ${entry.label}`}
+                  title="Open changed object"
+                  onClick={() => onOpenEntryTarget(entry)}
+                >
+                  <span className="network-recent-changes-open-icon" aria-hidden="true" />
+                </button>
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

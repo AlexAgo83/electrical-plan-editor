@@ -145,6 +145,9 @@ describe("App integration UI - global undo/redo", () => {
     switchScreenDrawerAware("home");
     expect(within(getPanelByHeading("Workspace")).getByLabelText("Recent changes list")).toBeInTheDocument();
     expect(screen.getByText("Connector 'C-UNDO-SYNC' created")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Open changed object: Connector 'C-UNDO-SYNC' created" }));
+    const reopenedConnectorsPanel = getPanelByHeading("Connectors");
+    expect(within(reopenedConnectorsPanel).getByText("C-UNDO-SYNC").closest("tr")).toHaveClass("is-selected");
 
     openOpsPanel();
     fireEvent.click(screen.getByRole("button", { name: "Undo" }));

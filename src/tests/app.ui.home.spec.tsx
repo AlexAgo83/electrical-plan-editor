@@ -42,10 +42,10 @@ describe("home workspace screen", () => {
     expect(quickStartActions).toEqual([
       "Resume",
       "Load network",
+      "Help",
       "Create empty workspace",
       "Save workspace",
-      "Import workspace",
-      "Help"
+      "Import workspace"
     ]);
     expect(screen.queryByRole("button", { name: "Validation" })).not.toBeInTheDocument();
   });
@@ -189,8 +189,8 @@ describe("home workspace screen", () => {
     switchScreenDrawerAware("home");
 
     const resumePanel = getPanelByHeading("Workspace");
-    expect(within(resumePanel).getByText(/Active network:/i, { selector: ".home-resume-copy-label" })).toBeInTheDocument();
-    expect(within(resumePanel).getByText("Main network sample", { selector: ".home-resume-copy-value" })).toBeInTheDocument();
+    expect(within(resumePanel).getByText("Main network sample", { selector: ".settings-panel-chip" })).toBeInTheDocument();
+    expect(within(resumePanel).queryByText(/Active network:/i)).not.toBeInTheDocument();
     expect(within(resumePanel).queryByLabelText("Workspace summary")).not.toBeInTheDocument();
   });
 

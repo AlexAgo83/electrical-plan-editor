@@ -1,40 +1,129 @@
 .network-recent-changes-list-shell {
+  min-height: 0;
   border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
-  border-radius: 0.6rem;
-  background: color-mix(in srgb, var(--theme-primary, currentColor) 5%, transparent);
-  padding: 0.18rem 0;
-  max-height: 14rem;
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--theme-primary, currentColor) 7%, transparent), transparent 68%),
+    color-mix(in srgb, var(--panel-bg, #fff) 88%, transparent);
+  padding: 0.28rem;
   overflow: auto;
 }
 
 .home-network-recent-changes {
   margin: 0;
-  max-height: 8.5rem;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .network-recent-changes-list {
   list-style: none;
   margin: 0;
   padding: 0;
+  display: grid;
+  gap: 0.32rem;
 }
 
 .network-recent-changes-item {
+  position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.62rem;
-  align-items: baseline;
-  padding: 0.58rem 0.72rem;
-  border-bottom: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  gap: 0.68rem;
+  align-items: center;
+  padding: 0.8rem 3.15rem 0.82rem 0.72rem;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-left-width: 0.24rem;
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--panel-bg, #fff) 92%, transparent);
+  box-shadow: 0 0.3rem 1rem color-mix(in srgb, #000 5%, transparent);
 }
 
-.network-recent-changes-item:last-child {
-  border-bottom: 0;
+.network-recent-changes-item.is-create {
+  border-left-color: color-mix(in srgb, #2f9e44 72%, var(--theme-primary, currentColor));
+}
+
+.network-recent-changes-item.is-update,
+.network-recent-changes-item.is-route,
+.network-recent-changes-item.is-occupancy {
+  border-left-color: color-mix(in srgb, var(--theme-primary, currentColor) 72%, #3f78a8);
+}
+
+.network-recent-changes-item.is-delete {
+  border-left-color: color-mix(in srgb, #d9480f 76%, var(--theme-primary, currentColor));
+}
+
+.network-recent-changes-item.is-workspace {
+  border-left-color: color-mix(in srgb, currentColor 38%, transparent);
+}
+
+.network-recent-changes-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.45rem;
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent), transparent),
+    color-mix(in srgb, currentColor 6%, transparent);
+  position: relative;
+}
+
+.network-recent-changes-icon::before {
+  content: "";
+  position: absolute;
+  inset: 0.46rem;
+  border: 2px solid currentColor;
+  opacity: 0.58;
+}
+
+.network-recent-changes-icon.is-network::before,
+.network-recent-changes-icon.is-workspace::before {
+  border-radius: 0.16rem;
+}
+
+.network-recent-changes-icon.is-connector::before {
+  border-radius: 0.12rem;
+  width: 0.68rem;
+  height: 0.42rem;
+  inset: 0.55rem 0.42rem auto auto;
+}
+
+.network-recent-changes-icon.is-splice::before {
+  border-radius: 50%;
+}
+
+.network-recent-changes-icon.is-wire::before,
+.network-recent-changes-icon.is-segment::before,
+.network-recent-changes-icon.is-layout::before {
+  height: 0;
+  inset: 0.83rem 0.4rem auto;
+  border-width: 2px 0 0;
+  transform: rotate(-25deg);
+}
+
+.network-recent-changes-icon.is-node::before {
+  border-radius: 50%;
+  inset: 0.56rem;
+}
+
+.network-recent-changes-icon.is-catalog::before {
+  border-radius: 0.12rem;
+  border-top-width: 0.42rem;
+}
+
+.network-recent-changes-main {
+  min-width: 0;
+  display: grid;
+  gap: 0.24rem;
 }
 
 .network-recent-changes-time {
+  position: absolute;
+  top: 0.52rem;
+  right: 0.72rem;
   font-family: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   color: color-mix(in srgb, currentColor 70%, transparent);
+  line-height: 1;
+  text-align: right;
 }
 
 .network-recent-changes-label {
@@ -42,6 +131,111 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.87rem;
+  font-size: 0.89rem;
+  font-weight: 700;
   color: inherit;
+}
+
+.network-recent-changes-meta {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.network-recent-changes-kind,
+.network-recent-changes-action,
+.network-recent-changes-target {
+  min-width: 0;
+  max-width: 100%;
+  border-radius: 999px;
+  padding: 0.14rem 0.42rem;
+  font-size: 0.71rem;
+  line-height: 1.25;
+}
+
+.network-recent-changes-kind {
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  color: color-mix(in srgb, currentColor 74%, transparent);
+}
+
+.network-recent-changes-action {
+  border: 1px solid transparent;
+  color: color-mix(in srgb, currentColor 84%, transparent);
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.network-recent-changes-action.is-create {
+  background: color-mix(in srgb, #2f9e44 14%, transparent);
+}
+
+.network-recent-changes-action.is-delete {
+  background: color-mix(in srgb, #d9480f 14%, transparent);
+}
+
+.network-recent-changes-action.is-route,
+.network-recent-changes-action.is-occupancy {
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 14%, transparent);
+}
+
+.network-recent-changes-target {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 8%, transparent);
+  color: color-mix(in srgb, currentColor 82%, transparent);
+}
+
+.network-recent-changes-open-button {
+  position: absolute;
+  right: 0.62rem;
+  bottom: 0.52rem;
+  width: 1.86rem;
+  height: 1.86rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 34%, transparent);
+  background:
+    radial-gradient(circle at 35% 30%, color-mix(in srgb, white 55%, transparent), transparent 42%),
+    color-mix(in srgb, var(--theme-primary, currentColor) 15%, var(--panel-bg, #fff));
+  color: inherit;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 0.22rem 0.7rem color-mix(in srgb, #000 9%, transparent);
+}
+
+.network-recent-changes-open-button:hover,
+.network-recent-changes-open-button:focus-visible {
+  border-color: var(--theme-primary, currentColor);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 24%, var(--panel-bg, #fff));
+}
+
+.network-recent-changes-open-icon {
+  width: 0.62rem;
+  height: 0.62rem;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  position: relative;
+  transform: translate(-0.06rem, -0.05rem);
+}
+
+.network-recent-changes-open-icon::after {
+  content: "";
+  position: absolute;
+  width: 0.34rem;
+  height: 2px;
+  right: -0.26rem;
+  bottom: -0.14rem;
+  border-radius: 999px;
+  background: currentColor;
+  transform: rotate(45deg);
+  transform-origin: left center;
+}
+
+@media (max-width: 640px) {
+  .network-recent-changes-item {
+    grid-template-columns: 1.6rem minmax(0, 1fr);
+  }
 }

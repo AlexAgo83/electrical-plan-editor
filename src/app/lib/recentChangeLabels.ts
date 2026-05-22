@@ -13,7 +13,14 @@ import type {
 } from "../../core/entities";
 import type { AppAction } from "../../store/actions";
 import type { AppState } from "../../store/types";
-import type { UndoHistoryEntry, UndoHistoryTargetKind } from "../types/app-controller";
+import type { ScreenId, SubScreenId, UndoHistoryEntry, UndoHistoryTargetKind } from "../types/app-controller";
+
+interface RecentChangeNavigationTarget {
+  navigationScreen: ScreenId;
+  navigationSubScreen?: SubScreenId;
+  navigationSelectionKind?: UndoHistoryEntry["navigationSelectionKind"];
+  navigationSelectionId?: string;
+}
 
 function targetKindLabel(kind: UndoHistoryTargetKind): string {
   switch (kind) {
@@ -454,6 +461,82 @@ function buildLabelRoot(targetKind: UndoHistoryTargetKind, displayRef: string | 
   return `${targetKindLabel(targetKind)} '${displayRef}'`;
 }
 
+function buildSelectionNavigationTarget(
+  navigationSubScreen: SubScreenId,
+  navigationSelectionKind: NonNullable<UndoHistoryEntry["navigationSelectionKind"]>,
+  navigationSelectionId: string
+): RecentChangeNavigationTarget {
+  return {
+    navigationScreen: "modeling",
+    navigationSubScreen,
+    navigationSelectionKind,
+    navigationSelectionId
+  };
+}
+
+function resolveNavigationTarget(action: AppAction): RecentChangeNavigationTarget | null {
+  switch (action.type) {
+    case "network/create":
+      return { navigationScreen: "networkScope", navigationSelectionId: action.payload.network.id };
+    case "network/select":
+    case "network/setSummaryViewState":
+    case "network/rename":
+    case "network/update":
+      return { navigationScreen: "networkScope", navigationSelectionId: action.payload.id };
+    case "network/duplicate":
+      return { navigationScreen: "networkScope", navigationSelectionId: action.payload.network.id };
+    case "harnessAssembly/upsert":
+      return { navigationScreen: "harnessAssembly", navigationSelectionId: action.payload.id };
+    case "catalog/upsert":
+      return buildSelectionNavigationTarget("catalog", "catalog", action.payload.id);
+    case "connector/upsert":
+      return buildSelectionNavigationTarget("connector", "connector", action.payload.id);
+    case "connector/occupyCavity":
+    case "connector/releaseCavity":
+      return buildSelectionNavigationTarget("connector", "connector", action.payload.connectorId);
+    case "splice/upsert":
+    case "splice/convertToDirectional":
+    case "splice/rerouteConnectedWires":
+      return buildSelectionNavigationTarget("splice", "splice", action.payload.id);
+    case "splice/occupyPort":
+    case "splice/releasePort":
+      return buildSelectionNavigationTarget("splice", "splice", action.payload.spliceId);
+    case "node/upsert":
+      return buildSelectionNavigationTarget("node", "node", action.payload.id);
+    case "node/rename":
+      return buildSelectionNavigationTarget("node", "node", action.payload.toId);
+    case "segment/upsert":
+      return buildSelectionNavigationTarget("segment", "segment", action.payload.id);
+    case "segment/rename":
+      return buildSelectionNavigationTarget("segment", "segment", action.payload.toId);
+    case "wire/save":
+    case "wire/upsert":
+    case "wire/lockRoute":
+    case "wire/resetRoute":
+      return buildSelectionNavigationTarget("wire", "wire", action.payload.id);
+    case "layout/setNodePosition":
+      return buildSelectionNavigationTarget("node", "node", action.payload.nodeId);
+    case "network/delete":
+    case "network/importMany":
+    case "harnessAssembly/remove":
+    case "catalog/remove":
+    case "connector/remove":
+    case "connector/removeCascade":
+    case "splice/remove":
+    case "splice/removeCascade":
+    case "node/remove":
+    case "segment/remove":
+    case "wire/remove":
+    case "layout/setNodePositions":
+    case "ui/select":
+    case "ui/setError":
+    case "ui/setThemeMode":
+    case "ui/clearSelection":
+    case "ui/clearError":
+      return null;
+  }
+}
+
 export function buildUndoHistoryEntry(
   action: AppAction,
   previousState: AppState,
@@ -463,12 +546,14 @@ export function buildUndoHistoryEntry(
 ): UndoHistoryEntry {
   const targetKind = toTargetKind(action.type);
   const displayRef = resolveDisplayRef(action, previousState, nextState);
+  const navigationTarget = resolveNavigationTarget(action);
   return {
     sequence,
     actionType: action.type,
     targetKind,
     targetId: displayRef,
     networkId: resolveEntryNetworkId(action, previousState, nextState),
+    ...(navigationTarget ?? {}),
     label: `${buildLabelRoot(targetKind, displayRef)} ${actionVerb(action, previousState)}`,
     timestampIso: nowIso
   };

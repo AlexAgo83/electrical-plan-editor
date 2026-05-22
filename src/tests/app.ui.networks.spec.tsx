@@ -96,12 +96,10 @@ describe("App integration UI - networks", () => {
     });
 
     const recentChangesList = screen.getByLabelText("Recent changes list");
-    const activeNetworkCopy = screen.getByText(/Active network:/i, { selector: ".home-resume-copy-label" }).closest(".home-resume-copy");
     const workspaceHeading = screen.getByRole("heading", { name: "Workspace" });
     const whatsNewHeading = screen.getByRole("heading", { name: "What's new" });
-    expect(activeNetworkCopy).not.toBeNull();
+    expect(screen.queryByText(/Active network:/i)).not.toBeInTheDocument();
     expect(workspaceHeading.compareDocumentPosition(recentChangesList) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
-    expect((activeNetworkCopy as HTMLElement).compareDocumentPosition(recentChangesList) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     expect(recentChangesList.compareDocumentPosition(whatsNewHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
 
     const workspacePanel = getPanelByHeading("Workspace");

@@ -168,6 +168,7 @@ export function useAppControllerWorkspaceContentAssembly({
     activeNetworkTechnicalId: state.activeNetworkTechnicalId,
     activeNetworkId: entities.activeNetworkId,
     undoHistoryEntries: entities.undoHistoryEntries,
+    store: handlers.store,
     networkCount: state.networkCount,
     onOpenImportPicker: domains.workspaceNetworkDomain.handleOpenImportPicker,
     onSaveWorkspace: () => domains.workspaceNetworkDomain.handleExportNetworksWithActiveSaveConfirmation("all"),
