@@ -657,6 +657,11 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Selected network no longer exists.": "Le réseau sélectionné n'existe plus.",
   "Splice created, but the linked splice node could not be created automatically. Create it manually in Nodes.": "Épissure créée, mais le nœud épissure lié n'a pas pu être créé automatiquement. Créez-le manuellement dans Nœuds.",
   "Splice name and technical ID are required.": "Le nom d'épissure et l'ID technique sont requis.",
+  "Suggest optimized placement": "Suggérer un placement optimisé",
+  "Suggested splice placement": "Placement d'épissure suggéré",
+  "Apply suggestion": "Appliquer la suggestion",
+  "Optimized splice placement applied.": "Placement optimisé de l'épissure appliqué.",
+  "No better placement found within current constraints.": "Aucun meilleur placement trouvé avec les contraintes actuelles.",
   "Unable to create network. Check technical ID uniqueness.": "Impossible de créer le réseau. Vérifiez l'unicité de l'ID technique.",
   "Unable to read selected file.": "Impossible de lire le fichier sélectionné.",
   "Unable to rename node.": "Impossible de renommer le nœud.",
@@ -674,6 +679,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "port released": "port libéré",
   "route locked": "route verrouillée",
   "route reset": "route réinitialisée",
+  "placement optimized": "placement optimisé",
   "view updated": "vue mise à jour",
   "Workspace state replaced": "État d'espace de travail remplacé"
 };

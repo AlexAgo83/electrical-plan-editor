@@ -7,6 +7,7 @@ interface ConfirmDialogProps {
   title: string;
   message: string;
   details?: string;
+  detailsLabel?: string;
   confirmLabel?: string;
   cancelLabel?: string;
   intent?: ConfirmDialogIntent;
@@ -30,6 +31,7 @@ export function ConfirmDialog({
   title,
   message,
   details,
+  detailsLabel = "Details",
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   intent = "neutral",
@@ -193,7 +195,7 @@ export function ConfirmDialog({
         </p>
         {details !== undefined && details.length > 0 ? (
           <p id={detailsId} className="confirm-dialog-details">
-            <span className="confirm-dialog-details-label">Filename</span>
+            <span className="confirm-dialog-details-label">{detailsLabel}</span>
             <code className="confirm-dialog-details-code">{details}</code>
           </p>
         ) : null}

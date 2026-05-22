@@ -14,6 +14,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     handleSpliceSubmit,
     handleConvertSpliceToDirectional,
     handleRerouteSpliceConnectedWires,
+    handleSuggestOptimizedSplicePlacement,
     spliceName,
     setSpliceName,
     spliceTechnicalId,
@@ -162,7 +163,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
         {spliceFormMode === "edit" ? (
           <div className="row-actions compact">
             <button type="button" className="button-with-icon" onClick={handleRerouteSpliceConnectedWires}>
-              <span className="action-button-icon is-refresh" aria-hidden="true" />
+              <span className="action-button-icon is-swap" aria-hidden="true" />
               Reroute connected wires
             </button>
           </div>
@@ -216,6 +217,12 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
         {spliceFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {spliceFormMode === "edit" ? "Cancel edit" : "Cancel"}
       </button>
+      {spliceFormMode === "edit" && isDirectional ? (
+        <button type="button" className="button-with-icon" onClick={handleSuggestOptimizedSplicePlacement}>
+          <span className="action-button-icon is-analysis" aria-hidden="true" />
+          Suggest optimized placement
+        </button>
+      ) : null}
     </div>
     {spliceFormInfo !== null ? <small className="inline-help">{spliceFormInfo}</small> : null}
     {spliceFormError !== null ? <small className="inline-error">{spliceFormError}</small> : null}

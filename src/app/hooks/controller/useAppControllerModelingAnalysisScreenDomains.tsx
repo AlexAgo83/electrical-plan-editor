@@ -587,6 +587,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     handleSpliceSubmit: modelingHandlers.splice.handleSpliceSubmit,
     handleConvertSpliceToDirectional: modelingHandlers.splice.handleConvertSpliceToDirectional,
     handleRerouteSpliceConnectedWires: modelingHandlers.splice.handleRerouteSpliceConnectedWires,
+    handleSuggestOptimizedSplicePlacement: modelingHandlers.splice.handleSuggestOptimizedSplicePlacement,
     spliceName: formsState.spliceName,
     setSpliceName: formsState.setSpliceName,
     spliceTechnicalId: formsState.spliceTechnicalId,

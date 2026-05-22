@@ -632,6 +632,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     state,
     dispatchAction,
     confirmAction: requestConfirmation,
+    notifyToast,
     choiceAction: requestChoiceSelection,
     formsState,
     pendingNewNodePosition,

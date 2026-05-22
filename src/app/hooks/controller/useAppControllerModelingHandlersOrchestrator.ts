@@ -14,6 +14,7 @@ interface UseAppControllerModelingHandlersOrchestratorParams {
   state: StateSnapshot;
   dispatchAction: DispatchAction;
   confirmAction: Parameters<typeof useConnectorHandlers>[0]["confirmAction"];
+  notifyToast: Parameters<typeof useSpliceHandlers>[0]["notifyToast"];
   choiceAction: Parameters<typeof useWireHandlers>[0]["choiceAction"];
   connectorFormMode: Parameters<typeof useConnectorHandlers>[0]["connectorFormMode"];
   setConnectorFormMode: Parameters<typeof useConnectorHandlers>[0]["setConnectorFormMode"];
@@ -198,6 +199,7 @@ export function useAppControllerModelingHandlersOrchestrator({
   state,
   dispatchAction,
   confirmAction,
+  notifyToast,
   choiceAction,
   connectorFormMode,
   setConnectorFormMode,
@@ -417,6 +419,7 @@ export function useAppControllerModelingHandlersOrchestrator({
     store,
     dispatchAction,
     confirmAction,
+    notifyToast,
     spliceFormMode,
     setSpliceFormMode,
     spliceEditAfterCreate,

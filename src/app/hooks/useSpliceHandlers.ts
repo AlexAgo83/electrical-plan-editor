@@ -10,6 +10,8 @@ import {
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { analyzeSpliceDeleteImpact } from "../../store/deleteImpact";
+import { findSplicePlacementSuggestion } from "../../store/splicePlacementOptimizer";
+import type { ToastNotificationVariant } from "./useToastNotifications";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestAutoSpliceNodeId, suggestNextSpliceTechnicalId } from "../lib/technical-id-suggestions";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
@@ -21,10 +23,13 @@ type DispatchAction = (
   }
 ) => void;
 
+type NotifyToast = (title: string, options?: { message?: string; variant?: ToastNotificationVariant }) => void;
+
 interface UseSpliceHandlersParams {
   store: AppStore;
   dispatchAction: DispatchAction;
   confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
+  notifyToast: NotifyToast;
   spliceFormMode: "idle" | "create" | "edit";
   setSpliceFormMode: (mode: "idle" | "create" | "edit") => void;
   spliceEditAfterCreate: boolean;
@@ -87,6 +92,7 @@ export function useSpliceHandlers({
   store,
   dispatchAction,
   confirmAction,
+  notifyToast,
   spliceFormMode,
   setSpliceFormMode,
   spliceEditAfterCreate: _spliceEditAfterCreate,
@@ -434,7 +440,6 @@ export function useSpliceHandlers({
       const convertedSplice = store.getState().splices.byId[splice.id];
       if (convertedSplice !== undefined) {
         startSpliceEdit(convertedSplice);
-        setSpliceFormInfo("Splice converted to directional L/R mode.");
       }
     })();
   }
@@ -452,8 +457,81 @@ export function useSpliceHandlers({
 
     dispatchAction(appActions.rerouteSpliceConnectedWires(splice.id));
     const nextError = store.getState().ui.lastError?.message ?? null;
-    setSpliceFormError(nextError);
-    setSpliceFormInfo(nextError === null ? "Connected wires rerouted and L/R sides reassigned." : null);
+    if (nextError !== null) {
+      notifyToast("Reroute failed", { message: nextError, variant: "error" });
+    }
+    setSpliceFormError(null);
+    setSpliceFormInfo(null);
+  }
+
+  function handleSuggestOptimizedSplicePlacement(): void {
+    if (spliceFormMode !== "edit" || editingSpliceId === null) {
+      return;
+    }
+
+    const result = findSplicePlacementSuggestion(store.getState(), editingSpliceId);
+    if (!("suggestion" in result)) {
+      setSpliceFormError(null);
+      setSpliceFormInfo(null);
+      notifyToast("No optimized placement", { message: result.reason, variant: "info" });
+      return;
+    }
+
+    const { suggestion } = result;
+    const formatVolume = (value: number): string => `${Math.round(value).toLocaleString("en-US")} mm3`;
+    const formatPercent = (value: number | null): string => (value === null ? "n/a" : `${Math.round(value)}%`);
+    const formatBalance = (left: number, right: number, ratio: number | null): string => {
+      return `L ${left.toFixed(2)} mm2 / R ${right.toFixed(2)} mm2 (${formatPercent(ratio)})`;
+    };
+    const comparisonDetails = [
+      "Copper volume",
+      `Current:   ${formatVolume(suggestion.current.copperVolumeMm3)}`,
+      `Suggested: ${formatVolume(suggestion.suggested.copperVolumeMm3)}`,
+      `Change:    ${suggestion.copperVolumeDeltaPercent.toFixed(1)}%`,
+      "",
+      "Section balance",
+      `Current:   ${formatBalance(
+        suggestion.current.leftSectionMm2,
+        suggestion.current.rightSectionMm2,
+        suggestion.current.balanceRatioPercent
+      )}`,
+      `Suggested: ${formatBalance(
+        suggestion.suggested.leftSectionMm2,
+        suggestion.suggested.rightSectionMm2,
+        suggestion.suggested.balanceRatioPercent
+      )}`,
+      `Limit:     ${Math.round(suggestion.balanceLimitPercent)}%`
+    ].join("\n");
+
+    void (async () => {
+      const shouldApply = await confirmAction({
+        title: "Suggested splice placement",
+        message: suggestion.warning ?? "Review the optimized placement before applying it.",
+        detailsLabel: "Comparison",
+        details: comparisonDetails,
+        confirmLabel: "Apply suggestion",
+        cancelLabel: "Cancel",
+        intent: suggestion.warning === null ? "neutral" : "warning"
+      });
+      if (!shouldApply) {
+        return;
+      }
+
+      dispatchAction(
+        appActions.applyOptimizedSplicePlacement(
+          suggestion.spliceId,
+          suggestion.spliceNodeId,
+          suggestion.position,
+          suggestion.segmentLengths
+        )
+      );
+      const nextError = store.getState().ui.lastError?.message ?? null;
+      if (nextError !== null) {
+        notifyToast("Optimized placement failed", { message: nextError, variant: "error" });
+      }
+      setSpliceFormError(null);
+      setSpliceFormInfo(null);
+    })();
   }
 
   function handleReservePort(event: FormEvent<HTMLFormElement>): void {
@@ -484,6 +562,7 @@ export function useSpliceHandlers({
     handleSpliceDelete,
     handleConvertSpliceToDirectional,
     handleRerouteSpliceConnectedWires,
+    handleSuggestOptimizedSplicePlacement,
     handleReservePort,
     handleReleasePort,
     syncDerivedSpliceCatalogFields,

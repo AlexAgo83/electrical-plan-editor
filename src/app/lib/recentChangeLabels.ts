@@ -251,6 +251,8 @@ function actionVerb(action: AppAction, previousState: AppState): string {
       return "converted";
     case "splice/rerouteConnectedWires":
       return "rerouted";
+    case "splice/applyOptimizedPlacement":
+      return "placement optimized";
     case "splice/remove":
     case "splice/removeCascade":
       return "deleted";
@@ -376,6 +378,7 @@ function resolveDisplayRef(action: AppAction, previousState: AppState, nextState
       );
     case "splice/convertToDirectional":
     case "splice/rerouteConnectedWires":
+    case "splice/applyOptimizedPlacement":
       return preferDisplayText(
         resolveSpliceDisplayRef(nextState, action.payload.id),
         resolveSpliceDisplayRef(previousState, action.payload.id)
@@ -497,6 +500,7 @@ function resolveNavigationTarget(action: AppAction): RecentChangeNavigationTarge
     case "splice/upsert":
     case "splice/convertToDirectional":
     case "splice/rerouteConnectedWires":
+    case "splice/applyOptimizedPlacement":
       return buildSelectionNavigationTarget("splice", "splice", action.payload.id);
     case "splice/occupyPort":
     case "splice/releasePort":

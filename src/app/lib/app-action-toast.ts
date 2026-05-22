@@ -213,6 +213,24 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
         getLabel: getSpliceLabel,
         nextState
       });
+    case "splice/convertToDirectional":
+      return {
+        title: "Splice converted",
+        message: getSpliceLabel(nextState, action.payload.id),
+        variant: "success"
+      };
+    case "splice/rerouteConnectedWires":
+      return {
+        title: "Connected wires rerouted",
+        message: getSpliceLabel(nextState, action.payload.id),
+        variant: "success"
+      };
+    case "splice/applyOptimizedPlacement":
+      return {
+        title: "Optimized placement applied",
+        message: getSpliceLabel(nextState, action.payload.id),
+        variant: "success"
+      };
     case "splice/remove":
     case "splice/removeCascade":
       return buildRemoveToast({

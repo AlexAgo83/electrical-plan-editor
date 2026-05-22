@@ -12,6 +12,7 @@ export interface ConfirmDialogRequest {
   title: string;
   message: string;
   details?: string;
+  detailsLabel?: string;
   confirmLabel?: string;
   cancelLabel?: string;
   intent?: ConfirmDialogIntent;

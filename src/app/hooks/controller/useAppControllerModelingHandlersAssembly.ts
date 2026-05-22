@@ -9,6 +9,7 @@ interface UseAppControllerModelingHandlersAssemblyParams {
   state: ModelingHandlersParams["state"];
   dispatchAction: ModelingHandlersParams["dispatchAction"];
   confirmAction: ModelingHandlersParams["confirmAction"];
+  notifyToast: ModelingHandlersParams["notifyToast"];
   choiceAction: ModelingHandlersParams["choiceAction"];
   formsState: EntityFormsStateModel;
   pendingNewNodePosition: ModelingHandlersParams["pendingNewNodePosition"];
@@ -27,6 +28,7 @@ export function useAppControllerModelingHandlersAssembly({
   state,
   dispatchAction,
   confirmAction,
+  notifyToast,
   choiceAction,
   formsState,
   pendingNewNodePosition,
@@ -44,6 +46,7 @@ export function useAppControllerModelingHandlersAssembly({
     state,
     dispatchAction,
     confirmAction,
+    notifyToast,
     choiceAction,
     connectorFormMode: formsState.connectorFormMode,
     setConnectorFormMode: formsState.setConnectorFormMode,

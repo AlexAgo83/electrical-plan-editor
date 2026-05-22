@@ -45,6 +45,7 @@ export interface ModelingFormsColumnProps {
   handleSpliceSubmit: (event: FormEvent<HTMLFormElement>) => void;
   handleConvertSpliceToDirectional: () => void;
   handleRerouteSpliceConnectedWires: () => void;
+  handleSuggestOptimizedSplicePlacement: () => void;
   spliceName: string;
   setSpliceName: (value: string) => void;
   spliceTechnicalId: string;

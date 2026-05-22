@@ -537,6 +537,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     handleSpliceSubmit: params.handleSpliceSubmit,
     handleConvertSpliceToDirectional: params.handleConvertSpliceToDirectional,
     handleRerouteSpliceConnectedWires: params.handleRerouteSpliceConnectedWires,
+    handleSuggestOptimizedSplicePlacement: params.handleSuggestOptimizedSplicePlacement,
     spliceName: params.spliceName,
     setSpliceName: params.setSpliceName,
     spliceTechnicalId: params.spliceTechnicalId,

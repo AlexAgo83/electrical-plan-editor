@@ -6,6 +6,7 @@ export interface ActiveConfirmDialogState {
   title: string;
   message: string;
   details?: string;
+  detailsLabel?: string;
   confirmLabel: string;
   cancelLabel: string;
   intent: ConfirmDialogIntent;
@@ -39,6 +40,7 @@ export function useConfirmDialogController() {
         title: request.title,
         message: request.message,
         details: request.details,
+        detailsLabel: request.detailsLabel,
         confirmLabel: request.confirmLabel ?? "Confirm",
         cancelLabel: request.cancelLabel ?? "Cancel",
         intent: request.intent ?? "neutral",

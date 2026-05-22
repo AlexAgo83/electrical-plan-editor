@@ -97,6 +97,15 @@ export type AppAction =
   | { type: "splice/upsert"; payload: Splice }
   | { type: "splice/convertToDirectional"; payload: { id: SpliceId } }
   | { type: "splice/rerouteConnectedWires"; payload: { id: SpliceId } }
+  | {
+      type: "splice/applyOptimizedPlacement";
+      payload: {
+        id: SpliceId;
+        nodeId: NodeId;
+        position: LayoutNodePosition;
+        segmentLengths: Record<SegmentId, number>;
+      };
+    }
   | { type: "splice/remove"; payload: { id: SpliceId } }
   | { type: "splice/removeCascade"; payload: { id: SpliceId } }
   | {
@@ -240,6 +249,15 @@ export const appActions = {
   rerouteSpliceConnectedWires: (id: SpliceId): AppAction => ({
     type: "splice/rerouteConnectedWires",
     payload: { id }
+  }),
+  applyOptimizedSplicePlacement: (
+    id: SpliceId,
+    nodeId: NodeId,
+    position: LayoutNodePosition,
+    segmentLengths: Record<SegmentId, number>
+  ): AppAction => ({
+    type: "splice/applyOptimizedPlacement",
+    payload: { id, nodeId, position, segmentLengths }
   }),
   removeSplice: (id: SpliceId): AppAction => ({ type: "splice/remove", payload: { id } }),
   removeSpliceCascade: (id: SpliceId): AppAction => ({ type: "splice/removeCascade", payload: { id } }),

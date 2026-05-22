@@ -82,6 +82,7 @@ export function AppControllerOverlays({
             title={activeConfirmDialog.title}
             message={activeConfirmDialog.message}
             details={activeConfirmDialog.details}
+            detailsLabel={activeConfirmDialog.detailsLabel}
             confirmLabel={activeConfirmDialog.confirmLabel}
             cancelLabel={activeConfirmDialog.cancelLabel}
             intent={activeConfirmDialog.intent}

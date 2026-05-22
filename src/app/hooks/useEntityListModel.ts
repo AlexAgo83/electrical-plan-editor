@@ -28,7 +28,7 @@ interface UseEntityListModelParams {
 }
 
 export type WireFilterField = "endpoints" | "name" | "technicalId" | "any";
-export type WireTwistGroupFilter = "all" | string;
+export type WireTwistGroupFilter = string;
 export type ConnectorFilterField = "name" | "technicalId" | "any";
 export type SpliceFilterField = "name" | "technicalId" | "any";
 export type NodeFilterField = "id" | "kind" | "reference" | "any";

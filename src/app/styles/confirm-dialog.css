@@ -82,6 +82,7 @@
   font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.82rem;
   line-height: 1.35;
+  white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
