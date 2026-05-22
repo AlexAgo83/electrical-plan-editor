@@ -31,6 +31,7 @@ import type {
   CanvasResizeBehaviorMode,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
+  ConnectorDrawingDisplayMode,
   NetworkCalloutContentMode,
   NodePosition,
   SubScreenId
@@ -84,6 +85,7 @@ export interface NetworkSummaryPanelProps {
   calloutContentMode: NetworkCalloutContentMode;
   showSelectedCalloutOnly: boolean;
   showCalloutWireNames: boolean;
+  connectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
   connectorDrawingScalePercent: number;
   zoomInvariantNodeShapes: boolean;
   nodeShapeSizePercent: number;
@@ -191,6 +193,7 @@ export function NetworkSummaryPanel({
   calloutContentMode,
   showSelectedCalloutOnly,
   showCalloutWireNames,
+  connectorDrawingDisplayMode,
   connectorDrawingScalePercent,
   zoomInvariantNodeShapes,
   nodeShapeSizePercent,
@@ -508,7 +511,7 @@ export function NetworkSummaryPanel({
     () =>
       buildCableCalloutViewModels({
         showCableCallouts,
-        calloutContentMode,
+        calloutContentMode: connectorDrawingDisplayMode === "callouts" ? calloutContentMode : "wireDetails",
         showSelectedCalloutOnly,
         nodes,
         networkNodePositions,
@@ -528,6 +531,7 @@ export function NetworkSummaryPanel({
     [
       showCableCallouts,
       calloutContentMode,
+      connectorDrawingDisplayMode,
       showSelectedCalloutOnly,
       nodes,
       networkNodePositions,
@@ -730,11 +734,15 @@ export function NetworkSummaryPanel({
     exportCartoucheNotes
   });
 
+  const normalizedConnectorDrawingScale = clampNumber(connectorDrawingScalePercent / 100, 1, 2);
+  const normalizedConnectorNodeDrawingScale =
+    connectorDrawingDisplayMode === "nodes" ? normalizedConnectorDrawingScale * 2.4 : normalizedConnectorDrawingScale;
+
   const renderedCableCallouts = useMemo(() => {
     return computeRenderedCableCallouts({
       orderedCableCallouts,
       calloutTextSize,
-      connectorDrawingScale: clampNumber(connectorDrawingScalePercent / 100, 1, 2),
+      connectorDrawingScale: normalizedConnectorDrawingScale,
       calloutContentMode,
       showCalloutWireNames,
       inverseLabelScale,
@@ -748,7 +756,7 @@ export function NetworkSummaryPanel({
   }, [
     orderedCableCallouts,
     calloutTextSize,
-    connectorDrawingScalePercent,
+    normalizedConnectorDrawingScale,
     calloutContentMode,
     showCalloutWireNames,
     inverseLabelScale,
@@ -864,6 +872,10 @@ export function NetworkSummaryPanel({
         selectedConnectorId,
         selectedSpliceId,
         connectorMap,
+        catalogItems,
+        connectorDrawingDisplayMode,
+        connectorCalloutGroupsById,
+        selectedWireId,
         spliceMap
       }),
     [
@@ -876,6 +888,10 @@ export function NetworkSummaryPanel({
       selectedConnectorId,
       selectedSpliceId,
       connectorMap,
+      catalogItems,
+      connectorDrawingDisplayMode,
+      connectorCalloutGroupsById,
+      selectedWireId,
       spliceMap
     ]
   );
@@ -1000,6 +1016,7 @@ export function NetworkSummaryPanel({
                 labelRotationDegrees={labelRotationDegrees}
                 zoomInvariantNodeShapes={zoomInvariantNodeShapes}
                 normalizedNodeShapeScale={normalizedNodeShapeScale}
+                connectorDrawingScale={normalizedConnectorNodeDrawingScale}
                 nodeStrokeWidth={nodeStrokeWidth}
                 nodeStrokeEmphasisWidth={nodeStrokeEmphasisWidth}
                 describeNode={describeNode}

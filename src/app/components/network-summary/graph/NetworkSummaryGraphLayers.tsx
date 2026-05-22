@@ -7,6 +7,7 @@ import {
 } from "react";
 import type { NetworkNode, NodeId, SegmentId } from "../../../../core/entities";
 import type { NodePosition } from "../../../types/app-controller";
+import { renderConnectorLayoutDrawing } from "../callouts/NetworkSummaryCalloutsLayer";
 import type { RenderedNodeModel, RenderedSegmentModel } from "./networkSummaryGraphModel";
 
 export interface SplicePlacementPreviewSegmentModel {
@@ -43,6 +44,7 @@ interface NetworkSummaryGraphLayersProps {
   labelRotationDegrees: number;
   zoomInvariantNodeShapes: boolean;
   normalizedNodeShapeScale: number;
+  connectorDrawingScale: number;
   nodeStrokeWidth: number;
   nodeStrokeEmphasisWidth: number;
   describeNode: (node: NetworkNode) => string;
@@ -100,6 +102,7 @@ export function NetworkSummaryGraphLayers({
   labelRotationDegrees,
   zoomInvariantNodeShapes,
   normalizedNodeShapeScale,
+  connectorDrawingScale,
   nodeStrokeWidth,
   nodeStrokeEmphasisWidth,
   describeNode,
@@ -196,12 +199,14 @@ export function NetworkSummaryGraphLayers({
           } as CSSProperties
         }
       >
-        {renderedNodes.map(({ node, position, nodeClassName }) => {
+        {renderedNodes.map(({ node, position, nodeClassName, connectorLayout, highlightedConnectorCavityIndexes }) => {
           const connectorWidth = 46 * normalizedNodeShapeScale;
           const connectorHeight = 30 * normalizedNodeShapeScale;
+          const connectorDrawingWidth = connectorWidth * connectorDrawingScale;
+          const connectorDrawingHeight = connectorHeight * connectorDrawingScale;
           const spliceDiamondSize = 30 * normalizedNodeShapeScale;
-          const connectorHitboxWidth = 56 * normalizedNodeShapeScale;
-          const connectorHitboxHeight = 40 * normalizedNodeShapeScale;
+          const connectorHitboxWidth = Math.max(56 * normalizedNodeShapeScale, connectorDrawingWidth + 10 * normalizedNodeShapeScale);
+          const connectorHitboxHeight = Math.max(40 * normalizedNodeShapeScale, connectorDrawingHeight + 10 * normalizedNodeShapeScale);
           const spliceHitboxSize = 38 * normalizedNodeShapeScale;
           const intermediateRadius = 17 * normalizedNodeShapeScale;
           const intermediateHitboxRadius = 22 * normalizedNodeShapeScale;
@@ -239,15 +244,29 @@ export function NetworkSummaryGraphLayers({
                       rx={9}
                       ry={9}
                     />
-                    <rect
-                      className="network-node-shape"
-                      x={position.x - connectorWidth / 2}
-                      y={position.y - connectorHeight / 2}
-                      width={connectorWidth}
-                      height={connectorHeight}
-                      rx={7}
-                      ry={7}
-                    />
+                    {connectorLayout === undefined ? (
+                      <rect
+                        className="network-node-shape"
+                        x={position.x - connectorWidth / 2}
+                        y={position.y - connectorHeight / 2}
+                        width={connectorWidth}
+                        height={connectorHeight}
+                        rx={7}
+                        ry={7}
+                      />
+                    ) : (
+                      <g
+                        className="network-node-connector-drawing"
+                        transform={`translate(${position.x} ${position.y - connectorDrawingHeight / 2})`}
+                      >
+                        {renderConnectorLayoutDrawing(
+                          connectorLayout,
+                          connectorDrawingWidth,
+                          connectorDrawingHeight,
+                          highlightedConnectorCavityIndexes
+                        )}
+                      </g>
+                    )}
                   </>
                 ) : node.kind === "splice" ? (
                   <>
@@ -341,13 +360,13 @@ export function NetworkSummaryGraphLayers({
           )
         )}
 
-        {renderedNodes.map(({ node, position, nodeLabel, isSubNetworkDeemphasized }) => (
+        {renderedNodes.map(({ node, position, nodeLabel, labelOffsetY, isSubNetworkDeemphasized }) => (
           <g
             key={`${node.id}-label`}
             className={`network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`}
             data-node-id={node.id}
           >
-            <g className="network-node-label-anchor" transform={`translate(${position.x} ${position.y}) scale(${inverseLabelScale})`}>
+            <g className="network-node-label-anchor" transform={`translate(${position.x} ${position.y + labelOffsetY}) scale(${inverseLabelScale})`}>
               <text
                 className="network-node-label"
                 x={0}

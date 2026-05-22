@@ -145,17 +145,61 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(networkSummaryPanel.querySelector(".network-callout-connector-keying[width]")).not.toBeNull();
 
     switchScreenDrawerAware("settings");
-    const connectorDrawingCheckbox = within(getPanelByHeading("Canvas tools preferences")).getByLabelText(
-      "Show connector drawing in callouts"
+    const connectorDrawingSelector = within(getPanelByHeading("Canvas tools preferences")).getByLabelText(
+      "Connector drawing display"
     );
-    expect(connectorDrawingCheckbox).toBeChecked();
+    expect(connectorDrawingSelector).toHaveValue("callouts");
     expect(within(getPanelByHeading("Canvas tools preferences")).getByRole("slider", { name: /Connector drawing size/ })).toHaveValue("125");
-    fireEvent.click(connectorDrawingCheckbox);
+    fireEvent.change(connectorDrawingSelector, { target: { value: "disabled" } });
 
     switchScreenDrawerAware("modeling");
     networkSummaryPanel = getPanelByHeading("Network summary");
     expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing")).toHaveLength(0);
     expect(networkSummaryPanel.querySelectorAll(".network-callout-table-cell").length).toBeGreaterThan(0);
+  });
+
+  it("can render connector layouts directly on connector nodes", () => {
+    const catalogItemId = asCatalogItemId("CAT-NODE-DRAWING");
+    const state = [
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "CAT-NODE-DRAWING",
+        connectionCount: 2,
+        connectorLayout: {
+          version: 1,
+          units: "grid",
+          width: 4,
+          height: 1,
+          ways: [
+            { cavityIndex: 1, x: 1, y: 1, shape: "round" },
+            { cavityIndex: 2, x: 4, y: 1, shape: "square" }
+          ]
+        }
+      }),
+      appActions.upsertConnector({
+        id: asConnectorId("C1"),
+        name: "Connector A",
+        technicalId: "C1",
+        cavityCount: 2,
+        catalogItemId
+      })
+    ].reduce(appReducer, createUiIntegrationState());
+
+    renderAppWithState(state);
+    switchScreenDrawerAware("settings");
+    const selector = within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Connector drawing display");
+    fireEvent.change(selector, { target: { value: "nodes" } });
+
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+    fireEvent.click(within(getPanelByHeading("Wires")).getByText("W-1"));
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
+
+    expect(networkSummaryPanel.querySelector(".network-node-connector-drawing")).not.toBeNull();
+    expect(networkSummaryPanel.querySelectorAll(".network-graph-layer-callouts .network-callout-connector-drawing")).toHaveLength(0);
+    expect(networkSummaryPanel.querySelectorAll(".network-node-connector-drawing .network-callout-connector-way.is-wire-highlighted")).toHaveLength(1);
   });
 
   it("does not draw generated connector layouts inside callouts", () => {

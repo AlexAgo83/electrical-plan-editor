@@ -52,6 +52,7 @@ export type CanvasLabelStrokeMode = "none" | "light" | "normal";
 export type CanvasLabelSizeMode = "extraSmall" | "small" | "normal" | "large" | "extraLarge";
 export type CanvasCalloutTextSize = "small" | "normal" | "large" | "extraLarge";
 export type NetworkCalloutContentMode = "wireDetails" | "connectorDrawing" | "both";
+export type ConnectorDrawingDisplayMode = "disabled" | "callouts" | "nodes";
 export type CanvasExportFormat = "svg" | "png";
 export type CanvasLabelRotationDegrees = -90 | -45 | -20 | 0 | 20 | 45 | 90;
 export type CanvasResizeBehaviorMode = "responsiveContentScale" | "visibleAreaOnly";

@@ -1,14 +1,21 @@
 import type {
   Connector,
   ConnectorId,
+  CatalogItem,
+  ConnectorLayout,
   NetworkNode,
   NodeId,
   Segment,
   SegmentId,
   Splice,
-  SpliceId
+  SpliceId,
+  WireId
 } from "../../../../core/entities";
+import { resolveEditedConnectorLayout } from "../../../../core/connectorLayout";
 import type { NodePosition } from "../../../types/app-controller";
+import type { ConnectorDrawingDisplayMode } from "../../../types/app-controller";
+import type { CalloutGroup } from "../callouts/calloutLayout";
+import { getHighlightedConnectorCavityIndexes } from "../callouts/NetworkSummaryCalloutsLayer";
 import { normalizeReadableSegmentLabelAngle } from "../callouts/calloutLayout";
 
 export interface RenderedSegmentModel {
@@ -31,8 +38,13 @@ export interface RenderedNodeModel {
   position: NodePosition;
   nodeClassName: string;
   nodeLabel: string;
+  connectorLayout?: ConnectorLayout;
+  highlightedConnectorCavityIndexes: ReadonlySet<number>;
+  labelOffsetY: number;
   isSubNetworkDeemphasized: boolean;
 }
+
+const CONNECTOR_LAYOUT_NODE_LABEL_OFFSET_Y = -21;
 
 interface BuildRenderedSegmentsParams {
   segments: Segment[];
@@ -126,6 +138,10 @@ interface BuildRenderedNodesParams {
   selectedConnectorId: ConnectorId | null;
   selectedSpliceId: SpliceId | null;
   connectorMap: ReadonlyMap<ConnectorId, Connector>;
+  catalogItems: CatalogItem[];
+  connectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
+  connectorCalloutGroupsById: ReadonlyMap<ConnectorId, CalloutGroup[]>;
+  selectedWireId: WireId | null;
   spliceMap: ReadonlyMap<SpliceId, Splice>;
 }
 
@@ -149,9 +165,14 @@ export function buildRenderedNodes({
   selectedConnectorId,
   selectedSpliceId,
   connectorMap,
+  catalogItems,
+  connectorDrawingDisplayMode,
+  connectorCalloutGroupsById,
+  selectedWireId,
   spliceMap
 }: BuildRenderedNodesParams): RenderedNodeModel[] {
   const result: RenderedNodeModel[] = [];
+  const catalogItemById = new Map(catalogItems.map((item) => [item.id, item] as const));
 
   for (const node of nodes) {
     const position = networkNodePositions[node.id];
@@ -176,12 +197,27 @@ export function buildRenderedNodes({
         : node.kind === "connector"
           ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
           : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
+    const connector = node.kind === "connector" ? connectorMap.get(node.connectorId) : undefined;
+    const connectorLayout =
+      connectorDrawingDisplayMode === "nodes" && connector !== undefined
+        ? resolveEditedConnectorLayout(
+            connector.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId)?.connectorLayout,
+            connector.cavityCount
+          )
+        : undefined;
+    const highlightedConnectorCavityIndexes =
+      connector !== undefined
+        ? getHighlightedConnectorCavityIndexes(connectorCalloutGroupsById.get(connector.id) ?? [], selectedWireId)
+        : new Set<number>();
 
     result.push({
       node,
       position,
       nodeClassName,
       nodeLabel,
+      connectorLayout,
+      highlightedConnectorCavityIndexes,
+      labelOffsetY: connectorLayout === undefined ? 0 : CONNECTOR_LAYOUT_NODE_LABEL_OFFSET_Y,
       isSubNetworkDeemphasized
     });
   }

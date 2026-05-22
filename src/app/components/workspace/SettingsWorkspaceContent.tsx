@@ -10,6 +10,7 @@ import type {
   CanvasLabelSizeMode,
   CanvasResizeBehaviorMode,
   CanvasLabelStrokeMode,
+  ConnectorDrawingDisplayMode,
   NetworkCalloutContentMode,
   SortDirection,
   SortField,
@@ -103,6 +104,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   canvasShowCalloutWireNames: boolean;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
+  canvasConnectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
+  setCanvasConnectorDrawingDisplayMode: (value: ConnectorDrawingDisplayMode) => void;
   canvasCalloutConnectorDrawingScalePercent: number;
   setCanvasCalloutConnectorDrawingScalePercent: (value: number) => void;
   canvasZoomInvariantNodeShapes: boolean;
@@ -204,7 +207,6 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultShowSegmentLengths,
   canvasDefaultShowCableCallouts,
   setCanvasDefaultShowCableCallouts,
-  canvasDefaultCalloutContentMode,
   setCanvasDefaultCalloutContentMode,
   setNetworkCalloutContentMode,
   canvasDefaultShowSelectedCalloutOnly,
@@ -222,6 +224,8 @@ export function SettingsWorkspaceContent({
   setCanvasDefaultAutoSegmentLabelRotation,
   canvasShowCalloutWireNames,
   setCanvasShowCalloutWireNames,
+  canvasConnectorDrawingDisplayMode,
+  setCanvasConnectorDrawingDisplayMode,
   canvasCalloutConnectorDrawingScalePercent,
   setCanvasCalloutConnectorDrawingScalePercent,
   canvasZoomInvariantNodeShapes,
@@ -406,17 +410,22 @@ export function SettingsWorkspaceContent({
             />
             Show connector/splice cable callouts by default
           </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={canvasDefaultCalloutContentMode === "connectorDrawing" || canvasDefaultCalloutContentMode === "both"}
+          <label className="settings-field">
+            Connector drawing display
+            <select
+              value={canvasConnectorDrawingDisplayMode}
               onChange={(event) => {
-                const mode: NetworkCalloutContentMode = event.target.checked ? "both" : "wireDetails";
-                setCanvasDefaultCalloutContentMode(mode);
-                setNetworkCalloutContentMode(mode);
+                const nextMode = event.target.value as ConnectorDrawingDisplayMode;
+                const nextCalloutMode: NetworkCalloutContentMode = nextMode === "callouts" ? "both" : "wireDetails";
+                setCanvasConnectorDrawingDisplayMode(nextMode);
+                setCanvasDefaultCalloutContentMode(nextCalloutMode);
+                setNetworkCalloutContentMode(nextCalloutMode);
               }}
-            />
-            Show connector drawing in callouts
+            >
+              <option value="disabled">Disabled</option>
+              <option value="callouts">Callouts</option>
+              <option value="nodes">Nodes</option>
+            </select>
           </label>
           <label className="settings-field settings-range-field">
             Connector drawing size (%)
@@ -428,7 +437,7 @@ export function SettingsWorkspaceContent({
                 max={200}
                 step={5}
                 value={canvasCalloutConnectorDrawingScalePercent}
-                disabled={canvasDefaultCalloutContentMode !== "connectorDrawing" && canvasDefaultCalloutContentMode !== "both"}
+                disabled={canvasConnectorDrawingDisplayMode === "disabled"}
                 onChange={(event) => {
                   const parsed = Number(event.target.value);
                   if (!Number.isFinite(parsed)) {

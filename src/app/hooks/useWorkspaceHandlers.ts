@@ -33,6 +33,7 @@ import type {
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
+  ConnectorDrawingDisplayMode,
   NetworkCalloutContentMode,
   NodePosition,
   SortDirection,
@@ -144,6 +145,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
+  setCanvasConnectorDrawingDisplayMode: (value: ConnectorDrawingDisplayMode) => void;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
   setCanvasNodeShapeSizePercent: (value: number) => void;
   setCanvasExportFormat: (value: "svg" | "png") => void;
@@ -251,6 +253,7 @@ export function useWorkspaceHandlers({
   setCanvasDefaultLabelRotationDegrees,
   setCanvasDefaultAutoSegmentLabelRotation,
   setCanvasShowCalloutWireNames,
+  setCanvasConnectorDrawingDisplayMode,
   setCanvasZoomInvariantNodeShapes,
   setCanvasNodeShapeSizePercent,
   setCanvasExportFormat,
@@ -782,6 +785,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultShowSegmentLengths(true);
     setCanvasDefaultShowCableCallouts(false);
     setCanvasDefaultCalloutContentMode("wireDetails");
+    setCanvasConnectorDrawingDisplayMode("disabled");
     setCanvasDefaultShowSelectedCalloutOnly(false);
     setCanvasDefaultLabelStrokeMode("light");
     setCanvasDefaultLabelSizeMode("small");

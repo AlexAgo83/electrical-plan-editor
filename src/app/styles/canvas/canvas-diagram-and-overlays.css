@@ -795,6 +795,9 @@
 .network-node.connector .network-node-shape {
   fill: var(--network-node-connector-fill, #dff0ff);
 }
+.network-node-connector-drawing {
+  pointer-events: none;
+}
 .network-node.splice .network-node-shape {
   fill: var(--network-node-splice-fill, #fdeecf);
 }
@@ -804,6 +807,10 @@
 .network-node.is-selected .network-node-shape {
   stroke: var(--network-selection-color, #0f6cb8);
   stroke-width: var(--network-node-stroke-emphasis-width, 3);
+}
+.network-node.is-selected .network-node-connector-drawing .network-callout-connector-shell {
+  stroke: var(--network-selection-color, #0f6cb8);
+  stroke-width: 0.12;
 }
 .network-node:focus-visible {
   outline: none;

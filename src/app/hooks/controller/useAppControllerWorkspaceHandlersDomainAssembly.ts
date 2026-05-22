@@ -139,6 +139,7 @@ export function useAppControllerWorkspaceHandlersDomainAssembly({
       setCanvasDefaultLabelRotationDegrees: preferencesState.setCanvasDefaultLabelRotationDegrees,
       setCanvasDefaultAutoSegmentLabelRotation: preferencesState.setCanvasDefaultAutoSegmentLabelRotation,
       setCanvasShowCalloutWireNames: preferencesState.setCanvasShowCalloutWireNames,
+      setCanvasConnectorDrawingDisplayMode: preferencesState.setCanvasConnectorDrawingDisplayMode,
       setCanvasZoomInvariantNodeShapes: preferencesState.setCanvasZoomInvariantNodeShapes,
       setCanvasNodeShapeSizePercent: preferencesState.setCanvasNodeShapeSizePercent,
       setCanvasExportFormat: preferencesState.setCanvasExportFormat,

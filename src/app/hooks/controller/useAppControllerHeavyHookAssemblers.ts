@@ -106,6 +106,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setCanvasDefaultLabelRotationDegrees"
     | "setCanvasDefaultAutoSegmentLabelRotation"
     | "setCanvasShowCalloutWireNames"
+    | "setCanvasConnectorDrawingDisplayMode"
     | "setCanvasZoomInvariantNodeShapes"
     | "setCanvasNodeShapeSizePercent"
     | "setCanvasExportFormat"

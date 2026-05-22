@@ -42,6 +42,29 @@ type RenderableKeying = {
   scale?: number;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
+export function getHighlightedConnectorCavityIndexes(
+  groups: CableCalloutViewModel["groups"],
+  selectedWireId: Wire["id"] | null
+): Set<number> {
+  const highlightedCavityIndexes = new Set<number>();
+  if (selectedWireId === null) {
+    return highlightedCavityIndexes;
+  }
+
+  for (const group of groups) {
+    if (!group.entries.some((entry) => entry.wireId === selectedWireId)) {
+      continue;
+    }
+    const cavityIndex = Number(/^C(\d+)$/.exec(group.label)?.[1] ?? Number.NaN);
+    if (Number.isInteger(cavityIndex) && cavityIndex > 0) {
+      highlightedCavityIndexes.add(cavityIndex);
+    }
+  }
+
+  return highlightedCavityIndexes;
+}
+
 function getKeyingStyle(keying: RenderableKeying): CSSProperties | undefined {
   return keying.color === undefined ? undefined : { fill: keying.color };
 }
@@ -115,7 +138,9 @@ function renderConnectorKeying(
   return <path className="network-callout-connector-keying" style={style} d={path} aria-hidden="true" />;
 }
 
-function renderConnectorLayoutDrawing(
+// Reused by connector nodes when the canvas displays physical connector layouts in-place.
+// eslint-disable-next-line react-refresh/only-export-components
+export function renderConnectorLayoutDrawing(
   layout: ConnectorLayout,
   width: number,
   height: number,
@@ -281,18 +306,7 @@ export function NetworkSummaryCalloutsLayer({
         const lastColumn = layout.columns[layout.columns.length - 1];
         const tableRightX =
           lastColumn === undefined ? contentLeftX : contentLeftX + lastColumn.x + lastColumn.width;
-        const highlightedCavityIndexes = new Set<number>();
-        if (selectedWireId !== null) {
-          for (const group of callout.groups) {
-            if (!group.entries.some((entry) => entry.wireId === selectedWireId)) {
-              continue;
-            }
-            const cavityIndex = Number(/^C(\d+)$/.exec(group.label)?.[1] ?? Number.NaN);
-            if (Number.isInteger(cavityIndex) && cavityIndex > 0) {
-              highlightedCavityIndexes.add(cavityIndex);
-            }
-          }
-        }
+        const highlightedCavityIndexes = getHighlightedConnectorCavityIndexes(callout.groups, selectedWireId);
 
         return (
           <g

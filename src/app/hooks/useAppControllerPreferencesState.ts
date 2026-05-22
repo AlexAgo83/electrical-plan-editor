@@ -8,6 +8,7 @@ import type {
   CanvasLabelSizeMode,
   CanvasResizeBehaviorMode,
   CanvasLabelStrokeMode,
+  ConnectorDrawingDisplayMode,
   NetworkCalloutContentMode,
   SortDirection,
   SortField,
@@ -54,6 +55,8 @@ export function useAppControllerPreferencesState() {
     useState<CanvasLabelRotationDegrees>(0);
   const [canvasDefaultAutoSegmentLabelRotation, setCanvasDefaultAutoSegmentLabelRotation] = useState(true);
   const [canvasShowCalloutWireNames, setCanvasShowCalloutWireNames] = useState(false);
+  const [canvasConnectorDrawingDisplayMode, setCanvasConnectorDrawingDisplayMode] =
+    useState<ConnectorDrawingDisplayMode>("callouts");
   const [canvasCalloutConnectorDrawingScalePercent, setCanvasCalloutConnectorDrawingScalePercent] = useState(125);
   const [canvasZoomInvariantNodeShapes, setCanvasZoomInvariantNodeShapes] = useState(true);
   const [canvasNodeShapeSizePercent, setCanvasNodeShapeSizePercent] = useState(70);
@@ -137,6 +140,8 @@ export function useAppControllerPreferencesState() {
     setCanvasDefaultAutoSegmentLabelRotation,
     canvasShowCalloutWireNames,
     setCanvasShowCalloutWireNames,
+    canvasConnectorDrawingDisplayMode,
+    setCanvasConnectorDrawingDisplayMode,
     canvasCalloutConnectorDrawingScalePercent,
     setCanvasCalloutConnectorDrawingScalePercent,
     canvasZoomInvariantNodeShapes,

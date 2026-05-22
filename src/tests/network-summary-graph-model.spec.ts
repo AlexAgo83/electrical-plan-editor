@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { NodeId, Segment, SegmentId } from "../core/entities";
-import { buildRenderedSegments } from "../app/components/network-summary/graph/networkSummaryGraphModel";
+import type { CatalogItemId, ConnectorId, NetworkNode, NodeId, Segment, SegmentId } from "../core/entities";
+import { buildRenderedNodes, buildRenderedSegments } from "../app/components/network-summary/graph/networkSummaryGraphModel";
 
 function asNodeId(value: string): NodeId {
   return value as NodeId;
@@ -8,6 +8,14 @@ function asNodeId(value: string): NodeId {
 
 function asSegmentId(value: string): SegmentId {
   return value as SegmentId;
+}
+
+function asConnectorId(value: string): ConnectorId {
+  return value as ConnectorId;
+}
+
+function asCatalogItemId(value: string): CatalogItemId {
+  return value as CatalogItemId;
 }
 
 describe("buildRenderedSegments", () => {
@@ -53,5 +61,67 @@ describe("buildRenderedSegments", () => {
     expect(Math.abs(renderedHorizontal?.segmentLengthLabelY ?? 0)).toBeGreaterThan(
       Math.abs(renderedDiagonal?.segmentLengthLabelY ?? 0)
     );
+  });
+});
+
+describe("buildRenderedNodes", () => {
+  it("keeps connector IDs close to the node drawing when a physical layout is rendered", () => {
+    const connectorId = asConnectorId("C-1");
+    const node: NetworkNode = {
+      id: asNodeId("N-C-1"),
+      kind: "connector",
+      connectorId
+    };
+    const catalogItemId = asCatalogItemId("CAT-1");
+
+    const rendered = buildRenderedNodes({
+      nodes: [node],
+      networkNodePositions: {
+        [node.id]: { x: 120, y: 80 }
+      },
+      isSubNetworkFilteringActive: false,
+      nodeHasActiveSubNetworkConnection: new Map(),
+      selectedCanvasNodeIds: new Set(),
+      selectedNodeId: null,
+      selectedConnectorId: null,
+      selectedSpliceId: null,
+      connectorMap: new Map([
+        [
+          connectorId,
+          {
+            id: connectorId,
+            name: "Connector 1",
+            technicalId: "C-1",
+            cavityCount: 2,
+            catalogItemId
+          }
+        ]
+      ]),
+      catalogItems: [
+        {
+          id: catalogItemId,
+          manufacturerReference: "REF-1",
+          name: "Two way",
+          connectionCount: 2,
+          connectorLayout: {
+            version: 1,
+            units: "grid",
+            width: 4,
+            height: 2,
+            ways: [
+              { cavityIndex: 1, x: 1, y: 1, shape: "round" },
+              { cavityIndex: 2, x: 3, y: 1, shape: "round" }
+            ]
+          }
+        }
+      ],
+      connectorDrawingDisplayMode: "nodes",
+      connectorCalloutGroupsById: new Map(),
+      selectedWireId: null,
+      spliceMap: new Map()
+    });
+
+    expect(rendered).toHaveLength(1);
+    expect(rendered[0]?.labelOffsetY).toBe(-21);
   });
 });
