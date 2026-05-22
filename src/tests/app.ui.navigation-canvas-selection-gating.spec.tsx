@@ -20,11 +20,11 @@ describe("App integration UI - navigation and canvas selection gating", () => {
     localStorage.clear();
   });
 
-  it("keeps analysis and form panels hidden for CAD-only selection until a table row is selected", () => {
+  it("opens the clicked canvas entity directly when another modeling sub-screen is active", () => {
     renderAppWithState(createUiIntegrationState());
     closeOnboardingIfOpen();
     switchScreenDrawerAware("modeling");
-    switchSubScreenDrawerAware("wire");
+    switchSubScreenDrawerAware("splice");
 
     const connectorNode = screen.getByRole("button", { name: "Select Connector 1 (C-1)" });
     fireEvent.mouseDown(connectorNode, { button: 0 });
@@ -36,13 +36,9 @@ describe("App integration UI - navigation and canvas selection gating", () => {
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })).toHaveClass(
       "is-active"
     );
-    const inspectorHeading = screen.queryByRole("heading", { name: "Inspector context" });
-    if (inspectorHeading !== null) {
-      const inspectorPanel = getPanelByHeading("Inspector context");
-      expect(within(inspectorPanel).getByText("N-C1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
-    }
-    expect(screen.queryByRole("heading", { name: "Connector analysis" })).toBeNull();
-    expect(screen.queryByRole("heading", { name: "Edit Connector" })).toBeNull();
+    const editPanel = getPanelByHeading("Edit Connector");
+    expect(within(editPanel).getByDisplayValue("Connector 1")).toBeInTheDocument();
+    expect(within(editPanel).getByDisplayValue("C-1")).toBeInTheDocument();
   });
 
   it("synchronizes inspector context and allows editing selected connector", () => {

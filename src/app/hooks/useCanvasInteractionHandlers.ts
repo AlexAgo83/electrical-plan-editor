@@ -81,7 +81,6 @@ export function useCanvasInteractionHandlers({
   interactionMode,
   isModelingScreen,
   isModelingAnalysisFocused,
-  activeSubScreen,
   setActiveScreen,
   setActiveSubScreen,
   setNodeFormMode,
@@ -170,8 +169,9 @@ export function useCanvasInteractionHandlers({
     unstable_batchedUpdates(() => {
       clearSelectedCanvasNodes();
 
-      if (isModelingScreen && !isModelingAnalysisFocused && activeSubScreen === "segment") {
+      if (isModelingScreen && !isModelingAnalysisFocused) {
         onExternalSelectionInteraction?.();
+        setActiveSubScreen("segment");
         startSegmentEdit(segment);
         return;
       }
@@ -196,26 +196,29 @@ export function useCanvasInteractionHandlers({
       clearSelectedCanvasNodes();
 
       if (isModelingScreen && !isModelingAnalysisFocused) {
-        if (activeSubScreen === "connector" && node.kind === "connector") {
+        if (node.kind === "connector") {
           const connector = state.connectors.byId[node.connectorId];
           if (connector !== undefined) {
             onExternalSelectionInteraction?.();
+            setActiveSubScreen("connector");
             startConnectorEdit(connector);
             return;
           }
         }
 
-        if (activeSubScreen === "splice" && node.kind === "splice") {
+        if (node.kind === "splice") {
           const splice = state.splices.byId[node.spliceId];
           if (splice !== undefined) {
             onExternalSelectionInteraction?.();
+            setActiveSubScreen("splice");
             startSpliceEdit(splice);
             return;
           }
         }
 
-        if (activeSubScreen === "node" && node.kind === "intermediate") {
+        if (node.kind === "intermediate") {
           onExternalSelectionInteraction?.();
+          setActiveSubScreen("node");
           startNodeEdit(node);
           return;
         }
