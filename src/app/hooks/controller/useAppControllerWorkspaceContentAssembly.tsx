@@ -291,6 +291,7 @@ export function useAppControllerWorkspaceContentAssembly({
     onExportBomCsv: handlers.handleExportBomCsv,
     handleRegenerateLayout: domains.workspaceNetworkDomain.handleRegenerateLayout,
     markDetailPanelsSelectionSourceAsExternal: handlers.markDetailPanelsSelectionSourceAsExternal,
+    onOpenHarnessAssemblyOnboardingHelp: () => handlers.openSingleStepOnboarding("harnessAssembly"),
     dispatchAction: handlers.dispatchAction,
     store: handlers.store
   });

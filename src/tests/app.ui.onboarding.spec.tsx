@@ -1,5 +1,6 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createSampleNetworkState } from "../store";
 import {
   createUiIntegrationState,
   getPanelByHeading,
@@ -83,12 +84,12 @@ describe("App integration UI - onboarding", () => {
   it("adds a final full-flow onboarding step for settings with Open Settings CTA on the left and Finish on the right", () => {
     renderAppWithState(createUiIntegrationState());
 
-    for (let index = 0; index < 6; index += 1) {
+    for (let index = 0; index < 7; index += 1) {
       fireEvent.click(screen.getByRole("button", { name: "Next" }));
     }
 
     const finalStepDialog = screen.getByRole("dialog", { name: "Configure your workspace defaults" });
-    expect(within(finalStepDialog).getByText("Step 7 of 7")).toBeInTheDocument();
+    expect(within(finalStepDialog).getByText("Step 8 of 8")).toBeInTheDocument();
     const openSettingsButton = within(finalStepDialog).getByRole("button", { name: "Open Settings" });
     const finishButton = within(finalStepDialog).getByRole("button", { name: "Finish" });
     expect(openSettingsButton).toBeInTheDocument();
@@ -101,6 +102,27 @@ describe("App integration UI - onboarding", () => {
 
     fireEvent.click(finishButton);
     expect(screen.queryByRole("dialog", { name: "Configure your workspace defaults" })).toBeNull();
+  });
+
+  it("opens harness assembly contextual onboarding help from the functional export actions", () => {
+    localStorage.setItem("electrical-plan-editor.displayed-harness-assembly-id", "assembly-sample-vehicle-platform");
+    renderAppWithState(createSampleNetworkState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("harnessAssembly");
+
+    const harnessFunctionalPanel = getPanelByHeading("Harness assembly functional schematic");
+    const actions = within(harnessFunctionalPanel).getByRole("group", { name: "Functional schematic actions" });
+    expect(within(actions).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
+      "Grid",
+      "Export SVG",
+      "Help"
+    ]);
+
+    fireEvent.click(within(actions).getByRole("button", { name: "Help" }));
+
+    const dialog = screen.getByRole("dialog", { name: "Build harness assemblies" });
+    expect(within(dialog).getByText("Context help")).toBeInTheDocument();
+    expect(within(dialog).getByRole("button", { name: "Scroll to Harness Assembly" })).toBeInTheDocument();
   });
 
   it("cancels pending onboarding target-focus retries when modal closes", () => {

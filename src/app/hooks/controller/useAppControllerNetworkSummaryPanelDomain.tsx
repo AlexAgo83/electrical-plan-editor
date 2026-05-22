@@ -162,6 +162,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   onExportBomCsv: () => void;
   handleRegenerateLayout: () => void;
   markDetailPanelsSelectionSourceAsExternal: () => void;
+  onOpenHarnessAssemblyOnboardingHelp: () => void;
   dispatchAction: (action: AppAction, options?: { trackHistory?: boolean }) => void;
   store: AppStore;
 }
@@ -216,6 +217,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   onExportBomCsv,
   handleRegenerateLayout,
   markDetailPanelsSelectionSourceAsExternal,
+  onOpenHarnessAssemblyOnboardingHelp,
   dispatchAction,
   store
 }: UseAppControllerNetworkSummaryPanelDomainParams) {
@@ -553,6 +555,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
         exportCartoucheName={`${displayedHarnessAssembly.name} functional schematic`}
         exportCartoucheProjectCode={displayedHarnessAssembly.technicalId}
         exportCartoucheCreatedAt={displayedHarnessAssembly.createdAt}
+        onOpenOnboardingHelp={onOpenHarnessAssemblyOnboardingHelp}
+        onboardingPanelKey="harness-assembly-functional"
       />
     );
   const currentNetworkFunctionalGraphPanel = hasActiveNetwork ? (
@@ -574,6 +578,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
       exportIncludeFrame={preferencesState.canvasExportIncludeFrame}
       exportIncludeCartouche={preferencesState.canvasExportIncludeCartouche}
       onOpenActiveNetworkInModeling={handleOpenActiveNetworkInModeling}
+      onOpenOnboardingHelp={onOpenHarnessAssemblyOnboardingHelp}
+      onboardingPanelKey="harness-assembly-current-network-functional"
     />
   ) : (
     <section className="panel functional-schematic-panel" aria-labelledby="current-network-functional-empty-title">

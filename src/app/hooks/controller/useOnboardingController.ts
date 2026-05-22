@@ -171,6 +171,8 @@ export function useOnboardingController({
     (target: OnboardingStepTarget) => {
       if (target.screen === "networkScope") {
         setActiveScreen("networkScope");
+      } else if (target.screen === "harnessAssembly") {
+        setActiveScreen("harnessAssembly");
       } else if (target.screen === "settings") {
         setActiveScreen("settings");
       } else {

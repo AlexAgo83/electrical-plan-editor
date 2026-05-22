@@ -1,6 +1,14 @@
 import type { SubScreenId } from "../types/app-controller";
 
-export type OnboardingStepId = "networkScope" | "catalog" | "connectorSpliceLibrary" | "nodes" | "segments" | "wires" | "settingsOverview";
+export type OnboardingStepId =
+  | "networkScope"
+  | "catalog"
+  | "connectorSpliceLibrary"
+  | "nodes"
+  | "segments"
+  | "wires"
+  | "harnessAssembly"
+  | "settingsOverview";
 export type OnboardingModalMode = "full" | "single";
 
 export interface OnboardingStepDescriptionPart {
@@ -15,7 +23,7 @@ export interface OnboardingStepDefinition {
   badgeIconClass?: string;
   description: OnboardingStepDescriptionPart[];
   target: {
-    screen: "networkScope" | "modeling" | "settings";
+    screen: "networkScope" | "harnessAssembly" | "modeling" | "settings";
     subScreen?: SubScreenId;
     panelSelector: string;
     panelLabel: string;
@@ -131,6 +139,22 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
       subScreen: "wire",
       panelSelector: '[data-onboarding-panel="modeling-wires"]',
       panelLabel: "Wires"
+    }
+  },
+  {
+    id: "harnessAssembly",
+    title: "Build harness assemblies",
+    badge: "HAR",
+    badgeIconClass: "is-harness-assembly",
+    description: [
+      { text: "Use " },
+      { text: "Harness Assembly", strong: true },
+      { text: " to group networks into physical harnesses, select master connector roots, and define interconnector links. The functional graph then traces the saved assembly and can be exported as SVG or PNG." }
+    ],
+    target: {
+      screen: "harnessAssembly",
+      panelSelector: '[data-onboarding-panel="harness-assembly-functional"]',
+      panelLabel: "Harness Assembly"
     }
   },
   {

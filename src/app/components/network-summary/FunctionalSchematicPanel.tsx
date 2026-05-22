@@ -39,6 +39,8 @@ interface FunctionalSchematicPanelProps {
   exportCartoucheLogoUrl?: string;
   exportCartoucheNotes?: string;
   onOpenActiveNetworkInModeling?: () => void;
+  onOpenOnboardingHelp?: () => void;
+  onboardingPanelKey?: string;
 }
 
 interface FunctionalNodePosition {
@@ -711,7 +713,9 @@ export function FunctionalSchematicPanel({
   exportCartoucheCreatedAt,
   exportCartoucheLogoUrl,
   exportCartoucheNotes,
-  onOpenActiveNetworkInModeling
+  onOpenActiveNetworkInModeling,
+  onOpenOnboardingHelp,
+  onboardingPanelKey
 }: FunctionalSchematicPanelProps): ReactElement {
   const [activeFilter, setActiveFilter] = useState<FunctionalDomainFilter>("all");
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null);
@@ -821,7 +825,11 @@ export function FunctionalSchematicPanel({
   });
   const canExport = graph.nodes.length > 0;
   return (
-    <section className="panel functional-schematic-panel" aria-labelledby="functional-schematic-title">
+    <section
+      className="panel functional-schematic-panel"
+      aria-labelledby="functional-schematic-title"
+      data-onboarding-panel={onboardingPanelKey}
+    >
       <header className="network-summary-header">
         <div>
           <div className="network-summary-title">
@@ -865,6 +873,12 @@ export function FunctionalSchematicPanel({
             <span className="network-summary-export-icon" aria-hidden="true" />
             Export {canvasExportFormat.toUpperCase()}
           </button>
+          {onOpenOnboardingHelp === undefined ? null : (
+            <button type="button" className="workspace-tab onboarding-help-button" onClick={onOpenOnboardingHelp}>
+              <span className="action-button-icon is-help" aria-hidden="true" />
+              Help
+            </button>
+          )}
         </div>
       </header>
 
