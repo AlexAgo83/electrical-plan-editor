@@ -50,6 +50,42 @@
   padding: 0.82rem 0.9rem;
 }
 
+.workspace-inspector-panel .splice-length-suggestion-panel {
+  pointer-events: auto;
+  box-shadow: 0 10px 26px rgba(9, 26, 40, 0.2);
+  background: rgba(255, 255, 255, 0.58);
+  -webkit-backdrop-filter: blur(9px);
+  backdrop-filter: blur(9px);
+  padding: 0.82rem 0.9rem;
+}
+
+.splice-length-suggestion-panel.is-warning {
+  border-color: #d89c38;
+}
+
+.splice-length-suggestion-message {
+  margin: 0 0 0.5rem;
+  color: #17374e;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.splice-length-suggestion-details {
+  display: grid;
+  gap: 0.28rem;
+  margin-bottom: 0.58rem;
+}
+
+.splice-length-suggestion-details .confirm-dialog-details-code {
+  max-height: 11rem;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.splice-length-suggestion-actions {
+  margin-top: 0;
+}
+
 .workspace-inspector-panel.is-collapsed .inspector-context-panel {
   padding: 0.72rem 0.82rem;
 }

@@ -252,7 +252,7 @@ function actionVerb(action: AppAction, previousState: AppState): string {
     case "splice/rerouteConnectedWires":
       return "rerouted";
     case "splice/applyOptimizedPlacement":
-      return "placement optimized";
+      return "lengths optimized";
     case "splice/remove":
     case "splice/removeCascade":
       return "deleted";

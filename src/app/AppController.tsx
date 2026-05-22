@@ -86,9 +86,7 @@ const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor"
 export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear();
   const state = useAppSnapshot(store);
-  const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, ValidationScreen } = appUiModules;
-  const { AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables } = appUiModules;
-  const { NetworkScopeWorkspaceContent, SettingsWorkspaceContent, ValidationWorkspaceContent } = appUiModules;
+  const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, ValidationScreen, AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables, NetworkScopeWorkspaceContent, SettingsWorkspaceContent, ValidationWorkspaceContent } = appUiModules;
 
   const networks = selectNetworks(state);
   const activeNetworkId = selectActiveNetworkId(state);
@@ -876,7 +874,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       dispatchAction(appActions.clearSelection());
       clearAllModelingForms();
     },
-    formsState
+    formsState,
+    spliceLengthSuggestion: spliceHandlers.optimizedLengthSuggestion,
+    onApplySpliceLengthSuggestion: spliceHandlers.applyOptimizedSpliceLengthSuggestion,
+    onCancelSpliceLengthSuggestion: spliceHandlers.cancelOptimizedSpliceLengthSuggestion
   });
   const {
     homeWorkspaceContent,
@@ -1083,8 +1084,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     inspector: { isInspectorHidden, isInspectorOpen, inspectorContextPanel }
   });
 
-  return <>
-    <AppShellLayout {...appShellLayoutProps} />
+  return <><AppShellLayout {...appShellLayoutProps} />
     <ToastViewport toasts={toasts} onDismissToast={dismissToast} />
     <AppControllerOverlays
       appShellClassName={appShellClassName}
@@ -1097,19 +1097,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload}
       openBomPreviewCatalogItem={openBomPreviewCatalogItem}
       openBomPreviewConnector={openBomPreviewConnector}
-      onboarding={{
-        activeOnboardingStep,
-        isOnboardingOpen,
-        onboardingModalMode,
-        onboardingStepDisplayIndex,
-        onboardingTotalSteps,
-        onboardingAutoOpenEnabled,
-        setOnboardingAutoOpenEnabledPersisted,
-        closeOnboarding,
-        handleOnboardingNext,
-        canGoNext: canOnboardingGoNext,
-        onboardingTargetActions
-      }}
+      onboarding={{ activeOnboardingStep, isOnboardingOpen, onboardingModalMode, onboardingStepDisplayIndex, onboardingTotalSteps, onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabledPersisted, closeOnboarding, handleOnboardingNext, canGoNext: canOnboardingGoNext, onboardingTargetActions }}
     />
   </>;
 }

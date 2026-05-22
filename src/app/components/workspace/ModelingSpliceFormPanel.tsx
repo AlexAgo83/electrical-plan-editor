@@ -220,7 +220,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       {spliceFormMode === "edit" && isDirectional ? (
         <button type="button" className="button-with-icon" onClick={handleSuggestOptimizedSplicePlacement}>
           <span className="action-button-icon is-analysis" aria-hidden="true" />
-          Suggest optimized placement
+          Suggest optimized lengths
         </button>
       ) : null}
     </div>

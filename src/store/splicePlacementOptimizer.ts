@@ -1,6 +1,6 @@
 import type { NodeId, Segment, SegmentId, SpliceId, Wire } from "../core/entities";
 import { resolveSplicePortMode } from "../core/splicePortMode";
-import type { LayoutNodePosition, AppState } from "./types";
+import type { AppState } from "./types";
 import { recomputeWireRouteAndDirectionalEndpoints } from "./reducer/helpers/wireTransitions";
 
 export interface SplicePlacementMetrics {
@@ -13,7 +13,6 @@ export interface SplicePlacementMetrics {
 export interface SplicePlacementSuggestion {
   spliceId: SpliceId;
   spliceNodeId: NodeId;
-  position: LayoutNodePosition;
   segmentLengths: Record<SegmentId, number>;
   current: SplicePlacementMetrics;
   suggested: SplicePlacementMetrics;
@@ -104,17 +103,6 @@ function computeMetrics(wires: Wire[], spliceId: SpliceId): SplicePlacementMetri
   };
 }
 
-function interpolatePosition(
-  left: LayoutNodePosition,
-  right: LayoutNodePosition,
-  ratioFromLeft: number
-): LayoutNodePosition {
-  return {
-    x: Math.round(left.x + (right.x - left.x) * ratioFromLeft),
-    y: Math.round(left.y + (right.y - left.y) * ratioFromLeft)
-  };
-}
-
 function toSegment(segment: ConnectedSegment): Segment {
   return {
     id: segment.id,
@@ -127,21 +115,15 @@ function toSegment(segment: ConnectedSegment): Segment {
 
 function buildCandidateState(
   state: AppState,
-  spliceNodeId: NodeId,
   leftSegment: ConnectedSegment,
   rightSegment: ConnectedSegment,
   leftLengthMm: number,
-  rightLengthMm: number,
-  position: LayoutNodePosition
+  rightLengthMm: number
 ): AppState {
   const leftSegmentValue = toSegment(leftSegment);
   const rightSegmentValue = toSegment(rightSegment);
   return {
     ...state,
-    nodePositions: {
-      ...state.nodePositions,
-      [spliceNodeId]: position
-    },
     segments: {
       ...state.segments,
       byId: {
@@ -220,12 +202,12 @@ export function findSplicePlacementSuggestion(
 
   const spliceNodeId = findSpliceNodeId(state, spliceId);
   if (spliceNodeId === null) {
-    return { reason: "This splice has no linked splice node to move." };
+    return { reason: "This splice has no linked splice node." };
   }
 
   const connectedSegments = getConnectedSegments(state, spliceNodeId);
   if (connectedSegments.length !== 2) {
-    return { reason: "Optimized placement is available when the splice is connected to exactly two routing segments." };
+    return { reason: "Length optimization is available when the splice is connected to exactly two routing segments." };
   }
 
   const [leftSegment, rightSegment] = connectedSegments;
@@ -233,23 +215,17 @@ export function findSplicePlacementSuggestion(
     return { reason: "Cannot resolve splice routing branches." };
   }
 
-  const leftPosition = state.nodePositions[leftSegment.otherNodeId];
-  const rightPosition = state.nodePositions[rightSegment.otherNodeId];
-  if (leftPosition === undefined || rightPosition === undefined) {
-    return { reason: "Both adjacent branch nodes need canvas positions before optimizing placement." };
-  }
-
   const connectedWires = getConnectedWires(state, spliceId);
   if (connectedWires.length < 2) {
-    return { reason: "At least two connected wires are required to optimize splice placement." };
+    return { reason: "At least two connected wires are required to optimize splice lengths." };
   }
   if (connectedWires.some((wire) => !Number.isFinite(wire.sectionMm2) || wire.sectionMm2 <= 0)) {
-    return { reason: "Every connected wire needs a positive section before optimizing placement." };
+    return { reason: "Every connected wire needs a positive section before optimizing lengths." };
   }
 
   const currentRecomputed = recomputeConnectedWiresForCandidate(state, spliceId, connectedWires);
   if (currentRecomputed === null) {
-    return { reason: "Connected wires cannot be routed from the current placement." };
+    return { reason: "Connected wires cannot be routed from the current segment lengths." };
   }
   const current = computeMetrics(currentRecomputed, spliceId);
 
@@ -260,7 +236,6 @@ export function findSplicePlacementSuggestion(
 
   let best:
     | {
-        position: LayoutNodePosition;
         leftLengthMm: number;
         rightLengthMm: number;
         metrics: SplicePlacementMetrics;
@@ -278,12 +253,10 @@ export function findSplicePlacementSuggestion(
 
     const candidateState = buildCandidateState(
       state,
-      spliceNodeId,
       leftSegment,
       rightSegment,
       leftLengthMm,
-      rightLengthMm,
-      interpolatePosition(leftPosition, rightPosition, ratioFromLeft)
+      rightLengthMm
     );
     const candidateWires = recomputeConnectedWiresForCandidate(candidateState, spliceId, connectedWires);
     if (candidateWires === null) {
@@ -294,7 +267,6 @@ export function findSplicePlacementSuggestion(
     const score = scoreCandidate(metrics, balanceLimitPercent);
     if (best === null || score < best.score) {
       best = {
-        position: interpolatePosition(leftPosition, rightPosition, ratioFromLeft),
         leftLengthMm,
         rightLengthMm,
         metrics,
@@ -304,26 +276,25 @@ export function findSplicePlacementSuggestion(
   }
 
   if (best === null) {
-    return { reason: "No routable optimized placement candidate was found." };
+    return { reason: "No routable optimized length candidate was found." };
   }
 
   const copperVolumeDeltaMm3 = best.metrics.copperVolumeMm3 - current.copperVolumeMm3;
   const copperVolumeDeltaPercent =
     current.copperVolumeMm3 > 0 ? (copperVolumeDeltaMm3 / current.copperVolumeMm3) * 100 : 0;
   if (copperVolumeDeltaPercent > -minimumImprovementPercent) {
-    return { reason: "No better placement found within current constraints." };
+    return { reason: "No better lengths found within current constraints." };
   }
 
   const warning =
     best.metrics.balanceRatioPercent !== null && best.metrics.balanceRatioPercent > balanceLimitPercent
-      ? "Suggested placement reduces copper but remains above the section balance limit."
+      ? "Suggested lengths reduce copper but remain above the section balance limit."
       : null;
 
   return {
     suggestion: {
       spliceId,
       spliceNodeId,
-      position: best.position,
       segmentLengths: {
         [leftSegment.id]: best.leftLengthMm,
         [rightSegment.id]: best.rightLengthMm

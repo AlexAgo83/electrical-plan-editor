@@ -59,7 +59,7 @@ function buildOptimizableSpliceState() {
 }
 
 describe("splice placement optimizer", () => {
-  it("suggests a lower copper placement for a directional splice on two adjacent segments", () => {
+  it("suggests lower copper segment lengths without using visual distances", () => {
     const state = buildOptimizableSpliceState();
     const result = findSplicePlacementSuggestion(state, asSpliceId("S-OPT"));
 
@@ -75,7 +75,26 @@ describe("splice placement optimizer", () => {
     expect(result.suggestion.segmentLengths[asSegmentId("SEG-R")]).toBeGreaterThan(20);
   });
 
-  it("applies the optimized placement as one reducer action with segment lengths and rerouted wires", () => {
+  it("can optimize segment lengths when adjacent branch nodes have no canvas positions", () => {
+    const base = buildOptimizableSpliceState();
+    const state = {
+      ...base,
+      nodePositions: {
+        [asNodeId("N-S")]: { x: 80, y: 0 }
+      }
+    };
+
+    const result = findSplicePlacementSuggestion(state, asSpliceId("S-OPT"));
+
+    expect("suggestion" in result).toBe(true);
+    if (!("suggestion" in result)) {
+      throw new Error(result.reason);
+    }
+    expect(result.suggestion.segmentLengths[asSegmentId("SEG-L")]).toBeLessThan(80);
+    expect(result.suggestion.segmentLengths[asSegmentId("SEG-R")]).toBeGreaterThan(20);
+  });
+
+  it("applies optimized segment lengths and rerouted wires without moving the splice node", () => {
     const state = buildOptimizableSpliceState();
     const result = findSplicePlacementSuggestion(state, asSpliceId("S-OPT"));
     if (!("suggestion" in result)) {
@@ -87,13 +106,12 @@ describe("splice placement optimizer", () => {
       appActions.applyOptimizedSplicePlacement(
         result.suggestion.spliceId,
         result.suggestion.spliceNodeId,
-        result.suggestion.position,
         result.suggestion.segmentLengths
       )
     );
 
     expect(next.meta.revision).toBe(state.meta.revision + 1);
-    expect(next.nodePositions[asNodeId("N-S")]).toEqual(result.suggestion.position);
+    expect(next.nodePositions[asNodeId("N-S")]).toEqual(state.nodePositions[asNodeId("N-S")]);
     expect(next.segments.byId[asSegmentId("SEG-L")]?.lengthMm).toBe(result.suggestion.segmentLengths[asSegmentId("SEG-L")]);
     expect(next.segments.byId[asSegmentId("SEG-R")]?.lengthMm).toBe(result.suggestion.segmentLengths[asSegmentId("SEG-R")]);
     expect(next.wires.byId[asWireId("W-L")]?.lengthMm).toBe(result.suggestion.segmentLengths[asSegmentId("SEG-L")]);

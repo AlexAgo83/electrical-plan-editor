@@ -2,6 +2,8 @@ import { useIssueNavigatorModel } from "../useIssueNavigatorModel";
 import { useInspectorPanelVisibility } from "../useInspectorPanelVisibility";
 import { useInspectorContextPanelControllerSlice } from "./useAppControllerScreenContentSlices";
 import type { NetworkNode } from "../../../core/entities";
+import { SpliceLengthSuggestionPanel } from "../../components/SpliceLengthSuggestionPanel";
+import type { PendingSpliceLengthSuggestion } from "../useSpliceHandlers";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
 import type { ValidationModel } from "../useValidationModel";
 import type { SubScreenId } from "../../types/app-controller";
@@ -55,6 +57,9 @@ interface UseAppControllerInspectorIssueLayoutStateParams {
     | "segmentFormMode"
     | "wireFormMode"
   >;
+  spliceLengthSuggestion: PendingSpliceLengthSuggestion | null;
+  onApplySpliceLengthSuggestion: () => void;
+  onCancelSpliceLengthSuggestion: () => void;
 }
 
 export function useAppControllerInspectorIssueLayoutState({
@@ -76,7 +81,10 @@ export function useAppControllerInspectorIssueLayoutState({
   describeNode,
   handleStartSelectedEdit,
   onClearSelection,
-  formsState
+  formsState,
+  spliceLengthSuggestion,
+  onApplySpliceLengthSuggestion,
+  onCancelSpliceLengthSuggestion
 }: UseAppControllerInspectorIssueLayoutStateParams) {
   const currentValidationIssue = isValidationScreen
     ? (validationModel.getFocusedValidationIssueByCursor() ?? validationModel.visibleValidationIssues[0] ?? null)
@@ -106,6 +114,7 @@ export function useAppControllerInspectorIssueLayoutState({
     formsState.nodeFormMode !== "idle" ||
     formsState.segmentFormMode !== "idle" ||
     formsState.wireFormMode !== "idle";
+  const hasSpliceLengthSuggestion = spliceLengthSuggestion !== null;
 
   const {
     isInspectorHidden,
@@ -118,8 +127,8 @@ export function useAppControllerInspectorIssueLayoutState({
     isModelingScreen,
     isAnalysisScreen,
     hasActiveNetwork,
-    hasInspectableSelection,
-    showFloatingInspectorPanel,
+    hasInspectableSelection: hasInspectableSelection || hasSpliceLengthSuggestion,
+    showFloatingInspectorPanel: showFloatingInspectorPanel || hasSpliceLengthSuggestion,
     viewportWidth,
     isDialogFocusActive,
     isNavigationDrawerOpen,
@@ -149,6 +158,16 @@ export function useAppControllerInspectorIssueLayoutState({
     handleStartSelectedEdit,
     onClearSelection
   });
+  const activeInspectorPanel =
+    spliceLengthSuggestion === null ? (
+      inspectorContextPanel
+    ) : (
+      <SpliceLengthSuggestionPanel
+        suggestion={spliceLengthSuggestion}
+        onApply={onApplySpliceLengthSuggestion}
+        onCancel={onCancelSpliceLengthSuggestion}
+      />
+    );
 
   return {
     currentValidationIssue,
@@ -160,7 +179,7 @@ export function useAppControllerInspectorIssueLayoutState({
     hasCatalogSelectionForActiveSubScreen,
     hasActiveEntityForm,
     isInspectorHidden,
-    isInspectorOpen,
-    inspectorContextPanel
+    isInspectorOpen: hasSpliceLengthSuggestion ? true : isInspectorOpen,
+    inspectorContextPanel: activeInspectorPanel
   };
 }

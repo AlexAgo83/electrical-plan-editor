@@ -31,7 +31,7 @@ export function ConfirmDialog({
   title,
   message,
   details,
-  detailsLabel = "Details",
+  detailsLabel = "Filename",
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   intent = "neutral",

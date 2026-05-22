@@ -227,7 +227,7 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
       };
     case "splice/applyOptimizedPlacement":
       return {
-        title: "Optimized placement applied",
+        title: "Optimized lengths applied",
         message: getSpliceLabel(nextState, action.payload.id),
         variant: "success"
       };

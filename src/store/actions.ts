@@ -102,7 +102,6 @@ export type AppAction =
       payload: {
         id: SpliceId;
         nodeId: NodeId;
-        position: LayoutNodePosition;
         segmentLengths: Record<SegmentId, number>;
       };
     }
@@ -253,11 +252,10 @@ export const appActions = {
   applyOptimizedSplicePlacement: (
     id: SpliceId,
     nodeId: NodeId,
-    position: LayoutNodePosition,
     segmentLengths: Record<SegmentId, number>
   ): AppAction => ({
     type: "splice/applyOptimizedPlacement",
-    payload: { id, nodeId, position, segmentLengths }
+    payload: { id, nodeId, segmentLengths }
   }),
   removeSplice: (id: SpliceId): AppAction => ({ type: "splice/remove", payload: { id } }),
   removeSpliceCascade: (id: SpliceId): AppAction => ({ type: "splice/removeCascade", payload: { id } }),
