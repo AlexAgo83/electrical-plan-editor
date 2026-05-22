@@ -85,7 +85,7 @@ describe("App integration UI - catalog", () => {
     expect(getPanelByHeading("Catalog")).toBeInTheDocument();
   });
 
-  it("keeps header action compaction stable while docked quick navigation blends in", async () => {
+  it("compacts header actions as soon as docked quick navigation blends in", async () => {
     renderAppWithState(createUiIntegrationState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
 
@@ -114,7 +114,7 @@ describe("App integration UI - catalog", () => {
     });
 
     await waitFor(() => expect(document.querySelector(".header-docked-nav-shell")).toHaveClass("is-visible"));
-    expect(headerBlock).not.toHaveClass("has-center-content");
+    expect(headerBlock).toHaveClass("has-center-content");
 
     Object.defineProperty(window, "scrollY", { configurable: true, writable: true, value: 80 });
     act(() => {

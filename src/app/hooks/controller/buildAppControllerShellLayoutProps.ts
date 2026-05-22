@@ -84,6 +84,7 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "hasActiveNetwork"
     | "networkScopeWorkspaceContent"
     | "harnessAssemblyWorkspaceContent"
+    | "headerHarnessAssemblyFunctionalScopeNavigation"
     | "modelingLeftColumnContent"
     | "modelingFormsColumnContent"
     | "networkSummaryPanel"

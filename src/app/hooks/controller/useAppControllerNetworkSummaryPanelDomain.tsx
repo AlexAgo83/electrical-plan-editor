@@ -24,6 +24,7 @@ import type { NodePosition, SubScreenId } from "../../types/app-controller";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
 import { appActions } from "../../../store";
 import { FunctionalSchematicPanel } from "../../components/network-summary/FunctionalSchematicPanel";
+import { HarnessAssemblyFunctionalScopeNavigation } from "../../components/network-summary/HarnessAssemblyFunctionalScopeNavigation";
 import { HarnessAssemblyManagerPanel } from "../../components/network-summary/HarnessAssemblyManagerPanel";
 import { buildHarnessAssemblyFunctionalSchematicGraph, type FunctionalDomainFilter } from "../../../core/functionalSchematic";
 import { buildNetworkSummaryPanelControllerSlice } from "./useAppControllerScreenContentSlices";
@@ -575,34 +576,32 @@ export function useAppControllerNetworkSummaryPanelDomain({
       </div>
     </section>
   );
+  const harnessAssemblyFunctionalScopeNavigation = (
+    <HarnessAssemblyFunctionalScopeNavigation
+      activeScope={harnessAssemblyGraphTab}
+      displayedHarnessAssembly={displayedHarnessAssembly}
+      onOpenAssemblyPicker={() => setIsHarnessAssemblyPickerOpen(true)}
+      onShowCurrentNetwork={() => {
+        setIsHarnessAssemblyPickerOpen(false);
+        setHarnessAssemblyGraphTab("current");
+      }}
+    />
+  );
+  const headerHarnessAssemblyFunctionalScopeNavigation = (
+    <HarnessAssemblyFunctionalScopeNavigation
+      activeScope={harnessAssemblyGraphTab}
+      displayedHarnessAssembly={displayedHarnessAssembly}
+      onOpenAssemblyPicker={() => setIsHarnessAssemblyPickerOpen(true)}
+      onShowCurrentNetwork={() => {
+        setIsHarnessAssemblyPickerOpen(false);
+        setHarnessAssemblyGraphTab("current");
+      }}
+      variant="header"
+    />
+  );
   const networkFunctionalSchematicPanel = (
     <>
-      <section className="panel harness-assembly-functional-tabs" aria-label="Functional graph scope">
-        <div className="network-summary-header-actions" role="tablist" aria-label="Functional graph scope tabs">
-          <button
-            type="button"
-            role="tab"
-            className={harnessAssemblyGraphTab === "assembly" ? "workspace-tab is-active" : "workspace-tab"}
-            aria-selected={harnessAssemblyGraphTab === "assembly"}
-            onClick={() => setIsHarnessAssemblyPickerOpen(true)}
-            title={displayedHarnessAssembly === null ? "Select a harness assembly" : `Selected: ${displayedHarnessAssembly.name}`}
-          >
-            Harness assembly
-          </button>
-          <button
-            type="button"
-            role="tab"
-            className={harnessAssemblyGraphTab === "current" ? "workspace-tab is-active" : "workspace-tab"}
-            aria-selected={harnessAssemblyGraphTab === "current"}
-            onClick={() => {
-              setIsHarnessAssemblyPickerOpen(false);
-              setHarnessAssemblyGraphTab("current");
-            }}
-          >
-            Current network functional
-          </button>
-        </div>
-      </section>
+      {harnessAssemblyFunctionalScopeNavigation}
       {isHarnessAssemblyPickerOpen ? (
         <div className="confirm-dialog-layer harness-assembly-picker-layer" role="presentation">
           <button
@@ -675,6 +674,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
 
   return {
     networkSummaryPanel,
-    networkFunctionalSchematicPanel
+    networkFunctionalSchematicPanel,
+    headerHarnessAssemblyFunctionalScopeNavigation
   };
 }

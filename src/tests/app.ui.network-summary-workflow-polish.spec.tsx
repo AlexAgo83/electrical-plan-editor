@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { HarnessAssemblyId, NetworkId } from "../core/entities";
 import { appActions, appReducer } from "../store";
@@ -318,7 +318,8 @@ describe("App integration UI - network summary workflow polish", () => {
 
     const assemblyPanel = getPanelByHeading("Harness assembly functional schematic");
     expect(assemblyPanel).toHaveTextContent("No harness assembly selected.");
-    fireEvent.click(screen.getByRole("tab", { name: "Current network functional" }));
+    const graphScope = screen.getByRole("region", { name: "Functional graph scope" });
+    fireEvent.click(within(graphScope).getByRole("tab", { name: "Current network functional" }));
 
     const functionalPanel = getCurrentNetworkFunctionalPanel("Main network sample");
     const functionalSvg = within(functionalPanel).getByLabelText("Read-only functional schematic");
@@ -361,7 +362,28 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(screen.queryByLabelText("Selected harness assembly")).not.toBeInTheDocument();
     expect(getPanelByHeading("Harness assembly functional schematic")).toHaveTextContent("No harness assembly selected.");
 
-    fireEvent.click(within(graphScope).getByRole("tab", { name: "Harness assembly" }));
+    const headerBlock = document.querySelector(".header-block");
+    expect(headerBlock).not.toBeNull();
+    expect(graphScope).toHaveAttribute("data-quick-entity-nav-source", "true");
+    Object.defineProperty(headerBlock, "getBoundingClientRect", {
+      configurable: true,
+      value: () => ({ top: 0, right: 1200, bottom: 72, left: 0, width: 1200, height: 72, x: 0, y: 0 })
+    });
+    Object.defineProperty(graphScope, "getBoundingClientRect", {
+      configurable: true,
+      value: () => ({ top: 48, right: 800, bottom: 96, left: 240, width: 560, height: 48, x: 240, y: 48 })
+    });
+    act(() => {
+      window.dispatchEvent(new Event("scroll"));
+    });
+    await waitFor(() => expect(document.querySelector(".header-docked-nav-shell")).toHaveClass("is-visible"));
+    const dockedScope = document.querySelector(".header-quick-entity-nav.harness-assembly-functional-scope-nav") as HTMLElement;
+    fireEvent.click(within(dockedScope).getByRole("tab", { name: "Current network functional" }));
+    expect(getPanelByHeading("Current network functional")).toBeInTheDocument();
+
+    const dockedAssemblyPickerButton = within(dockedScope).getByRole("tab", { name: "Select harness assembly" });
+    expect(dockedAssemblyPickerButton).not.toHaveClass("is-active");
+    fireEvent.click(dockedAssemblyPickerButton);
     const assemblyPicker = screen.getByRole("dialog", { name: "Select harness assembly" });
     fireEvent.click(within(assemblyPicker).getByRole("button", { name: /Main assembly/i }));
     expect(localStorage.getItem("electrical-plan-editor.displayed-harness-assembly-id")).toBe("asm-main");
@@ -383,7 +405,7 @@ describe("App integration UI - network summary workflow polish", () => {
       expect(getPanelByHeading("Harness assembly functional schematic")).toHaveTextContent("W-1");
     });
 
-    fireEvent.click(screen.getByRole("tab", { name: "Current network functional" }));
+    fireEvent.click(within(graphScope).getByRole("tab", { name: "Current network functional" }));
     const currentNetworkPanel = getCurrentNetworkFunctionalPanel("Harness B");
     expect(currentNetworkPanel).not.toHaveTextContent("W-1");
     expect(currentNetworkPanel).toHaveTextContent("Select a wire, connector, or splice to generate a functional trace.");

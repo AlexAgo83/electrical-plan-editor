@@ -192,7 +192,8 @@ export function useAppControllerWorkspaceContentAssembly({
     handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange
   });
 
-  const { networkSummaryPanel, networkFunctionalSchematicPanel } = useAppControllerNetworkSummaryPanelDomain({
+  const { networkSummaryPanel, networkFunctionalSchematicPanel, headerHarnessAssemblyFunctionalScopeNavigation } =
+    useAppControllerNetworkSummaryPanelDomain({
     NetworkSummaryPanelComponent: components.NetworkSummaryPanelComponent,
     hasActiveNetwork: state.hasActiveNetwork,
     isModelingScreen: state.isModelingScreen,
@@ -462,6 +463,7 @@ export function useAppControllerWorkspaceContentAssembly({
     analysisWorkspaceContentForLayout,
     networkScopeWorkspaceContent,
     harnessAssemblyWorkspaceContent: networkFunctionalSchematicPanel,
+    headerHarnessAssemblyFunctionalScopeNavigation,
     validationWorkspaceContent,
     settingsWorkspaceContent
   };

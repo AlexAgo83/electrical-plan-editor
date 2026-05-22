@@ -911,6 +911,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     analysisWorkspaceContentForLayout,
     networkScopeWorkspaceContent,
     harnessAssemblyWorkspaceContent,
+    headerHarnessAssemblyFunctionalScopeNavigation,
     validationWorkspaceContent,
     settingsWorkspaceContent
   } = useAppControllerWorkspaceContentAssembly({
@@ -1099,6 +1100,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       hasActiveNetwork,
       networkScopeWorkspaceContent,
       harnessAssemblyWorkspaceContent,
+      headerHarnessAssemblyFunctionalScopeNavigation,
       modelingLeftColumnContent: modelingLeftColumnContentForSubScreen,
       modelingFormsColumnContent: modelingFormsColumnContentForLayout,
       networkSummaryPanel,

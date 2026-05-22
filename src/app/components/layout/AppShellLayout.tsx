@@ -94,6 +94,7 @@ interface AppShellLayoutProps {
   hasActiveNetwork: boolean;
   networkScopeWorkspaceContent: ReactNode;
   harnessAssemblyWorkspaceContent: ReactNode;
+  headerHarnessAssemblyFunctionalScopeNavigation: ReactNode;
   modelingLeftColumnContent: ReactNode;
   modelingFormsColumnContent: ReactNode;
   networkSummaryPanel: ReactNode;
@@ -178,6 +179,7 @@ export function AppShellLayout({
   hasActiveNetwork,
   networkScopeWorkspaceContent,
   harnessAssemblyWorkspaceContent,
+  headerHarnessAssemblyFunctionalScopeNavigation,
   modelingLeftColumnContent,
   modelingFormsColumnContent,
   networkSummaryPanel,
@@ -194,7 +196,9 @@ export function AppShellLayout({
   const [quickEntityNavigationDockProgress, setQuickEntityNavigationDockProgress] = useState(0);
   const isQuickEntityNavigationDockedRef = useRef(false);
   const quickEntityNavigationDockThresholdRef = useRef<number | null>(null);
-  const shouldOfferDockedEntityNavigation = hasActiveNetwork && (isModelingScreen || isAnalysisScreen);
+  const shouldOfferDockedEntityNavigation =
+    hasActiveNetwork &&
+    (isModelingScreen || isAnalysisScreen || (isHarnessAssemblyScreen && headerHarnessAssemblyFunctionalScopeNavigation !== null));
 
   useEffect(() => {
     isQuickEntityNavigationDockedRef.current = isQuickEntityNavigationDocked;
@@ -280,6 +284,17 @@ export function AppShellLayout({
 
   const shouldMountDockedEntityNavigation =
     shouldOfferDockedEntityNavigation && (isQuickEntityNavigationDocked || quickEntityNavigationDockProgress > 0);
+  const headerCenterNavigation = isHarnessAssemblyScreen ? (
+    headerHarnessAssemblyFunctionalScopeNavigation
+  ) : (
+    <NetworkSummaryQuickEntityNavigation
+      variant="header"
+      quickEntityNavigationMode={isAnalysisScreen ? "analysis" : "modeling"}
+      activeSubScreen={activeSubScreen}
+      entityCountBySubScreen={entityCountBySubScreen}
+      onQuickEntityNavigation={onSubScreenChange}
+    />
+  );
   const headerCenterContent = shouldMountDockedEntityNavigation ? (
     <div
       className={
@@ -290,13 +305,7 @@ export function AppShellLayout({
       style={{ "--header-docked-nav-progress": quickEntityNavigationDockProgress } as CSSProperties}
       aria-hidden={!isQuickEntityNavigationDocked}
     >
-      <NetworkSummaryQuickEntityNavigation
-        variant="header"
-        quickEntityNavigationMode={isAnalysisScreen ? "analysis" : "modeling"}
-        activeSubScreen={activeSubScreen}
-        entityCountBySubScreen={entityCountBySubScreen}
-        onQuickEntityNavigation={onSubScreenChange}
-      />
+      {headerCenterNavigation}
     </div>
     ) : null;
 
@@ -386,7 +395,7 @@ export function AppShellLayout({
         isSettingsActive={isSettingsActive}
         onOpenSettings={onOpenSettings}
         isInstallPromptAvailable={isInstallPromptAvailable}
-        isDockedNavigationVisible={isQuickEntityNavigationDocked}
+        isDockedNavigationVisible={shouldMountDockedEntityNavigation}
         onInstallApp={onInstallApp}
         isPwaUpdateReady={isPwaUpdateReady}
         onApplyPwaUpdate={onApplyPwaUpdate}
