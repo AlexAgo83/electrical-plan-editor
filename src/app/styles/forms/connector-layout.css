@@ -158,10 +158,25 @@
   stroke-dasharray: 0.07 0.11;
 }
 
+.connector-layout-grid-center-line {
+  stroke: color-mix(in srgb, var(--theme-primary, currentColor) 58%, currentColor 42%);
+  stroke-width: 0.01375;
+  stroke-dasharray: 0.04 0.06;
+}
+
 .connector-layout-keying,
 .connector-physical-keying {
   fill: color-mix(in srgb, var(--theme-primary, currentColor) 68%, currentColor 32%);
   stroke: none;
+}
+
+.connector-layout-keying-handle {
+  cursor: pointer;
+}
+
+.connector-layout-keying-handle.is-selected .connector-layout-keying {
+  stroke: color-mix(in srgb, var(--theme-primary, currentColor) 30%, currentColor 70%);
+  stroke-width: 0.06;
 }
 
 .connector-layout-keying-handle.is-free {
@@ -368,7 +383,21 @@
   grid-column: span 2;
 }
 
-.connector-layout-keying-row > label,
+.connector-layout-keying-row > .connector-layout-checkbox-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.05rem;
+}
+
+.connector-layout-checkbox-field input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--theme-primary, currentColor);
+}
+
+.connector-layout-keying-row > label:not(.connector-layout-checkbox-field),
 .connector-layout-keying-color-control {
   display: grid;
   grid-template-rows: 1rem minmax(2.05rem, auto);

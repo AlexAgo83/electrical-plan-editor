@@ -235,6 +235,14 @@ function renderLayoutGrid(layout: ConnectorLayout): ReactElement {
         const y = index + 0.5;
         return <line key={`grid-y-${y}`} className="connector-layout-grid-line" x1={minX} y1={y} x2={maxX} y2={y} />;
       })}
+      {Array.from({ length: layout.width }, (_, index) => {
+        const x = index + 1;
+        return <line key={`grid-center-x-${x}`} className="connector-layout-grid-center-line" x1={x} y1={minY} x2={x} y2={maxY} />;
+      })}
+      {Array.from({ length: layout.height }, (_, index) => {
+        const y = index + 1;
+        return <line key={`grid-center-y-${y}`} className="connector-layout-grid-center-line" x1={minX} y1={y} x2={maxX} y2={y} />;
+      })}
     </g>
   );
 }
@@ -245,6 +253,104 @@ function getLayoutViewBox(layout: ConnectorLayout, shellPadding: number): string
   const width = layout.width - 1 + shellPadding * 2 + 1;
   const height = layout.height - 1 + shellPadding * 2 + 1;
   return `${minX} ${minY} ${width} ${height}`;
+}
+
+function snapKeyingCoordinateToGrid(value: number, maxGridCoordinate: number): number {
+  return Math.min(maxGridCoordinate + 0.5, Math.max(0.5, Math.round(value * 2) / 2));
+}
+
+function snapKeyingPositionToGrid(layout: ConnectorLayout, position: { x: number; y: number }): { x: number; y: number } {
+  return {
+    x: snapKeyingCoordinateToGrid(position.x, layout.width),
+    y: snapKeyingCoordinateToGrid(position.y, layout.height)
+  };
+}
+
+function roundPathPosition(value: number): number {
+  return Math.round(value * 10000) / 10000;
+}
+
+function getHalfStepValues(min: number, max: number): number[] {
+  const values: number[] = [];
+  const start = Math.ceil(min * 2) / 2;
+  const end = Math.floor(max * 2) / 2;
+  for (let value = start; value <= end + 0.0001; value += 0.5) {
+    values.push(roundPathPosition(value));
+  }
+  return values;
+}
+
+function getCircularPathDistance(left: number, right: number, perimeter: number): number {
+  const distance = Math.abs(right - left);
+  return Math.min(distance, perimeter - distance);
+}
+
+function snapSquareGuidedPathPositionToGrid(layout: ConnectorLayout, pathPosition: number, shellPadding: number): number {
+  const left = 1 - shellPadding;
+  const top = 1 - shellPadding;
+  const right = layout.width + shellPadding;
+  const bottom = layout.height + shellPadding;
+  const topLength = Math.max(0.0001, right - left);
+  const rightLength = Math.max(0.0001, bottom - top);
+  const bottomLength = topLength;
+  const perimeter = topLength * 2 + rightLength * 2;
+  const requestedDistance = Math.min(perimeter, Math.max(0, pathPosition * perimeter));
+  const candidateDistances = [
+    ...getHalfStepValues(left, right).map((x) => x - left),
+    ...getHalfStepValues(top, bottom).map((y) => topLength + y - top),
+    ...getHalfStepValues(left, right).map((x) => topLength + rightLength + right - x),
+    ...getHalfStepValues(top, bottom).map((y) => topLength + rightLength + bottomLength + bottom - y)
+  ];
+  const snappedDistance = candidateDistances.reduce((best, candidate) =>
+    getCircularPathDistance(requestedDistance, candidate, perimeter) < getCircularPathDistance(requestedDistance, best, perimeter)
+      ? candidate
+      : best
+  );
+  return roundPathPosition(snappedDistance / perimeter);
+}
+
+function snapCircleGuidedPathPositionToGrid(layout: ConnectorLayout, pathPosition: number, shellPadding: number): number {
+  const centerX = layout.width / 2 + 0.5;
+  const centerY = layout.height / 2 + 0.5;
+  const radiusX = (layout.width - 1) / 2 + shellPadding;
+  const radiusY = (layout.height - 1) / 2 + shellPadding;
+  const candidates: number[] = [];
+  for (const x of getHalfStepValues(centerX - radiusX, centerX + radiusX)) {
+    const ratio = (x - centerX) / radiusX;
+    const yOffset = Math.sqrt(Math.max(0, 1 - ratio * ratio)) * radiusY;
+    for (const y of [centerY - yOffset, centerY + yOffset]) {
+      const angle = Math.atan2(y - centerY, x - centerX);
+      candidates.push(roundPathPosition(((angle + Math.PI / 2 + Math.PI * 2) % (Math.PI * 2)) / (Math.PI * 2)));
+    }
+  }
+  for (const y of getHalfStepValues(centerY - radiusY, centerY + radiusY)) {
+    const ratio = (y - centerY) / radiusY;
+    const xOffset = Math.sqrt(Math.max(0, 1 - ratio * ratio)) * radiusX;
+    for (const x of [centerX - xOffset, centerX + xOffset]) {
+      const angle = Math.atan2(y - centerY, x - centerX);
+      candidates.push(roundPathPosition(((angle + Math.PI / 2 + Math.PI * 2) % (Math.PI * 2)) / (Math.PI * 2)));
+    }
+  }
+  return candidates.reduce((best, candidate) =>
+    getCircularPathDistance(pathPosition, candidate, 1) < getCircularPathDistance(pathPosition, best, 1) ? candidate : best
+  );
+}
+
+function snapGuidedPathPositionToGrid(
+  layout: ConnectorLayout,
+  pathPosition: number,
+  shellShape: ConnectorLayoutShellShape,
+  shellPadding: number
+): number {
+  const normalized = Math.min(1, Math.max(0, pathPosition));
+  if (shellShape === "circle") {
+    return snapCircleGuidedPathPositionToGrid(layout, normalized, shellPadding);
+  }
+  return snapSquareGuidedPathPositionToGrid(layout, normalized, shellPadding);
+}
+
+function isKeyingSnapEnabled(placement: ConnectorLayoutKeyingPlacement): boolean {
+  return placement.snapToGrid !== false;
 }
 
 export function ConnectorLayoutEditor({
@@ -260,6 +366,7 @@ export function ConnectorLayoutEditor({
     [connectorLayout, parsedConnectionCount]
   );
   const [selectedCavityIndex, setSelectedCavityIndex] = useState(1);
+  const [selectedKeyingIndex, setSelectedKeyingIndex] = useState<number | null>(null);
   const [detailPanel, setDetailPanel] = useState<ConnectorLayoutDetailPanel>("global");
   const [draggingCavityIndex, setDraggingCavityIndex] = useState<number | null>(null);
   const [draggingKeyingIndex, setDraggingKeyingIndex] = useState<number | null>(null);
@@ -268,6 +375,7 @@ export function ConnectorLayoutEditor({
     layout.ways.find((way) => way.cavityIndex === selectedCavityIndex) ?? layout.ways[0] ?? null;
   const duplicatePositionGroups = useMemo(() => getConnectorLayoutDuplicatePositions(layout), [layout]);
   const keyings = getConnectorLayoutKeyings(layout);
+  const selectedKeying = selectedKeyingIndex === null ? null : keyings[selectedKeyingIndex] ?? null;
   const shellShape = getConnectorLayoutShellShape(layout);
   const shellPadding = getConnectorLayoutShellPadding(layout);
   const cellPadding = getConnectorLayoutCellPadding(layout);
@@ -293,6 +401,11 @@ export function ConnectorLayoutEditor({
   function selectWay(cavityIndex: number): void {
     setSelectedCavityIndex(cavityIndex);
     setDetailPanel("selectedWay");
+  }
+
+  function selectKeying(index: number): void {
+    setSelectedKeyingIndex(index);
+    setDetailPanel("keying");
   }
 
   function updateLayoutSize(axis: "width" | "height", value: string): void {
@@ -341,6 +454,8 @@ export function ConnectorLayoutEditor({
   }
 
   function addKeyingWithDefaultColor(): void {
+    setSelectedKeyingIndex(keyings.length);
+    setDetailPanel("keying");
     commitLayout(addConnectorLayoutKeying(layout));
   }
 
@@ -349,12 +464,16 @@ export function ConnectorLayoutEditor({
     if (current === undefined) {
       return;
     }
+    const snapToGrid = current.placement === undefined ? true : isKeyingSnapEnabled(current.placement);
     if (mode === "guided") {
+      const pathPosition =
+        current.placement?.mode === "guided" ? current.placement.pathPosition : DEFAULT_CONNECTOR_LAYOUT_KEYING_PATH_POSITION;
       commitLayout(
         updateConnectorLayoutKeyingAt(layout, index, {
           placement: {
             mode: "guided",
-            pathPosition: current.placement?.mode === "guided" ? current.placement.pathPosition : DEFAULT_CONNECTOR_LAYOUT_KEYING_PATH_POSITION
+            pathPosition: snapToGrid ? snapGuidedPathPositionToGrid(layout, pathPosition, shellShape, shellPadding) : pathPosition,
+            snapToGrid: snapToGrid ? undefined : false
           }
         })
       );
@@ -363,7 +482,11 @@ export function ConnectorLayoutEditor({
     const anchor = getConnectorLayoutKeyingAnchor(current, layout, shellShape, shellPadding);
     commitLayout(
       updateConnectorLayoutKeyingAt(layout, index, {
-        placement: { mode: "free", x: anchor.x, y: anchor.y }
+        placement: {
+          mode: "free",
+          ...(snapToGrid ? snapKeyingPositionToGrid(layout, anchor) : { x: anchor.x, y: anchor.y }),
+          snapToGrid: snapToGrid ? undefined : false
+        }
       })
     );
   }
@@ -373,7 +496,40 @@ export function ConnectorLayoutEditor({
     if (!Number.isFinite(parsed)) {
       return;
     }
-    commitLayout(updateConnectorLayoutKeyingAt(layout, index, { placement: { mode: "guided", pathPosition: parsed } }));
+    const current = keyings[index];
+    const snapToGrid = current?.placement === undefined ? true : isKeyingSnapEnabled(current.placement);
+    commitLayout(
+      updateConnectorLayoutKeyingAt(layout, index, {
+        placement: {
+          mode: "guided",
+          pathPosition: snapToGrid ? snapGuidedPathPositionToGrid(layout, parsed, shellShape, shellPadding) : parsed,
+          snapToGrid: snapToGrid ? undefined : false
+        }
+      })
+    );
+  }
+
+  function updateKeyingSnap(index: number, snapToGrid: boolean): void {
+    const current = keyings[index];
+    if (current === undefined) {
+      return;
+    }
+    const placement = current.placement ?? { mode: "guided", pathPosition: DEFAULT_CONNECTOR_LAYOUT_KEYING_PATH_POSITION };
+    if (placement.mode === "free") {
+      updateKeyingFreePosition(index, { snapToGrid: snapToGrid ? undefined : false });
+      return;
+    }
+    commitLayout(
+      updateConnectorLayoutKeyingAt(layout, index, {
+        placement: {
+          mode: "guided",
+          pathPosition: snapToGrid
+            ? snapGuidedPathPositionToGrid(layout, placement.pathPosition, shellShape, shellPadding)
+            : placement.pathPosition,
+          snapToGrid: snapToGrid ? undefined : false
+        }
+      })
+    );
   }
 
   function updateKeyingFreePosition(index: number, patch: Partial<Extract<ConnectorLayoutKeyingPlacement, { mode: "free" }>>): void {
@@ -382,12 +538,20 @@ export function ConnectorLayoutEditor({
       return;
     }
     const anchor = getConnectorLayoutKeyingAnchor(current, layout, shellShape, shellPadding);
+    const currentFreePlacement = current.placement?.mode === "free" ? current.placement : null;
+    const snapToGrid = patch.snapToGrid ?? currentFreePlacement?.snapToGrid ?? true;
+    const position = {
+      x: patch.x ?? currentFreePlacement?.x ?? anchor.x,
+      y: patch.y ?? currentFreePlacement?.y ?? anchor.y
+    };
+    const nextPosition = snapToGrid === true ? snapKeyingPositionToGrid(layout, position) : position;
     commitLayout(
       updateConnectorLayoutKeyingAt(layout, index, {
         placement: {
           mode: "free",
-          x: patch.x ?? (current.placement?.mode === "free" ? current.placement.x : anchor.x),
-          y: patch.y ?? (current.placement?.mode === "free" ? current.placement.y : anchor.y)
+          x: nextPosition.x,
+          y: nextPosition.y,
+          snapToGrid: snapToGrid ? undefined : false
         }
       })
     );
@@ -538,13 +702,22 @@ export function ConnectorLayoutEditor({
 
   function handleKeyingPointerDown(event: PointerEvent<SVGGElement>, index: number): void {
     const keying = keyings[index];
+    selectKeying(index);
+    event.preventDefault();
+    event.stopPropagation();
     if (keying?.placement?.mode !== "free") {
       return;
     }
-    event.preventDefault();
-    event.stopPropagation();
     setDraggingKeyingIndex(index);
     event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function handleKeyingKeyDown(event: KeyboardEvent<SVGGElement>, index: number): void {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+    event.preventDefault();
+    selectKeying(index);
   }
 
   function handleLayoutPointerMove(event: PointerEvent<SVGSVGElement>): void {
@@ -592,6 +765,9 @@ export function ConnectorLayoutEditor({
   }
 
   const fieldsetClassName = showLegend ? "inline-fieldset connector-layout-editor" : "inline-fieldset connector-layout-editor is-embedded";
+  const selectedKeyingControlIndex = selectedKeying === null ? -1 : selectedKeyingIndex ?? -1;
+  const selectedKeyingPlacement =
+    selectedKeying?.placement ?? { mode: "guided" as const, pathPosition: DEFAULT_CONNECTOR_LAYOUT_KEYING_PATH_POSITION };
 
   return (
     <fieldset className={fieldsetClassName}>
@@ -619,17 +795,20 @@ export function ConnectorLayoutEditor({
             {keyings.map((keying, index) => (
               <g
                 key={`keying-preview-${index}`}
-                className={keying.placement?.mode === "free" ? "connector-layout-keying-handle is-free" : "connector-layout-keying-handle"}
-                role={keying.placement?.mode === "free" ? "button" : undefined}
-                tabIndex={keying.placement?.mode === "free" ? 0 : undefined}
-                aria-label={keying.placement?.mode === "free" ? `Drag keying ${index + 1}` : undefined}
+                className={`connector-layout-keying-handle${keying.placement?.mode === "free" ? " is-free" : ""}${
+                  detailPanel === "keying" && selectedKeyingIndex === index ? " is-selected" : ""
+                }`}
+                role="button"
+                tabIndex={0}
+                aria-label={`${keying.placement?.mode === "free" ? "Select and drag" : "Select"} keying ${index + 1}`}
                 onPointerDown={(event) => handleKeyingPointerDown(event, index)}
+                onKeyDown={(event) => handleKeyingKeyDown(event, index)}
               >
                 {renderKeying(keying, layout, shellShape, shellPadding)}
               </g>
             ))}
             {layout.ways.map((way) => {
-              const isSelected = selectedWay?.cavityIndex === way.cavityIndex;
+              const isSelected = detailPanel === "selectedWay" && selectedWay?.cavityIndex === way.cavityIndex;
               const label = getConnectorLayoutWayDisplayLabel(way);
               const labelClassName = `connector-layout-way-label${label.length > 2 ? " is-long-label" : ""}`;
               return (
@@ -825,27 +1004,29 @@ export function ConnectorLayoutEditor({
             <section className="connector-layout-control-card connector-layout-control-card-keying">
               <header className="connector-layout-control-card-header">
                 <h3>Keying features</h3>
-                <span>{keyings.length} features</span>
+                <span>
+                  {selectedKeying === null ? "No selection" : `Keying ${selectedKeyingControlIndex + 1}`} / {keyings.length}
+                </span>
               </header>
               <div className="connector-layout-keying-list" aria-label="Keying features">
                 <div className="connector-layout-keying-list-header">
-                  <p className="meta-line">Configure guided or free keying markers for the connector shell.</p>
+                  <p className="meta-line">
+                    {keyings.length === 0 ? "Add a keying marker to configure the connector shell." : "Select a keying marker in the preview to edit it."}
+                  </p>
                   <button type="button" className="button-with-icon" onClick={addKeyingWithDefaultColor}>
                     <span className="action-button-icon is-new" aria-hidden="true" />
                     Add keying
                   </button>
                 </div>
                 {keyings.length === 0 ? <p className="meta-line">No keying features.</p> : null}
-                {keyings.map((keying, index) => {
-                  const colorInputId = `connector-layout-keying-color-${index}`;
-                  const placement = keying.placement ?? { mode: "guided", pathPosition: DEFAULT_CONNECTOR_LAYOUT_KEYING_PATH_POSITION };
-                  return (
-                    <div key={`keying-${index}`} className="connector-layout-keying-row">
+                {keyings.length > 0 && selectedKeying === null ? <p className="meta-line">No keying selected.</p> : null}
+                {selectedKeying !== null && selectedKeyingControlIndex >= 0 ? (
+                    <div key={`keying-${selectedKeyingControlIndex}`} className="connector-layout-keying-row">
                       <label>
                         Placement
                         <select
-                          value={placement.mode}
-                          onChange={(event) => updateKeyingPlacementMode(index, event.target.value as ConnectorLayoutKeyingPlacement["mode"])}
+                          value={selectedKeyingPlacement.mode}
+                          onChange={(event) => updateKeyingPlacementMode(selectedKeyingControlIndex, event.target.value as ConnectorLayoutKeyingPlacement["mode"])}
                         >
                           <option value="guided">Guided</option>
                           <option value="free">Free</option>
@@ -854,10 +1035,10 @@ export function ConnectorLayoutEditor({
                       <label>
                         Shape
                         <select
-                          value={keying.shape ?? "arrow"}
+                          value={selectedKeying.shape ?? "arrow"}
                           onChange={(event) =>
                             commitLayout(
-                              updateConnectorLayoutKeyingAt(layout, index, {
+                              updateConnectorLayoutKeyingAt(layout, selectedKeyingControlIndex, {
                                 shape: event.target.value as ConnectorLayoutKeyingShape
                               })
                             )
@@ -871,15 +1052,15 @@ export function ConnectorLayoutEditor({
                         </select>
                       </label>
                       <div className="connector-layout-keying-color-control">
-                        <label htmlFor={colorInputId}>Color</label>
+                        <label htmlFor={`connector-layout-keying-color-${selectedKeyingControlIndex}`}>Color</label>
                         <div>
                           <input
-                            id={colorInputId}
+                            id={`connector-layout-keying-color-${selectedKeyingControlIndex}`}
                             type="color"
-                            value={keying.color ?? getDefaultKeyingColor()}
+                            value={selectedKeying.color ?? getDefaultKeyingColor()}
                             onChange={(event) =>
                               commitLayout(
-                                updateConnectorLayoutKeyingAt(layout, index, {
+                                updateConnectorLayoutKeyingAt(layout, selectedKeyingControlIndex, {
                                   color: event.target.value
                                 })
                               )
@@ -887,47 +1068,57 @@ export function ConnectorLayoutEditor({
                           />
                         </div>
                       </div>
-                      {placement.mode === "guided" ? (
+                      {selectedKeyingPlacement.mode === "guided" ? (
                         <label className="connector-layout-slider-field">
                           <span>
                             Position
-                            <strong>{Math.round(placement.pathPosition * 100)}%</strong>
+                            <strong>{Math.round(selectedKeyingPlacement.pathPosition * 100)}%</strong>
                           </span>
                           <input
                             type="range"
                             min={0}
                             max={1}
                             step={0.01}
-                            value={placement.pathPosition}
-                            onChange={(event) => updateKeyingGuidedPosition(index, event.target.value)}
+                            value={selectedKeyingPlacement.pathPosition}
+                            onChange={(event) => updateKeyingGuidedPosition(selectedKeyingControlIndex, event.target.value)}
                           />
                         </label>
                       ) : null}
+                      <label className="connector-layout-checkbox-field">
+                        <input
+                          type="checkbox"
+                          checked={isKeyingSnapEnabled(selectedKeyingPlacement)}
+                          onChange={(event) => updateKeyingSnap(selectedKeyingControlIndex, event.target.checked)}
+                        />
+                        Snap
+                      </label>
                       <label className="connector-layout-slider-field">
                         <span>
                           Scale
-                          <strong>{(keying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE).toFixed(2)}x</strong>
+                          <strong>{(selectedKeying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE).toFixed(2)}x</strong>
                         </span>
                         <input
                           type="range"
                           min={MIN_CONNECTOR_LAYOUT_KEYING_SCALE}
                           max={MAX_CONNECTOR_LAYOUT_KEYING_SCALE}
                           step={0.05}
-                          value={keying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE}
-                          onChange={(event) => updateKeyingScale(index, event.target.value)}
+                          value={selectedKeying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE}
+                          onChange={(event) => updateKeyingScale(selectedKeyingControlIndex, event.target.value)}
                         />
                       </label>
                       <button
                         type="button"
                         className="button-with-icon"
-                        onClick={() => commitLayout(removeConnectorLayoutKeying(layout, index))}
+                        onClick={() => {
+                          setSelectedKeyingIndex(keyings.length <= 1 ? null : Math.min(selectedKeyingControlIndex, keyings.length - 2));
+                          commitLayout(removeConnectorLayoutKeying(layout, selectedKeyingControlIndex));
+                        }}
                       >
                         <span className="action-button-icon is-delete" aria-hidden="true" />
                         Remove
                       </button>
                     </div>
-                  );
-                })}
+                ) : null}
               </div>
             </section>
           ) : null}

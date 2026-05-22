@@ -287,13 +287,15 @@ function normalizeKeyingPlacement(
       return {
         mode: "free",
         x: roundTo(clampNumber(placement.x, left - 0.5, right + 0.5) ?? (left + right) / 2, 2),
-        y: roundTo(clampNumber(placement.y, top - 0.5, bottom + 0.5) ?? (top + bottom) / 2, 2)
+        y: roundTo(clampNumber(placement.y, top - 0.5, bottom + 0.5) ?? (top + bottom) / 2, 2),
+        snapToGrid: placement.snapToGrid === false ? false : undefined
       };
     }
     if (placement.mode === "guided") {
       return {
         mode: "guided",
-        pathPosition: normalizePathPosition(placement.pathPosition)
+        pathPosition: normalizePathPosition(placement.pathPosition),
+        snapToGrid: placement.snapToGrid === false ? false : undefined
       };
     }
   }

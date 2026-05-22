@@ -179,12 +179,13 @@ describe("connector layout", () => {
       height: 3,
       shellShape: "square" as const,
       keyings: [
-        { side: "right" as const, shape: "arrow" as const, placement: { mode: "free" as const, x: 2.2, y: 0.62 } },
+        { side: "right" as const, shape: "arrow" as const, placement: { mode: "free" as const, x: 2.2, y: 0.62, snapToGrid: false } },
         { side: "right" as const, shape: "arrow" as const, placement: { mode: "free" as const, x: 4.42, y: 2 } }
       ]
     };
     const keyings = getConnectorLayoutKeyings(layout);
 
+    expect(keyings[0]?.placement).toEqual({ mode: "free", x: 2.2, y: 0.62, snapToGrid: false });
     expect(getConnectorLayoutKeyingAnchor(keyings[0]!, layout)).toMatchObject({ normalX: 0, normalY: -1 });
     expect(getConnectorLayoutKeyingAnchor(keyings[1]!, layout)).toMatchObject({ normalX: 1, normalY: 0 });
   });

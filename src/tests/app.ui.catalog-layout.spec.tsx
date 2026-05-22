@@ -106,10 +106,12 @@ describe("App integration UI - catalog layout", () => {
     });
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Auto layout" }));
     expect(catalogLayoutPanel.querySelectorAll(".connector-layout-grid-line")).toHaveLength(6);
+    expect(catalogLayoutPanel.querySelectorAll(".connector-layout-grid-center-line")).toHaveLength(4);
     expect(within(catalogLayoutPanel).getByRole("button", { name: "Remove column on right" })).toBeDisabled();
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Add column on left" }));
     expect(within(catalogLayoutPanel).getByLabelText("Grid width")).toHaveValue(3);
     expect(catalogLayoutPanel.querySelectorAll(".connector-layout-grid-line")).toHaveLength(7);
+    expect(catalogLayoutPanel.querySelectorAll(".connector-layout-grid-center-line")).toHaveLength(5);
     expect(within(catalogLayoutPanel).getByRole("button", { name: "Remove column on left" })).toBeEnabled();
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Remove column on left" }));
     expect(within(catalogLayoutPanel).getByLabelText("Grid width")).toHaveValue(2);
@@ -158,6 +160,7 @@ describe("App integration UI - catalog layout", () => {
     expect(shapeSelect).toHaveValue("arrow");
     expect(positionSlider).toHaveValue("0.375");
     expect(scaleInput).toHaveValue("1");
+    expect(within(getConnectorLayoutKeyingRow(catalogLayoutPanel)).getByLabelText("Snap")).toBeChecked();
     fireEvent.change(shapeSelect, {
       target: { value: "square" }
     });
@@ -165,13 +168,16 @@ describe("App integration UI - catalog layout", () => {
     fireEvent.change(positionSlider as HTMLElement, {
       target: { value: "0.55" }
     });
-    expect(positionSlider).toHaveValue("0.55");
+    expect(positionSlider).toHaveValue("0.5469");
     fireEvent.change(placementSelect, {
       target: { value: "free" }
     });
     expect(placementSelect).toHaveValue("free");
     const freeControls = getConnectorLayoutKeyingControls(getConnectorLayoutKeyingRow(catalogLayoutPanel));
     expect(freeControls.positionSlider).toBeNull();
+    expect(within(getConnectorLayoutKeyingRow(catalogLayoutPanel)).getByLabelText("Snap")).toBeChecked();
+    fireEvent.click(within(getConnectorLayoutKeyingRow(catalogLayoutPanel)).getByLabelText("Snap"));
+    expect(within(getConnectorLayoutKeyingRow(catalogLayoutPanel)).getByLabelText("Snap")).not.toBeChecked();
     expect(within(getConnectorLayoutKeyingRow(catalogLayoutPanel)).queryByText("Drag in preview")).not.toBeInTheDocument();
     fireEvent.change(scaleInput, {
       target: { value: "1.6" }
