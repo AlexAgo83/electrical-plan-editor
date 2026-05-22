@@ -257,6 +257,11 @@
   background: color-mix(in srgb, var(--theme-primary, currentColor) 13%, transparent);
 }
 
+.harness-assembly-picker-option.is-new {
+  border-style: dashed;
+  border-width: 2px;
+}
+
 .harness-assembly-link-form button,
 .harness-assembly-links button {
   border: 1px solid #7a99b3;

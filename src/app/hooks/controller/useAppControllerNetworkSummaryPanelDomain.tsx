@@ -20,7 +20,7 @@ import type { AppControllerCanvasDisplayStateModel } from "../useAppControllerCa
 import type { CanvasStateModel } from "../useCanvasState";
 import type { AppControllerPreferencesStateModel } from "../useAppControllerPreferencesState";
 import type { ShortestRouteResult } from "../../../core/pathfinding";
-import type { NodePosition, SubScreenId } from "../../types/app-controller";
+import type { NodePosition, ScreenId, SubScreenId } from "../../types/app-controller";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
 import { appActions } from "../../../store";
 import { FunctionalSchematicPanel } from "../../components/network-summary/FunctionalSchematicPanel";
@@ -65,6 +65,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   isModelingAnalysisFocused: boolean;
   activeSubScreen: SubScreenId;
   setActiveSubScreen: (subScreen: SubScreenId) => void;
+  handleWorkspaceScreenChange: (targetScreen: ScreenId) => void;
   entityCountBySubScreen: Record<SubScreenId, number>;
   onQuickEntityNavigation: (subScreen: SubScreenId) => void;
   activeNetwork: Network | null;
@@ -173,6 +174,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   isModelingAnalysisFocused,
   activeSubScreen,
   setActiveSubScreen,
+  handleWorkspaceScreenChange,
   entityCountBySubScreen,
   onQuickEntityNavigation,
   activeNetwork,
@@ -220,6 +222,14 @@ export function useAppControllerNetworkSummaryPanelDomain({
   const [displayedAssemblyId, setDisplayedAssemblyId] = useState<HarnessAssemblyId | "new" | "">(readPersistedDisplayedAssemblyId);
   const [harnessAssemblyGraphTab, setHarnessAssemblyGraphTab] = useState<"assembly" | "current">("assembly");
   const [isHarnessAssemblyPickerOpen, setIsHarnessAssemblyPickerOpen] = useState(false);
+  const handleOpenActiveNetworkInModeling = useCallback(() => {
+    handleWorkspaceScreenChange("modeling");
+  }, [handleWorkspaceScreenChange]);
+  const handleOpenCurrentNetworkFunctional = useCallback(() => {
+    setIsHarnessAssemblyPickerOpen(false);
+    setHarnessAssemblyGraphTab("current");
+    handleWorkspaceScreenChange("harnessAssembly");
+  }, [handleWorkspaceScreenChange]);
   const handleSelectConnectorFromCallout = useCallback(
     (connectorId: ConnectorId) => {
       unstable_batchedUpdates(() => {
@@ -373,6 +383,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         canExportBomCsv,
         onExportBomCsv,
         handleRegenerateLayout,
+        onOpenCurrentNetworkFunctional: handleOpenCurrentNetworkFunctional,
         showFunctionalSchematic: false
       }).networkSummaryPanel
     : null;
@@ -562,6 +573,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
       pngExportIncludeBackground={preferencesState.canvasPngExportIncludeBackground}
       exportIncludeFrame={preferencesState.canvasExportIncludeFrame}
       exportIncludeCartouche={preferencesState.canvasExportIncludeCartouche}
+      onOpenActiveNetworkInModeling={handleOpenActiveNetworkInModeling}
     />
   ) : (
     <section className="panel functional-schematic-panel" aria-labelledby="current-network-functional-empty-title">
@@ -622,7 +634,11 @@ export function useAppControllerNetworkSummaryPanelDomain({
             <div className="harness-assembly-picker-list" role="list">
               <button
                 type="button"
-                className={displayedAssemblyId === "new" ? "harness-assembly-picker-option is-selected" : "harness-assembly-picker-option"}
+                className={
+                  displayedAssemblyId === "new"
+                    ? "harness-assembly-picker-option is-new is-selected"
+                    : "harness-assembly-picker-option is-new"
+                }
                 onClick={() => handlePickDisplayedAssembly("new")}
               >
                 <span>New assembly</span>

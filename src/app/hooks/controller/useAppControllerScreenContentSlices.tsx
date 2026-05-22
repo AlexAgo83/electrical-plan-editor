@@ -70,6 +70,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   | "routingGraphNodeCount"
   | "routingGraphSegmentCount"
   | "onRegenerateLayout"
+  | "onOpenCurrentNetworkFunctional"
 > & {
   NetworkSummaryPanelComponent: ComponentType<NetworkSummaryPanelProps>;
   includeNetworkSummaryPanel?: boolean;
@@ -91,6 +92,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
     segmentIds: string[];
   };
   handleRegenerateLayout: NetworkSummaryPanelProps["onRegenerateLayout"];
+  onOpenCurrentNetworkFunctional?: NetworkSummaryPanelProps["onOpenCurrentNetworkFunctional"];
 };
 
 type NetworkScopeScreenContentSliceParams = Omit<
@@ -312,7 +314,8 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     pngExportIncludeBackground: params.pngExportIncludeBackground,
     canExportBomCsv: params.canExportBomCsv,
     onExportBomCsv: params.onExportBomCsv,
-    onRegenerateLayout: params.handleRegenerateLayout
+    onRegenerateLayout: params.handleRegenerateLayout,
+    onOpenCurrentNetworkFunctional: params.onOpenCurrentNetworkFunctional
   } satisfies NetworkSummaryPanelProps;
 
   return {

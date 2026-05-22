@@ -166,6 +166,7 @@ export interface NetworkSummaryPanelProps {
   canExportBomCsv: boolean;
   onExportBomCsv: () => void;
   onRegenerateLayout: () => void;
+  onOpenCurrentNetworkFunctional?: () => void;
   activeNetwork: Network | null;
   catalogItems: CatalogItem[];
   showFunctionalSchematic?: boolean;
@@ -266,6 +267,7 @@ export function NetworkSummaryPanel({
   canExportBomCsv,
   onExportBomCsv,
   onRegenerateLayout,
+  onOpenCurrentNetworkFunctional,
   activeNetwork,
   catalogItems,
   showFunctionalSchematic = true
@@ -851,6 +853,16 @@ export function NetworkSummaryPanel({
               toggleShowSegmentLengths={toggleShowSegmentLengths}
               toggleShowCableCallouts={toggleShowCableCallouts}
             />
+            {onOpenCurrentNetworkFunctional === undefined ? null : (
+              <button
+                type="button"
+                className="workspace-tab"
+                onClick={onOpenCurrentNetworkFunctional}
+              >
+                <span className="action-button-icon is-harness-assembly" aria-hidden="true" />
+                Functional
+              </button>
+            )}
             <NetworkSummaryExportMenu
               canvasExportFormat={canvasExportFormat}
               canExportCanvas={nodes.length > 0}

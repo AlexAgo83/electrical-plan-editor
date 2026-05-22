@@ -38,6 +38,7 @@ interface FunctionalSchematicPanelProps {
   exportCartoucheCreatedAt?: string;
   exportCartoucheLogoUrl?: string;
   exportCartoucheNotes?: string;
+  onOpenActiveNetworkInModeling?: () => void;
 }
 
 interface FunctionalNodePosition {
@@ -709,7 +710,8 @@ export function FunctionalSchematicPanel({
   exportCartoucheProjectCode,
   exportCartoucheCreatedAt,
   exportCartoucheLogoUrl,
-  exportCartoucheNotes
+  exportCartoucheNotes,
+  onOpenActiveNetworkInModeling
 }: FunctionalSchematicPanelProps): ReactElement {
   const [activeFilter, setActiveFilter] = useState<FunctionalDomainFilter>("all");
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null);
@@ -844,6 +846,16 @@ export function FunctionalSchematicPanel({
             <span className="network-summary-grid-icon" aria-hidden="true" />
             Grid
           </button>
+          {onOpenActiveNetworkInModeling === undefined ? null : (
+            <button
+              type="button"
+              className="workspace-tab"
+              onClick={onOpenActiveNetworkInModeling}
+            >
+              <span className="action-button-icon is-network-scope" aria-hidden="true" />
+              Active network
+            </button>
+          )}
           <button
             type="button"
             className="workspace-tab network-summary-export-button"

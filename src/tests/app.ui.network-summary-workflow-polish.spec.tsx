@@ -336,6 +336,12 @@ describe("App integration UI - network summary workflow polish", () => {
     const verticalFlowMatch = functionalEdgePathData.match(/^M\s+\S+\s+(\S+)\s+C\s+\S+\s+(\S+)/);
     expect(verticalFlowMatch).not.toBeNull();
     expect(Number(verticalFlowMatch?.[2])).toBeGreaterThan(Number(verticalFlowMatch?.[1]));
+    const functionalActions = within(functionalPanel).getByRole("group", { name: "Functional schematic actions" });
+    expect(within(functionalActions).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
+      "Grid",
+      "Active network",
+      "Export SVG"
+    ]);
     expect(within(functionalPanel).getByRole("button", { name: "Export SVG" })).toBeEnabled();
     expect(within(functionalPanel).getByRole("button", { name: "Signal" })).toBeInTheDocument();
     expect(within(functionalPanel).getByRole("button", { name: "12V power" })).toBeInTheDocument();
@@ -344,6 +350,18 @@ describe("App integration UI - network summary workflow polish", () => {
 
     fireEvent.click(within(functionalPanel).getByRole("button", { name: "CAN" }));
     expect(functionalPanel).toHaveTextContent("W-1");
+
+    fireEvent.click(within(functionalPanel).getByRole("button", { name: "Active network" }));
+    const networkSummary = getPanelByHeading("Network summary");
+    const networkSummaryActions = within(networkSummary).getByRole("group", { name: "Network summary display options" });
+    expect(within(networkSummaryActions).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
+      "Edit",
+      "View",
+      "Functional",
+      "Export"
+    ]);
+    fireEvent.click(within(networkSummaryActions).getByRole("button", { name: "Functional" }));
+    expect(getCurrentNetworkFunctionalPanel("Main network sample")).toBeInTheDocument();
   });
 
   it("uses a persisted explicit harness assembly picker and decouples the assembly graph from active network changes", async () => {
