@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ReactElement } from "react";
+import { useCallback, useMemo, useRef, useState, type ReactElement } from "react";
 import type { CatalogItem, Connector, ConnectorId, Network, Segment, Splice, SpliceId, Wire } from "../../../core/entities";
 import {
   buildFunctionalSchematicGraph,
@@ -11,7 +11,9 @@ import {
 import { CABLE_COLOR_BY_ID, getWireColorCode, getWireColorLabel } from "../../../core/cableColors";
 import type { ThemeMode } from "../../../store";
 import type { CanvasExportFormat } from "../../types/app-controller";
-import { useNetworkSummaryExportActions } from "./export/useNetworkSummaryExportActions";
+import { getThemeClassNames } from "../../lib/themeModes";
+import { SvgExportPreviewDialog } from "../dialogs/SvgExportPreviewDialog";
+import { type SvgPreviewOptions, useNetworkSummaryExportActions } from "./export/useNetworkSummaryExportActions";
 
 interface FunctionalSchematicPanelProps {
   network: Pick<Network, "name" | "voltageV" | "createdAt" | "author" | "projectCode" | "logoUrl" | "exportNotes"> | null;
@@ -40,6 +42,7 @@ interface FunctionalSchematicPanelProps {
   exportCartoucheCreatedAt?: string;
   exportCartoucheLogoUrl?: string;
   exportCartoucheNotes?: string;
+  showSvgPreviewDecorationOptions?: boolean;
   onOpenActiveNetworkInModeling?: () => void;
   onOpenOnboardingHelp?: () => void;
   onboardingPanelKey?: string;
@@ -716,6 +719,7 @@ export function FunctionalSchematicPanel({
   exportCartoucheCreatedAt,
   exportCartoucheLogoUrl,
   exportCartoucheNotes,
+  showSvgPreviewDecorationOptions = true,
   onOpenActiveNetworkInModeling,
   onOpenOnboardingHelp,
   onboardingPanelKey
@@ -812,7 +816,13 @@ export function FunctionalSchematicPanel({
     baseSvgHeight,
     ...edgeRenderModels.map((edge) => edge.labelY + edge.labelBoxHeight / 2 + FUNCTIONAL_LAYOUT_MARGIN_TOP)
   );
-  const { handleExportPlan } = useNetworkSummaryExportActions({
+  const {
+    activeSvgPreview,
+    createSvgPreview,
+    handleCloseSvgPreview,
+    handleDownloadSvgPreview,
+    handleExportPlan
+  } = useNetworkSummaryExportActions({
     networkSvgRef: svgRef,
     networkCanvasShellRef: shellRef,
     canvasExportFormat,
@@ -830,6 +840,24 @@ export function FunctionalSchematicPanel({
     exportCartoucheLogoUrl: exportCartoucheLogoUrl ?? network?.logoUrl,
     exportCartoucheNotes: exportCartoucheNotes ?? network?.exportNotes
   });
+  const dialogThemeHostClassName = ["app-shell", ...getThemeClassNames(themeMode)].join(" ");
+  const handlePreviewOptionsChange = useCallback(
+    (options: SvgPreviewOptions) => {
+      void createSvgPreview(options);
+    },
+    [createSvgPreview]
+  );
+  const handleRefreshPreview = useCallback(() => {
+    void createSvgPreview(
+      activeSvgPreview === null
+        ? undefined
+        : {
+            includeFrame: activeSvgPreview.includeFrame,
+            includeCartouche: activeSvgPreview.includeCartouche,
+            themeMode: activeSvgPreview.themeMode
+          }
+    );
+  }, [activeSvgPreview, createSvgPreview]);
   const canExport = graph.nodes.length > 0;
   return (
     <section
@@ -1008,6 +1036,16 @@ export function FunctionalSchematicPanel({
           {graph.warnings.length > 6 ? <p>{graph.warnings.length - 6} additional warnings hidden.</p> : null}
         </div>
       ) : null}
+      <SvgExportPreviewDialog
+        isOpen={activeSvgPreview !== null}
+        themeHostClassName={dialogThemeHostClassName}
+        showDecorationOptions={showSvgPreviewDecorationOptions}
+        preview={activeSvgPreview}
+        onPreviewOptionsChange={handlePreviewOptionsChange}
+        onFitNetwork={handleRefreshPreview}
+        onConfirm={handleDownloadSvgPreview}
+        onCancel={handleCloseSvgPreview}
+      />
     </section>
   );
 }

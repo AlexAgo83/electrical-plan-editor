@@ -578,11 +578,12 @@ export function useAppControllerNetworkSummaryPanelDomain({
         canvasExportFormat={preferencesState.canvasExportFormat}
         themeMode={preferencesState.themeMode}
         pngExportIncludeBackground={preferencesState.canvasPngExportIncludeBackground}
-        exportIncludeFrame={preferencesState.canvasExportIncludeFrame}
-        exportIncludeCartouche={preferencesState.canvasExportIncludeCartouche}
+        exportIncludeFrame={false}
+        exportIncludeCartouche={false}
         exportCartoucheName={`${displayedHarnessAssembly.name} functional schematic`}
         exportCartoucheProjectCode={displayedHarnessAssembly.technicalId}
         exportCartoucheCreatedAt={displayedHarnessAssembly.createdAt}
+        showSvgPreviewDecorationOptions={false}
         onboardingPanelKey="harness-assembly-functional"
       />
     );
@@ -603,8 +604,9 @@ export function useAppControllerNetworkSummaryPanelDomain({
       canvasExportFormat={preferencesState.canvasExportFormat}
       themeMode={preferencesState.themeMode}
       pngExportIncludeBackground={preferencesState.canvasPngExportIncludeBackground}
-      exportIncludeFrame={preferencesState.canvasExportIncludeFrame}
-      exportIncludeCartouche={preferencesState.canvasExportIncludeCartouche}
+      exportIncludeFrame={false}
+      exportIncludeCartouche={false}
+      showSvgPreviewDecorationOptions={false}
       onOpenActiveNetworkInModeling={handleOpenActiveNetworkInModeling}
       onboardingPanelKey="harness-assembly-current-network-functional"
     />

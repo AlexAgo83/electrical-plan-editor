@@ -6,6 +6,7 @@ import type { SvgExportPreviewState, SvgPreviewOptions } from "../network-summar
 interface SvgExportPreviewDialogProps {
   isOpen: boolean;
   themeHostClassName?: string;
+  showDecorationOptions?: boolean;
   preview: SvgExportPreviewState | null;
   onPreviewOptionsChange: (options: SvgPreviewOptions) => void;
   onFitNetwork: () => void;
@@ -24,6 +25,7 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
 export function SvgExportPreviewDialog({
   isOpen,
   themeHostClassName,
+  showDecorationOptions = true,
   preview,
   onPreviewOptionsChange,
   onFitNetwork,
@@ -156,14 +158,22 @@ export function SvgExportPreviewDialog({
           </div>
         </header>
         <div className="svg-preview-toolbar" aria-label="SVG preview options">
-          <label className="settings-checkbox-row">
-            <input type="checkbox" checked={preview.includeFrame} onChange={(event) => handleFrameChange(event.target.checked)} />
-            <span>Include frame</span>
-          </label>
-          <label className="settings-checkbox-row">
-            <input type="checkbox" checked={preview.includeCartouche} onChange={(event) => handleCartoucheChange(event.target.checked)} />
-            <span>Include identity</span>
-          </label>
+          {showDecorationOptions ? (
+            <>
+              <label className="settings-checkbox-row">
+                <input type="checkbox" checked={preview.includeFrame} onChange={(event) => handleFrameChange(event.target.checked)} />
+                <span>Include frame</span>
+              </label>
+              <label className="settings-checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={preview.includeCartouche}
+                  onChange={(event) => handleCartoucheChange(event.target.checked)}
+                />
+                <span>Include identity</span>
+              </label>
+            </>
+          ) : null}
           <label className="svg-preview-theme-field">
             <span>Theme</span>
             <select value={preview.themeMode} onChange={(event) => handleThemeChange(event.target.value as ThemeMode)}>

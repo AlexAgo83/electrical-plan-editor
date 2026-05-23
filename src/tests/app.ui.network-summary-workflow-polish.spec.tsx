@@ -285,7 +285,7 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(within(analysisQuickNavPanel).getByRole("button", { name: /Wires/i })).toBeInTheDocument();
   });
 
-  it("renders a read-only functional schematic trace with filters and export action", () => {
+  it("renders a read-only functional schematic trace with filters and export action", async () => {
     const baseState = createUiIntegrationState();
     const withFuseCatalog = appReducer(
       baseState,
@@ -367,7 +367,18 @@ describe("App integration UI - network summary workflow polish", () => {
       "Active network",
       "Export SVG"
     ]);
-    expect(within(functionalPanel).getByRole("button", { name: "Export SVG" })).toBeEnabled();
+    const exportSvgButton = within(functionalPanel).getByRole("button", { name: "Export SVG" });
+    expect(exportSvgButton).toBeEnabled();
+    fireEvent.click(exportSvgButton);
+    const previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
+    expect(within(previewDialog).getByLabelText("SVG export preview")).toBeInTheDocument();
+    expect(within(previewDialog).queryByLabelText("Include frame")).not.toBeInTheDocument();
+    expect(within(previewDialog).queryByLabelText("Include identity")).not.toBeInTheDocument();
+    expect(within(previewDialog).getByLabelText("Theme")).toBeInTheDocument();
+    const previewSvg = within(previewDialog).getByLabelText("SVG export preview").querySelector("svg");
+    expect(previewSvg?.outerHTML).not.toContain('class="network-export-frame"');
+    expect(previewSvg?.outerHTML).not.toContain('class="network-export-cartouche"');
+    fireEvent.click(within(previewDialog).getByRole("button", { name: "Cancel" }));
     expect(within(functionalPanel).queryByRole("button", { name: "Help" })).not.toBeInTheDocument();
     expect(within(functionalPanel).getByRole("button", { name: "Signal" })).toBeInTheDocument();
     expect(within(functionalPanel).getByRole("button", { name: "12V power" })).toBeInTheDocument();
