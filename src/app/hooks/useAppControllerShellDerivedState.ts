@@ -1,5 +1,6 @@
 import { useMemo, type CSSProperties } from "react";
 import { clamp, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE } from "../lib/app-utils-shared";
+import { getThemeClassNames } from "../lib/themeModes";
 import type { ThemeMode } from "../../store";
 import type { TableDensity, TableFontSize, WorkspacePanelsLayoutMode } from "../types/app-controller";
 
@@ -22,39 +23,7 @@ export function useAppControllerShellDerivedState({
   headerOffsetPx,
   canvasResetZoomPercentInput
 }: UseAppControllerShellDerivedStateParams) {
-  const themeClassNamesByMode: Record<ThemeMode, string[]> = {
-    normal: ["theme-normal"],
-    dark: ["theme-dark"],
-    slateNeon: ["theme-dark", "theme-slate-neon"],
-    paperBlueprint: ["theme-normal", "theme-paper-blueprint"],
-    warmBrown: ["theme-normal", "theme-warm-brown"],
-    deepGreen: ["theme-dark", "theme-deep-green"],
-    roseQuartz: ["theme-normal", "theme-paper-blueprint", "theme-rose-quartz"],
-    burgundyNoir: ["theme-dark", "theme-burgundy-noir"],
-    lavenderHaze: ["theme-normal", "theme-paper-blueprint", "theme-lavender-haze"],
-    amberNight: ["theme-dark", "theme-deep-green", "theme-amber-night"],
-    cyberpunk: ["theme-dark", "theme-amber-night", "theme-cyberpunk"],
-    olive: ["theme-dark", "theme-deep-green", "theme-olive"],
-    mistGray: ["theme-mist-gray"],
-    sagePaper: ["theme-sage-paper"],
-    sandSlate: ["theme-sand-slate"],
-    iceBlue: ["theme-ice-blue"],
-    softTeal: ["theme-soft-teal"],
-    dustyRose: ["theme-dusty-rose"],
-    paleOlive: ["theme-pale-olive"],
-    cloudLavender: ["theme-cloud-lavender"],
-    steelBlue: ["theme-steel-blue"],
-    forestGraphite: ["theme-forest-graphite"],
-    petrolSlate: ["theme-petrol-slate"],
-    copperNight: ["theme-copper-night"],
-    mossTaupe: ["theme-moss-taupe"],
-    navyAsh: ["theme-navy-ash"],
-    charcoalPlum: ["theme-charcoal-plum"],
-    smokedTeal: ["theme-smoked-teal"],
-    circleMobilityLight: ["theme-sage-paper", "theme-circle-mobility-light"],
-    circleMobilityDark: ["theme-petrol-slate", "theme-circle-mobility-dark"]
-  };
-  const resolvedThemeClassNames = themeClassNamesByMode[themeMode] ?? themeClassNamesByMode.normal;
+  const resolvedThemeClassNames = getThemeClassNames(themeMode);
   const appShellClassName = [
     "app-shell",
     tableDensity === "compact" ? "table-density-compact" : "",

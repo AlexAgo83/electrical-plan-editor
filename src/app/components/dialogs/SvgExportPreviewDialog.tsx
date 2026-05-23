@@ -1,11 +1,13 @@
 import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
-import type { SvgExportPreviewState } from "../network-summary/export/useNetworkSummaryExportActions";
+import type { ThemeMode } from "../../../store";
+import { getThemeClassNames, THEME_MODE_OPTIONS } from "../../lib/themeModes";
+import type { SvgExportPreviewState, SvgPreviewOptions } from "../network-summary/export/useNetworkSummaryExportActions";
 
 interface SvgExportPreviewDialogProps {
   isOpen: boolean;
   themeHostClassName?: string;
   preview: SvgExportPreviewState | null;
-  onPreviewOptionsChange: (options: { includeFrame: boolean; includeCartouche: boolean }) => void;
+  onPreviewOptionsChange: (options: SvgPreviewOptions) => void;
   onFitNetwork: () => void;
   onConfirm: () => void;
   onCancel: () => void;
@@ -95,15 +97,27 @@ export function SvgExportPreviewDialog({
   };
 
   const handleFrameChange = (includeFrame: boolean): void => {
-    onPreviewOptionsChange({ includeFrame, includeCartouche: preview.includeCartouche });
+    onPreviewOptionsChange({ includeFrame, includeCartouche: preview.includeCartouche, themeMode: preview.themeMode });
   };
 
   const handleCartoucheChange = (includeCartouche: boolean): void => {
-    onPreviewOptionsChange({ includeFrame: preview.includeFrame, includeCartouche });
+    onPreviewOptionsChange({ includeFrame: preview.includeFrame, includeCartouche, themeMode: preview.themeMode });
   };
 
+  const handleThemeChange = (themeMode: ThemeMode): void => {
+    onPreviewOptionsChange({ includeFrame: preview.includeFrame, includeCartouche: preview.includeCartouche, themeMode });
+  };
+  const layerClassName = [
+    "confirm-dialog-layer",
+    "app-shell",
+    ...getThemeClassNames(preview.themeMode),
+    themeHostClassName ?? ""
+  ]
+    .filter((token) => token.length > 0)
+    .join(" ");
+
   return (
-    <div className={themeHostClassName ? `confirm-dialog-layer ${themeHostClassName}` : "confirm-dialog-layer"} role="presentation">
+    <div className={layerClassName} role="presentation">
       <button type="button" className="confirm-dialog-backdrop" aria-label="Close SVG preview" onClick={onCancel} />
       <section
         ref={dialogRef}
@@ -138,6 +152,16 @@ export function SvgExportPreviewDialog({
           <label className="settings-checkbox-row">
             <input type="checkbox" checked={preview.includeCartouche} onChange={(event) => handleCartoucheChange(event.target.checked)} />
             <span>Include identity</span>
+          </label>
+          <label className="svg-preview-theme-field">
+            <span>Theme</span>
+            <select value={preview.themeMode} onChange={(event) => handleThemeChange(event.target.value as ThemeMode)}>
+              {THEME_MODE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </label>
           <button type="button" className="workspace-tab" onClick={onFitNetwork}>
             Fit network

@@ -252,6 +252,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     nodeShapeSizePercent: params.nodeShapeSizePercent,
     resizeBehaviorMode: params.resizeBehaviorMode,
     canvasExportFormat: params.canvasExportFormat,
+    themeMode: params.themeMode,
     exportIncludeFrame: params.exportIncludeFrame,
     setExportIncludeFrame: params.setExportIncludeFrame,
     exportIncludeCartouche: params.exportIncludeCartouche,

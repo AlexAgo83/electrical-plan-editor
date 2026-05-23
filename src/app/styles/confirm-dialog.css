@@ -266,6 +266,17 @@
   gap: 0.55rem 0.85rem;
 }
 
+.svg-preview-theme-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+}
+
+.svg-preview-theme-field select {
+  min-width: 12rem;
+}
+
 .svg-preview-shell {
   min-height: 16rem;
   max-height: min(30rem, calc(100vh - 17rem));

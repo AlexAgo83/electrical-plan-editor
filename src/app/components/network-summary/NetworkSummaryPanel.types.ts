@@ -13,7 +13,7 @@ import type {
   Wire
 } from "../../../core/entities";
 import type { ShortestRouteResult } from "../../../core/pathfinding";
-import type { SubNetworkSummary } from "../../../store";
+import type { SubNetworkSummary, ThemeMode } from "../../../store";
 import type {
   CanvasCalloutTextSize,
   CanvasExportFormat,
@@ -50,6 +50,7 @@ export interface NetworkSummaryPanelProps {
   labelRotationDegrees: CanvasLabelRotationDegrees;
   autoSegmentLabelRotation: boolean;
   canvasExportFormat: CanvasExportFormat;
+  themeMode: ThemeMode;
   exportIncludeFrame: boolean;
   setExportIncludeFrame: (value: boolean) => void;
   exportIncludeCartouche: boolean;

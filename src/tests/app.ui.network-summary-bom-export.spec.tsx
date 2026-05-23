@@ -215,7 +215,14 @@ describe("App integration UI - network summary BOM export", () => {
       expect(includeIdentityToggle).toBeChecked();
       expect(clickSpy).not.toHaveBeenCalled();
 
-      fireEvent.click(includeFrameToggle);
+      const themeSelect = within(previewDialog).getByLabelText("Theme");
+      expect(themeSelect).toHaveValue("warmBrown");
+      fireEvent.change(themeSelect, { target: { value: "dark" } });
+      previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
+      expect(within(previewDialog).getByLabelText("Theme")).toHaveValue("dark");
+      expect(previewDialog.parentElement).toHaveClass("theme-dark");
+
+      fireEvent.click(within(previewDialog).getByLabelText("Include frame"));
       previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
       expect(within(previewDialog).getByLabelText("Include frame")).toBeChecked();
       fireEvent.click(within(previewDialog).getByRole("button", { name: "Fit network" }));

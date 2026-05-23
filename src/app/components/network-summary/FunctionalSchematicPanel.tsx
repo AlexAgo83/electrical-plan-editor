@@ -9,6 +9,7 @@ import {
   type FunctionalTraceSeed
 } from "../../../core/functionalSchematic";
 import { CABLE_COLOR_BY_ID, getWireColorCode, getWireColorLabel } from "../../../core/cableColors";
+import type { ThemeMode } from "../../../store";
 import type { CanvasExportFormat } from "../../types/app-controller";
 import { useNetworkSummaryExportActions } from "./export/useNetworkSummaryExportActions";
 
@@ -29,6 +30,7 @@ interface FunctionalSchematicPanelProps {
   selectedConnectorId: ConnectorId | null;
   selectedSpliceId: SpliceId | null;
   canvasExportFormat: CanvasExportFormat;
+  themeMode: ThemeMode;
   pngExportIncludeBackground: boolean;
   exportIncludeFrame: boolean;
   exportIncludeCartouche: boolean;
@@ -704,6 +706,7 @@ export function FunctionalSchematicPanel({
   selectedConnectorId,
   selectedSpliceId,
   canvasExportFormat,
+  themeMode,
   pngExportIncludeBackground,
   exportIncludeFrame,
   exportIncludeCartouche,
@@ -816,6 +819,7 @@ export function FunctionalSchematicPanel({
     networkOffset: { x: 0, y: 0 },
     networkScale: 1,
     renderedNetworkScale: 1,
+    themeMode,
     pngExportIncludeBackground,
     exportIncludeFrame,
     exportIncludeCartouche,

@@ -44,6 +44,7 @@ import {
   buildRenderedSegments
 } from "./network-summary/graph/networkSummaryGraphModel";
 import {
+  type SvgPreviewOptions,
   useNetworkSummaryExportActions
 } from "./network-summary/export/useNetworkSummaryExportActions";
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
@@ -52,11 +53,6 @@ import { snapToGrid } from "../lib/app-utils-shared";
 import type { NetworkSummaryPanelProps } from "./network-summary/NetworkSummaryPanel.types";
 
 const CALLOUT_DRAG_START_THRESHOLD_PX = 4;
-
-interface SvgPreviewOptions {
-  includeFrame: boolean;
-  includeCartouche: boolean;
-}
 
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -85,6 +81,7 @@ export function NetworkSummaryPanel({
   labelRotationDegrees,
   autoSegmentLabelRotation,
   canvasExportFormat,
+  themeMode,
   exportIncludeFrame,
   setExportIncludeFrame,
   exportIncludeCartouche,
@@ -620,6 +617,7 @@ export function NetworkSummaryPanel({
     networkOffset,
     networkScale: effectiveScale,
     renderedNetworkScale: effectiveRenderScale,
+    themeMode,
     pngExportIncludeBackground,
     exportIncludeFrame,
     exportIncludeCartouche,
@@ -633,8 +631,12 @@ export function NetworkSummaryPanel({
 
   const handleSvgPreviewOptionsChange = useCallback(
     (options: SvgPreviewOptions) => {
-      setExportIncludeFrame(options.includeFrame);
-      setExportIncludeCartouche(options.includeCartouche);
+      if (options.includeFrame !== undefined) {
+        setExportIncludeFrame(options.includeFrame);
+      }
+      if (options.includeCartouche !== undefined) {
+        setExportIncludeCartouche(options.includeCartouche);
+      }
       void createSvgPreview(options);
     },
     [createSvgPreview, setExportIncludeCartouche, setExportIncludeFrame]
@@ -645,15 +647,17 @@ export function NetworkSummaryPanel({
       activeSvgPreview === null
         ? {
             includeFrame: exportIncludeFrame,
-            includeCartouche: exportIncludeCartouche
+            includeCartouche: exportIncludeCartouche,
+            themeMode
           }
         : {
             includeFrame: activeSvgPreview.includeFrame,
-            includeCartouche: activeSvgPreview.includeCartouche
+            includeCartouche: activeSvgPreview.includeCartouche,
+            themeMode: activeSvgPreview.themeMode
           }
     );
     fitNetworkToContent();
-  }, [activeSvgPreview, exportIncludeCartouche, exportIncludeFrame, fitNetworkToContent]);
+  }, [activeSvgPreview, exportIncludeCartouche, exportIncludeFrame, fitNetworkToContent, themeMode]);
 
   useEffect(() => {
     if (pendingFitSvgPreviewOptions === null) {
@@ -992,6 +996,7 @@ export function NetworkSummaryPanel({
           selectedConnectorId={selectedConnectorId}
           selectedSpliceId={selectedSpliceId}
           canvasExportFormat={canvasExportFormat}
+          themeMode={themeMode}
           pngExportIncludeBackground={pngExportIncludeBackground}
           exportIncludeFrame={exportIncludeFrame}
           exportIncludeCartouche={exportIncludeCartouche}

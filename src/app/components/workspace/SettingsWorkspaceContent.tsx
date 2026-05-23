@@ -2,6 +2,7 @@ import type { ChangeEvent, ReactElement, RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
+import { THEME_MODE_OPTIONS } from "../../lib/themeModes";
 import type {
   AppLocale,
   CanvasCalloutTextSize,
@@ -571,36 +572,11 @@ export function SettingsWorkspaceContent({
           <label className="settings-field">
             Theme mode
             <select value={themeMode} onChange={(event) => setThemeMode(event.target.value as ThemeMode)}>
-              <option value="normal">Light</option>
-              <option value="paperBlueprint">Paper Blueprint (Light)</option>
-              <option value="warmBrown">Warm Brown (Light)</option>
-              <option value="mistGray">Mist Gray (Light)</option>
-              <option value="sagePaper">Sage Paper (Light)</option>
-              <option value="sandSlate">Sand Slate (Light)</option>
-              <option value="iceBlue">Ice Blue (Light)</option>
-              <option value="softTeal">Soft Teal (Light)</option>
-              <option value="dustyRose">Dusty Rose (Light)</option>
-              <option value="paleOlive">Pale Olive (Light)</option>
-              <option value="cloudLavender">Cloud Lavender (Light)</option>
-              <option value="roseQuartz">Rose Quartz (Light)</option>
-              <option value="lavenderHaze">Lavender Haze (Light)</option>
-              <option value="circleMobilityLight">Circle Mobility (Light)</option>
-              <option value="dark">Dark</option>
-              <option value="slateNeon">Slate Neon (Dark)</option>
-              <option value="deepGreen">Deep Green (Dark)</option>
-              <option value="burgundyNoir">Burgundy Noir (Dark)</option>
-              <option value="amberNight">Amber Night (Dark)</option>
-              <option value="cyberpunk">Cyberpunk (Dark)</option>
-              <option value="olive">Olive (Dark)</option>
-              <option value="steelBlue">Steel Blue (Dark)</option>
-              <option value="forestGraphite">Forest Graphite (Dark)</option>
-              <option value="petrolSlate">Petrol Slate (Dark)</option>
-              <option value="copperNight">Copper Night (Dark)</option>
-              <option value="mossTaupe">Moss Taupe (Dark)</option>
-              <option value="navyAsh">Navy Ash (Dark)</option>
-              <option value="charcoalPlum">Charcoal Plum (Dark)</option>
-              <option value="smokedTeal">Smoked Teal (Dark)</option>
-              <option value="circleMobilityDark">Circle Mobility (Dark)</option>
+              {THEME_MODE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </label>
           <label className="settings-field">

@@ -1,6 +1,8 @@
 import { useCallback, useRef, useState, type RefObject } from "react";
+import type { ThemeMode } from "../../../../store";
 import type { CanvasExportFormat } from "../../../types/app-controller";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
+import { getThemeClassNames } from "../../../lib/themeModes";
 import {
   applyExportDecorations,
   copyComputedStylesToSvgClone,
@@ -16,6 +18,7 @@ interface UseNetworkSummaryExportActionsParams {
   networkOffset: { x: number; y: number };
   networkScale: number;
   renderedNetworkScale: number;
+  themeMode: ThemeMode;
   pngExportIncludeBackground: boolean;
   exportIncludeFrame: boolean;
   exportIncludeCartouche: boolean;
@@ -39,6 +42,13 @@ export interface SvgExportPreviewState {
   exportHeight: number;
   includeFrame: boolean;
   includeCartouche: boolean;
+  themeMode: ThemeMode;
+}
+
+export interface SvgPreviewOptions {
+  includeFrame?: boolean;
+  includeCartouche?: boolean;
+  themeMode?: ThemeMode;
 }
 
 function prepareSvgCloneForExport(sourceSvg: SVGSVGElement): PreparedSvgExport {
@@ -63,6 +73,37 @@ function prepareSvgCloneForExport(sourceSvg: SVGSVGElement): PreparedSvgExport {
   };
 }
 
+async function withThemedSourceSvg<T>(
+  sourceSvg: SVGSVGElement,
+  themeMode: ThemeMode,
+  callback: (themedSourceSvg: SVGSVGElement) => Promise<T>
+): Promise<T> {
+  if (typeof document === "undefined") {
+    return callback(sourceSvg);
+  }
+
+  const sourceRect = sourceSvg.getBoundingClientRect();
+  const host = document.createElement("div");
+  host.className = ["app-shell", ...getThemeClassNames(themeMode)].join(" ");
+  host.style.position = "fixed";
+  host.style.left = "-100000px";
+  host.style.top = "0";
+  host.style.width = `${Math.max(1, Math.round(sourceRect.width || sourceSvg.viewBox.baseVal.width || 1))}px`;
+  host.style.height = `${Math.max(1, Math.round(sourceRect.height || sourceSvg.viewBox.baseVal.height || 1))}px`;
+  host.style.visibility = "hidden";
+  host.style.pointerEvents = "none";
+  host.style.overflow = "hidden";
+
+  const themedSourceSvg = sourceSvg.cloneNode(true) as SVGSVGElement;
+  host.appendChild(themedSourceSvg);
+  document.body.appendChild(host);
+  try {
+    return await callback(themedSourceSvg);
+  } finally {
+    host.remove();
+  }
+}
+
 export function useNetworkSummaryExportActions({
   networkSvgRef,
   networkCanvasShellRef,
@@ -70,6 +111,7 @@ export function useNetworkSummaryExportActions({
   networkOffset,
   networkScale,
   renderedNetworkScale,
+  themeMode,
   pngExportIncludeBackground,
   exportIncludeFrame,
   exportIncludeCartouche,
@@ -83,42 +125,44 @@ export function useNetworkSummaryExportActions({
   const [activeSvgPreview, setActiveSvgPreview] = useState<SvgExportPreviewState | null>(null);
   const svgPreviewRequestIdRef = useRef(0);
 
-  const prepareDecoratedSvgClone = useCallback(async (options?: { includeFrame?: boolean; includeCartouche?: boolean }) => {
+  const prepareDecoratedSvgClone = useCallback(async (options?: SvgPreviewOptions) => {
     const sourceSvg = networkSvgRef.current;
     if (sourceSvg === null) {
       return null;
     }
 
-    const { svgClone, exportWidth, exportHeight } = prepareSvgCloneForExport(sourceSvg);
-    copyComputedStylesToSvgClone(sourceSvg, svgClone);
-    removeGlobalRenderScaleFromSvgClone({
-      cloneSvg: svgClone,
-      networkOffset,
-      networkScale,
-      renderedNetworkScale,
-      width: exportWidth,
-      height: exportHeight
-    });
-    await applyExportDecorations({
-      sourceSvg,
-      cloneSvg: svgClone,
-      width: exportWidth,
-      height: exportHeight,
-      includeFrame: options?.includeFrame ?? exportIncludeFrame,
-      includeCartouche: options?.includeCartouche ?? exportIncludeCartouche,
-      cartoucheNetworkName: exportCartoucheNetworkName,
-      cartoucheAuthor: exportCartoucheAuthor,
-      cartoucheProjectCode: exportCartoucheProjectCode,
-      cartoucheCreatedAt: exportCartoucheCreatedAt,
-      cartoucheLogoUrl: exportCartoucheLogoUrl,
-      cartoucheNotes: exportCartoucheNotes
-    });
+    return withThemedSourceSvg(sourceSvg, options?.themeMode ?? themeMode, async (themedSourceSvg) => {
+      const { svgClone, exportWidth, exportHeight } = prepareSvgCloneForExport(themedSourceSvg);
+      copyComputedStylesToSvgClone(themedSourceSvg, svgClone);
+      removeGlobalRenderScaleFromSvgClone({
+        cloneSvg: svgClone,
+        networkOffset,
+        networkScale,
+        renderedNetworkScale,
+        width: exportWidth,
+        height: exportHeight
+      });
+      await applyExportDecorations({
+        sourceSvg: themedSourceSvg,
+        cloneSvg: svgClone,
+        width: exportWidth,
+        height: exportHeight,
+        includeFrame: options?.includeFrame ?? exportIncludeFrame,
+        includeCartouche: options?.includeCartouche ?? exportIncludeCartouche,
+        cartoucheNetworkName: exportCartoucheNetworkName,
+        cartoucheAuthor: exportCartoucheAuthor,
+        cartoucheProjectCode: exportCartoucheProjectCode,
+        cartoucheCreatedAt: exportCartoucheCreatedAt,
+        cartoucheLogoUrl: exportCartoucheLogoUrl,
+        cartoucheNotes: exportCartoucheNotes
+      });
 
-    return {
-      svgClone,
-      exportWidth,
-      exportHeight
-    };
+      return {
+        svgClone,
+        exportWidth,
+        exportHeight
+      };
+    });
   }, [
     exportCartoucheAuthor,
     exportCartoucheCreatedAt,
@@ -131,7 +175,8 @@ export function useNetworkSummaryExportActions({
     networkSvgRef,
     networkOffset,
     networkScale,
-    renderedNetworkScale
+    renderedNetworkScale,
+    themeMode
   ]);
 
   const downloadSvgMarkup = useCallback((svgMarkup: string) => {
@@ -155,12 +200,13 @@ export function useNetworkSummaryExportActions({
   }, []);
 
   const createSvgPreview = useCallback(
-    async (options?: { includeFrame?: boolean; includeCartouche?: boolean }) => {
+    async (options?: SvgPreviewOptions) => {
       const requestId = svgPreviewRequestIdRef.current + 1;
       svgPreviewRequestIdRef.current = requestId;
       const includeFrame = options?.includeFrame ?? exportIncludeFrame;
       const includeCartouche = options?.includeCartouche ?? exportIncludeCartouche;
-      const prepared = await prepareDecoratedSvgClone({ includeFrame, includeCartouche });
+      const previewThemeMode = options?.themeMode ?? themeMode;
+      const prepared = await prepareDecoratedSvgClone({ includeFrame, includeCartouche, themeMode: previewThemeMode });
       if (prepared === null) {
         return null;
       }
@@ -174,12 +220,13 @@ export function useNetworkSummaryExportActions({
         exportWidth: prepared.exportWidth,
         exportHeight: prepared.exportHeight,
         includeFrame,
-        includeCartouche
+        includeCartouche,
+        themeMode: previewThemeMode
       };
       setActiveSvgPreview(preview);
       return preview;
     },
-    [exportIncludeCartouche, exportIncludeFrame, prepareDecoratedSvgClone]
+    [exportIncludeCartouche, exportIncludeFrame, prepareDecoratedSvgClone, themeMode]
   );
 
   const handleExportPlanAsSvg = useCallback(async () => {

@@ -125,6 +125,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
     | "canvasZoomInvariantNodeShapes"
     | "canvasNodeShapeSizePercent"
     | "canvasResizeBehaviorMode"
+    | "themeMode"
     | "canvasExportFormat"
     | "canvasExportIncludeFrame"
     | "setCanvasExportIncludeFrame"
@@ -342,6 +343,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         nodeShapeSizePercent: preferencesState.canvasNodeShapeSizePercent,
         resizeBehaviorMode: preferencesState.canvasResizeBehaviorMode,
         canvasExportFormat: preferencesState.canvasExportFormat,
+        themeMode: preferencesState.themeMode,
         exportIncludeFrame: preferencesState.canvasExportIncludeFrame,
         setExportIncludeFrame: preferencesState.setCanvasExportIncludeFrame,
         exportIncludeCartouche: preferencesState.canvasExportIncludeCartouche,
@@ -574,6 +576,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         selectedConnectorId={null}
         selectedSpliceId={null}
         canvasExportFormat={preferencesState.canvasExportFormat}
+        themeMode={preferencesState.themeMode}
         pngExportIncludeBackground={preferencesState.canvasPngExportIncludeBackground}
         exportIncludeFrame={preferencesState.canvasExportIncludeFrame}
         exportIncludeCartouche={preferencesState.canvasExportIncludeCartouche}
@@ -598,6 +601,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
       selectedConnectorId={selection.selectedConnectorId ?? mainHarnessConnectorIds[0] ?? null}
       selectedSpliceId={selection.selectedSpliceId}
       canvasExportFormat={preferencesState.canvasExportFormat}
+      themeMode={preferencesState.themeMode}
       pngExportIncludeBackground={preferencesState.canvasPngExportIncludeBackground}
       exportIncludeFrame={preferencesState.canvasExportIncludeFrame}
       exportIncludeCartouche={preferencesState.canvasExportIncludeCartouche}

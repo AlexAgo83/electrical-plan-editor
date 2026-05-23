@@ -1,0 +1,71 @@
+import type { ThemeMode } from "../../store";
+
+export const THEME_CLASS_NAMES_BY_MODE: Record<ThemeMode, string[]> = {
+  normal: ["theme-normal"],
+  dark: ["theme-dark"],
+  slateNeon: ["theme-dark", "theme-slate-neon"],
+  paperBlueprint: ["theme-normal", "theme-paper-blueprint"],
+  warmBrown: ["theme-normal", "theme-warm-brown"],
+  deepGreen: ["theme-dark", "theme-deep-green"],
+  roseQuartz: ["theme-normal", "theme-paper-blueprint", "theme-rose-quartz"],
+  burgundyNoir: ["theme-dark", "theme-burgundy-noir"],
+  lavenderHaze: ["theme-normal", "theme-paper-blueprint", "theme-lavender-haze"],
+  amberNight: ["theme-dark", "theme-deep-green", "theme-amber-night"],
+  cyberpunk: ["theme-dark", "theme-amber-night", "theme-cyberpunk"],
+  olive: ["theme-dark", "theme-deep-green", "theme-olive"],
+  mistGray: ["theme-mist-gray"],
+  sagePaper: ["theme-sage-paper"],
+  sandSlate: ["theme-sand-slate"],
+  iceBlue: ["theme-ice-blue"],
+  softTeal: ["theme-soft-teal"],
+  dustyRose: ["theme-dusty-rose"],
+  paleOlive: ["theme-pale-olive"],
+  cloudLavender: ["theme-cloud-lavender"],
+  steelBlue: ["theme-steel-blue"],
+  forestGraphite: ["theme-forest-graphite"],
+  petrolSlate: ["theme-petrol-slate"],
+  copperNight: ["theme-copper-night"],
+  mossTaupe: ["theme-moss-taupe"],
+  navyAsh: ["theme-navy-ash"],
+  charcoalPlum: ["theme-charcoal-plum"],
+  smokedTeal: ["theme-smoked-teal"],
+  circleMobilityLight: ["theme-sage-paper", "theme-circle-mobility-light"],
+  circleMobilityDark: ["theme-petrol-slate", "theme-circle-mobility-dark"]
+};
+
+export const THEME_MODE_OPTIONS: Array<{ value: ThemeMode; label: string }> = [
+  { value: "normal", label: "Light" },
+  { value: "paperBlueprint", label: "Paper Blueprint (Light)" },
+  { value: "warmBrown", label: "Warm Brown (Light)" },
+  { value: "mistGray", label: "Mist Gray (Light)" },
+  { value: "sagePaper", label: "Sage Paper (Light)" },
+  { value: "sandSlate", label: "Sand Slate (Light)" },
+  { value: "iceBlue", label: "Ice Blue (Light)" },
+  { value: "softTeal", label: "Soft Teal (Light)" },
+  { value: "dustyRose", label: "Dusty Rose (Light)" },
+  { value: "paleOlive", label: "Pale Olive (Light)" },
+  { value: "cloudLavender", label: "Cloud Lavender (Light)" },
+  { value: "roseQuartz", label: "Rose Quartz (Light)" },
+  { value: "lavenderHaze", label: "Lavender Haze (Light)" },
+  { value: "circleMobilityLight", label: "Circle Mobility (Light)" },
+  { value: "dark", label: "Dark" },
+  { value: "slateNeon", label: "Slate Neon (Dark)" },
+  { value: "deepGreen", label: "Deep Green (Dark)" },
+  { value: "burgundyNoir", label: "Burgundy Noir (Dark)" },
+  { value: "amberNight", label: "Amber Night (Dark)" },
+  { value: "cyberpunk", label: "Cyberpunk (Dark)" },
+  { value: "olive", label: "Olive (Dark)" },
+  { value: "steelBlue", label: "Steel Blue (Dark)" },
+  { value: "forestGraphite", label: "Forest Graphite (Dark)" },
+  { value: "petrolSlate", label: "Petrol Slate (Dark)" },
+  { value: "copperNight", label: "Copper Night (Dark)" },
+  { value: "mossTaupe", label: "Moss Taupe (Dark)" },
+  { value: "navyAsh", label: "Navy Ash (Dark)" },
+  { value: "charcoalPlum", label: "Charcoal Plum (Dark)" },
+  { value: "smokedTeal", label: "Smoked Teal (Dark)" },
+  { value: "circleMobilityDark", label: "Circle Mobility (Dark)" }
+];
+
+export function getThemeClassNames(themeMode: ThemeMode): string[] {
+  return THEME_CLASS_NAMES_BY_MODE[themeMode] ?? THEME_CLASS_NAMES_BY_MODE.normal;
+}
