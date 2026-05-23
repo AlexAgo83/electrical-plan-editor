@@ -270,11 +270,20 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .svg-preview-theme-field select {
-  min-width: 12rem;
+  width: min(100%, 19rem);
+  min-width: 14rem;
+  max-width: 100%;
+  border: 1px solid #bacada;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #153048;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
 }
 
 .svg-preview-shell {

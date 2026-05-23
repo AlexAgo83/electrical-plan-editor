@@ -50,6 +50,7 @@ import {
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
 import { SvgExportPreviewDialog } from "./dialogs/SvgExportPreviewDialog";
 import { snapToGrid } from "../lib/app-utils-shared";
+import { getThemeClassNames } from "../lib/themeModes";
 import type { NetworkSummaryPanelProps } from "./network-summary/NetworkSummaryPanel.types";
 
 const CALLOUT_DRAG_START_THRESHOLD_PX = 4;
@@ -172,6 +173,7 @@ export function NetworkSummaryPanel({
     { label: "Graph segments", value: routingGraphSegmentCount },
     { label: "Adjacency entries", value: totalEdgeEntries }
   ];
+  const dialogThemeHostClassName = ["app-shell", ...getThemeClassNames(themeMode)].join(" ");
   const activeNetworkName = activeNetwork?.name.trim() ?? "";
   const globalRenderScale = 1 + clampNumber(globalRenderScalePercent, 0, 300) / 100;
   const effectiveScale = networkScale > 0 ? networkScale : 1;
@@ -1004,6 +1006,7 @@ export function NetworkSummaryPanel({
       ) : null}
       <SvgExportPreviewDialog
         isOpen={activeSvgPreview !== null}
+        themeHostClassName={dialogThemeHostClassName}
         preview={activeSvgPreview}
         onPreviewOptionsChange={handleSvgPreviewOptionsChange}
         onFitNetwork={handleFitNetworkAndRefreshSvgPreview}

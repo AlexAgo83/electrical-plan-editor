@@ -221,6 +221,7 @@ describe("App integration UI - network summary BOM export", () => {
       previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
       expect(within(previewDialog).getByLabelText("Theme")).toHaveValue("dark");
       expect(previewDialog.parentElement).not.toHaveClass("theme-dark");
+      expect(previewDialog.parentElement).toHaveClass("theme-warm-brown");
       const previewThemeHost = within(previewDialog).getByLabelText("SVG export preview").querySelector(".svg-preview-theme-host");
       expect(previewThemeHost).toHaveClass("theme-dark");
       const previewSvg = within(previewDialog).getByLabelText("SVG export preview").querySelector("svg");
