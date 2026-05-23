@@ -22,7 +22,7 @@ interface UseAppControllerAuxDomainAssemblyParams {
     handleSelectNetwork: AuxDomainsParams["networkScope"]["handleSelectNetwork"];
     handleWorkspaceScreenChange: (targetScreen: ScreenChangeTarget) => void;
     handleDuplicateNetwork: AuxDomainsParams["networkScope"]["handleDuplicateNetwork"];
-    handleSaveActiveNetworkWithConfirmation: AuxDomainsParams["networkScope"]["handleExportActiveNetwork"];
+    handleSaveNetworkWithConfirmation: AuxDomainsParams["networkScope"]["handleExportNetwork"];
     handleOpenImportPicker: AuxDomainsParams["networkScope"]["handleOpenImportPicker"];
     importFileInputRef: AuxDomainsParams["networkScope"]["importFileInputRef"];
     handleImportFileChange: AuxDomainsParams["networkScope"]["handleImportFileChange"];
@@ -86,7 +86,7 @@ export function useAppControllerAuxDomainAssembly({
         networkScope.handleWorkspaceScreenChange("modeling");
       },
       handleDuplicateNetwork: networkScope.handleDuplicateNetwork,
-      handleExportActiveNetwork: networkScope.handleSaveActiveNetworkWithConfirmation,
+      handleExportNetwork: networkScope.handleSaveNetworkWithConfirmation,
       handleOpenImportPicker: networkScope.handleOpenImportPicker,
       importFileInputRef: networkScope.importFileInputRef,
       handleImportFileChange: networkScope.handleImportFileChange,

@@ -406,7 +406,7 @@ export function useAppControllerWorkspaceContentAssembly({
         handleSelectNetwork: domains.workspaceNetworkDomain.handleSelectNetwork,
         handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange,
         handleDuplicateNetwork: domains.workspaceNetworkDomain.handleDuplicateNetwork,
-        handleSaveActiveNetworkWithConfirmation: domains.workspaceNetworkDomain.handleSaveActiveNetworkWithConfirmation,
+        handleSaveNetworkWithConfirmation: domains.workspaceNetworkDomain.handleSaveNetworkWithConfirmation,
         handleOpenImportPicker: domains.workspaceNetworkDomain.handleOpenImportPicker,
         importFileInputRef: domains.workspaceNetworkDomain.importFileInputRef,
         handleImportFileChange: domains.workspaceNetworkDomain.handleImportFileChange,

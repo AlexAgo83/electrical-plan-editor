@@ -30,7 +30,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     | "handleSelectNetwork"
     | "handleOpenNetworkInModeling"
     | "handleDuplicateNetwork"
-    | "handleExportActiveNetwork"
+    | "handleExportNetwork"
     | "handleOpenImportPicker"
     | "importFileInputRef"
     | "handleImportFileChange"
@@ -90,7 +90,7 @@ export function useAppControllerAuxScreenContentDomains({
     handleSelectNetwork: networkScope.handleSelectNetwork,
     handleOpenNetworkInModeling: networkScope.handleOpenNetworkInModeling,
     handleDuplicateNetwork: networkScope.handleDuplicateNetwork,
-    handleExportActiveNetwork: networkScope.handleExportActiveNetwork,
+    handleExportNetwork: networkScope.handleExportNetwork,
     handleOpenImportPicker: networkScope.handleOpenImportPicker,
     importFileInputRef: networkScope.importFileInputRef,
     handleImportFileChange: networkScope.handleImportFileChange,

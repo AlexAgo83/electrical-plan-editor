@@ -108,10 +108,12 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
 
   const {
     handleSaveActiveNetworkWithConfirmation,
+    handleSaveNetworkWithConfirmation,
     handleExportNetworksWithActiveSaveConfirmation
   } = useAppControllerSaveExportActions({
     activeNetworkId: core.activeNetworkId,
     handleExportNetworks: networkImportExportModel.handleExportNetworks,
+    handleExportNetwork: networkImportExportModel.handleExportNetwork,
     requestConfirmation
   });
 
@@ -207,6 +209,7 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     handleRegenerateLayout,
     networkImportExportModel,
     handleSaveActiveNetworkWithConfirmation,
+    handleSaveNetworkWithConfirmation,
     handleExportNetworksWithActiveSaveConfirmation,
     catalogCsvImportFileInputRef,
     catalogCsvImportExportStatus,

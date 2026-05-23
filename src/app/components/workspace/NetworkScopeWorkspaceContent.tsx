@@ -40,7 +40,7 @@ interface NetworkScopeWorkspaceContentProps {
   handleSelectNetwork: (networkId: NetworkId) => void;
   handleOpenNetworkInModeling: (networkId: NetworkId) => void;
   handleDuplicateNetwork: (networkId: NetworkId | null) => void;
-  handleExportActiveNetwork: () => void;
+  handleExportNetwork: (networkId: NetworkId) => void;
   handleOpenImportPicker: () => void;
   importFileInputRef: RefObject<HTMLInputElement | null>;
   handleImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
@@ -85,7 +85,7 @@ export function NetworkScopeWorkspaceContent({
   handleSelectNetwork,
   handleOpenNetworkInModeling,
   handleDuplicateNetwork,
-  handleExportActiveNetwork,
+  handleExportNetwork,
   handleOpenImportPicker,
   importFileInputRef,
   handleImportFileChange,
@@ -489,11 +489,15 @@ export function NetworkScopeWorkspaceContent({
             <button
               type="button"
               className="button-with-icon network-scope-export-button"
-              onClick={handleExportActiveNetwork}
-              disabled={activeNetworkId === null || isCreateMode}
+              onClick={() => {
+                if (focusedNetwork !== null) {
+                  handleExportNetwork(focusedNetwork.id);
+                }
+              }}
+              disabled={focusedNetwork === null || isCreateMode}
             >
               <span className="action-button-icon is-home-import" aria-hidden="true" />
-              Export
+              {isMobileViewport ? "Exp." : "Export"}
             </button>
             <button
               type="button"
@@ -502,7 +506,7 @@ export function NetworkScopeWorkspaceContent({
               disabled={isCreateMode}
             >
               <span className="action-button-icon is-home-import" aria-hidden="true" />
-              Import
+              {isMobileViewport ? "Imp." : "Import"}
             </button>
             <input
               ref={importFileInputRef}

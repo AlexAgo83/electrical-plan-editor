@@ -38,6 +38,7 @@ interface UseNetworkImportExportResult {
   lastImportSummary: NetworkImportSummary | null;
   toggleSelectedExportNetwork: (networkId: NetworkId) => void;
   handleExportNetworks: (scope: "active" | "selected" | "all", exportedAtIsoOverride?: string) => void;
+  handleExportNetwork: (networkId: NetworkId, exportedAtIsoOverride?: string) => void;
   handleOpenImportPicker: () => void;
   handleImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
 }
@@ -333,6 +334,38 @@ export function useNetworkImportExport({
     })();
   }
 
+  function handleExportNetwork(networkId: NetworkId, exportedAtIsoOverride?: string): void {
+    void (async () => {
+      const exportedAtIso = exportedAtIsoOverride ?? new Date().toISOString();
+      const payload = buildNetworkFilePayload(store.getState(), "selected", [networkId], exportedAtIso);
+      if (payload.networks.length === 0) {
+        setImportExportStatus({
+          kind: "failed",
+          message: "No network available for the selected export scope."
+        });
+        return;
+      }
+
+      const serialized = serializeNetworkFilePayload(payload);
+      const exportResult = await exportJsonFile(buildNetworkExportFilename("selected", exportedAtIso), serialized);
+      if (exportResult === "cancelled") {
+        return;
+      }
+      if (exportResult === "failed") {
+        setImportExportStatus({
+          kind: "failed",
+          message: "Export is not available in this environment."
+        });
+        return;
+      }
+
+      setImportExportStatus({
+        kind: "success",
+        message: `Exported ${payload.networks.length} network(s) (selected).`
+      });
+    })();
+  }
+
   function handleOpenImportPicker(): void {
     importFileInputRef.current?.click();
   }
@@ -428,6 +461,7 @@ export function useNetworkImportExport({
     lastImportSummary,
     toggleSelectedExportNetwork,
     handleExportNetworks,
+    handleExportNetwork,
     handleOpenImportPicker,
     handleImportFileChange
   };

@@ -349,7 +349,7 @@ export function buildNetworkScopeScreenContentSlice(params: NetworkScopeScreenCo
     handleSelectNetwork: params.handleSelectNetwork,
     handleOpenNetworkInModeling: params.handleOpenNetworkInModeling,
     handleDuplicateNetwork: params.handleDuplicateNetwork,
-    handleExportActiveNetwork: params.handleExportActiveNetwork,
+    handleExportNetwork: params.handleExportNetwork,
     handleOpenImportPicker: params.handleOpenImportPicker,
     importFileInputRef: params.importFileInputRef,
     handleImportFileChange: params.handleImportFileChange,
