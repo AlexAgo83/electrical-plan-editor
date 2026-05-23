@@ -143,10 +143,14 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing").length).toBeGreaterThan(0);
     expect(networkSummaryPanel.querySelector(".network-callout-connector-keying[d]")).not.toBeNull();
     expect(networkSummaryPanel.querySelector(".network-callout-connector-keying[width]")).not.toBeNull();
-    const connectorHitbox = networkSummaryPanel.querySelector(".network-node.connector .network-node-hitbox");
+    const connectorLayoutNode = Array.from(networkSummaryPanel.querySelectorAll(".network-node.connector")).find((node) =>
+      node.querySelector(".network-node-connector-drawing")
+    );
+    expect(connectorLayoutNode).not.toBeNull();
+    const connectorHitbox = connectorLayoutNode?.querySelector(".network-node-hitbox");
     expect(connectorHitbox).not.toBeNull();
-    expect(Number(connectorHitbox?.getAttribute("width"))).toBeCloseTo(39.2);
-    expect(Number(connectorHitbox?.getAttribute("height"))).toBeCloseTo(28);
+    expect(Number(connectorHitbox?.getAttribute("width"))).toBeCloseTo(115.92);
+    expect(Number(connectorHitbox?.getAttribute("height"))).toBeCloseTo(75.6);
 
     switchScreenDrawerAware("settings");
     const connectorDrawingSelector = within(getPanelByHeading("Canvas render preferences")).getByLabelText(
