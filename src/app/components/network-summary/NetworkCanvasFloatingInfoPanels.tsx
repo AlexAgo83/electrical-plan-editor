@@ -15,7 +15,6 @@ interface NetworkCanvasFloatingInfoPanelsProps {
   selectedCanvasNodeCount: number;
   clearSelectedCanvasNodes: () => void;
   lockEntityMovement: boolean;
-  networkScalePercent: number;
   subNetworkSummaries: SubNetworkSummary[];
   activeSubNetworkTags: ReadonlySet<string>;
   toggleSubNetworkTag: (tag: string) => void;
@@ -40,7 +39,6 @@ export function NetworkCanvasFloatingInfoPanels({
   selectedCanvasNodeCount,
   clearSelectedCanvasNodes,
   lockEntityMovement,
-  networkScalePercent,
   subNetworkSummaries,
   activeSubNetworkTags,
   toggleSubNetworkTag,
@@ -106,12 +104,9 @@ export function NetworkCanvasFloatingInfoPanels({
           <p className="meta-line network-canvas-floating-copy">
             {lockEntityMovement ? "Drag empty canvas to pan." : <>Hold <strong>Shift</strong> and drag empty canvas to pan.</>}
           </p>
-          <p className="meta-line network-canvas-floating-copy">
-            {selectedCanvasNodeCount > 1
-              ? "Drag one selected node to move the full group."
-              : "Shift-click nodes to select a group."}
-          </p>
-          <p className="meta-line network-canvas-floating-copy">View: {networkScalePercent}% zoom.</p>
+          {selectedCanvasNodeCount > 1 ? (
+            <p className="meta-line network-canvas-floating-copy">Drag one selected node to move the full group.</p>
+          ) : null}
         </div>
         {selectedCanvasNodeCount > 0 ? (
           <div className="network-canvas-selection-summary" aria-live="polite">

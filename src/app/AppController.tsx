@@ -240,6 +240,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     operationsButtonRef,
     deferredInstallPromptRef
   });
+  const networkScalePercent = Math.round(networkScale * 100);
   const {
     connectorTechnicalIdAlreadyUsed,
     spliceTechnicalIdAlreadyUsed,
@@ -831,7 +832,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     modelingHandlers
   });
-  const networkScalePercent = Math.round(networkScale * 100);
   const {
     currentValidationIssue,
     issueNavigationScopeLabel,

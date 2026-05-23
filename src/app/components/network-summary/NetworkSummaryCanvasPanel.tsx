@@ -28,7 +28,6 @@ interface NetworkSummaryCanvasPanelProps {
   selectedCanvasNodeCount: number;
   clearSelectedCanvasNodes: () => void;
   lockEntityMovement: boolean;
-  networkScalePercent: number;
   subNetworkSummaries: SubNetworkSummary[];
   activeSubNetworkTags: ReadonlySet<string>;
   toggleSubNetworkTag: (tag: string) => void;
@@ -97,7 +96,6 @@ export function NetworkSummaryCanvasPanel({
   selectedCanvasNodeCount,
   clearSelectedCanvasNodes,
   lockEntityMovement,
-  networkScalePercent,
   subNetworkSummaries,
   activeSubNetworkTags,
   toggleSubNetworkTag,
@@ -165,7 +163,6 @@ export function NetworkSummaryCanvasPanel({
               selectedCanvasNodeCount={selectedCanvasNodeCount}
               clearSelectedCanvasNodes={clearSelectedCanvasNodes}
               lockEntityMovement={lockEntityMovement}
-              networkScalePercent={networkScalePercent}
               subNetworkSummaries={subNetworkSummaries}
               activeSubNetworkTags={activeSubNetworkTags}
               toggleSubNetworkTag={toggleSubNetworkTag}

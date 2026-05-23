@@ -535,21 +535,20 @@ describe("App integration UI - network summary workflow polish", () => {
     const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
     const zoomOutButton = within(networkSummaryPanel).getByRole("button", { name: "Zoom out" });
 
-    let previousZoomStatusText = "";
-    let zoomStatusText = "";
+    let previousViewportTransform = "";
+    let viewportTransform = "";
     for (let index = 0; index < 48; index += 1) {
       fireEvent.click(zoomOutButton);
-      zoomStatusText =
-        within(networkSummaryPanel).getByText(/View: \d+% zoom\./).textContent?.replace(/\s+/g, " ").trim() ?? "";
-      if (zoomStatusText === previousZoomStatusText) {
+      viewportTransform = getNetworkSummaryViewportTransform(networkSummaryPanel);
+      if (viewportTransform === previousViewportTransform) {
         break;
       }
-      previousZoomStatusText = zoomStatusText;
+      previousViewportTransform = viewportTransform;
     }
-    const zoomPercentMatch = zoomStatusText.match(/View:\s*(\d+)% zoom\./);
-    const zoomPercent = Number(zoomPercentMatch?.[1] ?? Number.NaN);
-    expect(Number.isFinite(zoomPercent)).toBe(true);
-    expect(zoomPercent).toBeLessThanOrEqual(5);
+    const zoomScaleMatch = viewportTransform.match(/scale\(([^)]+)\)/);
+    const zoomScale = Number(zoomScaleMatch?.[1] ?? Number.NaN);
+    expect(Number.isFinite(zoomScale)).toBe(true);
+    expect(zoomScale).toBeLessThanOrEqual(0.05);
 
     const rectSpy = vi.spyOn(networkSvg, "getBoundingClientRect").mockImplementation(
       () =>

@@ -553,7 +553,7 @@ describe("App integration UI - navigation and canvas", () => {
 
     expect(connectorNode).not.toBeNull();
     expect(intermediateNode).not.toBeNull();
-    expect(within(networkSummaryPanel).getByText("Shift-click nodes to select a group.")).toBeInTheDocument();
+    expect(within(networkSummaryPanel).queryByText("Shift-click nodes to select a group.")).not.toBeInTheDocument();
 
     fireEvent.mouseDown(connectorNode as Element, { button: 0, shiftKey: true });
     fireEvent.mouseUp(connectorNode as Element, { button: 0, shiftKey: true });
@@ -701,12 +701,11 @@ describe("App integration UI - navigation and canvas", () => {
     switchScreenDrawerAware("analysis");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
-    const currentZoomLine = () => within(networkSummaryPanel).getByText(/View: \d+% zoom\./).textContent ?? "";
-    const zoomBeforeWheel = currentZoomLine();
     const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    const transformBeforeWheel = getNetworkSummaryViewportTransform(networkSummaryPanel);
 
     fireEvent.wheel(networkSvg, { deltaY: -200 });
-    expect(currentZoomLine()).toBe(zoomBeforeWheel);
+    expect(getNetworkSummaryViewportTransform(networkSummaryPanel)).toBe(transformBeforeWheel);
   });
 
   it("keeps connector selection context when switching from modeling to analysis view", () => {
@@ -763,12 +762,11 @@ describe("App integration UI - navigation and canvas", () => {
     );
 
     const networkPanel = getPanelByHeading("Network summary");
-    const currentZoomLine = () => within(networkPanel).getByText(/View: \d+% zoom\./).textContent ?? "";
-    const fittedZoomLine = currentZoomLine();
+    const fittedTransform = getNetworkSummaryViewportTransform(networkPanel);
     fireEvent.click(within(networkPanel).getByRole("button", { name: "Zoom out" }));
-    expect(currentZoomLine()).not.toBe(fittedZoomLine);
+    expect(getNetworkSummaryViewportTransform(networkPanel)).not.toBe(fittedTransform);
     fireEvent.keyDown(window, { key: "f", altKey: true });
-    expect(currentZoomLine()).toBe(fittedZoomLine);
+    expect(getNetworkSummaryViewportTransform(networkPanel)).toBe(fittedTransform);
   });
 
   it("cancels edit mode when selection focus changes to another entity kind", () => {

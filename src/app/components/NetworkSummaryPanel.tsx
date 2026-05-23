@@ -158,6 +158,7 @@ export function NetworkSummaryPanel({
   catalogItems,
   showFunctionalSchematic = true
 }: NetworkSummaryPanelProps): ReactElement {
+  void networkScalePercent;
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
   const networkCanvasShellRef = useRef<HTMLDivElement | null>(null);
   const graphStats = [
@@ -868,7 +869,6 @@ export function NetworkSummaryPanel({
           selectedCanvasNodeCount={selectedCanvasNodeIds.size}
           clearSelectedCanvasNodes={clearSelectedCanvasNodes}
           lockEntityMovement={lockEntityMovement}
-          networkScalePercent={networkScalePercent}
           subNetworkSummaries={subNetworkSummaries}
           activeSubNetworkTags={activeSubNetworkTags}
           toggleSubNetworkTag={toggleSubNetworkTag}
