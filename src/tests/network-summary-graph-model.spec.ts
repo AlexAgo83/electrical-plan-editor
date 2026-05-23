@@ -18,6 +18,17 @@ function asCatalogItemId(value: string): CatalogItemId {
   return value as CatalogItemId;
 }
 
+const emptySegmentRenderContext = {
+  nodes: [],
+  connectorMap: new Map(),
+  catalogItems: [],
+  connectorDrawingDisplayMode: "disabled" as const,
+  normalizedNodeShapeScale: 1,
+  connectorDrawingScale: 1,
+  zoomInvariantNodeShapes: false,
+  inverseLabelScale: 1
+};
+
 describe("buildRenderedSegments", () => {
   it("offsets single labels off the segment centerline and increases the offset for near-horizontal segments", () => {
     const horizontalSegment: Segment = {
@@ -46,6 +57,7 @@ describe("buildRenderedSegments", () => {
       activeSubNetworkTagSet: new Set(),
       selectedWireRouteSegmentIds: new Set(),
       selectedSegmentId: null,
+      ...emptySegmentRenderContext,
       autoSegmentLabelRotation: true,
       labelRotationDegrees: 0,
       showSegmentNames: false,
@@ -61,6 +73,164 @@ describe("buildRenderedSegments", () => {
     expect(Math.abs(renderedHorizontal?.segmentLengthLabelY ?? 0)).toBeGreaterThan(
       Math.abs(renderedDiagonal?.segmentLengthLabelY ?? 0)
     );
+  });
+
+  it("centers labels in the visible gap between node shapes", () => {
+    const connectorId = asConnectorId("C-A");
+    const catalogItemId = asCatalogItemId("CAT-A");
+    const segment: Segment = {
+      id: asSegmentId("SEG-A"),
+      nodeA: asNodeId("N-A"),
+      nodeB: asNodeId("N-B"),
+      lengthMm: 120
+    };
+
+    const rendered = buildRenderedSegments({
+      segments: [segment],
+      nodes: [
+        {
+          id: asNodeId("N-A"),
+          kind: "connector",
+          connectorId
+        },
+        {
+          id: asNodeId("N-B"),
+          kind: "intermediate",
+          label: "Hub"
+        }
+      ],
+      networkNodePositions: {
+        [asNodeId("N-A")]: { x: 0, y: 0 },
+        [asNodeId("N-B")]: { x: 120, y: 0 }
+      },
+      segmentSubNetworkTagById: new Map(),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(),
+      selectedWireRouteSegmentIds: new Set(),
+      selectedSegmentId: null,
+      connectorMap: new Map([
+        [
+          connectorId,
+          {
+            id: connectorId,
+            name: "Connector A",
+            technicalId: "C-A",
+            cavityCount: 2,
+            catalogItemId
+          }
+        ]
+      ]),
+      catalogItems: [
+        {
+          id: catalogItemId,
+          manufacturerReference: "REF-A",
+          name: "Two way",
+          connectionCount: 2,
+          connectorLayout: {
+            version: 1,
+            units: "grid",
+            width: 4,
+            height: 2,
+            ways: [
+              { cavityIndex: 1, x: 1, y: 1, shape: "round" },
+              { cavityIndex: 2, x: 3, y: 1, shape: "round" }
+            ]
+          }
+        }
+      ],
+      connectorDrawingDisplayMode: "nodes",
+      normalizedNodeShapeScale: 1,
+      connectorDrawingScale: 2,
+      zoomInvariantNodeShapes: false,
+      inverseLabelScale: 1,
+      autoSegmentLabelRotation: true,
+      labelRotationDegrees: 0,
+      showSegmentNames: false,
+      showSegmentLengths: true
+    });
+
+    expect(rendered).toHaveLength(1);
+    expect(rendered[0]?.labelX).toBeCloseTo(74.5);
+    expect(rendered[0]?.labelY).toBe(0);
+  });
+
+  it("keeps labels in the visible gap when node shapes are close but not touching", () => {
+    const connectorId = asConnectorId("C-A");
+    const catalogItemId = asCatalogItemId("CAT-A");
+    const segment: Segment = {
+      id: asSegmentId("SEG-A"),
+      nodeA: asNodeId("N-A"),
+      nodeB: asNodeId("N-B"),
+      lengthMm: 66
+    };
+
+    const rendered = buildRenderedSegments({
+      segments: [segment],
+      nodes: [
+        {
+          id: asNodeId("N-A"),
+          kind: "connector",
+          connectorId
+        },
+        {
+          id: asNodeId("N-B"),
+          kind: "intermediate",
+          label: "Hub"
+        }
+      ],
+      networkNodePositions: {
+        [asNodeId("N-A")]: { x: 0, y: 0 },
+        [asNodeId("N-B")]: { x: 66, y: 0 }
+      },
+      segmentSubNetworkTagById: new Map(),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(),
+      selectedWireRouteSegmentIds: new Set(),
+      selectedSegmentId: null,
+      connectorMap: new Map([
+        [
+          connectorId,
+          {
+            id: connectorId,
+            name: "Connector A",
+            technicalId: "C-A",
+            cavityCount: 2,
+            catalogItemId
+          }
+        ]
+      ]),
+      catalogItems: [
+        {
+          id: catalogItemId,
+          manufacturerReference: "REF-A",
+          name: "Two way",
+          connectionCount: 2,
+          connectorLayout: {
+            version: 1,
+            units: "grid",
+            width: 4,
+            height: 2,
+            ways: [
+              { cavityIndex: 1, x: 1, y: 1, shape: "round" },
+              { cavityIndex: 2, x: 3, y: 1, shape: "round" }
+            ]
+          }
+        }
+      ],
+      connectorDrawingDisplayMode: "nodes",
+      normalizedNodeShapeScale: 1,
+      connectorDrawingScale: 2,
+      zoomInvariantNodeShapes: false,
+      inverseLabelScale: 1,
+      autoSegmentLabelRotation: true,
+      labelRotationDegrees: 0,
+      showSegmentNames: false,
+      showSegmentLengths: true
+    });
+
+    expect(rendered).toHaveLength(1);
+    expect(rendered[0]?.labelX).toBeGreaterThan(33);
+    expect(rendered[0]?.labelX).toBeCloseTo(47.5);
   });
 });
 
@@ -122,6 +292,6 @@ describe("buildRenderedNodes", () => {
     });
 
     expect(rendered).toHaveLength(1);
-    expect(rendered[0]?.labelOffsetY).toBe(-21);
+    expect(rendered[0]?.labelOffsetY).toBe(0);
   });
 });

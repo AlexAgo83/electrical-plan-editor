@@ -46,32 +46,167 @@ export interface RenderedNodeModel {
 
 interface BuildRenderedSegmentsParams {
   segments: Segment[];
+  nodes: NetworkNode[];
   networkNodePositions: Record<NodeId, NodePosition>;
   segmentSubNetworkTagById: ReadonlyMap<SegmentId, string>;
   isSubNetworkFilteringActive: boolean;
   activeSubNetworkTagSet: ReadonlySet<string>;
   selectedWireRouteSegmentIds: ReadonlySet<SegmentId>;
   selectedSegmentId: SegmentId | null;
+  connectorMap: ReadonlyMap<ConnectorId, Connector>;
+  catalogItems: CatalogItem[];
+  connectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
+  normalizedNodeShapeScale: number;
+  connectorDrawingScale: number;
+  zoomInvariantNodeShapes: boolean;
+  inverseLabelScale: number;
   autoSegmentLabelRotation: boolean;
   labelRotationDegrees: number;
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
 }
 
+interface SegmentNodeVisualBounds {
+  halfWidth: number;
+  halfHeight: number;
+  kind: "rect" | "diamond" | "circle";
+}
+
+const CONNECTOR_NODE_WIDTH = 46;
+const CONNECTOR_NODE_HEIGHT = 30;
+const SPLICE_DIAMOND_SIZE = 30;
+const INTERMEDIATE_NODE_RADIUS = 17;
+
+function getSegmentLabelAnchor(
+  nodeAPosition: NodePosition,
+  nodeBPosition: NodePosition,
+  nodeABounds: SegmentNodeVisualBounds | undefined,
+  nodeBBounds: SegmentNodeVisualBounds | undefined
+): NodePosition {
+  const midpoint = {
+    x: (nodeAPosition.x + nodeBPosition.x) / 2,
+    y: (nodeAPosition.y + nodeBPosition.y) / 2
+  };
+  if (nodeABounds === undefined && nodeBBounds === undefined) {
+    return midpoint;
+  }
+
+  const vectorX = nodeBPosition.x - nodeAPosition.x;
+  const vectorY = nodeBPosition.y - nodeAPosition.y;
+  const distance = Math.hypot(vectorX, vectorY);
+  if (distance <= 0) {
+    return midpoint;
+  }
+
+  const directionX = vectorX / distance;
+  const directionY = vectorY / distance;
+  const startInset = getNodeSegmentInset(nodeABounds, directionX, directionY);
+  const endInset = getNodeSegmentInset(nodeBBounds, directionX, directionY);
+  const visibleDistance = distance - startInset - endInset;
+
+  if (visibleDistance <= 0) {
+    return midpoint;
+  }
+
+  return {
+    x: (nodeAPosition.x + directionX * startInset + nodeBPosition.x - directionX * endInset) / 2,
+    y: (nodeAPosition.y + directionY * startInset + nodeBPosition.y - directionY * endInset) / 2
+  };
+}
+
+function getNodeSegmentInset(
+  bounds: SegmentNodeVisualBounds | undefined,
+  directionX: number,
+  directionY: number
+): number {
+  if (bounds === undefined) {
+    return 0;
+  }
+
+  if (bounds.kind === "circle") {
+    return bounds.halfWidth;
+  }
+
+  if (bounds.kind === "diamond") {
+    const denominator = Math.abs(directionX) + Math.abs(directionY);
+    return denominator <= 0 ? 0 : bounds.halfWidth / denominator;
+  }
+
+  const horizontalInset = Math.abs(directionX) <= 0 ? Number.POSITIVE_INFINITY : bounds.halfWidth / Math.abs(directionX);
+  const verticalInset = Math.abs(directionY) <= 0 ? Number.POSITIVE_INFINITY : bounds.halfHeight / Math.abs(directionY);
+  return Math.min(horizontalInset, verticalInset);
+}
+
+function getSegmentNodeVisualBounds(
+  node: NetworkNode | undefined,
+  connectorMap: ReadonlyMap<ConnectorId, Connector>,
+  catalogItemById: ReadonlyMap<CatalogItem["id"], CatalogItem>,
+  connectorDrawingDisplayMode: ConnectorDrawingDisplayMode,
+  nodeShapeScale: number,
+  connectorDrawingScale: number
+): SegmentNodeVisualBounds | undefined {
+  if (node === undefined) {
+    return undefined;
+  }
+
+  if (node.kind === "intermediate") {
+    return {
+      halfWidth: INTERMEDIATE_NODE_RADIUS * nodeShapeScale,
+      halfHeight: INTERMEDIATE_NODE_RADIUS * nodeShapeScale,
+      kind: "circle"
+    };
+  }
+
+  if (node.kind === "splice") {
+    return {
+      halfWidth: (SPLICE_DIAMOND_SIZE * nodeShapeScale) / Math.SQRT2,
+      halfHeight: (SPLICE_DIAMOND_SIZE * nodeShapeScale) / Math.SQRT2,
+      kind: "diamond"
+    };
+  }
+
+  const connector = connectorMap.get(node.connectorId);
+  const connectorLayout =
+    connectorDrawingDisplayMode === "nodes" && connector !== undefined
+      ? resolveEditedConnectorLayout(
+          connector.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId)?.connectorLayout,
+          connector.cavityCount
+        )
+      : undefined;
+  const layoutScale = connectorLayout === undefined ? 1 : connectorDrawingScale;
+
+  return {
+    halfWidth: (CONNECTOR_NODE_WIDTH * nodeShapeScale * layoutScale) / 2,
+    halfHeight: (CONNECTOR_NODE_HEIGHT * nodeShapeScale * layoutScale) / 2,
+    kind: "rect"
+  };
+}
+
 export function buildRenderedSegments({
   segments,
+  nodes,
   networkNodePositions,
   segmentSubNetworkTagById,
   isSubNetworkFilteringActive,
   activeSubNetworkTagSet,
   selectedWireRouteSegmentIds,
   selectedSegmentId,
+  connectorMap,
+  catalogItems,
+  connectorDrawingDisplayMode,
+  normalizedNodeShapeScale,
+  connectorDrawingScale,
+  zoomInvariantNodeShapes,
+  inverseLabelScale,
   autoSegmentLabelRotation,
   labelRotationDegrees,
   showSegmentNames,
   showSegmentLengths
 }: BuildRenderedSegmentsParams): RenderedSegmentModel[] {
   const result: RenderedSegmentModel[] = [];
+  const nodeById = new Map(nodes.map((node) => [node.id, node] as const));
+  const catalogItemById = new Map(catalogItems.map((item) => [item.id, item] as const));
+  const nodeShapeScale = normalizedNodeShapeScale * (zoomInvariantNodeShapes ? inverseLabelScale : 1);
 
   for (const segment of segments) {
     const nodeAPosition = networkNodePositions[segment.nodeA];
@@ -88,8 +223,26 @@ export function buildRenderedSegments({
       isSelectedSegment ? " is-selected" : ""
     }`;
     const segmentGroupClassName = `network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`;
-    const labelX = (nodeAPosition.x + nodeBPosition.x) / 2;
-    const labelY = (nodeAPosition.y + nodeBPosition.y) / 2;
+    const labelAnchor = getSegmentLabelAnchor(
+      nodeAPosition,
+      nodeBPosition,
+      getSegmentNodeVisualBounds(
+        nodeById.get(segment.nodeA),
+        connectorMap,
+        catalogItemById,
+        connectorDrawingDisplayMode,
+        nodeShapeScale,
+        connectorDrawingScale
+      ),
+      getSegmentNodeVisualBounds(
+        nodeById.get(segment.nodeB),
+        connectorMap,
+        catalogItemById,
+        connectorDrawingDisplayMode,
+        nodeShapeScale,
+        connectorDrawingScale
+      )
+    );
     const segmentVectorX = nodeBPosition.x - nodeAPosition.x;
     const segmentVectorY = nodeBPosition.y - nodeAPosition.y;
     const segmentAngleDegrees = normalizeReadableSegmentLabelAngle(
@@ -113,8 +266,8 @@ export function buildRenderedSegments({
       nodeBPosition,
       segmentClassName,
       segmentGroupClassName,
-      labelX,
-      labelY,
+      labelX: labelAnchor.x,
+      labelY: labelAnchor.y,
       segmentLabelRotationDegrees,
       segmentIdLabelX: -segmentLengthLabelOffsetX,
       segmentIdLabelY: -segmentLengthLabelOffsetY,
