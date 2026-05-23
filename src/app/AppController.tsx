@@ -84,11 +84,9 @@ import "./styles.css";
 export type { AppProps } from "./types/app-controller";
 const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor";
 export function AppController({ store = appStore }: AppProps): ReactElement {
-  const currentYear = new Date().getFullYear();
-  const state = useAppSnapshot(store);
+  const currentYear = new Date().getFullYear(), state = useAppSnapshot(store);
   const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, ValidationScreen, AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables, NetworkScopeWorkspaceContent, SettingsWorkspaceContent, ValidationWorkspaceContent } = appUiModules;
-  const networks = selectNetworks(state);
-  const activeNetworkId = selectActiveNetworkId(state);
+  const networks = selectNetworks(state), activeNetworkId = selectActiveNetworkId(state);
   const activeNetworkSummaryViewState =
     activeNetworkId === null ? undefined : state.networkStates[activeNetworkId]?.networkSummaryViewState;
   const activeNetwork = selectActiveNetwork(state);
