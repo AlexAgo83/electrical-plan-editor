@@ -119,6 +119,7 @@ export interface NetworkSummaryPanelProps {
   onQuickEntityNavigation: (subScreen: SubScreenId) => void;
   onSelectConnectorFromCallout: (connectorId: ConnectorId) => void;
   onSelectSpliceFromCallout: (spliceId: SpliceId) => void;
+  onSelectWireFromConnectorPin: (wireId: Wire["id"]) => void;
   onPersistConnectorCalloutPosition: (connectorId: ConnectorId, position: NodePosition) => void;
   onPersistSpliceCalloutPosition: (spliceId: SpliceId, position: NodePosition) => void;
   onViewportSizeChange?: (size: { width: number; height: number }) => void;

@@ -15,7 +15,7 @@ import { resolveEditedConnectorLayout } from "../../../../core/connectorLayout";
 import type { NodePosition } from "../../../types/app-controller";
 import type { ConnectorDrawingDisplayMode } from "../../../types/app-controller";
 import type { CalloutGroup } from "../callouts/calloutLayout";
-import { getHighlightedConnectorCavityIndexes } from "../callouts/NetworkSummaryCalloutsLayer";
+import { getConnectorCavityWireIdByIndex, getHighlightedConnectorCavityIndexes } from "../callouts/NetworkSummaryCalloutsLayer";
 import { normalizeReadableSegmentLabelAngle } from "../callouts/calloutLayout";
 
 export interface RenderedSegmentModel {
@@ -40,6 +40,7 @@ export interface RenderedNodeModel {
   nodeLabel: string;
   connectorLayout?: ConnectorLayout;
   highlightedConnectorCavityIndexes: ReadonlySet<number>;
+  connectorCavityWireIdByIndex: ReadonlyMap<number, WireId>;
   labelOffsetY: number;
   isSubNetworkDeemphasized: boolean;
 }
@@ -360,6 +361,10 @@ export function buildRenderedNodes({
       connector !== undefined
         ? getHighlightedConnectorCavityIndexes(connectorCalloutGroupsById.get(connector.id) ?? [], selectedWireId)
         : new Set<number>();
+    const connectorCavityWireIdByIndex =
+      connector !== undefined
+        ? getConnectorCavityWireIdByIndex(connectorCalloutGroupsById.get(connector.id) ?? [])
+        : new Map<number, WireId>();
 
     result.push({
       node,
@@ -368,6 +373,7 @@ export function buildRenderedNodes({
       nodeLabel,
       connectorLayout,
       highlightedConnectorCavityIndexes,
+      connectorCavityWireIdByIndex,
       labelOffsetY: 0,
       isSubNetworkDeemphasized
     });

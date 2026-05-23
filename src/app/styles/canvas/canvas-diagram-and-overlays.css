@@ -764,6 +764,10 @@
   stroke-linecap: round;
   pointer-events: none;
 }
+.network-segment-length-unit {
+  font-size: 0.5em;
+  baseline-shift: 0.08em;
+}
 .network-canvas--label-size-small .network-segment-length-label {
   font-size: 7px;
 }

@@ -257,6 +257,17 @@ export function useAppControllerNetworkSummaryPanelDomain({
     [dispatchAction, markDetailPanelsSelectionSourceAsTable, setActiveSubScreen]
   );
 
+  const handleSelectWireFromConnectorPin = useCallback(
+    (wireId: Wire["id"]) => {
+      unstable_batchedUpdates(() => {
+        setActiveSubScreen("wire");
+        markDetailPanelsSelectionSourceAsTable();
+        dispatchAction(appActions.select({ kind: "wire", id: wireId }), { trackHistory: false });
+      });
+    },
+    [dispatchAction, markDetailPanelsSelectionSourceAsTable, setActiveSubScreen]
+  );
+
   const persistConnectorCalloutPosition = useCallback(
     (connectorId: ConnectorId, position: { x: number; y: number }) => {
       const existing = connectorMap.get(connectorId);
@@ -383,6 +394,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         onQuickEntityNavigation,
         onSelectConnectorFromCallout: handleSelectConnectorFromCallout,
         onSelectSpliceFromCallout: handleSelectSpliceFromCallout,
+        onSelectWireFromConnectorPin: handleSelectWireFromConnectorPin,
         onPersistConnectorCalloutPosition: persistConnectorCalloutPosition,
         onPersistSpliceCalloutPosition: persistSpliceCalloutPosition,
         onViewportSizeChange,

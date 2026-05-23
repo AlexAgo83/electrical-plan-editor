@@ -143,6 +143,7 @@ export function NetworkSummaryPanel({
   onQuickEntityNavigation,
   onSelectConnectorFromCallout,
   onSelectSpliceFromCallout,
+  onSelectWireFromConnectorPin,
   onPersistConnectorCalloutPosition,
   onPersistSpliceCalloutPosition,
   onViewportSizeChange,
@@ -907,6 +908,7 @@ export function NetworkSummaryPanel({
           handleCalloutMouseDown={handleCalloutMouseDown}
           onSelectConnectorFromCallout={onSelectConnectorFromCallout}
           onSelectSpliceFromCallout={onSelectSpliceFromCallout}
+          onSelectWireFromConnectorPin={onSelectWireFromConnectorPin}
         />
       </section>
       {showRoutePreviewPanel ? (

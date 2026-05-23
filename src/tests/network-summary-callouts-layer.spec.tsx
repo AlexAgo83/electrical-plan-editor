@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { ConnectorId, NodeId, WireId } from "../core/entities";
 import { NetworkSummaryCalloutsLayer } from "../app/components/network-summary/callouts/NetworkSummaryCalloutsLayer";
@@ -72,6 +72,7 @@ describe("NetworkSummaryCalloutsLayer", () => {
       isVisibleInViewport: true
     };
 
+    const onSelectWireFromConnectorPin = vi.fn();
     const { container } = render(
       <svg>
         <NetworkSummaryCalloutsLayer
@@ -82,6 +83,7 @@ describe("NetworkSummaryCalloutsLayer", () => {
           onCalloutMouseDown={vi.fn()}
           onSelectConnectorFromCallout={vi.fn()}
           onSelectSpliceFromCallout={vi.fn()}
+          onSelectWireFromConnectorPin={onSelectWireFromConnectorPin}
           networkOffset={{ x: 0, y: 0 }}
           networkScale={1}
         />
@@ -92,5 +94,10 @@ describe("NetworkSummaryCalloutsLayer", () => {
     expect(container.querySelector(".network-callout-connector-way-group.is-wire-highlighted text")?.textContent).toBe("C1");
     expect(container.querySelector(".network-callout-connector-shell")?.getAttribute("rx")).toBe("0");
     expect(container.querySelector(".network-callout-connector-shell")?.getAttribute("style")).toContain("stroke-width: 0.16");
+
+    const selectableWay = container.querySelector(".network-callout-connector-way-group.is-selectable-wire");
+    expect(selectableWay).not.toBeNull();
+    fireEvent.mouseDown(selectableWay as Element);
+    expect(onSelectWireFromConnectorPin).toHaveBeenCalledWith("W1");
   });
 });

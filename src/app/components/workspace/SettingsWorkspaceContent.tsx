@@ -306,6 +306,45 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
+            Connector drawing display
+            <select
+              value={canvasConnectorDrawingDisplayMode}
+              onChange={(event) => {
+                const nextMode = event.target.value as ConnectorDrawingDisplayMode;
+                const nextCalloutMode: NetworkCalloutContentMode = nextMode === "callouts" ? "both" : "wireDetails";
+                setCanvasConnectorDrawingDisplayMode(nextMode);
+                setCanvasDefaultCalloutContentMode(nextCalloutMode);
+                setNetworkCalloutContentMode(nextCalloutMode);
+              }}
+            >
+              <option value="disabled">Disabled</option>
+              <option value="callouts">Callouts</option>
+              <option value="nodes">Nodes</option>
+            </select>
+          </label>
+          <label className="settings-field settings-range-field">
+            Connector drawing size (%)
+            <div className="settings-range-control">
+              <input
+                className="settings-range-input"
+                type="range"
+                min={100}
+                max={200}
+                step={5}
+                value={canvasCalloutConnectorDrawingScalePercent}
+                disabled={canvasConnectorDrawingDisplayMode === "disabled"}
+                onChange={(event) => {
+                  const parsed = Number(event.target.value);
+                  if (!Number.isFinite(parsed)) {
+                    return;
+                  }
+                  setCanvasCalloutConnectorDrawingScalePercent(Math.min(200, Math.max(100, Math.round(parsed))));
+                }}
+              />
+              <span className="settings-range-value">{canvasCalloutConnectorDrawingScalePercent}%</span>
+            </div>
+          </label>
+          <label className="settings-field">
             Auto segment label rotation
             <select
               value={canvasDefaultAutoSegmentLabelRotation ? "yes" : "no"}
@@ -409,45 +448,6 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasDefaultShowCableCallouts(event.target.checked)}
             />
             Show connector/splice cable callouts by default
-          </label>
-          <label className="settings-field">
-            Connector drawing display
-            <select
-              value={canvasConnectorDrawingDisplayMode}
-              onChange={(event) => {
-                const nextMode = event.target.value as ConnectorDrawingDisplayMode;
-                const nextCalloutMode: NetworkCalloutContentMode = nextMode === "callouts" ? "both" : "wireDetails";
-                setCanvasConnectorDrawingDisplayMode(nextMode);
-                setCanvasDefaultCalloutContentMode(nextCalloutMode);
-                setNetworkCalloutContentMode(nextCalloutMode);
-              }}
-            >
-              <option value="disabled">Disabled</option>
-              <option value="callouts">Callouts</option>
-              <option value="nodes">Nodes</option>
-            </select>
-          </label>
-          <label className="settings-field settings-range-field">
-            Connector drawing size (%)
-            <div className="settings-range-control">
-              <input
-                className="settings-range-input"
-                type="range"
-                min={100}
-                max={200}
-                step={5}
-                value={canvasCalloutConnectorDrawingScalePercent}
-                disabled={canvasConnectorDrawingDisplayMode === "disabled"}
-                onChange={(event) => {
-                  const parsed = Number(event.target.value);
-                  if (!Number.isFinite(parsed)) {
-                    return;
-                  }
-                  setCanvasCalloutConnectorDrawingScalePercent(Math.min(200, Math.max(100, Math.round(parsed))));
-                }}
-              />
-              <span className="settings-range-value">{canvasCalloutConnectorDrawingScalePercent}%</span>
-            </div>
           </label>
           <label className="settings-checkbox">
             <input

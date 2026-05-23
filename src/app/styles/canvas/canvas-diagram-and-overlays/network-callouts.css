@@ -82,6 +82,15 @@
   stroke-width: 0.07;
 }
 
+.network-callout-connector-way-group.is-selectable-wire {
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.network-callout-connector-way-group.is-unused {
+  opacity: 0.48;
+}
+
 .network-callout-connector-way.is-wire-highlighted {
   fill: color-mix(in srgb, var(--network-wire-highlight-color, #4f8d2d) 34%, var(--network-label-stroke-color, rgba(246, 251, 255, 0.96)));
   stroke: var(--network-wire-highlight-color, #4f8d2d);

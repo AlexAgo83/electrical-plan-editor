@@ -316,6 +316,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     onQuickEntityNavigation: params.onQuickEntityNavigation,
     onSelectConnectorFromCallout: params.onSelectConnectorFromCallout,
     onSelectSpliceFromCallout: params.onSelectSpliceFromCallout,
+    onSelectWireFromConnectorPin: params.onSelectWireFromConnectorPin,
     onPersistConnectorCalloutPosition: params.onPersistConnectorCalloutPosition,
     onPersistSpliceCalloutPosition: params.onPersistSpliceCalloutPosition,
     onViewportSizeChange: params.onViewportSizeChange,

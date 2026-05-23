@@ -65,6 +65,21 @@ export function getHighlightedConnectorCavityIndexes(
   return highlightedCavityIndexes;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
+export function getConnectorCavityWireIdByIndex(groups: CableCalloutViewModel["groups"]): Map<number, Wire["id"]> {
+  const wireIdByCavityIndex = new Map<number, Wire["id"]>();
+
+  for (const group of groups) {
+    const cavityIndex = Number(/^C(\d+)$/.exec(group.label)?.[1] ?? Number.NaN);
+    const wireId = group.entries[0]?.wireId;
+    if (Number.isInteger(cavityIndex) && cavityIndex > 0 && wireId !== undefined) {
+      wireIdByCavityIndex.set(cavityIndex, wireId as Wire["id"]);
+    }
+  }
+
+  return wireIdByCavityIndex;
+}
+
 function getKeyingStyle(keying: RenderableKeying): CSSProperties | undefined {
   return keying.color === undefined ? undefined : { fill: keying.color };
 }
@@ -145,7 +160,9 @@ export function renderConnectorLayoutDrawing(
   width: number,
   height: number,
   highlightedCavityIndexes: ReadonlySet<number>,
-  titleId?: string
+  titleId?: string,
+  wireIdByCavityIndex?: ReadonlyMap<number, Wire["id"]>,
+  onSelectCavityWire?: (wireId: Wire["id"]) => void
 ): ReactElement {
   const shellPadding = getConnectorLayoutShellPadding(layout);
   const cellPadding = getConnectorLayoutCellPadding(layout);
@@ -212,12 +229,40 @@ export function renderConnectorLayoutDrawing(
           const labelClassName = `network-callout-connector-way-label${label.length > 2 ? " is-long-label" : ""}`;
           const labelFontSize = label.length > 2 ? 4.7 : 5.8;
           const isWireHighlighted = highlightedCavityIndexes.has(way.cavityIndex);
-          const wayClassName = `network-callout-connector-way${isWireHighlighted ? " is-wire-highlighted" : ""}`;
+          const wireId = wireIdByCavityIndex?.get(way.cavityIndex);
+          const canSelectWire = wireId !== undefined && onSelectCavityWire !== undefined;
+          const isUnused = wireId === undefined;
+          const wayClassName = `network-callout-connector-way${isWireHighlighted ? " is-wire-highlighted" : ""}${
+            isUnused ? " is-unused" : ""
+          }`;
+          const handleSelectCavityWire = (event: ReactMouseEvent<SVGGElement>): void => {
+            if (!canSelectWire) {
+              return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            onSelectCavityWire(wireId);
+          };
           return (
             <g
               key={way.cavityIndex}
-              className={isWireHighlighted ? "network-callout-connector-way-group is-wire-highlighted" : "network-callout-connector-way-group"}
+              className={`${isWireHighlighted ? "network-callout-connector-way-group is-wire-highlighted" : "network-callout-connector-way-group"}${
+                canSelectWire ? " is-selectable-wire" : ""
+              }${isUnused ? " is-unused" : ""}`}
               transform={`translate(${way.x} ${way.y})`}
+              role={canSelectWire ? "button" : undefined}
+              tabIndex={canSelectWire ? 0 : undefined}
+              aria-label={canSelectWire ? `Select wire connected to ${label}` : undefined}
+              onMouseDown={handleSelectCavityWire}
+              onClick={handleSelectCavityWire}
+              onKeyDown={(event: ReactKeyboardEvent<SVGGElement>) => {
+                if (!canSelectWire || (event.key !== "Enter" && event.key !== " ")) {
+                  return;
+                }
+                event.preventDefault();
+                event.stopPropagation();
+                onSelectCavityWire(wireId);
+              }}
             >
               {way.shape === "square" ? (
                 <rect
@@ -295,6 +340,7 @@ interface NetworkSummaryCalloutsLayerProps {
   ) => void;
   onSelectConnectorFromCallout: (connectorId: ConnectorId) => void;
   onSelectSpliceFromCallout: (spliceId: SpliceId) => void;
+  onSelectWireFromConnectorPin: (wireId: Wire["id"]) => void;
   networkOffset: { x: number; y: number };
   networkScale: number;
 }
@@ -307,6 +353,7 @@ export function NetworkSummaryCalloutsLayer({
   onCalloutMouseDown,
   onSelectConnectorFromCallout,
   onSelectSpliceFromCallout,
+  onSelectWireFromConnectorPin,
   networkOffset,
   networkScale
 }: NetworkSummaryCalloutsLayerProps): ReactElement {
@@ -323,6 +370,7 @@ export function NetworkSummaryCalloutsLayer({
         const tableRightX =
           lastColumn === undefined ? contentLeftX : contentLeftX + lastColumn.x + lastColumn.width;
         const highlightedCavityIndexes = getHighlightedConnectorCavityIndexes(callout.groups, selectedWireId);
+        const wireIdByCavityIndex = getConnectorCavityWireIdByIndex(callout.groups);
 
         return (
           <g
@@ -372,7 +420,10 @@ export function NetworkSummaryCalloutsLayer({
                       callout.connectorLayout,
                       layout.drawingWidth,
                       layout.drawingHeight,
-                      highlightedCavityIndexes
+                      highlightedCavityIndexes,
+                      undefined,
+                      wireIdByCavityIndex,
+                      onSelectWireFromConnectorPin
                     )}
                   </g>
                 ) : null}

@@ -78,6 +78,7 @@ interface NetworkSummaryCanvasPanelProps {
   ) => void;
   onSelectConnectorFromCallout: Parameters<typeof NetworkSummaryCalloutsLayer>[0]["onSelectConnectorFromCallout"];
   onSelectSpliceFromCallout: Parameters<typeof NetworkSummaryCalloutsLayer>[0]["onSelectSpliceFromCallout"];
+  onSelectWireFromConnectorPin: Parameters<typeof NetworkSummaryCalloutsLayer>[0]["onSelectWireFromConnectorPin"];
 }
 
 export function NetworkSummaryCanvasPanel({
@@ -139,7 +140,8 @@ export function NetworkSummaryCanvasPanel({
   setHoveredCalloutKey,
   handleCalloutMouseDown,
   onSelectConnectorFromCallout,
-  onSelectSpliceFromCallout
+  onSelectSpliceFromCallout,
+  onSelectWireFromConnectorPin
 }: NetworkSummaryCanvasPanelProps): ReactElement {
   return (
     <>
@@ -208,6 +210,7 @@ export function NetworkSummaryCanvasPanel({
                 onSelectSegment={handleNetworkSegmentClick}
                 onNodeMouseDown={handleNetworkNodeMouseDown}
                 onNodeActivate={handleNetworkNodeActivate}
+                onSelectWireFromConnectorPin={onSelectWireFromConnectorPin}
               />
               <NetworkSummaryCalloutsLayer
                 renderedCableCallouts={renderedCableCallouts}
@@ -217,6 +220,7 @@ export function NetworkSummaryCanvasPanel({
                 onCalloutMouseDown={handleCalloutMouseDown}
                 onSelectConnectorFromCallout={onSelectConnectorFromCallout}
                 onSelectSpliceFromCallout={onSelectSpliceFromCallout}
+                onSelectWireFromConnectorPin={onSelectWireFromConnectorPin}
                 networkOffset={networkOffset}
                 networkScale={networkScale}
               />

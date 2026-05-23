@@ -5,7 +5,7 @@ import {
   type ReactElement,
   type ReactNode
 } from "react";
-import type { NetworkNode, NodeId, SegmentId } from "../../../../core/entities";
+import type { NetworkNode, NodeId, SegmentId, WireId } from "../../../../core/entities";
 import type { NodePosition } from "../../../types/app-controller";
 import { renderConnectorLayoutDrawing } from "../callouts/NetworkSummaryCalloutsLayer";
 import type { RenderedNodeModel, RenderedSegmentModel } from "./networkSummaryGraphModel";
@@ -51,6 +51,7 @@ interface NetworkSummaryGraphLayersProps {
   onSelectSegment: (segmentId: SegmentId) => void;
   onNodeMouseDown: (event: ReactMouseEvent<SVGGElement>, nodeId: NodeId) => void;
   onNodeActivate: (nodeId: NodeId) => void;
+  onSelectWireFromConnectorPin: (wireId: WireId) => void;
 }
 
 function handleNetworkNodeKeyDown(
@@ -108,7 +109,8 @@ export function NetworkSummaryGraphLayers({
   describeNode,
   onSelectSegment,
   onNodeMouseDown,
-  onNodeActivate
+  onNodeActivate,
+  onSelectWireFromConnectorPin
 }: NetworkSummaryGraphLayersProps): ReactElement {
   return (
     <>
@@ -199,7 +201,7 @@ export function NetworkSummaryGraphLayers({
           } as CSSProperties
         }
       >
-        {renderedNodes.map(({ node, position, nodeClassName, nodeLabel, connectorLayout, highlightedConnectorCavityIndexes }) => {
+        {renderedNodes.map(({ node, position, nodeClassName, nodeLabel, connectorLayout, highlightedConnectorCavityIndexes, connectorCavityWireIdByIndex }) => {
           const connectorWidth = 46 * normalizedNodeShapeScale;
           const connectorHeight = 30 * normalizedNodeShapeScale;
           const connectorDrawingWidth = connectorWidth * connectorDrawingScale;
@@ -264,7 +266,9 @@ export function NetworkSummaryGraphLayers({
                           connectorDrawingWidth,
                           connectorDrawingHeight,
                           highlightedConnectorCavityIndexes,
-                          nodeLabel
+                          nodeLabel,
+                          connectorCavityWireIdByIndex,
+                          onSelectWireFromConnectorPin
                         )}
                       </g>
                     )}
@@ -353,7 +357,10 @@ export function NetworkSummaryGraphLayers({
                         : `rotate(${segmentLabelRotationDegrees} ${segmentLengthLabelX} ${segmentLengthLabelY})`
                     }
                   >
-                    {segment.lengthMm} mm
+                    <tspan>{segment.lengthMm}</tspan>
+                    <tspan className="network-segment-length-unit" dx="2">
+                      mm
+                    </tspan>
                   </text>
                 </g>
               ) : null}
