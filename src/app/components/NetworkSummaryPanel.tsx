@@ -867,6 +867,7 @@ export function NetworkSummaryPanel({
           setGlobalRenderScalePercent={setGlobalRenderScalePercent}
           selectedCanvasNodeCount={selectedCanvasNodeIds.size}
           clearSelectedCanvasNodes={clearSelectedCanvasNodes}
+          lockEntityMovement={lockEntityMovement}
           networkScalePercent={networkScalePercent}
           subNetworkSummaries={subNetworkSummaries}
           activeSubNetworkTags={activeSubNetworkTags}

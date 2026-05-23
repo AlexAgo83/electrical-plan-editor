@@ -381,7 +381,7 @@ export function useCanvasInteractionHandlers({
   }
 
   function handleNetworkCanvasMouseDown(event: ReactMouseEvent<SVGSVGElement>): void {
-    if (!event.shiftKey) {
+    if (!event.shiftKey && !lockEntityMovement) {
       return;
     }
     if (event.button !== 0) {

@@ -45,6 +45,14 @@ describe("App integration UI - navigation and canvas", () => {
         }) as DOMRect
     );
   }
+  function getNetworkSummaryViewportTransform(panel: HTMLElement): string {
+    const networkSvg = within(panel).getByLabelText("2D network diagram");
+    const transformGroup = networkSvg.querySelector("g[transform]");
+    if (transformGroup === null) {
+      throw new Error("Viewport transform group not found.");
+    }
+    return transformGroup.getAttribute("transform") ?? "";
+  }
   beforeEach(() => {
     localStorage.clear();
   });
@@ -659,6 +667,32 @@ describe("App integration UI - navigation and canvas", () => {
 
     fireEvent.mouseDown(networkSvg, { button: 2, shiftKey: true });
     expect(canvasShell).not.toHaveClass("is-panning");
+  });
+
+  it("allows dragging the 2D view without Shift while entity movement is locked", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
+    const rectSpy = mockSvgRect(networkSvg);
+    const initialTransform = getNetworkSummaryViewportTransform(networkSummaryPanel);
+
+    fireEvent.mouseDown(networkSvg, { button: 0, clientX: 240, clientY: 180 });
+    fireEvent.mouseMove(networkSvg, { clientX: 360, clientY: 250 });
+    fireEvent.mouseUp(networkSvg, { clientX: 360, clientY: 250 });
+    expect(getNetworkSummaryViewportTransform(networkSummaryPanel)).toBe(initialTransform);
+
+    openNetworkSummaryEditMenu(networkSummaryPanel);
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Lock" }));
+    expect(within(networkSummaryPanel).getByText("Drag empty canvas to pan.")).toBeInTheDocument();
+
+    fireEvent.mouseDown(networkSvg, { button: 0, clientX: 240, clientY: 180 });
+    fireEvent.mouseMove(networkSvg, { clientX: 360, clientY: 250 });
+    fireEvent.mouseUp(networkSvg, { clientX: 360, clientY: 250 });
+    expect(getNetworkSummaryViewportTransform(networkSummaryPanel)).not.toBe(initialTransform);
+
+    rectSpy.mockRestore();
   });
 
   it("does not change 2D zoom on mouse wheel", () => {
