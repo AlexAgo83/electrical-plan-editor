@@ -37,6 +37,15 @@ function getInitialAssemblyTechnicalId(network: Network | undefined): string {
   return network === undefined ? "HARNESS-ASSEMBLY" : `${network.technicalId}-ASSEMBLY`;
 }
 
+function formatConnectorOptionLabel(connector: Connector): string {
+  const name = connector.name.trim();
+  const technicalId = connector.technicalId.trim();
+  if (name.length === 0) {
+    return technicalId.length === 0 ? String(connector.id) : technicalId;
+  }
+  return technicalId.length === 0 ? name : `${name} (${technicalId})`;
+}
+
 export function HarnessAssemblyManagerPanel({
   assemblies,
   networks,
@@ -401,7 +410,9 @@ export function HarnessAssemblyManagerPanel({
               </select>
               <select value={sourceConnectorId} onChange={(event) => setSourceConnectorId(event.target.value as ConnectorId | "")}>
                 <option value="">Source connector</option>
-                {sourceConnectors.map((connector) => <option key={connector.id} value={connector.id}>{connector.technicalId}</option>)}
+                {sourceConnectors.map((connector) => (
+                  <option key={connector.id} value={connector.id}>{formatConnectorOptionLabel(connector)}</option>
+                ))}
               </select>
               <select value={targetNetworkId} onChange={(event) => {
                 setTargetNetworkId(event.target.value as NetworkId | "");
@@ -412,7 +423,9 @@ export function HarnessAssemblyManagerPanel({
               </select>
               <select value={targetConnectorId} onChange={(event) => setTargetConnectorId(event.target.value as ConnectorId | "")}>
                 <option value="">Target connector</option>
-                {targetConnectors.map((connector) => <option key={connector.id} value={connector.id}>{connector.technicalId}</option>)}
+                {targetConnectors.map((connector) => (
+                  <option key={connector.id} value={connector.id}>{formatConnectorOptionLabel(connector)}</option>
+                ))}
               </select>
               <button type="button" className="network-scope-create-button button-with-icon" onClick={handleAddLink} disabled={!canAddLink}>
                 <span className="action-button-icon is-new" aria-hidden="true" />
