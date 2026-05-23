@@ -800,7 +800,7 @@
   fill: var(--network-node-connector-fill, #dff0ff);
 }
 .network-node-connector-drawing {
-  pointer-events: none;
+  pointer-events: visiblePainted;
 }
 .network-node.splice .network-node-shape {
   fill: var(--network-node-splice-fill, #fdeecf);

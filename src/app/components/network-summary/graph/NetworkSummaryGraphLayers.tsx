@@ -207,10 +207,8 @@ export function NetworkSummaryGraphLayers({
           const connectorDrawingWidth = connectorWidth * connectorDrawingScale;
           const connectorDrawingHeight = connectorHeight * connectorDrawingScale;
           const spliceDiamondSize = 30 * normalizedNodeShapeScale;
-          const connectorHitboxWidth =
-            connectorLayout === undefined ? 56 * normalizedNodeShapeScale : Math.max(56 * normalizedNodeShapeScale, connectorDrawingWidth);
-          const connectorHitboxHeight =
-            connectorLayout === undefined ? 40 * normalizedNodeShapeScale : Math.max(40 * normalizedNodeShapeScale, connectorDrawingHeight);
+          const connectorHitboxWidth = 56 * normalizedNodeShapeScale;
+          const connectorHitboxHeight = 40 * normalizedNodeShapeScale;
           const spliceHitboxSize = 38 * normalizedNodeShapeScale;
           const intermediateRadius = 17 * normalizedNodeShapeScale;
           const intermediateHitboxRadius = 22 * normalizedNodeShapeScale;
@@ -239,25 +237,27 @@ export function NetworkSummaryGraphLayers({
               >
                 {node.kind === "connector" ? (
                   <>
-                    <rect
-                      className="network-node-hitbox"
-                      x={position.x - connectorHitboxWidth / 2}
-                      y={position.y - connectorHitboxHeight / 2}
-                      width={connectorHitboxWidth}
-                      height={connectorHitboxHeight}
-                      rx={9}
-                      ry={9}
-                    />
                     {connectorLayout === undefined ? (
-                      <rect
-                        className="network-node-shape"
-                        x={position.x - connectorWidth / 2}
-                        y={position.y - connectorHeight / 2}
-                        width={connectorWidth}
-                        height={connectorHeight}
-                        rx={7}
-                        ry={7}
-                      />
+                      <>
+                        <rect
+                          className="network-node-hitbox"
+                          x={position.x - connectorHitboxWidth / 2}
+                          y={position.y - connectorHitboxHeight / 2}
+                          width={connectorHitboxWidth}
+                          height={connectorHitboxHeight}
+                          rx={9}
+                          ry={9}
+                        />
+                        <rect
+                          className="network-node-shape"
+                          x={position.x - connectorWidth / 2}
+                          y={position.y - connectorHeight / 2}
+                          width={connectorWidth}
+                          height={connectorHeight}
+                          rx={7}
+                          ry={7}
+                        />
+                      </>
                     ) : (
                       <g
                         className="network-node-connector-drawing"

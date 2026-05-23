@@ -147,10 +147,11 @@ describe("App integration UI - settings canvas callouts", () => {
       node.querySelector(".network-node-connector-drawing")
     );
     expect(connectorLayoutNode).not.toBeNull();
-    const connectorHitbox = connectorLayoutNode?.querySelector(".network-node-hitbox");
-    expect(connectorHitbox).not.toBeNull();
-    expect(Number(connectorHitbox?.getAttribute("width"))).toBeCloseTo(115.92);
-    expect(Number(connectorHitbox?.getAttribute("height"))).toBeCloseTo(75.6);
+    expect(connectorLayoutNode?.querySelector(".network-node-hitbox")).toBeNull();
+    const connectorLayoutShell = connectorLayoutNode?.querySelector(".network-callout-connector-shell");
+    expect(connectorLayoutShell).not.toBeNull();
+    fireEvent.mouseDown(connectorLayoutShell as Element, { button: 0, clientX: 220, clientY: 140 });
+    expect(connectorLayoutNode).toHaveClass("is-selected");
 
     switchScreenDrawerAware("settings");
     const connectorDrawingSelector = within(getPanelByHeading("Canvas render preferences")).getByLabelText(
