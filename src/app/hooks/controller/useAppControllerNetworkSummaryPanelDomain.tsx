@@ -120,6 +120,8 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
     | "canvasShowCalloutWireNames"
     | "canvasConnectorDrawingDisplayMode"
     | "canvasCalloutConnectorDrawingScalePercent"
+    | "canvasGlobalRenderScalePercent"
+    | "setCanvasGlobalRenderScalePercent"
     | "canvasZoomInvariantNodeShapes"
     | "canvasNodeShapeSizePercent"
     | "canvasResizeBehaviorMode"
@@ -332,6 +334,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
         showCalloutWireNames: preferencesState.canvasShowCalloutWireNames,
         connectorDrawingDisplayMode: preferencesState.canvasConnectorDrawingDisplayMode,
         connectorDrawingScalePercent: preferencesState.canvasCalloutConnectorDrawingScalePercent,
+        globalRenderScalePercent: preferencesState.canvasGlobalRenderScalePercent,
+        setGlobalRenderScalePercent: preferencesState.setCanvasGlobalRenderScalePercent,
         zoomInvariantNodeShapes: preferencesState.canvasZoomInvariantNodeShapes,
         nodeShapeSizePercent: preferencesState.canvasNodeShapeSizePercent,
         resizeBehaviorMode: preferencesState.canvasResizeBehaviorMode,

@@ -18,7 +18,7 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 10;
+const UI_PREFERENCES_SCHEMA_VERSION = 12;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 function normalizeThemeMode(value: unknown): ThemeMode {
@@ -139,6 +139,7 @@ interface UiPreferencesPayload {
   canvasShowCalloutWireNames: boolean;
   canvasConnectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
   canvasCalloutConnectorDrawingScalePercent: number;
+  canvasGlobalRenderScalePercent: number;
   canvasZoomInvariantNodeShapes: boolean;
   canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
@@ -247,6 +248,26 @@ function migrateUiPreferencesFromV9(candidate: Record<string, unknown>): Record<
   };
 }
 
+function migrateUiPreferencesFromV10(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    canvasGlobalRenderScalePercent:
+      typeof candidate.canvasGlobalRenderScalePercent === "number" ? candidate.canvasGlobalRenderScalePercent : 0,
+    schemaVersion: 11
+  };
+}
+
+function migrateUiPreferencesFromV11(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    canvasResetZoomPercentInput:
+      candidate.canvasResetZoomPercentInput === "60" || typeof candidate.canvasResetZoomPercentInput !== "string"
+        ? "100"
+        : candidate.canvasResetZoomPercentInput,
+    schemaVersion: 12
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -309,6 +330,16 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
       version = 10;
       continue;
     }
+    if (version === 10) {
+      migrated = migrateUiPreferencesFromV10(migrated);
+      version = 11;
+      continue;
+    }
+    if (version === 11) {
+      migrated = migrateUiPreferencesFromV11(migrated);
+      version = 12;
+      continue;
+    }
     return null;
   }
 
@@ -366,6 +397,7 @@ interface UseUiPreferencesOptions {
   canvasShowCalloutWireNames: boolean;
   canvasConnectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
   canvasCalloutConnectorDrawingScalePercent: number;
+  canvasGlobalRenderScalePercent: number;
   canvasZoomInvariantNodeShapes: boolean;
   canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
@@ -423,6 +455,7 @@ interface UseUiPreferencesOptions {
   setCanvasShowCalloutWireNames: (value: boolean) => void;
   setCanvasConnectorDrawingDisplayMode: (value: ConnectorDrawingDisplayMode) => void;
   setCanvasCalloutConnectorDrawingScalePercent: (value: number) => void;
+  setCanvasGlobalRenderScalePercent: (value: number) => void;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
   setCanvasNodeShapeSizePercent: (value: number) => void;
   setCanvasExportFormat: (value: CanvasExportFormat) => void;
@@ -521,6 +554,14 @@ function normalizeCanvasCalloutConnectorDrawingScalePercent(value: unknown): num
   return clamp(Math.round(Number(parsed)), 100, 200);
 }
 
+function normalizeCanvasGlobalRenderScalePercent(value: unknown): number {
+  const parsed = typeof value === "string" ? Number(value) : value;
+  if (!Number.isFinite(parsed)) {
+    return 0;
+  }
+  return clamp(Math.round(Number(parsed)), 0, 300);
+}
+
 function normalizeWorkspacePanelsLayoutMode(value: unknown): WorkspacePanelsLayoutPreference {
   return value === "multiColumn" ? "multiColumn" : "singleColumn";
 }
@@ -588,6 +629,7 @@ export function useUiPreferences({
   canvasShowCalloutWireNames,
   canvasConnectorDrawingDisplayMode,
   canvasCalloutConnectorDrawingScalePercent,
+  canvasGlobalRenderScalePercent,
   canvasZoomInvariantNodeShapes,
   canvasNodeShapeSizePercent,
   canvasExportFormat,
@@ -645,6 +687,7 @@ export function useUiPreferences({
   setCanvasShowCalloutWireNames,
   setCanvasConnectorDrawingDisplayMode,
   setCanvasCalloutConnectorDrawingScalePercent,
+  setCanvasGlobalRenderScalePercent,
   setCanvasZoomInvariantNodeShapes,
   setCanvasNodeShapeSizePercent,
   setCanvasExportFormat,
@@ -729,7 +772,7 @@ export function useUiPreferences({
           ? preferences.canvasDefaultAutoSegmentLabelRotation
           : true;
       const rawResetZoomPercent =
-        typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "60";
+        typeof preferences.canvasResetZoomPercentInput === "string" ? preferences.canvasResetZoomPercentInput : "100";
       const parsedResetZoomPercent = Number(rawResetZoomPercent);
       const resetScale = Number.isFinite(parsedResetZoomPercent)
         ? clamp(parsedResetZoomPercent / 100, networkMinScale, networkMaxScale)
@@ -786,6 +829,7 @@ export function useUiPreferences({
       setCanvasCalloutConnectorDrawingScalePercent(
         normalizeCanvasCalloutConnectorDrawingScalePercent(preferences.canvasCalloutConnectorDrawingScalePercent)
       );
+      setCanvasGlobalRenderScalePercent(normalizeCanvasGlobalRenderScalePercent(preferences.canvasGlobalRenderScalePercent));
       setCanvasZoomInvariantNodeShapes(
         typeof preferences.canvasZoomInvariantNodeShapes === "boolean" ? preferences.canvasZoomInvariantNodeShapes : true
       );
@@ -858,6 +902,7 @@ export function useUiPreferences({
     setCanvasShowCalloutWireNames,
     setCanvasConnectorDrawingDisplayMode,
     setCanvasCalloutConnectorDrawingScalePercent,
+    setCanvasGlobalRenderScalePercent,
     setCanvasZoomInvariantNodeShapes,
     setCanvasNodeShapeSizePercent,
     setCanvasExportFormat,
@@ -956,6 +1001,7 @@ export function useUiPreferences({
       canvasShowCalloutWireNames,
       canvasConnectorDrawingDisplayMode,
       canvasCalloutConnectorDrawingScalePercent,
+      canvasGlobalRenderScalePercent,
       canvasZoomInvariantNodeShapes,
       canvasNodeShapeSizePercent,
       canvasExportFormat,
@@ -996,6 +1042,7 @@ export function useUiPreferences({
     canvasShowCalloutWireNames,
     canvasConnectorDrawingDisplayMode,
     canvasCalloutConnectorDrawingScalePercent,
+    canvasGlobalRenderScalePercent,
     canvasZoomInvariantNodeShapes,
     canvasNodeShapeSizePercent,
     canvasExportFormat,

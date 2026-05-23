@@ -23,6 +23,8 @@ interface NetworkSummaryCanvasPanelProps {
   showNetworkInfoPanels: boolean;
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
+  globalRenderScalePercent: number;
+  setGlobalRenderScalePercent: (value: number) => void;
   selectedCanvasNodeCount: number;
   clearSelectedCanvasNodes: () => void;
   networkScalePercent: number;
@@ -89,6 +91,8 @@ export function NetworkSummaryCanvasPanel({
   showNetworkInfoPanels,
   handleZoomAction,
   fitNetworkToContent,
+  globalRenderScalePercent,
+  setGlobalRenderScalePercent,
   selectedCanvasNodeCount,
   clearSelectedCanvasNodes,
   networkScalePercent,
@@ -154,6 +158,8 @@ export function NetworkSummaryCanvasPanel({
               showNetworkInfoPanels={showNetworkInfoPanels}
               handleZoomAction={handleZoomAction}
               fitNetworkToContent={fitNetworkToContent}
+              globalRenderScalePercent={globalRenderScalePercent}
+              setGlobalRenderScalePercent={setGlobalRenderScalePercent}
               selectedCanvasNodeCount={selectedCanvasNodeCount}
               clearSelectedCanvasNodes={clearSelectedCanvasNodes}
               networkScalePercent={networkScalePercent}

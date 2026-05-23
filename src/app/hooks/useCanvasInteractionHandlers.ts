@@ -48,6 +48,7 @@ interface UseCanvasInteractionHandlersParams {
   lockEntityMovement: boolean;
   networkOffset: NodePosition;
   networkScale: number;
+  networkRenderScale: number;
   setNetworkScale: Dispatch<SetStateAction<number>>;
   setNetworkOffset: Dispatch<SetStateAction<NodePosition>>;
   draggingNodeId: NodeId | null;
@@ -99,6 +100,7 @@ export function useCanvasInteractionHandlers({
   lockEntityMovement,
   networkOffset,
   networkScale,
+  networkRenderScale,
   setNetworkScale,
   setNetworkOffset,
   draggingNodeId,
@@ -309,8 +311,9 @@ export function useCanvasInteractionHandlers({
 
     const localX = localPoint.x;
     const localY = localPoint.y;
-    const modelX = (localX - networkOffset.x) / networkScale;
-    const modelY = (localY - networkOffset.y) / networkScale;
+    const effectiveScale = networkScale * networkRenderScale;
+    const modelX = (localX - networkOffset.x) / effectiveScale;
+    const modelY = (localY - networkOffset.y) / effectiveScale;
     const snappedX = snapNodesToGrid ? snapToGrid(modelX, NETWORK_GRID_STEP) : modelX;
     const snappedY = snapNodesToGrid ? snapToGrid(modelY, NETWORK_GRID_STEP) : modelY;
 
@@ -418,13 +421,14 @@ export function useCanvasInteractionHandlers({
 
     const viewCenterX = networkViewWidth / 2;
     const viewCenterY = networkViewHeight / 2;
-    const centerModelX = (viewCenterX - networkOffset.x) / networkScale;
-    const centerModelY = (viewCenterY - networkOffset.y) / networkScale;
+    const centerModelX = (viewCenterX - networkOffset.x) / (networkScale * networkRenderScale);
+    const centerModelY = (viewCenterY - networkOffset.y) / (networkScale * networkRenderScale);
+    const nextEffectiveScale = nextScale * networkRenderScale;
 
     setNetworkScale(nextScale);
     setNetworkOffset({
-      x: viewCenterX - centerModelX * nextScale,
-      y: viewCenterY - centerModelY * nextScale
+      x: viewCenterX - centerModelX * nextEffectiveScale,
+      y: viewCenterY - centerModelY * nextEffectiveScale
     });
   }
 

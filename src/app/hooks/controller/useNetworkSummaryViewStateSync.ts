@@ -6,7 +6,6 @@ import { computeNetworkFitViewportForPositions } from "../../lib/networkSummaryV
 
 type SetNetworkSummaryViewStateAction = ReturnType<typeof appActions.setNetworkSummaryViewState>;
 
-const LEGACY_RESET_SCALE = 0.6;
 const VIEWPORT_EPSILON = 0.0001;
 
 function isApproximatelyEqual(left: number, right: number): boolean {
@@ -43,36 +42,6 @@ function isSameNetworkViewport(
     isApproximatelyEqual(left.scale, right.scale) &&
     isApproximatelyEqual(left.offset.x, right.offset.x) &&
     isApproximatelyEqual(left.offset.y, right.offset.y)
-  );
-}
-
-function isLegacyDefaultNetworkSummaryViewState(
-  viewState: NetworkSummaryViewState,
-  options: {
-    configuredResetScale: number;
-    canvasDefaultShowInfoPanels: boolean;
-    canvasDefaultShowSegmentNames: boolean;
-    canvasDefaultShowSegmentLengths: boolean;
-    canvasDefaultShowCableCallouts: boolean;
-    canvasDefaultShowGrid: boolean;
-    canvasDefaultSnapToGrid: boolean;
-    canvasDefaultLockEntityMovement: boolean;
-  }
-): boolean {
-  const isResetScale =
-    isApproximatelyEqual(viewState.scale, options.configuredResetScale) ||
-    isApproximatelyEqual(viewState.scale, LEGACY_RESET_SCALE);
-  return (
-    isResetScale &&
-    isApproximatelyEqual(viewState.offset.x, 0) &&
-    isApproximatelyEqual(viewState.offset.y, 0) &&
-    viewState.showNetworkInfoPanels === options.canvasDefaultShowInfoPanels &&
-    viewState.showSegmentNames === options.canvasDefaultShowSegmentNames &&
-    viewState.showSegmentLengths === options.canvasDefaultShowSegmentLengths &&
-    viewState.showCableCallouts === options.canvasDefaultShowCableCallouts &&
-    viewState.showNetworkGrid === options.canvasDefaultShowGrid &&
-    viewState.snapNodesToGrid === options.canvasDefaultSnapToGrid &&
-    viewState.lockEntityMovement === options.canvasDefaultLockEntityMovement
   );
 }
 
@@ -165,21 +134,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     setLockEntityMovement,
     dispatchAction
   } = options;
-  const activeNetworkSummaryViewStateIsLegacyDefault =
-    activeNetworkSummaryViewState !== undefined &&
-    isLegacyDefaultNetworkSummaryViewState(activeNetworkSummaryViewState, {
-      configuredResetScale,
-      canvasDefaultShowInfoPanels,
-      canvasDefaultShowSegmentNames,
-      canvasDefaultShowSegmentLengths,
-      canvasDefaultShowCableCallouts,
-      canvasDefaultShowGrid,
-      canvasDefaultSnapToGrid,
-      canvasDefaultLockEntityMovement
-    });
-  const effectiveActiveNetworkSummaryViewState = activeNetworkSummaryViewStateIsLegacyDefault
-    ? undefined
-    : activeNetworkSummaryViewState;
+  const effectiveActiveNetworkSummaryViewState = activeNetworkSummaryViewState;
   const localViewSnapshotRef = useRef({
     networkScale,
     networkOffset,

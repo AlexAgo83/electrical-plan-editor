@@ -68,6 +68,8 @@ export function NetworkSummaryPanel({
   showCalloutWireNames,
   connectorDrawingDisplayMode,
   connectorDrawingScalePercent,
+  globalRenderScalePercent,
+  setGlobalRenderScalePercent,
   zoomInvariantNodeShapes,
   nodeShapeSizePercent,
   resizeBehaviorMode,
@@ -164,7 +166,9 @@ export function NetworkSummaryPanel({
     { label: "Adjacency entries", value: totalEdgeEntries }
   ];
   const activeNetworkName = activeNetwork?.name.trim() ?? "";
+  const globalRenderScale = 1 + clampNumber(globalRenderScalePercent, 0, 300) / 100;
   const effectiveScale = networkScale > 0 ? networkScale : 1;
+  const effectiveRenderScale = effectiveScale * globalRenderScale;
   const inverseLabelScale = 1 / effectiveScale;
   const normalizedNodeShapeScale = zoomInvariantNodeShapes
     ? Math.min(1.25, Math.max(0.5, nodeShapeSizePercent / 100))
@@ -186,10 +190,10 @@ export function NetworkSummaryPanel({
     "--network-callout-leader-dasharray": `${calloutLeaderDashFirst} ${calloutLeaderDashSecond}`
   } as CSSProperties;
   const useStrokeInvariantLines = resizeBehaviorMode === "visibleAreaOnly";
-  const visibleModelMinX = (0 - networkOffset.x) / effectiveScale;
-  const visibleModelMaxX = (networkViewWidth - networkOffset.x) / effectiveScale;
-  const visibleModelMinY = (0 - networkOffset.y) / effectiveScale;
-  const visibleModelMaxY = (networkViewHeight - networkOffset.y) / effectiveScale;
+  const visibleModelMinX = (0 - networkOffset.x) / effectiveRenderScale;
+  const visibleModelMaxX = (networkViewWidth - networkOffset.x) / effectiveRenderScale;
+  const visibleModelMinY = (0 - networkOffset.y) / effectiveRenderScale;
+  const visibleModelMaxY = (networkViewHeight - networkOffset.y) / effectiveRenderScale;
   const gridStartX = Math.floor(visibleModelMinX / networkGridStep) * networkGridStep;
   const gridEndX = Math.ceil(visibleModelMaxX / networkGridStep) * networkGridStep;
   const gridStartY = Math.floor(visibleModelMinY / networkGridStep) * networkGridStep;
@@ -460,14 +464,14 @@ export function NetworkSummaryPanel({
 
       const localX = ((clientX - bounds.left) / bounds.width) * networkViewWidth;
       const localY = ((clientY - bounds.top) / bounds.height) * networkViewHeight;
-      const modelX = (localX - networkOffset.x) / networkScale;
-      const modelY = (localY - networkOffset.y) / networkScale;
+      const modelX = (localX - networkOffset.x) / effectiveRenderScale;
+      const modelY = (localY - networkOffset.y) / effectiveRenderScale;
       return {
         x: snapNodesToGrid ? snapToGrid(modelX, networkGridStep) : modelX,
         y: snapNodesToGrid ? snapToGrid(modelY, networkGridStep) : modelY
       };
     },
-    [networkGridStep, networkOffset.x, networkOffset.y, networkScale, networkViewHeight, networkViewWidth, snapNodesToGrid]
+    [effectiveRenderScale, networkGridStep, networkOffset.x, networkOffset.y, networkViewHeight, networkViewWidth, snapNodesToGrid]
   );
 
   const selectCalloutTarget = useCallback(
@@ -597,6 +601,9 @@ export function NetworkSummaryPanel({
     networkSvgRef,
     networkCanvasShellRef,
     canvasExportFormat,
+    networkOffset,
+    networkScale: effectiveScale,
+    renderedNetworkScale: effectiveRenderScale,
     pngExportIncludeBackground,
     exportIncludeFrame,
     exportIncludeCartouche,
@@ -856,6 +863,8 @@ export function NetworkSummaryPanel({
           showNetworkInfoPanels={showNetworkInfoPanels}
           handleZoomAction={handleZoomAction}
           fitNetworkToContent={fitNetworkToContent}
+          globalRenderScalePercent={globalRenderScalePercent}
+          setGlobalRenderScalePercent={setGlobalRenderScalePercent}
           selectedCanvasNodeCount={selectedCanvasNodeIds.size}
           clearSelectedCanvasNodes={clearSelectedCanvasNodes}
           networkScalePercent={networkScalePercent}
@@ -877,7 +886,7 @@ export function NetworkSummaryPanel({
           handleCanvasMouseMoveWithCallouts={handleCanvasMouseMoveWithCallouts}
           stopNetworkInteractions={stopNetworkInteractions}
           networkOffset={networkOffset}
-          networkScale={networkScale}
+          networkScale={effectiveRenderScale}
           showNetworkGrid={showNetworkGrid}
           gridXPositions={gridXPositions}
           gridYPositions={gridYPositions}

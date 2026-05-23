@@ -39,6 +39,8 @@ export interface NetworkSummaryPanelProps {
   showCalloutWireNames: boolean;
   connectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
   connectorDrawingScalePercent: number;
+  globalRenderScalePercent: number;
+  setGlobalRenderScalePercent: (value: number) => void;
   zoomInvariantNodeShapes: boolean;
   nodeShapeSizePercent: number;
   resizeBehaviorMode: CanvasResizeBehaviorMode;

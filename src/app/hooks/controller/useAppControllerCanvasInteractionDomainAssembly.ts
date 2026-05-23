@@ -31,6 +31,7 @@ interface UseAppControllerCanvasInteractionDomainAssemblyParams {
     lockEntityMovement: boolean;
     networkOffset: NodePosition;
     networkScale: number;
+    networkRenderScale: number;
     setNetworkScale: CanvasInteractionAssemblyParams["viewport"]["setNetworkScale"];
     setNetworkOffset: CanvasInteractionAssemblyParams["viewport"]["setNetworkOffset"];
     draggingNodeId: NodeId | null;
@@ -87,6 +88,7 @@ export function useAppControllerCanvasInteractionDomainAssembly({
       lockEntityMovement: viewport.lockEntityMovement,
       networkOffset: viewport.networkOffset,
       networkScale: viewport.networkScale,
+      networkRenderScale: viewport.networkRenderScale,
       setNetworkScale: viewport.setNetworkScale,
       setNetworkOffset: viewport.setNetworkOffset,
       draggingNodeId: viewport.draggingNodeId,

@@ -10,6 +10,8 @@ interface NetworkCanvasFloatingInfoPanelsProps {
   showNetworkInfoPanels: boolean;
   handleZoomAction: (target: "in" | "out" | "reset") => void;
   fitNetworkToContent: () => void;
+  globalRenderScalePercent: number;
+  setGlobalRenderScalePercent: (value: number) => void;
   selectedCanvasNodeCount: number;
   clearSelectedCanvasNodes: () => void;
   networkScalePercent: number;
@@ -32,6 +34,8 @@ export function NetworkCanvasFloatingInfoPanels({
   showNetworkInfoPanels,
   handleZoomAction,
   fitNetworkToContent,
+  globalRenderScalePercent,
+  setGlobalRenderScalePercent,
   selectedCanvasNodeCount,
   clearSelectedCanvasNodes,
   networkScalePercent,
@@ -50,6 +54,24 @@ export function NetworkCanvasFloatingInfoPanels({
   return (
     <>
       <div className="network-canvas-floating-controls" aria-label="Canvas controls">
+        <label className="network-canvas-global-scale">
+          <span>Global scale</span>
+          <input
+            type="range"
+            min={0}
+            max={300}
+            step={5}
+            value={globalRenderScalePercent}
+            onChange={(event) => {
+              const parsed = Number(event.target.value);
+              if (!Number.isFinite(parsed)) {
+                return;
+              }
+              setGlobalRenderScalePercent(Math.min(300, Math.max(0, Math.round(parsed))));
+            }}
+          />
+          <strong>{globalRenderScalePercent}%</strong>
+        </label>
         <div className="network-canvas-toolbar">
           <button
             type="button"

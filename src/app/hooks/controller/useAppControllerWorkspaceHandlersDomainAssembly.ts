@@ -32,8 +32,6 @@ interface UseAppControllerWorkspaceHandlersDomainAssemblyParams {
     | "connectorMap"
     | "spliceMap"
     | "configuredResetScale"
-    | "networkScale"
-    | "networkOffset"
     | "setNetworkScale"
     | "setNetworkOffset"
   > & {
@@ -140,6 +138,7 @@ export function useAppControllerWorkspaceHandlersDomainAssembly({
       setCanvasDefaultAutoSegmentLabelRotation: preferencesState.setCanvasDefaultAutoSegmentLabelRotation,
       setCanvasShowCalloutWireNames: preferencesState.setCanvasShowCalloutWireNames,
       setCanvasConnectorDrawingDisplayMode: preferencesState.setCanvasConnectorDrawingDisplayMode,
+      setCanvasGlobalRenderScalePercent: preferencesState.setCanvasGlobalRenderScalePercent,
       setCanvasZoomInvariantNodeShapes: preferencesState.setCanvasZoomInvariantNodeShapes,
       setCanvasNodeShapeSizePercent: preferencesState.setCanvasNodeShapeSizePercent,
       setCanvasExportFormat: preferencesState.setCanvasExportFormat,

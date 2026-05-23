@@ -21,7 +21,7 @@ export function useAppControllerCanvasDisplayState() {
   const [networkCalloutTextSize, setNetworkCalloutTextSize] = useState<CanvasCalloutTextSize>("normal");
   const [networkLabelRotationDegrees, setNetworkLabelRotationDegrees] = useState<CanvasLabelRotationDegrees>(0);
   const [networkAutoSegmentLabelRotation, setNetworkAutoSegmentLabelRotation] = useState(true);
-  const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("60");
+  const [canvasResetZoomPercentInput, setCanvasResetZoomPercentInput] = useState("100");
 
   return {
     routePreviewStartNodeId,

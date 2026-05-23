@@ -593,8 +593,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       configuredResetScale,
       effectiveNetworkViewWidth,
       effectiveNetworkViewHeight,
-      networkScale,
-      networkOffset,
       setNetworkScale,
       setNetworkOffset
     },
@@ -794,6 +792,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     clearCatalogForm: catalogHandlers.clearCatalogForm
   });
 
+  const globalNetworkRenderScale = 1 + Math.min(300, Math.max(0, preferencesState.canvasGlobalRenderScalePercent)) / 100;
   const canvasInteractionDomain = useAppControllerCanvasInteractionDomainAssembly({
     core: {
       state,
@@ -815,6 +814,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       lockEntityMovement,
       networkOffset,
       networkScale,
+      networkRenderScale: globalNetworkRenderScale,
       setNetworkScale,
       setNetworkOffset,
       draggingNodeId,

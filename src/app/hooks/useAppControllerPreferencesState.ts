@@ -58,6 +58,7 @@ export function useAppControllerPreferencesState() {
   const [canvasConnectorDrawingDisplayMode, setCanvasConnectorDrawingDisplayMode] =
     useState<ConnectorDrawingDisplayMode>("nodes");
   const [canvasCalloutConnectorDrawingScalePercent, setCanvasCalloutConnectorDrawingScalePercent] = useState(150);
+  const [canvasGlobalRenderScalePercent, setCanvasGlobalRenderScalePercent] = useState(0);
   const [canvasZoomInvariantNodeShapes, setCanvasZoomInvariantNodeShapes] = useState(true);
   const [canvasNodeShapeSizePercent, setCanvasNodeShapeSizePercent] = useState(70);
   const [canvasExportFormat, setCanvasExportFormat] = useState<CanvasExportFormat>("svg");
@@ -144,6 +145,8 @@ export function useAppControllerPreferencesState() {
     setCanvasConnectorDrawingDisplayMode,
     canvasCalloutConnectorDrawingScalePercent,
     setCanvasCalloutConnectorDrawingScalePercent,
+    canvasGlobalRenderScalePercent,
+    setCanvasGlobalRenderScalePercent,
     canvasZoomInvariantNodeShapes,
     setCanvasZoomInvariantNodeShapes,
     canvasNodeShapeSizePercent,

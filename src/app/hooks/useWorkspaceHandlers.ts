@@ -85,8 +85,6 @@ interface UseWorkspaceHandlersParams {
   configuredResetScale: number;
   networkViewWidth: number;
   networkViewHeight: number;
-  networkScale: number;
-  networkOffset: NodePosition;
   setNetworkScale: (value: number) => void;
   setNetworkOffset: (value: NodePosition) => void;
   showCableCallouts: boolean;
@@ -146,6 +144,7 @@ interface UseWorkspaceHandlersParams {
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
   setCanvasConnectorDrawingDisplayMode: (value: ConnectorDrawingDisplayMode) => void;
+  setCanvasGlobalRenderScalePercent: (value: number) => void;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
   setCanvasNodeShapeSizePercent: (value: number) => void;
   setCanvasExportFormat: (value: "svg" | "png") => void;
@@ -197,8 +196,6 @@ export function useWorkspaceHandlers({
   configuredResetScale,
   networkViewWidth,
   networkViewHeight,
-  networkScale,
-  networkOffset,
   setNetworkScale,
   setNetworkOffset,
   showCableCallouts,
@@ -254,6 +251,7 @@ export function useWorkspaceHandlers({
   setCanvasDefaultAutoSegmentLabelRotation,
   setCanvasShowCalloutWireNames,
   setCanvasConnectorDrawingDisplayMode,
+  setCanvasGlobalRenderScalePercent,
   setCanvasZoomInvariantNodeShapes,
   setCanvasNodeShapeSizePercent,
   setCanvasExportFormat,
@@ -615,11 +613,42 @@ export function useWorkspaceHandlers({
   }
 
   function resetNetworkViewToConfiguredScale(): void {
-    setNetworkScale(configuredResetScale);
-    setNetworkOffset({ x: 0, y: 0 });
+    const positions = nodes
+      .map((node) => networkNodePositions[node.id])
+      .filter((position): position is NodePosition => position !== undefined);
+    const firstPosition = positions[0];
+    if (firstPosition === undefined) {
+      setCanvasGlobalRenderScalePercent(0);
+      setNetworkScale(configuredResetScale);
+      setNetworkOffset({ x: 0, y: 0 });
+      return;
+    }
+
+    let minX = firstPosition.x;
+    let maxX = firstPosition.x;
+    let minY = firstPosition.y;
+    let maxY = firstPosition.y;
+    for (const position of positions.slice(1)) {
+      minX = Math.min(minX, position.x);
+      maxX = Math.max(maxX, position.x);
+      minY = Math.min(minY, position.y);
+      maxY = Math.max(maxY, position.y);
+    }
+
+    const scale = configuredResetScale > 0 ? configuredResetScale : 1;
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    setCanvasGlobalRenderScalePercent(0);
+    setNetworkScale(scale);
+    setNetworkOffset({
+      x: networkViewWidth / 2 - centerX * scale,
+      y: networkViewHeight / 2 - centerY * scale
+    });
   }
 
   function fitNetworkToContent(): void {
+    resetNetworkViewToConfiguredScale();
+
     if (nodes.length === 0) {
       return;
     }
@@ -656,90 +685,46 @@ export function useWorkspaceHandlers({
     }
 
     if (showCableCallouts) {
-      let measuredCalloutBoundsFromDom = false;
+      const initialFit = computeNetworkFitViewportForBounds({
+        bounds: { minX, maxX, minY, maxY },
+        networkViewWidth,
+        networkViewHeight,
+        networkMinScale: NETWORK_MIN_SCALE,
+        networkMaxScale: NETWORK_MAX_SCALE
+      });
+      const safeScale = Math.max(0.05, initialFit.scale);
+      const inverseLabelScale = 1 / safeScale;
+      const estimatedCalloutHalfWidthBySize: Record<CanvasCalloutTextSize, number> = {
+        small: 130,
+        normal: 155,
+        large: 180,
+        extraLarge: 180
+      };
+      const estimatedCalloutHalfHeightBySize: Record<CanvasCalloutTextSize, number> = {
+        small: 52,
+        normal: 64,
+        large: 74,
+        extraLarge: 74
+      };
+      const calloutHalfWidth = estimatedCalloutHalfWidthBySize[networkCalloutTextSize] * inverseLabelScale;
+      const calloutHalfHeight = estimatedCalloutHalfHeightBySize[networkCalloutTextSize] * inverseLabelScale;
 
-      if (typeof document !== "undefined" && networkScale > 0.0001) {
-        const svgElement = document.querySelector<SVGSVGElement>(".network-summary-stack .network-svg");
-        const svgRect = svgElement?.getBoundingClientRect();
-        const calloutFrames = svgElement?.querySelectorAll(".network-callout-frame");
-        const hasUsableSvgRect =
-          svgRect !== undefined &&
-          svgRect.width > 0 &&
-          svgRect.height > 0 &&
-          Number.isFinite(svgRect.left) &&
-          Number.isFinite(svgRect.top);
-
-        if (svgElement !== null && hasUsableSvgRect && calloutFrames !== undefined && calloutFrames.length > 0) {
-          const scaleX = networkViewWidth / svgRect.width;
-          const scaleY = networkViewHeight / svgRect.height;
-
-          calloutFrames.forEach((frame) => {
-            const rect = frame.getBoundingClientRect();
-            if (rect.width <= 0 || rect.height <= 0) {
-              return;
-            }
-
-            const leftSvg = (rect.left - svgRect.left) * scaleX;
-            const rightSvg = (rect.right - svgRect.left) * scaleX;
-            const topSvg = (rect.top - svgRect.top) * scaleY;
-            const bottomSvg = (rect.bottom - svgRect.top) * scaleY;
-
-            const leftModel = (leftSvg - networkOffset.x) / networkScale;
-            const rightModel = (rightSvg - networkOffset.x) / networkScale;
-            const topModel = (topSvg - networkOffset.y) / networkScale;
-            const bottomModel = (bottomSvg - networkOffset.y) / networkScale;
-
-            minX = Math.min(minX, leftModel);
-            maxX = Math.max(maxX, rightModel);
-            minY = Math.min(minY, topModel);
-            maxY = Math.max(maxY, bottomModel);
-            measuredCalloutBoundsFromDom = true;
-          });
+      for (const node of nodes) {
+        if (node.kind !== "connector" && node.kind !== "splice") {
+          continue;
         }
-      }
-
-      if (!measuredCalloutBoundsFromDom) {
-        const initialFit = computeNetworkFitViewportForBounds({
-          bounds: { minX, maxX, minY, maxY },
-          networkViewWidth,
-          networkViewHeight,
-          networkMinScale: NETWORK_MIN_SCALE,
-          networkMaxScale: NETWORK_MAX_SCALE
-        });
-        const safeScale = Math.max(0.05, initialFit.scale);
-        const inverseLabelScale = 1 / safeScale;
-        const estimatedCalloutHalfWidthBySize: Record<CanvasCalloutTextSize, number> = {
-          small: 130,
-          normal: 155,
-          large: 180,
-          extraLarge: 180
-        };
-        const estimatedCalloutHalfHeightBySize: Record<CanvasCalloutTextSize, number> = {
-          small: 52,
-          normal: 64,
-          large: 74,
-          extraLarge: 74
-        };
-        const calloutHalfWidth = estimatedCalloutHalfWidthBySize[networkCalloutTextSize] * inverseLabelScale;
-        const calloutHalfHeight = estimatedCalloutHalfHeightBySize[networkCalloutTextSize] * inverseLabelScale;
-
-        for (const node of nodes) {
-          if (node.kind !== "connector" && node.kind !== "splice") {
-            continue;
-          }
-          const persistedPosition =
-            node.kind === "connector"
-              ? connectorMap.get(node.connectorId)?.cableCalloutPosition
-              : spliceMap.get(node.spliceId)?.cableCalloutPosition;
-          if (persistedPosition === undefined) {
-            continue;
-          }
-
-          minX = Math.min(minX, persistedPosition.x - calloutHalfWidth);
-          maxX = Math.max(maxX, persistedPosition.x + calloutHalfWidth);
-          minY = Math.min(minY, persistedPosition.y - calloutHalfHeight);
-          maxY = Math.max(maxY, persistedPosition.y + calloutHalfHeight);
+        const persistedPosition =
+          node.kind === "connector"
+            ? connectorMap.get(node.connectorId)?.cableCalloutPosition
+            : spliceMap.get(node.spliceId)?.cableCalloutPosition;
+        if (persistedPosition === undefined) {
+          continue;
         }
+
+        minX = Math.min(minX, persistedPosition.x - calloutHalfWidth);
+        maxX = Math.max(maxX, persistedPosition.x + calloutHalfWidth);
+        minY = Math.min(minY, persistedPosition.y - calloutHalfHeight);
+        maxY = Math.max(maxY, persistedPosition.y + calloutHalfHeight);
       }
     }
     const fittedViewport = computeNetworkFitViewportForBounds({
@@ -786,6 +771,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultShowCableCallouts(false);
     setCanvasDefaultCalloutContentMode("wireDetails");
     setCanvasConnectorDrawingDisplayMode("disabled");
+    setCanvasGlobalRenderScalePercent(0);
     setCanvasDefaultShowSelectedCalloutOnly(false);
     setCanvasDefaultLabelStrokeMode("light");
     setCanvasDefaultLabelSizeMode("small");
@@ -800,7 +786,7 @@ export function useWorkspaceHandlers({
     setCanvasExportIncludeFrame(false);
     setCanvasExportIncludeCartouche(true);
     setCanvasResizeBehaviorMode("visibleAreaOnly");
-    setCanvasResetZoomPercentInput("60");
+    setCanvasResetZoomPercentInput("100");
     setShowNetworkGrid(true);
     setSnapNodesToGrid(true);
     setLockEntityMovement(false);

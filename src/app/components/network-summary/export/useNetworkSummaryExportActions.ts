@@ -5,6 +5,7 @@ import {
   applyExportDecorations,
   copyComputedStylesToSvgClone,
   exportCanvasToPngBlob,
+  removeGlobalRenderScaleFromSvgClone,
   resolveCanvasExportBackgroundFill
 } from "./networkSummaryExport";
 
@@ -12,6 +13,9 @@ interface UseNetworkSummaryExportActionsParams {
   networkSvgRef: RefObject<SVGSVGElement | null>;
   networkCanvasShellRef: RefObject<HTMLDivElement | null>;
   canvasExportFormat: CanvasExportFormat;
+  networkOffset: { x: number; y: number };
+  networkScale: number;
+  renderedNetworkScale: number;
   pngExportIncludeBackground: boolean;
   exportIncludeFrame: boolean;
   exportIncludeCartouche: boolean;
@@ -55,6 +59,9 @@ export function useNetworkSummaryExportActions({
   networkSvgRef,
   networkCanvasShellRef,
   canvasExportFormat,
+  networkOffset,
+  networkScale,
+  renderedNetworkScale,
   pngExportIncludeBackground,
   exportIncludeFrame,
   exportIncludeCartouche,
@@ -73,6 +80,14 @@ export function useNetworkSummaryExportActions({
 
     const { svgClone, exportWidth, exportHeight } = prepareSvgCloneForExport(sourceSvg);
     copyComputedStylesToSvgClone(sourceSvg, svgClone);
+    removeGlobalRenderScaleFromSvgClone({
+      cloneSvg: svgClone,
+      networkOffset,
+      networkScale,
+      renderedNetworkScale,
+      width: exportWidth,
+      height: exportHeight
+    });
     await applyExportDecorations({
       sourceSvg,
       cloneSvg: svgClone,
@@ -102,7 +117,10 @@ export function useNetworkSummaryExportActions({
     exportCartoucheProjectCode,
     exportIncludeCartouche,
     exportIncludeFrame,
-    networkSvgRef
+    networkSvgRef,
+    networkOffset,
+    networkScale,
+    renderedNetworkScale
   ]);
 
   const handleExportPlanAsSvg = useCallback(async () => {

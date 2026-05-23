@@ -280,6 +280,24 @@
   gap: 0.24rem;
 }
 
+.network-canvas-global-scale {
+  display: grid;
+  grid-template-columns: auto minmax(8rem, 1fr) 3.2rem;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+  color: var(--theme-strong-text, #163348);
+}
+
+.network-canvas-global-scale input {
+  min-width: 0;
+}
+
+.network-canvas-global-scale strong {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .network-canvas-toolbar .workspace-tab {
   padding: 0.22rem 0.55rem;
   font-size: 0.76rem;

@@ -53,8 +53,6 @@ interface UseAppControllerWorkspaceNetworkDomainAssemblyParams {
     configuredResetScale: WorkspaceHandlersAssemblyParams["workspace"]["configuredResetScale"];
     effectiveNetworkViewWidth: number;
     effectiveNetworkViewHeight: number;
-    networkScale: WorkspaceHandlersAssemblyParams["workspace"]["networkScale"];
-    networkOffset: WorkspaceHandlersAssemblyParams["workspace"]["networkOffset"];
     setNetworkScale: WorkspaceHandlersAssemblyParams["workspace"]["setNetworkScale"];
     setNetworkOffset: WorkspaceHandlersAssemblyParams["workspace"]["setNetworkOffset"];
   };
@@ -166,8 +164,6 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
       configuredResetScale: workspace.configuredResetScale,
       networkViewWidth: workspace.effectiveNetworkViewWidth,
       networkViewHeight: workspace.effectiveNetworkViewHeight,
-      networkScale: workspace.networkScale,
-      networkOffset: workspace.networkOffset,
       setNetworkScale: workspace.setNetworkScale,
       setNetworkOffset: workspace.setNetworkOffset
     },

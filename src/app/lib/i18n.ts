@@ -227,6 +227,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Connector drawing display": "Affichage du dessin connecteur",
   "Disabled": "Desactive",
   "Connector drawing size (%)": "Taille du dessin connecteur (%)",
+  "Summary global scale (%)": "Échelle globale du summary (%)",
   "Show only selected connector/splice callout": "Afficher uniquement le cartouche connecteur/épissure sélectionné",
   "Show wire names in callout table": "Afficher les noms de fils dans le tableau des cartouches",
   "Keep connector/splice/node shape size constant while zooming": "Conserver la taille des formes connecteur/épissure/nœud pendant le zoom",

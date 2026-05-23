@@ -108,6 +108,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasConnectorDrawingDisplayMode: (value: ConnectorDrawingDisplayMode) => void;
   canvasCalloutConnectorDrawingScalePercent: number;
   setCanvasCalloutConnectorDrawingScalePercent: (value: number) => void;
+  canvasGlobalRenderScalePercent: number;
+  setCanvasGlobalRenderScalePercent: (value: number) => void;
   canvasZoomInvariantNodeShapes: boolean;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
   canvasNodeShapeSizePercent: number;
@@ -228,6 +230,8 @@ export function SettingsWorkspaceContent({
   setCanvasConnectorDrawingDisplayMode,
   canvasCalloutConnectorDrawingScalePercent,
   setCanvasCalloutConnectorDrawingScalePercent,
+  canvasGlobalRenderScalePercent,
+  setCanvasGlobalRenderScalePercent,
   canvasZoomInvariantNodeShapes,
   setCanvasZoomInvariantNodeShapes,
   canvasNodeShapeSizePercent,
@@ -342,6 +346,27 @@ export function SettingsWorkspaceContent({
                 }}
               />
               <span className="settings-range-value">{canvasCalloutConnectorDrawingScalePercent}%</span>
+            </div>
+          </label>
+          <label className="settings-field settings-range-field">
+            Summary global scale (%)
+            <div className="settings-range-control">
+              <input
+                className="settings-range-input"
+                type="range"
+                min={0}
+                max={300}
+                step={5}
+                value={canvasGlobalRenderScalePercent}
+                onChange={(event) => {
+                  const parsed = Number(event.target.value);
+                  if (!Number.isFinite(parsed)) {
+                    return;
+                  }
+                  setCanvasGlobalRenderScalePercent(Math.min(300, Math.max(0, Math.round(parsed))));
+                }}
+              />
+              <span className="settings-range-value">{canvasGlobalRenderScalePercent}%</span>
             </div>
           </label>
           <label className="settings-field">

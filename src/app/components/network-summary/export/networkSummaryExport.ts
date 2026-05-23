@@ -4,6 +4,7 @@ import {
   normalizeNetworkLogoUrl
 } from "../../../../core/networkMetadata";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
+import { NETWORK_GRID_STEP } from "../../../lib/app-utils-shared";
 
 const SVG_EXPORT_STYLE_PROPERTIES = [
   "fill",
@@ -65,6 +66,89 @@ export function copyComputedStylesToSvgClone(sourceSvg: SVGSVGElement, cloneSvg:
         inlineStyle.setProperty(propertyName, propertyValue);
       }
     }
+  }
+}
+
+export function removeGlobalRenderScaleFromSvgClone(params: {
+  cloneSvg: SVGSVGElement;
+  networkOffset: { x: number; y: number };
+  networkScale: number;
+  renderedNetworkScale: number;
+  width: number;
+  height: number;
+}): void {
+  const renderedScale = params.renderedNetworkScale;
+  const baseScale = params.networkScale;
+  if (!Number.isFinite(renderedScale) || !Number.isFinite(baseScale) || renderedScale <= 0) {
+    return;
+  }
+
+  const transformPattern = /^translate\(([-+\d.eE]+)\s+([-+\d.eE]+)\)\s+scale\(([-+\d.eE]+)\)$/;
+  const transformElements = Array.from(params.cloneSvg.querySelectorAll<SVGElement>("[transform]"));
+  for (const element of transformElements) {
+    const transform = element.getAttribute("transform")?.trim() ?? "";
+    const match = transform.match(transformPattern);
+    if (match === null) {
+      continue;
+    }
+
+    const [, rawX, rawY, rawScale] = match;
+    const x = Number(rawX);
+    const y = Number(rawY);
+    const scale = Number(rawScale);
+    if (
+      !Number.isFinite(x) ||
+      !Number.isFinite(y) ||
+      !Number.isFinite(scale) ||
+      Math.abs(x - params.networkOffset.x) > 0.0001 ||
+      Math.abs(y - params.networkOffset.y) > 0.0001 ||
+      Math.abs(scale - renderedScale) > 0.0001
+    ) {
+      continue;
+    }
+
+    element.setAttribute("transform", `translate(${params.networkOffset.x} ${params.networkOffset.y}) scale(${baseScale})`);
+  }
+
+  const gridLayer = params.cloneSvg.querySelector<SVGGElement>(".network-grid");
+  if (gridLayer === null || baseScale <= 0) {
+    return;
+  }
+  const gridLineStyle =
+    gridLayer.querySelector<SVGLineElement>("line")?.getAttribute("style") ||
+    "stroke: #d5e1eb; stroke-width: 1; vector-effect: non-scaling-stroke;";
+
+  const visibleModelMinX = (0 - params.networkOffset.x) / baseScale;
+  const visibleModelMaxX = (params.width - params.networkOffset.x) / baseScale;
+  const visibleModelMinY = (0 - params.networkOffset.y) / baseScale;
+  const visibleModelMaxY = (params.height - params.networkOffset.y) / baseScale;
+  const gridStartX = Math.floor(visibleModelMinX / NETWORK_GRID_STEP) * NETWORK_GRID_STEP;
+  const gridEndX = Math.ceil(visibleModelMaxX / NETWORK_GRID_STEP) * NETWORK_GRID_STEP;
+  const gridStartY = Math.floor(visibleModelMinY / NETWORK_GRID_STEP) * NETWORK_GRID_STEP;
+  const gridEndY = Math.ceil(visibleModelMaxY / NETWORK_GRID_STEP) * NETWORK_GRID_STEP;
+
+  gridLayer.replaceChildren();
+  for (let x = gridStartX; x <= gridEndX; x += NETWORK_GRID_STEP) {
+    const line = createSvgElement("line");
+    if (gridLineStyle.length > 0) {
+      line.setAttribute("style", gridLineStyle);
+    }
+    line.setAttribute("x1", String(x));
+    line.setAttribute("y1", String(visibleModelMinY));
+    line.setAttribute("x2", String(x));
+    line.setAttribute("y2", String(visibleModelMaxY));
+    gridLayer.appendChild(line);
+  }
+  for (let y = gridStartY; y <= gridEndY; y += NETWORK_GRID_STEP) {
+    const line = createSvgElement("line");
+    if (gridLineStyle.length > 0) {
+      line.setAttribute("style", gridLineStyle);
+    }
+    line.setAttribute("x1", String(visibleModelMinX));
+    line.setAttribute("y1", String(y));
+    line.setAttribute("x2", String(visibleModelMaxX));
+    line.setAttribute("y2", String(y));
+    gridLayer.appendChild(line);
   }
 }
 
