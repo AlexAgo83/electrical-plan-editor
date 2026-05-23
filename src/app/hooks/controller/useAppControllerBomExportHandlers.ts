@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CatalogItem, CatalogItemId, Connector, Splice, Wire } from "../../../core/entities";
 import type { ConnectorCavityOccupancyMap } from "../../../core/connectorCatalogMaterials";
 import { buildNetworkSummaryBomCsvExport, buildNetworkSummaryBomWorkbookSheets } from "../../lib/networkSummaryBomCsv";
@@ -49,6 +49,9 @@ export function useAppControllerBomExportHandlers({
   connectorCavityOccupancy
 }: UseAppControllerBomExportHandlersParams) {
   const [activeBomPreview, setActiveBomPreview] = useState<ActiveBomPreviewState | null>(null);
+  const [isBomPreviewLoading, setIsBomPreviewLoading] = useState(false);
+  const bomPreviewRequestIdRef = useRef(0);
+  const bomPreviewTimerRef = useRef<number | null>(null);
   const networkSummaryBomCsvExport = useMemo(
     () =>
       buildNetworkSummaryBomCsvExport(
@@ -86,42 +89,64 @@ export function useAppControllerBomExportHandlers({
       return;
     }
 
-    const normalizedWorkspaceCurrencyCode = workspaceCurrencyCode ?? "EUR";
-    const catalogItemReferenceLinks = Object.fromEntries(
-      catalogItems.map((item) => [item.manufacturerReference, item.id] as const)
-    );
-    const connectorTechnicalIdLinks = Object.fromEntries(
-      connectors.map((connector) => [connector.technicalId, connector.id] as const)
-    );
-    const workbookSheets = buildNetworkSummaryBomWorkbookSheets(
-      catalogItems,
-      connectors,
-      splices,
-      wires,
-      normalizedWorkspaceCurrencyCode,
-      workspaceTaxEnabled,
-      workspaceTaxRatePercent,
-      bomExportCompactColumns,
-      {
-        connectorCavityOccupancy,
-        showTraceabilityLabels: !bomTraceabilityLabelsHidden
-      }
-    );
+    bomPreviewRequestIdRef.current += 1;
+    const requestId = bomPreviewRequestIdRef.current;
+    if (bomPreviewTimerRef.current !== null) {
+      window.clearTimeout(bomPreviewTimerRef.current);
+    }
+    setIsBomPreviewLoading(true);
 
-    setActiveBomPreview({
-      format: tabularExportFormat,
-      headers: networkSummaryBomCsvExport.headers,
-      rows: networkSummaryBomCsvExport.rows,
-      itemRowCount: networkSummaryBomCsvExport.itemRowCount,
-      warnings: networkSummaryBomCsvExport.warnings,
-      catalogItemReferenceLinks,
-      connectorTechnicalIdLinks,
-      workspaceCurrencyCode: normalizedWorkspaceCurrencyCode,
-      workspaceTaxEnabled,
-      workspaceTaxRatePercent,
-      compactColumns: bomExportCompactColumns,
-      workbookSheets
-    });
+    bomPreviewTimerRef.current = window.setTimeout(() => {
+      try {
+        const normalizedWorkspaceCurrencyCode = workspaceCurrencyCode ?? "EUR";
+        const catalogItemReferenceLinks = Object.fromEntries(
+          catalogItems.map((item) => [item.manufacturerReference, item.id] as const)
+        );
+        const connectorTechnicalIdLinks = Object.fromEntries(
+          connectors.map((connector) => [connector.technicalId, connector.id] as const)
+        );
+        const workbookSheets = buildNetworkSummaryBomWorkbookSheets(
+          catalogItems,
+          connectors,
+          splices,
+          wires,
+          normalizedWorkspaceCurrencyCode,
+          workspaceTaxEnabled,
+          workspaceTaxRatePercent,
+          bomExportCompactColumns,
+          {
+            connectorCavityOccupancy,
+            showTraceabilityLabels: !bomTraceabilityLabelsHidden
+          }
+        );
+
+        if (requestId !== bomPreviewRequestIdRef.current) {
+          return;
+        }
+
+        bomPreviewTimerRef.current = null;
+        setActiveBomPreview({
+          format: tabularExportFormat,
+          headers: networkSummaryBomCsvExport.headers,
+          rows: networkSummaryBomCsvExport.rows,
+          itemRowCount: networkSummaryBomCsvExport.itemRowCount,
+          warnings: networkSummaryBomCsvExport.warnings,
+          catalogItemReferenceLinks,
+          connectorTechnicalIdLinks,
+          workspaceCurrencyCode: normalizedWorkspaceCurrencyCode,
+          workspaceTaxEnabled,
+          workspaceTaxRatePercent,
+          compactColumns: bomExportCompactColumns,
+          workbookSheets
+        });
+        setIsBomPreviewLoading(false);
+      } catch (error) {
+        if (requestId === bomPreviewRequestIdRef.current) {
+          setIsBomPreviewLoading(false);
+        }
+        throw error;
+      }
+    }, 0);
   }, [
     bomExportCompactColumns,
     bomTraceabilityLabelsHidden,
@@ -142,6 +167,12 @@ export function useAppControllerBomExportHandlers({
   ]);
 
   const closeActiveBomPreview = useCallback(() => {
+    bomPreviewRequestIdRef.current += 1;
+    if (bomPreviewTimerRef.current !== null) {
+      window.clearTimeout(bomPreviewTimerRef.current);
+      bomPreviewTimerRef.current = null;
+    }
+    setIsBomPreviewLoading(false);
     setActiveBomPreview(null);
   }, []);
 
@@ -152,6 +183,7 @@ export function useAppControllerBomExportHandlers({
     }
 
     setActiveBomPreview(null);
+    setIsBomPreviewLoading(false);
     if (preview.format === "xlsx") {
       void downloadTabularWorkbookFile("network-bom", preview.workbookSheets);
       return;
@@ -171,12 +203,21 @@ export function useAppControllerBomExportHandlers({
     );
   }, [activeBomPreview]);
 
+  useEffect(() => {
+    return () => {
+      if (bomPreviewTimerRef.current !== null) {
+        window.clearTimeout(bomPreviewTimerRef.current);
+      }
+    };
+  }, []);
+
   return {
     activeBomPreview,
     bomExportCompactColumns,
     canExportBomCsv,
     closeActiveBomPreview,
     confirmActiveBomPreviewDownload,
-    handleExportBomCsv
+    handleExportBomCsv,
+    isBomPreviewLoading
   };
 }

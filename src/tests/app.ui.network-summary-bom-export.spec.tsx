@@ -35,12 +35,16 @@ async function openSvgPreviewAndDownload(panel: HTMLElement): Promise<HTMLElemen
   return previewDialog;
 }
 
+async function findBomPreviewDialog(): Promise<HTMLElement> {
+  return screen.findByRole("dialog", { name: "BOM preview" });
+}
+
 describe("App integration UI - network summary BOM export", () => {
   beforeEach(() => {
     localStorage.clear();
   });
 
-  it("renders BOM to the right of SVG and uses the CSV export icon", () => {
+  it("renders BOM to the right of SVG and uses the CSV export icon", async () => {
     const catalogItemId = asCatalogItemId("CAT-BOM");
     const withCatalog = appReducer(
       appReducer(
@@ -103,7 +107,8 @@ describe("App integration UI - network summary BOM export", () => {
       expect(createObjectUrl).not.toHaveBeenCalled();
       expect(clickSpy).not.toHaveBeenCalled();
 
-      const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+      expect(await screen.findByRole("dialog", { name: "Preparing BOM preview" })).toBeInTheDocument();
+      const previewDialog = await findBomPreviewDialog();
       expect(within(previewDialog).getByText("Items")).toBeInTheDocument();
       expect(within(previewDialog).getAllByText("1").length).toBeGreaterThan(0);
       expect(within(previewDialog).getByText("CSV")).toBeInTheDocument();
@@ -139,7 +144,7 @@ describe("App integration UI - network summary BOM export", () => {
     expect(within(networkSummaryPanel).getByRole("button", { name: "BOM" })).toBeInTheDocument();
   });
 
-  it("cancels BOM preview without downloading", () => {
+  it("cancels BOM preview without downloading", async () => {
     const catalogItemId = asCatalogItemId("CAT-BOM-CANCEL");
     const withCatalog = appReducer(
       appReducer(
@@ -175,7 +180,7 @@ describe("App integration UI - network summary BOM export", () => {
       openExportMenu(networkSummaryPanel);
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
 
-      const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+      const previewDialog = await findBomPreviewDialog();
       fireEvent.click(within(previewDialog).getByRole("button", { name: "Cancel" }));
 
       expect(screen.queryByRole("dialog", { name: "BOM preview" })).toBeNull();
@@ -207,6 +212,7 @@ describe("App integration UI - network summary BOM export", () => {
       openExportMenu(networkSummaryPanel);
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
 
+      expect(await screen.findByRole("dialog", { name: "Preparing SVG preview" })).toBeInTheDocument();
       let previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
       expect(within(previewDialog).getByLabelText("SVG export preview")).toBeInTheDocument();
       const includeFrameToggle = within(previewDialog).getByLabelText("Include frame");
@@ -218,8 +224,9 @@ describe("App integration UI - network summary BOM export", () => {
       const themeSelect = within(previewDialog).getByLabelText("Theme");
       expect(themeSelect).toHaveValue("warmBrown");
       fireEvent.change(themeSelect, { target: { value: "dark" } });
-      previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
-      expect(within(previewDialog).getByLabelText("Theme")).toHaveValue("dark");
+      await waitFor(() => {
+        expect(within(previewDialog).getByLabelText("Theme")).toHaveValue("dark");
+      });
       expect(previewDialog.parentElement).not.toHaveClass("theme-dark");
       expect(previewDialog.parentElement).toHaveClass("theme-warm-brown");
       const previewThemeHost = within(previewDialog).getByLabelText("SVG export preview").querySelector(".svg-preview-theme-host");
@@ -228,8 +235,9 @@ describe("App integration UI - network summary BOM export", () => {
       expect(previewSvg?.outerHTML).not.toContain("visibility: hidden");
 
       fireEvent.click(within(previewDialog).getByLabelText("Include frame"));
-      previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
-      expect(within(previewDialog).getByLabelText("Include frame")).toBeChecked();
+      await waitFor(() => {
+        expect(within(previewDialog).getByLabelText("Include frame")).toBeChecked();
+      });
       fireEvent.click(within(previewDialog).getByRole("button", { name: "Fit network" }));
       expect(await screen.findByRole("dialog", { name: "SVG preview" })).toBeInTheDocument();
       fireEvent.click(within(previewDialog).getByRole("button", { name: "Download SVG" }));
@@ -249,7 +257,7 @@ describe("App integration UI - network summary BOM export", () => {
     }
   });
 
-  it("shows XLSX workbook sheets as BOM preview tabs", () => {
+  it("shows XLSX workbook sheets as BOM preview tabs", async () => {
     const catalogItemId = asCatalogItemId("CAT-BOM-XLSX");
     const withCatalog = appReducer(
       appReducer(
@@ -284,7 +292,7 @@ describe("App integration UI - network summary BOM export", () => {
     openExportMenu(networkSummaryPanel);
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
 
-    const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+    const previewDialog = await findBomPreviewDialog();
     expect(within(previewDialog).getByText("XLSX")).toBeInTheDocument();
     expect(within(previewDialog).getByText("Sheets")).toBeInTheDocument();
     expect(within(previewDialog).getAllByText("2").length).toBeGreaterThan(0);
@@ -297,7 +305,7 @@ describe("App integration UI - network summary BOM export", () => {
     expect(within(previewDialog).getByText("C-BOM-XLSX")).toBeInTheDocument();
   });
 
-  it("opens connectors from the BOM preview By connector sheet", () => {
+  it("opens connectors from the BOM preview By connector sheet", async () => {
     const catalogItemId = asCatalogItemId("CAT-BOM-CONNECTOR-LINK");
     const withCatalog = appReducer(
       appReducer(
@@ -331,7 +339,7 @@ describe("App integration UI - network summary BOM export", () => {
     openExportMenu(networkSummaryPanel);
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
 
-    const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+    const previewDialog = await findBomPreviewDialog();
     fireEvent.click(within(previewDialog).getByRole("tab", { name: /By connector/ }));
     fireEvent.click(within(previewDialog).getByRole("button", { name: "CONN-BOM-LINK" }));
 
@@ -340,7 +348,7 @@ describe("App integration UI - network summary BOM export", () => {
     expect(within(editConnectorPanel).getByLabelText("Technical ID")).toHaveValue("CONN-BOM-LINK");
   });
 
-  it("opens catalog entries from BOM preview manufacturer references", () => {
+  it("opens catalog entries from BOM preview manufacturer references", async () => {
     const catalogItemId = asCatalogItemId("CAT-BOM-LINK");
     const withCatalog = appReducer(
       appReducer(
@@ -369,7 +377,7 @@ describe("App integration UI - network summary BOM export", () => {
     openExportMenu(networkSummaryPanel);
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
 
-    const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+    const previewDialog = await findBomPreviewDialog();
     fireEvent.click(within(previewDialog).getByRole("button", { name: "CAT-BOM-LINK" }));
 
     expect(screen.queryByRole("dialog", { name: "BOM preview" })).toBeNull();
@@ -377,7 +385,7 @@ describe("App integration UI - network summary BOM export", () => {
     expect(within(editCatalogPanel).getByLabelText("Manufacturer reference")).toHaveValue("CAT-BOM-LINK");
   });
 
-  it("keeps wire termination references in the BOM preview as non-navigation text", () => {
+  it("keeps wire termination references in the BOM preview as non-navigation text", async () => {
     const baseState = createUiIntegrationState();
     const baseWire = baseState.wires.byId[asWireId("W1")];
     if (baseWire === undefined) {
@@ -408,12 +416,12 @@ describe("App integration UI - network summary BOM export", () => {
     openExportMenu(networkSummaryPanel);
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
 
-    const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+    const previewDialog = await findBomPreviewDialog();
     expect(within(previewDialog).getAllByText("TERM-NOT-CATALOG-LINK").length).toBeGreaterThan(0);
     expect(within(previewDialog).queryByRole("button", { name: "TERM-NOT-CATALOG-LINK" })).toBeNull();
   });
 
-  it("exports BOM CSV with a UTF-8 BOM and inline wire termination rows even without catalog-backed rows", () => {
+  it("exports BOM CSV with a UTF-8 BOM and inline wire termination rows even without catalog-backed rows", async () => {
     const baseState = createUiIntegrationState();
     const baseWire = baseState.wires.byId[asWireId("W1")];
     if (baseWire === undefined) {
@@ -464,7 +472,7 @@ describe("App integration UI - network summary BOM export", () => {
       const networkSummaryPanel = getPanelByHeading("Network summary");
       openExportMenu(networkSummaryPanel);
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
-      const previewDialog = screen.getByRole("dialog", { name: "BOM preview" });
+      const previewDialog = await findBomPreviewDialog();
       expect(within(previewDialog).getAllByText("Wire termination").length).toBeGreaterThan(0);
       fireEvent.click(within(previewDialog).getByRole("button", { name: "Download CSV" }));
 
@@ -671,6 +679,25 @@ describe("App integration UI - network summary BOM export", () => {
         Object.defineProperty(URL, "revokeObjectURL", originalRevokeObjectUrl);
       }
     }
+  });
+
+  it("toggles the network grid in the SVG export preview", async () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    openExportMenu(networkSummaryPanel);
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
+
+    const previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
+    const previewShell = within(previewDialog).getByLabelText("SVG export preview");
+    expect(within(previewDialog).getByLabelText("Include grid")).toBeChecked();
+    expect(previewShell.querySelector(".network-grid")).not.toBeNull();
+
+    fireEvent.click(within(previewDialog).getByLabelText("Include grid"));
+    await waitFor(() => {
+      expect(previewShell.querySelector(".network-grid")).toBeNull();
+    });
   });
 
   it("keeps a readable cartouche fill when exporting without callout frames present", async () => {

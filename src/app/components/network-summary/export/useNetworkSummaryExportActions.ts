@@ -23,6 +23,7 @@ interface UseNetworkSummaryExportActionsParams {
   pngExportIncludeBackground: boolean;
   exportIncludeFrame: boolean;
   exportIncludeCartouche: boolean;
+  exportIncludeGrid?: boolean;
   exportCartoucheNetworkName: string;
   exportCartoucheAuthor?: string;
   exportCartoucheProjectCode?: string;
@@ -43,12 +44,14 @@ export interface SvgExportPreviewState {
   exportHeight: number;
   includeFrame: boolean;
   includeCartouche: boolean;
+  includeGrid: boolean;
   themeMode: ThemeMode;
 }
 
 export interface SvgPreviewOptions {
   includeFrame?: boolean;
   includeCartouche?: boolean;
+  includeGrid?: boolean;
   themeMode?: ThemeMode;
 }
 
@@ -72,6 +75,29 @@ function prepareSvgCloneForExport(sourceSvg: SVGSVGElement): PreparedSvgExport {
     exportWidth,
     exportHeight
   };
+}
+
+function applySvgGridVisibility(svgClone: SVGSVGElement, includeGrid: boolean): void {
+  const gridLayers = Array.from(svgClone.querySelectorAll<SVGGElement>(".network-grid"));
+  if (!includeGrid) {
+    gridLayers.forEach((gridLayer) => gridLayer.remove());
+    return;
+  }
+
+  gridLayers.forEach((gridLayer) => {
+    gridLayer.classList.remove("is-hidden");
+    gridLayer.style.removeProperty("display");
+  });
+}
+
+function waitForPreviewRenderTurn(): Promise<void> {
+  if (typeof window === "undefined") {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, 0);
+  });
 }
 
 async function withThemedSourceSvg<T>(
@@ -117,6 +143,7 @@ export function useNetworkSummaryExportActions({
   pngExportIncludeBackground,
   exportIncludeFrame,
   exportIncludeCartouche,
+  exportIncludeGrid = true,
   exportCartoucheNetworkName,
   exportCartoucheAuthor,
   exportCartoucheProjectCode,
@@ -125,6 +152,7 @@ export function useNetworkSummaryExportActions({
   exportCartoucheNotes
 }: UseNetworkSummaryExportActionsParams) {
   const [activeSvgPreview, setActiveSvgPreview] = useState<SvgExportPreviewState | null>(null);
+  const [isSvgPreviewLoading, setIsSvgPreviewLoading] = useState(false);
   const svgPreviewRequestIdRef = useRef(0);
 
   const prepareDecoratedSvgClone = useCallback(async (options?: SvgPreviewOptions) => {
@@ -145,6 +173,7 @@ export function useNetworkSummaryExportActions({
         width: exportWidth,
         height: exportHeight
       });
+      applySvgGridVisibility(svgClone, options?.includeGrid ?? exportIncludeGrid);
       await applyExportDecorations({
         sourceSvg: themedSourceSvg,
         cloneSvg: svgClone,
@@ -175,6 +204,7 @@ export function useNetworkSummaryExportActions({
     exportCartoucheProjectCode,
     exportIncludeCartouche,
     exportIncludeFrame,
+    exportIncludeGrid,
     networkSvgRef,
     networkOffset,
     networkScale,
@@ -206,14 +236,28 @@ export function useNetworkSummaryExportActions({
     async (options?: SvgPreviewOptions) => {
       const requestId = svgPreviewRequestIdRef.current + 1;
       svgPreviewRequestIdRef.current = requestId;
+      setIsSvgPreviewLoading(true);
       const includeFrame = options?.includeFrame ?? exportIncludeFrame;
       const includeCartouche = options?.includeCartouche ?? exportIncludeCartouche;
+      const includeGrid = options?.includeGrid ?? exportIncludeGrid;
       const previewThemeMode = options?.themeMode ?? themeMode;
-      const prepared = await prepareDecoratedSvgClone({ includeFrame, includeCartouche, themeMode: previewThemeMode });
-      if (prepared === null) {
-        return null;
+      let prepared: PreparedSvgExport | null;
+      try {
+        await waitForPreviewRenderTurn();
+        if (requestId !== svgPreviewRequestIdRef.current) {
+          return null;
+        }
+        prepared = await prepareDecoratedSvgClone({ includeFrame, includeCartouche, includeGrid, themeMode: previewThemeMode });
+      } catch (error) {
+        if (requestId === svgPreviewRequestIdRef.current) {
+          setIsSvgPreviewLoading(false);
+        }
+        throw error;
       }
-      if (requestId !== svgPreviewRequestIdRef.current) {
+      if (prepared === null || requestId !== svgPreviewRequestIdRef.current) {
+        if (requestId === svgPreviewRequestIdRef.current) {
+          setIsSvgPreviewLoading(false);
+        }
         return null;
       }
 
@@ -224,12 +268,14 @@ export function useNetworkSummaryExportActions({
         exportHeight: prepared.exportHeight,
         includeFrame,
         includeCartouche,
+        includeGrid,
         themeMode: previewThemeMode
       };
       setActiveSvgPreview(preview);
+      setIsSvgPreviewLoading(false);
       return preview;
     },
-    [exportIncludeCartouche, exportIncludeFrame, prepareDecoratedSvgClone, themeMode]
+    [exportIncludeCartouche, exportIncludeFrame, exportIncludeGrid, prepareDecoratedSvgClone, themeMode]
   );
 
   const handleExportPlanAsSvg = useCallback(async () => {
@@ -244,12 +290,14 @@ export function useNetworkSummaryExportActions({
       return;
     }
     svgPreviewRequestIdRef.current += 1;
+    setIsSvgPreviewLoading(false);
     downloadSvgMarkup(activeSvgPreview.svgMarkup);
     setActiveSvgPreview(null);
   }, [activeSvgPreview, downloadSvgMarkup]);
 
   const handleCloseSvgPreview = useCallback(() => {
     svgPreviewRequestIdRef.current += 1;
+    setIsSvgPreviewLoading(false);
     setActiveSvgPreview(null);
   }, []);
 
@@ -329,6 +377,7 @@ export function useNetworkSummaryExportActions({
     handleDownloadSvgPreview,
     handleExportPlan,
     handleExportPlanAsPng,
-    handleExportPlanAsSvg
+    handleExportPlanAsSvg,
+    isSvgPreviewLoading
   };
 }

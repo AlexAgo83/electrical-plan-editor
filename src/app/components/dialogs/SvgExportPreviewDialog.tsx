@@ -7,6 +7,8 @@ interface SvgExportPreviewDialogProps {
   isOpen: boolean;
   themeHostClassName?: string;
   showDecorationOptions?: boolean;
+  showGridOption?: boolean;
+  showFitAction?: boolean;
   preview: SvgExportPreviewState | null;
   onPreviewOptionsChange: (options: SvgPreviewOptions) => void;
   onFitNetwork: () => void;
@@ -26,6 +28,8 @@ export function SvgExportPreviewDialog({
   isOpen,
   themeHostClassName,
   showDecorationOptions = true,
+  showGridOption = false,
+  showFitAction = true,
   preview,
   onPreviewOptionsChange,
   onFitNetwork,
@@ -114,15 +118,39 @@ export function SvgExportPreviewDialog({
   };
 
   const handleFrameChange = (includeFrame: boolean): void => {
-    onPreviewOptionsChange({ includeFrame, includeCartouche: preview.includeCartouche, themeMode: preview.themeMode });
+    onPreviewOptionsChange({
+      includeFrame,
+      includeCartouche: preview.includeCartouche,
+      includeGrid: preview.includeGrid,
+      themeMode: preview.themeMode
+    });
   };
 
   const handleCartoucheChange = (includeCartouche: boolean): void => {
-    onPreviewOptionsChange({ includeFrame: preview.includeFrame, includeCartouche, themeMode: preview.themeMode });
+    onPreviewOptionsChange({
+      includeFrame: preview.includeFrame,
+      includeCartouche,
+      includeGrid: preview.includeGrid,
+      themeMode: preview.themeMode
+    });
+  };
+
+  const handleGridChange = (includeGrid: boolean): void => {
+    onPreviewOptionsChange({
+      includeFrame: preview.includeFrame,
+      includeCartouche: preview.includeCartouche,
+      includeGrid,
+      themeMode: preview.themeMode
+    });
   };
 
   const handleThemeChange = (themeMode: ThemeMode): void => {
-    onPreviewOptionsChange({ includeFrame: preview.includeFrame, includeCartouche: preview.includeCartouche, themeMode });
+    onPreviewOptionsChange({
+      includeFrame: preview.includeFrame,
+      includeCartouche: preview.includeCartouche,
+      includeGrid: preview.includeGrid,
+      themeMode
+    });
   };
   const layerClassName = ["confirm-dialog-layer", themeHostClassName ?? ""].filter((token) => token.length > 0).join(" ");
   const previewThemeHostClassName = ["svg-preview-theme-host", "app-shell", ...getThemeClassNames(preview.themeMode)]
@@ -174,6 +202,12 @@ export function SvgExportPreviewDialog({
               </label>
             </>
           ) : null}
+          {showGridOption ? (
+            <label className="settings-checkbox-row">
+              <input type="checkbox" checked={preview.includeGrid} onChange={(event) => handleGridChange(event.target.checked)} />
+              <span>Include grid</span>
+            </label>
+          ) : null}
           <label className="svg-preview-theme-field">
             <span>Theme</span>
             <select value={preview.themeMode} onChange={(event) => handleThemeChange(event.target.value as ThemeMode)}>
@@ -184,9 +218,11 @@ export function SvgExportPreviewDialog({
               ))}
             </select>
           </label>
-          <button type="button" className="workspace-tab" onClick={onFitNetwork}>
-            Fit network
-          </button>
+          {showFitAction ? (
+            <button type="button" className="workspace-tab" onClick={onFitNetwork}>
+              Fit network
+            </button>
+          ) : null}
         </div>
         <div ref={previewShellRef} className="svg-preview-shell" tabIndex={0} aria-label="SVG export preview">
           <div className={previewThemeHostClassName}>

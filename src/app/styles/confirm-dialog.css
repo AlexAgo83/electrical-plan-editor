@@ -122,6 +122,47 @@
   min-width: 7rem;
 }
 
+.preview-loading-backdrop {
+  cursor: progress;
+}
+
+.preview-loading-dialog {
+  width: min(100%, 24rem);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.preview-loading-spinner {
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 3px solid color-mix(in srgb, currentColor 16%, transparent);
+  border-top-color: color-mix(in srgb, var(--theme-primary, currentColor) 76%, currentColor);
+  border-radius: 999px;
+  animation: preview-loading-spin 0.8s linear infinite;
+}
+
+.preview-loading-copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.preview-loading-copy h2,
+.preview-loading-copy p {
+  margin: 0;
+}
+
+.preview-loading-copy p {
+  color: color-mix(in srgb, currentColor 72%, transparent);
+  line-height: 1.35;
+}
+
+@keyframes preview-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .bom-preview-dialog {
   width: min(100%, 72rem);
   max-height: min(44rem, calc(100vh - 2rem));

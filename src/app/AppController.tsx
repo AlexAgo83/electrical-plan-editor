@@ -141,7 +141,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     canExportBomCsv,
     closeActiveBomPreview,
     confirmActiveBomPreviewDownload,
-    handleExportBomCsv
+    handleExportBomCsv,
+    isBomPreviewLoading
   } = useAppControllerBomExportHandlers({
     catalogItems,
     connectors,
@@ -1091,6 +1092,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       activeChoiceDialog={activeChoiceDialog}
       closeActiveChoiceDialog={closeActiveChoiceDialog}
       activeBomPreview={activeBomPreview}
+      isBomPreviewLoading={isBomPreviewLoading}
       closeActiveBomPreview={closeActiveBomPreview}
       confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload}
       openBomPreviewCatalogItem={openBomPreviewCatalogItem}

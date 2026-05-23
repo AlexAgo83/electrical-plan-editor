@@ -374,6 +374,8 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(within(previewDialog).getByLabelText("SVG export preview")).toBeInTheDocument();
     expect(within(previewDialog).queryByLabelText("Include frame")).not.toBeInTheDocument();
     expect(within(previewDialog).queryByLabelText("Include identity")).not.toBeInTheDocument();
+    expect(within(previewDialog).queryByLabelText("Include grid")).not.toBeInTheDocument();
+    expect(within(previewDialog).queryByRole("button", { name: "Fit network" })).not.toBeInTheDocument();
     expect(within(previewDialog).getByLabelText("Theme")).toBeInTheDocument();
     const previewSvg = within(previewDialog).getByLabelText("SVG export preview").querySelector("svg");
     expect(previewSvg?.outerHTML).not.toContain('class="network-export-frame"');

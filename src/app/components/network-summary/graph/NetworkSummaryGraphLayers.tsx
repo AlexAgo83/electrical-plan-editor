@@ -114,16 +114,18 @@ export function NetworkSummaryGraphLayers({
 }: NetworkSummaryGraphLayersProps): ReactElement {
   return (
     <>
-      {showNetworkGrid ? (
-        <g className="network-grid" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
+      <g
+        className={showNetworkGrid ? "network-grid" : "network-grid is-hidden"}
+        style={showNetworkGrid ? undefined : { display: "none" }}
+        transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
+      >
           {gridXPositions.map((position) => {
             return <line key={`grid-v-${position}`} x1={position} y1={visibleModelMinY} x2={position} y2={visibleModelMaxY} />;
           })}
           {gridYPositions.map((position) => {
             return <line key={`grid-h-${position}`} x1={visibleModelMinX} y1={position} x2={visibleModelMaxX} y2={position} />;
           })}
-        </g>
-      ) : null}
+      </g>
       {afterGridLayer}
 
       {splicePlacementPreviewSegments.length > 0 || splicePlacementPreviewNode !== null ? (

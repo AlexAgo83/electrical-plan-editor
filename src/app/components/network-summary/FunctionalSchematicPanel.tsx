@@ -12,6 +12,7 @@ import { CABLE_COLOR_BY_ID, getWireColorCode, getWireColorLabel } from "../../..
 import type { ThemeMode } from "../../../store";
 import type { CanvasExportFormat } from "../../types/app-controller";
 import { getThemeClassNames } from "../../lib/themeModes";
+import { PreviewLoadingDialog } from "../dialogs/PreviewLoadingDialog";
 import { SvgExportPreviewDialog } from "../dialogs/SvgExportPreviewDialog";
 import { type SvgPreviewOptions, useNetworkSummaryExportActions } from "./export/useNetworkSummaryExportActions";
 
@@ -821,7 +822,8 @@ export function FunctionalSchematicPanel({
     createSvgPreview,
     handleCloseSvgPreview,
     handleDownloadSvgPreview,
-    handleExportPlan
+    handleExportPlan,
+    isSvgPreviewLoading
   } = useNetworkSummaryExportActions({
     networkSvgRef: svgRef,
     networkCanvasShellRef: shellRef,
@@ -854,6 +856,7 @@ export function FunctionalSchematicPanel({
         : {
             includeFrame: activeSvgPreview.includeFrame,
             includeCartouche: activeSvgPreview.includeCartouche,
+            includeGrid: activeSvgPreview.includeGrid,
             themeMode: activeSvgPreview.themeMode
           }
     );
@@ -1040,11 +1043,18 @@ export function FunctionalSchematicPanel({
         isOpen={activeSvgPreview !== null}
         themeHostClassName={dialogThemeHostClassName}
         showDecorationOptions={showSvgPreviewDecorationOptions}
+        showFitAction={showSvgPreviewDecorationOptions}
         preview={activeSvgPreview}
         onPreviewOptionsChange={handlePreviewOptionsChange}
         onFitNetwork={handleRefreshPreview}
         onConfirm={handleDownloadSvgPreview}
         onCancel={handleCloseSvgPreview}
+      />
+      <PreviewLoadingDialog
+        isOpen={isSvgPreviewLoading && activeSvgPreview === null}
+        themeHostClassName={dialogThemeHostClassName}
+        title="Preparing SVG preview"
+        message="Rendering the functional schematic export."
       />
     </section>
   );

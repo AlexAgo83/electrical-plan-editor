@@ -49,6 +49,7 @@ import {
 } from "./network-summary/export/useNetworkSummaryExportActions";
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
 import { SvgExportPreviewDialog } from "./dialogs/SvgExportPreviewDialog";
+import { PreviewLoadingDialog } from "./dialogs/PreviewLoadingDialog";
 import { snapToGrid } from "../lib/app-utils-shared";
 import { getThemeClassNames } from "../lib/themeModes";
 import type { NetworkSummaryPanelProps } from "./network-summary/NetworkSummaryPanel.types";
@@ -611,7 +612,8 @@ export function NetworkSummaryPanel({
     createSvgPreview,
     handleCloseSvgPreview,
     handleDownloadSvgPreview,
-    handleExportPlan
+    handleExportPlan,
+    isSvgPreviewLoading
   } = useNetworkSummaryExportActions({
     networkSvgRef,
     networkCanvasShellRef,
@@ -623,6 +625,7 @@ export function NetworkSummaryPanel({
     pngExportIncludeBackground,
     exportIncludeFrame,
     exportIncludeCartouche,
+    exportIncludeGrid: showNetworkGrid,
     exportCartoucheNetworkName,
     exportCartoucheAuthor,
     exportCartoucheProjectCode,
@@ -650,16 +653,18 @@ export function NetworkSummaryPanel({
         ? {
             includeFrame: exportIncludeFrame,
             includeCartouche: exportIncludeCartouche,
+            includeGrid: showNetworkGrid,
             themeMode
           }
         : {
             includeFrame: activeSvgPreview.includeFrame,
             includeCartouche: activeSvgPreview.includeCartouche,
+            includeGrid: activeSvgPreview.includeGrid,
             themeMode: activeSvgPreview.themeMode
           }
     );
     fitNetworkToContent();
-  }, [activeSvgPreview, exportIncludeCartouche, exportIncludeFrame, fitNetworkToContent, themeMode]);
+  }, [activeSvgPreview, exportIncludeCartouche, exportIncludeFrame, fitNetworkToContent, showNetworkGrid, themeMode]);
 
   useEffect(() => {
     if (pendingFitSvgPreviewOptions === null) {
@@ -1007,11 +1012,18 @@ export function NetworkSummaryPanel({
       <SvgExportPreviewDialog
         isOpen={activeSvgPreview !== null}
         themeHostClassName={dialogThemeHostClassName}
+        showGridOption={true}
         preview={activeSvgPreview}
         onPreviewOptionsChange={handleSvgPreviewOptionsChange}
         onFitNetwork={handleFitNetworkAndRefreshSvgPreview}
         onConfirm={handleDownloadSvgPreview}
         onCancel={handleCloseSvgPreview}
+      />
+      <PreviewLoadingDialog
+        isOpen={isSvgPreviewLoading && activeSvgPreview === null}
+        themeHostClassName={dialogThemeHostClassName}
+        title="Preparing SVG preview"
+        message="Rendering the current network export."
       />
     </section>
   );

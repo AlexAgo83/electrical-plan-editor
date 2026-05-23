@@ -3,6 +3,7 @@ import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 import { ChoiceDialog } from "../dialogs/ChoiceDialog";
 import { DeleteImpactDialog } from "../dialogs/DeleteImpactDialog";
 import { BomExportPreviewDialog } from "../dialogs/BomExportPreviewDialog";
+import { PreviewLoadingDialog } from "../dialogs/PreviewLoadingDialog";
 import { OnboardingModal } from "../onboarding/OnboardingModal";
 import type { ActiveConfirmDialogState } from "../../hooks/controller/useConfirmDialogController";
 import type { ActiveChoiceDialogState } from "../../hooks/controller/useChoiceDialogController";
@@ -17,6 +18,7 @@ interface AppControllerOverlaysProps {
   activeChoiceDialog: ActiveChoiceDialogState | null;
   closeActiveChoiceDialog: (choiceId: string | null) => void;
   activeBomPreview: ActiveBomPreviewState | null;
+  isBomPreviewLoading: boolean;
   closeActiveBomPreview: () => void;
   confirmActiveBomPreviewDownload: () => void;
   openBomPreviewCatalogItem: (catalogItemId: CatalogItemId) => void;
@@ -44,6 +46,7 @@ export function AppControllerOverlays({
   activeChoiceDialog,
   closeActiveChoiceDialog,
   activeBomPreview,
+  isBomPreviewLoading,
   closeActiveBomPreview,
   confirmActiveBomPreviewDownload,
   openBomPreviewCatalogItem,
@@ -54,6 +57,7 @@ export function AppControllerOverlays({
     activeConfirmDialog === null &&
     activeChoiceDialog === null &&
     activeBomPreview === null &&
+    !isBomPreviewLoading &&
     onboarding.activeOnboardingStep === undefined
   ) {
     return null;
@@ -121,6 +125,12 @@ export function AppControllerOverlays({
           onCancel={closeActiveBomPreview}
         />
       ) : null}
+      <PreviewLoadingDialog
+        isOpen={isBomPreviewLoading && activeBomPreview === null}
+        themeHostClassName={appShellClassName}
+        title="Preparing BOM preview"
+        message="Building the export table."
+      />
       {onboarding.activeOnboardingStep !== undefined ? (
         <OnboardingModal
           isOpen={onboarding.isOnboardingOpen}
