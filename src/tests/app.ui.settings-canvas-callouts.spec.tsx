@@ -143,13 +143,17 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-callout-connector-drawing").length).toBeGreaterThan(0);
     expect(networkSummaryPanel.querySelector(".network-callout-connector-keying[d]")).not.toBeNull();
     expect(networkSummaryPanel.querySelector(".network-callout-connector-keying[width]")).not.toBeNull();
+    const connectorHitbox = networkSummaryPanel.querySelector(".network-node.connector .network-node-hitbox");
+    expect(connectorHitbox).not.toBeNull();
+    expect(Number(connectorHitbox?.getAttribute("width"))).toBeCloseTo(39.2);
+    expect(Number(connectorHitbox?.getAttribute("height"))).toBeCloseTo(28);
 
     switchScreenDrawerAware("settings");
-    const connectorDrawingSelector = within(getPanelByHeading("Canvas tools preferences")).getByLabelText(
+    const connectorDrawingSelector = within(getPanelByHeading("Canvas render preferences")).getByLabelText(
       "Connector drawing display"
     );
     expect(connectorDrawingSelector).toHaveValue("nodes");
-    expect(within(getPanelByHeading("Canvas tools preferences")).getByRole("slider", { name: /Connector drawing size/ })).toHaveValue("150");
+    expect(within(getPanelByHeading("Canvas render preferences")).getByRole("slider", { name: /Connector drawing size/ })).toHaveValue("150");
     fireEvent.change(connectorDrawingSelector, { target: { value: "disabled" } });
 
     switchScreenDrawerAware("modeling");
@@ -187,7 +191,7 @@ describe("App integration UI - settings canvas callouts", () => {
 
     renderAppWithState(state);
     switchScreenDrawerAware("settings");
-    const selector = within(getPanelByHeading("Canvas tools preferences")).getByLabelText("Connector drawing display");
+    const selector = within(getPanelByHeading("Canvas render preferences")).getByLabelText("Connector drawing display");
     fireEvent.change(selector, { target: { value: "nodes" } });
 
     switchScreenDrawerAware("modeling");

@@ -207,8 +207,8 @@ export function NetworkSummaryGraphLayers({
           const connectorDrawingWidth = connectorWidth * connectorDrawingScale;
           const connectorDrawingHeight = connectorHeight * connectorDrawingScale;
           const spliceDiamondSize = 30 * normalizedNodeShapeScale;
-          const connectorHitboxWidth = Math.max(56 * normalizedNodeShapeScale, connectorDrawingWidth + 10 * normalizedNodeShapeScale);
-          const connectorHitboxHeight = Math.max(40 * normalizedNodeShapeScale, connectorDrawingHeight + 10 * normalizedNodeShapeScale);
+          const connectorHitboxWidth = 56 * normalizedNodeShapeScale;
+          const connectorHitboxHeight = 40 * normalizedNodeShapeScale;
           const spliceHitboxSize = 38 * normalizedNodeShapeScale;
           const intermediateRadius = 17 * normalizedNodeShapeScale;
           const intermediateHitboxRadius = 22 * normalizedNodeShapeScale;
