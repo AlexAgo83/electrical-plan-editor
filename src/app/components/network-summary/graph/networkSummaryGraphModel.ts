@@ -44,8 +44,6 @@ export interface RenderedNodeModel {
   isSubNetworkDeemphasized: boolean;
 }
 
-const CONNECTOR_LAYOUT_NODE_LABEL_OFFSET_Y = -21;
-
 interface BuildRenderedSegmentsParams {
   segments: Segment[];
   networkNodePositions: Record<NodeId, NodePosition>;
@@ -217,7 +215,7 @@ export function buildRenderedNodes({
       nodeLabel,
       connectorLayout,
       highlightedConnectorCavityIndexes,
-      labelOffsetY: connectorLayout === undefined ? 0 : CONNECTOR_LAYOUT_NODE_LABEL_OFFSET_Y,
+      labelOffsetY: 0,
       isSubNetworkDeemphasized
     });
   }

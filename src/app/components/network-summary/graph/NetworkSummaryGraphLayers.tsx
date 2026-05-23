@@ -199,7 +199,7 @@ export function NetworkSummaryGraphLayers({
           } as CSSProperties
         }
       >
-        {renderedNodes.map(({ node, position, nodeClassName, connectorLayout, highlightedConnectorCavityIndexes }) => {
+        {renderedNodes.map(({ node, position, nodeClassName, nodeLabel, connectorLayout, highlightedConnectorCavityIndexes }) => {
           const connectorWidth = 46 * normalizedNodeShapeScale;
           const connectorHeight = 30 * normalizedNodeShapeScale;
           const connectorDrawingWidth = connectorWidth * connectorDrawingScale;
@@ -263,7 +263,8 @@ export function NetworkSummaryGraphLayers({
                           connectorLayout,
                           connectorDrawingWidth,
                           connectorDrawingHeight,
-                          highlightedConnectorCavityIndexes
+                          highlightedConnectorCavityIndexes,
+                          nodeLabel
                         )}
                       </g>
                     )}
@@ -360,26 +361,35 @@ export function NetworkSummaryGraphLayers({
           )
         )}
 
-        {renderedNodes.map(({ node, position, nodeLabel, labelOffsetY, isSubNetworkDeemphasized }) => (
-          <g
-            key={`${node.id}-label`}
-            className={`network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`}
-            data-node-id={node.id}
-          >
-            <g className="network-node-label-anchor" transform={`translate(${position.x} ${position.y + labelOffsetY}) scale(${inverseLabelScale})`}>
-              <text
-                className="network-node-label"
-                x={0}
-                y={0}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 0)`}
+        {renderedNodes.map(({ node, position, nodeLabel, labelOffsetY, connectorLayout, isSubNetworkDeemphasized }) => {
+          if (connectorLayout !== undefined) {
+            return null;
+          }
+
+          return (
+            <g
+              key={`${node.id}-label`}
+              className={`network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`}
+              data-node-id={node.id}
+            >
+              <g
+                className="network-node-label-anchor"
+                transform={`translate(${position.x} ${position.y + labelOffsetY}) scale(${inverseLabelScale})`}
               >
-                {nodeLabel}
-              </text>
+                <text
+                  className="network-node-label"
+                  x={0}
+                  y={0}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 0)`}
+                >
+                  {nodeLabel}
+                </text>
+              </g>
             </g>
-          </g>
-        ))}
+          );
+        })}
       </g>
     </>
   );

@@ -144,7 +144,8 @@ export function renderConnectorLayoutDrawing(
   layout: ConnectorLayout,
   width: number,
   height: number,
-  highlightedCavityIndexes: ReadonlySet<number>
+  highlightedCavityIndexes: ReadonlySet<number>,
+  titleId?: string
 ): ReactElement {
   const shellPadding = getConnectorLayoutShellPadding(layout);
   const cellPadding = getConnectorLayoutCellPadding(layout);
@@ -164,79 +165,94 @@ export function renderConnectorLayoutDrawing(
   const shellHeight = layout.height - 1 + shellPadding * 2;
   const shellCornerRadius = Math.min(0.55, shellPadding) * getConnectorLayoutShellCornerRadius(layout);
   const shellStrokeWidth = getConnectorLayoutShellStrokeWidth(layout);
+  const shellTopY = originY + shellY * scale;
+  const titleMargin = 1.2;
 
   return (
-    <g className="network-callout-connector-drawing" transform={`translate(${originX} ${originY}) scale(${scale})`}>
-      {shellShape === "circle" ? (
-        <ellipse
-          className="network-callout-connector-shell"
-          cx={layout.width / 2 + 0.5}
-          cy={layout.height / 2 + 0.5}
-          rx={shellWidth / 2}
-          ry={shellHeight / 2}
-          style={{ strokeWidth: shellStrokeWidth }}
-        />
-      ) : (
-        <rect
-          className="network-callout-connector-shell"
-          x={shellX}
-          y={shellY}
-          width={shellWidth}
-          height={shellHeight}
-          rx={shellCornerRadius}
-          style={{ strokeWidth: shellStrokeWidth }}
-        />
+    <>
+      {titleId === undefined ? null : (
+        <text
+          className="network-node-label network-node-connector-layout-title"
+          x={0}
+          y={shellTopY - titleMargin}
+          textAnchor="middle"
+          dominantBaseline="text-after-edge"
+        >
+          {titleId}
+        </text>
       )}
-      {getConnectorLayoutKeyings(layout).map((keying, index) => (
-        <g key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${keying.scale ?? "default"}-${index}`}>
-          {renderConnectorKeying(keying, layout, shellShape, shellPadding)}
-        </g>
-      ))}
-      {layout.ways.map((way) => {
-        const label = getConnectorLayoutWayDisplayLabel(way);
-        const labelClassName = `network-callout-connector-way-label${label.length > 2 ? " is-long-label" : ""}`;
-        const labelFontSize = label.length > 2 ? 4.7 : 5.8;
-        const isWireHighlighted = highlightedCavityIndexes.has(way.cavityIndex);
-        const wayClassName = `network-callout-connector-way${isWireHighlighted ? " is-wire-highlighted" : ""}`;
-        return (
-          <g
-            key={way.cavityIndex}
-            className={isWireHighlighted ? "network-callout-connector-way-group is-wire-highlighted" : "network-callout-connector-way-group"}
-            transform={`translate(${way.x} ${way.y})`}
-          >
-            {way.shape === "square" ? (
-              <rect
-                className={wayClassName}
-                x={-(0.56 * wayScale) / 2}
-                y={-(0.56 * wayScale) / 2}
-                width={0.56 * wayScale}
-                height={0.56 * wayScale}
-                rx={0.08 * wayScale}
-              />
-            ) : way.shape === "slot" ? (
-              <rect
-                className={wayClassName}
-                x={-(0.64 * wayScale) / 2}
-                y={-(0.44 * wayScale) / 2}
-                width={0.64 * wayScale}
-                height={0.44 * wayScale}
-                rx={(0.44 * wayScale) / 2}
-              />
-            ) : (
-              <circle className={wayClassName} r={0.32 * wayScale} />
-            )}
-            <text
-              className={labelClassName}
-              y={0}
-              style={{ fontSize: labelFontSize }}
-              transform={`scale(${inverseDrawingScale})`}
-            >
-              {label}
-            </text>
+      <g className="network-callout-connector-drawing" transform={`translate(${originX} ${originY}) scale(${scale})`}>
+        {shellShape === "circle" ? (
+          <ellipse
+            className="network-callout-connector-shell"
+            cx={layout.width / 2 + 0.5}
+            cy={layout.height / 2 + 0.5}
+            rx={shellWidth / 2}
+            ry={shellHeight / 2}
+            style={{ strokeWidth: shellStrokeWidth }}
+          />
+        ) : (
+          <rect
+            className="network-callout-connector-shell"
+            x={shellX}
+            y={shellY}
+            width={shellWidth}
+            height={shellHeight}
+            rx={shellCornerRadius}
+            style={{ strokeWidth: shellStrokeWidth }}
+          />
+        )}
+        {getConnectorLayoutKeyings(layout).map((keying, index) => (
+          <g key={`${keying.side}-${keying.shape ?? "arrow"}-${keying.position ?? "auto"}-${keying.scale ?? "default"}-${index}`}>
+            {renderConnectorKeying(keying, layout, shellShape, shellPadding)}
           </g>
-        );
-      })}
-    </g>
+        ))}
+        {layout.ways.map((way) => {
+          const label = getConnectorLayoutWayDisplayLabel(way);
+          const labelClassName = `network-callout-connector-way-label${label.length > 2 ? " is-long-label" : ""}`;
+          const labelFontSize = label.length > 2 ? 4.7 : 5.8;
+          const isWireHighlighted = highlightedCavityIndexes.has(way.cavityIndex);
+          const wayClassName = `network-callout-connector-way${isWireHighlighted ? " is-wire-highlighted" : ""}`;
+          return (
+            <g
+              key={way.cavityIndex}
+              className={isWireHighlighted ? "network-callout-connector-way-group is-wire-highlighted" : "network-callout-connector-way-group"}
+              transform={`translate(${way.x} ${way.y})`}
+            >
+              {way.shape === "square" ? (
+                <rect
+                  className={wayClassName}
+                  x={-(0.56 * wayScale) / 2}
+                  y={-(0.56 * wayScale) / 2}
+                  width={0.56 * wayScale}
+                  height={0.56 * wayScale}
+                  rx={0.08 * wayScale}
+                />
+              ) : way.shape === "slot" ? (
+                <rect
+                  className={wayClassName}
+                  x={-(0.64 * wayScale) / 2}
+                  y={-(0.44 * wayScale) / 2}
+                  width={0.64 * wayScale}
+                  height={0.44 * wayScale}
+                  rx={(0.44 * wayScale) / 2}
+                />
+              ) : (
+                <circle className={wayClassName} r={0.32 * wayScale} />
+              )}
+              <text
+                className={labelClassName}
+                y={0}
+                style={{ fontSize: labelFontSize }}
+                transform={`scale(${inverseDrawingScale})`}
+              >
+                {label}
+              </text>
+            </g>
+          );
+        })}
+      </g>
+    </>
   );
 }
 
