@@ -533,7 +533,7 @@ describe("App integration UI - network summary workflow polish", () => {
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
     const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
-    const zoomOutButton = within(networkSummaryPanel).getByRole("button", { name: "Zoom out" });
+    const zoomOutButton = within(networkSummaryPanel).getByRole("button", { name: "Scale Down" });
 
     let previousViewportTransform = "";
     let viewportTransform = "";
@@ -905,8 +905,8 @@ describe("App integration UI - network summary workflow polish", () => {
       Lock: getDisplayToggleButton(networkSummaryPanel, "Lock").classList.contains("is-active")
     } as const;
 
-    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom in" }));
-    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom in" }));
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Scale Up" }));
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Scale Up" }));
     fireEvent.mouseDown(networkSvg, { button: 0, shiftKey: true, clientX: 240, clientY: 180 });
     fireEvent.mouseMove(networkSvg, { clientX: 360, clientY: 250 });
     fireEvent.mouseUp(networkSvg, { clientX: 360, clientY: 250 });

@@ -418,7 +418,7 @@ describe("App integration UI - settings canvas render", () => {
     expect(segmentStrokeWidthAfter).toBeGreaterThan(segmentStrokeWidthBefore);
     expect(calloutLeaderStrokeWidthAfter).toBeGreaterThan(calloutLeaderStrokeWidthBefore);
     const transformBeforeZoom = invariantAnchor?.getAttribute("transform") ?? "";
-    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Zoom in" }));
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Scale Up" }));
     const transformAfterZoom = networkSummaryPanel.querySelector(".network-node-shape-anchor")?.getAttribute("transform") ?? "";
     expect(transformAfterZoom).not.toBe(transformBeforeZoom);
     firstRender.unmount();

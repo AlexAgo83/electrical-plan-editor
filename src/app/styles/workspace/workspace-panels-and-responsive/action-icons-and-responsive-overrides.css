@@ -37,6 +37,11 @@
   mask: url("/icons/ico_zoom.svg") center / contain no-repeat;
 }
 
+.action-button-icon.is-scale-up {
+  -webkit-mask: url("/icons/ico_scale_up.svg") center / contain no-repeat;
+  mask: url("/icons/ico_scale_up.svg") center / contain no-repeat;
+}
+
 .action-button-icon.is-delete {
   -webkit-mask: url("/icons/ico_delete.svg") center / contain no-repeat;
   mask: url("/icons/ico_delete.svg") center / contain no-repeat;

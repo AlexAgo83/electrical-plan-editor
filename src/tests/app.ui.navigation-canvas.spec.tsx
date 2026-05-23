@@ -763,7 +763,7 @@ describe("App integration UI - navigation and canvas", () => {
 
     const networkPanel = getPanelByHeading("Network summary");
     const fittedTransform = getNetworkSummaryViewportTransform(networkPanel);
-    fireEvent.click(within(networkPanel).getByRole("button", { name: "Zoom out" }));
+    fireEvent.click(within(networkPanel).getByRole("button", { name: "Scale Down" }));
     expect(getNetworkSummaryViewportTransform(networkPanel)).not.toBe(fittedTransform);
     fireEvent.keyDown(window, { key: "f", altKey: true });
     expect(getNetworkSummaryViewportTransform(networkPanel)).toBe(fittedTransform);

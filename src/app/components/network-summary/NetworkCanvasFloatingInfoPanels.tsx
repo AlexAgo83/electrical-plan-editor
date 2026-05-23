@@ -55,7 +55,10 @@ export function NetworkCanvasFloatingInfoPanels({
     <>
       <div className="network-canvas-floating-controls" aria-label="Canvas controls">
         <label className="network-canvas-global-scale">
-          <span>Global scale</span>
+          <span className="network-canvas-global-scale-label">
+            <span className="action-button-icon is-zoom" aria-hidden="true" />
+            <span>Zoom view</span>
+          </span>
           <input
             type="range"
             min={0}
@@ -76,21 +79,21 @@ export function NetworkCanvasFloatingInfoPanels({
           <button
             type="button"
             className="workspace-tab network-canvas-zoom-button"
-            aria-label="Zoom out"
-            title="Zoom out"
+            aria-label="Scale Down"
+            title="Scale Down"
             onClick={() => handleZoomAction("out")}
           >
-            <span className="action-button-icon is-zoom" aria-hidden="true" />
+            <span className="action-button-icon is-scale-up" aria-hidden="true" />
             <span aria-hidden="true">-</span>
           </button>
           <button
             type="button"
             className="workspace-tab network-canvas-zoom-button"
-            aria-label="Zoom in"
-            title="Zoom in"
+            aria-label="Scale Up"
+            title="Scale Up"
             onClick={() => handleZoomAction("in")}
           >
-            <span className="action-button-icon is-zoom" aria-hidden="true" />
+            <span className="action-button-icon is-scale-up" aria-hidden="true" />
             <span aria-hidden="true">+</span>
           </button>
           <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
