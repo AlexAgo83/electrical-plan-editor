@@ -69,6 +69,20 @@ export function copyComputedStylesToSvgClone(sourceSvg: SVGSVGElement, cloneSvg:
   }
 }
 
+export function disableSvgCloneInteractivity(cloneSvg: SVGSVGElement): void {
+  const interactiveElements = [cloneSvg, ...Array.from(cloneSvg.querySelectorAll("*"))] as SVGElement[];
+  for (const element of interactiveElements) {
+    element.removeAttribute("role");
+    element.removeAttribute("tabindex");
+    element.removeAttribute("focusable");
+    element.removeAttribute("aria-label");
+    element.removeAttribute("aria-pressed");
+    element.removeAttribute("aria-selected");
+    element.style.removeProperty("cursor");
+    element.style.setProperty("pointer-events", "none");
+  }
+}
+
 export function removeGlobalRenderScaleFromSvgClone(params: {
   cloneSvg: SVGSVGElement;
   networkOffset: { x: number; y: number };

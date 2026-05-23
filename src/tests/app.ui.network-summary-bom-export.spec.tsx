@@ -220,7 +220,11 @@ describe("App integration UI - network summary BOM export", () => {
       fireEvent.change(themeSelect, { target: { value: "dark" } });
       previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
       expect(within(previewDialog).getByLabelText("Theme")).toHaveValue("dark");
-      expect(previewDialog.parentElement).toHaveClass("theme-dark");
+      expect(previewDialog.parentElement).not.toHaveClass("theme-dark");
+      const previewThemeHost = within(previewDialog).getByLabelText("SVG export preview").querySelector(".svg-preview-theme-host");
+      expect(previewThemeHost).toHaveClass("theme-dark");
+      const previewSvg = within(previewDialog).getByLabelText("SVG export preview").querySelector("svg");
+      expect(previewSvg?.outerHTML).not.toContain("visibility: hidden");
 
       fireEvent.click(within(previewDialog).getByLabelText("Include frame"));
       previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
@@ -560,6 +564,10 @@ describe("App integration UI - network summary BOM export", () => {
       const noteRows = exportedSvg.match(/class="network-export-cartouche-note"/g) ?? [];
       expect(noteRows.length).toBeLessThanOrEqual(8);
       expect(exportedSvg).toContain("...");
+      expect(exportedSvg).not.toContain('role="button"');
+      expect(exportedSvg).not.toContain("tabindex=");
+      expect(exportedSvg).not.toContain("focusable=");
+      expect(exportedSvg).toContain("pointer-events: none");
       expect(clickSpy).toHaveBeenCalledTimes(1);
     } finally {
       fetchSpy.mockRestore();

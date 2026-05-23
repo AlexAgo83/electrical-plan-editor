@@ -6,6 +6,7 @@ import { getThemeClassNames } from "../../../lib/themeModes";
 import {
   applyExportDecorations,
   copyComputedStylesToSvgClone,
+  disableSvgCloneInteractivity,
   exportCanvasToPngBlob,
   removeGlobalRenderScaleFromSvgClone,
   resolveCanvasExportBackgroundFill
@@ -90,9 +91,10 @@ async function withThemedSourceSvg<T>(
   host.style.top = "0";
   host.style.width = `${Math.max(1, Math.round(sourceRect.width || sourceSvg.viewBox.baseVal.width || 1))}px`;
   host.style.height = `${Math.max(1, Math.round(sourceRect.height || sourceSvg.viewBox.baseVal.height || 1))}px`;
-  host.style.visibility = "hidden";
+  host.style.opacity = "0";
   host.style.pointerEvents = "none";
   host.style.overflow = "hidden";
+  host.setAttribute("aria-hidden", "true");
 
   const themedSourceSvg = sourceSvg.cloneNode(true) as SVGSVGElement;
   host.appendChild(themedSourceSvg);
@@ -134,6 +136,7 @@ export function useNetworkSummaryExportActions({
     return withThemedSourceSvg(sourceSvg, options?.themeMode ?? themeMode, async (themedSourceSvg) => {
       const { svgClone, exportWidth, exportHeight } = prepareSvgCloneForExport(themedSourceSvg);
       copyComputedStylesToSvgClone(themedSourceSvg, svgClone);
+      disableSvgCloneInteractivity(svgClone);
       removeGlobalRenderScaleFromSvgClone({
         cloneSvg: svgClone,
         networkOffset,

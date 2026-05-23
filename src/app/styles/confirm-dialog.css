@@ -305,6 +305,22 @@
   padding: 1rem;
 }
 
+.svg-preview-theme-host.app-shell {
+  display: grid;
+  min-height: 100%;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  gap: 0;
+  align-content: normal;
+  isolation: auto;
+  background: transparent;
+}
+
+.svg-preview-theme-host.app-shell::before {
+  content: none;
+}
+
 .svg-preview-content > svg {
   display: block;
   width: min(100%, 64rem);
@@ -312,6 +328,8 @@
   max-height: 28rem;
   background: canvas;
   box-shadow: 0 0.75rem 2rem color-mix(in srgb, black 18%, transparent);
+  pointer-events: none;
+  user-select: none;
 }
 
 .confirm-dialog.is-warning .confirm-dialog-confirm {

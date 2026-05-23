@@ -1,4 +1,4 @@
-import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
+import { useEffect, useLayoutEffect, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
 import type { ThemeMode } from "../../../store";
 import { getThemeClassNames, THEME_MODE_OPTIONS } from "../../lib/themeModes";
 import type { SvgExportPreviewState, SvgPreviewOptions } from "../network-summary/export/useNetworkSummaryExportActions";
@@ -31,6 +31,7 @@ export function SvgExportPreviewDialog({
   onCancel
 }: SvgExportPreviewDialogProps): ReactElement | null {
   const dialogRef = useRef<HTMLElement | null>(null);
+  const previewShellRef = useRef<HTMLDivElement | null>(null);
   const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
   const previousFocusedElementRef = useRef<HTMLElement | null>(null);
   const titleId = "svg-export-preview-title";
@@ -52,6 +53,20 @@ export function SvgExportPreviewDialog({
       previousFocusedElementRef.current = null;
     };
   }, [isOpen]);
+
+  useLayoutEffect(() => {
+    if (!isOpen || preview === null) {
+      return;
+    }
+
+    const previewShell = previewShellRef.current;
+    if (previewShell === null) {
+      return;
+    }
+
+    previewShell.scrollLeft = Math.max(0, (previewShell.scrollWidth - previewShell.clientWidth) / 2);
+    previewShell.scrollTop = Math.max(0, (previewShell.scrollHeight - previewShell.clientHeight) / 2);
+  }, [isOpen, preview]);
 
   if (!isOpen || preview === null) {
     return null;
@@ -107,12 +122,8 @@ export function SvgExportPreviewDialog({
   const handleThemeChange = (themeMode: ThemeMode): void => {
     onPreviewOptionsChange({ includeFrame: preview.includeFrame, includeCartouche: preview.includeCartouche, themeMode });
   };
-  const layerClassName = [
-    "confirm-dialog-layer",
-    "app-shell",
-    ...getThemeClassNames(preview.themeMode),
-    themeHostClassName ?? ""
-  ]
+  const layerClassName = ["confirm-dialog-layer", themeHostClassName ?? ""].filter((token) => token.length > 0).join(" ");
+  const previewThemeHostClassName = ["svg-preview-theme-host", "app-shell", ...getThemeClassNames(preview.themeMode)]
     .filter((token) => token.length > 0)
     .join(" ");
 
@@ -167,8 +178,10 @@ export function SvgExportPreviewDialog({
             Fit network
           </button>
         </div>
-        <div className="svg-preview-shell" tabIndex={0} aria-label="SVG export preview">
-          <div className="svg-preview-content" dangerouslySetInnerHTML={{ __html: preview.svgMarkup }} />
+        <div ref={previewShellRef} className="svg-preview-shell" tabIndex={0} aria-label="SVG export preview">
+          <div className={previewThemeHostClassName}>
+            <div className="svg-preview-content" dangerouslySetInnerHTML={{ __html: preview.svgMarkup }} />
+          </div>
         </div>
         <footer className="confirm-dialog-actions">
           <button ref={cancelButtonRef} type="button" className="confirm-dialog-cancel" onClick={onCancel}>
