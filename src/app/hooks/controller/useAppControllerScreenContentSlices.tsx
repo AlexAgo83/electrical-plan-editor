@@ -328,6 +328,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     pngExportIncludeBackground: params.pngExportIncludeBackground,
     canExportBomCsv: params.canExportBomCsv,
     onExportBomCsv: params.onExportBomCsv,
+    onExportNetwork: params.onExportNetwork,
     onRegenerateLayout: params.handleRegenerateLayout,
     onOpenCurrentNetworkFunctional: params.onOpenCurrentNetworkFunctional
   } satisfies NetworkSummaryPanelProps;
@@ -349,6 +350,9 @@ export function buildNetworkScopeScreenContentSlice(params: NetworkScopeScreenCo
     handleOpenNetworkInModeling: params.handleOpenNetworkInModeling,
     handleDuplicateNetwork: params.handleDuplicateNetwork,
     handleExportActiveNetwork: params.handleExportActiveNetwork,
+    handleOpenImportPicker: params.handleOpenImportPicker,
+    importFileInputRef: params.importFileInputRef,
+    handleImportFileChange: params.handleImportFileChange,
     handleDeleteNetwork: params.handleDeleteNetwork,
     networkFormMode: params.networkFormMode,
     handleOpenCreateNetworkForm: params.handleOpenCreateNetworkForm,

@@ -99,8 +99,10 @@ describe("App integration UI - network summary BOM export", () => {
       const refreshedNetworkSummaryPanel = getPanelByHeading("Network summary");
       openExportMenu(refreshedNetworkSummaryPanel);
       const exportSvgButton = within(refreshedNetworkSummaryPanel).getByRole("button", { name: "SVG" });
+      const exportNetworkButton = within(refreshedNetworkSummaryPanel).getByRole("button", { name: "Network" });
       const exportBomButton = within(refreshedNetworkSummaryPanel).getByRole("button", { name: "BOM" });
       expect(exportSvgButton).toHaveTextContent("SVG");
+      expect(exportNetworkButton).toBeEnabled();
       expect(exportBomButton.querySelector(".table-export-icon")).not.toBeNull();
 
       fireEvent.click(exportBomButton);
@@ -142,6 +144,41 @@ describe("App integration UI - network summary BOM export", () => {
     expect(within(networkSummaryPanel).queryByText(/BOM CSV pricing:/i)).toBeNull();
     openExportMenu(networkSummaryPanel);
     expect(within(networkSummaryPanel).getByRole("button", { name: "BOM" })).toBeInTheDocument();
+  });
+
+  it("exports the active network from the Network Summary export menu", async () => {
+    const originalCreateObjectUrl = Object.getOwnPropertyDescriptor(URL, "createObjectURL");
+    const originalRevokeObjectUrl = Object.getOwnPropertyDescriptor(URL, "revokeObjectURL");
+    const createObjectUrl = vi.fn(() => "blob:network-summary-network-export");
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, writable: true, value: createObjectUrl });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, writable: true, value: vi.fn() });
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+
+    try {
+      renderAppWithState(createUiIntegrationState());
+      switchScreenDrawerAware("modeling");
+
+      const networkSummaryPanel = getPanelByHeading("Network summary");
+      openExportMenu(networkSummaryPanel);
+      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Network" }));
+
+      const confirmDialog = await screen.findByRole("dialog", { name: "Save active network" });
+      expect(within(confirmDialog).getByText(/electrical-network-active-.*\.json/i)).toBeInTheDocument();
+      fireEvent.click(within(confirmDialog).getByRole("button", { name: "Save" }));
+
+      await waitFor(() => {
+        expect(clickSpy).toHaveBeenCalledTimes(1);
+      });
+      expect(createObjectUrl).toHaveBeenCalledTimes(1);
+    } finally {
+      clickSpy.mockRestore();
+      if (originalCreateObjectUrl !== undefined) {
+        Object.defineProperty(URL, "createObjectURL", originalCreateObjectUrl);
+      }
+      if (originalRevokeObjectUrl !== undefined) {
+        Object.defineProperty(URL, "revokeObjectURL", originalRevokeObjectUrl);
+      }
+    }
   });
 
   it("cancels BOM preview without downloading", async () => {
@@ -213,7 +250,7 @@ describe("App integration UI - network summary BOM export", () => {
       fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
 
       expect(await screen.findByRole("dialog", { name: "Preparing SVG preview" })).toBeInTheDocument();
-      let previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
+      const previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
       expect(within(previewDialog).getByLabelText("SVG export preview")).toBeInTheDocument();
       const includeFrameToggle = within(previewDialog).getByLabelText("Include frame");
       const includeIdentityToggle = within(previewDialog).getByLabelText("Include identity");

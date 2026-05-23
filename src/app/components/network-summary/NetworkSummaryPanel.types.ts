@@ -131,6 +131,7 @@ export interface NetworkSummaryPanelProps {
   pngExportIncludeBackground: boolean;
   canExportBomCsv: boolean;
   onExportBomCsv: () => void;
+  onExportNetwork: () => void;
   onRegenerateLayout: () => void;
   onOpenCurrentNetworkFunctional?: () => void;
   activeNetwork: Network | null;

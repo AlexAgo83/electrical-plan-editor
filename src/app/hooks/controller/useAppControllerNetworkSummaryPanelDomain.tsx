@@ -167,6 +167,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   onViewportSizeChange: (size: { width: number; height: number }) => void;
   canExportBomCsv: boolean;
   onExportBomCsv: () => void;
+  onExportNetwork: () => void;
   handleRegenerateLayout: () => void;
   markDetailPanelsSelectionSourceAsTable: () => void;
   onOpenHarnessAssemblyOnboardingHelp: () => void;
@@ -223,6 +224,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   onViewportSizeChange,
   canExportBomCsv,
   onExportBomCsv,
+  onExportNetwork,
   handleRegenerateLayout,
   markDetailPanelsSelectionSourceAsTable,
   onOpenHarnessAssemblyOnboardingHelp,
@@ -409,9 +411,10 @@ export function useAppControllerNetworkSummaryPanelDomain({
         onPersistSpliceCalloutPosition: persistSpliceCalloutPosition,
         onViewportSizeChange,
         pngExportIncludeBackground: preferencesState.canvasPngExportIncludeBackground,
-        canExportBomCsv,
-        onExportBomCsv,
-        handleRegenerateLayout,
+    canExportBomCsv,
+    onExportBomCsv,
+    onExportNetwork,
+    handleRegenerateLayout,
         onOpenCurrentNetworkFunctional: handleOpenCurrentNetworkFunctional,
         showFunctionalSchematic: false
       }).networkSummaryPanel

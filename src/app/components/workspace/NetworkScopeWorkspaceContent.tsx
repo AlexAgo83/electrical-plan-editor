@@ -1,4 +1,14 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactElement, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  type ReactElement,
+  type ReactNode,
+  type RefObject
+} from "react";
 import type { NetworkId } from "../../../core/entities";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
@@ -31,6 +41,9 @@ interface NetworkScopeWorkspaceContentProps {
   handleOpenNetworkInModeling: (networkId: NetworkId) => void;
   handleDuplicateNetwork: (networkId: NetworkId | null) => void;
   handleExportActiveNetwork: () => void;
+  handleOpenImportPicker: () => void;
+  importFileInputRef: RefObject<HTMLInputElement | null>;
+  handleImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   handleDeleteNetwork: (networkId: NetworkId | null) => void;
   networkFormMode: "create" | "edit" | null;
   handleOpenCreateNetworkForm: () => void;
@@ -73,6 +86,9 @@ export function NetworkScopeWorkspaceContent({
   handleOpenNetworkInModeling,
   handleDuplicateNetwork,
   handleExportActiveNetwork,
+  handleOpenImportPicker,
+  importFileInputRef,
+  handleImportFileChange,
   handleDeleteNetwork,
   networkFormMode,
   handleOpenCreateNetworkForm,
@@ -479,6 +495,24 @@ export function NetworkScopeWorkspaceContent({
               <span className="action-button-icon is-home-import" aria-hidden="true" />
               Export
             </button>
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={handleOpenImportPicker}
+              disabled={isCreateMode}
+            >
+              <span className="action-button-icon is-home-import" aria-hidden="true" />
+              Import
+            </button>
+            <input
+              ref={importFileInputRef}
+              type="file"
+              accept="application/json,.json"
+              onChange={(event) => {
+                void handleImportFileChange(event);
+              }}
+              hidden
+            />
           </div>
         </div>
       </section>

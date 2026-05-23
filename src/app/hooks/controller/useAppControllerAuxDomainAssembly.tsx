@@ -23,6 +23,9 @@ interface UseAppControllerAuxDomainAssemblyParams {
     handleWorkspaceScreenChange: (targetScreen: ScreenChangeTarget) => void;
     handleDuplicateNetwork: AuxDomainsParams["networkScope"]["handleDuplicateNetwork"];
     handleSaveActiveNetworkWithConfirmation: AuxDomainsParams["networkScope"]["handleExportActiveNetwork"];
+    handleOpenImportPicker: AuxDomainsParams["networkScope"]["handleOpenImportPicker"];
+    importFileInputRef: AuxDomainsParams["networkScope"]["importFileInputRef"];
+    handleImportFileChange: AuxDomainsParams["networkScope"]["handleImportFileChange"];
     handleDeleteNetwork: AuxDomainsParams["networkScope"]["handleDeleteNetwork"];
     handleOpenCreateNetworkForm: () => void;
     handleOpenEditNetworkForm: AuxDomainsParams["networkScope"]["handleOpenEditNetworkForm"];
@@ -84,6 +87,9 @@ export function useAppControllerAuxDomainAssembly({
       },
       handleDuplicateNetwork: networkScope.handleDuplicateNetwork,
       handleExportActiveNetwork: networkScope.handleSaveActiveNetworkWithConfirmation,
+      handleOpenImportPicker: networkScope.handleOpenImportPicker,
+      importFileInputRef: networkScope.importFileInputRef,
+      handleImportFileChange: networkScope.handleImportFileChange,
       handleDeleteNetwork: networkScope.handleDeleteNetwork,
       handleOpenCreateNetworkForm: networkScope.handleOpenCreateNetworkForm,
       handleOpenEditNetworkForm: networkScope.handleOpenEditNetworkForm,

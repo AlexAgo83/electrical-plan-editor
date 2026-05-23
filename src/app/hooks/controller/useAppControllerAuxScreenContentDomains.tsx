@@ -31,6 +31,9 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     | "handleOpenNetworkInModeling"
     | "handleDuplicateNetwork"
     | "handleExportActiveNetwork"
+    | "handleOpenImportPicker"
+    | "importFileInputRef"
+    | "handleImportFileChange"
     | "handleDeleteNetwork"
     | "handleOpenCreateNetworkForm"
     | "handleOpenEditNetworkForm"
@@ -88,6 +91,9 @@ export function useAppControllerAuxScreenContentDomains({
     handleOpenNetworkInModeling: networkScope.handleOpenNetworkInModeling,
     handleDuplicateNetwork: networkScope.handleDuplicateNetwork,
     handleExportActiveNetwork: networkScope.handleExportActiveNetwork,
+    handleOpenImportPicker: networkScope.handleOpenImportPicker,
+    importFileInputRef: networkScope.importFileInputRef,
+    handleImportFileChange: networkScope.handleImportFileChange,
     handleDeleteNetwork: networkScope.handleDeleteNetwork,
     networkFormMode: networkScope.formState.networkFormMode,
     handleOpenCreateNetworkForm: networkScope.handleOpenCreateNetworkForm,

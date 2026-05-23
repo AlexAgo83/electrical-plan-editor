@@ -159,6 +159,7 @@ export function NetworkSummaryPanel({
   pngExportIncludeBackground,
   canExportBomCsv,
   onExportBomCsv,
+  onExportNetwork,
   onRegenerateLayout,
   onOpenCurrentNetworkFunctional,
   activeNetwork,
@@ -909,8 +910,10 @@ export function NetworkSummaryPanel({
             <NetworkSummaryExportMenu
               canvasExportFormat={canvasExportFormat}
               canExportCanvas={nodes.length > 0}
+              canExportNetwork={activeNetwork !== null}
               canExportBomCsv={canExportBomCsv}
               onExportCanvas={handleExportPlan}
+              onExportNetwork={onExportNetwork}
               onExportBomCsv={onExportBomCsv}
             />
           </div>

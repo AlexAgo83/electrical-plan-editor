@@ -3,16 +3,20 @@ import { useEffect, useRef, useState, type ReactElement } from "react";
 interface NetworkSummaryExportMenuProps {
   canvasExportFormat: string;
   canExportCanvas: boolean;
+  canExportNetwork: boolean;
   canExportBomCsv: boolean;
   onExportCanvas: () => void;
+  onExportNetwork: () => void;
   onExportBomCsv: () => void;
 }
 
 export function NetworkSummaryExportMenu({
   canvasExportFormat,
   canExportCanvas,
+  canExportNetwork,
   canExportBomCsv,
   onExportCanvas,
+  onExportNetwork,
   onExportBomCsv
 }: NetworkSummaryExportMenuProps): ReactElement {
   const [open, setOpen] = useState(false);
@@ -39,6 +43,11 @@ export function NetworkSummaryExportMenu({
     onExportBomCsv();
   }
 
+  function handleExportNetwork() {
+    setOpen(false);
+    onExportNetwork();
+  }
+
   return (
     <div ref={wrapperRef} className="network-summary-view-menu-wrapper">
       <button
@@ -61,6 +70,15 @@ export function NetworkSummaryExportMenu({
           >
             <span className="network-summary-export-icon" aria-hidden="true" />
             {canvasExportFormat.toUpperCase()}
+          </button>
+          <button
+            type="button"
+            className="network-summary-view-menu-item"
+            onClick={handleExportNetwork}
+            disabled={!canExportNetwork}
+          >
+            <span className="action-button-icon is-home-import" aria-hidden="true" />
+            Network
           </button>
           <button
             type="button"

@@ -37,6 +37,20 @@ describe("App integration UI - import/export", () => {
     expect(within(selectionColumn as HTMLElement).getByText("Selected networks for export")).toBeInTheDocument();
   });
 
+  it("shows import next to export in Network Scope actions", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreen("networkScope");
+
+    const panel = getPanelByHeading("Network Scope");
+    const actionsRow = panel.querySelector(".network-scope-list-actions-row");
+    expect(actionsRow).not.toBeNull();
+
+    const exportButton = within(actionsRow as HTMLElement).getByRole("button", { name: "Export" });
+    const importButton = within(actionsRow as HTMLElement).getByRole("button", { name: "Import" });
+    expect(exportButton.compareDocumentPosition(importButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    expect(panel.querySelector('input[type="file"][accept="application/json,.json"]')).not.toBeNull();
+  });
+
   it("keeps active context stable when import file is invalid", async () => {
     const { store } = renderAppWithState(createUiIntegrationState());
     switchScreen("settings");
