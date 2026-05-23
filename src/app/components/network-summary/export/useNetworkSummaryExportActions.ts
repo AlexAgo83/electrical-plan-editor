@@ -1,4 +1,4 @@
-import { useCallback, type RefObject } from "react";
+import { useCallback, useRef, useState, type RefObject } from "react";
 import type { CanvasExportFormat } from "../../../types/app-controller";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 import {
@@ -31,6 +31,14 @@ interface PreparedSvgExport {
   svgClone: SVGSVGElement;
   exportWidth: number;
   exportHeight: number;
+}
+
+export interface SvgExportPreviewState {
+  svgMarkup: string;
+  exportWidth: number;
+  exportHeight: number;
+  includeFrame: boolean;
+  includeCartouche: boolean;
 }
 
 function prepareSvgCloneForExport(sourceSvg: SVGSVGElement): PreparedSvgExport {
@@ -72,7 +80,10 @@ export function useNetworkSummaryExportActions({
   exportCartoucheLogoUrl,
   exportCartoucheNotes
 }: UseNetworkSummaryExportActionsParams) {
-  const prepareDecoratedSvgClone = useCallback(async () => {
+  const [activeSvgPreview, setActiveSvgPreview] = useState<SvgExportPreviewState | null>(null);
+  const svgPreviewRequestIdRef = useRef(0);
+
+  const prepareDecoratedSvgClone = useCallback(async (options?: { includeFrame?: boolean; includeCartouche?: boolean }) => {
     const sourceSvg = networkSvgRef.current;
     if (sourceSvg === null) {
       return null;
@@ -93,8 +104,8 @@ export function useNetworkSummaryExportActions({
       cloneSvg: svgClone,
       width: exportWidth,
       height: exportHeight,
-      includeFrame: exportIncludeFrame,
-      includeCartouche: exportIncludeCartouche,
+      includeFrame: options?.includeFrame ?? exportIncludeFrame,
+      includeCartouche: options?.includeCartouche ?? exportIncludeCartouche,
       cartoucheNetworkName: exportCartoucheNetworkName,
       cartoucheAuthor: exportCartoucheAuthor,
       cartoucheProjectCode: exportCartoucheProjectCode,
@@ -123,18 +134,12 @@ export function useNetworkSummaryExportActions({
     renderedNetworkScale
   ]);
 
-  const handleExportPlanAsSvg = useCallback(async () => {
+  const downloadSvgMarkup = useCallback((svgMarkup: string) => {
     if (typeof window === "undefined") {
       return;
     }
 
-    const prepared = await prepareDecoratedSvgClone();
-    if (prepared === null) {
-      return;
-    }
-
-    const serializedSvg = new XMLSerializer().serializeToString(prepared.svgClone);
-    const blob = new Blob([serializedSvg], { type: "image/svg+xml;charset=utf-8" });
+    const blob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
     const blobUrl = URL.createObjectURL(blob);
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const downloadLink = document.createElement("a");
@@ -147,7 +152,56 @@ export function useNetworkSummaryExportActions({
     window.setTimeout(() => {
       URL.revokeObjectURL(blobUrl);
     }, 0);
-  }, [prepareDecoratedSvgClone]);
+  }, []);
+
+  const createSvgPreview = useCallback(
+    async (options?: { includeFrame?: boolean; includeCartouche?: boolean }) => {
+      const requestId = svgPreviewRequestIdRef.current + 1;
+      svgPreviewRequestIdRef.current = requestId;
+      const includeFrame = options?.includeFrame ?? exportIncludeFrame;
+      const includeCartouche = options?.includeCartouche ?? exportIncludeCartouche;
+      const prepared = await prepareDecoratedSvgClone({ includeFrame, includeCartouche });
+      if (prepared === null) {
+        return null;
+      }
+      if (requestId !== svgPreviewRequestIdRef.current) {
+        return null;
+      }
+
+      const svgMarkup = new XMLSerializer().serializeToString(prepared.svgClone);
+      const preview = {
+        svgMarkup,
+        exportWidth: prepared.exportWidth,
+        exportHeight: prepared.exportHeight,
+        includeFrame,
+        includeCartouche
+      };
+      setActiveSvgPreview(preview);
+      return preview;
+    },
+    [exportIncludeCartouche, exportIncludeFrame, prepareDecoratedSvgClone]
+  );
+
+  const handleExportPlanAsSvg = useCallback(async () => {
+    const preview = await createSvgPreview();
+    if (preview === null) {
+      return;
+    }
+  }, [createSvgPreview]);
+
+  const handleDownloadSvgPreview = useCallback(() => {
+    if (activeSvgPreview === null) {
+      return;
+    }
+    svgPreviewRequestIdRef.current += 1;
+    downloadSvgMarkup(activeSvgPreview.svgMarkup);
+    setActiveSvgPreview(null);
+  }, [activeSvgPreview, downloadSvgMarkup]);
+
+  const handleCloseSvgPreview = useCallback(() => {
+    svgPreviewRequestIdRef.current += 1;
+    setActiveSvgPreview(null);
+  }, []);
 
   const handleExportPlanAsPng = useCallback(async () => {
     if (typeof window === "undefined") {
@@ -219,6 +273,10 @@ export function useNetworkSummaryExportActions({
   }, [canvasExportFormat, handleExportPlanAsPng, handleExportPlanAsSvg]);
 
   return {
+    activeSvgPreview,
+    createSvgPreview,
+    handleCloseSvgPreview,
+    handleDownloadSvgPreview,
     handleExportPlan,
     handleExportPlanAsPng,
     handleExportPlanAsSvg

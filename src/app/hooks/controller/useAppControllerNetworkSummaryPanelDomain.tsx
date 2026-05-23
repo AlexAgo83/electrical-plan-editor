@@ -127,7 +127,9 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
     | "canvasResizeBehaviorMode"
     | "canvasExportFormat"
     | "canvasExportIncludeFrame"
+    | "setCanvasExportIncludeFrame"
     | "canvasExportIncludeCartouche"
+    | "setCanvasExportIncludeCartouche"
     | "canvasPngExportIncludeBackground"
     | "showFloatingInspectorPanel"
     | "setShowFloatingInspectorPanel"
@@ -341,7 +343,9 @@ export function useAppControllerNetworkSummaryPanelDomain({
         resizeBehaviorMode: preferencesState.canvasResizeBehaviorMode,
         canvasExportFormat: preferencesState.canvasExportFormat,
         exportIncludeFrame: preferencesState.canvasExportIncludeFrame,
+        setExportIncludeFrame: preferencesState.setCanvasExportIncludeFrame,
         exportIncludeCartouche: preferencesState.canvasExportIncludeCartouche,
+        setExportIncludeCartouche: preferencesState.setCanvasExportIncludeCartouche,
         exportCartoucheNetworkName: activeNetwork?.name ?? "",
         exportCartoucheAuthor: activeNetwork?.author,
         exportCartoucheProjectCode: activeNetwork?.projectCode,

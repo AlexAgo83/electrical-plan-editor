@@ -1,0 +1,161 @@
+import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
+import type { SvgExportPreviewState } from "../network-summary/export/useNetworkSummaryExportActions";
+
+interface SvgExportPreviewDialogProps {
+  isOpen: boolean;
+  themeHostClassName?: string;
+  preview: SvgExportPreviewState | null;
+  onPreviewOptionsChange: (options: { includeFrame: boolean; includeCartouche: boolean }) => void;
+  onFitNetwork: () => void;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+  ).filter((element) => !element.hasAttribute("hidden") && element.getAttribute("aria-hidden") !== "true");
+}
+
+export function SvgExportPreviewDialog({
+  isOpen,
+  themeHostClassName,
+  preview,
+  onPreviewOptionsChange,
+  onFitNetwork,
+  onConfirm,
+  onCancel
+}: SvgExportPreviewDialogProps): ReactElement | null {
+  const dialogRef = useRef<HTMLElement | null>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
+  const previousFocusedElementRef = useRef<HTMLElement | null>(null);
+  const titleId = "svg-export-preview-title";
+  const descriptionId = "svg-export-preview-description";
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    previousFocusedElementRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    cancelButtonRef.current?.focus();
+
+    return () => {
+      const previousFocusedElement = previousFocusedElementRef.current;
+      if (previousFocusedElement?.isConnected) {
+        previousFocusedElement.focus();
+      }
+      previousFocusedElementRef.current = null;
+    };
+  }, [isOpen]);
+
+  if (!isOpen || preview === null) {
+    return null;
+  }
+
+  const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      onCancel();
+      return;
+    }
+
+    if (event.key !== "Tab") {
+      return;
+    }
+
+    const dialogElement = dialogRef.current;
+    if (dialogElement === null) {
+      return;
+    }
+
+    const focusableElements = getFocusableElements(dialogElement);
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements[focusableElements.length - 1];
+    if (firstFocusable === undefined || lastFocusable === undefined) {
+      return;
+    }
+
+    const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (event.shiftKey) {
+      if (activeElement === firstFocusable || activeElement === dialogElement) {
+        event.preventDefault();
+        lastFocusable.focus();
+      }
+      return;
+    }
+
+    if (activeElement === lastFocusable) {
+      event.preventDefault();
+      firstFocusable.focus();
+    }
+  };
+
+  const handleFrameChange = (includeFrame: boolean): void => {
+    onPreviewOptionsChange({ includeFrame, includeCartouche: preview.includeCartouche });
+  };
+
+  const handleCartoucheChange = (includeCartouche: boolean): void => {
+    onPreviewOptionsChange({ includeFrame: preview.includeFrame, includeCartouche });
+  };
+
+  return (
+    <div className={themeHostClassName ? `confirm-dialog-layer ${themeHostClassName}` : "confirm-dialog-layer"} role="presentation">
+      <button type="button" className="confirm-dialog-backdrop" aria-label="Close SVG preview" onClick={onCancel} />
+      <section
+        ref={dialogRef}
+        className="confirm-dialog panel bom-preview-dialog svg-preview-dialog is-neutral"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+        tabIndex={-1}
+        onKeyDown={handleDialogKeyDown}
+      >
+        <header className="confirm-dialog-header bom-preview-dialog-header">
+          <h2 id={titleId}>SVG preview</h2>
+          <div className="bom-preview-dialog-summary" id={descriptionId}>
+            <span className="bom-preview-summary-item">
+              <span className="bom-preview-summary-label">Format</span>
+              <span className="bom-preview-summary-value">SVG</span>
+            </span>
+            <span className="bom-preview-summary-item">
+              <span className="bom-preview-summary-label">Size</span>
+              <span className="bom-preview-summary-value">
+                {preview.exportWidth} x {preview.exportHeight}
+              </span>
+            </span>
+          </div>
+        </header>
+        <div className="svg-preview-toolbar" aria-label="SVG preview options">
+          <label className="settings-checkbox-row">
+            <input type="checkbox" checked={preview.includeFrame} onChange={(event) => handleFrameChange(event.target.checked)} />
+            <span>Include frame</span>
+          </label>
+          <label className="settings-checkbox-row">
+            <input type="checkbox" checked={preview.includeCartouche} onChange={(event) => handleCartoucheChange(event.target.checked)} />
+            <span>Include identity</span>
+          </label>
+          <button type="button" className="workspace-tab" onClick={onFitNetwork}>
+            Fit network
+          </button>
+        </div>
+        <div className="svg-preview-shell" tabIndex={0} aria-label="SVG export preview">
+          <div className="svg-preview-content" dangerouslySetInnerHTML={{ __html: preview.svgMarkup }} />
+        </div>
+        <footer className="confirm-dialog-actions">
+          <button ref={cancelButtonRef} type="button" className="confirm-dialog-cancel" onClick={onCancel}>
+            Cancel
+          </button>
+          <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={onConfirm}>
+            <span className="network-summary-export-icon" aria-hidden="true" />
+            <span>Download SVG</span>
+          </button>
+        </footer>
+      </section>
+    </div>
+  );
+}

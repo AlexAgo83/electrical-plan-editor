@@ -47,10 +47,16 @@ import {
   useNetworkSummaryExportActions
 } from "./network-summary/export/useNetworkSummaryExportActions";
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
+import { SvgExportPreviewDialog } from "./dialogs/SvgExportPreviewDialog";
 import { snapToGrid } from "../lib/app-utils-shared";
 import type { NetworkSummaryPanelProps } from "./network-summary/NetworkSummaryPanel.types";
 
 const CALLOUT_DRAG_START_THRESHOLD_PX = 4;
+
+interface SvgPreviewOptions {
+  includeFrame: boolean;
+  includeCartouche: boolean;
+}
 
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -80,7 +86,9 @@ export function NetworkSummaryPanel({
   autoSegmentLabelRotation,
   canvasExportFormat,
   exportIncludeFrame,
+  setExportIncludeFrame,
   exportIncludeCartouche,
+  setExportIncludeCartouche,
   exportCartoucheNetworkName,
   exportCartoucheAuthor,
   exportCartoucheProjectCode,
@@ -159,6 +167,7 @@ export function NetworkSummaryPanel({
   showFunctionalSchematic = true
 }: NetworkSummaryPanelProps): ReactElement {
   void networkScalePercent;
+  const [pendingFitSvgPreviewOptions, setPendingFitSvgPreviewOptions] = useState<SvgPreviewOptions | null>(null);
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
   const networkCanvasShellRef = useRef<HTMLDivElement | null>(null);
   const graphStats = [
@@ -598,7 +607,13 @@ export function NetworkSummaryPanel({
     stopNetworkNodeDrag();
   }, [stopCalloutDrag, stopNetworkNodeDrag]);
 
-  const { handleExportPlan } = useNetworkSummaryExportActions({
+  const {
+    activeSvgPreview,
+    createSvgPreview,
+    handleCloseSvgPreview,
+    handleDownloadSvgPreview,
+    handleExportPlan
+  } = useNetworkSummaryExportActions({
     networkSvgRef,
     networkCanvasShellRef,
     canvasExportFormat,
@@ -615,6 +630,39 @@ export function NetworkSummaryPanel({
     exportCartoucheLogoUrl,
     exportCartoucheNotes
   });
+
+  const handleSvgPreviewOptionsChange = useCallback(
+    (options: SvgPreviewOptions) => {
+      setExportIncludeFrame(options.includeFrame);
+      setExportIncludeCartouche(options.includeCartouche);
+      void createSvgPreview(options);
+    },
+    [createSvgPreview, setExportIncludeCartouche, setExportIncludeFrame]
+  );
+
+  const handleFitNetworkAndRefreshSvgPreview = useCallback(() => {
+    setPendingFitSvgPreviewOptions(
+      activeSvgPreview === null
+        ? {
+            includeFrame: exportIncludeFrame,
+            includeCartouche: exportIncludeCartouche
+          }
+        : {
+            includeFrame: activeSvgPreview.includeFrame,
+            includeCartouche: activeSvgPreview.includeCartouche
+          }
+    );
+    fitNetworkToContent();
+  }, [activeSvgPreview, exportIncludeCartouche, exportIncludeFrame, fitNetworkToContent]);
+
+  useEffect(() => {
+    if (pendingFitSvgPreviewOptions === null) {
+      return;
+    }
+
+    void createSvgPreview(pendingFitSvgPreviewOptions);
+    setPendingFitSvgPreviewOptions(null);
+  }, [createSvgPreview, pendingFitSvgPreviewOptions]);
 
   const normalizedConnectorDrawingScale = clampNumber(connectorDrawingScalePercent / 100, 1, 2);
   const normalizedConnectorNodeDrawingScale =
@@ -949,6 +997,14 @@ export function NetworkSummaryPanel({
           exportIncludeCartouche={exportIncludeCartouche}
         />
       ) : null}
+      <SvgExportPreviewDialog
+        isOpen={activeSvgPreview !== null}
+        preview={activeSvgPreview}
+        onPreviewOptionsChange={handleSvgPreviewOptionsChange}
+        onFitNetwork={handleFitNetworkAndRefreshSvgPreview}
+        onConfirm={handleDownloadSvgPreview}
+        onCancel={handleCloseSvgPreview}
+      />
     </section>
   );
 }

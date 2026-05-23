@@ -259,6 +259,50 @@
   background: color-mix(in srgb, currentColor 3%, transparent);
 }
 
+.svg-preview-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.85rem;
+}
+
+.svg-preview-shell {
+  min-height: 16rem;
+  max-height: min(30rem, calc(100vh - 17rem));
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: 0.55rem;
+  background:
+    linear-gradient(45deg, color-mix(in srgb, currentColor 5%, transparent) 25%, transparent 25%),
+    linear-gradient(-45deg, color-mix(in srgb, currentColor 5%, transparent) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, color-mix(in srgb, currentColor 5%, transparent) 75%),
+    linear-gradient(-45deg, transparent 75%, color-mix(in srgb, currentColor 5%, transparent) 75%),
+    color-mix(in srgb, canvas 88%, currentColor 3%);
+  background-position:
+    0 0,
+    0 0.5rem,
+    0.5rem -0.5rem,
+    -0.5rem 0;
+  background-size: 1rem 1rem;
+}
+
+.svg-preview-content {
+  display: grid;
+  min-width: min-content;
+  min-height: 100%;
+  place-items: center;
+  padding: 1rem;
+}
+
+.svg-preview-content > svg {
+  display: block;
+  width: min(100%, 64rem);
+  height: auto;
+  max-height: 28rem;
+  background: canvas;
+  box-shadow: 0 0.75rem 2rem color-mix(in srgb, black 18%, transparent);
+}
+
 .confirm-dialog.is-warning .confirm-dialog-confirm {
   border-color: color-mix(in srgb, #b5751f 64%, transparent);
   background: color-mix(in srgb, #b5751f 18%, transparent);

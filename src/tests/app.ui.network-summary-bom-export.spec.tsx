@@ -28,6 +28,13 @@ function readBlobAsText(blob: Blob): Promise<string> {
   });
 }
 
+async function openSvgPreviewAndDownload(panel: HTMLElement): Promise<HTMLElement> {
+  fireEvent.click(within(panel).getByRole("button", { name: "SVG" }));
+  const previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
+  fireEvent.click(within(previewDialog).getByRole("button", { name: "Download SVG" }));
+  return previewDialog;
+}
+
 describe("App integration UI - network summary BOM export", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -174,6 +181,51 @@ describe("App integration UI - network summary BOM export", () => {
       expect(screen.queryByRole("dialog", { name: "BOM preview" })).toBeNull();
       expect(createObjectUrl).not.toHaveBeenCalled();
       expect(clickSpy).not.toHaveBeenCalled();
+    } finally {
+      clickSpy.mockRestore();
+      if (originalCreateObjectUrl !== undefined) {
+        Object.defineProperty(URL, "createObjectURL", originalCreateObjectUrl);
+      }
+      if (originalRevokeObjectUrl !== undefined) {
+        Object.defineProperty(URL, "revokeObjectURL", originalRevokeObjectUrl);
+      }
+    }
+  });
+
+  it("opens SVG export in a preview dialog with fit and decoration toggles before downloading", async () => {
+    const originalCreateObjectUrl = Object.getOwnPropertyDescriptor(URL, "createObjectURL");
+    const originalRevokeObjectUrl = Object.getOwnPropertyDescriptor(URL, "revokeObjectURL");
+    const createObjectUrl = vi.fn(() => "blob:svg-preview-options");
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, writable: true, value: createObjectUrl });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, writable: true, value: vi.fn() });
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+
+    try {
+      renderAppWithState(createUiIntegrationState());
+      switchScreenDrawerAware("modeling");
+      const networkSummaryPanel = getPanelByHeading("Network summary");
+      openExportMenu(networkSummaryPanel);
+      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
+
+      let previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
+      expect(within(previewDialog).getByLabelText("SVG export preview")).toBeInTheDocument();
+      const includeFrameToggle = within(previewDialog).getByLabelText("Include frame");
+      const includeIdentityToggle = within(previewDialog).getByLabelText("Include identity");
+      expect(includeFrameToggle).not.toBeChecked();
+      expect(includeIdentityToggle).toBeChecked();
+      expect(clickSpy).not.toHaveBeenCalled();
+
+      fireEvent.click(includeFrameToggle);
+      previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
+      expect(within(previewDialog).getByLabelText("Include frame")).toBeChecked();
+      fireEvent.click(within(previewDialog).getByRole("button", { name: "Fit network" }));
+      expect(await screen.findByRole("dialog", { name: "SVG preview" })).toBeInTheDocument();
+      fireEvent.click(within(previewDialog).getByRole("button", { name: "Download SVG" }));
+
+      await waitFor(() => {
+        expect(clickSpy).toHaveBeenCalledTimes(1);
+      });
+      expect(createObjectUrl).toHaveBeenCalledTimes(1);
     } finally {
       clickSpy.mockRestore();
       if (originalCreateObjectUrl !== undefined) {
@@ -475,7 +527,7 @@ describe("App integration UI - network summary BOM export", () => {
       const calloutsToggle = within(networkSummaryPanel).getByRole("button", { name: "Callouts" });
       fireEvent.click(calloutsToggle);
       openExportMenu(networkSummaryPanel);
-      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
+      await openSvgPreviewAndDownload(networkSummaryPanel);
 
       await waitFor(() => {
         expect(createObjectUrl).toHaveBeenCalledTimes(1);
@@ -538,7 +590,7 @@ describe("App integration UI - network summary BOM export", () => {
       }
       fireEvent.change(globalScaleInput, { target: { value: "100" } });
       openExportMenu(networkSummaryPanel);
-      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
+      await openSvgPreviewAndDownload(networkSummaryPanel);
 
       await waitFor(() => {
         expect(createObjectUrl).toHaveBeenCalledTimes(1);
@@ -646,7 +698,7 @@ describe("App integration UI - network summary BOM export", () => {
       switchScreenDrawerAware("modeling");
       const networkSummaryPanel = getPanelByHeading("Network summary");
       openExportMenu(networkSummaryPanel);
-      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
+      await openSvgPreviewAndDownload(networkSummaryPanel);
 
       await waitFor(() => {
         expect(createObjectUrl).toHaveBeenCalledTimes(1);
@@ -717,7 +769,7 @@ describe("App integration UI - network summary BOM export", () => {
       switchScreenDrawerAware("modeling");
       const networkSummaryPanel = getPanelByHeading("Network summary");
       openExportMenu(networkSummaryPanel);
-      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
+      await openSvgPreviewAndDownload(networkSummaryPanel);
 
       await waitFor(() => {
         expect(clickSpy).toHaveBeenCalledTimes(1);
@@ -776,7 +828,7 @@ describe("App integration UI - network summary BOM export", () => {
       switchScreenDrawerAware("modeling");
       const networkSummaryPanel = getPanelByHeading("Network summary");
       openExportMenu(networkSummaryPanel);
-      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
+      await openSvgPreviewAndDownload(networkSummaryPanel);
 
       await waitFor(() => {
         expect(createObjectUrl).toHaveBeenCalledTimes(1);
@@ -824,7 +876,7 @@ describe("App integration UI - network summary BOM export", () => {
       switchScreenDrawerAware("modeling");
       const networkSummaryPanel = getPanelByHeading("Network summary");
       openExportMenu(networkSummaryPanel);
-      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "SVG" }));
+      await openSvgPreviewAndDownload(networkSummaryPanel);
 
       await waitFor(() => {
         expect(createObjectUrl).toHaveBeenCalledTimes(1);

@@ -51,7 +51,9 @@ export interface NetworkSummaryPanelProps {
   autoSegmentLabelRotation: boolean;
   canvasExportFormat: CanvasExportFormat;
   exportIncludeFrame: boolean;
+  setExportIncludeFrame: (value: boolean) => void;
   exportIncludeCartouche: boolean;
+  setExportIncludeCartouche: (value: boolean) => void;
   exportCartoucheNetworkName: string;
   exportCartoucheAuthor?: string;
   exportCartoucheProjectCode?: string;
