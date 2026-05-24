@@ -1,0 +1,105 @@
+name: Deploy Render on release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag to deploy. Leave empty to use the latest release."
+        required: false
+        type: string
+
+jobs:
+  deploy-render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release commit
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG_INPUT: ${{ inputs.release_tag }}
+          RELEASE_TAG_EVENT: ${{ github.event.release.tag_name }}
+        run: |
+          if [ -n "$RELEASE_TAG_INPUT" ]; then
+            release_tag="$RELEASE_TAG_INPUT"
+          elif [ -n "$RELEASE_TAG_EVENT" ]; then
+            release_tag="$RELEASE_TAG_EVENT"
+          else
+            release_tag="$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)"
+          fi
+
+          git fetch --tags --force
+          release_sha="$(git rev-list -n 1 "$release_tag")"
+
+          {
+            echo "tag=$release_tag"
+            echo "sha=$release_sha"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Wait for CI success on release commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_SHA: ${{ steps.release.outputs.sha }}
+        run: |
+          deadline=$((SECONDS + 1800))
+
+          while true; do
+            runs_json="$(
+              gh run list \
+                --workflow "CI" \
+                --commit "$RELEASE_SHA" \
+                --json conclusion,createdAt,databaseId,headBranch,status,url \
+                --limit 20
+            )"
+
+            successful_run_url="$(
+              jq -r '[.[] | select(.status == "completed" and .conclusion == "success")] | sort_by(.createdAt) | last | .url // empty' <<< "$runs_json"
+            )"
+            if [ -n "$successful_run_url" ]; then
+              echo "CI passed for $RELEASE_TAG at $RELEASE_SHA: $successful_run_url"
+              exit 0
+            fi
+
+            active_run_count="$(jq '[.[] | select(.status != "completed")] | length' <<< "$runs_json")"
+            failed_run_url="$(
+              jq -r '[.[] | select(.status == "completed" and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out" or .conclusion == "action_required"))] | sort_by(.createdAt) | last | .url // empty' <<< "$runs_json"
+            )"
+
+            if [ "$active_run_count" -eq 0 ] && [ -n "$failed_run_url" ]; then
+              echo "CI did not pass for $RELEASE_TAG at $RELEASE_SHA: $failed_run_url"
+              exit 1
+            fi
+
+            if [ "$SECONDS" -ge "$deadline" ]; then
+              echo "Timed out waiting for CI success for $RELEASE_TAG at $RELEASE_SHA."
+              exit 1
+            fi
+
+            echo "Waiting for CI success for $RELEASE_TAG at $RELEASE_SHA..."
+            sleep 30
+          done
+
+      - name: Trigger Render deploy
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "RENDER_DEPLOY_HOOK_URL secret is not configured."
+            exit 1
+          fi
+
+          curl --fail-with-body \
+            --request POST \
+            "$RENDER_DEPLOY_HOOK_URL"
