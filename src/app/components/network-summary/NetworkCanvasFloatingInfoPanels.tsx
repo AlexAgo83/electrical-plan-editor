@@ -95,18 +95,19 @@ export function NetworkCanvasFloatingInfoPanels({
             <span aria-hidden="true">+</span>
           </button>
           <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
-            Reset view
+            <span className="action-button-icon is-undo" aria-hidden="true" />
+            <span>Reset view</span>
           </button>
           <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
-            Fit network
+            <span className="action-button-icon is-zoom" aria-hidden="true" />
+            <span>Fit network</span>
           </button>
         </div>
-        <div className="network-canvas-floating-guidance">
-          <p className="meta-line network-canvas-floating-copy">Drag empty canvas to pan.</p>
-          {selectedCanvasNodeCount > 1 ? (
+        {selectedCanvasNodeCount > 1 ? (
+          <div className="network-canvas-floating-guidance">
             <p className="meta-line network-canvas-floating-copy">Drag one selected node to move the full group.</p>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
         {selectedCanvasNodeCount > 0 ? (
           <div className="network-canvas-selection-summary" aria-live="polite">
             <p className="meta-line network-canvas-floating-copy">

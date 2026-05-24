@@ -88,6 +88,30 @@ describe("App integration UI - inspector floating shell", () => {
     expect(within(displayOptions).getByRole("button", { name: "Hide inspector" })).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("opens the hidden inspector when double-clicking an inspectable network summary element", async () => {
+    renderAppWithState(createUiIntegrationState());
+    closeOnboardingIfOpen();
+    switchScreenDrawerAware("analysis");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const displayOptions = within(networkSummaryPanel).getByRole("group", { name: "Network summary display options" });
+    const viewButton = within(displayOptions).getByRole("button", { name: "View" });
+    fireEvent.click(viewButton);
+    fireEvent.click(within(displayOptions).getByRole("button", { name: "Hide inspector" }));
+    expect(getInspectorShell()).not.toBeInTheDocument();
+    fireEvent.mouseDown(document.body);
+    expect(within(displayOptions).queryByRole("button", { name: "Show inspector" })).not.toBeInTheDocument();
+
+    const segmentHitbox = within(networkSummaryPanel).getByRole("button", { name: "Select segment SEG-A" });
+    fireEvent.click(segmentHitbox);
+    fireEvent.click(segmentHitbox, { detail: 2 });
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
+    });
+    expect(within(getPanelByHeading("Inspector context")).getByText("SEG-A", { selector: ".inspector-entity-id" })).toBeInTheDocument();
+  });
+
   it("closes the floating inspector from its header icon button", () => {
     renderAppWithState(createUiIntegrationState());
     closeOnboardingIfOpen();

@@ -71,6 +71,7 @@ interface NetworkSummaryCanvasPanelProps {
   handleNetworkSegmentClick: (segmentId: SegmentId) => void;
   handleNetworkNodeMouseDown: (event: ReactMouseEvent<SVGGElement>, nodeId: NodeId) => void;
   handleNetworkNodeActivate: (nodeId: NodeId) => void;
+  openInspectorForCanvasSelection: () => void;
   selectedWireId: Wire["id"] | null;
   setHoveredCalloutKey: (key: CalloutTargetKey | null) => void;
   handleCalloutMouseDown: (
@@ -138,6 +139,7 @@ export function NetworkSummaryCanvasPanel({
   handleNetworkSegmentClick,
   handleNetworkNodeMouseDown,
   handleNetworkNodeActivate,
+  openInspectorForCanvasSelection,
   selectedWireId,
   setHoveredCalloutKey,
   handleCalloutMouseDown,
@@ -213,6 +215,7 @@ export function NetworkSummaryCanvasPanel({
                 onSelectSegment={handleNetworkSegmentClick}
                 onNodeMouseDown={handleNetworkNodeMouseDown}
                 onNodeActivate={handleNetworkNodeActivate}
+                onOpenInspectorForSelection={openInspectorForCanvasSelection}
                 onSelectWireFromConnectorPin={onSelectWireFromConnectorPin}
               />
               <NetworkSummaryCalloutsLayer
@@ -224,6 +227,7 @@ export function NetworkSummaryCanvasPanel({
                 onSelectConnectorFromCallout={onSelectConnectorFromCallout}
                 onSelectSpliceFromCallout={onSelectSpliceFromCallout}
                 onSelectWireFromConnectorPin={onSelectWireFromConnectorPin}
+                onOpenInspectorForSelection={openInspectorForCanvasSelection}
                 networkOffset={networkOffset}
                 networkScale={networkScale}
               />

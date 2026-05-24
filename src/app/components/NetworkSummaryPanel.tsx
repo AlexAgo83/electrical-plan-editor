@@ -103,6 +103,7 @@ export function NetworkSummaryPanel({
   toggleShowSegmentLengths,
   toggleShowCableCallouts,
   toggleShowFloatingInspectorPanel,
+  openInspectorForCanvasSelection,
   toggleShowNetworkGrid,
   toggleSnapNodesToGrid,
   toggleLockEntityMovement,
@@ -957,6 +958,7 @@ export function NetworkSummaryPanel({
           handleNetworkSegmentClick={handleNetworkSegmentClick}
           handleNetworkNodeMouseDown={handleNetworkNodeMouseDown}
           handleNetworkNodeActivate={handleNetworkNodeActivate}
+          openInspectorForCanvasSelection={openInspectorForCanvasSelection}
           selectedWireId={selectedWireId}
           setHoveredCalloutKey={setHoveredCalloutKey}
           handleCalloutMouseDown={handleCalloutMouseDown}

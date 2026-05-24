@@ -84,6 +84,7 @@ describe("NetworkSummaryCalloutsLayer", () => {
           onSelectConnectorFromCallout={vi.fn()}
           onSelectSpliceFromCallout={vi.fn()}
           onSelectWireFromConnectorPin={onSelectWireFromConnectorPin}
+          onOpenInspectorForSelection={vi.fn()}
           networkOffset={{ x: 0, y: 0 }}
           networkScale={1}
         />

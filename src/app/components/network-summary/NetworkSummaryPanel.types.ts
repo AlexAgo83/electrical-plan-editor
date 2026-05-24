@@ -67,6 +67,7 @@ export interface NetworkSummaryPanelProps {
   toggleShowSegmentLengths: () => void;
   toggleShowCableCallouts: () => void;
   toggleShowFloatingInspectorPanel: () => void;
+  openInspectorForCanvasSelection: () => void;
   toggleShowNetworkGrid: () => void;
   toggleSnapNodesToGrid: () => void;
   toggleLockEntityMovement: () => void;

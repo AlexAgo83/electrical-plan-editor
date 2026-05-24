@@ -3,12 +3,15 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactElement,
-  type ReactNode
+  type ReactNode,
+  useRef
 } from "react";
 import type { NetworkNode, NodeId, SegmentId, WireId } from "../../../../core/entities";
 import type { NodePosition } from "../../../types/app-controller";
 import { renderConnectorLayoutDrawing } from "../callouts/NetworkSummaryCalloutsLayer";
 import type { RenderedNodeModel, RenderedSegmentModel } from "./networkSummaryGraphModel";
+
+const DOUBLE_CLICK_INTERVAL_MS = 450;
 
 export interface SplicePlacementPreviewSegmentModel {
   key: string;
@@ -51,6 +54,7 @@ interface NetworkSummaryGraphLayersProps {
   onSelectSegment: (segmentId: SegmentId) => void;
   onNodeMouseDown: (event: ReactMouseEvent<SVGGElement>, nodeId: NodeId) => void;
   onNodeActivate: (nodeId: NodeId) => void;
+  onOpenInspectorForSelection: () => void;
   onSelectWireFromConnectorPin: (wireId: WireId) => void;
 }
 
@@ -110,8 +114,17 @@ export function NetworkSummaryGraphLayers({
   onSelectSegment,
   onNodeMouseDown,
   onNodeActivate,
+  onOpenInspectorForSelection,
   onSelectWireFromConnectorPin
 }: NetworkSummaryGraphLayersProps): ReactElement {
+  const lastClickRef = useRef<{ key: string; timestamp: number } | null>(null);
+  const isRepeatedClick = (key: string): boolean => {
+    const timestamp = Date.now();
+    const isRepeated = lastClickRef.current?.key === key && timestamp - lastClickRef.current.timestamp <= DOUBLE_CLICK_INTERVAL_MS;
+    lastClickRef.current = { key, timestamp };
+    return isRepeated;
+  };
+
   return (
     <>
       <g
@@ -186,6 +199,15 @@ export function NetworkSummaryGraphLayers({
               onClick={(event) => {
                 event.stopPropagation();
                 onSelectSegment(segment.id);
+                if (event.detail >= 2 || isRepeatedClick(`segment:${segment.id}`)) {
+                  onOpenInspectorForSelection();
+                }
+              }}
+              onDoubleClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onSelectSegment(segment.id);
+                onOpenInspectorForSelection();
               }}
               onKeyDown={(event) => handleNetworkSegmentKeyDown(event, segment.id, onSelectSegment)}
             />
@@ -230,6 +252,16 @@ export function NetworkSummaryGraphLayers({
                 // Selection/editing is handled on mouse-down to support immediate drag interactions.
                 // Keep click from bubbling to future parent click handlers.
                 event.stopPropagation();
+                if (event.detail >= 2 || isRepeatedClick(`node:${node.id}`)) {
+                  onNodeActivate(node.id);
+                  onOpenInspectorForSelection();
+                }
+              }}
+              onDoubleClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onNodeActivate(node.id);
+                onOpenInspectorForSelection();
               }}
             >
               <title>{describeNode(node)}</title>
@@ -272,7 +304,8 @@ export function NetworkSummaryGraphLayers({
                           highlightedConnectorCavityIndexes,
                           nodeLabel,
                           connectorCavityWireIdByIndex,
-                          onSelectWireFromConnectorPin
+                          onSelectWireFromConnectorPin,
+                          onOpenInspectorForSelection
                         )}
                       </g>
                     )}

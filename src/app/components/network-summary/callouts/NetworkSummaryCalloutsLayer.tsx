@@ -1,4 +1,4 @@
-import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactElement } from "react";
+import { useRef, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent, type ReactElement } from "react";
 import type {
   ConnectorId,
   ConnectorLayout,
@@ -35,6 +35,7 @@ const KEYING_MARKER_RADIUS = 0.15;
 const KEYING_ARROW_WIDTH = 0.32;
 const KEYING_ARROW_DEPTH = 0.19;
 const DEFAULT_WAY_RENDER_CELL_SIZE = 1 - DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING;
+const DOUBLE_CLICK_INTERVAL_MS = 450;
 
 type RenderableKeying = {
   shape?: ConnectorLayoutKeyingShape;
@@ -162,7 +163,8 @@ export function renderConnectorLayoutDrawing(
   highlightedCavityIndexes: ReadonlySet<number>,
   titleId?: string,
   wireIdByCavityIndex?: ReadonlyMap<number, Wire["id"]>,
-  onSelectCavityWire?: (wireId: Wire["id"]) => void
+  onSelectCavityWire?: (wireId: Wire["id"]) => void,
+  onOpenInspectorForSelection?: () => void
 ): ReactElement {
   const shellPadding = getConnectorLayoutShellPadding(layout);
   const cellPadding = getConnectorLayoutCellPadding(layout);
@@ -254,7 +256,21 @@ export function renderConnectorLayoutDrawing(
               tabIndex={canSelectWire ? 0 : undefined}
               aria-label={canSelectWire ? `Select wire connected to ${label}` : undefined}
               onMouseDown={handleSelectCavityWire}
-              onClick={handleSelectCavityWire}
+              onClick={(event) => {
+                handleSelectCavityWire(event);
+                if (canSelectWire && event.detail >= 2) {
+                  onOpenInspectorForSelection?.();
+                }
+              }}
+              onDoubleClick={(event) => {
+                if (!canSelectWire) {
+                  return;
+                }
+                event.preventDefault();
+                event.stopPropagation();
+                onSelectCavityWire(wireId);
+                onOpenInspectorForSelection?.();
+              }}
               onKeyDown={(event: ReactKeyboardEvent<SVGGElement>) => {
                 if (!canSelectWire || (event.key !== "Enter" && event.key !== " ")) {
                   return;
@@ -341,6 +357,7 @@ interface NetworkSummaryCalloutsLayerProps {
   onSelectConnectorFromCallout: (connectorId: ConnectorId) => void;
   onSelectSpliceFromCallout: (spliceId: SpliceId) => void;
   onSelectWireFromConnectorPin: (wireId: Wire["id"]) => void;
+  onOpenInspectorForSelection: () => void;
   networkOffset: { x: number; y: number };
   networkScale: number;
 }
@@ -354,9 +371,18 @@ export function NetworkSummaryCalloutsLayer({
   onSelectConnectorFromCallout,
   onSelectSpliceFromCallout,
   onSelectWireFromConnectorPin,
+  onOpenInspectorForSelection,
   networkOffset,
   networkScale
 }: NetworkSummaryCalloutsLayerProps): ReactElement {
+  const lastClickRef = useRef<{ key: string; timestamp: number } | null>(null);
+  const isRepeatedClick = (key: string): boolean => {
+    const timestamp = Date.now();
+    const isRepeated = lastClickRef.current?.key === key && timestamp - lastClickRef.current.timestamp <= DOUBLE_CLICK_INTERVAL_MS;
+    lastClickRef.current = { key, timestamp };
+    return isRepeated;
+  };
+
   return (
     <g
       className="network-graph-layer network-graph-layer-callouts"
@@ -392,6 +418,25 @@ export function NetworkSummaryCalloutsLayer({
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
+                if (event.detail < 2 && !isRepeatedClick(`callout:${callout.key}`)) {
+                  return;
+                }
+                if (callout.kind === "connector") {
+                  onSelectConnectorFromCallout(callout.entityId as ConnectorId);
+                } else {
+                  onSelectSpliceFromCallout(callout.entityId as SpliceId);
+                }
+                onOpenInspectorForSelection();
+              }}
+              onDoubleClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (callout.kind === "connector") {
+                  onSelectConnectorFromCallout(callout.entityId as ConnectorId);
+                } else {
+                  onSelectSpliceFromCallout(callout.entityId as SpliceId);
+                }
+                onOpenInspectorForSelection();
               }}
               onKeyDown={(event: ReactKeyboardEvent<SVGGElement>) => {
                 if (event.key !== "Enter" && event.key !== " ") {
@@ -423,7 +468,8 @@ export function NetworkSummaryCalloutsLayer({
                       highlightedCavityIndexes,
                       undefined,
                       wireIdByCavityIndex,
-                      onSelectWireFromConnectorPin
+                      onSelectWireFromConnectorPin,
+                      onOpenInspectorForSelection
                     )}
                   </g>
                 ) : null}

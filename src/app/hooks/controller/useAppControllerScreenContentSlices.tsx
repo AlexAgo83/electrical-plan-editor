@@ -40,6 +40,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   | "toggleShowSegmentLengths"
   | "toggleShowCableCallouts"
   | "toggleShowFloatingInspectorPanel"
+  | "openInspectorForCanvasSelection"
   | "toggleShowNetworkGrid"
   | "toggleSnapNodesToGrid"
   | "toggleLockEntityMovement"
@@ -209,6 +210,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     toggleShowSegmentLengths: () => params.setShowSegmentLengths((current: boolean) => !current),
     toggleShowCableCallouts: () => params.setShowCableCallouts((current: boolean) => !current),
     toggleShowFloatingInspectorPanel: () => params.setShowFloatingInspectorPanel((current: boolean) => !current),
+    openInspectorForCanvasSelection: () => params.setShowFloatingInspectorPanel(true),
     toggleShowNetworkGrid: () => params.setShowNetworkGrid((current: boolean) => !current),
     toggleSnapNodesToGrid: () => params.setSnapNodesToGrid((current: boolean) => !current),
     toggleLockEntityMovement: () => params.setLockEntityMovement((current: boolean) => !current),
