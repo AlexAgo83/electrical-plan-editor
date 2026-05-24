@@ -284,6 +284,28 @@ describe("App integration UI - analysis go-to wire actions", () => {
     );
   });
 
+  it("opens node analysis from selected segment endpoint names", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("segment");
+
+    const segmentsPanel = getPanelByHeading("Segments");
+    fireEvent.click(within(segmentsPanel).getByText("SEG-A"));
+
+    const segmentAnalysisPanel = getPanelByHeading("Segment analysis");
+    expect(within(segmentAnalysisPanel).getByText("Selected segment")).toBeInTheDocument();
+    expect(within(segmentAnalysisPanel).getByText("40 mm")).toBeInTheDocument();
+    fireEvent.click(within(segmentAnalysisPanel).getByRole("button", { name: "Connector 1 (C-1)" }));
+
+    const nodeAnalysisPanel = getPanelByHeading("Node analysis");
+    expect(within(nodeAnalysisPanel).getByText("Selected node")).toBeInTheDocument();
+    expect(nodeAnalysisPanel.querySelector(".analysis-wire-identity-value")?.textContent).toContain("N-C1");
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Node$/, hidden: true })).toHaveClass("is-active");
+  });
+
   it("opens wire analysis from segment analysis traversing wires table", () => {
     renderAppWithState(createUiIntegrationDenseWiresState());
 
@@ -302,10 +324,34 @@ describe("App integration UI - analysis go-to wire actions", () => {
     const wireAnalysisPanel = getPanelByHeading("Wire analysis");
     expect(within(wireAnalysisPanel).getByText("Wire 1")).toBeInTheDocument();
     fireEvent.click(within(wireAnalysisPanel).getByRole("button", { name: "SEG-B" }));
-    expect(within(getPanelByHeading("Segment analysis")).getByText("SEG-B")).toBeInTheDocument();
+    expect(within(getPanelByHeading("Edit Segment")).getByDisplayValue("SEG-B")).toBeInTheDocument();
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Segment$/, hidden: true })).toHaveClass(
+      "is-active"
+    );
+  });
+
+  it("opens endpoint analysis from segment analysis traversing wires table", () => {
+    renderAppWithState(createUiIntegrationDenseWiresState());
+
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("segment");
+
+    const segmentsPanel = getPanelByHeading("Segments");
+    fireEvent.click(within(segmentsPanel).getByText("SEG-B"));
+
+    const segmentAnalysisPanel = getPanelByHeading("Segment analysis");
+    const traversingWiresTable = within(segmentAnalysisPanel).getByRole("table");
+    const firstRow = traversingWiresTable.querySelector("tbody tr");
+    expect(firstRow).not.toBeNull();
+    fireEvent.click(within(firstRow as HTMLElement).getByRole("button", { name: "Connector 1 (C-1) / C1" }));
+
+    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    expect(within(connectorAnalysisPanel).getByText("Connector 1")).toBeInTheDocument();
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Connector$/, hidden: true })).toHaveClass(
       "is-active"
     );
   });

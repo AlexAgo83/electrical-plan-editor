@@ -134,6 +134,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   onSelectWire: AnalysisSliceParams["onSelectWire"];
   onGoToSegmentFromAnalysis: AnalysisSliceParams["onGoToSegmentFromAnalysis"];
   onGoToWireFromAnalysis: AnalysisSliceParams["onGoToWireFromAnalysis"];
+  onOpenSegmentFromAnalysisTable: AnalysisSliceParams["onOpenSegmentFromAnalysisTable"];
   onOpenWireFromAnalysisTable: AnalysisSliceParams["onOpenWireFromAnalysisTable"];
   onOpenConnectorFromAnalysisTable: AnalysisSliceParams["onOpenConnectorFromAnalysisTable"];
   onOpenSpliceFromAnalysisTable: AnalysisSliceParams["onOpenSpliceFromAnalysisTable"];
@@ -181,6 +182,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   onSelectWire,
   onGoToSegmentFromAnalysis,
   onGoToWireFromAnalysis,
+  onOpenSegmentFromAnalysisTable,
   onOpenWireFromAnalysisTable,
   onOpenConnectorFromAnalysisTable,
   onOpenSpliceFromAnalysisTable,
@@ -844,6 +846,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     onSelectWire,
     onGoToSegmentFromAnalysis,
     onGoToWireFromAnalysis,
+    onOpenSegmentFromAnalysisTable,
     onOpenWireFromAnalysisTable,
     onOpenConnectorFromAnalysisTable,
     onOpenSpliceFromAnalysisTable,

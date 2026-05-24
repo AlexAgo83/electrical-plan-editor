@@ -434,7 +434,7 @@ describe("App integration UI - list ergonomics", () => {
     expect(within(wiresPanel).queryByText("Secondary Feed B")).not.toBeInTheDocument();
   });
 
-  it("distinguishes free unspecified wire colors from no-color and makes them discoverable via any-field filter", () => {
+  it("keeps free unspecified wire colors visually blank while discoverable via any-field filter", () => {
     const state = createSampleNetworkState();
     const firstWireId = state.wires.allIds[0];
     const activeNetworkId = state.activeNetworkId;
@@ -470,7 +470,12 @@ describe("App integration UI - list ergonomics", () => {
     switchSubScreen("wire");
 
     const wiresPanel = getPanelByHeading("Wires");
-    expect(within(wiresPanel).getByText("Unspecified")).toBeInTheDocument();
+    const wireRow = within(wiresPanel).getByText("Feed Main Junction").closest("tr");
+    expect(wireRow).not.toBeNull();
+    if (wireRow !== null) {
+      expect(within(wireRow).queryByText("Unspecified")).not.toBeInTheDocument();
+      expect(within(wireRow).queryByText("Free")).not.toBeInTheDocument();
+    }
 
     const wireFilterFieldSelect = within(wiresPanel).getByLabelText("Wire filter field");
     fireEvent.change(wireFilterFieldSelect, { target: { value: "any" } });

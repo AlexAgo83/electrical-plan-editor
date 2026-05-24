@@ -35,7 +35,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     onSelectWire,
     onSelectConnector,
     onSelectSplice,
-    onSelectSegment,
+    onOpenSegmentFromAnalysisTable,
     onSelectCatalogItem,
     onOpenWireOnboardingHelp,
     selectedWire,
@@ -100,6 +100,10 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     }
     return catalogItemById.get(wire.protection.catalogItemId)?.manufacturerReference ?? "(missing catalog item)";
   };
+  const getWireColorSummaryLabel = (wire: (typeof visibleWires)[number]): string | null => {
+    const label = getWireColorLabel(wire);
+    return label === "No color" || label === "Free color (unspecified)" ? null : label;
+  };
   const renderCurrentRoutePath = (segmentIds: readonly string[]): ReactElement => {
     if (segmentIds.length === 0) {
       return <p className="route-preview-path analysis-current-route-empty">(none)</p>;
@@ -114,7 +118,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
               <EntityReferenceButton
                 className="analysis-current-route-segment technical-id"
                 title={`Open segment ${segmentId}`}
-                onClick={() => onSelectSegment(segmentId as SegmentId)}
+                onClick={() => onOpenSegmentFromAnalysisTable(segmentId as SegmentId)}
               >
                 {segmentId}
               </EntityReferenceButton>
@@ -493,7 +497,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           <strong>{selectedWire.name}</strong> <span className="technical-id">({selectedWire.technicalId})</span>
         </p>
         <p className="meta-line" style={{ margin: 0 }}>
-          Section {selectedWire.sectionMm2} mm² • {getWireColorLabel(selectedWire)}
+          Section {selectedWire.sectionMm2} mm²{getWireColorSummaryLabel(selectedWire) !== null ? ` • ${getWireColorSummaryLabel(selectedWire)}` : ""}
         </p>
       </article>
       {getWireFuseManufacturerReference(selectedWire) !== null ? (

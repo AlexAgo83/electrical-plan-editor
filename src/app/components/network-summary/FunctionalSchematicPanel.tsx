@@ -79,6 +79,14 @@ interface FunctionalLabelCollisionBox {
 
 type WireColorPresentationInput = Parameters<typeof getWireColorCode>[0];
 
+function getFunctionalWireColorTitleLabel(wireColorInput: WireColorPresentationInput | null): string | null {
+  if (wireColorInput === null) {
+    return null;
+  }
+  const label = getWireColorLabel(wireColorInput);
+  return label === "No color" || label === "Free color (unspecified)" ? null : label;
+}
+
 interface FunctionalEdgeRenderModel {
   id: string;
   path: string;
@@ -717,7 +725,7 @@ export function FunctionalSchematicPanel({
       const wireTechnicalId = wire?.technicalId.trim() || edge.wireTechnicalId?.trim() || edge.label;
       const wireColorInput = getFunctionalEdgeWireColorInput(edge, wire);
       const wireColorCode = wireColorInput === null ? "" : getWireColorCode(wireColorInput);
-      const wireColorLabel = wireColorInput === null ? "No color" : getWireColorLabel(wireColorInput);
+      const wireColorLabel = getFunctionalWireColorTitleLabel(wireColorInput);
       return [
         {
           id: edge.id,
@@ -733,7 +741,9 @@ export function FunctionalSchematicPanel({
           labelBoxHeight: FUNCTIONAL_EDGE_LABEL_BOX_HEIGHT,
           wireName,
           wireTechnicalId,
-          title: `${wireName} ${wireTechnicalId}${wireColorCode.length > 0 ? ` ${wireColorCode}` : ""} - ${wireColorLabel}`,
+          title: `${wireName} ${wireTechnicalId}${wireColorCode.length > 0 ? ` ${wireColorCode}` : ""}${
+            wireColorLabel !== null ? ` - ${wireColorLabel}` : ""
+          }`,
           traceColor: edge.harnessColor ?? null,
           wireColorStyle: getFunctionalEdgeColorStyle(wireColorInput)
         }

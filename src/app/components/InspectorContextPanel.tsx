@@ -68,9 +68,12 @@ export function InspectorContextPanel({
     primaryColorId: string | null,
     secondaryColorId: string | null,
     freeColorLabel?: string | null
-  ): ReactElement | string {
+  ): ReactElement | string | null {
     const wireColor = { colorMode, primaryColorId, secondaryColorId, freeColorLabel };
     if (isWireFreeColorMode(wireColor)) {
+      if (freeColorLabel === null || freeColorLabel === undefined) {
+        return null;
+      }
       return (
         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }} title={getWireColorLabel(wireColor)}>
           <span
@@ -94,7 +97,7 @@ export function InspectorContextPanel({
     }
 
     if (primaryColorId === null) {
-      return "No color";
+      return null;
     }
 
     const primary = CABLE_COLOR_BY_ID[primaryColorId];
@@ -187,15 +190,18 @@ export function InspectorContextPanel({
       detailRows.push({ label: "Twist group", value: selectedWire.twistGroupLabel as string });
     }
     detailRows.push({ label: "Section", value: `${selectedWire.sectionMm2} mm²` });
-    detailRows.push({
-      label: "Cable colors",
-      value: renderCableColorSwatches(
-        selectedWire.colorMode,
-        selectedWire.primaryColorId,
-        selectedWire.secondaryColorId,
-        selectedWire.freeColorLabel
-      )
-    });
+    const cableColors = renderCableColorSwatches(
+      selectedWire.colorMode,
+      selectedWire.primaryColorId,
+      selectedWire.secondaryColorId,
+      selectedWire.freeColorLabel
+    );
+    if (cableColors !== null) {
+      detailRows.push({
+        label: "Cable colors",
+        value: cableColors
+      });
+    }
     if ((selectedWire.endpointAConnectionReference?.trim() ?? "").length > 0) {
       detailRows.push({ label: "Endpoint A connection ref", value: selectedWire.endpointAConnectionReference as string });
     }

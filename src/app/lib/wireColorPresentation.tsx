@@ -23,10 +23,10 @@ const neutralBadgeStyle: CSSProperties = {
 
 export function getWireColorCsvValue(wire: Pick<Wire, "primaryColorId" | "secondaryColorId" | "freeColorLabel">): string {
   if (isWireFreeColorMode(wire)) {
-    return getWireColorLabel(wire);
+    return wire.freeColorLabel === null ? "" : getWireColorLabel(wire);
   }
   if (wire.primaryColorId === null) {
-    return "No color";
+    return "";
   }
   return getWireColorCode(wire);
 }
@@ -43,6 +43,9 @@ export function renderWireColorCellValue(
   wire: Pick<Wire, "primaryColorId" | "secondaryColorId" | "freeColorLabel">
 ): ReactElement {
   if (isWireFreeColorMode(wire)) {
+    if (wire.freeColorLabel === null) {
+      return <></>;
+    }
     const colorLabel = getWireColorLabel(wire);
     return (
       <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }} title={colorLabel}>
@@ -53,7 +56,7 @@ export function renderWireColorCellValue(
   }
 
   if (wire.primaryColorId === null) {
-    return <span className="meta-line">No color</span>;
+    return <></>;
   }
 
   const primary = CABLE_COLOR_BY_ID[wire.primaryColorId];
@@ -78,6 +81,9 @@ export function renderWireColorPrefixMarker(
     return null;
   }
   if (isWireFreeColorMode(wire)) {
+    if (wire.freeColorLabel === null) {
+      return null;
+    }
     return (
       <span aria-hidden="true" title={getWireColorLabel(wire)} style={neutralBadgeStyle}>
         Free

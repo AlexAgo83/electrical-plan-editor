@@ -7,6 +7,7 @@ import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { renderWireColorCellValue } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { EntityReferenceButton } from "./EntityReferenceButton";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
@@ -52,6 +53,8 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
     visibleSegments,
     selectedSegmentId,
     selectedSegment,
+    onSelectConnector,
+    onSelectSplice,
     onSelectSegment,
     onGoToSegmentFromAnalysis,
     onOpenSegmentOnboardingHelp,
@@ -207,6 +210,27 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
       field,
       direction: current.field === field && current.direction === "asc" ? "desc" : "asc"
     });
+  const renderWireEndpointReference = (endpoint: Wire["endpointA"]): ReactElement => {
+    const label = describeWireEndpoint(endpoint);
+    if (endpoint.kind === "connectorCavity") {
+      return (
+        <EntityReferenceButton title={`Open connector ${endpoint.connectorId}`} onClick={() => onSelectConnector(endpoint.connectorId)}>
+          {label}
+        </EntityReferenceButton>
+      );
+    }
+
+    return (
+      <EntityReferenceButton title={`Open splice ${endpoint.spliceId}`} onClick={() => onSelectSplice(endpoint.spliceId)}>
+        {label}
+      </EntityReferenceButton>
+    );
+  };
+  const renderSegmentEndpointReference = (nodeId: NetworkNode["id"], endpointLabel: "Node A" | "Node B"): ReactElement => (
+    <EntityReferenceButton className="analysis-segment-endpoint-button" title={`Open ${endpointLabel.toLowerCase()} ${nodeLabelById.get(nodeId) ?? nodeId}`} onClick={() => onSelectNode(nodeId)}>
+      {nodeLabelById.get(nodeId) ?? nodeId}
+    </EntityReferenceButton>
+  );
 
   return (
     <>
@@ -504,16 +528,27 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
         ) : (
           <div className="analysis-wire-route-content">
             <article className="analysis-wire-identity">
-              <span className="analysis-wire-identity-label">Selected segment</span>
-              <p className="analysis-wire-identity-value">
-                <strong>{selectedSegment.id}</strong>{" "}
-                <span className="technical-id">
-                  ({nodeLabelById.get(selectedSegment.nodeA) ?? selectedSegment.nodeA} → {nodeLabelById.get(selectedSegment.nodeB) ?? selectedSegment.nodeB})
+              <div className="analysis-segment-identity-heading">
+                <span className="analysis-wire-identity-label">Selected segment</span>
+                <strong className="analysis-segment-identity-id technical-id">{selectedSegment.id}</strong>
+              </div>
+              <div className="analysis-segment-endpoint-path" aria-label={`Selected segment ${selectedSegment.id} path`}>
+                <span className="analysis-segment-endpoint">
+                  <span className="analysis-segment-endpoint-label">A</span>
+                  {renderSegmentEndpointReference(selectedSegment.nodeA, "Node A")}
                 </span>
-              </p>
-              <p className="meta-line" style={{ margin: 0 }}>
-                {selectedSegment.lengthMm} mm{formatSubNetworkDisplay(selectedSegment.subNetworkTag) ? ` • ${formatSubNetworkDisplay(selectedSegment.subNetworkTag)}` : ""}
-              </p>
+                <span className="analysis-segment-endpoint-arrow" aria-hidden="true">
+                  →
+                </span>
+                <span className="analysis-segment-endpoint">
+                  <span className="analysis-segment-endpoint-label">B</span>
+                  {renderSegmentEndpointReference(selectedSegment.nodeB, "Node B")}
+                </span>
+              </div>
+              <div className="analysis-segment-identity-meta">
+                <span>{selectedSegment.lengthMm} mm</span>
+                {formatSubNetworkDisplay(selectedSegment.subNetworkTag) ? <span>{formatSubNetworkDisplay(selectedSegment.subNetworkTag)}</span> : null}
+              </div>
             </article>
             {sortedSegmentTraversingWires.length === 0 ? (
               <p className="empty-copy">No wire traverses this segment.</p>
@@ -538,8 +573,8 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                       <td>{wire.name}</td>
                       <td className="technical-id">{wire.technicalId}</td>
                       <td>{renderWireColorCell(wire)}</td>
-                      <td>{describeWireEndpoint(wire.endpointA)}</td>
-                      <td>{describeWireEndpoint(wire.endpointB)}</td>
+                      <td>{renderWireEndpointReference(wire.endpointA)}</td>
+                      <td>{renderWireEndpointReference(wire.endpointB)}</td>
                       <td>{wire.sectionMm2}</td>
                       <td>{wire.lengthMm}</td>
                       {!isMobileViewport ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}

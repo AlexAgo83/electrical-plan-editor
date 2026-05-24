@@ -786,6 +786,7 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
     onSelectWire: params.onSelectWire,
     onGoToSegmentFromAnalysis: params.onGoToSegmentFromAnalysis,
     onGoToWireFromAnalysis: params.onGoToWireFromAnalysis,
+    onOpenSegmentFromAnalysisTable: params.onOpenSegmentFromAnalysisTable,
     onOpenWireFromAnalysisTable: params.onOpenWireFromAnalysisTable,
     onOpenConnectorFromAnalysisTable: params.onOpenConnectorFromAnalysisTable,
     onOpenSpliceFromAnalysisTable: params.onOpenSpliceFromAnalysisTable,

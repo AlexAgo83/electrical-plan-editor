@@ -146,6 +146,7 @@ export interface AnalysisWorkspaceContentProps {
   onSelectWire: (wireId: WireId) => void;
   onGoToSegmentFromAnalysis: (segmentId: SegmentId) => void;
   onGoToWireFromAnalysis: (wireId: WireId) => void;
+  onOpenSegmentFromAnalysisTable: (segmentId: SegmentId) => void;
   onOpenWireFromAnalysisTable: (wireId: WireId) => void;
   onOpenConnectorFromAnalysisTable: (connectorId: ConnectorId) => void;
   onOpenSpliceFromAnalysisTable: (spliceId: SpliceId) => void;

@@ -135,14 +135,16 @@ describe("App integration UI - wire free color mode", () => {
     const wireRow = within(wiresPanel).getByText("Free color unspecified wire").closest("tr");
     expect(wireRow).not.toBeNull();
     if (wireRow !== null) {
-      expect(within(wireRow).getByText("Unspecified")).toBeInTheDocument();
+      expect(within(wireRow).queryByText("Unspecified")).not.toBeInTheDocument();
+      expect(within(wireRow).queryByText("Free")).not.toBeInTheDocument();
     }
 
     closeOnboardingIfOpen();
     const inspectorHeading = screen.queryByRole("heading", { name: "Inspector context" });
     if (inspectorHeading !== null) {
       const inspectorPanel = getPanelByHeading("Inspector context");
-      expect(within(inspectorPanel).getByText("Free color (unspecified)")).toBeInTheDocument();
+      expect(within(inspectorPanel).queryByText("Cable colors")).not.toBeInTheDocument();
+      expect(within(inspectorPanel).queryByText("Free color (unspecified)")).not.toBeInTheDocument();
       expect(within(inspectorPanel).queryByText("No color")).not.toBeInTheDocument();
     }
   });

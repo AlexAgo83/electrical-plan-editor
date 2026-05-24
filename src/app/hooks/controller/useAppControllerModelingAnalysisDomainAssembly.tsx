@@ -24,6 +24,7 @@ interface UseAppControllerModelingAnalysisDomainAssemblyParams
     | "onSelectWire"
     | "onGoToSegmentFromAnalysis"
     | "onGoToWireFromAnalysis"
+    | "onOpenSegmentFromAnalysisTable"
     | "onOpenWireFromAnalysisTable"
     | "onOpenConnectorFromAnalysisTable"
     | "onOpenSpliceFromAnalysisTable"
@@ -124,6 +125,16 @@ export function useAppControllerModelingAnalysisDomainAssembly({
           id: wireId
         })
       );
+    },
+    onOpenSegmentFromAnalysisTable: (segmentId) => {
+      const segment = domains.store.getState().segments.byId[segmentId];
+      if (segment === undefined) {
+        return;
+      }
+      markSelectionPanelsFromTable();
+      handleWorkspaceScreenChange("modeling");
+      setActiveSubScreen("segment");
+      domains.modelingHandlers.segment.startSegmentEdit(segment);
     },
     onOpenWireFromAnalysisTable: (wireId) => {
       const wire = domains.store.getState().wires.byId[wireId];
