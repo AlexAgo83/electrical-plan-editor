@@ -145,9 +145,11 @@ Then open `http://127.0.0.1:5284` (unless overridden).
 - `npm run ci:blocking`: run the canonical blocking CI pipeline shared with GitHub Actions
 - `npm run ci:local`: alias of `npm run ci:blocking`
 - `npm run test:e2e`: run Playwright E2E smoke tests
+- `npm run quality:dependency-audit`: run the npm audit allowlist gate
 - `npm run quality:ui-modularization`: enforce UI modularization line-budget gate
 - `npm run quality:ui-timeout-governance`: enforce UI test timeout-override governance (no explicit per-test timeout override unless allowlisted)
 - `npm run quality:store-modularization`: enforce store modularization line-budget gate
+- `npm run quality:exceljs-boundary`: enforce that ExcelJS stays behind the tabular-export boundary
 - `npm run quality:pwa`: validate generated PWA build artifacts (`manifest`, `sw.js`, `workbox-*`)
 
 ## Deployment
@@ -244,10 +246,12 @@ git diff --exit-code -- logics/request
 python3 -m logics_manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability
 npm run lint
 npm run typecheck
+npm run quality:dependency-audit
 npm run test:ci:segmentation:check
 npm run quality:ui-modularization
 npm run quality:ui-timeout-governance
 npm run quality:store-modularization
+npm run quality:exceljs-boundary
 npm run test:ci:fast -- --coverage
 npm run test:ci:ui
 npm run test:e2e
