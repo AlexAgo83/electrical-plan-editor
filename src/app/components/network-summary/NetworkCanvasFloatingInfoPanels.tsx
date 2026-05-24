@@ -99,7 +99,7 @@ export function NetworkCanvasFloatingInfoPanels({
             <span>Reset view</span>
           </button>
           <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
-            <span className="action-button-icon is-zoom" aria-hidden="true" />
+            <span className="action-button-icon is-fit" aria-hidden="true" />
             <span>Fit network</span>
           </button>
         </div>

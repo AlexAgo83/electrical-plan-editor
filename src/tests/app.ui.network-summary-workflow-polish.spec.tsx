@@ -60,7 +60,7 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(resetViewButton).toHaveClass("workspace-tab");
     expect(resetViewButton.querySelector(".action-button-icon.is-undo")).not.toBeNull();
     expect(fitNetworkButton).toHaveClass("workspace-tab");
-    expect(fitNetworkButton.querySelector(".action-button-icon.is-zoom")).not.toBeNull();
+    expect(fitNetworkButton.querySelector(".action-button-icon.is-fit")).not.toBeNull();
   });
 
   it("treats a legacy reset viewport as no prior zoom change", async () => {
