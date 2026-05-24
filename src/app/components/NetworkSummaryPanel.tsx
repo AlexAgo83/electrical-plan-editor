@@ -25,6 +25,7 @@ import { NetworkSummaryExportMenu } from "./network-summary/NetworkSummaryExport
 import { NetworkSummaryQuickEntityNavigation } from "./network-summary/NetworkSummaryQuickEntityNavigation";
 import { NetworkSummaryCanvasPanel } from "./network-summary/NetworkSummaryCanvasPanel";
 import { useActiveSubNetworkTags } from "./network-summary/useActiveSubNetworkTags";
+import { useNetworkSummaryRenderScaleControls } from "./network-summary/useNetworkSummaryRenderScaleControls";
 import { useNetworkSummaryViewportSizeChange } from "./network-summary/useNetworkSummaryViewportSizeChange";
 import {
   buildCableCalloutViewModels,
@@ -106,7 +107,6 @@ export function NetworkSummaryPanel({
   toggleShowNetworkGrid,
   toggleSnapNodesToGrid,
   toggleLockEntityMovement,
-  networkScalePercent,
   routingGraphNodeCount,
   routingGraphSegmentCount,
   totalEdgeEntries,
@@ -168,7 +168,6 @@ export function NetworkSummaryPanel({
   catalogItems,
   showFunctionalSchematic = true
 }: NetworkSummaryPanelProps): ReactElement {
-  void networkScalePercent;
   const [pendingFitSvgPreviewOptions, setPendingFitSvgPreviewOptions] = useState<SvgPreviewOptions | null>(null);
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
   const networkCanvasShellRef = useRef<HTMLDivElement | null>(null);
@@ -215,33 +214,14 @@ export function NetworkSummaryPanel({
   const horizontalGridLineCount = Math.max(0, Math.ceil((gridEndY - gridStartY) / networkGridStep) + 1);
   const gridXPositions = Array.from({ length: verticalGridLineCount }, (_, index) => gridStartX + index * networkGridStep);
   const gridYPositions = Array.from({ length: horizontalGridLineCount }, (_, index) => gridStartY + index * networkGridStep);
-  const handleGlobalRenderScalePercentChange = useCallback(
-    (value: number) => {
-      const nextPercent = clampNumber(Math.round(value), 0, 300);
-      const currentPercent = clampNumber(globalRenderScalePercent, 0, 300);
-      if (nextPercent === currentPercent) {
-        return;
-      }
-
-      const viewCenterX = networkViewWidth / 2;
-      const viewCenterY = networkViewHeight / 2;
-      const currentRenderScale = 1 + currentPercent / 100;
-      const nextRenderScale = 1 + nextPercent / 100;
-      const currentEffectiveRenderScale = effectiveScale * currentRenderScale;
-      const nextEffectiveRenderScale = effectiveScale * nextRenderScale;
-
-      setNetworkOffset((currentOffset) => {
-        const centerModelX = (viewCenterX - currentOffset.x) / currentEffectiveRenderScale;
-        const centerModelY = (viewCenterY - currentOffset.y) / currentEffectiveRenderScale;
-        return {
-          x: viewCenterX - centerModelX * nextEffectiveRenderScale,
-          y: viewCenterY - centerModelY * nextEffectiveRenderScale
-        };
-      });
-      setGlobalRenderScalePercent(nextPercent);
-    },
-    [effectiveScale, globalRenderScalePercent, networkViewHeight, networkViewWidth, setGlobalRenderScalePercent, setNetworkOffset]
-  );
+  const handleGlobalRenderScalePercentChange = useNetworkSummaryRenderScaleControls({
+    effectiveScale,
+    globalRenderScalePercent,
+    networkViewWidth,
+    networkViewHeight,
+    setGlobalRenderScalePercent,
+    setNetworkOffset
+  });
   const allSubNetworkTags = useMemo(
     () => subNetworkSummaries.map((summary) => summary.tag),
     [subNetworkSummaries]

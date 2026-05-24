@@ -1,6 +1,6 @@
 import { useIssueNavigatorModel } from "../useIssueNavigatorModel";
 import { useInspectorPanelVisibility } from "../useInspectorPanelVisibility";
-import { useInspectorContextPanelControllerSlice } from "./useAppControllerScreenContentSlices";
+import { useInspectorContextPanelControllerSlice } from "./useAppControllerInspectorContextPanelSlice";
 import type { NetworkNode, SpliceId } from "../../../core/entities";
 import { SpliceLengthSuggestionPanel } from "../../components/SpliceLengthSuggestionPanel";
 import type { PendingSpliceLengthSuggestion } from "../useSpliceHandlers";

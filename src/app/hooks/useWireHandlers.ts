@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, type FormEvent } from "react";
 import type {
-  CatalogItemId,
   ConnectorId,
   WireMaterial,
   SegmentId,
@@ -19,21 +18,25 @@ import {
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { DEFAULT_WIRE_SECTION_MM2 } from "../../core/wireSection";
-import { buildRoutingGraphIndex } from "../../core/graph";
-import { findShortestRoute } from "../../core/pathfinding";
-import { computeRecommendedWireSectionMm2, normalizeWireCurrentA, resolveWireMaterial } from "../../core/wireSizing";
-import { resolveSplicePortMode } from "../../core/splicePortMode";
+import { normalizeWireCurrentA, resolveWireMaterial } from "../../core/wireSizing";
 import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
 import { suggestNextWireTechnicalId } from "../lib/technical-id-suggestions";
 import type { ChoiceDialogRequest, ConfirmDialogRequest } from "../types/confirm-dialog";
-import {
-  findNextAvailableConnectorWay,
-  findNextAvailableSplicePort,
-  getConnectorWayOccupant,
-  getSplicePortOccupant
-} from "../lib/wire-endpoint-slot-helpers";
-import { findNodeIdForEndpoint } from "../../store/reducer/helpers/wireTransitions";
 import { buildWireEndpointReferenceNameLookup, normalizeWireEndpointReferenceName } from "../../core/wireReferences";
+import {
+  buildWireEndpointDraft,
+  computeWireEndpointSlotHint,
+  findNextAvailableEndpointIndex,
+  type WireEndpointSlotHint
+} from "./wireEndpointFormHelpers";
+import { computeDraftWireSectionRecommendation } from "./wireSizingRecommendation";
+import { buildWireProtectionFromForm } from "./wireProtectionForm";
+import {
+  createWireEndpointReferenceNameSync,
+  normalizeWireEndpointReferenceInput,
+  resolveWireEndpointReferenceName,
+  type WireEndpointReferenceSyncPlan
+} from "./wireEndpointReferenceSync";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -128,21 +131,6 @@ interface UseWireHandlersParams {
   setWireFormError: (value: string | null) => void;
   selectedWire: Wire | null;
   defaultWireSectionMm2: number;
-}
-
-export interface WireEndpointSlotHint {
-  tone: "error" | "help";
-  message: string;
-}
-
-interface WireEndpointReferenceSyncPlan {
-  apply: () => void;
-}
-
-interface MatchingWireEndpointReferenceTarget {
-  wireId: WireId;
-  side: "A" | "B";
-  currentName: string | undefined;
 }
 
 export function useWireHandlers({
@@ -248,317 +236,41 @@ export function useWireHandlers({
     return new Set<string>([`wire:${editingWireId}:A`, `wire:${editingWireId}:B`]);
   };
 
-  const normalizeWireEndpointReferenceInput = (value: string): string | undefined => {
-    const normalized = value.trim();
-    if (normalized.length === 0) {
-      return undefined;
-    }
-
-    return normalized;
-  };
-
-  const resolveWireEndpointReferenceName = (
-    reference: string | undefined,
-    inputName: string,
-    kind: "connection" | "seal",
-    lookup: ReturnType<typeof buildWireEndpointReferenceNameLookup>
-  ): string | undefined => {
-    const normalizedInputName = normalizeWireEndpointReferenceName(inputName);
-    if (normalizedInputName !== undefined) {
-      return normalizedInputName;
-    }
-
-    const normalizedReference = normalizeWireEndpointReferenceInput(reference ?? "");
-    if (normalizedReference === undefined) {
-      return undefined;
-    }
-
-    return kind === "connection" ? lookup.connection.get(normalizedReference) : lookup.seal.get(normalizedReference);
-  };
-
-  const normalizeWireEndpointReferenceNames = (nextName: string | readonly string[] | undefined): string[] => {
-    const values = Array.isArray(nextName) ? nextName : [nextName];
-    const normalizedNames: string[] = [];
-    for (const value of values) {
-      const normalized = normalizeWireEndpointReferenceName(value);
-      if (normalized === undefined || normalizedNames.includes(normalized)) {
-        continue;
-      }
-      normalizedNames.push(normalized);
-    }
-    return normalizedNames;
-  };
-
-  const syncWireEndpointReferenceName = (
-    kind: "connection" | "seal",
-    reference: string | undefined,
-    nextName: string | readonly string[] | undefined,
-    options?: {
-      excludeWireId?: WireId;
-      onResolvedName?: (resolvedName: string | undefined) => void;
-    }
-  ): boolean | WireEndpointReferenceSyncPlan | Promise<WireEndpointReferenceSyncPlan | false> => {
-    const normalizedReference = normalizeWireEndpointReferenceInput(reference ?? "");
-    if (normalizedReference === undefined) {
-      return true;
-    }
-
-    const normalizedNextNames = normalizeWireEndpointReferenceNames(nextName);
-    const wiresSnapshot = store.getState().wires;
-    const matchingTargets = wiresSnapshot.allIds
-      .map((wireId) => wiresSnapshot.byId[wireId])
-      .filter((wire): wire is Wire => wire !== undefined)
-      .filter((wire) => options?.excludeWireId !== wire.id)
-      .flatMap((wire): MatchingWireEndpointReferenceTarget[] => {
-        const endpointATargetReference = normalizeWireEndpointReferenceInput(
-          kind === "connection" ? wire.endpointAConnectionReference ?? "" : wire.endpointASealReference ?? ""
-        );
-        const endpointBTargetReference = normalizeWireEndpointReferenceInput(
-          kind === "connection" ? wire.endpointBConnectionReference ?? "" : wire.endpointBSealReference ?? ""
-        );
-        const targets: MatchingWireEndpointReferenceTarget[] = [];
-
-        if (endpointATargetReference === normalizedReference) {
-          targets.push({
-            wireId: wire.id,
-            side: "A",
-            currentName: normalizeWireEndpointReferenceName(
-              kind === "connection" ? wire.endpointAConnectionName : wire.endpointASealName
-            )
-          });
-        }
-        if (endpointBTargetReference === normalizedReference) {
-          targets.push({
-            wireId: wire.id,
-            side: "B",
-            currentName: normalizeWireEndpointReferenceName(
-              kind === "connection" ? wire.endpointBConnectionName : wire.endpointBSealName
-            )
-          });
-        }
-
-        return targets;
-      });
-
-    const existingNames = new Set<string>();
-    for (const target of matchingTargets) {
-      if (target.currentName !== undefined) {
-        existingNames.add(target.currentName);
-      }
-    }
-
-    const createPlan = (resolvedName: string | undefined): WireEndpointReferenceSyncPlan => ({
-      apply: () => {
-        options?.onResolvedName?.(resolvedName);
-
-        if (matchingTargets.length === 0) {
-          return;
-        }
-
-        const updatesByWireId = new Map<
-          WireId,
-          {
-            endpointA: boolean;
-            endpointB: boolean;
+  const getWireEndpointDraftInput = useCallback(
+    (side: "A" | "B") =>
+      side === "A"
+        ? {
+            kind: wireEndpointAKind,
+            connectorId: wireEndpointAConnectorId,
+            cavityIndex: wireEndpointACavityIndex,
+            spliceId: wireEndpointASpliceId,
+            portIndex: wireEndpointAPortIndex
           }
-        >();
+        : {
+            kind: wireEndpointBKind,
+            connectorId: wireEndpointBConnectorId,
+            cavityIndex: wireEndpointBCavityIndex,
+            spliceId: wireEndpointBSpliceId,
+            portIndex: wireEndpointBPortIndex
+          },
+    [
+      wireEndpointAKind,
+      wireEndpointAConnectorId,
+      wireEndpointACavityIndex,
+      wireEndpointASpliceId,
+      wireEndpointAPortIndex,
+      wireEndpointBKind,
+      wireEndpointBConnectorId,
+      wireEndpointBCavityIndex,
+      wireEndpointBSpliceId,
+      wireEndpointBPortIndex
+    ]
+  );
 
-        for (const target of matchingTargets) {
-          const existingUpdate = updatesByWireId.get(target.wireId);
-          if (existingUpdate !== undefined) {
-            if (target.side === "A") {
-              existingUpdate.endpointA = true;
-            } else {
-              existingUpdate.endpointB = true;
-            }
-            continue;
-          }
-
-          updatesByWireId.set(target.wireId, {
-            endpointA: target.side === "A",
-            endpointB: target.side === "B"
-          });
-        }
-
-        const latestWiresSnapshot = store.getState().wires;
-        for (const [wireId, { endpointA, endpointB }] of updatesByWireId.entries()) {
-          const wire = latestWiresSnapshot.byId[wireId];
-          if (wire === undefined) {
-            continue;
-          }
-          const nextWire =
-            kind === "connection"
-              ? {
-                  ...wire,
-                  ...(endpointA ? { endpointAConnectionName: resolvedName } : {}),
-                  ...(endpointB ? { endpointBConnectionName: resolvedName } : {})
-                }
-              : {
-                  ...wire,
-                  ...(endpointA ? { endpointASealName: resolvedName } : {}),
-                  ...(endpointB ? { endpointBSealName: resolvedName } : {})
-                };
-          dispatchAction(appActions.saveWire(nextWire), { trackHistory: false });
-        }
-      }
-    });
-
-    if (normalizedNextNames.length === 0) {
-      return createPlan(undefined);
-    }
-
-    const candidateNames = [...normalizedNextNames];
-    for (const wireName of existingNames) {
-      if (!candidateNames.includes(wireName)) {
-        candidateNames.push(wireName);
-      }
-    }
-
-    if (candidateNames.length === 1) {
-      return createPlan(candidateNames[0]);
-    }
-
-    const visibleChoiceNames = candidateNames.slice(0, 3);
-    const details =
-      candidateNames.length > visibleChoiceNames.length
-        ? `Showing ${visibleChoiceNames.length} overwrite proposals out of ${candidateNames.length} detected names.`
-        : `Detected names: ${candidateNames.join(", ")}.`;
-
-    return choiceAction({
-      title: `Choose ${kind} name`,
-      message: `Reference '${normalizedReference}' has ${candidateNames.length} conflicting name${candidateNames.length > 1 ? "s" : ""}. Choose the one to keep.`,
-      details,
-      discardLabel: "Discard",
-      options: visibleChoiceNames.map((name) => ({
-        id: name,
-        label: name
-      })),
-      closeOnBackdrop: true
-    }).then((choiceId) => {
-      if (choiceId === null) {
-        return false;
-      }
-
-      const selectedName = visibleChoiceNames.find((name) => name === choiceId);
-      if (selectedName === undefined) {
-        return false;
-      }
-
-      return createPlan(selectedName);
-    });
-  };
+  const syncWireEndpointReferenceName = createWireEndpointReferenceNameSync({ store, dispatchAction, choiceAction });
 
   const computeEndpointSlotHint = (side: "A" | "B"): WireEndpointSlotHint | null => {
-    const snapshot = store.getState();
-    const excluded = buildExcludedOccupantRefs();
-
-    if (side === "A") {
-      if (wireEndpointAKind === "connectorCavity") {
-        if (wireEndpointAConnectorId.length === 0) {
-          return null;
-        }
-        const connector = snapshot.connectors.byId[wireEndpointAConnectorId as ConnectorId];
-        if (connector === undefined) {
-          return null;
-        }
-        const cavityIndex = toPositiveInteger(wireEndpointACavityIndex);
-        if (cavityIndex <= 0) {
-          return null;
-        }
-        const occupant = getConnectorWayOccupant(snapshot, connector.id, cavityIndex);
-        if (occupant === undefined || excluded.has(occupant)) {
-          return null;
-        }
-        const nextFree = findNextAvailableConnectorWay(snapshot, connector.id, connector.cavityCount, excluded);
-        if (nextFree === null) {
-          return { tone: "error", message: "Way is already occupied. No available ways on selected connector." };
-        }
-        if (nextFree === cavityIndex) {
-          return null;
-        }
-        return { tone: "error", message: `Way ${cavityIndex} is already occupied. Suggested: way ${nextFree}.` };
-      }
-
-      if (wireEndpointASpliceId.length === 0) {
-        return null;
-      }
-      const splice = snapshot.splices.byId[wireEndpointASpliceId as SpliceId];
-      if (splice === undefined) {
-        return null;
-      }
-      if (resolveSplicePortMode(splice) === "directional") {
-        return null;
-      }
-      const portIndex = toPositiveInteger(wireEndpointAPortIndex);
-      if (portIndex <= 0) {
-        return null;
-      }
-      const occupant = getSplicePortOccupant(snapshot, splice.id, portIndex);
-      if (occupant === undefined || excluded.has(occupant)) {
-        return null;
-      }
-      const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice, excluded);
-      if (nextFree === null) {
-        return { tone: "error", message: "Port is already occupied. No available ports on selected splice." };
-      }
-      if (nextFree === portIndex) {
-        return null;
-      }
-      return { tone: "error", message: `Port ${portIndex} is already occupied. Suggested: port ${nextFree}.` };
-    }
-
-    if (wireEndpointBKind === "connectorCavity") {
-      if (wireEndpointBConnectorId.length === 0) {
-        return null;
-      }
-      const connector = snapshot.connectors.byId[wireEndpointBConnectorId as ConnectorId];
-      if (connector === undefined) {
-        return null;
-      }
-      const cavityIndex = toPositiveInteger(wireEndpointBCavityIndex);
-      if (cavityIndex <= 0) {
-        return null;
-      }
-      const occupant = getConnectorWayOccupant(snapshot, connector.id, cavityIndex);
-      if (occupant === undefined || excluded.has(occupant)) {
-        return null;
-      }
-      const nextFree = findNextAvailableConnectorWay(snapshot, connector.id, connector.cavityCount, excluded);
-      if (nextFree === null) {
-        return { tone: "error", message: "Way is already occupied. No available ways on selected connector." };
-      }
-      if (nextFree === cavityIndex) {
-        return null;
-      }
-      return { tone: "error", message: `Way ${cavityIndex} is already occupied. Suggested: way ${nextFree}.` };
-    }
-
-    if (wireEndpointBSpliceId.length === 0) {
-      return null;
-    }
-    const splice = snapshot.splices.byId[wireEndpointBSpliceId as SpliceId];
-    if (splice === undefined) {
-      return null;
-    }
-    if (resolveSplicePortMode(splice) === "directional") {
-      return null;
-    }
-    const portIndex = toPositiveInteger(wireEndpointBPortIndex);
-    if (portIndex <= 0) {
-      return null;
-    }
-    const occupant = getSplicePortOccupant(snapshot, splice.id, portIndex);
-    if (occupant === undefined || excluded.has(occupant)) {
-      return null;
-    }
-    const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice, excluded);
-    if (nextFree === null) {
-      return { tone: "error", message: "Port is already occupied. No available ports on selected splice." };
-    }
-    if (nextFree === portIndex) {
-      return null;
-    }
-    return { tone: "error", message: `Port ${portIndex} is already occupied. Suggested: port ${nextFree}.` };
+    return computeWireEndpointSlotHint(store.getState(), buildExcludedOccupantRefs(), getWireEndpointDraftInput(side));
   };
 
   const prefillNextAvailableEndpointIndex = useCallback(
@@ -571,77 +283,48 @@ export function useWireHandlers({
       const excluded = new Set<string>();
 
       if (side === "A") {
-        if (wireEndpointAKind === "connectorCavity") {
-          if (wireEndpointAConnectorId.length === 0 || endpointAIndexTouchedByUserRef.current) {
-            return;
-          }
-          const connector = snapshot.connectors.byId[wireEndpointAConnectorId as ConnectorId];
-          if (connector === undefined) {
-            return;
-          }
-          const nextFree = findNextAvailableConnectorWay(snapshot, connector.id, connector.cavityCount, excluded);
-          if (nextFree !== null && String(nextFree) !== wireEndpointACavityIndex) {
+        if (endpointAIndexTouchedByUserRef.current) {
+          return;
+        }
+        const nextFree = findNextAvailableEndpointIndex(snapshot, excluded, getWireEndpointDraftInput("A"));
+        const currentIndex = wireEndpointAKind === "connectorCavity" ? wireEndpointACavityIndex : wireEndpointAPortIndex;
+        if (nextFree !== null && String(nextFree) !== currentIndex) {
+          if (wireEndpointAKind === "connectorCavity") {
             setWireEndpointACavityIndex(String(nextFree));
+          } else {
+            setWireEndpointAPortIndex(String(nextFree));
           }
-          return;
-        }
-        if (wireEndpointASpliceId.length === 0 || endpointAIndexTouchedByUserRef.current) {
-          return;
-        }
-        const splice = snapshot.splices.byId[wireEndpointASpliceId as SpliceId];
-        if (splice === undefined) {
-          return;
-        }
-        const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice, excluded);
-        if (nextFree !== null && String(nextFree) !== wireEndpointAPortIndex) {
-          setWireEndpointAPortIndex(String(nextFree));
         }
         return;
       }
 
-      if (wireEndpointBKind === "connectorCavity") {
-        if (wireEndpointBConnectorId.length === 0 || endpointBIndexTouchedByUserRef.current) {
-          return;
-        }
-        const connector = snapshot.connectors.byId[wireEndpointBConnectorId as ConnectorId];
-        if (connector === undefined) {
-          return;
-        }
-        const nextFree = findNextAvailableConnectorWay(snapshot, connector.id, connector.cavityCount, excluded);
-        if (nextFree !== null && String(nextFree) !== wireEndpointBCavityIndex) {
+      if (endpointBIndexTouchedByUserRef.current) {
+        return;
+      }
+      const nextFree = findNextAvailableEndpointIndex(snapshot, excluded, getWireEndpointDraftInput("B"));
+      const currentIndex = wireEndpointBKind === "connectorCavity" ? wireEndpointBCavityIndex : wireEndpointBPortIndex;
+      if (nextFree !== null && String(nextFree) !== currentIndex) {
+        if (wireEndpointBKind === "connectorCavity") {
           setWireEndpointBCavityIndex(String(nextFree));
+        } else {
+          setWireEndpointBPortIndex(String(nextFree));
         }
-        return;
-      }
-      if (wireEndpointBSpliceId.length === 0 || endpointBIndexTouchedByUserRef.current) {
-        return;
-      }
-      const splice = snapshot.splices.byId[wireEndpointBSpliceId as SpliceId];
-      if (splice === undefined) {
-        return;
-      }
-      const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice, excluded);
-      if (nextFree !== null && String(nextFree) !== wireEndpointBPortIndex) {
-        setWireEndpointBPortIndex(String(nextFree));
       }
     },
     [
       store,
       wireFormMode,
       wireEndpointAKind,
-      wireEndpointAConnectorId,
       wireEndpointACavityIndex,
-      wireEndpointASpliceId,
       wireEndpointAPortIndex,
       wireEndpointBKind,
-      wireEndpointBConnectorId,
       wireEndpointBCavityIndex,
-      wireEndpointBSpliceId,
       wireEndpointBPortIndex,
       setWireEndpointACavityIndex,
       setWireEndpointAPortIndex,
       setWireEndpointBCavityIndex,
-      setWireEndpointBPortIndex
+      setWireEndpointBPortIndex,
+      getWireEndpointDraftInput
     ]
   );
 
@@ -672,129 +355,20 @@ export function useWireHandlers({
 
   const buildWireEndpointPreview = useCallback(
     (side: "A" | "B"): WireEndpoint | null => {
-      if (side === "A") {
-        if (wireEndpointAKind === "connectorCavity") {
-          if (wireEndpointAConnectorId.length === 0) {
-            return null;
-          }
-
-          const cavityIndex = toPositiveInteger(wireEndpointACavityIndex);
-          if (cavityIndex <= 0) {
-            return null;
-          }
-
-          return {
-            kind: "connectorCavity",
-            connectorId: wireEndpointAConnectorId as ConnectorId,
-            cavityIndex
-          };
-        }
-
-        if (wireEndpointASpliceId.length === 0) {
-          return null;
-        }
-
-        const portIndex = toPositiveInteger(wireEndpointAPortIndex);
-        if (portIndex <= 0) {
-          return null;
-        }
-
-        return {
-          kind: "splicePort",
-          spliceId: wireEndpointASpliceId as SpliceId,
-          portIndex
-        };
-      }
-
-      if (wireEndpointBKind === "connectorCavity") {
-        if (wireEndpointBConnectorId.length === 0) {
-          return null;
-        }
-
-        const cavityIndex = toPositiveInteger(wireEndpointBCavityIndex);
-        if (cavityIndex <= 0) {
-          return null;
-        }
-
-        return {
-          kind: "connectorCavity",
-          connectorId: wireEndpointBConnectorId as ConnectorId,
-          cavityIndex
-        };
-      }
-
-      if (wireEndpointBSpliceId.length === 0) {
-        return null;
-      }
-
-      const portIndex = toPositiveInteger(wireEndpointBPortIndex);
-      if (portIndex <= 0) {
-        return null;
-      }
-
-      return {
-        kind: "splicePort",
-        spliceId: wireEndpointBSpliceId as SpliceId,
-        portIndex
-      };
+      return buildWireEndpointDraft(getWireEndpointDraftInput(side));
     },
-    [
-      wireEndpointAKind,
-      wireEndpointAConnectorId,
-      wireEndpointACavityIndex,
-      wireEndpointASpliceId,
-      wireEndpointAPortIndex,
-      wireEndpointBKind,
-      wireEndpointBConnectorId,
-      wireEndpointBCavityIndex,
-      wireEndpointBSpliceId,
-      wireEndpointBPortIndex
-    ]
+    [getWireEndpointDraftInput]
   );
 
   const draftEndpointA = buildWireEndpointPreview("A");
   const draftEndpointB = buildWireEndpointPreview("B");
-  const recommendedWireSectionMm2 = (() => {
-    const normalizedCurrentA = normalizeWireCurrentA(Number(wireCurrentA.replace(",", ".").trim()));
-    if (normalizedCurrentA === undefined || draftEndpointA === null || draftEndpointB === null) {
-      return null;
-    }
-
-    const snapshot = store.getState();
-    if (snapshot.activeNetworkId === null) {
-      return null;
-    }
-    const voltageV = snapshot.networks.byId[snapshot.activeNetworkId]?.voltageV;
-    if (voltageV === undefined) {
-      return null;
-    }
-
-    const startNodeId = findNodeIdForEndpoint(snapshot, draftEndpointA);
-    const endNodeId = findNodeIdForEndpoint(snapshot, draftEndpointB);
-    if (startNodeId === undefined || endNodeId === undefined) {
-      return null;
-    }
-
-    const graph = buildRoutingGraphIndex(
-      snapshot.nodes.allIds
-        .map((nodeId) => snapshot.nodes.byId[nodeId])
-        .filter((node): node is NonNullable<typeof node> => node !== undefined),
-      snapshot.segments.allIds
-        .map((segmentId) => snapshot.segments.byId[segmentId])
-        .filter((segment): segment is NonNullable<typeof segment> => segment !== undefined)
-    );
-    const route = findShortestRoute(graph, startNodeId, endNodeId);
-    if (route === null) {
-      return null;
-    }
-
-    return computeRecommendedWireSectionMm2({
-      currentA: normalizedCurrentA,
-      material: wireMaterial,
-      voltageV,
-      lengthMm: route.totalLengthMm
-    });
-  })();
+  const recommendedWireSectionMm2 = computeDraftWireSectionRecommendation({
+    snapshot: store.getState(),
+    currentInput: wireCurrentA,
+    material: wireMaterial,
+    endpointA: draftEndpointA,
+    endpointB: draftEndpointB
+  });
 
   function resetWireForm(): void {
     const state = store.getState();
@@ -1018,94 +592,35 @@ export function useWireHandlers({
   }
 
   function buildWireEndpoint(side: "A" | "B"): WireEndpoint | null {
-    if (side === "A") {
-      if (wireEndpointAKind === "connectorCavity") {
-        if (wireEndpointAConnectorId.length === 0) {
-          setWireFormError("Endpoint A connector is required.");
-          return null;
-        }
-
-        return {
-          kind: "connectorCavity",
-          connectorId: wireEndpointAConnectorId as ConnectorId,
-          cavityIndex: toPositiveInteger(wireEndpointACavityIndex)
-        };
-      }
-
-      if (wireEndpointASpliceId.length === 0) {
-        setWireFormError("Endpoint A splice is required.");
-        return null;
-      }
-
-      return {
-        kind: "splicePort",
-        spliceId: wireEndpointASpliceId as SpliceId,
-        portIndex: toPositiveInteger(wireEndpointAPortIndex),
-        spliceSideOverride:
-          wireEndpointASpliceSideOverride === "auto" ? undefined : wireEndpointASpliceSideOverride,
-        spliceSideLocked: wireEndpointASpliceSideLocked
-      };
-    }
-
-    if (wireEndpointBKind === "connectorCavity") {
-      if (wireEndpointBConnectorId.length === 0) {
-        setWireFormError("Endpoint B connector is required.");
-        return null;
-      }
-
-      return {
-        kind: "connectorCavity",
-        connectorId: wireEndpointBConnectorId as ConnectorId,
-        cavityIndex: toPositiveInteger(wireEndpointBCavityIndex)
-      };
-    }
-
-    if (wireEndpointBSpliceId.length === 0) {
-      setWireFormError("Endpoint B splice is required.");
+    const input = getWireEndpointDraftInput(side);
+    const endpoint =
+      buildWireEndpointDraft(input) ??
+      (input.kind === "connectorCavity" && input.connectorId.length > 0
+        ? {
+            kind: "connectorCavity" as const,
+            connectorId: input.connectorId as ConnectorId,
+            cavityIndex: toPositiveInteger(input.cavityIndex)
+          }
+        : input.kind === "splicePort" && input.spliceId.length > 0
+          ? {
+              kind: "splicePort" as const,
+              spliceId: input.spliceId as SpliceId,
+              portIndex: toPositiveInteger(input.portIndex)
+            }
+          : null);
+    if (endpoint === null) {
+      setWireFormError(`Endpoint ${side} ${input.kind === "connectorCavity" ? "connector" : "splice"} is required.`);
       return null;
     }
-
+    if (endpoint.kind === "connectorCavity") {
+      return endpoint;
+    }
+    const spliceSideOverride = side === "A" ? wireEndpointASpliceSideOverride : wireEndpointBSpliceSideOverride;
+    const spliceSideLocked = side === "A" ? wireEndpointASpliceSideLocked : wireEndpointBSpliceSideLocked;
     return {
-      kind: "splicePort",
-      spliceId: wireEndpointBSpliceId as SpliceId,
-      portIndex: toPositiveInteger(wireEndpointBPortIndex),
-      spliceSideOverride:
-        wireEndpointBSpliceSideOverride === "auto" ? undefined : wireEndpointBSpliceSideOverride,
-      spliceSideLocked: wireEndpointBSpliceSideLocked
-    };
-  }
-
-  function buildWireProtection():
-    | {
-        kind: "fuse";
-        catalogItemId: CatalogItemId;
-      }
-    | undefined
-    | null {
-    if (!wireFuseEnabled) {
-      return undefined;
-    }
-
-    const normalizedCatalogItemId = wireFuseCatalogItemId.trim();
-    if (normalizedCatalogItemId.length === 0) {
-      setWireFormError("Fuse catalog item is required.");
-      return null;
-    }
-
-    const catalogItem = store.getState().catalogItems.byId[normalizedCatalogItemId as CatalogItemId];
-    if (catalogItem === undefined) {
-      setWireFormError("Selected fuse catalog item no longer exists.");
-      return null;
-    }
-
-    if (catalogItem.manufacturerReference.trim().length === 0) {
-      setWireFormError("Selected fuse catalog item is missing a manufacturer reference.");
-      return null;
-    }
-
-    return {
-      kind: "fuse",
-      catalogItemId: normalizedCatalogItemId as CatalogItemId
+      ...endpoint,
+      spliceSideOverride: spliceSideOverride === "auto" ? undefined : spliceSideOverride,
+      spliceSideLocked
     };
   }
 
@@ -1188,7 +703,7 @@ export function useWireHandlers({
       return;
     }
 
-    const protection = buildWireProtection();
+    const protection = buildWireProtectionFromForm(store, wireFuseEnabled, wireFuseCatalogItemId, setWireFormError);
     if (protection === null) {
       return;
     }

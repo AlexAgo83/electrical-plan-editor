@@ -4,7 +4,7 @@ import type { DirectionalSpliceSide } from "../../../core/directionalSplice";
 import type { DeleteDependencySummaryCategory } from "../../../store/deleteImpact";
 import type { SplicePortMode } from "../../../core/splicePortMode";
 import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
-import type { WireEndpointSlotHint } from "../../hooks/useWireHandlers";
+import type { WireEndpointSlotHint } from "../../hooks/wireEndpointFormHelpers";
 
 export interface ModelingFormsColumnProps {
   catalogItems: CatalogItem[];

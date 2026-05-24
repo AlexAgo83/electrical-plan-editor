@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { DEFAULT_WIRE_SECTION_MM2, normalizeWireSectionMm2 } from "../../core/wireSection";
 import type { ThemeMode } from "../../store";
 import { normalizeAppLocale } from "../lib/i18n";
+import { readUiPreferences, writeUiPreferences } from "./uiPreferencesStorage";
+import type { UiPreferencesPayload } from "./uiPreferencesStorage";
 import type {
   AppLocale,
   CanvasCalloutTextSize,
@@ -17,9 +19,6 @@ import type {
   WorkspaceCurrencyCode,
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
-
-const UI_PREFERENCES_SCHEMA_VERSION = 12;
-const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 function normalizeThemeMode(value: unknown): ThemeMode {
   switch (value) {
@@ -104,261 +103,8 @@ interface SortState {
   direction: SortDirection;
 }
 
-interface UiPreferencesPayload {
-  schemaVersion: number;
-  locale: AppLocale;
-  themeMode: ThemeMode;
-  tableDensity: TableDensity;
-  tableFontSize: TableFontSizePreference;
-  workspaceCurrencyCode: WorkspaceCurrencyCode;
-  workspaceTaxEnabled: boolean;
-  workspaceTaxRatePercent: number;
-  tabularExportFormat: TabularExportFormat;
-  bomExportCompactColumns: boolean;
-  bomTraceabilityLabelsHidden: boolean;
-  defaultWireSectionMm2: number;
-  defaultAutoCreateLinkedNodes: boolean;
-  spliceSectionImbalanceRatioPercent: number;
-  defaultSortField: SortField;
-  defaultSortDirection: SortDirection;
-  defaultIdSortDirection: SortDirection;
-  canvasDefaultShowGrid: boolean;
-  canvasDefaultSnapToGrid: boolean;
-  canvasDefaultLockEntityMovement: boolean;
-  canvasDefaultShowInfoPanels: boolean;
-  canvasDefaultShowSegmentNames: boolean;
-  canvasDefaultShowSegmentLengths: boolean;
-  canvasDefaultShowCableCallouts: boolean;
-  canvasDefaultCalloutContentMode?: NetworkCalloutContentMode;
-  canvasDefaultShowSelectedCalloutOnly: boolean;
-  canvasDefaultLabelStrokeMode: CanvasLabelStrokeMode;
-  canvasDefaultLabelSizeMode: CanvasLabelSizeMode;
-  canvasDefaultCalloutTextSize: CanvasCalloutTextSize;
-  canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
-  canvasDefaultAutoSegmentLabelRotation: boolean;
-  canvasShowCalloutWireNames: boolean;
-  canvasConnectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
-  canvasCalloutConnectorDrawingScalePercent: number;
-  canvasGlobalRenderScalePercent: number;
-  canvasZoomInvariantNodeShapes: boolean;
-  canvasNodeShapeSizePercent: number;
-  canvasExportFormat: CanvasExportFormat;
-  canvasPngExportIncludeBackground: boolean;
-  canvasExportIncludeFrame: boolean;
-  canvasExportIncludeCartouche: boolean;
-  canvasResizeBehaviorMode: CanvasResizeBehaviorMode;
-  canvasResetZoomPercentInput: string;
-  showShortcutHints: boolean;
-  keyboardShortcutsEnabled: boolean;
-  restoreViewportOnUndo: boolean;
-  showFloatingInspectorPanel: boolean;
-  showRoutePreviewPanel: boolean;
-  workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
-  workspaceWideScreen: boolean;
-}
-
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function migrateUiPreferencesFromV1(candidate: Record<string, unknown>): Record<string, unknown> {
-  return {
-    ...candidate,
-    // v2 aligns the fallback with current product defaults when this key is missing.
-    canvasDefaultShowSegmentNames:
-      typeof candidate.canvasDefaultShowSegmentNames === "boolean" ? candidate.canvasDefaultShowSegmentNames : false,
-    schemaVersion: 2
-  };
-}
-
-function migrateUiPreferencesFromV2(candidate: Record<string, unknown>): Record<string, unknown> {
-  return {
-    ...candidate,
-    tabularExportFormat: typeof candidate.tabularExportFormat === "string" ? candidate.tabularExportFormat : "csv",
-    schemaVersion: 3
-  };
-}
-
-function migrateUiPreferencesFromV3(candidate: Record<string, unknown>): Record<string, unknown> {
-  return {
-    ...candidate,
-    tabularExportFormat: typeof candidate.tabularExportFormat === "string" ? candidate.tabularExportFormat : "csv",
-    schemaVersion: 4
-  };
-}
-
-function migrateUiPreferencesFromV4(candidate: Record<string, unknown>): Record<string, unknown> {
-  return {
-    ...candidate,
-    bomExportCompactColumns: typeof candidate.bomExportCompactColumns === "boolean" ? candidate.bomExportCompactColumns : false,
-    schemaVersion: 5
-  };
-}
-
-function migrateUiPreferencesFromV5(candidate: Record<string, unknown>): Record<string, unknown> {
-  return {
-    ...candidate,
-    spliceSectionImbalanceRatioPercent:
-      typeof candidate.spliceSectionImbalanceRatioPercent === "number"
-        ? candidate.spliceSectionImbalanceRatioPercent
-        : 300,
-    schemaVersion: 6
-  };
-}
-
-function migrateUiPreferencesFromV6(candidate: Record<string, unknown>): Record<string, unknown> {
-  return {
-    ...candidate,
-    bomTraceabilityLabelsHidden:
-      typeof candidate.bomTraceabilityLabelsHidden === "boolean" ? candidate.bomTraceabilityLabelsHidden : false,
-    schemaVersion: 7
-  };
-}
-
-function migrateUiPreferencesFromV7(candidate: Record<string, unknown>): Record<string, unknown> {
-  return {
-    ...candidate,
-    showRoutePreviewPanel: typeof candidate.showRoutePreviewPanel === "boolean" ? candidate.showRoutePreviewPanel : false,
-    schemaVersion: 8
-  };
-}
-
-function migrateUiPreferencesFromV8(candidate: Record<string, unknown>): Record<string, unknown> {
-  return {
-    ...candidate,
-    canvasCalloutConnectorDrawingScalePercent:
-      typeof candidate.canvasCalloutConnectorDrawingScalePercent === "number"
-        ? candidate.canvasCalloutConnectorDrawingScalePercent
-        : 150,
-    schemaVersion: 9
-  };
-}
-
-function migrateUiPreferencesFromV9(candidate: Record<string, unknown>): Record<string, unknown> {
-  const legacyMode = candidate.canvasDefaultCalloutContentMode;
-  return {
-    ...candidate,
-    canvasConnectorDrawingDisplayMode:
-      legacyMode === "connectorDrawing" || legacyMode === "both" ? "nodes" : "disabled",
-    schemaVersion: 10
-  };
-}
-
-function migrateUiPreferencesFromV10(candidate: Record<string, unknown>): Record<string, unknown> {
-  return {
-    ...candidate,
-    canvasGlobalRenderScalePercent:
-      typeof candidate.canvasGlobalRenderScalePercent === "number" ? candidate.canvasGlobalRenderScalePercent : 0,
-    schemaVersion: 11
-  };
-}
-
-function migrateUiPreferencesFromV11(candidate: Record<string, unknown>): Record<string, unknown> {
-  return {
-    ...candidate,
-    canvasResetZoomPercentInput:
-      candidate.canvasResetZoomPercentInput === "60" || typeof candidate.canvasResetZoomPercentInput !== "string"
-        ? "100"
-        : candidate.canvasResetZoomPercentInput,
-    schemaVersion: 12
-  };
-}
-
-function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
-  if (!isRecord(parsed)) {
-    return null;
-  }
-
-  const rawSchemaVersion = parsed.schemaVersion;
-  let version =
-    typeof rawSchemaVersion === "number" && Number.isInteger(rawSchemaVersion) && rawSchemaVersion >= 1
-      ? rawSchemaVersion
-      : 1;
-
-  if (version > UI_PREFERENCES_SCHEMA_VERSION) {
-    return null;
-  }
-
-  let migrated: Record<string, unknown> = { ...parsed };
-  while (version < UI_PREFERENCES_SCHEMA_VERSION) {
-    if (version === 1) {
-      migrated = migrateUiPreferencesFromV1(migrated);
-      version = 2;
-      continue;
-    }
-    if (version === 2) {
-      migrated = migrateUiPreferencesFromV2(migrated);
-      version = 3;
-      continue;
-    }
-    if (version === 3) {
-      migrated = migrateUiPreferencesFromV3(migrated);
-      version = 4;
-      continue;
-    }
-    if (version === 4) {
-      migrated = migrateUiPreferencesFromV4(migrated);
-      version = 5;
-      continue;
-    }
-    if (version === 5) {
-      migrated = migrateUiPreferencesFromV5(migrated);
-      version = 6;
-      continue;
-    }
-    if (version === 6) {
-      migrated = migrateUiPreferencesFromV6(migrated);
-      version = 7;
-      continue;
-    }
-    if (version === 7) {
-      migrated = migrateUiPreferencesFromV7(migrated);
-      version = 8;
-      continue;
-    }
-    if (version === 8) {
-      migrated = migrateUiPreferencesFromV8(migrated);
-      version = 9;
-      continue;
-    }
-    if (version === 9) {
-      migrated = migrateUiPreferencesFromV9(migrated);
-      version = 10;
-      continue;
-    }
-    if (version === 10) {
-      migrated = migrateUiPreferencesFromV10(migrated);
-      version = 11;
-      continue;
-    }
-    if (version === 11) {
-      migrated = migrateUiPreferencesFromV11(migrated);
-      version = 12;
-      continue;
-    }
-    return null;
-  }
-
-  migrated.schemaVersion = UI_PREFERENCES_SCHEMA_VERSION;
-  return migrated as Partial<UiPreferencesPayload>;
-}
-
-function readUiPreferences(): Partial<UiPreferencesPayload> | null {
-  try {
-    const raw = localStorage.getItem(UI_PREFERENCES_STORAGE_KEY);
-    if (raw === null) {
-      return null;
-    }
-
-    const parsed: unknown = JSON.parse(raw);
-    return migrateUiPreferencesPayload(parsed);
-  } catch {
-    return null;
-  }
 }
 
 interface UseUiPreferencesOptions {
@@ -966,8 +712,7 @@ export function useUiPreferences({
       return;
     }
 
-    const payload: UiPreferencesPayload = {
-      schemaVersion: UI_PREFERENCES_SCHEMA_VERSION,
+    const payload: Omit<UiPreferencesPayload, "schemaVersion"> = {
       locale,
       themeMode,
       tableDensity,
@@ -1019,11 +764,7 @@ export function useUiPreferences({
       workspaceWideScreen
     };
 
-    try {
-      localStorage.setItem(UI_PREFERENCES_STORAGE_KEY, JSON.stringify(payload));
-    } catch {
-      // Ignore storage write failures to preserve runtime behavior.
-    }
+    writeUiPreferences(payload);
   }, [
     canvasDefaultShowGrid,
     canvasDefaultSnapToGrid,
