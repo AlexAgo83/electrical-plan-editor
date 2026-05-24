@@ -49,6 +49,20 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(rendered.store.getState().networkStates[activeNetworkId]?.networkSummaryViewState).toBeUndefined();
   });
 
+  it("shows icons on the reset and fit canvas controls", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const panel = getPanelByHeading("Network summary");
+    const resetViewButton = within(panel).getByRole("button", { name: "Reset view" });
+    const fitNetworkButton = within(panel).getByRole("button", { name: "Fit network" });
+
+    expect(resetViewButton).toHaveClass("workspace-tab");
+    expect(resetViewButton.querySelector(".action-button-icon.is-undo")).not.toBeNull();
+    expect(fitNetworkButton).toHaveClass("workspace-tab");
+    expect(fitNetworkButton.querySelector(".action-button-icon.is-zoom")).not.toBeNull();
+  });
+
   it("treats a legacy reset viewport as no prior zoom change", async () => {
     const base = createUiIntegrationState();
     const activeNetworkId = base.activeNetworkId;

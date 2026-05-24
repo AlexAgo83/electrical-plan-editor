@@ -311,14 +311,15 @@
 }
 
 .network-canvas-toolbar .workspace-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
   padding: 0.22rem 0.55rem;
   font-size: 0.76rem;
 }
 
 .network-canvas-toolbar .network-canvas-zoom-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   gap: 0.24rem;
   min-width: 2.35rem;
 }
