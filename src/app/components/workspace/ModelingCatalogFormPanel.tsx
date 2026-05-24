@@ -23,6 +23,8 @@ interface ModelingCatalogFormPanelProps {
   setCatalogUnitPriceExclTax: (value: string) => void;
   catalogUrl: string;
   setCatalogUrl: (value: string) => void;
+  catalogShowConnectorMaterialDefaults: boolean;
+  setCatalogShowConnectorMaterialDefaults: (value: boolean) => void;
   catalogAllSameTerminals: boolean;
   setCatalogAllSameTerminals: (value: boolean) => void;
   catalogDefaultTerminalReference: string;
@@ -60,6 +62,8 @@ export function ModelingCatalogFormPanel({
   setCatalogUnitPriceExclTax,
   catalogUrl,
   setCatalogUrl,
+  catalogShowConnectorMaterialDefaults,
+  setCatalogShowConnectorMaterialDefaults,
   catalogAllSameTerminals,
   setCatalogAllSameTerminals,
   catalogDefaultTerminalReference,
@@ -186,6 +190,28 @@ export function ModelingCatalogFormPanel({
         <label className="settings-checkbox">
           <input
             type="checkbox"
+            checked={catalogShowConnectorMaterialDefaults}
+            onChange={(event) => {
+              const checked = event.target.checked;
+              setCatalogShowConnectorMaterialDefaults(checked);
+              if (!checked) {
+                setCatalogAllSameTerminals(false);
+                setCatalogDefaultTerminalReference("");
+                setCatalogDefaultTerminalName("");
+                setCatalogDefaultSealReference("");
+                setCatalogDefaultSealName("");
+                setCatalogPlugDefinitionsText("");
+              }
+              if (checked) {
+                scrollToFormPanel(FORM_PANEL_IDS.catalogConnectorDefaults);
+              }
+            }}
+          />
+          Connector material defaults
+        </label>
+        <label className="settings-checkbox">
+          <input
+            type="checkbox"
             checked={catalogShowConnectorPhysicalLayout}
             onChange={(event) => {
               const checked = event.target.checked;
@@ -212,62 +238,64 @@ export function ModelingCatalogFormPanel({
         {renderCatalogFormError()}
       </article>
 
-      <article className="panel catalog-material-defaults-panel">
-        {renderFormHeader("Connector material defaults", catalogFormMode)}
-        <label className="settings-checkbox">
-          <input
-            type="checkbox"
-            checked={catalogAllSameTerminals}
-            onChange={(event) => setCatalogAllSameTerminals(event.target.checked)}
-          />
-          All same terminals
-        </label>
-        <label>
-          Default terminal reference
-          <input
-            value={catalogDefaultTerminalReference}
-            onChange={(event) => setCatalogDefaultTerminalReference(event.target.value)}
-            placeholder="Optional terminal ref"
-          />
-        </label>
-        <label>
-          Default terminal name
-          <input
-            value={catalogDefaultTerminalName}
-            onChange={(event) => setCatalogDefaultTerminalName(event.target.value)}
-            placeholder="Optional terminal name"
-          />
-        </label>
-        <label>
-          Default seal reference
-          <input
-            value={catalogDefaultSealReference}
-            onChange={(event) => setCatalogDefaultSealReference(event.target.value)}
-            placeholder="Optional seal ref"
-          />
-        </label>
-        <label>
-          Default seal name
-          <input
-            value={catalogDefaultSealName}
-            onChange={(event) => setCatalogDefaultSealName(event.target.value)}
-            placeholder="Optional seal name"
-          />
-        </label>
-        <label>
-          Plug definitions
-          <textarea
-            value={catalogPlugDefinitionsText}
-            onChange={(event) => setCatalogPlugDefinitionsText(event.target.value)}
-            placeholder={"PLUG-REF,2,Plug name\nPLUG-ALT,1"}
-            rows={3}
-          />
-        </label>
-        <div className="row-actions catalog-item-submit-actions">
-          {renderCatalogSubmitButton()}
-        </div>
-        {renderCatalogFormError()}
-      </article>
+      {catalogShowConnectorMaterialDefaults ? (
+        <article className="panel catalog-material-defaults-panel" data-form-panel={FORM_PANEL_IDS.catalogConnectorDefaults}>
+          {renderFormHeader("Connector material defaults", catalogFormMode)}
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={catalogAllSameTerminals}
+              onChange={(event) => setCatalogAllSameTerminals(event.target.checked)}
+            />
+            All same terminals
+          </label>
+          <label>
+            Default terminal reference
+            <input
+              value={catalogDefaultTerminalReference}
+              onChange={(event) => setCatalogDefaultTerminalReference(event.target.value)}
+              placeholder="Optional terminal ref"
+            />
+          </label>
+          <label>
+            Default terminal name
+            <input
+              value={catalogDefaultTerminalName}
+              onChange={(event) => setCatalogDefaultTerminalName(event.target.value)}
+              placeholder="Optional terminal name"
+            />
+          </label>
+          <label>
+            Default seal reference
+            <input
+              value={catalogDefaultSealReference}
+              onChange={(event) => setCatalogDefaultSealReference(event.target.value)}
+              placeholder="Optional seal ref"
+            />
+          </label>
+          <label>
+            Default seal name
+            <input
+              value={catalogDefaultSealName}
+              onChange={(event) => setCatalogDefaultSealName(event.target.value)}
+              placeholder="Optional seal name"
+            />
+          </label>
+          <label>
+            Plug definitions
+            <textarea
+              value={catalogPlugDefinitionsText}
+              onChange={(event) => setCatalogPlugDefinitionsText(event.target.value)}
+              placeholder={"PLUG-REF,2,Plug name\nPLUG-ALT,1"}
+              rows={3}
+            />
+          </label>
+          <div className="row-actions catalog-item-submit-actions">
+            {renderCatalogSubmitButton()}
+          </div>
+          {renderCatalogFormError()}
+        </article>
+      ) : null}
 
       {catalogShowConnectorPhysicalLayout ? (
         <article className="panel catalog-connector-layout-panel" data-form-panel={FORM_PANEL_IDS.catalogConnectorLayout}>

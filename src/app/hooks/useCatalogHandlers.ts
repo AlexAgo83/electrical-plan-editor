@@ -32,6 +32,8 @@ interface UseCatalogHandlersParams {
   setCatalogUnitPriceExclTax: (value: string) => void;
   catalogUrl: string;
   setCatalogUrl: (value: string) => void;
+  catalogShowConnectorMaterialDefaults?: boolean;
+  setCatalogShowConnectorMaterialDefaults?: (value: boolean) => void;
   catalogAllSameTerminals?: boolean;
   setCatalogAllSameTerminals?: (value: boolean) => void;
   catalogDefaultTerminalReference?: string;
@@ -81,6 +83,8 @@ export function useCatalogHandlers({
   setCatalogUnitPriceExclTax,
   catalogUrl,
   setCatalogUrl,
+  catalogShowConnectorMaterialDefaults = false,
+  setCatalogShowConnectorMaterialDefaults = () => {},
   catalogAllSameTerminals = false,
   setCatalogAllSameTerminals = () => {},
   catalogDefaultTerminalReference = "",
@@ -106,6 +110,7 @@ export function useCatalogHandlers({
     setCatalogDefaultSealReference("");
     setCatalogDefaultSealName("");
     setCatalogPlugDefinitionsText("");
+    setCatalogShowConnectorMaterialDefaults(false);
     setCatalogConnectorLayout(undefined);
     setCatalogShowConnectorPhysicalLayout(false);
   }
@@ -147,6 +152,7 @@ export function useCatalogHandlers({
     setCatalogName(item.name ?? "");
     setCatalogUnitPriceExclTax(item.unitPriceExclTax === undefined ? "" : String(item.unitPriceExclTax));
     setCatalogUrl(item.url ?? "");
+    setCatalogShowConnectorMaterialDefaults(item.connectorDefaults !== undefined);
     setCatalogAllSameTerminals(item.connectorDefaults?.allSameTerminals === true);
     setCatalogDefaultTerminalReference(item.connectorDefaults?.defaultTerminal?.terminalReference ?? "");
     setCatalogDefaultTerminalName(item.connectorDefaults?.defaultTerminal?.terminalName ?? "");
@@ -235,16 +241,18 @@ export function useCatalogHandlers({
         name: catalogName.trim().length === 0 ? undefined : catalogName.trim(),
         unitPriceExclTax,
         url: url.length === 0 ? undefined : url,
-        connectorDefaults: {
-          allSameTerminals: catalogAllSameTerminals ? true : undefined,
-          defaultTerminal: {
-            terminalReference: catalogDefaultTerminalReference.trim() || undefined,
-            terminalName: catalogDefaultTerminalName.trim() || undefined,
-            sealReference: catalogDefaultSealReference.trim() || undefined,
-            sealName: catalogDefaultSealName.trim() || undefined
-          },
-          plugs: plugDefinitions.length > 0 ? plugDefinitions : undefined
-        },
+        connectorDefaults: catalogShowConnectorMaterialDefaults
+          ? {
+              allSameTerminals: catalogAllSameTerminals ? true : undefined,
+              defaultTerminal: {
+                terminalReference: catalogDefaultTerminalReference.trim() || undefined,
+                terminalName: catalogDefaultTerminalName.trim() || undefined,
+                sealReference: catalogDefaultSealReference.trim() || undefined,
+                sealName: catalogDefaultSealName.trim() || undefined
+              },
+              plugs: plugDefinitions.length > 0 ? plugDefinitions : undefined
+            }
+          : undefined,
         connectorLayout: normalizedConnectorLayout
       })
     );

@@ -153,9 +153,11 @@ describe("App integration UI - catalog", () => {
     fireEvent.change(within(catalogFormPanel).getByLabelText("URL"), {
       target: { value: "not-a-url" }
     });
+    expect(screen.queryByRole("heading", { name: "Connector material defaults" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Connector physical layout" })).not.toBeInTheDocument();
+    fireEvent.click(within(catalogFormPanel).getByLabelText("Connector material defaults"));
     const catalogMaterialPanel = getPanelByHeading("Connector material defaults");
     expect(catalogMaterialPanel).toHaveClass("catalog-material-defaults-panel");
-    expect(screen.queryByRole("heading", { name: "Connector physical layout" })).not.toBeInTheDocument();
     expect(within(catalogMaterialPanel).getByRole("button", { name: "Create" })).toBeDisabled();
     fireEvent.click(within(catalogFormPanel).getByLabelText("Connector physical layout"));
     const catalogLayoutPanel = getPanelByHeading("Connector physical layout");
@@ -465,6 +467,33 @@ describe("App integration UI - catalog", () => {
         expect(scrollSpy.scrollTargets).toContain(catalogLayoutPanel);
       });
       expect(catalogLayoutPanel).toHaveAttribute("data-form-panel", "catalog-connector-layout-form");
+    } finally {
+      scrollSpy.restore();
+    }
+  }, 15000);
+
+  it("scrolls to the connector material defaults panel when enabling it", async () => {
+    const scrollSpy = installScrollIntoViewSpy();
+
+    try {
+      renderAppWithState(createUiIntegrationState());
+      fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+      switchScreenDrawerAware("modeling");
+
+      const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+      expect(secondaryNavRow).not.toBeNull();
+      fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+
+      const catalogPanel = getPanelByHeading("Catalog");
+      fireEvent.click(within(catalogPanel).getByRole("button", { name: "Create catalog item" }));
+      const catalogFormPanel = getPanelByHeading("Create catalog item");
+      fireEvent.click(within(catalogFormPanel).getByLabelText("Connector material defaults"));
+
+      const catalogMaterialPanel = getPanelByHeading("Connector material defaults");
+      await waitFor(() => {
+        expect(scrollSpy.scrollTargets).toContain(catalogMaterialPanel);
+      });
+      expect(catalogMaterialPanel).toHaveAttribute("data-form-panel", "catalog-connector-defaults-form");
     } finally {
       scrollSpy.restore();
     }

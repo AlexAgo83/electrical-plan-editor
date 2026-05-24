@@ -22,6 +22,7 @@ export function useEntityFormsState() {
   const [catalogName, setCatalogName] = useState("");
   const [catalogUnitPriceExclTax, setCatalogUnitPriceExclTax] = useState("");
   const [catalogUrl, setCatalogUrl] = useState("");
+  const [catalogShowConnectorMaterialDefaults, setCatalogShowConnectorMaterialDefaults] = useState(false);
   const [catalogAllSameTerminals, setCatalogAllSameTerminals] = useState(false);
   const [catalogDefaultTerminalReference, setCatalogDefaultTerminalReference] = useState("");
   const [catalogDefaultTerminalName, setCatalogDefaultTerminalName] = useState("");
@@ -141,6 +142,8 @@ export function useEntityFormsState() {
     setCatalogUnitPriceExclTax,
     catalogUrl,
     setCatalogUrl,
+    catalogShowConnectorMaterialDefaults,
+    setCatalogShowConnectorMaterialDefaults,
     catalogAllSameTerminals,
     setCatalogAllSameTerminals,
     catalogDefaultTerminalReference,
