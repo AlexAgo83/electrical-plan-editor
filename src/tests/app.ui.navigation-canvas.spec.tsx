@@ -669,28 +669,27 @@ describe("App integration UI - navigation and canvas", () => {
     expect(canvasShell).not.toHaveClass("is-panning");
   });
 
-  it("allows dragging the 2D view without Shift while entity movement is locked", () => {
+  it("allows dragging the empty 2D view without Shift while keeping entity drag separate", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
     const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
     const rectSpy = mockSvgRect(networkSvg);
     const initialTransform = getNetworkSummaryViewportTransform(networkSummaryPanel);
+    expect(connectorNode).not.toBeNull();
 
     fireEvent.mouseDown(networkSvg, { button: 0, clientX: 240, clientY: 180 });
     fireEvent.mouseMove(networkSvg, { clientX: 360, clientY: 250 });
     fireEvent.mouseUp(networkSvg, { clientX: 360, clientY: 250 });
-    expect(getNetworkSummaryViewportTransform(networkSummaryPanel)).toBe(initialTransform);
+    const pannedTransform = getNetworkSummaryViewportTransform(networkSummaryPanel);
+    expect(pannedTransform).not.toBe(initialTransform);
 
-    openNetworkSummaryEditMenu(networkSummaryPanel);
-    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Lock" }));
-    expect(within(networkSummaryPanel).getByText("Drag empty canvas to pan.")).toBeInTheDocument();
-
-    fireEvent.mouseDown(networkSvg, { button: 0, clientX: 240, clientY: 180 });
-    fireEvent.mouseMove(networkSvg, { clientX: 360, clientY: 250 });
-    fireEvent.mouseUp(networkSvg, { clientX: 360, clientY: 250 });
-    expect(getNetworkSummaryViewportTransform(networkSummaryPanel)).not.toBe(initialTransform);
+    fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 180, clientY: 120 });
+    fireEvent.mouseMove(networkSvg, { clientX: 420, clientY: 250 });
+    fireEvent.mouseUp(networkSvg, { clientX: 420, clientY: 250 });
+    expect(getNetworkSummaryViewportTransform(networkSummaryPanel)).toBe(pannedTransform);
 
     rectSpy.mockRestore();
   });
