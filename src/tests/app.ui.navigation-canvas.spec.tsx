@@ -542,6 +542,33 @@ describe("App integration UI - navigation and canvas", () => {
     expect(connectorNode).not.toHaveClass("is-selected");
   });
 
+  it("keeps the current selection after dragging the empty 2D canvas", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
+    expect(connectorNode).not.toBeNull();
+
+    fireEvent.mouseDown(connectorNode as Element, { button: 0 });
+    fireEvent.mouseUp(connectorNode as Element, { button: 0 });
+    fireEvent.click(connectorNode as Element);
+    expect(connectorNode).toHaveClass("is-selected");
+
+    const rectSpy = mockSvgRect(networkSvg);
+    fireEvent.mouseDown(networkSvg, { button: 0, clientX: 240, clientY: 180 });
+    fireEvent.mouseMove(networkSvg, { clientX: 360, clientY: 250 });
+    fireEvent.mouseUp(networkSvg, { clientX: 360, clientY: 250 });
+    fireEvent.click(networkSvg);
+    rectSpy.mockRestore();
+
+    expect(connectorNode).toHaveClass("is-selected");
+
+    fireEvent.click(networkSvg);
+    expect(connectorNode).not.toHaveClass("is-selected");
+  });
+
   it("supports shift-click multi-selection on canvas nodes and clears it from the empty canvas", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");

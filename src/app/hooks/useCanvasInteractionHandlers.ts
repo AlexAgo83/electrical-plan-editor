@@ -22,6 +22,7 @@ type DispatchAction = (
 ) => void;
 
 const NODE_DRAG_START_THRESHOLD_PX = 4;
+const PAN_CLICK_SUPPRESSION_THRESHOLD_PX = 4;
 
 interface UseCanvasInteractionHandlersParams {
   state: ReturnType<AppStore["getState"]>;
@@ -129,6 +130,7 @@ export function useCanvasInteractionHandlers({
     startClientY: number;
     hasStartedDrag: boolean;
   } | null>(null);
+  const shouldSuppressNextCanvasClickRef = useRef(false);
 
   function clearSelectedCanvasNodes(): void {
     setSelectedCanvasNodeIds((previous) => (previous.size === 0 ? previous : new Set<NodeId>()));
@@ -262,6 +264,11 @@ export function useCanvasInteractionHandlers({
       return;
     }
 
+    if (shouldSuppressNextCanvasClickRef.current) {
+      shouldSuppressNextCanvasClickRef.current = false;
+      return;
+    }
+
     if (interactionMode === "select") {
       clearSelectedCanvasNodes();
       onExternalSelectionInteraction?.();
@@ -390,6 +397,7 @@ export function useCanvasInteractionHandlers({
     }
 
     event.preventDefault();
+    shouldSuppressNextCanvasClickRef.current = false;
     panStartRef.current = {
       clientX: event.clientX,
       clientY: event.clientY,
@@ -489,6 +497,12 @@ export function useCanvasInteractionHandlers({
 
       const deltaX = ((event.clientX - panStartRef.current.clientX) / bounds.width) * networkViewWidth;
       const deltaY = ((event.clientY - panStartRef.current.clientY) / bounds.height) * networkViewHeight;
+      if (
+        Math.hypot(event.clientX - panStartRef.current.clientX, event.clientY - panStartRef.current.clientY) >=
+        PAN_CLICK_SUPPRESSION_THRESHOLD_PX
+      ) {
+        shouldSuppressNextCanvasClickRef.current = true;
+      }
       const nextOffsetX = panStartRef.current.offsetX + deltaX;
       const nextOffsetY = panStartRef.current.offsetY + deltaY;
       setNetworkOffset((current) => {
