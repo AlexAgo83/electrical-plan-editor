@@ -1,22 +1,10 @@
 import { type ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import appPackageMetadata from "../../package.json";
-import type { CatalogItemId, ConnectorId } from "../core/entities";
+import type { CatalogItemId } from "../core/entities";
 import {
   appActions,
   hasSampleNetworkSignature,
-  isWorkspaceEmpty,
-  selectActiveNetwork,
-  selectActiveNetworkId,
-  selectConnectors,
-  selectCatalogItems,
-  selectNetworks,
-  selectNodes,
-  selectRoutingGraphIndex,
-  selectSegments,
-  selectSplices,
-  selectSubNetworkSummaries,
-  selectWires,
-  withPreservedNetworkSummaryViewStates
+  isWorkspaceEmpty
 } from "../store";
 import { appStore } from "./store";
 import { appUiModules, preloadNetworkSummaryWorkspaceUiModules } from "./components/appUiModules";
@@ -38,12 +26,15 @@ import { buildAppControllerShellLayoutProps } from "./hooks/controller/buildAppC
 import { useAppControllerWorkspaceNetworkDomainAssembly } from "./hooks/controller/useAppControllerWorkspaceNetworkDomainAssembly";
 import { useAppControllerSelectionHandlersDomainAssembly } from "./hooks/controller/useAppControllerSelectionHandlersDomainAssembly";
 import { useAppControllerCanvasInteractionDomainAssembly } from "./hooks/controller/useAppControllerCanvasInteractionDomainAssembly";
+import { useAppControllerEntitySnapshot } from "./hooks/controller/useAppControllerEntitySnapshot";
 import { useAppControllerInspectorIssueLayoutState } from "./hooks/controller/useAppControllerInspectorIssueLayoutState";
 import { useAppControllerNetworkViewportState } from "./hooks/controller/useAppControllerNetworkViewportState";
 import { useAppControllerHeaderOffsetState } from "./hooks/controller/useAppControllerHeaderOffsetState";
 import { useAppControllerCanvasStateSyncEffects } from "./hooks/controller/useAppControllerCanvasStateSyncEffects";
 import { useConfirmDialogController } from "./hooks/controller/useConfirmDialogController";
 import { useChoiceDialogController } from "./hooks/controller/useChoiceDialogController";
+import { useAppControllerHistoryDispatch } from "./hooks/controller/useAppControllerHistoryDispatch";
+import { useAppControllerBomPreviewNavigation } from "./hooks/controller/useAppControllerBomPreviewNavigation";
 import { useNetworkSummaryViewStateSync } from "./hooks/controller/useNetworkSummaryViewStateSync";
 import { useOnboardingController } from "./hooks/controller/useOnboardingController";
 import { useAppControllerPersistenceHealth } from "./hooks/controller/useAppControllerPersistenceHealth";
@@ -59,12 +50,9 @@ import {
 } from "./hooks/controller/useAppControllerLifecycleEffects";
 import { useEntityListModel } from "./hooks/useEntityListModel";
 import { useEntityFormsState } from "./hooks/useEntityFormsState";
-import { useEntityRelationshipMaps } from "./hooks/useEntityRelationshipMaps";
-import { useNetworkEntityCountsById } from "./hooks/useNetworkEntityCountsById";
 import { useNetworkScopeFormState } from "./hooks/useNetworkScopeFormState";
 import { useModelingFormSelectionSync } from "./hooks/useModelingFormSelectionSync";
 import { useNodeDescriptions } from "./hooks/useNodeDescriptions";
-import { useStoreHistory } from "./hooks/useStoreHistory";
 import { useValidationModel } from "./hooks/useValidationModel";
 import { useWireEndpointDescriptions } from "./hooks/useWireEndpointDescriptions";
 import { useWorkspaceShellChrome } from "./hooks/useWorkspaceShellChrome";
@@ -76,9 +64,8 @@ import { useAppControllerUiPreferencesBindings } from "./hooks/controller/useApp
 import { buildAppControllerNamespacedCanvasState } from "./hooks/useAppControllerNamespacedCanvasState";
 import { buildAppControllerNamespacedFormsState } from "./hooks/useAppControllerNamespacedFormsState";
 import { useAppSnapshot } from "./hooks/useAppSnapshot";
-import { HISTORY_LIMIT, NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE } from "./lib/app-utils-shared";
+import { NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE } from "./lib/app-utils-shared";
 import { useAppControllerBomExportHandlers } from "./hooks/controller/useAppControllerBomExportHandlers";
-import { buildAppActionToast } from "./lib/app-action-toast";
 import type { AppProps, SubScreenId } from "./types/app-controller";
 import "./styles.css";
 export type { AppProps } from "./types/app-controller";
@@ -86,21 +73,26 @@ const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor"
 export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear(), state = useAppSnapshot(store);
   const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, ValidationScreen, AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables, NetworkScopeWorkspaceContent, SettingsWorkspaceContent, ValidationWorkspaceContent } = appUiModules;
-  const networks = selectNetworks(state), activeNetworkId = selectActiveNetworkId(state);
-  const activeNetworkSummaryViewState =
-    activeNetworkId === null ? undefined : state.networkStates[activeNetworkId]?.networkSummaryViewState;
-  const activeNetwork = selectActiveNetwork(state);
-  const connectors = selectConnectors(state);
-  const catalogItems = selectCatalogItems(state);
-  const splices = selectSplices(state);
-  const nodes = selectNodes(state);
-  const segments = selectSegments(state);
-  const wires = selectWires(state);
-  const routingGraph = selectRoutingGraphIndex(state);
-  const subNetworkSummaries = selectSubNetworkSummaries(state);
-  const networkEntityCountsById = useNetworkEntityCountsById(networks, state.networkStates);
-  const { connectorMap, spliceMap, segmentMap, connectorNodeByConnectorId, spliceNodeBySpliceId } =
-    useEntityRelationshipMaps(connectors, splices, nodes, segments);
+  const {
+    networks,
+    activeNetworkId,
+    activeNetworkSummaryViewState,
+    activeNetwork,
+    connectors,
+    catalogItems,
+    splices,
+    nodes,
+    segments,
+    wires,
+    routingGraph,
+    subNetworkSummaries,
+    networkEntityCountsById,
+    connectorMap,
+    spliceMap,
+    segmentMap,
+    connectorNodeByConnectorId,
+    spliceNodeBySpliceId
+  } = useAppControllerEntitySnapshot(state);
   const formsState = useEntityFormsState();
   const forms = useMemo(() => buildAppControllerNamespacedFormsState(formsState), [formsState]);
   const { setWireForcedRouteInput } = formsState;
@@ -409,51 +401,19 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isUndoAvailable,
     isRedoAvailable,
     undoHistoryEntries,
-    dispatchAction: dispatchActionWithHistory,
+    dispatchAction,
     handleUndo,
     handleRedo,
     replaceStateWithHistory
-  } = useStoreHistory({
+  } = useAppControllerHistoryDispatch({
     store,
-    historyLimit: HISTORY_LIMIT,
-    transformUndoRedoTargetState: (targetState, currentState) =>
-      restoreViewportOnUndo ? targetState : withPreservedNetworkSummaryViewStates(targetState, currentState),
-    onUndoRedoApplied: ({ direction, entry }) => {
-      setPendingNewNodePosition(null);
-      notifyToast(direction === "undo" ? "Undo applied" : "Redo applied", {
-        message: entry.label,
-        variant: "info"
-      });
-    },
-    onReplaceStateApplied: () => {
-      setPendingNewNodePosition(null);
-      setActiveScreen("modeling");
-      setActiveSubScreen("connector");
-      setInteractionMode("select");
-    }
+    restoreViewportOnUndo,
+    setPendingNewNodePosition,
+    setActiveScreen,
+    setActiveSubScreen,
+    setInteractionMode,
+    notifyToast
   });
-  const dispatchAction = useCallback(
-    (
-      action: Parameters<typeof dispatchActionWithHistory>[0],
-      options?: Parameters<typeof dispatchActionWithHistory>[1]
-    ): void => {
-      const previousState = store.getState();
-      dispatchActionWithHistory(action, options);
-      const nextState = store.getState();
-      if (nextState === previousState || options?.trackHistory === false) {
-        return;
-      }
-
-      const toast = buildAppActionToast(action, previousState, nextState);
-      if (toast !== null) {
-        notifyToast(toast.title, {
-          message: toast.message,
-          variant: toast.variant
-        });
-      }
-    },
-    [dispatchActionWithHistory, notifyToast, store]
-  );
   const {
     lastError,
     bootRecoveryMessage,
@@ -498,27 +458,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCatalogConnectorLayout: formsState.setCatalogConnectorLayout,
     setCatalogFormError: formsState.setCatalogFormError
   });
-  const openBomPreviewCatalogItem = useCallback(
-    (catalogItemId: CatalogItemId) => {
-      closeActiveBomPreview();
-      setDetailPanelsSelectionSource("table");
-      setActiveScreen("modeling");
-      setActiveSubScreen("catalog");
-      const catalogItem = store.getState().catalogItems.byId[catalogItemId];
-      if (catalogItem !== undefined) {
-        catalogHandlers.startCatalogEdit(catalogItem);
-        return;
-      }
-
-      dispatchAction(
-        appActions.select({
-          kind: "catalog",
-          id: catalogItemId
-        })
-      );
-    },
-    [catalogHandlers, closeActiveBomPreview, dispatchAction, setActiveScreen, setActiveSubScreen, store]
-  );
   useNetworkSummaryViewStateSync({
     activeNetworkId,
     activeNetworkSummaryViewState,
@@ -641,27 +580,16 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   });
   const { connector: connectorHandlers, splice: spliceHandlers, node: nodeHandlers, segment: segmentHandlers, wire: wireHandlers } =
     modelingHandlers;
-  const openBomPreviewConnector = useCallback(
-    (connectorId: ConnectorId) => {
-      closeActiveBomPreview();
-      setDetailPanelsSelectionSource("table");
-      setActiveScreen("modeling");
-      setActiveSubScreen("connector");
-      const connector = store.getState().connectors.byId[connectorId];
-      if (connector !== undefined) {
-        modelingHandlers.connector.startConnectorEdit(connector);
-        return;
-      }
-
-      dispatchAction(
-        appActions.select({
-          kind: "connector",
-          id: connectorId
-        })
-      );
-    },
-    [closeActiveBomPreview, dispatchAction, modelingHandlers.connector, setActiveScreen, setActiveSubScreen, store]
-  );
+  const { openBomPreviewCatalogItem, openBomPreviewConnector } = useAppControllerBomPreviewNavigation({
+    store,
+    dispatchAction,
+    closeActiveBomPreview,
+    setDetailPanelsSelectionSource,
+    setActiveScreen,
+    setActiveSubScreen,
+    startCatalogEdit: catalogHandlers.startCatalogEdit,
+    startConnectorEdit: modelingHandlers.connector.startConnectorEdit
+  });
 
   const catalogAnalysisDomain = useAppControllerCatalogAnalysisActions({
     connectorMap,
