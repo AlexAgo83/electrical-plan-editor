@@ -450,3 +450,69 @@
   display: grid;
   gap: 0.2rem;
 }
+
+.analysis-current-route-path {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 1.35rem;
+}
+
+.analysis-current-route-step {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  min-height: 1.8rem;
+  border: 1px solid color-mix(in srgb, var(--theme-primary, #2c6c93) 26%, transparent);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, #fff 82%, var(--theme-primary, #2c6c93) 18%), rgba(255, 255, 255, 0.68));
+  color: #15364d;
+  padding: 0.24rem 0.56rem 0.24rem 0.28rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(26, 67, 94, 0.08);
+}
+
+.analysis-current-route-step:not(:last-child)::after {
+  content: "\2192";
+  position: absolute;
+  left: calc(100% + 0.34rem);
+  top: 50%;
+  transform: translateY(-50%);
+  color: color-mix(in srgb, var(--theme-primary, #2c6c93) 62%, currentColor);
+  font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.analysis-current-route-index {
+  display: inline-grid;
+  place-items: center;
+  width: 1.18rem;
+  height: 1.18rem;
+  border-radius: 50%;
+  background: var(--theme-primary, #2c6c93);
+  color: #fff;
+  font-size: 0.68rem;
+  letter-spacing: 0;
+}
+
+.analysis-current-route-segment {
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.analysis-current-route-empty {
+  display: inline-flex;
+  width: fit-content;
+  border: 1px dashed color-mix(in srgb, currentColor 28%, transparent);
+  border-radius: 999px;
+  padding: 0.22rem 0.56rem;
+  color: #4d697d;
+  background: color-mix(in srgb, currentColor 5%, transparent);
+}

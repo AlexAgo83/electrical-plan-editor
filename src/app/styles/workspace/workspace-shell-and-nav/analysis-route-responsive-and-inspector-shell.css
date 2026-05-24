@@ -10,6 +10,18 @@
   margin: 0;
 }
 
+.analysis-wire-route-current .analysis-current-route-index {
+  color: #fff;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.analysis-wire-route-current .analysis-current-route-segment {
+  color: #15364d;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .analysis-wire-route-input {
   margin-top: 0.08rem;
 }

@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactElement } from "react";
 import { getWireColorLabel, getWireColorSortValue } from "../../../core/cableColors";
-import type { WireEndpoint } from "../../../core/entities";
+import type { SegmentId, WireEndpoint } from "../../../core/entities";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
@@ -25,6 +25,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     tabularExportFormat,
     catalogItems,
     connectors,
+    segments,
     splices,
     wires,
     visibleWires,
@@ -34,6 +35,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     onSelectWire,
     onSelectConnector,
     onSelectSplice,
+    onSelectSegment,
     onSelectCatalogItem,
     onOpenWireOnboardingHelp,
     selectedWire,
@@ -53,6 +55,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   type WireAnalysisTableSortField = "name" | "technicalId" | "color" | "endpointA" | "endpointB" | "sectionMm2" | "lengthMm" | "routeMode";
   const isMobileViewport = useIsMobileViewport();
   const connectorById = useMemo(() => new Map(connectors.map((connector) => [connector.id, connector] as const)), [connectors]);
+  const segmentById = useMemo(() => new Map(segments.map((segment) => [segment.id, segment] as const)), [segments]);
   const spliceById = useMemo(() => new Map(splices.map((splice) => [splice.id, splice] as const)), [splices]);
   const [wireAnalysisTableSort, setWireAnalysisTableSort] = useState<{ field: WireAnalysisTableSortField; direction: "asc" | "desc" }>({
     field: "name",
@@ -96,6 +99,32 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
       return null;
     }
     return catalogItemById.get(wire.protection.catalogItemId)?.manufacturerReference ?? "(missing catalog item)";
+  };
+  const renderCurrentRoutePath = (segmentIds: readonly string[]): ReactElement => {
+    if (segmentIds.length === 0) {
+      return <p className="route-preview-path analysis-current-route-empty">(none)</p>;
+    }
+
+    return (
+      <ol className="analysis-current-route-path" aria-label="Current route segment order">
+        {segmentIds.map((segmentId, index) => (
+          <li key={`${segmentId}-${index}`} className="analysis-current-route-step">
+            <span className="analysis-current-route-index">{index + 1}</span>
+            {segmentById.has(segmentId as SegmentId) ? (
+              <EntityReferenceButton
+                className="analysis-current-route-segment technical-id"
+                title={`Open segment ${segmentId}`}
+                onClick={() => onSelectSegment(segmentId as SegmentId)}
+              >
+                {segmentId}
+              </EntityReferenceButton>
+            ) : (
+              <span className="analysis-current-route-segment technical-id">{segmentId}</span>
+            )}
+          </li>
+        ))}
+      </ol>
+    );
   };
   const renderWireEndpointReference = (endpoint: WireEndpoint): ReactElement => {
     const label = describeWireEndpoint(endpoint);
@@ -492,7 +521,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
 
       <article className="analysis-wire-route-current">
         <span>Current route</span>
-        <p className="route-preview-path">{selectedWire.routeSegmentIds.join(" -> ") || "(none)"}</p>
+        {renderCurrentRoutePath(selectedWire.routeSegmentIds)}
       </article>
       <article className="analysis-wire-route-current">
         <span>Endpoint references</span>

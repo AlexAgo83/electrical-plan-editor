@@ -301,9 +301,11 @@ describe("App integration UI - analysis go-to wire actions", () => {
 
     const wireAnalysisPanel = getPanelByHeading("Wire analysis");
     expect(within(wireAnalysisPanel).getByText("Wire 1")).toBeInTheDocument();
+    fireEvent.click(within(wireAnalysisPanel).getByRole("button", { name: "SEG-B" }));
+    expect(within(getPanelByHeading("Segment analysis")).getByText("SEG-B")).toBeInTheDocument();
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
-    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/, hidden: true })).toHaveClass(
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Segment$/, hidden: true })).toHaveClass(
       "is-active"
     );
   });

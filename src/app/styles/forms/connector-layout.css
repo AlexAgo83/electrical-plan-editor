@@ -48,6 +48,13 @@
 .connector-layout-preview,
 .connector-physical-canvas {
   max-height: min(54vh, 28rem);
+}
+
+.connector-layout-preview {
+  overflow: hidden;
+}
+
+.connector-physical-canvas {
   overflow: auto;
 }
 
