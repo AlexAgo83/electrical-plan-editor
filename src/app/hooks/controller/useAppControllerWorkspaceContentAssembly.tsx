@@ -218,6 +218,7 @@ export function useAppControllerWorkspaceContentAssembly({
       lockEntityMovement: models.canvasState.lockEntityMovement,
       setLockEntityMovement: models.canvasState.setLockEntityMovement,
       networkOffset: models.canvasState.networkOffset,
+      setNetworkOffset: models.canvasState.setNetworkOffset,
       networkScale: models.canvasState.networkScale
     },
     canvasDisplayState: {

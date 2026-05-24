@@ -44,6 +44,31 @@ function getNetworkSummaryViewportTransform(panel: HTMLElement): string {
   return transformGroup.getAttribute("transform") ?? "";
 }
 
+function parseNetworkSummaryViewportTransform(transform: string): { offsetX: number; offsetY: number; scale: number } {
+  const match = transform.match(/^translate\(([^ )]+)\s+([^)]+)\)\s+scale\(([^)]+)\)$/);
+  if (match === null) {
+    throw new Error(`Unexpected viewport transform: ${transform}`);
+  }
+  return {
+    offsetX: Number(match[1]),
+    offsetY: Number(match[2]),
+    scale: Number(match[3])
+  };
+}
+
+function getNetworkSummaryViewBoxSize(panel: HTMLElement): { width: number; height: number } {
+  const networkSvg = within(panel).getByLabelText("2D network diagram");
+  const values = (networkSvg.getAttribute("viewBox") ?? "")
+    .split(/\s+/)
+    .map((value) => Number(value));
+  const width = values[2];
+  const height = values[3];
+  if (width === undefined || height === undefined || !Number.isFinite(width) || !Number.isFinite(height)) {
+    throw new Error("Unable to parse network summary viewBox.");
+  }
+  return { width, height };
+}
+
 function openViewMenu(panel: HTMLElement): void {
   const viewButton = within(panel).getByRole("button", { name: "View" });
   if (viewButton.getAttribute("aria-expanded") !== "true") {
@@ -593,6 +618,31 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(cy).toBeLessThan(0);
 
     rectSpy.mockRestore();
+  });
+
+  it("keeps the visible center anchored when changing the view zoom slider", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const viewBoxSize = getNetworkSummaryViewBoxSize(networkSummaryPanel);
+    const before = parseNetworkSummaryViewportTransform(getNetworkSummaryViewportTransform(networkSummaryPanel));
+    const centerBefore = {
+      x: (viewBoxSize.width / 2 - before.offsetX) / before.scale,
+      y: (viewBoxSize.height / 2 - before.offsetY) / before.scale
+    };
+    const zoomSlider = within(networkSummaryPanel).getByRole("slider", { name: /Zoom view/ });
+
+    fireEvent.change(zoomSlider, { target: { value: "100" } });
+
+    const after = parseNetworkSummaryViewportTransform(getNetworkSummaryViewportTransform(networkSummaryPanel));
+    const centerAfter = {
+      x: (viewBoxSize.width / 2 - after.offsetX) / after.scale,
+      y: (viewBoxSize.height / 2 - after.offsetY) / after.scale
+    };
+    expect(after.scale).toBeGreaterThan(before.scale);
+    expect(centerAfter.x).toBeCloseTo(centerBefore.x, 5);
+    expect(centerAfter.y).toBeCloseTo(centerBefore.y, 5);
   });
 
   it("toggles connector/splice cable callouts, selects linked entities, and persists dragged callout positions", () => {

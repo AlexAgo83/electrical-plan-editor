@@ -27,7 +27,6 @@ interface NetworkSummaryCanvasPanelProps {
   setGlobalRenderScalePercent: (value: number) => void;
   selectedCanvasNodeCount: number;
   clearSelectedCanvasNodes: () => void;
-  lockEntityMovement: boolean;
   subNetworkSummaries: SubNetworkSummary[];
   activeSubNetworkTags: ReadonlySet<string>;
   toggleSubNetworkTag: (tag: string) => void;
@@ -95,7 +94,6 @@ export function NetworkSummaryCanvasPanel({
   setGlobalRenderScalePercent,
   selectedCanvasNodeCount,
   clearSelectedCanvasNodes,
-  lockEntityMovement,
   subNetworkSummaries,
   activeSubNetworkTags,
   toggleSubNetworkTag,
@@ -162,7 +160,6 @@ export function NetworkSummaryCanvasPanel({
               setGlobalRenderScalePercent={setGlobalRenderScalePercent}
               selectedCanvasNodeCount={selectedCanvasNodeCount}
               clearSelectedCanvasNodes={clearSelectedCanvasNodes}
-              lockEntityMovement={lockEntityMovement}
               subNetworkSummaries={subNetworkSummaries}
               activeSubNetworkTags={activeSubNetworkTags}
               toggleSubNetworkTag={toggleSubNetworkTag}

@@ -1,4 +1,4 @@
-import type { MouseEvent as ReactMouseEvent, WheelEvent as ReactWheelEvent } from "react";
+import type { Dispatch, MouseEvent as ReactMouseEvent, SetStateAction, WheelEvent as ReactWheelEvent } from "react";
 import type {
   CatalogItem,
   Connector,
@@ -90,6 +90,7 @@ export interface NetworkSummaryPanelProps {
   networkViewHeight: number;
   networkGridStep: number;
   networkOffset: NodePosition;
+  setNetworkOffset: Dispatch<SetStateAction<NodePosition>>;
   networkScale: number;
   handleNetworkCanvasMouseDown: (event: ReactMouseEvent<SVGSVGElement>) => void;
   handleNetworkCanvasClick: (event: ReactMouseEvent<SVGSVGElement>) => void;

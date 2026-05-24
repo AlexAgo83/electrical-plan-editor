@@ -286,6 +286,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     networkViewHeight: params.networkViewHeight,
     networkGridStep: params.networkGridStep,
     networkOffset: params.networkOffset,
+    setNetworkOffset: params.setNetworkOffset,
     networkScale: params.networkScale,
     handleNetworkCanvasMouseDown: params.handleNetworkCanvasMouseDown,
     handleNetworkCanvasClick: params.handleNetworkCanvasClick,

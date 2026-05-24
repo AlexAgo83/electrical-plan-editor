@@ -119,6 +119,7 @@ export function NetworkSummaryPanel({
   networkViewHeight,
   networkGridStep,
   networkOffset,
+  setNetworkOffset,
   networkScale,
   handleNetworkCanvasMouseDown,
   handleNetworkCanvasClick,
@@ -214,6 +215,33 @@ export function NetworkSummaryPanel({
   const horizontalGridLineCount = Math.max(0, Math.ceil((gridEndY - gridStartY) / networkGridStep) + 1);
   const gridXPositions = Array.from({ length: verticalGridLineCount }, (_, index) => gridStartX + index * networkGridStep);
   const gridYPositions = Array.from({ length: horizontalGridLineCount }, (_, index) => gridStartY + index * networkGridStep);
+  const handleGlobalRenderScalePercentChange = useCallback(
+    (value: number) => {
+      const nextPercent = clampNumber(Math.round(value), 0, 300);
+      const currentPercent = clampNumber(globalRenderScalePercent, 0, 300);
+      if (nextPercent === currentPercent) {
+        return;
+      }
+
+      const viewCenterX = networkViewWidth / 2;
+      const viewCenterY = networkViewHeight / 2;
+      const currentRenderScale = 1 + currentPercent / 100;
+      const nextRenderScale = 1 + nextPercent / 100;
+      const currentEffectiveRenderScale = effectiveScale * currentRenderScale;
+      const nextEffectiveRenderScale = effectiveScale * nextRenderScale;
+
+      setNetworkOffset((currentOffset) => {
+        const centerModelX = (viewCenterX - currentOffset.x) / currentEffectiveRenderScale;
+        const centerModelY = (viewCenterY - currentOffset.y) / currentEffectiveRenderScale;
+        return {
+          x: viewCenterX - centerModelX * nextEffectiveRenderScale,
+          y: viewCenterY - centerModelY * nextEffectiveRenderScale
+        };
+      });
+      setGlobalRenderScalePercent(nextPercent);
+    },
+    [effectiveScale, globalRenderScalePercent, networkViewHeight, networkViewWidth, setGlobalRenderScalePercent, setNetworkOffset]
+  );
   const allSubNetworkTags = useMemo(
     () => subNetworkSummaries.map((summary) => summary.tag),
     [subNetworkSummaries]
@@ -886,10 +914,9 @@ export function NetworkSummaryPanel({
           handleZoomAction={handleZoomAction}
           fitNetworkToContent={fitNetworkToContent}
           globalRenderScalePercent={globalRenderScalePercent}
-          setGlobalRenderScalePercent={setGlobalRenderScalePercent}
+          setGlobalRenderScalePercent={handleGlobalRenderScalePercentChange}
           selectedCanvasNodeCount={selectedCanvasNodeIds.size}
           clearSelectedCanvasNodes={clearSelectedCanvasNodes}
-          lockEntityMovement={lockEntityMovement}
           subNetworkSummaries={subNetworkSummaries}
           activeSubNetworkTags={activeSubNetworkTags}
           toggleSubNetworkTag={toggleSubNetworkTag}

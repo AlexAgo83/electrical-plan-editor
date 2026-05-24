@@ -92,6 +92,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
     | "lockEntityMovement"
     | "setLockEntityMovement"
     | "networkOffset"
+    | "setNetworkOffset"
     | "networkScale"
   >;
   canvasDisplayState: Pick<
@@ -371,6 +372,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         networkViewHeight: effectiveNetworkViewHeight,
         networkGridStep,
         networkOffset: canvasState.networkOffset,
+        setNetworkOffset: canvasState.setNetworkOffset,
         networkScale: canvasState.networkScale,
         handleNetworkCanvasMouseDown,
         handleNetworkCanvasClick,
