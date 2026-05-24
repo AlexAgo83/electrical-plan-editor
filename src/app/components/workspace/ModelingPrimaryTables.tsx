@@ -8,8 +8,6 @@ import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 import type {
-  CatalogItem,
-  CatalogItemId,
   Connector,
   ConnectorId,
   NetworkNode,
@@ -17,77 +15,9 @@ import type {
   Splice,
   SpliceId
 } from "../../../core/entities";
-import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
-import type { OccupancyFilter, SortDirection, SortState } from "../../types/app-controller";
+import type { SortDirection } from "../../types/app-controller";
 import { EntityReferenceButton } from "./EntityReferenceButton";
-
-interface ModelingPrimaryTablesProps {
-  activeBatchScope: ModelingBatchSelectionScope | null;
-  batchSelectionIds: ReadonlySet<string>;
-  onEnterBatchMode: (scope: ModelingBatchSelectionScope) => void;
-  onExitBatchMode: () => void;
-  onToggleBatchSelection: (scope: ModelingBatchSelectionScope, id: string) => void;
-  onSetBatchSelectionForVisible: (scope: ModelingBatchSelectionScope, ids: readonly string[]) => void;
-  onDeleteSelectedInBatchMode: () => void;
-  isConnectorSubScreen: boolean;
-  connectorFormMode: "idle" | "create" | "edit";
-  onOpenCreateConnector: () => void;
-  connectorOccupancyFilter: OccupancyFilter;
-  setConnectorOccupancyFilter: (value: OccupancyFilter) => void;
-  connectorFilterField: "name" | "technicalId" | "any";
-  setConnectorFilterField: (value: "name" | "technicalId" | "any") => void;
-  connectorFilterQuery: string;
-  setConnectorFilterQuery: (value: string) => void;
-  catalogItems: CatalogItem[];
-  connectors: Connector[];
-  visibleConnectors: Connector[];
-  connectorSort: SortState;
-  setConnectorSort: (value: SortState | ((current: SortState) => SortState)) => void;
-  getSortIndicator: (sortState: SortState, field: SortState["field"]) => string;
-  connectorOccupiedCountById: Map<ConnectorId, number>;
-  selectedConnectorId: ConnectorId | null;
-  onEditConnector: (connector: Connector) => void;
-  onSelectCatalogItem: (catalogItemId: CatalogItemId) => void;
-  onDeleteConnector: (connectorId: ConnectorId) => void;
-  onOpenConnectorOnboardingHelp?: () => void;
-  isSpliceSubScreen: boolean;
-  spliceFormMode: "idle" | "create" | "edit";
-  onOpenCreateSplice: () => void;
-  spliceOccupancyFilter: OccupancyFilter;
-  setSpliceOccupancyFilter: (value: OccupancyFilter) => void;
-  spliceFilterField: "name" | "technicalId" | "any";
-  setSpliceFilterField: (value: "name" | "technicalId" | "any") => void;
-  spliceFilterQuery: string;
-  setSpliceFilterQuery: (value: string) => void;
-  splices: Splice[];
-  visibleSplices: Splice[];
-  spliceSort: SortState;
-  setSpliceSort: (value: SortState | ((current: SortState) => SortState)) => void;
-  spliceOccupiedCountById: Map<SpliceId, number>;
-  selectedSpliceId: SpliceId | null;
-  onEditSplice: (splice: Splice) => void;
-  onDeleteSplice: (spliceId: SpliceId) => void;
-  onOpenSpliceOnboardingHelp?: () => void;
-  isNodeSubScreen: boolean;
-  nodeFormMode: "idle" | "create" | "edit";
-  onOpenCreateNode: () => void;
-  nodeKindFilter: "all" | NetworkNode["kind"];
-  setNodeKindFilter: (value: "all" | NetworkNode["kind"]) => void;
-  nodeFilterField: "id" | "kind" | "reference" | "any";
-  setNodeFilterField: (value: "id" | "kind" | "reference" | "any") => void;
-  nodeFilterQuery: string;
-  setNodeFilterQuery: (value: string) => void;
-  nodes: NetworkNode[];
-  visibleNodes: NetworkNode[];
-  nodeIdSortDirection: SortDirection;
-  setNodeIdSortDirection: (value: SortDirection | ((current: SortDirection) => SortDirection)) => void;
-  segmentsCountByNodeId: Map<NodeId, number>;
-  selectedNodeId: NodeId | null;
-  describeNode: (node: NetworkNode) => string;
-  onEditNode: (node: NetworkNode) => void;
-  onDeleteNode: (nodeId: NodeId) => void;
-  onOpenNodeOnboardingHelp?: () => void;
-}
+import type { ModelingPrimaryTablesProps } from "./ModelingPrimaryTables.types";
 
 export function ModelingPrimaryTables({
   activeBatchScope,
@@ -219,9 +149,6 @@ export function ModelingPrimaryTables({
     onEditConnector(connector);
     scrollToFormPanel(FORM_PANEL_IDS.connector);
   };
-  const openEditConnector = (connector: Connector) => {
-    onEditConnector(connector);
-  };
   const openCreateSpliceAndScroll = () => {
     onOpenCreateSplice();
     scrollToFormPanel(FORM_PANEL_IDS.splice);
@@ -230,9 +157,6 @@ export function ModelingPrimaryTables({
     onEditSplice(splice);
     scrollToFormPanel(FORM_PANEL_IDS.splice);
   };
-  const openEditSplice = (splice: Splice) => {
-    onEditSplice(splice);
-  };
   const openCreateNodeAndScroll = () => {
     onOpenCreateNode();
     scrollToFormPanel(FORM_PANEL_IDS.node);
@@ -240,9 +164,6 @@ export function ModelingPrimaryTables({
   const openEditNodeAndScroll = (node: NetworkNode) => {
     onEditNode(node);
     scrollToFormPanel(FORM_PANEL_IDS.node);
-  };
-  const openEditNode = (node: NetworkNode) => {
-    onEditNode(node);
   };
   useEffect(() => {
     if (connectorSort.field !== "name" && connectorSort.field !== "technicalId") {
@@ -552,7 +473,7 @@ export function ModelingPrimaryTables({
                     onClick={() =>
                       isConnectorBatchMode
                         ? onToggleBatchSelection("connector", connector.id)
-                        : openEditConnector(connector)
+                        : onEditConnector(connector)
                     }
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
@@ -561,7 +482,7 @@ export function ModelingPrimaryTables({
                           onToggleBatchSelection("connector", connector.id);
                           return;
                         }
-                        openEditConnector(connector);
+                        onEditConnector(connector);
                       }
                     }}
                   >
@@ -768,7 +689,7 @@ export function ModelingPrimaryTables({
                     onClick={() =>
                       isSpliceBatchMode
                         ? onToggleBatchSelection("splice", splice.id)
-                        : openEditSplice(splice)
+                        : onEditSplice(splice)
                     }
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
@@ -777,7 +698,7 @@ export function ModelingPrimaryTables({
                           onToggleBatchSelection("splice", splice.id);
                           return;
                         }
-                        openEditSplice(splice);
+                        onEditSplice(splice);
                       }
                     }}
                   >
@@ -979,7 +900,7 @@ export function ModelingPrimaryTables({
                     className={isNodeBatchMode ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row` : isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
                     aria-selected={isNodeBatchMode ? isBatchSelected : isFocused}
                     tabIndex={0}
-                    onClick={() => (isNodeBatchMode ? onToggleBatchSelection("node", node.id) : openEditNode(node))}
+                    onClick={() => (isNodeBatchMode ? onToggleBatchSelection("node", node.id) : onEditNode(node))}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
@@ -987,7 +908,7 @@ export function ModelingPrimaryTables({
                           onToggleBatchSelection("node", node.id);
                           return;
                         }
-                        openEditNode(node);
+                        onEditNode(node);
                       }
                     }}
                   >
