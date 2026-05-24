@@ -141,9 +141,6 @@ export function useAppControllerInspectorIssueLayoutState({
     isOperationsPanelOpen
   });
 
-  const inspectableSelectedSubScreen =
-    selectionEntities.selectedSubScreen === "catalog" ? null : selectionEntities.selectedSubScreen;
-
   const { inspectorContextPanel } = useInspectorContextPanelControllerSlice({
     isInspectorOpen,
     canExpandInspectorFromCollapsed,
@@ -151,7 +148,7 @@ export function useAppControllerInspectorIssueLayoutState({
     expandInspectorFromCollapsed,
     collapseInspectorToCollapsed,
     selected: selectionEntities.selected,
-    selectedSubScreen: inspectableSelectedSubScreen,
+    selectedSubScreen: selectionEntities.selectedSubScreen,
     selectedCatalogItem: selectionEntities.selectedCatalogItem,
     selectedConnector: selectionEntities.selectedConnector,
     selectedSplice: selectionEntities.selectedSplice,

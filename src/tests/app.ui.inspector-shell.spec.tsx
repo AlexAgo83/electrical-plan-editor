@@ -281,6 +281,7 @@ describe("App integration UI - inspector floating shell", () => {
     const inspectorPanel = getPanelByHeading("Inspector context");
     expect(within(inspectorPanel).getByText("CAT-MFR-1", { selector: ".inspector-entity-id" })).toBeInTheDocument();
     expect(within(inspectorPanel).queryByText("CAT-INTERNAL-1", { selector: ".inspector-entity-id" })).not.toBeInTheDocument();
+    expect(within(inspectorPanel).getByRole("button", { name: "Edit" })).toBeInTheDocument();
   });
 
   it("opens referenced catalog items from connector manufacturer reference cells", () => {

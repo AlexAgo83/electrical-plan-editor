@@ -12,7 +12,7 @@ interface InspectorContextPanelProps {
   onCollapseToCollapsed: () => void;
   onCloseInspector: () => void;
   selected: SelectionState | null;
-  selectedSubScreen: "connector" | "splice" | "node" | "segment" | "wire" | null;
+  selectedSubScreen: "catalog" | "connector" | "splice" | "node" | "segment" | "wire" | null;
   selectedCatalogItem: CatalogItem | null;
   selectedConnector: Connector | null;
   selectedSplice: Splice | null;

@@ -359,6 +359,11 @@ export function useSelectionHandlers({
     setActiveSubScreen(selectedSubScreen);
     scrollToFormPanel(resolveFormPanelId(selectedSubScreen));
 
+    if (selected?.kind === "catalog") {
+      startCatalogEditFromValidation?.(selected.id);
+      return;
+    }
+
     if (selectedConnector !== null) {
       startConnectorEdit(selectedConnector);
       return;
