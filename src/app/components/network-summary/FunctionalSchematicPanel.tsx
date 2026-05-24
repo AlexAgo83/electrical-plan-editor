@@ -10,10 +10,10 @@ import {
 } from "../../../core/functionalSchematic";
 import { CABLE_COLOR_BY_ID, getWireColorCode, getWireColorLabel } from "../../../core/cableColors";
 import type { ThemeMode } from "../../../store";
-import type { CanvasExportFormat } from "../../types/app-controller";
 import { getThemeClassNames } from "../../lib/themeModes";
 import { PreviewLoadingDialog } from "../dialogs/PreviewLoadingDialog";
 import { SvgExportPreviewDialog } from "../dialogs/SvgExportPreviewDialog";
+import { NetworkSummaryExportMenu } from "./NetworkSummaryExportMenu";
 import { type SvgPreviewOptions, useNetworkSummaryExportActions } from "./export/useNetworkSummaryExportActions";
 import {
   getFunctionalNodeClassName,
@@ -37,7 +37,6 @@ interface FunctionalSchematicPanelProps {
   selectedWireId: Wire["id"] | null;
   selectedConnectorId: ConnectorId | null;
   selectedSpliceId: SpliceId | null;
-  canvasExportFormat: CanvasExportFormat;
   themeMode: ThemeMode;
   pngExportIncludeBackground: boolean;
   exportIncludeFrame: boolean;
@@ -639,7 +638,6 @@ export function FunctionalSchematicPanel({
   selectedWireId,
   selectedConnectorId,
   selectedSpliceId,
-  canvasExportFormat,
   themeMode,
   pngExportIncludeBackground,
   exportIncludeFrame,
@@ -752,12 +750,13 @@ export function FunctionalSchematicPanel({
     createSvgPreview,
     handleCloseSvgPreview,
     handleDownloadSvgPreview,
-    handleExportPlan,
-    isSvgPreviewLoading
+    handleExportPlanAsPng,
+    handleExportPlanAsSvg,
+    isSvgPreviewLoading,
+    svgPreviewLoadingFormat
   } = useNetworkSummaryExportActions({
     networkSvgRef: svgRef,
     networkCanvasShellRef: shellRef,
-    canvasExportFormat,
     networkOffset: { x: 0, y: 0 },
     networkScale: 1,
     renderedNetworkScale: 1,
@@ -832,15 +831,16 @@ export function FunctionalSchematicPanel({
               Active network
             </button>
           )}
-          <button
-            type="button"
-            className="workspace-tab network-summary-export-button"
-            onClick={handleExportPlan}
-            disabled={!canExport}
-          >
-            <span className="network-summary-export-icon" aria-hidden="true" />
-            Export {canvasExportFormat.toUpperCase()}
-          </button>
+          <NetworkSummaryExportMenu
+            canExportSvg={canExport}
+            canExportPng={canExport}
+            onExportSvg={() => {
+              void handleExportPlanAsSvg();
+            }}
+            onExportPng={() => {
+              void handleExportPlanAsPng();
+            }}
+          />
           {onOpenOnboardingHelp === undefined ? null : (
             <button type="button" className="workspace-tab onboarding-help-button" onClick={onOpenOnboardingHelp}>
               <span className="action-button-icon is-help" aria-hidden="true" />
@@ -983,7 +983,7 @@ export function FunctionalSchematicPanel({
       <PreviewLoadingDialog
         isOpen={isSvgPreviewLoading && activeSvgPreview === null}
         themeHostClassName={dialogThemeHostClassName}
-        title="Preparing SVG preview"
+        title={`Preparing ${svgPreviewLoadingFormat.toUpperCase()} preview`}
         message="Rendering the functional schematic export."
       />
     </section>

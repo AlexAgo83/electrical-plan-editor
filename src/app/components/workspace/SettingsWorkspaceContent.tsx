@@ -6,7 +6,6 @@ import { THEME_MODE_OPTIONS } from "../../lib/themeModes";
 import type {
   AppLocale,
   CanvasCalloutTextSize,
-  CanvasExportFormat,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasResizeBehaviorMode,
@@ -115,8 +114,6 @@ interface SettingsWorkspaceContentProps {
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
   canvasNodeShapeSizePercent: number;
   setCanvasNodeShapeSizePercent: (value: number) => void;
-  canvasExportFormat: CanvasExportFormat;
-  setCanvasExportFormat: (value: CanvasExportFormat) => void;
   canvasPngExportIncludeBackground: boolean;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
   canvasExportIncludeFrame: boolean;
@@ -237,8 +234,6 @@ export function SettingsWorkspaceContent({
   setCanvasZoomInvariantNodeShapes,
   canvasNodeShapeSizePercent,
   setCanvasNodeShapeSizePercent,
-  canvasExportFormat,
-  setCanvasExportFormat,
   canvasPngExportIncludeBackground,
   setCanvasPngExportIncludeBackground,
   canvasExportIncludeFrame,
@@ -524,16 +519,6 @@ export function SettingsWorkspaceContent({
               />
               <span className="settings-range-value">{canvasNodeShapeSizePercent}%</span>
             </div>
-          </label>
-          <label className="settings-field">
-            Export format
-            <select
-              value={canvasExportFormat}
-              onChange={(event) => setCanvasExportFormat(event.target.value as CanvasExportFormat)}
-            >
-              <option value="svg">SVG</option>
-              <option value="png">PNG</option>
-            </select>
           </label>
           <label className="settings-checkbox">
             <input

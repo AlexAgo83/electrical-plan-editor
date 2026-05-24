@@ -1,21 +1,23 @@
 import { useEffect, useRef, useState, type ReactElement } from "react";
 
 interface NetworkSummaryExportMenuProps {
-  canvasExportFormat: string;
-  canExportCanvas: boolean;
-  canExportNetwork: boolean;
-  canExportBomCsv: boolean;
-  onExportCanvas: () => void;
-  onExportNetwork: () => void;
-  onExportBomCsv: () => void;
+  canExportSvg: boolean;
+  canExportPng: boolean;
+  canExportNetwork?: boolean;
+  canExportBomCsv?: boolean;
+  onExportSvg: () => void;
+  onExportPng: () => void;
+  onExportNetwork?: () => void;
+  onExportBomCsv?: () => void;
 }
 
 export function NetworkSummaryExportMenu({
-  canvasExportFormat,
-  canExportCanvas,
+  canExportSvg,
+  canExportPng,
   canExportNetwork,
   canExportBomCsv,
-  onExportCanvas,
+  onExportSvg,
+  onExportPng,
   onExportNetwork,
   onExportBomCsv
 }: NetworkSummaryExportMenuProps): ReactElement {
@@ -33,19 +35,24 @@ export function NetworkSummaryExportMenu({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
-  function handleExportCanvas() {
+  function handleExportSvg() {
     setOpen(false);
-    onExportCanvas();
+    onExportSvg();
+  }
+
+  function handleExportPng() {
+    setOpen(false);
+    onExportPng();
   }
 
   function handleExportBom() {
     setOpen(false);
-    onExportBomCsv();
+    onExportBomCsv?.();
   }
 
   function handleExportNetwork() {
     setOpen(false);
-    onExportNetwork();
+    onExportNetwork?.();
   }
 
   return (
@@ -65,30 +72,43 @@ export function NetworkSummaryExportMenu({
           <button
             type="button"
             className="network-summary-view-menu-item"
-            onClick={handleExportCanvas}
-            disabled={!canExportCanvas}
+            onClick={handleExportSvg}
+            disabled={!canExportSvg}
           >
             <span className="network-summary-export-icon" aria-hidden="true" />
-            {canvasExportFormat.toUpperCase()}
+            SVG
           </button>
           <button
             type="button"
             className="network-summary-view-menu-item"
-            onClick={handleExportNetwork}
-            disabled={!canExportNetwork}
+            onClick={handleExportPng}
+            disabled={!canExportPng}
           >
-            <span className="action-button-icon is-home-import" aria-hidden="true" />
-            Network
+            <span className="network-summary-export-icon" aria-hidden="true" />
+            PNG
           </button>
-          <button
-            type="button"
-            className="network-summary-view-menu-item"
-            onClick={handleExportBom}
-            disabled={!canExportBomCsv}
-          >
-            <span className="table-export-icon" aria-hidden="true" />
-            BOM
-          </button>
+          {onExportNetwork === undefined ? null : (
+            <button
+              type="button"
+              className="network-summary-view-menu-item"
+              onClick={handleExportNetwork}
+              disabled={!canExportNetwork}
+            >
+              <span className="action-button-icon is-home-import" aria-hidden="true" />
+              Network
+            </button>
+          )}
+          {onExportBomCsv === undefined ? null : (
+            <button
+              type="button"
+              className="network-summary-view-menu-item"
+              onClick={handleExportBom}
+              disabled={!canExportBomCsv}
+            >
+              <span className="table-export-icon" aria-hidden="true" />
+              BOM
+            </button>
+          )}
         </div>
       )}
     </div>

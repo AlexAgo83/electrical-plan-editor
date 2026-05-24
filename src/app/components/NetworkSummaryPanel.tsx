@@ -84,7 +84,6 @@ export function NetworkSummaryPanel({
   calloutTextSize,
   labelRotationDegrees,
   autoSegmentLabelRotation,
-  canvasExportFormat,
   themeMode,
   exportIncludeFrame,
   setExportIncludeFrame,
@@ -580,12 +579,13 @@ export function NetworkSummaryPanel({
     createSvgPreview,
     handleCloseSvgPreview,
     handleDownloadSvgPreview,
-    handleExportPlan,
-    isSvgPreviewLoading
+    handleExportPlanAsPng,
+    handleExportPlanAsSvg,
+    isSvgPreviewLoading,
+    svgPreviewLoadingFormat
   } = useNetworkSummaryExportActions({
     networkSvgRef,
     networkCanvasShellRef,
-    canvasExportFormat,
     networkOffset,
     networkScale: effectiveScale,
     renderedNetworkScale: effectiveRenderScale,
@@ -875,11 +875,16 @@ export function NetworkSummaryPanel({
               </button>
             )}
             <NetworkSummaryExportMenu
-              canvasExportFormat={canvasExportFormat}
-              canExportCanvas={nodes.length > 0}
+              canExportSvg={nodes.length > 0}
+              canExportPng={nodes.length > 0}
               canExportNetwork={activeNetwork !== null}
               canExportBomCsv={canExportBomCsv}
-              onExportCanvas={handleExportPlan}
+              onExportSvg={() => {
+                void handleExportPlanAsSvg();
+              }}
+              onExportPng={() => {
+                void handleExportPlanAsPng();
+              }}
               onExportNetwork={onExportNetwork}
               onExportBomCsv={onExportBomCsv}
             />
@@ -971,7 +976,6 @@ export function NetworkSummaryPanel({
           selectedWireId={selectedWireId}
           selectedConnectorId={selectedConnectorId}
           selectedSpliceId={selectedSpliceId}
-          canvasExportFormat={canvasExportFormat}
           themeMode={themeMode}
           pngExportIncludeBackground={pngExportIncludeBackground}
           exportIncludeFrame={exportIncludeFrame}
@@ -991,7 +995,7 @@ export function NetworkSummaryPanel({
       <PreviewLoadingDialog
         isOpen={isSvgPreviewLoading && activeSvgPreview === null}
         themeHostClassName={dialogThemeHostClassName}
-        title="Preparing SVG preview"
+        title={`Preparing ${svgPreviewLoadingFormat.toUpperCase()} preview`}
         message="Rendering the current network export."
       />
     </section>

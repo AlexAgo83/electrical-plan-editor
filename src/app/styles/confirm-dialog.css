@@ -371,7 +371,8 @@
   content: none;
 }
 
-.svg-preview-content > svg {
+.svg-preview-content > svg,
+.svg-preview-content > img {
   display: block;
   width: min(100%, 64rem);
   height: auto;

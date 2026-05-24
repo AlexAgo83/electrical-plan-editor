@@ -16,7 +16,6 @@ import type { ShortestRouteResult } from "../../../core/pathfinding";
 import type { SubNetworkSummary, ThemeMode } from "../../../store";
 import type {
   CanvasCalloutTextSize,
-  CanvasExportFormat,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
   CanvasLabelStrokeMode,
@@ -49,7 +48,6 @@ export interface NetworkSummaryPanelProps {
   calloutTextSize: CanvasCalloutTextSize;
   labelRotationDegrees: CanvasLabelRotationDegrees;
   autoSegmentLabelRotation: boolean;
-  canvasExportFormat: CanvasExportFormat;
   themeMode: ThemeMode;
   exportIncludeFrame: boolean;
   setExportIncludeFrame: (value: boolean) => void;

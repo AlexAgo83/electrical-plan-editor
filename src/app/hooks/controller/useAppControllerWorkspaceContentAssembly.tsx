@@ -251,7 +251,6 @@ export function useAppControllerWorkspaceContentAssembly({
       canvasNodeShapeSizePercent: models.preferencesState.canvasNodeShapeSizePercent,
       canvasResizeBehaviorMode: models.preferencesState.canvasResizeBehaviorMode,
       themeMode: models.preferencesState.themeMode,
-      canvasExportFormat: models.preferencesState.canvasExportFormat,
       canvasExportIncludeFrame: models.preferencesState.canvasExportIncludeFrame,
       setCanvasExportIncludeFrame: models.preferencesState.setCanvasExportIncludeFrame,
       canvasExportIncludeCartouche: models.preferencesState.canvasExportIncludeCartouche,

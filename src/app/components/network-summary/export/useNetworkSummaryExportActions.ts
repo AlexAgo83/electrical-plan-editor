@@ -1,13 +1,11 @@
 import { useCallback, useRef, useState, type RefObject } from "react";
 import type { ThemeMode } from "../../../../store";
-import type { CanvasExportFormat } from "../../../types/app-controller";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 import { getThemeClassNames } from "../../../lib/themeModes";
 import {
   applyExportDecorations,
   copyComputedStylesToSvgClone,
   disableSvgCloneInteractivity,
-  exportCanvasToPngBlob,
   removeGlobalRenderScaleFromSvgClone,
   resolveCanvasExportBackgroundFill
 } from "./networkSummaryExport";
@@ -15,7 +13,6 @@ import {
 interface UseNetworkSummaryExportActionsParams {
   networkSvgRef: RefObject<SVGSVGElement | null>;
   networkCanvasShellRef: RefObject<HTMLDivElement | null>;
-  canvasExportFormat: CanvasExportFormat;
   networkOffset: { x: number; y: number };
   networkScale: number;
   renderedNetworkScale: number;
@@ -39,7 +36,9 @@ interface PreparedSvgExport {
 }
 
 export interface SvgExportPreviewState {
+  format: "svg" | "png";
   svgMarkup: string;
+  pngDataUrl?: string;
   exportWidth: number;
   exportHeight: number;
   includeFrame: boolean;
@@ -54,6 +53,8 @@ export interface SvgPreviewOptions {
   includeGrid?: boolean;
   themeMode?: ThemeMode;
 }
+
+export type CanvasPreviewFormat = "svg" | "png";
 
 function prepareSvgCloneForExport(sourceSvg: SVGSVGElement): PreparedSvgExport {
   const viewBoxWidth = sourceSvg.viewBox.baseVal.width;
@@ -135,7 +136,6 @@ async function withThemedSourceSvg<T>(
 export function useNetworkSummaryExportActions({
   networkSvgRef,
   networkCanvasShellRef,
-  canvasExportFormat,
   networkOffset,
   networkScale,
   renderedNetworkScale,
@@ -153,6 +153,7 @@ export function useNetworkSummaryExportActions({
 }: UseNetworkSummaryExportActionsParams) {
   const [activeSvgPreview, setActiveSvgPreview] = useState<SvgExportPreviewState | null>(null);
   const [isSvgPreviewLoading, setIsSvgPreviewLoading] = useState(false);
+  const [svgPreviewLoadingFormat, setSvgPreviewLoadingFormat] = useState<CanvasPreviewFormat>("svg");
   const svgPreviewRequestIdRef = useRef(0);
 
   const prepareDecoratedSvgClone = useCallback(async (options?: SvgPreviewOptions) => {
@@ -232,10 +233,57 @@ export function useNetworkSummaryExportActions({
     }, 0);
   }, []);
 
+  const renderPreparedSvgAsPngDataUrl = useCallback(
+    async (prepared: PreparedSvgExport): Promise<string | null> => {
+      if (typeof window === "undefined") {
+        return null;
+      }
+
+      const serializedSvg = new XMLSerializer().serializeToString(prepared.svgClone);
+      const svgBlob = new Blob([serializedSvg], { type: "image/svg+xml;charset=utf-8" });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      try {
+        const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+          const nextImage = new Image();
+          nextImage.decoding = "async";
+          nextImage.onload = () => resolve(nextImage);
+          nextImage.onerror = () => reject(new Error("Unable to render SVG export preview."));
+          nextImage.src = svgUrl;
+        });
+
+        const exportScale = Math.max(1, Math.ceil(window.devicePixelRatio || 1));
+        const canvas = document.createElement("canvas");
+        canvas.width = prepared.exportWidth * exportScale;
+        canvas.height = prepared.exportHeight * exportScale;
+
+        const context = getCanvasTextMeasurementContext(canvas);
+        if (context === null) {
+          return null;
+        }
+
+        context.setTransform(exportScale, 0, 0, exportScale, 0, 0);
+        if (pngExportIncludeBackground) {
+          const backgroundFill = resolveCanvasExportBackgroundFill(networkCanvasShellRef.current);
+          if (backgroundFill !== null) {
+            context.fillStyle = backgroundFill;
+            context.fillRect(0, 0, prepared.exportWidth, prepared.exportHeight);
+          }
+        }
+        context.drawImage(image, 0, 0, prepared.exportWidth, prepared.exportHeight);
+
+        return canvas.toDataURL("image/png");
+      } finally {
+        URL.revokeObjectURL(svgUrl);
+      }
+    },
+    [networkCanvasShellRef, pngExportIncludeBackground]
+  );
+
   const createSvgPreview = useCallback(
     async (options?: SvgPreviewOptions) => {
       const requestId = svgPreviewRequestIdRef.current + 1;
       svgPreviewRequestIdRef.current = requestId;
+      setSvgPreviewLoadingFormat("svg");
       setIsSvgPreviewLoading(true);
       const includeFrame = options?.includeFrame ?? exportIncludeFrame;
       const includeCartouche = options?.includeCartouche ?? exportIncludeCartouche;
@@ -263,6 +311,7 @@ export function useNetworkSummaryExportActions({
 
       const svgMarkup = new XMLSerializer().serializeToString(prepared.svgClone);
       const preview = {
+        format: "svg" as const,
         svgMarkup,
         exportWidth: prepared.exportWidth,
         exportHeight: prepared.exportHeight,
@@ -278,6 +327,78 @@ export function useNetworkSummaryExportActions({
     [exportIncludeCartouche, exportIncludeFrame, exportIncludeGrid, prepareDecoratedSvgClone, themeMode]
   );
 
+  const createPngPreview = useCallback(
+    async (options?: SvgPreviewOptions) => {
+      const requestId = svgPreviewRequestIdRef.current + 1;
+      svgPreviewRequestIdRef.current = requestId;
+      setSvgPreviewLoadingFormat("png");
+      setIsSvgPreviewLoading(true);
+      const includeFrame = options?.includeFrame ?? exportIncludeFrame;
+      const includeCartouche = options?.includeCartouche ?? exportIncludeCartouche;
+      const includeGrid = options?.includeGrid ?? exportIncludeGrid;
+      const previewThemeMode = options?.themeMode ?? themeMode;
+      let prepared: PreparedSvgExport | null;
+      try {
+        await waitForPreviewRenderTurn();
+        if (requestId !== svgPreviewRequestIdRef.current) {
+          return null;
+        }
+        prepared = await prepareDecoratedSvgClone({ includeFrame, includeCartouche, includeGrid, themeMode: previewThemeMode });
+      } catch (error) {
+        if (requestId === svgPreviewRequestIdRef.current) {
+          setIsSvgPreviewLoading(false);
+        }
+        throw error;
+      }
+      if (prepared === null || requestId !== svgPreviewRequestIdRef.current) {
+        if (requestId === svgPreviewRequestIdRef.current) {
+          setIsSvgPreviewLoading(false);
+        }
+        return null;
+      }
+
+      let pngDataUrl: string | null;
+      try {
+        pngDataUrl = await renderPreparedSvgAsPngDataUrl(prepared);
+      } catch (error) {
+        if (requestId === svgPreviewRequestIdRef.current) {
+          setIsSvgPreviewLoading(false);
+        }
+        throw error;
+      }
+      if (pngDataUrl === null || requestId !== svgPreviewRequestIdRef.current) {
+        if (requestId === svgPreviewRequestIdRef.current) {
+          setIsSvgPreviewLoading(false);
+        }
+        return null;
+      }
+
+      const svgMarkup = new XMLSerializer().serializeToString(prepared.svgClone);
+      const preview = {
+        format: "png" as const,
+        svgMarkup,
+        pngDataUrl,
+        exportWidth: prepared.exportWidth,
+        exportHeight: prepared.exportHeight,
+        includeFrame,
+        includeCartouche,
+        includeGrid,
+        themeMode: previewThemeMode
+      };
+      setActiveSvgPreview(preview);
+      setIsSvgPreviewLoading(false);
+      return preview;
+    },
+    [
+      exportIncludeCartouche,
+      exportIncludeFrame,
+      exportIncludeGrid,
+      prepareDecoratedSvgClone,
+      renderPreparedSvgAsPngDataUrl,
+      themeMode
+    ]
+  );
+
   const handleExportPlanAsSvg = useCallback(async () => {
     const preview = await createSvgPreview();
     if (preview === null) {
@@ -291,6 +412,21 @@ export function useNetworkSummaryExportActions({
     }
     svgPreviewRequestIdRef.current += 1;
     setIsSvgPreviewLoading(false);
+    if (activeSvgPreview.format === "png") {
+      if (activeSvgPreview.pngDataUrl === undefined) {
+        return;
+      }
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const downloadLink = document.createElement("a");
+      downloadLink.href = activeSvgPreview.pngDataUrl;
+      downloadLink.download = `network-plan-${timestamp}.png`;
+      downloadLink.style.display = "none";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+      setActiveSvgPreview(null);
+      return;
+    }
     downloadSvgMarkup(activeSvgPreview.svgMarkup);
     setActiveSvgPreview(null);
   }, [activeSvgPreview, downloadSvgMarkup]);
@@ -306,78 +442,18 @@ export function useNetworkSummaryExportActions({
       return;
     }
 
-    const prepared = await prepareDecoratedSvgClone();
-    if (prepared === null) {
-      return;
-    }
-
-    const serializedSvg = new XMLSerializer().serializeToString(prepared.svgClone);
-    const svgBlob = new Blob([serializedSvg], { type: "image/svg+xml;charset=utf-8" });
-    const svgUrl = URL.createObjectURL(svgBlob);
-    try {
-      const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const nextImage = new Image();
-        nextImage.decoding = "async";
-        nextImage.onload = () => resolve(nextImage);
-        nextImage.onerror = () => reject(new Error("Unable to render SVG export preview."));
-        nextImage.src = svgUrl;
-      });
-
-      const exportScale = Math.max(1, Math.ceil(window.devicePixelRatio || 1));
-      const canvas = document.createElement("canvas");
-      canvas.width = prepared.exportWidth * exportScale;
-      canvas.height = prepared.exportHeight * exportScale;
-
-      const context = getCanvasTextMeasurementContext(canvas);
-      if (context === null) {
-        return;
-      }
-
-      context.setTransform(exportScale, 0, 0, exportScale, 0, 0);
-      if (pngExportIncludeBackground) {
-        const backgroundFill = resolveCanvasExportBackgroundFill(networkCanvasShellRef.current);
-        if (backgroundFill !== null) {
-          context.fillStyle = backgroundFill;
-          context.fillRect(0, 0, prepared.exportWidth, prepared.exportHeight);
-        }
-      }
-      context.drawImage(image, 0, 0, prepared.exportWidth, prepared.exportHeight);
-
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const pngBlob = await exportCanvasToPngBlob(canvas);
-      const pngBlobUrl = URL.createObjectURL(pngBlob);
-      const downloadLink = document.createElement("a");
-      downloadLink.href = pngBlobUrl;
-      downloadLink.download = `network-plan-${timestamp}.png`;
-      downloadLink.style.display = "none";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      downloadLink.remove();
-      window.setTimeout(() => {
-        URL.revokeObjectURL(pngBlobUrl);
-      }, 0);
-    } finally {
-      URL.revokeObjectURL(svgUrl);
-    }
-  }, [networkCanvasShellRef, pngExportIncludeBackground, prepareDecoratedSvgClone]);
-
-  const handleExportPlan = useCallback(() => {
-    if (canvasExportFormat === "png") {
-      void handleExportPlanAsPng();
-      return;
-    }
-
-    void handleExportPlanAsSvg();
-  }, [canvasExportFormat, handleExportPlanAsPng, handleExportPlanAsSvg]);
+    await createPngPreview();
+  }, [createPngPreview]);
 
   return {
     activeSvgPreview,
+    createPngPreview,
     createSvgPreview,
     handleCloseSvgPreview,
     handleDownloadSvgPreview,
-    handleExportPlan,
     handleExportPlanAsPng,
     handleExportPlanAsSvg,
-    isSvgPreviewLoading
+    isSvgPreviewLoading,
+    svgPreviewLoadingFormat
   };
 }

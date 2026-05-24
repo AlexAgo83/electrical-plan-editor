@@ -77,6 +77,9 @@ export function SvgExportPreviewDialog({
   if (!isOpen || preview === null) {
     return null;
   }
+  const previewFormatLabel = preview.format.toUpperCase();
+  const previewTitle = `${previewFormatLabel} preview`;
+  const previewAriaLabel = `${previewFormatLabel} export preview`;
 
   const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
     if (event.key === "Escape") {
@@ -159,7 +162,7 @@ export function SvgExportPreviewDialog({
 
   return (
     <div className={layerClassName} role="presentation">
-      <button type="button" className="confirm-dialog-backdrop" aria-label="Close SVG preview" onClick={onCancel} />
+      <button type="button" className="confirm-dialog-backdrop" aria-label={`Close ${previewFormatLabel} preview`} onClick={onCancel} />
       <section
         ref={dialogRef}
         className="confirm-dialog panel bom-preview-dialog svg-preview-dialog is-neutral"
@@ -171,11 +174,11 @@ export function SvgExportPreviewDialog({
         onKeyDown={handleDialogKeyDown}
       >
         <header className="confirm-dialog-header bom-preview-dialog-header">
-          <h2 id={titleId}>SVG preview</h2>
+          <h2 id={titleId}>{previewTitle}</h2>
           <div className="bom-preview-dialog-summary" id={descriptionId}>
             <span className="bom-preview-summary-item">
               <span className="bom-preview-summary-label">Format</span>
-              <span className="bom-preview-summary-value">SVG</span>
+              <span className="bom-preview-summary-value">{previewFormatLabel}</span>
             </span>
             <span className="bom-preview-summary-item">
               <span className="bom-preview-summary-label">Size</span>
@@ -224,9 +227,21 @@ export function SvgExportPreviewDialog({
             </button>
           ) : null}
         </div>
-        <div ref={previewShellRef} className="svg-preview-shell" tabIndex={0} aria-label="SVG export preview">
+        <div ref={previewShellRef} className="svg-preview-shell" tabIndex={0} aria-label={previewAriaLabel}>
           <div className={previewThemeHostClassName}>
-            <div className="svg-preview-content" dangerouslySetInnerHTML={{ __html: preview.svgMarkup }} />
+            {preview.format === "png" && preview.pngDataUrl !== undefined ? (
+              <div className="svg-preview-content">
+                <img
+                  src={preview.pngDataUrl}
+                  width={preview.exportWidth}
+                  height={preview.exportHeight}
+                  alt=""
+                  aria-hidden="true"
+                />
+              </div>
+            ) : (
+              <div className="svg-preview-content" dangerouslySetInnerHTML={{ __html: preview.svgMarkup }} />
+            )}
           </div>
         </div>
         <footer className="confirm-dialog-actions">
@@ -235,7 +250,7 @@ export function SvgExportPreviewDialog({
           </button>
           <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={onConfirm}>
             <span className="network-summary-export-icon" aria-hidden="true" />
-            <span>Download SVG</span>
+            <span>Download {previewFormatLabel}</span>
           </button>
         </footer>
       </section>

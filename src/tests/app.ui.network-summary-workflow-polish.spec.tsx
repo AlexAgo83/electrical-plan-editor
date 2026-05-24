@@ -211,11 +211,14 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(within(functionalActions).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
       "Grid",
       "Active network",
-      "Export SVG"
+      "Export"
     ]);
-    const exportSvgButton = within(functionalPanel).getByRole("button", { name: "Export SVG" });
+    const exportSvgButton = within(functionalPanel).getByRole("button", { name: "Export" });
     expect(exportSvgButton).toBeEnabled();
     fireEvent.click(exportSvgButton);
+    expect(within(functionalPanel).getByRole("button", { name: "SVG" })).toBeEnabled();
+    expect(within(functionalPanel).getByRole("button", { name: "PNG" })).toBeEnabled();
+    fireEvent.click(within(functionalPanel).getByRole("button", { name: "SVG" }));
     const previewDialog = await screen.findByRole("dialog", { name: "SVG preview" });
     expect(within(previewDialog).getByLabelText("SVG export preview")).toBeInTheDocument();
     expect(within(previewDialog).queryByLabelText("Include frame")).not.toBeInTheDocument();
