@@ -208,21 +208,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   });
   const { activeConfirmDialog, requestConfirmation, closeActiveConfirmDialog } = useConfirmDialogController();
   const { activeChoiceDialog, requestChoiceSelection, closeActiveChoiceDialog } = useChoiceDialogController();
-  const {
-    isInstallPromptAvailable,
-    isPwaUpdateReady,
-    isNavigationDrawerOpen,
-    isOperationsPanelOpen,
-    viewportWidth,
-    isDialogFocusActive,
-    closeNavigationDrawer,
-    handleToggleNavigationDrawer,
-    closeOperationsPanel,
-    handleToggleOperationsPanel,
-    handleOpenSettingsScreen,
-    handleInstallApp,
-    handleApplyPwaUpdate
-  } = useWorkspaceShellChrome({
+  const { isInstallPromptAvailable, isPwaUpdateReady, isNavigationDrawerOpen, isOperationsPanelOpen, viewportWidth, isDialogFocusActive, closeNavigationDrawer, handleToggleNavigationDrawer, closeOperationsPanel, handleToggleOperationsPanel, handleOpenSettingsScreen, handleInstallApp, handleApplyPwaUpdate } = useWorkspaceShellChrome({
     activeScreen,
     setActiveScreen,
     navigationDrawerRef,
@@ -1010,19 +996,5 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     inspector: { isInspectorHidden, isInspectorOpen, inspectorContextPanel }
   });
-  return <><AppShellLayout {...appShellLayoutProps} /><ToastViewport toasts={toasts} onDismissToast={dismissToast} />
-    <AppControllerOverlays
-      appShellClassName={appShellClassName}
-      activeConfirmDialog={activeConfirmDialog}
-      closeActiveConfirmDialog={closeActiveConfirmDialog}
-      activeChoiceDialog={activeChoiceDialog}
-      closeActiveChoiceDialog={closeActiveChoiceDialog}
-      activeBomPreview={activeBomPreview}
-      isBomPreviewLoading={isBomPreviewLoading}
-      closeActiveBomPreview={closeActiveBomPreview}
-      confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload}
-      openBomPreviewCatalogItem={openBomPreviewCatalogItem}
-      openBomPreviewConnector={openBomPreviewConnector}
-      onboarding={{ activeOnboardingStep, isOnboardingOpen, onboardingModalMode, onboardingStepDisplayIndex, onboardingTotalSteps, onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabledPersisted, closeOnboarding, handleOnboardingNext, canGoNext: canOnboardingGoNext, onboardingTargetActions }}
-    /></>;
+  return <><AppShellLayout {...appShellLayoutProps} /><ToastViewport toasts={toasts} onDismissToast={dismissToast} /><AppControllerOverlays appShellClassName={appShellClassName} activeConfirmDialog={activeConfirmDialog} closeActiveConfirmDialog={closeActiveConfirmDialog} activeChoiceDialog={activeChoiceDialog} closeActiveChoiceDialog={closeActiveChoiceDialog} activeBomPreview={activeBomPreview} isBomPreviewLoading={isBomPreviewLoading} closeActiveBomPreview={closeActiveBomPreview} confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload} openBomPreviewCatalogItem={openBomPreviewCatalogItem} openBomPreviewConnector={openBomPreviewConnector} onboarding={{ activeOnboardingStep, isOnboardingOpen, onboardingModalMode, onboardingStepDisplayIndex, onboardingTotalSteps, onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabledPersisted, closeOnboarding, handleOnboardingNext, canGoNext: canOnboardingGoNext, onboardingTargetActions }} /></>;
 }
