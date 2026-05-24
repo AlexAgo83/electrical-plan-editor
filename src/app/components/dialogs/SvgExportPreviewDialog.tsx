@@ -122,6 +122,7 @@ export function SvgExportPreviewDialog({
 
   const handleFrameChange = (includeFrame: boolean): void => {
     onPreviewOptionsChange({
+      format: preview.format,
       includeFrame,
       includeCartouche: preview.includeCartouche,
       includeGrid: preview.includeGrid,
@@ -131,6 +132,7 @@ export function SvgExportPreviewDialog({
 
   const handleCartoucheChange = (includeCartouche: boolean): void => {
     onPreviewOptionsChange({
+      format: preview.format,
       includeFrame: preview.includeFrame,
       includeCartouche,
       includeGrid: preview.includeGrid,
@@ -140,6 +142,7 @@ export function SvgExportPreviewDialog({
 
   const handleGridChange = (includeGrid: boolean): void => {
     onPreviewOptionsChange({
+      format: preview.format,
       includeFrame: preview.includeFrame,
       includeCartouche: preview.includeCartouche,
       includeGrid,
@@ -149,6 +152,7 @@ export function SvgExportPreviewDialog({
 
   const handleThemeChange = (themeMode: ThemeMode): void => {
     onPreviewOptionsChange({
+      format: preview.format,
       includeFrame: preview.includeFrame,
       includeCartouche: preview.includeCartouche,
       includeGrid: preview.includeGrid,

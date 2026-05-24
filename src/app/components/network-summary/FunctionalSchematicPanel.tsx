@@ -747,6 +747,7 @@ export function FunctionalSchematicPanel({
   );
   const {
     activeSvgPreview,
+    createPngPreview,
     createSvgPreview,
     handleCloseSvgPreview,
     handleDownloadSvgPreview,
@@ -774,22 +775,31 @@ export function FunctionalSchematicPanel({
   const dialogThemeHostClassName = ["app-shell", ...getThemeClassNames(themeMode)].join(" ");
   const handlePreviewOptionsChange = useCallback(
     (options: SvgPreviewOptions) => {
+      if (options.format === "png") {
+        void createPngPreview(options);
+        return;
+      }
       void createSvgPreview(options);
     },
-    [createSvgPreview]
+    [createPngPreview, createSvgPreview]
   );
   const handleRefreshPreview = useCallback(() => {
-    void createSvgPreview(
+    const options =
       activeSvgPreview === null
         ? undefined
         : {
+            format: activeSvgPreview.format,
             includeFrame: activeSvgPreview.includeFrame,
             includeCartouche: activeSvgPreview.includeCartouche,
             includeGrid: activeSvgPreview.includeGrid,
             themeMode: activeSvgPreview.themeMode
-          }
-    );
-  }, [activeSvgPreview, createSvgPreview]);
+          };
+    if (options?.format === "png") {
+      void createPngPreview(options);
+      return;
+    }
+    void createSvgPreview(options);
+  }, [activeSvgPreview, createPngPreview, createSvgPreview]);
   const canExport = graph.nodes.length > 0;
   return (
     <section

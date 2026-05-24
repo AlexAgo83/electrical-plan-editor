@@ -124,7 +124,7 @@ async function closeBlockedDialog(title: string): Promise<void> {
 }
 
 function openOpsPanel(): void {
-  fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+  fireEvent.click(screen.getByRole("button", { name: "Ops" }));
 }
 
 type DeleteEntityCase = {

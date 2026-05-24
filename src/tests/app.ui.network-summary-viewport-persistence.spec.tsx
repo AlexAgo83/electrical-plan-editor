@@ -252,7 +252,7 @@ describe("App integration UI - network summary viewport persistence", () => {
     });
     expect(viewportBeforeUndo).not.toBe(viewportAtEditTime);
 
-    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ops" }));
     fireEvent.click(screen.getByRole("button", { name: "Undo" }));
 
     await waitFor(() => {
@@ -308,7 +308,7 @@ describe("App integration UI - network summary viewport persistence", () => {
     });
     expect(viewportBeforeUndo).not.toBe(viewportAtEditTime);
 
-    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ops" }));
     fireEvent.click(screen.getByRole("button", { name: "Undo" }));
 
     await waitFor(() => {

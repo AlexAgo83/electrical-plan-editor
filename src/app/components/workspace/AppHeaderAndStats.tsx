@@ -122,11 +122,11 @@ export function AppHeaderAndStats({
             onClick={onToggleOperationsPanel}
             aria-expanded={isOperationsPanelOpen}
             aria-controls="workspace-operations-panel"
-            aria-label="Ops & Health"
+            aria-label="Ops"
             aria-description={opsStatusDescription}
           >
             <span className="header-ops-icon" aria-hidden="true" />
-            <span className="header-ops-label">Ops &amp; Health</span>
+            <span className="header-ops-label">Ops</span>
             <span
               className={validationErrorCount > 0 ? "header-ops-badge is-error" : "header-ops-badge"}
               aria-hidden="true"

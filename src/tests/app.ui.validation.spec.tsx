@@ -11,7 +11,7 @@ import {
 
 describe("App integration UI - validation", () => {
   function openOperationsHealthPanel(): void {
-    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ops" }));
   }
 
   function closeOnboardingIfOpen(): void {
@@ -228,7 +228,7 @@ describe("App integration UI - validation", () => {
     const validationButton = within(primaryNavRow as HTMLElement).getByRole("button", { name: /^Validation$/, hidden: true });
     expect(validationButton.getAttribute("aria-description")).toMatch(/issue/i);
 
-    const opsButton = screen.getByRole("button", { name: "Ops & Health" });
+    const opsButton = screen.getByRole("button", { name: "Ops" });
     expect(opsButton.getAttribute("aria-description")).toMatch(/validation issue/i);
   });
 

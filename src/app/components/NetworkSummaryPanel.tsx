@@ -576,6 +576,7 @@ export function NetworkSummaryPanel({
 
   const {
     activeSvgPreview,
+    createPngPreview,
     createSvgPreview,
     handleCloseSvgPreview,
     handleDownloadSvgPreview,
@@ -610,21 +611,27 @@ export function NetworkSummaryPanel({
       if (options.includeCartouche !== undefined) {
         setExportIncludeCartouche(options.includeCartouche);
       }
+      if (options.format === "png") {
+        void createPngPreview(options);
+        return;
+      }
       void createSvgPreview(options);
     },
-    [createSvgPreview, setExportIncludeCartouche, setExportIncludeFrame]
+    [createPngPreview, createSvgPreview, setExportIncludeCartouche, setExportIncludeFrame]
   );
 
   const handleFitNetworkAndRefreshSvgPreview = useCallback(() => {
     setPendingFitSvgPreviewOptions(
       activeSvgPreview === null
         ? {
+            format: "svg",
             includeFrame: exportIncludeFrame,
             includeCartouche: exportIncludeCartouche,
             includeGrid: showNetworkGrid,
             themeMode
           }
         : {
+            format: activeSvgPreview.format,
             includeFrame: activeSvgPreview.includeFrame,
             includeCartouche: activeSvgPreview.includeCartouche,
             includeGrid: activeSvgPreview.includeGrid,
@@ -639,9 +646,13 @@ export function NetworkSummaryPanel({
       return;
     }
 
-    void createSvgPreview(pendingFitSvgPreviewOptions);
+    if (pendingFitSvgPreviewOptions.format === "png") {
+      void createPngPreview(pendingFitSvgPreviewOptions);
+    } else {
+      void createSvgPreview(pendingFitSvgPreviewOptions);
+    }
     setPendingFitSvgPreviewOptions(null);
-  }, [createSvgPreview, pendingFitSvgPreviewOptions]);
+  }, [createPngPreview, createSvgPreview, pendingFitSvgPreviewOptions]);
 
   const normalizedConnectorDrawingScale = clampNumber(connectorDrawingScalePercent / 100, 1, 2);
   const normalizedConnectorNodeDrawingScale =

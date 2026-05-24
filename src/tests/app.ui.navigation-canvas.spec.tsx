@@ -21,7 +21,7 @@ describe("App integration UI - navigation and canvas", () => {
       connectionCount: 4
     }));
   }
-  const openOperationsHealthPanel = () => fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+  const openOperationsHealthPanel = () => fireEvent.click(screen.getByRole("button", { name: "Ops" }));
   function openNetworkSummaryEditMenu(panel: HTMLElement): void {
     const editButton = within(panel).getByRole("button", { name: "Edit" });
     if (editButton.getAttribute("aria-expanded") !== "true") {

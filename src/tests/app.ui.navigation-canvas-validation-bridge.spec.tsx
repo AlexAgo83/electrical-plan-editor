@@ -9,7 +9,7 @@ import {
 
 describe("App integration UI - navigation and canvas validation bridge", () => {
   function openOperationsHealthPanel(): void {
-    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ops" }));
   }
 
   beforeEach(() => {

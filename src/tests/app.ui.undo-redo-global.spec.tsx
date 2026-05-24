@@ -23,7 +23,7 @@ function createStateWithCatalog() {
 }
 
 function openOpsPanel(): void {
-  fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+  fireEvent.click(screen.getByRole("button", { name: "Ops" }));
 }
 
 describe("App integration UI - global undo/redo", () => {
@@ -82,7 +82,7 @@ describe("App integration UI - global undo/redo", () => {
     fireEvent.change(within(settingsPanel).getByLabelText("Theme mode"), { target: { value: "normal" } });
     openOpsPanel();
     expect(screen.getByRole("button", { name: "Undo" })).toBeDisabled();
-    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ops" }));
 
     switchScreenDrawerAware("modeling");
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
@@ -151,7 +151,7 @@ describe("App integration UI - global undo/redo", () => {
 
     openOpsPanel();
     fireEvent.click(screen.getByRole("button", { name: "Undo" }));
-    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ops" }));
     expect(screen.queryByLabelText("Recent changes list")).not.toBeInTheDocument();
   });
 

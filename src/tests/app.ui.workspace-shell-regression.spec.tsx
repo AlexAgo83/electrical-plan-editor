@@ -29,11 +29,11 @@ describe("App integration UI - workspace shell regression", () => {
   it("closes the operations panel on Escape and restores focus to the ops trigger", () => {
     renderAppWithState(createUiIntegrationState());
 
-    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ops" }));
     expect(screen.getByRole("button", { name: "Close operations panel" })).toBeInTheDocument();
 
     fireEvent.keyDown(document, { key: "Escape" });
-    const opsButton = screen.getByRole("button", { name: "Ops & Health" });
+    const opsButton = screen.getByRole("button", { name: "Ops" });
     expect(opsButton).toBeInTheDocument();
     expect(document.activeElement).toBe(opsButton);
   });
@@ -46,10 +46,10 @@ describe("App integration UI - workspace shell regression", () => {
     fireEvent.focus(screen.getByRole("button", { name: "Settings" }));
     expect(screen.getByRole("button", { name: "Open menu" })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ops" }));
     expect(screen.getByRole("button", { name: "Close operations panel" })).toBeInTheDocument();
     fireEvent.focus(screen.getByRole("button", { name: "Settings" }));
-    expect(screen.getByRole("button", { name: "Ops & Health" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ops" })).toBeInTheDocument();
     expect(document.querySelector(".workspace-ops-panel")).not.toHaveClass("is-open");
   });
 
@@ -86,7 +86,7 @@ describe("App integration UI - workspace shell regression", () => {
       expect(drawerPanel).not.toHaveAttribute("inert");
 
       fireEvent.click(screen.getByRole("button", { name: "Close menu" }));
-      fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+      fireEvent.click(screen.getByRole("button", { name: "Ops" }));
       expect(opsBackdrop).not.toBeDisabled();
       expect(opsBackdrop).toHaveAttribute("aria-hidden", "false");
       expect(opsPanel).toHaveAttribute("aria-hidden", "false");

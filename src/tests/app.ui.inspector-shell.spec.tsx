@@ -332,7 +332,7 @@ describe("App integration UI - inspector floating shell", () => {
       fireEvent.click(screen.getByRole("button", { name: "Close navigation menu" }));
       expect(getInspectorShell()).not.toBeInTheDocument();
 
-      fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+      fireEvent.click(screen.getByRole("button", { name: "Ops" }));
       expect(getInspectorShell()).not.toBeInTheDocument();
       return;
     }
@@ -343,7 +343,7 @@ describe("App integration UI - inspector floating shell", () => {
     fireEvent.click(screen.getByRole("button", { name: "Close navigation menu" }));
     expect(screen.getByLabelText("Inspector context panel")).toHaveClass("is-open");
 
-    fireEvent.click(screen.getByRole("button", { name: "Ops & Health" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ops" }));
     expect(getInspectorShell()).not.toBeInTheDocument();
   });
 });

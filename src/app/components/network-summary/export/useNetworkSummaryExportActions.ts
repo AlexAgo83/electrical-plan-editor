@@ -47,14 +47,15 @@ export interface SvgExportPreviewState {
   themeMode: ThemeMode;
 }
 
+export type CanvasPreviewFormat = "svg" | "png";
+
 export interface SvgPreviewOptions {
+  format?: CanvasPreviewFormat;
   includeFrame?: boolean;
   includeCartouche?: boolean;
   includeGrid?: boolean;
   themeMode?: ThemeMode;
 }
-
-export type CanvasPreviewFormat = "svg" | "png";
 
 function prepareSvgCloneForExport(sourceSvg: SVGSVGElement): PreparedSvgExport {
   const viewBoxWidth = sourceSvg.viewBox.baseVal.width;

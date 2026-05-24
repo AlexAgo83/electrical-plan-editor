@@ -131,7 +131,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Close menu": "Fermer le menu",
   "Install app": "Installer l'app",
   "Update ready": "Mise à jour prête",
-  "Ops & Health": "Ops et santé",
+  "Ops": "Ops",
   "Clear": "Effacer",
   "No active network selected. Open Network Scope to choose or create one.": "Aucun réseau actif sélectionné. Ouvrez Périmètre réseau pour en choisir ou en créer un.",
   "No active network selected. Load network to choose or create one.": "Aucun réseau actif sélectionné. Chargez un réseau pour en choisir ou en créer un.",
