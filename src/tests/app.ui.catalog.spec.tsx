@@ -154,10 +154,12 @@ describe("App integration UI - catalog", () => {
       target: { value: "not-a-url" }
     });
     const catalogMaterialPanel = getPanelByHeading("Connector material defaults");
-    const catalogLayoutPanel = getPanelByHeading("Connector physical layout");
     expect(catalogMaterialPanel).toHaveClass("catalog-material-defaults-panel");
-    expect(catalogLayoutPanel).toHaveClass("catalog-connector-layout-panel");
+    expect(screen.queryByRole("heading", { name: "Connector physical layout" })).not.toBeInTheDocument();
     expect(within(catalogMaterialPanel).getByRole("button", { name: "Create" })).toBeDisabled();
+    fireEvent.click(within(catalogFormPanel).getByLabelText("Connector physical layout"));
+    const catalogLayoutPanel = getPanelByHeading("Connector physical layout");
+    expect(catalogLayoutPanel).toHaveClass("catalog-connector-layout-panel");
     expect(within(catalogLayoutPanel).getByRole("button", { name: "Create" })).toBeDisabled();
     expect(within(catalogLayoutPanel).getByRole("heading", { name: "Global layout" })).toBeInTheDocument();
     expect(within(catalogLayoutPanel).getByText("6 ways").closest(".connector-layout-control-card-header")).not.toBeNull();
@@ -436,6 +438,33 @@ describe("App integration UI - catalog", () => {
       await waitFor(() => {
         expect(scrollSpy.scrollTargets).toContain(editCatalogPanel);
       });
+    } finally {
+      scrollSpy.restore();
+    }
+  }, 15000);
+
+  it("scrolls to the connector physical layout panel when enabling it", async () => {
+    const scrollSpy = installScrollIntoViewSpy();
+
+    try {
+      renderAppWithState(createUiIntegrationState());
+      fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+      switchScreenDrawerAware("modeling");
+
+      const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+      expect(secondaryNavRow).not.toBeNull();
+      fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+
+      const catalogPanel = getPanelByHeading("Catalog");
+      fireEvent.click(within(catalogPanel).getByRole("button", { name: "Create catalog item" }));
+      const catalogFormPanel = getPanelByHeading("Create catalog item");
+      fireEvent.click(within(catalogFormPanel).getByLabelText("Connector physical layout"));
+
+      const catalogLayoutPanel = getPanelByHeading("Connector physical layout");
+      await waitFor(() => {
+        expect(scrollSpy.scrollTargets).toContain(catalogLayoutPanel);
+      });
+      expect(catalogLayoutPanel).toHaveAttribute("data-form-panel", "catalog-connector-layout-form");
     } finally {
       scrollSpy.restore();
     }

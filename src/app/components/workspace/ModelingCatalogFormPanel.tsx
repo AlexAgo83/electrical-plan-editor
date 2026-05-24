@@ -2,7 +2,7 @@ import type { FormEvent, ReactElement } from "react";
 import { createDefaultConnectorLayout } from "../../../core/connectorLayout";
 import type { ConnectorLayout } from "../../../core/entities";
 import { isValidCatalogUrlInput } from "../../../store";
-import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
+import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import type { WorkspaceCurrencyCode } from "../../types/app-controller";
 import { ConnectorLayoutEditor } from "./ConnectorLayoutEditor";
 import { renderFormHeader } from "./ModelingFormsColumn.shared";
@@ -37,6 +37,8 @@ interface ModelingCatalogFormPanelProps {
   setCatalogPlugDefinitionsText: (value: string) => void;
   catalogConnectorLayout: ConnectorLayout | undefined;
   setCatalogConnectorLayout: (value: ConnectorLayout | undefined) => void;
+  catalogShowConnectorPhysicalLayout: boolean;
+  setCatalogShowConnectorPhysicalLayout: (value: boolean) => void;
   catalogManufacturerReferenceAlreadyUsed: boolean;
   cancelCatalogEdit: () => void;
   catalogFormError: string | null;
@@ -72,6 +74,8 @@ export function ModelingCatalogFormPanel({
   setCatalogPlugDefinitionsText,
   catalogConnectorLayout,
   setCatalogConnectorLayout,
+  catalogShowConnectorPhysicalLayout,
+  setCatalogShowConnectorPhysicalLayout,
   catalogManufacturerReferenceAlreadyUsed,
   cancelCatalogEdit,
   catalogFormError
@@ -179,6 +183,25 @@ export function ModelingCatalogFormPanel({
             </a>
           </div>
         ) : null}
+        <label className="settings-checkbox">
+          <input
+            type="checkbox"
+            checked={catalogShowConnectorPhysicalLayout}
+            onChange={(event) => {
+              const checked = event.target.checked;
+              setCatalogShowConnectorPhysicalLayout(checked);
+              if (!checked) {
+                setCatalogConnectorLayout(undefined);
+              } else if (catalogConnectorLayout === undefined) {
+                setCatalogConnectorLayout(createDefaultConnectorLayout(resolveCatalogLayoutConnectionCount()));
+              }
+              if (checked) {
+                scrollToFormPanel(FORM_PANEL_IDS.catalogConnectorLayout);
+              }
+            }}
+          />
+          Connector physical layout
+        </label>
         <div className="row-actions catalog-item-submit-actions">
           {renderCatalogSubmitButton()}
           <button type="button" className={catalogFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelCatalogEdit}>
@@ -246,31 +269,33 @@ export function ModelingCatalogFormPanel({
         {renderCatalogFormError()}
       </article>
 
-      <article className="panel catalog-connector-layout-panel">
-        {renderFormHeader("Connector physical layout", catalogFormMode)}
-        <ConnectorLayoutEditor
-          connectionCount={catalogConnectionCount}
-          connectorLayout={catalogConnectorLayout}
-          setConnectorLayout={setCatalogConnectorLayout}
-          showLegend={false}
-        />
-        <div className="row-actions catalog-item-submit-actions">
-          {renderCatalogSubmitButton()}
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => setCatalogConnectorLayout(createDefaultConnectorLayout(resolveCatalogLayoutConnectionCount()))}
-          >
-            <span className="action-button-icon is-catalog" aria-hidden="true" />
-            Auto layout
-          </button>
-          <button type="button" className="button-with-icon" onClick={() => setCatalogConnectorLayout(undefined)}>
-            <span className="action-button-icon is-cancel" aria-hidden="true" />
-            Clear custom layout
-          </button>
-        </div>
-        {renderCatalogFormError()}
-      </article>
+      {catalogShowConnectorPhysicalLayout ? (
+        <article className="panel catalog-connector-layout-panel" data-form-panel={FORM_PANEL_IDS.catalogConnectorLayout}>
+          {renderFormHeader("Connector physical layout", catalogFormMode)}
+          <ConnectorLayoutEditor
+            connectionCount={catalogConnectionCount}
+            connectorLayout={catalogConnectorLayout}
+            setConnectorLayout={setCatalogConnectorLayout}
+            showLegend={false}
+          />
+          <div className="row-actions catalog-item-submit-actions">
+            {renderCatalogSubmitButton()}
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={() => setCatalogConnectorLayout(createDefaultConnectorLayout(resolveCatalogLayoutConnectionCount()))}
+            >
+              <span className="action-button-icon is-catalog" aria-hidden="true" />
+              Auto layout
+            </button>
+            <button type="button" className="button-with-icon" onClick={() => setCatalogConnectorLayout(undefined)}>
+              <span className="action-button-icon is-cancel" aria-hidden="true" />
+              Clear custom layout
+            </button>
+          </div>
+          {renderCatalogFormError()}
+        </article>
+      ) : null}
     </form>
   );
 }

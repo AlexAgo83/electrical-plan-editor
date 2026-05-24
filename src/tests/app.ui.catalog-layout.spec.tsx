@@ -99,6 +99,8 @@ describe("App integration UI - catalog layout", () => {
     const catalogPanel = getPanelByHeading("Catalog");
     fireEvent.click(within(catalogPanel).getByRole("button", { name: "Create catalog item" }));
     const catalogFormPanel = getPanelByHeading("Create catalog item");
+    expect(screen.queryByRole("heading", { name: "Connector physical layout" })).not.toBeInTheDocument();
+    fireEvent.click(within(catalogFormPanel).getByLabelText("Connector physical layout"));
     const catalogLayoutPanel = getPanelByHeading("Connector physical layout");
 
     fireEvent.change(within(catalogFormPanel).getByLabelText("Connection count"), {

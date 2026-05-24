@@ -29,6 +29,7 @@ export function useEntityFormsState() {
   const [catalogDefaultSealName, setCatalogDefaultSealName] = useState("");
   const [catalogPlugDefinitionsText, setCatalogPlugDefinitionsText] = useState("");
   const [catalogConnectorLayout, setCatalogConnectorLayout] = useState<ConnectorLayout | undefined>(undefined);
+  const [catalogShowConnectorPhysicalLayout, setCatalogShowConnectorPhysicalLayout] = useState(false);
   const [catalogFormError, setCatalogFormError] = useState<string | null>(null);
 
   const [connectorFormMode, setConnectorFormMode] = useState<"idle" | "create" | "edit">("idle");
@@ -154,6 +155,8 @@ export function useEntityFormsState() {
     setCatalogPlugDefinitionsText,
     catalogConnectorLayout,
     setCatalogConnectorLayout,
+    catalogShowConnectorPhysicalLayout,
+    setCatalogShowConnectorPhysicalLayout,
     catalogFormError,
     setCatalogFormError,
     connectorFormMode,

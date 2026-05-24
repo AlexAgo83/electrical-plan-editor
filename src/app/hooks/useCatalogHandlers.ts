@@ -46,6 +46,8 @@ interface UseCatalogHandlersParams {
   setCatalogPlugDefinitionsText?: (value: string) => void;
   catalogConnectorLayout?: ConnectorLayout | undefined;
   setCatalogConnectorLayout?: (value: ConnectorLayout | undefined) => void;
+  catalogShowConnectorPhysicalLayout?: boolean;
+  setCatalogShowConnectorPhysicalLayout?: (value: boolean) => void;
   setCatalogFormError: (value: string | null) => void;
 }
 
@@ -93,6 +95,8 @@ export function useCatalogHandlers({
   setCatalogPlugDefinitionsText = () => {},
   catalogConnectorLayout,
   setCatalogConnectorLayout = () => {},
+  catalogShowConnectorPhysicalLayout = false,
+  setCatalogShowConnectorPhysicalLayout = () => {},
   setCatalogFormError
 }: UseCatalogHandlersParams) {
   function clearCatalogMaterialDefaults(): void {
@@ -103,6 +107,7 @@ export function useCatalogHandlers({
     setCatalogDefaultSealName("");
     setCatalogPlugDefinitionsText("");
     setCatalogConnectorLayout(undefined);
+    setCatalogShowConnectorPhysicalLayout(false);
   }
 
   function clearCatalogForm(): void {
@@ -153,6 +158,7 @@ export function useCatalogHandlers({
         .join("\n") ?? ""
     );
     setCatalogConnectorLayout(item.connectorLayout);
+    setCatalogShowConnectorPhysicalLayout(item.connectorLayout !== undefined);
     setCatalogFormError(null);
     dispatchAction(appActions.select({ kind: "catalog", id: item.id }), { trackHistory: false });
   }
@@ -207,7 +213,9 @@ export function useCatalogHandlers({
       setCatalogFormError("Plug definitions must use one line per plug: reference,quantity,name.");
       return;
     }
-    const normalizedConnectorLayout = normalizeConnectorLayout(catalogConnectorLayout, connectionCount);
+    const normalizedConnectorLayout = catalogShowConnectorPhysicalLayout
+      ? normalizeConnectorLayout(catalogConnectorLayout, connectionCount)
+      : undefined;
     setCatalogFormError(null);
 
     const existing =
