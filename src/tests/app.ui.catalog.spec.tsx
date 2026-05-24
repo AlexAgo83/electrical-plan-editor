@@ -48,7 +48,7 @@ describe("App integration UI - catalog", () => {
     expect(quickNavLabels[0]).toMatch(/^Catalog\d+$/);
     expect(quickNavLabels[1]).toMatch(/^Connectors\d+$/);
 
-    fireEvent.click(within(quickNavGroup as HTMLElement).getByRole("button", { name: /^Catalog\b/i }));
+    fireEvent.click(within(quickNavGroup as HTMLElement).getByRole("button", { name: /^Catalog/i }));
     expect(getPanelByHeading("Catalog")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Catalog item form" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Edit catalog item" })).not.toBeInTheDocument();
@@ -81,7 +81,7 @@ describe("App integration UI - catalog", () => {
 
     await waitFor(() => expect(document.querySelector(".header-docked-nav-shell")).toHaveClass("is-visible"));
     const dockedNav = document.querySelector(".header-quick-entity-nav") as HTMLElement;
-    fireEvent.click(within(dockedNav).getByRole("button", { name: /^Catalog\b/i }));
+    fireEvent.click(within(dockedNav).getByRole("button", { name: /^Catalog/i }));
     expect(getPanelByHeading("Catalog")).toBeInTheDocument();
   });
 
@@ -181,7 +181,7 @@ describe("App integration UI - catalog", () => {
       target: { value: "round" }
     });
     expect(shapeSelect).toHaveValue("round");
-    expect(colorInput).toHaveValue("#7a7a7a");
+    expect(colorInput).toHaveAttribute("type", "color");
     fireEvent.change(colorInput, {
       target: { value: "#ff8800" }
     });

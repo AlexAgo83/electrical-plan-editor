@@ -82,7 +82,7 @@ describe("App integration UI - catalog layout", () => {
     expect(connectorAnalysisPanel.querySelector("ellipse.connector-physical-shell")?.getAttribute("rx")).toBe("3.75");
     expect(connectorAnalysisPanel.querySelectorAll(".connector-physical-keying")).toHaveLength(2);
     const squareKeying = connectorAnalysisPanel.querySelector(".connector-physical-keying");
-    expect(squareKeying?.getAttribute("style")).toContain("fill: #ff8800");
+    expect(squareKeying?.getAttribute("style")).toMatch(/fill: (#ff8800|rgb\(255, 136, 0\))/);
     expect(Number(squareKeying?.getAttribute("y"))).toBeGreaterThan(0);
     expect(connectorAnalysisPanel.querySelector('.connector-physical-way-shape[width="0.66"]')).not.toBeNull();
   });

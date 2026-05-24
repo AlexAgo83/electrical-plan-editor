@@ -313,7 +313,7 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(assemblyPanel).toHaveTextContent("Filtered trace across Main assembly");
     expect(assemblyPanel).toHaveTextContent("W-1");
 
-    const harnessBCheckbox = within(manager).getByRole("checkbox", { name: /Harness B H-B/i });
+    const harnessBCheckbox = within(manager).getByRole("checkbox", { name: /Harness B.*H-B/i });
     fireEvent.click(harnessBCheckbox);
     expect(manager).toHaveTextContent("Unsaved assembly edits are not reflected in the visualization yet.");
     expect(assemblyPanel).toHaveTextContent("Filtered trace across Main assembly");

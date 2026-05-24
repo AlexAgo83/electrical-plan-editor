@@ -195,6 +195,24 @@ function resolveElementStyleValue(style: CSSStyleDeclaration, property: string, 
   return value.length > 0 ? value : fallback;
 }
 
+function isUninformativeSvgColor(value: string): boolean {
+  const normalized = value.trim().toLowerCase().replace(/\s+/g, " ");
+  return (
+    normalized.length === 0 ||
+    normalized === "transparent" ||
+    normalized === "currentcolor" ||
+    normalized === "#000" ||
+    normalized === "#000000" ||
+    normalized === "rgb(0, 0, 0)" ||
+    normalized === "rgba(0, 0, 0, 0)"
+  );
+}
+
+function resolveCartoucheColor(style: CSSStyleDeclaration, property: string, fallback: string): string {
+  const value = style.getPropertyValue(property).trim();
+  return isUninformativeSvgColor(value) ? fallback : value;
+}
+
 function measureTextWidth(text: string, font: string): number {
   const canvas = document.createElement("canvas");
   const context = getCanvasTextMeasurementContext(canvas);
@@ -413,11 +431,11 @@ function appendExportCartoucheOverlay(params: {
   const rowStyle = window.getComputedStyle(rowTextSource ?? params.sourceSvg);
   const titleStyle = window.getComputedStyle(titleSource ?? rowTextSource ?? params.sourceSvg);
 
-  const fillColor = resolveElementStyleValue(frameStyle, "fill", "rgba(223, 240, 255, 0.92)");
+  const fillColor = resolveCartoucheColor(frameStyle, "fill", "rgba(223, 240, 255, 0.92)");
   const fillOpacity = resolveElementStyleValue(frameStyle, "fill-opacity", "0.92");
-  const strokeColor = resolveElementStyleValue(frameStyle, "stroke", "var(--network-node-stroke-color, #55748d)");
-  const textColor = resolveElementStyleValue(rowStyle, "fill", "var(--network-node-label-color, #183549)");
-  const subtleTextColor = resolveElementStyleValue(
+  const strokeColor = resolveCartoucheColor(frameStyle, "stroke", "var(--network-node-stroke-color, #55748d)");
+  const textColor = resolveCartoucheColor(rowStyle, "fill", "var(--network-node-label-color, #183549)");
+  const subtleTextColor = resolveCartoucheColor(
     titleStyle,
     "fill",
     "var(--network-segment-length-label-color, #547086)"

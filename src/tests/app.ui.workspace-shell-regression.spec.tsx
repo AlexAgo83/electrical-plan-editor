@@ -219,7 +219,7 @@ describe("App integration UI - workspace shell regression", () => {
     fireEvent.click(within(primaryNavRow as HTMLElement).getByRole("button", { name: /Modeling/i, hidden: true }));
 
     const quickEntityNav = screen.getByRole("group", { name: "Quick entity navigation strip" });
-    fireEvent.click(within(quickEntityNav).getByRole("button", { name: /Connectors 1/i }));
+    fireEvent.click(within(quickEntityNav).getByRole("button", { name: /Connectors\s*1/i }));
     let connectorsPanel = screen.getByRole("heading", { name: "Connectors" }).closest(".panel");
     expect(connectorsPanel).not.toBeNull();
     fireEvent.click(within(connectorsPanel as HTMLElement).getByText("Connector 1"));
