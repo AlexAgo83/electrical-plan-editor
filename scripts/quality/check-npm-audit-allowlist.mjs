@@ -1,16 +1,27 @@
 import { spawnSync } from "node:child_process";
 
+// fixAvailable may be false (no fix) or an object with isSemVerMajor:true
+// (fix requires a major version change — downgrade to exceljs@3.x is not viable).
+function isNoViableFix(fixAvailable) {
+  return (
+    fixAvailable === false ||
+    (typeof fixAvailable === "object" &&
+      fixAvailable !== null &&
+      fixAvailable.isSemVerMajor === true)
+  );
+}
+
 const ALLOWED_VULNERABILITIES = [
   {
     name: "exceljs",
     severity: "moderate",
-    reason: "exceljs@4.4.0 is the latest upstream release and still depends on vulnerable uuid; XLSX export is dynamically loaded and isolated.",
+    reason: "exceljs@4.x is the latest upstream release and still depends on vulnerable uuid; the only available fix is a downgrade to 3.x (isSemVerMajor). XLSX export is dynamically loaded and isolated.",
     matches(vulnerability) {
       return (
         vulnerability.name === "exceljs" &&
         vulnerability.severity === "moderate" &&
         vulnerability.isDirect === true &&
-        vulnerability.fixAvailable === false &&
+        isNoViableFix(vulnerability.fixAvailable) &&
         Array.isArray(vulnerability.via) &&
         vulnerability.via.length === 1 &&
         vulnerability.via[0] === "uuid"
@@ -20,12 +31,12 @@ const ALLOWED_VULNERABILITIES = [
   {
     name: "uuid",
     severity: "moderate",
-    reason: "Transitive dependency of exceljs only; no upstream exceljs release currently removes it.",
+    reason: "Transitive dependency of exceljs only; no upstream exceljs@4.x release currently removes it.",
     matches(vulnerability) {
       return (
         vulnerability.name === "uuid" &&
         vulnerability.severity === "moderate" &&
-        vulnerability.fixAvailable === false &&
+        isNoViableFix(vulnerability.fixAvailable) &&
         Array.isArray(vulnerability.effects) &&
         vulnerability.effects.length === 1 &&
         vulnerability.effects[0] === "exceljs" &&

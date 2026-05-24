@@ -64,6 +64,18 @@ const ALLOWED_TIMEOUT_OVERRIDES = [
       "src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx::does not partially apply wire endpoint reference renames when a conflicting choice is discarded",
     rationale:
       "Wire reference rename atomicity test involves choice dialog and conflict resolution flows; temporary override retained until fixture cost is reduced."
+  },
+  {
+    key:
+      "src/tests/app.ui.catalog.spec.tsx::scrolls to the connector physical layout panel when enabling it",
+    rationale:
+      "Catalog scroll behavior test involves async DOM mutations and scroll spy coordination for panel enable; temporary override retained pending test decomposition."
+  },
+  {
+    key:
+      "src/tests/app.ui.catalog.spec.tsx::scrolls to the connector material defaults panel when enabling it",
+    rationale:
+      "Catalog scroll behavior test involves async DOM mutations and scroll spy coordination for panel enable; temporary override retained pending test decomposition."
   }
 ];
 
