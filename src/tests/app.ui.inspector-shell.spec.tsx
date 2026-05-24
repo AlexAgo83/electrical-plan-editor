@@ -322,6 +322,45 @@ describe("App integration UI - inspector floating shell", () => {
     }
   });
 
+  it("opens referenced catalog items from inspector manufacturer references", () => {
+    const baseState = createUiIntegrationState();
+    const connector = baseState.connectors.byId[asConnectorId("C1")];
+    if (connector === undefined) {
+      throw new Error("Expected connector C1 in integration state.");
+    }
+    const stateWithCatalog = appReducer(
+      appReducer(
+        baseState,
+        appActions.upsertCatalogItem({
+          id: asCatalogItemId("CAT-INTERNAL-1"),
+          manufacturerReference: "CAT-MFR-1",
+          name: "Catalog inspector sample",
+          connectionCount: connector.cavityCount
+        })
+      ),
+      appActions.upsertConnector({
+        ...connector,
+        catalogItemId: asCatalogItemId("CAT-INTERNAL-1"),
+        manufacturerReference: "CAT-MFR-1"
+      })
+    );
+
+    renderAppWithState(stateWithCatalog);
+    closeOnboardingIfOpen();
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Select Connector 1 (C-1)" }));
+    const inspectorShell = getInspectorShell();
+    if (inspectorShell === null) {
+      return;
+    }
+
+    fireEvent.click(within(getPanelByHeading("Inspector context")).getByRole("button", { name: "CAT-MFR-1" }));
+
+    expect(within(getPanelByHeading("Edit catalog item")).getByLabelText("Manufacturer reference")).toHaveValue("CAT-MFR-1");
+  });
+
   it("hides inspector on Validation, Network Scope and Settings", () => {
     renderAppWithState(createUiIntegrationState());
 

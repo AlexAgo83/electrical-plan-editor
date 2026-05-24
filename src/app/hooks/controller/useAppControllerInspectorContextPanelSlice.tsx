@@ -12,6 +12,7 @@ type InspectorContextPanelControllerSliceParams = Omit<
   | "connectorOccupiedCount"
   | "spliceOccupiedCount"
   | "onEditSelected"
+  | "onSelectCatalogItem"
   | "onClearSelection"
   | "onSuggestOptimizedSplicePlacement"
 > & {
@@ -23,6 +24,7 @@ type InspectorContextPanelControllerSliceParams = Omit<
   selectedConnectorOccupiedCount: number;
   selectedSpliceOccupiedCount: number;
   handleStartSelectedEdit: ComponentProps<typeof InspectorContextPanel>["onEditSelected"];
+  onSelectCatalogItem: ComponentProps<typeof InspectorContextPanel>["onSelectCatalogItem"];
   onClearSelection: ComponentProps<typeof InspectorContextPanel>["onClearSelection"];
   onCloseInspector: ComponentProps<typeof InspectorContextPanel>["onCloseInspector"];
   onSuggestOptimizedSplicePlacement: ComponentProps<typeof InspectorContextPanel>["onSuggestOptimizedSplicePlacement"];
@@ -48,6 +50,7 @@ export function useInspectorContextPanelControllerSlice(params: InspectorContext
     spliceOccupiedCount: params.selectedSpliceOccupiedCount,
     describeNode: params.describeNode,
     onEditSelected: params.handleStartSelectedEdit,
+    onSelectCatalogItem: params.onSelectCatalogItem,
     onClearSelection: params.onClearSelection,
     onSuggestOptimizedSplicePlacement: params.onSuggestOptimizedSplicePlacement
   } satisfies ComponentProps<typeof InspectorContextPanel>;

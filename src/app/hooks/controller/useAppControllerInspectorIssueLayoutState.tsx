@@ -1,7 +1,7 @@
 import { useIssueNavigatorModel } from "../useIssueNavigatorModel";
 import { useInspectorPanelVisibility } from "../useInspectorPanelVisibility";
 import { useInspectorContextPanelControllerSlice } from "./useAppControllerInspectorContextPanelSlice";
-import type { NetworkNode, SpliceId } from "../../../core/entities";
+import type { CatalogItemId, NetworkNode, SpliceId } from "../../../core/entities";
 import { SpliceLengthSuggestionPanel } from "../../components/SpliceLengthSuggestionPanel";
 import type { PendingSpliceLengthSuggestion } from "../useSpliceHandlers";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
@@ -48,6 +48,7 @@ interface UseAppControllerInspectorIssueLayoutStateParams {
   isOperationsPanelOpen: boolean;
   describeNode: (node: NetworkNode) => string;
   handleStartSelectedEdit: () => void;
+  onSelectCatalogItem: (catalogItemId: CatalogItemId) => void;
   onClearSelection: () => void;
   formsState: Pick<
     EntityFormsStateModel,
@@ -83,6 +84,7 @@ export function useAppControllerInspectorIssueLayoutState({
   isOperationsPanelOpen,
   describeNode,
   handleStartSelectedEdit,
+  onSelectCatalogItem,
   onClearSelection,
   formsState,
   spliceLengthSuggestion,
@@ -160,6 +162,7 @@ export function useAppControllerInspectorIssueLayoutState({
     selectedSpliceOccupiedCount: selectionEntities.selectedSpliceOccupiedCount,
     describeNode,
     handleStartSelectedEdit,
+    onSelectCatalogItem,
     onClearSelection,
     onCloseInspector,
     onSuggestOptimizedSplicePlacement

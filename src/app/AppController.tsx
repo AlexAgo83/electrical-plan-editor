@@ -658,6 +658,20 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setDetailPanelsSelectionSource,
     onSelectEntityWithoutHistory: handleSelectEntityWithoutHistory
   });
+  const handleSelectCatalogItemFromInspector = useCallback(
+    (catalogItemId: CatalogItemId) => {
+      markDetailPanelsSelectionSourceAsTable();
+      setActiveScreen("modeling");
+      setActiveSubScreen("catalog");
+      const catalogItem = store.getState().catalogItems.byId[catalogItemId];
+      if (catalogItem !== undefined) {
+        catalogHandlers.startCatalogEdit(catalogItem);
+        return;
+      }
+      dispatchAction(appActions.select({ kind: "catalog", id: catalogItemId }));
+    },
+    [catalogHandlers, dispatchAction, markDetailPanelsSelectionSourceAsTable, setActiveScreen, setActiveSubScreen, store]
+  );
 
   useAppControllerAnalysisSubScreenTrackingEffect({
     activeScreen,
@@ -781,6 +795,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isOperationsPanelOpen,
     describeNode,
     handleStartSelectedEdit: selectionHandlersDomain.handleStartSelectedEdit,
+    onSelectCatalogItem: handleSelectCatalogItemFromInspector,
     onClearSelection: () => {
       dispatchAction(appActions.clearSelection());
       clearAllModelingForms();

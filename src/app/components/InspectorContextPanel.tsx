@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, getWireColorLabel, isWireFreeColorMode, type WireColorMode } from "../../core/cableColors";
 import type { CatalogItem, Connector, NetworkNode, Segment, Splice, SpliceId, Wire } from "../../core/entities";
 import type { SelectionState } from "../../store/types";
+import { EntityReferenceButton } from "./workspace/EntityReferenceButton";
 
 interface InspectorContextPanelProps {
   mode: "open" | "collapsed";
@@ -22,6 +23,7 @@ interface InspectorContextPanelProps {
   spliceOccupiedCount: number;
   describeNode: (node: NetworkNode) => string;
   onEditSelected: () => void;
+  onSelectCatalogItem: (catalogItemId: CatalogItem["id"]) => void;
   onClearSelection: () => void;
   onSuggestOptimizedSplicePlacement: (spliceId: SpliceId) => void;
 }
@@ -45,9 +47,22 @@ export function InspectorContextPanel({
   spliceOccupiedCount,
   describeNode,
   onEditSelected,
+  onSelectCatalogItem,
   onClearSelection,
   onSuggestOptimizedSplicePlacement
 }: InspectorContextPanelProps): ReactElement {
+  function renderCatalogReference(reference: string, catalogItemId: CatalogItem["id"] | undefined): ReactElement | string {
+    if (catalogItemId === undefined) {
+      return reference;
+    }
+
+    return (
+      <EntityReferenceButton title={`Open catalog item ${reference}`} onClick={() => onSelectCatalogItem(catalogItemId)}>
+        <span className="technical-id">{reference}</span>
+      </EntityReferenceButton>
+    );
+  }
+
   function renderCableColorSwatches(
     colorMode: WireColorMode | null | undefined,
     primaryColorId: string | null,
@@ -134,7 +149,10 @@ export function InspectorContextPanel({
     detailRows.push({ label: "Name", value: selectedConnector.name });
     detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedConnector.technicalId}</span> });
     if ((selectedConnector.manufacturerReference?.trim() ?? "").length > 0) {
-      detailRows.push({ label: "Manufacturer reference", value: selectedConnector.manufacturerReference as string });
+      detailRows.push({
+        label: "Manufacturer reference",
+        value: renderCatalogReference(selectedConnector.manufacturerReference as string, selectedConnector.catalogItemId)
+      });
     }
     detailRows.push({ label: "Ways", value: `${selectedConnector.cavityCount} / Occupied ${connectorOccupiedCount}` });
   }
@@ -143,7 +161,10 @@ export function InspectorContextPanel({
     detailRows.push({ label: "Name", value: selectedSplice.name });
     detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedSplice.technicalId}</span> });
     if ((selectedSplice.manufacturerReference?.trim() ?? "").length > 0) {
-      detailRows.push({ label: "Manufacturer reference", value: selectedSplice.manufacturerReference as string });
+      detailRows.push({
+        label: "Manufacturer reference",
+        value: renderCatalogReference(selectedSplice.manufacturerReference as string, selectedSplice.catalogItemId)
+      });
     }
     detailRows.push({ label: "Ports", value: `${selectedSplice.portCount} / Occupied ${spliceOccupiedCount}` });
   }
