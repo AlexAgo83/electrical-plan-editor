@@ -360,6 +360,10 @@
   max-width: 100%;
 }
 
+.catalog-usage-empty-actions {
+  margin-top: 0.85rem;
+}
+
 .catalog-reference-table {
   table-layout: fixed;
 }

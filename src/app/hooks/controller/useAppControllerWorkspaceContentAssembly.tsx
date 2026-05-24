@@ -293,6 +293,7 @@ export function useAppControllerWorkspaceContentAssembly({
     onExportNetwork: () => domains.workspaceNetworkDomain.handleExportNetworksWithActiveSaveConfirmation("active"),
     handleRegenerateLayout: domains.workspaceNetworkDomain.handleRegenerateLayout,
     markDetailPanelsSelectionSourceAsTable: handlers.markDetailPanelsSelectionSourceAsTable,
+    startWireEdit: models.modelingHandlers.wire.startWireEdit,
     onOpenHarnessAssemblyOnboardingHelp: () => handlers.openSingleStepOnboarding("harnessAssembly"),
     dispatchAction: handlers.dispatchAction,
     store: handlers.store

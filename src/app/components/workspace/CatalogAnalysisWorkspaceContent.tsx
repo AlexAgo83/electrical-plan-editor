@@ -73,7 +73,7 @@ function CatalogUsageTableSection({
       <article className="panel">
         {renderHeader()}
         <p className="empty-copy">No linked {activeLabel} for the selected catalog item.</p>
-        <div className="row-actions compact">
+        <div className="row-actions compact catalog-usage-empty-actions">
           <button type="button" className="button-with-icon" onClick={onCreate}>
             <span className={`action-button-icon ${createIconClass}`} aria-hidden="true" />
             {createLabel}

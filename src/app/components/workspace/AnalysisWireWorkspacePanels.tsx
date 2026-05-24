@@ -479,14 +479,14 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
       <div className="route-preview-selection-strip">
         <article>
           <span>Start</span>
-          <strong>{describeWireEndpoint(selectedWire.endpointA)}</strong>
+          <strong>{renderWireEndpointReference(selectedWire.endpointA)}</strong>
         </article>
         <span className="route-preview-selection-arrow" aria-hidden="true">
           &rarr;
         </span>
         <article>
           <span>End</span>
-          <strong>{describeWireEndpoint(selectedWire.endpointB)}</strong>
+          <strong>{renderWireEndpointReference(selectedWire.endpointB)}</strong>
         </article>
       </div>
 

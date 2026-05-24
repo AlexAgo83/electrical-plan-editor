@@ -209,6 +209,9 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(networkSummaryPanel.querySelector(".network-node-connector-drawing")).not.toBeNull();
     expect(networkSummaryPanel.querySelectorAll(".network-graph-layer-callouts .network-callout-connector-drawing")).toHaveLength(0);
     expect(networkSummaryPanel.querySelectorAll(".network-node-connector-drawing .network-callout-connector-way.is-wire-highlighted")).toHaveLength(1);
+
+    fireEvent.mouseDown(within(networkSummaryPanel).getByRole("button", { name: "Select wire connected to C1" }));
+    expect(within(getPanelByHeading("Edit Wire")).getByDisplayValue("W-1")).toBeInTheDocument();
   });
 
   it("does not draw generated connector layouts inside callouts", () => {

@@ -39,9 +39,12 @@ describe("App integration UI - analysis go-to wire actions", () => {
 
     const wireAnalysisPanel = getPanelByHeading("Wire analysis");
     expect(within(wireAnalysisPanel).getByText("Wire 1")).toBeInTheDocument();
+    expect(within(wireAnalysisPanel).getByRole("button", { name: "Connector 1 (C-1) / C1" })).toBeInTheDocument();
+    fireEvent.click(within(wireAnalysisPanel).getByRole("button", { name: "Splice 1 (S-1) / P1" }));
+    expect(getPanelByHeading("Splice analysis")).toBeInTheDocument();
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
-    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/, hidden: true })).toHaveClass("is-active");
+    expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Splice$/, hidden: true })).toHaveClass("is-active");
   });
 
   it("shows wire color markers in connector ways and physical views", () => {

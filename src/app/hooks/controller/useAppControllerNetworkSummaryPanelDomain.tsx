@@ -170,6 +170,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   onExportNetwork: () => void;
   handleRegenerateLayout: () => void;
   markDetailPanelsSelectionSourceAsTable: () => void;
+  startWireEdit: (wire: Wire) => void;
   onOpenHarnessAssemblyOnboardingHelp: () => void;
   dispatchAction: (action: AppAction, options?: { trackHistory?: boolean }) => void;
   store: AppStore;
@@ -227,6 +228,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   onExportNetwork,
   handleRegenerateLayout,
   markDetailPanelsSelectionSourceAsTable,
+  startWireEdit,
   onOpenHarnessAssemblyOnboardingHelp,
   dispatchAction,
   store
@@ -266,13 +268,17 @@ export function useAppControllerNetworkSummaryPanelDomain({
 
   const handleSelectWireFromConnectorPin = useCallback(
     (wireId: Wire["id"]) => {
+      const wire = store.getState().wires.byId[wireId];
+      if (wire === undefined) {
+        return;
+      }
       unstable_batchedUpdates(() => {
         setActiveSubScreen("wire");
         markDetailPanelsSelectionSourceAsTable();
-        dispatchAction(appActions.select({ kind: "wire", id: wireId }), { trackHistory: false });
+        startWireEdit(wire);
       });
     },
-    [dispatchAction, markDetailPanelsSelectionSourceAsTable, setActiveSubScreen]
+    [markDetailPanelsSelectionSourceAsTable, setActiveSubScreen, startWireEdit, store]
   );
 
   const persistConnectorCalloutPosition = useCallback(
