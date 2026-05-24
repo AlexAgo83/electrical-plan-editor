@@ -17,6 +17,7 @@ import {
   switchSubScreenDrawerAware,
   withViewportWidth
 } from "./helpers/app-ui-test-utils";
+import { installScrollIntoViewSpy } from "./helpers/app-ui-form-test-utils";
 
 function setViewportWidth(width: number): void {
   Object.defineProperty(window, "innerWidth", {
@@ -129,6 +130,35 @@ describe("App integration UI - inspector floating shell", () => {
     expect(getInspectorShell()).not.toBeInTheDocument();
   });
 
+  it("labels the inspector selected-entity action as edit and scrolls to the edit panel", async () => {
+    const scrollSpy = installScrollIntoViewSpy();
+    try {
+      renderAppWithState(createUiIntegrationState());
+      closeOnboardingIfOpen();
+      switchScreenDrawerAware("modeling");
+
+      const networkSummaryPanel = getPanelByHeading("Network summary");
+      fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Select Connector 1 (C-1)" }));
+      const inspectorShell = getInspectorShell();
+      if (inspectorShell === null) {
+        return;
+      }
+
+      const inspectorPanel = getPanelByHeading("Inspector context");
+      expect(within(inspectorPanel).queryByRole("button", { name: "Select" })).not.toBeInTheDocument();
+      fireEvent.click(within(inspectorPanel).getByRole("button", { name: "Edit" }));
+
+      expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
+      await waitFor(() => {
+        expect(
+          scrollSpy.scrollTargets.some((target) => target.getAttribute("data-form-panel") === "modeling-connector-form")
+        ).toBe(true);
+      });
+    } finally {
+      scrollSpy.restore();
+    }
+  });
+
   it("offers optimized splice length suggestions from the inspector splice actions", async () => {
     const state = reduceAll([
       appActions.upsertConnector({ id: asConnectorId("C-L"), name: "Left", technicalId: "C-L", cavityCount: 1 }),
@@ -186,6 +216,7 @@ describe("App integration UI - inspector floating shell", () => {
 
     const inspectorPanel = getPanelByHeading("Inspector context");
     expect(within(inspectorPanel).queryByRole("button", { name: "Select" })).not.toBeInTheDocument();
+    expect(within(inspectorPanel).getByRole("button", { name: "Edit" })).toBeInTheDocument();
     fireEvent.click(within(inspectorPanel).getByRole("button", { name: "Suggest optimized lengths" }));
 
     await waitFor(() => {

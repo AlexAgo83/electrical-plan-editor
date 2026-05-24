@@ -2,6 +2,7 @@ import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, SegmentId, S
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { resolveEndpointNodeId } from "../lib/app-utils-networking";
+import { FORM_PANEL_IDS, scrollToFormPanel, type FormPanelId } from "../lib/form-panel-scroll";
 import type {
   InteractionMode,
   NodePosition,
@@ -98,6 +99,25 @@ export function useSelectionHandlers({
   startSegmentEdit,
   startWireEdit
 }: UseSelectionHandlersParams) {
+  function resolveFormPanelId(subScreen: SubScreenId): FormPanelId {
+    if (subScreen === "catalog") {
+      return FORM_PANEL_IDS.catalog;
+    }
+    if (subScreen === "connector") {
+      return FORM_PANEL_IDS.connector;
+    }
+    if (subScreen === "splice") {
+      return FORM_PANEL_IDS.splice;
+    }
+    if (subScreen === "node") {
+      return FORM_PANEL_IDS.node;
+    }
+    if (subScreen === "segment") {
+      return FORM_PANEL_IDS.segment;
+    }
+    return FORM_PANEL_IDS.wire;
+  }
+
   function resolveSelectionAnchor(target: SelectionTarget): NodePosition | null {
     if (target.kind === "node") {
       return networkNodePositions[target.id as NodeId] ?? null;
@@ -337,6 +357,7 @@ export function useSelectionHandlers({
 
     setActiveScreen("modeling");
     setActiveSubScreen(selectedSubScreen);
+    scrollToFormPanel(resolveFormPanelId(selectedSubScreen));
 
     if (selectedConnector !== null) {
       startConnectorEdit(selectedConnector);

@@ -266,10 +266,10 @@ export function InspectorContextPanel({
                 Suggest optimized lengths
               </button>
             ) : null}
-            {selectedSplice === null ? (
+            {selectedSubScreen !== null ? (
               <button type="button" className="button-with-icon" onClick={onEditSelected} disabled={selectedSubScreen === null}>
                 <span className="action-button-icon is-edit" aria-hidden="true" />
-                Select
+                Edit
               </button>
             ) : null}
             <button type="button" className="button-with-icon" onClick={onClearSelection}>
