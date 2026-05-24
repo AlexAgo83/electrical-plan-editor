@@ -222,11 +222,15 @@ describe("App integration UI - catalog", () => {
       .find((item) => item?.manufacturerReference === "TE-1-967616-1");
     expect(createdCatalogItem?.connectorLayout?.ways).toHaveLength(6);
     fireEvent.click(within(catalogPanel).getByText("TE-1-967616-1"));
-    const catalogAnalysisGrid = screen.getByRole("heading", { name: "Connectors" }).closest(".analysis-panel-grid");
+    const catalogAnalysisGrid = screen.getByRole("heading", { name: "Used by" }).closest(".analysis-panel-grid");
     expect(catalogAnalysisGrid).not.toBeNull();
-    const connectorsUsageHeading = within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Connectors" });
+    const connectorsUsageHeading = within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Used by" });
     const connectorsUsagePanel = connectorsUsageHeading.closest(".panel");
     expect(connectorsUsagePanel).not.toBeNull();
+    expect(within(connectorsUsagePanel as HTMLElement).getByRole("button", { name: /^Connectors\s+0$/ })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
     fireEvent.click(within(connectorsUsagePanel as HTMLElement).getByRole("button", { name: "Create Connector" }));
 
     connectorFormPanel = getPanelByHeading("Create Connector");
@@ -303,10 +307,18 @@ describe("App integration UI - catalog", () => {
     expect(within(catalogPanel).getByRole("button", { name: "Delete" })).toBeEnabled();
 
     expect(screen.queryByRole("heading", { name: "Catalog analysis" })).not.toBeInTheDocument();
-    const catalogAnalysisGrid = screen.getByRole("heading", { name: "Connectors" }).closest(".analysis-panel-grid");
+    const catalogAnalysisGrid = screen.getByRole("heading", { name: "Used by" }).closest(".analysis-panel-grid");
     expect(catalogAnalysisGrid).not.toBeNull();
-    expect(within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Connectors" })).toBeInTheDocument();
-    expect(within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Splices" })).toBeInTheDocument();
+    const usagePanel = within(catalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Used by" }).closest(".panel");
+    expect(usagePanel).not.toBeNull();
+    expect(within(usagePanel as HTMLElement).getByRole("button", { name: /^Connectors\s+1$/ })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    expect(within(usagePanel as HTMLElement).getByRole("button", { name: /^Splices\s+1$/ })).toHaveAttribute(
+      "aria-pressed",
+      "false"
+    );
     fireEvent.click(within(catalogPanel).getByRole("button", { name: "Seal refs" }));
     expect(
       within(catalogPanel).getByRole("textbox", { name: "Wire seal references name for SEAL-1" })
@@ -317,26 +329,27 @@ describe("App integration UI - catalog", () => {
         .closest("tr")
     ).toHaveClass("data-table-editable-row");
     expect(screen.queryByRole("heading", { name: "Edit catalog item" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Connectors" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Splices" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Used by" })).not.toBeInTheDocument();
     fireEvent.click(within(catalogPanel).getByRole("button", { name: "Items" }));
 
-    const refreshedCatalogAnalysisGrid = screen.getByRole("heading", { name: "Connectors" }).closest(".analysis-panel-grid");
+    const refreshedCatalogAnalysisGrid = screen.getByRole("heading", { name: "Used by" }).closest(".analysis-panel-grid");
     expect(refreshedCatalogAnalysisGrid).not.toBeNull();
-    const splicesUsageHeading = within(refreshedCatalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Splices" });
+    const splicesUsageHeading = within(refreshedCatalogAnalysisGrid as HTMLElement).getByRole("heading", { name: "Used by" });
     const splicesUsagePanel = splicesUsageHeading.closest(".panel");
     expect(splicesUsagePanel).not.toBeNull();
+    fireEvent.click(within(splicesUsagePanel as HTMLElement).getByRole("button", { name: /^Splices\s+1$/ }));
     expect(within(splicesUsagePanel as HTMLElement).getByText("Splice 1")).toBeInTheDocument();
     fireEvent.click(within(splicesUsagePanel as HTMLElement).getByRole("button", { name: "Go to" }));
     expect(getPanelByHeading("Edit Splice")).toBeInTheDocument();
 
     fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
     fireEvent.click(within(getPanelByHeading("Catalog")).getByText("CAT-ANALYSIS"));
-    const refreshedAnalysisGrid = screen.getByRole("heading", { name: "Connectors" }).closest(".analysis-panel-grid");
+    const refreshedAnalysisGrid = screen.getByRole("heading", { name: "Used by" }).closest(".analysis-panel-grid");
     expect(refreshedAnalysisGrid).not.toBeNull();
-    const connectorsUsageHeading = within(refreshedAnalysisGrid as HTMLElement).getByRole("heading", { name: "Connectors" });
+    const connectorsUsageHeading = within(refreshedAnalysisGrid as HTMLElement).getByRole("heading", { name: "Used by" });
     const connectorsUsagePanel = connectorsUsageHeading.closest(".panel");
     expect(connectorsUsagePanel).not.toBeNull();
+    fireEvent.click(within(connectorsUsagePanel as HTMLElement).getByRole("button", { name: /^Connectors\s+1$/ }));
     expect(within(connectorsUsagePanel as HTMLElement).getByText("Connector 1")).toBeInTheDocument();
     fireEvent.click(within(connectorsUsagePanel as HTMLElement).getByRole("button", { name: "Go to" }));
     expect(getPanelByHeading("Edit Connector")).toBeInTheDocument();
