@@ -280,37 +280,21 @@ describe("appReducer network lifecycle", () => {
     expect(attemptedWrite.ui.lastError?.message).toBe("No active network selected. Create or select a network first.");
   });
 
-  it("seeds exactly three default catalog items when creating a new network", () => {
+  it("creates new networks with an empty catalog", () => {
     const created = appReducer(
       createInitialState(),
       appActions.createNetwork({
-        id: asNetworkId("net-seeded"),
-        name: "Seeded network",
-        technicalId: "NET-SEEDED",
+        id: asNetworkId("net-empty-catalog"),
+        name: "Empty catalog network",
+        technicalId: "NET-EMPTY-CATALOG",
         createdAt: "2026-03-01T10:00:00.000Z",
         updatedAt: "2026-03-01T10:00:00.000Z"
       })
     );
 
-    expect(created.activeNetworkId).toBe(asNetworkId("net-seeded"));
-    expect(created.catalogItems.allIds).toHaveLength(3);
-
-    const refs = created.catalogItems.allIds
-      .map((id) => created.catalogItems.byId[id]?.manufacturerReference)
-      .filter((value): value is string => typeof value === "string");
-    expect(refs).toEqual(["CAT-2W-STD", "CAT-6P-STD", "CAT-8W-STD"]);
-
-    const findCatalogItemByRef = (manufacturerReference: string) =>
-      created.catalogItems.allIds
-        .map((id) => created.catalogItems.byId[id])
-        .find((item) => item?.manufacturerReference === manufacturerReference);
-
-    expect(findCatalogItemByRef("CAT-2W-STD")?.name).toBe("2-way standard connector");
-    expect(findCatalogItemByRef("CAT-2W-STD")?.unitPriceExclTax).toBe(5);
-    expect(findCatalogItemByRef("CAT-6P-STD")?.name).toBe("6-port standard splice");
-    expect(findCatalogItemByRef("CAT-6P-STD")?.unitPriceExclTax).toBe(8.5);
-    expect(findCatalogItemByRef("CAT-8W-STD")?.name).toBe("8-way standard connector");
-    expect(findCatalogItemByRef("CAT-8W-STD")?.unitPriceExclTax).toBe(12);
+    expect(created.activeNetworkId).toBe(asNetworkId("net-empty-catalog"));
+    expect(created.catalogItems.allIds).toHaveLength(0);
+    expect(created.networkStates[asNetworkId("net-empty-catalog")]?.catalogItems.allIds).toHaveLength(0);
   });
 
   it("does not inject default catalog seeds on network import", () => {

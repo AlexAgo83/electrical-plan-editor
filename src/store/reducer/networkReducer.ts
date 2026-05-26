@@ -12,7 +12,7 @@ import { normalizeNetworkVoltageV } from "../../core/wireSizing";
 import type { AppAction } from "../actions";
 import {
   cloneNetworkSummaryViewState,
-  createSeededNetworkScopedState,
+  createEmptyNetworkScopedState,
   type AppState,
   type NetworkScopedState
 } from "../types";
@@ -191,7 +191,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         networks: upsertEntity(persisted.networks, nextNetwork),
         networkStates: {
           ...persisted.networkStates,
-          [network.id]: createSeededNetworkScopedState()
+          [network.id]: createEmptyNetworkScopedState()
         }
       };
       if (setActive || persisted.activeNetworkId === null) {
