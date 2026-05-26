@@ -706,7 +706,7 @@ function migrateLegacySingleNetworkStateToCurrent(
           byId: {
             [legacySampleAssemblyId]: {
               id: legacySampleAssemblyId,
-              name: "Sample vehicle platform assembly",
+              name: "Vehicle platform assembly (Sample)",
               technicalId: "ASM-SAMPLE-VEHICLE",
               members: [{ networkId: network.id, color: "#2563eb" }],
               masterConnectorRefs: [{ networkId: network.id, connectorId: legacySampleMainConnectorId }],

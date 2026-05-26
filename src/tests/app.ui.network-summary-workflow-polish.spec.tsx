@@ -206,7 +206,7 @@ describe("App integration UI - network summary workflow polish", () => {
     const graphScope = screen.getByRole("region", { name: "Functional graph scope" });
     fireEvent.click(within(graphScope).getByRole("tab", { name: "Current network functional" }));
 
-    const functionalPanel = getCurrentNetworkFunctionalPanel("Main network sample");
+    const functionalPanel = getCurrentNetworkFunctionalPanel("Main network (Sample)");
     const functionalSvg = within(functionalPanel).getByLabelText("Read-only functional schematic");
     expect(functionalSvg).toBeInTheDocument();
     expect(functionalPanel).toHaveTextContent("C-1 pin 1");
@@ -263,7 +263,7 @@ describe("App integration UI - network summary workflow polish", () => {
       "Export"
     ]);
     fireEvent.click(within(networkSummaryActions).getByRole("button", { name: "Functional" }));
-    expect(getCurrentNetworkFunctionalPanel("Main network sample")).toBeInTheDocument();
+    expect(getCurrentNetworkFunctionalPanel("Main network (Sample)")).toBeInTheDocument();
   });
 
   it("uses a persisted explicit harness assembly picker and decouples the assembly graph from active network changes", async () => {

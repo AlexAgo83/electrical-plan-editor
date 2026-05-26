@@ -20,7 +20,7 @@ describe("App integration UI - wire sizing recommendation", () => {
 
     switchScreenDrawerAware("networkScope");
     const networkScopePanel = getPanelByHeading("Network Scope");
-    fireEvent.click(within(networkScopePanel).getByText("Main network sample").closest("tr") as HTMLElement);
+    fireEvent.click(within(networkScopePanel).getByText("Main network (Sample)").closest("tr") as HTMLElement);
     const editNetworkPanel = getPanelByHeading("Edit network");
     fireEvent.change(within(editNetworkPanel).getByLabelText("Voltage (V, optional)"), { target: { value: "12" } });
     fireEvent.click(within(editNetworkPanel).getByRole("button", { name: "Save network" }));

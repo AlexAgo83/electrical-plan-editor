@@ -26,9 +26,6 @@ interface SettingsWorkspaceContentProps {
   isCurrentWorkspaceEmpty: boolean;
   hasBuiltInSampleState: boolean;
   handleRecreateSampleNetwork: () => void;
-  handleRecreateValidationIssuesSampleNetwork: () => void;
-  handleRecreateCatalogValidationIssuesSampleNetwork: () => void;
-  handleRecreatePricingBomQaSampleNetwork: () => void;
   handleResetSampleNetwork: () => void;
   activeNetworkId: NetworkId | null;
   selectedExportNetworkIds: NetworkId[];
@@ -147,9 +144,6 @@ export function SettingsWorkspaceContent({
   isCurrentWorkspaceEmpty,
   hasBuiltInSampleState,
   handleRecreateSampleNetwork,
-  handleRecreateValidationIssuesSampleNetwork,
-  handleRecreateCatalogValidationIssuesSampleNetwork,
-  handleRecreatePricingBomQaSampleNetwork,
   handleResetSampleNetwork,
   activeNetworkId,
   selectedExportNetworkIds,
@@ -910,15 +904,6 @@ export function SettingsWorkspaceContent({
         <div className="row-actions settings-actions">
           <button type="button" onClick={handleRecreateSampleNetwork}>
             Recreate sample network
-          </button>
-          <button type="button" onClick={handleRecreateValidationIssuesSampleNetwork}>
-            Recreate validation issues sample
-          </button>
-          <button type="button" onClick={handleRecreateCatalogValidationIssuesSampleNetwork}>
-            Recreate catalog validation issues sample
-          </button>
-          <button type="button" onClick={handleRecreatePricingBomQaSampleNetwork}>
-            Recreate pricing / BOM QA sample
           </button>
           <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
             Reset sample network to baseline

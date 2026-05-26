@@ -127,25 +127,6 @@ describe("App integration UI - settings", () => {
     expect(within(catalogPanel).getByText("SAMPLE-CAT-SRC-12W")).toBeInTheDocument();
   });
 
-  it("recreates a validation issues sample from settings when workspace is empty", () => {
-    renderAppWithState(createInitialState());
-
-    switchScreenDrawerAware("settings");
-    const sampleControlsPanel = getPanelByHeading("Sample network controls");
-    const validationSampleButton = within(sampleControlsPanel).getByRole("button", {
-      name: "Recreate validation issues sample"
-    });
-
-    expect(validationSampleButton).toBeEnabled();
-    fireEvent.click(validationSampleButton);
-
-    switchScreenDrawerAware("validation");
-    expect(getPanelByHeading("Validation center")).toBeInTheDocument();
-    expect(
-      within(document.body).getByText("Wire 'WIRE-VAL-BROKEN' endpoint A references missing connector 'C-GHOST'.")
-    ).toBeInTheDocument();
-  });
-
   it("recreates sample networks without deleting user-created networks", () => {
     const sampled = createSampleNetworkState();
     const withUserNetwork = appReducer(
@@ -170,8 +151,10 @@ describe("App integration UI - settings", () => {
     switchScreenDrawerAware("networkScope");
     const networkScopePanel = getPanelByHeading("Network Scope");
     expect(within(networkScopePanel).getByText("User custom network")).toBeInTheDocument();
-    expect(within(networkScopePanel).getByText("Lighting branch demo")).toBeInTheDocument();
-    expect(within(networkScopePanel).getByText("Sensor backbone demo")).toBeInTheDocument();
+    expect(within(networkScopePanel).getByText("Lighting branch (Sample)")).toBeInTheDocument();
+    expect(within(networkScopePanel).getByText("Sensor backbone (Sample)")).toBeInTheDocument();
+    expect(within(networkScopePanel).getByText("Door module (Sample)")).toBeInTheDocument();
+    expect(within(networkScopePanel).getByText("Charging service (Sample)")).toBeInTheDocument();
   });
 
   it("resets built-in sample networks to baseline without deleting user-created networks", () => {
@@ -203,39 +186,7 @@ describe("App integration UI - settings", () => {
     switchScreenDrawerAware("networkScope");
     const networkScopePanel = getPanelByHeading("Network Scope");
     expect(within(networkScopePanel).getByText("User custom network")).toBeInTheDocument();
-    expect(within(networkScopePanel).getByText("Main network sample")).toBeInTheDocument();
-  });
-
-  it("recreates validation issues sample without deleting user-created networks", () => {
-    const sampled = createSampleNetworkState();
-    const withUserNetwork = appReducer(
-      sampled,
-      appActions.createNetwork({
-        id: ("net-user-custom" as NetworkId),
-        name: "User custom network",
-        technicalId: "NET-USER-CUSTOM",
-        createdAt: "2026-02-24T12:20:00.000Z",
-        updatedAt: "2026-02-24T12:20:00.000Z"
-      })
-    );
-
-    renderAppWithState(withUserNetwork);
-    switchScreenDrawerAware("settings");
-    const sampleControlsPanel = getPanelByHeading("Sample network controls");
-    const validationSampleButton = within(sampleControlsPanel).getByRole("button", {
-      name: "Recreate validation issues sample"
-    });
-
-    fireEvent.click(validationSampleButton);
-    const confirmDialog = screen.getByRole("dialog", { name: "Replace built-in sample content" });
-    fireEvent.click(within(confirmDialog).getByRole("button", { name: "Confirm" }));
-
-    switchScreenDrawerAware("networkScope");
-    const networkScopePanel = getPanelByHeading("Network Scope");
-    expect(within(networkScopePanel).getByText("User custom network")).toBeInTheDocument();
-
-    switchScreenDrawerAware("validation");
-    expect(getPanelByHeading("Validation center")).toBeInTheDocument();
+    expect(within(networkScopePanel).getByText("Main network (Sample)")).toBeInTheDocument();
   });
 
   it("keeps settings workspace accessible when no active network exists", () => {

@@ -429,12 +429,6 @@ export function useAppControllerWorkspaceContentAssembly({
         isCurrentWorkspaceEmpty: state.isCurrentWorkspaceEmpty,
         hasBuiltInSampleState: state.hasBuiltInSampleState,
         handleRecreateSampleNetwork: domains.workspaceNetworkDomain.handleRecreateSampleNetwork,
-        handleRecreateValidationIssuesSampleNetwork:
-          domains.workspaceNetworkDomain.handleRecreateValidationIssuesSampleNetwork,
-        handleRecreateCatalogValidationIssuesSampleNetwork:
-          domains.workspaceNetworkDomain.handleRecreateCatalogValidationIssuesSampleNetwork,
-        handleRecreatePricingBomQaSampleNetwork:
-          domains.workspaceNetworkDomain.handleRecreatePricingBomQaSampleNetwork,
         handleResetSampleNetwork: domains.workspaceNetworkDomain.handleResetSampleNetwork,
         activeNetworkId: entities.activeNetworkId,
         networkImportExportModel: domains.workspaceNetworkDomain.networkImportExportModel,

@@ -44,7 +44,7 @@ describe("App integration UI - networks", () => {
       switchScreen("networkScope");
 
       const networkScopePanel = getPanelByHeading("Network Scope");
-      fireEvent.click(within(networkScopePanel).getByText("Main network sample").closest("tr") as HTMLElement);
+      fireEvent.click(within(networkScopePanel).getByText("Main network (Sample)").closest("tr") as HTMLElement);
       expect(getPanelByHeading("Edit network")).toBeInTheDocument();
 
       await new Promise((resolve) => setTimeout(resolve, 30));
@@ -83,7 +83,7 @@ describe("App integration UI - networks", () => {
 
     switchScreen("networkScope");
     const networkScopePanel = getPanelByHeading("Network Scope");
-    fireEvent.click(within(networkScopePanel).getByText("Main network sample").closest("tr") as HTMLElement);
+    fireEvent.click(within(networkScopePanel).getByText("Main network (Sample)").closest("tr") as HTMLElement);
     const editFormPanel = getPanelByHeading("Edit network");
     fireEvent.change(within(editFormPanel).getByLabelText("Description (optional)"), { target: { value: "Recent change update" } });
     fireEvent.click(within(editFormPanel).getByRole("button", { name: "Save network" }));
@@ -123,7 +123,7 @@ describe("App integration UI - networks", () => {
     switchScreen("networkScope");
 
     const networkScopePanel = getPanelByHeading("Network Scope");
-    fireEvent.click(within(networkScopePanel).getByText("Main network sample").closest("tr") as HTMLElement);
+    fireEvent.click(within(networkScopePanel).getByText("Main network (Sample)").closest("tr") as HTMLElement);
     const editFormPanel = getPanelByHeading("Edit network");
     fireEvent.change(within(editFormPanel).getByLabelText("Description (optional)"), { target: { value: "Persist recent changes" } });
     fireEvent.click(within(editFormPanel).getByRole("button", { name: "Save network" }));
@@ -150,7 +150,7 @@ describe("App integration UI - networks", () => {
 
     switchScreen("networkScope");
     const networkScopePanel = getPanelByHeading("Network Scope");
-    const mainNetworkRow = within(networkScopePanel).getByText("Main network sample").closest("tr");
+    const mainNetworkRow = within(networkScopePanel).getByText("Main network (Sample)").closest("tr");
     expect(mainNetworkRow).not.toBeNull();
     fireEvent.click(mainNetworkRow as HTMLElement);
     expect(getPanelByHeading("Edit network")).toBeInTheDocument();
@@ -290,13 +290,13 @@ describe("App integration UI - networks", () => {
     switchScreen("networkScope");
 
     const networkScopePanel = getPanelByHeading("Network Scope");
-    const mainNetworkRow = within(networkScopePanel).getByText("Main network sample").closest("tr");
+    const mainNetworkRow = within(networkScopePanel).getByText("Main network (Sample)").closest("tr");
     expect(mainNetworkRow).not.toBeNull();
     fireEvent.click(mainNetworkRow as HTMLElement);
 
     const formPanel = getPanelByHeading("Edit network");
 
-    expect(within(formPanel).getByLabelText("Network name")).toHaveValue("Main network sample");
+    expect(within(formPanel).getByLabelText("Network name")).toHaveValue("Main network (Sample)");
     expect(within(formPanel).getByLabelText("Network technical ID")).toHaveValue("NET-MAIN-SAMPLE");
 
     fireEvent.change(within(formPanel).getByLabelText("Network name"), {
@@ -322,7 +322,7 @@ describe("App integration UI - networks", () => {
     switchScreen("networkScope");
 
     const networkScopePanel = getPanelByHeading("Network Scope");
-    fireEvent.click(within(networkScopePanel).getByText("Main network sample").closest("tr") as HTMLElement);
+    fireEvent.click(within(networkScopePanel).getByText("Main network (Sample)").closest("tr") as HTMLElement);
     const formPanel = getPanelByHeading("Edit network");
 
     fireEvent.change(within(formPanel).getByLabelText("Creation date"), {
@@ -437,7 +437,7 @@ describe("App integration UI - networks", () => {
     switchScreen("networkScope");
 
     const networkScopePanel = getPanelByHeading("Network Scope");
-    const mainNetworkRow = within(networkScopePanel).getByText("Main network sample").closest("tr");
+    const mainNetworkRow = within(networkScopePanel).getByText("Main network (Sample)").closest("tr");
     expect(mainNetworkRow).not.toBeNull();
     fireEvent.click(mainNetworkRow as HTMLElement);
 
@@ -447,11 +447,11 @@ describe("App integration UI - networks", () => {
     expect(document.activeElement).toBe(nameInput);
 
     fireEvent.change(nameInput, {
-      target: { value: "Main network sample X" }
+      target: { value: "Main network (Sample) X" }
     });
 
     await waitFor(() => {
-      expect(nameInput).toHaveValue("Main network sample X");
+      expect(nameInput).toHaveValue("Main network (Sample) X");
       expect(document.activeElement).toBe(nameInput);
     });
   });
@@ -471,7 +471,7 @@ describe("App integration UI - networks", () => {
     switchScreen("networkScope");
 
     const networkScopePanel = getPanelByHeading("Network Scope");
-    expect(within(networkScopePanel).getByText("Main network sample")).toBeInTheDocument();
+    expect(within(networkScopePanel).getByText("Main network (Sample)")).toBeInTheDocument();
     expect(within(networkScopePanel).getByText("Validation issues sample")).toBeInTheDocument();
     expect(within(networkScopePanel).getByText("Filter")).toBeInTheDocument();
 
@@ -483,6 +483,6 @@ describe("App integration UI - networks", () => {
     });
 
     expect(within(networkScopePanel).getByText("Validation issues sample")).toBeInTheDocument();
-    expect(within(networkScopePanel).queryByText("Main network sample")).not.toBeInTheDocument();
+    expect(within(networkScopePanel).queryByText("Main network (Sample)")).not.toBeInTheDocument();
   });
 });

@@ -14,10 +14,7 @@ import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import {
   appActions,
   appReducer,
-  createCatalogValidationIssuesSampleNetworkState,
-  createPricingBomQaSampleNetworkState,
   createSampleNetworkState,
-  createValidationIssuesSampleNetworkState,
   selectNetworkTechnicalIdTaken
 } from "../../store";
 import {
@@ -540,78 +537,6 @@ export function useWorkspaceHandlers({
     })();
   }
 
-  function handleRecreateValidationIssuesSampleNetwork(): void {
-    if (isCurrentWorkspaceEmpty) {
-      refreshBuiltInSampleNetworks(createValidationIssuesSampleNetworkState, {
-        activateImportedSample: true
-      });
-      return;
-    }
-
-    void (async () => {
-      const shouldReplace = await confirmAction({
-        title: "Replace built-in sample content",
-        message: "Refresh built-in sample networks with the validation issues sample? User-created networks are preserved.",
-        intent: "warning"
-      });
-      if (!shouldReplace) {
-        return;
-      }
-
-      refreshBuiltInSampleNetworks(createValidationIssuesSampleNetworkState, {
-        activateImportedSample: true
-      });
-    })();
-  }
-
-  function handleRecreateCatalogValidationIssuesSampleNetwork(): void {
-    if (isCurrentWorkspaceEmpty) {
-      refreshBuiltInSampleNetworks(createCatalogValidationIssuesSampleNetworkState, {
-        activateImportedSample: true
-      });
-      return;
-    }
-
-    void (async () => {
-      const shouldReplace = await confirmAction({
-        title: "Replace built-in sample content",
-        message: "Refresh built-in sample networks with the catalog validation issues sample? User-created networks are preserved.",
-        intent: "warning"
-      });
-      if (!shouldReplace) {
-        return;
-      }
-
-      refreshBuiltInSampleNetworks(createCatalogValidationIssuesSampleNetworkState, {
-        activateImportedSample: true
-      });
-    })();
-  }
-
-  function handleRecreatePricingBomQaSampleNetwork(): void {
-    if (isCurrentWorkspaceEmpty) {
-      refreshBuiltInSampleNetworks(createPricingBomQaSampleNetworkState, {
-        activateImportedSample: true
-      });
-      return;
-    }
-
-    void (async () => {
-      const shouldReplace = await confirmAction({
-        title: "Replace built-in sample content",
-        message: "Refresh built-in sample networks with the pricing / BOM QA sample? User-created networks are preserved.",
-        intent: "warning"
-      });
-      if (!shouldReplace) {
-        return;
-      }
-
-      refreshBuiltInSampleNetworks(createPricingBomQaSampleNetworkState, {
-        activateImportedSample: true
-      });
-    })();
-  }
-
   function resetNetworkViewToConfiguredScale(): void {
     const positions = nodes
       .map((node) => networkNodePositions[node.id])
@@ -819,9 +744,6 @@ export function useWorkspaceHandlers({
     handleDuplicateNetwork,
     handleDeleteNetwork,
     handleRecreateSampleNetwork,
-    handleRecreateValidationIssuesSampleNetwork,
-    handleRecreateCatalogValidationIssuesSampleNetwork,
-    handleRecreatePricingBomQaSampleNetwork,
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,
     fitNetworkToContent,

@@ -161,7 +161,7 @@ describe("localStorage persistence adapter", () => {
 
     const withVoltage = appReducer(
       base,
-      appActions.updateNetwork(activeNetworkId, "Main network sample", "NET-MAIN-SAMPLE", "2026-03-01T08:00:00.000Z", undefined, {
+      appActions.updateNetwork(activeNetworkId, "Main network (Sample)", "NET-MAIN-SAMPLE", "2026-03-01T08:00:00.000Z", undefined, {
         voltageV: 48
       })
     );

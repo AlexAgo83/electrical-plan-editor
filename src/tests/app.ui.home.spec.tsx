@@ -189,7 +189,7 @@ describe("home workspace screen", () => {
     switchScreenDrawerAware("home");
 
     const resumePanel = getPanelByHeading("Workspace");
-    expect(within(resumePanel).getByText("Main network sample", { selector: ".settings-panel-chip" })).toBeInTheDocument();
+    expect(within(resumePanel).getByText("Main network (Sample)", { selector: ".settings-panel-chip" })).toBeInTheDocument();
     expect(within(resumePanel).queryByText(/Active network:/i)).not.toBeInTheDocument();
     expect(within(resumePanel).queryByLabelText("Workspace summary")).not.toBeInTheDocument();
   });

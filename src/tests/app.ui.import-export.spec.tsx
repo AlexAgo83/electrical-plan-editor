@@ -52,7 +52,7 @@ describe("App integration UI - import/export", () => {
     expect(exportButton.compareDocumentPosition(importButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     expect(panel.querySelector('input[type="file"][accept="application/json,.json"]')).not.toBeNull();
 
-    fireEvent.click(within(panel).getByText("Main network sample").closest("tr") as HTMLElement);
+    fireEvent.click(within(panel).getByText("Main network (Sample)").closest("tr") as HTMLElement);
     expect(exportButton).toBeEnabled();
     fireEvent.click(exportButton);
     expect(await screen.findByRole("dialog", { name: "Save selected network" })).toBeInTheDocument();

@@ -3,12 +3,9 @@ export { createAppStore, type AppStore } from "./createStore";
 export { appReducer } from "./reducer";
 export {
   createSampleNetworkState,
-  createValidationIssuesSampleNetworkState,
   hasSampleNetworkSignature,
   isWorkspaceEmpty
 } from "./sampleNetwork";
-export { createCatalogValidationIssuesSampleNetworkState } from "./sampleNetworkCatalogValidationSample";
-export { createPricingBomQaSampleNetworkState } from "./sampleNetworkPricingQaSample";
 export * from "./selectors";
 export * from "./catalog";
 export { withPreservedNetworkSummaryViewStates } from "./networking";

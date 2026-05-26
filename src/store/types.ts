@@ -269,7 +269,7 @@ export function createInitialState(): AppState {
   const defaultScopedState = createEmptyNetworkScopedState();
   const defaultNetwork: Network = {
     id: DEFAULT_NETWORK_ID,
-    name: "Main network sample",
+    name: "Main network (Sample)",
     technicalId: DEFAULT_NETWORK_TECHNICAL_ID,
     createdAt: DEFAULT_NETWORK_CREATED_AT,
     updatedAt: DEFAULT_NETWORK_CREATED_AT

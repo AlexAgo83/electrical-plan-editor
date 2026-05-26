@@ -52,9 +52,6 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     isCurrentWorkspaceEmpty: SettingsSliceParams["isCurrentWorkspaceEmpty"];
     hasBuiltInSampleState: SettingsSliceParams["hasBuiltInSampleState"];
     handleRecreateSampleNetwork: SettingsSliceParams["handleRecreateSampleNetwork"];
-    handleRecreateValidationIssuesSampleNetwork: SettingsSliceParams["handleRecreateValidationIssuesSampleNetwork"];
-    handleRecreateCatalogValidationIssuesSampleNetwork: SettingsSliceParams["handleRecreateCatalogValidationIssuesSampleNetwork"];
-    handleRecreatePricingBomQaSampleNetwork: SettingsSliceParams["handleRecreatePricingBomQaSampleNetwork"];
     handleResetSampleNetwork: SettingsSliceParams["handleResetSampleNetwork"];
     activeNetworkId: SettingsSliceParams["activeNetworkId"];
     importExport: NetworkImportExportModel;
@@ -156,9 +153,6 @@ export function useAppControllerAuxScreenContentDomains({
     isCurrentWorkspaceEmpty: settings.isCurrentWorkspaceEmpty,
     hasBuiltInSampleState: settings.hasBuiltInSampleState,
     handleRecreateSampleNetwork: settings.handleRecreateSampleNetwork,
-    handleRecreateValidationIssuesSampleNetwork: settings.handleRecreateValidationIssuesSampleNetwork,
-    handleRecreateCatalogValidationIssuesSampleNetwork: settings.handleRecreateCatalogValidationIssuesSampleNetwork,
-    handleRecreatePricingBomQaSampleNetwork: settings.handleRecreatePricingBomQaSampleNetwork,
     handleResetSampleNetwork: settings.handleResetSampleNetwork,
     activeNetworkId: settings.activeNetworkId,
     selectedExportNetworkIds: settings.importExport.selectedExportNetworkIds,

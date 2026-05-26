@@ -1,7 +1,6 @@
 import type {
   ConnectorId,
   HarnessAssemblyId,
-  NetworkId,
   NodeId,
   SegmentId,
   SpliceId,
@@ -12,9 +11,7 @@ import { appReducer } from "./reducer";
 import { buildAdditionalSampleNetworkDemoActions } from "./sampleNetworkAdditionalDemos";
 import {
   buildMainSampleCatalogActions,
-  buildValidationSampleCatalogActions,
-  mainSampleCatalogIds,
-  validationSampleCatalogIds
+  mainSampleCatalogIds
 } from "./sampleNetworkCatalog";
 import { createInitialState, type AppState } from "./types";
 
@@ -269,6 +266,7 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-001"),
       name: "Feed Main Junction",
       technicalId: "WIRE-FEED-J1",
+      primaryColorId: "RD",
       endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 1 },
       endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 1 }
     }),
@@ -276,6 +274,8 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-002"),
       name: "Supply Actuator A",
       technicalId: "WIRE-ACT-A",
+      primaryColorId: "BU",
+      secondaryColorId: "WH",
       endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 2 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 1 }
     }),
@@ -283,6 +283,8 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-003"),
       name: "Supply Actuator B",
       technicalId: "WIRE-ACT-B",
+      primaryColorId: "GN",
+      secondaryColorId: "YE",
       endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 2 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 1 }
     }),
@@ -290,6 +292,7 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-004"),
       name: "Secondary Feed B",
       technicalId: "WIRE-B-SECONDARY",
+      primaryColorId: "OG",
       endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 3 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 2 }
     }),
@@ -303,6 +306,8 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-005"),
       name: "Branch Junction Feed",
       technicalId: "WIRE-BRANCH-J2",
+      primaryColorId: "VT",
+      secondaryColorId: "GY",
       endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 1 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 2 }
     }),
@@ -310,6 +315,8 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-006"),
       name: "Aux Feed Junction 1",
       technicalId: "WIRE-AUX-J1-1",
+      primaryColorId: "RD",
+      secondaryColorId: "BK",
       endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 7 },
       endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 7 }
     }),
@@ -317,6 +324,8 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-007"),
       name: "Aux Feed Junction 2",
       technicalId: "WIRE-AUX-J1-2",
+      primaryColorId: "RD",
+      secondaryColorId: "BU",
       endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 8 },
       endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 8 }
     }),
@@ -324,6 +333,7 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-008"),
       name: "Aux Supply Actuator A-1",
       technicalId: "WIRE-AUX-A-1",
+      primaryColorId: "BU",
       endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 9 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 5 }
     }),
@@ -331,6 +341,7 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-009"),
       name: "Aux Supply Actuator B-1",
       technicalId: "WIRE-AUX-B-1",
+      primaryColorId: "GN",
       endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 10 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 5 }
     }),
@@ -338,6 +349,8 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-010"),
       name: "Branch Return A-1",
       technicalId: "WIRE-BR-RET-A-1",
+      primaryColorId: "BK",
+      secondaryColorId: "WH",
       endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 5 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 6 }
     }),
@@ -345,6 +358,8 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-011"),
       name: "Branch Return A-2",
       technicalId: "WIRE-BR-RET-A-2",
+      primaryColorId: "BK",
+      secondaryColorId: "BU",
       endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 6 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 7 }
     }),
@@ -352,6 +367,8 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-012"),
       name: "Branch Return B-1",
       technicalId: "WIRE-BR-RET-B-1",
+      primaryColorId: "BK",
+      secondaryColorId: "GN",
       endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 7 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 6 }
     }),
@@ -359,6 +376,8 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-013"),
       name: "Branch Return B-2",
       technicalId: "WIRE-BR-RET-B-2",
+      primaryColorId: "BK",
+      secondaryColorId: "YE",
       endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 8 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 7 }
     }),
@@ -366,6 +385,7 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-014"),
       name: "J1 Service Link A",
       technicalId: "WIRE-J1-SVC-A",
+      primaryColorId: "CY",
       endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 9 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 8 }
     }),
@@ -373,6 +393,7 @@ export function createSampleNetworkState(): AppState {
       id: asWireId("W-015"),
       name: "J1 Service Link B",
       technicalId: "WIRE-J1-SVC-B",
+      primaryColorId: "PK",
       endpointA: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 10 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 8 }
     }),
@@ -380,104 +401,4 @@ export function createSampleNetworkState(): AppState {
   ];
 
   return actions.reduce(appReducer, createInitialState());
-}
-
-export function createValidationIssuesSampleNetworkState(): AppState {
-  const base = createSampleNetworkState();
-  const activeNetworkId = base.activeNetworkId as NetworkId;
-  const connectorSrc = base.connectors.byId[asConnectorId("C-SRC")];
-  const connectorDst1 = base.connectors.byId[asConnectorId("C-DST-1")];
-  const connectorDst2 = base.connectors.byId[asConnectorId("C-DST-2")];
-  const spliceJ1 = base.splices.byId[asSpliceId("S-J1")];
-  const spliceJ2 = base.splices.byId[asSpliceId("S-J2")];
-  if (connectorSrc === undefined || connectorDst1 === undefined || connectorDst2 === undefined || spliceJ1 === undefined || spliceJ2 === undefined) {
-    throw new Error("Expected validation sample connectors/splices in base sample.");
-  }
-
-  return [
-    appActions.updateNetwork(
-      activeNetworkId,
-      "Validation issues sample",
-      "NET-VALIDATION-SAMPLE",
-      "2026-02-22T00:00:00.000Z"
-    ),
-    ...buildValidationSampleCatalogActions(),
-    appActions.upsertConnector({
-      ...connectorSrc,
-      catalogItemId: validationSampleCatalogIds.powerSource12Way
-    }),
-    appActions.upsertConnector({
-      ...connectorDst1,
-      catalogItemId: validationSampleCatalogIds.actuator8Way
-    }),
-    appActions.upsertConnector({
-      ...connectorDst2,
-      catalogItemId: validationSampleCatalogIds.actuator8Way
-    }),
-    appActions.upsertSplice({
-      ...spliceJ1,
-      catalogItemId: validationSampleCatalogIds.mainJunction10Port
-    }),
-    appActions.upsertSplice({
-      ...spliceJ2,
-      catalogItemId: validationSampleCatalogIds.branchJunction8Port
-    }),
-    appActions.saveWire({
-      id: asWireId("W-VAL-EX-001"),
-      name: "Validation Extra Feed 1",
-      technicalId: "WIRE-VAL-EX-001",
-      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 4 },
-      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 3 }
-    }),
-    appActions.saveWire({
-      id: asWireId("W-VAL-EX-002"),
-      name: "Validation Extra Feed 2",
-      technicalId: "WIRE-VAL-EX-002",
-      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 5 },
-      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 4 }
-    }),
-    appActions.saveWire({
-      id: asWireId("W-VAL-EX-003"),
-      name: "Validation Extra Actuator A-1",
-      technicalId: "WIRE-VAL-EX-003",
-      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 3 },
-      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 5 }
-    }),
-    appActions.saveWire({
-      id: asWireId("W-VAL-EX-004"),
-      name: "Validation Extra Actuator A-2",
-      technicalId: "WIRE-VAL-EX-004",
-      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-1"), cavityIndex: 4 },
-      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J1"), portIndex: 6 }
-    }),
-    appActions.saveWire({
-      id: asWireId("W-VAL-EX-005"),
-      name: "Validation Extra Branch B-1",
-      technicalId: "WIRE-VAL-EX-005",
-      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 3 },
-      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 2 }
-    }),
-    appActions.saveWire({
-      id: asWireId("W-VAL-EX-006"),
-      name: "Validation Extra Branch B-2",
-      technicalId: "WIRE-VAL-EX-006",
-      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-DST-2"), cavityIndex: 4 },
-      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 3 }
-    }),
-    appActions.occupyConnectorCavity(asConnectorId("C-SRC"), 6, "wire:ghost-wire:A"),
-    appActions.occupySplicePort(asSpliceId("S-J2"), 4, "manual-validation-check"),
-    appActions.upsertWire({
-      id: asWireId("W-VAL-ERR-001"),
-      name: "",
-      technicalId: "WIRE-VAL-BROKEN",
-      sectionMm2: 0.5,
-      primaryColorId: null,
-      secondaryColorId: null,
-      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-GHOST"), cavityIndex: 1 },
-      endpointB: { kind: "splicePort", spliceId: asSpliceId("S-J2"), portIndex: 4 },
-      routeSegmentIds: [],
-      lengthMm: 0,
-      isRouteLocked: true
-    })
-  ].reduce(appReducer, base);
 }

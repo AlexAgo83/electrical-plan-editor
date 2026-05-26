@@ -44,9 +44,6 @@ interface UseAppControllerAuxDomainAssemblyParams {
     isCurrentWorkspaceEmpty: boolean;
     hasBuiltInSampleState: boolean;
     handleRecreateSampleNetwork: () => void;
-    handleRecreateValidationIssuesSampleNetwork: () => void;
-    handleRecreateCatalogValidationIssuesSampleNetwork: () => void;
-    handleRecreatePricingBomQaSampleNetwork: () => void;
     handleResetSampleNetwork: () => void;
     activeNetworkId: AuxDomainsParams["settings"]["activeNetworkId"];
     networkImportExportModel: AuxDomainsParams["settings"]["importExport"];
@@ -108,9 +105,6 @@ export function useAppControllerAuxDomainAssembly({
       isCurrentWorkspaceEmpty: settings.isCurrentWorkspaceEmpty,
       hasBuiltInSampleState: settings.hasBuiltInSampleState,
       handleRecreateSampleNetwork: settings.handleRecreateSampleNetwork,
-      handleRecreateValidationIssuesSampleNetwork: settings.handleRecreateValidationIssuesSampleNetwork,
-      handleRecreateCatalogValidationIssuesSampleNetwork: settings.handleRecreateCatalogValidationIssuesSampleNetwork,
-      handleRecreatePricingBomQaSampleNetwork: settings.handleRecreatePricingBomQaSampleNetwork,
       handleResetSampleNetwork: settings.handleResetSampleNetwork,
       activeNetworkId: settings.activeNetworkId,
       importExport: {

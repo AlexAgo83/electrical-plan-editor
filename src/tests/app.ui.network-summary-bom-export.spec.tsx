@@ -544,7 +544,7 @@ describe("App integration UI - network summary BOM export", () => {
       baseState,
       appActions.updateNetwork(
         activeNetworkId,
-        "Main network sample",
+        "Main network (Sample)",
         "NET-MAIN-SAMPLE",
         "2026-03-03T11:00:00.000Z",
         undefined,
@@ -748,7 +748,7 @@ describe("App integration UI - network summary BOM export", () => {
       baseState,
       appActions.updateNetwork(
         activeNetworkId,
-        "Main network sample",
+        "Main network (Sample)",
         "NET-MAIN-SAMPLE",
         "2026-03-03T11:00:00.000Z",
         undefined,
@@ -816,7 +816,7 @@ describe("App integration UI - network summary BOM export", () => {
       baseState,
       appActions.updateNetwork(
         activeNetworkId,
-        "Main network sample",
+        "Main network (Sample)",
         "NET-MAIN-SAMPLE",
         "2026-03-03T11:00:00.000Z",
         undefined,
@@ -880,7 +880,7 @@ describe("App integration UI - network summary BOM export", () => {
       baseState,
       appActions.updateNetwork(
         activeNetworkId,
-        "Main network sample",
+        "Main network (Sample)",
         "NET-MAIN-SAMPLE",
         "2026-03-03T11:00:00.000Z",
         undefined,

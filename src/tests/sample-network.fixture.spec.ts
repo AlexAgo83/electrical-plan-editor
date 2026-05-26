@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { isEditedConnectorLayout } from "../core/connectorLayout";
 import type { ConnectorId, HarnessAssemblyId, NetworkId, SegmentId, WireId } from "../core/entities";
 import {
   createInitialState,
@@ -31,9 +32,15 @@ describe("sample network fixture", () => {
   it("creates a comprehensive deterministic sample state", () => {
     const state = createSampleNetworkState();
 
-    expect(state.networks.allIds.length).toBeGreaterThanOrEqual(3);
+    expect(state.networks.allIds.length).toBeGreaterThanOrEqual(5);
     expect(Object.values(state.networks.byId).map((network) => network.technicalId)).toEqual(
-      expect.arrayContaining(["NET-MAIN-SAMPLE", "NET-LIGHTING-DEMO", "NET-SENSOR-BB-DEMO"])
+      expect.arrayContaining([
+        "NET-MAIN-SAMPLE",
+        "NET-LIGHTING-DEMO",
+        "NET-SENSOR-BB-DEMO",
+        "NET-DOOR-MODULE-SAMPLE",
+        "NET-CHARGING-SERVICE-SAMPLE"
+      ])
     );
     expect(state.connectors.allIds.length).toBeGreaterThanOrEqual(3);
     expect(state.splices.allIds.length).toBeGreaterThanOrEqual(2);
@@ -62,7 +69,13 @@ describe("sample network fixture", () => {
 
   it("assigns catalog items to sample connectors and splices across built-in demo networks", () => {
     const state = createSampleNetworkState();
-    const sampleTechnicalIds = new Set(["NET-MAIN-SAMPLE", "NET-LIGHTING-DEMO", "NET-SENSOR-BB-DEMO"]);
+    const sampleTechnicalIds = new Set([
+      "NET-MAIN-SAMPLE",
+      "NET-LIGHTING-DEMO",
+      "NET-SENSOR-BB-DEMO",
+      "NET-DOOR-MODULE-SAMPLE",
+      "NET-CHARGING-SERVICE-SAMPLE"
+    ]);
 
     for (const networkId of state.networks.allIds) {
       const network = state.networks.byId[networkId];
@@ -89,17 +102,50 @@ describe("sample network fixture", () => {
     expect(assembly?.members.map((member) => member.networkId)).toEqual([
       asNetworkId("network-main"),
       asNetworkId("network-lighting-demo"),
-      asNetworkId("network-sensor-backbone-demo")
+      asNetworkId("network-sensor-backbone-demo"),
+      asNetworkId("network-door-module-demo"),
+      asNetworkId("network-charging-service-demo")
     ]);
     expect(assembly?.masterConnectorRefs).toEqual([
       { networkId: asNetworkId("network-main"), connectorId: asConnectorId("C-SRC") },
       { networkId: asNetworkId("network-lighting-demo"), connectorId: asConnectorId("L-C-SRC") },
-      { networkId: asNetworkId("network-sensor-backbone-demo"), connectorId: asConnectorId("S-C-ECU") }
+      { networkId: asNetworkId("network-sensor-backbone-demo"), connectorId: asConnectorId("S-C-ECU") },
+      { networkId: asNetworkId("network-door-module-demo"), connectorId: asConnectorId("D-C-BODY") },
+      { networkId: asNetworkId("network-charging-service-demo"), connectorId: asConnectorId("H-C-INLET") }
     ]);
-    expect(assembly?.connectorLinks).toHaveLength(2);
+    expect(assembly?.connectorLinks).toHaveLength(4);
     expect(state.networkStates[asNetworkId("network-main")]?.connectors.byId[asConnectorId("C-SRC")]?.isMainHarnessConnector).toBe(true);
     expect(state.networkStates[asNetworkId("network-lighting-demo")]?.connectors.byId[asConnectorId("L-C-SRC")]?.isMainHarnessConnector).toBe(true);
     expect(state.networkStates[asNetworkId("network-sensor-backbone-demo")]?.connectors.byId[asConnectorId("S-C-ECU")]?.isMainHarnessConnector).toBe(true);
+    expect(state.networkStates[asNetworkId("network-door-module-demo")]?.connectors.byId[asConnectorId("D-C-BODY")]?.isMainHarnessConnector).toBe(true);
+    expect(state.networkStates[asNetworkId("network-charging-service-demo")]?.connectors.byId[asConnectorId("H-C-INLET")]?.isMainHarnessConnector).toBe(true);
+  });
+
+  it("uses colored sample wires and edited connector layouts across built-in demo networks", () => {
+    const state = createSampleNetworkState();
+
+    for (const networkId of state.networks.allIds) {
+      const scoped = state.networkStates[networkId];
+      expect(scoped).toBeDefined();
+      if (scoped === undefined) {
+        continue;
+      }
+
+      for (const wireId of scoped.wires.allIds) {
+        const wire = scoped.wires.byId[wireId];
+        expect(wire?.primaryColorId, `${wireId} should have a primary sample color`).not.toBeNull();
+      }
+
+      for (const connectorId of scoped.connectors.allIds) {
+        const connector = scoped.connectors.byId[connectorId];
+        const catalogItem = connector?.catalogItemId === undefined ? undefined : scoped.catalogItems.byId[connector.catalogItemId];
+        expect(catalogItem?.connectorLayout, `${connectorId} should have a connector layout`).toBeDefined();
+        expect(
+          isEditedConnectorLayout(catalogItem?.connectorLayout, connector?.cavityCount ?? 1),
+          `${connectorId} should use a custom connector layout`
+        ).toBe(true);
+      }
+    }
   });
 
   it("keeps source connector occupancy coherent for seeded wires", () => {
