@@ -323,7 +323,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
 
     const wireAnalysisPanel = getPanelByHeading("Wire analysis");
     expect(within(wireAnalysisPanel).getByText("Wire 1")).toBeInTheDocument();
-    fireEvent.click(within(wireAnalysisPanel).getByRole("button", { name: "SEG-B" }));
+    fireEvent.click(within(wireAnalysisPanel).getByRole("button", { name: /SEG-B/ }));
     expect(within(getPanelByHeading("Edit Segment")).getByDisplayValue("SEG-B")).toBeInTheDocument();
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
