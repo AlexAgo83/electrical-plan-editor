@@ -26,6 +26,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     catalogItems,
     connectors,
     segments,
+    nodeLabelById,
     splices,
     wires,
     visibleWires,
@@ -104,6 +105,11 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     const label = getWireColorLabel(wire);
     return label === "No color" || label === "Free color (unspecified)" ? null : label;
   };
+  const getRouteSegmentLabel = (segment: (typeof segments)[number]): string => {
+    const nodeALabel = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
+    const nodeBLabel = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
+    return `${nodeALabel} -> ${nodeBLabel} (${segment.id})`;
+  };
   const renderCurrentRoutePath = (segmentIds: readonly string[]): ReactElement => {
     if (segmentIds.length === 0) {
       return <p className="route-preview-path analysis-current-route-empty">(none)</p>;
@@ -111,22 +117,29 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
 
     return (
       <ol className="analysis-current-route-path" aria-label="Current route segment order">
-        {segmentIds.map((segmentId, index) => (
-          <li key={`${segmentId}-${index}`} className="analysis-current-route-step">
-            <span className="analysis-current-route-index">{index + 1}</span>
-            {segmentById.has(segmentId as SegmentId) ? (
-              <EntityReferenceButton
-                className="analysis-current-route-segment technical-id"
-                title={`Open segment ${segmentId}`}
-                onClick={() => onOpenSegmentFromAnalysisTable(segmentId as SegmentId)}
-              >
-                {segmentId}
-              </EntityReferenceButton>
-            ) : (
-              <span className="analysis-current-route-segment technical-id">{segmentId}</span>
-            )}
-          </li>
-        ))}
+        {segmentIds.map((segmentId, index) => {
+          const segment = segmentById.get(segmentId as SegmentId);
+          const segmentLabel = segment === undefined ? segmentId : getRouteSegmentLabel(segment);
+
+          return (
+            <li key={`${segmentId}-${index}`} className="analysis-current-route-step">
+              <span className="analysis-current-route-index">{index + 1}</span>
+              {segment === undefined ? (
+                <span className="analysis-current-route-segment technical-id" title={segmentLabel}>
+                  {segmentLabel}
+                </span>
+              ) : (
+                <EntityReferenceButton
+                  className="analysis-current-route-segment"
+                  title={segmentLabel}
+                  onClick={() => onOpenSegmentFromAnalysisTable(segment.id)}
+                >
+                  {segmentLabel}
+                </EntityReferenceButton>
+              )}
+            </li>
+          );
+        })}
       </ol>
     );
   };
