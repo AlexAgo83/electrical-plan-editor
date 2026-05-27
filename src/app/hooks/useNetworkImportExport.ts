@@ -400,11 +400,11 @@ export function useNetworkImportExport({
   }
 
   const proceedWithImport = useCallback(
-    async (
+    (
       payload: NetworkFilePayloadV1,
       overwriteMap: ReadonlyMap<string, NetworkId>,
       resetInput: () => void
-    ): Promise<void> => {
+    ): void => {
       const overwriteNetworkIds = [...overwriteMap.values()];
       const resolved = resolveImportConflicts(payload, store.getState(), overwriteMap);
       setLastImportSummary(resolved.summary);
@@ -465,7 +465,7 @@ export function useNetworkImportExport({
       const usedPrefixes = new Set<string>();
 
       function buildSheetPrefix(technicalId: string): string {
-        const sanitized = technicalId.replace(/[:\\/?\*\[\]]/g, "_").slice(0, 18);
+        const sanitized = technicalId.replace(/[:\\/?*[\]]/g, "_").slice(0, 18);
         if (!usedPrefixes.has(sanitized)) {
           usedPrefixes.add(sanitized);
           return sanitized;
@@ -597,7 +597,7 @@ export function useNetworkImportExport({
       return;
     }
 
-    await proceedWithImport(parsed.payload, new Map(), resetInput);
+    proceedWithImport(parsed.payload, new Map(), resetInput);
   }
 
   const importOverwriteDialog: ImportOverwriteDialogModel | null =
