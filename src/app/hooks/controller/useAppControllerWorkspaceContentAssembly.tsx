@@ -411,6 +411,7 @@ export function useAppControllerWorkspaceContentAssembly({
         handleOpenImportPicker: domains.workspaceNetworkDomain.handleOpenImportPicker,
         importFileInputRef: domains.workspaceNetworkDomain.importFileInputRef,
         handleImportFileChange: domains.workspaceNetworkDomain.handleImportFileChange,
+        importOverwriteDialog: domains.workspaceNetworkDomain.importOverwriteDialog,
         handleDeleteNetwork: domains.workspaceNetworkDomain.handleDeleteNetwork,
         handleOpenCreateNetworkForm: domains.workspaceNetworkDomain.handleOpenCreateNetworkForm,
         handleOpenEditNetworkForm: domains.workspaceNetworkDomain.handleOpenEditNetworkForm,

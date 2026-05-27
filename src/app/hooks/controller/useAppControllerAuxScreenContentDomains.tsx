@@ -34,6 +34,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     | "handleOpenImportPicker"
     | "importFileInputRef"
     | "handleImportFileChange"
+    | "importOverwriteDialog"
     | "handleDeleteNetwork"
     | "handleOpenCreateNetworkForm"
     | "handleOpenEditNetworkForm"
@@ -91,6 +92,7 @@ export function useAppControllerAuxScreenContentDomains({
     handleOpenImportPicker: networkScope.handleOpenImportPicker,
     importFileInputRef: networkScope.importFileInputRef,
     handleImportFileChange: networkScope.handleImportFileChange,
+    importOverwriteDialog: networkScope.importOverwriteDialog,
     handleDeleteNetwork: networkScope.handleDeleteNetwork,
     networkFormMode: networkScope.formState.networkFormMode,
     handleOpenCreateNetworkForm: networkScope.handleOpenCreateNetworkForm,
@@ -164,6 +166,8 @@ export function useAppControllerAuxScreenContentDomains({
     handleImportFileChange: settings.importExport.handleImportFileChange,
     importExportStatus: settings.importExport.importExportStatus,
     lastImportSummary: settings.importExport.lastImportSummary,
+    importOverwriteDialog: settings.importExport.importOverwriteDialog,
+    handleExportGroupedBom: settings.importExport.handleExportGroupedBom,
     locale: settings.prefs.locale,
     setLocale: settings.prefs.setLocale,
     themeMode: settings.prefs.themeMode,

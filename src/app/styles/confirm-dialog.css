@@ -393,6 +393,91 @@
   background: color-mix(in srgb, #b04343 18%, transparent);
 }
 
+.import-overwrite-dialog {
+  width: min(100%, 40rem);
+  max-height: min(36rem, calc(100vh - 2rem));
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+
+.import-overwrite-candidates {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.import-overwrite-candidate {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, currentColor 3%, transparent);
+}
+
+.import-overwrite-candidate-info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0.45rem;
+  align-items: baseline;
+}
+
+.import-overwrite-existing-label,
+.import-overwrite-imported-label {
+  grid-column: 1;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.import-overwrite-imported-info .import-overwrite-imported-label {
+  color: color-mix(in srgb, var(--theme-primary, currentColor) 90%, currentColor);
+  opacity: 0.8;
+}
+
+.import-overwrite-name {
+  grid-column: 2;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.import-overwrite-tech-id {
+  grid-column: 2;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  opacity: 0.72;
+  overflow-wrap: anywhere;
+}
+
+.import-overwrite-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.85rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.import-overwrite-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.import-overwrite-choice input[type="radio"] {
+  accent-color: var(--theme-primary, currentColor);
+  cursor: pointer;
+}
+
 @media (max-width: 640px) {
   .confirm-dialog {
     padding: 0.8rem;

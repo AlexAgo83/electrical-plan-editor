@@ -1,27 +1,55 @@
-import { type ChangeEvent, type MutableRefObject, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, type MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import {
   type Network,
   type NetworkId,
   type SpliceId,
   type WireEndpoint
 } from "../../core/entities";
+import { buildNetworkSummaryBomWorkbookSheets } from "../lib/networkSummaryBomCsv";
+import { buildWireListSheet } from "../lib/wireListExport";
+import { downloadTabularWorkbookFile } from "../lib/tabularExport";
+import type { WorkspaceCurrencyCode } from "../types/app-controller";
 import { spliceSideToPortIndex } from "../../core/directionalSplice";
 import { DIRECTIONAL_SPLICE_PORT_COUNT, resolveSplicePortMode } from "../../core/splicePortMode";
 import type { NetworkExportScope } from "../../adapters/portability";
 import type { AppStore } from "../../store";
 import {
   buildNetworkFilePayload,
+  detectOverwriteCandidates,
   parseNetworkFilePayload,
   resolveImportConflicts,
   serializeNetworkFilePayload,
-  type NetworkImportSummary
+  type NetworkImportSummary,
+  type OverwriteCandidate
 } from "../../adapters/portability";
+import type { OverwriteDecision } from "../components/dialogs/ImportOverwriteDialog";
 import { appActions } from "../../store";
 import type { NetworkScopedState } from "../../store";
+import type { NetworkFilePayloadV1 } from "../../adapters/portability/networkFile";
 import type { ImportExportStatus } from "../types/app-controller";
 import type { ToastNotificationVariant } from "./useToastNotifications";
 
 type NotifyToast = (title: string, options?: { message?: string; variant?: ToastNotificationVariant }) => void;
+
+interface PendingOverwriteImport {
+  payload: NetworkFilePayloadV1;
+  candidates: OverwriteCandidate[];
+  resetInput: () => void;
+}
+
+export interface ImportOverwriteDialogModel {
+  candidates: OverwriteCandidate[];
+  onConfirm: (decisions: Map<string, OverwriteDecision>) => void;
+  onCancel: () => void;
+}
+
+interface GroupedBomPreferences {
+  workspaceCurrencyCode?: WorkspaceCurrencyCode;
+  workspaceTaxEnabled?: boolean;
+  workspaceTaxRatePercent?: number;
+  bomExportCompactColumns?: boolean;
+  bomTraceabilityLabelsHidden?: boolean;
+}
 
 interface UseNetworkImportExportParams {
   store: AppStore;
@@ -29,6 +57,7 @@ interface UseNetworkImportExportParams {
   activeNetworkId: NetworkId | null;
   dispatchAction: (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean }) => void;
   notifyToast?: NotifyToast;
+  groupedBomPreferences?: GroupedBomPreferences;
 }
 
 interface UseNetworkImportExportResult {
@@ -36,9 +65,11 @@ interface UseNetworkImportExportResult {
   selectedExportNetworkIds: NetworkId[];
   importExportStatus: ImportExportStatus | null;
   lastImportSummary: NetworkImportSummary | null;
+  importOverwriteDialog: ImportOverwriteDialogModel | null;
   toggleSelectedExportNetwork: (networkId: NetworkId) => void;
   handleExportNetworks: (scope: "active" | "selected" | "all", exportedAtIsoOverride?: string) => void;
   handleExportNetwork: (networkId: NetworkId, exportedAtIsoOverride?: string) => void;
+  handleExportGroupedBom: (networkIds: NetworkId[]) => void;
   handleOpenImportPicker: () => void;
   handleImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
 }
@@ -270,12 +301,14 @@ export function useNetworkImportExport({
   networks,
   activeNetworkId,
   dispatchAction,
-  notifyToast
+  notifyToast,
+  groupedBomPreferences
 }: UseNetworkImportExportParams): UseNetworkImportExportResult {
   const importFileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedExportNetworkIds, setSelectedExportNetworkIds] = useState<NetworkId[]>([]);
   const [importExportStatus, setImportExportStatus] = useState<ImportExportStatus | null>(null);
   const [lastImportSummary, setLastImportSummary] = useState<NetworkImportSummary | null>(null);
+  const [pendingOverwriteImport, setPendingOverwriteImport] = useState<PendingOverwriteImport | null>(null);
 
   useEffect(() => {
     const availableIds = new Set(networks.map((network) => network.id));
@@ -366,6 +399,147 @@ export function useNetworkImportExport({
     })();
   }
 
+  const proceedWithImport = useCallback(
+    async (
+      payload: NetworkFilePayloadV1,
+      overwriteMap: ReadonlyMap<string, NetworkId>,
+      resetInput: () => void
+    ): Promise<void> => {
+      const overwriteNetworkIds = [...overwriteMap.values()];
+      const resolved = resolveImportConflicts(payload, store.getState(), overwriteMap);
+      setLastImportSummary(resolved.summary);
+
+      if (resolved.networks.length === 0) {
+        const message = "No network was imported. Check file errors.";
+        setImportExportStatus({ kind: "failed", message });
+        notifyToast?.("Import failed", {
+          message: formatImportSummaryMessage(resolved.summary),
+          variant: "error"
+        });
+        resetInput();
+        return;
+      }
+
+      let networkStatesToImport = resolved.networkStates;
+      if (hasLegacyNumericSplices(resolved.networkStates) && typeof window !== "undefined") {
+        const shouldConvertLegacySplices = window.confirm(
+          "Legacy numeric splice ports were detected. Convert them to directional L/R splices now? Choose Cancel to keep the old numeric design."
+        );
+        if (shouldConvertLegacySplices) {
+          networkStatesToImport = convertLegacyNumericSplicesToDirectional(resolved.networkStates);
+        }
+      }
+
+      dispatchAction(
+        appActions.importNetworks(
+          resolved.networks,
+          networkStatesToImport,
+          resolved.harnessAssemblies,
+          true,
+          overwriteNetworkIds.length > 0 ? overwriteNetworkIds : undefined
+        )
+      );
+
+      const importStatusKind: ImportExportStatus["kind"] =
+        resolved.summary.errors.length > 0 || resolved.summary.warnings.length > 0 ? "partial" : "success";
+      setImportExportStatus({
+        kind: importStatusKind,
+        message: `Imported ${resolved.networks.length} network(s).`
+      });
+      notifyToast?.("Networks imported", {
+        message: formatImportSummaryMessage(resolved.summary),
+        variant: importStatusKind === "success" ? "success" : "warning"
+      });
+      resetInput();
+    },
+    [store, dispatchAction, notifyToast]
+  );
+
+  function handleExportGroupedBom(networkIds: NetworkId[]): void {
+    if (networkIds.length === 0) {
+      return;
+    }
+    void (async () => {
+      const state = store.getState();
+      const prefs = groupedBomPreferences ?? {};
+      const usedPrefixes = new Set<string>();
+
+      function buildSheetPrefix(technicalId: string): string {
+        const sanitized = technicalId.replace(/[:\\/?\*\[\]]/g, "_").slice(0, 18);
+        if (!usedPrefixes.has(sanitized)) {
+          usedPrefixes.add(sanitized);
+          return sanitized;
+        }
+        let index = 2;
+        while (usedPrefixes.has(`${sanitized.slice(0, 15)}_${index}`)) {
+          index++;
+        }
+        const unique = `${sanitized.slice(0, 15)}_${index}`;
+        usedPrefixes.add(unique);
+        return unique;
+      }
+
+      const allSheets = [];
+      for (const networkId of networkIds) {
+        const network = state.networks.byId[networkId];
+        const networkState = state.networkStates[networkId];
+        if (network === undefined || networkState === undefined) {
+          continue;
+        }
+
+        const connectors = networkState.connectors.allIds
+          .map((id) => networkState.connectors.byId[id])
+          .filter((c) => c !== undefined);
+        const splices = networkState.splices.allIds
+          .map((id) => networkState.splices.byId[id])
+          .filter((s) => s !== undefined);
+        const wires = networkState.wires.allIds
+          .map((id) => networkState.wires.byId[id])
+          .filter((w) => w !== undefined);
+        const catalogItems = networkState.catalogItems.allIds
+          .map((id) => networkState.catalogItems.byId[id])
+          .filter((c) => c !== undefined);
+        const connectorCavityOccupancy = Object.fromEntries(
+          Object.entries(networkState.connectorCavityOccupancy)
+        );
+
+        const prefix = buildSheetPrefix(network.technicalId);
+        const bomSheets = buildNetworkSummaryBomWorkbookSheets(
+          catalogItems,
+          connectors,
+          splices,
+          wires,
+          prefs.workspaceCurrencyCode ?? "EUR",
+          prefs.workspaceTaxEnabled ?? true,
+          prefs.workspaceTaxRatePercent ?? 20,
+          prefs.bomExportCompactColumns ?? false,
+          {
+            connectorCavityOccupancy,
+            showTraceabilityLabels: !(prefs.bomTraceabilityLabelsHidden ?? false)
+          }
+        );
+
+        for (const sheet of bomSheets) {
+          const shortSheetName = sheet.name.replace(/^Network\s+/i, "");
+          allSheets.push({ ...sheet, name: `${prefix} ${shortSheetName}` });
+        }
+
+        allSheets.push(
+          buildWireListSheet(`${prefix} Wires`, wires, connectors, splices)
+        );
+      }
+
+      if (allSheets.length === 0) {
+        setImportExportStatus({ kind: "failed", message: "No network data found for selected networks." });
+        return;
+      }
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").replace("T", "_").replace(/Z$/i, "");
+      await downloadTabularWorkbookFile(`grouped-bom-${timestamp}`, allSheets);
+      setImportExportStatus({ kind: "success", message: `Exported grouped BOM for ${networkIds.length} network(s).` });
+    })();
+  }
+
   function handleOpenImportPicker(): void {
     importFileInputRef.current?.click();
   }
@@ -412,56 +586,51 @@ export function useNetworkImportExport({
       return;
     }
 
-    const resolved = resolveImportConflicts(parsed.payload, store.getState());
-    setLastImportSummary(resolved.summary);
+    const currentState = store.getState();
+    const existingNetworks = currentState.networks.allIds
+      .map((id) => currentState.networks.byId[id])
+      .filter((n): n is Network => n !== undefined);
+    const candidates = detectOverwriteCandidates(parsed.payload, existingNetworks);
 
-    if (resolved.networks.length === 0) {
-      const message = "No network was imported. Check file errors.";
-      setImportExportStatus({
-        kind: "failed",
-        message
-      });
-      notifyToast?.("Import failed", {
-        message: formatImportSummaryMessage(resolved.summary),
-        variant: "error"
-      });
-      resetInput();
+    if (candidates.length > 0) {
+      setPendingOverwriteImport({ payload: parsed.payload, candidates, resetInput });
       return;
     }
 
-    let networkStatesToImport = resolved.networkStates;
-    if (hasLegacyNumericSplices(resolved.networkStates) && typeof window !== "undefined") {
-      const shouldConvertLegacySplices = window.confirm(
-        "Legacy numeric splice ports were detected. Convert them to directional L/R splices now? Choose Cancel to keep the old numeric design."
-      );
-      if (shouldConvertLegacySplices) {
-        networkStatesToImport = convertLegacyNumericSplicesToDirectional(resolved.networkStates);
-      }
-    }
-
-    dispatchAction(appActions.importNetworks(resolved.networks, networkStatesToImport, resolved.harnessAssemblies, true));
-
-    const importStatusKind: ImportExportStatus["kind"] =
-      resolved.summary.errors.length > 0 || resolved.summary.warnings.length > 0 ? "partial" : "success";
-    setImportExportStatus({
-      kind: importStatusKind,
-      message: `Imported ${resolved.networks.length} network(s).`
-    });
-    notifyToast?.("Networks imported", {
-      message: formatImportSummaryMessage(resolved.summary),
-      variant: importStatusKind === "success" ? "success" : "warning"
-    });
-    resetInput();
+    await proceedWithImport(parsed.payload, new Map(), resetInput);
   }
+
+  const importOverwriteDialog: ImportOverwriteDialogModel | null =
+    pendingOverwriteImport !== null
+      ? {
+          candidates: pendingOverwriteImport.candidates,
+          onConfirm: (decisions) => {
+            const overwriteMap = new Map<string, NetworkId>();
+            for (const candidate of pendingOverwriteImport.candidates) {
+              if ((decisions.get(candidate.importedNetworkId) ?? "overwrite") === "overwrite") {
+                overwriteMap.set(candidate.importedNetworkId, candidate.existingNetworkId);
+              }
+            }
+            setPendingOverwriteImport(null);
+            void proceedWithImport(pendingOverwriteImport.payload, overwriteMap, pendingOverwriteImport.resetInput);
+          },
+          onCancel: () => {
+            pendingOverwriteImport.resetInput();
+            setPendingOverwriteImport(null);
+          }
+        }
+      : null;
 
   return {
     importFileInputRef,
     selectedExportNetworkIds,
     importExportStatus,
     lastImportSummary,
+    importOverwriteDialog,
     toggleSelectedExportNetwork,
     handleExportNetworks,
     handleExportNetwork,
+    handleExportGroupedBom,
     handleOpenImportPicker,
     handleImportFileChange
   };

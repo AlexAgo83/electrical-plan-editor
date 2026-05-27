@@ -951,7 +951,9 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setWorkspacePanelsLayoutMode: params.setWorkspacePanelsLayoutMode,
     workspaceWideScreen: params.workspaceWideScreen,
     setWorkspaceWideScreen: params.setWorkspaceWideScreen,
-    resetWorkspacePreferencesToDefaults: params.resetWorkspacePreferencesToDefaults
+    resetWorkspacePreferencesToDefaults: params.resetWorkspacePreferencesToDefaults,
+    importOverwriteDialog: params.importOverwriteDialog,
+    handleExportGroupedBom: params.handleExportGroupedBom
   } satisfies SettingsWorkspaceContentProps;
 
   return {

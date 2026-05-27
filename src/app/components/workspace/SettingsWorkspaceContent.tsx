@@ -1,5 +1,6 @@
 import type { ChangeEvent, ReactElement, RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
+import { ImportOverwriteDialog } from "../dialogs/ImportOverwriteDialog";
 import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
 import { THEME_MODE_OPTIONS } from "../../lib/themeModes";
@@ -138,6 +139,8 @@ interface SettingsWorkspaceContentProps {
   workspaceWideScreen: boolean;
   setWorkspaceWideScreen: (value: boolean) => void;
   resetWorkspacePreferencesToDefaults: () => void;
+  importOverwriteDialog?: import("../../hooks/useNetworkImportExport").ImportOverwriteDialogModel | null;
+  handleExportGroupedBom?: (networkIds: NetworkId[]) => void;
 }
 
 export function SettingsWorkspaceContent({
@@ -253,7 +256,9 @@ export function SettingsWorkspaceContent({
   setWorkspacePanelsLayoutMode,
   workspaceWideScreen,
   setWorkspaceWideScreen,
-  resetWorkspacePreferencesToDefaults
+  resetWorkspacePreferencesToDefaults,
+  importOverwriteDialog = null,
+  handleExportGroupedBom
 }: SettingsWorkspaceContentProps): ReactElement {
   return (
     <section className="panel-grid settings-panel-grid">
@@ -837,6 +842,15 @@ export function SettingsWorkspaceContent({
               <button type="button" onClick={() => handleExportNetworks("all")} disabled={networks.length === 0}>Export all</button>
             </div>
             <div className="row-actions settings-actions">
+              <button
+                type="button"
+                onClick={() => handleExportGroupedBom?.(selectedExportNetworkIds)}
+                disabled={selectedExportNetworkIds.length === 0 || handleExportGroupedBom === undefined}
+              >
+                Export grouped BOM (XLSX)
+              </button>
+            </div>
+            <div className="row-actions settings-actions">
               <button type="button" onClick={handleOpenImportPicker}>Import from file</button>
               <input
                 ref={importFileInputRef}
@@ -847,6 +861,14 @@ export function SettingsWorkspaceContent({
                 }}
                 hidden
               />
+              {importOverwriteDialog !== null ? (
+                <ImportOverwriteDialog
+                  isOpen
+                  candidates={importOverwriteDialog.candidates}
+                  onConfirm={importOverwriteDialog.onConfirm}
+                  onCancel={importOverwriteDialog.onCancel}
+                />
+              ) : null}
             </div>
           </div>
           <fieldset className="inline-fieldset settings-export-fieldset settings-import-export-selection-column">

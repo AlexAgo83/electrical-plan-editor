@@ -757,12 +757,85 @@ export function parseNetworkFilePayload(rawJson: string): { payload: NetworkFile
   };
 }
 
+export interface OverwriteCandidate {
+  importedNetworkId: string;
+  importedName: string;
+  importedTechnicalId: string;
+  existingNetworkId: NetworkId;
+  existingName: string;
+  existingTechnicalId: string;
+  matchReason: "technicalId" | "name" | "nameVariant";
+}
+
+export function detectOverwriteCandidates(
+  payload: NetworkFilePayloadV1,
+  existingNetworks: Network[]
+): OverwriteCandidate[] {
+  const candidates: OverwriteCandidate[] = [];
+  const matchedExistingIds = new Set<string>();
+
+  for (const bundle of payload.networks) {
+    const { id: importedId, name: rawImportedName, technicalId: rawImportedTechId } = bundle.network;
+    const normalizedImportedName = rawImportedName.trim().toLowerCase();
+    const normalizedImportedTechId = rawImportedTechId.trim();
+    const strippedImportedName = normalizedImportedName.replace(/-imp\d*$/i, "").trim();
+    const strippedImportedTechId = normalizedImportedTechId.replace(/-IMP\d*$/, "");
+
+    for (const existing of existingNetworks) {
+      if (matchedExistingIds.has(existing.id as string)) {
+        continue;
+      }
+
+      const normalizedExistingName = existing.name.trim().toLowerCase();
+      const normalizedExistingTechId = existing.technicalId.trim();
+
+      let matchReason: OverwriteCandidate["matchReason"] | null = null;
+
+      if (normalizedImportedTechId === normalizedExistingTechId) {
+        matchReason = "technicalId";
+      } else if (normalizedImportedName === normalizedExistingName) {
+        matchReason = "name";
+      } else if (
+        (strippedImportedName !== normalizedImportedName && strippedImportedName === normalizedExistingName) ||
+        (strippedImportedTechId !== normalizedImportedTechId && strippedImportedTechId === normalizedExistingTechId)
+      ) {
+        matchReason = "nameVariant";
+      }
+
+      if (matchReason !== null) {
+        matchedExistingIds.add(existing.id as string);
+        candidates.push({
+          importedNetworkId: importedId as string,
+          importedName: rawImportedName.trim(),
+          importedTechnicalId: normalizedImportedTechId,
+          existingNetworkId: existing.id,
+          existingName: existing.name.trim(),
+          existingTechnicalId: normalizedExistingTechId,
+          matchReason
+        });
+        break;
+      }
+    }
+  }
+
+  return candidates;
+}
+
 export function resolveImportConflicts(
   payload: NetworkFilePayloadV1,
-  existingState: AppState
+  existingState: AppState,
+  overwriteMap: ReadonlyMap<string, NetworkId> = new Map()
 ): NetworkImportResult {
   const importBaseIso = new Date().toISOString();
   const existingTechnicalIds = new Set(existingState.networks.allIds.map((id) => existingState.networks.byId[id]?.technicalId ?? ""));
+
+  for (const existingId of overwriteMap.values()) {
+    const overwrittenNetwork = existingState.networks.byId[existingId];
+    if (overwrittenNetwork !== undefined) {
+      existingTechnicalIds.delete(overwrittenNetwork.technicalId);
+    }
+  }
+
   const existingIds = new Set(existingState.networks.allIds.map((id) => id as string));
   const existingHarnessAssemblyIds = new Set(existingState.harnessAssemblies.allIds.map((id) => id as string));
   const existingHarnessAssemblyTechnicalIds = new Set(
@@ -790,10 +863,17 @@ export function resolveImportConflicts(
     }
 
     let importedId = sourceNetwork.id as string;
-    if (existingIds.has(importedId)) {
+    const targetExistingId = overwriteMap.get(importedId);
+
+    if (targetExistingId !== undefined) {
+      importedId = targetExistingId as string;
+    } else if (existingIds.has(importedId)) {
       const dedupedId = dedupeWithSuffix(importedId, existingIds, "-import");
       summary.warnings.push(`Network ID '${sourceNetwork.id}' was renamed to '${dedupedId}' during import.`);
       importedId = dedupedId;
+      existingIds.add(importedId);
+    } else {
+      existingIds.add(importedId);
     }
 
     let importedTechnicalId = normalizedTechnicalId;
@@ -805,7 +885,6 @@ export function resolveImportConflicts(
       importedTechnicalId = dedupedTechnicalId;
     }
 
-    existingIds.add(importedId);
     existingTechnicalIds.add(importedTechnicalId);
 
     const networkId = importedId as NetworkId;

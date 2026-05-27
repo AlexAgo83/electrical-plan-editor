@@ -422,16 +422,22 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       let nextHarnessAssemblies = persisted.harnessAssemblies;
       const nextNetworkStates = { ...persisted.networkStates };
       const nowIso = new Date().toISOString();
+      const overwriteSet = new Set<string>((action.payload.overwriteNetworkIds ?? []).map((id) => id as string));
       for (const network of action.payload.networks) {
         const normalizedName = network.name.trim();
         const normalizedTechnicalId = network.technicalId.trim();
         if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
           return withError(state, "Cannot import network with empty name or technical ID.");
         }
-        if (nextNetworks.byId[network.id] !== undefined) {
+        const isOverwrite = overwriteSet.has(network.id as string);
+        if (!isOverwrite && nextNetworks.byId[network.id] !== undefined) {
           return withError(state, `Cannot import network '${network.id}': ID already exists.`);
         }
-        if (hasDuplicateNetworkTechnicalId({ ...persisted, networks: nextNetworks }, normalizedTechnicalId)) {
+        if (hasDuplicateNetworkTechnicalId(
+          { ...persisted, networks: nextNetworks },
+          normalizedTechnicalId,
+          isOverwrite ? network.id : undefined
+        )) {
           return withError(state, `Cannot import network '${normalizedTechnicalId}': technical ID already exists.`);
         }
         const scoped = action.payload.networkStates[network.id];

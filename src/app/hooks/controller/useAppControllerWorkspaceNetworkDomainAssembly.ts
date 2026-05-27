@@ -103,7 +103,14 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     networks: core.networks,
     activeNetworkId: core.activeNetworkId,
     dispatchAction: core.dispatchAction,
-    notifyToast: core.notifyToast
+    notifyToast: core.notifyToast,
+    groupedBomPreferences: {
+      workspaceCurrencyCode: ui.preferencesState.workspaceCurrencyCode,
+      workspaceTaxEnabled: ui.preferencesState.workspaceTaxEnabled,
+      workspaceTaxRatePercent: ui.preferencesState.workspaceTaxRatePercent,
+      bomExportCompactColumns: ui.preferencesState.bomExportCompactColumns,
+      bomTraceabilityLabelsHidden: ui.preferencesState.bomTraceabilityLabelsHidden
+    }
   });
 
   const {
@@ -232,7 +239,8 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     importExportStatus: networkImportExportModel.importExportStatus,
     lastImportSummary: networkImportExportModel.lastImportSummary,
     handleOpenImportPicker: networkImportExportModel.handleOpenImportPicker,
-    handleImportFileChange: networkImportExportModel.handleImportFileChange
+    handleImportFileChange: networkImportExportModel.handleImportFileChange,
+    importOverwriteDialog: networkImportExportModel.importOverwriteDialog
   };
 }
 

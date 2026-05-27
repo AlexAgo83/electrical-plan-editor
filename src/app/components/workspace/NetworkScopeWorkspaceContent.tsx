@@ -10,6 +10,8 @@ import {
   type RefObject
 } from "react";
 import type { NetworkId } from "../../../core/entities";
+import type { ImportOverwriteDialogModel } from "../../hooks/useNetworkImportExport";
+import { ImportOverwriteDialog } from "../dialogs/ImportOverwriteDialog";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, nextSortState, sortByTableColumns } from "../../lib/app-utils-shared";
@@ -74,6 +76,7 @@ interface NetworkScopeWorkspaceContentProps {
   focusRequestedNetworkToken: number;
   onOpenOnboardingHelp?: () => void;
   functionalSchematicPanel?: ReactNode;
+  importOverwriteDialog?: ImportOverwriteDialogModel | null;
 }
 
 export function NetworkScopeWorkspaceContent({
@@ -118,7 +121,8 @@ export function NetworkScopeWorkspaceContent({
   focusRequestedNetworkId,
   focusRequestedNetworkToken,
   onOpenOnboardingHelp,
-  functionalSchematicPanel
+  functionalSchematicPanel,
+  importOverwriteDialog = null
 }: NetworkScopeWorkspaceContentProps): ReactElement {
   type NetworkScopeFilterField = "name" | "technicalId" | "any";
   type NetworkScopeTableSortField = "name" | "technicalId" | "status";
@@ -517,6 +521,14 @@ export function NetworkScopeWorkspaceContent({
               }}
               hidden
             />
+            {importOverwriteDialog !== null ? (
+              <ImportOverwriteDialog
+                isOpen
+                candidates={importOverwriteDialog.candidates}
+                onConfirm={importOverwriteDialog.onConfirm}
+                onCancel={importOverwriteDialog.onCancel}
+              />
+            ) : null}
           </div>
         </div>
       </section>
