@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { createEmptyNetworkScopedState } from "../store";
 import { createUiIntegrationState, getPanelByHeading, renderAppWithState, switchScreen } from "./helpers/app-ui-test-utils";
 
 describe("App integration UI - import/export", () => {
@@ -78,5 +79,54 @@ describe("App integration UI - import/export", () => {
       ).toBeInTheDocument();
     });
     expect(store.getState().activeNetworkId).toBe(initialActiveNetworkId);
+  });
+
+  it("shows import warning details below the summary", async () => {
+    const { store } = renderAppWithState(createUiIntegrationState());
+    switchScreen("settings");
+    const existing = store.getState();
+    const activeNetworkId = existing.activeNetworkId;
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network in import/export UI fixture.");
+    }
+    const activeNetwork = existing.networks.byId[activeNetworkId];
+    if (activeNetwork === undefined) {
+      throw new Error("Expected active network entity in import/export UI fixture.");
+    }
+
+    const payload = {
+      schemaVersion: 3,
+      exportedAt: "2026-05-27T10:00:00.000Z",
+      source: {
+        app: "electrical-plan-editor",
+        appVersion: "test",
+        appSchemaVersion: 3
+      },
+      networks: [
+        {
+          network: {
+            id: activeNetwork.id,
+            name: "Imported duplicate",
+            technicalId: activeNetwork.technicalId,
+            createdAt: "2026-05-27T09:00:00.000Z",
+            updatedAt: "2026-05-27T09:00:00.000Z"
+          },
+          state: createEmptyNetworkScopedState()
+        }
+      ]
+    };
+
+    const panel = getPanelByHeading("Import / Export networks");
+    const fileInput = panel.querySelector('input[type="file"]');
+    expect(fileInput).not.toBeNull();
+    fireEvent.change(fileInput as HTMLInputElement, {
+      target: {
+        files: [new File([JSON.stringify(payload)], "duplicate-network.json", { type: "application/json" })]
+      }
+    });
+
+    expect(await within(panel).findByText("Warning details")).toBeInTheDocument();
+    expect(within(panel).getByText(/Network ID 'network-main' was renamed to 'network-main-import' during import\./)).toBeInTheDocument();
+    expect(within(panel).getByText(/Network technical ID 'NET-MAIN-SAMPLE' was renamed to 'NET-MAIN-SAMPLE-IMP' during import\./)).toBeInTheDocument();
   });
 });

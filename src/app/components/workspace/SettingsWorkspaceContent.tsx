@@ -878,12 +878,34 @@ export function SettingsWorkspaceContent({
         </div>
         {importExportStatus !== null ? <p className={`meta-line import-status is-${importExportStatus.kind}`}>{importExportStatus.message}</p> : null}
         {lastImportSummary !== null ? (
-          <div className="settings-import-summary">
-            <p className="meta-line"><span>Imported</span> <strong>{lastImportSummary.importedNetworkIds.length}</strong></p>
-            <p className="meta-line"><span>Skipped</span> <strong>{lastImportSummary.skippedNetworkIds.length}</strong></p>
-            <p className="meta-line"><span>Warnings</span> <strong>{lastImportSummary.warnings.length}</strong></p>
-            <p className="meta-line"><span>Errors</span> <strong>{lastImportSummary.errors.length}</strong></p>
-          </div>
+          <>
+            <div className="settings-import-summary">
+              <p className="meta-line"><span>Imported</span> <strong>{lastImportSummary.importedNetworkIds.length}</strong></p>
+              <p className="meta-line"><span>Skipped</span> <strong>{lastImportSummary.skippedNetworkIds.length}</strong></p>
+              <p className="meta-line"><span>Warnings</span> <strong>{lastImportSummary.warnings.length}</strong></p>
+              <p className="meta-line"><span>Errors</span> <strong>{lastImportSummary.errors.length}</strong></p>
+            </div>
+            {lastImportSummary.warnings.length > 0 ? (
+              <div className="settings-import-details is-warning" role="status" aria-label="Import warning details">
+                <h3>Warning details</h3>
+                <ul>
+                  {lastImportSummary.warnings.map((warning, index) => (
+                    <li key={`${index}-${warning}`}>{warning}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {lastImportSummary.errors.length > 0 ? (
+              <div className="settings-import-details is-error" role="alert" aria-label="Import error details">
+                <h3>Error details</h3>
+                <ul>
+                  {lastImportSummary.errors.map((error, index) => (
+                    <li key={`${index}-${error}`}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </>
         ) : null}
       </section>
 

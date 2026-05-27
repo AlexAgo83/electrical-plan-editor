@@ -540,6 +540,37 @@
   color: #20435f;
 }
 
+.settings-import-details {
+  margin-top: 0.55rem;
+  border: 1px solid #d5c27b;
+  border-radius: 0.5rem;
+  background: rgba(255, 250, 226, 0.82);
+  padding: 0.55rem 0.7rem;
+  color: #5c4210;
+}
+
+.settings-import-details.is-error {
+  border-color: #d3a7ad;
+  background: #fbeaed;
+  color: #8f1e1e;
+}
+
+.settings-import-details h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.88rem;
+  line-height: 1.2;
+}
+
+.settings-import-details ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.settings-import-details li {
+  margin: 0.2rem 0;
+  overflow-wrap: anywhere;
+}
+
 .settings-primary-action {
   border-color: #5f8bab !important;
   background: linear-gradient(180deg, #38698c, #2a5979) !important;
