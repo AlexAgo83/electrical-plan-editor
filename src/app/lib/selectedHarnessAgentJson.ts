@@ -41,7 +41,7 @@ interface MaterialRef {
 }
 
 interface BomQuantity {
-  kind: "connector" | "splice" | "terminal" | "seal" | "plug" | "protection";
+  kind: "connector" | "splice" | "terminal" | "seal" | "plug" | "protection" | "accessory";
   reference: string;
   name?: string;
   quantity: number;
@@ -50,7 +50,7 @@ interface BomQuantity {
 }
 
 interface AgentCatalogPart {
-  kind: "catalogItem" | "terminal" | "seal" | "plug" | "protection";
+  kind: "catalogItem" | "terminal" | "seal" | "plug" | "protection" | "accessory";
   reference: string;
   id?: string;
   name?: string;
@@ -296,6 +296,44 @@ function registerEndpointMaterials(
   }
 }
 
+function registerCatalogAdditionalAccessories(
+  catalogItem: CatalogItem,
+  usedBy: Record<string, string | number>,
+  catalogParts: Map<string, AgentCatalogPart>,
+  quantities: Map<string, BomQuantity>,
+  relationships: AgentRelationship[]
+): void {
+  for (const accessory of catalogItem.additionalAccessories ?? []) {
+    const reference = normalizeReference(accessory.accessoryReference);
+    if (reference === undefined) {
+      continue;
+    }
+    const accessoryUsedBy = {
+      ...usedBy,
+      catalogItemId: catalogItem.id,
+      catalogItemReference: catalogItem.manufacturerReference
+    };
+    addUsedBy(
+      catalogParts,
+      `accessory:${reference}`,
+      { kind: "accessory", reference, name: accessory.accessoryName },
+      accessoryUsedBy
+    );
+    addQuantity(
+      quantities,
+      { kind: "accessory", reference, name: accessory.accessoryName, origin: "catalogDefault" },
+      1,
+      accessoryUsedBy
+    );
+    relationships.push({
+      kind: "catalog-item-additional-accessory",
+      from: { catalogItemId: catalogItem.id, manufacturerReference: catalogItem.manufacturerReference },
+      to: { accessoryReference: reference },
+      via: usedBy
+    });
+  }
+}
+
 function scopedConnectorOccupancy(scoped: NetworkScopedState): ConnectorCavityOccupancyMap {
   return scoped.connectorCavityOccupancy;
 }
@@ -389,6 +427,7 @@ export function buildSelectedHarnessAgentJsonPayload(params: {
             1,
             usedBy
           );
+          registerCatalogAdditionalAccessories(catalogItem, usedBy, catalogParts, quantities, relationships);
           relationships.push({
             kind: "connector-catalog-item",
             from: { networkId: member.networkId, connectorId: connector.id },
@@ -428,6 +467,7 @@ export function buildSelectedHarnessAgentJsonPayload(params: {
             1,
             usedBy
           );
+          registerCatalogAdditionalAccessories(catalogItem, usedBy, catalogParts, quantities, relationships);
           relationships.push({
             kind: "splice-catalog-item",
             from: { networkId: member.networkId, spliceId: splice.id },

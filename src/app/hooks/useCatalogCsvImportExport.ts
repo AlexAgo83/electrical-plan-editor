@@ -197,6 +197,7 @@ export function useCatalogCsvImportExport({
           url: row.url,
           ...(parsed.schema === "current"
             ? {
+                additionalAccessories: row.additionalAccessories,
                 connectorDefaults: row.connectorDefaults,
                 connectorLayout: row.connectorLayout
               }

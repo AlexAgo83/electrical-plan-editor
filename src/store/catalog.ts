@@ -1,4 +1,5 @@
 import type {
+  CatalogAdditionalAccessory,
   CatalogItem,
   CatalogItemId,
   Connector,
@@ -81,6 +82,29 @@ export function isValidCatalogUrlInput(value: string): boolean {
   return normalized.length === 0 || isAbsoluteHttpUrl(normalized);
 }
 
+export function normalizeCatalogAdditionalAccessories(value: unknown): CatalogAdditionalAccessory[] | undefined {
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+  const normalized = value
+    .map((candidate): CatalogAdditionalAccessory | null => {
+      if (candidate === null || typeof candidate !== "object") {
+        return null;
+      }
+      const accessory = candidate as Partial<CatalogAdditionalAccessory>;
+      const accessoryReference = normalizeManufacturerReference(accessory.accessoryReference);
+      if (accessoryReference === undefined) {
+        return null;
+      }
+      return {
+        accessoryReference,
+        accessoryName: normalizeCatalogName(accessory.accessoryName)
+      };
+    })
+    .filter((accessory): accessory is CatalogAdditionalAccessory => accessory !== null);
+  return normalized.length === 0 ? undefined : normalized;
+}
+
 export function normalizeCatalogItem(candidate: Partial<CatalogItem>): CatalogItem | null {
   if (typeof candidate.id !== "string" || candidate.id.trim().length === 0) {
     return null;
@@ -98,6 +122,7 @@ export function normalizeCatalogItem(candidate: Partial<CatalogItem>): CatalogIt
     name: normalizeCatalogName(candidate.name),
     unitPriceExclTax: normalizeCatalogUnitPriceExclTax(candidate.unitPriceExclTax),
     url: normalizeCatalogUrl(candidate.url),
+    additionalAccessories: normalizeCatalogAdditionalAccessories(candidate.additionalAccessories),
     connectorDefaults: normalizeConnectorCatalogDefaults(candidate.connectorDefaults, connectionCount),
     connectorLayout: normalizeConnectorLayout(candidate.connectorLayout, connectionCount)
   };

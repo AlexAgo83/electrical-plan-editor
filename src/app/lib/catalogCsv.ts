@@ -8,11 +8,21 @@ export const CATALOG_CSV_HEADERS = [
   "Name",
   "Unit price (excl. tax)",
   "URL",
+  "Additional accessories (JSON)",
   "Connector defaults (JSON)",
   "Connector layout (JSON)"
 ] as const;
 
 export const LEGACY_CATALOG_CSV_HEADERS = CATALOG_CSV_HEADERS.slice(0, 5);
+const PREVIOUS_CATALOG_CSV_HEADERS = [
+  "Manufacturer reference",
+  "Connection count",
+  "Name",
+  "Unit price (excl. tax)",
+  "URL",
+  "Connector defaults (JSON)",
+  "Connector layout (JSON)"
+] as const;
 
 export interface CatalogCsvImportRow {
   manufacturerReference: string;
@@ -20,6 +30,7 @@ export interface CatalogCsvImportRow {
   name?: string;
   unitPriceExclTax?: number;
   url?: string;
+  additionalAccessories?: CatalogItem["additionalAccessories"];
   connectorDefaults?: CatalogItem["connectorDefaults"];
   connectorLayout?: CatalogItem["connectorLayout"];
 }
@@ -162,6 +173,29 @@ function parseOptionalJsonObject(
   return { ok: true, value: parsed as Record<string, unknown> };
 }
 
+function parseOptionalJsonArray(
+  raw: string,
+  label: string
+): { ok: true; value: unknown[] | undefined } | { ok: false; message: string } {
+  const normalized = raw.trim();
+  if (normalized.length === 0) {
+    return { ok: true, value: undefined };
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(normalized);
+  } catch {
+    return { ok: false, message: `${label} must be valid JSON when provided.` };
+  }
+
+  if (!Array.isArray(parsed)) {
+    return { ok: false, message: `${label} must be a JSON array when provided.` };
+  }
+
+  return { ok: true, value: parsed };
+}
+
 export function buildCatalogCsvExport(catalogItems: CatalogItem[]): { headers: string[]; rows: CsvCellValue[][] } {
   const rows = [...catalogItems]
     .sort((left, right) => left.manufacturerReference.localeCompare(right.manufacturerReference, undefined, { sensitivity: "base" }))
@@ -171,6 +205,7 @@ export function buildCatalogCsvExport(catalogItems: CatalogItem[]): { headers: s
       item.name ?? "",
       item.unitPriceExclTax ?? "",
       item.url ?? "",
+      stableStringifyJson(item.additionalAccessories),
       stableStringifyJson(item.connectorDefaults),
       stableStringifyJson(item.connectorLayout)
     ]);
@@ -193,6 +228,7 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
 
   const headerRow = rows[0]?.map((value) => value.replace(/^\uFEFF/, "")) ?? [];
   const expectedHeaders = [...CATALOG_CSV_HEADERS];
+  const previousHeaders = [...PREVIOUS_CATALOG_CSV_HEADERS];
   const legacyHeaders = [...LEGACY_CATALOG_CSV_HEADERS];
   const issues: CatalogCsvImportIssue[] = [];
   const hasCurrentHeaders =
@@ -201,8 +237,11 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
   const hasLegacyHeaders =
     headerRow.length === legacyHeaders.length &&
     headerRow.every((value, index) => value === legacyHeaders[index]);
+  const hasPreviousHeaders =
+    headerRow.length === previousHeaders.length &&
+    headerRow.every((value, index) => value === previousHeaders[index]);
 
-  if (!hasCurrentHeaders && !hasLegacyHeaders) {
+  if (!hasCurrentHeaders && !hasPreviousHeaders && !hasLegacyHeaders) {
     return {
       rows: [],
       issues: [
@@ -216,8 +255,8 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
     };
   }
 
-  const schema = hasCurrentHeaders ? "current" : "legacy";
-  const activeHeaders = hasCurrentHeaders ? expectedHeaders : legacyHeaders;
+  const schema = hasCurrentHeaders || hasPreviousHeaders ? "current" : "legacy";
+  const activeHeaders = hasCurrentHeaders ? expectedHeaders : hasPreviousHeaders ? previousHeaders : legacyHeaders;
   const dataRows = rows.slice(1);
   const rawRowsByManufacturerRef = new Map<string, { rowNumber: number; values: string[]; manufacturerReference: string }>();
 
@@ -303,9 +342,22 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
       continue;
     }
 
+    const additionalAccessories =
+      hasCurrentHeaders
+        ? parseOptionalJsonArray(values[5] ?? "", "Additional accessories (JSON)")
+        : { ok: true as const, value: undefined };
+    if (!additionalAccessories.ok) {
+      issues.push({
+        kind: "error",
+        rowNumber,
+        message: additionalAccessories.message
+      });
+      continue;
+    }
+
     const connectorDefaults =
       schema === "current"
-        ? parseOptionalJsonObject(values[5] ?? "", "Connector defaults (JSON)")
+        ? parseOptionalJsonObject(values[hasCurrentHeaders ? 6 : 5] ?? "", "Connector defaults (JSON)")
         : { ok: true as const, value: undefined };
     if (!connectorDefaults.ok) {
       issues.push({
@@ -318,7 +370,7 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
 
     const connectorLayout =
       schema === "current"
-        ? parseOptionalJsonObject(values[6] ?? "", "Connector layout (JSON)")
+        ? parseOptionalJsonObject(values[hasCurrentHeaders ? 7 : 6] ?? "", "Connector layout (JSON)")
         : { ok: true as const, value: undefined };
     if (!connectorLayout.ok) {
       issues.push({
@@ -335,6 +387,7 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
       name: normalizeOptionalText(values[2] ?? ""),
       unitPriceExclTax,
       url,
+      additionalAccessories: additionalAccessories.value as CatalogItem["additionalAccessories"],
       connectorDefaults: connectorDefaults.value as CatalogItem["connectorDefaults"],
       connectorLayout: connectorLayout.value as CatalogItem["connectorLayout"]
     });

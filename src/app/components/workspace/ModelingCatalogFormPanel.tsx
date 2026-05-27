@@ -1,6 +1,6 @@
 import type { FormEvent, ReactElement } from "react";
 import { createDefaultConnectorLayout } from "../../../core/connectorLayout";
-import type { ConnectorLayout } from "../../../core/entities";
+import type { CatalogAdditionalAccessory, ConnectorLayout } from "../../../core/entities";
 import { isValidCatalogUrlInput } from "../../../store";
 import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import type { WorkspaceCurrencyCode } from "../../types/app-controller";
@@ -23,6 +23,8 @@ interface ModelingCatalogFormPanelProps {
   setCatalogUnitPriceExclTax: (value: string) => void;
   catalogUrl: string;
   setCatalogUrl: (value: string) => void;
+  catalogAdditionalAccessories: CatalogAdditionalAccessory[];
+  setCatalogAdditionalAccessories: (value: CatalogAdditionalAccessory[]) => void;
   catalogShowConnectorMaterialDefaults: boolean;
   setCatalogShowConnectorMaterialDefaults: (value: boolean) => void;
   catalogAllSameTerminals: boolean;
@@ -62,6 +64,8 @@ export function ModelingCatalogFormPanel({
   setCatalogUnitPriceExclTax,
   catalogUrl,
   setCatalogUrl,
+  catalogAdditionalAccessories,
+  setCatalogAdditionalAccessories,
   catalogShowConnectorMaterialDefaults,
   setCatalogShowConnectorMaterialDefaults,
   catalogAllSameTerminals,
@@ -111,6 +115,14 @@ export function ModelingCatalogFormPanel({
   function resolveCatalogLayoutConnectionCount(): number {
     const parsed = Number(catalogConnectionCount);
     return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
+  }
+
+  function updateAdditionalAccessory(index: number, patch: Partial<CatalogAdditionalAccessory>): void {
+    setCatalogAdditionalAccessories(
+      catalogAdditionalAccessories.map((accessory, accessoryIndex) =>
+        accessoryIndex === index ? { ...accessory, ...patch } : accessory
+      )
+    );
   }
 
   return (
@@ -187,6 +199,63 @@ export function ModelingCatalogFormPanel({
             </a>
           </div>
         ) : null}
+        <div className="inline-fieldset catalog-accessories-fieldset">
+          <div className="inline-fieldset-header">
+            <span>Additional accessories</span>
+            <button
+              type="button"
+              className="button-with-icon catalog-accessory-action-button"
+              onClick={() =>
+                setCatalogAdditionalAccessories([
+                  ...catalogAdditionalAccessories,
+                  { accessoryReference: "", accessoryName: "" }
+                ])
+              }
+            >
+              <span className="action-button-icon is-new" aria-hidden="true" />
+              Add additional accessory
+            </button>
+          </div>
+          {catalogAdditionalAccessories.length === 0 ? (
+            <small className="meta-line">No additional accessory.</small>
+          ) : (
+            <div className="catalog-accessory-list">
+              {catalogAdditionalAccessories.map((accessory, index) => (
+                <div className="catalog-accessory-row" key={index}>
+                  <label>
+                    Accessory reference
+                    <input
+                      value={accessory.accessoryReference}
+                      onChange={(event) => updateAdditionalAccessory(index, { accessoryReference: event.target.value })}
+                      placeholder="Optional accessory ref"
+                      maxLength={120}
+                    />
+                  </label>
+                  <label>
+                    Accessory name
+                    <input
+                      value={accessory.accessoryName ?? ""}
+                      onChange={(event) => updateAdditionalAccessory(index, { accessoryName: event.target.value })}
+                      placeholder="Optional accessory name"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="button-with-icon catalog-accessory-action-button catalog-accessory-remove-button"
+                    onClick={() =>
+                      setCatalogAdditionalAccessories(
+                        catalogAdditionalAccessories.filter((_accessory, accessoryIndex) => accessoryIndex !== index)
+                      )
+                    }
+                  >
+                    <span className="action-button-icon is-delete" aria-hidden="true" />
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         <label className="settings-checkbox">
           <input
             type="checkbox"

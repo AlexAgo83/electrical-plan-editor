@@ -54,6 +54,7 @@ function createSelectedHarnessExportState(): AppState {
         manufacturerReference: "CONN-REF",
         name: "Connector catalog",
         connectionCount: 3,
+        additionalAccessories: [{ accessoryReference: "LOCK-REF", accessoryName: "Connector lock" }],
         connectorDefaults: {
           allSameTerminals: true,
           defaultTerminal: {
@@ -293,12 +294,14 @@ describe("selected harness agent JSON export", () => {
         expect.objectContaining({ kind: "terminal", reference: "TERM-OVERRIDE", quantity: 1, origin: "connectorOverride" }),
         expect.objectContaining({ kind: "seal", reference: "SEAL-DEFAULT", quantity: 1, origin: "catalogDefault" }),
         expect.objectContaining({ kind: "plug", reference: "PLUG-DEFAULT", quantity: 1, origin: "catalogDefault" }),
+        expect.objectContaining({ kind: "accessory", reference: "LOCK-REF", quantity: 1, origin: "catalogDefault" }),
         expect.objectContaining({ kind: "protection", reference: "FUSE-REF", quantity: 1 })
       ])
     );
     expect(result.payload.catalogParts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: "catalogItem", reference: "CONN-REF", usedBy: [expect.objectContaining({ connectorId: "conn-main" })] }),
+        expect.objectContaining({ kind: "accessory", reference: "LOCK-REF", usedBy: [expect.objectContaining({ connectorId: "conn-main" })] }),
         expect.objectContaining({ kind: "terminal", reference: "TERM-MANUAL", usedBy: [expect.objectContaining({ wireId: "wire-1" })] }),
         expect.objectContaining({ kind: "plug", reference: "PLUG-DEFAULT", usedBy: [expect.objectContaining({ connectorId: "conn-main" })] })
       ])
@@ -309,6 +312,7 @@ describe("selected harness agent JSON export", () => {
         expect.objectContaining({ kind: "harness-master-connector" }),
         expect.objectContaining({ kind: "inter-harness-connector-link" }),
         expect.objectContaining({ kind: "wire-endpoint" }),
+        expect.objectContaining({ kind: "catalog-item-additional-accessory" }),
         expect.objectContaining({ kind: "wire-protection-catalog-item" })
       ])
     );

@@ -428,6 +428,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCatalogUnitPriceExclTax: formsState.setCatalogUnitPriceExclTax,
     catalogUrl: formsState.catalogUrl,
     setCatalogUrl: formsState.setCatalogUrl,
+    catalogAdditionalAccessories: formsState.catalogAdditionalAccessories,
+    setCatalogAdditionalAccessories: formsState.setCatalogAdditionalAccessories,
     catalogShowConnectorMaterialDefaults: formsState.catalogShowConnectorMaterialDefaults,
     setCatalogShowConnectorMaterialDefaults: formsState.setCatalogShowConnectorMaterialDefaults,
     catalogAllSameTerminals: formsState.catalogAllSameTerminals,

@@ -21,9 +21,10 @@ interface WireTerminationAggregateRow {
   name?: string;
   quantity: number;
   origin: BomMaterialOrigin;
+  rowType?: "Wire termination" | "Catalog accessory";
 }
 
-type WireTerminationKind = "connection" | "seal" | "plug";
+type WireTerminationKind = "connection" | "seal" | "plug" | "accessory";
 
 interface ConnectorGroupedTerminationRow {
   kind: WireTerminationKind;
@@ -187,6 +188,36 @@ function registerWireTermination(
   });
 }
 
+function registerCatalogAccessory(
+  aggregates: Map<string, WireTerminationAggregateRow>,
+  reference: string | undefined,
+  name: string | undefined,
+  quantity: number
+): void {
+  const normalizedReference = normalizeWireTerminationReference(reference);
+  if (normalizedReference === undefined || quantity < 1) {
+    return;
+  }
+
+  const aggregateKey = `accessory:catalog default:${normalizedReference}`;
+  const existing = aggregates.get(aggregateKey);
+  if (existing !== undefined) {
+    existing.quantity += quantity;
+    if (existing.name === undefined && name !== undefined) {
+      existing.name = name;
+    }
+    return;
+  }
+
+  aggregates.set(aggregateKey, {
+    reference: normalizedReference,
+    name,
+    quantity,
+    origin: "catalog default",
+    rowType: "Catalog accessory"
+  });
+}
+
 function registerGroupedWireTermination(
   groups: Map<string, ConnectorGroupedTerminationAggregate>,
   connectorTechnicalId: string,
@@ -340,6 +371,9 @@ function buildNetworkSummaryBomExportData(
       continue;
     }
     ensureAggregate(catalogItem).connectorQuantity += 1;
+    for (const accessory of catalogItem.additionalAccessories ?? []) {
+      registerCatalogAccessory(wireTerminationAggregates, accessory.accessoryReference, accessory.accessoryName, 1);
+    }
   }
 
   for (const splice of splices) {
@@ -351,6 +385,9 @@ function buildNetworkSummaryBomExportData(
       continue;
     }
     ensureAggregate(catalogItem).spliceQuantity += 1;
+    for (const accessory of catalogItem.additionalAccessories ?? []) {
+      registerCatalogAccessory(wireTerminationAggregates, accessory.accessoryReference, accessory.accessoryName, 1);
+    }
   }
 
   for (const connector of connectors) {
@@ -480,6 +517,19 @@ function buildNetworkSummaryBomExportData(
       options.connectorCavityOccupancy
     );
     warnings.push(...plugWarnings.map((warning) => warning.message));
+    for (const accessory of catalogItem?.additionalAccessories ?? []) {
+      registerGroupedWireTermination(
+        groupedConnectorAggregates,
+        connector.technicalId,
+        connector.name,
+        connector.cavityCount,
+        "accessory",
+        accessory.accessoryReference,
+        accessory.accessoryName,
+        "catalog default",
+        wireReferenceNameLookup
+      );
+    }
     for (const plug of plugs) {
       registerWireTermination(
         wireTerminationAggregates,
@@ -647,11 +697,11 @@ function buildNetworkSummaryBomExportData(
     );
   }
 
-  for (const { reference, name, quantity, origin } of orderedWireTerminationRows) {
+  for (const { reference, name, quantity, origin, rowType } of orderedWireTerminationRows) {
     rows.push(
       padRow(
         createBomRow(compactColumns, {
-          type: "Wire termination",
+          type: rowType ?? "Wire termination",
           manufacturerReference: reference,
           name: name ?? "",
           connectionCount: "",
@@ -689,7 +739,7 @@ function buildNetworkSummaryBomExportData(
         group.connectorTechnicalId,
         group.connectorName,
         "",
-        row.kind === "connection" ? "Connection" : row.kind === "seal" ? "Seal" : "Plug",
+        row.kind === "connection" ? "Connection" : row.kind === "seal" ? "Seal" : row.kind === "plug" ? "Plug" : "Accessory",
         row.reference,
         row.name ?? "",
         row.quantity,

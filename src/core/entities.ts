@@ -95,8 +95,14 @@ export interface CatalogItem {
   name?: string;
   unitPriceExclTax?: number;
   url?: string;
+  additionalAccessories?: CatalogAdditionalAccessory[];
   connectorDefaults?: ConnectorCatalogDefaults;
   connectorLayout?: ConnectorLayout;
+}
+
+export interface CatalogAdditionalAccessory {
+  accessoryReference: string;
+  accessoryName?: string;
 }
 
 export type ConnectorLayoutWayShape = "round" | "square" | "slot";

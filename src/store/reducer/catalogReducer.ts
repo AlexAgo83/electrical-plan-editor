@@ -6,6 +6,7 @@ import type { AppAction } from "../actions";
 import {
   isValidCatalogUrlInput,
   normalizeCatalogConnectionCount,
+  normalizeCatalogAdditionalAccessories,
   normalizeCatalogName,
   normalizeCatalogUnitPriceExclTax,
   normalizeCatalogUrl,
@@ -161,6 +162,7 @@ export function handleCatalogActions(state: AppState, action: AppAction): AppSta
         name: normalizeCatalogName(action.payload.name),
         unitPriceExclTax: normalizeCatalogUnitPriceExclTax(action.payload.unitPriceExclTax),
         url: normalizeCatalogUrl(action.payload.url),
+        additionalAccessories: normalizeCatalogAdditionalAccessories(action.payload.additionalAccessories),
         connectorDefaults: normalizeConnectorCatalogDefaults(action.payload.connectorDefaults, normalizedConnectionCount),
         connectorLayout: normalizeConnectorLayout(action.payload.connectorLayout, normalizedConnectionCount)
       };

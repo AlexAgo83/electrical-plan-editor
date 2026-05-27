@@ -45,6 +45,59 @@
   color: #345167;
 }
 
+.inline-fieldset-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.catalog-accessory-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.catalog-accessory-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  align-items: end;
+}
+
+.catalog-accessory-action-button {
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 34%, transparent);
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 9%, transparent);
+  color: inherit;
+  padding: 0.32rem 0.65rem;
+  min-height: 2.05rem;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.catalog-accessory-action-button.button-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.catalog-accessory-remove-button {
+  border-color: color-mix(in srgb, #b42318 36%, currentColor 18%);
+  background: color-mix(in srgb, #b42318 8%, transparent);
+}
+
+@media (max-width: 720px) {
+  .catalog-accessory-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .app-shell .inline-fieldset.catalog-material-application-fieldset {
   border-color: color-mix(in srgb, var(--theme-primary, currentColor) 28%, #cfdde8);
   background: linear-gradient(

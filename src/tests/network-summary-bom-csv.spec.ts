@@ -369,6 +369,52 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     expect(exported.rows).toContainEqual(["Wire termination", "TERM-DEFAULT", "", "", 2, "", 2, "catalog default", "", "", "", ""]);
   });
 
+  it("adds catalog item accessories to BOM quantities for linked components", () => {
+    const catalogItems: CatalogItem[] = [
+      {
+        id: asCatalogItemId("CAT-CONN"),
+        manufacturerReference: "CONN-2",
+        connectionCount: 2,
+        additionalAccessories: [{ accessoryReference: "LOCK-A", accessoryName: "Connector lock" }]
+      }
+    ];
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-001",
+        cavityCount: 2,
+        catalogItemId: asCatalogItemId("CAT-CONN")
+      },
+      {
+        id: asConnectorId("C2"),
+        name: "Connector 2",
+        technicalId: "C-002",
+        cavityCount: 2,
+        catalogItemId: asCatalogItemId("CAT-CONN")
+      }
+    ];
+
+    const exported = buildNetworkSummaryBomCsvExport(catalogItems, connectors, [], [], "EUR", true, 20, false, {
+      showTraceabilityLabels: true
+    });
+
+    expect(exported.rows).toContainEqual([
+      "Catalog accessory",
+      "LOCK-A",
+      "Connector lock",
+      "",
+      2,
+      "",
+      2,
+      "catalog default",
+      "",
+      "",
+      "",
+      ""
+    ]);
+  });
+
   it("keeps plug and seal opt-outs independent and reports plug quantity warnings without blocking BOM output", () => {
     const catalogItems: CatalogItem[] = [
       {

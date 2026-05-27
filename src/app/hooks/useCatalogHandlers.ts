@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import type { CatalogItem, CatalogItemId, ConnectorLayout } from "../../core/entities";
+import type { CatalogAdditionalAccessory, CatalogItem, CatalogItemId, ConnectorLayout } from "../../core/entities";
 import { normalizeConnectorLayout } from "../../core/connectorLayout";
 import type { AppStore } from "../../store";
 import { appActions, isValidCatalogUrlInput } from "../../store";
@@ -32,6 +32,8 @@ interface UseCatalogHandlersParams {
   setCatalogUnitPriceExclTax: (value: string) => void;
   catalogUrl: string;
   setCatalogUrl: (value: string) => void;
+  catalogAdditionalAccessories?: CatalogAdditionalAccessory[];
+  setCatalogAdditionalAccessories?: (value: CatalogAdditionalAccessory[]) => void;
   catalogShowConnectorMaterialDefaults?: boolean;
   setCatalogShowConnectorMaterialDefaults?: (value: boolean) => void;
   catalogAllSameTerminals?: boolean;
@@ -83,6 +85,8 @@ export function useCatalogHandlers({
   setCatalogUnitPriceExclTax,
   catalogUrl,
   setCatalogUrl,
+  catalogAdditionalAccessories = [],
+  setCatalogAdditionalAccessories = () => {},
   catalogShowConnectorMaterialDefaults = false,
   setCatalogShowConnectorMaterialDefaults = () => {},
   catalogAllSameTerminals = false,
@@ -123,6 +127,7 @@ export function useCatalogHandlers({
     setCatalogName("");
     setCatalogUnitPriceExclTax("");
     setCatalogUrl("");
+    setCatalogAdditionalAccessories([]);
     clearCatalogMaterialDefaults();
     setCatalogFormError(null);
   }
@@ -135,6 +140,7 @@ export function useCatalogHandlers({
     setCatalogName("");
     setCatalogUnitPriceExclTax("");
     setCatalogUrl("");
+    setCatalogAdditionalAccessories([]);
     clearCatalogMaterialDefaults();
     setCatalogFormError(null);
   }
@@ -152,6 +158,7 @@ export function useCatalogHandlers({
     setCatalogName(item.name ?? "");
     setCatalogUnitPriceExclTax(item.unitPriceExclTax === undefined ? "" : String(item.unitPriceExclTax));
     setCatalogUrl(item.url ?? "");
+    setCatalogAdditionalAccessories(item.additionalAccessories ?? []);
     setCatalogShowConnectorMaterialDefaults(item.connectorDefaults !== undefined);
     setCatalogAllSameTerminals(item.connectorDefaults?.allSameTerminals === true);
     setCatalogDefaultTerminalReference(item.connectorDefaults?.defaultTerminal?.terminalReference ?? "");
@@ -181,6 +188,16 @@ export function useCatalogHandlers({
     const connectionCount = Number.isInteger(parsedConnectionCount) && parsedConnectionCount > 0 ? parsedConnectionCount : 0;
     const unitPriceExclTax = normalizeOptionalNumber(catalogUnitPriceExclTax);
     const url = catalogUrl.trim();
+    const additionalAccessories = catalogAdditionalAccessories
+      .map((accessory) => ({
+        accessoryReference: accessory.accessoryReference.trim(),
+        accessoryName: accessory.accessoryName?.trim() ?? ""
+      }))
+      .filter((accessory) => accessory.accessoryReference.length > 0 || accessory.accessoryName.length > 0)
+      .map((accessory) => ({
+        accessoryReference: accessory.accessoryReference,
+        accessoryName: accessory.accessoryName.length === 0 ? undefined : accessory.accessoryName
+      }));
     const plugDefinitions = catalogPlugDefinitionsText
       .split(/\r?\n/)
       .map((line) => line.trim())
@@ -215,6 +232,14 @@ export function useCatalogHandlers({
       setCatalogFormError("URL must be empty or a valid absolute http/https URL.");
       return;
     }
+    if (additionalAccessories.some((accessory) => accessory.accessoryReference.length === 0)) {
+      setCatalogFormError("Accessory reference is required when an accessory name is filled.");
+      return;
+    }
+    if (additionalAccessories.some((accessory) => accessory.accessoryReference.length > 120)) {
+      setCatalogFormError("Accessory reference must be 120 characters or fewer.");
+      return;
+    }
     if (plugDefinitions.some((plug) => plug.plugReference.length === 0 || Number.isNaN(plug.quantity))) {
       setCatalogFormError("Plug definitions must use one line per plug: reference,quantity,name.");
       return;
@@ -241,6 +266,7 @@ export function useCatalogHandlers({
         name: catalogName.trim().length === 0 ? undefined : catalogName.trim(),
         unitPriceExclTax,
         url: url.length === 0 ? undefined : url,
+        additionalAccessories: additionalAccessories.length > 0 ? additionalAccessories : undefined,
         connectorDefaults: catalogShowConnectorMaterialDefaults
           ? {
               allSameTerminals: catalogAllSameTerminals ? true : undefined,

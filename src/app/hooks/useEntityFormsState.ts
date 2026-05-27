@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type {
   CatalogItemId,
+  CatalogAdditionalAccessory,
   ConnectorId,
   NetworkNode,
   NodeId,
@@ -22,6 +23,7 @@ export function useEntityFormsState() {
   const [catalogName, setCatalogName] = useState("");
   const [catalogUnitPriceExclTax, setCatalogUnitPriceExclTax] = useState("");
   const [catalogUrl, setCatalogUrl] = useState("");
+  const [catalogAdditionalAccessories, setCatalogAdditionalAccessories] = useState<CatalogAdditionalAccessory[]>([]);
   const [catalogShowConnectorMaterialDefaults, setCatalogShowConnectorMaterialDefaults] = useState(false);
   const [catalogAllSameTerminals, setCatalogAllSameTerminals] = useState(false);
   const [catalogDefaultTerminalReference, setCatalogDefaultTerminalReference] = useState("");
@@ -142,6 +144,8 @@ export function useEntityFormsState() {
     setCatalogUnitPriceExclTax,
     catalogUrl,
     setCatalogUrl,
+    catalogAdditionalAccessories,
+    setCatalogAdditionalAccessories,
     catalogShowConnectorMaterialDefaults,
     setCatalogShowConnectorMaterialDefaults,
     catalogAllSameTerminals,
