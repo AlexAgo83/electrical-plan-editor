@@ -148,7 +148,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       <button
         type="button"
         className="button-with-icon"
-        onClick={() => setConnectorTerminalOverridesText("")}
+        onClick={connectorHandlers.handleClearConnectorTerminalAndSealOverrides}
       >
         <span className="action-button-icon is-delete" aria-hidden="true" />
         Clear terminal and seal overrides

@@ -469,8 +469,8 @@ describe("App integration UI - creation flow ergonomics", () => {
 
   it("clears connector terminal and seal overrides from the edit form", () => {
     const connectorId = asConnectorId("C-OVERRIDE");
-    const state = appReducer(
-      createInitialStateWithCatalog(),
+    const otherConnectorId = asConnectorId("C-OTHER");
+    const state = [
       appActions.upsertConnector({
         id: connectorId,
         name: "Override connector",
@@ -486,8 +486,67 @@ describe("App integration UI - creation flow ergonomics", () => {
             sealName: "Old seal"
           }
         }
+      }),
+      appActions.upsertConnector({
+        id: otherConnectorId,
+        name: "Other connector",
+        technicalId: "C-OTHER",
+        cavityCount: 4,
+        catalogItemId: asCatalogItemId("CAT-4"),
+        manufacturerReference: "CAT-REF-4"
+      }),
+      appActions.upsertSplice({
+        id: asSpliceId("S-OVERRIDE"),
+        name: "Override splice",
+        technicalId: "S-OVERRIDE",
+        portCount: 4
+      }),
+      appActions.upsertNode({ id: asNodeId("N-C-OVERRIDE"), kind: "connector", connectorId }),
+      appActions.upsertNode({ id: asNodeId("N-C-OTHER"), kind: "connector", connectorId: otherConnectorId }),
+      appActions.upsertNode({ id: asNodeId("N-S-OVERRIDE"), kind: "splice", spliceId: asSpliceId("S-OVERRIDE") }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-OVERRIDE-A"),
+        nodeA: asNodeId("N-C-OVERRIDE"),
+        nodeB: asNodeId("N-S-OVERRIDE"),
+        lengthMm: 100
+      }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-OVERRIDE-B"),
+        nodeA: asNodeId("N-C-OTHER"),
+        nodeB: asNodeId("N-C-OVERRIDE"),
+        lengthMm: 100
+      }),
+      appActions.saveWire({
+        id: asWireId("W-OVERRIDE-A"),
+        name: "Target side A",
+        technicalId: "W-OVERRIDE-A",
+        endpointA: { kind: "connectorCavity", connectorId, cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-OVERRIDE"), portIndex: 1 },
+        endpointAConnectionReference: "TERM-A",
+        endpointAConnectionName: "Terminal A",
+        endpointASealReference: "SEAL-A",
+        endpointASealName: "Seal A",
+        endpointBConnectionReference: "TERM-B-KEEP",
+        endpointBConnectionName: "Terminal B keep",
+        endpointBSealReference: "SEAL-B-KEEP",
+        endpointBSealName: "Seal B keep"
+      }),
+      appActions.saveWire({
+        id: asWireId("W-OVERRIDE-B"),
+        name: "Target side B",
+        technicalId: "W-OVERRIDE-B",
+        endpointA: { kind: "connectorCavity", connectorId: otherConnectorId, cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId, cavityIndex: 2 },
+        endpointAConnectionReference: "TERM-A-KEEP",
+        endpointAConnectionName: "Terminal A keep",
+        endpointASealReference: "SEAL-A-KEEP",
+        endpointASealName: "Seal A keep",
+        endpointBConnectionReference: "TERM-B",
+        endpointBConnectionName: "Terminal B",
+        endpointBSealReference: "SEAL-B",
+        endpointBSealName: "Seal B"
       })
-    );
+    ].reduce(appReducer, createInitialStateWithCatalog());
     const { store } = renderAppWithState(state);
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("connector");
@@ -502,6 +561,26 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(clearButton).toBeEnabled();
     fireEvent.click(clearButton);
     expect(overridesInput).toHaveValue("");
+
+    const clearedSideA = store.getState().wires.byId[asWireId("W-OVERRIDE-A")];
+    expect(clearedSideA?.endpointAConnectionReference).toBeUndefined();
+    expect(clearedSideA?.endpointAConnectionName).toBeUndefined();
+    expect(clearedSideA?.endpointASealReference).toBeUndefined();
+    expect(clearedSideA?.endpointASealName).toBeUndefined();
+    expect(clearedSideA?.endpointBConnectionReference).toBe("TERM-B-KEEP");
+    expect(clearedSideA?.endpointBConnectionName).toBe("Terminal B keep");
+    expect(clearedSideA?.endpointBSealReference).toBe("SEAL-B-KEEP");
+    expect(clearedSideA?.endpointBSealName).toBe("Seal B keep");
+
+    const clearedSideB = store.getState().wires.byId[asWireId("W-OVERRIDE-B")];
+    expect(clearedSideB?.endpointAConnectionReference).toBe("TERM-A-KEEP");
+    expect(clearedSideB?.endpointAConnectionName).toBe("Terminal A keep");
+    expect(clearedSideB?.endpointASealReference).toBe("SEAL-A-KEEP");
+    expect(clearedSideB?.endpointASealName).toBe("Seal A keep");
+    expect(clearedSideB?.endpointBConnectionReference).toBeUndefined();
+    expect(clearedSideB?.endpointBConnectionName).toBeUndefined();
+    expect(clearedSideB?.endpointBSealReference).toBeUndefined();
+    expect(clearedSideB?.endpointBSealName).toBeUndefined();
 
     fireEvent.click(within(editConnectorPanel).getByRole("button", { name: "Save" }));
     expect(store.getState().connectors.byId[connectorId]?.terminalOverrides).toBeUndefined();
