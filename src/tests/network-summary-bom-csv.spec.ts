@@ -215,10 +215,10 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     expect(sheets[1]?.name).toBe("By connector");
     expect(sheets[1]?.headers).toEqual(["Connector ID", "Connector name", "Connection count", "Type", "Reference", "Name", "Quantity"]);
     expect(sheets[1]?.rows).toEqual([
-      ["C-001", "Connector 1", 2, "Connector", "", "", 1],
+      ["C-001", "Connector 1", 2, "Connector", "", "Connector 1", 1],
       ["C-001", "Connector 1", "", "Connection", "TERM-A", "Conn A", 1],
       ["C-001", "Connector 1", "", "Seal", "SEAL-A", "Seal A", 1],
-      ["C-002", "Connector 2", 4, "Connector", "", "", 1]
+      ["C-002", "Connector 2", 4, "Connector", "", "Connector 2", 1]
     ]);
   });
 
@@ -234,7 +234,31 @@ describe("buildNetworkSummaryBomCsvExport", () => {
 
     const sheets = buildNetworkSummaryBomWorkbookSheets([], connectors, [], []);
 
-    expect(sheets[1]?.rows).toEqual([["C-001", "Connector 1", 2, "Connector", "", "", 1]]);
+    expect(sheets[1]?.rows).toEqual([["C-001", "Connector 1", 2, "Connector", "", "Connector 1", 1]]);
+  });
+
+  it("includes connector catalog reference and name on grouped connector rows", () => {
+    const catalogItems: CatalogItem[] = [
+      {
+        id: asCatalogItemId("CAT-C1"),
+        manufacturerReference: "MFR-C1",
+        name: "Catalog connector",
+        connectionCount: 2
+      }
+    ];
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-001",
+        cavityCount: 2,
+        catalogItemId: asCatalogItemId("CAT-C1")
+      }
+    ];
+
+    const sheets = buildNetworkSummaryBomWorkbookSheets(catalogItems, connectors, [], []);
+
+    expect(sheets[1]?.rows[0]).toEqual(["C-001", "Connector 1", 2, "Connector", "MFR-C1", "Catalog connector", 1]);
   });
 
   it("returns summary and metadata rows only when no resolvable catalog-backed components are present", () => {

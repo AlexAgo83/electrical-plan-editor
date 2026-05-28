@@ -137,7 +137,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         Apply catalog plugs
       </label>
       <label>
-        Terminal overrides
+        Terminal and seal overrides
         <textarea
           value={connectorTerminalOverridesText}
           onChange={(event) => setConnectorTerminalOverridesText(event.target.value)}
@@ -145,6 +145,15 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
           rows={3}
         />
       </label>
+      <button
+        type="button"
+        className="button-with-icon"
+        onClick={() => setConnectorTerminalOverridesText("")}
+        disabled={connectorTerminalOverridesText.trim().length === 0}
+      >
+        <span className="action-button-icon is-delete" aria-hidden="true" />
+        Clear terminal and seal overrides
+      </button>
     </fieldset>
     <label className="settings-checkbox">
       <input

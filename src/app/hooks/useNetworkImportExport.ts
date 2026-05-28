@@ -436,7 +436,8 @@ export function useNetworkImportExport({
           networkStatesToImport,
           resolved.harnessAssemblies,
           true,
-          overwriteNetworkIds.length > 0 ? overwriteNetworkIds : undefined
+          overwriteNetworkIds.length > 0 ? overwriteNetworkIds : undefined,
+          resolved.overwriteHarnessAssemblyIds.length > 0 ? resolved.overwriteHarnessAssemblyIds : undefined
         )
       );
 

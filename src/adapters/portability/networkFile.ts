@@ -71,6 +71,7 @@ export interface NetworkImportResult {
   networks: Network[];
   networkStates: Record<NetworkId, NetworkScopedState>;
   harnessAssemblies: HarnessAssembly[];
+  overwriteHarnessAssemblyIds: HarnessAssemblyId[];
   summary: NetworkImportSummary;
 }
 
@@ -448,6 +449,12 @@ function dedupeWithSuffix(base: string, taken: Set<string>, suffix: string): str
     candidate = `${base}${suffix}-${index}`;
   }
   return candidate;
+}
+
+function buildHarnessAssemblyMemberKey(networkIds: readonly NetworkId[]): string {
+  return [...new Set(networkIds.map((networkId) => networkId as string))]
+    .sort((left, right) => left.localeCompare(right))
+    .join("|");
 }
 
 function parseIsoDate(value: string): number | null {
@@ -841,6 +848,17 @@ export function resolveImportConflicts(
   const existingHarnessAssemblyTechnicalIds = new Set(
     existingState.harnessAssemblies.allIds.map((id) => existingState.harnessAssemblies.byId[id]?.technicalId ?? "")
   );
+  const overwrittenNetworkIds = new Set<string>([...overwriteMap.values()].map((id) => id as string));
+  const harnessAssemblyByTechnicalId = new Map<string, HarnessAssembly>();
+  const harnessAssemblyByMemberKey = new Map<string, HarnessAssembly>();
+  for (const assemblyId of existingState.harnessAssemblies.allIds) {
+    const assembly = existingState.harnessAssemblies.byId[assemblyId];
+    if (assembly === undefined) {
+      continue;
+    }
+    harnessAssemblyByTechnicalId.set(assembly.technicalId.trim(), assembly);
+    harnessAssemblyByMemberKey.set(buildHarnessAssemblyMemberKey(assembly.members.map((member) => member.networkId)), assembly);
+  }
 
   const summary: NetworkImportSummary = {
     importedNetworkIds: [],
@@ -851,6 +869,7 @@ export function resolveImportConflicts(
   const networks: Network[] = [];
   const networkStates = {} as Record<NetworkId, NetworkScopedState>;
   const importedNetworkIdBySourceId = new Map<string, NetworkId>();
+  const overwriteHarnessAssemblyIds: HarnessAssemblyId[] = [];
 
   for (const bundle of payload.networks) {
     const sourceNetwork = bundle.network;
@@ -914,10 +933,21 @@ export function resolveImportConflicts(
       return [];
     }
     const memberIds = new Set(members.map((member) => member.networkId as string));
+    const overwritesExistingNetwork = members.some((member) => overwrittenNetworkIds.has(member.networkId as string));
+    const existingAssemblyForOverwrite =
+      overwritesExistingNetwork
+        ? existingState.harnessAssemblies.byId[assembly.id] ??
+          harnessAssemblyByTechnicalId.get(assembly.technicalId.trim()) ??
+          harnessAssemblyByMemberKey.get(buildHarnessAssemblyMemberKey(members.map((member) => member.networkId)))
+        : undefined;
     const remapNetworkId = (networkId: NetworkId): NetworkId | null =>
       importedNetworkIdBySourceId.get(networkId as string) ?? null;
-    let importedAssemblyId = assembly.id as string;
-    if (existingHarnessAssemblyIds.has(importedAssemblyId)) {
+    let importedAssemblyId = (existingAssemblyForOverwrite?.id ?? assembly.id) as string;
+    if (existingAssemblyForOverwrite !== undefined) {
+      overwriteHarnessAssemblyIds.push(existingAssemblyForOverwrite.id);
+      existingHarnessAssemblyIds.delete(existingAssemblyForOverwrite.id as string);
+      existingHarnessAssemblyTechnicalIds.delete(existingAssemblyForOverwrite.technicalId.trim());
+    } else if (existingHarnessAssemblyIds.has(importedAssemblyId)) {
       const dedupedAssemblyId = dedupeWithSuffix(importedAssemblyId, existingHarnessAssemblyIds, "-import");
       summary.warnings.push(`Harness assembly ID '${assembly.id}' was renamed to '${dedupedAssemblyId}' during import.`);
       importedAssemblyId = dedupedAssemblyId;
@@ -960,6 +990,7 @@ export function resolveImportConflicts(
     networks,
     networkStates,
     harnessAssemblies,
+    overwriteHarnessAssemblyIds,
     summary
   };
 }

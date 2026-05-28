@@ -423,6 +423,9 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       const nextNetworkStates = { ...persisted.networkStates };
       const nowIso = new Date().toISOString();
       const overwriteSet = new Set<string>((action.payload.overwriteNetworkIds ?? []).map((id) => id as string));
+      const overwriteHarnessAssemblySet = new Set<string>(
+        (action.payload.overwriteHarnessAssemblyIds ?? []).map((id) => id as string)
+      );
       for (const network of action.payload.networks) {
         const normalizedName = network.name.trim();
         const normalizedTechnicalId = network.technicalId.trim();
@@ -467,7 +470,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         nextNetworkStates[network.id] = cloneScopedState(scoped);
       }
       for (const assembly of action.payload.harnessAssemblies ?? []) {
-        if (nextHarnessAssemblies.byId[assembly.id] !== undefined) {
+        if (nextHarnessAssemblies.byId[assembly.id] !== undefined && !overwriteHarnessAssemblySet.has(assembly.id as string)) {
           return withError(state, `Cannot import harness assembly '${assembly.id}': ID already exists.`);
         }
         nextHarnessAssemblies = upsertEntity(nextHarnessAssemblies, assembly);

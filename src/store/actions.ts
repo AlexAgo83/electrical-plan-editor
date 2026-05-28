@@ -81,6 +81,7 @@ export type AppAction =
         harnessAssemblies?: HarnessAssembly[];
         activateFirst?: boolean;
         overwriteNetworkIds?: NetworkId[];
+        overwriteHarnessAssemblyIds?: HarnessAssemblyId[];
       };
     }
   | { type: "harnessAssembly/upsert"; payload: HarnessAssembly }
@@ -216,14 +217,22 @@ export const appActions = {
     networkStates: Record<NetworkId, NetworkScopedState>,
     harnessAssembliesOrActivateFirst: HarnessAssembly[] | boolean = [],
     activateFirst = false,
-    overwriteNetworkIds?: NetworkId[]
+    overwriteNetworkIds?: NetworkId[],
+    overwriteHarnessAssemblyIds?: HarnessAssemblyId[]
   ): AppAction => {
     const harnessAssemblies = Array.isArray(harnessAssembliesOrActivateFirst) ? harnessAssembliesOrActivateFirst : [];
     const resolvedActivateFirst =
       typeof harnessAssembliesOrActivateFirst === "boolean" ? harnessAssembliesOrActivateFirst : activateFirst;
     return {
       type: "network/importMany",
-      payload: { networks, networkStates, harnessAssemblies, activateFirst: resolvedActivateFirst, overwriteNetworkIds }
+      payload: {
+        networks,
+        networkStates,
+        harnessAssemblies,
+        activateFirst: resolvedActivateFirst,
+        overwriteNetworkIds,
+        overwriteHarnessAssemblyIds
+      }
     };
   },
 

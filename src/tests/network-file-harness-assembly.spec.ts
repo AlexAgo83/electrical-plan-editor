@@ -98,4 +98,42 @@ describe("network file harness assemblies", () => {
       "Harness assembly technical ID 'ASM-MAIN' was renamed to 'ASM-MAIN-IMP' during import."
     );
   });
+
+  it("overwrites matching harness assemblies when their member networks are overwritten", () => {
+    const initial = createInitialState();
+    const defaultNetworkId = initial.activeNetworkId as NetworkId;
+    const withAssembly = appReducer(
+      initial,
+      appActions.upsertHarnessAssembly({
+        id: asAssemblyId("asm-main"),
+        name: "Main assembly",
+        technicalId: "ASM-MAIN",
+        members: [{ networkId: defaultNetworkId, color: "#2563eb" }],
+        masterConnectorRefs: [],
+        connectorLinks: [],
+        createdAt: "2026-05-11T00:00:00.000Z",
+        updatedAt: "2026-05-11T00:00:00.000Z"
+      })
+    );
+    const payload = buildNetworkFilePayload(withAssembly, "all", [], "2026-05-11T12:00:00.000Z");
+    const parsed = parseNetworkFilePayload(JSON.stringify(payload));
+    const overwriteMap = new Map<string, NetworkId>([[defaultNetworkId as string, defaultNetworkId]]);
+    const resolved = resolveImportConflicts(parsed.payload!, withAssembly, overwriteMap);
+    const imported = appReducer(
+      withAssembly,
+      appActions.importNetworks(
+        resolved.networks,
+        resolved.networkStates,
+        resolved.harnessAssemblies,
+        false,
+        [...overwriteMap.values()],
+        resolved.overwriteHarnessAssemblyIds
+      )
+    );
+
+    expect(resolved.harnessAssemblies[0]?.id).toBe("asm-main");
+    expect(resolved.overwriteHarnessAssemblyIds).toEqual(["asm-main"]);
+    expect(imported.harnessAssemblies.allIds).toEqual(["asm-main"]);
+    expect(imported.harnessAssemblies.byId[asAssemblyId("asm-main")]?.technicalId).toBe("ASM-MAIN");
+  });
 });

@@ -716,6 +716,10 @@ function buildNetworkSummaryBomExportData(
 
   const itemRowCount = orderedRows.length + orderedWireTerminationRows.length;
   for (const group of groupedConnectorRows) {
+    const connector = connectors.find((candidate) => candidate.technicalId === group.connectorTechnicalId);
+    const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogById.get(connector.catalogItemId);
+    const connectorReference = connector?.manufacturerReference ?? catalogItem?.manufacturerReference ?? "";
+    const connectorCatalogName = catalogItem?.name ?? connector?.name ?? group.connectorName;
     const orderedGroupRows = [...group.rows.values()].sort((left, right) => {
       const kindCompare = left.kind.localeCompare(right.kind, undefined, { sensitivity: "base" });
       if (kindCompare !== 0) {
@@ -729,8 +733,8 @@ function buildNetworkSummaryBomExportData(
       group.connectorName,
       group.connectionCount,
       "Connector",
-      "",
-      "",
+      connectorReference,
+      connectorCatalogName,
       1,
       ...(includeTraceability ? ["catalog default"] : [])
     ]);

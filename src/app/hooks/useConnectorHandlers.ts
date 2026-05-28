@@ -208,13 +208,18 @@ export function useConnectorHandlers({
   }
 
   function startConnectorEdit(connector: Connector, fromCreate = false): void {
+    const catalogItem =
+      connector.catalogItemId === undefined ? undefined : store.getState().catalogItems.byId[connector.catalogItemId];
+
     setConnectorFormMode("edit");
     setConnectorEditAfterCreate(fromCreate);
     setEditingConnectorId(connector.id);
     setConnectorName(connector.name);
     setConnectorTechnicalId(connector.technicalId);
-    if (connector.catalogItemId !== undefined && store.getState().catalogItems.byId[connector.catalogItemId] !== undefined) {
-      syncDerivedConnectorCatalogFields(connector.catalogItemId);
+    if (connector.catalogItemId !== undefined && catalogItem !== undefined) {
+      setConnectorCatalogItemId(connector.catalogItemId);
+      setConnectorManufacturerReference(catalogItem.manufacturerReference);
+      setCavityCount(String(catalogItem.connectionCount));
     } else {
       setConnectorCatalogItemId("");
       setConnectorManufacturerReference(connector.manufacturerReference ?? "");
