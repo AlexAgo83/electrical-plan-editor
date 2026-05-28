@@ -149,7 +149,6 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         type="button"
         className="button-with-icon"
         onClick={() => setConnectorTerminalOverridesText("")}
-        disabled={connectorTerminalOverridesText.trim().length === 0}
       >
         <span className="action-button-icon is-delete" aria-hidden="true" />
         Clear terminal and seal overrides

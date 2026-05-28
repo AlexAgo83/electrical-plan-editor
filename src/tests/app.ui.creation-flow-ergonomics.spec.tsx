@@ -467,6 +467,46 @@ describe("App integration UI - creation flow ergonomics", () => {
     }
   });
 
+  it("clears connector terminal and seal overrides from the edit form", () => {
+    const connectorId = asConnectorId("C-OVERRIDE");
+    const state = appReducer(
+      createInitialStateWithCatalog(),
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "Override connector",
+        technicalId: "C-OVERRIDE",
+        cavityCount: 4,
+        catalogItemId: asCatalogItemId("CAT-4"),
+        manufacturerReference: "CAT-REF-4",
+        terminalOverrides: {
+          1: {
+            terminalReference: "TERM-OLD",
+            terminalName: "Old terminal",
+            sealReference: "SEAL-OLD",
+            sealName: "Old seal"
+          }
+        }
+      })
+    );
+    const { store } = renderAppWithState(state);
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("connector");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Override connector"));
+    const editConnectorPanel = getPanelByHeading("Edit Connector");
+    const overridesInput = within(editConnectorPanel).getByLabelText("Terminal and seal overrides");
+    expect(overridesInput).toHaveValue("1,TERM-OLD,SEAL-OLD,Old terminal,Old seal");
+
+    const clearButton = within(editConnectorPanel).getByRole("button", { name: "Clear terminal and seal overrides" });
+    expect(clearButton).toBeEnabled();
+    fireEvent.click(clearButton);
+    expect(overridesInput).toHaveValue("");
+
+    fireEvent.click(within(editConnectorPanel).getByRole("button", { name: "Save" }));
+    expect(store.getState().connectors.byId[connectorId]?.terminalOverrides).toBeUndefined();
+  });
+
   it("opens linked catalog items from connector and splice edit form manufacturer references", () => {
     const catalogItemId = asCatalogItemId("CAT-2");
     const stateWithLinkedEntities = appReducer(
