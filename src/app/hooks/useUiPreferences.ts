@@ -157,6 +157,7 @@ interface UseUiPreferencesOptions {
   restoreViewportOnUndo: boolean;
   showFloatingInspectorPanel: boolean;
   showRoutePreviewPanel: boolean;
+  hideWireAnalysisRoutePanel: boolean;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
   workspaceWideScreen: boolean;
   preferencesHydrated: boolean;
@@ -231,6 +232,7 @@ interface UseUiPreferencesOptions {
   setRestoreViewportOnUndo: (value: boolean) => void;
   setShowFloatingInspectorPanel: (value: boolean) => void;
   setShowRoutePreviewPanel: (value: boolean) => void;
+  setHideWireAnalysisRoutePanel: (value: boolean) => void;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutPreference) => void;
   setWorkspaceWideScreen: (value: boolean) => void;
   setPreferencesHydrated: (value: boolean) => void;
@@ -389,6 +391,7 @@ export function useUiPreferences({
   restoreViewportOnUndo,
   showFloatingInspectorPanel,
   showRoutePreviewPanel,
+  hideWireAnalysisRoutePanel,
   workspacePanelsLayoutMode,
   workspaceWideScreen,
   preferencesHydrated,
@@ -463,6 +466,7 @@ export function useUiPreferences({
   setRestoreViewportOnUndo,
   setShowFloatingInspectorPanel,
   setShowRoutePreviewPanel,
+  setHideWireAnalysisRoutePanel,
   setWorkspacePanelsLayoutMode,
   setWorkspaceWideScreen,
   setPreferencesHydrated
@@ -623,6 +627,9 @@ export function useUiPreferences({
       setShowRoutePreviewPanel(
         typeof preferences.showRoutePreviewPanel === "boolean" ? preferences.showRoutePreviewPanel : false
       );
+      setHideWireAnalysisRoutePanel(
+        typeof preferences.hideWireAnalysisRoutePanel === "boolean" ? preferences.hideWireAnalysisRoutePanel : false
+      );
       setWorkspacePanelsLayoutMode(normalizeWorkspacePanelsLayoutMode(preferences.workspacePanelsLayoutMode));
       setWorkspaceWideScreen(typeof preferences.workspaceWideScreen === "boolean" ? preferences.workspaceWideScreen : false);
     }
@@ -677,6 +684,7 @@ export function useUiPreferences({
     setShowSegmentNames,
     setShowFloatingInspectorPanel,
     setShowRoutePreviewPanel,
+    setHideWireAnalysisRoutePanel,
     setShowShortcutHints,
     setShowSegmentLengths,
     setShowCableCallouts,
@@ -760,6 +768,7 @@ export function useUiPreferences({
       restoreViewportOnUndo,
       showFloatingInspectorPanel,
       showRoutePreviewPanel,
+      hideWireAnalysisRoutePanel,
       workspacePanelsLayoutMode,
       workspaceWideScreen
     };
@@ -800,6 +809,7 @@ export function useUiPreferences({
     restoreViewportOnUndo,
     showFloatingInspectorPanel,
     showRoutePreviewPanel,
+    hideWireAnalysisRoutePanel,
     showShortcutHints,
     tableDensity,
     tableFontSize,

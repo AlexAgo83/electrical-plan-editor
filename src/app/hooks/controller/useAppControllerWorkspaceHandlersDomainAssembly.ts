@@ -152,6 +152,7 @@ export function useAppControllerWorkspaceHandlersDomainAssembly({
       setRestoreViewportOnUndo: preferencesState.setRestoreViewportOnUndo,
       setShowFloatingInspectorPanel: preferencesState.setShowFloatingInspectorPanel,
       setShowRoutePreviewPanel: preferencesState.setShowRoutePreviewPanel,
+      setHideWireAnalysisRoutePanel: preferencesState.setHideWireAnalysisRoutePanel,
       setWorkspacePanelsLayoutMode: preferencesState.setWorkspacePanelsLayoutMode,
       setWorkspaceWideScreen: preferencesState.setWorkspaceWideScreen
     }

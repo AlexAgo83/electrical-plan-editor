@@ -155,6 +155,7 @@ interface UseWorkspaceHandlersParams {
   setRestoreViewportOnUndo: (value: boolean) => void;
   setShowFloatingInspectorPanel: (value: boolean) => void;
   setShowRoutePreviewPanel: (value: boolean) => void;
+  setHideWireAnalysisRoutePanel: (value: boolean) => void;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
   setWorkspaceWideScreen: (value: boolean) => void;
   confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
@@ -262,6 +263,7 @@ export function useWorkspaceHandlers({
   setRestoreViewportOnUndo,
   setShowFloatingInspectorPanel,
   setShowRoutePreviewPanel,
+  setHideWireAnalysisRoutePanel,
   setWorkspacePanelsLayoutMode,
   setWorkspaceWideScreen,
   confirmAction
@@ -733,6 +735,7 @@ export function useWorkspaceHandlers({
     setRestoreViewportOnUndo(true);
     setShowFloatingInspectorPanel(true);
     setShowRoutePreviewPanel(false);
+    setHideWireAnalysisRoutePanel(false);
     setWorkspacePanelsLayoutMode("singleColumn");
     setWorkspaceWideScreen(false);
   }

@@ -48,7 +48,8 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     setWireForcedRouteInput,
     handleLockWireRoute,
     handleResetWireRoute,
-    wireFormError
+    wireFormError,
+    hideWireAnalysisRoutePanel = false
   } = props;
   void _wireSort;
   void _setWireSort;
@@ -491,7 +492,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   )}
 </section>
 
-<section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen}>
+<section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen || hideWireAnalysisRoutePanel}>
   <header className="analysis-wire-route-header">
     <h2>Wire analysis</h2>
     {selectedWire !== null ? (

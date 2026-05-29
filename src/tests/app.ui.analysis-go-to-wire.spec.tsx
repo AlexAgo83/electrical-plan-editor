@@ -17,7 +17,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
     localStorage.clear();
   });
 
-  it("opens wire analysis from connector occupancy card and keeps Go to before Release", () => {
+  it("opens wire editing from connector occupancy card and keeps Go to before Release", () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("analysis");
@@ -37,6 +37,8 @@ describe("App integration UI - analysis go-to wire actions", () => {
 
     fireEvent.click(within(occupiedCard as HTMLElement).getByRole("button", { name: "Go to" }));
 
+    const wireEditPanel = getPanelByHeading("Edit Wire");
+    expect(within(wireEditPanel).getByDisplayValue("W-1")).toBeInTheDocument();
     const wireAnalysisPanel = getPanelByHeading("Wire analysis");
     expect(within(wireAnalysisPanel).getByText("Wire 1")).toBeInTheDocument();
     expect(within(wireAnalysisPanel).getByRole("button", { name: "Connector 1 (C-1) / C1" })).toBeInTheDocument();

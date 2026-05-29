@@ -39,6 +39,7 @@ export type SpliceAnalysisView = "ports" | "synthesis";
 
 export interface AnalysisWorkspaceContentProps {
   showEntityTables?: boolean;
+  hideWireAnalysisRoutePanel?: boolean;
   isConnectorSubScreen: boolean;
   isSpliceSubScreen: boolean;
   isNodeSubScreen: boolean;

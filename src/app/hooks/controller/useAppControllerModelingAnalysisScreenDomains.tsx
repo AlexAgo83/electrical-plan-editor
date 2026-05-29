@@ -40,6 +40,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
     "catalogItems" | "connectors" | "splices" | "nodes" | "segments" | "wires"
   >;
   tabularExportFormat: ModelingSliceParams["tabularExportFormat"];
+  hideWireAnalysisRoutePanel: AnalysisSliceParams["hideWireAnalysisRoutePanel"];
   formsState: AppControllerFormsStateFlat;
   modelingHandlers: AppControllerModelingHandlersOrchestrator;
   catalogHandlers: Pick<CatalogHandlersModel, "startCatalogEdit">;
@@ -175,6 +176,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   spliceTechnicalIdAlreadyUsed,
   wireTechnicalIdAlreadyUsed,
   tabularExportFormat,
+  hideWireAnalysisRoutePanel,
   onSelectConnector,
   onSelectSplice,
   onSelectNode,
@@ -739,6 +741,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     ? (() => {
       return buildAnalysisScreenContentSlice({
     AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
+    hideWireAnalysisRoutePanel,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
     isNodeSubScreen: screenFlags.isNodeSubScreen,

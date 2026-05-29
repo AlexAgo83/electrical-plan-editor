@@ -119,6 +119,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setRestoreViewportOnUndo"
     | "setShowFloatingInspectorPanel"
     | "setShowRoutePreviewPanel"
+    | "setHideWireAnalysisRoutePanel"
     | "setWorkspacePanelsLayoutMode"
     | "setWorkspaceWideScreen"
   >;

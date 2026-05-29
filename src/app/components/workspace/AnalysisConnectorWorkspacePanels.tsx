@@ -38,7 +38,6 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     handleReserveCavity,
     connectorCavityStatuses,
     handleReleaseCavity,
-    onGoToWireFromAnalysis,
     onOpenWireFromAnalysisTable,
     onOpenConnectorFromAnalysisTable,
     onOpenSpliceFromAnalysisTable,
@@ -525,7 +524,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
                         if (!canGoToWire || parsedOccupantRef === null) {
                           return;
                         }
-                        onGoToWireFromAnalysis(parsedOccupantRef.wireId);
+                        onOpenWireFromAnalysisTable(parsedOccupantRef.wireId);
                       }}
                     >
                       <span className="action-button-icon is-open" aria-hidden="true" />
@@ -555,7 +554,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         wireById={wireById}
         selectedWireId={selectedWireId}
         parseOccupantWireId={parseOccupantWireId}
-        onGoToWire={onGoToWireFromAnalysis}
+        onGoToWire={onOpenWireFromAnalysisTable}
       />
     </>
   ) : sortedConnectorSynthesisRowsByColumns.length === 0 ? (

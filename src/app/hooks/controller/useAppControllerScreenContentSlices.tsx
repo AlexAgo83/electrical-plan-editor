@@ -679,6 +679,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
 export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSliceParams) {
   const analysisWorkspaceContentProps = {
     showEntityTables: false,
+    hideWireAnalysisRoutePanel: params.hideWireAnalysisRoutePanel,
     isConnectorSubScreen: params.isConnectorSubScreen,
     isSpliceSubScreen: params.isSpliceSubScreen,
     isNodeSubScreen: params.isNodeSubScreen,
@@ -947,6 +948,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setShowFloatingInspectorPanel: params.setShowFloatingInspectorPanel,
     showRoutePreviewPanel: params.showRoutePreviewPanel,
     setShowRoutePreviewPanel: params.setShowRoutePreviewPanel,
+    hideWireAnalysisRoutePanel: params.hideWireAnalysisRoutePanel,
+    setHideWireAnalysisRoutePanel: params.setHideWireAnalysisRoutePanel,
     workspacePanelsLayoutMode: params.workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode: params.setWorkspacePanelsLayoutMode,
     workspaceWideScreen: params.workspaceWideScreen,

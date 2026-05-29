@@ -15,7 +15,7 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 12;
+const UI_PREFERENCES_SCHEMA_VERSION = 13;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 type TableDensity = "comfortable" | "compact";
@@ -73,6 +73,7 @@ export interface UiPreferencesPayload {
   restoreViewportOnUndo: boolean;
   showFloatingInspectorPanel: boolean;
   showRoutePreviewPanel: boolean;
+  hideWireAnalysisRoutePanel: boolean;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
   workspaceWideScreen: boolean;
 }
@@ -183,6 +184,15 @@ function migrateUiPreferencesFromV11(candidate: Record<string, unknown>): Record
   };
 }
 
+function migrateUiPreferencesFromV12(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    hideWireAnalysisRoutePanel:
+      typeof candidate.hideWireAnalysisRoutePanel === "boolean" ? candidate.hideWireAnalysisRoutePanel : false,
+    schemaVersion: 13
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -253,6 +263,11 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
     if (version === 11) {
       migrated = migrateUiPreferencesFromV11(migrated);
       version = 12;
+      continue;
+    }
+    if (version === 12) {
+      migrated = migrateUiPreferencesFromV12(migrated);
+      version = 13;
       continue;
     }
     return null;

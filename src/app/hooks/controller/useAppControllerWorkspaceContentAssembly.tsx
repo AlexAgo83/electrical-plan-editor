@@ -323,6 +323,7 @@ export function useAppControllerWorkspaceContentAssembly({
         wires: entities.wires
       },
       tabularExportFormat: models.preferencesState.tabularExportFormat,
+      hideWireAnalysisRoutePanel: models.preferencesState.hideWireAnalysisRoutePanel,
       formsState: models.formsState,
       modelingHandlers: models.modelingHandlers,
       catalogHandlers: models.catalogHandlers,

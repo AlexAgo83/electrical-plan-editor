@@ -264,6 +264,8 @@ export function useAppControllerAuxScreenContentDomains({
     setShowFloatingInspectorPanel: settings.prefs.setShowFloatingInspectorPanel,
     showRoutePreviewPanel: settings.prefs.showRoutePreviewPanel,
     setShowRoutePreviewPanel: settings.prefs.setShowRoutePreviewPanel,
+    hideWireAnalysisRoutePanel: settings.prefs.hideWireAnalysisRoutePanel,
+    setHideWireAnalysisRoutePanel: settings.prefs.setHideWireAnalysisRoutePanel,
     workspacePanelsLayoutMode: settings.prefs.workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode: settings.prefs.setWorkspacePanelsLayoutMode,
     workspaceWideScreen: settings.prefs.workspaceWideScreen,

@@ -134,6 +134,8 @@ interface SettingsWorkspaceContentProps {
   setShowFloatingInspectorPanel: (value: boolean) => void;
   showRoutePreviewPanel: boolean;
   setShowRoutePreviewPanel: (value: boolean) => void;
+  hideWireAnalysisRoutePanel: boolean;
+  setHideWireAnalysisRoutePanel: (value: boolean) => void;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutMode;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
   workspaceWideScreen: boolean;
@@ -252,6 +254,8 @@ export function SettingsWorkspaceContent({
   setShowFloatingInspectorPanel,
   showRoutePreviewPanel,
   setShowRoutePreviewPanel,
+  hideWireAnalysisRoutePanel,
+  setHideWireAnalysisRoutePanel,
   workspacePanelsLayoutMode,
   setWorkspacePanelsLayoutMode,
   workspaceWideScreen,
@@ -624,6 +628,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setShowRoutePreviewPanel(event.target.checked)}
             />
             Show route preview panel
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={hideWireAnalysisRoutePanel}
+              onChange={(event) => setHideWireAnalysisRoutePanel(event.target.checked)}
+            />
+            Hide Wire analysis auto route panel
           </label>
           <label className="settings-field">
             Workspace panels layout
