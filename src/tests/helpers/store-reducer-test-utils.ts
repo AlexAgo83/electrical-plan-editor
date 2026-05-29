@@ -1,5 +1,9 @@
-import type { ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../core/entities";
+import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../core/entities";
 import { appReducer, createInitialState, type AppState } from "../../store";
+
+export function asCatalogItemId(value: string): CatalogItemId {
+  return value as CatalogItemId;
+}
 
 export function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;

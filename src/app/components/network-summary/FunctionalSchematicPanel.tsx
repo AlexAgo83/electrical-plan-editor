@@ -142,8 +142,9 @@ function resolveSeed({
 }
 
 function getSeedLabel(seed: FunctionalTraceSeed, rootConnectors: readonly Connector[]): string {
-  if (rootConnectors.length === 1) {
-    return `main connector ${rootConnectors[0]!.technicalId}`;
+  const [firstRootConnector] = rootConnectors;
+  if (rootConnectors.length === 1 && firstRootConnector !== undefined) {
+    return `main connector ${firstRootConnector.technicalId}`;
   }
   if (rootConnectors.length > 1) {
     return `${rootConnectors.length} main connectors`;
@@ -233,12 +234,14 @@ function buildFunctionalSchematicLayout(graph: FunctionalSchematicGraph): Functi
   if (roots.length === 0) {
     roots = orderedNodes.filter((node) => nodeMatchesSeed(node, graph.seed));
   }
-  if (roots.length === 0 && graph.edges.length > 0) {
-    const firstEdgeRoot = nodeById.get(graph.edges[0]!.fromNodeId);
+  const [firstEdge] = graph.edges;
+  if (roots.length === 0 && firstEdge !== undefined) {
+    const firstEdgeRoot = nodeById.get(firstEdge.fromNodeId);
     roots = firstEdgeRoot === undefined ? [] : [firstEdgeRoot];
   }
-  if (roots.length === 0 && orderedNodes.length > 0) {
-    roots = [orderedNodes[0]!];
+  const [firstOrderedNode] = orderedNodes;
+  if (roots.length === 0 && firstOrderedNode !== undefined) {
+    roots = [firstOrderedNode];
   }
 
   const rankByNodeId = new Map<string, number>();
@@ -248,7 +251,10 @@ function buildFunctionalSchematicLayout(graph: FunctionalSchematicGraph): Functi
   });
   const maxTraversalRank = Math.max(0, orderedNodes.length - 1);
   for (let index = 0; index < queue.length; index += 1) {
-    const nodeId = queue[index]!;
+    const nodeId = queue[index];
+    if (nodeId === undefined) {
+      continue;
+    }
     const currentRank = rankByNodeId.get(nodeId) ?? 0;
     for (const nextNodeId of adjacency.get(nodeId) ?? []) {
       const nextRank = currentRank + 1;
@@ -364,8 +370,8 @@ function buildFunctionalSchematicLayout(graph: FunctionalSchematicGraph): Functi
       assignChildrenColumns(node.id);
     }
     const disconnectedNodes = row.filter((node) => !rootIds.has(node.id) && (incomingEdgesByNodeId.get(node.id) ?? []).length === 0);
-    if (disconnectedNodes.length > 0) {
-      const lastDisconnectedNode = disconnectedNodes.at(-1)!;
+    const lastDisconnectedNode = disconnectedNodes.at(-1);
+    if (lastDisconnectedNode !== undefined) {
       const lastDisconnectedWidth =
         layoutWidthByNodeId.get(lastDisconnectedNode.id) ?? getFunctionalNodeLayoutWidth(lastDisconnectedNode);
       nextDisconnectedColumn += getFunctionalLayoutGapBetweenWidths(lastDisconnectedWidth, getFunctionalNodeLayoutWidth(lastDisconnectedNode));

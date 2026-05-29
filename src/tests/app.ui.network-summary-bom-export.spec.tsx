@@ -337,7 +337,9 @@ describe("App integration UI - network summary BOM export", () => {
     const byConnectorTab = within(previewDialog).getByRole("tab", { name: /By connector/ });
     fireEvent.click(byConnectorTab);
 
-    expect(byConnectorTab).toHaveAttribute("aria-selected", "true");
+    await waitFor(() => {
+      expect(byConnectorTab).toHaveAttribute("aria-selected", "true");
+    });
     expect(within(previewDialog).getByText("Connector ID")).toBeInTheDocument();
     expect(within(previewDialog).getByText("C-BOM-XLSX")).toBeInTheDocument();
   });
