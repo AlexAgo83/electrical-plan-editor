@@ -342,6 +342,49 @@ export function useNetworkImportExport({
   const importFileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedExportNetworkIds, setSelectedExportNetworkIds] = useState<NetworkId[]>([]);
   const [importExportStatus, setImportExportStatus] = useState<ImportExportStatus | null>(null);
+  const [groupedSvgExportProgress, setGroupedSvgExportProgress] = useState<{
+    current: number;
+    total: number;
+    networkName: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+    const OVERLAY_ID = "grouped-svg-export-overlay";
+    if (groupedSvgExportProgress === null) {
+      document.getElementById(OVERLAY_ID)?.remove();
+      return;
+    }
+    let overlay = document.getElementById(OVERLAY_ID);
+    if (overlay === null) {
+      overlay = document.createElement("div");
+      overlay.id = OVERLAY_ID;
+      overlay.setAttribute("role", "status");
+      overlay.setAttribute("aria-live", "polite");
+      Object.assign(overlay.style, {
+        position: "fixed",
+        inset: "0",
+        zIndex: "10000",
+        background: "rgba(0, 0, 0, 0.55)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#fff",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        pointerEvents: "auto"
+      });
+      document.body.appendChild(overlay);
+    }
+    const { current, total, networkName } = groupedSvgExportProgress;
+    overlay.innerHTML = `<div style="background:#1f2937;padding:24px 32px;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,0.4);text-align:center;max-width:480px"><div style="font-weight:600;font-size:16px;margin-bottom:6px">Exporting SVG ${current} of ${total}</div><div style="opacity:0.85;font-size:14px">${networkName.replace(/[<>&"]/g, (c) => ({"<":"&lt;",">":"&gt;","&":"&amp;","\"":"&quot;"}[c] ?? c))}</div></div>`;
+    return () => {
+      if (groupedSvgExportProgress === null) {
+        document.getElementById(OVERLAY_ID)?.remove();
+      }
+    };
+  }, [groupedSvgExportProgress]);
   const [lastImportSummary, setLastImportSummary] = useState<NetworkImportSummary | null>(null);
   const [pendingOverwriteImport, setPendingOverwriteImport] = useState<PendingOverwriteImport | null>(null);
 
@@ -593,21 +636,31 @@ export function useNetworkImportExport({
       }
 
       const originalNetworkId = store.getState().activeNetworkId;
-      let exportedCount = 0;
-      for (const networkId of networkIds) {
-        const network = store.getState().networks.byId[networkId];
-        if (network === undefined) {
-          continue;
+      const validNetworks = networkIds.flatMap((id) => {
+        const network = store.getState().networks.byId[id];
+        return network === undefined ? [] : [network];
+      });
+      try {
+        let exportedCount = 0;
+        for (let i = 0; i < validNetworks.length; i++) {
+          const network = validNetworks[i]!;
+          setGroupedSvgExportProgress({
+            current: i + 1,
+            total: validNetworks.length,
+            networkName: network.name || network.technicalId || String(network.id)
+          });
+          dispatchAction(appActions.selectNetwork(network.id));
+          await waitForNextFrames(3);
+          await networkSummaryPanelRef.current?.exportSvgDirect();
+          exportedCount += 1;
         }
-        dispatchAction(appActions.selectNetwork(networkId));
-        await waitForNextFrames(3);
-        await networkSummaryPanelRef.current?.exportSvgDirect();
-        exportedCount += 1;
+        if (originalNetworkId !== null && originalNetworkId !== store.getState().activeNetworkId) {
+          dispatchAction(appActions.selectNetwork(originalNetworkId));
+        }
+        setImportExportStatus({ kind: "success", message: `Exported grouped SVG for ${exportedCount} network(s).` });
+      } finally {
+        setGroupedSvgExportProgress(null);
       }
-      if (originalNetworkId !== null && originalNetworkId !== store.getState().activeNetworkId) {
-        dispatchAction(appActions.selectNetwork(originalNetworkId));
-      }
-      setImportExportStatus({ kind: "success", message: `Exported grouped SVG for ${exportedCount} network(s).` });
     })();
   }
 
