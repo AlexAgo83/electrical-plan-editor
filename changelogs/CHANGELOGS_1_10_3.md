@@ -1,5 +1,11 @@
 # Changelog (`1.10.2 -> 1.10.3`)
 
+## Major Highlights
+
+- Published a recovery release from the CI-green commit after the `v1.10.2` tag was blocked.
+- Kept the Network Summary panel within its locked line budget so the Render release workflow can pass.
+- Aligned release metadata to `1.10.3` across package, lockfile, version, and README.
+
 ## Version 1.10.3 - Render Release Deployment Recovery
 
 ### Release and CI

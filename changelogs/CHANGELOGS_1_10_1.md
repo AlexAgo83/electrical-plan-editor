@@ -1,5 +1,11 @@
 # Changelog (`1.10.0 -> 1.10.1`)
 
+## Major Highlights
+
+- Changed connector analysis `Go to` actions so they open the targeted wire directly in edit mode.
+- Added a Settings preference for hiding the Wire analysis auto route panel.
+- Persisted the new route panel visibility preference through a UI preference schema migration.
+
 ## Version 1.10.1 - Analysis Wire Navigation Controls
 
 ### Wire Analysis

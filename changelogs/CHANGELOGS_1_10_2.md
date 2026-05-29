@@ -1,5 +1,12 @@
 # Changelog (`1.10.1 -> 1.10.2`)
 
+## Major Highlights
+
+- Added grouped SVG export for selected networks from Settings.
+- Rendered each selected network plan SVG sequentially while restoring the original active network afterward.
+- Improved SVG and PNG export filenames by using the network name instead of raw ISO timestamps.
+- Added a direct SVG export path for grouped export workflows.
+
 ## Version 1.10.2 - Grouped SVG Export and Cleaner Filenames
 
 ### Settings / Import & Export

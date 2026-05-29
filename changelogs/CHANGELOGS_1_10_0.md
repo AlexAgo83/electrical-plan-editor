@@ -1,5 +1,11 @@
 # Changelog (`1.9.8 -> 1.10.0`)
 
+## Major Highlights
+
+- Changed connector endpoint material cleanup so clearing overrides also clears manual connection and seal fields on wire endpoints terminating at the edited connector.
+- Kept cleanup scoped to the edited connector side while preserving unrelated endpoints.
+- Aligned release metadata to `1.10.0` and corrected semantic release ordering.
+
 ## Version 1.10.0 - Connector Endpoint Material Cleanup
 
 ### Connector Catalog Materials

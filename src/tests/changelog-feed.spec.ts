@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { buildHomeChangelogEntriesFromModules } from "../app/lib/changelogFeed";
 
 describe("home changelog feed", () => {
@@ -27,5 +29,25 @@ describe("home changelog feed", () => {
     expect(entries).toHaveLength(2);
     expect(entries[0]?.sourcePath).toBe("../../../changelogs/alpha/CHANGELOGS_0_9_16.md");
     expect(entries[1]?.sourcePath).toBe("../../../changelogs/zeta/CHANGELOGS_0_9_16.md");
+  });
+
+  it("keeps every root changelog compatible with the home feed section format", () => {
+    const changelogDirectory = join(process.cwd(), "changelogs");
+    const changelogFiles = readdirSync(changelogDirectory)
+      .filter((fileName) => /^CHANGELOGS_\d+_\d+_\d+\.md$/.test(fileName))
+      .sort();
+
+    expect(changelogFiles.length).toBeGreaterThan(0);
+
+    for (const fileName of changelogFiles) {
+      const content = readFileSync(join(changelogDirectory, fileName), "utf8");
+      const majorHighlightsIndex = content.indexOf("## Major Highlights");
+      const firstVersionSectionIndex = content.search(/^## Version /m);
+
+      expect(majorHighlightsIndex, `${fileName} should include Major Highlights`).toBeGreaterThan(-1);
+      if (firstVersionSectionIndex !== -1) {
+        expect(majorHighlightsIndex, `${fileName} should list Major Highlights before Version sections`).toBeLessThan(firstVersionSectionIndex);
+      }
+    }
   });
 });

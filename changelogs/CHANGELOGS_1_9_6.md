@@ -1,5 +1,12 @@
 # Changelog (`1.9.5 -> 1.9.6`)
 
+## Major Highlights
+
+- Added overwrite detection for imported networks that closely match existing networks.
+- Added a grouped multi-network BOM XLSX export from Settings.
+- Included per-network BOM, by-connector termination, and wire-list sheets in grouped exports.
+- Applied existing BOM preferences to grouped workbook generation.
+
 ## Version 1.9.6 - Import Overwrite and Grouped BOM Export
 
 ### Import / Export

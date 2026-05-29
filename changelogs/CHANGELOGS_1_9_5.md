@@ -1,5 +1,11 @@
 # Changelog (`1.9.4 -> 1.9.5`)
 
+## Major Highlights
+
+- Added visible import warning and error details so partial imports explain exactly what happened.
+- Preserved existing import counters while exposing deterministic rename reasons.
+- Added regression coverage for duplicate-network import warnings in Settings.
+
 ## Version 1.9.5 - Import Warning Details
 
 ### Import / Export

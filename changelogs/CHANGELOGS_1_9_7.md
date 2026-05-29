@@ -1,5 +1,12 @@
 # Changelog (`1.9.6 -> 1.9.7`)
 
+## Major Highlights
+
+- Added connector manufacturer references and resolved names to the BOM by-connector workbook sheet.
+- Added a connector edit action for clearing terminal and seal overrides.
+- Fixed connector form synchronization when switching edited connectors.
+- Prevented duplicate harness assemblies when overwritten networks are imported.
+
 ## Version 1.9.7 - Connector BOM and Harness Import Cleanup
 
 ### BOM Export
