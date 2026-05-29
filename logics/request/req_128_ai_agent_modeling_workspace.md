@@ -2,15 +2,15 @@
 > From version: 1.10.3
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 95%
-> Confidence: 90%
+> Understanding: 98%
+> Confidence: 94%
 > Complexity: High
 > Theme: AI
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
 
 # Needs
 - Add a new `AI Agent` section inside Modeling that can assist with harness and network modifications.
-- Add an AI settings area where users can configure the provider, model, credentials, endpoint, and safety options.
+- Add an AI settings area where users can configure OpenAI or Gemini, editable model name, local-storage API key, endpoint, and safety options.
 - Support a default assisted mode where the agent proposes structured plan operations for user review before application.
 - Support a clearly gated experimental mode where the agent can apply validated operations directly.
 - Make every AI session reversible through a single grouped undo or rollback action.
@@ -92,14 +92,18 @@ flowchart TD
 # Clarified Behavior
 - The AI Agent section belongs in Modeling.
 - AI provider configuration belongs in Settings, not inside the Modeling panel.
+- V1 supports OpenAI and Gemini provider configuration.
+- End users enter API keys locally in app settings; keys are persisted in local storage and `.env` keys are only a local development convenience.
+- V1 model selection uses editable model-name fields rather than a rigid provider model list.
 - Assisted mode is the safe default.
 - Experimental direct execution is allowed only when explicitly enabled.
+- V1 target scopes are current selection and active network; selected-harness scope is deferred to V2 because it is a saved multi-network harness assembly.
 - AI-generated changes are not trusted until local validation accepts them.
 - The agent should receive structured, scoped context instead of a full raw application dump.
-- The first implementation should prefer a narrow, reliable operation vocabulary over broad free-form mutation.
+- The first implementation should prefer a narrow V1 operation vocabulary: add connector/splice/node/segment/wire, move supported entities, update safe scalar fields, and regenerate routes.
 
 # Acceptance Criteria
-- AC1: Settings includes an AI configuration area with provider, model, credential or endpoint configuration, timeout or strictness options, and a connection test.
+- AC1: Settings includes an AI configuration area with OpenAI and Gemini provider choices, editable model name, local-storage API key or endpoint configuration, timeout or strictness options, and a connection test.
 - AC2: Modeling includes a visible `AI Agent` section.
 - AC3: The AI Agent section lets the user provide an instruction, choose a target scope, choose assisted or experimental mode, and review permissions.
 - AC4: Assisted mode is the default mode.
@@ -134,7 +138,7 @@ flowchart TD
 
 # Companion docs
 - Product brief(s): `logics/product/prod_004_ai_agent_modeling_workspace.md`
-- Architecture decision(s): TBD
+- Architecture decision(s): `logics/architecture/adr_009_ai_agent_operation_contract_and_reversible_execution.md`
 
 # References
 - `logics/request/req_127_selected_harness_agent_json_export.md`
@@ -149,4 +153,8 @@ flowchart TD
 - Skip when: The work only exports read-only agent context, targets human reports, or modifies providers without an in-app Modeling agent.
 
 # Backlog
-- none
+- `logics/backlog/item_600_ai_provider_settings_and_capability_contract.md`
+- `logics/backlog/item_601_ai_agent_context_builder_and_operation_contract.md`
+- `logics/backlog/item_602_modeling_ai_agent_assisted_proposal_workflow.md`
+- `logics/backlog/item_603_ai_agent_experimental_direct_execution_and_rollback.md`
+- `logics/backlog/item_604_ai_agent_validation_regression_and_release_gate.md`

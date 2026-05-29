@@ -1,0 +1,103 @@
+## item_603_ai_agent_experimental_direct_execution_and_rollback - AI Agent Experimental Direct Execution and Rollback
+> From version: 1.10.3
+> Schema version: 1.0
+> Status: Draft
+> Understanding: 94%
+> Confidence: 82%
+> Progress: 0%
+> Complexity: High
+> Theme: AI
+> Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+
+# Problem
+Advanced users want an experimental mode where the AI Agent can apply validated changes directly.
+This mode is useful only if it is explicitly gated, constrained by the same operation validator, and reversible as a single AI session.
+
+# Scope
+- In:
+  - Gate direct execution behind the global AI settings opt-in.
+  - Show direct execution as experimental in Modeling.
+  - Create a pre-run snapshot before direct execution.
+  - Execute only operations accepted by local validation.
+  - Stop, skip, or reject invalid operations with visible result details.
+  - Offer one-click rollback for the completed AI session.
+- Out:
+  - Unbounded raw store mutation.
+  - Deleting entities without explicit delete permission.
+  - Autonomous background execution.
+  - Provider tools that bypass local validation.
+
+```mermaid
+%% logics-kind: backlog
+%% logics-signature: backlog|ai-agent-experimental-direct-execution-a|req-128-ai-agent-modeling-workspace|advanced-users-want-an-experimental-mode|ac1-experimental-direct-mode-is-unavaila
+flowchart TD
+    OptIn[Settings opt-in] --> DirectMode[Experimental direct mode]
+    DirectMode --> Snapshot[Pre-run snapshot]
+    Snapshot --> ToolCalls[Provider operations or tool calls]
+    ToolCalls --> Validate[Local validation]
+    Validate --> Apply[Apply accepted operations]
+    Validate --> Reject[Reject invalid operations]
+    Apply --> Summary[Session summary]
+    Summary --> Rollback[One-click rollback]
+```
+
+# Acceptance criteria
+- AC1: Experimental direct mode is unavailable until the global AI settings opt-in is enabled.
+- AC2: The UI clearly marks direct execution as experimental.
+- AC3: A pre-run snapshot is created before any direct execution mutation.
+- AC4: Direct execution uses the same operation validator and executor as assisted mode.
+- AC5: Invalid, unsupported, or out-of-permission operations are rejected without mutation.
+- AC6: Delete operations remain blocked unless delete permission is explicitly enabled for the run.
+- AC7: The session result summarizes applied, rejected, skipped, and failed operations.
+- AC8: The user can roll back the whole direct execution session in one action.
+- AC9: Rollback restores the exact pre-run modeling state.
+- AC10: Tests cover opt-in gating, snapshot creation, rejected direct operations, delete gating, successful direct apply, and rollback.
+
+# AC Traceability
+- request-AC8 -> backlog AC1 and AC2.
+- request-AC9 -> backlog AC3, AC4, AC5.
+- request-AC10 -> backlog AC8 and AC9.
+- request-AC11 -> backlog AC4 and AC5.
+- request-AC12 -> backlog AC6.
+- request-AC13 -> backlog AC7.
+- request-AC15 -> backlog AC10.
+
+# Decision framing
+- Product framing: Covered by `prod_004_ai_agent_modeling_workspace`.
+- Architecture framing: Covered by `adr_009_ai_agent_operation_contract_and_reversible_execution`.
+
+# Links
+- Product brief(s): `logics/product/prod_004_ai_agent_modeling_workspace.md`
+- Architecture decision(s): `logics/architecture/adr_009_ai_agent_operation_contract_and_reversible_execution.md`
+- Request: `logics/request/req_128_ai_agent_modeling_workspace.md`
+<!-- When creating a task from this item, add: Derived from `logics/backlog/item_603_ai_agent_experimental_direct_execution_and_rollback.md` in the task # Links section -->
+
+# Priority
+- Impact: Medium
+- Urgency: Medium
+
+# Dependencies
+- `item_600_ai_provider_settings_and_capability_contract`.
+- `item_601_ai_agent_context_builder_and_operation_contract`.
+- `item_602_modeling_ai_agent_assisted_proposal_workflow`.
+- Existing undo/redo and persistence semantics.
+
+# Risks
+- Users may over-trust direct execution if warnings are not visible.
+- Snapshot rollback must not conflict with unrelated user actions made after the AI session.
+- Provider tool-call streaming could complicate transaction boundaries if introduced too early.
+
+# Validation plan
+- Add direct execution tests with mocked provider/tool output.
+- Add rollback tests that compare pre-run and post-rollback state.
+- Add destructive permission tests.
+- Run targeted AI Agent and history tests, `npm run -s typecheck`, and `npm run -s lint`.
+
+# AI Context
+- Summary: Add opt-in experimental AI direct execution with pre-run snapshots and one-click rollback.
+- Keywords: experimental AI mode, direct execution, snapshot, rollback, permissions, delete gate
+- Use when: Implementing direct AI mutation behavior after assisted mode exists.
+- Skip when: Implementing provider settings or assisted proposal review.
+
+# Tasks
+- none

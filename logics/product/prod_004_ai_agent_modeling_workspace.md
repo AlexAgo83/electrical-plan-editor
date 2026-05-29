@@ -2,9 +2,9 @@
 > Date: 2026-05-29
 > Status: Draft
 > Related request: `req_128_ai_agent_modeling_workspace`
-> Related backlog: TBD
+> Related backlog: `item_600_ai_provider_settings_and_capability_contract`, `item_601_ai_agent_context_builder_and_operation_contract`, `item_602_modeling_ai_agent_assisted_proposal_workflow`, `item_603_ai_agent_experimental_direct_execution_and_rollback`, `item_604_ai_agent_validation_regression_and_release_gate`
 > Related task: TBD
-> Related architecture: TBD
+> Related architecture: `adr_009_ai_agent_operation_contract_and_reversible_execution`
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
 
 # Overview
@@ -54,6 +54,7 @@ Typical situations:
 # Goals
 - Add an AI control surface directly in Modeling.
 - Keep AI provider configuration centralized in Settings.
+- Support OpenAI and Gemini as the first configured providers.
 - Let users express intent in natural language while execution remains structured.
 - Support a safe assisted mode where users review operations before application.
 - Support an opt-in experimental mode where the agent can apply valid operations directly.
@@ -68,7 +69,7 @@ Typical situations:
 - Create a general-purpose chat assistant unrelated to the active plan.
 - Implement full harness optimization in the first version.
 - Add persistent cross-project AI memory.
-- Require cloud AI usage when local or custom providers are configured.
+- Require local or custom providers in V1.
 
 # Experience Direction
 The new Modeling section should be named `AI Agent`.
@@ -178,14 +179,17 @@ User instruction
 # Operation Model
 The agent should act through a small operation vocabulary, not through direct state writes.
 
-Candidate operation families:
-- `add_entity`: connector, splice, node, segment, wire;
-- `move_entity`: connector, splice, node, or grouped canvas entities;
-- `update_entity`: labels, technical IDs, sections, materials, colors, protection, route locks;
+Recommended V1 operation families:
+- `add_entity`: connector, splice, node, segment, or wire with required network scope and explicit fields;
+- `move_entity`: connector, splice, node, or selected canvas entity movement within the active network;
+- `update_entity`: safe scalar fields such as name, technical ID, section, material, color, protection, route lock, and display metadata;
+- `regenerate_route`: route recalculation for selected or active-network wires within the permitted scope.
+
+Recommended V2 operation families:
 - `assign_endpoint`: connector cavity or splice port assignment;
-- `assign_catalog_reference`: catalog-backed connector, splice, terminal, seal, plug, or protection reference;
-- `regenerate_route`: recalculate routes within allowed scope;
-- `delete_entity`: only when explicitly permitted.
+- `assign_catalog_reference`: connector, splice, terminal, seal, plug, or protection catalog association;
+- `delete_entity`: destructive action, disabled unless explicitly permitted;
+- selected-harness multi-network operations.
 
 Each operation should include:
 - stable target IDs;
@@ -212,12 +216,16 @@ Required safeguards:
 # Key Product Decisions
 - The `AI Agent` belongs in Modeling because its purpose is to change modeling data.
 - Provider configuration belongs in Settings because it is an application-level capability.
+- V1 supports OpenAI and Gemini provider configuration.
+- Users enter their own API keys locally in the app settings and those keys are persisted in local storage with the rest of the local app settings; local development may also use `.env` keys for developer workflows.
+- Provider model selection uses editable model-name fields in V1 instead of a rigid baked-in model list.
 - Assisted mode is the default.
 - Experimental mode is explicit, opt-in, and reversible.
 - The operation contract is the shared foundation for both modes.
 - The app validates and executes operations; the provider only proposes or requests them.
 - Undo/rollback is a non-negotiable product requirement.
-- V1 should start with a narrow operation vocabulary and expand after validation.
+- V1 should start with current-selection and active-network scopes; selected-harness scope is deferred to V2 because it spans multiple networks and has a larger mutation blast radius.
+- V1 should start with add, move, update, and route-regeneration operations; endpoint assignment, catalog assignment, delete, and selected-harness mutation should follow after the core contract is proven.
 
 # Functional Scope
 In scope:
@@ -243,11 +251,13 @@ Out of scope:
 
 # MVP Direction
 Recommended V1:
-- AI settings with one provider abstraction and extension points for additional providers;
+- AI settings with OpenAI and Gemini provider adapters behind one provider abstraction;
+- user-entered API keys persisted in local storage, with optional `.env` keys for development/test workflows;
+- editable model-name fields for OpenAI and Gemini instead of a fixed model selector;
 - Modeling `AI Agent` entry;
 - assisted mode only enabled by default;
 - scope limited to current selection or active network;
-- operation vocabulary limited to safe add, move, and update operations;
+- operation vocabulary limited to safe add, move, update, and route-regeneration operations;
 - delete unavailable or disabled by default;
 - validation summary and operation details;
 - apply as one history transaction;
@@ -256,7 +266,7 @@ Recommended V1:
 Recommended V2:
 - experimental direct execution;
 - selected-harness scope;
-- route regeneration and endpoint assignment tools;
+- endpoint assignment tools;
 - catalog-reference assignment tools;
 - richer visual diff on canvas;
 - session history;
@@ -272,10 +282,7 @@ Recommended V2:
 - The operation contract can support new actions without widening raw state access.
 
 # Open Questions
-- Which provider should be the first supported implementation?
-- Should credentials be stored locally, in environment variables, or both?
-- What is the smallest useful V1 operation vocabulary?
-- Should selected-harness scope be V1 or V2, given the existing selected-harness agent JSON export?
+- Which OpenAI and Gemini default model names should prefill the editable fields at implementation time?
 - How detailed should the visual diff be before V1 ships?
 - Should experimental mode require a per-run confirmation even after it is enabled in Settings?
 - Should the app keep an AI session history, or only the latest session summary?
@@ -285,3 +292,9 @@ Recommended V2:
 - `logics/request/req_128_ai_agent_modeling_workspace.md`
 - `logics/product/prod_000_modeling_productivity_and_repeated_action_ergonomics.md`
 - `logics/architecture/adr_003_modeling_create_flow_reset_and_canvas_group_movement_interaction_contracts.md`
+- `logics/architecture/adr_009_ai_agent_operation_contract_and_reversible_execution.md`
+- `logics/backlog/item_600_ai_provider_settings_and_capability_contract.md`
+- `logics/backlog/item_601_ai_agent_context_builder_and_operation_contract.md`
+- `logics/backlog/item_602_modeling_ai_agent_assisted_proposal_workflow.md`
+- `logics/backlog/item_603_ai_agent_experimental_direct_execution_and_rollback.md`
+- `logics/backlog/item_604_ai_agent_validation_regression_and_release_gate.md`
