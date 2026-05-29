@@ -2,7 +2,9 @@ node_modules
 dist
 coverage
 .claude/
+.rtk/
 .cache/
+CLAUDE.md
 
 playwright-report
 test-results
