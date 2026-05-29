@@ -168,6 +168,7 @@ export function useAppControllerAuxScreenContentDomains({
     lastImportSummary: settings.importExport.lastImportSummary,
     importOverwriteDialog: settings.importExport.importOverwriteDialog,
     handleExportGroupedBom: settings.importExport.handleExportGroupedBom,
+    handleExportGroupedSvg: settings.importExport.handleExportGroupedSvg,
     locale: settings.prefs.locale,
     setLocale: settings.prefs.setLocale,
     themeMode: settings.prefs.themeMode,

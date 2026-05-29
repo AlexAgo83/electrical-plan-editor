@@ -1,4 +1,5 @@
-import { type ChangeEvent, type MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, type MutableRefObject, type RefObject, useCallback, useEffect, useRef, useState } from "react";
+import type { NetworkSummaryPanelHandle } from "../components/network-summary/NetworkSummaryPanel.types";
 import {
   type Network,
   type NetworkId,
@@ -58,6 +59,8 @@ interface UseNetworkImportExportParams {
   dispatchAction: (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean }) => void;
   notifyToast?: NotifyToast;
   groupedBomPreferences?: GroupedBomPreferences;
+  networkSummaryPanelRef?: RefObject<NetworkSummaryPanelHandle | null>;
+  ensureNetworkPlanScreen?: () => void;
 }
 
 interface UseNetworkImportExportResult {
@@ -70,6 +73,7 @@ interface UseNetworkImportExportResult {
   handleExportNetworks: (scope: "active" | "selected" | "all", exportedAtIsoOverride?: string) => void;
   handleExportNetwork: (networkId: NetworkId, exportedAtIsoOverride?: string) => void;
   handleExportGroupedBom: (networkIds: NetworkId[]) => void;
+  handleExportGroupedSvg: (networkIds: NetworkId[]) => void;
   handleOpenImportPicker: () => void;
   handleImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
 }
@@ -92,6 +96,35 @@ function toFilesystemSafeTimestamp(exportedAtIso: string): string {
   const minute = pad2(exportedAt.getMinutes());
   const second = pad2(exportedAt.getSeconds());
   return `${year}-${month}-${day}_${hour}-${minute}-${second}`;
+}
+
+function waitForNextFrames(frameCount: number): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") {
+      resolve();
+      return;
+    }
+    let remaining = Math.max(1, frameCount);
+    const tick = () => {
+      remaining -= 1;
+      if (remaining <= 0) {
+        resolve();
+        return;
+      }
+      window.requestAnimationFrame(tick);
+    };
+    window.requestAnimationFrame(tick);
+  });
+}
+
+async function waitFor(predicate: () => boolean, attempts: number, intervalMs: number): Promise<boolean> {
+  for (let i = 0; i < attempts; i++) {
+    if (predicate()) {
+      return true;
+    }
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+  return predicate();
 }
 
 function hasLegacyNumericSplices(networkStates: Record<NetworkId, NetworkScopedState>): boolean {
@@ -302,7 +335,9 @@ export function useNetworkImportExport({
   activeNetworkId,
   dispatchAction,
   notifyToast,
-  groupedBomPreferences
+  groupedBomPreferences,
+  networkSummaryPanelRef,
+  ensureNetworkPlanScreen
 }: UseNetworkImportExportParams): UseNetworkImportExportResult {
   const importFileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedExportNetworkIds, setSelectedExportNetworkIds] = useState<NetworkId[]>([]);
@@ -541,6 +576,41 @@ export function useNetworkImportExport({
     })();
   }
 
+  function handleExportGroupedSvg(networkIds: NetworkId[]): void {
+    if (networkIds.length === 0) {
+      return;
+    }
+    if (networkSummaryPanelRef === undefined) {
+      setImportExportStatus({ kind: "failed", message: "Grouped SVG export is unavailable in this context." });
+      return;
+    }
+    void (async () => {
+      ensureNetworkPlanScreen?.();
+      const panelReady = await waitFor(() => networkSummaryPanelRef.current !== null, 60, 100);
+      if (!panelReady) {
+        setImportExportStatus({ kind: "failed", message: "Network plan is not ready for SVG export." });
+        return;
+      }
+
+      const originalNetworkId = store.getState().activeNetworkId;
+      let exportedCount = 0;
+      for (const networkId of networkIds) {
+        const network = store.getState().networks.byId[networkId];
+        if (network === undefined) {
+          continue;
+        }
+        dispatchAction(appActions.selectNetwork(networkId));
+        await waitForNextFrames(3);
+        await networkSummaryPanelRef.current?.exportSvgDirect();
+        exportedCount += 1;
+      }
+      if (originalNetworkId !== null && originalNetworkId !== store.getState().activeNetworkId) {
+        dispatchAction(appActions.selectNetwork(originalNetworkId));
+      }
+      setImportExportStatus({ kind: "success", message: `Exported grouped SVG for ${exportedCount} network(s).` });
+    })();
+  }
+
   function handleOpenImportPicker(): void {
     importFileInputRef.current?.click();
   }
@@ -632,6 +702,7 @@ export function useNetworkImportExport({
     handleExportNetworks,
     handleExportNetwork,
     handleExportGroupedBom,
+    handleExportGroupedSvg,
     handleOpenImportPicker,
     handleImportFileChange
   };

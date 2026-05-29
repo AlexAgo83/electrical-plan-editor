@@ -189,6 +189,7 @@ export function useAppControllerWorkspaceContentAssembly({
   const { networkSummaryPanel, networkFunctionalSchematicPanel, headerHarnessAssemblyFunctionalScopeNavigation } =
     useAppControllerNetworkSummaryPanelDomain({
     NetworkSummaryPanelComponent: components.NetworkSummaryPanelComponent,
+    networkSummaryPanelRef: domains.workspaceNetworkDomain.networkSummaryPanelRef,
     hasActiveNetwork: state.hasActiveNetwork,
     isModelingScreen: state.isModelingScreen,
     isAnalysisScreen: state.isAnalysisScreen,

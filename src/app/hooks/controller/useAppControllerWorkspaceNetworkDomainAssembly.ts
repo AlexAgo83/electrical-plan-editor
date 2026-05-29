@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import type { AppStore, AppState } from "../../../store";
+import type { NetworkSummaryPanelHandle } from "../../components/network-summary/NetworkSummaryPanel.types";
 import type { AppAction } from "../../../store/actions";
 import type { CatalogItem, NetworkNode, Segment } from "../../../core/entities";
 import type { AppControllerCanvasDisplayStateModel } from "../useAppControllerCanvasDisplayState";
@@ -98,6 +100,8 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     replaceStateWithHistory: core.replaceStateWithHistory
   });
 
+  const networkSummaryPanelRef = useRef<NetworkSummaryPanelHandle | null>(null);
+
   const networkImportExportModel = useNetworkImportExport({
     store: core.store,
     networks: core.networks,
@@ -110,7 +114,9 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
       workspaceTaxRatePercent: ui.preferencesState.workspaceTaxRatePercent,
       bomExportCompactColumns: ui.preferencesState.bomExportCompactColumns,
       bomTraceabilityLabelsHidden: ui.preferencesState.bomTraceabilityLabelsHidden
-    }
+    },
+    networkSummaryPanelRef,
+    ensureNetworkPlanScreen: () => navigation.setActiveScreen("modeling")
   });
 
   const {
@@ -240,7 +246,8 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     lastImportSummary: networkImportExportModel.lastImportSummary,
     handleOpenImportPicker: networkImportExportModel.handleOpenImportPicker,
     handleImportFileChange: networkImportExportModel.handleImportFileChange,
-    importOverwriteDialog: networkImportExportModel.importOverwriteDialog
+    importOverwriteDialog: networkImportExportModel.importOverwriteDialog,
+    networkSummaryPanelRef
   };
 }
 

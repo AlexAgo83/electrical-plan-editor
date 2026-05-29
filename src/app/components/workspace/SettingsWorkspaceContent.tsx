@@ -143,6 +143,7 @@ interface SettingsWorkspaceContentProps {
   resetWorkspacePreferencesToDefaults: () => void;
   importOverwriteDialog?: import("../../hooks/useNetworkImportExport").ImportOverwriteDialogModel | null;
   handleExportGroupedBom?: (networkIds: NetworkId[]) => void;
+  handleExportGroupedSvg?: (networkIds: NetworkId[]) => void;
 }
 
 export function SettingsWorkspaceContent({
@@ -262,7 +263,8 @@ export function SettingsWorkspaceContent({
   setWorkspaceWideScreen,
   resetWorkspacePreferencesToDefaults,
   importOverwriteDialog = null,
-  handleExportGroupedBom
+  handleExportGroupedBom,
+  handleExportGroupedSvg
 }: SettingsWorkspaceContentProps): ReactElement {
   return (
     <section className="panel-grid settings-panel-grid">
@@ -860,6 +862,13 @@ export function SettingsWorkspaceContent({
                 disabled={selectedExportNetworkIds.length === 0 || handleExportGroupedBom === undefined}
               >
                 Export grouped BOM (XLSX)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleExportGroupedSvg?.(selectedExportNetworkIds)}
+                disabled={selectedExportNetworkIds.length === 0 || handleExportGroupedSvg === undefined}
+              >
+                Export grouped SVG
               </button>
             </div>
             <div className="row-actions settings-actions">
