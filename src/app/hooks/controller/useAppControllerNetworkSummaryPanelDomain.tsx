@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { unstable_batchedUpdates } from "react-dom";
 import type { AppAction } from "../../../store/actions";
 import type {
@@ -24,6 +24,7 @@ import type { NodePosition, ScreenId, SubScreenId } from "../../types/app-contro
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
 import { appActions } from "../../../store";
 import { FunctionalSchematicPanel } from "../../components/network-summary/FunctionalSchematicPanel";
+import type { NetworkSummaryPanelHandle } from "../../components/network-summary/NetworkSummaryPanel.types";
 import { HarnessAssemblyFunctionalScopeNavigation } from "../../components/network-summary/HarnessAssemblyFunctionalScopeNavigation";
 import { HarnessAssemblyManagerPanel } from "../../components/network-summary/HarnessAssemblyManagerPanel";
 import { buildHarnessAssemblyFunctionalSchematicGraph, type FunctionalDomainFilter } from "../../../core/functionalSchematic";
@@ -236,6 +237,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   const [displayedAssemblyId, setDisplayedAssemblyId] = useState<HarnessAssemblyId | "new" | "">(readPersistedDisplayedAssemblyId);
   const [harnessAssemblyGraphTab, setHarnessAssemblyGraphTab] = useState<"assembly" | "current">("assembly");
   const [isHarnessAssemblyPickerOpen, setIsHarnessAssemblyPickerOpen] = useState(false);
+  const networkSummaryPanelRef = useRef<NetworkSummaryPanelHandle>(null);
   const handleOpenActiveNetworkInModeling = useCallback(() => {
     handleWorkspaceScreenChange("modeling");
   }, [handleWorkspaceScreenChange]);
@@ -320,6 +322,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   const networkSummaryPanel = shouldIncludeNetworkSummaryPanel
     ? buildNetworkSummaryPanelControllerSlice({
         NetworkSummaryPanelComponent,
+        networkSummaryPanelRef,
         handleZoomAction,
         fitNetworkToContent,
         showNetworkGrid: canvasState.showNetworkGrid,
@@ -496,6 +499,26 @@ export function useAppControllerNetworkSummaryPanelDomain({
       );
     })();
   }, [displayedHarnessAssembly, store]);
+  const handleExportHarnessMemberNetworksSvg = useCallback(() => {
+    if (displayedHarnessAssembly === null) {
+      return;
+    }
+    const memberNetworkIds = displayedHarnessAssembly.members.map((m) => m.networkId);
+    if (memberNetworkIds.length === 0) {
+      return;
+    }
+    void (async () => {
+      const originalNetworkId = store.getState().activeNetworkId;
+      for (const networkId of memberNetworkIds) {
+        dispatchAction(appActions.selectNetwork(networkId));
+        await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+        await networkSummaryPanelRef.current?.exportSvgDirect();
+      }
+      if (originalNetworkId !== null) {
+        dispatchAction(appActions.selectNetwork(originalNetworkId));
+      }
+    })();
+  }, [displayedHarnessAssembly, dispatchAction, store]);
   const assemblyGraphFactory = useMemo(() => {
     if (displayedHarnessAssembly === null) {
       return null;
@@ -716,6 +739,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
           selectedAssemblyId={displayedAssemblyId}
           canExportAgentJson={displayedHarnessAssembly !== null}
           onExportAgentJson={handleExportSelectedHarnessAgentJson}
+          canExportSvg={displayedHarnessAssembly !== null}
+          onExportSvg={handleExportHarnessMemberNetworksSvg}
           onOpenOnboardingHelp={onOpenHarnessAssemblyOnboardingHelp}
           onSelectedAssemblyIdChange={handleDisplayedAssemblyIdChange}
           onUpsertAssembly={(assembly) => {

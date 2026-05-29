@@ -1,4 +1,13 @@
 import { useCallback, useRef, useState, type RefObject } from "react";
+
+function buildSvgExportFilename(networkName: string, format: "svg" | "png"): string {
+  const normalized = networkName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  const base = normalized.length > 0 ? normalized : "network-plan";
+  const now = new Date();
+  const pad2 = (n: number) => String(n).padStart(2, "0");
+  const timestamp = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}_${pad2(now.getHours())}-${pad2(now.getMinutes())}-${pad2(now.getSeconds())}`;
+  return `${base}-${timestamp}.${format}`;
+}
 import type { ThemeMode } from "../../../../store";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 import { getThemeClassNames } from "../../../lib/themeModes";
@@ -221,10 +230,9 @@ export function useNetworkSummaryExportActions({
 
     const blob = new Blob([svgMarkup], { type: "image/svg+xml;charset=utf-8" });
     const blobUrl = URL.createObjectURL(blob);
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const downloadLink = document.createElement("a");
     downloadLink.href = blobUrl;
-    downloadLink.download = `network-plan-${timestamp}.svg`;
+    downloadLink.download = buildSvgExportFilename(exportCartoucheNetworkName, "svg");
     downloadLink.style.display = "none";
     document.body.appendChild(downloadLink);
     downloadLink.click();
@@ -232,7 +240,7 @@ export function useNetworkSummaryExportActions({
     window.setTimeout(() => {
       URL.revokeObjectURL(blobUrl);
     }, 0);
-  }, []);
+  }, [exportCartoucheNetworkName]);
 
   const renderPreparedSvgAsPngDataUrl = useCallback(
     async (prepared: PreparedSvgExport): Promise<string | null> => {
@@ -417,10 +425,9 @@ export function useNetworkSummaryExportActions({
       if (activeSvgPreview.pngDataUrl === undefined) {
         return;
       }
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
       const downloadLink = document.createElement("a");
       downloadLink.href = activeSvgPreview.pngDataUrl;
-      downloadLink.download = `network-plan-${timestamp}.png`;
+      downloadLink.download = buildSvgExportFilename(exportCartoucheNetworkName, "png");
       downloadLink.style.display = "none";
       document.body.appendChild(downloadLink);
       downloadLink.click();
@@ -430,7 +437,7 @@ export function useNetworkSummaryExportActions({
     }
     downloadSvgMarkup(activeSvgPreview.svgMarkup);
     setActiveSvgPreview(null);
-  }, [activeSvgPreview, downloadSvgMarkup]);
+  }, [activeSvgPreview, downloadSvgMarkup, exportCartoucheNetworkName]);
 
   const handleCloseSvgPreview = useCallback(() => {
     svgPreviewRequestIdRef.current += 1;
@@ -446,6 +453,16 @@ export function useNetworkSummaryExportActions({
     await createPngPreview();
   }, [createPngPreview]);
 
+  const handleExportPlanAsSvgDirect = useCallback(async () => {
+    await waitForPreviewRenderTurn();
+    const prepared = await prepareDecoratedSvgClone();
+    if (prepared === null) {
+      return;
+    }
+    const svgMarkup = new XMLSerializer().serializeToString(prepared.svgClone);
+    downloadSvgMarkup(svgMarkup);
+  }, [downloadSvgMarkup, prepareDecoratedSvgClone]);
+
   return {
     activeSvgPreview,
     createPngPreview,
@@ -454,6 +471,7 @@ export function useNetworkSummaryExportActions({
     handleDownloadSvgPreview,
     handleExportPlanAsPng,
     handleExportPlanAsSvg,
+    handleExportPlanAsSvgDirect,
     isSvgPreviewLoading,
     svgPreviewLoadingFormat
   };

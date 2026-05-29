@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -54,7 +55,7 @@ import { SvgExportPreviewDialog } from "./dialogs/SvgExportPreviewDialog";
 import { PreviewLoadingDialog } from "./dialogs/PreviewLoadingDialog";
 import { snapToGrid } from "../lib/app-utils-shared";
 import { getThemeClassNames } from "../lib/themeModes";
-import type { NetworkSummaryPanelProps } from "./network-summary/NetworkSummaryPanel.types";
+import type { NetworkSummaryPanelHandle, NetworkSummaryPanelProps } from "./network-summary/NetworkSummaryPanel.types";
 
 const CALLOUT_DRAG_START_THRESHOLD_PX = 4;
 
@@ -166,7 +167,8 @@ export function NetworkSummaryPanel({
   onOpenCurrentNetworkFunctional,
   activeNetwork,
   catalogItems,
-  showFunctionalSchematic = true
+  showFunctionalSchematic = true,
+  imperativeRef
 }: NetworkSummaryPanelProps): ReactElement {
   const [pendingFitSvgPreviewOptions, setPendingFitSvgPreviewOptions] = useState<SvgPreviewOptions | null>(null);
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
@@ -583,6 +585,7 @@ export function NetworkSummaryPanel({
     handleDownloadSvgPreview,
     handleExportPlanAsPng,
     handleExportPlanAsSvg,
+    handleExportPlanAsSvgDirect,
     isSvgPreviewLoading,
     svgPreviewLoadingFormat
   } = useNetworkSummaryExportActions({
@@ -603,6 +606,10 @@ export function NetworkSummaryPanel({
     exportCartoucheLogoUrl,
     exportCartoucheNotes
   });
+
+  useImperativeHandle(imperativeRef, (): NetworkSummaryPanelHandle => ({
+    exportSvgDirect: handleExportPlanAsSvgDirect
+  }), [handleExportPlanAsSvgDirect]);
 
   const handleSvgPreviewOptionsChange = useCallback(
     (options: SvgPreviewOptions) => {

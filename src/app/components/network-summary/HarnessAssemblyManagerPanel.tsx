@@ -19,6 +19,8 @@ interface HarnessAssemblyManagerPanelProps {
   selectedAssemblyId: HarnessAssemblyId | "new" | "";
   canExportAgentJson?: boolean;
   onExportAgentJson?: () => void;
+  canExportSvg?: boolean;
+  onExportSvg?: () => void;
   onOpenOnboardingHelp?: () => void;
   onSelectedAssemblyIdChange: (assemblyId: HarnessAssemblyId | "new" | "") => void;
   onUpsertAssembly: (assembly: HarnessAssembly) => void;
@@ -53,6 +55,8 @@ export function HarnessAssemblyManagerPanel({
   selectedAssemblyId,
   canExportAgentJson = false,
   onExportAgentJson,
+  canExportSvg = false,
+  onExportSvg,
   onOpenOnboardingHelp,
   onSelectedAssemblyIdChange,
   onUpsertAssembly,
@@ -326,6 +330,16 @@ export function HarnessAssemblyManagerPanel({
               >
                 <span className="action-button-icon is-open" aria-hidden="true" />
                 Agent JSON
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={onExportSvg}
+                disabled={!canExportSvg}
+                title={canExportSvg ? "Export harness functional schematic as SVG" : "Select a saved harness assembly to export SVG"}
+              >
+                <span className="action-button-icon is-export" aria-hidden="true" />
+                Export SVG
               </button>
               {selectedAssembly !== null ? (
                 <button type="button" className="network-delete-button button-with-icon" onClick={() => onRemoveAssembly(selectedAssembly.id)}>

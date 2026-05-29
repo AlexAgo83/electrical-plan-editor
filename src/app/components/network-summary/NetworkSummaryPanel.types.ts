@@ -1,4 +1,8 @@
-import type { Dispatch, MouseEvent as ReactMouseEvent, SetStateAction, WheelEvent as ReactWheelEvent } from "react";
+import type { Dispatch, MouseEvent as ReactMouseEvent, Ref, SetStateAction, WheelEvent as ReactWheelEvent } from "react";
+
+export interface NetworkSummaryPanelHandle {
+  exportSvgDirect: () => Promise<void>;
+}
 import type {
   CatalogItem,
   Connector,
@@ -137,4 +141,5 @@ export interface NetworkSummaryPanelProps {
   activeNetwork: Network | null;
   catalogItems: CatalogItem[];
   showFunctionalSchematic?: boolean;
+  imperativeRef?: Ref<NetworkSummaryPanelHandle>;
 }

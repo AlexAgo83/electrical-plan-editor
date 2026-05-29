@@ -1,4 +1,5 @@
-import type { ComponentProps, ComponentType, Dispatch, SetStateAction } from "react";
+import type { ComponentProps, ComponentType, Dispatch, Ref, SetStateAction } from "react";
+import type { NetworkSummaryPanelHandle } from "../../components/network-summary/NetworkSummaryPanel.types";
 import type { AppStore } from "../../../store";
 import { ModelingController } from "../../components/controller/ModelingController";
 import type { AppControllerModelingHandlersOrchestrator } from "./useAppControllerModelingHandlersOrchestrator";
@@ -50,6 +51,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   | "onOpenCurrentNetworkFunctional"
 > & {
   NetworkSummaryPanelComponent: ComponentType<NetworkSummaryPanelProps>;
+  networkSummaryPanelRef?: Ref<NetworkSummaryPanelHandle>;
   includeNetworkSummaryPanel?: boolean;
   setShowNetworkInfoPanels: BooleanStateSetter;
   setShowSegmentLengths: BooleanStateSetter;
@@ -274,7 +276,8 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     onExportBomCsv: params.onExportBomCsv,
     onExportNetwork: params.onExportNetwork,
     onRegenerateLayout: params.handleRegenerateLayout,
-    onOpenCurrentNetworkFunctional: params.onOpenCurrentNetworkFunctional
+    onOpenCurrentNetworkFunctional: params.onOpenCurrentNetworkFunctional,
+    imperativeRef: params.networkSummaryPanelRef
   } satisfies NetworkSummaryPanelProps;
 
   return {
