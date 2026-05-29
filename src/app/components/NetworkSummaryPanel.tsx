@@ -607,10 +607,7 @@ export function NetworkSummaryPanel({
     exportCartoucheNotes
   });
 
-  useImperativeHandle(imperativeRef, (): NetworkSummaryPanelHandle => ({
-    exportSvgDirect: handleExportPlanAsSvgDirect
-  }), [handleExportPlanAsSvgDirect]);
-
+  useImperativeHandle(imperativeRef, (): NetworkSummaryPanelHandle => ({ exportSvgDirect: handleExportPlanAsSvgDirect }), [handleExportPlanAsSvgDirect]);
   const handleSvgPreviewOptionsChange = useCallback(
     (options: SvgPreviewOptions) => {
       if (options.includeFrame !== undefined) {
