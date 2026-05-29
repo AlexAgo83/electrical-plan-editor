@@ -2,8 +2,8 @@
 > From version: 1.10.3
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 95%
-> Confidence: 87%
+> Understanding: 97%
+> Confidence: 90%
 > Progress: 0%
 > Complexity: High
 > Theme: AI
@@ -16,6 +16,8 @@ This assisted path is the default trust-building experience and the foundation f
 # Scope
 - In:
   - Add the `AI Agent` section inside Modeling.
+  - Place the `AI Agent` entry beside the existing `Wires` Modeling entry.
+  - Keep the entry visible but disabled when no valid provider is configured.
   - Let users choose action type, target scope, permissions, and instruction.
   - Run the configured provider in assisted mode.
   - Show proposal summary and operation details after local validation.
@@ -42,27 +44,31 @@ flowchart LR
 
 # Acceptance criteria
 - AC1: Modeling includes a visible `AI Agent` section.
-- AC2: Assisted mode is selected by default.
-- AC3: The user can enter an instruction and select a target scope.
-- AC4: The user can review operation permissions before running the agent.
-- AC5: Delete permission is disabled by default.
-- AC6: Running the agent produces a proposal summary with operation counts by status and type.
-- AC7: The proposal detail view lists accepted, rejected, warning, and unsupported operations.
-- AC8: Rejecting a proposal leaves modeling state unchanged.
-- AC9: Applying a proposal mutates only accepted operations.
-- AC10: Applying a proposal creates one grouped history transaction.
-- AC11: Undo restores the pre-apply state in one action.
-- AC12: UI tests cover assisted run, review, reject, apply, and undo behavior with mocked provider output.
+- AC2: The `AI Agent` entry is placed beside the existing `Wires` Modeling entry.
+- AC3: The `AI Agent` entry is visible but disabled when provider readiness is invalid, missing, or failed.
+- AC4: Disabled entry feedback directs the user to Settings AI provider configuration.
+- AC5: Assisted mode is selected by default.
+- AC6: The user can enter an instruction and select a target scope.
+- AC7: The user can review operation permissions before running the agent.
+- AC8: Delete permission is disabled by default.
+- AC9: Running the agent produces a proposal summary with operation counts by status and type.
+- AC10: The proposal detail view lists accepted, rejected, warning, and unsupported operations.
+- AC11: Rejecting a proposal leaves modeling state unchanged.
+- AC12: Applying a proposal mutates only accepted operations.
+- AC13: Applying a proposal creates one grouped history transaction.
+- AC14: Undo restores the pre-apply state in one action.
+- AC15: UI tests cover disabled provider entry behavior, assisted run, review, reject, apply, and undo behavior with mocked provider output.
 
 # AC Traceability
 - request-AC2 -> backlog AC1.
-- request-AC3 -> backlog AC2, AC3, AC4.
-- request-AC4 -> backlog AC2.
-- request-AC6 -> backlog AC8 and AC9.
-- request-AC7 -> backlog AC10 and AC11.
-- request-AC12 -> backlog AC5.
-- request-AC13 -> backlog AC6 and AC7.
-- request-AC15 -> backlog AC12.
+- request-AC3 -> backlog AC2, AC3, and AC4.
+- request-AC4 -> backlog AC5, AC6, and AC7.
+- request-AC5 -> backlog AC5.
+- request-AC7 -> backlog AC11 and AC12.
+- request-AC8 -> backlog AC13 and AC14.
+- request-AC13 -> backlog AC8.
+- request-AC14 -> backlog AC9 and AC10.
+- request-AC16 -> backlog AC15.
 
 # Decision framing
 - Product framing: Covered by `prod_004_ai_agent_modeling_workspace`.
@@ -91,6 +97,7 @@ flowchart LR
 
 # Validation plan
 - Add UI tests with mocked provider output.
+- Add UI tests for the disabled `AI Agent` entry when provider readiness is invalid.
 - Add reducer/history tests for grouped transaction application.
 - Run targeted Modeling UI tests, `npm run -s typecheck`, and `npm run -s lint`.
 

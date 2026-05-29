@@ -2,7 +2,7 @@
 > From version: 1.10.3
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 98%
+> Understanding: 99%
 > Confidence: 94%
 > Complexity: High
 > Theme: AI
@@ -50,6 +50,8 @@ flowchart TD
 
 ## B. Modeling AI Agent section
 - Add a new Modeling section named `AI Agent`.
+- Add the `AI Agent` entry as a peer action next to the existing `Wires` Modeling entry.
+- Keep the `AI Agent` entry visible but disabled when no valid provider is configured.
 - The section should act as the control surface for AI-assisted modeling, not as a generic chat page.
 - Let the user choose an action type, target scope, execution mode, and free-form instruction.
 - Target scope candidates include current selection, active network, selected harness assembly, and possibly all visible modeling data in later versions.
@@ -105,19 +107,20 @@ flowchart TD
 # Acceptance Criteria
 - AC1: Settings includes an AI configuration area with OpenAI and Gemini provider choices, editable model name, local-storage API key or endpoint configuration, timeout or strictness options, and a connection test.
 - AC2: Modeling includes a visible `AI Agent` section.
-- AC3: The AI Agent section lets the user provide an instruction, choose a target scope, choose assisted or experimental mode, and review permissions.
-- AC4: Assisted mode is the default mode.
-- AC5: Assisted mode receives AI output as structured operations and validates those operations before user review.
-- AC6: The user can apply or reject an assisted proposal.
-- AC7: Applied assisted proposals are committed as one grouped history transaction.
-- AC8: Experimental mode is disabled unless explicitly enabled in AI settings.
-- AC9: Experimental mode creates a pre-run snapshot and applies only locally validated operations.
-- AC10: A completed experimental session can be rolled back in one user action.
-- AC11: AI operations cannot bypass existing domain validation, dependency guards, or destructive-action permissions.
-- AC12: Delete operations are blocked by default and require explicit permission.
-- AC13: The result view summarizes added, moved, updated, deleted, routed, accepted, and rejected operations.
-- AC14: Validation errors and rejected operations are exposed to the user with actionable context.
-- AC15: Tests cover operation validation, assisted apply/reject, experimental rollback, delete permission gating, and grouped undo behavior.
+- AC3: The `AI Agent` entry is placed beside the existing `Wires` Modeling entry and is disabled when provider readiness is invalid.
+- AC4: The AI Agent section lets the user provide an instruction, choose a target scope, choose assisted or experimental mode, and review permissions.
+- AC5: Assisted mode is the default mode.
+- AC6: Assisted mode receives AI output as structured operations and validates those operations before user review.
+- AC7: The user can apply or reject an assisted proposal.
+- AC8: Applied assisted proposals are committed as one grouped history transaction.
+- AC9: Experimental mode is disabled unless explicitly enabled in AI settings.
+- AC10: Experimental mode creates a pre-run snapshot and applies only locally validated operations.
+- AC11: A completed experimental session can be rolled back in one user action.
+- AC12: AI operations cannot bypass existing domain validation, dependency guards, or destructive-action permissions.
+- AC13: Delete operations are blocked by default and require explicit permission.
+- AC14: The result view summarizes added, moved, updated, deleted, routed, accepted, and rejected operations.
+- AC15: Validation errors and rejected operations are exposed to the user with actionable context.
+- AC16: Tests cover operation validation, assisted apply/reject, experimental rollback, delete permission gating, provider-readiness disabled entry behavior, and grouped undo behavior.
 
 # Out of Scope
 - Fully autonomous background optimization without user-triggered execution.

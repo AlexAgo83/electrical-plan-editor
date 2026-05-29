@@ -2,7 +2,7 @@
 > From version: 1.10.3
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 98%
+> Understanding: 99%
 > Confidence: 93%
 > Progress: 0%
 > Complexity: Medium
@@ -53,11 +53,13 @@ flowchart LR
 - AC6: The provider boundary exposes capabilities such as structured output, tool calls, maximum context, and local/cloud classification.
 - AC7: Experimental direct execution has a separate global opt-in setting and is disabled by default.
 - AC8: Modeling AI Agent UI can read provider readiness without depending on provider-specific implementation details.
+- AC9: Provider readiness exposes enough state for the Modeling `AI Agent` entry to be visible but disabled when no valid provider is configured.
 
 # AC Traceability
 - request-AC1 -> backlog AC1, AC2, AC3, AC4, AC5.
 - request-AC8 -> backlog AC7.
-- request-AC3 -> backlog AC6 and AC8.
+- request-AC3 -> backlog AC8 and AC9.
+- request-AC4 -> backlog AC6 and AC8.
 
 # Decision framing
 - Product framing: Covered by `prod_004_ai_agent_modeling_workspace`.

@@ -1,5 +1,5 @@
 ## prod_004_ai_agent_modeling_workspace - AI Agent Modeling Workspace
-> Date: 2026-05-29
+> Date: 2026-05-30
 > Status: Draft
 > Related request: `req_128_ai_agent_modeling_workspace`
 > Related backlog: `item_600_ai_provider_settings_and_capability_contract`, `item_601_ai_agent_context_builder_and_operation_contract`, `item_602_modeling_ai_agent_assisted_proposal_workflow`, `item_603_ai_agent_experimental_direct_execution_and_rollback`, `item_604_ai_agent_validation_regression_and_release_gate`
@@ -73,6 +73,9 @@ Typical situations:
 
 # Experience Direction
 The new Modeling section should be named `AI Agent`.
+The entry point should live next to the existing `Wires` Modeling entry so it reads as another Modeling tool, not as a global assistant.
+The entry remains visible but disabled until the selected provider is valid and ready.
+Disabled copy should point the user to Settings AI provider configuration instead of hiding the feature.
 
 It should feel like an operational cockpit:
 - action selector;
@@ -212,9 +215,11 @@ Required safeguards:
 - grouped rollback for experimental execution;
 - visible summary of applied and rejected operations;
 - no silent fallback to broader scope when the selected scope is unavailable.
+- the Modeling `AI Agent` entry is disabled when provider readiness is invalid, missing, or failed.
 
 # Key Product Decisions
 - The `AI Agent` belongs in Modeling because its purpose is to change modeling data.
+- The `AI Agent` entry sits beside `Wires` in Modeling and uses provider readiness to enable or disable entry.
 - Provider configuration belongs in Settings because it is an application-level capability.
 - V1 supports OpenAI and Gemini provider configuration.
 - Users enter their own API keys locally in the app settings and those keys are persisted in local storage with the rest of the local app settings; local development may also use `.env` keys for developer workflows.
