@@ -101,4 +101,28 @@ describe("AI agent provider client", () => {
       operations: [{ type: "regenerate_route", wireIds: ["W1"] }]
     });
   });
+
+  it("reports invalid provider JSON with an actionable error", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>(() =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify({
+              output_text: "not-json"
+            }),
+            { status: 200 }
+          )
+        )
+      )
+    );
+
+    await expect(
+      requestAiAgentProviderProposal({
+        settings: buildSettings("openai"),
+        context: buildAiAgentContext(createSampleNetworkState(), "activeNetwork"),
+        instruction: "Return broken JSON."
+      })
+    ).rejects.toThrow("AI provider returned invalid JSON for the operation contract.");
+  });
 });

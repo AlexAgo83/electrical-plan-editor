@@ -44,7 +44,11 @@ function parseJsonText(rawText: string): unknown {
   if (trimmed.length === 0) {
     throw new Error("AI provider returned an empty response.");
   }
-  return JSON.parse(trimmed);
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    throw new Error("AI provider returned invalid JSON for the operation contract.");
+  }
 }
 
 function asUnknownArray(value: unknown): unknown[] {
