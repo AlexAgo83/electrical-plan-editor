@@ -15,6 +15,7 @@ interface OperationsHealthPanelProps {
   onResumeWorkspaceFile: () => void;
   onSaveWorkspaceFileNow: () => void;
   onSaveWorkspaceFileAs: () => void;
+  onUnlinkWorkspaceFile: () => void;
   workspaceFileInputRef: RefObject<HTMLInputElement | null>;
   onWorkspaceFileInputChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   validationIssuesCount: number;
@@ -41,6 +42,7 @@ export function OperationsHealthPanel({
   onResumeWorkspaceFile,
   onSaveWorkspaceFileNow,
   onSaveWorkspaceFileAs,
+  onUnlinkWorkspaceFile,
   workspaceFileInputRef,
   onWorkspaceFileInputChange,
   validationIssuesCount,
@@ -125,6 +127,15 @@ export function OperationsHealthPanel({
           <button type="button" className="button-with-icon" onClick={onSaveWorkspaceFileAs}>
             <span className="action-button-icon is-save" aria-hidden="true" />
             Save as
+          </button>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={onUnlinkWorkspaceFile}
+            disabled={workspaceFileStatus.mode !== "linked"}
+          >
+            <span className="action-button-icon is-swap" aria-hidden="true" />
+            Unlink
           </button>
           <input
             ref={workspaceFileInputRef}

@@ -63,6 +63,7 @@ interface AppShellLayoutProps {
   onResumeWorkspaceFile: OperationsHealthPanelProps["onResumeWorkspaceFile"];
   onSaveWorkspaceFileNow: OperationsHealthPanelProps["onSaveWorkspaceFileNow"];
   onSaveWorkspaceFileAs: OperationsHealthPanelProps["onSaveWorkspaceFileAs"];
+  onUnlinkWorkspaceFile: OperationsHealthPanelProps["onUnlinkWorkspaceFile"];
   workspaceFileInputRef: OperationsHealthPanelProps["workspaceFileInputRef"];
   onWorkspaceFileInputChange: OperationsHealthPanelProps["onWorkspaceFileInputChange"];
   validationIssuesCount: number;
@@ -161,6 +162,7 @@ export function AppShellLayout({
   onResumeWorkspaceFile,
   onSaveWorkspaceFileNow,
   onSaveWorkspaceFileAs,
+  onUnlinkWorkspaceFile,
   workspaceFileInputRef,
   onWorkspaceFileInputChange,
   validationIssuesCount,
@@ -648,6 +650,7 @@ export function AppShellLayout({
             onResumeWorkspaceFile={onResumeWorkspaceFile}
             onSaveWorkspaceFileNow={onSaveWorkspaceFileNow}
             onSaveWorkspaceFileAs={onSaveWorkspaceFileAs}
+            onUnlinkWorkspaceFile={onUnlinkWorkspaceFile}
             workspaceFileInputRef={workspaceFileInputRef}
             onWorkspaceFileInputChange={onWorkspaceFileInputChange}
             validationIssuesCount={validationIssuesCount}

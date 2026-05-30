@@ -1046,6 +1046,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       onResumeWorkspaceFile: workspaceFileStorage.resumeWorkspaceFile,
       onSaveWorkspaceFileNow: workspaceFileStorage.saveWorkspaceFileNow,
       onSaveWorkspaceFileAs: workspaceFileStorage.saveWorkspaceFileAs,
+      onUnlinkWorkspaceFile: workspaceFileStorage.unlinkWorkspaceFile,
       workspaceFileInputRef: workspaceFileStorage.workspaceFileInputRef,
       onWorkspaceFileInputChange: workspaceFileStorage.handleWorkspaceFileInputChange
     },

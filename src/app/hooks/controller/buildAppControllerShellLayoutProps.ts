@@ -36,6 +36,7 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "onResumeWorkspaceFile"
     | "onSaveWorkspaceFileNow"
     | "onSaveWorkspaceFileAs"
+    | "onUnlinkWorkspaceFile"
     | "workspaceFileInputRef"
     | "onWorkspaceFileInputChange"
   >;
