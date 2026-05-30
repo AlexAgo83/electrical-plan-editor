@@ -12,6 +12,7 @@ import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSel
 import type { ValidationModel } from "../useValidationModel";
 import type { AiSettingsModel } from "../useAiSettings";
 import { ModelingAiAgentPanel } from "../../components/workspace/ModelingAiAgentPanel";
+import { buildAiAgentContext } from "../../lib/aiAgentContext";
 import type { AiProviderReadiness } from "../../lib/aiSettings";
 import type { AppControllerModelingHandlersAssemblyModel } from "./useAppControllerModelingHandlersAssembly";
 import type { AppControllerWorkspaceNetworkDomainAssemblyModel } from "./useAppControllerWorkspaceNetworkDomainAssembly";
@@ -468,6 +469,10 @@ export function useAppControllerWorkspaceContentAssembly({
     <ModelingAiAgentPanel
       providerReadiness={state.aiProviderReadiness}
       experimentalDirectExecutionEnabled={models.aiSettings.settings.experimentalDirectExecutionEnabled}
+      contextSummaries={{
+        activeNetwork: buildAiAgentContext(handlers.store.getState(), "activeNetwork").summary,
+        currentSelection: buildAiAgentContext(handlers.store.getState(), "currentSelection").summary
+      }}
       onOpenSettings={handlers.handleOpenSettingsScreen}
     />
   ) : null;

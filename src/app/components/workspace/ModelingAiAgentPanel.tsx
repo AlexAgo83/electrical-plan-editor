@@ -1,9 +1,12 @@
 import { useMemo, useState, type ReactElement } from "react";
+import type { AiAgentContextSummary } from "../../lib/aiAgentContext";
+import type { AiAgentScope } from "../../lib/aiAgentOperationContract";
 import type { AiProviderReadiness } from "../../lib/aiSettings";
 
 interface ModelingAiAgentPanelProps {
   providerReadiness: AiProviderReadiness;
   experimentalDirectExecutionEnabled: boolean;
+  contextSummaries: Record<AiAgentScope, AiAgentContextSummary>;
   onOpenSettings: () => void;
 }
 
@@ -20,10 +23,11 @@ interface AgentPermissions {
 export function ModelingAiAgentPanel({
   providerReadiness,
   experimentalDirectExecutionEnabled,
+  contextSummaries,
   onOpenSettings
 }: ModelingAiAgentPanelProps): ReactElement {
   const [instruction, setInstruction] = useState("");
-  const [targetScope, setTargetScope] = useState("activeNetwork");
+  const [targetScope, setTargetScope] = useState<AiAgentScope>("activeNetwork");
   const [agentMode, setAgentMode] = useState<AgentMode>("assisted");
   const [permissions, setPermissions] = useState<AgentPermissions>({
     add: true,
@@ -34,7 +38,8 @@ export function ModelingAiAgentPanel({
   });
   const [draftStatus, setDraftStatus] = useState<string | null>(null);
   const selectedMode = agentMode === "direct" && !experimentalDirectExecutionEnabled ? "assisted" : agentMode;
-  const canPrepareProposal = providerReadiness.isReady && instruction.trim().length > 0;
+  const selectedContextSummary = contextSummaries[targetScope];
+  const canPrepareProposal = providerReadiness.isReady && selectedContextSummary.isAvailable && instruction.trim().length > 0;
   const enabledPermissionCount = useMemo(
     () => Object.values(permissions).filter(Boolean).length,
     [permissions]
@@ -71,6 +76,32 @@ export function ModelingAiAgentPanel({
           <span>Permissions</span> <strong>{enabledPermissionCount} enabled</strong>
         </p>
       </div>
+      <div className="settings-import-summary" role="region" aria-label="AI context summary">
+        <p className="meta-line">
+          <span>Context</span> <strong>{selectedContextSummary.scopeLabel}</strong>
+        </p>
+        <p className="meta-line">
+          <span>Network</span> <strong>{selectedContextSummary.networkName ?? "None"}</strong>
+        </p>
+        <p className="meta-line">
+          <span>Entities</span>{" "}
+          <strong>
+            {selectedContextSummary.counts.connectors} connectors, {selectedContextSummary.counts.splices} splices,{" "}
+            {selectedContextSummary.counts.nodes} nodes, {selectedContextSummary.counts.segments} segments,{" "}
+            {selectedContextSummary.counts.wires} wires
+          </strong>
+        </p>
+        {selectedContextSummary.selectionLabel !== null ? (
+          <p className="meta-line">
+            <span>Selection</span> <strong>{selectedContextSummary.selectionLabel}</strong>
+          </p>
+        ) : null}
+        {!selectedContextSummary.isAvailable && selectedContextSummary.unavailableReason !== null ? (
+          <p className="meta-line">
+            <span>Status</span> <strong>{selectedContextSummary.unavailableReason}</strong>
+          </p>
+        ) : null}
+      </div>
 
       <form className="stack-form" onSubmit={(event) => event.preventDefault()}>
         <label>
@@ -88,7 +119,7 @@ export function ModelingAiAgentPanel({
         <div className="form-split">
           <label>
             Target scope
-            <select value={targetScope} onChange={(event) => setTargetScope(event.target.value)}>
+            <select value={targetScope} onChange={(event) => setTargetScope(event.target.value as AiAgentScope)}>
               <option value="activeNetwork">Active network</option>
               <option value="currentSelection">Current selection</option>
               <option value="selectedHarness" disabled>
@@ -155,7 +186,7 @@ export function ModelingAiAgentPanel({
             disabled={!canPrepareProposal}
             onClick={() => {
               setDraftStatus(
-                `Draft ready for ${targetScope === "activeNetwork" ? "active network" : "current selection"} scope. Provider execution will be connected with the operation contract.`
+                `Draft ready for ${selectedContextSummary.scopeLabel.toLowerCase()} scope with ${enabledPermissionCount} enabled permission groups. Provider execution will be connected with the operation contract.`
               );
             }}
           >

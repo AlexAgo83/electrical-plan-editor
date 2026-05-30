@@ -224,6 +224,7 @@ describe("App integration UI - settings", () => {
     fireEvent.click(enabledAiAgentButton);
     expect(screen.getByRole("heading", { name: "AI Agent" })).toBeInTheDocument();
     expect(screen.getByText("Provider ready")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("Main network (Sample)");
     expect(screen.getByLabelText("Instruction")).toBeInTheDocument();
     expect(screen.getByLabelText("Target scope")).toHaveValue("activeNetwork");
     expect(screen.getByLabelText("Agent mode")).toHaveValue("assisted");

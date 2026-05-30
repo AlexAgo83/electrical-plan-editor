@@ -1,0 +1,63 @@
+import { describe, expect, it } from "vitest";
+import type { ConnectorId } from "../core/entities";
+import { createEmptyWorkspaceState, createSampleNetworkState } from "../store";
+import { buildAiAgentContext } from "../app/lib/aiAgentContext";
+
+describe("AI agent context builder", () => {
+  it("builds an active-network context summary from the current modeling state", () => {
+    const state = createSampleNetworkState();
+    const context = buildAiAgentContext(state, "activeNetwork");
+
+    expect(context.schemaVersion).toBe(1);
+    expect(context.summary.isAvailable).toBe(true);
+    expect(context.summary.networkName).toBe("Main network (Sample)");
+    expect(context.summary.counts).toEqual({
+      connectors: state.connectors.allIds.length,
+      splices: state.splices.allIds.length,
+      nodes: state.nodes.allIds.length,
+      segments: state.segments.allIds.length,
+      wires: state.wires.allIds.length
+    });
+    expect(context.entities.connectors).toContainEqual(
+      expect.objectContaining({
+        technicalId: "CONN-SRC-01"
+      })
+    );
+  });
+
+  it("builds a narrow current-selection context when a modeling entity is selected", () => {
+    const baseState = createSampleNetworkState();
+    const state = {
+      ...baseState,
+      ui: {
+        ...baseState.ui,
+        selected: {
+          kind: "connector" as const,
+          id: "C-SRC" as ConnectorId
+        }
+      }
+    };
+    const context = buildAiAgentContext(state, "currentSelection");
+
+    expect(context.summary.isAvailable).toBe(true);
+    expect(context.summary.selectionLabel).toBe("Connector CONN-SRC-01");
+    expect(context.summary.counts.connectors).toBe(1);
+    expect(context.summary.counts.wires).toBe(0);
+  });
+
+  it("marks current-selection context unavailable without a valid selected entity", () => {
+    const context = buildAiAgentContext(createSampleNetworkState(), "currentSelection");
+
+    expect(context.summary.isAvailable).toBe(false);
+    expect(context.summary.unavailableReason).toBe("Select a Modeling entity before using current selection scope.");
+    expect(context.summary.networkName).toBe("Main network (Sample)");
+  });
+
+  it("marks all context unavailable when no active network exists", () => {
+    const context = buildAiAgentContext(createEmptyWorkspaceState(), "activeNetwork");
+
+    expect(context.summary.isAvailable).toBe(false);
+    expect(context.summary.unavailableReason).toBe("No active network is available.");
+    expect(context.entities.connectors).toHaveLength(0);
+  });
+});
