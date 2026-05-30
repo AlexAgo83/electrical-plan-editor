@@ -15,7 +15,9 @@ import { ModelingAiAgentPanel } from "../../components/workspace/ModelingAiAgent
 import { applyAiAgentAcceptedOperations } from "../../lib/aiAgentApply";
 import { buildAiAgentContext } from "../../lib/aiAgentContext";
 import { prepareAiAgentProposalDraft } from "../../lib/aiAgentProposal";
+import { requestAiAgentProviderProposal } from "../../lib/aiAgentProviderClient";
 import type { AiProviderReadiness } from "../../lib/aiSettings";
+import { validateAiAgentOperations } from "../../lib/aiAgentOperationContract";
 import type { AppControllerModelingHandlersAssemblyModel } from "./useAppControllerModelingHandlersAssembly";
 import type { AppControllerWorkspaceNetworkDomainAssemblyModel } from "./useAppControllerWorkspaceNetworkDomainAssembly";
 import type { AppControllerCatalogAnalysisActionsModel } from "./useAppControllerCatalogAnalysisActions";
@@ -475,14 +477,33 @@ export function useAppControllerWorkspaceContentAssembly({
         activeNetwork: buildAiAgentContext(handlers.store.getState(), "activeNetwork").summary,
         currentSelection: buildAiAgentContext(handlers.store.getState(), "currentSelection").summary
       }}
-      onPrepareProposal={(request) =>
-        prepareAiAgentProposalDraft({
-          state: handlers.store.getState(),
-          scope: request.scope,
-          instruction: request.instruction,
-          permissions: request.permissions
-        })
-      }
+      onPrepareProposal={async (request) => {
+        const currentState = handlers.store.getState();
+        if (!request.useConfiguredProvider) {
+          return prepareAiAgentProposalDraft({
+            state: currentState,
+            scope: request.scope,
+            instruction: request.instruction,
+            permissions: request.permissions
+          });
+        }
+        const context = buildAiAgentContext(currentState, request.scope);
+        const providerResponse = await requestAiAgentProviderProposal({
+          settings: models.aiSettings.settings,
+          context,
+          instruction: request.instruction
+        });
+        return {
+          summary: `Provider draft generated from ${providerResponse.rawText.length} response characters.`,
+          validation: validateAiAgentOperations({
+            state: currentState,
+            payload: providerResponse.payload,
+            scope: request.scope,
+            selection: currentState.ui.selected,
+            permissions: request.permissions
+          })
+        };
+      }}
       onApplyProposal={(validation) => {
         const result = applyAiAgentAcceptedOperations(handlers.store.getState(), validation);
         if (result.nextState !== handlers.store.getState()) {

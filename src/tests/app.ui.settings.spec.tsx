@@ -247,7 +247,7 @@ describe("App integration UI - settings", () => {
     const prepareProposalButton = screen.getByRole("button", { name: "Prepare proposal" });
     expect(prepareProposalButton).toBeEnabled();
     fireEvent.click(prepareProposalButton);
-    expect(screen.getByText(/Local draft generated/)).toBeInTheDocument();
+    expect(await screen.findByText(/Local draft generated/)).toBeInTheDocument();
     const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
     expect(within(proposalSummary).getByText("Accepted")).toBeInTheDocument();
     expect(within(proposalSummary).getByText("Unsupported")).toBeInTheDocument();

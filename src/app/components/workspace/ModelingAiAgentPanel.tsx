@@ -12,7 +12,8 @@ interface ModelingAiAgentPanelProps {
     scope: AiAgentScope;
     instruction: string;
     permissions: AiAgentOperationPermissions;
-  }) => { summary: string; validation: AiAgentOperationValidationResult };
+    useConfiguredProvider: boolean;
+  }) => Promise<{ summary: string; validation: AiAgentOperationValidationResult }>;
   onApplyProposal: (validation: AiAgentOperationValidationResult) => { appliedCount: number; skippedCount: number };
 }
 
@@ -38,9 +39,12 @@ export function ModelingAiAgentPanel({
   });
   const [draftStatus, setDraftStatus] = useState<string | null>(null);
   const [proposalValidation, setProposalValidation] = useState<AiAgentOperationValidationResult | null>(null);
+  const [useConfiguredProvider, setUseConfiguredProvider] = useState(false);
+  const [isPreparingProposal, setIsPreparingProposal] = useState(false);
   const selectedMode = agentMode === "direct" && !experimentalDirectExecutionEnabled ? "assisted" : agentMode;
   const selectedContextSummary = contextSummaries[targetScope];
-  const canPrepareProposal = providerReadiness.isReady && selectedContextSummary.isAvailable && instruction.trim().length > 0;
+  const canPrepareProposal =
+    providerReadiness.isReady && selectedContextSummary.isAvailable && instruction.trim().length > 0 && !isPreparingProposal;
   const enabledPermissionCount = useMemo(
     () => Object.values(permissions).filter(Boolean).length,
     [permissions]
@@ -195,6 +199,18 @@ export function ModelingAiAgentPanel({
             Delete entities
           </label>
         </fieldset>
+        <label className="settings-checkbox">
+          <input
+            type="checkbox"
+            checked={useConfiguredProvider}
+            onChange={(event) => {
+              setUseConfiguredProvider(event.target.checked);
+              setProposalValidation(null);
+              setDraftStatus(null);
+            }}
+          />
+          Use configured provider for proposal generation
+        </label>
 
         {draftStatus !== null ? <p className="meta-line">{draftStatus}</p> : null}
 
@@ -203,18 +219,32 @@ export function ModelingAiAgentPanel({
             type="button"
             disabled={!canPrepareProposal}
             onClick={() => {
-              const draft = onPrepareProposal({
+              setIsPreparingProposal(true);
+              setDraftStatus(
+                useConfiguredProvider ? "Requesting proposal from configured provider..." : "Preparing local proposal preview..."
+              );
+              void onPrepareProposal({
                 scope: targetScope,
                 instruction,
-                permissions
-              });
-              setProposalValidation(draft.validation);
-              setDraftStatus(
-                `${draft.summary} ${selectedContextSummary.scopeLabel} scope, ${enabledPermissionCount} enabled permission groups.`
-              );
+                permissions,
+                useConfiguredProvider
+              })
+                .then((draft) => {
+                  setProposalValidation(draft.validation);
+                  setDraftStatus(
+                    `${draft.summary} ${selectedContextSummary.scopeLabel} scope, ${enabledPermissionCount} enabled permission groups.`
+                  );
+                })
+                .catch((error: unknown) => {
+                  setProposalValidation(null);
+                  setDraftStatus(error instanceof Error ? error.message : "Proposal generation failed.");
+                })
+                .finally(() => {
+                  setIsPreparingProposal(false);
+                });
             }}
           >
-            Prepare proposal
+            {isPreparingProposal ? "Preparing..." : "Prepare proposal"}
           </button>
           <button type="button" onClick={onOpenSettings}>
             Open AI settings
