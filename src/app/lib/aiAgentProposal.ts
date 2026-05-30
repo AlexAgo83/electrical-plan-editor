@@ -1,5 +1,5 @@
 import type { AppState } from "../../store/types";
-import type { NodeId, WireId } from "../../core/entities";
+import type { HarnessAssemblyId, NodeId, WireId } from "../../core/entities";
 import {
   validateAiAgentOperations,
   type AiAgentOperationPermissions,
@@ -17,6 +17,7 @@ interface PrepareAiAgentProposalDraftParams {
   scope: AiAgentScope;
   instruction: string;
   permissions: AiAgentOperationPermissions;
+  selectedHarnessAssemblyId?: HarnessAssemblyId | null;
 }
 
 function buildFirstAcceptedOperation(state: AppState, scope: AiAgentScope, permissions: AiAgentOperationPermissions): unknown {
@@ -66,7 +67,8 @@ export function prepareAiAgentProposalDraft({
   state,
   scope,
   instruction,
-  permissions
+  permissions,
+  selectedHarnessAssemblyId
 }: PrepareAiAgentProposalDraftParams): AiAgentProposalDraft {
   const payload = {
     schemaVersion: 1,
@@ -84,7 +86,8 @@ export function prepareAiAgentProposalDraft({
     scope,
     selection: state.ui.selected,
     permissions,
-    instruction
+    instruction,
+    selectedHarnessAssemblyId
   });
   return {
     summary: `Local draft generated from ${instruction.trim().length} instruction characters.`,

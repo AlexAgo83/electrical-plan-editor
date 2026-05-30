@@ -1,5 +1,6 @@
-import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
+import type { CatalogItemId, ConnectorId, NetworkId, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
 import { appActions, appReducer, type AppState } from "../../store";
+import { assignScopedState, extractScopedState } from "../../store/networking";
 import type { AiAgentOperationValidationResult, AiAgentSupportedOperation } from "./aiAgentOperationContract";
 
 export interface AiAgentApplyResult {
@@ -562,6 +563,74 @@ export function applyAiAgentAcceptedOperations(
   state: AppState,
   validation: AiAgentOperationValidationResult
 ): AiAgentApplyResult {
+  if (validation.accepted.some((operation) => operation.networkId !== undefined)) {
+    let nextState = state;
+    let appliedCount = 0;
+    const operationsByNetworkId = new Map<NetworkId, AiAgentSupportedOperation[]>();
+    const activeNetworkOperations: AiAgentSupportedOperation[] = [];
+    for (const operation of validation.accepted) {
+      if (operation.networkId === undefined) {
+        activeNetworkOperations.push(operation);
+        continue;
+      }
+      operationsByNetworkId.set(operation.networkId, [...(operationsByNetworkId.get(operation.networkId) ?? []), operation]);
+    }
+
+    for (const operation of activeNetworkOperations) {
+      const operationNextState = applyAcceptedOperation(nextState, operation);
+      if (operationNextState !== nextState) {
+        nextState = operationNextState;
+        appliedCount += 1;
+      }
+    }
+
+    for (const [networkId, operations] of operationsByNetworkId) {
+      const scoped = nextState.networkStates[networkId];
+      if (scoped === undefined) {
+        continue;
+      }
+      let scopedWorkingState = assignScopedState({ ...nextState, activeNetworkId: networkId }, scoped);
+      let scopedAppliedCount = 0;
+      for (const operation of operations) {
+        const operationNextState = applyAcceptedOperation(scopedWorkingState, operation);
+        if (operationNextState !== scopedWorkingState) {
+          scopedWorkingState = operationNextState;
+          scopedAppliedCount += 1;
+        }
+      }
+      if (scopedAppliedCount === 0) {
+        continue;
+      }
+      const updatedScoped = scopedWorkingState.networkStates[networkId] ?? extractScopedState(scopedWorkingState);
+      nextState =
+        state.activeNetworkId === networkId
+          ? assignScopedState(
+              {
+                ...scopedWorkingState,
+                networkStates: {
+                  ...scopedWorkingState.networkStates,
+                  [networkId]: updatedScoped
+                }
+              },
+              updatedScoped
+            )
+          : {
+              ...nextState,
+              networkStates: {
+                ...nextState.networkStates,
+                [networkId]: updatedScoped
+              }
+            };
+      appliedCount += scopedAppliedCount;
+    }
+
+    return {
+      nextState,
+      appliedCount,
+      skippedCount: validation.accepted.length - appliedCount
+    };
+  }
+
   let nextState = state;
   let appliedCount = 0;
 

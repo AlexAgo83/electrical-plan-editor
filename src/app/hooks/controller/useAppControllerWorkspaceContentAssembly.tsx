@@ -510,7 +510,8 @@ export function useAppControllerWorkspaceContentAssembly({
               scope: request.scope,
               selection: currentState.ui.selected,
               permissions: request.permissions,
-              instruction: request.instruction
+              instruction: request.instruction,
+              selectedHarnessAssemblyId
             })
           };
         } catch (error) {
@@ -518,7 +519,8 @@ export function useAppControllerWorkspaceContentAssembly({
             state: currentState,
             scope: request.scope,
             instruction: request.instruction,
-            permissions: request.permissions
+            permissions: request.permissions,
+            selectedHarnessAssemblyId
           });
           return {
             ...fallback,

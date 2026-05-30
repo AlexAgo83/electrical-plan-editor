@@ -113,6 +113,33 @@ describe("AI agent apply", () => {
     expect(result.nextState.nodePositions["AI-NODE-001" as NodeId]).toEqual({ x: 80, y: 90 });
   });
 
+  it("applies accepted operations to their scoped network when networkId is present", () => {
+    const state = createSampleNetworkState();
+    const result = applyAiAgentAcceptedOperations(state, {
+      accepted: [
+        {
+          type: "update_entity",
+          entityKind: "wire",
+          entityId: "L-W-001",
+          networkId: "network-lighting-demo" as NetworkId,
+          fields: {
+            name: "Lighting feed AI update"
+          }
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    });
+
+    expect(result.appliedCount).toBe(1);
+    expect(result.nextState.activeNetworkId).toBe(state.activeNetworkId);
+    expect(result.nextState.wires.byId["L-W-001" as WireId]).toBeUndefined();
+    expect(result.nextState.networkStates["network-lighting-demo" as NetworkId]?.wires.byId["L-W-001" as WireId]?.name).toBe(
+      "Lighting feed AI update"
+    );
+  });
+
   it("applies route regeneration operations through reset route", () => {
     const state = createSampleNetworkState();
     const validation: AiAgentOperationValidationResult = {

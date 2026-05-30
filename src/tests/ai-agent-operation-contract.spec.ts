@@ -41,6 +41,66 @@ describe("AI agent operation contract", () => {
     expect(result.unsupported).toHaveLength(0);
   });
 
+  it("infers the target network for existing entities in all-network scope", () => {
+    const state = createSampleNetworkState();
+    const result = validateAiAgentOperations({
+      state,
+      scope: "allNetworks",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "update_entity",
+            entityKind: "wire",
+            entityId: "L-W-001",
+            fields: {
+              name: "Lighting feed AI update"
+            }
+          }
+        ]
+      }
+    });
+
+    expect(result.rejected).toHaveLength(0);
+    expect(result.accepted).toEqual([
+      expect.objectContaining({
+        type: "update_entity",
+        entityId: "L-W-001",
+        networkId: "network-lighting-demo"
+      })
+    ]);
+  });
+
+  it("rejects add-only operations without networkId in all-network scope", () => {
+    const state = createSampleNetworkState();
+    const result = validateAiAgentOperations({
+      state,
+      scope: "allNetworks",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "add_node",
+            label: "AI node",
+            position: { x: 1, y: 2 }
+          }
+        ]
+      }
+    });
+
+    expect(result.accepted).toHaveLength(0);
+    expect(result.rejected).toEqual([
+      expect.objectContaining({
+        operationType: "add_node",
+        message: "Multi-network AI operations must include networkId when no existing scoped entity identifies the target network."
+      })
+    ]);
+  });
+
   it("rejects malformed operations and disabled permission groups", () => {
     const state = createSampleNetworkState();
     const result = validateAiAgentOperations({

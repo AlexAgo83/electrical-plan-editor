@@ -4,6 +4,8 @@ import type {
   ConnectorId,
   ConnectorLayout,
   ConnectorTerminalMaterial,
+  HarnessAssemblyId,
+  NetworkId,
   NodeId,
   SegmentId,
   SpliceId,
@@ -21,6 +23,7 @@ import {
   analyzeSpliceDeleteImpact
 } from "../../store/deleteImpact";
 import { computeForcedRouteLength, findNodeIdForEndpoint } from "../../store/reducer/helpers/wireTransitions";
+import { assignScopedState } from "../../store/networking";
 import { createNodePositionMap } from "./layout/generation";
 
 export const AI_AGENT_OPERATION_SCHEMA_VERSION = 1;
@@ -57,23 +60,26 @@ interface AiAgentOperationEnvelope {
 }
 
 export type AiAgentSupportedOperation =
-  | AiAgentAddConnectorOperation
-  | AiAgentAddSpliceOperation
-  | AiAgentAddNodeOperation
-  | AiAgentAddSegmentOperation
-  | AiAgentAddWireOperation
-  | AiAgentMoveEntityOperation
-  | AiAgentBatchMoveEntitiesOperation
-  | AiAgentPlaceEntityRelativeToEntityOperation
-  | AiAgentUpdateEntityOperation
-  | AiAgentRegenerateRouteOperation
-  | AiAgentDeleteEntityOperation
-  | AiAgentCreateCatalogItemOperation
-  | AiAgentUpdateCatalogConnectorLayoutOperation
-  | AiAgentAssignCatalogItemOperation
-  | AiAgentSetConnectorTerminalMaterialOperation
-  | AiAgentLockWireRouteOperation
-  | AiAgentClarificationRequiredOperation;
+  & { networkId?: NetworkId }
+  & (
+    | AiAgentAddConnectorOperation
+    | AiAgentAddSpliceOperation
+    | AiAgentAddNodeOperation
+    | AiAgentAddSegmentOperation
+    | AiAgentAddWireOperation
+    | AiAgentMoveEntityOperation
+    | AiAgentBatchMoveEntitiesOperation
+    | AiAgentPlaceEntityRelativeToEntityOperation
+    | AiAgentUpdateEntityOperation
+    | AiAgentRegenerateRouteOperation
+    | AiAgentDeleteEntityOperation
+    | AiAgentCreateCatalogItemOperation
+    | AiAgentUpdateCatalogConnectorLayoutOperation
+    | AiAgentAssignCatalogItemOperation
+    | AiAgentSetConnectorTerminalMaterialOperation
+    | AiAgentLockWireRouteOperation
+    | AiAgentClarificationRequiredOperation
+  );
 
 export interface AiAgentAddConnectorOperation {
   type: "add_connector";
@@ -223,6 +229,7 @@ interface ValidateAiAgentOperationsParams {
   selection: SelectionState | null;
   permissions: AiAgentOperationPermissions;
   instruction?: string;
+  selectedHarnessAssemblyId?: HarnessAssemblyId | null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -1704,7 +1711,178 @@ function isWithinSelectionScope(operation: AiAgentSupportedOperation, selection:
   return true;
 }
 
-export function validateAiAgentOperations({
+function buildNetworkScopedAppState(state: AppState, networkId: NetworkId): AppState | null {
+  const scoped = state.networkStates[networkId];
+  return scoped === undefined ? null : assignScopedState({ ...state, activeNetworkId: networkId }, scoped);
+}
+
+function networkIdsForAiScope(
+  state: AppState,
+  scope: AiAgentScope,
+  selectedHarnessAssemblyId: HarnessAssemblyId | null | undefined
+): NetworkId[] {
+  if (scope === "activeNetwork" || scope === "currentSelection") {
+    return state.activeNetworkId === null ? [] : [state.activeNetworkId];
+  }
+  if (scope === "selectedHarness") {
+    const selectedHarness =
+      selectedHarnessAssemblyId === null || selectedHarnessAssemblyId === undefined
+        ? null
+        : state.harnessAssemblies.byId[selectedHarnessAssemblyId] ?? null;
+    const fallbackHarnessId = state.harnessAssemblies.allIds[0];
+    const harness = selectedHarness ?? (fallbackHarnessId === undefined ? null : state.harnessAssemblies.byId[fallbackHarnessId] ?? null);
+    return harness === null ? [] : harness.members.map((member) => member.networkId);
+  }
+  return [...state.networks.allIds];
+}
+
+function operationReferencesEntityInScopedState(
+  state: AppState,
+  rawOperation: Record<string, unknown>
+): boolean {
+  const type = readString(rawOperation.type);
+  const entityKind = readString(rawOperation.entityKind);
+  const entityId = readString(rawOperation.entityId);
+  const containsConnector = (value: unknown): boolean => typeof value === "string" && state.connectors.byId[value as ConnectorId] !== undefined;
+  const containsSplice = (value: unknown): boolean => typeof value === "string" && state.splices.byId[value as SpliceId] !== undefined;
+  const containsNode = (value: unknown): boolean => typeof value === "string" && state.nodes.byId[value as NodeId] !== undefined;
+  const containsSegment = (value: unknown): boolean => typeof value === "string" && state.segments.byId[value as SegmentId] !== undefined;
+  const containsWire = (value: unknown): boolean => typeof value === "string" && state.wires.byId[value as WireId] !== undefined;
+  const containsCatalog = (value: unknown): boolean => typeof value === "string" && state.catalogItems.byId[value as CatalogItemId] !== undefined;
+  const containsEndpoint = (value: unknown): boolean => {
+    if (!isRecord(value)) {
+      return false;
+    }
+    if (value.kind === "connectorCavity") {
+      return containsConnector(value.connectorId);
+    }
+    if (value.kind === "splicePort") {
+      return containsSplice(value.spliceId);
+    }
+    return false;
+  };
+
+  if (type === "add_segment") {
+    return containsNode(rawOperation.nodeA) && containsNode(rawOperation.nodeB);
+  }
+  if (type === "add_wire") {
+    return containsEndpoint(rawOperation.endpointA) && containsEndpoint(rawOperation.endpointB);
+  }
+  if (type === "regenerate_route") {
+    return Array.isArray(rawOperation.wireIds) && rawOperation.wireIds.every(containsWire);
+  }
+  if (type === "lock_wire_route") {
+    return containsWire(rawOperation.wireId) && Array.isArray(rawOperation.segmentIds) && rawOperation.segmentIds.every(containsSegment);
+  }
+  if (type === "update_catalog_connector_layout") {
+    return containsCatalog(rawOperation.catalogItemId);
+  }
+  if (type === "set_connector_terminal_material") {
+    return containsConnector(rawOperation.connectorId);
+  }
+  if (type === "assign_catalog_item") {
+    const entityExistsForKind =
+      entityKind === "connector"
+        ? containsConnector(entityId)
+        : entityKind === "splice"
+          ? containsSplice(entityId)
+          : entityKind === "wireProtection"
+            ? containsWire(entityId)
+            : false;
+    return entityExistsForKind && containsCatalog(rawOperation.catalogItemId);
+  }
+  if (type === "batch_move_entities" && Array.isArray(rawOperation.moves)) {
+    return rawOperation.moves.every((move) => {
+      if (!isRecord(move)) {
+        return false;
+      }
+      const moveKind = readString(move.entityKind);
+      return moveKind === "connector"
+        ? containsConnector(move.entityId)
+        : moveKind === "splice"
+          ? containsSplice(move.entityId)
+          : moveKind === "node" && containsNode(move.entityId);
+    });
+  }
+  if (type === "place_entity_relative_to_entity") {
+    const referenceKind = readString(rawOperation.referenceEntityKind);
+    const entityMatches =
+      entityKind === "connector"
+        ? containsConnector(entityId)
+        : entityKind === "splice"
+          ? containsSplice(entityId)
+          : entityKind === "node" && containsNode(entityId);
+    const referenceMatches =
+      referenceKind === "connector"
+        ? containsConnector(rawOperation.referenceEntityId)
+        : referenceKind === "splice"
+          ? containsSplice(rawOperation.referenceEntityId)
+          : referenceKind === "node" && containsNode(rawOperation.referenceEntityId);
+    return entityMatches && referenceMatches;
+  }
+  if (type === "move_entity" || type === "update_entity" || type === "delete_entity") {
+    if (entityKind === "catalog") {
+      return containsCatalog(entityId);
+    }
+    if (entityKind === "connector") {
+      return containsConnector(entityId);
+    }
+    if (entityKind === "splice") {
+      return containsSplice(entityId);
+    }
+    if (entityKind === "node") {
+      return containsNode(entityId);
+    }
+    if (entityKind === "segment") {
+      return containsSegment(entityId);
+    }
+    return entityKind === "wire" && containsWire(entityId);
+  }
+  return false;
+}
+
+function resolveOperationNetworkId(
+  state: AppState,
+  operation: unknown,
+  scope: AiAgentScope,
+  selectedHarnessAssemblyId: HarnessAssemblyId | null | undefined
+): NetworkId | AiAgentOperationValidationIssue {
+  if (!isRecord(operation)) {
+    return reject(-1, "unknown", "Operation must be an object.");
+  }
+  const operationType = readString(operation.type) ?? "unknown";
+  const scopedNetworkIds = networkIdsForAiScope(state, scope, selectedHarnessAssemblyId);
+  const declaredNetworkId = readString(operation.networkId);
+  if (declaredNetworkId !== null) {
+    return scopedNetworkIds.includes(declaredNetworkId as NetworkId) && state.networkStates[declaredNetworkId as NetworkId] !== undefined
+      ? (declaredNetworkId as NetworkId)
+      : reject(-1, operationType, "Operation networkId is outside the selected AI scope.");
+  }
+  if (scope === "activeNetwork" || scope === "currentSelection") {
+    return state.activeNetworkId ?? reject(-1, operationType, "No active network is available.");
+  }
+
+  const matchingNetworkIds = scopedNetworkIds.filter((networkId) => {
+    const scopedState = buildNetworkScopedAppState(state, networkId);
+    return scopedState !== null && operationReferencesEntityInScopedState(scopedState, operation);
+  });
+  if (matchingNetworkIds.length === 1) {
+    return matchingNetworkIds[0] as NetworkId;
+  }
+  return reject(
+    -1,
+    operationType,
+    matchingNetworkIds.length === 0
+      ? "Multi-network AI operations must include networkId when no existing scoped entity identifies the target network."
+      : "Multi-network AI operation references are ambiguous; include networkId."
+  );
+}
+
+function withOperationNetworkId(operation: unknown, networkId: NetworkId): unknown {
+  return isRecord(operation) ? { ...operation, networkId } : operation;
+}
+
+function validateAiAgentOperationsForState({
   state,
   payload,
   scope,
@@ -1865,7 +2043,15 @@ export function validateAiAgentOperations({
       return;
     }
 
-    result.accepted.push(prospectiveNormalized);
+    const operationNetworkId = isRecord(operation) ? readString(operation.networkId) : null;
+    result.accepted.push(
+      operationNetworkId === null
+        ? prospectiveNormalized
+        : {
+            ...prospectiveNormalized,
+            networkId: operationNetworkId as NetworkId
+          }
+    );
     if (prospectiveNormalized.type === "create_catalog_item") {
       const catalogItemId = prospectiveNormalized.id ?? (`AI-CAT-${String(prospectiveCatalogItems.size + 1).padStart(3, "0")}` as CatalogItemId);
       prospectiveCatalogItems.add(catalogItemId);
@@ -1925,5 +2111,59 @@ export function validateAiAgentOperations({
     }
   });
 
+  return result;
+}
+
+export function validateAiAgentOperations(params: ValidateAiAgentOperationsParams): AiAgentOperationValidationResult {
+  if (params.scope === "activeNetwork" || params.scope === "currentSelection") {
+    return validateAiAgentOperationsForState(params);
+  }
+
+  const envelope = parseEnvelope(params.payload);
+  if ("status" in envelope) {
+    return {
+      accepted: [],
+      rejected: [envelope],
+      unsupported: [],
+      warnings: []
+    };
+  }
+
+  const groupedOperations = new Map<NetworkId, unknown[]>();
+  const rejected: AiAgentOperationValidationIssue[] = [];
+  envelope.operations.forEach((operation, operationIndex) => {
+    const targetNetworkId = resolveOperationNetworkId(params.state, operation, params.scope, params.selectedHarnessAssemblyId);
+    if (typeof targetNetworkId === "object") {
+      rejected.push({ ...targetNetworkId, operationIndex });
+      return;
+    }
+    groupedOperations.set(targetNetworkId, [...(groupedOperations.get(targetNetworkId) ?? []), withOperationNetworkId(operation, targetNetworkId)]);
+  });
+
+  const result: AiAgentOperationValidationResult = {
+    accepted: [],
+    rejected,
+    unsupported: [],
+    warnings: []
+  };
+  for (const [networkId, operations] of groupedOperations) {
+    const scopedState = buildNetworkScopedAppState(params.state, networkId);
+    if (scopedState === null) {
+      result.rejected.push(reject(-1, "network", `Network '${networkId}' is not available.`));
+      continue;
+    }
+    const scopedResult = validateAiAgentOperationsForState({
+      ...params,
+      state: scopedState,
+      payload: {
+        schemaVersion: AI_AGENT_OPERATION_SCHEMA_VERSION,
+        operations
+      }
+    });
+    result.accepted.push(...scopedResult.accepted);
+    result.rejected.push(...scopedResult.rejected);
+    result.unsupported.push(...scopedResult.unsupported);
+    result.warnings.push(...scopedResult.warnings);
+  }
   return result;
 }
