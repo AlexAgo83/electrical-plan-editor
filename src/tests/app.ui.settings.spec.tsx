@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { NetworkId } from "../core/entities";
 import {
   asConnectorId,
@@ -15,6 +15,7 @@ import { appActions, appReducer, createInitialState, createSampleNetworkState } 
 
 describe("App integration UI - settings", () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     localStorage.clear();
   });
 
@@ -200,7 +201,7 @@ describe("App integration UI - settings", () => {
     expect(within(document.body).queryByRole("heading", { name: "No active network" })).not.toBeInTheDocument();
   });
 
-  it("configures AI provider readiness and gates the Modeling AI Agent entry", () => {
+  it("configures AI provider readiness and gates the Modeling AI Agent entry", async () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("modeling");
@@ -215,6 +216,12 @@ describe("App integration UI - settings", () => {
       target: { value: "sk-local-test" }
     });
     expect(within(aiProviderPanel).getByText("OpenAI provider is ready.")).toBeInTheDocument();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.resolve(new Response("{}", { status: 200 })))
+    );
+    fireEvent.click(within(aiProviderPanel).getByRole("button", { name: "Test connection" }));
+    expect(await within(aiProviderPanel).findByText("OpenAI connection succeeded.")).toBeInTheDocument();
 
     switchScreenDrawerAware("modeling");
     const enabledAiAgentButton = within(screen.getByRole("region", { name: "Quick entity navigation" })).getByRole("button", {
@@ -224,6 +231,9 @@ describe("App integration UI - settings", () => {
     fireEvent.click(enabledAiAgentButton);
     expect(screen.getByRole("heading", { name: "AI Agent" })).toBeInTheDocument();
     expect(screen.getByText("Provider ready")).toBeInTheDocument();
+    const activeQuickEntityNavigation = screen.getByRole("region", { name: "Quick entity navigation" });
+    expect(within(activeQuickEntityNavigation).getByRole("button", { name: /Connectors/ })).toHaveAttribute("aria-pressed", "false");
+    expect(within(activeQuickEntityNavigation).getByRole("button", { name: "AI Agent" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("Main network (Sample)");
     expect(screen.getByLabelText("Instruction")).toBeInTheDocument();
     expect(screen.getByLabelText("Target scope")).toHaveValue("activeNetwork");

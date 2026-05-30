@@ -121,7 +121,7 @@ export function WorkspaceNavigation({
               <button
                 key={subScreenId}
                 type="button"
-                className={activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
+                className={!isAiAgentOpen && activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
                 onClick={() => onSubScreenChange(subScreenId)}
               >
                 <span className="workspace-tab-content">

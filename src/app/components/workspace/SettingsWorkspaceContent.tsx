@@ -360,13 +360,17 @@ export function SettingsWorkspaceContent({
           </label>
         </div>
         <div className="row-actions settings-actions">
-          <button type="button" disabled>
+          <button
+            type="button"
+            onClick={() => {
+              void aiSettings.testConnection();
+            }}
+            disabled={!aiSettings.readiness.isReady || aiSettings.connectionTest.status === "testing"}
+          >
             Test connection
           </button>
         </div>
-        <p className="meta-line">
-          Connection testing and live provider calls are intentionally disabled until the operation contract is wired.
-        </p>
+        <p className="meta-line">{aiSettings.connectionTest.message}</p>
       </section>
 
       <section className="panel settings-panel">

@@ -74,9 +74,9 @@ export function NetworkSummaryQuickEntityNavigation({
           <button
             key={item.subScreen}
             type="button"
-            className={activeSubScreen === item.subScreen ? "filter-chip is-active" : "filter-chip"}
+            className={!isAiAgentOpen && activeSubScreen === item.subScreen ? "filter-chip is-active" : "filter-chip"}
             onClick={() => onQuickEntityNavigation(item.subScreen)}
-            aria-pressed={activeSubScreen === item.subScreen}
+            aria-pressed={!isAiAgentOpen && activeSubScreen === item.subScreen}
           >
             <span
               className={`action-button-icon network-summary-quick-entity-nav-icon ${SUB_SCREEN_ICON_CLASS_BY_ID[item.subScreen]}`}
