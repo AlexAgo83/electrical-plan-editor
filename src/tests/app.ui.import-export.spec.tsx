@@ -129,8 +129,9 @@ describe("App integration UI - import/export", () => {
     fireEvent.click(within(overwriteDialog).getByRole("radio", { name: "Import as new copy" }));
     fireEvent.click(within(overwriteDialog).getByRole("button", { name: "Confirm" }));
 
-    expect(await within(panel).findByText("Warning details")).toBeInTheDocument();
-    expect(within(panel).getByText(/Network ID 'network-main' was renamed to 'network-main-import' during import\./)).toBeInTheDocument();
-    expect(within(panel).getByText(/Network technical ID 'NET-MAIN-SAMPLE' was renamed to 'NET-MAIN-SAMPLE-IMP' during import\./)).toBeInTheDocument();
+    const warningDetails = await screen.findByRole("status", { name: "Import warning details" });
+    expect(within(warningDetails).getByText("Warning details")).toBeInTheDocument();
+    expect(within(warningDetails).getByText(/Network ID 'network-main' was renamed to 'network-main-import' during import\./)).toBeInTheDocument();
+    expect(within(warningDetails).getByText(/Network technical ID 'NET-MAIN-SAMPLE' was renamed to 'NET-MAIN-SAMPLE-IMP' during import\./)).toBeInTheDocument();
   });
 });
