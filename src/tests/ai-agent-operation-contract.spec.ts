@@ -341,6 +341,47 @@ describe("AI agent operation contract", () => {
     expect(result.accepted.map((operation) => operation.type)).toEqual(["add_node", "add_segment"]);
   });
 
+  it("accepts connector, segment, and wire additions that reference earlier same-plan connector nodes", () => {
+    const state = appReducer(createSampleNetworkState(), appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "add_connector",
+            id: "H-C-AI-SERVICE",
+            nodeId: "H-N-AI-SERVICE",
+            name: "AI Service Connector",
+            technicalId: "H-CONN-AI-SERVICE",
+            cavityCount: 2,
+            position: { x: 80, y: 240 }
+          },
+          {
+            type: "add_segment",
+            nodeA: "H-N-AI-SERVICE",
+            nodeB: "H-N-HVIL",
+            lengthMm: 25
+          },
+          {
+            type: "add_wire",
+            name: "AI service to OBC",
+            technicalId: "H-WIRE-AI-SERVICE-OBC",
+            endpointA: { kind: "connectorCavity", connectorId: "H-C-AI-SERVICE", cavityIndex: 1 },
+            endpointB: { kind: "connectorCavity", connectorId: "H-C-OBC", cavityIndex: 12 },
+            sectionMm2: 0.5
+          }
+        ]
+      }
+    });
+
+    expect(result.rejected).toHaveLength(0);
+    expect(result.accepted.map((operation) => operation.type)).toEqual(["add_connector", "add_segment", "add_wire"]);
+  });
+
   it("accepts relative moves that reference connector technical IDs", () => {
     const baseState = createSampleNetworkState();
     const state = appReducer(baseState, appActions.select({ kind: "connector", id: "C-SRC" as ConnectorId }));

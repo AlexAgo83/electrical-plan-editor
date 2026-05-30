@@ -16,6 +16,22 @@ function buildNextAiNodeId(state: AppState): NodeId {
   return `AI-NODE-${String(index).padStart(3, "0")}` as NodeId;
 }
 
+function buildNextAiConnectorId(state: AppState): ConnectorId {
+  let index = 1;
+  while (state.connectors.byId[`AI-CONN-${String(index).padStart(3, "0")}` as ConnectorId] !== undefined) {
+    index += 1;
+  }
+  return `AI-CONN-${String(index).padStart(3, "0")}` as ConnectorId;
+}
+
+function buildNextAiSpliceId(state: AppState): SpliceId {
+  let index = 1;
+  while (state.splices.byId[`AI-SPLICE-${String(index).padStart(3, "0")}` as SpliceId] !== undefined) {
+    index += 1;
+  }
+  return `AI-SPLICE-${String(index).padStart(3, "0")}` as SpliceId;
+}
+
 function buildNextAiWireId(state: AppState): WireId {
   let index = 1;
   while (state.wires.byId[`AI-WIRE-${String(index).padStart(3, "0")}` as WireId] !== undefined) {
@@ -47,6 +63,53 @@ function isWireEndpoint(value: unknown): value is WireEndpoint {
 }
 
 function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOperation): AppState {
+  if (operation.type === "add_connector") {
+    const connectorId =
+      operation.id !== undefined && state.connectors.byId[operation.id] === undefined ? operation.id : buildNextAiConnectorId(state);
+    const nodeId =
+      operation.nodeId !== undefined && state.nodes.byId[operation.nodeId] === undefined ? operation.nodeId : buildNextAiNodeId(state);
+    const withConnector = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: connectorId,
+        name: operation.name,
+        technicalId: operation.technicalId,
+        cavityCount: operation.cavityCount
+      })
+    );
+    const withNode = appReducer(
+      withConnector,
+      appActions.upsertNode({
+        id: nodeId,
+        kind: "connector",
+        connectorId
+      })
+    );
+    return appReducer(withNode, appActions.setNodePosition(nodeId, operation.position));
+  }
+  if (operation.type === "add_splice") {
+    const spliceId = operation.id !== undefined && state.splices.byId[operation.id] === undefined ? operation.id : buildNextAiSpliceId(state);
+    const nodeId =
+      operation.nodeId !== undefined && state.nodes.byId[operation.nodeId] === undefined ? operation.nodeId : buildNextAiNodeId(state);
+    const withSplice = appReducer(
+      state,
+      appActions.upsertSplice({
+        id: spliceId,
+        name: operation.name,
+        technicalId: operation.technicalId,
+        portCount: operation.portCount
+      })
+    );
+    const withNode = appReducer(
+      withSplice,
+      appActions.upsertNode({
+        id: nodeId,
+        kind: "splice",
+        spliceId
+      })
+    );
+    return appReducer(withNode, appActions.setNodePosition(nodeId, operation.position));
+  }
   if (operation.type === "add_node") {
     const nodeId = operation.id !== undefined && state.nodes.byId[operation.id] === undefined ? operation.id : buildNextAiNodeId(state);
     const withNode = appReducer(

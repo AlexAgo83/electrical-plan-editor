@@ -55,10 +55,10 @@ function formatAiAgentOperationDetails(operation: AiAgentSupportedOperation): st
     return `${operation.entityKind} ${operation.entityId} ${operation.placement} ${operation.referenceEntityKind} ${operation.referenceEntityId}`;
   }
   if (operation.type === "add_connector") {
-    return `${operation.technicalId} · ${operation.name} · ${operation.cavityCount} ways`;
+    return `${operation.id === undefined ? "" : `${operation.id} · `}${operation.technicalId} · ${operation.name} · ${operation.cavityCount} ways`;
   }
   if (operation.type === "add_splice") {
-    return `${operation.technicalId} · ${operation.name} · ${operation.portCount} ports`;
+    return `${operation.id === undefined ? "" : `${operation.id} · `}${operation.technicalId} · ${operation.name} · ${operation.portCount} ports`;
   }
   if (operation.type === "add_node") {
     return `${operation.id === undefined ? "" : `${operation.id} · `}${operation.label} · x: ${operation.position.x}, y: ${operation.position.y}`;

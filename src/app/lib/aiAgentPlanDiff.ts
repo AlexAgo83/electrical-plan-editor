@@ -168,6 +168,25 @@ function pushConnectorUpdate(
   }
 }
 
+function pushAddedConnector(
+  operations: AiAgentSupportedOperation[],
+  connector: AiAgentEditablePlan["connectors"][number],
+  node: AiAgentEditableNode | undefined
+) {
+  if (node?.kind !== "connector" || node.position === undefined) {
+    return;
+  }
+  operations.push({
+    type: "add_connector",
+    id: connector.id,
+    nodeId: node.id,
+    name: connector.name,
+    technicalId: connector.technicalId,
+    cavityCount: connector.cavityCount,
+    position: node.position
+  });
+}
+
 function pushCatalogItemUpdate(
   operations: AiAgentSupportedOperation[],
   before: Pick<
@@ -225,6 +244,25 @@ function pushSpliceUpdate(
   if (Object.keys(fields).length > 0) {
     operations.push({ type: "update_entity", entityKind: "splice", entityId: before.id, fields });
   }
+}
+
+function pushAddedSplice(
+  operations: AiAgentSupportedOperation[],
+  splice: AiAgentEditablePlan["splices"][number],
+  node: AiAgentEditableNode | undefined
+) {
+  if (node?.kind !== "splice" || node.position === undefined) {
+    return;
+  }
+  operations.push({
+    type: "add_splice",
+    id: splice.id,
+    nodeId: node.id,
+    name: splice.name,
+    technicalId: splice.technicalId,
+    portCount: splice.portCount,
+    position: node.position
+  });
 }
 
 function pushWireUpdate(
@@ -342,10 +380,17 @@ export function buildAiAgentOperationsFromPlanDiff(
   const beforeNodes = indexById(beforePlan.nodes);
   const beforeSegments = indexById(beforePlan.segments);
   const beforeWires = indexById(beforePlan.wires);
+  const addedConnectorNodeIds = new Set<string>();
+  const addedSpliceNodeIds = new Set<string>();
 
   for (const connector of modifiedPlan.connectors) {
     const before = beforeConnectors.get(connector.id);
     if (before === undefined) {
+      const node = modifiedPlan.nodes.find((candidate) => candidate.kind === "connector" && candidate.connectorId === connector.id);
+      pushAddedConnector(operations, connector, node);
+      if (node !== undefined) {
+        addedConnectorNodeIds.add(node.id);
+      }
       continue;
     }
     pushConnectorUpdate(operations, before, connector);
@@ -354,6 +399,11 @@ export function buildAiAgentOperationsFromPlanDiff(
   for (const splice of modifiedPlan.splices) {
     const before = beforeSplices.get(splice.id);
     if (before === undefined) {
+      const node = modifiedPlan.nodes.find((candidate) => candidate.kind === "splice" && candidate.spliceId === splice.id);
+      pushAddedSplice(operations, splice, node);
+      if (node !== undefined) {
+        addedSpliceNodeIds.add(node.id);
+      }
       continue;
     }
     pushSpliceUpdate(operations, before, splice);
@@ -370,6 +420,9 @@ export function buildAiAgentOperationsFromPlanDiff(
   for (const node of modifiedPlan.nodes) {
     const before = beforeNodes.get(node.id);
     if (before === undefined) {
+      if (addedConnectorNodeIds.has(node.id) || addedSpliceNodeIds.has(node.id)) {
+        continue;
+      }
       if (node.kind === "intermediate" && node.position !== undefined) {
         operations.push({ type: "add_node", id: node.id, label: node.label, position: node.position });
       }

@@ -49,6 +49,8 @@ export type AiAgentSupportedOperation =
 
 export interface AiAgentAddConnectorOperation {
   type: "add_connector";
+  id?: ConnectorId;
+  nodeId?: NodeId;
   name: string;
   technicalId: string;
   cavityCount: number;
@@ -57,6 +59,8 @@ export interface AiAgentAddConnectorOperation {
 
 export interface AiAgentAddSpliceOperation {
   type: "add_splice";
+  id?: SpliceId;
+  nodeId?: NodeId;
   name: string;
   technicalId: string;
   portCount: number;
@@ -583,22 +587,42 @@ function parseOperation(
   }
 
   if (type === "add_connector") {
+    const id = readString(operation.id);
+    const nodeId = readString(operation.nodeId);
     const name = readString(operation.name);
     const technicalId = readString(operation.technicalId);
     const cavityCount = readPositiveNumber(operation.cavityCount);
     const position = readPosition(operation.position);
     return name !== null && technicalId !== null && cavityCount !== null && position !== null
-      ? { type, name, technicalId, cavityCount, position }
+      ? {
+          type,
+          ...(id === null ? {} : { id: id as ConnectorId }),
+          ...(nodeId === null ? {} : { nodeId: nodeId as NodeId }),
+          name,
+          technicalId,
+          cavityCount,
+          position
+        }
       : reject(operationIndex, type, "Connector creation requires name, technicalId, cavityCount, and position.");
   }
 
   if (type === "add_splice") {
+    const id = readString(operation.id);
+    const nodeId = readString(operation.nodeId);
     const name = readString(operation.name);
     const technicalId = readString(operation.technicalId);
     const portCount = readPositiveNumber(operation.portCount);
     const position = readPosition(operation.position);
     return name !== null && technicalId !== null && portCount !== null && position !== null
-      ? { type, name, technicalId, portCount, position }
+      ? {
+          type,
+          ...(id === null ? {} : { id: id as SpliceId }),
+          ...(nodeId === null ? {} : { nodeId: nodeId as NodeId }),
+          name,
+          technicalId,
+          portCount,
+          position
+        }
       : reject(operationIndex, type, "Splice creation requires name, technicalId, portCount, and position.");
   }
 
@@ -884,15 +908,35 @@ function permissionForOperation(operation: AiAgentSupportedOperation): keyof AiA
   return "route";
 }
 
-function entityExists(state: AppState, operation: AiAgentSupportedOperation, prospectiveNodeIds: Set<string>): boolean {
+function entityExists(
+  state: AppState,
+  operation: AiAgentSupportedOperation,
+  prospectiveNodeIds: Set<string>,
+  prospectiveConnectors: Map<string, number>,
+  prospectiveSplices: Map<string, number>
+): boolean {
   const endpointExists = (endpoint: WireEndpoint): boolean => {
     if (endpoint.kind === "connectorCavity") {
       const connector = state.connectors.byId[endpoint.connectorId];
-      return connector !== undefined && Number.isInteger(endpoint.cavityIndex) && endpoint.cavityIndex >= 1 && endpoint.cavityIndex <= connector.cavityCount;
+      const cavityCount = connector?.cavityCount ?? prospectiveConnectors.get(endpoint.connectorId);
+      return cavityCount !== undefined && Number.isInteger(endpoint.cavityIndex) && endpoint.cavityIndex >= 1 && endpoint.cavityIndex <= cavityCount;
     }
     const splice = state.splices.byId[endpoint.spliceId];
-    return splice !== undefined && Number.isInteger(endpoint.portIndex) && endpoint.portIndex >= 1 && endpoint.portIndex <= splice.portCount;
+    const portCount = splice?.portCount ?? prospectiveSplices.get(endpoint.spliceId);
+    return portCount !== undefined && Number.isInteger(endpoint.portIndex) && endpoint.portIndex >= 1 && endpoint.portIndex <= portCount;
   };
+  if (operation.type === "add_connector") {
+    return (
+      (operation.id === undefined || state.connectors.byId[operation.id] === undefined) &&
+      (operation.nodeId === undefined || state.nodes.byId[operation.nodeId] === undefined)
+    );
+  }
+  if (operation.type === "add_splice") {
+    return (
+      (operation.id === undefined || state.splices.byId[operation.id] === undefined) &&
+      (operation.nodeId === undefined || state.nodes.byId[operation.nodeId] === undefined)
+    );
+  }
   if (operation.type === "add_node") {
     return operation.id === undefined || state.nodes.byId[operation.id] === undefined;
   }
@@ -1028,6 +1072,8 @@ export function validateAiAgentOperations({
   }
 
   const prospectiveNodeIds = new Set<string>(state.nodes.allIds);
+  const prospectiveConnectors = new Map<string, number>();
+  const prospectiveSplices = new Map<string, number>();
 
   envelope.operations.forEach((operation, operationIndex) => {
     const parsed = parseOperation(operation, operationIndex, selection, instruction);
@@ -1046,7 +1092,7 @@ export function validateAiAgentOperations({
       result.rejected.push(reject(operationIndex, normalized.type, `${permission} permission is disabled.`));
       return;
     }
-    if (!entityExists(state, normalized, prospectiveNodeIds)) {
+    if (!entityExists(state, normalized, prospectiveNodeIds, prospectiveConnectors, prospectiveSplices)) {
       result.rejected.push(reject(operationIndex, normalized.type, "Operation references unknown modeling entities."));
       return;
     }
@@ -1075,6 +1121,18 @@ export function validateAiAgentOperations({
     }
 
     result.accepted.push(normalized);
+    if (normalized.type === "add_connector" && normalized.id !== undefined) {
+      prospectiveConnectors.set(normalized.id, normalized.cavityCount);
+      if (normalized.nodeId !== undefined) {
+        prospectiveNodeIds.add(normalized.nodeId);
+      }
+    }
+    if (normalized.type === "add_splice" && normalized.id !== undefined) {
+      prospectiveSplices.set(normalized.id, normalized.portCount);
+      if (normalized.nodeId !== undefined) {
+        prospectiveNodeIds.add(normalized.nodeId);
+      }
+    }
     if (normalized.type === "add_node" && normalized.id !== undefined) {
       prospectiveNodeIds.add(normalized.id);
     }

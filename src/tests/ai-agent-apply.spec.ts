@@ -277,4 +277,66 @@ describe("AI agent apply", () => {
       lengthMm: 40
     });
   });
+
+  it("applies connector additions with linked nodes before dependent segments and wires", () => {
+    const state = appReducer(createSampleNetworkState(), appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "add_connector",
+          id: "H-C-AI-SERVICE" as ConnectorId,
+          nodeId: "H-N-AI-SERVICE" as NodeId,
+          name: "AI Service Connector",
+          technicalId: "H-CONN-AI-SERVICE",
+          cavityCount: 2,
+          position: { x: 80, y: 240 }
+        },
+        {
+          type: "add_segment",
+          nodeA: "H-N-AI-SERVICE" as NodeId,
+          nodeB: "H-N-HVIL" as NodeId,
+          lengthMm: 25
+        },
+        {
+          type: "add_wire",
+          name: "AI service to OBC",
+          technicalId: "H-WIRE-AI-SERVICE-OBC",
+          endpointA: { kind: "connectorCavity", connectorId: "H-C-AI-SERVICE" as ConnectorId, cavityIndex: 1 },
+          endpointB: { kind: "connectorCavity", connectorId: "H-C-OBC" as ConnectorId, cavityIndex: 12 },
+          sectionMm2: 0.5
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.appliedCount).toBe(3);
+    expect(result.nextState.connectors.byId["H-C-AI-SERVICE" as ConnectorId]).toEqual(
+      expect.objectContaining({
+        name: "AI Service Connector",
+        technicalId: "H-CONN-AI-SERVICE",
+        cavityCount: 2
+      })
+    );
+    expect(result.nextState.nodes.byId["H-N-AI-SERVICE" as NodeId]).toEqual({
+      id: "H-N-AI-SERVICE",
+      kind: "connector",
+      connectorId: "H-C-AI-SERVICE"
+    });
+    expect(result.nextState.segments.byId["AI-SEG-001" as SegmentId]).toEqual({
+      id: "AI-SEG-001",
+      nodeA: "H-N-AI-SERVICE",
+      nodeB: "H-N-HVIL",
+      lengthMm: 25
+    });
+    expect(result.nextState.wires.byId["AI-WIRE-001" as WireId]).toEqual(
+      expect.objectContaining({
+        endpointA: { kind: "connectorCavity", connectorId: "H-C-AI-SERVICE", cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: "H-C-OBC", cavityIndex: 12 }
+      })
+    );
+  });
 });

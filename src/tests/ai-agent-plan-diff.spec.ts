@@ -206,4 +206,82 @@ describe("AI agent plan diff", () => {
       ])
     );
   });
+
+  it("derives connector additions before dependent segment and wire additions", () => {
+    const state = appReducer(createSampleNetworkState(), appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const beforePlan = buildAiAgentEditablePlan(buildAiAgentContext(state, "activeNetwork"));
+    const modifiedPlan = {
+      ...beforePlan,
+      connectors: [
+        ...beforePlan.connectors,
+        {
+          id: "H-C-AI-SERVICE" as ConnectorId,
+          name: "AI Service Connector",
+          technicalId: "H-CONN-AI-SERVICE",
+          cavityCount: 2
+        }
+      ],
+      nodes: [
+        ...beforePlan.nodes,
+        {
+          id: "H-N-AI-SERVICE" as NodeId,
+          kind: "connector" as const,
+          connectorId: "H-C-AI-SERVICE" as ConnectorId,
+          position: { x: 80, y: 240 }
+        }
+      ],
+      segments: [
+        ...beforePlan.segments,
+        {
+          id: "H-SEG-AI-SERVICE" as SegmentId,
+          nodeA: "H-N-AI-SERVICE" as NodeId,
+          nodeB: "H-N-HVIL" as NodeId,
+          lengthMm: 25
+        }
+      ],
+      wires: [
+        ...beforePlan.wires,
+        {
+          id: "H-WIRE-AI-SERVICE-OBC" as WireId,
+          name: "AI service to OBC",
+          technicalId: "H-WIRE-AI-SERVICE-OBC",
+          endpointA: { kind: "connectorCavity" as const, connectorId: "H-C-AI-SERVICE" as ConnectorId, cavityIndex: 1 },
+          endpointB: { kind: "connectorCavity" as const, connectorId: "H-C-OBC" as ConnectorId, cavityIndex: 12 },
+          sectionMm2: 0.5,
+          primaryColorId: null,
+          secondaryColorId: null,
+          routeSegmentIds: [],
+          lengthMm: 0
+        }
+      ]
+    };
+
+    const operations = buildAiAgentOperationsFromPlanDiff(beforePlan, modifiedPlan);
+
+    expect(operations.slice(-2)).toEqual([
+      {
+        type: "add_segment",
+        nodeA: "H-N-AI-SERVICE",
+        nodeB: "H-N-HVIL",
+        lengthMm: 25
+      },
+      {
+        type: "add_wire",
+        name: "AI service to OBC",
+        technicalId: "H-WIRE-AI-SERVICE-OBC",
+        endpointA: { kind: "connectorCavity", connectorId: "H-C-AI-SERVICE", cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: "H-C-OBC", cavityIndex: 12 },
+        sectionMm2: 0.5
+      }
+    ]);
+    expect(operations[0]).toEqual({
+      type: "add_connector",
+      id: "H-C-AI-SERVICE",
+      nodeId: "H-N-AI-SERVICE",
+      name: "AI Service Connector",
+      technicalId: "H-CONN-AI-SERVICE",
+      cavityCount: 2,
+      position: { x: 80, y: 240 }
+    });
+  });
 });
