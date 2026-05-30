@@ -265,6 +265,10 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     activeSubScreen: params.activeSubScreen,
     entityCountBySubScreen: params.entityCountBySubScreen,
     onQuickEntityNavigation: params.onQuickEntityNavigation,
+    isAiAgentOpen: params.isAiAgentOpen,
+    isAiAgentReady: params.isAiAgentReady,
+    aiAgentDisabledReason: params.aiAgentDisabledReason,
+    onOpenAiAgent: params.onOpenAiAgent,
     onSelectConnectorFromCallout: params.onSelectConnectorFromCallout,
     onSelectSpliceFromCallout: params.onSelectSpliceFromCallout,
     onSelectWireFromConnectorPin: params.onSelectWireFromConnectorPin,
@@ -960,7 +964,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     resetWorkspacePreferencesToDefaults: params.resetWorkspacePreferencesToDefaults,
     importOverwriteDialog: params.importOverwriteDialog,
     handleExportGroupedBom: params.handleExportGroupedBom,
-    handleExportGroupedSvg: params.handleExportGroupedSvg
+    handleExportGroupedSvg: params.handleExportGroupedSvg,
+    aiSettings: params.aiSettings
   } satisfies SettingsWorkspaceContentProps;
 
   return {

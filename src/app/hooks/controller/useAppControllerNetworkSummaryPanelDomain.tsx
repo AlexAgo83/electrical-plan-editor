@@ -69,6 +69,10 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   handleWorkspaceScreenChange: (targetScreen: ScreenId) => void;
   entityCountBySubScreen: Record<SubScreenId, number>;
   onQuickEntityNavigation: (subScreen: SubScreenId) => void;
+  isAiAgentOpen?: boolean;
+  isAiAgentReady?: boolean;
+  aiAgentDisabledReason?: string;
+  onOpenAiAgent?: () => void;
   activeNetwork: Network | null;
   nodes: NetworkSummaryPanelSliceParams["nodes"];
   segments: Segment[];
@@ -189,6 +193,10 @@ export function useAppControllerNetworkSummaryPanelDomain({
   handleWorkspaceScreenChange,
   entityCountBySubScreen,
   onQuickEntityNavigation,
+  isAiAgentOpen = false,
+  isAiAgentReady = false,
+  aiAgentDisabledReason,
+  onOpenAiAgent,
   activeNetwork,
   nodes,
   segments,
@@ -413,6 +421,10 @@ export function useAppControllerNetworkSummaryPanelDomain({
         activeSubScreen,
         entityCountBySubScreen,
         onQuickEntityNavigation,
+        isAiAgentOpen,
+        isAiAgentReady,
+        aiAgentDisabledReason,
+        onOpenAiAgent,
         onSelectConnectorFromCallout: handleSelectConnectorFromCallout,
         onSelectSpliceFromCallout: handleSelectSpliceFromCallout,
         onSelectWireFromConnectorPin: handleSelectWireFromConnectorPin,

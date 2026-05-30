@@ -3,6 +3,7 @@ import type { NetworkScopeFormStateModel } from "../useNetworkScopeFormState";
 import type { ValidationModel } from "../useValidationModel";
 import type { AppControllerPreferencesStateModel } from "../useAppControllerPreferencesState";
 import type { AppControllerCanvasDisplayStateModel } from "../useAppControllerCanvasDisplayState";
+import type { AiSettingsModel } from "../useAiSettings";
 import { useAppControllerAuxScreenContentDomains } from "./useAppControllerAuxScreenContentDomains";
 
 type AuxDomainsParams = Parameters<typeof useAppControllerAuxScreenContentDomains>[0];
@@ -55,6 +56,7 @@ interface UseAppControllerAuxDomainAssemblyParams {
     configuredResetZoomPercent: number;
     handleZoomAction: (target: "in" | "out" | "reset") => void;
     resetWorkspacePreferencesToDefaults: () => void;
+    aiSettings: AiSettingsModel;
   };
   includeNetworkScopeContent: boolean;
   includeValidationContent: boolean;
@@ -118,7 +120,8 @@ export function useAppControllerAuxDomainAssembly({
       canvasDisplay: settings.canvasDisplayState,
       configuredResetZoomPercent: settings.configuredResetZoomPercent,
       handleZoomAction: settings.handleZoomAction,
-      resetWorkspacePreferencesToDefaults: settings.resetWorkspacePreferencesToDefaults
+      resetWorkspacePreferencesToDefaults: settings.resetWorkspacePreferencesToDefaults,
+      aiSettings: settings.aiSettings
     },
     includeNetworkScopeContent,
     includeValidationContent,

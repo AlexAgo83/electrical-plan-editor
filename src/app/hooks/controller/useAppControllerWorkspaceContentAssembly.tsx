@@ -10,6 +10,9 @@ import type { EntityFormsStateModel } from "../useEntityFormsState";
 import type { NetworkScopeFormStateModel } from "../useNetworkScopeFormState";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
 import type { ValidationModel } from "../useValidationModel";
+import type { AiSettingsModel } from "../useAiSettings";
+import { ModelingAiAgentPanel } from "../../components/workspace/ModelingAiAgentPanel";
+import type { AiProviderReadiness } from "../../lib/aiSettings";
 import type { AppControllerModelingHandlersAssemblyModel } from "./useAppControllerModelingHandlersAssembly";
 import type { AppControllerWorkspaceNetworkDomainAssemblyModel } from "./useAppControllerWorkspaceNetworkDomainAssembly";
 import type { AppControllerCatalogAnalysisActionsModel } from "./useAppControllerCatalogAnalysisActions";
@@ -74,6 +77,10 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     configuredResetZoomPercent: AuxDomainsParams["settings"]["configuredResetZoomPercent"];
     networkCount: number;
     networkTechnicalIdAlreadyUsed: boolean;
+    isAiAgentModelingOpen: boolean;
+    isAiAgentReady: boolean;
+    aiAgentDisabledReason: string;
+    aiProviderReadiness: AiProviderReadiness;
   };
   entities: {
     entityCountBySubScreen: NetworkSummaryParams["entityCountBySubScreen"];
@@ -115,6 +122,7 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     validationModel: ValidationModel;
     networkScopeFormState: NetworkScopeFormStateModel;
     catalogHandlers: CatalogHandlersModel;
+    aiSettings: AiSettingsModel;
   };
   domains: {
     workspaceNetworkDomain: AppControllerWorkspaceNetworkDomainAssemblyModel;
@@ -130,6 +138,8 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     setActiveSubScreen: (subScreen: SubScreenId) => void;
     setInteractionMode: HomeWorkspaceParams["setInteractionMode"];
     handleWorkspaceScreenChange: (targetScreen: ScreenId) => void;
+    handleOpenSettingsScreen: () => void;
+    handleOpenAiAgent: () => void;
     openFullOnboarding: HomeWorkspaceParams["onOpenOnboardingHelp"];
     openSingleStepOnboarding: ModelingAnalysisParams["openSingleStepOnboarding"];
     markDetailPanelsSelectionSourceAsTable: () => void;
@@ -199,6 +209,10 @@ export function useAppControllerWorkspaceContentAssembly({
     handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange,
     entityCountBySubScreen: entities.entityCountBySubScreen,
     onQuickEntityNavigation: handlers.setActiveSubScreen,
+    isAiAgentOpen: state.isAiAgentModelingOpen,
+    isAiAgentReady: state.isAiAgentReady,
+    aiAgentDisabledReason: state.aiAgentDisabledReason,
+    onOpenAiAgent: handlers.handleOpenAiAgent,
     activeNetwork: state.activeNetwork,
     nodes: entities.nodes,
     segments: entities.segments,
@@ -442,19 +456,31 @@ export function useAppControllerWorkspaceContentAssembly({
         canvasDisplayState: models.canvasDisplayState,
         configuredResetZoomPercent: state.configuredResetZoomPercent,
         handleZoomAction: domains.canvasInteractionDomain.handleZoomAction,
-        resetWorkspacePreferencesToDefaults: domains.workspaceNetworkDomain.resetWorkspacePreferencesToDefaults
+        resetWorkspacePreferencesToDefaults: domains.workspaceNetworkDomain.resetWorkspacePreferencesToDefaults,
+        aiSettings: models.aiSettings
       },
       includeNetworkScopeContent: state.isNetworkScopeScreen,
       includeValidationContent: state.hasActiveNetwork && state.isValidationScreen,
       includeSettingsContent: state.isSettingsScreen
     });
 
+  const aiAgentWorkspaceContent = state.isAiAgentModelingOpen ? (
+    <ModelingAiAgentPanel providerReadiness={state.aiProviderReadiness} onOpenSettings={handlers.handleOpenSettingsScreen} />
+  ) : null;
+
+  const modelingLeftColumnContentForActiveMode = state.isAiAgentModelingOpen
+    ? aiAgentWorkspaceContent
+    : modelingLeftColumnContentForSubScreen;
+
   const modelingFormsColumnContentForLayout =
-    isModelingBatchModeActive || state.hasTableSelectionForActiveSubScreen || state.hasActiveEntityForm || state.isCatalogSubScreen
+    !state.isAiAgentModelingOpen &&
+    (isModelingBatchModeActive || state.hasTableSelectionForActiveSubScreen || state.hasActiveEntityForm || state.isCatalogSubScreen)
       ? modelingFormsColumnContentForSubScreen
       : null;
 
-  const analysisWorkspaceContentForLayout = state.isCatalogSubScreen
+  const analysisWorkspaceContentForLayout = state.isAiAgentModelingOpen
+    ? null
+    : state.isCatalogSubScreen
     ? analysisWorkspaceContentForSubScreen
     : state.hasTableSelectionForActiveSubScreen ||
         (state.isModelingScreen && state.hasInspectableSelectionForActiveSubScreen)
@@ -464,7 +490,7 @@ export function useAppControllerWorkspaceContentAssembly({
   return {
     homeWorkspaceContent,
     networkSummaryPanel,
-    modelingLeftColumnContentForSubScreen,
+    modelingLeftColumnContentForSubScreen: modelingLeftColumnContentForActiveMode,
     modelingFormsColumnContentForLayout,
     analysisWorkspaceContentForLayout,
     networkScopeWorkspaceContent,

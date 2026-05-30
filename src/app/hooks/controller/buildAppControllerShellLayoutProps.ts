@@ -48,8 +48,12 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "isAnalysisScreen"
     | "isValidationScreen"
     | "entityCountBySubScreen"
+    | "isAiAgentOpen"
+    | "isAiAgentReady"
+    | "aiAgentDisabledReason"
     | "onScreenChange"
     | "onSubScreenChange"
+    | "onOpenAiAgent"
   >;
   operations: Pick<
     AppShellLayoutProps,

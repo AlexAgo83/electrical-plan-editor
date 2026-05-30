@@ -126,6 +126,10 @@ export interface NetworkSummaryPanelProps {
   activeSubScreen: SubScreenId;
   entityCountBySubScreen: Record<SubScreenId, number>;
   onQuickEntityNavigation: (subScreen: SubScreenId) => void;
+  isAiAgentOpen?: boolean;
+  isAiAgentReady?: boolean;
+  aiAgentDisabledReason?: string;
+  onOpenAiAgent?: () => void;
   onSelectConnectorFromCallout: (connectorId: ConnectorId) => void;
   onSelectSpliceFromCallout: (spliceId: SpliceId) => void;
   onSelectWireFromConnectorPin: (wireId: Wire["id"]) => void;

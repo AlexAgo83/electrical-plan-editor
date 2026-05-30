@@ -60,6 +60,7 @@ import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
 import { useAppLocaleDomTranslation } from "./hooks/useAppLocaleDomTranslation";
 import { useHoverDescriptionTitles } from "./hooks/useHoverDescriptionTitles";
 import { useToastNotifications } from "./hooks/useToastNotifications";
+import { useAiSettings } from "./hooks/useAiSettings";
 import { useAppControllerUiPreferencesBindings } from "./hooks/controller/useAppControllerUiPreferencesBindings";
 import { buildAppControllerNamespacedCanvasState } from "./hooks/useAppControllerNamespacedCanvasState";
 import { buildAppControllerNamespacedFormsState } from "./hooks/useAppControllerNamespacedFormsState";
@@ -183,6 +184,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isSettingsScreen,
     activeScreenRef
   } = useWorkspaceNavigation();
+  const [isAiAgentModelingOpen, setIsAiAgentModelingOpen] = useState(false);
+  const aiSettings = useAiSettings();
   const [isModelingAnalysisFocused, setIsModelingAnalysisFocused] = useState(false);
   const [lastAnalysisSubScreen, setLastAnalysisSubScreen] = useState<"connector" | "splice" | "node" | "segment" | "wire">("wire");
   const [detailPanelsSelectionSource, setDetailPanelsSelectionSource] = useState<"table" | "external">("external");
@@ -217,6 +220,23 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     operationsButtonRef,
     deferredInstallPromptRef
   });
+  const handleSubScreenChange = useCallback(
+    (subScreen: SubScreenId) => {
+      setIsAiAgentModelingOpen(false);
+      setActiveSubScreen(subScreen);
+    },
+    [setActiveSubScreen]
+  );
+  const handleOpenAiAgent = useCallback(() => {
+    if (!aiSettings.readiness.isReady) {
+      return;
+    }
+    setActiveScreen("modeling");
+    setIsAiAgentModelingOpen(true);
+  }, [aiSettings.readiness.isReady, setActiveScreen]);
+  const aiAgentDisabledReason = aiSettings.readiness.isReady
+    ? "AI Agent is ready."
+    : `${aiSettings.readiness.message} Configure a valid provider in Settings.`;
   const networkScalePercent = Math.round(networkScale * 100);
   const {
     connectorTechnicalIdAlreadyUsed,
@@ -866,7 +886,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       workspaceCurrencyCode,
       configuredResetZoomPercent,
       networkCount: networks.length,
-      networkTechnicalIdAlreadyUsed
+      networkTechnicalIdAlreadyUsed,
+      isAiAgentModelingOpen,
+      isAiAgentReady: aiSettings.readiness.isReady,
+      aiAgentDisabledReason,
+      aiProviderReadiness: aiSettings.readiness
     },
     entities: {
       entityCountBySubScreen,
@@ -907,7 +931,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       selectionEntities,
       validationModel,
       networkScopeFormState,
-      catalogHandlers
+      catalogHandlers,
+      aiSettings
     },
     domains: {
       workspaceNetworkDomain,
@@ -920,9 +945,11 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       requestConfirmation,
       replaceStateWithHistory,
       setActiveScreen,
-      setActiveSubScreen,
+      setActiveSubScreen: handleSubScreenChange,
       setInteractionMode,
       handleWorkspaceScreenChange,
+      handleOpenSettingsScreen,
+      handleOpenAiAgent,
       openFullOnboarding,
       openSingleStepOnboarding,
       markDetailPanelsSelectionSourceAsTable,
@@ -980,8 +1007,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isAnalysisScreen,
       isValidationScreen,
       entityCountBySubScreen,
+      isAiAgentOpen: isAiAgentModelingOpen,
+      isAiAgentReady: aiSettings.readiness.isReady,
+      aiAgentDisabledReason,
       onScreenChange: handleWorkspaceDrawerScreenChange,
-      onSubScreenChange: setActiveSubScreen
+      onSubScreenChange: handleSubScreenChange,
+      onOpenAiAgent: handleOpenAiAgent
     },
     operations: {
       handleUndo,

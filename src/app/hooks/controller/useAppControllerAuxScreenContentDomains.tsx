@@ -3,6 +3,7 @@ import type { AppControllerPreferencesStateModel } from "../useAppControllerPref
 import type { NetworkImportExportModel } from "../useNetworkImportExport";
 import type { NetworkScopeFormStateModel } from "../useNetworkScopeFormState";
 import type { ValidationModel } from "../useValidationModel";
+import type { AiSettingsModel } from "../useAiSettings";
 import {
   buildNetworkScopeScreenContentSlice,
   buildSettingsScreenContentSlice,
@@ -62,6 +63,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     configuredResetZoomPercent: SettingsSliceParams["configuredResetZoomPercent"];
     handleZoomAction: SettingsSliceParams["handleZoomAction"];
     resetWorkspacePreferencesToDefaults: SettingsSliceParams["resetWorkspacePreferencesToDefaults"];
+    aiSettings: AiSettingsModel;
   };
   includeNetworkScopeContent: boolean;
   includeValidationContent: boolean;
@@ -271,7 +273,8 @@ export function useAppControllerAuxScreenContentDomains({
     setWorkspacePanelsLayoutMode: settings.prefs.setWorkspacePanelsLayoutMode,
     workspaceWideScreen: settings.prefs.workspaceWideScreen,
     setWorkspaceWideScreen: settings.prefs.setWorkspaceWideScreen,
-    resetWorkspacePreferencesToDefaults: settings.resetWorkspacePreferencesToDefaults
+    resetWorkspacePreferencesToDefaults: settings.resetWorkspacePreferencesToDefaults,
+    aiSettings: settings.aiSettings
       })
     : null;
 

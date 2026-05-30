@@ -153,6 +153,10 @@ export function NetworkSummaryPanel({
   activeSubScreen,
   entityCountBySubScreen,
   onQuickEntityNavigation,
+  isAiAgentOpen = false,
+  isAiAgentReady = false,
+  aiAgentDisabledReason,
+  onOpenAiAgent,
   onSelectConnectorFromCallout,
   onSelectSpliceFromCallout,
   onSelectWireFromConnectorPin,
@@ -844,6 +848,10 @@ export function NetworkSummaryPanel({
         activeSubScreen={activeSubScreen}
         entityCountBySubScreen={entityCountBySubScreen}
         onQuickEntityNavigation={onQuickEntityNavigation}
+        isAiAgentOpen={isAiAgentOpen}
+        isAiAgentReady={isAiAgentReady}
+        aiAgentDisabledReason={aiAgentDisabledReason}
+        onOpenAiAgent={onOpenAiAgent}
       />
       <section className="panel">
         <header className="network-summary-header">

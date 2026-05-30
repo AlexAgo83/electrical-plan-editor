@@ -4,6 +4,8 @@ import { ImportOverwriteDialog } from "../dialogs/ImportOverwriteDialog";
 import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
 import { THEME_MODE_OPTIONS } from "../../lib/themeModes";
+import { getAiProviderLabel, type AiProviderId } from "../../lib/aiSettings";
+import type { AiSettingsModel } from "../../hooks/useAiSettings";
 import type {
   AppLocale,
   CanvasCalloutTextSize,
@@ -144,6 +146,7 @@ interface SettingsWorkspaceContentProps {
   importOverwriteDialog?: import("../../hooks/useNetworkImportExport").ImportOverwriteDialogModel | null;
   handleExportGroupedBom?: (networkIds: NetworkId[]) => void;
   handleExportGroupedSvg?: (networkIds: NetworkId[]) => void;
+  aiSettings: AiSettingsModel;
 }
 
 export function SettingsWorkspaceContent({
@@ -264,10 +267,108 @@ export function SettingsWorkspaceContent({
   resetWorkspacePreferencesToDefaults,
   importOverwriteDialog = null,
   handleExportGroupedBom,
-  handleExportGroupedSvg
+  handleExportGroupedSvg,
+  aiSettings
 }: SettingsWorkspaceContentProps): ReactElement {
+  const activeAiProviderConfig = aiSettings.settings.providers[aiSettings.settings.provider];
   return (
     <section className="panel-grid settings-panel-grid">
+      <section className="panel settings-panel" data-onboarding-panel="settings-ai-provider">
+        <header className="settings-panel-header">
+          <h2>AI provider</h2>
+          <span className="settings-panel-chip">AI</span>
+        </header>
+        <p className="settings-panel-intro">
+          Configure the local provider used by the Modeling AI Agent. API keys are stored locally in this browser.
+        </p>
+        <div className="settings-state-row" aria-label="AI provider status">
+          <span className={aiSettings.readiness.isReady ? "settings-state-chip is-ok" : "settings-state-chip is-warn"}>
+            {aiSettings.readiness.isReady ? "Ready" : "Not ready"}
+          </span>
+          <span className="settings-state-chip">{aiSettings.readiness.message}</span>
+        </div>
+        <div className="settings-grid">
+          <label className="settings-field">
+            Provider
+            <select
+              value={aiSettings.settings.provider}
+              onChange={(event) => aiSettings.setProvider(event.target.value as AiProviderId)}
+            >
+              <option value="openai">OpenAI</option>
+              <option value="gemini">Gemini</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            Model
+            <input
+              type="text"
+              value={activeAiProviderConfig.model}
+              onChange={(event) => aiSettings.updateProviderConfig(aiSettings.settings.provider, { model: event.target.value })}
+              placeholder={aiSettings.settings.provider === "openai" ? "gpt-4.1-mini" : "gemini-2.0-flash"}
+            />
+          </label>
+          <label className="settings-field">
+            API key
+            <input
+              type="password"
+              value={activeAiProviderConfig.apiKey}
+              onChange={(event) => aiSettings.updateProviderConfig(aiSettings.settings.provider, { apiKey: event.target.value })}
+              placeholder={`${getAiProviderLabel(aiSettings.settings.provider)} API key`}
+              autoComplete="off"
+            />
+          </label>
+          <label className="settings-field">
+            Endpoint
+            <input
+              type="url"
+              value={activeAiProviderConfig.endpoint}
+              onChange={(event) => aiSettings.updateProviderConfig(aiSettings.settings.provider, { endpoint: event.target.value })}
+            />
+          </label>
+          <label className="settings-field">
+            Timeout (ms)
+            <input
+              type="number"
+              min={5000}
+              max={120000}
+              step={1000}
+              value={String(aiSettings.settings.timeoutMs)}
+              onChange={(event) => {
+                const parsed = Number(event.target.value);
+                if (!Number.isFinite(parsed)) {
+                  return;
+                }
+                aiSettings.setTimeoutMs(Math.min(120000, Math.max(5000, Math.round(parsed))));
+              }}
+            />
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={aiSettings.settings.strictMode}
+              onChange={(event) => aiSettings.setStrictMode(event.target.checked)}
+            />
+            Strict structured output mode
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={aiSettings.settings.experimentalDirectExecutionEnabled}
+              onChange={(event) => aiSettings.setExperimentalDirectExecutionEnabled(event.target.checked)}
+            />
+            Enable experimental direct execution
+          </label>
+        </div>
+        <div className="row-actions settings-actions">
+          <button type="button" disabled>
+            Test connection
+          </button>
+        </div>
+        <p className="meta-line">
+          Connection testing and live provider calls are intentionally disabled until the operation contract is wired.
+        </p>
+      </section>
+
       <section className="panel settings-panel">
         <header className="settings-panel-header">
           <h2>Canvas render preferences</h2>

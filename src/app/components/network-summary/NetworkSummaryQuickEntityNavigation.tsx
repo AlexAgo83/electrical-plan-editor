@@ -6,6 +6,10 @@ interface NetworkSummaryQuickEntityNavigationProps {
   activeSubScreen: SubScreenId;
   entityCountBySubScreen: Record<SubScreenId, number>;
   onQuickEntityNavigation: (subScreen: SubScreenId) => void;
+  isAiAgentOpen?: boolean;
+  isAiAgentReady?: boolean;
+  aiAgentDisabledReason?: string;
+  onOpenAiAgent?: () => void;
   variant?: "panel" | "header";
 }
 
@@ -44,6 +48,10 @@ export function NetworkSummaryQuickEntityNavigation({
   activeSubScreen,
   entityCountBySubScreen,
   onQuickEntityNavigation,
+  isAiAgentOpen = false,
+  isAiAgentReady = false,
+  aiAgentDisabledReason = "Configure a valid AI provider in Settings.",
+  onOpenAiAgent,
   variant = "panel"
 }: NetworkSummaryQuickEntityNavigationProps): ReactElement {
   const sectionClassName =
@@ -78,6 +86,19 @@ export function NetworkSummaryQuickEntityNavigation({
             <span className="filter-chip-count">{entityCountBySubScreen[item.subScreen]}</span>
           </button>
         ))}
+        {quickEntityNavigationMode === "modeling" ? (
+          <button
+            type="button"
+            className={isAiAgentOpen ? "filter-chip is-active" : "filter-chip"}
+            onClick={onOpenAiAgent}
+            aria-pressed={isAiAgentOpen}
+            disabled={!isAiAgentReady || onOpenAiAgent === undefined}
+            title={isAiAgentReady ? "Open AI Agent" : aiAgentDisabledReason}
+          >
+            <span className="action-button-icon network-summary-quick-entity-nav-icon is-ai-agent" aria-hidden="true" />
+            <span className="network-summary-quick-entity-nav-label">AI Agent</span>
+          </button>
+        ) : null}
       </div>
     </section>
   );

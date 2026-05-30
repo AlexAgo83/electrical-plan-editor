@@ -10,8 +10,12 @@ interface WorkspaceNavigationProps {
   validationIssuesCount: number;
   validationErrorCount: number;
   entityCountBySubScreen: Record<SubScreenId, number>;
+  isAiAgentOpen?: boolean;
+  isAiAgentReady?: boolean;
+  aiAgentDisabledReason?: string;
   onScreenChange: (screen: ScreenId) => void;
   onSubScreenChange: (subScreen: SubScreenId) => void;
+  onOpenAiAgent?: () => void;
 }
 
 export function WorkspaceNavigation({
@@ -23,8 +27,12 @@ export function WorkspaceNavigation({
   validationIssuesCount,
   validationErrorCount,
   entityCountBySubScreen,
+  isAiAgentOpen = false,
+  isAiAgentReady = false,
+  aiAgentDisabledReason = "Configure a valid AI provider in Settings.",
   onScreenChange,
-  onSubScreenChange
+  onSubScreenChange,
+  onOpenAiAgent
 }: WorkspaceNavigationProps): ReactElement {
   const validationCounterDescription = `${validationIssuesCount} issue${validationIssuesCount === 1 ? "" : "s"}${
     validationErrorCount > 0
@@ -125,6 +133,21 @@ export function WorkspaceNavigation({
                 </span>
               </button>
             ))}
+            {!isAnalysisScreen ? (
+              <button
+                type="button"
+                className={isAiAgentOpen ? "workspace-tab is-active" : "workspace-tab"}
+                onClick={onOpenAiAgent}
+                aria-description={isAiAgentReady ? "AI Agent modeling workspace" : aiAgentDisabledReason}
+                disabled={!isAiAgentReady || onOpenAiAgent === undefined}
+                title={isAiAgentReady ? "Open AI Agent" : aiAgentDisabledReason}
+              >
+                <span className="workspace-tab-content">
+                  <span className="action-button-icon is-ai-agent" aria-hidden="true" />
+                  <span>AI Agent</span>
+                </span>
+              </button>
+            ) : null}
           </div>
         </section>
       ) : null}
@@ -138,8 +161,8 @@ export function WorkspaceNavigation({
           : isModelingScreen || isAnalysisScreen
           ? "Modeling workspace: entity editor, operational lists, and analysis panels."
           : isValidationScreen
-              ? "Validation center: grouped model integrity issues with one-click navigation."
-              : "Settings workspace: workspace preferences and project-level options."}
+          ? "Validation center: grouped model integrity issues with one-click navigation."
+          : "Settings workspace: workspace preferences and project-level options."}
       </p>
     </section>
   );

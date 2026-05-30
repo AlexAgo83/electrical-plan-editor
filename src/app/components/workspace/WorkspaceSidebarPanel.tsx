@@ -11,8 +11,12 @@ interface WorkspaceSidebarPanelProps {
   validationIssuesCount: number;
   validationErrorCount: number;
   entityCountBySubScreen: Record<SubScreenId, number>;
+  isAiAgentOpen?: boolean;
+  isAiAgentReady?: boolean;
+  aiAgentDisabledReason?: string;
   onScreenChange: (screen: ScreenId) => void;
   onSubScreenChange: (subScreen: SubScreenId) => void;
+  onOpenAiAgent?: () => void;
 }
 
 export function WorkspaceSidebarPanel({
@@ -24,8 +28,12 @@ export function WorkspaceSidebarPanel({
   validationIssuesCount,
   validationErrorCount,
   entityCountBySubScreen,
+  isAiAgentOpen,
+  isAiAgentReady,
+  aiAgentDisabledReason,
   onScreenChange,
-  onSubScreenChange
+  onSubScreenChange,
+  onOpenAiAgent
 }: WorkspaceSidebarPanelProps): ReactElement {
   return (
     <aside className="workspace-sidebar">
@@ -38,8 +46,12 @@ export function WorkspaceSidebarPanel({
         validationIssuesCount={validationIssuesCount}
         validationErrorCount={validationErrorCount}
         entityCountBySubScreen={entityCountBySubScreen}
+        isAiAgentOpen={isAiAgentOpen}
+        isAiAgentReady={isAiAgentReady}
+        aiAgentDisabledReason={aiAgentDisabledReason}
         onScreenChange={onScreenChange}
         onSubScreenChange={onSubScreenChange}
+        onOpenAiAgent={onOpenAiAgent}
       />
     </aside>
   );

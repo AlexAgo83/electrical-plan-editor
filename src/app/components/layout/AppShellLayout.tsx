@@ -68,8 +68,12 @@ interface AppShellLayoutProps {
   isAnalysisScreen: WorkspaceSidebarPanelProps["isAnalysisScreen"];
   isValidationScreen: WorkspaceSidebarPanelProps["isValidationScreen"];
   entityCountBySubScreen: WorkspaceSidebarPanelProps["entityCountBySubScreen"];
+  isAiAgentOpen: boolean;
+  isAiAgentReady: boolean;
+  aiAgentDisabledReason: string;
   onScreenChange: WorkspaceSidebarPanelProps["onScreenChange"];
   onSubScreenChange: WorkspaceSidebarPanelProps["onSubScreenChange"];
+  onOpenAiAgent: () => void;
   handleUndo: OperationsHealthPanelProps["handleUndo"];
   handleRedo: OperationsHealthPanelProps["handleRedo"];
   isUndoAvailable: OperationsHealthPanelProps["isUndoAvailable"];
@@ -153,8 +157,12 @@ export function AppShellLayout({
   isAnalysisScreen,
   isValidationScreen,
   entityCountBySubScreen,
+  isAiAgentOpen,
+  isAiAgentReady,
+  aiAgentDisabledReason,
   onScreenChange,
   onSubScreenChange,
+  onOpenAiAgent,
   handleUndo,
   handleRedo,
   isUndoAvailable,
@@ -311,6 +319,10 @@ export function AppShellLayout({
       activeSubScreen={activeSubScreen}
       entityCountBySubScreen={entityCountBySubScreen}
       onQuickEntityNavigation={onSubScreenChange}
+      isAiAgentOpen={isAiAgentOpen}
+      isAiAgentReady={isAiAgentReady}
+      aiAgentDisabledReason={aiAgentDisabledReason}
+      onOpenAiAgent={onOpenAiAgent}
     />
   );
   const headerCenterContent = shouldMountDockedEntityNavigation ? (
@@ -455,6 +467,9 @@ export function AppShellLayout({
             validationIssuesCount={validationIssuesCount}
             validationErrorCount={validationErrorCount}
             entityCountBySubScreen={entityCountBySubScreen}
+            isAiAgentOpen={isAiAgentOpen}
+            isAiAgentReady={isAiAgentReady}
+            aiAgentDisabledReason={aiAgentDisabledReason}
             onScreenChange={(screen) => {
               onScreenChange(screen);
               if (screen !== "modeling") {
@@ -463,6 +478,10 @@ export function AppShellLayout({
             }}
             onSubScreenChange={(subScreen) => {
               onSubScreenChange(subScreen);
+              closeNavigationDrawer();
+            }}
+            onOpenAiAgent={() => {
+              onOpenAiAgent();
               closeNavigationDrawer();
             }}
           />

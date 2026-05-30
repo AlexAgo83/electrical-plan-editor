@@ -137,6 +137,11 @@
   mask: url("/icons/ico_wires.svg") center / contain no-repeat;
 }
 
+.action-button-icon.is-ai-agent {
+  -webkit-mask: url("/icons/settings.svg") center / contain no-repeat;
+  mask: url("/icons/settings.svg") center / contain no-repeat;
+}
+
 .action-button-icon.is-validation {
   -webkit-mask: url("/icons/health.svg") center / contain no-repeat;
   mask: url("/icons/health.svg") center / contain no-repeat;

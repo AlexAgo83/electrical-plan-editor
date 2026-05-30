@@ -200,6 +200,32 @@ describe("App integration UI - settings", () => {
     expect(within(document.body).queryByRole("heading", { name: "No active network" })).not.toBeInTheDocument();
   });
 
+  it("configures AI provider readiness and gates the Modeling AI Agent entry", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("modeling");
+    const quickEntityNavigation = screen.getByRole("region", { name: "Quick entity navigation" });
+    const disabledAiAgentButton = within(quickEntityNavigation).getByRole("button", { name: "AI Agent" });
+    expect(disabledAiAgentButton).toBeDisabled();
+
+    switchScreenDrawerAware("settings");
+    const aiProviderPanel = getPanelByHeading("AI provider");
+    expect(within(aiProviderPanel).getByText("OpenAI API key is required.")).toBeInTheDocument();
+    fireEvent.change(within(aiProviderPanel).getByLabelText("API key"), {
+      target: { value: "sk-local-test" }
+    });
+    expect(within(aiProviderPanel).getByText("OpenAI provider is ready.")).toBeInTheDocument();
+
+    switchScreenDrawerAware("modeling");
+    const enabledAiAgentButton = within(screen.getByRole("region", { name: "Quick entity navigation" })).getByRole("button", {
+      name: "AI Agent"
+    });
+    expect(enabledAiAgentButton).toBeEnabled();
+    fireEvent.click(enabledAiAgentButton);
+    expect(screen.getByRole("heading", { name: "AI Agent" })).toBeInTheDocument();
+    expect(screen.getByText("Provider ready")).toBeInTheDocument();
+  });
+
   it("keeps settings and import/export controls operable on mobile baseline viewports", async () => {
     await withViewportSize({ width: 390, height: 844 }, async () => {
       const rendered = renderAppWithState(createUiIntegrationState());
