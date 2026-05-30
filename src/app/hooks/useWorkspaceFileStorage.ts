@@ -469,8 +469,16 @@ export function useWorkspaceFileStorage({
         const previousPayload = lastLoadedPayloadRef.current;
         if (!options?.ignoreConflict && previousPayload !== null) {
           const currentFile = parseWorkspaceFilePayload(await readHandleText(handle));
+          if (currentFile.payload === null) {
+            setStatusBase((current) => ({
+              ...current,
+              conflict: true,
+              isSaving: false,
+              message: "The linked workspace file could not be read as a valid workspace. Choose which version to keep before overwriting it."
+            }));
+            return "conflict";
+          }
           if (
-            currentFile.payload !== null &&
             currentFile.payload.revisionId !== previousPayload.revisionId
           ) {
             setStatusBase((current) => ({

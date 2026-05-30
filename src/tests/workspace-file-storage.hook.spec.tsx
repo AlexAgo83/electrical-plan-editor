@@ -112,4 +112,60 @@ describe("useWorkspaceFileStorage", () => {
     });
     expect(linkedCreateWritable).not.toHaveBeenCalled();
   });
+
+  it("does not overwrite a linked file that no longer parses as a workspace", async () => {
+    const state = createSampleNetworkState();
+    const payload = buildWorkspaceFilePayload(state, null, "2026-05-30T09:00:00.000Z");
+    const linkedCreateWritable = vi.fn(() =>
+      Promise.resolve({
+        write: vi.fn(),
+        close: vi.fn()
+      })
+    );
+    const linkedHandle = {
+      name: "linked.epe.json",
+      getFile: vi
+        .fn()
+        .mockResolvedValueOnce({
+          text: () => Promise.resolve(serializeWorkspaceFilePayload(payload))
+        } as File)
+        .mockResolvedValue({
+          text: () => Promise.resolve("{")
+        } as File),
+      createWritable: linkedCreateWritable,
+      queryPermission: vi.fn(() => Promise.resolve("granted" as const)),
+      requestPermission: vi.fn(() => Promise.resolve("granted" as const))
+    };
+    const store = createAppStore(state);
+
+    Object.defineProperty(window, "showOpenFilePicker", {
+      configurable: true,
+      writable: true,
+      value: vi.fn(() => Promise.resolve([linkedHandle]))
+    });
+
+    const { result } = renderHook(() =>
+      useWorkspaceFileStorage({
+        store,
+        replaceStateWithHistory: store.replaceState,
+        requestConfirmation: vi.fn(() => Promise.resolve(true)),
+        notifyToast: vi.fn()
+      })
+    );
+
+    act(() => {
+      result.current.openWorkspaceFile();
+    });
+    await waitFor(() => expect(result.current.workspaceFileStatus.mode).toBe("linked"));
+
+    act(() => {
+      result.current.saveWorkspaceFileNow();
+    });
+
+    await waitFor(() => expect(result.current.workspaceFileStatus.conflict).toBe(true));
+    expect(result.current.workspaceFileStatus.message).toBe(
+      "The linked workspace file could not be read as a valid workspace. Choose which version to keep before overwriting it."
+    );
+    expect(linkedCreateWritable).not.toHaveBeenCalled();
+  });
 });

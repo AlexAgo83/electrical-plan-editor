@@ -228,10 +228,7 @@ export function useStoreHistory({
         const next = [...previous, currentState];
         return next.length > historyLimit ? next.slice(next.length - historyLimit) : next;
       });
-      setUndoHistoryEntries((previous) => {
-        const next = [...previous, historyEntry];
-        return next.length > historyLimit ? next.slice(next.length - historyLimit) : next;
-      });
+      setUndoHistoryEntries([historyEntry]);
       setRedoStack([]);
       setRedoHistoryEntries([]);
       onReplaceStateApplied?.();
