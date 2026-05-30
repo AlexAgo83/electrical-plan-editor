@@ -204,6 +204,22 @@ describe("App integration UI - settings", () => {
     expect(within(document.body).queryByRole("heading", { name: "No active network" })).not.toBeInTheDocument();
   });
 
+  it("exposes workspace storage status and file actions in settings", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const workspaceStoragePanel = getPanelByHeading("Workspace storage");
+
+    expect(within(workspaceStoragePanel).getAllByText("Local only").length).toBeGreaterThan(0);
+    expect(within(workspaceStoragePanel).getByText("Local browser cache")).toBeInTheDocument();
+    expect(within(workspaceStoragePanel).getByText("No resumable file")).toBeInTheDocument();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Resume workspace file" })).toBeDisabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Open workspace file" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Relink workspace file" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file now" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file as" })).toBeEnabled();
+  });
+
   it("configures AI provider readiness and gates the Modeling AI Agent entry", async () => {
     renderAppWithState(createUiIntegrationState());
 
