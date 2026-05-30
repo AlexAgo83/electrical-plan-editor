@@ -44,7 +44,8 @@ export type AiAgentSupportedOperation =
   | AiAgentMoveEntityOperation
   | AiAgentPlaceEntityRelativeToEntityOperation
   | AiAgentUpdateEntityOperation
-  | AiAgentRegenerateRouteOperation;
+  | AiAgentRegenerateRouteOperation
+  | AiAgentDeleteEntityOperation;
 
 export interface AiAgentAddConnectorOperation {
   type: "add_connector";
@@ -64,6 +65,7 @@ export interface AiAgentAddSpliceOperation {
 
 export interface AiAgentAddNodeOperation {
   type: "add_node";
+  id?: NodeId;
   label: string;
   position: LayoutNodePosition;
 }
@@ -113,6 +115,12 @@ export interface AiAgentUpdateEntityOperation {
   fields: Record<string, unknown>;
 }
 
+export interface AiAgentDeleteEntityOperation {
+  type: "delete_entity";
+  entityKind: "wire";
+  entityId: string;
+}
+
 export interface AiAgentRegenerateRouteOperation {
   type: "regenerate_route";
   wireIds: WireId[];
@@ -153,6 +161,29 @@ function readPosition(value: unknown): LayoutNodePosition | null {
 
 function readStringArray(value: unknown): string[] | null {
   return Array.isArray(value) && value.every((entry) => typeof entry === "string") ? value : null;
+}
+
+function readOptionalString(value: unknown): string | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+  return typeof value === "string" ? value.trim() : undefined;
+}
+
+function readOptionalBoolean(value: unknown): boolean | undefined {
+  return typeof value === "boolean" ? value : undefined;
+}
+
+function readOptionalPositiveNumber(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : undefined;
+}
+
+function readOptionalRecord(value: unknown): Record<string, unknown> | undefined {
+  return isRecord(value) ? value : undefined;
+}
+
+function readOptionalArray(value: unknown): unknown[] | undefined {
+  return Array.isArray(value) ? value : undefined;
 }
 
 function normalizeEntityReference(value: string): string {
@@ -323,12 +354,120 @@ function readSafeUpdateFields(entityKind: AiAgentUpdateEntityOperation["entityKi
   ) {
     fields.connectionCount = value.connectionCount;
   }
+  if (entityKind === "catalog") {
+    const unitPriceExclTax = readOptionalPositiveNumber(value.unitPriceExclTax);
+    const url = readOptionalString(value.url);
+    const additionalAccessories = readOptionalArray(value.additionalAccessories);
+    const connectorDefaults = readOptionalRecord(value.connectorDefaults);
+    const connectorLayout = readOptionalRecord(value.connectorLayout);
+    if (unitPriceExclTax !== undefined) {
+      fields.unitPriceExclTax = unitPriceExclTax;
+    }
+    if (url !== undefined) {
+      fields.url = url.length > 0 ? url : undefined;
+    }
+    if (additionalAccessories !== undefined) {
+      fields.additionalAccessories = additionalAccessories;
+    }
+    if (connectorDefaults !== undefined) {
+      fields.connectorDefaults = connectorDefaults;
+    }
+    if (connectorLayout !== undefined) {
+      fields.connectorLayout = connectorLayout;
+    }
+  }
   if (
     (entityKind === "connector" || entityKind === "splice" || entityKind === "wire") &&
     typeof value.technicalId === "string" &&
     value.technicalId.trim().length > 0
   ) {
     fields.technicalId = value.technicalId.trim();
+  }
+  if (entityKind === "connector") {
+    const cavityCount = readOptionalPositiveNumber(value.cavityCount);
+    const manufacturerReference = readOptionalString(value.manufacturerReference);
+    const catalogItemId = readOptionalString(value.catalogItemId);
+    const applyCatalogPlugs = readOptionalBoolean(value.applyCatalogPlugs);
+    const applyCatalogSeals = readOptionalBoolean(value.applyCatalogSeals);
+    const terminalOverrides = readOptionalRecord(value.terminalOverrides);
+    if (cavityCount !== undefined && Number.isInteger(cavityCount)) {
+      fields.cavityCount = cavityCount;
+    }
+    if (manufacturerReference !== undefined) {
+      fields.manufacturerReference = manufacturerReference.length > 0 ? manufacturerReference : undefined;
+    }
+    if (catalogItemId !== undefined) {
+      fields.catalogItemId = catalogItemId.length > 0 ? catalogItemId : undefined;
+    }
+    if (applyCatalogPlugs !== undefined) {
+      fields.applyCatalogPlugs = applyCatalogPlugs;
+    }
+    if (applyCatalogSeals !== undefined) {
+      fields.applyCatalogSeals = applyCatalogSeals;
+    }
+    if (terminalOverrides !== undefined) {
+      fields.terminalOverrides = terminalOverrides;
+    }
+  }
+  if (entityKind === "splice") {
+    const portCount = readOptionalPositiveNumber(value.portCount);
+    const manufacturerReference = readOptionalString(value.manufacturerReference);
+    const catalogItemId = readOptionalString(value.catalogItemId);
+    if (portCount !== undefined && Number.isInteger(portCount)) {
+      fields.portCount = portCount;
+    }
+    if (manufacturerReference !== undefined) {
+      fields.manufacturerReference = manufacturerReference.length > 0 ? manufacturerReference : undefined;
+    }
+    if (catalogItemId !== undefined) {
+      fields.catalogItemId = catalogItemId.length > 0 ? catalogItemId : undefined;
+    }
+  }
+  if (entityKind === "wire") {
+    const sectionMm2 = readOptionalPositiveNumber(value.sectionMm2);
+    const currentA = readOptionalPositiveNumber(value.currentA);
+    const twistGroupLabel = readOptionalString(value.twistGroupLabel);
+    const functionalDomainTag = readOptionalString(value.functionalDomainTag);
+    const colorMode = readOptionalString(value.colorMode);
+    const primaryColorId = readOptionalString(value.primaryColorId);
+    const secondaryColorId = readOptionalString(value.secondaryColorId);
+    const freeColorLabel = readOptionalString(value.freeColorLabel);
+    const material = readOptionalString(value.material);
+    const endpointA = parseEndpoint(value.endpointA);
+    const endpointB = parseEndpoint(value.endpointB);
+    if (sectionMm2 !== undefined) {
+      fields.sectionMm2 = sectionMm2;
+    }
+    if (currentA !== undefined) {
+      fields.currentA = currentA;
+    }
+    if (twistGroupLabel !== undefined) {
+      fields.twistGroupLabel = twistGroupLabel.length > 0 ? twistGroupLabel : undefined;
+    }
+    if (functionalDomainTag !== undefined) {
+      fields.functionalDomainTag = functionalDomainTag.length > 0 ? functionalDomainTag : undefined;
+    }
+    if (colorMode === "none" || colorMode === "catalog" || colorMode === "free") {
+      fields.colorMode = colorMode;
+    }
+    if (primaryColorId !== undefined) {
+      fields.primaryColorId = primaryColorId.length > 0 ? primaryColorId : null;
+    }
+    if (secondaryColorId !== undefined) {
+      fields.secondaryColorId = secondaryColorId.length > 0 ? secondaryColorId : null;
+    }
+    if (freeColorLabel !== undefined) {
+      fields.freeColorLabel = freeColorLabel.length > 0 ? freeColorLabel : null;
+    }
+    if (material === "copper" || material === "aluminum") {
+      fields.material = material;
+    }
+    if (endpointA !== null) {
+      fields.endpointA = endpointA;
+    }
+    if (endpointB !== null) {
+      fields.endpointB = endpointB;
+    }
   }
   if (entityKind === "node" && typeof value.label === "string" && value.label.trim().length > 0) {
     fields.label = value.label.trim();
@@ -432,8 +571,15 @@ function parseOperation(
     return reject(operationIndex, "unknown", "Operation type is required.");
   }
 
-  if (type === "delete_entity" || type === "assign_endpoint" || type === "assign_catalog_reference") {
+  if (type === "assign_endpoint" || type === "assign_catalog_reference") {
     return unsupported(operationIndex, type, `${type} is not supported in the V1 AI operation contract.`);
+  }
+  if (type === "delete_entity") {
+    const entityKind = readString(operation.entityKind);
+    const entityId = readString(operation.entityId);
+    return entityKind === "wire" && entityId !== null
+      ? { type, entityKind, entityId }
+      : unsupported(operationIndex, type, "Only wire delete_entity operations are supported in the V1 AI operation contract.");
   }
 
   if (type === "add_connector") {
@@ -457,10 +603,11 @@ function parseOperation(
   }
 
   if (type === "add_node") {
+    const id = readString(operation.id);
     const label = readString(operation.label);
     const position = readPosition(operation.position);
     return label !== null && position !== null
-      ? { type, label, position }
+      ? { type, ...(id === null ? {} : { id: id as NodeId }), label, position }
       : reject(operationIndex, type, "Node creation requires label and position.");
   }
 
@@ -703,6 +850,12 @@ function normalizeOperationEntityReferences(state: AppState, operation: AiAgentS
       wireIds: operation.wireIds.map((wireId) => resolveEntityId(state, "wire", wireId) as WireId)
     };
   }
+  if (operation.type === "delete_entity") {
+    return {
+      ...operation,
+      entityId: resolveEntityId(state, operation.entityKind, operation.entityId)
+    };
+  }
   return operation;
 }
 
@@ -725,10 +878,13 @@ function permissionForOperation(operation: AiAgentSupportedOperation): keyof AiA
   if (operation.type === "update_entity") {
     return "update";
   }
+  if (operation.type === "delete_entity") {
+    return "delete";
+  }
   return "route";
 }
 
-function entityExists(state: AppState, operation: AiAgentSupportedOperation): boolean {
+function entityExists(state: AppState, operation: AiAgentSupportedOperation, prospectiveNodeIds: Set<string>): boolean {
   const endpointExists = (endpoint: WireEndpoint): boolean => {
     if (endpoint.kind === "connectorCavity") {
       const connector = state.connectors.byId[endpoint.connectorId];
@@ -737,14 +893,20 @@ function entityExists(state: AppState, operation: AiAgentSupportedOperation): bo
     const splice = state.splices.byId[endpoint.spliceId];
     return splice !== undefined && Number.isInteger(endpoint.portIndex) && endpoint.portIndex >= 1 && endpoint.portIndex <= splice.portCount;
   };
+  if (operation.type === "add_node") {
+    return operation.id === undefined || state.nodes.byId[operation.id] === undefined;
+  }
   if (operation.type === "add_segment") {
-    return state.nodes.byId[operation.nodeA] !== undefined && state.nodes.byId[operation.nodeB] !== undefined;
+    return prospectiveNodeIds.has(operation.nodeA) && prospectiveNodeIds.has(operation.nodeB);
   }
   if (operation.type === "add_wire") {
     return endpointExists(operation.endpointA) && endpointExists(operation.endpointB);
   }
   if (operation.type === "regenerate_route") {
     return operation.wireIds.every((wireId) => state.wires.byId[wireId] !== undefined);
+  }
+  if (operation.type === "delete_entity") {
+    return state.wires.byId[operation.entityId as WireId] !== undefined;
   }
   if (operation.type === "move_entity" || operation.type === "place_entity_relative_to_entity" || operation.type === "update_entity") {
     if (operation.entityKind === "catalog") {
@@ -762,9 +924,57 @@ function entityExists(state: AppState, operation: AiAgentSupportedOperation): bo
     if (operation.entityKind === "segment") {
       return state.segments.byId[operation.entityId as SegmentId] !== undefined;
     }
-    return state.wires.byId[operation.entityId as WireId] !== undefined;
+    if (operation.type !== "update_entity") {
+      return false;
+    }
+    if (state.wires.byId[operation.entityId as WireId] === undefined) {
+      return false;
+    }
+    const endpointA = operation.fields.endpointA as WireEndpoint | undefined;
+    const endpointB = operation.fields.endpointB as WireEndpoint | undefined;
+    return (endpointA === undefined || endpointExists(endpointA)) && (endpointB === undefined || endpointExists(endpointB));
   }
   return true;
+}
+
+function endpointOccupancyConflict(state: AppState, endpoint: WireEndpoint, wireId?: WireId): boolean {
+  const occupant =
+    endpoint.kind === "connectorCavity"
+      ? state.connectorCavityOccupancy[endpoint.connectorId]?.[endpoint.cavityIndex]
+      : state.splicePortOccupancy[endpoint.spliceId]?.[endpoint.portIndex];
+  if (occupant === undefined) {
+    return false;
+  }
+  return wireId === undefined ? true : occupant !== `wire:${wireId}:A` && occupant !== `wire:${wireId}:B`;
+}
+
+function wireEndpointKey(endpoint: WireEndpoint): string {
+  return endpoint.kind === "connectorCavity"
+    ? `connector:${endpoint.connectorId}:${endpoint.cavityIndex}`
+    : `splice:${endpoint.spliceId}:${endpoint.portIndex}`;
+}
+
+function wireEndpointConflictMessage(state: AppState, operation: AiAgentSupportedOperation): string | null {
+  if (operation.type === "add_wire") {
+    return endpointOccupancyConflict(state, operation.endpointA) || endpointOccupancyConflict(state, operation.endpointB)
+      ? "Wire endpoint is already occupied."
+      : null;
+  }
+  if (operation.type !== "update_entity" || operation.entityKind !== "wire") {
+    return null;
+  }
+  const wire = state.wires.byId[operation.entityId as WireId];
+  if (wire === undefined) {
+    return null;
+  }
+  const endpointA = (operation.fields.endpointA as WireEndpoint | undefined) ?? wire.endpointA;
+  const endpointB = (operation.fields.endpointB as WireEndpoint | undefined) ?? wire.endpointB;
+  if (wireEndpointKey(endpointA) === wireEndpointKey(endpointB)) {
+    return "Wire endpoints must be different.";
+  }
+  return endpointOccupancyConflict(state, endpointA, wire.id) || endpointOccupancyConflict(state, endpointB, wire.id)
+    ? "Wire endpoint is already occupied."
+    : null;
 }
 
 function entityReferenceExists(
@@ -791,6 +1001,9 @@ function isWithinSelectionScope(operation: AiAgentSupportedOperation, selection:
   if (operation.type === "regenerate_route") {
     return selection.kind === "wire" && operation.wireIds.includes(selection.id as WireId);
   }
+  if (operation.type === "delete_entity") {
+    return selection.kind === "wire" && operation.entityId === selection.id;
+  }
   return true;
 }
 
@@ -814,6 +1027,8 @@ export function validateAiAgentOperations({
     return result;
   }
 
+  const prospectiveNodeIds = new Set<string>(state.nodes.allIds);
+
   envelope.operations.forEach((operation, operationIndex) => {
     const parsed = parseOperation(operation, operationIndex, selection, instruction);
     if ("status" in parsed) {
@@ -831,7 +1046,7 @@ export function validateAiAgentOperations({
       result.rejected.push(reject(operationIndex, normalized.type, `${permission} permission is disabled.`));
       return;
     }
-    if (!entityExists(state, normalized)) {
+    if (!entityExists(state, normalized, prospectiveNodeIds)) {
       result.rejected.push(reject(operationIndex, normalized.type, "Operation references unknown modeling entities."));
       return;
     }
@@ -849,12 +1064,20 @@ export function validateAiAgentOperations({
       result.rejected.push(reject(operationIndex, normalized.type, "Move operation could not resolve a canvas position."));
       return;
     }
+    const endpointConflictMessage = wireEndpointConflictMessage(state, normalized);
+    if (endpointConflictMessage !== null) {
+      result.rejected.push(reject(operationIndex, normalized.type, endpointConflictMessage));
+      return;
+    }
     if (scope === "currentSelection" && !isWithinSelectionScope(normalized, selection)) {
       result.rejected.push(reject(operationIndex, normalized.type, "Operation is outside the current selection scope."));
       return;
     }
 
     result.accepted.push(normalized);
+    if (normalized.type === "add_node" && normalized.id !== undefined) {
+      prospectiveNodeIds.add(normalized.id);
+    }
   });
 
   return result;

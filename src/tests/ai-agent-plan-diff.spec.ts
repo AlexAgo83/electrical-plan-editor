@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { CatalogItemId, ConnectorId, NetworkId, NodeId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NetworkId, NodeId, SegmentId, WireId } from "../core/entities";
 import { appActions, appReducer, createSampleNetworkState } from "../store";
 import { buildAiAgentContext } from "../app/lib/aiAgentContext";
 import {
@@ -100,12 +100,14 @@ describe("AI agent plan diff", () => {
       wires: [
         ...beforePlan.wires,
         {
-          id: "AI-WIRE-INLET-OBC",
+          id: "AI-WIRE-INLET-OBC" as WireId,
           name: "Inlet to OBC pin bridge",
           technicalId: "H-WIRE-INLET-OBC-P7-P12",
           endpointA: { kind: "connectorCavity" as const, connectorId: "H-C-INLET" as ConnectorId, cavityIndex: 7 },
           endpointB: { kind: "connectorCavity" as const, connectorId: "H-C-OBC" as ConnectorId, cavityIndex: 12 },
           sectionMm2: 0.5,
+          primaryColorId: null,
+          secondaryColorId: null,
           routeSegmentIds: [],
           lengthMm: 0
         }
@@ -120,5 +122,88 @@ describe("AI agent plan diff", () => {
       endpointB: { kind: "connectorCavity", connectorId: "H-C-OBC", cavityIndex: 12 },
       sectionMm2: 0.5
     });
+  });
+
+  it("derives wire updates and wire deletions from modified editable plans", () => {
+    const state = createSampleNetworkState();
+    const beforePlan = buildAiAgentEditablePlan(buildAiAgentContext(state, "activeNetwork"));
+    const modifiedPlan = {
+      ...beforePlan,
+      wires: beforePlan.wires
+        .filter((wire) => wire.id !== ("W-002" as WireId))
+        .map((wire) =>
+          wire.id === ("W-001" as WireId)
+            ? {
+                ...wire,
+                name: "Renamed feed",
+                sectionMm2: 1.5,
+                endpointA: { kind: "connectorCavity" as const, connectorId: "C-SRC" as ConnectorId, cavityIndex: 11 }
+              }
+            : wire
+        )
+    };
+
+    expect(buildAiAgentOperationsFromPlanDiff(beforePlan, modifiedPlan)).toEqual(
+      expect.arrayContaining([
+        {
+          type: "update_entity",
+          entityKind: "wire",
+          entityId: "W-001",
+          fields: {
+            name: "Renamed feed",
+            sectionMm2: 1.5,
+            endpointA: { kind: "connectorCavity", connectorId: "C-SRC", cavityIndex: 11 }
+          }
+        },
+        {
+          type: "delete_entity",
+          entityKind: "wire",
+          entityId: "W-002"
+        }
+      ])
+    );
+  });
+
+  it("derives intermediate node and segment additions from modified editable plans", () => {
+    const state = createSampleNetworkState();
+    const beforePlan = buildAiAgentEditablePlan(buildAiAgentContext(state, "activeNetwork"));
+    const modifiedPlan = {
+      ...beforePlan,
+      nodes: [
+        ...beforePlan.nodes,
+        {
+          id: "AI-NODE-900" as NodeId,
+          kind: "intermediate" as const,
+          label: "AI route point",
+          position: { x: 320, y: 180 }
+        }
+      ],
+      segments: [
+        ...beforePlan.segments,
+        {
+          id: "AI-SEG-900" as SegmentId,
+          nodeA: "N-C-SRC" as NodeId,
+          nodeB: "AI-NODE-900" as NodeId,
+          lengthMm: 40
+        }
+      ]
+    };
+
+    expect(buildAiAgentOperationsFromPlanDiff(beforePlan, modifiedPlan)).toEqual(
+      expect.arrayContaining([
+        {
+          type: "add_node",
+          id: "AI-NODE-900",
+          label: "AI route point",
+          position: { x: 320, y: 180 }
+        },
+        {
+          type: "add_segment",
+          nodeA: "N-C-SRC",
+          nodeB: "AI-NODE-900",
+          lengthMm: 40
+        }
+      ])
+    );
   });
 });

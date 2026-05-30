@@ -89,8 +89,8 @@ describe("AI agent operation contract", () => {
         operations: [
           {
             type: "delete_entity",
-            entityKind: "wire",
-            entityId: "W-001"
+            entityKind: "connector",
+            entityId: "C-SRC"
           },
           {
             type: "unknown_operation"
@@ -102,6 +102,42 @@ describe("AI agent operation contract", () => {
     expect(result.accepted).toHaveLength(0);
     expect(result.rejected).toHaveLength(0);
     expect(result.unsupported.map((issue) => issue.operationType)).toEqual(["delete_entity", "unknown_operation"]);
+  });
+
+  it("accepts wire deletion when delete permission is enabled", () => {
+    const state = createSampleNetworkState();
+    const result = validateAiAgentOperations({
+      state,
+      scope: "currentSelection",
+      selection: {
+        kind: "wire",
+        id: "W-001" as WireId
+      },
+      permissions: {
+        ...DEFAULT_PERMISSIONS,
+        delete: true
+      },
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "delete_entity",
+            entityKind: "wire",
+            entityId: "W-001"
+          }
+        ]
+      }
+    });
+
+    expect(result.rejected).toHaveLength(0);
+    expect(result.unsupported).toHaveLength(0);
+    expect(result.accepted).toEqual([
+      {
+        type: "delete_entity",
+        entityKind: "wire",
+        entityId: "W-001"
+      }
+    ]);
   });
 
   it("rejects operations outside the current selection scope", () => {
@@ -247,6 +283,62 @@ describe("AI agent operation contract", () => {
         technicalId: "H-WIRE-INLET-OBC-P7-P12"
       })
     ]);
+  });
+
+  it("rejects wire endpoint updates that target occupied pins", () => {
+    const state = createSampleNetworkState();
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "update_entity",
+            entityKind: "wire",
+            entityId: "W-001",
+            fields: {
+              endpointA: { kind: "connectorCavity", connectorId: "C-SRC", cavityIndex: 2 }
+            }
+          }
+        ]
+      }
+    });
+
+    expect(result.accepted).toHaveLength(0);
+    expect(result.rejected).toEqual([expect.objectContaining({ message: "Wire endpoint is already occupied." })]);
+  });
+
+  it("accepts added segments that reference earlier added AI nodes", () => {
+    const state = createSampleNetworkState();
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "add_node",
+            id: "AI-NODE-900",
+            label: "AI route point",
+            position: { x: 320, y: 180 }
+          },
+          {
+            type: "add_segment",
+            nodeA: "N-C-SRC",
+            nodeB: "AI-NODE-900",
+            lengthMm: 40
+          }
+        ]
+      }
+    });
+
+    expect(result.rejected).toHaveLength(0);
+    expect(result.accepted.map((operation) => operation.type)).toEqual(["add_node", "add_segment"]);
   });
 
   it("accepts relative moves that reference connector technical IDs", () => {

@@ -1,4 +1,4 @@
-import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../core/entities";
+import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
 import { appActions, appReducer, type AppState } from "../../store";
 import type { AiAgentOperationValidationResult, AiAgentSupportedOperation } from "./aiAgentOperationContract";
 
@@ -24,9 +24,31 @@ function buildNextAiWireId(state: AppState): WireId {
   return `AI-WIRE-${String(index).padStart(3, "0")}` as WireId;
 }
 
+function buildNextAiSegmentId(state: AppState): SegmentId {
+  let index = 1;
+  while (state.segments.byId[`AI-SEG-${String(index).padStart(3, "0")}` as SegmentId] !== undefined) {
+    index += 1;
+  }
+  return `AI-SEG-${String(index).padStart(3, "0")}` as SegmentId;
+}
+
+function isWireEndpoint(value: unknown): value is WireEndpoint {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const endpoint = value as Partial<WireEndpoint>;
+  if (endpoint.kind === "connectorCavity") {
+    return typeof endpoint.connectorId === "string" && typeof endpoint.cavityIndex === "number";
+  }
+  if (endpoint.kind === "splicePort") {
+    return typeof endpoint.spliceId === "string" && typeof endpoint.portIndex === "number";
+  }
+  return false;
+}
+
 function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOperation): AppState {
   if (operation.type === "add_node") {
-    const nodeId = buildNextAiNodeId(state);
+    const nodeId = operation.id !== undefined && state.nodes.byId[operation.id] === undefined ? operation.id : buildNextAiNodeId(state);
     const withNode = appReducer(
       state,
       appActions.upsertNode({
@@ -47,6 +69,17 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
         endpointA: operation.endpointA,
         endpointB: operation.endpointB,
         sectionMm2: operation.sectionMm2
+      })
+    );
+  }
+  if (operation.type === "add_segment") {
+    return appReducer(
+      state,
+      appActions.upsertSegment({
+        id: buildNextAiSegmentId(state),
+        nodeA: operation.nodeA,
+        nodeB: operation.nodeB,
+        lengthMm: operation.lengthMm
       })
     );
   }
@@ -97,7 +130,22 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
                   : catalogItem.manufacturerReference,
               connectionCount:
                 typeof operation.fields.connectionCount === "number" ? operation.fields.connectionCount : catalogItem.connectionCount,
-              name: typeof operation.fields.name === "string" ? operation.fields.name : catalogItem.name
+              name: typeof operation.fields.name === "string" ? operation.fields.name : catalogItem.name,
+              unitPriceExclTax:
+                typeof operation.fields.unitPriceExclTax === "number" ? operation.fields.unitPriceExclTax : catalogItem.unitPriceExclTax,
+              url:
+                typeof operation.fields.url === "string" || operation.fields.url === undefined ? operation.fields.url : catalogItem.url,
+              additionalAccessories: Array.isArray(operation.fields.additionalAccessories)
+                ? (operation.fields.additionalAccessories as typeof catalogItem.additionalAccessories)
+                : catalogItem.additionalAccessories,
+              connectorDefaults:
+                typeof operation.fields.connectorDefaults === "object" && operation.fields.connectorDefaults !== null
+                  ? (operation.fields.connectorDefaults as typeof catalogItem.connectorDefaults)
+                  : catalogItem.connectorDefaults,
+              connectorLayout:
+                typeof operation.fields.connectorLayout === "object" && operation.fields.connectorLayout !== null
+                  ? (operation.fields.connectorLayout as typeof catalogItem.connectorLayout)
+                  : catalogItem.connectorLayout
             })
           );
     }
@@ -111,7 +159,24 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
               ...connector,
               name: typeof operation.fields.name === "string" ? operation.fields.name : connector.name,
               technicalId:
-                typeof operation.fields.technicalId === "string" ? operation.fields.technicalId : connector.technicalId
+                typeof operation.fields.technicalId === "string" ? operation.fields.technicalId : connector.technicalId,
+              cavityCount: typeof operation.fields.cavityCount === "number" ? operation.fields.cavityCount : connector.cavityCount,
+              manufacturerReference:
+                typeof operation.fields.manufacturerReference === "string" || operation.fields.manufacturerReference === undefined
+                  ? operation.fields.manufacturerReference
+                  : connector.manufacturerReference,
+              catalogItemId:
+                typeof operation.fields.catalogItemId === "string" || operation.fields.catalogItemId === undefined
+                  ? (operation.fields.catalogItemId as CatalogItemId | undefined)
+                  : connector.catalogItemId,
+              applyCatalogPlugs:
+                typeof operation.fields.applyCatalogPlugs === "boolean" ? operation.fields.applyCatalogPlugs : connector.applyCatalogPlugs,
+              applyCatalogSeals:
+                typeof operation.fields.applyCatalogSeals === "boolean" ? operation.fields.applyCatalogSeals : connector.applyCatalogSeals,
+              terminalOverrides:
+                typeof operation.fields.terminalOverrides === "object" && operation.fields.terminalOverrides !== null
+                  ? (operation.fields.terminalOverrides as typeof connector.terminalOverrides)
+                  : connector.terminalOverrides
             })
           );
     }
@@ -124,7 +189,16 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
             appActions.upsertSplice({
               ...splice,
               name: typeof operation.fields.name === "string" ? operation.fields.name : splice.name,
-              technicalId: typeof operation.fields.technicalId === "string" ? operation.fields.technicalId : splice.technicalId
+              technicalId: typeof operation.fields.technicalId === "string" ? operation.fields.technicalId : splice.technicalId,
+              portCount: typeof operation.fields.portCount === "number" ? operation.fields.portCount : splice.portCount,
+              manufacturerReference:
+                typeof operation.fields.manufacturerReference === "string" || operation.fields.manufacturerReference === undefined
+                  ? operation.fields.manufacturerReference
+                  : splice.manufacturerReference,
+              catalogItemId:
+                typeof operation.fields.catalogItemId === "string" || operation.fields.catalogItemId === undefined
+                  ? (operation.fields.catalogItemId as CatalogItemId | undefined)
+                  : splice.catalogItemId
             })
           );
     }
@@ -161,12 +235,59 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
       ? state
       : appReducer(
           state,
-          appActions.upsertWire({
-            ...wire,
+          appActions.saveWire({
+            id: wire.id,
             name: typeof operation.fields.name === "string" ? operation.fields.name : wire.name,
-            technicalId: typeof operation.fields.technicalId === "string" ? operation.fields.technicalId : wire.technicalId
+            technicalId: typeof operation.fields.technicalId === "string" ? operation.fields.technicalId : wire.technicalId,
+            twistGroupLabel:
+              typeof operation.fields.twistGroupLabel === "string" || operation.fields.twistGroupLabel === undefined
+                ? operation.fields.twistGroupLabel
+                : wire.twistGroupLabel,
+            functionalDomainTag:
+              typeof operation.fields.functionalDomainTag === "string" || operation.fields.functionalDomainTag === undefined
+                ? operation.fields.functionalDomainTag
+                : wire.functionalDomainTag,
+            sectionMm2: typeof operation.fields.sectionMm2 === "number" ? operation.fields.sectionMm2 : wire.sectionMm2,
+            currentA:
+              typeof operation.fields.currentA === "number" || operation.fields.currentA === undefined
+                ? operation.fields.currentA
+                : wire.currentA,
+            material:
+              operation.fields.material === "copper" || operation.fields.material === "aluminum"
+                ? operation.fields.material
+                : wire.material,
+            colorMode:
+              operation.fields.colorMode === "none" || operation.fields.colorMode === "catalog" || operation.fields.colorMode === "free"
+                ? operation.fields.colorMode
+                : wire.colorMode,
+            primaryColorId:
+              typeof operation.fields.primaryColorId === "string" || operation.fields.primaryColorId === null
+                ? operation.fields.primaryColorId
+                : wire.primaryColorId,
+            secondaryColorId:
+              typeof operation.fields.secondaryColorId === "string" || operation.fields.secondaryColorId === null
+                ? operation.fields.secondaryColorId
+                : wire.secondaryColorId,
+            freeColorLabel:
+              typeof operation.fields.freeColorLabel === "string" || operation.fields.freeColorLabel === null
+                ? operation.fields.freeColorLabel
+                : wire.freeColorLabel,
+            endpointA: isWireEndpoint(operation.fields.endpointA) ? operation.fields.endpointA : wire.endpointA,
+            endpointB: isWireEndpoint(operation.fields.endpointB) ? operation.fields.endpointB : wire.endpointB,
+            endpointAConnectionReference: wire.endpointAConnectionReference,
+            endpointAConnectionName: wire.endpointAConnectionName,
+            endpointASealReference: wire.endpointASealReference,
+            endpointASealName: wire.endpointASealName,
+            endpointBConnectionReference: wire.endpointBConnectionReference,
+            endpointBConnectionName: wire.endpointBConnectionName,
+            endpointBSealReference: wire.endpointBSealReference,
+            endpointBSealName: wire.endpointBSealName,
+            protection: wire.protection
           })
         );
+  }
+  if (operation.type === "delete_entity") {
+    return appReducer(state, appActions.removeWire(operation.entityId as WireId));
   }
   return state;
 }

@@ -36,6 +36,10 @@ function hasChanged(left: unknown, right: unknown): boolean {
   return left !== right;
 }
 
+function hasDeepChanged(left: unknown, right: unknown): boolean {
+  return JSON.stringify(left ?? null) !== JSON.stringify(right ?? null);
+}
+
 function isWireEndpoint(value: unknown): value is WireEndpoint {
   if (!isRecord(value)) {
     return false;
@@ -115,15 +119,49 @@ function nodeEntityReference(node: AiAgentEditableNode): {
 
 function pushConnectorUpdate(
   operations: AiAgentSupportedOperation[],
-  before: Pick<Connector, "id" | "name" | "technicalId">,
-  after: Pick<Connector, "id" | "name" | "technicalId">
+  before: Pick<
+    Connector,
+    | "id"
+    | "name"
+    | "technicalId"
+    | "cavityCount"
+    | "manufacturerReference"
+    | "catalogItemId"
+    | "applyCatalogPlugs"
+    | "applyCatalogSeals"
+    | "terminalOverrides"
+  >,
+  after: Pick<
+    Connector,
+    | "id"
+    | "name"
+    | "technicalId"
+    | "cavityCount"
+    | "manufacturerReference"
+    | "catalogItemId"
+    | "applyCatalogPlugs"
+    | "applyCatalogSeals"
+    | "terminalOverrides"
+  >
 ) {
   const fields: Record<string, unknown> = {};
-  if (hasChanged(before.name, after.name)) {
-    fields.name = after.name;
-  }
-  if (hasChanged(before.technicalId, after.technicalId)) {
-    fields.technicalId = after.technicalId;
+  (
+    [
+      "name",
+      "technicalId",
+      "cavityCount",
+      "manufacturerReference",
+      "catalogItemId",
+      "applyCatalogPlugs",
+      "applyCatalogSeals"
+    ] as const
+  ).forEach((field) => {
+    if (hasChanged(before[field], after[field])) {
+      fields[field] = after[field];
+    }
+  });
+  if (hasDeepChanged(before.terminalOverrides, after.terminalOverrides)) {
+    fields.terminalOverrides = after.terminalOverrides;
   }
   if (Object.keys(fields).length > 0) {
     operations.push({ type: "update_entity", entityKind: "connector", entityId: before.id, fields });
@@ -132,19 +170,42 @@ function pushConnectorUpdate(
 
 function pushCatalogItemUpdate(
   operations: AiAgentSupportedOperation[],
-  before: Pick<CatalogItem, "id" | "manufacturerReference" | "connectionCount" | "name">,
-  after: Pick<CatalogItem, "id" | "manufacturerReference" | "connectionCount" | "name">
+  before: Pick<
+    CatalogItem,
+    | "id"
+    | "manufacturerReference"
+    | "connectionCount"
+    | "name"
+    | "unitPriceExclTax"
+    | "url"
+    | "additionalAccessories"
+    | "connectorDefaults"
+    | "connectorLayout"
+  >,
+  after: Pick<
+    CatalogItem,
+    | "id"
+    | "manufacturerReference"
+    | "connectionCount"
+    | "name"
+    | "unitPriceExclTax"
+    | "url"
+    | "additionalAccessories"
+    | "connectorDefaults"
+    | "connectorLayout"
+  >
 ) {
   const fields: Record<string, unknown> = {};
-  if (hasChanged(before.manufacturerReference, after.manufacturerReference)) {
-    fields.manufacturerReference = after.manufacturerReference;
-  }
-  if (hasChanged(before.connectionCount, after.connectionCount)) {
-    fields.connectionCount = after.connectionCount;
-  }
-  if (hasChanged(before.name, after.name)) {
-    fields.name = after.name;
-  }
+  (["manufacturerReference", "connectionCount", "name", "unitPriceExclTax", "url"] as const).forEach((field) => {
+    if (hasChanged(before[field], after[field])) {
+      fields[field] = after[field];
+    }
+  });
+  (["additionalAccessories", "connectorDefaults", "connectorLayout"] as const).forEach((field) => {
+    if (hasDeepChanged(before[field], after[field])) {
+      fields[field] = after[field];
+    }
+  });
   if (Object.keys(fields).length > 0) {
     operations.push({ type: "update_entity", entityKind: "catalog", entityId: before.id, fields });
   }
@@ -152,16 +213,15 @@ function pushCatalogItemUpdate(
 
 function pushSpliceUpdate(
   operations: AiAgentSupportedOperation[],
-  before: Pick<Splice, "id" | "name" | "technicalId">,
-  after: Pick<Splice, "id" | "name" | "technicalId">
+  before: Pick<Splice, "id" | "name" | "technicalId" | "portCount" | "manufacturerReference" | "catalogItemId">,
+  after: Pick<Splice, "id" | "name" | "technicalId" | "portCount" | "manufacturerReference" | "catalogItemId">
 ) {
   const fields: Record<string, unknown> = {};
-  if (hasChanged(before.name, after.name)) {
-    fields.name = after.name;
-  }
-  if (hasChanged(before.technicalId, after.technicalId)) {
-    fields.technicalId = after.technicalId;
-  }
+  (["name", "technicalId", "portCount", "manufacturerReference", "catalogItemId"] as const).forEach((field) => {
+    if (hasChanged(before[field], after[field])) {
+      fields[field] = after[field];
+    }
+  });
   if (Object.keys(fields).length > 0) {
     operations.push({ type: "update_entity", entityKind: "splice", entityId: before.id, fields });
   }
@@ -169,15 +229,66 @@ function pushSpliceUpdate(
 
 function pushWireUpdate(
   operations: AiAgentSupportedOperation[],
-  before: Pick<Wire, "id" | "name" | "technicalId">,
-  after: Pick<Wire, "id" | "name" | "technicalId">
+  before: Pick<
+    Wire,
+    | "id"
+    | "name"
+    | "technicalId"
+    | "twistGroupLabel"
+    | "functionalDomainTag"
+    | "sectionMm2"
+    | "currentA"
+    | "material"
+    | "colorMode"
+    | "primaryColorId"
+    | "secondaryColorId"
+    | "freeColorLabel"
+    | "endpointA"
+    | "endpointB"
+  >,
+  after: Pick<
+    Wire,
+    | "id"
+    | "name"
+    | "technicalId"
+    | "twistGroupLabel"
+    | "functionalDomainTag"
+    | "sectionMm2"
+    | "currentA"
+    | "material"
+    | "colorMode"
+    | "primaryColorId"
+    | "secondaryColorId"
+    | "freeColorLabel"
+    | "endpointA"
+    | "endpointB"
+  >
 ) {
   const fields: Record<string, unknown> = {};
-  if (hasChanged(before.name, after.name)) {
-    fields.name = after.name;
+  (
+    [
+      "name",
+      "technicalId",
+      "twistGroupLabel",
+      "functionalDomainTag",
+      "sectionMm2",
+      "currentA",
+      "material",
+      "colorMode",
+      "primaryColorId",
+      "secondaryColorId",
+      "freeColorLabel"
+    ] as const
+  ).forEach((field) => {
+    if (hasChanged(before[field], after[field])) {
+      fields[field] = after[field];
+    }
+  });
+  if (hasDeepChanged(before.endpointA, after.endpointA)) {
+    fields.endpointA = after.endpointA;
   }
-  if (hasChanged(before.technicalId, after.technicalId)) {
-    fields.technicalId = after.technicalId;
+  if (hasDeepChanged(before.endpointB, after.endpointB)) {
+    fields.endpointB = after.endpointB;
   }
   if (Object.keys(fields).length > 0) {
     operations.push({ type: "update_entity", entityKind: "wire", entityId: before.id, fields });
@@ -259,6 +370,9 @@ export function buildAiAgentOperationsFromPlanDiff(
   for (const node of modifiedPlan.nodes) {
     const before = beforeNodes.get(node.id);
     if (before === undefined) {
+      if (node.kind === "intermediate" && node.position !== undefined) {
+        operations.push({ type: "add_node", id: node.id, label: node.label, position: node.position });
+      }
       continue;
     }
     if (before.kind === "intermediate" && node.kind === "intermediate" && hasChanged(before.label, node.label)) {
@@ -272,6 +386,12 @@ export function buildAiAgentOperationsFromPlanDiff(
   for (const segment of modifiedPlan.segments) {
     const before = beforeSegments.get(segment.id);
     if (before === undefined) {
+      operations.push({
+        type: "add_segment",
+        nodeA: segment.nodeA,
+        nodeB: segment.nodeB,
+        lengthMm: segment.lengthMm
+      });
       continue;
     }
     pushSegmentUpdate(operations, before, segment);
@@ -284,6 +404,12 @@ export function buildAiAgentOperationsFromPlanDiff(
       continue;
     }
     pushWireUpdate(operations, before, wire);
+  }
+  const modifiedWireIds = new Set(modifiedPlan.wires.map((wire) => wire.id));
+  for (const wire of beforePlan.wires) {
+    if (!modifiedWireIds.has(wire.id)) {
+      operations.push({ type: "delete_entity", entityKind: "wire", entityId: wire.id });
+    }
   }
 
   return operations;

@@ -35,13 +35,57 @@ export interface AiAgentContext {
   selection: SelectionState | null;
   summary: AiAgentContextSummary;
   entities: {
-    connectors: Array<Pick<Connector, "id" | "name" | "technicalId" | "cavityCount">>;
-    splices: Array<Pick<Splice, "id" | "name" | "technicalId" | "portCount" | "portMode">>;
-    catalogItems: Array<Pick<CatalogItem, "id" | "manufacturerReference" | "connectionCount" | "name">>;
+    connectors: Array<
+      Pick<
+        Connector,
+        | "id"
+        | "name"
+        | "technicalId"
+        | "cavityCount"
+        | "manufacturerReference"
+        | "catalogItemId"
+        | "applyCatalogPlugs"
+        | "applyCatalogSeals"
+        | "terminalOverrides"
+      >
+    >;
+    splices: Array<Pick<Splice, "id" | "name" | "technicalId" | "portCount" | "portMode" | "manufacturerReference" | "catalogItemId">>;
+    catalogItems: Array<
+      Pick<
+        CatalogItem,
+        | "id"
+        | "manufacturerReference"
+        | "connectionCount"
+        | "name"
+        | "unitPriceExclTax"
+        | "url"
+        | "additionalAccessories"
+        | "connectorDefaults"
+        | "connectorLayout"
+      >
+    >;
     nodes: NetworkNode[];
     segments: Array<Pick<Segment, "id" | "nodeA" | "nodeB" | "lengthMm" | "subNetworkTag">>;
     wires: Array<
-      Pick<Wire, "id" | "name" | "technicalId" | "endpointA" | "endpointB" | "routeSegmentIds" | "lengthMm" | "sectionMm2">
+      Pick<
+        Wire,
+        | "id"
+        | "name"
+        | "technicalId"
+        | "endpointA"
+        | "endpointB"
+        | "routeSegmentIds"
+        | "lengthMm"
+        | "sectionMm2"
+        | "twistGroupLabel"
+        | "functionalDomainTag"
+        | "currentA"
+        | "material"
+        | "colorMode"
+        | "primaryColorId"
+        | "secondaryColorId"
+        | "freeColorLabel"
+      >
     >;
     nodePositions: Record<string, LayoutNodePosition>;
   };

@@ -239,7 +239,7 @@ describe("App integration UI - settings", () => {
     expect(screen.getByLabelText("Instruction")).toBeInTheDocument();
     expect(screen.getByLabelText("Target scope")).toHaveValue("activeNetwork");
     expect(screen.getByLabelText("Agent mode")).toHaveValue("assisted");
-    expect(screen.getByLabelText("Delete entities")).toBeDisabled();
+    expect(screen.getByLabelText("Delete entities")).toBeEnabled();
     expect(screen.getByRole("button", { name: "Prepare proposal" })).toBeDisabled();
 
     fireEvent.change(screen.getByLabelText("Instruction"), {

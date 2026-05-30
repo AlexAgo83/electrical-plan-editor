@@ -42,6 +42,9 @@ describe("AI agent proposal draft", () => {
     });
 
     expect(draft.validation.accepted).toHaveLength(0);
-    expect(draft.validation.unsupported.map((issue) => issue.operationType)).toEqual(["delete_entity", "assign_endpoint"]);
+    expect(draft.validation.rejected).toEqual([
+      expect.objectContaining({ operationType: "delete_entity", message: "delete permission is disabled." })
+    ]);
+    expect(draft.validation.unsupported.map((issue) => issue.operationType)).toEqual(["assign_endpoint"]);
   });
 });

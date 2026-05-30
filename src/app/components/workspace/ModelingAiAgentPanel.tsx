@@ -32,7 +32,11 @@ function formatAiAgentValue(value: unknown): string {
   if (value === undefined) {
     return "cleared";
   }
-  return JSON.stringify(value) ?? String(value);
+  try {
+    return JSON.stringify(value) ?? "unserializable value";
+  } catch {
+    return "unserializable value";
+  }
 }
 
 function formatAiAgentOperationDetails(operation: AiAgentSupportedOperation): string {
@@ -57,13 +61,16 @@ function formatAiAgentOperationDetails(operation: AiAgentSupportedOperation): st
     return `${operation.technicalId} · ${operation.name} · ${operation.portCount} ports`;
   }
   if (operation.type === "add_node") {
-    return `${operation.label} · x: ${operation.position.x}, y: ${operation.position.y}`;
+    return `${operation.id === undefined ? "" : `${operation.id} · `}${operation.label} · x: ${operation.position.x}, y: ${operation.position.y}`;
   }
   if (operation.type === "add_segment") {
     return `${operation.nodeA} -> ${operation.nodeB} · ${operation.lengthMm} mm`;
   }
   if (operation.type === "add_wire") {
     return `${operation.technicalId} · ${operation.name} · ${operation.sectionMm2} mm2`;
+  }
+  if (operation.type === "delete_entity") {
+    return `${operation.entityKind} ${operation.entityId}`;
   }
   return `${operation.wireIds.length} wire${operation.wireIds.length === 1 ? "" : "s"}`;
 }
@@ -257,7 +264,11 @@ export function ModelingAiAgentPanel({
             Regenerate routes
           </label>
           <label className="settings-checkbox">
-            <input type="checkbox" checked={permissions.delete} disabled />
+            <input
+              type="checkbox"
+              checked={permissions.delete}
+              onChange={(event) => updatePermission("delete", event.target.checked)}
+            />
             Delete entities
           </label>
         </fieldset>

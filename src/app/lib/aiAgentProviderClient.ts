@@ -28,8 +28,8 @@ function buildProviderPrompt(context: AiAgentContext, instruction: string): stri
         modifiedPlan: editablePlan
       },
       editableFields:
-        "Only change existing scoped entities needed by the instruction, except add new wires to wires when the instruction asks for a new wire. For new wires include id, name, technicalId, endpointA, endpointB, and sectionMm2. For catalog requests, edit catalogItems fields such as manufacturerReference, name, or connectionCount. For rename requests, edit name or technicalId on the target entity. For movement, edit node.position on the connector/splice/intermediate node. Preserve ids and references.",
-      deferredChanges: ["assign_endpoint", "assign_catalog_reference", "delete_entity"],
+        "Only change existing scoped entities needed by the instruction. Add new intermediate nodes and segments when a requested wire needs missing topology. Add new wires to wires with id, name, technicalId, endpointA, endpointB, and sectionMm2. Modify existing wires by editing name, technicalId, endpoints, sectionMm2, currentA, material, color fields, twistGroupLabel, or functionalDomainTag. Delete wires by removing them from wires. For catalog requests, edit catalogItems fields such as manufacturerReference, name, connectionCount, unitPriceExclTax, url, additionalAccessories, connectorDefaults, or connectorLayout. For connector/splice requests, edit names, technical IDs, capacity, linked catalog refs, manufacturer refs, terminal overrides, and safe catalog-application flags. For movement, edit node.position on the connector/splice/intermediate node. Preserve ids and references unless intentionally deleting a wire.",
+      deferredChanges: ["assign_endpoint", "assign_catalog_reference"],
       compatibility:
         "If you cannot return modifiedPlan, you may return the legacy {schemaVersion, operations} contract, but modifiedPlan is preferred."
     },

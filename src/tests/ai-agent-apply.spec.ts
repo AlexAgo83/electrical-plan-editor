@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { CatalogItemId, ConnectorId, NetworkId, NodeId, WireId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NetworkId, NodeId, SegmentId, WireId } from "../core/entities";
 import { appActions, appReducer, createSampleNetworkState } from "../store";
 import { applyAiAgentAcceptedOperations } from "../app/lib/aiAgentApply";
 import type { AiAgentOperationValidationResult } from "../app/lib/aiAgentOperationContract";
@@ -185,5 +185,96 @@ describe("AI agent apply", () => {
         routeSegmentIds: ["H-SEG-001", "H-SEG-002"]
       })
     );
+  });
+
+  it("applies wire update operations through the normal wire save path", () => {
+    const state = createSampleNetworkState();
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "update_entity",
+          entityKind: "wire",
+          entityId: "W-001",
+          fields: {
+            name: "Renamed feed",
+            sectionMm2: 1.5,
+            endpointA: { kind: "connectorCavity", connectorId: "C-SRC", cavityIndex: 11 }
+          }
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.appliedCount).toBe(1);
+    expect(result.nextState.wires.byId["W-001" as WireId]).toEqual(
+      expect.objectContaining({
+        name: "Renamed feed",
+        sectionMm2: 1.5,
+        endpointA: { kind: "connectorCavity", connectorId: "C-SRC", cavityIndex: 11 }
+      })
+    );
+  });
+
+  it("applies accepted wire deletions", () => {
+    const state = createSampleNetworkState();
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "delete_entity",
+          entityKind: "wire",
+          entityId: "W-001"
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.appliedCount).toBe(1);
+    expect(result.nextState.wires.byId["W-001" as WireId]).toBeUndefined();
+  });
+
+  it("applies AI node IDs and segment additions in order", () => {
+    const state = createSampleNetworkState();
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "add_node",
+          id: "AI-NODE-900" as NodeId,
+          label: "AI route point",
+          position: { x: 320, y: 180 }
+        },
+        {
+          type: "add_segment",
+          nodeA: "N-C-SRC" as NodeId,
+          nodeB: "AI-NODE-900" as NodeId,
+          lengthMm: 40
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.appliedCount).toBe(2);
+    expect(result.nextState.nodes.byId["AI-NODE-900" as NodeId]).toEqual({
+      id: "AI-NODE-900",
+      kind: "intermediate",
+      label: "AI route point"
+    });
+    expect(result.nextState.segments.byId["AI-SEG-001" as SegmentId]).toEqual({
+      id: "AI-SEG-001",
+      nodeA: "N-C-SRC",
+      nodeB: "AI-NODE-900",
+      lengthMm: 40
+    });
   });
 });
