@@ -39,6 +39,15 @@ async function findBomPreviewDialog(): Promise<HTMLElement> {
   return screen.findByRole("dialog", { name: "BOM preview" });
 }
 
+async function selectBomPreviewSheet(previewDialog: HTMLElement, sheetName: RegExp): Promise<void> {
+  fireEvent.click(within(previewDialog).getByRole("tab", { name: sheetName }));
+
+  await waitFor(() => {
+    expect(within(previewDialog).getByRole("tab", { name: sheetName })).toHaveAttribute("aria-selected", "true");
+  });
+  expect(within(previewDialog).getByRole("tabpanel", { name: sheetName })).toBeInTheDocument();
+}
+
 describe("App integration UI - network summary BOM export", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -334,12 +343,7 @@ describe("App integration UI - network summary BOM export", () => {
     expect(within(previewDialog).getByText("Sheets")).toBeInTheDocument();
     expect(within(previewDialog).getAllByText("2").length).toBeGreaterThan(0);
     expect(within(previewDialog).getByRole("tab", { name: /Network BOM/ })).toHaveAttribute("aria-selected", "true");
-    const byConnectorTab = within(previewDialog).getByRole("tab", { name: /By connector/ });
-    fireEvent.click(byConnectorTab);
-
-    await waitFor(() => {
-      expect(byConnectorTab).toHaveAttribute("aria-selected", "true");
-    });
+    await selectBomPreviewSheet(previewDialog, /By connector/);
     expect(within(previewDialog).getByText("Connector ID")).toBeInTheDocument();
     expect(within(previewDialog).getByText("C-BOM-XLSX")).toBeInTheDocument();
   });
@@ -379,7 +383,7 @@ describe("App integration UI - network summary BOM export", () => {
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "BOM" }));
 
     const previewDialog = await findBomPreviewDialog();
-    fireEvent.click(within(previewDialog).getByRole("tab", { name: /By connector/ }));
+    await selectBomPreviewSheet(previewDialog, /By connector/);
     fireEvent.click(within(previewDialog).getByRole("button", { name: "CONN-BOM-LINK" }));
 
     expect(screen.queryByRole("dialog", { name: "BOM preview" })).toBeNull();
