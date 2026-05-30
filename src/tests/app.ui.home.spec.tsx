@@ -50,6 +50,28 @@ describe("home workspace screen", () => {
     expect(screen.queryByRole("button", { name: "Validation" })).not.toBeInTheDocument();
   });
 
+  it("exposes compact workspace storage actions in the operations panel", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    fireEvent.click(screen.getByRole("button", { name: "Ops" }));
+    const workspaceStoragePanel = screen.getByRole("region", { name: "Workspace storage" });
+
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Resume workspace file" })).toBeDisabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Open workspace file" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Link workspace file" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file now" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file as" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Unlink workspace file" })).toBeDisabled();
+    expect(within(workspaceStoragePanel).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
+      "Resume",
+      "Open",
+      "Link",
+      "Save now",
+      "Save as",
+      "Unlink"
+    ]);
+  });
+
   it("renders an auto-detected changelog feed in descending version order", () => {
     renderAppWithState(createUiIntegrationState());
 

@@ -218,6 +218,15 @@ describe("App integration UI - settings", () => {
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Link workspace file" })).toBeEnabled();
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file now" })).toBeEnabled();
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file as" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Unlink workspace file" })).toBeDisabled();
+    expect(within(workspaceStoragePanel).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
+      "Resume",
+      "Open",
+      "Link",
+      "Save now",
+      "Save as",
+      "Unlink"
+    ]);
   });
 
   it("configures AI provider readiness and gates the Modeling AI Agent entry", async () => {
