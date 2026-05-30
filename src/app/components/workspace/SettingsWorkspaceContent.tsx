@@ -553,6 +553,9 @@ export function SettingsWorkspaceContent({
           <span className="settings-state-chip">
             {workspaceFileStatus.directFileAccessSupported ? "Direct file access" : "Fallback download"}
           </span>
+          <span className={workspaceFileStatus.fileAvailability === "unavailable" ? "settings-state-chip is-warn" : "settings-state-chip"}>
+            File: {workspaceFileStatus.fileAvailability === "available" ? "Available" : workspaceFileStatus.fileAvailability === "unavailable" ? "Unavailable" : "Unknown"}
+          </span>
         </div>
         <dl className="settings-storage-details">
           <div>

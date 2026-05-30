@@ -52,6 +52,7 @@ export interface WorkspaceFileStorageStatus {
   resumeFileName: string | null;
   canResume: boolean;
   resumeStatus: "none" | "available" | "permission-required" | "unavailable";
+  fileAvailability: "unknown" | "available" | "unavailable";
   directFileAccessSupported: boolean;
   saveTarget: "local-cache" | "linked-file" | "download";
   lastSavedAtIso: string | null;
@@ -261,6 +262,7 @@ export function useWorkspaceFileStorage({
     resumeFileName: null,
     canResume: false,
     resumeStatus: "none",
+    fileAvailability: "unknown",
     directFileAccessSupported: isDirectFileAccessSupported(),
     saveTarget: "local-cache",
     lastSavedAtIso: null,
@@ -318,6 +320,7 @@ export function useWorkspaceFileStorage({
         resumeFileName: handle === null ? null : sourceLabel,
         canResume: handle !== null,
         resumeStatus: handle === null ? "none" : nextPermission === "granted" || nextPermission === "unknown" ? "available" : "permission-required",
+        fileAvailability: "available",
         directFileAccessSupported: isDirectFileAccessSupported(),
         saveTarget: handle === null ? "local-cache" : "linked-file",
         lastSavedAtIso: parsed.payload.updatedAtIso,
@@ -349,6 +352,7 @@ export function useWorkspaceFileStorage({
         resumeFileName: storedHandle.name,
         canResume: true,
         resumeStatus: "available",
+        fileAvailability: "unknown",
         directFileAccessSupported: isDirectFileAccessSupported(),
         message:
           current.mode === "linked"
@@ -367,6 +371,7 @@ export function useWorkspaceFileStorage({
           canResume: false,
           resumeFileName: null,
           resumeStatus: "unavailable",
+          fileAvailability: "unavailable",
           message: "No previous workspace file handle is available in this browser."
         }));
         notifyToast("Workspace file cannot be resumed", {
@@ -383,6 +388,7 @@ export function useWorkspaceFileStorage({
           ...current,
           canResume: true,
           resumeFileName: handle.name,
+          fileAvailability: "unavailable",
           message: "The previous workspace file could not be resumed. Try opening it again."
         }));
         notifyToast("Workspace file cannot be resumed", {
@@ -476,8 +482,9 @@ export function useWorkspaceFileStorage({
       } catch {
         setStatusBase((current) => ({
           ...current,
+          fileAvailability: "unavailable",
           isSaving: false,
-          message: "The linked workspace file could not be written. Local browser persistence remains active."
+          message: "The linked workspace file could not be written. It may be unavailable; local browser persistence remains active."
         }));
         return "failed";
       }
@@ -510,6 +517,7 @@ export function useWorkspaceFileStorage({
             resumeFileName: handle.name,
             canResume: true,
             resumeStatus: permission === "granted" || permission === "unknown" ? "available" : "permission-required",
+            fileAvailability: "available",
             directFileAccessSupported: isDirectFileAccessSupported(),
             saveTarget: "linked-file",
             lastSavedAtIso: payload.updatedAtIso,
@@ -547,6 +555,7 @@ export function useWorkspaceFileStorage({
         resumeFileName: current.resumeFileName,
         canResume: current.canResume,
         resumeStatus: current.resumeStatus,
+        fileAvailability: current.fileAvailability,
         directFileAccessSupported: isDirectFileAccessSupported(),
         saveTarget: "download",
         lastSavedAtIso: payload.updatedAtIso,
@@ -571,6 +580,7 @@ export function useWorkspaceFileStorage({
       resumeFileName: null,
       canResume: false,
       resumeStatus: "none",
+      fileAvailability: "unknown",
       directFileAccessSupported: isDirectFileAccessSupported(),
       saveTarget: "local-cache",
       lastSavedAtIso: null,
@@ -611,9 +621,14 @@ export function useWorkspaceFileStorage({
         }
       } catch {
         notifyToast("Workspace file cannot be opened", {
-          message: "The linked file could not be read.",
+          message: "The linked file could not be read. It may have been moved or deleted; relink it from Workspace storage.",
           variant: "error"
         });
+        setStatusBase((current) => ({
+          ...current,
+          fileAvailability: "unavailable",
+          message: "The linked file could not be read. It may have been moved or deleted; relink it from Workspace storage."
+        }));
       }
     })();
   }, [notifyToast]);
@@ -644,9 +659,15 @@ export function useWorkspaceFileStorage({
         }
       } catch {
         notifyToast("Workspace file cannot be opened", {
-          message: "The resumable file could not be read.",
+          message: "The resumable file could not be read. It may have been moved or deleted; relink it from Workspace storage.",
           variant: "error"
         });
+        setStatusBase((current) => ({
+          ...current,
+          fileAvailability: "unavailable",
+          resumeStatus: "unavailable",
+          message: "The resumable file could not be read. It may have been moved or deleted; relink it from Workspace storage."
+        }));
       }
     })();
   }, [notifyToast]);

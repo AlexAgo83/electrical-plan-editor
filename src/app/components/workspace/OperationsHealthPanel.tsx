@@ -90,6 +90,9 @@ export function OperationsHealthPanel({
         <p className="meta-line">
           Direct file access: {workspaceFileStatus.directFileAccessSupported ? "Supported" : "Fallback download only"}
         </p>
+        <p className="meta-line">
+          File availability: {workspaceFileStatus.fileAvailability === "available" ? "Available" : workspaceFileStatus.fileAvailability === "unavailable" ? "Unavailable" : "Unknown"}
+        </p>
         {workspaceFileStatus.fileName !== null ? <p className="meta-line">File: {workspaceFileStatus.fileName}</p> : null}
         {workspaceFileStatus.mode !== "linked" && workspaceFileStatus.resumeFileName !== null ? (
           <p className="meta-line">Resume: {workspaceFileStatus.resumeFileName}</p>
